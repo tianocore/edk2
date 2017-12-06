@@ -844,7 +844,7 @@ CFormPkg::DeclarePendingQuestion (
   // DisableIf
   CIfrDisableIf DIObj;
   DIObj.SetLineNo (LineNo);
-  *InsertOpcodeAddr = DIObj.GetObjBinAddr ();
+  *InsertOpcodeAddr = DIObj.GetObjBinAddr<CHAR8>();
   
   //TrueOpcode
   CIfrTrue TObj (LineNo);
@@ -1925,7 +1925,7 @@ CIfrRecordInfoDB::IfrCreateDefaultForQuestion (
           Obj = new CIfrObj (pOpHead->OpCode, NULL, pSNode->mBinBufLen, FALSE);
           assert (Obj != NULL);
           Obj->SetLineNo (pSNode->mLineNo);
-          ObjBinBuf = Obj->GetObjBinAddr();
+          ObjBinBuf = Obj->GetObjBinAddr<CHAR8>();
           memcpy (ObjBinBuf, pSNode->mIfrBinBuf, (UINTN)pSNode->mBinBufLen);
           delete Obj;
           pSNode = pSNode->mNext;

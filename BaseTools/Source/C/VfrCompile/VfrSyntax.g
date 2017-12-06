@@ -986,7 +986,7 @@ vfrStatementDefaultStore :
                                                     <<
                                                        if (gCVfrDefaultStore.DefaultIdRegistered (DefaultId) == FALSE) {
                                                          CIfrDefaultStore DSObj;
-                                                         _PCATCH(gCVfrDefaultStore.RegisterDefaultStore (DSObj.GetObjBinAddr(), N->getText(), _STOSID(S->getText(), S->getLine()), DefaultId)), D->getLine();
+                                                         _PCATCH(gCVfrDefaultStore.RegisterDefaultStore (DSObj.GetObjBinAddr<CHAR8>(), N->getText(), _STOSID(S->getText(), S->getLine()), DefaultId)), D->getLine();
                                                          DSObj.SetLineNo(D->getLine());
                                                          DSObj.SetDefaultName (_STOSID(S->getText(), S->getLine()));
                                                          DSObj.SetDefaultId (DefaultId);
@@ -1770,7 +1770,7 @@ vfrFormDefinition :
                                                         LObj3.SetNumber (0xffff);  //add end label for UEFI, label number hardcode 0xffff
                                                       }
 
-                                                      {CIfrEnd EObj; EObj.SetLineNo (E->getLine()); mLastFormEndAddr = EObj.GetObjBinAddr (); gAdjustOpcodeOffset = EObj.GetObjBinOffset ();}
+                                                      {CIfrEnd EObj; EObj.SetLineNo (E->getLine()); mLastFormEndAddr = EObj.GetObjBinAddr<CHAR8>(); gAdjustOpcodeOffset = EObj.GetObjBinOffset ();}
                                                     >>
   ";"
   ;
@@ -5675,7 +5675,7 @@ EfiVfrParser::_DeclareStandardDefaultStorage (
   //
   CIfrDefaultStore DSObj;
 
-  gCVfrDefaultStore.RegisterDefaultStore (DSObj.GetObjBinAddr(), (CHAR8 *) "Standard Defaults", EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_STANDARD);
+  gCVfrDefaultStore.RegisterDefaultStore (DSObj.GetObjBinAddr<CHAR8>(), (CHAR8 *) "Standard Defaults", EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_STANDARD);
   DSObj.SetLineNo (LineNo);
   DSObj.SetDefaultName (EFI_STRING_ID_INVALID);
   DSObj.SetDefaultId (EFI_HII_DEFAULT_CLASS_STANDARD);
@@ -5685,7 +5685,7 @@ EfiVfrParser::_DeclareStandardDefaultStorage (
   //
   CIfrDefaultStore DSObjMF;
 
-  gCVfrDefaultStore.RegisterDefaultStore (DSObjMF.GetObjBinAddr(), (CHAR8 *) "Standard ManuFacturing", EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_MANUFACTURING);
+  gCVfrDefaultStore.RegisterDefaultStore (DSObjMF.GetObjBinAddr<CHAR8>(), (CHAR8 *) "Standard ManuFacturing", EFI_STRING_ID_INVALID, EFI_HII_DEFAULT_CLASS_MANUFACTURING);
   DSObjMF.SetLineNo (LineNo);
   DSObjMF.SetDefaultName (EFI_STRING_ID_INVALID);
   DSObjMF.SetDefaultId (EFI_HII_DEFAULT_CLASS_MANUFACTURING);

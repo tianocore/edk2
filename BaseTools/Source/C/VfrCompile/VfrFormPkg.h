@@ -278,8 +278,9 @@ public:
     mLineNo = LineNo;
   }
 
-  inline CHAR8 * GetObjBinAddr (VOID) {
-    return mObjBinBuf;
+  template<typename T>
+  inline T * GetObjBinAddr (VOID) {
+    return reinterpret_cast<T *>(mObjBinBuf);
   }
 
   inline UINT32 GetObjBinOffset (VOID) {
@@ -665,8 +666,8 @@ private:
   EFI_GUID *mClassGuid;
 
 public:
-  CIfrFormSet (UINT8 Size) : CIfrObj (EFI_IFR_FORM_SET_OP, (CHAR8 **)&mFormSet, Size),
-                   CIfrOpHeader (EFI_IFR_FORM_SET_OP, &mFormSet->Header, Size) {
+  CIfrFormSet (UINT8 Size) : CIfrObj (EFI_IFR_FORM_SET_OP, (CHAR8 **)NULL, Size),
+                   CIfrOpHeader (EFI_IFR_FORM_SET_OP, &(GetObjBinAddr<EFI_IFR_FORM_SET>())->Header, Size), mFormSet(GetObjBinAddr<EFI_IFR_FORM_SET>()) {
     mFormSet->Help         = EFI_STRING_ID_INVALID;
     mFormSet->FormSetTitle = EFI_STRING_ID_INVALID;
     mFormSet->Flags        = 0;
@@ -696,12 +697,9 @@ public:
 };
 
 class CIfrEnd : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_END  *mEnd;
-
 public:
-  CIfrEnd () : CIfrObj (EFI_IFR_END_OP, (CHAR8 **)&mEnd),
-               CIfrOpHeader (EFI_IFR_END_OP, &mEnd->Header) {}
+  CIfrEnd () : CIfrObj (EFI_IFR_END_OP),
+               CIfrOpHeader (EFI_IFR_END_OP, &(GetObjBinAddr<EFI_IFR_END>())->Header) {}
 };
 
 class CIfrDefaultStore : public CIfrObj, public CIfrOpHeader {
@@ -709,8 +707,8 @@ private:
   EFI_IFR_DEFAULTSTORE *mDefaultStore;
 
 public:
-  CIfrDefaultStore () : CIfrObj (EFI_IFR_DEFAULTSTORE_OP, (CHAR8 **)&mDefaultStore),
-                       CIfrOpHeader (EFI_IFR_DEFAULTSTORE_OP, &mDefaultStore->Header) {
+  CIfrDefaultStore () : CIfrObj (EFI_IFR_DEFAULTSTORE_OP),
+                       CIfrOpHeader (EFI_IFR_DEFAULTSTORE_OP, &(GetObjBinAddr<EFI_IFR_DEFAULTSTORE>())->Header), mDefaultStore(GetObjBinAddr<EFI_IFR_DEFAULTSTORE>()) {
     mDefaultStore->DefaultId   = EFI_VARSTORE_ID_INVALID;
     mDefaultStore->DefaultName = EFI_STRING_ID_INVALID;
   }
@@ -751,8 +749,8 @@ private:
   EFI_IFR_FORM  *mForm;
 
 public:
-  CIfrForm () : CIfrObj (EFI_IFR_FORM_OP, (CHAR8 **)&mForm), 
-                CIfrOpHeader (EFI_IFR_FORM_OP, &mForm->Header) {
+  CIfrForm () : CIfrObj (EFI_IFR_FORM_OP),
+                CIfrOpHeader (EFI_IFR_FORM_OP, &(GetObjBinAddr<EFI_IFR_FORM>())->Header), mForm(GetObjBinAddr<EFI_IFR_FORM>()) {
     mForm->FormId    = 0;
     mForm->FormTitle = EFI_STRING_ID_INVALID;
   }
@@ -783,8 +781,8 @@ private:
   EFI_IFR_FORM_MAP_METHOD *mMethodMap;
 
 public:
-  CIfrFormMap () : CIfrObj (EFI_IFR_FORM_MAP_OP, (CHAR8 **)&mFormMap, sizeof (EFI_IFR_FORM_MAP), TRUE), 
-                   CIfrOpHeader (EFI_IFR_FORM_MAP_OP, &mFormMap->Header) {
+  CIfrFormMap () : CIfrObj (EFI_IFR_FORM_MAP_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_FORM_MAP), TRUE),
+                   CIfrOpHeader (EFI_IFR_FORM_MAP_OP, &(GetObjBinAddr<EFI_IFR_FORM_MAP>())->Header), mFormMap(GetObjBinAddr<EFI_IFR_FORM_MAP>()) {
     mFormMap->FormId = 0;
     mMethodMap       = (EFI_IFR_FORM_MAP_METHOD *) (mFormMap + 1);
   }
@@ -820,8 +818,8 @@ private:
   EFI_IFR_VARSTORE *mVarStore;
 
 public:
-  CIfrVarStore () : CIfrObj (EFI_IFR_VARSTORE_OP, (CHAR8 **)&mVarStore, sizeof (EFI_IFR_VARSTORE), TRUE), 
-                   CIfrOpHeader (EFI_IFR_VARSTORE_OP, &mVarStore->Header) {
+  CIfrVarStore () : CIfrObj (EFI_IFR_VARSTORE_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_VARSTORE), TRUE),
+                   CIfrOpHeader (EFI_IFR_VARSTORE_OP, &(GetObjBinAddr<EFI_IFR_VARSTORE>())->Header), mVarStore(GetObjBinAddr<EFI_IFR_VARSTORE>()) {
     mVarStore->VarStoreId = EFI_VARSTORE_ID_INVALID;
     mVarStore->Size       = 0;
     memset (&mVarStore->Guid, 0, sizeof (EFI_GUID));
@@ -860,8 +858,8 @@ private:
   EFI_IFR_VARSTORE_EFI *mVarStoreEfi;
 
 public:
-  CIfrVarStoreEfi () : CIfrObj (EFI_IFR_VARSTORE_EFI_OP, (CHAR8 **)&mVarStoreEfi, sizeof (EFI_IFR_VARSTORE_EFI), TRUE),
-                      CIfrOpHeader (EFI_IFR_VARSTORE_EFI_OP, &mVarStoreEfi->Header) {
+  CIfrVarStoreEfi () : CIfrObj (EFI_IFR_VARSTORE_EFI_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_VARSTORE_EFI), TRUE),
+                      CIfrOpHeader (EFI_IFR_VARSTORE_EFI_OP, &(GetObjBinAddr<EFI_IFR_VARSTORE_EFI>())->Header), mVarStoreEfi(GetObjBinAddr<EFI_IFR_VARSTORE_EFI>()) {
     mVarStoreEfi->VarStoreId = EFI_VAROFFSET_INVALID;
     mVarStoreEfi->Size       = 0;
     memset (&mVarStoreEfi->Guid, 0, sizeof (EFI_GUID));
@@ -916,8 +914,8 @@ private:
   EFI_IFR_VARSTORE_NAME_VALUE *mVarStoreNameValue;
 
 public:
-  CIfrVarStoreNameValue () : CIfrObj (EFI_IFR_VARSTORE_NAME_VALUE_OP, (CHAR8 **)&mVarStoreNameValue), 
-                              CIfrOpHeader (EFI_IFR_VARSTORE_NAME_VALUE_OP, &mVarStoreNameValue->Header) {
+  CIfrVarStoreNameValue () : CIfrObj (EFI_IFR_VARSTORE_NAME_VALUE_OP),
+                              CIfrOpHeader (EFI_IFR_VARSTORE_NAME_VALUE_OP, &(GetObjBinAddr<EFI_IFR_VARSTORE_NAME_VALUE>())->Header), mVarStoreNameValue(GetObjBinAddr<EFI_IFR_VARSTORE_NAME_VALUE>()) {
     mVarStoreNameValue->VarStoreId = EFI_VAROFFSET_INVALID;
     memset (&mVarStoreNameValue->Guid, 0, sizeof (EFI_GUID));
   }
@@ -936,8 +934,8 @@ private:
   EFI_IFR_IMAGE *mImage;
 
 public:
-  CIfrImage () : CIfrObj (EFI_IFR_IMAGE_OP, (CHAR8 **)&mImage),
-                 CIfrOpHeader (EFI_IFR_IMAGE_OP, &mImage->Header) {
+  CIfrImage () : CIfrObj (EFI_IFR_IMAGE_OP),
+                 CIfrOpHeader (EFI_IFR_IMAGE_OP, &(GetObjBinAddr<EFI_IFR_IMAGE>())->Header), mImage(GetObjBinAddr<EFI_IFR_IMAGE>()) {
     mImage->Id = EFI_IMAGE_ID_INVALID;
   }
 
@@ -947,23 +945,17 @@ public:
 };
 
 class CIfrModal : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_MODAL_TAG *mModal;
-
 public:
-  CIfrModal () : CIfrObj (EFI_IFR_MODAL_TAG_OP, (CHAR8 **)&mModal),
-                 CIfrOpHeader (EFI_IFR_MODAL_TAG_OP, &mModal->Header) {
+  CIfrModal () : CIfrObj (EFI_IFR_MODAL_TAG_OP),
+                 CIfrOpHeader (EFI_IFR_MODAL_TAG_OP, &(GetObjBinAddr<EFI_IFR_MODAL_TAG>())->Header) {
   }
 };
 
 
 class CIfrLocked : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_LOCKED *mLocked;
-
 public:
-  CIfrLocked () : CIfrObj (EFI_IFR_LOCKED_OP, (CHAR8 **)&mLocked),
-                  CIfrOpHeader (EFI_IFR_LOCKED_OP, &mLocked->Header) {}
+  CIfrLocked () : CIfrObj (EFI_IFR_LOCKED_OP),
+                  CIfrOpHeader (EFI_IFR_LOCKED_OP, &(GetObjBinAddr<EFI_IFR_LOCKED>())->Header) {}
 };
 
 class CIfrRule : public CIfrObj, public CIfrOpHeader {
@@ -971,9 +963,8 @@ private:
   EFI_IFR_RULE *mRule;
 
 public:
-  CIfrRule () : CIfrObj (EFI_IFR_RULE_OP, (CHAR8 **)&mRule),
-                mRule ((EFI_IFR_RULE *)GetObjBinAddr()),
-                CIfrOpHeader (EFI_IFR_RULE_OP, &mRule->Header) {
+  CIfrRule () : CIfrObj (EFI_IFR_RULE_OP),
+                CIfrOpHeader (EFI_IFR_RULE_OP, &(GetObjBinAddr<EFI_IFR_RULE>())->Header), mRule(GetObjBinAddr<EFI_IFR_RULE>()) {
     mRule->RuleId = EFI_RULE_ID_INVALID;
   }
 
@@ -994,8 +985,8 @@ public:
     IN UINT16             DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD,
     IN UINT8              Type      = EFI_IFR_TYPE_OTHER,
     IN EFI_IFR_TYPE_VALUE Value     = gZeroEfiIfrTypeValue
-    ) : CIfrObj (EFI_IFR_DEFAULT_OP, (CHAR8 **)&mDefault, Size),
-        CIfrOpHeader (EFI_IFR_DEFAULT_OP, &mDefault->Header, Size) {
+    ) : CIfrObj (EFI_IFR_DEFAULT_OP, (CHAR8 **)NULL, Size),
+        CIfrOpHeader (EFI_IFR_DEFAULT_OP, &(GetObjBinAddr<EFI_IFR_DEFAULT>())->Header, Size), mDefault(GetObjBinAddr<EFI_IFR_DEFAULT>()) {
     mDefault->Type      = Type;
     mDefault->DefaultId = DefaultId;
     memmove (&(mDefault->Value), &Value, Size - OFFSET_OF (EFI_IFR_DEFAULT, Value));
@@ -1022,8 +1013,8 @@ public:
   CIfrDefault2 (
     IN UINT16             DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD,
     IN UINT8              Type      = EFI_IFR_TYPE_OTHER
-    ) : CIfrObj (EFI_IFR_DEFAULT_OP, (CHAR8 **)&mDefault, sizeof (EFI_IFR_DEFAULT_2)),
-        CIfrOpHeader (EFI_IFR_DEFAULT_OP, &mDefault->Header, sizeof (EFI_IFR_DEFAULT_2)) {
+    ) : CIfrObj (EFI_IFR_DEFAULT_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_DEFAULT_2)),
+        CIfrOpHeader (EFI_IFR_DEFAULT_OP, &(GetObjBinAddr<EFI_IFR_DEFAULT_2>())->Header, sizeof (EFI_IFR_DEFAULT_2)), mDefault(GetObjBinAddr<EFI_IFR_DEFAULT_2>()) {
     mDefault->Type      = Type;
     mDefault->DefaultId = DefaultId;
   }
@@ -1038,32 +1029,23 @@ public:
 };
 
 class CIfrValue : public CIfrObj, public CIfrOpHeader{
-private:
-  EFI_IFR_VALUE *mValue;
-
 public:
-  CIfrValue () : CIfrObj (EFI_IFR_VALUE_OP, (CHAR8 **)&mValue),
-                CIfrOpHeader (EFI_IFR_VALUE_OP, &mValue->Header) {}
+  CIfrValue () : CIfrObj (EFI_IFR_VALUE_OP),
+                CIfrOpHeader (EFI_IFR_VALUE_OP, &(GetObjBinAddr<EFI_IFR_VALUE>())->Header) {}
 
 };
 
 class CIfrRead : public CIfrObj, public CIfrOpHeader{
-private:
-  EFI_IFR_READ *mRead;
-
 public:
-  CIfrRead () : CIfrObj (EFI_IFR_READ_OP, (CHAR8 **)&mRead),
-                CIfrOpHeader (EFI_IFR_READ_OP, &mRead->Header) {}
+  CIfrRead () : CIfrObj (EFI_IFR_READ_OP),
+                CIfrOpHeader (EFI_IFR_READ_OP, &(GetObjBinAddr<EFI_IFR_READ>())->Header) {}
 
 };
 
 class CIfrWrite : public CIfrObj, public CIfrOpHeader{
-private:
-  EFI_IFR_WRITE *mWrite;
-
 public:
-  CIfrWrite () : CIfrObj (EFI_IFR_WRITE_OP, (CHAR8 **)&mWrite),
-                CIfrOpHeader (EFI_IFR_WRITE_OP, &mWrite->Header) {}
+  CIfrWrite () : CIfrObj (EFI_IFR_WRITE_OP),
+                CIfrOpHeader (EFI_IFR_WRITE_OP, &(GetObjBinAddr<EFI_IFR_WRITE>())->Header) {}
 
 };
 
@@ -1074,8 +1056,8 @@ private:
 public:
   CIfrGet (
   IN UINT32 LineNo  
-  ) : CIfrObj (EFI_IFR_GET_OP, (CHAR8 **)&mGet),
-      CIfrOpHeader (EFI_IFR_GET_OP, &mGet->Header) {
+  ) : CIfrObj (EFI_IFR_GET_OP),
+      CIfrOpHeader (EFI_IFR_GET_OP, &(GetObjBinAddr<EFI_IFR_GET>())->Header), mGet(GetObjBinAddr<EFI_IFR_GET>()) {
     SetLineNo (LineNo);
   }
 
@@ -1094,8 +1076,8 @@ private:
 public:
   CIfrSet (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_SET_OP, (CHAR8 **)&mSet),
-      CIfrOpHeader (EFI_IFR_SET_OP, &mSet->Header) {
+  ) : CIfrObj (EFI_IFR_SET_OP),
+      CIfrOpHeader (EFI_IFR_SET_OP, &(GetObjBinAddr<EFI_IFR_SET>())->Header), mSet(GetObjBinAddr<EFI_IFR_SET>()) {
     SetLineNo (LineNo);
   }
 
@@ -1112,9 +1094,9 @@ private:
   EFI_IFR_SUBTITLE   *mSubtitle;
 
 public:
-  CIfrSubtitle () : CIfrObj (EFI_IFR_SUBTITLE_OP, (CHAR8 **)&mSubtitle),
-                  CIfrOpHeader (EFI_IFR_SUBTITLE_OP, &mSubtitle->Header),
-  CIfrStatementHeader (&mSubtitle->Statement) {
+  CIfrSubtitle () : CIfrObj (EFI_IFR_SUBTITLE_OP),
+                  CIfrOpHeader (EFI_IFR_SUBTITLE_OP, &(GetObjBinAddr<EFI_IFR_SUBTITLE>())->Header),
+  CIfrStatementHeader (&(GetObjBinAddr<EFI_IFR_SUBTITLE>())->Statement), mSubtitle(GetObjBinAddr<EFI_IFR_SUBTITLE>()) {
     mSubtitle->Flags = 0;
   }
 
@@ -1132,9 +1114,9 @@ private:
   EFI_IFR_TEXT *mText;
 
 public:
-  CIfrText () : CIfrObj (EFI_IFR_TEXT_OP, (CHAR8 **)&mText),
-               CIfrOpHeader (EFI_IFR_TEXT_OP, &mText->Header), 
-               CIfrStatementHeader (&mText->Statement) {
+  CIfrText () : CIfrObj (EFI_IFR_TEXT_OP),
+               CIfrOpHeader (EFI_IFR_TEXT_OP, &(GetObjBinAddr<EFI_IFR_TEXT>())->Header),
+               CIfrStatementHeader (&(GetObjBinAddr<EFI_IFR_TEXT>())->Statement), mText(GetObjBinAddr<EFI_IFR_TEXT>()) {
     mText->TextTwo = EFI_STRING_ID_INVALID;
   }
 
@@ -1148,9 +1130,9 @@ private:
   EFI_IFR_REF *mRef;
 
 public:
-  CIfrRef () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)&mRef),
-              CIfrOpHeader (EFI_IFR_REF_OP, &mRef->Header), 
-              CIfrQuestionHeader (&mRef->Question) {
+  CIfrRef () : CIfrObj (EFI_IFR_REF_OP),
+              CIfrOpHeader (EFI_IFR_REF_OP, &(GetObjBinAddr<EFI_IFR_REF>())->Header),
+              CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_REF>())->Question), mRef(GetObjBinAddr<EFI_IFR_REF>()) {
     mRef->FormId = 0;
   }
 
@@ -1164,9 +1146,9 @@ private:
   EFI_IFR_REF2 *mRef2;
 
 public:
-  CIfrRef2 () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)&mRef2, sizeof (EFI_IFR_REF2)),
-               CIfrOpHeader (EFI_IFR_REF_OP, &mRef2->Header, sizeof (EFI_IFR_REF2)), 
-               CIfrQuestionHeader (&mRef2->Question) {
+  CIfrRef2 () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_REF2)),
+               CIfrOpHeader (EFI_IFR_REF_OP, &(GetObjBinAddr<EFI_IFR_REF2>())->Header, sizeof (EFI_IFR_REF2)),
+               CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_REF2>())->Question), mRef2(GetObjBinAddr<EFI_IFR_REF2>()) {
     mRef2->FormId     = 0;
     mRef2->QuestionId = EFI_QUESTION_ID_INVALID;
   }
@@ -1185,9 +1167,9 @@ private:
   EFI_IFR_REF3 *mRef3;
 
 public:
-  CIfrRef3 () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)&mRef3, sizeof(EFI_IFR_REF3)),
-               CIfrOpHeader (EFI_IFR_REF_OP, &mRef3->Header, sizeof (EFI_IFR_REF3)), 
-               CIfrQuestionHeader (&mRef3->Question) {
+  CIfrRef3 () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)NULL, sizeof(EFI_IFR_REF3)),
+               CIfrOpHeader (EFI_IFR_REF_OP, &(GetObjBinAddr<EFI_IFR_REF3>())->Header, sizeof (EFI_IFR_REF3)),
+               CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_REF3>())->Question), mRef3(GetObjBinAddr<EFI_IFR_REF3>()) {
     mRef3->FormId     = 0;
     mRef3->QuestionId = EFI_QUESTION_ID_INVALID;
     memset (&mRef3->FormSetId, 0, sizeof (EFI_GUID));
@@ -1211,9 +1193,9 @@ private:
   EFI_IFR_REF4 *mRef4;
 
 public:
-  CIfrRef4 () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)&mRef4, sizeof(EFI_IFR_REF4)),
-               CIfrOpHeader (EFI_IFR_REF_OP, &mRef4->Header, sizeof(EFI_IFR_REF4)), 
-               CIfrQuestionHeader (&mRef4->Question) {
+  CIfrRef4 () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)NULL, sizeof(EFI_IFR_REF4)),
+               CIfrOpHeader (EFI_IFR_REF_OP, &(GetObjBinAddr<EFI_IFR_REF4>())->Header, sizeof(EFI_IFR_REF4)),
+               CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_REF4>())->Question), mRef4(GetObjBinAddr<EFI_IFR_REF4>()) {
     mRef4->FormId     = 0;
     mRef4->QuestionId = EFI_QUESTION_ID_INVALID;
     memset (&mRef4->FormSetId, 0, sizeof (EFI_GUID));
@@ -1238,13 +1220,10 @@ public:
 };
 
 class CIfrRef5 : public CIfrObj, public CIfrOpHeader, public CIfrQuestionHeader {
-private:
-  EFI_IFR_REF5 *mRef5;
-
 public:
-  CIfrRef5 () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)&mRef5, sizeof (EFI_IFR_REF5)),
-              CIfrOpHeader (EFI_IFR_REF_OP, &mRef5->Header, sizeof (EFI_IFR_REF5)), 
-              CIfrQuestionHeader (&mRef5->Question) {
+  CIfrRef5 () : CIfrObj (EFI_IFR_REF_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_REF5)),
+              CIfrOpHeader (EFI_IFR_REF_OP, &(GetObjBinAddr<EFI_IFR_REF5>())->Header, sizeof (EFI_IFR_REF5)),
+              CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_REF5>())->Question) {
   }
 };
 
@@ -1253,9 +1232,9 @@ private:
   EFI_IFR_RESET_BUTTON *mResetButton;
 
 public:
-  CIfrResetButton () : CIfrObj (EFI_IFR_RESET_BUTTON_OP, (CHAR8 **)&mResetButton),
-                       CIfrOpHeader (EFI_IFR_RESET_BUTTON_OP, &mResetButton->Header), 
-  CIfrStatementHeader (&mResetButton->Statement) {
+  CIfrResetButton () : CIfrObj (EFI_IFR_RESET_BUTTON_OP),
+                       CIfrOpHeader (EFI_IFR_RESET_BUTTON_OP, &(GetObjBinAddr<EFI_IFR_RESET_BUTTON>())->Header),
+  CIfrStatementHeader (&(GetObjBinAddr<EFI_IFR_RESET_BUTTON>())->Statement), mResetButton(GetObjBinAddr<EFI_IFR_RESET_BUTTON>()) {
     mResetButton->DefaultId = EFI_HII_DEFAULT_CLASS_STANDARD;
   }
 
@@ -1269,9 +1248,9 @@ private:
   EFI_IFR_CHECKBOX *mCheckBox;
 
 public:
-  CIfrCheckBox () : CIfrObj (EFI_IFR_CHECKBOX_OP, (CHAR8 **)&mCheckBox),
-                     CIfrOpHeader (EFI_IFR_CHECKBOX_OP, &mCheckBox->Header), 
-                     CIfrQuestionHeader (&mCheckBox->Question) {
+  CIfrCheckBox () : CIfrObj (EFI_IFR_CHECKBOX_OP),
+                     CIfrOpHeader (EFI_IFR_CHECKBOX_OP, &(GetObjBinAddr<EFI_IFR_CHECKBOX>())->Header),
+                     CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_CHECKBOX>())->Question), mCheckBox(GetObjBinAddr<EFI_IFR_CHECKBOX>()) {
     mCheckBox->Flags = 0;
     gCurrentQuestion  = this;
   }
@@ -1309,9 +1288,9 @@ private:
   EFI_IFR_ACTION *mAction;
 
 public:
-  CIfrAction () : CIfrObj (EFI_IFR_ACTION_OP, (CHAR8 **)&mAction),
-                 CIfrOpHeader (EFI_IFR_ACTION_OP, &mAction->Header), 
-                 CIfrQuestionHeader (&mAction->Question) {
+  CIfrAction () : CIfrObj (EFI_IFR_ACTION_OP),
+                 CIfrOpHeader (EFI_IFR_ACTION_OP, &(GetObjBinAddr<EFI_IFR_ACTION>())->Header),
+                 CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_ACTION>())->Question), mAction(GetObjBinAddr<EFI_IFR_ACTION>()) {
     mAction->QuestionConfig = EFI_STRING_ID_INVALID;
   }
 
@@ -1325,9 +1304,9 @@ private:
   EFI_IFR_DATE *mDate;
 
 public:
-  CIfrDate () : CIfrObj (EFI_IFR_DATE_OP, (CHAR8 **)&mDate),
-               CIfrOpHeader (EFI_IFR_DATE_OP, &mDate->Header),
-               CIfrQuestionHeader (&mDate->Question) {
+  CIfrDate () : CIfrObj (EFI_IFR_DATE_OP),
+               CIfrOpHeader (EFI_IFR_DATE_OP, &(GetObjBinAddr<EFI_IFR_DATE>())->Header),
+               CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_DATE>())->Question), mDate(GetObjBinAddr<EFI_IFR_DATE>()) {
     mDate->Flags = 0;
   }
 
@@ -1368,10 +1347,10 @@ private:
   EFI_IFR_NUMERIC *mNumeric;
 
 public:
-  CIfrNumeric () : CIfrObj (EFI_IFR_NUMERIC_OP, (CHAR8 **)&mNumeric, sizeof (EFI_IFR_NUMERIC), TRUE),
-                   CIfrOpHeader (EFI_IFR_NUMERIC_OP, &mNumeric->Header),
-                   CIfrQuestionHeader (&mNumeric->Question),
-                   CIfrMinMaxStepData (&mNumeric->data, TRUE) {
+  CIfrNumeric () : CIfrObj (EFI_IFR_NUMERIC_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_NUMERIC), TRUE),
+                   CIfrOpHeader (EFI_IFR_NUMERIC_OP, &(GetObjBinAddr<EFI_IFR_NUMERIC>())->Header),
+                   CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_NUMERIC>())->Question),
+                   CIfrMinMaxStepData (&(GetObjBinAddr<EFI_IFR_NUMERIC>())->data, TRUE), mNumeric(GetObjBinAddr<EFI_IFR_NUMERIC>()) {
     mNumeric->Flags  = EFI_IFR_NUMERIC_SIZE_1 | EFI_IFR_DISPLAY_UINT_DEC;
     gCurrentQuestion   = this;
     gCurrentMinMaxData = this;
@@ -1397,7 +1376,7 @@ public:
     //
     // Update the buffer pointer used by other class.
     //
-    mNumeric = (EFI_IFR_NUMERIC *) GetObjBinAddr();
+    mNumeric = GetObjBinAddr<EFI_IFR_NUMERIC>();
     UpdateHeader (&mNumeric->Header);
     UpdateCIfrQuestionHeader(&mNumeric->Question);
     UpdateCIfrMinMaxStepData(&mNumeric->data);
@@ -1445,10 +1424,10 @@ private:
   EFI_IFR_ONE_OF *mOneOf;
 
 public:
-  CIfrOneOf () : CIfrObj (EFI_IFR_ONE_OF_OP, (CHAR8 **)&mOneOf, sizeof (EFI_IFR_ONE_OF), TRUE),
-                 CIfrOpHeader (EFI_IFR_ONE_OF_OP, &mOneOf->Header),
-                 CIfrQuestionHeader (&mOneOf->Question),
-                 CIfrMinMaxStepData (&mOneOf->data) {
+  CIfrOneOf () : CIfrObj (EFI_IFR_ONE_OF_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_ONE_OF), TRUE),
+                 CIfrOpHeader (EFI_IFR_ONE_OF_OP, &(GetObjBinAddr<EFI_IFR_ONE_OF>())->Header),
+                 CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_ONE_OF>())->Question),
+                 CIfrMinMaxStepData (&(GetObjBinAddr<EFI_IFR_ONE_OF>())->data), mOneOf(GetObjBinAddr<EFI_IFR_ONE_OF>()) {
     mOneOf->Flags    = 0;
     gCurrentQuestion   = this;
     gCurrentMinMaxData = this;
@@ -1506,7 +1485,7 @@ public:
     //
     // Update the buffer pointer used by other class.
     //
-    mOneOf = (EFI_IFR_ONE_OF *) GetObjBinAddr();
+    mOneOf = GetObjBinAddr<EFI_IFR_ONE_OF>();
     UpdateHeader (&mOneOf->Header);
     UpdateCIfrQuestionHeader(&mOneOf->Question);
     UpdateCIfrMinMaxStepData(&mOneOf->data);
@@ -1518,9 +1497,9 @@ private:
   EFI_IFR_STRING *mString;
 
 public:
-  CIfrString () : CIfrObj (EFI_IFR_STRING_OP, (CHAR8 **)&mString),
-                 CIfrOpHeader (EFI_IFR_STRING_OP, &mString->Header),
-                 CIfrQuestionHeader (&mString->Question) {
+  CIfrString () : CIfrObj (EFI_IFR_STRING_OP),
+                 CIfrOpHeader (EFI_IFR_STRING_OP, &(GetObjBinAddr<EFI_IFR_STRING>())->Header),
+                 CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_STRING>())->Question), mString(GetObjBinAddr<EFI_IFR_STRING>()) {
     mString->Flags   = 0;
     mString->MinSize = 0;
     mString->MaxSize = 0;
@@ -1560,9 +1539,9 @@ private:
   EFI_IFR_PASSWORD *mPassword;
 
 public:
-  CIfrPassword () : CIfrObj (EFI_IFR_PASSWORD_OP, (CHAR8 **)&mPassword),
-                    CIfrOpHeader (EFI_IFR_PASSWORD_OP, &mPassword->Header),
-                    CIfrQuestionHeader (&mPassword->Question) {
+  CIfrPassword () : CIfrObj (EFI_IFR_PASSWORD_OP),
+                    CIfrOpHeader (EFI_IFR_PASSWORD_OP, &(GetObjBinAddr<EFI_IFR_PASSWORD>())->Header),
+                    CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_PASSWORD>())->Question), mPassword(GetObjBinAddr<EFI_IFR_PASSWORD>()) {
     mPassword->MinSize = 0;
     mPassword->MaxSize = 0;
     gCurrentQuestion   = this;
@@ -1586,9 +1565,9 @@ private:
   EFI_IFR_ORDERED_LIST *mOrderedList;
 
 public:
-  CIfrOrderedList () : CIfrObj (EFI_IFR_ORDERED_LIST_OP, (CHAR8 **)&mOrderedList),
-                      CIfrOpHeader (EFI_IFR_ORDERED_LIST_OP, &mOrderedList->Header),
-                      CIfrQuestionHeader (&mOrderedList->Question) {
+  CIfrOrderedList () : CIfrObj (EFI_IFR_ORDERED_LIST_OP),
+                      CIfrOpHeader (EFI_IFR_ORDERED_LIST_OP, &(GetObjBinAddr<EFI_IFR_ORDERED_LIST>())->Header),
+                      CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_ORDERED_LIST>())->Question), mOrderedList(GetObjBinAddr<EFI_IFR_ORDERED_LIST>()) {
     mOrderedList->MaxContainers = 0;
     mOrderedList->Flags         = 0;
     gCurrentQuestion            = this;
@@ -1627,9 +1606,9 @@ private:
   EFI_IFR_TIME *mTime;
 
 public:
-  CIfrTime () : CIfrObj (EFI_IFR_TIME_OP, (CHAR8 **)&mTime),
-                CIfrOpHeader (EFI_IFR_TIME_OP, &mTime->Header),
-                CIfrQuestionHeader (&mTime->Question) {
+  CIfrTime () : CIfrObj (EFI_IFR_TIME_OP),
+                CIfrOpHeader (EFI_IFR_TIME_OP, &(GetObjBinAddr<EFI_IFR_TIME>())->Header),
+                CIfrQuestionHeader (&(GetObjBinAddr<EFI_IFR_TIME>())->Question), mTime(GetObjBinAddr<EFI_IFR_TIME>()) {
     mTime->Flags = 0;
   }
 
@@ -1666,31 +1645,21 @@ public:
 };
 
 class CIfrDisableIf : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_DISABLE_IF *mDisableIf;
-
 public:
-  CIfrDisableIf () : CIfrObj (EFI_IFR_DISABLE_IF_OP, (CHAR8 **)&mDisableIf),
-                   mDisableIf ((EFI_IFR_DISABLE_IF *) GetObjBinAddr()),
-                   CIfrOpHeader (EFI_IFR_DISABLE_IF_OP, &mDisableIf->Header) {}
+  CIfrDisableIf () : CIfrObj (EFI_IFR_DISABLE_IF_OP),
+                   CIfrOpHeader (EFI_IFR_DISABLE_IF_OP, &(GetObjBinAddr<EFI_IFR_DISABLE_IF>())->Header) {}
 };
 
 class CIfrSuppressIf : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_SUPPRESS_IF *mSuppressIf;
-
 public:
-  CIfrSuppressIf () : CIfrObj (EFI_IFR_SUPPRESS_IF_OP, (CHAR8 **)&mSuppressIf),
-                     CIfrOpHeader (EFI_IFR_SUPPRESS_IF_OP, &mSuppressIf->Header) {}
+  CIfrSuppressIf () : CIfrObj (EFI_IFR_SUPPRESS_IF_OP),
+                     CIfrOpHeader (EFI_IFR_SUPPRESS_IF_OP, &(GetObjBinAddr<EFI_IFR_SUPPRESS_IF>())->Header) {}
 };
 
 class CIfrGrayOutIf : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_GRAY_OUT_IF *mGrayOutIf;
-
 public:
-  CIfrGrayOutIf () : CIfrObj (EFI_IFR_GRAY_OUT_IF_OP, (CHAR8 **)&mGrayOutIf),
-                    CIfrOpHeader (EFI_IFR_GRAY_OUT_IF_OP, &mGrayOutIf->Header) {}
+  CIfrGrayOutIf () : CIfrObj (EFI_IFR_GRAY_OUT_IF_OP),
+                    CIfrOpHeader (EFI_IFR_GRAY_OUT_IF_OP, &(GetObjBinAddr<EFI_IFR_GRAY_OUT_IF>())->Header) {}
 };
 
 class CIfrInconsistentIf : public CIfrObj, public CIfrOpHeader {
@@ -1698,8 +1667,8 @@ private:
   EFI_IFR_INCONSISTENT_IF *mInconsistentIf;
 
 public:
-  CIfrInconsistentIf () : CIfrObj (EFI_IFR_INCONSISTENT_IF_OP, (CHAR8 **)&mInconsistentIf),
-                        CIfrOpHeader (EFI_IFR_INCONSISTENT_IF_OP, &mInconsistentIf->Header) {
+  CIfrInconsistentIf () : CIfrObj (EFI_IFR_INCONSISTENT_IF_OP),
+                        CIfrOpHeader (EFI_IFR_INCONSISTENT_IF_OP, &(GetObjBinAddr<EFI_IFR_INCONSISTENT_IF>())->Header), mInconsistentIf(GetObjBinAddr<EFI_IFR_INCONSISTENT_IF>()) {
     mInconsistentIf->Error = EFI_STRING_ID_INVALID;
   }
 
@@ -1713,8 +1682,8 @@ private:
   EFI_IFR_WARNING_IF *mWarningIf;
 
 public:
-  CIfrWarningIf () : CIfrObj (EFI_IFR_WARNING_IF_OP, (CHAR8 **)&mWarningIf),
-                        CIfrOpHeader (EFI_IFR_WARNING_IF_OP, &mWarningIf->Header) {
+  CIfrWarningIf () : CIfrObj (EFI_IFR_WARNING_IF_OP),
+                        CIfrOpHeader (EFI_IFR_WARNING_IF_OP, &(GetObjBinAddr<EFI_IFR_WARNING_IF>())->Header), mWarningIf(GetObjBinAddr<EFI_IFR_WARNING_IF>()) {
     mWarningIf->Warning = EFI_STRING_ID_INVALID;
     mWarningIf->TimeOut = 0;
   }
@@ -1733,8 +1702,8 @@ private:
   EFI_IFR_NO_SUBMIT_IF *mNoSubmitIf;
 
 public:
-  CIfrNoSubmitIf () : CIfrObj (EFI_IFR_NO_SUBMIT_IF_OP, (CHAR8 **)&mNoSubmitIf),
-                     CIfrOpHeader (EFI_IFR_NO_SUBMIT_IF_OP, &mNoSubmitIf->Header) {
+  CIfrNoSubmitIf () : CIfrObj (EFI_IFR_NO_SUBMIT_IF_OP),
+                     CIfrOpHeader (EFI_IFR_NO_SUBMIT_IF_OP, &(GetObjBinAddr<EFI_IFR_NO_SUBMIT_IF>())->Header), mNoSubmitIf(GetObjBinAddr<EFI_IFR_NO_SUBMIT_IF>()) {
     mNoSubmitIf->Error = EFI_STRING_ID_INVALID;
   }
 
@@ -1748,8 +1717,8 @@ private:
   EFI_IFR_REFRESH *mRefresh;
 
 public:
-  CIfrRefresh () : CIfrObj (EFI_IFR_REFRESH_OP, (CHAR8 **)&mRefresh),
-                  CIfrOpHeader (EFI_IFR_REFRESH_OP, &mRefresh->Header) {
+  CIfrRefresh () : CIfrObj (EFI_IFR_REFRESH_OP),
+                  CIfrOpHeader (EFI_IFR_REFRESH_OP, &(GetObjBinAddr<EFI_IFR_REFRESH>())->Header), mRefresh(GetObjBinAddr<EFI_IFR_REFRESH>()) {
     mRefresh->RefreshInterval = 0;
   }
 
@@ -1763,8 +1732,8 @@ private:
   EFI_IFR_REFRESH_ID *mRefreshId;
 
 public:
-  CIfrRefreshId () : CIfrObj (EFI_IFR_REFRESH_ID_OP, (CHAR8 **)&mRefreshId),
-      CIfrOpHeader (EFI_IFR_REFRESH_ID_OP, &mRefreshId->Header) {
+  CIfrRefreshId () : CIfrObj (EFI_IFR_REFRESH_ID_OP),
+      CIfrOpHeader (EFI_IFR_REFRESH_ID_OP, &(GetObjBinAddr<EFI_IFR_REFRESH_ID>())->Header), mRefreshId(GetObjBinAddr<EFI_IFR_REFRESH_ID>()) {
     memset (&mRefreshId->RefreshEventGroupId, 0, sizeof (EFI_GUID));
   }
 
@@ -1778,8 +1747,8 @@ private:
   EFI_IFR_VARSTORE_DEVICE *mVarStoreDevice;
 
 public:
-  CIfrVarStoreDevice () : CIfrObj (EFI_IFR_VARSTORE_DEVICE_OP, (CHAR8 **)&mVarStoreDevice),
-                          CIfrOpHeader (EFI_IFR_VARSTORE_DEVICE_OP, &mVarStoreDevice->Header) {
+  CIfrVarStoreDevice () : CIfrObj (EFI_IFR_VARSTORE_DEVICE_OP),
+                          CIfrOpHeader (EFI_IFR_VARSTORE_DEVICE_OP, &(GetObjBinAddr<EFI_IFR_VARSTORE_DEVICE>())->Header), mVarStoreDevice(GetObjBinAddr<EFI_IFR_VARSTORE_DEVICE>()) {
     mVarStoreDevice->DevicePath = EFI_STRING_ID_INVALID;
   }
 
@@ -1793,8 +1762,8 @@ private:
   EFI_IFR_ONE_OF_OPTION *mOneOfOption;
 
 public:
-  CIfrOneOfOption (UINT8 Size) : CIfrObj (EFI_IFR_ONE_OF_OPTION_OP, (CHAR8 **)&mOneOfOption, Size),
-                       CIfrOpHeader (EFI_IFR_ONE_OF_OPTION_OP, &mOneOfOption->Header, Size) {
+  CIfrOneOfOption (UINT8 Size) : CIfrObj (EFI_IFR_ONE_OF_OPTION_OP, (CHAR8 **)NULL, Size),
+                       CIfrOpHeader (EFI_IFR_ONE_OF_OPTION_OP, &(GetObjBinAddr<EFI_IFR_ONE_OF_OPTION>())->Header, Size), mOneOfOption(GetObjBinAddr<EFI_IFR_ONE_OF_OPTION>()) {
     mOneOfOption->Flags  = 0;
     mOneOfOption->Option = EFI_STRING_ID_INVALID;
     mOneOfOption->Type   = EFI_IFR_TYPE_OTHER;
@@ -1868,8 +1837,8 @@ private:
   EFI_IFR_GUID_CLASS *mClass;
 
 public:
-  CIfrClass () : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)&mClass, sizeof (EFI_IFR_GUID_CLASS)),
-                CIfrOpHeader (EFI_IFR_GUID_OP, &mClass->Header, sizeof (EFI_IFR_GUID_CLASS)) {
+  CIfrClass () : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_GUID_CLASS)),
+                CIfrOpHeader (EFI_IFR_GUID_OP, &(GetObjBinAddr<EFI_IFR_GUID_CLASS>())->Header, sizeof (EFI_IFR_GUID_CLASS)), mClass(GetObjBinAddr<EFI_IFR_GUID_CLASS>()) {
     mClass->ExtendOpCode = EFI_IFR_EXTEND_OP_CLASS;
     mClass->Guid         = IfrTianoGuid;
     mClass->Class        = EFI_NON_DEVICE_CLASS;
@@ -1885,8 +1854,8 @@ private:
   EFI_IFR_GUID_SUBCLASS *mSubClass;
 
 public:
-  CIfrSubClass () : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)&mSubClass, sizeof (EFI_IFR_GUID_SUBCLASS)),
-                    CIfrOpHeader (EFI_IFR_GUID_OP, &mSubClass->Header, sizeof (EFI_IFR_GUID_SUBCLASS)) {
+  CIfrSubClass () : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_GUID_SUBCLASS)),
+                    CIfrOpHeader (EFI_IFR_GUID_OP, &(GetObjBinAddr<EFI_IFR_GUID_SUBCLASS>())->Header, sizeof (EFI_IFR_GUID_SUBCLASS)), mSubClass(GetObjBinAddr<EFI_IFR_GUID_SUBCLASS>()) {
     mSubClass->ExtendOpCode = EFI_IFR_EXTEND_OP_SUBCLASS;
     mSubClass->Guid         = IfrTianoGuid;
     mSubClass->SubClass     = EFI_SETUP_APPLICATION_SUBCLASS;
@@ -1902,8 +1871,8 @@ private:
   EFI_IFR_GUID_LABEL *mLabel;
 
 public:
-  CIfrLabel () : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)&mLabel, sizeof (EFI_IFR_GUID_LABEL)),
-                CIfrOpHeader (EFI_IFR_GUID_OP, &mLabel->Header, sizeof (EFI_IFR_GUID_LABEL)) {
+  CIfrLabel () : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_GUID_LABEL)),
+                CIfrOpHeader (EFI_IFR_GUID_OP, &(GetObjBinAddr<EFI_IFR_GUID_LABEL>())->Header, sizeof (EFI_IFR_GUID_LABEL)), mLabel(GetObjBinAddr<EFI_IFR_GUID_LABEL>()) {
     mLabel->ExtendOpCode = EFI_IFR_EXTEND_OP_LABEL;
     mLabel->Guid         = IfrTianoGuid;
   }
@@ -1918,8 +1887,8 @@ private:
   EFI_IFR_GUID_BANNER *mBanner;
 
 public:
-  CIfrBanner () : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)&mBanner, sizeof (EFI_IFR_GUID_BANNER)),
-                  CIfrOpHeader (EFI_IFR_GUID_OP, &mBanner->Header, sizeof (EFI_IFR_GUID_BANNER)) {
+  CIfrBanner () : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_GUID_BANNER)),
+                  CIfrOpHeader (EFI_IFR_GUID_OP, &(GetObjBinAddr<EFI_IFR_GUID_BANNER>())->Header, sizeof (EFI_IFR_GUID_BANNER)), mBanner(GetObjBinAddr<EFI_IFR_GUID_BANNER>()) {
     mBanner->ExtendOpCode = EFI_IFR_EXTEND_OP_BANNER;
     mBanner->Guid         = IfrTianoGuid;
   }
@@ -1946,8 +1915,8 @@ public:
     IN EFI_QUESTION_ID QuestionId,
     IN EFI_IFR_TYPE_VALUE &OptionValue,
     IN EFI_QUESTION_ID KeyValue
-  ) : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)&mOptionKey, sizeof (EFI_IFR_GUID_OPTIONKEY)),
-      CIfrOpHeader (EFI_IFR_GUID_OP, &mOptionKey->Header, sizeof (EFI_IFR_GUID_OPTIONKEY)) {
+  ) : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_GUID_OPTIONKEY)),
+      CIfrOpHeader (EFI_IFR_GUID_OP, &(GetObjBinAddr<EFI_IFR_GUID_OPTIONKEY>())->Header, sizeof (EFI_IFR_GUID_OPTIONKEY)), mOptionKey(GetObjBinAddr<EFI_IFR_GUID_OPTIONKEY>()) {
     mOptionKey->ExtendOpCode = EFI_IFR_EXTEND_OP_OPTIONKEY;
     mOptionKey->Guid         = IfrFrameworkGuid;
     mOptionKey->QuestionId   = QuestionId;
@@ -1964,8 +1933,8 @@ public:
   CIfrVarEqName (
     IN EFI_QUESTION_ID QuestionId,
     IN EFI_STRING_ID   NameId
-  ) : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)&mVarEqName, sizeof (EFI_IFR_GUID_VAREQNAME)),
-      CIfrOpHeader (EFI_IFR_GUID_OP, &mVarEqName->Header, sizeof (EFI_IFR_GUID_VAREQNAME)) {
+  ) : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_GUID_VAREQNAME)),
+      CIfrOpHeader (EFI_IFR_GUID_OP, &(GetObjBinAddr<EFI_IFR_GUID_VAREQNAME>())->Header, sizeof (EFI_IFR_GUID_VAREQNAME)), mVarEqName(GetObjBinAddr<EFI_IFR_GUID_VAREQNAME>()) {
     mVarEqName->ExtendOpCode = EFI_IFR_EXTEND_OP_VAREQNAME;
     mVarEqName->Guid         = IfrFrameworkGuid;
     mVarEqName->QuestionId   = QuestionId;
@@ -1978,8 +1947,8 @@ private:
   EFI_IFR_GUID_TIMEOUT *mTimeout;
 
 public:
-  CIfrTimeout (IN UINT16 Timeout = 0) : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)&mTimeout, sizeof (EFI_IFR_GUID_TIMEOUT)),
-                                        CIfrOpHeader (EFI_IFR_GUID_OP, &mTimeout->Header, sizeof (EFI_IFR_GUID_TIMEOUT)) {
+  CIfrTimeout (IN UINT16 Timeout = 0) : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_GUID_TIMEOUT)),
+                                        CIfrOpHeader (EFI_IFR_GUID_OP, &(GetObjBinAddr<EFI_IFR_GUID_TIMEOUT>())->Header, sizeof (EFI_IFR_GUID_TIMEOUT)), mTimeout(GetObjBinAddr<EFI_IFR_GUID_TIMEOUT>()) {
     mTimeout->ExtendOpCode = EFI_IFR_EXTEND_OP_TIMEOUT;
     mTimeout->Guid         = IfrTianoGuid;
     mTimeout->TimeOut      = Timeout;
@@ -1995,8 +1964,8 @@ private:
   EFI_IFR_GUID *mGuid;
 
 public:
-  CIfrGuid (UINT8 Size) : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)&mGuid, sizeof (EFI_IFR_GUID)+Size),
-                  CIfrOpHeader (EFI_IFR_GUID_OP, &mGuid->Header, sizeof (EFI_IFR_GUID)+Size) {
+  CIfrGuid (UINT8 Size) : CIfrObj (EFI_IFR_GUID_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_GUID)+Size),
+                  CIfrOpHeader (EFI_IFR_GUID_OP, &(GetObjBinAddr<EFI_IFR_GUID>())->Header, sizeof (EFI_IFR_GUID)+Size), mGuid(GetObjBinAddr<EFI_IFR_GUID>()) {
     memset (&mGuid->Guid, 0, sizeof (EFI_GUID));
   }
 
@@ -2010,14 +1979,11 @@ public:
 };
 
 class CIfrDup : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_DUP *mDup;
-
 public:
   CIfrDup (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_DUP_OP, (CHAR8 **)&mDup),
-      CIfrOpHeader (EFI_IFR_DUP_OP, &mDup->Header) {
+  ) : CIfrObj (EFI_IFR_DUP_OP),
+      CIfrOpHeader (EFI_IFR_DUP_OP, &(GetObjBinAddr<EFI_IFR_DUP>())->Header) {
     SetLineNo (LineNo);
   }
 };
@@ -2029,8 +1995,8 @@ private:
 public:
   CIfrEqIdId (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_EQ_ID_ID_OP, (CHAR8 **)&mEqIdId),
-                 CIfrOpHeader (EFI_IFR_EQ_ID_ID_OP, &mEqIdId->Header) {
+  ) : CIfrObj (EFI_IFR_EQ_ID_ID_OP),
+                 CIfrOpHeader (EFI_IFR_EQ_ID_ID_OP, &(GetObjBinAddr<EFI_IFR_EQ_ID_ID>())->Header), mEqIdId(GetObjBinAddr<EFI_IFR_EQ_ID_ID>()) {
     SetLineNo (LineNo);
     mEqIdId->QuestionId1 = EFI_QUESTION_ID_INVALID;
     mEqIdId->QuestionId2 = EFI_QUESTION_ID_INVALID;
@@ -2068,8 +2034,8 @@ private:
 public:
   CIfrEqIdVal (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_EQ_ID_VAL_OP, (CHAR8 **)&mEqIdVal),
-      CIfrOpHeader (EFI_IFR_EQ_ID_VAL_OP, &mEqIdVal->Header) {
+  ) : CIfrObj (EFI_IFR_EQ_ID_VAL_OP),
+      CIfrOpHeader (EFI_IFR_EQ_ID_VAL_OP, &(GetObjBinAddr<EFI_IFR_EQ_ID_VAL>())->Header), mEqIdVal(GetObjBinAddr<EFI_IFR_EQ_ID_VAL>()) {
     SetLineNo (LineNo);
     mEqIdVal->QuestionId = EFI_QUESTION_ID_INVALID;
   }
@@ -2098,8 +2064,8 @@ private:
 public:
   CIfrEqIdList (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_EQ_ID_VAL_LIST_OP, (CHAR8 **)&mEqIdVList, sizeof (EFI_IFR_EQ_ID_VAL_LIST), TRUE),
-                   CIfrOpHeader (EFI_IFR_EQ_ID_VAL_LIST_OP, &mEqIdVList->Header) {
+  ) : CIfrObj (EFI_IFR_EQ_ID_VAL_LIST_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_EQ_ID_VAL_LIST), TRUE),
+                   CIfrOpHeader (EFI_IFR_EQ_ID_VAL_LIST_OP, &(GetObjBinAddr<EFI_IFR_EQ_ID_VAL_LIST>())->Header), mEqIdVList(GetObjBinAddr<EFI_IFR_EQ_ID_VAL_LIST>()) {
     SetLineNo (LineNo);
     mEqIdVList->QuestionId   = EFI_QUESTION_ID_INVALID;
     mEqIdVList->ListLength   = 0;
@@ -2109,7 +2075,7 @@ public:
   VOID UpdateIfrBuffer ( 
   ) {
     _EMIT_PENDING_OBJ();
-    mEqIdVList = (EFI_IFR_EQ_ID_VAL_LIST *) GetObjBinAddr();
+    mEqIdVList = GetObjBinAddr<EFI_IFR_EQ_ID_VAL_LIST>();
     UpdateHeader (&mEqIdVList->Header);
   }
 
@@ -2149,8 +2115,8 @@ private:
 public:
   CIfrQuestionRef1 (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_QUESTION_REF1_OP, (CHAR8 **)&mQuestionRef1),
-      CIfrOpHeader (EFI_IFR_QUESTION_REF1_OP, &mQuestionRef1->Header) {
+  ) : CIfrObj (EFI_IFR_QUESTION_REF1_OP),
+      CIfrOpHeader (EFI_IFR_QUESTION_REF1_OP, &(GetObjBinAddr<EFI_IFR_QUESTION_REF1>())->Header), mQuestionRef1(GetObjBinAddr<EFI_IFR_QUESTION_REF1>()) {
     SetLineNo (LineNo);
     mQuestionRef1->QuestionId = EFI_QUESTION_ID_INVALID;
   }
@@ -2169,27 +2135,21 @@ public:
 };
 
 class CIfrQuestionRef2 : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_QUESTION_REF2 *mQuestionRef2;
-
 public:
   CIfrQuestionRef2 (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_QUESTION_REF2_OP, (CHAR8 **)&mQuestionRef2),
-      CIfrOpHeader (EFI_IFR_QUESTION_REF2_OP, &mQuestionRef2->Header) {
+  ) : CIfrObj (EFI_IFR_QUESTION_REF2_OP),
+      CIfrOpHeader (EFI_IFR_QUESTION_REF2_OP, &(GetObjBinAddr<EFI_IFR_QUESTION_REF2>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrQuestionRef3 : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_QUESTION_REF3 *mQuestionRef3;
-
 public:
   CIfrQuestionRef3 (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_QUESTION_REF3_OP, (CHAR8 **)&mQuestionRef3),
-      CIfrOpHeader (EFI_IFR_QUESTION_REF3_OP, &mQuestionRef3->Header) {
+  ) : CIfrObj (EFI_IFR_QUESTION_REF3_OP),
+      CIfrOpHeader (EFI_IFR_QUESTION_REF3_OP, &(GetObjBinAddr<EFI_IFR_QUESTION_REF3>())->Header) {
     SetLineNo (LineNo);
   }
 };
@@ -2201,8 +2161,8 @@ private:
 public:
   CIfrQuestionRef3_2 (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_QUESTION_REF3_OP, (CHAR8 **)&mQuestionRef3_2, sizeof (EFI_IFR_QUESTION_REF3_2)),
-      CIfrOpHeader (EFI_IFR_QUESTION_REF3_OP, &mQuestionRef3_2->Header, sizeof (EFI_IFR_QUESTION_REF3_2)) {
+  ) : CIfrObj (EFI_IFR_QUESTION_REF3_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_QUESTION_REF3_2)),
+      CIfrOpHeader (EFI_IFR_QUESTION_REF3_OP, &(GetObjBinAddr<EFI_IFR_QUESTION_REF3_2>())->Header, sizeof (EFI_IFR_QUESTION_REF3_2)), mQuestionRef3_2(GetObjBinAddr<EFI_IFR_QUESTION_REF3_2>()) {
     SetLineNo (LineNo);
     mQuestionRef3_2->DevicePath = EFI_STRING_ID_INVALID;
   }
@@ -2219,8 +2179,8 @@ private:
 public:
   CIfrQuestionRef3_3 (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_QUESTION_REF3_OP, (CHAR8 **)&mQuestionRef3_3, sizeof (EFI_IFR_QUESTION_REF3_3)),
-      CIfrOpHeader (EFI_IFR_QUESTION_REF3_OP, &mQuestionRef3_3->Header, sizeof (EFI_IFR_QUESTION_REF3_3)) {
+  ) : CIfrObj (EFI_IFR_QUESTION_REF3_OP, (CHAR8 **)NULL, sizeof (EFI_IFR_QUESTION_REF3_3)),
+      CIfrOpHeader (EFI_IFR_QUESTION_REF3_OP, &(GetObjBinAddr<EFI_IFR_QUESTION_REF3_3>())->Header, sizeof (EFI_IFR_QUESTION_REF3_3)), mQuestionRef3_3(GetObjBinAddr<EFI_IFR_QUESTION_REF3_3>()) {
     SetLineNo (LineNo);
     mQuestionRef3_3->DevicePath = EFI_STRING_ID_INVALID;
     memset (&mQuestionRef3_3->Guid, 0, sizeof (EFI_GUID));
@@ -2242,8 +2202,8 @@ private:
 public:
   CIfrRuleRef (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_RULE_REF_OP, (CHAR8 **)&mRuleRef),
-      CIfrOpHeader (EFI_IFR_RULE_REF_OP, &mRuleRef->Header) {
+  ) : CIfrObj (EFI_IFR_RULE_REF_OP),
+      CIfrOpHeader (EFI_IFR_RULE_REF_OP, &(GetObjBinAddr<EFI_IFR_RULE_REF>())->Header), mRuleRef(GetObjBinAddr<EFI_IFR_RULE_REF>()) {
     SetLineNo (LineNo);
     mRuleRef->RuleId = EFI_RULE_ID_INVALID;
   }
@@ -2260,8 +2220,8 @@ private:
 public:
   CIfrStringRef1 (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_STRING_REF1_OP, (CHAR8 **)&mStringRef1),
-      CIfrOpHeader (EFI_IFR_STRING_REF1_OP, &mStringRef1->Header) {
+  ) : CIfrObj (EFI_IFR_STRING_REF1_OP),
+      CIfrOpHeader (EFI_IFR_STRING_REF1_OP, &(GetObjBinAddr<EFI_IFR_STRING_REF1>())->Header), mStringRef1(GetObjBinAddr<EFI_IFR_STRING_REF1>()) {
     SetLineNo (LineNo);
     mStringRef1->StringId = EFI_STRING_ID_INVALID;
   }
@@ -2272,27 +2232,21 @@ public:
 };
 
 class CIfrStringRef2 : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_STRING_REF2 *mStringRef2;
-
 public:
   CIfrStringRef2 (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_STRING_REF2_OP, (CHAR8 **)&mStringRef2),
-      CIfrOpHeader (EFI_IFR_STRING_REF2_OP, &mStringRef2->Header) {
+  ) : CIfrObj (EFI_IFR_STRING_REF2_OP),
+      CIfrOpHeader (EFI_IFR_STRING_REF2_OP, &(GetObjBinAddr<EFI_IFR_STRING_REF2>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrThis : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_THIS *mThis;
-
 public:
   CIfrThis (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_THIS_OP, (CHAR8 **)&mThis),
-      CIfrOpHeader (EFI_IFR_THIS_OP, &mThis->Header) {
+  ) : CIfrObj (EFI_IFR_THIS_OP),
+      CIfrOpHeader (EFI_IFR_THIS_OP, &(GetObjBinAddr<EFI_IFR_THIS>())->Header) {
     SetLineNo (LineNo);
   }
 };
@@ -2304,8 +2258,8 @@ private:
 public:
   CIfrSecurity (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_SECURITY_OP, (CHAR8 **)&mSecurity),
-      CIfrOpHeader (EFI_IFR_SECURITY_OP, &mSecurity->Header) {
+  ) : CIfrObj (EFI_IFR_SECURITY_OP),
+      CIfrOpHeader (EFI_IFR_SECURITY_OP, &(GetObjBinAddr<EFI_IFR_SECURITY>())->Header), mSecurity(GetObjBinAddr<EFI_IFR_SECURITY>()) {
     SetLineNo (LineNo);
     memset (&mSecurity->Permissions, 0, sizeof (EFI_GUID));
   }
@@ -2322,8 +2276,8 @@ private:
 public:
   CIfrUint8 (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_UINT8_OP, (CHAR8 **)&mUint8),
-      CIfrOpHeader (EFI_IFR_UINT8_OP, &mUint8->Header) {
+  ) : CIfrObj (EFI_IFR_UINT8_OP),
+      CIfrOpHeader (EFI_IFR_UINT8_OP, &(GetObjBinAddr<EFI_IFR_UINT8>())->Header), mUint8(GetObjBinAddr<EFI_IFR_UINT8>()) {
     SetLineNo (LineNo);
   }
 
@@ -2339,8 +2293,8 @@ private:
 public:
   CIfrUint16 (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_UINT16_OP, (CHAR8 **)&mUint16),
-      CIfrOpHeader (EFI_IFR_UINT16_OP, &mUint16->Header) {
+  ) : CIfrObj (EFI_IFR_UINT16_OP),
+      CIfrOpHeader (EFI_IFR_UINT16_OP, &(GetObjBinAddr<EFI_IFR_UINT16>())->Header), mUint16(GetObjBinAddr<EFI_IFR_UINT16>()) {
     SetLineNo (LineNo);
   }
 
@@ -2356,8 +2310,8 @@ private:
 public:
   CIfrUint32 (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_UINT32_OP, (CHAR8 **)&mUint32),
-      CIfrOpHeader (EFI_IFR_UINT32_OP, &mUint32->Header) {
+  ) : CIfrObj (EFI_IFR_UINT32_OP),
+      CIfrOpHeader (EFI_IFR_UINT32_OP, &(GetObjBinAddr<EFI_IFR_UINT32>())->Header), mUint32(GetObjBinAddr<EFI_IFR_UINT32>()) {
     SetLineNo (LineNo);
   }
 
@@ -2373,8 +2327,8 @@ private:
 public:
   CIfrUint64 (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_UINT64_OP, (CHAR8 **)&mUint64),
-      CIfrOpHeader (EFI_IFR_UINT64_OP, &mUint64->Header) {
+  ) : CIfrObj (EFI_IFR_UINT64_OP),
+      CIfrOpHeader (EFI_IFR_UINT64_OP, &(GetObjBinAddr<EFI_IFR_UINT64>())->Header), mUint64(GetObjBinAddr<EFI_IFR_UINT64>()) {
     SetLineNo (LineNo);
   }
 
@@ -2384,144 +2338,111 @@ public:
 };
 
 class CIfrTrue : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_TRUE *mTrue;
-
 public:
   CIfrTrue (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_TRUE_OP, (CHAR8 **)&mTrue),
-      CIfrOpHeader (EFI_IFR_TRUE_OP, &mTrue->Header) {
+  ) : CIfrObj (EFI_IFR_TRUE_OP),
+      CIfrOpHeader (EFI_IFR_TRUE_OP, &(GetObjBinAddr<EFI_IFR_TRUE>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrFalse : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_FALSE *mFalse;
-
 public:
   CIfrFalse (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_FALSE_OP, (CHAR8 **)&mFalse),
-      CIfrOpHeader (EFI_IFR_FALSE_OP, &mFalse->Header) {
+  ) : CIfrObj (EFI_IFR_FALSE_OP),
+      CIfrOpHeader (EFI_IFR_FALSE_OP, &(GetObjBinAddr<EFI_IFR_FALSE>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrOne : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_ONE *mOne;
-
 public:
   CIfrOne (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_ONE_OP, (CHAR8 **)&mOne),
-      CIfrOpHeader (EFI_IFR_ONE_OP, &mOne->Header) {
+  ) : CIfrObj (EFI_IFR_ONE_OP),
+      CIfrOpHeader (EFI_IFR_ONE_OP, &(GetObjBinAddr<EFI_IFR_ONE>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrOnes : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_ONES *mOnes;
-
 public:
   CIfrOnes (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_ONES_OP, (CHAR8 **)&mOnes),
-      CIfrOpHeader (EFI_IFR_ONES_OP, &mOnes->Header) {
+  ) : CIfrObj (EFI_IFR_ONES_OP),
+      CIfrOpHeader (EFI_IFR_ONES_OP, &(GetObjBinAddr<EFI_IFR_ONES>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrZero : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_ZERO *mZero;
-
 public:
   CIfrZero (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_ZERO_OP, (CHAR8 **)&mZero),
-      CIfrOpHeader (EFI_IFR_ZERO_OP, &mZero->Header) {
+  ) : CIfrObj (EFI_IFR_ZERO_OP),
+      CIfrOpHeader (EFI_IFR_ZERO_OP, &(GetObjBinAddr<EFI_IFR_ZERO>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrUndefined : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_UNDEFINED *mUndefined;
-
 public:
   CIfrUndefined (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_UNDEFINED_OP, (CHAR8 **)&mUndefined),
-      CIfrOpHeader (EFI_IFR_UNDEFINED_OP, &mUndefined->Header) {
+  ) : CIfrObj (EFI_IFR_UNDEFINED_OP),
+      CIfrOpHeader (EFI_IFR_UNDEFINED_OP, &(GetObjBinAddr<EFI_IFR_UNDEFINED>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrVersion : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_VERSION *mVersion;
-
 public:
   CIfrVersion (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_VERSION_OP, (CHAR8 **)&mVersion),
-      CIfrOpHeader (EFI_IFR_VERSION_OP, &mVersion->Header) {
+  ) : CIfrObj (EFI_IFR_VERSION_OP),
+      CIfrOpHeader (EFI_IFR_VERSION_OP, &(GetObjBinAddr<EFI_IFR_VERSION>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrLength : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_LENGTH *mLength;
-
 public:
   CIfrLength (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_LENGTH_OP, (CHAR8 **)&mLength),
-      CIfrOpHeader (EFI_IFR_LENGTH_OP, &mLength->Header) {
+  ) : CIfrObj (EFI_IFR_LENGTH_OP),
+      CIfrOpHeader (EFI_IFR_LENGTH_OP, &(GetObjBinAddr<EFI_IFR_LENGTH>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrNot : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_NOT *mNot;
-
 public:
   CIfrNot (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_NOT_OP, (CHAR8 **)&mNot),
-      CIfrOpHeader (EFI_IFR_NOT_OP, &mNot->Header) {
+  ) : CIfrObj (EFI_IFR_NOT_OP),
+      CIfrOpHeader (EFI_IFR_NOT_OP, &(GetObjBinAddr<EFI_IFR_NOT>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrBitWiseNot : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_BITWISE_NOT *mBitWise;
-
 public:
   CIfrBitWiseNot (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_BITWISE_NOT_OP, (CHAR8 **)&mBitWise),
-      CIfrOpHeader (EFI_IFR_BITWISE_NOT_OP, &mBitWise->Header) {
+  ) : CIfrObj (EFI_IFR_BITWISE_NOT_OP),
+      CIfrOpHeader (EFI_IFR_BITWISE_NOT_OP, &(GetObjBinAddr<EFI_IFR_BITWISE_NOT>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrToBoolean : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_TO_BOOLEAN *mToBoolean;
-
 public:
   CIfrToBoolean (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_TO_BOOLEAN_OP, (CHAR8 **)&mToBoolean),
-      CIfrOpHeader (EFI_IFR_TO_BOOLEAN_OP, &mToBoolean->Header) {
+  ) : CIfrObj (EFI_IFR_TO_BOOLEAN_OP),
+      CIfrOpHeader (EFI_IFR_TO_BOOLEAN_OP, &(GetObjBinAddr<EFI_IFR_TO_BOOLEAN>())->Header) {
     SetLineNo (LineNo);
   }
 };
@@ -2533,8 +2454,8 @@ private:
 public:
   CIfrToString (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_TO_STRING_OP, (CHAR8 **)&mToString),
-      CIfrOpHeader (EFI_IFR_TO_STRING_OP, &mToString->Header) {
+  ) : CIfrObj (EFI_IFR_TO_STRING_OP),
+      CIfrOpHeader (EFI_IFR_TO_STRING_OP, &(GetObjBinAddr<EFI_IFR_TO_STRING>())->Header), mToString(GetObjBinAddr<EFI_IFR_TO_STRING>()) {
     SetLineNo (LineNo);
   }
 
@@ -2544,209 +2465,161 @@ public:
 };
 
 class CIfrToUint : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_TO_UINT *mToUint;
-
 public:
   CIfrToUint (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_TO_UINT_OP, (CHAR8 **)&mToUint),
-      CIfrOpHeader (EFI_IFR_TO_UINT_OP, &mToUint->Header) {
+  ) : CIfrObj (EFI_IFR_TO_UINT_OP),
+      CIfrOpHeader (EFI_IFR_TO_UINT_OP, &(GetObjBinAddr<EFI_IFR_TO_UINT>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrToUpper : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_TO_UPPER *mToUpper;
-
 public:
   CIfrToUpper (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_TO_UPPER_OP, (CHAR8 **)&mToUpper),
-      CIfrOpHeader (EFI_IFR_TO_UPPER_OP, &mToUpper->Header) {
+  ) : CIfrObj (EFI_IFR_TO_UPPER_OP),
+      CIfrOpHeader (EFI_IFR_TO_UPPER_OP, &(GetObjBinAddr<EFI_IFR_TO_UPPER>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrToLower : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_TO_LOWER *mToLower;
-
 public:
   CIfrToLower (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_TO_LOWER_OP, (CHAR8 **)&mToLower),
-      CIfrOpHeader (EFI_IFR_TO_LOWER_OP, &mToLower->Header) {
+  ) : CIfrObj (EFI_IFR_TO_LOWER_OP),
+      CIfrOpHeader (EFI_IFR_TO_LOWER_OP, &(GetObjBinAddr<EFI_IFR_TO_LOWER>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrAdd : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_ADD *mAdd;
-
 public:
   CIfrAdd (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_ADD_OP, (CHAR8 **)&mAdd),
-      CIfrOpHeader (EFI_IFR_ADD_OP, &mAdd->Header) {
+  ) : CIfrObj (EFI_IFR_ADD_OP),
+      CIfrOpHeader (EFI_IFR_ADD_OP, &(GetObjBinAddr<EFI_IFR_ADD>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrBitWiseAnd : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_BITWISE_AND *mBitWiseAnd;
-
 public:
   CIfrBitWiseAnd (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_BITWISE_AND_OP, (CHAR8 **)&mBitWiseAnd),
-      CIfrOpHeader (EFI_IFR_BITWISE_AND_OP, &mBitWiseAnd->Header) {
+  ) : CIfrObj (EFI_IFR_BITWISE_AND_OP),
+      CIfrOpHeader (EFI_IFR_BITWISE_AND_OP, &(GetObjBinAddr<EFI_IFR_BITWISE_AND>())->Header) {
     SetLineNo(LineNo);
   }
 };
 
 class CIfrBitWiseOr : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_BITWISE_OR *mBitWiseOr;
-
 public:
   CIfrBitWiseOr (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_BITWISE_OR_OP, (CHAR8 **)&mBitWiseOr),
-      CIfrOpHeader (EFI_IFR_BITWISE_OR_OP, &mBitWiseOr->Header) {
+  ) : CIfrObj (EFI_IFR_BITWISE_OR_OP),
+      CIfrOpHeader (EFI_IFR_BITWISE_OR_OP, &(GetObjBinAddr<EFI_IFR_BITWISE_OR>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrAnd : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_AND *mAnd;
-
 public:
   CIfrAnd (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_AND_OP, (CHAR8 **)&mAnd),
-      CIfrOpHeader (EFI_IFR_AND_OP, &mAnd->Header) {
+  ) : CIfrObj (EFI_IFR_AND_OP),
+      CIfrOpHeader (EFI_IFR_AND_OP, &(GetObjBinAddr<EFI_IFR_AND>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrCatenate : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_CATENATE *mCatenate;
-
 public:
   CIfrCatenate (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_CATENATE_OP, (CHAR8 **)&mCatenate),
-      CIfrOpHeader (EFI_IFR_CATENATE_OP, &mCatenate->Header) {
+  ) : CIfrObj (EFI_IFR_CATENATE_OP),
+      CIfrOpHeader (EFI_IFR_CATENATE_OP, &(GetObjBinAddr<EFI_IFR_CATENATE>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrDivide : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_DIVIDE *mDivide;
-
 public:
   CIfrDivide (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_DIVIDE_OP, (CHAR8 **)&mDivide),
-      CIfrOpHeader (EFI_IFR_DIVIDE_OP, &mDivide->Header) {
+  ) : CIfrObj (EFI_IFR_DIVIDE_OP),
+      CIfrOpHeader (EFI_IFR_DIVIDE_OP, &(GetObjBinAddr<EFI_IFR_DIVIDE>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrEqual : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_EQUAL *mEqual;
-
 public:
   CIfrEqual (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_EQUAL_OP, (CHAR8 **)&mEqual),
-      CIfrOpHeader (EFI_IFR_EQUAL_OP, &mEqual->Header) {
+  ) : CIfrObj (EFI_IFR_EQUAL_OP),
+      CIfrOpHeader (EFI_IFR_EQUAL_OP, &(GetObjBinAddr<EFI_IFR_EQUAL>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrGreaterEqual : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_GREATER_EQUAL *mGreaterEqual;
-
 public:
   CIfrGreaterEqual (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_GREATER_EQUAL_OP, (CHAR8 **)&mGreaterEqual),
-      CIfrOpHeader (EFI_IFR_GREATER_EQUAL_OP, &mGreaterEqual->Header) {
+  ) : CIfrObj (EFI_IFR_GREATER_EQUAL_OP),
+      CIfrOpHeader (EFI_IFR_GREATER_EQUAL_OP, &(GetObjBinAddr<EFI_IFR_GREATER_EQUAL>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrGreaterThan : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_GREATER_THAN *mGreaterThan;
-
 public:
   CIfrGreaterThan (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_GREATER_THAN_OP, (CHAR8 **)&mGreaterThan),
-      CIfrOpHeader (EFI_IFR_GREATER_THAN_OP, &mGreaterThan->Header) {
+  ) : CIfrObj (EFI_IFR_GREATER_THAN_OP),
+      CIfrOpHeader (EFI_IFR_GREATER_THAN_OP, &(GetObjBinAddr<EFI_IFR_GREATER_THAN>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrLessEqual : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_LESS_EQUAL *mLessEqual;
-
 public:
   CIfrLessEqual (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_LESS_EQUAL_OP, (CHAR8 **)&mLessEqual),
-      CIfrOpHeader (EFI_IFR_LESS_EQUAL_OP, &mLessEqual->Header) {
+  ) : CIfrObj (EFI_IFR_LESS_EQUAL_OP),
+      CIfrOpHeader (EFI_IFR_LESS_EQUAL_OP, &(GetObjBinAddr<EFI_IFR_LESS_EQUAL>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrLessThan : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_LESS_THAN *mLessThan;
-
 public:
   CIfrLessThan (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_LESS_THAN_OP, (CHAR8 **)&mLessThan),
-      CIfrOpHeader (EFI_IFR_LESS_THAN_OP, &mLessThan->Header) {
+  ) : CIfrObj (EFI_IFR_LESS_THAN_OP),
+      CIfrOpHeader (EFI_IFR_LESS_THAN_OP, &(GetObjBinAddr<EFI_IFR_LESS_THAN>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrMap : public CIfrObj, public CIfrOpHeader{
-private:
-  EFI_IFR_MAP *mMap;
-
 public:
   CIfrMap (
   IN UINT32 LineNo  
-  ) : CIfrObj (EFI_IFR_MAP_OP, (CHAR8 **)&mMap),
-      CIfrOpHeader (EFI_IFR_MAP_OP, &mMap->Header) {
+  ) : CIfrObj (EFI_IFR_MAP_OP),
+      CIfrOpHeader (EFI_IFR_MAP_OP, &(GetObjBinAddr<EFI_IFR_MAP>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrMatch : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_MATCH *mMatch;
-
 public:
   CIfrMatch (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_MATCH_OP, (CHAR8 **)&mMatch),
-      CIfrOpHeader (EFI_IFR_MATCH_OP, &mMatch->Header) {
+  ) : CIfrObj (EFI_IFR_MATCH_OP),
+      CIfrOpHeader (EFI_IFR_MATCH_OP, &(GetObjBinAddr<EFI_IFR_MATCH>())->Header) {
     SetLineNo (LineNo);
   }
 };
@@ -2759,113 +2632,89 @@ public:
   CIfrMatch2 (
   IN UINT32   LineNo,
   IN EFI_GUID *Guid
-  ) : CIfrObj (EFI_IFR_MATCH2_OP, (CHAR8 **)&mMatch2),
-      CIfrOpHeader (EFI_IFR_MATCH2_OP, &mMatch2->Header) {
+  ) : CIfrObj (EFI_IFR_MATCH2_OP),
+      CIfrOpHeader (EFI_IFR_MATCH2_OP, &(GetObjBinAddr<EFI_IFR_MATCH2>())->Header), mMatch2(GetObjBinAddr<EFI_IFR_MATCH2>()) {
     SetLineNo (LineNo);
     memmove (&mMatch2->SyntaxType, Guid, sizeof (EFI_GUID));
   }
 };
 
 class CIfrMultiply : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_MULTIPLY *mMultiply;
-
 public:
   CIfrMultiply (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_MULTIPLY_OP, (CHAR8 **)&mMultiply),
-      CIfrOpHeader (EFI_IFR_MULTIPLY_OP, &mMultiply->Header) {
+  ) : CIfrObj (EFI_IFR_MULTIPLY_OP),
+      CIfrOpHeader (EFI_IFR_MULTIPLY_OP, &(GetObjBinAddr<EFI_IFR_MULTIPLY>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrModulo : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_MODULO *mModulo;
-
 public:
   CIfrModulo (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_MODULO_OP, (CHAR8 **)&mModulo),
-      CIfrOpHeader (EFI_IFR_MODULO_OP, &mModulo->Header) {
+  ) : CIfrObj (EFI_IFR_MODULO_OP),
+      CIfrOpHeader (EFI_IFR_MODULO_OP, &(GetObjBinAddr<EFI_IFR_MODULO>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrNotEqual : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_NOT_EQUAL *mNotEqual;
-
 public:
   CIfrNotEqual (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_NOT_EQUAL_OP, (CHAR8 **)&mNotEqual),
-      CIfrOpHeader (EFI_IFR_NOT_EQUAL_OP, &mNotEqual->Header) {
+  ) : CIfrObj (EFI_IFR_NOT_EQUAL_OP),
+      CIfrOpHeader (EFI_IFR_NOT_EQUAL_OP, &(GetObjBinAddr<EFI_IFR_NOT_EQUAL>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrOr : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_OR *mOr;
-
 public:
   CIfrOr (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_OR_OP, (CHAR8 **)&mOr),
-      CIfrOpHeader (EFI_IFR_OR_OP, &mOr->Header) {
+  ) : CIfrObj (EFI_IFR_OR_OP),
+      CIfrOpHeader (EFI_IFR_OR_OP, &(GetObjBinAddr<EFI_IFR_OR>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrShiftLeft : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_SHIFT_LEFT *mShiftLeft;
-
 public:
   CIfrShiftLeft (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_SHIFT_LEFT_OP, (CHAR8 **)&mShiftLeft),
-      CIfrOpHeader (EFI_IFR_SHIFT_LEFT_OP, &mShiftLeft->Header) {
+  ) : CIfrObj (EFI_IFR_SHIFT_LEFT_OP),
+      CIfrOpHeader (EFI_IFR_SHIFT_LEFT_OP, &(GetObjBinAddr<EFI_IFR_SHIFT_LEFT>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrShiftRight : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_SHIFT_RIGHT *mShiftRight;
-
 public:
   CIfrShiftRight (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_SHIFT_RIGHT_OP, (CHAR8 **)&mShiftRight),
-      CIfrOpHeader (EFI_IFR_SHIFT_RIGHT_OP, &mShiftRight->Header) {
+  ) : CIfrObj (EFI_IFR_SHIFT_RIGHT_OP),
+      CIfrOpHeader (EFI_IFR_SHIFT_RIGHT_OP, &(GetObjBinAddr<EFI_IFR_SHIFT_RIGHT>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrSubtract : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_SUBTRACT *mSubtract;
-
 public:
   CIfrSubtract (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_SUBTRACT_OP, (CHAR8 **)&mSubtract),
-      CIfrOpHeader (EFI_IFR_SUBTRACT_OP, &mSubtract->Header) {
+  ) : CIfrObj (EFI_IFR_SUBTRACT_OP),
+      CIfrOpHeader (EFI_IFR_SUBTRACT_OP, &(GetObjBinAddr<EFI_IFR_SUBTRACT>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrConditional : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_CONDITIONAL *mConditional;
-
 public:
   CIfrConditional (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_CONDITIONAL_OP, (CHAR8 **)&mConditional),
-      CIfrOpHeader (EFI_IFR_CONDITIONAL_OP, &mConditional->Header) {
+  ) : CIfrObj (EFI_IFR_CONDITIONAL_OP),
+      CIfrOpHeader (EFI_IFR_CONDITIONAL_OP, &(GetObjBinAddr<EFI_IFR_CONDITIONAL>())->Header) {
     SetLineNo (LineNo);
   }
 };
@@ -2877,8 +2726,8 @@ private:
 public:
   CIfrFind (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_FIND_OP, (CHAR8 **)&mFind),
-      CIfrOpHeader (EFI_IFR_FIND_OP, &mFind->Header) {
+  ) : CIfrObj (EFI_IFR_FIND_OP),
+      CIfrOpHeader (EFI_IFR_FIND_OP, &(GetObjBinAddr<EFI_IFR_FIND>())->Header), mFind(GetObjBinAddr<EFI_IFR_FIND>()) {
     SetLineNo (LineNo);
   }
 
@@ -2888,27 +2737,21 @@ public:
 };
 
 class CIfrMid : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_MID *mMid;
-
 public:
   CIfrMid (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_MID_OP, (CHAR8 **)&mMid),
-      CIfrOpHeader (EFI_IFR_MID_OP, &mMid->Header) {
+  ) : CIfrObj (EFI_IFR_MID_OP),
+      CIfrOpHeader (EFI_IFR_MID_OP, &(GetObjBinAddr<EFI_IFR_MID>())->Header) {
     SetLineNo (LineNo);
   }
 };
 
 class CIfrToken : public CIfrObj, public CIfrOpHeader {
-private:
-  EFI_IFR_TOKEN *mToken;
-
 public:
   CIfrToken (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_TOKEN_OP, (CHAR8 **)&mToken),
-      CIfrOpHeader (EFI_IFR_TOKEN_OP, &mToken->Header) {
+  ) : CIfrObj (EFI_IFR_TOKEN_OP),
+      CIfrOpHeader (EFI_IFR_TOKEN_OP, &(GetObjBinAddr<EFI_IFR_TOKEN>())->Header) {
     SetLineNo (LineNo);
   }
 };
@@ -2920,8 +2763,8 @@ private:
 public:
   CIfrSpan (
   IN UINT32 LineNo
-  ) : CIfrObj (EFI_IFR_SPAN_OP, (CHAR8 **)&mSpan),
-      CIfrOpHeader (EFI_IFR_SPAN_OP, &mSpan->Header) {
+  ) : CIfrObj (EFI_IFR_SPAN_OP),
+      CIfrOpHeader (EFI_IFR_SPAN_OP, &(GetObjBinAddr<EFI_IFR_SPAN>())->Header), mSpan(GetObjBinAddr<EFI_IFR_SPAN>()) {
     SetLineNo (LineNo);
     mSpan->Flags = EFI_IFR_FLAGS_FIRST_MATCHING;
   }
