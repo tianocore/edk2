@@ -51,8 +51,6 @@ UINT8                mSwSmiValue;
 LIST_ENTRY           *mOpalDeviceList;
 LIST_ENTRY           mSmmDeviceList  = INITIALIZE_LIST_HEAD_VARIABLE (mSmmDeviceList);
 
-BOOLEAN              mSendBlockSID   = FALSE;
-
 // AHCI
 UINT32               mAhciBar = 0;
 EFI_AHCI_REGISTERS   mAhciRegisters;
@@ -347,9 +345,18 @@ SmmUnlockOpalPassword (
   UINTN                          MemoryLength;
   OPAL_SESSION                   Session;
   BOOLEAN                        BlockSidSupport;
+  UINT32                         PpStorageFlag;
+  BOOLEAN                        BlockSIDEnabled;
 
   ZeroMem (StorePcieConfDataList, sizeof (StorePcieConfDataList));
   Status = EFI_DEVICE_ERROR;
+
+  PpStorageFlag = Tcg2PhysicalPresenceLibGetManagementFlags ();
+  if ((PpStorageFlag & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_ENABLE_BLOCK_SID) != 0) {
+    BlockSIDEnabled = TRUE;
+  } else {
+    BlockSIDEnabled = FALSE;
+  }
 
   //
   // try to unlock all locked hdd disks.
@@ -445,7 +452,7 @@ SmmUnlockOpalPassword (
       }
     }
 
-    if (mSendBlockSID && BlockSidSupport) {
+    if (BlockSIDEnabled && BlockSidSupport) {
       Result = OpalBlockSid (&Session, TRUE);
       if (Result != TcgResultSuccess) {
         break;
@@ -667,9 +674,6 @@ OpalPasswordSmmInit (
   EFI_SMM_SW_REGISTER_CONTEXT           Context;
   EFI_HANDLE                            S3SleepEntryHandle;
   EFI_SMM_SX_REGISTER_CONTEXT           EntryRegisterContext;
-  EFI_SMM_VARIABLE_PROTOCOL             *SmmVariable;
-  OPAL_EXTRA_INFO_VAR                   OpalExtraInfo;
-  UINTN                                 DataSize;
   EFI_PHYSICAL_ADDRESS                  Address;
 
   mBuffer            = NULL;
@@ -777,21 +781,6 @@ OpalPasswordSmmInit (
   // trigger smi to unlock hdd if it's locked.
   //
   mSwSmiValue = (UINT8) Context.SwSmiInputValue;
-
-  Status = gSmst->SmmLocateProtocol (&gEfiSmmVariableProtocolGuid, NULL, (VOID**)&SmmVariable);
-  if (!EFI_ERROR (Status)) {
-    DataSize = sizeof (OPAL_EXTRA_INFO_VAR);
-    Status = SmmVariable->SmmGetVariable (
-                    OPAL_EXTRA_INFO_VAR_NAME,
-                    &gOpalExtraInfoVariableGuid,
-                    NULL,
-                    &DataSize,
-                    &OpalExtraInfo
-                    );
-    if (!EFI_ERROR (Status)) {
-      mSendBlockSID = OpalExtraInfo.EnableBlockSid;
-    }
-  }
 
   return EFI_SUCCESS;
 

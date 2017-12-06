@@ -46,10 +46,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DevicePathLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/SmmIoLib.h>
+#include <Library/Tcg2PhysicalPresenceLib.h>
 
 #include <IndustryStandard/Pci22.h>
-
-#include <Guid/OpalPasswordExtraInfoVariable.h>
 
 #include "OpalAhciMode.h"
 #include "OpalIdeMode.h"
