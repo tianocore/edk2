@@ -24,7 +24,7 @@
 //
 // Make sure we are using the correct packing rules per EFI specification
 //
-#ifndef __GNUC__
+#if !defined(__GNUC__) && !defined(__ASSEMBLER__)
 #pragma pack()
 #endif
 
