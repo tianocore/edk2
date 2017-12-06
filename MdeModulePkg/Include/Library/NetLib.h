@@ -95,6 +95,12 @@ typedef UINT16          TCP_PORTNO;
 #define  DNS_CLASS_HS          4
 #define  DNS_CLASS_ANY         255
 
+//
+// Number of 100ns units time Interval for network media state detect
+//
+#define MEDIA_STATE_DETECT_TIME_INTERVAL  1000000U
+
+
 #pragma pack(1)
 
 //
@@ -1246,6 +1252,40 @@ NetLibDetectMedia (
   IN  EFI_HANDLE            ServiceHandle,
   OUT BOOLEAN               *MediaPresent
   );
+
+/**
+
+  Detect media state for a network device. This routine will wait for a period of time at 
+  a specified checking interval when a certain network is under connecting until connection 
+  process finishes or timeout. If Aip protocol is supported by low layer drivers, three kinds
+  of media states can be detected: EFI_SUCCESS, EFI_NOT_READY and EFI_NO_MEDIA, represents
+  connected state, connecting state and no media state respectively. When function detects 
+  the current state is EFI_NOT_READY, it will loop to wait for next time's check until state 
+  turns to be EFI_SUCCESS or EFI_NO_MEDIA. If Aip protocol is not supported, function will 
+  call NetLibDetectMedia() and return state directly.
+
+  @param[in]   ServiceHandle    The handle where network service binding protocols are
+                                installed on.
+  @param[in]   Timeout          The maximum number of 100ns units to wait when network
+                                is connecting. Zero value means detect once and return
+                                immediately.
+  @param[out]  MediaState       The pointer to the detected media state.
+
+  @retval EFI_SUCCESS           Media detection success.
+  @retval EFI_INVALID_PARAMETER ServiceHandle is not a valid network device handle or 
+                                MediaState pointer is NULL.
+  @retval EFI_DEVICE_ERROR      A device error occurred.
+  @retval EFI_TIMEOUT           Network is connecting but timeout.
+
+**/
+EFI_STATUS
+EFIAPI
+NetLibDetectMediaWaitTimeout (
+  IN  EFI_HANDLE            ServiceHandle,
+  IN  UINT64                Timeout,
+  OUT EFI_STATUS            *MediaState
+  );
+
 
 /**
   Create an IPv4 device path node.

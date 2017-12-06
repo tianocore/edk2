@@ -54,6 +54,7 @@
 [Guids]
   gEfiSmbiosTableGuid                           ## SOMETIMES_CONSUMES  ## SystemTable
   gEfiSmbios3TableGuid                          ## SOMETIMES_CONSUMES  ## SystemTable
+  gEfiAdapterInfoMediaStateGuid                 ## SOMETIMES_CONSUMES
 
 
 [Protocols]
@@ -63,3 +64,4 @@
   gEfiIp4Config2ProtocolGuid                    ## SOMETIMES_CONSUMES
   gEfiComponentNameProtocolGuid                 ## SOMETIMES_CONSUMES
   gEfiComponentName2ProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiAdapterInformationProtocolGuid            ## SOMETIMES_CONSUMES
