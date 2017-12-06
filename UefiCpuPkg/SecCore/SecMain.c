@@ -189,7 +189,7 @@ SecStartup (
   //
   SecCoreData.DataSize               = (UINT16) sizeof (EFI_SEC_PEI_HAND_OFF);
   SecCoreData.BootFirmwareVolumeBase = BootFirmwareVolume;
-  SecCoreData.BootFirmwareVolumeSize = (UINTN)(0x100000000ULL - (UINTN) BootFirmwareVolume);
+  SecCoreData.BootFirmwareVolumeSize = (UINTN)((EFI_FIRMWARE_VOLUME_HEADER *) BootFirmwareVolume)->FvLength;
   SecCoreData.TemporaryRamBase       = (VOID*)(UINTN) TempRamBase;
   SecCoreData.TemporaryRamSize       = SizeOfRam;
   SecCoreData.PeiTemporaryRamBase    = SecCoreData.TemporaryRamBase;
