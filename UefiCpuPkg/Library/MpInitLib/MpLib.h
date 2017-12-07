@@ -102,6 +102,9 @@ typedef struct {
   UINTN                          Dr3;
   UINTN                          Dr6;
   UINTN                          Dr7;
+  IA32_DESCRIPTOR                Gdtr;
+  IA32_DESCRIPTOR                Idtr;
+  UINT16                         Tr;
 } CPU_VOLATILE_REGISTERS;
 
 //

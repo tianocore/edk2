@@ -195,6 +195,10 @@ SaveVolatileRegisters (
     VolatileRegisters->Dr6 = AsmReadDr6 ();
     VolatileRegisters->Dr7 = AsmReadDr7 ();
   }
+
+  AsmReadGdtr (&VolatileRegisters->Gdtr);
+  AsmReadIdtr (&VolatileRegisters->Idtr);
+  VolatileRegisters->Tr = AsmReadTr ();
 }
 
 /**
@@ -211,6 +215,7 @@ RestoreVolatileRegisters (
   )
 {
   CPUID_VERSION_INFO_EDX        VersionInfoEdx;
+  IA32_TSS_DESCRIPTOR           *Tss;
 
   AsmWriteCr0 (VolatileRegisters->Cr0);
   AsmWriteCr3 (VolatileRegisters->Cr3);
@@ -229,6 +234,18 @@ RestoreVolatileRegisters (
       AsmWriteDr3 (VolatileRegisters->Dr3);
       AsmWriteDr6 (VolatileRegisters->Dr6);
       AsmWriteDr7 (VolatileRegisters->Dr7);
+    }
+  }
+
+  AsmWriteGdtr (&VolatileRegisters->Gdtr);
+  AsmWriteIdtr (&VolatileRegisters->Idtr);
+  if (VolatileRegisters->Tr != 0 &&
+      VolatileRegisters->Tr < VolatileRegisters->Gdtr.Limit) {
+    Tss = (IA32_TSS_DESCRIPTOR *)(VolatileRegisters->Gdtr.Base +
+                                  VolatileRegisters->Tr);
+    if (Tss->Bits.P == 1) {
+      Tss->Bits.Type &= 0xD;  // 1101 - Clear busy bit just in case
+      AsmWriteTr (VolatileRegisters->Tr);
     }
   }
 }
