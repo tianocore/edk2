@@ -602,6 +602,190 @@ CollectBistDataFromHob (
 }
 
 /**
+  Get GDT register value.
+
+  This function is mainly for AP purpose because AP may have different GDT
+  table than BSP.
+
+  @param[in,out] Buffer  The pointer to private data buffer.
+
+**/
+VOID
+EFIAPI
+GetGdtr (
+  IN OUT VOID *Buffer
+  )
+{
+  AsmReadGdtr ((IA32_DESCRIPTOR *)Buffer);
+}
+
+/**
+  Initializes CPU exceptions handlers for the sake of stack switch requirement.
+
+  This function is a wrapper of InitializeCpuExceptionHandlersEx. It's mainly
+  for the sake of AP's init because of EFI_AP_PROCEDURE API requirement.
+
+  @param[in,out] Buffer  The pointer to private data buffer.
+
+**/
+VOID
+EFIAPI
+InitializeExceptionStackSwitchHandlers (
+  IN OUT VOID *Buffer
+  )
+{
+  CPU_EXCEPTION_INIT_DATA           *EssData;
+  IA32_DESCRIPTOR                   Idtr;
+  EFI_STATUS                        Status;
+
+  EssData = Buffer;
+  //
+  // We don't plan to replace IDT table with a new one, but we should not assume
+  // the AP's IDT is the same as BSP's IDT either.
+  //
+  AsmReadIdtr (&Idtr);
+  EssData->Ia32.IdtTable = (VOID *)Idtr.Base;
+  EssData->Ia32.IdtTableSize = Idtr.Limit + 1;
+  Status = InitializeCpuExceptionHandlersEx (NULL, EssData);
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
+  Initializes MP exceptions handlers for the sake of stack switch requirement.
+
+  This function will allocate required resources required to setup stack switch
+  and pass them through CPU_EXCEPTION_INIT_DATA to each logic processor.
+
+**/
+VOID
+InitializeMpExceptionStackSwitchHandlers (
+  VOID
+  )
+{
+  UINTN                           Index;
+  UINTN                           Bsp;
+  UINTN                           ExceptionNumber;
+  UINTN                           OldGdtSize;
+  UINTN                           NewGdtSize;
+  UINTN                           NewStackSize;
+  IA32_DESCRIPTOR                 Gdtr;
+  CPU_EXCEPTION_INIT_DATA         EssData;
+  UINT8                           *GdtBuffer;
+  UINT8                           *StackTop;
+
+  if (!PcdGetBool (PcdCpuStackGuard)) {
+    return;
+  }
+
+  ExceptionNumber = FixedPcdGetSize (PcdCpuStackSwitchExceptionList);
+  NewStackSize = FixedPcdGet32 (PcdCpuKnownGoodStackSize) * ExceptionNumber;
+
+  StackTop = AllocateRuntimeZeroPool (NewStackSize * mNumberOfProcessors);
+  ASSERT (StackTop != NULL);
+  StackTop += NewStackSize  * mNumberOfProcessors;
+
+  //
+  // The default exception handlers must have been initialized. Let's just skip
+  // it in this method.
+  //
+  EssData.Ia32.Revision = CPU_EXCEPTION_INIT_DATA_REV;
+  EssData.Ia32.InitDefaultHandlers = FALSE;
+
+  EssData.Ia32.StackSwitchExceptions = FixedPcdGetPtr(PcdCpuStackSwitchExceptionList);
+  EssData.Ia32.StackSwitchExceptionNumber = ExceptionNumber;
+  EssData.Ia32.KnownGoodStackSize = FixedPcdGet32(PcdCpuKnownGoodStackSize);
+
+  MpInitLibWhoAmI (&Bsp);
+  for (Index = 0; Index < mNumberOfProcessors; ++Index) {
+    //
+    // To support stack switch, we need to re-construct GDT but not IDT.
+    //
+    if (Index == Bsp) {
+      GetGdtr (&Gdtr);
+    } else {
+      //
+      // AP might have different size of GDT from BSP.
+      //
+      MpInitLibStartupThisAP (GetGdtr, Index, NULL, 0, (VOID *)&Gdtr, NULL);
+    }
+
+    //
+    // X64 needs only one TSS of current task working for all exceptions
+    // because of its IST feature. IA32 needs one TSS for each exception
+    // in addition to current task. Since AP is not supposed to allocate
+    // memory, we have to do it in BSP. To simplify the code, we allocate
+    // memory for IA32 case to cover both IA32 and X64 exception stack
+    // switch.
+    //
+    // Layout of memory to allocate for each processor:
+    //    --------------------------------
+    //    |            Alignment         |  (just in case)
+    //    --------------------------------
+    //    |                              |
+    //    |        Original GDT          |
+    //    |                              |
+    //    --------------------------------
+    //    |    Current task descriptor   |
+    //    --------------------------------
+    //    |                              |
+    //    |  Exception task descriptors  |  X ExceptionNumber
+    //    |                              |
+    //    --------------------------------
+    //    |  Current task-state segment  |
+    //    --------------------------------
+    //    |                              |
+    //    | Exception task-state segment |  X ExceptionNumber
+    //    |                              |
+    //    --------------------------------
+    //
+    OldGdtSize = Gdtr.Limit + 1;
+    EssData.Ia32.ExceptionTssDescSize = sizeof (IA32_TSS_DESCRIPTOR) *
+                                        (ExceptionNumber + 1);
+    EssData.Ia32.ExceptionTssSize = sizeof (IA32_TASK_STATE_SEGMENT) *
+                                    (ExceptionNumber + 1);
+    NewGdtSize = sizeof (IA32_TSS_DESCRIPTOR) +
+                 OldGdtSize +
+                 EssData.Ia32.ExceptionTssDescSize +
+                 EssData.Ia32.ExceptionTssSize;
+
+    GdtBuffer = AllocateRuntimeZeroPool (NewGdtSize);
+    ASSERT (GdtBuffer != NULL);
+
+    //
+    // Make sure GDT table alignment
+    //
+    EssData.Ia32.GdtTable = ALIGN_POINTER(GdtBuffer, sizeof (IA32_TSS_DESCRIPTOR));
+    NewGdtSize -= ((UINT8 *)EssData.Ia32.GdtTable - GdtBuffer);
+    EssData.Ia32.GdtTableSize = NewGdtSize;
+
+    EssData.Ia32.ExceptionTssDesc = ((UINT8 *)EssData.Ia32.GdtTable + OldGdtSize);
+    EssData.Ia32.ExceptionTss = ((UINT8 *)EssData.Ia32.GdtTable + OldGdtSize +
+                                 EssData.Ia32.ExceptionTssDescSize);
+
+    EssData.Ia32.KnownGoodStackTop = (UINTN)StackTop;
+    DEBUG ((DEBUG_INFO,
+            "Exception stack top[cpu%lu]: 0x%lX\n",
+            (UINT64)(UINTN)Index,
+            (UINT64)(UINTN)StackTop));
+
+    if (Index == Bsp) {
+      InitializeExceptionStackSwitchHandlers (&EssData);
+    } else {
+      MpInitLibStartupThisAP (
+        InitializeExceptionStackSwitchHandlers,
+        Index,
+        NULL,
+        0,
+        (VOID *)&EssData,
+        NULL
+        );
+    }
+
+    StackTop  -= NewStackSize;
+  }
+}
+
+/**
   Initialize Multi-processor support.
 
 **/
@@ -623,6 +807,11 @@ InitializeMpSupport (
   MpInitLibGetNumberOfProcessors (&NumberOfProcessors, &NumberOfEnabledProcessors);
   mNumberOfProcessors = NumberOfProcessors;
   DEBUG ((DEBUG_INFO, "Detect CPU count: %d\n", mNumberOfProcessors));
+
+  //
+  // Initialize exception stack switch handlers for each logic processor.
+  //
+  InitializeMpExceptionStackSwitchHandlers ();
 
   //
   // Update CPU healthy information from Guided HOB
