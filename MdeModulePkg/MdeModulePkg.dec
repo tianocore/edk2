@@ -392,6 +392,9 @@
   ## Include/Guid/PlatformHasAcpi.h
   gEdkiiPlatformHasAcpiGuid = { 0xf0966b41, 0xc23f, 0x41b9, { 0x96, 0x04, 0x0f, 0xf7, 0xe1, 0x11, 0x96, 0x5a } }
 
+  ## Include/Guid/ExtendedFirmwarePerformance.h
+  gEdkiiFpdtExtendedFirmwarePerformanceGuid = { 0x3b387bfd, 0x7abc, 0x4cf2, { 0xa0, 0xca, 0xb6, 0xa1, 0x6c, 0x1b, 0x1b, 0x25 } }
+
   ## Include/Guid/EndofS3Resume.h
   gEdkiiEndOfS3ResumeGuid = { 0x96f5296d, 0x05f7, 0x4f3c, {0x84, 0x67, 0xe4, 0x56, 0x89, 0x0e, 0x0c, 0xb5 } }
 
@@ -1409,6 +1412,12 @@
   # @Prompt CapsuleMax value in capsule report variable.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleMax|0xFFFF|UINT16|0x00000107
 
+  ## Control which FPDT record format will be used to store the performance entry.
+  # On TRUE, the string FPDT record will be used to store every performance entry.
+  # On FALSE, the different FPDT record will be used to store the different performance entries.
+  # @Prompt String FPDT Record Enable Only
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly|FALSE|BOOLEAN|0x00000109
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
@@ -1708,7 +1717,7 @@
   ## This PCD specifies the additional pad size in FPDT Basic Boot Performance Table for
   #  the extension FPDT boot records received after ReadyToBoot and before ExitBootService.
   # @Prompt Pad size for extension FPDT boot records.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x0|UINT32|0x0001005F
+  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x20000|UINT32|0x0001005F
 
   ## Indicates if ConIn device are connected on demand.<BR><BR>
   #   TRUE  - ConIn device are not connected during BDS and ReadKeyStroke/ReadKeyStrokeEx produced

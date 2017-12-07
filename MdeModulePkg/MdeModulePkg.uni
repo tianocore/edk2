@@ -4,7 +4,7 @@
 // It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 // and libraries instances, which are used for those modules.
 //
-// Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials are licensed and made available under
 // the terms and conditions of the BSD License that accompanies this distribution.
@@ -1232,3 +1232,9 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNvStoreDefaultValueBuffer_PROMPT  #language en-US "NV Storage Default Value Buffer"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNvStoreDefaultValueBuffer_HELP    #language en-US "This dynamic PCD holds the DynamicHii PCD value. Its value is the auto generated.\n"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEdkiiFpdtStringRecordEnableOnly_PROMPT  #language en-US "String FPDT Record Enable Only"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEdkiiFpdtStringRecordEnableOnly_HELP    #language en-US "Control which FPDT record format will be used to store the performance entry.\n"
+                                                                                                      "On TRUE, the string FPDT record will be used to store every performance entry.\n"
+                                                                                                      "On FALSE, the different FPDT record will be used to store the different performance entries."
