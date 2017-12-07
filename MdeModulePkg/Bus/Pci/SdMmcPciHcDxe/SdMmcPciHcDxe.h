@@ -35,6 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DriverBinding.h>
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
+#include <Protocol/SdMmcOverride.h>
 #include <Protocol/SdMmcPassThru.h>
 
 #include "SdMmcPciHci.h"
@@ -42,6 +43,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern EFI_COMPONENT_NAME_PROTOCOL  gSdMmcPciHcComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gSdMmcPciHcComponentName2;
 extern EFI_DRIVER_BINDING_PROTOCOL  gSdMmcPciHcDriverBinding;
+
+extern EDKII_SD_MMC_OVERRIDE        *mOverride;
 
 #define SD_MMC_HC_PRIVATE_SIGNATURE  SIGNATURE_32 ('s', 'd', 't', 'f')
 
@@ -780,6 +783,39 @@ EFI_STATUS
 SdCardIdentification (
   IN SD_MMC_HC_PRIVATE_DATA             *Private,
   IN UINT8                              Slot
+  );
+
+/**
+  Software reset the specified SD/MMC host controller.
+
+  @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+
+  @retval EFI_SUCCESS       The software reset executes successfully.
+  @retval Others            The software reset fails.
+
+**/
+EFI_STATUS
+SdMmcHcReset (
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  Slot
+  );
+
+/**
+  Initial SD/MMC host controller with lowest clock frequency, max power and max timeout value
+  at initialization.
+
+  @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+
+  @retval EFI_SUCCESS       The host controller is initialized successfully.
+  @retval Others            The host controller isn't initialized successfully.
+
+**/
+EFI_STATUS
+SdMmcHcInitHost (
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  Slot
   );
 
 #endif

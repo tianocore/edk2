@@ -48,6 +48,7 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
   DevicePathLib
@@ -61,6 +62,7 @@
   DebugLib
 
 [Protocols]
+  gEdkiiSdMmcOverrideProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiPciIoProtocolGuid                         ## TO_START
   gEfiSdMmcPassThruProtocolGuid                 ## BY_START
