@@ -95,6 +95,7 @@ HandOffToDxeCore (
     // for the DxeIpl and the DxeCore are both X64.
     //
     ASSERT (PcdGetBool (PcdSetNxForStack) == FALSE);
+    ASSERT (PcdGetBool (PcdCpuStackGuard) == FALSE);
   }
   
   //

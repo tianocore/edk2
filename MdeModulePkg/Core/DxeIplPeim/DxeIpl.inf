@@ -49,7 +49,7 @@
 [Sources.X64]
   X64/VirtualMemory.h
   X64/VirtualMemory.c
-  X64/DxeLoadFunc.c    
+  X64/DxeLoadFunc.c
 
 [Sources.IPF]
   Ipf/DxeLoadFunc.c
@@ -117,6 +117,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPteMemoryEncryptionAddressOrMask    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPropertyMask               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdCpuStackGuard                       ## CONSUMES
 
 [Pcd.IA32,Pcd.X64,Pcd.ARM,Pcd.AARCH64]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack               ## SOMETIMES_CONSUMES
@@ -132,7 +133,7 @@
 #
 # [Hob]
 # MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # MEMORY_ALLOCATION_MODULE for DxeCore
-# MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # New Stack HoB   
+# MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # New Stack HoB
 # MEMORY_ALLOCATION                 ## SOMETIMES_PRODUCES # Old Stack HOB
 #
 # [Hob.IPF]

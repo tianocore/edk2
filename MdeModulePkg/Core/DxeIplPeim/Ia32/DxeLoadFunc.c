@@ -235,6 +235,10 @@ ToBuildPageTable (
     return TRUE;
   }
 
+  if (PcdGetBool (PcdCpuStackGuard)) {
+    return TRUE;
+  }
+
   if (PcdGetBool (PcdSetNxForStack) && IsExecuteDisableBitAvailable ()) {
     return TRUE;
   }

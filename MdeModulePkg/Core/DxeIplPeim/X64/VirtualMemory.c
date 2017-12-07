@@ -118,6 +118,39 @@ EnableExecuteDisableBit (
 }
 
 /**
+  The function will check if page table entry should be splitted to smaller
+  granularity.
+
+  @retval TRUE      Page table should be split.
+  @retval FALSE     Page table should not be split.
+**/
+BOOLEAN
+ToSplitPageTable (
+  IN EFI_PHYSICAL_ADDRESS               Address,
+  IN UINTN                              Size,
+  IN EFI_PHYSICAL_ADDRESS               StackBase,
+  IN UINTN                              StackSize
+  )
+{
+  if (IsNullDetectionEnabled () && Address == 0) {
+    return TRUE;
+  }
+
+  if (PcdGetBool (PcdCpuStackGuard)) {
+    if (StackBase >= Address && StackBase < (Address + Size)) {
+      return TRUE;
+    }
+  }
+
+  if (PcdGetBool (PcdSetNxForStack)) {
+    if ((Address < StackBase + StackSize) && ((Address + Size) > StackBase)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+/**
   Split 2M page to 4K.
 
   @param[in]      PhysicalAddress       Start physical address the 2M page covered.
@@ -160,7 +193,8 @@ Split2MPageTo4K (
     PageTableEntry->Uint64 = (UINT64) PhysicalAddress4K | AddressEncMask;
     PageTableEntry->Bits.ReadWrite = 1;
 
-    if (IsNullDetectionEnabled () && PhysicalAddress4K == 0) {
+    if ((IsNullDetectionEnabled () && PhysicalAddress4K == 0) ||
+        (PcdGetBool (PcdCpuStackGuard) && PhysicalAddress4K == StackBase)) {
       PageTableEntry->Bits.Present = 0;
     } else {
       PageTableEntry->Bits.Present = 1;
@@ -214,10 +248,7 @@ Split1GPageTo2M (
 
   PhysicalAddress2M = PhysicalAddress;
   for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PhysicalAddress2M += SIZE_2MB) {
-    if ((IsNullDetectionEnabled () && PhysicalAddress2M == 0)
-        || (PcdGetBool (PcdSetNxForStack)
-            && (PhysicalAddress2M < StackBase + StackSize)
-            && ((PhysicalAddress2M + SIZE_2MB) > StackBase))) {
+    if (ToSplitPageTable (PhysicalAddress2M, SIZE_2MB, StackBase, StackSize)) {
       //
       // Need to split this 2M page that covers NULL or stack range.
       //
@@ -359,10 +390,7 @@ CreateIdentityMappingPageTables (
       PageDirectory1GEntry = (VOID *) PageDirectoryPointerEntry;
     
       for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
-        if ((IsNullDetectionEnabled () && PageAddress == 0)
-            || (PcdGetBool (PcdSetNxForStack)
-                && (PageAddress < StackBase + StackSize)
-                && ((PageAddress + SIZE_1GB) > StackBase))) {
+        if (ToSplitPageTable (PageAddress, SIZE_1GB, StackBase, StackSize)) {
           Split1GPageTo2M (PageAddress, (UINT64 *) PageDirectory1GEntry, StackBase, StackSize);
         } else {
           //
@@ -391,10 +419,7 @@ CreateIdentityMappingPageTables (
         PageDirectoryPointerEntry->Bits.Present = 1;
 
         for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
-          if ((IsNullDetectionEnabled () && PageAddress == 0)
-              || (PcdGetBool (PcdSetNxForStack)
-                  && (PageAddress < StackBase + StackSize)
-                  && ((PageAddress + SIZE_2MB) > StackBase))) {
+          if (ToSplitPageTable (PageAddress, SIZE_2MB, StackBase, StackSize)) {
             //
             // Need to split this 2M page that covers NULL or stack range.
             //
