@@ -138,6 +138,18 @@
   # @Prompt Lock SMM Feature Control MSR.
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock|TRUE|BOOLEAN|0x3213210B
 
+[PcdsFixedAtBuild]
+  ## List of exception vectors which need switching stack.
+  #  This PCD will only take into effect if PcdCpuStackGuard is enabled.
+  #  By default exception #DD(8), #PF(14) are supported.
+  # @Prompt Specify exception vectors which need switching stack.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuStackSwitchExceptionList|{0x08, 0x0E}|VOID*|0x30002000
+
+  ## Size of good stack for an exception.
+  #  This PCD will only take into effect if PcdCpuStackGuard is enabled.
+  # @Prompt Specify size of good stack of exception which need switching stack.
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuKnownGoodStackSize|2048|UINT32|0x30002001
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ## This value is the CPU Local APIC base address, which aligns the address on a 4-KByte boundary.
   # @Prompt Configure base address of CPU Local APIC
