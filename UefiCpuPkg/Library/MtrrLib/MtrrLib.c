@@ -2489,7 +2489,7 @@ MtrrSetMemoryAttributeInMtrrSettings (
   Range.Type        = Attribute;
   ScratchSize = sizeof (Scratch);
   Status = MtrrSetMemoryAttributesInMtrrSettings (MtrrSetting, Scratch, &ScratchSize, &Range, 1);
-  DEBUG ((DEBUG_CACHE, "MtrrSetMemoryAttribute(MtrrSettings = %p) %s: [%016lx, %016lx) - %x\n",
+  DEBUG ((DEBUG_CACHE, "MtrrSetMemoryAttribute(MtrrSettings = %p) %a: [%016lx, %016lx) - %r\n",
           MtrrSetting,
           mMtrrMemoryCacheTypeShortName[Attribute], BaseAddress, BaseAddress + Length, Status));
 
