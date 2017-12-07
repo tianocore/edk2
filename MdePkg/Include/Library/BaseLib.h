@@ -6647,6 +6647,8 @@ typedef struct {
 #define IA32_IDT_GATE_TYPE_INTERRUPT_32  0x8E
 #define IA32_IDT_GATE_TYPE_TRAP_32       0x8F
 
+#define IA32_GDT_TYPE_TSS               0x9
+#define IA32_GDT_ALIGNMENT              8
 
 #if defined (MDE_CPU_IA32)
 ///
@@ -6662,6 +6664,70 @@ typedef union {
   } Bits;
   UINT64  Uint64;
 } IA32_IDT_GATE_DESCRIPTOR;
+
+#pragma pack (1)
+//
+// IA32 Task-State Segment Definition
+//
+typedef struct {
+  UINT16    PreviousTaskLink;
+  UINT16    Reserved_2;
+  UINT32    ESP0;
+  UINT16    SS0;
+  UINT16    Reserved_10;
+  UINT32    ESP1;
+  UINT16    SS1;
+  UINT16    Reserved_18;
+  UINT32    ESP2;
+  UINT16    SS2;
+  UINT16    Reserved_26;
+  UINT32    CR3;
+  UINT32    EIP;
+  UINT32    EFLAGS;
+  UINT32    EAX;
+  UINT32    ECX;
+  UINT32    EDX;
+  UINT32    EBX;
+  UINT32    ESP;
+  UINT32    EBP;
+  UINT32    ESI;
+  UINT32    EDI;
+  UINT16    ES;
+  UINT16    Reserved_74;
+  UINT16    CS;
+  UINT16    Reserved_78;
+  UINT16    SS;
+  UINT16    Reserved_82;
+  UINT16    DS;
+  UINT16    Reserved_86;
+  UINT16    FS;
+  UINT16    Reserved_90;
+  UINT16    GS;
+  UINT16    Reserved_94;
+  UINT16    LDTSegmentSelector;
+  UINT16    Reserved_98;
+  UINT16    T;
+  UINT16    IOMapBaseAddress;
+} IA32_TASK_STATE_SEGMENT;
+
+typedef union {
+  struct {
+    UINT32  LimitLow:16;    ///< Segment Limit 15..00
+    UINT32  BaseLow:16;     ///< Base Address  15..00
+    UINT32  BaseMid:8;      ///< Base Address  23..16
+    UINT32  Type:4;         ///< Type (1 0 B 1)
+    UINT32  Reserved_43:1;  ///< 0
+    UINT32  DPL:2;          ///< Descriptor Privilege Level
+    UINT32  P:1;            ///< Segment Present
+    UINT32  LimitHigh:4;    ///< Segment Limit 19..16
+    UINT32  AVL:1;          ///< Available for use by system software
+    UINT32  Reserved_52:2;  ///< 0 0
+    UINT32  G:1;            ///< Granularity
+    UINT32  BaseHigh:8;     ///< Base Address 31..24
+  } Bits;
+  UINT64  Uint64;
+} IA32_TSS_DESCRIPTOR;
+#pragma pack ()
 
 #endif
 
@@ -6684,6 +6750,46 @@ typedef union {
     UINT64  Uint64_1;
   } Uint128;   
 } IA32_IDT_GATE_DESCRIPTOR;
+
+#pragma pack (1)
+//
+// IA32 Task-State Segment Definition
+//
+typedef struct {
+  UINT32    Reserved_0;
+  UINT64    RSP0;
+  UINT64    RSP1;
+  UINT64    RSP2;
+  UINT64    Reserved_28;
+  UINT64    IST[7];
+  UINT64    Reserved_92;
+  UINT16    Reserved_100;
+  UINT16    IOMapBaseAddress;
+} IA32_TASK_STATE_SEGMENT;
+
+typedef union {
+  struct {
+    UINT32  LimitLow:16;    ///< Segment Limit 15..00
+    UINT32  BaseLow:16;     ///< Base Address  15..00
+    UINT32  BaseMidl:8;     ///< Base Address  23..16
+    UINT32  Type:4;         ///< Type (1 0 B 1)
+    UINT32  Reserved_43:1;  ///< 0
+    UINT32  DPL:2;          ///< Descriptor Privilege Level
+    UINT32  P:1;            ///< Segment Present
+    UINT32  LimitHigh:4;    ///< Segment Limit 19..16
+    UINT32  AVL:1;          ///< Available for use by system software
+    UINT32  Reserved_52:2;  ///< 0 0
+    UINT32  G:1;            ///< Granularity
+    UINT32  BaseMidh:8;     ///< Base Address  31..24
+    UINT32  BaseHigh:32;    ///< Base Address  63..32
+    UINT32  Reserved_96:32; ///< Reserved
+  } Bits;
+  struct {
+    UINT64  Uint64;
+    UINT64  Uint64_1;
+  } Uint128;
+} IA32_TSS_DESCRIPTOR;
+#pragma pack ()
 
 #endif
 
@@ -8948,6 +9054,17 @@ BOOLEAN
 EFIAPI
 AsmRdRand64  (
   OUT     UINT64                    *Rand
+  );
+
+/**
+  Load given selector into TR register
+
+  @param[in] Selector     Task segment selector
+**/
+VOID
+EFIAPI
+AsmWriteTr (
+  IN UINT16 Selector
   );
 
 #endif
