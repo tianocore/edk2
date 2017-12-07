@@ -110,7 +110,7 @@ class Section (SectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (File list, boolean)
     #
-    def GetFileList(FfsInf, FileType, FileExtension, Dict = {}):
+    def GetFileList(FfsInf, FileType, FileExtension, Dict = {}, IsMakefile=False):
         if FileType in Section.SectFileType.keys() :
             IsSect = True
         else :
@@ -141,7 +141,7 @@ class Section (SectionClassObject):
                 else:
                     GenFdsGlobalVariable.InfLogger ("\nCurrent ARCH \'%s\' of File %s is not in the Support Arch Scope of %s specified by INF %s in FDF" %(FfsInf.CurrentArch, File.File, File.Arch, FfsInf.InfFileName))
 
-        if Suffix != None:
+        if (not IsMakefile and Suffix != None and os.path.exists(FfsInf.EfiOutputPath)) or (IsMakefile and Suffix != None):
             #
             # Get Makefile path and time stamp
             #

@@ -92,9 +92,10 @@ class EfiSection (EfiSectionClassObject):
             elif os.path.exists(Filename):
                 FileList.append(Filename)
             elif '.depex' in FfsInf.FinalTargetSuffixMap or FfsInf.Depex:
-                FileList.append(Filename)
+                if IsMakefile:
+                    FileList.append(Filename)
         else:
-            FileList, IsSect = Section.Section.GetFileList(FfsInf, self.FileType, self.FileExtension, Dict)
+            FileList, IsSect = Section.Section.GetFileList(FfsInf, self.FileType, self.FileExtension, Dict, IsMakefile=IsMakefile)
             if IsSect :
                 return FileList, self.Alignment
 
