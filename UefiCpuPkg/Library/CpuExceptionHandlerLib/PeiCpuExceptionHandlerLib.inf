@@ -30,6 +30,7 @@
 [Sources.Ia32]
   Ia32/ExceptionHandlerAsm.asm
   Ia32/ExceptionHandlerAsm.nasm
+  Ia32/ExceptionTssEntryAsm.nasm
   Ia32/ExceptionHandlerAsm.S
   Ia32/ArchExceptionHandler.c
   Ia32/ArchInterruptDefs.h

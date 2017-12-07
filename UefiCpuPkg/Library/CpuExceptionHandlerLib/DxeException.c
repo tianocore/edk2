@@ -25,6 +25,10 @@ UINTN                       mEnabledInterruptNum = 0;
 
 EXCEPTION_HANDLER_DATA      mExceptionHandlerData;
 
+UINT8                       mNewStack[CPU_STACK_SWITCH_EXCEPTION_NUMBER *
+                                      CPU_KNOWN_GOOD_STACK_SIZE];
+UINT8                       mNewGdt[CPU_TSS_GDT_SIZE];
+
 /**
   Common exception handler.
 
@@ -196,4 +200,84 @@ RegisterCpuInterruptHandler (
   )
 {
   return RegisterCpuInterruptHandlerWorker (InterruptType, InterruptHandler, &mExceptionHandlerData);
+}
+
+/**
+  Initializes CPU exceptions entries and setup stack switch for given exceptions.
+
+  This method will call InitializeCpuExceptionHandlers() to setup default
+  exception handlers unless indicated not to do it explicitly.
+
+  If InitData is passed with NULL, this method will use the resource reserved
+  by global variables to initialize it; Otherwise it will use data in InitData
+  to setup stack switch. This is for the different use cases in DxeCore and
+  Cpu MP exception initialization.
+
+  @param[in]  VectorInfo    Pointer to reserved vector list.
+  @param[in]  InitData      Pointer to data required to setup stack switch for
+                            given exceptions.
+
+  @retval EFI_SUCCESS             The exceptions have been successfully
+                                  initialized.
+  @retval EFI_INVALID_PARAMETER   VectorInfo or InitData contains invalid
+                                  content.
+
+**/
+EFI_STATUS
+EFIAPI
+InitializeCpuExceptionHandlersEx (
+  IN EFI_VECTOR_HANDOFF_INFO            *VectorInfo OPTIONAL,
+  IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
+  )
+{
+  EFI_STATUS                        Status;
+  CPU_EXCEPTION_INIT_DATA           EssData;
+  IA32_DESCRIPTOR                   Idtr;
+  IA32_DESCRIPTOR                   Gdtr;
+
+  //
+  // To avoid repeat initialization of default handlers, the caller should pass
+  // an extended init data with InitDefaultHandlers set to FALSE. There's no
+  // need to call this method to just initialize default handlers. Call non-ex
+  // version instead; or this method must be implemented as a simple wrapper of
+  // non-ex version of it, if this version has to be called.
+  //
+  if (InitData == NULL || InitData->X64.InitDefaultHandlers) {
+    Status = InitializeCpuExceptionHandlers (VectorInfo);
+  } else {
+    Status = EFI_SUCCESS;
+  }
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // Initializing stack switch is only necessary for Stack Guard functionality.
+    //
+    if (PcdGetBool (PcdCpuStackGuard)) {
+      if (InitData == NULL) {
+        SetMem (mNewGdt, sizeof (mNewGdt), 0);
+
+        AsmReadIdtr (&Idtr);
+        AsmReadGdtr (&Gdtr);
+
+        EssData.X64.Revision = CPU_EXCEPTION_INIT_DATA_REV;
+        EssData.X64.KnownGoodStackTop = (UINTN)mNewStack;
+        EssData.X64.KnownGoodStackSize = CPU_KNOWN_GOOD_STACK_SIZE;
+        EssData.X64.StackSwitchExceptions = CPU_STACK_SWITCH_EXCEPTION_LIST;
+        EssData.X64.StackSwitchExceptionNumber = CPU_STACK_SWITCH_EXCEPTION_NUMBER;
+        EssData.X64.IdtTable = (VOID *)Idtr.Base;
+        EssData.X64.IdtTableSize = Idtr.Limit + 1;
+        EssData.X64.GdtTable = mNewGdt;
+        EssData.X64.GdtTableSize = sizeof (mNewGdt);
+        EssData.X64.ExceptionTssDesc = mNewGdt + Gdtr.Limit + 1;
+        EssData.X64.ExceptionTssDescSize = CPU_TSS_DESC_SIZE;
+        EssData.X64.ExceptionTss = mNewGdt + Gdtr.Limit + 1 + CPU_TSS_DESC_SIZE;
+        EssData.X64.ExceptionTssSize = CPU_TSS_SIZE;
+
+        InitData = &EssData;
+      }
+      Status = ArchSetupExcpetionStack (InitData);
+    }
+  }
+
+  return  Status;
 }

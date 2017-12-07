@@ -113,6 +113,162 @@ ArchRestoreExceptionContext (
 }
 
 /**
+  Setup separate stack for given exceptions.
+
+  @param[in] StackSwitchData      Pointer to data required for setuping up
+                                  stack switch.
+
+  @retval EFI_SUCCESS             The exceptions have been successfully
+                                  initialized with new stack.
+  @retval EFI_INVALID_PARAMETER   StackSwitchData contains invalid content.
+
+**/
+EFI_STATUS
+ArchSetupExcpetionStack (
+  IN CPU_EXCEPTION_INIT_DATA          *StackSwitchData
+  )
+{
+  IA32_DESCRIPTOR                   Gdtr;
+  IA32_DESCRIPTOR                   Idtr;
+  IA32_IDT_GATE_DESCRIPTOR          *IdtTable;
+  IA32_TSS_DESCRIPTOR               *TssDesc;
+  IA32_TASK_STATE_SEGMENT           *Tss;
+  UINTN                             StackTop;
+  UINTN                             Index;
+  UINTN                             Vector;
+  UINTN                             TssBase;
+  UINTN                             GdtSize;
+
+  if (StackSwitchData == NULL ||
+      StackSwitchData->Ia32.Revision != CPU_EXCEPTION_INIT_DATA_REV ||
+      StackSwitchData->X64.KnownGoodStackTop == 0 ||
+      StackSwitchData->X64.KnownGoodStackSize == 0 ||
+      StackSwitchData->X64.StackSwitchExceptions == NULL ||
+      StackSwitchData->X64.StackSwitchExceptionNumber == 0 ||
+      StackSwitchData->X64.StackSwitchExceptionNumber > CPU_EXCEPTION_NUM ||
+      StackSwitchData->X64.GdtTable == NULL ||
+      StackSwitchData->X64.IdtTable == NULL ||
+      StackSwitchData->X64.ExceptionTssDesc == NULL ||
+      StackSwitchData->X64.ExceptionTss == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // The caller is responsible for that the GDT table, no matter the existing
+  // one or newly allocated, has enough space to hold descriptors for exception
+  // task-state segments.
+  //
+  if (((UINTN)StackSwitchData->X64.GdtTable & (IA32_GDT_ALIGNMENT - 1)) != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((UINTN)StackSwitchData->X64.ExceptionTssDesc < (UINTN)(StackSwitchData->X64.GdtTable)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (((UINTN)StackSwitchData->X64.ExceptionTssDesc + StackSwitchData->X64.ExceptionTssDescSize) >
+      ((UINTN)(StackSwitchData->X64.GdtTable) + StackSwitchData->X64.GdtTableSize)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // One task gate descriptor and one task-state segment are needed.
+  //
+  if (StackSwitchData->X64.ExceptionTssDescSize < sizeof (IA32_TSS_DESCRIPTOR)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  if (StackSwitchData->X64.ExceptionTssSize < sizeof (IA32_TASK_STATE_SEGMENT)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Interrupt stack table supports only 7 vectors.
+  //
+  TssDesc = StackSwitchData->X64.ExceptionTssDesc;
+  Tss     = StackSwitchData->X64.ExceptionTss;
+  if (StackSwitchData->X64.StackSwitchExceptionNumber > ARRAY_SIZE (Tss->IST)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Initialize new GDT table and/or IDT table, if any
+  //
+  AsmReadIdtr (&Idtr);
+  AsmReadGdtr (&Gdtr);
+
+  GdtSize = (UINTN)TssDesc + sizeof (IA32_TSS_DESCRIPTOR) -
+            (UINTN)(StackSwitchData->X64.GdtTable);
+  if ((UINTN)StackSwitchData->X64.GdtTable != Gdtr.Base) {
+    CopyMem (StackSwitchData->X64.GdtTable, (VOID *)Gdtr.Base, Gdtr.Limit + 1);
+    Gdtr.Base = (UINTN)StackSwitchData->X64.GdtTable;
+    Gdtr.Limit = (UINT16)GdtSize - 1;
+  }
+
+  if ((UINTN)StackSwitchData->X64.IdtTable != Idtr.Base) {
+    Idtr.Base = (UINTN)StackSwitchData->X64.IdtTable;
+  }
+  if (StackSwitchData->X64.IdtTableSize > 0) {
+    Idtr.Limit = (UINT16)(StackSwitchData->X64.IdtTableSize - 1);
+  }
+
+  //
+  // Fixup current task descriptor. Task-state segment for current task will
+  // be filled by processor during task switching.
+  //
+  TssBase = (UINTN)Tss;
+
+  TssDesc->Bits.LimitLow   = sizeof(IA32_TASK_STATE_SEGMENT) - 1;
+  TssDesc->Bits.BaseLow    = (UINT16)TssBase;
+  TssDesc->Bits.BaseMidl   = (UINT8)(TssBase >> 16);
+  TssDesc->Bits.Type       = IA32_GDT_TYPE_TSS;
+  TssDesc->Bits.P          = 1;
+  TssDesc->Bits.LimitHigh  = 0;
+  TssDesc->Bits.BaseMidh   = (UINT8)(TssBase >> 24);
+  TssDesc->Bits.BaseHigh   = (UINT32)(TssBase >> 32);
+
+  //
+  // Fixup exception task descriptor and task-state segment
+  //
+  StackTop = StackSwitchData->X64.KnownGoodStackTop - CPU_STACK_ALIGNMENT;
+  StackTop = (UINTN)ALIGN_POINTER (StackTop, CPU_STACK_ALIGNMENT);
+  IdtTable = StackSwitchData->X64.IdtTable;
+  for (Index = 0; Index < StackSwitchData->X64.StackSwitchExceptionNumber; ++Index) {
+    //
+    // Fixup IST
+    //
+    Tss->IST[Index] = StackTop;
+    StackTop -= StackSwitchData->X64.KnownGoodStackSize;
+
+    //
+    // Set the IST field to enable corresponding IST
+    //
+    Vector = StackSwitchData->X64.StackSwitchExceptions[Index];
+    if (Vector >= CPU_EXCEPTION_NUM ||
+        Vector >= (Idtr.Limit + 1) / sizeof (IA32_IDT_GATE_DESCRIPTOR)) {
+      continue;
+    }
+    IdtTable[Vector].Bits.Reserved_0 = (UINT8)(Index + 1);
+  }
+
+  //
+  // Publish GDT
+  //
+  AsmWriteGdtr (&Gdtr);
+
+  //
+  // Load current task
+  //
+  AsmWriteTr ((UINT16)((UINTN)StackSwitchData->X64.ExceptionTssDesc - Gdtr.Base));
+
+  //
+  // Publish IDT
+  //
+  AsmWriteIdtr (&Idtr);
+
+  return EFI_SUCCESS;
+}
+
+/**
   Display CPU information.
 
   @param ExceptionType  Exception type.

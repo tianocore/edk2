@@ -48,6 +48,17 @@
     0xb21d9148, 0x9211, 0x4d8f, { 0xad, 0xd3, 0x66, 0xb1, 0x89, 0xc9, 0x2c, 0x83 } \
   }
 
+#define CPU_STACK_SWITCH_EXCEPTION_NUMBER \
+  FixedPcdGetSize (PcdCpuStackSwitchExceptionList)
+
+#define CPU_STACK_SWITCH_EXCEPTION_LIST \
+  FixedPcdGetPtr (PcdCpuStackSwitchExceptionList)
+
+#define CPU_KNOWN_GOOD_STACK_SIZE \
+  FixedPcdGet32 (PcdCpuKnownGoodStackSize)
+
+#define CPU_TSS_GDT_SIZE (SIZE_2KB + CPU_TSS_DESC_SIZE + CPU_TSS_SIZE)
+
 //
 // Record exception handler information
 //
@@ -286,6 +297,34 @@ CommonExceptionHandlerWorker (
   IN EFI_EXCEPTION_TYPE          ExceptionType,
   IN EFI_SYSTEM_CONTEXT          SystemContext,
   IN EXCEPTION_HANDLER_DATA      *ExceptionHandlerData
+  );
+
+/**
+  Setup separate stack for specific exceptions.
+
+  @param[in] StackSwitchData      Pointer to data required for setuping up
+                                  stack switch.
+
+  @retval EFI_SUCCESS             The exceptions have been successfully
+                                  initialized with new stack.
+  @retval EFI_INVALID_PARAMETER   StackSwitchData contains invalid content.
+**/
+EFI_STATUS
+ArchSetupExcpetionStack (
+  IN CPU_EXCEPTION_INIT_DATA        *StackSwitchData
+  );
+
+/**
+  Return address map of exception handler template so that C code can generate
+  exception tables. The template is only for exceptions using task gate instead
+  of interrupt gate.
+
+  @param AddressMap  Pointer to a buffer where the address map is returned.
+**/
+VOID
+EFIAPI
+AsmGetTssTemplateMap (
+  OUT EXCEPTION_HANDLER_TEMPLATE_MAP  *AddressMap
   );
 
 #endif

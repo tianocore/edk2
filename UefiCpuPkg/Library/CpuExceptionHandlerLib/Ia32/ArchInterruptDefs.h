@@ -41,4 +41,12 @@ typedef struct {
   UINT8       HookAfterStubHeaderCode[HOOKAFTER_STUB_SIZE];
 } RESERVED_VECTORS_DATA;
 
+#define CPU_TSS_DESC_SIZE \
+  (sizeof (IA32_TSS_DESCRIPTOR) * \
+   (PcdGetSize (PcdCpuStackSwitchExceptionList) + 1))
+
+#define CPU_TSS_SIZE \
+  (sizeof (IA32_TASK_STATE_SEGMENT) * \
+   (PcdGetSize (PcdCpuStackSwitchExceptionList) + 1))
+
 #endif
