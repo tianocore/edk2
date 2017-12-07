@@ -53,7 +53,10 @@
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmProfileEnable_PROMPT  #language en-US "Enable SMM Profile"
 
-#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmProfileEnable_HELP  #language en-US "Indicates if SMM Profile will be enabled. If enabled, instruction executions in and data accesses to memory outside of SMRAM will be logged. This PCD is only for validation purpose. It should be set to false in production.<BR><BR>\n"
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmProfileEnable_HELP  #language en-US "Indicates if SMM Profile will be enabled.\n"
+                                                                                   "If enabled, instruction executions in and data accesses to memory outside of SMRAM will be logged.\n"
+                                                                                   "It could not be enabled at the same time with SMM static page table feature (PcdCpuSmmStaticPageTable).\n"
+                                                                                   "This PCD is only for validation purpose. It should be set to false in production.<BR><BR>\n"
                                                                                    "TRUE  - SMM Profile will be enabled.<BR>\n"
                                                                                    "FALSE - SMM Profile will be disabled.<BR>"
 
@@ -150,8 +153,11 @@
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmStaticPageTable_PROMPT  #language en-US "Use static page table for all memory in SMM."
 
 #string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuSmmStaticPageTable_HELP  #language en-US "Indicates if SMM uses static page table.\n"
-                                                                                     "If enabled, SMM will not use on-demand paging. SMM will build static page table for all memory.<BR><BR>\n"
-                                                                                     "This flag only impacts X64 build, because SMM alway builds static page table for IA32.\n"
+                                                                                     "If enabled, SMM will not use on-demand paging. SMM will build static page table for all memory.\n"
+                                                                                     "This flag only impacts X64 build, because SMM always builds static page table for IA32.\n"
+                                                                                     "It could not be enabled at the same time with SMM profile feature (PcdCpuSmmProfileEnable).\n"
+                                                                                     "It could not be enabled also at the same time with heap guard feature for SMM\n"
+                                                                                     "(PcdHeapGuardPropertyMask in MdeModulePkg).<BR><BR>\n"
                                                                                      "TRUE  - SMM uses static page table for all memory.<BR>\n"
                                                                                      "FALSE - SMM uses static page table for below 4G memory and use on-demand paging for above 4G memory.<BR>"
 

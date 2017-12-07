@@ -919,17 +919,24 @@ SetPageTableAttributes (
   //
   // Don't do this if
   //  - no static page table; or
-  //  - SMM heap guard feature enabled
+  //  - SMM heap guard feature enabled; or
   //      BIT2: SMM page guard enabled
   //      BIT3: SMM pool guard enabled
+  //  - SMM profile feature enabled
   //
   if (!mCpuSmmStaticPageTable ||
-      (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) {
+      ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0) ||
+      FeaturePcdGet (PcdCpuSmmProfileEnable)) {
     //
-    // Static paging and heap guard should not be enabled at the same time.
+    // Static paging and heap guard could not be enabled at the same time.
     //
     ASSERT (!(mCpuSmmStaticPageTable &&
               (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT3 | BIT2)) != 0));
+
+    //
+    // Static paging and SMM profile could not be enabled at the same time.
+    //
+    ASSERT (!(mCpuSmmStaticPageTable && FeaturePcdGet (PcdCpuSmmProfileEnable)));
     return ;
   }
 
