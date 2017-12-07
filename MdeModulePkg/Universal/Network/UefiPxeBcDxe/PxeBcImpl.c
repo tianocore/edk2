@@ -166,13 +166,15 @@ IcmpErrorListenHandlerDpc (
     return;
   }
 
-  if (EFI_ERROR (Status) || (RxData == NULL)) {
-    //
-    // Only process the normal packets and the icmp error packets, if RxData is NULL
-    // with Status == EFI_SUCCESS or EFI_ICMP_ERROR, just resume the receive although
-    // this should be a bug of the low layer (IP).
-    //
+  if (RxData == NULL) {
     goto Resume;
+  }
+
+  if (Status != EFI_ICMP_ERROR) {
+    //
+    // The return status should be recognized as EFI_ICMP_ERROR.
+    //
+    goto CleanUp;
   }
 
   if (EFI_IP4 (RxData->Header->SourceAddress) != 0 &&
@@ -215,8 +217,6 @@ IcmpErrorListenHandlerDpc (
     }
     CopiedPointer += CopiedLen;
   }
-
-  goto Resume;
 
 CleanUp:
   gBS->SignalEvent (RxData->RecycleSignal);
