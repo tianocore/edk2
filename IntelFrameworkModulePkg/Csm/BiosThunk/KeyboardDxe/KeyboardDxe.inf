@@ -74,7 +74,6 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFastPS2Detection                  ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask  ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   KeyboardDxeExtra.uni
