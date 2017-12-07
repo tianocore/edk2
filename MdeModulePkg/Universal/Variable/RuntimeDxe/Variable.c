@@ -3146,7 +3146,11 @@ VariableServiceSetVariable (
   //  Make sure if runtime bit is set, boot service bit is set also.
   //
   if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS) {
-    return EFI_INVALID_PARAMETER;
+    if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+      return EFI_UNSUPPORTED;
+    } else {
+      return EFI_INVALID_PARAMETER;
+    }
   } else if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
     if (!mVariableModuleGlobal->VariableGlobal.AuthSupport) {
       //
@@ -3169,15 +3173,16 @@ VariableServiceSetVariable (
   //
   if (((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) == EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS)
      && ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS)) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_UNSUPPORTED;
   }
 
   if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) == EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) {
-    if (DataSize < AUTHINFO_SIZE) {
-      //
-      // Try to write Authenticated Variable without AuthInfo.
-      //
-      return EFI_SECURITY_VIOLATION;
+    //
+    //  If DataSize == AUTHINFO_SIZE and then PayloadSize is 0.
+    //  Maybe it's the delete operation of common authenticated variable at user physical presence.
+    //
+    if (DataSize != AUTHINFO_SIZE) {
+      return EFI_UNSUPPORTED;
     }
     PayloadSize = DataSize - AUTHINFO_SIZE;
   } else if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) == EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) {
@@ -3521,6 +3526,13 @@ VariableServiceQueryVariableInfo (
 
   if(MaximumVariableStorageSize == NULL || RemainingVariableStorageSize == NULL || MaximumVariableSize == NULL || Attributes == 0) {
     return EFI_INVALID_PARAMETER;
+  }
+
+  if ((Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
+    //
+    //  Deprecated attribute, make this check as highest priority.
+    //
+    return EFI_UNSUPPORTED;
   }
 
   if ((Attributes & EFI_VARIABLE_ATTRIBUTES_MASK) == 0) {
