@@ -148,7 +148,6 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdHighPmmMemorySize            ## CONSUMES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemoryBase      ## CONSUMES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemorySize      ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdNullPointerDetectionPropertyMask        ## CONSUMES
 
 [Depex]
   gEfiLegacyRegion2ProtocolGuid AND gEfiLegacyInterruptProtocolGuid AND gEfiLegacyBiosPlatformProtocolGuid AND gEfiLegacy8259ProtocolGuid AND gEfiGenericMemTestProtocolGuid AND gEfiCpuArchProtocolGuid AND gEfiTimerArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

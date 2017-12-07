@@ -2403,35 +2403,33 @@ LegacyBiosInstallRom (
   // 2. BBS compliants drives will not change 40:75 until boot time.
   // 3. Onboard IDE controllers will change 40:75
   //
-  DisableNullDetection ();
+  ACCESS_PAGE0_CODE (
+    LocalDiskStart = (UINT8) ((*(UINT8 *) ((UINTN) 0x475)) + 0x80);
+    if ((Private->Disk4075 + 0x80) < LocalDiskStart) {
+      //
+      // Update table since onboard IDE drives found
+      //
+      Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].PciSegment        = 0xff;
+      Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].PciBus            = 0xff;
+      Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].PciDevice         = 0xff;
+      Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].PciFunction       = 0xff;
+      Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].StartDriveNumber  = (UINT8) (Private->Disk4075 + 0x80);
+      Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].EndDriveNumber    = LocalDiskStart;
+      Private->LegacyEfiHddTableIndex ++;
+      Private->Disk4075 = (UINT8) (LocalDiskStart & 0x7f);
+      Private->DiskEnd  = LocalDiskStart;
+    }
 
-  LocalDiskStart = (UINT8) ((*(UINT8 *) ((UINTN) 0x475)) + 0x80);
-  if ((Private->Disk4075 + 0x80) < LocalDiskStart) {
-    //
-    // Update table since onboard IDE drives found
-    //
-    Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].PciSegment        = 0xff;
-    Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].PciBus            = 0xff;
-    Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].PciDevice         = 0xff;
-    Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].PciFunction       = 0xff;
-    Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].StartDriveNumber  = (UINT8) (Private->Disk4075 + 0x80);
-    Private->LegacyEfiHddTable[Private->LegacyEfiHddTableIndex].EndDriveNumber    = LocalDiskStart;
-    Private->LegacyEfiHddTableIndex ++;
-    Private->Disk4075 = (UINT8) (LocalDiskStart & 0x7f);
-    Private->DiskEnd  = LocalDiskStart;
-  }
+    if (PciHandle != mVgaHandle) {
 
-  if (PciHandle != mVgaHandle) {
+      EnablePs2Keyboard ();
 
-    EnablePs2Keyboard ();
-
-    //
-    // Store current mode settings since PrepareToScanRom may change mode.
-    //
-    VideoMode = *(UINT8 *) ((UINTN) (0x400 + BDA_VIDEO_MODE));
-  }
-
-  EnableNullDetection ();
+      //
+      // Store current mode settings since PrepareToScanRom may change mode.
+      //
+      VideoMode = *(UINT8 *) ((UINTN) (0x400 + BDA_VIDEO_MODE));
+    }
+  );
 
   //
   // Notify the platform that we are about to scan the ROM
@@ -2473,11 +2471,11 @@ LegacyBiosInstallRom (
   // Multiply result by 18.2 for number of ticks since midnight.
   // Use 182/10 to avoid floating point math.
   //
-  DisableNullDetection ();
-  LocalTime = (LocalTime * 182) / 10;
-  BdaPtr    = (UINT32 *) ((UINTN) 0x46C);
-  *BdaPtr   = LocalTime;
-  EnableNullDetection ();
+  ACCESS_PAGE0_CODE (
+    LocalTime = (LocalTime * 182) / 10;
+    BdaPtr    = (UINT32 *) ((UINTN) 0x46C);
+    *BdaPtr   = LocalTime;
+  );
   
   //
   // Pass in handoff data
@@ -2573,9 +2571,9 @@ LegacyBiosInstallRom (
     //
     // Set mode settings since PrepareToScanRom may change mode
     //
-    DisableNullDetection ();
-    OldVideoMode = *(UINT8 *) ((UINTN) (0x400 + BDA_VIDEO_MODE));
-    EnableNullDetection ();
+    ACCESS_PAGE0_CODE ({
+      OldVideoMode = *(UINT8 *) ((UINTN) (0x400 + BDA_VIDEO_MODE));
+    });
 
     if (VideoMode != OldVideoMode) {
       //
@@ -2617,9 +2615,9 @@ LegacyBiosInstallRom (
     }
   }
 
-  DisableNullDetection ();
-  LocalDiskEnd = (UINT8) ((*(UINT8 *) ((UINTN) 0x475)) + 0x80);
-  EnableNullDetection ();
+  ACCESS_PAGE0_CODE (
+    LocalDiskEnd = (UINT8) ((*(UINT8 *) ((UINTN) 0x475)) + 0x80);
+  );
   
   //
   // Allow platform to perform any required actions after the

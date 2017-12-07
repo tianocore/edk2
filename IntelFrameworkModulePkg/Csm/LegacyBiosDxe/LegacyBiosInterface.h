@@ -1544,20 +1544,4 @@ LegacyBiosInstallVgaRom (
   IN  LEGACY_BIOS_INSTANCE            *Private
   );
 
-/**
-   Enable NULL pointer detection.
-**/
-VOID
-EnableNullDetection (
-  VOID
-  );
-
-/**
-   Disable NULL pointer detection.
-**/
-VOID
-DisableNullDetection (
-  VOID
-  );
-
 #endif

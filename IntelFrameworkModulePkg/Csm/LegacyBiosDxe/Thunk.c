@@ -73,10 +73,10 @@ LegacyBiosInt86 (
   // The base address of legacy interrupt vector table is 0.
   // We use this base address to get the legacy interrupt handler.
   //
-  DisableNullDetection ();
-  Segment               = (UINT16)(((UINT32 *)0)[BiosInt] >> 16);
-  Offset                = (UINT16)((UINT32 *)0)[BiosInt];
-  EnableNullDetection ();
+  ACCESS_PAGE0_CODE (
+    Segment               = (UINT16)(((UINT32 *)0)[BiosInt] >> 16);
+    Offset                = (UINT16)((UINT32 *)0)[BiosInt];
+  );
   
   return InternalLegacyBiosFarCall (
            This,
@@ -286,29 +286,6 @@ InternalLegacyBiosFarCall (
 
   AsmThunk16 (&mThunkContext);
 
-  //
-  // OPROM may allocate EBDA range by itself and change EBDA base and EBDA size.
-  // Get the current EBDA base address, and compared with pre-allocate minimum
-  // EBDA base address, if the current EBDA base address is smaller, it indicates
-  // PcdEbdaReservedMemorySize should be adjusted to larger for more OPROMs.
-  //
-  DEBUG_CODE (
-    {
-      UINTN                 EbdaBaseAddress;
-      UINTN                 ReservedEbdaBaseAddress;
-
-      //
-      // Skip this part of debug code if NULL pointer detection is enabled
-      //
-      if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) == 0) {
-        EbdaBaseAddress = (*(UINT16 *) (UINTN) 0x40E) << 4;
-        ReservedEbdaBaseAddress = CONVENTIONAL_MEMORY_TOP
-                                  - PcdGet32 (PcdEbdaReservedMemorySize);
-        ASSERT (ReservedEbdaBaseAddress <= EbdaBaseAddress);
-      }
-    }
-  );
-
   if (Stack != NULL && StackSize != 0) {
     //
     // Copy low memory stack to Stack
@@ -334,6 +311,26 @@ InternalLegacyBiosFarCall (
   //
   gBS->RestoreTPL (OriginalTpl);
   
+  //
+  // OPROM may allocate EBDA range by itself and change EBDA base and EBDA size.
+  // Get the current EBDA base address, and compared with pre-allocate minimum
+  // EBDA base address, if the current EBDA base address is smaller, it indicates
+  // PcdEbdaReservedMemorySize should be adjusted to larger for more OPROMs.
+  //
+  DEBUG_CODE (
+    {
+      UINTN                 EbdaBaseAddress;
+      UINTN                 ReservedEbdaBaseAddress;
+
+      ACCESS_PAGE0_CODE (
+        EbdaBaseAddress = (*(UINT16 *) (UINTN) 0x40E) << 4;
+        ReservedEbdaBaseAddress = CONVENTIONAL_MEMORY_TOP
+                                  - PcdGet32 (PcdEbdaReservedMemorySize);
+        ASSERT (ReservedEbdaBaseAddress <= EbdaBaseAddress);
+      );
+    }
+  );
+
   //
   // Restore interrupt of debug timer
   //
