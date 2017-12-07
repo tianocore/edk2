@@ -188,15 +188,15 @@ CommonHandler:
     add     rsp, -0x20
 
     mov     rcx, rbx
-    mov     rax, CpuSmmDebugEntry
+    mov     rax, ASM_PFX(CpuSmmDebugEntry)
     call    rax
 
     mov     rcx, rbx
-    mov     rax, SmiRendezvous          ; rax <- absolute addr of SmiRedezvous
+    mov     rax, ASM_PFX(SmiRendezvous)          ; rax <- absolute addr of SmiRedezvous
     call    rax
 
     mov     rcx, rbx
-    mov     rax, CpuSmmDebugExit
+    mov     rax, ASM_PFX(CpuSmmDebugExit)
     call    rax
 
     add     rsp, 0x20
