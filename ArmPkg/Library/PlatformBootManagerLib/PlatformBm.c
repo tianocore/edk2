@@ -515,6 +515,8 @@ PlatformBootManagerBeforeConsole (
   PlatformRegisterOptionsAndKeys ();
 }
 
+#define VERSION_STRING_PREFIX    L"Tianocore/EDK2 firmware version "
+
 /**
   Do the platform specific action after the console is ready
   Possible things that can be done in PlatformBootManagerAfterConsole:
@@ -534,14 +536,37 @@ PlatformBootManagerAfterConsole (
 {
   ESRT_MANAGEMENT_PROTOCOL      *EsrtManagement;
   EFI_STATUS                    Status;
+  EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
+  UINTN                         FirmwareVerLength;
+  UINTN                         PosX;
+  UINTN                         PosY;
+
+  FirmwareVerLength = StrLen (PcdGetPtr (PcdFirmwareVersionString));
 
   //
   // Show the splash screen.
   //
   Status = BootLogoEnableLogo ();
   if (EFI_ERROR (Status)) {
+    if (FirmwareVerLength > 0) {
+      Print (VERSION_STRING_PREFIX L"%s",
+        PcdGetPtr (PcdFirmwareVersionString));
+    }
     Print (L"Press ESCAPE for boot options ");
+  } else if (FirmwareVerLength > 0) {
+    Status = gBS->HandleProtocol (gST->ConsoleOutHandle,
+                    &gEfiGraphicsOutputProtocolGuid, (VOID **)&GraphicsOutput);
+    if (!EFI_ERROR (Status)) {
+      PosX = (GraphicsOutput->Mode->Info->HorizontalResolution -
+              (StrLen (VERSION_STRING_PREFIX) + FirmwareVerLength) *
+              EFI_GLYPH_WIDTH) / 2;
+      PosY = 0;
+
+      PrintXY (PosX, PosY, NULL, NULL, VERSION_STRING_PREFIX L"%s",
+        PcdGetPtr (PcdFirmwareVersionString));
+    }
   }
+
   //
   // Connect the rest of the devices.
   //
