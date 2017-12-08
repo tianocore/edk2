@@ -24,6 +24,7 @@
 #include <Guid/BootScriptExecutorVariable.h>
 #include <Guid/ExtendedFirmwarePerformance.h>
 #include <Guid/EndOfS3Resume.h>
+#include <Guid/S3SmmInitDone.h>
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/S3Resume2.h>
 #include <Ppi/SmmAccess.h>
@@ -259,6 +260,12 @@ EFI_PEI_PPI_DESCRIPTOR mPpiListEndOfPeiTable = {
   0
 };
 
+EFI_PEI_PPI_DESCRIPTOR mPpiListS3SmmInitDoneTable = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gEdkiiS3SmmInitDoneGuid,
+  0
+};
+
 //
 // Global Descriptor Table (GDT)
 //
@@ -322,13 +329,14 @@ IsLongModeWakingVector (
 }
 
 /**
-  Send EndOfS3Resume event to SmmCore through communication buffer way.
+  Signal to SMM through communication buffer way.
 
-  @retval  EFI_SUCCESS                 Return send the event success.
+  @param[in]  HandlerType       SMI handler type to be signaled.
+
 **/
-EFI_STATUS
-SignalEndOfS3Resume (
-  VOID
+VOID
+SignalToSmmByCommunication (
+  IN EFI_GUID   *HandlerType
   )
 {
   EFI_STATUS                         Status;
@@ -338,7 +346,7 @@ SignalEndOfS3Resume (
   SMM_COMMUNICATE_HEADER_64          Header64;
   VOID                               *CommBuffer;
 
-  DEBUG ((DEBUG_INFO, "SignalEndOfS3Resume - Enter\n"));
+  DEBUG ((DEBUG_INFO, "Signal %g to SMM - Enter\n", HandlerType));
 
   //
   // This buffer consumed in DXE phase, so base on DXE mode to prepare communicate buffer.
@@ -355,7 +363,7 @@ SignalEndOfS3Resume (
     Header32.MessageLength = 0;
     CommSize = OFFSET_OF (SMM_COMMUNICATE_HEADER_32, Data);
   }
-  CopyGuid (CommBuffer, &gEdkiiEndOfS3ResumeGuid);
+  CopyGuid (CommBuffer, HandlerType);
 
   Status = PeiServicesLocatePpi (
              &gEfiPeiSmmCommunicationPpiGuid,
@@ -365,7 +373,7 @@ SignalEndOfS3Resume (
              );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Locate Smm Communicate Ppi failed (%r)!\n", Status));
-    return Status;
+    return;
   }
 
   Status = SmmCommunicationPpi->Communicate (
@@ -377,8 +385,8 @@ SignalEndOfS3Resume (
     DEBUG ((DEBUG_ERROR, "SmmCommunicationPpi->Communicate return failure (%r)!\n", Status));
   }
 
-  DEBUG ((DEBUG_INFO, "SignalEndOfS3Resume - Exit (%r)\n", Status));
-  return Status;
+  DEBUG ((DEBUG_INFO, "Signal %g to SMM - Exit (%r)\n", HandlerType, Status));
+  return;
 }
 
 /**
@@ -463,12 +471,13 @@ S3ResumeBootOs (
 
   PERF_END_EX (NULL, "EndOfPeiPpi", NULL, 0, PERF_INMODULE_END_ID);
 
-  //
-  // Signal EndOfS3Resume event.
-  //
   PERF_START_EX (NULL, "EndOfS3Resume", NULL, 0, PERF_INMODULE_START_ID);
 
-  SignalEndOfS3Resume ();
+  DEBUG ((DEBUG_INFO, "Signal EndOfS3Resume\n"));
+  //
+  // Signal EndOfS3Resume to SMM.
+  //
+  SignalToSmmByCommunication (&gEdkiiEndOfS3ResumeGuid);
 
   PERF_END_EX (NULL, "EndOfS3Resume", NULL, 0, PERF_INMODULE_END_ID);
 
@@ -787,6 +796,17 @@ S3ResumeExecuteBootScript (
         Status = SmmAccess->Lock ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
       }
     }
+
+    DEBUG ((DEBUG_INFO, "Signal S3SmmInitDone\n"));
+    //
+    // Install S3SmmInitDone PPI.
+    //
+    Status = PeiServicesInstallPpi (&mPpiListS3SmmInitDoneTable);
+    ASSERT_EFI_ERROR (Status);
+    //
+    // Signal S3SmmInitDone to SMM.
+    //
+    SignalToSmmByCommunication (&gEdkiiS3SmmInitDoneGuid);
   }
 
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
