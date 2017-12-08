@@ -78,6 +78,9 @@
   gEfiAcpiVariableGuid
   gEfiAcpiS3ContextGuid                         ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
   gEdkiiEndOfS3ResumeGuid                       ## SOMETIMES_CONSUMES ## UNDEFINED # Used to do smm communication
+  ## SOMETIMES_PRODUCES ## UNDEFINED # Install PPI
+  ## SOMETIMES_CONSUMES ## UNDEFINED # Used to do smm communication
+  gEdkiiS3SmmInitDoneGuid
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid               ## CONSUMES
