@@ -157,6 +157,7 @@ SmmLegacyBootHandler (
 {
   EFI_STATUS    Status;
   EFI_HANDLE    SmmHandle;
+  UINTN         Index;
 
   //
   // Install SMM Legacy Boot protocol.
@@ -172,6 +173,16 @@ SmmLegacyBootHandler (
   mInLegacyBoot = TRUE;
 
   SmiHandlerUnRegister (DispatchHandle);
+
+  //
+  // It is legacy boot, unregister ExitBootService SMI handler.
+  //
+  for (Index = 0; mSmmCoreSmiHandlers[Index].HandlerType != NULL; Index++) {
+    if (CompareGuid (mSmmCoreSmiHandlers[Index].HandlerType, &gEfiEventExitBootServicesGuid)) {
+      SmiHandlerUnRegister (mSmmCoreSmiHandlers[Index].DispatchHandle);
+      break;
+    }
+  }
 
   return Status;
 }
@@ -201,6 +212,7 @@ SmmExitBootServicesHandler (
 {
   EFI_STATUS    Status;
   EFI_HANDLE    SmmHandle;
+  UINTN         Index;
 
   //
   // Install SMM Exit Boot Services protocol.
@@ -214,6 +226,16 @@ SmmExitBootServicesHandler (
              );
 
   SmiHandlerUnRegister (DispatchHandle);
+
+  //
+  // It is UEFI boot, unregister LegacyBoot SMI handler.
+  //
+  for (Index = 0; mSmmCoreSmiHandlers[Index].HandlerType != NULL; Index++) {
+    if (CompareGuid (mSmmCoreSmiHandlers[Index].HandlerType, &gEfiEventLegacyBootGuid)) {
+      SmiHandlerUnRegister (mSmmCoreSmiHandlers[Index].DispatchHandle);
+      break;
+    }
+  }
 
   return Status;
 }
