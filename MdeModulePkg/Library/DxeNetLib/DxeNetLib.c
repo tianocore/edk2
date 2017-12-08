@@ -2605,6 +2605,24 @@ NetLibDetectMediaWaitTimeout (
     if (MediaInfo != NULL) {
       FreePool (MediaInfo);
     }
+
+    if (Status == EFI_UNSUPPORTED) {
+
+      //
+      // If gEfiAdapterInfoMediaStateGuid is not supported, call NetLibDetectMedia to get media state!
+      //
+      MediaPresent = TRUE;
+      Status = NetLibDetectMedia (ServiceHandle, &MediaPresent);
+      if (!EFI_ERROR (Status)) {
+        if (MediaPresent == TRUE) {
+          *MediaState = EFI_SUCCESS;
+        } else {
+          *MediaState = EFI_NO_MEDIA;
+        }
+      }
+      return Status;
+    }
+
     return Status;
   }
 
