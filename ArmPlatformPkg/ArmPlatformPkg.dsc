@@ -27,7 +27,7 @@
   DSC_SPECIFICATION              = 0x0001001A
   OUTPUT_DIRECTORY               = Build/ArmPlatform
   SUPPORTED_ARCHITECTURES        = ARM|AARCH64
-  BUILD_TARGETS                  = DEBUG|RELEASE
+  BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
 [BuildOptions]
