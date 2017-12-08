@@ -33,6 +33,7 @@
 #include <Protocol/SmmLegacyBoot.h>
 #include <Protocol/SmmReadyToBoot.h>
 #include <Protocol/SmmMemoryAttribute.h>
+#include <Protocol/SmmSxDispatch2.h>
 
 #include <Guid/Apriori.h>
 #include <Guid/EventGroup.h>

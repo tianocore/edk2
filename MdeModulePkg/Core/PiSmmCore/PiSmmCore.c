@@ -72,6 +72,12 @@ EFI_SMM_SYSTEM_TABLE2  gSmmCoreSmst = {
 BOOLEAN  mInLegacyBoot = FALSE;
 
 //
+// Flag to determine if it is during S3 resume.
+// It will be set in S3 entry callback and cleared at EndOfS3Resume.
+//
+BOOLEAN  mDuringS3Resume = FALSE;
+
+//
 // Table of SMI Handlers that are registered by the SMM Core when it is initialized
 //
 SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
@@ -213,6 +219,37 @@ SmmExitBootServicesHandler (
 }
 
 /**
+  Main entry point for an SMM handler dispatch or communicate-based callback.
+
+  @param[in]     DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
+  @param[in]     Context         Points to an optional handler context which was specified when the
+                                 handler was registered.
+  @param[in,out] CommBuffer      A pointer to a collection of data in memory that will
+                                 be conveyed from a non-SMM environment into an SMM environment.
+  @param[in,out] CommBufferSize  The size of the CommBuffer.
+
+  @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers
+                                              should still be called.
+  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED  The interrupt has been quiesced but other handlers should
+                                              still be called.
+  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The interrupt is still pending and other handlers should still
+                                              be called.
+  @retval EFI_INTERRUPT_PENDING               The interrupt could not be quiesced.
+**/
+EFI_STATUS
+EFIAPI
+SmmS3EntryCallBack (
+  IN           EFI_HANDLE           DispatchHandle,
+  IN     CONST VOID                 *Context         OPTIONAL,
+  IN OUT       VOID                 *CommBuffer      OPTIONAL,
+  IN OUT       UINTN                *CommBufferSize  OPTIONAL
+  )
+{
+  mDuringS3Resume = TRUE;
+  return EFI_SUCCESS;
+}
+
+/**
   Software SMI handler that is called when an Ready To Boot event is signalled.
   Then the SMM Core also install SMM Ready To Boot protocol to notify SMM driver
   that system enter ready to boot.
@@ -235,8 +272,11 @@ SmmReadyToBootHandler (
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
-  EFI_STATUS    Status;
-  EFI_HANDLE    SmmHandle;
+  EFI_STATUS                        Status;
+  EFI_HANDLE                        SmmHandle;
+  EFI_SMM_SX_DISPATCH2_PROTOCOL     *SxDispatch;
+  EFI_SMM_SX_REGISTER_CONTEXT       EntryRegisterContext;
+  EFI_HANDLE                        S3EntryHandle;
 
   //
   // Install SMM Ready To Boot protocol.
@@ -251,7 +291,31 @@ SmmReadyToBootHandler (
 
   SmiHandlerUnRegister (DispatchHandle);
 
-  return Status;
+  //
+  // Locate SmmSxDispatch2 protocol.
+  //
+  Status = SmmLocateProtocol (
+             &gEfiSmmSxDispatch2ProtocolGuid,
+             NULL,
+             &SxDispatch
+             );
+  if (!EFI_ERROR (Status)) {
+    //
+    // Register a S3 entry callback function to
+    // determine if it will be during S3 resume.
+    //
+    EntryRegisterContext.Type  = SxS3;
+    EntryRegisterContext.Phase = SxEntry;
+    Status = SxDispatch->Register (
+                           SxDispatch,
+                           SmmS3EntryCallBack,
+                           &EntryRegisterContext,
+                           &S3EntryHandle
+                           );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -409,7 +473,12 @@ SmmEndOfS3ResumeHandler (
   EFI_STATUS  Status;
   EFI_HANDLE  SmmHandle;
 
-  DEBUG ((EFI_D_INFO, "SmmEndOfS3ResumeHandler\n"));
+  DEBUG ((DEBUG_INFO, "SmmEndOfS3ResumeHandler\n"));
+
+  if (!mDuringS3Resume) {
+    DEBUG ((DEBUG_ERROR, "It is not during S3 resume\n"));
+    return EFI_SUCCESS;
+  }
 
   //
   // Install SMM EndOfS3Resume protocol
@@ -433,6 +502,8 @@ SmmEndOfS3ResumeHandler (
            NULL
            );
   ASSERT_EFI_ERROR (Status);
+
+  mDuringS3Resume = FALSE;
 
   return Status;
 }
