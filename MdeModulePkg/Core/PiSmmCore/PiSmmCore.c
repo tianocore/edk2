@@ -1,7 +1,7 @@
 /** @file
   SMM Core Main Entry Point
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -87,6 +87,7 @@ SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
   { SmmExitBootServicesHandler, &gEfiEventExitBootServicesGuid,      NULL, FALSE },
   { SmmReadyToBootHandler,      &gEfiEventReadyToBootGuid,           NULL, FALSE },
   { SmmEndOfDxeHandler,         &gEfiEndOfDxeEventGroupGuid,         NULL, TRUE },
+  { SmmS3SmmInitDoneHandler,    &gEdkiiS3SmmInitDoneGuid,            NULL, FALSE },
   { SmmEndOfS3ResumeHandler,    &gEdkiiEndOfS3ResumeGuid,            NULL, FALSE },
   { NULL,                       NULL,                                NULL, FALSE }
 };
@@ -469,6 +470,65 @@ SmmEndOfDxeHandler (
   }
 
   return EFI_SUCCESS;
+}
+
+/**
+  Software SMI handler that is called when the S3SmmInitDone signal is triggered.
+  This function installs the SMM S3SmmInitDone Protocol so SMM Drivers are informed that
+  S3 SMM initialization has been done.
+
+  @param  DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
+  @param  Context         Points to an optional handler context which was specified when the handler was registered.
+  @param  CommBuffer      A pointer to a collection of data in memory that will
+                          be conveyed from a non-SMM environment into an SMM environment.
+  @param  CommBufferSize  The size of the CommBuffer.
+
+  @return Status Code
+
+**/
+EFI_STATUS
+EFIAPI
+SmmS3SmmInitDoneHandler (
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context,        OPTIONAL
+  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+  EFI_HANDLE  SmmHandle;
+
+  DEBUG ((DEBUG_INFO, "SmmS3SmmInitDoneHandler\n"));
+
+  if (!mDuringS3Resume) {
+    DEBUG ((DEBUG_ERROR, "It is not during S3 resume\n"));
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Install SMM S3SmmInitDone protocol
+  //
+  SmmHandle = NULL;
+  Status = SmmInstallProtocolInterface (
+             &SmmHandle,
+             &gEdkiiS3SmmInitDoneGuid,
+             EFI_NATIVE_INTERFACE,
+             NULL
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Uninstall the protocol here because the comsumer just hook the
+  // installation event.
+  //
+  Status = SmmUninstallProtocolInterface (
+           SmmHandle,
+           &gEdkiiS3SmmInitDoneGuid,
+           NULL
+           );
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
 }
 
 /**
