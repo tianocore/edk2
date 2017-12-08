@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by SmmCore module.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -42,6 +42,7 @@
 #include <Guid/LoadModuleAtFixedAddress.h>
 #include <Guid/SmiHandlerProfile.h>
 #include <Guid/EndOfS3Resume.h>
+#include <Guid/S3SmmInitDone.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -808,6 +809,29 @@ SmmReadyToBootHandler (
   IN     CONST VOID               *Context,        OPTIONAL
   IN OUT VOID                     *CommBuffer,     OPTIONAL
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
+  );
+
+/**
+  Software SMI handler that is called when the S3SmmInitDone signal is triggered.
+  This function installs the SMM S3SmmInitDone Protocol so SMM Drivers are informed that
+  S3 SMM initialization has been done.
+
+  @param  DispatchHandle  The unique handle assigned to this handler by SmiHandlerRegister().
+  @param  Context         Points to an optional handler context which was specified when the handler was registered.
+  @param  CommBuffer      A pointer to a collection of data in memory that will
+                          be conveyed from a non-SMM environment into an SMM environment.
+  @param  CommBufferSize  The size of the CommBuffer.
+
+  @return Status Code
+
+**/
+EFI_STATUS
+EFIAPI
+SmmS3SmmInitDoneHandler (
+  IN     EFI_HANDLE  DispatchHandle,
+  IN     CONST VOID  *Context,        OPTIONAL
+  IN OUT VOID        *CommBuffer,     OPTIONAL
+  IN OUT UINTN       *CommBufferSize  OPTIONAL
   );
 
 /**
