@@ -18,7 +18,7 @@
   FILE_GUID                      = b78d02bb-d0b5-4389-bc7f-b39ee846c784
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = LcdPlatformNullLib
+  LIBRARY_CLASS                  = LcdPlatformLib
 
 [Sources]
   LcdPlatformNullLib.c
