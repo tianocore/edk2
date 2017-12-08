@@ -32,7 +32,6 @@
 #include <Protocol/SmmExitBootServices.h>
 #include <Protocol/SmmLegacyBoot.h>
 #include <Protocol/SmmReadyToBoot.h>
-#include <Protocol/SmmEndOfS3Resume.h>
 #include <Protocol/SmmMemoryAttribute.h>
 
 #include <Guid/Apriori.h>
@@ -41,6 +40,7 @@
 #include <Guid/MemoryProfile.h>
 #include <Guid/LoadModuleAtFixedAddress.h>
 #include <Guid/SmiHandlerProfile.h>
+#include <Guid/EndOfS3Resume.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>

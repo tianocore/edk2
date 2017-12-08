@@ -81,7 +81,7 @@ SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
   { SmmExitBootServicesHandler, &gEfiEventExitBootServicesGuid,      NULL, FALSE },
   { SmmReadyToBootHandler,      &gEfiEventReadyToBootGuid,           NULL, FALSE },
   { SmmEndOfDxeHandler,         &gEfiEndOfDxeEventGroupGuid,         NULL, TRUE },
-  { SmmEndOfS3ResumeHandler,    &gEdkiiSmmEndOfS3ResumeProtocolGuid, NULL, FALSE },
+  { SmmEndOfS3ResumeHandler,    &gEdkiiEndOfS3ResumeGuid,            NULL, FALSE },
   { NULL,                       NULL,                                NULL, FALSE }
 };
 
@@ -384,7 +384,7 @@ SmmEndOfDxeHandler (
 }
 
 /**
-  Software SMI handler that is called when the EndOfS3Resume event is trigged.
+  Software SMI handler that is called when the EndOfS3Resume signal is triggered.
   This function installs the SMM EndOfS3Resume Protocol so SMM Drivers are informed that
   S3 resume has finished.
 
@@ -417,19 +417,19 @@ SmmEndOfS3ResumeHandler (
   SmmHandle = NULL;
   Status = SmmInstallProtocolInterface (
              &SmmHandle,
-             &gEdkiiSmmEndOfS3ResumeProtocolGuid,
+             &gEdkiiEndOfS3ResumeGuid,
              EFI_NATIVE_INTERFACE,
              NULL
              );
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Uninstall the protocol here because the comsume just hook the
+  // Uninstall the protocol here because the comsumer just hook the
   // installation event.
   //
   Status = SmmUninstallProtocolInterface (
            SmmHandle,
-           &gEdkiiSmmEndOfS3ResumeProtocolGuid,
+           &gEdkiiEndOfS3ResumeGuid,
            NULL
            );
   ASSERT_EFI_ERROR (Status);

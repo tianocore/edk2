@@ -23,14 +23,13 @@
 #include <Guid/AcpiS3Context.h>
 #include <Guid/BootScriptExecutorVariable.h>
 #include <Guid/Performance.h>
+#include <Guid/EndOfS3Resume.h>
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/S3Resume2.h>
 #include <Ppi/SmmAccess.h>
 #include <Ppi/PostBootScriptTable.h>
 #include <Ppi/EndOfPeiPhase.h>
 #include <Ppi/SmmCommunication.h>
-
-#include <Protocol/SmmEndOfS3Resume.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
@@ -156,7 +155,7 @@ typedef union {
 
 //
 // Define two type of smm communicate headers.
-// One for 32 bits  PEI + 64 bits DXE, the other for 32 bits PEI + 32 bits DXE case.
+// One for 32 bits PEI + 64 bits DXE, the other for 32 bits PEI + 32 bits DXE case.
 //
 typedef struct {
   EFI_GUID  HeaderGuid;
@@ -471,7 +470,7 @@ SignalEndOfS3Resume (
   // This buffer consumed in DXE phase, so base on DXE mode to prepare communicate buffer.
   // Detect whether DXE is 64 bits mode.
   // if (sizeof(UINTN) == sizeof(UINT64), PEI already 64 bits, assume DXE also 64 bits.
-  // or (FeaturePcdGet (PcdDxeIplSwitchToLongMode)), Dxe will switch to 64 bits.
+  // or (FeaturePcdGet (PcdDxeIplSwitchToLongMode)), DXE will switch to 64 bits.
   //
   if ((sizeof(UINTN) == sizeof(UINT64)) || (FeaturePcdGet (PcdDxeIplSwitchToLongMode))) {
     CommBuffer = &Header64;
@@ -482,7 +481,7 @@ SignalEndOfS3Resume (
     Header32.MessageLength = 0;
     CommSize = OFFSET_OF (SMM_COMMUNICATE_HEADER_32, Data);
   }
-  CopyGuid (CommBuffer, &gEdkiiSmmEndOfS3ResumeProtocolGuid);
+  CopyGuid (CommBuffer, &gEdkiiEndOfS3ResumeGuid);
 
   Status = PeiServicesLocatePpi (
              &gEfiPeiSmmCommunicationPpiGuid,
