@@ -1968,7 +1968,7 @@ ActionNode *p;
                     (p->pred_fail == NULL ?                          /* MR23/MR27 */
                        	"0 /* report */" : "1 /* user action */"),   /* MR23/MR27 */
                     (p->pred_fail == NULL ?                          /* MR23 */
-                        "0; /* no user action */" : p->pred_fail));  /* MR23 */
+                        "; /* no user action */" : p->pred_fail));   /* MR23 */
 			tabs--;
 		}
 		else    /* not a predicate */
@@ -2618,7 +2618,7 @@ TokNode *p;
                     (a->pred_fail == NULL ?                          /* MR23/MR27 */
                        	"0 /* report */" : "1 /* user action */"),   /* MR23/MR27 */
                     (a->pred_fail == NULL ?                          /* MR23 */
-                        "0; /* no user action */" : a->pred_fail));  /* MR23 */
+                        "; /* no user action */" : a->pred_fail));   /* MR23 */
 			tabs--;
 /* Disabled in MR30 ************************************************************
    And moved into genAction
