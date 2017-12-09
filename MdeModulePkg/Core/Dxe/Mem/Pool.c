@@ -642,7 +642,9 @@ CoreFreePoolPagesWithGuard (
   NoPagesGuarded = NoPages;
 
   AdjustMemoryF (&Memory, &NoPages);
-  CoreFreePoolPagesI (PoolType, Memory, NoPages);
+  if (NoPages > 0) {
+    CoreFreePoolPagesI (PoolType, Memory, NoPages);
+  }
 
   UnsetGuardForMemory (MemoryGuarded, NoPagesGuarded);
 }

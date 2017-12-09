@@ -920,21 +920,22 @@ CoreConvertPagesEx (
         UINT64  EndToClear;
 
         StartToClear = Start;
-        EndToClear   = RangeEnd;
+        EndToClear   = RangeEnd + 1;
         if (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT1|BIT0)) {
           if (IsGuardPage(StartToClear)) {
             StartToClear += EFI_PAGE_SIZE;
           }
-          if (IsGuardPage (EndToClear)) {
+          if (IsGuardPage (EndToClear - 1)) {
             EndToClear -= EFI_PAGE_SIZE;
           }
-          ASSERT (EndToClear > StartToClear);
         }
 
-        DEBUG_CLEAR_MEMORY(
-          (VOID *)(UINTN)StartToClear,
-          (UINTN)(EndToClear - StartToClear + 1)
-          );
+        if (EndToClear > StartToClear) {
+          DEBUG_CLEAR_MEMORY(
+            (VOID *)(UINTN)StartToClear,
+            (UINTN)(EndToClear - StartToClear)
+            );
+        }
       }
     }
 

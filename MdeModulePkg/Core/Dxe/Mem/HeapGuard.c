@@ -768,6 +768,7 @@ UnsetGuardForMemory (
   )
 {
   EFI_PHYSICAL_ADDRESS  GuardPage;
+  UINT64                GuardBitmap;
 
   if (NumberOfPages == 0) {
     return;
@@ -776,16 +777,29 @@ UnsetGuardForMemory (
   //
   // Head Guard must be one page before, if any.
   //
+  //          MSB-> 1     0 <-LSB
+  //          -------------------
+  //  Head Guard -> 0     1 -> Don't free Head Guard  (shared Guard)
+  //  Head Guard -> 0     0 -> Free Head Guard either (not shared Guard)
+  //                1     X -> Don't free first page  (need a new Guard)
+  //                           (it'll be turned into a Guard page later)
+  //          -------------------
+  //      Start -> -1    -2
+  //
   GuardPage = Memory - EFI_PAGES_TO_SIZE (1);
-  if (IsHeadGuard (GuardPage)) {
-    if (!IsMemoryGuarded (GuardPage - EFI_PAGES_TO_SIZE (1))) {
+  GuardBitmap = GetGuardedMemoryBits (Memory - EFI_PAGES_TO_SIZE (2), 2);
+  if ((GuardBitmap & BIT1) == 0) {
+    //
+    // Head Guard exists.
+    //
+    if ((GuardBitmap & BIT0) == 0) {
       //
       // If the head Guard is not a tail Guard of adjacent memory block,
       // unset it.
       //
       UnsetGuardPage (GuardPage);
     }
-  } else if (IsMemoryGuarded (GuardPage)) {
+  } else {
     //
     // Pages before memory to free are still in Guard. It's a partial free
     // case. Turn first page of memory block to free into a new Guard.
@@ -796,16 +810,29 @@ UnsetGuardForMemory (
   //
   // Tail Guard must be the page after this memory block to free, if any.
   //
+  //   MSB-> 1     0 <-LSB
+  //  --------------------
+  //         1     0 <- Tail Guard -> Don't free Tail Guard  (shared Guard)
+  //         0     0 <- Tail Guard -> Free Tail Guard either (not shared Guard)
+  //         X     1               -> Don't free last page   (need a new Guard)
+  //                                 (it'll be turned into a Guard page later)
+  //  --------------------
+  //        +1    +0 <- End
+  //
   GuardPage = Memory + EFI_PAGES_TO_SIZE (NumberOfPages);
-  if (IsTailGuard (GuardPage)) {
-    if (!IsMemoryGuarded (GuardPage + EFI_PAGES_TO_SIZE (1))) {
+  GuardBitmap = GetGuardedMemoryBits (GuardPage, 2);
+  if ((GuardBitmap & BIT0) == 0) {
+    //
+    // Tail Guard exists.
+    //
+    if ((GuardBitmap & BIT1) == 0) {
       //
       // If the tail Guard is not a head Guard of adjacent memory block,
       // free it; otherwise, keep it.
       //
       UnsetGuardPage (GuardPage);
     }
-  } else if (IsMemoryGuarded (GuardPage)) {
+  } else {
     //
     // Pages after memory to free are still in Guard. It's a partial free
     // case. We need to keep one page to be a head Guard.
@@ -895,6 +922,7 @@ AdjustMemoryF (
   EFI_PHYSICAL_ADDRESS  Start;
   EFI_PHYSICAL_ADDRESS  MemoryToTest;
   UINTN                 PagesToFree;
+  UINT64                GuardBitmap;
 
   if (Memory == NULL || NumberOfPages == NULL || *NumberOfPages == 0) {
     return;
@@ -906,9 +934,22 @@ AdjustMemoryF (
   //
   // Head Guard must be one page before, if any.
   //
-  MemoryToTest = Start - EFI_PAGES_TO_SIZE (1);
-  if (IsHeadGuard (MemoryToTest)) {
-    if (!IsMemoryGuarded (MemoryToTest - EFI_PAGES_TO_SIZE (1))) {
+  //          MSB-> 1     0 <-LSB
+  //          -------------------
+  //  Head Guard -> 0     1 -> Don't free Head Guard  (shared Guard)
+  //  Head Guard -> 0     0 -> Free Head Guard either (not shared Guard)
+  //                1     X -> Don't free first page  (need a new Guard)
+  //                           (it'll be turned into a Guard page later)
+  //          -------------------
+  //      Start -> -1    -2
+  //
+  MemoryToTest = Start - EFI_PAGES_TO_SIZE (2);
+  GuardBitmap = GetGuardedMemoryBits (MemoryToTest, 2);
+  if ((GuardBitmap & BIT1) == 0) {
+    //
+    // Head Guard exists.
+    //
+    if ((GuardBitmap & BIT0) == 0) {
       //
       // If the head Guard is not a tail Guard of adjacent memory block,
       // free it; otherwise, keep it.
@@ -916,10 +957,10 @@ AdjustMemoryF (
       Start       -= EFI_PAGES_TO_SIZE (1);
       PagesToFree += 1;
     }
-  } else if (IsMemoryGuarded (MemoryToTest)) {
+  } else {
     //
-    // Pages before memory to free are still in Guard. It's a partial free
-    // case. We need to keep one page to be a tail Guard.
+    // No Head Guard, and pages before memory to free are still in Guard. It's a
+    // partial free case. We need to keep one page to be a tail Guard.
     //
     Start       += EFI_PAGES_TO_SIZE (1);
     PagesToFree -= 1;
@@ -928,19 +969,32 @@ AdjustMemoryF (
   //
   // Tail Guard must be the page after this memory block to free, if any.
   //
+  //   MSB-> 1     0 <-LSB
+  //  --------------------
+  //         1     0 <- Tail Guard -> Don't free Tail Guard  (shared Guard)
+  //         0     0 <- Tail Guard -> Free Tail Guard either (not shared Guard)
+  //         X     1               -> Don't free last page   (need a new Guard)
+  //                                 (it'll be turned into a Guard page later)
+  //  --------------------
+  //        +1    +0 <- End
+  //
   MemoryToTest = Start + EFI_PAGES_TO_SIZE (PagesToFree);
-  if (IsTailGuard (MemoryToTest)) {
-    if (!IsMemoryGuarded (MemoryToTest + EFI_PAGES_TO_SIZE (1))) {
+  GuardBitmap = GetGuardedMemoryBits (MemoryToTest, 2);
+  if ((GuardBitmap & BIT0) == 0) {
+    //
+    // Tail Guard exists.
+    //
+    if ((GuardBitmap & BIT1) == 0) {
       //
       // If the tail Guard is not a head Guard of adjacent memory block,
       // free it; otherwise, keep it.
       //
       PagesToFree += 1;
     }
-  } else if (IsMemoryGuarded (MemoryToTest)) {
+  } else if (PagesToFree > 0) {
     //
-    // Pages after memory to free are still in Guard. It's a partial free
-    // case. We need to keep one page to be a head Guard.
+    // No Tail Guard, and pages after memory to free are still in Guard. It's a
+    // partial free case. We need to keep one page to be a head Guard.
     //
     PagesToFree -= 1;
   }
@@ -1054,11 +1108,14 @@ CoreConvertPagesWithGuard (
 {
   if (NewType == EfiConventionalMemory) {
     AdjustMemoryF (&Start, &NumberOfPages);
+    if (NumberOfPages == 0) {
+      return EFI_SUCCESS;
+    }
   } else {
     AdjustMemoryA (&Start, &NumberOfPages);
   }
 
-  return CoreConvertPages(Start, NumberOfPages, NewType);
+  return CoreConvertPages (Start, NumberOfPages, NewType);
 }
 
 /**
