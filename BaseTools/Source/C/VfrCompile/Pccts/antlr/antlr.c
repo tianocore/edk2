@@ -41,6 +41,7 @@ ANTLR_INFO
 #pragma warn -aus  /* unused assignment of 'xxx' */
 #endif
 
+#pragma clang diagnostic ignored "-Wparentheses-equality"
 
 #ifdef __USE_PROTOS
 static void chkToken(char *, char *, char *, int);
