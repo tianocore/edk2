@@ -549,7 +549,7 @@ PlatformBootManagerAfterConsole (
   Status = BootLogoEnableLogo ();
   if (EFI_ERROR (Status)) {
     if (FirmwareVerLength > 0) {
-      Print (VERSION_STRING_PREFIX L"%s",
+      Print (VERSION_STRING_PREFIX L"%s\n",
         PcdGetPtr (PcdFirmwareVersionString));
     }
     Print (L"Press ESCAPE for boot options ");
