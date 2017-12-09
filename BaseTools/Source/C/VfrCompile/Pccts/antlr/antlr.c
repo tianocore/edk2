@@ -3252,7 +3252,7 @@ enum_def(fname)
         zzMake0;
         {
         if ( (LA(1)==ID)&&(isDLGmaxToken(LATEXT(1))) ) {
-          if (!(isDLGmaxToken(LATEXT(1)))            ) {zzfailed_pred("  isDLGmaxToken(LATEXT(1))",0 /* report */, { 0; /* no user action */ } );}
+          if (!(isDLGmaxToken(LATEXT(1)))            ) {zzfailed_pred("  isDLGmaxToken(LATEXT(1))",0 /* report */, { ; /* no user action */ } );}
           zzmatch(ID); zzCONSUME;
           {
             zzBLOCK(zztasp4);
