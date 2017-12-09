@@ -42,7 +42,7 @@ class CVfrDLGLexer : public VfrLexer
 {
 public:
   CVfrDLGLexer (DLGFileInput *F) : VfrLexer (F) {};
-  INT32 errstd (char *Text)
+  void errstd (const char *Text)
   {
     printf ("unrecognized input '%s'\n", Text);
   }
