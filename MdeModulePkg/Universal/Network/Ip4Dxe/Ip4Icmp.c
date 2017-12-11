@@ -267,6 +267,9 @@ Ip4IcmpReplyEcho (
              Ip4SysPacketSent,
              NULL
              );
+  if (EFI_ERROR (Status)) {
+    NetbufFree (Data);
+  }
 
 ON_EXIT:
   NetbufFree (Packet);
