@@ -160,8 +160,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Memory type to guard (matching the related PCD definition)
 //
-#define GUARD_HEAP_TYPE_POOL        BIT2
-#define GUARD_HEAP_TYPE_PAGE        BIT3
+#define GUARD_HEAP_TYPE_PAGE        BIT2
+#define GUARD_HEAP_TYPE_POOL        BIT3
 
 //
 // Debug message level
