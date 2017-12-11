@@ -59,10 +59,10 @@ typedef struct {
   LIST_ENTRY               FeatureList;
 
   CPU_FEATURES_INIT_ORDER  *InitOrder;
-  UINT8                    *SupportPcds;
-  UINT8                    *CapabilityPcds;
-  UINT8                    *ConfigurationPcds;
-  UINT8                    *SettingPcds;
+  UINT8                    *SupportPcd;
+  UINT8                    *CapabilityPcd;
+  UINT8                    *ConfigurationPcd;
+  UINT8                    *SettingPcd;
 
   CPU_REGISTER_TABLE       *RegisterTable;
   CPU_REGISTER_TABLE       *PreSmmRegisterTable;
