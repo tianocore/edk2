@@ -994,7 +994,7 @@ PxeBcInstallCallback (
   //
   PxeBc  = &Private->PxeBc;
   Status = gBS->HandleProtocol (
-                  Private->Controller,
+                  Private->Mode.UsingIpv6 ? Private->Ip6Nic->Controller : Private->Ip4Nic->Controller,
                   &gEfiPxeBaseCodeCallbackProtocolGuid,
                   (VOID **) &Private->PxeBcCallback
                   );
@@ -1010,7 +1010,7 @@ PxeBcInstallCallback (
     // Install a default callback if user didn't offer one.
     //
     Status = gBS->InstallProtocolInterface (
-                    &Private->Controller,
+                    Private->Mode.UsingIpv6 ? &Private->Ip6Nic->Controller : &Private->Ip4Nic->Controller,
                     &gEfiPxeBaseCodeCallbackProtocolGuid,
                     EFI_NATIVE_INTERFACE,
                     &Private->LoadFileCallback
@@ -1054,7 +1054,7 @@ PxeBcUninstallCallback (
     PxeBc->SetParameters (PxeBc, NULL, NULL, NULL, NULL, &NewMakeCallback);
 
     gBS->UninstallProtocolInterface (
-          Private->Controller,
+          Private->Mode.UsingIpv6 ? Private->Ip6Nic->Controller : Private->Ip4Nic->Controller,
           &gEfiPxeBaseCodeCallbackProtocolGuid,
           &Private->LoadFileCallback
           );

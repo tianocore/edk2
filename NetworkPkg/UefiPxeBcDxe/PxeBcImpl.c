@@ -1925,7 +1925,7 @@ EfiPxeBcSetParameters (
       // Update the previous PxeBcCallback protocol.
       //
       Status = gBS->HandleProtocol (
-                      Private->Controller,
+                      Mode->UsingIpv6 ? Private->Ip6Nic->Controller : Private->Ip4Nic->Controller,
                       &gEfiPxeBaseCodeCallbackProtocolGuid,
                       (VOID **) &Private->PxeBcCallback
                       );
