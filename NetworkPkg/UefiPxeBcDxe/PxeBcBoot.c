@@ -1242,7 +1242,7 @@ ON_EXIT:
   } else if (Status == EFI_NO_MEDIA) {
     AsciiPrint ("\n  PXE-E12: Could not detect network connection.\n");
   } else if (Status == EFI_NO_RESPONSE) {
-    AsciiPrint ("\n  PXE-E16: No offer received.\n");
+    AsciiPrint ("\n  PXE-E16: No valid offer received.\n");
   } else if (Status == EFI_TIMEOUT) {
     AsciiPrint ("\n  PXE-E18: Server response timeout.\n");
   } else if (Status == EFI_ABORTED) {

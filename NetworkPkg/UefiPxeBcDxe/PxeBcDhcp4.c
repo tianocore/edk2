@@ -1707,6 +1707,11 @@ PxeBcDhcp4Dora (
     if (Status == EFI_ICMP_ERROR) {
       PxeMode->IcmpErrorReceived = TRUE;
     }
+
+    if (Status == EFI_TIMEOUT && Private->OfferNum > 0) {
+      Status = EFI_NO_RESPONSE;
+    }
+    
     goto ON_EXIT;
   }
 
