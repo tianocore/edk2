@@ -3838,7 +3838,13 @@ class ModuleAutoGen(AutoGen):
 
     ## Create AsBuilt INF file the module
     #
-    def CreateAsBuiltInf(self):
+    def CreateAsBuiltInf(self, IsOnlyCopy = False):
+        self.OutputFile = []
+        if IsOnlyCopy:
+            if GlobalData.gBinCacheDest:
+                self.CopyModuleToCache()
+                return
+
         if self.IsAsBuiltInfCreated:
             return
             
@@ -3971,7 +3977,6 @@ class ModuleAutoGen(AutoGen):
             AsBuiltInfDict['module_pi_specification_version'] += [self.Specification['PI_SPECIFICATION_VERSION']]
 
         OutputDir = self.OutputDir.replace('\\', '/').strip('/')
-        self.OutputFile = []
         for Item in self.CodaTargetList:
             File = Item.Target.Path.replace('\\', '/').strip('/').replace(OutputDir, '').strip('/')
             if File not in self.OutputFile:
@@ -4198,8 +4203,12 @@ class ModuleAutoGen(AutoGen):
             shutil.copy2(HashFile, FileDir)
         if os.path.exists(ModuleFile):
             shutil.copy2(ModuleFile, FileDir)
+        if not self.OutputFile:
+            Ma = self.Workspace.BuildDatabase[PathClass(ModuleFile), self.Arch, self.BuildTarget, self.ToolChain]
+            self.OutputFile = Ma.Binaries
         if self.OutputFile:
             for File in self.OutputFile:
+                File = str(File)
                 if not os.path.isabs(File):
                     File = os.path.join(self.OutputDir, File)
                 if os.path.exists(File):

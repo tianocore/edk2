@@ -825,6 +825,7 @@ class Build():
         self.LoadFixAddress = 0
         self.UniFlag        = BuildOptions.Flag
         self.BuildModules = []
+        self.HashSkipModules = []
         self.Db_Flag = False
         self.LaunchPrebuildFlag = False
         self.PlatformBuildPath = os.path.join(GlobalData.gConfDirectory,'.cache', '.PlatformBuild')
@@ -2016,6 +2017,7 @@ class Build():
                         if Ma == None:
                             continue
                         if Ma.CanSkipbyHash():
+                            self.HashSkipModules.append(Ma)
                             continue
 
                         # Not to auto-gen for targets 'clean', 'cleanlib', 'cleanall', 'run', 'fds'
@@ -2214,7 +2216,10 @@ class Build():
     def CreateAsBuiltInf(self):
         for Module in self.BuildModules:
             Module.CreateAsBuiltInf()
+        for Module in self.HashSkipModules:
+            Module.CreateAsBuiltInf(True)
         self.BuildModules = []
+        self.HashSkipModules = []
     ## Do some clean-up works when error occurred
     def Relinquish(self):
         OldLogLevel = EdkLogger.GetLevel()
