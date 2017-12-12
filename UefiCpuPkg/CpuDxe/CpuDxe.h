@@ -273,5 +273,7 @@ RefreshGcdMemoryAttributesFromPaging (
   VOID
   );
 
+extern BOOLEAN mIsAllocatingPageTable;
+
 #endif
 
