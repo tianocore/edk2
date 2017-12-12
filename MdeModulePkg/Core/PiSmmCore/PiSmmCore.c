@@ -319,7 +319,7 @@ SmmReadyToBootHandler (
   Status = SmmLocateProtocol (
              &gEfiSmmSxDispatch2ProtocolGuid,
              NULL,
-             &SxDispatch
+             (VOID **)&SxDispatch
              );
   if (!EFI_ERROR (Status)) {
     //
