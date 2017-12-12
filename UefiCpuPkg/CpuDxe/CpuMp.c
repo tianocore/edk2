@@ -695,6 +695,11 @@ InitializeMpExceptionStackSwitchHandlers (
   EssData.Ia32.StackSwitchExceptionNumber = ExceptionNumber;
   EssData.Ia32.KnownGoodStackSize = FixedPcdGet32(PcdCpuKnownGoodStackSize);
 
+  //
+  // Initialize Gdtr to suppress incorrect compiler/analyzer warnings.
+  //
+  Gdtr.Base = 0;
+  Gdtr.Limit = 0;
   MpInitLibWhoAmI (&Bsp);
   for (Index = 0; Index < mNumberOfProcessors; ++Index) {
     //
