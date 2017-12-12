@@ -2,6 +2,7 @@
   Handle operations in files and directories from UDF/ECMA-167 file systems.
 
   Copyright (C) 2014-2017 Paulo Alcantara <pcacjr@zytor.com>
+  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -248,7 +249,7 @@ UdfOpen (
     FileName = TempFileName + 1;
   }
 
-  StrCpyS (NewPrivFileData->FileName, UDF_PATH_LENGTH, FileName);
+  StrCpyS (NewPrivFileData->FileName, UDF_FILENAME_LENGTH, FileName);
 
   Status = GetFileSize (
     PrivFsData->BlockIo,
@@ -457,7 +458,7 @@ UdfRead (
       FreePool ((VOID *)NewFileEntryData);
       NewFileEntryData = FoundFile.FileEntry;
 
-      Status = GetFileNameFromFid (NewFileIdentifierDesc, FileName);
+      Status = GetFileNameFromFid (NewFileIdentifierDesc, ARRAY_SIZE (FileName), FileName);
       if (EFI_ERROR (Status)) {
         FreePool ((VOID *)FoundFile.FileIdentifierDesc);
         goto Error_Get_FileName;
@@ -469,7 +470,7 @@ UdfRead (
       FoundFile.FileIdentifierDesc  = NewFileIdentifierDesc;
       FoundFile.FileEntry           = NewFileEntryData;
 
-      Status = GetFileNameFromFid (FoundFile.FileIdentifierDesc, FileName);
+      Status = GetFileNameFromFid (FoundFile.FileIdentifierDesc, ARRAY_SIZE (FileName), FileName);
       if (EFI_ERROR (Status)) {
         goto Error_Get_FileName;
       }
@@ -735,6 +736,12 @@ UdfSetPosition (
 /**
   Get information about a file.
 
+  @attention This is boundary function that may receive untrusted input.
+  @attention The input is from FileSystem.
+
+  The File Set Descriptor is external input, so this routine will do basic
+  validation for File Set Descriptor and report status.
+
   @param  This            Protocol instance pointer.
   @param  InformationType Type of information to return in Buffer.
   @param  BufferSize      On input size of buffer, on output amount of data in
@@ -811,6 +818,10 @@ UdfGetInfo (
         *String = *(UINT8 *)(OstaCompressed + Index) << 8;
         Index++;
       } else {
+        if (Index > ARRAY_SIZE (VolumeLabel)) {
+          return EFI_VOLUME_CORRUPTED;
+        }
+
         *String = 0;
       }
 
@@ -830,7 +841,11 @@ UdfGetInfo (
       String++;
     }
 
-    *String = L'\0';
+    Index = ((UINTN)String - (UINTN)VolumeLabel) / sizeof (CHAR16);
+    if (Index > ARRAY_SIZE (VolumeLabel) - 1) {
+      Index = ARRAY_SIZE (VolumeLabel) - 1;
+    }
+    VolumeLabel[Index] = L'\0';
 
     FileSystemInfoLength = StrSize (VolumeLabel) +
                            sizeof (EFI_FILE_SYSTEM_INFO);
@@ -840,8 +855,11 @@ UdfGetInfo (
     }
 
     FileSystemInfo = (EFI_FILE_SYSTEM_INFO *)Buffer;
-    StrCpyS (FileSystemInfo->VolumeLabel, ARRAY_SIZE (VolumeLabel),
-             VolumeLabel);
+    StrCpyS (
+      FileSystemInfo->VolumeLabel,
+      (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_INFO, VolumeLabel)) / sizeof (CHAR16),
+      VolumeLabel
+      );
     Status = GetVolumeSize (
       PrivFsData->BlockIo,
       PrivFsData->DiskIo,

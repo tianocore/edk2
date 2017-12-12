@@ -2,6 +2,7 @@
   Handle on-disk format and volume structures in UDF/ECMA-167 file systems.
 
   Copyright (C) 2014-2017 Paulo Alcantara <pcacjr@zytor.com>
+  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -1466,7 +1467,7 @@ InternalFindFile (
         break;
       }
     } else {
-      Status = GetFileNameFromFid (FileIdentifierDesc, FoundFileName);
+      Status = GetFileNameFromFid (FileIdentifierDesc, ARRAY_SIZE (FoundFileName), FoundFileName);
       if (EFI_ERROR (Status)) {
         break;
       }
@@ -1763,6 +1764,11 @@ FindFile (
   while (*FilePath != L'\0') {
     FileNamePointer = FileName;
     while (*FilePath != L'\0' && *FilePath != L'\\') {
+      if ((((UINTN)FileNamePointer - (UINTN)FileName) / sizeof (CHAR16)) >=
+          (ARRAY_SIZE (FileName) - 1)) {
+        return EFI_NOT_FOUND;
+      }
+
       *FileNamePointer++ = *FilePath++;
     }
 
@@ -1954,22 +1960,38 @@ ReadDirectoryEntry (
   Get a filename (encoded in OSTA-compressed format) from a File Identifier
   Descriptor on an UDF volume.
 
+  @attention This is boundary function that may receive untrusted input.
+  @attention The input is from FileSystem.
+
+  The File Identifier Descriptor is external input, so this routine will do
+  basic validation for File Identifier Descriptor and report status.
+
   @param[in]   FileIdentifierDesc  File Identifier Descriptor pointer.
+  @param[in]   CharMax             The maximum number of FileName Unicode char,
+                                   including terminating null char.
   @param[out]  FileName            Decoded filename.
 
   @retval EFI_SUCCESS           Filename decoded and read.
   @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @retval EFI_BUFFER_TOO_SMALL  The string buffer FileName cannot hold the
+                                decoded filename.
 **/
 EFI_STATUS
 GetFileNameFromFid (
   IN   UDF_FILE_IDENTIFIER_DESCRIPTOR  *FileIdentifierDesc,
+  IN   UINTN                           CharMax,
   OUT  CHAR16                          *FileName
   )
 {
-  UINT8 *OstaCompressed;
-  UINT8 CompressionId;
-  UINT8 Length;
-  UINTN Index;
+  UINT8  *OstaCompressed;
+  UINT8  CompressionId;
+  UINT8  Length;
+  UINTN  Index;
+  CHAR16 *FileNameBak;
+
+  if (CharMax == 0) {
+    return EFI_BUFFER_TOO_SMALL;
+  }
 
   OstaCompressed =
     (UINT8 *)(
@@ -1982,10 +2004,22 @@ GetFileNameFromFid (
     return EFI_VOLUME_CORRUPTED;
   }
 
+  FileNameBak = FileName;
+
   //
   // Decode filename.
   //
   Length = FileIdentifierDesc->LengthOfFileIdentifier;
+  if (CompressionId == 16) {
+    if (((UINTN)Length >> 1) > CharMax) {
+      return EFI_BUFFER_TOO_SMALL;
+    }
+  } else {
+    if ((Length != 0) && ((UINTN)Length - 1 > CharMax)) {
+      return EFI_BUFFER_TOO_SMALL;
+    }
+  }
+
   for (Index = 1; Index < Length; Index++) {
     if (CompressionId == 16) {
       *FileName = OstaCompressed[Index++] << 8;
@@ -2000,13 +2034,23 @@ GetFileNameFromFid (
     FileName++;
   }
 
-  *FileName = L'\0';
+  Index = ((UINTN)FileName - (UINTN)FileNameBak) / sizeof (CHAR16);
+  if (Index > CharMax - 1) {
+    Index = CharMax - 1;
+  }
+  FileNameBak[Index] = L'\0';
 
   return EFI_SUCCESS;
 }
 
 /**
   Resolve a symlink file on an UDF volume.
+
+  @attention This is boundary function that may receive untrusted input.
+  @attention The input is from FileSystem.
+
+  The Path Component is external input, so this routine will do basic
+  validation for Path Component and report status.
 
   @param[in]   BlockIo        BlockIo interface.
   @param[in]   DiskIo         DiskIo interface.
@@ -2136,6 +2180,9 @@ ResolveSymlink (
                           Index) << 8;
           Index++;
         } else {
+          if (Index > ARRAY_SIZE (FileName)) {
+            return EFI_UNSUPPORTED;
+          }
           *Char = 0;
         }
 
@@ -2146,7 +2193,11 @@ ResolveSymlink (
         Char++;
       }
 
-      *Char = L'\0';
+      Index = ((UINTN)Char - (UINTN)FileName) / sizeof (CHAR16);
+      if (Index > ARRAY_SIZE (FileName) - 1) {
+        Index = ARRAY_SIZE (FileName) - 1;
+      }
+      FileName[Index] = L'\0';
       break;
     }
 
