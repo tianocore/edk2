@@ -296,35 +296,61 @@ FfsProcessSection (
   UINT32                                  SectionLength;
   UINT32                                  ParsedLength;
   EFI_COMPRESSION_SECTION                 *CompressionSection;
+  EFI_COMPRESSION_SECTION2                *CompressionSection2;
   UINT32                                  DstBufferSize;
   VOID                                    *ScratchBuffer;
   UINT32                                  ScratchBufferSize;
   VOID                                    *DstBuffer;
   UINT16                                  SectionAttribute;
   UINT32                                  AuthenticationStatus;
+  CHAR8                                   *CompressedData;
+  UINTN                                   CompressedDataLength;
 
 
   *OutputBuffer = NULL;
   ParsedLength  = 0;
   Status        = EFI_NOT_FOUND;
   while (ParsedLength < SectionSize) {
+    if (IS_SECTION2 (Section)) {
+      ASSERT (SECTION2_SIZE (Section) > 0x00FFFFFF);
+    }
+
     if (Section->Type == SectionType) {
-      *OutputBuffer = (VOID *)(Section + 1);
+      if (IS_SECTION2 (Section)) {
+        *OutputBuffer = (VOID *)((UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER2));
+      } else {
+        *OutputBuffer = (VOID *)((UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER));
+      }
 
       return EFI_SUCCESS;
     } else if ((Section->Type == EFI_SECTION_COMPRESSION) || (Section->Type == EFI_SECTION_GUID_DEFINED)) {
 
       if (Section->Type == EFI_SECTION_COMPRESSION) {
-        CompressionSection  = (EFI_COMPRESSION_SECTION *) Section;
-        SectionLength       = *(UINT32 *)Section->Size & 0x00FFFFFF;
+        if (IS_SECTION2 (Section)) {
+          CompressionSection2 = (EFI_COMPRESSION_SECTION2 *) Section;
+          SectionLength       = SECTION2_SIZE (Section);
 
-        if (CompressionSection->CompressionType != EFI_STANDARD_COMPRESSION) {
-          return EFI_UNSUPPORTED;
+          if (CompressionSection2->CompressionType != EFI_STANDARD_COMPRESSION) {
+            return EFI_UNSUPPORTED;
+          }
+
+          CompressedData = (CHAR8 *) ((EFI_COMPRESSION_SECTION2 *) Section + 1);
+          CompressedDataLength = (UINT32) SectionLength - sizeof (EFI_COMPRESSION_SECTION2);
+        } else {
+          CompressionSection  = (EFI_COMPRESSION_SECTION *) Section;
+          SectionLength       = SECTION_SIZE (Section);
+
+          if (CompressionSection->CompressionType != EFI_STANDARD_COMPRESSION) {
+            return EFI_UNSUPPORTED;
+          }
+
+          CompressedData = (CHAR8 *) ((EFI_COMPRESSION_SECTION *) Section + 1);
+          CompressedDataLength = (UINT32) SectionLength - sizeof (EFI_COMPRESSION_SECTION);
         }
 
         Status = UefiDecompressGetInfo (
-                   (UINT8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
-                   (UINT32) SectionLength - sizeof (EFI_COMPRESSION_SECTION),
+                   CompressedData,
+                   CompressedDataLength,
                    &DstBufferSize,
                    &ScratchBufferSize
                    );
@@ -362,13 +388,23 @@ FfsProcessSection (
       // DstBuffer still is one section. Adjust DstBuffer offset, skip EFI section header
       // to make section data at page alignment.
       //
-      DstBuffer = (UINT8 *)DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER);
+      if (IS_SECTION2 (Section))
+        DstBuffer = (UINT8 *)DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER2);
+      else
+        DstBuffer = (UINT8 *)DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER);
       //
       // Call decompress function
       //
       if (Section->Type == EFI_SECTION_COMPRESSION) {
+        if (IS_SECTION2 (Section)) {
+          CompressedData = (CHAR8 *) ((EFI_COMPRESSION_SECTION2 *) Section + 1);
+        }
+        else {
+          CompressedData = (CHAR8 *) ((EFI_COMPRESSION_SECTION *) Section + 1);
+        }
+
         Status = UefiDecompress (
-                    (CHAR8 *) ((EFI_COMPRESSION_SECTION *) Section + 1),
+                    CompressedData,
                     DstBuffer,
                     ScratchBuffer
                     );
@@ -397,12 +433,15 @@ FfsProcessSection (
        }
     }
 
+    if (IS_SECTION2 (Section)) {
+      SectionLength = SECTION2_SIZE (Section);
+    } else {
+      SectionLength = SECTION_SIZE (Section);
+    }
     //
-    // Size is 24 bits wide so mask upper 8 bits.
     // SectionLength is adjusted it is 4 byte aligned.
     // Go to the next section
     //
-    SectionLength = *(UINT32 *)Section->Size & 0x00FFFFFF;
     SectionLength = GET_OCCUPIED_SIZE (SectionLength, 4);
     ASSERT (SectionLength != 0);
     ParsedLength += SectionLength;
