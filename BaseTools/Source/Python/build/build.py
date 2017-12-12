@@ -1845,6 +1845,10 @@ class Build():
                         if self.ModuleFile.Dir == Module.Dir and self.ModuleFile.Name == Module.Name:
                             Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
                             if Ma == None: continue
+                            MaList.append(Ma)
+                            if Ma.CanSkipbyHash():
+                                self.HashSkipModules.append(Ma)
+                                continue
                             # Not to auto-gen for targets 'clean', 'cleanlib', 'cleanall', 'run', 'fds'
                             if self.Target not in ['clean', 'cleanlib', 'cleanall', 'run', 'fds']:
                                 # for target which must generate AutoGen code and makefile
@@ -1856,7 +1860,6 @@ class Build():
                                         del CmdListDict[Module.File, Arch]
                                     else:
                                         Ma.CreateMakeFile(True)
-                            MaList.append(Ma)
                             self.BuildModules.append(Ma)
                     self.AutoGenTime += int(round((time.time() - AutoGenStart)))
                     MakeStart = time.time()
