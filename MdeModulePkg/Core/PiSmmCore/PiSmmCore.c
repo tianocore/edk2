@@ -321,7 +321,7 @@ SmmReadyToBootHandler (
              NULL,
              (VOID **)&SxDispatch
              );
-  if (!EFI_ERROR (Status)) {
+  if (!EFI_ERROR (Status) && (SxDispatch != NULL)) {
     //
     // Register a S3 entry callback function to
     // determine if it will be during S3 resume.
