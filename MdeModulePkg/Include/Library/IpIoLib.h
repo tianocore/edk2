@@ -385,6 +385,7 @@ IpIoStop (
                                       successfully.
   @retval          EFI_ACCESS_DENIED  The IP_IO instance is configured; avoid  
                                       reopening it.
+  @retval          EFI_UNSUPPORTED    IPv4 RawData mode is no supported.
   @retval          Others             An error condition occurred.
 
 **/
@@ -418,6 +419,7 @@ IpIoOpen (
   @retval          EFI_INVALID_PARAMETER The input parameter is not correct.
   @retval          EFI_NOT_STARTED       The IpIo is not configured.
   @retval          EFI_OUT_OF_RESOURCES  Failed due to resource limit.
+  @retval          Others                Error condition occurred.
 
 **/
 EFI_STATUS
@@ -543,6 +545,7 @@ IpIoFindSender (
   @param[out]  IsHard                If TRUE, indicates that it is a hard error.
   @param[out]  Notify                If TRUE, SockError needs to be notified.
 
+  @retval EFI_UNSUPPORTED            Unrecognizable ICMP error code
   @return The ICMP Error Status, such as EFI_NETWORK_UNREACHABLE.
 
 **/
@@ -576,6 +579,7 @@ IpIoGetIcmpErrStatus (
   @retval      EFI_INVALID_PARAMETER The Neighbor Address is invalid.
   @retval      EFI_NOT_FOUND         The neighbor cache entry is not in the 
                                      neighbor table.  
+  @retval      EFI_UNSUPPORTED       IP version is IPv4, which doesn't support neighbor cache refresh.
   @retval      EFI_OUT_OF_RESOURCES  Failed due to resource limitations.
 
 **/

@@ -129,6 +129,7 @@ IpIoTransmitHandler (
 
   @retval       EFI_SUCCESS        The IP child is created and the IP protocol
                                    interface is retrieved.
+  @retval       EFI_UNSUPPORTED    Upsupported IpVersion.
   @retval       Others             The required operation failed.
 
 **/
@@ -206,6 +207,7 @@ IpIoCreateIpChildOpenProtocol (
 
   @retval     EFI_SUCCESS         The IP protocol is closed and the relevant IP child
                                   is destroyed.
+  @retval     EFI_UNSUPPORTED     Upsupported IpVersion.
   @retval     Others              The required operation failed.
 
 **/
@@ -1289,6 +1291,7 @@ ReleaseIpIo:
                                       successfully.
   @retval          EFI_ACCESS_DENIED  The IP_IO instance is configured, avoid to 
                                       reopen it.
+  @retval          EFI_UNSUPPORTED    IPv4 RawData mode is no supported.
   @retval          Others             Error condition occurred.
 
 **/
@@ -1501,20 +1504,28 @@ IpIoDestroy (
   IN OUT IP_IO *IpIo
   )
 {
+  EFI_STATUS    Status;
+  
   //
   // Stop the IpIo.
   //
-  IpIoStop (IpIo);
+  Status = IpIoStop (IpIo);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Close the IP protocol and destroy the child.
   //
-  IpIoCloseProtocolDestroyIpChild (
-    IpIo->Controller,
-    IpIo->Image,
-    IpIo->ChildHandle,
-    IpIo->IpVersion
-    );
+  Status = IpIoCloseProtocolDestroyIpChild (
+             IpIo->Controller,
+             IpIo->Image,
+             IpIo->ChildHandle,
+             IpIo->IpVersion
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   gBS->FreePool (IpIo);
 
@@ -1545,6 +1556,7 @@ IpIoDestroy (
   @retval          EFI_INVALID_PARAMETER The input parameter is not correct.
   @retval          EFI_NOT_STARTED       The IpIo is not configured.
   @retval          EFI_OUT_OF_RESOURCES  Failed due to resource limit.
+  @retval          Others                Error condition occurred.
 
 **/
 EFI_STATUS
@@ -2073,6 +2085,7 @@ IpIoFindSender (
   @param[out]  IsHard                If TRUE, indicates that it is a hard error.
   @param[out]  Notify                If TRUE, SockError needs to be notified.
 
+  @retval EFI_UNSUPPORTED            Unrecognizable ICMP error code.
   @return ICMP Error Status, such as EFI_NETWORK_UNREACHABLE.
 
 **/
@@ -2191,6 +2204,7 @@ IpIoGetIcmpErrStatus (
   @retval      EFI_INVALID_PARAMETER Neighbor Address is invalid.
   @retval      EFI_NOT_FOUND         The neighbor cache entry is not in the 
                                      neighbor table.  
+  @retval      EFI_UNSUPPORTED       IP version is IPv4, which doesn't support neighbor cache refresh.
   @retval      EFI_OUT_OF_RESOURCES  Failed due to resource limit.
 
 **/
@@ -2203,8 +2217,12 @@ IpIoRefreshNeighbor (
 {
   EFI_IP6_PROTOCOL  *Ip;
 
-  if (!IpIo->IsConfigured || IpIo->IpVersion != IP_VERSION_6) {
+  if (!IpIo->IsConfigured) {
     return EFI_NOT_STARTED;
+  }
+
+  if (IpIo->IpVersion != IP_VERSION_6) {
+    return EFI_UNSUPPORTED;
   }
 
   Ip = IpIo->Ip.Ip6;
