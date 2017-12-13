@@ -2533,6 +2533,13 @@ SetFileInfo (
 /**
   Get volume and free space size information of an UDF volume.
 
+  @attention This is boundary function that may receive untrusted input.
+  @attention The input is from FileSystem.
+
+  The Logical Volume Descriptor and the Logical Volume Integrity Descriptor are
+  external inputs, so this routine will do basic validation for both descriptors
+  and report status.
+
   @param[in]   BlockIo        BlockIo interface.
   @param[in]   DiskIo         DiskIo interface.
   @param[in]   Volume         UDF volume information structure.
@@ -2571,7 +2578,8 @@ GetVolumeSize (
 
   ExtentAd = &LogicalVolDesc->IntegritySequenceExtent;
 
-  if (ExtentAd->ExtentLength == 0) {
+  if ((ExtentAd->ExtentLength == 0) ||
+      (ExtentAd->ExtentLength < sizeof (UDF_LOGICAL_VOLUME_INTEGRITY))) {
     return EFI_VOLUME_CORRUPTED;
   }
 
@@ -2607,6 +2615,13 @@ GetVolumeSize (
   // Check if read block is a Logical Volume Integrity Descriptor
   //
   if (DescriptorTag->TagIdentifier != UdfLogicalVolumeIntegrityDescriptor) {
+    Status = EFI_VOLUME_CORRUPTED;
+    goto Out_Free;
+  }
+
+  if ((LogicalVolInt->NumberOfPartitions > MAX_UINT32 / sizeof (UINT32) / 2) ||
+      (LogicalVolInt->NumberOfPartitions * sizeof (UINT32) * 2 >
+       ExtentAd->ExtentLength - sizeof (UDF_LOGICAL_VOLUME_INTEGRITY))) {
     Status = EFI_VOLUME_CORRUPTED;
     goto Out_Free;
   }

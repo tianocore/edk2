@@ -903,6 +903,13 @@ SetFileInfo (
 /**
   Get volume and free space size information of an UDF volume.
 
+  @attention This is boundary function that may receive untrusted input.
+  @attention The input is from FileSystem.
+
+  The Logical Volume Descriptor and the Logical Volume Integrity Descriptor are
+  external inputs, so this routine will do basic validation for both descriptors
+  and report status.
+
   @param[in]   BlockIo        BlockIo interface.
   @param[in]   DiskIo         DiskIo interface.
   @param[in]   Volume         UDF volume information structure.
