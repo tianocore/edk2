@@ -234,24 +234,25 @@ IpIoCloseProtocolDestroyIpChild (
   //
   // Close the previously openned IP protocol.
   //
-  gBS->CloseProtocol (
-         ChildHandle,
-         IpProtocolGuid,
-         ImageHandle,
-         ControllerHandle
-         );
+  Status = gBS->CloseProtocol (
+                  ChildHandle,
+                  IpProtocolGuid,
+                  ImageHandle,
+                  ControllerHandle
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // Destroy the IP child.
   //
-  Status = NetLibDestroyServiceChild (
-             ControllerHandle,
-             ImageHandle,
-             ServiceBindingGuid,
-             ChildHandle
-             );
-
-  return Status;
+  return NetLibDestroyServiceChild (
+           ControllerHandle,
+           ImageHandle,
+           ServiceBindingGuid,
+           ChildHandle
+           );
 }
 
 /**
@@ -377,8 +378,14 @@ IpIoIcmpv4Handler (
   TrimBytes  = (UINT32) (PayLoadHdr - (UINT8 *) IcmpHdr);
 
   NetbufTrim (Pkt, TrimBytes, TRUE);
-
-  IpIo->PktRcvdNotify (EFI_ICMP_ERROR, IcmpErr, Session, Pkt, IpIo->RcvdContext);
+  
+  //
+  // If the input packet has invalid format, and TrimBytes is larger than 
+  // the packet size, the NetbufTrim might trim the packet to zero.
+  //
+  if (Pkt->TotalSize != 0) {
+    IpIo->PktRcvdNotify (EFI_ICMP_ERROR, IcmpErr, Session, Pkt, IpIo->RcvdContext);
+  }
 
   return EFI_SUCCESS;  
 }
@@ -539,7 +546,13 @@ IpIoIcmpv6Handler (
   
   NetbufTrim (Pkt, TrimBytes, TRUE);
 
-  IpIo->PktRcvdNotify (EFI_ICMP_ERROR, IcmpErr, Session, Pkt, IpIo->RcvdContext);
+  //
+  // If the input packet has invalid format, and TrimBytes is larger than 
+  // the packet size, the NetbufTrim might trim the packet to zero.
+  //
+  if (Pkt->TotalSize != 0) {
+    IpIo->PktRcvdNotify (EFI_ICMP_ERROR, IcmpErr, Session, Pkt, IpIo->RcvdContext);
+  }
 
   return EFI_SUCCESS;
 }
@@ -1542,7 +1555,7 @@ IpIoSend (
   IN     IP_IO_IP_INFO  *Sender        OPTIONAL,
   IN     VOID           *Context       OPTIONAL,
   IN     VOID           *NotifyData    OPTIONAL,
-  IN     EFI_IP_ADDRESS *Dest,
+  IN     EFI_IP_ADDRESS *Dest          OPTIONAL,
   IN     IP_IO_OVERRIDE *OverrideData  OPTIONAL
   )
 {
@@ -1799,19 +1812,23 @@ IpIoConfigIp (
   }
 
   if (IpConfigData != NULL) {
-    if (IpInfo->IpVersion == IP_VERSION_4){
+    if (IpInfo->IpVersion == IP_VERSION_4) {
 
       if (((EFI_IP4_CONFIG_DATA *) IpConfigData)->UseDefaultAddress) {
-        Ip.Ip4->GetModeData (
-                  Ip.Ip4, 
-                  &Ip4ModeData, 
-                  NULL, 
-                  NULL
-                  );
+        Status = Ip.Ip4->GetModeData (
+                           Ip.Ip4, 
+                           &Ip4ModeData, 
+                           NULL, 
+                           NULL
+                           );
+        if (EFI_ERROR (Status)) {
+          Ip.Ip4->Configure (Ip.Ip4, NULL);
+          goto OnExit;
+        }
 
         IP4_COPY_ADDRESS (&((EFI_IP4_CONFIG_DATA*) IpConfigData)->StationAddress, &Ip4ModeData.ConfigData.StationAddress);
         IP4_COPY_ADDRESS (&((EFI_IP4_CONFIG_DATA*) IpConfigData)->SubnetMask, &Ip4ModeData.ConfigData.SubnetMask);
-    }
+      }
 
       CopyMem (
         &IpInfo->Addr.Addr, 
@@ -1828,16 +1845,20 @@ IpIoConfigIp (
                          Ip.Ip4,
                          &IpInfo->DummyRcvToken.Ip4Token
                          );
-    if (EFI_ERROR (Status)) {
-      Ip.Ip4->Configure (Ip.Ip4, NULL);
-    }
-  } else {
-    Ip.Ip6->GetModeData (
-              Ip.Ip6,
-              &Ip6ModeData,
-              NULL,
-              NULL
-              );
+      if (EFI_ERROR (Status)) {
+        Ip.Ip4->Configure (Ip.Ip4, NULL);
+      }
+    } else {
+      Status = Ip.Ip6->GetModeData (
+                         Ip.Ip6,
+                         &Ip6ModeData,
+                         NULL,
+                         NULL
+                         );
+      if (EFI_ERROR (Status)) {
+        Ip.Ip6->Configure (Ip.Ip6, NULL);
+        goto OnExit;
+      }
 
       if (Ip6ModeData.IsConfigured) {
         CopyMem (

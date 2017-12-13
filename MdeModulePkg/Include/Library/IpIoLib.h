@@ -428,7 +428,7 @@ IpIoSend (
   IN     IP_IO_IP_INFO  *Sender        OPTIONAL,
   IN     VOID           *Context       OPTIONAL,
   IN     VOID           *NotifyData    OPTIONAL,
-  IN     EFI_IP_ADDRESS *Dest,
+  IN     EFI_IP_ADDRESS *Dest          OPTIONAL,
   IN     IP_IO_OVERRIDE *OverrideData  OPTIONAL
   );
 
