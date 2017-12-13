@@ -727,6 +727,7 @@ Ip4ConfigProtocol (
                     EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
                     );
     if (EFI_ERROR (Status)) {
+      Ip4FreeInterface (IpIf, IpInstance);
       goto ON_ERROR;
     }
   }
