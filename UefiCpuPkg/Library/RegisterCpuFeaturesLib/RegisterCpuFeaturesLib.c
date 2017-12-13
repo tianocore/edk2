@@ -81,6 +81,34 @@ DumpCpuFeature (
 }
 
 /**
+  Determines if the CPU feature is valid.
+
+  @param[in]  Feature        Pointer to CPU feature
+
+  @retval TRUE  The CPU feature is valid.
+  @retval FALSE The CPU feature is invalid.
+**/
+BOOLEAN
+RegisterCpuFeatureLibIsFeatureValid (
+  IN UINT32        Feature
+  )
+{
+  UINT32      Data;
+
+  Data = Feature;
+  Data &= ~(CPU_FEATURE_BEFORE | CPU_FEATURE_AFTER | CPU_FEATURE_BEFORE_ALL | CPU_FEATURE_AFTER_ALL);
+  //
+  // Currently, CPU_FEATURE_PROC_TRACE is the MAX feature we support.
+  // If you define a feature bigger than it, please replace it at below.
+  //
+  if (Data > CPU_FEATURE_PROC_TRACE) {
+    DEBUG ((DEBUG_ERROR, "Invalid CPU feature: 0x%x ", Feature));
+    return FALSE;
+  }
+  return TRUE;
+}
+
+/**
   Determines if the feature bit mask is in dependent CPU feature bit mask buffer.
 
   @param[in]  FeatureMask        Pointer to CPU feature bit mask
@@ -444,6 +472,7 @@ RegisterCpuFeature (
 
   VA_START (Marker, InitializeFunc);
   Feature = VA_ARG (Marker, UINT32);
+  ASSERT (RegisterCpuFeatureLibIsFeatureValid(Feature));
   while (Feature != CPU_FEATURE_END) {
     ASSERT ((Feature & (CPU_FEATURE_BEFORE | CPU_FEATURE_AFTER))
                     != (CPU_FEATURE_BEFORE | CPU_FEATURE_AFTER));
