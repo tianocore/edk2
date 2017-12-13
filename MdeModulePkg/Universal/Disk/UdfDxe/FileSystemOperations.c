@@ -516,15 +516,27 @@ DuplicateFe (
 
   NOTE: The FE/EFE can be thought it was an inode.
 
+  @attention This is boundary function that may receive untrusted input.
+  @attention The input is from FileSystem.
+
+  The (Extended) File Entry is external input, so this routine will do basic
+  validation for (Extended) File Entry and report status.
+
   @param[in]  FileEntryData       (Extended) File Entry pointer.
+  @param[in]  FileEntrySize       Size of the (Extended) File Entry specified
+                                  by FileEntryData.
   @param[out] Data                Buffer contains the raw data of a given
                                   (Extended) File Entry.
   @param[out] Length              Length of the data in Buffer.
 
+  @retval EFI_SUCCESS             Raw data and size of the FE/EFE was read.
+  @retval EFI_VOLUME_CORRUPTED    The file system structures are corrupted.
+
 **/
-VOID
+EFI_STATUS
 GetFileEntryData (
   IN   VOID    *FileEntryData,
+  IN   UINTN   FileEntrySize,
   OUT  VOID    **Data,
   OUT  UINT64  *Length
   )
@@ -548,20 +560,40 @@ GetFileEntryData (
     *Data    = (VOID *)((UINT8 *)FileEntry->Data +
                         FileEntry->LengthOfExtendedAttributes);
   }
+
+  if ((*Length > FileEntrySize) ||
+      ((UINTN)FileEntryData > (UINTN)(*Data)) ||
+      ((UINTN)(*Data) - (UINTN)FileEntryData > FileEntrySize - *Length)) {
+    return EFI_VOLUME_CORRUPTED;
+  }
+  return EFI_SUCCESS;
 }
 
 /**
   Get Allocation Descriptors' data information from a given FE/EFE.
 
+  @attention This is boundary function that may receive untrusted input.
+  @attention The input is from FileSystem.
+
+  The (Extended) File Entry is external input, so this routine will do basic
+  validation for (Extended) File Entry and report status.
+
   @param[in]  FileEntryData       (Extended) File Entry pointer.
+  @param[in]  FileEntrySize       Size of the (Extended) File Entry specified
+                                  by FileEntryData.
   @param[out] AdsData             Buffer contains the Allocation Descriptors'
                                   data from a given FE/EFE.
   @param[out] Length              Length of the data in AdsData.
 
+  @retval EFI_SUCCESS             The data and size of Allocation Descriptors
+                                  were read from the FE/EFE.
+  @retval EFI_VOLUME_CORRUPTED    The file system structures are corrupted.
+
 **/
-VOID
+EFI_STATUS
 GetAdsInformation (
   IN   VOID    *FileEntryData,
+  IN   UINTN   FileEntrySize,
   OUT  VOID    **AdsData,
   OUT  UINT64  *Length
   )
@@ -585,6 +617,13 @@ GetAdsInformation (
     *AdsData = (VOID *)((UINT8 *)FileEntry->Data +
                         FileEntry->LengthOfExtendedAttributes);
   }
+
+  if ((*Length > FileEntrySize) ||
+      ((UINTN)FileEntryData > (UINTN)(*AdsData)) ||
+      ((UINTN)(*AdsData) - (UINTN)FileEntryData > FileEntrySize - *Length)) {
+    return EFI_VOLUME_CORRUPTED;
+  }
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1099,7 +1138,10 @@ ReadFile (
     //
     // There are no extents for this FE/EFE. All data is inline.
     //
-    GetFileEntryData (FileEntryData, &Data, &Length);
+    Status = GetFileEntryData (FileEntryData, Volume->FileEntrySize, &Data, &Length);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
     if (ReadFileInfo->Flags == ReadFileGetFileSize) {
       ReadFileInfo->ReadLength = Length;
@@ -1143,7 +1185,11 @@ ReadFile (
     // This FE/EFE contains a run of Allocation Descriptors. Get data + size
     // for start reading them out.
     //
-    GetAdsInformation (FileEntryData, &Data, &Length);
+    Status = GetAdsInformation (FileEntryData, Volume->FileEntrySize, &Data, &Length);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
     AdOffset = 0;
 
     for (;;) {
