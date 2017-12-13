@@ -184,7 +184,7 @@ class FV (FvClassObject):
                     if GenFdsGlobalVariable.LargeFileInFvFlags[-1]:
                         FFSGuid = GenFdsGlobalVariable.EFI_FIRMWARE_FILE_SYSTEM3_GUID;
                     #Update GenFv again
-                        GenFdsGlobalVariable.GenerateFirmwareVolume(
+                    GenFdsGlobalVariable.GenerateFirmwareVolume(
                                                 FvOutputFile,
                                                 [self.InfFileName],
                                                 AddressFile=FvInfoFileName,
