@@ -1,7 +1,7 @@
 /** @file
   Support functions declaration for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -40,7 +40,7 @@
 EFI_STATUS
 PxeBcFlushStationIp (
   PXEBC_PRIVATE_DATA       *Private,
-  EFI_IP_ADDRESS           *StationIp,
+  EFI_IP_ADDRESS           *StationIp,     OPTIONAL
   EFI_IP_ADDRESS           *SubnetMask     OPTIONAL
   );
 

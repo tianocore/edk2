@@ -30,22 +30,22 @@
 EFI_STATUS
 PxeBcFlushStationIp (
   PXEBC_PRIVATE_DATA       *Private,
-  EFI_IP_ADDRESS           *StationIp,
+  EFI_IP_ADDRESS           *StationIp,     OPTIONAL
   EFI_IP_ADDRESS           *SubnetMask     OPTIONAL
   )
 {
   EFI_PXE_BASE_CODE_MODE   *Mode;
   EFI_STATUS               Status;
 
-  ASSERT (StationIp != NULL);
-
   Mode   = Private->PxeBc.Mode;
   Status = EFI_SUCCESS;
 
   if (Mode->UsingIpv6) {
 
-    CopyMem (&Private->Udp6CfgData.StationAddress, StationIp, sizeof (EFI_IPv6_ADDRESS));
-    CopyMem (&Private->Ip6CfgData.StationAddress, StationIp, sizeof (EFI_IPv6_ADDRESS));
+    if (StationIp != NULL) {
+      CopyMem (&Private->Udp6CfgData.StationAddress, StationIp, sizeof (EFI_IPv6_ADDRESS));
+      CopyMem (&Private->Ip6CfgData.StationAddress, StationIp, sizeof (EFI_IPv6_ADDRESS));
+    }
 
     //
     // Reconfigure the Ip6 instance to capture background ICMP6 packets with new station Ip address.
@@ -60,11 +60,15 @@ PxeBcFlushStationIp (
 
     Status = Private->Ip6->Receive (Private->Ip6, &Private->Icmp6Token);
   } else {
-    ASSERT (SubnetMask != NULL);
-    CopyMem (&Private->Udp4CfgData.StationAddress, StationIp, sizeof (EFI_IPv4_ADDRESS));
-    CopyMem (&Private->Udp4CfgData.SubnetMask, SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-    CopyMem (&Private->Ip4CfgData.StationAddress, StationIp, sizeof (EFI_IPv4_ADDRESS));
-    CopyMem (&Private->Ip4CfgData.SubnetMask, SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+    if (StationIp != NULL) {
+      CopyMem (&Private->Udp4CfgData.StationAddress, StationIp, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Private->Ip4CfgData.StationAddress, StationIp, sizeof (EFI_IPv4_ADDRESS));
+    }
+    
+    if (SubnetMask != NULL) {
+      CopyMem (&Private->Udp4CfgData.SubnetMask, SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+      CopyMem (&Private->Ip4CfgData.SubnetMask, SubnetMask, sizeof (EFI_IPv4_ADDRESS));
+    }
 
     //
     // Reconfigure the Ip4 instance to capture background ICMP packets with new station Ip address.
