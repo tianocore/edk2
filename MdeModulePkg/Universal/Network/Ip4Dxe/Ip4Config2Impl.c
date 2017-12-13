@@ -2062,18 +2062,6 @@ Ip4Config2InitInstance (
   DataItem->SetData  = Ip4Config2SetDnsServer;
   DataItem->Status   = EFI_NOT_FOUND;
 
-  //
-  // Create the event used for DHCP.
-  //
-  Status = gBS->CreateEvent (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  Ip4Config2OnDhcp4Event,
-                  Instance,
-                  &Instance->Dhcp4Event
-                  );
-  ASSERT_EFI_ERROR (Status);
-
   Instance->Configured  = TRUE;
 
   //
