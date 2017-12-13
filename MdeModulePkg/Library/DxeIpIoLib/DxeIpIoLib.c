@@ -2,7 +2,7 @@
   IpIo Library.
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1524,10 +1524,12 @@ IpIoDestroy (
   @param[in]       Context               Optional context data.
   @param[in]       NotifyData            Optional notify data.
   @param[in]       Dest                  The destination IP address to send this packet to.
+                                         This parameter is optional when using IPv6.
   @param[in]       OverrideData          The data to override some configuration of the IP
                                          instance used for sending.
 
   @retval          EFI_SUCCESS           The operation is completed successfully.
+  @retval          EFI_INVALID_PARAMETER The input parameter is not correct.
   @retval          EFI_NOT_STARTED       The IpIo is not configured.
   @retval          EFI_OUT_OF_RESOURCES  Failed due to resource limit.
 
@@ -1548,7 +1550,13 @@ IpIoSend (
   IP_IO_IP_PROTOCOL Ip;
   IP_IO_SEND_ENTRY  *SndEntry;
 
-  ASSERT ((IpIo->IpVersion != IP_VERSION_4) || (Dest != NULL));
+  if ((IpIo == NULL) || (Pkt == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if ((IpIo->IpVersion == IP_VERSION_4) && (Dest == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (!IpIo->IsConfigured) {
     return EFI_NOT_STARTED;
