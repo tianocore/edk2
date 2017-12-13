@@ -359,8 +359,9 @@ IpIoDestroy (
 
   @param[in, out]  IpIo            The pointer to the IP_IO instance that needs to stop.
 
-  @retval          EFI_SUCCESS     The IP_IO instance stopped successfully.
-  @retval          Others          Anrror condition occurred.
+  @retval          EFI_SUCCESS            The IP_IO instance stopped successfully.
+  @retval          EFI_INVALID_PARAMETER  Invalid input parameter.
+  @retval          Others                 Anrror condition occurred.
 
 **/
 EFI_STATUS
@@ -381,12 +382,13 @@ IpIoStop (
   @param[in]       OpenData           The configuration data and callbacks for
                                       the IP_IO instance.
 
-  @retval          EFI_SUCCESS        The IP_IO instance opened with OpenData
-                                      successfully.
-  @retval          EFI_ACCESS_DENIED  The IP_IO instance is configured; avoid  
-                                      reopening it.
-  @retval          EFI_UNSUPPORTED    IPv4 RawData mode is no supported.
-  @retval          Others             An error condition occurred.
+  @retval          EFI_SUCCESS            The IP_IO instance opened with OpenData
+                                          successfully.
+  @retval          EFI_ACCESS_DENIED      The IP_IO instance is configured, avoid to 
+                                          reopen it.
+  @retval          EFI_UNSUPPORTED        IPv4 RawData mode is no supported.
+  @retval          EFI_INVALID_PARAMETER  Invalid input parameter.
+  @retval          Others                 Error condition occurred.
 
 **/
 EFI_STATUS
@@ -522,7 +524,7 @@ IpIoRemoveIp (
   @param[in]       Src               The local IP address.
 
   @return The pointer to the IP protocol can be used for sending purpose and its local
-          address is the same with Src.
+          address is the same with Src. NULL if failed.
 
 **/
 IP_IO_IP_INFO *

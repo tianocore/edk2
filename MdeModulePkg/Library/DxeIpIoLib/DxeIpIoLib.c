@@ -283,15 +283,22 @@ IpIoIcmpv4Handler (
   UINT8                Type;
   UINT8                Code;
   UINT32               TrimBytes;
-
+  
+  ASSERT (IpIo != NULL);
+  ASSERT (Pkt != NULL);
+  ASSERT (Session != NULL);
   ASSERT (IpIo->IpVersion == IP_VERSION_4);
-
-  IcmpHdr = NET_PROTO_HDR (Pkt, IP4_ICMP_ERROR_HEAD);
-  IpHdr   = (EFI_IP4_HEADER *) (&IcmpHdr->IpHead);
-
+  
   //
   // Check the ICMP packet length.
   //
+  if (Pkt->TotalSize < sizeof (IP4_ICMP_ERROR_HEAD)) {
+    return EFI_ABORTED;
+  }
+  
+  IcmpHdr = NET_PROTO_HDR (Pkt, IP4_ICMP_ERROR_HEAD);
+  IpHdr   = (EFI_IP4_HEADER *) (&IcmpHdr->IpHead);
+
   if (Pkt->TotalSize < ICMP_ERRLEN (IpHdr)) {
 
     return EFI_ABORTED;
@@ -421,6 +428,9 @@ IpIoIcmpv6Handler (
   UINT32               TrimBytes;
   BOOLEAN              Flag;
 
+  ASSERT (IpIo != NULL);
+  ASSERT (Pkt != NULL);
+  ASSERT (Session != NULL);
   ASSERT (IpIo->IpVersion == IP_VERSION_6);
 
   //
@@ -1043,6 +1053,7 @@ IpIoListenHandlerDpc (
   }
 
   if (IpIo->IpVersion == IP_VERSION_4) {
+    ASSERT (RxData->Ip4RxData.Header != NULL);
     if (IP4_IS_LOCAL_BROADCAST (EFI_IP4 (RxData->Ip4RxData.Header->SourceAddress))) {
       //
       // The source address is a broadcast address, discard it.
@@ -1065,6 +1076,11 @@ IpIoListenHandlerDpc (
       //
       goto CleanUp;
     }
+
+    //
+    // The fragment should always be valid for non-zero length packet.
+    //
+    ASSERT (RxData->Ip4RxData.FragmentCount != 0);
 
     //
     // Create a netbuffer representing IPv4 packet
@@ -1090,7 +1106,7 @@ IpIoListenHandlerDpc (
     Session.IpHdrLen       = RxData->Ip4RxData.HeaderLength;
     Session.IpVersion      = IP_VERSION_4;
   } else {
-
+    ASSERT (RxData->Ip6RxData.Header != NULL);
     if (!NetIp6IsValidUnicast(&RxData->Ip6RxData.Header->SourceAddress)) {
       goto CleanUp;
     }
@@ -1101,6 +1117,11 @@ IpIoListenHandlerDpc (
       //
       goto CleanUp;
     }
+    
+    //
+    // The fragment should always be valid for non-zero length packet.
+    //
+    ASSERT (RxData->Ip6RxData.FragmentCount != 0);
     
     //
     // Create a netbuffer representing IPv6 packet
@@ -1287,12 +1308,13 @@ ReleaseIpIo:
   @param[in]       OpenData           The configuration data and callbacks for
                                       the IP_IO instance.
 
-  @retval          EFI_SUCCESS        The IP_IO instance opened with OpenData
-                                      successfully.
-  @retval          EFI_ACCESS_DENIED  The IP_IO instance is configured, avoid to 
-                                      reopen it.
-  @retval          EFI_UNSUPPORTED    IPv4 RawData mode is no supported.
-  @retval          Others             Error condition occurred.
+  @retval          EFI_SUCCESS            The IP_IO instance opened with OpenData
+                                          successfully.
+  @retval          EFI_ACCESS_DENIED      The IP_IO instance is configured, avoid to 
+                                          reopen it.
+  @retval          EFI_UNSUPPORTED        IPv4 RawData mode is no supported.
+  @retval          EFI_INVALID_PARAMETER  Invalid input parameter.
+  @retval          Others                 Error condition occurred.
 
 **/
 EFI_STATUS
@@ -1304,6 +1326,10 @@ IpIoOpen (
 {
   EFI_STATUS        Status;
   UINT8             IpVersion;
+
+  if (IpIo == NULL || OpenData == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (IpIo->IsConfigured) {
     return EFI_ACCESS_DENIED;
@@ -1416,8 +1442,9 @@ ErrorExit:
 
   @param[in, out]  IpIo            Pointer to the IP_IO instance that needs to stop.
 
-  @retval          EFI_SUCCESS     The IP_IO instance stopped successfully.
-  @retval          Others          Error condition occurred.
+  @retval          EFI_SUCCESS            The IP_IO instance stopped successfully.
+  @retval          EFI_INVALID_PARAMETER  Invalid input parameter.
+  @retval          Others                 Error condition occurred.
 
 **/
 EFI_STATUS
@@ -1429,6 +1456,10 @@ IpIoStop (
   EFI_STATUS        Status;
   IP_IO_IP_INFO     *IpInfo;
   UINT8             IpVersion;
+
+  if (IpIo == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (!IpIo->IsConfigured) {
     return EFI_SUCCESS;
@@ -1957,6 +1988,10 @@ IpIoRemoveIp (
 {
 
   UINT8               IpVersion;
+  
+  if (IpIo == NULL || IpInfo == NULL) {
+    return;
+  }
 
   ASSERT (IpInfo->RefCnt > 0);
 
@@ -2021,7 +2056,7 @@ IpIoRemoveIp (
   @param[in]       Src               The local IP address.
 
   @return Pointer to the IP protocol can be used for sending purpose and its local
-          address is the same with Src.
+          address is the same with Src. NULL if failed.
 
 **/
 IP_IO_IP_INFO *
@@ -2037,7 +2072,13 @@ IpIoFindSender (
   LIST_ENTRY      *IpInfoEntry;
   IP_IO_IP_INFO   *IpInfo;
 
-  ASSERT ((IpVersion == IP_VERSION_4) || (IpVersion == IP_VERSION_6));  
+  if (IpIo == NULL || Src == NULL) {
+    return NULL;
+  }
+
+  if ((IpVersion != IP_VERSION_4) && (IpVersion != IP_VERSION_6)) {
+    return NULL;
+  }
 
   NET_LIST_FOR_EACH (IpIoEntry, &mActiveIpIoList) {
     IpIoPtr = NET_LIST_USER_STRUCT (IpIoEntry, IP_IO, Entry);
