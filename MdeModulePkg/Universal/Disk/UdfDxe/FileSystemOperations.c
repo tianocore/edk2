@@ -2219,6 +2219,10 @@ ResolveSymlink (
         return EFI_VOLUME_CORRUPTED;
       }
 
+      if ((UINTN)PathComp->ComponentIdentifier + PathCompLength > (UINTN)EndData) {
+        return EFI_VOLUME_CORRUPTED;
+      }
+
       Char = FileName;
       for (Index = 1; Index < PathCompLength; Index++) {
         if (CompressionId == 16) {
