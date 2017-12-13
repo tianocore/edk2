@@ -293,8 +293,12 @@ Ip4Config2IpToStr (
   @param[in]   IpCount   The size of IPv4 address list.
   @param[out]  Str       The string contains several decimal dotted
                          IPv4 addresses separated by space.       
+
+  @retval EFI_SUCCESS           Operation is success.
+  @retval EFI_OUT_OF_RESOURCES  Error occurs in allocating memory.
+
 **/
-VOID
+EFI_STATUS
 Ip4Config2IpListToStr (
   IN  EFI_IPv4_ADDRESS  *Ip,
   IN  UINTN             IpCount,
@@ -317,7 +321,9 @@ Ip4Config2IpListToStr (
     TempIp = Ip + Index;
     if (TempStr == NULL) {
       TempStr = AllocateZeroPool(2 * IP4_STR_MAX_SIZE);
-      ASSERT(TempStr != NULL);
+      if (TempStr == NULL) {
+        return EFI_OUT_OF_RESOURCES;
+      }
     }
 
     UnicodeSPrint (
@@ -347,6 +353,8 @@ Ip4Config2IpListToStr (
   if (TempStr != NULL) {
     FreePool(TempStr);
   }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -518,7 +526,7 @@ Ip4Config2ConvertConfigNvDataToIfrNvData (
   Ip4Config2IpToStr (&Ip4Info->StationAddress, IfrNvData->StationAddress);
   Ip4Config2IpToStr (&Ip4Info->SubnetMask, IfrNvData->SubnetMask);
   Ip4Config2IpToStr (&GatewayAddress, IfrNvData->GatewayAddress);
-  Ip4Config2IpListToStr (DnsAddress, DnsCount, IfrNvData->DnsAddress);
+  Status = Ip4Config2IpListToStr (DnsAddress, DnsCount, IfrNvData->DnsAddress);
 
 Exit:
 
@@ -914,7 +922,10 @@ Ip4FormExtractConfig (
       ConfigRequestHdr = HiiConstructConfigHdr (&gIp4Config2NvDataGuid, mIp4Config2StorageName, Private->ChildHandle);
       Size = (StrLen (ConfigRequestHdr) + 32 + 1) * sizeof (CHAR16);
       ConfigRequest = AllocateZeroPool (Size);
-      ASSERT (ConfigRequest != NULL);
+      if (ConfigRequest == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Failure;
+      }
       AllocatedRequest = TRUE;
       
       UnicodeSPrint (ConfigRequest, Size, L"%s&OFFSET=0&WIDTH=%016LX", ConfigRequestHdr, (UINT64)BufferSize);
