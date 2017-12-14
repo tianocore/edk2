@@ -296,9 +296,6 @@ SmmReadyToBootHandler (
 {
   EFI_STATUS                        Status;
   EFI_HANDLE                        SmmHandle;
-  EFI_SMM_SX_DISPATCH2_PROTOCOL     *SxDispatch;
-  EFI_SMM_SX_REGISTER_CONTEXT       EntryRegisterContext;
-  EFI_HANDLE                        S3EntryHandle;
 
   //
   // Install SMM Ready To Boot protocol.
@@ -313,31 +310,7 @@ SmmReadyToBootHandler (
 
   SmiHandlerUnRegister (DispatchHandle);
 
-  //
-  // Locate SmmSxDispatch2 protocol.
-  //
-  Status = SmmLocateProtocol (
-             &gEfiSmmSxDispatch2ProtocolGuid,
-             NULL,
-             (VOID **)&SxDispatch
-             );
-  if (!EFI_ERROR (Status) && (SxDispatch != NULL)) {
-    //
-    // Register a S3 entry callback function to
-    // determine if it will be during S3 resume.
-    //
-    EntryRegisterContext.Type  = SxS3;
-    EntryRegisterContext.Phase = SxEntry;
-    Status = SxDispatch->Register (
-                           SxDispatch,
-                           SmmS3EntryCallBack,
-                           &EntryRegisterContext,
-                           &S3EntryHandle
-                           );
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -452,10 +425,14 @@ SmmEndOfDxeHandler (
   IN OUT UINTN       *CommBufferSize  OPTIONAL
   )
 {
-  EFI_STATUS  Status;
-  EFI_HANDLE  SmmHandle;
+  EFI_STATUS                        Status;
+  EFI_HANDLE                        SmmHandle;
+  EFI_SMM_SX_DISPATCH2_PROTOCOL     *SxDispatch;
+  EFI_SMM_SX_REGISTER_CONTEXT       EntryRegisterContext;
+  EFI_HANDLE                        S3EntryHandle;
 
   DEBUG ((EFI_D_INFO, "SmmEndOfDxeHandler\n"));
+
   //
   // Install SMM EndOfDxe protocol
   //
@@ -466,7 +443,32 @@ SmmEndOfDxeHandler (
              EFI_NATIVE_INTERFACE,
              NULL
              );
-  return Status;
+
+  //
+  // Locate SmmSxDispatch2 protocol.
+  //
+  Status = SmmLocateProtocol (
+             &gEfiSmmSxDispatch2ProtocolGuid,
+             NULL,
+             (VOID **)&SxDispatch
+             );
+  if (!EFI_ERROR (Status) && (SxDispatch != NULL)) {
+    //
+    // Register a S3 entry callback function to
+    // determine if it will be during S3 resume.
+    //
+    EntryRegisterContext.Type  = SxS3;
+    EntryRegisterContext.Phase = SxEntry;
+    Status = SxDispatch->Register (
+                           SxDispatch,
+                           SmmS3EntryCallBack,
+                           &EntryRegisterContext,
+                           &S3EntryHandle
+                           );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -526,7 +528,6 @@ SmmEndOfS3ResumeHandler (
   ASSERT_EFI_ERROR (Status);
 
   mDuringS3Resume = FALSE;
-
   return Status;
 }
 
