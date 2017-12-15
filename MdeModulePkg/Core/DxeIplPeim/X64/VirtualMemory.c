@@ -472,6 +472,8 @@ SetPageTablePoolReadOnly (
       //
       // The smaller granularity of page must be needed.
       //
+      ASSERT (Level > 1);
+
       NewPageTable = AllocatePageTableMemory (1);
       ASSERT (NewPageTable != NULL);
 
@@ -481,10 +483,10 @@ SetPageTablePoolReadOnly (
             ++EntryIndex) {
         NewPageTable[EntryIndex] = PhysicalAddress  | AddressEncMask |
                                    IA32_PG_P | IA32_PG_RW;
-        if (Level > 1) {
+        if (Level > 2) {
           NewPageTable[EntryIndex] |= IA32_PG_PS;
         }
-        PhysicalAddress += LevelSize[Level];
+        PhysicalAddress += LevelSize[Level - 1];
       }
 
       PageTable[Index] = (UINT64)(UINTN)NewPageTable | AddressEncMask |
