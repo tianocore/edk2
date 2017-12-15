@@ -1264,7 +1264,7 @@ class DscBuildData(PlatformBuildClassObject):
             CApp = CApp + '{\n'
             CApp = CApp + '  UINT32  Size;\n'
             CApp = CApp + '  UINT32  FieldSize;\n'
-            CApp = CApp + '  UINT8   *Value;\n'
+            CApp = CApp + '  CHAR8   *Value;\n'
             CApp = CApp + '  UINT32  OriginalSize;\n'
             CApp = CApp + '  VOID    *OriginalPcd;\n'
             CApp = CApp + '  %s      *Pcd;\n' % (Pcd.DatumType)
@@ -1434,7 +1434,7 @@ class DscBuildData(PlatformBuildClassObject):
         else:
             MakeApp = MakeApp + PcdGccMakefile
             MakeApp = MakeApp + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o\n' % (self.OutputPath, PcdValueInitName) + \
-                      'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'BUILD_CFLAGS += -Wno-error\n' + 'INCLUDE +='
+                      'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'BUILD_CFLAGS += -Wno-pointer-to-int-cast -Wno-unused-variable\n' + 'INCLUDE +='
 
         PlatformInc = {}
         for Cache in self._Bdb._CACHE_.values():
@@ -1472,11 +1472,43 @@ class DscBuildData(PlatformBuildClassObject):
         File.write(InitByteValue)
         File.close()
 
+        Messages = ''
         if sys.platform == "win32":
             StdOut, StdErr = self.ExecuteCommand ('nmake clean & nmake -f %s' % (MakeFileName))
+            Messages = StdOut
         else:
             StdOut, StdErr = self.ExecuteCommand ('make clean & make -f %s' % (MakeFileName))
-        Messages = StdOut.split('\r')
+            Messages = StdErr
+        Messages = Messages.split('\n')
+        for Message in Messages:
+            if " error" in Message:
+                FileInfo = Message.strip().split('(')
+                if len (FileInfo) > 1:
+                    FileName = FileInfo [0]
+                    FileLine = FileInfo [1].split (')')[0]
+                else:
+                    FileInfo = Message.strip().split(':')
+                    FileName = FileInfo [0]
+                    FileLine = FileInfo [1]
+
+                File = open (FileName, 'r')
+                FileData = File.readlines()
+                File.close()
+                error_line = FileData[int (FileLine) - 1]
+                if r"//" in error_line:
+                    c_line,dsc_line = error_line.split(r"//")
+                else:
+                    dsc_line = error_line
+
+                message_itmes = Message.split(":")
+                Index = 0
+                for item in message_itmes:
+                    if "PcdValueInit.c" in item:
+                        Index = message_itmes.index(item)
+                        message_itmes[Index] = dsc_line.strip()
+                        break
+
+                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, ":".join(message_itmes[Index:]))
 
         PcdValueInitExe = PcdValueInitName
         if not sys.platform == "win32":
