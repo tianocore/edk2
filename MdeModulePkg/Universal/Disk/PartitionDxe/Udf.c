@@ -1,8 +1,17 @@
 /** @file
   Scan for an UDF file system on a formatted media.
 
+  Caution: This file requires additional review when modified.
+  This driver will have external input - CD/DVD media.
+  This external input must be validated carefully to avoid security issue like
+  buffer overflow, integer overflow.
+
+  FindUdfFileSystem() routine will consume the media properties and do basic
+  validation.
+
   Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
   Copyright (C) 2014-2017 Paulo Alcantara <pcacjr@zytor.com>
+  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -100,6 +109,20 @@ FindAnchorVolumeDescriptorPointer (
   EndLBA = BlockIo->Media->LastBlock;
   *LastRecordedBlock = EndLBA;
   AvdpsCount = 0;
+
+  //
+  // Check if the block size of the underlying media can hold the data of an
+  // Anchor Volume Descriptor Pointer
+  //
+  if (BlockSize < sizeof (UDF_ANCHOR_VOLUME_DESCRIPTOR_POINTER)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Media block size 0x%x unable to hold an AVDP.\n",
+      __FUNCTION__,
+      BlockSize
+      ));
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Find AVDP at block 256
@@ -597,6 +620,12 @@ Out_Free:
 
 /**
   Find a supported UDF file system in block device.
+
+  @attention This is boundary function that may receive untrusted input.
+  @attention The input is from Partition.
+
+  The CD/DVD media is the external input, so this routine will do basic
+  validation for the media.
 
   @param[in]  BlockIo             BlockIo interface.
   @param[in]  DiskIo              DiskIo interface.
