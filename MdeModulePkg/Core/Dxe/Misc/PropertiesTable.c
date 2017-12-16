@@ -1229,11 +1229,11 @@ InsertImageRecord (
   InsertTailList (&mImagePropertiesPrivateData.ImageRecordList, &ImageRecord->Link);
   mImagePropertiesPrivateData.ImageRecordCount++;
 
-  SortImageRecord ();
-
   if (mImagePropertiesPrivateData.CodeSegmentCountMax < ImageRecord->CodeSegmentCount) {
     mImagePropertiesPrivateData.CodeSegmentCountMax = ImageRecord->CodeSegmentCount;
   }
+
+  SortImageRecord ();
 
 Finish:
   return ;
