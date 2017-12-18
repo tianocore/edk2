@@ -1,7 +1,7 @@
 /** @file
 Common basic Library Functions
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -638,12 +638,22 @@ Returns:
       //
       RootPath = getcwd (NULL, 0);
       if (RootPath != NULL) {
-        strcat (mCommonLibFullPath, RootPath);
+        if (strlen (mCommonLibFullPath) + strlen (RootPath) > MAX_LONG_FILE_PATH - 1) {
+          Error (NULL, 0, 2000, "Invalid parameter", "RootPath is too long!");
+          free (RootPath);
+          return NULL;
+        }
+        strncat (mCommonLibFullPath, RootPath, MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
         if (FileName[0] != '\\' && FileName[0] != '/') {
+          if (strlen (mCommonLibFullPath) + 1 > MAX_LONG_FILE_PATH - 1) {
+            Error (NULL, 0, 2000, "Invalid parameter", "RootPath is too long!");
+            free (RootPath);
+            return NULL;
+          }
           //
           // Attach directory separator
           //
-          strcat (mCommonLibFullPath, "\\");
+          strncat (mCommonLibFullPath, "\\", MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
         }
         free (RootPath);
       }
@@ -673,7 +683,7 @@ Returns:
     //
     if ((PathPointer = strstr (mCommonLibFullPath, ":\\\\")) != NULL) {
       *(PathPointer + 2) = '\0';
-      strcat (mCommonLibFullPath, PathPointer + 3);
+      strncat (mCommonLibFullPath, PathPointer + 3, MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
     }
     
     //
@@ -681,7 +691,7 @@ Returns:
     //
     while ((PathPointer = strstr (mCommonLibFullPath, ".\\")) != NULL) {
       *PathPointer = '\0';
-      strcat (mCommonLibFullPath, PathPointer + 2);
+      strncat (mCommonLibFullPath, PathPointer + 2, MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
     }
         
     //
@@ -689,7 +699,7 @@ Returns:
     //
     while ((PathPointer = strstr (mCommonLibFullPath, "\\.\\")) != NULL) {
       *PathPointer = '\0';
-      strcat (mCommonLibFullPath, PathPointer + 2);
+      strncat (mCommonLibFullPath, PathPointer + 2, MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
     }
 
     //
@@ -706,7 +716,7 @@ Returns:
         // Skip one directory
         //
         *PathPointer = '\0';
-        strcat (mCommonLibFullPath, NextPointer);
+        strncat (mCommonLibFullPath, NextPointer, MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
       } else {
         //
         // No directory is found. Just break.

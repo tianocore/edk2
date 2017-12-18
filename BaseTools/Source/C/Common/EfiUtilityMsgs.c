@@ -1,7 +1,7 @@
 /** @file
 EFI tools utility functions to display warning, error, and informational messages
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -608,12 +608,9 @@ Returns:
   if (UtilityName != NULL) {
     if (strlen (UtilityName) >= sizeof (mUtilityName)) {
       Error (UtilityName, 0, 0, "application error", "utility name length exceeds internal buffer size");
-      strncpy (mUtilityName, UtilityName, sizeof (mUtilityName) - 1);
-      mUtilityName[sizeof (mUtilityName) - 1] = 0;
-      return ;
-    } else {
-      strcpy (mUtilityName, UtilityName);
     }
+    strncpy (mUtilityName, UtilityName, sizeof (mUtilityName) - 1);
+    mUtilityName[sizeof (mUtilityName) - 1] = 0;
   } else {
     Error (NULL, 0, 0, "application error", "SetUtilityName() called with NULL utility name");
   }
