@@ -462,10 +462,11 @@ Notes:
                        );
     }
     if (Cptr != NULL) {
-      sprintf (Line, ": %s", Cptr);
+      strcpy (Line, ": ");
+      strncat (Line, Cptr, MAX_LINE_LEN - strlen (Line) - 1);
       if (LineNumber != 0) {
         sprintf (Line2, "(%u)", (unsigned) LineNumber);
-        strcat (Line, Line2);
+        strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
       }
     }
   } else {
@@ -476,14 +477,16 @@ Notes:
       if (mUtilityName[0] != '\0') {
         fprintf (stdout, "%s...\n", mUtilityName);
       }
-      sprintf (Line, "%s", Cptr);
+      strncpy (Line, Cptr, MAX_LINE_LEN - 1);
+      Line[MAX_LINE_LEN - 1] = 0;
       if (LineNumber != 0) {
         sprintf (Line2, "(%u)", (unsigned) LineNumber);
-        strcat (Line, Line2);
+        strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
       }
     } else {
       if (mUtilityName[0] != '\0') {
-        sprintf (Line, "%s", mUtilityName);
+        strncpy (Line, mUtilityName, MAX_LINE_LEN - 1);
+        Line[MAX_LINE_LEN - 1] = 0;
       }
     }
 
@@ -501,12 +504,12 @@ Notes:
   // Have to print an error code or Visual Studio won't find the
   // message for you. It has to be decimal digits too.
   //
+  strncat (Line, ": ", MAX_LINE_LEN - strlen (Line) - 1);
+  strncat (Line, Type, MAX_LINE_LEN - strlen (Line) - 1);
   if (MessageCode != 0) {
-    sprintf (Line2, ": %s %04u", Type, (unsigned) MessageCode);
-  } else {
-    sprintf (Line2, ": %s", Type);
+    sprintf (Line2, " %04u", (unsigned) MessageCode);
+    strncat (Line, Line2, MAX_LINE_LEN - strlen (Line) - 1);
   }
-  strcat (Line, Line2);
   fprintf (stdout, "%s", Line);
   //
   // If offending text was provided, then print it
