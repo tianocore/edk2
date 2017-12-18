@@ -4,7 +4,7 @@ Reading/writing MBR/DBR.
     If we write MBR to disk, we just update the MBR code and the partition table wouldn't be over written.
     If we process DBR, we will patch MBR to set first partition active if no active partition exists.
     
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -631,6 +631,14 @@ GetPathInfo (
 	return ErrorSuccess;
   } 
 
+  //
+  // Check the path length
+  //
+  if (strlen (PathInfo->Path) >= (sizeof (PathInfo->PhysicalPath) / sizeof (PathInfo->PhysicalPath[0]))) {
+    fprintf (stderr, "ERROR, Path is too long for - %s", PathInfo->Path);
+    return ErrorPath;
+  }
+
   PathInfo->Type = PathFile;
   if (PathInfo->Input) {
     //
@@ -644,7 +652,12 @@ GetPathInfo (
     fclose (f);
   }
   PathInfo->Type = PathFile;
-  strcpy(PathInfo->PhysicalPath, PathInfo->Path);
+  strncpy(
+    PathInfo->PhysicalPath,
+    PathInfo->Path,
+    sizeof (PathInfo->PhysicalPath) / sizeof (PathInfo->PhysicalPath[0]) - 1
+    );
+  PathInfo->PhysicalPath[sizeof (PathInfo->PhysicalPath) / sizeof (PathInfo->PhysicalPath[0]) - 1] = 0;
 
   return ErrorSuccess;
 }    
