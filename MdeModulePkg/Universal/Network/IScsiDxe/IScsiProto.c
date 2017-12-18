@@ -289,16 +289,16 @@ IScsiSessionLogin (
   ISCSI_SESSION     *Session;
   ISCSI_CONNECTION  *Conn;
   EFI_TCP4_PROTOCOL *Tcp4;
-  BOOLEAN           MediaPresent;
+  EFI_STATUS        MediaStatus;
 
   Session = &Private->Session;
 
   //
   // Check media status before session login
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (Private->Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Private->Controller, ISCSI_CHECK_MEDIA_LOGIN_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
     return EFI_NO_MEDIA;
   }
 

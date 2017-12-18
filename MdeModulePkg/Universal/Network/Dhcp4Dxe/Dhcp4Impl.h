@@ -43,6 +43,7 @@ typedef struct _DHCP_PROTOCOL DHCP_PROTOCOL;
 #define DHCP_SERVICE_SIGNATURE   SIGNATURE_32 ('D', 'H', 'C', 'P')
 #define DHCP_PROTOCOL_SIGNATURE  SIGNATURE_32 ('d', 'h', 'c', 'p')
 
+#define DHCP_CHECK_MEDIA_WAITING_TIME    EFI_TIMER_PERIOD_SECONDS(20)
 
 //
 // The state of the DHCP service. It starts as UNCONFIGED. If

@@ -360,7 +360,7 @@ IScsiDoDhcp (
   EFI_STATUS              Status;
   EFI_DHCP4_PACKET_OPTION *ParaList;
   EFI_DHCP4_CONFIG_DATA   Dhcp4ConfigData;
-  BOOLEAN                 MediaPresent;
+  EFI_STATUS              MediaStatus;
   UINT8                   *Data;
 
   Dhcp4Handle = NULL;
@@ -370,9 +370,9 @@ IScsiDoDhcp (
   //
   // Check media status before do DHCP
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Controller, ISCSI_CHECK_MEDIA_GET_DHCP_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
     return EFI_NO_MEDIA;
   }
 

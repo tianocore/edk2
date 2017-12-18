@@ -780,9 +780,9 @@ EfiDhcp4Start (
 {
   DHCP_PROTOCOL             *Instance;
   DHCP_SERVICE              *DhcpSb;
-  BOOLEAN                   MediaPresent;
   EFI_STATUS                Status;
   EFI_TPL                   OldTpl;
+  EFI_STATUS                MediaStatus;
 
   //
   // First validate the parameters
@@ -813,9 +813,9 @@ EfiDhcp4Start (
   //
   // Check Media Satus.
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (DhcpSb->Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (DhcpSb->Controller, DHCP_CHECK_MEDIA_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
     Status = EFI_NO_MEDIA;
     goto ON_ERROR;
   }

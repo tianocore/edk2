@@ -42,6 +42,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define ISCSI_VERSION_MAX                       0x00
 #define ISCSI_VERSION_MIN                       0x00
 
+#define ISCSI_CHECK_MEDIA_LOGIN_WAITING_TIME          EFI_TIMER_PERIOD_SECONDS(20)
+#define ISCSI_CHECK_MEDIA_GET_DHCP_WAITING_TIME       EFI_TIMER_PERIOD_SECONDS(20)
+
 #define ISCSI_KEY_AUTH_METHOD                   "AuthMethod"
 #define ISCSI_KEY_HEADER_DIGEST                 "HeaderDigest"
 #define ISCSI_KEY_DATA_DIGEST                   "DataDigest"
