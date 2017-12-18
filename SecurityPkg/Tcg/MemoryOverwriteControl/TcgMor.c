@@ -23,8 +23,6 @@ UINT8    mMorControl;
 /**
   Ready to Boot Event notification handler.
 
-  Sequence of OS boot events is measured in this event notification handler.
-
   @param[in]  Event     Event whose notification function is being invoked
   @param[in]  Context   Pointer to the notification function's context
 
@@ -234,9 +232,6 @@ Exit:
 /**
   Notification function of END_OF_DXE.
 
-  This is a notification function registered on END_OF_DXE event.
-  It is to get VarCheckPcdBin.
-
   @param[in] Event      Event whose notification function is being invoked.
   @param[in] Context    Pointer to the notification function's context.
 
@@ -299,6 +294,8 @@ TPerResetAtEndOfDxe (
 
     InitiateTPerReset (Ssp, BlockIo->Media->MediaId);
   }
+
+  FreePool (HandleBuffer);
 }
 
 /**
