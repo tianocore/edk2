@@ -755,7 +755,7 @@ Ping6CreateIpInstance (
   UINTN                            HandleNum;
   EFI_HANDLE                       *HandleBuffer;
   BOOLEAN                          UnspecifiedSrc;
-  BOOLEAN                          MediaPresent;
+  EFI_STATUS                       MediaStatus;
   EFI_SERVICE_BINDING_PROTOCOL     *Ip6Sb;
   EFI_IP6_CONFIG_PROTOCOL          *Ip6Cfg;
   EFI_IP6_CONFIG_DATA              Ip6Config;
@@ -766,7 +766,7 @@ Ping6CreateIpInstance (
 
   HandleBuffer      = NULL;
   UnspecifiedSrc    = FALSE;
-  MediaPresent      = TRUE;
+  MediaStatus       = EFI_SUCCESS
   Ip6Sb             = NULL;
   IfInfo            = NULL;
   IfInfoSize        = 0;
@@ -814,8 +814,8 @@ Ping6CreateIpInstance (
       //
       // Check media.
       //
-      NetLibDetectMedia (HandleBuffer[HandleIndex], &MediaPresent);
-      if (!MediaPresent) {
+      NetLibDetectMediaWaitTimeout (HandleBuffer[HandleIndex], 0, &MediaStatus);
+      if (MediaStatus != EFI_SUCCESS) {
         //
         // Skip this one.
         //

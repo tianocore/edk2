@@ -550,11 +550,11 @@ IfConfigShowInterfaceInfo (
   LIST_ENTRY                   *Entry;
   LIST_ENTRY                   *Next;
   IFCONFIG_INTERFACE_CB        *IfCb;
-  BOOLEAN                       MediaPresent;
+  EFI_STATUS                    MediaStatus;
   EFI_IPv4_ADDRESS              Gateway;
   UINT32                        Index;
   
-  MediaPresent = TRUE;
+  MediaStatus = EFI_SUCCESS;
 
   if (IsListEmpty (IfList)) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INVALID_INTERFACE), gShellNetwork1HiiHandle);
@@ -576,8 +576,8 @@ IfConfigShowInterfaceInfo (
     //
     // Get Media State.
     //
-    if (EFI_SUCCESS == NetLibDetectMedia (IfCb->NicHandle, &MediaPresent)) {
-      if (!MediaPresent) {
+    if (EFI_SUCCESS == NetLibDetectMediaWaitTimeout (IfCb->NicHandle, 0, &MediaStatus)) {
+      if (MediaStatus != EFI_SUCCESS) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_MEDIA_STATE), gShellNetwork1HiiHandle, L"Media disconnected");
       } else {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_MEDIA_STATE), gShellNetwork1HiiHandle, L"Media present");
