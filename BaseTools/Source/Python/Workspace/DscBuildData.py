@@ -1014,25 +1014,6 @@ class DscBuildData(PlatformBuildClassObject):
         for stru_pcd in S_pcd_set.values():
             if stru_pcd.Type not in DynamicPcdType:
                 continue
-            if stru_pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
-                for skuid in SkuIds:
-                    nextskuid = skuid
-                    NoDefault = False
-                    if skuid not in stru_pcd.SkuOverrideValues:
-                        while nextskuid not in stru_pcd.SkuOverrideValues:
-                            if nextskuid == "DEFAULT":
-                                NoDefault = True
-                                break
-                            nextskuid = self.SkuIdMgr.GetNextSkuId(nextskuid)
-                        stru_pcd.SkuOverrideValues[skuid] = {}
-                    if NoDefault:
-                        continue
-                    PcdDefaultStoreSet = set([defaultstorename  for defaultstorename in stru_pcd.SkuOverrideValues[nextskuid]])
-                    mindefaultstorename = DefaultStoreMgr.GetMin(PcdDefaultStoreSet)
-
-                    for defaultstoreid in DefaultStores:
-                        if defaultstoreid not in stru_pcd.SkuOverrideValues[skuid]:
-                            stru_pcd.SkuOverrideValues[skuid][defaultstoreid] = copy.deepcopy(stru_pcd.SkuOverrideValues[nextskuid][mindefaultstorename])
             for skuid in SkuIds:
                 if skuid in stru_pcd.SkuOverrideValues:
                     continue
@@ -1043,13 +1024,32 @@ class DscBuildData(PlatformBuildClassObject):
                         NoDefault = True
                         break
                     nextskuid = self.SkuIdMgr.GetNextSkuId(nextskuid)
-                stru_pcd.SkuOverrideValues[skuid] = copy.deepcopy(stru_pcd.SkuOverrideValues[nextskuid]) if not NoDefault else copy.deepcopy({defaultstorename: stru_pcd.DefaultValues for defaultstorename in DefaultStores})
+                stru_pcd.SkuOverrideValues[skuid] = copy.deepcopy(stru_pcd.SkuOverrideValues[nextskuid]) if not NoDefault else copy.deepcopy({defaultstorename: stru_pcd.DefaultValues for defaultstorename in DefaultStores} if DefaultStores else {'STANDARD':stru_pcd.DefaultValues})
+            if stru_pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
+                for skuid in SkuIds:
+                    nextskuid = skuid
+                    NoDefault = False
+                    if skuid not in stru_pcd.SkuOverrideValues:
+                        while nextskuid not in stru_pcd.SkuOverrideValues:
+                            if nextskuid == "DEFAULT":
+                                NoDefault = True
+                                break
+                            nextskuid = self.SkuIdMgr.GetNextSkuId(nextskuid)
+                    if NoDefault:
+                        continue
+                    PcdDefaultStoreSet = set([defaultstorename  for defaultstorename in stru_pcd.SkuOverrideValues[nextskuid]])
+                    mindefaultstorename = DefaultStoreMgr.GetMin(PcdDefaultStoreSet)
+
+                    for defaultstoreid in DefaultStores:
+                        if defaultstoreid not in stru_pcd.SkuOverrideValues[skuid]:
+                            stru_pcd.SkuOverrideValues[skuid][defaultstoreid] = copy.deepcopy(stru_pcd.SkuOverrideValues[nextskuid][mindefaultstorename])
 
         Str_Pcd_Values = self.GenerateByteArrayValue(S_pcd_set)
         if Str_Pcd_Values:
             for (skuname,StoreName,PcdGuid,PcdName,PcdValue) in Str_Pcd_Values:
                 str_pcd_obj = S_pcd_set.get((PcdName, PcdGuid))
                 if str_pcd_obj is None:
+                    print PcdName, PcdGuid
                     raise
                 if str_pcd_obj.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
