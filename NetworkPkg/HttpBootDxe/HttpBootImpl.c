@@ -548,7 +548,7 @@ HttpBootDxeLoadFile (
 {
   HTTP_BOOT_PRIVATE_DATA        *Private;
   HTTP_BOOT_VIRTUAL_NIC         *VirtualNic;
-  BOOLEAN                       MediaPresent;
+  EFI_STATUS                    MediaStatus;
   BOOLEAN                       UsingIpv6;
   EFI_STATUS                    Status;
   HTTP_BOOT_IMAGE_TYPE          ImageType;
@@ -570,9 +570,9 @@ HttpBootDxeLoadFile (
   //
   // Check media status before HTTP boot start
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (Private->Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Private->Controller, HTTP_BOOT_CHECK_MEDIA_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
     AsciiPrint ("\n  Error: Could not detect network connection.\n");
     return EFI_NO_MEDIA;
   }

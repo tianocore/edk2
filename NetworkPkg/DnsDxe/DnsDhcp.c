@@ -269,7 +269,7 @@ GetDns4ServerFromDhcp4 (
   EFI_STATUS                          Status;
   EFI_HANDLE                          Image;
   EFI_HANDLE                          Controller;
-  BOOLEAN                             MediaPresent;
+  EFI_STATUS                          MediaStatus;
   EFI_HANDLE                          MnpChildHandle;  
   EFI_MANAGED_NETWORK_PROTOCOL        *Mnp;
   EFI_MANAGED_NETWORK_CONFIG_DATA     MnpConfigData;
@@ -316,9 +316,9 @@ GetDns4ServerFromDhcp4 (
   //
   // Check media.
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Controller, DNS_CHECK_MEDIA_GET_DHCP_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
     return EFI_NO_MEDIA;
   }
 
@@ -620,7 +620,7 @@ GetDns6ServerFromDhcp6 (
   EFI_DHCP6_PACKET_OPTION   *Oro;
   EFI_DHCP6_RETRANSMISSION  InfoReqReXmit;
   EFI_EVENT                 Timer;
-  BOOLEAN                   MediaPresent;
+  EFI_STATUS                MediaStatus;
   DNS6_SERVER_INFOR         DnsServerInfor;
 
   Dhcp6Handle = NULL;
@@ -635,9 +635,9 @@ GetDns6ServerFromDhcp6 (
   //
   // Check media status before doing DHCP.
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Controller, DNS_CHECK_MEDIA_GET_DHCP_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
     return EFI_NO_MEDIA;
   }
 

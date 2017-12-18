@@ -401,14 +401,15 @@ IScsiDoDhcp6 (
   EFI_DHCP6_PACKET_OPTION   *Oro;
   EFI_DHCP6_RETRANSMISSION  InfoReqReXmit;
   EFI_EVENT                 Timer;
-  BOOLEAN                   MediaPresent;
+  EFI_STATUS                MediaStatus;
 
   //
   // Check media status before doing DHCP.
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Controller, ISCSI_CHECK_MEDIA_GET_DHCP_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
+    AsciiPrint ("\n  Error: Could not detect network connection.\n");
     return EFI_NO_MEDIA;
   }
 

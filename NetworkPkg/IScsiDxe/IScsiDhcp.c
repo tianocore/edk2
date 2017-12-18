@@ -443,7 +443,7 @@ IScsiDoDhcp (
   EFI_DHCP4_PACKET_OPTION       *ParaList;
   EFI_DHCP4_CONFIG_DATA         Dhcp4ConfigData;
   ISCSI_SESSION_CONFIG_NVDATA   *NvData;
-  BOOLEAN                       MediaPresent;
+  EFI_STATUS                    MediaStatus;
 
   Dhcp4Handle = NULL;
   Ip4Config2  = NULL;
@@ -453,9 +453,10 @@ IScsiDoDhcp (
   //
   // Check media status before doing DHCP.
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Controller, ISCSI_CHECK_MEDIA_GET_DHCP_WAITING_TIME, &MediaStatus);
+  if (MediaStatus!= EFI_SUCCESS) {
+    AsciiPrint ("\n  Error: Could not detect network connection.\n");
     return EFI_NO_MEDIA;
   }
 

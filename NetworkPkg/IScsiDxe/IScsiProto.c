@@ -444,14 +444,14 @@ IScsiSessionLogin (
   VOID              *Tcp;
   EFI_GUID          *ProtocolGuid;
   UINT8             RetryCount;
-  BOOLEAN           MediaPresent;
+  EFI_STATUS        MediaStatus;
 
   //
   // Check media status before session login.
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (Session->Private->Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Session->Private->Controller, ISCSI_CHECK_MEDIA_LOGIN_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
     return EFI_NO_MEDIA;
   }
 

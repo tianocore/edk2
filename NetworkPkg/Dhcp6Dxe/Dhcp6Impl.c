@@ -76,7 +76,7 @@ EfiDhcp6Start (
   EFI_TPL                      OldTpl;
   DHCP6_INSTANCE               *Instance;
   DHCP6_SERVICE                *Service;
-  BOOLEAN                      MediaPresent;
+  EFI_STATUS                   MediaStatus;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -106,9 +106,9 @@ EfiDhcp6Start (
   //
   // Check Media Satus.
   //
-  MediaPresent = TRUE;
-  NetLibDetectMedia (Service->Controller, &MediaPresent);
-  if (!MediaPresent) {
+  MediaStatus = EFI_SUCCESS;
+  NetLibDetectMediaWaitTimeout (Service->Controller, DHCP_CHECK_MEDIA_WAITING_TIME, &MediaStatus);
+  if (MediaStatus != EFI_SUCCESS) {
     Status = EFI_NO_MEDIA;
     goto ON_ERROR;
   }
