@@ -1670,7 +1670,11 @@ Finish:
   if (OutFile != NULL) {
     fclose (OutFile);
   }
-  
+
+  if (DummyFileBuffer != NULL) {
+    free (DummyFileBuffer);
+  }
+
   VerboseMsg ("%s tool done with return code is 0x%x.", UTILITY_NAME, GetUtilityStatus ());
 
   return GetUtilityStatus ();
