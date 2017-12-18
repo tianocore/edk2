@@ -362,10 +362,20 @@ Returns:
       }
     } else if (strnicmp (*TokenStr, "COMP_BIN", 8) == 0) {
       TokenStr++;
-      strcpy (VtfInfo->CompBinName, *TokenStr);
+      if (strlen (*TokenStr) >= FILE_NAME_SIZE) {
+        Error (NULL, 0, 3000, "Invalid", "The 'COMP_BIN' name is too long.");
+        return ;
+      }
+      strncpy (VtfInfo->CompBinName, *TokenStr, FILE_NAME_SIZE - 1);
+      VtfInfo->CompBinName[FILE_NAME_SIZE - 1] = 0;
     } else if (strnicmp (*TokenStr, "COMP_SYM", 8) == 0) {
       TokenStr++;
-      strcpy (VtfInfo->CompSymName, *TokenStr);
+      if (strlen (*TokenStr) >= FILE_NAME_SIZE) {
+        Error (NULL, 0, 3000, "Invalid", "The 'COMP_SYM' name is too long.");
+        return ;
+      }
+      strncpy (VtfInfo->CompSymName, *TokenStr, FILE_NAME_SIZE - 1);
+      VtfInfo->CompSymName[FILE_NAME_SIZE - 1] = 0;
     } else if (strnicmp (*TokenStr, "COMP_SIZE", 9) == 0) {
       TokenStr++;
       if (strnicmp (*TokenStr, "-", 1) == 0) {
@@ -444,14 +454,24 @@ Returns:
     if (SectionOptionFlag) {
       if (stricmp (*TokenStr, "IA32_RST_BIN") == 0) {
         TokenStr++;
-        strcpy (IA32BinFile, *TokenStr);
+        if (strlen (*TokenStr) >= FILE_NAME_SIZE) {
+          Error (NULL, 0, 3000, "Invalid", "The 'IA32_RST_BIN' name is too long.");
+          break;
+        }
+        strncpy (IA32BinFile, *TokenStr, FILE_NAME_SIZE - 1);
+        IA32BinFile[FILE_NAME_SIZE - 1] = 0;
       }
     }
 
     if (SectionCompFlag) {
       if (stricmp (*TokenStr, "COMP_NAME") == 0) {
         TokenStr++;
-        strcpy (FileListPtr->CompName, *TokenStr);
+        if (strlen (*TokenStr) >= COMPONENT_NAME_SIZE) {
+          Error (NULL, 0, 3000, "Invalid", "The 'COMP_NAME' name is too long.");
+          break;
+        }
+        strncpy (FileListPtr->CompName, *TokenStr, COMPONENT_NAME_SIZE - 1);
+        FileListPtr->CompName[COMPONENT_NAME_SIZE - 1] = 0;
         TokenStr++;
         ParseAndUpdateComponents (FileListPtr);
       }
@@ -2240,9 +2260,20 @@ Returns:
   //
   // Use the file name minus extension as the base for tokens
   //
-  strcpy (BaseToken, SourceFileName);
+  if (strlen (SourceFileName) >= MAX_LONG_FILE_PATH) {
+    fclose (SourceFile);
+    Error (NULL, 0, 2000, "Invalid parameter", "The source file name is too long.");
+    return EFI_ABORTED;
+  }
+  strncpy (BaseToken, SourceFileName, MAX_LONG_FILE_PATH - 1);
+  BaseToken[MAX_LONG_FILE_PATH - 1] = 0;
   strtok (BaseToken, ". \t\n");
-  strcat (BaseToken, "__");
+  if (strlen (BaseToken) + strlen ("__") >= MAX_LONG_FILE_PATH) {
+    fclose (SourceFile);
+    Error (NULL, 0, 2000, "Invalid parameter", "The source file name is too long.");
+    return EFI_ABORTED;
+  }
+  strncat (BaseToken, "__", MAX_LONG_FILE_PATH - strlen (BaseToken) - 1);
 
   //
   // Open the destination file
