@@ -96,7 +96,13 @@ Returns:
   //
   if (!mOptions.OutFileName[0]) {
     if (mOptions.FileList != NULL) {
-      strcpy (mOptions.OutFileName, mOptions.FileList->FileName);
+      if (strlen (mOptions.FileList->FileName) >= MAX_PATH) {
+        Status = STATUS_ERROR;
+        Error (NULL, 0, 2000, "Invalid parameter", "Input file name is too long - %s.", mOptions.FileList->FileName);
+        goto BailOut;
+      }
+      strncpy (mOptions.OutFileName, mOptions.FileList->FileName, MAX_PATH - 1);
+      mOptions.OutFileName[MAX_PATH - 1] = 0;
       //
       // Find the last . on the line and replace the filename extension with
       // the default
