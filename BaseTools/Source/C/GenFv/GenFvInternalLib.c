@@ -824,7 +824,11 @@ Returns:
   //
   // Construct Map file Name 
   //
-  strcpy (PeMapFileName, FileName);
+  if (strlen (FileName) >= MAX_LONG_FILE_PATH) {
+    return EFI_ABORTED;
+  }
+  strncpy (PeMapFileName, FileName, MAX_LONG_FILE_PATH - 1);
+  PeMapFileName[MAX_LONG_FILE_PATH - 1] = 0;
   
   //
   // Change '\\' to '/', unified path format.
@@ -861,7 +865,11 @@ Returns:
     Cptr --;
   }
 	*Cptr2 = '\0';
-	strcpy (KeyWord, Cptr + 1);
+  if (strlen (Cptr + 1) >= MAX_LINE_LEN) {
+    return EFI_ABORTED;
+  }
+  strncpy (KeyWord, Cptr + 1, MAX_LINE_LEN - 1);
+  KeyWord[MAX_LINE_LEN - 1] = 0;
 	*Cptr2 = '.';
 
   //
@@ -3534,7 +3542,12 @@ Returns:
           //
           // Construct the original efi file Name 
           //
-          strcpy (PeFileName, FileName);
+          if (strlen (FileName) >= MAX_LONG_FILE_PATH) {
+            Error (NULL, 0, 2000, "Invalid", "The file name %s is too long.", FileName);
+            return EFI_ABORTED;
+          }
+          strncpy (PeFileName, FileName, MAX_LONG_FILE_PATH - 1);
+          PeFileName[MAX_LONG_FILE_PATH - 1] = 0;
           Cptr = PeFileName + strlen (PeFileName);
           while (*Cptr != '.') {
             Cptr --;
@@ -3789,7 +3802,12 @@ Returns:
       //
       // Construct the original efi file name 
       //
-      strcpy (PeFileName, FileName);
+      if (strlen (FileName) >= MAX_LONG_FILE_PATH) {
+        Error (NULL, 0, 2000, "Invalid", "The file name %s is too long.", FileName);
+        return EFI_ABORTED;
+      }
+      strncpy (PeFileName, FileName, MAX_LONG_FILE_PATH - 1);
+      PeFileName[MAX_LONG_FILE_PATH - 1] = 0;
       Cptr = PeFileName + strlen (PeFileName);
       while (*Cptr != '.') {
         Cptr --;
