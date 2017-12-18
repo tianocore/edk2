@@ -766,7 +766,7 @@ Ping6CreateIpInstance (
 
   HandleBuffer      = NULL;
   UnspecifiedSrc    = FALSE;
-  MediaStatus       = EFI_SUCCESS
+  MediaStatus       = EFI_SUCCESS;
   Ip6Sb             = NULL;
   IfInfo            = NULL;
   IfInfoSize        = 0;
