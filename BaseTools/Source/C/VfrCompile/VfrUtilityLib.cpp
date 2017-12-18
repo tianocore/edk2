@@ -958,6 +958,7 @@ CVfrVarDataTypeDB::CVfrVarDataTypeDB (
   mPackAlign     = DEFAULT_PACK_ALIGN;
   mPackStack     = NULL;
   mFirstNewDataTypeName = NULL;
+  mCurrDataType  = NULL;
 
   InternalTypesListInit ();
 }
@@ -1605,6 +1606,7 @@ SVfrVarStorageNode::SVfrVarStorageNode (
   IN EFI_VARSTORE_ID       VarStoreId
   )
 {
+  memset (&mGuid, 0, sizeof (EFI_GUID));
   if (StoreName != NULL) {
     mVarStoreName = new CHAR8[strlen(StoreName) + 1];
     strcpy (mVarStoreName, StoreName);
@@ -1616,6 +1618,7 @@ SVfrVarStorageNode::SVfrVarStorageNode (
   mVarStoreType                      = EFI_VFR_VARSTORE_NAME;
   mStorageInfo.mNameSpace.mNameTable = new EFI_VARSTORE_ID[DEFAULT_NAME_TABLE_ITEMS];
   mStorageInfo.mNameSpace.mTableSize = 0;
+  mAssignedFlag                      = FALSE;
 }
 
 SVfrVarStorageNode::~SVfrVarStorageNode (

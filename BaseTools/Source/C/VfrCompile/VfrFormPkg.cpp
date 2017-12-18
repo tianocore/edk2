@@ -104,8 +104,13 @@ CFormPkg::CFormPkg (
   SBufferNode *Node;
 
   mPkgLength           = 0;
+  mBufferSize          = 0;
   mBufferNodeQueueHead = NULL;
+  mBufferNodeQueueTail = NULL;
   mCurrBufferNode      = NULL;
+  mReadBufferNode      = NULL;
+  mReadBufferOffset    = 0;
+  PendingAssignList    = NULL;
 
   Node = new SBufferNode;
   if (Node == NULL) {
@@ -2421,6 +2426,7 @@ CIfrObj::CIfrObj (
   mObjBinLen   = (ObjBinLen == 0) ? gOpcodeSizesScopeTable[OpCode].mSize : ObjBinLen;
   mObjBinBuf   = ((DelayEmit == FALSE) && (gCreateOp == TRUE)) ? gCFormPkg.IfrBinBufferGet (mObjBinLen) : new CHAR8[EFI_IFR_MAX_LENGTH];
   mRecordIdx   = (gCreateOp == TRUE) ? gCIfrRecordInfoDB.IfrRecordRegister (0xFFFFFFFF, mObjBinBuf, mObjBinLen, mPkgOffset) : EFI_IFR_RECORDINFO_IDX_INVALUD;
+  mLineNo      = 0;
 
   assert (mObjBinBuf != NULL);
 
