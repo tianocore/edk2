@@ -606,7 +606,12 @@ Returns:
   UINT8                   PeSectionNum;
   UINT32                  HeaderSize;
   UINT32                  Alignment;
-  CHAR8                   AlignmentBuffer[8];
+  //
+  // Workaround for static code checkers.
+  // Ensures the size of 'AlignmentBuffer' can hold all the digits of an
+  // unsigned 32-bit integer plus the size unit character.
+  //
+  CHAR8                   AlignmentBuffer[16];
   
   //
   // Init local variables
