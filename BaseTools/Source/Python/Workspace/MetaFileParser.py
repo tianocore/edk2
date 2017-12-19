@@ -1136,6 +1136,8 @@ class DscParser(MetaFileParser):
             self._ValueList[0], self._ValueList[1] = PcdNameTockens[0], PcdNameTockens[1]
         elif len(PcdNameTockens) == 3:
             self._ValueList[0], self._ValueList[1] = ".".join((PcdNameTockens[0], PcdNameTockens[1])), PcdNameTockens[2]
+        elif len(PcdNameTockens) > 3:
+            self._ValueList[0], self._ValueList[1] = ".".join((PcdNameTockens[0], PcdNameTockens[1])), ".".join(PcdNameTockens[2:])
         if len(TokenList) == 2:
             self._ValueList[2] = TokenList[1]
         if self._ValueList[0] == '' or self._ValueList[1] == '':
@@ -1910,7 +1912,7 @@ class DecParser(MetaFileParser):
                 if len(PcdNames) == 2:
                     self._CurrentStructurePcdName = ""
                 else:
-                    self._ValueList[1] = PcdNames[2]
+                    self._ValueList[1] = TAB_SPLIT.join(PcdNames[2:])
                     self._ValueList[2] = PcdTockens[1]
         if not self._CurrentStructurePcdName:
             TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT, 1)

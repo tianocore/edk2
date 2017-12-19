@@ -1207,18 +1207,19 @@ class DscBuildData(PlatformBuildClassObject):
 
         def get_length(value):
             Value = value.strip()
-            if Value.startswith('GUID') and Value.endswith(')'):
-                return 16
-            if Value.startswith('L"') and Value.endswith('"'):
-                return len(Value[2:-1])
-            if Value[0] == '"' and Value[-1] == '"':
-                return len(Value) - 2
-            if Value[0] == '{' and Value[-1] == '}':
-                return len(Value.split(","))
-            if Value.startswith("L'") and Value.endswith("'") and len(list(Value[2:-1])) > 1:
-                return  len(list(Value[2:-1]))
-            if Value[0] == "'" and Value[-1] == "'" and len(list(Value[1:-1])) > 1:
-                return len(Value) - 2
+            if len(value) > 1:
+                if Value.startswith('GUID') and Value.endswith(')'):
+                    return 16
+                if Value.startswith('L"') and Value.endswith('"'):
+                    return len(Value[2:-1])
+                if Value[0] == '"' and Value[-1] == '"':
+                    return len(Value) - 2
+                if Value[0] == '{' and Value[-1] == '}':
+                    return len(Value.split(","))
+                if Value.startswith("L'") and Value.endswith("'") and len(list(Value[2:-1])) > 1:
+                    return  len(list(Value[2:-1]))
+                if Value[0] == "'" and Value[-1] == "'" and len(list(Value[1:-1])) > 1:
+                    return len(Value) - 2
             return len(Value)
 
         return str(max([pcd_size for pcd_size in [get_length(item) for item in sku_values]]))
