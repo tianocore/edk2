@@ -360,7 +360,6 @@ ReadSaveStateRegister (
   UINT32                      SmmRevId;
   SMRAM_SAVE_STATE_IOMISC     IoMisc;
   EFI_SMM_SAVE_STATE_IO_INFO  *IoInfo;
-  VOID                        *IoMemAddr;
 
   //
   // Check for special EFI_SMM_SAVE_STATE_REGISTER_LMA
@@ -407,6 +406,14 @@ ReadSaveStateRegister (
     }
 
     //
+    // Only support IN/OUT, but not INS/OUTS/REP INS/REP OUTS.
+    //
+    if ((mSmmCpuIoType[IoMisc.Bits.Type] != EFI_SMM_SAVE_STATE_IO_TYPE_INPUT) &&
+        (mSmmCpuIoType[IoMisc.Bits.Type] != EFI_SMM_SAVE_STATE_IO_TYPE_OUTPUT)) {
+      return EFI_NOT_FOUND;
+    }
+
+    //
     // Compute index for the I/O Length and I/O Type lookup tables
     //
     if (mSmmCpuIoWidth[IoMisc.Bits.Length].Width == 0 || mSmmCpuIoType[IoMisc.Bits.Type] == 0) {
@@ -425,13 +432,7 @@ ReadSaveStateRegister (
     IoInfo->IoPort = (UINT16)IoMisc.Bits.Port;
     IoInfo->IoWidth = mSmmCpuIoWidth[IoMisc.Bits.Length].IoWidth;
     IoInfo->IoType = mSmmCpuIoType[IoMisc.Bits.Type];
-    if (IoInfo->IoType == EFI_SMM_SAVE_STATE_IO_TYPE_INPUT || IoInfo->IoType == EFI_SMM_SAVE_STATE_IO_TYPE_OUTPUT) {
-      ReadSaveStateRegister (CpuIndex, EFI_SMM_SAVE_STATE_REGISTER_RAX, mSmmCpuIoWidth[IoMisc.Bits.Length].Width, &IoInfo->IoData);
-    }
-    else {
-      ReadSaveStateRegisterByIndex(CpuIndex, SMM_SAVE_STATE_REGISTER_IOMEMADDR_INDEX, sizeof(IoMemAddr), &IoMemAddr);
-      CopyMem(&IoInfo->IoData, IoMemAddr, mSmmCpuIoWidth[IoMisc.Bits.Length].Width);
-    }
+    ReadSaveStateRegister (CpuIndex, EFI_SMM_SAVE_STATE_REGISTER_RAX, mSmmCpuIoWidth[IoMisc.Bits.Length].Width, &IoInfo->IoData);
     return EFI_SUCCESS;
   }
 
