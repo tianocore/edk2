@@ -1401,7 +1401,7 @@ class PlatformAutoGen(AutoGen):
                 if os.path.exists(VpdMapFilePath):
                     OrgVpdFile.Read(VpdMapFilePath)
                     PcdItems = OrgVpdFile.GetOffset(PcdNvStoreDfBuffer[0])
-                    NvStoreOffset = PcdItems[0].strip() if PcdItems else '0'
+                    NvStoreOffset = PcdItems.values()[0].strip() if PcdItems else '0'
                 else:
                     EdkLogger.error("build", FILE_READ_FAILURE, "Can not find VPD map file %s to fix up VPD offset." % VpdMapFilePath)
 
@@ -1665,6 +1665,14 @@ class PlatformAutoGen(AutoGen):
                    PcdKey in VpdPcdDict:
                     Pcd = VpdPcdDict[PcdKey]
                     SkuValueMap = {}
+                    DefaultSku = Pcd.SkuInfoList.get('DEFAULT')
+                    if DefaultSku:
+                        PcdValue = DefaultSku.DefaultValue
+                        if PcdValue not in SkuValueMap:
+                            SkuValueMap[PcdValue] = []
+                            VpdFile.Add(Pcd, 'DEFAULT',DefaultSku.VpdOffset)
+                        SkuValueMap[PcdValue].append(DefaultSku)
+
                     for (SkuName,Sku) in Pcd.SkuInfoList.items():
                         Sku.VpdOffset = Sku.VpdOffset.strip()
                         PcdValue = Sku.DefaultValue
@@ -1691,7 +1699,7 @@ class PlatformAutoGen(AutoGen):
                                     EdkLogger.error("build", FORMAT_INVALID, 'The offset value of PCD %s.%s should be %s-byte aligned.' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Alignment))
                         if PcdValue not in SkuValueMap:
                             SkuValueMap[PcdValue] = []
-                            VpdFile.Add(Pcd, Sku.VpdOffset)
+                            VpdFile.Add(Pcd, SkuName,Sku.VpdOffset)
                         SkuValueMap[PcdValue].append(Sku)
                         # if the offset of a VPD is *, then it need to be fixed up by third party tool.
                         if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
@@ -1720,6 +1728,13 @@ class PlatformAutoGen(AutoGen):
                         if not FoundFlag :
                             # just pick the a value to determine whether is unicode string type
                             SkuValueMap = {}
+                            DefaultSku = DscPcdEntry.SkuInfoList.get('DEFAULT')
+                            if DefaultSku:
+                                PcdValue = DefaultSku.DefaultValue
+                                if PcdValue not in SkuValueMap:
+                                    SkuValueMap[PcdValue] = []
+                                    VpdFile.Add(DscPcdEntry, 'DEFAULT',Sku.VpdOffset)
+                                SkuValueMap[PcdValue].append(Sku)
                             for (SkuName,Sku) in DscPcdEntry.SkuInfoList.items():
                                 Sku.VpdOffset = Sku.VpdOffset.strip() 
                                 
@@ -1770,7 +1785,7 @@ class PlatformAutoGen(AutoGen):
                                             EdkLogger.error("build", FORMAT_INVALID, 'The offset value of PCD %s.%s should be %s-byte aligned.' % (DscPcdEntry.TokenSpaceGuidCName, DscPcdEntry.TokenCName, Alignment))
                                 if PcdValue not in SkuValueMap:
                                     SkuValueMap[PcdValue] = []
-                                    VpdFile.Add(DscPcdEntry, Sku.VpdOffset)
+                                    VpdFile.Add(DscPcdEntry, SkuName,Sku.VpdOffset)
                                 SkuValueMap[PcdValue].append(Sku)
                                 if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
                                     NeedProcessVpdMapFile = True 

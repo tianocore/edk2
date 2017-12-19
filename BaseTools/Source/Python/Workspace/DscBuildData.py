@@ -1653,6 +1653,7 @@ class DscBuildData(PlatformBuildClassObject):
         Pcds = {}
         DefaultStoreObj = DefaultStore(self._GetDefaultStores())
         SkuIds = set([(skuid,skuobj.SkuId) for pcdobj in PcdSet.values() for skuid,skuobj in pcdobj.SkuInfoList.items()])
+        SkuIds = self.SkuIdMgr.AvailableSkuIdSet
         DefaultStores = set([storename for pcdobj in PcdSet.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict.keys()])
         for PcdCName, TokenSpaceGuid in PcdSet:
             PcdObj = PcdSet[(PcdCName, TokenSpaceGuid)]
@@ -1673,7 +1674,7 @@ class DscBuildData(PlatformBuildClassObject):
                         if defaultstorename not in skuobj.DefaultStoreDict:
                             skuobj.DefaultStoreDict[defaultstorename] = copy.deepcopy(skuobj.DefaultStoreDict[mindefaultstorename])
                     skuobj.HiiDefaultValue = skuobj.DefaultStoreDict[mindefaultstorename]
-            for skuname,skuid in SkuIds:
+            for skuname,skuid in SkuIds.items():
                 if skuname not in PcdObj.SkuInfoList:
                     nextskuid = self.SkuIdMgr.GetNextSkuId(skuname)
                     while nextskuid not in PcdObj.SkuInfoList:

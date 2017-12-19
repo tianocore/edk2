@@ -88,7 +88,7 @@ class VpdInfoFile:
     #
     #  @param offset integer value for VPD's offset in specific SKU.
     #
-    def Add(self, Vpd, Offset):
+    def Add(self, Vpd, skuname,Offset):
         if (Vpd == None):
             EdkLogger.error("VpdInfoFile", BuildToolError.ATTRIBUTE_UNKNOWN_ERROR, "Invalid VPD PCD entry.")
         
@@ -111,12 +111,9 @@ class VpdInfoFile:
             #
             # If there is no Vpd instance in dict, that imply this offset for a given SKU is a new one 
             #
-            self._VpdArray[Vpd] = [Offset]
-        else:
-            #
-            # If there is an offset for a specific SKU in dict, then append this offset for other sku to array.
-            #
-            self._VpdArray[Vpd].append(Offset)
+            self._VpdArray[Vpd] = {}
+
+        self._VpdArray[Vpd].update({skuname:Offset})
             
         
     ## Generate VPD PCD information into a text file
@@ -138,12 +135,12 @@ class VpdInfoFile:
             for PcdItem in GlobalData.MixedPcd:
                 if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
                     PcdTokenCName = PcdItem[0]
-            for Offset in self._VpdArray[Pcd]:
-                PcdValue = str(Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[i]].DefaultValue).strip()
+            for skuname in self._VpdArray[Pcd]:
+                PcdValue = str(Pcd.SkuInfoList[skuname].DefaultValue).strip()
                 if PcdValue == "" :
                     PcdValue  = Pcd.DefaultValue
 
-                Content += "%s.%s|%s|%s|%s|%s  \n" % (Pcd.TokenSpaceGuidCName, PcdTokenCName, str(Pcd.SkuInfoList.keys()[i]),str(Offset).strip(), str(Pcd.MaxDatumSize).strip(),PcdValue)
+                Content += "%s.%s|%s|%s|%s|%s  \n" % (Pcd.TokenSpaceGuidCName, PcdTokenCName, skuname,str(self._VpdArray[Pcd][skuname]).strip(), str(Pcd.MaxDatumSize).strip(),PcdValue)
                 i += 1
 
         return SaveFileOnChange(FilePath, Content, False)
@@ -190,10 +187,10 @@ class VpdInfoFile:
                         VpdObjectTokenCName = PcdItem[0]
                 for sku in VpdObject.SkuInfoList.keys():
                     if VpdObject.TokenSpaceGuidCName == TokenSpaceName and VpdObjectTokenCName == PcdTokenName.strip() and sku == SkuId:
-                        if self._VpdArray[VpdObject][VpdObject.SkuInfoList.keys().index(sku)] == "*":
+                        if self._VpdArray[VpdObject][sku] == "*":
                             if Offset == "*":
                                 EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "The offset of %s has not been fixed up by third-party BPDG tool." % PcdName)                              
-                            self._VpdArray[VpdObject][VpdObject.SkuInfoList.keys().index(sku)] = Offset
+                            self._VpdArray[VpdObject][sku] = Offset
                         Found = True
             if not Found:
                 EdkLogger.error("BPDG", BuildToolError.PARSER_ERROR, "Can not find PCD defined in VPD guid file.")
