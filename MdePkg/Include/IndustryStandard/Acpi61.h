@@ -2052,7 +2052,9 @@ typedef struct {
 //
 // PCCT Subspace type
 //
-#define EFI_ACPI_6_1_PCCT_SUBSPACE_TYPE_GENERIC  0x00
+#define EFI_ACPI_6_1_PCCT_SUBSPACE_TYPE_GENERIC                         0x00
+#define EFI_ACPI_6_1_PCCT_SUBSPACE_TYPE_1_HW_REDUCED_COMMUNICATIONS     0x01
+#define EFI_ACPI_6_1_PCCT_SUBSPACE_TYPE_2_HW_REDUCED_COMMUNICATIONS     0x02
 
 ///
 /// PCC Subspace Structure Header
@@ -2103,6 +2105,50 @@ typedef struct {
   EFI_ACPI_6_1_PCCT_GENERIC_SHARED_MEMORY_REGION_COMMAND    Command;
   EFI_ACPI_6_1_PCCT_GENERIC_SHARED_MEMORY_REGION_STATUS     Status;
 } EFI_ACPI_6_1_PCCT_GENERIC_SHARED_MEMORY_REGION_HEADER;
+
+#define EFI_ACPI_6_1_PCCT_SUBSPACE_DOORBELL_INTERRUPT_FLAGS_POLARITY    BIT0
+#define EFI_ACPI_6_1_PCCT_SUBSPACE_DOORBELL_INTERRUPT_FLAGS_MODE        BIT1
+
+///
+/// Type 1 HW-Reduced Communications Subspace Structure
+///
+typedef struct {
+  UINT8                                    Type;
+  UINT8                                    Length;
+  UINT32                                   DoorbellInterrupt;
+  UINT8                                    DoorbellInterruptFlags;
+  UINT8                                    Reserved;
+  UINT64                                   BaseAddress;
+  UINT64                                   AddressLength;
+  EFI_ACPI_6_1_GENERIC_ADDRESS_STRUCTURE   DoorbellRegister;
+  UINT64                                   DoorbellPreserve;
+  UINT64                                   DoorbellWrite;
+  UINT32                                   NominalLatency;
+  UINT32                                   MaximumPeriodicAccessRate;
+  UINT16                                   MinimumRequestTurnaroundTime;
+} EFI_ACPI_6_1_PCCT_SUBSPACE_1_HW_REDUCED_COMMUNICATIONS;
+
+///
+/// Type 2 HW-Reduced Communications Subspace Structure
+///
+typedef struct {
+  UINT8                                    Type;
+  UINT8                                    Length;
+  UINT32                                   DoorbellInterrupt;
+  UINT8                                    DoorbellInterruptFlags;
+  UINT8                                    Reserved;
+  UINT64                                   BaseAddress;
+  UINT64                                   AddressLength;
+  EFI_ACPI_6_1_GENERIC_ADDRESS_STRUCTURE   DoorbellRegister;
+  UINT64                                   DoorbellPreserve;
+  UINT64                                   DoorbellWrite;
+  UINT32                                   NominalLatency;
+  UINT32                                   MaximumPeriodicAccessRate;
+  UINT16                                   MinimumRequestTurnaroundTime;
+  EFI_ACPI_6_1_GENERIC_ADDRESS_STRUCTURE   DoorbellAckRegister;
+  UINT64                                   DoorbellAckPreserve;
+  UINT64                                   DoorbellAckWrite;
+} EFI_ACPI_6_1_PCCT_SUBSPACE_2_HW_REDUCED_COMMUNICATIONS;
 
 //
 // Known table signatures
