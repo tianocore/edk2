@@ -3,6 +3,7 @@
   to show progress bar and LOGO.
 
 Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016, Microsoft Corporation<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -19,6 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/PlatformLogo.h>
 #include <Protocol/UgaDraw.h>
 #include <Protocol/BootLogo.h>
+#include <Protocol/BootLogo2.h>
 #include <Library/BaseLib.h>
 #include <Library/UefiLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -56,6 +58,7 @@ BootLogoEnableLogo (
   UINT32                                RefreshRate;
   EFI_GRAPHICS_OUTPUT_PROTOCOL          *GraphicsOutput;
   EFI_BOOT_LOGO_PROTOCOL                *BootLogo;
+  EDKII_BOOT_LOGO2_PROTOCOL             *BootLogo2;
   UINTN                                 NumberOfLogos;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL         *LogoBlt;
   UINTN                                 LogoDestX;
@@ -96,6 +99,14 @@ BootLogoEnableLogo (
   Status = gBS->LocateProtocol (&gEfiBootLogoProtocolGuid, NULL, (VOID **) &BootLogo);
   if (EFI_ERROR (Status)) {
     BootLogo = NULL;
+  }
+
+  //
+  // Try to open Boot Logo 2 Protocol.
+  //
+  Status = gBS->LocateProtocol (&gEdkiiBootLogo2ProtocolGuid, NULL, (VOID **) &BootLogo2);
+  if (EFI_ERROR (Status)) {
+    BootLogo2 = NULL;
   }
 
   //
@@ -259,7 +270,7 @@ BootLogoEnableLogo (
     }
   }
 
-  if (BootLogo == NULL || NumberOfLogos == 0) {
+  if ((BootLogo == NULL && BootLogo2 == NULL) || NumberOfLogos == 0) {
     //
     // No logo displayed.
     //
@@ -330,7 +341,24 @@ BootLogoEnableLogo (
   }
 
   if (!EFI_ERROR (Status)) {
-    BootLogo->SetBootLogo (BootLogo, LogoBlt, LogoDestX, LogoDestY, LogoWidth, LogoHeight);
+    //
+    // Attempt to register logo with Boot Logo 2 Protocol first
+    //
+    if (BootLogo2 != NULL) {
+      Status = BootLogo2->SetBootLogo (BootLogo2, LogoBlt, LogoDestX, LogoDestY, LogoWidth, LogoHeight);
+    }
+    //
+    // If Boot Logo 2 Protocol is not available or registration with Boot Logo 2
+    // Protocol failed, then attempt to register logo with Boot Logo Protocol
+    //
+    if (EFI_ERROR (Status) && BootLogo != NULL) {
+      Status = BootLogo->SetBootLogo (BootLogo, LogoBlt, LogoDestX, LogoDestY, LogoWidth, LogoHeight);
+    }
+    //
+    // Status of this function is EFI_SUCCESS even if registration with Boot
+    // Logo 2 Protocol or Boot Logo Protocol fails.
+    //
+    Status = EFI_SUCCESS;
   }
   FreePool (LogoBlt);
 
