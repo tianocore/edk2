@@ -176,7 +176,8 @@ typedef struct {
   //GUID                  Signature;  // PcdDataBaseGuid
   //UINT32                BuildVersion;
   //UINT32                Length;
-  //SKU_ID                SystemSkuId;      // Current SkuId value.
+  //SKU_ID                SystemSkuId;       // Current SkuId value.
+  //UINT32                LengthForAllSkus;  // Length of all SKU PCD DB
   //UINT32                UninitDataBaseSize;// Total size for PCD those default value with 0.
   //TABLE_OFFSET          LocalTokenNumberTableOffset;
   //TABLE_OFFSET          ExMapTableOffset;
@@ -188,7 +189,7 @@ typedef struct {
   //UINT16                LocalTokenCount;  // LOCAL_TOKEN_NUMBER for all
   //UINT16                ExTokenCount;     // EX_TOKEN_NUMBER for DynamicEx
   //UINT16                GuidTableCount;   // The Number of Guid in GuidTable
-  //UINT8                 Pad[2];
+  //UINT8                 Pad[6];
   ${PHASE}_PCD_DATABASE_INIT    Init;
   ${PHASE}_PCD_DATABASE_UNINIT  Uninit;
 } ${PHASE}_PCD_DATABASE;
@@ -767,7 +768,7 @@ def BuildExDataBase(Dict):
     # VardefValueBoolean is the last table in the init table items
     InitTableNum = DbNameTotle.index("VardefValueBoolean") + 1
     # The FixedHeader length of the PCD_DATABASE_INIT, from Signature to Pad
-    FixedHeaderLen = 76
+    FixedHeaderLen = 80
 
     # Get offset of SkuId table in the database 
     SkuIdTableOffset = FixedHeaderLen
@@ -924,10 +925,11 @@ def BuildExDataBase(Dict):
  
     Buffer += b
     b = pack('=B', Pad)
-
     Buffer += b
-    b = pack('=B', Pad)
- 
+    Buffer += b
+    Buffer += b
+    Buffer += b
+    Buffer += b
     Buffer += b
     
     Index = 0
@@ -991,9 +993,13 @@ def CreatePcdDataBase(PcdDBData):
     databasebuff = PcdDBData[("DEFAULT","0")][0]
 
     for skuname,skuid in delta:
-        databasebuff += pack('=H', int(skuid))
-        databasebuff += pack('=H', 0)
-        databasebuff += pack('=L', 8+4*len(delta[(skuname,skuid)]))
+        # 8 byte align
+        if len(databasebuff) % 8 > 0:
+            for i in range(8 - (len(databasebuff) % 8)):
+                databasebuff += pack("=B",0)
+        databasebuff += pack('=Q', int(skuid))
+        databasebuff += pack('=Q', 0)
+        databasebuff += pack('=L', 8+8+4+4*len(delta[(skuname,skuid)]))
         for item in delta[(skuname,skuid)]:
             databasebuff += pack("=L",item[0])
             databasebuff = databasebuff[:-1] + pack("=B",item[1])

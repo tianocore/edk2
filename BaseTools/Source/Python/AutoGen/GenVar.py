@@ -69,7 +69,7 @@ class VariableMgr(object):
     def PatchNVStoreDefaultMaxSize(self,maxsize):
         if not self.NVHeaderBuff:
             return ""
-        self.NVHeaderBuff = self.NVHeaderBuff[:8] + pack("=L",maxsize)
+        self.NVHeaderBuff = self.NVHeaderBuff[:8] + pack("=Q",maxsize)
         default_var_bin = self.format_data(self.NVHeaderBuff + self.VarDefaultBuff + self.VarDeltaBuff)
         value_str = "{"
         default_var_bin_strip = [ data.strip("""'""") for data in default_var_bin]
@@ -166,7 +166,7 @@ class VariableMgr(object):
 
         variable_storage_header_buffer = self.PACK_VARIABLE_STORE_HEADER(len(NvStoreDataBuffer) + 28)
 
-        nv_default_part = self.AlignData(self.PACK_DEFAULT_DATA(0, 0, self.unpack_data(variable_storage_header_buffer+NvStoreDataBuffer)))
+        nv_default_part = self.AlignData(self.PACK_DEFAULT_DATA(0, 0, self.unpack_data(variable_storage_header_buffer+NvStoreDataBuffer)), 8)
 
         data_delta_structure_buffer = ""
         for skuname,defaultstore in var_data:
@@ -180,9 +180,9 @@ class VariableMgr(object):
                 delta_data = [(item[0] + offset, item[1]) for item in delta_data]
                 delta_data_set.extend(delta_data)
 
-            data_delta_structure_buffer += self.AlignData(self.PACK_DELTA_DATA(skuname,defaultstore,delta_data_set))
+            data_delta_structure_buffer += self.AlignData(self.PACK_DELTA_DATA(skuname,defaultstore,delta_data_set), 8)
 
-        size = len(nv_default_part + data_delta_structure_buffer) + 12
+        size = len(nv_default_part + data_delta_structure_buffer) + 16
         maxsize = self.VpdRegionSize if self.VpdRegionSize else size
         NV_Store_Default_Header = self.PACK_NV_STORE_DEFAULT_HEADER(size,maxsize)
 
@@ -243,7 +243,7 @@ class VariableMgr(object):
         Signature += pack("=B",ord('B'))
 
         SizeBuffer = pack("=L",size)
-        MaxSizeBuffer = pack("=L",maxsize)
+        MaxSizeBuffer = pack("=Q",maxsize)
 
         return Signature + SizeBuffer + MaxSizeBuffer
 
@@ -292,9 +292,9 @@ class VariableMgr(object):
 
     def PACK_DEFAULT_DATA(self, defaultstoragename,skuid,var_value):
         Buffer = ""
-        Buffer += pack("=L",8)
-        Buffer += pack("=H",int(defaultstoragename))
-        Buffer += pack("=H",int(skuid))
+        Buffer += pack("=L",4+8+8)
+        Buffer += pack("=Q",int(skuid))
+        Buffer += pack("=Q",int(defaultstoragename))
 
         for item in var_value:
             Buffer += pack("=B",item)
@@ -315,9 +315,9 @@ class VariableMgr(object):
         skuid = self.GetSkuId(skuname)
         defaultstorageid = self.GetDefaultStoreId(defaultstoragename)
         Buffer = ""
-        Buffer += pack("=L",8)
-        Buffer += pack("=H",int(skuid))
-        Buffer += pack("=H",int(defaultstorageid))
+        Buffer += pack("=L",4+8+8)
+        Buffer += pack("=Q",int(skuid))
+        Buffer += pack("=Q",int(defaultstorageid))
         for (delta_offset,value) in delta_list:
             Buffer += pack("=L",delta_offset)
             Buffer = Buffer[:-1] + pack("=B",value)
@@ -328,8 +328,9 @@ class VariableMgr(object):
 
     def AlignData(self,data, align = 4):
         mybuffer = data
-        for i in range(len(data) % align):
-            mybuffer += pack("=B",0)
+        if (len(data) % align) > 0:
+            for i in range(align - (len(data) % align)):
+                mybuffer += pack("=B",0)
 
         return mybuffer
 
