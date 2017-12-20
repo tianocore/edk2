@@ -128,6 +128,7 @@ PopulateLevel2PageTable (
   UINT32  SectionDescriptor;
   UINT32  TranslationTable;
   UINT32  BaseSectionAddress;
+  UINT32  FirstPageOffset;
 
   switch (Attributes) {
     case ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK:
@@ -199,8 +200,11 @@ PopulateLevel2PageTable (
         TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
   }
 
-  PageEntry = ((UINT32 *)(TranslationTable) + ((PhysicalBase & TT_DESCRIPTOR_PAGE_INDEX_MASK) >> TT_DESCRIPTOR_PAGE_BASE_SHIFT));
+  FirstPageOffset = (PhysicalBase & TT_DESCRIPTOR_PAGE_INDEX_MASK) >> TT_DESCRIPTOR_PAGE_BASE_SHIFT;
+  PageEntry = (UINT32 *)TranslationTable + FirstPageOffset;
   Pages     = RemainLength / TT_DESCRIPTOR_PAGE_SIZE;
+
+  ASSERT (FirstPageOffset + Pages <= TRANSLATION_TABLE_PAGE_COUNT);
 
   for (Index = 0; Index < Pages; Index++) {
     *PageEntry++     =  TT_DESCRIPTOR_PAGE_BASE_ADDRESS(PhysicalBase) | PageAttributes;
@@ -220,6 +224,7 @@ FillTranslationTable (
   UINT32  Attributes;
   UINT32  PhysicalBase;
   UINT64  RemainLength;
+  UINT32  PageMapLength;
 
   ASSERT(MemoryRegion->Length > 0);
 
@@ -268,30 +273,31 @@ FillTranslationTable (
   SectionEntry    = TRANSLATION_TABLE_ENTRY_FOR_VIRTUAL_ADDRESS(TranslationTable, MemoryRegion->VirtualBase);
 
   while (RemainLength != 0) {
-    if (PhysicalBase % TT_DESCRIPTOR_SECTION_SIZE == 0) {
-      if (RemainLength >= TT_DESCRIPTOR_SECTION_SIZE) {
-        // Case: Physical address aligned on the Section Size (1MB) && the length is greater than the Section Size
-        *SectionEntry++ = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(PhysicalBase) | Attributes;
-        PhysicalBase += TT_DESCRIPTOR_SECTION_SIZE;
-      } else {
-        // Case: Physical address aligned on the Section Size (1MB) && the length does not fill a section
-        PopulateLevel2PageTable (SectionEntry++, PhysicalBase, RemainLength, MemoryRegion->Attributes);
-
-        // It must be the last entry
-        break;
-      }
+    if (PhysicalBase % TT_DESCRIPTOR_SECTION_SIZE == 0 &&
+        RemainLength >= TT_DESCRIPTOR_SECTION_SIZE) {
+      // Case: Physical address aligned on the Section Size (1MB) && the length
+      // is greater than the Section Size
+      *SectionEntry++ = TT_DESCRIPTOR_SECTION_BASE_ADDRESS(PhysicalBase) | Attributes;
+      PhysicalBase += TT_DESCRIPTOR_SECTION_SIZE;
+      RemainLength -= TT_DESCRIPTOR_SECTION_SIZE;
     } else {
+      PageMapLength = MIN (RemainLength, TT_DESCRIPTOR_SECTION_SIZE) -
+                      (PhysicalBase % TT_DESCRIPTOR_SECTION_SIZE);
+
+      // Case: Physical address aligned on the Section Size (1MB) && the length
+      //       does not fill a section
       // Case: Physical address NOT aligned on the Section Size (1MB)
-      PopulateLevel2PageTable (SectionEntry++, PhysicalBase, RemainLength, MemoryRegion->Attributes);
-      // Aligned the address
-      PhysicalBase = (PhysicalBase + TT_DESCRIPTOR_SECTION_SIZE) & ~(TT_DESCRIPTOR_SECTION_SIZE-1);
+      PopulateLevel2PageTable (SectionEntry++, PhysicalBase, PageMapLength,
+        MemoryRegion->Attributes);
 
       // If it is the last entry
       if (RemainLength < TT_DESCRIPTOR_SECTION_SIZE) {
         break;
       }
+
+      PhysicalBase += PageMapLength;
+      RemainLength -= PageMapLength;
     }
-    RemainLength -= TT_DESCRIPTOR_SECTION_SIZE;
   }
 }
 
