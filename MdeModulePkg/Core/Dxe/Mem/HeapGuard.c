@@ -583,8 +583,7 @@ SetGuardPage (
   mOnGuarding = TRUE;
   //
   // Note: This might overwrite other attributes needed by other features,
-  // such as memory protection (NX). Please make sure they are not enabled
-  // at the same time.
+  // such as NX memory protection.
   //
   gCpu->SetMemoryAttributes (gCpu, BaseAddress, EFI_PAGE_SIZE, EFI_MEMORY_RP);
   mOnGuarding = FALSE;
@@ -605,6 +604,18 @@ UnsetGuardPage (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress
   )
 {
+  UINT64          Attributes;
+
+  //
+  // Once the Guard page is unset, it will be freed back to memory pool. NX
+  // memory protection must be restored for this page if NX is enabled for free
+  // memory.
+  //
+  Attributes = 0;
+  if ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & (1 << EfiConventionalMemory)) != 0) {
+    Attributes |= EFI_MEMORY_XP;
+  }
+
   //
   // Set flag to make sure allocating memory without GUARD for page table
   // operation; otherwise infinite loops could be caused.
@@ -615,7 +626,7 @@ UnsetGuardPage (
   // such as memory protection (NX). Please make sure they are not enabled
   // at the same time.
   //
-  gCpu->SetMemoryAttributes (gCpu, BaseAddress, EFI_PAGE_SIZE, 0);
+  gCpu->SetMemoryAttributes (gCpu, BaseAddress, EFI_PAGE_SIZE, Attributes);
   mOnGuarding = FALSE;
 }
 
@@ -869,6 +880,15 @@ AdjustMemoryS (
 {
   UINT64  Target;
 
+  //
+  // UEFI spec requires that allocated pool must be 8-byte aligned. If it's
+  // indicated to put the pool near the Tail Guard, we need extra bytes to
+  // make sure alignment of the returned pool address.
+  //
+  if ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0) {
+    SizeRequested = ALIGN_VALUE(SizeRequested, 8);
+  }
+
   Target = Start + Size - SizeRequested;
 
   //
@@ -1052,7 +1072,7 @@ AdjustPoolHeadA (
   IN UINTN                   Size
   )
 {
-  if ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0) {
+  if (Memory == 0 || (PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0) {
     //
     // Pool head is put near the head Guard
     //
@@ -1062,6 +1082,7 @@ AdjustPoolHeadA (
   //
   // Pool head is put near the tail Guard
   //
+  Size = ALIGN_VALUE (Size, 8);
   return (VOID *)(UINTN)(Memory + EFI_PAGES_TO_SIZE (NoPages) - Size);
 }
 
@@ -1077,7 +1098,7 @@ AdjustPoolHeadF (
   IN EFI_PHYSICAL_ADDRESS    Memory
   )
 {
-  if ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0) {
+  if (Memory == 0 || (PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0) {
     //
     // Pool head is put near the head Guard
     //

@@ -1070,15 +1070,12 @@ CoreInitializeMemoryProtection (
   // - code regions should have no EFI_MEMORY_XP attribute
   // - EfiConventionalMemory and EfiBootServicesData should use the
   //   same attribute
-  // - heap guard should not be enabled for the same type of memory
   //
   ASSERT ((GetPermissionAttributeForMemoryType (EfiBootServicesCode) & EFI_MEMORY_XP) == 0);
   ASSERT ((GetPermissionAttributeForMemoryType (EfiRuntimeServicesCode) & EFI_MEMORY_XP) == 0);
   ASSERT ((GetPermissionAttributeForMemoryType (EfiLoaderCode) & EFI_MEMORY_XP) == 0);
   ASSERT (GetPermissionAttributeForMemoryType (EfiBootServicesData) ==
           GetPermissionAttributeForMemoryType (EfiConventionalMemory));
-  ASSERT ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & PcdGet64 (PcdHeapGuardPoolType)) == 0);
-  ASSERT ((PcdGet64 (PcdDxeNxMemoryProtectionPolicy) & PcdGet64 (PcdHeapGuardPageType)) == 0);
 
   if (mImageProtectionPolicy != 0 || PcdGet64 (PcdDxeNxMemoryProtectionPolicy) != 0) {
     Status = CoreCreateEvent (

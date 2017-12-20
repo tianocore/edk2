@@ -877,6 +877,15 @@ AdjustMemoryS (
 {
   UINT64  Target;
 
+  //
+  // UEFI spec requires that allocated pool must be 8-byte aligned. If it's
+  // indicated to put the pool near the Tail Guard, we need extra bytes to
+  // make sure alignment of the returned pool address.
+  //
+  if ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0) {
+    SizeRequested = ALIGN_VALUE(SizeRequested, 8);
+  }
+
   Target = Start + Size - SizeRequested;
 
   //
@@ -1060,7 +1069,7 @@ AdjustPoolHeadA (
   IN UINTN                   Size
   )
 {
-  if ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0) {
+  if (Memory == 0 || (PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0) {
     //
     // Pool head is put near the head Guard
     //
@@ -1070,6 +1079,7 @@ AdjustPoolHeadA (
   //
   // Pool head is put near the tail Guard
   //
+  Size = ALIGN_VALUE (Size, 8);
   return (VOID *)(UINTN)(Memory + EFI_PAGES_TO_SIZE (NoPages) - Size);
 }
 
@@ -1085,7 +1095,7 @@ AdjustPoolHeadF (
   IN EFI_PHYSICAL_ADDRESS    Memory
   )
 {
-  if ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0) {
+  if (Memory == 0 || (PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) != 0) {
     //
     // Pool head is put near the head Guard
     //
