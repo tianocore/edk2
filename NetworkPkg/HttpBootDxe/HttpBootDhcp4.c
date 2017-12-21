@@ -422,6 +422,9 @@ HttpBootParseDhcp4Packet (
     if (!IsProxyOffer) {
       OfferType = IsDnsOffer ? HttpOfferTypeDhcpDns : HttpOfferTypeDhcpOnly;
     } else {
+      if (Cache4->UriParser != NULL) {
+        FreePool (Cache4->UriParser);
+      }
       return EFI_DEVICE_ERROR;
     }
   }

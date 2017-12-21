@@ -122,8 +122,9 @@ HttpBootStart (
   UINTN                Index;
   EFI_STATUS           Status;
   CHAR8                *Uri;
-  
 
+  Uri = NULL;
+  
   if (Private == NULL || FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -154,6 +155,9 @@ HttpBootStart (
       //
       Status = HttpBootStop (Private);
       if (EFI_ERROR (Status)) {
+        if (Uri != NULL) {
+          FreePool (Uri);
+        }
         return Status;
       }
     } else {
