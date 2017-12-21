@@ -372,6 +372,8 @@ HttpParseUrl (
   BOOLEAN               FoundAt;
   EFI_STATUS            Status;
   HTTP_URL_PARSER       *Parser;
+
+  Parser = NULL;
   
   if (Url == NULL || Length == 0 || UrlParser == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -402,6 +404,7 @@ HttpParseUrl (
 
     switch (State) {
     case UrlParserStateMax:
+      FreePool (Parser);
       return EFI_INVALID_PARAMETER;
       
     case UrlParserSchemeColon:
@@ -464,6 +467,7 @@ HttpParseUrl (
   if ((Parser->FieldBitMap & BIT (HTTP_URI_FIELD_AUTHORITY)) != 0) {
     Status = NetHttpParseAuthority (Url, FoundAt, Parser);
     if (EFI_ERROR (Status)) {
+      FreePool (Parser);
       return Status;
     }
   }
@@ -1528,6 +1532,7 @@ HttpSetFieldNameAndValue (
   FieldValueSize = AsciiStrSize (FieldValue);
   HttpHeader->FieldValue = AllocateZeroPool (FieldValueSize);
   if (HttpHeader->FieldValue == NULL) {
+    FreePool (HttpHeader->FieldName);
     return EFI_OUT_OF_RESOURCES;
   }
   CopyMem (HttpHeader->FieldValue, FieldValue, FieldValueSize);
