@@ -8,7 +8,7 @@
 
   MicrocodeWrite() and VerifyMicrocode() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -494,7 +494,7 @@ VerifyMicrocode (
       //
       // Calculate Extended Checksum
       //
-      if ((ExtendedTableLength > sizeof(CPU_MICROCODE_EXTENDED_TABLE_HEADER)) && ((ExtendedTableLength & 0x3) != 0)) {
+      if ((ExtendedTableLength > sizeof(CPU_MICROCODE_EXTENDED_TABLE_HEADER)) && ((ExtendedTableLength & 0x3) == 0)) {
         CheckSum32 = CalculateSum32((UINT32 *)ExtendedTableHeader, ExtendedTableLength);
         if (CheckSum32 == 0) {
           //
