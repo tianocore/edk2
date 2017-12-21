@@ -279,14 +279,11 @@ PxeBcIcmpErrorDpcHandle (
     gBS->SignalEvent (RxData->RecycleSignal);
     goto ON_EXIT;
   }
-
-  if (RxData->Header->Protocol != EFI_IP_PROTO_ICMP) {
-    //
-    // The protocol value in the header of the receveid packet should be EFI_IP_PROTO_ICMP.
-    //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
-  }
+  
+  //
+  // The protocol has been configured to only receive ICMP packet.
+  //
+  ASSERT (RxData->Header->Protocol == EFI_IP_PROTO_ICMP);
 
   Type = *((UINT8 *) RxData->FragmentTable[0].FragmentBuffer);
 
@@ -416,13 +413,10 @@ PxeBcIcmp6ErrorDpcHandle (
     goto ON_EXIT;
   }
 
-  if (RxData->Header->NextHeader != IP6_ICMP) {
-    //
-    // The nextheader in the header of the receveid packet should be IP6_ICMP.
-    //
-    gBS->SignalEvent (RxData->RecycleSignal);
-    goto ON_EXIT;
-  }
+  //
+  // The protocol has been configured to only receive ICMP packet.
+  //
+  ASSERT (RxData->Header->NextHeader == IP6_ICMP);
 
   Type = *((UINT8 *) RxData->FragmentTable[0].FragmentBuffer);
 
