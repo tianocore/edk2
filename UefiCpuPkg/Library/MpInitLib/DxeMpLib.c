@@ -17,6 +17,7 @@
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugAgentLib.h>
+#include <Library/DxeServicesTableLib.h>
 
 #include <Protocol/Timer.h>
 
@@ -288,9 +289,12 @@ InitMpGlobalData (
   IN CPU_MP_DATA               *CpuMpData
   )
 {
-  EFI_STATUS                 Status;
-  EFI_PHYSICAL_ADDRESS       Address;
-  UINTN                      ApSafeBufferSize;
+  EFI_STATUS                          Status;
+  EFI_PHYSICAL_ADDRESS                Address;
+  UINTN                               ApSafeBufferSize;
+  UINTN                               Index;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR     MemDesc;
+  UINTN                               StackBase;
 
   SaveCpuMpData (CpuMpData);
 
@@ -299,6 +303,30 @@ InitMpGlobalData (
     // If only BSP exists, return
     //
     return;
+  }
+
+  if (PcdGetBool (PcdCpuStackGuard)) {
+    //
+    // One extra page at the bottom of the stack is needed for Guard page.
+    //
+    if (CpuMpData->CpuApStackSize <= EFI_PAGE_SIZE) {
+      DEBUG ((DEBUG_ERROR, "PcdCpuApStackSize is not big enough for Stack Guard!\n"));
+      ASSERT (FALSE);
+    }
+
+    for (Index = 0; Index < CpuMpData->CpuCount; ++Index) {
+      StackBase = CpuMpData->Buffer + Index * CpuMpData->CpuApStackSize;
+
+      Status = gDS->GetMemorySpaceDescriptor (StackBase, &MemDesc);
+      ASSERT_EFI_ERROR (Status);
+
+      Status = gDS->SetMemorySpaceAttributes (
+                      StackBase,
+                      EFI_PAGES_TO_SIZE (1),
+                      MemDesc.Attributes | EFI_MEMORY_RP
+                      );
+      ASSERT_EFI_ERROR (Status);
+    }
   }
 
   //
