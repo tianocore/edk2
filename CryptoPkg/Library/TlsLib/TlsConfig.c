@@ -642,6 +642,8 @@ TlsSetCertRevocationList (
   This function returns the protocol version used by the specified TLS
   connection.
 
+  If Tls is NULL, then ASSERT().
+
   @param[in]  Tls    Pointer to the TLS object.
 
   @return  The protocol version of the specified TLS connection.
@@ -667,6 +669,8 @@ TlsGetVersion (
 
   This function returns the connection end (as client or as server) used by
   the specified TLS connection.
+
+  If Tls is NULL, then ASSERT().
 
   @param[in]  Tls    Pointer to the TLS object.
 
@@ -760,6 +764,8 @@ TlsGetCurrentCompressionId (
 
   This function returns the peer verification mode currently set in the
   specified TLS connection.
+
+  If Tls is NULL, then ASSERT().
 
   @param[in]  Tls    Pointer to the TLS object.
 
@@ -984,7 +990,7 @@ TlsGetHostPublicCert (
   Cert    = NULL;
   TlsConn = (TLS_CONNECTION *) Tls;
 
-  if (TlsConn == NULL || TlsConn->Ssl == NULL || DataSize == NULL) {
+  if (TlsConn == NULL || TlsConn->Ssl == NULL || DataSize == NULL || (*DataSize != 0 && Data == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
