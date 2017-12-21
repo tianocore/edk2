@@ -149,7 +149,6 @@ CpuInitDataInitialize (
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuFeaturesData->InitOrder = AllocateZeroPool (sizeof (CPU_FEATURES_INIT_ORDER) * NumberOfCpus);
   ASSERT (CpuFeaturesData->InitOrder != NULL);
-  CpuFeaturesData->BitMaskSize = (UINT32) PcdGetSize (PcdCpuFeaturesSupport);
 
   //
   // Collect CPU Features information
