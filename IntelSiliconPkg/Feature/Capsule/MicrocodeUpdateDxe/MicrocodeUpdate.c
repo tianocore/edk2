@@ -8,7 +8,7 @@
 
   MicrocodeWrite() and VerifyMicrocode() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -421,7 +421,7 @@ VerifyMicrocode (
     return EFI_INCOMPATIBLE_VERSION;
   }
   //
-  // Check Size
+  // Check TotalSize
   //
   if (MicrocodeEntryPoint->DataSize == 0) {
     TotalSize = 2048;
@@ -430,6 +430,14 @@ VerifyMicrocode (
   }
   if (TotalSize <= sizeof(CPU_MICROCODE_HEADER)) {
     DEBUG((DEBUG_ERROR, "VerifyMicrocode - TotalSize too small\n"));
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
+    if (AbortReason != NULL) {
+      *AbortReason = AllocateCopyPool(sizeof(L"InvalidTotalSize"), L"InvalidTotalSize");
+    }
+    return EFI_VOLUME_CORRUPTED;
+  }
+  if ((TotalSize & (SIZE_1KB - 1)) != 0) {
+    DEBUG((DEBUG_ERROR, "VerifyMicrocode - TotalSize is not multiples of 1024 bytes (1 KBytes)\n"));
     *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
     if (AbortReason != NULL) {
       *AbortReason = AllocateCopyPool(sizeof(L"InvalidTotalSize"), L"InvalidTotalSize");
@@ -445,7 +453,7 @@ VerifyMicrocode (
     return EFI_VOLUME_CORRUPTED;
   }
   //
-  // Check CheckSum32
+  // Check DataSize
   //
   if (MicrocodeEntryPoint->DataSize == 0) {
     DataSize = 2048 - sizeof(CPU_MICROCODE_HEADER);
@@ -461,13 +469,16 @@ VerifyMicrocode (
     return EFI_VOLUME_CORRUPTED;
   }
   if ((DataSize & 0x3) != 0) {
-    DEBUG((DEBUG_ERROR, "VerifyMicrocode - DataSize not aligned\n"));
+    DEBUG((DEBUG_ERROR, "VerifyMicrocode - DataSize is not multiples of DWORDs\n"));
     *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
     if (AbortReason != NULL) {
       *AbortReason = AllocateCopyPool(sizeof(L"InvalidDataSize"), L"InvalidDataSize");
     }
     return EFI_VOLUME_CORRUPTED;
   }
+  //
+  // Check CheckSum32
+  //
   CheckSum32 = CalculateSum32((UINT32 *)MicrocodeEntryPoint, DataSize + sizeof(CPU_MICROCODE_HEADER));
   if (CheckSum32 != 0) {
     DEBUG((DEBUG_ERROR, "VerifyMicrocode - fail on CheckSum32\n"));
