@@ -711,6 +711,7 @@ HttpBootCallback (
           if (HttpHeader != NULL) {
             Print (L"\n  HTTP ERROR: Resource Redirected.\n  New Location: %a\n", HttpHeader->FieldValue);
           }
+          break; 
         }
       }
       
