@@ -2145,12 +2145,21 @@ class SkuClass():
     def __init__(self,SkuIdentifier='', SkuIds=None):
         if SkuIds is None:
             SkuIds = {}
+
+        for SkuName in SkuIds:
+            SkuId = SkuIds[SkuName][0]
+            skuid_num = int(SkuId,16) if SkuId.upper().startswith("0X") else int(SkuId)
+            if skuid_num > 0xFFFF:
+                EdkLogger.error("build", PARAMETER_INVALID,
+                            ExtraData = "SKU-ID [%s] must less than 65535"
+                                      % (SkuName))
         
         self.AvailableSkuIds = sdict()
         self.SkuIdSet = []
         self.SkuIdNumberSet = []
         self.SkuData = SkuIds
         self.__SkuInherit = {}
+        self.__SkuIdentifier = SkuIdentifier
         if SkuIdentifier == '' or SkuIdentifier is None:
             self.SkuIdSet = ['DEFAULT']
             self.SkuIdNumberSet = ['0U']
@@ -2189,14 +2198,48 @@ class SkuClass():
             for item in self.SkuData.values():
                 self.__SkuInherit[item[1]]=item[2] if item[2] else "DEFAULT"
         return self.__SkuInherit.get(skuname,"DEFAULT")
+
+    def GetSkuChain(self,sku):
+        skulist = [sku]
+        nextsku = sku
+        while 1:
+            nextsku = self.GetNextSkuId(nextsku)
+            skulist.append(nextsku)
+            if nextsku == "DEFAULT":
+                break
+        skulist.reverse()
+        return skulist
+    def SkuOverrideOrder(self):
+        skuorderset = []
+        for skuname in self.SkuIdSet:
+            skuorderset.append(self.GetSkuChain(skuname))
         
+        skuorder = []
+        for index in range(max([len(item) for item in skuorderset])):
+            for subset in skuorderset:
+                if index > len(subset)-1:
+                    continue
+                if subset[index] in skuorder:
+                    continue
+                skuorder.append(subset[index])
+
+        return skuorder
+
     def __SkuUsageType(self): 
         
+        if self.__SkuIdentifier.upper() == "ALL":
+            return SkuClass.MULTIPLE
+
         if len(self.SkuIdSet) == 1:
             if self.SkuIdSet[0] == 'DEFAULT':
                 return SkuClass.DEFAULT
             else:
                 return SkuClass.SINGLE
+        elif len(self.SkuIdSet) == 2:
+            if 'DEFAULT' in self.SkuIdSet:
+                return SkuClass.SINGLE
+            else:
+                return SkuClass.MULTIPLE
         else:
             return SkuClass.MULTIPLE
     def DumpSkuIdArrary(self):
@@ -2219,7 +2262,10 @@ class SkuClass():
     
     def __GetSystemSkuID(self):
         if self.__SkuUsageType() == SkuClass.SINGLE:
-            return self.SkuIdSet[0]
+            if len(self.SkuIdSet) == 1:
+                return self.SkuIdSet[0]
+            else:
+                return self.SkuIdSet[0] if self.SkuIdSet[0] != 'DEFAULT' else self.SkuIdSet[1]
         else:
             return 'DEFAULT'
     def __GetAvailableSkuIdNumber(self):
