@@ -46,9 +46,11 @@ def PackGUID(Guid):
                 )
     return GuidBuffer
 
-class Variable(object):
-    def __init__(self,):
+class VariableMgr(object):
+    def __init__(self, DefaultStoreMap,SkuIdMap):
         self.VarInfo = []
+        self.DefaultStoreMap = DefaultStoreMap
+        self.SkuIdMap = SkuIdMap
 
     def append_variable(self,uefi_var):
         self.VarInfo.append(uefi_var)
@@ -61,7 +63,7 @@ class Variable(object):
         for item in self.VarInfo:
             if item.pcdindex not in indexedvarinfo:
                 indexedvarinfo[item.pcdindex] = dict()
-            indexedvarinfo[item.pcdindex][(int(item.skuname),int(item.defaultstoragename))] = item
+            indexedvarinfo[item.pcdindex][(item.skuname,item.defaultstoragename)] = item
 
         for index in indexedvarinfo:
             sku_var_info = indexedvarinfo[index]
@@ -69,7 +71,7 @@ class Variable(object):
             default_data_buffer = ""
             others_data_buffer = ""
             tail = None
-            default_sku_default = indexedvarinfo.get(index).get((0,0))
+            default_sku_default = indexedvarinfo.get(index).get(("DEFAULT","STANDARD"))
 
             if default_sku_default.data_type not in ["UINT8","UINT16","UINT32","UINT64","BOOLEAN"]:
                 var_max_len = max([len(var_item.default_value.split(",")) for var_item in sku_var_info.values()])
@@ -82,13 +84,13 @@ class Variable(object):
             for item in default_data_buffer:
                 default_data_array += unpack("B",item)
 
-            if (0,0) not in var_data:
-                var_data[(0,0)] = collections.OrderedDict()
-            var_data[(0,0)][index] = (default_data_buffer,sku_var_info[(0,0)])
+            if ("DEFAULT","STANDARD") not in var_data:
+                var_data[("DEFAULT","STANDARD")] = collections.OrderedDict()
+            var_data[("DEFAULT","STANDARD")][index] = (default_data_buffer,sku_var_info[("DEFAULT","STANDARD")])
 
             for (skuid,defaultstoragename) in indexedvarinfo.get(index):
                 tail = None
-                if (skuid,defaultstoragename) == (0,0):
+                if (skuid,defaultstoragename) == ("DEFAULT","STANDARD"):
                     continue
                 other_sku_other = indexedvarinfo.get(index).get((skuid,defaultstoragename))
 
@@ -113,7 +115,7 @@ class Variable(object):
 
         var_data = self.process_variable_data()
 
-        pcds_default_data = var_data.get((0,0))
+        pcds_default_data = var_data.get(("DEFAULT","STANDARD"))
         NvStoreDataBuffer = ""
         var_data_offset = collections.OrderedDict()
         offset = NvStorageHeaderSize
@@ -127,11 +129,6 @@ class Variable(object):
             else:
                 var_attr_value = 0x07
 
-            print "default var_name_buffer"
-            print self.format_data(var_name_buffer)
-            print "default var_buffer"
-            print self.format_data(default_data)
-
             DataBuffer = self.AlignData(var_name_buffer + default_data)
 
             data_size = len(DataBuffer)
@@ -139,20 +136,18 @@ class Variable(object):
             var_data_offset[default_info.pcdindex] = offset
             offset += data_size - len(default_info.var_name.split(","))
 
-            var_header_buffer = self.PACK_VARIABLE_HEADER(var_attr_value, len(default_info.var_name.split(",")), data_size, vendorguid)
+            var_header_buffer = self.PACK_VARIABLE_HEADER(var_attr_value, len(default_info.var_name.split(",")), len (default_data), vendorguid)
             NvStoreDataBuffer += (var_header_buffer + DataBuffer)
 
         variable_storage_header_buffer = self.PACK_VARIABLE_STORE_HEADER(len(NvStoreDataBuffer) + 28)
 
         nv_default_part = self.AlignData(self.PACK_DEFAULT_DATA(0, 0, self.unpack_data(variable_storage_header_buffer+NvStoreDataBuffer)))
 
-        print "default whole data \n",self.format_data(nv_default_part)
-
         data_delta_structure_buffer = ""
-        for skuid,defaultid in var_data:
-            if (skuid,defaultid) == (0,0):
+        for skuname,defaultstore in var_data:
+            if (skuname,defaultstore) == ("DEFAULT","STANDARD"):
                 continue
-            pcds_sku_data = var_data.get((skuid,defaultid))
+            pcds_sku_data = var_data.get((skuname,defaultstore))
             delta_data_set = []
             for pcdindex in pcds_sku_data:
                 offset = var_data_offset[pcdindex]
@@ -160,10 +155,7 @@ class Variable(object):
                 delta_data = [(item[0] + offset, item[1]) for item in delta_data]
                 delta_data_set.extend(delta_data)
 
-            data_delta_structure_buffer += self.AlignData(self.PACK_DELTA_DATA(defaultid,skuid,delta_data_set))
-            print "delta data"
-            print delta_data_set
-            print self.format_data(self.AlignData(self.PACK_DELTA_DATA(defaultid,skuid,delta_data_set)))
+            data_delta_structure_buffer += self.AlignData(self.PACK_DELTA_DATA(skuname,defaultstore,delta_data_set))
 
         return self.format_data(nv_default_part + data_delta_structure_buffer)
 
@@ -179,8 +171,6 @@ class Variable(object):
         return final_data
 
     def calculate_delta(self, default, theother):
-        print "default data \n", default
-        print "other data \n",theother
         if len(default) - len(theother) != 0:
             EdkLogger.error("build", FORMAT_INVALID, 'The variable data length is not the same for the same PCD.')
         data_delta = []
@@ -258,7 +248,7 @@ class Variable(object):
 
     def PACK_DEFAULT_DATA(self, defaultstoragename,skuid,var_value):
         Buffer = ""
-        Buffer += pack("=H",6)
+        Buffer += pack("=L",8)
         Buffer += pack("=H",int(defaultstoragename))
         Buffer += pack("=H",int(skuid))
 
@@ -269,11 +259,21 @@ class Variable(object):
 
         return Buffer
 
-    def PACK_DELTA_DATA(self,defaultstoragename,skuid,delta_list):
+    def GetSkuId(self,skuname):
+        if skuname not in self.SkuIdMap:
+            return None
+        return self.SkuIdMap.get(skuname)[0]
+    def GetDefaultStoreId(self,dname):
+        if dname not in self.DefaultStoreMap:
+            return None
+        return self.DefaultStoreMap.get(dname)[0]
+    def PACK_DELTA_DATA(self,skuname,defaultstoragename,delta_list):
+        skuid = self.GetSkuId(skuname)
+        defaultstorageid = self.GetDefaultStoreId(defaultstoragename)
         Buffer = ""
-        Buffer += pack("=H",6)
-        Buffer += pack("=H",int(defaultstoragename))
+        Buffer += pack("=L",8)
         Buffer += pack("=H",int(skuid))
+        Buffer += pack("=H",int(defaultstorageid))
         for (delta_offset,value) in delta_list:
             Buffer += pack("=L",delta_offset)
             Buffer = Buffer[:-1] + pack("=B",value)
@@ -294,4 +294,4 @@ class Variable(object):
         for name_char in var_name.strip("{").strip("}").split(","):
             Buffer += pack("=B",int(name_char,16))
 
-        return Buffer
+        return Buffer

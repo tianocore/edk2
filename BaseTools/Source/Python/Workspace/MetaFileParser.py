@@ -296,7 +296,7 @@ class MetaFileParser(object):
         for Item in GetSplitValueList(self._CurrentLine[1:-1], TAB_COMMA_SPLIT):
             if Item == '':
                 continue
-            ItemList = GetSplitValueList(Item, TAB_SPLIT,2)
+            ItemList = GetSplitValueList(Item, TAB_SPLIT,3)
             # different section should not mix in one section
             if self._SectionName != '' and self._SectionName != ItemList[0].upper():
                 EdkLogger.error('Parser', FORMAT_INVALID, "Different section names in the same section",
@@ -329,7 +329,11 @@ class MetaFileParser(object):
                     S2 = ItemList[2].upper()
             else:
                 S2 = 'COMMON'
-            self._Scope.append([S1, S2])
+            if len(ItemList) > 3:
+                S3 = ItemList[3]
+            else:
+                S3 = "COMMON"
+            self._Scope.append([S1, S2, S3])
 
         # 'COMMON' must not be used with specific ARCHs at the same section
         if 'COMMON' in ArchList and len(ArchList) > 1:
@@ -410,7 +414,7 @@ class MetaFileParser(object):
 
     ## Construct section Macro dict 
     def _ConstructSectionMacroDict(self, Name, Value):
-        ScopeKey = [(Scope[0], Scope[1]) for Scope in self._Scope]
+        ScopeKey = [(Scope[0], Scope[1],Scope[2]) for Scope in self._Scope]
         ScopeKey = tuple(ScopeKey)
         SectionDictKey = self._SectionType, ScopeKey
         #
@@ -442,20 +446,20 @@ class MetaFileParser(object):
                 continue
 
             for ActiveScope in self._Scope:
-                Scope0, Scope1 = ActiveScope[0], ActiveScope[1]
-                if(Scope0, Scope1) not in Scope:
+                Scope0, Scope1 ,Scope2= ActiveScope[0], ActiveScope[1],ActiveScope[2]
+                if(Scope0, Scope1,Scope2) not in Scope:
                     break
             else:
                 SpeSpeMacroDict.update(self._SectionsMacroDict[(SectionType, Scope)])
 
             for ActiveScope in self._Scope:
-                Scope0, Scope1 = ActiveScope[0], ActiveScope[1]
-                if(Scope0, Scope1) not in Scope and (Scope0, "COMMON") not in Scope and ("COMMON", Scope1) not in Scope:
+                Scope0, Scope1,Scope2 = ActiveScope[0], ActiveScope[1],ActiveScope[2]
+                if(Scope0, Scope1,Scope2) not in Scope and (Scope0, "COMMON","COMMON") not in Scope and ("COMMON", Scope1,"COMMON") not in Scope:
                     break
             else:
                 ComSpeMacroDict.update(self._SectionsMacroDict[(SectionType, Scope)])
 
-            if ("COMMON", "COMMON") in Scope:
+            if ("COMMON", "COMMON","COMMON") in Scope:
                 ComComMacroDict.update(self._SectionsMacroDict[(SectionType, Scope)])
 
         Macros.update(ComComMacroDict)
@@ -627,7 +631,7 @@ class InfParser(MetaFileParser):
             # Model, Value1, Value2, Value3, Arch, Platform, BelongsToItem=-1,
             # LineBegin=-1, ColumnBegin=-1, LineEnd=-1, ColumnEnd=-1, Enabled=-1
             #
-            for Arch, Platform in self._Scope:
+            for Arch, Platform,_ in self._Scope:
                 LastItem = self._Store(self._SectionType,
                             self._ValueList[0],
                             self._ValueList[1],
@@ -804,6 +808,7 @@ class DscParser(MetaFileParser):
     # DSC file supported data types (one type per section)
     DataType = {
         TAB_SKUIDS.upper()                          :   MODEL_EFI_SKU_ID,
+        TAB_DEFAULT_STORES.upper()                  :   MODEL_EFI_DEFAULT_STORES,
         TAB_LIBRARIES.upper()                       :   MODEL_EFI_LIBRARY_INSTANCE,
         TAB_LIBRARY_CLASSES.upper()                 :   MODEL_EFI_LIBRARY_CLASS,
         TAB_BUILD_OPTIONS.upper()                   :   MODEL_META_DATA_BUILD_OPTION,
@@ -952,7 +957,7 @@ class DscParser(MetaFileParser):
             # Model, Value1, Value2, Value3, Arch, ModuleType, BelongsToItem=-1, BelongsToFile=-1,
             # LineBegin=-1, ColumnBegin=-1, LineEnd=-1, ColumnEnd=-1, Enabled=-1
             #
-            for Arch, ModuleType in self._Scope:
+            for Arch, ModuleType, DefaultStore in self._Scope:
                 Owner = self._Owner[-1]
                 if self._SubsectionType != MODEL_UNKNOWN:
                     Owner = OwnerId[Arch]
@@ -963,6 +968,7 @@ class DscParser(MetaFileParser):
                                         self._ValueList[2],
                                         Arch,
                                         ModuleType,
+                                        DefaultStore,
                                         Owner,
                                         self._From,
                                         self._LineIndex + 1,
@@ -1015,7 +1021,7 @@ class DscParser(MetaFileParser):
                             ExtraData=self._CurrentLine)
 
         ItemType = self.DataType[DirectiveName]
-        Scope = [['COMMON', 'COMMON']]
+        Scope = [['COMMON', 'COMMON','COMMON']]
         if ItemType == MODEL_META_DATA_INCLUDE:
             Scope = self._Scope
         if ItemType == MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF:
@@ -1045,7 +1051,7 @@ class DscParser(MetaFileParser):
         # Model, Value1, Value2, Value3, Arch, ModuleType, BelongsToItem=-1, BelongsToFile=-1,
         # LineBegin=-1, ColumnBegin=-1, LineEnd=-1, ColumnEnd=-1, Enabled=-1
         #
-        for Arch, ModuleType in Scope:
+        for Arch, ModuleType, DefaultStore in Scope:
             self._LastItem = self._Store(
                                     ItemType,
                                     self._ValueList[0],
@@ -1053,6 +1059,7 @@ class DscParser(MetaFileParser):
                                     self._ValueList[2],
                                     Arch,
                                     ModuleType,
+                                    DefaultStore,
                                     self._Owner[-1],
                                     self._From,
                                     self._LineIndex + 1,
@@ -1088,6 +1095,13 @@ class DscParser(MetaFileParser):
 
     @ParseMacro
     def _SkuIdParser(self):
+        TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT)
+        if len(TokenList) not in (2,3):
+            EdkLogger.error('Parser', FORMAT_INVALID, "Correct format is '<Integer>|<UiName>[|<UiName>]'",
+                            ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
+        self._ValueList[0:len(TokenList)] = TokenList
+    @ParseMacro
+    def _DefaultStoresParser(self):
         TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT)
         if len(TokenList) != 2:
             EdkLogger.error('Parser', FORMAT_INVALID, "Correct format is '<Integer>|<UiName>'",
@@ -1243,6 +1257,7 @@ class DscParser(MetaFileParser):
             MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF     :   self.__ProcessDirective,
             MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSEIF    :   self.__ProcessDirective,
             MODEL_EFI_SKU_ID                                :   self.__ProcessSkuId,
+            MODEL_EFI_DEFAULT_STORES                        :   self.__ProcessDefaultStores,
             MODEL_EFI_LIBRARY_INSTANCE                      :   self.__ProcessLibraryInstance,
             MODEL_EFI_LIBRARY_CLASS                         :   self.__ProcessLibraryClass,
             MODEL_PCD_FIXED_AT_BUILD                        :   self.__ProcessPcd,
@@ -1276,7 +1291,7 @@ class DscParser(MetaFileParser):
         self._ContentIndex = 0
         self._InSubsection = False
         while self._ContentIndex < len(self._Content) :
-            Id, self._ItemType, V1, V2, V3, S1, S2, Owner, self._From, \
+            Id, self._ItemType, V1, V2, V3, S1, S2, S3,Owner, self._From, \
                 LineStart, ColStart, LineEnd, ColEnd, Enabled = self._Content[self._ContentIndex]
 
             if self._From < 0:
@@ -1284,7 +1299,7 @@ class DscParser(MetaFileParser):
 
             self._ContentIndex += 1
 
-            self._Scope = [[S1, S2]]
+            self._Scope = [[S1, S2, S3]]
             #
             # For !include directive, handle it specially,
             # merge arch and module type in case of duplicate items
@@ -1293,9 +1308,9 @@ class DscParser(MetaFileParser):
                 if self._ContentIndex >= len(self._Content):
                     break
                 Record = self._Content[self._ContentIndex]
-                if LineStart == Record[9] and LineEnd == Record[11]:
-                    if [Record[5], Record[6]] not in self._Scope:
-                        self._Scope.append([Record[5], Record[6]])
+                if LineStart == Record[10] and LineEnd == Record[12]:
+                    if [Record[5], Record[6],Record[7]] not in self._Scope:
+                        self._Scope.append([Record[5], Record[6],Record[7]])
                     self._ContentIndex += 1
                 else:
                     break
@@ -1348,6 +1363,7 @@ class DscParser(MetaFileParser):
                                 self._ValueList[2],
                                 S1,
                                 S2,
+                                S3,
                                 NewOwner,
                                 self._From,
                                 self._LineIndex + 1,
@@ -1383,7 +1399,7 @@ class DscParser(MetaFileParser):
                         MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_DEFAULT, MODEL_PCD_DYNAMIC_EX_HII,
                         MODEL_PCD_DYNAMIC_EX_VPD):
             Records = self._RawTable.Query(PcdType, BelongsToItem= -1.0)
-            for TokenSpaceGuid, PcdName, Value, Dummy2, Dummy3, ID, Line in Records:
+            for TokenSpaceGuid, PcdName, Value, Dummy2, Dummy3, Dummy4,ID, Line in Records:
                 Name = TokenSpaceGuid + '.' + PcdName
                 if Name not in GlobalData.gPlatformOtherPcds:
                     PcdLine = Line
@@ -1549,6 +1565,9 @@ class DscParser(MetaFileParser):
     def __ProcessSkuId(self):
         self._ValueList = [ReplaceMacro(Value, self._Macros, RaiseError=True)
                            for Value in self._ValueList]
+    def __ProcessDefaultStores(self):
+        self._ValueList = [ReplaceMacro(Value, self._Macros, RaiseError=True)
+                           for Value in self._ValueList]
 
     def __ProcessLibraryInstance(self):
         self._ValueList = [ReplaceMacro(Value, self._Macros) for Value in self._ValueList]
@@ -1598,6 +1617,7 @@ class DscParser(MetaFileParser):
     _SectionParser = {
         MODEL_META_DATA_HEADER                          :   _DefineParser,
         MODEL_EFI_SKU_ID                                :   _SkuIdParser,
+        MODEL_EFI_DEFAULT_STORES                        :   _DefaultStoresParser,
         MODEL_EFI_LIBRARY_INSTANCE                      :   _LibraryInstanceParser,
         MODEL_EFI_LIBRARY_CLASS                         :   _LibraryClassParser,
         MODEL_PCD_FIXED_AT_BUILD                        :   _PcdParser,

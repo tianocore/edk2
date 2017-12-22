@@ -1677,6 +1677,9 @@ def CreatePcdCode(Info, AutoGenC, AutoGenH):
         if Pcd.Type in gDynamicExPcd and Pcd.TokenSpaceGuidCName not in TokenSpaceList:
             TokenSpaceList += [Pcd.TokenSpaceGuidCName]
             
+    SkuMgr = Info.Workspace.Platform.SkuIdMgr
+    AutoGenH.Append("\n// Definition of SkuId Array\n")
+    AutoGenH.Append("extern UINT64 _gPcd_SkuId_Array[];\n")
     # Add extern declarations to AutoGen.h if one or more Token Space GUIDs were found
     if TokenSpaceList <> []:            
         AutoGenH.Append("\n// Definition of PCD Token Space GUIDs used in this module\n\n")
@@ -1694,6 +1697,8 @@ def CreatePcdCode(Info, AutoGenC, AutoGenH):
             CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd)
         DynExPcdTokenNumberMapping (Info, AutoGenH)
     else:
+        AutoGenC.Append("\n// Definition of SkuId Array\n")
+        AutoGenC.Append("GLOBAL_REMOVE_IF_UNREFERENCED UINT64 _gPcd_SkuId_Array[] = %s;\n" % SkuMgr.DumpSkuIdArrary())
         if Info.ModulePcdList:
             AutoGenH.Append("\n// Definition of PCDs used in this module\n")
             AutoGenC.Append("\n// Definition of PCDs used in this module\n")

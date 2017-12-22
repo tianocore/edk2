@@ -16,6 +16,7 @@ import Common.LongFilePathOs as os
 from Common.Misc import sdict
 from Common.Misc import RealPath2
 from Common.BuildToolError import *
+from Common.DataType import *
 import collections
 
 ## PcdClassObject
@@ -108,11 +109,11 @@ class PcdClassObject(object):
         return hash((self.TokenCName, self.TokenSpaceGuidCName))
 
 class StructurePcd(PcdClassObject):
-    def __init__(self, StructuredPcdIncludeFile="", Packages=None, Name=None, Guid=None, Type=None, DatumType=None, Value=None, Token=None, MaxDatumSize=None, SkuInfoList={}, IsOverrided=False, GuidValue=None, validateranges=[], validlists=[], expressions=[]):
+    def __init__(self, StructuredPcdIncludeFile="", Packages=None, Name=None, Guid=None, Type=None, DatumType=None, Value=None, Token=None, MaxDatumSize=None, SkuInfoList={}, IsOverrided=False, GuidValue=None, validateranges=[], validlists=[], expressions=[],default_store = TAB_DEFAULT_STORES_DEFAULT):
         super(StructurePcd, self).__init__(Name, Guid, Type, DatumType, Value, Token, MaxDatumSize, SkuInfoList, IsOverrided, GuidValue, validateranges, validlists, expressions)
         self.StructuredPcdIncludeFile = StructuredPcdIncludeFile
         self.PackageDecs = Packages
-        self.DefaultStoreName = ['STANDARD']
+        self.DefaultStoreName = [default_store]
         self.DefaultValues = collections.OrderedDict({})
         self.PcdMode = None
         self.SkuOverrideValues = collections.OrderedDict({})
@@ -127,13 +128,15 @@ class StructurePcd(PcdClassObject):
         self.DefaultValues[FieldName] = [Value.strip(), FileName, LineNo]
         return self.DefaultValues[FieldName]
 
-    def AddOverrideValue (self, FieldName, Value, SkuName, FileName="", LineNo=0):
+    def AddOverrideValue (self, FieldName, Value, SkuName, DefaultStoreName, FileName="", LineNo=0):
         if SkuName not in self.SkuOverrideValues:
             self.SkuOverrideValues[SkuName] = collections.OrderedDict({})
-        if FieldName in self.SkuOverrideValues[SkuName]:
-            del self.SkuOverrideValues[SkuName][FieldName]
-        self.SkuOverrideValues[SkuName][FieldName] = [Value.strip(), FileName, LineNo]
-        return self.SkuOverrideValues[SkuName][FieldName]
+        if DefaultStoreName not in self.SkuOverrideValues[SkuName]:
+            self.SkuOverrideValues[SkuName][DefaultStoreName] = collections.OrderedDict({})
+        if FieldName in self.SkuOverrideValues[SkuName][DefaultStoreName]:
+            del self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName]
+        self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName] = [Value.strip(), FileName, LineNo]
+        return self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName]
 
     def SetPcdMode (self, PcdMode):
         self.PcdMode = PcdMode

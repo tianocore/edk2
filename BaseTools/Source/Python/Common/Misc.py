@@ -2093,30 +2093,55 @@ class PeImageClass():
             Value = (Value << 8) | int(ByteList[index])
         return Value
 
+class DefaultStore():
+    def __init__(self,DefaultStores ):
 
+        self.DefaultStores = DefaultStores
+    def DefaultStoreID(self,DefaultStoreName):
+        for key,value in self.DefaultStores.items():
+            if value == DefaultStoreName:
+                return key
+        return None
+    def GetDefaultDefault(self):
+        if not self.DefaultStores or "0" in self.DefaultStores:
+            return "0",TAB_DEFAULT_STORES_DEFAULT
+        else:
+            minvalue = min([int(value_str) for value_str in self.DefaultStores.keys()])
+            return (str(minvalue), self.DefaultStores[str(minvalue)])
+    def GetMin(self,DefaultSIdList):
+        if not DefaultSIdList:
+            return "STANDARD"
+        minid = min({storeid for storeid, storename in self.DefaultStores.values() if storename in DefaultSIdList}  )
+        for sid,name in self.DefaultStores.values():
+            if sid == minid:
+                return name
 class SkuClass():
     
     DEFAULT = 0
     SINGLE = 1
     MULTIPLE =2
     
-    def __init__(self,SkuIdentifier='', SkuIds={}):
+    def __init__(self,SkuIdentifier='', SkuIds=None):
+        if SkuIds is None:
+            SkuIds = {}
         
         self.AvailableSkuIds = sdict()
         self.SkuIdSet = []
         self.SkuIdNumberSet = []
+        self.SkuData = SkuIds
+        self.__SkuInherit = {}
         if SkuIdentifier == '' or SkuIdentifier is None:
             self.SkuIdSet = ['DEFAULT']
             self.SkuIdNumberSet = ['0U']
         elif SkuIdentifier == 'ALL':
             self.SkuIdSet = SkuIds.keys()
-            self.SkuIdNumberSet = [num.strip() + 'U' for num in SkuIds.values()]
+            self.SkuIdNumberSet = [num[0].strip() + 'U' for num in SkuIds.values()]
         else:
             r = SkuIdentifier.split('|') 
-            self.SkuIdSet=[r[k].strip() for k in range(len(r))]      
+            self.SkuIdSet=[(r[k].strip()).upper() for k in range(len(r))]
             k = None
             try: 
-                self.SkuIdNumberSet = [SkuIds[k].strip() + 'U' for k in self.SkuIdSet]   
+                self.SkuIdNumberSet = [SkuIds[k][0].strip() + 'U' for k in self.SkuIdSet]
             except Exception:
                 EdkLogger.error("build", PARAMETER_INVALID,
                             ExtraData = "SKU-ID [%s] is not supported by the platform. [Valid SKU-ID: %s]"
@@ -2126,11 +2151,19 @@ class SkuClass():
             self.SkuIdNumberSet.remove('0U')
         for each in self.SkuIdSet:
             if each in SkuIds:
-                self.AvailableSkuIds[each] = SkuIds[each]
+                self.AvailableSkuIds[each] = SkuIds[each][0]
             else:
                 EdkLogger.error("build", PARAMETER_INVALID,
                             ExtraData="SKU-ID [%s] is not supported by the platform. [Valid SKU-ID: %s]"
                                       % (each, " | ".join(SkuIds.keys())))
+        if self.SkuUsageType != self.SINGLE:
+            self.AvailableSkuIds.update({'DEFAULT':0, 'COMMON':0})
+    def GetNextSkuId(self, skuname):
+        if not self.__SkuInherit:
+            self.__SkuInherit = {}
+            for item in self.SkuData.values():
+                self.__SkuInherit[item[1]]=item[2] if item[2] else "DEFAULT"
+        return self.__SkuInherit.get(skuname,"DEFAULT")
         
     def __SkuUsageType(self): 
         
@@ -2141,7 +2174,21 @@ class SkuClass():
                 return SkuClass.SINGLE
         else:
             return SkuClass.MULTIPLE
+    def DumpSkuIdArrary(self):
 
+        ArrayStrList = []
+        if self.SkuUsageType == SkuClass.SINGLE:
+            ArrayStr = "{0x0}"
+        else:
+            for skuname in self.AvailableSkuIds:
+                if skuname == "COMMON":
+                    continue
+                while skuname != "DEFAULT":
+                    ArrayStrList.append(hex(int(self.AvailableSkuIds[skuname])))
+                    skuname = self.GetNextSkuId(skuname)
+                ArrayStrList.append("0x0")
+            ArrayStr = "{" + ",".join(ArrayStrList) +  "}"
+        return ArrayStr
     def __GetAvailableSkuIds(self):
         return self.AvailableSkuIds
     

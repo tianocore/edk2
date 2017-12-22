@@ -270,19 +270,22 @@ class PpiClass(GuidProtocolPpiCommonClass):
 #
 class SkuInfoClass(object):
     def __init__(self, SkuIdName = '', SkuId = '', VariableName = '', VariableGuid = '', VariableOffset = '', 
-                 HiiDefaultValue = '', VpdOffset = '', DefaultValue = '', VariableGuidValue = '', VariableAttribute = ''):
+                 HiiDefaultValue = '', VpdOffset = '', DefaultValue = '', VariableGuidValue = '', VariableAttribute = '', DefaultStore = None):
         self.SkuIdName = SkuIdName
         self.SkuId = SkuId
         
         #
         # Used by Hii
         #
+        if DefaultStore is None:
+            DefaultStore = {}
         self.VariableName = VariableName
         self.VariableGuid = VariableGuid
         self.VariableGuidValue = VariableGuidValue
         self.VariableOffset = VariableOffset
         self.HiiDefaultValue = HiiDefaultValue
         self.VariableAttribute = VariableAttribute
+        self.DefaultStoreDict = DefaultStore
         
         #
         # Used by Vpd

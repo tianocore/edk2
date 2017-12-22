@@ -44,7 +44,7 @@ from Common.MultipleWorkspace import MultipleWorkspace as mws
 import InfSectionParser
 import datetime
 import hashlib
-from GenVar import Variable,var_info
+from GenVar import VariableMgr,var_info
 
 ## Regular expression for splitting Dependency Expression string into tokens
 gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
@@ -1225,6 +1225,7 @@ class PlatformAutoGen(AutoGen):
         self.AllPcdList = []
         # get the original module/package/platform objects
         self.BuildDatabase = Workspace.BuildDatabase
+        self.DscBuildDataObj = Workspace.Platform
 
         # flag indicating if the makefile/C-code file has been created or not
         self.IsMakeFileCreated  = False
@@ -1354,23 +1355,21 @@ class PlatformAutoGen(AutoGen):
                     LibAuto.ConstPcd[key] = Pcd.DefaultValue
 
     def CollectVariables(self, DynamicPcdSet):
-        VariableInfo = Variable()
+        VariableInfo = VariableMgr(self.DscBuildDataObj._GetDefaultStores(),self.DscBuildDataObj._GetSkuIds())
         Index = 0
         for Pcd in DynamicPcdSet:
-            if not hasattr(Pcd,"DefaultStoreName"):
-                Pcd.DefaultStoreName = ['0']
-            for StorageName in Pcd.DefaultStoreName:
-                pcdname = ".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName))
-                for SkuName in Pcd.SkuInfoList:
-                    Sku = Pcd.SkuInfoList[SkuName]
-                    SkuId = Sku.SkuId
-                    if SkuId == None or SkuId == '':
-                        continue
-                    if len(Sku.VariableName) > 0:
-                        VariableGuidStructure = Sku.VariableGuidValue
-                        VariableGuid = GuidStructureStringToGuidString(VariableGuidStructure)
-                        if Pcd.Phase == "DXE":
-                            VariableInfo.append_variable(var_info(Index,pcdname,StorageName,SkuId, StringToArray(Sku.VariableName),VariableGuid, Sku.VariableAttribute , Pcd.DefaultValue,Sku.HiiDefaultValue,Pcd.DatumType))
+            pcdname = ".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName))
+            for SkuName in Pcd.SkuInfoList:
+                Sku = Pcd.SkuInfoList[SkuName]
+                SkuId = Sku.SkuId
+                if SkuId == None or SkuId == '':
+                    continue
+                if len(Sku.VariableName) > 0:
+                    VariableGuidStructure = Sku.VariableGuidValue
+                    VariableGuid = GuidStructureStringToGuidString(VariableGuidStructure)
+                    if Pcd.Phase == "DXE":
+                        for StorageName in Sku.DefaultStoreDict:
+                            VariableInfo.append_variable(var_info(Index,pcdname,StorageName,SkuName, StringToArray(Sku.VariableName),VariableGuid, Sku.VariableAttribute , Pcd.DefaultValue,Sku.DefaultStoreDict[StorageName],Pcd.DatumType))
             Index += 1
         return VariableInfo
     ## Collect dynamic PCDs
@@ -2383,7 +2382,7 @@ class PlatformAutoGen(AutoGen):
             else:
                 SkuName = 'DEFAULT'
             ToPcd.SkuInfoList = {
-                SkuName : SkuInfoClass(SkuName, self.Platform.SkuIds[SkuName], '', '', '', '', '', ToPcd.DefaultValue)
+                SkuName : SkuInfoClass(SkuName, self.Platform.SkuIds[SkuName][0], '', '', '', '', '', ToPcd.DefaultValue)
             }
 
     ## Apply PCD setting defined platform to a module
