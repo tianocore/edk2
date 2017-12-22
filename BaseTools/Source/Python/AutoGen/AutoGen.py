@@ -1637,15 +1637,8 @@ class PlatformAutoGen(AutoGen):
                 if Pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
                     Pcd.DatumType = "VOID*"
 
-                PcdValue = Sku.DefaultValue
-                if Pcd.DatumType == 'VOID*' and PcdValue.startswith("L"):
                     # if found PCD which datum value is unicode string the insert to left size of UnicodeIndex
-                    UnicodePcdArray.append(Pcd)
-                elif len(Sku.VariableName) > 0:
                     # if found HII type PCD then insert to right of UnicodeIndex
-                    HiiPcdArray.append(Pcd)
-                else:
-                    OtherPcdArray.append(Pcd)
                 if Pcd.Type in [TAB_PCDS_DYNAMIC_VPD, TAB_PCDS_DYNAMIC_EX_VPD]:
                     VpdPcdDict[(Pcd.TokenCName, Pcd.TokenSpaceGuidCName)] = Pcd
 
@@ -1653,25 +1646,25 @@ class PlatformAutoGen(AutoGen):
             PcdNvStoreDfBuffer = VpdPcdDict.get(("PcdNvStoreDefaultValueBuffer","gEfiMdeModulePkgTokenSpaceGuid"))
             if PcdNvStoreDfBuffer:
                 self.VariableInfo = self.CollectVariables(self._DynamicPcdList)
-                default_skuobj = PcdNvStoreDfBuffer.SkuInfoList.get("DEFAULT")
                 vardump = self.VariableInfo.dump()
-                if vardump and default_skuobj:
-                    default_skuobj.DefaultValue = vardump
+                if vardump:
                     PcdNvStoreDfBuffer.DefaultValue = vardump
-                    PcdNvStoreDfBuffer.SkuInfoList.clear()
-                    PcdNvStoreDfBuffer.SkuInfoList['DEFAULT'] = default_skuobj
-                    PcdNvStoreDfBuffer.MaxDatumSize = str(len(default_skuobj.DefaultValue.split(",")))
+                    for skuname in PcdNvStoreDfBuffer.SkuInfoList:
+                        PcdNvStoreDfBuffer.SkuInfoList[skuname].DefaultValue = vardump
+                        PcdNvStoreDfBuffer.MaxDatumSize = str(len(vardump.split(",")))
 
             PlatformPcds = self._PlatformPcds.keys()
             PlatformPcds.sort()
             #
             # Add VPD type PCD into VpdFile and determine whether the VPD PCD need to be fixed up.
             #
+            VpdSkuMap = {}
             for PcdKey in PlatformPcds:
                 Pcd = self._PlatformPcds[PcdKey]
                 if Pcd.Type in [TAB_PCDS_DYNAMIC_VPD, TAB_PCDS_DYNAMIC_EX_VPD] and \
                    PcdKey in VpdPcdDict:
                     Pcd = VpdPcdDict[PcdKey]
+                    SkuValueMap = {}
                     for (SkuName,Sku) in Pcd.SkuInfoList.items():
                         Sku.VpdOffset = Sku.VpdOffset.strip()
                         PcdValue = Sku.DefaultValue
@@ -1696,7 +1689,10 @@ class PlatformAutoGen(AutoGen):
                                     EdkLogger.warn("build", "The offset value of PCD %s.%s is not 8-byte aligned!" %(Pcd.TokenSpaceGuidCName, Pcd.TokenCName), File=self.MetaFile)
                                 else:
                                     EdkLogger.error("build", FORMAT_INVALID, 'The offset value of PCD %s.%s should be %s-byte aligned.' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Alignment))
-                        VpdFile.Add(Pcd, Sku.VpdOffset)
+                        if PcdValue not in SkuValueMap:
+                            SkuValueMap[PcdValue] = []
+                            VpdFile.Add(Pcd, Sku.VpdOffset)
+                        SkuValueMap[PcdValue].append(Sku)
                         # if the offset of a VPD is *, then it need to be fixed up by third party tool.
                         if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
                             NeedProcessVpdMapFile = True
@@ -1704,7 +1700,7 @@ class PlatformAutoGen(AutoGen):
                                 EdkLogger.error("Build", FILE_NOT_FOUND, \
                                                 "Fail to find third-party BPDG tool to process VPD PCDs. BPDG Guid tool need to be defined in tools_def.txt and VPD_TOOL_GUID need to be provided in DSC file.")
 
-
+                    VpdSkuMap[PcdKey] = SkuValueMap
             #
             # Fix the PCDs define in VPD PCD section that never referenced by module.
             # An example is PCD for signature usage.
@@ -1723,6 +1719,7 @@ class PlatformAutoGen(AutoGen):
                         # Not found, it should be signature
                         if not FoundFlag :
                             # just pick the a value to determine whether is unicode string type
+                            SkuValueMap = {}
                             for (SkuName,Sku) in DscPcdEntry.SkuInfoList.items():
                                 Sku.VpdOffset = Sku.VpdOffset.strip() 
                                 
@@ -1748,7 +1745,6 @@ class PlatformAutoGen(AutoGen):
                                                                                                                     
                                 if DscPcdEntry not in self._DynamicPcdList:
                                     self._DynamicPcdList.append(DscPcdEntry)
-#                                Sku = DscPcdEntry.SkuInfoList[DscPcdEntry.SkuInfoList.keys()[0]]
                                 Sku.VpdOffset = Sku.VpdOffset.strip()
                                 PcdValue = Sku.DefaultValue
                                 if PcdValue == "":
@@ -1772,7 +1768,10 @@ class PlatformAutoGen(AutoGen):
                                             EdkLogger.warn("build", "The offset value of PCD %s.%s is not 8-byte aligned!" %(DscPcdEntry.TokenSpaceGuidCName, DscPcdEntry.TokenCName), File=self.MetaFile)
                                         else:
                                             EdkLogger.error("build", FORMAT_INVALID, 'The offset value of PCD %s.%s should be %s-byte aligned.' % (DscPcdEntry.TokenSpaceGuidCName, DscPcdEntry.TokenCName, Alignment))
-                                VpdFile.Add(DscPcdEntry, Sku.VpdOffset)
+                                if PcdValue not in SkuValueMap:
+                                    SkuValueMap[PcdValue] = []
+                                    VpdFile.Add(DscPcdEntry, Sku.VpdOffset)
+                                SkuValueMap[PcdValue].append(Sku)
                                 if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
                                     NeedProcessVpdMapFile = True 
                             if DscPcdEntry.DatumType == 'VOID*' and PcdValue.startswith("L"):
@@ -1783,9 +1782,7 @@ class PlatformAutoGen(AutoGen):
                                 OtherPcdArray.append(DscPcdEntry)
                                 
                                 # if the offset of a VPD is *, then it need to be fixed up by third party tool.
-                                                       
-                    
-                    
+                            VpdSkuMap[DscPcd] = SkuValueMap
             if (self.Platform.FlashDefinition == None or self.Platform.FlashDefinition == '') and \
                VpdFile.GetCount() != 0:
                 EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE, 
@@ -1804,17 +1801,37 @@ class PlatformAutoGen(AutoGen):
                         VpdFile.Read(VpdMapFilePath)
 
                         # Fixup "*" offset
-                        for Pcd in self._DynamicPcdList:
+                        for pcd in VpdSkuMap:
+                            vpdinfo = VpdFile.GetVpdInfo(pcd)
+                            if vpdinfo is None:
                             # just pick the a value to determine whether is unicode string type
-                            i = 0
-                            for (SkuName,Sku) in Pcd.SkuInfoList.items():                        
-                                if Sku.VpdOffset == "*":
-                                    Sku.VpdOffset = VpdFile.GetOffset(Pcd)[i].strip()
-                                i += 1
+                                continue
+                            for pcdvalue in VpdSkuMap[pcd]:
+                                for sku in VpdSkuMap[pcd][pcdvalue]:
+                                    for item in vpdinfo:
+                                        if item[2] == pcdvalue:
+                                            sku.VpdOffset = item[1]
                     else:
                         EdkLogger.error("build", FILE_READ_FAILURE, "Can not find VPD map file %s to fix up VPD offset." % VpdMapFilePath)
 
-            # Delete the DynamicPcdList At the last time enter into this function 
+            # Delete the DynamicPcdList At the last time enter into this function
+            for Pcd in self._DynamicPcdList:
+                # just pick the a value to determine whether is unicode string type
+                Sku = Pcd.SkuInfoList[Pcd.SkuInfoList.keys()[0]]
+                Sku.VpdOffset = Sku.VpdOffset.strip()
+
+                if Pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
+                    Pcd.DatumType = "VOID*"
+
+                PcdValue = Sku.DefaultValue
+                if Pcd.DatumType == 'VOID*' and PcdValue.startswith("L"):
+                    # if found PCD which datum value is unicode string the insert to left size of UnicodeIndex
+                    UnicodePcdArray.append(Pcd)
+                elif len(Sku.VariableName) > 0:
+                    # if found HII type PCD then insert to right of UnicodeIndex
+                    HiiPcdArray.append(Pcd)
+                else:
+                    OtherPcdArray.append(Pcd)
             del self._DynamicPcdList[:]
         self._DynamicPcdList.extend(UnicodePcdArray)
         self._DynamicPcdList.extend(HiiPcdArray)

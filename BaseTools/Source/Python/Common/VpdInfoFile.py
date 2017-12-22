@@ -79,6 +79,7 @@ class VpdInfoFile:
         #           @see BuildClassObject.PcdClassObject
         #  Value  : offset in different SKU such as [sku1_offset, sku2_offset]
         self._VpdArray = {}
+        self._VpdInfo = {}
     
     ## Add a VPD PCD collected from platform's autogen when building.
     #
@@ -179,6 +180,9 @@ class VpdInfoFile:
             
             Found = False
             
+            if (TokenSpaceName, PcdTokenName) not in self._VpdInfo:
+                self._VpdInfo[(TokenSpaceName, PcdTokenName)] = []
+            self._VpdInfo[(TokenSpaceName, PcdTokenName)].append((SkuId,Offset, Value))
             for VpdObject in self._VpdArray.keys():
                 VpdObjectTokenCName = VpdObject.TokenCName
                 for PcdItem in GlobalData.MixedPcd:
@@ -217,6 +221,8 @@ class VpdInfoFile:
             return None
         
         return self._VpdArray[vpd]
+    def GetVpdInfo(self,(PcdTokenName,TokenSpaceName)):
+        return self._VpdInfo.get((TokenSpaceName, PcdTokenName))
     
 ## Call external BPDG tool to process VPD file
 #    
