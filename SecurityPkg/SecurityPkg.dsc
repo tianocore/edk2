@@ -160,11 +160,6 @@
   #SecurityPkg/UserIdentification/UserProfileManagerDxe/UserProfileManagerDxe.inf
 
   #
-  # Application
-  #
-  SecurityPkg/Application/RngTest/RngTest.inf
-
-  #
   # TPM
   #
   SecurityPkg/Library/DxeTpmMeasureBootLib/DxeTpmMeasureBootLib.inf
