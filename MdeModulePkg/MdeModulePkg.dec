@@ -1907,5 +1907,16 @@
   # @Prompt If there is any test key used by the platform.
   gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed|FALSE|BOOLEAN|0x00030003
 
+[PcdsDynamicEx]
+  ## This dynamic PCD enables the default variable setting.
+  #  Its value is the default store ID value. The default value is zero as Standard default.
+  #  When its value is set in PEI, it will trig the default setting to be applied as the default EFI variable.
+  # @Prompt NV Storage DefaultId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNvStoreDefaultId|0x0|UINT16|0x00030004
+
+  ## This dynamic PCD holds the DynamicHii PCD value. Its value is the auto generated.
+  # @Prompt NV Storage Default Value Buffer
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNvStoreDefaultValueBuffer|{0x0}|VOID*|0x00030005
+
 [UserExtensions.TianoCore."ExtraFiles"]
   MdeModulePkgExtra.uni

@@ -1215,3 +1215,12 @@
                                                                                     "   TRUE  - UEFI Stack Guard will be enabled.<BR>\n"
                                                                                     "   FALSE - UEFI Stack Guard will be disabled.<BR>"
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSetNvStoreDefaultId_PROMPT  #language en-US "NV Storage DefaultId"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdSetNvStoreDefaultId_HELP    #language en-US "This dynamic PCD enables the default variable setting.\n"
+                                                                                    "  Its value is the default store ID value. The default value is zero as Standard default.\n"
+                                                                                    "  When its value is set in PEI, it will trig the default setting to be applied as the default EFI variable.\n"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNvStoreDefaultValueBuffer_PROMPT  #language en-US "NV Storage Default Value Buffer"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNvStoreDefaultValueBuffer_HELP    #language en-US "This dynamic PCD holds the DynamicHii PCD value. Its value is the auto generated.\n"

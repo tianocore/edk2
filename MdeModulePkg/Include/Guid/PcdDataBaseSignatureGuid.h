@@ -146,5 +146,74 @@ typedef struct {
   DXE_PCD_DATABASE  *DxeDb;
 } PCD_DATABASE;
 
+typedef struct {
+  UINT32 Offset:24;
+  UINT32 Value:8;
+} PCD_DATA_DELTA;
+
+typedef struct {
+  SKU_ID SkuId;
+  UINT16 DefaultId;
+  UINT8  Reserved[6];
+} PCD_DEFAULT_INFO;
+
+typedef struct {
+  //
+  // Full size, it must be at 8 byte alignment.
+  //
+  UINT32 DataSize;
+  //
+  // HeaderSize includes HeaderSize fields and DefaultInfo arrays
+  //
+  UINT32 HeaderSize;
+  //
+  // DefaultInfo arrays those have the same default setting.
+  //
+  PCD_DEFAULT_INFO DefaultInfo[1];
+  //
+  // Default data is stored as variable storage or the array of DATA_DELTA.
+  //
+} PCD_DEFAULT_DATA;
+
+#define PCD_NV_STORE_DEFAULT_BUFFER_SIGNATURE SIGNATURE_32('N', 'S', 'D', 'B')
+
+typedef struct {
+  //
+  // PCD_NV_STORE_DEFAULT_BUFFER_SIGNATURE
+  //
+  UINT32    Signature;
+  //
+  // Length of the taken default buffer
+  //
+  UINT32    Length;
+  //
+  // Length of the total reserved buffer
+  //
+  UINT32    MaxLength;
+  //
+  // Reserved for 8 byte alignment
+  //
+  UINT32    Reserved;
+  // one or more PCD_DEFAULT_DATA
+} PCD_NV_STORE_DEFAULT_BUFFER_HEADER;
+
+//
+// NvStoreDefaultValueBuffer layout:
+// +-------------------------------------+
+// | PCD_NV_STORE_DEFAULT_BUFFER_HEADER  |
+// +-------------------------------------+
+// | PCD_DEFAULT_DATA (DEFAULT, Standard)|
+// +-------------------------------------+
+// | PCD_DATA_DELTA   (DEFAULT, Standard)|
+// +-------------------------------------+
+// | ......                              |
+// +-------------------------------------+
+// | PCD_DEFAULT_DATA (SKU A, Standard)  |
+// +-------------------------------------+
+// | PCD_DATA_DELTA   (SKU A, Standard)  |
+// +-------------------------------------+
+// | ......                              |
+// +-------------------------------------+
+//
 
 #endif
