@@ -62,11 +62,6 @@ typedef struct  {
 } DYNAMICEX_MAPPING;
 
 typedef struct {
-  UINT32  SkuDataStartOffset;   // Offset(with DATUM TYPE info) from the PCD_DB.
-  UINT32  SkuIdTableOffset;     // Offset from the PCD_DB.
-} SKU_HEAD;
-
-typedef struct {
   UINT32  StringIndex;          // Offset in String Table in units of UINT8.
   UINT32  DefaultValueOffset;   // Offset of the Default Value.
   UINT16  GuidTableIndex;       // Offset in Guid Table in units of GUID.
@@ -94,8 +89,9 @@ typedef UINT32 TABLE_OFFSET;
 typedef struct {
     GUID                  Signature;            // PcdDataBaseGuid.
     UINT32                BuildVersion;
-    UINT32                Length;
+    UINT32                Length;               // Length of DEFAULT SKU PCD DB
     SKU_ID                SystemSkuId;          // Current SkuId value.
+    UINT32                LengthForAllSkus;     // Length of all SKU PCD DB
     UINT32                UninitDataBaseSize;   // Total size for PCD those default value with 0.
     TABLE_OFFSET          LocalTokenNumberTableOffset;
     TABLE_OFFSET          ExMapTableOffset;
@@ -107,7 +103,7 @@ typedef struct {
     UINT16                LocalTokenCount;      // LOCAL_TOKEN_NUMBER for all.
     UINT16                ExTokenCount;         // EX_TOKEN_NUMBER for DynamicEx.
     UINT16                GuidTableCount;       // The Number of Guid in GuidTable.
-    UINT8                 Pad[2];               // Pad bytes to satisfy the alignment.
+    UINT8                 Pad[6];               // Pad bytes to satisfy the alignment.
 
     //
     // Default initialized external PCD database binary structure
@@ -115,7 +111,6 @@ typedef struct {
     // Padding is needed to keep necessary alignment
     //
     //SKU_ID                         SkuIdTable[];            // SkuIds system supports.
-    //SKU_ID                         SkuIndexTable[];         // SkuIds for each PCD with SKU enable.
     //UINT64                         ValueUint64[];
     //UINT32                         ValueUint32[];
     //VPD_HEAD                       VpdHead[];               // VPD Offset
@@ -125,7 +120,6 @@ typedef struct {
     //STRING_HEAD                    StringHead[];            // String PCD
     //PCD_NAME_INDEX                 PcdNameTable[];          // PCD name index info. It can be accessed by the PcdNameTableOffset.
     //VARIABLE_HEAD                  VariableHead[];          // HII PCD
-    //SKU_HEAD                       SkuHead[];               // Store SKU info for each PCD with SKU enable.
     //UINT8                          StringTable[];           // String for String PCD value and HII PCD Variable Name. It can be accessed by StringTableOffset.
     //SIZE_INFO                      SizeTable[];             // MaxSize and CurSize for String PCD. It can be accessed by SizeTableOffset.
     //UINT16                         ValueUint16[];
@@ -215,5 +209,27 @@ typedef struct {
 // | ......                              |
 // +-------------------------------------+
 //
+
+#pragma pack(1)
+typedef struct {
+  SKU_ID    SkuId;
+  SKU_ID    SkuIdCompared;
+  UINT32    Length;
+  // PCD_DATA_DELTA   DeltaData[]
+} PCD_DATABASE_SKU_DELTA;
+
+//
+// PCD database layout:
+// +---------------------------------+
+// | PCD_DATABASE_INIT (DEFAULT SKU) |
+// +---------------------------------+
+// | PCD_DATABASE_SKU_DELTA (SKU A)  |
+// +---------------------------------+
+// | PCD_DATABASE_SKU_DELTA (SKU B)  |
+// +---------------------------------+
+// | ......                          |
+// +---------------------------------+
+//
+#pragma pack()
 
 #endif

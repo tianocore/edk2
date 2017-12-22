@@ -229,6 +229,103 @@ PcdSetNvStoreDefaultIdCallBack (
 }
 
 /**
+  Report Pei PCD database of all SKUs as Guid HOB so that DxePcd can access it.
+
+  @param PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
+  @param NotifyDescriptor  Address of the notification descriptor data structure.
+  @param Ppi               Address of the PPI that was installed.
+
+  @retval EFI_SUCCESS      Successfully update the Boot records.
+**/
+EFI_STATUS
+EFIAPI
+EndOfPeiSignalPpiNotifyCallback (
+  IN EFI_PEI_SERVICES           **PeiServices,
+  IN EFI_PEI_NOTIFY_DESCRIPTOR  *NotifyDescriptor,
+  IN VOID                       *Ppi
+  )
+{
+  PEI_PCD_DATABASE       *Database;
+  EFI_BOOT_MODE          BootMode;
+  EFI_STATUS             Status;
+  UINTN                  Instance;
+  EFI_PEI_FV_HANDLE      VolumeHandle;
+  EFI_PEI_FILE_HANDLE    FileHandle;
+  VOID                   *PcdDb;
+  UINT32                 Length;
+  PEI_PCD_DATABASE       *PeiPcdDb;
+
+  Status = PeiServicesGetBootMode(&BootMode);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Don't need to report it on S3 boot.
+  //
+  if (BootMode == BOOT_ON_S3_RESUME) {
+    return EFI_SUCCESS;
+  }
+
+  PeiPcdDb = GetPcdDatabase();
+  if (PeiPcdDb->SystemSkuId != (SKU_ID) 0) {
+    //
+    // SkuId has been set. Don't need to report it to DXE phase.
+    //
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Get full PCD database from PcdPeim FileHandle
+  //
+  Instance    = 0;
+  FileHandle  = NULL;
+  while (TRUE) {
+    //
+    // Traverse all firmware volume instances
+    //
+    Status = PeiServicesFfsFindNextVolume (Instance, &VolumeHandle);
+    //
+    // Error should not happen
+    //
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Find PcdDb file from the beginning in this firmware volume.
+    //
+    FileHandle = NULL;
+    Status = PeiServicesFfsFindFileByName (&gEfiCallerIdGuid, VolumeHandle, &FileHandle);
+    if (!EFI_ERROR (Status)) {
+      //
+      // Find PcdPeim FileHandle in this volume
+      //
+      break;
+    }
+    //
+    // We cannot find PcdPeim in this firmware volume, then search the next volume.
+    //
+    Instance++;
+  }
+
+  //
+  // Find PEI PcdDb and Build second PcdDB GuidHob
+  //
+  Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, FileHandle, &PcdDb);
+  ASSERT_EFI_ERROR (Status);
+  Length = PeiPcdDb->LengthForAllSkus;
+  Database = BuildGuidHob (&gPcdDataBaseHobGuid, Length);
+  CopyMem (Database, PcdDb, Length);
+
+  return EFI_SUCCESS;
+}
+
+EFI_PEI_NOTIFY_DESCRIPTOR mEndOfPeiSignalPpiNotifyList[] = {
+  {
+    (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+    &gEfiEndOfPeiSignalPpiGuid,
+    EndOfPeiSignalPpiNotifyCallback
+  }
+};
+
+/**
   Main entry for PCD PEIM driver.
   
   This routine initialize the PCD database for PEI phase and install PCD_PPI/EFI_PEI_PCD_PPI.
@@ -260,6 +357,9 @@ PcdPeimInit (
   // Install GET_PCD_INFO_PPI and EFI_GET_PCD_INFO_PPI.
   //
   Status = PeiServicesInstallPpi (&mPpiList2[0]);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = PeiServicesNotifyPpi (&mEndOfPeiSignalPpiNotifyList[0]);
   ASSERT_EFI_ERROR (Status);
 
   Status = PeiRegisterCallBackOnSet (
@@ -366,6 +466,14 @@ PeiPcdSetSku (
   PEI_PCD_DATABASE  *PeiPcdDb;
   SKU_ID            *SkuIdTable;
   UINTN             Index;
+  EFI_STATUS            Status;
+  UINTN                 Instance;
+  EFI_PEI_FV_HANDLE     VolumeHandle;
+  EFI_PEI_FILE_HANDLE   FileHandle;
+  VOID                  *PcdDb;
+  UINT32                Length;
+  PCD_DATABASE_SKU_DELTA *SkuDelta;
+  PCD_DATA_DELTA         *SkuDeltaData;
 
   PeiPcdDb = GetPcdDatabase();
 
@@ -391,8 +499,70 @@ PeiPcdSetSku (
   SkuIdTable = (SKU_ID *) ((UINT8 *) PeiPcdDb + PeiPcdDb->SkuIdTableOffset);
   for (Index = 0; Index < SkuIdTable[0]; Index++) {
     if (SkuId == SkuIdTable[Index + 1]) {
-      DEBUG ((EFI_D_INFO, "PcdPei - Set current SKU Id to 0x%lx.\n", (SKU_ID) SkuId));
+      break;
+    }
+  }
+
+  if (Index < SkuIdTable[0]) {
+    //
+    // Get full PCD database from PcdPeim FileHandle
+    //
+    Instance    = 0;
+    FileHandle  = NULL;
+    while (TRUE) {
+      //
+      // Traverse all firmware volume instances
+      //
+      Status = PeiServicesFfsFindNextVolume (Instance, &VolumeHandle);
+      //
+      // Error should not happen
+      //
+      ASSERT_EFI_ERROR (Status);
+
+      //
+      // Find PcdDb file from the beginning in this firmware volume.
+      //
+      FileHandle = NULL;
+      Status = PeiServicesFfsFindFileByName (&gEfiCallerIdGuid, VolumeHandle, &FileHandle);
+      if (!EFI_ERROR (Status)) {
+        //
+        // Find PcdPeim FileHandle in this volume
+        //
+        break;
+      }
+      //
+      // We cannot find PcdPeim in this firmware volume, then search the next volume.
+      //
+      Instance++;
+    }
+
+    //
+    // Find the delta data between the different Skus
+    //
+    Status = PeiServicesFfsFindSectionData (EFI_SECTION_RAW, FileHandle, &PcdDb);
+    ASSERT_EFI_ERROR (Status);
+    Length = PeiPcdDb->LengthForAllSkus;
+    Index  = (PeiPcdDb->Length + 7) & (~7);
+    SkuDelta = NULL;
+    while (Index < Length) {
+      SkuDelta = (PCD_DATABASE_SKU_DELTA *) ((UINT8 *) PcdDb + Index);
+      if (SkuDelta->SkuId == SkuId && SkuDelta->SkuIdCompared == 0) {
+        break;
+      }
+      Index = (Index + SkuDelta->Length + 7) & (~7);
+    }
+
+    //
+    // Patch the delta data into current PCD database
+    //
+    if (Index < Length && SkuDelta != NULL) {
+      SkuDeltaData = (PCD_DATA_DELTA *) (SkuDelta + 1);
+      while ((UINT8 *) SkuDeltaData < (UINT8 *) SkuDelta + SkuDelta->Length) {
+        *((UINT8 *) PeiPcdDb + SkuDeltaData->Offset) = (UINT8) SkuDeltaData->Value;
+        SkuDeltaData ++;
+      }
       PeiPcdDb->SystemSkuId = (SKU_ID) SkuId;
+      DEBUG ((DEBUG_INFO, "PcdPei - Set current SKU Id to 0x%lx.\n", (SKU_ID) SkuId));
       return;
     }
   }
@@ -401,6 +571,7 @@ PeiPcdSetSku (
   // Invalid input SkuId, the default SKU Id will be still used for the system.
   //
   DEBUG ((EFI_D_INFO, "PcdPei - Invalid input SkuId, the default SKU Id will be still used.\n"));
+
   return;
 }
 
@@ -1406,9 +1577,7 @@ GetPtrTypeSize (
 {
   INTN        SizeTableIdx;
   UINTN       LocalTokenNumber;
-  SKU_ID      *SkuIdTable;
   SIZE_INFO   *SizeTable;
-  UINTN       Index;
 
   SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, Database);
 
@@ -1432,27 +1601,12 @@ GetPtrTypeSize (
       //
       return *MaxSize;
   } else {
-    if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == 0) {
-      //
-      // We have only two entry for Non-Sku enabled PCD entry:
-      // 1) MAX SIZE
-      // 2) Current Size
-      //
-      return SizeTable[SizeTableIdx + 1];
-    } else {
-      //
-      // We have these entry for SKU enabled PCD entry
-      // 1) MAX SIZE
-      // 2) Current Size for each SKU_ID (It is equal to MaxSku).
-      //
-      SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, Database);
-      for (Index = 0; Index < SkuIdTable[0]; Index++) {
-        if (SkuIdTable[1 + Index] == Database->SystemSkuId) {
-          return SizeTable[SizeTableIdx + 1 + Index];
-        }
-      }
-      return SizeTable[SizeTableIdx + 1];
-    }
+    //
+    // We have only two entry for Non-Sku enabled PCD entry:
+    // 1) MAX SIZE
+    // 2) Current Size
+    //
+    return SizeTable[SizeTableIdx + 1];
   }
 }
 
@@ -1479,9 +1633,7 @@ SetPtrTypeSize (
 {
   INTN        SizeTableIdx;
   UINTN       LocalTokenNumber;
-  SKU_ID      *SkuIdTable;
   SIZE_INFO   *SizeTable;
-  UINTN       Index;
   UINTN       MaxSize;
   
   SizeTableIdx = GetSizeTableIndex (LocalTokenNumberTableIdx, Database);
@@ -1510,30 +1662,13 @@ SetPtrTypeSize (
        return FALSE;
     }
     
-    if ((LocalTokenNumber & PCD_TYPE_SKU_ENABLED) == 0) {
-      //
-      // We have only two entry for Non-Sku enabled PCD entry:
-      // 1) MAX SIZE
-      // 2) Current Size
-      //
-      SizeTable[SizeTableIdx + 1] = (SIZE_INFO) *CurrentSize;
-      return TRUE;
-    } else {
-      //
-      // We have these entry for SKU enabled PCD entry
-      // 1) MAX SIZE
-      // 2) Current Size for each SKU_ID (It is equal to MaxSku).
-      //
-      SkuIdTable = GetSkuIdArray (LocalTokenNumberTableIdx, Database);
-      for (Index = 0; Index < SkuIdTable[0]; Index++) {
-        if (SkuIdTable[1 + Index] == Database->SystemSkuId) {
-          SizeTable[SizeTableIdx + 1 + Index] = (SIZE_INFO) *CurrentSize;
-          return TRUE;
-        }
-      }
-      SizeTable[SizeTableIdx + 1] = (SIZE_INFO) *CurrentSize;
-      return TRUE;
-    }
+    //
+    // We have only two entry for Non-Sku enabled PCD entry:
+    // 1) MAX SIZE
+    // 2) Current Size
+    //
+    SizeTable[SizeTableIdx + 1] = (SIZE_INFO) *CurrentSize;
+    return TRUE;
   }
 
 }

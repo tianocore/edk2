@@ -338,6 +338,7 @@
   gEfiPeiPcdPpiGuid                             ## PRODUCES
   gGetPcdInfoPpiGuid                            ## SOMETIMES_PRODUCES
   gEfiGetPcdInfoPpiGuid                         ## SOMETIMES_PRODUCES
+  gEfiEndOfPeiSignalPpiGuid                     ## NOTIFY
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiFullPcdDatabaseEnable  ## CONSUMES

@@ -39,7 +39,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Please make sure the PCD Serivce DXE Version is consistent with
 // the version of the generated DXE PCD Database by build tool.
 //
-#define PCD_SERVICE_DXE_VERSION      6
+#define PCD_SERVICE_DXE_VERSION      7
 
 //
 // PCD_DXE_SERVICE_DRIVER_VERSION is defined in Autogen.h.
@@ -962,24 +962,6 @@ ExGetWorker (
   );
 
 /**
-  Find the local token number according to system SKU ID.
-
-  @param LocalTokenNumber PCD token number
-  @param Size             The size of PCD entry.
-  @param IsPeiDb          If TRUE, the PCD entry is initialized in PEI phase.
-                          If False, the PCD entry is initialized in DXE phase.
-
-  @return Token number according to system SKU ID.
-
-**/
-UINT32
-GetSkuEnabledTokenNumber (
-  UINT32 LocalTokenNumber,
-  UINTN  Size,
-  BOOLEAN IsPeiDb
-  );
-
-/**
   Get Variable which contains HII type PCD entry.
 
   @param VariableGuid    Variable's guid
@@ -1175,6 +1157,21 @@ EFIAPI
 VariableLockCallBack (
   IN EFI_EVENT          Event,
   IN VOID               *Context
+  );
+
+/**
+  Update PCD database base on current SkuId
+
+  @param   SkuId     Current SkuId
+  @param   IsPeiDb   Whether to update PEI PCD database.
+
+  @retval EFI_SUCCESS    Update PCD database successfully.
+  @retval EFI_NOT_FOUND  Not found PCD database for current SkuId.
+**/
+EFI_STATUS
+UpdatePcdDatabase (
+  IN SKU_ID        SkuId,
+  IN BOOLEAN       IsPeiDb
   );
 
 extern  PCD_DATABASE   mPcdDatabase;

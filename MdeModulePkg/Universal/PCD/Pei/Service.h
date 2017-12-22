@@ -994,21 +994,6 @@ GetExPcdTokenNumber (
   );
 
 /**
-  Find the local token number according to system SKU ID.
-
-  @param LocalTokenNumber PCD token number
-  @param Size             The size of PCD entry.
-
-  @return Token number according to system SKU ID.
-
-**/
-UINT32
-GetSkuEnabledTokenNumber (
-  UINT32 LocalTokenNumber,
-  UINTN  Size
-  );
-
-/**
   The function registers the CallBackOnSet fucntion
   according to TokenNumber and EFI_GUID space.
 
@@ -1041,21 +1026,6 @@ PeiRegisterCallBackWorker (
 PEI_PCD_DATABASE *
 BuildPcdDatabase (
   IN EFI_PEI_FILE_HANDLE    FileHandle
-  );
-
-/**
-  Get SKU ID tabble from PCD database.
-
-  @param LocalTokenNumberTableIdx Index of local token number in token number table.
-  @param Database                 PCD Database in PEI phase
-
-  @return Pointer to SKU ID array table
-
-**/
-SKU_ID *
-GetSkuIdArray (
-  IN    UINTN             LocalTokenNumberTableIdx,
-  IN    PEI_PCD_DATABASE  *Database
   );
 
 /**
