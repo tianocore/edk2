@@ -118,7 +118,7 @@ class StructurePcd(PcdClassObject):
         self.PcdMode = None
         self.SkuOverrideValues = collections.OrderedDict({})
         self.FlexibleFieldName = None
-
+        self.StructName = None
     def __repr__(self):
         return self.TypeName
 
@@ -170,6 +170,7 @@ class StructurePcd(PcdClassObject):
             self.DefaultFromDSC=None
             self.OverrideValues = PcdObject.SkuOverrideValues if PcdObject.SkuOverrideValues else self.SkuOverrideValues
             self.FlexibleFieldName = PcdObject.FlexibleFieldName if PcdObject.FlexibleFieldName else self.FlexibleFieldName
+            self.StructName = PcdObject.DatumType if PcdObject.DatumType else self.StructName
 
 ## LibraryClassObject
 #

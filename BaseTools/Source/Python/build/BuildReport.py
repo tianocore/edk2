@@ -37,19 +37,14 @@ from Common.InfClassObject import gComponentType2ModuleType
 from Common.BuildToolError import FILE_WRITE_FAILURE
 from Common.BuildToolError import CODE_ERROR
 from Common.BuildToolError import COMMAND_FAILURE
-from Common.DataType import TAB_LINE_BREAK
-from Common.DataType import TAB_DEPEX
-from Common.DataType import TAB_SLASH
-from Common.DataType import TAB_SPACE_SPLIT
-from Common.DataType import TAB_BRG_PCD
-from Common.DataType import TAB_BRG_LIBRARY
-from Common.DataType import TAB_BACK_SLASH
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 import Common.GlobalData as GlobalData
 from AutoGen.AutoGen import ModuleAutoGen
 from Common.Misc import PathClass
 from Common.String import NormPath
+from Common.DataType import *
+import collections
 
 ## Pattern to extract contents in EDK DXS files
 gDxsDependencyPattern = re.compile(r"DEPENDENCY_START(.+)DEPENDENCY_END", re.DOTALL)
@@ -144,6 +139,37 @@ def FileWrite(File, String, Wrapper=False):
     if Wrapper:
         String = textwrap.fill(String, 120)
     File.write(String + gEndOfLine)
+
+def ByteArrayForamt(Value):
+    IsByteArray = False
+    SplitNum = 16
+    ArrayList = []
+    if Value.startswith('{') and Value.endswith('}'):
+        Value = Value[1:-1]
+        ValueList = Value.split(',')
+        if len(ValueList) >= SplitNum:
+            IsByteArray = True
+    if IsByteArray:
+        if ValueList:
+            Len = len(ValueList)/SplitNum
+            for i, element in enumerate(ValueList):
+                ValueList[i] = '0x%02X' % int(element.strip(), 16)
+        if Len:
+            Id = 0
+            while (Id <= Len):
+                End = min(SplitNum*(Id+1), len(ValueList))
+                Str = ','.join(ValueList[SplitNum*Id : End])
+                if End == len(ValueList):
+                    Str += '}'
+                    ArrayList.append(Str)
+                    break
+                else:
+                    Str += ','
+                    ArrayList.append(Str)
+                Id += 1
+        else:
+            ArrayList = [Value + '}']
+    return IsByteArray, ArrayList
 
 ##
 # Find all the header file that the module source directly includes.
@@ -723,6 +749,7 @@ class PcdReport(object):
         self.UnusedPcds = {}
         self.ConditionalPcds = {}
         self.MaxLen = 0
+        self.Arch = None
         if Wa.FdfProfile:
             self.FdfPcdSet = Wa.FdfProfile.PcdDict
         else:
@@ -730,6 +757,7 @@ class PcdReport(object):
 
         self.ModulePcdOverride = {}
         for Pa in Wa.AutoGenObjectList:
+            self.Arch = Pa.Arch
             #
             # Collect all platform referenced PCDs and grouped them by PCD token space
             # GUID C Names
@@ -830,10 +858,9 @@ class PcdReport(object):
         # Collect PCDs defined in DSC common section
         #
         self.DscPcdDefault = {}
-        for Arch in Wa.ArchList:
-            Platform = Wa.BuildDatabase[Wa.MetaFile, Arch, Wa.BuildTarget, Wa.ToolChain]
-            for (TokenCName, TokenSpaceGuidCName) in Platform.Pcds:
-                DscDefaultValue = Platform.Pcds[(TokenCName, TokenSpaceGuidCName)].DscDefaultValue
+        for Pa in Wa.AutoGenObjectList:
+            for (TokenCName, TokenSpaceGuidCName) in Pa.Platform.Pcds:
+                DscDefaultValue = Pa.Platform.Pcds[(TokenCName, TokenSpaceGuidCName)].DefaultValue
                 if DscDefaultValue:
                     self.DscPcdDefault[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
 
@@ -978,39 +1005,39 @@ class PcdReport(object):
                         else:
                             DscMatch = (DscDefaultValue.strip() == PcdValue.strip())
 
+                    IsStructure = False
+                    if GlobalData.gStructurePcd and (self.Arch in GlobalData.gStructurePcd.keys()) and ((Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.gStructurePcd[self.Arch]):
+                        IsStructure = True
+                        if TypeName in ('DYNVPD', 'DEXVPD'):
+                            SkuInfoList = Pcd.SkuInfoList
+                        Pcd = GlobalData.gStructurePcd[self.Arch][(Pcd.TokenCName, Pcd.TokenSpaceGuidCName)]
+                        Pcd.DatumType = Pcd.StructName
+                        if TypeName in ('DYNVPD', 'DEXVPD'):
+                            Pcd.SkuInfoList = SkuInfoList
+                        if Pcd.OverrideValues:
+                            DscMatch = True
+                            DecMatch = False
                     #
                     # Report PCD item according to their override relationship
                     #
                     if DecMatch and InfMatch:
-                        FileWrite(File, '    %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+                        self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '  ')
                     elif BuildOptionMatch:
-                        FileWrite(File, ' *B %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+                        self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*B')
                     else:
                         if DscMatch:
                             if (Pcd.TokenCName, Key) in self.FdfPcdSet:
-                                FileWrite(File, ' *F %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+                                self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*F')
                             else:
-                                FileWrite(File, ' *P %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
+                                self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*P')
                         else:
-                            FileWrite(File, ' *M %-*s: %6s %10s = %-22s' % (self.MaxLen, PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', PcdValue.strip()))
-
-                    if TypeName in ('DYNHII', 'DEXHII', 'DYNVPD', 'DEXVPD'):
-                        for SkuInfo in Pcd.SkuInfoList.values():
-                            if TypeName in ('DYNHII', 'DEXHII'):
-                                FileWrite(File, '%*s: %s: %s' % (self.MaxLen + 4, SkuInfo.VariableGuid, SkuInfo.VariableName, SkuInfo.VariableOffset))
-                            else:
-                                FileWrite(File, '%*s' % (self.MaxLen + 4, SkuInfo.VpdOffset))
-                               
-                    if not DscMatch and DscDefaultValBak != None:
-                        FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DSC DEFAULT', DscDefaultValBak.strip()))
-
-                    if not InfMatch and InfDefaultValue != None:
-                        FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'INF DEFAULT', InfDefaultValue.strip()))
-
-                    if not DecMatch and DecDefaultValue != None:
-                        FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DEC DEFAULT', DecDefaultValue.strip()))
+                            self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*M')
 
                     if ModulePcdSet == None:
+                        if IsStructure:
+                            continue
+                        if not TypeName in ('PATCH', 'FLAG', 'FIXED'):
+                            continue
                         if not BuildOptionMatch:
                             ModuleOverride = self.ModulePcdOverride.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName), {})
                             for ModulePath in ModuleOverride:
@@ -1022,7 +1049,13 @@ class PcdReport(object):
                                     Match = (ModuleDefault.strip() == PcdValue.strip())
                                 if Match:
                                     continue
-                                FileWrite(File, ' *M %-*s = %s' % (self.MaxLen + 19, ModulePath, ModuleDefault.strip()))
+                                IsByteArray, ArrayList = ByteArrayForamt(ModuleDefault.strip())
+                                if IsByteArray:
+                                    FileWrite(File, ' *M %-*s = %s' % (self.MaxLen + 19, ModulePath, '{'))
+                                    for Array in ArrayList:
+                                        FileWrite(File, '%s' % (Array))
+                                else:
+                                    FileWrite(File, ' *M %-*s = %s' % (self.MaxLen + 19, ModulePath, ModuleDefault.strip()))
 
         if ModulePcdSet == None:
             FileWrite(File, gSectionEnd)
@@ -1031,6 +1064,181 @@ class PcdReport(object):
                 FileWrite(File, gSubSectionEnd)
 
 
+    def PrintPcdDefault(self, File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue):
+        if not DscMatch and DscDefaultValue != None:
+            Value = DscDefaultValue.strip()
+            IsByteArray, ArrayList = ByteArrayForamt(Value)
+            if IsByteArray:
+                FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DSC DEFAULT', "{"))
+                for Array in ArrayList:
+                    FileWrite(File, '%s' % (Array))
+            else:
+                FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DSC DEFAULT', Value))
+        if not InfMatch and InfDefaultValue != None:
+            Value = InfDefaultValue.strip()
+            IsByteArray, ArrayList = ByteArrayForamt(Value)
+            if IsByteArray:
+                FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'INF DEFAULT', "{"))
+                for Array in ArrayList:
+                    FileWrite(File, '%s' % (Array))
+            else:
+                FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'INF DEFAULT', Value))
+
+        if not DecMatch and DecDefaultValue != None:
+            Value = DecDefaultValue.strip()
+            IsByteArray, ArrayList = ByteArrayForamt(Value)
+            if IsByteArray:
+                FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DEC DEFAULT', "{"))
+                for Array in ArrayList:
+                    FileWrite(File, '%s' % (Array))
+            else:
+                FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DEC DEFAULT', Value))
+            if IsStructure:
+                self.PrintStructureInfo(File, Pcd.DefaultValues)
+
+    def PrintPcdValue(self, File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, Flag = '  '):
+        if not Pcd.SkuInfoList:
+            Value = Pcd.DefaultValue
+            IsByteArray, ArrayList = ByteArrayForamt(Value)
+            if IsByteArray:
+                FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '{'))
+                for Array in ArrayList:
+                    FileWrite(File, '%s' % (Array))
+            else:
+                FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', Value))
+            if IsStructure:
+                OverrideValues = Pcd.OverrideValues
+                if OverrideValues:
+                    Keys = OverrideValues.keys()
+                    Data = OverrideValues[Keys[0]]
+                    Struct = Data.values()[0]
+                    self.PrintStructureInfo(File, Struct)
+            self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
+        else:
+            FirstPrint = True
+            SkuList = sorted(Pcd.SkuInfoList.keys())
+            for Sku in SkuList:
+                SkuInfo = Pcd.SkuInfoList[Sku]
+                if TypeName in ('DYNHII', 'DEXHII'):
+                    if SkuInfo.DefaultStoreDict:
+                        DefaultStoreList = sorted(SkuInfo.DefaultStoreDict.keys())
+                        for DefaultStore in DefaultStoreList:
+                            Value = SkuInfo.DefaultStoreDict[DefaultStore]
+                            IsByteArray, ArrayList = ByteArrayForamt(Value)
+                            if FirstPrint:
+                                FirstPrint = False
+                                if IsByteArray:
+                                    FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '(' + DefaultStore + ')', '{'))
+                                    for Array in ArrayList:
+                                        FileWrite(File, '%s' % (Array))
+                                else:
+                                    FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '(' + DefaultStore + ')', Value))
+                            else:
+                                if IsByteArray:
+                                    FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '(' + DefaultStore + ')', '{'))
+                                    for Array in ArrayList:
+                                        FileWrite(File, '%s' % (Array))
+                                else:
+                                    FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '(' + DefaultStore + ')', Value))
+                            FileWrite(File, '%*s: %s: %s' % (self.MaxLen + 4, SkuInfo.VariableGuid, SkuInfo.VariableName, SkuInfo.VariableOffset))
+                            if IsStructure:
+                                OverrideValues = Pcd.OverrideValues[Sku]
+                                Struct = OverrideValues[DefaultStore]
+                                self.PrintStructureInfo(File, Struct)
+                            self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
+                elif TypeName in ('DYNVPD', 'DEXVPD'):
+                    Value = SkuInfo.DefaultValue
+                    IsByteArray, ArrayList = ByteArrayForamt(Value)
+                    if FirstPrint:
+                        FirstPrint = False
+                        if IsByteArray:
+                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', "{"))
+                            for Array in ArrayList:
+                                FileWrite(File, '%s' % (Array))
+                        else:
+                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', Value))
+                    else:
+                        if IsByteArray:
+                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ' , TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', "{"))
+                            for Array in ArrayList:
+                                FileWrite(File, '%s' % (Array))
+                        else:
+                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ' , TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', Value))
+                    FileWrite(File, '%*s' % (self.MaxLen + 4, SkuInfo.VpdOffset))
+                    if IsStructure:
+                        OverrideValues = Pcd.OverrideValues[Sku]
+                        if OverrideValues:
+                            Keys = OverrideValues.keys()
+                            Struct = OverrideValues[Keys[0]]
+                            self.PrintStructureInfo(File, Struct)
+                    self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
+                else:
+                    Value = SkuInfo.DefaultValue
+                    IsByteArray, ArrayList = ByteArrayForamt(Value)
+                    if FirstPrint:
+                        FirstPrint = False
+                        if IsByteArray:
+                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '{'))
+                            for Array in ArrayList:
+                                FileWrite(File, '%s' % (Array))
+                        else:
+                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', Value))
+                    else:
+                        if IsByteArray:
+                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '{'))
+                            for Array in ArrayList:
+                                FileWrite(File, '%s' % (Array))
+                        else:
+                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', Value))
+                    if IsStructure:
+                        OverrideValues = Pcd.OverrideValues[Sku]
+                        if OverrideValues:
+                            Keys = OverrideValues.keys()
+                            Struct = OverrideValues[Keys[0]]
+                            self.PrintStructureInfo(File, Struct)
+                    self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
+
+    def PrintStructureInfo(self, File, Struct):
+        NewInfo = collections.OrderedDict()
+        for Key, Value in Struct.items():
+            if Key not in NewInfo:
+                NewInfo[Key] = Value[0]
+            else:
+                del NewInfo[Key]
+                NewInfo[Key] = Value[0]
+        if NewInfo:
+            for item in NewInfo:
+                FileWrite(File, '        %-*s = %s' % (self.MaxLen + 4, '.' + item, NewInfo[item]))
+
+    def StrtoHex(self, value):
+        try:
+            value = hex(int(value))
+            return value
+        except:
+            if value.startswith("L\"") and value.endswith("\""):
+                valuelist = []
+                for ch in value[2:-1]:
+                    valuelist.append(hex(ord(ch)))
+                    valuelist.append('0x00')
+                return valuelist
+            elif value.startswith("\"") and value.endswith("\""):
+                return hex(ord(value[1:-1]))
+            elif value.startswith("{") and value.endswith("}"):
+                valuelist = []
+                if ',' not in value:
+                    return value[1:-1]
+                for ch in value[1:-1].split(','):
+                    ch = ch.strip()
+                    if ch.startswith('0x') or ch.startswith('0X'):
+                        valuelist.append(ch)
+                        continue
+                    try:
+                        valuelist.append(hex(int(ch.strip())))
+                    except:
+                        pass
+                return valuelist
+            else:
+                return value
 
 ##
 # Reports platform and module Prediction information
@@ -1413,10 +1621,9 @@ class FdRegionReport(object):
         #
         # Collect PCDs defined in DSC file
         #
-        for arch in Wa.ArchList:
-            Platform = Wa.BuildDatabase[Wa.MetaFile, arch]
-            for (TokenCName, TokenSpaceGuidCName) in Platform.Pcds:
-                DscDefaultValue = Platform.Pcds[(TokenCName, TokenSpaceGuidCName)].DefaultValue
+        for Pa in Wa.AutoGenObjectList:
+            for (TokenCName, TokenSpaceGuidCName) in Pa.Platform.Pcds:
+                DscDefaultValue = Pa.Platform.Pcds[(TokenCName, TokenSpaceGuidCName)].DefaultValue
                 PlatformPcds[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
 
         #
@@ -1620,7 +1827,16 @@ class FdReport(object):
             FileWrite(File, "Size:               0x%X (%.0fK)" % (self.VPDSize, self.VPDSize / 1024.0))
             FileWrite(File, gSubSectionSep)
             for item in self.VPDInfoList:
-                FileWrite(File, item)
+                ValueList = item.split('|')
+                Value = ValueList[-1].strip()
+                IsByteArray, ArrayList = ByteArrayForamt(Value)
+                if IsByteArray:
+                    ValueList[-1] = ' {'
+                    FileWrite(File, '|'.join(ValueList))
+                    for Array in ArrayList:
+                        FileWrite(File, '%s' % (Array))
+                else:
+                    FileWrite(File, item)
             FileWrite(File, gSubSectionEnd)
         FileWrite(File, gSectionEnd)
 
@@ -1718,6 +1934,10 @@ class PlatformReport(object):
         FileWrite(File, "Architectures:        %s" % self.Architectures)
         FileWrite(File, "Tool Chain:           %s" % self.ToolChain)
         FileWrite(File, "Target:               %s" % self.Target)
+        if GlobalData.gSkuids:
+            FileWrite(File, "SKUID:                %s" % " ".join(GlobalData.gSkuids))
+        if GlobalData.gDefaultStores:
+            FileWrite(File, "DefaultStore:         %s" % " ".join(GlobalData.gDefaultStores))
         FileWrite(File, "Output Path:          %s" % self.OutputPath)
         FileWrite(File, "Build Environment:    %s" % self.BuildEnvironment)
         FileWrite(File, "Build Duration:       %s" % BuildDuration)

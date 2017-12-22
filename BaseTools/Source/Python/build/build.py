@@ -761,6 +761,8 @@ class Build():
         self.SkipAutoGen    = BuildOptions.SkipAutoGen
         self.Reparse        = BuildOptions.Reparse
         self.SkuId          = BuildOptions.SkuId
+        if self.SkuId:
+            GlobalData.gSKUID_CMD = self.SkuId
         self.ConfDirectory = BuildOptions.ConfDirectory
         self.SpawnMode      = True
         self.BuildReport    = BuildReport(BuildOptions.ReportFile, BuildOptions.ReportType)

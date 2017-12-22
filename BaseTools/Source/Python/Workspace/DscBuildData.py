@@ -159,7 +159,7 @@ class DscBuildData(PlatformBuildClassObject):
         else:
             self.OutputPath = os.path.dirname(self.DscFile)
         self.DefaultStores = None
-        self.SkuIdMgr = SkuClass(self.SkuIdentifier, self.SkuIds)
+        self.SkuIdMgr = SkuClass(self.SkuName, self.SkuIds)
         arraystr = self.SkuIdMgr.DumpSkuIdArrary()
 
     ## XXX[key] = value
@@ -185,8 +185,6 @@ class DscBuildData(PlatformBuildClassObject):
         self._SupArchList       = None
         self._BuildTargets      = None
         self._SkuName           = None
-        self._SkuIdentifier     = None
-        self._AvilableSkuIds    = None
         self._PcdInfoFlag       = None
         self._VarCheckFlag      = None
         self._FlashDefinition   = None
@@ -306,8 +304,8 @@ class DscBuildData(PlatformBuildClassObject):
             elif Name == TAB_DSC_DEFINES_SKUID_IDENTIFIER:
                 if self._SkuName == None:
                     self._SkuName = Record[2]
-                self._SkuIdentifier = Record[2]
-                self._AvilableSkuIds = Record[2]
+                if GlobalData.gSKUID_CMD:
+                    self._SkuName = GlobalData.gSKUID_CMD
             elif Name == TAB_DSC_DEFINES_PCD_INFO_GENERATION:
                 self._PcdInfoFlag = Record[2]
             elif Name == TAB_DSC_DEFINES_PCD_VAR_CHECK_GENERATION:
@@ -438,23 +436,13 @@ class DscBuildData(PlatformBuildClassObject):
             return True
         else:
             return False
-    def _GetAviableSkuIds(self):
-        if self._AvilableSkuIds:
-            return self._AvilableSkuIds
-        return self.SkuIdentifier
-    def _GetSkuIdentifier(self):
-        if self._SkuName:
-            return self._SkuName
-        if self._SkuIdentifier == None:
-            if self._Header == None:
-                self._GetHeaderInfo()
-        return self._SkuIdentifier
-    ## Retrieve SKUID_IDENTIFIER
+
+    # # Retrieve SKUID_IDENTIFIER
     def _GetSkuName(self):
         if self._SkuName == None:
             if self._Header == None:
                 self._GetHeaderInfo()
-            if (self._SkuName == None or self._SkuName not in self.SkuIds):
+            if self._SkuName == None:
                 self._SkuName = 'DEFAULT'
         return self._SkuName
 
@@ -620,6 +608,9 @@ class DscBuildData(PlatformBuildClassObject):
                 self.DefaultStores[Record[1].upper()] = (self.ToInt(Record[0]),Record[1].upper())
             if TAB_DEFAULT_STORES_DEFAULT not in self.DefaultStores:
                 self.DefaultStores[TAB_DEFAULT_STORES_DEFAULT] = (0,TAB_DEFAULT_STORES_DEFAULT)
+            GlobalData.gDefaultStores = self.DefaultStores.keys()
+            if GlobalData.gDefaultStores:
+                GlobalData.gDefaultStores.sort()
         return self.DefaultStores
 
     ## Retrieve [Components] section information
@@ -854,10 +845,14 @@ class DscBuildData(PlatformBuildClassObject):
             for pcdname in Pcds:
                 pcd = Pcds[pcdname]
                 Pcds[pcdname].SkuInfoList = {"DEFAULT":pcd.SkuInfoList[skuid] for skuid in pcd.SkuInfoList if skuid in available_sku}
+                if type(pcd) is StructurePcd and pcd.OverrideValues:
+                    Pcds[pcdname].OverrideValues = {"DEFAULT":pcd.OverrideValues[skuid] for skuid in pcd.OverrideValues if skuid in available_sku}
         else:
             for pcdname in Pcds:
                 pcd = Pcds[pcdname]
                 Pcds[pcdname].SkuInfoList = {skuid:pcd.SkuInfoList[skuid] for skuid in pcd.SkuInfoList if skuid in available_sku}
+                if type(pcd) is StructurePcd and pcd.OverrideValues:
+                    Pcds[pcdname].OverrideValues = {skuid:pcd.OverrideValues[skuid] for skuid in pcd.OverrideValues if skuid in available_sku}
         return Pcds
     def CompleteHiiPcdsDefaultStores(self,Pcds):
         HiiPcd = [Pcds[pcd] for pcd in Pcds if Pcds[pcd].Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]]
@@ -1574,6 +1569,10 @@ class DscBuildData(PlatformBuildClassObject):
 
         for pcd in Pcds.values():
             pcdDecObject = self._DecPcds[pcd.TokenCName, pcd.TokenSpaceGuidCName]
+            # Only fix the value while no value provided in DSC file.
+            for sku in pcd.SkuInfoList.values():
+                if (sku.DefaultValue == "" or sku.DefaultValue==None):
+                    sku.DefaultValue = pcdDecObject.DefaultValue
             if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
                 valuefromDec = pcdDecObject.DefaultValue
                 SkuInfo = SkuInfoClass('DEFAULT', '0', '', '', '', '', '', valuefromDec)
@@ -1872,6 +1871,10 @@ class DscBuildData(PlatformBuildClassObject):
         for pcd in Pcds.values():
             SkuInfoObj = pcd.SkuInfoList.values()[0]
             pcdDecObject = self._DecPcds[pcd.TokenCName, pcd.TokenSpaceGuidCName]
+            # Only fix the value while no value provided in DSC file.
+            for sku in pcd.SkuInfoList.values():
+                if (sku.DefaultValue == "" or sku.DefaultValue==None):
+                    sku.DefaultValue = pcdDecObject.DefaultValue
             if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
                 valuefromDec = pcdDecObject.DefaultValue
                 SkuInfo = SkuInfoClass('DEFAULT', '0', '', '', '', '', SkuInfoObj.VpdOffset, valuefromDec)
@@ -1927,8 +1930,6 @@ class DscBuildData(PlatformBuildClassObject):
     SupArchList         = property(_GetSupArch)
     BuildTargets        = property(_GetBuildTarget)
     SkuName             = property(_GetSkuName, _SetSkuName)
-    SkuIdentifier       = property(_GetSkuIdentifier)
-    AvilableSkuIds      = property(_GetAviableSkuIds)
     PcdInfoFlag         = property(_GetPcdInfoFlag)
     VarCheckFlag        = property(_GetVarCheckFlag)
     FlashDefinition     = property(_GetFdfFile)

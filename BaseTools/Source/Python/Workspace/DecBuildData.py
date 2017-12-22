@@ -401,14 +401,15 @@ class DecBuildData(PackageBuildClassObject):
         #
         PcdDict = tdict(True, 3)
         # for summarizing PCD
-        PcdSet = set()
+        PcdSet = []
         # find out all PCDs of the 'type'
 
         StrPcdSet = []
         RecordList = self._RawData[Type, self._Arch]
         for TokenSpaceGuid, PcdCName, Setting, Arch, PrivateFlag, Dummy1, Dummy2 in RecordList:
             PcdDict[Arch, PcdCName, TokenSpaceGuid] = (Setting,Dummy2)
-            PcdSet.add((PcdCName, TokenSpaceGuid))
+            if not (PcdCName, TokenSpaceGuid) in PcdSet:
+                PcdSet.append((PcdCName, TokenSpaceGuid))
 
         for PcdCName, TokenSpaceGuid in PcdSet:
             #

@@ -1144,9 +1144,9 @@ class DscParser(MetaFileParser):
                             File=self.MetaFile, Line=self._LineIndex + 1)
         if self._ValueList[2] == '':
             #
-            # The PCD values are optional for FIXEDATBUILD and PATCHABLEINMODULE
+            # The PCD values are optional for FIXEDATBUILD, PATCHABLEINMODULE, Dynamic/DynamicEx default
             #
-            if self._SectionType in (MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE):
+            if self._SectionType in (MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT):
                 return
             EdkLogger.error('Parser', FORMAT_INVALID, "No PCD value given",
                             ExtraData=self._CurrentLine + " (<TokenSpaceGuidCName>.<TokenCName>|<PcdValue>)",
