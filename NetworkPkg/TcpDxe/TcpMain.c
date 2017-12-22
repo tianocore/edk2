@@ -40,6 +40,9 @@ TcpChkDataBuf (
   UINT32 Len;
 
   for (Index = 0, Len = 0; Index < FragmentCount; Index++) {
+    if (FragmentTable[Index].FragmentBuffer == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
     Len = Len + FragmentTable[Index].FragmentLength;
   }
 
