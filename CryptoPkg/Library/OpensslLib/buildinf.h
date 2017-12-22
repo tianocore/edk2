@@ -1,2 +1,2 @@
 #define PLATFORM  "UEFI"
-#define DATE      "Tues Mar 21 01:23:45 PDT 2017"
+#define DATE      "Fri Dec 22 01:23:45 PDT 2017"

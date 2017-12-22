@@ -18,7 +18,7 @@ on the cryptography.
                              OpenSSL-Version
 =============================================================================
   EDKII supports building with the latest release of OpenSSL.
-  The latest official release is OpenSSL-1.1.0e (Released at 2017-Feb-16).
+  The latest official release is OpenSSL-1.1.0g (Released at 2017-Nov-02).
   NOTE: Only latest release version was fully validated.
         And no guarantees on build & functionality if using other versions.
 
@@ -28,13 +28,13 @@ on the cryptography.
 1. Clone the latest official OpenSSL release into the directory
      CryptoPkg/Library/OpensslLib/openssl/
 
-   Use OpenSSL-1.1.0e release as one example:
-     (OpenSSL_1_1_0e below is the tag name for the OpenSSL-1.1.0e release)
+   Use OpenSSL-1.1.0g release as one example:
+     (OpenSSL_1_1_0g below is the tag name for the OpenSSL-1.1.0g release)
      > cd CryptoPkg/Library/OpensslLib
-     > git clone -b OpenSSL_1_1_0e https://github.com/openssl/openssl openssl
+     > git clone -b OpenSSL_1_1_0g https://github.com/openssl/openssl openssl
      or
      > git clone https://github.com/openssl/openssl openssl
-     > git checkout OpenSSL_1_1_0e
+     > git checkout OpenSSL_1_1_0g
 Or
 2. Download the latest OpenSSL release package from the official website:
      https://www.openssl.org/source/
