@@ -1262,6 +1262,9 @@ class PlatformAutoGen(AutoGen):
         self._BuildCommand = None
         self._AsBuildInfList = []
         self._AsBuildModuleList = []
+
+        self.VariableInfo = None
+
         if GlobalData.gFdfParser != None:
             self._AsBuildInfList = GlobalData.gFdfParser.Profile.InfList
             for Inf in self._AsBuildInfList:
@@ -1273,6 +1276,7 @@ class PlatformAutoGen(AutoGen):
         # get library/modules for build
         self.LibraryBuildDirectoryList = []
         self.ModuleBuildDirectoryList = []
+
         return True
 
     def __repr__(self):
@@ -1355,7 +1359,22 @@ class PlatformAutoGen(AutoGen):
                     LibAuto.ConstPcd[key] = Pcd.DefaultValue
 
     def CollectVariables(self, DynamicPcdSet):
+
+        VpdRegionSize = 0
+        VpdRegionBase = 0
+        if self.Workspace.FdfFile:
+            FdDict = self.Workspace.FdfProfile.FdDict[GlobalData.gFdfParser.CurrentFdName]
+            for FdRegion in FdDict.RegionList:
+                for item in FdRegion.RegionDataList:
+                    if self.Platform.VpdToolGuid.strip() and self.Platform.VpdToolGuid in item:
+                        VpdRegionSize = FdRegion.Size
+                        VpdRegionBase = FdRegion.Offset
+                        break
+
+
         VariableInfo = VariableMgr(self.DscBuildDataObj._GetDefaultStores(),self.DscBuildDataObj._GetSkuIds())
+        VariableInfo.SetVpdRegionMaxSize(VpdRegionSize)
+        VariableInfo.SetVpdRegionOffset(VpdRegionBase)
         Index = 0
         for Pcd in DynamicPcdSet:
             pcdname = ".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName))
@@ -1369,9 +1388,37 @@ class PlatformAutoGen(AutoGen):
                     VariableGuid = GuidStructureStringToGuidString(VariableGuidStructure)
                     if Pcd.Phase == "DXE":
                         for StorageName in Sku.DefaultStoreDict:
-                            VariableInfo.append_variable(var_info(Index,pcdname,StorageName,SkuName, StringToArray(Sku.VariableName),VariableGuid, Sku.VariableAttribute , Pcd.DefaultValue,Sku.DefaultStoreDict[StorageName],Pcd.DatumType))
+                            VariableInfo.append_variable(var_info(Index,pcdname,StorageName,SkuName, StringToArray(Sku.VariableName),VariableGuid, Sku.VariableAttribute , Sku.HiiDefaultValue,Sku.DefaultStoreDict[StorageName],Pcd.DatumType))
             Index += 1
         return VariableInfo
+
+    def UpdateNVStoreMaxSize(self,OrgVpdFile):
+        VpdMapFilePath = os.path.join(self.BuildDir, "FV", "%s.map" % self.Platform.VpdToolGuid)
+#         VpdFile = VpdInfoFile.VpdInfoFile()
+        PcdNvStoreDfBuffer = [item for item in self._DynamicPcdList if item.TokenCName == "PcdNvStoreDefaultValueBuffer" and item.TokenSpaceGuidCName == "gEfiMdeModulePkgTokenSpaceGuid"]
+
+        if PcdNvStoreDfBuffer:
+            if os.path.exists(VpdMapFilePath):
+                OrgVpdFile.Read(VpdMapFilePath)
+                PcdItems = OrgVpdFile.GetOffset(PcdNvStoreDfBuffer[0])
+                NvStoreOffset = PcdItems[0].strip() if PcdItems else 0
+            else:
+                EdkLogger.error("build", FILE_READ_FAILURE, "Can not find VPD map file %s to fix up VPD offset." % VpdMapFilePath)
+
+            NvStoreOffset = int(NvStoreOffset,16) if NvStoreOffset.upper().startswith("0X") else int(NvStoreOffset)
+            maxsize = self.VariableInfo.VpdRegionSize  - NvStoreOffset
+            var_data = self.VariableInfo.PatchNVStoreDefaultMaxSize(maxsize)
+            default_skuobj = PcdNvStoreDfBuffer[0].SkuInfoList.get("DEFAULT")
+
+            if var_data and default_skuobj:
+                default_skuobj.DefaultValue = var_data
+                PcdNvStoreDfBuffer[0].DefaultValue = var_data
+                PcdNvStoreDfBuffer[0].SkuInfoList.clear()
+                PcdNvStoreDfBuffer[0].SkuInfoList['DEFAULT'] = default_skuobj
+                PcdNvStoreDfBuffer[0].MaxDatumSize = str(len(default_skuobj.DefaultValue.split(",")))
+
+        return OrgVpdFile
+
     ## Collect dynamic PCDs
     #
     #  Gather dynamic PCDs list from each module and their settings from platform
@@ -1605,13 +1652,12 @@ class PlatformAutoGen(AutoGen):
             #Collect DynamicHii PCD values and assign it to DynamicExVpd PCD gEfiMdeModulePkgTokenSpaceGuid.PcdNvStoreDefaultValueBuffer
             PcdNvStoreDfBuffer = VpdPcdDict.get(("PcdNvStoreDefaultValueBuffer","gEfiMdeModulePkgTokenSpaceGuid"))
             if PcdNvStoreDfBuffer:
-                var_info = self.CollectVariables(self._DynamicPcdList)
+                self.VariableInfo = self.CollectVariables(self._DynamicPcdList)
                 default_skuobj = PcdNvStoreDfBuffer.SkuInfoList.get("DEFAULT")
-                vardump = var_info.dump()
-                if vardump:
+                vardump = self.VariableInfo.dump()
+                if vardump and default_skuobj:
                     default_skuobj.DefaultValue = vardump
                     PcdNvStoreDfBuffer.DefaultValue = vardump
-                if default_skuobj:
                     PcdNvStoreDfBuffer.SkuInfoList.clear()
                     PcdNvStoreDfBuffer.SkuInfoList['DEFAULT'] = default_skuobj
                     PcdNvStoreDfBuffer.MaxDatumSize = str(len(default_skuobj.DefaultValue.split(",")))
@@ -1746,29 +1792,10 @@ class PlatformAutoGen(AutoGen):
                                 "Fail to get FLASH_DEFINITION definition in DSC file %s which is required when DSC contains VPD PCD." % str(self.Platform.MetaFile))
 
             if VpdFile.GetCount() != 0:
-                FvPath = os.path.join(self.BuildDir, "FV")
-                if not os.path.exists(FvPath):
-                    try:
-                        os.makedirs(FvPath)
-                    except:
-                        EdkLogger.error("build", FILE_WRITE_FAILURE, "Fail to create FV folder under %s" % self.BuildDir)
 
-                VpdFilePath = os.path.join(FvPath, "%s.txt" % self.Platform.VpdToolGuid)
+                self.FixVpdOffset(VpdFile)
 
-                if VpdFile.Write(VpdFilePath):
-                    # retrieve BPDG tool's path from tool_def.txt according to VPD_TOOL_GUID defined in DSC file.
-                    BPDGToolName = None
-                    for ToolDef in self.ToolDefinition.values():
-                        if ToolDef.has_key("GUID") and ToolDef["GUID"] == self.Platform.VpdToolGuid:
-                            if not ToolDef.has_key("PATH"):
-                                EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE, "PATH attribute was not provided for BPDG guid tool %s in tools_def.txt" % self.Platform.VpdToolGuid)
-                            BPDGToolName = ToolDef["PATH"]
-                            break
-                    # Call third party GUID BPDG tool.
-                    if BPDGToolName != None:
-                        VpdInfoFile.CallExtenalBPDGTool(BPDGToolName, VpdFilePath)
-                    else:
-                        EdkLogger.error("Build", FILE_NOT_FOUND, "Fail to find third-party BPDG tool to process VPD PCDs. BPDG Guid tool need to be defined in tools_def.txt and VPD_TOOL_GUID need to be provided in DSC file.")
+                self.FixVpdOffset(self.UpdateNVStoreMaxSize(VpdFile))
 
                 # Process VPD map file generated by third party BPDG tool
                 if NeedProcessVpdMapFile:
@@ -1800,7 +1827,32 @@ class PlatformAutoGen(AutoGen):
                         continue
                     pcd.SkuInfoList[SkuName] = pcd.SkuInfoList['DEFAULT']
         self.AllPcdList = self._NonDynamicPcdList + self._DynamicPcdList
-        
+
+    def FixVpdOffset(self,VpdFile ):
+        FvPath = os.path.join(self.BuildDir, "FV")
+        if not os.path.exists(FvPath):
+            try:
+                os.makedirs(FvPath)
+            except:
+                EdkLogger.error("build", FILE_WRITE_FAILURE, "Fail to create FV folder under %s" % self.BuildDir)
+
+        VpdFilePath = os.path.join(FvPath, "%s.txt" % self.Platform.VpdToolGuid)
+
+        if VpdFile.Write(VpdFilePath):
+            # retrieve BPDG tool's path from tool_def.txt according to VPD_TOOL_GUID defined in DSC file.
+            BPDGToolName = None
+            for ToolDef in self.ToolDefinition.values():
+                if ToolDef.has_key("GUID") and ToolDef["GUID"] == self.Platform.VpdToolGuid:
+                    if not ToolDef.has_key("PATH"):
+                        EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE, "PATH attribute was not provided for BPDG guid tool %s in tools_def.txt" % self.Platform.VpdToolGuid)
+                    BPDGToolName = ToolDef["PATH"]
+                    break
+            # Call third party GUID BPDG tool.
+            if BPDGToolName != None:
+                VpdInfoFile.CallExtenalBPDGTool(BPDGToolName, VpdFilePath)
+            else:
+                EdkLogger.error("Build", FILE_NOT_FOUND, "Fail to find third-party BPDG tool to process VPD PCDs. BPDG Guid tool need to be defined in tools_def.txt and VPD_TOOL_GUID need to be provided in DSC file.")
+
     ## Return the platform build data object
     def _GetPlatform(self):
         if self._Platform == None:

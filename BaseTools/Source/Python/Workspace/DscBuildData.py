@@ -1246,13 +1246,10 @@ class DscBuildData(PlatformBuildClassObject):
             CApp = CApp + '  VOID    *OriginalPcd;\n'
             CApp = CApp + '  %s      *Pcd;\n' % (Pcd.DatumType)
             CApp = CApp + '\n'
+
             Pcd.DefaultValue = Pcd.DefaultValue.strip()
-            if Pcd.DefaultValue.startswith('L"') and Pcd.DefaultValue.endswith('"'):
-                PcdDefaultValue = "{" + ",".join(self.__UNICODE2OCTList(Pcd.DefaultValue)) + "}"
-            elif Pcd.DefaultValue.startswith('"') and Pcd.DefaultValue.endswith('"'):
-                PcdDefaultValue = "{" + ",".join(self.__STRING2OCTList(Pcd.DefaultValue)) + "}"
-            else:
-                PcdDefaultValue = Pcd.DefaultValue
+            PcdDefaultValue = StringToArray(Pcd.DefaultValue)
+
             InitByteValue += '%s.%s.%s.%s|%s|%s\n' % (SkuName, DefaultStoreName, Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Pcd.DatumType, PcdDefaultValue)
 
             #
@@ -1457,32 +1454,6 @@ class DscBuildData(PlatformBuildClassObject):
         else:
             StdOut, StdErr = self.ExecuteCommand ('make clean & make -f %s' % (MakeFileName))
         Messages = StdOut.split('\r')
-        for Message in Messages:
-            if " error " in Message:
-                FileInfo = Message.strip().split('(')
-                if len (FileInfo) > 0:
-                    FileName = FileInfo [0]
-                    FileLine = FileInfo [1].split (')')[0]
-                else:
-                    FileInfo = Message.strip().split(':')
-                    FileName = FileInfo [0]
-                    FileLine = FileInfo [1]
-
-                File = open (FileName, 'r')
-                FileData = File.readlines()
-                File.close()
-                error_line = FileData[int (FileLine) - 1]
-                if r"//" in error_line:
-                    c_line,dsc_line = error_line.split(r"//")
-                else:
-                    dsc_line = error_line
-
-                message_itmes = Message.split(":")
-                for item in message_itmes:
-                    if "PcdValueInit.c" in item:
-                        message_itmes[message_itmes.index(item)] = dsc_line.strip()
-
-                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, ":".join(message_itmes[1:]))
 
         PcdValueInitExe = PcdValueInitName
         if not sys.platform == "win32":
@@ -1772,14 +1743,13 @@ class DscBuildData(PlatformBuildClassObject):
             if pcdDecObject.DatumType == 'VOID*':
                 for (_, skuobj) in pcd.SkuInfoList.items():
                     datalen = 0
-                    if skuobj.HiiDefaultValue.startswith("L"):
-                        datalen = (len(skuobj.HiiDefaultValue) - 3 + 1) * 2
-                    elif skuobj.HiiDefaultValue.startswith("{"):
-                        datalen = len(skuobj.HiiDefaultValue.split(","))
-                    else:
-                        datalen = len(skuobj.HiiDefaultValue) - 2 + 1
+                    skuobj.HiiDefaultValue = StringToArray(skuobj.HiiDefaultValue)
+                    datalen = len(skuobj.HiiDefaultValue.split(","))
                     if datalen > MaxSize:
                         MaxSize = datalen
+                    for defaultst in skuobj.DefaultStoreDict:
+                        skuobj.DefaultStoreDict[defaultst] = StringToArray(skuobj.DefaultStoreDict[defaultst])
+                pcd.DefaultValue = StringToArray(pcd.DefaultValue)
                 pcd.MaxDatumSize = str(MaxSize)
         rt, invalidhii = self.CheckVariableNameAssignment(Pcds)
         if not rt:

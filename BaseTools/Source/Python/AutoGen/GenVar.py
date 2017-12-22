@@ -51,9 +51,31 @@ class VariableMgr(object):
         self.VarInfo = []
         self.DefaultStoreMap = DefaultStoreMap
         self.SkuIdMap = SkuIdMap
+        self.VpdRegionSize = 0
+        self.VpdRegionOffset = 0
+        self.NVHeaderBuff = None
+        self.VarDefaultBuff = None
+        self.VarDeltaBuff = None
 
     def append_variable(self,uefi_var):
         self.VarInfo.append(uefi_var)
+
+    def SetVpdRegionMaxSize(self,maxsize):
+        self.VpdRegionSize = maxsize
+
+    def SetVpdRegionOffset(self,vpdoffset):
+        self.VpdRegionOffset = vpdoffset
+
+    def PatchNVStoreDefaultMaxSize(self,maxsize):
+        if not self.NVHeaderBuff:
+            return ""
+        self.NVHeaderBuff = self.NVHeaderBuff[:8] + pack("=L",maxsize)
+        default_var_bin = self.format_data(self.NVHeaderBuff + self.VarDefaultBuff + self.VarDeltaBuff)
+        value_str = "{"
+        default_var_bin_strip = [ data.strip("""'""") for data in default_var_bin]
+        value_str += ",".join(default_var_bin_strip)
+        value_str += "}"
+        return value_str
 
     def process_variable_data(self):
 
@@ -118,7 +140,7 @@ class VariableMgr(object):
         if not var_data:
             return []
 
-        pcds_default_data = var_data.get(("DEFAULT","STANDARD"))
+        pcds_default_data = var_data.get(("DEFAULT","STANDARD"),{})
         NvStoreDataBuffer = ""
         var_data_offset = collections.OrderedDict()
         offset = NvStorageHeaderSize
@@ -131,11 +153,6 @@ class VariableMgr(object):
                 var_attr_value,_ = VariableAttributes.GetVarAttributes(default_info.var_attribute)
             else:
                 var_attr_value = 0x07
-
-#             print "default var_name_buffer"
-#             print self.format_data(var_name_buffer)
-#             print "default var_buffer"
-#             print self.format_data(default_data)
 
             DataBuffer = self.AlignData(var_name_buffer + default_data)
 
@@ -151,8 +168,6 @@ class VariableMgr(object):
 
         nv_default_part = self.AlignData(self.PACK_DEFAULT_DATA(0, 0, self.unpack_data(variable_storage_header_buffer+NvStoreDataBuffer)))
 
-#         print "default whole data \n",self.format_data(nv_default_part)
-
         data_delta_structure_buffer = ""
         for skuname,defaultstore in var_data:
             if (skuname,defaultstore) == ("DEFAULT","STANDARD"):
@@ -166,11 +181,15 @@ class VariableMgr(object):
                 delta_data_set.extend(delta_data)
 
             data_delta_structure_buffer += self.AlignData(self.PACK_DELTA_DATA(skuname,defaultstore,delta_data_set))
-#             print "delta data"
-#             print delta_data_set
-#             print self.format_data(self.AlignData(self.PACK_DELTA_DATA(skuname,defaultstore,delta_data_set)))
 
-        return self.format_data(nv_default_part + data_delta_structure_buffer)
+        size = len(nv_default_part + data_delta_structure_buffer) + 12
+        maxsize = self.VpdRegionSize if self.VpdRegionSize else size
+        NV_Store_Default_Header = self.PACK_NV_STORE_DEFAULT_HEADER(size,maxsize)
+
+        self.NVHeaderBuff =  NV_Store_Default_Header
+        self.VarDefaultBuff =nv_default_part
+        self.VarDeltaBuff =  data_delta_structure_buffer
+        return self.format_data(NV_Store_Default_Header + nv_default_part + data_delta_structure_buffer)
 
 
     def format_data(self,data):
@@ -184,8 +203,6 @@ class VariableMgr(object):
         return final_data
 
     def calculate_delta(self, default, theother):
-#         print "default data \n", default
-#         print "other data \n",theother
         if len(default) - len(theother) != 0:
             EdkLogger.error("build", FORMAT_INVALID, 'The variable data length is not the same for the same PCD.')
         data_delta = []
@@ -219,6 +236,16 @@ class VariableMgr(object):
 
         return GuidBuffer + SizeBuffer + FormatBuffer + StateBuffer + reservedBuffer
 
+    def PACK_NV_STORE_DEFAULT_HEADER(self,size,maxsize):
+        Signature = pack('=B',ord('N'))
+        Signature += pack("=B",ord('S'))
+        Signature += pack("=B",ord('D'))
+        Signature += pack("=B",ord('B'))
+
+        SizeBuffer = pack("=L",size)
+        MaxSizeBuffer = pack("=L",maxsize)
+
+        return Signature + SizeBuffer + MaxSizeBuffer
 
     def PACK_VARIABLE_HEADER(self,attribute,namesize,datasize,vendorguid):
 
