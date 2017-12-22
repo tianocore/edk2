@@ -1,5 +1,5 @@
 # Ebc, Ia32, Ipf, X64
-  The binaries in this package are generated from git revision: 3ff40610334fa0f3c43659a1be10a51aacb3863b.
+  The binaries in this package are generated from git revision: ccba4d320bdc951f970edea74454e8b3b5f0bb30.
   The binaries are built with no debug info (RELEASE TARGET).
   The Component Name 2 Protocol and Unicode Collation 2 Protocol are supported.
 
