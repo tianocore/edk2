@@ -503,6 +503,14 @@ class GenVPD :
         #
         self.PcdUnknownOffsetList.sort(lambda x, y: cmp(x.PcdBinSize, y.PcdBinSize))
 
+        index =0
+        for pcd in self.PcdUnknownOffsetList:
+            index += 1
+            if pcd.PcdCName == ".".join(("gEfiMdeModulePkgTokenSpaceGuid","PcdNvStoreDefaultValueBuffer")):
+                if index != len(self.PcdUnknownOffsetList):
+                    for i in range(len(self.PcdUnknownOffsetList) - index):
+                        self.PcdUnknownOffsetList[index+i -1 ] , self.PcdUnknownOffsetList[index+i] = self.PcdUnknownOffsetList[index+i] , self.PcdUnknownOffsetList[index+i -1]
+
         #
         # Process all Offset value are "*"
         #

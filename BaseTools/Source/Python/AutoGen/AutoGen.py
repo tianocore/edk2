@@ -1393,29 +1393,29 @@ class PlatformAutoGen(AutoGen):
         return VariableInfo
 
     def UpdateNVStoreMaxSize(self,OrgVpdFile):
-        VpdMapFilePath = os.path.join(self.BuildDir, "FV", "%s.map" % self.Platform.VpdToolGuid)
-#         VpdFile = VpdInfoFile.VpdInfoFile()
-        PcdNvStoreDfBuffer = [item for item in self._DynamicPcdList if item.TokenCName == "PcdNvStoreDefaultValueBuffer" and item.TokenSpaceGuidCName == "gEfiMdeModulePkgTokenSpaceGuid"]
+        if self.VariableInfo:
+            VpdMapFilePath = os.path.join(self.BuildDir, "FV", "%s.map" % self.Platform.VpdToolGuid)
+            PcdNvStoreDfBuffer = [item for item in self._DynamicPcdList if item.TokenCName == "PcdNvStoreDefaultValueBuffer" and item.TokenSpaceGuidCName == "gEfiMdeModulePkgTokenSpaceGuid"]
 
-        if PcdNvStoreDfBuffer:
-            if os.path.exists(VpdMapFilePath):
-                OrgVpdFile.Read(VpdMapFilePath)
-                PcdItems = OrgVpdFile.GetOffset(PcdNvStoreDfBuffer[0])
-                NvStoreOffset = PcdItems[0].strip() if PcdItems else 0
-            else:
-                EdkLogger.error("build", FILE_READ_FAILURE, "Can not find VPD map file %s to fix up VPD offset." % VpdMapFilePath)
+            if PcdNvStoreDfBuffer:
+                if os.path.exists(VpdMapFilePath):
+                    OrgVpdFile.Read(VpdMapFilePath)
+                    PcdItems = OrgVpdFile.GetOffset(PcdNvStoreDfBuffer[0])
+                    NvStoreOffset = PcdItems[0].strip() if PcdItems else '0'
+                else:
+                    EdkLogger.error("build", FILE_READ_FAILURE, "Can not find VPD map file %s to fix up VPD offset." % VpdMapFilePath)
 
-            NvStoreOffset = int(NvStoreOffset,16) if NvStoreOffset.upper().startswith("0X") else int(NvStoreOffset)
-            maxsize = self.VariableInfo.VpdRegionSize  - NvStoreOffset
-            var_data = self.VariableInfo.PatchNVStoreDefaultMaxSize(maxsize)
-            default_skuobj = PcdNvStoreDfBuffer[0].SkuInfoList.get("DEFAULT")
+                NvStoreOffset = int(NvStoreOffset,16) if NvStoreOffset.upper().startswith("0X") else int(NvStoreOffset)
+                default_skuobj = PcdNvStoreDfBuffer[0].SkuInfoList.get("DEFAULT")
+                maxsize = self.VariableInfo.VpdRegionSize  - NvStoreOffset if self.VariableInfo.VpdRegionSize else len(default_skuobj.DefaultValue.split(","))
+                var_data = self.VariableInfo.PatchNVStoreDefaultMaxSize(maxsize)
 
-            if var_data and default_skuobj:
-                default_skuobj.DefaultValue = var_data
-                PcdNvStoreDfBuffer[0].DefaultValue = var_data
-                PcdNvStoreDfBuffer[0].SkuInfoList.clear()
-                PcdNvStoreDfBuffer[0].SkuInfoList['DEFAULT'] = default_skuobj
-                PcdNvStoreDfBuffer[0].MaxDatumSize = str(len(default_skuobj.DefaultValue.split(",")))
+                if var_data and default_skuobj:
+                    default_skuobj.DefaultValue = var_data
+                    PcdNvStoreDfBuffer[0].DefaultValue = var_data
+                    PcdNvStoreDfBuffer[0].SkuInfoList.clear()
+                    PcdNvStoreDfBuffer[0].SkuInfoList['DEFAULT'] = default_skuobj
+                    PcdNvStoreDfBuffer[0].MaxDatumSize = str(len(default_skuobj.DefaultValue.split(",")))
 
         return OrgVpdFile
 
@@ -1613,9 +1613,9 @@ class PlatformAutoGen(AutoGen):
         #
         # The reason of sorting is make sure the unicode string is in double-byte alignment in string table.
         #
-        UnicodePcdArray = []
-        HiiPcdArray     = []
-        OtherPcdArray   = []
+        UnicodePcdArray = set()
+        HiiPcdArray     = set()
+        OtherPcdArray   = set()
         VpdPcdDict      = {}
         VpdFile               = VpdInfoFile.VpdInfoFile()
         NeedProcessVpdMapFile = False
@@ -1775,12 +1775,12 @@ class PlatformAutoGen(AutoGen):
                                 if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
                                     NeedProcessVpdMapFile = True 
                             if DscPcdEntry.DatumType == 'VOID*' and PcdValue.startswith("L"):
-                                UnicodePcdArray.append(DscPcdEntry)
+                                UnicodePcdArray.add(DscPcdEntry)
                             elif len(Sku.VariableName) > 0:
-                                HiiPcdArray.append(DscPcdEntry)
+                                HiiPcdArray.add(DscPcdEntry)
                             else:
-                                OtherPcdArray.append(DscPcdEntry)
-                                
+                                OtherPcdArray.add(DscPcdEntry)
+
                                 # if the offset of a VPD is *, then it need to be fixed up by third party tool.
                             VpdSkuMap[DscPcd] = SkuValueMap
             if (self.Platform.FlashDefinition == None or self.Platform.FlashDefinition == '') and \
@@ -1826,16 +1826,16 @@ class PlatformAutoGen(AutoGen):
                 PcdValue = Sku.DefaultValue
                 if Pcd.DatumType == 'VOID*' and PcdValue.startswith("L"):
                     # if found PCD which datum value is unicode string the insert to left size of UnicodeIndex
-                    UnicodePcdArray.append(Pcd)
+                    UnicodePcdArray.add(Pcd)
                 elif len(Sku.VariableName) > 0:
                     # if found HII type PCD then insert to right of UnicodeIndex
-                    HiiPcdArray.append(Pcd)
+                    HiiPcdArray.add(Pcd)
                 else:
-                    OtherPcdArray.append(Pcd)
+                    OtherPcdArray.add(Pcd)
             del self._DynamicPcdList[:]
-        self._DynamicPcdList.extend(UnicodePcdArray)
-        self._DynamicPcdList.extend(HiiPcdArray)
-        self._DynamicPcdList.extend(OtherPcdArray)
+        self._DynamicPcdList.extend(list(UnicodePcdArray))
+        self._DynamicPcdList.extend(list(HiiPcdArray))
+        self._DynamicPcdList.extend(list(OtherPcdArray))
         allskuset = [(SkuName,Sku.SkuId) for pcd in self._DynamicPcdList for (SkuName,Sku) in pcd.SkuInfoList.items()]
         for pcd in self._DynamicPcdList:
             if len(pcd.SkuInfoList) == 1:
