@@ -2111,7 +2111,10 @@ class DefaultStore():
     def GetMin(self,DefaultSIdList):
         if not DefaultSIdList:
             return "STANDARD"
-        minid = min({storeid for storeid, storename in self.DefaultStores.values() if storename in DefaultSIdList}  )
+        storeidset = {storeid for storeid, storename in self.DefaultStores.values() if storename in DefaultSIdList}
+        if not storeidset:
+            return ""
+        minid = min(storeidset )
         for sid,name in self.DefaultStores.values():
             if sid == minid:
                 return name

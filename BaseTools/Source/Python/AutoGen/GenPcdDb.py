@@ -18,8 +18,10 @@ from ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER
 from ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB
 from ValidCheckingInfoObject import VAR_VALID_OBJECT_FACTORY
 from Common.VariableAttributes import VariableAttributes
+import copy
+from struct import unpack
 
-DATABASE_VERSION = 6
+DATABASE_VERSION = 7
 
 gPcdDatabaseAutoGenC = TemplateString("""
 //
@@ -114,7 +116,6 @@ gPcdDatabaseAutoGenH = TemplateString("""
 #define ${PHASE}_EXMAPPING_TABLE_SIZE           ${EXMAPPING_TABLE_SIZE}
 #define ${PHASE}_EX_TOKEN_NUMBER                ${EX_TOKEN_NUMBER}
 #define ${PHASE}_SIZE_TABLE_SIZE                ${SIZE_TABLE_SIZE}
-#define ${PHASE}_SKU_HEAD_SIZE                  ${SKU_HEAD_SIZE}
 #define ${PHASE}_GUID_TABLE_EMPTY               ${GUID_TABLE_EMPTY}
 #define ${PHASE}_STRING_TABLE_EMPTY             ${STRING_TABLE_EMPTY}
 #define ${PHASE}_SKUID_TABLE_EMPTY              ${SKUID_TABLE_EMPTY}
@@ -139,9 +140,6 @@ ${END}
 ${BEGIN}  STRING_HEAD        ${STRING_HEAD_CNAME_DECL}_${STRING_HEAD_GUID_DECL}[${STRING_HEAD_NUMSKUS_DECL}];
 ${END}
 ${BEGIN}  VARIABLE_HEAD      ${VARIABLE_HEAD_CNAME_DECL}_${VARIABLE_HEAD_GUID_DECL}_Variable_Header[${VARIABLE_HEAD_NUMSKUS_DECL}];
-${END}
-${BEGIN}  SKU_HEAD           SkuHead[${PHASE}_SKU_HEAD_SIZE];
-${END}
 ${BEGIN}  UINT8              StringTable${STRING_TABLE_INDEX}[${STRING_TABLE_LENGTH}]; /* ${STRING_TABLE_CNAME}_${STRING_TABLE_GUID} */
 ${END}
   SIZE_INFO          SizeTable[${PHASE}_SIZE_TABLE_SIZE];
@@ -653,7 +651,7 @@ def GetTokenTypeValue(TokenType):
         "PCD_TYPE_DATA":(0x0 << 28),
         "PCD_TYPE_HII":(0x8 << 28),
         "PCD_TYPE_VPD":(0x4 << 28),
-        "PCD_TYPE_SKU_ENABLED":(0x2 << 28),
+#        "PCD_TYPE_SKU_ENABLED":(0x2 << 28),
         "PCD_TYPE_STRING":(0x1 << 28),
 
         "PCD_DATUM_TYPE_SHIFT":24,
@@ -698,9 +696,7 @@ def BuildExDataBase(Dict):
     VariableTable = Dict['VARIABLE_DB_VALUE']
     DbVariableTable = DbVariableTableItemList(20, RawDataList = VariableTable)
     NumberOfSkuEnabledPcd = GetIntegerValue(Dict['SKU_HEAD_SIZE'])
-    Dict['SKUHEAD_TABLE_VALUE'] = [(0,0) for i in xrange(NumberOfSkuEnabledPcd)]
-    SkuTable = Dict['SKUHEAD_TABLE_VALUE']  # Generated later
-    DbSkuTable = DbSkuHeadTableItemList(8, RawDataList = SkuTable)
+
     Dict['STRING_TABLE_DB_VALUE'] = [StringArrayToList(x) for x in Dict['STRING_TABLE_VALUE']]
     
     StringTableValue = Dict['STRING_TABLE_DB_VALUE']
@@ -738,8 +734,8 @@ def BuildExDataBase(Dict):
     DbVardefValueBoolean = DbItemList(1, RawDataList = VardefValueBoolean)
     SkuidValue = Dict['SKUID_VALUE']
     DbSkuidValue = DbItemList(8, RawDataList = SkuidValue)
-    SkuIndexValue = Dict['SKU_INDEX_VALUE']
-    DbSkuIndexValue = DbItemList(8,RawDataList = SkuIndexValue)
+
+
     
     # Unit Db Items
     UnInitValueUint64 = Dict['UNINIT_GUID_DECL_UINT64']
@@ -754,24 +750,24 @@ def BuildExDataBase(Dict):
     DbUnInitValueBoolean = DbItemList(1, RawDataList = UnInitValueBoolean)
     PcdTokenNumberMap = Dict['PCD_ORDER_TOKEN_NUMBER_MAP']
  
-    DbNameTotle = ["SkuidValue", "SkuIndexValue", "InitValueUint64", "VardefValueUint64", "InitValueUint32", "VardefValueUint32", "VpdHeadValue", "ExMapTable",
-               "LocalTokenNumberTable", "GuidTable", "StringHeadValue",  "PcdNameOffsetTable","VariableTable","SkuTable", "StringTableLen", "PcdTokenTable", "PcdCNameTable", 
+    DbNameTotle = ["SkuidValue",  "InitValueUint64", "VardefValueUint64", "InitValueUint32", "VardefValueUint32", "VpdHeadValue", "ExMapTable",
+               "LocalTokenNumberTable", "GuidTable", "StringHeadValue",  "PcdNameOffsetTable","VariableTable", "StringTableLen", "PcdTokenTable", "PcdCNameTable",
                "SizeTableValue", "InitValueUint16", "VardefValueUint16", "InitValueUint8", "VardefValueUint8", "InitValueBoolean",
                "VardefValueBoolean", "UnInitValueUint64", "UnInitValueUint32", "UnInitValueUint16", "UnInitValueUint8", "UnInitValueBoolean"]
  
-    DbTotal = [SkuidValue, SkuIndexValue, InitValueUint64, VardefValueUint64, InitValueUint32, VardefValueUint32, VpdHeadValue, ExMapTable,
-               LocalTokenNumberTable, GuidTable, StringHeadValue,  PcdNameOffsetTable,VariableTable,SkuTable, StringTableLen, PcdTokenTable,PcdCNameTable, 
+    DbTotal = [SkuidValue,  InitValueUint64, VardefValueUint64, InitValueUint32, VardefValueUint32, VpdHeadValue, ExMapTable,
+               LocalTokenNumberTable, GuidTable, StringHeadValue,  PcdNameOffsetTable,VariableTable, StringTableLen, PcdTokenTable,PcdCNameTable,
                SizeTableValue, InitValueUint16, VardefValueUint16, InitValueUint8, VardefValueUint8, InitValueBoolean,
                VardefValueBoolean, UnInitValueUint64, UnInitValueUint32, UnInitValueUint16, UnInitValueUint8, UnInitValueBoolean]
-    DbItemTotal = [DbSkuidValue, DbSkuIndexValue, DbInitValueUint64, DbVardefValueUint64, DbInitValueUint32, DbVardefValueUint32, DbVpdHeadValue, DbExMapTable,
-               DbLocalTokenNumberTable, DbGuidTable, DbStringHeadValue,  DbPcdNameOffsetTable,DbVariableTable,DbSkuTable, DbStringTableLen, DbPcdTokenTable, DbPcdCNameTable, 
+    DbItemTotal = [DbSkuidValue,  DbInitValueUint64, DbVardefValueUint64, DbInitValueUint32, DbVardefValueUint32, DbVpdHeadValue, DbExMapTable,
+               DbLocalTokenNumberTable, DbGuidTable, DbStringHeadValue,  DbPcdNameOffsetTable,DbVariableTable, DbStringTableLen, DbPcdTokenTable, DbPcdCNameTable,
                DbSizeTableValue, DbInitValueUint16, DbVardefValueUint16, DbInitValueUint8, DbVardefValueUint8, DbInitValueBoolean,
                DbVardefValueBoolean, DbUnInitValueUint64, DbUnInitValueUint32, DbUnInitValueUint16, DbUnInitValueUint8, DbUnInitValueBoolean]
     
     # VardefValueBoolean is the last table in the init table items
     InitTableNum = DbNameTotle.index("VardefValueBoolean") + 1
     # The FixedHeader length of the PCD_DATABASE_INIT, from Signature to Pad
-    FixedHeaderLen = 72
+    FixedHeaderLen = 76
 
     # Get offset of SkuId table in the database 
     SkuIdTableOffset = FixedHeaderLen
@@ -782,26 +778,8 @@ def BuildExDataBase(Dict):
     
     
     # Get offset of SkuValue table in the database    
-    SkuTableOffset = FixedHeaderLen
-    for DbIndex in xrange(len(DbTotal)):
-        if DbTotal[DbIndex] is SkuTable:
-            break
-        elif DbItemTotal[DbIndex] is DbSkuIndexValue:
-            if DbItemTotal[DbIndex].RawDataList:
-                Count = 0
-                for item in DbItemTotal[DbIndex].RawDataList:
-                    Count += len(item)
-                SkuTableOffset += DbItemTotal[DbIndex].ItemSize * Count
-                continue
-        SkuTableOffset += DbItemTotal[DbIndex].GetListSize()
 
     # Fix up the LocalTokenNumberTable, SkuHeader table
-    SkuHeaderIndex = 0
-    if len(Dict['SKU_INDEX_VALUE']) > 0:
-        SkuIndexIndexTable = [(0) for i in xrange(len(Dict['SKU_INDEX_VALUE']))]
-        SkuIndexIndexTable[0] = 0  #Dict['SKU_INDEX_VALUE'][0][0]
-        for i in range(1,len(Dict['SKU_INDEX_VALUE'])):
-            SkuIndexIndexTable[i] = SkuIndexIndexTable[i-1]+Dict['SKU_INDEX_VALUE'][i-1][0] + 1
     for (LocalTokenNumberTableIndex, (Offset, Table)) in enumerate(LocalTokenNumberTable):
         DbIndex = 0
         DbOffset = FixedHeaderLen
@@ -809,13 +787,6 @@ def BuildExDataBase(Dict):
             if DbTotal[DbIndex] is Table:
                 DbOffset += DbItemTotal[DbIndex].GetInterOffset(Offset)
                 break
-            elif DbItemTotal[DbIndex] is DbSkuIndexValue:
-                if DbItemTotal[DbIndex].RawDataList:
-                    Count = 0
-                    for item in DbItemTotal[DbIndex].RawDataList:
-                        Count += len(item)
-                    DbOffset += DbItemTotal[DbIndex].ItemSize * Count
-                    continue
             DbOffset += DbItemTotal[DbIndex].GetListSize()
             if DbIndex + 1 == InitTableNum:
                 if DbOffset % 8:
@@ -828,16 +799,8 @@ def BuildExDataBase(Dict):
         LocalTokenNumberTable[LocalTokenNumberTableIndex] = DbOffset|int(TokenTypeValue)
         # if PCD_TYPE_SKU_ENABLED, then we need to fix up the SkuTable
         
-        SkuIndexTabalOffset = SkuIdTableOffset + len(Dict['SKUID_VALUE']) * 8
-        if (TokenTypeValue & (0x2 << 28)):
-            SkuTable[SkuHeaderIndex] = (DbOffset|int(TokenTypeValue & ~(0x2<<28)), SkuIndexTabalOffset + SkuIndexIndexTable[PcdTokenNumberMap[LocalTokenNumberTableIndex]] * 8)
-            LocalTokenNumberTable[LocalTokenNumberTableIndex] = (SkuTableOffset + SkuHeaderIndex * 8) | int(TokenTypeValue)
-            SkuHeaderIndex += 1
         
     
-    if SkuHeaderIndex == 0:
-        SkuHeaderIndex = 1
-    assert(SkuHeaderIndex == NumberOfSkuEnabledPcd)
 
     # resolve variable table offset 
     for VariableEntries in VariableTable:
@@ -850,13 +813,6 @@ def BuildExDataBase(Dict):
                 if DbTotal[DbIndex] is VariableRefTable:
                     DbOffset += DbItemTotal[DbIndex].GetInterOffset(VariableOffset)
                     break
-                elif DbItemTotal[DbIndex] is DbSkuIndexValue:
-                    if DbItemTotal[DbIndex].RawDataList:
-                        Count = 0
-                        for item in DbItemTotal[DbIndex].RawDataList:
-                            Count += len(item)
-                        DbOffset += DbItemTotal[DbIndex].ItemSize * Count
-                        continue
                 DbOffset += DbItemTotal[DbIndex].GetListSize()
                 if DbIndex + 1 == InitTableNum:
                     if DbOffset % 8:
@@ -888,13 +844,7 @@ def BuildExDataBase(Dict):
             SkuIdTableOffset = DbTotalLength
         elif DbItemTotal[DbIndex] is DbPcdNameOffsetTable:
             DbPcdNameOffset = DbTotalLength
-        elif DbItemTotal[DbIndex] is DbSkuIndexValue:
-            if DbItemTotal[DbIndex].RawDataList:
-                Count = 0
-                for item in DbItemTotal[DbIndex].RawDataList:
-                    Count += len(item)
-                DbTotalLength += DbItemTotal[DbIndex].ItemSize * Count
-                continue
+
 
         DbTotalLength += DbItemTotal[DbIndex].GetListSize()
     if not Dict['PCD_INFO_FLAG']:
@@ -935,6 +885,9 @@ def BuildExDataBase(Dict):
 
     Buffer += b
     b = pack('=Q', SystemSkuId)
+
+    Buffer += b
+    b = pack('=L', 0)
 
     Buffer += b
     b = pack('=L', UninitDataBaseSize)
@@ -1003,7 +956,7 @@ def CreatePcdDatabaseCode (Info, AutoGenC, AutoGenH):
         EdkLogger.error("build", AUTOGEN_ERROR, "Not supported PcdIsDriver type:%s" % Info.PcdIsDriver,
                         ExtraData="[%s]" % str(Info))
 
-    AdditionalAutoGenH, AdditionalAutoGenC, PcdDbBuffer = CreatePcdDatabasePhaseSpecificAutoGen (Info.PlatformInfo, 'PEI')
+    AdditionalAutoGenH, AdditionalAutoGenC, PcdDbBuffer = NewCreatePcdDatabasePhaseSpecificAutoGen (Info.PlatformInfo, 'PEI')
     AutoGenH.Append(AdditionalAutoGenH.String)
 
     Phase = gPcdPhaseMap[Info.PcdIsDriver]
@@ -1011,7 +964,7 @@ def CreatePcdDatabaseCode (Info, AutoGenC, AutoGenH):
         AutoGenC.Append(AdditionalAutoGenC.String)
 
     if Phase == 'DXE':
-        AdditionalAutoGenH, AdditionalAutoGenC, PcdDbBuffer = CreatePcdDatabasePhaseSpecificAutoGen (Info.PlatformInfo, Phase)
+        AdditionalAutoGenH, AdditionalAutoGenC, PcdDbBuffer = NewCreatePcdDatabasePhaseSpecificAutoGen (Info.PlatformInfo, Phase)
         AutoGenH.Append(AdditionalAutoGenH.String)
         AutoGenC.Append(AdditionalAutoGenC.String)
 
@@ -1022,14 +975,83 @@ def CreatePcdDatabaseCode (Info, AutoGenC, AutoGenH):
     DbFile = StringIO()
     DbFile.write(PcdDbBuffer)
     Changed = SaveFileOnChange(DbFileName, DbFile.getvalue(), True)
+def CreatePcdDataBase(PcdDBData):
+    delta = {}
+    basedata = {}
+    if not PcdDBData:
+        return ""
+    for skuname,skuid in PcdDBData:
+        if len(PcdDBData[(skuname,skuid)][1]) != len(PcdDBData[("DEFAULT","0")][1]):
+            EdkLogger.ERROR("The size of each sku in one pcd are not same")
+    for skuname,skuid in PcdDBData:
+        if skuname == "DEFAULT":
+            continue
+        delta[(skuname,skuid)] = [(index,data,hex(data)) for index,data in enumerate(PcdDBData[(skuname,skuid)][1]) if PcdDBData[(skuname,skuid)][1][index] != PcdDBData[("DEFAULT","0")][1][index]]
+        basedata[(skuname,skuid)] = [(index,PcdDBData[("DEFAULT","0")][1][index],hex(PcdDBData[("DEFAULT","0")][1][index])) for index,data in enumerate(PcdDBData[(skuname,skuid)][1]) if PcdDBData[(skuname,skuid)][1][index] != PcdDBData[("DEFAULT","0")][1][index]]
+    databasebuff = PcdDBData[("DEFAULT","0")][0]
 
+    for skuname,skuid in delta:
+        databasebuff += pack('=H', int(skuid))
+        databasebuff += pack('=H', 0)
+        databasebuff += pack('=L', 8+4*len(delta[(skuname,skuid)]))
+        for item in delta[(skuname,skuid)]:
+            databasebuff += pack("=L",item[0])
+            databasebuff = databasebuff[:-1] + pack("=B",item[1])
+    totallen = len(databasebuff)
+    totallenbuff = pack("=L",totallen)
+    newbuffer = databasebuff[:32]
+    for i in range(4):
+        newbuffer += totallenbuff[i]
+    for i in range(36,totallen):
+        newbuffer += databasebuff[i]
+
+    return newbuffer
+def CreateVarCheckBin(VarCheckTab):
+    return VarCheckTab[('DEFAULT',"0")]
+def CreateAutoGen(PcdDriverAutoGenData):
+    autogenC = TemplateString()
+    for skuname,skuid in PcdDriverAutoGenData:
+        autogenC.Append("//SKUID: %s" % skuname)
+        autogenC.Append(PcdDriverAutoGenData[(skuname,skuid)][1].String)
+    return (PcdDriverAutoGenData[(skuname,skuid)][0],autogenC)
+def NewCreatePcdDatabasePhaseSpecificAutoGen(Platform,Phase):
+    def prune_sku(pcd,skuname):
+        new_pcd = copy.deepcopy(pcd)
+        new_pcd.SkuInfoList = {skuname:pcd.SkuInfoList[skuname]}
+        return new_pcd
+    DynamicPcds = Platform.DynamicPcdList
+    DynamicPcdSet_Sku = {(SkuName,skuobj.SkuId):[] for pcd in DynamicPcds for (SkuName,skuobj) in pcd.SkuInfoList.items() }
+    for skuname,skuid in DynamicPcdSet_Sku:
+        DynamicPcdSet_Sku[(skuname,skuid)] = [prune_sku(pcd,skuname) for pcd in DynamicPcds]
+    PcdDBData = {}
+    PcdDriverAutoGenData = {}
+    VarCheckTableData = {}
+    if DynamicPcdSet_Sku:
+        for skuname,skuid in DynamicPcdSet_Sku:
+            AdditionalAutoGenH, AdditionalAutoGenC, PcdDbBuffer,VarCheckTab = CreatePcdDatabasePhaseSpecificAutoGen (Platform,DynamicPcdSet_Sku[(skuname,skuid)], Phase)
+            final_data = ()
+            for item in PcdDbBuffer:
+                final_data += unpack("B",item)
+            PcdDBData[(skuname,skuid)] = (PcdDbBuffer, final_data)
+            PcdDriverAutoGenData[(skuname,skuid)] = (AdditionalAutoGenH, AdditionalAutoGenC)
+            VarCheckTableData[(skuname,skuid)] = VarCheckTab
+        if Platform.Platform.VarCheckFlag:
+            dest = os.path.join(Platform.BuildDir, 'FV')
+            VarCheckTable = CreateVarCheckBin(VarCheckTableData)
+            VarCheckTable.dump(dest, Phase)
+        AdditionalAutoGenH, AdditionalAutoGenC =  CreateAutoGen(PcdDriverAutoGenData)
+    else:
+        AdditionalAutoGenH, AdditionalAutoGenC, PcdDbBuffer,VarCheckTab = CreatePcdDatabasePhaseSpecificAutoGen (Platform,{}, Phase)
+
+    PcdDbBuffer = CreatePcdDataBase(PcdDBData)
+    return AdditionalAutoGenH, AdditionalAutoGenC, PcdDbBuffer
 ## Create PCD database in DXE or PEI phase
 #
 #   @param      Platform    The platform object
 #   @retval     tuple       Two TemplateString objects for C code and header file,
 #                           respectively
 #
-def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
+def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
     AutoGenC = TemplateString()
     AutoGenH = TemplateString()
 
@@ -1106,8 +1128,6 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
 
     Dict['LOCAL_TOKEN_NUMBER_DB_VALUE'] = []
     Dict['VARIABLE_DB_VALUE'] = []
-    Dict['SKUHEAD_TABLE_VALUE'] = []
-    Dict['SKU_INDEX_VALUE'] = []
     
     Dict['PCD_TOKENSPACE'] = []
     Dict['PCD_CNAME'] = [] 
@@ -1132,7 +1152,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
     GuidList = []
     VarCheckTab = VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER()
     i = 0
-    ReorderedDynPcdList = GetOrderedDynamicPcdList(Platform.DynamicPcdList, Platform.PcdTokenNumber)
+    ReorderedDynPcdList = GetOrderedDynamicPcdList(DynamicPcdList, Platform.PcdTokenNumber)
     for item in ReorderedDynPcdList:
         if item.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
             item.DatumType = "VOID*"
@@ -1193,11 +1213,9 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
             Pcd.TokenTypeList = ['PCD_DATUM_TYPE_' + Pcd.DatumType]
 
         if len(Pcd.SkuInfoList) > 1:
-            Pcd.TokenTypeList += ['PCD_TYPE_SKU_ENABLED']
+#             Pcd.TokenTypeList += ['PCD_TYPE_SKU_ENABLED']
             NumberOfSkuEnabledPcd += 1
         
-        SkuIndexTableTmp = []
-        SkuIndexTableTmp.append(0)  
         SkuIdIndex = 1  
         VariableHeadList = []
         for SkuName in Pcd.SkuInfoList:
@@ -1206,10 +1224,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
             if SkuId == None or SkuId == '':
                 continue
 
-            if (SkuId + 'U') not in Dict['SKUID_VALUE']:
-                Dict['SKUID_VALUE'].append(SkuId + 'U')
                 
-            SkuIndexTableTmp.append(SkuId+'U')
             SkuIdIndex += 1
     
             if len(Sku.VariableName) > 0:
@@ -1240,32 +1255,28 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                 Pcd.InitString = 'INIT'
                 # Store all variable names of one HII PCD under different SKU to stringTable
                 # and calculate the VariableHeadStringIndex
-                if SkuIdIndex - 2 == 0:
-                    for SkuName2 in Pcd.SkuInfoList:
-                        SkuInfo = Pcd.SkuInfoList[SkuName2]
-                        if SkuInfo.SkuId == None or SkuInfo.SkuId == '':
-                            continue
-                        VariableNameStructure = StringToArray(SkuInfo.VariableName)
-                        if VariableNameStructure not in Dict['STRING_TABLE_VALUE']:
-                            Dict['STRING_TABLE_CNAME'].append(CName)
-                            Dict['STRING_TABLE_GUID'].append(TokenSpaceGuid)
-                            if StringTableIndex == 0:
-                                Dict['STRING_TABLE_INDEX'].append('')
-                            else:
-                                Dict['STRING_TABLE_INDEX'].append('_%d' % StringTableIndex)
-                            VarNameSize = len(VariableNameStructure.replace(',',' ').split())
-                            Dict['STRING_TABLE_LENGTH'].append(VarNameSize )
-                            Dict['STRING_TABLE_VALUE'].append(VariableNameStructure)
-                            StringHeadOffsetList.append(str(StringTableSize) + 'U')
-                            VarStringDbOffsetList = []
-                            VarStringDbOffsetList.append(StringTableSize)
-                            Dict['STRING_DB_VALUE'].append(VarStringDbOffsetList)      
-                            StringTableIndex += 1
-                            StringTableSize += len(VariableNameStructure.replace(',',' ').split())
-                        VariableHeadStringIndex = 0
-                        for Index in range(Dict['STRING_TABLE_VALUE'].index(VariableNameStructure)):
-                            VariableHeadStringIndex += Dict['STRING_TABLE_LENGTH'][Index]
-                        VariableHeadList.append(VariableHeadStringIndex)
+
+                VariableNameStructure = StringToArray(Sku.VariableName)
+                if VariableNameStructure not in Dict['STRING_TABLE_VALUE']:
+                    Dict['STRING_TABLE_CNAME'].append(CName)
+                    Dict['STRING_TABLE_GUID'].append(TokenSpaceGuid)
+                    if StringTableIndex == 0:
+                        Dict['STRING_TABLE_INDEX'].append('')
+                    else:
+                        Dict['STRING_TABLE_INDEX'].append('_%d' % StringTableIndex)
+                    VarNameSize = len(VariableNameStructure.replace(',',' ').split())
+                    Dict['STRING_TABLE_LENGTH'].append(VarNameSize )
+                    Dict['STRING_TABLE_VALUE'].append(VariableNameStructure)
+                    StringHeadOffsetList.append(str(StringTableSize) + 'U')
+                    VarStringDbOffsetList = []
+                    VarStringDbOffsetList.append(StringTableSize)
+                    Dict['STRING_DB_VALUE'].append(VarStringDbOffsetList)
+                    StringTableIndex += 1
+                    StringTableSize += len(VariableNameStructure.replace(',',' ').split())
+                VariableHeadStringIndex = 0
+                for Index in range(Dict['STRING_TABLE_VALUE'].index(VariableNameStructure)):
+                    VariableHeadStringIndex += Dict['STRING_TABLE_LENGTH'][Index]
+                VariableHeadList.append(VariableHeadStringIndex)
                         
                 VariableHeadStringIndex = VariableHeadList[SkuIdIndex - 2]
                 # store VariableGuid to GuidTable and get the VariableHeadGuidIndex
@@ -1411,9 +1422,6 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
             Dict['SIZE_TABLE_CURRENT_LENGTH'].append(VoidStarTypeCurrSize)
         
         
-        SkuIndexTableTmp[0] = len(SkuIndexTableTmp) - 1
-        if len(Pcd.SkuInfoList) > 1:
-            Dict['SKU_INDEX_VALUE'].append(SkuIndexTableTmp)            
 
         if 'PCD_TYPE_HII' in Pcd.TokenTypeList:
             Dict['VARIABLE_HEAD_CNAME_DECL'].append(CName)
@@ -1666,11 +1674,10 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, Phase):
                 
         AutoGenC.Append(gPcdDatabaseAutoGenC.Replace(Dict))
     
-    if Platform.Platform.VarCheckFlag:
-        dest = os.path.join(Platform.BuildDir, 'FV')
-        VarCheckTab.dump(dest, Phase)
+
+#     print Phase
     Buffer = BuildExDataBase(Dict)
-    return AutoGenH, AutoGenC, Buffer
+    return AutoGenH, AutoGenC, Buffer,VarCheckTab
 
 def GetOrderedDynamicPcdList(DynamicPcdList, PcdTokenNumberList):
     ReorderedDyPcdList = [None for i in range(len(DynamicPcdList))]

@@ -115,6 +115,9 @@ class VariableMgr(object):
 
         var_data = self.process_variable_data()
 
+        if not var_data:
+            return []
+
         pcds_default_data = var_data.get(("DEFAULT","STANDARD"))
         NvStoreDataBuffer = ""
         var_data_offset = collections.OrderedDict()
@@ -128,6 +131,11 @@ class VariableMgr(object):
                 var_attr_value,_ = VariableAttributes.GetVarAttributes(default_info.var_attribute)
             else:
                 var_attr_value = 0x07
+
+#             print "default var_name_buffer"
+#             print self.format_data(var_name_buffer)
+#             print "default var_buffer"
+#             print self.format_data(default_data)
 
             DataBuffer = self.AlignData(var_name_buffer + default_data)
 
@@ -143,6 +151,8 @@ class VariableMgr(object):
 
         nv_default_part = self.AlignData(self.PACK_DEFAULT_DATA(0, 0, self.unpack_data(variable_storage_header_buffer+NvStoreDataBuffer)))
 
+#         print "default whole data \n",self.format_data(nv_default_part)
+
         data_delta_structure_buffer = ""
         for skuname,defaultstore in var_data:
             if (skuname,defaultstore) == ("DEFAULT","STANDARD"):
@@ -156,6 +166,9 @@ class VariableMgr(object):
                 delta_data_set.extend(delta_data)
 
             data_delta_structure_buffer += self.AlignData(self.PACK_DELTA_DATA(skuname,defaultstore,delta_data_set))
+#             print "delta data"
+#             print delta_data_set
+#             print self.format_data(self.AlignData(self.PACK_DELTA_DATA(skuname,defaultstore,delta_data_set)))
 
         return self.format_data(nv_default_part + data_delta_structure_buffer)
 
@@ -171,6 +184,8 @@ class VariableMgr(object):
         return final_data
 
     def calculate_delta(self, default, theother):
+#         print "default data \n", default
+#         print "other data \n",theother
         if len(default) - len(theother) != 0:
             EdkLogger.error("build", FORMAT_INVALID, 'The variable data length is not the same for the same PCD.')
         data_delta = []
@@ -182,11 +197,13 @@ class VariableMgr(object):
     def dump(self):
 
         default_var_bin = self.new_process_varinfo()
-        value_str = "{"
-        default_var_bin_strip = [ data.strip("""'""") for data in default_var_bin]
-        value_str += ",".join(default_var_bin_strip)
-        value_str += "}"
-        return value_str
+        if default_var_bin:
+            value_str = "{"
+            default_var_bin_strip = [ data.strip("""'""") for data in default_var_bin]
+            value_str += ",".join(default_var_bin_strip)
+            value_str += "}"
+            return value_str
+        return ""
 
     def PACK_VARIABLE_STORE_HEADER(self,size):
         #Signature: gEfiVariableGuid

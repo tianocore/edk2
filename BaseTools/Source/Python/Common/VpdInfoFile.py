@@ -102,8 +102,9 @@ class VpdInfoFile:
             if Vpd.MaxDatumSize == None or Vpd.MaxDatumSize == "":
                 Vpd.MaxDatumSize = VpdInfoFile._MAX_SIZE_TYPE[Vpd.DatumType]
         else:
-            EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID,  
-                            "Invalid DatumType %s for VPD PCD %s.%s" % (Vpd.DatumType, Vpd.TokenSpaceGuidCName, Vpd.TokenCName))
+            if Vpd.MaxDatumSize <= 0:
+                EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID,
+                                "Invalid max datum size for VPD PCD %s.%s" % (Vpd.TokenSpaceGuidCName, Vpd.TokenCName))
             
         if Vpd not in self._VpdArray.keys():
             #
