@@ -4036,7 +4036,105 @@ VariableWriteServiceInitialize (
   return Status;
 }
 
+/**
+  Convert normal variable storage to the allocated auth variable storage.
 
+  @param[in]  NormalVarStorage  Pointer to the normal variable storage header
+
+  @retval the allocated auth variable storage
+**/
+VOID *
+ConvertNormalVarStorageToAuthVarStorage (
+  VARIABLE_STORE_HEADER *NormalVarStorage
+  )
+{
+  VARIABLE_HEADER *StartPtr;
+  UINT8           *NextPtr;
+  VARIABLE_HEADER *EndPtr;
+  UINTN           AuthVarStroageSize;
+  AUTHENTICATED_VARIABLE_HEADER *AuthStartPtr;
+  VARIABLE_STORE_HEADER         *AuthVarStorage;
+
+  AuthVarStroageSize  = sizeof (VARIABLE_STORE_HEADER);
+  //
+  // Set AuthFormat as FALSE for normal variable storage
+  //
+  mVariableModuleGlobal->VariableGlobal.AuthFormat = FALSE;
+
+  //
+  // Calculate Auth Variable Storage Size
+  //
+  StartPtr = GetStartPointer (NormalVarStorage);
+  EndPtr   = GetEndPointer (NormalVarStorage);
+  while (StartPtr < EndPtr) {
+    if (StartPtr->State == VAR_ADDED) {
+      AuthVarStroageSize = HEADER_ALIGN (AuthVarStroageSize);
+      AuthVarStroageSize += sizeof (AUTHENTICATED_VARIABLE_HEADER);
+      AuthVarStroageSize += StartPtr->NameSize + GET_PAD_SIZE (StartPtr->NameSize);
+      AuthVarStroageSize += StartPtr->DataSize + GET_PAD_SIZE (StartPtr->DataSize);
+    }
+    StartPtr  = GetNextVariablePtr (StartPtr);
+  }
+
+  //
+  // Allocate Runtime memory for Auth Variable Storage
+  //
+  AuthVarStorage = AllocateRuntimeZeroPool (AuthVarStroageSize);
+  ASSERT (AuthVarStorage != NULL);
+  if (AuthVarStorage == NULL) {
+    return NULL;
+  }
+
+  //
+  // Copy Variable from Normal storage to Auth storage
+  //
+  StartPtr = GetStartPointer (NormalVarStorage);
+  EndPtr   = GetEndPointer (NormalVarStorage);
+  AuthStartPtr = (AUTHENTICATED_VARIABLE_HEADER *) GetStartPointer (AuthVarStorage);
+  while (StartPtr < EndPtr) {
+    if (StartPtr->State == VAR_ADDED) {
+      AuthStartPtr = (AUTHENTICATED_VARIABLE_HEADER *) HEADER_ALIGN (AuthStartPtr);
+      //
+      // Copy Variable Header
+      //
+      AuthStartPtr->StartId     = StartPtr->StartId;
+      AuthStartPtr->State       = StartPtr->State;
+      AuthStartPtr->Attributes  = StartPtr->Attributes;
+      AuthStartPtr->NameSize    = StartPtr->NameSize;
+      AuthStartPtr->DataSize    = StartPtr->DataSize;
+      CopyGuid (&AuthStartPtr->VendorGuid, &StartPtr->VendorGuid);
+      //
+      // Copy Variable Name
+      //
+      NextPtr = (UINT8 *) (AuthStartPtr + 1);
+      CopyMem (NextPtr, GetVariableNamePtr (StartPtr), AuthStartPtr->NameSize);
+      //
+      // Copy Variable Data
+      //
+      NextPtr = NextPtr + AuthStartPtr->NameSize + GET_PAD_SIZE (AuthStartPtr->NameSize);
+      CopyMem (NextPtr, GetVariableDataPtr (StartPtr), AuthStartPtr->DataSize);
+      //
+      // Go to next variable
+      //
+      AuthStartPtr = (AUTHENTICATED_VARIABLE_HEADER *) (NextPtr + AuthStartPtr->DataSize + GET_PAD_SIZE (AuthStartPtr->DataSize));
+    }
+    StartPtr = GetNextVariablePtr (StartPtr);
+  }
+  //
+  // Update Auth Storage Header
+  //
+  AuthVarStorage->Format = NormalVarStorage->Format;
+  AuthVarStorage->State  = NormalVarStorage->State;
+  AuthVarStorage->Size = (UINT32) (UINTN) ((UINT8 *) AuthStartPtr - (UINT8 *) AuthVarStorage);
+  CopyGuid (&AuthVarStorage->Signature, &gEfiAuthenticatedVariableGuid);
+  ASSERT (AuthVarStorage->Size <= AuthVarStroageSize);
+
+  //
+  // Restore AuthFormat
+  //
+  mVariableModuleGlobal->VariableGlobal.AuthFormat = TRUE;
+  return AuthVarStorage;
+}
 /**
   Initializes variable store area for non-volatile and volatile variable.
 
@@ -4057,6 +4155,7 @@ VariableCommonInitialize (
   EFI_HOB_GUID_TYPE               *GuidHob;
   EFI_GUID                        *VariableGuid;
   EFI_FIRMWARE_VOLUME_HEADER      *NvFvHeader;
+  BOOLEAN                         IsNormalVariableHob;
 
   //
   // Allocate runtime memory for variable driver global structure.
@@ -4098,12 +4197,24 @@ VariableCommonInitialize (
   //
   // Get HOB variable store.
   //
+  IsNormalVariableHob = FALSE;
   GuidHob = GetFirstGuidHob (VariableGuid);
+  if (GuidHob == NULL && VariableGuid == &gEfiAuthenticatedVariableGuid) {
+    //
+    // Try getting it from normal variable HOB
+    //
+    GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
+    IsNormalVariableHob = TRUE;
+  }
   if (GuidHob != NULL) {
     VariableStoreHeader = GET_GUID_HOB_DATA (GuidHob);
     VariableStoreLength = GuidHob->Header.HobLength - sizeof (EFI_HOB_GUID_TYPE);
     if (GetVariableStoreStatus (VariableStoreHeader) == EfiValid) {
-      mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) AllocateRuntimeCopyPool ((UINTN) VariableStoreLength, (VOID *) VariableStoreHeader);
+      if (IsNormalVariableHob == FALSE) {
+        mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) AllocateRuntimeCopyPool ((UINTN) VariableStoreLength, (VOID *) VariableStoreHeader);
+      } else {
+        mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) ConvertNormalVarStorageToAuthVarStorage ((VOID *) VariableStoreHeader);
+      }
       if (mVariableModuleGlobal->VariableGlobal.HobVariableBase == 0) {
         FreePool (NvFvHeader);
         FreePool (mVariableModuleGlobal);
