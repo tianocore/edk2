@@ -45,7 +45,7 @@ DpcLibConstructor (
   Status = gBS->LocateProtocol (&gEfiDpcProtocolGuid, NULL, (VOID **)&mDpc);
   ASSERT_EFI_ERROR (Status);
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
