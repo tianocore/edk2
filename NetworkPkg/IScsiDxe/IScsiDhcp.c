@@ -134,6 +134,7 @@ IScsiDhcpExtractRootPath (
     CopyMem (&ConfigNvData->TargetUrl, Field->Str, Field->Len);
     ConfigNvData->TargetUrl[Field->Len + 1] = '\0';
   } else {
+    ConfigNvData->DnsMode = FALSE;
     ZeroMem(ConfigNvData->TargetUrl, sizeof (ConfigNvData->TargetUrl));
     Status = IScsiAsciiStrToIp (Field->Str, IpMode, &Ip);
     CopyMem (&ConfigNvData->TargetIp, &Ip, sizeof (EFI_IP_ADDRESS));
