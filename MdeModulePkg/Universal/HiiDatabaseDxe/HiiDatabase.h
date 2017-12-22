@@ -32,7 +32,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/HiiKeyBoardLayout.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/MdeModuleHii.h>
-
+#include <Guid/VariableFormat.h>
+#include <Guid/PcdDataBaseSignatureGuid.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -64,6 +65,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // IFR data structure
 //
 // BASE_CR (a, IFR_DEFAULT_VALUE_DATA, Entry) to get the whole structure.
+
+typedef struct {
+  LIST_ENTRY            Entry;             // Link to VarStorage Default Data
+  UINT16                DefaultId;
+  VARIABLE_STORE_HEADER *VariableStorage;
+} VARSTORAGE_DEFAULT_DATA;
 
 typedef struct {
   LIST_ENTRY          Entry;             // Link to VarStorage

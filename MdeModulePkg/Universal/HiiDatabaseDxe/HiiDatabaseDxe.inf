@@ -79,6 +79,7 @@
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNvStoreDefaultValueBuffer ## CONSUMES
 
 [Guids]  
   #
