@@ -292,7 +292,11 @@ TcpTransmitSegment (
   BOOLEAN   Syn;
   UINT32    DataLen;
 
-  ASSERT ((Nbuf != NULL) && (Nbuf->Tcp == NULL) && (TcpVerifySegment (Nbuf) != 0));
+  ASSERT ((Nbuf != NULL) && (Nbuf->Tcp == NULL));
+
+  if (TcpVerifySegment (Nbuf) == 0) {
+    return -1; 
+  }
 
   DataLen = Nbuf->TotalSize;
 
@@ -634,7 +638,11 @@ TcpGetSegment (
     Nbuf = TcpGetSegmentSock (Tcb, Seq, Len);
   }
 
-  ASSERT (TcpVerifySegment (Nbuf) != 0);
+  if (TcpVerifySegment (Nbuf) == 0) {
+    NetbufFree (Nbuf);
+    return NULL;
+  }
+  
   return Nbuf;
 }
 
@@ -701,7 +709,9 @@ TcpRetransmit (
     return -1;
   }
 
-  ASSERT (TcpVerifySegment (Nbuf) != 0);
+  if (TcpVerifySegment (Nbuf) == 0) {
+    goto OnError;
+  }
 
   if (TcpTransmitSegment (Tcb, Nbuf) != 0) {
     goto OnError;
@@ -886,8 +896,14 @@ TcpToSendData (
     Seg->End  = End;
     Seg->Flag = Flag;
 
-    ASSERT (TcpVerifySegment (Nbuf) != 0);
-    ASSERT (TcpCheckSndQue (&Tcb->SndQue) != 0);
+    if (TcpVerifySegment (Nbuf) == 0 || TcpCheckSndQue (&Tcb->SndQue) == 0) {
+      DEBUG (
+        (EFI_D_ERROR,
+        "TcpToSendData: discard a broken segment for TCB %p\n",
+        Tcb)
+        );
+      goto OnError;
+    }
 
     //
     // Don't send an empty segment here.
@@ -899,8 +915,7 @@ TcpToSendData (
         Tcb)
         );
 
-      NetbufFree (Nbuf);
-      return Sent;
+      goto OnError;
     }
 
     if (TcpTransmitSegment (Tcb, Nbuf) != 0) {
