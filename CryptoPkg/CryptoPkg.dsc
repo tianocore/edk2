@@ -125,8 +125,6 @@
   CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
   CryptoPkg/Library/TlsLib/TlsLib.inf
 
-  CryptoPkg/Application/Cryptest/Cryptest.inf
-
   CryptoPkg/CryptRuntimeDxe/CryptRuntimeDxe.inf
 
 [Components.IA32, Components.X64]
