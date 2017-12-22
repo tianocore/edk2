@@ -1,7 +1,7 @@
 /** @file
   Common head file for TCP socket.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -897,25 +897,6 @@ EFI_STATUS
 SockGetMode (
   IN     SOCKET *Sock,
   IN OUT VOID   *Mode
-  );
-
-/**
-  Configure the low level protocol to join a multicast group for
-  this socket's connection.
-
-  @param[in]  Sock             Pointer to the socket of the connection to join the
-                               specific multicast group.
-  @param[in]  GroupInfo        Pointer to the multicast group information.
-
-  @retval EFI_SUCCESS          The configuration completed successfully.
-  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket.
-  @retval EFI_NOT_STARTED      The socket is not configured.
-
-**/
-EFI_STATUS
-SockGroup (
-  IN SOCKET *Sock,
-  IN VOID   *GroupInfo
   );
 
 /**
