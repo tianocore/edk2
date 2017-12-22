@@ -330,6 +330,7 @@
   ## SOMETIMES_CONSUMES  ## HOB
   gPcdDataBaseHobGuid                           
   gPcdDataBaseSignatureGuid                     ## CONSUMES  ## GUID  # PCD database signature GUID.
+  gEfiMdeModulePkgTokenSpaceGuid                ## SOMETIMES_CONSUMES  ## GUID
 
 [Ppis]
   gEfiPeiReadOnlyVariable2PpiGuid               ## SOMETIMES_CONSUMES
@@ -344,6 +345,8 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxPeiPcdCallBackNumberPerPcdEntry ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdNvStoreDefaultValueBuffer ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNvStoreDefaultId       ## CONSUMES
 
 [Depex]
   TRUE

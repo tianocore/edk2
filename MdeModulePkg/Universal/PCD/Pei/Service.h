@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Ppi/PiPcdInfo.h>
 #include <Guid/PcdDataBaseHobGuid.h>
 #include <Guid/PcdDataBaseSignatureGuid.h>
+#include <Guid/VariableFormat.h>
 #include <Library/DebugLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/BaseLib.h>
@@ -36,7 +37,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // Please make sure the PCD Serivce PEIM Version is consistent with
 // the version of the generated PEIM PCD Database by build tool.
 //
-#define PCD_SERVICE_PEIM_VERSION      6
+#define PCD_SERVICE_PEIM_VERSION      7
 
 //
 // PCD_PEI_SERVICE_DRIVER_VERSION is defined in Autogen.h.
