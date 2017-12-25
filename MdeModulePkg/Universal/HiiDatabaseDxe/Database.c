@@ -739,6 +739,8 @@ FindQuestionDefaultSetting (
   if (VariableHeader == NULL) {
     return EFI_NOT_FOUND;
   }
+  StartBit   = 0;
+  EndBit     = 0;
   ByteOffset = IfrQuestionHdr->VarStoreInfo.VarOffset;
   if (BitFieldQuestion) {
     BitOffset  = IfrQuestionHdr->VarStoreInfo.VarOffset;
@@ -818,6 +820,7 @@ UpdateDefaultSettingInFormPackage (
 
   ZeroMem (&VarStoreQuestionHeader, sizeof (VarStoreQuestionHeader));
   PackageLength = FormPackage->FormPkgHdr.Length - sizeof (EFI_HII_PACKAGE_HEADER);
+  Width         = 0;
   IfrOffset     = 0;
   IfrScope      = 0;
   IfrOpHdr      = (EFI_IFR_OP_HEADER *) FormPackage->IfrData;
