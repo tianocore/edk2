@@ -2528,7 +2528,6 @@ Exit:
   @retval EFI_TIMEOUT           Network is connecting but timeout.
 
 **/
-
 EFI_STATUS
 EFIAPI
 NetLibDetectMediaWaitTimeout (
@@ -2573,7 +2572,7 @@ NetLibDetectMediaWaitTimeout (
     MediaPresent = TRUE;
     Status = NetLibDetectMedia (ServiceHandle, &MediaPresent);
     if (!EFI_ERROR (Status)) {
-      if (MediaPresent == TRUE) {
+      if (MediaPresent) {
         *MediaState = EFI_SUCCESS;
       } else {
         *MediaState = EFI_NO_MEDIA;
@@ -2614,7 +2613,7 @@ NetLibDetectMediaWaitTimeout (
       MediaPresent = TRUE;
       Status = NetLibDetectMedia (ServiceHandle, &MediaPresent);
       if (!EFI_ERROR (Status)) {
-        if (MediaPresent == TRUE) {
+        if (MediaPresent) {
           *MediaState = EFI_SUCCESS;
         } else {
           *MediaState = EFI_NO_MEDIA;
