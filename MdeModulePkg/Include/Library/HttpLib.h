@@ -286,8 +286,9 @@ HttpInitMsgParser (
 
   @retval EFI_SUCCESS                Successfully parse the message-body.
   @retval EFI_INVALID_PARAMETER      MsgParser is NULL or Body is NULL or BodyLength is 0.
-  @retval Others                     Operation aborted.
-
+  @retval EFI_ABORTED                Operation aborted.
+  @retval Other                      Error happened while parsing message body.
+  
 **/
 EFI_STATUS
 EFIAPI

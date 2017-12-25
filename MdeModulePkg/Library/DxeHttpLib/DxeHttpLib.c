@@ -155,7 +155,7 @@ NetHttpParseAuthorityChar (
   @param[in, out]  UrlParser      Pointer to the buffer of the parse result.
 
   @retval EFI_SUCCESS             Successfully parse the authority.
-  @retval Other                   Error happened.
+  @retval EFI_INVALID_PARAMETER   The Url is invalid to parse the authority component.
 
 **/
 EFI_STATUS
@@ -572,7 +572,7 @@ HttpUrlGetIp4 (
   Parser = (HTTP_URL_PARSER*) UrlParser;
 
   if ((Parser->FieldBitMap & BIT (HTTP_URI_FIELD_HOST)) == 0) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_NOT_FOUND;
   }
 
   Ip4String = AllocatePool (Parser->FieldData[HTTP_URI_FIELD_HOST].Length + 1);
@@ -635,7 +635,7 @@ HttpUrlGetIp6 (
   Parser = (HTTP_URL_PARSER*) UrlParser;
 
   if ((Parser->FieldBitMap & BIT (HTTP_URI_FIELD_HOST)) == 0) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_NOT_FOUND;
   }
 
   //
@@ -714,7 +714,7 @@ HttpUrlGetPort (
   Parser = (HTTP_URL_PARSER*) UrlParser;
 
   if ((Parser->FieldBitMap & BIT (HTTP_URI_FIELD_PORT)) == 0) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_NOT_FOUND;
   }
 
   PortString = AllocatePool (Parser->FieldData[HTTP_URI_FIELD_PORT].Length + 1);
@@ -1133,7 +1133,8 @@ HttpInitMsgParser (
 
   @retval EFI_SUCCESS                Successfully parse the message-body.
   @retval EFI_INVALID_PARAMETER      MsgParser is NULL or Body is NULL or BodyLength is 0.
-  @retval Others                     Operation aborted.
+  @retval EFI_ABORTED                Operation aborted.
+  @retval Other                      Error happened while parsing message body.
 
 **/
 EFI_STATUS
