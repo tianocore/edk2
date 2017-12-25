@@ -62,15 +62,17 @@ AesniSupport (
 {
   MSR_SANDY_BRIDGE_FEATURE_CONFIG_REGISTER   *MsrFeatureConfig;
 
-  if (IS_SANDY_BRIDGE_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
-      IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
-      IS_XEON_5600_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
-      IS_XEON_E7_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
-      IS_XEON_PHI_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
-    MsrFeatureConfig = (MSR_SANDY_BRIDGE_FEATURE_CONFIG_REGISTER *) ConfigData;
-    ASSERT (MsrFeatureConfig != NULL);
-    MsrFeatureConfig[ProcessorNumber].Uint64 = AsmReadMsr64 (MSR_SANDY_BRIDGE_FEATURE_CONFIG);
-    return (CpuInfo->CpuIdVersionInfoEcx.Bits.AESNI == 1);
+  if (CpuInfo->CpuIdVersionInfoEcx.Bits.AESNI == 1) {
+    if (IS_SANDY_BRIDGE_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+        IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+        IS_XEON_5600_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+        IS_XEON_E7_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+        IS_XEON_PHI_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+      MsrFeatureConfig = (MSR_SANDY_BRIDGE_FEATURE_CONFIG_REGISTER *) ConfigData;
+      ASSERT (MsrFeatureConfig != NULL);
+      MsrFeatureConfig[ProcessorNumber].Uint64 = AsmReadMsr64 (MSR_SANDY_BRIDGE_FEATURE_CONFIG);
+    }
+    return TRUE;
   }
   return FALSE;
 }
