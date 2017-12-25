@@ -372,6 +372,7 @@ HttpFindHeader (
 
 
   @retval EFI_SUCCESS             The FieldName and FieldValue are set into HttpHeader successfully.
+  @retval EFI_INVALID_PARAMETER   The parameter is invalid.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate resources.
 
 **/

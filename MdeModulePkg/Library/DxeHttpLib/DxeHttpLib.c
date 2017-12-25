@@ -1399,6 +1399,10 @@ HttpIsMessageComplete (
 {
   HTTP_BODY_PARSER      *Parser;
 
+  if (MsgParser == NULL) {
+    return FALSE;
+  }
+
   Parser = (HTTP_BODY_PARSER*) MsgParser;
 
   if (Parser->State == BodyParserComplete) {
@@ -1500,6 +1504,7 @@ AsciiStrGetNextToken (
 
 
   @retval EFI_SUCCESS             The FieldName and FieldValue are set into HttpHeader successfully.
+  @retval EFI_INVALID_PARAMETER   The parameter is invalid.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate resources.
 
 **/
@@ -1513,6 +1518,10 @@ HttpSetFieldNameAndValue (
 {
   UINTN                       FieldNameSize;
   UINTN                       FieldValueSize;
+
+  if (HttpHeader == NULL || FieldName == NULL || FieldValue == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (HttpHeader->FieldName != NULL) {
     FreePool (HttpHeader->FieldName);
@@ -1731,10 +1740,6 @@ HttpGenRequestMessage (
   UINTN                            Index;
   EFI_HTTP_UTILITIES_PROTOCOL      *HttpUtilitiesProtocol;
 
-
-  ASSERT (Message != NULL);
-
-  *RequestMsg           = NULL;
   Status                = EFI_SUCCESS;
   HttpHdrSize           = 0;
   MsgSize               = 0;
@@ -1749,7 +1754,8 @@ HttpGenRequestMessage (
   // 3. If we do not have a Request, HeaderCount should be zero
   // 4. If we do not have Request and Headers, we need at least a message-body
   //
-  if ((Message->Data.Request != NULL && Url == NULL) ||
+  if ((Message == NULL || RequestMsg == NULL || RequestMsgSize == NULL) || 
+      (Message->Data.Request != NULL && Url == NULL) ||
       (Message->Data.Request != NULL && Message->HeaderCount == 0) ||
       (Message->Data.Request == NULL && Message->HeaderCount != 0) ||
       (Message->Data.Request == NULL && Message->HeaderCount == 0 && Message->BodyLength == 0)) {
@@ -1830,6 +1836,7 @@ HttpGenRequestMessage (
   //
   // memory for the string that needs to be sent to TCP
   //
+  *RequestMsg           = NULL;
   *RequestMsg = AllocateZeroPool (MsgSize);
   if (*RequestMsg == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -2055,7 +2062,15 @@ HttpIsValidHttpHeader (
 {
   UINTN                       Index;
 
+  if (FieldName == NULL) {
+    return FALSE;
+  }
+
   for (Index = 0; Index < DeleteCount; Index++) {
+    if (DeleteList[Index] == NULL) {
+      continue;
+    }
+    
     if (AsciiStrCmp (FieldName, DeleteList[Index]) == 0) {
       return FALSE;
     }
