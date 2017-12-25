@@ -56,7 +56,7 @@ UriPercentDecode (
   HexStr[2] = '\0';
   while (Index < BufferLength) {
     if (Buffer[Index] == '%') {
-      if (!NET_IS_HEX_CHAR (Buffer[Index+1]) || !NET_IS_HEX_CHAR (Buffer[Index+2])) {
+      if (Index + 1 >= BufferLength || Index + 2 >= BufferLength || !NET_IS_HEX_CHAR (Buffer[Index+1]) || !NET_IS_HEX_CHAR (Buffer[Index+2])) {
         return EFI_INVALID_PARAMETER;
       }
       HexStr[0] = Buffer[Index+1];
@@ -1558,6 +1558,7 @@ HttpGetFieldNameAndValue (
   CHAR8  *FieldNameStr;
   CHAR8  *FieldValueStr;
   CHAR8  *StrPtr;
+  CHAR8  *EndofHeader;
 
   if (String == NULL || FieldName == NULL || FieldValue == NULL) {
     return NULL;
@@ -1568,6 +1569,16 @@ HttpGetFieldNameAndValue (
   FieldNameStr  = NULL;
   FieldValueStr = NULL;
   StrPtr        = NULL;
+  EndofHeader   = NULL;
+
+
+  //
+  // Check whether the raw HTTP header string is valid or not.
+  //
+  EndofHeader = AsciiStrStr (String, "\r\n\r\n");
+  if (EndofHeader == NULL) {
+    return NULL;
+  }
 
   //
   // Each header field consists of a name followed by a colon (":") and the field value.
@@ -1585,13 +1596,32 @@ HttpGetFieldNameAndValue (
 
   //
   // The field value MAY be preceded by any amount of LWS, though a single SP is preferred.
+  // Note: LWS  = [CRLF] 1*(SP|HT), it can be '\r\n ' or '\r\n\t' or ' ' or '\t'.
+  //       CRLF = '\r\n'.
+  //       SP   = ' '.
+  //       HT   = '\t' (Tab).
   //
   while (TRUE) {
     if (*FieldValueStr == ' ' || *FieldValueStr == '\t') {
+      //
+      // Boundary condition check. 
+      //
+      if ((UINTN)EndofHeader - (UINTN)(FieldValueStr) < 1) {
+        return NULL;  
+      }
+      
       FieldValueStr ++;
-    } else if (*FieldValueStr == '\r' && *(FieldValueStr + 1) == '\n' &&
-               (*(FieldValueStr + 2) == ' ' || *(FieldValueStr + 2) == '\t')) {
-      FieldValueStr = FieldValueStr + 3;
+    } else if (*FieldValueStr == '\r') {
+      //
+      // Boundary condition check. 
+      //
+      if ((UINTN)EndofHeader - (UINTN)(FieldValueStr) < 3) {
+        return NULL;  
+      }
+
+      if (*(FieldValueStr + 1) == '\n' && (*(FieldValueStr + 2) == ' ' || *(FieldValueStr + 2) == '\t')) {
+        FieldValueStr = FieldValueStr + 3;
+      }
     } else {
       break;
     }
