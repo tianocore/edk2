@@ -1308,9 +1308,28 @@ class DscBuildData(PlatformBuildClassObject):
             # OFFSET_OF(FlexbleArrayField) + sizeof(FlexibleArray[0]) * (HighestIndex + 1)
             #
             CApp = CApp + '  Size = sizeof(%s);\n' % (Pcd.DatumType)
+            for FieldList in [Pcd.DefaultValues]:
+                if not FieldList:
+                    continue
+                for FieldName in FieldList:
+                    FieldName = "." + FieldName
+                    IsArray = self.IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
+                    if IsArray:
+                        Value, ValueSize = ParseFieldValue (FieldList[FieldName.strip(".")][0])
+                        CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d / __ARRAY_ELEMENT_SIZE(%s, %s) + ((%d %% __ARRAY_ELEMENT_SIZE(%s, %s)) ? 1 : 0));\n' % (Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."));
+                    else:
+                        NewFieldName = ''
+                        while '[' in  FieldName:
+                            NewFieldName = NewFieldName + FieldName.split('[', 1)[0] + '[0]'
+                            ArrayIndex = int(FieldName.split('[', 1)[1].split(']', 1)[0])
+                            FieldName = FieldName.split(']', 1)[1]
+                        FieldName = NewFieldName + FieldName
+                        while '[' in FieldName:
+                            FieldName = FieldName.rsplit('[', 1)[0]
+                            CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d);\n' % (Pcd.DatumType, FieldName.strip("."), ArrayIndex + 1)
             for skuname in self.SkuIdMgr.SkuOverrideOrder():
                 inherit_OverrideValues = Pcd.SkuOverrideValues[skuname]
-                for FieldList in [Pcd.DefaultValues, inherit_OverrideValues.get(DefaultStoreName)]:
+                for FieldList in [inherit_OverrideValues.get(DefaultStoreName)]:
                     if not FieldList:
                         continue
                     for FieldName in FieldList:
@@ -1349,9 +1368,32 @@ class DscBuildData(PlatformBuildClassObject):
             #
             # Assign field values in PCD
             #
+            for FieldList in [Pcd.DefaultValues]:
+                if not FieldList:
+                    continue
+                for FieldName in FieldList:
+                    IsArray = self.IsFieldValueAnArray(FieldList[FieldName][0])
+                    try:
+                        Value, ValueSize = ParseFieldValue (FieldList[FieldName][0])
+                    except Exception:
+                        print FieldList[FieldName][0]
+                    if isinstance(Value, str):
+                        CApp = CApp + '  Pcd->%s = %s; // From %s Line %d Value %s\n' % (FieldName, Value, FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
+                    elif IsArray:
+                        #
+                        # Use memcpy() to copy value into field
+                        #
+                        CApp = CApp + '  FieldSize = __FIELD_SIZE(%s, %s);\n' % (Pcd.DatumType, FieldName)
+                        CApp = CApp + '  Value     = %s; // From %s Line %d Value %s\n' % (self.IntToCString(Value, ValueSize), FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
+                        CApp = CApp + '  memcpy (&Pcd->%s[0], Value, (FieldSize > 0 && FieldSize < %d) ? FieldSize : %d);\n' % (FieldName, ValueSize, ValueSize)
+                    else:
+                        if ValueSize > 4:
+                            CApp = CApp + '  Pcd->%s = %dULL; // From %s Line %d Value %s\n' % (FieldName, Value, FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
+                        else:
+                            CApp = CApp + '  Pcd->%s = %d; // From %s Line %d Value %s\n' % (FieldName, Value, FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
             for skuname in self.SkuIdMgr.SkuOverrideOrder():
                 inherit_OverrideValues = Pcd.SkuOverrideValues[skuname]
-                for FieldList in [Pcd.DefaultValues, Pcd.DefaultFromDSC,inherit_OverrideValues.get(DefaultStoreName)]:
+                for FieldList in [Pcd.DefaultFromDSC,inherit_OverrideValues.get(DefaultStoreName)]:
                     if not FieldList:
                         continue
                     if Pcd.DefaultFromDSC and FieldList == Pcd.DefaultFromDSC:
