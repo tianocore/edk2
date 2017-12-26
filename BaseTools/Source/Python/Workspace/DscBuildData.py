@@ -23,7 +23,8 @@ from Common.Misc import *
 from types import *
 
 from CommonDataClass.CommonClass import SkuInfoClass
-
+from Common.TargetTxtClassObject import *
+from Common.ToolDefClassObject import *
 from MetaDataTable import *
 from MetaFileTable import *
 from MetaFileParser import *
@@ -77,10 +78,10 @@ PcdMakefileHeader = '''
 
 '''
 
+WindowsCFLAGS = 'CFLAGS = $(CFLAGS) /wd4200 /wd4034 /wd4101 '
+LinuxCFLAGS = 'BUILD_CFLAGS += -Wno-pointer-to-int-cast -Wno-unused-variable '
 PcdMakefileEnd = '''
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.common
-
-CFLAGS = $(CFLAGS) /wd4200 /wd4034 /wd4101
 
 LIBS = $(LIB_PATH)\Common.lib
 
@@ -152,6 +153,7 @@ class DscBuildData(PlatformBuildClassObject):
         self._Arch = Arch
         self._Target = Target
         self._Toolchain = Toolchain
+        self._ToolChainFamily = None
         self._Clear()
         self._HandleOverridePath()
         if os.getenv("WORKSPACE"):
@@ -1458,7 +1460,7 @@ class DscBuildData(PlatformBuildClassObject):
         else:
             MakeApp = MakeApp + PcdGccMakefile
             MakeApp = MakeApp + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o\n' % (self.OutputPath, PcdValueInitName) + \
-                      'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'BUILD_CFLAGS += -Wno-pointer-to-int-cast -Wno-unused-variable\n' + 'INCLUDE +='
+                      'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'INCLUDE +='
 
         PlatformInc = {}
         for Cache in self._Bdb._CACHE_.values():
@@ -1483,6 +1485,50 @@ class DscBuildData(PlatformBuildClassObject):
                     for inc in PlatformInc[pkg]:
                         MakeApp += '-I'  + str(inc) + ' '
         MakeApp = MakeApp + '\n'
+
+        CC_FLAGS = LinuxCFLAGS
+        if sys.platform == "win32":
+            CC_FLAGS = WindowsCFLAGS
+        BuildOptions = {}
+        for Options in self.BuildOptions:
+            if Options[2] != EDKII_NAME:
+                continue
+            Family = Options[0]
+            if Family and Family != self.ToolChainFamily:
+                continue
+            Target, Tag, Arch, Tool, Attr = Options[1].split("_")
+            if Tool != 'CC':
+                continue
+
+            if Target == "*" or Target == self._Target:
+                if Tag == "*" or Tag == self._Toolchain:
+                    if Arch == "*" or Arch == self.Arch:
+                        if Tool not in BuildOptions:
+                            BuildOptions[Tool] = {}
+                        if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or self.BuildOptions[Options].startswith('='):
+                            BuildOptions[Tool][Attr] = self.BuildOptions[Options]
+                        else:
+                            # append options for the same tool except PATH
+                            if Attr != 'PATH':
+                                BuildOptions[Tool][Attr] += " " + self.BuildOptions[Options]
+                            else:
+                                BuildOptions[Tool][Attr] = self.BuildOptions[Options]
+        if BuildOptions:
+            for Tool in BuildOptions:
+                for Attr in BuildOptions[Tool]:
+                    if Attr == "FLAGS":
+                        Value = BuildOptions[Tool][Attr]
+                        ValueList = Value.split()
+                        if ValueList:
+                            for Id, Item in enumerate(ValueList):
+                                if Item == '-D' or Item == '/D':
+                                    CC_FLAGS += ' ' + Item
+                                    if Id + 1 < len(ValueList):
+                                        CC_FLAGS += ' ' + ValueList[Id + 1]
+                                elif Item.startswith('/D') or Item.startswith('-D'):
+                                    CC_FLAGS += ' ' + Item
+        MakeApp += CC_FLAGS
+
         if sys.platform == "win32":
             MakeApp = MakeApp + PcdMakefileEnd
         MakeFileName = os.path.join(self.OutputPath, 'Makefile')
@@ -1964,6 +2010,28 @@ class DscBuildData(PlatformBuildClassObject):
             Module.MetaFile = FilePath
             self.Modules.append(Module)
 
+    def _GetToolChainFamily(self):
+        self._ToolChainFamily = "MSFT"
+        BuildConfigurationFile = os.path.normpath(os.path.join(GlobalData.gConfDirectory, "target.txt"))
+        if os.path.isfile(BuildConfigurationFile) == True:
+            TargetTxt      = TargetTxtClassObject()
+            TargetTxt.LoadTargetTxtFile(BuildConfigurationFile)
+            ToolDefinitionFile = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
+            if ToolDefinitionFile == '':
+                ToolDefinitionFile = "tools_def.txt"
+                ToolDefinitionFile = os.path.normpath(mws.join(self.WorkspaceDir, 'Conf', ToolDefinitionFile))
+            if os.path.isfile(ToolDefinitionFile) == True:
+                ToolDef        = ToolDefClassObject()
+                ToolDef.LoadToolDefFile(ToolDefinitionFile)
+                ToolDefinition = ToolDef.ToolsDefTxtDatabase
+                if TAB_TOD_DEFINES_FAMILY not in ToolDefinition \
+                   or self._Toolchain not in ToolDefinition[TAB_TOD_DEFINES_FAMILY] \
+                   or not ToolDefinition[TAB_TOD_DEFINES_FAMILY][self._Toolchain]:
+                    self._ToolChainFamily = "MSFT"
+                else:
+                    self._ToolChainFamily = ToolDefinition[TAB_TOD_DEFINES_FAMILY][self._Toolchain]
+        return self._ToolChainFamily
+
     ## Add external PCDs
     #
     #   The external PCDs are mostly those listed in FDF file to specify address
@@ -2022,3 +2090,4 @@ class DscBuildData(PlatformBuildClassObject):
     LibraryClasses      = property(_GetLibraryClasses)
     Pcds                = property(_GetPcds)
     BuildOptions        = property(_GetBuildOptions)
+    ToolChainFamily     = property(_GetToolChainFamily)
