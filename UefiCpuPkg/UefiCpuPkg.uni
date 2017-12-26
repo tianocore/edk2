@@ -230,5 +230,17 @@
                                                                                         "Processor trace is enabled through set BIT44(CPU_FEATURE_PROC_TRACE) in PcdCpuFeaturesSetting.<BR><BR>\n"
                                                                                         "This PCD is ignored if CPU processor trace is disabled.<BR><BR>\n"
                                                                                         "Default value is 0 which means single range output scheme will be used if CPU processor trace is enabled.<BR>\n"
-                                                                                        "0 - Single Range output scheme.<BR>\n"
-                                                                                        "1 - ToPA(Table of physical address) scheme.<BR>\n"
+                                                                                        "0 - Single Range output scheme.<BR>\n"
+                                                                                        "1 - ToPA(Table of physical address) scheme.<BR>\n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuStackSwitchExceptionList_PROMPT  #language en-US "Specify exception vectors which need switching stack."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuStackSwitchExceptionList_HELP  #language en-US "List of exception vectors which need switching stack.\n"
+                                                                                           "This PCD will only take into effect if PcdCpuStackGuard is enabled.n"
+                                                                                           "By default exception #DD(8), #PF(14) are supported.n"
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuKnownGoodStackSize_PROMPT  #language en-US "Specify size of good stack of exception which need switching stack."
+
+#string STR_gUefiCpuPkgTokenSpaceGuid_PcdCpuKnownGoodStackSize_HELP  #language en-US "Size of good stack for an exception.\n"
+                                                                                     "This PCD will only take into effect if PcdCpuStackGuard is enabled.\n"
+
