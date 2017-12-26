@@ -88,6 +88,9 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\MetaFileTable.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\WorkspaceCommon.py \
               $(BASE_TOOLS_PATH)\Source\Python\Workspace\WorkspaceDatabase.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Workspace\DecBuildData.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Workspace\DscBuildData.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Workspace\InfBuildData.py \
               $(BASE_TOOLS_PATH)\Source\Python\AutoGen\AutoGen.py \
               $(BASE_TOOLS_PATH)\Source\Python\AutoGen\BuildEngine.py \
               $(BASE_TOOLS_PATH)\Source\Python\AutoGen\GenC.py \
@@ -98,6 +101,7 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\AutoGen\StrGather.py \
               $(BASE_TOOLS_PATH)\Source\Python\AutoGen\UniClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\AutoGen\ValidCheckingInfoObject.py \
+              $(BASE_TOOLS_PATH)\Source\Python\AutoGen\GenVar.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\RangeExpression.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\VariableAttributes.py
 
