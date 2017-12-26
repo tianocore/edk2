@@ -472,6 +472,8 @@ EfiHttpRequest (
 
           FreePool (HostName);
 
+          HttpUrlFreeParser (UrlParser);
+
           //
           // Queue the HTTP token and return.
           //
@@ -656,6 +658,10 @@ EfiHttpRequest (
   if (HostName != NULL) {
     FreePool (HostName);
   }
+
+  if (UrlParser != NULL) {
+    HttpUrlFreeParser (UrlParser);
+  }
   
   return EFI_SUCCESS;
 
@@ -699,7 +705,7 @@ Error1:
   if (Wrap != NULL) {
     FreePool (Wrap);
   }
-  if (UrlParser!= NULL) {
+  if (UrlParser != NULL) {
     HttpUrlFreeParser (UrlParser);
   }
 
