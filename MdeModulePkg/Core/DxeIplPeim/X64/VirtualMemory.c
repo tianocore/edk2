@@ -126,6 +126,11 @@ EnableExecuteDisableBit (
   The function will check if page table entry should be splitted to smaller
   granularity.
 
+  @param Address      Physical memory address.
+  @param Size         Size of the given physical memory.
+  @param StackBase    Base address of stack.
+  @param StackSize    Size of stack.
+
   @retval TRUE      Page table should be split.
   @retval FALSE     Page table should not be split.
 **/
