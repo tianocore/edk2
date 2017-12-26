@@ -800,7 +800,7 @@ class DscBuildData(PlatformBuildClassObject):
                 ModuleData = self._Bdb[ModuleFile, self._Arch, self._Target, self._Toolchain]
                 PkgSet.update(ModuleData.Packages)
 
-            self._DecPcds = GetDeclaredPcd(self, self._Bdb, self._Arch, self._Target, self._Toolchain,PkgSet)
+            self._DecPcds, self._GuidDict = GetDeclaredPcd(self, self._Bdb, self._Arch, self._Target, self._Toolchain,PkgSet)
 
 
         if (PcdCName, TokenSpaceGuid) not in self._DecPcds:
@@ -821,6 +821,8 @@ class DscBuildData(PlatformBuildClassObject):
                 ValueList[Index] = ValueExpression(ValueList[Index], GlobalData.gPlatformPcds)(True)
             except WrnExpression, Value:
                 ValueList[Index] = Value.result
+            except BadExpression, Value:
+                EdkLogger.error('Parser', FORMAT_INVALID, Value, File=self.MetaFile, Line=self._LineIndex + 1)
             except EvaluationException, Excpt:
                 if hasattr(Excpt, 'Pcd'):
                     if Excpt.Pcd in GlobalData.gPlatformOtherPcds:
@@ -834,11 +836,13 @@ class DscBuildData(PlatformBuildClassObject):
                 else:
                     EdkLogger.error('Parser', FORMAT_INVALID, "Invalid expression: %s" % str(Excpt),
                                     File=self.MetaFile, Line=LineNo)
-            if ValueList[Index] == 'True':
-                ValueList[Index] = '1'
-            elif ValueList[Index] == 'False':
-                ValueList[Index] = '0'
         if ValueList[Index]:
+            DatumType = self._DecPcds[PcdCName, TokenSpaceGuid].DatumType
+            try:
+                ValueList[Index] = ValueExpressionEx(ValueList[Index], DatumType, self._GuidDict)(True)
+            except BadExpression, Value:
+                EdkLogger.error('Parser', FORMAT_INVALID, Value, File=self.MetaFile, Line=LineNo,
+                                ExtraData="PCD [%s.%s] Value \"%s\" " % (TokenSpaceGuid, PcdCName, ValueList[Index]))
             Valid, ErrStr = CheckPcdDatum(self._DecPcds[PcdCName, TokenSpaceGuid].DatumType, ValueList[Index])
             if not Valid:
                 EdkLogger.error('build', FORMAT_INVALID, ErrStr, File=self.MetaFile, Line=LineNo,
@@ -2058,7 +2062,7 @@ class DscBuildData(PlatformBuildClassObject):
                     continue
                 ModuleData = self._Bdb[ModuleFile, self._Arch, self._Target, self._Toolchain]
                 PkgSet.update(ModuleData.Packages)
-            self._DecPcds = GetDeclaredPcd(self, self._Bdb, self._Arch, self._Target, self._Toolchain,PkgSet)
+            self._DecPcds, self._GuidDict = GetDeclaredPcd(self, self._Bdb, self._Arch, self._Target, self._Toolchain,PkgSet)
         return self._DecPcds
     _Macros             = property(_GetMacros)
     Arch                = property(_GetArch, _SetArch)

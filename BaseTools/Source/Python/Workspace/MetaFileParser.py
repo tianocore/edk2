@@ -27,7 +27,7 @@ import Common.GlobalData as GlobalData
 from CommonDataClass.DataClass import *
 from Common.DataType import *
 from Common.String import *
-from Common.Misc import GuidStructureStringToGuidString, CheckPcdDatum, PathClass, AnalyzePcdData, AnalyzeDscPcd, AnalyzePcdExpression
+from Common.Misc import GuidStructureStringToGuidString, CheckPcdDatum, PathClass, AnalyzePcdData, AnalyzeDscPcd, AnalyzePcdExpression, ParseFieldValue
 from Common.Expression import *
 from CommonDataClass.Exceptions import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
@@ -182,6 +182,7 @@ class MetaFileParser(object):
         self._PostProcessed = False
         # Different version of meta-file has different way to parse.
         self._Version = 0
+        self._GuidDict = {}  # for Parser PCD value {GUID(gTokeSpaceGuidName)}
 
     ## Store the parsed data in table
     def _Store(self, *Args):
@@ -1871,6 +1872,8 @@ class DecParser(MetaFileParser):
                             File=self.MetaFile, Line=self._LineIndex + 1)
         self._ValueList[0] = TokenList[0]
         self._ValueList[1] = TokenList[1]
+        if self._ValueList[0] not in self._GuidDict:
+            self._GuidDict[self._ValueList[0]] = self._ValueList[1]
 
     ## PCD sections parser
     #
@@ -1987,12 +1990,14 @@ class DecParser(MetaFileParser):
                     ValueList[0] = ValueExpression(PcdValue, self._AllPcdDict)(True)
                 except WrnExpression, Value:
                     ValueList[0] = Value.result
+                except BadExpression, Value:
+                    EdkLogger.error('Parser', FORMAT_INVALID, Value, File=self.MetaFile, Line=self._LineIndex + 1)
 
-            if ValueList[0] == 'True':
-                ValueList[0] = '1'
-            if ValueList[0] == 'False':
-                ValueList[0] = '0'
-
+            if ValueList[0]:
+                try:
+                    ValueList[0] = ValueExpressionEx(ValueList[0], ValueList[1], self._GuidDict)(True)
+                except BadExpression, Value:
+                    EdkLogger.error('Parser', FORMAT_INVALID, Value, ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
             # check format of default value against the datum type
             IsValid, Cause = CheckPcdDatum(ValueList[1], ValueList[0])
             if not IsValid:

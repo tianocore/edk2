@@ -271,6 +271,7 @@ class WorkspaceAutoGen(AutoGen):
         self._FvDir         = None
         self._MakeFileDir   = None
         self._BuildCommand  = None
+        self._GuidDict = {}
 
         # there's many relative directory operations, so ...
         os.chdir(self.WorkspaceDir)
@@ -419,11 +420,22 @@ class WorkspaceAutoGen(AutoGen):
                     PcdDatumType = ''
                     NewValue = ''
                     for package in PGen.PackageList:
+                        Guids = package.Guids
+                        self._GuidDict.update(Guids)
+                    for package in PGen.PackageList:
                         for key in package.Pcds:
                             PcdItem = package.Pcds[key]
                             if HasTokenSpace:
                                 if (PcdItem.TokenCName, PcdItem.TokenSpaceGuidCName) == (TokenCName, TokenSpaceGuidCName):
                                     PcdDatumType = PcdItem.DatumType
+                                    if pcdvalue.startswith('H'):
+                                        try:
+                                            pcdvalue = ValueExpressionEx(pcdvalue[1:], PcdDatumType, self._GuidDict)(True)
+                                        except BadExpression, Value:
+                                            if Value.result > 1:
+                                                EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
+                                                                (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
+                                        pcdvalue = 'H' + pcdvalue
                                     NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
                                     FoundFlag = True
                             else:
@@ -433,6 +445,13 @@ class WorkspaceAutoGen(AutoGen):
                                             TokenSpaceGuidCNameList.append(PcdItem.TokenSpaceGuidCName)
                                             PcdDatumType = PcdItem.DatumType
                                             TokenSpaceGuidCName = PcdItem.TokenSpaceGuidCName
+                                            if pcdvalue.startswith('H'):
+                                                try:
+                                                    pcdvalue = ValueExpressionEx(pcdvalue[1:], PcdDatumType, self._GuidDict)(True)
+                                                except BadExpression, Value:
+                                                    EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %
+                                                                    (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
+                                                pcdvalue = 'H' + pcdvalue
                                             NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
                                             FoundFlag = True
                                         else:
@@ -2446,6 +2465,26 @@ class PlatformAutoGen(AutoGen):
                 ToPcd.DatumType = FromPcd.DatumType
             if FromPcd.SkuInfoList not in [None, '', []]:
                 ToPcd.SkuInfoList = FromPcd.SkuInfoList
+            # Add Flexible PCD format parse
+            PcdValue = ToPcd.DefaultValue
+            if PcdValue:
+                try:
+                    ToPcd.DefaultValue = ValueExpression(PcdValue)(True)
+                except WrnExpression, Value:
+                    ToPcd.DefaultValue = Value.result
+                except BadExpression, Value:
+                    EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %(ToPcd.TokenSpaceGuidCName, ToPcd.TokenCName, ToPcd.DefaultValue, Value),
+                                    File=self.MetaFile)
+            if ToPcd.DefaultValue:
+                _GuidDict = {}
+                for Pkg in self.PackageList:
+                    Guids = Pkg.Guids
+                    _GuidDict.update(Guids)
+                try:
+                    ToPcd.DefaultValue = ValueExpressionEx(ToPcd.DefaultValue, ToPcd.DatumType, _GuidDict)(True)
+                except BadExpression, Value:
+                    EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %(ToPcd.TokenSpaceGuidCName, ToPcd.TokenCName, ToPcd.DefaultValue, Value),
+                                        File=self.MetaFile)
 
             # check the validation of datum
             IsValid, Cause = CheckPcdDatum(ToPcd.DatumType, ToPcd.DefaultValue)

@@ -1033,6 +1033,8 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
 
         if Pcd.DatumType in ['UINT64', 'UINT32', 'UINT16', 'UINT8']:
             try:
+                if Value.upper().endswith('L'):
+                    Value = Value[:-1]
                 if Value.upper().startswith('0X'):
                     ValueNumber = int (Value, 16)
                 else:

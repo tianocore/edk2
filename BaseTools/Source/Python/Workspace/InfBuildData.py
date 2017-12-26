@@ -16,6 +16,7 @@ from Common.String import *
 from Common.DataType import *
 from Common.Misc import *
 from types import *
+from MetaFileParser import *
 
 from Workspace.BuildClassObject import ModuleBuildClassObject, LibraryClassObject, PcdClassObject
 ## Module build information from INF file
@@ -1144,6 +1145,12 @@ class InfBuildData(ModuleBuildClassObject):
                     Pcd.InfDefaultValue = Pcd.DefaultValue
                     if Pcd.DefaultValue in [None, '']:
                         Pcd.DefaultValue = PcdInPackage.DefaultValue
+                    else:
+                        try:
+                            Pcd.DefaultValue = ValueExpressionEx(Pcd.DefaultValue, Pcd.DatumType, self.Guids)(True)
+                        except BadExpression, Value:
+                            EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %(TokenSpaceGuid, PcdRealName, Pcd.DefaultValue, Value),
+                                            File=self.MetaFile, Line=LineNo)
                     break
             else:
                 EdkLogger.error(

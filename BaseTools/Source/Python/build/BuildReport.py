@@ -45,6 +45,7 @@ from Common.Misc import PathClass
 from Common.String import NormPath
 from Common.DataType import *
 import collections
+from Common.Expression import ValueExpressionEx
 
 ## Pattern to extract contents in EDK DXS files
 gDxsDependencyPattern = re.compile(r"DEPENDENCY_START(.+)DEPENDENCY_END", re.DOTALL)
@@ -849,8 +850,11 @@ class PcdReport(object):
         # Collect PCD DEC default value.
         #
         self.DecPcdDefault = {}
+        self._GuidDict = {}
         for Pa in Wa.AutoGenObjectList:
             for Package in Pa.PackageList:
+                Guids = Package.Guids
+                self._GuidDict.update(Guids)
                 for (TokenCName, TokenSpaceGuidCName, DecType) in Package.Pcds:
                     DecDefaultValue = Package.Pcds[TokenCName, TokenSpaceGuidCName, DecType].DefaultValue
                     self.DecPcdDefault.setdefault((TokenCName, TokenSpaceGuidCName, DecType), DecDefaultValue)
@@ -943,6 +947,8 @@ class PcdReport(object):
                     DscDefaultValue = self.DscPcdDefault.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName))
                     DscDefaultValBak= DscDefaultValue
                     DscDefaultValue = self.FdfPcdSet.get((Pcd.TokenCName, Key), DscDefaultValue)
+                    if DscDefaultValue:
+                        DscDefaultValue = ValueExpressionEx(DscDefaultValue, Pcd.DatumType, self._GuidDict)(True)
                     InfDefaultValue = None
                     
                     PcdValue = DecDefaultValue
