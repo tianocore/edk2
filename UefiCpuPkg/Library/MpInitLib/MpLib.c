@@ -243,7 +243,7 @@ RestoreVolatileRegisters (
       VolatileRegisters->Tr < VolatileRegisters->Gdtr.Limit) {
     Tss = (IA32_TSS_DESCRIPTOR *)(VolatileRegisters->Gdtr.Base +
                                   VolatileRegisters->Tr);
-    if (Tss->Bits.P == 1) {
+    if (Tss->Bits.Present == 1) {
       Tss->Bits.Type &= 0xD;  // 1101 - Clear busy bit just in case
       AsmWriteTr (VolatileRegisters->Tr);
     }

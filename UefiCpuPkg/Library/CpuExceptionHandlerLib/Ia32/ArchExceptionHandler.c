@@ -216,7 +216,7 @@ ArchSetupExcpetionStack (
   TssDesc->Bits.BaseLow    = (UINT16)TssBase;
   TssDesc->Bits.BaseMid    = (UINT8)(TssBase >> 16);
   TssDesc->Bits.Type       = IA32_GDT_TYPE_TSS;
-  TssDesc->Bits.P          = 1;
+  TssDesc->Bits.Present    = 1;
   TssDesc->Bits.LimitHigh  = 0;
   TssDesc->Bits.BaseHigh   = (UINT8)(TssBase >> 24);
 
@@ -240,7 +240,7 @@ ArchSetupExcpetionStack (
     TssDesc->Bits.BaseLow   = (UINT16)TssBase;
     TssDesc->Bits.BaseMid   = (UINT8)(TssBase >> 16);
     TssDesc->Bits.Type      = IA32_GDT_TYPE_TSS;
-    TssDesc->Bits.P         = 1;
+    TssDesc->Bits.Present   = 1;
     TssDesc->Bits.LimitHigh = 0;
     TssDesc->Bits.BaseHigh  = (UINT8)(TssBase >> 24);
 
@@ -253,17 +253,17 @@ ArchSetupExcpetionStack (
       continue;
     }
 
-    Tss->EIP    = (UINT32)(TemplateMap.ExceptionStart
+    Tss->Eip    = (UINT32)(TemplateMap.ExceptionStart
                            + Vector * TemplateMap.ExceptionStubHeaderSize);
-    Tss->EFLAGS = 0x2;
-    Tss->ESP    = StackTop;
-    Tss->CR3    = AsmReadCr3 ();
-    Tss->ES     = AsmReadEs ();
-    Tss->CS     = AsmReadCs ();
-    Tss->SS     = AsmReadSs ();
-    Tss->DS     = AsmReadDs ();
-    Tss->FS     = AsmReadFs ();
-    Tss->GS     = AsmReadGs ();
+    Tss->Eflags = 0x2;
+    Tss->Esp    = StackTop;
+    Tss->Cr3    = AsmReadCr3 ();
+    Tss->Es     = AsmReadEs ();
+    Tss->Cs     = AsmReadCs ();
+    Tss->Ss     = AsmReadSs ();
+    Tss->Ds     = AsmReadDs ();
+    Tss->Fs     = AsmReadFs ();
+    Tss->Gs     = AsmReadGs ();
 
     StackTop   -= StackSwitchData->Ia32.KnownGoodStackSize;
 
