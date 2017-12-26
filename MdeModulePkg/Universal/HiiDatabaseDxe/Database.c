@@ -844,6 +844,9 @@ UpdateDefaultSettingInFormPackage (
         // Reallocate EFI VarStore Buffer
         //
         EfiVarStoreList   = ReallocatePool (EfiVarStoreMaxNum * sizeof (UINTN), (EfiVarStoreMaxNum + BASE_NUMBER) * sizeof (UINTN), EfiVarStoreList);
+        if (EfiVarStoreList == NULL) {
+          break;
+        }
         EfiVarStoreMaxNum = EfiVarStoreMaxNum + BASE_NUMBER;
       }
       IfrEfiVarStore = (EFI_IFR_VARSTORE_EFI *) IfrOpHdr;
@@ -851,6 +854,9 @@ UpdateDefaultSettingInFormPackage (
       // Convert VarStore Name from ASCII string to Unicode string.
       //
       EfiVarStoreList [EfiVarStoreNumber] = AllocatePool (IfrEfiVarStore->Header.Length + AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name));
+      if (EfiVarStoreList [EfiVarStoreNumber] == NULL) {
+        break;
+      }
       CopyMem (EfiVarStoreList [EfiVarStoreNumber], IfrEfiVarStore, IfrEfiVarStore->Header.Length);
       AsciiStrToUnicodeStrS ((CHAR8 *)IfrEfiVarStore->Name, (CHAR16 *) &(EfiVarStoreList [EfiVarStoreNumber]->Name[0]), AsciiStrSize ((CHAR8 *)IfrEfiVarStore->Name) * sizeof (CHAR16));
       Status = FindQuestionDefaultSetting (EFI_HII_DEFAULT_CLASS_STANDARD, EfiVarStoreList[EfiVarStoreNumber], &VarStoreQuestionHeader, NULL, IfrEfiVarStore->Size, FALSE);
@@ -867,6 +873,9 @@ UpdateDefaultSettingInFormPackage (
         // Reallocate DefaultIdNumber
         //
         DefaultIdList   = ReallocatePool (DefaultIdMaxNum * sizeof (UINT16), (DefaultIdMaxNum + BASE_NUMBER) * sizeof (UINT16), DefaultIdList);
+        if (DefaultIdList == NULL) {
+          break;
+        }
         DefaultIdMaxNum = DefaultIdMaxNum + BASE_NUMBER;
       }
       DefaultIdList[DefaultIdNumber ++] = ((EFI_IFR_DEFAULTSTORE *) IfrOpHdr)->DefaultId;
