@@ -1012,7 +1012,7 @@ class DscBuildData(PlatformBuildClassObject):
                             "Pcd (%s.%s) defined in DSC is not declared in DEC files. Arch: ['%s']" % (str_pcd[0], str_pcd[1], self._Arch),
                             File=self.MetaFile,Line = StrPcdSet[str_pcd][0][5])
         # Add the Structure PCD that only defined in DEC, don't have override in DSC file
-        for Pcd in self._DecPcds:
+        for Pcd in self.DecPcds:
             if type (self._DecPcds[Pcd]) is StructurePcd:
                 if Pcd not in S_pcd_set:
                     str_pcd_obj_str = StructurePcd()
@@ -1977,7 +1977,21 @@ class DscBuildData(PlatformBuildClassObject):
         if (Name, Guid) not in self.Pcds:
             self.Pcds[Name, Guid] = PcdClassObject(Name, Guid, '', '', '', '', '', {}, False, None)
         self.Pcds[Name, Guid].DefaultValue = Value
-
+    @property
+    def DecPcds(self):
+        if self._DecPcds == None:
+            FdfInfList = []
+            if GlobalData.gFdfParser:
+                FdfInfList = GlobalData.gFdfParser.Profile.InfList
+            PkgSet = set()
+            for Inf in FdfInfList:
+                ModuleFile = PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch=self._Arch)
+                if ModuleFile in self._Modules:
+                    continue
+                ModuleData = self._Bdb[ModuleFile, self._Arch, self._Target, self._Toolchain]
+                PkgSet.update(ModuleData.Packages)
+            self._DecPcds = GetDeclaredPcd(self, self._Bdb, self._Arch, self._Target, self._Toolchain,PkgSet)
+        return self._DecPcds
     _Macros             = property(_GetMacros)
     Arch                = property(_GetArch, _SetArch)
     Platform            = property(_GetPlatformName)
