@@ -2149,10 +2149,10 @@ class SkuClass():
         for SkuName in SkuIds:
             SkuId = SkuIds[SkuName][0]
             skuid_num = int(SkuId,16) if SkuId.upper().startswith("0X") else int(SkuId)
-            if skuid_num > 0xFFFF:
+            if skuid_num > 0xFFFFFFFFFFFFFFFF:
                 EdkLogger.error("build", PARAMETER_INVALID,
-                            ExtraData = "SKU-ID [%s] must less than 65535"
-                                      % (SkuName))
+                            ExtraData = "SKU-ID [%s] value %s exceeds the max value of UINT64"
+                                      % (SkuName, SkuId))
         
         self.AvailableSkuIds = sdict()
         self.SkuIdSet = []
