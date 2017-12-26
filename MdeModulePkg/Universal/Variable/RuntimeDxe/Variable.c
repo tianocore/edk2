@@ -4125,7 +4125,7 @@ ConvertNormalVarStorageToAuthVarStorage (
   //
   AuthVarStorage->Format = NormalVarStorage->Format;
   AuthVarStorage->State  = NormalVarStorage->State;
-  AuthVarStorage->Size = (UINT32) (UINTN) ((UINT8 *) AuthStartPtr - (UINT8 *) AuthVarStorage);
+  AuthVarStorage->Size = (UINT32)((UINTN)AuthStartPtr - (UINTN)AuthVarStorage);
   CopyGuid (&AuthVarStorage->Signature, &gEfiAuthenticatedVariableGuid);
   ASSERT (AuthVarStorage->Size <= AuthVarStroageSize);
 
