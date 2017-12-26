@@ -434,9 +434,9 @@ HttpFreeHeaderFields (
                                   NULL if any error occured.
   @param[out]  RequestMsgSize     Size of the RequestMsg (in bytes).
 
-  @return EFI_SUCCESS             If HTTP request string was created successfully
+  @retval EFI_SUCCESS             If HTTP request string was created successfully.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate resources.
-  @retval EFI_INVALID_PARAMETER   The input arguments are invalid
+  @retval EFI_INVALID_PARAMETER   The input arguments are invalid.
 
 **/
 EFI_STATUS
