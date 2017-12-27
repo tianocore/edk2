@@ -6672,41 +6672,41 @@ typedef union {
 typedef struct {
   UINT16    PreviousTaskLink;
   UINT16    Reserved_2;
-  UINT32    Esp0;
-  UINT16    Ss0;
+  UINT32    ESP0;
+  UINT16    SS0;
   UINT16    Reserved_10;
-  UINT32    Esp1;
-  UINT16    Ss1;
+  UINT32    ESP1;
+  UINT16    SS1;
   UINT16    Reserved_18;
-  UINT32    Esp2;
-  UINT16    Ss2;
+  UINT32    ESP2;
+  UINT16    SS2;
   UINT16    Reserved_26;
-  UINT32    Cr3;
-  UINT32    Eip;
-  UINT32    Eflags;
-  UINT32    Eax;
-  UINT32    Ecx;
-  UINT32    Edx;
-  UINT32    Ebx;
-  UINT32    Esp;
-  UINT32    Ebp;
-  UINT32    Esi;
-  UINT32    Edi;
-  UINT16    Es;
+  UINT32    CR3;
+  UINT32    EIP;
+  UINT32    EFLAGS;
+  UINT32    EAX;
+  UINT32    ECX;
+  UINT32    EDX;
+  UINT32    EBX;
+  UINT32    ESP;
+  UINT32    EBP;
+  UINT32    ESI;
+  UINT32    EDI;
+  UINT16    ES;
   UINT16    Reserved_74;
-  UINT16    Cs;
+  UINT16    CS;
   UINT16    Reserved_78;
-  UINT16    Ss;
+  UINT16    SS;
   UINT16    Reserved_82;
-  UINT16    Ds;
+  UINT16    DS;
   UINT16    Reserved_86;
-  UINT16    Fs;
+  UINT16    FS;
   UINT16    Reserved_90;
-  UINT16    Gs;
+  UINT16    GS;
   UINT16    Reserved_94;
   UINT16    LDTSegmentSelector;
   UINT16    Reserved_98;
-  UINT16    Tflag;
+  UINT16    T;
   UINT16    IOMapBaseAddress;
 } IA32_TASK_STATE_SEGMENT;
 
@@ -6717,12 +6717,12 @@ typedef union {
     UINT32  BaseMid:8;      ///< Base Address  23..16
     UINT32  Type:4;         ///< Type (1 0 B 1)
     UINT32  Reserved_43:1;  ///< 0
-    UINT32  Dpl:2;          ///< Descriptor Privilege Level
-    UINT32  Present:1;      ///< Segment Present
+    UINT32  DPL:2;          ///< Descriptor Privilege Level
+    UINT32  P:1;            ///< Segment Present
     UINT32  LimitHigh:4;    ///< Segment Limit 19..16
-    UINT32  Avl:1;          ///< Available for use by system software
+    UINT32  AVL:1;          ///< Available for use by system software
     UINT32  Reserved_52:2;  ///< 0 0
-    UINT32  Granularity:1;  ///< Granularity
+    UINT32  G:1;            ///< Granularity
     UINT32  BaseHigh:8;     ///< Base Address 31..24
   } Bits;
   UINT64  Uint64;
@@ -6757,11 +6757,11 @@ typedef union {
 //
 typedef struct {
   UINT32    Reserved_0;
-  UINT64    Rsp0;
-  UINT64    Rsp1;
-  UINT64    Rsp2;
+  UINT64    RSP0;
+  UINT64    RSP1;
+  UINT64    RSP2;
   UINT64    Reserved_28;
-  UINT64    Ist[7];
+  UINT64    IST[7];
   UINT64    Reserved_92;
   UINT16    Reserved_100;
   UINT16    IOMapBaseAddress;
@@ -6774,12 +6774,12 @@ typedef union {
     UINT32  BaseMidl:8;     ///< Base Address  23..16
     UINT32  Type:4;         ///< Type (1 0 B 1)
     UINT32  Reserved_43:1;  ///< 0
-    UINT32  Dpl:2;          ///< Descriptor Privilege Level
-    UINT32  Present:1;      ///< Segment Present
+    UINT32  DPL:2;          ///< Descriptor Privilege Level
+    UINT32  P:1;            ///< Segment Present
     UINT32  LimitHigh:4;    ///< Segment Limit 19..16
-    UINT32  Avl:1;          ///< Available for use by system software
+    UINT32  AVL:1;          ///< Available for use by system software
     UINT32  Reserved_52:2;  ///< 0 0
-    UINT32  Granularity:1;  ///< Granularity
+    UINT32  G:1;            ///< Granularity
     UINT32  BaseMidh:8;     ///< Base Address  31..24
     UINT32  BaseHigh:32;    ///< Base Address  63..32
     UINT32  Reserved_96:32; ///< Reserved
