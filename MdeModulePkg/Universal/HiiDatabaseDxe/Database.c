@@ -845,7 +845,7 @@ UpdateDefaultSettingInFormPackage (
         //
         EfiVarStoreList   = ReallocatePool (EfiVarStoreMaxNum * sizeof (UINTN), (EfiVarStoreMaxNum + BASE_NUMBER) * sizeof (UINTN), EfiVarStoreList);
         if (EfiVarStoreList == NULL) {
-          break;
+          goto Done;
         }
         EfiVarStoreMaxNum = EfiVarStoreMaxNum + BASE_NUMBER;
       }
@@ -874,7 +874,7 @@ UpdateDefaultSettingInFormPackage (
         //
         DefaultIdList   = ReallocatePool (DefaultIdMaxNum * sizeof (UINT16), (DefaultIdMaxNum + BASE_NUMBER) * sizeof (UINT16), DefaultIdList);
         if (DefaultIdList == NULL) {
-          break;
+          goto Done;
         }
         DefaultIdMaxNum = DefaultIdMaxNum + BASE_NUMBER;
       }
@@ -1046,8 +1046,10 @@ UpdateDefaultSettingInFormPackage (
   }
 
 Done:
-  for (Index = 0; Index < EfiVarStoreNumber; Index ++) {
-    FreePool (EfiVarStoreList [Index]);
+  if (EfiVarStoreList != NULL) {
+    for (Index = 0; Index < EfiVarStoreNumber; Index ++) {
+      FreePool (EfiVarStoreList [Index]);
+    }
   }
   return;
 }
