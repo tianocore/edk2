@@ -218,6 +218,26 @@ VERIFY_SIZE_OF (__VERIFY_UINT32_ENUM_SIZE, 4);
   #endif
 #endif
 
+///
+/// Tell the code optimizer that the function will return twice.
+/// This prevents wrong optimizations which can cause bugs.
+///
+#ifndef RETURNS_TWICE
+  #if defined (__GNUC__) || defined (__clang__)
+    ///
+    /// Tell the code optimizer that the function will return twice.
+    /// This prevents wrong optimizations which can cause bugs.
+    ///
+    #define RETURNS_TWICE  __attribute__((returns_twice))
+  #else
+    ///
+    /// Tell the code optimizer that the function will return twice.
+    /// This prevents wrong optimizations which can cause bugs.
+    ///
+    #define RETURNS_TWICE
+  #endif
+#endif
+
 //
 // For symbol name in assembly code, an extra "_" is sometimes necessary
 //
