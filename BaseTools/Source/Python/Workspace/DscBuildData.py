@@ -1716,8 +1716,7 @@ class DscBuildData(PlatformBuildClassObject):
     def CompletePcdValues(self,PcdSet):
         Pcds = {}
         DefaultStoreObj = DefaultStore(self._GetDefaultStores())
-        SkuIds = set([(skuid,skuobj.SkuId) for pcdobj in PcdSet.values() for skuid,skuobj in pcdobj.SkuInfoList.items()])
-        SkuIds = self.SkuIdMgr.AvailableSkuIdSet
+        SkuIds = {skuname:skuid for skuname,skuid in self.SkuIdMgr.AvailableSkuIdSet.items() if skuname !='COMMON'}
         DefaultStores = set([storename for pcdobj in PcdSet.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict.keys()])
         for PcdCName, TokenSpaceGuid in PcdSet:
             PcdObj = PcdSet[(PcdCName, TokenSpaceGuid)]
