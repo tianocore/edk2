@@ -2251,6 +2251,8 @@ class SkuClass():
         return self.__SkuInherit.get(skuname,"DEFAULT")
 
     def GetSkuChain(self,sku):
+        if sku == "DEFAULT":
+            return ["DEFAULT"]
         skulist = [sku]
         nextsku = sku
         while 1:

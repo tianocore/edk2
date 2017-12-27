@@ -1327,7 +1327,7 @@ class DscBuildData(PlatformBuildClassObject):
                         while '[' in FieldName:
                             FieldName = FieldName.rsplit('[', 1)[0]
                             CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d);\n' % (Pcd.DatumType, FieldName.strip("."), ArrayIndex + 1)
-            for skuname in self.SkuIdMgr.SkuOverrideOrder():
+            for skuname in self.SkuIdMgr.GetSkuChain(SkuName):
                 inherit_OverrideValues = Pcd.SkuOverrideValues[skuname]
                 for FieldList in [inherit_OverrideValues.get(DefaultStoreName)]:
                     if not FieldList:
@@ -1391,7 +1391,7 @@ class DscBuildData(PlatformBuildClassObject):
                             CApp = CApp + '  Pcd->%s = %dULL; // From %s Line %d Value %s\n' % (FieldName, Value, FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
                         else:
                             CApp = CApp + '  Pcd->%s = %d; // From %s Line %d Value %s\n' % (FieldName, Value, FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
-            for skuname in self.SkuIdMgr.SkuOverrideOrder():
+            for skuname in self.SkuIdMgr.GetSkuChain(SkuName):
                 inherit_OverrideValues = Pcd.SkuOverrideValues[skuname]
                 for FieldList in [Pcd.DefaultFromDSC,inherit_OverrideValues.get(DefaultStoreName)]:
                     if not FieldList:
