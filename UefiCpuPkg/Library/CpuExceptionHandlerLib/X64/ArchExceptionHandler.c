@@ -414,5 +414,14 @@ DumpImageAndCpuContent (
   //
   // Dump module image base and module entry point by RIP
   //
-  DumpModuleImageInfo (SystemContext.SystemContextX64->Rip);
+  if ((ExceptionType == EXCEPT_IA32_PAGE_FAULT) &&
+      ((SystemContext.SystemContextX64->ExceptionData & IA32_PF_EC_ID) != 0)) {
+    //
+    // The RIP in SystemContext could not be used
+    // if it is page fault with I/D set.
+    //
+    DumpModuleImageInfo ((*(UINTN *)(UINTN)SystemContext.SystemContextX64->Rsp));
+  } else {
+    DumpModuleImageInfo (SystemContext.SystemContextX64->Rip);
+  }
 }

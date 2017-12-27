@@ -414,5 +414,14 @@ DumpImageAndCpuContent (
   //
   // Dump module image base and module entry point by EIP
   //
-  DumpModuleImageInfo (SystemContext.SystemContextIa32->Eip);
+  if ((ExceptionType == EXCEPT_IA32_PAGE_FAULT) &&
+      ((SystemContext.SystemContextIa32->ExceptionData & IA32_PF_EC_ID) != 0)) {
+    //
+    // The EIP in SystemContext could not be used
+    // if it is page fault with I/D set.
+    //
+    DumpModuleImageInfo ((*(UINTN *)(UINTN)SystemContext.SystemContextIa32->Esp));
+  } else {
+    DumpModuleImageInfo (SystemContext.SystemContextIa32->Eip);
+  }
 }
