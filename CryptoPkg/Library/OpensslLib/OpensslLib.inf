@@ -557,10 +557,10 @@
   #                   types appropriate to the format string specified.
   #
   GCC:*_*_IA32_CC_FLAGS    = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -Wno-error=maybe-uninitialized
-  GCC:*_*_X64_CC_FLAGS     = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -Wno-error=maybe-uninitialized -Wno-error=format -DNO_MSABI_VA_FUNCS
-  GCC:*_*_IPF_CC_FLAGS     = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -Wno-error=maybe-uninitialized -Wno-error=format
+  GCC:*_*_X64_CC_FLAGS     = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -Wno-error=maybe-uninitialized -Wno-format -DNO_MSABI_VA_FUNCS
+  GCC:*_*_IPF_CC_FLAGS     = -U_WIN32 -U_WIN64 $(OPENSSL_FLAGS) -Wno-error=maybe-uninitialized -Wno-format
   GCC:*_*_ARM_CC_FLAGS     = $(OPENSSL_FLAGS)
-  GCC:*_*_AARCH64_CC_FLAGS = $(OPENSSL_FLAGS) -Wno-error=format
+  GCC:*_*_AARCH64_CC_FLAGS = $(OPENSSL_FLAGS) -Wno-format
 
   # suppress the following warnings in openssl so we don't break the build with warnings-as-errors:
   # 1295: Deprecated declaration <entity> - give arg types
