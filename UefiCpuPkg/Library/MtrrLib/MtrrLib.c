@@ -1683,7 +1683,7 @@ MtrrLibCalculateMtrrs (
 
 
 /**
-  Apply the variable MTRR settings to memory range array.
+  Apply the fixed MTRR settings to memory range array.
 
   @param Fixed             The fixed MTRR settings.
   @param Ranges            Return the memory range array holding memory type
