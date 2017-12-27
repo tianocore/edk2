@@ -186,7 +186,7 @@ ArchSetupExcpetionStack (
   //
   TssDesc = StackSwitchData->X64.ExceptionTssDesc;
   Tss     = StackSwitchData->X64.ExceptionTss;
-  if (StackSwitchData->X64.StackSwitchExceptionNumber > ARRAY_SIZE (Tss->Ist)) {
+  if (StackSwitchData->X64.StackSwitchExceptionNumber > ARRAY_SIZE (Tss->IST)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -221,7 +221,7 @@ ArchSetupExcpetionStack (
   TssDesc->Bits.BaseLow    = (UINT16)TssBase;
   TssDesc->Bits.BaseMidl   = (UINT8)(TssBase >> 16);
   TssDesc->Bits.Type       = IA32_GDT_TYPE_TSS;
-  TssDesc->Bits.Present    = 1;
+  TssDesc->Bits.P          = 1;
   TssDesc->Bits.LimitHigh  = 0;
   TssDesc->Bits.BaseMidh   = (UINT8)(TssBase >> 24);
   TssDesc->Bits.BaseHigh   = (UINT32)(TssBase >> 32);
@@ -236,7 +236,7 @@ ArchSetupExcpetionStack (
     //
     // Fixup IST
     //
-    Tss->Ist[Index] = StackTop;
+    Tss->IST[Index] = StackTop;
     StackTop -= StackSwitchData->X64.KnownGoodStackSize;
 
     //
