@@ -313,6 +313,7 @@ SortApicId (
   CPU_INFO_IN_HOB   CpuInfo;
   UINT32            ApCount;
   CPU_INFO_IN_HOB   *CpuInfoInHob;
+  volatile UINT32   *StartupApSignal;
 
   ApCount = CpuMpData->CpuCount - 1;
   CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
@@ -337,6 +338,14 @@ SortApicId (
           sizeof (CPU_INFO_IN_HOB)
           );
         CopyMem (&CpuInfoInHob[Index1], &CpuInfo, sizeof (CPU_INFO_IN_HOB));
+
+        //
+        // Also exchange the StartupApSignal.
+        //
+        StartupApSignal = CpuMpData->CpuData[Index3].StartupApSignal;
+        CpuMpData->CpuData[Index3].StartupApSignal =
+          CpuMpData->CpuData[Index1].StartupApSignal;
+        CpuMpData->CpuData[Index1].StartupApSignal = StartupApSignal;
       }
     }
 
