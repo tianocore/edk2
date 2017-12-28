@@ -1,7 +1,7 @@
 /** @file
   Partition driver that produces logical BlockIo devices from a physical
   BlockIo device. The logical BlockIo devices are based on the format
-  of the raw block devices media. Currently "El Torito CD-ROM", UDF, Legacy
+  of the raw block devices media. Currently "El Torito CD-ROM", Legacy
   MBR, and GPT partition schemes are supported.
 
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
@@ -43,8 +43,8 @@ EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding = {
 //
 PARTITION_DETECT_ROUTINE mPartitionDetectRoutineTable[] = {
   PartitionInstallGptChildHandles,
+  PartitionInstallElToritoChildHandles,
   PartitionInstallMbrChildHandles,
-  PartitionInstallUdfChildHandles,
   NULL
 };
 
@@ -305,9 +305,9 @@ PartitionDriverBindingStart (
   if (BlockIo->Media->MediaPresent ||
       (BlockIo->Media->RemovableMedia && !BlockIo->Media->LogicalPartition)) {
     //
-    // Try for GPT, then legacy MBR partition types, and then UDF and El Torito.
-    // If the media supports a given partition type install child handles to
-    // represent the partitions described by the media.
+    // Try for GPT, then El Torito, and then legacy MBR partition types. If the
+    // media supports a given partition type install child handles to represent
+    // the partitions described by the media.
     //
     Routine = &mPartitionDetectRoutineTable[0];
     while (*Routine != NULL) {

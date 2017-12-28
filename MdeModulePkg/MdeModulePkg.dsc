@@ -349,7 +349,6 @@
   MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
   MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
-  MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
   MdeModulePkg/Universal/Disk/CdExpressPei/CdExpressPei.inf
   MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
