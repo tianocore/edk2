@@ -121,7 +121,7 @@ class FV (FvClassObject):
                     continue
             if GenFdsGlobalVariable.EnableGenfdsMultiThread and GenFdsGlobalVariable.ModuleFile and GenFdsGlobalVariable.ModuleFile.Path.find(os.path.normpath(FfsFile.InfFileName)) == -1:
                 continue
-            FileName = FfsFile.GenFfs(MacroDict, FvParentAddr=BaseAddress, IsMakefile=Flag)
+            FileName = FfsFile.GenFfs(MacroDict, FvParentAddr=BaseAddress, IsMakefile=Flag, FvName=self.UiFvName)
             FfsFileList.append(FileName)
             if not Flag:
                 self.FvInfFile.writelines("EFI_FILE_NAME = " + \

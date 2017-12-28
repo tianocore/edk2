@@ -57,7 +57,7 @@ class FileStatement (FileStatementClassObject) :
     #   @param  FvParentAddr Parent Fv base address
     #   @retval string       Generated FFS file name
     #
-    def GenFfs(self, Dict = {}, FvChildAddr=[], FvParentAddr=None, IsMakefile=False):
+    def GenFfs(self, Dict = {}, FvChildAddr=[], FvParentAddr=None, IsMakefile=False, FvName=None):
         
         if self.NameGuid != None and self.NameGuid.startswith('PCD('):
             PcdValue = GenFdsGlobalVariable.GetPcdValue(self.NameGuid)
@@ -72,7 +72,10 @@ class FileStatement (FileStatementClassObject) :
                             % (self.NameGuid))
             self.NameGuid = RegistryGuidStr
         
-        OutputDir = os.path.join(GenFdsGlobalVariable.FfsDir, self.NameGuid)
+        Str = self.NameGuid
+        if FvName:
+            Str += FvName
+        OutputDir = os.path.join(GenFdsGlobalVariable.FfsDir, Str)
         if not os.path.exists(OutputDir):
             os.makedirs(OutputDir)
 
