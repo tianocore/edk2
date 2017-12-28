@@ -29,18 +29,18 @@ BUILD_LD ?= ld
 LINKER ?= $(BUILD_CC)
 ifeq ($(HOST_ARCH), IA32)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/Ia32/
-endif
 
-ifeq ($(HOST_ARCH), X64)
+else ifeq ($(HOST_ARCH), X64)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/X64/
-endif
 
-ifeq ($(HOST_ARCH), ARM)
+else ifeq ($(HOST_ARCH), ARM)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/Arm/
-endif
 
-ifeq ($(HOST_ARCH), AARCH64)
+else ifeq ($(HOST_ARCH), AARCH64)
 ARCH_INCLUDE = -I $(MAKEROOT)/Include/AArch64/
+
+else
+$(error Bad HOST_ARCH)
 endif
 
 INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE) 
