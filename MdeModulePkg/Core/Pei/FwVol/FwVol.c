@@ -514,7 +514,7 @@ PeiInitializeFv (
     "The %dth FV start address is 0x%11p, size is 0x%08x, handle is 0x%p\n", 
     (UINT32) PrivateData->FvCount, 
     (VOID *) BfvHeader, 
-    BfvHeader->FvLength,
+    (UINT32) BfvHeader->FvLength,
     FvHandle
     ));    
   PrivateData->FvCount ++;
