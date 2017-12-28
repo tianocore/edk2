@@ -721,9 +721,14 @@ FindQuestionDefaultSetting (
       VariableStorage = NULL;
     }
     Entry = AllocatePool (sizeof (VARSTORAGE_DEFAULT_DATA));
-    Entry->DefaultId = DefaultId;
-    Entry->VariableStorage = VariableStorage;
-    InsertTailList (&gVarStorageList, &Entry->Entry);
+    if (Entry != NULL) {
+      Entry->DefaultId = DefaultId;
+      Entry->VariableStorage = VariableStorage;
+      InsertTailList (&gVarStorageList, &Entry->Entry);
+    } else if (VariableStorage != NULL) {
+      FreePool (VariableStorage);
+      VariableStorage = NULL;
+    }
   }
   //
   // The matched variable storage is not found.
