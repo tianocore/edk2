@@ -188,6 +188,29 @@ GetWakeupBuffer (
 }
 
 /**
+  Get available EfiBootServicesCode memory below 4GB by specified size.
+
+  This buffer is required to safely transfer AP from real address mode to
+  protected mode or long mode, due to the fact that the buffer returned by
+  GetWakeupBuffer() may be marked as non-executable.
+
+  @param[in] BufferSize   Wakeup transition buffer size.
+
+  @retval other   Return wakeup transition buffer address below 4GB.
+  @retval 0       Cannot find free memory below 4GB.
+**/
+UINTN
+GetModeTransitionBuffer (
+  IN UINTN                BufferSize
+  )
+{
+  //
+  // PEI phase doesn't need to do such transition. So simply return 0.
+  //
+  return 0;
+}
+
+/**
   Checks APs status and updates APs status if needed.
 
 **/

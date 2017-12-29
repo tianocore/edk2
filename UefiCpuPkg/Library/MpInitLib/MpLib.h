@@ -152,6 +152,7 @@ typedef struct {
   UINTN             RendezvousFunnelSize;
   UINT8             *RelocateApLoopFuncAddress;
   UINTN             RelocateApLoopFuncSize;
+  UINTN             ModeTransitionOffset;
 } MP_ASSEMBLY_ADDRESS_MAP;
 
 typedef struct _CPU_MP_DATA  CPU_MP_DATA;
@@ -182,6 +183,10 @@ typedef struct {
   UINTN                 NumApsExecuting;
   CPU_MP_DATA           *CpuMpData;
   UINTN                 InitializeFloatingPointUnitsAddress;
+  UINT32                ModeTransitionMemory;
+  UINT16                ModeTransitionSegment;
+  UINT32                ModeHighMemory;
+  UINT16                ModeHighSegment;
 } MP_CPU_EXCHANGE_INFO;
 
 #pragma pack()
@@ -327,6 +332,23 @@ SaveCpuMpData (
 UINTN
 GetWakeupBuffer (
   IN UINTN                WakeupBufferSize
+  );
+
+/**
+  Get available EfiBootServicesCode memory below 4GB by specified size.
+
+  This buffer is required to safely transfer AP from real address mode to
+  protected mode or long mode, due to the fact that the buffer returned by
+  GetWakeupBuffer() may be marked as non-executable.
+
+  @param[in] BufferSize   Wakeup transition buffer size.
+
+  @retval other   Return wakeup transition buffer address below 4GB.
+  @retval 0       Cannot find free memory below 4GB.
+**/
+UINTN
+GetModeTransitionBuffer (
+  IN UINTN                BufferSize
   );
 
 /**

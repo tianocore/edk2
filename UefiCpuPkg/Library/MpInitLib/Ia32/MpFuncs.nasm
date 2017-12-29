@@ -48,19 +48,13 @@ BITS 16
     mov        si,  BufferStartLocation
     mov        ebx, [si]
 
-    mov        si,  ModeOffsetLocation
-    mov        eax, [si]
-    mov        si,  CodeSegmentLocation
-    mov        edx, [si]
-    mov        di,  ax
-    sub        di,  02h
-    mov        [di], dx
-    sub        di,  04h
-    add        eax, ebx
-    mov        [di],eax
-
     mov        si,  DataSegmentLocation
     mov        edx, [si]
+
+    ;
+    ; Get start address of 32-bit code in low memory (<1MB)
+    ;
+    mov        edi, ModeTransitionMemoryLocation
 
     mov        si, GdtrLocation
 o32 lgdt       [cs:si]
@@ -68,14 +62,21 @@ o32 lgdt       [cs:si]
     mov        si, IdtrLocation
 o32 lidt       [cs:si]
 
-    xor        ax,  ax
-    mov        ds,  ax
-
+    ;
+    ; Switch to protected mode
+    ;
     mov        eax, cr0                        ; Get control register 0
     or         eax, 000000003h                 ; Set PE bit (bit #0) & MP
     mov        cr0, eax
 
-    jmp        0:strict dword 0                ; far jump to protected mode
+    ; Switch to 32-bit code in executable memory (>1MB)
+o32 jmp far    [cs:di]
+
+;
+; Following code may be copied to memory with type of EfiBootServicesCode.
+; This is required at DXE phase if NX is enabled for EfiBootServicesCode of
+; memory.
+;
 BITS 32
 Flat32Start:                                   ; protected mode entry point
     mov        ds, dx
@@ -266,6 +267,7 @@ ASM_PFX(AsmGetAddressMap):
     mov        dword [ebx +  8h], RendezvousFunnelProcEnd - RendezvousFunnelProcStart
     mov        dword [ebx + 0Ch], AsmRelocateApLoopStart
     mov        dword [ebx + 10h], AsmRelocateApLoopEnd - AsmRelocateApLoopStart
+    mov        dword [ebx + 14h], Flat32Start - RendezvousFunnelProcStart
 
     popad
     ret

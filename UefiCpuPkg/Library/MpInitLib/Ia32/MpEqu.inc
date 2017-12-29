@@ -41,4 +41,9 @@ Cr3Location                   equ        LockLocation + 34h
 InitFlagLocation              equ        LockLocation + 38h
 CpuInfoLocation               equ        LockLocation + 3Ch
 NumApsExecutingLocation       equ        LockLocation + 40h
+InitializeFloatingPointUnitsAddress equ  LockLocation + 48h
+ModeTransitionMemoryLocation        equ  LockLocation + 4Ch
+ModeTransitionSegmentLocation       equ  LockLocation + 50h
+ModeHighMemoryLocation              equ  LockLocation + 52h
+ModeHighSegmentLocation             equ  LockLocation + 56h
 

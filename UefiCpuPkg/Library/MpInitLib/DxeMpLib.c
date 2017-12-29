@@ -114,6 +114,40 @@ GetWakeupBuffer (
 }
 
 /**
+  Get available EfiBootServicesCode memory below 4GB by specified size.
+
+  This buffer is required to safely transfer AP from real address mode to
+  protected mode or long mode, due to the fact that the buffer returned by
+  GetWakeupBuffer() may be marked as non-executable.
+
+  @param[in] BufferSize   Wakeup transition buffer size.
+
+  @retval other   Return wakeup transition buffer address below 4GB.
+  @retval 0       Cannot find free memory below 4GB.
+**/
+UINTN
+GetModeTransitionBuffer (
+  IN UINTN                BufferSize
+  )
+{
+  EFI_STATUS              Status;
+  EFI_PHYSICAL_ADDRESS    StartAddress;
+
+  StartAddress = BASE_4GB - 1;
+  Status = gBS->AllocatePages (
+                  AllocateMaxAddress,
+                  EfiBootServicesCode,
+                  EFI_SIZE_TO_PAGES (BufferSize),
+                  &StartAddress
+                  );
+  if (EFI_ERROR (Status)) {
+    StartAddress = 0;
+  }
+
+  return (UINTN)StartAddress;
+}
+
+/**
   Checks APs status and updates APs status if needed.
 
 **/
