@@ -893,6 +893,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack|0x5AA55AA5|UINT32|0x30001051
 
   ## Indicates which type allocation need guard page.
+  #
+  # If a bit is set, a head guard page and a tail guard page will be added just
+  # before and after corresponding type of pages allocated if there's enough
+  # free pages for all of them. The page allocation for the type related to
+  # cleared bits keeps the same as ususal.
+  #
   # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
   #  EfiReservedMemoryType             0x0000000000000001<BR>
   #  EfiLoaderCode                     0x0000000000000002<BR>
@@ -916,6 +922,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPageType|0x0|UINT64|0x30001052
 
   ## Indicates which type allocation need guard page.
+  #
+  # If a bit is set, a head guard page and a tail guard page will be added just
+  # before and after corresponding type of pages which the allocated pool occupies,
+  # if there's enough free memory for all of them. The pool allocation for the
+  # type related to cleared bits keeps the same as ususal.
+  #
   # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
   #  EfiReservedMemoryType             0x0000000000000001<BR>
   #  EfiLoaderCode                     0x0000000000000002<BR>
