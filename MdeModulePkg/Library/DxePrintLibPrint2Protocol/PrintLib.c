@@ -2052,7 +2052,7 @@ InternalPrintLibSPrintMarker (
       //
       for (Count = 0;
             ArgumentString[Count * BytesPerArgumentCharacter] != '\0' &&
-            Count < Precision || ((Flags & PRECISION) == 0);
+            (Count < Precision || ((Flags & PRECISION) == 0));
             Count++) {
         ArgumentCharacter = ((ArgumentString[Count * BytesPerArgumentCharacter] & 0xff) | ((ArgumentString[Count * BytesPerArgumentCharacter + 1]) << 8)) & ArgumentMask;
         if (ArgumentCharacter == 0) {
