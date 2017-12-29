@@ -164,7 +164,7 @@ class ValueExpression(object):
                 else:
                     Oprand1,Size = ParseFieldValue('"' + Oprand1 + '"')
             if type(Oprand2) == type(''):
-                if Oprand2[0] in ['"', "'", 'L'] or Oprand2.startswith('UINT'):
+                if Oprand2[0] in ['"', "'"] or Oprand2.startswith('L"') or Oprand2.startswith("L'") or Oprand2.startswith('UINT'):
                     Oprand2, Size = ParseFieldValue(Oprand2)
                 else:
                     Oprand2, Size = ParseFieldValue('"' + Oprand2 + '"')
