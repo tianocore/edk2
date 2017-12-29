@@ -1518,6 +1518,10 @@ BuildVarCheckHiiBin (
   //
   Data = AllocateRuntimeZeroPool (BinSize);
   ASSERT (Data != NULL);
+  //
+  // Make sure the allocated buffer for VarCheckHiiBin at required alignment.
+  //
+  ASSERT ((((UINTN) Data) & (HEADER_ALIGNMENT - 1)) == 0);
   DEBUG ((DEBUG_INFO, "VarCheckHiiBin - built at 0x%x\n", Data));
 
   //
