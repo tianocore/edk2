@@ -42,4 +42,7 @@ InitFlagLocation              equ        LockLocation + 6Ch
 CpuInfoLocation               equ        LockLocation + 74h
 NumApsExecutingLocation       equ        LockLocation + 7Ch
 InitializeFloatingPointUnitsAddress equ  LockLocation + 8Ch
-
+ModeTransitionMemoryLocation        equ  LockLocation + 94h
+ModeTransitionSegmentLocation       equ  LockLocation + 98h
+ModeHighMemoryLocation              equ  LockLocation + 9Ah
+ModeHighSegmentLocation             equ  LockLocation + 9Eh
