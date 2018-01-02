@@ -1,7 +1,7 @@
 /** @file
   This implementation of EFI_PXE_BASE_CODE_PROTOCOL and EFI_LOAD_FILE_PROTOCOL.
 
-  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -2349,8 +2349,15 @@ EfiPxeLoadFile (
   EFI_STATUS                  Status;
   EFI_STATUS                  MediaStatus;
 
-  if (FilePath == NULL || !IsDevicePathEnd (FilePath)) {
+  if (This == NULL || BufferSize == NULL || FilePath == NULL || !IsDevicePathEnd (FilePath)) {
     return EFI_INVALID_PARAMETER;
+  }
+  
+  //
+  // Only support BootPolicy
+  //
+  if (!BootPolicy) {
+    return EFI_UNSUPPORTED;
   }
   
   VirtualNic = PXEBC_VIRTUAL_NIC_FROM_LOADFILE (This);
@@ -2358,17 +2365,6 @@ EfiPxeLoadFile (
   PxeBc      = &Private->PxeBc;
   UsingIpv6  = FALSE;
   Status     = EFI_DEVICE_ERROR;
-
-  if (This == NULL || BufferSize == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Only support BootPolicy
-  //
-  if (!BootPolicy) {
-    return EFI_UNSUPPORTED;
-  }
 
   //
   // Check media status before PXE start
