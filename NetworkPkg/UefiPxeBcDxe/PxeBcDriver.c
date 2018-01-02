@@ -2,7 +2,7 @@
   Driver Binding functions implementationfor for UefiPxeBc Driver.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -254,6 +254,7 @@ PxeBcDestroyIp4Children (
            &Private->PxeBc,
            NULL
            );
+    FreePool (Private->Ip4Nic->DevicePath);
 
     if (Private->Snp != NULL) { 
       //
@@ -414,6 +415,8 @@ PxeBcDestroyIp6Children (
            &Private->PxeBc,
            NULL
            );
+    FreePool (Private->Ip6Nic->DevicePath);
+    
     if (Private->Snp != NULL) {
       //
       // Close SNP from the child virtual handle
