@@ -1405,9 +1405,8 @@ class PlatformAutoGen(AutoGen):
                 if len(Sku.VariableName) > 0:
                     VariableGuidStructure = Sku.VariableGuidValue
                     VariableGuid = GuidStructureStringToGuidString(VariableGuidStructure)
-                    if Pcd.Phase == "DXE":
-                        for StorageName in Sku.DefaultStoreDict:
-                            VariableInfo.append_variable(var_info(Index,pcdname,StorageName,SkuName, StringToArray(Sku.VariableName),VariableGuid, Sku.VariableAttribute , Sku.HiiDefaultValue,Sku.DefaultStoreDict[StorageName],Pcd.DatumType))
+                    for StorageName in Sku.DefaultStoreDict:
+                        VariableInfo.append_variable(var_info(Index,pcdname,StorageName,SkuName, StringToArray(Sku.VariableName),VariableGuid, Sku.VariableAttribute , Sku.HiiDefaultValue,Sku.DefaultStoreDict[StorageName],Pcd.DatumType))
             Index += 1
         return VariableInfo
 
