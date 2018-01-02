@@ -1210,6 +1210,8 @@ PxeBcDhcp4CallBack (
     return EFI_SUCCESS;
   }
 
+  ASSERT (Packet != NULL);
+
   Private   = (PXEBC_PRIVATE_DATA *) Context;
   Mode      = Private->PxeBc.Mode;
   Callback  = Private->PxeBcCallback;
@@ -1305,6 +1307,8 @@ PxeBcDhcp4CallBack (
     break;
 
   case Dhcp4SelectOffer:
+    ASSERT (NewPacket != NULL);
+    
     //
     // Select offer by the default policy or by order, and record the SelectIndex
     // and SelectProxyType.
