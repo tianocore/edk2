@@ -67,11 +67,11 @@ AsciiStrCaseStr (
       Dst = *SearchStringTmp;
 
       if ((Src >= 'A') && (Src <= 'Z')) {
-        Src -= ('A' - 'a');
+        Src += ('a' - 'A');
       }
 
       if ((Dst >= 'A') && (Dst <= 'Z')) {
-        Dst -= ('A' - 'a');
+        Dst += ('a' - 'A');
       }
 
       if (Src != Dst) {
