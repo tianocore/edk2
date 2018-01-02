@@ -266,11 +266,7 @@ Returns:
     sprintf(PcdList[Index].Value, "0x%08x", (UINT32)(Value & 0xffffffff));
     break;
   case PcdDataTypeUint64:
-#ifdef __GNUC__
-    sprintf(PcdList[Index].Value, "0x%016lx", Value);
-#else
-    sprintf(PcdList[Index].Value, "0x%016llx", Value);
-#endif
+    sprintf(PcdList[Index].Value, "0x%016llx", (unsigned long long)Value);
     break;
   case PcdDataTypePointer:
     fprintf (stderr, "PCD %s.%s.%s.%s is structure.  Use PcdSetPtr()\n", SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
