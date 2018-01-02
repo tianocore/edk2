@@ -2,7 +2,7 @@
   Functions implementation related with DHCPv6 for UefiPxeBc Driver.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -2030,6 +2030,9 @@ PxeBcDhcp6CallBack (
       SelectAd   = &Private->OfferBuffer[Private->SelectIndex - 1].Dhcp6.Packet.Offer;
       *NewPacket = AllocateZeroPool (SelectAd->Size);
       ASSERT (*NewPacket != NULL);
+      if (*NewPacket == NULL) {
+        return EFI_ABORTED;
+      }
       CopyMem (*NewPacket, SelectAd, SelectAd->Size);
     }
     break;
