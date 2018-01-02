@@ -2051,7 +2051,9 @@ InternalPrintLibSPrintMarker (
       // ArgumentString is either null-terminated, or it contains Precision characters
       //
       for (Count = 0;
-            ArgumentString[Count * BytesPerArgumentCharacter] != '\0' &&
+            (ArgumentString[Count * BytesPerArgumentCharacter] != '\0' ||
+             (BytesPerArgumentCharacter > 1 &&
+              ArgumentString[Count * BytesPerArgumentCharacter + 1]!= '\0')) &&
             (Count < Precision || ((Flags & PRECISION) == 0));
             Count++) {
         ArgumentCharacter = ((ArgumentString[Count * BytesPerArgumentCharacter] & 0xff) | ((ArgumentString[Count * BytesPerArgumentCharacter + 1]) << 8)) & ArgumentMask;
@@ -2110,7 +2112,9 @@ InternalPrintLibSPrintMarker (
     //
     // Copy the string into the output buffer performing the required type conversions
     //
-    while (Index < Count && (*ArgumentString) != '\0') {
+    while (Index < Count &&
+           (ArgumentString[0] != '\0' ||
+            (BytesPerArgumentCharacter > 1 && ArgumentString[1] != '\0'))) {
       ArgumentCharacter = ((*ArgumentString & 0xff) | (((UINT8)*(ArgumentString + 1)) << 8)) & ArgumentMask;
 
       LengthToReturn += (1 * BytesPerOutputCharacter);
