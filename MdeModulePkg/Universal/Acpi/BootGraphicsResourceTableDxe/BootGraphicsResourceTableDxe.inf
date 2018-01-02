@@ -2,6 +2,7 @@
 #  This module install ACPI Boot Graphics Resource Table (BGRT).
 #
 #  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016, Microsoft Corporation<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -49,6 +50,7 @@
 [Protocols]
   gEfiAcpiTableProtocolGuid                     ## CONSUMES
   gEfiBootLogoProtocolGuid                      ## PRODUCES
+  gEdkiiBootLogo2ProtocolGuid                   ## PRODUCES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES

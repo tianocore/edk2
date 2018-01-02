@@ -2,6 +2,7 @@
   This module install ACPI Boot Graphics Resource Table (BGRT).
 
   Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016, Microsoft Corporation<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +19,7 @@
 #include <Protocol/AcpiTable.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/BootLogo.h>
+#include <Protocol/BootLogo2.h>
 
 #include <Guid/EventGroup.h>
 
@@ -33,20 +35,19 @@
 /**
   Update information of logo image drawn on screen.
 
-  @param  This           The pointer to the Boot Logo protocol instance.
-  @param  BltBuffer      The BLT buffer for logo drawn on screen. If BltBuffer
-                         is set to NULL, it indicates that logo image is no
-                         longer on the screen.
-  @param  DestinationX   X coordinate of destination for the BltBuffer.
-  @param  DestinationY   Y coordinate of destination for the BltBuffer.
-  @param  Width          Width of rectangle in BltBuffer in pixels.
-  @param  Height         Hight of rectangle in BltBuffer in pixels.
+  @param[in] This          The pointer to the Boot Logo protocol 2 instance.
+  @param[in] BltBuffer     The BLT buffer for logo drawn on screen. If BltBuffer
+                           is set to NULL, it indicates that logo image is no
+                           longer on the screen.
+  @param[in] DestinationX  X coordinate of destination for the BltBuffer.
+  @param[in] DestinationY  Y coordinate of destination for the BltBuffer.
+  @param[in] Width         Width of rectangle in BltBuffer in pixels.
+  @param[in] Height        Hight of rectangle in BltBuffer in pixels.
 
-  @retval EFI_SUCCESS             The boot logo information was updated.
-  @retval EFI_INVALID_PARAMETER   One of the parameters has an invalid value.
-  @retval EFI_OUT_OF_RESOURCES    The logo information was not updated due to
-                                  insufficient memory resources.
-
+  @retval EFI_SUCCESS            The boot logo information was updated.
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+  @retval EFI_OUT_OF_RESOURCES   The logo information was not updated due to
+                                 insufficient memory resources.
 **/
 EFI_STATUS
 EFIAPI
@@ -59,6 +60,69 @@ SetBootLogo (
   IN UINTN                          Height
   );
 
+/**
+  Update information of logo image drawn on screen.
+
+  @param[in] This          The pointer to the Boot Logo protocol 2 instance.
+  @param[in] BltBuffer     The BLT buffer for logo drawn on screen. If BltBuffer
+                           is set to NULL, it indicates that logo image is no
+                           longer on the screen.
+  @param[in] DestinationX  X coordinate of destination for the BltBuffer.
+  @param[in] DestinationY  Y coordinate of destination for the BltBuffer.
+  @param[in] Width         Width of rectangle in BltBuffer in pixels.
+  @param[in] Height        Hight of rectangle in BltBuffer in pixels.
+
+  @retval EFI_SUCCESS            The boot logo information was updated.
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+  @retval EFI_OUT_OF_RESOURCES   The logo information was not updated due to
+                                 insufficient memory resources.
+**/
+EFI_STATUS
+EFIAPI
+SetBootLogo2 (
+  IN EDKII_BOOT_LOGO2_PROTOCOL      *This,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer       OPTIONAL,
+  IN UINTN                          DestinationX,
+  IN UINTN                          DestinationY,
+  IN UINTN                          Width,
+  IN UINTN                          Height
+  );
+
+/**
+  Get the location of the boot logo on the screen.
+
+  @param[in]  This          The pointer to the Boot Logo Protocol 2 instance
+  @param[out] BltBuffer     Returns pointer to the GOP BLT buffer that was
+                            previously registered with SetBootLogo2(). The
+                            buffer returned must not be modified or freed.
+  @param[out] DestinationX  Returns the X start position of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] DestinationY  Returns the Y start position of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] Width         Returns the width of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] Height        Returns the height of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+
+  @retval EFI_SUCCESS            The location of the boot logo was returned.
+  @retval EFI_NOT_READY          The boot logo has not been set.
+  @retval EFI_INVALID_PARAMETER  BltBuffer is NULL.
+  @retval EFI_INVALID_PARAMETER  DestinationX is NULL.
+  @retval EFI_INVALID_PARAMETER  DestinationY is NULL.
+  @retval EFI_INVALID_PARAMETER  Width is NULL.
+  @retval EFI_INVALID_PARAMETER  Height is NULL.
+**/
+EFI_STATUS
+EFIAPI
+GetBootLogo2 (
+  IN  EDKII_BOOT_LOGO2_PROTOCOL      *This,
+  OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  **BltBuffer,
+  OUT UINTN                          *DestinationX,
+  OUT UINTN                          *DestinationY,
+  OUT UINTN                          *Width,
+  OUT UINTN                          *Height
+  );
+
 //
 // Boot Logo Protocol Handle
 //
@@ -69,6 +133,14 @@ EFI_HANDLE  mBootLogoHandle = NULL;
 //
 EFI_BOOT_LOGO_PROTOCOL  mBootLogoProtocolTemplate = {
   SetBootLogo
+};
+
+///
+/// Boot Logo 2 Protocol instance
+///
+EDKII_BOOT_LOGO2_PROTOCOL mBootLogo2ProtocolTemplate = {
+  SetBootLogo2,
+  GetBootLogo2
 };
 
 EFI_EVENT                      mBootGraphicsReadyToBootEvent;
@@ -136,6 +208,47 @@ SetBootLogo (
   IN UINTN                             DestinationY,
   IN UINTN                             Width,
   IN UINTN                             Height
+  )
+{
+  //
+  // Call same service in Boot Logo 2 Protocol
+  //
+  return SetBootLogo2 (
+           &mBootLogo2ProtocolTemplate,
+           BltBuffer,
+           DestinationX,
+           DestinationY,
+           Width,
+           Height
+           );
+}
+
+/**
+  Update information of logo image drawn on screen.
+
+  @param[in] This          The pointer to the Boot Logo protocol 2 instance.
+  @param[in] BltBuffer     The BLT buffer for logo drawn on screen. If BltBuffer
+                           is set to NULL, it indicates that logo image is no
+                           longer on the screen.
+  @param[in] DestinationX  X coordinate of destination for the BltBuffer.
+  @param[in] DestinationY  Y coordinate of destination for the BltBuffer.
+  @param[in] Width         Width of rectangle in BltBuffer in pixels.
+  @param[in] Height        Hight of rectangle in BltBuffer in pixels.
+
+  @retval EFI_SUCCESS            The boot logo information was updated.
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+  @retval EFI_OUT_OF_RESOURCES   The logo information was not updated due to
+                                 insufficient memory resources.
+**/
+EFI_STATUS
+EFIAPI
+SetBootLogo2 (
+  IN EDKII_BOOT_LOGO2_PROTOCOL      *This,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer       OPTIONAL,
+  IN UINTN                          DestinationX,
+  IN UINTN                          DestinationY,
+  IN UINTN                          Width,
+  IN UINTN                          Height
   )
 {
   EFI_STATUS  Status;
@@ -223,6 +336,71 @@ SetBootLogo (
   mLogoWidth   = Width;
   mLogoHeight  = Height;
   mIsLogoValid = TRUE;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Get the location of the boot logo on the screen.
+
+  @param[in]  This          The pointer to the Boot Logo Protocol 2 instance
+  @param[out] BltBuffer     Returns pointer to the GOP BLT buffer that was
+                            previously registered with SetBootLogo2(). The
+                            buffer returned must not be modified or freed.
+  @param[out] DestinationX  Returns the X start position of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] DestinationY  Returns the Y start position of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] Width         Returns the width of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] Height        Returns the height of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+
+  @retval EFI_SUCCESS            The location of the boot logo was returned.
+  @retval EFI_NOT_READY          The boot logo has not been set.
+  @retval EFI_INVALID_PARAMETER  BltBuffer is NULL.
+  @retval EFI_INVALID_PARAMETER  DestinationX is NULL.
+  @retval EFI_INVALID_PARAMETER  DestinationY is NULL.
+  @retval EFI_INVALID_PARAMETER  Width is NULL.
+  @retval EFI_INVALID_PARAMETER  Height is NULL.
+**/
+EFI_STATUS
+EFIAPI
+GetBootLogo2 (
+  IN  EDKII_BOOT_LOGO2_PROTOCOL      *This,
+  OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  **BltBuffer,
+  OUT UINTN                          *DestinationX,
+  OUT UINTN                          *DestinationY,
+  OUT UINTN                          *Width,
+  OUT UINTN                          *Height
+  )
+{
+  //
+  // If the boot logo has not been set with SetBootLogo() or SetBootLogo() was
+  // called with a NULL BltBuffer then the boot logo is not valid and
+  // EFI_NOT_READY is returned.
+  //
+  if (mLogoBltBuffer == NULL) {
+    DEBUG ((DEBUG_ERROR, "Request to get boot logo location before boot logo has been set.\n"));
+    return EFI_NOT_READY;
+  }
+
+  //
+  // Make sure none of the boot logo location parameters are NULL.
+  //
+  if (BltBuffer == NULL || DestinationX == NULL || DestinationY == NULL ||
+      Width == NULL || Height == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Boot logo is valid.  Return values from module globals.
+  //
+  *BltBuffer    = mLogoBltBuffer;
+  *DestinationX = mLogoDestX;
+  *DestinationY = mLogoDestY;
+  *Width        = mLogoWidth;
+  *Height       = mLogoHeight;
 
   return EFI_SUCCESS;
 }
@@ -401,12 +579,14 @@ BootGraphicsDxeEntryPoint (
   Header->CreatorRevision = PcdGet32 (PcdAcpiDefaultCreatorRevision);
 
   //
-  // Install Boot Logo protocol.
+  // Install Boot Logo and Boot Logo 2 Protocols.
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mBootLogoHandle,
                   &gEfiBootLogoProtocolGuid,
                   &mBootLogoProtocolTemplate,
+                  &gEdkiiBootLogo2ProtocolGuid,
+                  &mBootLogo2ProtocolTemplate,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
