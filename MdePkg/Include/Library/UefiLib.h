@@ -12,7 +12,7 @@
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
 The full text of the license may be found at
@@ -1490,4 +1490,34 @@ CatSPrint (
   ...
   );
 
+/**
+  Returns an array of protocol instance that matches the given protocol.
+
+  @param[in]  Protocol      Provides the protocol to search for.
+  @param[out] NoProtocols   The number of protocols returned in Buffer.
+  @param[out] Buffer        A pointer to the buffer to return the requested
+                            array of protocol instances that match Protocol.
+                            The returned buffer is allocated using
+                            EFI_BOOT_SERVICES.AllocatePool().  The caller is
+                            responsible for freeing this buffer with
+                            EFI_BOOT_SERVICES.FreePool().
+
+  @retval EFI_SUCCESS            The array of protocols was returned in Buffer,
+                                 and the number of protocols in Buffer was
+                                 returned in NoProtocols.
+  @retval EFI_NOT_FOUND          No protocols found.
+  @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the
+                                 matching results.
+  @retval EFI_INVALID_PARAMETER  Protocol is NULL.
+  @retval EFI_INVALID_PARAMETER  NoProtocols is NULL.
+  @retval EFI_INVALID_PARAMETER  Buffer is NULL.
+
+**/
+EFI_STATUS
+EFIAPI
+EfiLocateProtocolBuffer (
+  IN  EFI_GUID  *Protocol,
+  OUT UINTN     *NoProtocols,
+  OUT VOID      ***Buffer
+  );
 #endif
