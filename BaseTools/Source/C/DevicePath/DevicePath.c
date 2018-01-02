@@ -103,11 +103,19 @@ Returns:
 }
 
 
-void print_mem(void const *vp, size_t n)
+STATIC
+VOID
+PrintMem (
+  CONST VOID *Buffer,
+  UINTN      Count
+  )
 {
-    unsigned char const *p = vp;
-    for (size_t i=0; i<n; i++) {
-        printf("0x%02x ", p[i]);
+  CONST UINT8 *Bytes;
+  UINTN       Idx;
+
+  Bytes = Buffer;
+  for (Idx = 0; Idx < Count; Idx++) {
+    printf("0x%02x ", Bytes[Idx]);
   }
 }
 
@@ -177,10 +185,10 @@ int main(int argc, CHAR8 *argv[])
   DevicePath = UefiDevicePathLibConvertTextToDevicePath(Str16);
   while (!((DevicePath->Type == END_DEVICE_PATH_TYPE) && (DevicePath->SubType == END_ENTIRE_DEVICE_PATH_SUBTYPE)) )
   {
-    print_mem(DevicePath, (DevicePath->Length[0] | DevicePath->Length[1] << 8));
+    PrintMem (DevicePath, DevicePath->Length[0] | DevicePath->Length[1] << 8);
     DevicePath = (EFI_DEVICE_PATH_PROTOCOL *)((UINT8 *)DevicePath + (DevicePath->Length[0] | DevicePath->Length[1] << 8));
   }
-  print_mem(DevicePath, (DevicePath->Length[0] | DevicePath->Length[1] << 8));
+  PrintMem (DevicePath, DevicePath->Length[0] | DevicePath->Length[1] << 8);
   putchar('\n');
   return STATUS_SUCCESS;
 }
