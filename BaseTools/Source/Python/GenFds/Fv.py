@@ -1,7 +1,7 @@
 ## @file
 # process FV generation
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -179,7 +179,7 @@ class FV (FvClassObject):
                 if FvChildAddr != []:
                     # Update Ffs again
                     for FfsFile in self.FfsList :
-                        FileName = FfsFile.GenFfs(MacroDict, FvChildAddr, BaseAddress, IsMakefile=Flag)
+                        FileName = FfsFile.GenFfs(MacroDict, FvChildAddr, BaseAddress, IsMakefile=Flag, FvName=self.UiFvName)
 
                     if GenFdsGlobalVariable.LargeFileInFvFlags[-1]:
                         FFSGuid = GenFdsGlobalVariable.EFI_FIRMWARE_FILE_SYSTEM3_GUID;
