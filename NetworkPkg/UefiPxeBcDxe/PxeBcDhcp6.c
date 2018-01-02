@@ -548,6 +548,7 @@ PxeBcExtractBootFileUrl (
     if (ModeStr != NULL && *(ModeStr + AsciiStrLen (";mode=octet")) == '\0') {
       *ModeStr = '\0';
     } else if (AsciiStrStr (BootFileNamePtr, ";mode=") != NULL) {
+      FreePool (TmpStr);
       return EFI_INVALID_PARAMETER;
     }
 
@@ -1005,7 +1006,7 @@ PxeBcRequestBootService (
                     );
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ON_ERROR;
   }
 
   //
@@ -1020,7 +1021,7 @@ PxeBcRequestBootService (
   //
   Status = Private->Udp6Read->Configure (Private->Udp6Read, &Private->Udp6CfgData);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ON_ERROR;
   }
     
   Status = PxeBc->UdpRead (
@@ -1041,7 +1042,7 @@ PxeBcRequestBootService (
   Private->Udp6Read->Configure (Private->Udp6Read, NULL);
 
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ON_ERROR;
   }
 
   //
@@ -1050,6 +1051,13 @@ PxeBcRequestBootService (
   Reply->Length = (UINT32) ReadSize;
 
   return EFI_SUCCESS;
+  
+ON_ERROR:
+  if (Discover != NULL) {
+    FreePool (Discover);
+  }
+
+  return Status;
 }
 
 
@@ -2158,7 +2166,7 @@ PxeBcDhcp6Discover (
                     (VOID *) Discover
                     );
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ON_ERROR;
   }
 
   //
@@ -2178,7 +2186,7 @@ PxeBcDhcp6Discover (
   //
   Status = Private->Udp6Read->Configure (Private->Udp6Read, &Private->Udp6CfgData);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ON_ERROR;
   }
   
   Status = PxeBc->UdpRead (
@@ -2198,10 +2206,17 @@ PxeBcDhcp6Discover (
   //
   Private->Udp6Read->Configure (Private->Udp6Read, NULL);
   if (EFI_ERROR (Status)) {
-    return Status;
+    goto ON_ERROR;
   }
 
   return EFI_SUCCESS;
+
+ON_ERROR:
+  if (Discover != NULL) {
+    FreePool (Discover);
+  }
+
+  return Status;
 }
 
 
