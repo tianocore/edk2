@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -83,6 +83,21 @@ typedef struct {
   BOOLEAN                          HasDirtyPages;
   PCI_DEVICE_INFORMATION           PciDeviceInfo;
 } VTD_UNIT_INFORMATION;
+
+//
+// This is the initial max ACCESS request.
+// The number may be enlarged later.
+//
+#define MAX_VTD_ACCESS_REQUEST      0x100
+
+typedef struct {
+  UINT16                Segment;
+  VTD_SOURCE_ID         SourceId;
+  UINT64                BaseAddress;
+  UINT64                Length;
+  UINT64                IoMmuAccess;
+} VTD_ACCESS_REQUEST;
+
 
 /**
   The scan bus callback function.
@@ -559,6 +574,35 @@ GetPciBusDeviceFunction (
   OUT UINT8                                       *Bus,
   OUT UINT8                                       *Device,
   OUT UINT8                                       *Function
+  );
+
+/**
+  Append VTd Access Request to global.
+
+  @param[in]  Segment           The Segment used to identify a VTd engine.
+  @param[in]  SourceId          The SourceId used to identify a VTd engine and table entry.
+  @param[in]  BaseAddress       The base of device memory address to be used as the DMA memory.
+  @param[in]  Length            The length of device memory address to be used as the DMA memory.
+  @param[in]  IoMmuAccess       The IOMMU access.
+
+  @retval EFI_SUCCESS           The IoMmuAccess is set for the memory range specified by BaseAddress and Length.
+  @retval EFI_INVALID_PARAMETER BaseAddress is not IoMmu Page size aligned.
+  @retval EFI_INVALID_PARAMETER Length is not IoMmu Page size aligned.
+  @retval EFI_INVALID_PARAMETER Length is 0.
+  @retval EFI_INVALID_PARAMETER IoMmuAccess specified an illegal combination of access.
+  @retval EFI_UNSUPPORTED       The bit mask of IoMmuAccess is not supported by the IOMMU.
+  @retval EFI_UNSUPPORTED       The IOMMU does not support the memory range specified by BaseAddress and Length.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to modify the IOMMU access.
+  @retval EFI_DEVICE_ERROR      The IOMMU device reported an error while attempting the operation.
+
+**/
+EFI_STATUS
+RequestAccessAttribute (
+  IN UINT16                 Segment,
+  IN VTD_SOURCE_ID          SourceId,
+  IN UINT64                 BaseAddress,
+  IN UINT64                 Length,
+  IN UINT64                 IoMmuAccess
   );
 
 #endif
