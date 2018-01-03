@@ -403,7 +403,6 @@ SyslogBuildPacket (
                     Time.Minute,
                     Time.Second
                     );
-  Len--;
 
   Len += (UINT32) AsciiSPrint (
                     Buf + Len,
@@ -414,7 +413,7 @@ SyslogBuildPacket (
                     Line,
                     File
                     );
-  Len--;
+  Len ++;
 
   //
   // OK, patch the IP length/checksum and UDP length fields.
