@@ -1,7 +1,7 @@
 /** @file
 Common basic Library Functions
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -2032,8 +2032,8 @@ StrToIpv6Address (
     return RETURN_UNSUPPORTED;
   }
   memcpy (&Address->Addr[0], &LocalAddress.Addr[0], CompressStart);
-  memset (&Address->Addr[CompressStart], 0,  ARRAY_SIZE (Address->Addr) - AddressIndex);
   if (AddressIndex > CompressStart) {
+    memset (&Address->Addr[CompressStart], 0,  ARRAY_SIZE (Address->Addr) - AddressIndex);
     memcpy (
       &Address->Addr[CompressStart + ARRAY_SIZE (Address->Addr) - AddressIndex],
       &LocalAddress.Addr[CompressStart],
