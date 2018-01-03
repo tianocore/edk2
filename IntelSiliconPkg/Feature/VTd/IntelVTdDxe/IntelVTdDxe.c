@@ -1,7 +1,7 @@
 /** @file
   Intel VTd driver.
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -230,6 +230,14 @@ VTdSetAttribute (
   DEBUG ((DEBUG_VERBOSE, "IoMmuSetAttribute: "));
   DEBUG ((DEBUG_VERBOSE, "PCI(S%x.B%x.D%x.F%x) ", Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
   DEBUG ((DEBUG_VERBOSE, "(0x%lx~0x%lx) - %lx\n", DeviceAddress, Length, IoMmuAccess));
+
+  if (mAcpiDmarTable == NULL) {
+    //
+    // Record the entry to driver global variable.
+    // As such once VTd is activated, the setting can be adopted.
+    //
+    return RequestAccessAttribute (Segment, SourceId, DeviceAddress, Length, IoMmuAccess);
+  }
 
   PERF_CODE (
     AsciiSPrint (PerfToken, sizeof(PerfToken), "S%04xB%02xD%02xF%01x", Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function);
