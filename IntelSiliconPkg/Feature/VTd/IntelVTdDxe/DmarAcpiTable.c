@@ -27,7 +27,7 @@ typedef struct {
 
 #pragma pack()
 
-EFI_ACPI_DMAR_HEADER  *mAcpiDmarTable;
+EFI_ACPI_DMAR_HEADER  *mAcpiDmarTable = NULL;
 
 /**
   Dump DMAR DeviceScopeEntry.
