@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -473,7 +473,8 @@ InitializeDmaProtection (
   EFI_STATUS  Status;
   EFI_EVENT   ExitBootServicesEvent;
   EFI_EVENT   LegacyBootEvent;
-  EFI_EVENT   Event;
+  EFI_EVENT   EventAcpi10;
+  EFI_EVENT   EventAcpi20;
   
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
@@ -481,7 +482,7 @@ InitializeDmaProtection (
                   AcpiNotificationFunc,
                   NULL,
                   &gEfiAcpi10TableGuid,
-                  &Event
+                  &EventAcpi10
                   );
   ASSERT_EFI_ERROR (Status);
 
@@ -491,9 +492,16 @@ InitializeDmaProtection (
                   AcpiNotificationFunc,
                   NULL,
                   &gEfiAcpi20TableGuid,
-                  &Event
+                  &EventAcpi20
                   );
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Signal the events initially for the case
+  // that DMAR table has been installed.
+  //
+  gBS->SignalEvent (EventAcpi20);
+  gBS->SignalEvent (EventAcpi10);
 
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
