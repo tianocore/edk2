@@ -1005,6 +1005,9 @@ GetDmarAcpiTable (
                &AcpiTable
                );
   }
+  if (EFI_ERROR (Status)) {
+    return EFI_NOT_FOUND;
+  }
   ASSERT (AcpiTable != NULL);
 
   mAcpiDmarTable = FindAcpiPtr (
