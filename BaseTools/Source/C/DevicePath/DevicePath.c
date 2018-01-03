@@ -183,6 +183,11 @@ int main(int argc, CHAR8 *argv[])
   }
   Ascii2UnicodeString(Str, Str16);
   DevicePath = UefiDevicePathLibConvertTextToDevicePath(Str16);
+  if (DevicePath == NULL) {
+    fprintf(stderr, "Convert fail, Cannot convert text to a device path");
+    free(Str16);
+    return STATUS_ERROR;
+  }
   while (!((DevicePath->Type == END_DEVICE_PATH_TYPE) && (DevicePath->SubType == END_ENTIRE_DEVICE_PATH_SUBTYPE)) )
   {
     PrintMem (DevicePath, DevicePath->Length[0] | DevicePath->Length[1] << 8);
