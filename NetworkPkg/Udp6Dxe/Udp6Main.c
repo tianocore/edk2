@@ -381,7 +381,7 @@ Udp6Groups (
     Status = NetMapInsertTail (&Instance->McastIps, (VOID *) McastIp, NULL);
   } else {
 
-    NetMapIterate (&Instance->McastIps, Udp6LeaveGroup, MulticastAddress);
+    Status = NetMapIterate (&Instance->McastIps, Udp6LeaveGroup, MulticastAddress);
   }
 
 ON_EXIT:

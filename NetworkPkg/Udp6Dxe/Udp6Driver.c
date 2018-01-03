@@ -290,18 +290,15 @@ Udp6DriverBindingStop (
                NULL
                );
   } else if (IsListEmpty (&Udp6Service->ChildrenList)) {
-    gBS->UninstallMultipleProtocolInterfaces (
-           NicHandle,
-           &gEfiUdp6ServiceBindingProtocolGuid,
-           &Udp6Service->ServiceBinding,
-           NULL
-           );
+    Status = gBS->UninstallMultipleProtocolInterfaces (
+               NicHandle,
+               &gEfiUdp6ServiceBindingProtocolGuid,
+               &Udp6Service->ServiceBinding,
+               NULL
+               );
  
     Udp6CleanService (Udp6Service);
-
     FreePool (Udp6Service);
-
-    Status = EFI_SUCCESS;
   }
 
   return Status;
@@ -510,21 +507,30 @@ Udp6ServiceBindingDestroyChild (
   //
   // Close the Ip6 protocol on the default IpIo.
   //
-  gBS->CloseProtocol (
-         Udp6Service->IpIo->ChildHandle,
-         &gEfiIp6ProtocolGuid,
-         gUdp6DriverBinding.DriverBindingHandle,
-         Instance->ChildHandle
-         );
+  Status = gBS->CloseProtocol (
+             Udp6Service->IpIo->ChildHandle,
+             &gEfiIp6ProtocolGuid,
+             gUdp6DriverBinding.DriverBindingHandle,
+             Instance->ChildHandle
+             );
+  if (EFI_ERROR (Status)) {
+    Instance->InDestroy = FALSE;
+    return Status;
+  }
+
   //
   // Close the Ip6 protocol on this instance's IpInfo.
   //
-  gBS->CloseProtocol (
-         Instance->IpInfo->ChildHandle,
-         &gEfiIp6ProtocolGuid,
-         gUdp6DriverBinding.DriverBindingHandle,
-         Instance->ChildHandle
-         );
+  Status = gBS->CloseProtocol (
+             Instance->IpInfo->ChildHandle,
+             &gEfiIp6ProtocolGuid,
+             gUdp6DriverBinding.DriverBindingHandle,
+             Instance->ChildHandle
+             );
+  if (EFI_ERROR (Status)) {
+    Instance->InDestroy = FALSE;
+    return Status;
+  }
 
   //
   // Uninstall the Udp6Protocol previously installed on the ChildHandle.
