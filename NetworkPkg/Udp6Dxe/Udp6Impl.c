@@ -1,7 +1,7 @@
 /** @file
   Udp6 driver's whole implementation.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1608,6 +1608,10 @@ Udp6Demultiplex (
   //
   Udp6Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
   ASSERT (Udp6Header != NULL);
+  if (Udp6Header == NULL) {
+    NetbufFree (Packet);
+    return;
+  }
 
   if (Udp6Header->Checksum != 0) {
     //
@@ -1718,6 +1722,9 @@ Udp6SendPortUnreach (
   //
   Ip6ModeData = AllocateZeroPool (sizeof (EFI_IP6_MODE_DATA));
   ASSERT (Ip6ModeData != NULL);
+  if (Ip6ModeData == NULL) {
+    goto EXIT;
+  }
 
   //
   // If not finding the related IpSender use the default IpIo to send out
@@ -1766,6 +1773,9 @@ Udp6SendPortUnreach (
   //
   IcmpErrHdr = (IP6_ICMP_ERROR_HEAD *) NetbufAllocSpace (Packet, Len, FALSE);
   ASSERT (IcmpErrHdr != NULL);
+  if (IcmpErrHdr == NULL) {
+    goto EXIT;
+  }
 
   //
   // Set the required fields for the icmp port unreachable message.
@@ -1847,6 +1857,10 @@ Udp6IcmpHandler (
   
   Udp6Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
   ASSERT (Udp6Header != NULL);
+  if (Udp6Header == NULL) {
+    NetbufFree (Packet);
+    return;
+  }
 
   IP6_COPY_ADDRESS (&Udp6Session.SourceAddress, &NetSession->Source);
   IP6_COPY_ADDRESS (&Udp6Session.DestinationAddress, &NetSession->Dest);
