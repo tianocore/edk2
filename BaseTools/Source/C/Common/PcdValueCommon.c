@@ -72,6 +72,9 @@ Returns:
   CHAR8  *Token;
 
   Token = malloc (TokenEnd - TokenStart + 1);
+  if (Token == NULL) {
+    return;
+  }
   memcpy (Token, &FileBuffer[TokenStart], TokenEnd - TokenStart);
   Token[TokenEnd - TokenStart] = 0;
   switch (TokenIndex) {
@@ -333,6 +336,10 @@ Returns:
       Value = End + 1;
     }
     Buffer = malloc(*Size);
+    if (Buffer == NULL) {
+      *Size = 0;
+      return NULL;
+    }
     Value = &PcdList[Index].Value[1];
     for (*Size = 0, Buffer[*Size] = (UINT8) strtoul(Value, &End, 16); Value != End; *Size = *Size + 1, Buffer[*Size] = (UINT8) strtoul(Value, &End, 16)) {
       Value = End + 1;
