@@ -1,7 +1,7 @@
 /** @file
   This file implement the EFI_DHCP4_PROTOCOL interface.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1186,8 +1186,10 @@ EfiDhcp4Build (
   @param[in] UdpIo      The UdpIo being created.
   @param[in] Context    Dhcp4 instance.
 
-  @retval EFI_SUCCESS   UdpIo is configured successfully.
-  @retval other         Other error occurs.
+  @retval EFI_SUCCESS              UdpIo is configured successfully.
+  @retval EFI_INVALID_PARAMETER    Class E IP address is not supported or other parameters
+                                   are not valid.
+  @retval other                    Other error occurs.
 **/
 EFI_STATUS
 EFIAPI
@@ -1229,7 +1231,14 @@ Dhcp4InstanceConfigUdpIo (
     // compute it according to the classful addressing rule.
     //
     Class = NetGetIpClass (ClientAddr);
+    //
+    //  Class E IP address is not supported here!
+    //
     ASSERT (Class < IP4_ADDR_CLASSE);
+    if (Class >= IP4_ADDR_CLASSE) {
+      return EFI_INVALID_PARAMETER;
+    }
+    
     SubnetMask = gIp4AllMasks[Class << 3];
   } else {
     SubnetMask = DhcpSb->Netmask;
