@@ -1,7 +1,7 @@
 /** @file
   Driver Binding functions and Service Binding functions for the Network driver module.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -164,7 +164,6 @@ Udp6DriverBindingStart (
                   );
   if (EFI_ERROR (Status)) {
     Udp6CleanService (Udp6Service);
-    goto EXIT;
   }
 
 EXIT:
@@ -182,8 +181,9 @@ EXIT:
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 
-  @retval EFI_SUCCESS           The entry has been removed successfully.
-  @retval Others                Fail to remove the entry.
+  @retval EFI_INVALID_PARAMETER  Entry is NULL or Context is NULL.
+  @retval EFI_SUCCESS            The entry has been removed successfully.
+  @retval Others                 Fail to remove the entry.
 
 **/
 EFI_STATUS
@@ -243,12 +243,12 @@ Udp6DriverBindingStop (
   IN  EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   )
 {
-  EFI_STATUS                    Status;
-  EFI_HANDLE                    NicHandle;
-  EFI_SERVICE_BINDING_PROTOCOL  *ServiceBinding;
-  UDP6_SERVICE_DATA             *Udp6Service;
-  LIST_ENTRY                    *List;
-  UDP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT Context;
+  EFI_STATUS                                Status;
+  EFI_HANDLE                                NicHandle;
+  EFI_SERVICE_BINDING_PROTOCOL              *ServiceBinding;
+  UDP6_SERVICE_DATA                         *Udp6Service;
+  LIST_ENTRY                                *List;
+  UDP6_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT  Context;
 
   //
   // Find the NicHandle where UDP6 ServiceBinding Protocol is installed.
