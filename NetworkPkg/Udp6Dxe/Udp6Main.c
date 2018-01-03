@@ -585,7 +585,7 @@ Udp6Transmit (
         //
         // If the calculated checksum is 0, fill the Checksum field with all ones.
         //
-        Udp6Header->Checksum = 0XFFFF;
+        Udp6Header->Checksum = 0xffff;
       }
     } else {
       //

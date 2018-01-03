@@ -158,7 +158,8 @@ Udp6RecycleRxDataWrap (
   @param[in]  RxData             Pointer to the EFI_UDP6_RECEIVE_DATA of this
                                  datagram.
 
-  @return Pointer to the structure wrapping the RxData and the Packet.
+  @return Pointer to the structure wrapping the RxData and the Packet. NULL will
+          be returned if any error occurs.
 
 **/
 UDP6_RXDATA_WRAP *
@@ -1374,7 +1375,8 @@ Udp6RecycleRxDataWrap (
   @param[in]  RxData             Pointer to the EFI_UDP6_RECEIVE_DATA of this
                                  datagram.
 
-  @return Pointer to the structure wrapping the RxData and the Packet.
+  @return Pointer to the structure wrapping the RxData and the Packet. NULL will
+          be returned if any error occurs.
 
 **/
 UDP6_RXDATA_WRAP *
@@ -1598,7 +1600,7 @@ Udp6Demultiplex (
   EFI_UDP6_SESSION_DATA  *Udp6Session;
   UINTN                  Enqueued;
 
-  if (Packet->TotalSize < sizeof (EFI_UDP_HEADER)) {
+  if (Packet->TotalSize < UDP6_HEADER_SIZE) {
     NetbufFree (Packet);
     return;
   }
@@ -1850,7 +1852,7 @@ Udp6IcmpHandler (
   LIST_ENTRY             *Entry;
   UDP6_INSTANCE_DATA     *Instance;
 
-  if (Packet->TotalSize < sizeof (EFI_UDP_HEADER)) {
+  if (Packet->TotalSize < UDP6_HEADER_SIZE) {
     NetbufFree (Packet);
     return;
   }
