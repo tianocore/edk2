@@ -351,6 +351,9 @@ Udp6Groups (
 
   Instance = UDP6_INSTANCE_DATA_FROM_THIS (This);
   if (!Instance->Configured) {
+    if (McastIp != NULL) {
+      FreePool (McastIp);
+    }
     return EFI_NOT_STARTED;
   }
 
