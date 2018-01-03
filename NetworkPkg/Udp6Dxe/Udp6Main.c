@@ -1,7 +1,7 @@
 /** @file
   Contains all EFI_UDP6_PROTOCOL interfaces.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -525,6 +525,11 @@ Udp6Transmit (
 
   Udp6Header = (EFI_UDP_HEADER *) NetbufAllocSpace (Packet, UDP6_HEADER_SIZE, TRUE);
   ASSERT (Udp6Header != NULL);
+  if (Udp6Header == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ON_EXIT;
+  }
+  
   ConfigData = &Instance->ConfigData;
 
   //
