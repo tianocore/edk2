@@ -1,7 +1,7 @@
 /** @file
 Common library assistance routines.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -28,9 +28,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define MAX_UINT8   ((UINT8)0xFF)
 #define ARRAY_SIZE(Array) (sizeof (Array) / sizeof ((Array)[0]))
 #define ASCII_RSIZE_MAX 1000000
-#ifndef RSIZE_MAX
+#undef RSIZE_MAX
 #define RSIZE_MAX 1000000
-#endif
 
 #define IS_COMMA(a)                ((a) == L',')
 #define IS_HYPHEN(a)               ((a) == L'-')
