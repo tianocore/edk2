@@ -57,6 +57,9 @@ Udp6FindInstanceByPort (
   interface. It's called to signal the udp TxToken when the IpIo layer completes
   transmitting of the udp datagram.
 
+  If Context is NULL, then ASSERT().
+  If NotifyData is NULL, then ASSERT().
+
   @param[in]  Status            The completion status of the output udp datagram.
   @param[in]  Context           Pointer to the context data.
   @param[in]  Sender            Specify a EFI_IP6_PROTOCOL for sending.
@@ -74,6 +77,10 @@ Udp6DgramSent (
 
 /**
   This function processes the received datagram passed up by the IpIo layer.
+
+  If NetSession is NULL, then ASSERT().
+  If Packet is NULL, then ASSERT().
+  If Context is NULL, then ASSERT().
 
   @param[in]  Status            The status of this udp datagram.
   @param[in]  IcmpError         The IcmpError code, only available when Status is
@@ -977,6 +984,9 @@ Udp6RemoveToken (
   interface. It's called to signal the udp TxToken when IpIo layer completes the
   transmitting of the udp datagram.
 
+  If Context is NULL, then ASSERT().
+  If NotifyData is NULL, then ASSERT().
+
   @param[in]  Status            The completion status of the output udp datagram.
   @param[in]  Context           Pointer to the context data.
   @param[in]  Sender            Specify a EFI_IP6_PROTOCOL for sending.
@@ -995,6 +1005,8 @@ Udp6DgramSent (
   UDP6_INSTANCE_DATA         *Instance;
   EFI_UDP6_COMPLETION_TOKEN  *Token;
 
+  ASSERT (Context != NULL && NotifyData != NULL);
+
   Instance = (UDP6_INSTANCE_DATA *) Context;
   Token    = (EFI_UDP6_COMPLETION_TOKEN *) NotifyData;
 
@@ -1011,6 +1023,10 @@ Udp6DgramSent (
 
 /**
   This function processes the received datagram passed up by the IpIo layer.
+
+  If NetSession is NULL, then ASSERT().
+  If Packet is NULL, then ASSERT().
+  If Context is NULL, then ASSERT().
 
   @param[in]  Status            The status of this udp datagram.
   @param[in]  IcmpError         The IcmpError code, only available when Status is
@@ -1031,6 +1047,7 @@ Udp6DgramRcvd (
   IN VOID                  *Context
   )
 {
+  ASSERT (NetSession != NULL && Packet != NULL && Context != NULL);
   NET_CHECK_SIGNATURE (Packet, NET_BUF_SIGNATURE);
 
   //
