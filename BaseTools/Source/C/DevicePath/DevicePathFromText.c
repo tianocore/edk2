@@ -1,7 +1,7 @@
 /** @file
   DevicePathFromText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -3277,6 +3277,17 @@ UefiDevicePathLibConvertTextToDeviceNode (
     //
     FromText = DevPathFromTextFilePath;
     DeviceNode = FromText (DeviceNodeStr);
+    //
+    // According to above logic, if 'FromText' is NULL in the 'if' statement,
+    // then 'ParamStr' must be NULL as well. No memory allocation has been made
+    // in this case.
+    //
+    // The below check is for addressing a false positive potential memory leak
+    // issue raised from static analysis.
+    //
+    if (ParamStr != NULL) {
+      free (ParamStr);
+    }
   } else {
     DeviceNode = FromText (ParamStr);
     free (ParamStr);
