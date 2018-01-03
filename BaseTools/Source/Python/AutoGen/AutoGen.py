@@ -4148,8 +4148,9 @@ class ModuleAutoGen(AutoGen):
             AsBuiltInfDict['module_pi_specification_version'] += [self.Specification['PI_SPECIFICATION_VERSION']]
 
         OutputDir = self.OutputDir.replace('\\', '/').strip('/')
+        DebugDir = self.DebugDir.replace('\\', '/').strip('/')
         for Item in self.CodaTargetList:
-            File = Item.Target.Path.replace('\\', '/').strip('/').replace(OutputDir, '').strip('/')
+            File = Item.Target.Path.replace('\\', '/').strip('/').replace(DebugDir, '').strip('/')
             if File not in self.OutputFile:
                 self.OutputFile.append(File)
             if Item.Target.Ext.lower() == '.aml':
