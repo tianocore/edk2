@@ -48,6 +48,8 @@
 #define ALIGN_VALUE_UP(Value, Alignment)  (((Value) + (Alignment) - 1) & (~((Alignment) - 1)))
 #define ALIGN_VALUE_LOW(Value, Alignment) ((Value) & (~((Alignment) - 1)))
 
+#define VTD_TPL_LEVEL TPL_NOTIFY
+
 //
 // This is the initial max PCI DATA number.
 // The number may be enlarged later.

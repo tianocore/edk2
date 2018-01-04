@@ -12,16 +12,6 @@
 
 **/
 
-#include <PiDxe.h>
-
-#include <Protocol/IoMmu.h>
-#include <Protocol/PciIo.h>
-
-#include <Library/IoLib.h>
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-
 #include "DmaProtection.h"
 
 /**
@@ -306,18 +296,22 @@ IoMmuSetAttribute (
   EFI_STATUS            Status;
   EFI_PHYSICAL_ADDRESS  DeviceAddress;
   UINTN                 NumberOfPages;
+  EFI_TPL               OriginalTpl;
+
+  OriginalTpl = gBS->RaiseTPL (VTD_TPL_LEVEL);
 
   Status = GetDeviceInfoFromMapping (Mapping, &DeviceAddress, &NumberOfPages);
-  if (EFI_ERROR(Status)) {
-    return Status;
+  if (!EFI_ERROR(Status)) {
+    Status = VTdSetAttribute (
+               This,
+               DeviceHandle,
+               DeviceAddress,
+               EFI_PAGES_TO_SIZE(NumberOfPages),
+               IoMmuAccess
+               );
   }
-  Status = VTdSetAttribute (
-             This,
-             DeviceHandle,
-             DeviceAddress,
-             EFI_PAGES_TO_SIZE(NumberOfPages),
-             IoMmuAccess
-             );
+
+  gBS->RestoreTPL (OriginalTpl);
 
   return Status;
 }

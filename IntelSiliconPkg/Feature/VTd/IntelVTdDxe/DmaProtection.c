@@ -478,7 +478,7 @@ InitializeDmaProtection (
   
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  VTD_TPL_LEVEL,
                   AcpiNotificationFunc,
                   NULL,
                   &gEfiAcpi10TableGuid,
@@ -488,7 +488,7 @@ InitializeDmaProtection (
 
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
+                  VTD_TPL_LEVEL,
                   AcpiNotificationFunc,
                   NULL,
                   &gEfiAcpi20TableGuid,
