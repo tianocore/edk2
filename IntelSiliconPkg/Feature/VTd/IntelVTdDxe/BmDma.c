@@ -1,7 +1,7 @@
 /** @file
   BmDma related function
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,15 +12,7 @@
 
 **/
 
-#include <PiDxe.h>
-
-#include <Protocol/IoMmu.h>
-
-#include <Library/BaseLib.h>
-#include <Library/DebugLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
+#include "DmaProtection.h"
 
 // TBD: May make it a policy
 #define DMA_MEMORY_TOP          MAX_UINTN
@@ -76,6 +68,7 @@ IoMmuMap (
   MAP_INFO                                          *MapInfo;
   EFI_PHYSICAL_ADDRESS                              DmaMemoryTop;
   BOOLEAN                                           NeedRemap;
+  EFI_TPL                                           OriginalTpl;
 
   if (NumberOfBytes == NULL || DeviceAddress == NULL ||
       Mapping == NULL) {
@@ -198,7 +191,9 @@ IoMmuMap (
     MapInfo->DeviceAddress = MapInfo->HostAddress;
   }
 
+  OriginalTpl = gBS->RaiseTPL (VTD_TPL_LEVEL);
   InsertTailList (&gMaps, &MapInfo->Link);
+  gBS->RestoreTPL (OriginalTpl);
 
   //
   // The DeviceAddress is the address of the maped buffer below 4GB
@@ -233,6 +228,7 @@ IoMmuUnmap (
 {
   MAP_INFO                 *MapInfo;
   LIST_ENTRY               *Link;
+  EFI_TPL                  OriginalTpl;
 
   DEBUG ((DEBUG_VERBOSE, "IoMmuUnmap: 0x%08x\n", Mapping));
 
@@ -241,6 +237,7 @@ IoMmuUnmap (
     return EFI_INVALID_PARAMETER;
   }
 
+  OriginalTpl = gBS->RaiseTPL (VTD_TPL_LEVEL);
   MapInfo = NULL;
   for (Link = GetFirstNode (&gMaps)
        ; !IsNull (&gMaps, Link)
@@ -255,10 +252,12 @@ IoMmuUnmap (
   // Mapping is not a valid value returned by Map()
   //
   if (MapInfo != Mapping) {
+    gBS->RestoreTPL (OriginalTpl);
     DEBUG ((DEBUG_ERROR, "IoMmuUnmap: %r\n", EFI_INVALID_PARAMETER));
     return EFI_INVALID_PARAMETER;
   }
   RemoveEntryList (&MapInfo->Link);
+  gBS->RestoreTPL (OriginalTpl);
 
   if (MapInfo->DeviceAddress != MapInfo->HostAddress) {
     //
