@@ -16,6 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PiSmmCpuDxeSmm.h"
 
+UINT8                               mPhysicalAddressBits = 32;
+
 /**
   Create PageTable for SMM use.
 
