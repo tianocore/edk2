@@ -207,6 +207,7 @@ EFI_SYSTEM_TABLE      *gDxeCoreST = NULL;
 EFI_RUNTIME_SERVICES  *gDxeCoreRT = &mEfiRuntimeServicesTableTemplate;
 EFI_HANDLE            gDxeCoreImageHandle = NULL;
 
+BOOLEAN               gMemoryMapTerminated = FALSE;
 
 //
 // EFI Decompress Protocol
@@ -744,6 +745,8 @@ CoreExitBootServices (
     CoreNotifySignalList (&gEventExitBootServicesFailedGuid);
     return Status;
   }
+
+  gMemoryMapTerminated = TRUE;
 
   //
   // Notify other drivers that we are exiting boot services.

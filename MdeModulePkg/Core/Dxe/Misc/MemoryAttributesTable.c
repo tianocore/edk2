@@ -62,7 +62,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 EFI_STATUS
 EFIAPI
-CoreGetMemoryMapPropertiesTable (
+CoreGetMemoryMapWithSeparatedImageSection (
   IN OUT UINTN                  *MemoryMapSize,
   IN OUT EFI_MEMORY_DESCRIPTOR  *MemoryMap,
   OUT UINTN                     *MapKey,
@@ -71,18 +71,16 @@ CoreGetMemoryMapPropertiesTable (
   );
 
 extern EFI_PROPERTIES_TABLE  mPropertiesTable;
+EFI_MEMORY_ATTRIBUTES_TABLE  *mMemoryAttributesTable = NULL;
+BOOLEAN                      mMemoryAttributesTableReadyToBoot = FALSE;
 
 /**
   Install MemoryAttributesTable.
 
-  @param[in]  Event     The Event this notify function registered to.
-  @param[in]  Context   Pointer to the context data registered to the Event.
 **/
 VOID
-EFIAPI
 InstallMemoryAttributesTable (
-  EFI_EVENT                               Event,
-  VOID                                    *Context
+  VOID
   )
 {
   UINTN                          MemoryMapSize;
@@ -97,15 +95,32 @@ InstallMemoryAttributesTable (
   EFI_MEMORY_ATTRIBUTES_TABLE    *MemoryAttributesTable;
   EFI_MEMORY_DESCRIPTOR          *MemoryAttributesEntry;
 
+  if (gMemoryMapTerminated) {
+    //
+    // Directly return after MemoryMap terminated.
+    //
+    return;
+  }
+
   if ((mPropertiesTable.MemoryProtectionAttribute & EFI_PROPERTIES_RUNTIME_MEMORY_PROTECTION_NON_EXECUTABLE_PE_DATA) == 0) {
     DEBUG ((EFI_D_VERBOSE, "MemoryProtectionAttribute NON_EXECUTABLE_PE_DATA is not set, "));
     DEBUG ((EFI_D_VERBOSE, "because Runtime Driver Section Alignment is not %dK.\n", EFI_ACPI_RUNTIME_PAGE_ALLOCATION_ALIGNMENT >> 10));
     return ;
   }
 
+  if (mMemoryAttributesTable == NULL) {
+    //
+    // InstallConfigurationTable here to occupy one entry for MemoryAttributesTable
+    // before GetMemoryMap below, as InstallConfigurationTable may allocate runtime
+    // memory for the new entry.
+    //
+    Status = gBS->InstallConfigurationTable (&gEfiMemoryAttributesTableGuid, (VOID *) (UINTN) MAX_ADDRESS);
+    ASSERT_EFI_ERROR (Status);
+  }
+
   MemoryMapSize = 0;
   MemoryMap = NULL;
-  Status = CoreGetMemoryMapPropertiesTable (
+  Status = CoreGetMemoryMapWithSeparatedImageSection (
              &MemoryMapSize,
              MemoryMap,
              &MapKey,
@@ -118,7 +133,7 @@ InstallMemoryAttributesTable (
     MemoryMap = AllocatePool (MemoryMapSize);
     ASSERT (MemoryMap != NULL);
 
-    Status = CoreGetMemoryMapPropertiesTable (
+    Status = CoreGetMemoryMapWithSeparatedImageSection (
                &MemoryMapSize,
                MemoryMap,
                &MapKey,
@@ -174,9 +189,72 @@ InstallMemoryAttributesTable (
     }
     MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, DescriptorSize);
   }
+  MemoryMap = MemoryMapStart;
+  FreePool (MemoryMap);
 
+  //
+  // Update configuratoin table for MemoryAttributesTable.
+  //
   Status = gBS->InstallConfigurationTable (&gEfiMemoryAttributesTableGuid, MemoryAttributesTable);
   ASSERT_EFI_ERROR (Status);
+
+  if (mMemoryAttributesTable != NULL) {
+    FreePool (mMemoryAttributesTable);
+  }
+  mMemoryAttributesTable = MemoryAttributesTable; 
+}
+
+/**
+  Install MemoryAttributesTable on memory allocation.
+
+  @param[in] MemoryType EFI memory type.
+**/
+VOID
+InstallMemoryAttributesTableOnMemoryAllocation (
+  IN EFI_MEMORY_TYPE    MemoryType
+  )
+{
+  //
+  // Install MemoryAttributesTable after ReadyToBoot on runtime memory allocation.
+  //
+  if (mMemoryAttributesTableReadyToBoot &&
+      ((MemoryType == EfiRuntimeServicesCode) || (MemoryType == EfiRuntimeServicesData))) {
+    InstallMemoryAttributesTable ();
+  }
+}
+
+/**
+  Install MemoryAttributesTable on ReadyToBoot.
+
+  @param[in] Event      The Event this notify function registered to.
+  @param[in] Context    Pointer to the context data registered to the Event.
+**/
+VOID
+EFIAPI
+InstallMemoryAttributesTableOnReadyToBoot (
+  IN EFI_EVENT          Event,
+  IN VOID               *Context
+  )
+{
+  InstallMemoryAttributesTable ();
+  mMemoryAttributesTableReadyToBoot = TRUE; 
+}
+
+/**
+  Install initial MemoryAttributesTable on EndOfDxe.
+  Then SMM can consume this information.
+
+  @param[in] Event      The Event this notify function registered to.
+  @param[in] Context    Pointer to the context data registered to the Event.
+**/
+VOID
+EFIAPI
+InstallMemoryAttributesTableOnEndOfDxe (
+  IN EFI_EVENT          Event,
+  IN VOID               *Context
+  )
+{
+  InstallMemoryAttributesTable ();
 }
 
 /**
@@ -190,19 +268,35 @@ CoreInitializeMemoryAttributesTable (
 {
   EFI_STATUS  Status;
   EFI_EVENT   ReadyToBootEvent;
+  EFI_EVENT   EndOfDxeEvent;
 
   //
-  // Construct the table at ReadyToBoot, because this should be
-  // last point to allocate RuntimeCode/RuntimeData.
+  // Construct the table at ReadyToBoot.
   //
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_NOTIFY,
-                  InstallMemoryAttributesTable,
-                  NULL,
-                  &gEfiEventReadyToBootGuid,
-                  &ReadyToBootEvent
-                  );
+  Status = CoreCreateEventInternal (
+             EVT_NOTIFY_SIGNAL,
+             TPL_CALLBACK,
+             InstallMemoryAttributesTableOnReadyToBoot,
+             NULL,
+             &gEfiEventReadyToBootGuid,
+             &ReadyToBootEvent
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Construct the initial table at EndOfDxe,
+  // then SMM can consume this information.
+  // Use TPL_NOTIFY here, as such SMM code (TPL_CALLBACK)
+  // can run after it.
+  //
+  Status = CoreCreateEventInternal (
+             EVT_NOTIFY_SIGNAL,
+             TPL_NOTIFY,
+             InstallMemoryAttributesTableOnEndOfDxe,
+             NULL,
+             &gEfiEndOfDxeEventGroupGuid,
+             &EndOfDxeEvent
+             );
   ASSERT_EFI_ERROR (Status);
   return ;
 }

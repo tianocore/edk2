@@ -276,6 +276,8 @@ extern EFI_RUNTIME_SERVICES                     *gDxeCoreRT;
 extern EFI_DXE_SERVICES                         *gDxeCoreDS;
 extern EFI_HANDLE                               gDxeCoreImageHandle;
 
+extern BOOLEAN                                  gMemoryMapTerminated;
+
 extern EFI_DECOMPRESS_PROTOCOL                  gEfiDecompress;
 
 extern EFI_RUNTIME_ARCH_PROTOCOL                *gRuntime;
@@ -1310,24 +1312,6 @@ CoreInternalAllocatePages (
 EFI_STATUS
 EFIAPI
 CoreFreePages (
-  IN EFI_PHYSICAL_ADDRESS   Memory,
-  IN UINTN                  NumberOfPages
-  );
-
-/**
-  Frees previous allocated pages.
-
-  @param  Memory                 Base address of memory being freed
-  @param  NumberOfPages          The number of pages to free
-
-  @retval EFI_NOT_FOUND          Could not find the entry that covers the range
-  @retval EFI_INVALID_PARAMETER  Address not aligned
-  @return EFI_SUCCESS         -Pages successfully freed.
-
-**/
-EFI_STATUS
-EFIAPI
-CoreInternalFreePages (
   IN EFI_PHYSICAL_ADDRESS   Memory,
   IN UINTN                  NumberOfPages
   );
@@ -2899,6 +2883,16 @@ VOID
 EFIAPI
 CoreInitializeMemoryAttributesTable (
   VOID
+  );
+
+/**
+  Install MemoryAttributesTable on memory allocation.
+
+  @param[in] MemoryType EFI memory type.
+**/
+VOID
+InstallMemoryAttributesTableOnMemoryAllocation (
+  IN EFI_MEMORY_TYPE    MemoryType
   );
 
 /**
