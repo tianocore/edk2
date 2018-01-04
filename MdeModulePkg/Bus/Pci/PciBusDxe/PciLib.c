@@ -1125,14 +1125,14 @@ PciScanBus (
           BusPadding = FALSE;
           if (gPciHotPlugInit != NULL) {
 
-            if (IsRootPciHotPlugBus (PciDevice->DevicePath, &HpIndex)) {
+            if (IsPciHotPlugBus (PciDevice)) {
 
               //
               // If it is initialized, get the padded bus range
               //
               Status = gPciHotPlugInit->GetResourcePadding (
                                           gPciHotPlugInit,
-                                          gPciRootHpcPool[HpIndex].HpbDevicePath,
+                                          PciDevice->DevicePath,
                                           PciAddress,
                                           &State,
                                           (VOID **) &Descriptors,
