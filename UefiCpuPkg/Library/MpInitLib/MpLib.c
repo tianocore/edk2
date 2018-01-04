@@ -1502,7 +1502,7 @@ MpInitLibInitialize (
   //
   // Set BSP basic information
   //
-  InitializeApData (CpuMpData, 0, 0, CpuMpData->Buffer);
+  InitializeApData (CpuMpData, 0, 0, CpuMpData->Buffer + ApStackSize);
   //
   // Save assembly code information
   //
