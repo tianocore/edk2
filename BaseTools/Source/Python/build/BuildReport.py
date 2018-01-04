@@ -4,7 +4,7 @@
 # This module contains the functionality to generate build report after
 # build all target completes successfully.
 #
-# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -756,6 +756,13 @@ class PcdReport(object):
         else:
             self.FdfPcdSet = {}
 
+        self.DefaultStoreSingle = True
+        self.SkuSingle = True
+        if GlobalData.gDefaultStores and len(GlobalData.gDefaultStores) > 1:
+            self.DefaultStoreSingle = False
+        if GlobalData.gSkuids and len(GlobalData.gSkuids) > 1:
+            self.SkuSingle = False
+
         self.ModulePcdOverride = {}
         for Pa in Wa.AutoGenObjectList:
             self.Arch = Pa.Arch
@@ -1125,6 +1132,7 @@ class PcdReport(object):
             SkuList = sorted(Pcd.SkuInfoList.keys())
             for Sku in SkuList:
                 SkuInfo = Pcd.SkuInfoList[Sku]
+                SkuIdName = SkuInfo.SkuIdName
                 if TypeName in ('DYNHII', 'DEXHII'):
                     if SkuInfo.DefaultStoreDict:
                         DefaultStoreList = sorted(SkuInfo.DefaultStoreDict.keys())
@@ -1134,68 +1142,84 @@ class PcdReport(object):
                             if FirstPrint:
                                 FirstPrint = False
                                 if IsByteArray:
-                                    FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '(' + DefaultStore + ')', '{'))
+                                    if self.DefaultStoreSingle and self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '{'))
+                                    elif self.DefaultStoreSingle and not self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', '{'))
+                                    elif not self.DefaultStoreSingle and self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + DefaultStore + ')', '{'))
+                                    else:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', '(' + DefaultStore + ')', '{'))
                                     for Array in ArrayList:
                                         FileWrite(File, '%s' % (Array))
                                 else:
-                                    FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '(' + DefaultStore + ')', Value))
+                                    if self.DefaultStoreSingle and self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', Value))
+                                    elif self.DefaultStoreSingle and not self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', Value))
+                                    elif not self.DefaultStoreSingle and self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + DefaultStore + ')', Value))
+                                    else:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', '(' + DefaultStore + ')', Value))
                             else:
                                 if IsByteArray:
-                                    FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '(' + DefaultStore + ')', '{'))
+                                    if self.DefaultStoreSingle and self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '{'))
+                                    elif self.DefaultStoreSingle and not self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', '{'))
+                                    elif not self.DefaultStoreSingle and self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + DefaultStore + ')', '{'))
+                                    else:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', '(' + DefaultStore + ')', '{'))
                                     for Array in ArrayList:
                                         FileWrite(File, '%s' % (Array))
                                 else:
-                                    FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '(' + DefaultStore + ')', Value))
+                                    if self.DefaultStoreSingle and self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')',  Value))
+                                    elif self.DefaultStoreSingle and not self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', Value))
+                                    elif not self.DefaultStoreSingle and self.SkuSingle:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + DefaultStore + ')', Value))
+                                    else:
+                                        FileWrite(File, ' %-*s   : %6s %10s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', '(' + DefaultStore + ')', Value))
                             FileWrite(File, '%*s: %s: %s' % (self.MaxLen + 4, SkuInfo.VariableGuid, SkuInfo.VariableName, SkuInfo.VariableOffset))
                             if IsStructure:
                                 OverrideValues = Pcd.SkuOverrideValues[Sku]
                                 Struct = OverrideValues[DefaultStore]
                                 self.PrintStructureInfo(File, Struct)
                             self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
-                elif TypeName in ('DYNVPD', 'DEXVPD'):
-                    Value = SkuInfo.DefaultValue
-                    IsByteArray, ArrayList = ByteArrayForamt(Value)
-                    if FirstPrint:
-                        FirstPrint = False
-                        if IsByteArray:
-                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', "{"))
-                            for Array in ArrayList:
-                                FileWrite(File, '%s' % (Array))
-                        else:
-                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', Value))
-                    else:
-                        if IsByteArray:
-                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ' , TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', "{"))
-                            for Array in ArrayList:
-                                FileWrite(File, '%s' % (Array))
-                        else:
-                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ' , TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', Value))
-                    FileWrite(File, '%*s' % (self.MaxLen + 4, SkuInfo.VpdOffset))
-                    if IsStructure:
-                        OverrideValues = Pcd.SkuOverrideValues[Sku]
-                        if OverrideValues:
-                            Keys = OverrideValues.keys()
-                            Struct = OverrideValues[Keys[0]]
-                            self.PrintStructureInfo(File, Struct)
-                    self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
                 else:
                     Value = SkuInfo.DefaultValue
                     IsByteArray, ArrayList = ByteArrayForamt(Value)
                     if FirstPrint:
                         FirstPrint = False
                         if IsByteArray:
-                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '{'))
+                            if self.SkuSingle:
+                                FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', "{"))
+                            else:
+                                FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', "{"))
                             for Array in ArrayList:
                                 FileWrite(File, '%s' % (Array))
                         else:
-                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', Value))
+                            if self.SkuSingle:
+                                FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', Value))
+                            else:
+                                FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', Value))
                     else:
                         if IsByteArray:
-                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', '{'))
+                            if self.SkuSingle:
+                                FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, ' ' , TypeName, '(' + Pcd.DatumType + ')', "{"))
+                            else:
+                                FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ' , TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', "{"))
                             for Array in ArrayList:
                                 FileWrite(File, '%s' % (Array))
                         else:
-                            FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuInfo.SkuIdName + ')', Value))
+                            if self.SkuSingle:
+                                FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, ' ' , TypeName, '(' + Pcd.DatumType + ')', Value))
+                            else:
+                                FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ' , TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', Value))
+                    if TypeName in ('DYNVPD', 'DEXVPD'):
+                        FileWrite(File, '%*s' % (self.MaxLen + 4, SkuInfo.VpdOffset))
                     if IsStructure:
                         OverrideValues = Pcd.SkuOverrideValues[Sku]
                         if OverrideValues:
