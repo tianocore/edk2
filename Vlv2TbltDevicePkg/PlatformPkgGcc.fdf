@@ -1,7 +1,7 @@
 #/** @file
 # FDF file of Platform.
 #
-# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
@@ -730,7 +730,7 @@ FILE FREEFORM = 878AC2CC-5343-46F2-B563-51F89DAF56BA {
 !endif
 
 !if $(CAPSULE_ENABLE) || $(MICOCODE_CAPSULE_ENABLE)
-INF  MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+INF  MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
 !endif
 !if $(CAPSULE_ENABLE)
 INF  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareReportDxe.inf

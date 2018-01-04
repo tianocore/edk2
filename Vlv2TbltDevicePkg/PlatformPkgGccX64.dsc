@@ -1,7 +1,7 @@
 #/** @file
 # Platform description.
 #
-# Copyright (c) 2012  - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012  - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
@@ -1567,7 +1567,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
   Vlv2TbltDevicePkg/Application/FirmwareUpdate/FirmwareUpdate.inf
 
 !if $(CAPSULE_ENABLE) || $(MICOCODE_CAPSULE_ENABLE)
-  MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+  MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
   MdeModulePkg/Application/CapsuleApp/CapsuleApp.inf
 !endif
 
