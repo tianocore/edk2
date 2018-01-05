@@ -250,7 +250,7 @@
 
     <Command.GCC>
         "$(PP)" $(DTCPP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
-        "$(DTC)" -I dts -O dtb -o ${dst} ${d_path}(+)${s_base}.i
+        "$(DTC)" $(DTC_FLAGS) -I dts -O dtb -o ${dst} ${d_path}(+)${s_base}.i
 
 [Visual-Form-Representation-File]
     <InputFile>
