@@ -78,4 +78,8 @@ static inline char *strchr(const char *s, int c) {
   return AsciiStrStr (s, pattern);
 }
 
+static inline size_t strnlen (const char* str, size_t strsz ) {
+  return AsciiStrnLenS (str, strsz);
+}
+
 #endif /* _LIBFDT_ENV_H */

@@ -1,6 +1,6 @@
 /*
  * libfdt - Flat Device Tree manipulation
- * Copyright (C) 2006 David Gibson, IBM Corporation.
+ * Copyright (C) 2014 David Gibson <david@gibson.dropbear.id.au>
  *
  * libfdt is dual licensed: you can use it either under the terms of
  * the GPL, or the BSD license, at your option.
@@ -55,48 +55,42 @@
 
 #include "libfdt_internal.h"
 
-struct fdt_errtabent {
-	const char *str;
-};
-
-#define FDT_ERRTABENT(val) \
-	[(val)] = { .str = #val, }
-
-static struct fdt_errtabent fdt_errtable[] = {
-	FDT_ERRTABENT(FDT_ERR_NOTFOUND),
-	FDT_ERRTABENT(FDT_ERR_EXISTS),
-	FDT_ERRTABENT(FDT_ERR_NOSPACE),
-
-	FDT_ERRTABENT(FDT_ERR_BADOFFSET),
-	FDT_ERRTABENT(FDT_ERR_BADPATH),
-	FDT_ERRTABENT(FDT_ERR_BADPHANDLE),
-	FDT_ERRTABENT(FDT_ERR_BADSTATE),
-
-	FDT_ERRTABENT(FDT_ERR_TRUNCATED),
-	FDT_ERRTABENT(FDT_ERR_BADMAGIC),
-	FDT_ERRTABENT(FDT_ERR_BADVERSION),
-	FDT_ERRTABENT(FDT_ERR_BADSTRUCTURE),
-	FDT_ERRTABENT(FDT_ERR_BADLAYOUT),
-	FDT_ERRTABENT(FDT_ERR_INTERNAL),
-	FDT_ERRTABENT(FDT_ERR_BADNCELLS),
-	FDT_ERRTABENT(FDT_ERR_BADVALUE),
-	FDT_ERRTABENT(FDT_ERR_BADOVERLAY),
-	FDT_ERRTABENT(FDT_ERR_NOPHANDLES),
-};
-#define FDT_ERRTABSIZE	(sizeof(fdt_errtable) / sizeof(fdt_errtable[0]))
-
-const char *fdt_strerror(int errval)
+int fdt_address_cells(const void *fdt, int nodeoffset)
 {
-	if (errval > 0)
-		return "<valid offset/length>";
-	else if (errval == 0)
-		return "<no error>";
-	else if (errval > -FDT_ERRTABSIZE) {
-		const char *s = fdt_errtable[-errval].str;
+	const fdt32_t *ac;
+	int val;
+	int len;
 
-		if (s)
-			return s;
-	}
+	ac = fdt_getprop(fdt, nodeoffset, "#address-cells", &len);
+	if (!ac)
+		return 2;
 
-	return "<unknown error>";
+	if (len != sizeof(*ac))
+		return -FDT_ERR_BADNCELLS;
+
+	val = fdt32_to_cpu(*ac);
+	if ((val <= 0) || (val > FDT_MAX_NCELLS))
+		return -FDT_ERR_BADNCELLS;
+
+	return val;
+}
+
+int fdt_size_cells(const void *fdt, int nodeoffset)
+{
+	const fdt32_t *sc;
+	int val;
+	int len;
+
+	sc = fdt_getprop(fdt, nodeoffset, "#size-cells", &len);
+	if (!sc)
+		return 2;
+
+	if (len != sizeof(*sc))
+		return -FDT_ERR_BADNCELLS;
+
+	val = fdt32_to_cpu(*sc);
+	if ((val < 0) || (val > FDT_MAX_NCELLS))
+		return -FDT_ERR_BADNCELLS;
+
+	return val;
 }

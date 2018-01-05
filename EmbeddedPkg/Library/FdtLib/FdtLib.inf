@@ -32,6 +32,7 @@
   fdt_sw.c
   fdt_wip.c
   fdt.c
+  fdt_addresses.c
 
 [Packages]
   MdePkg/MdePkg.dec
