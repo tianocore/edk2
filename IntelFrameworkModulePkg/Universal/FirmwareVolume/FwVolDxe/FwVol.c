@@ -4,7 +4,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -510,10 +510,10 @@ FvCheck (
     //
     FwVolExtHeader = (EFI_FIRMWARE_VOLUME_EXT_HEADER *) (UINTN) (FvDevice->CachedFv + FvDevice->FwVolHeader->ExtHeaderOffset);
     Ptr = (UINT8 *) FwVolExtHeader + FwVolExtHeader->ExtHeaderSize;
-    Ptr = (UINT8 *) ALIGN_POINTER (Ptr, 8);
   } else {
     Ptr = (UINT8 *) (UINTN) (FvDevice->CachedFv + FvDevice->FwVolHeader->HeaderLength);
   }
+  Ptr = (UINT8 *) ALIGN_POINTER (Ptr, 8);
   TopFvAddress = (UINT8 *) (UINTN) (FvDevice->CachedFv + FvDevice->FwVolHeader->FvLength);
 
   //
