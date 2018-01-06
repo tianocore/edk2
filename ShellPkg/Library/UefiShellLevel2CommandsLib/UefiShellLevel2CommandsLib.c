@@ -268,8 +268,9 @@ VerifyIntermediateDirectories (
   @return Char as an upper case character.
 **/
 CHAR16
+EFIAPI
 InternalCharToUpper (
-  IN CONST CHAR16                    Char
+  IN      CHAR16                    Char
   );
 
 /**
