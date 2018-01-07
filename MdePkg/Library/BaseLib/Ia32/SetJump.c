@@ -49,6 +49,7 @@ InternalAssertJumpBuffer (
 
 **/
 _declspec (naked)
+RETURNS_TWICE
 UINTN
 EFIAPI
 SetJump (

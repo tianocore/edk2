@@ -4903,6 +4903,7 @@ MemoryFence (
   @retval 0 Indicates a return from SetJump().
 
 **/
+RETURNS_TWICE
 UINTN
 EFIAPI
 SetJump (
