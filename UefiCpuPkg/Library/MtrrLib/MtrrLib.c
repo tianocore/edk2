@@ -5,7 +5,7 @@
     Most of services in this library instance are suggested to be invoked by BSP only,
     except for MtrrSetAllMtrrs() which is used to sync BSP's MTRR setting to APs.
 
-  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1570,7 +1570,7 @@ MtrrLibCalculateMtrrs (
   //
   VectorCount = VectorIndex + 1;
   DEBUG ((
-    DEBUG_CACHE, "VectorCount (%016lx - %016lx) = %d\n", 
+    DEBUG_CACHE, "  VectorCount (%016lx - %016lx) = %d\n",
     Ranges[0].BaseAddress, Ranges[RangeCount - 1].BaseAddress + Ranges[RangeCount - 1].Length, VectorCount
     ));
   ASSERT (VectorCount < MAX_UINT16);
@@ -2209,6 +2209,7 @@ MtrrSetMemoryAttributesInMtrrSettings (
   MTRR_CONTEXT              MtrrContext;
   BOOLEAN                   MtrrContextValid;
 
+  Status = RETURN_SUCCESS;
   MtrrLibInitializeMtrrMask (&MtrrValidBitsMask, &MtrrValidAddressMask);
 
   //
@@ -2227,23 +2228,47 @@ MtrrSetMemoryAttributesInMtrrSettings (
   OriginalVariableMtrrCount = 0;
 
   //
+  // 0. Dump the requests.
+  //
+  DEBUG_CODE (
+    DEBUG ((DEBUG_CACHE, "Mtrr: Set Mem Attribute to %a, ScratchSize = %x%a",
+            (MtrrSetting == NULL) ? "Hardware" : "Buffer", *ScratchSize,
+            (RangeCount <= 1) ? "," : "\n"
+            ));
+    for (Index = 0; Index < RangeCount; Index++) {
+      DEBUG ((DEBUG_CACHE, " %a: [%016lx, %016lx)\n",
+              mMtrrMemoryCacheTypeShortName[MIN (Ranges[Index].Type, CacheInvalid)],
+              Ranges[Index].BaseAddress, Ranges[Index].BaseAddress + Ranges[Index].Length
+              ));
+    }
+  );
+
+  //
   // 1. Validate the parameters.
   //
+  if (!IsMtrrSupported ()) {
+    Status = RETURN_UNSUPPORTED;
+    goto Exit;
+  }
+
   for (Index = 0; Index < RangeCount; Index++) {
     if (Ranges[Index].Length == 0) {
-      return RETURN_INVALID_PARAMETER;
+      Status = RETURN_INVALID_PARAMETER;
+      goto Exit;
     }
     if (((Ranges[Index].BaseAddress & ~MtrrValidAddressMask) != 0) ||
         ((Ranges[Index].Length & ~MtrrValidAddressMask) != 0)
         ) {
-      return RETURN_UNSUPPORTED;
+      Status = RETURN_UNSUPPORTED;
+      goto Exit;
     }
     if ((Ranges[Index].Type != CacheUncacheable) &&
         (Ranges[Index].Type != CacheWriteCombining) &&
         (Ranges[Index].Type != CacheWriteThrough) &&
         (Ranges[Index].Type != CacheWriteProtected) &&
         (Ranges[Index].Type != CacheWriteBack)) {
-      return RETURN_INVALID_PARAMETER;
+      Status = RETURN_INVALID_PARAMETER;
+      goto Exit;
     }
     if (Ranges[Index].BaseAddress + Ranges[Index].Length > BASE_1MB) {
       Above1MbExist = TRUE;
@@ -2309,7 +2334,7 @@ MtrrSetMemoryAttributesInMtrrSettings (
       if (Status == RETURN_ALREADY_STARTED) {
         Status = RETURN_SUCCESS;
       } else if (Status == RETURN_OUT_OF_RESOURCES) {
-        return Status;
+        goto Exit;
       } else {
         ASSERT_RETURN_ERROR (Status);
         Modified = TRUE;
@@ -2327,7 +2352,7 @@ MtrrSetMemoryAttributesInMtrrSettings (
                  WorkingVariableMtrr, FirmwareVariableMtrrCount + 1, &WorkingVariableMtrrCount
                  );
       if (RETURN_ERROR (Status)) {
-        return Status;
+        goto Exit;
       }
 
       //
@@ -2346,7 +2371,8 @@ MtrrSetMemoryAttributesInMtrrSettings (
       }
 
       if (WorkingVariableMtrrCount > FirmwareVariableMtrrCount) {
-        return RETURN_OUT_OF_RESOURCES;
+        Status = RETURN_OUT_OF_RESOURCES;
+        goto Exit;
       }
 
       //
@@ -2375,7 +2401,7 @@ MtrrSetMemoryAttributesInMtrrSettings (
                Ranges[Index].BaseAddress, Ranges[Index].Length, Ranges[Index].Type
                );
     if (RETURN_ERROR (Status)) {
-      return Status;
+      goto Exit;
     }
   }
 
@@ -2441,7 +2467,12 @@ MtrrSetMemoryAttributesInMtrrSettings (
     }
   }
 
-  return RETURN_SUCCESS;
+Exit:
+  DEBUG ((DEBUG_CACHE, "  Result = %r\n", Status));
+  if (!RETURN_ERROR (Status)) {
+    MtrrDebugPrintAllMtrrsWorker (MtrrSetting);
+  }
+  return Status;
 }
 
 /**
@@ -2475,28 +2506,15 @@ MtrrSetMemoryAttributeInMtrrSettings (
   IN MTRR_MEMORY_CACHE_TYPE  Attribute
   )
 {
-  RETURN_STATUS              Status;
   UINT8                      Scratch[SCRATCH_BUFFER_SIZE];
   UINTN                      ScratchSize;
   MTRR_MEMORY_RANGE          Range;
-
-  if (!IsMtrrSupported ()) {
-    return RETURN_UNSUPPORTED;
-  }
 
   Range.BaseAddress = BaseAddress;
   Range.Length      = Length;
   Range.Type        = Attribute;
   ScratchSize = sizeof (Scratch);
-  Status = MtrrSetMemoryAttributesInMtrrSettings (MtrrSetting, Scratch, &ScratchSize, &Range, 1);
-  DEBUG ((DEBUG_CACHE, "MtrrSetMemoryAttribute(MtrrSettings = %p) %a: [%016lx, %016lx) - %r\n",
-          MtrrSetting,
-          mMtrrMemoryCacheTypeShortName[Attribute], BaseAddress, BaseAddress + Length, Status));
-
-  if (!RETURN_ERROR (Status)) {
-    MtrrDebugPrintAllMtrrsWorker (MtrrSetting);
-  }
-  return Status;
+  return MtrrSetMemoryAttributesInMtrrSettings (MtrrSetting, Scratch, &ScratchSize, &Range, 1);
 }
 
 /**
@@ -2788,6 +2806,7 @@ MtrrDebugPrintAllMtrrsWorker (
     UINT64            MtrrValidBitsMask;
     UINT64            MtrrValidAddressMask;
     UINT32            VariableMtrrCount;
+    BOOLEAN           ContainVariableMtrr;
     MTRR_MEMORY_RANGE Ranges[
       ARRAY_SIZE (mMtrrLibFixedMtrrTable) * sizeof (UINT64) + 2 * ARRAY_SIZE (Mtrrs->Variables.Mtrr) + 1
       ];
@@ -2809,13 +2828,13 @@ MtrrDebugPrintAllMtrrsWorker (
     //
     // Dump RAW MTRR contents
     //
-    DEBUG((DEBUG_CACHE, "MTRR Settings\n"));
-    DEBUG((DEBUG_CACHE, "=============\n"));
-    DEBUG((DEBUG_CACHE, "MTRR Default Type: %016lx\n", Mtrrs->MtrrDefType));
+    DEBUG ((DEBUG_CACHE, "MTRR Settings:\n"));
+    DEBUG ((DEBUG_CACHE, "=============\n"));
+    DEBUG ((DEBUG_CACHE, "MTRR Default Type: %016lx\n", Mtrrs->MtrrDefType));
     for (Index = 0; Index < ARRAY_SIZE (mMtrrLibFixedMtrrTable); Index++) {
-      DEBUG((DEBUG_CACHE, "Fixed MTRR[%02d]   : %016lx\n", Index, Mtrrs->Fixed.Mtrr[Index]));
+      DEBUG ((DEBUG_CACHE, "Fixed MTRR[%02d]   : %016lx\n", Index, Mtrrs->Fixed.Mtrr[Index]));
     }
-
+    ContainVariableMtrr = FALSE;
     for (Index = 0; Index < VariableMtrrCount; Index++) {
       if (((MSR_IA32_MTRR_PHYSMASK_REGISTER *)&Mtrrs->Variables.Mtrr[Index].Mask)->Bits.V == 0) {
         //
@@ -2823,18 +2842,22 @@ MtrrDebugPrintAllMtrrsWorker (
         //
         continue;
       }
+      ContainVariableMtrr = TRUE;
       DEBUG ((DEBUG_CACHE, "Variable MTRR[%02d]: Base=%016lx Mask=%016lx\n",
         Index,
         Mtrrs->Variables.Mtrr[Index].Base,
         Mtrrs->Variables.Mtrr[Index].Mask
         ));
     }
+    if (!ContainVariableMtrr) {
+      DEBUG ((DEBUG_CACHE, "Variable MTRR    : None.\n"));
+    }
     DEBUG((DEBUG_CACHE, "\n"));
 
     //
     // Dump MTRR setting in ranges
     //
-    DEBUG((DEBUG_CACHE, "MTRR Ranges\n"));
+    DEBUG((DEBUG_CACHE, "Memory Ranges:\n"));
     DEBUG((DEBUG_CACHE, "====================================\n"));
     MtrrLibInitializeMtrrMask (&MtrrValidBitsMask, &MtrrValidAddressMask);
     Ranges[0].BaseAddress = 0;
