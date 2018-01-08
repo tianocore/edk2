@@ -5,7 +5,7 @@
   configuration cycles must be through the 256 MB PCI Express MMIO window whose base address
   is defined by PcdPciExpressBaseAddress.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #ifndef __PCI_EXPRESS_LIB_H__
 #define __PCI_EXPRESS_LIB_H__
+
+#include <IndustryStandard/PciExpress21.h>
 
 /**
   Macro that converts PCI Bus, PCI Device, PCI Function and PCI Register to an
