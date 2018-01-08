@@ -1,7 +1,7 @@
 /** @file
   Help functions to access UDP service, it is used by both the DHCP and MTFTP.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -410,6 +410,9 @@ UdpIoCreateRxToken (
 /**
   Wrap a transmit request into a new created UDP_TX_TOKEN.
 
+  If Packet is NULL, then ASSERT().
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
+
   @param[in]  UdpIo                 The UdpIo to send packet to.
   @param[in]  Packet                The user's packet.
   @param[in]  EndPoint              The local and remote access point.
@@ -580,6 +583,9 @@ UdpIoCreateTxToken (
   Creates a UDP_IO to access the UDP service. It creates and configures
   a UDP child.
 
+  If Configure is NULL, then ASSERT().
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
+
   It locates the UDP service binding prototype on the Controller parameter
   uses the UDP service binding prototype to create a UDP child (also known as
   a UDP instance) configures the UDP child by calling Configure function prototype.
@@ -749,7 +755,9 @@ FREE_MEM:
 
 /**
   Cancel all the sent datagram that pass the selection criteria of ToCancel.
+
   If ToCancel is NULL, all the datagrams are cancelled.
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
 
   @param[in]  UdpIo                 The UDP_IO to cancel packet.
   @param[in]  IoStatus              The IoStatus to return to the packet owners.
@@ -764,7 +772,7 @@ UdpIoCancelDgrams (
   IN UDP_IO                 *UdpIo,
   IN EFI_STATUS             IoStatus,
   IN UDP_IO_TO_CANCEL       ToCancel,        OPTIONAL
-  IN VOID                   *Context
+  IN VOID                   *Context         OPTIONAL
   )
 {
   LIST_ENTRY                *Entry;
@@ -791,11 +799,14 @@ UdpIoCancelDgrams (
 /**
   Free the UDP_IO and all its related resources.
 
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
+
   The function will cancel all sent datagram and receive request.
 
   @param[in]  UdpIo             The UDP_IO to free.
 
   @retval EFI_SUCCESS           The UDP_IO is freed.
+  @retval Others                Failed to free UDP_IO.
 
 **/
 EFI_STATUS
@@ -804,6 +815,7 @@ UdpIoFreeIo (
   IN  UDP_IO           *UdpIo
   )
 {
+  EFI_STATUS           Status;
   UDP_RX_TOKEN         *RxToken;
 
   ASSERT ((UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) ||
@@ -822,49 +834,67 @@ UdpIoFreeIo (
   if (UdpIo->UdpVersion == UDP_IO_UDP4_VERSION) {
 
     if ((RxToken = UdpIo->RecvRequest) != NULL) {
-      UdpIo->Protocol.Udp4->Cancel (UdpIo->Protocol.Udp4, &RxToken->Token.Udp4);
+      Status = UdpIo->Protocol.Udp4->Cancel (UdpIo->Protocol.Udp4, &RxToken->Token.Udp4);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
     }
 
     //
     // Close then destroy the Udp4 child
     //
-    gBS->CloseProtocol (
-           UdpIo->UdpHandle,
-           &gEfiUdp4ProtocolGuid,
-           UdpIo->Image,
-           UdpIo->Controller
-           );
+    Status = gBS->CloseProtocol (
+                    UdpIo->UdpHandle,
+                    &gEfiUdp4ProtocolGuid,
+                    UdpIo->Image,
+                    UdpIo->Controller
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
-    NetLibDestroyServiceChild (
-      UdpIo->Controller,
-      UdpIo->Image,
-      &gEfiUdp4ServiceBindingProtocolGuid,
-      UdpIo->UdpHandle
-      );
+    Status = NetLibDestroyServiceChild (
+               UdpIo->Controller,
+               UdpIo->Image,
+               &gEfiUdp4ServiceBindingProtocolGuid,
+               UdpIo->UdpHandle
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
 
   } else {
 
     if ((RxToken = UdpIo->RecvRequest) != NULL) {
-      UdpIo->Protocol.Udp6->Cancel (UdpIo->Protocol.Udp6, &RxToken->Token.Udp6);
+      Status = UdpIo->Protocol.Udp6->Cancel (UdpIo->Protocol.Udp6, &RxToken->Token.Udp6);
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
     }
 
     //
     // Close then destroy the Udp6 child
     //
-    gBS->CloseProtocol (
-           UdpIo->UdpHandle,
-           &gEfiUdp6ProtocolGuid,
-           UdpIo->Image,
-           UdpIo->Controller
-           );
-
-    NetLibDestroyServiceChild (
-      UdpIo->Controller,
-      UdpIo->Image,
-      &gEfiUdp6ServiceBindingProtocolGuid,
-      UdpIo->UdpHandle
-      );
+    Status = gBS->CloseProtocol (
+               UdpIo->UdpHandle,
+               &gEfiUdp6ProtocolGuid,
+               UdpIo->Image,
+               UdpIo->Controller
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
     }
+
+    Status = NetLibDestroyServiceChild (
+               UdpIo->Controller,
+               UdpIo->Image,
+               &gEfiUdp6ServiceBindingProtocolGuid,
+               UdpIo->UdpHandle
+               );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
 
   if (!IsListEmpty(&UdpIo->Link)) {
     RemoveEntryList (&UdpIo->Link);
@@ -878,6 +908,8 @@ UdpIoFreeIo (
 /**
   Clean up the UDP_IO without freeing it. The function is called when
   user wants to re-use the UDP_IO later.
+
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
 
   It will release all the transmitted datagrams and receive request. It will
   also configure NULL for the UDP instance.
@@ -919,6 +951,8 @@ UdpIoCleanIo (
 
 /**
   Send a packet through the UDP_IO.
+
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
 
   The packet will be wrapped in UDP_TX_TOKEN. Function Callback will be called
   when the packet is sent. The optional parameter EndPoint overrides the default
@@ -1029,6 +1063,8 @@ UdpIoCancelSentDatagram (
 
 /**
   Issue a receive request to the UDP_IO.
+
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
 
   This function is called when upper-layer needs packet from UDP for processing.
   Only one receive request is acceptable at a time so a common usage model is

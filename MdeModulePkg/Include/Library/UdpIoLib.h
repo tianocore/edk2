@@ -2,7 +2,7 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to access UDP service. It is used by both DHCP and MTFTP.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -197,7 +197,9 @@ BOOLEAN
 
 /**
   Cancel all the sent datagram that pass the selection criteria of ToCancel.
+
   If ToCancel is NULL, all the datagrams are cancelled.
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
 
   @param[in]  UdpIo                 The UDP_IO to cancel packet.
   @param[in]  IoStatus              The IoStatus to return to the packet owners.
@@ -212,12 +214,15 @@ UdpIoCancelDgrams (
   IN UDP_IO                 *UdpIo,
   IN EFI_STATUS             IoStatus,
   IN UDP_IO_TO_CANCEL       ToCancel,        OPTIONAL
-  IN VOID                   *Context
+  IN VOID                   *Context         OPTIONAL
   );
 
 /**
   Creates a UDP_IO to access the UDP service. It creates and configures
   a UDP child.
+
+  If Configure is NULL, then ASSERT().
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
 
   It locates the UDP service binding prototype on the Controller parameter
   uses the UDP service binding prototype to create a UDP child (also known as
@@ -247,11 +252,14 @@ UdpIoCreateIo (
 /**
   Free the UDP_IO and all its related resources.
 
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
+
   The function cancels all sent datagrams and receive requests.
 
   @param[in]  UdpIo             The UDP_IO to free.
 
   @retval EFI_SUCCESS           The UDP_IO is freed.
+  @retval Others                Failed to free UDP_IO.
 
 **/
 EFI_STATUS
@@ -263,6 +271,8 @@ UdpIoFreeIo (
 /**
   Cleans up the UDP_IO without freeing it. Call this function
   if you intend to later re-use the UDP_IO.
+
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
 
   This function releases all transmitted datagrams and receive requests and configures NULL for the UDP instance.
 
@@ -277,6 +287,8 @@ UdpIoCleanIo (
 
 /**
   Send a packet through the UDP_IO.
+
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
 
   The packet will be wrapped in UDP_TX_TOKEN. Function Callback will be called
   when the packet is sent. The optional parameter EndPoint overrides the default
@@ -323,6 +335,8 @@ UdpIoCancelSentDatagram (
 
 /**
   Issue a receive request to the UDP_IO.
+
+  If Udp version is not UDP_IO_UDP4_VERSION or UDP_IO_UDP6_VERSION, then ASSERT().
 
   This function is called when upper-layer needs packet from UDP for processing.
   Only one receive request is acceptable at a time. Therefore, one common usage model is
