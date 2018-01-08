@@ -1227,10 +1227,8 @@ BmIsLoadOptionPeHeaderValid (
       // Check PE32 or PE32+ magic, and machine type
       //
       OptionalHeader = (EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHeader->Pe32.OptionalHeader;
-      if ((OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC ||
-           OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) &&
-          EFI_IMAGE_MACHINE_TYPE_SUPPORTED (PeHeader->Pe32.FileHeader.Machine)
-          ) {
+      if (OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC ||
+          OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
         //
         // Check the Subsystem:
         //   Driver#### must be of type BootServiceDriver or RuntimeDriver
