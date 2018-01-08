@@ -1148,7 +1148,11 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHeapGuardPageType_PROMPT  #language en-US "The memory type mask for Page Guard"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHeapGuardPageType_HELP    #language en-US "Indicates which type allocation need guard page.\n"
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHeapGuardPageType_HELP    #language en-US "Indicates which type allocation need guard page.\n\n"
+                                                                                        " If a bit is set, a head guard page and a tail guard page will be added just\n"
+                                                                                        " before and after corresponding type of pages allocated if there's enough\n"
+                                                                                        " free pages for all of them. The page allocation for the type related to\n"
+                                                                                        " cleared bits keeps the same as ususal.\n\n"
                                                                                         " Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>\n"
                                                                                         "  EfiReservedMemoryType             0x0000000000000001\n"
                                                                                         "  EfiLoaderCode                     0x0000000000000002\n"
@@ -1171,7 +1175,11 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHeapGuardPoolType_PROMPT  #language en-US "The memory type mask for Pool Guard"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHeapGuardPoolType_HELP    #language en-US "Indicates which type allocation need guard page.\n"
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHeapGuardPoolType_HELP    #language en-US "Indicates which type allocation need guard page.\n\n"
+                                                                                        " If a bit is set, a head guard page and a tail guard page will be added just\n"
+                                                                                        " before and after corresponding type of pages which the allocated pool occupies,\n"
+                                                                                        " if there's enough free memory for all of them. The pool allocation for the\n"
+                                                                                        " type related to cleared bits keeps the same as ususal.\n\n"
                                                                                         " Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>\n"
                                                                                         "  EfiReservedMemoryType             0x0000000000000001\n"
                                                                                         "  EfiLoaderCode                     0x0000000000000002\n"
