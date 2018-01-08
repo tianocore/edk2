@@ -2,7 +2,7 @@
   Interface routine for Mtftp4.
   
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -409,17 +409,18 @@ Mtftp4Start (
     return Status;
   }
 
+  if ((Token->OverrideData != NULL) && !Mtftp4OverrideValid (Instance, Token->OverrideData)) {
+    Status = EFI_INVALID_PARAMETER;
+    gBS->RestoreTPL (OldTpl);
+    return Status;
+  }
+
   //
   // Set the Operation now to prevent the application start other
   // operations.
   //
   Instance->Operation = Operation;
   Override            = Token->OverrideData;
-
-  if ((Override != NULL) && !Mtftp4OverrideValid (Instance, Override)) {
-    Status = EFI_INVALID_PARAMETER;
-    goto ON_ERROR;
-  }
 
   if (Token->OptionCount != 0) {
     Status = Mtftp4ParseOption (
@@ -430,6 +431,7 @@ Mtftp4Start (
                );
 
     if (EFI_ERROR (Status)) {
+      Status = EFI_DEVICE_ERROR;
       goto ON_ERROR;
     }
   }
@@ -484,6 +486,7 @@ Mtftp4Start (
   Status = Mtftp4ConfigUnicastPort (Instance->UnicastPort, Instance);
 
   if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
     goto ON_ERROR;
   }
 
@@ -501,13 +504,13 @@ Mtftp4Start (
     Status = Mtftp4RrqStart (Instance, Operation);
   }
 
-  gBS->RestoreTPL (OldTpl);
-
   if (EFI_ERROR (Status)) {
+    Status = EFI_DEVICE_ERROR;
     goto ON_ERROR;
   }
 
   if (Token->Event != NULL) {
+    gBS->RestoreTPL (OldTpl);
     return EFI_SUCCESS;
   }
 
@@ -519,6 +522,7 @@ Mtftp4Start (
     This->Poll (This);
   }
 
+  gBS->RestoreTPL (OldTpl);
   return Token->Status;
 
 ON_ERROR:
