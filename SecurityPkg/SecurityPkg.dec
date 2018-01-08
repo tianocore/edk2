@@ -446,6 +446,16 @@
   # @Prompt Initial setting of TCG2 Persistent Firmware Management Flags
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags|0x300E2|UINT32|0x0001001B
 
+  ## Indicate current TPM2 Interrupt Number reported by _CRS control method.<BR><BR>
+  # TPM2 Interrupt feature is disabled If the pcd is set to 0.<BR>
+  # @Prompt Current TPM2 Interrupt Number
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2CurrentIrqNum|0x0C|UINT32|0x0001001C
+
+  ## Indicate platform possible TPM2 Interrupt Number reported by _PRS control method.<BR><BR>
+  # Possible TPM2 Interrupt Number Buffer will not be reported if TPM2 Interrupt feature is disabled.<BR>
+  # @Prompt Possible TPM2 Interrupt Number buffer
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2PossibleIrqNumBuf|{0x0C, 0x00, 0x00, 0x00}|VOID*|0x0001001D
+
 [PcdsDynamic, PcdsDynamicEx]
 
   ## This PCD indicates Hash mask for TPM 2.0.<BR><BR>
