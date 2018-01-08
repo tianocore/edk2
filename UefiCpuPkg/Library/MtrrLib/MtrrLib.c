@@ -1583,20 +1583,33 @@ MtrrLibCalculateMtrrs (
   Vector[VectorCount - 1].Address = Base1;
 
   Weight = (UINT8 *) &Vector[VectorCount];
-  //
-  // Set mandatory weight between any vector to max
-  // Set optional weight and between any vector and self->self to 0
-  // E.g.:
-  //   00 FF FF FF
-  //   00 00 FF FF
-  //   00 00 00 FF
-  //   00 00 00 00
-  //
   for (VectorIndex = 0; VectorIndex < VectorCount; VectorIndex++) {
+    //
+    // Set optional weight between vertices and self->self to 0
+    //
     SetMem (&Weight[M(VectorIndex, 0)], VectorIndex + 1, 0);
-    if (VectorIndex != VectorCount - 1) {
-      Weight[M (VectorIndex, VectorIndex + 1)] = (DefaultType == Vector[VectorIndex].Type) ? 0 : 1;
-      SetMem (&Weight[M (VectorIndex, VectorIndex + 2)], VectorCount - VectorIndex - 2, MAX_WEIGHT);
+    //
+    // Set mandatory weight between vectors to MAX_WEIGHT
+    //
+    SetMem (&Weight[M (VectorIndex, VectorIndex + 1)], VectorCount - VectorIndex - 1, MAX_WEIGHT);
+
+    // Final result looks like:
+    //   00 FF FF FF
+    //   00 00 FF FF
+    //   00 00 00 FF
+    //   00 00 00 00
+  }
+
+  //
+  // Set mandatory weight and optional weight for adjacent vertices
+  //
+  for (VectorIndex = 0; VectorIndex < VectorCount - 1; VectorIndex++) {
+    if (Vector[VectorIndex].Type != DefaultType) {
+      Weight[M (VectorIndex, VectorIndex + 1)] = 1;
+      Weight[O (VectorIndex, VectorIndex + 1)] = 0;
+    } else {
+      Weight[M (VectorIndex, VectorIndex + 1)] = 0;
+      Weight[O (VectorIndex, VectorIndex + 1)] = 1;
     }
   }
 
