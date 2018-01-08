@@ -2,7 +2,7 @@
   The TPM2 definition block in ACPI table for TCG2 physical presence  
   and MemoryClear.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 (c)Copyright 2016 HP Development Company, L.P.<BR>
 Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
 This program and the accompanying materials 
@@ -92,20 +92,59 @@ DefinitionBlock (
         MCIP,   32, //   Used for save the Mor paramter
         MORD,   32, //   Memory Overwrite Request Data
         MRET,   32, //   Memory Overwrite function return code
-        UCRQ,   32  //   Phyical Presence request operation to Get User Confirmation Status 
+        UCRQ,   32, //   Phyical Presence request operation to Get User Confirmation Status
+        IRQN,   32, //   IRQ Number for _CRS
+        SFRB,   8   //   Is shortformed Pkglength for resource buffer
       }
 
-      Name(RESO, ResourceTemplate () {
-        Memory32Fixed (ReadWrite, 0xfed40000, 0x5000, REGS)
+      //
+      // Possible resource settings returned by  _PRS method
+      //   RESS : ResourceTemplate with PkgLength <=63
+      //   RESL : ResourceTemplate with PkgLength > 63
+      //
+      // The format of the data has to follow the same format as
+      // _CRS (according to ACPI spec).
+      //
+      Name (RESS, ResourceTemplate() {
+        Memory32Fixed (ReadWrite, 0xfed40000, 0x5000)
+        Interrupt(ResourceConsumer, Level, ActiveLow, Shared, , , ) {1,2,3,4,5,6,7,8,9,10}
+      })
+
+      Name (RESL, ResourceTemplate() {
+        Memory32Fixed (ReadWrite, 0xfed40000, 0x5000)
+        Interrupt(ResourceConsumer, Level, ActiveLow, Shared, , , ) {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+      })
+
+      //
+      // Current resource settings for _CRS method
+      //
+      Name(RES0, ResourceTemplate () {
+        Memory32Fixed (ReadWrite, 0xfed40000, 0x5000, REG0)
         Interrupt(ResourceConsumer, Level, ActiveLow, Shared, , , INTR) {12}
       })
+
+      Name(RES1, ResourceTemplate () {
+        Memory32Fixed (ReadWrite, 0xfed40000, 0x5000, REG1)
+      })
+
 
       //
       // Return the resource consumed by TPM device.
       //
       Method(_CRS,0,Serialized)
       {
-        Return(RESO)
+        //
+        // IRQNum = 0 means disable IRQ support
+        //
+        If (LEqual(IRQN, 0)) {
+          Return (RES1)
+        }
+        Else
+        {
+          CreateDWordField(RES0, ^INTR._INT, LIRQ)
+          Store(IRQN, LIRQ)
+          Return (RES0)
+        }
       }
 
       //
@@ -113,23 +152,34 @@ DefinitionBlock (
       // assign an interrupt number to the device. The input byte stream
       // has to be the same as returned by _CRS (according to ACPI spec).
       //
+      // Platform may choose to override this function with specific interrupt
+      // programing logic to replace FIFO/TIS SIRQ registers programing
+      //
       Method(_SRS,1,Serialized)
       {
         //
+        // Do not configure Interrupt if IRQ Num is configured 0 by default
+        //
+        If (LEqual(IRQN, 0)) {
+          Return (0)
+        }
+
+        //
         // Update resource descriptor
         // Use the field name to identify the offsets in the argument
-        // buffer and RESO buffer.
+        // buffer and RES0 buffer.
         //
         CreateDWordField(Arg0, ^INTR._INT, IRQ0)
-        CreateDWordField(RESO, ^INTR._INT, LIRQ)
+        CreateDWordField(RES0, ^INTR._INT, LIRQ)
         Store(IRQ0, LIRQ)
+        Store(IRQ0, IRQN)
 
         CreateBitField(Arg0, ^INTR._HE, ITRG)
-        CreateBitField(RESO, ^INTR._HE, LTRG)
+        CreateBitField(RES0, ^INTR._HE, LTRG)
         Store(ITRG, LTRG)
 
         CreateBitField(Arg0, ^INTR._LL, ILVL)
-        CreateBitField(RESO, ^INTR._LL, LLVL)
+        CreateBitField(RES0, ^INTR._LL, LLVL)
         Store(ILVL, LLVL)
 
         //
@@ -176,15 +226,25 @@ DefinitionBlock (
         }
       }
 
-      //
-      // Possible resource settings.
-      // The format of the data has to follow the same format as
-      // _CRS (according to ACPI spec).
-      //
-      Name (_PRS, ResourceTemplate() {
-        Memory32Fixed (ReadWrite, 0xfed40000, 0x5000)
-        Interrupt(ResourceConsumer, Level, ActiveLow, Shared, , , SIRQ) {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
-      })
+      Method(_PRS,0,Serialized)
+      {
+        //
+        // IRQNum = 0 means disable IRQ support
+        //
+        If (LEqual(IRQN, 0)) {
+          Return (RES1)
+        } ElseIf(LEqual(SFRB, 0)) {
+          //
+          // Long format. Possible resources PkgLength > 63
+          //
+          Return (RESL)
+        } Else {
+          //
+          // Short format. Possible resources PkgLength <=63
+          //
+          Return (RESS)
+        }
+      }
 
       Method (PTS, 1, Serialized)
       {  
