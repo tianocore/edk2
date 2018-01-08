@@ -295,6 +295,7 @@ InitMpGlobalData (
   UINTN                               Index;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR     MemDesc;
   UINTN                               StackBase;
+  CPU_INFO_IN_HOB                     *CpuInfoInHob;
 
   SaveCpuMpData (CpuMpData);
 
@@ -314,8 +315,21 @@ InitMpGlobalData (
       ASSERT (FALSE);
     }
 
+    //
+    // DXE will reuse stack allocated for APs at PEI phase if it's available.
+    // Let's check it here.
+    //
+    // Note: BSP's stack guard is set at DxeIpl phase. But for the sake of
+    // BSP/AP exchange, stack guard for ApTopOfStack of cpu 0 will still be
+    // set here.
+    //
+    CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
     for (Index = 0; Index < CpuMpData->CpuCount; ++Index) {
-      StackBase = CpuMpData->Buffer + Index * CpuMpData->CpuApStackSize;
+      if (CpuInfoInHob != NULL && CpuInfoInHob[Index].ApTopOfStack != 0) {
+        StackBase = CpuInfoInHob[Index].ApTopOfStack - CpuMpData->CpuApStackSize;
+      } else {
+        StackBase = CpuMpData->Buffer + Index * CpuMpData->CpuApStackSize;
+      }
 
       Status = gDS->GetMemorySpaceDescriptor (StackBase, &MemDesc);
       ASSERT_EFI_ERROR (Status);
@@ -326,6 +340,9 @@ InitMpGlobalData (
                       MemDesc.Attributes | EFI_MEMORY_RP
                       );
       ASSERT_EFI_ERROR (Status);
+
+      DEBUG ((DEBUG_INFO, "Stack Guard set at %lx [cpu%lu]!\n",
+              (UINT64)StackBase, (UINT64)Index));
     }
   }
 
