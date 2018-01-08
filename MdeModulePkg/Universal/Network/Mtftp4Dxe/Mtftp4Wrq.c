@@ -1,7 +1,7 @@
 /** @file
   Routines to process Wrq (upload).
   
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -92,6 +92,10 @@ Mtftp4WrqSendBlock (
     if (EFI_ERROR (Status) || (DataLen > Instance->BlkSize)) {
       if (DataBuf != NULL) {
         FreePool (DataBuf);
+      }
+
+      if (UdpPacket != NULL) {
+        NetbufFree (UdpPacket);
       }
 
       Mtftp4SendError (
