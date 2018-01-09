@@ -2270,8 +2270,13 @@ MtrrSetMemoryAttributesInMtrrSettings (
       goto Exit;
     }
     if (((Ranges[Index].BaseAddress & ~MtrrValidAddressMask) != 0) ||
-        ((Ranges[Index].Length & ~MtrrValidAddressMask) != 0)
+        ((((Ranges[Index].BaseAddress + Ranges[Index].Length) & ~MtrrValidAddressMask) != 0) &&
+          (Ranges[Index].BaseAddress + Ranges[Index].Length) != MtrrValidBitsMask + 1)
         ) {
+      //
+      // Either the BaseAddress or the Limit doesn't follow the alignment requirement.
+      // Note: It's still valid if Limit doesn't follow the alignment requirement but equals to MAX Address.
+      //
       Status = RETURN_UNSUPPORTED;
       goto Exit;
     }
