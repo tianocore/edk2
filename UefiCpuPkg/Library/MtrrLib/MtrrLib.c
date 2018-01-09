@@ -1171,7 +1171,6 @@ MtrrLibCalculateLeastMtrrs (
 
   for (Index = Start; Index <= Stop; Index++) {
     Vertices[Index].Visited = FALSE;
-    Vertices[Index].Previous = VertexCount;
     Mandatory = Weight[M(Start,Index)];
     Vertices[Index].Weight = Mandatory;
     if (Mandatory != MAX_WEIGHT) {
