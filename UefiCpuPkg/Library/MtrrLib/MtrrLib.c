@@ -47,7 +47,7 @@ typedef struct {
   UINT64                 Address;
   UINT64                 Alignment;
   UINT64                 Length;
-  UINT8                  Type : 7;
+  MTRR_MEMORY_CACHE_TYPE Type : 7;
 
   //
   // Temprary use for calculating the best MTRR settings.
@@ -1429,7 +1429,7 @@ MtrrLibCalculateSubtractivePath (
           while (SubStart != SubStop) {
             Status = MtrrLibAppendVariableMtrr (
               Mtrrs, MtrrCapacity, MtrrCount,
-              Vertices[SubStart].Address, Vertices[SubStart].Length, (MTRR_MEMORY_CACHE_TYPE) Vertices[SubStart].Type
+              Vertices[SubStart].Address, Vertices[SubStart].Length, Vertices[SubStart].Type
             );
             if (RETURN_ERROR (Status)) {
               return Status;
@@ -1450,10 +1450,11 @@ MtrrLibCalculateSubtractivePath (
             Pre = Vertices[Cur].Previous;
             SubStop = Pre;
 
-            if (Weight[M (Pre, Cur)] != 0) {
+            if (Weight[M (Pre, Cur)] + Weight[O (Pre, Cur)] != 0) {
               Status = MtrrLibAppendVariableMtrr (
                 Mtrrs, MtrrCapacity, MtrrCount,
-                Vertices[Pre].Address, Vertices[Cur].Address - Vertices[Pre].Address, LowestPrecedentType
+                Vertices[Pre].Address, Vertices[Cur].Address - Vertices[Pre].Address,
+                (Pre != Cur - 1) ? LowestPrecedentType : Vertices[Pre].Type
               );
               if (RETURN_ERROR (Status)) {
                 return Status;
