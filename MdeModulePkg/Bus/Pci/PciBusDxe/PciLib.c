@@ -1154,19 +1154,13 @@ PciScanBus (
 
               FreePool (Descriptors);
 
-              switch (Status) {
-                case EFI_SUCCESS:
-                  BusPadding = TRUE;
-                  break;
-
-                case EFI_NOT_FOUND:
-                  //
-                  // no bus number padding requested
-                  //
-                  break;
-
-                default:
-                  return Status;
+              if (!EFI_ERROR (Status)) {
+                BusPadding = TRUE;
+              } else if (Status != EFI_NOT_FOUND) {
+                //
+                // EFI_NOT_FOUND is not a real error. It indicates no bus number padding requested.
+                //
+                return Status;
               }
             }
           }
