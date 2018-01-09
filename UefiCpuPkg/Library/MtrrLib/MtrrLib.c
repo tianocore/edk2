@@ -1,7 +1,7 @@
 /** @file
   MTRR setting library
 
-  @par Note: 
+  @par Note:
     Most of services in this library instance are suggested to be invoked by BSP only,
     except for MtrrSetAllMtrrs() which is used to sync BSP's MTRR setting to APs.
 
@@ -32,8 +32,8 @@
 #define SCRATCH_BUFFER_SIZE           (4 * SIZE_4KB)
 #define MTRR_LIB_ASSERT_ALIGNED(B, L) ASSERT ((B & ~(L - 1)) == B);
 
-#define M(x,y) ((x) * VectorCount + (y))
-#define O(x,y) ((y) * VectorCount + (x))
+#define M(x,y) ((x) * VertexCount + (y))
+#define O(x,y) ((y) * VertexCount + (x))
 
 //
 // Context to save and restore when MTRRs are programmed
@@ -1142,21 +1142,21 @@ MtrrLibGetNumberOfTypes (
 }
 
 /**
-  Calculate the least MTRR number from vector Start to Stop and update
-  the Previous of all vectors from Start to Stop is updated to reflect
+  Calculate the least MTRR number from vertex Start to Stop and update
+  the Previous of all vertices from Start to Stop is updated to reflect
   how the memory range is covered by MTRR.
 
-  @param VectorCount     The count of vectors in the graph.
-  @param Vector          Array holding all vectors.
-  @param Weight          2-dimention array holding weights between vectors.
-  @param Start           Start vector.
-  @param Stop            Stop vector.
+  @param VertexCount     The count of vertices in the graph.
+  @param Vertices        Array holding all vertices.
+  @param Weight          2-dimention array holding weights between vertices.
+  @param Start           Start vertex.
+  @param Stop            Stop vertex.
   @param IncludeOptional TRUE to count the optional weight.
 **/
 VOID
 MtrrLibCalculateLeastMtrrs (
-  IN UINT16                      VectorCount,
-  IN MTRR_LIB_ADDRESS            *Vector,
+  IN UINT16                      VertexCount,
+  IN MTRR_LIB_ADDRESS            *Vertices,
   IN OUT CONST UINT8             *Weight,
   IN UINT16                      Start,
   IN UINT16                      Stop,
@@ -1170,52 +1170,52 @@ MtrrLibCalculateLeastMtrrs (
   UINT8                          Optional;
 
   for (Index = Start; Index <= Stop; Index++) {
-    Vector[Index].Visited = FALSE;
-    Vector[Index].Previous = VectorCount;
+    Vertices[Index].Visited = FALSE;
+    Vertices[Index].Previous = VertexCount;
     Mandatory = Weight[M(Start,Index)];
-    Vector[Index].Weight = Mandatory;
+    Vertices[Index].Weight = Mandatory;
     if (Mandatory != MAX_WEIGHT) {
       Optional = IncludeOptional ? Weight[O(Start, Index)] : 0;
-      Vector[Index].Weight += Optional;
-      ASSERT (Vector[Index].Weight >= Optional);
+      Vertices[Index].Weight += Optional;
+      ASSERT (Vertices[Index].Weight >= Optional);
     }
   }
 
   MinI = Start;
   MinWeight = 0;
-  while (!Vector[Stop].Visited) {
+  while (!Vertices[Stop].Visited) {
     //
-    // Update the weight from the shortest vector to other unvisited vectors
+    // Update the weight from the shortest vertex to other unvisited vertices
     //
     for (Index = Start + 1; Index <= Stop; Index++) {
-      if (!Vector[Index].Visited) {
+      if (!Vertices[Index].Visited) {
         Mandatory = Weight[M(MinI, Index)];
         if (Mandatory != MAX_WEIGHT) {
           Optional = IncludeOptional ? Weight[O(MinI, Index)] : 0;
-          if (MinWeight + Mandatory + Optional <= Vector[Index].Weight) {
-            Vector[Index].Weight   = MinWeight + Mandatory + Optional;
-            Vector[Index].Previous = MinI; // Previous is Start based.
+          if (MinWeight + Mandatory + Optional <= Vertices[Index].Weight) {
+            Vertices[Index].Weight   = MinWeight + Mandatory + Optional;
+            Vertices[Index].Previous = MinI; // Previous is Start based.
           }
         }
       }
     }
 
     //
-    // Find the shortest vector from Start
+    // Find the shortest vertex from Start
     //
-    MinI      = VectorCount;
+    MinI      = VertexCount;
     MinWeight = MAX_WEIGHT;
     for (Index = Start + 1; Index <= Stop; Index++) {
-      if (!Vector[Index].Visited && MinWeight > Vector[Index].Weight) {
+      if (!Vertices[Index].Visited && MinWeight > Vertices[Index].Weight) {
         MinI      = Index;
-        MinWeight = Vector[Index].Weight;
+        MinWeight = Vertices[Index].Weight;
       }
     }
 
     //
-    // Mark the shortest vector from Start as visited
+    // Mark the shortest vertex from Start as visited
     //
-    Vector[MinI].Visited = TRUE;
+    Vertices[MinI].Visited = TRUE;
   }
 }
 
@@ -1288,17 +1288,17 @@ MtrrLibIsPowerOfTwo (
 }
 
 /**
-  Calculate the subtractive path from vector Start to Stop.
+  Calculate the subtractive path from vertex Start to Stop.
 
   @param DefaultType  Default memory type.
   @param A0           Alignment to use when base address is 0.
   @param Ranges       Array holding memory type settings for all memory regions.
   @param RangeCount   The count of memory ranges the array holds.
-  @param VectorCount  The count of vectors in the graph.
-  @param Vector       Array holding all vectors.
-  @param Weight       2-dimention array holding weights between vectors.
-  @param Start        Start vector.
-  @param Stop         Stop vector.
+  @param VertexCount  The count of vertices in the graph.
+  @param Vertices     Array holding all vertices.
+  @param Weight       2-dimention array holding weights between vertices.
+  @param Start        Start vertex.
+  @param Stop         Stop vertex.
   @param Types        Type bit mask of memory range from Start to Stop.
   @param TypeCount    Number of different memory types from Start to Stop.
   @param Mtrrs        Array holding all MTRR settings.
@@ -1315,8 +1315,8 @@ MtrrLibCalculateSubtractivePath (
   IN UINT64                      A0,
   IN CONST MTRR_MEMORY_RANGE     *Ranges,
   IN UINTN                       RangeCount,
-  IN UINT16                      VectorCount,
-  IN MTRR_LIB_ADDRESS            *Vector,
+  IN UINT16                      VertexCount,
+  IN MTRR_LIB_ADDRESS            *Vertices,
   IN OUT UINT8                   *Weight,
   IN UINT16                      Start,
   IN UINT16                      Stop,
@@ -1342,8 +1342,8 @@ MtrrLibCalculateSubtractivePath (
   MTRR_MEMORY_CACHE_TYPE         LowestType;
   MTRR_MEMORY_CACHE_TYPE         LowestPrecedentType;
 
-  Base   = Vector[Start].Address;
-  Length = Vector[Stop].Address - Base;
+  Base   = Vertices[Start].Address;
+  Length = Vertices[Stop].Address - Base;
 
   LowestType = MtrrLibLowestType (Types);
 
@@ -1404,18 +1404,18 @@ MtrrLibCalculateSubtractivePath (
       // We might use positive or subtractive, depending on which way uses less MTRR
       //
       for (SubStart = Start; SubStart <= Stop; SubStart++) {
-        if (Vector[SubStart].Address == HBase) {
+        if (Vertices[SubStart].Address == HBase) {
           break;
         }
       }
 
       for (SubStop = SubStart; SubStop <= Stop; SubStop++) {
-        if (Vector[SubStop].Address == HBase + HLength) {
+        if (Vertices[SubStop].Address == HBase + HLength) {
           break;
         }
       }
-      ASSERT (Vector[SubStart].Address == HBase);
-      ASSERT (Vector[SubStop].Address == HBase + HLength);
+      ASSERT (Vertices[SubStart].Address == HBase);
+      ASSERT (Vertices[SubStop].Address == HBase + HLength);
 
       if ((TypeCount == 2) || (SubStart == SubStop - 1)) {
         //
@@ -1429,7 +1429,7 @@ MtrrLibCalculateSubtractivePath (
           while (SubStart != SubStop) {
             Status = MtrrLibAppendVariableMtrr (
               Mtrrs, MtrrCapacity, MtrrCount,
-              Vector[SubStart].Address, Vector[SubStart].Length, (MTRR_MEMORY_CACHE_TYPE) Vector[SubStart].Type
+              Vertices[SubStart].Address, Vertices[SubStart].Length, (MTRR_MEMORY_CACHE_TYPE) Vertices[SubStart].Type
             );
             if (RETURN_ERROR (Status)) {
               return Status;
@@ -1439,21 +1439,21 @@ MtrrLibCalculateSubtractivePath (
         }
       } else {
         ASSERT (TypeCount == 3);
-        MtrrLibCalculateLeastMtrrs (VectorCount, Vector, Weight, SubStart, SubStop, TRUE);
+        MtrrLibCalculateLeastMtrrs (VertexCount, Vertices, Weight, SubStart, SubStop, TRUE);
 
         if (Mtrrs == NULL) {
-          Weight[M (Start, Stop)] += Vector[SubStop].Weight;
+          Weight[M (Start, Stop)] += Vertices[SubStop].Weight;
         } else {
           // When we need to collect the optimal path from SubStart to SubStop
           while (SubStop != SubStart) {
             Cur = SubStop;
-            Pre = Vector[Cur].Previous;
+            Pre = Vertices[Cur].Previous;
             SubStop = Pre;
 
             if (Weight[M (Pre, Cur)] != 0) {
               Status = MtrrLibAppendVariableMtrr (
                 Mtrrs, MtrrCapacity, MtrrCount,
-                Vector[Pre].Address, Vector[Cur].Address - Vector[Pre].Address, LowestPrecedentType
+                Vertices[Pre].Address, Vertices[Cur].Address - Vertices[Pre].Address, LowestPrecedentType
               );
               if (RETURN_ERROR (Status)) {
                 return Status;
@@ -1463,7 +1463,7 @@ MtrrLibCalculateSubtractivePath (
               Status = MtrrLibCalculateSubtractivePath (
                 DefaultType, A0,
                 Ranges, RangeCount,
-                VectorCount, Vector, Weight,
+                VertexCount, Vertices, Weight,
                 Pre, Cur, PrecedentTypes, 2,
                 Mtrrs, MtrrCapacity, MtrrCount
               );
@@ -1526,10 +1526,10 @@ MtrrLibCalculateMtrrs (
   UINT64                    Length;
   UINT64                    Alignment;
   UINT64                    SubLength;
-  MTRR_LIB_ADDRESS          *Vector;
+  MTRR_LIB_ADDRESS          *Vertices;
   UINT8                     *Weight;
-  UINT32                    VectorIndex;
-  UINT32                    VectorCount;
+  UINT32                    VertexIndex;
+  UINT32                    VertexCount;
   UINTN                     RequiredScratchSize;
   UINT8                     TypeCount;
   UINT16                    Start;
@@ -1542,10 +1542,10 @@ MtrrLibCalculateMtrrs (
   MTRR_LIB_ASSERT_ALIGNED (Base0, Base1 - Base0);
 
   //
-  // Count the number of vectors.
+  // Count the number of vertices.
   //
-  Vector = (MTRR_LIB_ADDRESS*)Scratch;
-  for (VectorIndex = 0, Index = 0; Index < RangeCount; Index++) {
+  Vertices = (MTRR_LIB_ADDRESS*)Scratch;
+  for (VertexIndex = 0, Index = 0; Index < RangeCount; Index++) {
     Base = Ranges[Index].BaseAddress;
     Length = Ranges[Index].Length;
     while (Length != 0) {
@@ -1554,44 +1554,44 @@ MtrrLibCalculateMtrrs (
       if (SubLength > Length) {
         SubLength = GetPowerOfTwo64 (Length);
       }
-      if (VectorIndex < *ScratchSize / sizeof (*Vector)) {
-        Vector[VectorIndex].Address   = Base;
-        Vector[VectorIndex].Alignment = Alignment;
-        Vector[VectorIndex].Type      = Ranges[Index].Type;
-        Vector[VectorIndex].Length    = SubLength;
+      if (VertexIndex < *ScratchSize / sizeof (*Vertices)) {
+        Vertices[VertexIndex].Address   = Base;
+        Vertices[VertexIndex].Alignment = Alignment;
+        Vertices[VertexIndex].Type      = Ranges[Index].Type;
+        Vertices[VertexIndex].Length    = SubLength;
       }
       Base   += SubLength;
       Length -= SubLength;
-      VectorIndex++;
+      VertexIndex++;
     }
   }
   //
-  // Vector[VectorIndex] = Base1, so whole vector count is (VectorIndex + 1).
+  // Vertices[VertexIndex] = Base1, so whole vertex count is (VertexIndex + 1).
   //
-  VectorCount = VectorIndex + 1;
+  VertexCount = VertexIndex + 1;
   DEBUG ((
-    DEBUG_CACHE, "  VectorCount (%016lx - %016lx) = %d\n",
-    Ranges[0].BaseAddress, Ranges[RangeCount - 1].BaseAddress + Ranges[RangeCount - 1].Length, VectorCount
+    DEBUG_CACHE, "  Count of vertices (%016llx - %016llx) = %d\n",
+    Ranges[0].BaseAddress, Ranges[RangeCount - 1].BaseAddress + Ranges[RangeCount - 1].Length, VertexCount
     ));
-  ASSERT (VectorCount < MAX_UINT16);
+  ASSERT (VertexCount < MAX_UINT16);
 
-  RequiredScratchSize = VectorCount * sizeof (*Vector) + VectorCount * VectorCount * sizeof (*Weight);
+  RequiredScratchSize = VertexCount * sizeof (*Vertices) + VertexCount * VertexCount * sizeof (*Weight);
   if (*ScratchSize < RequiredScratchSize) {
     *ScratchSize = RequiredScratchSize;
     return RETURN_BUFFER_TOO_SMALL;
   }
-  Vector[VectorCount - 1].Address = Base1;
+  Vertices[VertexCount - 1].Address = Base1;
 
-  Weight = (UINT8 *) &Vector[VectorCount];
-  for (VectorIndex = 0; VectorIndex < VectorCount; VectorIndex++) {
+  Weight = (UINT8 *) &Vertices[VertexCount];
+  for (VertexIndex = 0; VertexIndex < VertexCount; VertexIndex++) {
     //
     // Set optional weight between vertices and self->self to 0
     //
-    SetMem (&Weight[M(VectorIndex, 0)], VectorIndex + 1, 0);
+    SetMem (&Weight[M(VertexIndex, 0)], VertexIndex + 1, 0);
     //
-    // Set mandatory weight between vectors to MAX_WEIGHT
+    // Set mandatory weight between vertices to MAX_WEIGHT
     //
-    SetMem (&Weight[M (VectorIndex, VectorIndex + 1)], VectorCount - VectorIndex - 1, MAX_WEIGHT);
+    SetMem (&Weight[M (VertexIndex, VertexIndex + 1)], VertexCount - VertexIndex - 1, MAX_WEIGHT);
 
     // Final result looks like:
     //   00 FF FF FF
@@ -1603,22 +1603,22 @@ MtrrLibCalculateMtrrs (
   //
   // Set mandatory weight and optional weight for adjacent vertices
   //
-  for (VectorIndex = 0; VectorIndex < VectorCount - 1; VectorIndex++) {
-    if (Vector[VectorIndex].Type != DefaultType) {
-      Weight[M (VectorIndex, VectorIndex + 1)] = 1;
-      Weight[O (VectorIndex, VectorIndex + 1)] = 0;
+  for (VertexIndex = 0; VertexIndex < VertexCount - 1; VertexIndex++) {
+    if (Vertices[VertexIndex].Type != DefaultType) {
+      Weight[M (VertexIndex, VertexIndex + 1)] = 1;
+      Weight[O (VertexIndex, VertexIndex + 1)] = 0;
     } else {
-      Weight[M (VectorIndex, VectorIndex + 1)] = 0;
-      Weight[O (VectorIndex, VectorIndex + 1)] = 1;
+      Weight[M (VertexIndex, VertexIndex + 1)] = 0;
+      Weight[O (VertexIndex, VertexIndex + 1)] = 1;
     }
   }
 
   for (TypeCount = 2; TypeCount <= 3; TypeCount++) {
-    for (Start = 0; Start < VectorCount; Start++) {
-      for (Stop = Start + 2; Stop < VectorCount; Stop++) {
-        ASSERT (Vector[Stop].Address > Vector[Start].Address);
-        Length = Vector[Stop].Address - Vector[Start].Address;
-        if (Length > Vector[Start].Alignment) {
+    for (Start = 0; Start < VertexCount; Start++) {
+      for (Stop = Start + 2; Stop < VertexCount; Stop++) {
+        ASSERT (Vertices[Stop].Address > Vertices[Start].Address);
+        Length = Vertices[Stop].Address - Vertices[Start].Address;
+        if (Length > Vertices[Start].Alignment) {
           //
           // Pickup a new Start when [Start, Stop) cannot be described by one MTRR.
           //
@@ -1626,7 +1626,7 @@ MtrrLibCalculateMtrrs (
         }
         if ((Weight[M(Start, Stop)] == MAX_WEIGHT) && MtrrLibIsPowerOfTwo (Length)) {
           if (MtrrLibGetNumberOfTypes (
-                Ranges, RangeCount, Vector[Start].Address, Vector[Stop].Address - Vector[Start].Address, &Type
+                Ranges, RangeCount, Vertices[Start].Address, Vertices[Stop].Address - Vertices[Start].Address, &Type
                 ) == TypeCount) {
             //
             // Update the Weight[Start, Stop] using subtractive path.
@@ -1634,7 +1634,7 @@ MtrrLibCalculateMtrrs (
             MtrrLibCalculateSubtractivePath (
               DefaultType, A0,
               Ranges, RangeCount,
-              (UINT16)VectorCount, Vector, Weight,
+              (UINT16)VertexCount, Vertices, Weight,
               Start, Stop, Type, TypeCount,
               NULL, 0, NULL
               );
@@ -1651,17 +1651,17 @@ MtrrLibCalculateMtrrs (
   }
 
   Status = RETURN_SUCCESS;
-  MtrrLibCalculateLeastMtrrs ((UINT16) VectorCount, Vector, Weight, 0, (UINT16) VectorCount - 1, FALSE);
-  Stop = (UINT16) VectorCount - 1;
+  MtrrLibCalculateLeastMtrrs ((UINT16) VertexCount, Vertices, Weight, 0, (UINT16) VertexCount - 1, FALSE);
+  Stop = (UINT16) VertexCount - 1;
   while (Stop != 0) {
-    Start = Vector[Stop].Previous;
+    Start = Vertices[Stop].Previous;
     TypeCount = MAX_UINT8;
     Type = 0;
     if (Weight[M(Start, Stop)] != 0) {
-      TypeCount = MtrrLibGetNumberOfTypes (Ranges, RangeCount, Vector[Start].Address, Vector[Stop].Address - Vector[Start].Address, &Type);
+      TypeCount = MtrrLibGetNumberOfTypes (Ranges, RangeCount, Vertices[Start].Address, Vertices[Stop].Address - Vertices[Start].Address, &Type);
       Status = MtrrLibAppendVariableMtrr (
         Mtrrs, MtrrCapacity, MtrrCount,
-        Vector[Start].Address, Vector[Stop].Address - Vector[Start].Address, 
+        Vertices[Start].Address, Vertices[Stop].Address - Vertices[Start].Address,
         MtrrLibLowestType (Type)
         );
       if (RETURN_ERROR (Status)) {
@@ -1675,13 +1675,13 @@ MtrrLibCalculateMtrrs (
       //
       if (TypeCount == MAX_UINT8) {
         TypeCount = MtrrLibGetNumberOfTypes (
-                      Ranges, RangeCount, Vector[Start].Address, Vector[Stop].Address - Vector[Start].Address, &Type
+                      Ranges, RangeCount, Vertices[Start].Address, Vertices[Stop].Address - Vertices[Start].Address, &Type
                       );
       }
       Status = MtrrLibCalculateSubtractivePath (
                  DefaultType, A0,
                  Ranges, RangeCount,
-                 (UINT16) VectorCount, Vector, Weight, Start, Stop,
+                 (UINT16) VertexCount, Vertices, Weight, Start, Stop,
                  Type, TypeCount,
                  Mtrrs, MtrrCapacity, MtrrCount
                  );
@@ -1788,7 +1788,7 @@ MtrrLibApplyVariableMtrrs (
   // 2. Set other types than WB or UC
   //
   for (Index = 0; Index < VariableMtrrCount; Index++) {
-    if ((VariableMtrr[Index].Length != 0) && 
+    if ((VariableMtrr[Index].Length != 0) &&
         (VariableMtrr[Index].Type != CacheWriteBack) && (VariableMtrr[Index].Type != CacheUncacheable)) {
       Status = MtrrLibSetMemoryType (
                  Ranges, RangeCapacity, RangeCount,
@@ -1981,7 +1981,7 @@ MtrrLibSetMemoryRanges (
   UINTN                     BiggestScratchSize;
 
   *VariableMtrrCount = 0;
-  
+
   //
   // Since the whole ranges need multiple calls of MtrrLibCalculateMtrrs().
   // Each call needs different scratch buffer size.
