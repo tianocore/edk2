@@ -310,6 +310,8 @@ typedef struct _IP_IO_IP_INFO {
 
 /**
   Create a new IP_IO instance.
+
+  If IpVersion is not IP_VERSION_4 or IP_VERSION_6, then ASSERT().
   
   This function uses IP4/IP6 service binding protocol in Controller to create
   an IP4/IP6 child (aka IP4/IP6 instance).
@@ -353,6 +355,8 @@ IpIoDestroy (
 
 /**
   Stop an IP_IO instance.
+
+  If Ip version is not IP_VERSION_4 or IP_VERSION_6, then ASSERT().
   
   This function is paired with IpIoOpen(). The IP_IO will be unconfigured, and all
   pending send/receive tokens will be canceled.
@@ -372,7 +376,9 @@ IpIoStop (
 
 /**
   Open an IP_IO instance for use.
-  
+
+  If Ip version is not IP_VERSION_4 or IP_VERSION_6, then ASSERT().
+
   This function is called after IpIoCreate(). It is used for configuring the IP
   instance and register the callbacks and their context data for sending and
   receiving IP packets.
@@ -401,7 +407,7 @@ IpIoOpen (
 /**
   Send out an IP packet.
   
-  This function is called after IpIoOpen(). The data to be sent are wrapped in
+  This function is called after IpIoOpen(). The data to be sent is wrapped in
   Pkt. The IP instance wrapped in IpIo is used for sending by default but can be
   overriden by Sender. Other sending configs, like source address and gateway
   address etc., are specified in OverrideData.
@@ -439,6 +445,9 @@ IpIoSend (
 /**
   Cancel the IP transmit token that wraps this Packet.
 
+  If IpIo is NULL, then ASSERT().
+  If Packet is NULL, then ASSERT().
+
   @param[in]  IpIo                  The pointer to the IP_IO instance.
   @param[in]  Packet                The pointer to the packet of NET_BUF to cancel.
 
@@ -452,6 +461,9 @@ IpIoCancelTxToken (
 
 /**
   Add a new IP instance for sending data.
+
+  If IpIo is NULL, then ASSERT().
+  If Ip version is not IP_VERSION_4 or IP_VERSION_6, then ASSERT().
   
   The function is used to add the IP_IO to the IP_IO sending list. The caller
   can later use IpIoFindSender() to get the IP_IO and call IpIoSend() to send
@@ -472,6 +484,8 @@ IpIoAddIp (
 /**
   Configure the IP instance of this IpInfo and start the receiving if IpConfigData
   is not NULL.
+
+  If Ip version is not IP_VERSION_4 or IP_VERSION_6, then ASSERT().
 
   @param[in, out]  IpInfo          The pointer to the IP_IO_IP_INFO instance.
   @param[in, out]  IpConfigData    The IP4 or IP6 configure data used to configure 
@@ -495,6 +509,8 @@ IpIoConfigIp (
 /**
   Destroy an IP instance maintained in IpIo->IpList for
   sending purpose.
+
+  If Ip version is not IP_VERSION_4 or IP_VERSION_6, then ASSERT().  
   
   This function pairs with IpIoAddIp(). The IpInfo is previously created by
   IpIoAddIp(). The IP_IO_IP_INFO::RefCnt is decremented and the IP instance
@@ -586,6 +602,7 @@ IpIoGetIcmpErrStatus (
 
 **/
 EFI_STATUS
+EFIAPI
 IpIoRefreshNeighbor (
   IN IP_IO           *IpIo,
   IN EFI_IP_ADDRESS  *Neighbor,
