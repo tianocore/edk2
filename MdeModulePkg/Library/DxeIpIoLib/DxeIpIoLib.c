@@ -1039,12 +1039,22 @@ IpIoListenHandlerDpc (
     return;
   }
 
-  if (((EFI_SUCCESS != Status) && (EFI_ICMP_ERROR != Status)) || (NULL == RxData)) {
+  if ((EFI_SUCCESS != Status) && (EFI_ICMP_ERROR != Status)) {
     //
-    // @bug Only process the normal packets and the icmp error packets, if RxData is NULL
-    // @bug with Status == EFI_SUCCESS or EFI_ICMP_ERROR, just resume the receive although
-    // @bug this should be a bug of the low layer (IP).
+    // Only process the normal packets and the icmp error packets.
     //
+    if (RxData != NULL) {
+      goto CleanUp;
+    } else {
+      goto Resume;
+    }
+  }
+
+  //
+  // if RxData is NULL with Status == EFI_SUCCESS or EFI_ICMP_ERROR, this should be a code issue in the low layer (IP).
+  //
+  ASSERT (RxData != NULL);
+  if (RxData == NULL) {
     goto Resume;
   }
 
