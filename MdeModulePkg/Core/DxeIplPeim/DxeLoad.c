@@ -708,17 +708,12 @@ Decompress (
         return EFI_OUT_OF_RESOURCES;
       }
       //
-      // Allocate destination buffer, extra one page for adjustment 
+      // Allocate destination buffer
       //
-      DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize) + 1);
+      DstBuffer = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
       if (DstBuffer == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
-      //
-      // DstBuffer still is one section. Adjust DstBuffer offset, skip EFI section header
-      // to make section data at page alignment.
-      //
-      DstBuffer = DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER);
       //
       // Call decompress function
       //
@@ -749,15 +744,10 @@ Decompress (
     // Allocate destination buffer
     //
     DstBufferSize = UncompressedLength;
-    DstBuffer     = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize) + 1);
+    DstBuffer     = AllocatePages (EFI_SIZE_TO_PAGES (DstBufferSize));
     if (DstBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    //
-    // Adjust DstBuffer offset, skip EFI section header
-    // to make section data at page alignment.
-    //
-    DstBuffer = DstBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER);
     //
     // stream is not actually compressed, just encapsulated.  So just copy it.
     //
