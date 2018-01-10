@@ -7500,7 +7500,6 @@ NOOPT_MYTOOLS_IPF_DLINK_FLAGS            = /NOLOGO /NODEFAULTLIB /LTCG /DLL /OPT
 
 *_XCODE5_*_*_FAMILY            = GCC
 *_XCODE5_*_*_BUILDRULEFAMILY   = XCODE
-*_XCODE5_*_*_BUILDRULEORDER    = S s nasm
 
 #
 # use xcode-select to change Xcode version of command line tools
