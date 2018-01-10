@@ -1,7 +1,7 @@
 /** @file
  Section Extraction PEIM
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -194,16 +194,11 @@ CustomGuidedSectionExtract (
     //
     // Allocate output buffer
     //
-    *OutputBuffer = AllocatePages (EFI_SIZE_TO_PAGES (OutputBufferSize) + 1);
+    *OutputBuffer = AllocatePages (EFI_SIZE_TO_PAGES (OutputBufferSize));
     if (*OutputBuffer == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
     DEBUG ((DEBUG_INFO, "Customized Guided section Memory Size required is 0x%x and address is 0x%p\n", OutputBufferSize, *OutputBuffer));
-    //
-    // *OutputBuffer still is one section. Adjust *OutputBuffer offset, 
-    // skip EFI section header to make section data at page alignment.
-    //
-    *OutputBuffer = (VOID *)((UINT8 *) *OutputBuffer + EFI_PAGE_SIZE - sizeof (EFI_COMMON_SECTION_HEADER));
   }
   
   Status = ExtractGuidedSectionDecode (
