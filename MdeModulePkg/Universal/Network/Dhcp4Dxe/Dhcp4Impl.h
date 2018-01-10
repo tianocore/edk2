@@ -6,7 +6,7 @@
   RFC 1534: Interoperation Between DHCP and BOOTP
   RFC 3396: Encoding Long Options in DHCP.
   
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -182,6 +182,18 @@ PxeDhcpDone (
 VOID
 DhcpCleanConfigure (
   IN OUT EFI_DHCP4_CONFIG_DATA  *Config
+  );
+
+/**
+  Callback of Dhcp packet. Does nothing.
+
+  @param Arg           The context.
+
+**/
+VOID
+EFIAPI
+DhcpDummyExtFree (
+  IN VOID                   *Arg
   );
 
 /**

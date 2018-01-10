@@ -1,7 +1,7 @@
 /** @file
   EFI DHCP protocol implementation.
   
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1096,23 +1096,6 @@ RESTART:
   }
 }
 
-
-/**
-  Release the packet.
-
-  @param[in]  Arg                   The packet to release
-
-**/
-VOID
-EFIAPI
-DhcpReleasePacket (
-  IN VOID                   *Arg
-  )
-{
-  FreePool (Arg);
-}
-
-
 /**
   Release the net buffer when packet is sent.
 
@@ -1359,13 +1342,12 @@ DhcpSendMessage (
     Packet->Dhcp4.Header.HwAddrLen
     );
 
-
   //
   // Wrap it into a netbuf then send it.
   //
   Frag.Bulk = (UINT8 *) &Packet->Dhcp4.Header;
   Frag.Len  = Packet->Length;
-  Wrap      = NetbufFromExt (&Frag, 1, 0, 0, DhcpReleasePacket, Packet);
+  Wrap      = NetbufFromExt (&Frag, 1, 0, 0, DhcpDummyExtFree, NULL);
 
   if (Wrap == NULL) {
     FreePool (Packet);
@@ -1399,7 +1381,6 @@ DhcpSendMessage (
   }
 
   ASSERT (UdpIo != NULL);
-  NET_GET_REF (Wrap);
   
   Status = UdpIoSendDatagram (
              UdpIo, 
@@ -1411,7 +1392,7 @@ DhcpSendMessage (
              );
 
   if (EFI_ERROR (Status)) {
-    NET_PUT_REF (Wrap);
+    NetbufFree (Wrap);
     return EFI_ACCESS_DENIED;
   }
 
@@ -1454,12 +1435,12 @@ DhcpRetransmit (
   //
   Frag.Bulk = (UINT8 *) &DhcpSb->LastPacket->Dhcp4.Header;
   Frag.Len  = DhcpSb->LastPacket->Length;
-  Wrap      = NetbufFromExt (&Frag, 1, 0, 0, DhcpReleasePacket, DhcpSb->LastPacket);
+  Wrap      = NetbufFromExt (&Frag, 1, 0, 0, DhcpDummyExtFree, NULL);
 
   if (Wrap == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Broadcast the message, unless we know the server address.
   //
@@ -1477,7 +1458,6 @@ DhcpRetransmit (
 
   ASSERT (UdpIo != NULL);
 
-  NET_GET_REF (Wrap);
   Status = UdpIoSendDatagram (
              UdpIo,
              Wrap,
@@ -1488,7 +1468,7 @@ DhcpRetransmit (
              );
 
   if (EFI_ERROR (Status)) {
-    NET_PUT_REF (Wrap);
+    NetbufFree (Wrap);
     return EFI_ACCESS_DENIED;
   }
 
