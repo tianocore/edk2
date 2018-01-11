@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -60,7 +60,7 @@ ASM_PFX(gSmmCr4): DD 0
 ASM_PFX(gSmmCr0): DD 0
     mov     cr0, rax                    ; enable protected mode & paging
     DB      0x66, 0xea                   ; far jmp to long mode
-ASM_PFX(gSmmJmpAddr): DQ @LongMode
+ASM_PFX(gSmmJmpAddr): DQ 0;@LongMode
 @LongMode:                              ; long-mode starts here
     DB      0x48, 0xbc                   ; mov rsp, imm64
 ASM_PFX(gSmmInitStack): DQ 0
@@ -99,7 +99,7 @@ ASM_PFX(gcSmmInitTemplate):
     sub ebp, 0x30000
     jmp ebp
 @L1:
-    DQ      ASM_PFX(SmmStartup)
+    DQ     0; ASM_PFX(SmmStartup)
 
 ASM_PFX(gcSmmInitSize): DW $ - ASM_PFX(gcSmmInitTemplate)
 
@@ -128,3 +128,14 @@ ASM_PFX(mRebasedFlagAddr32): dd 0
     ;
     db      0xff, 0x25
 ASM_PFX(mSmmRelocationOriginalAddressPtr32): dd 0
+
+global ASM_PFX(PiSmmCpuSmmInitFixupAddress)
+ASM_PFX(PiSmmCpuSmmInitFixupAddress):
+    lea    rax, [@LongMode]
+    lea    rcx, [ASM_PFX(gSmmJmpAddr)]
+    mov    qword [rcx], rax
+
+    lea    rax, [ASM_PFX(SmmStartup)]
+    lea    rcx, [@L1]
+    mov    qword [rcx], rax
+    ret
