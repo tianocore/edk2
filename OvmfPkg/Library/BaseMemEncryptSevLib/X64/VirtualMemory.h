@@ -128,6 +128,20 @@ typedef union {
 
 #define IA32_PG_P                   BIT0
 #define IA32_PG_RW                  BIT1
+#define IA32_PG_PS                  BIT7
+
+#define PAGING_PAE_INDEX_MASK       0x1FF
+
+#define PAGING_4K_ADDRESS_MASK_64   0x000FFFFFFFFFF000ull
+#define PAGING_2M_ADDRESS_MASK_64   0x000FFFFFFFE00000ull
+#define PAGING_1G_ADDRESS_MASK_64   0x000FFFFFC0000000ull
+
+#define PAGING_L1_ADDRESS_SHIFT     12
+#define PAGING_L2_ADDRESS_SHIFT     21
+#define PAGING_L3_ADDRESS_SHIFT     30
+#define PAGING_L4_ADDRESS_SHIFT     39
+
+#define PAGING_PML4E_NUMBER         4
 
 #define PAGETABLE_ENTRY_MASK        ((1UL << 9) - 1)
 #define PML4_OFFSET(x)              ( (x >> 39) & PAGETABLE_ENTRY_MASK)
@@ -135,6 +149,20 @@ typedef union {
 #define PDE_OFFSET(x)               ( (x >> 21) & PAGETABLE_ENTRY_MASK)
 #define PTE_OFFSET(x)               ( (x >> 12) & PAGETABLE_ENTRY_MASK)
 #define PAGING_1G_ADDRESS_MASK_64   0x000FFFFFC0000000ull
+
+#define PAGE_TABLE_POOL_ALIGNMENT   BASE_2MB
+#define PAGE_TABLE_POOL_UNIT_SIZE   SIZE_2MB
+#define PAGE_TABLE_POOL_UNIT_PAGES  EFI_SIZE_TO_PAGES (PAGE_TABLE_POOL_UNIT_SIZE)
+#define PAGE_TABLE_POOL_ALIGN_MASK  \
+  (~(EFI_PHYSICAL_ADDRESS)(PAGE_TABLE_POOL_ALIGNMENT - 1))
+
+typedef struct {
+  VOID            *NextPool;
+  UINTN           Offset;
+  UINTN           FreePages;
+} PAGE_TABLE_POOL;
+
+
 
 /**
   This function clears memory encryption bit for the memory region specified by PhysicalAddress
