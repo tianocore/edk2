@@ -2,7 +2,7 @@
 # build a platform or a module
 #
 #  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -26,6 +26,7 @@ import platform
 import traceback
 import encodings.ascii
 import itertools
+import multiprocessing
 
 from struct import *
 from threading import *
@@ -936,7 +937,10 @@ class Build():
                 self.ThreadNumber = int(self.ThreadNumber, 0)
 
         if self.ThreadNumber == 0:
-            self.ThreadNumber = 1
+            try:
+                self.ThreadNumber = multiprocessing.cpu_count()
+            except (ImportError, NotImplementedError):
+                self.ThreadNumber = 1
 
         if not self.PlatformFile:
             PlatformFile = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_ACTIVE_PLATFORM]
