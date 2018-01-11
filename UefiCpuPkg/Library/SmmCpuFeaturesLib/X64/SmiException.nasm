@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -95,7 +95,7 @@ ASM_PFX(OnStmSetup):
 ; Check XD disable bit
 ;
     xor     r8, r8
-    mov     rax, ASM_PFX(gStmXdSupported)
+    lea     rax, [ASM_PFX(gStmXdSupported)]
     mov     al, [rax]
     cmp     al, 0
     jz      @StmXdDone1
@@ -118,7 +118,7 @@ ASM_PFX(OnStmSetup):
   call ASM_PFX(SmmStmSetup)
   add  rsp, 0x20
 
-    mov     rax, ASM_PFX(gStmXdSupported)
+    lea     rax, [ASM_PFX(gStmXdSupported)]
     mov     al, [rax]
     cmp     al, 0
     jz      .11
@@ -139,7 +139,7 @@ ASM_PFX(OnStmTeardown):
 ; Check XD disable bit
 ;
     xor     r8, r8
-    mov     rax, ASM_PFX(gStmXdSupported)
+    lea     rax, [ASM_PFX(gStmXdSupported)]
     mov     al, [rax]
     cmp     al, 0
     jz      @StmXdDone2
@@ -162,7 +162,7 @@ ASM_PFX(OnStmTeardown):
   call ASM_PFX(SmmStmTeardown)
   add  rsp, 0x20
 
-    mov     rax, ASM_PFX(gStmXdSupported)
+    lea     rax, [ASM_PFX(gStmXdSupported)]
     mov     al, [rax]
     cmp     al, 0
     jz      .12
