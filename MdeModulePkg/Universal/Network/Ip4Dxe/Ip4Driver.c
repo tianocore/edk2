@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP4 driver.
 
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
 This program and the accompanying materials
@@ -253,6 +253,7 @@ Ip4CreateService (
   ZeroMem (&IpSb->SnpMode, sizeof (EFI_SIMPLE_NETWORK_MODE));
 
   IpSb->Timer = NULL;
+  IpSb->ReconfigCheckTimer = NULL;
 
   IpSb->ReconfigEvent = NULL;
 
@@ -278,6 +279,18 @@ Ip4CreateService (
                   Ip4TimerTicking,
                   IpSb,
                   &IpSb->Timer
+                  );
+
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL | EVT_TIMER,
+                  TPL_CALLBACK,
+                  Ip4TimerReconfigChecking,
+                  IpSb,
+                  &IpSb->ReconfigCheckTimer
                   );
 
   if (EFI_ERROR (Status)) {
@@ -408,6 +421,13 @@ Ip4CleanService (
     gBS->CloseEvent (IpSb->Timer);
 
     IpSb->Timer = NULL;
+  }
+
+  if (IpSb->ReconfigCheckTimer != NULL) {
+    gBS->SetTimer (IpSb->ReconfigCheckTimer, TimerCancel, 0);
+    gBS->CloseEvent (IpSb->ReconfigCheckTimer);
+
+    IpSb->ReconfigCheckTimer = NULL;
   }
 
   if (IpSb->DefaultInterface != NULL) {
@@ -625,6 +645,12 @@ Ip4DriverBindingStart (
   }
 
   Status = gBS->SetTimer (IpSb->Timer, TimerPeriodic, TICKS_PER_SECOND);
+
+  if (EFI_ERROR (Status)) {
+    goto UNINSTALL_PROTOCOL;
+  }
+
+  Status = gBS->SetTimer (IpSb->ReconfigCheckTimer, TimerPeriodic, 500 * TICKS_PER_MS);
 
   if (EFI_ERROR (Status)) {
     goto UNINSTALL_PROTOCOL;

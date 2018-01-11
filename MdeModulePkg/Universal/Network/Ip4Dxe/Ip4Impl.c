@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2249,18 +2249,10 @@ Ip4SentPacketTicking (
   return EFI_SUCCESS;
 }
 
-
 /**
-  There are two steps for this the heart beat timer of IP4 service instance. 
-  First, it times out all of its IP4 children's received-but-not-delivered 
-  and transmitted-but-not-recycle packets, and provides time input for its 
-  IGMP protocol.
-  Second, a dedicated timer is used to poll underlying media status. In case 
-  of cable swap, a new round auto configuration will be initiated. The timer 
-  will signal the IP4 to run DHCP configuration again. IP4 driver will free
-  old IP address related resource, such as route table and Interface, then
-  initiate a DHCP process to acquire new IP, eventually create route table 
-  for new IP address.
+  This heart beat timer of IP4 service instance times out all of its IP4 children's 
+  received-but-not-delivered and transmitted-but-not-recycle packets, and provides 
+  time input for its IGMP protocol.
 
   @param[in]  Event                  The IP4 service instance's heart beat timer.
   @param[in]  Context                The IP4 service instance.
@@ -2274,6 +2266,34 @@ Ip4TimerTicking (
   )
 {
   IP4_SERVICE               *IpSb;
+
+  IpSb = (IP4_SERVICE *) Context;
+  NET_CHECK_SIGNATURE (IpSb, IP4_SERVICE_SIGNATURE);
+  
+  Ip4PacketTimerTicking (IpSb);
+  Ip4IgmpTicking (IpSb);
+}
+
+/**
+  This dedicated timer is used to poll underlying network media status. In case 
+  of cable swap or wireless network switch, a new round auto configuration will 
+  be initiated. The timer will signal the IP4 to run DHCP configuration again. 
+  IP4 driver will free old IP address related resource, such as route table and 
+  Interface, then initiate a DHCP process to acquire new IP, eventually create 
+  route table for new IP address.
+
+  @param[in]  Event                  The IP4 service instance's heart beat timer.
+  @param[in]  Context                The IP4 service instance.
+
+**/
+VOID
+EFIAPI
+Ip4TimerReconfigChecking (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
+  )
+{
+  IP4_SERVICE               *IpSb;
   BOOLEAN                   OldMediaPresent;
   EFI_STATUS                Status;
   EFI_SIMPLE_NETWORK_MODE   SnpModeData;
@@ -2282,9 +2302,6 @@ Ip4TimerTicking (
   NET_CHECK_SIGNATURE (IpSb, IP4_SERVICE_SIGNATURE);
   
   OldMediaPresent = IpSb->MediaPresent;
-
-  Ip4PacketTimerTicking (IpSb);
-  Ip4IgmpTicking (IpSb);
 
   //
   // Get fresh mode data from MNP, since underlying media status may change. 
