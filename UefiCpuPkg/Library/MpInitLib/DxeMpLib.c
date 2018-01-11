@@ -326,7 +326,7 @@ InitMpGlobalData (
     CpuInfoInHob = (CPU_INFO_IN_HOB *)(UINTN)CpuMpData->CpuInfoInHob;
     for (Index = 0; Index < CpuMpData->CpuCount; ++Index) {
       if (CpuInfoInHob != NULL && CpuInfoInHob[Index].ApTopOfStack != 0) {
-        StackBase = CpuInfoInHob[Index].ApTopOfStack - CpuMpData->CpuApStackSize;
+        StackBase = (UINTN)CpuInfoInHob[Index].ApTopOfStack - CpuMpData->CpuApStackSize;
       } else {
         StackBase = CpuMpData->Buffer + Index * CpuMpData->CpuApStackSize;
       }
