@@ -804,7 +804,7 @@ NetIp6IsLinkLocalAddr (
   Check whether the Ipv6 address1 and address2 are on the connected network.
 
   ASSERT if Ip1 or Ip2 is NULL.
-  ASSERT if PrefixLength exceeds IP6_PREFIX_MAX.
+  ASSERT if PrefixLength exceeds or equals to IP6_PREFIX_MAX.
 
   @param[in] Ip1          - Ip6 address1, in network order.
   @param[in] Ip2          - Ip6 address2, in network order.
@@ -826,7 +826,7 @@ NetIp6IsNetEqual (
   UINT8 Bit;
   UINT8 Mask;
 
-  ASSERT ((Ip1 != NULL) && (Ip2 != NULL) && (PrefixLength <= IP6_PREFIX_MAX));
+  ASSERT ((Ip1 != NULL) && (Ip2 != NULL) && (PrefixLength < IP6_PREFIX_MAX));
 
   if (PrefixLength == 0) {
     return TRUE;
@@ -842,6 +842,10 @@ NetIp6IsNetEqual (
   if (Bit > 0) {
     Mask = (UINT8) (0xFF << (8 - Bit));
 
+    ASSERT (Byte < 16);
+    if (Byte >= 16) {
+      return FALSE;
+    }
     if ((Ip1->Addr[Byte] & Mask) != (Ip2->Addr[Byte] & Mask)) {
       return FALSE;
     }
