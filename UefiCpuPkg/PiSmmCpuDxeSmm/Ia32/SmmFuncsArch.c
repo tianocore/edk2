@@ -1,7 +1,7 @@
 /** @file
   SMM CPU misc functions for Ia32 arch specific.
   
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -77,7 +77,12 @@ InitGdt (
 
     GdtTssTableSize = (gcSmiGdtr.Limit + 1 + TSS_SIZE * 2 + 7) & ~7; // 8 bytes aligned
     mGdtBufferSize = GdtTssTableSize * gSmmCpuPrivate->SmmCoreEntryContext.NumberOfCpus;
-    GdtTssTables = (UINT8*)AllocateCodePages (EFI_SIZE_TO_PAGES (mGdtBufferSize));
+    //
+    // IA32 Stack Guard need use task switch to switch stack that need
+    // write GDT and TSS, so AllocateCodePages() could not be used here
+    // as code pages will be set to RO. 
+    //
+    GdtTssTables = (UINT8*)AllocatePages (EFI_SIZE_TO_PAGES (mGdtBufferSize));
     ASSERT (GdtTssTables != NULL);
     mGdtBuffer = (UINTN)GdtTssTables;
     GdtTableStepSize = GdtTssTableSize;
@@ -124,61 +129,6 @@ InitGdt (
 
   *GdtStepSize = GdtTableStepSize;
   return GdtTssTables;
-}
-
-/**
-  This function sets GDT/IDT buffer to be RO and XP.
-**/
-VOID
-PatchGdtIdtMap (
-  VOID
-  )
-{
-  EFI_PHYSICAL_ADDRESS       BaseAddress;
-  UINTN                      Size;
-
-  //
-  // GDT
-  //
-  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - GDT:\n"));
-
-  BaseAddress = mGdtBuffer;
-  Size = ALIGN_VALUE(mGdtBufferSize, SIZE_4KB);
-  if (!FeaturePcdGet (PcdCpuSmmStackGuard)) {
-    //
-    // Do not set RO for IA32 when stack guard feature is enabled.
-    // Stack Guard need use task switch to switch stack.
-    // It need write GDT and TSS.
-    //
-    SmmSetMemoryAttributes (
-      BaseAddress,
-      Size,
-      EFI_MEMORY_RO
-      );
-  }
-  SmmSetMemoryAttributes (
-    BaseAddress,
-    Size,
-    EFI_MEMORY_XP
-    );
-
-  //
-  // IDT
-  //
-  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - IDT:\n"));
-
-  BaseAddress = gcSmiIdtr.Base;
-  Size = ALIGN_VALUE(gcSmiIdtr.Limit + 1, SIZE_4KB);
-  SmmSetMemoryAttributes (
-    BaseAddress,
-    Size,
-    EFI_MEMORY_RO
-    );
-  SmmSetMemoryAttributes (
-    BaseAddress,
-    Size,
-    EFI_MEMORY_XP
-    );
 }
 
 /**
