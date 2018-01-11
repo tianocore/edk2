@@ -4,7 +4,7 @@
   Note that if the debug message length is larger than the maximum allowable
   record length, then the debug message will be ignored directly.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -96,7 +96,7 @@ DebugPrint (
   // If the TotalSize is larger than the maximum record size, then return
   //
   if (TotalSize > sizeof (Buffer)) {
-    return;
+    TotalSize = sizeof (Buffer);
   }
 
   //
@@ -113,9 +113,12 @@ DebugPrint (
   FormatString          = (CHAR8 *)((UINT64 *)(DebugInfo + 1) + 12);
 
   //
-  // Copy the Format string into the record
+  // Copy the Format string into the record. It will be truncated if it's too long.
   //
-  AsciiStrCpyS (FormatString, sizeof(Buffer) - (4 + sizeof(EFI_DEBUG_INFO) + 12 * sizeof(UINT64)), Format);
+  AsciiStrnCpyS (
+    FormatString, sizeof(Buffer) - (4 + sizeof(EFI_DEBUG_INFO) + 12 * sizeof(UINT64)),
+    Format,       sizeof(Buffer) - (4 + sizeof(EFI_DEBUG_INFO) + 12 * sizeof(UINT64)) - 1
+    );
 
   //
   // The first 12 * sizeof (UINT64) bytes following EFI_DEBUG_INFO are for variable arguments
