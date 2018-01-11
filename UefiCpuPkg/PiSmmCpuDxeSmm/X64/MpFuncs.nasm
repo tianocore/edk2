@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -18,8 +18,6 @@
 ;
 ;-------------------------------------------------------------------------------
 
-extern ASM_PFX(InitializeFloatingPointUnits)
-
 %define VacantFlag 0x0
 %define NotVacantFlag 0xff
 
@@ -31,6 +29,7 @@ extern ASM_PFX(InitializeFloatingPointUnits)
 %define IdtrLocation LockLocation + 0x2A
 %define BufferStartLocation LockLocation + 0x34
 %define Cr3OffsetLocation LockLocation + 0x38
+%define InitializeFloatingPointUnitsAddress LockLocation + 0x3C
 
 ;-------------------------------------------------------------------------------------
 ;RendezvousFunnelProc  procedure follows. All APs execute their procedure. This
@@ -153,7 +152,7 @@ Releaselock:
         ;
         ; Call assembly function to initialize FPU.
         ;
-        mov         rax, ASM_PFX(InitializeFloatingPointUnits)
+        mov         rax, qword [esi + InitializeFloatingPointUnitsAddress]
         sub         rsp, 0x20
         call        rax
         add         rsp, 0x20
@@ -185,7 +184,7 @@ RendezvousFunnelProcEnd:
 ; comments here for definition of address map
 global ASM_PFX(AsmGetAddressMap)
 ASM_PFX(AsmGetAddressMap):
-        mov         rax, RendezvousFunnelProcStart
+        lea         rax, [RendezvousFunnelProcStart]
         mov         qword [rcx], rax
         mov         qword [rcx+0x8], PMODE_ENTRY - RendezvousFunnelProcStart
         mov         qword [rcx+0x10], FLAT32_JUMP - RendezvousFunnelProcStart

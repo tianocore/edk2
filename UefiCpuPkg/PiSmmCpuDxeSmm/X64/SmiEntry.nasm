@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -158,7 +158,8 @@ Base:
     mov     cr0, rbx
     retf
 @LongMode:                              ; long mode (64-bit code) starts here
-    mov     rax, ASM_PFX(gSmiHandlerIdtr)
+    mov     rax, strict qword 0         ;  mov     rax, ASM_PFX(gSmiHandlerIdtr)
+SmiHandlerIdtrAbsAddr:
     lidt    [rax]
     lea     ebx, [rdi + DSC_OFFSET]
     mov     ax, [rbx + DSC_DS]
@@ -169,7 +170,9 @@ Base:
     mov     gs, eax
     mov     ax, [rbx + DSC_SS]
     mov     ss, eax
-;   jmp     _SmiHandler                 ; instruction is not needed
+    mov     rax, strict qword 0         ;   mov     rax, _SmiHandler
+_SmiHandlerAbsAddr:
+    jmp     rax
 
 _SmiHandler:
     mov     rbx, [rsp + 0x8]             ; rcx <- CpuIndex
@@ -184,16 +187,13 @@ _SmiHandler:
     add     rsp, -0x20
 
     mov     rcx, rbx
-    mov     rax, ASM_PFX(CpuSmmDebugEntry)
-    call    rax
+    call    ASM_PFX(CpuSmmDebugEntry)
 
     mov     rcx, rbx
-    mov     rax, ASM_PFX(SmiRendezvous)  ; rax <- absolute addr of SmiRedezvous
-    call    rax
+    call    ASM_PFX(SmiRendezvous)
 
     mov     rcx, rbx
-    mov     rax, ASM_PFX(CpuSmmDebugExit)
-    call    rax
+    call    ASM_PFX(CpuSmmDebugExit)
 
     add     rsp, 0x20
 
@@ -205,7 +205,7 @@ _SmiHandler:
 
     add     rsp, 0x200
 
-    mov     rax, ASM_PFX(mXdSupported)
+    lea     rax, [ASM_PFX(mXdSupported)]
     mov     al, [rax]
     cmp     al, 0
     jz      .1
@@ -222,3 +222,13 @@ _SmiHandler:
 
 ASM_PFX(gcSmiHandlerSize)    DW      $ - _SmiEntryPoint
 
+global ASM_PFX(PiSmmCpuSmiEntryFixupAddress)
+ASM_PFX(PiSmmCpuSmiEntryFixupAddress):
+    lea    rax, [ASM_PFX(gSmiHandlerIdtr)]
+    lea    rcx, [SmiHandlerIdtrAbsAddr]
+    mov    qword [rcx - 8], rax
+
+    lea    rax, [_SmiHandler]
+    lea    rcx, [_SmiHandlerAbsAddr]
+    mov    qword [rcx - 8], rax
+    ret

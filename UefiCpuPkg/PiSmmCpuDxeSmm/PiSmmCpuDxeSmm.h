@@ -1158,4 +1158,22 @@ EdkiiSmmGetMemoryAttributes (
   IN  UINT64                                *Attributes
   );
 
+/**
+  This function fixes up the address of the global variable or function
+  referred in SmmInit assembly files to be the absoute address.
+**/
+VOID
+EFIAPI
+PiSmmCpuSmmInitFixupAddress (
+ );
+
+/**
+  This function fixes up the address of the global variable or function
+  referred in SmiEntry assembly files to be the absoute address.
+**/
+VOID
+EFIAPI
+PiSmmCpuSmiEntryFixupAddress (
+ );
+
 #endif
