@@ -1,7 +1,7 @@
 /** @file
   Ip4 internal functions and type defintions.
   
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
 This program and the accompanying materials
@@ -206,7 +206,7 @@ struct _IP4_SERVICE {
   EFI_SIMPLE_NETWORK_MODE         SnpMode;
 
   EFI_EVENT                       Timer;
-
+  EFI_EVENT                       ReconfigCheckTimer;
   EFI_EVENT                       ReconfigEvent;
 
   BOOLEAN                         Reconfig;
@@ -334,10 +334,9 @@ Ip4Groups (
   );
 
 /**
-  The heart beat timer of IP4 service instance. It times out
-  all of its IP4 children's received-but-not-delivered and
-  transmitted-but-not-recycle packets, and provides time input
-  for its IGMP protocol.
+  This heart beat timer of IP4 service instance times out all of its IP4 children's 
+  received-but-not-delivered and transmitted-but-not-recycle packets, and provides 
+  time input for its IGMP protocol.
 
   @param[in]  Event                  The IP4 service instance's heart beat timer.
   @param[in]  Context                The IP4 service instance.
@@ -346,6 +345,25 @@ Ip4Groups (
 VOID
 EFIAPI
 Ip4TimerTicking (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
+  );
+
+/**
+  This dedicated timer is used to poll underlying network media status. In case 
+  of cable swap or wireless network switch, a new round auto configuration will 
+  be initiated. The timer will signal the IP4 to run DHCP configuration again. 
+  IP4 driver will free old IP address related resource, such as route table and 
+  Interface, then initiate a DHCP process to acquire new IP, eventually create 
+  route table for new IP address.
+
+  @param[in]  Event                  The IP4 service instance's heart beat timer.
+  @param[in]  Context                The IP4 service instance.
+
+**/
+VOID
+EFIAPI
+Ip4TimerReconfigChecking (
   IN EFI_EVENT              Event,
   IN VOID                   *Context
   );
