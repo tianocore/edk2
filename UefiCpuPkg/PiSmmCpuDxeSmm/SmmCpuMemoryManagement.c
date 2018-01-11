@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -764,6 +764,53 @@ PatchSmmSaveStateMap (
   SmmSetMemoryAttributes (
     mCpuHotPlugData.SmBase[mMaxNumberOfCpus - 1] + SMM_HANDLER_OFFSET + TileCodeSize,
     SIZE_32KB - TileCodeSize,
+    EFI_MEMORY_XP
+    );
+}
+
+/**
+  This function sets GDT/IDT buffer to be RO and XP.
+**/
+VOID
+PatchGdtIdtMap (
+  VOID
+  )
+{
+  EFI_PHYSICAL_ADDRESS       BaseAddress;
+  UINTN                      Size;
+
+  //
+  // GDT
+  //
+  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - GDT:\n"));
+
+  BaseAddress = mGdtBuffer;
+  Size = ALIGN_VALUE(mGdtBufferSize, SIZE_4KB);
+  //
+  // The range should have been set to RO
+  // if it is allocated with EfiRuntimeServicesCode.
+  //
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
+    EFI_MEMORY_XP
+    );
+
+  //
+  // IDT
+  //
+  DEBUG ((DEBUG_INFO, "PatchGdtIdtMap - IDT:\n"));
+
+  BaseAddress = gcSmiIdtr.Base;
+  Size = ALIGN_VALUE(gcSmiIdtr.Limit + 1, SIZE_4KB);
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
+    EFI_MEMORY_RO
+    );
+  SmmSetMemoryAttributes (
+    BaseAddress,
+    Size,
     EFI_MEMORY_XP
     );
 }
