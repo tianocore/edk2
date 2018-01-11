@@ -1,7 +1,7 @@
 /** @file
 Agent Module to load other modules to deploy SMM Entry Vector for X86 CPU.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -541,6 +541,12 @@ PiCpuSmmEntry (
   UINTN                      FamilyId;
   UINTN                      ModelId;
   UINT32                     Cr3;
+
+  //
+  // Initialize address fixup
+  //
+  PiSmmCpuSmmInitFixupAddress ();
+  PiSmmCpuSmiEntryFixupAddress ();
 
   //
   // Initialize Debug Agent to support source level debug in SMM code

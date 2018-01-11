@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -85,3 +85,7 @@ ASM_PFX(SmmRelocationSemaphoreComplete):
     mov     byte [eax], 1
     pop     eax
     jmp     [ASM_PFX(mSmmRelocationOriginalAddress)]
+
+global ASM_PFX(PiSmmCpuSmmInitFixupAddress)
+ASM_PFX(PiSmmCpuSmmInitFixupAddress):
+    ret
