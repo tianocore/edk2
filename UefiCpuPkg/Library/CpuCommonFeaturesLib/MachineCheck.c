@@ -105,6 +105,9 @@ McaSupport (
   IN VOID                              *ConfigData  OPTIONAL
   )
 {
+  if (!MceSupport (ProcessorNumber, CpuInfo, ConfigData)) {
+    return FALSE;
+  }
   return (CpuInfo->CpuIdVersionInfoEdx.Bits.MCA == 1);
 }
 
