@@ -1,7 +1,7 @@
 /** @file
   Helper functions for USB Keyboard Driver.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1484,6 +1484,65 @@ USBParseKey (
   return EFI_NOT_READY;
 }
 
+/**
+  Initialize the key state.
+
+  @param  UsbKeyboardDevice     The USB_KB_DEV instance.
+  @param  KeyState              A pointer to receive the key state information.
+**/
+VOID
+InitializeKeyState (
+  IN  USB_KB_DEV           *UsbKeyboardDevice,
+  OUT EFI_KEY_STATE        *KeyState
+  )
+{
+  KeyState->KeyShiftState  = EFI_SHIFT_STATE_VALID;
+  KeyState->KeyToggleState = EFI_TOGGLE_STATE_VALID;
+
+  if (UsbKeyboardDevice->LeftCtrlOn) {
+    KeyState->KeyShiftState |= EFI_LEFT_CONTROL_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightCtrlOn) {
+    KeyState->KeyShiftState |= EFI_RIGHT_CONTROL_PRESSED;
+  }
+  if (UsbKeyboardDevice->LeftAltOn) {
+    KeyState->KeyShiftState |= EFI_LEFT_ALT_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightAltOn) {
+    KeyState->KeyShiftState |= EFI_RIGHT_ALT_PRESSED;
+  }
+  if (UsbKeyboardDevice->LeftShiftOn) {
+    KeyState->KeyShiftState |= EFI_LEFT_SHIFT_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightShiftOn) {
+    KeyState->KeyShiftState |= EFI_RIGHT_SHIFT_PRESSED;
+  }
+  if (UsbKeyboardDevice->LeftLogoOn) {
+    KeyState->KeyShiftState |= EFI_LEFT_LOGO_PRESSED;
+  }
+  if (UsbKeyboardDevice->RightLogoOn) {
+    KeyState->KeyShiftState |= EFI_RIGHT_LOGO_PRESSED;
+  }
+  if (UsbKeyboardDevice->MenuKeyOn) {
+    KeyState->KeyShiftState |= EFI_MENU_KEY_PRESSED;
+  }
+  if (UsbKeyboardDevice->SysReqOn) {
+    KeyState->KeyShiftState |= EFI_SYS_REQ_PRESSED;
+  }
+
+  if (UsbKeyboardDevice->ScrollOn) {
+    KeyState->KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
+  }
+  if (UsbKeyboardDevice->NumLockOn) {
+    KeyState->KeyToggleState |= EFI_NUM_LOCK_ACTIVE;
+  }
+  if (UsbKeyboardDevice->CapsOn) {
+    KeyState->KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
+  }
+  if (UsbKeyboardDevice->IsSupportPartialKey) {
+    KeyState->KeyToggleState |= EFI_KEY_STATE_EXPOSED;
+  }
+}
 
 /**
   Converts USB Keycode ranging from 0x4 to 0x65 to EFI_INPUT_KEY.
@@ -1619,52 +1678,8 @@ UsbKeyCodeToEfiInputKey (
   //
   // Save Shift/Toggle state
   //
-  KeyData->KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
-  KeyData->KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
+  InitializeKeyState (UsbKeyboardDevice, &KeyData->KeyState);
 
-  if (UsbKeyboardDevice->LeftCtrlOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_LEFT_CONTROL_PRESSED;
-  }
-  if (UsbKeyboardDevice->RightCtrlOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_RIGHT_CONTROL_PRESSED;
-  }
-  if (UsbKeyboardDevice->LeftAltOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_LEFT_ALT_PRESSED;
-  }
-  if (UsbKeyboardDevice->RightAltOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_RIGHT_ALT_PRESSED;
-  }
-  if (UsbKeyboardDevice->LeftShiftOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_LEFT_SHIFT_PRESSED;
-  }
-  if (UsbKeyboardDevice->RightShiftOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_RIGHT_SHIFT_PRESSED;
-  }
-  if (UsbKeyboardDevice->LeftLogoOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_LEFT_LOGO_PRESSED;
-  }
-  if (UsbKeyboardDevice->RightLogoOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_RIGHT_LOGO_PRESSED;
-  }
-  if (UsbKeyboardDevice->MenuKeyOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_MENU_KEY_PRESSED;
-  }
-  if (UsbKeyboardDevice->SysReqOn) {
-    KeyData->KeyState.KeyShiftState |= EFI_SYS_REQ_PRESSED;
-  }
-
-  if (UsbKeyboardDevice->ScrollOn) {
-    KeyData->KeyState.KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
-  }
-  if (UsbKeyboardDevice->NumLockOn) {
-    KeyData->KeyState.KeyToggleState |= EFI_NUM_LOCK_ACTIVE;
-  }
-  if (UsbKeyboardDevice->CapsOn) {
-    KeyData->KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
-  }
-  if (UsbKeyboardDevice->IsSupportPartialKey) {
-    KeyData->KeyState.KeyToggleState |= EFI_KEY_STATE_EXPOSED;
-  }
   //
   // Signal KeyNotify process event if this key pressed matches any key registered.
   //

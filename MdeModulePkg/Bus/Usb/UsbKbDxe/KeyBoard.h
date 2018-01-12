@@ -1,7 +1,7 @@
 /** @file
   Function prototype for USB Keyboard Driver.
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -315,6 +315,18 @@ USBKeyboardRepeatHandler (
 VOID
 SetKeyLED (
   IN  USB_KB_DEV    *UsbKeyboardDevice
+  );
+
+/**
+  Initialize the key state.
+
+  @param  UsbKeyboardDevice     The USB_KB_DEV instance.
+  @param  KeyState              A pointer to receive the key state information.
+**/
+VOID
+InitializeKeyState (
+  IN  USB_KB_DEV           *UsbKeyboardDevice,
+  OUT EFI_KEY_STATE        *KeyState
   );
 
 #endif

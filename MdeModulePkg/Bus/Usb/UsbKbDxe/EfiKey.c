@@ -2,7 +2,7 @@
   USB Keyboard Driver that manages USB keyboard and produces Simple Text Input
   Protocol and Simple Text Input Ex Protocol.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -607,6 +607,8 @@ USBKeyboardReadKeyStrokeWorker (
   }
 
   if (IsQueueEmpty (&UsbKeyboardDevice->EfiKeyQueue)) {
+    ZeroMem (&KeyData->Key, sizeof (KeyData->Key));
+    InitializeKeyState (UsbKeyboardDevice, &KeyData->KeyState);
     return EFI_NOT_READY;
   }
 
