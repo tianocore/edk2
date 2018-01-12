@@ -803,11 +803,10 @@ PatchGdtIdtMap (
 
   BaseAddress = gcSmiIdtr.Base;
   Size = ALIGN_VALUE(gcSmiIdtr.Limit + 1, SIZE_4KB);
-  SmmSetMemoryAttributes (
-    BaseAddress,
-    Size,
-    EFI_MEMORY_RO
-    );
+  //
+  // The range should have been set to RO
+  // if it is allocated with EfiRuntimeServicesCode.
+  //
   SmmSetMemoryAttributes (
     BaseAddress,
     Size,
