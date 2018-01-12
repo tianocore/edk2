@@ -16,7 +16,10 @@
 
     EXPORT CpuBreakpoint
 
-  AREA Cpu_Breakpoint, CODE, READONLY
+; Force ARM mode for this section, as MSFT assembler defaults to THUMB
+  AREA Cpu_Breakpoint, CODE, READONLY, ARM
+
+  ARM
 
 ;/**
 ;  Generates a breakpoint on the CPU.
