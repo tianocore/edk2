@@ -1,7 +1,7 @@
 /** @file
   Private data structures for the Console Splitter driver
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -129,6 +129,8 @@ typedef struct {
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL  **TextInExList;
   UINTN                              TextInExListCount;
   LIST_ENTRY                         NotifyList;
+  EFI_KEY_DATA                       *KeyQueue;
+  UINTN                              CurrentNumberOfKeys;
   //
   // It will be initialized and synced between console input devices
   // for toggle state sync.
