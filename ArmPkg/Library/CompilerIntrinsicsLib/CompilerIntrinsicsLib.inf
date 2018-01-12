@@ -23,8 +23,12 @@
   LIBRARY_CLASS                  = CompilerIntrinsicsLib
 
 [Sources]
-  memcpy.c
-  memset.c
+  memcpy.c             | RVCT
+  memcpy.c             | GCC
+  memcpy_ms.c          | MSFT
+  memset.c             | RVCT
+  memset.c             | GCC
+  memset_ms.c          | MSFT
 
 [Sources.ARM]
   Arm/mullu.asm        | RVCT
@@ -94,6 +98,10 @@
   Arm/llsr.S       | GCC
   Arm/llsl.S       | GCC
 
+  Arm/div.asm      | MSFT
+  Arm/uldiv.asm    | MSFT
+  Arm/ldivmod.asm  | MSFT
+  Arm/llsr.asm     | MSFT
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -101,3 +109,7 @@
 
 [LibraryClasses]
 
+[BuildOptions]
+  MSFT:*_*_ARM_CC_FLAGS = /GL-
+  MSFT:*_*_ARM_ASM_FLAGS = /oldit
+  MSFT:*_*_AARCH64_CC_FLAGS = /GL-

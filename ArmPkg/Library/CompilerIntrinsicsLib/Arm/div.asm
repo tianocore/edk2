@@ -1,6 +1,7 @@
 //------------------------------------------------------------------------------
 //
 // Copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
+// Copyright (c) 2018, Pete Batard. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -17,18 +18,19 @@
     EXPORT  __aeabi_uidivmod
     EXPORT  __aeabi_idiv
     EXPORT  __aeabi_idivmod
+    EXPORT  __rt_udiv
+    EXPORT  __rt_sdiv
 
     AREA  Math, CODE, READONLY
 
 ;
 ;UINT32
 ;EFIAPI
-;__aeabi_uidivmode (
-;  IN UINT32  Dividen
+;__aeabi_uidivmod (
+;  IN UINT32  Dividend
 ;  IN UINT32  Divisor
 ;  );
 ;
-
 __aeabi_uidiv
 __aeabi_uidivmod
     RSBS    r12, r1, r0, LSR #4
@@ -40,10 +42,40 @@ __aeabi_uidivmod
     B       __arm_div_large
 
 ;
+;UINT64
+;EFIAPI
+;__rt_udiv (
+;  IN UINT32  Divisor,
+;  IN UINT32  Dividend
+;  );
+;
+__rt_udiv
+    ; Swap R0 and R1
+    MOV     r12, r0
+    MOV     r0, r1
+    MOV     r1, r12
+    B       __aeabi_uidivmod
+
+;
+;UINT64
+;EFIAPI
+;__rt_sdiv (
+;  IN INT32  Divisor,
+;  IN INT32  Dividend
+;  );
+;
+__rt_sdiv
+    ; Swap R0 and R1
+    MOV     r12, r0
+    MOV     r0, r1
+    MOV     r1, r12
+    B       __aeabi_idivmod
+
+;
 ;INT32
 ;EFIAPI
-;__aeabi_idivmode (
-;  IN INT32  Dividen
+;__aeabi_idivmod (
+;  IN INT32  Dividend
 ;  IN INT32  Divisor
 ;  );
 ;
@@ -152,4 +184,3 @@ __aeabi_idiv0
     BX      r14
 
     END
-
