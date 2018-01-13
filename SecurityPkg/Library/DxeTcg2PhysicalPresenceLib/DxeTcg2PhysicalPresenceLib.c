@@ -186,6 +186,18 @@ Tcg2ExecutePhysicalPresence (
     case TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS:
       Status = Tpm2GetCapabilitySupportedAndActivePcrs (&TpmHashAlgorithmBitmap, &ActivePcrBanks);
       ASSERT_EFI_ERROR (Status);
+
+      //
+      // PP spec requirements:
+      //    Firmware should check that all requested (set) hashing algorithms are supported with respective PCR banks.
+      //    Firmware has to ensure that at least one PCR banks is active.
+      // If not, an error is returned and no action is taken.
+      //
+      if (CommandParameter == 0 || (CommandParameter & (~TpmHashAlgorithmBitmap)) != 0) {
+        DEBUG((DEBUG_ERROR, "PCR banks %x to allocate are not supported by TPM. Skip operation\n", CommandParameter));
+        return TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
+      }
+
       Status = Tpm2PcrAllocateBanks (PlatformAuth, TpmHashAlgorithmBitmap, CommandParameter);
       if (EFI_ERROR (Status)) {
         return TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE;
