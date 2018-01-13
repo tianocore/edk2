@@ -155,6 +155,9 @@
   mrc     p15, 0, r0, c1, c0, 0      // Read SCTLR into R0 (Read control register configuration data)
   bx      lr
 
+ RVCT_ASM_EXPORT ArmWriteSctlr
+  mcr     p15, 0, r0, c1, c0, 0
+  bx      lr
 
  RVCT_ASM_EXPORT ArmReadCpuActlr
   mrc     p15, 0, r0, c1, c0, 1

@@ -187,4 +187,13 @@ ASM_FUNC(ArmReadSctlr)
 3:mrs   x0, sctlr_el3
 4:ret
 
+ASM_FUNC(ArmWriteSctlr)
+  EL1_OR_EL2_OR_EL3(x1)
+1:msr   sctlr_el1, x0
+  ret
+2:msr   sctlr_el2, x0
+  ret
+3:msr   sctlr_el3, x0
+4:ret
+
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

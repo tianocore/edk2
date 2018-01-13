@@ -558,6 +558,12 @@ ArmReadSctlr (
   VOID
   );
 
+VOID
+EFIAPI
+ArmWriteSctlr (
+  IN  UINT32   Value
+  );
+
 UINTN
 EFIAPI
 ArmReadHVBar (
