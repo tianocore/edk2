@@ -1550,6 +1550,7 @@ SmmIplEntry (
   EFI_CPU_ARCH_PROTOCOL           *CpuArch;
   EFI_STATUS                      SetAttrStatus;
   EFI_SMRAM_DESCRIPTOR            *SmramRangeSmmDriver;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR MemDesc;
 
   //
   // Fill in the image handle of the SMM IPL so the SMM Core can use this as the 
@@ -1616,7 +1617,8 @@ SmmIplEntry (
 
     GetSmramCacheRange (mCurrentSmramRange, &mSmramCacheBase, &mSmramCacheSize);
     //
-    // If CPU AP is present, attempt to set SMRAM cacheability to WB
+    // If CPU AP is present, attempt to set SMRAM cacheability to WB and clear
+    // XP if it's set.
     // Note that it is expected that cacheability of SMRAM has been set to WB if CPU AP
     // is not available here.
     //
@@ -1630,7 +1632,19 @@ SmmIplEntry (
                       );
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_WARN, "SMM IPL failed to set SMRAM window to EFI_MEMORY_WB\n"));
-      }  
+      }
+
+      Status = gDS->GetMemorySpaceDescriptor(
+                      mCurrentSmramRange->PhysicalStart,
+                      &MemDesc
+                      );
+      if (!EFI_ERROR (Status) && (MemDesc.Attributes & EFI_MEMORY_XP) != 0) {
+        gDS->SetMemorySpaceAttributes (
+               mCurrentSmramRange->PhysicalStart,
+               mCurrentSmramRange->PhysicalSize,
+               MemDesc.Attributes & (~EFI_MEMORY_XP)
+               );
+      }
     }
     //
     // if Loading module at Fixed Address feature is enabled, save the SMRAM base to Load
