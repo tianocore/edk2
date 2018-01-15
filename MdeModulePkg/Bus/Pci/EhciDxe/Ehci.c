@@ -11,7 +11,7 @@
   and companion host controller when UHCI or OHCI gets attached earlier than EHCI and a 
   USB 2.0 device inserts.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1220,6 +1220,7 @@ EhcSyncInterruptTransfer (
     Status = EFI_SUCCESS;
   }
 
+  EhcFreeUrb (Ehc, Urb);
 ON_EXIT:
   Ehc->PciIo->Flush (Ehc->PciIo);
   gBS->RestoreTPL (OldTpl);
