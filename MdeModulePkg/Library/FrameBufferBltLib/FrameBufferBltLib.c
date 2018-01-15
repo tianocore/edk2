@@ -280,6 +280,7 @@ FrameBufferBltLibVideoFill (
     SizeInBytes = WidthInBytes * Height;
     if (SizeInBytes >= 8) {
       SetMem32 (Destination, SizeInBytes & ~3, (UINT32) WideFill);
+      Destination += SizeInBytes & ~3;
       SizeInBytes &= 3;
     }
     if (SizeInBytes > 0) {
@@ -297,6 +298,7 @@ FrameBufferBltLibVideoFill (
         SizeInBytes = WidthInBytes;
         if (SizeInBytes >= 8) {
           SetMem64 (Destination, SizeInBytes & ~7, WideFill);
+          Destination += SizeInBytes & ~7;
           SizeInBytes &= 7;
         }
         if (SizeInBytes > 0) {
