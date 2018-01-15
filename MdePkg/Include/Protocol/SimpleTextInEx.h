@@ -5,7 +5,7 @@
   which exposes much more state and modifier information from the input device,
   also allows one to register a notification for a particular keystroke.
 
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -190,13 +190,10 @@ typedef struct {
                   pressed.
 
 
-  @retval EFI_SUCCESS     The keystroke information was
-                          returned.
-
-  @retval EFI_NOT_READY   There was no keystroke data available.
-                          EFI_DEVICE_ERROR The keystroke
-                          information was not returned due to
-                          hardware errors.
+  @retval EFI_SUCCESS      The keystroke information was returned.
+  @retval EFI_NOT_READY    There was no keystroke data available.
+  @retval EFI_DEVICE_ERROR The keystroke information was not returned due to
+                           hardware errors.
 
 
 **/
