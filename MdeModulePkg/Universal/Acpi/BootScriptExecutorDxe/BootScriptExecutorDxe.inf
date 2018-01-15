@@ -68,6 +68,7 @@
   LockBoxLib
   CpuExceptionHandlerLib
   DevicePathLib
+  DxeServicesTableLib
 
 [Guids]
   gEfiBootScriptExecutorVariableGuid    ## PRODUCES ## UNDEFINED # SaveLockBox

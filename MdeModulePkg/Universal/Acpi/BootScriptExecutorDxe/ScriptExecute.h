@@ -38,6 +38,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/LockBoxLib.h>
 #include <Library/CpuExceptionHandlerLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/DxeServicesTableLib.h>
 
 #include <Guid/AcpiS3Context.h>
 #include <Guid/BootScriptExecutorVariable.h>
