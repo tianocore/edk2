@@ -42,6 +42,11 @@ ASM_PFX(gcSmiInitGdtr):
 
 global ASM_PFX(SmmStartup)
 ASM_PFX(SmmStartup):
+    DB      0x66
+    mov     eax, 0x80000001             ; read capability
+    cpuid
+    DB      0x66
+    mov     ebx, edx                    ; rdmsr will change edx. keep it in ebx.
     DB      0x66, 0xb8                   ; mov eax, imm32
 ASM_PFX(gSmmCr3): DD 0
     mov     cr3, rax
@@ -54,7 +59,12 @@ ASM_PFX(gSmmCr4): DD 0
     DB      0x66
     mov     ecx, 0xc0000080             ; IA32_EFER MSR
     rdmsr
-    or      ah, 1                       ; set LME bit
+    or      ah, BIT0                    ; set LME bit
+    DB      0x66
+    test    ebx, BIT20                  ; check NXE capability
+    jz      .1
+    or      ah, BIT3                    ; set NXE bit
+.1:
     wrmsr
     DB      0x66, 0xb8                   ; mov eax, imm32
 ASM_PFX(gSmmCr0): DD 0
