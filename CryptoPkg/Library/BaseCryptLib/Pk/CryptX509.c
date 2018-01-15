@@ -644,8 +644,8 @@ X509GetTBSCert (
   )
 {
   CONST UINT8  *Temp;
-  INTN         Asn1Tag;
-  INTN         ObjClass;
+  UINT32       Asn1Tag;
+  UINT32       ObjClass;
   UINTN        Length;
 
   //
@@ -673,7 +673,8 @@ X509GetTBSCert (
   // So we can just ASN1-parse the x.509 DER-encoded data. If we strip
   // the first SEQUENCE, the second SEQUENCE is the TBSCertificate.
   //
-  Temp = Cert;
+  Temp   = Cert;
+  Length = 0;
   ASN1_get_object (&Temp, (long *)&Length, (int *)&Asn1Tag, (int *)&ObjClass, (long)CertSize);
 
   if (Asn1Tag != V_ASN1_SEQUENCE) {
