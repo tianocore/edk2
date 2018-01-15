@@ -273,6 +273,7 @@ ReadyToLockEventNotify (
   UINTN                                         Pages;
   EFI_PHYSICAL_ADDRESS                          FfsBuffer;
   PE_COFF_LOADER_IMAGE_CONTEXT                  ImageContext;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR               MemDesc;
 
   Status = gBS->LocateProtocol (&gEfiDxeSmmReadyToLockProtocolGuid, NULL, &Interface);
   if (EFI_ERROR (Status)) {
@@ -322,6 +323,19 @@ ReadyToLockEventNotify (
                   &FfsBuffer
                   );
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // Make sure that the buffer can be used to store code.
+  //
+  Status = gDS->GetMemorySpaceDescriptor (FfsBuffer, &MemDesc);
+  if (!EFI_ERROR (Status) && (MemDesc.Attributes & EFI_MEMORY_XP) != 0) {
+    gDS->SetMemorySpaceAttributes (
+           FfsBuffer,
+           EFI_PAGES_TO_SIZE (Pages),
+           MemDesc.Attributes & (~EFI_MEMORY_XP)
+           );
+  }
+
   ImageContext.ImageAddress = (PHYSICAL_ADDRESS)(UINTN)FfsBuffer;
   //
   // Align buffer on section boundary
