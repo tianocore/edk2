@@ -1,7 +1,7 @@
 /** @file
   FrameBufferBltLib - Library to perform blt operations on a frame buffer.
 
-  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,11 +21,10 @@
 #include <Library/FrameBufferBltLib.h>
 
 struct FRAME_BUFFER_CONFIGURE {
-  UINTN                           ColorDepth;
-  UINTN                           WidthInBytes;
-  UINTN                           BytesPerPixel;
-  UINTN                           WidthInPixels;
-  UINTN                           Height;
+  UINT32                          WidthInBytes;
+  UINT32                          BytesPerPixel;
+  UINT32                          WidthInPixels;
+  UINT32                          Height;
   UINT8                           *FrameBuffer;
   EFI_GRAPHICS_PIXEL_FORMAT       PixelFormat;
   EFI_PIXEL_BITMASK               PixelMasks;
@@ -53,7 +52,7 @@ CONST EFI_PIXEL_BITMASK mBgrPixelMasks = {
 VOID
 FrameBufferBltLibConfigurePixelFormat (
   IN CONST EFI_PIXEL_BITMASK    *BitMask,
-  OUT UINTN                     *BytesPerPixel,
+  OUT UINT32                    *BytesPerPixel,
   OUT INT8                      *PixelShl,
   OUT INT8                      *PixelShr
   )
@@ -84,7 +83,7 @@ FrameBufferBltLibConfigurePixelFormat (
   MergedMasks = (UINT32) (MergedMasks | Masks[3]);
 
   ASSERT (MergedMasks != 0);
-  *BytesPerPixel = (UINTN) ((HighBitSet32 (MergedMasks) + 7) / 8);
+  *BytesPerPixel = (UINT32) ((HighBitSet32 (MergedMasks) + 7) / 8);
   DEBUG ((DEBUG_INFO, "Bytes per pixel: %d\n", *BytesPerPixel));
 }
 
@@ -115,7 +114,7 @@ FrameBufferBltConfigure (
   )
 {
   CONST EFI_PIXEL_BITMASK                      *BitMask;
-  UINTN                                        BytesPerPixel;
+  UINT32                                       BytesPerPixel;
   INT8                                         PixelShl[4];
   INT8                                         PixelShr[4];
 
@@ -164,8 +163,8 @@ FrameBufferBltConfigure (
   Configure->BytesPerPixel = BytesPerPixel;
   Configure->PixelFormat   = FrameBufferInfo->PixelFormat;
   Configure->FrameBuffer   = (UINT8*) FrameBuffer;
-  Configure->WidthInPixels = (UINTN) FrameBufferInfo->HorizontalResolution;
-  Configure->Height        = (UINTN) FrameBufferInfo->VerticalResolution;
+  Configure->WidthInPixels = FrameBufferInfo->HorizontalResolution;
+  Configure->Height        = FrameBufferInfo->VerticalResolution;
   Configure->WidthInBytes  = Configure->WidthInPixels * Configure->BytesPerPixel;
 
   return RETURN_SUCCESS;
