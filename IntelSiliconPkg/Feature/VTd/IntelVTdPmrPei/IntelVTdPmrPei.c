@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License which accompanies this distribution.
@@ -60,7 +60,7 @@ typedef struct {
 
   PEI Memory Layout:
 
-              +------------------+ <=============== PHMR.Limit (Top of memory)
+              +------------------+ <=============== PHMR.Limit (+ alignment) (Top of memory)
               |   Mem Resource   |
               |                  |
 
@@ -72,7 +72,7 @@ typedef struct {
   DMA Buffer  |   * DMA FREE *   |
        |      |  --------------  |
        V      |  Read/Write Buf  |
-  =========== +==================+ <=============== PLMR.Limit
+  =========== +==================+ <=============== PLMR.Limit (+ alignment)
               |   PEI allocated  |
               |  --------------  | <------- EfiFreeMemoryTop
               |   * PEI FREE *   |
