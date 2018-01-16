@@ -124,7 +124,6 @@ EFI_STATUS
 
 extern EFI_ACPI_DMAR_HEADER  *mAcpiDmarTable;
 
-extern UINT64                           mVtdHostAddressWidthMask;
 extern UINTN                            mVtdUnitNumber;
 extern VTD_UNIT_INFORMATION             *mVtdUnitInformation;
 
