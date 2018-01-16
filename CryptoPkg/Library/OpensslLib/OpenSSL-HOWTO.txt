@@ -25,21 +25,22 @@ on the cryptography.
 =============================================================================
                       HOW to Install OpenSSL for UEFI Building
 =============================================================================
-1. Clone the latest official OpenSSL release into the directory
-     CryptoPkg/Library/OpensslLib/openssl/
+  OpenSSL repository was added as one submodule of EDKII project.
 
-   Use OpenSSL-1.1.0g release as one example:
-     (OpenSSL_1_1_0g below is the tag name for the OpenSSL-1.1.0g release)
-     > cd CryptoPkg/Library/OpensslLib
-     > git clone -b OpenSSL_1_1_0g https://github.com/openssl/openssl openssl
-     or
-     > git clone https://github.com/openssl/openssl openssl
-     > git checkout OpenSSL_1_1_0g
-Or
-2. Download the latest OpenSSL release package from the official website:
-     https://www.openssl.org/source/
-   and unpack the OpenSSL source into:
-     CryptoPkg/Library/OpensslLib/openssl/
+  The user can use the following commands to clone both main EDKII repo and
+openssl submodule:
+  1) Add the "--recursive" flag to the git clone command:
+     $ git clone --recursive https://github.com/tianocore/edk2
+or
+  2) Manually initialize and update the submodules after the clone operation
+     on main project:
+     $ git clone https://github.com/tianocore/edk2
+     $ git submodule update --init --recursive
+
+  And use the following combined commands to pull the remote submodule updates
+(e.g. Updating the new supported OpenSSL release tag):
+     $ git pull --recurse-submodules && \
+       git submodule update --recursive --remote
 
 =============================================================================
                       About process_files.pl
