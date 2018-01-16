@@ -677,7 +677,7 @@ InitVTdPmrForAll (
   LowBottom = 0;
   LowTop = 0;
   HighBottom = 0;
-  HighTop = LShiftU64 (1, VTdInfo->HostAddressWidth);
+  HighTop = LShiftU64 (1, VTdInfo->HostAddressWidth + 1);
 
   Status = SetDmaProtectedRange (
              VTdInfo,
