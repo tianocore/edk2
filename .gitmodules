@@ -1,0 +1,3 @@
+[submodule "CryptoPkg/Library/OpensslLib/openssl"]
+	path = CryptoPkg/Library/OpensslLib/openssl
+	url = https://github.com/openssl/openssl
