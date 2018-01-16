@@ -806,8 +806,6 @@ ParseDmarAcpiTableDrhd (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  mVtdHostAddressWidthMask = LShiftU64 (1ull, mAcpiDmarTable->HostAddressWidth) - 1;
-
   VtdIndex = 0;
   DmarHeader = (EFI_ACPI_DMAR_STRUCTURE_HEADER *)((UINTN)(mAcpiDmarTable + 1));
   while ((UINTN)DmarHeader < (UINTN)mAcpiDmarTable + mAcpiDmarTable->Header.Length) {
