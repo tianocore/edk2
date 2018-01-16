@@ -699,6 +699,10 @@ ConvertMemoryPageAttributes (
       DEBUG ((DEBUG_ERROR, "Non-PAE Paging!\n"));
       return EFI_UNSUPPORTED;
     }
+    if ((BaseAddress + Length) > BASE_4GB) {
+      DEBUG ((DEBUG_ERROR, "Beyond 4GB memory in 32-bit mode!\n"));
+      return EFI_UNSUPPORTED;
+    }
     break;
   case IMAGE_FILE_MACHINE_X64:
     ASSERT (CurrentPagingContext.ContextData.X64.PageTableBase != 0);
