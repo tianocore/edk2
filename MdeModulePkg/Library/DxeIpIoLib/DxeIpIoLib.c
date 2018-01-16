@@ -1742,12 +1742,12 @@ IpIoAddIp (
   EFI_EVENT      Event;
 
   ASSERT (IpIo != NULL);
+  ASSERT ((IpIo->IpVersion == IP_VERSION_4) || (IpIo->IpVersion == IP_VERSION_6));
 
   IpInfo = AllocatePool (sizeof (IP_IO_IP_INFO));
   if (IpInfo == NULL) {
     return NULL;
   }
-  ASSERT ((IpInfo->IpVersion == IP_VERSION_4) || (IpInfo->IpVersion == IP_VERSION_6));
 
   //
   // Init this IpInfo, set the Addr and SubnetMask to 0 before we configure the IP
