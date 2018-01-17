@@ -5,7 +5,7 @@
 #  for Firmware Basic Boot Performance Record and other boot performance records, 
 #  and install FPDT to ACPI table.
 #
-#  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -55,7 +55,6 @@
 [Protocols]
   gEfiAcpiTableProtocolGuid                     ## CONSUMES
   gEfiRscHandlerProtocolGuid                    ## CONSUMES
-  gEfiSmmCommunicationProtocolGuid              ## SOMETIMES_CONSUMES
   gEfiVariableArchProtocolGuid                  ## CONSUMES
   gEfiLockBoxProtocolGuid                       ## CONSUMES
 
@@ -69,8 +68,8 @@
   ## SOMETIMES_CONSUMES ## UNDEFINED # Used to do smm communication
   ## SOMETIMES_CONSUMES ## UNDEFINED # StatusCode Data
   gEfiFirmwarePerformanceGuid
+  gEdkiiFpdtExtendedFirmwarePerformanceGuid     ## SOMETIMES_CONSUMES ## UNDEFINED # StatusCode Data
   gFirmwarePerformanceS3PointerGuid             ## PRODUCES ## UNDEFINED # SaveLockBox
-  gEdkiiPiSmmCommunicationRegionTableGuid       ## SOMETIMES_CONSUMES    ## SystemTable
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad    ## CONSUMES
