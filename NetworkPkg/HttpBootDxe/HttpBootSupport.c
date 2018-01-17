@@ -1093,7 +1093,6 @@ HttpBootCheckUriScheme (
   // Return EFI_INVALID_PARAMETER if the URI is not HTTP or HTTPS.
   //
   if ((AsciiStrnCmp (Uri, "http://", 7) != 0) && (AsciiStrnCmp (Uri, "https://", 8) != 0)) {
-    AsciiPrint ("\n  Error: Invalid URI address.\n");
     DEBUG ((EFI_D_ERROR, "HttpBootCheckUriScheme: Invalid Uri.\n"));
     return EFI_INVALID_PARAMETER;
   }
@@ -1102,7 +1101,6 @@ HttpBootCheckUriScheme (
   // HTTP is disabled, return EFI_ACCESS_DENIED if the URI is HTTP.
   //
   if (!PcdGetBool (PcdAllowHttpConnections) && (AsciiStrnCmp (Uri, "http://", 7) == 0)) {
-    AsciiPrint ("\n  Error: Access forbidden, only HTTPS connection is allowed.\n");
     DEBUG ((EFI_D_ERROR, "HttpBootCheckUriScheme: HTTP is disabled.\n"));
     return EFI_ACCESS_DENIED;
   }

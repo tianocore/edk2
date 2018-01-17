@@ -238,6 +238,11 @@ HttpBootDhcp4ExtractUriInfo (
   Status = HttpBootCheckUriScheme (Private->BootFileUri);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "HttpBootDhcp4ExtractUriInfo: %r.\n", Status));
+    if (Status == EFI_INVALID_PARAMETER) {
+      AsciiPrint ("\n  Error: Invalid URI address.\n");
+    } else if (Status == EFI_ACCESS_DENIED) {
+      AsciiPrint ("\n  Error: Access forbidden, only HTTPS connection is allowed.\n");
+    }
     return Status;
   }
 
@@ -373,6 +378,11 @@ HttpBootDhcp6ExtractUriInfo (
   Status = HttpBootCheckUriScheme (Private->BootFileUri);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "HttpBootDhcp6ExtractUriInfo: %r.\n", Status));
+    if (Status == EFI_INVALID_PARAMETER) {
+      AsciiPrint ("\n  Error: Invalid URI address.\n");
+    } else if (Status == EFI_ACCESS_DENIED) {
+      AsciiPrint ("\n  Error: Access forbidden, only HTTPS connection is allowed.\n");
+    }
     return Status;
   }
 
