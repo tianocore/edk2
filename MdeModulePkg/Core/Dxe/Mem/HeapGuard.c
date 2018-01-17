@@ -1127,11 +1127,26 @@ CoreConvertPagesWithGuard (
   IN EFI_MEMORY_TYPE  NewType
   )
 {
+  UINT64  OldStart;
+  UINTN   OldPages;
+
   if (NewType == EfiConventionalMemory) {
+    OldStart = Start;
+    OldPages = NumberOfPages;
+
     AdjustMemoryF (&Start, &NumberOfPages);
     if (NumberOfPages == 0) {
       return EFI_SUCCESS;
     }
+
+    //
+    // It's safe to unset Guard page inside memory lock because there should
+    // be no memory allocation occurred in updating memory page attribute at
+    // this point. And unsetting Guard page before free will prevent Guard
+    // page just freed back to pool from being allocated right away before
+    // marking it usable (from non-present to present).
+    //
+    UnsetGuardForMemory (OldStart, OldPages);
   } else {
     AdjustMemoryA (&Start, &NumberOfPages);
   }
