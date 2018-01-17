@@ -286,9 +286,13 @@ CreateSecondLevelPagingEntry (
   if (SecondLevelPagingEntry == NULL) {
     return NULL;
   }
-  SecondLevelPagingEntry = CreateSecondLevelPagingEntryTable (VtdIndex, SecondLevelPagingEntry, SIZE_4GB, mAbove4GMemoryLimit, IoMmuAccess);
-  if (SecondLevelPagingEntry == NULL) {
-    return NULL;
+
+  if (mAbove4GMemoryLimit != 0) {
+    ASSERT (mAbove4GMemoryLimit > BASE_4GB);
+    SecondLevelPagingEntry = CreateSecondLevelPagingEntryTable (VtdIndex, SecondLevelPagingEntry, SIZE_4GB, mAbove4GMemoryLimit, IoMmuAccess);
+    if (SecondLevelPagingEntry == NULL) {
+      return NULL;
+    }
   }
 
   return SecondLevelPagingEntry;
