@@ -60,7 +60,7 @@ typedef struct {
 
   PEI Memory Layout:
 
-              +------------------+ <=============== PHMR.Limit (+ alignment) (Top of memory)
+              +------------------+ <=============== PHMR.Limit (+ alignment) (1 << (HostAddressWidth + 1))
               |   Mem Resource   |
               |                  |
 
@@ -377,159 +377,6 @@ CONST EFI_PEI_PPI_DESCRIPTOR mIoMmuPpiList = {
   (VOID *) &mIoMmuPpi
 };
 
-#define MEMORY_ATTRIBUTE_MASK (EFI_RESOURCE_ATTRIBUTE_PRESENT | \
-                               EFI_RESOURCE_ATTRIBUTE_INITIALIZED | \
-                               EFI_RESOURCE_ATTRIBUTE_TESTED | \
-                               EFI_RESOURCE_ATTRIBUTE_16_BIT_IO | \
-                               EFI_RESOURCE_ATTRIBUTE_32_BIT_IO | \
-                               EFI_RESOURCE_ATTRIBUTE_64_BIT_IO \
-                               )
-
-#define TESTED_MEMORY_ATTRIBUTES      (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED | EFI_RESOURCE_ATTRIBUTE_TESTED)
-
-#define INITIALIZED_MEMORY_ATTRIBUTES (EFI_RESOURCE_ATTRIBUTE_PRESENT | EFI_RESOURCE_ATTRIBUTE_INITIALIZED)
-
-#define PRESENT_MEMORY_ATTRIBUTES     (EFI_RESOURCE_ATTRIBUTE_PRESENT)
-
-GLOBAL_REMOVE_IF_UNREFERENCED CHAR8 *mResourceTypeShortName[] = {
-  "Mem",
-  "MMIO",
-  "I/O",
-  "FD",
-  "MM Port I/O",
-  "Reserved Mem",
-  "Reserved I/O",
-};
-
-/**
-  Return the short name of resource type.
-
-  @param Type  resource type.
-
-  @return the short name of resource type.
-**/
-CHAR8 *
-ShortNameOfResourceType (
-  IN UINT32 Type
-  )
-{
-  if (Type < sizeof(mResourceTypeShortName) / sizeof(mResourceTypeShortName[0])) {
-    return mResourceTypeShortName[Type];
-  } else {
-    return "Unknown";
-  }
-}
-
-/**
-  Dump resource hob.
-
-  @param HobList  the HOB list.
-**/
-VOID
-DumpResourceHob (
-  IN VOID                        *HobList
-  )
-{
-  EFI_PEI_HOB_POINTERS        Hob;
-  EFI_HOB_RESOURCE_DESCRIPTOR *ResourceHob;
-
-  DEBUG ((DEBUG_VERBOSE, "Resource Descriptor HOBs\n"));
-  for (Hob.Raw = HobList; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      ResourceHob = Hob.ResourceDescriptor;
-      DEBUG ((DEBUG_VERBOSE,
-        "  BA=%016lx  L=%016lx  Attr=%08x  ",
-        ResourceHob->PhysicalStart,
-        ResourceHob->ResourceLength,
-        ResourceHob->ResourceAttribute
-        ));
-      DEBUG ((DEBUG_VERBOSE, ShortNameOfResourceType(ResourceHob->ResourceType)));
-      switch (ResourceHob->ResourceType) {
-      case EFI_RESOURCE_SYSTEM_MEMORY:
-        if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_PERSISTENT) != 0) {
-          DEBUG ((DEBUG_VERBOSE, " (Persistent)"));
-        } else if ((ResourceHob->ResourceAttribute & EFI_RESOURCE_ATTRIBUTE_MORE_RELIABLE) != 0) {
-          DEBUG ((DEBUG_VERBOSE, " (MoreReliable)"));
-        } else if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == TESTED_MEMORY_ATTRIBUTES) {
-          DEBUG ((DEBUG_VERBOSE, " (Tested)"));
-        } else if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == INITIALIZED_MEMORY_ATTRIBUTES) {
-          DEBUG ((DEBUG_VERBOSE, " (Init)"));
-        } else if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) == PRESENT_MEMORY_ATTRIBUTES) {
-          DEBUG ((DEBUG_VERBOSE, " (Present)"));
-        } else {
-          DEBUG ((DEBUG_VERBOSE, " (Unknown)"));
-        }
-        break;
-      default:
-        break;
-      }
-      DEBUG ((DEBUG_VERBOSE, "\n"));
-    }
-  }
-}
-
-/**
-  Dump PHIT hob.
-
-  @param HobList  the HOB list.
-**/
-VOID
-DumpPhitHob (
-  IN VOID                        *HobList
-  )
-{
-  EFI_HOB_HANDOFF_INFO_TABLE  *PhitHob;
-
-  PhitHob = HobList;
-  ASSERT(GET_HOB_TYPE(HobList) == EFI_HOB_TYPE_HANDOFF);
-  DEBUG ((DEBUG_VERBOSE, "PHIT HOB\n"));
-  DEBUG ((DEBUG_VERBOSE, "  PhitHob             - 0x%x\n", PhitHob));
-  DEBUG ((DEBUG_VERBOSE, "  BootMode            - 0x%x\n", PhitHob->BootMode));
-  DEBUG ((DEBUG_VERBOSE, "  EfiMemoryTop        - 0x%016lx\n", PhitHob->EfiMemoryTop));
-  DEBUG ((DEBUG_VERBOSE, "  EfiMemoryBottom     - 0x%016lx\n", PhitHob->EfiMemoryBottom));
-  DEBUG ((DEBUG_VERBOSE, "  EfiFreeMemoryTop    - 0x%016lx\n", PhitHob->EfiFreeMemoryTop));
-  DEBUG ((DEBUG_VERBOSE, "  EfiFreeMemoryBottom - 0x%016lx\n", PhitHob->EfiFreeMemoryBottom));
-  DEBUG ((DEBUG_VERBOSE, "  EfiEndOfHobList     - 0x%lx\n", PhitHob->EfiEndOfHobList));
-}
-
-/**
-  Get the highest memory.
-
-  @return the highest memory.
-**/
-UINT64
-GetTopMemory (
-  VOID
-  )
-{
-  VOID                        *HobList;
-  EFI_PEI_HOB_POINTERS        Hob;
-  EFI_HOB_RESOURCE_DESCRIPTOR *ResourceHob;
-  UINT64                      TopMemory;
-  UINT64                      ResourceTop;
-
-  HobList = GetHobList ();
-
-  TopMemory = 0;
-  for (Hob.Raw = HobList; !END_OF_HOB_LIST (Hob); Hob.Raw = GET_NEXT_HOB (Hob)) {
-    if (GET_HOB_TYPE (Hob) == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
-      ResourceHob = Hob.ResourceDescriptor;
-      switch (ResourceHob->ResourceType) {
-      case EFI_RESOURCE_SYSTEM_MEMORY:
-        ResourceTop = ResourceHob->PhysicalStart + ResourceHob->ResourceLength;
-        if (TopMemory < ResourceTop) {
-          TopMemory = ResourceTop;
-        }
-        break;
-      default:
-        break;
-      }
-      DEBUG ((DEBUG_VERBOSE, "\n"));
-    }
-  }
-  return TopMemory;
-}
-
 /**
   Initialize DMA protection.
 
@@ -548,8 +395,6 @@ InitDmaProtection (
   )
 {
   EFI_STATUS                  Status;
-  VOID                        *HobList;
-  EFI_HOB_HANDOFF_INFO_TABLE  *PhitHob;
   UINT32                      LowMemoryAlignment;
   UINT64                      HighMemoryAlignment;
   UINTN                       MemoryAlignment;
@@ -557,14 +402,6 @@ InitDmaProtection (
   UINTN                       LowTop;
   UINTN                       HighBottom;
   UINT64                      HighTop;
-
-  HobList = GetHobList ();
-  DumpPhitHob (HobList);
-  DumpResourceHob (HobList);
-
-  PhitHob = HobList;
-
-  ASSERT (PhitHob->EfiMemoryBottom < PhitHob->EfiMemoryTop);
 
   LowMemoryAlignment = GetLowMemoryAlignment (VTdInfo, VTdInfo->EngineMask);
   HighMemoryAlignment = GetHighMemoryAlignment (VTdInfo, VTdInfo->EngineMask);
@@ -584,7 +421,7 @@ InitDmaProtection (
   LowBottom = 0;
   LowTop = *DmaBufferBase;
   HighBottom = *DmaBufferBase + DmaBufferSize;
-  HighTop = GetTopMemory ();
+  HighTop = LShiftU64 (1, VTdInfo->HostAddressWidth + 1);
 
   Status = SetDmaProtectedRange (
              VTdInfo,

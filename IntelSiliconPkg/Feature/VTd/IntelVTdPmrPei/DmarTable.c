@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -528,7 +528,7 @@ ProcessRmrr (
       LowBottom = 0;
       LowTop = (UINTN)DmarRmrr->ReservedMemoryRegionBaseAddress;
       HighBottom = (UINTN)DmarRmrr->ReservedMemoryRegionLimitAddress + 1;
-      HighTop = GetTopMemory ();
+      HighTop = LShiftU64 (1, VTdInfo->HostAddressWidth + 1);
 
       SetDmaProtectedRange (
         VTdInfo,
