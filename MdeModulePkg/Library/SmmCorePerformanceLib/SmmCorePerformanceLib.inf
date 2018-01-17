@@ -8,7 +8,7 @@
 #  This library is mainly used by SMM Core to start performance logging to ensure that
 #  SMM Performance and PerformanceEx Protocol are installed at the very beginning of SMM phase.
 #  
-#  Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -58,9 +58,12 @@
   SmmServicesTableLib
   SmmMemLib
   UefiLib
+  ReportStatusCodeLib
+  PeCoffGetEntryPointLib
 
 [Protocols]
   gEfiSmmBase2ProtocolGuid                  ## CONSUMES
+  gEdkiiSmmReadyToBootProtocolGuid          ## NOTIFY
 
 [Guids]
   ## PRODUCES ## UNDEFINED # Install protocol
@@ -71,6 +74,9 @@
   gSmmPerformanceExProtocolGuid
   ## PRODUCES ## SystemTable
   gPerformanceProtocolGuid
+  gEdkiiFpdtExtendedFirmwarePerformanceGuid ## SOMETIMES_PRODUCES ## UNDEFINED # StatusCode Data
+  gZeroGuid                                 ## SOMETIMES_CONSUMES ## GUID
 
 [Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly ## CONSUMES

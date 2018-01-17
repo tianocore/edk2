@@ -4,7 +4,7 @@
   This header file holds the prototypes of the SMM Performance and PerformanceEx Protocol published by this
   library instance at its constructor.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 #include <Guid/Performance.h>
+#include <Guid/ExtendedFirmwarePerformance.h>
+#include <Guid/FirmwarePerformance.h>
+#include <Guid/ZeroGuid.h>
+#include <Guid/EventGroup.h>
 
 #include <Library/SmmServicesTableLib.h>
 #include <Library/DebugLib.h>
@@ -33,8 +37,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Library/SmmMemLib.h>
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/DxeServicesLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
 
 #include <Protocol/SmmBase2.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/DevicePathToText.h>
 
 //
 // Interface declarations for SMM PerformanceEx Protocol.
