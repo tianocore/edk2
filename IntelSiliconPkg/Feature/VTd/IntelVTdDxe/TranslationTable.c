@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -226,7 +226,7 @@ CreateSecondLevelPagingEntryTable (
 
     Lvl3Start = RShiftU64 (BaseAddress, 30) & 0x1FF;
     if (ALIGN_VALUE_LOW(BaseAddress + SIZE_1GB, SIZE_1GB) <= EndAddress) {
-      Lvl3End = SIZE_4KB/sizeof(VTD_SECOND_LEVEL_PAGING_ENTRY);
+      Lvl3End = SIZE_4KB/sizeof(VTD_SECOND_LEVEL_PAGING_ENTRY) - 1;
     } else {
       Lvl3End = RShiftU64 (EndAddress - 1, 30) & 0x1FF;
     }
@@ -252,16 +252,21 @@ CreateSecondLevelPagingEntryTable (
         Lvl2PtEntry[Index2].Bits.PageSize = 1;
         BaseAddress += SIZE_2MB;
         if (BaseAddress >= MemoryLimit) {
-          goto Done;
+          break;
         }
       }
       FlushPageTableMemory (VtdIndex, (UINTN)Lvl2PtEntry, SIZE_4KB);
+      if (BaseAddress >= MemoryLimit) {
+        break;
+      }
     }
     FlushPageTableMemory (VtdIndex, (UINTN)&Lvl3PtEntry[Lvl3Start], (UINTN)&Lvl3PtEntry[Lvl3End + 1] - (UINTN)&Lvl3PtEntry[Lvl3Start]);
+    if (BaseAddress >= MemoryLimit) {
+      break;
+    }
   }
   FlushPageTableMemory (VtdIndex, (UINTN)&Lvl4PtEntry[Lvl4Start], (UINTN)&Lvl4PtEntry[Lvl4End + 1] - (UINTN)&Lvl4PtEntry[Lvl4Start]);
 
-Done:
   return SecondLevelPagingEntry;
 }
 
