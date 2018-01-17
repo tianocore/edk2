@@ -900,42 +900,17 @@ CoreConvertPagesEx (
     //
     CoreAddRange (MemType, Start, RangeEnd, Attribute);
     if (ChangingType && (MemType == EfiConventionalMemory)) {
+      //
+      // Avoid calling DEBUG_CLEAR_MEMORY() for an address of 0 because this
+      // macro will ASSERT() if address is 0.  Instead, CoreAddRange() guarantees
+      // that the page starting at address 0 is always filled with zeros.
+      //
       if (Start == 0) {
-        //
-        // Avoid calling DEBUG_CLEAR_MEMORY() for an address of 0 because this
-        // macro will ASSERT() if address is 0.  Instead, CoreAddRange()
-        // guarantees that the page starting at address 0 is always filled
-        // with zeros.
-        //
         if (RangeEnd > EFI_PAGE_SIZE) {
           DEBUG_CLEAR_MEMORY ((VOID *)(UINTN) EFI_PAGE_SIZE, (UINTN) (RangeEnd - EFI_PAGE_SIZE + 1));
         }
       } else {
-        //
-        // If Heap Guard is enabled, the page at the top and/or bottom of
-        // this memory block to free might be inaccessible. Skipping them
-        // to avoid page fault exception.
-        //
-        UINT64  StartToClear;
-        UINT64  EndToClear;
-
-        StartToClear = Start;
-        EndToClear   = RangeEnd + 1;
-        if (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT1|BIT0)) {
-          if (IsGuardPage(StartToClear)) {
-            StartToClear += EFI_PAGE_SIZE;
-          }
-          if (IsGuardPage (EndToClear - 1)) {
-            EndToClear -= EFI_PAGE_SIZE;
-          }
-        }
-
-        if (EndToClear > StartToClear) {
-          DEBUG_CLEAR_MEMORY(
-            (VOID *)(UINTN)StartToClear,
-            (UINTN)(EndToClear - StartToClear)
-            );
-        }
+        DEBUG_CLEAR_MEMORY ((VOID *)(UINTN) Start, (UINTN) (RangeEnd - Start + 1));
       }
     }
 
@@ -1513,9 +1488,6 @@ CoreInternalFreePages (
 
 Done:
   CoreReleaseMemoryLock ();
-  if (IsGuarded) {
-    UnsetGuardForMemory(Memory, NumberOfPages);
-  }
   return Status;
 }
 
