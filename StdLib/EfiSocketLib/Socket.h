@@ -597,6 +597,7 @@ EFI_STATUS
 **/
 typedef
 VOID
+EFIAPI
 (* PFN_API_IO_COMPLETE) (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
@@ -607,7 +608,7 @@ VOID
 
 
   @param [in] pSocket         Address of a ESL_SOCKET structure
-  
+
   @retval EFI_SUCCESS - The port is connected
   @retval EFI_NOT_STARTED - The port is not connected
 
@@ -729,7 +730,7 @@ EFI_STATUS
   This routine is called by ::EslSocketPortCloseRxDone as
   the last step of closing processing.
   See the \ref PortCloseStateMachine section.
-  
+
   @param [in] pPort       Address of an ::ESL_PORT structure.
 
   @retval EFI_SUCCESS     The port is closed
@@ -779,13 +780,13 @@ EFI_STATUS
   @param [in] pPort           Address of an ::ESL_PORT structure.
 
   @param [in] pPacket         Address of an ::ESL_PACKET structure.
-  
+
   @param [in] pbConsumePacket Address of a BOOLEAN indicating if the packet is to be consumed
-  
+
   @param [in] BufferLength    Length of the the buffer
-  
+
   @param [in] pBuffer         Address of a buffer to receive the data.
-  
+
   @param [in] pDataLength     Number of received data bytes in the buffer.
 
   @param [out] pAddress       Network address to receive the remote system address
@@ -915,6 +916,7 @@ EFI_STATUS
 **/
 typedef
 VOID
+EFIAPI
 (* PFN_API_TX_COMPLETE) (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
@@ -1132,7 +1134,7 @@ extern CONST EFI_SERVICE_BINDING_PROTOCOL mEfiServiceBinding;
 
 /**
   Allocate and initialize a ESL_SOCKET structure.
-  
+
   This support function allocates an ::ESL_SOCKET structure
   and installs a protocol on ChildHandle.  If pChildHandle is a
   pointer to NULL, then a new handle is created and returned in
@@ -1141,7 +1143,7 @@ extern CONST EFI_SERVICE_BINDING_PROTOCOL mEfiServiceBinding;
 
   @param [in, out] pChildHandle Pointer to the handle of the child to create.
                                 If it is NULL, then a new handle is created.
-                                If it is a pointer to an existing UEFI handle, 
+                                If it is a pointer to an existing UEFI handle,
                                 then the protocol is added to the existing UEFI
                                 handle.
   @param [in] DebugFlags        Flags for debug messages
@@ -1152,7 +1154,7 @@ extern CONST EFI_SERVICE_BINDING_PROTOCOL mEfiServiceBinding;
   @retval EFI_OUT_OF_RESOURCES  There are not enough resources available to create
                                 the child
   @retval other                 The child handle was not created
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -1217,7 +1219,7 @@ EslSocketCopyFragmentedBuffer (
   handle.
 
   @param [in] pSocketProtocol Address of an ::EFI_SOCKET_PROTOCOL structure.
-  
+
   @param [out] pErrno         Address to receive the errno value upon completion.
 
   @retval EFI_SUCCESS   The socket resources were returned successfully.
@@ -1413,7 +1415,7 @@ EslSocketPortAllocate (
     <li>::EslUdp4PortAllocate - Port initialization failure</li>
   </ul>
   See the \ref PortCloseStateMachine section.
-  
+
   @param [in] pPort       Address of an ::ESL_PORT structure.
 
   @retval EFI_SUCCESS     The port is closed

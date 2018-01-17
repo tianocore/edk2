@@ -275,13 +275,13 @@ EslUdp6PortAllocate (
   @param [in] pPort           Address of an ::ESL_PORT structure.
 
   @param [in] pPacket         Address of an ::ESL_PACKET structure.
-  
+
   @param [in] pbConsumePacket Address of a BOOLEAN indicating if the packet is to be consumed
-  
+
   @param [in] BufferLength    Length of the the buffer
-  
+
   @param [in] pBuffer         Address of a buffer to receive the data.
-  
+
   @param [in] pDataLength     Number of received data bytes in the buffer.
 
   @param [out] pAddress       Network address to receive the remote system address
@@ -485,6 +485,7 @@ EslUdp6RemoteAddressSet (
 
 **/
 VOID
+EFIAPI
 EslUdp6RxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
@@ -494,14 +495,14 @@ EslUdp6RxComplete (
   ESL_PACKET * pPacket;
   EFI_UDP6_RECEIVE_DATA * pRxData;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
 
   //
   //  Get the operation status.
   //
   Status = pIo->Token.Udp6Rx.Status;
-  
+
   //
   //  Get the packet length
   //
@@ -758,7 +759,7 @@ EslUdp6RxComplete (
   //  Determine the socket configuration status
   //
   Status = pSocket->bConfigured ? EFI_SUCCESS : EFI_NOT_STARTED;
-  
+
   //
   //  Return the port connected state.
   //
@@ -1028,6 +1029,7 @@ EslUdp6TxBuffer (
 
 **/
 VOID
+EFIAPI
 EslUdp6TxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
@@ -1038,9 +1040,9 @@ EslUdp6TxComplete (
   ESL_PACKET * pPacket;
   ESL_SOCKET * pSocket;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
-  
+
   //
   //  Locate the active transmit packet
   //
