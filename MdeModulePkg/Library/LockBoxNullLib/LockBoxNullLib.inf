@@ -21,7 +21,7 @@
   FILE_GUID                      = 0BA38EBD-E190-4df7-8EC4-0A6E2B43772D
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = LockBoxLib|PEIM DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER UEFI_APPLICATION DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = LockBoxLib
 
 
 #
