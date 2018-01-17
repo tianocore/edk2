@@ -1808,6 +1808,7 @@ EslTcp6RemoteAddressSet (
 
 **/
 VOID
+EFIAPI
 EslTcp6RxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
@@ -2197,6 +2198,7 @@ EslTcp6TxBuffer (
 
 **/
 VOID
+EFIAPI
 EslTcp6TxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
@@ -2254,6 +2256,7 @@ EslTcp6TxComplete (
 
 **/
 VOID
+EFIAPI
 EslTcp6TxOobComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo

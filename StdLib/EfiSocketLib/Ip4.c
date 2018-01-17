@@ -595,6 +595,7 @@ EslIp4RemoteAddressSet (
 
 **/
 VOID
+EFIAPI
 EslIp4RxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
@@ -1124,6 +1125,7 @@ EslIp4TxBuffer (
 
 **/
 VOID
+EFIAPI
 EslIp4TxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
@@ -1235,13 +1237,13 @@ EslIp4VerifyLocalIpAddress (
     //  Open the configuration protocol
     //
     pService = pPort->pService;
-    Status = gBS->OpenProtocol ( 
+    Status = gBS->OpenProtocol (
                     pService->Controller,
                     &gEfiIp4Config2ProtocolGuid,
                     (VOID **)&pIpConfig2Protocol,
                     NULL,
                     NULL,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL 
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
     if ( EFI_ERROR ( Status )) {
       DEBUG (( DEBUG_ERROR,
@@ -1254,7 +1256,7 @@ EslIp4VerifyLocalIpAddress (
     // Get the interface information size.
     //
     DataSize = 0;
-    Status = pIpConfig2Protocol->GetData ( 
+    Status = pIpConfig2Protocol->GetData (
                                    pIpConfig2Protocol,
                                    Ip4Config2DataTypeInterfaceInfo,
                                    &DataSize,
@@ -1281,7 +1283,7 @@ EslIp4VerifyLocalIpAddress (
     //
     // Get the interface info.
     //
-    Status = pIpConfig2Protocol->GetData ( 
+    Status = pIpConfig2Protocol->GetData (
                                   pIpConfig2Protocol,
                                   Ip4Config2DataTypeInterfaceInfo,
                                   &DataSize,

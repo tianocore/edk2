@@ -119,7 +119,7 @@ EslUdp4LocalAddressSet (
     //  Determine if the default address is used
     //
     pConfig->UseDefaultAddress = (BOOLEAN)( 0 == pIpAddress->sin_addr.s_addr );
-    
+
     //
     //  Set the subnet mask
     //
@@ -291,13 +291,13 @@ EslUdp4PortAllocate (
   @param [in] pPort           Address of an ::ESL_PORT structure.
 
   @param [in] pPacket         Address of an ::ESL_PACKET structure.
-  
+
   @param [in] pbConsumePacket Address of a BOOLEAN indicating if the packet is to be consumed
-  
+
   @param [in] BufferLength    Length of the the buffer
-  
+
   @param [in] pBuffer         Address of a buffer to receive the data.
-  
+
   @param [in] pDataLength     Number of received data bytes in the buffer.
 
   @param [out] pAddress       Network address to receive the remote system address
@@ -491,6 +491,7 @@ EslUdp4RemoteAddressSet (
 
 **/
 VOID
+EFIAPI
 EslUdp4RxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
@@ -500,14 +501,14 @@ EslUdp4RxComplete (
   ESL_PACKET * pPacket;
   EFI_UDP4_RECEIVE_DATA * pRxData;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
 
   //
   //  Get the operation status.
   //
   Status = pIo->Token.Udp4Rx.Status;
-  
+
   //
   //  Get the packet length
   //
@@ -713,7 +714,7 @@ EslUdp4RxComplete (
   //  Determine the socket configuration status
   //
   Status = pSocket->bConfigured ? EFI_SUCCESS : EFI_NOT_STARTED;
-  
+
   //
   //  Return the port connected state.
   //
@@ -976,6 +977,7 @@ EslUdp4TxBuffer (
 
 **/
 VOID
+EFIAPI
 EslUdp4TxComplete (
   IN EFI_EVENT Event,
   IN ESL_IO_MGMT * pIo
@@ -986,9 +988,9 @@ EslUdp4TxComplete (
   ESL_PACKET * pPacket;
   ESL_SOCKET * pSocket;
   EFI_STATUS Status;
-  
+
   DBG_ENTER ( );
-  
+
   //
   //  Locate the active transmit packet
   //
@@ -1087,13 +1089,13 @@ EslUdp4VerifyLocalIpAddress (
     //  Open the configuration protocol
     //
     pService = pPort->pService;
-    Status = gBS->OpenProtocol ( 
+    Status = gBS->OpenProtocol (
                     pService->Controller,
                     &gEfiIp4Config2ProtocolGuid,
                     (VOID **)&pIpConfig2Protocol,
                     NULL,
                     NULL,
-                    EFI_OPEN_PROTOCOL_GET_PROTOCOL 
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
                     );
     if ( EFI_ERROR ( Status )) {
       DEBUG (( DEBUG_ERROR,
@@ -1106,7 +1108,7 @@ EslUdp4VerifyLocalIpAddress (
     //  Get the interface information size
     //
     DataSize = 0;
-    Status = pIpConfig2Protocol->GetData ( 
+    Status = pIpConfig2Protocol->GetData (
                                    pIpConfig2Protocol,
                                    Ip4Config2DataTypeInterfaceInfo,
                                    &DataSize,
@@ -1133,7 +1135,7 @@ EslUdp4VerifyLocalIpAddress (
     //
     // Get the interface info.
     //
-    Status = pIpConfig2Protocol->GetData ( 
+    Status = pIpConfig2Protocol->GetData (
                                   pIpConfig2Protocol,
                                   Ip4Config2DataTypeInterfaceInfo,
                                   &DataSize,
