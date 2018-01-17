@@ -1771,6 +1771,7 @@ SwitchBSPWorker (
   ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
   ApicBaseMsr.Bits.BSP = 1;
   AsmWriteMsr64 (MSR_IA32_APIC_BASE, ApicBaseMsr.Uint64);
+  ProgramVirtualWireMode ();
 
   //
   // Wait for old BSP finished AP task
