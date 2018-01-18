@@ -2464,7 +2464,9 @@ MtrrSetMemoryAttributesInMtrrSettings (
                                     BaseAddress and Length cannot be modified.
   @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to modify the attributes of
                                     the memory resource range.
-  @retval RETURN_BUFFER_TOO_SMALL   The scratch buffer is too small for MTRR calculation.
+  @retval RETURN_BUFFER_TOO_SMALL   The fixed internal scratch buffer is too small for MTRR calculation.
+                                    Caller should use MtrrSetMemoryAttributesInMtrrSettings() to specify
+                                    external scratch buffer.
 **/
 RETURN_STATUS
 EFIAPI
@@ -2523,7 +2525,9 @@ MtrrSetMemoryAttributeInMtrrSettings (
   @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to
                                     modify the attributes of the memory
                                     resource range.
-  @retval RETURN_BUFFER_TOO_SMALL   The scratch buffer is too small for MTRR calculation.
+  @retval RETURN_BUFFER_TOO_SMALL   The fixed internal scratch buffer is too small for MTRR calculation.
+                                    Caller should use MtrrSetMemoryAttributesInMtrrSettings() to specify
+                                    external scratch buffer.
 **/
 RETURN_STATUS
 EFIAPI
