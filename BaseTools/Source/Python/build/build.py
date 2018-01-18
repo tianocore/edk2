@@ -794,12 +794,18 @@ class Build():
             if not os.path.isabs(BinCacheSource):
                 BinCacheSource = mws.join(self.WorkspaceDir, BinCacheSource)
             GlobalData.gBinCacheSource = BinCacheSource
+        else:
+            if GlobalData.gBinCacheSource != None:
+                EdkLogger.error("build", OPTION_VALUE_INVALID, ExtraData="Invalid value of option --binary-source.")
 
         if GlobalData.gBinCacheDest:
             BinCacheDest = os.path.normpath(GlobalData.gBinCacheDest)
             if not os.path.isabs(BinCacheDest):
                 BinCacheDest = mws.join(self.WorkspaceDir, BinCacheDest)
             GlobalData.gBinCacheDest = BinCacheDest
+        else:
+            if GlobalData.gBinCacheDest != None:
+                EdkLogger.error("build", OPTION_VALUE_INVALID, ExtraData="Invalid value of option --binary-destination.")
 
         if self.ConfDirectory:
             # Get alternate Conf location, if it is absolute, then just use the absolute directory name
