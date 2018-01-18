@@ -597,7 +597,6 @@ DisableReadOnlyPageWriteProtect (
   )
 {
   AsmWriteCr0 (AsmReadCr0() & ~BIT16);
-  SyncMemoryPageAttributesAp (SyncCpuDisableWriteProtection);
 }
 
 /**
@@ -609,7 +608,6 @@ EnableReadOnlyPageWriteProtect (
   )
 {
   AsmWriteCr0 (AsmReadCr0() | BIT16);
-  SyncMemoryPageAttributesAp (SyncCpuEnableWriteProtection);
 }
 
 /**
