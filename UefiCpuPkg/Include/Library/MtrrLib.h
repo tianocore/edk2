@@ -157,6 +157,11 @@ GetFirmwareVariableMtrrCount (
   @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to
                                     modify the attributes of the memory
                                     resource range.
+                                    Multiple memory range attributes setting by calling this API multiple
+                                    times may fail with status RETURN_OUT_OF_RESOURCES. It may not mean
+                                    the number of CPU MTRRs are too small to set such memory attributes.
+                                    Pass the multiple memory range attributes to one call of
+                                    MtrrSetMemoryAttributesInMtrrSettings() may succeed.
   @retval RETURN_BUFFER_TOO_SMALL   The fixed internal scratch buffer is too small for MTRR calculation.
                                     Caller should use MtrrSetMemoryAttributesInMtrrSettings() to specify
                                     external scratch buffer.
@@ -354,6 +359,11 @@ MtrrGetDefaultMemoryType (
                                     BaseAddress and Length cannot be modified.
   @retval RETURN_OUT_OF_RESOURCES   There are not enough system resources to modify the attributes of
                                     the memory resource range.
+                                    Multiple memory range attributes setting by calling this API multiple
+                                    times may fail with status RETURN_OUT_OF_RESOURCES. It may not mean
+                                    the number of CPU MTRRs are too small to set such memory attributes.
+                                    Pass the multiple memory range attributes to one call of
+                                    MtrrSetMemoryAttributesInMtrrSettings() may succeed.
   @retval RETURN_BUFFER_TOO_SMALL   The fixed internal scratch buffer is too small for MTRR calculation.
                                     Caller should use MtrrSetMemoryAttributesInMtrrSettings() to specify
                                     external scratch buffer.
