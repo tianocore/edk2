@@ -4,7 +4,7 @@
   This header file holds the prototypes of the Performance and PerformanceEx Protocol published by this
   library instance at its constructor.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiDxe.h>
 
 #include <Guid/Performance.h>
+#include <Guid/ExtendedFirmwarePerformance.h>
+#include <Guid/ZeroGuid.h>
+#include <Guid/EventGroup.h>
+#include <Guid/FirmwarePerformance.h>
+#include <Guid/PiSmmCommunicationRegionTable.h>
+
+#include <Protocol/DriverBinding.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/ComponentName2.h>
+#include <Protocol/DevicePathToText.h>
+#include <Protocol/SmmCommunication.h>
 
 #include <Library/PerformanceLib.h>
 #include <Library/DebugLib.h>
@@ -31,8 +42,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/TimerLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiLib.h>
+#include <Library/ReportStatusCodeLib.h>
+#include <Library/DxeServicesLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
 
 //
 // Interface declarations for PerformanceEx Protocol.
