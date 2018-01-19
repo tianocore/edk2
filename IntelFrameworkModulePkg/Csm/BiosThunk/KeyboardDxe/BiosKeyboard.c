@@ -1,7 +1,7 @@
 /** @file
   ConsoleOut Routines that speak VGA.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -269,7 +269,9 @@ BiosKeyboardDriverBindingStart (
   BiosKeyboardPrivate->StatusRegisterAddress      = KEYBOARD_8042_STATUS_REGISTER;
   BiosKeyboardPrivate->CommandRegisterAddress     = KEYBOARD_8042_COMMAND_REGISTER;
   BiosKeyboardPrivate->ExtendedKeyboard           = TRUE;
-  
+
+  BiosKeyboardPrivate->KeyState.KeyShiftState     = 0;
+  BiosKeyboardPrivate->KeyState.KeyToggleState    = 0;
   BiosKeyboardPrivate->Queue.Front                = 0;
   BiosKeyboardPrivate->Queue.Rear                 = 0;
   BiosKeyboardPrivate->QueueForNotify.Front       = 0;
@@ -978,6 +980,8 @@ KeyboardReadKeyStrokeWorker (
   //
   Status = CheckQueue (&BiosKeyboardPrivate->Queue);
   if (EFI_ERROR (Status)) {
+    ZeroMem (&KeyData->Key, sizeof (KeyData->Key));
+    CopyMem (&KeyData->KeyState, &BiosKeyboardPrivate->KeyState, sizeof (EFI_KEY_STATE));
     gBS->RestoreTPL (OldTpl);
     return EFI_NOT_READY;
   }
@@ -1986,6 +1990,12 @@ BiosKeyboardTimerHandler (
   }
 
   Enqueue (&BiosKeyboardPrivate->Queue, &KeyData);
+
+  //
+  // Save the current key state
+  //
+  CopyMem (&BiosKeyboardPrivate->KeyState, &KeyData.KeyState, sizeof (EFI_KEY_STATE));
+
   //
   // Leave critical section and return
   //
