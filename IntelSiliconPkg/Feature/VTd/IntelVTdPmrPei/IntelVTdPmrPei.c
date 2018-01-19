@@ -381,17 +381,13 @@ CONST EFI_PEI_PPI_DESCRIPTOR mIoMmuPpiList = {
   Initialize DMA protection.
 
   @param VTdInfo        The VTd engine context information.
-  @param DmaBufferSize  the DMA buffer size
-  @param DmaBufferBase  the DMA buffer base
 
   @retval EFI_SUCCESS           the DMA protection is initialized.
   @retval EFI_OUT_OF_RESOURCES  no enough resource to initialize DMA protection.
 **/
 EFI_STATUS
 InitDmaProtection (
-  IN   VTD_INFO                    *VTdInfo,
-  IN   UINTN                       DmaBufferSize,
-  OUT  UINTN                       *DmaBufferBase
+  IN   VTD_INFO                    *VTdInfo
   )
 {
   EFI_STATUS                  Status;
@@ -402,6 +398,13 @@ InitDmaProtection (
   UINTN                       LowTop;
   UINTN                       HighBottom;
   UINT64                      HighTop;
+  DMA_BUFFER_INFO             *DmaBufferInfo;
+  VOID                        *Hob;
+
+  Hob = GetFirstGuidHob (&mDmaBufferInfoGuid);
+  DmaBufferInfo = GET_GUID_HOB_DATA(Hob);
+
+  DEBUG ((DEBUG_INFO, " DmaBufferSize : 0x%x\n", DmaBufferInfo->DmaBufferSize));
 
   LowMemoryAlignment = GetLowMemoryAlignment (VTdInfo, VTdInfo->EngineMask);
   HighMemoryAlignment = GetHighMemoryAlignment (VTdInfo, VTdInfo->EngineMask);
@@ -410,17 +413,28 @@ InitDmaProtection (
   } else {
     MemoryAlignment = LowMemoryAlignment;
   }
-  ASSERT (DmaBufferSize == ALIGN_VALUE(DmaBufferSize, MemoryAlignment));
-  *DmaBufferBase = (UINTN)AllocateAlignedPages (EFI_SIZE_TO_PAGES(DmaBufferSize), MemoryAlignment);
-  ASSERT (*DmaBufferBase != 0);
-  if (*DmaBufferBase == 0) {
+  ASSERT (DmaBufferInfo->DmaBufferSize == ALIGN_VALUE(DmaBufferInfo->DmaBufferSize, MemoryAlignment));
+  DmaBufferInfo->DmaBufferBase = (UINTN)AllocateAlignedPages (EFI_SIZE_TO_PAGES(DmaBufferInfo->DmaBufferSize), MemoryAlignment);
+  ASSERT (DmaBufferInfo->DmaBufferBase != 0);
+  if (DmaBufferInfo->DmaBufferBase == 0) {
     DEBUG ((DEBUG_INFO, " InitDmaProtection : OutOfResource\n"));
     return EFI_OUT_OF_RESOURCES;
   }
 
+  DEBUG ((DEBUG_INFO, " DmaBufferBase : 0x%x\n", DmaBufferInfo->DmaBufferBase));
+
+  DmaBufferInfo->DmaBufferCurrentTop = DmaBufferInfo->DmaBufferBase + DmaBufferInfo->DmaBufferSize;
+  DmaBufferInfo->DmaBufferCurrentBottom = DmaBufferInfo->DmaBufferBase;
+
+  //
+  // Install PPI.
+  //
+  Status = PeiServicesInstallPpi (&mIoMmuPpiList);
+  ASSERT_EFI_ERROR(Status);
+
   LowBottom = 0;
-  LowTop = *DmaBufferBase;
-  HighBottom = *DmaBufferBase + DmaBufferSize;
+  LowTop = DmaBufferInfo->DmaBufferBase;
+  HighBottom = DmaBufferInfo->DmaBufferBase + DmaBufferInfo->DmaBufferSize;
   HighTop = LShiftU64 (1, VTdInfo->HostAddressWidth + 1);
 
   Status = SetDmaProtectedRange (
@@ -433,7 +447,7 @@ InitDmaProtection (
              );
 
   if (EFI_ERROR(Status)) {
-    FreePages ((VOID *)*DmaBufferBase, EFI_SIZE_TO_PAGES(DmaBufferSize));
+    FreePages ((VOID *)DmaBufferInfo->DmaBufferBase, EFI_SIZE_TO_PAGES(DmaBufferInfo->DmaBufferSize));
   }
 
   return Status;
@@ -543,7 +557,6 @@ InitVTdPmrForDma (
   EFI_STATUS                  Status;
   VOID                        *Hob;
   VTD_INFO                    *VTdInfo;
-  DMA_BUFFER_INFO             *DmaBufferInfo;
 
   Hob = GetFirstGuidHob (&mVTdInfoGuid);
   VTdInfo = GET_GUID_HOB_DATA(Hob);
@@ -553,29 +566,11 @@ InitVTdPmrForDma (
   //
   ParseDmarAcpiTableRmrr (VTdInfo);
 
-  Hob = GetFirstGuidHob (&mDmaBufferInfoGuid);
-  DmaBufferInfo = GET_GUID_HOB_DATA(Hob);
-
-  DEBUG ((DEBUG_INFO, " DmaBufferSize : 0x%x\n", DmaBufferInfo->DmaBufferSize));
   //
-  // Find a pre-memory in resource hob as DMA buffer
-  // Mark PEI memory to be DMA protected.
+  // Allocate a range in PEI memory as DMA buffer
+  // Mark others to be DMA protected.
   //
-  Status = InitDmaProtection (VTdInfo, DmaBufferInfo->DmaBufferSize, &DmaBufferInfo->DmaBufferBase);
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
-  DEBUG ((DEBUG_INFO, " DmaBufferBase : 0x%x\n", DmaBufferInfo->DmaBufferBase));
-
-  DmaBufferInfo->DmaBufferCurrentTop = DmaBufferInfo->DmaBufferBase + DmaBufferInfo->DmaBufferSize;
-  DmaBufferInfo->DmaBufferCurrentBottom = DmaBufferInfo->DmaBufferBase;
-
-  //
-  // Install PPI.
-  //
-  Status = PeiServicesInstallPpi (&mIoMmuPpiList);
-  ASSERT_EFI_ERROR(Status);
+  Status = InitDmaProtection (VTdInfo);
 
   return Status;
 }
