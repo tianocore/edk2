@@ -7,7 +7,7 @@
   number of performance logging entry is specified by PcdMaxPeiPerformanceLogEntries or 
   PcdMaxPeiPerformanceLogEntries16.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiPei.h>
 
-#include <Guid/Performance.h>
+#include <Guid/ExtendedFirmwarePerformance.h>
 
 #include <Library/PerformanceLib.h>
 #include <Library/DebugLib.h>
@@ -32,129 +32,399 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>
 
+#define  STRING_SIZE            (FPDT_STRING_EVENT_RECORD_NAME_LENGTH * sizeof (CHAR8))
+#define  MAX_RECORD_SIZE        (sizeof (FPDT_DYNAMIC_STRING_EVENT_RECORD) + STRING_SIZE)
 
 /**
-  Gets the GUID HOB for PEI performance.
+Check whether the Token is a known one which is uesed by core.
 
-  This internal function searches for the GUID HOB for PEI performance.
-  If that GUID HOB is not found, it will build a new one.
-  It outputs the data area of that GUID HOB to record performance log.
+@param  Token      Pointer to a Null-terminated ASCII string
 
-  @param    PeiPerformanceLog           Pointer to Pointer to PEI performance log header.
-  @param    PeiPerformanceIdArray       Pointer to Pointer to PEI performance identifier array.
+@retval TRUE       Is a known one used by core.
+@retval FALSE      Not a known one.
 
 **/
-VOID
-InternalGetPerformanceHobLog (
-  OUT PEI_PERFORMANCE_LOG_HEADER    **PeiPerformanceLog,
-  OUT UINT32                        **PeiPerformanceIdArray
+BOOLEAN
+IsKnownTokens (
+  IN CONST CHAR8  *Token
   )
 {
-  EFI_HOB_GUID_TYPE           *GuidHob;
-  UINTN                       PeiPerformanceSize;
-  UINT16                      PeiPerformanceLogEntries;
-
-  ASSERT (PeiPerformanceLog != NULL);
-  ASSERT (PeiPerformanceIdArray != NULL);
-
-  PeiPerformanceLogEntries = (UINT16) (PcdGet16 (PcdMaxPeiPerformanceLogEntries16) != 0 ?
-                                       PcdGet16 (PcdMaxPeiPerformanceLogEntries16) :
-                                       PcdGet8 (PcdMaxPeiPerformanceLogEntries));
-  GuidHob = GetFirstGuidHob (&gPerformanceProtocolGuid);
-
-  if (GuidHob != NULL) {
-    //
-    // PEI Performance HOB was found, then return the existing one.
-    //
-    *PeiPerformanceLog = GET_GUID_HOB_DATA (GuidHob);
-
-    GuidHob = GetFirstGuidHob (&gPerformanceExProtocolGuid);
-    ASSERT (GuidHob != NULL);
-    *PeiPerformanceIdArray = GET_GUID_HOB_DATA (GuidHob);
+  if (AsciiStrCmp (Token, SEC_TOK) == 0 ||
+      AsciiStrCmp (Token, PEI_TOK) == 0 ||
+      AsciiStrCmp (Token, DXE_TOK) == 0 ||
+      AsciiStrCmp (Token, BDS_TOK) == 0 ||
+      AsciiStrCmp (Token, DRIVERBINDING_START_TOK) == 0 ||
+      AsciiStrCmp (Token, DRIVERBINDING_SUPPORT_TOK) == 0 ||
+      AsciiStrCmp (Token, DRIVERBINDING_STOP_TOK) == 0 ||
+      AsciiStrCmp (Token, LOAD_IMAGE_TOK) == 0 ||
+      AsciiStrCmp (Token, START_IMAGE_TOK) == 0 ||
+      AsciiStrCmp (Token, PEIM_TOK) == 0) {
+    return TRUE;
   } else {
-    //
-    // PEI Performance HOB was not found, then build one.
-    //
-    PeiPerformanceSize     = sizeof (PEI_PERFORMANCE_LOG_HEADER) +
-                             sizeof (PEI_PERFORMANCE_LOG_ENTRY) * PeiPerformanceLogEntries;
-    *PeiPerformanceLog     = BuildGuidHob (&gPerformanceProtocolGuid, PeiPerformanceSize);
-    *PeiPerformanceLog     = ZeroMem (*PeiPerformanceLog, PeiPerformanceSize);
-
-    PeiPerformanceSize     = sizeof (UINT32) * PeiPerformanceLogEntries;
-    *PeiPerformanceIdArray = BuildGuidHob (&gPerformanceExProtocolGuid, PeiPerformanceSize);
-    *PeiPerformanceIdArray = ZeroMem (*PeiPerformanceIdArray, PeiPerformanceSize);
+    return FALSE;
   }
 }
 
 /**
-  Searches in the log array with keyword Handle, Token, Module and Identifier.
+Check whether the ID is a known one which map to the known Token.
 
-  This internal function searches for the log entry in the log array.
-  If there is an entry that exactly matches the given keywords
-  and its end time stamp is zero, then the index of that log entry is returned;
-  otherwise, the the number of log entries in the array is returned.
+@param  Identifier  32-bit identifier.
 
-  @param  PeiPerformanceLog       Pointer to the data structure containing PEI 
-                                  performance data.
-  @param  PeiPerformanceIdArray   Pointer to PEI performance identifier array.
+@retval TRUE        Is a known one used by core.
+@retval FALSE       Not a known one.
+
+**/
+BOOLEAN
+IsKnownID (
+  IN UINT32       Identifier
+  )
+{
+  if (Identifier == MODULE_START_ID ||
+      Identifier == MODULE_END_ID ||
+      Identifier == MODULE_LOADIMAGE_START_ID ||
+      Identifier == MODULE_LOADIMAGE_END_ID ||
+      Identifier == MODULE_DB_START_ID ||
+      Identifier == MODULE_DB_END_ID ||
+      Identifier == MODULE_DB_SUPPORT_START_ID ||
+      Identifier == MODULE_DB_SUPPORT_END_ID ||
+      Identifier == MODULE_DB_STOP_START_ID ||
+      Identifier == MODULE_DB_STOP_END_ID) {
+    return TRUE;
+  } else {
+    return FALSE;
+  }
+}
+
+/**
+  Get the FPDT record info.
+
+  @param  IsStart                 TRUE if the performance log is start log.
   @param  Handle                  Pointer to environment specific context used
                                   to identify the component being measured.
   @param  Token                   Pointer to a Null-terminated ASCII string
                                   that identifies the component being measured.
   @param  Module                  Pointer to a Null-terminated ASCII string
                                   that identifies the module being measured.
-  @param  Identifier              32-bit identifier.
+  @param  RecordInfo              On return, pointer to the info of the record.
 
-  @retval The index of log entry in the array.
+  @retval EFI_SUCCESS             Get record info successfully.
+  @retval EFI_UNSUPPORTED         No matched FPDT record.
 
 **/
-UINT32
-InternalSearchForLogEntry (
-  IN PEI_PERFORMANCE_LOG_HEADER *PeiPerformanceLog,
-  IN UINT32                     *PeiPerformanceIdArray,
-  IN CONST VOID                 *Handle,  OPTIONAL
-  IN CONST CHAR8                *Token,   OPTIONAL
-  IN CONST CHAR8                *Module,   OPTIONAL
-  IN UINT32                     Identifier
+EFI_STATUS
+GetFpdtRecordInfo (
+  IN BOOLEAN                 IsStart,
+  IN CONST VOID              *Handle,
+  IN CONST CHAR8             *Token,
+  IN CONST CHAR8             *Module,
+  OUT FPDT_BASIC_RECORD_INFO *RecordInfo
   )
 {
-  UINT32                    Index;
-  UINT32                    Index2;
-  UINT32                    NumberOfEntries;
-  PEI_PERFORMANCE_LOG_ENTRY *LogEntryArray;
+  UINTN     StringSize;
+  UINT16    RecordType;
 
+  RecordType = FPDT_DYNAMIC_STRING_EVENT_TYPE;
 
-  if (Token == NULL) {
-    Token = "";
+  //
+  // Get the ProgressID based on the Token.
+  // When PcdEdkiiFpdtStringRecordEnableOnly is TRUE, all records are with type of FPDT_DYNAMIC_STRING_EVENT_TYPE.
+  //
+  if (Token != NULL) {
+    if (AsciiStrCmp (Token, LOAD_IMAGE_TOK) == 0) {               // "LoadImage:"
+      if (IsStart) {
+        RecordInfo->ProgressID = MODULE_LOADIMAGE_START_ID;
+      } else {
+        RecordInfo->ProgressID = MODULE_LOADIMAGE_END_ID;
+      }
+      if(!PcdGetBool (PcdEdkiiFpdtStringRecordEnableOnly)) {
+        RecordType = FPDT_GUID_QWORD_EVENT_TYPE;
+      }
+    } else if (AsciiStrCmp (Token, SEC_TOK) == 0 ||               // "SEC"
+               AsciiStrCmp (Token, PEI_TOK) == 0) {               // "PEI"
+      if (IsStart) {
+        RecordInfo->ProgressID = PERF_CROSSMODULE_START_ID;
+      } else {
+        RecordInfo->ProgressID = PERF_CROSSMODULE_END_ID;
+      }
+    } else if (AsciiStrCmp (Token, PEIM_TOK) == 0) {              // "PEIM"
+      if (IsStart) {
+        RecordInfo->ProgressID = MODULE_START_ID;
+      } else {
+        RecordInfo->ProgressID = MODULE_END_ID;
+      }
+      if(!PcdGetBool (PcdEdkiiFpdtStringRecordEnableOnly)) {
+        RecordType = FPDT_GUID_EVENT_TYPE;
+      }
+    } else {                                                      //Pref used in Modules.
+      if (IsStart) {
+        RecordInfo->ProgressID = PERF_INMODULE_START_ID;
+      } else {
+        RecordInfo->ProgressID = PERF_INMODULE_END_ID;
+      }
+    }
+  } else if (Module != NULL || Handle != NULL) {                  //Pref used in Modules.
+    if (IsStart) {
+      RecordInfo->ProgressID = PERF_INMODULE_START_ID;
+    } else {
+      RecordInfo->ProgressID = PERF_INMODULE_END_ID;
+    }
+  } else {
+    return EFI_UNSUPPORTED;
   }
-  if (Module == NULL) {
-    Module = "";
-  }
-  NumberOfEntries = PeiPerformanceLog->NumberOfEntries;
-  LogEntryArray   = (PEI_PERFORMANCE_LOG_ENTRY *) (PeiPerformanceLog + 1);
 
-  Index2 = 0;
-
-  for (Index = 0; Index < NumberOfEntries; Index++) {
-    Index2 = NumberOfEntries - 1 - Index;
-    if (LogEntryArray[Index2].EndTimeStamp == 0 &&
-        (LogEntryArray[Index2].Handle == (EFI_PHYSICAL_ADDRESS) (UINTN) Handle) &&
-        AsciiStrnCmp (LogEntryArray[Index2].Token, Token, PEI_PERFORMANCE_STRING_LENGTH) == 0 &&
-        AsciiStrnCmp (LogEntryArray[Index2].Module, Module, PEI_PERFORMANCE_STRING_LENGTH) == 0) {
-      Index = Index2;
+  //
+  // Get the Guid and string.
+  //
+  if(PcdGetBool (PcdEdkiiFpdtStringRecordEnableOnly)) {
+    RecordInfo->RecordSize = sizeof (FPDT_DYNAMIC_STRING_EVENT_RECORD) + STRING_SIZE;
+  } else {
+    switch (RecordType) {
+    case FPDT_GUID_EVENT_TYPE:
+      RecordInfo->RecordSize = sizeof (FPDT_GUID_EVENT_RECORD);
       break;
+
+    case FPDT_GUID_QWORD_EVENT_TYPE:
+      RecordInfo->RecordSize = sizeof (FPDT_GUID_QWORD_EVENT_RECORD);
+      break;
+
+    case FPDT_DYNAMIC_STRING_EVENT_TYPE:
+      if (Token != NULL) {
+        StringSize = AsciiStrSize (Token);
+      } else if (Module != NULL) {
+        StringSize = AsciiStrSize (Module);
+      } else {
+        StringSize = STRING_SIZE;
+      }
+      RecordInfo->RecordSize  = (UINT8)(sizeof (FPDT_DYNAMIC_STRING_EVENT_RECORD) + StringSize);
+      break;
+
+    default:
+      //
+      // Other type is unsupported in PEI phase yet, return EFI_UNSUPPORTED
+      //
+      return EFI_UNSUPPORTED;
     }
   }
-  return Index;
+  RecordInfo->Type = RecordType;
+  return EFI_SUCCESS;
+}
+
+/**
+  Convert PEI performance log to FPDT String boot record.
+
+  @param  IsStart                 TRUE if the performance log is start log.
+  @param  Handle                  Pointer to environment specific context used
+                                  to identify the component being measured.
+  @param  Token                   Pointer to a Null-terminated ASCII string
+                                  that identifies the component being measured.
+  @param  Module                  Pointer to a Null-terminated ASCII string
+                                  that identifies the module being measured.
+  @param  Ticker                  64-bit time stamp.
+  @param  Identifier              32-bit identifier. If the value is 0, the created record
+                                  is same as the one created by StartGauge of PERFORMANCE_PROTOCOL.
+
+  @retval EFI_SUCCESS              Add FPDT boot record.
+  @retval EFI_OUT_OF_RESOURCES     There are not enough resources to record the measurement.
+  @retval EFI_UNSUPPORTED          No matched FPDT record.
+
+**/
+EFI_STATUS
+InsertPeiFpdtMeasurement (
+  IN BOOLEAN      IsStart,
+  IN CONST VOID   *Handle,  OPTIONAL
+  IN CONST CHAR8  *Token,   OPTIONAL
+  IN CONST CHAR8  *Module,  OPTIONAL
+  IN UINT64       Ticker,
+  IN UINT32       Identifier
+  )
+{
+  EFI_HOB_GUID_TYPE                     *GuidHob;
+  UINTN                                 PeiPerformanceSize;
+  UINT8                                 *PeiFirmwarePerformance;
+  FPDT_PEI_EXT_PERF_HEADER              *PeiPerformanceLogHeader;
+  FPDT_RECORD_PTR                       FpdtRecordPtr;
+  FPDT_BASIC_RECORD_INFO                RecordInfo;
+  CONST VOID                            *ModuleGuid;
+  UINTN                                 DestMax;
+  UINTN                                 StrLength;
+  CONST CHAR8                           *StringPtr;
+  EFI_STATUS                            Status;
+  UINT16                                PeiPerformanceLogEntries;
+  UINT64                                TimeStamp;
+
+  StringPtr = NULL;
+  FpdtRecordPtr.RecordHeader = NULL;
+  PeiPerformanceLogHeader = NULL;
+
+  //
+  // Get record info (type, size, ProgressID and Module Guid).
+  //
+  Status = GetFpdtRecordInfo (IsStart, Handle, Token, Module, &RecordInfo);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // If PERF_START()/PERF_END() have specified the ProgressID,it has high priority.
+  // !!! Note: If the Pref is not the known Token used in the core but have same
+  // ID with the core Token, this case will not be supported.
+  // And in currtnt usage mode, for the unkown ID, there is a general rule:
+  // If it is start pref: the lower 4 bits of the ID should be 0.
+  // If it is end pref: the lower 4 bits of the ID should not be 0.
+  // If input ID doesn't follow the rule, we will adjust it.
+  //
+  if ((Identifier != 0) && (IsKnownID (Identifier)) && (!IsKnownTokens (Token))) {
+    return EFI_UNSUPPORTED;
+  } else if ((Identifier != 0) && (!IsKnownID (Identifier)) && (!IsKnownTokens (Token))) {
+    if (IsStart && ((Identifier & 0x000F) != 0)) {
+      Identifier &= 0xFFF0;
+    } else if ((!IsStart) && ((Identifier & 0x000F) == 0)) {
+      Identifier += 1;
+    }
+    RecordInfo.ProgressID = (UINT16)Identifier;
+  }
+
+  //
+  // Get the number of PeiPerformanceLogEntries form PCD.
+  //
+  PeiPerformanceLogEntries = (UINT16) (PcdGet16 (PcdMaxPeiPerformanceLogEntries16) != 0 ?
+                                       PcdGet16 (PcdMaxPeiPerformanceLogEntries16) :
+                                       PcdGet8 (PcdMaxPeiPerformanceLogEntries));
+
+  //
+  // Create GUID HOB Data.
+  //
+  GuidHob = GetFirstGuidHob (&gEdkiiFpdtExtendedFirmwarePerformanceGuid);
+  PeiFirmwarePerformance = NULL;
+  while (GuidHob != NULL) {
+    //
+    // PEI Performance HOB was found, then return the existing one.
+    //
+    PeiFirmwarePerformance  = (UINT8*)GET_GUID_HOB_DATA (GuidHob);
+    PeiPerformanceLogHeader = (FPDT_PEI_EXT_PERF_HEADER *)PeiFirmwarePerformance;
+    if (!PeiPerformanceLogHeader->HobIsFull && PeiPerformanceLogHeader->SizeOfAllEntries + RecordInfo.RecordSize > PeiPerformanceLogEntries * MAX_RECORD_SIZE) {
+      PeiPerformanceLogHeader->HobIsFull = TRUE;
+    }
+    if (!PeiPerformanceLogHeader->HobIsFull && PeiPerformanceLogHeader->SizeOfAllEntries + RecordInfo.RecordSize <= PeiPerformanceLogEntries * MAX_RECORD_SIZE) {
+      FpdtRecordPtr.RecordHeader = (EFI_ACPI_5_0_FPDT_PERFORMANCE_RECORD_HEADER *)(PeiFirmwarePerformance + sizeof (FPDT_PEI_EXT_PERF_HEADER) + PeiPerformanceLogHeader->SizeOfAllEntries);
+      break;
+    }
+    //
+    // Previous HOB is used, then find next one.
+    //
+    GuidHob = GetNextGuidHob (&gEdkiiFpdtExtendedFirmwarePerformanceGuid, GET_NEXT_HOB (GuidHob));
+  }
+
+  if (GuidHob == NULL) {
+    //
+    // PEI Performance HOB was not found, then build one.
+    //
+    PeiPerformanceSize      = sizeof (FPDT_PEI_EXT_PERF_HEADER) +
+                              MAX_RECORD_SIZE * PeiPerformanceLogEntries;
+    PeiFirmwarePerformance  = (UINT8*)BuildGuidHob (&gEdkiiFpdtExtendedFirmwarePerformanceGuid, PeiPerformanceSize);
+    if (PeiFirmwarePerformance != NULL) {
+      ZeroMem (PeiFirmwarePerformance, PeiPerformanceSize);
+    }
+    PeiPerformanceLogHeader = (FPDT_PEI_EXT_PERF_HEADER *)PeiFirmwarePerformance;
+    FpdtRecordPtr.RecordHeader = (EFI_ACPI_5_0_FPDT_PERFORMANCE_RECORD_HEADER *)(PeiFirmwarePerformance + sizeof (FPDT_PEI_EXT_PERF_HEADER));
+  }
+
+  if (PeiFirmwarePerformance == NULL) {
+    //
+    // there is no enough resource to store performance data
+    //
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Get the TimeStamp.
+  //
+  if (Ticker == 0) {
+    Ticker    = GetPerformanceCounter ();
+    TimeStamp = GetTimeInNanoSecond (Ticker);
+  } else if (Ticker == 1) {
+    TimeStamp = 0;
+  } else {
+    TimeStamp = GetTimeInNanoSecond (Ticker);
+  }
+
+  //
+  // Get the ModuleGuid.
+  //
+  if (Handle != NULL) {
+    ModuleGuid = Handle;
+  } else {
+    ModuleGuid = &gEfiCallerIdGuid;
+  }
+
+  switch (RecordInfo.Type) {
+  case FPDT_GUID_EVENT_TYPE:
+    FpdtRecordPtr.GuidEvent->Header.Type       = FPDT_GUID_EVENT_TYPE;
+    FpdtRecordPtr.GuidEvent->Header.Length     = RecordInfo.RecordSize;;
+    FpdtRecordPtr.GuidEvent->Header.Revision   = FPDT_RECORD_REVISION_1;
+    FpdtRecordPtr.GuidEvent->ProgressID        = RecordInfo.ProgressID;
+    FpdtRecordPtr.GuidEvent->Timestamp         = TimeStamp;
+    CopyMem (&FpdtRecordPtr.GuidEvent->Guid, ModuleGuid, sizeof (EFI_GUID));
+    PeiPerformanceLogHeader->SizeOfAllEntries += RecordInfo.RecordSize;
+    break;
+
+  case FPDT_GUID_QWORD_EVENT_TYPE:
+    FpdtRecordPtr.GuidQwordEvent->Header.Type     = FPDT_GUID_QWORD_EVENT_TYPE;
+    FpdtRecordPtr.GuidQwordEvent->Header.Length   = RecordInfo.RecordSize;;
+    FpdtRecordPtr.GuidQwordEvent->Header.Revision = FPDT_RECORD_REVISION_1;
+    FpdtRecordPtr.GuidQwordEvent->ProgressID      = RecordInfo.ProgressID;
+    FpdtRecordPtr.GuidQwordEvent->Timestamp       = TimeStamp;
+    PeiPerformanceLogHeader->LoadImageCount++;
+    FpdtRecordPtr.GuidQwordEvent->Qword           = PeiPerformanceLogHeader->LoadImageCount;
+    CopyMem (&FpdtRecordPtr.GuidQwordEvent->Guid, ModuleGuid, sizeof (EFI_GUID));
+    PeiPerformanceLogHeader->SizeOfAllEntries += RecordInfo.RecordSize;
+    break;
+
+  case FPDT_DYNAMIC_STRING_EVENT_TYPE:
+    FpdtRecordPtr.DynamicStringEvent->Header.Type       = FPDT_DYNAMIC_STRING_EVENT_TYPE;
+    FpdtRecordPtr.DynamicStringEvent->Header.Length     = RecordInfo.RecordSize;
+    FpdtRecordPtr.DynamicStringEvent->Header.Revision   = FPDT_RECORD_REVISION_1;
+    FpdtRecordPtr.DynamicStringEvent->ProgressID        = RecordInfo.ProgressID;
+    FpdtRecordPtr.DynamicStringEvent->Timestamp         = TimeStamp;
+    CopyMem (&FpdtRecordPtr.DynamicStringEvent->Guid, ModuleGuid, sizeof (EFI_GUID));
+    PeiPerformanceLogHeader->SizeOfAllEntries += RecordInfo.RecordSize;
+
+    if (Token != NULL) {
+      StringPtr                     = Token;
+    } else if (Module != NULL) {
+      StringPtr                     = Module;
+    }
+    if (StringPtr != NULL && AsciiStrLen (StringPtr) != 0) {
+      DestMax                       = (RecordInfo.RecordSize - sizeof (FPDT_DYNAMIC_STRING_EVENT_RECORD)) / sizeof (CHAR8);
+      StrLength                     = AsciiStrLen (StringPtr);
+      if (StrLength >= DestMax) {
+        StrLength                   = DestMax -1;
+      }
+      AsciiStrnCpyS (FpdtRecordPtr.DynamicStringEvent->String, DestMax, StringPtr, StrLength);
+    } else {
+      AsciiStrCpyS (FpdtRecordPtr.DynamicStringEvent->String, FPDT_STRING_EVENT_RECORD_NAME_LENGTH, "unknown name");
+    }
+    break;
+
+  default:
+    //
+    // Record is not supported in current PEI phase, return EFI_ABORTED
+    //
+    return EFI_UNSUPPORTED;
+  }
+
+  return EFI_SUCCESS;
 }
 
 /**
   Creates a record for the beginning of a performance measurement.
 
-  Creates a record that contains the Handle, Token, Module and Identifier.
-  If TimeStamp is not zero, then TimeStamp is added to the record as the start time.
   If TimeStamp is zero, then this function reads the current time stamp
   and adds that time stamp value to the record as the start time.
+
+  If TimeStamp is one, then this function reads 0 as the start time.
+
+  If TimeStamp is other value, then TimeStamp is added to the record as the start time.
 
   @param  Handle                  Pointer to environment specific context used
                                   to identify the component being measured.
@@ -180,53 +450,16 @@ StartPerformanceMeasurementEx (
   IN UINT32       Identifier
   )
 {
-  PEI_PERFORMANCE_LOG_HEADER  *PeiPerformanceLog;
-  UINT32                      *PeiPerformanceIdArray;
-  PEI_PERFORMANCE_LOG_ENTRY   *LogEntryArray;
-  UINT32                      Index;
-  UINT16                      PeiPerformanceLogEntries;
-
-  PeiPerformanceLogEntries = (UINT16) (PcdGet16 (PcdMaxPeiPerformanceLogEntries16) != 0 ?
-                                       PcdGet16 (PcdMaxPeiPerformanceLogEntries16) :
-                                       PcdGet8 (PcdMaxPeiPerformanceLogEntries));
-
-  InternalGetPerformanceHobLog (&PeiPerformanceLog, &PeiPerformanceIdArray);
-
-  if (PeiPerformanceLog->NumberOfEntries >= PeiPerformanceLogEntries) {
-    DEBUG ((DEBUG_ERROR, "PEI performance log array out of resources\n"));
-    return RETURN_OUT_OF_RESOURCES;
-  }
-  Index                       = PeiPerformanceLog->NumberOfEntries++;
-  LogEntryArray               = (PEI_PERFORMANCE_LOG_ENTRY *) (PeiPerformanceLog + 1);
-  LogEntryArray[Index].Handle = (EFI_PHYSICAL_ADDRESS) (UINTN) Handle;
-
-  if (Token != NULL) {
-    AsciiStrnCpyS (LogEntryArray[Index].Token, PEI_PERFORMANCE_STRING_SIZE, Token, PEI_PERFORMANCE_STRING_LENGTH);
-  }
-  if (Module != NULL) {
-    AsciiStrnCpyS (LogEntryArray[Index].Module, PEI_PERFORMANCE_STRING_SIZE, Module, PEI_PERFORMANCE_STRING_LENGTH);
-  }
-
-  LogEntryArray[Index].EndTimeStamp = 0;
-  PeiPerformanceIdArray[Index] = Identifier;
-
-  if (TimeStamp == 0) {
-    TimeStamp = GetPerformanceCounter ();
-  }
-  LogEntryArray[Index].StartTimeStamp = TimeStamp;
-
-  return RETURN_SUCCESS;
+  return InsertPeiFpdtMeasurement (TRUE, Handle, Token, Module, TimeStamp, Identifier);
 }
 
 /**
-  Fills in the end time of a performance measurement.
 
-  Looks up the record that matches Handle, Token and Module.
-  If the record can not be found then return RETURN_NOT_FOUND.
-  If the record is found and TimeStamp is not zero,
-  then TimeStamp is added to the record as the end time.
-  If the record is found and TimeStamp is zero, then this function reads
-  the current time stamp and adds that time stamp value to the record as the end time.
+  Creates a record for the end of a performance measurement.
+
+  If the TimeStamp is not zero or one, then TimeStamp is added to the record as the end time.
+  If the TimeStamp is zero, then this function reads the current time stamp and adds that time stamp value to the record as the end time.
+  If the TimeStamp is one, then this function reads 0 as the end time.
 
   @param  Handle                  Pointer to environment specific context used
                                   to identify the component being measured.
@@ -252,24 +485,7 @@ EndPerformanceMeasurementEx (
   IN UINT32       Identifier
   )
 {
-  PEI_PERFORMANCE_LOG_HEADER  *PeiPerformanceLog;
-  UINT32                      *PeiPerformanceIdArray;
-  PEI_PERFORMANCE_LOG_ENTRY   *LogEntryArray;
-  UINT32                      Index;
-
-  if (TimeStamp == 0) {
-    TimeStamp = GetPerformanceCounter ();
-  }
-
-  InternalGetPerformanceHobLog (&PeiPerformanceLog, &PeiPerformanceIdArray);
-  Index             = InternalSearchForLogEntry (PeiPerformanceLog, PeiPerformanceIdArray, Handle, Token, Module, Identifier);
-  if (Index >= PeiPerformanceLog->NumberOfEntries) {
-    return RETURN_NOT_FOUND;
-  }
-  LogEntryArray     = (PEI_PERFORMANCE_LOG_ENTRY *) (PeiPerformanceLog + 1);
-  LogEntryArray[Index].EndTimeStamp = TimeStamp;
-
-  return RETURN_SUCCESS;
+  return InsertPeiFpdtMeasurement (FALSE, Handle, Token, Module, TimeStamp, Identifier);
 }
 
 /**
@@ -294,6 +510,8 @@ EndPerformanceMeasurementEx (
   If StartTimeStamp is NULL, then ASSERT().
   If EndTimeStamp is NULL, then ASSERT().
   If Identifier is NULL, then ASSERT().
+
+  !!!NOT Support yet!!!
 
   @param  LogEntryKey             On entry, the key of the performance measurement log entry to retrieve.
                                   0, then the first performance measurement log entry is retrieved.
@@ -325,51 +543,19 @@ GetPerformanceMeasurementEx (
   OUT UINT32      *Identifier
   )
 {
-  PEI_PERFORMANCE_LOG_HEADER  *PeiPerformanceLog;
-  UINT32                      *PeiPerformanceIdArray;
-  PEI_PERFORMANCE_LOG_ENTRY   *CurrentLogEntry;
-  PEI_PERFORMANCE_LOG_ENTRY   *LogEntryArray;
-  UINTN                       NumberOfEntries;
-
-  ASSERT (Handle != NULL);
-  ASSERT (Token != NULL);
-  ASSERT (Module != NULL);
-  ASSERT (StartTimeStamp != NULL);
-  ASSERT (EndTimeStamp != NULL);
-  ASSERT (Identifier != NULL);
-
-  InternalGetPerformanceHobLog (&PeiPerformanceLog, &PeiPerformanceIdArray);
-
-  NumberOfEntries   = (UINTN) (PeiPerformanceLog->NumberOfEntries);
-  LogEntryArray     = (PEI_PERFORMANCE_LOG_ENTRY *) (PeiPerformanceLog + 1);
-  //
-  // Make sure that LogEntryKey is a valid log entry key.
-  //
-  ASSERT (LogEntryKey <= NumberOfEntries);
-
-  if (LogEntryKey == NumberOfEntries) {
-    return 0;
-  }
-
-  CurrentLogEntry = &(LogEntryArray[LogEntryKey]);
-
-  *Handle         = (VOID *) (UINTN) (CurrentLogEntry->Handle);
-  *Token          = CurrentLogEntry->Token;
-  *Module         = CurrentLogEntry->Module;
-  *StartTimeStamp = CurrentLogEntry->StartTimeStamp;
-  *EndTimeStamp   = CurrentLogEntry->EndTimeStamp;
-  *Identifier     = PeiPerformanceIdArray[LogEntryKey++];
-
-  return LogEntryKey;
+  return 0;
 }
 
 /**
   Creates a record for the beginning of a performance measurement.
 
-  Creates a record that contains the Handle, Token, and Module.
-  If TimeStamp is not zero, then TimeStamp is added to the record as the start time.
   If TimeStamp is zero, then this function reads the current time stamp
   and adds that time stamp value to the record as the start time.
+
+  If TimeStamp is one, then this function reads 0 as the start time.
+
+  If TimeStamp is other value, then TimeStamp is added to the record as the start time.
+
 
   @param  Handle                  Pointer to environment specific context used
                                   to identify the component being measured.
@@ -392,18 +578,16 @@ StartPerformanceMeasurement (
   IN UINT64       TimeStamp
   )
 {
-  return StartPerformanceMeasurementEx (Handle, Token, Module, TimeStamp, 0);
+  return InsertPeiFpdtMeasurement (TRUE, Handle, Token, Module, TimeStamp, 0);
 }
 
 /**
-  Fills in the end time of a performance measurement.
 
-  Looks up the record that matches Handle, Token, and Module.
-  If the record can not be found then return RETURN_NOT_FOUND.
-  If the record is found and TimeStamp is not zero,
-  then TimeStamp is added to the record as the end time.
-  If the record is found and TimeStamp is zero, then this function reads
-  the current time stamp and adds that time stamp value to the record as the end time.
+  Creates a record for the end of a performance measurement.
+
+  If the TimeStamp is not zero or one, then TimeStamp is added to the record as the end time.
+  If the TimeStamp is zero, then this function reads the current time stamp and adds that time stamp value to the record as the end time.
+  If the TimeStamp is one, then this function reads 0 as the end time.
 
   @param  Handle                  Pointer to environment specific context used
                                   to identify the component being measured.
@@ -426,7 +610,7 @@ EndPerformanceMeasurement (
   IN UINT64       TimeStamp
   )
 {
-  return EndPerformanceMeasurementEx (Handle, Token, Module, TimeStamp, 0);
+  return InsertPeiFpdtMeasurement (FALSE, Handle, Token, Module, TimeStamp, 0);
 }
 
 /**
@@ -450,6 +634,8 @@ EndPerformanceMeasurement (
   If Module is NULL, then ASSERT().
   If StartTimeStamp is NULL, then ASSERT().
   If EndTimeStamp is NULL, then ASSERT().
+
+  NOT Support yet.
 
   @param  LogEntryKey             On entry, the key of the performance measurement log entry to retrieve.
                                   0, then the first performance measurement log entry is retrieved.
@@ -479,8 +665,7 @@ GetPerformanceMeasurement (
   OUT UINT64      *EndTimeStamp
   )
 {
-  UINT32 Identifier;
-  return GetPerformanceMeasurementEx (LogEntryKey, Handle, Token, Module, StartTimeStamp, EndTimeStamp, &Identifier);
+  return 0;
 }
 
 /**
