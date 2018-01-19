@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -220,7 +220,8 @@ typedef struct {
   UINT16                                      StatusRegisterAddress;
   UINT16                                      CommandRegisterAddress;
   BOOLEAN                                     ExtendedKeyboard;
-  
+
+  EFI_KEY_STATE                               KeyState;
   //
   // Buffer storing EFI_KEY_DATA
   //
