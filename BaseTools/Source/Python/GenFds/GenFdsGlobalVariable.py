@@ -1,7 +1,7 @@
 ## @file
 # Global variables for GenFds
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -500,7 +500,7 @@ class GenFdsGlobalVariable:
             if IsMakefile:
                 if ' '.join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:
                     GenFdsGlobalVariable.SecCmdList.append(' '.join(Cmd).strip())
-            elif GenFdsGlobalVariable.NeedsUpdate(Output, list(Input)):
+            elif GenFdsGlobalVariable.NeedsUpdate(Output, list(Input) + [CommandFile]):
                 GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
                 GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate section")
                 if (os.path.getsize(Output) >= GenFdsGlobalVariable.LARGE_FILE_SIZE and
@@ -552,7 +552,7 @@ class GenFdsGlobalVariable:
             GenFdsGlobalVariable.SecCmdList = []
             GenFdsGlobalVariable.CopyList = []
         else:
-            if not GenFdsGlobalVariable.NeedsUpdate(Output, list(Input)):
+            if not GenFdsGlobalVariable.NeedsUpdate(Output, list(Input) + [CommandFile]):
                 return
             GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate FFS")
 
