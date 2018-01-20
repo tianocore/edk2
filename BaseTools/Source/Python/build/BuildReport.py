@@ -952,9 +952,9 @@ class PcdReport(object):
                     #
                     DecDefaultValue = self.DecPcdDefault.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, DecType))
                     DscDefaultValue = self.DscPcdDefault.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName))
-                    DscDefaultValBak= DscDefaultValue
+                    DscDefaultValBak = DscDefaultValue
                     DscDefaultValue = self.FdfPcdSet.get((Pcd.TokenCName, Key), DscDefaultValue)
-                    if DscDefaultValue:
+                    if DscDefaultValue != DscDefaultValBak:
                         DscDefaultValue = ValueExpressionEx(DscDefaultValue, Pcd.DatumType, self._GuidDict)(True)
                     InfDefaultValue = None
                     
