@@ -1,7 +1,7 @@
 /** @file
   Header file for 'dp' command functions.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,9 @@
 #include <Uefi.h>
 
 #include <Guid/Performance.h>
+#include <Guid/ExtendedFirmwarePerformance.h>
+#include <Guid/FirmwarePerformance.h>
+#include <Guid/Acpi.h>
 
 #include <Protocol/HiiPackageList.h>
 #include <Protocol/DevicePath.h>
@@ -42,7 +45,7 @@
 extern EFI_HANDLE mDpHiiHandle;
 
 #define DP_MAJOR_VERSION        2
-#define DP_MINOR_VERSION        4
+#define DP_MINOR_VERSION        5
 
 /**
   * The value assigned to DP_DEBUG controls which debug output

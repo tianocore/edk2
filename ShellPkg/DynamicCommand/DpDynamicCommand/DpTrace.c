@@ -1,7 +1,7 @@
 /** @file
   Trace reporting for the Dp utility.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -23,11 +23,59 @@
 #include <Library/HiiLib.h>
 #include <Library/PcdLib.h>
 
-#include <Guid/Performance.h>
-
 #include "Dp.h"
 #include "Literals.h"
 #include "DpInternal.h"
+
+/**
+  Attempts to retrieve a performance measurement log entry from the performance measurement log.
+
+
+  @param  LogEntryKey             On entry, the key of the performance measurement log entry to retrieve.
+                                  0, then the first performance measurement log entry is retrieved.
+                                  On exit, the key of the next performance log entry.
+  @param  Handle                  Pointer to environment specific context used to identify the component
+                                  being measured.
+  @param  Token                   Pointer to a Null-terminated ASCII string that identifies the component
+                                  being measured.
+  @param  Module                  Pointer to a Null-terminated ASCII string that identifies the module
+                                  being measured.
+  @param  StartTimeStamp          Pointer to the 64-bit time stamp that was recorded when the measurement
+                                  was started.
+  @param  EndTimeStamp            Pointer to the 64-bit time stamp that was recorded when the measurement
+                                  was ended.
+  @param  Identifier              Pointer to the 32-bit identifier that was recorded when the measurement
+                                  was ended.
+
+  @return The key for the next performance log entry (in general case).
+
+**/
+UINTN
+GetPerformanceMeasurementRecord (
+ IN  UINTN       LogEntryKey,
+ OUT CONST VOID  **Handle,
+ OUT CONST CHAR8 **Token,
+ OUT CONST CHAR8 **Module,
+ OUT UINT64      *StartTimeStamp,
+ OUT UINT64      *EndTimeStamp,
+ OUT UINT32      *Identifier
+  )
+{
+  if (LogEntryKey == mMeasurementNum) {
+    return 0;
+  }
+
+  *Handle         = (VOID *) (UINTN) mMeasurementList[LogEntryKey].Handle;
+  *Token          = mMeasurementList[LogEntryKey].Token;
+  *Module         = mMeasurementList[LogEntryKey].Module;
+  *StartTimeStamp = mMeasurementList[LogEntryKey].StartTimeStamp;
+  *EndTimeStamp   = mMeasurementList[LogEntryKey].EndTimeStamp;
+  *Identifier     = mMeasurementList[LogEntryKey].Identifier;
+
+  LogEntryKey ++;
+
+  return LogEntryKey;
+}
 
 /**
   Collect verbose statistics about the logged performance measurements.
@@ -57,7 +105,7 @@ GatherStatistics(
   INTN                      TIndex;
 
   LogEntryKey = 0;
-  while ((LogEntryKey = GetPerformanceMeasurementEx (
+  while ((LogEntryKey = GetPerformanceMeasurementRecord (
                         LogEntryKey,
                         &Measurement.Handle,
                         &Measurement.Token,
@@ -79,13 +127,13 @@ GatherStatistics(
     if (IsPhase( &Measurement)) {
       ++SummaryData.NumSummary;       // Count the number of major phases
     }
-    else {  // !IsPhase(...
+    else {  // !IsPhase
       if(Measurement.Handle == NULL) {
         ++SummaryData.NumGlobal;
       }
     }
 
-    if (AsciiStrnCmp (Measurement.Token, ALit_PEIM, PERF_TOKEN_LENGTH) == 0) {
+    if (AsciiStrCmp (Measurement.Token, ALit_PEIM) == 0) {
       ++SummaryData.NumPEIMs;         // Count PEIM measurements
     }
 
@@ -190,7 +238,7 @@ DumpAllTrace(
     Count = 0;
     Index = 0;
     while ( WITHIN_LIMIT(Count, Limit) &&
-            ((LogEntryKey = GetPerformanceMeasurementEx (
+            ((LogEntryKey = GetPerformanceMeasurementRecord (
                             LogEntryKey,
                             &Measurement.Handle,
                             &Measurement.Token,
@@ -231,7 +279,7 @@ DumpAllTrace(
         }
       }
 
-      if (AsciiStrnCmp (Measurement.Token, ALit_PEIM, PERF_TOKEN_LENGTH) == 0) {
+      if (AsciiStrCmp (Measurement.Token, ALit_PEIM) == 0) {
         UnicodeSPrint (mGaugeString, sizeof (mGaugeString), L"%g", Measurement.Handle);
       }
 
@@ -331,7 +379,7 @@ DumpRawTrace(
   Count = 0;
   Index = 0;
   while ( WITHIN_LIMIT(Count, Limit) &&
-          ((LogEntryKey = GetPerformanceMeasurementEx (
+          ((LogEntryKey = GetPerformanceMeasurementRecord (
                           LogEntryKey,
                           &Measurement.Handle,
                           &Measurement.Token,
@@ -420,7 +468,7 @@ ProcessPhases(
   FreePool (StringPtrUnknown);
 
   LogEntryKey = 0;
-  while ((LogEntryKey = GetPerformanceMeasurementEx (
+  while ((LogEntryKey = GetPerformanceMeasurementRecord (
                           LogEntryKey,
                           &Measurement.Handle,
                           &Measurement.Token,
@@ -434,17 +482,17 @@ ProcessPhases(
     }
     Duration = GetDuration (&Measurement);
     if (   Measurement.Handle != NULL
-        && (AsciiStrnCmp (Measurement.Token, ALit_BdsTO, PERF_TOKEN_LENGTH) == 0)
+        && (AsciiStrCmp (Measurement.Token, ALit_BdsTO) == 0)
        )
     {
       BdsTimeoutValue = Duration;
-    } else if (AsciiStrnCmp (Measurement.Token, ALit_SEC, PERF_TOKEN_LENGTH) == 0) {
+    } else if (AsciiStrCmp (Measurement.Token, ALit_SEC) == 0) {
       SecTime     = Duration;
-    } else if (AsciiStrnCmp (Measurement.Token, ALit_PEI, PERF_TOKEN_LENGTH) == 0) {
+    } else if (AsciiStrCmp (Measurement.Token, ALit_PEI) == 0) {
       PeiTime     = Duration;
-    } else if (AsciiStrnCmp (Measurement.Token, ALit_DXE, PERF_TOKEN_LENGTH) == 0) {
+    } else if (AsciiStrCmp (Measurement.Token, ALit_DXE) == 0) {
       DxeTime      = Duration;
-    } else if (AsciiStrnCmp (Measurement.Token, ALit_BDS, PERF_TOKEN_LENGTH) == 0) {
+    } else if (AsciiStrCmp (Measurement.Token, ALit_BDS) == 0) {
       BdsTime      = Duration;
     }
   }
@@ -462,10 +510,7 @@ ProcessPhases(
   // print PEI phase duration time
   //
   if (PeiTime > 0) {
-    ElapsedTime = DivU64x32 (
-                    PeiTime,
-                    (UINT32)TimerInfo.Frequency
-                    );
+    ElapsedTime = DivU64x32 (PeiTime, 1000000);
     Total += ElapsedTime;
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_DURATION), mDpHiiHandle, ALit_PEI, ElapsedTime);
   }
@@ -473,10 +518,7 @@ ProcessPhases(
   // print DXE phase duration time
   //
   if (DxeTime > 0) {
-    ElapsedTime = DivU64x32 (
-                    DxeTime,
-                    (UINT32)TimerInfo.Frequency
-                    );
+    ElapsedTime = DivU64x32 (DxeTime, 1000000);
     Total += ElapsedTime;
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_DURATION), mDpHiiHandle, ALit_DXE, ElapsedTime);
   }
@@ -484,19 +526,13 @@ ProcessPhases(
   // print BDS phase duration time
   //
   if (BdsTime > 0) {
-    ElapsedTime = DivU64x32 (
-                    BdsTime,
-                    (UINT32)TimerInfo.Frequency
-                    );
+    ElapsedTime = DivU64x32 (BdsTime, 1000000);
     Total += ElapsedTime;
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_DURATION), mDpHiiHandle, ALit_BDS, ElapsedTime);
   }
 
   if (BdsTimeoutValue > 0) {
-    ElapsedTime = DivU64x32 (
-                    BdsTimeoutValue,
-                    (UINT32)TimerInfo.Frequency
-                    );
+    ElapsedTime = DivU64x32 (BdsTimeoutValue, 1000000);
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PHASE_BDSTO), mDpHiiHandle, ALit_BdsTO, ElapsedTime);
   }
 
@@ -554,7 +590,7 @@ ProcessHandles(
 
     LogEntryKey = 0;
     Count   = 0;
-    while ((LogEntryKey = GetPerformanceMeasurementEx (
+    while ((LogEntryKey = GetPerformanceMeasurementRecord (
                             LogEntryKey,
                             &Measurement.Handle,
                             &Measurement.Token,
@@ -657,7 +693,7 @@ ProcessPeims(
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_DASHES), mDpHiiHandle);
   TIndex  = 0;
   LogEntryKey = 0;
-  while ((LogEntryKey = GetPerformanceMeasurementEx (
+  while ((LogEntryKey = GetPerformanceMeasurementRecord (
                           LogEntryKey,
                           &Measurement.Handle,
                           &Measurement.Token,
@@ -668,7 +704,7 @@ ProcessPeims(
   {
     TIndex++;
     if ((Measurement.EndTimeStamp == 0) ||
-        (AsciiStrnCmp (Measurement.Token, ALit_PEIM, PERF_TOKEN_LENGTH) != 0)
+        (AsciiStrCmp (Measurement.Token, ALit_PEIM) != 0)
        ) {
       continue;
     }
@@ -680,7 +716,6 @@ ProcessPeims(
       if (mShowId) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PEIM_VARS2), mDpHiiHandle,
               TIndex,   // 1 based, Which measurement record is being printed
-              Measurement.Handle,  // base address
               Measurement.Handle,  // file guid
               ElapsedTime,
               Measurement.Identifier
@@ -688,7 +723,6 @@ ProcessPeims(
       } else {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_PEIM_VARS), mDpHiiHandle,
               TIndex,   // 1 based, Which measurement record is being printed
-              Measurement.Handle,  // base address
               Measurement.Handle,  // file guid
               ElapsedTime
         );
@@ -746,7 +780,7 @@ ProcessGlobal(
   Index = 1;
   LogEntryKey = 0;
 
-  while ((LogEntryKey = GetPerformanceMeasurementEx (
+  while ((LogEntryKey = GetPerformanceMeasurementRecord (
                           LogEntryKey,
                           &Measurement.Handle,
                           &Measurement.Token,
