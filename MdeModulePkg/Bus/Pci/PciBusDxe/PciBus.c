@@ -360,8 +360,19 @@ PciBusDriverBindingStart (
   //
   StartPciDevices (Controller);
 
-  gFullEnumeration = FALSE;
-  return EFI_SUCCESS;
+  if (gFullEnumeration) {
+    gFullEnumeration = FALSE;
+
+    Status = gBS->InstallProtocolInterface (
+                    &PciRootBridgeIo->ParentHandle,
+                    &gEfiPciEnumerationCompleteProtocolGuid,
+                    EFI_NATIVE_INTERFACE,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  return Status;
 }
 
 /**
