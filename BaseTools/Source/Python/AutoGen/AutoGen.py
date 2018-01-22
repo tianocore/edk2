@@ -4153,6 +4153,8 @@ class ModuleAutoGen(AutoGen):
             File = Item.Target.Path.replace('\\', '/').strip('/').replace(DebugDir, '').strip('/')
             if File not in self.OutputFile:
                 self.OutputFile.append(File)
+            if os.path.isabs(File):
+                File = File.replace('\\', '/').strip('/').replace(OutputDir, '').strip('/')
             if Item.Target.Ext.lower() == '.aml':
                 AsBuiltInfDict['binary_item'] += ['ASL|' + File]
             elif Item.Target.Ext.lower() == '.acpi':
