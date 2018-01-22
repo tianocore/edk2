@@ -5,7 +5,7 @@
 #  It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 #  and libraries instances, which are used for those features.
 #
-# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015 Hewlett Packard Enterprise Development LP <BR>
 # Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
 # This program and the accompanying materials are licensed and made available under
@@ -23,7 +23,7 @@
   PACKAGE_NAME                   = SecurityPkg
   PACKAGE_UNI_FILE               = SecurityPkg.uni
   PACKAGE_GUID                   = 4EFC4F66-6219-4427-B780-FB99F470767F
-  PACKAGE_VERSION                = 0.97
+  PACKAGE_VERSION                = 0.98
 
 [Includes]
   Include
