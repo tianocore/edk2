@@ -1,7 +1,7 @@
 ## @file
 #  Cryptographic Library Package for UEFI Security Implementation.
 #
-#  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@
 [Defines]
   PLATFORM_NAME                  = CryptoPkg
   PLATFORM_GUID                  = E1063286-6C8C-4c25-AEF0-67A9A5B6E6B6
-  PLATFORM_VERSION               = 0.97
+  PLATFORM_VERSION               = 0.98
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/CryptoPkg
   SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|ARM|AARCH64
