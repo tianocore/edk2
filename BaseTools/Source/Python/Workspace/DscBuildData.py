@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -582,13 +582,14 @@ class DscBuildData(PlatformBuildClassObject):
                     EdkLogger.error('build', FORMAT_INVALID, 'No Sku ID name',
                                     File=self.MetaFile, Line=Record[-1])
                 Pattern = re.compile('^[1-9]\d*|0$')
-                if Pattern.match(Record[0]) == None:
-                    EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID number is invalid. The correct format is '{(0-9)} {(1-9)(0-9)+}'",
+                HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
+                if Pattern.match(Record[0]) == None and HexPattern.match(Record[0]) == None:
+                    EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID number is invalid. It only support Integer and HexNumber",
                                     File=self.MetaFile, Line=Record[-1])
                 if not IsValidWord(Record[1]):
                     EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID name is invalid. The correct format is '(a-zA-Z0-9_)(a-zA-Z0-9_-.)*'",
                                     File=self.MetaFile, Line=Record[-1])
-                self._SkuIds[Record[1].upper()] = (Record[0], Record[1].upper(), Record[2].upper())
+                self._SkuIds[Record[1].upper()] = (str(self.ToInt(Record[0])), Record[1].upper(), Record[2].upper())
             if 'DEFAULT' not in self._SkuIds:
                 self._SkuIds['DEFAULT'] = ("0","DEFAULT","DEFAULT")
             if 'COMMON' not in self._SkuIds:

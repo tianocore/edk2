@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse meta files
 #
-# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -1098,7 +1098,7 @@ class DscParser(MetaFileParser):
     def _SkuIdParser(self):
         TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT)
         if len(TokenList) not in (2,3):
-            EdkLogger.error('Parser', FORMAT_INVALID, "Correct format is '<Integer>|<UiName>[|<UiName>]'",
+            EdkLogger.error('Parser', FORMAT_INVALID, "Correct format is '<Number>|<UiName>[|<UiName>]'",
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
         self._ValueList[0:len(TokenList)] = TokenList
     @ParseMacro
