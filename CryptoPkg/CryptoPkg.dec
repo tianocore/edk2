@@ -4,7 +4,7 @@
 #  This Package provides cryptographic-related libraries for UEFI security modules.
 #  It also provides a test application to test libraries.
 #
-#  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@
   PACKAGE_NAME                   = CryptoPkg
   PACKAGE_UNI_FILE               = CryptoPkg.uni
   PACKAGE_GUID                   = 36470E80-36F2-4ba0-8CC8-937C7D9FF888
-  PACKAGE_VERSION                = 0.97
+  PACKAGE_VERSION                = 0.98
 
 [Includes]
   Include
