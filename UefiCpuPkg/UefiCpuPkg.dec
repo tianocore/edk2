@@ -18,7 +18,7 @@
   PACKAGE_NAME                   = UefiCpuPkg
   PACKAGE_UNI_FILE               = UefiCpuPkg.uni
   PACKAGE_GUID                   = 2171df9b-0d39-45aa-ac37-2de190010d23
-  PACKAGE_VERSION                = 0.80
+  PACKAGE_VERSION                = 0.90
 
 [Includes]
   Include
