@@ -1,7 +1,7 @@
 /** @file
   MP initialize support functions for PEI phase.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -75,15 +75,15 @@ SaveCpuMpData (
 **/
 BOOLEAN
 CheckOverlapWithAllocatedBuffer (
-  IN UINTN                WakeupBufferStart,
-  IN UINTN                WakeupBufferEnd
+  IN UINT64               WakeupBufferStart,
+  IN UINT64               WakeupBufferEnd
   )
 {
   EFI_PEI_HOB_POINTERS      Hob;
   EFI_HOB_MEMORY_ALLOCATION *MemoryHob;
   BOOLEAN                   Overlapped;
-  UINTN                     MemoryStart;
-  UINTN                     MemoryEnd;
+  UINT64                    MemoryStart;
+  UINT64                    MemoryEnd;
 
   Overlapped = FALSE;
   //
@@ -96,9 +96,8 @@ CheckOverlapWithAllocatedBuffer (
   while (!END_OF_HOB_LIST (Hob)) {
     if (Hob.Header->HobType == EFI_HOB_TYPE_MEMORY_ALLOCATION) {
       MemoryHob   = Hob.MemoryAllocation;
-      MemoryStart = (UINTN) MemoryHob->AllocDescriptor.MemoryBaseAddress;
-      MemoryEnd   = (UINTN) (MemoryHob->AllocDescriptor.MemoryBaseAddress +
-                             MemoryHob->AllocDescriptor.MemoryLength);
+      MemoryStart = MemoryHob->AllocDescriptor.MemoryBaseAddress;
+      MemoryEnd   = MemoryHob->AllocDescriptor.MemoryBaseAddress + MemoryHob->AllocDescriptor.MemoryLength;
       if (!((WakeupBufferStart >= MemoryEnd) || (WakeupBufferEnd <= MemoryStart))) {
         Overlapped = TRUE;
         break;
@@ -123,8 +122,8 @@ GetWakeupBuffer (
   )
 {
   EFI_PEI_HOB_POINTERS    Hob;
-  UINTN                   WakeupBufferStart;
-  UINTN                   WakeupBufferEnd;
+  UINT64                  WakeupBufferStart;
+  UINT64                  WakeupBufferEnd;
 
   WakeupBufferSize = (WakeupBufferSize + SIZE_4KB - 1) & ~(SIZE_4KB - 1);
 
@@ -149,7 +148,7 @@ GetWakeupBuffer (
         //
         // Need memory under 1MB to be collected here
         //
-        WakeupBufferEnd = (UINTN) (Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength);
+        WakeupBufferEnd = Hob.ResourceDescriptor->PhysicalStart + Hob.ResourceDescriptor->ResourceLength;
         if (WakeupBufferEnd > BASE_1MB) {
           //
           // Wakeup buffer should be under 1MB
@@ -174,7 +173,7 @@ GetWakeupBuffer (
           }
           DEBUG ((DEBUG_INFO, "WakeupBufferStart = %x, WakeupBufferSize = %x\n",
                                WakeupBufferStart, WakeupBufferSize));
-          return WakeupBufferStart;
+          return (UINTN)WakeupBufferStart;
         }
       }
     }
