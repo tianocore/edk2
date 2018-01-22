@@ -104,16 +104,6 @@ PciEnumerator (
     return Status;
   }
 
-  Status = gBS->InstallProtocolInterface (
-                  &HostBridgeHandle,
-                  &gEfiPciEnumerationCompleteProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
   return EFI_SUCCESS;
 }
 
