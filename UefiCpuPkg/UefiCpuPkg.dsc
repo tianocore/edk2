@@ -16,7 +16,7 @@
 [Defines]
   PLATFORM_NAME                  = UefiCpu
   PLATFORM_GUID                  = a1b7be22-78b3-4260-9569-8649e8c17d49
-  PLATFORM_VERSION               = 0.80
+  PLATFORM_VERSION               = 0.90
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/UefiCpu
   SUPPORTED_ARCHITECTURES        = IA32|IPF|X64
