@@ -397,7 +397,7 @@ ShellCommandRunHelp (
         CopyListOfCommandNamesWithDynamic(&SortedCommandList, &SortedCommandListSize);
 
         for (CurrentCommand = SortedCommandList 
-          ; CurrentCommand != NULL && *CurrentCommand != CHAR_NULL && CurrentCommand < SortedCommandList + SortedCommandListSize/sizeof(CHAR16)
+          ; CurrentCommand != NULL && CurrentCommand < SortedCommandList + SortedCommandListSize/sizeof(CHAR16) && *CurrentCommand != CHAR_NULL
           ; CurrentCommand += StrLen(CurrentCommand) + 1
           ) {
           //
