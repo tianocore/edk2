@@ -1,7 +1,7 @@
 ##  @file
 # Provides Shell 'dp' dynamic command.
 #
-# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -26,7 +26,6 @@
   UEFI_HII_RESOURCE_SECTION      = TRUE
 
 [Sources.common]
-  PerformanceTokens.h
   Dp.uni
   Dp.c
   Dp.h
@@ -62,6 +61,8 @@
 
 [Guids]
   gPerformanceProtocolGuid                                ## CONSUMES ## SystemTable
+  gEfiAcpi20TableGuid                                     ## CONSUMES
+  gEfiAcpi10TableGuid                                     ## CONSUMES
 
 [Protocols]
   gEfiLoadedImageProtocolGuid                             ## CONSUMES

@@ -6,7 +6,7 @@
   Dp application.  In addition to global data, function declarations for
   DpUtilities.c, DpTrace.c, and DpProfile.c are included here.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -29,11 +29,12 @@ extern CHAR16             mGaugeString[DP_GAUGE_STRING_LENGTH + 1];
 extern CHAR16             mUnicodeToken[DXE_PERFORMANCE_STRING_SIZE];
 extern UINT64             mInterestThreshold;
 extern BOOLEAN            mShowId;
+extern UINT8              *mBootPerformanceTable;
+extern UINTN              mBootPerformanceTableLength;
+extern MEASUREMENT_RECORD *mMeasurementList;
+extern UINTN              mMeasurementNum;
 
 extern PERF_SUMMARY_DATA  SummaryData;    ///< Create the SummaryData structure and init. to ZERO.
-
-/// Timer Specific Information.
-extern TIMER_INFO         TimerInfo;
 
 /// Items for which to gather cumulative statistics.
 extern PERF_CUM_DATA      CumData[];

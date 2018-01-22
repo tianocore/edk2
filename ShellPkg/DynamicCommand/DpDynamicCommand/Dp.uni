@@ -1,7 +1,7 @@
 // *++
 //
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
-// Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 // (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -51,10 +51,10 @@
 #string STR_DP_HANDLE_SECTION2         #language en-US  "Index: Handle               Driver Name             Description  Time(us)    ID\n"
 #string STR_DP_HANDLE_VARS2            #language en-US  "%5d: [%3x]  %36s  %11s  %L8d %5d\n"
 #string STR_DP_SECTION_PEIMS           #language en-US  "PEIMs"
-#string STR_DP_PEIM_SECTION            #language en-US  "Index:  Pointer Value              Instance GUID              Token    Time(us)\n"
-#string STR_DP_PEIM_VARS               #language en-US  "%5d:  0x%11p   %g   PEIM    %L8d\n"
-#string STR_DP_PEIM_SECTION2           #language en-US  "Index: Pointer Value             Instance GUID            Token  Time(us)    ID\n"
-#string STR_DP_PEIM_VARS2              #language en-US  "%5d: 0x%11p  %g PEIM  %L8d %5d\n"
+#string STR_DP_PEIM_SECTION            #language en-US  "Index:                Instance GUID              Token    Time(us)\n"
+#string STR_DP_PEIM_VARS               #language en-US  "%5d:    %g   PEIM    %L8d\n"
+#string STR_DP_PEIM_SECTION2           #language en-US  "Index:               Instance GUID            Token  Time(us)    ID\n"
+#string STR_DP_PEIM_VARS2              #language en-US  "%5d:   %g PEIM  %L8d %5d\n"
 #string STR_DP_SECTION_GENERAL         #language en-US  "General"
 #string STR_DP_GLOBAL_SECTION          #language en-US  "Index                      Name                         Description    Time(us)\n"
 #string STR_DP_GLOBAL_VARS             #language en-US  "%5d:%25s     %31s    %L8d\n"
@@ -90,6 +90,7 @@
 #string STR_DP_INCOMPLETE              #language en-US  " I "
 #string STR_DP_COMPLETE                #language en-US  "   "
 #string STR_ALIT_UNKNOWN               #language en-US  "Unknown"
+#string STR_DP_GET_BOOT_PERFORMANCE_TABLE_FAIL          #language en-US  "Fail to get boot performance table\n"
 
 #string STR_GET_HELP_DP         #language en-US ""
 ".TH dp 0 "Display performance metrics"\r\n"

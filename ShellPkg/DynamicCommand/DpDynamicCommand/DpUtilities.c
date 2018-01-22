@@ -1,7 +1,7 @@
 /** @file
   Utility functions used by the Dp application.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -71,22 +71,8 @@ GetDuration (
     return 0;
   }
 
-  // PERF_START macros are called with a value of 1 to indicate
-  // the beginning of time.  So, adjust the start ticker value
-  // to the real beginning of time.
-  // Assumes no wraparound.  Even then, there is a very low probability
-  // of having a valid StartTicker value of 1.
-  if (Measurement->StartTimeStamp == 1) {
-    Measurement->StartTimeStamp = TimerInfo.StartCount;
-  }
-  if (TimerInfo.CountUp) {
-    Duration = Measurement->EndTimeStamp - Measurement->StartTimeStamp;
-    Error = (BOOLEAN)(Duration > Measurement->EndTimeStamp);
-  }
-  else {
-    Duration = Measurement->StartTimeStamp - Measurement->EndTimeStamp;
-    Error = (BOOLEAN)(Duration > Measurement->StartTimeStamp);
-  }
+  Duration = Measurement->EndTimeStamp - Measurement->StartTimeStamp;
+  Error = (BOOLEAN)(Duration > Measurement->EndTimeStamp);
 
   if (Error) {
     DEBUG ((EFI_D_ERROR, ALit_TimerLibError));
@@ -113,11 +99,11 @@ IsPhase(
 {
   BOOLEAN   RetVal;
 
-  RetVal = (BOOLEAN)( ( *Measurement->Module == '\0')                               &&
-            ((AsciiStrnCmp (Measurement->Token, ALit_SEC, PERF_TOKEN_LENGTH) == 0)    ||
-             (AsciiStrnCmp (Measurement->Token, ALit_PEI, PERF_TOKEN_LENGTH) == 0)    ||
-             (AsciiStrnCmp (Measurement->Token, ALit_DXE, PERF_TOKEN_LENGTH) == 0)    ||
-             (AsciiStrnCmp (Measurement->Token, ALit_BDS, PERF_TOKEN_LENGTH) == 0))
+  RetVal = (BOOLEAN)(
+            ((AsciiStrCmp (Measurement->Token, ALit_SEC) == 0)    ||
+             (AsciiStrCmp (Measurement->Token, ALit_PEI) == 0)    ||
+             (AsciiStrCmp (Measurement->Token, ALit_DXE) == 0)    ||
+             (AsciiStrCmp (Measurement->Token, ALit_BDS) == 0))
             );
   return RetVal;
 }
@@ -378,10 +364,7 @@ DurationInMicroSeconds (
   IN UINT64 Duration
   )
 {
-  UINT64 Temp;
-
-  Temp = MultU64x32 (Duration, 1000);
-  return DivU64x32 (Temp, TimerInfo.Frequency);
+  return DivU64x32 (Duration, 1000);
 }
 
 /** 
@@ -405,7 +388,7 @@ GetCumulativeItem(
   INTN    Index;
 
   for( Index = 0; Index < (INTN)NumCum; ++Index) {
-    if (AsciiStrnCmp (Measurement->Token, CumData[Index].Name, PERF_TOKEN_LENGTH) == 0) {
+    if (AsciiStrCmp (Measurement->Token, CumData[Index].Name) == 0) {
       return Index;  // Exit, we found a match
     }
   }
