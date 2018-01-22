@@ -8,7 +8,7 @@
   PCI Root Bridges. So it means platform needs install PCI Root Bridge IO protocol for each
   PCI Root Bus and install PCI Host Bridge Resource Allocation Protocol.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -240,8 +240,9 @@ PciBusDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  EFI_STATUS                Status;
-  EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
+  EFI_STATUS                      Status;
+  EFI_DEVICE_PATH_PROTOCOL        *ParentDevicePath;
+  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
 
   //
   // Check RemainingDevicePath validation
@@ -321,12 +322,34 @@ PciBusDriverBindingStart (
     ParentDevicePath
     );
 
+  Status = EFI_SUCCESS;
   //
   // Enumerate the entire host bridge
   // After enumeration, a database that records all the device information will be created
   //
   //
-  Status = PciEnumerator (Controller);
+  if (gFullEnumeration) {
+    //
+    // Get the rootbridge Io protocol to find the host bridge handle
+    //
+    Status = gBS->OpenProtocol (
+                    Controller,
+                    &gEfiPciRootBridgeIoProtocolGuid,
+                    (VOID **) &PciRootBridgeIo,
+                    gPciBusDriverBinding.DriverBindingHandle,
+                    Controller,
+                    EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                    );
+
+    if (!EFI_ERROR (Status)) {
+      Status = PciEnumerator (Controller, PciRootBridgeIo->ParentHandle);
+    }
+  } else {
+    //
+    // If PCI bus has already done the full enumeration, never do it again
+    //
+    Status = PciEnumeratorLight (Controller);
+  }
 
   if (EFI_ERROR (Status)) {
     return Status;
@@ -337,6 +360,7 @@ PciBusDriverBindingStart (
   //
   StartPciDevices (Controller);
 
+  gFullEnumeration = FALSE;
   return EFI_SUCCESS;
 }
 
