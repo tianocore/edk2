@@ -1,7 +1,7 @@
 /** @file
   PCI eunmeration implementation on entire PCI bus system for PCI Bus module.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   This routine is used to enumerate entire pci bus system
   in a given platform.
 
-  @param Controller  Parent controller handle.
+  @param Controller          Parent controller handle.
+  @param HostBridgeHandle    Host bridge handle.
 
   @retval EFI_SUCCESS    PCI enumeration finished successfully.
   @retval other          Some error occurred when enumerating the pci bus system.
@@ -27,41 +28,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 EFI_STATUS
 PciEnumerator (
-  IN EFI_HANDLE                    Controller
+  IN EFI_HANDLE                    Controller,
+  IN EFI_HANDLE                    HostBridgeHandle
   )
 {
-  EFI_HANDLE                                        HostBridgeHandle;
   EFI_STATUS                                        Status;
   EFI_PCI_HOST_BRIDGE_RESOURCE_ALLOCATION_PROTOCOL  *PciResAlloc;
-  EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL                   *PciRootBridgeIo;
-
-  //
-  // If PCI bus has already done the full enumeration, never do it again
-  //
-  if (!gFullEnumeration) {
-    return PciEnumeratorLight (Controller);
-  }
-
-  //
-  // Get the rootbridge Io protocol to find the host bridge handle
-  //
-  Status = gBS->OpenProtocol (
-                  Controller,
-                  &gEfiPciRootBridgeIoProtocolGuid,
-                  (VOID **) &PciRootBridgeIo,
-                  gPciBusDriverBinding.DriverBindingHandle,
-                  Controller,
-                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  // Get the host bridge handle
-  //
-  HostBridgeHandle = PciRootBridgeIo->ParentHandle;
 
   //
   // Get the pci host bridge resource allocation protocol
@@ -131,8 +103,6 @@ PciEnumerator (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  gFullEnumeration = FALSE;
 
   Status = gBS->InstallProtocolInterface (
                   &HostBridgeHandle,
