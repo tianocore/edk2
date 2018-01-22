@@ -1105,7 +1105,7 @@ class DscParser(MetaFileParser):
     def _DefaultStoresParser(self):
         TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT)
         if len(TokenList) != 2:
-            EdkLogger.error('Parser', FORMAT_INVALID, "Correct format is '<Integer>|<UiName>'",
+            EdkLogger.error('Parser', FORMAT_INVALID, "Correct format is '<Number>|<UiName>'",
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
         self._ValueList[0:len(TokenList)] = TokenList
 

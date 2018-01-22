@@ -608,6 +608,14 @@ class DscBuildData(PlatformBuildClassObject):
                 if Record[1] in [None, '']:
                     EdkLogger.error('build', FORMAT_INVALID, 'No DefaultStores ID name',
                                     File=self.MetaFile, Line=Record[-1])
+                Pattern = re.compile('^[1-9]\d*|0$')
+                HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
+                if Pattern.match(Record[0]) == None and HexPattern.match(Record[0]) == None:
+                    EdkLogger.error('build', FORMAT_INVALID, "The format of the DefaultStores ID number is invalid. It only support Integer and HexNumber",
+                                    File=self.MetaFile, Line=Record[-1])
+                if not IsValidWord(Record[1]):
+                    EdkLogger.error('build', FORMAT_INVALID, "The format of the DefaultStores ID name is invalid. The correct format is '(a-zA-Z0-9_)(a-zA-Z0-9_-.)*'",
+                                    File=self.MetaFile, Line=Record[-1])
                 self.DefaultStores[Record[1].upper()] = (self.ToInt(Record[0]),Record[1].upper())
             if TAB_DEFAULT_STORES_DEFAULT not in self.DefaultStores:
                 self.DefaultStores[TAB_DEFAULT_STORES_DEFAULT] = (0,TAB_DEFAULT_STORES_DEFAULT)
