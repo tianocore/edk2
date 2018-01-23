@@ -1,7 +1,7 @@
 /** @file
   PTP (Platform TPM Profile) CRB (Command Response Buffer) interface used by dTPM2.0 library.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -240,8 +240,26 @@ PtpCrbTpmCommand (
              PTP_TIMEOUT_MAX
              );
   if (EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
-    goto Exit;
+    //
+    // Command Completion check timeout. Cancel the currently executing command by writing TPM_CRB_CTRL_CANCEL,
+    // Expect TPM_RC_CANCELLED or successfully completed response.
+    //
+    MmioWrite32((UINTN)&CrbReg->CrbControlCancel, PTP_CRB_CONTROL_CANCEL);
+    Status = PtpCrbWaitRegisterBits (
+               &CrbReg->CrbControlStart,
+               0,
+               PTP_CRB_CONTROL_START,
+               PTP_TIMEOUT_B
+               );
+    MmioWrite32((UINTN)&CrbReg->CrbControlCancel, 0);
+
+    if (EFI_ERROR(Status)) {
+      //
+      // Still in Command Execution state. Try to goIdle, the behavior is agnostic.
+      //
+      Status = EFI_DEVICE_ERROR;
+      goto Exit;
+    }
   }
 
   //
