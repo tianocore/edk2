@@ -1,7 +1,7 @@
 ## @file
 #  PC/AT Chipset Package
 #
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -46,6 +46,7 @@
   IoApicLib|PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
   LocalApicLib|UefiCpuPkg/Library/BaseXApicLib/BaseXApicLib.inf
   ReportStatusCodeLib|MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+  HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
 
 [Components]
   PcAtChipsetPkg/8254TimerDxe/8254Timer.inf
@@ -57,6 +58,7 @@
   PcAtChipsetPkg/Library/BaseIoApicLib/BaseIoApicLib.inf
   PcAtChipsetPkg/Library/AcpiTimerLib/BaseAcpiTimerLib.inf
   PcAtChipsetPkg/Library/AcpiTimerLib/DxeAcpiTimerLib.inf
+  PcAtChipsetPkg/Library/AcpiTimerLib/PeiAcpiTimerLib.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
 
 [BuildOptions]
