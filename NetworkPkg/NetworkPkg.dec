@@ -3,7 +3,7 @@
 #
 # This package provides network modules that conform to UEFI 2.4 specification.
 #
-# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 #
 # This program and the accompanying materials are licensed and made available under
@@ -20,7 +20,7 @@
   DEC_SPECIFICATION              = 0x00010005
   PACKAGE_NAME                   = NetworkPkg
   PACKAGE_GUID                   = 947988BE-8D5C-471a-893D-AD181C46BEBB
-  PACKAGE_VERSION                = 0.97
+  PACKAGE_VERSION                = 0.98
   PACKAGE_UNI_FILE               = NetworkPkg.uni
 
 [Includes]
