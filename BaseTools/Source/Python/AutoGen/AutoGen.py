@@ -1746,14 +1746,12 @@ class PlatformAutoGen(AutoGen):
                         if not FoundFlag :
                             # just pick the a value to determine whether is unicode string type
                             SkuValueMap = {}
+                            SkuObjList = DscPcdEntry.SkuInfoList.items()
                             DefaultSku = DscPcdEntry.SkuInfoList.get('DEFAULT')
                             if DefaultSku:
-                                PcdValue = DefaultSku.DefaultValue
-                                if PcdValue not in SkuValueMap:
-                                    SkuValueMap[PcdValue] = []
-                                    VpdFile.Add(DscPcdEntry, 'DEFAULT',DefaultSku.VpdOffset)
-                                SkuValueMap[PcdValue].append(DefaultSku)
-                            for (SkuName,Sku) in DscPcdEntry.SkuInfoList.items():
+                                defaultindex = SkuObjList.index(('DEFAULT',DefaultSku))
+                                SkuObjList[0],SkuObjList[defaultindex] = SkuObjList[defaultindex],SkuObjList[0]
+                            for (SkuName,Sku) in SkuObjList:
                                 Sku.VpdOffset = Sku.VpdOffset.strip() 
                                 
                                 # Need to iterate DEC pcd information to get the value & datumtype
