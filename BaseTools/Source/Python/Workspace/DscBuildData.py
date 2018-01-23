@@ -1298,8 +1298,11 @@ class DscBuildData(PlatformBuildClassObject):
             CApp = CApp + '  %s      *Pcd;  // From %s Line %d \n' % (Pcd.DatumType, Pcd.PkgPath, Pcd.PcdDefineLineNo)
             CApp = CApp + '\n'
 
-            Pcd.DefaultValue = Pcd.DefaultValue.strip()
-            PcdDefaultValue = StringToArray(Pcd.DefaultValue)
+            if SkuName in Pcd.SkuInfoList:
+                DefaultValue = Pcd.SkuInfoList[SkuName].DefaultStoreDict.get(DefaultStoreName,Pcd.SkuInfoList[SkuName].HiiDefaultValue) if Pcd.SkuInfoList[SkuName].HiiDefaultValue  else Pcd.SkuInfoList[SkuName].DefaultValue
+            else:
+                DefaultValue = Pcd.DefaultValue
+            PcdDefaultValue = StringToArray(DefaultValue.strip())
 
             InitByteValue += '%s.%s.%s.%s|%s|%s\n' % (SkuName, DefaultStoreName, Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Pcd.DatumType, PcdDefaultValue)
 

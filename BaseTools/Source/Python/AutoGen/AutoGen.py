@@ -1751,8 +1751,8 @@ class PlatformAutoGen(AutoGen):
                                 PcdValue = DefaultSku.DefaultValue
                                 if PcdValue not in SkuValueMap:
                                     SkuValueMap[PcdValue] = []
-                                    VpdFile.Add(DscPcdEntry, 'DEFAULT',Sku.VpdOffset)
-                                SkuValueMap[PcdValue].append(Sku)
+                                    VpdFile.Add(DscPcdEntry, 'DEFAULT',DefaultSku.VpdOffset)
+                                SkuValueMap[PcdValue].append(DefaultSku)
                             for (SkuName,Sku) in DscPcdEntry.SkuInfoList.items():
                                 Sku.VpdOffset = Sku.VpdOffset.strip() 
                                 
