@@ -1,7 +1,7 @@
 /** @file
   Library functions which relates with booting.
 
-Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1117,6 +1117,14 @@ BmMatchHttpBootDevicePath (
     if (CompareMem (Left, Right, DevicePathNodeLength (Left)) != 0) {
       if ((DevicePathType (Left) != MESSAGING_DEVICE_PATH) || (DevicePathType (Right) != MESSAGING_DEVICE_PATH)) {
         return FALSE;
+      }
+
+      if (DevicePathSubType (Left) == MSG_DNS_DP) {
+        Left = NextDevicePathNode (Left);
+      }
+
+      if (DevicePathSubType (Right) == MSG_DNS_DP) {
+        Right = NextDevicePathNode (Right);
       }
 
       if (((DevicePathSubType (Left) != MSG_IPv4_DP) || (DevicePathSubType (Right) != MSG_IPv4_DP)) &&
