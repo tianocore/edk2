@@ -1,7 +1,7 @@
 /** @file
   TIS (TPM Interface Specification) functions used by dTPM2.0 library.
   
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
@@ -295,10 +295,32 @@ Tpm2TisTpmCommand (
              TIS_TIMEOUT_MAX
              );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Wait for Tpm2 response data time out!!\n"));
-    Status = EFI_DEVICE_ERROR;
-    goto Exit;
+    //
+    // dataAvail check timeout. Cancel the currently executing command by writing commandCancel,
+    // Expect TPM_RC_CANCELLED or successfully completed response.
+    //
+    DEBUG ((DEBUG_ERROR, "Wait for Tpm2 response data time out. Trying to cancel the command!!\n"));
+
+    MmioWrite32((UINTN)&TisReg->Status, TIS_PC_STS_CANCEL);
+    Status = TisPcWaitRegisterBits (
+               &TisReg->Status,
+               (UINT8) (TIS_PC_VALID | TIS_PC_STS_DATA),
+               0,
+               TIS_TIMEOUT_B
+               );
+    //
+    // Do not clear CANCEL bit here bicoz Writes of 0 to this bit are ignored
+    //
+    if (EFI_ERROR (Status)) {
+      //
+      // Cancel executing command fail to get any response
+      // Try to abort the command with write of a 1 to commandReady in Command Execution state
+      //
+      Status = EFI_DEVICE_ERROR;
+      goto Exit;
+    }
   }
+
   //
   // Get response data header
   //
