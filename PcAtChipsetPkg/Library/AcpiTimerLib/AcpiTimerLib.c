@@ -1,7 +1,7 @@
 /** @file
   ACPI Timer implements one instance of Timer Library.
 
-  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -20,6 +20,8 @@
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
 #include <IndustryStandard/Acpi.h>
+
+GUID mFrequencyHobGuid = { 0x3fca54f6, 0xe1a2, 0x4b20, { 0xbe, 0x76, 0x92, 0x6b, 0x4b, 0x48, 0xbf, 0xaa }};
 
 /**
   Internal function to retrieves the 64-bit frequency in Hz.
