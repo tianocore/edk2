@@ -1915,6 +1915,9 @@ class DecParser(MetaFileParser):
                 if len(PcdNames) == 2:
                     self._CurrentStructurePcdName = ""
                 else:
+                    if self._CurrentStructurePcdName != TAB_SPLIT.join(PcdNames[:2]):
+                        EdkLogger.error('Parser', FORMAT_INVALID, "Pcd Name does not match: %s and %s " % (self._CurrentStructurePcdName , TAB_SPLIT.join(PcdNames[:2])),
+                                File=self.MetaFile, Line=self._LineIndex + 1)
                     self._ValueList[1] = TAB_SPLIT.join(PcdNames[2:])
                     self._ValueList[2] = PcdTockens[1]
         if not self._CurrentStructurePcdName:
