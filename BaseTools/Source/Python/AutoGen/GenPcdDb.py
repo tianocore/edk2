@@ -1024,6 +1024,19 @@ def NewCreatePcdDatabasePhaseSpecificAutoGen(Platform,Phase):
     def prune_sku(pcd,skuname):
         new_pcd = copy.deepcopy(pcd)
         new_pcd.SkuInfoList = {skuname:pcd.SkuInfoList[skuname]}
+        new_pcd.isinit = 'INIT'
+        if new_pcd.DatumType in ['UINT8','UINT16','UINT32','UINT64']:
+            for skuobj in pcd.SkuInfoList.values():
+                if skuobj.DefaultValue:
+                    defaultvalue = int(skuobj.DefaultValue,16) if skuobj.DefaultValue.upper().startswith("0X") else int(skuobj.DefaultValue,10)
+                    if defaultvalue  != 0:
+                        new_pcd.isinit = "INIT"
+                        break
+                elif skuobj.VariableName:
+                    new_pcd.isinit = "INIT"
+                    break
+            else:
+                new_pcd.isinit = "UNINIT"
         return new_pcd
     DynamicPcds = Platform.DynamicPcdList
     DynamicPcdSet_Sku = {(SkuName,skuobj.SkuId):[] for pcd in DynamicPcds for (SkuName,skuobj) in pcd.SkuInfoList.items() }
@@ -1401,8 +1414,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                     if Sku.DefaultValue == 'TRUE':
                         Pcd.InitString = 'INIT'
                     else:
-                        if int(Sku.DefaultValue, 0) != 0:
-                            Pcd.InitString = 'INIT'
+                        Pcd.InitString = Pcd.isinit
                 #
                 # For UNIT64 type PCD's value, ULL should be append to avoid
                 # warning under linux building environment.
