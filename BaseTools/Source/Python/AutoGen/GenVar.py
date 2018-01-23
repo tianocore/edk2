@@ -21,7 +21,7 @@ from Common.VariableAttributes import VariableAttributes
 from Common.Misc import *
 import collections
 
-var_info = collections.namedtuple("uefi_var", "pcdindex,pcdname,defaultstoragename,skuname,var_name, var_guid, var_attribute,pcd_default_value, default_value, data_type")
+var_info = collections.namedtuple("uefi_var", "pcdindex,pcdname,defaultstoragename,skuname,var_name, var_guid, var_offset,var_attribute,pcd_default_value, default_value, data_type")
 NvStorageHeaderSize = 28
 VariableHeaderSize = 32
 
@@ -76,7 +76,38 @@ class VariableMgr(object):
         value_str += ",".join(default_var_bin_strip)
         value_str += "}"
         return value_str
-
+    def combine_variable(self):
+        indexedvarinfo = collections.OrderedDict()
+        for item in self.VarInfo:
+            if (item.skuname,item.defaultstoragename, item.var_name,item.var_guid) not in indexedvarinfo:
+                indexedvarinfo[(item.skuname,item.defaultstoragename, item.var_name,item.var_guid) ] = []
+            indexedvarinfo[(item.skuname,item.defaultstoragename, item.var_name,item.var_guid)].append(item)
+        for key in indexedvarinfo:
+            sku_var_info_offset_list = indexedvarinfo[key]
+            if len(sku_var_info_offset_list) == 1:
+                continue
+            newvalue = {}
+            for item in sku_var_info_offset_list:
+                data_type = item.data_type
+                value_list = item.default_value.strip("{").strip("}").split(",")
+                if data_type in ["BOOLEAN","UINT8","UINT16","UINT32","UINT64"]:
+                    if data_type == ["BOOLEAN","UINT8"]:
+                        data_flag = "=B"
+                    elif data_type == "UINT16":
+                        data_flag = "=H"
+                    elif data_type == "UINT32":
+                        data_flag = "=L"
+                    elif data_type == "UINT64":
+                        data_flag = "=Q"
+                    data = value_list[0]
+                    value_list = []
+                    for data_byte in pack(data_flag,int(data,16) if data.upper().startswith('0X') else int(data)):
+                        value_list += [hex(unpack("B",data_byte)[0])]
+                newvalue[int(item.var_offset,16) if item.var_offset.upper().startswith("0X") else int(item.var_offset)] = value_list
+            newvaluestr = "{" + ",".join(reduce(lambda x,y: x+y, [newvalue[k] for k in sorted(newvalue.keys())] )) +"}"
+            n = sku_var_info_offset_list[0]
+            indexedvarinfo[key] =  [var_info(n.pcdindex,n.pcdname,n.defaultstoragename,n.skuname,n.var_name, n.var_guid, "0x00",n.var_attribute,newvaluestr  , newvaluestr , "VOID*")]
+        self.VarInfo = [item[0] for item in indexedvarinfo.values()]
     def process_variable_data(self):
 
         var_data = dict()
@@ -134,6 +165,7 @@ class VariableMgr(object):
         return var_data
 
     def new_process_varinfo(self):
+        self.combine_variable()
 
         var_data = self.process_variable_data()
 
