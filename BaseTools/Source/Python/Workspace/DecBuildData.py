@@ -383,6 +383,8 @@ class DecBuildData(PackageBuildClassObject):
                     struct_pcd.copy(item)
                     struct_pcd.TokenValue = struct_pcd.TokenValue.strip("{").strip()
                     struct_pcd.TokenSpaceGuidCName, struct_pcd.TokenCName = pcdname.split(".")
+                    struct_pcd.PcdDefineLineNo = LineNo
+                    struct_pcd.PkgPath = self.MetaFile.File
                 else:
                     struct_pcd.AddDefaultValue(item.TokenCName, item.DefaultValue,self.MetaFile.File,LineNo)
 

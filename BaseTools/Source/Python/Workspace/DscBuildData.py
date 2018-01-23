@@ -1295,7 +1295,7 @@ class DscBuildData(PlatformBuildClassObject):
             CApp = CApp + '  CHAR8   *Value;\n'
             CApp = CApp + '  UINT32  OriginalSize;\n'
             CApp = CApp + '  VOID    *OriginalPcd;\n'
-            CApp = CApp + '  %s      *Pcd;\n' % (Pcd.DatumType)
+            CApp = CApp + '  %s      *Pcd;  // From %s Line %d \n' % (Pcd.DatumType, Pcd.PkgPath, Pcd.PcdDefineLineNo)
             CApp = CApp + '\n'
 
             Pcd.DefaultValue = Pcd.DefaultValue.strip()
