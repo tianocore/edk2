@@ -843,14 +843,15 @@ FillExchangeInfoData (
       );
 
     ExchangeInfo->ModeTransitionMemory = (UINT32)CpuMpData->WakeupBufferHigh;
-    ExchangeInfo->ModeHighMemory = (UINT32)CpuMpData->WakeupBufferHigh +
-                                   (UINT32)ExchangeInfo->ModeOffset -
-                                   (UINT32)CpuMpData->AddressMap.ModeTransitionOffset;
-    ExchangeInfo->ModeHighSegment = (UINT16)ExchangeInfo->CodeSegment;
   } else {
     ExchangeInfo->ModeTransitionMemory = (UINT32)
       (ExchangeInfo->BufferStart + CpuMpData->AddressMap.ModeTransitionOffset);
   }
+
+  ExchangeInfo->ModeHighMemory = ExchangeInfo->ModeTransitionMemory +
+                         (UINT32)ExchangeInfo->ModeOffset -
+                         (UINT32)CpuMpData->AddressMap.ModeTransitionOffset;
+  ExchangeInfo->ModeHighSegment = (UINT16)ExchangeInfo->CodeSegment;
 }
 
 /**
