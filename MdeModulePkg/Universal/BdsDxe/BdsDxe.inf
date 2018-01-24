@@ -5,7 +5,7 @@
 #  gEfiBdsArchProtocolGuid. After DxeCore finish dispatching, DxeCore will invoke Entry
 #  interface of protocol gEfiBdsArchProtocolGuid, then BDS phase is entered.
 #  
-#  Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -78,7 +78,6 @@
                                                 ## SOMETIMES_CONSUMES ## Variable:L"ErrOut" (The device path of error out device)
   gConnectConInEventGuid                        ## SOMETIMES_CONSUMES ## Event
   gEdkiiStatusCodeDataTypeVariableGuid          ## SOMETIMES_CONSUMES ## GUID
-  gPerformanceProtocolGuid                      ## SOMETIMES_PRODUCES ## Variable:L"PerfDataMemAddr" (The ACPI address of performance data)
   gEfiEventReadyToBootGuid                      ## CONSUMES           ## Event
 
 [Protocols]
