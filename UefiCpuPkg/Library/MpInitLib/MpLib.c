@@ -823,19 +823,20 @@ FillExchangeInfoData (
   // Copy all 32-bit code and 64-bit code into memory with type of
   // EfiBootServicesCode to avoid page fault if NX memory protection is enabled.
   //
-  if (ExchangeInfo->ModeTransitionMemory != 0) {
+  if (CpuMpData->WakeupBufferHigh != 0) {
     Size = CpuMpData->AddressMap.RendezvousFunnelSize -
            CpuMpData->AddressMap.ModeTransitionOffset;
     CopyMem (
-      (VOID *)(UINTN)ExchangeInfo->ModeTransitionMemory,
+      (VOID *)CpuMpData->WakeupBufferHigh,
       CpuMpData->AddressMap.RendezvousFunnelAddress +
       CpuMpData->AddressMap.ModeTransitionOffset,
       Size
       );
 
-    ExchangeInfo->ModeHighMemory = ExchangeInfo->ModeTransitionMemory;
-    ExchangeInfo->ModeHighMemory += (UINT32)ExchangeInfo->ModeOffset -
-               (UINT32)CpuMpData->AddressMap.ModeTransitionOffset;
+    ExchangeInfo->ModeTransitionMemory = (UINT32)CpuMpData->WakeupBufferHigh;
+    ExchangeInfo->ModeHighMemory = (UINT32)CpuMpData->WakeupBufferHigh +
+                                   (UINT32)ExchangeInfo->ModeOffset -
+                                   (UINT32)CpuMpData->AddressMap.ModeTransitionOffset;
     ExchangeInfo->ModeHighSegment = (UINT16)ExchangeInfo->CodeSegment;
   } else {
     ExchangeInfo->ModeTransitionMemory = (UINT32)
@@ -916,11 +917,10 @@ AllocateResetVector (
     CpuMpData->WakeupBuffer      = GetWakeupBuffer (ApResetVectorSize);
     CpuMpData->MpCpuExchangeInfo = (MP_CPU_EXCHANGE_INFO *) (UINTN)
                     (CpuMpData->WakeupBuffer + CpuMpData->AddressMap.RendezvousFunnelSize);
-    CpuMpData->MpCpuExchangeInfo->ModeTransitionMemory = (UINT32)
-                    GetModeTransitionBuffer (
-                      CpuMpData->AddressMap.RendezvousFunnelSize -
-                      CpuMpData->AddressMap.ModeTransitionOffset
-                      );
+    CpuMpData->WakeupBufferHigh  = GetModeTransitionBuffer (
+                                    CpuMpData->AddressMap.RendezvousFunnelSize -
+                                    CpuMpData->AddressMap.ModeTransitionOffset
+                                    );
   }
   BackupAndPrepareWakeupBuffer (CpuMpData);
 }
