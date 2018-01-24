@@ -335,7 +335,7 @@ Returns:
       printf("%x\n", Byte);
       Value = End + 1;
     }
-    Buffer = malloc(*Size);
+    Buffer = malloc(*Size + 1);
     if (Buffer == NULL) {
       *Size = 0;
       return NULL;
