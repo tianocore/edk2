@@ -22,7 +22,6 @@
 
 #include <Guid/AcpiS3Context.h>
 #include <Guid/BootScriptExecutorVariable.h>
-#include <Guid/Performance.h>
 #include <Guid/ExtendedFirmwarePerformance.h>
 #include <Guid/EndOfS3Resume.h>
 #include <Ppi/ReadOnlyVariable2.h>
@@ -286,132 +285,6 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST IA32_DESCRIPTOR mGdt = {
   (UINTN) mGdtEntries
   };
 
-/**
-  Performance measure function to get S3 detailed performance data.
-
-  This function will getS3 detailed performance data and saved in pre-reserved ACPI memory.
-**/
-VOID
-WriteToOsS3PerformanceData (
-  VOID
-  )
-{
-  EFI_STATUS                                    Status;
-  EFI_PHYSICAL_ADDRESS                          mAcpiLowMemoryBase;
-  PERF_HEADER                                   *PerfHeader;
-  PERF_DATA                                     *PerfData;
-  UINT64                                        Ticker;
-  UINTN                                         Index;
-  EFI_PEI_READ_ONLY_VARIABLE2_PPI               *VariableServices;
-  UINTN                                         VarSize;
-  UINTN                                         LogEntryKey;
-  CONST VOID                                    *Handle;
-  CONST CHAR8                                   *Token;
-  CONST CHAR8                                   *Module;
-  UINT64                                        StartTicker;
-  UINT64                                        EndTicker;
-  UINT64                                        StartValue;
-  UINT64                                        EndValue;
-  BOOLEAN                                       CountUp;
-  UINT64                                        Freq;
-
-  //
-  // Retrieve time stamp count as early as possible
-  //
-  Ticker = GetPerformanceCounter ();
-
-  Freq   = GetPerformanceCounterProperties (&StartValue, &EndValue);
-
-  Freq   = DivU64x32 (Freq, 1000);
-
-  Status = PeiServicesLocatePpi (
-             &gEfiPeiReadOnlyVariable2PpiGuid,
-             0,
-             NULL,
-             (VOID **) &VariableServices
-             );
-  if (EFI_ERROR (Status)) {
-    return;
-  }
-
-  VarSize   = sizeof (EFI_PHYSICAL_ADDRESS);
-  Status = VariableServices->GetVariable (
-                               VariableServices,
-                               L"PerfDataMemAddr",
-                               &gPerformanceProtocolGuid,
-                               NULL,
-                               &VarSize,
-                               &mAcpiLowMemoryBase
-                               );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Fail to retrieve variable to log S3 performance data \n"));
-    return;
-  }
-
-  PerfHeader = (PERF_HEADER *) (UINTN) mAcpiLowMemoryBase;
-
-  if (PerfHeader->Signiture != PERFORMANCE_SIGNATURE) {
-    DEBUG ((EFI_D_ERROR, "Performance data in ACPI memory get corrupted! \n"));
-    return;
-  }
-
-  //
-  // Record total S3 resume time.
-  //
-  if (EndValue >= StartValue) {
-    PerfHeader->S3Resume = Ticker - StartValue;
-    CountUp              = TRUE;
-  } else {
-    PerfHeader->S3Resume = StartValue - Ticker;
-    CountUp              = FALSE;
-  }
-
-  //
-  // Get S3 detailed performance data
-  //
-  Index = 0;
-  LogEntryKey = 0;
-  while ((LogEntryKey = GetPerformanceMeasurement (
-                          LogEntryKey,
-                          &Handle,
-                          &Token,
-                          &Module,
-                          &StartTicker,
-                          &EndTicker)) != 0) {
-    if (EndTicker != 0) {
-      PerfData = &PerfHeader->S3Entry[Index];
-
-      //
-      // Use File Handle to specify the different performance log for PEIM.
-      // File Handle is the base address of PEIM FFS file.
-      //
-      if ((AsciiStrnCmp (Token, "PEIM", PEI_PERFORMANCE_STRING_SIZE) == 0) && (Handle != NULL)) {
-        AsciiSPrint (PerfData->Token, PERF_TOKEN_LENGTH, "0x%11p", Handle);
-      } else {
-        AsciiStrnCpyS (PerfData->Token, PERF_TOKEN_SIZE, Token, PERF_TOKEN_LENGTH);
-      }
-      if (StartTicker == 1) {
-        StartTicker = StartValue;
-      }
-      if (EndTicker == 1) {
-        EndTicker = StartValue;
-      }
-      Ticker = CountUp? (EndTicker - StartTicker) : (StartTicker - EndTicker);
-      PerfData->Duration = (UINT32) DivU64x32 (Ticker, (UINT32) Freq);
-
-      //
-      // Only Record > 1ms performance data so that more big performance can be recorded.
-      //
-      if ((Ticker > Freq) && (++Index >= PERF_PEI_ENTRY_MAX_NUM)) {
-        //
-        // Reach the maximum number of PEI performance log entries.
-        //
-        break;
-      }
-    }
-  }
-  PerfHeader->S3EntryNum = (UINT32) Index;
-}
 
 /**
   The function will check if current waking vector is long mode.
@@ -603,10 +476,6 @@ S3ResumeBootOs (
   // report status code on S3 resume
   //
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_OS_WAKE);
-
-  PERF_CODE (
-    WriteToOsS3PerformanceData ();
-    );
 
   AsmTransferControl = (ASM_TRANSFER_CONTROL)(UINTN)PeiS3ResumeState->AsmTransferControl;
   if (Facs->XFirmwareWakingVector != 0) {

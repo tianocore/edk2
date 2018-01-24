@@ -5,7 +5,7 @@
 # This module will excute the boot script saved during last boot and after that,
 # control is passed to OS waking up handler.
 #
-# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
@@ -73,7 +73,6 @@
 [Guids]
   gEfiBootScriptExecutorVariableGuid            ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
   gEfiBootScriptExecutorContextGuid             ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
-  gPerformanceProtocolGuid                      ## SOMETIMES_CONSUMES ## Variable:L"PerfDataMemAddr"
   ## SOMETIMES_CONSUMES ## HOB
   ## SOMETIMES_CONSUMES ## UNDEFINED # LockBox
   gEfiAcpiVariableGuid
