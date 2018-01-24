@@ -822,7 +822,7 @@ FbGopCheckForVbe (
   BitsPerPixel         = pFbInfo->BitsPerPixel;
   HorizontalResolution = pFbInfo->HorizontalResolution;
   VerticalResolution   = pFbInfo->VerticalResolution;
-  BytesPerScanLine     = HorizontalResolution * (BitsPerPixel / 8);
+  BytesPerScanLine     = pFbInfo->BytesPerScanLine;
   
   ModeBuffer = (FB_VIDEO_MODE_DATA *) AllocatePool (
 																						ModeNumber * sizeof (FB_VIDEO_MODE_DATA)
