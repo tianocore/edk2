@@ -51,7 +51,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/MemoryTypeInformation.h>
 #include <Guid/FileInfo.h>
 #include <Guid/GlobalVariable.h>
-#include <Guid/Performance.h>
 #include <Guid/StatusCodeDataTypeVariable.h>
 
 #include <Library/PrintLib.h>
@@ -182,22 +181,6 @@ EFI_STATUS
 BmGetFreeOptionNumber (
   IN  EFI_BOOT_MANAGER_LOAD_OPTION_TYPE LoadOptionType,
   OUT UINT16                            *FreeOptionNumber
-  );
-
-/**
-
-  Writes performance data of booting into the allocated memory.
-  OS can process these records.
-
-  @param  Event                 The triggered event.
-  @param  Context               Context for this event.
-
-**/
-VOID
-EFIAPI
-BmWriteBootToOsPerformanceData (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
   );
 
 /**
