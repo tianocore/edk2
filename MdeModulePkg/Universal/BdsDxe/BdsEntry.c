@@ -5,7 +5,7 @@
   After DxeCore finish DXE phase, gEfiBdsArchProtocolGuid->BdsEntry will be invoked
   to enter BDS phase.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 This program and the accompanying materials
@@ -635,57 +635,6 @@ BdsFormalizeEfiGlobalVariable (
 }
 
 /**
-
-  Allocate a block of memory that will contain performance data to OS.
-
-**/
-VOID
-BdsAllocateMemoryForPerformanceData (
-  VOID
-  )
-{
-  EFI_STATUS                    Status;
-  EFI_PHYSICAL_ADDRESS          AcpiLowMemoryBase;
-  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
-
-  AcpiLowMemoryBase = 0x0FFFFFFFFULL;
-
-  //
-  // Allocate a block of memory that will contain performance data to OS.
-  //
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  EFI_SIZE_TO_PAGES (PERF_DATA_MAX_LENGTH),
-                  &AcpiLowMemoryBase
-                  );
-  if (!EFI_ERROR (Status)) {
-    //
-    // Save the pointer to variable for use in S3 resume.
-    //
-    Status = BdsDxeSetVariableAndReportStatusCodeOnError (
-               L"PerfDataMemAddr",
-               &gPerformanceProtocolGuid,
-               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-               sizeof (EFI_PHYSICAL_ADDRESS),
-               &AcpiLowMemoryBase
-               );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[Bds] PerfDataMemAddr (%08x) cannot be saved to NV storage.\n", AcpiLowMemoryBase));
-    }
-    //
-    // Mark L"PerfDataMemAddr" variable to read-only if the Variable Lock protocol exists
-    // Still lock it even the variable cannot be saved to prevent it's set by 3rd party code.
-    //
-    Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
-    if (!EFI_ERROR (Status)) {
-      Status = VariableLock->RequestToLock (VariableLock, L"PerfDataMemAddr", &gPerformanceProtocolGuid);
-      ASSERT_EFI_ERROR (Status);
-    }
-  }
-}
-
-/**
   Enter an infinite loop of calling the Boot Manager Menu.
 
   This is a last resort alternative to BdsEntry() giving up for good. This
@@ -779,10 +728,6 @@ BdsEntry (
   PERF_END (NULL, "DXE", NULL, 0);
   PERF_START (NULL, "BDS", NULL, 0);
   DEBUG ((EFI_D_INFO, "[Bds] Entry...\n"));
-
-  PERF_CODE (
-    BdsAllocateMemoryForPerformanceData ();
-  );
 
   //
   // Fill in FirmwareVendor and FirmwareRevision from PCDs
