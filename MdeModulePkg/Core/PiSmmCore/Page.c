@@ -1,7 +1,7 @@
 /** @file
   SMM Memory page management functions.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
   distribution.  The full text of the license may be found at
@@ -246,6 +246,8 @@ RemoveOldEntry (
   )
 {
   RemoveEntryList (&Entry->Link);
+  Entry->Link.ForwardLink = NULL;
+
   if (!Entry->FromStack) {
     InsertTailList (&mFreeMemoryMapEntryList, &Entry->Link);
   }
