@@ -67,7 +67,7 @@ class PcdClassObject(object):
         self.DscDefaultValue = None
         if IsDsc:
             self.DscDefaultValue = Value
-        
+
     ## Convert the class to a string
     #
     #  Convert each member of the class to string
@@ -109,7 +109,11 @@ class PcdClassObject(object):
         return hash((self.TokenCName, self.TokenSpaceGuidCName))
 
 class StructurePcd(PcdClassObject):
-    def __init__(self, StructuredPcdIncludeFile="", Packages=None, Name=None, Guid=None, Type=None, DatumType=None, Value=None, Token=None, MaxDatumSize=None, SkuInfoList={}, IsOverrided=False, GuidValue=None, validateranges=[], validlists=[], expressions=[],default_store = TAB_DEFAULT_STORES_DEFAULT):
+    def __init__(self, StructuredPcdIncludeFile=None, Packages=None, Name=None, Guid=None, Type=None, DatumType=None, Value=None, Token=None, MaxDatumSize=None, SkuInfoList=None, IsOverrided=False, GuidValue=None, validateranges=None, validlists=None, expressions=None,default_store = TAB_DEFAULT_STORES_DEFAULT):
+        if SkuInfoList is None: SkuInfoList={}
+        if validateranges is None: validateranges=[]
+        if validlists is None: validlists=[]
+        if expressions is None : expressions=[]
         super(StructurePcd, self).__init__(Name, Guid, Type, DatumType, Value, Token, MaxDatumSize, SkuInfoList, IsOverrided, GuidValue, validateranges, validlists, expressions)
         self.StructuredPcdIncludeFile = StructuredPcdIncludeFile
         self.PackageDecs = Packages
@@ -441,4 +445,3 @@ class PlatformBuildClassObject(object):
     #
     def __hash__(self):
         return hash(self.MetaFile)
-
