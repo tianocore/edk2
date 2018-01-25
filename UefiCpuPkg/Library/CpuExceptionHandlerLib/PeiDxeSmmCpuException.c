@@ -1,7 +1,7 @@
 /** @file
   CPU Exception Library provides PEI/DXE/SMM CPU common exception handler.
 
-Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -98,6 +98,10 @@ CommonExceptionHandlerWorker (
     while (!AcquireSpinLockOrFail (&ExceptionHandlerData->DisplayMessageSpinLock)) {
       CpuPause ();
     }
+    //
+    // Initialize the serial port before dumping.
+    //
+    SerialPortInitialize ();
     //
     // Display ExceptionType, CPU information and Image information
     //
