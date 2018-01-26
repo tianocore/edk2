@@ -639,6 +639,13 @@ ApWakeupFunction (
         // Restore AP's volatile registers saved
         //
         RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
+      } else {
+        //
+        // The CPU driver might not flush TLB for APs on spot after updating
+        // page attributes. AP in mwait loop mode needs to take care of it when
+        // woken up.
+        //
+        CpuFlushTlb ();
       }
 
       if (GetApState (&CpuMpData->CpuData[ProcessorNumber]) == CpuStateReady) {
