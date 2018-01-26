@@ -1,7 +1,7 @@
 /** @file
   PEI IOMMU PPI.
 
-Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -69,6 +69,8 @@ typedef struct _EDKII_IOMMU_PPI  EDKII_IOMMU_PPI;
   @retval EFI_UNSUPPORTED        The IOMMU does not support the memory range specified by Mapping.
   @retval EFI_OUT_OF_RESOURCES   There are not enough resources available to modify the IOMMU access.
   @retval EFI_DEVICE_ERROR       The IOMMU device reported an error while attempting the operation.
+  @retval EFI_NOT_AVAILABLE_YET  DMA protection has been enabled, but DMA buffer are
+                                 not available to be allocated yet.
 
 **/
 typedef
@@ -97,6 +99,8 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
   @retval EFI_DEVICE_ERROR      The system hardware could not map the requested address.
+  @retval EFI_NOT_AVAILABLE_YET DMA protection has been enabled, but DMA buffer are
+                                not available to be allocated yet.
 
 **/
 typedef
@@ -119,6 +123,9 @@ EFI_STATUS
   @retval EFI_SUCCESS           The range was unmapped.
   @retval EFI_INVALID_PARAMETER Mapping is not a value that was returned by Map().
   @retval EFI_DEVICE_ERROR      The data was not committed to the target system memory.
+  @retval EFI_NOT_AVAILABLE_YET DMA protection has been enabled, but DMA buffer are
+                                not available to be allocated yet.
+
 **/
 typedef
 EFI_STATUS
@@ -144,6 +151,8 @@ EFI_STATUS
                                 MEMORY_WRITE_COMBINE, MEMORY_CACHED and DUAL_ADDRESS_CYCLE.
   @retval EFI_INVALID_PARAMETER One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES  The memory pages could not be allocated.
+  @retval EFI_NOT_AVAILABLE_YET DMA protection has been enabled, but DMA buffer are
+                                not available to be allocated yet.
 
 **/
 typedef
@@ -159,13 +168,15 @@ EFI_STATUS
 /**
   Frees memory that was allocated with AllocateBuffer().
 
-  @param  This                  The protocol instance pointer.
+  @param  This                  The PPI instance pointer.
   @param  Pages                 The number of pages to free.
   @param  HostAddress           The base system memory address of the allocated range.
 
   @retval EFI_SUCCESS           The requested memory pages were freed.
   @retval EFI_INVALID_PARAMETER The memory range specified by HostAddress and Pages
                                 was not allocated with AllocateBuffer().
+  @retval EFI_NOT_AVAILABLE_YET DMA protection has been enabled, but DMA buffer are
+                                not available to be allocated yet.
 
 **/
 typedef
