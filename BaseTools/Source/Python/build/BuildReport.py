@@ -37,6 +37,7 @@ from Common.InfClassObject import gComponentType2ModuleType
 from Common.BuildToolError import FILE_WRITE_FAILURE
 from Common.BuildToolError import CODE_ERROR
 from Common.BuildToolError import COMMAND_FAILURE
+from Common.BuildToolError import FORMAT_INVALID
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 import Common.GlobalData as GlobalData
@@ -45,7 +46,7 @@ from Common.Misc import PathClass
 from Common.String import NormPath
 from Common.DataType import *
 import collections
-from Common.Expression import ValueExpressionEx
+from Common.Expression import *
 
 ## Pattern to extract contents in EDK DXS files
 gDxsDependencyPattern = re.compile(r"DEPENDENCY_START(.+)DEPENDENCY_END", re.DOTALL)
@@ -955,7 +956,11 @@ class PcdReport(object):
                     DscDefaultValBak = DscDefaultValue
                     DscDefaultValue = self.FdfPcdSet.get((Pcd.TokenCName, Key), DscDefaultValue)
                     if DscDefaultValue != DscDefaultValBak:
-                        DscDefaultValue = ValueExpressionEx(DscDefaultValue, Pcd.DatumType, self._GuidDict)(True)
+                        try:
+                            DscDefaultValue = ValueExpressionEx(DscDefaultValue, Pcd.DatumType, self._GuidDict)(True)
+                        except BadExpression, Value:
+                            EdkLogger.error('BuildReport', FORMAT_INVALID, "PCD Value: %s, Type: %s" %(DscDefaultValue, Pcd.DatumType))
+
                     InfDefaultValue = None
                     
                     PcdValue = DecDefaultValue
