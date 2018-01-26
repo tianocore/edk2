@@ -1593,6 +1593,8 @@ class DscParser(MetaFileParser):
                 ValList[Index] = ValueExpression(PcdValue, self._Macros)(True)
             except WrnExpression, Value:
                 ValList[Index] = Value.result
+            except:
+                pass
 
         if ValList[Index] == 'True':
             ValList[Index] = '1'
@@ -1989,14 +1991,6 @@ class DecParser(MetaFileParser):
 
             PcdValue = ValueList[0]
             if PcdValue:
-                try:
-                    ValueList[0] = ValueExpression(PcdValue, self._AllPcdDict)(True)
-                except WrnExpression, Value:
-                    ValueList[0] = Value.result
-                except BadExpression, Value:
-                    EdkLogger.error('Parser', FORMAT_INVALID, Value, File=self.MetaFile, Line=self._LineIndex + 1)
-
-            if ValueList[0]:
                 try:
                     ValueList[0] = ValueExpressionEx(ValueList[0], ValueList[1], self._GuidDict)(True)
                 except BadExpression, Value:

@@ -1245,6 +1245,7 @@ class PlatformAutoGen(AutoGen):
         # get the original module/package/platform objects
         self.BuildDatabase = Workspace.BuildDatabase
         self.DscBuildDataObj = Workspace.Platform
+        self._GuidDict = Workspace._GuidDict
 
         # flag indicating if the makefile/C-code file has been created or not
         self.IsMakeFileCreated  = False
@@ -2463,22 +2464,9 @@ class PlatformAutoGen(AutoGen):
             if FromPcd.SkuInfoList not in [None, '', []]:
                 ToPcd.SkuInfoList = FromPcd.SkuInfoList
             # Add Flexible PCD format parse
-            PcdValue = ToPcd.DefaultValue
-            if PcdValue:
-                try:
-                    ToPcd.DefaultValue = ValueExpression(PcdValue)(True)
-                except WrnExpression, Value:
-                    ToPcd.DefaultValue = Value.result
-                except BadExpression, Value:
-                    EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %(ToPcd.TokenSpaceGuidCName, ToPcd.TokenCName, ToPcd.DefaultValue, Value),
-                                    File=self.MetaFile)
             if ToPcd.DefaultValue:
-                _GuidDict = {}
-                for Pkg in self.PackageList:
-                    Guids = Pkg.Guids
-                    _GuidDict.update(Guids)
                 try:
-                    ToPcd.DefaultValue = ValueExpressionEx(ToPcd.DefaultValue, ToPcd.DatumType, _GuidDict)(True)
+                    ToPcd.DefaultValue = ValueExpressionEx(ToPcd.DefaultValue, ToPcd.DatumType, self._GuidDict)(True)
                 except BadExpression, Value:
                     EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %(ToPcd.TokenSpaceGuidCName, ToPcd.TokenCName, ToPcd.DefaultValue, Value),
                                         File=self.MetaFile)

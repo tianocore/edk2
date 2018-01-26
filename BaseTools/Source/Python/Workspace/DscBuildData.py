@@ -825,13 +825,14 @@ class DscBuildData(PlatformBuildClassObject):
                 if ValueList[2] == '-1':
                     EdkLogger.error('build', FORMAT_INVALID, "Pcd format incorrect.", File=self.MetaFile, Line=LineNo,
                                 ExtraData="%s.%s|%s" % (TokenSpaceGuid, PcdCName, Setting))
-        if ValueList[Index] and PcdType not in [MODEL_PCD_FEATURE_FLAG, MODEL_PCD_FIXED_AT_BUILD]:
+        if ValueList[Index]:
+            DatumType = self._DecPcds[PcdCName, TokenSpaceGuid].DatumType
             try:
-                ValueList[Index] = ValueExpression(ValueList[Index], GlobalData.gPlatformPcds)(True)
-            except WrnExpression, Value:
-                ValueList[Index] = Value.result
+                ValueList[Index] = ValueExpressionEx(ValueList[Index], DatumType, self._GuidDict)(True)
             except BadExpression, Value:
-                EdkLogger.error('Parser', FORMAT_INVALID, Value, File=self.MetaFile, Line=self._LineIndex + 1)
+                EdkLogger.error('Parser', FORMAT_INVALID, Value, File=self.MetaFile, Line=LineNo,
+                                ExtraData="PCD [%s.%s] Value \"%s\" " % (
+                                TokenSpaceGuid, PcdCName, ValueList[Index]))
             except EvaluationException, Excpt:
                 if hasattr(Excpt, 'Pcd'):
                     if Excpt.Pcd in GlobalData.gPlatformOtherPcds:
@@ -845,13 +846,8 @@ class DscBuildData(PlatformBuildClassObject):
                 else:
                     EdkLogger.error('Parser', FORMAT_INVALID, "Invalid expression: %s" % str(Excpt),
                                     File=self.MetaFile, Line=LineNo)
+
         if ValueList[Index]:
-            DatumType = self._DecPcds[PcdCName, TokenSpaceGuid].DatumType
-            try:
-                ValueList[Index] = ValueExpressionEx(ValueList[Index], DatumType, self._GuidDict)(True)
-            except BadExpression, Value:
-                EdkLogger.error('Parser', FORMAT_INVALID, Value, File=self.MetaFile, Line=LineNo,
-                                ExtraData="PCD [%s.%s] Value \"%s\" " % (TokenSpaceGuid, PcdCName, ValueList[Index]))
             Valid, ErrStr = CheckPcdDatum(self._DecPcds[PcdCName, TokenSpaceGuid].DatumType, ValueList[Index])
             if not Valid:
                 EdkLogger.error('build', FORMAT_INVALID, ErrStr, File=self.MetaFile, Line=LineNo,
@@ -860,6 +856,9 @@ class DscBuildData(PlatformBuildClassObject):
                 if self._DecPcds[PcdCName, TokenSpaceGuid].DatumType.strip() != ValueList[1].strip():
                     EdkLogger.error('build', FORMAT_INVALID, ErrStr , File=self.MetaFile, Line=LineNo,
                                 ExtraData="%s.%s|%s" % (TokenSpaceGuid, PcdCName, Setting))
+        if (TokenSpaceGuid + '.' + PcdCName) in GlobalData.gPlatformPcds:
+            if GlobalData.gPlatformPcds[TokenSpaceGuid + '.' + PcdCName] != ValueList[Index]:
+                GlobalData.gPlatformPcds[TokenSpaceGuid + '.' + PcdCName] = ValueList[Index]
         return ValueList
 
     def _FilterPcdBySkuUsage(self,Pcds):
