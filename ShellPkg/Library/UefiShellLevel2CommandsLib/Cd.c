@@ -3,7 +3,7 @@
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -102,7 +102,7 @@ IsCurrentFileSystem (
   if (((UINTN) Splitter1 - (UINTN) FullPath) != ((UINTN) Splitter2 - (UINTN) Cwd)) {
     return FALSE;
   } else {
-    if (StrniCmp (FullPath, Cwd, ((UINTN) Splitter1 - (UINTN) FullPath) / sizeof (CHAR16)) == NULL) {
+    if (StrniCmp (FullPath, Cwd, ((UINTN) Splitter1 - (UINTN) FullPath) / sizeof (CHAR16)) == 0) {
       return TRUE;
     } else {
       return FALSE;

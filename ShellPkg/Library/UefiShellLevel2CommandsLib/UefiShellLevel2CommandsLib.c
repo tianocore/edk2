@@ -22,7 +22,7 @@
   * functions are non-interactive only
 
   Copyright (c) 2014 Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -261,50 +261,53 @@ VerifyIntermediateDirectories (
 }
 
 /**
-  Be lazy and borrow from baselib.
-
-  @param[in] Char   The character to convert to upper case.
-
-  @return Char as an upper case character.
-**/
-CHAR16
-EFIAPI
-InternalCharToUpper (
-  IN      CHAR16                    Char
-  );
-
-/**
   String comparison without regard to case for a limited number of characters.
 
   @param[in] Source   The first item to compare.
   @param[in] Target   The second item to compare.
   @param[in] Count    How many characters to compare.
 
-  @retval NULL Source and Target are identical strings without regard to case.
-  @return The location in Source where there is a difference.
+  @retval 0    Source and Target are identical strings without regard to case.
+  @retval !=0  Source is not identical to Target.
+  
 **/
-CONST CHAR16*
+INTN
 StrniCmp(
   IN CONST CHAR16 *Source,
   IN CONST CHAR16 *Target,
   IN CONST UINTN  Count
   )
 {
-  UINTN   LoopCount;
-  CHAR16  Char1;
-  CHAR16  Char2;
+  CHAR16                    *SourceCopy;
+  CHAR16                    *TargetCopy;
+  UINTN                     SourceLength;
+  UINTN                     TargetLength;
+  INTN                      Result;
 
-  ASSERT(Source != NULL);
-  ASSERT(Target != NULL);
-
-  for (LoopCount = 0 ; LoopCount < Count ; LoopCount++) {
-    Char1 = InternalCharToUpper(Source[LoopCount]);
-    Char2 = InternalCharToUpper(Target[LoopCount]);
-    if (Char1 != Char2) {
-      return (&Source[LoopCount]);
-    }
+  if (Count == 0) {
+    return 0;
   }
-  return (NULL);
+
+  SourceLength = StrLen (Source);
+  TargetLength = StrLen (Target);
+  SourceLength = MIN (SourceLength, Count);
+  TargetLength = MIN (TargetLength, Count);
+  SourceCopy = AllocateCopyPool ((SourceLength + 1) * sizeof (CHAR16), Source);
+  if (SourceCopy == NULL) {
+    return -1;
+  }
+  TargetCopy = AllocateCopyPool ((TargetLength + 1) * sizeof (CHAR16), Target);
+  if (TargetCopy == NULL) {
+    FreePool (SourceCopy);
+    return -1;
+  }
+  
+  SourceCopy[SourceLength] = L'\0';
+  TargetCopy[TargetLength] = L'\0';
+  Result = gUnicodeCollation->StriColl (gUnicodeCollation, SourceCopy, TargetCopy);
+  FreePool (SourceCopy);
+  FreePool (TargetCopy);
+  return Result;
 }
 
 

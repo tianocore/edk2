@@ -280,16 +280,17 @@ VerifyIntermediateDirectories (
   );
 
 /**
-  CaseInsensitive length limited string comparison.
+  String comparison without regard to case for a limited number of characters.
 
-  @param[in] Source   Pointer to first string.
-  @param[in] Target   Pointer to second string.
-  @param[in] Count    Number of characters to compare.
+  @param[in] Source   The first item to compare.
+  @param[in] Target   The second item to compare.
+  @param[in] Count    How many characters to compare.
 
-  @retval 0   The strings are the same.
-  @return     non-zero if the strings are different.
+  @retval 0    Source and Target are identical strings without regard to case.
+  @retval !=0  Source is not identical to Target.
+  
 **/
-CONST CHAR16*
+INTN
 StrniCmp(
   IN CONST CHAR16 *Source,
   IN CONST CHAR16 *Target,

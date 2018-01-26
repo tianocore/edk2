@@ -2,7 +2,7 @@
   Main file for time, timezone, and date shell level 2 and shell level 3 functions.
 
   (C) Copyright 2012-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -550,7 +550,7 @@ ShellCommandRunTime (
           // perform level 3 operation here.
           //
           if ((TempLocation = ShellCommandLineGetValue(Package, L"-tz")) != NULL) {
-            if (StrniCmp (TempLocation, L"_local", StrLen (TempLocation)) == NULL) {
+            if (gUnicodeCollation->StriColl(gUnicodeCollation, (CHAR16 *)TempLocation, L"_local") == 0) {
               Tz = EFI_UNSPECIFIED_TIMEZONE;
             } else if (TempLocation[0] == L'-') {
 
@@ -713,7 +713,7 @@ CheckAndSetTimeZone (
     return (SHELL_INVALID_PARAMETER);
   }
 
-  if (StrniCmp (TimeZoneString, L"_local", StrLen (TimeZoneString)) == NULL) {
+  if (gUnicodeCollation->StriColl(gUnicodeCollation, (CHAR16 *)TimeZoneString, L"_local") == 0) {
     Status = gRT->GetTime (&TheTime, NULL);
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"gRT->GetTime", Status);
