@@ -1,7 +1,7 @@
 /** @file
   Provides interface to shell internal functions for shell commands.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 
@@ -72,14 +72,70 @@ CommandInit(
   VOID
   )
 {
-  EFI_STATUS Status;
-  if (gUnicodeCollation == NULL) {
-    Status = gBS->LocateProtocol(&gEfiUnicodeCollation2ProtocolGuid, NULL, (VOID**)&gUnicodeCollation);
-    if (EFI_ERROR(Status)) {
-      return (EFI_DEVICE_ERROR);
-    }
+  UINTN                           NumHandles;
+  EFI_HANDLE                      *Handles;
+  EFI_UNICODE_COLLATION_PROTOCOL  *Uc;
+  CHAR8                           *BestLanguage;
+  UINTN                           Index;
+  EFI_STATUS                      Status;
+  CHAR8                           *PlatformLang;
+  
+  GetEfiGlobalVariable2 (EFI_PLATFORM_LANG_VARIABLE_NAME, (VOID**)&PlatformLang, NULL);
+  if (PlatformLang == NULL) {
+    return EFI_UNSUPPORTED;
   }
-  return (EFI_SUCCESS);
+
+  if (gUnicodeCollation == NULL) {
+    Status = gBS->LocateHandleBuffer (
+                    ByProtocol,
+                    &gEfiUnicodeCollation2ProtocolGuid,
+                    NULL,
+                    &NumHandles,
+                    &Handles
+                    );
+    if (EFI_ERROR (Status)) {
+      NumHandles = 0;
+      Handles    = NULL;
+    }
+    for (Index = 0; Index < NumHandles; Index++) {
+      //
+      // Open Unicode Collation Protocol
+      //
+      Status = gBS->OpenProtocol (
+                      Handles[Index],
+                      &gEfiUnicodeCollation2ProtocolGuid,
+                      (VOID **) &Uc,
+                      gImageHandle,
+                      NULL,
+                      EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                      );
+      if (EFI_ERROR (Status)) {
+        continue;
+      }
+
+      //
+      // Find the best matching matching language from the supported languages
+      // of Unicode Collation2 protocol. 
+      //
+      BestLanguage = GetBestLanguage (
+                       Uc->SupportedLanguages,
+                       FALSE,
+                       PlatformLang,
+                       NULL
+                       );
+      if (BestLanguage != NULL) {
+        FreePool (BestLanguage);
+        gUnicodeCollation = Uc;
+        break;
+      }
+    }
+    if (Handles != NULL) {
+      FreePool (Handles);
+    }
+    FreePool (PlatformLang);
+  }
+
+  return (gUnicodeCollation == NULL) ? EFI_UNSUPPORTED : EFI_SUCCESS;
 }
 
 /**
@@ -112,11 +168,9 @@ ShellCommandLibConstructor (
   mProfileListSize  = 0;
   mProfileList      = NULL;
 
-  if (gUnicodeCollation == NULL) {
-    Status = gBS->LocateProtocol(&gEfiUnicodeCollation2ProtocolGuid, NULL, (VOID**)&gUnicodeCollation);
-    if (EFI_ERROR(Status)) {
-      return (EFI_DEVICE_ERROR);
-    }
+  Status = CommandInit ();
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
   }
 
   return (RETURN_SUCCESS);
