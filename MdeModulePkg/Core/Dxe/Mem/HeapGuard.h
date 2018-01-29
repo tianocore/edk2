@@ -389,6 +389,16 @@ AdjustPoolHeadF (
   IN EFI_PHYSICAL_ADDRESS    Memory
   );
 
+/**
+  Check to see if the heap guard is enabled for page and/or pool allocation.
+
+  @return TRUE/FALSE.
+**/
+BOOLEAN
+IsHeapGuardEnabled (
+  VOID
+  );
+
 extern BOOLEAN mOnGuarding;
 
 #endif

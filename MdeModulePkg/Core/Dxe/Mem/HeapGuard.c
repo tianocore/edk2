@@ -729,6 +729,20 @@ IsPageTypeToGuard (
 }
 
 /**
+  Check to see if the heap guard is enabled for page and/or pool allocation.
+
+  @return TRUE/FALSE.
+**/
+BOOLEAN
+IsHeapGuardEnabled (
+  VOID
+  )
+{
+  return IsMemoryTypeToGuard (EfiMaxMemoryType, AllocateAnyPages,
+                              GUARD_HEAP_TYPE_POOL|GUARD_HEAP_TYPE_PAGE);
+}
+
+/**
   Set head Guard and tail Guard for the given memory range.
 
   @param[in]  Memory          Base address of memory to set guard for.
