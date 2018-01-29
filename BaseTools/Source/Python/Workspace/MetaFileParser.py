@@ -1893,22 +1893,24 @@ class DecParser(MetaFileParser):
             if "|" not in self._CurrentLine:
                 if "<HeaderFiles>" == self._CurrentLine:
                     self._include_flag = True
+                    self._package_flag = False
                     self._ValueList = None
                     return
                 if "<Packages>" == self._CurrentLine:
                     self._package_flag = True
                     self._ValueList = None
+                    self._include_flag = False
                     return
 
                 if self._include_flag:
                     self._ValueList[1] = "<HeaderFiles>_" + md5.new(self._CurrentLine).hexdigest()
                     self._ValueList[2] = self._CurrentLine
-                    self._include_flag = False
                 if self._package_flag and "}" != self._CurrentLine:
                     self._ValueList[1] = "<Packages>_" + md5.new(self._CurrentLine).hexdigest()
                     self._ValueList[2] = self._CurrentLine
                 if self._CurrentLine == "}":
                     self._package_flag = False
+                    self._include_flag = False
                     self._ValueList = None
                     return
             else:
