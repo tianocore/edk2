@@ -2,7 +2,7 @@
 #  This file include GenVpd class for fix the Vpd type PCD offset, and PcdEntry for describe
 #  and process each entry of vpd type PCD.
 #
-#  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -35,7 +35,7 @@ _FORMAT_CHAR = {1: 'B',
 #
 class PcdEntry:
     def __init__(self, PcdCName, SkuId,PcdOffset, PcdSize, PcdValue, Lineno=None, FileName=None, PcdUnpackValue=None, 
-                 PcdBinOffset=None, PcdBinSize=None):
+                 PcdBinOffset=None, PcdBinSize=None, Alignment=None):
         self.PcdCName       = PcdCName.strip()
         self.SkuId          = SkuId.strip()
         self.PcdOffset      = PcdOffset.strip()
@@ -46,6 +46,7 @@ class PcdEntry:
         self.PcdUnpackValue = PcdUnpackValue
         self.PcdBinOffset   = PcdBinOffset
         self.PcdBinSize     = PcdBinSize
+        self.Alignment       = Alignment
         
         if self.PcdValue == '' :
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
@@ -434,6 +435,7 @@ class GenVPD :
                 else:
                     Alignment = 1
 
+                PCD.Alignment = Alignment
                 if PCD.PcdOffset != '*':
                     if PCD.PcdOccupySize % Alignment != 0:
                         if PCD.PcdUnpackValue.startswith("{"):
@@ -444,6 +446,7 @@ class GenVPD :
                     if PCD.PcdOccupySize % Alignment != 0:
                         PCD.PcdOccupySize = (PCD.PcdOccupySize / Alignment + 1) * Alignment
 
+                PackSize = PCD.PcdOccupySize
                 if PCD._IsBoolean(PCD.PcdValue, PCD.PcdSize):
                     PCD._PackBooleanValue(PCD.PcdValue)
                     self.FileLinesList[count] = PCD
@@ -518,6 +521,8 @@ class GenVPD :
             # The offset start from 0
             NowOffset = 0
             for Pcd in self.PcdUnknownOffsetList :
+                if NowOffset % Pcd.Alignment != 0:
+                    NowOffset = (NowOffset/ Pcd.Alignment + 1) * Pcd.Alignment
                 Pcd.PcdBinOffset = NowOffset
                 Pcd.PcdOffset    = str(hex(Pcd.PcdBinOffset))
                 NowOffset       += Pcd.PcdOccupySize
@@ -580,6 +585,8 @@ class GenVPD :
                         needFixPcdSize      = eachUnfixedPcd.PcdOccupySize
                         # Not been fixed
                         if eachUnfixedPcd.PcdOffset == '*' :
+                            if LastOffset % eachUnfixedPcd.Alignment != 0:
+                                LastOffset = (LastOffset / eachUnfixedPcd.Alignment + 1) * eachUnfixedPcd.Alignment
                             # The offset un-fixed pcd can write into this free space
                             if needFixPcdSize <= (NowOffset - LastOffset) :
                                 # Change the offset value of un-fixed pcd
@@ -632,6 +639,9 @@ class GenVPD :
             NeedFixPcd = self.PcdUnknownOffsetList[0]
             
             NeedFixPcd.PcdBinOffset = LastPcd.PcdBinOffset + LastPcd.PcdOccupySize
+            if NeedFixPcd.PcdBinOffset % NeedFixPcd.Alignment != 0:
+                NeedFixPcd.PcdBinOffset = (NeedFixPcd.PcdBinOffset / NeedFixPcd.Alignment + 1) * NeedFixPcd.Alignment
+
             NeedFixPcd.PcdOffset    = str(hex(NeedFixPcd.PcdBinOffset))
             
             # Insert this pcd into fixed offset pcd list's tail.
