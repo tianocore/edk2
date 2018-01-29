@@ -845,10 +845,24 @@ InitializeDxeNxMemoryProtectionPolicy (
 
     Attributes = GetPermissionAttributeForMemoryType (MemoryMapEntry->Type);
     if (Attributes != 0) {
-      SetUefiImageMemoryAttributes (
-        MemoryMapEntry->PhysicalStart,
-        LShiftU64 (MemoryMapEntry->NumberOfPages, EFI_PAGE_SHIFT),
-        Attributes);
+      if (MemoryMapEntry->PhysicalStart == 0 &&
+          PcdGet8 (PcdNullPointerDetectionPropertyMask) != 0) {
+
+        ASSERT (MemoryMapEntry->NumberOfPages > 0);
+        //
+        // Skip page 0 if NULL pointer detection is enabled to avoid attributes
+        // overwritten.
+        //
+        SetUefiImageMemoryAttributes (
+          MemoryMapEntry->PhysicalStart + EFI_PAGE_SIZE,
+          LShiftU64 (MemoryMapEntry->NumberOfPages - 1, EFI_PAGE_SHIFT),
+          Attributes);
+      } else {
+        SetUefiImageMemoryAttributes (
+          MemoryMapEntry->PhysicalStart,
+          LShiftU64 (MemoryMapEntry->NumberOfPages, EFI_PAGE_SHIFT),
+          Attributes);
+      }
     }
     MemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
   }
