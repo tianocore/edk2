@@ -1470,10 +1470,10 @@ class DscBuildData(PlatformBuildClassObject):
         Includes = {}
         for PcdName in StructuredPcds:
             Pcd = StructuredPcds[PcdName]
-            IncludeFile = Pcd.StructuredPcdIncludeFile
-            if IncludeFile not in Includes:
-                Includes[IncludeFile] = True
-                CApp = CApp + '#include <%s>\n' % (IncludeFile)
+            for IncludeFile in Pcd.StructuredPcdIncludeFile:
+                if IncludeFile not in Includes:
+                    Includes[IncludeFile] = True
+                    CApp = CApp + '#include <%s>\n' % (IncludeFile)
         CApp = CApp + '\n'
 
         for PcdName in StructuredPcds:

@@ -115,7 +115,7 @@ class StructurePcd(PcdClassObject):
         if validlists is None: validlists=[]
         if expressions is None : expressions=[]
         super(StructurePcd, self).__init__(Name, Guid, Type, DatumType, Value, Token, MaxDatumSize, SkuInfoList, IsOverrided, GuidValue, validateranges, validlists, expressions)
-        self.StructuredPcdIncludeFile = StructuredPcdIncludeFile
+        self.StructuredPcdIncludeFile = [] if StructuredPcdIncludeFile is None else StructuredPcdIncludeFile
         self.PackageDecs = Packages
         self.DefaultStoreName = [default_store]
         self.DefaultValues = collections.OrderedDict({})
