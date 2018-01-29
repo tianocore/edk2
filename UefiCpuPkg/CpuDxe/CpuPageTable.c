@@ -90,70 +90,6 @@ PAGE_ATTRIBUTE_TABLE mPageAttributeTable[] = {
 PAGE_TABLE_POOL   *mPageTablePool = NULL;
 
 /**
-  Enable write protection function for AP.
-
-  @param[in,out] Buffer  The pointer to private data buffer.
-**/
-VOID
-EFIAPI
-SyncCpuEnableWriteProtection (
-  IN OUT VOID *Buffer
-  )
-{
-  AsmWriteCr0 (AsmReadCr0 () | BIT16);
-}
-
-/**
-  CpuFlushTlb function for AP.
-
-  @param[in,out] Buffer  The pointer to private data buffer.
-**/
-VOID
-EFIAPI
-SyncCpuFlushTlb (
-  IN OUT VOID *Buffer
-  )
-{
-  CpuFlushTlb();
-}
-
-/**
-  Sync memory page attributes for AP.
-
-  @param[in] Procedure            A pointer to the function to be run on enabled APs of
-                                  the system.
-**/
-VOID
-SyncMemoryPageAttributesAp (
-  IN EFI_AP_PROCEDURE            Procedure
-  )
-{
-  EFI_STATUS                Status;
-  EFI_MP_SERVICES_PROTOCOL  *MpService;
-
-  Status = gBS->LocateProtocol (
-                  &gEfiMpServiceProtocolGuid,
-                  NULL,
-                  (VOID **)&MpService
-                  );
-  //
-  // Synchronize the update with all APs
-  //
-  if (!EFI_ERROR (Status)) {
-    Status = MpService->StartupAllAPs (
-                          MpService,          // This
-                          Procedure,          // Procedure
-                          FALSE,              // SingleThread
-                          NULL,               // WaitEvent
-                          0,                  // TimeoutInMicrosecsond
-                          NULL,               // ProcedureArgument
-                          NULL                // FailedCpuList
-                          );
-    ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_STARTED || Status == EFI_NOT_READY);
-  }
-}
-
-/**
   Return current paging context.
 
   @param[in,out]  PagingContext     The paging context.
@@ -575,20 +511,6 @@ IsReadOnlyPageWriteProtected (
 }
 
 /**
-  Disable write protection function for AP.
-
-  @param[in,out] Buffer  The pointer to private data buffer.
-**/
-VOID
-EFIAPI
-SyncCpuDisableWriteProtection (
-  IN OUT VOID *Buffer
-  )
-{
-  AsmWriteCr0 (AsmReadCr0() & ~BIT16);
-}
-
-/**
  Disable Write Protect on pages marked as read-only.
 **/
 VOID
@@ -835,10 +757,13 @@ AssignMemoryPageAttributes (
   if (!EFI_ERROR(Status)) {
     if ((PagingContext == NULL) && IsModified) {
       //
-      // Flush TLB as last step
+      // Flush TLB as last step.
+      //
+      // Note: Since APs will always init CR3 register in HLT loop mode or do
+      // TLB flush in MWAIT loop mode, there's no need to flush TLB for them
+      // here.
       //
       CpuFlushTlb();
-      SyncMemoryPageAttributesAp (SyncCpuFlushTlb);
     }
   }
 
