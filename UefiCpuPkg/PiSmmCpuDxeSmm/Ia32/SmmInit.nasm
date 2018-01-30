@@ -47,12 +47,12 @@ ASM_PFX(SmmStartup):
     cpuid
     DB      0x66
     mov     ebx, edx                    ; rdmsr will change edx. keep it in ebx.
-    DB      0x66, 0xb8
+    DB      0x66, 0xb8                  ; mov eax, imm32
 ASM_PFX(gSmmCr3): DD 0
     mov     cr3, eax
     DB      0x67, 0x66
     lgdt    [cs:ebp + (ASM_PFX(gcSmiInitGdtr) - ASM_PFX(SmmStartup))]
-    DB      0x66, 0xb8
+    DB      0x66, 0xb8                  ; mov eax, imm32
 ASM_PFX(gSmmCr4): DD 0
     mov     cr4, eax
     DB      0x66
@@ -64,11 +64,11 @@ ASM_PFX(gSmmCr4): DD 0
     or      ah, BIT3                    ; set NXE bit
     wrmsr
 .1:
-    DB      0x66, 0xb8
+    DB      0x66, 0xb8                  ; mov eax, imm32
 ASM_PFX(gSmmCr0): DD 0
     DB      0xbf, PROTECT_MODE_DS, 0    ; mov di, PROTECT_MODE_DS
     mov     cr0, eax
-    DB      0x66, 0xea                   ; jmp far [ptr48]
+    DB      0x66, 0xea                  ; jmp far [ptr48]
 ASM_PFX(gSmmJmpAddr):
     DD      @32bit
     DW      PROTECT_MODE_CS
