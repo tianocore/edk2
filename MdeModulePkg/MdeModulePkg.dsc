@@ -267,10 +267,6 @@
   MdeModulePkg/Bus/Isa/Ps2MouseDxe/Ps2MouseDxe.inf
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 
-  MdeModulePkg/Core/Dxe/DxeMain.inf {
-    <LibraryClasses>
-      NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
-  }
   MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
   MdeModulePkg/Core/Pei/PeiMain.inf
   MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
@@ -314,7 +310,6 @@
   MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
   MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
-  MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
   MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
   MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
   MdeModulePkg/Library/PlatformVarCleanupLib/PlatformVarCleanupLib.inf
@@ -439,13 +434,14 @@
   MdeModulePkg/Universal/EbcDxe/EbcDebugger.inf
   MdeModulePkg/Universal/EbcDxe/EbcDebuggerConfig.inf
 
-[Components.IA32, Components.X64, Components.Ebc]
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+[Components.IA32, Components.X64, Components.IPF, Components.ARM, Components.AARCH64]
+  MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+  MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
-      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
-      NULL|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
-      NULL|MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
+      NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
   }
+
+[Components.IA32, Components.X64, Components.Ebc]
   MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
   
 [Components.IA32, Components.X64]
@@ -453,6 +449,12 @@
   MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
   MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
+      NULL|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
+      NULL|MdeModulePkg/Library/VarCheckPcdLib/VarCheckPcdLib.inf
+  }
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/VarCheckUefiLib/VarCheckUefiLib.inf
       NULL|MdeModulePkg/Library/VarCheckHiiLib/VarCheckHiiLib.inf
