@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1818,10 +1818,10 @@ def CheckPcdDatum(Type, Value):
     if Type == "VOID*":
         ValueRe = re.compile(r'\s*L?\".*\"\s*$')
         if not (((Value.startswith('L"') or Value.startswith('"')) and Value.endswith('"'))
-                or (Value.startswith('{') and Value.endswith('}'))
+                or (Value.startswith('{') and Value.endswith('}')) or (Value.startswith("L'") or Value.startswith("'") and Value.endswith("'"))
                ):
             return False, "Invalid value [%s] of type [%s]; must be in the form of {...} for array"\
-                          ", or \"...\" for string, or L\"...\" for unicode string" % (Value, Type)
+                          ", \"...\" or \'...\' for string, L\"...\" or L\'...\' for unicode string" % (Value, Type)
         elif ValueRe.match(Value):
             # Check the chars in UnicodeString or CString is printable
             if Value.startswith("L"):
