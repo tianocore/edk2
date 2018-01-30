@@ -62,7 +62,7 @@ class PcdEntry:
 
         self._GenOffsetValue ()
 
-    ## Analyze the string value to judge the PCD's datum type euqal to Boolean or not.
+    ## Analyze the string value to judge the PCD's datum type equal to Boolean or not.
     # 
     #  @param   ValueString      PCD's value
     #  @param   Size             PCD's size
@@ -165,18 +165,18 @@ class PcdEntry:
     ## Pack VOID* type VPD PCD's value form string to binary type.
     #
     #  The VOID* type of string divided into 3 sub-type:
-    #    1:    L"String", Unicode type string.
-    #    2:    "String",  Ascii type string.
+    #    1:    L"String"/L'String', Unicode type string.
+    #    2:    "String"/'String',  Ascii type string.
     #    3:    {bytearray}, only support byte-array.
     #
     #  @param ValueString     The Integer type string for pack.
     #       
     def _PackPtrValue(self, ValueString, Size):
-        if ValueString.startswith('L"'):
+        if ValueString.startswith('L"') or ValueString.startswith("L'"):
             self._PackUnicode(ValueString, Size)
         elif ValueString.startswith('{') and ValueString.endswith('}'):
             self._PackByteArray(ValueString, Size)
-        elif ValueString.startswith('"') and ValueString.endswith('"'):
+        elif (ValueString.startswith('"') and ValueString.endswith('"')) or (ValueString.startswith("'") and ValueString.endswith("'")):
             self._PackString(ValueString, Size)
         else:
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
@@ -184,7 +184,7 @@ class PcdEntry:
 
     ## Pack an Ascii PCD value.
     #  
-    #  An Ascii string for a PCD should be in format as  "".
+    #  An Ascii string for a PCD should be in format as  ""/''.
     #                   
     def _PackString(self, ValueString, Size):
         if (Size < 0):
@@ -192,11 +192,14 @@ class PcdEntry:
                             "Invalid parameter Size %s of PCD %s!(File: %s Line: %s)" % (self.PcdBinSize, self.PcdCName, self.FileName, self.Lineno))
         if (ValueString == ""):
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "Invalid parameter ValueString %s of PCD %s!(File: %s Line: %s)" % (self.PcdUnpackValue, self.PcdCName, self.FileName, self.Lineno))
-        if (len(ValueString) < 2):
-            EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "For PCD: %s ,ASCII string %s at least contains two!(File: %s Line: %s)" % (self.PcdCName, self.PcdUnpackValue, self.FileName, self.Lineno))
+
+        QuotedFlag = True
+        if ValueString.startswith("'"):
+            QuotedFlag = False
 
         ValueString = ValueString[1:-1]
-        if len(ValueString) + 1 > Size:
+        # No null-terminator in 'string' 
+        if (QuotedFlag and len(ValueString) + 1 > Size) or (not QuotedFlag and len(ValueString) > Size):
             EdkLogger.error("BPDG", BuildToolError.RESOURCE_OVERFLOW,
                             "PCD value string %s is exceed to size %d(File: %s Line: %s)" % (ValueString, Size, self.FileName, self.Lineno))
         try:
@@ -259,19 +262,20 @@ class PcdEntry:
 
     ## Pack a unicode PCD value into byte array.
     #  
-    #  A unicode string for a PCD should be in format as  L"".
+    #  A unicode string for a PCD should be in format as  L""/L''.
     #
     def _PackUnicode(self, UnicodeString, Size):
         if (Size < 0):
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "Invalid parameter Size %s of PCD %s!(File: %s Line: %s)" % \
                              (self.PcdBinSize, self.PcdCName, self.FileName, self.Lineno))
-        if (len(UnicodeString) < 3):
-            EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "For PCD: %s ,ASCII string %s at least contains two!(File: %s Line: %s)" % \
-                            (self.PcdCName, self.PcdUnpackValue, self.FileName, self.Lineno))
 
+        QuotedFlag = True
+        if UnicodeString.startswith("L'"):
+            QuotedFlag = False 
         UnicodeString = UnicodeString[2:-1]
 
-        if (len(UnicodeString) + 1) * 2 > Size:
+        # No null-terminator in L'string'
+        if (QuotedFlag and (len(UnicodeString) + 1) * 2 > Size) or (not QuotedFlag and len(UnicodeString) * 2 > Size):
             EdkLogger.error("BPDG", BuildToolError.RESOURCE_OVERFLOW,
                             "The size of unicode string %s is too larger for size %s(File: %s Line: %s)" % \
                             (UnicodeString, Size, self.FileName, self.Lineno))
