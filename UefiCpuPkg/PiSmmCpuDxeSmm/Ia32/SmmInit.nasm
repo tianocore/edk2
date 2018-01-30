@@ -41,24 +41,21 @@ ASM_PFX(gcSmiInitGdtr):
             DQ      0
 
 global ASM_PFX(SmmStartup)
+
+BITS 16
 ASM_PFX(SmmStartup):
-    DB      0x66
     mov     eax, 0x80000001             ; read capability
     cpuid
-    DB      0x66
     mov     ebx, edx                    ; rdmsr will change edx. keep it in ebx.
     DB      0x66, 0xb8                  ; mov eax, imm32
 ASM_PFX(gSmmCr3): DD 0
     mov     cr3, eax
-    DB      0x67, 0x66
-    lgdt    [cs:ebp + (ASM_PFX(gcSmiInitGdtr) - ASM_PFX(SmmStartup))]
+o32 lgdt    [cs:ebp + (ASM_PFX(gcSmiInitGdtr) - ASM_PFX(SmmStartup))]
     DB      0x66, 0xb8                  ; mov eax, imm32
 ASM_PFX(gSmmCr4): DD 0
     mov     cr4, eax
-    DB      0x66
     mov     ecx, 0xc0000080             ; IA32_EFER MSR
     rdmsr
-    DB      0x66
     test    ebx, BIT20                  ; check NXE capability
     jz      .1
     or      ah, BIT3                    ; set NXE bit
@@ -66,12 +63,14 @@ ASM_PFX(gSmmCr4): DD 0
 .1:
     DB      0x66, 0xb8                  ; mov eax, imm32
 ASM_PFX(gSmmCr0): DD 0
-    DB      0xbf, PROTECT_MODE_DS, 0    ; mov di, PROTECT_MODE_DS
+    mov     di, PROTECT_MODE_DS
     mov     cr0, eax
     DB      0x66, 0xea                  ; jmp far [ptr48]
 ASM_PFX(gSmmJmpAddr):
     DD      @32bit
     DW      PROTECT_MODE_CS
+
+BITS 32
 @32bit:
     mov     ds, edi
     mov     es, edi
