@@ -40,13 +40,12 @@
 #include <Library/SynchronizationLib.h>
 #include <Library/SmmMemLib.h>
 
-#define EXTENSION_RECORD_SIZE     0x1000
+SMM_BOOT_PERFORMANCE_TABLE    *mSmmBootPerformanceTable = NULL;
 
 EFI_SMM_RSC_HANDLER_PROTOCOL  *mRscHandlerProtocol    = NULL;
 UINT64                        mSuspendStartTime       = 0;
 BOOLEAN                       mS3SuspendLockBoxSaved  = FALSE;
 UINT32                        mBootRecordSize = 0;
-UINT32                        mBootRecordMaxSize = 0;
 UINT8                         *mBootRecordBuffer = NULL;
 
 SPIN_LOCK                     mSmmFpdtLock;
@@ -84,7 +83,6 @@ FpdtStatusCodeListenerSmm (
   EFI_STATUS                           Status;
   UINT64                               CurrentTime;
   EFI_ACPI_5_0_FPDT_S3_SUSPEND_RECORD  S3SuspendRecord;
-  UINT8                                *NewRecordBuffer;
 
   //
   // Check whether status code is what we are interested in.
@@ -96,32 +94,14 @@ FpdtStatusCodeListenerSmm (
   //
   // Collect one or more Boot records in boot time
   //
-  if (Data != NULL && CompareGuid (&Data->Type, &gEfiFirmwarePerformanceGuid)) {
+  if (Data != NULL && CompareGuid (&Data->Type, &gEdkiiFpdtExtendedFirmwarePerformanceGuid)) {
     AcquireSpinLock (&mSmmFpdtLock);
-    
-    if (mBootRecordSize + Data->Size > mBootRecordMaxSize) {
-      //
-      // Try to allocate big SMRAM data to store Boot record. 
-      //
-      if (mSmramIsOutOfResource) {
-        ReleaseSpinLock (&mSmmFpdtLock);
-        return EFI_OUT_OF_RESOURCES;
-      }
-      NewRecordBuffer = ReallocatePool (mBootRecordSize, mBootRecordSize + Data->Size + EXTENSION_RECORD_SIZE, mBootRecordBuffer); 
-      if (NewRecordBuffer == NULL) {
-        ReleaseSpinLock (&mSmmFpdtLock);
-        mSmramIsOutOfResource = TRUE;
-        return EFI_OUT_OF_RESOURCES;
-      }
-      mBootRecordBuffer  = NewRecordBuffer;
-      mBootRecordMaxSize = mBootRecordSize + Data->Size + EXTENSION_RECORD_SIZE;
-    }
     //
-    // Save boot record into the temp memory space.
+    // Get the boot performance data.
     //
-    CopyMem (mBootRecordBuffer + mBootRecordSize, Data + 1, Data->Size);
-    mBootRecordSize += Data->Size;
-    
+    CopyMem (&mSmmBootPerformanceTable, Data + 1, Data->Size);
+    mBootRecordBuffer = ((UINT8 *) (mSmmBootPerformanceTable)) + sizeof (SMM_BOOT_PERFORMANCE_TABLE);
+
     ReleaseSpinLock (&mSmmFpdtLock);
     return EFI_SUCCESS;
   }
@@ -239,6 +219,9 @@ FpdtSmiHandler (
 
   switch (SmmCommData->Function) {
     case SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE :
+      if (mSmmBootPerformanceTable != NULL) {
+        mBootRecordSize = mSmmBootPerformanceTable->Header.Length - sizeof (SMM_BOOT_PERFORMANCE_TABLE);
+      }
       SmmCommData->BootRecordSize = mBootRecordSize;
       break;
 
