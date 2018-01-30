@@ -893,7 +893,7 @@ FbGopCheckForVbe (
   FbGopPrivate->GraphicsOutput.Mode->Info->VerticalResolution   = VerticalResolution;   
   FbGopPrivate->GraphicsOutput.Mode->Info->PixelFormat = CurrentModeData->PixelFormat;
   CopyMem (&(FbGopPrivate->GraphicsOutput.Mode->Info->PixelInformation), &mPixelBitMask, sizeof (EFI_PIXEL_BITMASK));  
-  FbGopPrivate->GraphicsOutput.Mode->Info->PixelsPerScanLine = HorizontalResolution;    
+  FbGopPrivate->GraphicsOutput.Mode->Info->PixelsPerScanLine = (UINT32)(BytesPerScanLine * 8 / BitsPerPixel);
   FbGopPrivate->GraphicsOutput.Mode->SizeOfInfo = sizeof(EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
   FbGopPrivate->GraphicsOutput.Mode->FrameBufferBase = (EFI_PHYSICAL_ADDRESS) (UINTN) CurrentModeData->LinearFrameBuffer;
   FbGopPrivate->GraphicsOutput.Mode->FrameBufferSize =  CurrentModeData->FrameBufferSize;
