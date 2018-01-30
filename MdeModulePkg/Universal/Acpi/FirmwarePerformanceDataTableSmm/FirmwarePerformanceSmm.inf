@@ -60,6 +60,7 @@
   ## PRODUCES             ## UNDEFINED # SmiHandlerRegister
   ## SOMETIMES_CONSUMES   ## UNDEFINED # StatusCode Data
   gEfiFirmwarePerformanceGuid
+  gEdkiiFpdtExtendedFirmwarePerformanceGuid  ## SOMETIMES_PRODUCES ## UNDEFINED # StatusCode Data
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeS3SuspendStart  ## CONSUMES
