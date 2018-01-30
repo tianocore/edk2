@@ -2569,7 +2569,7 @@ typedef struct {
 /// Processor hierarchy node structure
 ///
 typedef struct {
-  UINT32                                        Type;
+  UINT8                                         Type;
   UINT8                                         Length;
   UINT8                                         Reserved[2];
   EFI_ACPI_6_2_PPTT_STRUCTURE_PROCESSOR_FLAGS   Flags;
