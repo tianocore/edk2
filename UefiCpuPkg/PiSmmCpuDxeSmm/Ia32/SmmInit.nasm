@@ -47,6 +47,8 @@ ASM_PFX(SmmStartup):
     mov     eax, 0x80000001             ; read capability
     cpuid
     mov     ebx, edx                    ; rdmsr will change edx. keep it in ebx.
+    and     ebx, BIT20                  ; extract NX capability bit
+    shr     ebx, 9                      ; shift bit to IA32_EFER.NXE[BIT11] position
     DB      0x66, 0xb8                  ; mov eax, imm32
 ASM_PFX(gSmmCr3): DD 0
     mov     cr3, eax
@@ -56,11 +58,8 @@ ASM_PFX(gSmmCr4): DD 0
     mov     cr4, eax
     mov     ecx, 0xc0000080             ; IA32_EFER MSR
     rdmsr
-    test    ebx, BIT20                  ; check NXE capability
-    jz      .1
-    or      ah, BIT3                    ; set NXE bit
+    or      eax, ebx                    ; set NXE bit if NX is available
     wrmsr
-.1:
     DB      0x66, 0xb8                  ; mov eax, imm32
 ASM_PFX(gSmmCr0): DD 0
     mov     di, PROTECT_MODE_DS
