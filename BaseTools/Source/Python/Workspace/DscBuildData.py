@@ -854,7 +854,7 @@ class DscBuildData(PlatformBuildClassObject):
                                 ExtraData="%s.%s" % (TokenSpaceGuid, PcdCName))
             if PcdType in (MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT):
                 if self._DecPcds[PcdCName, TokenSpaceGuid].DatumType.strip() != ValueList[1].strip():
-                    EdkLogger.error('build', FORMAT_INVALID, ErrStr , File=self.MetaFile, Line=LineNo,
+                    EdkLogger.error('build', FORMAT_INVALID, "Pcd datumtype used in DSC file is not the same as its declaration in DEC file." , File=self.MetaFile, Line=LineNo,
                                 ExtraData="%s.%s|%s" % (TokenSpaceGuid, PcdCName, Setting))
         if (TokenSpaceGuid + '.' + PcdCName) in GlobalData.gPlatformPcds:
             if GlobalData.gPlatformPcds[TokenSpaceGuid + '.' + PcdCName] != ValueList[Index]:
@@ -1010,13 +1010,16 @@ class DscBuildData(PlatformBuildClassObject):
         for str_pcd in StrPcdSet:
             str_pcd_obj = Pcds.get((str_pcd[1], str_pcd[0]), None)
             str_pcd_dec = self._DecPcds.get((str_pcd[1], str_pcd[0]), None)
+            if not isinstance (str_pcd_dec, StructurePcd):
+                EdkLogger.error('build', PARSER_ERROR,
+                            "Pcd (%s.%s) is not declared as Structure PCD in DEC files. Arch: ['%s']" % (str_pcd[0], str_pcd[1], self._Arch),
+                            File=self.MetaFile,Line = StrPcdSet[str_pcd][0][5])
             if str_pcd_dec:
                 str_pcd_obj_str = StructurePcd()
                 str_pcd_obj_str.copy(str_pcd_dec)
                 if str_pcd_obj:
                     str_pcd_obj_str.copy(str_pcd_obj)
-                    if str_pcd_obj.DefaultValue:
-                        str_pcd_obj_str.DefaultFromDSC = str_pcd_obj.DefaultValue
+                str_pcd_obj_str.DefaultFromDSC = str_pcd_obj_str.DefaultValue
                 for str_pcd_data in StrPcdSet[str_pcd]:
                     if str_pcd_data[3] in SkuIds:
                         str_pcd_obj_str.AddOverrideValue(str_pcd_data[2], str(str_pcd_data[6]), 'DEFAULT' if str_pcd_data[3] == 'COMMON' else str_pcd_data[3],'STANDARD' if str_pcd_data[4] == 'COMMON' else str_pcd_data[4], self.MetaFile.File,LineNo=str_pcd_data[5])
@@ -1154,7 +1157,7 @@ class DscBuildData(PlatformBuildClassObject):
                                             File=self.MetaFile, Line=Dummy5)
             if SkuName in (self.SkuIdMgr.SystemSkuId, 'DEFAULT', 'COMMON'):
                 if "." not in TokenSpaceGuid:
-                    PcdSet.add((PcdCName, TokenSpaceGuid, SkuName, Dummy4))
+                    PcdSet.add((PcdCName, TokenSpaceGuid, SkuName, Dummy5))
                 PcdDict[Arch, PcdCName, TokenSpaceGuid, SkuName] = Setting
 
         for PcdCName, TokenSpaceGuid, SkuName, Dummy4 in PcdSet:
@@ -1263,12 +1266,9 @@ class DscBuildData(PlatformBuildClassObject):
         try:
             Process = subprocess.Popen(Command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         except:
-            print 'ERROR: Can not execute command:', Command
-            sys.exit(1)
+            EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s' % Command)
         Result = Process.communicate()
-        if Process.returncode <> 0:
-            print 'ERROR: Can not collect output from command:', Command
-        return Result[0], Result[1]
+        return Process.returncode, Result[0], Result[1]
 
     def IntToCString(self, Value, ValueSize):
         Result = '"'
@@ -1389,7 +1389,7 @@ class DscBuildData(PlatformBuildClassObject):
                     try:
                         Value, ValueSize = ParseFieldValue (FieldList[FieldName][0])
                     except Exception:
-                        print FieldList[FieldName][0]
+                        EdkLogger.error('Build', FORMAT_INVALID, "Invalid value format for %s. From %s Line %d " % (".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName,FieldName)),FieldList[FieldName][1], FieldList[FieldName][2]))
                     if isinstance(Value, str):
                         CApp = CApp + '  Pcd->%s = %s; // From %s Line %d Value %s\n' % (FieldName, Value, FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
                     elif IsArray:
@@ -1427,7 +1427,7 @@ class DscBuildData(PlatformBuildClassObject):
                         try:
                             Value, ValueSize = ParseFieldValue (FieldList[FieldName][0])
                         except Exception:
-                            print FieldList[FieldName][0]
+                            EdkLogger.error('Build', FORMAT_INVALID, "Invalid value format for %s. From %s Line %d " % (".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName,FieldName)),FieldList[FieldName][1], FieldList[FieldName][2]))
                         if isinstance(Value, str):
                             CApp = CApp + '  Pcd->%s = %s; // From %s Line %d Value %s\n' % (FieldName, Value, FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
                         elif IsArray:
@@ -1603,50 +1603,68 @@ class DscBuildData(PlatformBuildClassObject):
 
         Messages = ''
         if sys.platform == "win32":
-            StdOut, StdErr = self.ExecuteCommand ('nmake clean & nmake -f %s' % (MakeFileName))
+            MakeCommand = 'nmake clean & nmake -f %s' % (MakeFileName)
+            returncode, StdOut, StdErr = self.ExecuteCommand (MakeCommand)
             Messages = StdOut
         else:
-            StdOut, StdErr = self.ExecuteCommand ('make clean & make -f %s' % (MakeFileName))
+            MakeCommand = 'make clean & make -f %s' % (MakeFileName)
+            returncode, StdOut, StdErr = self.ExecuteCommand (MakeCommand)
             Messages = StdErr
         Messages = Messages.split('\n')
-        for Message in Messages:
-            if " error" in Message:
-                FileInfo = Message.strip().split('(')
-                if len (FileInfo) > 1:
-                    FileName = FileInfo [0]
-                    FileLine = FileInfo [1].split (')')[0]
-                else:
-                    FileInfo = Message.strip().split(':')
-                    FileName = FileInfo [0]
-                    FileLine = FileInfo [1]
-
-                File = open (FileName, 'r')
-                FileData = File.readlines()
-                File.close()
-                error_line = FileData[int (FileLine) - 1]
-                if r"//" in error_line:
-                    c_line,dsc_line = error_line.split(r"//")
-                else:
-                    dsc_line = error_line
-
-                message_itmes = Message.split(":")
-                Index = 0
-                for item in message_itmes:
-                    if "PcdValueInit.c" in item:
-                        Index = message_itmes.index(item)
-                        message_itmes[Index] = dsc_line.strip()
-                        break
-
-                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, ":".join(message_itmes[Index:]))
+        MessageGroup = []
+        if returncode <>0:
+            CAppBaseFileName = os.path.join(self.OutputPath, PcdValueInitName)
+            File = open (CAppBaseFileName + '.c', 'r')
+            FileData = File.readlines()
+            File.close()
+            for Message in Messages:
+                if " error" in Message or "warning" in Message:
+                    FileInfo = Message.strip().split('(')
+                    if len (FileInfo) > 1:
+                        FileName = FileInfo [0]
+                        FileLine = FileInfo [1].split (')')[0]
+                    else:
+                        FileInfo = Message.strip().split(':')
+                        FileName = FileInfo [0]
+                        FileLine = FileInfo [1]
+                    if FileLine.isdigit():
+                        error_line = FileData[int (FileLine) - 1]
+                        if r"//" in error_line:
+                            c_line,dsc_line = error_line.split(r"//")
+                        else:
+                            dsc_line = error_line
+                        message_itmes = Message.split(":")
+                        Index = 0
+                        if "PcdValueInit.c" not in Message:
+                            break
+                        else:
+                            for item in message_itmes:
+                                if "PcdValueInit.c" in item:
+                                    Index = message_itmes.index(item)
+                                    message_itmes[Index] = dsc_line.strip()
+                                    break
+                            MessageGroup.append(":".join(message_itmes[Index:]).strip())
+                            continue
+                    else:
+                        MessageGroup.append(Message)
+            if MessageGroup:
+                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "\n".join(MessageGroup) )
+            else:
+                EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s' % MakeCommand)
 
         PcdValueInitExe = PcdValueInitName
         if not sys.platform == "win32":
             PcdValueInitExe = os.path.join(os.getenv("EDK_TOOLS_PATH"), 'Source', 'C', 'bin', PcdValueInitName)
 
-        StdOut, StdErr = self.ExecuteCommand (PcdValueInitExe + ' -i %s -o %s' % (InputValueFile, OutputValueFile))
-        File = open (OutputValueFile, 'r')
-        FileBuffer = File.readlines()
-        File.close()
+        Command = PcdValueInitExe + ' -i %s -o %s' % (InputValueFile, OutputValueFile)
+        returncode, StdOut, StdErr = self.ExecuteCommand (Command)
+        if returncode <> 0:
+            EdkLogger.warn('Build', COMMAND_FAILURE, 'Can not collect output from command: %s' % Command)
+            FileBuffer = []
+        else:
+            File = open (OutputValueFile, 'r')
+            FileBuffer = File.readlines()
+            File.close()
 
         StructurePcdSet = []
         for Pcd in FileBuffer:
@@ -1683,7 +1701,7 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('build', PARAMETER_INVALID, 'Sku %s is not defined in [SkuIds] section' % SkuName,
                                             File=self.MetaFile, Line=Dummy5)
             if "." not in TokenSpaceGuid:
-                PcdList.append((PcdCName, TokenSpaceGuid, SkuName, Dummy4))
+                PcdList.append((PcdCName, TokenSpaceGuid, SkuName, Dummy5))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid] = Setting
 
         # Remove redundant PCD candidates, per the ARCH and SKU
@@ -1839,7 +1857,7 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('build', PARAMETER_INVALID, 'DefaultStores %s is not defined in [DefaultStores] section' % DefaultStore,
                                             File=self.MetaFile, Line=Dummy5)
             if "." not in TokenSpaceGuid:
-                PcdSet.add((PcdCName, TokenSpaceGuid, SkuName,DefaultStore, Dummy4))
+                PcdSet.add((PcdCName, TokenSpaceGuid, SkuName,DefaultStore, Dummy5))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid,DefaultStore] = Setting
 
 
@@ -1991,7 +2009,7 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('build', PARAMETER_INVALID, 'Sku %s is not defined in [SkuIds] section' % SkuName,
                                             File=self.MetaFile, Line=Dummy5)
             if "." not in TokenSpaceGuid:
-                PcdList.append((PcdCName, TokenSpaceGuid, SkuName, Dummy4))
+                PcdList.append((PcdCName, TokenSpaceGuid, SkuName, Dummy5))
             PcdDict[Arch, SkuName, PcdCName, TokenSpaceGuid] = Setting
 
         # Remove redundant PCD candidates, per the ARCH and SKU
