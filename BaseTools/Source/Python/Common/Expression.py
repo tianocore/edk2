@@ -791,7 +791,7 @@ class ValueExpressionEx(ValueExpression):
                     raise BadExpression('Type %s PCD Value Size is Larger than 4 byte' % self.PcdType)
                 if self.PcdType == 'UINT64' and Size > 8:
                     raise BadExpression('Type %s PCD Value Size is Larger than 8 byte' % self.PcdType)
-            if self.PcdType in ['VOID*']:
+            else:
                 try:
                     TmpValue = long(PcdValue)
                     TmpList = []

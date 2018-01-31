@@ -302,9 +302,7 @@ def main():
         if ArchList != None:
             GenFdsGlobalVariable.ArchList = ArchList
 
-        if Options.OptionPcd:
-            GlobalData.BuildOptionPcd = Options.OptionPcd
-            CheckBuildOptionPcd()
+        # Dsc Build Data will handle Pcd Settings from CommandLine.
 
         """Modify images from build output if the feature of loading driver at fixed address is on."""
         if GenFdsGlobalVariable.FixedLoadAddress:
