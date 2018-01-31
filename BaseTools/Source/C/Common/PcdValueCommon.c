@@ -330,9 +330,7 @@ Returns:
     break;
   case PcdDataTypePointer:
     Value = &PcdList[Index].Value[1];
-    printf ("Value = %s\n", PcdList[Index].Value);
     for (*Size = 0, Byte = (UINT8) strtoul(Value, &End, 16); Value != End; Byte = (UINT8) strtoul(Value, &End, 16), *Size = *Size + 1) {
-      printf("%x\n", Byte);
       Value = End + 1;
     }
     Buffer = malloc(*Size + 1);
@@ -401,7 +399,6 @@ Returns:
     PcdList[Index].Value = malloc(Size * 5 + 3);
     PcdList[Index].Value[0] = '{';
     for (ValueIndex = 0; ValueIndex < Size; ValueIndex++) {
-      printf("Value[%d] = %02x\n", ValueIndex, Value[ValueIndex]);
       sprintf(&PcdList[Index].Value[1 + ValueIndex * 5], "0x%02x,", Value[ValueIndex]);
     }
     PcdList[Index].Value[1 + Size * 5 - 1] = '}';
@@ -724,15 +721,11 @@ Returns:
   if (*InputFileName == NULL) {
     fprintf (stderr, "Missing option.  Input files is not specified\n");
     exit (EXIT_FAILURE);
-  } else {
-    printf ("Input file name is %s\n", *InputFileName);
   }
 
   if (*OutputFileName == NULL) {
     fprintf (stderr, "Missing option.  Output file is not specified\n");
     exit (EXIT_FAILURE);
-  } else {
-    printf ("Output file name is %s\n", *OutputFileName);
   }
 }
 
@@ -761,7 +754,6 @@ Returns:
   UINT8   *FileBuffer;
   UINT32  FileSize;
 
-  printf ("PCD tool start.\n");
   InputFileName = NULL;
   OutputFileName = NULL;
 
@@ -789,8 +781,6 @@ Returns:
   // Save the updated PCD value
   //
   WriteOutputFile (OutputFileName);
-
-  printf ("PCD tool done.\n");
 
   exit (EXIT_SUCCESS);
 }
