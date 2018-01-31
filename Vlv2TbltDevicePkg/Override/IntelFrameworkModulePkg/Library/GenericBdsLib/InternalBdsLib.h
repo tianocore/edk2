@@ -46,7 +46,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/FileInfo.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/PcAnsi.h>
-#include <Guid/Performance.h>
 #include <Guid/BdsLibHii.h>
 #include <Guid/HdBootVariable.h>
 #include <Guid/LastEnumLang.h>
@@ -85,22 +84,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
         #error "Can not determine the default boot file name for unknown processor type!"
     #endif
 #endif
-
-/**
-
-  Writes performance data of booting into the allocated memory.
-  OS can process these records.
-
-  @param  Event                 The triggered event.
-  @param  Context               Context for this event.
-
-**/
-VOID
-EFIAPI
-WriteBootToOsPerformanceData (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  );
 
 /**
   Get the headers (dos, image, optional header) from an image
