@@ -162,7 +162,6 @@ class DscBuildData(PlatformBuildClassObject):
             self.OutputPath = os.path.dirname(self.DscFile)
         self.DefaultStores = None
         self.SkuIdMgr = SkuClass(self.SkuName, self.SkuIds)
-        arraystr = self.SkuIdMgr.DumpSkuIdArrary()
 
     ## XXX[key] = value
     def __setitem__(self, key, value):
@@ -451,7 +450,6 @@ class DscBuildData(PlatformBuildClassObject):
     ## Override SKUID_IDENTIFIER
     def _SetSkuName(self, Value):
         self._SkuName = Value
-        self._Pcds = None
 
     def _GetFdfFile(self):
         if self._FlashDefinition == None:
@@ -889,10 +887,164 @@ class DscBuildData(PlatformBuildClassObject):
                     skuobj.DefaultStoreDict['STANDARD'] = copy.deepcopy(skuobj.DefaultStoreDict[mindefaultstorename])
         return Pcds
 
+    def RecoverCommandLinePcd(self):
+        pcdset = []
+        if GlobalData.BuildOptionPcd:
+            for pcd in GlobalData.BuildOptionPcd:
+                if pcd[2] == "":
+                    pcdset.append((pcd[0],pcd[1],pcd[3]))
+                else:
+                    pcdobj = self._Pcds.get((pcd[1],pcd[0]))
+                    if pcdobj:
+                        pcdset.append((pcd[0],pcd[1], pcdobj.DefaultValue))
+                    else:
+                        pcdset.append((pcd[0],pcd[1],pcd[3]))
+        GlobalData.BuildOptionPcd = pcdset
+    def GetFieldValueFromComm(self,ValueStr,TokenSpaceGuidCName, TokenCName, FieldName):
+        PredictedFieldType = "VOID*"
+        if ValueStr.startswith('L'):
+            if not ValueStr[1]:
+                EdkLogger.error("build", FORMAT_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", H"{...}"')
+            ValueStr = ValueStr[0] + '"' + ValueStr[1:] + '"'
+            PredictedFieldType = "VOID*"
+        elif ValueStr.startswith('H') or ValueStr.startswith('{'):
+            EdkLogger.error("build", FORMAT_INVALID, 'Currently we do not support assign H"{...}" format for Pcd field.', ExtraData="%s.%s.%s from command line" % (TokenSpaceGuidCName, TokenCName, FieldName))
+            ValueStr = ValueStr[1:]
+            PredictedFieldType = "VOID*"
+        elif ValueStr.upper() in ['TRUE', '0X1', '0X01', '1', 'FALSE', '0X0', '0X00', '0']:
+            PredictedFieldType = "BOOLEAN"
+        elif ValueStr.isdigit() or ValueStr.upper().startswith('0X'):
+            PredictedFieldType = TAB_UINT16
+        else:
+            if not ValueStr[0]:
+                EdkLogger.error("build", FORMAT_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", H"{...}"')
+            ValueStr = '"' + ValueStr + '"'
+            PredictedFieldType = "VOID*"
+        IsValid, Cause = CheckPcdDatum(PredictedFieldType, ValueStr)
+        if not IsValid:
+            EdkLogger.error("build", FORMAT_INVALID, Cause, ExtraData="%s.%s.%s from command line" % (TokenSpaceGuidCName, TokenCName, FieldName))
+        if PredictedFieldType == 'BOOLEAN':
+            ValueStr = ValueStr.upper()
+            if ValueStr == 'TRUE' or ValueStr == '1':
+                ValueStr = '1'
+            elif ValueStr == 'FALSE' or ValueStr == '0':
+                ValueStr = '0'
+        return  ValueStr
+    def __ParsePcdFromCommandLine(self):
+        if GlobalData.BuildOptionPcd:
+            for i, pcd in enumerate(GlobalData.BuildOptionPcd):
+                if type(pcd) is tuple:
+                    continue
+                (pcdname, pcdvalue) = pcd.split('=')
+                if not pcdvalue:
+                    EdkLogger.error('build', AUTOGEN_ERROR, "No Value specified for the PCD %s." % (pcdname))
+                if '.' in pcdname:
+                    (Name1, Name2) = pcdname.split('.',1)
+                    if "." in Name2:
+                        (Name3, FieldName) = Name2.split(".",1)
+                        if ((Name3,Name1)) in self.DecPcds:
+                            HasTokenSpace = True
+                            TokenCName = Name3
+                            TokenSpaceGuidCName = Name1
+                        else:
+                            FieldName = Name2
+                            TokenCName = Name1
+                            TokenSpaceGuidCName = ''
+                            HasTokenSpace = False
+                    else:
+                        if ((Name2,Name1)) in self.DecPcds:
+                            HasTokenSpace = True
+                            TokenCName = Name2
+                            TokenSpaceGuidCName = Name1
+                            FieldName =""
+                        else:
+                            FieldName = Name2
+                            TokenCName = Name1
+                            TokenSpaceGuidCName = ''
+                            HasTokenSpace = False
+                else:
+                    FieldName = ""
+                    TokenCName = pcdname
+                    TokenSpaceGuidCName = ''
+                    HasTokenSpace = False
+                TokenSpaceGuidCNameList = []
+                FoundFlag = False
+                PcdDatumType = ''
+                NewValue = ''
+                if not HasTokenSpace:
+                    for key in self.DecPcds:
+                        if TokenCName == key[0]:
+                            if TokenSpaceGuidCName:
+                                EdkLogger.error(
+                                                'build',
+                                                 AUTOGEN_ERROR,
+                                                "The Pcd %s is found under multiple different TokenSpaceGuid: %s and %s." % (TokenCName, TokenSpaceGuidCName, key[1])
+                                                )
+                            else:
+                                TokenSpaceGuidCName = key[1]
+                                FoundFlag = True
+                else:
+                    if (TokenCName, TokenSpaceGuidCName) in self.DecPcds:
+                        FoundFlag = True
+                if FieldName:
+                    NewValue = self.GetFieldValueFromComm(pcdvalue, TokenSpaceGuidCName, TokenCName, FieldName)
+                    GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, FieldName,NewValue,("build command options",1))
+                else:
+                    for key in self.DecPcds:
+                        PcdItem = self.DecPcds[key]
+                        if HasTokenSpace:
+                            if (PcdItem.TokenCName, PcdItem.TokenSpaceGuidCName) == (TokenCName, TokenSpaceGuidCName):
+                                PcdDatumType = PcdItem.DatumType
+                                if pcdvalue.startswith('H'):
+                                    try:
+                                        pcdvalue = ValueExpressionEx(pcdvalue[1:], PcdDatumType, self._GuidDict)(True)
+                                    except BadExpression, Value:
+                                        if Value.result > 1:
+                                            EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
+                                                            (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
+                                    pcdvalue = 'H' + pcdvalue
+                                NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
+                                FoundFlag = True
+                        else:
+                            if PcdItem.TokenCName == TokenCName:
+                                if not PcdItem.TokenSpaceGuidCName in TokenSpaceGuidCNameList:
+                                    if len (TokenSpaceGuidCNameList) < 1:
+                                        TokenSpaceGuidCNameList.append(PcdItem.TokenSpaceGuidCName)
+                                        PcdDatumType = PcdItem.DatumType
+                                        TokenSpaceGuidCName = PcdItem.TokenSpaceGuidCName
+                                        if pcdvalue.startswith('H'):
+                                            try:
+                                                pcdvalue = ValueExpressionEx(pcdvalue[1:], PcdDatumType, self._GuidDict)(True)
+                                            except BadExpression, Value:
+                                                EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %
+                                                                (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
+                                            pcdvalue = 'H' + pcdvalue
+                                        NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
+                                        FoundFlag = True
+                                    else:
+                                        EdkLogger.error(
+                                                'build',
+                                                 AUTOGEN_ERROR,
+                                                "The Pcd %s is found under multiple different TokenSpaceGuid: %s and %s." % (TokenCName, PcdItem.TokenSpaceGuidCName, TokenSpaceGuidCNameList[0])
+                                                )
+                    GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, FieldName,NewValue,("build command options",1))
+                if not FoundFlag:
+                    if HasTokenSpace:
+                        EdkLogger.error('build', AUTOGEN_ERROR, "The Pcd %s.%s is not found in the DEC file." % (TokenSpaceGuidCName, TokenCName))
+                    else:
+                        EdkLogger.error('build', AUTOGEN_ERROR, "The Pcd %s is not found in the DEC file." % (TokenCName))
+                for BuildData in self._Bdb._CACHE_.values():
+                    if BuildData.MetaFile.Ext == '.dec' or BuildData.MetaFile.Ext == '.dsc':
+                        continue
+                    for key in BuildData.Pcds:
+                        PcdItem = BuildData.Pcds[key]
+                        if (TokenSpaceGuidCName, TokenCName) == (PcdItem.TokenSpaceGuidCName, PcdItem.TokenCName) and FieldName =="":
+                            PcdItem.DefaultValue = NewValue
     ## Retrieve all PCD settings in platform
     def _GetPcds(self):
         if self._Pcds == None:
             self._Pcds = sdict()
+            self.__ParsePcdFromCommandLine()
             self._Pcds.update(self._GetPcd(MODEL_PCD_FIXED_AT_BUILD))
             self._Pcds.update(self._GetPcd(MODEL_PCD_PATCHABLE_IN_MODULE))
             self._Pcds.update(self._GetPcd(MODEL_PCD_FEATURE_FLAG))
@@ -907,6 +1059,8 @@ class DscBuildData(PlatformBuildClassObject):
             self._Pcds = self.UpdateStructuredPcds(MODEL_PCD_TYPE_LIST, self._Pcds)
             self._Pcds = self.CompleteHiiPcdsDefaultStores(self._Pcds)
             self._Pcds = self._FilterPcdBySkuUsage(self._Pcds)
+            self._Pcds = self.OverrideByFdfCommOverAll(self._Pcds)
+            self.RecoverCommandLinePcd()
         return self._Pcds
 
     def _dumpPcdInfo(self,Pcds):
@@ -971,7 +1125,55 @@ class DscBuildData(PlatformBuildClassObject):
             structure_pcd_data[(item[0],item[1])].append(item)
 
         return structure_pcd_data
+    def OverrideByFdfComm(self,StruPcds):
+        StructurePcdInCom = {(item[0],item[1],item[2] ):(item[3],item[4]) for item in GlobalData.BuildOptionPcd if len(item) == 5 and (item[1],item[0]) in StruPcds } if GlobalData.BuildOptionPcd else {}
+        GlobalPcds = set([(item[0],item[1]) for item in StructurePcdInCom.keys()])
+        for Pcd in StruPcds.values():
+            if (Pcd.TokenSpaceGuidCName,Pcd.TokenCName) not in GlobalPcds:
+                continue
+            FieldValues = {item[2]:StructurePcdInCom[item] for item in StructurePcdInCom if (Pcd.TokenSpaceGuidCName,Pcd.TokenCName) == (item[0],item[1]) and item[2]}
+            for sku in Pcd.SkuOverrideValues:
+                for defaultstore in Pcd.SkuOverrideValues[sku]:
+                    for field in FieldValues:
+                        if field not in Pcd.SkuOverrideValues[sku][defaultstore]:
+                            Pcd.SkuOverrideValues[sku][defaultstore][field] = ["","",""]
+                        Pcd.SkuOverrideValues[sku][defaultstore][field][0] = FieldValues[field][0]
+                        Pcd.SkuOverrideValues[sku][defaultstore][field][1] = FieldValues[field][1][0]
+                        Pcd.SkuOverrideValues[sku][defaultstore][field][2] = FieldValues[field][1][1]
+        return StruPcds
+    def OverrideByFdfCommOverAll(self,AllPcds):
+        def CheckStructureInComm(commpcds):
+            if not commpcds:
+                return False
+            if len(commpcds[0]) == 5:
+                return True
+            return False
 
+        if CheckStructureInComm(GlobalData.BuildOptionPcd):
+            StructurePcdInCom = {(item[0],item[1],item[2] ):(item[3],item[4]) for item in GlobalData.BuildOptionPcd } if GlobalData.BuildOptionPcd else {}
+            NoFiledValues = {(item[0],item[1]):StructurePcdInCom[item] for item in StructurePcdInCom if not item[2]}
+        else:
+            NoFiledValues = {(item[0],item[1]):[item[2]] for item in GlobalData.BuildOptionPcd}
+        for Guid,Name in NoFiledValues:
+            if (Name,Guid) in AllPcds:
+                Pcd = AllPcds.get((Name,Guid))
+                Pcd.DefaultValue = NoFiledValues[(Pcd.TokenSpaceGuidCName,Pcd.TokenCName)][0]
+                for sku in Pcd.SkuInfoList:
+                    SkuInfo = Pcd.SkuInfoList[sku]
+                    if SkuInfo.DefaultValue:
+                        SkuInfo.DefaultValue = NoFiledValues[(Pcd.TokenSpaceGuidCName,Pcd.TokenCName)][0]
+                    else:
+                        SkuInfo.HiiDefaultValue = NoFiledValues[(Pcd.TokenSpaceGuidCName,Pcd.TokenCName)][0]
+                        for defaultstore in SkuInfo.DefaultStoreDict:
+                            SkuInfo.DefaultStoreDict[defaultstore] = NoFiledValues[(Pcd.TokenSpaceGuidCName,Pcd.TokenCName)][0]
+            else:
+                PcdInDec = self.DecPcds.get((Name,Guid))
+                if PcdInDec:
+                    if PcdInDec.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],
+                                        self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
+                        self.Pcds[Name, Guid] = copy.deepcopy(PcdInDec)
+                        self.Pcds[Name, Guid].DefaultValue = NoFiledValues[( Guid,Name)][0]
+        return AllPcds
     def UpdateStructuredPcds(self, TypeList, AllPcds):
 
         DynamicPcdType = [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_DEFAULT],
@@ -1002,7 +1204,7 @@ class DscBuildData(PlatformBuildClassObject):
                 continue
 
             if SkuName in SkuIds and "." in TokenSpaceGuid:
-                S_PcdSet.append(( TokenSpaceGuid.split(".")[0],TokenSpaceGuid.split(".")[1], PcdCName,SkuName, default_store,Dummy5, AnalyzePcdExpression(Setting)[0]))
+                S_PcdSet.append([ TokenSpaceGuid.split(".")[0],TokenSpaceGuid.split(".")[1], PcdCName,SkuName, default_store,Dummy5, AnalyzePcdExpression(Setting)[0]])
 
         # handle pcd value override
         StrPcdSet = self.GetStructurePcdInfo(S_PcdSet)
@@ -1072,7 +1274,7 @@ class DscBuildData(PlatformBuildClassObject):
                     for defaultstoreid in DefaultStores:
                         if defaultstoreid not in stru_pcd.SkuOverrideValues[skuid]:
                             stru_pcd.SkuOverrideValues[skuid][defaultstoreid] = copy.deepcopy(stru_pcd.SkuOverrideValues[nextskuid][mindefaultstorename])
-
+        S_pcd_set = self.OverrideByFdfComm(S_pcd_set)
         Str_Pcd_Values = self.GenerateByteArrayValue(S_pcd_set)
         if Str_Pcd_Values:
             for (skuname,StoreName,PcdGuid,PcdName,PcdValue) in Str_Pcd_Values:

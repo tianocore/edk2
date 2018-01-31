@@ -2348,7 +2348,7 @@ def PackRegistryFormatGuid(Guid):
                 )
 
 def BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, Value):
-    if PcdDatumType == 'VOID*':
+    if PcdDatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64,'BOOLEAN']:
         if Value.startswith('L'):
             if not Value[1]:
                 EdkLogger.error("build", FORMAT_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", H"{...}"')

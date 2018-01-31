@@ -398,89 +398,10 @@ class WorkspaceAutoGen(AutoGen):
         for Arch in self.ArchList:
             Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
 
-            DecPcds = {}
-            DecPcdsKey = set()
-            PGen = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
-            if GlobalData.BuildOptionPcd:
-                for i, pcd in enumerate(GlobalData.BuildOptionPcd):
-                    if type(pcd) is tuple:
-                        continue
-                    (pcdname, pcdvalue) = pcd.split('=')
-                    if not pcdvalue:
-                        EdkLogger.error('build', AUTOGEN_ERROR, "No Value specified for the PCD %s." % (pcdname))
-                    if '.' in pcdname:
-                        (TokenSpaceGuidCName, TokenCName) = pcdname.split('.')
-                        HasTokenSpace = True
-                    else:
-                        TokenCName = pcdname
-                        TokenSpaceGuidCName = ''
-                        HasTokenSpace = False
-                    TokenSpaceGuidCNameList = []
-                    FoundFlag = False
-                    PcdDatumType = ''
-                    NewValue = ''
-                    for package in PGen.PackageList:
-                        Guids = package.Guids
-                        self._GuidDict.update(Guids)
-                    for package in PGen.PackageList:
-                        for key in package.Pcds:
-                            PcdItem = package.Pcds[key]
-                            if HasTokenSpace:
-                                if (PcdItem.TokenCName, PcdItem.TokenSpaceGuidCName) == (TokenCName, TokenSpaceGuidCName):
-                                    PcdDatumType = PcdItem.DatumType
-                                    if pcdvalue.startswith('H'):
-                                        try:
-                                            pcdvalue = ValueExpressionEx(pcdvalue[1:], PcdDatumType, self._GuidDict)(True)
-                                        except BadExpression, Value:
-                                            if Value.result > 1:
-                                                EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
-                                                                (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                        pcdvalue = 'H' + pcdvalue
-                                    NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
-                                    FoundFlag = True
-                            else:
-                                if PcdItem.TokenCName == TokenCName:
-                                    if not PcdItem.TokenSpaceGuidCName in TokenSpaceGuidCNameList:
-                                        if len (TokenSpaceGuidCNameList) < 1:
-                                            TokenSpaceGuidCNameList.append(PcdItem.TokenSpaceGuidCName)
-                                            PcdDatumType = PcdItem.DatumType
-                                            TokenSpaceGuidCName = PcdItem.TokenSpaceGuidCName
-                                            if pcdvalue.startswith('H'):
-                                                try:
-                                                    pcdvalue = ValueExpressionEx(pcdvalue[1:], PcdDatumType, self._GuidDict)(True)
-                                                except BadExpression, Value:
-                                                    EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %
-                                                                    (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                                pcdvalue = 'H' + pcdvalue
-                                            NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
-                                            FoundFlag = True
-                                        else:
-                                            EdkLogger.error(
-                                                    'build',
-                                                     AUTOGEN_ERROR,
-                                                    "The Pcd %s is found under multiple different TokenSpaceGuid: %s and %s." % (TokenCName, PcdItem.TokenSpaceGuidCName, TokenSpaceGuidCNameList[0])
-                                                    )
 
-                    GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, NewValue)
 
-                    if not FoundFlag:
-                        if HasTokenSpace:
-                            EdkLogger.error('build', AUTOGEN_ERROR, "The Pcd %s.%s is not found in the DEC file." % (TokenSpaceGuidCName, TokenCName))
-                        else:
-                            EdkLogger.error('build', AUTOGEN_ERROR, "The Pcd %s is not found in the DEC file." % (TokenCName))
 
-                    for BuildData in PGen.BuildDatabase._CACHE_.values():
-                        if BuildData.Arch != Arch:
-                            continue
-                        if BuildData.MetaFile.Ext == '.dec':
-                            continue
-                        for key in BuildData.Pcds:
-                            PcdItem = BuildData.Pcds[key]
-                            if (TokenSpaceGuidCName, TokenCName) == (PcdItem.TokenSpaceGuidCName, PcdItem.TokenCName):
-                                PcdItem.DefaultValue = NewValue
 
-                    if (TokenCName, TokenSpaceGuidCName) in PcdSet:
-                        PcdSet[(TokenCName, TokenSpaceGuidCName)] = NewValue
 
             SourcePcdDict = {'DynamicEx':[], 'PatchableInModule':[],'Dynamic':[],'FixedAtBuild':[]}
             BinaryPcdDict = {'DynamicEx':[], 'PatchableInModule':[]}
@@ -488,6 +409,7 @@ class WorkspaceAutoGen(AutoGen):
             BinaryPcdDict_Keys = BinaryPcdDict.keys()
 
             # generate the SourcePcdDict and BinaryPcdDict
+            PGen = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
             for BuildData in PGen.BuildDatabase._CACHE_.values():
                 if BuildData.Arch != Arch:
                     continue
@@ -630,6 +552,8 @@ class WorkspaceAutoGen(AutoGen):
                 ModuleData = self.BuildDatabase[ModuleFile, Arch, Target, Toolchain]
                 PkgSet.update(ModuleData.Packages)
             Pkgs = list(PkgSet) + list(PGen.PackageList)
+            DecPcds = {}
+            DecPcdsKey = set()
             for Pkg in Pkgs:
                 for Pcd in Pkg.Pcds:
                     DecPcds[Pcd[0], Pcd[1]] = Pkg.Pcds[Pcd]
@@ -1446,15 +1370,25 @@ class PlatformAutoGen(AutoGen):
     def CollectPlatformDynamicPcds(self):
         # Override the platform Pcd's value by build option
         if GlobalData.BuildOptionPcd:
-            for key in self.Platform.Pcds:
-                PlatformPcd = self.Platform.Pcds[key]
-                for PcdItem in GlobalData.BuildOptionPcd:
-                    if (PlatformPcd.TokenSpaceGuidCName, PlatformPcd.TokenCName) == (PcdItem[0], PcdItem[1]):
-                        PlatformPcd.DefaultValue = PcdItem[2]
-                        if PlatformPcd.SkuInfoList:
-                            Sku = PlatformPcd.SkuInfoList[PlatformPcd.SkuInfoList.keys()[0]]
-                            Sku.DefaultValue = PcdItem[2]
-                        break
+            for PcdItem in GlobalData.BuildOptionPcd:
+                PlatformPcd = self.Platform.Pcds.get((PcdItem[1],PcdItem[0]))
+                if PlatformPcd:
+                    if PlatformPcd.DatumType in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64,'BOOLEAN']:
+                        for sku in PlatformPcd.SkuInfoList:
+                            PlatformPcd.SkuInfoList[sku].DefaultValue = PcdItem[2]
+                    else:
+                        PcdDefaultValue = StringToArray(PcdItem[2])
+                        for sku in PlatformPcd.SkuInfoList:
+                            skuinfo = PlatformPcd.SkuInfoList[sku]
+                            if skuinfo.VariableGuid:
+                                skuinfo.HiiDefaultValue = PcdDefaultValue
+                            else:
+                                skuinfo.DefaultValue = PcdDefaultValue
+                        PlatformPcd.DefaultValue = PcdDefaultValue
+                        if PlatformPcd.MaxDatumSize:
+                            PlatformPcd.MaxDatumSize = str(max([int(PlatformPcd.MaxDatumSize),len(PcdDefaultValue.split(","))]))
+                        else:
+                            PlatformPcd.MaxDatumSize = str(len(PcdDefaultValue.split(",")))
 
         for key in self.Platform.Pcds:
             for SinglePcd in GlobalData.MixedPcd:
