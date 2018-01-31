@@ -1327,9 +1327,10 @@ class DscBuildData(PlatformBuildClassObject):
                     IsArray = self.IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
                     if IsArray:
                         Value, ValueSize = ParseFieldValue (FieldList[FieldName.strip(".")][0])
-                        CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d / __ARRAY_ELEMENT_SIZE(%s, %s) + ((%d %% __ARRAY_ELEMENT_SIZE(%s, %s)) ? 1 : 0));\n' % (Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."));
+                        CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d / __ARRAY_ELEMENT_SIZE(%s, %s) + ((%d %% __ARRAY_ELEMENT_SIZE(%s, %s)) ? 1 : 0));  // From %s Line %d Value %s \n' % (Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."), FieldList[FieldName.strip(".")][1], FieldList[FieldName.strip(".")][2], FieldList[FieldName.strip(".")][0]);
                     else:
                         NewFieldName = ''
+                        FieldName_ori = FieldName.strip('.')
                         while '[' in  FieldName:
                             NewFieldName = NewFieldName + FieldName.split('[', 1)[0] + '[0]'
                             ArrayIndex = int(FieldName.split('[', 1)[1].split(']', 1)[0])
@@ -1337,7 +1338,7 @@ class DscBuildData(PlatformBuildClassObject):
                         FieldName = NewFieldName + FieldName
                         while '[' in FieldName:
                             FieldName = FieldName.rsplit('[', 1)[0]
-                            CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d);\n' % (Pcd.DatumType, FieldName.strip("."), ArrayIndex + 1)
+                            CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d); // From %s Line %d Value %s\n' % (Pcd.DatumType, FieldName.strip("."), ArrayIndex + 1, FieldList[FieldName_ori][1], FieldList[FieldName_ori][2], FieldList[FieldName_ori][0])
             for skuname in self.SkuIdMgr.GetSkuChain(SkuName):
                 inherit_OverrideValues = Pcd.SkuOverrideValues[skuname]
                 for FieldList in [inherit_OverrideValues.get(DefaultStoreName)]:
@@ -1348,9 +1349,10 @@ class DscBuildData(PlatformBuildClassObject):
                         IsArray = self.IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
                         if IsArray:
                             Value, ValueSize = ParseFieldValue (FieldList[FieldName.strip(".")][0])
-                            CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d / __ARRAY_ELEMENT_SIZE(%s, %s) + ((%d %% __ARRAY_ELEMENT_SIZE(%s, %s)) ? 1 : 0));\n' % (Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."));
+                            CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d / __ARRAY_ELEMENT_SIZE(%s, %s) + ((%d %% __ARRAY_ELEMENT_SIZE(%s, %s)) ? 1 : 0)); // From %s Line %d Value %s\n' % (Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."), FieldList[FieldName.strip(".")][1], FieldList[FieldName.strip(".")][2], FieldList[FieldName.strip(".")][0]);
                         else:
                             NewFieldName = ''
+                            FieldName_ori = FieldName.strip('.')
                             while '[' in  FieldName:
                                 NewFieldName = NewFieldName + FieldName.split('[', 1)[0] + '[0]'
                                 ArrayIndex = int(FieldName.split('[', 1)[1].split(']', 1)[0])
@@ -1358,7 +1360,7 @@ class DscBuildData(PlatformBuildClassObject):
                             FieldName = NewFieldName + FieldName
                             while '[' in FieldName:
                                 FieldName = FieldName.rsplit('[', 1)[0]
-                                CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d);\n' % (Pcd.DatumType, FieldName.strip("."), ArrayIndex + 1)
+                                CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d); // From %s Line %d Value %s \n' % (Pcd.DatumType, FieldName.strip("."), ArrayIndex + 1, FieldList[FieldName_ori][1], FieldList[FieldName_ori][2], FieldList[FieldName_ori][0])
                 if skuname == SkuName:
                     break
 
