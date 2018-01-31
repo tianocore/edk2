@@ -375,7 +375,7 @@ RETURN_STATUS
 EFIAPI
 SafeInt16ToUint8 (
   IN INT16 Operand,
-  OUT UINT8 *pui8Result
+  OUT UINT8 *Result
   );
 
 /**
@@ -564,7 +564,7 @@ RETURN_STATUS
 EFIAPI
 SafeUint16ToUint8 (
   IN UINT16 Operand,
-  OUT UINT8 *pui8Result
+  OUT UINT8 *Result
   );
 
 /**
@@ -672,7 +672,7 @@ RETURN_STATUS
 EFIAPI
 SafeInt32ToUint8 (
   IN INT32 Operand,
-  OUT UINT8 *pui8Result
+  OUT UINT8 *Result
   );
 
 /**
@@ -889,7 +889,7 @@ RETURN_STATUS
 EFIAPI
 SafeUint32ToUint8 (
   IN UINT32 Operand,
-  OUT UINT8 *pui8Result
+  OUT UINT8 *Result
   );
 
 /**
@@ -1078,7 +1078,7 @@ RETURN_STATUS
 EFIAPI
 SafeIntnToUint8 (
   IN INTN Operand,
-  OUT UINT8 *pui8Result
+  OUT UINT8 *Result
   );
 
 /**
@@ -1321,7 +1321,7 @@ RETURN_STATUS
 EFIAPI
 SafeUintnToUint8 (
   IN UINTN Operand,
-  OUT UINT8 *pui8Result
+  OUT UINT8 *Result
   );
 
 /**
