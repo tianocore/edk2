@@ -1,7 +1,7 @@
 /** @file
   BDS Lib functions which relate with create or process the boot option.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,29 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 BOOLEAN mEnumBootDevice = FALSE;
 EFI_HII_HANDLE gBdsLibStringPackHandle = NULL;
+
+/**
+
+  End Perf entry of BDS
+
+  @param  Event                 The triggered event.
+  @param  Context               Context for this event.
+
+**/
+VOID
+EFIAPI
+BmEndOfBdsPerfCode (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  //
+  // Record the performance data for End of BDS
+  //
+  PERF_END(NULL, "BDS", NULL, 0);
+
+  return ;
+}
 
 /**
   The constructor function register UNI strings into imageHandle.
@@ -1695,7 +1718,7 @@ BdsLibDoLegacyBoot (
     //
     Status = EfiCreateEventLegacyBootEx(
                TPL_NOTIFY,
-               WriteBootToOsPerformanceData,
+               BmEndOfBdsPerfCode,
                NULL, 
                &LegacyBootEvent
                );
@@ -2425,7 +2448,7 @@ BdsLibBootViaBootOption (
   // Write boot to OS performance data for UEFI boot
   //
   PERF_CODE (
-    WriteBootToOsPerformanceData (NULL, NULL);
+    BmEndOfBdsPerfCode (NULL, NULL);
   );
 
   //
