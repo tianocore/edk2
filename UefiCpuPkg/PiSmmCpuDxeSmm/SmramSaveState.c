@@ -107,7 +107,7 @@ typedef struct {
 ///
 X86_ASSEMBLY_PATCH_LABEL gPatchSmbase;
 X86_ASSEMBLY_PATCH_LABEL gPatchSmiStack;
-extern UINT32            gSmiCr3;
+X86_ASSEMBLY_PATCH_LABEL gPatchSmiCr3;
 extern volatile UINT8    gcSmiHandlerTemplate[];
 extern CONST UINT16      gcSmiHandlerSize;
 
@@ -719,7 +719,7 @@ InstallSmiHandler (
   //
   CpuSmiStack = (UINT32)((UINTN)SmiStack + StackSize - sizeof (UINTN));
   PatchInstructionX86 (gPatchSmiStack, CpuSmiStack, 4);
-  gSmiCr3               = Cr3;
+  PatchInstructionX86 (gPatchSmiCr3, Cr3, 4);
   PatchInstructionX86 (gPatchSmbase, SmBase, 4);
   gSmiHandlerIdtr.Base  = IdtBase;
   gSmiHandlerIdtr.Limit = (UINT16)(IdtSize - 1);

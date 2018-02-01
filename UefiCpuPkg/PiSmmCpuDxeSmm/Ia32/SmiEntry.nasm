@@ -44,7 +44,7 @@ extern ASM_PFX(CpuSmmDebugExit)
 
 global ASM_PFX(gcSmiHandlerTemplate)
 global ASM_PFX(gcSmiHandlerSize)
-global ASM_PFX(gSmiCr3)
+global ASM_PFX(gPatchSmiCr3)
 global ASM_PFX(gPatchSmiStack)
 global ASM_PFX(gPatchSmbase)
 global ASM_PFX(mXdSupported)
@@ -93,8 +93,8 @@ ASM_PFX(gPatchSmiStack):
     jmp     ProtFlatMode
 
 ProtFlatMode:
-    DB      0xb8                        ; mov eax, imm32
-ASM_PFX(gSmiCr3): DD 0
+    mov eax, strict dword 0               ; source operand will be patched
+ASM_PFX(gPatchSmiCr3):
     mov     cr3, eax
 ;
 ; Need to test for CR4 specific bit support

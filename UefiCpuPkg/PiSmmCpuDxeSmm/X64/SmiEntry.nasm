@@ -56,7 +56,7 @@ extern ASM_PFX(CpuSmmDebugExit)
 global ASM_PFX(gPatchSmbase)
 global ASM_PFX(mXdSupported)
 global ASM_PFX(gPatchSmiStack)
-global ASM_PFX(gSmiCr3)
+global ASM_PFX(gPatchSmiCr3)
 global ASM_PFX(gcSmiHandlerTemplate)
 global ASM_PFX(gcSmiHandlerSize)
 
@@ -102,8 +102,8 @@ ASM_PFX(gPatchSmiStack):
 
 BITS 64
 ProtFlatMode:
-    DB      0xb8                        ; mov eax, offset gSmiCr3
-ASM_PFX(gSmiCr3): DD 0
+    mov eax, strict dword 0               ; source operand will be patched
+ASM_PFX(gPatchSmiCr3):
     mov     cr3, rax
     mov     eax, 0x668                   ; as cr4.PGE is not set here, refresh cr3
     mov     cr4, rax                    ; in PreModifyMtrrs() to flush TLB.
