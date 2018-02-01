@@ -53,7 +53,7 @@ extern ASM_PFX(gSmiHandlerIdtr)
 extern ASM_PFX(CpuSmmDebugEntry)
 extern ASM_PFX(CpuSmmDebugExit)
 
-global ASM_PFX(gSmbase)
+global ASM_PFX(gPatchSmbase)
 global ASM_PFX(mXdSupported)
 global ASM_PFX(gSmiStack)
 global ASM_PFX(gSmiCr3)
@@ -75,8 +75,8 @@ _SmiEntryPoint:
 o32 lgdt    [cs:bx]                       ; lgdt fword ptr cs:[bx]
     mov     ax, PROTECT_MODE_CS
     mov     [cs:bx-0x2],ax
-    DB      0x66, 0xbf                   ; mov edi, SMBASE
-ASM_PFX(gSmbase): DD 0
+    mov     edi, strict dword 0           ; source operand will be patched
+ASM_PFX(gPatchSmbase):
     lea     eax, [edi + (@ProtectedMode - _SmiEntryPoint) + 0x8000]
     mov     [cs:bx-0x6],eax
     mov     ebx, cr0

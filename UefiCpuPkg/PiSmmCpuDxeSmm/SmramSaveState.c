@@ -105,11 +105,11 @@ typedef struct {
 ///
 /// Variables from SMI Handler
 ///
-extern UINT32           gSmbase;
-extern volatile UINT32  gSmiStack;
-extern UINT32           gSmiCr3;
-extern volatile UINT8   gcSmiHandlerTemplate[];
-extern CONST UINT16     gcSmiHandlerSize;
+X86_ASSEMBLY_PATCH_LABEL gPatchSmbase;
+extern volatile UINT32   gSmiStack;
+extern UINT32            gSmiCr3;
+extern volatile UINT8    gcSmiHandlerTemplate[];
+extern CONST UINT16      gcSmiHandlerSize;
 
 //
 // Variables used by SMI Handler
@@ -718,7 +718,7 @@ InstallSmiHandler (
   //
   gSmiStack             = (UINT32)((UINTN)SmiStack + StackSize - sizeof (UINTN));
   gSmiCr3               = Cr3;
-  gSmbase               = SmBase;
+  PatchInstructionX86 (gPatchSmbase, SmBase, 4);
   gSmiHandlerIdtr.Base  = IdtBase;
   gSmiHandlerIdtr.Limit = (UINT16)(IdtSize - 1);
 
