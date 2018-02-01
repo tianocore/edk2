@@ -53,20 +53,10 @@
   Ia32/SmmFuncsArch.c
   Ia32/SmmProfileArch.c
   Ia32/SmmProfileArch.h
-  Ia32/SmmInit.asm
-  Ia32/SmiEntry.asm
-  Ia32/SmiException.asm
-  Ia32/MpFuncs.asm
-
   Ia32/SmmInit.nasm
   Ia32/SmiEntry.nasm
   Ia32/SmiException.nasm
   Ia32/MpFuncs.nasm
-
-  Ia32/SmmInit.S
-  Ia32/SmiEntry.S
-  Ia32/SmiException.S
-  Ia32/MpFuncs.S
 
 [Sources.X64]
   X64/Semaphore.c
@@ -74,20 +64,10 @@
   X64/SmmFuncsArch.c
   X64/SmmProfileArch.c
   X64/SmmProfileArch.h
-  X64/SmmInit.asm
-  X64/SmiEntry.asm
-  X64/SmiException.asm
-  X64/MpFuncs.asm
-
   X64/SmmInit.nasm
   X64/SmiEntry.nasm
   X64/SmiException.nasm
   X64/MpFuncs.nasm
-
-  X64/SmmInit.S
-  X64/SmiEntry.S
-  X64/SmiException.S
-  X64/MpFuncs.S
 
 [Packages]
   MdePkg/MdePkg.dec
