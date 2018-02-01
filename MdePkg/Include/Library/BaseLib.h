@@ -1119,7 +1119,7 @@ StrnCpy (
   IN      CONST CHAR16              *Source,
   IN      UINTN                     Length
   );
-#endif
+#endif // !defined (DISABLE_NEW_DEPRECATED_INTERFACES)
 
 /**
   Returns the length of a Null-terminated Unicode string.
@@ -1338,7 +1338,7 @@ StrnCat (
   IN      CONST CHAR16              *Source,
   IN      UINTN                     Length
   );
-#endif
+#endif // !defined (DISABLE_NEW_DEPRECATED_INTERFACES)
 
 /**
   Returns the first occurrence of a Null-terminated Unicode sub-string
@@ -1811,7 +1811,7 @@ UnicodeStrToAsciiStr (
   OUT     CHAR8                     *Destination
   );
 
-#endif
+#endif // !defined (DISABLE_NEW_DEPRECATED_INTERFACES)
 
 /**
   Convert a Null-terminated Unicode string to a Null-terminated
@@ -1985,7 +1985,7 @@ AsciiStrnCpy (
   IN      CONST CHAR8               *Source,
   IN      UINTN                     Length
   );
-#endif
+#endif // !defined (DISABLE_NEW_DEPRECATED_INTERFACES)
 
 /**
   Returns the length of a Null-terminated ASCII string.
@@ -2229,7 +2229,7 @@ AsciiStrnCat (
   IN      CONST CHAR8               *Source,
   IN      UINTN                     Length
   );
-#endif
+#endif // !defined (DISABLE_NEW_DEPRECATED_INTERFACES)
 
 /**
   Returns the first occurrence of a Null-terminated ASCII sub-string
@@ -2670,7 +2670,7 @@ AsciiStrToUnicodeStr (
   OUT     CHAR16                    *Destination
   );
 
-#endif
+#endif // !defined (DISABLE_NEW_DEPRECATED_INTERFACES)
 
 /**
   Convert one Null-terminated ASCII string to a Null-terminated
@@ -6495,7 +6495,7 @@ AsmPalCall (
   IN UINT64  Arg3,
   IN UINT64  Arg4
   );
-#endif
+#endif // defined (MDE_CPU_IPF)
 
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 ///
@@ -6730,7 +6730,7 @@ typedef union {
 } IA32_TSS_DESCRIPTOR;
 #pragma pack ()
 
-#endif
+#endif // defined (MDE_CPU_IA32)
 
 #if defined (MDE_CPU_X64)
 ///
@@ -6792,7 +6792,7 @@ typedef union {
 } IA32_TSS_DESCRIPTOR;
 #pragma pack ()
 
-#endif
+#endif // defined (MDE_CPU_X64)
 
 ///
 /// Byte packed structure for an FP/SSE/SSE2 context.
@@ -9068,7 +9068,5 @@ AsmWriteTr (
   IN UINT16 Selector
   );
 
-#endif
-#endif
-
-
+#endif // defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
+#endif // !defined (__BASE_LIB__)
