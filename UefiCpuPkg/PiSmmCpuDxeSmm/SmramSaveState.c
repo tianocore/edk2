@@ -106,7 +106,7 @@ typedef struct {
 /// Variables from SMI Handler
 ///
 X86_ASSEMBLY_PATCH_LABEL gPatchSmbase;
-extern volatile UINT32   gSmiStack;
+X86_ASSEMBLY_PATCH_LABEL gPatchSmiStack;
 extern UINT32            gSmiCr3;
 extern volatile UINT8    gcSmiHandlerTemplate[];
 extern CONST UINT16      gcSmiHandlerSize;
@@ -686,6 +686,7 @@ InstallSmiHandler (
   )
 {
   PROCESSOR_SMM_DESCRIPTOR  *Psd;
+  UINT32                    CpuSmiStack;
 
   //
   // Initialize PROCESSOR_SMM_DESCRIPTOR
@@ -716,7 +717,8 @@ InstallSmiHandler (
   //
   // Initialize values in template before copy
   //
-  gSmiStack             = (UINT32)((UINTN)SmiStack + StackSize - sizeof (UINTN));
+  CpuSmiStack = (UINT32)((UINTN)SmiStack + StackSize - sizeof (UINTN));
+  PatchInstructionX86 (gPatchSmiStack, CpuSmiStack, 4);
   gSmiCr3               = Cr3;
   PatchInstructionX86 (gPatchSmbase, SmBase, 4);
   gSmiHandlerIdtr.Base  = IdtBase;
@@ -725,7 +727,7 @@ InstallSmiHandler (
   //
   // Set the value at the top of the CPU stack to the CPU Index
   //
-  *(UINTN*)(UINTN)gSmiStack = CpuIndex;
+  *(UINTN*)(UINTN)CpuSmiStack = CpuIndex;
 
   //
   // Copy template to CPU specific SMI handler location

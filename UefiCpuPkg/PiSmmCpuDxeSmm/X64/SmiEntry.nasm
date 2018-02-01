@@ -55,7 +55,7 @@ extern ASM_PFX(CpuSmmDebugExit)
 
 global ASM_PFX(gPatchSmbase)
 global ASM_PFX(mXdSupported)
-global ASM_PFX(gSmiStack)
+global ASM_PFX(gPatchSmiStack)
 global ASM_PFX(gSmiCr3)
 global ASM_PFX(gcSmiHandlerTemplate)
 global ASM_PFX(gcSmiHandlerSize)
@@ -96,8 +96,8 @@ o16 mov     es, ax
 o16 mov     fs, ax
 o16 mov     gs, ax
 o16 mov     ss, ax
-    DB      0xbc                   ; mov esp, imm32
-ASM_PFX(gSmiStack): DD 0
+    mov esp, strict dword 0               ; source operand will be patched
+ASM_PFX(gPatchSmiStack):
     jmp     ProtFlatMode
 
 BITS 64
