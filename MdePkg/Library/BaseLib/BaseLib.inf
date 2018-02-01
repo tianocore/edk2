@@ -431,6 +431,7 @@
   X86DisablePaging64.c
   X86DisablePaging32.c
   X86RdRand.c
+  X86PatchInstruction.c
 
 [Sources.X64]
   X64/Thunk16.nasm
@@ -757,6 +758,7 @@
   X86DisablePaging64.c
   X86DisablePaging32.c
   X86RdRand.c
+  X86PatchInstruction.c
   X64/GccInline.c | GCC
   X64/Thunk16.S | XCODE 
   X64/SwitchStack.nasm| GCC
