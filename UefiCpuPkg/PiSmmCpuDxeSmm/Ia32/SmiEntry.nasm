@@ -47,7 +47,8 @@ global ASM_PFX(gcSmiHandlerSize)
 global ASM_PFX(gPatchSmiCr3)
 global ASM_PFX(gPatchSmiStack)
 global ASM_PFX(gPatchSmbase)
-global ASM_PFX(mXdSupported)
+extern ASM_PFX(mXdSupported)
+global ASM_PFX(gPatchXdSupported)
 extern ASM_PFX(gSmiHandlerIdtr)
 
     SECTION .text
@@ -133,8 +134,8 @@ ASM_PFX(gPatchSmiCr3):
 .6:
 
 ; enable NXE if supported
-    DB      0b0h                        ; mov al, imm8
-ASM_PFX(mXdSupported):     DB      1
+    mov     al, strict byte 1           ; source operand may be patched
+ASM_PFX(gPatchXdSupported):
     cmp     al, 0
     jz      @SkipXd
 ;

@@ -54,7 +54,8 @@ extern ASM_PFX(CpuSmmDebugEntry)
 extern ASM_PFX(CpuSmmDebugExit)
 
 global ASM_PFX(gPatchSmbase)
-global ASM_PFX(mXdSupported)
+extern ASM_PFX(mXdSupported)
+global ASM_PFX(gPatchXdSupported)
 global ASM_PFX(gPatchSmiStack)
 global ASM_PFX(gPatchSmiCr3)
 global ASM_PFX(gcSmiHandlerTemplate)
@@ -118,8 +119,8 @@ ASM_PFX(gPatchSmiCr3):
     ltr     ax
 
 ; enable NXE if supported
-    DB      0xb0                        ; mov al, imm8
-ASM_PFX(mXdSupported):     DB      1
+    mov     al, strict byte 1           ; source operand may be patched
+ASM_PFX(gPatchXdSupported):
     cmp     al, 0
     jz      @SkipXd
 ;

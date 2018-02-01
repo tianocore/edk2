@@ -32,6 +32,11 @@ UINTN                     mSmmProfileSize;
 UINTN                     mMsrDsAreaSize   = SMM_PROFILE_DTS_SIZE;
 
 //
+// The flag indicates if execute-disable is supported by processor.
+//
+BOOLEAN                   mXdSupported     = TRUE;
+
+//
 // The flag indicates if execute-disable is enabled on processor.
 //
 BOOLEAN                   mXdEnabled       = FALSE;
@@ -1010,6 +1015,7 @@ CheckFeatureSupported (
       // Extended CPUID functions are not supported on this processor.
       //
       mXdSupported = FALSE;
+      PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
     }
 
     AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx);
@@ -1018,6 +1024,7 @@ CheckFeatureSupported (
       // Execute Disable Bit feature is not supported on this processor.
       //
       mXdSupported = FALSE;
+      PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
     }
   }
 
