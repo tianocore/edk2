@@ -3,9 +3,9 @@
   for ResetSystem().  A reset filter evaluates the parameters passed to
   ResetSystem() and converts a ResetType of EfiResetPlatformSpecific to a
   non-platform specific reset type.  The registered filters are processed before
-  EDKII_PLATFORM_SPECIFIC_RESET_HANDLER_PPI handlers.
+  EDKII_PLATFORM_SPECIFIC_RESET_NOTIFICATION_PPI handlers.
 
-  Copyright (c) 2017 Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018 Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at

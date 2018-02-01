@@ -1,9 +1,9 @@
 /** @file
   This PPI provides services to register a platform specific handler for
   ResetSystem().  The registered handlers are processed after
-  EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PPI notifications.
+  EDKII_PLATFORM_SPECIFIC_RESET_NOTIFICATION_PPI notifications.
 
-  Copyright (c) 2017 Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018 Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.
   The full text of the license may be found at

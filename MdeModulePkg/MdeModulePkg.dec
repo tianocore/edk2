@@ -450,6 +450,9 @@
   ## Include/Ppi/PlatformSpecificResetFilter.h
   gEdkiiPlatformSpecificResetFilterPpiGuid = { 0x8c9f4de3, 0x7b90, 0x47ef, { 0x93, 0x8, 0x28, 0x7c, 0xec, 0xd6, 0x6d, 0xe8 } }
 
+  ## Include/Ppi/PlatformSpecificResetNotification.h
+  gEdkiiPlatformSpecificResetNotificationPpiGuid = { 0xe09f355d, 0xdae8, 0x4910, { 0xb1, 0x4a, 0x92, 0x78, 0xf, 0xdc, 0xf7, 0xcb } }
+
   ## Include/Ppi/PlatformSpecificResetHandler.h
   gEdkiiPlatformSpecificResetHandlerPpiGuid = { 0x75cf14ae, 0x3441, 0x49dc, { 0xaa, 0x10, 0xbb, 0x35, 0xa7, 0xba, 0x8b, 0xab } }
 
@@ -1431,8 +1434,8 @@
   # @Prompt String FPDT Record Enable Only
   gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly|FALSE|BOOLEAN|0x00000109
 
-  ## Indicates the allowable maximum number of Reset Filters or Reset Handlers in PEI phase.
-  # @Prompt Maximum Number of PEI Reset Filters or Reset Handlers.
+  ## Indicates the allowable maximum number of Reset Filters, Reset Notifications or Reset Handlers in PEI phase.
+  # @Prompt Maximum Number of PEI Reset Filters, Reset Notifications or Reset Handlers.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaximumPeiResetNotifies|0x10|UINT32|0x0000010A
 
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]

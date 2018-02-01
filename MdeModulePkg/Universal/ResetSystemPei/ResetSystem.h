@@ -21,6 +21,7 @@
 
 #include <Ppi/Reset2.h>
 #include <Ppi/PlatformSpecificResetFilter.h>
+#include <Ppi/PlatformSpecificResetNotification.h>
 #include <Ppi/PlatformSpecificResetHandler.h>
 
 #include <Library/BaseLib.h>
