@@ -1,7 +1,7 @@
 /** @file
   SMI management.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available 
   under the terms and conditions of the BSD License which accompanies this 
   distribution.  The full text of the license may be found at        
@@ -276,14 +276,41 @@ SmiHandlerUnRegister (
 {
   SMI_HANDLER  *SmiHandler;
   SMI_ENTRY    *SmiEntry;
+  LIST_ENTRY   *EntryLink;
+  LIST_ENTRY   *HandlerLink;
 
-  SmiHandler = (SMI_HANDLER *) DispatchHandle;
-
-  if (SmiHandler == NULL) {
+  if (DispatchHandle == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  if (SmiHandler->Signature != SMI_HANDLER_SIGNATURE) {
+  //
+  // Look for it in root SMI handlers
+  //
+  SmiHandler = NULL;
+  for ( HandlerLink = GetFirstNode (&mRootSmiEntry.SmiHandlers)
+      ; !IsNull (&mRootSmiEntry.SmiHandlers, HandlerLink) && (SmiHandler != DispatchHandle)
+      ; HandlerLink = GetNextNode (&mRootSmiEntry.SmiHandlers, HandlerLink)
+      ) {
+    SmiHandler = CR (HandlerLink, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
+  }
+
+  //
+  // Look for it in non-root SMI handlers
+  //
+  for ( EntryLink = GetFirstNode (&mSmiEntryList)
+      ; !IsNull (&mSmiEntryList, EntryLink) && (SmiHandler != DispatchHandle)
+      ; EntryLink = GetNextNode (&mSmiEntryList, EntryLink)
+      ) {
+    SmiEntry = CR (EntryLink, SMI_ENTRY, AllEntries, SMI_ENTRY_SIGNATURE);
+    for ( HandlerLink = GetFirstNode (&SmiEntry->SmiHandlers)
+        ; !IsNull (&SmiEntry->SmiHandlers, HandlerLink) && (SmiHandler != DispatchHandle)
+        ; HandlerLink = GetNextNode (&SmiEntry->SmiHandlers, HandlerLink)
+        ) {
+      SmiHandler = CR (HandlerLink, SMI_HANDLER, Link, SMI_HANDLER_SIGNATURE);
+    }
+  }
+
+  if (SmiHandler != DispatchHandle) {
     return EFI_INVALID_PARAMETER;
   }
 
