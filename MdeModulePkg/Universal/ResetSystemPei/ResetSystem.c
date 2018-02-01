@@ -25,6 +25,7 @@ EFI_PEI_RESET2_PPI mPpiReset2 = {
 
 EFI_GUID                *mProcessingOrder[] = {
   &gEdkiiPlatformSpecificResetFilterPpiGuid,
+  &gEdkiiPlatformSpecificResetNotificationPpiGuid,
   &gEdkiiPlatformSpecificResetHandlerPpiGuid
 };
 
@@ -34,6 +35,14 @@ RESET_FILTER_INSTANCE   mResetFilter = {
     UnregisterResetNotify
   },
   &gEdkiiPlatformSpecificResetFilterPpiGuid
+};
+
+RESET_FILTER_INSTANCE   mResetNotification = {
+  {
+    RegisterResetNotify,
+    UnregisterResetNotify
+  },
+  &gEdkiiPlatformSpecificResetNotificationPpiGuid
 };
 
 RESET_FILTER_INSTANCE   mResetHandler = {
@@ -54,6 +63,11 @@ EFI_PEI_PPI_DESCRIPTOR mPpiListReset[] = {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gEdkiiPlatformSpecificResetFilterPpiGuid,
     &mResetFilter.ResetFilter
+  },
+  {
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
+    &gEdkiiPlatformSpecificResetNotificationPpiGuid,
+    &mResetNotification.ResetFilter
   },
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
@@ -101,6 +115,7 @@ RegisterResetNotify (
 
   ResetFilter = (RESET_FILTER_INSTANCE *) This;
   ASSERT (CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetFilterPpiGuid) ||
+          CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetNotificationPpiGuid) ||
           CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetHandlerPpiGuid)
           );
 
@@ -187,6 +202,7 @@ UnregisterResetNotify (
 
   ResetFilter = (RESET_FILTER_INSTANCE *)This;
   ASSERT (CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetFilterPpiGuid) ||
+    CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetNotificationPpiGuid) ||
     CompareGuid (ResetFilter->Guid, &gEdkiiPlatformSpecificResetHandlerPpiGuid)
   );
 

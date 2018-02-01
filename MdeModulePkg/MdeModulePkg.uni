@@ -1059,9 +1059,10 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleMax_HELP  #language en-US "CapsuleMax value in capsule report variable."
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaximumPeiResetNotifies_PROMPT  #language en-US "Maximum Number of PEI Reset Filters or Reset Handlers."
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaximumPeiResetNotifies_PROMPT  #language en-US "Maximum Number of PEI Reset Filters, Reset Notifications or Reset Handlers."
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaximumPeiResetNotifies_HELP  #language en-US "Indicates the allowable maximum number of Reset Filters or Reset Handlers in PEI phase."
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaximumPeiResetNotifies_HELP  #language en-US "Indicates the allowable maximum number of Reset Filters, <BR>\n"
+                                                                                            "Reset Notifications or Reset Handlers in PEI phase."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdRecoveryFileName_PROMPT  #language en-US "Recover file name in PEI phase"
 
