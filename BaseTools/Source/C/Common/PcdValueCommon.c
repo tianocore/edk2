@@ -312,7 +312,6 @@ Returns:
   CHAR8   *Value;
   UINT8   *Buffer;
   CHAR8   *End;
-  UINT8   Byte;
 
   Index = LookupPcdIndex (SkuName, DefaultValueName, TokenSpaceGuidName, TokenName);
   if (Index < 0) {
@@ -330,7 +329,7 @@ Returns:
     break;
   case PcdDataTypePointer:
     Value = &PcdList[Index].Value[1];
-    for (*Size = 0, Byte = (UINT8) strtoul(Value, &End, 16); Value != End; Byte = (UINT8) strtoul(Value, &End, 16), *Size = *Size + 1) {
+    for (*Size = 0, strtoul(Value, &End, 16); Value != End; strtoul(Value, &End, 16), *Size = *Size + 1) {
       Value = End + 1;
     }
     Buffer = malloc(*Size + 1);
