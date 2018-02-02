@@ -1,7 +1,7 @@
 /** @file
   Safe String functions.
 
-  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -342,7 +342,7 @@ StrnCpyS (
   //
   // 4. If Length is not less than DestMax, then DestMax shall be greater than StrnLenS(Source, DestMax).
   //
-  SourceLen = StrnLenS (Source, DestMax);
+  SourceLen = StrnLenS (Source, MIN (DestMax, Length));
   if (Length >= DestMax) {
     SAFE_STRING_CONSTRAINT_CHECK ((DestMax > SourceLen), RETURN_BUFFER_TOO_SMALL);
   }
@@ -361,7 +361,7 @@ StrnCpyS (
   // pointed to by Destination. If no null character was copied from Source, then Destination[Length] is set to a null
   // character.
   //
-  while ((*Source != 0) && (SourceLen > 0)) {
+  while ((SourceLen > 0) && (*Source != 0)) {
     *(Destination++) = *(Source++);
     SourceLen--;
   }
@@ -551,7 +551,7 @@ StrnCatS (
   //
   // 5. If Length is not less than CopyLen, then CopyLen shall be greater than StrnLenS(Source, CopyLen).
   //
-  SourceLen = StrnLenS (Source, CopyLen);
+  SourceLen = StrnLenS (Source, MIN (CopyLen, Length));
   if (Length >= CopyLen) {
     SAFE_STRING_CONSTRAINT_CHECK ((CopyLen > SourceLen), RETURN_BUFFER_TOO_SMALL);
   }
@@ -572,7 +572,7 @@ StrnCatS (
   // a null character.
   //
   Destination = Destination + DestLen;
-  while ((*Source != 0) && (SourceLen > 0)) {
+  while ((SourceLen > 0) && (*Source != 0)) {
     *(Destination++) = *(Source++);
     SourceLen--;
   }
@@ -1916,7 +1916,7 @@ AsciiStrnCpyS (
   //
   // 4. If Length is not less than DestMax, then DestMax shall be greater than AsciiStrnLenS(Source, DestMax).
   //
-  SourceLen = AsciiStrnLenS (Source, DestMax);
+  SourceLen = AsciiStrnLenS (Source, MIN (DestMax, Length));
   if (Length >= DestMax) {
     SAFE_STRING_CONSTRAINT_CHECK ((DestMax > SourceLen), RETURN_BUFFER_TOO_SMALL);
   }
@@ -1935,7 +1935,7 @@ AsciiStrnCpyS (
   // pointed to by Destination. If no null character was copied from Source, then Destination[Length] is set to a null
   // character.
   //
-  while ((*Source != 0) && (SourceLen > 0)) {
+  while ((SourceLen > 0) && (*Source != 0)) {
     *(Destination++) = *(Source++);
     SourceLen--;
   }
@@ -2115,7 +2115,7 @@ AsciiStrnCatS (
   //
   // 5. If Length is not less than CopyLen, then CopyLen shall be greater than AsciiStrnLenS(Source, CopyLen).
   //
-  SourceLen = AsciiStrnLenS (Source, CopyLen);
+  SourceLen = AsciiStrnLenS (Source, MIN (CopyLen, Length));
   if (Length >= CopyLen) {
     SAFE_STRING_CONSTRAINT_CHECK ((CopyLen > SourceLen), RETURN_BUFFER_TOO_SMALL);
   }
@@ -2136,7 +2136,7 @@ AsciiStrnCatS (
   // a null character.
   //
   Destination = Destination + DestLen;
-  while ((*Source != 0) && (SourceLen > 0)) {
+  while ((SourceLen > 0) && (*Source != 0)) {
     *(Destination++) = *(Source++);
     SourceLen--;
   }
