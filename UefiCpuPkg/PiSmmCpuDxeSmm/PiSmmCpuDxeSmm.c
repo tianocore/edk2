@@ -406,7 +406,7 @@ SmmRelocateBases (
   // Patch ASM code template with current CR0, CR3, and CR4 values
   //
   gSmmCr0 = (UINT32)AsmReadCr0 ();
-  gSmmCr3 = (UINT32)AsmReadCr3 ();
+  PatchInstructionX86 (gPatchSmmCr3, AsmReadCr3 (), 4);
   gSmmCr4 = (UINT32)AsmReadCr4 ();
 
   //

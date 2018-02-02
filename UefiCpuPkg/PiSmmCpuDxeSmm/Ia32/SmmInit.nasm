@@ -22,7 +22,7 @@ extern ASM_PFX(SmmInitHandler)
 extern ASM_PFX(mRebasedFlag)
 extern ASM_PFX(mSmmRelocationOriginalAddress)
 
-global ASM_PFX(gSmmCr3)
+global ASM_PFX(gPatchSmmCr3)
 global ASM_PFX(gSmmCr4)
 global ASM_PFX(gSmmCr0)
 global ASM_PFX(gSmmJmpAddr)
@@ -49,8 +49,8 @@ ASM_PFX(SmmStartup):
     mov     ebx, edx                    ; rdmsr will change edx. keep it in ebx.
     and     ebx, BIT20                  ; extract NX capability bit
     shr     ebx, 9                      ; shift bit to IA32_EFER.NXE[BIT11] position
-    DB      0x66, 0xb8                  ; mov eax, imm32
-ASM_PFX(gSmmCr3): DD 0
+    mov     eax, strict dword 0         ; source operand will be patched
+ASM_PFX(gPatchSmmCr3):
     mov     cr3, eax
 o32 lgdt    [cs:ebp + (ASM_PFX(gcSmiInitGdtr) - ASM_PFX(SmmStartup))]
     DB      0x66, 0xb8                  ; mov eax, imm32
