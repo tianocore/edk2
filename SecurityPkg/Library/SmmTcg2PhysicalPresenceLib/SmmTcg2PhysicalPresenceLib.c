@@ -10,7 +10,7 @@
   Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction() and Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction()
   will receive untrusted input and do validation.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -27,12 +27,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/SmmVariable.h>
 
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/Tcg2PpVendorLib.h>
 #include <Library/SmmServicesTableLib.h>
 
+#define     PP_INF_VERSION_1_2    "1.2"
+
 EFI_SMM_VARIABLE_PROTOCOL  *mTcg2PpSmmVariable;
+BOOLEAN                    mIsTcg2PPVerLowerThan_1_3 = FALSE;
 
 /**
   The handler for TPM physical presence function:
@@ -337,11 +341,22 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
       break;
 
     default:
-      if (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
-        //
-        // TCG PP spec defined operations that are reserved or un-implemented
-        //
-        return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
+      if (mIsTcg2PPVerLowerThan_1_3 == FALSE) {
+        if (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+          //
+          // TCG2 PP1.3 spec defined operations that are reserved or un-implemented
+          //
+          return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
+        }
+      } else {
+       //
+       // TCG PP lower than 1.3. (1.0, 1.1, 1.2)
+       //
+       if (OperationRequest <= TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) {
+         RequestConfirmed = TRUE;
+       } else if (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+         return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
+       }
       }
       break;
   }
@@ -376,6 +391,10 @@ Tcg2PhysicalPresenceLibConstructor (
   )
 {
   EFI_STATUS  Status;
+
+  if (AsciiStrnCmp(PP_INF_VERSION_1_2, (CHAR8 *)PcdGetPtr(PcdTcgPhysicalPresenceInterfaceVer), sizeof(PP_INF_VERSION_1_2) - 1) <= 0) {
+    mIsTcg2PPVerLowerThan_1_3 = TRUE;
+  }
 
   //
   // Locate SmmVariableProtocol.
