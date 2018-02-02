@@ -29,8 +29,8 @@ global ASM_PFX(gPatchSmmInitStack)
 global ASM_PFX(gcSmiInitGdtr)
 global ASM_PFX(gcSmmInitSize)
 global ASM_PFX(gcSmmInitTemplate)
-global ASM_PFX(mRebasedFlagAddr32)
-global ASM_PFX(mSmmRelocationOriginalAddressPtr32)
+global ASM_PFX(gPatchRebasedFlagAddr32)
+global ASM_PFX(gPatchSmmRelocationOriginalAddressPtr32)
 
 %define LONG_MODE_CS 0x38
 
@@ -125,20 +125,18 @@ ASM_PFX(SmmRelocationSemaphoreComplete):
 ;
 ; Semaphore code running in 32-bit mode
 ;
+BITS 32
 global ASM_PFX(SmmRelocationSemaphoreComplete32)
 ASM_PFX(SmmRelocationSemaphoreComplete32):
-    ;
-    ; mov byte ptr [], 1
-    ;
-    db      0xc6, 0x5
-ASM_PFX(mRebasedFlagAddr32): dd 0
-    db      1
-    ;
-    ; jmp dword ptr []
-    ;
-    db      0xff, 0x25
-ASM_PFX(mSmmRelocationOriginalAddressPtr32): dd 0
+    push    eax
+    mov     eax, strict dword 0                ; source operand will be patched
+ASM_PFX(gPatchRebasedFlagAddr32):
+    mov     byte [eax], 1
+    pop     eax
+    jmp     dword [dword 0]                    ; destination will be patched
+ASM_PFX(gPatchSmmRelocationOriginalAddressPtr32):
 
+BITS 64
 global ASM_PFX(PiSmmCpuSmmInitFixupAddress)
 ASM_PFX(PiSmmCpuSmmInitFixupAddress):
     lea    rax, [@LongMode]
