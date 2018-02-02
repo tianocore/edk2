@@ -1528,7 +1528,12 @@ class DscBuildData(PlatformBuildClassObject):
                     FieldName = "." + FieldName
                     IsArray = self.IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
                     if IsArray:
-                        Value, ValueSize = ParseFieldValue (FieldList[FieldName.strip(".")][0])
+                        try:
+                            Value = ValueExpressionEx(FieldList[FieldName.strip(".")][0], "VOID*", self._GuidDict)(True)
+                        except BadExpression:
+                            EdkLogger.error('Build', FORMAT_INVALID, "Invalid value format for %s. From %s Line %d " %
+                                            (".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName, FieldName.strip('.'))), FieldList[FieldName.strip(".")][1], FieldList[FieldName.strip(".")][2]))
+                        Value, ValueSize = ParseFieldValue(Value)
                         CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d / __ARRAY_ELEMENT_SIZE(%s, %s) + ((%d %% __ARRAY_ELEMENT_SIZE(%s, %s)) ? 1 : 0));  // From %s Line %d Value %s \n' % (Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."), FieldList[FieldName.strip(".")][1], FieldList[FieldName.strip(".")][2], FieldList[FieldName.strip(".")][0]);
                     else:
                         NewFieldName = ''
@@ -1550,7 +1555,12 @@ class DscBuildData(PlatformBuildClassObject):
                         FieldName = "." + FieldName
                         IsArray = self.IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
                         if IsArray:
-                            Value, ValueSize = ParseFieldValue (FieldList[FieldName.strip(".")][0])
+                            try:
+                                Value = ValueExpressionEx(FieldList[FieldName.strip(".")][0], "VOID*", self._GuidDict)(True)
+                            except BadExpression:
+                                EdkLogger.error('Build', FORMAT_INVALID, "Invalid value format for %s. From %s Line %d " %
+                                                (".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName, FieldName.strip('.'))), FieldList[FieldName.strip(".")][1], FieldList[FieldName.strip(".")][2]))
+                            Value, ValueSize = ParseFieldValue(Value)
                             CApp = CApp + '  __FLEXIBLE_SIZE(Size, %s, %s, %d / __ARRAY_ELEMENT_SIZE(%s, %s) + ((%d %% __ARRAY_ELEMENT_SIZE(%s, %s)) ? 1 : 0)); // From %s Line %d Value %s\n' % (Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."), ValueSize, Pcd.DatumType, FieldName.strip("."), FieldList[FieldName.strip(".")][1], FieldList[FieldName.strip(".")][2], FieldList[FieldName.strip(".")][0]);
                         else:
                             NewFieldName = ''
@@ -1588,6 +1598,13 @@ class DscBuildData(PlatformBuildClassObject):
                     continue
                 for FieldName in FieldList:
                     IsArray = self.IsFieldValueAnArray(FieldList[FieldName][0])
+                    if IsArray:
+                        try:
+                            FieldList[FieldName][0] = ValueExpressionEx(FieldList[FieldName][0], "VOID*", self._GuidDict)(True)
+                        except BadExpression:
+                            EdkLogger.error('Build', FORMAT_INVALID, "Invalid value format for %s. From %s Line %d " %
+                                            (".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName, FieldName)), FieldList[FieldName][1],FieldList[FieldName][2]))
+
                     try:
                         Value, ValueSize = ParseFieldValue (FieldList[FieldName][0])
                     except Exception:
@@ -1613,6 +1630,13 @@ class DscBuildData(PlatformBuildClassObject):
                         continue
                     if Pcd.DefaultFromDSC and FieldList == Pcd.DefaultFromDSC:
                         IsArray = self.IsFieldValueAnArray(FieldList)
+                        if IsArray:
+                            try:
+                                FieldList = ValueExpressionEx(FieldList, "VOID*")(True)
+                            except BadExpression:
+                                EdkLogger.error("Build", FORMAT_INVALID, "Invalid value format for %s.%s, from DSC: %s" %
+                                                (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, FieldList))
+
                         Value, ValueSize = ParseFieldValue (FieldList)
                         if isinstance(Value, str):
                             CApp = CApp + '  Pcd = %s; // From DSC Default Value %s\n' % (Value, Pcd.DefaultFromDSC)
@@ -1626,6 +1650,13 @@ class DscBuildData(PlatformBuildClassObject):
 
                     for FieldName in FieldList:
                         IsArray = self.IsFieldValueAnArray(FieldList[FieldName][0])
+                        if IsArray:
+                            try:
+                                FieldList[FieldName][0] = ValueExpressionEx(FieldList[FieldName][0], "VOID*", self._GuidDict)(True)
+                            except BadExpression:
+                                EdkLogger.error('Build', FORMAT_INVALID, "Invalid value format for %s. From %s Line %d " %
+                                                (".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName, FieldName)), FieldList[FieldName][1], FieldList[FieldName][2]))
+
                         try:
                             Value, ValueSize = ParseFieldValue (FieldList[FieldName][0])
                         except Exception:
