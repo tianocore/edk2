@@ -4,7 +4,7 @@
   read/write debug packet to communication with HOST based on transfer
   protocol.
 
-  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -2485,7 +2485,7 @@ InterruptProcess (
     AcquireMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
 
     if (MultiProcessorDebugSupport()) {
-      if (IsBsp (ProcessorIndex)) {
+      if (DebugAgentIsBsp (ProcessorIndex)) {
         //
         // If current processor is BSP, check Apic timer's init count if changed,
         // it may be re-written when switching BSP.
@@ -2498,7 +2498,7 @@ InterruptProcess (
         }
       }
 
-      if (!IsBsp (ProcessorIndex) || mDebugMpContext.IpiSentByAp) {
+      if (!DebugAgentIsBsp (ProcessorIndex) || mDebugMpContext.IpiSentByAp) {
         ReleaseMpSpinLock (&mDebugMpContext.DebugPortSpinLock);
         //
         // If current processor is not BSP or this is one IPI sent by AP
