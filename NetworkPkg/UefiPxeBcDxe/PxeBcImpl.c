@@ -1949,6 +1949,7 @@ EfiPxeBcSetParameters (
 
   if (NewSendGUID != NULL) {
     if (*NewSendGUID && EFI_ERROR (NetLibGetSystemGuid (&SystemGuid))) {
+      DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
       return EFI_INVALID_PARAMETER;
     }
     Mode->SendGUID = *NewSendGUID;
