@@ -125,6 +125,11 @@ UINTN                    mSmmCpuSmramRangeCount;
 
 UINT8                    mPhysicalAddressBits;
 
+//
+// Control register contents saved for SMM S3 resume state initialization.
+//
+UINT32                   mSmmCr4;
+
 /**
   Initialize IDT to setup exception handlers for SMM.
 
@@ -407,7 +412,8 @@ SmmRelocateBases (
   //
   gSmmCr0 = (UINT32)AsmReadCr0 ();
   PatchInstructionX86 (gPatchSmmCr3, AsmReadCr3 (), 4);
-  gSmmCr4 = (UINT32)AsmReadCr4 ();
+  mSmmCr4 = (UINT32)AsmReadCr4 ();
+  PatchInstructionX86 (gPatchSmmCr4, mSmmCr4, 4);
 
   //
   // Patch GDTR for SMM base relocation

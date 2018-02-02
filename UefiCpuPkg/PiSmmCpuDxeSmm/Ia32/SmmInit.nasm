@@ -23,7 +23,7 @@ extern ASM_PFX(mRebasedFlag)
 extern ASM_PFX(mSmmRelocationOriginalAddress)
 
 global ASM_PFX(gPatchSmmCr3)
-global ASM_PFX(gSmmCr4)
+global ASM_PFX(gPatchSmmCr4)
 global ASM_PFX(gSmmCr0)
 global ASM_PFX(gSmmJmpAddr)
 global ASM_PFX(gSmmInitStack)
@@ -53,8 +53,8 @@ ASM_PFX(SmmStartup):
 ASM_PFX(gPatchSmmCr3):
     mov     cr3, eax
 o32 lgdt    [cs:ebp + (ASM_PFX(gcSmiInitGdtr) - ASM_PFX(SmmStartup))]
-    DB      0x66, 0xb8                  ; mov eax, imm32
-ASM_PFX(gSmmCr4): DD 0
+    mov     eax, strict dword 0         ; source operand will be patched
+ASM_PFX(gPatchSmmCr4):
     mov     cr4, eax
     mov     ecx, 0xc0000080             ; IA32_EFER MSR
     rdmsr
