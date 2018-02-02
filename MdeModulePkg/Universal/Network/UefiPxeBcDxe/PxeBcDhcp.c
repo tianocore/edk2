@@ -2,7 +2,7 @@
   Support for PxeBc dhcp functions.
 
 Copyright (c) 2013, Red Hat, Inc.
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -957,6 +957,7 @@ PxeBcDhcpCallBack (
         // SetMem(DHCPV4_OPTIONS_BUFFER.DhcpPlatformId.Guid, sizeof(EFI_GUID), 0xff);
         // GUID not yet set - send all 0's to show not programable
         //
+        DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
         ZeroMem (DhcpHeader->ClientHwAddr, sizeof (EFI_GUID));
       }
 
@@ -1133,6 +1134,7 @@ PxeBcBuildDhcpOptions (
     // SetMem(DHCPV4_OPTIONS_BUFFER.DhcpPlatformId.Guid, sizeof(EFI_GUID), 0xff);
     // GUID not yet set - send all 0's to show not programable
     //
+    DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
     ZeroMem (OptEnt.Uuid->Guid, sizeof (EFI_GUID));
   }
 
@@ -1301,6 +1303,7 @@ PxeBcDiscvBootService (
       //
       // GUID not yet set - send all 0's to show not programable
       //
+      DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
       ZeroMem (DhcpHeader->ClientHwAddr, sizeof (EFI_GUID));
     }
 
