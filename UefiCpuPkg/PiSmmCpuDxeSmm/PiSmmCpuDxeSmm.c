@@ -570,13 +570,6 @@ PiCpuSmmEntry (
     );
 
   //
-  // Fix segment address of the long-mode-switch jump
-  //
-  if (sizeof (UINTN) == sizeof (UINT64)) {
-    gSmmJmpAddr.Segment = LONG_MODE_CODE_SEGMENT;
-  }
-
-  //
   // Find out SMRR Base and SMRR Size
   //
   FindSmramInfo (&mCpuHotPlugData.SmrrBase, &mCpuHotPlugData.SmrrSize);

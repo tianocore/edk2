@@ -25,7 +25,6 @@ extern ASM_PFX(mSmmRelocationOriginalAddress)
 global ASM_PFX(gPatchSmmCr3)
 global ASM_PFX(gPatchSmmCr4)
 global ASM_PFX(gPatchSmmCr0)
-global ASM_PFX(gSmmJmpAddr)
 global ASM_PFX(gSmmInitStack)
 global ASM_PFX(gcSmiInitGdtr)
 global ASM_PFX(gcSmmInitSize)
@@ -64,10 +63,7 @@ ASM_PFX(gPatchSmmCr4):
 ASM_PFX(gPatchSmmCr0):
     mov     di, PROTECT_MODE_DS
     mov     cr0, eax
-    DB      0x66, 0xea                  ; jmp far [ptr48]
-ASM_PFX(gSmmJmpAddr):
-    DD      @32bit
-    DW      PROTECT_MODE_CS
+    jmp     PROTECT_MODE_CS : dword @32bit
 
 BITS 32
 @32bit:

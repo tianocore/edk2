@@ -25,13 +25,14 @@ extern ASM_PFX(mSmmRelocationOriginalAddress)
 global ASM_PFX(gPatchSmmCr3)
 global ASM_PFX(gPatchSmmCr4)
 global ASM_PFX(gPatchSmmCr0)
-global ASM_PFX(gSmmJmpAddr)
 global ASM_PFX(gSmmInitStack)
 global ASM_PFX(gcSmiInitGdtr)
 global ASM_PFX(gcSmmInitSize)
 global ASM_PFX(gcSmmInitTemplate)
 global ASM_PFX(mRebasedFlagAddr32)
 global ASM_PFX(mSmmRelocationOriginalAddressPtr32)
+
+%define LONG_MODE_CS 0x38
 
     DEFAULT REL
     SECTION .text
@@ -66,8 +67,8 @@ ASM_PFX(gPatchSmmCr4):
     mov     eax, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmCr0):
     mov     cr0, eax                    ; enable protected mode & paging
-    DB      0x66, 0xea                   ; far jmp to long mode
-ASM_PFX(gSmmJmpAddr): DQ 0;@LongMode
+    jmp     LONG_MODE_CS : dword 0      ; offset will be patched to @LongMode
+@PatchLongModeOffset:
 
 BITS 64
 @LongMode:                              ; long-mode starts here
@@ -141,8 +142,8 @@ ASM_PFX(mSmmRelocationOriginalAddressPtr32): dd 0
 global ASM_PFX(PiSmmCpuSmmInitFixupAddress)
 ASM_PFX(PiSmmCpuSmmInitFixupAddress):
     lea    rax, [@LongMode]
-    lea    rcx, [ASM_PFX(gSmmJmpAddr)]
-    mov    qword [rcx], rax
+    lea    rcx, [@PatchLongModeOffset - 6]
+    mov    dword [rcx], eax
 
     lea    rax, [ASM_PFX(SmmStartup)]
     lea    rcx, [@L1]
