@@ -41,26 +41,23 @@ ASM_PFX(gcSmiInitGdtr):
             DQ      0
 
 global ASM_PFX(SmmStartup)
+
+BITS 16
 ASM_PFX(SmmStartup):
-    DB      0x66
     mov     eax, 0x80000001             ; read capability
     cpuid
-    DB      0x66
     mov     ebx, edx                    ; rdmsr will change edx. keep it in ebx.
     DB      0x66, 0xb8                   ; mov eax, imm32
 ASM_PFX(gSmmCr3): DD 0
-    mov     cr3, rax
-    DB      0x66, 0x2e
-    lgdt    [ebp + (ASM_PFX(gcSmiInitGdtr) - ASM_PFX(SmmStartup))]
+    mov     cr3, eax
+o32 lgdt    [cs:ebp + (ASM_PFX(gcSmiInitGdtr) - ASM_PFX(SmmStartup))]
     DB      0x66, 0xb8                   ; mov eax, imm32
 ASM_PFX(gSmmCr4): DD 0
     or      ah,  2                      ; enable XMM registers access
-    mov     cr4, rax
-    DB      0x66
+    mov     cr4, eax
     mov     ecx, 0xc0000080             ; IA32_EFER MSR
     rdmsr
     or      ah, BIT0                    ; set LME bit
-    DB      0x66
     test    ebx, BIT20                  ; check NXE capability
     jz      .1
     or      ah, BIT3                    ; set NXE bit
@@ -68,9 +65,11 @@ ASM_PFX(gSmmCr4): DD 0
     wrmsr
     DB      0x66, 0xb8                   ; mov eax, imm32
 ASM_PFX(gSmmCr0): DD 0
-    mov     cr0, rax                    ; enable protected mode & paging
+    mov     cr0, eax                    ; enable protected mode & paging
     DB      0x66, 0xea                   ; far jmp to long mode
 ASM_PFX(gSmmJmpAddr): DQ 0;@LongMode
+
+BITS 64
 @LongMode:                              ; long-mode starts here
     DB      0x48, 0xbc                   ; mov rsp, imm64
 ASM_PFX(gSmmInitStack): DQ 0
