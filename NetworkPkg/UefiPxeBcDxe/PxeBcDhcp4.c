@@ -320,6 +320,7 @@ PxeBcBuildDhcp4Options (
     //
     // Zero the Guid to indicate NOT programable if failed to get system Guid.
     //
+    DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
     ZeroMem (OptEnt.Uuid->Guid, sizeof (EFI_GUID));
   }
 
@@ -1282,6 +1283,7 @@ PxeBcDhcp4CallBack (
         //
         // Zero the Guid to indicate NOT programable if failed to get system Guid.
         //
+        DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
         ZeroMem (Packet->Dhcp4.Header.ClientHwAddr, sizeof (EFI_GUID));
       }
       Packet->Dhcp4.Header.HwAddrLen = (UINT8) sizeof (EFI_GUID);
@@ -1470,6 +1472,7 @@ PxeBcDhcp4Discover (
       //
       // Zero the Guid to indicate NOT programable if failed to get system Guid.
       //
+      DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
       ZeroMem (Token.Packet->Dhcp4.Header.ClientHwAddr, sizeof (EFI_GUID));
     }
     Token.Packet->Dhcp4.Header.HwAddrLen = (UINT8)  sizeof (EFI_GUID);
