@@ -1572,6 +1572,8 @@ def ParseFieldValue (Value):
     if Value.startswith("L'") and Value.endswith("'"):
         # Unicode Character Constant
         List = list(Value[2:-1])
+        if len(List) == 0:
+            raise BadExpression('Length %s is %s' % (Value, len(List)))
         List.reverse()
         Value = 0
         for Char in List:
@@ -1580,6 +1582,8 @@ def ParseFieldValue (Value):
     if Value.startswith("'") and Value.endswith("'"):
         # Character constant
         List = list(Value[1:-1])
+        if len(List) == 0:
+            raise BadExpression('Length %s is %s' % (Value, len(List)))
         List.reverse()
         Value = 0
         for Char in List:

@@ -740,7 +740,12 @@ class ValueExpressionEx(ValueExpression):
         try:
             PcdValue = ValueExpression.__call__(self, RealValue, Depth)
             if self.PcdType == 'VOID*' and (PcdValue.startswith("'") or PcdValue.startswith("L'")):
-                raise BadExpression
+                PcdValue, Size = ParseFieldValue(PcdValue)
+                PcdValueList = []
+                for I in range(Size):
+                    PcdValueList.append('0x%02X'%(PcdValue & 0xff))
+                    PcdValue = PcdValue >> 8
+                PcdValue = '{' + ','.join(PcdValueList) + '}'
             elif self.PcdType in ['UINT8', 'UINT16', 'UINT32', 'UINT64', 'BOOLEAN'] and (PcdValue.startswith("'") or \
                       PcdValue.startswith('"') or PcdValue.startswith("L'") or PcdValue.startswith('L"') or PcdValue.startswith('{')):
                 raise BadExpression
@@ -755,6 +760,8 @@ class ValueExpressionEx(ValueExpression):
                     TmpValue = 0
                     Size = 0
                     for Item in PcdValue:
+                        if Item.startswith('UINT8'):
+                            ItemSize = 1
                         if Item.startswith('UINT16'):
                             ItemSize = 2
                         elif Item.startswith('UINT32'):
@@ -776,7 +783,10 @@ class ValueExpressionEx(ValueExpression):
                         TmpValue = (ItemValue << (Size * 8)) | TmpValue
                         Size = Size + ItemSize
                 else:
-                    TmpValue, Size = ParseFieldValue(PcdValue)
+                    try:
+                        TmpValue, Size = ParseFieldValue(PcdValue)
+                    except BadExpression:
+                        raise BadExpression("Type: %s, Value: %s, format or value error" % (self.PcdType, PcdValue))
                 if type(TmpValue) == type(''):
                     TmpValue = int(TmpValue)
                 else:
@@ -858,7 +868,7 @@ class ValueExpressionEx(ValueExpression):
                                     else:
                                         raise BadExpression('%s not defined before use' % Offset)
                                 ValueType = ""
-                                if Item.startswith('UINT16'):
+                                if Item.startswith('UINT8'):
                                     ItemSize = 1
                                     ValueType = "UINT8"
                                 elif Item.startswith('UINT16'):
@@ -887,6 +897,9 @@ class ValueExpressionEx(ValueExpression):
 
                             if Size > 0:
                                 PcdValue = '{' + ValueStr[:-2] + '}'
+                    else:
+                        raise  BadExpression("Type: %s, Value: %s, format or value error"%(self.PcdType, PcdValue))
+
         if PcdValue == 'True':
             PcdValue = '1'
         if PcdValue == 'False':
