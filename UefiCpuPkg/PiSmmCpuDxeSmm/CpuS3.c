@@ -744,7 +744,7 @@ InitSmmS3ResumeState (
       SmmS3ResumeState->SmmS3StackSize = 0;
     }
 
-    SmmS3ResumeState->SmmS3Cr0 = gSmmCr0;
+    SmmS3ResumeState->SmmS3Cr0 = mSmmCr0;
     SmmS3ResumeState->SmmS3Cr3 = Cr3;
     SmmS3ResumeState->SmmS3Cr4 = mSmmCr4;
 

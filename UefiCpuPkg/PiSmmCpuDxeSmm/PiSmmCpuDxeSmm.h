@@ -308,7 +308,8 @@ extern IA32_FAR_ADDRESS             gSmmJmpAddr;
 
 extern CONST UINT8                  gcSmmInitTemplate[];
 extern CONST UINT16                 gcSmmInitSize;
-extern UINT32                       gSmmCr0;
+X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr0;
+extern UINT32                       mSmmCr0;
 X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr3;
 extern UINT32                       mSmmCr4;
 X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr4;

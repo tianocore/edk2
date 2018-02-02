@@ -24,7 +24,7 @@ extern ASM_PFX(mSmmRelocationOriginalAddress)
 
 global ASM_PFX(gPatchSmmCr3)
 global ASM_PFX(gPatchSmmCr4)
-global ASM_PFX(gSmmCr0)
+global ASM_PFX(gPatchSmmCr0)
 global ASM_PFX(gSmmJmpAddr)
 global ASM_PFX(gSmmInitStack)
 global ASM_PFX(gcSmiInitGdtr)
@@ -60,8 +60,8 @@ ASM_PFX(gPatchSmmCr4):
     rdmsr
     or      eax, ebx                    ; set NXE bit if NX is available
     wrmsr
-    DB      0x66, 0xb8                  ; mov eax, imm32
-ASM_PFX(gSmmCr0): DD 0
+    mov     eax, strict dword 0         ; source operand will be patched
+ASM_PFX(gPatchSmmCr0):
     mov     di, PROTECT_MODE_DS
     mov     cr0, eax
     DB      0x66, 0xea                  ; jmp far [ptr48]

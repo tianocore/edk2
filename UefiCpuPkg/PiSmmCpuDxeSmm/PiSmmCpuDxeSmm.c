@@ -128,6 +128,7 @@ UINT8                    mPhysicalAddressBits;
 //
 // Control register contents saved for SMM S3 resume state initialization.
 //
+UINT32                   mSmmCr0;
 UINT32                   mSmmCr4;
 
 /**
@@ -410,7 +411,8 @@ SmmRelocateBases (
   //
   // Patch ASM code template with current CR0, CR3, and CR4 values
   //
-  gSmmCr0 = (UINT32)AsmReadCr0 ();
+  mSmmCr0 = (UINT32)AsmReadCr0 ();
+  PatchInstructionX86 (gPatchSmmCr0, mSmmCr0, 4);
   PatchInstructionX86 (gPatchSmmCr3, AsmReadCr3 (), 4);
   mSmmCr4 = (UINT32)AsmReadCr4 ();
   PatchInstructionX86 (gPatchSmmCr4, mSmmCr4, 4);
