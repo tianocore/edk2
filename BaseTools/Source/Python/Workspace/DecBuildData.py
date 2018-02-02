@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -423,6 +423,11 @@ class DecBuildData(PackageBuildClassObject):
                 continue
 
             DefaultValue, DatumType, TokenNumber = AnalyzePcdData(Setting)
+            if DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
+                StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*$')
+                if StructPattern.match(DatumType) == None:
+                    EdkLogger.error('build', FORMAT_INVALID, "DatumType only support BOOLEAN, UINT8, UINT16, UINT32, UINT64, VOID* or a valid struct name.", File=self.MetaFile, Line=LineNo)
+
             validateranges, validlists, expressions = self._RawData.GetValidExpression(TokenSpaceGuid, PcdCName)
             PcdObj = PcdClassObject(
                                         PcdCName,
