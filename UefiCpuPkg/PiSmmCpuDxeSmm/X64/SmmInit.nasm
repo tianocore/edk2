@@ -25,7 +25,7 @@ extern ASM_PFX(mSmmRelocationOriginalAddress)
 global ASM_PFX(gPatchSmmCr3)
 global ASM_PFX(gPatchSmmCr4)
 global ASM_PFX(gPatchSmmCr0)
-global ASM_PFX(gSmmInitStack)
+global ASM_PFX(gPatchSmmInitStack)
 global ASM_PFX(gcSmiInitGdtr)
 global ASM_PFX(gcSmmInitSize)
 global ASM_PFX(gcSmmInitTemplate)
@@ -72,8 +72,8 @@ ASM_PFX(gPatchSmmCr0):
 
 BITS 64
 @LongMode:                              ; long-mode starts here
-    DB      0x48, 0xbc                   ; mov rsp, imm64
-ASM_PFX(gSmmInitStack): DQ 0
+    mov     rsp, strict qword 0         ; source operand will be patched
+ASM_PFX(gPatchSmmInitStack):
     and     sp, 0xfff0                  ; make sure RSP is 16-byte aligned
     ;
     ; Accoring to X64 calling convention, XMM0~5 are volatile, we need to save

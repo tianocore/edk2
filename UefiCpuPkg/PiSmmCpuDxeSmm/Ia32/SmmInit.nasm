@@ -25,7 +25,7 @@ extern ASM_PFX(mSmmRelocationOriginalAddress)
 global ASM_PFX(gPatchSmmCr3)
 global ASM_PFX(gPatchSmmCr4)
 global ASM_PFX(gPatchSmmCr0)
-global ASM_PFX(gSmmInitStack)
+global ASM_PFX(gPatchSmmInitStack)
 global ASM_PFX(gcSmiInitGdtr)
 global ASM_PFX(gcSmmInitSize)
 global ASM_PFX(gcSmmInitTemplate)
@@ -72,8 +72,8 @@ BITS 32
     mov     fs, edi
     mov     gs, edi
     mov     ss, edi
-    DB      0xbc                        ; mov esp, imm32
-ASM_PFX(gSmmInitStack): DD 0
+    mov     esp, strict dword 0         ; source operand will be patched
+ASM_PFX(gPatchSmmInitStack):
     call    ASM_PFX(SmmInitHandler)
     rsm
 

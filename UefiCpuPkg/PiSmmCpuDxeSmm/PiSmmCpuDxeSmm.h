@@ -302,7 +302,7 @@ extern UINT32                       mSmmCr0;
 X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr3;
 extern UINT32                       mSmmCr4;
 X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr4;
-extern UINTN                        gSmmInitStack;
+X86_ASSEMBLY_PATCH_LABEL            gPatchSmmInitStack;
 
 /**
   Semaphore operation for all processor relocate SMMBase.

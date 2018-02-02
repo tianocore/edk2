@@ -848,7 +848,11 @@ PiCpuSmmEntry (
   //
   // Set SMI stack for SMM base relocation
   //
-  gSmmInitStack = (UINTN) (Stacks + mSmmStackSize - sizeof (UINTN));
+  PatchInstructionX86 (
+    gPatchSmmInitStack,
+    (UINTN) (Stacks + mSmmStackSize - sizeof (UINTN)),
+    sizeof (UINTN)
+    );
 
   //
   // Initialize IDT
