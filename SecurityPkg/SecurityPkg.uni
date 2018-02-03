@@ -5,7 +5,7 @@
 // It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 // and libraries instances, which are used for those features.
 //
-// Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials are licensed and made available under
 // the terms and conditions of the BSD License which accompanies this distribution.
@@ -238,3 +238,12 @@
                                                                                     "To support configuring from setup page, this PCD can be DynamicHii type and map to a setup option.<BR>\n"
                                                                                     "For example, map to TCG2_VERSION.Tpm2AcpiTableRev to be configured by Tcg2ConfigDxe driver.<BR>\n"
                                                                                     "gEfiSecurityPkgTokenSpaceGuid.PcdTpm2AcpiTableRev|L\"TCG2_VERSION\"|gTcg2ConfigFormSetGuid|0x8|3|NV,BS<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2CurrentIrqNum_PROMPT  #language en-US "Current TPM2 device interrupt number"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2CurrentIrqNum_HELP  #language en-US "This PCD defines current TPM2 device interrupt number reported by _CRS. If set to 0, interrupt is disabled."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2PossibleIrqNumBuf_PROMPT  #language en-US "Possible TPM2 device interrupt number buffer"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2PossibleIrqNumBuf_HELP  #language en-US "This PCD defines possible TPM2 interrupt number in a platform reported by _PRS control method.\n"
+                                                                                         "If PcdTpm2CurrentIrqNum set to 0, _PRS will not report any possible TPM2 interrupt numbers."
