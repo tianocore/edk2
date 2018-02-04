@@ -8,7 +8,7 @@
 // and host, PeCoffExtraActionLib instance to report symbol path information,
 // etc.
 //
-// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials are licensed and made available under
 // the terms and conditions of the BSD License that accompanies this distribution.
@@ -70,7 +70,7 @@
 #string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdDebugPortHandleBufferSize_HELP  #language en-US "The data buffer size used by debug port in debug communication library instances.\n"
                                                                                                      "Its value is not suggested to be changed in platform DSC file."
 
-#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbXhciMemorySpaceBase_PROMPT  #language en-US "Configure ehci host controller memory BAR."
+#string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbXhciMemorySpaceBase_PROMPT  #language en-US "Configure xhci host controller memory BAR."
 
 #string STR_gEfiSourceLevelDebugPkgTokenSpaceGuid_PcdUsbXhciMemorySpaceBase_HELP  #language en-US "The memory BAR of xhci host controller, in which usb debug feature is enabled.\n"
                                                                                                   "Note that the memory BAR address is only used before Pci bus resource allocation."
