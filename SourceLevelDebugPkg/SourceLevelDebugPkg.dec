@@ -6,7 +6,7 @@
 # and host, PeCoffExtraActionLib instance to report symbol path information,
 # etc.
 #
-# Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under 
 # the terms and conditions of the BSD License that accompanies this distribution.  
 # The full text of the license may be found at
@@ -92,7 +92,7 @@
 
   ## The memory BAR of xhci host controller, in which usb debug feature is enabled.
   ## Note that the memory BAR address is only used before Pci bus resource allocation.
-  # @Prompt Configure ehci host controller memory BAR.
+  # @Prompt Configure xhci host controller memory BAR.
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciMemorySpaceBase|0xD0000000|UINT64|0x00000007
   
   ## The pci address of xhci host controller, in which usb debug feature is enabled.

@@ -1,7 +1,7 @@
 /** @file
   Debug Communication Library definitions.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -88,7 +88,7 @@ DebugPortInitialize (
   @param  Handle           Debug port handle.
   @param  Buffer           Pointer to the data buffer to store the data read from the debug device.
   @param  NumberOfBytes    Number of bytes which will be read.
-  @param  Timeout          Timeout value for reading from debug device. It unit is Microsecond.
+  @param  Timeout          Timeout value for reading from debug device. Its unit is Microsecond.
 
   @retval 0                Read data failed, no data is to be read.
   @retval >0               Actual number of bytes read from debug device.
@@ -118,7 +118,7 @@ DebugPortReadBuffer (
 
   @retval 0                NumberOfBytes is 0.
   @retval >0               The number of bytes written to the debug device.
-                           If this value is less than NumberOfBytes, then the read operation failed.
+                           If this value is less than NumberOfBytes, then the write operation failed.
 
 **/
 UINTN
@@ -139,7 +139,7 @@ DebugPortWriteBuffer (
   @param  Handle           Debug port handle.
 
   @retval TRUE             Data is waiting to be read from the debug device.
-  @retval FALSE            There is no data waiting to be read from the serial device.
+  @retval FALSE            There is no data waiting to be read from the debug device.
 
 **/
 BOOLEAN
