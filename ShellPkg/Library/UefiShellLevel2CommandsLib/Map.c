@@ -1,7 +1,7 @@
 /** @file
   Main file for map shell level 2 command.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   
@@ -220,19 +220,25 @@ MappingListHasType(
   IN CONST BOOLEAN    Consist
   )
 {
-  CHAR16 *NewSpecific;
-  RETURN_STATUS  Status;
+  CHAR16              *NewSpecific;
+  RETURN_STATUS       Status;
+  UINTN               Length;
   
   //
   // specific has priority
   //
   if (Specific != NULL) {
-    NewSpecific = AllocateCopyPool(StrSize(Specific) + sizeof(CHAR16), Specific);
+    Length      = StrLen (Specific);
+    //
+    // Allocate enough buffer for Specific and potential ":"
+    //
+    NewSpecific = AllocatePool ((Length + 2) * sizeof(CHAR16));
     if (NewSpecific == NULL){
       return FALSE;
     }
-    if (NewSpecific[StrLen(NewSpecific)-1] != L':') {
-      Status = StrnCatS(NewSpecific, (StrSize(Specific) + sizeof(CHAR16))/sizeof(CHAR16), L":", StrLen(L":"));
+    StrCpyS (NewSpecific, Length + 2, Specific);
+    if (Specific[Length - 1] != L':') {
+      Status = StrnCatS(NewSpecific, Length + 2, L":", StrLen(L":"));
       if (EFI_ERROR (Status)) {
         FreePool(NewSpecific);
         return FALSE;
