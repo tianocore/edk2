@@ -1535,16 +1535,10 @@ def ParseFieldValue (Value):
     if Value.startswith('GUID') and Value.endswith(')'):
         Value = Value.split('(', 1)[1][:-1].strip()
         if Value[0] == '{' and Value[-1] == '}':
-            Value = Value[1:-1].strip()
-            Value = Value.split('{', 1)
-            Value = ['%02x' % int(Item, 16) for Item in (Value[0] + Value[1][:-1]).split(',')]
-            if len(Value[0]) != 8:
-                Value[0] = '%08X' % int(Value[0], 16)
-            if len(Value[1]) != 4:
-                Value[1] = '%04X' % int(Value[1], 16)
-            if len(Value[2]) != 4:
-                Value[2] = '%04X' % int(Value[2], 16)
-            Value = '-'.join(Value[0:3]) + '-' + ''.join(Value[3:5]) + '-' + ''.join(Value[5:11])
+            TmpValue = GuidStructureStringToGuidString(Value)
+            if len(TmpValue) == 0:
+                raise BadExpression("Invalid GUID value string %s" % Value)
+            Value = TmpValue
         if Value[0] == '"' and Value[-1] == '"':
             Value = Value[1:-1]
         try:
