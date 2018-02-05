@@ -2,7 +2,7 @@
   Main file for endfor and for shell level 1 functions.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -624,7 +624,9 @@ ShellCommandRunFor (
   if (CurrentScriptFile != NULL && CurrentScriptFile->CurrentCommand != NULL) {
     Info = (SHELL_FOR_INFO*)CurrentScriptFile->CurrentCommand->Data;
     if (CurrentScriptFile->CurrentCommand->Reset) {
-      Info->CurrentValue  = (CHAR16*)Info->Set;
+      if (Info != NULL) {
+        Info->CurrentValue = (CHAR16*)Info->Set;
+      }
       FirstPass = TRUE;
       CurrentScriptFile->CurrentCommand->Reset = FALSE;
     }
