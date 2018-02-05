@@ -1554,6 +1554,8 @@ class TopLevelMakefile(BuildFile):
                     if pcdValue.startswith('H'):
                         pcdValue = 'H' + '"' + pcdValue[1:] + '"'
                         ExtraOption += " --pcd " + pcdName + '=' + pcdValue
+                    elif pcdValue.startswith("L'"):
+                        ExtraOption += "--pcd " + pcdName + '=' + pcdValue
                     elif pcdValue.startswith('L'):
                         pcdValue = 'L' + '"' + pcdValue[1:] + '"'
                         ExtraOption += " --pcd " + pcdName + '=' + pcdValue
