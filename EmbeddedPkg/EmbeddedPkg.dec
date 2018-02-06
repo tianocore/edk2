@@ -70,7 +70,6 @@
 [Protocols.common]
   gHardwareInterruptProtocolGuid =  { 0x2890B3EA, 0x053D, 0x1643, { 0xAD, 0x0C, 0xD6, 0x48, 0x08, 0xDA, 0x3F, 0xF1 } }
   gHardwareInterrupt2ProtocolGuid = { 0x32898322, 0x2da1, 0x474a, { 0xba, 0xaa, 0xf3, 0xf7, 0xcf, 0x56, 0x94, 0x70 } }
-  gEfiDebugSupportPeriodicCallbackProtocolGuid = { 0x9546e07c, 0x2cbb, 0x4c88, { 0x98, 0x6c, 0xcd, 0x34, 0x10, 0x86, 0xf0, 0x44 } }
   gEmbeddedDeviceGuid =   { 0xbf4b9d10, 0x13ec, 0x43dd, { 0x88, 0x80, 0xe9, 0xb, 0x71, 0x8f, 0x27, 0xde } }
   gEmbeddedExternalDeviceProtocolGuid = { 0x735F8C64, 0xD696, 0x44D0, { 0xBD, 0xF2, 0x44, 0x7F, 0xD0, 0x5A, 0x54, 0x06 }}
   gEmbeddedGpioProtocolGuid           = { 0x17a0a3d7, 0xc0a5, 0x4635, { 0xbb, 0xd5, 0x07, 0x21, 0x87, 0xdf, 0xe2, 0xee }}
@@ -86,15 +85,6 @@
   gEdkiiEmbeddedGpioPpiGuid = { 0x21c3b115, 0x4e0b, 0x470c, { 0x85, 0xc7, 0xe1, 0x05, 0xa5, 0x75, 0xc9, 0x7b }}
 
 [PcdsFeatureFlag.common]
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedMacBoot|FALSE|BOOLEAN|0x00000001
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedDirCmd|TRUE|BOOLEAN|0x00000002
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedHobCmd|TRUE|BOOLEAN|0x00000003
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedHwDebugCmd|TRUE|BOOLEAN|0x00000004
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedIoEnable|FALSE|BOOLEAN|0x00000005
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedScriptCmd|FALSE|BOOLEAN|0x00000006
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPciDebugCmd|FALSE|BOOLEAN|0x00000041
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedProbeRemovable|TRUE|BOOLEAN|0x00000052
-
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
   gEmbeddedTokenSpaceGuid.PcdCacheEnable|FALSE|BOOLEAN|0x00000042
   gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x00000053
@@ -103,10 +93,6 @@
   gEmbeddedTokenSpaceGuid.PcdSataSiI3132FeatureDirectCommandIssuing|FALSE|BOOLEAN|0x00000051
 
 [PcdsFixedAtBuild.common]
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedAutomaticBootCommand|L""|VOID*|0x00000007
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07|UINT32|0x00000008
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000|UINT32|0x00000009
-
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0|UINT32|0x0000000b
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|131072|UINT32|0x0000000c
 
@@ -140,9 +126,6 @@
   gEmbeddedTokenSpaceGuid.PcdEmbeddedFdSize|0x0000000|UINT32|0x00000031
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterFrequencyInHz|0x0000000|UINT64|0x00000032
   gEmbeddedTokenSpaceGuid.PcdEmbeddedPerformanceCounterPeriodInNanoseconds|0x0000000|UINT32|0x00000033
-
-# Shell characteristics
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedShellCharacterEcho|TRUE|BOOLEAN|0x00000046
 
   gEmbeddedTokenSpaceGuid.PcdGdbBaudRate|115200|UINT64|0x00000047
   gEmbeddedTokenSpaceGuid.PcdGdbDataBits|8|UINT8|0x00000048
