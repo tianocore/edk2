@@ -121,6 +121,44 @@ RegisterInterruptSource (
   }
 }
 
+STATIC VOID *mCpuArchProtocolNotifyEventRegistration;
+
+STATIC
+VOID
+EFIAPI
+CpuArchEventProtocolNotify (
+  IN  EFI_EVENT       Event,
+  IN  VOID            *Context
+  )
+{
+  EFI_CPU_ARCH_PROTOCOL   *Cpu;
+  EFI_STATUS              Status;
+
+  // Get the CPU protocol that this driver requires.
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  // Unregister the default exception handler.
+  Status = Cpu->RegisterInterruptHandler (Cpu, ARM_ARCH_EXCEPTION_IRQ, NULL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Cpu->RegisterInterruptHandler() - %r\n",
+      __FUNCTION__, Status));
+    return;
+  }
+
+  // Register to receive interrupts
+  Status = Cpu->RegisterInterruptHandler (Cpu, ARM_ARCH_EXCEPTION_IRQ,
+                  Context);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Cpu->RegisterInterruptHandler() - %r\n",
+      __FUNCTION__, Status));
+  }
+
+  gBS->CloseEvent (Event);
+}
+
 EFI_STATUS
 InstallAndRegisterInterruptService (
   IN EFI_HARDWARE_INTERRUPT_PROTOCOL   *InterruptProtocol,
@@ -130,7 +168,6 @@ InstallAndRegisterInterruptService (
   )
 {
   EFI_STATUS               Status;
-  EFI_CPU_ARCH_PROTOCOL   *Cpu;
   CONST UINTN              RihArraySize =
     (sizeof(HARDWARE_INTERRUPT_HANDLER) * mGicNumInterrupts);
 
@@ -152,27 +189,15 @@ InstallAndRegisterInterruptService (
     return Status;
   }
 
-  // Get the CPU protocol that this driver requires.
-  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&Cpu);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  // Unregister the default exception handler.
-  Status = Cpu->RegisterInterruptHandler (Cpu, ARM_ARCH_EXCEPTION_IRQ, NULL);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  // Register to receive interrupts
-  Status = Cpu->RegisterInterruptHandler (
-                  Cpu,
-                  ARM_ARCH_EXCEPTION_IRQ,
-                  InterruptHandler
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
+  //
+  // Install the interrupt handler as soon as the CPU arch protocol appears.
+  //
+  EfiCreateProtocolNotifyEvent (
+    &gEfiCpuArchProtocolGuid,
+    TPL_CALLBACK,
+    CpuArchEventProtocolNotify,
+    InterruptHandler,
+    &mCpuArchProtocolNotifyEventRegistration);
 
   // Register for an ExitBootServicesEvent
   Status = gBS->CreateEvent (

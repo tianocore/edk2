@@ -16,7 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = ArmGicDxe
-  FILE_GUID                      = DE371F7C-DEC4-4D21-ADF1-593ABCC15882
+  FILE_GUID                      = DE371F7C-DEC4-4D21-ADF1-593ABCC15882 # gArmGicDxeFileGuid
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
 
@@ -45,6 +45,7 @@
   UefiDriverEntryPoint
   IoLib
   PcdLib
+  UefiLib
 
 [Protocols]
   gHardwareInterruptProtocolGuid
@@ -58,4 +59,4 @@
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy
 
 [Depex]
-  gEfiCpuArchProtocolGuid
+  TRUE
