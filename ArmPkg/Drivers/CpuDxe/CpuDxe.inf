@@ -60,7 +60,6 @@
 
 [Protocols]
   gEfiCpuArchProtocolGuid
-  gEfiDebugSupportPeriodicCallbackProtocolGuid
 
 [Guids]
   gEfiDebugImageInfoTableGuid
@@ -72,7 +71,6 @@
   gArmTokenSpaceGuid.PcdVFPEnabled
 
 [FeaturePcd.common]
-  gArmTokenSpaceGuid.PcdCpuDxeProduceDebugSupport
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
 
 [Depex]

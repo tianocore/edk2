@@ -35,7 +35,6 @@
 #include <Guid/DebugImageInfoTable.h>
 #include <Protocol/Cpu.h>
 #include <Protocol/DebugSupport.h>
-#include <Protocol/DebugSupportPeriodicCallback.h>
 #include <Protocol/LoadedImage.h>
 
 extern BOOLEAN mIsFlushingGCD;
