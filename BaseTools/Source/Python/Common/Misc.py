@@ -1603,7 +1603,8 @@ def ParseFieldValue (Value):
                 Value = (Value << 8) | ((ItemValue >> 8 * I) & 0xff)
         return Value, RetSize
     if Value.startswith('DEVICE_PATH(') and Value.endswith(')'):
-        Value = Value.split('"')[1]
+        Value = Value.replace("DEVICE_PATH(", '').rstrip(')')
+        Value = Value.strip().strip('"')
         return ParseDevPathValue(Value)
     if Value.lower().startswith('0x'):
         Value = int(Value, 16)
