@@ -1205,6 +1205,10 @@ SmmInternalFreePagesExWithGuard (
   EFI_PHYSICAL_ADDRESS    MemoryToFree;
   UINTN                   PagesToFree;
 
+  if (((Memory & EFI_PAGE_MASK) != 0) || (Memory == 0) || (NumberOfPages == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   MemoryToFree  = Memory;
   PagesToFree   = NumberOfPages;
 
