@@ -23,6 +23,8 @@
 #include <Register/Amd/Cpuid.h>
 #include <Library/MemEncryptSevLib.h>
 
+#include "Platform.h"
+
 /**
 
   Function checks if SEV support is available, if present then it sets
@@ -30,7 +32,6 @@
 
   **/
 VOID
-EFIAPI
 AmdSevInitialize (
   VOID
   )
