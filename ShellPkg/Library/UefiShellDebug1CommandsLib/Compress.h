@@ -28,7 +28,6 @@
   @retval EFI_BUFFER_TOO_SMALL  The buffer was too small.  DstSize is required.
 **/
 EFI_STATUS
-EFIAPI
 Compress (
   IN      VOID    *SrcBuffer,
   IN      UINT64  SrcSize,
