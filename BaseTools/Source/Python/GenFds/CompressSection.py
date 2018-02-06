@@ -61,14 +61,28 @@ class CompressSection (CompressSectionClassObject) :
 
         SectFiles = tuple()
         Index = 0
+        MaxAlign = None
         for Sect in self.SectionList:
             Index = Index + 1
             SecIndex = '%s.%d' %(SecNum, Index)
             ReturnSectList, AlignValue = Sect.GenSection(OutputPath, ModuleName, SecIndex, KeyStringList, FfsInf, Dict, IsMakefile=IsMakefile)
+            if AlignValue != None:
+                if MaxAlign == None:
+                    MaxAlign = AlignValue
+                if GenFdsGlobalVariable.GetAlignment (AlignValue) > GenFdsGlobalVariable.GetAlignment (MaxAlign):
+                    MaxAlign = AlignValue
             if ReturnSectList != []:
+                if AlignValue == None:
+                    AlignValue = "1"
                 for FileData in ReturnSectList:
                     SectFiles += (FileData,)
 
+        if MaxAlign != None:
+            if self.Alignment == None:
+                self.Alignment = MaxAlign
+            else:
+                if GenFdsGlobalVariable.GetAlignment (MaxAlign) > GenFdsGlobalVariable.GetAlignment (self.Alignment):
+                    self.Alignment = MaxAlign
 
         OutputFile = OutputPath + \
                      os.sep     + \
