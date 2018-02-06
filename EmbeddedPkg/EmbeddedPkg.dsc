@@ -148,18 +148,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable|FALSE
   gEfiMdePkgTokenSpaceGuid.PcdDriverDiagnostics2Disable|FALSE
 
-  #
-  # Control what commands are supported from the UI
-  # Turn these on and off to add features or save size
-  #
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedMacBoot|TRUE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedDirCmd|TRUE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedHobCmd|TRUE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedHwDebugCmd|TRUE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedIoEnable|FALSE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedScriptCmd|FALSE
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedPciDebugCmd|TRUE
-
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE
 
 
@@ -180,9 +168,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock|200000000
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedAutomaticBootCommand|L""
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedDefaultTextColor|0x07
-  gEmbeddedTokenSpaceGuid.PcdEmbeddedMemVariableStoreSize|0x10000
 
   gEmbeddedTokenSpaceGuid.PcdPrePiStackBase|0
   gEmbeddedTokenSpaceGuid.PcdPrePiStackSize|0
