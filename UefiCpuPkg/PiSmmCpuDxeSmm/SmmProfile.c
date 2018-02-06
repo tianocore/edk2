@@ -1302,6 +1302,8 @@ SmmProfilePFHandler (
 {
   UINT64                *PageTable;
   UINT64                PFAddress;
+  UINT64                RestoreAddress;
+  UINTN                 RestorePageNumber;
   UINTN                 CpuIndex;
   UINTN                 Index;
   UINT64                InstructionAddress;
@@ -1331,10 +1333,21 @@ SmmProfilePFHandler (
   PFAddress         = AsmReadCr2 ();
   CpuIndex          = GetCpuIndex ();
 
-  if (PFAddress <= 0xFFFFFFFF) {
-    RestorePageTableBelow4G (PageTable, PFAddress, CpuIndex, ErrorCode);
-  } else {
-    RestorePageTableAbove4G (PageTable, PFAddress, CpuIndex, ErrorCode, &IsValidPFAddress);
+  //
+  // Memory operation cross pages, like "rep mov" instruction, will cause
+  // infinite loop between this and Debug Trap handler. We have to make sure
+  // that current page and the page followed are both in PRESENT state.
+  //
+  RestorePageNumber = 2;
+  RestoreAddress = PFAddress;
+  while (RestorePageNumber > 0) {
+    if (RestoreAddress <= 0xFFFFFFFF) {
+      RestorePageTableBelow4G (PageTable, RestoreAddress, CpuIndex, ErrorCode);
+    } else {
+      RestorePageTableAbove4G (PageTable, RestoreAddress, CpuIndex, ErrorCode, &IsValidPFAddress);
+    }
+    RestoreAddress += EFI_PAGE_SIZE;
+    RestorePageNumber--;
   }
 
   if (!IsValidPFAddress) {
