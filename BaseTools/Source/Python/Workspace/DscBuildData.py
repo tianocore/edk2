@@ -898,7 +898,8 @@ class DscBuildData(PlatformBuildClassObject):
                     if pcdobj:
                         pcdset.append((pcd[0],pcd[1], pcdobj.DefaultValue))
                     else:
-                        pcdset.append((pcd[0],pcd[1],pcd[3]))
+                        pcdvalue = pcd[3] if len(pcd) == 4 else pcd[2]
+                        pcdset.append((pcd[0],pcd[1],pcdvalue))
         GlobalData.BuildOptionPcd = pcdset
     def GetFieldValueFromComm(self,ValueStr,TokenSpaceGuidCName, TokenCName, FieldName):
         PredictedFieldType = "VOID*"
@@ -2233,10 +2234,14 @@ class DscBuildData(PlatformBuildClassObject):
         for pcd in Pcds.values():
             SkuInfoObj = pcd.SkuInfoList.values()[0]
             pcdDecObject = self._DecPcds[pcd.TokenCName, pcd.TokenSpaceGuidCName]
+            pcd.DatumType = pcdDecObject.DatumType
             # Only fix the value while no value provided in DSC file.
             for sku in pcd.SkuInfoList.values():
                 if (sku.HiiDefaultValue == "" or sku.HiiDefaultValue == None):
                     sku.HiiDefaultValue = pcdDecObject.DefaultValue
+                    for default_store in sku.DefaultStoreDict:
+                        sku.DefaultStoreDict[default_store]=pcdDecObject.DefaultValue
+                    pcd.DefaultValue = pcdDecObject.DefaultValue
             if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
                 valuefromDec = pcdDecObject.DefaultValue
                 SkuInfo = SkuInfoClass('DEFAULT', '0', SkuInfoObj.VariableName, SkuInfoObj.VariableGuid, SkuInfoObj.VariableOffset, valuefromDec,VariableAttribute=SkuInfoObj.VariableAttribute,DefaultStore={DefaultStore:valuefromDec})
