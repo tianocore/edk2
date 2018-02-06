@@ -539,10 +539,11 @@ UpdatePossibleResource (
   *(DataPtr + 1) = 0;
 
   //
-  // 5. Jump over whole ResourceTemplate. Stuff rest bytes to NOOP
+  // 5. Jump over new ResourceTemplate. Stuff rest bytes to NOOP
   //
-  for (DataPtr += 2; DataPtr < DataEndPtr; DataPtr++) {
-    *DataPtr = AML_NOOP_OP;
+  DataPtr += 2;
+  if (DataPtr < DataEndPtr) {
+    SetMem(DataPtr, (UINTN)(DataEndPtr - DataPtr), AML_NOOP_OP);
   }
 
   return EFI_SUCCESS;
