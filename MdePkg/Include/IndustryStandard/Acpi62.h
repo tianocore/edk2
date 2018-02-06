@@ -2557,6 +2557,12 @@ typedef struct {
 } EFI_ACPI_6_2_PPTT_STRUCTURE_HEADER;
 
 ///
+/// For PPTT struct processor flags
+///
+#define EFI_ACPI_6_2_PPTT_PROCESSOR_ID_INVALID 0x0
+#define EFI_ACPI_6_2_PPTT_PROCESSOR_ID_VALID   0x1
+
+///
 /// Processor hierarchy node structure flags
 ///
 typedef struct {
@@ -2591,6 +2597,18 @@ typedef struct {
   UINT32                        LineSizeValid:1;
   UINT32                        Reserved:25;
 } EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE_FLAGS;
+
+///
+/// For cache attributes
+///
+#define EFI_ACPI_6_2_CACHE_ATTRIBUTES_ALLOCATION_READ            0x0
+#define EFI_ACPI_6_2_CACHE_ATTRIBUTES_ALLOCATION_WRITE           0x1
+#define EFI_ACPI_6_2_CACHE_ATTRIBUTES_ALLOCATION_READ_WRITE      0x2
+#define EFI_ACPI_6_2_CACHE_ATTRIBUTES_CACHE_TYPE_DATA            0x0
+#define EFI_ACPI_6_2_CACHE_ATTRIBUTES_CACHE_TYPE_INSTRUCTION     0x1
+#define EFI_ACPI_6_2_CACHE_ATTRIBUTES_CACHE_TYPE_UNIFIED         0x2
+#define EFI_ACPI_6_2_CACHE_ATTRIBUTES_WRITE_POLICY_WRITE_BACK    0x0
+#define EFI_ACPI_6_2_CACHE_ATTRIBUTES_WRITE_POLICY_WRITE_THROUGH 0x1
 
 ///
 /// Cache Type Structure cache attributes
