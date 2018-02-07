@@ -1446,7 +1446,6 @@ IsNestedFmpCapsule (
   )
 {
   EFI_STATUS                 Status;
-  EFI_SYSTEM_RESOURCE_TABLE  *Esrt;
   EFI_SYSTEM_RESOURCE_ENTRY  *EsrtEntry;
   UINTN                      Index;
   BOOLEAN                    EsrtGuidFound;
@@ -1454,6 +1453,8 @@ IsNestedFmpCapsule (
   UINTN                      NestedCapsuleSize;
   ESRT_MANAGEMENT_PROTOCOL   *EsrtProtocol;
   EFI_SYSTEM_RESOURCE_ENTRY  Entry;
+  EFI_HANDLE                 *HandleBuffer;
+  UINTN                      NumberOfHandles;
 
   EsrtGuidFound = FALSE;
   if (mIsVirtualAddrConverted) {
@@ -1479,19 +1480,21 @@ IsNestedFmpCapsule (
     }
 
     //
-    // Check ESRT configuration table
+    // Check Firmware Management Protocols
     //
     if (!EsrtGuidFound) {
-      Status = EfiGetSystemConfigurationTable(&gEfiSystemResourceTableGuid, (VOID **)&Esrt);
+      HandleBuffer = NULL;
+      Status = GetFmpHandleBufferByType (
+                 &CapsuleHeader->CapsuleGuid,
+                 0,
+                 &NumberOfHandles,
+                 &HandleBuffer
+                 );
       if (!EFI_ERROR(Status)) {
-        ASSERT (Esrt != NULL);
-        EsrtEntry = (VOID *)(Esrt + 1);
-        for (Index = 0; Index < Esrt->FwResourceCount; Index++, EsrtEntry++) {
-          if (CompareGuid(&EsrtEntry->FwClass, &CapsuleHeader->CapsuleGuid)) {
-            EsrtGuidFound = TRUE;
-            break;
-          }
-        }
+        EsrtGuidFound = TRUE;
+      }
+      if (HandleBuffer != NULL) {
+        FreePool (HandleBuffer);
       }
     }
   }
