@@ -104,10 +104,27 @@ class VariableMgr(object):
                     for data_byte in pack(data_flag,int(data,16) if data.upper().startswith('0X') else int(data)):
                         value_list += [hex(unpack("B",data_byte)[0])]
                 newvalue[int(item.var_offset,16) if item.var_offset.upper().startswith("0X") else int(item.var_offset)] = value_list
-            newvaluestr = "{" + ",".join(reduce(lambda x,y: x+y, [newvalue[k] for k in sorted(newvalue.keys())] )) +"}"
+            try:
+                newvaluestr = "{" + ",".join(self.assemble_variable(newvalue)) +"}"
+            except:
+                EdkLogger.error("build", AUTOGEN_ERROR, "Variable offset conflict in PCDs: %s \n" % (" and ".join([item.pcdname for item in sku_var_info_offset_list])))
             n = sku_var_info_offset_list[0]
             indexedvarinfo[key] =  [var_info(n.pcdindex,n.pcdname,n.defaultstoragename,n.skuname,n.var_name, n.var_guid, "0x00",n.var_attribute,newvaluestr  , newvaluestr , "VOID*")]
         self.VarInfo = [item[0] for item in indexedvarinfo.values()]
+
+    def assemble_variable(self, valuelist):
+        ordered_value = [valuelist[k] for k in sorted(valuelist.keys())]
+        ordered_offset = sorted(valuelist.keys())
+        var_value = []
+        num = 0
+        for offset in ordered_offset:
+            if offset < len(var_value):
+                raise
+            for _ in xrange(offset - len(var_value)):
+                var_value.append('0x00')
+            var_value += ordered_value[num]
+            num +=1
+        return var_value
     def process_variable_data(self):
 
         var_data = dict()

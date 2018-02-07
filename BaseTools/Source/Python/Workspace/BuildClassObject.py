@@ -114,6 +114,7 @@ class StructurePcd(PcdClassObject):
         if validateranges is None: validateranges=[]
         if validlists is None: validlists=[]
         if expressions is None : expressions=[]
+        if Packages is None : Packages = []
         super(StructurePcd, self).__init__(Name, Guid, Type, DatumType, Value, Token, MaxDatumSize, SkuInfoList, IsOverrided, GuidValue, validateranges, validlists, expressions)
         self.StructuredPcdIncludeFile = [] if StructuredPcdIncludeFile is None else StructuredPcdIncludeFile
         self.PackageDecs = Packages
