@@ -157,19 +157,9 @@ class ValueExpression(object):
     def Eval(Operator, Oprand1, Oprand2 = None):
         WrnExp = None
 
-        if Operator not in ["in", "not in"] and (type(Oprand1) == type('') or type(Oprand2) == type('')):
-            if type(Oprand1) == type(''):
-                if Oprand1[0] in ['"', "'"] or Oprand1.startswith('L"') or Oprand1.startswith("L'")or Oprand1.startswith('UINT'):
-                    Oprand1, Size = ParseFieldValue(Oprand1)
-                else:
-                    Oprand1,Size = ParseFieldValue('"' + Oprand1 + '"')
-            if type(Oprand2) == type(''):
-                if Oprand2[0] in ['"', "'"] or Oprand2.startswith('L"') or Oprand2.startswith("L'") or Oprand2.startswith('UINT'):
-                    Oprand2, Size = ParseFieldValue(Oprand2)
-                else:
-                    Oprand2, Size = ParseFieldValue('"' + Oprand2 + '"')
-            if type(Oprand1) == type('') or type(Oprand2) == type(''):
-                raise BadExpression(ERR_STRING_EXPR % Operator)
+        if Operator not in ["==", "!=", ">=", "<=", ">", "<", "in", "not in"] and \
+            (type(Oprand1) == type('') or type(Oprand2) == type('')):
+            raise BadExpression(ERR_STRING_EXPR % Operator)
         if Operator in ['in', 'not in']:
             if type(Oprand1) != type(''):
                 Oprand1 = IntToStr(Oprand1)
@@ -296,8 +286,6 @@ class ValueExpression(object):
             except BadExpression:
                 pass
             if type(Token) == type('') and Token.startswith('{') and Token.endswith('}') and self._Idx >= self._Len:
-                if len(Token) != len(self._Expr.replace(' ', '')):
-                    raise BadExpression
                 return self._Expr
 
             self._Idx = 0
@@ -459,7 +447,6 @@ class ValueExpression(object):
                 if self._Token[Index] in ['"']:
                     Flag += 1
             if Flag == 2 and self._Token.endswith('"'):
-                self._Token = ParseFieldValue(self._Token)[0]
                 return True
         if self._Token.startswith("'") or self._Token.startswith("L'"):
             Flag = 0
@@ -467,7 +454,6 @@ class ValueExpression(object):
                 if self._Token[Index] in ["'"]:
                     Flag += 1
             if Flag == 2 and self._Token.endswith("'"):
-                self._Token = ParseFieldValue(self._Token)[0]
                 return True
         try:
             self._Token = int(self._Token, Radix)
@@ -622,24 +608,16 @@ class ValueExpression(object):
             self._Idx += 1
             UStr = self.__GetString()
             self._Token = 'L"' + UStr + '"'
-            self._Token, Size = ParseFieldValue(self._Token)
             return self._Token
         elif Expr.startswith("L'"):
             # Skip L
             self._Idx += 1
             UStr = self.__GetString()
             self._Token = "L'" + UStr + "'"
-            self._Token, Size = ParseFieldValue(self._Token)
-            return self._Token
-        elif Expr.startswith('"'):
-            UStr = self.__GetString()
-            self._Token = '"' + UStr + '"'
-            self._Token, Size = ParseFieldValue(self._Token)
             return self._Token
         elif Expr.startswith("'"):
             UStr = self.__GetString()
             self._Token = "'" + UStr + "'"
-            self._Token, Size = ParseFieldValue(self._Token)
             return self._Token
         elif Expr.startswith('UINT'):
             Re = re.compile('(?:UINT8|UINT16|UINT32|UINT64)\((.+)\)')
@@ -751,7 +729,7 @@ class ValueExpressionEx(ValueExpression):
                 raise BadExpression
         except WrnExpression, Value:
             PcdValue = Value.result
-        except BadExpression:
+        except BadExpression, Value:
             if self.PcdType in ['UINT8', 'UINT16', 'UINT32', 'UINT64', 'BOOLEAN']:
                 PcdValue = PcdValue.strip()
                 if type(PcdValue) == type('') and PcdValue.startswith('{') and PcdValue.endswith('}'):
@@ -785,10 +763,13 @@ class ValueExpressionEx(ValueExpression):
                 else:
                     try:
                         TmpValue, Size = ParseFieldValue(PcdValue)
-                    except BadExpression:
-                        raise BadExpression("Type: %s, Value: %s, format or value error" % (self.PcdType, PcdValue))
+                    except BadExpression, Value:
+                        raise BadExpression("Type: %s, Value: %s, %s" % (self.PcdType, PcdValue, Value))
                 if type(TmpValue) == type(''):
-                    TmpValue = int(TmpValue)
+                    try:
+                        TmpValue = int(TmpValue)
+                    except:
+                        raise  BadExpression(Value)
                 else:
                     PcdValue = '0x%0{}X'.format(Size) % (TmpValue)
                 if TmpValue < 0:
@@ -898,7 +879,7 @@ class ValueExpressionEx(ValueExpression):
                             if Size > 0:
                                 PcdValue = '{' + ValueStr[:-2] + '}'
                     else:
-                        raise  BadExpression("Type: %s, Value: %s, format or value error"%(self.PcdType, PcdValue))
+                        raise  BadExpression("Type: %s, Value: %s, %s"%(self.PcdType, PcdValue, Value))
 
         if PcdValue == 'True':
             PcdValue = '1'

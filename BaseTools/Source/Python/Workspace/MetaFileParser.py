@@ -1994,6 +1994,7 @@ class DecParser(MetaFileParser):
             PcdValue = ValueList[0]
             if PcdValue:
                 try:
+                    self._GuidDict.update(self._AllPcdDict)
                     ValueList[0] = ValueExpressionEx(ValueList[0], ValueList[1], self._GuidDict)(True)
                 except BadExpression, Value:
                     EdkLogger.error('Parser', FORMAT_INVALID, Value, ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
