@@ -1,7 +1,7 @@
 /** @file
   Produce EFI_BLOCK_IO_PROTOCOL on a RAM disk device.
 
-  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -54,6 +54,7 @@ RamDiskInitBlockIo (
   EFI_BLOCK_IO_PROTOCOL           *BlockIo;
   EFI_BLOCK_IO2_PROTOCOL          *BlockIo2;
   EFI_BLOCK_IO_MEDIA              *Media;
+  UINT32                          Remainder;
 
   BlockIo  = &PrivateData->BlockIo;
   BlockIo2 = &PrivateData->BlockIo2;
@@ -69,11 +70,18 @@ RamDiskInitBlockIo (
   Media->LogicalPartition = FALSE;
   Media->ReadOnly         = FALSE;
   Media->WriteCaching     = FALSE;
-  Media->BlockSize        = RAM_DISK_BLOCK_SIZE;
-  Media->LastBlock        = DivU64x32 (
-                              PrivateData->Size + RAM_DISK_BLOCK_SIZE - 1,
-                              RAM_DISK_BLOCK_SIZE
-                              ) - 1;
+
+  for (Media->BlockSize = RAM_DISK_DEFAULT_BLOCK_SIZE;
+       Media->BlockSize >= 1;
+       Media->BlockSize = Media->BlockSize >> 1) {
+    Media->LastBlock = DivU64x32Remainder (PrivateData->Size, Media->BlockSize, &Remainder) - 1;
+    if (Remainder == 0) {
+      break;
+    }
+  }
+  ASSERT (Media->BlockSize != 0);
+
+  return;
 }
 
 

@@ -1,7 +1,7 @@
 /** @file
   The realization of EFI_RAM_DISK_PROTOCOL.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -613,7 +613,8 @@ RamDiskRegister (
   //
   // Add check to prevent data read across the memory boundary
   //
-  if (RamDiskBase + RamDiskSize > ((UINTN) -1) - RAM_DISK_BLOCK_SIZE + 1) {
+  if ((RamDiskSize > MAX_UINTN) ||
+      (RamDiskBase > MAX_UINTN - RamDiskSize + 1)) {
     return EFI_INVALID_PARAMETER;
   }
 
