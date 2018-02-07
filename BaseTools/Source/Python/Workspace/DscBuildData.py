@@ -1285,7 +1285,10 @@ class DscBuildData(PlatformBuildClassObject):
                 str_pcd_obj_str.copy(str_pcd_dec)
                 if str_pcd_obj:
                     str_pcd_obj_str.copy(str_pcd_obj)
-                str_pcd_obj_str.DefaultFromDSC = str_pcd_obj_str.DefaultValue
+                if str_pcd_obj.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
+                    str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].HiiDefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
+                else:
+                    str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].DefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
                 for str_pcd_data in StrPcdSet[str_pcd]:
                     if str_pcd_data[3] in SkuIds:
                         str_pcd_obj_str.AddOverrideValue(str_pcd_data[2], str(str_pcd_data[6]), 'DEFAULT' if str_pcd_data[3] == 'COMMON' else str_pcd_data[3],'STANDARD' if str_pcd_data[4] == 'COMMON' else str_pcd_data[4], self.MetaFile.File,LineNo=str_pcd_data[5])
@@ -1303,8 +1306,10 @@ class DscBuildData(PlatformBuildClassObject):
                     str_pcd_obj = Pcds.get(Pcd, None)
                     if str_pcd_obj:
                         str_pcd_obj_str.copy(str_pcd_obj)
-                        if str_pcd_obj.DefaultValue:
-                            str_pcd_obj_str.DefaultFromDSC = str_pcd_obj.DefaultValue
+                        if str_pcd_obj.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
+                            str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].HiiDefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
+                        else:
+                            str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].DefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
                     S_pcd_set[Pcd] = str_pcd_obj_str
         if S_pcd_set:
             GlobalData.gStructurePcd[self.Arch] = S_pcd_set
@@ -1697,10 +1702,11 @@ class DscBuildData(PlatformBuildClassObject):
                 storeset = [DefaultStoreName] if DefaultStoreName == 'STANDARD' else ['STANDARD', DefaultStoreName]
                 for defaultstorenameitem in storeset:
                     CApp = CApp + "// SkuName: %s,  DefaultStoreName: %s \n" % (skuname, defaultstorenameitem)
-                    for FieldList in [Pcd.DefaultFromDSC,inherit_OverrideValues.get(defaultstorenameitem)]:
+                    pcddefaultvalue = Pcd.DefaultFromDSC.get(skuname,{}).get(defaultstorenameitem, Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue
+                    for FieldList in [pcddefaultvalue,inherit_OverrideValues.get(defaultstorenameitem)]:
                         if not FieldList:
                             continue
-                        if Pcd.DefaultFromDSC and FieldList == Pcd.DefaultFromDSC:
+                        if pcddefaultvalue and FieldList == pcddefaultvalue:
                             IsArray = self.IsFieldValueAnArray(FieldList)
                             if IsArray:
                                 try:
@@ -1710,12 +1716,12 @@ class DscBuildData(PlatformBuildClassObject):
                                                     (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, FieldList))
                             Value, ValueSize = ParseFieldValue (FieldList)
                             if isinstance(Value, str):
-                                CApp = CApp + '  Pcd = %s; // From DSC Default Value %s\n' % (Value, Pcd.DefaultFromDSC)
+                                CApp = CApp + '  Pcd = %s; // From DSC Default Value %s\n' % (Value, Pcd.DefaultFromDSC.get(skuname,{}).get(defaultstorenameitem, Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue)
                             elif IsArray:
                             #
                             # Use memcpy() to copy value into field
                             #
-                                CApp = CApp + '  Value     = %s; // From DSC Default Value %s\n' % (self.IntToCString(Value, ValueSize), Pcd.DefaultFromDSC)
+                                CApp = CApp + '  Value     = %s; // From DSC Default Value %s\n' % (self.IntToCString(Value, ValueSize), Pcd.DefaultFromDSC.get(skuname,{}).get(defaultstorenameitem, Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue)
                                 CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
                             continue
                         for FieldName in FieldList:
