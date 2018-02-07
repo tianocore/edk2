@@ -1,7 +1,7 @@
 ## @file
 # Create makefile for MS nmake and GNU make
 #
-# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -798,9 +798,13 @@ cleanlib:
                                     Tool = Flag
                                     break
                         if Tool:
+                            if 'PATH' not in self._AutoGenObject._BuildOption[Tool]:
+                                EdkLogger.error("build", AUTOGEN_ERROR, "%s_PATH doesn't exist in %s ToolChain and %s Arch." %(Tool, self._AutoGenObject.ToolChain, self._AutoGenObject.Arch), ExtraData="[%s]" % str(self._AutoGenObject))
                             SingleCommandLength += len(self._AutoGenObject._BuildOption[Tool]['PATH'])
                             for item in SingleCommandList[1:]:
                                 if FlagDict[Tool]['Macro'] in item:
+                                    if 'FLAGS' not in self._AutoGenObject._BuildOption[Tool]:
+                                        EdkLogger.error("build", AUTOGEN_ERROR, "%s_FLAGS doesn't exist in %s ToolChain and %s Arch." %(Tool, self._AutoGenObject.ToolChain, self._AutoGenObject.Arch), ExtraData="[%s]" % str(self._AutoGenObject))
                                     Str = self._AutoGenObject._BuildOption[Tool]['FLAGS']
                                     for Option in self._AutoGenObject.BuildOption.keys():
                                         for Attr in self._AutoGenObject.BuildOption[Option]:
