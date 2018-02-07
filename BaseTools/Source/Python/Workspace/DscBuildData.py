@@ -808,7 +808,7 @@ class DscBuildData(PlatformBuildClassObject):
                 PkgSet.update(ModuleData.Packages)
 
             self._DecPcds, self._GuidDict = GetDeclaredPcd(self, self._Bdb, self._Arch, self._Target, self._Toolchain,PkgSet)
-
+            self._GuidDict.update(GlobalData.gPlatformPcds)
 
         if (PcdCName, TokenSpaceGuid) not in self._DecPcds:
             EdkLogger.error('build', PARSER_ERROR,
