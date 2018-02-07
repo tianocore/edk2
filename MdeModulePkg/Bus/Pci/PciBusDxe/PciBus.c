@@ -245,6 +245,11 @@ PciBusDriverBindingStart (
   EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL *PciRootBridgeIo;
 
   //
+  // Initialize PciRootBridgeIo to suppress incorrect compiler warning.
+  //
+  PciRootBridgeIo = NULL;
+
+  //
   // Check RemainingDevicePath validation
   //
   if (RemainingDevicePath != NULL) {
