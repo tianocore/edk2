@@ -72,7 +72,6 @@
 [Guids]
   gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID
   gWindowsUxCapsuleGuid                   ## SOMETIMES_CONSUMES ## GUID
-  gEfiSystemResourceTableGuid             ## SOMETIMES_CONSUMES ## GUID
   gEfiCapsuleReportGuid                   ## CONSUMES ## Variable
   gEfiCapsuleVendorGuid                   ## CONSUMES ## Variable
   gEfiEndOfDxeEventGroupGuid              ## CONSUMES ## Event
