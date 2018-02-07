@@ -16,6 +16,7 @@
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
 #include <Library/HobLib.h>
+#include <Library/DebugLib.h>
 
 extern GUID mFrequencyHobGuid;
 
