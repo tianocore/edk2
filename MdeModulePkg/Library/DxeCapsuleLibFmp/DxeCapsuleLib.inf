@@ -73,7 +73,6 @@
 [Guids]
   gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID
   gWindowsUxCapsuleGuid                   ## SOMETIMES_CONSUMES ## GUID
-  gEfiSystemResourceTableGuid             ## SOMETIMES_CONSUMES ## GUID
   ## SOMETIMES_CONSUMES ## Variable:L"CapsuleMax"
   ## SOMETIMES_PRODUCES ## Variable:L"CapsuleMax"
   gEfiCapsuleReportGuid
