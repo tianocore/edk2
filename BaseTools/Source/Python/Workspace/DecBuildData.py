@@ -389,6 +389,8 @@ class DecBuildData(PackageBuildClassObject):
                     struct_pcd.AddDefaultValue(item.TokenCName, item.DefaultValue,self.MetaFile.File,LineNo)
 
             struct_pcd.PackageDecs = dep_pkgs
+            if not struct_pcd.StructuredPcdIncludeFile:
+                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "The structure Pcd %s.%s header file is not found in %s line %s \n" % (struct_pcd.TokenSpaceGuidCName, struct_pcd.TokenCName,self.MetaFile.File,LineNo ))
 
             str_pcd_set.append(struct_pcd)
 
@@ -423,11 +425,6 @@ class DecBuildData(PackageBuildClassObject):
                 continue
 
             DefaultValue, DatumType, TokenNumber = AnalyzePcdData(Setting)
-            if DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
-                StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*$')
-                if StructPattern.match(DatumType) == None:
-                    EdkLogger.error('build', FORMAT_INVALID, "DatumType only support BOOLEAN, UINT8, UINT16, UINT32, UINT64, VOID* or a valid struct name.", File=self.MetaFile, Line=LineNo)
-
             validateranges, validlists, expressions = self._RawData.GetValidExpression(TokenSpaceGuid, PcdCName)
             PcdObj = PcdClassObject(
                                         PcdCName,
