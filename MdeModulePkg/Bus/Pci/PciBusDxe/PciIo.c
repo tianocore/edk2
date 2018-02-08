@@ -1972,6 +1972,10 @@ PciIoGetBarAttributes (
         return EFI_UNSUPPORTED;
       }
     }
+
+    // According to UEFI spec 2.7, we need return host address for
+    // PciIo->GetBarAttributes, and host address = device address - translation.
+    Descriptor->AddrRangeMin -= Descriptor->AddrTranslationOffset;
   }
 
   return EFI_SUCCESS;
