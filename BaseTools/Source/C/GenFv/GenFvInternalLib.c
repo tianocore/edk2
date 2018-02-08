@@ -1,7 +1,7 @@
 /** @file
 This file contains the internal functions required to generate a Firmware Volume.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions Copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 Portions Copyright (c) 2016 HP Development Company, L.P.<BR>
 This program and the accompanying materials                          
@@ -3532,7 +3532,7 @@ Returns:
           //
           // Xip module has the same section alignment and file alignment.
           //
-          Error (NULL, 0, 3000, "Invalid", "Section-Alignment and File-Alignment do not match : %s.", FileName);
+          Error (NULL, 0, 3000, "Invalid", "PE image Section-Alignment and File-Alignment do not match : %s.", FileName);
           return EFI_ABORTED;
         }
         //
@@ -3610,7 +3610,7 @@ Returns:
           //
           // Xip module has the same section alignment and file alignment.
           //
-          Error (NULL, 0, 3000, "Invalid", "Section-Alignment and File-Alignment do not match : %s.", FileName);
+          Error (NULL, 0, 3000, "Invalid", "PE image Section-Alignment and File-Alignment do not match : %s.", FileName);
           return EFI_ABORTED;
         }
         NewPe32BaseAddress = XipBase + (UINTN) CurrentPe32Section.Pe32Section + CurSecHdrSize - (UINTN)FfsFile;
