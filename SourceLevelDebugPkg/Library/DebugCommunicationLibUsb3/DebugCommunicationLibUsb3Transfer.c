@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on usb3 debug port.
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -145,11 +145,9 @@ XhcCheckNewEvent (
   )
 {
   EFI_STATUS          Status;
-  TRB_TEMPLATE        *EvtTrb;
 
   ASSERT (EvtRing != NULL);
 
-  EvtTrb     = (TRB_TEMPLATE *)(UINTN) EvtRing->EventRingDequeue;
   *NewEvtTrb = (TRB_TEMPLATE *)(UINTN) EvtRing->EventRingDequeue;
 
   if (EvtRing->EventRingDequeue == EvtRing->EventRingEnqueue) {

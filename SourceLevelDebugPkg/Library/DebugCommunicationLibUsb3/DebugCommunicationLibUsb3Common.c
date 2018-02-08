@@ -906,7 +906,6 @@ DebugPortWriteBuffer (
   USB3_DEBUG_PORT_HANDLE    *UsbDebugPortHandle;
   UINTN                     Sent;
   UINTN                     Total;
-  UINTN                     Index;
 
   if (NumberOfBytes == 0 || Buffer == NULL) {
     return 0;
@@ -934,7 +933,6 @@ DebugPortWriteBuffer (
   //
   DebugPortPollBuffer (UsbDebugPortHandle);
 
-  Index = 0;
   while ((Total < NumberOfBytes)) {
     if (NumberOfBytes - Total > USB3_DEBUG_PORT_WRITE_MAX_PACKET_SIZE) {
       Sent = USB3_DEBUG_PORT_WRITE_MAX_PACKET_SIZE;
