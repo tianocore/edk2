@@ -852,7 +852,6 @@ DebugPortWriteBuffer (
   UINTN                     Sent;
   UINTN                     Total;
   EFI_PHYSICAL_ADDRESS      XhciMmioBase;
-  UINTN                     Index;
 
   if (NumberOfBytes == 0 || Buffer == NULL) {
     return 0;
@@ -895,7 +894,6 @@ DebugPortWriteBuffer (
   //
   DebugPortPollBuffer (Handle);
 
-  Index = 0;
   while ((Total < NumberOfBytes)) {
     if (NumberOfBytes - Total > USB3_DEBUG_PORT_WRITE_MAX_PACKET_SIZE) {
       Sent = USB3_DEBUG_PORT_WRITE_MAX_PACKET_SIZE;
