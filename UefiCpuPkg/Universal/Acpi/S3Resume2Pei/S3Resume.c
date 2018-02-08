@@ -4,7 +4,7 @@
   This module will execute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -23,6 +23,7 @@
 #include <Guid/AcpiS3Context.h>
 #include <Guid/BootScriptExecutorVariable.h>
 #include <Guid/Performance.h>
+#include <Guid/ExtendedFirmwarePerformance.h>
 #include <Guid/EndOfS3Resume.h>
 #include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/S3Resume2.h>
@@ -553,8 +554,12 @@ S3ResumeBootOs (
   //
   // Install BootScriptDonePpi
   //
+  PERF_START_EX (NULL, "BootScriptDonePpi", NULL, 0, PERF_INMODULE_START_ID);
+
   Status = PeiServicesInstallPpi (&mPpiListPostScriptTable);
   ASSERT_EFI_ERROR (Status);
+
+  PERF_END_EX (NULL, "BootScriptDonePpi", NULL, 0, PERF_INMODULE_END_ID);
 
   //
   // Get ACPI Table Address
@@ -578,13 +583,21 @@ S3ResumeBootOs (
   //
   // Install EndOfPeiPpi
   //
+  PERF_START_EX (NULL, "EndOfPeiPpi", NULL, 0, PERF_INMODULE_START_ID);
+
   Status = PeiServicesInstallPpi (&mPpiListEndOfPeiTable);
   ASSERT_EFI_ERROR (Status);
+
+  PERF_END_EX (NULL, "EndOfPeiPpi", NULL, 0, PERF_INMODULE_END_ID);
 
   //
   // Signal EndOfS3Resume event.
   //
+  PERF_START_EX (NULL, "EndOfS3Resume", NULL, 0, PERF_INMODULE_START_ID);
+
   SignalEndOfS3Resume ();
+
+  PERF_END_EX (NULL, "EndOfS3Resume", NULL, 0, PERF_INMODULE_END_ID);
 
   //
   // report status code on S3 resume
