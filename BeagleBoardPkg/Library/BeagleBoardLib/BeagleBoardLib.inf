@@ -44,9 +44,6 @@
   BeagleBoardHelper.S    | GCC
   BeagleBoardHelper.asm  | RVCT
 
-[FeaturePcd]
-  gEmbeddedTokenSpaceGuid.PcdCacheEnable
-
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFdBaseAddress
   gArmTokenSpaceGuid.PcdFdSize
