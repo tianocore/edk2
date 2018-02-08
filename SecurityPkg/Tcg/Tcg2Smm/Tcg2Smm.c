@@ -543,7 +543,7 @@ UpdatePossibleResource (
   //
   DataPtr += 2;
   if (DataPtr < DataEndPtr) {
-    SetMem(DataPtr, (UINTN)(DataEndPtr - DataPtr), AML_NOOP_OP);
+    SetMem(DataPtr, (UINTN)DataEndPtr - (UINTN)DataPtr, AML_NOOP_OP);
   }
 
   return EFI_SUCCESS;
