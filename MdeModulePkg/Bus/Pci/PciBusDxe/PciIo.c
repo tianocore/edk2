@@ -1812,10 +1812,14 @@ GetMmioAddressTranslationOffset (
     return (UINT64) -1;
   }
 
+  // According to UEFI 2.7, EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL::Configuration()
+  // returns host address instead of device address, while AddrTranslationOffset
+  // is not zero, and device address = host address + AddrTranslationOffset, so
+  // we convert host address to device address for range compare.
   while (Configuration->Desc == ACPI_ADDRESS_SPACE_DESCRIPTOR) {
     if ((Configuration->ResType == ACPI_ADDRESS_SPACE_TYPE_MEM) &&
-        (Configuration->AddrRangeMin <= AddrRangeMin) &&
-        (Configuration->AddrRangeMin + Configuration->AddrLen >= AddrRangeMin + AddrLen)
+        (Configuration->AddrRangeMin + Configuration->AddrTranslationOffset <= AddrRangeMin) &&
+        (Configuration->AddrRangeMin + Configuration->AddrLen + Configuration->AddrTranslationOffset >= AddrRangeMin + AddrLen)
         ) {
       return Configuration->AddrTranslationOffset;
     }
