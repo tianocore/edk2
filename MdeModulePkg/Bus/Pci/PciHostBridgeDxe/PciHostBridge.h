@@ -38,6 +38,13 @@ typedef struct {
 #define PCI_HOST_BRIDGE_FROM_THIS(a) CR (a, PCI_HOST_BRIDGE_INSTANCE, ResAlloc, PCI_HOST_BRIDGE_SIGNATURE)
 
 //
+// Macros to translate device address to host address and vice versa. According
+// to UEFI 2.7, device address = host address + translation offset.
+//
+#define TO_HOST_ADDRESS(DeviceAddress,TranslationOffset) ((DeviceAddress) - (TranslationOffset))
+#define TO_DEVICE_ADDRESS(HostAddress,TranslationOffset) ((HostAddress) + (TranslationOffset))
+
+//
 // Driver Entry Point
 //
 /**
@@ -245,6 +252,20 @@ PreprocessController (
 VOID
 ResourceConflict (
   IN  PCI_HOST_BRIDGE_INSTANCE *HostBridge
+  );
+
+/**
+  This routine gets translation offset from a root bridge instance by resource type.
+
+  @param RootBridge The Root Bridge Instance for the resources.
+  @param ResourceType The Resource Type of the translation offset.
+
+  @retval The Translation Offset of the specified resource.
+**/
+UINT64
+GetTranslationByResourceType (
+  IN  PCI_ROOT_BRIDGE_INSTANCE     *RootBridge,
+  IN  PCI_RESOURCE_TYPE            ResourceType
   );
 
 extern EFI_METRONOME_ARCH_PROTOCOL *mMetronome;

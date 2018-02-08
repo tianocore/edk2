@@ -33,6 +33,39 @@ EFI_EVENT                   mIoMmuEvent;
 VOID                        *mIoMmuRegistration;
 
 /**
+  This routine gets translation offset from a root bridge instance by resource type.
+
+  @param RootBridge The Root Bridge Instance for the resources.
+  @param ResourceType The Resource Type of the translation offset.
+
+  @retval The Translation Offset of the specified resource.
+**/
+UINT64
+GetTranslationByResourceType (
+  IN  PCI_ROOT_BRIDGE_INSTANCE     *RootBridge,
+  IN  PCI_RESOURCE_TYPE            ResourceType
+  )
+{
+  switch (ResourceType) {
+    case TypeIo:
+      return RootBridge->Io.Translation;
+    case TypeMem32:
+      return RootBridge->Mem.Translation;
+    case TypePMem32:
+      return RootBridge->PMem.Translation;
+    case TypeMem64:
+      return RootBridge->MemAbove4G.Translation;
+    case TypePMem64:
+      return RootBridge->PMemAbove4G.Translation;
+    case TypeBus:
+      return RootBridge->Bus.Translation;
+    default:
+      ASSERT (FALSE);
+      return 0;
+  }
+}
+
+/**
   Ensure the compatibility of an IO space descriptor with the IO aperture.
 
   The IO space descriptor can come from the GCD IO space map, or it can
@@ -366,6 +399,7 @@ InitializePciHostBridge (
   UINTN                       MemApertureIndex;
   BOOLEAN                     ResourceAssigned;
   LIST_ENTRY                  *Link;
+  UINT64                      HostAddress;
 
   RootBridges = PciHostBridgeGetRootBridges (&RootBridgeCount);
   if ((RootBridges == NULL) || (RootBridgeCount == 0)) {
@@ -411,8 +445,15 @@ InitializePciHostBridge (
     }
 
     if (RootBridges[Index].Io.Base <= RootBridges[Index].Io.Limit) {
+      //
+      // Base and Limit in PCI_ROOT_BRIDGE_APERTURE are device address.
+      // For GCD resource manipulation, we need to use host address.
+      //
+      HostAddress = TO_HOST_ADDRESS (RootBridges[Index].Io.Base,
+        RootBridges[Index].Io.Translation);
+
       Status = AddIoSpace (
-                 RootBridges[Index].Io.Base,
+                 HostAddress,
                  RootBridges[Index].Io.Limit - RootBridges[Index].Io.Base + 1
                  );
       ASSERT_EFI_ERROR (Status);
@@ -422,7 +463,7 @@ InitializePciHostBridge (
                         EfiGcdIoTypeIo,
                         0,
                         RootBridges[Index].Io.Limit - RootBridges[Index].Io.Base + 1,
-                        &RootBridges[Index].Io.Base,
+                        &HostAddress,
                         gImageHandle,
                         NULL
                         );
@@ -443,14 +484,20 @@ InitializePciHostBridge (
 
     for (MemApertureIndex = 0; MemApertureIndex < ARRAY_SIZE (MemApertures); MemApertureIndex++) {
       if (MemApertures[MemApertureIndex]->Base <= MemApertures[MemApertureIndex]->Limit) {
+        //
+        // Base and Limit in PCI_ROOT_BRIDGE_APERTURE are device address.
+        // For GCD resource manipulation, we need to use host address.
+        //
+        HostAddress = TO_HOST_ADDRESS (MemApertures[MemApertureIndex]->Base,
+          MemApertures[MemApertureIndex]->Translation);
         Status = AddMemoryMappedIoSpace (
-                   MemApertures[MemApertureIndex]->Base,
+                   HostAddress,
                    MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
                    EFI_MEMORY_UC
                    );
         ASSERT_EFI_ERROR (Status);
         Status = gDS->SetMemorySpaceAttributes (
-                        MemApertures[MemApertureIndex]->Base,
+                        HostAddress,
                         MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
                         EFI_MEMORY_UC
                         );
@@ -463,7 +510,7 @@ InitializePciHostBridge (
                           EfiGcdMemoryTypeMemoryMappedIo,
                           0,
                           MemApertures[MemApertureIndex]->Limit - MemApertures[MemApertureIndex]->Base + 1,
-                          &MemApertures[MemApertureIndex]->Base,
+                          &HostAddress,
                           gImageHandle,
                           NULL
                           );
@@ -654,6 +701,11 @@ AllocateResource (
   if (BaseAddress < Limit) {
     //
     // Have to make sure Aligment is handled since we are doing direct address allocation
+    // Strictly speaking, alignment requirement should be applied to device
+    // address instead of host address which is used in GCD manipulation below,
+    // but as we restrict the alignment of Translation to be larger than any BAR
+    // alignment in the root bridge, we can simplify the situation and consider
+    // the same alignment requirement is also applied to host address.
     //
     BaseAddress = ALIGN_VALUE (BaseAddress, LShiftU64 (1, BitsOfAlignment));
 
@@ -721,6 +773,7 @@ NotifyPhase (
   PCI_RESOURCE_TYPE                     Index2;
   BOOLEAN                               ResNodeHandled[TypeMax];
   UINT64                                MaxAlignment;
+  UINT64                                Translation;
 
   HostBridge = PCI_HOST_BRIDGE_FROM_THIS (This);
 
@@ -822,14 +875,43 @@ NotifyPhase (
           BitsOfAlignment = LowBitSet64 (Alignment + 1);
           BaseAddress = MAX_UINT64;
 
+          //
+          // RESTRICTION: To simplify the situation, we require the alignment of
+          // Translation must be larger than any BAR alignment in the same root
+          // bridge, so that resource allocation alignment can be applied to
+          // both device address and host address.
+          //
+          Translation = GetTranslationByResourceType (RootBridge, Index);
+          if ((Translation & Alignment) != 0) {
+            DEBUG ((DEBUG_ERROR, "[%a:%d] Translation %lx is not aligned to %lx!\n",
+              __FUNCTION__, __LINE__, Translation, Alignment
+              ));
+            ASSERT ((Translation & Alignment) == 0);
+            //
+            // This may be caused by too large alignment or too small
+            // Translation; pick the 1st possibility and return out of resource,
+            // which can also go thru the same process for out of resource
+            // outside the loop.
+            //
+            ReturnStatus = EFI_OUT_OF_RESOURCES;
+            continue;
+          }
+
           switch (Index) {
           case TypeIo:
+            //
+            // Base and Limit in PCI_ROOT_BRIDGE_APERTURE are device address.
+            // For AllocateResource is manipulating GCD resource, we need to use
+            // host address here.
+            //
             BaseAddress = AllocateResource (
                             FALSE,
                             RootBridge->ResAllocNode[Index].Length,
                             MIN (15, BitsOfAlignment),
-                            ALIGN_VALUE (RootBridge->Io.Base, Alignment + 1),
-                            RootBridge->Io.Limit
+                            TO_HOST_ADDRESS (ALIGN_VALUE (RootBridge->Io.Base, Alignment + 1),
+                              RootBridge->Io.Translation),
+                            TO_HOST_ADDRESS (RootBridge->Io.Limit,
+                              RootBridge->Io.Translation)
                             );
             break;
 
@@ -838,8 +920,10 @@ NotifyPhase (
                             TRUE,
                             RootBridge->ResAllocNode[Index].Length,
                             MIN (63, BitsOfAlignment),
-                            ALIGN_VALUE (RootBridge->MemAbove4G.Base, Alignment + 1),
-                            RootBridge->MemAbove4G.Limit
+                            TO_HOST_ADDRESS (ALIGN_VALUE (RootBridge->MemAbove4G.Base, Alignment + 1),
+                              RootBridge->MemAbove4G.Translation),
+                            TO_HOST_ADDRESS (RootBridge->MemAbove4G.Limit,
+                              RootBridge->MemAbove4G.Translation)
                             );
             if (BaseAddress != MAX_UINT64) {
               break;
@@ -853,8 +937,10 @@ NotifyPhase (
                             TRUE,
                             RootBridge->ResAllocNode[Index].Length,
                             MIN (31, BitsOfAlignment),
-                            ALIGN_VALUE (RootBridge->Mem.Base, Alignment + 1),
-                            RootBridge->Mem.Limit
+                            TO_HOST_ADDRESS (ALIGN_VALUE (RootBridge->Mem.Base, Alignment + 1),
+                              RootBridge->Mem.Translation),
+                            TO_HOST_ADDRESS (RootBridge->Mem.Limit,
+                              RootBridge->Mem.Translation)
                             );
             break;
 
@@ -863,8 +949,10 @@ NotifyPhase (
                             TRUE,
                             RootBridge->ResAllocNode[Index].Length,
                             MIN (63, BitsOfAlignment),
-                            ALIGN_VALUE (RootBridge->PMemAbove4G.Base, Alignment + 1),
-                            RootBridge->PMemAbove4G.Limit
+                            TO_HOST_ADDRESS (ALIGN_VALUE (RootBridge->PMemAbove4G.Base, Alignment + 1),
+                              RootBridge->PMemAbove4G.Translation),
+                            TO_HOST_ADDRESS (RootBridge->PMemAbove4G.Limit,
+                              RootBridge->PMemAbove4G.Translation)
                             );
             if (BaseAddress != MAX_UINT64) {
               break;
@@ -877,8 +965,10 @@ NotifyPhase (
                             TRUE,
                             RootBridge->ResAllocNode[Index].Length,
                             MIN (31, BitsOfAlignment),
-                            ALIGN_VALUE (RootBridge->PMem.Base, Alignment + 1),
-                            RootBridge->PMem.Limit
+                            TO_HOST_ADDRESS (ALIGN_VALUE (RootBridge->PMem.Base, Alignment + 1),
+                              RootBridge->PMem.Translation),
+                            TO_HOST_ADDRESS (RootBridge->PMem.Limit,
+                              RootBridge->PMem.Translation)
                             );
             break;
 
@@ -1421,7 +1511,14 @@ GetProposedResources (
           Descriptor->Desc                  = ACPI_ADDRESS_SPACE_DESCRIPTOR;
           Descriptor->Len                   = sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;;
           Descriptor->GenFlag               = 0;
-          Descriptor->AddrRangeMin          = RootBridge->ResAllocNode[Index].Base;
+          //
+          // AddrRangeMin in Resource Descriptor here should be device address
+          // instead of host address, or else PCI bus driver cannot set correct
+          // address into PCI BAR registers.
+          // Base in ResAllocNode is a host address, so conversion is needed.
+          //
+          Descriptor->AddrRangeMin          = TO_DEVICE_ADDRESS (RootBridge->ResAllocNode[Index].Base,
+            GetTranslationByResourceType (RootBridge, Index));
           Descriptor->AddrRangeMax          = 0;
           Descriptor->AddrTranslationOffset = (ResStatus == ResAllocated) ? EFI_RESOURCE_SATISFIED : PCI_RESOURCE_LESS;
           Descriptor->AddrLen               = RootBridge->ResAllocNode[Index].Length;
