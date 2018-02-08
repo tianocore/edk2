@@ -71,10 +71,15 @@ typedef UINT8 EFI_FFS_FILE_STATE;
 #define EFI_FV_FILETYPE_DRIVER                0x07
 #define EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER  0x08
 #define EFI_FV_FILETYPE_APPLICATION           0x09
-#define EFI_FV_FILETYPE_SMM                   0x0A
+#define EFI_FV_FILETYPE_MM                    0x0A
+#define EFI_FV_FILETYPE_SMM                   EFI_FV_FILETYPE_MM
 #define EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE 0x0B
-#define EFI_FV_FILETYPE_COMBINED_SMM_DXE      0x0C
-#define EFI_FV_FILETYPE_SMM_CORE              0x0D
+#define EFI_FV_FILETYPE_COMBINED_MM_DXE       0x0C
+#define EFI_FV_FILETYPE_COMBINED_SMM_DXE      EFI_FV_FILETYPE_COMBINED_MM_DXE
+#define EFI_FV_FILETYPE_MM_CORE               0x0D
+#define EFI_FV_FILETYPE_SMM_CORE              EFI_FV_FILETYPE_MM_CORE
+#define EFI_FV_FILETYPE_MM_STANDALONE         0x0E
+#define EFI_FV_FILETYPE_MM_CORE_STANDALONE    0x0F
 #define EFI_FV_FILETYPE_OEM_MIN               0xc0
 #define EFI_FV_FILETYPE_OEM_MAX               0xdf
 #define EFI_FV_FILETYPE_DEBUG_MIN             0xe0
@@ -217,7 +222,8 @@ typedef UINT8 EFI_SECTION_TYPE;
 #define EFI_SECTION_FREEFORM_SUBTYPE_GUID 0x18
 #define EFI_SECTION_RAW                   0x19
 #define EFI_SECTION_PEI_DEPEX             0x1B
-#define EFI_SECTION_SMM_DEPEX             0x1C
+#define EFI_SECTION_MM_DEPEX              0x1C
+#define EFI_SECTION_SMM_DEPEX             EFI_SECTION_MM_DEPEX
 
 ///
 /// Common section header.
