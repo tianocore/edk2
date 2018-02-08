@@ -86,7 +86,6 @@
 
 [PcdsFeatureFlag.common]
   gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob|FALSE|BOOLEAN|0x0000001b
-  gEmbeddedTokenSpaceGuid.PcdCacheEnable|FALSE|BOOLEAN|0x00000042
   gEmbeddedTokenSpaceGuid.PcdGdbSerial|FALSE|BOOLEAN|0x00000053
 
   gEmbeddedTokenSpaceGuid.PcdSataSiI3132FeaturePMPSupport|FALSE|BOOLEAN|0x00000050
