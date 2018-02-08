@@ -1,7 +1,7 @@
 /** @file
   Machine Check features.
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -140,24 +140,26 @@ McaInitialize (
   MSR_IA32_MCG_CAP_REGISTER  McgCap;
   UINT32                     BankIndex;
 
-  McgCap.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_CAP);
-  for (BankIndex = 0; BankIndex < (UINT32) McgCap.Bits.Count; BankIndex++) {
-    CPU_REGISTER_TABLE_WRITE64 (
-      ProcessorNumber,
-      Msr,
-      MSR_IA32_MC0_CTL + BankIndex * 4,
-      MAX_UINT64
-      );
-  }
-
-  if (PcdGetBool (PcdIsPowerOnReset)) {
-    for (BankIndex = 0; BankIndex < (UINTN) McgCap.Bits.Count; BankIndex++) {
+  if (State == TRUE) {
+    McgCap.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_CAP);
+    for (BankIndex = 0; BankIndex < (UINT32) McgCap.Bits.Count; BankIndex++) {
       CPU_REGISTER_TABLE_WRITE64 (
         ProcessorNumber,
         Msr,
-        MSR_IA32_MC0_STATUS + BankIndex * 4,
-        0
+        MSR_IA32_MC0_CTL + BankIndex * 4,
+        MAX_UINT64
         );
+    }
+
+    if (PcdGetBool (PcdIsPowerOnReset)) {
+      for (BankIndex = 0; BankIndex < (UINTN) McgCap.Bits.Count; BankIndex++) {
+        CPU_REGISTER_TABLE_WRITE64 (
+          ProcessorNumber,
+          Msr,
+          MSR_IA32_MC0_STATUS + BankIndex * 4,
+          0
+          );
+      }
     }
   }
 
