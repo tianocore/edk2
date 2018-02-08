@@ -1,7 +1,7 @@
 /** @file
   Pei Core Load Image Support
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -506,6 +506,9 @@ LoadAndRelocatePeCoffImage (
   //
   Status = PeCoffLoaderLoadImage (&ImageContext);
   if (EFI_ERROR (Status)) {
+    if (ImageContext.ImageError == IMAGE_ERROR_INVALID_SECTION_ALIGNMENT) {
+      DEBUG ((DEBUG_ERROR, "PEIM Image Address 0x%11p doesn't meet with section alignment 0x%x.\n", (VOID*)(UINTN)ImageContext.ImageAddress, ImageContext.SectionAlignment));
+    }
     return Status;
   }
   //
@@ -611,6 +614,8 @@ PeiLoadImageLoadImage (
       return Status;
     }
   }
+
+  DEBUG ((DEBUG_INFO, "Loading PEIM %g\n", FileHandle));
 
   //
   // If memory is installed, perform the shadow operations
