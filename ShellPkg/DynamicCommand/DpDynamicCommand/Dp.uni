@@ -90,7 +90,8 @@
 #string STR_DP_INCOMPLETE              #language en-US  " I "
 #string STR_DP_COMPLETE                #language en-US  "   "
 #string STR_ALIT_UNKNOWN               #language en-US  "Unknown"
-#string STR_DP_GET_BOOT_PERFORMANCE_TABLE_FAIL          #language en-US  "Fail to get boot performance table\n"
+#string STR_DP_GET_ACPI_TABLE_FAIL     #language en-US  "Fail to get ACPI Table\n"
+#string STR_DP_GET_ACPI_FPDT_FAIL      #language en-US  "Fail to get Firmware Performance Data Table (FPDT) in ACPI Table\n"
 
 #string STR_GET_HELP_DP         #language en-US ""
 ".TH dp 0 "Display performance metrics"\r\n"
