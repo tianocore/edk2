@@ -1,7 +1,7 @@
 /** @file
   Produce EFI_BLOCK_IO_PROTOCOL on a RAM disk device.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -137,18 +137,18 @@ RamDiskBlkIoReadBlocks (
   RAM_DISK_PRIVATE_DATA           *PrivateData;
   UINTN                           NumberOfBlocks;
 
+  PrivateData = RAM_DISK_PRIVATE_FROM_BLKIO (This);
+
+  if (MediaId != PrivateData->Media.MediaId) {
+    return EFI_MEDIA_CHANGED;
+  }
+
   if (Buffer == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   if (BufferSize == 0) {
     return EFI_SUCCESS;
-  }
-
-  PrivateData = RAM_DISK_PRIVATE_FROM_BLKIO (This);
-
-  if (MediaId != PrivateData->Media.MediaId) {
-    return EFI_MEDIA_CHANGED;
   }
 
   if ((BufferSize % PrivateData->Media.BlockSize) != 0) {
@@ -212,14 +212,6 @@ RamDiskBlkIoWriteBlocks (
   RAM_DISK_PRIVATE_DATA           *PrivateData;
   UINTN                           NumberOfBlocks;
 
-  if (Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (BufferSize == 0) {
-    return EFI_SUCCESS;
-  }
-
   PrivateData = RAM_DISK_PRIVATE_FROM_BLKIO (This);
 
   if (MediaId != PrivateData->Media.MediaId) {
@@ -228,6 +220,14 @@ RamDiskBlkIoWriteBlocks (
 
   if (TRUE == PrivateData->Media.ReadOnly) {
     return EFI_WRITE_PROTECTED;
+  }
+
+  if (Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (BufferSize == 0) {
+    return EFI_SUCCESS;
   }
 
   if ((BufferSize % PrivateData->Media.BlockSize) != 0) {
