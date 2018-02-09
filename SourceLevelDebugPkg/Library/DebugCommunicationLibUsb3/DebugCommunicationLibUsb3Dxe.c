@@ -443,7 +443,7 @@ DebugCommunicationUsb3DxeConstructor (
   }
 
 Done:
-  if (mUsb3Instance->Ready && (mUsb3Instance->PciIoEvent == 0)) {
+  if ((mUsb3Instance != NULL) && mUsb3Instance->Ready && (mUsb3Instance->PciIoEvent == 0)) {
     Status = Usb3NamedEventListen (
                &gEfiPciIoProtocolGuid,
                TPL_NOTIFY,
