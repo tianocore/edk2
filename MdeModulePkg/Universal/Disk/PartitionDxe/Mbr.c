@@ -13,7 +13,7 @@
 
 Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
 Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -149,6 +149,13 @@ PartitionInstallMbrChildHandles (
   BlockSize = BlockIo->Media->BlockSize;
   MediaId   = BlockIo->Media->MediaId;
   LastBlock = BlockIo->Media->LastBlock;
+
+  //
+  // Ensure the block size can hold the MBR
+  //
+  if (BlockSize < sizeof (MASTER_BOOT_RECORD)) {
+    return EFI_NOT_FOUND;
+  }
 
   Mbr = AllocatePool (BlockSize);
   if (Mbr == NULL) {
