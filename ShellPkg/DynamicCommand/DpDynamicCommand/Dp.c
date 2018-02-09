@@ -258,6 +258,7 @@ GetBootPerformanceTable (
                  );
   }
   if (EFI_ERROR(Status) || AcpiTable == NULL) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GET_ACPI_TABLE_FAIL), mDpHiiHandle);
     return Status;
   }
 
@@ -266,6 +267,7 @@ GetBootPerformanceTable (
                       EFI_ACPI_5_0_FIRMWARE_PERFORMANCE_DATA_TABLE_SIGNATURE
                       );
   if (FirmwarePerformanceTable == NULL) {
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GET_ACPI_FPDT_FAIL), mDpHiiHandle);
     return EFI_NOT_FOUND;
   }
 
@@ -739,7 +741,6 @@ RunDp (
   //
   Status = GetBootPerformanceTable ();
   if (EFI_ERROR(Status)) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GET_BOOT_PERFORMANCE_TABLE_FAIL), mDpHiiHandle);
     return Status;
   }
 
