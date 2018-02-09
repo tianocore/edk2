@@ -857,8 +857,10 @@ class ValueExpressionEx(ValueExpression):
                                     ValueType = "UINT16"
                                 elif Item.startswith('UINT32'):
                                     ItemSize = 4
+                                    ValueType = "UINT32"
                                 elif Item.startswith('UINT64'):
                                     ItemSize = 8
+                                    ValueType = "UINT64"
                                 else:
                                     ItemSize = 0
                                 if ValueType:
