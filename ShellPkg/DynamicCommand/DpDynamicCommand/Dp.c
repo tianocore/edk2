@@ -257,7 +257,7 @@ GetBootPerformanceTable (
                &AcpiTable
                  );
   }
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR(Status) || AcpiTable == NULL) {
     return Status;
   }
 
