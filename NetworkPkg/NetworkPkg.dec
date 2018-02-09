@@ -46,6 +46,9 @@
   # Include/Guid/TlsAuthentication.h
   gEfiTlsCaCertificateGuid      = { 0xfd2340D0, 0x3dab, 0x4349, { 0xa6, 0xc7, 0x3b, 0x4f, 0x12, 0xb4, 0x8e, 0xae }}
 
+  # Include/Guid/HttpTlsCipherList.h
+  gEdkiiHttpTlsCipherListGuid   = { 0x46ddb415, 0x5244, 0x49c7, { 0x93, 0x74, 0xf0, 0xe2, 0x98, 0xe7, 0xd3, 0x86 }}
+
 [PcdsFixedAtBuild]
   ## The max attempt number will be created by iSCSI driver.
   # @Prompt Max attempt number.
