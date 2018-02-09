@@ -60,6 +60,7 @@ class CompressSection (CompressSectionClassObject) :
             self.Alignment = FfsInf.__ExtendMacro__(self.Alignment)
 
         SectFiles = tuple()
+        SectAlign = []
         Index = 0
         MaxAlign = None
         for Sect in self.SectionList:
@@ -76,13 +77,7 @@ class CompressSection (CompressSectionClassObject) :
                     AlignValue = "1"
                 for FileData in ReturnSectList:
                     SectFiles += (FileData,)
-
-        if MaxAlign != None:
-            if self.Alignment == None:
-                self.Alignment = MaxAlign
-            else:
-                if GenFdsGlobalVariable.GetAlignment (MaxAlign) > GenFdsGlobalVariable.GetAlignment (self.Alignment):
-                    self.Alignment = MaxAlign
+                    SectAlign.append(AlignValue)
 
         OutputFile = OutputPath + \
                      os.sep     + \
@@ -91,8 +86,10 @@ class CompressSection (CompressSectionClassObject) :
                      SecNum     + \
                      Ffs.SectionSuffix['COMPRESS']
         OutputFile = os.path.normpath(OutputFile)
+        DummyFile = OutputFile + '.dummy'
+        GenFdsGlobalVariable.GenerateSection(DummyFile, SectFiles, InputAlign=SectAlign, IsMakefile=IsMakefile)
 
-        GenFdsGlobalVariable.GenerateSection(OutputFile, SectFiles, Section.Section.SectionType['COMPRESS'],
+        GenFdsGlobalVariable.GenerateSection(OutputFile, [DummyFile], Section.Section.SectionType['COMPRESS'],
                                              CompressionType=self.CompTypeDict[self.CompType], IsMakefile=IsMakefile)
         OutputFileList = []
         OutputFileList.append(OutputFile)
