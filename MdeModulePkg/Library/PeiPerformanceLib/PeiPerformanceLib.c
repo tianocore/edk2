@@ -49,6 +49,10 @@ IsKnownTokens (
   IN CONST CHAR8  *Token
   )
 {
+  if (Token == NULL) {
+    return FALSE;
+  }
+
   if (AsciiStrCmp (Token, SEC_TOK) == 0 ||
       AsciiStrCmp (Token, PEI_TOK) == 0 ||
       AsciiStrCmp (Token, DXE_TOK) == 0 ||
@@ -266,7 +270,7 @@ InsertPeiFpdtMeasurement (
 
   //
   // If PERF_START()/PERF_END() have specified the ProgressID,it has high priority.
-  // !!! Note: If the Pref is not the known Token used in the core but have same
+  // !!! Note: If the Perf is not the known Token used in the core but have same
   // ID with the core Token, this case will not be supported.
   // And in currtnt usage mode, for the unkown ID, there is a general rule:
   // If it is start pref: the lower 4 bits of the ID should be 0.
