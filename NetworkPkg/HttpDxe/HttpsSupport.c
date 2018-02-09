@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous routines specific to Https for HttpDxe driver.
 
-Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -467,6 +467,87 @@ TlsConfigCertificate (
 }
 
 /**
+  Read the HttpTlsCipherList variable and configure it for HTTPS session.
+
+  @param[in, out]  HttpInstance  The HTTP instance private data.
+
+  @retval EFI_SUCCESS            The prefered HTTP TLS CipherList is configured.
+  @retval EFI_NOT_FOUND          Fail to get 'HttpTlsCipherList' variable.
+  @retval EFI_INVALID_PARAMETER  The contents of variable are invalid.
+  @retval EFI_OUT_OF_RESOURCES   Can't allocate memory resources.
+
+  @retval Others                 Other error as indicated.
+
+**/
+EFI_STATUS
+TlsConfigCipherList (
+  IN OUT HTTP_PROTOCOL      *HttpInstance
+  )
+{
+  EFI_STATUS          Status;
+  UINT8               *CipherList;
+  UINTN               CipherListSize;
+
+  CipherList     = NULL;
+  CipherListSize = 0;
+
+  //
+  // Try to read the HttpTlsCipherList variable.
+  //
+  Status  = gRT->GetVariable (
+                   EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE,
+                   &gEdkiiHttpTlsCipherListGuid,
+                   NULL,
+                   &CipherListSize,
+                   NULL
+                   );
+  ASSERT (EFI_ERROR (Status));
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    return Status;
+  }
+
+  if (CipherListSize % sizeof (EFI_TLS_CIPHER) != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Allocate buffer and read the config variable.
+  //
+  CipherList = AllocatePool (CipherListSize);
+  if (CipherList == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = gRT->GetVariable (
+                  EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE,
+                  &gEdkiiHttpTlsCipherListGuid,
+                  NULL,
+                  &CipherListSize,
+                  CipherList
+                  );
+  if (EFI_ERROR (Status)) {
+    //
+    // GetVariable still error or the variable is corrupted.
+    //
+    goto ON_EXIT;
+  }
+
+  ASSERT (CipherList != NULL);
+
+  Status = HttpInstance->Tls->SetSessionData (
+                                HttpInstance->Tls,
+                                EfiTlsCipherList,
+                                CipherList,
+                                CipherListSize
+                                );
+
+ON_EXIT:  
+  FreePool (CipherList);
+  
+  return Status;
+}
+
+/**
   Configure TLS session data.
 
   @param[in, out]  HttpInstance       The HTTP instance private data.
@@ -522,6 +603,15 @@ TlsConfigureSession (
                                 sizeof (EFI_TLS_SESSION_STATE)
                                 );
   if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Tls Cipher List
+  //
+  Status = TlsConfigCipherList (HttpInstance);
+  if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
+    DEBUG ((EFI_D_ERROR, "TlsConfigCipherList: return %r error.\n", Status));
     return Status;
   }
 
