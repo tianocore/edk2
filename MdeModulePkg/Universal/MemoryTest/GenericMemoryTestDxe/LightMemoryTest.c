@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -106,7 +106,8 @@ ConstructBaseMemoryRange (
   gDS->GetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
 
   for (Index = 0; Index < NumberOfDescriptors; Index++) {
-    if (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeSystemMemory) {
+    if ((MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeSystemMemory) ||
+        (MemorySpaceMap[Index].GcdMemoryType == EfiGcdMemoryTypeMoreReliable)) {
       Private->BaseMemorySize += MemorySpaceMap[Index].Length;
     }
   }
@@ -139,6 +140,41 @@ DestroyLinkList (
 }
 
 /**
+  Convert the memory range to tested.
+
+  @param BaseAddress  Base address of the memory range.
+  @param Length       Length of the memory range.
+  @param Capabilities Capabilities of the memory range.
+
+  @retval EFI_SUCCESS The memory range is converted to tested.
+  @retval others      Error happens.
+**/
+EFI_STATUS
+ConvertToTestedMemory (
+  IN UINT64           BaseAddress,
+  IN UINT64           Length,
+  IN UINT64           Capabilities
+  )
+{
+  EFI_STATUS Status;
+  Status = gDS->RemoveMemorySpace (
+                  BaseAddress,
+                  Length
+                  );
+  if (!EFI_ERROR (Status)) {
+    Status = gDS->AddMemorySpace (
+                    ((Capabilities & EFI_MEMORY_MORE_RELIABLE) == EFI_MEMORY_MORE_RELIABLE) ?
+                    EfiGcdMemoryTypeMoreReliable : EfiGcdMemoryTypeSystemMemory,
+                    BaseAddress,
+                    Length,
+                    Capabilities &~
+                    (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
+                    );
+  }
+  return Status;
+}
+
+/**
   Add the extened memory to whole system memory map.
 
   @param[in] Private  Point to generic memory test driver's private data.
@@ -160,18 +196,12 @@ UpdateMemoryMap (
   while (Link != &Private->NonTestedMemRanList) {
     Range = NONTESTED_MEMORY_RANGE_FROM_LINK (Link);
 
-    gDS->RemoveMemorySpace (
-          Range->StartAddress,
-          Range->Length
-          );
-
-    gDS->AddMemorySpace (
-          EfiGcdMemoryTypeSystemMemory,
-          Range->StartAddress,
-          Range->Length,
-          Range->Capabilities &~(EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
-          );
-
+    ConvertToTestedMemory (
+      Range->StartAddress,
+      Range->Length,
+      Range->Capabilities &~
+      (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
+      );
     Link = Link->ForwardLink;
   }
 
@@ -215,17 +245,12 @@ DirectRangeTest (
   //
   // Add the tested compatible memory to system memory using GCD service
   //
-  gDS->RemoveMemorySpace (
-        StartAddress,
-        Length
-        );
-
-  gDS->AddMemorySpace (
-        EfiGcdMemoryTypeSystemMemory,
-        StartAddress,
-        Length,
-        Capabilities &~(EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
-        );
+  ConvertToTestedMemory (
+      StartAddress,
+      Length,
+      Capabilities &~
+      (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
+      );
 
   return EFI_SUCCESS;
 }
