@@ -1,7 +1,7 @@
 ## @file
 #  SMM LockBox library instance.
 #
-#  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions
@@ -44,7 +44,15 @@
   BaseLib
   DebugLib
 
+[Protocols]
+  gEfiSmmReadyToLockProtocolGuid    ## NOTIFY
+  gEfiSmmEndOfDxeProtocolGuid       ## NOTIFY
+  gEfiSmmSxDispatch2ProtocolGuid    ## NOTIFY
+
 [Guids]
   ## SOMETIMES_CONSUMES   ## UNDEFINED # SmmSystemTable
   ## SOMETIMES_PRODUCES   ## UNDEFINED # SmmSystemTable
   gEfiSmmLockBoxCommunicationGuid
+  ## CONSUMES             ## UNDEFINED # Protocol notify
+  gEdkiiEndOfS3ResumeGuid
+

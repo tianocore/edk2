@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -241,7 +241,7 @@ SetLockBoxAttributes (
   // Basic check
   //
   if ((Guid == NULL) ||
-      ((Attributes & ~LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE) != 0)) {
+      ((Attributes & ~(LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE | LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY)) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
