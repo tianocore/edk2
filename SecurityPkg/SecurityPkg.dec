@@ -90,10 +90,6 @@
   #
   TcgStorageOpalLib|Include/Library/TcgStorageOpalLib.h
 
-  ## @libraryclass  Provides interfaces about Opal commond special for Opal password solution.
-  #
-  OpalPasswordSupportLib|Include/Library/OpalPasswordSupportLib.h
-
 [Guids]
   ## Security package token space guid.
   # Include/Guid/SecurityPkgTokenSpace.h
