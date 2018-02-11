@@ -175,6 +175,13 @@
   #
   BmpSupportLib|Include/Library/BmpSupportLib.h
 
+  ## @libraryclass  Provides services to display completion progress when
+  #  processing a firmware update that updates the firmware image in a firmware
+  #  device.  A platform may provide its own instance of this library class to
+  #  customize how a user is informed of completion progress.
+  #
+  DisplayUpdateProgressLib|Include/Library/DisplayUpdateProgressLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -595,6 +602,10 @@
   gEdkiiPlatformSpecificResetFilterProtocolGuid  = { 0x695d7835, 0x8d47, 0x4c11, { 0xab, 0x22, 0xfa, 0x8a, 0xcc, 0xe7, 0xae, 0x7a } }
   ## Include/Protocol/PlatformSpecificResetHandler.h
   gEdkiiPlatformSpecificResetHandlerProtocolGuid = { 0x2df6ba0b, 0x7092, 0x440d, { 0xbd, 0x4, 0xfb, 0x9, 0x1e, 0xc3, 0xf3, 0xc1 } }
+
+  ## Include/Protocol/FirmwareManagementProgress.h
+  gEdkiiFirmwareManagementProgressProtocolGuid = { 0x1849bda2, 0x6952, 0x4e86, { 0xa1, 0xdb, 0x55, 0x9a, 0x3c, 0x47, 0x9d, 0xf1 } }
+
 #
 # [Error.gEfiMdeModulePkgTokenSpaceGuid]
 #   0x80000001 | Invalid value provided.
