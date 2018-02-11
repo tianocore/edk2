@@ -324,6 +324,8 @@
   #
   SecurityPkg/Tcg/Opal/OpalPasswordDxe/OpalPasswordDxe.inf
   SecurityPkg/Tcg/Opal/OpalPasswordSmm/OpalPasswordSmm.inf
+  SecurityPkg/Tcg/Opal/OpalPassword/OpalPasswordDxe.inf
+  SecurityPkg/Tcg/Opal/OpalPassword/OpalPasswordPei.inf
 
 [Components.IPF]
   SecurityPkg/VariableAuthenticated/EsalVariableDxeSal/EsalVariableDxeSal.inf
