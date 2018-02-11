@@ -2,7 +2,7 @@
   This library is only intended to be used by DXE modules that need save
   confidential information to LockBox and get it by PEI modules in S3 phase.
 
-Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -62,9 +62,17 @@ SetLockBoxAttributes (
   );
 
 //
-// With this flag, this LockBox can be restored to this Buffer with RestoreAllLockBoxInPlace()
+// With this flag, this LockBox can be restored to this Buffer
+// with RestoreAllLockBoxInPlace()
 //
-#define LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE  BIT0
+#define LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE     BIT0
+//
+// With this flag, this LockBox can be restored in S3 resume only.
+// This LockBox can not be restored after SmmReadyToLock in normal boot
+// and after EndOfS3Resume in S3 resume.
+// It can not be set together with LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE.
+//
+#define LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY   BIT1
 
 /**
   This function will update confidential information to lockbox.
