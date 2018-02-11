@@ -3,7 +3,7 @@
   StdIn, StdOut, StdErr, etc...).
 
   Copyright 2016 Dell Inc.
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1555,6 +1555,54 @@ FileInterfaceMemGetPosition(
 }
 
 /**
+  File style interface for Mem (GetInfo).
+
+  @param  This            Protocol instance pointer.
+  @param  InformationType Type of information to return in Buffer.
+  @param  BufferSize      On input size of buffer, on output amount of data in buffer.
+  @param  Buffer          The buffer to return data.
+
+  @retval EFI_SUCCESS          Data was returned.
+  @retval EFI_UNSUPPORT        InformationType is not supported.
+  @retval EFI_NO_MEDIA         The device has no media.
+  @retval EFI_DEVICE_ERROR     The device reported an error.
+  @retval EFI_VOLUME_CORRUPTED The file system structures are corrupted.
+  @retval EFI_WRITE_PROTECTED  The device is write protected.
+  @retval EFI_ACCESS_DENIED    The file was open for read only.
+  @retval EFI_BUFFER_TOO_SMALL Buffer was too small; required size returned in BufferSize.
+
+**/
+EFI_STATUS
+EFIAPI
+FileInterfaceMemGetInfo(
+  IN EFI_FILE_PROTOCOL        *This,
+  IN EFI_GUID                 *InformationType,
+  IN OUT UINTN                *BufferSize,
+  OUT VOID                    *Buffer
+  )
+{
+  EFI_FILE_INFO               *FileInfo;
+
+  if (CompareGuid (InformationType, &gEfiFileInfoGuid)) {
+    if (*BufferSize < sizeof (EFI_FILE_INFO)) {
+      *BufferSize = sizeof (EFI_FILE_INFO);
+      return EFI_BUFFER_TOO_SMALL;
+    }
+    if (Buffer == NULL) {
+      return EFI_INVALID_PARAMETER;
+    }
+    FileInfo = (EFI_FILE_INFO *)Buffer;
+    FileInfo->Size = sizeof (*FileInfo);
+    ZeroMem (FileInfo, sizeof (*FileInfo));
+    FileInfo->FileSize = ((EFI_FILE_PROTOCOL_MEM*)This)->FileSize;
+    FileInfo->PhysicalSize = FileInfo->FileSize;
+    return EFI_SUCCESS;
+  }
+
+  return EFI_UNSUPPORTED;
+}
+
+/**
   File style interface for Mem (Write).
   
   @param[in] This              The pointer to the EFI_FILE_PROTOCOL object.
@@ -1689,7 +1737,7 @@ CreateFileInterfaceMem(
   FileInterface->Close       = FileInterfaceMemClose;
   FileInterface->GetPosition = FileInterfaceMemGetPosition;
   FileInterface->SetPosition = FileInterfaceMemSetPosition;
-  FileInterface->GetInfo     = FileInterfaceNopGetInfo;
+  FileInterface->GetInfo     = FileInterfaceMemGetInfo;
   FileInterface->SetInfo     = FileInterfaceNopSetInfo;
   FileInterface->Flush       = FileInterfaceNopGeneric;
   FileInterface->Delete      = FileInterfaceNopGeneric;
