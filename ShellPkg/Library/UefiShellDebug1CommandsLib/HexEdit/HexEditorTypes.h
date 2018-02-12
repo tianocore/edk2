@@ -1,7 +1,7 @@
 /** @file
   data types that are used by editor
   
-  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -109,17 +109,18 @@ typedef struct {
 } HEFI_EDITOR_BUFFER_IMAGE;
 
 typedef struct {
-  HEFI_EDITOR_BUFFER_IMAGE    *BufferImage;
+  HEFI_EDITOR_BUFFER_IMAGE          *BufferImage;
 
-  HEFI_EDITOR_COLOR_UNION     ColorAttributes;
-  HEFI_EDITOR_POSITION        ScreenSize;           // row number and column number
-  BOOLEAN                     MouseSupported;
-  EFI_SIMPLE_POINTER_PROTOCOL *MouseInterface;
-  INT32                       MouseAccumulatorX;
-  INT32                       MouseAccumulatorY;
+  HEFI_EDITOR_COLOR_UNION           ColorAttributes;
+  HEFI_EDITOR_POSITION              ScreenSize;           // row number and column number
+  EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *TextInputEx;
+  BOOLEAN                           MouseSupported;
+  EFI_SIMPLE_POINTER_PROTOCOL       *MouseInterface;
+  INT32                             MouseAccumulatorX;
+  INT32                             MouseAccumulatorY;
 
-  UINTN                       SelectStart;          // starting from 1
-  UINTN                       SelectEnd;            // starting from 1
+  UINTN                             SelectStart;          // starting from 1
+  UINTN                             SelectEnd;            // starting from 1
 } HEFI_EDITOR_GLOBAL_EDITOR;
 
 #endif
