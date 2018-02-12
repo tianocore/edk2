@@ -100,7 +100,7 @@ GetResetPlatformSpecificGuid (
   //
   if ((ResetDataStringSize < DataSize) && (DataSize - ResetDataStringSize) >= sizeof (GUID)) {
     ResetSubtypeGuid = (GUID *)((UINT8 *)ResetData + ResetDataStringSize);
-    DEBUG ((DEBUG_VERBOSE, __FUNCTION__" - Detected reset subtype %g...\n", ResetSubtypeGuid));
+    DEBUG ((DEBUG_VERBOSE, " - Detected reset subtype %g...\n", ResetSubtypeGuid));
     return ResetSubtypeGuid;
   }
   return NULL;
