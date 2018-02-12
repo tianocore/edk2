@@ -1497,7 +1497,7 @@ MainEditorInit (
   // Find mouse in System Table ConsoleInHandle
   //
   Status = gBS->HandleProtocol (
-                gST->ConIn,
+                gST->ConsoleInHandle,
                 &gEfiSimplePointerProtocolGuid,
                 (VOID**)&MainEditor.MouseInterface
                 );
