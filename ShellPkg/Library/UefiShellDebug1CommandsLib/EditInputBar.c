@@ -1,7 +1,7 @@
 /** @file
   Implements inputbar interface functions.
 
-  Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,18 +18,22 @@
 CHAR16  *mPrompt;        // Input bar mPrompt string.
 CHAR16  *mReturnString;  // The returned string.
 UINTN   StringSize;      // Size of mReturnString space size.
+EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *mTextInEx;
 
 /**
   Initialize the input bar.
+
+  @param[in] TextInEx  Pointer to SimpleTextInEx instance in System Table.
 **/
 VOID
 InputBarInit (
-  VOID
+  IN EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *TextInEx
   )
 {
   mPrompt       = NULL;
   mReturnString = NULL;
   StringSize    = 0;
+  mTextInEx     = TextInEx;
 }
 
 /**
@@ -125,7 +129,7 @@ InputBarRefresh (
 {
   INPUT_BAR_COLOR_UNION   Orig;
   INPUT_BAR_COLOR_UNION   New;
-  EFI_INPUT_KEY           Key;
+  EFI_KEY_DATA            KeyData;
   UINTN                   Size;
   EFI_STATUS              Status;
   BOOLEAN                 NoDisplay;
@@ -174,15 +178,25 @@ InputBarRefresh (
   // wait for user input
   //
   for (;;) {
-    gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &EventIndex);
-    Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    Status = gBS->WaitForEvent (1, &mTextInEx->WaitForKeyEx, &EventIndex);
+    if (EFI_ERROR (Status) || (EventIndex != 0)) {
+      continue;
+    }
+    Status = mTextInEx->ReadKeyStrokeEx (mTextInEx, &KeyData);
     if (EFI_ERROR (Status)) {
+      continue;
+    }
+    if (((KeyData.KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) &&
+        (KeyData.KeyState.KeyShiftState != EFI_SHIFT_STATE_VALID)) {
+      //
+      // Shift key pressed.
+      //
       continue;
     }
     //
     // pressed ESC
     //
-    if (Key.ScanCode == SCAN_ESC) {
+    if (KeyData.Key.ScanCode == SCAN_ESC) {
       Size    = 0;
       Status  = EFI_NOT_READY;
       break;
@@ -190,9 +204,9 @@ InputBarRefresh (
     //
     // return pressed
     //
-    if (Key.UnicodeChar == CHAR_LINEFEED || Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
+    if (KeyData.Key.UnicodeChar == CHAR_LINEFEED || KeyData.Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
       break;
-    } else if (Key.UnicodeChar == CHAR_BACKSPACE) {
+    } else if (KeyData.Key.UnicodeChar == CHAR_BACKSPACE) {
       //
       // backspace
       //
@@ -205,11 +219,11 @@ InputBarRefresh (
 
         }
       }
-    } else if (Key.UnicodeChar <= 127 && Key.UnicodeChar >= 32) {
+    } else if (KeyData.Key.UnicodeChar <= 127 && KeyData.Key.UnicodeChar >= 32) {
       //
       // VALID ASCII char pressed
       //
-      mReturnString[Size] = Key.UnicodeChar;
+      mReturnString[Size] = KeyData.Key.UnicodeChar;
 
       //
       // should be less than specified length
