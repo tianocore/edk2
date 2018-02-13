@@ -3,7 +3,7 @@
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright 2016 Dell Inc.
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -3636,29 +3636,36 @@ InternalShellIsHexOrDecimalNumber (
   )
 {
   BOOLEAN Hex;
+  BOOLEAN LeadingZero;
+
+  if (String == NULL) {
+    return FALSE;
+  }
 
   //
   // chop off a single negative sign
   //
-  if (String != NULL && *String == L'-') {
+  if (*String == L'-') {
     String++;
   }
 
-  if (String == NULL) {
-    return (FALSE);
+  if (*String == CHAR_NULL) {
+    return FALSE;
   }
 
   //
   // chop leading zeroes
   //
-  while(String != NULL && *String == L'0'){
+  LeadingZero = FALSE;
+  while(*String == L'0'){
     String++;
+    LeadingZero = TRUE;
   }
   //
   // allow '0x' or '0X', but not 'x' or 'X'
   //
-  if (String != NULL && (*String == L'x' || *String == L'X')) {
-    if (*(String-1) != L'0') {
+  if (*String == L'x' || *String == L'X') {
+    if (!LeadingZero) {
       //
       // we got an x without a preceeding 0
       //
@@ -3675,7 +3682,7 @@ InternalShellIsHexOrDecimalNumber (
   //
   // loop through the remaining characters and use the lib function
   //
-  for ( ; String != NULL && *String != CHAR_NULL && !(StopAtSpace && *String == L' ') ; String++){
+  for ( ; *String != CHAR_NULL && !(StopAtSpace && *String == L' ') ; String++){
     if (TimeNumbers && (String[0] == L':')) {
       continue;
     }
