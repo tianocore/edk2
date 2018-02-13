@@ -183,16 +183,18 @@ MenuBarDispatchControlHotKey (
   //
   ControlIndex = MAX_UINT16;
 
-  if ((KeyData->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) == 0) {
+  if (((KeyData->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) == 0) ||
+      (KeyData->KeyState.KeyShiftState == EFI_SHIFT_STATE_VALID)) {
     //
-    // For those console devices that cannot report the CONTROL state,
+    // For consoles that don't support/report shift state,
     // Ctrl+A is translated to 1 (UnicodeChar).
     //
     ControlIndex = KeyData->Key.UnicodeChar;
-  } else if (((KeyData->KeyState.KeyShiftState & (EFI_RIGHT_CONTROL_PRESSED | EFI_LEFT_CONTROL_PRESSED)) != 0) &&
+  } else if (((KeyData->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) &&
+             ((KeyData->KeyState.KeyShiftState & (EFI_RIGHT_CONTROL_PRESSED | EFI_LEFT_CONTROL_PRESSED)) != 0) &&
              ((KeyData->KeyState.KeyShiftState & ~(EFI_SHIFT_STATE_VALID | EFI_RIGHT_CONTROL_PRESSED | EFI_LEFT_CONTROL_PRESSED)) == 0)) {
     //
-    // For those console devices that can report the CONTROL state,
+    // For consoles that supports/reports shift state,
     // make sure only CONTROL is pressed.
     //
     if ((KeyData->Key.UnicodeChar >= L'A') && (KeyData->Key.UnicodeChar <= L'Z')) {
