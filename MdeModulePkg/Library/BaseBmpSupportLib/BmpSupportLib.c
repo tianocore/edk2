@@ -426,7 +426,7 @@ TranslateBmpToGopBlt (
 
     }
 
-    ImageIndex = (UINTN)(Image - ImageHeader);
+    ImageIndex = (UINTN)Image - (UINTN)ImageHeader;
     if ((ImageIndex % 4) != 0) {
       //
       // Bmp Image starts each row on a 32-bit boundary!
