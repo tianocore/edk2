@@ -1,7 +1,7 @@
 /** @file
   This contains the business logic for the module-specific Reset Helper functions.
 
-  Copyright (c) 2017 Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018 Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016 Microsoft Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available under
@@ -100,7 +100,7 @@ GetResetPlatformSpecificGuid (
   //
   if ((ResetDataStringSize < DataSize) && (DataSize - ResetDataStringSize) >= sizeof (GUID)) {
     ResetSubtypeGuid = (GUID *)((UINT8 *)ResetData + ResetDataStringSize);
-    DEBUG ((DEBUG_VERBOSE, __FUNCTION__" - Detected reset subtype %g...\n", ResetSubtypeGuid));
+    DEBUG ((DEBUG_VERBOSE, "%a - Detected reset subtype %g...\n", __FUNCTION__, ResetSubtypeGuid));
     return ResetSubtypeGuid;
   }
   return NULL;
