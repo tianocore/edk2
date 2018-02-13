@@ -124,6 +124,8 @@ UsbBootRequestSense (
       Status = EFI_NOT_READY;
     } else if (SenseData.Asc == USB_BOOT_ASC_NO_MEDIA) {
       Status = EFI_NOT_READY;
+    } else if (SenseData.Asc == USB_BOOT_ASC_POWER_ON) {
+      Status = EFI_SUCCESS;
     }
     break;
 
