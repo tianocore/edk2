@@ -137,11 +137,7 @@ LcdSetMode (
 
   // PL111_REG_LCD_CONTROL
   LcdControl = PL111_CTRL_LCD_EN | PL111_CTRL_LCD_BPP (LcdBpp) |
-               PL111_CTRL_LCD_TFT | PL111_CTRL_BGR;
-  MmioWrite32 (PL111_REG_LCD_CONTROL, LcdControl);
-
-  // Turn on power to the LCD Panel
-  LcdControl |= PL111_CTRL_LCD_PWR;
+               PL111_CTRL_LCD_TFT | PL111_CTRL_LCD_PWR | PL111_CTRL_BGR;
   MmioWrite32 (PL111_REG_LCD_CONTROL, LcdControl);
 
   return EFI_SUCCESS;
