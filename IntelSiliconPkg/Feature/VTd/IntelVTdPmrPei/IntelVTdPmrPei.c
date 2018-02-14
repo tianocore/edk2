@@ -189,7 +189,7 @@ PeiIoMmuMap (
   if (Operation == EdkiiIoMmuOperationBusMasterCommonBuffer ||
       Operation == EdkiiIoMmuOperationBusMasterCommonBuffer64) {
     *DeviceAddress = (UINTN)HostAddress;
-    *Mapping = 0;
+    *Mapping = NULL;
     return EFI_SUCCESS;
   }
 
@@ -266,7 +266,7 @@ PeiIoMmuUnmap (
   }
 
   if (Mapping == NULL) {
-    return EFI_INVALID_PARAMETER;
+    return EFI_SUCCESS;
   }
 
   MapInfo = Mapping;
