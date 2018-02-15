@@ -3837,27 +3837,55 @@ SafeInt64Sub (
   )
 {
   RETURN_STATUS  Status;
-  INT64          SignedResult;
 
   if (Result == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
 
-  SignedResult = Minuend - Subtrahend;
-
   //
-  // Subtracting a positive number from a positive number never overflows.
-  // Subtracting a negative number from a negative number never overflows.
-  // If you subtract a negative number from a positive number, you expect a positive result.
-  // If you subtract a positive number from a negative number, you expect a negative result.
-  // Overflow if inputs vary in sign and the output does not have the same sign as the first input.
+  // * A Subtrahend of zero can never cause underflow or overflow.
   //
-  if (((Minuend < 0) != (Subtrahend < 0)) &&
-      ((Minuend < 0) != (SignedResult < 0))) {
+  // * A positive Subtrahend can only cause underflow. The underflow condition
+  //   is:
+  //
+  //     (Minuend - Subtrahend) < MIN_INT64
+  //
+  //   Adding Subtrahend to both sides yields
+  //
+  //     Minuend < (MIN_INT64 + Subtrahend)
+  //
+  //   This condition can be coded directly in C because the RHS will neither
+  //   underflow nor overflow. That is due to the starting condition:
+  //
+  //     0 < Subtrahend <= MAX_INT64
+  //
+  //   Adding MIN_INT64 to all three sides yields
+  //
+  //     MIN_INT64 < (MIN_INT64 + Subtrahend) <= (MIN_INT64 + MAX_INT64) = -1
+  //
+  // * A negative Subtrahend can only cause overflow. The overflow condition is
+  //
+  //     (Minuend - Subtrahend) > MAX_INT64
+  //
+  //   Adding Subtrahend to both sides yields
+  //
+  //     Minuend > (MAX_INT64 + Subtrahend)
+  //
+  //   This condition can be coded directly in C because the RHS will neither
+  //   underflow nor overflow. That is due to the starting condition:
+  //
+  //     MIN_INT64 <= Subtrahend < 0
+  //
+  //   Adding MAX_INT64 to all three sides yields
+  //
+  //     -1 = (MAX_INT64 + MIN_INT64) <= (MAX_INT64 + Subtrahend) < MAX_INT64
+  //
+  if (((Subtrahend > 0) && (Minuend < (MIN_INT64 + Subtrahend))) ||
+      ((Subtrahend < 0) && (Minuend > (MAX_INT64 + Subtrahend)))) {
     *Result = INT64_ERROR;
     Status = RETURN_BUFFER_TOO_SMALL;
   } else {
-    *Result = SignedResult;
+    *Result = Minuend - Subtrahend;
     Status = RETURN_SUCCESS;
   }
 
