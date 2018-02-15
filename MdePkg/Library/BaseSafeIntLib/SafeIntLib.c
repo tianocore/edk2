@@ -3631,26 +3631,62 @@ SafeInt64Add (
   )
 {
   RETURN_STATUS  Status;
-  INT64          SignedResult;
 
   if (Result == NULL) {
     return RETURN_INVALID_PARAMETER;
   }
 
-  SignedResult = Augend + Addend;
-
   //
-  // Adding positive to negative never overflows.
-  // If you add two positive numbers, you expect a positive result.
-  // If you add two negative numbers, you expect a negative result.
-  // Overflow if inputs are the same sign and output is not that sign.
+  // * An Addend of zero can never cause underflow or overflow.
   //
-  if (((Augend < 0) == (Addend < 0))  &&
-      ((Augend < 0) != (SignedResult < 0))) {
+  // * A positive Addend can only cause overflow. The overflow condition is
+  //
+  //     (Augend + Addend) > MAX_INT64
+  //
+  //   Subtracting Addend from both sides yields
+  //
+  //     Augend > (MAX_INT64 - Addend)
+  //
+  //   This condition can be coded directly in C because the RHS will neither
+  //   underflow nor overflow. That is due to the starting condition:
+  //
+  //     0 < Addend <= MAX_INT64
+  //
+  //   Multiplying all three sides by (-1) yields
+  //
+  //     0 > (-Addend) >= (-MAX_INT64)
+  //
+  //   Adding MAX_INT64 to all three sides yields
+  //
+  //     MAX_INT64 > (MAX_INT64 - Addend) >= 0
+  //
+  // * A negative Addend can only cause underflow. The underflow condition is
+  //
+  //     (Augend + Addend) < MIN_INT64
+  //
+  //   Subtracting Addend from both sides yields
+  //
+  //     Augend < (MIN_INT64 - Addend)
+  //
+  //   This condition can be coded directly in C because the RHS will neither
+  //   underflow nor overflow. That is due to the starting condition:
+  //
+  //     MIN_INT64 <= Addend < 0
+  //
+  //   Multiplying all three sides by (-1) yields
+  //
+  //     (-MIN_INT64) >= (-Addend) > 0
+  //
+  //   Adding MIN_INT64 to all three sides yields
+  //
+  //     0 >= (MIN_INT64 - Addend) > MIN_INT64
+  //
+  if (((Addend > 0) && (Augend > (MAX_INT64 - Addend))) ||
+      ((Addend < 0) && (Augend < (MIN_INT64 - Addend)))) {
     *Result = INT64_ERROR;
     Status = RETURN_BUFFER_TOO_SMALL;
   } else {
-    *Result = SignedResult;
+    *Result = Augend + Addend;
     Status = RETURN_SUCCESS;
   }
 
