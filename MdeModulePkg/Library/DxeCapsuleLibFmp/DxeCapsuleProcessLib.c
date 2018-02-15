@@ -9,7 +9,7 @@
   ProcessCapsules(), ProcessTheseCapsules() will receive untrusted
   input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,7 @@
 
 #include <PiDxe.h>
 #include <Protocol/EsrtManagement.h>
+#include <Protocol/FirmwareManagementProgress.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -34,8 +35,11 @@
 #include <Library/HobLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/CapsuleLib.h>
+#include <Library/DisplayUpdateProgressLib.h>
 
 #include <IndustryStandard/WindowsUxCapsule.h>
+
+extern EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL  *mFmpProgress;
 
 /**
   Return if this FMP is a system FMP or a device FMP, based upon CapsuleHeader.
@@ -100,6 +104,62 @@ BOOLEAN                          mNeedReset;
 VOID                        **mCapsulePtr;
 EFI_STATUS                  *mCapsuleStatusArray;
 UINT32                      mCapsuleTotalNumber;
+
+/**
+  Function indicate the current completion progress of the firmware
+  update. Platform may override with own specific progress function.
+
+  @param[in]  Completion  A value between 1 and 100 indicating the current
+                          completion progress of the firmware update
+
+  @retval EFI_SUCESS             The capsule update progress was updated.
+  @retval EFI_INVALID_PARAMETER  Completion is greater than 100%.
+**/
+EFI_STATUS
+EFIAPI
+UpdateImageProgress (
+  IN UINTN  Completion
+  )
+{
+  EFI_STATUS                           Status;
+  UINTN                                Seconds;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  *Color;
+
+  DEBUG((DEBUG_INFO, "Update Progress - %d%%\n", Completion));
+
+  if (Completion > 100) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Use a default timeout of 5 minutes if there is not FMP Progress Protocol.
+  //
+  Seconds = 5 * 60;
+  Color   = NULL;
+  if (mFmpProgress != NULL) {
+    Seconds = mFmpProgress->WatchdogSeconds;
+    Color   = &mFmpProgress->ProgressBarForegroundColor;
+  }
+
+  //
+  // Cancel the watchdog timer
+  //
+  gBS->SetWatchdogTimer (0, 0x0000, 0, NULL);
+
+  if (Completion != 100) {
+    //
+    // Arm the watchdog timer from PCD setting
+    //
+    if (Seconds != 0) {
+      DEBUG ((DEBUG_VERBOSE, "Arm watchdog timer %d seconds\n", Seconds));
+      gBS->SetWatchdogTimer (Seconds, 0x0000, 0, NULL);
+    }
+  }
+
+  Status = DisplayUpdateProgress (Completion, Color);
+
+  return Status;
+}
 
 /**
   This function initializes the mCapsulePtr, mCapsuleStatusArray and mCapsuleTotalNumber.
@@ -319,7 +379,6 @@ ProcessTheseCapsules (
   EFI_STATUS                  Status;
   EFI_CAPSULE_HEADER          *CapsuleHeader;
   UINT32                      Index;
-  BOOLEAN                     DisplayCapsuleExist;
   ESRT_MANAGEMENT_PROTOCOL    *EsrtManagement;
   UINT16                      EmbeddedDriverCount;
 
@@ -354,12 +413,10 @@ ProcessTheseCapsules (
   //
   // If Windows UX capsule exist, process it first
   //
-  DisplayCapsuleExist = FALSE;
   for (Index = 0; Index < mCapsuleTotalNumber; Index++) {
     CapsuleHeader = (EFI_CAPSULE_HEADER*) mCapsulePtr [Index];
     if (CompareGuid (&CapsuleHeader->CapsuleGuid, &gWindowsUxCapsuleGuid)) {
       DEBUG ((DEBUG_INFO, "ProcessCapsuleImage (Ux) - 0x%x\n", CapsuleHeader));
-      DisplayCapsuleExist = TRUE;
       DEBUG ((DEBUG_INFO, "Display logo capsule is found.\n"));
       Status = ProcessCapsuleImage (CapsuleHeader);
       mCapsuleStatusArray [Index] = EFI_SUCCESS;
@@ -368,12 +425,7 @@ ProcessTheseCapsules (
     }
   }
 
-  if (!DisplayCapsuleExist) {
-    //
-    // Display Capsule not found. Display the default string.
-    //
-    Print (L"Updating the firmware ......\r\n");
-  }
+  DEBUG ((DEBUG_INFO, "Updating the firmware ......\n"));
 
   //
   // All capsules left are recognized by platform.
@@ -411,7 +463,6 @@ ProcessTheseCapsules (
           if (EFI_ERROR(Status)) {
             REPORT_STATUS_CODE(EFI_ERROR_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeUpdateFirmwareFailed)));
             DEBUG ((DEBUG_ERROR, "Capsule process failed!\n"));
-            Print (L"Firmware update failed...\r\n");
           } else {
             REPORT_STATUS_CODE(EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeUpdateFirmwareSuccess)));
           }
@@ -447,18 +498,9 @@ DoResetSystem (
   VOID
   )
 {
-  UINTN                         Index;
-
-  REPORT_STATUS_CODE(EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeResettingSystem)));
-
-  Print(L"Capsule Request Cold Reboot.\n");
   DEBUG((DEBUG_INFO, "Capsule Request Cold Reboot."));
 
-  for (Index = 5; Index > 0; Index--) {
-    Print(L"\rResetting system in %d seconds ...", Index);
-    DEBUG((DEBUG_INFO, "\rResetting system in %d seconds ...", Index));
-    gBS->Stall(1000000);
-  }
+  REPORT_STATUS_CODE(EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeResettingSystem)));
 
   gRT->ResetSystem(EfiResetCold, EFI_SUCCESS, 0, NULL);
 
