@@ -260,3 +260,8 @@ M: Mang Guo <mang.guo@intel.com>
 Vlv2TbltDevicePkg
 M: David Wei <david.wei@intel.com>
 M: Mang Guo <mang.guo@intel.com>
+
+StandaloneMmPkg
+M: Achin Gupta <achin.gupta@arm.com>
+M: Jiewen Yao <jiewen.yao@intel.com>
+R: Supreeth Venkatesh <supreeth.venkatesh@arm.com>
