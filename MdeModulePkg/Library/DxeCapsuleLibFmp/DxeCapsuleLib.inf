@@ -52,6 +52,7 @@
   PrintLib
   HobLib
   BmpSupportLib
+  DisplayUpdateProgressLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleMax                               ## CONSUMES
@@ -66,9 +67,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeResettingSystem         ## CONSUMES
 
 [Protocols]
-  gEsrtManagementProtocolGuid             ## CONSUMES
-  gEfiFirmwareManagementProtocolGuid      ## CONSUMES
-  gEdkiiVariableLockProtocolGuid          ## SOMETIMES_CONSUMES
+  gEsrtManagementProtocolGuid                   ## CONSUMES
+  gEfiFirmwareManagementProtocolGuid            ## CONSUMES
+  gEdkiiVariableLockProtocolGuid                ## SOMETIMES_CONSUMES
+  gEdkiiFirmwareManagementProgressProtocolGuid  ## SOMETIMES_CONSUMES
 
 [Guids]
   gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID
