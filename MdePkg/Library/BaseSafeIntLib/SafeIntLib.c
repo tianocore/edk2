@@ -33,7 +33,7 @@
 //
 // Magnitude of MIN_INT64 as expressed by a UINT64 number.
 //
-#define MIN_INT64_MAGNITUDE ((((UINT64) - (MIN_INT64 + 1))) + 1)
+#define MIN_INT64_MAGNITUDE (((UINT64)(- (MIN_INT64 + 1))) + 1)
 
 //
 // Conversion functions
