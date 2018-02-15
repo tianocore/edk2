@@ -4143,6 +4143,8 @@ SafeInt64Mult (
       if (UnsignedResult > MIN_INT64_MAGNITUDE) {
         *Result = INT64_ERROR;
         Status = RETURN_BUFFER_TOO_SMALL;
+      } else if (UnsignedResult == MIN_INT64_MAGNITUDE) {
+        *Result = MIN_INT64;
       } else {
         *Result = - ((INT64)UnsignedResult);
       }
