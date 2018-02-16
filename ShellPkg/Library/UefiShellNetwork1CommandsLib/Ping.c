@@ -784,14 +784,17 @@ PingSendEchoRequest (
   }
 
   ASSERT(Private->ProtocolPointers.Transmit != NULL);
+
+  InsertTailList (&Private->TxList, &TxInfo->Link);
+
   Status = Private->ProtocolPointers.Transmit (Private->IpProtocol, TxInfo->Token);
 
   if (EFI_ERROR (Status)) {
+    RemoveEntryList (&TxInfo->Link);
     PingDestroyTxInfo (TxInfo, Private->IpChoice);
     return Status;
   }
 
-  InsertTailList (&Private->TxList, &TxInfo->Link);
   Private->TxCount++;
 
   return EFI_SUCCESS;
