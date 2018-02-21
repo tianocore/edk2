@@ -827,6 +827,30 @@ class ValueExpressionEx(ValueExpression):
                             LabelDict = {}
                             ReLabel = re.compile('LABEL\((\w+)\)')
                             ReOffset = re.compile('OFFSET_OF\((\w+)\)')
+                            LabelOffset = 0
+                            for Index, Item in enumerate(ListItem):
+                                # compute byte offset of every LABEL
+                                Item = Item.strip()
+                                try:
+                                    LabelList = ReLabel.findall(Item)
+                                    for Label in LabelList:
+                                        if Label not in LabelDict.keys():
+                                            LabelDict[Label] = str(LabelOffset)
+                                    Item = ReLabel.sub('', Item)
+                                except:
+                                    pass
+                                if Item.startswith('UINT8'):
+                                    LabelOffset = LabelOffset + 1
+                                elif Item.startswith('UINT16'):
+                                    LabelOffset = LabelOffset + 2
+                                elif Item.startswith('UINT32'):
+                                    LabelOffset = LabelOffset + 4
+                                elif Item.startswith('UINT64'):
+                                    LabelOffset = LabelOffset + 8
+                                else:
+                                    ItemValue, ItemSize = ParseFieldValue(Item)
+                                    LabelOffset = LabelOffset + ItemSize
+
                             for Index, Item in enumerate(ListItem):
                                 # for LABEL parse
                                 Item = Item.strip()
@@ -847,7 +871,7 @@ class ValueExpressionEx(ValueExpression):
                                         Re = re.compile('OFFSET_OF\(%s\)'% Offset)
                                         Item = Re.sub(LabelDict[Offset], Item)
                                     else:
-                                        raise BadExpression('%s not defined before use' % Offset)
+                                        raise BadExpression('%s not defined' % Offset)
                                 ValueType = ""
                                 if Item.startswith('UINT8'):
                                     ItemSize = 1
