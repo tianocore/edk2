@@ -2239,6 +2239,10 @@ class SkuClass():
             GlobalData.gSkuids = (self.SkuIdSet)
             if 'COMMON' in GlobalData.gSkuids:
                 GlobalData.gSkuids.remove('COMMON')
+            if self.SkuUsageType == self.SINGLE:
+                if len(GlobalData.gSkuids) != 1:
+                    if 'DEFAULT' in GlobalData.gSkuids:
+                        GlobalData.gSkuids.remove('DEFAULT')
             if GlobalData.gSkuids:
                 GlobalData.gSkuids.sort()
 
