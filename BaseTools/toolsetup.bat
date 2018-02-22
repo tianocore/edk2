@@ -317,7 +317,7 @@ goto end
     echo !!! WARNING !!! PYTHON_FREEZER_PATH environment variable is not set.
     echo Setup environment to run Python scripts directly.
     echo.
-    set "PATH=%PATH%;%BASE_TOOLS_PATH%\BinWrappers\WindowsLike"
+    set "PATH=%BASE_TOOLS_PATH%\BinWrappers\WindowsLike;%PATH%"
   )
 
   set BASETOOLS_PYTHON_SOURCE=%BASE_TOOLS_PATH%\Source\Python
