@@ -273,6 +273,7 @@
   QemuFwCfgLib|OvmfPkg/Library/QemuFwCfgLib/QemuFwCfgPeiLib.inf
 
 !if $(TPM2_ENABLE) == TRUE
+  BaseCryptLib|CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   Tpm2DeviceLib|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2DeviceLibDTpm.inf
 !endif
 
@@ -608,6 +609,12 @@
 
 !if $(TPM2_ENABLE) == TRUE
   OvmfPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
+  SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
+    <LibraryClasses>
+      HashLib|SecurityPkg/Library/HashLibBaseCryptoRouter/HashLibBaseCryptoRouterPei.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
+  }
 !endif
 
   #
