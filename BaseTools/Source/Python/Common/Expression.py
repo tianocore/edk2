@@ -68,6 +68,44 @@ def SplitString(String):
         RetList.append(Item)
     return RetList
 
+def SplitPcdValueString(String):
+    # There might be escaped comma in GUID() or DEVICE_PATH() or " "
+    # or ' ' or L' ' or L" "
+    Str = String
+    RetList = []
+    InParenthesis = 0
+    InSingleQuote = False
+    InDoubleQuote = False
+    Item = ''
+    for i, ch in enumerate(Str):
+        if ch == '(':
+            InParenthesis += 1
+        if ch == ')':
+            if InParenthesis:
+                InParenthesis -= 1
+            else:
+                raise BadExpression(ERR_STRING_TOKEN % Item)
+        if ch == '"' and not InSingleQuote:
+            if String[i-1] != '\\':
+                InDoubleQuote = not InDoubleQuote
+        if ch == "'" and not InDoubleQuote:
+            if String[i-1] != '\\':
+                InSingleQuote = not InSingleQuote
+        if ch == ',':
+            if InParenthesis or InSingleQuote or InDoubleQuote:
+                Item += String[i]
+                continue
+            elif Item:
+                RetList.append(Item)
+                Item = ''
+            continue
+        Item += String[i]
+    if InSingleQuote or InDoubleQuote or InParenthesis:
+        raise BadExpression(ERR_STRING_TOKEN % Item)
+    if Item:
+        RetList.append(Item)
+    return RetList
+
 ## ReplaceExprMacro
 #
 def ReplaceExprMacro(String, Macros, ExceptionList = None):
@@ -733,24 +771,42 @@ class ValueExpressionEx(ValueExpression):
             if self.PcdType in ['UINT8', 'UINT16', 'UINT32', 'UINT64', 'BOOLEAN']:
                 PcdValue = PcdValue.strip()
                 if type(PcdValue) == type('') and PcdValue.startswith('{') and PcdValue.endswith('}'):
-                    PcdValue = PcdValue[1:-1].split(',')
+                    PcdValue = SplitPcdValueString(PcdValue[1:-1])
                 if type(PcdValue) == type([]):
                     TmpValue = 0
                     Size = 0
+                    ValueType = ''
                     for Item in PcdValue:
+                        Item = Item.strip()
                         if Item.startswith('UINT8'):
                             ItemSize = 1
-                        if Item.startswith('UINT16'):
+                            ValueType = 'UINT8'
+                        elif Item.startswith('UINT16'):
                             ItemSize = 2
+                            ValueType = 'UINT16'
                         elif Item.startswith('UINT32'):
                             ItemSize = 4
+                            ValueType = 'UINT32'
                         elif Item.startswith('UINT64'):
                             ItemSize = 8
+                            ValueType = 'UINT64'
+                        elif Item.startswith('"') or Item.startswith("'") or Item.startswith('L'):
+                            ItemSize = 0
+                            ValueType = 'VOID*'
                         else:
                             ItemSize = 0
-                        Item = ValueExpressionEx(Item, self.PcdType, self._Symb)(True)
+                            ValueType = 'UINT8'
+                        Item = ValueExpressionEx(Item, ValueType, self._Symb)(True)
 
                         if ItemSize == 0:
+                            try:
+                                tmpValue = int(Item, 16) if Item.upper().startswith('0X') else int(Item, 0)
+                                if tmpValue > 255:
+                                    raise BadExpression("Byte  array number %s should less than 0xFF." % Item)
+                            except BadExpression, Value:
+                                raise BadExpression(Value)
+                            except ValueError:
+                                pass
                             ItemValue, ItemSize = ParseFieldValue(Item)
                         else:
                             ItemValue = ParseFieldValue(Item)[0]
@@ -794,84 +850,81 @@ class ValueExpressionEx(ValueExpression):
                         PcdValue = '{' + ', '.join(TmpList) + '}'
                 except:
                     if PcdValue.strip().startswith('{'):
-                        PcdValue = PcdValue.strip()[1:-1].strip()
-                        Size = 0
-                        ValueStr = ''
-                        TokenSpaceGuidName = ''
-                        if PcdValue.startswith('GUID') and PcdValue.endswith(')'):
+                        PcdValueList = SplitPcdValueString(PcdValue.strip()[1:-1])
+                        LabelDict = {}
+                        NewPcdValueList = []
+                        ReLabel = re.compile('LABEL\((\w+)\)')
+                        ReOffset = re.compile('OFFSET_OF\((\w+)\)')
+                        LabelOffset = 0
+                        for Index, Item in enumerate(PcdValueList):
+                            # compute byte offset of every LABEL
+                            Item = Item.strip()
                             try:
-                                TokenSpaceGuidName = re.search('GUID\((\w+)\)', PcdValue).group(1)
+                                LabelList = ReLabel.findall(Item)
+                                for Label in LabelList:
+                                    if Label not in LabelDict.keys():
+                                        LabelDict[Label] = str(LabelOffset)
                             except:
                                 pass
-                            if TokenSpaceGuidName and TokenSpaceGuidName in self._Symb:
-                                PcdValue = 'GUID(' + self._Symb[TokenSpaceGuidName] + ')'
-                            elif TokenSpaceGuidName:
-                                raise BadExpression('%s not found in DEC file' % TokenSpaceGuidName)
-
-                            ListItem, Size = ParseFieldValue(PcdValue)
-                        elif PcdValue.startswith('DEVICE_PATH') and PcdValue.endswith(')'):
-                            ListItem, Size = ParseFieldValue(PcdValue)
-                        else:
-                            ListItem = PcdValue.split(',')
-
-                        if type(ListItem) == type(0) or type(ListItem) == type(0L):
-                            for Index in range(0, Size):
-                                ValueStr += '0x%02X' % (int(ListItem) & 255)
-                                ListItem >>= 8
-                                ValueStr += ', '
-                                PcdValue = '{' + ValueStr[:-2] + '}'
-                        elif type(ListItem) == type(''):
-                            if ListItem.startswith('{') and ListItem.endswith('}'):
-                                PcdValue = ListItem
-                        else:
-                            LabelDict = {}
-                            ReLabel = re.compile('LABEL\((\w+)\)')
-                            ReOffset = re.compile('OFFSET_OF\((\w+)\)')
-                            LabelOffset = 0
-                            for Index, Item in enumerate(ListItem):
-                                # compute byte offset of every LABEL
-                                Item = Item.strip()
+                            if Item.startswith('UINT8'):
+                                LabelOffset = LabelOffset + 1
+                            elif Item.startswith('UINT16'):
+                                LabelOffset = LabelOffset + 2
+                            elif Item.startswith('UINT32'):
+                                LabelOffset = LabelOffset + 4
+                            elif Item.startswith('UINT64'):
+                                LabelOffset = LabelOffset + 8
+                            else:
                                 try:
-                                    LabelList = ReLabel.findall(Item)
-                                    for Label in LabelList:
-                                        if Label not in LabelDict.keys():
-                                            LabelDict[Label] = str(LabelOffset)
-                                    Item = ReLabel.sub('', Item)
-                                except:
-                                    pass
-                                if Item.startswith('UINT8'):
-                                    LabelOffset = LabelOffset + 1
-                                elif Item.startswith('UINT16'):
-                                    LabelOffset = LabelOffset + 2
-                                elif Item.startswith('UINT32'):
-                                    LabelOffset = LabelOffset + 4
-                                elif Item.startswith('UINT64'):
-                                    LabelOffset = LabelOffset + 8
-                                else:
                                     ItemValue, ItemSize = ParseFieldValue(Item)
                                     LabelOffset = LabelOffset + ItemSize
+                                except:
+                                    LabelOffset = LabelOffset + 1
 
-                            for Index, Item in enumerate(ListItem):
-                                # for LABEL parse
-                                Item = Item.strip()
+                        for Index, Item in enumerate(PcdValueList):
+                            # for LABEL parse
+                            Item = Item.strip()
+                            try:
+                                Item = ReLabel.sub('', Item)
+                            except:
+                                pass
+                            try:
+                                OffsetList = ReOffset.findall(Item)
+                            except:
+                                pass
+                            for Offset in OffsetList:
+                                if Offset in LabelDict.keys():
+                                    Re = re.compile('OFFSET_OF\(%s\)' % Offset)
+                                    Item = Re.sub(LabelDict[Offset], Item)
+                                else:
+                                    raise BadExpression('%s not defined' % Offset)
+                            NewPcdValueList.append(Item)
+
+                        AllPcdValueList = []
+                        for Item in NewPcdValueList:
+                            Size = 0
+                            ValueStr = ''
+                            TokenSpaceGuidName = ''
+                            if Item.startswith('GUID') and Item.endswith(')'):
                                 try:
-                                    LabelList = ReLabel.findall(Item)
-                                    for Label in LabelList:
-                                        if Label not in LabelDict.keys():
-                                            LabelDict[Label] = str(Index)
-                                    Item = ReLabel.sub('', Item)
+                                    TokenSpaceGuidName = re.search('GUID\((\w+)\)', Item).group(1)
                                 except:
                                     pass
-                                try:
-                                    OffsetList = ReOffset.findall(Item)
-                                except:
-                                    pass
-                                for Offset in OffsetList:
-                                    if Offset in LabelDict.keys():
-                                        Re = re.compile('OFFSET_OF\(%s\)'% Offset)
-                                        Item = Re.sub(LabelDict[Offset], Item)
-                                    else:
-                                        raise BadExpression('%s not defined' % Offset)
+                                if TokenSpaceGuidName and TokenSpaceGuidName in self._Symb:
+                                    Item = 'GUID(' + self._Symb[TokenSpaceGuidName] + ')'
+                                elif TokenSpaceGuidName:
+                                    raise BadExpression('%s not found in DEC file' % TokenSpaceGuidName)
+                                Item, Size = ParseFieldValue(Item)
+                                for Index in range(0, Size):
+                                    ValueStr = '0x%02X' % (int(Item) & 255)
+                                    Item >>= 8
+                                    AllPcdValueList.append(ValueStr)
+                                continue
+                            elif Item.startswith('DEVICE_PATH') and Item.endswith(')'):
+                                Item, Size = ParseFieldValue(Item)
+                                AllPcdValueList.append(Item[1:-1])
+                                continue
+                            else:
                                 ValueType = ""
                                 if Item.startswith('UINT8'):
                                     ItemSize = 1
@@ -894,16 +947,18 @@ class ValueExpressionEx(ValueExpression):
                                 Item = '0x%x' % TmpValue if type(TmpValue) != type('') else TmpValue
                                 if ItemSize == 0:
                                     ItemValue, ItemSize = ParseFieldValue(Item)
+                                    if not (Item.startswith('"') or Item.startswith('L') or Item.startswith('{')) and ItemSize > 1:
+                                        raise BadExpression("Byte  array number %s should less than 0xFF." % Item)
                                 else:
                                     ItemValue = ParseFieldValue(Item)[0]
                                 for I in range(0, ItemSize):
-                                    ValueStr += '0x%02X' % (int(ItemValue) & 255)
+                                    ValueStr = '0x%02X' % (int(ItemValue) & 255)
                                     ItemValue >>= 8
-                                    ValueStr += ', '
+                                    AllPcdValueList.append(ValueStr)
                                 Size += ItemSize
 
-                            if Size > 0:
-                                PcdValue = '{' + ValueStr[:-2] + '}'
+                        if Size > 0:
+                            PcdValue = '{' + ','.join(AllPcdValueList) + '}'
                     else:
                         raise  BadExpression("Type: %s, Value: %s, %s"%(self.PcdType, PcdValue, Value))
 
