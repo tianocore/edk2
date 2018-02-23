@@ -206,7 +206,7 @@
         # For RVCTCYGWIN ASM_FLAGS must be first to work around pathing issues
         "$(ASM)" $(ASM_FLAGS) -o ${dst} $(INC) ${d_path}(+)${s_base}.iii
 
-[Assembly-Code-File.COMMON.ARM]
+[Assembly-Code-File.COMMON.ARM,Assembly-Code-File.COMMON.AARCH64]
     # Remove --convert-hex for ARM as it breaks MSFT assemblers
     <InputFile.MSFT, InputFile.INTEL, InputFile.RVCT>
         ?.asm, ?.Asm, ?.ASM
