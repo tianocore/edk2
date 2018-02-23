@@ -668,16 +668,15 @@ struct _LIST_ENTRY {
 
 #define VA_COPY(Dest, Start)          __va_copy (Dest, Start)
 
-#elif defined(_M_ARM)
+#elif defined(_M_ARM) || defined(_M_ARM64)
 //
 // MSFT ARM variable argument list support.
-// Same as the generic macros below, except for VA_ARG that needs extra adjustment.
 //
 
 typedef char* VA_LIST;
 
-#define VA_START(Marker, Parameter)     (Marker = (VA_LIST) ((UINTN) & (Parameter) + _INT_SIZE_OF(Parameter)))
-#define VA_ARG(Marker, TYPE)            (*(TYPE *) ((Marker += _INT_SIZE_OF(TYPE) + ((-(INTN)Marker) & (sizeof(TYPE) - 1))) - _INT_SIZE_OF (TYPE)))
+#define VA_START(Marker, Parameter)     __va_start (&Marker, &Parameter, _INT_SIZE_OF (Parameter), __alignof(Parameter), &Parameter)
+#define VA_ARG(Marker, TYPE)            (*(TYPE *) ((Marker += _INT_SIZE_OF (TYPE) + ((-(INTN)Marker) & (sizeof(TYPE) - 1))) - _INT_SIZE_OF (TYPE)))
 #define VA_END(Marker)                  (Marker = (VA_LIST) 0)
 #define VA_COPY(Dest, Start)            ((void)((Dest) = (Start)))
 
