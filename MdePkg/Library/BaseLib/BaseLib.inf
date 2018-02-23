@@ -867,6 +867,14 @@
   AArch64/SetJumpLongJump.S         | GCC
   AArch64/CpuBreakpoint.S           | GCC
 
+  AArch64/MemoryFence.asm           | MSFT
+  AArch64/SwitchStack.asm           | MSFT
+  AArch64/EnableInterrupts.asm      | MSFT
+  AArch64/DisableInterrupts.asm     | MSFT
+  AArch64/GetInterruptsState.asm    | MSFT
+  AArch64/SetJumpLongJump.asm       | MSFT
+  AArch64/CpuBreakpoint.asm         | MSFT
+
 [Packages]
   MdePkg/MdePkg.dec
 
