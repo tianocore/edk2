@@ -58,7 +58,6 @@
   PerformanceLib
   MemoryAllocationLib
   ReportStatusCodeLib
-  Tcg2PhysicalPresenceLib
   ResetSystemLib
 
 [Guids]
