@@ -2,7 +2,7 @@
   Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -41,13 +41,12 @@ ReadKeyStrokeWorker (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!EfiKeyFiFoRemoveOneKey (TerminalDevice, &KeyData->Key)) {
-    return EFI_NOT_READY;
-  }
-
   KeyData->KeyState.KeyShiftState  = 0;
   KeyData->KeyState.KeyToggleState = 0;
 
+  if (!EfiKeyFiFoRemoveOneKey (TerminalDevice, &KeyData->Key)) {
+    return EFI_NOT_READY;
+  }
 
   return EFI_SUCCESS;
 
