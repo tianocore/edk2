@@ -1907,6 +1907,13 @@ class PlatformAutoGen(AutoGen):
                     NewOption = self.ToolDefinition["MAKE"]["FLAGS"].strip()
                     if NewOption != '':
                         self._BuildCommand += SplitOption(NewOption)
+                if "MAKE" in self.EdkIIBuildOption:
+                    if "FLAGS" in self.EdkIIBuildOption["MAKE"]:
+                        Flags = self.EdkIIBuildOption["MAKE"]["FLAGS"]
+                        if Flags.startswith('='):
+                            self._BuildCommand = [self._BuildCommand[0]] + [Flags[1:]]
+                        else:
+                            self._BuildCommand += [Flags]
         return self._BuildCommand
 
     ## Get tool chain definition
