@@ -9,7 +9,7 @@
   SmmLockBoxHandler(), SmmLockBoxRestore(), SmmLockBoxUpdate(), SmmLockBoxSave()
   will receive untrusted input and do basic validation.
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -217,6 +217,9 @@ SmmLockBoxRestore (
                (VOID *)(UINTN)TempLockBoxParameterRestore.Buffer,
                (UINTN *)&TempLockBoxParameterRestore.Length
                );
+    if (Status == EFI_BUFFER_TOO_SMALL) {
+      LockBoxParameterRestore->Length = TempLockBoxParameterRestore.Length;
+    }
   }
   LockBoxParameterRestore->Header.ReturnStatus = (UINT64)Status;
   return ;
