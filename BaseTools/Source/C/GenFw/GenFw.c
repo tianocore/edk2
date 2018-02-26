@@ -92,6 +92,7 @@ CHAR8  *mInImageName;
 UINT32 mImageTimeStamp = 0;
 UINT32 mImageSize = 0;
 UINT32 mOutImageType = FW_DUMMY_IMAGE;
+BOOLEAN mIsConvertXip = FALSE;
 
 
 STATIC
@@ -665,6 +666,8 @@ PeCoffConvertImageToXip (
   free (*FileBuffer);
   *FileLength = XipLength;
   *FileBuffer = XipFile;
+
+  mIsConvertXip = TRUE;
 }
 
 UINT8 *
@@ -2897,6 +2900,9 @@ Returns:
     Index = 0;
     for (Index=0; Index < DebugDirectoryEntrySize / sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY); Index ++, DebugEntry ++) {
       DebugEntry->TimeDateStamp = 0;
+      if (mIsConvertXip) {
+        DebugEntry->FileOffset = DebugEntry->RVA;
+      }
       if (ZeroDebugFlag || DebugEntry->Type != EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
         memset (FileBuffer + DebugEntry->FileOffset, 0, DebugEntry->SizeOfData);
         memset (DebugEntry, 0, sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY));
