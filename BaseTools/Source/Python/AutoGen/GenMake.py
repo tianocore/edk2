@@ -1555,13 +1555,19 @@ class TopLevelMakefile(BuildFile):
             for index, option in enumerate(GlobalData.gCommand):
                 if "--pcd" == option and GlobalData.gCommand[index+1]:
                     pcdName, pcdValue = GlobalData.gCommand[index+1].split('=')
-                    if pcdValue.startswith('H'):
-                        pcdValue = 'H' + '"' + pcdValue[1:] + '"'
-                        ExtraOption += " --pcd " + pcdName + '=' + pcdValue
-                    elif pcdValue.startswith("L'"):
-                        ExtraOption += "--pcd " + pcdName + '=' + pcdValue
-                    elif pcdValue.startswith('L'):
-                        pcdValue = 'L' + '"' + pcdValue[1:] + '"'
+                    for Item in GlobalData.BuildOptionPcd:
+                        if '.'.join(Item[0:2]) == pcdName:
+                            pcdValue = Item[2]
+                            if pcdValue.startswith('L') or pcdValue.startswith('"'):
+                                pcdValue, Size = ParseFieldValue(pcdValue)
+                                NewVal = '{'
+                                for S in range(Size):
+                                    NewVal = NewVal + '0x%02X' % ((pcdValue >> S * 8) & 0xff)
+                                    NewVal += ','
+                                pcdValue =  NewVal[:-1] + '}'
+                            break
+                    if pcdValue.startswith('{'):
+                        pcdValue = 'H' + '"' + pcdValue + '"'
                         ExtraOption += " --pcd " + pcdName + '=' + pcdValue
                     else:
                         ExtraOption += " --pcd " + GlobalData.gCommand[index+1]

@@ -45,26 +45,32 @@ def GetSplitValueList(String, SplitTag=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
     ValueList = []
     Last = 0
     Escaped = False
-    InString = False
+    InSingleQuoteString = False
+    InDoubleQuoteString = False
     InParenthesis = 0
     for Index in range(0, len(String)):
         Char = String[Index]
 
         if not Escaped:
             # Found a splitter not in a string, split it
-            if not InString and InParenthesis == 0 and Char == SplitTag:
+            if (not InSingleQuoteString or not InDoubleQuoteString) and InParenthesis == 0 and Char == SplitTag:
                 ValueList.append(String[Last:Index].strip())
                 Last = Index + 1
                 if MaxSplit > 0 and len(ValueList) >= MaxSplit:
                     break
 
-            if Char == '\\' and InString:
+            if Char == '\\' and (InSingleQuoteString or InDoubleQuoteString):
                 Escaped = True
-            elif Char == '"':
-                if not InString:
-                    InString = True
+            elif Char == '"' and not InSingleQuoteString:
+                if not InDoubleQuoteString:
+                    InDoubleQuoteString = True
                 else:
-                    InString = False
+                    InDoubleQuoteString = False
+            elif Char == "'" and not InDoubleQuoteString:
+                if not InSingleQuoteString:
+                    InSingleQuoteString = True
+                else:
+                    InSingleQuoteString = False
             elif Char == '(':
                 InParenthesis = InParenthesis + 1
             elif Char == ')':
@@ -345,14 +351,17 @@ def CleanString(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyle
     #
     # remove comments, but we should escape comment character in string
     #
-    InString = False
+    InDoubleQuoteString = False
+    InSingleQuoteString = False
     CommentInString = False
     for Index in range(0, len(Line)):
-        if Line[Index] == '"':
-            InString = not InString
-        elif Line[Index] == CommentCharacter and InString :
+        if Line[Index] == '"' and not InSingleQuoteString:
+            InDoubleQuoteString = not InDoubleQuoteString
+        elif Line[Index] == "'" and not InDoubleQuoteString:
+            InSingleQuoteString = not InSingleQuoteString
+        elif Line[Index] == CommentCharacter and (InSingleQuoteString or InDoubleQuoteString):
             CommentInString = True
-        elif Line[Index] == CommentCharacter and not InString :
+        elif Line[Index] == CommentCharacter and not (InSingleQuoteString or InDoubleQuoteString):
             Line = Line[0: Index]
             break
 
@@ -402,15 +411,18 @@ def CleanString2(Line, CommentCharacter=DataType.TAB_COMMENT_SPLIT, AllowCppStyl
     #
     # separate comments and statements, but we should escape comment character in string
     #
-    InString = False
+    InDoubleQuoteString = False
+    InSingleQuoteString = False
     CommentInString = False
     Comment = ''
     for Index in range(0, len(Line)):
-        if Line[Index] == '"':
-            InString = not InString
-        elif Line[Index] == CommentCharacter and InString:
+        if Line[Index] == '"' and not InSingleQuoteString:
+            InDoubleQuoteString = not InDoubleQuoteString
+        elif Line[Index] == "'" and not InDoubleQuoteString:
+            InSingleQuoteString = not InSingleQuoteString
+        elif Line[Index] == CommentCharacter and (InDoubleQuoteString or InSingleQuoteString):
             CommentInString = True
-        elif Line[Index] == CommentCharacter and not InString:
+        elif Line[Index] == CommentCharacter and not (InDoubleQuoteString or InSingleQuoteString):
             Comment = Line[Index:].strip()
             Line = Line[0:Index].strip()
             break
