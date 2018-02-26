@@ -1944,6 +1944,8 @@ class DscBuildData(PlatformBuildClassObject):
                         message_itmes = Message.split(":")
                         Index = 0
                         if "PcdValueInit.c" not in Message:
+                            if not MessageGroup:
+                                MessageGroup.append(Message)
                             break
                         else:
                             for item in message_itmes:
