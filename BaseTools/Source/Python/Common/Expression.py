@@ -45,15 +45,28 @@ ERR_IN_OPERAND          = 'Macro after IN operator can only be: $(FAMILY), $(ARC
 #  For example: abc"de\"f"ghi"jkl"mn will be: ['abc', '"de\"f"', 'ghi', '"jkl"', 'mn']
 #
 def SplitString(String):
-    # There might be escaped quote: "abc\"def\\\"ghi"
-    Str = String.replace('\\\\', '//').replace('\\\"', '\\\'')
+    # There might be escaped quote: "abc\"def\\\"ghi", 'abc\'def\\\'ghi'
+    Str = String
     RetList = []
-    InQuote = False
+    InSingleQuote = False
+    InDoubleQuote = False
     Item = ''
     for i, ch in enumerate(Str):
-        if ch == '"':
-            InQuote = not InQuote
-            if not InQuote:
+        if ch == '"' and not InSingleQuote:
+            if Str[i - 1] != '\\':
+                InDoubleQuote = not InDoubleQuote
+            if not InDoubleQuote:
+                Item += String[i]
+                RetList.append(Item)
+                Item = ''
+                continue
+            if Item:
+                RetList.append(Item)
+                Item = ''
+        elif ch == "'" and not InDoubleQuote:
+            if Str[i - 1] != '\\':
+                InSingleQuote = not InSingleQuote
+            if not InSingleQuote:
                 Item += String[i]
                 RetList.append(Item)
                 Item = ''
@@ -62,7 +75,7 @@ def SplitString(String):
                 RetList.append(Item)
                 Item = ''
         Item += String[i]
-    if InQuote:
+    if InSingleQuote or InDoubleQuote:
         raise BadExpression(ERR_STRING_TOKEN % Item)
     if Item:
         RetList.append(Item)
@@ -483,6 +496,8 @@ class ValueExpression(object):
             Flag = 0
             for Index in range(len(self._Token)):
                 if self._Token[Index] in ['"']:
+                    if self._Token[Index - 1] == '\\':
+                        continue
                     Flag += 1
             if Flag == 2 and self._Token.endswith('"'):
                 return True
@@ -490,6 +505,8 @@ class ValueExpression(object):
             Flag = 0
             for Index in range(len(self._Token)):
                 if self._Token[Index] in ["'"]:
+                    if self._Token[Index - 1] == '\\':
+                        continue
                     Flag += 1
             if Flag == 2 and self._Token.endswith("'"):
                 return True
@@ -537,16 +554,25 @@ class ValueExpression(object):
         self._Idx += 1
 
         # Replace escape \\\", \"
-        Expr = self._Expr[self._Idx:].replace('\\\\', '//').replace('\\\"', '\\\'')
-        for Ch in Expr:
-            self._Idx += 1
-            if Ch == '"' or Ch == "'":
-                break
-        self._Token = self._LiteralToken = self._Expr[Idx:self._Idx]
-        if self._Token.startswith('"') and not self._Token.endswith('"'):
-            raise BadExpression(ERR_STRING_TOKEN % self._Token)
-        if self._Token.startswith("'") and not self._Token.endswith("'"):
-            raise BadExpression(ERR_STRING_TOKEN % self._Token)
+        if self._Expr[Idx] == '"':
+            Expr = self._Expr[self._Idx:].replace('\\\\', '//').replace('\\\"', '\\\'')
+            for Ch in Expr:
+                self._Idx += 1
+                if Ch == '"':
+                    break
+            self._Token = self._LiteralToken = self._Expr[Idx:self._Idx]
+            if not self._Token.endswith('"'):
+                raise BadExpression(ERR_STRING_TOKEN % self._Token)
+        #Replace escape \\\', \'
+        elif self._Expr[Idx] == "'":
+            Expr = self._Expr[self._Idx:].replace('\\\\', '//').replace("\\\'", "\\\"")
+            for Ch in Expr:
+                self._Idx += 1
+                if Ch == "'":
+                    break
+            self._Token = self._LiteralToken = self._Expr[Idx:self._Idx]
+            if not self._Token.endswith("'"):
+                raise BadExpression(ERR_STRING_TOKEN % self._Token)
         self._Token = self._Token[1:-1]
         return self._Token
 

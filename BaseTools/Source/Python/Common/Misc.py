@@ -1443,21 +1443,26 @@ def ParseConsoleLog(Filename):
 
 def AnalyzePcdExpression(Setting):
     Setting = Setting.strip()
-    # There might be escaped quote in a string: \", \\\"
-    Data = Setting.replace('\\\\', '//').replace('\\\"', '\\\'')
+    # There might be escaped quote in a string: \", \\\" , \', \\\'
+    Data = Setting
     # There might be '|' in string and in ( ... | ... ), replace it with '-'
     NewStr = ''
-    InStr = False
+    InSingleQuoteStr = False
+    InDoubleQuoteStr = False
     Pair = 0
-    for ch in Data:
-        if ch == '"':
-            InStr = not InStr
-        elif ch == '(' and not InStr:
+    for Index, ch in enumerate(Data):
+        if ch == '"' and not InSingleQuoteStr:
+            if Data[Index - 1] != '\\':
+                InDoubleQuoteStr = not InDoubleQuoteStr
+        elif ch == "'" and not InDoubleQuoteStr:
+            if Data[Index - 1] != '\\':
+                InSingleQuoteStr = not InSingleQuoteStr
+        elif ch == '(' and not (InSingleQuoteStr or InDoubleQuoteStr):
             Pair += 1
-        elif ch == ')' and not InStr:
+        elif ch == ')' and not (InSingleQuoteStr or InDoubleQuoteStr):
             Pair -= 1
 
-        if (Pair > 0 or InStr) and ch == TAB_VALUE_SPLIT:
+        if (Pair > 0 or InSingleQuoteStr or InDoubleQuoteStr) and ch == TAB_VALUE_SPLIT:
             NewStr += '-'
         else:
             NewStr += ch
@@ -1549,7 +1554,7 @@ def ParseFieldValue (Value):
         return Value, 16
     if Value.startswith('L"') and Value.endswith('"'):
         # Unicode String
-        List = list(Value[2:-1])
+        List = list(eval(Value[1:]))  # translate escape character
         List.reverse()
         Value = 0
         for Char in List:
@@ -1557,7 +1562,7 @@ def ParseFieldValue (Value):
         return Value, (len(List) + 1) * 2
     if Value.startswith('"') and Value.endswith('"'):
         # ASCII String
-        List = list(Value[1:-1])
+        List = list(eval(Value))  # translate escape character
         List.reverse()
         Value = 0
         for Char in List:
@@ -1565,7 +1570,7 @@ def ParseFieldValue (Value):
         return Value, len(List) + 1
     if Value.startswith("L'") and Value.endswith("'"):
         # Unicode Character Constant
-        List = list(Value[2:-1])
+        List = list(eval(Value[1:])) # translate escape character
         if len(List) == 0:
             raise BadExpression('Length %s is %s' % (Value, len(List)))
         List.reverse()
@@ -1575,7 +1580,7 @@ def ParseFieldValue (Value):
         return Value, len(List) * 2
     if Value.startswith("'") and Value.endswith("'"):
         # Character constant
-        List = list(Value[1:-1])
+        List = list(eval(Value)) # translate escape character
         if len(List) == 0:
             raise BadExpression('Length %s is %s' % (Value, len(List)))
         List.reverse()
