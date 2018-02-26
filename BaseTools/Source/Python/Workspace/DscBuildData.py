@@ -679,8 +679,9 @@ class DscBuildData(PlatformBuildClassObject):
                 for TokenSpaceGuid, PcdCName, Setting, Dummy1, Dummy2, Dummy3, Dummy4,Dummy5 in RecordList:
                     TokenList = GetSplitValueList(Setting)
                     DefaultValue = TokenList[0]
-                    if len(TokenList) > 1:
-                        MaxDatumSize = TokenList[1]
+                    # the format is PcdName| Value | VOID* | MaxDatumSize
+                    if len(TokenList) > 2:
+                        MaxDatumSize = TokenList[2]
                     else:
                         MaxDatumSize = ''
                     TypeString = self._PCD_TYPE_STRING_[Type]
