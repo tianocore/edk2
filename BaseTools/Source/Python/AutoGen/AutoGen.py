@@ -2421,7 +2421,7 @@ class PlatformAutoGen(AutoGen):
             ToPcd.validlists = FromPcd.validlists
             ToPcd.expressions = FromPcd.expressions
 
-        if ToPcd.DatumType == "VOID*" and ToPcd.MaxDatumSize in ['', None]:
+        if FromPcd != None and ToPcd.DatumType == "VOID*" and ToPcd.MaxDatumSize in ['', None]:
             EdkLogger.debug(EdkLogger.DEBUG_9, "No MaxDatumSize specified for PCD %s.%s" \
                             % (ToPcd.TokenSpaceGuidCName, TokenCName))
             Value = ToPcd.DefaultValue
@@ -2494,6 +2494,19 @@ class PlatformAutoGen(AutoGen):
                             break
                 if Flag:
                     self._OverridePcd(ToPcd, PlatformModule.Pcds[Key], Module)
+        # use PCD value to calculate the MaxDatumSize when it is not specified
+        for Name, Guid in Pcds:
+            Pcd = Pcds[Name, Guid]
+            if Pcd.DatumType == "VOID*" and Pcd.MaxDatumSize in ['', None]:
+                Value = Pcd.DefaultValue
+                if Value in [None, '']:
+                    Pcd.MaxDatumSize = '1'
+                elif Value[0] == 'L':
+                    Pcd.MaxDatumSize = str((len(Value) - 2) * 2)
+                elif Value[0] == '{':
+                    Pcd.MaxDatumSize = str(len(Value.split(',')))
+                else:
+                    Pcd.MaxDatumSize = str(len(Value) - 1)
         return Pcds.values()
 
     ## Resolve library names to library modules
