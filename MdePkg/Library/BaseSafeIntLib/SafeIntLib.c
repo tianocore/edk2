@@ -28,6 +28,7 @@
 
 #include <Base.h>
 #include <Library/SafeIntLib.h>
+#include <Library/BaseLib.h>
 
 
 //
@@ -3373,8 +3374,8 @@ SafeUint64Mult (
   // b * c must be less than 2^32 or there would be bits in the high 64-bits
   // then there must be no overflow of the resulting values summed up.
   //
-  DwordA = (UINT32)(Multiplicand >> 32);
-  DwordC = (UINT32)(Multiplier >> 32);
+  DwordA = (UINT32)RShiftU64 (Multiplicand, 32);
+  DwordC = (UINT32)RShiftU64 (Multiplier, 32);
 
   //
   // common case -- if high dwords are both zero, no chance for overflow
@@ -3409,7 +3410,7 @@ SafeUint64Mult (
           // now sum them all up checking for overflow.
           // shifting is safe because we already checked for overflow above
           //
-          if (!RETURN_ERROR (SafeUint64Add (ProductBC << 32, ProductAD << 32, &UnsignedResult))) {
+          if (!RETURN_ERROR (SafeUint64Add (LShiftU64 (ProductBC, 32), LShiftU64 (ProductAD, 32), &UnsignedResult))) {
             //
             // b * d
             //
@@ -4075,7 +4076,7 @@ SafeInt32Mult (
   OUT INT32  *Result
   )
 {
-  return SafeInt64ToInt32 (((INT64)Multiplicand) *((INT64)Multiplier), Result);
+  return SafeInt64ToInt32 (MultS64x64 (Multiplicand, Multiplier), Result);
 }
 
 /**

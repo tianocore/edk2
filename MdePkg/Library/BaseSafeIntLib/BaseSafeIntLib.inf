@@ -56,3 +56,6 @@
 
 [Packages]
   MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
