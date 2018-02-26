@@ -399,7 +399,7 @@ def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
     ToolOptionKey = None
     KeyList = None
     for ToolDef in ToolDefinition.items():
-        if NameGuid == ToolDef[1]:
+        if NameGuid.lower() == ToolDef[1].lower() :
             KeyList = ToolDef[0].split('_')
             Key = KeyList[0] + \
                   '_' + \
