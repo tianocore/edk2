@@ -28,6 +28,7 @@
 
 #include <Base.h>
 #include <Library/SafeIntLib.h>
+#include <Library/BaseLib.h>
 
 /**
   INT32 -> UINTN conversion
@@ -549,6 +550,6 @@ SafeIntnMult (
   OUT INTN  *Result
   )
 {
-  return SafeInt64ToIntn (((INT64)Multiplicand) *((INT64)Multiplier), Result);
+  return SafeInt64ToIntn (MultS64x64 (Multiplicand, Multiplier), Result);
 }
 
