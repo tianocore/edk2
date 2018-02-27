@@ -1,7 +1,7 @@
 /** @file
   Implementation of EFI_HTTP_PROTOCOL protocol interfaces.
 
-  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -281,11 +281,12 @@ EfiHttpRequest (
   Request = HttpMsg->Data.Request;
 
   //
-  // Only support GET, HEAD, PATCH, PUT and POST method in current implementation.
+  // Only support GET, HEAD, DELETE, PATCH, PUT and POST method in current implementation.
   //
   if ((Request != NULL) && (Request->Method != HttpMethodGet) &&
-      (Request->Method != HttpMethodHead) && (Request->Method != HttpMethodPut) && 
-      (Request->Method != HttpMethodPost) && (Request->Method != HttpMethodPatch)) {
+      (Request->Method != HttpMethodHead) && (Request->Method != HttpMethodDelete) && 
+      (Request->Method != HttpMethodPut) && (Request->Method != HttpMethodPost) && 
+      (Request->Method != HttpMethodPatch)) {
     return EFI_UNSUPPORTED;
   }
 
