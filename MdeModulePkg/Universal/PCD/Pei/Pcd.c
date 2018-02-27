@@ -475,12 +475,15 @@ PeiPcdSetSku (
   PCD_DATABASE_SKU_DELTA *SkuDelta;
   PCD_DATA_DELTA         *SkuDeltaData;
 
+  DEBUG ((DEBUG_INFO, "PcdPei - SkuId 0x%lx is to be set.\n", (SKU_ID) SkuId));
+
   PeiPcdDb = GetPcdDatabase();
 
   if (SkuId == PeiPcdDb->SystemSkuId) {
     //
     // The input SKU Id is equal to current SKU Id, return directly.
     //
+    DEBUG ((DEBUG_INFO, "PcdPei - SkuId is same to current system Sku.\n"));
     return;
   }
 
@@ -499,6 +502,7 @@ PeiPcdSetSku (
   SkuIdTable = (SKU_ID *) ((UINT8 *) PeiPcdDb + PeiPcdDb->SkuIdTableOffset);
   for (Index = 0; Index < SkuIdTable[0]; Index++) {
     if (SkuId == SkuIdTable[Index + 1]) {
+      DEBUG ((DEBUG_INFO, "PcdPei - SkuId is found in SkuId table.\n"));
       break;
     }
   }
@@ -570,7 +574,7 @@ PeiPcdSetSku (
   //
   // Invalid input SkuId, the default SKU Id will be still used for the system.
   //
-  DEBUG ((EFI_D_INFO, "PcdPei - Invalid input SkuId, the default SKU Id will be still used.\n"));
+  DEBUG ((DEBUG_ERROR, "PcdPei - Invalid input SkuId, the default SKU Id will be still used.\n"));
 
   return;
 }
