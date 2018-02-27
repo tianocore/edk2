@@ -34,10 +34,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Guid/FfsSectionAlignmentPadding.h>
 
+#include "WinNtInclude.h"
 #include "GenFvInternalLib.h"
 #include "FvLib.h"
 #include "PeCoffLib.h"
-#include "WinNtInclude.h"
 
 #define ARMT_UNCONDITIONAL_JUMP_INSTRUCTION       0xEB000000
 #define ARM64_UNCONDITIONAL_JUMP_INSTRUCTION      0x14000000

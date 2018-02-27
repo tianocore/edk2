@@ -122,6 +122,8 @@
 
 #endif
 
+#ifndef GUID_DEFINED
+#define GUID_DEFINED
 ///
 /// 128 bit buffer containing a unique identifier value.
 /// Unless otherwise specified, aligned on a 64 bit boundary.
@@ -132,6 +134,7 @@ typedef struct {
   UINT16  Data3;
   UINT8   Data4[8];
 } GUID;
+#endif
 
 ///
 /// 4-byte buffer. An IPv4 internet protocol address.
