@@ -3504,6 +3504,10 @@ CVfrStringDB::SetStringFileName(IN CHAR8 *StringFileName)
     return;
   }
 
+  if (mStringFileName != NULL) {
+    delete[] mStringFileName;
+  }
+
   FileLen = strlen (StringFileName) + 1;
   mStringFileName = new CHAR8[FileLen];
   if (mStringFileName == NULL) {
