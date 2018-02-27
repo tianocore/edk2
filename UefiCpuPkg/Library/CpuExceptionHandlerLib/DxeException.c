@@ -270,7 +270,7 @@ InitializeCpuExceptionHandlersEx (
         AsmReadGdtr (&Gdtr);
 
         EssData.X64.Revision = CPU_EXCEPTION_INIT_DATA_REV;
-        EssData.X64.KnownGoodStackTop = (UINTN)mNewStack;
+        EssData.X64.KnownGoodStackTop = (UINTN)mNewStack + sizeof (mNewStack);
         EssData.X64.KnownGoodStackSize = CPU_KNOWN_GOOD_STACK_SIZE;
         EssData.X64.StackSwitchExceptions = CPU_STACK_SWITCH_EXCEPTION_LIST;
         EssData.X64.StackSwitchExceptionNumber = CPU_STACK_SWITCH_EXCEPTION_NUMBER;
