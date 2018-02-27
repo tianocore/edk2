@@ -788,7 +788,7 @@ UpdatePcdDatabase (
     SkuDelta = NULL;
     while (Index < mPeiPcdDbSize) {
       SkuDelta = (PCD_DATABASE_SKU_DELTA *) ((UINT8 *) mPeiPcdDbBinary + Index);
-      if (SkuDelta->SkuId == (UINT16) SkuId && SkuDelta->SkuIdCompared == 0) {
+      if (SkuDelta->SkuId == SkuId && SkuDelta->SkuIdCompared == 0) {
         break;
       }
       Index = (Index + SkuDelta->Length + 7) & (~7);
