@@ -20,8 +20,27 @@
 // (Base > Limit) indicates an aperture is not available.
 //
 typedef struct {
+  //
+  // Base and Limit are the device address instead of host address when
+  // Translation is not zero
+  //
   UINT64 Base;
   UINT64 Limit;
+  //
+  // According to UEFI 2.7, Device Address = Host Address + Translation,
+  // so Translation = Device Address - Host Address.
+  // On platforms where Translation is not zero, the subtraction is probably to
+  // be performed with UINT64 wrap-around semantics, for we may translate an
+  // above-4G host address into a below-4G device address for legacy PCIe device
+  // compatibility.
+  //
+  // NOTE: The alignment of Translation is required to be larger than any BAR
+  // alignment in the same root bridge, so that the same alignment can be
+  // applied to both device address and host address, which simplifies the
+  // situation and makes the current resource allocation code in generic PCI
+  // host bridge driver still work.
+  //
+  UINT64 Translation;
 } PCI_ROOT_BRIDGE_APERTURE;
 
 typedef struct {
