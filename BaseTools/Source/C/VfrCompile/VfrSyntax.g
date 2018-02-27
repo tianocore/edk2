@@ -969,7 +969,7 @@ vfrExtensionData[UINT8 *DataBuff, UINT32 Size, CHAR8 *TypeName, UINT32 TypeSize,
                  break;
               }
             }
-            if (TFName != NULL) { delete TFName; TFName = NULL; }
+            if (TFName != NULL) { delete[] TFName; TFName = NULL; }
           >>
   )*
 )
@@ -1166,7 +1166,7 @@ vfrStatementVarStoreEfi :
                                                        VSEObj.SetSize ((UINT16) Size);
                                                        VSEObj.SetName (StoreName);
                                                        if (IsUEFI23EfiVarstore == FALSE && StoreName != NULL) {
-                                                         delete StoreName; 
+                                                         delete[] StoreName;
                                                        }
                                                     >>
   ";"
@@ -1324,7 +1324,7 @@ vfrQuestionBaseInfo[EFI_VARSTORE_INFO & Info, EFI_QUESTION_ID & QId, EFI_QUESION
                                                    >>
                                                    <<
                                                       if (VarIdStr != NULL) {
-                                                        delete VarIdStr;
+                                                        delete[] VarIdStr;
                                                       }
                                                       _SAVE_CURRQEST_VARINFO (Info);
                                                    >>
@@ -1511,7 +1511,7 @@ vfrStorageVarId[EFI_VARSTORE_INFO & Info, CHAR8 *&QuestVarIdStr, BOOLEAN CheckFl
                                                        }
 
                                                        QuestVarIdStr = VarIdStr;
-                                                       if (VarStr != NULL) {delete VarStr;}
+                                                       if (VarStr != NULL) {delete[] VarStr;}
                                                     >>
   )
   ;
@@ -4667,7 +4667,7 @@ getExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                             CIfrGet GObj(L->getLine()); 
                                                             _SAVE_OPHDR_COND (GObj, ($ExpOpCount == 0), L->getLine()); 
                                                             GObj.SetVarInfo (&Info); 
-                                                            delete VarIdStr; 
+                                                            delete[] VarIdStr;
                                                             $ExpOpCount++;
                                                           }
                                                        >>
@@ -4841,7 +4841,7 @@ setExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                             }
                                                             CIfrSet TSObj(L->getLine()); 
                                                             TSObj.SetVarInfo (&Info); 
-                                                            delete VarIdStr; 
+                                                            delete[] VarIdStr;
                                                             $ExpOpCount++;
                                                           }
                                                        >>
@@ -5474,7 +5474,7 @@ EfiVfrParser::_STRCAT (
   NewStr[0] = '\0';
   if (*Dest != NULL) {
     strcpy (NewStr, *Dest);
-    delete *Dest;
+    delete[] *Dest;
   }
   strcat (NewStr, Src);
 

@@ -2,7 +2,7 @@
   
   Vfr common library functions.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -360,7 +360,7 @@ CVfrBufferConfig::Write (
 
   case 'i' : // set info
     if (mItemListPos->mId != NULL) {
-      delete mItemListPos->mId;
+      delete[] mItemListPos->mId;
     }
     mItemListPos->mId = NULL;
     if (Id != NULL) {
@@ -1630,7 +1630,7 @@ SVfrVarStorageNode::~SVfrVarStorageNode (
   }
 
   if (mVarStoreType == EFI_VFR_VARSTORE_NAME) {
-    delete mStorageInfo.mNameSpace.mNameTable;
+    delete[] mStorageInfo.mNameSpace.mNameTable;
   }
 }
 
@@ -3489,7 +3489,7 @@ CVfrStringDB::CVfrStringDB ()
 CVfrStringDB::~CVfrStringDB ()
 {
   if (mStringFileName != NULL) {
-    delete mStringFileName;
+    delete[] mStringFileName;
   }
   mStringFileName = NULL;
 }

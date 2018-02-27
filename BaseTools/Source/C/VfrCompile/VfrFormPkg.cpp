@@ -144,7 +144,7 @@ CFormPkg::~CFormPkg ()
     pBNode = mBufferNodeQueueHead;
     mBufferNodeQueueHead = mBufferNodeQueueHead->mNext;
     if (pBNode->mBufferStart != NULL) {
-      delete pBNode->mBufferStart;
+      delete[] pBNode->mBufferStart;
       delete pBNode;
     }
   }
@@ -1152,7 +1152,7 @@ CIfrRecordInfoDB::IfrRecordOutput (
   SIfrRecord *pNode; 
 
   if (TBuffer.Buffer != NULL) {
-    delete TBuffer.Buffer;
+    delete[] TBuffer.Buffer;
   }
 
   TBuffer.Size = 0;
@@ -2259,7 +2259,7 @@ CIfrObj::_EMIT_PENDING_OBJ (
   // update bin buffer to package data buffer
   //
   if (mObjBinBuf != NULL) {
-    delete mObjBinBuf;
+    delete[] mObjBinBuf;
     mObjBinBuf = ObjBinBuf;
   }
   
