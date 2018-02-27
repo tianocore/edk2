@@ -237,6 +237,7 @@ DEFINE IPHONE_TOOLS            = /Developer/Platforms/iPhoneOS.platform/Develope
 
 DEFINE SOURCERY_CYGWIN_TOOLS = /cygdrive/c/Program Files/CodeSourcery/Sourcery G++ Lite/bin
 
+DEFINE DTCPP_BIN               = ENV(DTCPP_PREFIX)cpp
 DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 
 ####################################################################################
@@ -4499,6 +4500,8 @@ DEBUG_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_N
 RELEASE_*_*_OBJCOPY_ADDDEBUGFLAG   =
 NOOPT_*_*_OBJCOPY_ADDDEBUGFLAG     = --add-gnu-debuglink=$(DEBUG_DIR)/$(MODULE_NAME).debug
 *_*_*_DTC_FLAGS                    = -H epapr
+*_*_*_DTCPP_PATH                   = DEF(DTCPP_BIN)
+*_*_*_DTC_PATH                     = DEF(DTC_BIN)
 
 DEFINE GCC_ALL_CC_FLAGS            = -g -Os -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -include AutoGen.h -fno-common
 DEFINE GCC_IA32_CC_FLAGS           = DEF(GCC_ALL_CC_FLAGS) -m32 -malign-double -freorder-blocks -freorder-blocks-and-partition -O2 -mno-stack-arg-probe
@@ -4912,7 +4915,6 @@ RELEASE_GCC45_X64_CC_FLAGS       = DEF(GCC45_X64_CC_FLAGS) -Os
 *_GCC46_*_MAKE_PATH                    = DEF(GCC46_IA32_PREFIX)make
 *_GCC46_*_*_DLL                        = ENV(GCC46_DLL)
 *_GCC46_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
-*_GCC46_*_DTC_PATH                     = DEF(DTC_BIN)
 
 *_GCC46_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)
 *_GCC46_*_ASLPP_FLAGS                  = DEF(GCC_ASLPP_FLAGS)
@@ -5023,7 +5025,6 @@ RELEASE_GCC46_ARM_CC_FLAGS       = DEF(GCC46_ARM_CC_FLAGS) -Wno-unused-but-set-v
 *_GCC47_*_MAKE_PATH                    = DEF(GCC47_IA32_PREFIX)make
 *_GCC47_*_*_DLL                        = ENV(GCC47_DLL)
 *_GCC47_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
-*_GCC47_*_DTC_PATH                     = DEF(DTC_BIN)
 
 *_GCC47_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)
 *_GCC47_*_ASLPP_FLAGS                  = DEF(GCC_ASLPP_FLAGS)
@@ -5163,7 +5164,6 @@ RELEASE_GCC47_AARCH64_CC_FLAGS   = DEF(GCC47_AARCH64_CC_FLAGS) -Wno-unused-but-s
 *_GCC48_*_MAKE_PATH                    = DEF(GCC48_IA32_PREFIX)make
 *_GCC48_*_*_DLL                        = ENV(GCC48_DLL)
 *_GCC48_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
-*_GCC48_*_DTC_PATH                     = DEF(DTC_BIN)
 
 *_GCC48_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)
 *_GCC48_*_ASLPP_FLAGS                  = DEF(GCC_ASLPP_FLAGS)
@@ -5303,7 +5303,6 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-s
 *_GCC49_*_MAKE_PATH                    = DEF(GCC49_IA32_PREFIX)make
 *_GCC49_*_*_DLL                        = ENV(GCC49_DLL)
 *_GCC49_*_ASL_PATH                     = DEF(UNIX_IASL_BIN)
-*_GCC49_*_DTC_PATH                     = DEF(DTC_BIN)
 
 *_GCC49_*_PP_FLAGS                     = DEF(GCC_PP_FLAGS)
 *_GCC49_*_ASLPP_FLAGS                  = DEF(GCC_ASLPP_FLAGS)
@@ -5449,7 +5448,6 @@ RELEASE_GCC49_AARCH64_DLINK_FLAGS  = DEF(GCC49_AARCH64_DLINK_FLAGS)
 *_GCC5_*_MAKE_PATH               = DEF(GCC5_IA32_PREFIX)make
 *_GCC5_*_*_DLL                   = ENV(GCC5_DLL)
 *_GCC5_*_ASL_PATH                = DEF(UNIX_IASL_BIN)
-*_GCC5_*_DTC_PATH                = DEF(DTC_BIN)
 
 *_GCC5_*_PP_FLAGS                = DEF(GCC_PP_FLAGS)
 *_GCC5_*_ASLPP_FLAGS             = DEF(GCC_ASLPP_FLAGS)
@@ -5606,7 +5604,6 @@ RELEASE_GCC5_AARCH64_DLINK_FLAGS = DEF(GCC5_AARCH64_DLINK_FLAGS) -flto -Os -L$(W
 *_CLANG35_*_MAKE_PATH            = make
 *_CLANG35_*_*_DLL                = ENV(CLANG35_DLL)
 *_CLANG35_*_ASL_PATH             = DEF(UNIX_IASL_BIN)
-*_CLANG35_*_DTC_PATH             = DEF(DTC_BIN)
 
 *_CLANG35_*_PP_FLAGS             = DEF(GCC_PP_FLAGS)
 *_CLANG35_*_ASLCC_FLAGS          = DEF(GCC_ASLCC_FLAGS)
@@ -5684,7 +5681,6 @@ RELEASE_CLANG35_AARCH64_CC_FLAGS = DEF(CLANG35_AARCH64_CC_FLAGS) $(ARCHCC_FLAGS)
 *_CLANG38_*_MAKE_PATH               = make
 *_CLANG38_*_*_DLL                   = ENV(CLANG38_DLL)
 *_CLANG38_*_ASL_PATH                = DEF(UNIX_IASL_BIN)
-*_CLANG38_*_DTC_PATH                = DEF(DTC_BIN)
 
 *_CLANG38_*_APP_FLAGS               =
 *_CLANG38_*_ASL_FLAGS               = DEF(IASL_FLAGS)
