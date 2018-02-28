@@ -895,12 +895,11 @@ class DscBuildData(PlatformBuildClassObject):
                 if pcd[2] == "":
                     pcdset.append((pcd[0],pcd[1],pcd[3]))
                 else:
-                    pcdobj = self._Pcds.get((pcd[1],pcd[0]))
-                    if pcdobj:
-                        pcdset.append((pcd[0],pcd[1], pcdobj.DefaultValue))
-                    else:
+                    if (pcd[1],pcd[0]) not in self._Pcds:
                         pcdvalue = pcd[3] if len(pcd) == 4 else pcd[2]
                         pcdset.append((pcd[0],pcd[1],pcdvalue))
+                    #else:
+                        # remove the settings from command line since it has been handled.
         GlobalData.BuildOptionPcd = pcdset
     def GetFieldValueFromComm(self,ValueStr,TokenSpaceGuidCName, TokenCName, FieldName):
         PredictedFieldType = "VOID*"
@@ -1677,6 +1676,23 @@ class DscBuildData(PlatformBuildClassObject):
             # Assign field values in PCD
             #
             CApp = CApp + "// Default value in Dec \n"
+            DefaultValueFromDec = Pcd.DefaultValueFromDec
+            IsArray = self.IsFieldValueAnArray(Pcd.DefaultValueFromDec)
+            if IsArray:
+                try:
+                    DefaultValueFromDec = ValueExpressionEx(Pcd.DefaultValueFromDec, "VOID*")(True)
+                except BadExpression:
+                    EdkLogger.error("Build", FORMAT_INVALID, "Invalid value format for %s.%s, from DEC: %s" %
+                                    (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, DefaultValueFromDec))
+            Value, ValueSize = ParseFieldValue (DefaultValueFromDec)
+            if isinstance(Value, str):
+                CApp = CApp + '  Pcd = %s; // From DEC Default Value %s\n' % (Value, Pcd.DefaultValueFromDec)
+            elif IsArray:
+            #
+            # Use memcpy() to copy value into field
+            #
+                CApp = CApp + '  Value     = %s; // From DEC Default Value %s\n' % (self.IntToCString(Value, ValueSize), Pcd.DefaultValueFromDec)
+                CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
             for FieldList in [Pcd.DefaultValues]:
                 if not FieldList:
                     continue
