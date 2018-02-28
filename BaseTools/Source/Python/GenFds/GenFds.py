@@ -326,6 +326,7 @@ def main():
                                     FvObj.FvRegionInFD = RegionObj.Size
                                     RegionObj.BlockInfoOfRegion(FdObj.BlockSizeList, FvObj)
 
+        GlobalData.BuildOptionPcd     = Options.OptionPcd if Options.OptionPcd else {}
         """Call GenFds"""
         GenFds.GenFd('', FdfParserObj, BuildWorkSpace, ArchList)
 

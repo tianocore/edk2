@@ -95,6 +95,7 @@ class DecBuildData(PackageBuildClassObject):
         self._Ppis              = None
         self._Guids             = None
         self._Includes          = None
+        self._CommonIncludes    = None
         self._LibraryClasses    = None
         self._Pcds              = None
         self.__Macros           = None
@@ -296,7 +297,8 @@ class DecBuildData(PackageBuildClassObject):
 
     ## Retrieve public include paths declared in this package
     def _GetInclude(self):
-        if self._Includes == None:
+        if self._Includes == None or self._CommonIncludes is None:
+            self._CommonIncludes = []
             self._Includes = []
             self._PrivateIncludes = []
             PublicInclues = []
@@ -324,7 +326,8 @@ class DecBuildData(PackageBuildClassObject):
                         PublicInclues.append(File)
                     if File in self._PrivateIncludes:
                         EdkLogger.error('build', OPTION_CONFLICT, "Can't determine %s's attribute, it is both defined as Private and non-Private attribute in DEC file." % File, File=self.MetaFile, Line=LineNo)
-
+                if Record[3] == "COMMON":
+                    self._CommonIncludes.append(File)
         return self._Includes
 
     ## Retrieve library class declarations (not used in build at present)
@@ -452,6 +455,11 @@ class DecBuildData(PackageBuildClassObject):
             Pcds[pcd.TokenCName, pcd.TokenSpaceGuidCName, self._PCD_TYPE_STRING_[Type]] = pcd
 
         return Pcds
+    @property
+    def CommonIncludes(self):
+        if self._CommonIncludes is None:
+            self.Includes
+        return self._CommonIncludes
 
 
     _Macros = property(_GetMacros)

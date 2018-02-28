@@ -37,6 +37,7 @@ from Common.Parsing import IsValidWord
 from Common.VariableAttributes import VariableAttributes
 import Common.GlobalData as GlobalData
 import subprocess
+from Common.Misc import SaveFileOnChange
 from Workspace.BuildClassObject import PlatformBuildClassObject, StructurePcd, PcdClassObject, ModuleBuildClassObject
 
 #
@@ -89,7 +90,6 @@ LIBS = $(LIB_PATH)\Common.lib
 '''
 
 PcdGccMakefile = '''
-ARCH ?= IA32
 MAKEROOT ?= $(EDK_TOOLS_PATH)/Source/C
 LIBS = -lCommon
 '''
@@ -156,12 +156,15 @@ class DscBuildData(PlatformBuildClassObject):
         self._ToolChainFamily = None
         self._Clear()
         self._HandleOverridePath()
-        if os.getenv("WORKSPACE"):
-            self.OutputPath = os.path.join(os.getenv("WORKSPACE"), 'Build', PcdValueInitName)
-        else:
-            self.OutputPath = os.path.dirname(self.DscFile)
+        self.WorkspaceDir = os.getenv("WORKSPACE") if os.getenv("WORKSPACE") else ""
         self.DefaultStores = None
         self.SkuIdMgr = SkuClass(self.SkuName, self.SkuIds)
+    @property
+    def OutputPath(self):
+        if os.getenv("WORKSPACE"):
+            return os.path.join(os.getenv("WORKSPACE"), self.OutputDirectory, self._Target + "_" + self._Toolchain,PcdValueInitName)
+        else:
+            return os.path.dirname(self.DscFile)
 
     ## XXX[key] = value
     def __setitem__(self, key, value):
@@ -1300,7 +1303,7 @@ class DscBuildData(PlatformBuildClassObject):
                     str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].DefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
                 for str_pcd_data in StrPcdSet[str_pcd]:
                     if str_pcd_data[3] in SkuIds:
-                        str_pcd_obj_str.AddOverrideValue(str_pcd_data[2], str(str_pcd_data[6]), 'DEFAULT' if str_pcd_data[3] == 'COMMON' else str_pcd_data[3],'STANDARD' if str_pcd_data[4] == 'COMMON' else str_pcd_data[4], self.MetaFile.File,LineNo=str_pcd_data[5])
+                        str_pcd_obj_str.AddOverrideValue(str_pcd_data[2], str(str_pcd_data[6]), 'DEFAULT' if str_pcd_data[3] == 'COMMON' else str_pcd_data[3],'STANDARD' if str_pcd_data[4] == 'COMMON' else str_pcd_data[4], self.MetaFile.File if self.WorkspaceDir not in self.MetaFile.File else self.MetaFile.File[len(self.WorkspaceDir) if self.WorkspaceDir.endswith(os.path.sep) else len(self.WorkspaceDir)+1:],LineNo=str_pcd_data[5])
                 S_pcd_set[str_pcd[1], str_pcd[0]] = str_pcd_obj_str
             else:
                 EdkLogger.error('build', PARSER_ERROR,
@@ -1809,10 +1812,10 @@ class DscBuildData(PlatformBuildClassObject):
                     Includes[IncludeFile] = True
                     CApp = CApp + '#include <%s>\n' % (IncludeFile)
         CApp = CApp + '\n'
-
         for PcdName in StructuredPcds:
             Pcd = StructuredPcds[PcdName]
-            if not Pcd.SkuOverrideValues:
+            if not Pcd.SkuOverrideValues or Pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],
+                        self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
                 InitByteValue, CApp = self.GenerateInitializeFunc(self.SkuIdMgr.SystemSkuId, 'STANDARD', Pcd, InitByteValue, CApp)
             else:
                 for SkuName in self.SkuIdMgr.SkuOverrideOrder():
@@ -1828,7 +1831,7 @@ class DscBuildData(PlatformBuildClassObject):
         CApp = CApp + '  )\n'
         CApp = CApp + '{\n'
         for Pcd in StructuredPcds.values():
-            if not Pcd.SkuOverrideValues:
+            if not Pcd.SkuOverrideValues or Pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
                 CApp = CApp + '  Initialize_%s_%s_%s_%s();\n' % (self.SkuIdMgr.SystemSkuId, 'STANDARD', Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
             else:
                 for SkuName in self.SkuIdMgr.SkuOverrideOrder():
@@ -1843,13 +1846,11 @@ class DscBuildData(PlatformBuildClassObject):
         if not os.path.exists(self.OutputPath):
             os.makedirs(self.OutputPath)
         CAppBaseFileName = os.path.join(self.OutputPath, PcdValueInitName)
-        File = open (CAppBaseFileName + '.c', 'w')
-        File.write(CApp)
-        File.close()
+        SaveFileOnChange(CAppBaseFileName + '.c', CApp, False)
 
         MakeApp = PcdMakefileHeader
         if sys.platform == "win32":
-            MakeApp = MakeApp + 'ARCH = IA32\nAPPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\%s.obj\n' % (self.OutputPath, PcdValueInitName) + 'INC = '
+            MakeApp = MakeApp + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\%s.obj\n' % (self.OutputPath, PcdValueInitName) + 'INC = '
         else:
             MakeApp = MakeApp + PcdGccMakefile
             MakeApp = MakeApp + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o\n' % (self.OutputPath, PcdValueInitName) + \
@@ -1861,7 +1862,7 @@ class DscBuildData(PlatformBuildClassObject):
                 continue
             if Cache.Includes:
                 if str(Cache.MetaFile.Path) not in PlatformInc:
-                    PlatformInc[str(Cache.MetaFile.Path)] = Cache.Includes
+                    PlatformInc[str(Cache.MetaFile.Path)] = Cache.CommonIncludes
 
         PcdDependDEC = []
         for Pcd in StructuredPcds.values():
@@ -1925,82 +1926,78 @@ class DscBuildData(PlatformBuildClassObject):
         if sys.platform == "win32":
             MakeApp = MakeApp + PcdMakefileEnd
         MakeFileName = os.path.join(self.OutputPath, 'Makefile')
-        File = open (MakeFileName, 'w')
-        File.write(MakeApp)
-        File.close()
+        SaveFileOnChange(MakeFileName, MakeApp, False)
 
         InputValueFile = os.path.join(self.OutputPath, 'Input.txt')
         OutputValueFile = os.path.join(self.OutputPath, 'Output.txt')
-        File = open (InputValueFile, 'w')
-        File.write(InitByteValue)
-        File.close()
-
-        Messages = ''
-        if sys.platform == "win32":
-            MakeCommand = 'nmake clean & nmake -f %s' % (MakeFileName)
-            returncode, StdOut, StdErr = self.ExecuteCommand (MakeCommand)
-            Messages = StdOut
-        else:
-            MakeCommand = 'make clean & make -f %s' % (MakeFileName)
-            returncode, StdOut, StdErr = self.ExecuteCommand (MakeCommand)
-            Messages = StdErr
-        Messages = Messages.split('\n')
-        MessageGroup = []
-        if returncode <>0:
-            CAppBaseFileName = os.path.join(self.OutputPath, PcdValueInitName)
-            File = open (CAppBaseFileName + '.c', 'r')
-            FileData = File.readlines()
-            File.close()
-            for Message in Messages:
-                if " error" in Message or "warning" in Message:
-                    FileInfo = Message.strip().split('(')
-                    if len (FileInfo) > 1:
-                        FileName = FileInfo [0]
-                        FileLine = FileInfo [1].split (')')[0]
-                    else:
-                        FileInfo = Message.strip().split(':')
-                        FileName = FileInfo [0]
-                        FileLine = FileInfo [1]
-                    if FileLine.isdigit():
-                        error_line = FileData[int (FileLine) - 1]
-                        if r"//" in error_line:
-                            c_line,dsc_line = error_line.split(r"//")
-                        else:
-                            dsc_line = error_line
-                        message_itmes = Message.split(":")
-                        Index = 0
-                        if "PcdValueInit.c" not in Message:
-                            if not MessageGroup:
-                                MessageGroup.append(Message)
-                            break
-                        else:
-                            for item in message_itmes:
-                                if "PcdValueInit.c" in item:
-                                    Index = message_itmes.index(item)
-                                    message_itmes[Index] = dsc_line.strip()
-                                    break
-                            MessageGroup.append(":".join(message_itmes[Index:]).strip())
-                            continue
-                    else:
-                        MessageGroup.append(Message)
-            if MessageGroup:
-                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "\n".join(MessageGroup) )
-            else:
-                EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s' % MakeCommand)
+        SaveFileOnChange(InputValueFile, InitByteValue, False)
 
         PcdValueInitExe = PcdValueInitName
         if not sys.platform == "win32":
             PcdValueInitExe = os.path.join(os.getenv("EDK_TOOLS_PATH"), 'Source', 'C', 'bin', PcdValueInitName)
-
-        Command = PcdValueInitExe + ' -i %s -o %s' % (InputValueFile, OutputValueFile)
-        returncode, StdOut, StdErr = self.ExecuteCommand (Command)
-        if returncode <> 0:
-            EdkLogger.warn('Build', COMMAND_FAILURE, 'Can not collect output from command: %s' % Command)
-            FileBuffer = []
         else:
-            File = open (OutputValueFile, 'r')
-            FileBuffer = File.readlines()
-            File.close()
+            PcdValueInitExe = os.path.join(os.getenv("EDK_TOOLS_PATH"), 'Bin', 'Win32', PcdValueInitName) +".exe"
+        if not os.path.exists(PcdValueInitExe) or self.NeedUpdateOutput(OutputValueFile, CAppBaseFileName + '.c',MakeFileName,InputValueFile):
+            Messages = ''
+            if sys.platform == "win32":
+                MakeCommand = 'nmake clean & nmake -f %s' % (MakeFileName)
+                returncode, StdOut, StdErr = self.ExecuteCommand (MakeCommand)
+                Messages = StdOut
+            else:
+                MakeCommand = 'make clean & make -f %s' % (MakeFileName)
+                returncode, StdOut, StdErr = self.ExecuteCommand (MakeCommand)
+                Messages = StdErr
+            Messages = Messages.split('\n')
+            MessageGroup = []
+            if returncode <>0:
+                CAppBaseFileName = os.path.join(self.OutputPath, PcdValueInitName)
+                File = open (CAppBaseFileName + '.c', 'r')
+                FileData = File.readlines()
+                File.close()
+                for Message in Messages:
+                    if " error" in Message or "warning" in Message:
+                        FileInfo = Message.strip().split('(')
+                        if len (FileInfo) > 1:
+                            FileName = FileInfo [0]
+                            FileLine = FileInfo [1].split (')')[0]
+                        else:
+                            FileInfo = Message.strip().split(':')
+                            FileName = FileInfo [0]
+                            FileLine = FileInfo [1]
+                        if FileLine.isdigit():
+                            error_line = FileData[int (FileLine) - 1]
+                            if r"//" in error_line:
+                                c_line,dsc_line = error_line.split(r"//")
+                            else:
+                                dsc_line = error_line
+                            message_itmes = Message.split(":")
+                            Index = 0
+                            if "PcdValueInit.c" not in Message:
+                                if not MessageGroup:
+                                    MessageGroup.append(Message)
+                                break
+                            else:
+                                for item in message_itmes:
+                                    if "PcdValueInit.c" in item:
+                                        Index = message_itmes.index(item)
+                                        message_itmes[Index] = dsc_line.strip()
+                                        break
+                                MessageGroup.append(":".join(message_itmes[Index:]).strip())
+                                continue
+                        else:
+                            MessageGroup.append(Message)
+                if MessageGroup:
+                    EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "\n".join(MessageGroup) )
+                else:
+                    EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s' % MakeCommand)
+            Command = PcdValueInitExe + ' -i %s -o %s' % (InputValueFile, OutputValueFile)
+            returncode, StdOut, StdErr = self.ExecuteCommand (Command)
+            if returncode <> 0:
+                EdkLogger.warn('Build', COMMAND_FAILURE, 'Can not collect output from command: %s' % Command)
+
+        File = open (OutputValueFile, 'r')
+        FileBuffer = File.readlines()
+        File.close()
 
         StructurePcdSet = []
         for Pcd in FileBuffer:
@@ -2008,6 +2005,17 @@ class DscBuildData(PlatformBuildClassObject):
             PcdInfo = PcdValue[0].split ('.')
             StructurePcdSet.append((PcdInfo[0],PcdInfo[1], PcdInfo[2], PcdInfo[3], PcdValue[2].strip()))
         return StructurePcdSet
+
+    def NeedUpdateOutput(self,OutputFile, ValueCFile, MakeFile, StructureInput):
+        if not os.path.exists(OutputFile):
+            return True
+        if os.stat(OutputFile).st_mtime <= os.stat(ValueCFile).st_mtime:
+            return True
+        if os.stat(OutputFile).st_mtime <= os.stat(MakeFile).st_mtime:
+            return True
+        if os.stat(OutputFile).st_mtime <= os.stat(StructureInput).st_mtime:
+            return True
+        return False
 
     ## Retrieve dynamic PCD settings
     #
