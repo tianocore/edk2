@@ -1865,13 +1865,21 @@ class Build():
                             if self.Target not in ['clean', 'cleanlib', 'cleanall', 'run', 'fds']:
                                 # for target which must generate AutoGen code and makefile
                                 if not self.SkipAutoGen or self.Target == 'genc':
+                                    self.Progress.Start("Generating code")
                                     Ma.CreateCodeFile(True)
+                                    self.Progress.Stop("done!")
+                                if self.Target == "genc":
+                                    return True
                                 if not self.SkipAutoGen or self.Target == 'genmake':
+                                    self.Progress.Start("Generating makefile")
                                     if CmdListDict and self.Fdf and (Module.File, Arch) in CmdListDict:
                                         Ma.CreateMakeFile(True, CmdListDict[Module.File, Arch])
                                         del CmdListDict[Module.File, Arch]
                                     else:
                                         Ma.CreateMakeFile(True)
+                                    self.Progress.Stop("done!")
+                                if self.Target == "genmake":
+                                    return True
                             self.BuildModules.append(Ma)
                     self.AutoGenTime += int(round((time.time() - AutoGenStart)))
                     MakeStart = time.time()
