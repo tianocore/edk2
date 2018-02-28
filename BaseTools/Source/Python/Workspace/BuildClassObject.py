@@ -126,6 +126,7 @@ class StructurePcd(PcdClassObject):
         self.StructName = None
         self.PcdDefineLineNo = 0
         self.PkgPath = ""
+        self.DefaultValueFromDec = ""
     def __repr__(self):
         return self.TypeName
 
@@ -135,6 +136,8 @@ class StructurePcd(PcdClassObject):
         self.DefaultValues[FieldName] = [Value.strip(), FileName, LineNo]
         return self.DefaultValues[FieldName]
 
+    def SetDecDefaultValue(self,DefaultValue):
+        self.DefaultValueFromDec = DefaultValue
     def AddOverrideValue (self, FieldName, Value, SkuName, DefaultStoreName, FileName="", LineNo=0):
         if SkuName not in self.SkuOverrideValues:
             self.SkuOverrideValues[SkuName] = collections.OrderedDict({})
@@ -175,6 +178,7 @@ class StructurePcd(PcdClassObject):
             self.DefaultValues = PcdObject.DefaultValues if PcdObject.DefaultValues else self.DefaultValues
             self.PcdMode = PcdObject.PcdMode if PcdObject.PcdMode else self.PcdMode
             self.DefaultFromDSC=None
+            self.DefaultValueFromDec = PcdObject.DefaultValueFromDec if PcdObject.DefaultValueFromDec else self.DefaultValueFromDec
             self.SkuOverrideValues = PcdObject.SkuOverrideValues if PcdObject.SkuOverrideValues else self.SkuOverrideValues
             self.FlexibleFieldName = PcdObject.FlexibleFieldName if PcdObject.FlexibleFieldName else self.FlexibleFieldName
             self.StructName = PcdObject.DatumType if PcdObject.DatumType else self.StructName
