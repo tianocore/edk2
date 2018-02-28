@@ -217,6 +217,7 @@ M: Kelly Steele <kelly.steele@intel.com>
 SecurityPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
 M: Chao Zhang <chao.b.zhang@intel.com>
+M: Jiewen Yao <jiewen.yao@intel.com>
 
 ShellBinPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
