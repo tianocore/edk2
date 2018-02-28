@@ -1726,7 +1726,13 @@ class FdRegionReport(object):
             FvTotalSize = 0
             FvTakenSize = 0
             FvFreeSize  = 0
-            FvReportFileName = os.path.join(self._FvDir, FvName + ".Fv.txt")
+            if not os.path.isfile(FvName):
+                FvReportFileName = os.path.join(self._FvDir, FvName + ".Fv.txt")
+            else:
+                if FvName.upper().endswith('.FV'):
+                    FvReportFileName = FvName + ".txt"
+                else:
+                    FvReportFileName = FvName + ".Fv.txt"
             try:
                 #
                 # Collect size info in the firmware volume.
