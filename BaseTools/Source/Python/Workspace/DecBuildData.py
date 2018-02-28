@@ -15,6 +15,7 @@ from Common.String import *
 from Common.DataType import *
 from Common.Misc import *
 from types import *
+from collections import OrderedDict
 
 from Workspace.BuildClassObject import PackageBuildClassObject, StructurePcd, PcdClassObject
 
@@ -367,7 +368,7 @@ class DecBuildData(PackageBuildClassObject):
 
 
     def ProcessStructurePcd(self, StructurePcdRawDataSet):
-        s_pcd_set = dict()
+        s_pcd_set = OrderedDict()
         for s_pcd,LineNo in StructurePcdRawDataSet:
             if s_pcd.TokenSpaceGuidCName not in s_pcd_set:
                 s_pcd_set[s_pcd.TokenSpaceGuidCName] = []
