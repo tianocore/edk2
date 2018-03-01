@@ -32,13 +32,11 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
-  BaseLib
   DebugLib
   DxeServicesTableLib
   MemEncryptSevLib
-  UefiBootServicesTableLib
+  MemoryAllocationLib
   UefiDriverEntryPoint
-  UefiLib
 
 [Depex]
   TRUE

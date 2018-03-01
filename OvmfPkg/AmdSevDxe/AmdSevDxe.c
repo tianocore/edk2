@@ -16,14 +16,10 @@
 
 **/
 
-#include <Library/BaseLib.h>
-#include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/MemEncryptSevLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <PiDxe.h>
 
 EFI_STATUS
 EFIAPI
