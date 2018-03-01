@@ -32,11 +32,17 @@
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
+  BaseLib
+  BaseMemoryLib
   DebugLib
   DxeServicesTableLib
   MemEncryptSevLib
   MemoryAllocationLib
+  PcdLib
   UefiDriverEntryPoint
 
 [Depex]
   TRUE
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
