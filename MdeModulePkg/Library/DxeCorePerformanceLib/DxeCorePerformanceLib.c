@@ -283,9 +283,8 @@ AllocateBootPerformanceTable (
         SmmCommData->Function       = SMM_FPDT_FUNCTION_GET_BOOT_RECORD_SIZE;
         SmmCommData->BootRecordData = NULL;
         Status = Communication->Communicate (Communication, SmmBootRecordCommBuffer, &CommSize);
-        ASSERT_EFI_ERROR (Status);
 
-        if (!EFI_ERROR (SmmCommData->ReturnStatus) && SmmCommData->BootRecordSize != 0) {
+        if (!EFI_ERROR (Status) && !EFI_ERROR (SmmCommData->ReturnStatus) && SmmCommData->BootRecordSize != 0) {
           //
           // Get all boot records
           //
@@ -317,7 +316,7 @@ AllocateBootPerformanceTable (
   // Boot Performance table includes BasicBoot record, and one or more appended Boot Records.
   //
   BootPerformanceDataSize = sizeof (BOOT_PERFORMANCE_TABLE) + mPerformanceLength + PcdGet32 (PcdExtFpdtBootRecordPadSize);
-  if (SmmCommData != NULL) {
+  if (SmmCommData != NULL && SmmBootRecordData != NULL) {
     BootPerformanceDataSize += SmmBootRecordDataSize;
   }
 
