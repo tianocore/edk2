@@ -474,6 +474,7 @@ HttpBootDhcp6ExtractUriInfo (
     Status = HttpBootDns (Private, HostNameStr, &IpAddr);
     FreePool (HostNameStr);
     if (EFI_ERROR (Status)) {
+      AsciiPrint ("\n  Error: Could not retrieve the host address from DNS server.\n");
       goto Error;
     }  
   } 
