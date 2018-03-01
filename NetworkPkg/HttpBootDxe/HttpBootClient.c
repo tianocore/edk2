@@ -1,7 +1,7 @@
 /** @file
   Implementation of the boot file download function.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials are licensed and made available under 
 the terms and conditions of the BSD License that accompanies this distribution.  
@@ -436,7 +436,7 @@ HttpBootDhcp6ExtractUriInfo (
   }
   
   //
-  // Extract the HTTP server Ip frome URL. This is used to Check route table 
+  // Extract the HTTP server Ip from URL. This is used to Check route table 
   // whether can send message to HTTP Server Ip through the GateWay.
   //
   Status = HttpUrlGetIp6 (
@@ -746,7 +746,7 @@ HttpBootGetFileFromCache (
   HTTP_BOOT_ENTITY_DATA       *EntityData;
   UINTN                       CopyedSize;
   
-  if (Uri == NULL || BufferSize == 0 || Buffer == NULL || ImageType == NULL) {
+  if (Uri == NULL || BufferSize == NULL || Buffer == NULL || ImageType == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -757,8 +757,7 @@ HttpBootGetFileFromCache (
     //
     if ((Cache->RequestData != NULL) &&
         (Cache->RequestData->Url != NULL) &&
-        (StrCmp (Uri, Cache->RequestData->Url) == 0)) 
-    {
+        (StrCmp (Uri, Cache->RequestData->Url) == 0)) {
       //
       // Hit in cache, record image type.
       //
@@ -947,7 +946,7 @@ HttpBootGetBootFile (
     return EFI_OUT_OF_RESOURCES;
   }
   AsciiStrToUnicodeStrS (Private->BootFileUri, Url, UrlSize);
-  if (!HeaderOnly) {
+  if (!HeaderOnly && Buffer != NULL) {
     Status = HttpBootGetFileFromCache (Private, Url, BufferSize, Buffer, ImageType);
     if (Status != EFI_NOT_FOUND) {
       FreePool (Url);
@@ -1129,7 +1128,7 @@ HttpBootGetBootFile (
   Context.Cache      = Cache;
   Context.Private    = Private;
   Status = HttpInitMsgParser (
-             HeaderOnly? HttpMethodHead : HttpMethodGet,
+             HeaderOnly ? HttpMethodHead : HttpMethodGet,
              ResponseData->Response.StatusCode,
              ResponseData->HeaderCount,
              ResponseData->Headers,
