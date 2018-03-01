@@ -128,7 +128,6 @@
 
 #string STR_MM_NOT_ALIGNED        #language en-US "%H%s%N: Address parameter %016LX is not aligned.\r\n"
 #string STR_MM_PCIE_ADDRESS_RANGE #language en-US "%H%s%N: Address parameter %016LX is not a valid PCI/PCIE address.\r\n"
-#string STR_MM_IO_ADDRESS_RANGE   #language en-US "%H%s%N: IO address out of range 0 - 0xFFFF\r\n"
 #string STR_MM_MMIO               #language en-US "%HMMIO%N"
 #string STR_MM_IO                 #language en-US "%HIO%N"
 #string STR_MM_PCI                #language en-US "%HPCI%N"
@@ -136,7 +135,6 @@
 #string STR_MM_PCIE               #language en-US "%HPCIE%N"
 #string STR_MM_ADDRESS            #language en-US "  0x%016lx : "
 #string STR_MM_BUF                #language en-US "0x%0*lx"
-#string STR_MM_ADDRESS_RANGE2     #language en-US "%H%s%N: IO address out of range\r\n"
 #string STR_MM_ERROR              #language en-US "%H%s%N: Input had incorrect format\r\n"
 
 #string STR_SETVAR_PRINT          #language en-US "%g - %s - %04x Bytes\r\n"
