@@ -27,18 +27,18 @@
   AmdSevDxe.c
 
 [Packages]
-  MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
 
 [LibraryClasses]
   BaseLib
-  UefiLib
-  UefiDriverEntryPoint
-  UefiBootServicesTableLib
-  DxeServicesTableLib
   DebugLib
+  DxeServicesTableLib
   MemEncryptSevLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
 
 [Depex]
   TRUE
