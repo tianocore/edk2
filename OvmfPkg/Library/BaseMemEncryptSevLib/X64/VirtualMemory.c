@@ -18,8 +18,8 @@
 **/
 
 #include <Library/CpuLib.h>
-#include <Register/Cpuid.h>
 #include <Register/Amd/Cpuid.h>
+#include <Register/Cpuid.h>
 
 #include "VirtualMemory.h"
 

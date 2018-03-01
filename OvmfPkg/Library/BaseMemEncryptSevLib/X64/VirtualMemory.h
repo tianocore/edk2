@@ -20,13 +20,13 @@
 #ifndef __VIRTUAL_MEMORY__
 #define __VIRTUAL_MEMORY__
 
-#include <Uefi.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Uefi.h>
 
-#include <Library/CacheMaintenanceLib.h>
 #define SYS_CODE64_SEL 0x38
 
 #pragma pack(1)

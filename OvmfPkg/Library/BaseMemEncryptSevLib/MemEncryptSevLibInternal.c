@@ -16,10 +16,10 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
-#include <Register/Cpuid.h>
+#include <Library/MemEncryptSevLib.h>
 #include <Register/Amd/Cpuid.h>
 #include <Register/Amd/Msr.h>
-#include <Library/MemEncryptSevLib.h>
+#include <Register/Cpuid.h>
 
 STATIC BOOLEAN mSevStatus = FALSE;
 STATIC BOOLEAN mSevStatusChecked = FALSE;

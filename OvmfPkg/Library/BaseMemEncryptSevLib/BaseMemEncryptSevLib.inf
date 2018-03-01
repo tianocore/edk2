@@ -31,8 +31,8 @@
 #
 
 [Packages]
-  MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
   OvmfPkg/OvmfPkg.dec
   UefiCpuPkg/UefiCpuPkg.dec
 
@@ -42,12 +42,12 @@
   X64/VirtualMemory.c
 
 [Sources.IA32]
-  MemEncryptSevLibInternal.c
   Ia32/MemEncryptSevLib.c
+  MemEncryptSevLibInternal.c
 
 [LibraryClasses]
   BaseLib
-  CpuLib
   CacheMaintenanceLib
+  CpuLib
   DebugLib
   MemoryAllocationLib
