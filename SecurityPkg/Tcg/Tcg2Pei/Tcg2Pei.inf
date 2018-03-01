@@ -91,7 +91,6 @@
 
 [Depex]
   gEfiPeiMasterBootModePpiGuid AND
-  gEfiPeiReadOnlyVariable2PpiGuid AND
   gEfiTpmDeviceSelectedGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
