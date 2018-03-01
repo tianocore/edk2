@@ -22,9 +22,9 @@
 /**
   Returns a boolean to indicate whether SEV is enabled
 
-  @retval TRUE           SEV is active
+  @retval TRUE           SEV is enabled
   @retval FALSE          SEV is not enabled
-  **/
+**/
 BOOLEAN
 EFIAPI
 MemEncryptSevIsEnabled (
