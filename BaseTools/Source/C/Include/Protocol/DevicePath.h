@@ -5,7 +5,7 @@
   from a software point of view. The path must persist from boot to boot, so
   it can not contain things like PCI bus numbers that change from boot to boot.
 
-Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -37,6 +37,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define DEVICE_PATH_PROTOCOL  EFI_DEVICE_PATH_PROTOCOL_GUID
 
 #pragma pack(1)
+
+#if defined(_MSC_EXTENSIONS)
+//
+// Disable warning when last field of data structure is a zero sized array.
+//
+#pragma warning ( disable : 4200 )
+#endif
 
 /**
   This protocol can be used on any device handle to obtain generic path/location
@@ -830,7 +837,7 @@ typedef struct {
   ///
   /// Instance of the DNS server address.
   ///
-  EFI_IP_ADDRESS                  DnsServerIp[1024];
+  EFI_IP_ADDRESS                  DnsServerIp[];
 } DNS_DEVICE_PATH;
 
 ///
@@ -842,7 +849,7 @@ typedef struct {
   ///
   /// Instance of the URI pursuant to RFC 3986.
   ///
-  CHAR8                           Uri[1024];
+  CHAR8                           Uri[];
 } URI_DEVICE_PATH;
 
 ///
