@@ -382,6 +382,9 @@ Udp6Groups (
   } else {
 
     Status = NetMapIterate (&Instance->McastIps, Udp6LeaveGroup, MulticastAddress);
+    if ((MulticastAddress != NULL) && (Status == EFI_ABORTED)) {
+      Status = EFI_SUCCESS;
+    } 
   }
 
 ON_EXIT:
