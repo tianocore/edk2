@@ -548,21 +548,23 @@ EnableReadOnlyPageWriteProtect (
 
 /**
   This function either sets or clears memory encryption bit for the memory
-  region specified by PhysicalAddress and length from the current page table
+  region specified by PhysicalAddress and Length from the current page table
   context.
 
-  The function iterates through the physicalAddress one page at a time, and set
+  The function iterates through the PhysicalAddress one page at a time, and set
   or clears the memory encryption mask in the page table. If it encounters
   that a given physical address range is part of large page then it attempts to
   change the attribute at one go (based on size), otherwise it splits the
   large pages into smaller (e.g 2M page into 4K pages) and then try to set or
   clear the encryption bit on the smallest page size.
 
+  @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
+                                      current CR3)
   @param[in]  PhysicalAddress         The physical address that is the start
                                       address of a memory region.
   @param[in]  Length                  The length of memory region
   @param[in]  Mode                    Set or Clear mode
-  @param[in]  Flush                   Flush the caches before applying the
+  @param[in]  CacheFlush              Flush the caches before applying the
                                       encryption mask
 
   @retval RETURN_SUCCESS              The attributes were cleared for the
