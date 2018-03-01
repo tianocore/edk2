@@ -15,13 +15,12 @@
 //
 // The package level header files this module uses
 //
-#include <PiPei.h>
-
 #include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
-#include <Register/Cpuid.h>
-#include <Register/Amd/Cpuid.h>
 #include <Library/MemEncryptSevLib.h>
+#include <Library/PcdLib.h>
+#include <PiPei.h>
+#include <Register/Amd/Cpuid.h>
+#include <Register/Cpuid.h>
 
 #include "Platform.h"
 
