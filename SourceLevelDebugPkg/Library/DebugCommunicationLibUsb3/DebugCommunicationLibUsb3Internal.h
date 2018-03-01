@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on usb3 debug port.
 
-  Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -540,7 +540,7 @@ typedef struct _USB3_DEBUG_PORT_INSTANCE {
 UINT32
 XhcReadDebugReg (
   IN  USB3_DEBUG_PORT_HANDLE    *Handle,
-  IN  UINT32                      Offset
+  IN  UINT32                    Offset
   );
 
 /**
@@ -554,8 +554,8 @@ XhcReadDebugReg (
 VOID
 XhcSetDebugRegBit (
   IN USB3_DEBUG_PORT_HANDLE  *Handle,
-  IN UINT32                   Offset,
-  IN UINT32                   Bit
+  IN UINT32                  Offset,
+  IN UINT32                  Bit
   );
   
 /**
@@ -571,43 +571,6 @@ XhcWriteDebugReg (
   IN USB3_DEBUG_PORT_HANDLE     *Handle,
   IN UINT32                     Offset,
   IN UINT32                     Data
-  );
-
-/**
-  Discover the USB3 debug device.
-  
-  @param  Handle                Debug port handle.
-  
-  @retval RETURN_SUCCESS        The serial device was initialized.
-  @retval RETURN_DEVICE_ERROR   The serial device could not be initialized.
-
-**/
-RETURN_STATUS
-DiscoverUsb3DebugPort(
-  USB3_DEBUG_PORT_HANDLE  *Handle
-  );
-  
-/**
-  Initialize the Serial Device hardware.
-  
-  @param  Handle            Debug port handle.
-
-  @retval RETURN_SUCCESS    The serial device was initialized successfully.
-  @retval !RETURN_SUCCESS   Error.
-
-**/
-RETURN_STATUS
-InitializeUsb3DebugPort (
-  USB3_DEBUG_PORT_HANDLE  *Handle
-  );
-
-/**
-  Return XHCI MMIO base address.
-
-**/
-EFI_PHYSICAL_ADDRESS
-GetXhciBaseAddress (
-  VOID
   );
 
 /**
@@ -728,4 +691,4 @@ XhcDataTransfer (
   IN     UINTN                               Timeout
   );
 
-#endif //__SERIAL_PORT_LIB_USB__
+#endif //__USB3_DEBUG_PORT_LIB_INTERNAL__

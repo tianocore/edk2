@@ -85,15 +85,15 @@ XhcClearR32Bit(
   Write the data to the XHCI debug register.
 
   @param  Handle       Debug port handle.
-  @param  Offset       The offset of the runtime register.
+  @param  Offset       The offset of the debug register.
   @param  Data         The data to write.
 
 **/
 VOID
 XhcWriteDebugReg (
   IN USB3_DEBUG_PORT_HANDLE  *Handle,
-  IN UINT32                   Offset,
-  IN UINT32                   Data
+  IN UINT32                  Offset,
+  IN UINT32                  Data
   )
 {
   EFI_PHYSICAL_ADDRESS  DebugCapabilityBase;
@@ -116,7 +116,7 @@ XhcWriteDebugReg (
 UINT32
 XhcReadDebugReg (
   IN  USB3_DEBUG_PORT_HANDLE *Handle,
-  IN  UINT32                   Offset
+  IN  UINT32                 Offset
   )
 {
   UINT32                  Data;
@@ -129,16 +129,16 @@ XhcReadDebugReg (
 }
 
 /**
-  Set one bit of the runtime register while keeping other bits.
+  Set one bit of the debug register while keeping other bits.
 
   @param  Handle       Debug port handle.
-  @param  Offset       The offset of the runtime register.
+  @param  Offset       The offset of the debug register.
   @param  Bit          The bit mask of the register to set.
 
 **/
 VOID
 XhcSetDebugRegBit (
-  IN USB3_DEBUG_PORT_HANDLE *Handle,
+  IN USB3_DEBUG_PORT_HANDLE   *Handle,
   IN UINT32                   Offset,
   IN UINT32                   Bit
   )
@@ -216,7 +216,7 @@ UpdateXhcResource (
 
   @param  Handle             Debug port handle.
 
-  @retval RETURN_UNSUPPORTED The usb host controller does not supported usb debug port capability.
+  @retval RETURN_UNSUPPORTED The usb host controller does not support usb debug port capability.
   @retval RETURN_SUCCESS     Get bar and offset successfully.
 
 **/
