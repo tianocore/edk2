@@ -188,8 +188,10 @@ typedef struct {
 
 /**
   This function clears memory encryption bit for the memory region specified by
-  PhysicalAddress and length from the current page table context.
+  PhysicalAddress and Length from the current page table context.
 
+  @param[in]  Cr3BaseAddress          Cr3 Base Address (if zero then use
+                                      current CR3)
   @param[in]  PhysicalAddress         The physical address that is the start
                                       address of a memory region.
   @param[in]  Length                  The length of memory region
@@ -199,16 +201,16 @@ typedef struct {
   @retval RETURN_SUCCESS              The attributes were cleared for the
                                       memory region.
   @retval RETURN_INVALID_PARAMETER    Number of pages is zero.
-  @retval RETURN_UNSUPPORTED          Setting the memory encyrption attribute
+  @retval RETURN_UNSUPPORTED          Clearing the memory encyrption attribute
                                       is not supported
 **/
 RETURN_STATUS
 EFIAPI
 InternalMemEncryptSevSetMemoryDecrypted (
-  IN  PHYSICAL_ADDRESS     Cr3BaseAddress,
-  IN  PHYSICAL_ADDRESS     PhysicalAddress,
-  IN  UINT64               Length,
-  IN  BOOLEAN              CacheFlush
+  IN  PHYSICAL_ADDRESS        Cr3BaseAddress,
+  IN  PHYSICAL_ADDRESS        PhysicalAddress,
+  IN  UINTN                   Length,
+  IN  BOOLEAN                 Flush
   );
 
 /**
