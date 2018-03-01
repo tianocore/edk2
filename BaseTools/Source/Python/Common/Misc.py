@@ -1554,7 +1554,13 @@ def ParseFieldValue (Value):
         return Value, 16
     if Value.startswith('L"') and Value.endswith('"'):
         # Unicode String
-        List = list(eval(Value[1:]))  # translate escape character
+        # translate escape character
+        Value = Value[1:]
+        try:
+            Value = eval(Value)
+        except:
+            Value = Value[1:-1]
+        List = list(Value)
         List.reverse()
         Value = 0
         for Char in List:
@@ -1562,7 +1568,12 @@ def ParseFieldValue (Value):
         return Value, (len(List) + 1) * 2
     if Value.startswith('"') and Value.endswith('"'):
         # ASCII String
-        List = list(eval(Value))  # translate escape character
+        # translate escape character
+        try:
+            Value = eval(Value)
+        except:
+            Value = Value[1:-1]
+        List = list(Value)
         List.reverse()
         Value = 0
         for Char in List:
@@ -1570,7 +1581,13 @@ def ParseFieldValue (Value):
         return Value, len(List) + 1
     if Value.startswith("L'") and Value.endswith("'"):
         # Unicode Character Constant
-        List = list(eval(Value[1:])) # translate escape character
+        # translate escape character
+        Value = Value[1:]
+        try:
+            Value = eval(Value)
+        except:
+            Value = Value[1:-1]
+        List = list(Value)
         if len(List) == 0:
             raise BadExpression('Length %s is %s' % (Value, len(List)))
         List.reverse()
@@ -1580,7 +1597,12 @@ def ParseFieldValue (Value):
         return Value, len(List) * 2
     if Value.startswith("'") and Value.endswith("'"):
         # Character constant
-        List = list(eval(Value)) # translate escape character
+        # translate escape character
+        try:
+            Value = eval(Value)
+        except:
+            Value = Value[1:-1]
+        List = list(Value)
         if len(List) == 0:
             raise BadExpression('Length %s is %s' % (Value, len(List)))
         List.reverse()
