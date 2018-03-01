@@ -119,6 +119,12 @@ def SplitPcdValueString(String):
         RetList.append(Item)
     return RetList
 
+def IsValidCString(Str):
+    ValidString = re.compile(r'[_a-zA-Z][_0-9a-zA-Z]*$')
+    if not ValidString.match(Str):
+        return False
+    return True
+
 ## ReplaceExprMacro
 #
 def ReplaceExprMacro(String, Macros, ExceptionList = None):
@@ -885,13 +891,13 @@ class ValueExpressionEx(ValueExpression):
                         for Index, Item in enumerate(PcdValueList):
                             # compute byte offset of every LABEL
                             Item = Item.strip()
-                            try:
-                                LabelList = ReLabel.findall(Item)
+                            LabelList = ReLabel.findall(Item)
+                            if LabelList:
                                 for Label in LabelList:
+                                    if not IsValidCString(Label):
+                                        raise BadExpression('%s is not a valid c variable name' % Label)
                                     if Label not in LabelDict.keys():
                                         LabelDict[Label] = str(LabelOffset)
-                            except:
-                                pass
                             if Item.startswith('UINT8'):
                                 LabelOffset = LabelOffset + 1
                             elif Item.startswith('UINT16'):
