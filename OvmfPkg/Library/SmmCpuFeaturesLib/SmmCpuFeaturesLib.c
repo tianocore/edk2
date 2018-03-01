@@ -444,7 +444,7 @@ typedef struct {
 /// Table used by GetRegisterIndex() to convert an EFI_SMM_SAVE_STATE_REGISTER
 /// value to an index into a table of type CPU_SMM_SAVE_STATE_LOOKUP_ENTRY
 ///
-static CONST CPU_SMM_SAVE_STATE_REGISTER_RANGE mSmmCpuRegisterRanges[] = {
+STATIC CONST CPU_SMM_SAVE_STATE_REGISTER_RANGE mSmmCpuRegisterRanges[] = {
   SMM_REGISTER_RANGE (
     EFI_SMM_SAVE_STATE_REGISTER_GDTBASE,
     EFI_SMM_SAVE_STATE_REGISTER_LDTINFO
@@ -464,7 +464,7 @@ static CONST CPU_SMM_SAVE_STATE_REGISTER_RANGE mSmmCpuRegisterRanges[] = {
 /// Lookup table used to retrieve the widths and offsets associated with each
 /// supported EFI_SMM_SAVE_STATE_REGISTER value
 ///
-static CONST CPU_SMM_SAVE_STATE_LOOKUP_ENTRY mSmmCpuWidthOffset[] = {
+STATIC CONST CPU_SMM_SAVE_STATE_LOOKUP_ENTRY mSmmCpuWidthOffset[] = {
   {
     0,                                    // Width32
     0,                                    // Width64
@@ -833,7 +833,8 @@ static CONST CPU_SMM_SAVE_STATE_LOOKUP_ENTRY mSmmCpuWidthOffset[] = {
   @retval >0  Index into mSmmCpuWidthOffset[] associated with Register
 
 **/
-static UINTN
+STATIC
+UINTN
 GetRegisterIndex (
   IN EFI_SMM_SAVE_STATE_REGISTER  Register
   )
@@ -876,7 +877,8 @@ GetRegisterIndex (
   @retval EFI_INVALID_PARAMTER  This or Buffer is NULL.
 
 **/
-static EFI_STATUS
+STATIC
+EFI_STATUS
 ReadSaveStateRegisterByIndex (
   IN UINTN   CpuIndex,
   IN UINTN   RegisterIndex,
