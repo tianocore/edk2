@@ -36,5 +36,4 @@
   BaseLib
   BaseMemoryLib
   DebugLib
-  PcdLib
   SmmServicesTableLib
