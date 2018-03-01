@@ -126,6 +126,11 @@ DebugPrint (
   // Here we will process the variable arguments and pack them in this area.
   //
   VA_START (VaListMarker, Format);
+
+  //
+  // Use the actual format string.
+  //
+  Format = FormatString;
   for (; *Format != '\0'; Format++) {
     //
     // Only format with prefix % is processed.
