@@ -108,6 +108,12 @@ CHAR16 *
 #define BM_OPTION_NAME_LEN                          sizeof ("PlatformRecovery####")
 extern CHAR16  *mBmLoadOptionName[];
 
+//
+// Maximum number of reconnect retry to repair controller; it is to limit the
+// number of recursive call of BmRepairAllControllers.
+//
+#define MAX_RECONNECT_REPAIR                        10
+
 /**
   Visitor function to be called by BmForEachVariable for each variable
   in variable storage.
@@ -145,10 +151,13 @@ typedef struct {
 
 /**
   Repair all the controllers according to the Driver Health status queried.
+
+  @param ReconnectRepairCount     To record the number of recursive call of
+                                  this function itself.
 **/
 VOID
 BmRepairAllControllers (
-  VOID
+  UINTN       ReconnectRepairCount
   );
 
 #define BM_HOTKEY_SIGNATURE SIGNATURE_32 ('b', 'm', 'h', 'k')
@@ -325,14 +334,6 @@ EFI_DEVICE_PATH_PROTOCOL *
 BmDelPartMatchInstance (
   IN     EFI_DEVICE_PATH_PROTOCOL  *Multi,
   IN     EFI_DEVICE_PATH_PROTOCOL  *Single
-  );
-
-/**
-  Repair all the controllers according to the Driver Health status queried.
-**/
-VOID
-BmRepairAllControllers (
-  VOID
   );
 
 /**

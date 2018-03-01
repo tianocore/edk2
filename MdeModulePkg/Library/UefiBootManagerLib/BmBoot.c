@@ -1767,7 +1767,7 @@ EfiBootManagerBoot (
     //
     // 4. Repair system through DriverHealth protocol
     //
-    BmRepairAllControllers ();
+    BmRepairAllControllers (0);
   }
 
   PERF_START_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32) OptionNumber);
