@@ -15,8 +15,10 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemEncryptSevLib.h>
 #include <Library/SmmCpuFeaturesLib.h>
 #include <Library/SmmServicesTableLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include <PiSmm.h>
 #include <Register/QemuSmramSaveStateMap.h>
 
@@ -185,6 +187,42 @@ SmmCpuFeaturesSmmRelocationComplete (
   VOID
   )
 {
+  EFI_STATUS Status;
+  UINTN      MapPagesBase;
+  UINTN      MapPagesCount;
+
+  if (!MemEncryptSevIsEnabled ()) {
+    return;
+  }
+
+  //
+  // Now that SMBASE relocation is complete, re-encrypt the original SMRAM save
+  // state map's container pages, and release the pages to DXE. (The pages were
+  // allocated in PlatformPei.)
+  //
+  Status = MemEncryptSevLocateInitialSmramSaveStateMapPages (
+             &MapPagesBase,
+             &MapPagesCount
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = MemEncryptSevSetPageEncMask (
+             0,             // Cr3BaseAddress -- use current CR3
+             MapPagesBase,  // BaseAddress
+             MapPagesCount, // NumPages
+             TRUE           // Flush
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: MemEncryptSevSetPageEncMask(): %r\n",
+      __FUNCTION__, Status));
+    ASSERT (FALSE);
+    CpuDeadLoop ();
+  }
+
+  ZeroMem ((VOID *)MapPagesBase, EFI_PAGES_TO_SIZE (MapPagesCount));
+
+  Status = gBS->FreePages (MapPagesBase, MapPagesCount);
+  ASSERT_EFI_ERROR (Status);
 }
 
 /**
