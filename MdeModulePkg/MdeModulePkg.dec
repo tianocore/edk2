@@ -1745,7 +1745,7 @@
   ## This PCD specifies the additional pad size in FPDT Basic Boot Performance Table for
   #  the extension FPDT boot records received after ReadyToBoot and before ExitBootService.
   # @Prompt Pad size for extension FPDT boot records.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x0|UINT32|0x0001005F
+  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x20000|UINT32|0x0001005F
 
   ## Indicates if ConIn device are connected on demand.<BR><BR>
   #   TRUE  - ConIn device are not connected during BDS and ReadKeyStroke/ReadKeyStrokeEx produced
