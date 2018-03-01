@@ -925,6 +925,10 @@ class FdfParser:
 
         MacroDict.update(GlobalData.gGlobalDefines)
         MacroDict.update(GlobalData.gCommandLineDefines)
+        if GlobalData.BuildOptionPcd:
+            for Item in GlobalData.BuildOptionPcd:
+                PcdName, TmpValue = Item.split("=")
+                MacroDict[PcdName.strip()] = TmpValue
         # Highest priority
 
         return MacroDict
