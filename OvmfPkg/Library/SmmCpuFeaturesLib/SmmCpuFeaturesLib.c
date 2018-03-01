@@ -12,14 +12,14 @@
   WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
-#include <PiSmm.h>
-#include <Library/SmmCpuFeaturesLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/PcdLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/SmmServicesTableLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
+#include <Library/SmmCpuFeaturesLib.h>
+#include <Library/SmmServicesTableLib.h>
+#include <PiSmm.h>
 #include <Register/QemuSmramSaveStateMap.h>
 
 //
