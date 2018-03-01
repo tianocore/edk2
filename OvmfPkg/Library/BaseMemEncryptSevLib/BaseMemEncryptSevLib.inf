@@ -51,3 +51,7 @@
   CpuLib
   DebugLib
   MemoryAllocationLib
+  PcdLib
+
+[FeaturePcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdSmmSmramRequire
