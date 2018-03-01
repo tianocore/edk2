@@ -35,13 +35,15 @@ MemEncryptSevIsEnabled (
   This function clears memory encryption bit for the memory region specified
   by BaseAddress and Number of pages from the current page table context.
 
-  @param[in]  BaseAddress           The physical address that is the start address
-                                    of a memory region.
-  @param[in]  NumberOfPages         The number of pages from start memory region.
+  @param[in]  BaseAddress           The physical address that is the start
+                                    address of a memory region.
+  @param[in]  NumberOfPages         The number of pages from start memory
+                                    region.
   @param[in]  Flush                 Flush the caches before clearing the bit
                                     (mostly TRUE except MMIO addresses)
 
-  @retval RETURN_SUCCESS            The attributes were cleared for the memory region.
+  @retval RETURN_SUCCESS            The attributes were cleared for the memory
+                                    region.
   @retval RETURN_INVALID_PARAMETER  Number of pages is zero.
   @retval RETURN_UNSUPPORTED        Clearing memory encryption attribute is not
                                     supported
@@ -59,13 +61,15 @@ MemEncryptSevClearPageEncMask (
   This function sets memory encryption bit for the memory region specified by
   BaseAddress and Number of pages from the current page table context.
 
-  @param[in]  BaseAddress           The physical address that is the start address
-                                    of a memory region.
-  @param[in]  NumberOfPages         The number of pages from start memory region.
+  @param[in]  BaseAddress           The physical address that is the start
+                                    address of a memory region.
+  @param[in]  NumberOfPages         The number of pages from start memory
+                                    region.
   @param[in]  Flush                 Flush the caches before clearing the bit
                                     (mostly TRUE except MMIO addresses)
 
-  @retval RETURN_SUCCESS            The attributes were set for the memory region.
+  @retval RETURN_SUCCESS            The attributes were set for the memory
+                                    region.
   @retval RETURN_INVALID_PARAMETER  Number of pages is zero.
   @retval RETURN_UNSUPPORTED        Clearing memory encryption attribute is not
                                     supported
