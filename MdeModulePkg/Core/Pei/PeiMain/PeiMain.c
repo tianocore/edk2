@@ -104,7 +104,7 @@ ShadowPeiCore (
   Status = PeiLoadImage (
               GetPeiServicesTablePointer (),
               *((EFI_PEI_FILE_HANDLE*)&PeiCoreFileHandle),
-              PEIM_STATE_REGISITER_FOR_SHADOW,
+              PEIM_STATE_REGISTER_FOR_SHADOW,
               &EntryPoint,
               &AuthenticationState
               );

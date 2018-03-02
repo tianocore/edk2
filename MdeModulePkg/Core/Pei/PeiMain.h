@@ -104,7 +104,7 @@ typedef struct {
 //
 #define PEIM_STATE_NOT_DISPATCHED         0x00
 #define PEIM_STATE_DISPATCHED             0x01
-#define PEIM_STATE_REGISITER_FOR_SHADOW   0x02
+#define PEIM_STATE_REGISTER_FOR_SHADOW    0x02
 #define PEIM_STATE_DONE                   0x03
 
 typedef struct {

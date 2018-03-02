@@ -970,7 +970,7 @@ PeiDispatcher (
   if ((Private->PeiMemoryInstalled) && (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot))) {
     //
     // Once real memory is available, shadow the RegisterForShadow modules. And meanwhile
-    // update the modules' status from PEIM_STATE_REGISITER_FOR_SHADOW to PEIM_STATE_DONE.
+    // update the modules' status from PEIM_STATE_REGISTER_FOR_SHADOW to PEIM_STATE_DONE.
     //
     SaveCurrentPeimCount  = Private->CurrentPeimCount;
     SaveCurrentFvCount    = Private->CurrentPeimFvCount;
@@ -978,7 +978,7 @@ PeiDispatcher (
 
     for (Index1 = 0; Index1 <= SaveCurrentFvCount; Index1++) {
       for (Index2 = 0; (Index2 < PcdGet32 (PcdPeiCoreMaxPeimPerFv)) && (Private->Fv[Index1].FvFileHandles[Index2] != NULL); Index2++) {
-        if (Private->Fv[Index1].PeimState[Index2] == PEIM_STATE_REGISITER_FOR_SHADOW) {
+        if (Private->Fv[Index1].PeimState[Index2] == PEIM_STATE_REGISTER_FOR_SHADOW) {
           PeimFileHandle = Private->Fv[Index1].FvFileHandles[Index2];
           Private->CurrentFileHandle   = PeimFileHandle;
           Private->CurrentPeimFvCount  = Index1;
@@ -986,13 +986,13 @@ PeiDispatcher (
           Status = PeiLoadImage (
                     (CONST EFI_PEI_SERVICES **) &Private->Ps,
                     PeimFileHandle,
-                    PEIM_STATE_REGISITER_FOR_SHADOW,
+                    PEIM_STATE_REGISTER_FOR_SHADOW,
                     &EntryPoint,
                     &AuthenticationState
                     );
           if (Status == EFI_SUCCESS) {
             //
-            // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DONE
+            // PEIM_STATE_REGISTER_FOR_SHADOW move to PEIM_STATE_DONE
             //
             Private->Fv[Index1].PeimState[Index2]++;
             //
@@ -1165,7 +1165,7 @@ PeiDispatcher (
             //
             PeiCheckAndSwitchStack (SecCoreData, Private);
 
-            if ((Private->PeiMemoryInstalled) && (Private->Fv[FvCount].PeimState[PeimCount] == PEIM_STATE_REGISITER_FOR_SHADOW) &&   \
+            if ((Private->PeiMemoryInstalled) && (Private->Fv[FvCount].PeimState[PeimCount] == PEIM_STATE_REGISTER_FOR_SHADOW) &&   \
                 (Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME || PcdGetBool (PcdShadowPeimOnS3Boot))) {
               //
               // If memory is available we shadow images by default for performance reasons.
@@ -1179,7 +1179,7 @@ PeiDispatcher (
                 Status = PeiLoadImage (
                            PeiServices,
                            PeimFileHandle,
-                           PEIM_STATE_REGISITER_FOR_SHADOW,
+                           PEIM_STATE_REGISTER_FOR_SHADOW,
                            &EntryPoint,
                            &AuthenticationState
                            );
@@ -1192,7 +1192,7 @@ PeiDispatcher (
               //PERF_END (PeiServices, L"PEIM", PeimFileHandle, 0);
 
               //
-              // PEIM_STATE_REGISITER_FOR_SHADOW move to PEIM_STATE_DONE
+              // PEIM_STATE_REGISTER_FOR_SHADOW move to PEIM_STATE_DONE
               //
               Private->Fv[FvCount].PeimState[PeimCount]++;
 
@@ -1356,14 +1356,14 @@ PeiRegisterForShadow (
     return EFI_NOT_FOUND;
   }
 
-  if (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPeimCount] >= PEIM_STATE_REGISITER_FOR_SHADOW) {
+  if (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPeimCount] >= PEIM_STATE_REGISTER_FOR_SHADOW) {
     //
     // If the PEIM has already entered the PEIM_STATE_REGISTER_FOR_SHADOW or PEIM_STATE_DONE then it's already been started
     //
     return EFI_ALREADY_STARTED;
   }
 
-  Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPeimCount] = PEIM_STATE_REGISITER_FOR_SHADOW;
+  Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPeimCount] = PEIM_STATE_REGISTER_FOR_SHADOW;
 
   return EFI_SUCCESS;
 }

@@ -387,7 +387,7 @@ LoadAndRelocatePeCoffImage (
   }
   IsRegisterForShadow = FALSE;
   if ((Private->CurrentFileHandle == FileHandle) 
-    && (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPeimCount] == PEIM_STATE_REGISITER_FOR_SHADOW)) {
+    && (Private->Fv[Private->CurrentPeimFvCount].PeimState[Private->CurrentPeimCount] == PEIM_STATE_REGISTER_FOR_SHADOW)) {
     IsRegisterForShadow = TRUE;
   }
 
@@ -876,7 +876,7 @@ PeiLoadImage (
         //
         // The shadowed PEIM must be relocatable.
         //
-        if (PeimState == PEIM_STATE_REGISITER_FOR_SHADOW) {
+        if (PeimState == PEIM_STATE_REGISTER_FOR_SHADOW) {
           IsStrip = RelocationIsStrip ((VOID *) (UINTN) ImageAddress);
           ASSERT (!IsStrip);
           if (IsStrip) {
