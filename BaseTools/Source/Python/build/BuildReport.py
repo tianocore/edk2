@@ -958,7 +958,7 @@ class PcdReport(object):
                     if DscDefaultValue != DscDefaultValBak:
                         try:
                             DscDefaultValue = ValueExpressionEx(DscDefaultValue, Pcd.DatumType, self._GuidDict)(True)
-                        except BadExpression, Value:
+                        except BadExpression, DscDefaultValue:
                             EdkLogger.error('BuildReport', FORMAT_INVALID, "PCD Value: %s, Type: %s" %(DscDefaultValue, Pcd.DatumType))
 
                     InfDefaultValue = None
@@ -1033,9 +1033,42 @@ class PcdReport(object):
                         Pcd.DatumType = Pcd.StructName
                         if TypeName in ('DYNVPD', 'DEXVPD'):
                             Pcd.SkuInfoList = SkuInfoList
-                        if Pcd.SkuOverrideValues:
-                            DscMatch = True
+                        if Pcd.PcdFieldValueFromComm:
+                            BuildOptionMatch = True
                             DecMatch = False
+                        elif Pcd.SkuOverrideValues:
+                            DscOverride = False
+                            if not Pcd.SkuInfoList:
+                                OverrideValues = Pcd.SkuOverrideValues
+                                if OverrideValues:
+                                    Keys = OverrideValues.keys()
+                                    Data = OverrideValues[Keys[0]]
+                                    Struct = Data.values()[0]
+                                    DscOverride = self.ParseStruct(Struct)
+                            else:
+                                SkuList = sorted(Pcd.SkuInfoList.keys())
+                                for Sku in SkuList:
+                                    SkuInfo = Pcd.SkuInfoList[Sku]
+                                    if TypeName in ('DYNHII', 'DEXHII'):
+                                        if SkuInfo.DefaultStoreDict:
+                                            DefaultStoreList = sorted(SkuInfo.DefaultStoreDict.keys())
+                                            for DefaultStore in DefaultStoreList:
+                                                OverrideValues = Pcd.SkuOverrideValues[Sku]
+                                                DscOverride = self.ParseStruct(OverrideValues[DefaultStore])
+                                                if DscOverride:
+                                                    break
+                                    else:
+                                        OverrideValues = Pcd.SkuOverrideValues[Sku]
+                                        if OverrideValues:
+                                            Keys = OverrideValues.keys()
+                                            OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[Keys[0]])
+                                            DscOverride = self.ParseStruct(OverrideFieldStruct)
+                                    if DscOverride:
+                                        break
+                            if DscOverride:
+                                DscMatch = True
+                                DecMatch = False
+
                     #
                     # Report PCD item according to their override relationship
                     #
@@ -1082,6 +1115,14 @@ class PcdReport(object):
             if not ReportSubType and ModulePcdSet:
                 FileWrite(File, gSubSectionEnd)
 
+    def ParseStruct(self, struct):
+        HasDscOverride = False
+        if struct:
+            for _, Values in struct.items():
+                if Values[1] and Values[1].endswith('.dsc'):
+                    HasDscOverride = True
+                    break
+        return HasDscOverride
 
     def PrintPcdDefault(self, File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue):
         if not DscMatch and DscDefaultValue != None:
@@ -1114,6 +1155,8 @@ class PcdReport(object):
                 FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DEC DEFAULT', Value))
             if IsStructure:
                 self.PrintStructureInfo(File, Pcd.DefaultValues)
+        if DecMatch and IsStructure:
+            self.PrintStructureInfo(File, Pcd.DefaultValues)
 
     def PrintPcdValue(self, File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, Flag = '  '):
         if not Pcd.SkuInfoList:
@@ -1131,7 +1174,8 @@ class PcdReport(object):
                     Keys = OverrideValues.keys()
                     Data = OverrideValues[Keys[0]]
                     Struct = Data.values()[0]
-                    self.PrintStructureInfo(File, Struct)
+                    OverrideFieldStruct = self.OverrideFieldValue(Pcd, Struct)
+                    self.PrintStructureInfo(File, OverrideFieldStruct)
             self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
         else:
             FirstPrint = True
@@ -1191,8 +1235,8 @@ class PcdReport(object):
                             FileWrite(File, '%*s: %s: %s' % (self.MaxLen + 4, SkuInfo.VariableGuid, SkuInfo.VariableName, SkuInfo.VariableOffset))
                             if IsStructure:
                                 OverrideValues = Pcd.SkuOverrideValues[Sku]
-                                Struct = OverrideValues[DefaultStore]
-                                self.PrintStructureInfo(File, Struct)
+                                OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[DefaultStore])
+                                self.PrintStructureInfo(File, OverrideFieldStruct)
                             self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
                 else:
                     Value = SkuInfo.DefaultValue
@@ -1230,12 +1274,22 @@ class PcdReport(object):
                         OverrideValues = Pcd.SkuOverrideValues[Sku]
                         if OverrideValues:
                             Keys = OverrideValues.keys()
-                            Struct = OverrideValues[Keys[0]]
-                            self.PrintStructureInfo(File, Struct)
+                            OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[Keys[0]])
+                            self.PrintStructureInfo(File, OverrideFieldStruct)
                     self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
 
+    def OverrideFieldValue(self, Pcd, OverrideStruct):
+        OverrideFieldStruct = collections.OrderedDict()
+        if OverrideStruct:
+            for Key, Values in OverrideStruct.items():
+                if Values[1] and Values[1].endswith('.dsc'):
+                    OverrideFieldStruct[Key] = Values
+        if Pcd.PcdFieldValueFromComm:
+            for Key, Values in Pcd.PcdFieldValueFromComm.items():
+                OverrideFieldStruct[Key] = Values
+        return OverrideFieldStruct
+
     def PrintStructureInfo(self, File, Struct):
-        NewInfo = collections.OrderedDict()
         for Key, Value in Struct.items():
             if Value[1] and 'build command options' in Value[1]:
                 FileWrite(File, '    *B  %-*s = %s' % (self.MaxLen + 4, '.' + Key, Value[0]))
