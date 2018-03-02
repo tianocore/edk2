@@ -1319,10 +1319,10 @@ class DscBuildData(PlatformBuildClassObject):
                 str_pcd_obj_str.copy(str_pcd_dec)
                 if str_pcd_obj:
                     str_pcd_obj_str.copy(str_pcd_obj)
-                if str_pcd_obj.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
-                    str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].HiiDefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
-                else:
-                    str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].DefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
+                    if str_pcd_obj.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
+                        str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].HiiDefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
+                    else:
+                        str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].DefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
                 for str_pcd_data in StrPcdSet[str_pcd]:
                     if str_pcd_data[3] in SkuIds:
                         str_pcd_obj_str.AddOverrideValue(str_pcd_data[2], str(str_pcd_data[6]), 'DEFAULT' if str_pcd_data[3] == 'COMMON' else str_pcd_data[3],'STANDARD' if str_pcd_data[4] == 'COMMON' else str_pcd_data[4], self.MetaFile.File if self.WorkspaceDir not in self.MetaFile.File else self.MetaFile.File[len(self.WorkspaceDir) if self.WorkspaceDir.endswith(os.path.sep) else len(self.WorkspaceDir)+1:],LineNo=str_pcd_data[5])
@@ -1764,6 +1764,9 @@ class DscBuildData(PlatformBuildClassObject):
         if (SkuName,DefaultStoreName) == ('DEFAULT','STANDARD'):
             pcddefaultvalue = Pcd.DefaultFromDSC.get('DEFAULT',{}).get('STANDARD', Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue
         else:
+            if not Pcd.DscRawValue:
+                # handle the case that structure pcd is not appear in DSC
+                self.CopyDscRawValue(Pcd)
             pcddefaultvalue = Pcd.DscRawValue.get(SkuName,{}).get(DefaultStoreName)
         for FieldList in [pcddefaultvalue,inherit_OverrideValues.get(DefaultStoreName)]:
             if not FieldList:
@@ -1960,8 +1963,8 @@ class DscBuildData(PlatformBuildClassObject):
                     if skuname == SkuName:
                         break
             else:
-                CApp = CApp + "// SkuName: DEFAULT,  DefaultStoreName: STANDARD \n"
-                CApp = CApp + self.GenerateInitValueStatement(Pcd,"DEFAULT","STANDARD")
+                CApp = CApp + "// SkuName: %s,  DefaultStoreName: STANDARD \n" % self.SkuIdMgr.SystemSkuId
+                CApp = CApp + self.GenerateInitValueStatement(Pcd,self.SkuIdMgr.SystemSkuId,"STANDARD")
             CApp = CApp + self.GenerateCommandLineValueStatement(Pcd)
             #
             # Set new PCD value and size
@@ -2327,6 +2330,10 @@ class DscBuildData(PlatformBuildClassObject):
     def CopyDscRawValue(self,Pcd):
         if Pcd.DscRawValue is None:
             Pcd.DscRawValue = dict()
+        if Pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD], self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
+            if self.SkuIdMgr.SystemSkuId not in Pcd.DscRawValue:
+                Pcd.DscRawValue[self.SkuIdMgr.SystemSkuId] = {}
+            Pcd.DscRawValue[self.SkuIdMgr.SystemSkuId]['STANDARD'] = Pcd.DefaultValue
         for skuname in Pcd.SkuInfoList:
             Pcd.DscRawValue[skuname] = {}
             if Pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
@@ -2341,6 +2348,7 @@ class DscBuildData(PlatformBuildClassObject):
         DefaultStores = set([storename for pcdobj in PcdSet.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict.keys()])
         for PcdCName, TokenSpaceGuid in PcdSet:
             PcdObj = PcdSet[(PcdCName, TokenSpaceGuid)]
+            self.CopyDscRawValue(PcdObj)
             if PcdObj.Type not in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_DEFAULT],
                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII],
                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_VPD],
@@ -2349,7 +2357,6 @@ class DscBuildData(PlatformBuildClassObject):
                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_VPD]]:
                 Pcds[PcdCName, TokenSpaceGuid]= PcdObj
                 continue
-            self.CopyDscRawValue(PcdObj)
             PcdType = PcdObj.Type
             if PcdType in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
                 for skuid in PcdObj.SkuInfoList:
