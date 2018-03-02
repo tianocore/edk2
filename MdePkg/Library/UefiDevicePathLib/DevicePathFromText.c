@@ -1,7 +1,7 @@
 /** @file
   DevicePathFromText protocol as defined in the UEFI 2.0 specification.
 
-Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2581,7 +2581,7 @@ DevPathFromTextiSCSI (
 
   ISCSIDevPath->LoginOption      = (UINT16) Options;
 
-  if (StrCmp (ProtocolStr, L"TCP") == 0) {
+  if (IS_NULL (*ProtocolStr) || (StrCmp (ProtocolStr, L"TCP") == 0)) {
     ISCSIDevPath->NetworkProtocol = 0;
   } else {
     //
