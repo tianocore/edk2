@@ -129,9 +129,9 @@ Returns:
   } else {
     Length = strlen(Str);
     if (Length < 4) {
-      strncpy (TemStr + 4 - Length, Str, Length);
+      memcpy (TemStr + 4 - Length, Str, Length);
     } else {
-      strncpy (TemStr, Str + Length - 4, 4);
+      memcpy (TemStr, Str + Length - 4, 4);
     }
   
     sscanf (
