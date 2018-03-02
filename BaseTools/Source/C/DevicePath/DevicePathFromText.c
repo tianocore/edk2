@@ -2426,7 +2426,7 @@ DevPathFromTextiSCSI (
 
   ISCSIDevPath->LoginOption      = (UINT16) Options;
 
-  if (StrCmp (ProtocolStr, L"TCP") == 0) {
+  if (IS_NULL (*ProtocolStr) || (StrCmp (ProtocolStr, L"TCP") == 0)) {
     ISCSIDevPath->NetworkProtocol = 0;
   } else {
     //
