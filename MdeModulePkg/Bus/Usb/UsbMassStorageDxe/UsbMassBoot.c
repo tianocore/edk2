@@ -691,7 +691,6 @@ UsbBootDetectMedia (
   EFI_BLOCK_IO_MEDIA        OldMedia;
   EFI_BLOCK_IO_MEDIA        *Media;
   UINT8                     CmdSet;
-  EFI_TPL                   OldTpl;
   EFI_STATUS                Status;
 
   Media    = &UsbMass->BlockIoMedia;
@@ -740,11 +739,10 @@ ON_ERROR:
       (Media->LastBlock != OldMedia.LastBlock)) {
 
     //
-    // This function is called by Block I/O Protocol APIs, which run at TPL_NOTIFY.
-    // Here we temporarily restore TPL to TPL_CALLBACK to invoke ReinstallProtocolInterface().
-    //
-    OldTpl = EfiGetCurrentTpl ();
-    gBS->RestoreTPL (TPL_CALLBACK);
+    // This function is called from:
+    //   Block I/O Protocol APIs, which run at TPL_CALLBACK.
+    //   DriverBindingStart(), which raises to TPL_CALLBACK.
+    ASSERT (EfiGetCurrentTpl () == TPL_CALLBACK);
 
     gBS->ReinstallProtocolInterface (
            UsbMass->Controller,
@@ -752,9 +750,6 @@ ON_ERROR:
            &UsbMass->BlockIo,
            &UsbMass->BlockIo
            );
-
-    ASSERT (EfiGetCurrentTpl () == TPL_CALLBACK);
-    gBS->RaiseTPL (OldTpl);
 
     //
     // Update MediaId after reinstalling Block I/O Protocol.
