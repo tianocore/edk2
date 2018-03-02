@@ -388,9 +388,9 @@ InitMpGlobalData (
   // Allocating it in advance since memory services are not available in
   // Exit Boot Services callback function.
   //
-  ApSafeBufferSize  = CpuMpData->AddressMap.RelocateApLoopFuncSize;
-  ApSafeBufferSize += CpuMpData->CpuCount * AP_SAFE_STACK_SIZE;
-
+  ApSafeBufferSize  = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (
+                        CpuMpData->AddressMap.RelocateApLoopFuncSize
+                        ));
   Address = BASE_4GB - 1;
   Status  = gBS->AllocatePages (
                    AllocateMaxAddress,
@@ -399,9 +399,39 @@ InitMpGlobalData (
                    &Address
                    );
   ASSERT_EFI_ERROR (Status);
+
   mReservedApLoopFunc = (VOID *) (UINTN) Address;
   ASSERT (mReservedApLoopFunc != NULL);
-  mReservedTopOfApStack = (UINTN) Address + EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (ApSafeBufferSize));
+
+  //
+  // Make sure that the buffer memory is executable if NX protection is enabled
+  // for EfiReservedMemoryType.
+  // 
+  // TODO: Check EFI_MEMORY_XP bit set or not once it's available in DXE GCD
+  //       service.
+  //
+  Status = gDS->GetMemorySpaceDescriptor (Address, &MemDesc);
+  if (!EFI_ERROR (Status)) {
+    gDS->SetMemorySpaceAttributes (
+           Address,
+           ApSafeBufferSize,
+           MemDesc.Attributes & (~EFI_MEMORY_XP)
+           );
+  }
+
+  ApSafeBufferSize = EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES (
+                       CpuMpData->CpuCount * AP_SAFE_STACK_SIZE
+                       ));
+  Address = BASE_4GB - 1;
+  Status  = gBS->AllocatePages (
+                   AllocateMaxAddress,
+                   EfiReservedMemoryType,
+                   EFI_SIZE_TO_PAGES (ApSafeBufferSize),
+                   &Address
+                   );
+  ASSERT_EFI_ERROR (Status);
+
+  mReservedTopOfApStack = (UINTN) Address + ApSafeBufferSize;
   ASSERT ((mReservedTopOfApStack & (UINTN)(CPU_STACK_ALIGNMENT - 1)) == 0);
   CopyMem (
     mReservedApLoopFunc,
