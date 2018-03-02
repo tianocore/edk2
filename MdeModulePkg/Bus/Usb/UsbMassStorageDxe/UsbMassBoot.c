@@ -2,7 +2,7 @@
   Implementation of the command set of USB Mass Storage Specification
   for Bootability, Revision 1.0.
 
-Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -630,10 +630,8 @@ UsbBootGetParams (
 {
   EFI_BLOCK_IO_MEDIA          *Media;
   EFI_STATUS                  Status;
-  UINT8                       CmdSet;
 
   Media  = &(UsbMass->BlockIoMedia);
-  CmdSet = ((EFI_USB_INTERFACE_DESCRIPTOR *) (UsbMass->Context))->InterfaceSubClass;
 
   Status = UsbBootInquiry (UsbMass);
   if (EFI_ERROR (Status)) {
@@ -668,18 +666,9 @@ UsbBootGetParams (
     Media->BlockSize        = 0x0800;
   }
 
-  if ((UsbMass->Pdt != USB_PDT_CDROM) && (CmdSet == USB_MASS_STORE_SCSI)) {
-    //
-    // ModeSense is required for the device with PDT of 0x00/0x07/0x0E,
-    // which is from [MassStorageBootabilitySpec-Page7].
-    // ModeSense(10) is useless here, while ModeSense(6) defined in SCSI
-    // could get the information of WriteProtected.
-    // Since not all device support this command, so skip if fail.
-    //
-    UsbScsiModeSense (UsbMass);
-  }
+  Status = UsbBootDetectMedia (UsbMass);
 
-  return UsbBootReadCapacity (UsbMass);
+  return Status;
 }
 
 
@@ -710,7 +699,7 @@ UsbBootDetectMedia (
   CmdSet = ((EFI_USB_INTERFACE_DESCRIPTOR *) (UsbMass->Context))->InterfaceSubClass;
 
   Status = UsbBootIsUnitReady (UsbMass);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) && (Status != EFI_MEDIA_CHANGED)) {
     goto ON_ERROR;
   }
 
