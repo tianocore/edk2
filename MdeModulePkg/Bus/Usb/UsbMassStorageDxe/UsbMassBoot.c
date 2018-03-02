@@ -2,7 +2,7 @@
   Implementation of the command set of USB Mass Storage Specification
   for Bootability, Revision 1.0.
 
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -137,8 +137,9 @@ UsbBootRequestSense (
     break;
   }
 
-  DEBUG ((EFI_D_INFO, "UsbBootRequestSense: (%r) with sense key %x/%x/%x\n",
+  DEBUG ((EFI_D_INFO, "UsbBootRequestSense: (%r) with error code (%x) sense key %x/%x/%x\n",
           Status,
+          SenseData.ErrorCode,
           USB_BOOT_SENSE_KEY (SenseData.SenseKey),
           SenseData.Asc,
           SenseData.Ascq
@@ -196,7 +197,7 @@ UsbBootExecCmd (
                            );
 
   if (Status == EFI_TIMEOUT) {
-    DEBUG ((EFI_D_ERROR, "UsbBootExecCmd: Timeout to Exec 0x%x Cmd\n", *(UINT8 *)Cmd));
+    DEBUG ((EFI_D_ERROR, "UsbBootExecCmd: %r to Exec 0x%x Cmd\n", Status, *(UINT8 *)Cmd));
     return EFI_TIMEOUT;
   }
 
@@ -211,6 +212,7 @@ UsbBootExecCmd (
   //
   // If command execution failed, then retrieve error info via sense request.
   //
+  DEBUG ((EFI_D_ERROR, "UsbBootExecCmd: %r to Exec 0x%x Cmd (Result = %x)\n", Status, *(UINT8 *)Cmd, CmdResult));
   return UsbBootRequestSense (UsbMass);
 }
 
