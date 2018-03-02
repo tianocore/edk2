@@ -71,9 +71,9 @@ INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKE
 BUILD_CPPFLAGS = $(INCLUDE) -O2
 ifeq ($(DARWIN),Darwin)
 # assume clang or clang compatible flags on OS X
-BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -c -g
+BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-self-assign -Wno-unused-result -nostdlib -c -g
 else
-BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-unused-result -nostdlib -c -g
+BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-stringop-truncation -Wno-unused-result -nostdlib -c -g
 endif
 BUILD_LFLAGS =
 BUILD_CXXFLAGS = -Wno-unused-result
