@@ -1,7 +1,7 @@
 /** @file
   Support routines for MTFTP.
   
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -185,6 +185,20 @@ Mtftp4SendError (
 EFI_STATUS
 Mtftp4Retransmit (
   IN MTFTP4_PROTOCOL        *Instance
+  );
+
+/**
+  The timer ticking function in TPL_NOTIFY level for the Mtftp service instance.
+
+  @param  Event                 The ticking event
+  @param  Context               The Mtftp service instance
+
+**/
+VOID
+EFIAPI
+Mtftp4OnTimerTickNotifyLevel (
+  IN EFI_EVENT              Event,
+  IN VOID                   *Context
   );
 
 /**

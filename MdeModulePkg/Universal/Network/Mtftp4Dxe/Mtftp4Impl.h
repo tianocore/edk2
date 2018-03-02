@@ -9,7 +9,7 @@
   RFC2348 - TFTP Blocksize Option
   RFC2349 - TFTP Timeout Interval and Transfer Size Options
   
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -72,7 +72,8 @@ struct _MTFTP4_SERVICE {
   UINT16                        ChildrenNum;
   LIST_ENTRY                    Children;
 
-  EFI_EVENT                     Timer;  ///< Ticking timer for all the MTFTP clients
+  EFI_EVENT                     Timer;  ///< Ticking timer for all the MTFTP clients to handle the packet timeout case.
+  EFI_EVENT                     TimerNotifyLevel; ///< Ticking timer for all the MTFTP clients to calculate the packet live time.
   EFI_EVENT                     TimerToGetMap;
 
   EFI_HANDLE                    Controller;
@@ -135,6 +136,7 @@ struct _MTFTP4_PROTOCOL {
   //
   NET_BUF                       *LastPacket;
   UINT32                        PacketToLive;
+  BOOLEAN                       HasTimeout;
   UINT32                        CurRetry;
   UINT32                        MaxRetry;
   UINT32                        Timeout;
