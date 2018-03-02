@@ -1,7 +1,7 @@
 /** @file
   Implementation of Mtftp drivers.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -162,11 +162,12 @@ Mtftp4CreateService (
   MtftpSb->ChildrenNum    = 0;
   InitializeListHead (&MtftpSb->Children);
 
-  MtftpSb->Timer          = NULL;
-  MtftpSb->TimerToGetMap  = NULL;
-  MtftpSb->Controller     = Controller;
-  MtftpSb->Image          = Image;
-  MtftpSb->ConnectUdp     = NULL;
+  MtftpSb->Timer            = NULL;
+  MtftpSb->TimerNotifyLevel = NULL;
+  MtftpSb->TimerToGetMap    = NULL;
+  MtftpSb->Controller       = Controller;
+  MtftpSb->Image            = Image;
+  MtftpSb->ConnectUdp       = NULL;
 
   //
   // Create the timer and a udp to be notified when UDP is uninstalled
@@ -178,8 +179,20 @@ Mtftp4CreateService (
                   MtftpSb,
                   &MtftpSb->Timer
                   );
-
   if (EFI_ERROR (Status)) {
+    FreePool (MtftpSb);
+    return Status;
+  }
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL | EVT_TIMER,
+                  TPL_NOTIFY,
+                  Mtftp4OnTimerTickNotifyLevel,
+                  MtftpSb,
+                  &MtftpSb->TimerNotifyLevel
+                  );
+  if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (MtftpSb->Timer);
     FreePool (MtftpSb);
     return Status;
   }
@@ -196,6 +209,7 @@ Mtftp4CreateService (
                   &MtftpSb->TimerToGetMap
                   );
   if (EFI_ERROR (Status)) {
+    gBS->CloseEvent (MtftpSb->TimerNotifyLevel);
     gBS->CloseEvent (MtftpSb->Timer);
     FreePool (MtftpSb);
     return Status;
@@ -211,6 +225,7 @@ Mtftp4CreateService (
 
   if (MtftpSb->ConnectUdp == NULL) {
     gBS->CloseEvent (MtftpSb->TimerToGetMap);
+    gBS->CloseEvent (MtftpSb->TimerNotifyLevel);
     gBS->CloseEvent (MtftpSb->Timer);
     FreePool (MtftpSb);
     return EFI_DEVICE_ERROR;
@@ -234,6 +249,7 @@ Mtftp4CleanService (
 {
   UdpIoFreeIo (MtftpSb->ConnectUdp);
   gBS->CloseEvent (MtftpSb->TimerToGetMap);
+  gBS->CloseEvent (MtftpSb->TimerNotifyLevel);
   gBS->CloseEvent (MtftpSb->Timer);
 }
 
@@ -294,6 +310,12 @@ Mtftp4DriverBindingStart (
     goto ON_ERROR;
   }
 
+  Status = gBS->SetTimer (MtftpSb->TimerNotifyLevel, TimerPeriodic, TICKS_PER_SECOND);
+
+  if (EFI_ERROR (Status)) {
+    goto ON_ERROR;
+  }
+  
   //
   // Install the Mtftp4ServiceBinding Protocol onto Controller
   //

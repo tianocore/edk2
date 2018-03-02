@@ -1082,6 +1082,7 @@ EfiMtftp4Poll (
 {
   MTFTP4_PROTOCOL           *Instance;
   EFI_UDP4_PROTOCOL         *Udp;
+  EFI_STATUS                Status;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1096,7 +1097,9 @@ EfiMtftp4Poll (
   }
 
   Udp = Instance->UnicastPort->Protocol.Udp4;
-  return Udp->Poll (Udp);
+  Status = Udp->Poll (Udp);
+  Mtftp4OnTimerTick (NULL, Instance->Service);
+  return Status;
 }
 
 EFI_MTFTP4_PROTOCOL gMtftp4ProtocolTemplate = {
