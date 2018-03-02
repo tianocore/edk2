@@ -1184,12 +1184,6 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
             if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
                 CName = PcdItem[0]
 
-        if GlobalData.BuildOptionPcd:
-            for PcdItem in GlobalData.BuildOptionPcd:
-                if (Pcd.TokenSpaceGuidCName, CName) == (PcdItem[0], PcdItem[1]):
-                    Pcd.DefaultValue = PcdItem[2]
-                    break
-
         EdkLogger.debug(EdkLogger.DEBUG_3, "PCD: %s %s (%s : %s)" % (CName, TokenSpaceGuidCName, Pcd.Phase, Phase))
 
         if Pcd.Phase == 'PEI':
@@ -1504,12 +1498,6 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
         for PcdItem in GlobalData.MixedPcd:
             if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
                 CName = PcdItem[0]
-
-        if GlobalData.BuildOptionPcd:
-            for PcdItem in GlobalData.BuildOptionPcd:
-                if (Pcd.TokenSpaceGuidCName, CName) == (PcdItem[0], PcdItem[1]):
-                    Pcd.DefaultValue = PcdItem[2]
-                    break
 
         EdkLogger.debug(EdkLogger.DEBUG_1, "PCD = %s.%s" % (CName, TokenSpaceGuidCName))
         EdkLogger.debug(EdkLogger.DEBUG_1, "phase = %s" % Phase)

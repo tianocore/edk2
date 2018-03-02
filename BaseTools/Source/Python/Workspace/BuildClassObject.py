@@ -129,6 +129,8 @@ class StructurePcd(PcdClassObject):
         self.PkgPath = ""
         self.DefaultValueFromDec = ""
         self.ValueChain = dict()
+        self.PcdValueFromComm = ""
+        self.PcdFieldValueFromComm = collections.OrderedDict({})
     def __repr__(self):
         return self.TypeName
 
@@ -188,6 +190,8 @@ class StructurePcd(PcdClassObject):
             self.PcdDefineLineNo = PcdObject.PcdDefineLineNo if PcdObject.PcdDefineLineNo else self.PcdDefineLineNo
             self.PkgPath = PcdObject.PkgPath if PcdObject.PkgPath else self.PkgPath
             self.ValueChain = PcdObject.ValueChain if PcdObject.ValueChain else self.ValueChain
+            self.PcdValueFromComm = PcdObject.PcdValueFromComm if PcdObject.PcdValueFromComm else self.PcdValueFromComm
+            self.PcdFieldValueFromComm = PcdObject.PcdFieldValueFromComm if PcdObject.PcdFieldValueFromComm else self.PcdFieldValueFromComm
 
 ## LibraryClassObject
 #
