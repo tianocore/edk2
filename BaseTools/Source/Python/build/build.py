@@ -772,7 +772,7 @@ class Build():
         self.AutoGenTime    = 0
         self.MakeTime       = 0
         self.GenFdsTime     = 0
-        GlobalData.BuildOptionPcd     = BuildOptions.OptionPcd if BuildOptions.OptionPcd else {}
+        GlobalData.BuildOptionPcd     = BuildOptions.OptionPcd if BuildOptions.OptionPcd else []
         #Set global flag for build mode
         GlobalData.gIgnoreSource = BuildOptions.IgnoreSources
         GlobalData.gUseHashCache = BuildOptions.UseHashCache

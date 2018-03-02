@@ -1368,27 +1368,6 @@ class PlatformAutoGen(AutoGen):
     #  This interface should be invoked explicitly when platform action is created.
     #
     def CollectPlatformDynamicPcds(self):
-        # Override the platform Pcd's value by build option
-        if GlobalData.BuildOptionPcd:
-            for PcdItem in GlobalData.BuildOptionPcd:
-                PlatformPcd = self.Platform.Pcds.get((PcdItem[1],PcdItem[0]))
-                if PlatformPcd:
-                    if PlatformPcd.DatumType in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64,'BOOLEAN']:
-                        for sku in PlatformPcd.SkuInfoList:
-                            PlatformPcd.SkuInfoList[sku].DefaultValue = PcdItem[2]
-                    else:
-                        PcdDefaultValue = StringToArray(PcdItem[2])
-                        for sku in PlatformPcd.SkuInfoList:
-                            skuinfo = PlatformPcd.SkuInfoList[sku]
-                            if skuinfo.VariableGuid:
-                                skuinfo.HiiDefaultValue = PcdDefaultValue
-                            else:
-                                skuinfo.DefaultValue = PcdDefaultValue
-                        PlatformPcd.DefaultValue = PcdDefaultValue
-                        if PlatformPcd.MaxDatumSize:
-                            PlatformPcd.MaxDatumSize = str(max([int(PlatformPcd.MaxDatumSize),len(PcdDefaultValue.split(","))]))
-                        else:
-                            PlatformPcd.MaxDatumSize = str(len(PcdDefaultValue.split(",")))
 
         for key in self.Platform.Pcds:
             for SinglePcd in GlobalData.MixedPcd:
@@ -2373,11 +2352,6 @@ class PlatformAutoGen(AutoGen):
                 TokenCName = PcdItem[0]
                 break
         if FromPcd != None:
-            if GlobalData.BuildOptionPcd:
-                for pcd in GlobalData.BuildOptionPcd:
-                    if (FromPcd.TokenSpaceGuidCName, FromPcd.TokenCName) == (pcd[0], pcd[1]):
-                        FromPcd.DefaultValue = pcd[2]
-                        break
             if ToPcd.Pending and FromPcd.Type not in [None, '']:
                 ToPcd.Type = FromPcd.Type
             elif (ToPcd.Type not in [None, '']) and (FromPcd.Type not in [None, ''])\
