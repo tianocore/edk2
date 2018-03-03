@@ -60,7 +60,7 @@ UsbMassReset (
   EFI_STATUS      Status;
 
   //
-  // Raise TPL to TPL_NOTIFY to serialize all its operations
+  // Raise TPL to TPL_CALLBACK to serialize all its operations
   // to protect shared data structures.
   //
   OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
@@ -114,7 +114,7 @@ UsbMassReadBlocks (
   UINTN               TotalBlock;
 
   //
-  // Raise TPL to TPL_NOTIFY to serialize all its operations
+  // Raise TPL to TPL_CALLBACK to serialize all its operations
   // to protect shared data structures.
   //
   OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
@@ -230,7 +230,7 @@ UsbMassWriteBlocks (
   UINTN               TotalBlock;
 
   //
-  // Raise TPL to TPL_NOTIFY to serialize all its operations
+  // Raise TPL to TPL_CALLBACK to serialize all its operations
   // to protect shared data structures.
   //
   OldTpl  = gBS->RaiseTPL (TPL_CALLBACK);
