@@ -2,7 +2,7 @@
   Provides interface to shell console logger.
 
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -322,7 +322,7 @@ UpdateDisplayFromHistory(
         //
         StringSegmentEndChar = CHAR_NULL;
         for ( StringSegmentEnd = StringSegment
-            ; StringSegmentEnd != CHAR_NULL
+            ; *StringSegmentEnd != CHAR_NULL
             ; StringSegmentEnd++
             , Column++
            ){
