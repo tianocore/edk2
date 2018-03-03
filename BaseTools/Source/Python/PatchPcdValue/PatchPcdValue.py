@@ -161,10 +161,11 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
             #
             # Patch {0x1, 0x2, ...} byte by byte
             #
-            ValueList = ValueString[1 : len(ValueString) - 1].split(', ')
+            ValueList = ValueString[1 : len(ValueString) - 1].split(',')
             Index = 0
             try:
                 for ByteString in ValueList:
+                    ByteString = ByteString.strip()
                     if ByteString.upper().startswith('0X'):
                         ByteValue = int(ByteString, 16)
                     else:
