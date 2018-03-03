@@ -46,6 +46,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 import Common.GlobalData as GlobalData
 from DepexSection import DepexSection
 from Common.Misc import SaveFileOnChange
+from Common.Expression import *
 
 ## generate FFS from INF
 #
@@ -279,6 +280,20 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
             if not DscOverride and not FdfOverride and not BuildOptionOverride:
                 continue
+
+            # Support Flexible PCD format
+            if DefaultValue:
+                try:
+                    DefaultValue = ValueExpressionEx(DefaultValue, Pcd.DatumType, Platform._GuidDict)(True)
+                except BadExpression:
+                    EdkLogger.error("GenFds", GENFDS_ERROR, 'PCD [%s.%s] Value "%s"' %(Pcd.TokenSpaceGuidCName, Pcd.TokenCName, DefaultValue), File=self.InfFileName)
+
+            if Pcd.DefaultValue:
+                try:
+                    Pcd.DefaultValue = ValueExpressionEx(Pcd.DefaultValue, Pcd.DatumType, Platform._GuidDict)(True)
+                except BadExpression:
+                    EdkLogger.error("GenFds", GENFDS_ERROR, 'PCD [%s.%s] Value "%s"' %(Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Pcd.DefaultValue),File=self.InfFileName)
+
             # Check value, if value are equal, no need to patch
             if Pcd.DatumType == "VOID*":
                 if Pcd.DefaultValue == DefaultValue or DefaultValue in [None, '']:
