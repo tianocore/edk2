@@ -3,7 +3,7 @@
 #
 # This package provides common open source Intel silicon modules.
 #
-# Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -60,4 +60,20 @@
   #  BIT1: Enable IOMMU when transfer control to OS (ExitBootService in normal boot. EndOfPEI in S3)
   # @Prompt The policy for VTd driver behavior.
   gIntelSiliconPkgTokenSpaceGuid.PcdVTdPolicyPropertyMask|1|UINT8|0x00000002
+
+  ## Declares VTd PEI DMA buffer size.<BR><BR>
+  #  When this PCD value is referred by platform to calculate the required
+  #  memory size for PEI (InstallPeiMemory), the PMR alignment requirement
+  #  needs be considered to be added with this PCD value for alignment
+  #  adjustment need by AllocateAlignedPages.
+  # @Prompt The VTd PEI DMA buffer size.
+  gIntelSiliconPkgTokenSpaceGuid.PcdVTdPeiDmaBufferSize|0x00400000|UINT32|0x00000003
+
+  ## Declares VTd PEI DMA buffer size for S3.<BR><BR>
+  #  When this PCD value is referred by platform to calculate the required
+  #  memory size for PEI S3 (InstallPeiMemory), the PMR alignment requirement
+  #  needs be considered to be added with this PCD value for alignment
+  #  adjustment need by AllocateAlignedPages.
+  # @Prompt The VTd PEI DMA buffer size for S3.
+  gIntelSiliconPkgTokenSpaceGuid.PcdVTdPeiDmaBufferSizeS3|0x00200000|UINT32|0x00000004
 
