@@ -2,7 +2,7 @@
   DevicePathToText protocol as defined in the UEFI 2.0 specification.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1539,18 +1539,20 @@ DevPathToTextiSCSI (
 {
   ISCSI_DEVICE_PATH_WITH_NAME *ISCSIDevPath;
   UINT16                      Options;
+  UINTN                       Index;
 
   ISCSIDevPath = DevPath;
   UefiDevicePathLibCatPrint (
     Str,
-    L"iSCSI(%a,0x%x,0x%lx,",
+    L"iSCSI(%a,0x%x,0x",
     ISCSIDevPath->TargetName,
-    ISCSIDevPath->TargetPortalGroupTag,
-    ISCSIDevPath->Lun
+    ISCSIDevPath->TargetPortalGroupTag
     );
-
+  for (Index = 0; Index < sizeof (ISCSIDevPath->Lun) / sizeof (UINT8); Index++) {
+    UefiDevicePathLibCatPrint (Str, L"%02x", ((UINT8 *)&ISCSIDevPath->Lun)[Index]);
+  }
   Options = ISCSIDevPath->LoginOption;
-  UefiDevicePathLibCatPrint (Str, L"%s,", (((Options >> 1) & 0x0001) != 0) ? L"CRC32C" : L"None");
+  UefiDevicePathLibCatPrint (Str, L",%s,", (((Options >> 1) & 0x0001) != 0) ? L"CRC32C" : L"None");
   UefiDevicePathLibCatPrint (Str, L"%s,", (((Options >> 3) & 0x0001) != 0) ? L"CRC32C" : L"None");
   if (((Options >> 11) & 0x0001) != 0) {
     UefiDevicePathLibCatPrint (Str, L"%s,", L"None");
