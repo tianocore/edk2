@@ -3,7 +3,7 @@
 #
 #  This module is used to provide API used by Opal password solution.
 #
-# Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -18,7 +18,7 @@
   FILE_GUID                      = ad63b09b-1fc9-4789-af0c-5af8a3fb1f9c
   VERSION_STRING                 = 1.0
   MODULE_TYPE                    = BASE
-  LIBRARY_CLASS                  = TcgStorageCoreLib|DXE_DRIVER DXE_CORE DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = TcgStorageCoreLib
 #
 # The following information is for reference only and not required by the build tools.
 #
