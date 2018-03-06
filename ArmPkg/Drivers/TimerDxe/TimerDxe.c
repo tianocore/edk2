@@ -306,11 +306,12 @@ TimerInterruptHandler (
   //
   OriginalTPL = gBS->RaiseTPL (TPL_HIGH_LEVEL);
 
+  // Signal end of interrupt early to help avoid losing subsequent ticks
+  // from long duration handlers
+  gInterrupt->EndOfInterrupt (gInterrupt, Source);
+
   // Check if the timer interrupt is active
   if ((ArmGenericTimerGetTimerCtrlReg () ) & ARM_ARCH_TIMER_ISTATUS) {
-
-    // Signal end of interrupt early to help avoid losing subsequent ticks from long duration handlers
-    gInterrupt->EndOfInterrupt (gInterrupt, Source);
 
     if (mTimerNotifyFunction) {
       mTimerNotifyFunction (mTimerPeriod * mElapsedPeriod);
@@ -338,9 +339,6 @@ TimerInterruptHandler (
     ArmGenericTimerSetCompareVal (CompareValue);
     ArmGenericTimerEnableTimer ();
   }
-
-  // Enable timer interrupts
-  gInterrupt->EnableInterruptSource (gInterrupt, Source);
 
   gBS->RestoreTPL (OriginalTPL);
 }
