@@ -59,36 +59,39 @@ GenericMemoryTestEntryPoint (
 }
 
 /**
-  Convert the memory descriptor to tested.
+  Convert the memory range to tested.
 
-  @param Descriptor  Pointer to EFI_GCD_MEMORY_SPACE_DESCRIPTOR
+  @param BaseAddress  Base address of the memory range.
+  @param Length       Length of the memory range.
+  @param Capabilities Capabilities of the memory range.
 
-  @retval EFI_SUCCESS The memory descriptor is converted to tested.
+  @retval EFI_SUCCESS The memory range is converted to tested.
   @retval others      Error happens.
 **/
 EFI_STATUS
 ConvertToTestedMemory (
-  IN CONST EFI_GCD_MEMORY_SPACE_DESCRIPTOR *Descriptor
+  IN UINT64           BaseAddress,
+  IN UINT64           Length,
+  IN UINT64           Capabilities
   )
 {
   EFI_STATUS Status;
   Status = gDS->RemoveMemorySpace (
-                  Descriptor->BaseAddress,
-                  Descriptor->Length
+                  BaseAddress,
+                  Length
                   );
   if (!EFI_ERROR (Status)) {
     Status = gDS->AddMemorySpace (
-                    ((Descriptor->Capabilities & EFI_MEMORY_MORE_RELIABLE) == EFI_MEMORY_MORE_RELIABLE) ?
+                    ((Capabilities & EFI_MEMORY_MORE_RELIABLE) == EFI_MEMORY_MORE_RELIABLE) ?
                     EfiGcdMemoryTypeMoreReliable : EfiGcdMemoryTypeSystemMemory,
-                    Descriptor->BaseAddress,
-                    Descriptor->Length,
-                    Descriptor->Capabilities &~
+                    BaseAddress,
+                    Length,
+                    Capabilities &~
                     (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
                     );
   }
   return Status;
 }
-
 
 /**
   Initialize the generic memory test.
@@ -129,7 +132,11 @@ InitializeMemoryTest (
       //
       // For those reserved memory that have not been tested, simply promote to system memory.
       //
-      Status = ConvertToTestedMemory (&MemorySpaceMap[Index]);
+      Status = ConvertToTestedMemory (
+                 MemorySpaceMap[Index].BaseAddress,
+                 MemorySpaceMap[Index].Length,
+                 MemorySpaceMap[Index].Capabilities
+                 );
       ASSERT_EFI_ERROR (Status);
       mTestedSystemMemory += MemorySpaceMap[Index].Length;
       mTotalSystemMemory += MemorySpaceMap[Index].Length;
@@ -236,7 +243,11 @@ GenCompatibleRangeTest (
 
   Status = gDS->GetMemorySpaceDescriptor (StartAddress, &Descriptor);
   if (!EFI_ERROR (Status)) {
-    Status = ConvertToTestedMemory (&Descriptor);
+    Status = ConvertToTestedMemory (
+               Descriptor.BaseAddress,
+               Descriptor.Length,
+               Descriptor.Capabilities
+               );
   }
   return Status;
 }
