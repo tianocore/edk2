@@ -240,14 +240,51 @@ GenCompatibleRangeTest (
 {
   EFI_STATUS                      Status;
   EFI_GCD_MEMORY_SPACE_DESCRIPTOR Descriptor;
+  EFI_PHYSICAL_ADDRESS            CurrentBase;
+  UINT64                          CurrentLength;
 
-  Status = gDS->GetMemorySpaceDescriptor (StartAddress, &Descriptor);
-  if (!EFI_ERROR (Status)) {
-    Status = ConvertToTestedMemory (
-               Descriptor.BaseAddress,
-               Descriptor.Length,
-               Descriptor.Capabilities
-               );
+  //
+  // Check if the parameter is below 16MB
+  //
+  if (StartAddress + Length > SIZE_16MB) {
+    return EFI_INVALID_PARAMETER;
   }
-  return Status;
+  CurrentBase = StartAddress;
+  do {
+    //
+    // Check the required memory range status; if the required memory range span
+    // the different GCD memory descriptor, it may be cause different action.
+    //
+    Status = gDS->GetMemorySpaceDescriptor (
+                    CurrentBase,
+                    &Descriptor
+                    );
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if (Descriptor.GcdMemoryType == EfiGcdMemoryTypeReserved &&
+        (Descriptor.Capabilities & (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED | EFI_MEMORY_TESTED)) ==
+          (EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED)
+          ) {
+      CurrentLength = Descriptor.BaseAddress + Descriptor.Length - CurrentBase;
+      if (CurrentBase + CurrentLength > StartAddress + Length) {
+        CurrentLength = StartAddress + Length - CurrentBase;
+      }
+      Status = ConvertToTestedMemory (
+                 CurrentBase,
+                 CurrentLength,
+                 Descriptor.Capabilities
+                 );
+      if (EFI_ERROR (Status)) {
+        return Status;
+      }
+    }
+    CurrentBase = Descriptor.BaseAddress + Descriptor.Length;
+  } while (CurrentBase < StartAddress + Length);
+  //
+  // Here means the required range already be tested, so just return success.
+  //
+  return EFI_SUCCESS;
 }
+
