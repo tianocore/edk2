@@ -114,6 +114,24 @@ IoMmuFreeBuffer (
   );
 
 /**
+  This function fills DeviceHandle/IoMmuAccess to the MAP_HANDLE_INFO,
+  based upon the DeviceAddress.
+
+  @param[in]  DeviceHandle      The device who initiates the DMA access request.
+  @param[in]  DeviceAddress     The base of device memory address to be used as the DMA memory.
+  @param[in]  Length            The length of device memory address to be used as the DMA memory.
+  @param[in]  IoMmuAccess       The IOMMU access.
+
+**/
+VOID
+SyncDeviceHandleToMapInfo (
+  IN EFI_HANDLE            DeviceHandle,
+  IN EFI_PHYSICAL_ADDRESS  DeviceAddress,
+  IN UINT64                Length,
+  IN UINT64                IoMmuAccess
+  );
+
+/**
   Convert the DeviceHandle to SourceId and Segment.
 
   @param[in]  DeviceHandle      The device who initiates the DMA access request.
@@ -236,21 +254,30 @@ VTdSetAttribute (
     // Record the entry to driver global variable.
     // As such once VTd is activated, the setting can be adopted.
     //
-    return RequestAccessAttribute (Segment, SourceId, DeviceAddress, Length, IoMmuAccess);
+    Status = RequestAccessAttribute (Segment, SourceId, DeviceAddress, Length, IoMmuAccess);
+  } else {
+    PERF_CODE (
+      AsciiSPrint (PerfToken, sizeof(PerfToken), "S%04xB%02xD%02xF%01x", Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function);
+      Identifier = (Segment << 16) | SourceId.Uint16;
+      PERF_START_EX (gImageHandle, PerfToken, "IntelVTD", 0, Identifier);
+    );
+
+    Status = SetAccessAttribute (Segment, SourceId, DeviceAddress, Length, IoMmuAccess);
+
+    PERF_CODE (
+      Identifier = (Segment << 16) | SourceId.Uint16;
+      PERF_END_EX (gImageHandle, PerfToken, "IntelVTD", 0, Identifier);
+    );
   }
 
-  PERF_CODE (
-    AsciiSPrint (PerfToken, sizeof(PerfToken), "S%04xB%02xD%02xF%01x", Segment, SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function);
-    Identifier = (Segment << 16) | SourceId.Uint16;
-    PERF_START_EX (gImageHandle, PerfToken, "IntelVTD", 0, Identifier);
-  );
-
-  Status = SetAccessAttribute (Segment, SourceId, DeviceAddress, Length, IoMmuAccess);
-
-  PERF_CODE (
-    Identifier = (Segment << 16) | SourceId.Uint16;
-    PERF_END_EX (gImageHandle, PerfToken, "IntelVTD", 0, Identifier);
-  );
+  if (!EFI_ERROR(Status)) {
+    SyncDeviceHandleToMapInfo (
+      DeviceHandle,
+      DeviceAddress,
+      Length,
+      IoMmuAccess
+      );
+  }
 
   return Status;
 }
