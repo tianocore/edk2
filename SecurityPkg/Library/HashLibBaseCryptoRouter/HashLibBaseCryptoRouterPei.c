@@ -426,6 +426,7 @@ HashLibBaseCryptoRouterPeiConstructor (
     //
     ZeroMem (&HashInterfaceHob->HashInterface, sizeof (HashInterfaceHob->HashInterface));
     HashInterfaceHob->HashInterfaceCount = 0;
+    HashInterfaceHob->SupportedHashMask = 0;
   }
 
   //
