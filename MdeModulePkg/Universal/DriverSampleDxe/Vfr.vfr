@@ -2,7 +2,7 @@
 //
 //    Sample Setup formset.
 //
-//  Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
@@ -915,19 +915,9 @@ formset
     subtitle text = STRING_TOKEN(STR_SUBTITLE_TEXT2);
     subtitle text = STRING_TOKEN(STR_UNION_EFI_VARSTORE);
 
-    numeric varid   = MyEfiUnionVar.ByteField,
+    numeric varid   = MyEfiUnionVar.UnionNumeric,
             prompt  = STRING_TOKEN(STR_UNION_BYTE_NUMERIC_PROMPT),
             help    = STRING_TOKEN(STR_UNION_BYTE_NUMERIC_HELP),
-            minimum = 0,
-            maximum = 20,
-            step    = 0,
-            default = 7, defaultstore = MyStandardDefault,
-            default = 8, defaultstore = MyManufactureDefault,
-    endnumeric;
-
-    numeric varid   = MyEfiUnionVar.BitField,
-            prompt  = STRING_TOKEN(STR_UNION_BIT_NUMERIC_PROMPT),
-            help    = STRING_TOKEN(STR_UNION_BIT_NUMERIC_HELP),
             minimum = 0,
             maximum = 20,
             step    = 0,

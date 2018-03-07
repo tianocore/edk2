@@ -1,6 +1,6 @@
 // *++
 	//
-// Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials                          
 // are licensed and made available under the terms and conditions of the BSD License         
 // which accompanies this distribution.  The full text of the license may be found at        
@@ -332,10 +332,6 @@
                                        #language fr-FR "UNION EfiVarStore byte numeric"
 #string STR_UNION_BYTE_NUMERIC_HELP    #language en-US "Question refer to byte field in UNION type efivastore, the Standard default is 7 Manufacture default is 8"
                                        #language fr-FR "Question refer to byte field in UNION type efivastore, the Standard default is 7 Manufacture default is 8"
-#string STR_UNION_BIT_NUMERIC_PROMPT   #language en-US "UNION EfiVarStore bit numeric"
-                                       #language fr-FR "UNION EfiVarStore bit numeric"
-#string STR_UNION_BIT_NUMERIC_HELP     #language en-US "Question refer to bit field in UNION type efivastore, the Standard default is 7 Manufacture default is 8"
-                                       #language fr-FR "Question refer to bit field in UNION type efivastore, the Standard default is 7 Manufacture default is 8"
 // Boot Order
 #string STR_BOOT_TITLE                 #language en-US "Boot"
 #string STR_BOOT_OPTIONS               #language en-US "Boot Order"
