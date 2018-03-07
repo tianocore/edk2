@@ -140,7 +140,7 @@ McaInitialize (
   MSR_IA32_MCG_CAP_REGISTER  McgCap;
   UINT32                     BankIndex;
 
-  if (State == TRUE) {
+  if (State) {
     McgCap.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_CAP);
     for (BankIndex = 0; BankIndex < (UINT32) McgCap.Bits.Count; BankIndex++) {
       CPU_REGISTER_TABLE_WRITE64 (
