@@ -174,7 +174,6 @@
 #                         PCD_TYPE_DATA
 #                         PCD_TYPE_HII
 #                         PCD_TYPE_VPD
-#                         PCD_TYPE_SKU_ENABLED
 #                         PCD_TYPE_STRING
 #          Datum Type   : indicate PCD vaue type from following macro:
 #                         PCD_DATUM_TYPE_POINTER
@@ -279,7 +278,7 @@
 #            - Variable GUID for HII type PCD
 #            - Token space GUID for dynamicex type PCD 
 #    
-#  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
