@@ -1,7 +1,7 @@
 /** @file
   UEFI Heap Guard functions.
 
-Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017-2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -904,13 +904,6 @@ AdjustMemoryS (
   }
 
   Target = Start + Size - SizeRequested;
-
-  //
-  // At least one more page needed for Guard page.
-  //
-  if (Size < (SizeRequested + EFI_PAGES_TO_SIZE (1))) {
-    return 0;
-  }
 
   if (!IsGuardPage (Start + Size)) {
     // No Guard at tail to share. One more page is needed.
