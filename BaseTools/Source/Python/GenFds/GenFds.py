@@ -38,8 +38,6 @@ from Common.Misc import DirCache, PathClass
 from Common.Misc import SaveFileOnChange
 from Common.Misc import ClearDuplicatedInf
 from Common.Misc import GuidStructureStringToGuidString
-from Common.Misc import CheckPcdDatum
-from Common.Misc import BuildOptionPcdValueFormat
 from Common.BuildVersion import gBUILD_VERSION
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 import FfsFileStatement
@@ -368,53 +366,6 @@ def SingleCheckCallback(option, opt_str, value, parser):
         gParamCheck.append(option)
     else:
         parser.error("Option %s only allows one instance in command line!" % option)
-
-def CheckBuildOptionPcd():
-    for Arch in GenFdsGlobalVariable.ArchList:
-        PkgList  = GenFdsGlobalVariable.WorkSpace.GetPackageList(GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag)
-        for i, pcd in enumerate(GlobalData.BuildOptionPcd):
-            if type(pcd) is tuple:
-                continue
-            (pcdname, pcdvalue) = pcd.split('=')
-            if not pcdvalue:
-                EdkLogger.error('GenFds', OPTION_MISSING, "No Value specified for the PCD %s." % (pcdname))
-            if '.' in pcdname:
-                (TokenSpaceGuidCName, TokenCName) = pcdname.split('.')
-                HasTokenSpace = True
-            else:
-                TokenCName = pcdname
-                TokenSpaceGuidCName = ''
-                HasTokenSpace = False
-            TokenSpaceGuidCNameList = []
-            FoundFlag = False
-            PcdDatumType = ''
-            NewValue = ''
-            for package in PkgList:
-                for key in package.Pcds:
-                    PcdItem = package.Pcds[key]
-                    if HasTokenSpace:
-                        if (PcdItem.TokenCName, PcdItem.TokenSpaceGuidCName) == (TokenCName, TokenSpaceGuidCName):
-                            PcdDatumType = PcdItem.DatumType
-                            NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
-                            FoundFlag = True
-                    else:
-                        if PcdItem.TokenCName == TokenCName:
-                            if not PcdItem.TokenSpaceGuidCName in TokenSpaceGuidCNameList:
-                                if len (TokenSpaceGuidCNameList) < 1:
-                                    TokenSpaceGuidCNameList.append(PcdItem.TokenSpaceGuidCName)
-                                    PcdDatumType = PcdItem.DatumType
-                                    TokenSpaceGuidCName = PcdItem.TokenSpaceGuidCName
-                                    NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
-                                    FoundFlag = True
-                                else:
-                                    EdkLogger.error(
-                                            'GenFds',
-                                            PCD_VALIDATION_INFO_ERROR,
-                                            "The Pcd %s is found under multiple different TokenSpaceGuid: %s and %s." % (TokenCName, PcdItem.TokenSpaceGuidCName, TokenSpaceGuidCNameList[0])
-                                            )
-
-            GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, NewValue)
-
 
 ## FindExtendTool()
 #

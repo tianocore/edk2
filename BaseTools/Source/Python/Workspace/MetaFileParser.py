@@ -1246,6 +1246,7 @@ class DscParser(MetaFileParser):
         if GlobalData.BuildOptionPcd:
             for Item in GlobalData.BuildOptionPcd:
                 PcdName, TmpValue = Item.split("=")
+                TmpValue = BuildOptionValue(TmpValue, self._GuidDict)
                 Macros[PcdName.strip()] = TmpValue
         return Macros
 

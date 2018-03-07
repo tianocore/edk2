@@ -977,7 +977,9 @@ class PcdReport(object):
                     if GlobalData.BuildOptionPcd:
                         for pcd in GlobalData.BuildOptionPcd:
                             if (Pcd.TokenSpaceGuidCName, Pcd.TokenCName) == (pcd[0], pcd[1]):
-                                PcdValue = pcd[2]
+                                if pcd[2]:
+                                    continue
+                                PcdValue = pcd[3]
                                 Pcd.DefaultValue = PcdValue
                                 BuildOptionMatch = True
                                 break
