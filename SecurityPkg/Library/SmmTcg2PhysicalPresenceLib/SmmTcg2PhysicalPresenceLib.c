@@ -341,7 +341,7 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
       break;
 
     default:
-      if (mIsTcg2PPVerLowerThan_1_3 == FALSE) {
+      if (!mIsTcg2PPVerLowerThan_1_3) {
         if (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
           //
           // TCG2 PP1.3 spec defined operations that are reserved or un-implemented
