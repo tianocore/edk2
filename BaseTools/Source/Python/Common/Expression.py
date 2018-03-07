@@ -15,7 +15,7 @@
 from Common.GlobalData import *
 from CommonDataClass.Exceptions import BadExpression
 from CommonDataClass.Exceptions import WrnExpression
-from Misc import GuidStringToGuidStructureString, ParseFieldValue
+from Misc import GuidStringToGuidStructureString, ParseFieldValue, IsFieldValueAnArray
 import Common.EdkLogger as EdkLogger
 import copy
 
@@ -124,6 +124,25 @@ def IsValidCString(Str):
     if not ValidString.match(Str):
         return False
     return True
+
+def BuildOptionValue(PcdValue, GuidDict):
+    IsArray = False
+    if PcdValue.startswith('H'):
+        InputValue = PcdValue[1:]
+    elif PcdValue.startswith("L'") or PcdValue.startswith("'"):
+        InputValue = PcdValue
+    elif PcdValue.startswith('L'):
+        InputValue = 'L"' + PcdValue[1:] + '"'
+    else:
+        InputValue = PcdValue
+    if IsFieldValueAnArray(InputValue):
+        IsArray = True
+    if IsArray:
+        try:
+            PcdValue = ValueExpressionEx(InputValue, 'VOID*', GuidDict)(True)
+        except:
+            pass
+    return PcdValue
 
 ## ReplaceExprMacro
 #

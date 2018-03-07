@@ -21,7 +21,7 @@ from Common.String import *
 from Common.DataType import *
 from Common.Misc import *
 from types import *
-
+from Common.Expression import *
 from CommonDataClass.CommonClass import SkuInfoClass
 from Common.TargetTxtClassObject import *
 from Common.ToolDefClassObject import *
@@ -905,36 +905,6 @@ class DscBuildData(PlatformBuildClassObject):
             if isinstance(self._Pcds[pcd],StructurePcd) and (self._Pcds[pcd].PcdValueFromComm or self._Pcds[pcd].PcdFieldValueFromComm):
                 UpdateCommandLineValue(self._Pcds[pcd])
 
-    def GetFieldValueFromComm(self,ValueStr,TokenSpaceGuidCName, TokenCName, FieldName):
-        PredictedFieldType = "VOID*"
-        if ValueStr.startswith('L'):
-            if not ValueStr[1]:
-                EdkLogger.error("build", FORMAT_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", H"{...}"')
-            ValueStr = ValueStr[0] + '"' + ValueStr[1:] + '"'
-            PredictedFieldType = "VOID*"
-        elif ValueStr.startswith('H') or ValueStr.startswith('{'):
-            EdkLogger.error("build", FORMAT_INVALID, 'Currently we do not support assign H"{...}" format for Pcd field.', ExtraData="%s.%s.%s from command line" % (TokenSpaceGuidCName, TokenCName, FieldName))
-            ValueStr = ValueStr[1:]
-            PredictedFieldType = "VOID*"
-        elif ValueStr.upper() in ['TRUE', '0X1', '0X01', '1', 'FALSE', '0X0', '0X00', '0']:
-            PredictedFieldType = "BOOLEAN"
-        elif ValueStr.isdigit() or ValueStr.upper().startswith('0X'):
-            PredictedFieldType = TAB_UINT16
-        else:
-            if not ValueStr[0]:
-                EdkLogger.error("build", FORMAT_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", H"{...}"')
-            ValueStr = '"' + ValueStr + '"'
-            PredictedFieldType = "VOID*"
-        IsValid, Cause = CheckPcdDatum(PredictedFieldType, ValueStr)
-        if not IsValid:
-            EdkLogger.error("build", FORMAT_INVALID, Cause, ExtraData="%s.%s.%s from command line" % (TokenSpaceGuidCName, TokenCName, FieldName))
-        if PredictedFieldType == 'BOOLEAN':
-            ValueStr = ValueStr.upper()
-            if ValueStr == 'TRUE' or ValueStr == '1':
-                ValueStr = '1'
-            elif ValueStr == 'FALSE' or ValueStr == '0':
-                ValueStr = '0'
-        return  ValueStr
     def __ParsePcdFromCommandLine(self):
         if GlobalData.BuildOptionPcd:
             for i, pcd in enumerate(GlobalData.BuildOptionPcd):
@@ -975,148 +945,118 @@ class DscBuildData(PlatformBuildClassObject):
                 TokenSpaceGuidCNameList = []
                 FoundFlag = False
                 PcdDatumType = ''
-                NewValue = ''
+                DisplayName = TokenCName
+                if FieldName:
+                    DisplayName = TokenCName + '.' + FieldName
                 if not HasTokenSpace:
                     for key in self.DecPcds:
-                        if TokenCName == key[0]:
-                            if TokenSpaceGuidCName:
-                                EdkLogger.error(
-                                                'build',
-                                                 AUTOGEN_ERROR,
-                                                "The Pcd %s is found under multiple different TokenSpaceGuid: %s and %s." % (TokenCName, TokenSpaceGuidCName, key[1])
-                                                )
-                            else:
-                                TokenSpaceGuidCName = key[1]
-                                FoundFlag = True
+                        PcdItem = self.DecPcds[key]
+                        if TokenCName == PcdItem.TokenCName:
+                            if not PcdItem.TokenSpaceGuidCName in TokenSpaceGuidCNameList:
+                                if len (TokenSpaceGuidCNameList) < 1:
+                                    TokenSpaceGuidCNameList.append(PcdItem.TokenSpaceGuidCName)
+                                    TokenSpaceGuidCName = PcdItem.TokenSpaceGuidCName
+                                    PcdDatumType = PcdItem.DatumType
+                                    FoundFlag = True
+                                else:
+                                    EdkLogger.error(
+                                            'build',
+                                             AUTOGEN_ERROR,
+                                            "The Pcd %s is found under multiple different TokenSpaceGuid: %s and %s." % (DisplayName, PcdItem.TokenSpaceGuidCName, TokenSpaceGuidCNameList[0])
+                                            )
                 else:
                     if (TokenCName, TokenSpaceGuidCName) in self.DecPcds:
                         FoundFlag = True
-                if FieldName:
-                    NewValue = self.GetFieldValueFromComm(pcdvalue, TokenSpaceGuidCName, TokenCName, FieldName)
-                    GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, FieldName,NewValue,("build command options",1))
-                else:
-                    # Replace \' to ', \\\' to \'
-                    pcdvalue = pcdvalue.replace("\\\\\\'", '\\\\\\"').replace('\\\'', '\'').replace('\\\\\\"', "\\'")
-                    for key in self.DecPcds:
-                        PcdItem = self.DecPcds[key]
-                        if HasTokenSpace:
-                            if (PcdItem.TokenCName, PcdItem.TokenSpaceGuidCName) == (TokenCName, TokenSpaceGuidCName):
-                                PcdDatumType = PcdItem.DatumType
-                                if pcdvalue.startswith('H'):
-                                    try:
-                                        pcdvalue = ValueExpressionEx(pcdvalue[1:], PcdDatumType, self._GuidDict)(True)
-                                    except BadExpression, Value:
-                                        EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
-                                                        (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                    if PcdDatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, 'BOOLEAN']:
-                                        pcdvalue = 'H' + pcdvalue
-                                elif pcdvalue.startswith("L'"):
-                                    try:
-                                        pcdvalue = ValueExpressionEx(pcdvalue, PcdDatumType, self._GuidDict)(True)
-                                    except BadExpression, Value:
-                                        EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
-                                                        (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                    if PcdDatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, 'BOOLEAN']:
-                                        pcdvalue = 'H' + pcdvalue
-                                elif pcdvalue.startswith("'"):
-                                    try:
-                                        pcdvalue = ValueExpressionEx(pcdvalue, PcdDatumType, self._GuidDict)(True)
-                                    except BadExpression, Value:
-                                        EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
-                                                        (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                    if PcdDatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, 'BOOLEAN']:
-                                        pcdvalue = 'H' + pcdvalue
-                                elif pcdvalue.startswith('L'):
-                                    pcdvalue = 'L"' + pcdvalue[1:] + '"'
-                                    try:
-                                        pcdvalue = ValueExpressionEx(pcdvalue, PcdDatumType, self._GuidDict)(True)
-                                    except BadExpression, Value:
-                                        EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
-                                                        (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                else:
-                                    try:
-                                        pcdvalue = ValueExpressionEx(pcdvalue, PcdDatumType, self._GuidDict)(True)
-                                    except BadExpression, Value:
-                                        try:
-                                            pcdvalue = '"' + pcdvalue + '"'
-                                            pcdvalue = ValueExpressionEx(pcdvalue, PcdDatumType, self._GuidDict)(True)
-                                        except BadExpression, Value:
-                                            EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
-                                                            (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
-                                FoundFlag = True
-                        else:
-                            if PcdItem.TokenCName == TokenCName:
-                                if not PcdItem.TokenSpaceGuidCName in TokenSpaceGuidCNameList:
-                                    if len (TokenSpaceGuidCNameList) < 1:
-                                        TokenSpaceGuidCNameList.append(PcdItem.TokenSpaceGuidCName)
-                                        PcdDatumType = PcdItem.DatumType
-                                        TokenSpaceGuidCName = PcdItem.TokenSpaceGuidCName
-                                        if pcdvalue.startswith('H'):
-                                            try:
-                                                pcdvalue = ValueExpressionEx(pcdvalue[1:], PcdDatumType, self._GuidDict)(True)
-                                            except BadExpression, Value:
-                                                EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %
-                                                                (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                            if PcdDatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64,'BOOLEAN']:
-                                                pcdvalue = 'H' + pcdvalue
-                                        elif pcdvalue.startswith("L'"):
-                                            try:
-                                                pcdvalue = ValueExpressionEx(pcdvalue, PcdDatumType, self._GuidDict)(
-                                                    True)
-                                            except BadExpression, Value:
-                                                EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
-                                                                (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                            if PcdDatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, 'BOOLEAN']:
-                                                pcdvalue = 'H' + pcdvalue
-                                        elif pcdvalue.startswith("'"):
-                                            try:
-                                                pcdvalue = ValueExpressionEx(pcdvalue, PcdDatumType, self._GuidDict)(
-                                                    True)
-                                            except BadExpression, Value:
-                                                EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
-                                                                (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                            if PcdDatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, 'BOOLEAN']:
-                                                pcdvalue = 'H' + pcdvalue
-                                        elif pcdvalue.startswith('L'):
-                                            pcdvalue = 'L"' + pcdvalue[1:] + '"'
-                                            try:
-                                                pcdvalue = ValueExpressionEx(pcdvalue, PcdDatumType, self._GuidDict)(
-                                                    True)
-                                            except BadExpression, Value:
-                                                EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
-                                                                (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                        else:
-                                            try:
-                                                pcdvalue = ValueExpressionEx(pcdvalue, PcdDatumType, self._GuidDict)(True)
-                                            except BadExpression, Value:
-                                                try:
-                                                    pcdvalue = '"' + pcdvalue + '"'
-                                                    pcdvalue = ValueExpressionEx(pcdvalue, PcdDatumType, self._GuidDict)(True)
-                                                except BadExpression, Value:
-                                                    EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
-                                                                    (TokenSpaceGuidCName, TokenCName, pcdvalue, Value))
-                                        NewValue = BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, pcdvalue)
-                                        FoundFlag = True
-                                    else:
-                                        EdkLogger.error(
-                                                'build',
-                                                 AUTOGEN_ERROR,
-                                                "The Pcd %s is found under multiple different TokenSpaceGuid: %s and %s." % (TokenCName, PcdItem.TokenSpaceGuidCName, TokenSpaceGuidCNameList[0])
-                                                )
-                    GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, FieldName,NewValue,("build command options",1))
                 if not FoundFlag:
                     if HasTokenSpace:
-                        EdkLogger.error('build', AUTOGEN_ERROR, "The Pcd %s.%s is not found in the DEC file." % (TokenSpaceGuidCName, TokenCName))
+                        EdkLogger.error('build', AUTOGEN_ERROR, "The Pcd %s.%s is not found in the DEC file." % (TokenSpaceGuidCName, DisplayName))
                     else:
-                        EdkLogger.error('build', AUTOGEN_ERROR, "The Pcd %s is not found in the DEC file." % (TokenCName))
+                        EdkLogger.error('build', AUTOGEN_ERROR, "The Pcd %s is not found in the DEC file." % (DisplayName))
+                pcdvalue = pcdvalue.replace("\\\\\\'", '\\\\\\"').replace('\\\'', '\'').replace('\\\\\\"', "\\'")
+                if FieldName:
+                    pcdvalue = self.HandleFlexiblePcd(TokenSpaceGuidCName, TokenCName, pcdvalue, PcdDatumType, self._GuidDict, FieldName)
+                else:
+                    pcdvalue = self.HandleFlexiblePcd(TokenSpaceGuidCName, TokenCName, pcdvalue, PcdDatumType, self._GuidDict)
+                    IsValid, Cause = CheckPcdDatum(PcdDatumType, pcdvalue)
+                    if not IsValid:
+                        EdkLogger.error("build", FORMAT_INVALID, Cause, ExtraData="%s.%s" % (TokenSpaceGuidCName, TokenCName))
+                GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, FieldName, pcdvalue,("build command options",1))
+
                 for BuildData in self._Bdb._CACHE_.values():
                     if BuildData.MetaFile.Ext == '.dec' or BuildData.MetaFile.Ext == '.dsc':
                         continue
                     for key in BuildData.Pcds:
                         PcdItem = BuildData.Pcds[key]
                         if (TokenSpaceGuidCName, TokenCName) == (PcdItem.TokenSpaceGuidCName, PcdItem.TokenCName) and FieldName =="":
-                            PcdItem.DefaultValue = NewValue
+                            PcdItem.DefaultValue = pcdvalue
+
+    def HandleFlexiblePcd(self, TokenSpaceGuidCName, TokenCName, PcdValue, PcdDatumType, GuidDict, FieldName=''):
+        if FieldName:
+            IsArray = False
+            TokenCName += '.' + FieldName
+        if PcdValue.startswith('H'):
+            if FieldName and IsFieldValueAnArray(PcdValue[1:]):
+                PcdDatumType = 'VOID*'
+                IsArray = True
+            if FieldName and not IsArray:
+                return PcdValue
+            try:
+                PcdValue = ValueExpressionEx(PcdValue[1:], PcdDatumType, GuidDict)(True)
+            except BadExpression, Value:     
+                EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
+                                (TokenSpaceGuidCName, TokenCName, PcdValue, Value))
+        elif PcdValue.startswith("L'") or PcdValue.startswith("'"):
+            if FieldName and IsFieldValueAnArray(PcdValue):
+                PcdDatumType = 'VOID*'
+                IsArray = True
+            if FieldName and not IsArray:
+                return PcdValue
+            try:
+                PcdValue = ValueExpressionEx(PcdValue, PcdDatumType, GuidDict)(True)
+            except BadExpression, Value:
+                EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
+                                (TokenSpaceGuidCName, TokenCName, PcdValue, Value))
+        elif PcdValue.startswith('L'):
+            PcdValue = 'L"' + PcdValue[1:] + '"'
+            if FieldName and IsFieldValueAnArray(PcdValue):
+                PcdDatumType = 'VOID*'
+                IsArray = True
+            if FieldName and not IsArray:
+                return PcdValue
+            try:
+                PcdValue = ValueExpressionEx(PcdValue, PcdDatumType, GuidDict)(True)
+            except BadExpression, Value:
+                EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
+                                (TokenSpaceGuidCName, TokenCName, PcdValue, Value))
+        else:
+            if PcdValue.upper() == 'FALSE':
+                PcdValue = str(0)
+            if PcdValue.upper() == 'TRUE':
+                PcdValue = str(1)
+            if not FieldName:
+                if PcdDatumType not in ['UINT8','UINT16','UINT32','UINT64','BOOLEAN']:
+                    PcdValue = '"' + PcdValue + '"'
+            else:
+                IsArray = False
+                Base = 10
+                if PcdValue.upper().startswith('0X'):
+                    Base = 16
+                try:
+                    Num = int(PcdValue, Base)
+                except:
+                    PcdValue = '"' + PcdValue + '"'
+                if IsFieldValueAnArray(PcdValue):
+                    PcdDatumType = 'VOID*'
+                    IsArray = True
+                if not IsArray:
+                    return PcdValue
+            try:
+                PcdValue = ValueExpressionEx(PcdValue, PcdDatumType, GuidDict)(True)
+            except BadExpression, Value:
+                EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
+                                (TokenSpaceGuidCName, TokenCName, PcdValue, Value))
+        return PcdValue
+
     ## Retrieve all PCD settings in platform
     def _GetPcds(self):
         if self._Pcds == None:
@@ -1555,22 +1495,6 @@ class DscBuildData(PlatformBuildClassObject):
 
         return str(max([pcd_size for pcd_size in [get_length(item) for item in sku_values]]))
 
-    def IsFieldValueAnArray (self, Value):
-        Value = Value.strip()
-        if Value.startswith('GUID') and Value.endswith(')'):
-            return True
-        if Value.startswith('L"') and Value.endswith('"')  and len(list(Value[2:-1])) > 1:
-            return True
-        if Value[0] == '"' and Value[-1] == '"' and len(list(Value[1:-1])) > 1:
-            return True
-        if Value[0] == '{' and Value[-1] == '}':
-            return True
-        if Value.startswith("L'") and Value.endswith("'") and len(list(Value[2:-1])) > 1:
-            return True
-        if Value[0] == "'" and Value[-1] == "'" and len(list(Value[1:-1])) > 1:
-            return True
-        return False
-
     def ExecuteCommand (self, Command):
         try:
             Process = subprocess.Popen(Command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
@@ -1617,7 +1541,7 @@ class DscBuildData(PlatformBuildClassObject):
                 continue
             for FieldName in FieldList:
                 FieldName = "." + FieldName
-                IsArray = self.IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
+                IsArray = IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
                 if IsArray and not (FieldList[FieldName.strip(".")][0].startswith('{GUID') and FieldList[FieldName.strip(".")][0].endswith('}')):
                     try:
                         Value = ValueExpressionEx(FieldList[FieldName.strip(".")][0], "VOID*", self._GuidDict)(True)
@@ -1647,7 +1571,7 @@ class DscBuildData(PlatformBuildClassObject):
                         continue
                     for FieldName in FieldList:
                         FieldName = "." + FieldName
-                        IsArray = self.IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
+                        IsArray = IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
                         if IsArray and not (FieldList[FieldName.strip(".")][0].startswith('{GUID') and FieldList[FieldName.strip(".")][0].endswith('}')):
                             try:
                                 Value = ValueExpressionEx(FieldList[FieldName.strip(".")][0], "VOID*", self._GuidDict)(True)
@@ -1671,7 +1595,7 @@ class DscBuildData(PlatformBuildClassObject):
             CApp = CApp + "// From Command Line \n"
         for FieldName in Pcd.PcdFieldValueFromComm:
             FieldName = "." + FieldName
-            IsArray = self.IsFieldValueAnArray(Pcd.PcdFieldValueFromComm[FieldName.strip(".")][0])
+            IsArray = IsFieldValueAnArray(Pcd.PcdFieldValueFromComm[FieldName.strip(".")][0])
             if IsArray and not (Pcd.PcdFieldValueFromComm[FieldName.strip(".")][0].startswith('{GUID') and Pcd.PcdFieldValueFromComm[FieldName.strip(".")][0].endswith('}')):
                 try:
                     Value = ValueExpressionEx(Pcd.PcdFieldValueFromComm[FieldName.strip(".")][0], "VOID*", self._GuidDict)(True)
@@ -1704,7 +1628,7 @@ class DscBuildData(PlatformBuildClassObject):
         CApp = CApp + '  UINT32  FieldSize;\n'
         CApp = CApp + '  CHAR8   *Value;\n'
         DefaultValueFromDec = Pcd.DefaultValueFromDec
-        IsArray = self.IsFieldValueAnArray(Pcd.DefaultValueFromDec)
+        IsArray = IsFieldValueAnArray(Pcd.DefaultValueFromDec)
         if IsArray:
             try:
                 DefaultValueFromDec = ValueExpressionEx(Pcd.DefaultValueFromDec, "VOID*")(True)
@@ -1725,7 +1649,7 @@ class DscBuildData(PlatformBuildClassObject):
             if not FieldList:
                 continue
             for FieldName in FieldList:
-                IsArray = self.IsFieldValueAnArray(FieldList[FieldName][0])
+                IsArray = IsFieldValueAnArray(FieldList[FieldName][0])
                 if IsArray:
                     try:
                         FieldList[FieldName][0] = ValueExpressionEx(FieldList[FieldName][0], "VOID*", self._GuidDict)(True)
@@ -1775,7 +1699,7 @@ class DscBuildData(PlatformBuildClassObject):
             if not FieldList:
                 continue
             if pcddefaultvalue and FieldList == pcddefaultvalue:
-                IsArray = self.IsFieldValueAnArray(FieldList)
+                IsArray = IsFieldValueAnArray(FieldList)
                 if IsArray:
                     try:
                         FieldList = ValueExpressionEx(FieldList, "VOID*")(True)
@@ -1805,7 +1729,7 @@ class DscBuildData(PlatformBuildClassObject):
                 continue
             if (SkuName,DefaultStoreName) == ('DEFAULT','STANDARD') or (( (SkuName,'') not in Pcd.ValueChain) and ( (SkuName,DefaultStoreName) not in Pcd.ValueChain )):
                 for FieldName in FieldList:
-                    IsArray = self.IsFieldValueAnArray(FieldList[FieldName][0])
+                    IsArray = IsFieldValueAnArray(FieldList[FieldName][0])
                     if IsArray:
                         try:
                             FieldList[FieldName][0] = ValueExpressionEx(FieldList[FieldName][0], "VOID*", self._GuidDict)(True)
@@ -1846,7 +1770,7 @@ class DscBuildData(PlatformBuildClassObject):
             if not FieldList:
                 continue
             if pcddefaultvalue and FieldList == pcddefaultvalue:
-                IsArray = self.IsFieldValueAnArray(FieldList)
+                IsArray = IsFieldValueAnArray(FieldList)
                 if IsArray:
                     try:
                         FieldList = ValueExpressionEx(FieldList, "VOID*")(True)
@@ -1865,7 +1789,7 @@ class DscBuildData(PlatformBuildClassObject):
                     CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
                 continue
             for FieldName in FieldList:
-                IsArray = self.IsFieldValueAnArray(FieldList[FieldName][0])
+                IsArray = IsFieldValueAnArray(FieldList[FieldName][0])
                 if IsArray:
                     try:
                         FieldList[FieldName][0] = ValueExpressionEx(FieldList[FieldName][0], "VOID*", self._GuidDict)(True)

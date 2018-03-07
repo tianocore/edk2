@@ -928,6 +928,7 @@ class FdfParser:
         if GlobalData.BuildOptionPcd:
             for Item in GlobalData.BuildOptionPcd:
                 PcdName, TmpValue = Item.split("=")
+                TmpValue = BuildOptionValue(TmpValue, {})
                 MacroDict[PcdName.strip()] = TmpValue
         # Highest priority
 

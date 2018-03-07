@@ -1441,6 +1441,22 @@ def ParseConsoleLog(Filename):
     Opr.close()
     Opw.close()
 
+def IsFieldValueAnArray (Value):
+    Value = Value.strip()
+    if Value.startswith('GUID') and Value.endswith(')'):
+        return True
+    if Value.startswith('L"') and Value.endswith('"')  and len(list(Value[2:-1])) > 1:
+        return True
+    if Value[0] == '"' and Value[-1] == '"' and len(list(Value[1:-1])) > 1:
+        return True
+    if Value[0] == '{' and Value[-1] == '}':
+        return True
+    if Value.startswith("L'") and Value.endswith("'") and len(list(Value[2:-1])) > 1:
+        return True
+    if Value[0] == "'" and Value[-1] == "'" and len(list(Value[1:-1])) > 1:
+        return True
+    return False
+
 def AnalyzePcdExpression(Setting):
     Setting = Setting.strip()
     # There might be escaped quote in a string: \", \\\" , \', \\\'
@@ -2377,31 +2393,6 @@ def PackRegistryFormatGuid(Guid):
                 int(Guid[4][-2:], 16)
                 )
 
-def BuildOptionPcdValueFormat(TokenSpaceGuidCName, TokenCName, PcdDatumType, Value):
-    if PcdDatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64,'BOOLEAN']:
-        if Value.startswith('L') or Value.startswith('"'):
-            if not Value[1]:
-                EdkLogger.error("build", FORMAT_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", H"{...}"')
-            Value = Value
-        elif Value.startswith('H'):
-            if not Value[1]:
-                EdkLogger.error("build", FORMAT_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", H"{...}"')
-            Value = Value[1:]
-        else:
-            if not Value[0]:
-                EdkLogger.error("build", FORMAT_INVALID, 'For Void* type PCD, when specify the Value in the command line, please use the following format: "string", L"string", H"{...}"')
-            Value = '"' + Value + '"'
-
-    IsValid, Cause = CheckPcdDatum(PcdDatumType, Value)
-    if not IsValid:
-        EdkLogger.error("build", FORMAT_INVALID, Cause, ExtraData="%s.%s" % (TokenSpaceGuidCName, TokenCName))
-    if PcdDatumType == 'BOOLEAN':
-        Value = Value.upper()
-        if Value == 'TRUE' or Value == '1':
-            Value = '1'
-        elif Value == 'FALSE' or Value == '0':
-            Value = '0'
-    return  Value
 ##  Get the integer value from string like "14U" or integer like 2
 #
 #   @param      Input   The object that may be either a integer value or a string

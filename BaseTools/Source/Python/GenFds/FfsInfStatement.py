@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation from INF statement
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2014-2016 Hewlett-Packard Development Company, L.P.<BR>
 #
 #  This program and the accompanying materials
@@ -274,7 +274,9 @@ class FfsInfStatement(FfsInfStatementClassObject):
             if GlobalData.BuildOptionPcd:
                 for pcd in GlobalData.BuildOptionPcd:
                     if PcdKey == (pcd[1], pcd[0]):
-                        DefaultValue = pcd[2]
+                        if pcd[2]:
+                            continue
+                        DefaultValue = pcd[3]
                         BuildOptionOverride = True
                         break
 
@@ -288,15 +290,15 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 except BadExpression:
                     EdkLogger.error("GenFds", GENFDS_ERROR, 'PCD [%s.%s] Value "%s"' %(Pcd.TokenSpaceGuidCName, Pcd.TokenCName, DefaultValue), File=self.InfFileName)
 
-            if Pcd.DefaultValue:
+            if Pcd.InfDefaultValue:
                 try:
-                    Pcd.DefaultValue = ValueExpressionEx(Pcd.DefaultValue, Pcd.DatumType, Platform._GuidDict)(True)
+                    Pcd.InfDefaultValue = ValueExpressionEx(Pcd.InfDefaultValue, Pcd.DatumType, Platform._GuidDict)(True)
                 except BadExpression:
                     EdkLogger.error("GenFds", GENFDS_ERROR, 'PCD [%s.%s] Value "%s"' %(Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Pcd.DefaultValue),File=self.InfFileName)
 
             # Check value, if value are equal, no need to patch
             if Pcd.DatumType == "VOID*":
-                if Pcd.DefaultValue == DefaultValue or DefaultValue in [None, '']:
+                if Pcd.InfDefaultValue == DefaultValue or DefaultValue in [None, '']:
                     continue
                 # Get the string size from FDF or DSC
                 if DefaultValue[0] == 'L':
@@ -310,15 +312,15 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     Pcd.MaxDatumSize = PatchPcd.MaxDatumSize
                 # If no defined the maximum size in DSC, try to get current size from INF
                 if Pcd.MaxDatumSize in ['', None]:
-                    Pcd.MaxDatumSize = str(len(Pcd.DefaultValue.split(',')))
+                    Pcd.MaxDatumSize = str(len(Pcd.InfDefaultValue.split(',')))
             else:
                 Base1 = Base2 = 10
-                if Pcd.DefaultValue.upper().startswith('0X'):
+                if Pcd.InfDefaultValue.upper().startswith('0X'):
                     Base1 = 16
                 if DefaultValue.upper().startswith('0X'):
                     Base2 = 16
                 try:
-                    PcdValueInImg = int(Pcd.DefaultValue, Base1)
+                    PcdValueInImg = int(Pcd.InfDefaultValue, Base1)
                     PcdValueInDscOrFdf = int(DefaultValue, Base2)
                     if PcdValueInImg == PcdValueInDscOrFdf:
                         continue
