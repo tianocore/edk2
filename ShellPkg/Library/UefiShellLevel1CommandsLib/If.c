@@ -141,7 +141,7 @@ TestOperation (
       //
       // string compare
       //
-      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) > 0) || (StringCompare(&Compare1, &Compare2) > 0)) {
+      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) > 0) || (!CaseInsensitive && StringCompare(&Compare1, &Compare2) > 0)) {
         return (TRUE);
       }
     } else {
@@ -175,7 +175,7 @@ TestOperation (
       //
       // string compare
       //
-      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) < 0) || (StringCompare(&Compare1, &Compare2) < 0)) {
+      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) < 0) || (!CaseInsensitive && StringCompare(&Compare1, &Compare2) < 0)) {
         return (TRUE);
       }
     } else {
@@ -209,7 +209,7 @@ TestOperation (
       //
       // string compare
       //
-      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) == 0) || (StringCompare(&Compare1, &Compare2) == 0)) {
+      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) == 0) || (!CaseInsensitive && StringCompare(&Compare1, &Compare2) == 0)) {
         return (TRUE);
       }
     } else {
@@ -236,7 +236,7 @@ TestOperation (
       //
       // string compare
       //
-      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) != 0) || (StringCompare(&Compare1, &Compare2) != 0)) {
+      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) != 0) || (!CaseInsensitive && StringCompare(&Compare1, &Compare2) != 0)) {
         return (TRUE);
       }
     } else {
@@ -264,7 +264,7 @@ TestOperation (
       //
       // string compare
       //
-      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) >= 0) || (StringCompare(&Compare1, &Compare2) >= 0)) {
+      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) >= 0) || (!CaseInsensitive && StringCompare(&Compare1, &Compare2) >= 0)) {
         return (TRUE);
       }
     } else {
@@ -298,7 +298,7 @@ TestOperation (
       //
       // string compare
       //
-      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) <= 0) || (StringCompare(&Compare1, &Compare2) <= 0)) {
+      if ((CaseInsensitive && StringNoCaseCompare(&Compare1, &Compare2) <= 0) || (!CaseInsensitive && StringCompare(&Compare1, &Compare2) <= 0)) {
         return (TRUE);
       }
     } else {
