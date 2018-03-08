@@ -18,6 +18,15 @@
 #define DMA_MEMORY_TOP          MAX_UINTN
 //#define DMA_MEMORY_TOP          0x0000000001FFFFFFULL
 
+#define MAP_HANDLE_INFO_SIGNATURE  SIGNATURE_32 ('H', 'M', 'A', 'P')
+typedef struct {
+  UINT32                                    Signature;
+  LIST_ENTRY                                Link;
+  EFI_HANDLE                                DeviceHandle;
+  UINT64                                    IoMmuAccess;
+} MAP_HANDLE_INFO;
+#define MAP_HANDLE_INFO_FROM_LINK(a) CR (a, MAP_HANDLE_INFO, Link, MAP_HANDLE_INFO_SIGNATURE)
+
 #define MAP_INFO_SIGNATURE  SIGNATURE_32 ('D', 'M', 'A', 'P')
 typedef struct {
   UINT32                                    Signature;
@@ -27,10 +36,94 @@ typedef struct {
   UINTN                                     NumberOfPages;
   EFI_PHYSICAL_ADDRESS                      HostAddress;
   EFI_PHYSICAL_ADDRESS                      DeviceAddress;
+  LIST_ENTRY                                HandleList;
 } MAP_INFO;
 #define MAP_INFO_FROM_LINK(a) CR (a, MAP_INFO, Link, MAP_INFO_SIGNATURE)
 
 LIST_ENTRY                        gMaps = INITIALIZE_LIST_HEAD_VARIABLE(gMaps);
+
+/**
+  This function fills DeviceHandle/IoMmuAccess to the MAP_HANDLE_INFO,
+  based upon the DeviceAddress.
+
+  @param[in]  DeviceHandle      The device who initiates the DMA access request.
+  @param[in]  DeviceAddress     The base of device memory address to be used as the DMA memory.
+  @param[in]  Length            The length of device memory address to be used as the DMA memory.
+  @param[in]  IoMmuAccess       The IOMMU access.
+
+**/
+VOID
+SyncDeviceHandleToMapInfo (
+  IN EFI_HANDLE            DeviceHandle,
+  IN EFI_PHYSICAL_ADDRESS  DeviceAddress,
+  IN UINT64                Length,
+  IN UINT64                IoMmuAccess
+  )
+{
+  MAP_INFO                 *MapInfo;
+  MAP_HANDLE_INFO          *MapHandleInfo;
+  LIST_ENTRY               *Link;
+  EFI_TPL                  OriginalTpl;
+
+  //
+  // Find MapInfo according to DeviceAddress
+  //
+  OriginalTpl = gBS->RaiseTPL (VTD_TPL_LEVEL);
+  MapInfo = NULL;
+  for (Link = GetFirstNode (&gMaps)
+       ; !IsNull (&gMaps, Link)
+       ; Link = GetNextNode (&gMaps, Link)
+       ) {
+    MapInfo = MAP_INFO_FROM_LINK (Link);
+    if (MapInfo->DeviceAddress == DeviceAddress) {
+      break;
+    }
+  }
+  if ((MapInfo == NULL) || (MapInfo->DeviceAddress != DeviceAddress)) {
+    DEBUG ((DEBUG_ERROR, "SyncDeviceHandleToMapInfo: DeviceAddress(0x%lx) - not found\n", DeviceAddress));
+    gBS->RestoreTPL (OriginalTpl);
+    return ;
+  }
+
+  //
+  // Find MapHandleInfo according to DeviceHandle
+  //
+  MapHandleInfo = NULL;
+  for (Link = GetFirstNode (&MapInfo->HandleList)
+       ; !IsNull (&MapInfo->HandleList, Link)
+       ; Link = GetNextNode (&MapInfo->HandleList, Link)
+       ) {
+    MapHandleInfo = MAP_HANDLE_INFO_FROM_LINK (Link);
+    if (MapHandleInfo->DeviceHandle == DeviceHandle) {
+      break;
+    }
+  }
+  if ((MapHandleInfo != NULL) && (MapHandleInfo->DeviceHandle == DeviceHandle)) {
+    MapHandleInfo->IoMmuAccess       = IoMmuAccess;
+    gBS->RestoreTPL (OriginalTpl);
+    return ;
+  }
+
+  //
+  // No DeviceHandle
+  // Initialize and insert the MAP_HANDLE_INFO structure
+  //
+  MapHandleInfo = AllocatePool (sizeof (MAP_HANDLE_INFO));
+  if (MapHandleInfo == NULL) {
+    DEBUG ((DEBUG_ERROR, "SyncDeviceHandleToMapInfo: %r\n", EFI_OUT_OF_RESOURCES));
+    gBS->RestoreTPL (OriginalTpl);
+    return ;
+  }
+
+  MapHandleInfo->Signature         = MAP_HANDLE_INFO_SIGNATURE;
+  MapHandleInfo->DeviceHandle      = DeviceHandle;
+  MapHandleInfo->IoMmuAccess       = IoMmuAccess;
+
+  InsertTailList (&MapInfo->HandleList, &MapHandleInfo->Link);
+  gBS->RestoreTPL (OriginalTpl);
+
+  return ;
+}
 
 /**
   Provides the controller-specific addresses required to access system memory from a
@@ -156,6 +249,7 @@ IoMmuMap (
   MapInfo->NumberOfPages     = EFI_SIZE_TO_PAGES (MapInfo->NumberOfBytes);
   MapInfo->HostAddress       = PhysicalAddress;
   MapInfo->DeviceAddress     = DmaMemoryTop;
+  InitializeListHead(&MapInfo->HandleList);
 
   //
   // Allocate a buffer below 4GB to map the transfer to.
@@ -227,6 +321,7 @@ IoMmuUnmap (
   )
 {
   MAP_INFO                 *MapInfo;
+  MAP_HANDLE_INFO          *MapHandleInfo;
   LIST_ENTRY               *Link;
   EFI_TPL                  OriginalTpl;
 
@@ -258,6 +353,15 @@ IoMmuUnmap (
   }
   RemoveEntryList (&MapInfo->Link);
   gBS->RestoreTPL (OriginalTpl);
+
+  //
+  // remove all nodes in MapInfo->HandleList
+  //
+  while (!IsListEmpty (&MapInfo->HandleList)) {
+    MapHandleInfo = MAP_HANDLE_INFO_FROM_LINK (MapInfo->HandleList.ForwardLink);
+    RemoveEntryList (&MapHandleInfo->Link);
+    FreePool (MapHandleInfo);
+  }
 
   if (MapInfo->DeviceAddress != MapInfo->HostAddress) {
     //
