@@ -916,11 +916,8 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
     PatchPcdSizeVariableName = '_gPcd_BinaryPatch_Size_' + TokenCName
     FixPcdSizeTokenName = '_PCD_SIZE_' + TokenCName
 
-    if GlobalData.BuildOptionPcd:
-        for PcdItem in GlobalData.BuildOptionPcd:
-            if (Pcd.TokenSpaceGuidCName, TokenCName) == (PcdItem[0], PcdItem[1]):
-                Pcd.DefaultValue = PcdItem[2]
-                break
+    if Pcd.PcdValueFromComm:
+        Pcd.DefaultValue = Pcd.PcdValueFromComm
     
     if Pcd.Type in gDynamicExPcd:
         TokenNumber = int(Pcd.TokenValue, 0)
@@ -1215,12 +1212,8 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
     PatchPcdSizeTokenName = '_PCD_PATCHABLE_' + TokenCName +'_SIZE'
     PatchPcdSizeVariableName = '_gPcd_BinaryPatch_Size_' + TokenCName
 
-    if GlobalData.BuildOptionPcd:
-        for PcdItem in GlobalData.BuildOptionPcd:
-            if (Pcd.TokenSpaceGuidCName, TokenCName) == (PcdItem[0], PcdItem[1]):
-                Pcd.DefaultValue = PcdItem[2]
-                break
-
+    if Pcd.PcdValueFromComm:
+        Pcd.DefaultValue = Pcd.PcdValueFromComm
     #
     # Write PCDs
     #

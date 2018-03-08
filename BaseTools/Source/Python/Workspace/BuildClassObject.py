@@ -68,6 +68,7 @@ class PcdClassObject(object):
         self.DscRawValue = None
         if IsDsc:
             self.DscDefaultValue = Value
+        self.PcdValueFromComm = ""
 
     ## Convert the class to a string
     #
@@ -129,7 +130,6 @@ class StructurePcd(PcdClassObject):
         self.PkgPath = ""
         self.DefaultValueFromDec = ""
         self.ValueChain = dict()
-        self.PcdValueFromComm = ""
         self.PcdFieldValueFromComm = collections.OrderedDict({})
     def __repr__(self):
         return self.TypeName
@@ -177,6 +177,7 @@ class StructurePcd(PcdClassObject):
         self.validlists = PcdObject.validlists if PcdObject.validlists else self.validlists
         self.expressions = PcdObject.expressions if PcdObject.expressions else self.expressions
         self.DscRawValue = PcdObject.DscRawValue if PcdObject.DscRawValue else self.DscRawValue
+        self.PcdValueFromComm = PcdObject.PcdValueFromComm if PcdObject.PcdValueFromComm else self.PcdValueFromComm
         if type(PcdObject) is StructurePcd:
             self.StructuredPcdIncludeFile = PcdObject.StructuredPcdIncludeFile if PcdObject.StructuredPcdIncludeFile else self.StructuredPcdIncludeFile
             self.PackageDecs = PcdObject.PackageDecs if PcdObject.PackageDecs else self.PackageDecs
@@ -190,7 +191,6 @@ class StructurePcd(PcdClassObject):
             self.PcdDefineLineNo = PcdObject.PcdDefineLineNo if PcdObject.PcdDefineLineNo else self.PcdDefineLineNo
             self.PkgPath = PcdObject.PkgPath if PcdObject.PkgPath else self.PkgPath
             self.ValueChain = PcdObject.ValueChain if PcdObject.ValueChain else self.ValueChain
-            self.PcdValueFromComm = PcdObject.PcdValueFromComm if PcdObject.PcdValueFromComm else self.PcdValueFromComm
             self.PcdFieldValueFromComm = PcdObject.PcdFieldValueFromComm if PcdObject.PcdFieldValueFromComm else self.PcdFieldValueFromComm
 
 ## LibraryClassObject
