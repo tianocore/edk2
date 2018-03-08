@@ -893,18 +893,18 @@ class DscBuildData(PlatformBuildClassObject):
         return Pcds
 
     def RecoverCommandLinePcd(self):
-        pcdset = []
-        if GlobalData.BuildOptionPcd:
-            for pcd in GlobalData.BuildOptionPcd:
-                if pcd[2] == "":
-                    pcdset.append((pcd[0],pcd[1],pcd[3]))
-                else:
-                    if (pcd[1],pcd[0]) not in self._Pcds:
-                        pcdvalue = pcd[3] if len(pcd) == 4 else pcd[2]
-                        pcdset.append((pcd[0],pcd[1],pcdvalue))
-                    #else:
-                        # remove the settings from command line since it has been handled.
-        GlobalData.BuildOptionPcd = pcdset
+        def UpdateCommandLineValue(pcd):
+            if pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],
+                                        self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
+                pcd.PcdValueFromComm = pcd.DefaultValue
+            elif pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
+                pcd.PcdValueFromComm = pcd.SkuInfoList.get("DEFAULT").HiiDefaultValue
+            else:
+                pcd.PcdValueFromComm = pcd.SkuInfoList.get("DEFAULT").DefaultValue
+        for pcd in self._Pcds:
+            if isinstance(self._Pcds[pcd],StructurePcd) and (self._Pcds[pcd].PcdValueFromComm or self._Pcds[pcd].PcdFieldValueFromComm):
+                UpdateCommandLineValue(self._Pcds[pcd])
+
     def GetFieldValueFromComm(self,ValueStr,TokenSpaceGuidCName, TokenCName, FieldName):
         PredictedFieldType = "VOID*"
         if ValueStr.startswith('L'):
@@ -1242,6 +1242,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if isinstance(self._DecPcds.get((Pcd.TokenCName,Pcd.TokenSpaceGuidCName), None),StructurePcd):
                     self._DecPcds.get((Pcd.TokenCName,Pcd.TokenSpaceGuidCName)).PcdValueFromComm = NoFiledValues[(Pcd.TokenSpaceGuidCName,Pcd.TokenCName)][0]
                 else:
+                    Pcd.PcdValueFromComm = NoFiledValues[(Pcd.TokenSpaceGuidCName,Pcd.TokenCName)][0]
                     Pcd.DefaultValue = NoFiledValues[(Pcd.TokenSpaceGuidCName,Pcd.TokenCName)][0]
                     for sku in Pcd.SkuInfoList:
                         SkuInfo = Pcd.SkuInfoList[sku]
@@ -1266,9 +1267,8 @@ class DscBuildData(PlatformBuildClassObject):
                         Pcd.MaxDatumSize = str(MaxSize)
             else:
                 PcdInDec = self.DecPcds.get((Name,Guid))
-                if isinstance(PcdInDec,StructurePcd):
-                    PcdInDec.PcdValueFromComm = NoFiledValues[(Guid,Name)][0]
                 if PcdInDec:
+                    PcdInDec.PcdValueFromComm = NoFiledValues[(Guid,Name)][0]
                     if PcdInDec.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
                         self.Pcds[Name, Guid] = copy.deepcopy(PcdInDec)
@@ -1711,6 +1711,7 @@ class DscBuildData(PlatformBuildClassObject):
             except BadExpression:
                 EdkLogger.error("Build", FORMAT_INVALID, "Invalid value format for %s.%s, from DEC: %s" %
                                 (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, DefaultValueFromDec))
+        DefaultValueFromDec = StringToArray(DefaultValueFromDec)
         Value, ValueSize = ParseFieldValue (DefaultValueFromDec)
         if isinstance(Value, str):
             CApp = CApp + '  Pcd = %s; // From DEC Default Value %s\n' % (Value, Pcd.DefaultValueFromDec)
@@ -1850,7 +1851,7 @@ class DscBuildData(PlatformBuildClassObject):
                     try:
                         FieldList = ValueExpressionEx(FieldList, "VOID*")(True)
                     except BadExpression:
-                        EdkLogger.error("Build", FORMAT_INVALID, "Invalid value format for %s.%s, from DSC: %s" %
+                        EdkLogger.error("Build", FORMAT_INVALID, "Invalid value format for %s.%s, from Command: %s" %
                                         (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, FieldList))
                 Value, ValueSize = ParseFieldValue (FieldList)
 

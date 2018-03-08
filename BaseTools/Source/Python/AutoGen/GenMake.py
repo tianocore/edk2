@@ -1551,25 +1551,15 @@ class TopLevelMakefile(BuildFile):
         if GlobalData.gIgnoreSource:
             ExtraOption += " --ignore-sources"
 
-        for index, option in enumerate(GlobalData.gCommand):
-            if "--pcd" == option and GlobalData.gCommand[index+1]:
-                pcdName, pcdValue = GlobalData.gCommand[index+1].split('=')
-                for Item in GlobalData.BuildOptionPcd:
-                    if '.'.join(Item[0:2]) == pcdName:
-                        pcdValue = Item[2]
-                        if pcdValue.startswith('L') or pcdValue.startswith('"'):
-                            pcdValue, Size = ParseFieldValue(pcdValue)
-                            NewVal = '{'
-                            for S in range(Size):
-                                NewVal = NewVal + '0x%02X' % ((pcdValue >> S * 8) & 0xff)
-                                NewVal += ','
-                            pcdValue =  NewVal[:-1] + '}'
-                        break
-                if pcdValue.startswith('{'):
-                    pcdValue = 'H' + '"' + pcdValue + '"'
-                    ExtraOption += " --pcd " + pcdName + '=' + pcdValue
-                else:
-                    ExtraOption += " --pcd " + GlobalData.gCommand[index+1]
+        for pcd in GlobalData.BuildOptionPcd:
+            if pcd[2]:
+                pcdname = '.'.join(pcd[0:3])
+            else:
+                pcdname = '.'.join(pcd[0:2])
+            if pcd[3].startswith('{'):
+                ExtraOption += " --pcd " + pcdname + '=' + 'H' + '"' + pcd[3] + '"'
+            else:
+                ExtraOption += " --pcd " + pcdname + '=' + pcd[3]
 
         MakefileName = self._FILE_NAME_[self._FileType]
         SubBuildCommandList = []
