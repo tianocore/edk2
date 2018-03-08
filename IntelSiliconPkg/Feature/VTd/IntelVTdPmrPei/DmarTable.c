@@ -302,6 +302,10 @@ DumpAcpiDMAR (
     "      X2APIC_OPT_OUT_SET ................................. 0x%02x\n",
     Dmar->Flags & EFI_ACPI_DMAR_FLAGS_X2APIC_OPT_OUT
     ));
+  DEBUG ((DEBUG_INFO,
+    "      DMA_CTRL_PLATFORM_OPT_IN_FLAG ...................... 0x%02x\n",
+    Dmar->Flags & EFI_ACPI_DMAR_FLAGS_DMA_CTRL_PLATFORM_OPT_IN_FLAG
+    ));
 
   DmarLen  = Dmar->Header.Length - sizeof(EFI_ACPI_DMAR_HEADER);
   DmarHeader = (EFI_ACPI_DMAR_STRUCTURE_HEADER *)(Dmar + 1);
