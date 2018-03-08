@@ -123,6 +123,7 @@ ExtractGuidedSectionGetInfo (
 {
   PRE_PI_EXTRACT_GUIDED_SECTION_DATA  *SavedData;
   UINT32                              Index;
+  EFI_GUID                            *SectionDefinitionGuid;
 
   if (InputSection == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -134,11 +135,17 @@ ExtractGuidedSectionGetInfo (
 
   SavedData = GetSavedData();
 
+  if (IS_SECTION2 (InputSection)) {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid);
+  } else {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid);
+  }
+
   //
   // Search the match registered GetInfo handler for the input guided section.
   //
   for (Index = 0; Index < SavedData->NumberOfExtractHandler; Index ++) {
-    if (CompareGuid (&SavedData->ExtractHandlerGuidTable[Index], &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+    if (CompareGuid (&SavedData->ExtractHandlerGuidTable[Index], SectionDefinitionGuid)) {
       break;
     }
   }
@@ -172,6 +179,7 @@ ExtractGuidedSectionDecode (
 {
   PRE_PI_EXTRACT_GUIDED_SECTION_DATA  *SavedData;
   UINT32                              Index;
+  EFI_GUID                            *SectionDefinitionGuid;
 
   if (InputSection == NULL) {
     return RETURN_INVALID_PARAMETER;
@@ -182,11 +190,17 @@ ExtractGuidedSectionDecode (
 
   SavedData = GetSavedData();
 
+  if (IS_SECTION2 (InputSection)) {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION2 *) InputSection)->SectionDefinitionGuid);
+  } else {
+    SectionDefinitionGuid = &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid);
+  }
+
   //
   // Search the match registered GetInfo handler for the input guided section.
   //
   for (Index = 0; Index < SavedData->NumberOfExtractHandler; Index ++) {
-    if (CompareGuid (&SavedData->ExtractHandlerGuidTable[Index], &(((EFI_GUID_DEFINED_SECTION *) InputSection)->SectionDefinitionGuid))) {
+    if (CompareGuid (&SavedData->ExtractHandlerGuidTable[Index], SectionDefinitionGuid)) {
       break;
     }
   }
