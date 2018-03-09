@@ -142,6 +142,7 @@ def main():
         else:
             EdkLogger.error("GenFds", OPTION_MISSING, "Missing active platform")
 
+        GlobalData.BuildOptionPcd     = Options.OptionPcd if Options.OptionPcd else {}
         GenFdsGlobalVariable.ActivePlatform = PathClass(NormPath(ActivePlatform))
 
         if (Options.ConfDirectory):
@@ -326,7 +327,6 @@ def main():
                                     FvObj.FvRegionInFD = RegionObj.Size
                                     RegionObj.BlockInfoOfRegion(FdObj.BlockSizeList, FvObj)
 
-        GlobalData.BuildOptionPcd     = Options.OptionPcd if Options.OptionPcd else {}
         """Call GenFds"""
         GenFds.GenFd('', FdfParserObj, BuildWorkSpace, ArchList)
 
