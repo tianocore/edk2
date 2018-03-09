@@ -136,6 +136,7 @@ DumpDmarExtContextEntryTable (
       if (ExtContextEntry[Index2].Bits.Present == 0) {
         continue;
       }
+      DumpSecondLevelPagingEntry ((VOID *)(UINTN)VTD_64BITS_ADDRESS(ExtContextEntry[Index2].Bits.SecondLevelPageTranslationPointerLo, ExtContextEntry[Index2].Bits.SecondLevelPageTranslationPointerHi));
     }
 
     if (ExtRootEntry[Index].Bits.UpperPresent == 0) {
