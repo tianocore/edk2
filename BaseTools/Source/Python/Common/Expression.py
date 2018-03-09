@@ -909,8 +909,9 @@ class ValueExpressionEx(ValueExpression):
                         LabelOffset = 0
                         for Index, Item in enumerate(PcdValueList):
                             # compute byte offset of every LABEL
-                            Item = Item.strip()
                             LabelList = ReLabel.findall(Item)
+                            Item = ReLabel.sub('', Item)
+                            Item = Item.strip()
                             if LabelList:
                                 for Label in LabelList:
                                     if not IsValidCString(Label):
