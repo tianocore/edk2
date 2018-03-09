@@ -927,6 +927,8 @@ class FdfParser:
         MacroDict.update(GlobalData.gCommandLineDefines)
         if GlobalData.BuildOptionPcd:
             for Item in GlobalData.BuildOptionPcd:
+                if type(Item) is tuple:
+                    continue
                 PcdName, TmpValue = Item.split("=")
                 TmpValue = BuildOptionValue(TmpValue, {})
                 MacroDict[PcdName.strip()] = TmpValue
