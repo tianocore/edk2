@@ -1,17 +1,20 @@
 /** @file
-  The module entry point for Tcg2 configuration module.
+  Set TPM device type
 
-Copyright (c) 2018, Red Hat, Inc.
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  In SecurityPkg, this module initializes the TPM device type based on a UEFI
+  variable and/or hardware detection. In OvmfPkg, the module only performs TPM2
+  hardware detection.
 
-This program and the accompanying materials
-are licensed and made available under the terms and conditions of the BSD License
-which accompanies this distribution.  The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php
+  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (C) 2018, Red Hat, Inc.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution. The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 
@@ -55,23 +58,25 @@ Tcg2ConfigPeimEntryPoint (
 
   Status = Tpm2RequestUseTpm ();
   if (!EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "%a: TPM2 detected\n", __FUNCTION__));
-      Size = sizeof(gEfiTpmDeviceInstanceTpm20DtpmGuid);
-      Status = PcdSetPtrS (
-          PcdTpmInstanceGuid,
-          &Size,
-          &gEfiTpmDeviceInstanceTpm20DtpmGuid
-          );
-      ASSERT_EFI_ERROR (Status);
+    DEBUG ((DEBUG_INFO, "%a: TPM2 detected\n", __FUNCTION__));
+    Size = sizeof (gEfiTpmDeviceInstanceTpm20DtpmGuid);
+    Status = PcdSetPtrS (
+               PcdTpmInstanceGuid,
+               &Size,
+               &gEfiTpmDeviceInstanceTpm20DtpmGuid
+               );
+    ASSERT_EFI_ERROR (Status);
   } else {
-      DEBUG ((DEBUG_INFO, "%a: no TPM2 detected\n", __FUNCTION__));
-      // If no TPM2 was detected, we still need to install
-      // TpmInitializationDonePpi. Namely, Tcg2Pei will exit early upon
-      // seeing the default (all-bits-zero) contents of
-      // PcdTpmInstanceGuid, thus we have to install the PPI in its place,
-      // in order to unblock any dependent PEIMs.
-      Status = PeiServicesInstallPpi (&mTpmInitializationDonePpiList);
-      ASSERT_EFI_ERROR (Status);
+    DEBUG ((DEBUG_INFO, "%a: no TPM2 detected\n", __FUNCTION__));
+    //
+    // If no TPM2 was detected, we still need to install
+    // TpmInitializationDonePpi. Namely, Tcg2Pei will exit early upon seeing
+    // the default (all-bits-zero) contents of PcdTpmInstanceGuid, thus we have
+    // to install the PPI in its place, in order to unblock any dependent
+    // PEIMs.
+    //
+    Status = PeiServicesInstallPpi (&mTpmInitializationDonePpiList);
+    ASSERT_EFI_ERROR (Status);
   }
 
   //

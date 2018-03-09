@@ -1,20 +1,20 @@
 ## @file
-#  Set TPM device type
+# Set TPM device type
 #
-#  In SecurityPkg, this module initializes the TPM device type based on
-#  a UEFI variable and/or hardware detection. In OvmfPkg, the module
-#  only performs TPM2 hardware detection.
+# In SecurityPkg, this module initializes the TPM device type based on a UEFI
+# variable and/or hardware detection. In OvmfPkg, the module only performs TPM2
+# hardware detection.
 #
 # Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
 # Copyright (C) 2018, Red Hat, Inc.
 #
-# This program and the accompanying materials
-# are licensed and made available under the terms and conditions of the BSD License
-# which accompanies this distribution. The full text of the license may be found at
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
-# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ##
 
 [Defines]
@@ -40,7 +40,7 @@
   Tpm2DeviceLib
 
 [Guids]
-  gEfiTpmDeviceSelectedGuid           ## PRODUCES             ## GUID    # Used as a PPI GUID
+  gEfiTpmDeviceSelectedGuid           ## PRODUCES ## GUID # Used as a PPI GUID
   gEfiTpmDeviceInstanceTpm20DtpmGuid  ## SOMETIMES_CONSUMES
 
 [Ppis]
