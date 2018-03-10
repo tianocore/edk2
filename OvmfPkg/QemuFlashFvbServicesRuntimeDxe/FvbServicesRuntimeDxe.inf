@@ -36,6 +36,7 @@
 [Sources]
   FvbInfo.c
   FwBlockService.c
+  FwBlockService.h
   FwBlockServiceDxe.c
   QemuFlash.c
   QemuFlashDxe.c
