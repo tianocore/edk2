@@ -30,6 +30,7 @@
 
 [Sources]
   DebugLib.c
+  DebugLibDetect.h
   DebugLibDetectRom.c
 
 [Packages]
