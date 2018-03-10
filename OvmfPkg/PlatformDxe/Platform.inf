@@ -26,6 +26,7 @@
 
 [Sources]
   Platform.c
+  Platform.h
   Platform.uni
   PlatformConfig.c
   PlatformForms.vfr
