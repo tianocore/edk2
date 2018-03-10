@@ -33,6 +33,7 @@
 [Sources]
   FsAccess.c
   NvVarsFileLib.c
+  NvVarsFileLib.h
 
 [Packages]
   MdePkg/MdePkg.dec
