@@ -29,6 +29,7 @@
 [Sources]
   LockBoxBase.c
   LockBoxLib.c
+  LockBoxLib.h
 
 [Packages]
   MdePkg/MdePkg.dec
