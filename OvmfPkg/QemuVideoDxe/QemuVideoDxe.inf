@@ -40,10 +40,10 @@
   Initialize.c
 
 [Sources.Ia32, Sources.X64]
-  VbeShim.c
   UnalignedIoGcc.c    | GCC
-  UnalignedIoMsc.c    | MSFT
   UnalignedIoIcc.c    | INTEL
+  UnalignedIoMsc.c    | MSFT
+  VbeShim.c
 
 [Sources.IPF, Sources.EBC]
   UnalignedIoUnsupported.c
