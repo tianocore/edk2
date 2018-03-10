@@ -40,6 +40,7 @@
   MemEncryptSevLibInternal.c
   X64/MemEncryptSevLib.c
   X64/VirtualMemory.c
+  X64/VirtualMemory.h
 
 [Sources.IA32]
   Ia32/MemEncryptSevLib.c
