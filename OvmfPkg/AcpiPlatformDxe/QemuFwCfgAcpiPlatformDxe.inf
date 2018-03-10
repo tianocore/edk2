@@ -33,6 +33,7 @@
   PciDecoding.c
   QemuFwCfgAcpi.c
   QemuFwCfgAcpiPlatform.c
+  QemuLoader.h
 
 [Packages]
   MdePkg/MdePkg.dec
