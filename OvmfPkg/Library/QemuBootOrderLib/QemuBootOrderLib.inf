@@ -31,8 +31,8 @@
 #
 
 [Sources]
-  QemuBootOrderLib.c
   ExtraRootBusMap.c
+  QemuBootOrderLib.c
 
 [Packages]
   MdePkg/MdePkg.dec
