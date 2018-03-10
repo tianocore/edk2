@@ -32,6 +32,7 @@
 
 [Sources]
   PlatformBm.c
+  PlatformBm.h
   QemuKernel.c
 
 [Packages]
