@@ -28,6 +28,7 @@
 
 [Sources]
   AcpiPlatform.c
+  AcpiPlatform.h
   BootScript.c
   EntryPoint.c
   PciDecoding.c
