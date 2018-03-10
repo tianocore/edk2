@@ -35,6 +35,7 @@
   BlockIo.h
   ComponentName.c
   ComponentName.h
+  DriverBinding.h
   XenPvBlkDxe.c
   XenPvBlkDxe.h
 
