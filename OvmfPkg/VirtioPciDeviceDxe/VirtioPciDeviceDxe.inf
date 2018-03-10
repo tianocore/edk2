@@ -24,6 +24,7 @@
 
 [Sources]
   VirtioPciDevice.c
+  VirtioPciDevice.h
   VirtioPciFunctions.c
 
 [Packages]
