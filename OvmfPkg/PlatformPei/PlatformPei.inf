@@ -31,6 +31,7 @@
 [Sources]
   AmdSev.c
   Cmos.c
+  Cmos.h
   FeatureControl.c
   Fv.c
   MemDetect.c
