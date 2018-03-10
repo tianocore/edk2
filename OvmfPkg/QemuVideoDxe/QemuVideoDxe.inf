@@ -39,6 +39,7 @@
   Gop.c
   Initialize.c
   Qemu.h
+  UnalignedIoInternal.h
 
 [Sources.Ia32, Sources.X64]
   UnalignedIoGcc.c    | GCC
