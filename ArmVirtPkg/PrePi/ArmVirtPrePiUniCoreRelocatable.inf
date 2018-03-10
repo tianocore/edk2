@@ -22,8 +22,8 @@
   VERSION_STRING                 = 1.0
 
 [Sources]
-  PrePi.c
   FdtParser.c
+  PrePi.c
 
 [Sources.AArch64]
   AArch64/ArchPrePi.c
