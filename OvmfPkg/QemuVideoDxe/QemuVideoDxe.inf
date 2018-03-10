@@ -46,6 +46,7 @@
   UnalignedIoIcc.c    | INTEL
   UnalignedIoMsc.c    | MSFT
   VbeShim.c
+  VbeShim.h
 
 [Sources.IPF, Sources.EBC]
   UnalignedIoUnsupported.c
