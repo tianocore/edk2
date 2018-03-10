@@ -41,6 +41,7 @@
   FwBlockService.h
   FwBlockServiceSmm.c
   QemuFlash.c
+  QemuFlash.h
   QemuFlashSmm.c
 
 [Packages]

@@ -39,6 +39,7 @@
   FwBlockService.h
   FwBlockServiceDxe.c
   QemuFlash.c
+  QemuFlash.h
   QemuFlashDxe.c
 
 [Packages]
