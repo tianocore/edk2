@@ -34,6 +34,7 @@
   LegacyInterrupt.c
   LegacyInterrupt.h
   LegacyPlatform.c
+  LegacyPlatform.h
   LegacyRegion.c
 
 [Packages]
