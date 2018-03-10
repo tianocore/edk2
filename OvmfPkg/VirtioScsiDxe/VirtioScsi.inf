@@ -24,6 +24,7 @@
 
 [Sources]
   VirtioScsi.c
+  VirtioScsi.h
 
 [Packages]
   MdePkg/MdePkg.dec
