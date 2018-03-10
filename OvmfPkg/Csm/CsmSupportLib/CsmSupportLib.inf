@@ -30,6 +30,7 @@
 
 [Sources]
   CsmSupportLib.c
+  CsmSupportLib.h
   LegacyInterrupt.c
   LegacyPlatform.c
   LegacyRegion.c
