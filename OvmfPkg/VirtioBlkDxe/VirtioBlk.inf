@@ -23,6 +23,7 @@
 
 [Sources]
   VirtioBlk.c
+  VirtioBlk.h
 
 [Packages]
   MdePkg/MdePkg.dec
