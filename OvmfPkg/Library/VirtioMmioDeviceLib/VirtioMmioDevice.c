@@ -20,7 +20,7 @@
 
 #include "VirtioMmioDevice.h"
 
-static VIRTIO_DEVICE_PROTOCOL mMmioDeviceProtocolTemplate = {
+STATIC CONST VIRTIO_DEVICE_PROTOCOL mMmioDeviceProtocolTemplate = {
     0,                                     // Revision
     0,                                     // SubSystemDeviceId
     VirtioMmioGetDeviceFeatures,           // GetDeviceFeatures
