@@ -29,6 +29,7 @@
 [Sources.common]
   Linux.c
   LinuxGdt.c
+  LoadLinuxLib.h
 
 [Sources.IA32]
   Ia32/JumpToKernel.nasm
