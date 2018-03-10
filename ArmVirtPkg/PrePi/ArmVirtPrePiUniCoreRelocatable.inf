@@ -24,6 +24,7 @@
 [Sources]
   FdtParser.c
   PrePi.c
+  PrePi.h
 
 [Sources.AArch64]
   AArch64/ArchPrePi.c
