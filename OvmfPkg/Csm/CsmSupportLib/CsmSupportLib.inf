@@ -36,6 +36,7 @@
   LegacyPlatform.c
   LegacyPlatform.h
   LegacyRegion.c
+  LegacyRegion.h
 
 [Packages]
   MdePkg/MdePkg.dec
