@@ -24,6 +24,7 @@
 
 [Sources]
   SerializeVariablesLib.c
+  SerializeVariablesLib.h
 
 [Packages]
   MdePkg/MdePkg.dec
