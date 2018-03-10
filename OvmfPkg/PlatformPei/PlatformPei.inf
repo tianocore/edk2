@@ -38,6 +38,7 @@
   Platform.c
   Platform.h
   Xen.c
+  Xen.h
 
 [Packages]
   IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
