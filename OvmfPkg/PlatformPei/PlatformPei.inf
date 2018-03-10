@@ -36,6 +36,7 @@
   Fv.c
   MemDetect.c
   Platform.c
+  Platform.h
   Xen.c
 
 [Packages]
