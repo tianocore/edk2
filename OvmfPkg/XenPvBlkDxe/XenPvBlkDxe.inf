@@ -29,14 +29,14 @@
   OvmfPkg/OvmfPkg.dec
 
 [Sources]
-  XenPvBlkDxe.h
-  XenPvBlkDxe.c
-  ComponentName.c
-  ComponentName.h
   BlockFront.c
   BlockFront.h
   BlockIo.c
   BlockIo.h
+  ComponentName.c
+  ComponentName.h
+  XenPvBlkDxe.c
+  XenPvBlkDxe.h
 
 
 [LibraryClasses]
