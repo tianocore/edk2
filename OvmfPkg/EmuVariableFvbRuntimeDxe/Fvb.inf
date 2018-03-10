@@ -29,6 +29,7 @@
 
 [Sources]
   Fvb.c
+  Fvb.h
 
 [Packages]
   MdePkg/MdePkg.dec
