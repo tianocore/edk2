@@ -32,6 +32,7 @@
 
 [Sources]
   ExtraRootBusMap.c
+  ExtraRootBusMap.h
   QemuBootOrderLib.c
 
 [Packages]
