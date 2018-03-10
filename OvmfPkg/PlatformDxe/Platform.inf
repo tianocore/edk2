@@ -29,6 +29,7 @@
   Platform.h
   Platform.uni
   PlatformConfig.c
+  PlatformConfig.h
   PlatformForms.vfr
 
 [Packages]
