@@ -26,6 +26,7 @@
 
 [Sources]
   AmdSevIoMmu.c
+  AmdSevIoMmu.h
   IoMmuDxe.c
 
 [Packages]
