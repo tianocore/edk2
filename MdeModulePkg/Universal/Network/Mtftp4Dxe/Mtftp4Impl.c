@@ -366,6 +366,7 @@ Mtftp4Start (
   EFI_MTFTP4_CONFIG_DATA    *Config;
   EFI_TPL                   OldTpl;
   EFI_STATUS                Status;
+  EFI_STATUS                TokenStatus;
 
   //
   // Validate the parameters
@@ -393,7 +394,9 @@ Mtftp4Start (
 
   Instance = MTFTP4_PROTOCOL_FROM_THIS (This);
 
-  Status = EFI_SUCCESS;
+  Status      = EFI_SUCCESS;
+  TokenStatus = EFI_SUCCESS;
+  
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   if (Instance->State != MTFTP4_STATE_CONFIGED) {
@@ -404,13 +407,11 @@ Mtftp4Start (
     Status = EFI_ACCESS_DENIED;
   }
 
-  if (EFI_ERROR (Status)) {
-    gBS->RestoreTPL (OldTpl);
-    return Status;
-  }
-
   if ((Token->OverrideData != NULL) && !Mtftp4OverrideValid (Instance, Token->OverrideData)) {
     Status = EFI_INVALID_PARAMETER;
+  }
+
+  if (EFI_ERROR (Status)) {
     gBS->RestoreTPL (OldTpl);
     return Status;
   }
@@ -431,7 +432,7 @@ Mtftp4Start (
                );
 
     if (EFI_ERROR (Status)) {
-      Status = EFI_DEVICE_ERROR;
+      TokenStatus = EFI_DEVICE_ERROR;
       goto ON_ERROR;
     }
   }
@@ -484,9 +485,8 @@ Mtftp4Start (
   // Config the unicast UDP child to send initial request
   //
   Status = Mtftp4ConfigUnicastPort (Instance->UnicastPort, Instance);
-
   if (EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
+    TokenStatus = EFI_DEVICE_ERROR;
     goto ON_ERROR;
   }
 
@@ -505,7 +505,7 @@ Mtftp4Start (
   }
 
   if (EFI_ERROR (Status)) {
-    Status = EFI_DEVICE_ERROR;
+    TokenStatus = EFI_DEVICE_ERROR;
     goto ON_ERROR;
   }
 
@@ -526,7 +526,7 @@ Mtftp4Start (
   return Token->Status;
 
 ON_ERROR:
-  Mtftp4CleanOperation (Instance, Status);
+  Mtftp4CleanOperation (Instance, TokenStatus);
   gBS->RestoreTPL (OldTpl);
 
   return Status;
