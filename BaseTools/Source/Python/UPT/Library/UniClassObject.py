@@ -1,7 +1,7 @@
 ## @file
 # Collect all defined strings in multiple uni files.
 #
-# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -46,8 +46,6 @@ LF = u'\u000A'
 NULL = u'\u0000'
 TAB = u'\t'
 BACK_SPLASH = u'\\'
-
-gINCLUDE_PATTERN = re.compile("^!include[\s]+([\S]+)[\s]*$", re.MULTILINE | re.UNICODE)
 
 gLANG_CONV_TABLE = {'eng':'en', 'fra':'fr', \
                  'aar':'aa', 'abk':'ab', 'ave':'ae', 'afr':'af', 'aka':'ak', 'amh':'am', \
@@ -542,22 +540,6 @@ class UniFileClassObject(object):
             Line = Line.replace(u'''\"''', u'''"''')
             Line = Line.replace(u'\t', u' ')
             Line = Line.replace(u'\u0006', u'\\')
-
-            # IncList = gINCLUDE_PATTERN.findall(Line)
-            IncList = []
-            if len(IncList) == 1:
-                for Dir in [File.Dir] + self.IncludePathList:
-                    IncFile = PathClass(str(IncList[0]), Dir)
-                    self.IncFileList.append(IncFile)
-                    if os.path.isfile(IncFile.Path):
-                        Lines.extend(self.PreProcess(IncFile, True))
-                        break
-                else:
-                    EdkLogger.Error("Unicode File Parser", 
-                                    ToolError.FILE_NOT_FOUND, 
-                                    Message="Cannot find include file", 
-                                    ExtraData=str(IncList[0]))
-                continue
 
             #
             # Check if single line has correct '"'
