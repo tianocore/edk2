@@ -966,6 +966,7 @@ class DscBuildData(PlatformBuildClassObject):
                                             )
                 else:
                     if (TokenCName, TokenSpaceGuidCName) in self.DecPcds:
+                        PcdDatumType = self.DecPcds[(TokenCName, TokenSpaceGuidCName)].DatumType
                         FoundFlag = True
                 if not FoundFlag:
                     if HasTokenSpace:
