@@ -1984,7 +1984,7 @@ IScsiDnsIsConfigured (
       continue;
     }
     
-    if (AttemptTmp->SessionConfigData.DnsMode) {
+    if (AttemptTmp->SessionConfigData.DnsMode || AttemptTmp->SessionConfigData.TargetInfoFromDhcp) {
       FreePool (AttemptTmp);
       FreePool (AttemptConfigOrder);
       return TRUE;
