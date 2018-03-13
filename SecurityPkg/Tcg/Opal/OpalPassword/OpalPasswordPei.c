@@ -717,17 +717,16 @@ UnlockOpalPasswordAta (
       ASSERT_EFI_ERROR (Status);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "%a() AhciModeInitialize() error, Status: %r\n", __FUNCTION__, Status));
+      } else {
+        OpalDev.Signature = OPAL_PEI_DEVICE_SIGNATURE;
+        OpalDev.Sscp.ReceiveData = SecurityReceiveData;
+        OpalDev.Sscp.SendData = SecuritySendData;
+        OpalDev.DeviceType = OPAL_DEVICE_TYPE_ATA;
+        OpalDev.Device = (OPAL_DEVICE_COMMON *) DevInfoAta;
+        OpalDev.Context = &AhciContext;
+
+        UnlockOpalPassword (&OpalDev);
       }
-
-      OpalDev.Signature = OPAL_PEI_DEVICE_SIGNATURE;
-      OpalDev.Sscp.ReceiveData = SecurityReceiveData;
-      OpalDev.Sscp.SendData = SecuritySendData;
-      OpalDev.DeviceType = OPAL_DEVICE_TYPE_ATA;
-      OpalDev.Device = (OPAL_DEVICE_COMMON *) DevInfoAta;
-      OpalDev.Context = &AhciContext;
-
-      UnlockOpalPassword (&OpalDev);
-
       AhciFreeResource (&AhciContext);
       PciWrite32 (PCI_LIB_ADDRESS (Bus, Device, Function, 0x24), AhciBar);
     }
