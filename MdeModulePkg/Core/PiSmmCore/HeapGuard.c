@@ -251,8 +251,8 @@ FindGuardedMemoryMap (
   //
   // Adjust current map table depth according to the address to access
   //
-  while (mMapLevel < GUARDED_HEAP_MAP_TABLE_DEPTH
-         &&
+  while (AllocMapUnit &&
+         mMapLevel < GUARDED_HEAP_MAP_TABLE_DEPTH &&
          RShiftU64 (
            Address,
            mLevelShift[GUARDED_HEAP_MAP_TABLE_DEPTH - mMapLevel - 1]
@@ -887,6 +887,10 @@ AdjustMemoryS (
   }
 
   Target = Start + Size - SizeRequested;
+  ASSERT (Target >= Start);
+  if (Target == 0) {
+    return 0;
+  }
 
   if (!IsGuardPage (Start + Size)) {
     // No Guard at tail to share. One more page is needed.
