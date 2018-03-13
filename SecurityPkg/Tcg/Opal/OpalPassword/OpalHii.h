@@ -26,7 +26,15 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
     0x0d510a4f, 0xa81b, 0x473f, { 0x87, 0x07, 0xb7, 0xfd, 0xfb, 0xc0, 0x45, 0xba } \
   }
 
+#define OPAL_REQUEST_VARIABLE_NAME     L"OpalRequest"
+
 #pragma pack(1)
+
+typedef struct {
+  UINT32                   Length;
+  OPAL_REQUEST             OpalRequest;
+  //EFI_DEVICE_PATH_PROTOCOL OpalDevicePath;
+} OPAL_REQUEST_VARIABLE;
 
 typedef struct {
   UINT16 Id: HII_KEY_ID_BITS;
