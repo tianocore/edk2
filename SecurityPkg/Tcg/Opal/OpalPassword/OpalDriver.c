@@ -611,6 +611,14 @@ OpalEndOfDxeEventNotify (
   }
 
   //
+  // If no any device, return directly.
+  //
+  if (mOpalDriver.DeviceList == NULL) {
+    gBS->CloseEvent (Event);
+    return;
+  }
+
+  //
   // Assume 64K size and alignment are enough.
   //
   Length = 0x10000;
