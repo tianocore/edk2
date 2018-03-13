@@ -1217,14 +1217,14 @@ TranslateMmioOfwNodes (
     //                |                             fixed
     //                base address of virtio-mmio register block
     //
-    // UEFI device path prefix (dependent on presence of nonzero PCI function):
+    // UEFI device path prefix:
     //
-    //   <VenHwString>/MAC(
+    //   <VenHwString>
     //
     Written = UnicodeSPrintAsciiFormat (
                 Translated,
                 *TranslatedSize * sizeof (*Translated), // BufferSize in bytes
-                "%s/MAC(",
+                "%s",
                 VenHwString
                 );
   } else {
