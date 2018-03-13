@@ -123,7 +123,6 @@ def IsValidCName(Str):
     return True if __ValidString.match(Str) else False
 
 def BuildOptionValue(PcdValue, GuidDict):
-    IsArray = False
     if PcdValue.startswith('H'):
         InputValue = PcdValue[1:]
     elif PcdValue.startswith("L'") or PcdValue.startswith("'"):
@@ -133,8 +132,6 @@ def BuildOptionValue(PcdValue, GuidDict):
     else:
         InputValue = PcdValue
     if IsFieldValueAnArray(InputValue):
-        IsArray = True
-    if IsArray:
         try:
             PcdValue = ValueExpressionEx(InputValue, 'VOID*', GuidDict)(True)
         except:
