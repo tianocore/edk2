@@ -2003,7 +2003,6 @@ EfiPxeBcSetStationIP (
   EFI_STATUS              Status;
   PXEBC_PRIVATE_DATA      *Private;
   EFI_PXE_BASE_CODE_MODE  *Mode;
-  EFI_ARP_CONFIG_DATA     ArpConfigData;
 
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2043,27 +2042,6 @@ EfiPxeBcSetStationIP (
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
-  } else if (!Mode->UsingIpv6 && NewStationIp != NULL) {
-    //
-    // Configure the corresponding ARP with the IPv4 address.
-    //
-    ZeroMem (&ArpConfigData, sizeof (EFI_ARP_CONFIG_DATA));
-
-    ArpConfigData.SwAddressType   = 0x0800;
-    ArpConfigData.SwAddressLength = (UINT8) sizeof (EFI_IPv4_ADDRESS);
-    ArpConfigData.StationAddress  = &NewStationIp->v4;
-
-    Private->Arp->Configure (Private->Arp, NULL);
-    Private->Arp->Configure (Private->Arp, &ArpConfigData);
-
-    if (NewSubnetMask != NULL) {
-      Mode->RouteTableEntries                = 1;
-      Mode->RouteTable[0].IpAddr.Addr[0]     = NewStationIp->Addr[0] & NewSubnetMask->Addr[0];
-      Mode->RouteTable[0].SubnetMask.Addr[0] = NewSubnetMask->Addr[0];
-      Mode->RouteTable[0].GwAddr.Addr[0]     = 0;
-    }
-
-    Private->IsAddressOk = TRUE;
   }
 
   if (NewStationIp != NULL) {
@@ -2077,6 +2055,10 @@ EfiPxeBcSetStationIP (
   }
 
   Status = PxeBcFlushStationIp (Private, NewStationIp, NewSubnetMask);
+  if (!EFI_ERROR (Status)) {
+    Private->IsAddressOk = TRUE;
+  }
+  
 ON_EXIT:
   return Status;
 }
