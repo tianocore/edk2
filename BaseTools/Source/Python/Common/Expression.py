@@ -40,6 +40,8 @@ ERR_ARRAY_ELE           = 'This must be HEX value for NList or Array: [%s].'
 ERR_EMPTY_EXPR          = 'Empty expression is not allowed.'
 ERR_IN_OPERAND          = 'Macro after IN operator can only be: $(FAMILY), $(ARCH), $(TOOL_CHAIN_TAG) and $(TARGET).'
 
+__ValidString = re.compile(r'[_a-zA-Z][_0-9a-zA-Z]*$')
+
 ## SplitString
 #  Split string to list according double quote
 #  For example: abc"de\"f"ghi"jkl"mn will be: ['abc', '"de\"f"', 'ghi', '"jkl"', 'mn']
@@ -117,11 +119,8 @@ def SplitPcdValueString(String):
         RetList.append(Item)
     return RetList
 
-def IsValidCString(Str):
-    ValidString = re.compile(r'[_a-zA-Z][_0-9a-zA-Z]*$')
-    if not ValidString.match(Str):
-        return False
-    return True
+def IsValidCName(Str):
+    return True if __ValidString.match(Str) else False
 
 def BuildOptionValue(PcdValue, GuidDict):
     IsArray = False
@@ -912,7 +911,7 @@ class ValueExpressionEx(ValueExpression):
                             Item = Item.strip()
                             if LabelList:
                                 for Label in LabelList:
-                                    if not IsValidCString(Label):
+                                    if not IsValidCName(Label):
                                         raise BadExpression('%s is not a valid c variable name' % Label)
                                     if Label not in LabelDict.keys():
                                         LabelDict[Label] = str(LabelOffset)
