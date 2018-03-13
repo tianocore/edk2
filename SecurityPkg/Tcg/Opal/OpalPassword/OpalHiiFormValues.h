@@ -20,8 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define FORMID_VALUE_MAIN_MENU                             0x01
 #define FORMID_VALUE_DISK_INFO_FORM_MAIN                   0x02
 
-#define OPAL_REQUEST_VARIABLE_NAME                         L"OpalRequest"
-
 #pragma pack(1)
 typedef struct {
   UINT16    Lock:1;
@@ -47,12 +45,6 @@ typedef struct {
   OPAL_REQUEST    OpalRequest;
   UINT8           EnableBlockSid;
 } OPAL_HII_CONFIGURATION;
-
-typedef struct {
-  UINT32                   Length;
-  OPAL_REQUEST             OpalRequest;
-  //EFI_DEVICE_PATH_PROTOCOL OpalDevicePath;
-} OPAL_REQUEST_VARIABLE;
 
 #pragma pack()
 
