@@ -56,7 +56,7 @@ BrotliDecoderState* BrotliDecoderCreateInstance(
     brotli_alloc_func alloc_func, brotli_free_func free_func, void* opaque) {
   BrotliDecoderState* state = 0;
   if (!alloc_func && !free_func) {
-    state = (BrotliDecoderState*)malloc(sizeof(BrotliDecoderState));
+    state = (BrotliDecoderState*)BrDummyMalloc(sizeof(BrotliDecoderState));
   } else if (alloc_func && free_func) {
     state = (BrotliDecoderState*)alloc_func(opaque, sizeof(BrotliDecoderState));
   }

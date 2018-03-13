@@ -3,7 +3,7 @@
 
   Allows BROTLI code to build under UEFI (edk2) build environment
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -41,12 +41,12 @@ typedef struct
 #define memset(dest,ch,count)       SetMem(dest,(UINTN)(count),(UINT8)(ch))
 
 VOID *
-malloc (
+BrDummyMalloc (
   IN size_t   Size
   );
 
 VOID
-free (
+BrDummyFree (
   IN VOID *   Ptr
   );
 

@@ -1,7 +1,7 @@
 /** @file
   Brotli Decompress interfaces
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,7 +17,7 @@
   Dummy malloc function for compiler.
 **/
 VOID *
-malloc (
+BrDummyMalloc (
   IN size_t    Size
   )
 {
@@ -29,7 +29,7 @@ malloc (
   Dummy free function for compiler.
 **/
 VOID
-free (
+BrDummyFree (
   IN VOID *    Ptr
   )
 {
@@ -198,7 +198,7 @@ BrotliDecompress (
   @return The size of the uncompressed buffer.
 **/
 UINT64
-GetDecodedSizeOfBuf(
+BrGetDecodedSizeOfBuf(
   IN UINT8 *  EncodedData,
   IN UINT8    StartOffset,
   IN UINT8    EndOffset
@@ -259,10 +259,10 @@ BrotliUefiDecompressGetInfo (
   ASSERT(SourceSize >= BROTLI_SCRATCH_MAX);
 
   MaxOffset = BROTLI_DECODE_MAX;
-  GetSize = GetDecodedSizeOfBuf((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
+  GetSize = BrGetDecodedSizeOfBuf((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
   *DestinationSize = (UINT32)GetSize;
   MaxOffset = BROTLI_SCRATCH_MAX;
-  GetSize = GetDecodedSizeOfBuf((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
+  GetSize = BrGetDecodedSizeOfBuf((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
   *ScratchSize = (UINT32)GetSize;
   return EFI_SUCCESS;
 }
@@ -305,7 +305,7 @@ BrotliUefiDecompress (
   UINT8          MaxOffset;
 
   MaxOffset = BROTLI_SCRATCH_MAX;
-  GetSize = GetDecodedSizeOfBuf((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
+  GetSize = BrGetDecodedSizeOfBuf((UINT8 *)Source, MaxOffset - BROTLI_INFO_SIZE, MaxOffset);
 
   BroBuff.Buff     = Scratch;
   BroBuff.BuffSize = (UINTN)GetSize;
