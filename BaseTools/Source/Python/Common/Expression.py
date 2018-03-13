@@ -46,14 +46,13 @@ ERR_IN_OPERAND          = 'Macro after IN operator can only be: $(FAMILY), $(ARC
 #
 def SplitString(String):
     # There might be escaped quote: "abc\"def\\\"ghi", 'abc\'def\\\'ghi'
-    Str = String
     RetList = []
     InSingleQuote = False
     InDoubleQuote = False
     Item = ''
-    for i, ch in enumerate(Str):
+    for i, ch in enumerate(String):
         if ch == '"' and not InSingleQuote:
-            if Str[i - 1] != '\\':
+            if String[i - 1] != '\\':
                 InDoubleQuote = not InDoubleQuote
             if not InDoubleQuote:
                 Item += String[i]
@@ -64,7 +63,7 @@ def SplitString(String):
                 RetList.append(Item)
                 Item = ''
         elif ch == "'" and not InDoubleQuote:
-            if Str[i - 1] != '\\':
+            if String[i - 1] != '\\':
                 InSingleQuote = not InSingleQuote
             if not InSingleQuote:
                 Item += String[i]
@@ -84,13 +83,12 @@ def SplitString(String):
 def SplitPcdValueString(String):
     # There might be escaped comma in GUID() or DEVICE_PATH() or " "
     # or ' ' or L' ' or L" "
-    Str = String
     RetList = []
     InParenthesis = 0
     InSingleQuote = False
     InDoubleQuote = False
     Item = ''
-    for i, ch in enumerate(Str):
+    for i, ch in enumerate(String):
         if ch == '(':
             InParenthesis += 1
         if ch == ')':
