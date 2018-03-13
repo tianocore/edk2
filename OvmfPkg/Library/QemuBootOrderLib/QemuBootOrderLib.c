@@ -1909,7 +1909,8 @@ SetBootOrderFromQemu (
                     BootOrder.Data
                     );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: setting BootOrder: %r\n", __FUNCTION__, Status));
+      DEBUG ((DEBUG_ERROR, "%a: setting BootOrder: %r\n", __FUNCTION__,
+        Status));
       goto ErrorFreeExtraPciRoots;
     }
 
