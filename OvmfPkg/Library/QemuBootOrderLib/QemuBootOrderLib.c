@@ -1454,6 +1454,156 @@ TranslateOfwPath (
 
 
 /**
+  Connect devices based on the boot order retrieved from QEMU.
+
+  Attempt to retrieve the "bootorder" fw_cfg file from QEMU. Translate the
+  OpenFirmware device paths therein to UEFI device path fragments. Connect the
+  devices identified by the UEFI devpath prefixes as narrowly as possible, then
+  connect all their child devices, recursively.
+
+  If this function fails, then platform BDS should fall back to
+  EfiBootManagerConnectAll(), or some other method for connecting any expected
+  boot devices.
+
+  @retval RETURN_SUCCESS            The "bootorder" fw_cfg file has been
+                                    parsed, and the referenced device-subtrees
+                                    have been connected.
+
+  @retval RETURN_UNSUPPORTED        QEMU's fw_cfg is not supported.
+
+  @retval RETURN_NOT_FOUND          Empty or nonexistent "bootorder" fw_cfg
+                                    file.
+
+  @retval RETURN_INVALID_PARAMETER  Parse error in the "bootorder" fw_cfg file.
+
+  @retval RETURN_OUT_OF_RESOURCES   Memory allocation failed.
+
+  @return                           Error statuses propagated from underlying
+                                    functions.
+**/
+RETURN_STATUS
+EFIAPI
+ConnectDevicesFromQemu (
+  VOID
+  )
+{
+  RETURN_STATUS        Status;
+  FIRMWARE_CONFIG_ITEM FwCfgItem;
+  UINTN                FwCfgSize;
+  CHAR8                *FwCfg;
+  EFI_STATUS           EfiStatus;
+  EXTRA_ROOT_BUS_MAP   *ExtraPciRoots;
+  CONST CHAR8          *FwCfgPtr;
+  UINTN                NumConnected;
+  UINTN                TranslatedSize;
+  CHAR16               Translated[TRANSLATION_OUTPUT_SIZE];
+
+  Status = QemuFwCfgFindFile ("bootorder", &FwCfgItem, &FwCfgSize);
+  if (RETURN_ERROR (Status)) {
+    return Status;
+  }
+
+  if (FwCfgSize == 0) {
+    return RETURN_NOT_FOUND;
+  }
+
+  FwCfg = AllocatePool (FwCfgSize);
+  if (FwCfg == NULL) {
+    return RETURN_OUT_OF_RESOURCES;
+  }
+
+  QemuFwCfgSelectItem (FwCfgItem);
+  QemuFwCfgReadBytes (FwCfgSize, FwCfg);
+  if (FwCfg[FwCfgSize - 1] != '\0') {
+    Status = RETURN_INVALID_PARAMETER;
+    goto FreeFwCfg;
+  }
+  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg:\n", __FUNCTION__));
+  DEBUG ((DEBUG_VERBOSE, "%a\n", FwCfg));
+  DEBUG ((DEBUG_VERBOSE, "%a: FwCfg: <end>\n", __FUNCTION__));
+
+  if (FeaturePcdGet (PcdQemuBootOrderPciTranslation)) {
+    EfiStatus = CreateExtraRootBusMap (&ExtraPciRoots);
+    if (EFI_ERROR (EfiStatus)) {
+      Status = (RETURN_STATUS)EfiStatus;
+      goto FreeFwCfg;
+    }
+  } else {
+    ExtraPciRoots = NULL;
+  }
+
+  //
+  // Translate each OpenFirmware path to a UEFI devpath prefix.
+  //
+  FwCfgPtr = FwCfg;
+  NumConnected = 0;
+  TranslatedSize = ARRAY_SIZE (Translated);
+  Status = TranslateOfwPath (&FwCfgPtr, ExtraPciRoots, Translated,
+             &TranslatedSize);
+  while (!RETURN_ERROR (Status)) {
+    EFI_DEVICE_PATH_PROTOCOL *DevicePath;
+    EFI_HANDLE               Controller;
+
+    //
+    // Convert the UEFI devpath prefix to binary representation.
+    //
+    ASSERT (Translated[TranslatedSize] == L'\0');
+    DevicePath = ConvertTextToDevicePath (Translated);
+    if (DevicePath == NULL) {
+      Status = RETURN_OUT_OF_RESOURCES;
+      goto FreeExtraPciRoots;
+    }
+    //
+    // Advance along DevicePath, connecting the nodes individually, and asking
+    // drivers not to produce sibling nodes. Retrieve the controller handle
+    // associated with the full DevicePath -- this is the device that QEMU's
+    // OFW devpath refers to.
+    //
+    EfiStatus = EfiBootManagerConnectDevicePath (DevicePath, &Controller);
+    FreePool (DevicePath);
+    if (EFI_ERROR (EfiStatus)) {
+      Status = (RETURN_STATUS)EfiStatus;
+      goto FreeExtraPciRoots;
+    }
+    //
+    // Because QEMU's OFW devpaths have lesser expressive power than UEFI
+    // devpaths (i.e., DevicePath is considered a prefix), connect the tree
+    // rooted at Controller, recursively. If no children are produced
+    // (EFI_NOT_FOUND), that's OK.
+    //
+    EfiStatus = gBS->ConnectController (Controller, NULL, NULL, TRUE);
+    if (EFI_ERROR (EfiStatus) && EfiStatus != EFI_NOT_FOUND) {
+      Status = (RETURN_STATUS)EfiStatus;
+      goto FreeExtraPciRoots;
+    }
+    ++NumConnected;
+    //
+    // Move to the next OFW devpath.
+    //
+    TranslatedSize = ARRAY_SIZE (Translated);
+    Status = TranslateOfwPath (&FwCfgPtr, ExtraPciRoots, Translated,
+               &TranslatedSize);
+  }
+
+  if (Status == RETURN_NOT_FOUND && NumConnected > 0) {
+    DEBUG ((DEBUG_INFO, "%a: %Lu OpenFirmware device path(s) connected\n",
+      __FUNCTION__, (UINT64)NumConnected));
+    Status = RETURN_SUCCESS;
+  }
+
+FreeExtraPciRoots:
+  if (ExtraPciRoots != NULL) {
+    DestroyExtraRootBusMap (ExtraPciRoots);
+  }
+
+FreeFwCfg:
+  FreePool (FwCfg);
+
+  return Status;
+}
+
+
+/**
 
   Convert the UEFI DevicePath to full text representation with DevPathToText,
   then match the UEFI device path fragment in Translated against it.
@@ -1743,8 +1893,8 @@ PruneBootVariables (
   translated fragments against the current list of boot options, and rewrite
   the BootOrder NvVar so that it corresponds to the order described in fw_cfg.
 
-  Platform BDS should call this function after EfiBootManagerConnectAll () and
-  EfiBootManagerRefreshAllBootOption () return.
+  Platform BDS should call this function after connecting any expected boot
+  devices and calling EfiBootManagerRefreshAllBootOption ().
 
   @retval RETURN_SUCCESS            BootOrder NvVar rewritten.
 
