@@ -1346,7 +1346,8 @@ Returns:
 
 --*/
 {
-  UINTN Index;
+  UINTN         Index;
+  RETURN_STATUS Status;
 
   DEBUG ((EFI_D_INFO, "PlatformBdsConnectSequence\n"));
 
@@ -1365,11 +1366,14 @@ Returns:
     Index++;
   }
 
-  //
-  // Just use the simple policy to connect all devices
-  //
-  DEBUG ((EFI_D_INFO, "EfiBootManagerConnectAll\n"));
-  EfiBootManagerConnectAll ();
+  Status = ConnectDevicesFromQemu ();
+  if (RETURN_ERROR (Status)) {
+    //
+    // Just use the simple policy to connect all devices
+    //
+    DEBUG ((DEBUG_INFO, "EfiBootManagerConnectAll\n"));
+    EfiBootManagerConnectAll ();
+  }
 
   PciAcpiInitialization ();
 }
