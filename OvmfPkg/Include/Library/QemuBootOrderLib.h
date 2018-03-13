@@ -49,6 +49,7 @@
 
 **/
 RETURN_STATUS
+EFIAPI
 SetBootOrderFromQemu (
   VOID
   );
@@ -61,6 +62,7 @@ SetBootOrderFromQemu (
   @return  The TimeoutDefault argument for PlatformBdsEnterFrontPage().
 **/
 UINT16
+EFIAPI
 GetFrontPageTimeoutFromQemu (
   VOID
   );

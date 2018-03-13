@@ -1763,6 +1763,7 @@ PruneBootVariables (
 
 **/
 RETURN_STATUS
+EFIAPI
 SetBootOrderFromQemu (
   VOID
   )
@@ -1946,6 +1947,7 @@ ErrorFreeFwCfg:
   @return  The TimeoutDefault argument for PlatformBdsEnterFrontPage().
 **/
 UINT16
+EFIAPI
 GetFrontPageTimeoutFromQemu (
   VOID
   )
