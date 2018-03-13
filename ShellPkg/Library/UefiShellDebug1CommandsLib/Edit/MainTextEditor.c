@@ -1840,7 +1840,6 @@ MainEditorKeyInput (
   EFI_KEY_DATA              KeyData;
   EFI_STATUS                Status;
   EFI_SIMPLE_POINTER_STATE  MouseState;
-  UINTN                     EventIndex;
   BOOLEAN                   NoShiftState;
 
   do {
@@ -1876,8 +1875,11 @@ MainEditorKeyInput (
       }
     }
 
-    Status = gBS->WaitForEvent (1, &MainEditor.TextInputEx->WaitForKeyEx, &EventIndex);
-    if (!EFI_ERROR (Status) && EventIndex == 0) {
+    //
+    // CheckEvent() returns Success when non-partial key is pressed.
+    //
+    Status = gBS->CheckEvent (MainEditor.TextInputEx->WaitForKeyEx);
+    if (!EFI_ERROR (Status)) {
       Status = MainEditor.TextInputEx->ReadKeyStrokeEx (MainEditor.TextInputEx, &KeyData);
       if (!EFI_ERROR (Status)) {
         //
@@ -1917,11 +1919,11 @@ MainEditorKeyInput (
         }
 
       }
-      //
-      // after handling, refresh editor
-      //
-      MainEditorRefresh ();
     }
+    //
+    // after handling, refresh editor
+    //
+    MainEditorRefresh ();
 
   } while (Status != EFI_OUT_OF_RESOURCES && !EditorExit);
 

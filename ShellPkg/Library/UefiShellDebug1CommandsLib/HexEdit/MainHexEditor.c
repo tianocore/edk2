@@ -2108,7 +2108,6 @@ HMainEditorKeyInput (
   EFI_KEY_DATA              KeyData;
   EFI_STATUS                Status;
   EFI_SIMPLE_POINTER_STATE  MouseState;
-  UINTN                     EventIndex;
   BOOLEAN                   NoShiftState;
   BOOLEAN                   LengthChange;
   UINTN                     Size;
@@ -2268,8 +2267,11 @@ HMainEditorKeyInput (
       }
     }
 
-    Status = gBS->WaitForEvent (1, &HMainEditor.TextInputEx->WaitForKeyEx, &EventIndex);
-    if (!EFI_ERROR (Status) && EventIndex == 0) {
+    //
+    // CheckEvent() returns Success when non-partial key is pressed.
+    //
+    Status = gBS->CheckEvent (HMainEditor.TextInputEx->WaitForKeyEx);
+    if (!EFI_ERROR (Status)) {
       Status = HMainEditor.TextInputEx->ReadKeyStrokeEx (HMainEditor.TextInputEx, &KeyData);
       if (!EFI_ERROR (Status)) {
         //
@@ -2351,11 +2353,11 @@ HMainEditorKeyInput (
           }
         }
       }
-      //
-      // after handling, refresh editor
-      //
-      HMainEditorRefresh ();
     }
+    //
+    // after handling, refresh editor
+    //
+    HMainEditorRefresh ();
 
   } while (Status != EFI_OUT_OF_RESOURCES && !HEditorExit);
 
