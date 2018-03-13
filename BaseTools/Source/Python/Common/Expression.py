@@ -93,18 +93,18 @@ def SplitPcdValueString(String):
     for i, ch in enumerate(String):
         if ch == '(':
             InParenthesis += 1
-        if ch == ')':
+        elif ch == ')':
             if InParenthesis:
                 InParenthesis -= 1
             else:
                 raise BadExpression(ERR_STRING_TOKEN % Item)
-        if ch == '"' and not InSingleQuote:
+        elif ch == '"' and not InSingleQuote:
             if String[i-1] != '\\':
                 InDoubleQuote = not InDoubleQuote
-        if ch == "'" and not InDoubleQuote:
+        elif ch == "'" and not InDoubleQuote:
             if String[i-1] != '\\':
                 InSingleQuote = not InSingleQuote
-        if ch == ',':
+        elif ch == ',':
             if InParenthesis or InSingleQuote or InDoubleQuote:
                 Item += String[i]
                 continue
