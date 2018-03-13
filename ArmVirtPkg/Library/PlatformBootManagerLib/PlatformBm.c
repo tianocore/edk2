@@ -663,15 +663,23 @@ PlatformBootManagerAfterConsole (
   VOID
   )
 {
+  RETURN_STATUS Status;
+
   //
   // Show the splash screen.
   //
   BootLogoEnableLogo ();
 
   //
-  // Connect the rest of the devices.
+  // Connect the purported boot devices.
   //
-  EfiBootManagerConnectAll ();
+  Status = ConnectDevicesFromQemu ();
+  if (RETURN_ERROR (Status)) {
+    //
+    // Connect the rest of the devices.
+    //
+    EfiBootManagerConnectAll ();
+  }
 
   //
   // Process QEMU's -kernel command line option. Note that the kernel booted
