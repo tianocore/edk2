@@ -27,7 +27,7 @@ Abstract:
 #include "SetupMode.h"
 #include <Guid/SetupVariable.h>
 #include <Library/TcgPhysicalPresenceLib.h>
-#include <Library/TrEEPhysicalPresenceLib.h>
+#include <Library/Tcg2PhysicalPresenceLib.h>
 #include <Protocol/I2cMasterMcg.h>
 #include <TianoApi.h>
 #include <PlatformBaseAddresses.h>
@@ -1795,7 +1795,7 @@ PlatformBdsPolicyBehavior (
     TcgPhysicalPresenceLibProcessRequest();
     #endif
     #ifdef FTPM_ENABLE
-    TrEEPhysicalPresenceLibProcessRequest(NULL);
+    Tcg2PhysicalPresenceLibProcessRequest(NULL);
     #endif
 
     if (EsrtManagement != NULL) {
@@ -2005,7 +2005,7 @@ FULL_CONFIGURATION:
    TcgPhysicalPresenceLibProcessRequest();
    #endif
    #ifdef FTPM_ENABLE
-   TrEEPhysicalPresenceLibProcessRequest(NULL);
+   Tcg2PhysicalPresenceLibProcessRequest(NULL);
    #endif
 
     if (EsrtManagement != NULL) {
