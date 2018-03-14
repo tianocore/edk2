@@ -619,7 +619,7 @@
   # Trusted Platform Module
   #
 !if $(MEASURED_BOOT_ENABLE)
-  SecurityPkg/Tcg/TrEEConfig/TrEEConfigPei.inf
+  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
   SecurityPkg/Tcg/TcgPei/TcgPei.inf
 !endif
 
