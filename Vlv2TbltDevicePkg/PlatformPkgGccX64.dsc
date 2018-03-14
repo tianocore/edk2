@@ -291,9 +291,9 @@
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
 !endif
   TpmMeasurementLib|SecurityPkg/Library/DxeTpmMeasurementLib/DxeTpmMeasurementLib.inf
-  TrEEPhysicalPresenceLib|SecurityPkg/Library/DxeTrEEPhysicalPresenceLib/DxeTrEEPhysicalPresenceLib.inf
+  Tcg2PhysicalPresenceLib|SecurityPkg/Library/DxeTcg2PhysicalPresenceLib/DxeTcg2PhysicalPresenceLib.inf
 !if $(FTPM_ENABLE) == TRUE
-  TrEEPpVendorLib|SecurityPkg/Library/TrEEPpVendorLibNull/TrEEPpVendorLibNull.inf
+  Tcg2PpVendorLib|SecurityPkg/Library/Tcg2PpVendorLibNull/Tcg2PpVendorLibNull.inf
 !endif
 
 
@@ -1070,7 +1070,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
 
 !if $(FTPM_ENABLE) == TRUE
-   SecurityPkg/Tcg/TrEEPei/TrEEPei.inf {
+   SecurityPkg/Tcg/Tcg2Pei/Tcg2Pei.inf {
     <PcdsPatchableInModule>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000046
     <LibraryClasses>
@@ -1081,7 +1081,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
   }
 !endif
 !if $(TPM_ENABLED) == TRUE
-  SecurityPkg/Tcg/TrEEConfig/TrEEConfigPei.inf {
+  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   }
@@ -1201,7 +1201,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
     !if $(FTPM_ENABLE) == TRUE
       Tpm2DeviceLib|Vlv2TbltDevicePkg/Library/Tpm2DeviceLibSeCDxe/Tpm2DeviceLibSeC.inf
     !else
-      TrEEPhysicalPresenceLib|$(PLATFORM_PACKAGE)/Library/DxeTrEEPhysicalPresenceLibNull/DxeTrEEPhysicalPresenceLibNull.inf
+      Tcg2PhysicalPresenceLib|$(PLATFORM_PACKAGE)/Library/DxeTcg2PhysicalPresenceLibNull/DxeTcg2PhysicalPresenceLibNull.inf
     !endif
   }
 
@@ -1321,7 +1321,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
 !if $(FTPM_ENABLE) == TRUE
   $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/Tpm2DeviceSeCDxe.inf
   SecurityPkg/Tcg/MemoryOverwriteControl/TcgMor.inf
-  SecurityPkg/Tcg/TrEEDxe/TrEEDxe.inf{
+  SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf{
     <LibraryClasses>
       NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
       NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
@@ -1331,7 +1331,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
   $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/FtpmSmm.inf
 !endif
 !if $(TPM_ENABLED) == TRUE
-  SecurityPkg/Tcg/TrEEConfig/TrEEConfigPei.inf {
+  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf {
     <LibraryClasses>
       PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
   }
