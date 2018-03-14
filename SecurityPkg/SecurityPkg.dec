@@ -64,15 +64,7 @@
   ##  @libraryclass  Provides TPM Interface Specification (TIS) interfaces for TPM command.
   #
   TpmCommLib|Include/Library/TpmCommLib.h
-  
-  ##  @libraryclass  Provides interfaces to handle TPM 2.0 request.
-  #
-  TrEEPhysicalPresenceLib|Include/Library/TrEEPhysicalPresenceLib.h
-  
-  ##  @libraryclass  Provides support for TrEE PP >= 128 Vendor Specific PPI Operation.
-  #
-  TrEEPpVendorLib|Include/Library/TrEEPpVendorLib.h
-  
+
   ##  @libraryclass  Provides support for TCG Physical Presence Interface (PPI) specification 
   #   >= 128 Vendor Specific PPI Operation.
   #
@@ -175,10 +167,6 @@
   #  Include/Guid/SecureBootConfigHii.h
   gSecureBootConfigFormSetGuid       = { 0x5daf50a5, 0xea81, 0x4de2, {0x8f, 0x9b, 0xca, 0xbd, 0xa9, 0xcf, 0x5c, 0x14}}
 
-  ## GUID used to "TrEEPhysicalPresence" variable and "TrEEPhysicalPresenceFlags" variable for TPM2 request and response.
-  #  Include/Guid/TrEEPhysicalPresenceData.h
-  gEfiTrEEPhysicalPresenceGuid = { 0xf24643c2, 0xc622, 0x494e, { 0x8a, 0xd, 0x46, 0x32, 0x57, 0x9c, 0x2d, 0x5b }}
-
   ## GUID value used for PcdTpmInstanceGuid to indicate TPM is disabled.
   #  Include/Guid/TpmInstance.h
   gEfiTpmDeviceInstanceNoneGuid      = { 0x00000000, 0x0000, 0x0000, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
@@ -194,10 +182,6 @@
   ## GUID used to select supported TPM instance from UI.
   #  Include/Guid/TpmInstance.h
   gEfiTpmDeviceSelectedGuid          = { 0x7f4158d3, 0x74d, 0x456d, { 0x8c, 0xb2, 0x1, 0xf9, 0xc8, 0xf7, 0x9d, 0xaa } }
-
-  ## GUID used for FormSet and config variable.
-  #  Include/Guid/TrEEConfigHii.h
-  gTrEEConfigFormSetGuid              = {0xc54b425f, 0xaa79, 0x48b4, { 0x98, 0x1f, 0x99, 0x8b, 0x3c, 0x4b, 0x64, 0x1c }}
 
   ## Include/OpalPasswordExtraInfoVariable.h
   gOpalExtraInfoVariableGuid =  {0x44a2ad5d, 0x612c, 0x47b3, {0xb0, 0x6e, 0xc8, 0xf5, 0x0b, 0xfb, 0xf0, 0x7d}}
