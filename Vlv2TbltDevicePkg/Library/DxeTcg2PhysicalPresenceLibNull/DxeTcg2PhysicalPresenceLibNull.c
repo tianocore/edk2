@@ -5,7 +5,7 @@
   This driver will have external input - variable.
   This external input must be validated carefully to avoid security issue.
 
-  TrEEExecutePendingTpmRequest() will receive untrusted input and do validation.
+  Tcg2ExecutePendingTpmRequest() will receive untrusted input and do validation.
 
 Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials 
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <PiDxe.h>
 
-#include <Protocol/TrEEProtocol.h>
+#include <Protocol/Tcg2Protocol.h>
 #include <Protocol/VariableLock.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -32,9 +32,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PrintLib.h>
 #include <Library/HiiLib.h>
 #include <Guid/EventGroup.h>
-#include <Guid/TrEEPhysicalPresenceData.h>
+#include <Guid/Tcg2PhysicalPresenceData.h>
 #include <Library/Tpm2CommandLib.h>
-#include <Library/TrEEPpVendorLib.h>
+#include <Library/Tcg2PpVendorLib.h>
 
 
 /**
@@ -47,7 +47,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 CHAR16 *
-TrEEPhysicalPresenceGetStringById (
+Tcg2PhysicalPresenceGetStringById (
   IN  EFI_STRING_ID   Id
   )
 {
@@ -87,7 +87,7 @@ TpmCommandClear (
   @retval Others                                   Return code from the TPM device after command execution.
 **/
 UINT32
-TrEEExecutePhysicalPresence (
+Tcg2ExecutePhysicalPresence (
   IN      TPM2B_AUTH                       *PlatformAuth,  OPTIONAL
   IN      UINT32                           CommandCode,
   IN OUT  EFI_TREE_PHYSICAL_PRESENCE_FLAGS *PpiFlags
@@ -107,7 +107,7 @@ TrEEExecutePhysicalPresence (
   @retval     FALSE       User discarded the changes.
 **/
 BOOLEAN
-TrEEReadUserKey (
+Tcg2ReadUserKey (
   IN     BOOLEAN                    CautionKey
   )
 {
@@ -127,7 +127,7 @@ TrEEReadUserKey (
 **/
 EFI_STATUS
 EFIAPI
-TrEEPhysicalPresenceLibConstructor (
+Tcg2PhysicalPresenceLibConstructor (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
@@ -144,7 +144,7 @@ TrEEPhysicalPresenceLibConstructor (
   @retval    FALSE         The user doesn't confirm the changes.
 **/
 BOOLEAN
-TrEEUserConfirm (
+Tcg2UserConfirm (
   IN      UINT32                    TpmPpCommand
   )
 {
@@ -155,7 +155,7 @@ TrEEUserConfirm (
   Check if there is a valid physical presence command request. Also updates parameter value 
   to whether the requested physical presence command already confirmed by user
  
-   @param[in]  TcgPpData                 EFI TrEE Physical Presence request data. 
+   @param[in]  TcgPpData                 EFI Tcg2 Physical Presence request data. 
    @param[in]  Flags                     The physical presence interface flags.
    @param[out] RequestConfirmed            If the physical presence operation command required user confirm from UI.
                                              True, it indicates the command doesn't require user confirm, or already confirmed 
@@ -167,7 +167,7 @@ TrEEUserConfirm (
 
 **/
 BOOLEAN
-TrEEHaveValidTpmRequest  (
+Tcg2HaveValidTpmRequest  (
   IN      EFI_TREE_PHYSICAL_PRESENCE       *TcgPpData,
   IN      EFI_TREE_PHYSICAL_PRESENCE_FLAGS Flags,
   OUT     BOOLEAN                          *RequestConfirmed
@@ -189,7 +189,7 @@ TrEEHaveValidTpmRequest  (
   @param[in] Flags                The physical presence interface flags.
 **/
 VOID
-TrEEExecutePendingTpmRequest (
+Tcg2ExecutePendingTpmRequest (
   IN      TPM2B_AUTH                       *PlatformAuth,  OPTIONAL
   IN      EFI_TREE_PHYSICAL_PRESENCE       *TcgPpData,
   IN      EFI_TREE_PHYSICAL_PRESENCE_FLAGS Flags
@@ -213,7 +213,7 @@ TrEEExecutePendingTpmRequest (
 **/
 VOID
 EFIAPI
-TrEEPhysicalPresenceLibProcessRequest (
+Tcg2PhysicalPresenceLibProcessRequest (
   IN      TPM2B_AUTH                     *PlatformAuth  OPTIONAL
   )
 {
@@ -232,7 +232,7 @@ TrEEPhysicalPresenceLibProcessRequest (
 **/
 BOOLEAN
 EFIAPI
-TrEEPhysicalPresenceLibNeedUserConfirm(
+Tcg2PhysicalPresenceLibNeedUserConfirm(
   VOID
   )
 {
