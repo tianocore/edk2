@@ -262,7 +262,6 @@
   gEfiI2cEnumerateProtocolGuid                            ## UNDEFINED
   gEfiI2cHostProtocolGuid                                 ## UNDEFINED
   gEfiI2cBusConfigurationManagementProtocolGuid           ## UNDEFINED
-  gEfiTrEEProtocolGuid                                    ## UNDEFINED
   gEfiTcg2ProtocolGuid                                    ## UNDEFINED
   gEfiTimestampProtocolGuid                               ## UNDEFINED
   gEfiRngProtocolGuid                                     ## UNDEFINED
