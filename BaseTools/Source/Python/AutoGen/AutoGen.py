@@ -1278,7 +1278,7 @@ class PlatformAutoGen(AutoGen):
             FixedAtBuildPcds = {}  
             ShareFixedAtBuildPcdsSameValue = {} 
             for Module in LibAuto._ReferenceModules:                
-                for Pcd in Module.FixedAtBuildPcds + LibAuto.FixedAtBuildPcds:
+                for Pcd in Module.FixedAtBuildPcds:
                     key = ".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName))  
                     if key not in FixedAtBuildPcds:
                         ShareFixedAtBuildPcdsSameValue[key] = True
@@ -1295,7 +1295,7 @@ class PlatformAutoGen(AutoGen):
                     if DscPcd.Type != "FixedAtBuild":
                         continue
                 if key in ShareFixedAtBuildPcdsSameValue and ShareFixedAtBuildPcdsSameValue[key]:                    
-                    LibAuto.ConstPcd[key] = Pcd.DefaultValue
+                    LibAuto.ConstPcd[key] = FixedAtBuildPcds[key]
 
     def CollectVariables(self, DynamicPcdSet):
 
