@@ -2349,7 +2349,6 @@ STATIC CONST GUID_INFO_BLOCK mGuidStringList[] = {
   {STRING_TOKEN(STR_I2CEN),                 &gEfiI2cEnumerateProtocolGuid,                    NULL},
   {STRING_TOKEN(STR_I2C_H),                 &gEfiI2cHostProtocolGuid,                         NULL},
   {STRING_TOKEN(STR_I2C_BCM),               &gEfiI2cBusConfigurationManagementProtocolGuid,   NULL},
-  {STRING_TOKEN(STR_TREE),                  &gEfiTrEEProtocolGuid,                            NULL},
   {STRING_TOKEN(STR_TCG2),                  &gEfiTcg2ProtocolGuid,                            NULL},
   {STRING_TOKEN(STR_TIMESTAMP),             &gEfiTimestampProtocolGuid,                       NULL},
   {STRING_TOKEN(STR_RNG),                   &gEfiRngProtocolGuid,                             NULL},

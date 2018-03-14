@@ -302,7 +302,6 @@
 #string STR_I2CEN                 #language en-US "I2cEnumerate"
 #string STR_I2C_H                 #language en-US "I2cHost"
 #string STR_I2C_BCM               #language en-US "I2cBusConfigurationManagement"
-#string STR_TREE                  #language en-US "TrEE"
 #string STR_TCG2                  #language en-US "Tcg2"
 #string STR_TIMESTAMP             #language en-US "Timestamp"
 #string STR_RNG                   #language en-US "Rng"
