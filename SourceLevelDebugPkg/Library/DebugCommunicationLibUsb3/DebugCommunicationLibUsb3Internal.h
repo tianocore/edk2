@@ -46,6 +46,7 @@
 #define USB3DBG_DBG_CAB       1   // The XHCI host controller supports debug capability
 #define USB3DBG_ENABLED       2   // The XHCI debug device is enabled
 #define USB3DBG_NOT_ENABLED   4   // The XHCI debug device is not enabled
+#define USB3DBG_UNINITIALIZED 255 // The XHCI debug device is uninitialized
 
 #define USB3_DEBUG_PORT_WRITE_MAX_PACKET_SIZE 0x08
 
@@ -456,7 +457,7 @@ typedef struct _USB3_DEBUG_PORT_INSTANCE {
   UINT8                                   Initialized;
 
   //
-  // The flag indicates debug device is ready
+  // The flag indicates debug capability is supported
   //
   BOOLEAN                                 DebugSupport;
   
@@ -464,6 +465,21 @@ typedef struct _USB3_DEBUG_PORT_INSTANCE {
   // The flag indicates debug device is ready
   //
   BOOLEAN                                 Ready;
+
+  //
+  // The flag indicates the instance is from HOB
+  //
+  BOOLEAN                                 FromHob;
+
+  //
+  // Prevent notification being interrupted by debug timer
+  //
+  BOOLEAN                                 InNotify;
+
+  //
+  // PciIo protocol event
+  //
+  EFI_PHYSICAL_ADDRESS                    PciIoEvent;
 
   //
   // The flag indicates if USB 3.0 ports has been turn off/on power
@@ -691,4 +707,37 @@ XhcDataTransfer (
   IN     UINTN                               Timeout
   );
 
-#endif //__USB3_DEBUG_PORT_LIB_INTERNAL__
+/**
+  Initialize usb debug port hardware.
+
+  @param  Handle           Debug port handle.
+
+  @retval TRUE             The usb debug port hardware configuration is changed.
+  @retval FALSE            The usb debug port hardware configuration is not changed.
+
+**/
+RETURN_STATUS
+EFIAPI
+InitializeUsbDebugHardware (
+  IN USB3_DEBUG_PORT_HANDLE *Handle
+  );
+
+/**
+  Return USB3 debug instance address pointer.
+
+**/  
+EFI_PHYSICAL_ADDRESS *
+GetUsb3DebugPortInstanceAddrPtr (
+  VOID
+  );
+
+/**
+  Return USB3 debug instance address.
+
+**/  
+USB3_DEBUG_PORT_HANDLE *
+GetUsb3DebugPortInstance (
+  VOID
+  );
+
+#endif //__SERIAL_PORT_LIB_USB__

@@ -14,11 +14,6 @@
 
 #include "DebugCommunicationLibUsb3Internal.h"
 
-//
-// The global variable which can be used after memory is ready.
-//
-USB3_DEBUG_PORT_HANDLE     mDebugCommunicationLibUsb3DebugPortHandle;
-
 UINT16   mString0Desc[] = {
   //  String Descriptor Type + Length
   ( USB_DESC_TYPE_STRING << 8 ) + STRING0_DESC_LEN,
@@ -151,6 +146,28 @@ XhcSetDebugRegBit (
 }
 
 /**
+  Clear one bit of the debug register while keeping other bits.
+
+  @param  Handle       Debug port handle.
+  @param  Offset       The offset of the debug register.
+  @param  Bit          The bit mask of the register to clear.
+
+**/
+VOID
+XhcClearDebugRegBit (
+  IN USB3_DEBUG_PORT_HANDLE   *Handle,
+  IN UINT32                   Offset,
+  IN UINT32                   Bit
+  )
+{
+  UINT32                  Data;
+
+  Data  = XhcReadDebugReg (Handle, Offset);
+  Data  &= ~Bit;
+  XhcWriteDebugReg (Handle, Offset, Data);
+}
+
+/**
   Program and eanble XHCI MMIO base address.
 
   @return XHCI MMIO base address.
@@ -199,7 +216,7 @@ UpdateXhcResource (
   IN EFI_PHYSICAL_ADDRESS                   XhciMmioBase
   )
 {
-  if ((Handle == NULL) || (Handle->XhciMmioBase == XhciMmioBase)) {
+  if (Handle == NULL) {
     return;
   }
 
@@ -235,6 +252,14 @@ CalculateUsbDebugPortMmioBase (
   UINT32                          Capability;
   EFI_PHYSICAL_ADDRESS            CapabilityPointer;
   UINT8                           CapLength;
+
+  if (Handle->Initialized != USB3DBG_UNINITIALIZED) {
+    if (Handle->Initialized == USB3DBG_NO_DBG_CAB) {
+      return RETURN_UNSUPPORTED;
+    } else {
+      return RETURN_SUCCESS;
+    }
+  }
 
   VendorId = PciRead16 (PcdGet32(PcdUsbXhciPciAddress) + PCI_VENDOR_ID_OFFSET);
   DeviceId = PciRead16 (PcdGet32(PcdUsbXhciPciAddress) + PCI_DEVICE_ID_OFFSET);
@@ -288,6 +313,7 @@ CalculateUsbDebugPortMmioBase (
   Handle->DebugCapabilityBase   = CapabilityPointer;
   Handle->DebugCapabilityOffset = CapabilityPointer - Handle->XhciMmioBase;
   Handle->XhciOpRegister        = Handle->XhciMmioBase + CapLength;
+  Handle->DebugSupport = TRUE;
   Handle->Initialized = USB3DBG_DBG_CAB;
   return RETURN_SUCCESS;
 
@@ -326,6 +352,9 @@ NeedReinitializeHardware(
   Dcctrl = XhcReadDebugReg (Handle, XHC_DC_DCCTRL);
   if ((Dcctrl & BIT0) == 0) {
     Result = TRUE;
+  } else if (!Handle->Ready) {
+    Handle->Ready = TRUE;
+    Handle->Initialized = USB3DBG_ENABLED;
   }
 
   return Result;
@@ -678,6 +707,13 @@ InitializeUsbDebugHardware (
   }
 
   //
+  // Clear DCE bit and LSE bit in DCCTRL
+  //
+  if ((XhcReadDebugReg (Handle, XHC_DC_DCCTRL) & (BIT1|BIT31)) == (BIT1|BIT31)) {
+    XhcClearDebugRegBit (Handle, XHC_DC_DCCTRL, BIT1|BIT31);
+  }
+
+  //
   // Construct the buffer for read, poll and write.
   //
   Handle->UrbIn.Data  = (EFI_PHYSICAL_ADDRESS)(UINTN) Buffer;
@@ -746,6 +782,73 @@ Enable:
 }
 
 /**
+  Discover and initialize usb debug port.
+
+  @param Handle                 Debug port handle.
+
+**/
+VOID
+DiscoverInitializeUsbDebugPort (
+  IN USB3_DEBUG_PORT_HANDLE     *Handle
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_PHYSICAL_ADDRESS          XhciMmioBase;
+
+  //
+  // Read 64-bit MMIO base address
+  //
+  XhciMmioBase = ProgramXhciBaseAddress ();
+  Handle->XhciMmioBase = XhciMmioBase;
+
+  Status = CalculateUsbDebugPortMmioBase (Handle);
+  if (!RETURN_ERROR (Status)) {
+    UpdateXhcResource (Handle, XhciMmioBase);
+    if (NeedReinitializeHardware (Handle)) {
+      InitializeUsbDebugHardware (Handle);
+    }
+  }
+}
+
+/**
+  Set USB3 debug instance address.
+
+  @param[in] Instance           Debug port instance.
+
+**/  
+VOID
+SetUsb3DebugPortInstance (
+  IN USB3_DEBUG_PORT_HANDLE     *Instance
+  )
+{
+  EFI_PHYSICAL_ADDRESS          *AddrPtr;
+
+  AddrPtr = GetUsb3DebugPortInstanceAddrPtr ();
+  ASSERT (AddrPtr != NULL);
+  *AddrPtr = (EFI_PHYSICAL_ADDRESS) (UINTN) Instance;
+}
+
+/**
+  Return USB3 debug instance address.
+
+**/  
+USB3_DEBUG_PORT_HANDLE *
+GetUsb3DebugPortInstance (
+  VOID
+  )
+{
+  EFI_PHYSICAL_ADDRESS          *AddrPtr;
+  USB3_DEBUG_PORT_HANDLE        *Instance;
+
+  AddrPtr = GetUsb3DebugPortInstanceAddrPtr ();
+  ASSERT (AddrPtr != NULL);
+
+  Instance = (USB3_DEBUG_PORT_HANDLE *) (UINTN) *AddrPtr;
+
+  return Instance;
+}
+
+/**
   Read data from debug device and save the data in buffer.
 
   Reads NumberOfBytes data bytes from a debug device into the buffer
@@ -772,7 +875,6 @@ DebugPortReadBuffer (
   )
 {
   USB3_DEBUG_PORT_HANDLE    *UsbDebugPortHandle;
-  RETURN_STATUS             Status;
   UINT8                     Index;
   UINT8                     *Data;
 
@@ -781,24 +883,27 @@ DebugPortReadBuffer (
   }
 
   //
-  // If Handle is NULL, it means memory is ready for use.
-  // Use global variable to store handle value.
+  // If Handle is NULL, get own instance.
+  // If Handle is not NULL, use it and set the instance.
   //
-  if (Handle == NULL) {
-    UsbDebugPortHandle = &mDebugCommunicationLibUsb3DebugPortHandle;
+  if (Handle != NULL) {
+    UsbDebugPortHandle = (USB3_DEBUG_PORT_HANDLE *) Handle;
+    SetUsb3DebugPortInstance (UsbDebugPortHandle);
   } else {
-    UsbDebugPortHandle = (USB3_DEBUG_PORT_HANDLE *)Handle;
+    UsbDebugPortHandle = GetUsb3DebugPortInstance ();
   }
-  
-  if (UsbDebugPortHandle->Initialized == USB3DBG_NO_DBG_CAB) {
+  if (UsbDebugPortHandle == NULL) {
     return 0;
   }
-  
-  if (NeedReinitializeHardware(UsbDebugPortHandle)) {
-    Status = InitializeUsbDebugHardware (UsbDebugPortHandle);
-    if (RETURN_ERROR(Status)) {
-      return 0;
-    }
+
+  if (UsbDebugPortHandle->InNotify) {
+    return 0;
+  }
+
+  DiscoverInitializeUsbDebugPort (UsbDebugPortHandle);
+
+  if (UsbDebugPortHandle->Initialized != USB3DBG_ENABLED) {
+    return 0;
   }
 
   Data = (UINT8 *)(UINTN)UsbDebugPortHandle->Data;
@@ -848,10 +953,8 @@ DebugPortWriteBuffer (
   )
 {
   USB3_DEBUG_PORT_HANDLE    *UsbDebugPortHandle;
-  RETURN_STATUS             Status;
   UINTN                     Sent;
   UINTN                     Total;
-  EFI_PHYSICAL_ADDRESS      XhciMmioBase;
 
   if (NumberOfBytes == 0 || Buffer == NULL) {
     return 0;
@@ -861,38 +964,34 @@ DebugPortWriteBuffer (
   Total = 0;
 
   //
-  // If Handle is NULL, it means memory is ready for use.
-  // Use global variable to store handle value.
+  // If Handle is NULL, get own instance.
+  // If Handle is not NULL, use it and set the instance.
   //
-  if (Handle == NULL) {
-    UsbDebugPortHandle = &mDebugCommunicationLibUsb3DebugPortHandle;
+  if (Handle != NULL) {
+    UsbDebugPortHandle = (USB3_DEBUG_PORT_HANDLE *) Handle;
+    SetUsb3DebugPortInstance (UsbDebugPortHandle);
   } else {
-    UsbDebugPortHandle = (USB3_DEBUG_PORT_HANDLE *)Handle;
+    UsbDebugPortHandle = GetUsb3DebugPortInstance ();
   }
-  
-  if (UsbDebugPortHandle->Initialized == USB3DBG_NO_DBG_CAB) {
+  if (UsbDebugPortHandle == NULL) {
     return 0;
   }
 
-  //
-  // MMIO base address is possible to clear, set it if it is cleared. (XhciMemorySpaceClose in PchUsbCommon.c)
-  //
-  XhciMmioBase = ProgramXhciBaseAddress ();
+  if (UsbDebugPortHandle->InNotify) {
+    return 0;
+  }
 
-  UpdateXhcResource (UsbDebugPortHandle, XhciMmioBase);
+  DiscoverInitializeUsbDebugPort (UsbDebugPortHandle);
 
-  if (NeedReinitializeHardware(UsbDebugPortHandle)) {
-    Status = InitializeUsbDebugHardware (UsbDebugPortHandle);
-    if (RETURN_ERROR(Status)) {
-      return 0;
-    }
+  if (UsbDebugPortHandle->Initialized != USB3DBG_ENABLED) {
+    return 0;
   }
 
   //
   // When host is trying to send data, write will be blocked.
   // Poll to see if there is any data sent by host at first.
   //
-  DebugPortPollBuffer (Handle);
+  DebugPortPollBuffer (UsbDebugPortHandle);
 
   while ((Total < NumberOfBytes)) {
     if (NumberOfBytes - Total > USB3_DEBUG_PORT_WRITE_MAX_PACKET_SIZE) {
@@ -900,7 +999,7 @@ DebugPortWriteBuffer (
     } else {
       Sent = (UINT8)(NumberOfBytes - Total);
     }
-    Status = XhcDataTransfer (UsbDebugPortHandle, EfiUsbDataOut, Buffer + Total, &Sent, DATA_TRANSFER_WRITE_TIMEOUT);
+    XhcDataTransfer (UsbDebugPortHandle, EfiUsbDataOut, Buffer + Total, &Sent, DATA_TRANSFER_WRITE_TIMEOUT);
     Total += Sent;
   }
   
@@ -928,33 +1027,31 @@ DebugPortPollBuffer (
 {
   USB3_DEBUG_PORT_HANDLE     *UsbDebugPortHandle;
   UINTN                     Length;
-  RETURN_STATUS             Status;
-  EFI_PHYSICAL_ADDRESS      XhciMmioBase;
 
   //
-  // If Handle is NULL, it means memory is ready for use.
-  // Use global variable to store handle value.
+  // If Handle is NULL, get own instance.
+  // If Handle is not NULL, use it and set the instance.
   //
-  if (Handle == NULL) {
-    UsbDebugPortHandle = &mDebugCommunicationLibUsb3DebugPortHandle;
+  if (Handle != NULL) {
+    UsbDebugPortHandle = (USB3_DEBUG_PORT_HANDLE *) Handle;
+    SetUsb3DebugPortInstance (UsbDebugPortHandle);
   } else {
-    UsbDebugPortHandle = (USB3_DEBUG_PORT_HANDLE *)Handle;
+    UsbDebugPortHandle = GetUsb3DebugPortInstance ();
+  }
+  if (UsbDebugPortHandle == NULL) {
+    return FALSE;
   }
 
-  if (UsbDebugPortHandle->Initialized == USB3DBG_NO_DBG_CAB) {
-    return 0;
+  if (UsbDebugPortHandle->InNotify) {
+    return FALSE;
   }
 
-  XhciMmioBase = ProgramXhciBaseAddress ();
-  UpdateXhcResource (UsbDebugPortHandle, XhciMmioBase);
-  
-  if (NeedReinitializeHardware(UsbDebugPortHandle)) {
-    Status = InitializeUsbDebugHardware(UsbDebugPortHandle);
-    if (RETURN_ERROR(Status)) {
-      return FALSE;
-    }
+  DiscoverInitializeUsbDebugPort (UsbDebugPortHandle);
+
+  if (UsbDebugPortHandle->Initialized != USB3DBG_ENABLED) {
+    return FALSE;
   }
-  
+
   //
   // If the data buffer is not empty, then return TRUE directly.
   // Otherwise initialize a usb read transaction and read data to internal data buffer.
@@ -967,7 +1064,7 @@ DebugPortPollBuffer (
   // Read data as much as we can
   //
   Length = XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE;
-  XhcDataTransfer (Handle, EfiUsbDataIn, (VOID *)(UINTN)UsbDebugPortHandle->Data, &Length, DATA_TRANSFER_POLL_TIMEOUT);
+  XhcDataTransfer (UsbDebugPortHandle, EfiUsbDataIn, (VOID *)(UINTN)UsbDebugPortHandle->Data, &Length, DATA_TRANSFER_POLL_TIMEOUT);
 
   if (Length > XHCI_DEBUG_DEVICE_MAX_PACKET_SIZE) {
     return FALSE;
@@ -1015,8 +1112,6 @@ DebugPortInitialize (
   IN DEBUG_PORT_CONTINUE  Function
   )
 {
-  RETURN_STATUS             Status;
-  USB3_DEBUG_PORT_HANDLE    Handle;
   USB3_DEBUG_PORT_HANDLE    *UsbDebugPortHandle;
 
   //
@@ -1025,40 +1120,19 @@ DebugPortInitialize (
   ASSERT (PcdGet16 (PcdDebugPortHandleBufferSize) == sizeof (USB3_DEBUG_PORT_HANDLE));
 
   if (Function == NULL && Context != NULL) {
-    UsbDebugPortHandle = (USB3_DEBUG_PORT_HANDLE *)Context;
-  } else {
-    ZeroMem(&Handle, sizeof (USB3_DEBUG_PORT_HANDLE));
-    UsbDebugPortHandle = &Handle;
+    SetUsb3DebugPortInstance ((USB3_DEBUG_PORT_HANDLE *) Context);
+    return (DEBUG_PORT_HANDLE) Context;
+  }
+  UsbDebugPortHandle = GetUsb3DebugPortInstance ();
+  if (UsbDebugPortHandle == NULL) {
+    return NULL;
   }
 
-  if (Function == NULL && Context != NULL) {
-    return (DEBUG_PORT_HANDLE *) Context;
-  }
-  
-  //
-  // Read 64-bit MMIO base address
-  //
-  UsbDebugPortHandle->XhciMmioBase = ProgramXhciBaseAddress ();
-
-  Status = CalculateUsbDebugPortMmioBase (UsbDebugPortHandle);
-  if (RETURN_ERROR (Status)) {
-    goto Exit;
-  }
-
-  if (NeedReinitializeHardware(&Handle)) {
-    Status = InitializeUsbDebugHardware (&Handle);
-    if (RETURN_ERROR(Status)) {
-      goto Exit;
-    }
-  }
-
-Exit:
+  DiscoverInitializeUsbDebugPort (UsbDebugPortHandle);
 
   if (Function != NULL) {
-    Function (Context, &Handle);
-  } else {
-    CopyMem(&mDebugCommunicationLibUsb3DebugPortHandle, &Handle, sizeof (USB3_DEBUG_PORT_HANDLE));
+    Function (Context, (DEBUG_PORT_HANDLE) UsbDebugPortHandle);
   }
 
-  return (DEBUG_PORT_HANDLE)(UINTN)&mDebugCommunicationLibUsb3DebugPortHandle;
+  return (DEBUG_PORT_HANDLE) UsbDebugPortHandle;
 }
