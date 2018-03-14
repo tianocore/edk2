@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "DxeMain.h"
 #include "Gcd.h"
+#include "Mem/HeapGuard.h"
 
 #define MINIMUM_INITIAL_MEMORY_SIZE 0x10000
 
@@ -391,12 +392,21 @@ CoreAllocateGcdMapEntry (
   IN OUT EFI_GCD_MAP_ENTRY  **BottomEntry
   )
 {
+  //
+  // Set to mOnGuarding to TRUE before memory allocation. This will make sure
+  // that the entry memory is not "guarded" by HeapGuard. Otherwise it might
+  // cause problem when it's freed (if HeapGuard is enabled).
+  //
+  mOnGuarding = TRUE;
   *TopEntry = AllocateZeroPool (sizeof (EFI_GCD_MAP_ENTRY));
+  mOnGuarding = FALSE;
   if (*TopEntry == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
+  mOnGuarding = TRUE;
   *BottomEntry = AllocateZeroPool (sizeof (EFI_GCD_MAP_ENTRY));
+  mOnGuarding = FALSE;
   if (*BottomEntry == NULL) {
     CoreFreePool (*TopEntry);
     return EFI_OUT_OF_RESOURCES;
