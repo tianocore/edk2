@@ -1001,6 +1001,11 @@ MemoryProtectionCpuArchProtocolNotify (
     InitializeDxeNxMemoryProtectionPolicy ();
   }
 
+  //
+  // Call notify function meant for Heap Guard.
+  //
+  HeapGuardCpuArchProtocolNotify ();
+
   if (mImageProtectionPolicy == 0) {
     return;
   }

@@ -399,6 +399,14 @@ IsHeapGuardEnabled (
   VOID
   );
 
+/**
+  Notify function used to set all Guard pages after CPU Arch Protocol installed.
+**/
+VOID
+HeapGuardCpuArchProtocolNotify (
+  VOID
+  );
+
 extern BOOLEAN mOnGuarding;
 
 #endif
