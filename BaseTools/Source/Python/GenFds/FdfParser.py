@@ -136,21 +136,6 @@ class Warning (Exception):
     def __str__(self):
         return self.Message
 
-## The MACRO class that used to record macro value data when parsing include file
-#
-#
-class MacroProfile :
-    ## The constructor
-    #
-    #   @param  self        The object pointer
-    #   @param  FileName    The file that to be parsed
-    #
-    def __init__(self, FileName, Line):
-        self.FileName = FileName
-        self.DefinedAtLine  = Line
-        self.MacroName = None
-        self.MacroValue = None
-
 ## The Include file content class that used to record file data when parsing include file
 #
 # May raise Exception when opening file.
