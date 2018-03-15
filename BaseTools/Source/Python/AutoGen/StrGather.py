@@ -59,9 +59,6 @@ NOT_REFERENCED = 'not referenced'
 COMMENT_NOT_REFERENCED = ' ' + COMMENT + NOT_REFERENCED
 CHAR_ARRAY_DEFIN = 'unsigned char'
 COMMON_FILE_NAME = 'Strings'
-OFFSET = 'offset'
-STRING = 'string'
-TO = 'to'
 STRING_TOKEN = re.compile('STRING_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
 
 EFI_HII_ARRAY_SIZE_LENGTH = 4
@@ -97,7 +94,7 @@ PRINTABLE_LANGUAGE_NAME_STRING_NAME = '$PRINTABLE_LANGUAGE_NAME'
 # @retval:       The formatted hex string
 #
 def DecToHexStr(Dec, Digit = 8):
-    return eval("'0x%0" + str(Digit) + "X' % int(Dec)")
+    return '0x{0:0{1}X}'.format(Dec,Digit)
 
 ## Convert a dec number to a hex list
 #
@@ -112,11 +109,8 @@ def DecToHexStr(Dec, Digit = 8):
 # @retval:       A list for formatted hex string
 #
 def DecToHexList(Dec, Digit = 8):
-    Hex = eval("'%0" + str(Digit) + "X' % int(Dec)")
-    List = []
-    for Bit in range(Digit - 2, -1, -2):
-        List.append(HexHeader + Hex[Bit:Bit + 2])
-    return List
+    Hex = '{0:0{1}X}'.format(Dec,Digit)
+    return ["0x" + Hex[Bit:Bit + 2] for Bit in range(Digit - 2, -1, -2)]
 
 ## Convert a acsii string to a hex list
 #
@@ -128,11 +122,7 @@ def DecToHexList(Dec, Digit = 8):
 # @retval:       A list for formatted hex string
 #
 def AscToHexList(Ascii):
-    List = []
-    for Item in Ascii:
-        List.append('0x%02X' % ord(Item))
-
-    return List
+    return ['0x{0:02X}'.format(ord(Item)) for Item in Ascii]
 
 ## Create header of .h file
 #
