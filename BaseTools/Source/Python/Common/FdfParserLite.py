@@ -1,7 +1,7 @@
 ## @file
 # parse FDF file
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -21,6 +21,7 @@ import Common.LongFilePathOs as os
 import CommonDataClass.FdfClass
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
+from Common.RangeExpression import RangeExpression
 
 ##define T_CHAR_SPACE                ' '
 ##define T_CHAR_NULL                 '\0'
@@ -931,8 +932,7 @@ class FdfParser(object):
         
         if not self.__GetNextToken():
             return False
-        p = re.compile('[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}')
-        if p.match(self.__Token) != None:
+        if RangeExpression.RegGuidPattern.match(self.__Token) != None:
             return True
         else:
             self.__UndoToken()

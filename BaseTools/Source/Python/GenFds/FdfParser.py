@@ -59,6 +59,7 @@ import Common.LongFilePathOs as os
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Capsule import EFI_CERT_TYPE_PKCS7_GUID
 from Capsule import EFI_CERT_TYPE_RSA2048_SHA256_GUID
+from Common.RangeExpression import RangeExpression
 
 ##define T_CHAR_SPACE                ' '
 ##define T_CHAR_NULL                 '\0'
@@ -1149,8 +1150,7 @@ class FdfParser:
 
         if not self.__GetNextToken():
             return False
-        p = re.compile('[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}')
-        if p.match(self.__Token) != None:
+        if RangeExpression.RegGuidPattern.match(self.__Token) != None:
             return True
         else:
             self.__UndoToken()
