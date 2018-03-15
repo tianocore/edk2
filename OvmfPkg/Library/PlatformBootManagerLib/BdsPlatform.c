@@ -1359,8 +1359,6 @@ PlatformBdsConnectSequence (
     DEBUG ((DEBUG_INFO, "EfiBootManagerConnectAll\n"));
     EfiBootManagerConnectAll ();
   }
-
-  PciAcpiInitialization ();
 }
 
 /**
@@ -1445,6 +1443,11 @@ PlatformBootManagerAfterConsole (
   // Logo show
   //
   BootLogoEnableLogo ();
+
+  //
+  // Set PCI Interrupt Line registers and ACPI SCI_EN
+  //
+  PciAcpiInitialization ();
 
   //
   // Perform some platform specific connect sequence
