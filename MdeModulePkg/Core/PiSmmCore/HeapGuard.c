@@ -941,6 +941,7 @@ AdjustMemoryF (
   EFI_PHYSICAL_ADDRESS  MemoryToTest;
   UINTN                 PagesToFree;
   UINT64                GuardBitmap;
+  UINT64                Attributes;
 
   if (Memory == NULL || NumberOfPages == NULL || *NumberOfPages == 0) {
     return;
@@ -948,6 +949,27 @@ AdjustMemoryF (
 
   Start = *Memory;
   PagesToFree = *NumberOfPages;
+
+  //
+  // In case the memory to free is marked as read-only (e.g. EfiRuntimeServicesCode).
+  //
+  if (mSmmMemoryAttribute != NULL) {
+    Attributes = 0;
+    mSmmMemoryAttribute->GetMemoryAttributes (
+                           mSmmMemoryAttribute,
+                           Start,
+                           EFI_PAGES_TO_SIZE (PagesToFree),
+                           &Attributes
+                           );
+    if ((Attributes & EFI_MEMORY_RO) != 0) {
+      mSmmMemoryAttribute->ClearMemoryAttributes (
+                             mSmmMemoryAttribute,
+                             Start,
+                             EFI_PAGES_TO_SIZE (PagesToFree),
+                             EFI_MEMORY_RO
+                             );
+    }
+  }
 
   //
   // Head Guard must be one page before, if any.
