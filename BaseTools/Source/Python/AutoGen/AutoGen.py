@@ -159,8 +159,8 @@ ${tail_comments}
 #   This class just implements the cache mechanism of AutoGen objects.
 #
 class AutoGen(object):
-    # database to maintain the objects of xxxAutoGen
-    _CACHE_ = {}    # (BuildTarget, ToolChain) : {ARCH : {platform file: AutoGen object}}}
+    # database to maintain the objects in each child class
+    __ObjectCache = {}    # (BuildTarget, ToolChain, ARCH, platform file): AutoGen object
 
     ## Factory method
     #
@@ -174,24 +174,19 @@ class AutoGen(object):
     #   @param  *args           The specific class related parameters
     #   @param  **kwargs        The specific class related dict parameters
     #
-    def __new__(Class, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
+    def __new__(cls, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
         # check if the object has been created
-        Key = (Target, Toolchain)
-        if Key not in Class._CACHE_ or Arch not in Class._CACHE_[Key] \
-           or MetaFile not in Class._CACHE_[Key][Arch]:
-            AutoGenObject = super(AutoGen, Class).__new__(Class)
-            # call real constructor
-            if not AutoGenObject._Init(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
-                return None
-            if Key not in Class._CACHE_:
-                Class._CACHE_[Key] = {}
-            if Arch not in Class._CACHE_[Key]:
-                Class._CACHE_[Key][Arch] = {}
-            Class._CACHE_[Key][Arch][MetaFile] = AutoGenObject
-        else:
-            AutoGenObject = Class._CACHE_[Key][Arch][MetaFile]
+        Key = (Target, Toolchain, Arch, MetaFile)
+        try:
+            # if it exists, just return it directly
+            return cls.__ObjectCache[Key]
+        except:
+            # it didnt exist. create it, cache it, then return it
+            cls.__ObjectCache[Key] = super(AutoGen, cls).__new__(cls)
+            return cls.__ObjectCache[Key]
 
-        return AutoGenObject
+    def __init__ (self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
+        super(AutoGen, self).__init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
 
     ## hash() operator
     #
@@ -221,10 +216,16 @@ class AutoGen(object):
 # architecture. This class will generate top level makefile.
 #
 class WorkspaceAutoGen(AutoGen):
-    ## Real constructor of WorkspaceAutoGen
-    #
-    # This method behaves the same as __init__ except that it needs explicit invoke
-    # (in super class's __new__ method)
+    # call super().__init__ then call the worker function with different parameter count
+    def __init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
+        try:
+            self._Init
+        except:
+            super(WorkspaceAutoGen, self).__init__(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+            self._InitWorker(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+            self._Init = True
+    
+    ## Initialize WorkspaceAutoGen
     #
     #   @param  WorkspaceDir            Root directory of workspace
     #   @param  ActivePlatform          Meta-file of active platform
@@ -240,7 +241,7 @@ class WorkspaceAutoGen(AutoGen):
     #   @param  Caps                    Capsule list to be generated
     #   @param  SkuId                   SKU id from command line
     #
-    def _Init(self, WorkspaceDir, ActivePlatform, Target, Toolchain, ArchList, MetaFileDb,
+    def _InitWorker(self, WorkspaceDir, ActivePlatform, Target, Toolchain, ArchList, MetaFileDb,
               BuildConfig, ToolDefinition, FlashDefinitionFile='', Fds=None, Fvs=None, Caps=None, SkuId='', UniFlag=None,
               Progress=None, BuildModule=None):
         if Fds is None:
@@ -1111,6 +1112,14 @@ class WorkspaceAutoGen(AutoGen):
 #  file in order to generate makefile for platform.
 #
 class PlatformAutoGen(AutoGen):
+    # call super().__init__ then call the worker function with different parameter count
+    def __init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
+        try:
+            self._Init
+        except:
+            super(PlatformAutoGen, self).__init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+            self._InitWorker(Workspace, MetaFile, Target, Toolchain, Arch)
+            self._Init = True
     #
     # Used to store all PCDs for both PEI and DXE phase, in order to generate 
     # correct PCD database
@@ -1139,11 +1148,8 @@ class PlatformAutoGen(AutoGen):
                 "0x10001"  : 2,      #  TARGET_*********_****_***********_ATTRIBUTE
                 "0x00001"  : 1}      #  ******_*********_****_***********_ATTRIBUTE (Lowest)
 
-    ## The real constructor of PlatformAutoGen
+    ## Initialize PlatformAutoGen
     #
-    #  This method is not supposed to be called by users of PlatformAutoGen. It's
-    #  only used by factory method __new__() to do real initialization work for an
-    #  object of PlatformAutoGen
     #
     #   @param      Workspace       WorkspaceAutoGen object
     #   @param      PlatformFile    Platform file (DSC file)
@@ -1151,7 +1157,7 @@ class PlatformAutoGen(AutoGen):
     #   @param      Toolchain       Name of tool chain
     #   @param      Arch            arch of the platform supports
     #
-    def _Init(self, Workspace, PlatformFile, Target, Toolchain, Arch):
+    def _InitWorker(self, Workspace, PlatformFile, Target, Toolchain, Arch):
         EdkLogger.debug(EdkLogger.DEBUG_9, "AutoGen platform [%s] [%s]" % (PlatformFile, Arch))
         GlobalData.gProcessingFile = "%s [%s, %s, %s]" % (PlatformFile, Arch, Toolchain, Target)
 
@@ -2776,15 +2782,29 @@ class PlatformAutoGen(AutoGen):
 # to the [depex] section in module's inf file.
 #
 class ModuleAutoGen(AutoGen):
+    # call super().__init__ then call the worker function with different parameter count
+    def __init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
+        try:
+            self._Init
+        except:
+            super(ModuleAutoGen, self).__init__(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+            self._InitWorker(Workspace, MetaFile, Target, Toolchain, Arch, *args)
+            self._Init = True
+
     ## Cache the timestamps of metafiles of every module in a class variable
     #
     TimeDict = {}
 
-    ## The real constructor of ModuleAutoGen
-    #
-    #  This method is not supposed to be called by users of ModuleAutoGen. It's
-    #  only used by factory method __new__() to do real initialization work for an
-    #  object of ModuleAutoGen
+    def __new__(cls, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
+        obj = super(ModuleAutoGen, cls).__new__(cls, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+        # check if this module is employed by active platform
+        if not PlatformAutoGen(Workspace, args[0], Target, Toolchain, Arch).ValidModule(MetaFile):
+            EdkLogger.verbose("Module [%s] for [%s] is not employed by active platform\n" \
+                              % (MetaFile, Arch))
+            return None
+        return obj
+            
+    ## Initialize ModuleAutoGen
     #
     #   @param      Workspace           EdkIIWorkspaceBuild object
     #   @param      ModuleFile          The path of module file
@@ -2793,7 +2813,7 @@ class ModuleAutoGen(AutoGen):
     #   @param      Arch                The arch the module supports
     #   @param      PlatformFile        Platform meta-file
     #
-    def _Init(self, Workspace, ModuleFile, Target, Toolchain, Arch, PlatformFile):
+    def _InitWorker(self, Workspace, ModuleFile, Target, Toolchain, Arch, PlatformFile):
         EdkLogger.debug(EdkLogger.DEBUG_9, "AutoGen module [%s] [%s]" % (ModuleFile, Arch))
         GlobalData.gProcessingFile = "%s [%s, %s, %s]" % (ModuleFile, Arch, Toolchain, Target)
 
@@ -2802,11 +2822,6 @@ class ModuleAutoGen(AutoGen):
 
         self.MetaFile = ModuleFile
         self.PlatformInfo = PlatformAutoGen(Workspace, PlatformFile, Target, Toolchain, Arch)
-        # check if this module is employed by active platform
-        if not self.PlatformInfo.ValidModule(self.MetaFile):
-            EdkLogger.verbose("Module [%s] for [%s] is not employed by active platform\n" \
-                              % (self.MetaFile, Arch))
-            return False
 
         self.SourceDir = self.MetaFile.SubDir
         self.SourceDir = mws.relpath(self.SourceDir, self.WorkspaceDir)
