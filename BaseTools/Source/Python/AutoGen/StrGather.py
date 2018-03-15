@@ -2,7 +2,7 @@
 # This file is used to parse a strings file and create or add to a string database 
 # file.
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -63,7 +63,6 @@ OFFSET = 'offset'
 STRING = 'string'
 TO = 'to'
 STRING_TOKEN = re.compile('STRING_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
-COMPATIBLE_STRING_TOKEN = re.compile('STRING_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
 
 EFI_HII_ARRAY_SIZE_LENGTH = 4
 EFI_HII_PACKAGE_HEADER_LENGTH = 4
@@ -572,11 +571,7 @@ def SearchString(UniObjectClass, FileList, IsCompatibleMode):
         if os.path.isfile(File):
             Lines = open(File, 'r')
             for Line in Lines:
-                if not IsCompatibleMode:
-                    StringTokenList = STRING_TOKEN.findall(Line)
-                else:
-                    StringTokenList = COMPATIBLE_STRING_TOKEN.findall(Line)
-                for StrName in StringTokenList:
+                for StrName in STRING_TOKEN.findall(Line):
                     EdkLogger.debug(EdkLogger.DEBUG_5, "Found string identifier: " + StrName)
                     UniObjectClass.SetStringReferenced(StrName)
 
