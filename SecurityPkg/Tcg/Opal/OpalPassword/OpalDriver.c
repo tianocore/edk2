@@ -27,7 +27,7 @@ EFI_GUID mOpalDeviceNvmeGuid = OPAL_DEVICE_NVME_GUID;
 BOOLEAN                 mOpalEndOfDxe = FALSE;
 OPAL_REQUEST_VARIABLE   *mOpalRequestVariable = NULL;
 UINTN                   mOpalRequestVariableSize = 0;
-CHAR16                  mPopUpString[256];
+CHAR16                  mPopUpString[100];
 
 typedef struct {
   UINT32                   Address;
@@ -659,7 +659,7 @@ OpalEndOfDxeEventNotify (
   @param[in]  PopUpString   Pop up string.
   @param[out] PressEsc      Whether user escape function through Press ESC.
 
-  @retval Password string if success. NULL if failed.
+  @retval Psid string if success. NULL if failed.
 
 **/
 CHAR8 *
@@ -908,10 +908,12 @@ OpalDriverPopUpPasswordInput (
 }
 
 /**
-  Check if disk is locked, show popup window and ask for password if it is.
+  Get pop up string.
 
-  @param[in] Dev            The device which need to be unlocked.
+  @param[in] Dev            The OPAL device.
   @param[in] RequestString  Request string.
+
+  @return Pop up string.
 
 **/
 CHAR16 *
@@ -920,15 +922,10 @@ OpalGetPopUpString (
   IN CHAR16             *RequestString
   )
 {
-  UINTN                 StrLength;
-
-  StrLength = StrLen (RequestString) + 1 + MAX (StrLen (Dev->Name16), StrLen (L"Disk"));
-  ASSERT (StrLength < sizeof (mPopUpString) / sizeof (CHAR16));
-
   if (Dev->Name16 == NULL) {
-    UnicodeSPrint (mPopUpString, StrLength + 1, L"%s Disk", RequestString);
+    UnicodeSPrint (mPopUpString, sizeof (mPopUpString), L"%s Disk", RequestString);
   } else {
-    UnicodeSPrint (mPopUpString, StrLength + 1, L"%s %s", RequestString, Dev->Name16);
+    UnicodeSPrint (mPopUpString, sizeof (mPopUpString), L"%s %s", RequestString, Dev->Name16);
   }
 
   return mPopUpString;
