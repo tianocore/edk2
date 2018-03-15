@@ -337,7 +337,6 @@ TimerInterruptHandler (
 
     // Set next compare value
     ArmGenericTimerSetCompareVal (CompareValue);
-    ArmGenericTimerEnableTimer ();
     ArmInstructionSynchronizationBarrier ();
   }
 
