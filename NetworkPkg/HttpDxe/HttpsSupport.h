@@ -1,7 +1,7 @@
 /** @file
   The header files of miscellaneous routines specific to Https for HttpDxe driver.
 
-Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -217,11 +217,19 @@ TlsCloseSession (
   Process one message according to the CryptMode.
 
   @param[in]           HttpInstance    Pointer to HTTP_PROTOCOL structure.
-  @param[in]           Message         Pointer to the message buffer needed to processed.
+  @param[in]           Message         Pointer to the message buffer needed to processed. 
+                                       If ProcessMode is EfiTlsEncrypt, the message contain the TLS
+                                       header and plain text TLS APP payload.
+                                       If ProcessMode is EfiTlsDecrypt, the message contain the TLS 
+                                       header and cipher text TLS APP payload.
   @param[in]           MessageSize     Pointer to the message buffer size.
   @param[in]           ProcessMode     Process mode.
   @param[in, out]      Fragment        Only one Fragment returned after the Message is
                                        processed successfully.
+                                       If ProcessMode is EfiTlsEncrypt, the fragment contain the TLS 
+                                       header and cipher text TLS APP payload.
+                                       If ProcessMode is EfiTlsDecrypt, the fragment contain the TLS 
+                                       header and plain text TLS APP payload.
 
   @retval EFI_SUCCESS          Message is processed successfully.
   @retval EFI_OUT_OF_RESOURCES   Can't allocate memory resources.

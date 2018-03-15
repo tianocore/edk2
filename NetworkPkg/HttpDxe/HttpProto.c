@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous routines for HttpDxe driver.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1476,50 +1476,87 @@ HttpTransmitTcp (
   EFI_TCP4_PROTOCOL             *Tcp4;
   EFI_TCP6_IO_TOKEN             *Tx6Token;
   EFI_TCP6_PROTOCOL             *Tcp6;
-  UINT8                         *Buffer;  
-  UINTN                         BufferSize;
+  UINT8                         *TlsRecord;  
+  UINT16                        PayloadSize;
   NET_FRAGMENT                  TempFragment;
+  NET_FRAGMENT                  Fragment;
+  UINTN                         RecordCount;
+  UINTN                         RemainingLen;
 
   Status                = EFI_SUCCESS;
-  Buffer                = NULL;
+  TlsRecord             = NULL;
+  PayloadSize           = 0;
   TempFragment.Len      = 0;
   TempFragment.Bulk     = NULL;
+  Fragment.Len          = 0;
+  Fragment.Bulk         = NULL;
+  RecordCount           = 0;
+  RemainingLen          = 0;
 
   //
   // Need to encrypt data.
   //
   if (HttpInstance->UseHttps) {
     //
-    // Build BufferOut data
+    // Allocate enough buffer for each TLS plaintext records.
     //
-    BufferSize = sizeof (TLS_RECORD_HEADER) + TxStringLen;
-    Buffer     = AllocateZeroPool (BufferSize);
-    if (Buffer == NULL) {
+    TlsRecord = AllocateZeroPool (TLS_RECORD_HEADER_LENGTH + TLS_PLAINTEXT_RECORD_MAX_PAYLOAD_LENGTH);
+    if (TlsRecord == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       return Status;
     }
-    ((TLS_RECORD_HEADER *) Buffer)->ContentType = TlsContentTypeApplicationData;
-    ((TLS_RECORD_HEADER *) Buffer)->Version.Major = HttpInstance->TlsConfigData.Version.Major;
-    ((TLS_RECORD_HEADER *) Buffer)->Version.Minor = HttpInstance->TlsConfigData.Version.Minor;
-    ((TLS_RECORD_HEADER *) Buffer)->Length = (UINT16) (TxStringLen);
-    CopyMem (Buffer + sizeof (TLS_RECORD_HEADER), TxString, TxStringLen);
-    
-    //
-    // Encrypt Packet.
-    //
-    Status = TlsProcessMessage (
-               HttpInstance, 
-               Buffer, 
-               BufferSize, 
-               EfiTlsEncrypt, 
-               &TempFragment
-               );
-    
-    FreePool (Buffer);
 
-    if (EFI_ERROR (Status)) {
-      return Status;
+    //
+    // Allocate enough buffer for all TLS ciphertext records.
+    //
+    RecordCount = TxStringLen / TLS_PLAINTEXT_RECORD_MAX_PAYLOAD_LENGTH + 1;
+    Fragment.Bulk = AllocateZeroPool (RecordCount * (TLS_RECORD_HEADER_LENGTH + TLS_CIPHERTEXT_RECORD_MAX_PAYLOAD_LENGTH));
+    if (Fragment.Bulk == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_ERROR;
     }
+
+    //
+    // Encrypt each TLS plaintext records.
+    //
+    RemainingLen = TxStringLen;
+    while (RemainingLen != 0) {
+      PayloadSize = (UINT16) MIN (TLS_PLAINTEXT_RECORD_MAX_PAYLOAD_LENGTH, RemainingLen);
+      
+      ((TLS_RECORD_HEADER *) TlsRecord)->ContentType = TlsContentTypeApplicationData;
+      ((TLS_RECORD_HEADER *) TlsRecord)->Version.Major = HttpInstance->TlsConfigData.Version.Major;
+      ((TLS_RECORD_HEADER *) TlsRecord)->Version.Minor = HttpInstance->TlsConfigData.Version.Minor;
+      ((TLS_RECORD_HEADER *) TlsRecord)->Length = PayloadSize;
+
+      CopyMem (TlsRecord + TLS_RECORD_HEADER_LENGTH, TxString + (TxStringLen - RemainingLen), PayloadSize);
+      
+      Status = TlsProcessMessage (
+                 HttpInstance, 
+                 TlsRecord, 
+                 TLS_RECORD_HEADER_LENGTH + PayloadSize, 
+                 EfiTlsEncrypt, 
+                 &TempFragment
+                 );
+      if (EFI_ERROR (Status)) {
+        goto ON_ERROR;
+      }
+
+      //
+      // Record the processed/encrypted Packet. 
+      //
+      CopyMem (Fragment.Bulk + Fragment.Len, TempFragment.Bulk, TempFragment.Len);
+      Fragment.Len += TempFragment.Len;
+
+      FreePool (TempFragment.Bulk);
+      TempFragment.Len  = 0;
+      TempFragment.Bulk = NULL;
+      
+      RemainingLen -= (UINTN) PayloadSize;
+      ZeroMem (TlsRecord, TLS_RECORD_HEADER_LENGTH + TLS_PLAINTEXT_RECORD_MAX_PAYLOAD_LENGTH);
+    }
+
+    FreePool (TlsRecord);
+    TlsRecord = NULL;
   }
   
   if (!HttpInstance->LocalAddressIsIPv6) {
@@ -1527,9 +1564,9 @@ HttpTransmitTcp (
     Tx4Token = &Wrap->TcpWrap.Tx4Token;
 
     if (HttpInstance->UseHttps) {
-      Tx4Token->Packet.TxData->DataLength = TempFragment.Len;
-      Tx4Token->Packet.TxData->FragmentTable[0].FragmentLength = TempFragment.Len;
-      Tx4Token->Packet.TxData->FragmentTable[0].FragmentBuffer = (VOID *) TempFragment.Bulk;
+      Tx4Token->Packet.TxData->DataLength = Fragment.Len;
+      Tx4Token->Packet.TxData->FragmentTable[0].FragmentLength = Fragment.Len;
+      Tx4Token->Packet.TxData->FragmentTable[0].FragmentBuffer = (VOID *) Fragment.Bulk;
     } else {
       Tx4Token->Packet.TxData->DataLength = (UINT32) TxStringLen;
       Tx4Token->Packet.TxData->FragmentTable[0].FragmentLength = (UINT32) TxStringLen;
@@ -1542,7 +1579,7 @@ HttpTransmitTcp (
     Status  = Tcp4->Transmit (Tcp4, Tx4Token);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "Transmit failed: %r\n", Status));
-      return Status;
+      goto ON_ERROR;
     }
 
   } else {
@@ -1550,9 +1587,9 @@ HttpTransmitTcp (
     Tx6Token = &Wrap->TcpWrap.Tx6Token;
     
     if (HttpInstance->UseHttps) {
-      Tx6Token->Packet.TxData->DataLength = TempFragment.Len;
-      Tx6Token->Packet.TxData->FragmentTable[0].FragmentLength = TempFragment.Len;
-      Tx6Token->Packet.TxData->FragmentTable[0].FragmentBuffer = (VOID *) TempFragment.Bulk;
+      Tx6Token->Packet.TxData->DataLength = Fragment.Len;
+      Tx6Token->Packet.TxData->FragmentTable[0].FragmentLength = Fragment.Len;
+      Tx6Token->Packet.TxData->FragmentTable[0].FragmentBuffer = (VOID *) Fragment.Bulk;
     } else {
       Tx6Token->Packet.TxData->DataLength = (UINT32) TxStringLen;
       Tx6Token->Packet.TxData->FragmentTable[0].FragmentLength = (UINT32) TxStringLen;
@@ -1565,10 +1602,26 @@ HttpTransmitTcp (
     Status = Tcp6->Transmit (Tcp6, Tx6Token);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "Transmit failed: %r\n", Status));
-      return Status;
+      goto ON_ERROR;
     }
   }
   
+  return Status;
+
+ON_ERROR:
+  
+  if (HttpInstance->UseHttps) {
+    if (TlsRecord != NULL) {
+      FreePool (TlsRecord);
+      TlsRecord = NULL;
+    }
+    
+    if (Fragment.Bulk != NULL) {
+      FreePool (Fragment.Bulk);
+      Fragment.Bulk = NULL;
+    }
+  }
+
   return Status;
 }
 

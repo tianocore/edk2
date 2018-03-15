@@ -951,7 +951,7 @@ TlsReceiveOnePdu (
   //
   // Allocate buffer to receive one TLS header.
   //
-  Len     = sizeof (TLS_RECORD_HEADER);
+  Len     = TLS_RECORD_HEADER_LENGTH;
   PduHdr  = NetbufAlloc (Len);
   if (PduHdr == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -1391,11 +1391,19 @@ TlsCloseSession (
   Process one message according to the CryptMode.
 
   @param[in]           HttpInstance    Pointer to HTTP_PROTOCOL structure.
-  @param[in]           Message         Pointer to the message buffer needed to processed.
+  @param[in]           Message         Pointer to the message buffer needed to processed. 
+                                       If ProcessMode is EfiTlsEncrypt, the message contain the TLS
+                                       header and plain text TLS APP payload.
+                                       If ProcessMode is EfiTlsDecrypt, the message contain the TLS 
+                                       header and cipher text TLS APP payload.
   @param[in]           MessageSize     Pointer to the message buffer size.
   @param[in]           ProcessMode     Process mode.
   @param[in, out]      Fragment        Only one Fragment returned after the Message is
                                        processed successfully.
+                                       If ProcessMode is EfiTlsEncrypt, the fragment contain the TLS 
+                                       header and cipher text TLS APP payload.
+                                       If ProcessMode is EfiTlsDecrypt, the fragment contain the TLS 
+                                       header and plain text TLS APP payload.
 
   @retval EFI_SUCCESS          Message is processed successfully.
   @retval EFI_OUT_OF_RESOURCES   Can't allocate memory resources.
@@ -1498,6 +1506,9 @@ TlsProcessMessage (
 ON_EXIT:
 
   if (OriginalFragmentTable != NULL) {
+    if( FragmentTable == OriginalFragmentTable) {
+      FragmentTable = NULL;
+    }
     FreePool (OriginalFragmentTable);
     OriginalFragmentTable = NULL;
   }
@@ -1682,7 +1693,7 @@ HttpsReceive (
       return Status;
     }
 
-    CopyMem (BufferIn, TempFragment.Bulk + sizeof (TLS_RECORD_HEADER), BufferInSize);
+    CopyMem (BufferIn, TempFragment.Bulk + TLS_RECORD_HEADER_LENGTH, BufferInSize);
 
     //
     // Free the buffer in TempFragment.
