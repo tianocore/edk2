@@ -73,7 +73,7 @@ SetBits (
   StartBit  = (UINTN)GUARDED_HEAP_MAP_ENTRY_BIT_INDEX (Address);
   EndBit    = (StartBit + BitNumber - 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
 
-  if ((StartBit + BitNumber) > GUARDED_HEAP_MAP_ENTRY_BITS) {
+  if ((StartBit + BitNumber) >= GUARDED_HEAP_MAP_ENTRY_BITS) {
     Msbs    = (GUARDED_HEAP_MAP_ENTRY_BITS - StartBit) %
               GUARDED_HEAP_MAP_ENTRY_BITS;
     Lsbs    = (EndBit + 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
@@ -126,7 +126,7 @@ ClearBits (
   StartBit  = (UINTN)GUARDED_HEAP_MAP_ENTRY_BIT_INDEX (Address);
   EndBit    = (StartBit + BitNumber - 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
 
-  if ((StartBit + BitNumber) > GUARDED_HEAP_MAP_ENTRY_BITS) {
+  if ((StartBit + BitNumber) >= GUARDED_HEAP_MAP_ENTRY_BITS) {
     Msbs    = (GUARDED_HEAP_MAP_ENTRY_BITS - StartBit) %
               GUARDED_HEAP_MAP_ENTRY_BITS;
     Lsbs    = (EndBit + 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
@@ -191,10 +191,14 @@ GetBits (
     Lsbs = 0;
   }
 
-  Result    = RShiftU64 ((*BitMap), StartBit) & (LShiftU64 (1, Msbs) - 1);
-  if (Lsbs > 0) {
-    BitMap  += 1;
-    Result  |= LShiftU64 ((*BitMap) & (LShiftU64 (1, Lsbs) - 1), Msbs);
+  if (StartBit == 0 && BitNumber == GUARDED_HEAP_MAP_ENTRY_BITS) {
+    Result = *BitMap;
+  } else {
+    Result    = RShiftU64((*BitMap), StartBit) & (LShiftU64(1, Msbs) - 1);
+    if (Lsbs > 0) {
+      BitMap  += 1;
+      Result  |= LShiftU64 ((*BitMap) & (LShiftU64 (1, Lsbs) - 1), Msbs);
+    }
   }
 
   return Result;
