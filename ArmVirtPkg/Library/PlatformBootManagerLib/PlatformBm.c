@@ -671,6 +671,14 @@ PlatformBootManagerAfterConsole (
   BootLogoEnableLogo ();
 
   //
+  // Process QEMU's -kernel command line option. The kernel booted this way
+  // will receive ACPI tables: in PlatformBootManagerBeforeConsole(), we
+  // connected any and all PCI root bridges, and then signaled the ACPI
+  // platform driver.
+  //
+  TryRunningQemuKernel ();
+
+  //
   // Connect the purported boot devices.
   //
   Status = ConnectDevicesFromQemu ();
@@ -680,14 +688,6 @@ PlatformBootManagerAfterConsole (
     //
     EfiBootManagerConnectAll ();
   }
-
-  //
-  // Process QEMU's -kernel command line option. Note that the kernel booted
-  // this way should receive ACPI tables, which is why we connect all devices
-  // first (see above) -- PCI enumeration blocks ACPI table installation, if
-  // there is a PCI host.
-  //
-  TryRunningQemuKernel ();
 
   //
   // Enumerate all possible boot options, then filter and reorder them based on
