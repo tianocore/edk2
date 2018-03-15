@@ -1450,14 +1450,14 @@ PlatformBootManagerAfterConsole (
   PciAcpiInitialization ();
 
   //
-  // Perform some platform specific connect sequence
-  //
-  PlatformBdsConnectSequence ();
-
-  //
   // Process QEMU's -kernel command line option
   //
   TryRunningQemuKernel ();
+
+  //
+  // Perform some platform specific connect sequence
+  //
+  PlatformBdsConnectSequence ();
 
   EfiBootManagerRefreshAllBootOption ();
 
