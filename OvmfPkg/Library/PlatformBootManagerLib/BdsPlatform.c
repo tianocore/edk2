@@ -2,13 +2,13 @@
   Platform BDS customizations.
 
   Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials
-  are licensed and made available under the terms and conditions of the BSD License
-  which accompanies this distribution.  The full text of the license may be found at
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+  WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -390,7 +390,8 @@ Returns:
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Dispatch deferred images after EndOfDxe event and ReadyToLock installation.
+  // Dispatch deferred images after EndOfDxe event and ReadyToLock
+  // installation.
   //
   EfiBootManagerDispatchDeferredImages ();
 
@@ -470,7 +471,8 @@ Returns:
   //
   // Register Keyboard
   //
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gPnpPs2KeyboardDeviceNode);
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gPnpPs2KeyboardDeviceNode);
 
   EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
 
@@ -480,9 +482,12 @@ Returns:
   DevicePath = TempDevicePath;
   gPnp16550ComPortDeviceNode.UID = 0;
 
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gPnp16550ComPortDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gPnp16550ComPortDeviceNode);
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
 
   //
   // Print Device Path
@@ -509,9 +514,12 @@ Returns:
   DevicePath = TempDevicePath;
   gPnp16550ComPortDeviceNode.UID = 1;
 
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gPnp16550ComPortDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gPnp16550ComPortDeviceNode);
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
 
   //
   // Print Device Path
@@ -588,7 +596,8 @@ GetGopDevicePath (
     // Add all the child handles as possible Console Device
     //
     for (Index = 0; Index < GopHandleCount; Index++) {
-      Status = gBS->HandleProtocol (GopHandleBuffer[Index], &gEfiDevicePathProtocolGuid, (VOID*)&TempDevicePath);
+      Status = gBS->HandleProtocol (GopHandleBuffer[Index],
+                      &gEfiDevicePathProtocolGuid, (VOID*)&TempDevicePath);
       if (EFI_ERROR (Status)) {
         continue;
       }
@@ -607,8 +616,8 @@ GetGopDevicePath (
         *GopDevicePath = TempDevicePath;
 
         //
-        // Delete the PCI device's path that added by GetPlugInPciVgaDevicePath()
-        // Add the integrity GOP device path.
+        // Delete the PCI device's path that added by
+        // GetPlugInPciVgaDevicePath(). Add the integrity GOP device path.
         //
         EfiBootManagerUpdateConsoleVariable (ConOutDev, NULL, PciDevicePath);
         EfiBootManagerUpdateConsoleVariable (ConOutDev, TempDevicePath, NULL);
@@ -700,8 +709,10 @@ Returns:
     return Status;
   }
 
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
-  DevicePath = AppendDevicePathNode (DevicePath, (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gUartDeviceNode);
+  DevicePath = AppendDevicePathNode (DevicePath,
+                 (EFI_DEVICE_PATH_PROTOCOL *)&gTerminalTypeDeviceNode);
 
   EfiBootManagerUpdateConsoleVariable (ConOut, DevicePath, NULL);
   EfiBootManagerUpdateConsoleVariable (ConIn, DevicePath, NULL);
@@ -817,7 +828,8 @@ VisitAllPciInstances (
   @param[in]  PciIo - PCI IO protocol instance
   @param[in]  Pci - PCI Header register block
 
-  @retval EFI_SUCCESS - PCI Device check and Console variable update successfully.
+  @retval EFI_SUCCESS - PCI Device check and Console variable update
+                        successfully.
   @retval EFI_STATUS - PCI Device check or Console variable update fail.
 
 **/
@@ -891,7 +903,8 @@ DetectAndPreparePlatformPciDevicePath (
 
   @param[in]  DetectVgaOnly - Only detect VGA device if it's TRUE.
 
-  @retval EFI_SUCCESS - PCI Device check and Console variable update successfully.
+  @retval EFI_SUCCESS - PCI Device check and Console variable update
+                        successfully.
   @retval EFI_STATUS - PCI Device check or Console variable update fail.
 
 **/
@@ -928,12 +941,14 @@ Arguments:
   //
   // Connect RootBridge
   //
-  GetEfiGlobalVariable2 (EFI_CON_OUT_VARIABLE_NAME, (VOID **) &VarConout, NULL);
+  GetEfiGlobalVariable2 (EFI_CON_OUT_VARIABLE_NAME, (VOID **) &VarConout,
+    NULL);
   GetEfiGlobalVariable2 (EFI_CON_IN_VARIABLE_NAME, (VOID **) &VarConin, NULL);
 
   if (VarConout == NULL || VarConin == NULL) {
     //
-    // Do platform specific PCI Device check and add them to ConOut, ConIn, ErrOut
+    // Do platform specific PCI Device check and add them to ConOut, ConIn,
+    // ErrOut
     //
     DetectAndPreparePlatformPciDevicePaths (FALSE);
 
@@ -947,13 +962,16 @@ Arguments:
       // Update the console variable with the connect type
       //
       if ((PlatformConsole[Index].ConnectType & CONSOLE_IN) == CONSOLE_IN) {
-        EfiBootManagerUpdateConsoleVariable (ConIn, PlatformConsole[Index].DevicePath, NULL);
+        EfiBootManagerUpdateConsoleVariable (ConIn,
+          PlatformConsole[Index].DevicePath, NULL);
       }
       if ((PlatformConsole[Index].ConnectType & CONSOLE_OUT) == CONSOLE_OUT) {
-        EfiBootManagerUpdateConsoleVariable (ConOut, PlatformConsole[Index].DevicePath, NULL);
+        EfiBootManagerUpdateConsoleVariable (ConOut,
+          PlatformConsole[Index].DevicePath, NULL);
       }
       if ((PlatformConsole[Index].ConnectType & STD_ERROR) == STD_ERROR) {
-        EfiBootManagerUpdateConsoleVariable (ErrOut, PlatformConsole[Index].DevicePath, NULL);
+        EfiBootManagerUpdateConsoleVariable (ErrOut,
+          PlatformConsole[Index].DevicePath, NULL);
       }
     }
   } else {
@@ -1237,7 +1255,10 @@ ConnectRecursivelyIfPciMassStorage (
       DEBUG((
         EFI_D_INFO,
         "Found %s device: %s\n",
-        IS_CLASS1 (PciHeader, PCI_CLASS_MASS_STORAGE) ? L"Mass Storage" : L"Xen",
+        (IS_CLASS1 (PciHeader, PCI_CLASS_MASS_STORAGE) ?
+         L"Mass Storage" :
+         L"Xen"
+         ),
         DevPathStr
         ));
       FreePool(DevPathStr);
@@ -1531,7 +1552,8 @@ NotifyDevPath (
     //
     // Get the DevicePath protocol on that handle
     //
-    Status = gBS->HandleProtocol (Handle, &gEfiDevicePathProtocolGuid, (VOID **)&DevPathNode);
+    Status = gBS->HandleProtocol (Handle, &gEfiDevicePathProtocolGuid,
+                    (VOID **)&DevPathNode);
     ASSERT_EFI_ERROR (Status);
 
     while (!IsDevicePathEnd (DevPathNode)) {
@@ -1581,7 +1603,8 @@ InstallDevicePathCallback (
 }
 
 /**
-  This function is called each second during the boot manager waits the timeout.
+  This function is called each second during the boot manager waits the
+  timeout.
 
   @param TimeoutRemain  The remaining timeout.
 **/
