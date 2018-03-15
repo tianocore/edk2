@@ -328,25 +328,24 @@ SaveS3BootScript (
 //
 // BDS Platform Functions
 //
+/**
+  Do the platform init, can be customized by OEM/IBV
+
+  Possible things that can be done in PlatformBootManagerBeforeConsole:
+
+  > Update console variable: 1. include hot-plug devices;
+  >                          2. Clear ConIn and add SOL for AMT
+  > Register new Driver#### or Boot####
+  > Register new Key####: e.g.: F12
+  > Signal ReadyToLock event
+  > Authentication action: 1. connect Auth devices;
+  >                        2. Identify auto logon user.
+**/
 VOID
 EFIAPI
 PlatformBootManagerBeforeConsole (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Platform Bds init. Include the platform firmware vendor, revision
-  and so crc check.
-
-Arguments:
-
-Returns:
-
-  None.
-
---*/
 {
   EFI_HANDLE    Handle;
   EFI_STATUS    Status;
@@ -429,28 +428,21 @@ ConnectRootBridge (
 }
 
 
+/**
+  Add IsaKeyboard to ConIn; add IsaSerial to ConOut, ConIn, ErrOut.
+
+  @param[in] DeviceHandle  Handle of the LPC Bridge device.
+
+  @retval EFI_SUCCESS  Console devices on the LPC bridge have been added to
+                       ConOut, ConIn, and ErrOut.
+
+  @return              Error codes, due to EFI_DEVICE_PATH_PROTOCOL missing
+                       from DeviceHandle.
+**/
 EFI_STATUS
 PrepareLpcBridgeDevicePath (
   IN EFI_HANDLE                DeviceHandle
   )
-/*++
-
-Routine Description:
-
-  Add IsaKeyboard to ConIn,
-  add IsaSerial to ConOut, ConIn, ErrOut.
-  LPC Bridge: 06 01 00
-
-Arguments:
-
-  DeviceHandle            - Handle of PCIIO protocol.
-
-Returns:
-
-  EFI_SUCCESS             - LPC bridge is added to ConOut, ConIn, and ErrOut.
-  EFI_STATUS              - No LPC bridge is added.
-
---*/
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
@@ -629,27 +621,20 @@ GetGopDevicePath (
   return EFI_SUCCESS;
 }
 
+/**
+  Add PCI display to ConOut.
+
+  @param[in] DeviceHandle  Handle of the PCI display device.
+
+  @retval EFI_SUCCESS  The PCI display device has been added to ConOut.
+
+  @return              Error codes, due to EFI_DEVICE_PATH_PROTOCOL missing
+                       from DeviceHandle.
+**/
 EFI_STATUS
 PreparePciDisplayDevicePath (
   IN EFI_HANDLE                DeviceHandle
   )
-/*++
-
-Routine Description:
-
-  Add PCI VGA to ConOut.
-  PCI VGA: 03 00 00
-
-Arguments:
-
-  DeviceHandle            - Handle of PCIIO protocol.
-
-Returns:
-
-  EFI_SUCCESS             - PCI VGA is added to ConOut.
-  EFI_STATUS              - No PCI VGA device is added.
-
---*/
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
@@ -674,27 +659,21 @@ Returns:
   return EFI_SUCCESS;
 }
 
+/**
+  Add PCI Serial to ConOut, ConIn, ErrOut.
+
+  @param[in] DeviceHandle  Handle of the PCI serial device.
+
+  @retval EFI_SUCCESS  The PCI serial device has been added to ConOut, ConIn,
+                       ErrOut.
+
+  @return              Error codes, due to EFI_DEVICE_PATH_PROTOCOL missing
+                       from DeviceHandle.
+**/
 EFI_STATUS
 PreparePciSerialDevicePath (
   IN EFI_HANDLE                DeviceHandle
   )
-/*++
-
-Routine Description:
-
-  Add PCI Serial to ConOut, ConIn, ErrOut.
-  PCI Serial: 07 00 02
-
-Arguments:
-
-  DeviceHandle            - Handle of PCIIO protocol.
-
-Returns:
-
-  EFI_SUCCESS             - PCI Serial is added to ConOut, ConIn, and ErrOut.
-  EFI_STATUS              - No PCI Serial device is added.
-
---*/
 {
   EFI_STATUS                Status;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
@@ -918,21 +897,17 @@ DetectAndPreparePlatformPciDevicePaths (
 }
 
 
+/**
+  Connect the predefined platform default console device.
+
+  Always try to find and enable PCI display devices.
+
+  @param[in] PlatformConsole  Predefined platform default console device array.
+**/
 VOID
 PlatformInitializeConsole (
   IN PLATFORM_CONSOLE_CONNECT_ENTRY   *PlatformConsole
   )
-/*++
-
-Routine Description:
-
-  Connect the predefined platform default console device. Always try to find
-  and enable the vga device if have.
-
-Arguments:
-
-  PlatformConsole         - Predefined platform default console device array.
---*/
 {
   UINTN                              Index;
   EFI_DEVICE_PATH_PROTOCOL           *VarConout;
@@ -1346,26 +1321,15 @@ PlatformBdsRestoreNvVarsFromHardDisk (
 
 }
 
+/**
+  Connect with predefined platform connect sequence.
+
+  The OEM/IBV can customize with their own connect sequence.
+**/
 VOID
 PlatformBdsConnectSequence (
   VOID
   )
-/*++
-
-Routine Description:
-
-  Connect with predefined platform connect sequence,
-  the OEM/IBV can customize with their own connect sequence.
-
-Arguments:
-
-  None.
-
-Returns:
-
-  None.
-
---*/
 {
   UINTN         Index;
   RETURN_STATUS Status;
@@ -1431,20 +1395,24 @@ SaveS3BootScript (
 }
 
 
+/**
+  Do the platform specific action after the console is ready
+
+  Possible things that can be done in PlatformBootManagerAfterConsole:
+
+  > Console post action:
+    > Dynamically switch output mode from 100x31 to 80x25 for certain senarino
+    > Signal console ready platform customized event
+  > Run diagnostics like memory testing
+  > Connect certain devices
+  > Dispatch aditional option roms
+  > Special boot: e.g.: USB boot, enter UI
+**/
 VOID
 EFIAPI
 PlatformBootManagerAfterConsole (
   VOID
   )
-/*++
-
-Routine Description:
-
-  The function will execute with as the platform policy, current policy
-  is driven by boot mode. IBV/OEM can customize this code for their specific
-  policy action.
-
---*/
 {
   EFI_BOOT_MODE                      BootMode;
 
