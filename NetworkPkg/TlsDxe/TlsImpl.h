@@ -1,7 +1,7 @@
 /** @file
   Header file of Miscellaneous Routines for TlsDxe driver.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -45,10 +45,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern EFI_SERVICE_BINDING_PROTOCOL    mTlsServiceBinding;
 extern EFI_TLS_PROTOCOL                mTlsProtocol;
 extern EFI_TLS_CONFIGURATION_PROTOCOL  mTlsConfigurationProtocol;
-
-#define RECORD_HEADER_LEN 5 /// ContentType(1) + Version(2) + Length(2)
-
-#define MAX_BUFFER_SIZE   32768
 
 /**
   Encrypt the message listed in fragment.
