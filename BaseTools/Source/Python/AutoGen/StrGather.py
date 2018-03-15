@@ -124,22 +124,6 @@ def DecToHexList(Dec, Digit = 8):
 def AscToHexList(Ascii):
     return ['0x{0:02X}'.format(ord(Item)) for Item in Ascii]
 
-## Create header of .h file
-#
-# Create a header of .h file
-#
-# @param BaseName: The basename of strings
-#
-# @retval Str:     A string for .h file header
-#
-def CreateHFileHeader(BaseName):
-    Str = ''
-    for Item in H_C_FILE_HEADER:
-        Str = WriteLine(Str, Item)
-    Str = WriteLine(Str, '#ifndef _' + BaseName.upper() + '_STRINGS_DEFINE_H_')
-    Str = WriteLine(Str, '#define _' + BaseName.upper() + '_STRINGS_DEFINE_H_')
-    return Str
-
 ## Create content of .h file
 #
 # Create content of .h file
@@ -203,19 +187,6 @@ def CreateHFile(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
     HFile = WriteLine('', CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag))
 
     return HFile
-
-## Create header of .c file
-#
-# Create a header of .c file
-#
-# @retval Str:     A string for .c file header
-#
-def CreateCFileHeader():
-    Str = ''
-    for Item in H_C_FILE_HEADER:
-        Str = WriteLine(Str, Item)
-
-    return Str
 
 ## Create a buffer to store all items in an array
 #
@@ -493,7 +464,6 @@ def CreateCFileEnd():
 #
 def CreateCFile(BaseName, UniObjectClass, IsCompatibleMode, FilterInfo):
     CFile = ''
-    #CFile = WriteLine(CFile, CreateCFileHeader())
     CFile = WriteLine(CFile, CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, None, FilterInfo))
     CFile = WriteLine(CFile, CreateCFileEnd())
     return CFile
