@@ -214,7 +214,6 @@ class ValueExpression(object):
 
     PcdPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
     HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
-    RegGuidPattern = re.compile(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
 
     SymbolPattern = re.compile("("
                                  "\$\([A-Z][A-Z0-9_]*\)|\$\(\w+\.\w+\)|\w+\.\w+|"
@@ -725,7 +724,7 @@ class ValueExpression(object):
         self._Token = ''
         if Expr:
             Ch = Expr[0]
-            Match = self.RegGuidPattern.match(Expr)
+            Match = gGuidPattern.match(Expr)
             if Match and not Expr[Match.end():Match.end()+1].isalnum() \
                 and Expr[Match.end():Match.end()+1] != '_':
                 self._Idx += Match.end()

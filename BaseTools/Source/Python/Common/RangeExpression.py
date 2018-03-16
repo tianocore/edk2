@@ -211,8 +211,6 @@ class RangeExpression(object):
 
     PcdPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
     HexPattern = re.compile(r'0[xX][0-9a-fA-F]+')
-    RegGuidPattern = re.compile(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
-    ExRegGuidPattern = re.compile(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')
     
     RangePattern = re.compile(r'[0-9]+ - [0-9]+')
 
@@ -341,18 +339,18 @@ class RangeExpression(object):
     def Eval(self, Operator, Oprand1, Oprand2 = None):
         
         if Operator in ["!", "NOT", "not"]:
-            if not self.RegGuidPattern.match(Oprand1.strip()):
+            if not gGuidPattern.match(Oprand1.strip()):
                 raise BadExpression(ERR_STRING_EXPR % Operator)
             return self.NegtiveRange(Oprand1)
         else:
             if Operator in ["==", ">=", "<=", ">", "<", '^']:
                 return self.EvalRange(Operator, Oprand1)
             elif Operator == 'and' :
-                if not self.ExRegGuidPattern.match(Oprand1.strip()) or not self.ExRegGuidPattern.match(Oprand2.strip()):
+                if not gGuidPatternEnd.match(Oprand1.strip()) or not gGuidPatternEnd.match(Oprand2.strip()):
                     raise BadExpression(ERR_STRING_EXPR % Operator)
                 return self.Rangeintersection(Oprand1, Oprand2)    
             elif Operator == 'or':
-                if not self.ExRegGuidPattern.match(Oprand1.strip()) or not self.ExRegGuidPattern.match(Oprand2.strip()):
+                if not gGuidPatternEnd.match(Oprand1.strip()) or not gGuidPatternEnd.match(Oprand2.strip()):
                     raise BadExpression(ERR_STRING_EXPR % Operator)
                 return self.Rangecollections(Oprand1, Oprand2)
             else:
@@ -410,7 +408,7 @@ class RangeExpression(object):
         # check if the expression does not need to evaluate
         if RealValue and Depth == 0:
             self._Token = self._Expr
-            if self.ExRegGuidPattern.match(self._Expr):
+            if gGuidPatternEnd.match(self._Expr):
                 return [self.operanddict[self._Expr] ]
 
             self._Idx = 0
@@ -657,7 +655,7 @@ class RangeExpression(object):
         self._Token = ''
         if Expr:
             Ch = Expr[0]
-            Match = self.RegGuidPattern.match(Expr)
+            Match = gGuidPattern.match(Expr)
             if Match and not Expr[Match.end():Match.end() + 1].isalnum() \
                 and Expr[Match.end():Match.end() + 1] != '_':
                 self._Idx += Match.end()

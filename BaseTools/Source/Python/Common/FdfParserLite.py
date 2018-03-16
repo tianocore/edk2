@@ -22,6 +22,7 @@ import CommonDataClass.FdfClass
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 from Common.RangeExpression import RangeExpression
+from Common.GlobalData import *
 
 ##define T_CHAR_SPACE                ' '
 ##define T_CHAR_NULL                 '\0'
@@ -934,7 +935,7 @@ class FdfParser(object):
         
         if not self.__GetNextToken():
             return False
-        if RangeExpression.RegGuidPattern.match(self.__Token) != None:
+        if gGuidPattern.match(self.__Token) != None:
             return True
         else:
             self.__UndoToken()

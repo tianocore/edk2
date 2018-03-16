@@ -1136,7 +1136,7 @@ class FdfParser:
 
         if not self.__GetNextToken():
             return False
-        if RangeExpression.RegGuidPattern.match(self.__Token) != None:
+        if gGuidPattern.match(self.__Token) != None:
             return True
         else:
             self.__UndoToken()
