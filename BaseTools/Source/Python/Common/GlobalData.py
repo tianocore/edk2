@@ -59,7 +59,9 @@ _GuidPattern = r"{Hex}{{8}}-{Hex}{{4}}-{Hex}{{4}}-{Hex}{{4}}-{Hex}{{12}}".format
 gGuidPattern = re.compile(r'{}'.format(_GuidPattern))
 gGuidPatternEnd = re.compile(r'{}$'.format(_GuidPattern))
 
+## Regular expressions for HEX matching
 g4HexChar = re.compile(r'{}{{4}}'.format(_HexChar))
+gHexPattern = re.compile(r'0[xX]{}+'.format(_HexChar))
 
 #
 # A global variable for whether current build in AutoGen phase or not.
