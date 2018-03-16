@@ -210,7 +210,6 @@ class RangeExpression(object):
     NonLetterOpLst = ['+', '-', '&', '|', '^', '!', '=', '>', '<']
 
     PcdPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
-    HexPattern = re.compile(r'0[xX][0-9a-fA-F]+')
     
     RangePattern = re.compile(r'[0-9]+ - [0-9]+')
 
@@ -219,7 +218,7 @@ class RangeExpression(object):
         # convert interval to object index. ex. 1 - 10 to a GUID
         expr = expr.strip()
         NumberDict = {}
-        for HexNumber in self.HexPattern.findall(expr):
+        for HexNumber in gHexPattern.findall(expr):
             Number = str(int(HexNumber, 16))
             NumberDict[HexNumber] = Number
         for HexNum in NumberDict:
@@ -624,7 +623,7 @@ class RangeExpression(object):
             self._LiteralToken.endswith('}'):
             return True
 
-        if self.HexPattern.match(self._LiteralToken):
+        if gHexPattern.match(self._LiteralToken):
             Token = self._LiteralToken[2:]
             Token = Token.lstrip('0')
             if not Token:
