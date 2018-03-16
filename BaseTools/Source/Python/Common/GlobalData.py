@@ -51,6 +51,13 @@ gMacroRefPattern = re.compile("\$\(({})\)".format(_MacroNamePattern), re.UNICODE
 gMacroDefPattern = re.compile("^(DEFINE|EDK_GLOBAL)[ \t]+")
 gMacroNamePattern = re.compile("^{}$".format(_MacroNamePattern))
 
+# definition for a GUID.  used to create regular expressions below.
+_GuidPattern = r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+
+## Regular expressions for GUID matching
+gGuidPattern = re.compile(r'{}'.format(_GuidPattern))
+gGuidPatternEnd = re.compile(r'{}$'.format(_GuidPattern))
+
 #
 # A global variable for whether current build in AutoGen phase or not.
 #
