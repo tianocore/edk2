@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define common static strings used by INF/DEC/DSC files
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -43,10 +43,13 @@ gBuildingModule = ''
 gSkuids = []
 gDefaultStores = []
 
+# definition for a MACRO name.  used to create regular expressions below.
+_MacroNamePattern = "[A-Z][A-Z0-9_]*"
+
 ## Regular expression for matching macro used in DSC/DEC/INF file inclusion
-gMacroRefPattern = re.compile("\$\(([A-Z][_A-Z0-9]*)\)", re.UNICODE)
+gMacroRefPattern = re.compile("\$\(({})\)".format(_MacroNamePattern), re.UNICODE)
 gMacroDefPattern = re.compile("^(DEFINE|EDK_GLOBAL)[ \t]+")
-gMacroNamePattern = re.compile("^[A-Z][A-Z0-9_]*$")
+gMacroNamePattern = re.compile("^{}$".format(_MacroNamePattern))
 
 #
 # A global variable for whether current build in AutoGen phase or not.
