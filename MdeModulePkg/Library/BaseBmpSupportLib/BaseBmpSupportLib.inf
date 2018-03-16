@@ -1,4 +1,5 @@
 ## @file
+# Base library to support BMP graphics image conversion.
 #
 # Provides services to convert a BMP graphics image to a GOP BLT buffer and
 # from a GOP BLT buffer to a BMP graphics image.

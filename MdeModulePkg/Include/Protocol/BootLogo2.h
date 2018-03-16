@@ -1,4 +1,4 @@
-/**
+/** @file
 Boot Logo 2 Protocol is used to convey information of Logo dispayed during boot.
 
 The Boot Logo 2 Protocol is a replacement for the Boot Logo Protocol.  If a
