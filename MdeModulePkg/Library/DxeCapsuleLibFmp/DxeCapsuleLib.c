@@ -330,8 +330,25 @@ DisplayCapsuleImage (
   UINTN                         Width;
   EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
 
-  ImagePayload = (DISPLAY_DISPLAY_PAYLOAD *)(CapsuleHeader + 1);
-  PayloadSize = CapsuleHeader->CapsuleImageSize - sizeof(EFI_CAPSULE_HEADER);
+  //
+  // UX capsule doesn't have extended header entries.
+  //
+  if (CapsuleHeader->HeaderSize != sizeof (EFI_CAPSULE_HEADER)) {
+    return EFI_UNSUPPORTED;
+  }
+  ImagePayload = (DISPLAY_DISPLAY_PAYLOAD *)((UINTN) CapsuleHeader + CapsuleHeader->HeaderSize);
+  //
+  // (CapsuleImageSize > HeaderSize) is guaranteed by IsValidCapsuleHeader().
+  //
+  PayloadSize = CapsuleHeader->CapsuleImageSize - CapsuleHeader->HeaderSize;
+
+  //
+  // Make sure the image payload at least contain the DISPLAY_DISPLAY_PAYLOAD header.
+  // Further size check is performed by the logic translating BMP to GOP BLT.
+  //
+  if (PayloadSize <= sizeof (DISPLAY_DISPLAY_PAYLOAD)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (ImagePayload->Version != 1) {
     return EFI_UNSUPPORTED;
