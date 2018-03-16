@@ -95,6 +95,67 @@ MAKEROOT ?= $(EDK_TOOLS_PATH)/Source/C
 LIBS = -lCommon
 '''
 
+## Regular expression for finding header file inclusions
+from AutoGen.GenMake import gIncludePattern
+
+## Find dependencies for one source file
+#
+#  By searching recursively "#include" directive in file, find out all the
+#  files needed by given source file. The dependecies will be only searched
+#  in given search path list.
+#
+#   @param      SearchPathList  The list of search path
+#
+#   @retval     list            The list of files the given source file depends on
+#
+def GetDependencyList(FileStack,SearchPathList):
+    DepDb = dict()
+    DependencySet = set(FileStack)
+    while len(FileStack) > 0:
+        F = FileStack.pop()
+        FullPathDependList = []
+        CurrentFileDependencyList = []
+        if F in DepDb:
+            CurrentFileDependencyList = DepDb[F]
+        else:
+            try:
+                Fd = open(F, 'r')
+                FileContent = Fd.read()
+            except BaseException, X:
+                EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=F + "\n\t" + str(X))
+            finally:
+                if "Fd" in dir(locals()):
+                    Fd.close()
+
+            if len(FileContent) == 0:
+                continue
+
+            if FileContent[0] == 0xff or FileContent[0] == 0xfe:
+                FileContent = unicode(FileContent, "utf-16")
+            IncludedFileList = gIncludePattern.findall(FileContent)
+
+            for Inc in IncludedFileList:
+                Inc = Inc.strip()
+                Inc = os.path.normpath(Inc)
+                CurrentFileDependencyList.append(Inc)
+            DepDb[F] = CurrentFileDependencyList
+
+        CurrentFilePath = os.path.dirname(F)
+        PathList = [CurrentFilePath] + SearchPathList
+        for Inc in CurrentFileDependencyList:
+            for SearchPath in PathList:
+                FilePath = os.path.join(SearchPath, Inc)
+                if not os.path.exists(FilePath):
+                    continue
+                if FilePath not in DependencySet:
+                    FileStack.append(FilePath)
+                    FullPathDependList.append(FilePath)
+                break
+        DependencySet.update(FullPathDependList)
+    DependencyList = list(DependencySet)  # remove duplicate ones
+
+    return DependencyList
+
 class DscBuildData(PlatformBuildClassObject):
     # dict used to convert PCD type in database to string used by build tool
     _PCD_TYPE_STRING_ = {
@@ -1918,11 +1979,13 @@ class DscBuildData(PlatformBuildClassObject):
         CApp = PcdMainCHeader
 
         Includes = {}
+        IncludeFiles = set()
         for PcdName in StructuredPcds:
             Pcd = StructuredPcds[PcdName]
             for IncludeFile in Pcd.StructuredPcdIncludeFile:
                 if IncludeFile not in Includes:
                     Includes[IncludeFile] = True
+                    IncludeFiles.add(IncludeFile)
                     CApp = CApp + '#include <%s>\n' % (IncludeFile)
         CApp = CApp + '\n'
         for PcdName in StructuredPcds:
@@ -1981,6 +2044,7 @@ class DscBuildData(PlatformBuildClassObject):
             MakeApp = MakeApp + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o\n' % (self.OutputPath, PcdValueInitName) + \
                       'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'INCLUDE +='
 
+        IncSearchList = []
         PlatformInc = {}
         for Cache in self._Bdb._CACHE_.values():
             if Cache.MetaFile.Ext.lower() != '.dec':
@@ -2003,6 +2067,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if pkg in PlatformInc:
                     for inc in PlatformInc[pkg]:
                         MakeApp += '-I'  + str(inc) + ' '
+                        IncSearchList.append(inc)
         MakeApp = MakeApp + '\n'
 
         CC_FLAGS = LinuxCFLAGS
@@ -2050,7 +2115,23 @@ class DscBuildData(PlatformBuildClassObject):
 
         if sys.platform == "win32":
             MakeApp = MakeApp + PcdMakefileEnd
+        MakeApp = MakeApp + '\n'
+        IncludeFileFullPaths = []
+        for includefile in IncludeFiles:
+            for includepath in IncSearchList:
+                includefullpath = os.path.join(str(includepath),includefile)
+                if os.path.exists(includefullpath):
+                    IncludeFileFullPaths.append(os.path.normpath(includefullpath))
+                    break
+        SearchPathList = []
+        SearchPathList.append(os.path.normpath(mws.join(GlobalData.gWorkspace, "BaseTools/Source/C/Include")))
+        SearchPathList.append(os.path.normpath(mws.join(GlobalData.gWorkspace, "BaseTools/Source/C/Common")))
+        SearchPathList.extend([str(item) for item in IncSearchList])
+        IncFileList = GetDependencyList(IncludeFileFullPaths,SearchPathList)
+        for include_file in IncFileList:
+            MakeApp += "$(OBJECTS) : %s\n" % include_file
         MakeFileName = os.path.join(self.OutputPath, 'Makefile')
+        MakeApp += "$(OBJECTS) : %s\n" % MakeFileName
         SaveFileOnChange(MakeFileName, MakeApp, False)
 
         InputValueFile = os.path.join(self.OutputPath, 'Input.txt')
@@ -2062,59 +2143,61 @@ class DscBuildData(PlatformBuildClassObject):
             PcdValueInitExe = os.path.join(os.getenv("EDK_TOOLS_PATH"), 'Source', 'C', 'bin', PcdValueInitName)
         else:
             PcdValueInitExe = os.path.join(os.getenv("EDK_TOOLS_PATH"), 'Bin', 'Win32', PcdValueInitName) +".exe"
-        if not os.path.exists(PcdValueInitExe) or self.NeedUpdateOutput(OutputValueFile, CAppBaseFileName + '.c',MakeFileName,InputValueFile):
-            Messages = ''
-            if sys.platform == "win32":
-                MakeCommand = 'nmake clean & nmake -f %s' % (MakeFileName)
-                returncode, StdOut, StdErr = self.ExecuteCommand (MakeCommand)
-                Messages = StdOut
+
+        Messages = ''
+        if sys.platform == "win32":
+            MakeCommand = 'nmake -f %s' % (MakeFileName)
+            returncode, StdOut, StdErr = self.ExecuteCommand (MakeCommand)
+            Messages = StdOut
+        else:
+            MakeCommand = 'make -f %s' % (MakeFileName)
+            returncode, StdOut, StdErr = self.ExecuteCommand (MakeCommand)
+            Messages = StdErr
+        Messages = Messages.split('\n')
+        MessageGroup = []
+        if returncode <>0:
+            CAppBaseFileName = os.path.join(self.OutputPath, PcdValueInitName)
+            File = open (CAppBaseFileName + '.c', 'r')
+            FileData = File.readlines()
+            File.close()
+            for Message in Messages:
+                if " error" in Message or "warning" in Message:
+                    FileInfo = Message.strip().split('(')
+                    if len (FileInfo) > 1:
+                        FileName = FileInfo [0]
+                        FileLine = FileInfo [1].split (')')[0]
+                    else:
+                        FileInfo = Message.strip().split(':')
+                        FileName = FileInfo [0]
+                        FileLine = FileInfo [1]
+                    if FileLine.isdigit():
+                        error_line = FileData[int (FileLine) - 1]
+                        if r"//" in error_line:
+                            c_line,dsc_line = error_line.split(r"//")
+                        else:
+                            dsc_line = error_line
+                        message_itmes = Message.split(":")
+                        Index = 0
+                        if "PcdValueInit.c" not in Message:
+                            if not MessageGroup:
+                                MessageGroup.append(Message)
+                            break
+                        else:
+                            for item in message_itmes:
+                                if "PcdValueInit.c" in item:
+                                    Index = message_itmes.index(item)
+                                    message_itmes[Index] = dsc_line.strip()
+                                    break
+                            MessageGroup.append(":".join(message_itmes[Index:]).strip())
+                            continue
+                    else:
+                        MessageGroup.append(Message)
+            if MessageGroup:
+                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "\n".join(MessageGroup) )
             else:
-                MakeCommand = 'make clean & make -f %s' % (MakeFileName)
-                returncode, StdOut, StdErr = self.ExecuteCommand (MakeCommand)
-                Messages = StdErr
-            Messages = Messages.split('\n')
-            MessageGroup = []
-            if returncode <>0:
-                CAppBaseFileName = os.path.join(self.OutputPath, PcdValueInitName)
-                File = open (CAppBaseFileName + '.c', 'r')
-                FileData = File.readlines()
-                File.close()
-                for Message in Messages:
-                    if " error" in Message or "warning" in Message:
-                        FileInfo = Message.strip().split('(')
-                        if len (FileInfo) > 1:
-                            FileName = FileInfo [0]
-                            FileLine = FileInfo [1].split (')')[0]
-                        else:
-                            FileInfo = Message.strip().split(':')
-                            FileName = FileInfo [0]
-                            FileLine = FileInfo [1]
-                        if FileLine.isdigit():
-                            error_line = FileData[int (FileLine) - 1]
-                            if r"//" in error_line:
-                                c_line,dsc_line = error_line.split(r"//")
-                            else:
-                                dsc_line = error_line
-                            message_itmes = Message.split(":")
-                            Index = 0
-                            if "PcdValueInit.c" not in Message:
-                                if not MessageGroup:
-                                    MessageGroup.append(Message)
-                                break
-                            else:
-                                for item in message_itmes:
-                                    if "PcdValueInit.c" in item:
-                                        Index = message_itmes.index(item)
-                                        message_itmes[Index] = dsc_line.strip()
-                                        break
-                                MessageGroup.append(":".join(message_itmes[Index:]).strip())
-                                continue
-                        else:
-                            MessageGroup.append(Message)
-                if MessageGroup:
-                    EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "\n".join(MessageGroup) )
-                else:
-                    EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s' % MakeCommand)
+                EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s' % MakeCommand)
+
+        if self.NeedUpdateOutput(OutputValueFile, PcdValueInitExe ,InputValueFile):
             Command = PcdValueInitExe + ' -i %s -o %s' % (InputValueFile, OutputValueFile)
             returncode, StdOut, StdErr = self.ExecuteCommand (Command)
             if returncode <> 0:
@@ -2131,12 +2214,10 @@ class DscBuildData(PlatformBuildClassObject):
             StructurePcdSet.append((PcdInfo[0],PcdInfo[1], PcdInfo[2], PcdInfo[3], PcdValue[2].strip()))
         return StructurePcdSet
 
-    def NeedUpdateOutput(self,OutputFile, ValueCFile, MakeFile, StructureInput):
+    def NeedUpdateOutput(self,OutputFile, ValueCFile, StructureInput):
         if not os.path.exists(OutputFile):
             return True
         if os.stat(OutputFile).st_mtime <= os.stat(ValueCFile).st_mtime:
-            return True
-        if os.stat(OutputFile).st_mtime <= os.stat(MakeFile).st_mtime:
             return True
         if os.stat(OutputFile).st_mtime <= os.stat(StructureInput).st_mtime:
             return True
