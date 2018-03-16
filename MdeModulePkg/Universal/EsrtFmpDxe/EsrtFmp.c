@@ -38,9 +38,12 @@
 #include <Guid/EventGroup.h>
 #include <Guid/SystemResourceTable.h>
 
-//
-// Print ESRT to debug console
-//
+/**
+ Print ESRT to debug console.
+
+ @param[in]  Table   Pointer to the ESRT table.
+
+**/
 VOID
 EFIAPI
 PrintTable (
@@ -131,6 +134,9 @@ IsSystemFmp (
   Function to create a single ESRT Entry and add it to the ESRT
   given a FMP descriptor.  If the guid is already in the ESRT it
   will be ignored.  The ESRT will grow if it does not have enough room.
+
+  @param[in]  FmpImageInfoBuf    Pointer to the EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+  @param[in]  FmpVersion         FMP Version.
 
   @return  Status code.
 

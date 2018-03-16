@@ -34,7 +34,7 @@
 #include <Guid/SystemResourceTable.h>
 
 /**
-  Function to print a single ESRT Entry (ESRE) to the debug console
+  Function to print a single ESRT Entry (ESRE) to the debug console.
 
   Print Format:
   | 00000000-0000-0000-0000-000000000000 | SSSSSSSSSSSS | 0x00000000 | 0x00000000 | 0x00000000 | 0x00000000 | 0x00000000 |
@@ -101,7 +101,7 @@ PrintOutEsrtEntry (
 }
 
 /**
-  Function to print the ESRT table to the debug console
+  Function to print the ESRT table to the debug console.
 
   @param[in]  Table  - Pointer to the ESRT table
 **/
