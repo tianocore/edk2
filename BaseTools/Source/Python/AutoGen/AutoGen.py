@@ -4064,7 +4064,7 @@ class ModuleAutoGen(AutoGen):
         OutputDir = self.OutputDir.replace('\\', '/').strip('/')
         DebugDir = self.DebugDir.replace('\\', '/').strip('/')
         for Item in self.CodaTargetList:
-            File = Item.Target.Path.replace('\\', '/').strip('/').replace(DebugDir, '').strip('/')
+            File = Item.Target.Path.replace('\\', '/').strip('/').replace(DebugDir, '').replace(OutputDir, '').strip('/')
             if File not in self.OutputFile:
                 self.OutputFile.append(File)
             if os.path.isabs(File):
