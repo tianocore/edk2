@@ -2354,6 +2354,7 @@ class PlatformAutoGen(AutoGen):
 
             if FromPcd.MaxDatumSize:
                 ToPcd.MaxDatumSize = FromPcd.MaxDatumSize
+                ToPcd.MaxSizeUserSet = FromPcd.MaxDatumSize
             if FromPcd.DefaultValue:
                 ToPcd.DefaultValue = FromPcd.DefaultValue
             if FromPcd.TokenValue:
@@ -2456,6 +2457,7 @@ class PlatformAutoGen(AutoGen):
         for Name, Guid in Pcds:
             Pcd = Pcds[Name, Guid]
             if Pcd.DatumType == "VOID*" and Pcd.MaxDatumSize in ['', None]:
+                Pcd.MaxSizeUserSet = None
                 Value = Pcd.DefaultValue
                 if Value in [None, '']:
                     Pcd.MaxDatumSize = '1'
@@ -4157,9 +4159,12 @@ class ModuleAutoGen(AutoGen):
                             Padding = Padding * 2
                             ArraySize = ArraySize / 2
                         if ArraySize < (len(PcdValue) + 1):
-                            EdkLogger.error("build", AUTOGEN_ERROR,
+                            if Pcd.MaxSizeUserSet:
+                                EdkLogger.error("build", AUTOGEN_ERROR,
                                             "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, TokenCName)
                                             )
+                            else:
+                                ArraySize = len(PcdValue) + 1
                         if ArraySize > len(PcdValue) + 1:
                             NewValue = NewValue + Padding * (ArraySize - len(PcdValue) - 1)
                         PcdValue = NewValue + Padding.strip().rstrip(',') + '}'
@@ -4167,9 +4172,12 @@ class ModuleAutoGen(AutoGen):
                         PcdValue = PcdValue.rstrip('}') + ', 0x00' * (ArraySize - len(PcdValue.split(',')))
                         PcdValue += '}'
                     else:
-                        EdkLogger.error("build", AUTOGEN_ERROR,
+                        if Pcd.MaxSizeUserSet:
+                            EdkLogger.error("build", AUTOGEN_ERROR,
                                         "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, TokenCName)
                                         )
+                        else:
+                            ArraySize = len(PcdValue) + 1
                 PcdItem = '%s.%s|%s|0x%X' % \
                     (Pcd.TokenSpaceGuidCName, TokenCName, PcdValue, PatchPcd[1])
                 PcdComments = ''

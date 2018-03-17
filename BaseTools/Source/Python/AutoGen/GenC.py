@@ -1109,9 +1109,14 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                     ArraySize = ArraySize / 2;
 
                 if ArraySize < (len(Value) + 1):
-                    EdkLogger.error("build", AUTOGEN_ERROR,
+                    if Pcd.MaxSizeUserSet:
+                        EdkLogger.error("build", AUTOGEN_ERROR,
                                     "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, TokenCName),
                                     ExtraData="[%s]" % str(Info))
+                    else:
+                        ArraySize = GetPcdSize(Pcd)
+                        if Unicode:
+                            ArraySize = ArraySize / 2
                 Value = NewValue + '0 }'
             Array = '[%d]' % ArraySize
         #
