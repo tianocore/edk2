@@ -481,7 +481,7 @@ DumpVtdRegs (
       SourceId.Uint16 = (UINT16)FrcdReg.Bits.SID;
       DEBUG((DEBUG_INFO, "    Source - B%02x D%02x F%02x\n", SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
       DEBUG((DEBUG_INFO, "    Type - %x (%a)\n", FrcdReg.Bits.T, FrcdReg.Bits.T ? "read" : "write"));
-      DEBUG((DEBUG_INFO, "    Reason - %x\n", FrcdReg.Bits.FR));
+      DEBUG((DEBUG_INFO, "    Reason - %x (Refer to VTd Spec, Appendix A)\n", FrcdReg.Bits.FR));
     }
   }
 
