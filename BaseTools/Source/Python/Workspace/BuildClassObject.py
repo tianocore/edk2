@@ -69,6 +69,7 @@ class PcdClassObject(object):
         if IsDsc:
             self.DscDefaultValue = Value
         self.PcdValueFromComm = ""
+        self.DefinitionPosition = ("","")
 
     ## Convert the class to a string
     #
@@ -178,6 +179,7 @@ class StructurePcd(PcdClassObject):
         self.expressions = PcdObject.expressions if PcdObject.expressions else self.expressions
         self.DscRawValue = PcdObject.DscRawValue if PcdObject.DscRawValue else self.DscRawValue
         self.PcdValueFromComm = PcdObject.PcdValueFromComm if PcdObject.PcdValueFromComm else self.PcdValueFromComm
+        self.DefinitionPosition = PcdObject.DefinitionPosition if PcdObject.DefinitionPosition else self.DefinitionPosition
         if type(PcdObject) is StructurePcd:
             self.StructuredPcdIncludeFile = PcdObject.StructuredPcdIncludeFile if PcdObject.StructuredPcdIncludeFile else self.StructuredPcdIncludeFile
             self.PackageDecs = PcdObject.PackageDecs if PcdObject.PackageDecs else self.PackageDecs

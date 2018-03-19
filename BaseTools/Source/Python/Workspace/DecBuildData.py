@@ -394,11 +394,7 @@ class DecBuildData(PackageBuildClassObject):
                     struct_pcd.AddDefaultValue(item.TokenCName, item.DefaultValue,self.MetaFile.File,LineNo)
 
             struct_pcd.PackageDecs = dep_pkgs
-            if not struct_pcd.StructuredPcdIncludeFile:
-                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "The structure Pcd %s.%s header file is not found in %s line %s \n" % (struct_pcd.TokenSpaceGuidCName, struct_pcd.TokenCName,self.MetaFile.File,LineNo ))
-
             str_pcd_set.append(struct_pcd)
-
         return str_pcd_set
 
     ## Retrieve PCD declarations for given type
@@ -446,6 +442,7 @@ class DecBuildData(PackageBuildClassObject):
                                         list(validlists),
                                         list(expressions)
                                         )
+            PcdObj.DefinitionPosition = (self.MetaFile.File,LineNo)
             if "." in TokenSpaceGuid:
                 StrPcdSet.append((PcdObj,LineNo))
             else:
@@ -454,6 +451,14 @@ class DecBuildData(PackageBuildClassObject):
         StructurePcds = self.ProcessStructurePcd(StrPcdSet)
         for pcd in StructurePcds:
             Pcds[pcd.TokenCName, pcd.TokenSpaceGuidCName, self._PCD_TYPE_STRING_[Type]] = pcd
+        StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*$')
+        for pcd in Pcds.values():
+            if pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
+                if StructPattern.match(pcd.DatumType) == None:
+                    EdkLogger.error('build', FORMAT_INVALID, "DatumType only support BOOLEAN, UINT8, UINT16, UINT32, UINT64, VOID* or a valid struct name.", pcd.DefinitionPosition[0],pcd.DefinitionPosition[1])
+        for struct_pcd in Pcds.values():
+            if isinstance(struct_pcd,StructurePcd) and not struct_pcd.StructuredPcdIncludeFile:
+                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "The structure Pcd %s.%s header file is not found in %s line %s \n" % (struct_pcd.TokenSpaceGuidCName, struct_pcd.TokenCName,struct_pcd.DefinitionPosition[0],struct_pcd.DefinitionPosition[1] ))
 
         return Pcds
     @property
