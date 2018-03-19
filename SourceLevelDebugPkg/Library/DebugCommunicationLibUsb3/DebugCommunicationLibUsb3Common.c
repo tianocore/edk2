@@ -673,11 +673,19 @@ InitializeUsbDebugHardware (
   UINTN                           Index;
   UINT8                           TotalUsb3Port;
   EFI_PHYSICAL_ADDRESS            XhciOpRegister;
+  UINT32                          Dcddi1;
 
   XhciOpRegister = Handle->XhciOpRegister;
   TotalUsb3Port = MmioRead32 (((UINTN) Handle->XhciMmioBase + XHC_HCSPARAMS1_OFFSET)) >> 24;
 
   if (Handle->Initialized == USB3DBG_NOT_ENABLED) {
+    Dcddi1 = XhcReadDebugReg (Handle,XHC_DC_DCDDI1);
+    if (Dcddi1 != (UINT32)((XHCI_DEBUG_DEVICE_VENDOR_ID << 16) | XHCI_DEBUG_DEVICE_PROTOCOL)) {
+      //
+      // The debug capability has been reset by other code, return device error.
+      //
+      return EFI_DEVICE_ERROR;
+    }
     //
     // If XHCI supports debug capability, hardware resource has been allocated, 
     // but it has not been enabled, try to enable again.
