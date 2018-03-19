@@ -1,7 +1,7 @@
 /** @file
   DXE Core Main Entry Point
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -805,6 +805,8 @@ CoreExitBootServices (
     (EFI_SOFTWARE_EFI_BOOT_SERVICE | EFI_SW_BS_PC_EXIT_BOOT_SERVICES)
     );
 
+  MemoryProtectionExitBootServicesCallback();
+
   //
   // Disable interrupt of Debug timer.
   //
@@ -814,8 +816,6 @@ CoreExitBootServices (
   // Disable CPU Interrupts
   //
   gCpu->DisableInterrupt (gCpu);
-
-  MemoryProtectionExitBootServicesCallback();
 
   //
   // Clear the non-runtime values of the EFI System Table
