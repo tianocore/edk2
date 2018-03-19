@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -253,6 +253,7 @@ RendezvousFunnelProcEnd:
 global ASM_PFX(AsmRelocateApLoop)
 ASM_PFX(AsmRelocateApLoop):
 AsmRelocateApLoopStart:
+    cli                          ; Disable interrupt before switching to 32-bit mode
     mov        rax, [rsp + 40]   ; CountTofinish
     lock dec   dword [rax]       ; (*CountTofinish)--
     mov        rsp, r9
@@ -288,6 +289,7 @@ PmEntry:
     jnz        HltLoop
     mov        ebx, edx           ; Save C-State to ebx
 MwaitLoop:
+    cli
     mov        eax, esp           ; Set Monitor Address
     xor        ecx, ecx           ; ecx = 0
     xor        edx, edx           ; edx = 0
