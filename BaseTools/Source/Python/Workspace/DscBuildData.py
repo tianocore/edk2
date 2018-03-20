@@ -1272,7 +1272,8 @@ class DscBuildData(PlatformBuildClassObject):
                 if PcdInDec:
                     PcdInDec.PcdValueFromComm = NoFiledValues[(Guid,Name)][0]
                     if PcdInDec.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],
-                                        self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
+                                        self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE],
+                                        self._PCD_TYPE_STRING_[MODEL_PCD_FEATURE_FLAG]]:
                         self.Pcds[Name, Guid] = copy.deepcopy(PcdInDec)
                         self.Pcds[Name, Guid].DefaultValue = NoFiledValues[( Guid,Name)][0]
         return AllPcds
