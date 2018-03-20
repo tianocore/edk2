@@ -1254,19 +1254,6 @@ class DscBuildData(PlatformBuildClassObject):
                             SkuInfo.HiiDefaultValue = NoFiledValues[(Pcd.TokenSpaceGuidCName,Pcd.TokenCName)][0]
                             for defaultstore in SkuInfo.DefaultStoreDict:
                                 SkuInfo.DefaultStoreDict[defaultstore] = NoFiledValues[(Pcd.TokenSpaceGuidCName,Pcd.TokenCName)][0]
-                    if Pcd.DatumType == "VOID*":
-                        if Pcd.MaxDatumSize is None:
-                            Pcd.MaxDatumSize = '0'
-                        MaxSize = int(Pcd.MaxDatumSize,10)
-                        if Pcd.DefaultValue.startswith("{") and Pcd.DefaultValue.endswith("}"):
-                            MaxSize = max([len(Pcd.DefaultValue.split(",")),MaxSize])
-                        elif Pcd.DefaultValue.startswith("\"") or Pcd.DefaultValue.startswith("\'"):
-                            MaxSize = max([len(Pcd.DefaultValue)-2+1,MaxSize])
-                        elif Pcd.DefaultValue.startswith("L\""):
-                            MaxSize = max([2*(len(Pcd.DefaultValue)-3+1),MaxSize])
-                        else:
-                            MaxSize = max([len(Pcd.DefaultValue),MaxSize])
-                        Pcd.MaxDatumSize = str(MaxSize)
             else:
                 PcdInDec = self.DecPcds.get((Name,Guid))
                 if PcdInDec:
