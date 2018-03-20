@@ -1,7 +1,7 @@
 /** @file
   Implement TPM2 Object related command.
 
-Copyright (c) 2017, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -109,11 +109,25 @@ Tpm2ReadPublic (
   // Basic check
   //
   OutPublicSize = SwapBytes16 (RecvBuffer.OutPublic.size);
+  if (OutPublicSize > sizeof(TPMT_PUBLIC)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2ReadPublic - OutPublicSize error %x\n", OutPublicSize));
+    return EFI_DEVICE_ERROR;
+  }
+
   NameSize = SwapBytes16 (ReadUnaligned16 ((UINT16 *)((UINT8 *)&RecvBuffer + sizeof(TPM2_RESPONSE_HEADER) +
                           sizeof(UINT16) + OutPublicSize)));
+  if (NameSize > sizeof(TPMU_NAME)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2ReadPublic - NameSize error %x\n", NameSize));
+    return EFI_DEVICE_ERROR;
+  }
+
   QualifiedNameSize = SwapBytes16 (ReadUnaligned16 ((UINT16 *)((UINT8 *)&RecvBuffer + sizeof(TPM2_RESPONSE_HEADER) +
                                    sizeof(UINT16) + OutPublicSize +
                                    sizeof(UINT16) + NameSize)));
+  if (QualifiedNameSize > sizeof(TPMU_NAME)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2ReadPublic - QualifiedNameSize error %x\n", QualifiedNameSize));
+    return EFI_DEVICE_ERROR;
+  }
 
   if (RecvBufferSize != sizeof(TPM2_RESPONSE_HEADER) + sizeof(UINT16) + OutPublicSize + sizeof(UINT16) + NameSize + sizeof(UINT16) + QualifiedNameSize) {
     DEBUG ((DEBUG_ERROR, "Tpm2ReadPublic - RecvBufferSize %x Error - OutPublicSize %x, NameSize %x, QualifiedNameSize %x\n", RecvBufferSize, OutPublicSize, NameSize, QualifiedNameSize));
@@ -132,6 +146,11 @@ Tpm2ReadPublic (
   Buffer = (UINT8 *)&RecvBuffer.OutPublic.publicArea.authPolicy;
   OutPublic->publicArea.authPolicy.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
   Buffer += sizeof(UINT16);
+  if (OutPublic->publicArea.authPolicy.size > sizeof(TPMU_HA)) {
+    DEBUG ((DEBUG_ERROR, "Tpm2ReadPublic - authPolicy.size error %x\n", OutPublic->publicArea.authPolicy.size));
+    return EFI_DEVICE_ERROR;
+  }
+
   CopyMem (OutPublic->publicArea.authPolicy.buffer, Buffer, OutPublic->publicArea.authPolicy.size);
   Buffer += OutPublic->publicArea.authPolicy.size;
 
@@ -307,28 +326,48 @@ Tpm2ReadPublic (
   case TPM_ALG_KEYEDHASH:
     OutPublic->publicArea.unique.keyedHash.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
     Buffer += sizeof(UINT16);
+    if(OutPublic->publicArea.unique.keyedHash.size > sizeof(TPMU_HA)) {
+      DEBUG ((DEBUG_ERROR, "Tpm2ReadPublic - keyedHash.size error %x\n", OutPublic->publicArea.unique.keyedHash.size));
+      return EFI_DEVICE_ERROR;
+    }
     CopyMem (OutPublic->publicArea.unique.keyedHash.buffer, Buffer, OutPublic->publicArea.unique.keyedHash.size);
     Buffer += OutPublic->publicArea.unique.keyedHash.size;
     break;
   case TPM_ALG_SYMCIPHER:
     OutPublic->publicArea.unique.sym.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
     Buffer += sizeof(UINT16);
+    if(OutPublic->publicArea.unique.sym.size > sizeof(TPMU_HA)) {
+      DEBUG ((DEBUG_ERROR, "Tpm2ReadPublic - sym.size error %x\n", OutPublic->publicArea.unique.sym.size));
+      return EFI_DEVICE_ERROR;
+    }
     CopyMem (OutPublic->publicArea.unique.sym.buffer, Buffer, OutPublic->publicArea.unique.sym.size);
     Buffer += OutPublic->publicArea.unique.sym.size;
     break;
   case TPM_ALG_RSA:
     OutPublic->publicArea.unique.rsa.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
     Buffer += sizeof(UINT16);
+    if(OutPublic->publicArea.unique.rsa.size > MAX_RSA_KEY_BYTES) {
+      DEBUG ((DEBUG_ERROR, "Tpm2ReadPublic - rsa.size error %x\n", OutPublic->publicArea.unique.rsa.size));
+      return EFI_DEVICE_ERROR;
+    }
     CopyMem (OutPublic->publicArea.unique.rsa.buffer, Buffer, OutPublic->publicArea.unique.rsa.size);
     Buffer += OutPublic->publicArea.unique.rsa.size;
     break;
   case TPM_ALG_ECC:
     OutPublic->publicArea.unique.ecc.x.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
     Buffer += sizeof(UINT16);
+    if (OutPublic->publicArea.unique.ecc.x.size > MAX_ECC_KEY_BYTES) {
+      DEBUG ((DEBUG_ERROR, "Tpm2ReadPublic - ecc.x.size error %x\n", OutPublic->publicArea.unique.ecc.x.size));
+      return EFI_DEVICE_ERROR;
+    }
     CopyMem (OutPublic->publicArea.unique.ecc.x.buffer, Buffer, OutPublic->publicArea.unique.ecc.x.size);
     Buffer += OutPublic->publicArea.unique.ecc.x.size;
     OutPublic->publicArea.unique.ecc.y.size = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
     Buffer += sizeof(UINT16);
+    if (OutPublic->publicArea.unique.ecc.y.size > MAX_ECC_KEY_BYTES) {
+      DEBUG ((DEBUG_ERROR, "Tpm2ReadPublic - ecc.y.size error %x\n", OutPublic->publicArea.unique.ecc.y.size));
+      return EFI_DEVICE_ERROR;
+    }
     CopyMem (OutPublic->publicArea.unique.ecc.y.buffer, Buffer, OutPublic->publicArea.unique.ecc.y.size);
     Buffer += OutPublic->publicArea.unique.ecc.y.size;
     break;
