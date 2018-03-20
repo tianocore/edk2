@@ -1,7 +1,7 @@
 /** @file
   Implement TPM2 Integrity related command.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -279,6 +279,11 @@ Tpm2PcrEvent (
   Buffer = (UINT8 *)&Res.Digests;
 
   Digests->count = SwapBytes32 (ReadUnaligned32 ((UINT32 *)Buffer));
+  if (Digests->count > HASH_COUNT) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PcrEvent - Digests->count error %x\n", Digests->count));
+    return EFI_DEVICE_ERROR;
+  }
+
   Buffer += sizeof(UINT32);
   for (Index = 0; Index < Digests->count; Index++) {
     Digests->digests[Index].hashAlg = SwapBytes16 (ReadUnaligned16 ((UINT16 *)Buffer));
@@ -383,6 +388,11 @@ Tpm2PcrRead (
     return EFI_DEVICE_ERROR;
   }
   PcrSelectionOut->count = SwapBytes32(RecvBuffer.PcrSelectionOut.count);
+  if (PcrSelectionOut->count > HASH_COUNT) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - PcrSelectionOut->count error %x\n", PcrSelectionOut->count));
+    return EFI_DEVICE_ERROR;
+  }
+
   if (RecvBufferSize < sizeof (TPM2_RESPONSE_HEADER) + sizeof(RecvBuffer.PcrUpdateCounter) + sizeof(RecvBuffer.PcrSelectionOut.count) + sizeof(RecvBuffer.PcrSelectionOut.pcrSelections[0]) * PcrSelectionOut->count) {
     DEBUG ((EFI_D_ERROR, "Tpm2PcrRead - RecvBufferSize Error - %x\n", RecvBufferSize));
     return EFI_DEVICE_ERROR;
@@ -390,6 +400,9 @@ Tpm2PcrRead (
   for (Index = 0; Index < PcrSelectionOut->count; Index++) {
     PcrSelectionOut->pcrSelections[Index].hash = SwapBytes16(RecvBuffer.PcrSelectionOut.pcrSelections[Index].hash);
     PcrSelectionOut->pcrSelections[Index].sizeofSelect = RecvBuffer.PcrSelectionOut.pcrSelections[Index].sizeofSelect;
+    if (PcrSelectionOut->pcrSelections[Index].sizeofSelect > PCR_SELECT_MAX) {
+      return EFI_DEVICE_ERROR;
+    }
     CopyMem (&PcrSelectionOut->pcrSelections[Index].pcrSelect, &RecvBuffer.PcrSelectionOut.pcrSelections[Index].pcrSelect, PcrSelectionOut->pcrSelections[Index].sizeofSelect);
   }
 
@@ -398,9 +411,20 @@ Tpm2PcrRead (
   //
   PcrValuesOut = (TPML_DIGEST *)((UINT8 *)&RecvBuffer + sizeof (TPM2_RESPONSE_HEADER) + sizeof(RecvBuffer.PcrUpdateCounter) + sizeof(RecvBuffer.PcrSelectionOut.count) + sizeof(RecvBuffer.PcrSelectionOut.pcrSelections[0]) * PcrSelectionOut->count);
   PcrValues->count = SwapBytes32(PcrValuesOut->count);
+  //
+  // The number of digests in list is not greater than 8 per TPML_DIGEST definition
+  //
+  if (PcrValues->count > 8) {
+    DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - PcrValues->count error %x\n", PcrValues->count));
+    return EFI_DEVICE_ERROR;
+  }
   Digests = PcrValuesOut->digests;
   for (Index = 0; Index < PcrValues->count; Index++) {
     PcrValues->digests[Index].size = SwapBytes16(Digests->size);
+    if (PcrValues->digests[Index].size > sizeof(TPMU_HA)) {
+      DEBUG ((DEBUG_ERROR, "Tpm2PcrRead - Digest.size error %x\n", PcrValues->digests[Index].size));
+      return EFI_DEVICE_ERROR;
+    }
     CopyMem (&PcrValues->digests[Index].buffer, &Digests->buffer, PcrValues->digests[Index].size);
     Digests = (TPM2B_DIGEST *)((UINT8 *)Digests + sizeof(Digests->size) + PcrValues->digests[Index].size);
   }
