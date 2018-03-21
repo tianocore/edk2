@@ -933,6 +933,18 @@ BdsEntry (
   PERF_START (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
   PlatformBootManagerAfterConsole ();
   PERF_END   (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
+
+  //
+  // If any component set PcdTestKeyUsed to TRUE because use of a test key
+  // was detected, then display a warning message on the debug log and the console
+  //
+  if (PcdGetBool (PcdTestKeyUsed)) {
+    DEBUG ((DEBUG_ERROR, "**********************************\n"));
+    DEBUG ((DEBUG_ERROR, "**  WARNING: Test Key is used.  **\n"));
+    DEBUG ((DEBUG_ERROR, "**********************************\n"));
+    Print (L"**  WARNING: Test Key is used.  **\n");
+  }
+
   //
   // Boot to Boot Manager Menu when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
   //
