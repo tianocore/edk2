@@ -1,7 +1,7 @@
 ## @file
 # This file is used to be the c coding style checking of ECC tool
 #
-# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1858,7 +1858,13 @@ def CheckDeclNoUseCType(FullFileName):
     for Result in ResultSet:
         for Type in CTypeTuple:
             if PatternInModifier(Result[0], Type):
-                PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE, 'Variable type %s' % Type, FileTable, Result[2])
+                if EccGlobalData.gException.IsException(ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE,
+                                                        Result[0] + ' ' + Result[1]):
+                    continue
+                PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE,
+                              'Invalid variable type (%s) in definition [%s]' % (Type, Result[0] + ' ' + Result[1]),
+                              FileTable,
+                              Result[2])
                 break
 
     SqlStatement = """ select Modifier, Name, ID, Value
