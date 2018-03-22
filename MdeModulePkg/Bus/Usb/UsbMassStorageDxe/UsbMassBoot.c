@@ -814,11 +814,13 @@ UsbBootReadBlocks (
   USB_BOOT_READ10_CMD       ReadCmd;
   EFI_STATUS                Status;
   UINT16                    Count;
+  UINT16                    CountMax;
   UINT32                    BlockSize;
   UINT32                    ByteSize;
   UINT32                    Timeout;
 
   BlockSize = UsbMass->BlockIoMedia.BlockSize;
+  CountMax = (UINT16)(USB_BOOT_MAX_CARRY_SIZE / BlockSize);
   Status    = EFI_SUCCESS;
 
   while (TotalBlock > 0) {
@@ -827,7 +829,7 @@ UsbBootReadBlocks (
     // on the device. We must split the total block because the READ10
     // command only has 16 bit transfer length (in the unit of block).
     //
-    Count     = (UINT16)((TotalBlock < USB_BOOT_IO_BLOCKS) ? TotalBlock : USB_BOOT_IO_BLOCKS);
+    Count     = (UINT16)((TotalBlock < CountMax) ? TotalBlock : CountMax);
     ByteSize  = (UINT32)Count * BlockSize;
 
     //
@@ -890,11 +892,13 @@ UsbBootWriteBlocks (
   USB_BOOT_WRITE10_CMD  WriteCmd;
   EFI_STATUS            Status;
   UINT16                Count;
+  UINT16                CountMax;
   UINT32                BlockSize;
   UINT32                ByteSize;
   UINT32                Timeout;
 
   BlockSize = UsbMass->BlockIoMedia.BlockSize;
+  CountMax = (UINT16)(USB_BOOT_MAX_CARRY_SIZE / BlockSize);
   Status    = EFI_SUCCESS;
 
   while (TotalBlock > 0) {
@@ -903,7 +907,7 @@ UsbBootWriteBlocks (
     // on the device. We must split the total block because the WRITE10
     // command only has 16 bit transfer length (in the unit of block).
     //
-    Count     = (UINT16)((TotalBlock < USB_BOOT_IO_BLOCKS) ? TotalBlock : USB_BOOT_IO_BLOCKS);
+    Count     = (UINT16)((TotalBlock < CountMax) ? TotalBlock : CountMax);
     ByteSize  = (UINT32)Count * BlockSize;
 
     //
@@ -966,18 +970,20 @@ UsbBootReadBlocks16 (
   UINT8                     ReadCmd[16];
   EFI_STATUS                Status;
   UINT16                    Count;
+  UINT16                    CountMax;
   UINT32                    BlockSize;
   UINT32                    ByteSize;
   UINT32                    Timeout;
 
   BlockSize = UsbMass->BlockIoMedia.BlockSize;
+  CountMax = (UINT16)(USB_BOOT_MAX_CARRY_SIZE / BlockSize);
   Status    = EFI_SUCCESS;
 
   while (TotalBlock > 0) {
     //
     // Split the total blocks into smaller pieces.
     //
-    Count     = (UINT16)((TotalBlock < USB_BOOT_IO_BLOCKS) ? TotalBlock : USB_BOOT_IO_BLOCKS);
+    Count     = (UINT16)((TotalBlock < CountMax) ? TotalBlock : CountMax);
     ByteSize  = (UINT32)Count * BlockSize;
 
     //
@@ -1040,18 +1046,20 @@ UsbBootWriteBlocks16 (
   UINT8                 WriteCmd[16];
   EFI_STATUS            Status;
   UINT16                Count;
+  UINT16                CountMax;
   UINT32                BlockSize;
   UINT32                ByteSize;
   UINT32                Timeout;
 
   BlockSize = UsbMass->BlockIoMedia.BlockSize;
+  CountMax = (UINT16)(USB_BOOT_MAX_CARRY_SIZE / BlockSize);
   Status    = EFI_SUCCESS;
 
   while (TotalBlock > 0) {
     //
     // Split the total blocks into smaller pieces.
     //
-    Count     = (UINT16)((TotalBlock < USB_BOOT_IO_BLOCKS) ? TotalBlock : USB_BOOT_IO_BLOCKS);
+    Count     = (UINT16)((TotalBlock < CountMax) ? TotalBlock : CountMax);
     ByteSize  = (UINT32)Count * BlockSize;
 
     //

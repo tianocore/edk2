@@ -65,9 +65,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_PDT_SIMPLE_DIRECT           0x0E       ///< Simplified direct access device
 
 //
-// Other parameters, Max carried size is 512B * 128 = 64KB
+// Other parameters, Max carried size is 64KB.
 //
-#define USB_BOOT_IO_BLOCKS              128
+#define USB_BOOT_MAX_CARRY_SIZE         SIZE_64KB
 
 //
 // Retry mass command times, set by experience
