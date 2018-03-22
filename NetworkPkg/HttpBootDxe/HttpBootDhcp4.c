@@ -332,8 +332,8 @@ HttpBootParseDhcp4Packet (
   // The offer with "HTTPClient" is a Http offer.
   //
   Option = Options[HTTP_BOOT_DHCP4_TAG_INDEX_CLASS_ID];
-  if ((Option != NULL) && (Option->Length >= 9) &&
-      (CompareMem (Option->Data, DEFAULT_CLASS_ID_DATA, 9) == 0)) {
+  if ((Option != NULL) && (Option->Length >= 10) &&
+      (CompareMem (Option->Data, DEFAULT_CLASS_ID_DATA, 10) == 0)) {
     IsHttpOffer = TRUE;
   }
 
