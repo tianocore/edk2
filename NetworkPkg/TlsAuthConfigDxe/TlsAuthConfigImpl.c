@@ -813,6 +813,7 @@ EnrollX509toVariable (
   CACert        = NULL;
   CACertData    = NULL;
   Data          = NULL;
+  Attr          = 0;
 
   Status = ReadFileContent (
              Private->FileContext->FHandle,
@@ -847,22 +848,22 @@ EnrollX509toVariable (
   CopyMem ((UINT8* ) (CACertData->SignatureData), X509Data, X509DataSize);
 
   //
-  // Check if signature database entry has been already existed.
-  // If true, use EFI_VARIABLE_APPEND_WRITE attribute to append the
-  // new signature data to original variable
+  // Check if the signature database entry already exists. If it does, use the
+  // EFI_VARIABLE_APPEND_WRITE attribute to append the new signature data to
+  // the original variable, plus preserve the original variable attributes.
   //
-  Attr = TLS_AUTH_CONFIG_VAR_BASE_ATTR;
-
   Status = gRT->GetVariable(
                   VariableName,
                   &gEfiTlsCaCertificateGuid,
-                  NULL,
+                  &Attr,
                   &DataSize,
                   NULL
                   );
   if (Status == EFI_BUFFER_TOO_SMALL) {
     Attr |= EFI_VARIABLE_APPEND_WRITE;
-  } else if (Status != EFI_NOT_FOUND) {
+  } else if (Status == EFI_NOT_FOUND) {
+    Attr = TLS_AUTH_CONFIG_VAR_BASE_ATTR;
+  } else {
     goto ON_EXIT;
   }
 
