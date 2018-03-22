@@ -75,6 +75,7 @@
 [Guids]
   gEfiTlsCaCertificateGuid                         ## SOMETIMES_CONSUMES  ## Variable:L"TlsCaCertificate"
   gEdkiiHttpTlsCipherListGuid                      ## SOMETIMES_CONSUMES  ## Variable:L"HttpTlsCipherList"
+  gEfiCertX509Guid                                 ## SOMETIMES_CONSUMES  ## GUID  # Check the cert type
 
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections       ## CONSUMES  

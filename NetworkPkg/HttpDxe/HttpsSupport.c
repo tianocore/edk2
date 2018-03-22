@@ -384,6 +384,7 @@ TlsConfigCertificate (
   UINT32              Index;
   EFI_SIGNATURE_LIST  *CertList;
   EFI_SIGNATURE_DATA  *Cert;
+  UINTN               CertArraySizeInBytes;
   UINTN               CertCount;
   UINT32              ItemDataSize;
 
@@ -428,6 +429,70 @@ TlsConfigCertificate (
   }
 
   ASSERT (CACert != NULL);
+
+  //
+  // Sanity check
+  //
+  Status = EFI_INVALID_PARAMETER;
+  CertCount = 0;
+  ItemDataSize = (UINT32) CACertSize;
+  while (ItemDataSize > 0) {
+    if (ItemDataSize < sizeof (EFI_SIGNATURE_LIST)) {
+      DEBUG ((DEBUG_ERROR, "%a: truncated EFI_SIGNATURE_LIST header\n",
+        __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    CertList = (EFI_SIGNATURE_LIST *) (CACert + (CACertSize - ItemDataSize));
+
+    if (CertList->SignatureListSize < sizeof (EFI_SIGNATURE_LIST)) {
+      DEBUG ((DEBUG_ERROR,
+        "%a: SignatureListSize too small for EFI_SIGNATURE_LIST\n",
+        __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    if (CertList->SignatureListSize > ItemDataSize) {
+      DEBUG ((DEBUG_ERROR, "%a: truncated EFI_SIGNATURE_LIST body\n",
+        __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    if (!CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid)) {
+      DEBUG ((DEBUG_ERROR, "%a: only X509 certificates are supported\n",
+        __FUNCTION__));
+      Status = EFI_UNSUPPORTED;
+      goto FreeCACert;
+    }
+
+    if (CertList->SignatureHeaderSize != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: SignatureHeaderSize must be 0 for X509\n",
+        __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    if (CertList->SignatureSize < sizeof (EFI_SIGNATURE_DATA)) {
+      DEBUG ((DEBUG_ERROR,
+        "%a: SignatureSize too small for EFI_SIGNATURE_DATA\n", __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    CertArraySizeInBytes = (CertList->SignatureListSize -
+                            sizeof (EFI_SIGNATURE_LIST));
+    if (CertArraySizeInBytes % CertList->SignatureSize != 0) {
+      DEBUG ((DEBUG_ERROR,
+        "%a: EFI_SIGNATURE_DATA array not a multiple of SignatureSize\n",
+        __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    CertCount += CertArraySizeInBytes / CertList->SignatureSize;
+    ItemDataSize -= CertList->SignatureListSize;
+  }
+  if (CertCount == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: no X509 certificates provided\n", __FUNCTION__));
+    goto FreeCACert;
+  }
 
   //
   // Enumerate all data and erasing the target item.
