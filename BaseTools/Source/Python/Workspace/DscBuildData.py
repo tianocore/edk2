@@ -2047,7 +2047,9 @@ class DscBuildData(PlatformBuildClassObject):
                 continue
             if Cache.Includes:
                 if str(Cache.MetaFile.Path) not in PlatformInc:
-                    PlatformInc[str(Cache.MetaFile.Path)] = Cache.CommonIncludes
+                    PlatformInc[str(Cache.MetaFile.Path)] = []
+                    PlatformInc[str(Cache.MetaFile.Path)].append (os.path.dirname(Cache.MetaFile.Path))
+                    PlatformInc[str(Cache.MetaFile.Path)].extend (Cache.CommonIncludes)
 
         PcdDependDEC = []
         for Pcd in StructuredPcds.values():
