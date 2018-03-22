@@ -425,9 +425,8 @@ TlsConfigCertificate (
     // GetVariable still error or the variable is corrupted.
     // Fall back to the default value.
     //
-    FreePool (CACert);
-
-    return EFI_NOT_FOUND;
+    Status = EFI_NOT_FOUND;
+    goto FreeCACert;
   }
 
   ASSERT (CACert != NULL);
@@ -451,8 +450,7 @@ TlsConfigCertificate (
                                                  CertList->SignatureSize - sizeof (Cert->SignatureOwner)
                                                  );
       if (EFI_ERROR (Status)) {
-        FreePool (CACert);
-        return Status;
+        goto FreeCACert;
       }
 
       Cert = (EFI_SIGNATURE_DATA *) ((UINT8 *) Cert + CertList->SignatureSize);
@@ -462,6 +460,7 @@ TlsConfigCertificate (
     CertList = (EFI_SIGNATURE_LIST *) ((UINT8 *) CertList + CertList->SignatureListSize);
   }
 
+FreeCACert:
   FreePool (CACert);
   return Status;
 }
