@@ -423,9 +423,7 @@ TlsConfigCertificate (
   if (EFI_ERROR (Status)) {
     //
     // GetVariable still error or the variable is corrupted.
-    // Fall back to the default value.
     //
-    Status = EFI_NOT_FOUND;
     goto FreeCACert;
   }
 
