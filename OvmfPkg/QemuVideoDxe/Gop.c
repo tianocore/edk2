@@ -366,7 +366,7 @@ Returns:
 
   default:
     Status = EFI_INVALID_PARAMETER;
-    ASSERT (FALSE);
+    break;
   }
 
   gBS->RestoreTPL (OriginalTPL);
