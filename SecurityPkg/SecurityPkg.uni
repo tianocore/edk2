@@ -255,3 +255,11 @@
                                                                                           "0x01 - FIFO interface as defined in PTP for TPM 2.0 is active.<BR>\n"
                                                                                           "0x02 - CRB interface is active.<BR>\n"
                                                                                           "0xFF - Contains no current active TPM interface type<BR>"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdCRBIdleByPass_PROMPT  #language en-US "IdleByass status supported by current active TPM interface."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdCRBIdleByPass_HELP  #language en-US "This PCD records IdleByass status supported by current active TPM interface.\n"
+                                                                                          "Accodingt to TCG PTP spec 1.3, TPM with CRB interface can skip idle state and diretcly move to CmdReady state. <BR>"
+                                                                                          "0x01 - Do not support IdleByPass.<BR>\n"
+                                                                                          "0x02 - Support IdleByPass.<BR>\n"
+                                                                                          "0xFF - IdleByPass State is not synced with TPM hardware.<BR>"

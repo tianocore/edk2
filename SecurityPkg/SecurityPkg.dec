@@ -474,5 +474,15 @@
   # @Prompt current active TPM interface type.
   gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType|0xFF|UINT8|0x0001001E
 
+  ## This PCD records IdleByass status supported by current active TPM interface.
+  #  Accodingt to TCG PTP spec 1.3, TPM with CRB interface can skip idle state and 
+  #  diretcly move to CmdReady state. <BR>
+  #  0x00 - Do not support IdleByPass.<BR>
+  #  0x01 - Support IdleByPass.<BR>
+  #  0xFF - IdleByPass State is not synced with TPM hardware.<BR>
+  #
+  # @Prompt IdleByass status supported by current active TPM interface.
+  gEfiSecurityPkgTokenSpaceGuid.PcdCRBIdleByPass|0xFF|UINT8|0x0001001F
+
 [UserExtensions.TianoCore."ExtraFiles"]
   SecurityPkgExtra.uni

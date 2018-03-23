@@ -32,6 +32,18 @@ Tpm2GetPtpInterface (
   );
 
 /**
+  Return PTP CRB interface IdleByPass state.
+
+  @param[in] Register                Pointer to PTP register.
+
+  @return PTP CRB interface IdleByPass state.
+**/
+UINT8
+Tpm2GetIdleByPass (
+  IN VOID *Register
+  );
+
+/**
   This service enables the sending of commands to the TPM2.
 
   @param[in]      InputParameterBlockSize  Size of the TPM2 input parameter block.
@@ -140,6 +152,7 @@ Tpm2DeviceLibConstructor (
   )
 {
   TPM2_PTP_INTERFACE_TYPE  PtpInterface;
+  UINT8                    IdleByPass;
 
   //
   // Cache current active TpmInterfaceType only when needed
@@ -148,5 +161,11 @@ Tpm2DeviceLibConstructor (
     PtpInterface = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
     PcdSet8S(PcdActiveTpmInterfaceType, PtpInterface);
   }
+
+  if (PcdGet8(PcdActiveTpmInterfaceType) == PtpInterfaceCrb && PcdGet8(PcdCRBIdleByPass) == 0xFF) {
+    IdleByPass = Tpm2GetIdleByPass((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+    PcdSet8S(PcdCRBIdleByPass, IdleByPass);
+  }
+
   return EFI_SUCCESS;
 }

@@ -174,10 +174,30 @@ PtpCrbTpmCommand (
     }
     DEBUG ((EFI_D_VERBOSE, "\n"));
   );
-  TpmOutSize = 0;
+  TpmOutSize         = 0;
 
   //
   // STEP 0:
+  // if CapCRbIdelByPass == 0, enforce Idle state before sending command
+  //
+  if (PcdGet8(PcdCRBIdleByPass) == 0 && (MmioRead32((UINTN)&CrbReg->CrbControlStatus) & PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE) == 0){
+    Status = PtpCrbWaitRegisterBits (
+              &CrbReg->CrbControlStatus,
+              PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE,
+              0,
+              PTP_TIMEOUT_C
+              );
+    if (EFI_ERROR (Status)) {
+      //
+      // Try to goIdle to recover TPM
+      //
+      Status = EFI_DEVICE_ERROR;
+      goto GoIdle_Exit;
+    }
+  }
+
+  //
+  // STEP 1:
   // Ready is any time the TPM is ready to receive a command, following a write
   // of 1 by software to Request.cmdReady, as indicated by the Status field
   // being cleared to 0.
@@ -191,7 +211,7 @@ PtpCrbTpmCommand (
              );
   if (EFI_ERROR (Status)) {
     Status = EFI_DEVICE_ERROR;
-    goto Exit;
+    goto GoIdle_Exit;
   }
   Status = PtpCrbWaitRegisterBits (
              &CrbReg->CrbControlStatus,
@@ -201,11 +221,11 @@ PtpCrbTpmCommand (
              );
   if (EFI_ERROR (Status)) {
     Status = EFI_DEVICE_ERROR;
-    goto Exit;
+    goto GoIdle_Exit;
   }
 
   //
-  // STEP 1:
+  // STEP 2:
   // Command Reception occurs following a Ready state between the write of the
   // first byte of a command to the Command Buffer and the receipt of a write
   // of 1 to Start.
@@ -221,7 +241,7 @@ PtpCrbTpmCommand (
   MmioWrite32 ((UINTN)&CrbReg->CrbControlResponseSize, sizeof(CrbReg->CrbDataBuffer));
 
   //
-  // STEP 2:
+  // STEP 3:
   // Command Execution occurs after receipt of a 1 to Start and the TPM
   // clearing Start to 0.
   //
@@ -251,12 +271,12 @@ PtpCrbTpmCommand (
       // Still in Command Execution state. Try to goIdle, the behavior is agnostic.
       //
       Status = EFI_DEVICE_ERROR;
-      goto Exit;
+      goto GoIdle_Exit;
     }
   }
 
   //
-  // STEP 3:
+  // STEP 4:
   // Command Completion occurs after completion of a command (indicated by the
   // TPM clearing TPM_CRB_CTRL_Start_x to 0) and before a write of a 1 by the
   // software to Request.goIdle.
@@ -283,14 +303,17 @@ PtpCrbTpmCommand (
   if (SwapBytes16 (Data16) == TPM_ST_RSP_COMMAND) {
     DEBUG ((EFI_D_ERROR, "TPM2: TPM_ST_RSP error - %x\n", TPM_ST_RSP_COMMAND));
     Status = EFI_UNSUPPORTED;
-    goto Exit;
+    goto GoIdle_Exit;
   }
 
   CopyMem (&Data32, (BufferOut + 2), sizeof (UINT32));
   TpmOutSize  = SwapBytes32 (Data32);
   if (*SizeOut < TpmOutSize) {
+    //
+    // Command completed, but buffer is not enough
+    //
     Status = EFI_BUFFER_TOO_SMALL;
-    goto Exit;
+    goto GoReady_Exit;
   }
   *SizeOut = TpmOutSize;
   //
@@ -299,7 +322,7 @@ PtpCrbTpmCommand (
   for (Index = sizeof (TPM2_RESPONSE_HEADER); Index < TpmOutSize; Index++) {
     BufferOut[Index] = MmioRead8 ((UINTN)&CrbReg->CrbDataBuffer[Index]);
   }
-Exit:
+
   DEBUG_CODE (
     DEBUG ((EFI_D_VERBOSE, "PtpCrbTpmCommand Receive - "));
     for (Index = 0; Index < TpmOutSize; Index++) {
@@ -308,11 +331,40 @@ Exit:
     DEBUG ((EFI_D_VERBOSE, "\n"));
   );
 
+GoReady_Exit:
   //
-  // STEP 4:
-  // Idle is any time TPM_CRB_CTRL_STS_x.Status.goIdle is 1.
+  // Goto Ready State if command is completed succesfully and TPM support IdleBypass
+  // If not supported. flow down to GoIdle
+  //
+  if (PcdGet8(PcdCRBIdleByPass) == 1) {
+    MmioWrite32((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_COMMAND_READY);
+    return Status;
+  }
+
+  //
+  // Do not wait for state transition for TIMEOUT_C
+  // This function will try to wait 2 TIMEOUT_C at the beginning in next call.
+  //
+GoIdle_Exit:
+
+  //
+  //  Return to Idle state by setting TPM_CRB_CTRL_STS_x.Status.goIdle to 1.
   //
   MmioWrite32((UINTN)&CrbReg->CrbControlRequest, PTP_CRB_CONTROL_AREA_REQUEST_GO_IDLE);
+
+  //
+  // Only enforce Idle state transition if execution fails when CRBIndleBypass==1
+  // Leave regular Idle delay at the beginning of next command execution
+  //
+  if (PcdGet8(PcdCRBIdleByPass) == 1){
+    Status = PtpCrbWaitRegisterBits (
+               &CrbReg->CrbControlStatus,
+               PTP_CRB_CONTROL_AREA_STATUS_TPM_IDLE,
+               0,
+               PTP_TIMEOUT_C
+               );
+  }
+
   return Status;
 }
 
@@ -392,6 +444,28 @@ Tpm2GetPtpInterface (
     return Tpm2PtpInterfaceFifo;
   }
   return Tpm2PtpInterfaceTis;
+}
+
+/**
+  Return PTP CRB interface IdleByPass state.
+
+  @param[in] Register                Pointer to PTP register.
+
+  @return PTP CRB interface IdleByPass state.
+**/
+UINT8
+Tpm2GetIdleByPass (
+  IN VOID *Register
+  )
+{
+  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
+
+  //
+  // Check interface id
+  //
+  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
+
+  return (UINT8)(InterfaceId.Bits.CapCRBIdleBypass);
 }
 
 /**

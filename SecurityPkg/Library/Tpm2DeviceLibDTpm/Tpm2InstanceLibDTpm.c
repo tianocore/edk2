@@ -35,6 +35,18 @@ Tpm2GetPtpInterface (
   );
 
 /**
+  Return PTP CRB interface IdleByPass state.
+
+  @param[in] Register                Pointer to PTP register.
+
+  @return PTP CRB interface IdleByPass state.
+**/
+UINT8
+Tpm2GetIdleByPass (
+  IN VOID *Register
+  );
+
+/**
   Dump PTP register information.
 
   @param[in] Register                Pointer to PTP register.
@@ -97,6 +109,7 @@ Tpm2InstanceLibDTpmConstructor (
 {
   EFI_STATUS               Status;
   TPM2_PTP_INTERFACE_TYPE  PtpInterface;
+  UINT8                    IdleByPass;
 
   Status = Tpm2RegisterTpm2DeviceLib (&mDTpm2InternalTpm2Device);
   if ((Status == EFI_SUCCESS) || (Status == EFI_UNSUPPORTED)) {
@@ -111,6 +124,12 @@ Tpm2InstanceLibDTpmConstructor (
         PtpInterface = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
         PcdSet8S(PcdActiveTpmInterfaceType, PtpInterface);
       }
+
+      if (PcdGet8(PcdActiveTpmInterfaceType) == PtpInterfaceCrb && PcdGet8(PcdCRBIdleByPass) == 0xFF) {
+        IdleByPass = Tpm2GetIdleByPass((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+        PcdSet8S(PcdCRBIdleByPass, IdleByPass);
+      }
+
       DumpPtpInfo ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
     }
     return EFI_SUCCESS;
