@@ -182,8 +182,7 @@ _SmiHandler:
     ; Save FP registers
     ;
     sub     rsp, 0x200
-    DB      0x48                         ; FXSAVE64
-    fxsave  [rsp]
+    fxsave64 [rsp]
 
     add     rsp, -0x20
 
@@ -201,8 +200,7 @@ _SmiHandler:
     ;
     ; Restore FP registers
     ;
-    DB      0x48                         ; FXRSTOR64
-    fxrstor [rsp]
+    fxrstor64 [rsp]
 
     add     rsp, 0x200
 

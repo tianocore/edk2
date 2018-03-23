@@ -279,7 +279,7 @@ ASM_PFX(PageFaultIdtHandlerSmmProfile):
 
     sub rsp, 512
     mov rdi, rsp
-    db 0xf, 0xae, 00000111y ;fxsave [rdi]
+    fxsave [rdi]
 
 ; UEFI calling convention for x64 requires that Direction flag in EFLAGs is clear
     cld
@@ -309,7 +309,7 @@ ASM_PFX(PageFaultIdtHandlerSmmProfile):
 ;; FX_SAVE_STATE_X64 FxSaveState;
 
     mov rsi, rsp
-    db 0xf, 0xae, 00001110y ; fxrstor [rsi]
+    fxrstor [rsi]
     add rsp, 512
 
 ;; UINT64  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
