@@ -1615,7 +1615,8 @@ UsbKeyCodeToEfiInputKey (
       // Need not return associated shift state if a class of printable characters that
       // are normally adjusted by shift modifiers. e.g. Shift Key + 'f' key = 'F'
       //
-      if ((KeyDescriptor->AffectedAttribute & EFI_AFFECTED_BY_CAPS_LOCK) != 0) {
+      if ((KeyDescriptor->Unicode != CHAR_NULL) && (KeyDescriptor->ShiftedUnicode != CHAR_NULL) &&
+          (KeyDescriptor->Unicode != KeyDescriptor->ShiftedUnicode)) {
         UsbKeyboardDevice->LeftShiftOn = FALSE;
         UsbKeyboardDevice->RightShiftOn = FALSE;
       }
