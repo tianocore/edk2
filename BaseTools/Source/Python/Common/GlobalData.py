@@ -52,7 +52,8 @@ gMacroDefPattern = re.compile("^(DEFINE|EDK_GLOBAL)[ \t]+")
 gMacroNamePattern = re.compile("^{}$".format(_MacroNamePattern))
 
 # definition for a GUID.  used to create regular expressions below.
-_GuidPattern = r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+_HexChar = r"[0-9a-fA-F]"
+_GuidPattern = r"{Hex}{{8}}-{Hex}{{4}}-{Hex}{{4}}-{Hex}{{4}}-{Hex}{{12}}".format(Hex=_HexChar)
 
 ## Regular expressions for GUID matching
 gGuidPattern = re.compile(r'{}'.format(_GuidPattern))
