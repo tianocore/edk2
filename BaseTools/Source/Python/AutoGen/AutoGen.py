@@ -410,7 +410,8 @@ class WorkspaceAutoGen(AutoGen):
         # apply SKU and inject PCDs from Flash Definition file
         for Arch in self.ArchList:
             Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
-
+            PlatformPcds = Platform.Pcds
+            self._GuidDict = Platform._GuidDict
             SourcePcdDict = {'DynamicEx':set(), 'PatchableInModule':set(),'Dynamic':set(),'FixedAtBuild':set()}
             BinaryPcdDict = {'DynamicEx':set(), 'PatchableInModule':set()}
             SourcePcdDict_Keys = SourcePcdDict.keys()
@@ -2790,7 +2791,7 @@ class ModuleAutoGen(AutoGen):
 
         self.Workspace = Workspace
         self.WorkspaceDir = Workspace.WorkspaceDir
-
+        self._GuidDict = Workspace._GuidDict
         self.MetaFile = ModuleFile
         self.PlatformInfo = PlatformAutoGen(Workspace, PlatformFile, Target, Toolchain, Arch)
 
