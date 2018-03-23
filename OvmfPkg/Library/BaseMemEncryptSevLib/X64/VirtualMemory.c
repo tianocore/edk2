@@ -2,7 +2,7 @@
 
   Virtual Memory Management Services to set or clear the memory encryption bit
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -595,6 +595,11 @@ SetMemoryEncDec (
   UINT64                         AddressEncMask;
   BOOLEAN                        IsWpEnabled;
   RETURN_STATUS                  Status;
+
+  //
+  // Set PageMapLevel4Entry to suppress incorrect compiler/analyzer warnings.
+  //
+  PageMapLevel4Entry = NULL;
 
   DEBUG ((
     DEBUG_VERBOSE,
