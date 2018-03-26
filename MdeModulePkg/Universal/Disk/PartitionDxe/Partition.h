@@ -4,6 +4,7 @@
   of the raw block devices media. Currently "El Torito CD-ROM", UDF, Legacy
   MBR, and GPT partition schemes are supported.
 
+Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -65,7 +66,7 @@ typedef struct {
   UINT32                       BlockSize;
   BOOLEAN                      InStop;
 
-  EFI_GUID                     *EspGuid;
+  EFI_GUID                     TypeGuid;
 
 } PARTITION_PRIVATE_DATA;
 
@@ -327,6 +328,7 @@ PartitionComponentNameGetControllerName (
   @param[in]  Start             Start Block.
   @param[in]  End               End Block.
   @param[in]  BlockSize         Child block size.
+  @param[in]  TypeGuid          Parition Type Guid.
 
   @retval EFI_SUCCESS       A child handle was added.
   @retval other             A child handle was not added.
@@ -345,7 +347,8 @@ PartitionInstallChildHandle (
   IN  EFI_PARTITION_INFO_PROTOCOL  *PartitionInfo,
   IN  EFI_LBA                      Start,
   IN  EFI_LBA                      End,
-  IN  UINT32                       BlockSize
+  IN  UINT32                       BlockSize,
+  IN  EFI_GUID                     *TypeGuid
   );
 
 /**

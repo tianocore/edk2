@@ -13,6 +13,7 @@
   PartitionValidGptTable(), PartitionCheckGptEntry() routine will accept disk
   partition content and validate the GPT table and GPT entry.
 
+Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -419,7 +420,8 @@ PartitionInstallGptChildHandles (
                &PartitionInfo,
                Entry->StartingLBA,
                Entry->EndingLBA,
-               BlockSize
+               BlockSize,
+               &Entry->PartitionTypeGUID
                );
   }
 

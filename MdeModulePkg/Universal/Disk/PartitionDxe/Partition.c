@@ -4,6 +4,7 @@
   of the raw block devices media. Currently "El Torito CD-ROM", UDF, Legacy
   MBR, and GPT partition schemes are supported.
 
+Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -401,6 +402,7 @@ PartitionDriverBindingStop (
   BOOLEAN                 AllChildrenStopped;
   PARTITION_PRIVATE_DATA  *Private;
   EFI_DISK_IO_PROTOCOL    *DiskIo;
+  EFI_GUID                *TypeGuid;
 
   BlockIo  = NULL;
   BlockIo2 = NULL;
@@ -493,6 +495,13 @@ PartitionDriverBindingStop (
            This->DriverBindingHandle,
            ChildHandleBuffer[Index]
            );
+
+    if (IsZeroGuid (&Private->TypeGuid)) {
+      TypeGuid = NULL;
+    } else {
+      TypeGuid = &Private->TypeGuid;
+    }
+
     //
     // All Software protocols have be freed from the handle so remove it.
     // Remove the BlockIo Protocol if has.
@@ -516,7 +525,7 @@ PartitionDriverBindingStop (
                          &Private->BlockIo2,
                          &gEfiPartitionInfoProtocolGuid,
                          &Private->PartitionInfo,
-                         Private->EspGuid,
+                         TypeGuid,
                          NULL,
                          NULL
                          );
@@ -530,7 +539,7 @@ PartitionDriverBindingStop (
                        &Private->BlockIo,
                        &gEfiPartitionInfoProtocolGuid,
                        &Private->PartitionInfo,
-                       Private->EspGuid,
+                       TypeGuid,
                        NULL,
                        NULL
                        );
@@ -1104,6 +1113,7 @@ PartitionFlushBlocksEx (
   @param[in]  Start             Start Block.
   @param[in]  End               End Block.
   @param[in]  BlockSize         Child block size.
+  @param[in]  TypeGuid          Partition GUID Type.
 
   @retval EFI_SUCCESS       A child handle was added.
   @retval other             A child handle was not added.
@@ -1122,7 +1132,8 @@ PartitionInstallChildHandle (
   IN  EFI_PARTITION_INFO_PROTOCOL  *PartitionInfo,
   IN  EFI_LBA                      Start,
   IN  EFI_LBA                      End,
-  IN  UINT32                       BlockSize
+  IN  UINT32                       BlockSize,
+  IN  EFI_GUID                     *TypeGuid
   )
 {
   EFI_STATUS              Status;
@@ -1216,13 +1227,10 @@ PartitionInstallChildHandle (
   //
   CopyMem (&Private->PartitionInfo, PartitionInfo, sizeof (EFI_PARTITION_INFO_PROTOCOL));
 
-  if (PartitionInfo->System == 1) {
-    Private->EspGuid = &gEfiPartTypeSystemPartGuid;
+  if (TypeGuid != NULL) {
+    CopyGuid(&(Private->TypeGuid), TypeGuid);
   } else {
-    //
-    // If NULL InstallMultipleProtocolInterfaces will ignore it.
-    //
-    Private->EspGuid = NULL;
+    ZeroMem ((VOID *)&(Private->TypeGuid), sizeof (EFI_GUID));
   }
 
   //
@@ -1240,7 +1248,7 @@ PartitionInstallChildHandle (
                     &Private->BlockIo2,
                     &gEfiPartitionInfoProtocolGuid,
                     &Private->PartitionInfo,
-                    Private->EspGuid,
+                    TypeGuid,
                     NULL,
                     NULL
                     );
@@ -1253,7 +1261,7 @@ PartitionInstallChildHandle (
                     &Private->BlockIo,
                     &gEfiPartitionInfoProtocolGuid,
                     &Private->PartitionInfo,
-                    Private->EspGuid,
+                    TypeGuid,
                     NULL,
                     NULL
                     );

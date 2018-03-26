@@ -11,6 +11,7 @@
         always on the first sector of a media. The first sector also contains
         the legacy boot strap code.
 
+Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
 Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
@@ -246,7 +247,8 @@ PartitionInstallMbrChildHandles (
                 &PartitionInfo,
                 HdDev.PartitionStart,
                 HdDev.PartitionStart + HdDev.PartitionSize - 1,
-                MBR_SIZE
+                MBR_SIZE,
+                ((Mbr->Partition[Index].OSIndicator == EFI_PARTITION) ? &gEfiPartTypeSystemPartGuid: NULL)
                 );
 
       if (!EFI_ERROR (Status)) {
@@ -317,7 +319,8 @@ PartitionInstallMbrChildHandles (
                  &PartitionInfo,
                  HdDev.PartitionStart - ParentHdDev.PartitionStart,
                  HdDev.PartitionStart - ParentHdDev.PartitionStart + HdDev.PartitionSize - 1,
-                 MBR_SIZE
+                 MBR_SIZE,
+                 ((Mbr->Partition[0].OSIndicator == EFI_PARTITION) ? &gEfiPartTypeSystemPartGuid: NULL)
                  );
       if (!EFI_ERROR (Status)) {
         Found = EFI_SUCCESS;
