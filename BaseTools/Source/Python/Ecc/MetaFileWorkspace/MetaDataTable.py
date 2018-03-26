@@ -116,7 +116,7 @@ class Table(object):
         SqlCommand = """select max(ID) from %s""" % self.Table
         Record = self.Cur.execute(SqlCommand).fetchall()
         Id = Record[0][0]
-        if Id == None:
+        if Id is None:
             Id = self.IdBase
         return Id
 
@@ -191,7 +191,7 @@ class TableDataModel(Table):
     def InitTable(self):
         EdkLogger.verbose("\nInitialize table DataModel started ...")
         Count = self.GetCount()
-        if Count != None and Count != 0:
+        if Count is not None and Count != 0:
             return
         for Item in DataClass.MODEL_LIST:
             CrossIndex = Item[1]

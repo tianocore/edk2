@@ -301,7 +301,7 @@ class CodeFragmentCollector:
                 InCharLiteral = not InCharLiteral
             # meet new line, then no longer in a comment for // and '#'
             if self.__CurrentChar() == T_CHAR_LF:
-                if HashComment and PPDirectiveObj != None:
+                if HashComment and PPDirectiveObj is not None:
                     if PPDirectiveObj.Content.rstrip(T_CHAR_CR).endswith(T_CHAR_BACKSLASH):
                         PPDirectiveObj.Content += T_CHAR_LF
                         PPExtend = True
@@ -423,7 +423,7 @@ class CodeFragmentCollector:
                 InCharLiteral = not InCharLiteral
             # meet new line, then no longer in a comment for // and '#'
             if self.__CurrentChar() == T_CHAR_LF:
-                if HashComment and PPDirectiveObj != None:
+                if HashComment and PPDirectiveObj is not None:
                     if PPDirectiveObj.Content.rstrip(T_CHAR_CR).endswith(T_CHAR_BACKSLASH):
                         PPDirectiveObj.Content += T_CHAR_LF
                         PPExtend = True

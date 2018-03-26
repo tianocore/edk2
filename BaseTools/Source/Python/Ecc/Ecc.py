@@ -178,7 +178,7 @@ class Ecc(object):
                 self.BuildMetaDataFileDatabase(SpeciDirs)
             if self.ScanSourceCode:
                 EdkLogger.quiet("Building database for Meta Data File Done!")
-                if SpeciDirs == None:
+                if SpeciDirs is None:
                     c.CollectSourceCodeDataIntoDB(EccGlobalData.gTarget)
                 else:
                     for specificDir in SpeciDirs:
@@ -195,7 +195,7 @@ class Ecc(object):
     #
     def BuildMetaDataFileDatabase(self, SpecificDirs = None):
         ScanFolders = []
-        if SpecificDirs == None:
+        if SpecificDirs is None:
             ScanFolders.append(EccGlobalData.gTarget)
         else:
             for specificDir in SpecificDirs:    
@@ -346,15 +346,15 @@ class Ecc(object):
         self.SetLogLevel(Options)
 
         # Set other options
-        if Options.ConfigFile != None:
+        if Options.ConfigFile is not None:
             self.ConfigFile = Options.ConfigFile
-        if Options.OutputFile != None:
+        if Options.OutputFile is not None:
             self.OutputFile = Options.OutputFile
-        if Options.ReportFile != None:
+        if Options.ReportFile is not None:
             self.ReportFile = Options.ReportFile
-        if Options.ExceptionFile != None:
+        if Options.ExceptionFile is not None:
             self.ExceptionFile = Options.ExceptionFile
-        if Options.Target != None:
+        if Options.Target is not None:
             if not os.path.isdir(Options.Target):
                 EdkLogger.error("ECC", BuildToolError.OPTION_VALUE_INVALID, ExtraData="Target [%s] does NOT exist" % Options.Target)
             else:
@@ -362,15 +362,15 @@ class Ecc(object):
         else:
             EdkLogger.warn("Ecc", EdkLogger.ECC_ERROR, "The target source tree was not specified, using current WORKSPACE instead!")
             EccGlobalData.gTarget = os.path.normpath(os.getenv("WORKSPACE"))
-        if Options.keepdatabase != None:
+        if Options.keepdatabase is not None:
             self.IsInit = False
-        if Options.metadata != None and Options.sourcecode != None:
+        if Options.metadata is not None and Options.sourcecode is not None:
             EdkLogger.error("ECC", BuildToolError.OPTION_CONFLICT, ExtraData="-m and -s can't be specified at one time")
-        if Options.metadata != None:
+        if Options.metadata is not None:
             self.ScanSourceCode = False
-        if Options.sourcecode != None:
+        if Options.sourcecode is not None:
             self.ScanMetaData = False
-        if Options.folders != None:
+        if Options.folders is not None:
             self.OnlyScan = True
 
     ## SetLogLevel
@@ -380,11 +380,11 @@ class Ecc(object):
     # @param Option:  The option list including log level setting
     #
     def SetLogLevel(self, Option):
-        if Option.verbose != None:
+        if Option.verbose is not None:
             EdkLogger.SetLevel(EdkLogger.VERBOSE)
-        elif Option.quiet != None:
+        elif Option.quiet is not None:
             EdkLogger.SetLevel(EdkLogger.QUIET)
-        elif Option.debug != None:
+        elif Option.debug is not None:
             EdkLogger.SetLevel(Option.debug + 1)
         else:
             EdkLogger.SetLevel(EdkLogger.INFO)

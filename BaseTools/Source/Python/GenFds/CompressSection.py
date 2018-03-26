@@ -55,7 +55,7 @@ class CompressSection (CompressSectionClassObject) :
     #
     def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}, IsMakefile = False):
 
-        if FfsInf != None:
+        if FfsInf is not None:
             self.CompType = FfsInf.__ExtendMacro__(self.CompType)
             self.Alignment = FfsInf.__ExtendMacro__(self.Alignment)
 
@@ -67,13 +67,13 @@ class CompressSection (CompressSectionClassObject) :
             Index = Index + 1
             SecIndex = '%s.%d' %(SecNum, Index)
             ReturnSectList, AlignValue = Sect.GenSection(OutputPath, ModuleName, SecIndex, KeyStringList, FfsInf, Dict, IsMakefile=IsMakefile)
-            if AlignValue != None:
-                if MaxAlign == None:
+            if AlignValue is not None:
+                if MaxAlign is None:
                     MaxAlign = AlignValue
                 if GenFdsGlobalVariable.GetAlignment (AlignValue) > GenFdsGlobalVariable.GetAlignment (MaxAlign):
                     MaxAlign = AlignValue
             if ReturnSectList != []:
-                if AlignValue == None:
+                if AlignValue is None:
                     AlignValue = "1"
                 for FileData in ReturnSectList:
                     SectFiles += (FileData,)

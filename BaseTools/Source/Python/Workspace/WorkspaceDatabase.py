@@ -214,7 +214,7 @@ class WorkspaceDatabase(object):
         else:
             curPath  = os.path.dirname(__file__) # curPath is the path of WorkspaceDatabase.py
             rootPath = os.path.split(curPath)[0] # rootPath is root path of python source, such as /BaseTools/Source/Python
-            if rootPath == "" or rootPath == None:
+            if rootPath == "" or rootPath is None:
                 EdkLogger.verbose("\nFail to find the root path of build.exe or python sources, so can not \
 determine whether database file is out of date!\n")
         
@@ -308,13 +308,13 @@ determine whether database file is out of date!\n")
                 Platform = self.BuildObject[PathClass(PlatformFile), 'COMMON']
             except:
                 Platform = None
-            if Platform != None:
+            if Platform is not None:
                 PlatformList.append(Platform)
         return PlatformList
 
     def _MapPlatform(self, Dscfile):
         Platform = self.BuildObject[PathClass(Dscfile), 'COMMON']
-        if Platform == None:
+        if Platform is None:
             EdkLogger.error('build', PARSER_ERROR, "Failed to parser DSC file: %s" % Dscfile)
         return Platform
 

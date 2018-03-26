@@ -116,7 +116,7 @@ class Dec(DecObject):
         #
         # Load Dec file if filename is not None
         #
-        if Filename != None:
+        if Filename is not None:
             self.LoadDecFile(Filename)
 
         #

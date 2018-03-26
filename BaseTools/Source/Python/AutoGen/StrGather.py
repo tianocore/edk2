@@ -150,7 +150,7 @@ def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
         Name = StringItem.StringName
         Token = StringItem.Token
         Referenced = StringItem.Referenced
-        if Name != None:
+        if Name is not None:
             Line = ''
             if Referenced == True:
                 if (ValueStartPtr - len(DEFINE_STR + Name)) <= 0:
@@ -478,11 +478,11 @@ def CreateCFile(BaseName, UniObjectClass, IsCompatibleMode, FilterInfo):
 # @retval FileList:    A list of all files found
 #
 def GetFileList(SourceFileList, IncludeList, SkipList):
-    if IncludeList == None:
+    if IncludeList is None:
         EdkLogger.error("UnicodeStringGather", AUTOGEN_ERROR, "Include path for unicode file is not defined")
 
     FileList = []
-    if SkipList == None:
+    if SkipList is None:
         SkipList = []
 
     for File in SourceFileList:

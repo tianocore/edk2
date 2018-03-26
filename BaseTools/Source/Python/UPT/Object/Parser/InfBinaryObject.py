@@ -271,7 +271,7 @@ class InfBinariesObject(InfSectionCommonDef):
                                 #
                                 pass
 
-            if InfBianryVerItemObj != None:
+            if InfBianryVerItemObj is not None:
                 if self.Binaries.has_key((InfBianryVerItemObj)):
                     BinariesList = self.Binaries[InfBianryVerItemObj]
                     BinariesList.append((InfBianryVerItemObj, VerComment))
@@ -521,7 +521,7 @@ class InfBinariesObject(InfSectionCommonDef):
 #                                #
 #                                pass
 
-            if InfBianryCommonItemObj != None:
+            if InfBianryCommonItemObj is not None:
                 if self.Binaries.has_key((InfBianryCommonItemObj)):
                     BinariesList = self.Binaries[InfBianryCommonItemObj]
                     BinariesList.append((InfBianryCommonItemObj, ItemComment))
@@ -538,11 +538,11 @@ class InfBinariesObject(InfSectionCommonDef):
             #
             # Validate Arch
             #            
-            if (ArchItem == '' or ArchItem == None):
+            if (ArchItem == '' or ArchItem is None):
                 ArchItem = 'COMMON'
             __SupArchList.append(ArchItem)
 
-        if UiInf != None:
+        if UiInf is not None:
             if len(UiInf) > 0:
                 #
                 # Check UI
@@ -672,7 +672,7 @@ class InfBinariesObject(InfSectionCommonDef):
 #                                        #
 #                                        pass
 
-                    if InfBianryUiItemObj != None:
+                    if InfBianryUiItemObj is not None:
                         if self.Binaries.has_key((InfBianryUiItemObj)):
                             BinariesList = self.Binaries[InfBianryUiItemObj]
                             BinariesList.append((InfBianryUiItemObj, UiComment))
@@ -681,7 +681,7 @@ class InfBinariesObject(InfSectionCommonDef):
                             BinariesList = []
                             BinariesList.append((InfBianryUiItemObj, UiComment))
                             self.Binaries[InfBianryUiItemObj] = BinariesList
-        if Ver != None and len(Ver) > 0:
+        if Ver is not None and len(Ver) > 0:
             self.CheckVer(Ver, __SupArchList)
         if CommonBinary and len(CommonBinary) > 0:
             self.ParseCommonBinary(CommonBinary, __SupArchList)

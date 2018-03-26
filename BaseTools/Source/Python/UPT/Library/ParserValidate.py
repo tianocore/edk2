@@ -128,7 +128,7 @@ def IsValidInfComponentType(ComponentType):
 #
 def IsValidToolFamily(ToolFamily):
     ReIsValieFamily = re.compile(r"^[A-Z]+[A-Za-z0-9]{0,}$", re.DOTALL)
-    if ReIsValieFamily.match(ToolFamily) == None:
+    if ReIsValieFamily.match(ToolFamily) is None:
         return False
     return True
 
@@ -159,7 +159,7 @@ def IsValidArch(Arch):
     if Arch == 'common':
         return True
     ReIsValieArch = re.compile(r"^[a-zA-Z]+[a-zA-Z0-9]{0,}$", re.DOTALL)
-    if ReIsValieArch.match(Arch) == None:
+    if ReIsValieArch.match(Arch) is None:
         return False
     return True
 
@@ -179,7 +179,7 @@ def IsValidFamily(Family):
         return True
        
     ReIsValidFamily = re.compile(r"^[A-Z]+[A-Za-z0-9]{0,}$", re.DOTALL)
-    if ReIsValidFamily.match(Family) == None:
+    if ReIsValidFamily.match(Family) is None:
         return False
     return True
 
@@ -199,13 +199,13 @@ def IsValidBuildOptionName(BuildOptionName):
     ReIsValidBuildOption1 = re.compile(r"^\s*(\*)|([A-Z][a-zA-Z0-9]*)$")
     ReIsValidBuildOption2 = re.compile(r"^\s*(\*)|([a-zA-Z][a-zA-Z0-9]*)$")
     
-    if ReIsValidBuildOption1.match(ToolOptionList[0]) == None:
+    if ReIsValidBuildOption1.match(ToolOptionList[0]) is None:
         return False
     
-    if ReIsValidBuildOption1.match(ToolOptionList[1]) == None:
+    if ReIsValidBuildOption1.match(ToolOptionList[1]) is None:
         return False
     
-    if ReIsValidBuildOption2.match(ToolOptionList[2]) == None:
+    if ReIsValidBuildOption2.match(ToolOptionList[2]) is None:
         return False
     
     if ToolOptionList[3] == "*" and ToolOptionList[4] not in ['FAMILY', 'DLL', 'DPATH']:
@@ -442,7 +442,7 @@ def IsValidDecVersion(Word):
         ReIsValidDecVersion = re.compile(r"[0-9]+\.?[0-9]+$")
     else:
         ReIsValidDecVersion = re.compile(r"[0-9]+$")
-    if ReIsValidDecVersion.match(Word) == None:
+    if ReIsValidDecVersion.match(Word) is None:
         return False 
     return True
    
@@ -457,7 +457,7 @@ def IsValidDecVersion(Word):
 #  
 def IsValidHexVersion(Word):
     ReIsValidHexVersion = re.compile(r"[0][xX][0-9A-Fa-f]{8}$", re.DOTALL)
-    if ReIsValidHexVersion.match(Word) == None:
+    if ReIsValidHexVersion.match(Word) is None:
         return False
     
     return True
@@ -471,7 +471,7 @@ def IsValidHexVersion(Word):
 #  
 def IsValidBuildNumber(Word):
     ReIsValieBuildNumber = re.compile(r"[0-9]{1,4}$", re.DOTALL)
-    if ReIsValieBuildNumber.match(Word) == None:
+    if ReIsValieBuildNumber.match(Word) is None:
         return False
     
     return True
@@ -488,7 +488,7 @@ def IsValidDepex(Word):
         return IsValidCFormatGuid(Word[Index+4:].strip())
 
     ReIsValidCName = re.compile(r"^[A-Za-z_][0-9A-Za-z_\s\.]*$", re.DOTALL)
-    if ReIsValidCName.match(Word) == None:
+    if ReIsValidCName.match(Word) is None:
         return False
     
     return True
@@ -585,11 +585,11 @@ def IsValidPcdValue(PcdValue):
         return True
     
     ReIsValidIntegerSingle = re.compile(r"^\s*[0-9]\s*$", re.DOTALL)
-    if ReIsValidIntegerSingle.match(PcdValue) != None:
+    if ReIsValidIntegerSingle.match(PcdValue) is not None:
         return True
     
     ReIsValidIntegerMulti = re.compile(r"^\s*[1-9][0-9]+\s*$", re.DOTALL)   
-    if ReIsValidIntegerMulti.match(PcdValue) != None:
+    if ReIsValidIntegerMulti.match(PcdValue) is not None:
         return True
     
     #
@@ -654,7 +654,7 @@ def IsValidPcdValue(PcdValue):
 #     
 def IsValidCVariableName(CName):
     ReIsValidCName = re.compile(r"^[A-Za-z_][0-9A-Za-z_]*$", re.DOTALL)
-    if ReIsValidCName.match(CName) == None:
+    if ReIsValidCName.match(CName) is None:
         return False
     
     return True
@@ -669,7 +669,7 @@ def IsValidCVariableName(CName):
 #
 def IsValidIdentifier(Ident):
     ReIdent = re.compile(r"^[A-Za-z_][0-9A-Za-z_]*$", re.DOTALL)
-    if ReIdent.match(Ident) == None:
+    if ReIdent.match(Ident) is None:
         return False
     
     return True
@@ -683,7 +683,7 @@ def IsValidIdentifier(Ident):
 def IsValidDecVersionVal(Ver):
     ReVersion = re.compile(r"[0-9]+(\.[0-9]{1,2})$")
     
-    if ReVersion.match(Ver) == None:
+    if ReVersion.match(Ver) is None:
         return False
       
     return True

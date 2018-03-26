@@ -60,7 +60,7 @@ class GuidSection(GuidSectionClassObject) :
         #
         self.KeyStringList = KeyStringList
         self.CurrentArchList = GenFdsGlobalVariable.ArchList
-        if FfsInf != None:
+        if FfsInf is not None:
             self.Alignment = FfsInf.__ExtendMacro__(self.Alignment)
             self.NameGuid = FfsInf.__ExtendMacro__(self.NameGuid)
             self.SectionType = FfsInf.__ExtendMacro__(self.SectionType)
@@ -79,7 +79,7 @@ class GuidSection(GuidSectionClassObject) :
             if self.FvAddr != []:
                 #no use FvAddr when the image is processed.
                 self.FvAddr = []
-            if self.FvParentAddr != None:
+            if self.FvParentAddr is not None:
                 #no use Parent Addr when the image is processed.
                 self.FvParentAddr = None
 
@@ -99,20 +99,20 @@ class GuidSection(GuidSectionClassObject) :
                 if Sect.IncludeFvSection:
                     self.IncludeFvSection = Sect.IncludeFvSection
 
-            if align != None:
-                if MaxAlign == None:
+            if align is not None:
+                if MaxAlign is None:
                     MaxAlign = align
                 if GenFdsGlobalVariable.GetAlignment (align) > GenFdsGlobalVariable.GetAlignment (MaxAlign):
                     MaxAlign = align
             if ReturnSectList != []:
-                if align == None:
+                if align is None:
                     align = "1"
                 for file in ReturnSectList:
                     SectFile += (file,)
                     SectAlign.append(align)
 
-        if MaxAlign != None:
-            if self.Alignment == None:
+        if MaxAlign is not None:
+            if self.Alignment is None:
                 self.Alignment = MaxAlign
             else:
                 if GenFdsGlobalVariable.GetAlignment (MaxAlign) > GenFdsGlobalVariable.GetAlignment (self.Alignment):
@@ -128,21 +128,21 @@ class GuidSection(GuidSectionClassObject) :
 
         ExternalTool = None
         ExternalOption = None
-        if self.NameGuid != None:
+        if self.NameGuid is not None:
             ExternalTool, ExternalOption = FindExtendTool(self.KeyStringList, self.CurrentArchList, self.NameGuid)
 
         #
         # If not have GUID , call default
         # GENCRC32 section
         #
-        if self.NameGuid == None :
+        if self.NameGuid is None :
             GenFdsGlobalVariable.VerboseLogger("Use GenSection function Generate CRC32 Section")
             GenFdsGlobalVariable.GenerateSection(OutputFile, SectFile, Section.Section.SectionType[self.SectionType], InputAlign=SectAlign, IsMakefile=IsMakefile)
             OutputFileList = []
             OutputFileList.append(OutputFile)
             return OutputFileList, self.Alignment
         #or GUID not in External Tool List
-        elif ExternalTool == None:
+        elif ExternalTool is None:
             EdkLogger.error("GenFds", GENFDS_ERROR, "No tool found with GUID %s" % self.NameGuid)
         else:
             DummyFile = OutputFile + ".dummy"
@@ -170,10 +170,10 @@ class GuidSection(GuidSectionClassObject) :
 
             FirstCall = False
             CmdOption = '-e'
-            if ExternalOption != None:
+            if ExternalOption is not None:
                 CmdOption = CmdOption + ' ' + ExternalOption
             if not GenFdsGlobalVariable.EnableGenfdsMultiThread:
-                if self.ProcessRequired not in ("TRUE", "1") and self.IncludeFvSection and not FvAddrIsSet and self.FvParentAddr != None:
+                if self.ProcessRequired not in ("TRUE", "1") and self.IncludeFvSection and not FvAddrIsSet and self.FvParentAddr is not None:
                     #FirstCall is only set for the encapsulated flash FV image without process required attribute.
                     FirstCall = True
                 #
@@ -213,7 +213,7 @@ class GuidSection(GuidSectionClassObject) :
                 if self.ExtraHeaderSize != -1:
                     HeaderLength = str(self.ExtraHeaderSize)
 
-                if self.ProcessRequired == "NONE" and HeaderLength == None:
+                if self.ProcessRequired == "NONE" and HeaderLength is None:
                     if TempFileSize > InputFileSize:
                         FileHandleIn.seek(0)
                         BufferIn = FileHandleIn.read()
@@ -222,7 +222,7 @@ class GuidSection(GuidSectionClassObject) :
                         if BufferIn == BufferOut[TempFileSize - InputFileSize:]:
                             HeaderLength = str(TempFileSize - InputFileSize)
                     #auto sec guided attribute with process required
-                    if HeaderLength == None:
+                    if HeaderLength is None:
                         Attribute.append('PROCESSING_REQUIRED')
 
                 FileHandleIn.close()
@@ -253,7 +253,7 @@ class GuidSection(GuidSectionClassObject) :
                     HeaderLength = str(self.ExtraHeaderSize)
                 if self.AuthStatusValid in ("TRUE", "1"):
                     Attribute.append('AUTH_STATUS_VALID')
-                if self.ProcessRequired == "NONE" and HeaderLength == None:
+                if self.ProcessRequired == "NONE" and HeaderLength is None:
                     GenFdsGlobalVariable.GenerateSection(OutputFile, [TempFile], Section.Section.SectionType['GUIDED'],
                                                          Guid=self.NameGuid, GuidAttr=Attribute,
                                                          GuidHdrLen=HeaderLength, DummyFile=DummyFile, IsMakefile=IsMakefile)

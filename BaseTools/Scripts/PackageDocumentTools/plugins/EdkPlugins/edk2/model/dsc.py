@@ -189,7 +189,7 @@ class DSCComponentObject(DSCSectionObject):
                 lines.append('    <%s>\n' % key)
 
                 for name, value in self._OveridePcds[key]:
-                    if value != None:
+                    if value is not None:
                         lines.append('      %s|%s\n' % (name, value))
                     else:
                         lines.append('      %s\n' % name)

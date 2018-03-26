@@ -722,7 +722,7 @@ def ReadMessage(From, To, ExitFlag):
         # read one line a time
         Line = From.readline()
         # empty string means "end"
-        if Line != None and Line != "":
+        if Line is not None and Line != "":
             To(Line.rstrip())
         else:
             break
@@ -904,7 +904,7 @@ class PcdReport(object):
         elif ReportSubType == 2:
             PcdDict = self.UnusedPcds
 
-        if ModulePcdSet == None:
+        if ModulePcdSet is None:
             FileWrite(File, gSectionStart)
             if ReportSubType == 1:
                 FileWrite(File, "Conditional Directives used by the build system")
@@ -966,7 +966,7 @@ class PcdReport(object):
                     PcdValue = DecDefaultValue
                     if DscDefaultValue:
                         PcdValue = DscDefaultValue
-                    if ModulePcdSet != None:
+                    if ModulePcdSet is not None:
                         if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type) not in ModulePcdSet:
                             continue
                         InfDefault, PcdValue = ModulePcdSet[Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type]
@@ -985,7 +985,7 @@ class PcdReport(object):
                                 break
 
                     if First:
-                        if ModulePcdSet == None:
+                        if ModulePcdSet is None:
                             FileWrite(File, "")
                         FileWrite(File, Key)
                         First = False
@@ -993,35 +993,35 @@ class PcdReport(object):
 
                     if Pcd.DatumType in ('UINT8', 'UINT16', 'UINT32', 'UINT64'):
                         PcdValueNumber = int(PcdValue.strip(), 0)
-                        if DecDefaultValue == None:
+                        if DecDefaultValue is None:
                             DecMatch = True
                         else:
                             DecDefaultValueNumber = int(DecDefaultValue.strip(), 0)
                             DecMatch = (DecDefaultValueNumber == PcdValueNumber)
 
-                        if InfDefaultValue == None:
+                        if InfDefaultValue is None:
                             InfMatch = True
                         else:
                             InfDefaultValueNumber = int(InfDefaultValue.strip(), 0)
                             InfMatch = (InfDefaultValueNumber == PcdValueNumber)
 
-                        if DscDefaultValue == None:
+                        if DscDefaultValue is None:
                             DscMatch = True
                         else:
                             DscDefaultValueNumber = int(DscDefaultValue.strip(), 0)
                             DscMatch = (DscDefaultValueNumber == PcdValueNumber)
                     else:
-                        if DecDefaultValue == None:
+                        if DecDefaultValue is None:
                             DecMatch = True
                         else:
                             DecMatch = (DecDefaultValue.strip() == PcdValue.strip())
 
-                        if InfDefaultValue == None:
+                        if InfDefaultValue is None:
                             InfMatch = True
                         else:
                             InfMatch = (InfDefaultValue.strip() == PcdValue.strip())
 
-                        if DscDefaultValue == None:
+                        if DscDefaultValue is None:
                             DscMatch = True
                         else:
                             DscMatch = (DscDefaultValue.strip() == PcdValue.strip())
@@ -1087,7 +1087,7 @@ class PcdReport(object):
                         else:
                             self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*M')
 
-                    if ModulePcdSet == None:
+                    if ModulePcdSet is None:
                         if IsStructure:
                             continue
                         if not TypeName in ('PATCH', 'FLAG', 'FIXED'):
@@ -1111,7 +1111,7 @@ class PcdReport(object):
                                 else:
                                     FileWrite(File, ' *M %-*s = %s' % (self.MaxLen + 19, ModulePath, ModuleDefault.strip()))
 
-        if ModulePcdSet == None:
+        if ModulePcdSet is None:
             FileWrite(File, gSectionEnd)
         else:
             if not ReportSubType and ModulePcdSet:
@@ -1127,7 +1127,7 @@ class PcdReport(object):
         return HasDscOverride
 
     def PrintPcdDefault(self, File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue):
-        if not DscMatch and DscDefaultValue != None:
+        if not DscMatch and DscDefaultValue is not None:
             Value = DscDefaultValue.strip()
             IsByteArray, ArrayList = ByteArrayForamt(Value)
             if IsByteArray:
@@ -1136,7 +1136,7 @@ class PcdReport(object):
                     FileWrite(File, '%s' % (Array))
             else:
                 FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DSC DEFAULT', Value))
-        if not InfMatch and InfDefaultValue != None:
+        if not InfMatch and InfDefaultValue is not None:
             Value = InfDefaultValue.strip()
             IsByteArray, ArrayList = ByteArrayForamt(Value)
             if IsByteArray:
@@ -1146,7 +1146,7 @@ class PcdReport(object):
             else:
                 FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'INF DEFAULT', Value))
 
-        if not DecMatch and DecDefaultValue != None:
+        if not DecMatch and DecDefaultValue is not None:
             Value = DecDefaultValue.strip()
             IsByteArray, ArrayList = ByteArrayForamt(Value)
             if IsByteArray:
@@ -1971,7 +1971,7 @@ class PlatformReport(object):
             self.PcdReport = PcdReport(Wa)
 
         self.FdReportList = []
-        if "FLASH" in ReportType and Wa.FdfProfile and MaList == None:
+        if "FLASH" in ReportType and Wa.FdfProfile and MaList is None:
             for Fd in Wa.FdfProfile.FdDict:
                 self.FdReportList.append(FdReport(Wa.FdfProfile.FdDict[Fd], Wa))
 
@@ -1984,7 +1984,7 @@ class PlatformReport(object):
             self.DepexParser = DepexParser(Wa)
             
         self.ModuleReportList = []
-        if MaList != None:
+        if MaList is not None:
             self._IsModuleBuild = True
             for Ma in MaList:
                 self.ModuleReportList.append(ModuleReport(Ma, ReportType))
@@ -1994,13 +1994,13 @@ class PlatformReport(object):
                 ModuleAutoGenList = []
                 for ModuleKey in Pa.Platform.Modules:
                     ModuleAutoGenList.append(Pa.Platform.Modules[ModuleKey].M)
-                if GlobalData.gFdfParser != None:
+                if GlobalData.gFdfParser is not None:
                     if Pa.Arch in GlobalData.gFdfParser.Profile.InfDict:
                         INFList = GlobalData.gFdfParser.Profile.InfDict[Pa.Arch]
                         for InfName in INFList:
                             InfClass = PathClass(NormPath(InfName), Wa.WorkspaceDir, Pa.Arch)
                             Ma = ModuleAutoGen(Wa, InfClass, Pa.BuildTarget, Pa.ToolChain, Pa.Arch, Wa.MetaFile)
-                            if Ma == None:
+                            if Ma is None:
                                 continue
                             if Ma not in ModuleAutoGenList:
                                 ModuleAutoGenList.append(Ma)

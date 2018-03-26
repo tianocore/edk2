@@ -234,7 +234,7 @@ class Report(object):
     #
     def GenerateFfs(self, FfsObj):
         self.FfsIndex = self.FfsIndex + 1
-        if FfsObj != None and FfsObj.Type in [0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0xA]:
+        if FfsObj is not None and FfsObj.Type in [0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0xA]:
             FfsGuid = FfsObj.Guid
             FfsOffset = FfsObj._OFF_
             FfsName = 'Unknown-Module'

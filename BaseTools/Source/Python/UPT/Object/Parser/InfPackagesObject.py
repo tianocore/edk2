@@ -75,7 +75,7 @@ class InfPackageObject():
             #
             # Validate Arch
             #            
-            if (ArchItem == '' or ArchItem == None):
+            if (ArchItem == '' or ArchItem is None):
                 ArchItem = 'COMMON'
             SupArchList.append(ArchItem)       
         
@@ -84,7 +84,7 @@ class InfPackageObject():
             HelpStringObj = PackageItem[1]
             CurrentLineOfPackItem = PackageItem[2]
             PackageItem = PackageItem[0]
-            if HelpStringObj != None:
+            if HelpStringObj is not None:
                 HelpString = HelpStringObj.HeaderComments + HelpStringObj.TailComments
                 PackageItemObj.SetHelpString(HelpString)                  
             if len(PackageItem) >= 1:
@@ -183,5 +183,5 @@ class InfPackageObject():
         return True
     
     def GetPackages(self, Arch = None):
-        if Arch == None:
+        if Arch is None:
             return self.Packages

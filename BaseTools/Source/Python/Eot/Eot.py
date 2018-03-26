@@ -579,11 +579,11 @@ class Eot(object):
     #  @param Option: The option list including log level setting
     #
     def SetLogLevel(self, Option):
-        if Option.verbose != None:
+        if Option.verbose is not None:
             EdkLogger.SetLevel(EdkLogger.VERBOSE)
-        elif Option.quiet != None:
+        elif Option.quiet is not None:
             EdkLogger.SetLevel(EdkLogger.QUIET)
-        elif Option.debug != None:
+        elif Option.debug is not None:
             EdkLogger.SetLevel(Option.debug + 1)
         else:
             EdkLogger.SetLevel(EdkLogger.INFO)

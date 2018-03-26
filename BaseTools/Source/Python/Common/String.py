@@ -634,7 +634,7 @@ def PreCheck(FileName, FileContent, SupSectionTag):
 # @retval True The file type is correct
 #
 def CheckFileType(CheckFilename, ExtName, ContainerFilename, SectionName, Line, LineNo= -1):
-    if CheckFilename != '' and CheckFilename != None:
+    if CheckFilename != '' and CheckFilename is not None:
         (Root, Ext) = os.path.splitext(CheckFilename)
         if Ext.upper() != ExtName.upper():
             ContainerFile = open(ContainerFilename, 'r').read()
@@ -662,7 +662,7 @@ def CheckFileType(CheckFilename, ExtName, ContainerFilename, SectionName, Line, 
 #
 def CheckFileExist(WorkspaceDir, CheckFilename, ContainerFilename, SectionName, Line, LineNo= -1):
     CheckFile = ''
-    if CheckFilename != '' and CheckFilename != None:
+    if CheckFilename != '' and CheckFilename is not None:
         CheckFile = WorkspaceFile(WorkspaceDir, CheckFilename)
         if not os.path.isfile(CheckFile):
             ContainerFile = open(ContainerFilename, 'r').read()

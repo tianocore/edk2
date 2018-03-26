@@ -124,7 +124,7 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
     if IsCompatibleMode:
         if length == 3 and LangName.isalpha():
             TempLangName = LangConvTable.get(LangName.lower())
-            if TempLangName != None:
+            if TempLangName is not None:
                 return TempLangName
             return LangName
         else:
@@ -136,7 +136,7 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
         if LangName.isalpha():
             return LangName
     elif length == 3:
-        if LangName.isalpha() and LangConvTable.get(LangName.lower()) == None:
+        if LangName.isalpha() and LangConvTable.get(LangName.lower()) is None:
             return LangName
     elif length == 5:
         if LangName[0:2].isalpha() and LangName[2] == '-':
@@ -144,7 +144,7 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
     elif length >= 6:
         if LangName[0:2].isalpha() and LangName[2] == '-':
             return LangName
-        if LangName[0:3].isalpha() and LangConvTable.get(LangName.lower()) == None and LangName[3] == '-':
+        if LangName[0:3].isalpha() and LangConvTable.get(LangName.lower()) is None and LangName[3] == '-':
             return LangName
 
     EdkLogger.error("Unicode File Parser", FORMAT_INVALID, "Invalid RFC 4646 language code : %s" % LangName, File)
@@ -195,14 +195,14 @@ class StringDefClassObject(object):
         self.UseOtherLangDef = UseOtherLangDef
         self.Length = 0
 
-        if Name != None:
+        if Name is not None:
             self.StringName = Name
             self.StringNameByteList = UniToHexList(Name)
-        if Value != None:
+        if Value is not None:
             self.StringValue = Value + u'\x00'        # Add a NULL at string tail
             self.StringValueByteList = UniToHexList(self.StringValue)
             self.Length = len(self.StringValueByteList)
-        if Token != None:
+        if Token is not None:
             self.Token = Token
 
     def __str__(self):
@@ -213,7 +213,7 @@ class StringDefClassObject(object):
                repr(self.UseOtherLangDef)
 
     def UpdateValue(self, Value = None):
-        if Value != None:
+        if Value is not None:
             self.StringValue = Value + u'\x00'        # Add a NULL at string tail
             self.StringValueByteList = UniToHexList(self.StringValue)
             self.Length = len(self.StringValueByteList)
@@ -352,7 +352,7 @@ class UniFileClassObject(object):
         # Check the string name
         if Name != '':
             MatchString = re.match('^[a-zA-Z][a-zA-Z0-9_]*$', Name, re.UNICODE)
-            if MatchString == None or MatchString.end(0) != len(Name):
+            if MatchString is None or MatchString.end(0) != len(Name):
                 EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid character.' % (Name, self.File))
         LanguageList = Item.split(u'#language ')
         for IndexI in range(len(LanguageList)):
@@ -466,7 +466,7 @@ class UniFileClassObject(object):
     # Load a .uni file
     #
     def LoadUniFile(self, File = None):
-        if File == None:
+        if File is None:
             EdkLogger.error("Unicode File Parser", PARSER_ERROR, 'No unicode file is given')
         self.File = File
         #
@@ -522,7 +522,7 @@ class UniFileClassObject(object):
                 # Check the string name
                 if not self.IsCompatibleMode and Name != '':
                     MatchString = re.match('^[a-zA-Z][a-zA-Z0-9_]*$', Name, re.UNICODE)
-                    if MatchString == None or MatchString.end(0) != len(Name):
+                    if MatchString is None or MatchString.end(0) != len(Name):
                         EdkLogger.error('Unicode File Parser', FORMAT_INVALID, 'The string token name %s defined in UNI file %s contains the invalid character.' % (Name, self.File))
                 self.AddStringToList(Name, Language, Value)
                 continue
@@ -578,7 +578,7 @@ class UniFileClassObject(object):
         IsAdded = True
         if Name in self.OrderedStringDict[Language]:
             IsAdded = False
-            if Value != None:
+            if Value is not None:
                 ItemIndexInList = self.OrderedStringDict[Language][Name]
                 Item = self.OrderedStringList[Language][ItemIndexInList]
                 Item.UpdateValue(Value)

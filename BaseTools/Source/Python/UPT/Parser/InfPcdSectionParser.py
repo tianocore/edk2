@@ -95,7 +95,7 @@ class InfPcdSectionParser(InfParserSectionRoot):
                                               FileName,
                                               DT.MODEL_EFI_PCD,
                                               self.FileLocalMacros)
-                    if Name != None:
+                    if Name is not None:
                         SectionMacros[Name] = Value
                         ValueList = []
                         CommentsList = []

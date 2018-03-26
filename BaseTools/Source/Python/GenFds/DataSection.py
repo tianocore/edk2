@@ -52,7 +52,7 @@ class DataSection (DataSectionClassObject):
         #
         # Prepare the parameter of GenSection
         #
-        if FfsFile != None:
+        if FfsFile is not None:
             self.SectFileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.SectFileName)
             self.SectFileName = GenFdsGlobalVariable.MacroExtend(self.SectFileName, Dict, FfsFile.CurrentArch)
         else:
@@ -92,7 +92,7 @@ class DataSection (DataSectionClassObject):
 
         NoStrip = True
         if self.SecType in ('TE', 'PE32'):
-            if self.KeepReloc != None:
+            if self.KeepReloc is not None:
                 NoStrip = self.KeepReloc
 
         if not NoStrip:

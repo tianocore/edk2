@@ -51,7 +51,7 @@ class Fdf(FdfObject):
         #
         # Load Fdf file if filename is not None
         #
-        if Filename != None:
+        if Filename is not None:
             self.LoadFdfFile(Filename)
 
     #

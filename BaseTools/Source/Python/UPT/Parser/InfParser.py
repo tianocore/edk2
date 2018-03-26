@@ -97,7 +97,7 @@ class InfParser(InfSectionParser):
         #
         # Load Inf file if filename is not None
         #
-        if Filename != None:
+        if Filename is not None:
             self.ParseInfFile(Filename)
 
     ## Parse INF file

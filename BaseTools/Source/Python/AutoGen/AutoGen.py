@@ -766,7 +766,7 @@ class WorkspaceAutoGen(AutoGen):
         for Fv in Fdf.Profile.FvDict:
             _GuidDict = {}
             for FfsFile in Fdf.Profile.FvDict[Fv].FfsList:
-                if FfsFile.InfFileName and FfsFile.NameGuid == None:
+                if FfsFile.InfFileName and FfsFile.NameGuid is None:
                     #
                     # Get INF file GUID
                     #
@@ -817,7 +817,7 @@ class WorkspaceAutoGen(AutoGen):
                                                 ExtraData=self.FdfFile)
                         InfFoundFlag = False
 
-                if FfsFile.NameGuid != None:
+                if FfsFile.NameGuid is not None:
                     _CheckPCDAsGuidPattern = re.compile("^PCD\(.+\..+\)$")
 
                     #
@@ -939,13 +939,13 @@ class WorkspaceAutoGen(AutoGen):
 
     ## Return the directory to store FV files
     def _GetFvDir(self):
-        if self._FvDir == None:
+        if self._FvDir is None:
             self._FvDir = path.join(self.BuildDir, 'FV')
         return self._FvDir
 
     ## Return the directory to store all intermediate and final files built
     def _GetBuildDir(self):
-        if self._BuildDir == None:
+        if self._BuildDir is None:
             return self.AutoGenObjectList[0].BuildDir
 
     ## Return the build output directory platform specifies
@@ -973,7 +973,7 @@ class WorkspaceAutoGen(AutoGen):
     #   @retval     string  Makefile directory
     #
     def _GetMakeFileDir(self):
-        if self._MakeFileDir == None:
+        if self._MakeFileDir is None:
             self._MakeFileDir = self.BuildDir
         return self._MakeFileDir
 
@@ -982,7 +982,7 @@ class WorkspaceAutoGen(AutoGen):
     #   @retval     string  Build command string
     #
     def _GetBuildCommand(self):
-        if self._BuildCommand == None:
+        if self._BuildCommand is None:
             # BuildCommand should be all the same. So just get one from platform AutoGen
             self._BuildCommand = self.AutoGenObjectList[0].BuildCommand
         return self._BuildCommand
@@ -1215,7 +1215,7 @@ class PlatformAutoGen(AutoGen):
 
         self.VariableInfo = None
 
-        if GlobalData.gFdfParser != None:
+        if GlobalData.gFdfParser is not None:
             self._AsBuildInfList = GlobalData.gFdfParser.Profile.InfList
             for Inf in self._AsBuildInfList:
                 InfClass = PathClass(NormPath(Inf), GlobalData.gWorkspace, self.Arch)
@@ -1331,7 +1331,7 @@ class PlatformAutoGen(AutoGen):
             for SkuName in Pcd.SkuInfoList:
                 Sku = Pcd.SkuInfoList[SkuName]
                 SkuId = Sku.SkuId
-                if SkuId == None or SkuId == '':
+                if SkuId is None or SkuId == '':
                     continue
                 if len(Sku.VariableName) > 0:
                     VariableGuidStructure = Sku.VariableGuidValue
@@ -1642,7 +1642,7 @@ class PlatformAutoGen(AutoGen):
                         # if the offset of a VPD is *, then it need to be fixed up by third party tool.
                         if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
                             NeedProcessVpdMapFile = True
-                            if self.Platform.VpdToolGuid == None or self.Platform.VpdToolGuid == '':
+                            if self.Platform.VpdToolGuid is None or self.Platform.VpdToolGuid == '':
                                 EdkLogger.error("Build", FILE_NOT_FOUND, \
                                                 "Fail to find third-party BPDG tool to process VPD PCDs. BPDG Guid tool need to be defined in tools_def.txt and VPD_TOOL_GUID need to be provided in DSC file.")
 
@@ -1654,7 +1654,7 @@ class PlatformAutoGen(AutoGen):
             for DscPcd in PlatformPcds:
                 DscPcdEntry = self._PlatformPcds[DscPcd]
                 if DscPcdEntry.Type in [TAB_PCDS_DYNAMIC_VPD, TAB_PCDS_DYNAMIC_EX_VPD]:
-                    if not (self.Platform.VpdToolGuid == None or self.Platform.VpdToolGuid == ''):
+                    if not (self.Platform.VpdToolGuid is None or self.Platform.VpdToolGuid == ''):
                         FoundFlag = False
                         for VpdPcd in VpdFile._VpdArray.keys():
                             # This PCD has been referenced by module
@@ -1734,7 +1734,7 @@ class PlatformAutoGen(AutoGen):
 
                                 # if the offset of a VPD is *, then it need to be fixed up by third party tool.
                             VpdSkuMap[DscPcd] = SkuValueMap
-            if (self.Platform.FlashDefinition == None or self.Platform.FlashDefinition == '') and \
+            if (self.Platform.FlashDefinition is None or self.Platform.FlashDefinition == '') and \
                VpdFile.GetCount() != 0:
                 EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE, 
                                 "Fail to get FLASH_DEFINITION definition in DSC file %s which is required when DSC contains VPD PCD." % str(self.Platform.MetaFile))
@@ -1817,14 +1817,14 @@ class PlatformAutoGen(AutoGen):
                     BPDGToolName = ToolDef["PATH"]
                     break
             # Call third party GUID BPDG tool.
-            if BPDGToolName != None:
+            if BPDGToolName is not None:
                 VpdInfoFile.CallExtenalBPDGTool(BPDGToolName, VpdFilePath)
             else:
                 EdkLogger.error("Build", FILE_NOT_FOUND, "Fail to find third-party BPDG tool to process VPD PCDs. BPDG Guid tool need to be defined in tools_def.txt and VPD_TOOL_GUID need to be provided in DSC file.")
 
     ## Return the platform build data object
     def _GetPlatform(self):
-        if self._Platform == None:
+        if self._Platform is None:
             self._Platform = self.BuildDatabase[self.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
         return self._Platform
 
@@ -1842,7 +1842,7 @@ class PlatformAutoGen(AutoGen):
 
     ## Return the FDF file name
     def _GetFdfFile(self):
-        if self._FdfFile == None:
+        if self._FdfFile is None:
             if self.Workspace.FdfFile != "":
                 self._FdfFile= mws.join(self.WorkspaceDir, self.Workspace.FdfFile)
             else:
@@ -1855,7 +1855,7 @@ class PlatformAutoGen(AutoGen):
 
     ## Return the directory to store all intermediate and final files built
     def _GetBuildDir(self):
-        if self._BuildDir == None:
+        if self._BuildDir is None:
             if os.path.isabs(self.OutputDir):
                 self._BuildDir = path.join(
                                             path.abspath(self.OutputDir),
@@ -1875,7 +1875,7 @@ class PlatformAutoGen(AutoGen):
     #   @retval     string  Makefile directory
     #
     def _GetMakeFileDir(self):
-        if self._MakeFileDir == None:
+        if self._MakeFileDir is None:
             self._MakeFileDir = path.join(self.BuildDir, self.Arch)
         return self._MakeFileDir
 
@@ -1884,7 +1884,7 @@ class PlatformAutoGen(AutoGen):
     #   @retval     string  Build command string
     #
     def _GetBuildCommand(self):
-        if self._BuildCommand == None:
+        if self._BuildCommand is None:
             self._BuildCommand = []
             if "MAKE" in self.ToolDefinition and "PATH" in self.ToolDefinition["MAKE"]:
                 self._BuildCommand += SplitOption(self.ToolDefinition["MAKE"]["PATH"])
@@ -1906,7 +1906,7 @@ class PlatformAutoGen(AutoGen):
     #  Get each tool defition for given tool chain from tools_def.txt and platform
     #
     def _GetToolDefinition(self):
-        if self._ToolDefinitions == None:
+        if self._ToolDefinitions is None:
             ToolDefinition = self.Workspace.ToolDef.ToolsDefTxtDictionary
             if TAB_TOD_DEFINES_COMMAND_TYPE not in self.Workspace.ToolDef.ToolsDefTxtDatabase:
                 EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, "No tools found in configuration",
@@ -1972,13 +1972,13 @@ class PlatformAutoGen(AutoGen):
 
     ## Return the paths of tools
     def _GetToolDefFile(self):
-        if self._ToolDefFile == None:
+        if self._ToolDefFile is None:
             self._ToolDefFile = os.path.join(self.MakeFileDir, "TOOLS_DEF." + self.Arch)
         return self._ToolDefFile
 
     ## Retrieve the toolchain family of given toolchain tag. Default to 'MSFT'.
     def _GetToolChainFamily(self):
-        if self._ToolChainFamily == None:
+        if self._ToolChainFamily is None:
             ToolDefinition = self.Workspace.ToolDef.ToolsDefTxtDatabase
             if TAB_TOD_DEFINES_FAMILY not in ToolDefinition \
                or self.ToolChain not in ToolDefinition[TAB_TOD_DEFINES_FAMILY] \
@@ -1991,7 +1991,7 @@ class PlatformAutoGen(AutoGen):
         return self._ToolChainFamily
 
     def _GetBuildRuleFamily(self):
-        if self._BuildRuleFamily == None:
+        if self._BuildRuleFamily is None:
             ToolDefinition = self.Workspace.ToolDef.ToolsDefTxtDatabase
             if TAB_TOD_DEFINES_BUILDRULEFAMILY not in ToolDefinition \
                or self.ToolChain not in ToolDefinition[TAB_TOD_DEFINES_BUILDRULEFAMILY] \
@@ -2005,19 +2005,19 @@ class PlatformAutoGen(AutoGen):
 
     ## Return the build options specific for all modules in this platform
     def _GetBuildOptions(self):
-        if self._BuildOption == None:
+        if self._BuildOption is None:
             self._BuildOption = self._ExpandBuildOption(self.Platform.BuildOptions)
         return self._BuildOption
 
     ## Return the build options specific for EDK modules in this platform
     def _GetEdkBuildOptions(self):
-        if self._EdkBuildOption == None:
+        if self._EdkBuildOption is None:
             self._EdkBuildOption = self._ExpandBuildOption(self.Platform.BuildOptions, EDK_NAME)
         return self._EdkBuildOption
 
     ## Return the build options specific for EDKII modules in this platform
     def _GetEdkIIBuildOptions(self):
-        if self._EdkIIBuildOption == None:
+        if self._EdkIIBuildOption is None:
             self._EdkIIBuildOption = self._ExpandBuildOption(self.Platform.BuildOptions, EDKII_NAME)
         return self._EdkIIBuildOption
 
@@ -2026,7 +2026,7 @@ class PlatformAutoGen(AutoGen):
     #   @retval     BuildRule object
     #
     def _GetBuildRule(self):
-        if self._BuildRule == None:
+        if self._BuildRule is None:
             BuildRuleFile = None
             if TAB_TAT_DEFINES_BUILD_RULE_CONF in self.Workspace.TargetTxt.TargetTxtDictionary:
                 BuildRuleFile = self.Workspace.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_BUILD_RULE_CONF]
@@ -2046,7 +2046,7 @@ class PlatformAutoGen(AutoGen):
 
     ## Summarize the packages used by modules in this platform
     def _GetPackageList(self):
-        if self._PackageList == None:
+        if self._PackageList is None:
             self._PackageList = set()
             for La in self.LibraryAutoGenList:
                 self._PackageList.update(La.DependentPackageList)
@@ -2071,19 +2071,19 @@ class PlatformAutoGen(AutoGen):
 
     ## Get list of non-dynamic PCDs
     def _GetNonDynamicPcdList(self):
-        if self._NonDynamicPcdList == None:
+        if self._NonDynamicPcdList is None:
             self.CollectPlatformDynamicPcds()
         return self._NonDynamicPcdList
 
     ## Get list of dynamic PCDs
     def _GetDynamicPcdList(self):
-        if self._DynamicPcdList == None:
+        if self._DynamicPcdList is None:
             self.CollectPlatformDynamicPcds()
         return self._DynamicPcdList
 
     ## Generate Token Number for all PCD
     def _GetPcdTokenNumbers(self):
-        if self._PcdTokenNumber == None:
+        if self._PcdTokenNumber is None:
             self._PcdTokenNumber = sdict()
             TokenNumber = 1
             #
@@ -2151,13 +2151,13 @@ class PlatformAutoGen(AutoGen):
 
     ## Summarize ModuleAutoGen objects of all modules to be built for this platform
     def _GetModuleAutoGenList(self):
-        if self._ModuleAutoGenList == None:
+        if self._ModuleAutoGenList is None:
             self._GetAutoGenObjectList()
         return self._ModuleAutoGenList
 
     ## Summarize ModuleAutoGen objects of all libraries to be built for this platform
     def _GetLibraryAutoGenList(self):
-        if self._LibraryAutoGenList == None:
+        if self._LibraryAutoGenList is None:
             self._GetAutoGenObjectList()
         return self._LibraryAutoGenList
 
@@ -2221,9 +2221,9 @@ class PlatformAutoGen(AutoGen):
                         LibraryPath = PlatformModule.LibraryClasses[LibraryClassName]
                     else:
                         LibraryPath = self.Platform.LibraryClasses[LibraryClassName, ModuleType]
-                    if LibraryPath == None or LibraryPath == "":
+                    if LibraryPath is None or LibraryPath == "":
                         LibraryPath = M.LibraryClasses[LibraryClassName]
-                        if LibraryPath == None or LibraryPath == "":
+                        if LibraryPath is None or LibraryPath == "":
                             EdkLogger.error("build", RESOURCE_NOT_AVAILABLE,
                                             "Instance of library class [%s] is not found" % LibraryClassName,
                                             File=self.MetaFile,
@@ -2233,7 +2233,7 @@ class PlatformAutoGen(AutoGen):
                     # for those forced library instance (NULL library), add a fake library class
                     if LibraryClassName.startswith("NULL"):
                         LibraryModule.LibraryClass.append(LibraryClassObject(LibraryClassName, [ModuleType]))
-                    elif LibraryModule.LibraryClass == None \
+                    elif LibraryModule.LibraryClass is None \
                          or len(LibraryModule.LibraryClass) == 0 \
                          or (ModuleType != 'USER_DEFINED'
                              and ModuleType not in LibraryModule.LibraryClass[0].SupModList):
@@ -2249,7 +2249,7 @@ class PlatformAutoGen(AutoGen):
                 else:
                     LibraryModule = LibraryInstance[LibraryClassName]
 
-                if LibraryModule == None:
+                if LibraryModule is None:
                     continue
 
                 if LibraryModule.ConstructorList != [] and LibraryModule not in Constructor:
@@ -2357,7 +2357,7 @@ class PlatformAutoGen(AutoGen):
             if (ToPcd.TokenCName, ToPcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
                 TokenCName = PcdItem[0]
                 break
-        if FromPcd != None:
+        if FromPcd is not None:
             if ToPcd.Pending and FromPcd.Type not in [None, '']:
                 ToPcd.Type = FromPcd.Type
             elif (ToPcd.Type not in [None, '']) and (FromPcd.Type not in [None, ''])\
@@ -2401,7 +2401,7 @@ class PlatformAutoGen(AutoGen):
             ToPcd.validlists = FromPcd.validlists
             ToPcd.expressions = FromPcd.expressions
 
-        if FromPcd != None and ToPcd.DatumType == "VOID*" and ToPcd.MaxDatumSize in ['', None]:
+        if FromPcd is not None and ToPcd.DatumType == "VOID*" and ToPcd.MaxDatumSize in ['', None]:
             EdkLogger.debug(EdkLogger.DEBUG_9, "No MaxDatumSize specified for PCD %s.%s" \
                             % (ToPcd.TokenSpaceGuidCName, TokenCName))
             Value = ToPcd.DefaultValue
@@ -2447,7 +2447,7 @@ class PlatformAutoGen(AutoGen):
                 Sku = PcdInModule.SkuInfoList[SkuId]
                 if Sku.VariableGuid == '': continue
                 Sku.VariableGuidValue = GuidValue(Sku.VariableGuid, self.PackageList, self.MetaFile.Path)
-                if Sku.VariableGuidValue == None:
+                if Sku.VariableGuidValue is None:
                     PackageList = "\n\t".join([str(P) for P in self.PackageList])
                     EdkLogger.error(
                                 'build',
@@ -2510,12 +2510,12 @@ class PlatformAutoGen(AutoGen):
             M = LibraryConsumerList.pop()
             for LibraryName in M.Libraries:
                 Library = self.Platform.LibraryClasses[LibraryName, ':dummy:']
-                if Library == None:
+                if Library is None:
                     for Key in self.Platform.LibraryClasses.data.keys():
                         if LibraryName.upper() == Key.upper():
                             Library = self.Platform.LibraryClasses[Key, ':dummy:']
                             break
-                    if Library == None:
+                    if Library is None:
                         EdkLogger.warn("build", "Library [%s] is not found" % LibraryName, File=str(M),
                             ExtraData="\t%s [%s]" % (str(Module), self.Arch))
                         continue
@@ -2570,13 +2570,13 @@ class PlatformAutoGen(AutoGen):
             # Key[1] -- TARGET_TOOLCHAIN_ARCH_COMMANDTYPE_ATTRIBUTE
             #
             if (Key[0] == self.BuildRuleFamily and
-                (ModuleStyle == None or len(Key) < 3 or (len(Key) > 2 and Key[2] == ModuleStyle))):
+                (ModuleStyle is None or len(Key) < 3 or (len(Key) > 2 and Key[2] == ModuleStyle))):
                 Target, ToolChain, Arch, CommandType, Attr = Key[1].split('_')
                 if Target == self.BuildTarget or Target == "*":
                     if ToolChain == self.ToolChain or ToolChain == "*":
                         if Arch == self.Arch or Arch == "*":
                             if Options[Key].startswith("="):
-                                if OverrideList.get(Key[1]) != None:
+                                if OverrideList.get(Key[1]) is not None:
                                     OverrideList.pop(Key[1])
                                 OverrideList[Key[1]] = Options[Key]
         
@@ -2600,14 +2600,14 @@ class PlatformAutoGen(AutoGen):
                                 if CommandType1 == CommandType2 or CommandType1 == "*" or CommandType2 == "*":
                                     if Attr1 == Attr2 or Attr1 == "*" or Attr2 == "*":
                                         if self.CalculatePriorityValue(NowKey) > self.CalculatePriorityValue(NextKey):
-                                            if Options.get((self.BuildRuleFamily, NextKey)) != None:
+                                            if Options.get((self.BuildRuleFamily, NextKey)) is not None:
                                                 Options.pop((self.BuildRuleFamily, NextKey))
                                         else:
-                                            if Options.get((self.BuildRuleFamily, NowKey)) != None:
+                                            if Options.get((self.BuildRuleFamily, NowKey)) is not None:
                                                 Options.pop((self.BuildRuleFamily, NowKey))
                                                            
         for Key in Options:
-            if ModuleStyle != None and len (Key) > 2:
+            if ModuleStyle is not None and len (Key) > 2:
                 # Check Module style is EDK or EDKII.
                 # Only append build option for the matched style module.
                 if ModuleStyle == EDK_NAME and Key[2] != EDK_NAME:
@@ -2644,7 +2644,7 @@ class PlatformAutoGen(AutoGen):
             return BuildOptions
 
         for Key in Options:
-            if ModuleStyle != None and len (Key) > 2:
+            if ModuleStyle is not None and len (Key) > 2:
                 # Check Module style is EDK or EDKII.
                 # Only append build option for the matched style module.
                 if ModuleStyle == EDK_NAME and Key[2] != EDK_NAME:
@@ -2736,7 +2736,7 @@ class PlatformAutoGen(AutoGen):
                             BuildOptions[Tool][Attr] += " " + Value
                         else:
                             BuildOptions[Tool][Attr] = Value
-        if Module.AutoGenVersion < 0x00010005 and self.Workspace.UniFlag != None:
+        if Module.AutoGenVersion < 0x00010005 and self.Workspace.UniFlag is not None:
             #
             # Override UNI flag only for EDK module.
             #
@@ -2942,7 +2942,7 @@ class ModuleAutoGen(AutoGen):
 
     # Macros could be used in build_rule.txt (also Makefile)
     def _GetMacros(self):
-        if self._Macro == None:
+        if self._Macro is None:
             self._Macro = sdict()
             self._Macro["WORKSPACE"             ] = self.WorkspaceDir
             self._Macro["MODULE_NAME"           ] = self.Name
@@ -2982,7 +2982,7 @@ class ModuleAutoGen(AutoGen):
 
     ## Return the module build data object
     def _GetModule(self):
-        if self._Module == None:
+        if self._Module is None:
             self._Module = self.Workspace.BuildDatabase[self.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
         return self._Module
 
@@ -3038,8 +3038,8 @@ class ModuleAutoGen(AutoGen):
 
     ## Check if the module is library or not
     def _IsLibrary(self):
-        if self._LibraryFlag == None:
-            if self.Module.LibraryClass != None and self.Module.LibraryClass != []:
+        if self._LibraryFlag is None:
+            if self.Module.LibraryClass is not None and self.Module.LibraryClass != []:
                 self._LibraryFlag = True
             else:
                 self._LibraryFlag = False
@@ -3051,7 +3051,7 @@ class ModuleAutoGen(AutoGen):
 
     ## Return the directory to store intermediate files of the module
     def _GetBuildDir(self):
-        if self._BuildDir == None:
+        if self._BuildDir is None:
             self._BuildDir = path.join(
                                     self.PlatformInfo.BuildDir,
                                     self.Arch,
@@ -3063,15 +3063,15 @@ class ModuleAutoGen(AutoGen):
 
     ## Return the directory to store the intermediate object files of the mdoule
     def _GetOutputDir(self):
-        if self._OutputDir == None:
+        if self._OutputDir is None:
             self._OutputDir = path.join(self.BuildDir, "OUTPUT")
             CreateDirectory(self._OutputDir)
         return self._OutputDir
 
     ## Return the directory to store ffs file
     def _GetFfsOutputDir(self):
-        if self._FfsOutputDir == None:
-            if GlobalData.gFdfParser != None:
+        if self._FfsOutputDir is None:
+            if GlobalData.gFdfParser is not None:
                 self._FfsOutputDir = path.join(self.PlatformInfo.BuildDir, "FV", "Ffs", self.Guid + self.Name)
             else:
                 self._FfsOutputDir = ''
@@ -3079,21 +3079,21 @@ class ModuleAutoGen(AutoGen):
 
     ## Return the directory to store auto-gened source files of the mdoule
     def _GetDebugDir(self):
-        if self._DebugDir == None:
+        if self._DebugDir is None:
             self._DebugDir = path.join(self.BuildDir, "DEBUG")
             CreateDirectory(self._DebugDir)
         return self._DebugDir
 
     ## Return the path of custom file
     def _GetCustomMakefile(self):
-        if self._CustomMakefile == None:
+        if self._CustomMakefile is None:
             self._CustomMakefile = {}
             for Type in self.Module.CustomMakefile:
                 if Type in gMakeTypeMap:
                     MakeType = gMakeTypeMap[Type]
                 else:
                     MakeType = 'nmake'
-                if self.SourceOverrideDir != None:
+                if self.SourceOverrideDir is not None:
                     File = os.path.join(self.SourceOverrideDir, self.Module.CustomMakefile[Type])
                     if not os.path.exists(File):
                         File = os.path.join(self.SourceDir, self.Module.CustomMakefile[Type])
@@ -3194,7 +3194,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     list    The token list of the dependency expression after parsed
     #
     def _GetDepexTokenList(self):
-        if self._DepexList == None:
+        if self._DepexList is None:
             self._DepexList = {}
             if self.DxsFile or self.IsLibrary or TAB_DEPENDENCY_EXPRESSION_FILE in self.FileTypes:
                 return self._DepexList
@@ -3230,7 +3230,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     list    The token list of the dependency expression after parsed
     #
     def _GetDepexExpressionTokenList(self):
-        if self._DepexExpressionList == None:
+        if self._DepexExpressionList is None:
             self._DepexExpressionList = {}
             if self.DxsFile or self.IsLibrary or TAB_DEPENDENCY_EXPRESSION_FILE in self.FileTypes:
                 return self._DepexExpressionList
@@ -3298,7 +3298,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     dict            The dict containing valid options
     #
     def _GetModuleBuildOption(self):
-        if self._BuildOption == None:
+        if self._BuildOption is None:
             self._BuildOption, self.BuildRuleOrder = self.PlatformInfo.ApplyBuildOption(self.Module)
             if self.BuildRuleOrder:
                 self.BuildRuleOrder = ['.%s' % Ext for Ext in self.BuildRuleOrder.split()]
@@ -3309,7 +3309,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     list            The include path list
     #
     def _GetBuildOptionIncPathList(self):
-        if self._BuildOptionIncPathList == None:
+        if self._BuildOptionIncPathList is None:
             #
             # Regular expression for finding Include Directories, the difference between MSFT and INTEL/GCC/RVCT
             # is the former use /I , the Latter used -I to specify include directories
@@ -3370,7 +3370,7 @@ class ModuleAutoGen(AutoGen):
     #  $(CONF_DIRECTORY)/build_rule.txt and toolchain family.
     #
     def _GetSourceFileList(self):
-        if self._SourceFileList == None:
+        if self._SourceFileList is None:
             self._SourceFileList = []
             for F in self.Module.Sources:
                 # match tool chain
@@ -3423,7 +3423,7 @@ class ModuleAutoGen(AutoGen):
 
     ## Return the list of unicode files
     def _GetUnicodeFileList(self):
-        if self._UnicodeFileList == None:
+        if self._UnicodeFileList is None:
             if TAB_UNICODE_FILE in self.FileTypes:
                 self._UnicodeFileList = self.FileTypes[TAB_UNICODE_FILE]
             else:
@@ -3432,7 +3432,7 @@ class ModuleAutoGen(AutoGen):
 
     ## Return the list of vfr files
     def _GetVfrFileList(self):
-        if self._VfrFileList == None:
+        if self._VfrFileList is None:
             if TAB_VFR_FILE in self.FileTypes:
                 self._VfrFileList = self.FileTypes[TAB_VFR_FILE]
             else:
@@ -3441,7 +3441,7 @@ class ModuleAutoGen(AutoGen):
 
     ## Return the list of Image Definition files
     def _GetIdfFileList(self):
-        if self._IdfFileList == None:
+        if self._IdfFileList is None:
             if TAB_IMAGE_FILE in self.FileTypes:
                 self._IdfFileList = self.FileTypes[TAB_IMAGE_FILE]
             else:
@@ -3455,7 +3455,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     list            The list of files which can be built later
     #
     def _GetBinaryFiles(self):
-        if self._BinaryFileList == None:
+        if self._BinaryFileList is None:
             self._BinaryFileList = []
             for F in self.Module.Binaries:
                 if F.Target not in ['COMMON', '*'] and F.Target != self.BuildTarget:
@@ -3465,7 +3465,7 @@ class ModuleAutoGen(AutoGen):
         return self._BinaryFileList
 
     def _GetBuildRules(self):
-        if self._BuildRules == None:
+        if self._BuildRules is None:
             BuildRules = {}
             BuildRuleDatabase = self.PlatformInfo.BuildRule
             for Type in BuildRuleDatabase.FileTypeList:
@@ -3492,7 +3492,7 @@ class ModuleAutoGen(AutoGen):
         return self._BuildRules
 
     def _ApplyBuildRule(self, File, FileType):
-        if self._BuildTargets == None:
+        if self._BuildTargets is None:
             self._IntroBuildTargetList = set()
             self._FinalBuildTargetList = set()
             self._BuildTargets = {}
@@ -3517,7 +3517,7 @@ class ModuleAutoGen(AutoGen):
             if Source != File:
                 CreateDirectory(Source.Dir)
 
-            if File.IsBinary and File == Source and self._BinaryFileList != None and File in self._BinaryFileList:
+            if File.IsBinary and File == Source and self._BinaryFileList is not None and File in self._BinaryFileList:
                 # Skip all files that are not binary libraries
                 if not self.IsLibrary:
                     continue
@@ -3569,7 +3569,7 @@ class ModuleAutoGen(AutoGen):
             FileType = TAB_UNKNOWN_FILE
 
     def _GetTargets(self):
-        if self._BuildTargets == None:
+        if self._BuildTargets is None:
             self._IntroBuildTargetList = set()
             self._FinalBuildTargetList = set()
             self._BuildTargets = {}
@@ -3616,7 +3616,7 @@ class ModuleAutoGen(AutoGen):
         if self.BuildType == 'UEFI_HII':
             UniStringAutoGenC = False
             IdfStringAutoGenC = False
-        if self._AutoGenFileList == None:
+        if self._AutoGenFileList is None:
             self._AutoGenFileList = {}
             AutoGenC = TemplateString()
             AutoGenH = TemplateString()
@@ -3639,29 +3639,29 @@ class ModuleAutoGen(AutoGen):
                 AutoFile = PathClass(gAutoGenStringFileName % {"module_name":self.Name}, self.DebugDir)
                 self._AutoGenFileList[AutoFile] = str(StringH)
                 self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
-            if UniStringBinBuffer != None and UniStringBinBuffer.getvalue() != "":
+            if UniStringBinBuffer is not None and UniStringBinBuffer.getvalue() != "":
                 AutoFile = PathClass(gAutoGenStringFormFileName % {"module_name":self.Name}, self.OutputDir)
                 self._AutoGenFileList[AutoFile] = UniStringBinBuffer.getvalue()
                 AutoFile.IsBinary = True
                 self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
-            if UniStringBinBuffer != None:
+            if UniStringBinBuffer is not None:
                 UniStringBinBuffer.close()
             if str(StringIdf) != "":
                 AutoFile = PathClass(gAutoGenImageDefFileName % {"module_name":self.Name}, self.DebugDir)
                 self._AutoGenFileList[AutoFile] = str(StringIdf)
                 self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
-            if IdfGenBinBuffer != None and IdfGenBinBuffer.getvalue() != "":
+            if IdfGenBinBuffer is not None and IdfGenBinBuffer.getvalue() != "":
                 AutoFile = PathClass(gAutoGenIdfFileName % {"module_name":self.Name}, self.OutputDir)
                 self._AutoGenFileList[AutoFile] = IdfGenBinBuffer.getvalue()
                 AutoFile.IsBinary = True
                 self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
-            if IdfGenBinBuffer != None:
+            if IdfGenBinBuffer is not None:
                 IdfGenBinBuffer.close()
         return self._AutoGenFileList
 
     ## Return the list of library modules explicitly or implicityly used by this module
     def _GetLibraryList(self):
-        if self._DependentLibraryList == None:
+        if self._DependentLibraryList is None:
             # only merge library classes and PCD for non-library module
             if self.IsLibrary:
                 self._DependentLibraryList = []
@@ -3683,7 +3683,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     list                    The list of PCD
     #
     def _GetModulePcdList(self):
-        if self._ModulePcdList == None:
+        if self._ModulePcdList is None:
             # apply PCD settings from platform
             self._ModulePcdList = self.PlatformInfo.ApplyPcdSetting(self.Module, self.Module.Pcds)
             self.UpdateComments(self._PcdComments, self.Module.PcdComments)
@@ -3694,7 +3694,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     list                    The list of PCD
     #
     def _GetLibraryPcdList(self):
-        if self._LibraryPcdList == None:
+        if self._LibraryPcdList is None:
             Pcds = sdict()
             if not self.IsLibrary:
                 # get PCDs from dependent libraries
@@ -3716,7 +3716,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     dict    The mapping between GUID cname and its value
     #
     def _GetGuidList(self):
-        if self._GuidList == None:
+        if self._GuidList is None:
             self._GuidList = sdict()
             self._GuidList.update(self.Module.Guids)
             for Library in self.DependentLibraryList:
@@ -3726,7 +3726,7 @@ class ModuleAutoGen(AutoGen):
         return self._GuidList
 
     def GetGuidsUsedByPcd(self):
-        if self._GuidsUsedByPcd == None:
+        if self._GuidsUsedByPcd is None:
             self._GuidsUsedByPcd = sdict()
             self._GuidsUsedByPcd.update(self.Module.GetGuidsUsedByPcd())
             for Library in self.DependentLibraryList:
@@ -3737,7 +3737,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     dict    The mapping between protocol cname and its value
     #
     def _GetProtocolList(self):
-        if self._ProtocolList == None:
+        if self._ProtocolList is None:
             self._ProtocolList = sdict()
             self._ProtocolList.update(self.Module.Protocols)
             for Library in self.DependentLibraryList:
@@ -3751,7 +3751,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     dict    The mapping between PPI cname and its value
     #
     def _GetPpiList(self):
-        if self._PpiList == None:
+        if self._PpiList is None:
             self._PpiList = sdict()
             self._PpiList.update(self.Module.Ppis)
             for Library in self.DependentLibraryList:
@@ -3765,7 +3765,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     list                    The list path
     #
     def _GetIncludePathList(self):
-        if self._IncludePathList == None:
+        if self._IncludePathList is None:
             self._IncludePathList = []
             if self.AutoGenVersion < 0x00010005:
                 for Inc in self.Module.Includes:
@@ -3957,7 +3957,7 @@ class ModuleAutoGen(AutoGen):
             return
             
         # Skip the following code for modules with no source files
-        if self.SourceFileList == None or self.SourceFileList == []:
+        if self.SourceFileList is None or self.SourceFileList == []:
             return
 
         # Skip the following code for modules without any binary files
@@ -4172,7 +4172,7 @@ class ModuleAutoGen(AutoGen):
                         HexFormat = '0x%016x'
                     PcdValue = HexFormat % int(Pcd.DefaultValue, 0)
                 else:
-                    if Pcd.MaxDatumSize == None or Pcd.MaxDatumSize == '':
+                    if Pcd.MaxDatumSize is None or Pcd.MaxDatumSize == '':
                         EdkLogger.error("build", AUTOGEN_ERROR,
                                         "Unknown [MaxDatumSize] of PCD [%s.%s]" % (Pcd.TokenSpaceGuidCName, TokenCName)
                                         )
@@ -4452,7 +4452,7 @@ class ModuleAutoGen(AutoGen):
 
     ## Summarize the ModuleAutoGen objects of all libraries used by this module
     def _GetLibraryAutoGenList(self):
-        if self._LibraryAutoGenList == None:
+        if self._LibraryAutoGenList is None:
             self._LibraryAutoGenList = []
             for Library in self.DependentLibraryList:
                 La = ModuleAutoGen(
@@ -4540,7 +4540,7 @@ class ModuleAutoGen(AutoGen):
         return True
 
     def GetTimeStampPath(self):
-        if self._TimeStampPath == None:
+        if self._TimeStampPath is None:
             self._TimeStampPath = os.path.join(self.MakeFileDir, 'AutoGenTimeStamp')
         return self._TimeStampPath
     def CreateTimeStamp(self, Makefile):

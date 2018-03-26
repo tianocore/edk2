@@ -117,9 +117,9 @@ class ModuleTable(MetaFileTable):
         ConditionString = "Model=%s AND Enabled>=0" % Model
         ValueString = "Value1,Value2,Value3,Usage,Scope1,Scope2,ID,StartLine"
 
-        if Arch != None and Arch != 'COMMON':
+        if Arch is not None and Arch != 'COMMON':
             ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Arch
-        if Platform != None and Platform != 'COMMON':
+        if Platform is not None and Platform != 'COMMON':
             ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT')" % Platform
 
         SqlCommand = "SELECT %s FROM %s WHERE %s" % (ValueString, self.Table, ConditionString)
@@ -198,7 +198,7 @@ class PackageTable(MetaFileTable):
         ConditionString = "Model=%s AND Enabled>=0" % Model
         ValueString = "Value1,Value2,Value3,Scope1,ID,StartLine"
 
-        if Arch != None and Arch != 'COMMON':
+        if Arch is not None and Arch != 'COMMON':
             ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Arch
 
         SqlCommand = "SELECT %s FROM %s WHERE %s" % (ValueString, self.Table, ConditionString)
@@ -283,17 +283,17 @@ class PlatformTable(MetaFileTable):
         ConditionString = "Model=%s AND Enabled>0" % Model
         ValueString = "Value1,Value2,Value3,Scope1,Scope2,ID,StartLine"
 
-        if Scope1 != None and Scope1 != 'COMMON':
+        if Scope1 is not None and Scope1 != 'COMMON':
             ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Scope1
-        if Scope2 != None and Scope2 != 'COMMON':
+        if Scope2 is not None and Scope2 != 'COMMON':
             ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT')" % Scope2
 
-        if BelongsToItem != None:
+        if BelongsToItem is not None:
             ConditionString += " AND BelongsToItem=%s" % BelongsToItem
         else:
             ConditionString += " AND BelongsToItem<0"
 
-        if FromItem != None:
+        if FromItem is not None:
             ConditionString += " AND FromItem=%s" % FromItem
 
         SqlCommand = "SELECT %s FROM %s WHERE %s" % (ValueString, self.Table, ConditionString)

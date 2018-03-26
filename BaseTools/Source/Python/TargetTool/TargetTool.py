@@ -85,7 +85,7 @@ class TargetTool():
         for Key in KeyList:
             if type(self.TargetTxtDictionary[Key]) == type([]):
                 print "%-30s = %s" % (Key, ''.join(elem + ' ' for elem in self.TargetTxtDictionary[Key]))
-            elif self.TargetTxtDictionary[Key] == None:
+            elif self.TargetTxtDictionary[Key] is None:
                 errMsg += "  Missing %s configuration information, please use TargetTool to set value!" % Key + os.linesep 
             else:
                 print "%-30s = %s" % (Key, self.TargetTxtDictionary[Key])
@@ -116,14 +116,14 @@ class TargetTool():
                                 Line = "%-30s = \n" % Key
                             else:
                                 ret = GetConfigureKeyValue(self, Key)
-                                if ret != None:
+                                if ret is not None:
                                     Line = ret
                             fw.write(Line)
             for key in self.TargetTxtDictionary.keys():
                 if key not in existKeys:
                     print "Warning: %s does not exist in original configuration file" % key
                     Line = GetConfigureKeyValue(self, key)
-                    if Line == None:
+                    if Line is None:
                         Line = "%-30s = " % key
                     fw.write(Line)
                 
@@ -138,14 +138,14 @@ class TargetTool():
 
 def GetConfigureKeyValue(self, Key):
     Line = None
-    if Key == TAB_TAT_DEFINES_ACTIVE_PLATFORM and self.Opt.DSCFILE != None:
+    if Key == TAB_TAT_DEFINES_ACTIVE_PLATFORM and self.Opt.DSCFILE is not None:
         dscFullPath = os.path.join(self.WorkSpace, self.Opt.DSCFILE)
         if os.path.exists(dscFullPath):
             Line = "%-30s = %s\n" % (Key, self.Opt.DSCFILE)
         else:
             EdkLogger.error("TagetTool", BuildToolError.FILE_NOT_FOUND, 
                             "DSC file %s does not exist!" % self.Opt.DSCFILE, RaiseError=False)
-    elif Key == TAB_TAT_DEFINES_TOOL_CHAIN_CONF and self.Opt.TOOL_DEFINITION_FILE != None:
+    elif Key == TAB_TAT_DEFINES_TOOL_CHAIN_CONF and self.Opt.TOOL_DEFINITION_FILE is not None:
         tooldefFullPath = os.path.join(self.WorkSpace, self.Opt.TOOL_DEFINITION_FILE)
         if os.path.exists(tooldefFullPath):
             Line = "%-30s = %s\n" % (Key, self.Opt.TOOL_DEFINITION_FILE)
@@ -157,15 +157,15 @@ def GetConfigureKeyValue(self, Key):
         Line = "%-30s = %s\n" % (Key, 'Enable')
     elif self.Opt.NUM <= 1:
         Line = "%-30s = %s\n" % (Key, 'Disable')        
-    elif Key == TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER and self.Opt.NUM != None:
+    elif Key == TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER and self.Opt.NUM is not None:
         Line = "%-30s = %s\n" % (Key, str(self.Opt.NUM))
-    elif Key == TAB_TAT_DEFINES_TARGET and self.Opt.TARGET != None:
+    elif Key == TAB_TAT_DEFINES_TARGET and self.Opt.TARGET is not None:
         Line = "%-30s = %s\n" % (Key, ''.join(elem + ' ' for elem in self.Opt.TARGET))
-    elif Key == TAB_TAT_DEFINES_TARGET_ARCH and self.Opt.TARGET_ARCH != None:
+    elif Key == TAB_TAT_DEFINES_TARGET_ARCH and self.Opt.TARGET_ARCH is not None:
         Line = "%-30s = %s\n" % (Key, ''.join(elem + ' ' for elem in self.Opt.TARGET_ARCH))
-    elif Key == TAB_TAT_DEFINES_TOOL_CHAIN_TAG and self.Opt.TOOL_CHAIN_TAG != None:
+    elif Key == TAB_TAT_DEFINES_TOOL_CHAIN_TAG and self.Opt.TOOL_CHAIN_TAG is not None:
         Line = "%-30s = %s\n" % (Key, self.Opt.TOOL_CHAIN_TAG)
-    elif Key == TAB_TAT_DEFINES_BUILD_RULE_CONF and self.Opt.BUILD_RULE_FILE != None:
+    elif Key == TAB_TAT_DEFINES_BUILD_RULE_CONF and self.Opt.BUILD_RULE_FILE is not None:
         buildruleFullPath = os.path.join(self.WorkSpace, self.Opt.BUILD_RULE_FILE)
         if os.path.exists(buildruleFullPath):
             Line = "%-30s = %s\n" % (Key, self.Opt.BUILD_RULE_FILE)
@@ -223,7 +223,7 @@ def MyOptionParser():
 if __name__ == '__main__':
     EdkLogger.Initialize()
     EdkLogger.SetLevel(EdkLogger.QUIET)
-    if os.getenv('WORKSPACE') == None:
+    if os.getenv('WORKSPACE') is None:
         print "ERROR: WORKSPACE should be specified or edksetup script should be executed before run TargetTool"
         sys.exit(1)
         
@@ -231,15 +231,15 @@ if __name__ == '__main__':
     if len(args) != 1 or (args[0].lower() != 'print' and args[0].lower() != 'clean' and args[0].lower() != 'set'):
         print "The number of args isn't 1 or the value of args is invalid."
         sys.exit(1)
-    if opt.NUM != None and opt.NUM < 1:
+    if opt.NUM is not None and opt.NUM < 1:
         print "The MAX_CONCURRENT_THREAD_NUMBER must be larger than 0."
         sys.exit(1)
-    if opt.TARGET != None and len(opt.TARGET) > 1:
+    if opt.TARGET is not None and len(opt.TARGET) > 1:
         for elem in opt.TARGET:
             if elem == '0':
                 print "0 will clear the TARGET setting in target.txt and can't combine with other value."
                 sys.exit(1)
-    if opt.TARGET_ARCH != None and len(opt.TARGET_ARCH) > 1:
+    if opt.TARGET_ARCH is not None and len(opt.TARGET_ARCH) > 1:
         for elem in opt.TARGET_ARCH:
             if elem == '0':
                 print "0 will clear the TARGET_ARCH setting in target.txt and can't combine with other value."

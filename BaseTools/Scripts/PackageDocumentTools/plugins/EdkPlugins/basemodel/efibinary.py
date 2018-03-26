@@ -553,7 +553,7 @@ class EfiFvMapFile(object):
             if line[0] != ' ':
                 # new entry
                 ret = rMapEntry.match(line)
-                if ret != None:
+                if ret is not None:
                     name     = ret.groups()[0]
                     baseaddr = int(ret.groups()[1], 16)
                     entry    = int(ret.groups()[2], 16)

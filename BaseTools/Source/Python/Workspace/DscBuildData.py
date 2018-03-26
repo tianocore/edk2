@@ -298,7 +298,7 @@ class DscBuildData(PlatformBuildClassObject):
 
     ## Get current effective macros
     def _GetMacros(self):
-        if self.__Macros == None:
+        if self.__Macros is None:
             self.__Macros = {}
             self.__Macros.update(GlobalData.gPlatformDefines)
             self.__Macros.update(GlobalData.gGlobalDefines)
@@ -368,7 +368,7 @@ class DscBuildData(PlatformBuildClassObject):
             elif Name == TAB_DSC_DEFINES_BUILD_TARGETS:
                 self._BuildTargets = GetSplitValueList(Record[2])
             elif Name == TAB_DSC_DEFINES_SKUID_IDENTIFIER:
-                if self._SkuName == None:
+                if self._SkuName is None:
                     self._SkuName = Record[2]
                 if GlobalData.gSKUID_CMD:
                     self._SkuName = GlobalData.gSKUID_CMD
@@ -427,76 +427,76 @@ class DscBuildData(PlatformBuildClassObject):
 
     ## Retrieve platform name
     def _GetPlatformName(self):
-        if self._PlatformName == None:
-            if self._Header == None:
+        if self._PlatformName is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._PlatformName == None:
+            if self._PlatformName is None:
                 EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No PLATFORM_NAME", File=self.MetaFile)
         return self._PlatformName
 
     ## Retrieve file guid
     def _GetFileGuid(self):
-        if self._Guid == None:
-            if self._Header == None:
+        if self._Guid is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._Guid == None:
+            if self._Guid is None:
                 EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No PLATFORM_GUID", File=self.MetaFile)
         return self._Guid
 
     ## Retrieve platform version
     def _GetVersion(self):
-        if self._Version == None:
-            if self._Header == None:
+        if self._Version is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._Version == None:
+            if self._Version is None:
                 EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No PLATFORM_VERSION", File=self.MetaFile)
         return self._Version
 
     ## Retrieve platform description file version
     def _GetDscSpec(self):
-        if self._DscSpecification == None:
-            if self._Header == None:
+        if self._DscSpecification is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._DscSpecification == None:
+            if self._DscSpecification is None:
                 EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No DSC_SPECIFICATION", File=self.MetaFile)
         return self._DscSpecification
 
     ## Retrieve OUTPUT_DIRECTORY
     def _GetOutpuDir(self):
-        if self._OutputDirectory == None:
-            if self._Header == None:
+        if self._OutputDirectory is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._OutputDirectory == None:
+            if self._OutputDirectory is None:
                 self._OutputDirectory = os.path.join("Build", self._PlatformName)
         return self._OutputDirectory
 
     ## Retrieve SUPPORTED_ARCHITECTURES
     def _GetSupArch(self):
-        if self._SupArchList == None:
-            if self._Header == None:
+        if self._SupArchList is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._SupArchList == None:
+            if self._SupArchList is None:
                 EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No SUPPORTED_ARCHITECTURES", File=self.MetaFile)
         return self._SupArchList
 
     ## Retrieve BUILD_TARGETS
     def _GetBuildTarget(self):
-        if self._BuildTargets == None:
-            if self._Header == None:
+        if self._BuildTargets is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._BuildTargets == None:
+            if self._BuildTargets is None:
                 EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No BUILD_TARGETS", File=self.MetaFile)
         return self._BuildTargets
 
     def _GetPcdInfoFlag(self):
-        if self._PcdInfoFlag == None or self._PcdInfoFlag.upper() == 'FALSE':
+        if self._PcdInfoFlag is None or self._PcdInfoFlag.upper() == 'FALSE':
             return False
         elif self._PcdInfoFlag.upper() == 'TRUE':
             return True
         else:
             return False
     def _GetVarCheckFlag(self):
-        if self._VarCheckFlag == None or self._VarCheckFlag.upper() == 'FALSE':
+        if self._VarCheckFlag is None or self._VarCheckFlag.upper() == 'FALSE':
             return False
         elif self._VarCheckFlag.upper() == 'TRUE':
             return True
@@ -505,10 +505,10 @@ class DscBuildData(PlatformBuildClassObject):
 
     # # Retrieve SKUID_IDENTIFIER
     def _GetSkuName(self):
-        if self._SkuName == None:
-            if self._Header == None:
+        if self._SkuName is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._SkuName == None:
+            if self._SkuName is None:
                 self._SkuName = 'DEFAULT'
         return self._SkuName
 
@@ -517,72 +517,72 @@ class DscBuildData(PlatformBuildClassObject):
         self._SkuName = Value
 
     def _GetFdfFile(self):
-        if self._FlashDefinition == None:
-            if self._Header == None:
+        if self._FlashDefinition is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._FlashDefinition == None:
+            if self._FlashDefinition is None:
                 self._FlashDefinition = ''
         return self._FlashDefinition
 
     def _GetPrebuild(self):
-        if self._Prebuild == None:
-            if self._Header == None:
+        if self._Prebuild is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._Prebuild == None:
+            if self._Prebuild is None:
                 self._Prebuild = ''
         return self._Prebuild
 
     def _GetPostbuild(self):
-        if self._Postbuild == None:
-            if self._Header == None:
+        if self._Postbuild is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._Postbuild == None:
+            if self._Postbuild is None:
                 self._Postbuild = ''
         return self._Postbuild
 
     ## Retrieve FLASH_DEFINITION
     def _GetBuildNumber(self):
-        if self._BuildNumber == None:
-            if self._Header == None:
+        if self._BuildNumber is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._BuildNumber == None:
+            if self._BuildNumber is None:
                 self._BuildNumber = ''
         return self._BuildNumber
 
     ## Retrieve MAKEFILE_NAME
     def _GetMakefileName(self):
-        if self._MakefileName == None:
-            if self._Header == None:
+        if self._MakefileName is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._MakefileName == None:
+            if self._MakefileName is None:
                 self._MakefileName = ''
         return self._MakefileName
 
     ## Retrieve BsBaseAddress
     def _GetBsBaseAddress(self):
-        if self._BsBaseAddress == None:
-            if self._Header == None:
+        if self._BsBaseAddress is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._BsBaseAddress == None:
+            if self._BsBaseAddress is None:
                 self._BsBaseAddress = ''
         return self._BsBaseAddress
 
     ## Retrieve RtBaseAddress
     def _GetRtBaseAddress(self):
-        if self._RtBaseAddress == None:
-            if self._Header == None:
+        if self._RtBaseAddress is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._RtBaseAddress == None:
+            if self._RtBaseAddress is None:
                 self._RtBaseAddress = ''
         return self._RtBaseAddress
 
     ## Retrieve the top address for the load fix address
     def _GetLoadFixAddress(self):
-        if self._LoadFixAddress == None:
-            if self._Header == None:
+        if self._LoadFixAddress is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
 
-            if self._LoadFixAddress == None:
+            if self._LoadFixAddress is None:
                 self._LoadFixAddress = self._Macros.get(TAB_FIX_LOAD_TOP_MEMORY_ADDRESS, '0')
 
             try:
@@ -608,33 +608,33 @@ class DscBuildData(PlatformBuildClassObject):
 
     ## Retrieve RFCLanguage filter
     def _GetRFCLanguages(self):
-        if self._RFCLanguages == None:
-            if self._Header == None:
+        if self._RFCLanguages is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._RFCLanguages == None:
+            if self._RFCLanguages is None:
                 self._RFCLanguages = []
         return self._RFCLanguages
 
     ## Retrieve ISOLanguage filter
     def _GetISOLanguages(self):
-        if self._ISOLanguages == None:
-            if self._Header == None:
+        if self._ISOLanguages is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._ISOLanguages == None:
+            if self._ISOLanguages is None:
                 self._ISOLanguages = []
         return self._ISOLanguages
     ## Retrieve the GUID string for VPD tool
     def _GetVpdToolGuid(self):
-        if self._VpdToolGuid == None:
-            if self._Header == None:
+        if self._VpdToolGuid is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._VpdToolGuid == None:
+            if self._VpdToolGuid is None:
                 self._VpdToolGuid = ''
         return self._VpdToolGuid
 
     ## Retrieve [SkuIds] section information
     def _GetSkuIds(self):
-        if self._SkuIds == None:
+        if self._SkuIds is None:
             self._SkuIds = sdict()
             RecordList = self._RawData[MODEL_EFI_SKU_ID, self._Arch]
             for Record in RecordList:
@@ -646,7 +646,7 @@ class DscBuildData(PlatformBuildClassObject):
                                     File=self.MetaFile, Line=Record[-1])
                 Pattern = re.compile('^[1-9]\d*|0$')
                 HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
-                if Pattern.match(Record[0]) == None and HexPattern.match(Record[0]) == None:
+                if Pattern.match(Record[0]) is None and HexPattern.match(Record[0]) is None:
                     EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID number is invalid. It only support Integer and HexNumber",
                                     File=self.MetaFile, Line=Record[-1])
                 if not IsValidWord(Record[1]):
@@ -661,7 +661,7 @@ class DscBuildData(PlatformBuildClassObject):
     def ToInt(self,intstr):
         return int(intstr,16) if intstr.upper().startswith("0X") else int(intstr)
     def _GetDefaultStores(self):
-        if self.DefaultStores == None:
+        if self.DefaultStores is None:
             self.DefaultStores = sdict()
             RecordList = self._RawData[MODEL_EFI_DEFAULT_STORES, self._Arch]
             for Record in RecordList:
@@ -673,7 +673,7 @@ class DscBuildData(PlatformBuildClassObject):
                                     File=self.MetaFile, Line=Record[-1])
                 Pattern = re.compile('^[1-9]\d*|0$')
                 HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
-                if Pattern.match(Record[0]) == None and HexPattern.match(Record[0]) == None:
+                if Pattern.match(Record[0]) is None and HexPattern.match(Record[0]) is None:
                     EdkLogger.error('build', FORMAT_INVALID, "The format of the DefaultStores ID number is invalid. It only support Integer and HexNumber",
                                     File=self.MetaFile, Line=Record[-1])
                 if not IsValidWord(Record[1]):
@@ -689,7 +689,7 @@ class DscBuildData(PlatformBuildClassObject):
 
     ## Retrieve [Components] section information
     def _GetModules(self):
-        if self._Modules != None:
+        if self._Modules is not None:
             return self._Modules
 
         self._Modules = sdict()
@@ -788,13 +788,13 @@ class DscBuildData(PlatformBuildClassObject):
 
     ## Retrieve all possible library instances used in this platform
     def _GetLibraryInstances(self):
-        if self._LibraryInstances == None:
+        if self._LibraryInstances is None:
             self._GetLibraryClasses()
         return self._LibraryInstances
 
     ## Retrieve [LibraryClasses] information
     def _GetLibraryClasses(self):
-        if self._LibraryClasses == None:
+        if self._LibraryClasses is None:
             self._LibraryInstances = []
             #
             # tdict is a special dict kind of type, used for selecting correct
@@ -832,7 +832,7 @@ class DscBuildData(PlatformBuildClassObject):
                 # try all possible module types
                 for ModuleType in SUP_MODULE_LIST:
                     LibraryInstance = LibraryClassDict[self._Arch, ModuleType, LibraryClass]
-                    if LibraryInstance == None:
+                    if LibraryInstance is None:
                         continue
                     self._LibraryClasses[LibraryClass, ModuleType] = LibraryInstance
 
@@ -859,7 +859,7 @@ class DscBuildData(PlatformBuildClassObject):
         return self._LibraryClasses
 
     def _ValidatePcd(self, PcdCName, TokenSpaceGuid, Setting, PcdType, LineNo):
-        if self._DecPcds == None:
+        if self._DecPcds is None:
 
             FdfInfList = []
             if GlobalData.gFdfParser:
@@ -1121,7 +1121,7 @@ class DscBuildData(PlatformBuildClassObject):
 
     ## Retrieve all PCD settings in platform
     def _GetPcds(self):
-        if self._Pcds == None:
+        if self._Pcds is None:
             self._Pcds = sdict()
             self.__ParsePcdFromCommandLine()
             self._Pcds.update(self._GetPcd(MODEL_PCD_FIXED_AT_BUILD))
@@ -1156,7 +1156,7 @@ class DscBuildData(PlatformBuildClassObject):
                     print "PcdCName: %s, SkuName: %s, Value: %s" % (".".join((pcdobj.TokenSpaceGuidCName, pcdobj.TokenCName)), skuid,str(pcdobj.SkuInfoList[skuid].DefaultValue))
     ## Retrieve [BuildOptions]
     def _GetBuildOptions(self):
-        if self._BuildOptions == None:
+        if self._BuildOptions is None:
             self._BuildOptions = sdict()
             #
             # Retrieve build option for EDKII and EDK style module
@@ -1178,7 +1178,7 @@ class DscBuildData(PlatformBuildClassObject):
         return self._BuildOptions
 
     def GetBuildOptionsByModuleType(self, Edk, ModuleType):
-        if self._ModuleTypeOptions == None:
+        if self._ModuleTypeOptions is None:
             self._ModuleTypeOptions = sdict()
         if (Edk, ModuleType) not in self._ModuleTypeOptions:
             options = sdict()
@@ -1471,7 +1471,7 @@ class DscBuildData(PlatformBuildClassObject):
 
         for PcdCName, TokenSpaceGuid, SkuName, Dummy4 in PcdSet:
             Setting = PcdDict[self._Arch, PcdCName, TokenSpaceGuid, SkuName]
-            if Setting == None:
+            if Setting is None:
                 continue
             PcdValue, DatumType, MaxDatumSize = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
             if (PcdCName, TokenSpaceGuid) in PcdValueDict:
@@ -2256,7 +2256,7 @@ class DscBuildData(PlatformBuildClassObject):
         for PcdCName, TokenSpaceGuid, SkuName, Dummy4 in PcdList:
 
             Setting = PcdDict[self._Arch, SkuName, PcdCName, TokenSpaceGuid]
-            if Setting == None:
+            if Setting is None:
                 continue
 
             PcdValue, DatumType, MaxDatumSize = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
@@ -2428,7 +2428,7 @@ class DscBuildData(PlatformBuildClassObject):
         for PcdCName, TokenSpaceGuid, SkuName,DefaultStore, Dummy4 in PcdSet:
 
             Setting = PcdDict[self._Arch, SkuName, PcdCName, TokenSpaceGuid,DefaultStore]
-            if Setting == None:
+            if Setting is None:
                 continue
             VariableName, VariableGuid, VariableOffset, DefaultValue, VarAttribute = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
 
@@ -2498,7 +2498,7 @@ class DscBuildData(PlatformBuildClassObject):
             pcd.DatumType = pcdDecObject.DatumType
             # Only fix the value while no value provided in DSC file.
             for sku in pcd.SkuInfoList.values():
-                if (sku.HiiDefaultValue == "" or sku.HiiDefaultValue == None):
+                if (sku.HiiDefaultValue == "" or sku.HiiDefaultValue is None):
                     sku.HiiDefaultValue = pcdDecObject.DefaultValue
                     for default_store in sku.DefaultStoreDict:
                         sku.DefaultStoreDict[default_store]=pcdDecObject.DefaultValue
@@ -2582,7 +2582,7 @@ class DscBuildData(PlatformBuildClassObject):
         # Remove redundant PCD candidates, per the ARCH and SKU
         for PcdCName, TokenSpaceGuid, SkuName, Dummy4 in PcdList:
             Setting = PcdDict[self._Arch, SkuName, PcdCName, TokenSpaceGuid]
-            if Setting == None:
+            if Setting is None:
                 continue
             #
             # For the VOID* type, it can have optional data of MaxDatumSize and InitialValue
@@ -2691,7 +2691,7 @@ class DscBuildData(PlatformBuildClassObject):
         self.Pcds[Name, Guid].DefaultValue = Value
     @property
     def DecPcds(self):
-        if self._DecPcds == None:
+        if self._DecPcds is None:
             FdfInfList = []
             if GlobalData.gFdfParser:
                 FdfInfList = GlobalData.gFdfParser.Profile.InfList

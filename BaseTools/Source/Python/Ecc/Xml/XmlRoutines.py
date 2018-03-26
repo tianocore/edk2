@@ -30,14 +30,14 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 def CreateXmlElement(Name, String, NodeList, AttributeList):
     Doc = xml.dom.minidom.Document()
     Element = Doc.createElement(Name)
-    if String != '' and String != None:
+    if String != '' and String is not None:
         Element.appendChild(Doc.createTextNode(String))
     
     for Item in NodeList:
         if type(Item) == type([]):
             Key = Item[0]
             Value = Item[1]
-            if Key != '' and Key != None and Value != '' and Value != None:
+            if Key != '' and Key is not None and Value != '' and Value is not None:
                 Node = Doc.createElement(Key)
                 Node.appendChild(Doc.createTextNode(Value))
                 Element.appendChild(Node)
@@ -46,7 +46,7 @@ def CreateXmlElement(Name, String, NodeList, AttributeList):
     for Item in AttributeList:
         Key = Item[0]
         Value = Item[1]
-        if Key != '' and Key != None and Value != '' and Value != None:
+        if Key != '' and Key is not None and Value != '' and Value is not None:
             Element.setAttribute(Key, Value)
     
     return Element
@@ -62,7 +62,7 @@ def CreateXmlElement(Name, String, NodeList, AttributeList):
 # @revel  Nodes              A list of XML nodes matching XPath style Sting.
 #
 def XmlList(Dom, String):
-    if String == None or String == "" or Dom == None or Dom == "":
+    if String is None or String == "" or Dom is None or Dom == "":
         return []
     if Dom.nodeType == Dom.DOCUMENT_NODE:
         Dom = Dom.documentElement
@@ -98,7 +98,7 @@ def XmlList(Dom, String):
 # @revel  Node               A single XML node matching XPath style Sting.
 #
 def XmlNode(Dom, String):
-    if String == None or String == ""  or Dom == None or Dom == "":
+    if String is None or String == ""  or Dom is None or Dom == "":
         return ""
     if Dom.nodeType == Dom.DOCUMENT_NODE:
         Dom = Dom.documentElement

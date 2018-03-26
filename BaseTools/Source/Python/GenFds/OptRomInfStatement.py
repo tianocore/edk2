@@ -46,10 +46,10 @@ class OptRomInfStatement (FfsInfStatement):
     #
     def __GetOptRomParams(self):
         
-        if self.OverrideAttribs == None:
+        if self.OverrideAttribs is None:
             self.OverrideAttribs = OptionRom.OverrideAttribs()
 
-        if self.OverrideAttribs.NeedCompress == None:
+        if self.OverrideAttribs.NeedCompress is None:
             self.OverrideAttribs.NeedCompress = self.OptRomDefs.get ('PCI_COMPRESS')
             if self.OverrideAttribs.NeedCompress is not None:
                 if self.OverrideAttribs.NeedCompress.upper() not in ('TRUE', 'FALSE'):
@@ -57,16 +57,16 @@ class OptRomInfStatement (FfsInfStatement):
                 self.OverrideAttribs.NeedCompress = \
                     self.OverrideAttribs.NeedCompress.upper() == 'TRUE'
 
-        if self.OverrideAttribs.PciVendorId == None:
+        if self.OverrideAttribs.PciVendorId is None:
             self.OverrideAttribs.PciVendorId = self.OptRomDefs.get ('PCI_VENDOR_ID')
         
-        if self.OverrideAttribs.PciClassCode == None:
+        if self.OverrideAttribs.PciClassCode is None:
             self.OverrideAttribs.PciClassCode = self.OptRomDefs.get ('PCI_CLASS_CODE')
             
-        if self.OverrideAttribs.PciDeviceId == None:
+        if self.OverrideAttribs.PciDeviceId is None:
             self.OverrideAttribs.PciDeviceId = self.OptRomDefs.get ('PCI_DEVICE_ID')
             
-        if self.OverrideAttribs.PciRevision == None:
+        if self.OverrideAttribs.PciRevision is None:
             self.OverrideAttribs.PciRevision = self.OptRomDefs.get ('PCI_REVISION')
         
 #        InfObj = GenFdsGlobalVariable.WorkSpace.BuildObject[self.PathClassObj, self.CurrentArch]  
@@ -121,7 +121,7 @@ class OptRomInfStatement (FfsInfStatement):
         #
 
         OutputFileList = []
-        if Rule.FileName != None:
+        if Rule.FileName is not None:
             GenSecInputFile = self.__ExtendMacro__(Rule.FileName)
             OutputFileList.append(GenSecInputFile)
         else:
@@ -143,7 +143,7 @@ class OptRomInfStatement (FfsInfStatement):
         OutputFileList = []
         for Sect in Rule.SectionList:
             if Sect.SectionType == 'PE32':
-                if Sect.FileName != None:
+                if Sect.FileName is not None:
                     GenSecInputFile = self.__ExtendMacro__(Sect.FileName)
                     OutputFileList.append(GenSecInputFile)
                 else:

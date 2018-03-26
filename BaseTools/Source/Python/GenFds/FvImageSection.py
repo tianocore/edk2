@@ -53,7 +53,7 @@ class FvImageSection(FvImageSectionClassObject):
     def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}, IsMakefile = False):
 
         OutputFileList = []
-        if self.FvFileType != None:
+        if self.FvFileType is not None:
             FileList, IsSect = Section.Section.GetFileList(FfsInf, self.FvFileType, self.FvFileExtension)
             if IsSect :
                 return FileList, self.Alignment
@@ -96,20 +96,20 @@ class FvImageSection(FvImageSectionClassObject):
         #
         # Generate Fv
         #
-        if self.FvName != None:
+        if self.FvName is not None:
             Buffer = StringIO.StringIO('')
             Fv = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName)
-            if Fv != None:
+            if Fv is not None:
                 self.Fv = Fv
                 FvFileName = Fv.AddToBuffer(Buffer, self.FvAddr, MacroDict = Dict, Flag=IsMakefile)
-                if Fv.FvAlignment != None:
-                    if self.Alignment == None:
+                if Fv.FvAlignment is not None:
+                    if self.Alignment is None:
                         self.Alignment = Fv.FvAlignment
                     else:
                         if GenFdsGlobalVariable.GetAlignment (Fv.FvAlignment) > GenFdsGlobalVariable.GetAlignment (self.Alignment):
                             self.Alignment = Fv.FvAlignment
             else:
-                if self.FvFileName != None:
+                if self.FvFileName is not None:
                     FvFileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FvFileName)
                     if os.path.isfile(FvFileName):
                         FvFileObj = open (FvFileName,'rb')

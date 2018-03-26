@@ -53,7 +53,7 @@ class ToolDefClassObject(object):
         for Env in os.environ:
             self.MacroDictionary["ENV(%s)" % Env] = os.environ[Env]
 
-        if FileName != None:
+        if FileName is not None:
             self.LoadToolDefFile(FileName)
 
     ## LoadToolDefFile

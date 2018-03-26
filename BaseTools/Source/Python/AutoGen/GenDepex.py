@@ -360,7 +360,7 @@ class DependencyExpression:
 
         FilePath = ""
         FileChangeFlag = True
-        if File == None:
+        if File is None:
             sys.stdout.write(Buffer.getvalue())
             FilePath = "STDOUT"
         else:
@@ -414,13 +414,13 @@ def Main():
         EdkLogger.SetLevel(EdkLogger.QUIET)
     elif Option.verbose:
         EdkLogger.SetLevel(EdkLogger.VERBOSE)
-    elif Option.debug != None:
+    elif Option.debug is not None:
         EdkLogger.SetLevel(Option.debug + 1)
     else:
         EdkLogger.SetLevel(EdkLogger.INFO)
 
     try:
-        if Option.ModuleType == None or Option.ModuleType not in gType2Phase:
+        if Option.ModuleType is None or Option.ModuleType not in gType2Phase:
             EdkLogger.error("GenDepex", OPTION_MISSING, "Module type is not specified or supported")
 
         DxsFile = ''
@@ -437,7 +437,7 @@ def Main():
             EdkLogger.error("GenDepex", OPTION_MISSING, "No expression string or file given")
 
         Dpx = DependencyExpression(DxsString, Option.ModuleType, Option.Optimize)
-        if Option.OutputFile != None:
+        if Option.OutputFile is not None:
             FileChangeFlag = Dpx.Generate(Option.OutputFile)
             if not FileChangeFlag and DxsFile:
                 #
@@ -450,7 +450,7 @@ def Main():
             Dpx.Generate()
     except BaseException, X:
         EdkLogger.quiet("")
-        if Option != None and Option.debug != None:
+        if Option is not None and Option.debug is not None:
             EdkLogger.quiet(traceback.format_exc())
         else:
             EdkLogger.quiet(str(X))

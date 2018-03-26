@@ -211,7 +211,7 @@ class InfSourcesObject(InfSectionCommonDef):
             #
             # Validate Arch
             #            
-            if (ArchItem == '' or ArchItem == None):
+            if (ArchItem == '' or ArchItem is None):
                 ArchItem = 'COMMON'  
             __SupArchList.append(ArchItem)   
 

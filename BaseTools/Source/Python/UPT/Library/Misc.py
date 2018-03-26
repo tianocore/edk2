@@ -120,7 +120,7 @@ def GuidStructureStringToGuidString(GuidValue):
 # @param      Directory:   The directory name
 #
 def CreateDirectory(Directory):
-    if Directory == None or Directory.strip() == "":
+    if Directory is None or Directory.strip() == "":
         return True
     try:
         if not access(Directory, F_OK):
@@ -134,7 +134,7 @@ def CreateDirectory(Directory):
 # @param      Directory:   The directory name
 #
 def RemoveDirectory(Directory, Recursively=False):
-    if Directory == None or Directory.strip() == "" or not \
+    if Directory is None or Directory.strip() == "" or not \
     os.path.exists(Directory):
         return
     if Recursively:
@@ -237,7 +237,7 @@ def GetNonMetaDataFiles(Root, SkipList, FullPath, PrefixPath):
 #
 def ValidFile(File, Ext=None):
     File = File.replace('\\', '/')
-    if Ext != None:
+    if Ext is not None:
         FileExt = os.path.splitext(File)[1]
         if FileExt.lower() != Ext.lower():
             return False
@@ -423,7 +423,7 @@ class Sdict(IterableUserDict):
     ## update method
     #
     def update(self, Dict=None, **Kwargs):
-        if Dict != None:
+        if Dict is not None:
             for Key1, Val1 in Dict.items():
                 self[Key1] = Val1
         if len(Kwargs):
@@ -529,7 +529,7 @@ class PathClass(object):
     ## _GetFileKey
     #
     def _GetFileKey(self):
-        if self._Key == None:
+        if self._Key is None:
             self._Key = self.Path.upper()
         return self._Key
     ## Validate

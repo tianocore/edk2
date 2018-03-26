@@ -85,7 +85,7 @@ def _parseForXcode(lines, efifilepath, varnames):
             for varname in varnames:
                 if varname in line:
                     m = re.match('^([\da-fA-FxX]+)([\s\S]*)([_]*%s)$' % varname, line)
-                    if m != None:
+                    if m is not None:
                         ret.append((varname, m.group(1)))
     return ret
 
@@ -110,27 +110,27 @@ def _parseForGCC(lines, efifilepath, varnames):
         # status handler
         if status == 3:
             m = re.match('^([\w_\.]+) +([\da-fA-Fx]+) +([\da-fA-Fx]+)$', line)
-            if m != None:
+            if m is not None:
                 sections.append(m.groups(0))
             for varname in varnames:
                 Str = ''
                 m = re.match("^.data.(%s)" % varname, line)
-                if m != None:
+                if m is not None:
                     m = re.match(".data.(%s)$" % varname, line)
-                    if m != None:
+                    if m is not None:
                         Str = lines[index + 1]
                     else:
                         Str = line[len(".data.%s" % varname):]
                     if Str:
                         m = re.match('^([\da-fA-Fx]+) +([\da-fA-Fx]+)', Str.strip())
-                        if m != None:
+                        if m is not None:
                             varoffset.append((varname, int(m.groups(0)[0], 16) , int(sections[-1][1], 16), sections[-1][0]))
 
     if not varoffset:
         return []
     # get section information from efi file
     efisecs = PeImageClass(efifilepath).SectionHeaderList
-    if efisecs == None or len(efisecs) == 0:
+    if efisecs is None or len(efisecs) == 0:
         return []
     #redirection
     redirection = 0
@@ -166,19 +166,19 @@ def _parseGeneral(lines, efifilepath, varnames):
             continue        
         if status == 1 and len(line) != 0:
             m =  secRe.match(line)
-            assert m != None, "Fail to parse the section in map file , line is %s" % line
+            assert m is not None, "Fail to parse the section in map file , line is %s" % line
             sec_no, sec_start, sec_length, sec_name, sec_class = m.groups(0)
             secs.append([int(sec_no, 16), int(sec_start, 16), int(sec_length, 16), sec_name, sec_class])
         if status == 2 and len(line) != 0:
             for varname in varnames:
                 m = symRe.match(line)
-                assert m != None, "Fail to parse the symbol in map file, line is %s" % line
+                assert m is not None, "Fail to parse the symbol in map file, line is %s" % line
                 sec_no, sym_offset, sym_name, vir_addr = m.groups(0)
                 sec_no     = int(sec_no,     16)
                 sym_offset = int(sym_offset, 16)
                 vir_addr   = int(vir_addr,   16)
                 m2 = re.match('^[_]*(%s)' % varname, sym_name)
-                if m2 != None:
+                if m2 is not None:
                     # fond a binary pcd entry in map file
                     for sec in secs:
                         if sec[0] == sec_no and (sym_offset >= sec[1] and sym_offset < sec[1] + sec[2]):
@@ -188,7 +188,7 @@ def _parseGeneral(lines, efifilepath, varnames):
 
     # get section information from efi file
     efisecs = PeImageClass(efifilepath).SectionHeaderList
-    if efisecs == None or len(efisecs) == 0:
+    if efisecs is None or len(efisecs) == 0:
         return []
 
     ret = []
@@ -423,7 +423,7 @@ def GuidStructureStringToGuidValueName(GuidValue):
 #   @param      Directory   The directory name
 #
 def CreateDirectory(Directory):
-    if Directory == None or Directory.strip() == "":
+    if Directory is None or Directory.strip() == "":
         return True
     try:
         if not os.access(Directory, os.F_OK):
@@ -437,7 +437,7 @@ def CreateDirectory(Directory):
 #   @param      Directory   The directory name
 #
 def RemoveDirectory(Directory, Recursively=False):
-    if Directory == None or Directory.strip() == "" or not os.path.exists(Directory):
+    if Directory is None or Directory.strip() == "" or not os.path.exists(Directory):
         return
     if Recursively:
         CurrentDirectory = os.getcwd()
@@ -540,7 +540,7 @@ def DataDump(Data, File):
     except:
         EdkLogger.error("", FILE_OPEN_FAILURE, ExtraData=File, RaiseError=False)
     finally:
-        if Fd != None:
+        if Fd is not None:
             Fd.close()
 
 ## Restore a Python object from a file
@@ -560,7 +560,7 @@ def DataRestore(File):
         EdkLogger.verbose("Failed to load [%s]\n\t%s" % (File, str(e)))
         Data = None
     finally:
-        if Fd != None:
+        if Fd is not None:
             Fd.close()
     return Data
 
@@ -668,7 +668,7 @@ def GetFiles(Root, SkipList=None, FullPath=True):
 #   @retval     False   if file doesn't exists
 #
 def ValidFile(File, Ext=None):
-    if Ext != None:
+    if Ext is not None:
         Dummy, FileExt = os.path.splitext(File)
         if FileExt.lower() != Ext.lower():
             return False
@@ -715,13 +715,13 @@ def RealPath2(File, Dir='', OverrideDir=''):
 #
 def ValidFile2(AllFiles, File, Ext=None, Workspace='', EfiSource='', EdkSource='', Dir='.', OverrideDir=''):
     NewFile = File
-    if Ext != None:
+    if Ext is not None:
         Dummy, FileExt = os.path.splitext(File)
         if FileExt.lower() != Ext.lower():
             return False, File
 
     # Replace the Edk macros
-    if OverrideDir != '' and OverrideDir != None:
+    if OverrideDir != '' and OverrideDir is not None:
         if OverrideDir.find('$(EFI_SOURCE)') > -1:
             OverrideDir = OverrideDir.replace('$(EFI_SOURCE)', EfiSource)
         if OverrideDir.find('$(EDK_SOURCE)') > -1:
@@ -737,19 +737,19 @@ def ValidFile2(AllFiles, File, Ext=None, Workspace='', EfiSource='', EdkSource='
         NewFile = File.replace('$(EFI_SOURCE)', EfiSource)
         NewFile = NewFile.replace('$(EDK_SOURCE)', EdkSource)
         NewFile = AllFiles[os.path.normpath(NewFile)]
-        if NewFile != None:
+        if NewFile is not None:
             return True, NewFile
 
     # Second check the path with override value
-    if OverrideDir != '' and OverrideDir != None:
+    if OverrideDir != '' and OverrideDir is not None:
         NewFile = AllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
-        if NewFile != None:
+        if NewFile is not None:
             return True, NewFile
 
     # Last check the path with normal definitions
     File = os.path.join(Dir, File)
     NewFile = AllFiles[os.path.normpath(File)]
-    if NewFile != None:
+    if NewFile is not None:
         return True, NewFile
 
     return False, File
@@ -759,7 +759,7 @@ def ValidFile2(AllFiles, File, Ext=None, Workspace='', EfiSource='', EdkSource='
 #
 def ValidFile3(AllFiles, File, Workspace='', EfiSource='', EdkSource='', Dir='.', OverrideDir=''):
     # Replace the Edk macros
-    if OverrideDir != '' and OverrideDir != None:
+    if OverrideDir != '' and OverrideDir is not None:
         if OverrideDir.find('$(EFI_SOURCE)') > -1:
             OverrideDir = OverrideDir.replace('$(EFI_SOURCE)', EfiSource)
         if OverrideDir.find('$(EDK_SOURCE)') > -1:
@@ -781,23 +781,23 @@ def ValidFile3(AllFiles, File, Workspace='', EfiSource='', EdkSource='', Dir='.'
             File = File.replace('$(EFI_SOURCE)', EfiSource)
             File = File.replace('$(EDK_SOURCE)', EdkSource)
             NewFile = AllFiles[os.path.normpath(File)]
-            if NewFile != None:
+            if NewFile is not None:
                 NewRelaPath = os.path.dirname(NewFile)
                 File = os.path.basename(NewFile)
                 #NewRelaPath = NewFile[:len(NewFile) - len(File.replace("..\\", '').replace("../", '')) - 1]
                 break
 
         # Second check the path with override value
-        if OverrideDir != '' and OverrideDir != None:
+        if OverrideDir != '' and OverrideDir is not None:
             NewFile = AllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
-            if NewFile != None:
+            if NewFile is not None:
                 #NewRelaPath = os.path.dirname(NewFile)
                 NewRelaPath = NewFile[:len(NewFile) - len(File.replace("..\\", '').replace("../", '')) - 1]
                 break
 
         # Last check the path with normal definitions
         NewFile = AllFiles[os.path.normpath(os.path.join(Dir, File))]
-        if NewFile != None:
+        if NewFile is not None:
             break
 
         # No file found
@@ -1062,7 +1062,7 @@ class Progressor:
         self.CodaMessage = CloseMessage
         self.ProgressChar = ProgressChar
         self.Interval = Interval
-        if Progressor._StopFlag == None:
+        if Progressor._StopFlag is None:
             Progressor._StopFlag = threading.Event()
 
     ## Start to print progress charater
@@ -1070,10 +1070,10 @@ class Progressor:
     #   @param      OpenMessage     The string printed before progress charaters
     #
     def Start(self, OpenMessage=None):
-        if OpenMessage != None:
+        if OpenMessage is not None:
             self.PromptMessage = OpenMessage
         Progressor._StopFlag.clear()
-        if Progressor._ProgressThread == None:
+        if Progressor._ProgressThread is None:
             Progressor._ProgressThread = threading.Thread(target=self._ProgressThreadEntry)
             Progressor._ProgressThread.setDaemon(False)
             Progressor._ProgressThread.start()
@@ -1084,7 +1084,7 @@ class Progressor:
     #
     def Stop(self, CloseMessage=None):
         OriginalCodaMessage = self.CodaMessage
-        if CloseMessage != None:
+        if CloseMessage is not None:
             self.CodaMessage = CloseMessage
         self.Abort()
         self.CodaMessage = OriginalCodaMessage
@@ -1107,9 +1107,9 @@ class Progressor:
     ## Abort the progress display
     @staticmethod
     def Abort():
-        if Progressor._StopFlag != None:
+        if Progressor._StopFlag is not None:
             Progressor._StopFlag.set()
-        if Progressor._ProgressThread != None:
+        if Progressor._ProgressThread is not None:
             Progressor._ProgressThread.join()
             Progressor._ProgressThread = None
 
@@ -1228,7 +1228,7 @@ class sdict(IterableUserDict):
         return key, value
 
     def update(self, dict=None, **kwargs):
-        if dict != None:
+        if dict is not None:
             for k, v in dict.items():
                 self[k] = v
         if len(kwargs):
@@ -1301,7 +1301,7 @@ class tdict:
             if self._Level_ > 1:
                 RestKeys = [self._Wildcard for i in range(0, self._Level_ - 1)]
 
-        if FirstKey == None or str(FirstKey).upper() in self._ValidWildcardList:
+        if FirstKey is None or str(FirstKey).upper() in self._ValidWildcardList:
             FirstKey = self._Wildcard
 
         if self._Single_:
@@ -1316,24 +1316,24 @@ class tdict:
             if FirstKey == self._Wildcard:
                 if FirstKey in self.data:
                     Value = self.data[FirstKey][RestKeys]
-                if Value == None:
+                if Value is None:
                     for Key in self.data:
                         Value = self.data[Key][RestKeys]
-                        if Value != None: break
+                        if Value is not None: break
             else:
                 if FirstKey in self.data:
                     Value = self.data[FirstKey][RestKeys]
-                if Value == None and self._Wildcard in self.data:
+                if Value is None and self._Wildcard in self.data:
                     #print "Value=None"
                     Value = self.data[self._Wildcard][RestKeys]
         else:
             if FirstKey == self._Wildcard:
                 if FirstKey in self.data:
                     Value = self.data[FirstKey]
-                if Value == None:
+                if Value is None:
                     for Key in self.data:
                         Value = self.data[Key]
-                        if Value != None: break
+                        if Value is not None: break
             else:
                 if FirstKey in self.data:
                     Value = self.data[FirstKey]
@@ -2066,7 +2066,7 @@ class PathClass(object):
         return hash(self.Path)
 
     def _GetFileKey(self):
-        if self._Key == None:
+        if self._Key is None:
             self._Key = self.Path.upper()   # + self.ToolChainFamily + self.TagName + self.ToolCode + self.Target
         return self._Key
 

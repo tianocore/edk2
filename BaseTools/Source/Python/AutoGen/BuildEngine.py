@@ -346,12 +346,12 @@ class BuildRule:
     def __init__(self, File=None, Content=None, LineIndex=0, SupportedFamily=["MSFT", "INTEL", "GCC", "RVCT"]):
         self.RuleFile = File
         # Read build rules from file if it's not none
-        if File != None:
+        if File is not None:
             try:
                 self.RuleContent = open(File, 'r').readlines()
             except:
                 EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=File)
-        elif Content != None:
+        elif Content is not None:
             self.RuleContent = Content
         else:
             EdkLogger.error("build", PARAMETER_MISSING, ExtraData="No rule file or string given")
@@ -478,7 +478,7 @@ class BuildRule:
                     EdkLogger.error("build", FORMAT_INVALID, "No file type given",
                                     File=self.RuleFile, Line=LineIndex + 1,
                                     ExtraData=self.RuleContent[LineIndex])
-                if self._FileTypePattern.match(FileType) == None:
+                if self._FileTypePattern.match(FileType) is None:
                     EdkLogger.error("build", FORMAT_INVALID, File=self.RuleFile, Line=LineIndex + 1,
                                     ExtraData="Only character, number (non-first character), '_' and '-' are allowed in file type")
             # new format: File-Type.Build-Type.Arch
@@ -561,7 +561,7 @@ class BuildRule:
         FileList = [File.strip() for File in self.RuleContent[LineIndex].split(",")]
         for ToolChainFamily in self._FamilyList:
             InputFiles = self._RuleInfo[ToolChainFamily, self._State]
-            if InputFiles == None:
+            if InputFiles is None:
                 InputFiles = []
                 self._RuleInfo[ToolChainFamily, self._State] = InputFiles
             InputFiles.extend(FileList)
@@ -573,7 +573,7 @@ class BuildRule:
     def ParseCommon(self, LineIndex):
         for ToolChainFamily in self._FamilyList:
             Items = self._RuleInfo[ToolChainFamily, self._State]
-            if Items == None:
+            if Items is None:
                 Items = []
                 self._RuleInfo[ToolChainFamily, self._State] = Items
             Items.append(self.RuleContent[LineIndex])

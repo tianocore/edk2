@@ -77,7 +77,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
                                           FileName,
                                           DT.MODEL_EFI_GUID,
                                           self.FileLocalMacros)
-                if Name != None:
+                if Name is not None:
                     SectionMacros[Name] = Value
                     CommentsList = []
                     ValueList = []
@@ -164,7 +164,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
                                           FileName,
                                           DT.MODEL_EFI_PPI,
                                           self.FileLocalMacros)
-                if Name != None:
+                if Name is not None:
                     SectionMacros[Name] = Value
                     ValueList = []
                     CommentsList = []
@@ -334,7 +334,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
                                           FileName,
                                           DT.MODEL_EFI_PROTOCOL,
                                           self.FileLocalMacros)
-                if Name != None:
+                if Name is not None:
                     SectionMacros[Name] = Value
                     ValueList = []
                     CommentsList = []

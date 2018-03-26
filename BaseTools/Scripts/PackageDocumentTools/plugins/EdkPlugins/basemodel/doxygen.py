@@ -58,7 +58,7 @@ class Page(BaseDoxygeItem):
         return subpage
 
     def AddPages(self, pageArray):
-        if pageArray == None:
+        if pageArray is None:
             return
         for page in pageArray:
             self.AddPage(page)
@@ -370,7 +370,7 @@ class DoxygenConfigFile:
         self.mWarningFile = str.replace('\\', '/')
 
     def FileExists(self, path):
-        if path == None:
+        if path is None:
             return False
         if len(path) == 0:
             return False
@@ -382,7 +382,7 @@ class DoxygenConfigFile:
         return False
 
     def AddFile(self, path):
-        if path == None:
+        if path is None:
             return
 
         if len(path) == 0:

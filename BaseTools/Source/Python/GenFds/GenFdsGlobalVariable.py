@@ -229,7 +229,7 @@ class GenFdsGlobalVariable:
                 Source = SourceList[Index]
                 Index = Index + 1
     
-                if File.IsBinary and File == Source and Inf.Binaries != None and File in Inf.Binaries:
+                if File.IsBinary and File == Source and Inf.Binaries is not None and File in Inf.Binaries:
                     # Skip all files that are not binary libraries
                     if not Inf.LibraryClass:
                         continue            
@@ -420,7 +420,7 @@ class GenFdsGlobalVariable:
         if not os.path.exists(Output):
             return True
         # always update "Output" if no "Input" given
-        if Input == None or len(Input) == 0:
+        if Input is None or len(Input) == 0:
             return True
 
         # if fdf file is changed after the 'Output" is generated, update the 'Output'
@@ -445,9 +445,9 @@ class GenFdsGlobalVariable:
             Cmd += ["-s", Type]
         if CompressionType not in [None, '']:
             Cmd += ["-c", CompressionType]
-        if Guid != None:
+        if Guid is not None:
             Cmd += ["-g", Guid]
-        if DummyFile != None:
+        if DummyFile is not None:
             Cmd += ["--dummy", DummyFile]
         if GuidHdrLen not in [None, '']:
             Cmd += ["-l", GuidHdrLen]
@@ -455,7 +455,7 @@ class GenFdsGlobalVariable:
             #Add each guided attribute
             for Attr in GuidAttr:
                 Cmd += ["-r", Attr]
-        if InputAlign != None:
+        if InputAlign is not None:
             #Section Align is only for dummy section without section type
             for SecAlign in InputAlign:
                 Cmd += ["--sectionalign", SecAlign]
@@ -509,7 +509,7 @@ class GenFdsGlobalVariable:
 
     @staticmethod
     def GetAlignment (AlignString):
-        if AlignString == None:
+        if AlignString is None:
             return 0
         if AlignString in ("1K", "2K", "4K", "8K", "16K", "32K", "64K", "128K", "256K", "512K"):
             return int (AlignString.rstrip('K')) * 1024
@@ -669,13 +669,13 @@ class GenFdsGlobalVariable:
             return
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, InputList))
                         
-        if ClassCode != None:
+        if ClassCode is not None:
             Cmd += ["-l", ClassCode]
-        if Revision != None:
+        if Revision is not None:
             Cmd += ["-r", Revision]
-        if DeviceId != None:
+        if DeviceId is not None:
             Cmd += ["-i", DeviceId]
-        if VendorId != None:
+        if VendorId is not None:
             Cmd += ["-f", VendorId]
 
         Cmd += ["-o", Output]
@@ -726,7 +726,7 @@ class GenFdsGlobalVariable:
             EdkLogger.error("GenFds", COMMAND_FAILURE, ExtraData="%s: %s" % (str(X), cmd[0]))
         (out, error) = PopenObject.communicate()
 
-        while PopenObject.returncode == None :
+        while PopenObject.returncode is None :
             PopenObject.wait()
         if returnValue != [] and returnValue[0] != 0:
             #get command return value
@@ -758,7 +758,7 @@ class GenFdsGlobalVariable:
     #   @param  MacroDict     Dictionary that contains macro value pair
     #
     def MacroExtend (Str, MacroDict={}, Arch='COMMON'):
-        if Str == None :
+        if Str is None :
             return None
 
         Dict = {'$(WORKSPACE)'   : GenFdsGlobalVariable.WorkSpaceDir,
@@ -774,7 +774,7 @@ class GenFdsGlobalVariable:
 
         Dict['$(OUTPUT_DIRECTORY)'] = OutputDir
 
-        if MacroDict != None  and len (MacroDict) != 0:
+        if MacroDict is not None  and len (MacroDict) != 0:
             Dict.update(MacroDict)
 
         for key in Dict.keys():
@@ -794,7 +794,7 @@ class GenFdsGlobalVariable:
     #   @param  PcdPattern           pattern that labels a PCD.
     #
     def GetPcdValue (PcdPattern):
-        if PcdPattern == None :
+        if PcdPattern is None :
             return None
         PcdPair = PcdPattern.lstrip('PCD(').rstrip(')').strip().split('.')
         TokenSpace = PcdPair[0]

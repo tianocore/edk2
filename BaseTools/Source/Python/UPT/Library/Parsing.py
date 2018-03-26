@@ -134,7 +134,7 @@ def GetLibraryClassOfInf(Item, ContainerFile, WorkspaceDir, LineNo= -1):
 #
 def CheckPcdTokenInfo(TokenInfoString, Section, File, LineNo= -1):
     Format = '<TokenSpaceGuidCName>.<PcdCName>'
-    if TokenInfoString != '' and TokenInfoString != None:
+    if TokenInfoString != '' and TokenInfoString is not None:
         TokenInfoList = GetSplitValueList(TokenInfoString, DataType.TAB_SPLIT)
         if len(TokenInfoList) == 2:
             return True
@@ -433,7 +433,7 @@ def GetComponents(Lines, KeyValues, CommentCharacter):
     LineList = Lines.split('\n')
     for Line in LineList:
         Line = CleanString(Line, CommentCharacter)
-        if Line == None or Line == '':
+        if Line is None or Line == '':
             continue
 
         if FindBlock == False:
@@ -921,7 +921,7 @@ def MacroParser(Line, FileName, SectionType, FileLocalMacros):
         FileLocalMacros[Name] = Value
 
     ReIsValidMacroName = re.compile(r"^[A-Z][A-Z0-9_]*$", re.DOTALL)
-    if ReIsValidMacroName.match(Name) == None:
+    if ReIsValidMacroName.match(Name) is None:
         Logger.Error('Parser',
                      FORMAT_INVALID,
                      ST.ERR_MACRONAME_INVALID % (Name),
@@ -940,7 +940,7 @@ def MacroParser(Line, FileName, SectionType, FileLocalMacros):
     # <UnicodeString>, <CArray> are subset of <AsciiString>.
     #
     ReIsValidMacroValue = re.compile(r"^[\x20-\x7e]*$", re.DOTALL)
-    if ReIsValidMacroValue.match(Value) == None:
+    if ReIsValidMacroValue.match(Value) is None:
         Logger.Error('Parser',
                      FORMAT_INVALID,
                      ST.ERR_MACROVALUE_INVALID % (Value),
@@ -979,7 +979,7 @@ def GenSection(SectionName, SectionDict, SplitArch=True, NeedBlankLine=False):
         else:
             Section = '[' + SectionName + ']'
         Content += '\n' + Section + '\n'
-        if StatementList != None:
+        if StatementList is not None:
             for Statement in StatementList:
                 LineList = Statement.split('\n')
                 NewStatement = ""

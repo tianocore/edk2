@@ -75,11 +75,11 @@ class AprioriSection (AprioriSectionClassObject):
                 InfFileName = NormPath(FfsObj.InfFileName)
                 Arch = FfsObj.GetCurrentArch()
 
-                if Arch != None:
+                if Arch is not None:
                     Dict['$(ARCH)'] = Arch
                 InfFileName = GenFdsGlobalVariable.MacroExtend(InfFileName, Dict, Arch)
 
-                if Arch != None:
+                if Arch is not None:
                     Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(InfFileName, GenFdsGlobalVariable.WorkSpaceDir), Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
                     Guid = Inf.Guid
 

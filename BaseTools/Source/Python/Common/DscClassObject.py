@@ -128,7 +128,7 @@ class Dsc(DscObject):
         #
         # Load Dsc file if filename is not None
         #
-        if Filename != None:
+        if Filename is not None:
             self.LoadDscFile(Filename)
 
         #
@@ -902,7 +902,7 @@ class Dsc(DscObject):
     #
     def GenSkuInfoList(self, SkuNameList, SkuInfo, VariableName='', VariableGuid='', VariableOffset='', HiiDefaultValue='', VpdOffset='', DefaultValue=''):
         SkuNameList = GetSplitValueList(SkuNameList)
-        if SkuNameList == None or SkuNameList == [] or SkuNameList == ['']:
+        if SkuNameList is None or SkuNameList == [] or SkuNameList == ['']:
             SkuNameList = ['DEFAULT']
         SkuInfoList = {}
         for Item in SkuNameList:

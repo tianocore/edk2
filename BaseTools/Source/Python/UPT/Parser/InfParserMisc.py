@@ -73,9 +73,9 @@ gINF_SECTION_DEF = {
 # @param Flag          If the flag set to True, need to skip macros in a quoted string 
 #
 def InfExpandMacro(Content, LineInfo, GlobalMacros=None, SectionMacros=None, Flag=False):
-    if GlobalMacros == None:
+    if GlobalMacros is None:
         GlobalMacros = {}
-    if SectionMacros == None:
+    if SectionMacros is None:
         SectionMacros = {}
     
     FileName = LineInfo[0]

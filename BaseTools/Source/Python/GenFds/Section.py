@@ -116,17 +116,17 @@ class Section (SectionClassObject):
         else :
             IsSect = False
 
-        if FileExtension != None:
+        if FileExtension is not None:
             Suffix = FileExtension
         elif IsSect :
             Suffix = Section.SectionType.get(FileType)
         else:
             Suffix = Section.BinFileType.get(FileType)
-        if FfsInf == None:
+        if FfsInf is None:
             EdkLogger.error("GenFds", GENFDS_ERROR, 'Inf File does not exist!')
 
         FileList = []
-        if FileType != None:
+        if FileType is not None:
             for File in FfsInf.BinFileList:
                 if File.Arch == "COMMON" or FfsInf.CurrentArch == File.Arch:
                     if File.Type == FileType or (int(FfsInf.PiSpecVersion, 16) >= 0x0001000A \
@@ -141,7 +141,7 @@ class Section (SectionClassObject):
                 else:
                     GenFdsGlobalVariable.InfLogger ("\nCurrent ARCH \'%s\' of File %s is not in the Support Arch Scope of %s specified by INF %s in FDF" %(FfsInf.CurrentArch, File.File, File.Arch, FfsInf.InfFileName))
 
-        if (not IsMakefile and Suffix != None and os.path.exists(FfsInf.EfiOutputPath)) or (IsMakefile and Suffix != None):
+        if (not IsMakefile and Suffix is not None and os.path.exists(FfsInf.EfiOutputPath)) or (IsMakefile and Suffix is not None):
             #
             # Get Makefile path and time stamp
             #

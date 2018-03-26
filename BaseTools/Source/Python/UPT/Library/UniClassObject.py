@@ -161,7 +161,7 @@ def GetLanguageCode1766(LangName, File=None):
             for Key in gLANG_CONV_TABLE.keys():
                 if gLANG_CONV_TABLE.get(Key) == LangName[0:2].lower():
                     return Key
-        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) == None and LangName[3] == '-':
+        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) is None and LangName[3] == '-':
             for Key in gLANG_CONV_TABLE.keys():
                 if Key == LangName[0:3].lower():
                     return Key
@@ -186,7 +186,7 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
     if IsCompatibleMode:
         if length == 3 and LangName.isalpha():
             TempLangName = gLANG_CONV_TABLE.get(LangName.lower())
-            if TempLangName != None:
+            if TempLangName is not None:
                 return TempLangName
             return LangName
         else:
@@ -200,7 +200,7 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
         if LangName.isalpha():
             return LangName
     elif length == 3:
-        if LangName.isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) == None:
+        if LangName.isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) is None:
             return LangName
     elif length == 5:
         if LangName[0:2].isalpha() and LangName[2] == '-':
@@ -208,7 +208,7 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
     elif length >= 6:
         if LangName[0:2].isalpha() and LangName[2] == '-':
             return LangName
-        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) == None and LangName[3] == '-':
+        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) is None and LangName[3] == '-':
             return LangName
 
     EdkLogger.Error("Unicode File Parser", 
@@ -270,14 +270,14 @@ class StringDefClassObject(object):
         self.UseOtherLangDef = UseOtherLangDef
         self.Length = 0
 
-        if Name != None:
+        if Name is not None:
             self.StringName = Name
             self.StringNameByteList = UniToHexList(Name)
-        if Value != None:
+        if Value is not None:
             self.StringValue = Value
             self.StringValueByteList = UniToHexList(self.StringValue)
             self.Length = len(self.StringValueByteList)
-        if Token != None:
+        if Token is not None:
             self.Token = Token
 
     def __str__(self):
@@ -288,7 +288,7 @@ class StringDefClassObject(object):
                repr(self.UseOtherLangDef)
 
     def UpdateValue(self, Value = None):
-        if Value != None:
+        if Value is not None:
             if self.StringValue:
                 self.StringValue = self.StringValue + '\r\n' + Value
             else:
@@ -393,7 +393,7 @@ class UniFileClassObject(object):
         # Check the string name is the upper character
         if Name != '':
             MatchString = re.match('[A-Z0-9_]+', Name, re.UNICODE)
-            if MatchString == None or MatchString.end(0) != len(Name):
+            if MatchString is None or MatchString.end(0) != len(Name):
                 EdkLogger.Error("Unicode File Parser", 
                              ToolError.FORMAT_INVALID,
                              'The string token name %s in UNI file %s must be upper case character.' %(Name, self.File))
@@ -798,7 +798,7 @@ class UniFileClassObject(object):
     # Load a .uni file
     #
     def LoadUniFile(self, File = None):
-        if File == None:
+        if File is None:
             EdkLogger.Error("Unicode File Parser", 
                             ToolError.PARSER_ERROR, 
                             Message='No unicode file is given', 
@@ -901,7 +901,7 @@ class UniFileClassObject(object):
         IsAdded = True
         if Name in self.OrderedStringDict[Language]:
             IsAdded = False
-            if Value != None:
+            if Value is not None:
                 ItemIndexInList = self.OrderedStringDict[Language][Name]
                 Item = self.OrderedStringList[Language][ItemIndexInList]
                 Item.UpdateValue(Value)

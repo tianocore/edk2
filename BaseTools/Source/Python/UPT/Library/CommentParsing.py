@@ -555,15 +555,15 @@ def ParseComment (Comment, UsageTokens, TypeTokens, RemoveTokens, ParseVariable)
     # from HelpText
     #
     for Token in List[0:NumTokens]:
-        if Usage == None and Token in UsageTokens:
+        if Usage is None and Token in UsageTokens:
             Usage = UsageTokens[Token]
             HelpText = HelpText.replace(Token, '')
-    if Usage != None or not ParseVariable:
+    if Usage is not None or not ParseVariable:
         for Token in List[0:NumTokens]:
-            if Type == None and Token in TypeTokens:
+            if Type is None and Token in TypeTokens:
                 Type = TypeTokens[Token]
                 HelpText = HelpText.replace(Token, '')
-            if Usage != None:    
+            if Usage is not None:    
                 for Token in List[0:NumTokens]:
                     if Token in RemoveTokens:
                         HelpText = HelpText.replace(Token, '')
@@ -571,13 +571,13 @@ def ParseComment (Comment, UsageTokens, TypeTokens, RemoveTokens, ParseVariable)
     #
     # If no Usage token is present and set Usage to UNDEFINED
     #  
-    if Usage == None:
+    if Usage is None:
         Usage = 'UNDEFINED'
     
     #
     # If no Type token is present and set Type to UNDEFINED
     #  
-    if Type == None:
+    if Type is None:
         Type = 'UNDEFINED'
     
     #

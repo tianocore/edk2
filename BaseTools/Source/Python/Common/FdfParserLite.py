@@ -356,7 +356,7 @@ class FdfParser(object):
                         if Profile.FileName == File and Profile.MacroName == Name and Profile.DefinedAtLine <= Line:
                             Value = Profile.MacroValue
                             
-                if Value != None:
+                if Value is not None:
                     Str = Str.replace('$(' + Name + ')', Value)
                     MacroEnd = MacroStart + len(Value) 
                 
@@ -679,8 +679,8 @@ class FdfParser(object):
         FileLineTuple = GetRealFileLine(self.FileName, Line)
         if Name in InputMacroDict:
             MacroValue = InputMacroDict[Name]
-            if Op == None:
-                if Value == 'Bool' and MacroValue == None or MacroValue.upper() == 'FALSE':
+            if Op is None:
+                if Value == 'Bool' and MacroValue is None or MacroValue.upper() == 'FALSE':
                     return False
                 return True
             elif Op == '!=':
@@ -694,7 +694,7 @@ class FdfParser(object):
                 else:
                     return False
             else:
-                if (self.__IsHex(Value) or Value.isdigit()) and (self.__IsHex(MacroValue) or (MacroValue != None and MacroValue.isdigit())):
+                if (self.__IsHex(Value) or Value.isdigit()) and (self.__IsHex(MacroValue) or (MacroValue is not None and MacroValue.isdigit())):
                     InputVal = long(Value, 0)
                     MacroVal = long(MacroValue, 0)
                     if Op == '>':
@@ -724,8 +724,8 @@ class FdfParser(object):
                 
         for Profile in AllMacroList:
             if Profile.FileName == FileLineTuple[0] and Profile.MacroName == Name and Profile.DefinedAtLine <= FileLineTuple[1]:
-                if Op == None:
-                    if Value == 'Bool' and Profile.MacroValue == None or Profile.MacroValue.upper() == 'FALSE':
+                if Op is None:
+                    if Value == 'Bool' and Profile.MacroValue is None or Profile.MacroValue.upper() == 'FALSE':
                         return False
                     return True
                 elif Op == '!=':
@@ -739,7 +739,7 @@ class FdfParser(object):
                     else:
                         return False
                 else:
-                    if (self.__IsHex(Value) or Value.isdigit()) and (self.__IsHex(Profile.MacroValue) or (Profile.MacroValue != None and Profile.MacroValue.isdigit())):
+                    if (self.__IsHex(Value) or Value.isdigit()) and (self.__IsHex(Profile.MacroValue) or (Profile.MacroValue is not None and Profile.MacroValue.isdigit())):
                         InputVal = long(Value, 0)
                         MacroVal = long(Profile.MacroValue, 0)
                         if Op == '>':
@@ -935,7 +935,7 @@ class FdfParser(object):
         
         if not self.__GetNextToken():
             return False
-        if gGuidPattern.match(self.__Token) != None:
+        if gGuidPattern.match(self.__Token) is not None:
             return True
         else:
             self.__UndoToken()
@@ -1454,7 +1454,7 @@ class FdfParser(object):
             pass
         
         for Item in Obj.BlockSizeList:
-            if Item[0] == None or Item[1] == None:
+            if Item[0] is None or Item[1] is None:
                 raise Warning("expected block statement for Fd Section", self.FileName, self.CurrentLineNumber)
 
         return True
@@ -2423,7 +2423,7 @@ class FdfParser(object):
             
             FvImageSectionObj = CommonDataClass.FdfClass.FvImageSectionClassObject()
             FvImageSectionObj.Alignment = AlignValue
-            if FvObj != None:
+            if FvObj is not None:
                 FvImageSectionObj.Fv = FvObj
                 FvImageSectionObj.FvName = None
             else:
@@ -2942,7 +2942,7 @@ class FdfParser(object):
             Rule.CheckSum = CheckSum
             Rule.Fixed = Fixed
             Rule.KeyStringList = KeyStringList
-            if KeepReloc != None:
+            if KeepReloc is not None:
                 Rule.KeepReloc = KeepReloc
             
             while True:
@@ -2969,7 +2969,7 @@ class FdfParser(object):
             Rule.Fixed = Fixed
             Rule.FileExtension = Ext
             Rule.KeyStringList = KeyStringList
-            if KeepReloc != None:
+            if KeepReloc is not None:
                 Rule.KeepReloc = KeepReloc
             
             return Rule
@@ -3012,7 +3012,7 @@ class FdfParser(object):
             Rule.Fixed = Fixed
             Rule.FileName = self.__Token
             Rule.KeyStringList = KeyStringList
-            if KeepReloc != None:
+            if KeepReloc is not None:
                 Rule.KeepReloc = KeepReloc
             return Rule
         
@@ -3149,7 +3149,7 @@ class FdfParser(object):
                     EfiSectionObj.KeepReloc = False
                 else:
                     EfiSectionObj.KeepReloc = True
-                if Obj.KeepReloc != None and Obj.KeepReloc != EfiSectionObj.KeepReloc:
+                if Obj.KeepReloc is not None and Obj.KeepReloc != EfiSectionObj.KeepReloc:
                     raise Warning("Section type %s has reloc strip flag conflict with Rule At Line %d" % (EfiSectionObj.SectionType, self.CurrentLineNumber), self.FileName, self.CurrentLineNumber)
             else:
                 raise Warning("Section type %s could not have reloc strip flag At Line %d" % (EfiSectionObj.SectionType, self.CurrentLineNumber), self.FileName, self.CurrentLineNumber)
@@ -3471,7 +3471,7 @@ class FdfParser(object):
             raise Warning("expected Component version At Line ", self.FileName, self.CurrentLineNumber)
 
         Pattern = re.compile('-$|[0-9]{0,1}[0-9]{1}\.[0-9]{0,1}[0-9]{1}')
-        if Pattern.match(self.__Token) == None:
+        if Pattern.match(self.__Token) is None:
             raise Warning("Unknown version format At line ", self.FileName, self.CurrentLineNumber)
         CompStatementObj.CompVer = self.__Token
         
@@ -3544,7 +3544,7 @@ class FdfParser(object):
             for elementRegion in FdObj.RegionList:
                 if elementRegion.RegionType == 'FV':
                     for elementRegionData in elementRegion.RegionDataList:
-                        if elementRegionData != None and elementRegionData.upper() not in FvList:
+                        if elementRegionData is not None and elementRegionData.upper() not in FvList:
                             FvList.append(elementRegionData.upper())
         return FvList
     
@@ -3561,9 +3561,9 @@ class FdfParser(object):
         
         for FfsObj in FvObj.FfsList:
             if isinstance(FfsObj, FfsFileStatement.FileStatement):
-                if FfsObj.FvName != None and FfsObj.FvName.upper() not in RefFvList:
+                if FfsObj.FvName is not None and FfsObj.FvName.upper() not in RefFvList:
                     RefFvList.append(FfsObj.FvName.upper())
-                elif FfsObj.FdName != None and FfsObj.FdName.upper() not in RefFdList:
+                elif FfsObj.FdName is not None and FfsObj.FdName.upper() not in RefFdList:
                     RefFdList.append(FfsObj.FdName.upper())
                 else:
                     self.__GetReferencedFdFvTupleFromSection(FfsObj, RefFdList, RefFvList)    
@@ -3584,9 +3584,9 @@ class FdfParser(object):
         while SectionStack != []:
             SectionObj = SectionStack.pop()
             if isinstance(SectionObj, FvImageSection.FvImageSection):
-                if SectionObj.FvName != None and SectionObj.FvName.upper() not in FvList:
+                if SectionObj.FvName is not None and SectionObj.FvName.upper() not in FvList:
                     FvList.append(SectionObj.FvName.upper())
-                if SectionObj.Fv != None and SectionObj.Fv.UiFvName != None and SectionObj.Fv.UiFvName.upper() not in FvList:
+                if SectionObj.Fv is not None and SectionObj.Fv.UiFvName is not None and SectionObj.Fv.UiFvName.upper() not in FvList:
                     FvList.append(SectionObj.Fv.UiFvName.upper())
                     self.__GetReferencedFdFvTuple(SectionObj.Fv, FdList, FvList)
             

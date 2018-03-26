@@ -93,7 +93,7 @@ class PcdClassObject(object):
     # @retval True  The two pcds are the same
     #
     def __eq__(self, Other):
-        return Other != None and self.TokenCName == Other.TokenCName and self.TokenSpaceGuidCName == Other.TokenSpaceGuidCName
+        return Other is not None and self.TokenCName == Other.TokenCName and self.TokenSpaceGuidCName == Other.TokenSpaceGuidCName
 
     ## Override __hash__ function
     #
@@ -121,7 +121,7 @@ class LibraryClassObject(object):
     def __init__(self, Name = None, SupModList = [], Type = None):
         self.LibraryClass = Name
         self.SupModList = SupModList
-        if Type != None:
+        if Type is not None:
             self.SupModList = CleanString(Type).split(DataType.TAB_SPACE_SPLIT)
 
 ## ModuleBuildClassObject
@@ -864,7 +864,7 @@ class WorkspaceBuild(object):
                             for Libs in Pb.LibraryClass:
                                 for Type in Libs.SupModList:
                                     Instance = self.FindLibraryClassInstanceOfLibrary(Lib, Arch, Type)
-                                    if Instance == None:
+                                    if Instance is None:
                                         Instance = RecommendedInstance
                                     Pb.LibraryClasses[(Lib, Type)] = Instance
                         else:
@@ -872,7 +872,7 @@ class WorkspaceBuild(object):
                             # For Module
                             #
                             Instance = self.FindLibraryClassInstanceOfModule(Lib, Arch, Pb.ModuleType, Inf)
-                            if Instance == None:
+                            if Instance is None:
                                 Instance = RecommendedInstance
                             Pb.LibraryClasses[(Lib, Pb.ModuleType)] = Instance
 
@@ -912,7 +912,7 @@ class WorkspaceBuild(object):
                     if not self.IsModuleDefinedInPlatform(Inf, Arch, InfList):
                         continue
                     Module = self.Build[Arch].ModuleDatabase[Inf]
-                    if Module.LibraryClass == None or Module.LibraryClass == []:
+                    if Module.LibraryClass is None or Module.LibraryClass == []:
                         self.UpdateLibrariesOfModule(Platform, Module, Arch)
                         for Key in Module.LibraryClasses:
                             Lib = Module.LibraryClasses[Key]
@@ -969,15 +969,15 @@ class WorkspaceBuild(object):
                     continue
 
                 LibraryClassName = Key[0]
-                if LibraryClassName not in LibraryInstance or LibraryInstance[LibraryClassName] == None:
-                    if LibraryPath == None or LibraryPath == "":
+                if LibraryClassName not in LibraryInstance or LibraryInstance[LibraryClassName] is None:
+                    if LibraryPath is None or LibraryPath == "":
                         LibraryInstance[LibraryClassName] = None
                         continue
                     LibraryModule = ModuleDatabase[LibraryPath]
                     LibraryInstance[LibraryClassName] = LibraryModule
                     LibraryConsumerList.append(LibraryModule)
                     EdkLogger.verbose("\t" + LibraryClassName + " : " + str(LibraryModule))
-                elif LibraryPath == None or LibraryPath == "":
+                elif LibraryPath is None or LibraryPath == "":
                     continue
                 else:
                     LibraryModule = LibraryInstance[LibraryClassName]
@@ -1002,7 +1002,7 @@ class WorkspaceBuild(object):
         Q = []
         for LibraryClassName in LibraryInstance:
             M = LibraryInstance[LibraryClassName]
-            if M == None:
+            if M is None:
                 EdkLogger.error("AutoGen", AUTOGEN_ERROR,
                                 "Library instance for library class [%s] is not found" % LibraryClassName,
                                 ExtraData="\t%s [%s]" % (str(Module), Arch))
@@ -1011,7 +1011,7 @@ class WorkspaceBuild(object):
             # check if there're duplicate library classes
             #
             for Lc in M.LibraryClass:
-                if Lc.SupModList != None and ModuleType not in Lc.SupModList:
+                if Lc.SupModList is not None and ModuleType not in Lc.SupModList:
                     EdkLogger.error("AutoGen", AUTOGEN_ERROR,
                                     "Module type [%s] is not supported by library instance [%s]" % (ModuleType, str(M)),
                                     ExtraData="\t%s" % str(Module))
@@ -1380,7 +1380,7 @@ class WorkspaceBuild(object):
             if (Name, Guid) in Pcds:
                 OwnerPlatform = Dsc
                 Pcd = Pcds[(Name, Guid)]
-                if Pcd.Type != '' and Pcd.Type != None:
+                if Pcd.Type != '' and Pcd.Type is not None:
                     NewType = Pcd.Type
                     if NewType in DataType.PCD_DYNAMIC_TYPE_LIST:
                         NewType = DataType.TAB_PCDS_DYNAMIC
@@ -1396,13 +1396,13 @@ class WorkspaceBuild(object):
                     EdkLogger.error("AutoGen", PARSER_ERROR, ErrorMsg)
 
 
-                if Pcd.DatumType != '' and Pcd.DatumType != None:
+                if Pcd.DatumType != '' and Pcd.DatumType is not None:
                     DatumType = Pcd.DatumType
-                if Pcd.TokenValue != '' and Pcd.TokenValue != None:
+                if Pcd.TokenValue != '' and Pcd.TokenValue is not None:
                     Token = Pcd.TokenValue
-                if Pcd.DefaultValue != '' and Pcd.DefaultValue != None:
+                if Pcd.DefaultValue != '' and Pcd.DefaultValue is not None:
                     Value = Pcd.DefaultValue
-                if Pcd.MaxDatumSize != '' and Pcd.MaxDatumSize != None:
+                if Pcd.MaxDatumSize != '' and Pcd.MaxDatumSize is not None:
                     MaxDatumSize = Pcd.MaxDatumSize
                 SkuInfoList =  Pcd.SkuInfoList
                 

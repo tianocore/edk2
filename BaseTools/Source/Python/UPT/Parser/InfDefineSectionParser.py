@@ -133,7 +133,7 @@ class InfDefinSectionParser(InfParserSectionRoot):
             if LineContent.find(DT.TAB_COMMENT_SPLIT) > -1:
                 TailComments = LineContent[LineContent.find(DT.TAB_COMMENT_SPLIT):]
                 LineContent = LineContent[:LineContent.find(DT.TAB_COMMENT_SPLIT)]
-                if LineComment == None:
+                if LineComment is None:
                     LineComment = InfLineCommentObject()
                 LineComment.SetTailComments(TailComments)
                               
@@ -144,7 +144,7 @@ class InfDefinSectionParser(InfParserSectionRoot):
                                       FileName, 
                                       DT.MODEL_META_DATA_HEADER, 
                                       self.FileLocalMacros)
-            if Name != None:
+            if Name is not None:
                 self.FileLocalMacros[Name] = Value
                 continue            
 
@@ -173,7 +173,7 @@ class InfDefinSectionParser(InfParserSectionRoot):
             Name, Value = _ValueList[0], _ValueList[1]            
             
             InfDefMemberObj = InfDefMember(Name, Value)
-            if (LineComment != None):
+            if (LineComment is not None):
                 InfDefMemberObj.Comments.SetHeaderComments(LineComment.GetHeaderComments())
                 InfDefMemberObj.Comments.SetTailComments(LineComment.GetTailComments())
                 

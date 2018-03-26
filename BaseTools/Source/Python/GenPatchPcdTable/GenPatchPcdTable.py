@@ -73,7 +73,7 @@ def _parseForXcode(lines, efifilepath):
         if status == 1 and len(line) != 0:
             if '_gPcd_BinaryPatch_' in line:
                 m = re.match('^([\da-fA-FxX]+)([\s\S]*)([_]*_gPcd_BinaryPatch_([\w]+))', line)
-                if m != None:
+                if m is not None:
                     pcds.append((m.groups(0)[3], int(m.groups(0)[0], 16)))
     return pcds
 
@@ -99,20 +99,20 @@ def _parseForGCC(lines, efifilepath):
         # status handler
         if status == 3:
             m = re.match('^([\w_\.]+) +([\da-fA-Fx]+) +([\da-fA-Fx]+)$', line)
-            if m != None:
+            if m is not None:
                 sections.append(m.groups(0))
         if status == 3:
             m = re.match('^.data._gPcd_BinaryPatch_([\w_\d]+)$', line)
-            if m != None:
+            if m is not None:
                 if lines[index + 1]:
                     PcdName = m.groups(0)[0]
                     m = re.match('^([\da-fA-Fx]+) +([\da-fA-Fx]+)', lines[index + 1].strip())
-                    if m != None:
+                    if m is not None:
                         bpcds.append((PcdName, int(m.groups(0)[0], 16) , int(sections[-1][1], 16), sections[-1][0]))
                 
     # get section information from efi file
     efisecs = PeImageClass(efifilepath).SectionHeaderList
-    if efisecs == None or len(efisecs) == 0:
+    if efisecs is None or len(efisecs) == 0:
         return None
     #redirection
     redirection = 0
@@ -152,18 +152,18 @@ def _parseGeneral(lines, efifilepath):
             continue
         if status == 1 and len(line) != 0:
             m = secRe.match(line)
-            assert m != None, "Fail to parse the section in map file , line is %s" % line
+            assert m is not None, "Fail to parse the section in map file , line is %s" % line
             sec_no, sec_start, sec_length, sec_name, sec_class = m.groups(0)
             secs.append([int(sec_no, 16), int(sec_start, 16), int(sec_length, 16), sec_name, sec_class])
         if status == 2 and len(line) != 0:
             m = symRe.match(line)
-            assert m != None, "Fail to parse the symbol in map file, line is %s" % line
+            assert m is not None, "Fail to parse the symbol in map file, line is %s" % line
             sec_no, sym_offset, sym_name, vir_addr = m.groups(0)
             sec_no = int(sec_no, 16)
             sym_offset = int(sym_offset, 16)
             vir_addr = int(vir_addr, 16)
             m2 = re.match('^[_]+gPcd_BinaryPatch_([\w]+)', sym_name)
-            if m2 != None:
+            if m2 is not None:
                 # fond a binary pcd entry in map file
                 for sec in secs:
                     if sec[0] == sec_no and (sym_offset >= sec[1] and sym_offset < sec[1] + sec[2]):
@@ -173,7 +173,7 @@ def _parseGeneral(lines, efifilepath):
 
     # get section information from efi file
     efisecs = PeImageClass(efifilepath).SectionHeaderList
-    if efisecs == None or len(efisecs) == 0:
+    if efisecs is None or len(efisecs) == 0:
         return None
     
     pcds = []
@@ -214,12 +214,12 @@ if __name__ == '__main__':
   
     (options, args) = parser.parse_args()
 
-    if options.mapfile == None or options.efifile == None:
+    if options.mapfile is None or options.efifile is None:
         print parser.get_usage()
     elif os.path.exists(options.mapfile) and os.path.exists(options.efifile):
         list = parsePcdInfoFromMapFile(options.mapfile, options.efifile)
-        if list != None:
-            if options.outfile != None:
+        if list is not None:
+            if options.outfile is not None:
                 generatePcdTable(list, options.outfile)
             else:
                 generatePcdTable(list, options.mapfile.replace('.map', '.BinaryPcdTable.txt'))

@@ -107,7 +107,7 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
     #
     # Get/Set Usage and HelpString
     #
-    if CommentsList != None and len(CommentsList) != 0 :
+    if CommentsList is not None and len(CommentsList) != 0 :
         CommentInsList = []
         PreUsage = None
         PreGuidType = None
@@ -126,7 +126,7 @@ def ParseGuidComment(CommentsList, InfGuidItemObj):
                                  [], 
                                  True)
             
-            if CommentItemHelpText == None:
+            if CommentItemHelpText is None:
                 CommentItemHelpText = ''
                 if Count == len(CommentsList) and CommentItemUsage == CommentItemGuidType == DT.ITEM_UNDEFINED:
                     CommentItemHelpText = DT.END_OF_LINE
@@ -236,7 +236,7 @@ class InfGuidObject():
             #
             # Validate Arch
             #            
-            if (ArchItem == '' or ArchItem == None):
+            if (ArchItem == '' or ArchItem is None):
                 ArchItem = 'COMMON'  
             
             __SupportArchList.append(ArchItem)

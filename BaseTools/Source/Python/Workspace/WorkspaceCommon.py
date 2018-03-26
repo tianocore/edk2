@@ -118,16 +118,16 @@ def _GetModuleLibraryInstances(Module, Platform, BuildDatabase, Arch, Target, To
                     LibraryPath = PlatformModule.LibraryClasses[LibraryClassName]
                 else:
                     LibraryPath = Platform.LibraryClasses[LibraryClassName, ModuleType]
-                if LibraryPath == None or LibraryPath == "":
+                if LibraryPath is None or LibraryPath == "":
                     LibraryPath = M.LibraryClasses[LibraryClassName]
-                    if LibraryPath == None or LibraryPath == "":
+                    if LibraryPath is None or LibraryPath == "":
                         return []
 
                 LibraryModule = BuildDatabase[LibraryPath, Arch, Target, Toolchain]
                 # for those forced library instance (NULL library), add a fake library class
                 if LibraryClassName.startswith("NULL"):
                     LibraryModule.LibraryClass.append(LibraryClassObject(LibraryClassName, [ModuleType]))
-                elif LibraryModule.LibraryClass == None \
+                elif LibraryModule.LibraryClass is None \
                      or len(LibraryModule.LibraryClass) == 0 \
                      or (ModuleType != 'USER_DEFINED'
                          and ModuleType not in LibraryModule.LibraryClass[0].SupModList):
@@ -139,7 +139,7 @@ def _GetModuleLibraryInstances(Module, Platform, BuildDatabase, Arch, Target, To
             else:
                 LibraryModule = LibraryInstance[LibraryClassName]
 
-            if LibraryModule == None:
+            if LibraryModule is None:
                 continue
 
             if LibraryModule.ConstructorList != [] and LibraryModule not in Constructor:
@@ -239,12 +239,12 @@ def _ResolveLibraryReference(Module, Platform):
         M = LibraryConsumerList.pop()
         for LibraryName in M.Libraries:
             Library = Platform.LibraryClasses[LibraryName, ':dummy:']
-            if Library == None:
+            if Library is None:
                 for Key in Platform.LibraryClasses.data.keys():
                     if LibraryName.upper() == Key.upper():
                         Library = Platform.LibraryClasses[Key, ':dummy:']
                         break
-                if Library == None:
+                if Library is None:
                     continue
 
             if Library not in LibraryList:

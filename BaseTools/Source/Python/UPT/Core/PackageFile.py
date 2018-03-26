@@ -56,7 +56,7 @@ class PackageFile:
                             ExtraData="%s (%s)" % (FileName, str(Xstr)))
 
         BadFile = self._ZipFile.testzip()
-        if BadFile != None:
+        if BadFile is not None:
             Logger.Error("PackagingTool", FILE_CHECKSUM_FAILURE, 
                             ExtraData="[%s] in %s" % (BadFile, FileName))
     

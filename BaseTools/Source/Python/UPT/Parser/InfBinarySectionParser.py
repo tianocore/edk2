@@ -112,7 +112,7 @@ class InfBinarySectionParser(InfParserSectionRoot):
             if BinLineContent.find(DT.TAB_COMMENT_SPLIT) > -1:
                 TailComments = BinLineContent[BinLineContent.find(DT.TAB_COMMENT_SPLIT):]
                 BinLineContent = BinLineContent[:BinLineContent.find(DT.TAB_COMMENT_SPLIT)]
-                if LineComment == None:
+                if LineComment is None:
                     LineComment = InfLineCommentObject()
                 LineComment.SetTailComments(TailComments)            
             
@@ -123,7 +123,7 @@ class InfBinarySectionParser(InfParserSectionRoot):
                                       FileName,
                                       DT.MODEL_EFI_BINARY_FILE,
                                       self.FileLocalMacros)
-            if MacroDef[0] != None:
+            if MacroDef[0] is not None:
                 SectionMacros[MacroDef[0]] = MacroDef[1]
                 LineComment = None
                 HeaderComments = []                   

@@ -43,7 +43,7 @@ def ValidateArch(ArchItem, PcdTypeItem1, LineNo, SupArchDict, SupArchList):
     #
     # Validate Arch
     #            
-    if (ArchItem == '' or ArchItem == None):
+    if (ArchItem == '' or ArchItem is None):
         ArchItem = 'COMMON'
 
     if PcdTypeItem1.upper != DT.TAB_INF_FEATURE_PCD.upper():
@@ -82,7 +82,7 @@ def ParsePcdComment(CommentList, PcdTypeItem, PcdItemObj):
 
         if PcdTypeItem == 'FeaturePcd':
             CommentItemUsage = DT.USAGE_ITEM_CONSUMES
-            if CommentItemHelpText == None:
+            if CommentItemHelpText is None:
                 CommentItemHelpText = ''
 
             if Count == 1:
@@ -96,7 +96,7 @@ def ParsePcdComment(CommentList, PcdTypeItem, PcdItemObj):
             else:
                 continue
 
-        if CommentItemHelpText == None:
+        if CommentItemHelpText is None:
             CommentItemHelpText = ''
             if Count == len(CommentList) and CommentItemUsage == DT.ITEM_UNDEFINED:
                 CommentItemHelpText = DT.END_OF_LINE
@@ -326,7 +326,7 @@ class InfPcdObject():
             #
             # Validate PcdType
             #
-            if (PcdTypeItem1 == '' or PcdTypeItem1 == None):
+            if (PcdTypeItem1 == '' or PcdTypeItem1 is None):
                 return False
             else:
                 if not IsValidPcdType(PcdTypeItem1):
@@ -346,7 +346,7 @@ class InfPcdObject():
                 CurrentLineOfPcdItem = PcdItem[2]
                 PcdItem = PcdItem[0]
 
-                if CommentList != None and len(CommentList) != 0:
+                if CommentList is not None and len(CommentList) != 0:
                     PcdItemObj = ParsePcdComment(CommentList, PcdTypeItem, PcdItemObj)
                 else:
                     CommentItemIns = InfPcdItemCommentContent()

@@ -167,11 +167,11 @@ class InfPomAlignment(ModuleObject):
         #
         # Convert UEFI/PI version to decimal number
         #
-        if DefineObj.GetUefiSpecificationVersion() != None:
+        if DefineObj.GetUefiSpecificationVersion() is not None:
             __UefiVersion = DefineObj.GetUefiSpecificationVersion().GetValue()
             __UefiVersion = ConvertVersionToDecimal(__UefiVersion)
             self.SetUefiSpecificationVersion(str(__UefiVersion))
-        if DefineObj.GetPiSpecificationVersion() != None:
+        if DefineObj.GetPiSpecificationVersion() is not None:
             __PiVersion = DefineObj.GetPiSpecificationVersion().GetValue()
             __PiVersion = ConvertVersionToDecimal(__PiVersion)
 
@@ -186,7 +186,7 @@ class InfPomAlignment(ModuleObject):
         # must exist items in INF define section
         # MODULE_TYPE/BASE_NAME/INF_VERSION/FILE_GUID/VERSION_STRING 
         #
-        if DefineObj.GetModuleType() == None:
+        if DefineObj.GetModuleType() is None:
             Logger.Error("InfParser", FORMAT_INVALID,
                          ST.ERR_INF_PARSER_DEFINE_SECTION_MUST_ITEM_NOT_EXIST % ("MODULE_TYPE"), File=self.FullPath)
         else:
@@ -205,7 +205,7 @@ class InfPomAlignment(ModuleObject):
                                  Line=DefineObj.ModuleType.CurrentLine.LineNo,
                                  ExtraData=DefineObj.ModuleType.CurrentLine.LineString)
                 self.LibModuleTypeList.append(ModuleType)
-        if DefineObj.GetBaseName() == None:
+        if DefineObj.GetBaseName() is None:
             Logger.Error("InfParser", FORMAT_INVALID,
                          ST.ERR_INF_PARSER_DEFINE_SECTION_MUST_ITEM_NOT_EXIST % ("BASE_NAME"), File=self.FullPath)
         else:
@@ -214,17 +214,17 @@ class InfPomAlignment(ModuleObject):
             self.UniFileClassObject = UniFileClassObject([PathClass(DefineObj.GetModuleUniFileName())])
         else:
             self.UniFileClassObject = None
-        if DefineObj.GetInfVersion() == None:
+        if DefineObj.GetInfVersion() is None:
             Logger.Error("InfParser", FORMAT_INVALID,
                          ST.ERR_INF_PARSER_DEFINE_SECTION_MUST_ITEM_NOT_EXIST % ("INF_VERSION"), File=self.FullPath)
         else:
             self.SetVersion(DefineObj.GetInfVersion().GetValue())
-        if DefineObj.GetFileGuid() == None:
+        if DefineObj.GetFileGuid() is None:
             Logger.Error("InfParser", FORMAT_INVALID,
                          ST.ERR_INF_PARSER_DEFINE_SECTION_MUST_ITEM_NOT_EXIST % ("FILE_GUID"), File=self.FullPath)
         else:
             self.SetGuid(DefineObj.GetFileGuid().GetValue())
-        if DefineObj.GetVersionString() == None:
+        if DefineObj.GetVersionString() is None:
             #
             # VERSION_STRING is missing from the [Defines] section, tools must assume that the module's version is 0.
             #
@@ -256,7 +256,7 @@ class InfPomAlignment(ModuleObject):
             if not (ModuleTypeValue == 'SEC' or ModuleTypeValue == 'PEI_CORE' or ModuleTypeValue == 'PEIM'):
                 Logger.Error("InfParser", FORMAT_INVALID, ST.ERR_INF_PARSER_DEFINE_SHADOW_INVALID, File=self.FullPath)
 
-        if DefineObj.GetPcdIsDriver() != None:
+        if DefineObj.GetPcdIsDriver() is not None:
             self.SetPcdIsDriver(DefineObj.GetPcdIsDriver().GetValue())
         #
         # LIBRARY_CLASS
@@ -499,7 +499,7 @@ class InfPomAlignment(ModuleObject):
                     LibraryClass.SetSupArchList(ConvertArchList(Item.GetSupArchList()))
                     LibraryClass.SetSupModuleList(Item.GetSupModuleList())
                     HelpStringObj = Item.GetHelpString()
-                    if HelpStringObj != None:
+                    if HelpStringObj is not None:
                         CommentString = GetHelpStringByRemoveHashKey(HelpStringObj.HeaderComments +
                                                                      HelpStringObj.TailComments)
                         HelpTextHeaderObj = CommonObject.TextObject()

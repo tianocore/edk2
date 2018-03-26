@@ -55,10 +55,10 @@ class EfiSection (EfiSectionClassObject):
     #
     def GenSection(self, OutputPath, ModuleName, SecNum, KeyStringList, FfsInf = None, Dict = {}, IsMakefile = False) :
         
-        if self.FileName != None and self.FileName.startswith('PCD('):
+        if self.FileName is not None and self.FileName.startswith('PCD('):
             self.FileName = GenFdsGlobalVariable.GetPcdValue(self.FileName)
         """Prepare the parameter of GenSection"""
-        if FfsInf != None :
+        if FfsInf is not None :
             InfFileName = FfsInf.InfFileName
             SectionType = FfsInf.__ExtendMacro__(self.SectionType)
             Filename = FfsInf.__ExtendMacro__(self.FileName)
@@ -66,20 +66,20 @@ class EfiSection (EfiSectionClassObject):
             StringData = FfsInf.__ExtendMacro__(self.StringData)
             NoStrip = True
             if FfsInf.ModuleType in ('SEC', 'PEI_CORE', 'PEIM') and SectionType in ('TE', 'PE32'):
-                if FfsInf.KeepReloc != None:
+                if FfsInf.KeepReloc is not None:
                     NoStrip = FfsInf.KeepReloc
-                elif FfsInf.KeepRelocFromRule != None:
+                elif FfsInf.KeepRelocFromRule is not None:
                     NoStrip = FfsInf.KeepRelocFromRule
-                elif self.KeepReloc != None:
+                elif self.KeepReloc is not None:
                     NoStrip = self.KeepReloc
-                elif FfsInf.ShadowFromInfFile != None:
+                elif FfsInf.ShadowFromInfFile is not None:
                     NoStrip = FfsInf.ShadowFromInfFile
         else:
             EdkLogger.error("GenFds", GENFDS_ERROR, "Module %s apply rule for None!" %ModuleName)
 
         """If the file name was pointed out, add it in FileList"""
         FileList = []
-        if Filename != None:
+        if Filename is not None:
             Filename = GenFdsGlobalVariable.MacroExtend(Filename, Dict)
             # check if the path is absolute or relative
             if os.path.isabs(Filename):
@@ -107,14 +107,14 @@ class EfiSection (EfiSectionClassObject):
         if SectionType == 'VERSION':
 
             InfOverrideVerString = False
-            if FfsInf.Version != None:
+            if FfsInf.Version is not None:
                 #StringData = FfsInf.Version
                 BuildNum = FfsInf.Version
                 InfOverrideVerString = True
 
             if InfOverrideVerString:
                 #VerTuple = ('-n', '"' + StringData + '"')
-                if BuildNum != None and BuildNum != '':
+                if BuildNum is not None and BuildNum != '':
                     BuildNumTuple = ('-j', BuildNum)
                 else:
                     BuildNumTuple = tuple()
@@ -136,7 +136,7 @@ class EfiSection (EfiSectionClassObject):
                     VerString = f.read()
                     f.close()
                     BuildNum = VerString
-                    if BuildNum != None and BuildNum != '':
+                    if BuildNum is not None and BuildNum != '':
                         BuildNumTuple = ('-j', BuildNum)
                     GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_VERSION',
                                                         #Ui=VerString,
@@ -146,7 +146,7 @@ class EfiSection (EfiSectionClassObject):
 
             else:
                 BuildNum = StringData
-                if BuildNum != None and BuildNum != '':
+                if BuildNum is not None and BuildNum != '':
                     BuildNumTuple = ('-j', BuildNum)
                 else:
                     BuildNumTuple = tuple()
@@ -173,7 +173,7 @@ class EfiSection (EfiSectionClassObject):
         elif SectionType == 'UI':
 
             InfOverrideUiString = False
-            if FfsInf.Ui != None:
+            if FfsInf.Ui is not None:
                 StringData = FfsInf.Ui
                 InfOverrideUiString = True
 
@@ -196,7 +196,7 @@ class EfiSection (EfiSectionClassObject):
                                                         Ui=UiString, IsMakefile=IsMakefile)
                     OutputFileList.append(OutputFile)
             else:
-                if StringData != None and len(StringData) > 0:
+                if StringData is not None and len(StringData) > 0:
                     UiTuple = ('-n', '"' + StringData + '"')
                 else:
                     UiTuple = tuple()

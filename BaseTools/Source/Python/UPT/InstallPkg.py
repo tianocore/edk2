@@ -91,7 +91,7 @@ def InstallNewPackage(WorkspaceDir, Path, CustomPath = False):
 # @param PathList:       The already installed standalone module Path list
 #
 def InstallNewModule(WorkspaceDir, Path, PathList = None):
-    if PathList == None:
+    if PathList is None:
         PathList = []
     Path = ConvertPath(Path)
     Path = os.path.normpath(Path)

@@ -45,7 +45,7 @@ class TargetTxtClassObject(object):
             DataType.TAB_TAT_DEFINES_BUILD_RULE_CONF                            : '',
         }
         self.ConfDirectoryPath = ""
-        if Filename != None:
+        if Filename is not None:
             self.LoadTargetTxtFile(Filename)
 
     ## LoadTargetTxtFile
@@ -83,7 +83,7 @@ class TargetTxtClassObject(object):
             self.ConfDirectoryPath = os.path.dirname(FileName)
         except:
             EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=FileName)
-            if F != None:
+            if F is not None:
                 F.close()
 
         for Line in F:
@@ -144,7 +144,7 @@ class TargetTxtClassObject(object):
     # @param Dict:  The dictionary to be printed
     #
     def printDict(Dict):
-        if Dict != None:
+        if Dict is not None:
             KeyList = Dict.keys()
             for Key in KeyList:
                 if Dict[Key] != '':

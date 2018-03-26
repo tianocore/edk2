@@ -74,7 +74,7 @@ class SurfaceObject(object):
 
     def Load(self, relativePath):
         # if has been loaded, directly return
-        if self._fileObj != None: return True
+        if self._fileObj is not None: return True
 
         relativePath = os.path.normpath(relativePath)
         fullPath = os.path.join(self._workspace, relativePath)
@@ -160,7 +160,7 @@ class Platform(SurfaceObject):
         return dsc.DSCFile
 
     def GetModuleCount(self):
-        if self.GetFileObj() == None:
+        if self.GetFileObj() is None:
             ErrorMsg("Fail to get module count because DSC file has not been load!")
 
         return len(self.GetFileObj().GetComponents())
@@ -171,7 +171,7 @@ class Platform(SurfaceObject):
     def LoadModules(self, precallback=None, postcallback=None):
         for obj in self.GetFileObj().GetComponents():
             mFilename = obj.GetFilename()
-            if precallback != None:
+            if precallback is not None:
                 precallback(self, mFilename)
             arch = obj.GetArch()
             if arch.lower() == 'common':
@@ -182,7 +182,7 @@ class Platform(SurfaceObject):
                 module = Module(self, self.GetWorkspace())
                 if module.Load(mFilename, arch, obj.GetOveridePcds(), obj.GetOverideLibs()):
                     self._modules.append(module)
-                    if postcallback != None:
+                    if postcallback is not None:
                         postcallback(self, module)
                 else:
                     del module
@@ -222,7 +222,7 @@ class Platform(SurfaceObject):
         for obj in objs:
             if obj.GetPcdName().lower() == name.lower():
                 arr.append(obj)
-        if arch != None:
+        if arch is not None:
             arr = self.FilterObjsByArch(arr, arch)
         return arr
 
@@ -292,7 +292,7 @@ class Platform(SurfaceObject):
             newSect = newDsc.AddNewSection(oldSect.GetName())
             for oldComObj in oldSect.GetObjects():
                 module = self.GetModuleObject(oldComObj.GetFilename(), oldSect.GetArch())
-                if module == None: continue
+                if module is None: continue
 
                 newComObj = dsc.DSCComponentObject(newSect)
                 newComObj.SetFilename(oldComObj.GetFilename())
@@ -300,7 +300,7 @@ class Platform(SurfaceObject):
                 # add all library instance for override section
                 libdict = module.GetLibraries()
                 for libclass in libdict.keys():
-                    if libdict[libclass] != None:
+                    if libdict[libclass] is not None:
                         newComObj.AddOverideLib(libclass, libdict[libclass].GetRelativeFilename().replace('\\', '/'))
 
                 # add all pcds for override section
@@ -338,7 +338,7 @@ class Module(SurfaceObject):
 
     def Destroy(self):
         for lib in self._libs.values():
-            if lib != None:
+            if lib is not None:
                 lib.Destroy()
         self._libs.clear()
 
@@ -351,12 +351,12 @@ class Module(SurfaceObject):
         del self._ppis[:]
 
         for protocol in self._protocols:
-            if protocol != None:
+            if protocol is not None:
                 protocol.DeRef(self)
         del self._protocols[:]
 
         for guid in self._guids:
-            if guid != None:
+            if guid is not None:
                 guid.DeRef(self)
         del self._guids[:]
 
@@ -375,9 +375,9 @@ class Module(SurfaceObject):
             return False
 
         self._arch = arch
-        if overidePcds != None:
+        if overidePcds is not None:
             self._overideLibs = overideLibs
-        if overideLibs != None:
+        if overideLibs is not None:
             self._overidePcds = overidePcds
 
         self._SearchLibraries()
@@ -403,7 +403,7 @@ class Module(SurfaceObject):
     def GetPcds(self):
         pcds = self._pcds.copy()
         for lib in self._libs.values():
-            if lib == None: continue
+            if lib is None: continue
             for name in lib._pcds.keys():
                 pcds[name] = lib._pcds[name]
         return pcds
@@ -412,7 +412,7 @@ class Module(SurfaceObject):
         ppis = []
         ppis += self._ppis
         for lib in self._libs.values():
-            if lib == None: continue
+            if lib is None: continue
             ppis += lib._ppis
         return ppis
 
@@ -420,7 +420,7 @@ class Module(SurfaceObject):
         pros = []
         pros = self._protocols
         for lib in self._libs.values():
-            if lib == None: continue
+            if lib is None: continue
             pros += lib._protocols
         return pros
 
@@ -428,7 +428,7 @@ class Module(SurfaceObject):
         guids = []
         guids += self._guids
         for lib in self._libs.values():
-            if lib == None: continue
+            if lib is None: continue
             guids += lib._guids
         return guids
 
@@ -436,12 +436,12 @@ class Module(SurfaceObject):
         deps = []
         deps += self._depexs
         for lib in self._libs.values():
-            if lib == None: continue
+            if lib is None: continue
             deps += lib._depexs
         return deps
 
     def IsLibrary(self):
-        return self.GetFileObj().GetDefine("LIBRARY_CLASS") != None
+        return self.GetFileObj().GetDefine("LIBRARY_CLASS") is not None
 
     def GetLibraryInstance(self, classname, arch, type):
         if classname not in self._libs.keys():
@@ -454,7 +454,7 @@ class Module(SurfaceObject):
             parent = self.GetParent()
             if issubclass(parent.__class__, Platform):
                 path = parent.GetLibraryPath(classname, arch, type)
-                if path == None:
+                if path is None:
                     ErrorMsg('Fail to get library instance for %s' % classname, self.GetFilename())
                     return None
                 self._libs[classname] = Library(self, self.GetWorkspace())
@@ -477,7 +477,7 @@ class Module(SurfaceObject):
                 continue
             classname = obj.GetClass()
             instance = self.GetLibraryInstance(classname, arch, type)
-            if not self.IsLibrary() and instance != None:
+            if not self.IsLibrary() and instance is not None:
                 instance._isInherit = False
 
             if classname not in self._libs.keys():
@@ -490,7 +490,7 @@ class Module(SurfaceObject):
         pros  = []
         deps  = []
         guids = []
-        if self.GetFileObj() != None:
+        if self.GetFileObj() is not None:
             pcds = self.FilterObjsByArch(self.GetFileObj().GetSectionObjectsByName('pcd'),
                                           self.GetArch())
             for pcd in pcds:
@@ -534,31 +534,31 @@ class Module(SurfaceObject):
         objs = self.GetFileObj().GetSectionObjectsByName('packages')
         for obj in objs:
             package = self.GetPlatform().GetPackage(obj.GetPath())
-            if package != None:
+            if package is not None:
                 self._packages.append(package)
 
     def GetPackages(self):
         return self._packages
 
     def GetPcdObjects(self):
-        if self.GetFileObj() == None:
+        if self.GetFileObj() is None:
             return []
 
         return self.GetFileObj().GetSectionObjectsByName('pcd')
 
     def GetLibraryClassHeaderFilePath(self):
         lcname = self.GetFileObj().GetProduceLibraryClass()
-        if lcname == None: return None
+        if lcname is None: return None
 
         pkgs = self.GetPackages()
         for package in pkgs:
             path = package.GetLibraryClassHeaderPathByName(lcname)
-            if path != None:
+            if path is not None:
                 return os.path.realpath(os.path.join(package.GetFileObj().GetPackageRootPath(), path))
         return None
 
     def Reload(self, force=False, callback=None):
-        if callback != None:
+        if callback is not None:
             callback(self, "Starting reload...")
 
         ret = SurfaceObject.Reload(self, force)
@@ -568,7 +568,7 @@ class Module(SurfaceObject):
             return True
 
         for lib in self._libs.values():
-            if lib != None:
+            if lib is not None:
                 lib.Destroy()
         self._libs.clear()
 
@@ -591,13 +591,13 @@ class Module(SurfaceObject):
         del self._packages[:]
         del self._depexs[:]
 
-        if callback != None:
+        if callback is not None:
             callback(self, "Searching libraries...")
         self._SearchLibraries()
-        if callback != None:
+        if callback is not None:
             callback(self, "Searching packages...")
         self._SearchPackage()
-        if callback != None:
+        if callback is not None:
             callback(self, "Searching surface items...")
         self._SearchSurfaceItems()
 
@@ -665,16 +665,16 @@ class Package(SurfaceObject):
 
     def Destroy(self):
         for pcd in self._pcds.values():
-            if pcd != None:
+            if pcd is not None:
                 pcd.Destroy()
         for guid in self._guids.values():
-            if guid != None:
+            if guid is not None:
                 guid.Destroy()
         for protocol in self._protocols.values():
-            if protocol != None:
+            if protocol is not None:
                 protocol.Destroy()
         for ppi in self._ppis.values():
-            if ppi != None:
+            if ppi is not None:
                 ppi.Destroy()
         self._pcds.clear()
         self._guids.clear()
@@ -689,7 +689,7 @@ class Package(SurfaceObject):
         pcds = self.GetFileObj().GetSectionObjectsByName('pcds')
         for pcd in pcds:
             if pcd.GetPcdName() in self._pcds.keys():
-                if self._pcds[pcd.GetPcdName()] != None:
+                if self._pcds[pcd.GetPcdName()] is not None:
                     self._pcds[pcd.GetPcdName()].AddDecObj(pcd)
             else:
                 self._pcds[pcd.GetPcdName()] = PcdItem(pcd.GetPcdName(), self, pcd)
@@ -726,7 +726,7 @@ class Package(SurfaceObject):
     def GetPcdDefineObjs(self, name=None):
         arr = []
         objs = self.GetFileObj().GetSectionObjectsByName('pcds')
-        if name == None: return objs
+        if name is None: return objs
 
         for obj in objs:
             if obj.GetPcdName().lower() == name.lower():
@@ -772,7 +772,7 @@ class ModulePcd(object):
 
     def __init__(self, parent, name, infObj, pcdItem):
         assert issubclass(parent.__class__, Module), "Module's PCD's parent must be module!"
-        assert pcdItem != None, 'Pcd %s does not in some package!' % name
+        assert pcdItem is not None, 'Pcd %s does not in some package!' % name
 
         self._name          = name
         self._parent        = parent

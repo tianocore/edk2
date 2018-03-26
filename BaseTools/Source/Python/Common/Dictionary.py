@@ -54,7 +54,7 @@ def ConvertTextFileToDictionary(FileName, Dictionary, CommentCharacter, KeySplit
 # @param Dict:  The dictionary to be printed
 #
 def printDict(Dict):
-    if Dict != None:
+    if Dict is not None:
         KeyList = Dict.keys()
         for Key in KeyList:
             if Dict[Key] != '':

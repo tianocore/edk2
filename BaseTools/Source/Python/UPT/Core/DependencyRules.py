@@ -104,12 +104,12 @@ class DependencyRules(object):
             # check whether satisfied by current distribution 
             #
             if not Exist:
-                if DpObj == None:
+                if DpObj is None:
                     Result = False
                     break
                 for GuidVerPair in DpObj.PackageSurfaceArea.keys():
                     if Dep.GetGuid() == GuidVerPair[0]:
-                        if Dep.GetVersion() == None or \
+                        if Dep.GetVersion() is None or \
                         len(Dep.GetVersion()) == 0:
                             Result = True
                             break

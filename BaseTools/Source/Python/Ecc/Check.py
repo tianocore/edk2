@@ -1299,7 +1299,7 @@ class Check(object):
             RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
             for Record in RecordSet:
                 Name = Record[1].strip()
-                if Name != '' and Name != None:
+                if Name != '' and Name is not None:
                     if Name[0] == '(':
                         Name = Name[1:Name.find(')')]
                     if Name.find('(') > -1:

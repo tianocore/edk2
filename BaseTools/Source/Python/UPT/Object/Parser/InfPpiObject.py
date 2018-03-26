@@ -51,7 +51,7 @@ def ParsePpiComment(CommentsList, InfPpiItemObj):
         if CommentItemString:
             pass
         
-        if CommentItemHelpText == None:
+        if CommentItemHelpText is None:
             CommentItemHelpText = ''
             if Count == len(CommentsList) and CommentItemUsage == CommentItemNotify == DT.ITEM_UNDEFINED:
                 CommentItemHelpText = DT.END_OF_LINE                    
@@ -213,7 +213,7 @@ class InfPpiObject():
             #
             # Validate Arch
             #            
-            if (ArchItem == '' or ArchItem == None):
+            if (ArchItem == '' or ArchItem is None):
                 ArchItem = 'COMMON'   
             __SupArchList.append(ArchItem)
             
@@ -290,7 +290,7 @@ class InfPpiObject():
             #
             # Get/Set Usage and HelpString for PPI entry
             #
-            if CommentsList != None and len(CommentsList) != 0:
+            if CommentsList is not None and len(CommentsList) != 0:
                 InfPpiItemObj = ParsePpiComment(CommentsList, InfPpiItemObj)
             else:
                 CommentItemIns = InfPpiItemCommentContent()

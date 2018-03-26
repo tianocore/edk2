@@ -381,7 +381,7 @@ class GenVPD :
         # Delete useless lines
         while (True) :
             try :
-                if (self.FileLinesList[count] == None) :
+                if (self.FileLinesList[count] is None) :
                     del(self.FileLinesList[count])
                 else :
                     count += 1
@@ -398,7 +398,7 @@ class GenVPD :
         # Process the pcds one by one base on the pcd's value and size
         count = 0
         for line in self.FileLinesList:
-            if line != None :
+            if line is not None :
                 PCD = PcdEntry(line[0], line[1], line[2], line[3], line[4],line[5], self.InputFileName)   
                 # Strip the space char
                 PCD.PcdCName     = PCD.PcdCName.strip(' ')

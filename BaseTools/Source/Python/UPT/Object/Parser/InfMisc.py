@@ -135,9 +135,9 @@ class InfSpecialCommentObject(InfSectionCommonDef):
 # An encapsulate of Error for INF parser.
 # 
 def ErrorInInf(Message=None, ErrorCode=None, LineInfo=None, RaiseError=True):
-    if ErrorCode == None:
+    if ErrorCode is None:
         ErrorCode = ToolError.FORMAT_INVALID
-    if LineInfo == None:
+    if LineInfo is None:
         LineInfo = ['', -1, '']
     Logger.Error("InfParser", 
                  ErrorCode, 

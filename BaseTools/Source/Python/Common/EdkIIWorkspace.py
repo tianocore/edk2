@@ -38,7 +38,7 @@ class EdkIIWorkspace:
         #
         # Check environment valiable 'WORKSPACE'
         #
-        if os.environ.get('WORKSPACE') == None:
+        if os.environ.get('WORKSPACE') is None:
             print 'ERROR: WORKSPACE not defined.    Please run EdkSetup from the EDK II install directory.'
             return False
 

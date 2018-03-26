@@ -783,14 +783,14 @@ class CParser(Parser):
 
                 if self.backtracking == 0:
                           
-                    if d != None:
+                    if d is not None:
                       self.function_definition_stack[-1].ModifierText = self.input.toString(d.start,d.stop)
                     else:
                       self.function_definition_stack[-1].ModifierText = ''
                     self.function_definition_stack[-1].DeclText = self.input.toString(declarator1.start,declarator1.stop)
                     self.function_definition_stack[-1].DeclLine = declarator1.start.line
                     self.function_definition_stack[-1].DeclOffset = declarator1.start.charPositionInLine
-                    if a != None:
+                    if a is not None:
                       self.function_definition_stack[-1].LBLine = a.start.line
                       self.function_definition_stack[-1].LBOffset = a.start.charPositionInLine
                     else:
@@ -920,7 +920,7 @@ class CParser(Parser):
                         return 
                     if self.backtracking == 0:
                             
-                        if b != None:
+                        if b is not None:
                           self.StoreTypedefDefinition(a.line, a.charPositionInLine, d.line, d.charPositionInLine, self.input.toString(b.start,b.stop), self.input.toString(c.start,c.stop))
                         else:
                           self.StoreTypedefDefinition(a.line, a.charPositionInLine, d.line, d.charPositionInLine, '', self.input.toString(c.start,c.stop))
@@ -957,7 +957,7 @@ class CParser(Parser):
                         return 
                     if self.backtracking == 0:
                           
-                        if t != None:
+                        if t is not None:
                           self.StoreVariableDeclaration(s.start.line, s.start.charPositionInLine, t.start.line, t.start.charPositionInLine, self.input.toString(s.start,s.stop), self.input.toString(t.start,t.stop))
                         	
 
@@ -1401,7 +1401,7 @@ class CParser(Parser):
                         return 
                     if self.backtracking == 0:
                           
-                        if s.stop != None:
+                        if s.stop is not None:
                           self.StoreStructUnionDefinition(s.start.line, s.start.charPositionInLine, s.stop.line, s.stop.charPositionInLine, self.input.toString(s.start,s.stop))
                         	
 
@@ -1416,7 +1416,7 @@ class CParser(Parser):
                         return 
                     if self.backtracking == 0:
                           
-                        if e.stop != None:
+                        if e.stop is not None:
                           self.StoreEnumerationDefinition(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
                         	
 

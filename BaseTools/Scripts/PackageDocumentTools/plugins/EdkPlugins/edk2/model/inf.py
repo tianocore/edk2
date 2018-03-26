@@ -23,7 +23,7 @@ class INFFile(ini.BaseINIFile):
 
     def GetProduceLibraryClass(self):
         obj = self.GetDefine("LIBRARY_CLASS")
-        if obj == None: return None
+        if obj is None: return None
 
         return obj.split('|')[0].strip()
 
@@ -59,7 +59,7 @@ class INFFile(ini.BaseINIFile):
         if not ini.BaseINIFile.Parse(self):
             return False
         classname = self.GetProduceLibraryClass()
-        if classname != None:
+        if classname is not None:
             libobjdict = INFFile._libobjs
             if libobjdict.has_key(classname):
                 if self not in libobjdict[classname]:
@@ -77,7 +77,7 @@ class INFFile(ini.BaseINIFile):
 
     def Clear(self):
         classname = self.GetProduceLibraryClass()
-        if classname != None:
+        if classname is not None:
             libobjdict = INFFile._libobjs
             libobjdict[classname].remove(self)
             if len(libobjdict[classname]) == 0:
@@ -114,7 +114,7 @@ class INFSection(ini.BaseINISection):
         return arr[1]
 
     def IsArchMatch(self, arch):
-        if arch == None or self.GetArch() == 'common':
+        if arch is None or self.GetArch() == 'common':
             return True
 
         if self.GetArch().lower() != arch.lower():
@@ -258,9 +258,9 @@ class INFSourceObject(INFSectionObject):
             del objdict[self.mFilename]
 
     def IsMatchFamily(self, family):
-        if family == None:
+        if family is None:
             return True
-        if self.mFamily != None:
+        if self.mFamily is not None:
             if family.strip().lower() == self.mFamily.lower():
                 return True
             else:

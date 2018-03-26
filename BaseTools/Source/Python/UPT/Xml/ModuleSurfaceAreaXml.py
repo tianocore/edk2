@@ -550,7 +550,7 @@ class ModulePropertyXml(object):
             Hob = Axml.FromXml(SubItem, 'HOB')
             self.HOBs.append(Hob)
 
-        if Header == None:
+        if Header is None:
             Header = ModuleObject()
 
         Header.SetModuleType(self.ModuleType)

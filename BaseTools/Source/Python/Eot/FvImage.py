@@ -52,7 +52,7 @@ class Image(array):
         return array.__new__(cls, 'B')
 
     def __init__(m, ID=None):
-        if ID == None:
+        if ID is None:
             m._ID_ = str(uuid.uuid1()).upper()
         else:
             m._ID_ = ID
@@ -208,7 +208,7 @@ class FirmwareVolume(Image):
         return (CouldBeLoaded, DepexString, FileDepex)
 
     def Dispatch(self, Db = None):
-        if Db == None:
+        if Db is None:
             return False
         self.UnDispatchedFfsDict = copy.copy(self.FfsDict)
         # Find PeiCore, DexCore, PeiPriori, DxePriori first
@@ -236,15 +236,15 @@ class FirmwareVolume(Image):
                 continue
 
         # Parse SEC_CORE first
-        if FfsSecCoreGuid != None:
+        if FfsSecCoreGuid is not None:
             self.OrderedFfsDict[FfsSecCoreGuid] = self.UnDispatchedFfsDict.pop(FfsSecCoreGuid)
             self.LoadPpi(Db, FfsSecCoreGuid)
 
         # Parse PEI first
-        if FfsPeiCoreGuid != None:
+        if FfsPeiCoreGuid is not None:
             self.OrderedFfsDict[FfsPeiCoreGuid] = self.UnDispatchedFfsDict.pop(FfsPeiCoreGuid)
             self.LoadPpi(Db, FfsPeiCoreGuid)
-            if FfsPeiPrioriGuid != None:
+            if FfsPeiPrioriGuid is not None:
                 # Load PEIM described in priori file
                 FfsPeiPriori = self.UnDispatchedFfsDict.pop(FfsPeiPrioriGuid)
                 if len(FfsPeiPriori.Sections) == 1:
@@ -263,10 +263,10 @@ class FirmwareVolume(Image):
         self.DisPatchPei(Db)
 
         # Parse DXE then
-        if FfsDxeCoreGuid != None:
+        if FfsDxeCoreGuid is not None:
             self.OrderedFfsDict[FfsDxeCoreGuid] = self.UnDispatchedFfsDict.pop(FfsDxeCoreGuid)
             self.LoadProtocol(Db, FfsDxeCoreGuid)
-            if FfsDxePrioriGuid != None:
+            if FfsDxePrioriGuid is not None:
                 # Load PEIM described in priori file
                 FfsDxePriori = self.UnDispatchedFfsDict.pop(FfsDxePrioriGuid)
                 if len(FfsDxePriori.Sections) == 1:
@@ -383,7 +383,7 @@ class FirmwareVolume(Image):
                     IsInstalled = True
                     NewFfs = self.UnDispatchedFfsDict.pop(FfsID)
                     NewFfs.Depex = DepexString
-                    if FileDepex != None:
+                    if FileDepex is not None:
                         ScheduleList.insert.insert(FileDepex[1], FfsID, NewFfs, FileDepex[0])
                     else:
                         ScheduleList[FfsID] = NewFfs
@@ -471,7 +471,7 @@ class FirmwareVolume(Image):
             FfsId = repr(FfsObj)
             if ((self.Attributes & 0x00000800) != 0 and len(FfsObj) == 0xFFFFFF) \
                 or ((self.Attributes & 0x00000800) == 0 and len(FfsObj) == 0):
-                if LastFfsObj != None:
+                if LastFfsObj is not None:
                     LastFfsObj.FreeSpace = EndOfFv - LastFfsObj._OFF_ - len(LastFfsObj)
             else:
                 if FfsId in self.FfsDict:
@@ -480,7 +480,7 @@ class FirmwareVolume(Image):
                                     % (FfsObj.Guid, FfsObj.Offset,
                                        self.FfsDict[FfsId].Guid, self.FfsDict[FfsId].Offset))
                 self.FfsDict[FfsId] = FfsObj
-                if LastFfsObj != None:
+                if LastFfsObj is not None:
                     LastFfsObj.FreeSpace = FfsStartAddress - LastFfsObj._OFF_ - len(LastFfsObj)
 
             FfsStartAddress += len(FfsObj)
@@ -527,11 +527,11 @@ class CompressedImage(Image):
 
     def __init__(m, CompressedData=None, CompressionType=None, UncompressedLength=None):
         Image.__init__(m)
-        if UncompressedLength != None:
+        if UncompressedLength is not None:
             m.UncompressedLength = UncompressedLength
-        if CompressionType != None:
+        if CompressionType is not None:
             m.CompressionType = CompressionType
-        if CompressedData != None:
+        if CompressedData is not None:
             m.Data = CompressedData
 
     def __str__(m):
@@ -607,13 +607,13 @@ class GuidDefinedImage(Image):
 
     def __init__(m, SectionDefinitionGuid=None, DataOffset=None, Attributes=None, Data=None):
         Image.__init__(m)
-        if SectionDefinitionGuid != None:
+        if SectionDefinitionGuid is not None:
             m.SectionDefinitionGuid = SectionDefinitionGuid
-        if DataOffset != None:
+        if DataOffset is not None:
             m.DataOffset = DataOffset
-        if Attributes != None:
+        if Attributes is not None:
             m.Attributes = Attributes
-        if Data != None:
+        if Data is not None:
             m.Data = Data
 
     def __str__(m):
@@ -791,7 +791,7 @@ class Depex(Image):
                 else:
                     CurrentData = m._OPCODE_
                 m._ExprList.append(Token)
-                if CurrentData == None:
+                if CurrentData is None:
                     break
         return m._ExprList
 
@@ -867,9 +867,9 @@ class Section(Image):
     def __init__(m, Type=None, Size=None):
         Image.__init__(m)
         m._Alignment = 1
-        if Type != None:
+        if Type is not None:
             m.Type = Type
-        if Size != None:
+        if Size is not None:
             m.Size = Size
 
     def __str__(m):
@@ -1283,7 +1283,7 @@ class LinkMap:
             for Line in MapFile:
                 Line = Line.strip()
                 if not MappingStart:
-                    if MappingTitle.match(Line) != None:
+                    if MappingTitle.match(Line) is not None:
                         MappingStart = True
                     continue
                 ResultList = MappingFormat.findall(Line)

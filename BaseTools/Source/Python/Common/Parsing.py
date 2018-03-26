@@ -299,7 +299,7 @@ def GetLibraryClassOfInf(Item, ContainerFile, WorkspaceDir, LineNo = -1):
 #
 def CheckPcdTokenInfo(TokenInfoString, Section, File, LineNo = -1):
     Format = '<TokenSpaceGuidCName>.<PcdCName>'
-    if TokenInfoString != '' and TokenInfoString != None:
+    if TokenInfoString != '' and TokenInfoString is not None:
         TokenInfoList = GetSplitValueList(TokenInfoString, TAB_SPLIT)
         if len(TokenInfoList) == 2:
             return True
@@ -550,7 +550,7 @@ def GetComponents(Lines, Key, KeyValues, CommentCharacter):
     LineList = Lines.split('\n')
     for Line in LineList:
         Line = CleanString(Line, CommentCharacter)
-        if Line == None or Line == '':
+        if Line is None or Line == '':
             continue
 
         if findBlock == False:

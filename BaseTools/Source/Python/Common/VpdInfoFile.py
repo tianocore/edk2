@@ -89,7 +89,7 @@ class VpdInfoFile:
     #  @param offset integer value for VPD's offset in specific SKU.
     #
     def Add(self, Vpd, skuname,Offset):
-        if (Vpd == None):
+        if (Vpd is None):
             EdkLogger.error("VpdInfoFile", BuildToolError.ATTRIBUTE_UNKNOWN_ERROR, "Invalid VPD PCD entry.")
         
         if not (Offset >= 0 or Offset == "*"):
@@ -100,7 +100,7 @@ class VpdInfoFile:
                 EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID, 
                                 "Invalid max datum size for VPD PCD %s.%s" % (Vpd.TokenSpaceGuidCName, Vpd.TokenCName))
         elif Vpd.DatumType in ["BOOLEAN", "UINT8", "UINT16", "UINT32", "UINT64"]: 
-            if Vpd.MaxDatumSize == None or Vpd.MaxDatumSize == "":
+            if Vpd.MaxDatumSize is None or Vpd.MaxDatumSize == "":
                 Vpd.MaxDatumSize = VpdInfoFile._MAX_SIZE_TYPE[Vpd.DatumType]
         else:
             if Vpd.MaxDatumSize <= 0:
@@ -122,7 +122,7 @@ class VpdInfoFile:
     #  If 
     #  @param FilePath        The given file path which would hold VPD information
     def Write(self, FilePath):
-        if not (FilePath != None or len(FilePath) != 0):
+        if not (FilePath is not None or len(FilePath) != 0):
             EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID,  
                             "Invalid parameter FilePath: %s." % FilePath)        
 
@@ -227,8 +227,8 @@ class VpdInfoFile:
 #  @param VpdFileName   The string path name for VPD information guid.txt
 # 
 def CallExtenalBPDGTool(ToolPath, VpdFileName):
-    assert ToolPath != None, "Invalid parameter ToolPath"
-    assert VpdFileName != None and os.path.exists(VpdFileName), "Invalid parameter VpdFileName"
+    assert ToolPath is not None, "Invalid parameter ToolPath"
+    assert VpdFileName is not None and os.path.exists(VpdFileName), "Invalid parameter VpdFileName"
     
     OutputDir = os.path.dirname(VpdFileName)
     FileName = os.path.basename(VpdFileName)
@@ -250,7 +250,7 @@ def CallExtenalBPDGTool(ToolPath, VpdFileName):
         EdkLogger.error("BPDG", BuildToolError.COMMAND_FAILURE, ExtraData="%s" % (str(X)))
     (out, error) = PopenObject.communicate()
     print out
-    while PopenObject.returncode == None :
+    while PopenObject.returncode is None :
         PopenObject.wait()
     
     if PopenObject.returncode != 0:

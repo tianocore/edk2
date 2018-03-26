@@ -86,7 +86,7 @@ class DepexSection (DepexSectionClassObject):
             for Exp in ExpList:
                 if Exp.upper() not in ('AND', 'OR', 'NOT', 'TRUE', 'FALSE', 'SOR', 'BEFORE', 'AFTER', 'END'):
                     GuidStr = self.__FindGuidValue(Exp)
-                    if GuidStr == None:
+                    if GuidStr is None:
                         EdkLogger.error("GenFds", RESOURCE_NOT_AVAILABLE,
                                         "Depex GUID %s could not be found in build DB! (ModuleName: %s)" % (Exp, ModuleName))
 

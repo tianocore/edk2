@@ -41,7 +41,7 @@ class OptRomFileStatement:
     #
     def GenFfs(self, Dict = {}, IsMakefile=False):
         
-        if self.FileName != None:
+        if self.FileName is not None:
             self.FileName = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FileName)
         
         return self.FileName

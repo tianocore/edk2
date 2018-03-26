@@ -45,7 +45,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
     CustomMakefile = DefineObj.GetCustomMakefile()
     UefiHiiResourceSection = DefineObj.GetUefiHiiResourceSection()
 
-    if EdkReleaseVersion != None:
+    if EdkReleaseVersion is not None:
         Name = DT.TAB_INF_DEFINES_EDK_RELEASE_VERSION
         Value = EdkReleaseVersion.GetValue()
         Statement = _GenInfDefineStateMent(EdkReleaseVersion.Comments.GetHeaderComments(),
@@ -54,7 +54,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            EdkReleaseVersion.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if Shadow != None:
+    if Shadow is not None:
         Name = DT.TAB_INF_DEFINES_SHADOW
         Value = Shadow.GetValue()
         Statement = _GenInfDefineStateMent(Shadow.Comments.GetHeaderComments(),
@@ -63,7 +63,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            Shadow.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if DpxSource != None:
+    if DpxSource is not None:
         Name = DT.TAB_INF_DEFINES_DPX_SOURCE
         for DpxSourceItem in DpxSource:
             Value = DpxSourceItem[0]
@@ -73,7 +73,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                                DpxSourceItem[1].GetTailComments())
             DefinesDictNew[Statement] = ArchString
 
-    if PciVendorId != None:
+    if PciVendorId is not None:
         Name = DT.TAB_INF_DEFINES_PCI_VENDOR_ID
         Value = PciVendorId.GetValue()
         Statement = _GenInfDefineStateMent(PciVendorId.Comments.GetHeaderComments(),
@@ -82,7 +82,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            PciVendorId.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if PciDeviceId != None:
+    if PciDeviceId is not None:
         Name = DT.TAB_INF_DEFINES_PCI_DEVICE_ID
         Value = PciDeviceId.GetValue()
         Statement = _GenInfDefineStateMent(PciDeviceId.Comments.GetHeaderComments(),
@@ -91,7 +91,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            PciDeviceId.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if PciClassCode != None:
+    if PciClassCode is not None:
         Name = DT.TAB_INF_DEFINES_PCI_CLASS_CODE
         Value = PciClassCode.GetValue()
         Statement = _GenInfDefineStateMent(PciClassCode.Comments.GetHeaderComments(),
@@ -100,7 +100,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            PciClassCode.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if PciRevision != None:
+    if PciRevision is not None:
         Name = DT.TAB_INF_DEFINES_PCI_REVISION
         Value = PciRevision.GetValue()
         Statement = _GenInfDefineStateMent(PciRevision.Comments.GetHeaderComments(),
@@ -109,7 +109,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
                                            PciRevision.Comments.GetTailComments())
         DefinesDictNew[Statement] = ArchString
 
-    if PciCompress != None:
+    if PciCompress is not None:
         Name = DT.TAB_INF_DEFINES_PCI_COMPRESS
         Value = PciCompress.GetValue()
         Statement = _GenInfDefineStateMent(PciCompress.Comments.GetHeaderComments(),
@@ -138,7 +138,7 @@ def GenModuleHeaderUserExt(DefineObj, ArchString):
 
             DefinesDictNew[Statement] = ArchString
 
-    if UefiHiiResourceSection != None:
+    if UefiHiiResourceSection is not None:
         Name = DT.TAB_INF_DEFINES_UEFI_HII_RESOURCE_SECTION
         Value = UefiHiiResourceSection.GetValue()
         HeaderComment = UefiHiiResourceSection.Comments.GetHeaderComments()

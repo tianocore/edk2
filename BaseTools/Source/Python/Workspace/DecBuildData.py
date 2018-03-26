@@ -107,7 +107,7 @@ class DecBuildData(PackageBuildClassObject):
 
     ## Get current effective macros
     def _GetMacros(self):
-        if self.__Macros == None:
+        if self.__Macros is None:
             self.__Macros = {}
             self.__Macros.update(GlobalData.gGlobalDefines)
         return self.__Macros
@@ -145,34 +145,34 @@ class DecBuildData(PackageBuildClassObject):
 
     ## Retrieve package name
     def _GetPackageName(self):
-        if self._PackageName == None:
-            if self._Header == None:
+        if self._PackageName is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._PackageName == None:
+            if self._PackageName is None:
                 EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE, "No PACKAGE_NAME", File=self.MetaFile)
         return self._PackageName
 
     ## Retrieve file guid
     def _GetFileGuid(self):
-        if self._Guid == None:
-            if self._Header == None:
+        if self._Guid is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._Guid == None:
+            if self._Guid is None:
                 EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE, "No PACKAGE_GUID", File=self.MetaFile)
         return self._Guid
 
     ## Retrieve package version
     def _GetVersion(self):
-        if self._Version == None:
-            if self._Header == None:
+        if self._Version is None:
+            if self._Header is None:
                 self._GetHeaderInfo()
-            if self._Version == None:
+            if self._Version is None:
                 self._Version = ''
         return self._Version
 
     ## Retrieve protocol definitions (name/value pairs)
     def _GetProtocol(self):
-        if self._Protocols == None:
+        if self._Protocols is None:
             #
             # tdict is a special kind of dict, used for selecting correct
             # protocol defition for given ARCH
@@ -214,7 +214,7 @@ class DecBuildData(PackageBuildClassObject):
 
     ## Retrieve PPI definitions (name/value pairs)
     def _GetPpi(self):
-        if self._Ppis == None:
+        if self._Ppis is None:
             #
             # tdict is a special kind of dict, used for selecting correct
             # PPI defition for given ARCH
@@ -256,7 +256,7 @@ class DecBuildData(PackageBuildClassObject):
 
     ## Retrieve GUID definitions (name/value pairs)
     def _GetGuid(self):
-        if self._Guids == None:
+        if self._Guids is None:
             #
             # tdict is a special kind of dict, used for selecting correct
             # GUID defition for given ARCH
@@ -298,7 +298,7 @@ class DecBuildData(PackageBuildClassObject):
 
     ## Retrieve public include paths declared in this package
     def _GetInclude(self):
-        if self._Includes == None or self._CommonIncludes is None:
+        if self._Includes is None or self._CommonIncludes is None:
             self._CommonIncludes = []
             self._Includes = []
             self._PrivateIncludes = []
@@ -333,7 +333,7 @@ class DecBuildData(PackageBuildClassObject):
 
     ## Retrieve library class declarations (not used in build at present)
     def _GetLibraryClass(self):
-        if self._LibraryClasses == None:
+        if self._LibraryClasses is None:
             #
             # tdict is a special kind of dict, used for selecting correct
             # library class declaration for given ARCH
@@ -357,7 +357,7 @@ class DecBuildData(PackageBuildClassObject):
 
     ## Retrieve PCD declarations
     def _GetPcds(self):
-        if self._Pcds == None:
+        if self._Pcds is None:
             self._Pcds = sdict()
             self._Pcds.update(self._GetPcd(MODEL_PCD_FIXED_AT_BUILD))
             self._Pcds.update(self._GetPcd(MODEL_PCD_PATCHABLE_IN_MODULE))
@@ -422,7 +422,7 @@ class DecBuildData(PackageBuildClassObject):
             # will automatically turn to 'common' ARCH and try again
             #
             Setting,LineNo = PcdDict[self._Arch, PcdCName, TokenSpaceGuid]
-            if Setting == None:
+            if Setting is None:
                 continue
 
             DefaultValue, DatumType, TokenNumber = AnalyzePcdData(Setting)
@@ -454,7 +454,7 @@ class DecBuildData(PackageBuildClassObject):
         StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*$')
         for pcd in Pcds.values():
             if pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
-                if StructPattern.match(pcd.DatumType) == None:
+                if StructPattern.match(pcd.DatumType) is None:
                     EdkLogger.error('build', FORMAT_INVALID, "DatumType only support BOOLEAN, UINT8, UINT16, UINT32, UINT64, VOID* or a valid struct name.", pcd.DefinitionPosition[0],pcd.DefinitionPosition[1])
         for struct_pcd in Pcds.values():
             if isinstance(struct_pcd,StructurePcd) and not struct_pcd.StructuredPcdIncludeFile:

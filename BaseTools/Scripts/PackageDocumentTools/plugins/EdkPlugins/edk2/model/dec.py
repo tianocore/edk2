@@ -77,7 +77,7 @@ class DECSection(ini.BaseINISection):
         return arr[1]
 
     def IsArchMatch(self, arch):
-        if arch == None or self.GetArch() == 'common':
+        if arch is None or self.GetArch() == 'common':
             return True
 
         if self.GetArch().lower() != arch.lower():

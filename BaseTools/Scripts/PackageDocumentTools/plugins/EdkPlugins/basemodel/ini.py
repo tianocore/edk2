@@ -34,7 +34,7 @@ class BaseINIFile(object):
         if key not in cls._objs.keys():
             cls._objs[key] = object.__new__(cls, *args, **kwargs)
 
-        if parent != None:
+        if parent is not None:
             cls._objs[key].AddParent(parent)
 
         return cls._objs[key]
@@ -47,7 +47,7 @@ class BaseINIFile(object):
         self._isModify = True
 
     def AddParent(self, parent):
-        if parent == None: return
+        if parent is None: return
         if not hasattr(self, "_parents"):
             self._parents = []
 
@@ -122,7 +122,7 @@ class BaseINIFile(object):
                 continue
 
             m = section_re.match(templine)
-            if m!= None: # found a section
+            if mis not None: # found a section
                 inGlobal = False
                 # Finish the latest section first
                 if len(sObjs) != 0:
@@ -165,7 +165,7 @@ class BaseINIFile(object):
     def Destroy(self, parent):
 
         # check referenced parent
-        if parent != None:
+        if parent is not None:
             assert parent in self._parents, "when destory ini object, can not found parent reference!"
             self._parents.remove(parent)
 
@@ -307,7 +307,7 @@ class BaseINISection(object):
                 visit += 1
                 continue
             line = line.split('#')[0].strip()
-            if iniObj != None:
+            if iniObj is not None:
                 if line.endswith('}'):
                     iniObj._end = visit - self._start
                     if not iniObj.Parse():

@@ -906,12 +906,12 @@ cleanlib:
             # skip non-C files
             if File.Ext not in [".c", ".C"] or File.Name == "AutoGen.c":
                 continue
-            elif DepSet == None:
+            elif DepSet is None:
                 DepSet = set(self.FileDependency[File])
             else:
                 DepSet &= set(self.FileDependency[File])
         # in case nothing in SourceFileList
-        if DepSet == None:
+        if DepSet is None:
             DepSet = set()
         #
         # Extract common files list in the dependency files
@@ -1516,7 +1516,7 @@ class TopLevelMakefile(BuildFile):
 
         # TRICK: for not generating GenFds call in makefile if no FDF file
         MacroList = []
-        if PlatformInfo.FdfFile != None and PlatformInfo.FdfFile != "":
+        if PlatformInfo.FdfFile is not None and PlatformInfo.FdfFile != "":
             FdfFileList = [PlatformInfo.FdfFile]
             # macros passed to GenFds
             MacroList.append('"%s=%s"' % ("EFI_SOURCE", GlobalData.gEfiSource.replace('\\', '\\\\')))

@@ -162,7 +162,7 @@ class DistributionPackageXml(object):
 
 
     def FromXml(self, Filename=None):
-        if Filename != None:
+        if Filename is not None:
             self.DistP = DistributionPackageClass()
             #
             # Load to XML
@@ -227,7 +227,7 @@ class DistributionPackageXml(object):
     def ToXml(self, DistP):
         if self.DistP:
             pass
-        if DistP != None:
+        if DistP is not None:
             #
             # Parse DistributionPackageHeader
             #
@@ -344,7 +344,7 @@ def ValidateMS1(Module, TopXmlTreeLevel):
     #
     XmlTreeLevel = TopXmlTreeLevel + ['Guids']
     for Item in Module.GetGuidList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'GuidCName':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -369,7 +369,7 @@ def ValidateMS1(Module, TopXmlTreeLevel):
     #
     XmlTreeLevel = TopXmlTreeLevel + ['Protocols']
     for Item in Module.GetProtocolList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'Protocol':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -384,7 +384,7 @@ def ValidateMS1(Module, TopXmlTreeLevel):
     #
     XmlTreeLevel = TopXmlTreeLevel + ['PPIs']
     for Item in Module.GetPpiList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'Ppi':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -399,7 +399,7 @@ def ValidateMS1(Module, TopXmlTreeLevel):
     #
     XmlTreeLevel = TopXmlTreeLevel + ['PcdCoded']
     for Item in Module.GetPcdList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'PcdEntry':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -416,7 +416,7 @@ def ValidateMS1(Module, TopXmlTreeLevel):
     #
     XmlTreeLevel = TopXmlTreeLevel + ['Externs']
     for Item in Module.GetExternList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'Extern':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -536,7 +536,7 @@ def ValidateMS2(Module, TopXmlTreeLevel):
     #
     XmlTreeLevel = TopXmlTreeLevel + ['LibraryClassDefinitions']
     for Item in Module.GetLibraryClassList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'LibraryClass':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -608,7 +608,7 @@ def ValidateMS2(Module, TopXmlTreeLevel):
     #
     XmlTreeLevel = TopXmlTreeLevel + ['SourceFiles']
     for Item in Module.GetSourceFileList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'Filename':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -636,7 +636,7 @@ def ValidateMS3(Module, TopXmlTreeLevel):
     #
     XmlTreeLevel = TopXmlTreeLevel + ['PackageDependencies']
     for Item in Module.GetPackageDependencyList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'Package':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -649,7 +649,7 @@ def ValidateMS3(Module, TopXmlTreeLevel):
     # Check BinaryFiles -> BinaryFile
     #
     for Item in Module.GetBinaryFileList():
-        if Item == None:
+        if Item is None:
             XmlTreeLevel = TopXmlTreeLevel + ['BinaryFiles']
             CheckDict = {'BinaryFile':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
@@ -772,7 +772,7 @@ def ValidatePS1(Package):
     #
     XmlTreeLevel = ['DistributionPackage', 'PackageSurfaceArea', 'ClonedFrom']
     for Item in Package.GetClonedFromList():
-        if Item == None:
+        if Item is None:
             CheckDict = Sdict()
             CheckDict['GUID'] = ''
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
@@ -787,7 +787,7 @@ def ValidatePS1(Package):
     #
     XmlTreeLevel = ['DistributionPackage', 'PackageSurfaceArea', 'LibraryClassDeclarations']
     for Item in Package.GetLibraryClassList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'LibraryClass':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -802,7 +802,7 @@ def ValidatePS1(Package):
     #
     XmlTreeLevel = ['DistributionPackage', 'PackageSurfaceArea', 'IndustryStandardIncludes']
     for Item in Package.GetStandardIncludeFileList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'IndustryStandardHeader':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -816,7 +816,7 @@ def ValidatePS1(Package):
     #
     XmlTreeLevel = ['DistributionPackage', 'PackageSurfaceArea', 'PackageIncludes']
     for Item in Package.GetPackageIncludeFileList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'PackageHeader':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -842,7 +842,7 @@ def ValidatePS2(Package):
     #
     XmlTreeLevel = ['DistributionPackage', 'PackageSurfaceArea', 'GuidDeclarations']
     for Item in Package.GetGuidList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'Entry':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -857,7 +857,7 @@ def ValidatePS2(Package):
     #
     XmlTreeLevel = ['DistributionPackage', 'PackageSurfaceArea', 'ProtocolDeclarations']
     for Item in Package.GetProtocolList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'Entry':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -872,7 +872,7 @@ def ValidatePS2(Package):
     #
     XmlTreeLevel = ['DistributionPackage', 'PackageSurfaceArea', 'PpiDeclarations']
     for Item in Package.GetPpiList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'Entry':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
@@ -887,7 +887,7 @@ def ValidatePS2(Package):
     #
     XmlTreeLevel = ['DistributionPackage', 'PackageSurfaceArea', 'PcdDeclarations']
     for Item in Package.GetPcdList():
-        if Item == None:
+        if Item is None:
             CheckDict = {'PcdEntry':''}
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 

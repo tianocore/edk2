@@ -87,7 +87,7 @@ class InfDepexSectionParser(InfParserSectionRoot):
         ReFormatComment = re.compile(r"""#(?:\s*)\[(.*?)\](?:.*)""", re.DOTALL)
         for CommentItem in DepexComment:
             CommentContent = CommentItem[0]
-            if ReFormatComment.match(CommentContent) != None:
+            if ReFormatComment.match(CommentContent) is not None:
                 FormatCommentLn = CommentItem[1] + 1
                 continue
             

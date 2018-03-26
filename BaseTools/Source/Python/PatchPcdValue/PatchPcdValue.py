@@ -267,13 +267,13 @@ def Main():
         if not os.path.exists (InputFile):
             EdkLogger.error("PatchPcdValue", FILE_NOT_FOUND, ExtraData=InputFile)
             return 1
-        if CommandOptions.PcdOffset == None or CommandOptions.PcdValue == None or CommandOptions.PcdTypeName == None:
+        if CommandOptions.PcdOffset is None or CommandOptions.PcdValue is None or CommandOptions.PcdTypeName is None:
             EdkLogger.error("PatchPcdValue", OPTION_MISSING, ExtraData="PcdOffset or PcdValue of PcdTypeName is not specified.")
             return 1
         if CommandOptions.PcdTypeName.upper() not in ["BOOLEAN", "UINT8", "UINT16", "UINT32", "UINT64", "VOID*"]:
             EdkLogger.error("PatchPcdValue", PARAMETER_INVALID, ExtraData="PCD type %s is not valid." % (CommandOptions.PcdTypeName))
             return 1
-        if CommandOptions.PcdTypeName.upper() == "VOID*" and CommandOptions.PcdMaxSize == None:
+        if CommandOptions.PcdTypeName.upper() == "VOID*" and CommandOptions.PcdMaxSize is None:
             EdkLogger.error("PatchPcdValue", OPTION_MISSING, ExtraData="PcdMaxSize is not specified for VOID* type PCD.")
             return 1
         #

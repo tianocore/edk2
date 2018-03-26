@@ -212,7 +212,7 @@ class LibraryClassObject(object):
     def __init__(self, Name = None, SupModList = [], Type = None):
         self.LibraryClass = Name
         self.SupModList = SupModList
-        if Type != None:
+        if Type is not None:
             self.SupModList = CleanString(Type).split(DataType.TAB_SPACE_SPLIT)
 
 ## ModuleBuildClassObject

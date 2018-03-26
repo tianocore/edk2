@@ -35,14 +35,14 @@ def WarnMsg(mess, fName=None, fNo=None):
 def NormalMessage(type, mess, fName=None, fNo=None):
     strMsg = type
 
-    if fName != None:
+    if fName is not None:
         strMsg += ' %s' % fName.replace('/', '\\')
-        if fNo != None:
+        if fNo is not None:
             strMsg += '(%d):' % fNo
         else:
             strMsg += ' :'
 
-    if fName == None and fNo == None:
+    if fName is None and fNo is None:
         strMsg += ' '
     strMsg += mess
 

@@ -63,7 +63,7 @@ class OPTIONROM (OptionRomClassObject):
                 FilePathNameList = FfsFile.GenFfs(IsMakefile=Flag)
                 if len(FilePathNameList) == 0:
                     EdkLogger.error("GenFds", GENFDS_ERROR, "Module %s not produce .efi files, so NO file could be put into option ROM." % (FfsFile.InfFileName))
-                if FfsFile.OverrideAttribs == None:
+                if FfsFile.OverrideAttribs is None:
                     EfiFileList.extend(FilePathNameList)
                 else:
                     FileName = os.path.basename(FilePathNameList[0])
@@ -84,7 +84,7 @@ class OPTIONROM (OptionRomClassObject):
                     BinFileList.append(TmpOutputFile)
             else:
                 FilePathName = FfsFile.GenFfs(IsMakefile=Flag)
-                if FfsFile.OverrideAttribs != None:
+                if FfsFile.OverrideAttribs is not None:
                     FileName = os.path.basename(FilePathName)
                     TmpOutputDir = os.path.join(GenFdsGlobalVariable.FvDir, self.DriverName, FfsFile.CurrentArch)
                     if not os.path.exists(TmpOutputDir) :

@@ -59,7 +59,7 @@ class FileStatement (FileStatementClassObject) :
     #
     def GenFfs(self, Dict = {}, FvChildAddr=[], FvParentAddr=None, IsMakefile=False, FvName=None):
         
-        if self.NameGuid != None and self.NameGuid.startswith('PCD('):
+        if self.NameGuid is not None and self.NameGuid.startswith('PCD('):
             PcdValue = GenFdsGlobalVariable.GetPcdValue(self.NameGuid)
             if len(PcdValue) == 0:
                 EdkLogger.error("GenFds", GENFDS_ERROR, '%s NOT defined.' \
@@ -81,7 +81,7 @@ class FileStatement (FileStatementClassObject) :
 
         Dict.update(self.DefineVarDict)
         SectionAlignments = None
-        if self.FvName != None :
+        if self.FvName is not None :
             Buffer = StringIO.StringIO('')
             if self.FvName.upper() not in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
                 EdkLogger.error("GenFds", GENFDS_ERROR, "FV (%s) is NOT described in FDF file!" % (self.FvName))
@@ -89,14 +89,14 @@ class FileStatement (FileStatementClassObject) :
             FileName = Fv.AddToBuffer(Buffer)
             SectionFiles = [FileName]
 
-        elif self.FdName != None:
+        elif self.FdName is not None:
             if self.FdName.upper() not in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
                 EdkLogger.error("GenFds", GENFDS_ERROR, "FD (%s) is NOT described in FDF file!" % (self.FdName))
             Fd = GenFdsGlobalVariable.FdfParser.Profile.FdDict.get(self.FdName.upper())
             FileName = Fd.GenFd()
             SectionFiles = [FileName]
 
-        elif self.FileName != None:
+        elif self.FileName is not None:
             if hasattr(self, 'FvFileType') and self.FvFileType == 'RAW':
                 if isinstance(self.FileName, list) and isinstance(self.SubAlignment, list) and len(self.FileName) == len(self.SubAlignment):
                     FileContent = ''
@@ -110,7 +110,7 @@ class FileStatement (FileStatementClassObject) :
                         Content = f.read()
                         f.close()
                         AlignValue = 1
-                        if self.SubAlignment[Index] != None:
+                        if self.SubAlignment[Index] is not None:
                             AlignValue = GenFdsGlobalVariable.GetAlignment(self.SubAlignment[Index])
                         if AlignValue > MaxAlignValue:
                             MaxAlignIndex = Index
@@ -151,7 +151,7 @@ class FileStatement (FileStatementClassObject) :
                         section.FvAddr = FvChildAddr.pop(0)
                     elif isinstance(section, GuidSection):
                         section.FvAddr = FvChildAddr
-                if FvParentAddr != None and isinstance(section, GuidSection):
+                if FvParentAddr is not None and isinstance(section, GuidSection):
                     section.FvParentAddr = FvParentAddr
 
                 if self.KeepReloc == False:

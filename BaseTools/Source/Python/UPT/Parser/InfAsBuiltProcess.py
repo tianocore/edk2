@@ -155,7 +155,7 @@ def GetPackageListInfo(FileNameString, WorkSpace, LineNo):
                                       DT.MODEL_META_DATA_HEADER,
                                       DefineSectionMacros)
 
-            if Name != None:
+            if Name is not None:
                 DefineSectionMacros[Name] = Value
                 continue
 
@@ -168,7 +168,7 @@ def GetPackageListInfo(FileNameString, WorkSpace, LineNo):
                                       FileNameString,
                                       DT.MODEL_META_DATA_PACKAGE,
                                       DefineSectionMacros)
-            if Name != None:
+            if Name is not None:
                 PackageSectionMacros[Name] = Value
                 continue
 

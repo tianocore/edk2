@@ -38,10 +38,10 @@ def GetArchModuleType(KeyList):
         #
         # Validate Arch
         #            
-        if (ArchItem == '' or ArchItem == None):
+        if (ArchItem == '' or ArchItem is None):
             ArchItem = 'COMMON'
 
-        if (ModuleItem == '' or ModuleItem == None):
+        if (ModuleItem == '' or ModuleItem is None):
             ModuleItem = 'COMMON'
 
         if ArchItem not in __SupArchList:
@@ -136,7 +136,7 @@ class InfLibraryClassObject():
                 LibItemObj.CurrentLine.SetLineNo(LibItem[2][1])
                 LibItemObj.CurrentLine.SetLineString(LibItem[2][0])
                 LibItem = LibItem[0]
-                if HelpStringObj != None:
+                if HelpStringObj is not None:
                     LibItemObj.SetHelpString(HelpStringObj)
                 if len(LibItem) >= 1:
                     if LibItem[0].strip() != '':

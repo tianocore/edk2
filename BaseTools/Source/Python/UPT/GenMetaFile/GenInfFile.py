@@ -618,11 +618,11 @@ def GenSourceStatement(SourceFile, Family, FeatureFlag, TagName=None,
     # format of SourceFile|Family|TagName|ToolCode|FeatureFlag
     #
     Statement += SourceFile
-    if TagName == None:
+    if TagName is None:
         TagName = ''
-    if ToolCode == None:
+    if ToolCode is None:
         ToolCode = ''
-    if HelpStr == None:
+    if HelpStr is None:
         HelpStr = ''
     if FeatureFlag:
         Statement += '|' + Family + '|' + TagName + '|' + ToolCode + '|' + FeatureFlag

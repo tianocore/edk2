@@ -73,7 +73,7 @@ def CheckForExistingDp(Path):
 #
 #
 def Main(Options = None):
-    if Options == None:
+    if Options is None:
         Logger.Error("\nMkPkg", OPTION_UNKNOWN_ERROR, ST.ERR_OPTION_NOT_FOUND)
     try:
         DataBase = GlobalData.gDB        

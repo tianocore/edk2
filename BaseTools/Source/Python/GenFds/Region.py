@@ -114,7 +114,7 @@ class Region(RegionClassObject):
                     if RegionData.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
                         FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(RegionData.upper())
 
-                    if FvObj != None :
+                    if FvObj is not None :
                         if not Flag:
                             GenFdsGlobalVariable.InfLogger('   Region Name = FV')
                         #
@@ -152,7 +152,7 @@ class Region(RegionClassObject):
                 # Add the exist Fv image into FD buffer
                 #
                 if not Flag:
-                    if FileName != None:
+                    if FileName is not None:
                         FileLength = os.stat(FileName)[ST_SIZE]
                         if FileLength > Size:
                             EdkLogger.error("GenFds", GENFDS_ERROR,
@@ -193,7 +193,7 @@ class Region(RegionClassObject):
                     if RegionData.upper() in GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict.keys():
                         CapsuleObj = GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict[RegionData.upper()]
 
-                    if CapsuleObj != None :
+                    if CapsuleObj is not None :
                         CapsuleObj.CapsuleName = RegionData.upper()
                         GenFdsGlobalVariable.InfLogger('   Region Name = CAPSULE')
                         #
@@ -270,7 +270,7 @@ class Region(RegionClassObject):
             #
             self.PadBuffer(Buffer, ErasePolarity, Size)
 
-        if self.RegionType == None:
+        if self.RegionType is None:
             GenFdsGlobalVariable.InfLogger('   Region Name = None')
             self.PadBuffer(Buffer, ErasePolarity, Size)
 
@@ -333,7 +333,7 @@ class Region(RegionClassObject):
             # first check whether FvObj.BlockSizeList items have only "BlockSize" or "NumBlocks",
             # if so, use ExpectedList
             for Item in FvObj.BlockSizeList:
-                if Item[0] == None or Item[1] == None:
+                if Item[0] is None or Item[1] is None:
                     FvObj.BlockSizeList = ExpectedList
                     break
             # make sure region size is no smaller than the summed block size in FV

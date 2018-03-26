@@ -159,7 +159,7 @@ class Capsule (CapsuleClassObject) :
                 if not os.path.isabs(fmp.ImageFile):
                     CapInputFile = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, fmp.ImageFile)
                 CapOutputTmp = os.path.join(GenFdsGlobalVariable.FvDir, self.UiCapsuleName) + '.tmp'
-                if ExternalTool == None:
+                if ExternalTool is None:
                     EdkLogger.error("GenFds", GENFDS_ERROR, "No tool found with GUID %s" % fmp.Certificate_Guid)
                 else:
                     CmdOption += ExternalTool

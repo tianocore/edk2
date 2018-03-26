@@ -49,7 +49,7 @@ def ParseProtocolComment(CommentsList, InfProtocolItemObj):
         if CommentItemString:
             pass
         
-        if CommentItemHelpText == None:
+        if CommentItemHelpText is None:
             CommentItemHelpText = ''
             if Count == len(CommentsList) and CommentItemUsage == CommentItemNotify == DT.ITEM_UNDEFINED:
                 CommentItemHelpText = DT.END_OF_LINE
@@ -203,7 +203,7 @@ class InfProtocolObject():
             #
             # Validate Arch
             #            
-            if (ArchItem == '' or ArchItem == None):
+            if (ArchItem == '' or ArchItem is None):
                 ArchItem = 'COMMON'
             __SupArchList.append(ArchItem)
 
@@ -259,7 +259,7 @@ class InfProtocolObject():
             #
             # Get/Set Usage and HelpString for Protocol entry
             #
-            if CommentsList != None and len(CommentsList) != 0:
+            if CommentsList is not None and len(CommentsList) != 0:
                 InfProtocolItemObj = ParseProtocolComment(CommentsList, InfProtocolItemObj)
             else:
                 CommentItemIns = InfProtocolItemCommentContent()

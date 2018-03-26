@@ -639,7 +639,7 @@ class FdfParser:
                     if not MacroVal:
                         if Macro in MacroDict:
                             MacroVal = MacroDict[Macro]
-                    if MacroVal != None:
+                    if MacroVal is not None:
                         IncFileName = IncFileName.replace('$(' + Macro + ')', MacroVal, 1)
                         if MacroVal.find('$(') != -1:
                             PreIndex = StartPos
@@ -687,7 +687,7 @@ class FdfParser:
                 # list index of the insertion, note that line number is 'CurrentLine + 1'
                 InsertAtLine = CurrentLine
                 ParentProfile = GetParentAtLine (CurrentLine)
-                if ParentProfile != None:
+                if ParentProfile is not None:
                     ParentProfile.IncludeFileList.insert(0, IncFileProfile)
                     IncFileProfile.Level = ParentProfile.Level + 1
                 IncFileProfile.InsertStartLineNumber = InsertAtLine + 1
@@ -763,7 +763,7 @@ class FdfParser:
                     while StartPos != -1 and EndPos != -1 and self.__Token not in ['!ifdef', '!ifndef', '!if', '!elseif']:
                         MacroName = CurLine[StartPos+2 : EndPos]
                         MacorValue = self.__GetMacroValue(MacroName)
-                        if MacorValue != None:
+                        if MacorValue is not None:
                             CurLine = CurLine.replace('$(' + MacroName + ')', MacorValue, 1)
                             if MacorValue.find('$(') != -1:
                                 PreIndex = StartPos
@@ -1136,7 +1136,7 @@ class FdfParser:
 
         if not self.__GetNextToken():
             return False
-        if gGuidPattern.match(self.__Token) != None:
+        if gGuidPattern.match(self.__Token) is not None:
             return True
         else:
             self.__UndoToken()
@@ -1412,7 +1412,7 @@ class FdfParser:
             #'\n\tGot Token: \"%s\" from File %s\n' % (self.__Token, FileLineTuple[0]) + \
             # At this point, the closest parent would be the included file itself
             Profile = GetParentAtLine(X.OriginalLineNumber)
-            if Profile != None:
+            if Profile is not None:
                 X.Message += ' near line %d, column %d: %s' \
                 % (X.LineNumber, 0, Profile.FileLinesList[X.LineNumber-1])
             else:
@@ -1540,7 +1540,7 @@ class FdfParser:
         while self.__GetTokenStatements(FdObj):
             pass
         for Attr in ("BaseAddress", "Size", "ErasePolarity"):
-            if getattr(FdObj, Attr) == None:
+            if getattr(FdObj, Attr) is None:
                 self.__GetNextToken()
                 raise Warning("Keyword %s missing" % Attr, self.FileName, self.CurrentLineNumber)
 
@@ -1695,7 +1695,7 @@ class FdfParser:
             IsBlock = True
         
             Item = Obj.BlockSizeList[-1]
-            if Item[0] == None or Item[1] == None:
+            if Item[0] is None or Item[1] is None:
                 raise Warning("expected block statement", self.FileName, self.CurrentLineNumber)
         return IsBlock
 
@@ -1863,7 +1863,7 @@ class FdfParser:
     #
     def __GetRegionLayout(self, Fd):
         Offset = self.__CalcRegionExpr() 
-        if Offset == None:
+        if Offset is None:
             return False
 
         RegionObj = Region.Region()
@@ -1874,7 +1874,7 @@ class FdfParser:
             raise Warning("expected '|'", self.FileName, self.CurrentLineNumber)
 
         Size = self.__CalcRegionExpr()
-        if Size == None:
+        if Size is None:
             raise Warning("expected Region Size", self.FileName, self.CurrentLineNumber)
         RegionObj.Size = Size
 
@@ -2974,7 +2974,7 @@ class FdfParser:
 
             FvImageSectionObj = FvImageSection.FvImageSection()
             FvImageSectionObj.Alignment = AlignValue
-            if FvObj != None:
+            if FvObj is not None:
                 FvImageSectionObj.Fv = FvObj
                 FvImageSectionObj.FvName = None
             else:
@@ -3791,7 +3791,7 @@ class FdfParser:
             Rule.CheckSum = CheckSum
             Rule.Fixed = Fixed
             Rule.KeyStringList = KeyStringList
-            if KeepReloc != None:
+            if KeepReloc is not None:
                 Rule.KeepReloc = KeepReloc
 
             while True:
@@ -3847,7 +3847,7 @@ class FdfParser:
             Rule.CheckSum = CheckSum
             Rule.Fixed = Fixed
             Rule.KeyStringList = KeyStringList
-            if KeepReloc != None:
+            if KeepReloc is not None:
                 Rule.KeepReloc = KeepReloc
             Rule.FileExtension = Ext
             Rule.FileName = self.__Token
@@ -3986,7 +3986,7 @@ class FdfParser:
                     EfiSectionObj.KeepReloc = False
                 else:
                     EfiSectionObj.KeepReloc = True
-                if Obj.KeepReloc != None and Obj.KeepReloc != EfiSectionObj.KeepReloc:
+                if Obj.KeepReloc is not None and Obj.KeepReloc != EfiSectionObj.KeepReloc:
                     raise Warning("Section type %s has reloc strip flag conflict with Rule" % EfiSectionObj.SectionType, self.FileName, self.CurrentLineNumber)
             else:
                 raise Warning("Section type %s could not have reloc strip flag" % EfiSectionObj.SectionType, self.FileName, self.CurrentLineNumber)
@@ -4313,7 +4313,7 @@ class FdfParser:
             raise Warning("expected Component version", self.FileName, self.CurrentLineNumber)
 
         Pattern = re.compile('-$|[0-9a-fA-F]{1,2}\.[0-9a-fA-F]{1,2}$', re.DOTALL)
-        if Pattern.match(self.__Token) == None:
+        if Pattern.match(self.__Token) is None:
             raise Warning("Unknown version format '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
         CompStatementObj.CompVer = self.__Token
 
@@ -4577,7 +4577,7 @@ class FdfParser:
                     for elementRegionData in elementRegion.RegionDataList:
                         if elementRegionData.endswith(".cap"):
                             continue
-                        if elementRegionData != None and elementRegionData.upper() not in CapList:
+                        if elementRegionData is not None and elementRegionData.upper() not in CapList:
                             CapList.append(elementRegionData.upper())
         return CapList
 
@@ -4593,15 +4593,15 @@ class FdfParser:
     def __GetReferencedFdCapTuple(self, CapObj, RefFdList = [], RefFvList = []):
 
         for CapsuleDataObj in CapObj.CapsuleDataList :
-            if hasattr(CapsuleDataObj, 'FvName') and CapsuleDataObj.FvName != None and CapsuleDataObj.FvName.upper() not in RefFvList:
+            if hasattr(CapsuleDataObj, 'FvName') and CapsuleDataObj.FvName is not None and CapsuleDataObj.FvName.upper() not in RefFvList:
                 RefFvList.append (CapsuleDataObj.FvName.upper())
-            elif hasattr(CapsuleDataObj, 'FdName') and CapsuleDataObj.FdName != None and CapsuleDataObj.FdName.upper() not in RefFdList:
+            elif hasattr(CapsuleDataObj, 'FdName') and CapsuleDataObj.FdName is not None and CapsuleDataObj.FdName.upper() not in RefFdList:
                 RefFdList.append (CapsuleDataObj.FdName.upper())            
-            elif CapsuleDataObj.Ffs != None:
+            elif CapsuleDataObj.Ffs is not None:
                 if isinstance(CapsuleDataObj.Ffs, FfsFileStatement.FileStatement):
-                    if CapsuleDataObj.Ffs.FvName != None and CapsuleDataObj.Ffs.FvName.upper() not in RefFvList:
+                    if CapsuleDataObj.Ffs.FvName is not None and CapsuleDataObj.Ffs.FvName.upper() not in RefFvList:
                         RefFvList.append(CapsuleDataObj.Ffs.FvName.upper())
-                    elif CapsuleDataObj.Ffs.FdName != None and CapsuleDataObj.Ffs.FdName.upper() not in RefFdList:
+                    elif CapsuleDataObj.Ffs.FdName is not None and CapsuleDataObj.Ffs.FdName.upper() not in RefFdList:
                         RefFdList.append(CapsuleDataObj.Ffs.FdName.upper())
                     else:
                         self.__GetReferencedFdFvTupleFromSection(CapsuleDataObj.Ffs, RefFdList, RefFvList)
@@ -4624,7 +4624,7 @@ class FdfParser:
                     for elementRegionData in elementRegion.RegionDataList:
                         if elementRegionData.endswith(".fv"):
                             continue
-                        if elementRegionData != None and elementRegionData.upper() not in FvList:
+                        if elementRegionData is not None and elementRegionData.upper() not in FvList:
                             FvList.append(elementRegionData.upper())
         return FvList
 
@@ -4641,9 +4641,9 @@ class FdfParser:
 
         for FfsObj in FvObj.FfsList:
             if isinstance(FfsObj, FfsFileStatement.FileStatement):
-                if FfsObj.FvName != None and FfsObj.FvName.upper() not in RefFvList:
+                if FfsObj.FvName is not None and FfsObj.FvName.upper() not in RefFvList:
                     RefFvList.append(FfsObj.FvName.upper())
-                elif FfsObj.FdName != None and FfsObj.FdName.upper() not in RefFdList:
+                elif FfsObj.FdName is not None and FfsObj.FdName.upper() not in RefFdList:
                     RefFdList.append(FfsObj.FdName.upper())
                 else:
                     self.__GetReferencedFdFvTupleFromSection(FfsObj, RefFdList, RefFvList)
@@ -4664,9 +4664,9 @@ class FdfParser:
         while SectionStack != []:
             SectionObj = SectionStack.pop()
             if isinstance(SectionObj, FvImageSection.FvImageSection):
-                if SectionObj.FvName != None and SectionObj.FvName.upper() not in FvList:
+                if SectionObj.FvName is not None and SectionObj.FvName.upper() not in FvList:
                     FvList.append(SectionObj.FvName.upper())
-                if SectionObj.Fv != None and SectionObj.Fv.UiFvName != None and SectionObj.Fv.UiFvName.upper() not in FvList:
+                if SectionObj.Fv is not None and SectionObj.Fv.UiFvName is not None and SectionObj.Fv.UiFvName.upper() not in FvList:
                     FvList.append(SectionObj.Fv.UiFvName.upper())
                     self.__GetReferencedFdFvTuple(SectionObj.Fv, FdList, FvList)
 

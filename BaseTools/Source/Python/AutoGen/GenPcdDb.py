@@ -1234,7 +1234,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
         for SkuName in Pcd.SkuInfoList:
             Sku = Pcd.SkuInfoList[SkuName]
             SkuId = Sku.SkuId
-            if SkuId == None or SkuId == '':
+            if SkuId is None or SkuId == '':
                 continue
 
                 

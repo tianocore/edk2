@@ -199,7 +199,7 @@ class Inf(InfObject):
         #
         # Load Inf file if filename is not None
         #
-        if Filename != None:
+        if Filename is not None:
             self.LoadInfFile(Filename)
 
         #

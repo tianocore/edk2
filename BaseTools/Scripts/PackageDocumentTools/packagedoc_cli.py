@@ -49,18 +49,18 @@ def parseCmdArgs():
 
     # validate the options
     errors = []
-    if options.WorkspacePath == None:
+    if options.WorkspacePath is None:
         errors.append('- Please specify workspace path via option -w!')
     elif not os.path.exists(options.WorkspacePath):
         errors.append("- Invalid workspace path %s! The workspace path should be exist in absolute path!" % options.WorkspacePath)
 
-    if options.PackagePath == None:
+    if options.PackagePath is None:
         errors.append('- Please specify package DEC file path via option -p!')
     elif not os.path.exists(options.PackagePath):
         errors.append("- Invalid package's DEC file path %s! The DEC path should be exist in absolute path!" % options.PackagePath)
 
     default = "C:\\Program Files\\doxygen\\bin\\doxygen.exe"
-    if options.DoxygenPath == None:
+    if options.DoxygenPath is None:
         if os.path.exists(default):
             print "Warning: Assume doxygen tool is installed at %s. If not, please specify via -x" % default
             options.DoxygenPath = default
@@ -69,7 +69,7 @@ def parseCmdArgs():
     elif not os.path.exists(options.DoxygenPath):
         errors.append("- Invalid doxygen tool path %s! The doxygen tool path should be exist in absolute path!" % options.DoxygenPath)
 
-    if options.OutputPath != None:
+    if options.OutputPath is not None:
         if not os.path.exists(options.OutputPath):
             # create output
             try:
@@ -77,7 +77,7 @@ def parseCmdArgs():
             except:
                 errors.append('- Fail to create the output directory %s' % options.OutputPath)
     else:
-        if options.PackagePath != None and os.path.exists(options.PackagePath):
+        if options.PackagePath is not None and os.path.exists(options.PackagePath):
             dirpath = os.path.dirname(options.PackagePath)
             default = os.path.join (dirpath, "Document")
             print 'Warning: Assume document output at %s. If not, please specify via option -o' % default
@@ -90,21 +90,21 @@ def parseCmdArgs():
         else:
             errors.append('- Please specify document output path via option -o!')
 
-    if options.Arch == None:
+    if options.Arch is None:
         options.Arch = 'ALL'
         print "Warning: Assume arch is \"ALL\". If not, specify via -a"
 
-    if options.DocumentMode == None:
+    if options.DocumentMode is None:
         options.DocumentMode = "HTML"
         print "Warning: Assume document mode is \"HTML\". If not, specify via -m"
 
-    if options.IncludeOnly == None:
+    if options.IncludeOnly is None:
         options.IncludeOnly = False
         print "Warning: Assume generate package document for all package\'s source including publich interfaces and implementation libraries and modules."
 
     if options.DocumentMode.lower() == 'chm':
         default = "C:\\Program Files\\HTML Help Workshop\\hhc.exe"
-        if options.HtmlWorkshopPath == None:
+        if options.HtmlWorkshopPath is None:
             if os.path.exists(default):
                 print 'Warning: Assume the installation path of Microsoft HTML Workshop is %s. If not, specify via option -c.' % default
                 options.HtmlWorkshopPath = default
@@ -382,7 +382,7 @@ if __name__ == '__main__':
 
     # create package model object firstly
     pkgObj = createPackageObject(wspath, pkgpath)
-    if pkgObj == None:
+    if pkgObj is None:
         sys.exit(-1)
 
     # create doxygen action model

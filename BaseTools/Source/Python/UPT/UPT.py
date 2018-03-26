@@ -90,7 +90,7 @@ def SetLogLevel(Opt):
         Logger.SetLevel(Logger.VERBOSE)
     elif Opt.opt_quiet:
         Logger.SetLevel(Logger.QUIET + 1)
-    elif Opt.debug_level != None:
+    elif Opt.debug_level is not None:
         if Opt.debug_level < 0 or Opt.debug_level > 9:
             Logger.Warn("UPT", ST.ERR_DEBUG_LEVEL)
             Logger.SetLevel(Logger.INFO)
