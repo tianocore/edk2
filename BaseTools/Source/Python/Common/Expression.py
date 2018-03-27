@@ -991,7 +991,7 @@ class ValueExpressionEx(ValueExpression):
                                 Item = '0x%x' % TmpValue if type(TmpValue) != type('') else TmpValue
                                 if ItemSize == 0:
                                     ItemValue, ItemSize = ParseFieldValue(Item)
-                                    if not (Item.startswith('"') or Item.startswith('L') or Item.startswith('{')) and ItemSize > 1:
+                                    if Item[0] not in ['"','L','{'] and ItemSize > 1:
                                         raise BadExpression("Byte  array number %s should less than 0xFF." % Item)
                                 else:
                                     ItemValue = ParseFieldValue(Item)[0]
