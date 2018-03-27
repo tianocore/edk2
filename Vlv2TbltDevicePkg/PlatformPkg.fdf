@@ -319,7 +319,7 @@ INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET
 INF EdkCompatibilityPkg/Compatibility/AcpiVariableHobOnSmramReserveHobThunk/AcpiVariableHobOnSmramReserveHobThunk.inf
 !endif
 
-INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/PiSmmCommunicationPei.inf
+# INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/PiSmmCommunicationPei.inf
 !if $(TPM_ENABLED) == TRUE
 INF SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
 INF SecurityPkg/Tcg/TcgPei/TcgPei.inf
@@ -473,6 +473,7 @@ INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
 INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/MpCpu.inf
 INF $(PLATFORM_PACKAGE)/Metronome/Metronome.inf
 INF IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF USE=X64 MdeModulePkg/Logo/Logo.inf
 INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
 INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
 INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
@@ -612,6 +613,8 @@ INF RuleOverride = ACPITABLE $(PLATFORM_RC_PACKAGE)/AcpiTablesPCAT/AcpiTables.in
 
 INF $(PLATFORM_PACKAGE)/AcpiPlatform/AcpiPlatform.inf
 
+INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+
   #
   # PCI
   #
@@ -635,8 +638,8 @@ INF  IntelFrameworkModulePkg/Bus/Isa/IsaSerialDxe/IsaSerialDxe.inf
 #
 # SDIO
 #
-INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/MmcHost.inf
-INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/MmcMediaDevice.inf
+#INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/MmcHost.inf
+#INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/MmcMediaDevice.inf
 #
 # IDE/SCSI/AHCI
 #
@@ -1086,6 +1089,12 @@ INF  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareUpdateDxe.inf
   }
 
 [Rule.Common.USER_DEFINED]
+  FILE FREEFORM = $(NAMED_GUID) {
+    UI  STRING="$(MODULE_NAME)" Optional
+    RAW BIN                |.bin
+  }
+
+[Rule.Common.USER_DEFINED.BINARY]
   FILE FREEFORM = $(NAMED_GUID) {
     UI  STRING="$(MODULE_NAME)" Optional
     RAW BIN                |.bin
