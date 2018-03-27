@@ -147,7 +147,7 @@ PostPmInitCallBack (
 EFI_STATUS
 IgdPmHook (
   IN EFI_HANDLE                      ImageHandle,
-  IN DXE_VLV_PLATFORM_POLICY_PROTOCOL *DxePlatformSaPolicy
+  IN DXE_VLV_PLATFORM_POLICY_PROTOCOL *DxePlatformSaPolicyParam
   )
 {
 

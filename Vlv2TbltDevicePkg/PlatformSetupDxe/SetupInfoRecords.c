@@ -1185,7 +1185,6 @@ UpdatePlatformInformation (
   EFI_STATUS               Status;
   UINT8                    CpuFlavor=0;
   EFI_PEI_HOB_POINTERS     GuidHob;
-  EFI_PLATFORM_INFO_HOB    *mPlatformInfo=NULL;
   UINTN                    NumHandles;
   EFI_HANDLE                        *HandleBuffer;
   UINTN                             Index;
