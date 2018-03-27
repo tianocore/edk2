@@ -4,7 +4,7 @@
 #   {0xa7717414, 0xc616, 0x4977, {0x94, 0x20, 0x84, 0x47, 0x12, 0xa7, 0x35, 0xbf}}
 # This tool has been tested with OpenSSL 1.0.1e 11 Feb 2013
 #
-# Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     # 
     # Sign the input file using the specified private key and capture signature from STDOUT
     #
-    Process = subprocess.Popen('%s sha1 -sha256 -sign "%s"' % (OpenSslCommand, args.PrivateKeyFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    Process = subprocess.Popen('%s dgst -sha256 -sign "%s"' % (OpenSslCommand, args.PrivateKeyFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Signature = Process.communicate(input=FullInputFileBuffer)[0]
     if Process.returncode <> 0:
       sys.exit(Process.returncode)
@@ -225,7 +225,7 @@ if __name__ == '__main__':
     #
     # Verify signature
     #    
-    Process = subprocess.Popen('%s sha1 -sha256 -prverify "%s" -signature %s' % (OpenSslCommand, args.PrivateKeyFileName, args.OutputFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    Process = subprocess.Popen('%s dgst -sha256 -prverify "%s" -signature %s' % (OpenSslCommand, args.PrivateKeyFileName, args.OutputFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Process.communicate(input=FullInputFileBuffer)
     if Process.returncode <> 0:
       print 'ERROR: Verification failed'
