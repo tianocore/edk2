@@ -41,6 +41,8 @@ ERR_EMPTY_EXPR          = 'Empty expression is not allowed.'
 ERR_IN_OPERAND          = 'Macro after IN operator can only be: $(FAMILY), $(ARCH), $(TOOL_CHAIN_TAG) and $(TARGET).'
 
 __ValidString = re.compile(r'[_a-zA-Z][_0-9a-zA-Z]*$')
+_ReLabel = re.compile('LABEL\((\w+)\)')
+_ReOffset = re.compile('OFFSET_OF\((\w+)\)')
 
 ## SplitString
 #  Split string to list according double quote
@@ -896,13 +898,11 @@ class ValueExpressionEx(ValueExpression):
                         PcdValueList = SplitPcdValueString(PcdValue.strip()[1:-1])
                         LabelDict = {}
                         NewPcdValueList = []
-                        ReLabel = re.compile('LABEL\((\w+)\)')
-                        ReOffset = re.compile('OFFSET_OF\((\w+)\)')
                         LabelOffset = 0
                         for Index, Item in enumerate(PcdValueList):
                             # compute byte offset of every LABEL
-                            LabelList = ReLabel.findall(Item)
-                            Item = ReLabel.sub('', Item)
+                            LabelList = _ReLabel.findall(Item)
+                            Item = _ReLabel.sub('', Item)
                             Item = Item.strip()
                             if LabelList:
                                 for Label in LabelList:
@@ -929,11 +929,11 @@ class ValueExpressionEx(ValueExpression):
                             # for LABEL parse
                             Item = Item.strip()
                             try:
-                                Item = ReLabel.sub('', Item)
+                                Item = _ReLabel.sub('', Item)
                             except:
                                 pass
                             try:
-                                OffsetList = ReOffset.findall(Item)
+                                OffsetList = _ReOffset.findall(Item)
                             except:
                                 pass
                             for Offset in OffsetList:
