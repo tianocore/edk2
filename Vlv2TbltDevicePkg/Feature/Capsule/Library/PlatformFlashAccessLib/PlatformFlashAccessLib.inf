@@ -1,7 +1,7 @@
 ## @file
 #  Platform Flash Access library.
 #
-#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -36,13 +36,26 @@
   MdeModulePkg/MdeModulePkg.dec
   SignedCapsulePkg/SignedCapsulePkg.dec
   Vlv2TbltDevicePkg/PlatformPkg.dec
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
 
 [LibraryClasses]
   BaseMemoryLib
+  IoLib
   PcdLib
   DebugLib
-  FlashDeviceLib
+#  FlashDeviceLib
   MemoryAllocationLib
+  CacheMaintenanceLib
+
+[Guids]
+  gEdkiiSystemFmpCapsuleConfigFileGuid          ## SOMETIMES_CONSUMES ## GUID
+
+[Protocols]
+  gEfiSpiProtocolGuid                          ## CONSUMES
 
 [Pcd]
-  gPlatformModuleTokenSpaceGuid.PcdFlashAreaBaseAddress
+  gPlatformModuleTokenSpaceGuid.PcdFlashAreaBaseAddress  ## SOMETIMES_CONSUMES
+  gPlatformModuleTokenSpaceGuid.PcdFlashChipBase         ## SOMETIMES_CONSUMES
+  gPlatformModuleTokenSpaceGuid.PcdFlashChipSize         ## SOMETIMES_CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress      ## SOMETIMES_CONSUMES
+

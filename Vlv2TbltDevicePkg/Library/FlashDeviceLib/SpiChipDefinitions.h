@@ -17,6 +17,7 @@
 #include <Library/SpiFlash.H>
 
 #define FLASH_SIZE  0x400000
+#define FLASH_DEVICE_BASE_ADDRESS (0xFFFFFFFF-FLASH_SIZE+1)
 
 //
 // Serial Flash device initialization data table provided to the
