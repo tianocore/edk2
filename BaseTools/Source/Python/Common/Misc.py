@@ -76,7 +76,7 @@ def GetVariableOffset(mapfilepath, efifilepath, varnames):
 def _parseForXcode(lines, efifilepath, varnames):
     status = 0
     ret = []
-    for index, line in enumerate(lines):
+    for line in lines:
         line = line.strip()
         if status == 0 and line == "# Symbols:":
             status = 1

@@ -5,7 +5,7 @@
 #    PCD Name    Offset in binary
 #    ========    ================
 #
-# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -65,7 +65,7 @@ def parsePcdInfoFromMapFile(mapfilepath, efifilepath):
 def _parseForXcode(lines, efifilepath):
     status = 0
     pcds = []
-    for index, line in enumerate(lines):
+    for line in lines:
         line = line.strip()
         if status == 0 and line == "# Symbols:":
             status = 1

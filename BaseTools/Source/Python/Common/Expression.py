@@ -899,7 +899,7 @@ class ValueExpressionEx(ValueExpression):
                         LabelDict = {}
                         NewPcdValueList = []
                         LabelOffset = 0
-                        for Index, Item in enumerate(PcdValueList):
+                        for Item in PcdValueList:
                             # compute byte offset of every LABEL
                             LabelList = _ReLabel.findall(Item)
                             Item = _ReLabel.sub('', Item)
@@ -925,7 +925,7 @@ class ValueExpressionEx(ValueExpression):
                                 except:
                                     LabelOffset = LabelOffset + 1
 
-                        for Index, Item in enumerate(PcdValueList):
+                        for Item in PcdValueList:
                             # for LABEL parse
                             Item = Item.strip()
                             try:
