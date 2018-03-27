@@ -936,12 +936,13 @@ class ValueExpressionEx(ValueExpression):
                                 OffsetList = _ReOffset.findall(Item)
                             except:
                                 pass
+                            # replace each offset, except errors
                             for Offset in OffsetList:
-                                if Offset in LabelDict.keys():
-                                    Re = re.compile('OFFSET_OF\(%s\)' % Offset)
-                                    Item = Re.sub(LabelDict[Offset], Item)
-                                else:
+                                try:
+                                    Item = Item.replace('OFFSET_OF({})'.format(Offset),LabelDict[Offset])
+                                except:
                                     raise BadExpression('%s not defined' % Offset)
+
                             NewPcdValueList.append(Item)
 
                         AllPcdValueList = []
