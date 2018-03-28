@@ -101,6 +101,7 @@ typedef struct {
   UINTN           HwErrVariableTotalSize;
   UINTN           MaxVariableSize;
   UINTN           MaxAuthVariableSize;
+  UINTN           MaxVolatileVariableSize;
   UINTN           ScratchBufferSize;
   CHAR8           *PlatformLangCodes;
   CHAR8           *LangCodes;
@@ -457,6 +458,17 @@ ReclaimForOS(
 **/
 UINTN
 GetNonVolatileMaxVariableSize (
+  VOID
+  );
+
+/**
+  Get maximum variable size, covering both non-volatile and volatile variables.
+
+  @return Maximum variable size.
+
+**/
+UINTN
+GetMaxVariableSize (
   VOID
   );
 

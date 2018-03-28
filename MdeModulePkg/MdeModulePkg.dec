@@ -1043,6 +1043,14 @@
   # @Prompt Maximum authenticated variable size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x00|UINT32|0x30000009
 
+  ## The maximum size of a single non-authenticated volatile variable.
+  # The default value is 0 for compatibility: in that case, the maximum
+  # non-authenticated volatile variable size remains specified by
+  # PcdMaxVariableSize. Only the MdeModulePkg/Universal/Variable/RuntimeDxe
+  # driver supports this PCD.
+  # @Prompt Maximum non-authenticated volatile variable size.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x00|UINT32|0x3000000a
+
   ## The maximum size of single hardware error record variable.<BR><BR>
   # In IA32/X64 platforms, this value should be larger than 1KB.<BR>
   # In IA64 platforms, this value should be larger than 128KB.<BR>

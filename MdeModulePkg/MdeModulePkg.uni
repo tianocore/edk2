@@ -94,6 +94,14 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxAuthVariableSize_HELP  #language en-US "The maximum size of a single authenticated variable."
                                                                                         "The value is 0 as default for compatibility that maximum authenticated variable size is specified by PcdMaxVariableSize."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxVolatileVariableSize_PROMPT  #language en-US "The maximum size of a single non-authenticated volatile variable."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxVolatileVariableSize_HELP  #language en-US "The maximum size of a single non-authenticated volatile variable.<BR><BR>\n"
+                                                                                            "The default value is 0 for compatibility: in that case, the maximum "
+                                                                                            "non-authenticated volatile variable size remains specified by "
+                                                                                            "PcdMaxVariableSize.<BR>\n"
+                                                                                            "Only the MdeModulePkg/Universal/Variable/RuntimeDxe driver supports this PCD.<BR>"
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxHardwareErrorVariableSize_PROMPT  #language en-US "Maximum HwErr variable size"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxHardwareErrorVariableSize_HELP  #language en-US "The maximum size of single hardware error record variable.<BR><BR>\n"

@@ -2345,12 +2345,14 @@ UpdateVariable (
         CopyMem (BufferForMerge, (UINT8 *) ((UINTN) CacheVariable->CurrPtr + DataOffset), DataSizeOfVariable (CacheVariable->CurrPtr));
 
         //
-        // Set Max Common/Auth Variable Data Size as default MaxDataSize.
+        // Set Max Auth/Non-Volatile/Volatile Variable Data Size as default MaxDataSize.
         //
         if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
           MaxDataSize = mVariableModuleGlobal->MaxAuthVariableSize - DataOffset;
-        } else {
+        } else if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
           MaxDataSize = mVariableModuleGlobal->MaxVariableSize - DataOffset;
+        } else {
+          MaxDataSize = mVariableModuleGlobal->MaxVolatileVariableSize - DataOffset;
         }
 
         //
@@ -3218,14 +3220,18 @@ VariableServiceSetVariable (
   } else {
     //
     //  The size of the VariableName, including the Unicode Null in bytes plus
-    //  the DataSize is limited to maximum size of Max(Auth)VariableSize bytes.
+    //  the DataSize is limited to maximum size of Max(Auth|Volatile)VariableSize bytes.
     //
     if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
       if (StrSize (VariableName) + PayloadSize > mVariableModuleGlobal->MaxAuthVariableSize - GetVariableHeaderSize ()) {
         return EFI_INVALID_PARAMETER;
       }
-    } else {
+    } else if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
       if (StrSize (VariableName) + PayloadSize > mVariableModuleGlobal->MaxVariableSize - GetVariableHeaderSize ()) {
+        return EFI_INVALID_PARAMETER;
+      }
+    } else {
+      if (StrSize (VariableName) + PayloadSize > mVariableModuleGlobal->MaxVolatileVariableSize - GetVariableHeaderSize ()) {
         return EFI_INVALID_PARAMETER;
       }
     }
@@ -3399,12 +3405,14 @@ VariableServiceQueryVariableInfoInternal (
     }
 
     //
-    // Let *MaximumVariableSize be Max(Auth)VariableSize with the exception of the variable header size.
+    // Let *MaximumVariableSize be Max(Auth|Volatile)VariableSize with the exception of the variable header size.
     //
     if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
       *MaximumVariableSize = mVariableModuleGlobal->MaxAuthVariableSize - GetVariableHeaderSize ();
-    } else {
+    } else if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
       *MaximumVariableSize = mVariableModuleGlobal->MaxVariableSize - GetVariableHeaderSize ();
+    } else {
+      *MaximumVariableSize = mVariableModuleGlobal->MaxVolatileVariableSize - GetVariableHeaderSize ();
     }
   }
 
@@ -3655,6 +3663,30 @@ GetNonVolatileMaxVariableSize (
   } else {
     return MAX (PcdGet32 (PcdMaxVariableSize), PcdGet32 (PcdMaxAuthVariableSize));
   }
+}
+
+/**
+  Get maximum variable size, covering both non-volatile and volatile variables.
+
+  @return Maximum variable size.
+
+**/
+UINTN
+GetMaxVariableSize (
+  VOID
+  )
+{
+  UINTN MaxVariableSize;
+
+  MaxVariableSize = GetNonVolatileMaxVariableSize();
+  //
+  // The condition below fails implicitly if PcdMaxVolatileVariableSize equals
+  // the default zero value.
+  //
+  if (MaxVariableSize < PcdGet32 (PcdMaxVolatileVariableSize)) {
+    MaxVariableSize = PcdGet32 (PcdMaxVolatileVariableSize);
+  }
+  return MaxVariableSize;
 }
 
 /**
@@ -4225,10 +4257,14 @@ VariableCommonInitialize (
     }
   }
 
+  mVariableModuleGlobal->MaxVolatileVariableSize = ((PcdGet32 (PcdMaxVolatileVariableSize) != 0) ?
+                                                    PcdGet32 (PcdMaxVolatileVariableSize) :
+                                                    mVariableModuleGlobal->MaxVariableSize
+                                                    );
   //
   // Allocate memory for volatile variable store, note that there is a scratch space to store scratch data.
   //
-  ScratchSize = GetNonVolatileMaxVariableSize ();
+  ScratchSize = GetMaxVariableSize ();
   mVariableModuleGlobal->ScratchBufferSize = ScratchSize;
   VolatileVariableStore = AllocateRuntimePool (PcdGet32 (PcdVariableStoreSize) + ScratchSize);
   if (VolatileVariableStore == NULL) {
