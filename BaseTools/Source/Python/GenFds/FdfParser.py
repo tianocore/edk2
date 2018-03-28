@@ -60,6 +60,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from Capsule import EFI_CERT_TYPE_PKCS7_GUID
 from Capsule import EFI_CERT_TYPE_RSA2048_SHA256_GUID
 from Common.RangeExpression import RangeExpression
+from Common.FdfParserLite import FileExtensionPattern
 
 ##define T_CHAR_SPACE                ' '
 ##define T_CHAR_NULL                 '\0'
@@ -3691,8 +3692,7 @@ class FdfParser:
 
         Ext = ""
         if self.__GetNextToken():
-            Pattern = re.compile(r'([a-zA-Z][a-zA-Z0-9]*)')
-            if Pattern.match(self.__Token):
+            if FileExtensionPattern.match(self.__Token):
                 Ext = self.__Token
                 return '.' + Ext
             else:

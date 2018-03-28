@@ -47,6 +47,8 @@ InputMacroDict = {}
 # All Macro values when parsing file, not replace existing Macro
 AllMacroList = []
 
+FileExtensionPattern = re.compile(r'([a-zA-Z][a-zA-Z0-9]*)')
+
 def GetRealFileLine (File, Line):
     
     InsertedLines = 0
@@ -2842,8 +2844,7 @@ class FdfParser(object):
             
         Ext = ""
         if self.__GetNextToken():
-            Pattern = re.compile(r'([a-zA-Z][a-zA-Z0-9]*)')
-            if Pattern.match(self.__Token):
+            if FileExtensionPattern.match(self.__Token):
                 Ext = self.__Token                            
                 return '.' + Ext    
             else:
