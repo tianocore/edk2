@@ -272,7 +272,7 @@ FmpSetImage (
   }
 
   Status = MicrocodeWrite(MicrocodeFmpPrivate, (VOID *)Image, ImageSize, &MicrocodeFmpPrivate->LastAttempt.LastAttemptVersion, &MicrocodeFmpPrivate->LastAttempt.LastAttemptStatus, AbortReason);
-  DEBUG((DEBUG_INFO, "SetImage - LastAttemp Version - 0x%x, State - 0x%x\n", MicrocodeFmpPrivate->LastAttempt.LastAttemptVersion, MicrocodeFmpPrivate->LastAttempt.LastAttemptStatus));
+  DEBUG((DEBUG_INFO, "SetImage - LastAttempt Version - 0x%x, Status - 0x%x\n", MicrocodeFmpPrivate->LastAttempt.LastAttemptVersion, MicrocodeFmpPrivate->LastAttempt.LastAttemptStatus));
   VarStatus = gRT->SetVariable(
                      MICROCODE_FMP_LAST_ATTEMPT_VARIABLE_NAME,
                      &gEfiCallerIdGuid,
@@ -280,7 +280,7 @@ FmpSetImage (
                      sizeof(MicrocodeFmpPrivate->LastAttempt),
                      &MicrocodeFmpPrivate->LastAttempt
                      );
-  DEBUG((DEBUG_INFO, "SetLastAttemp - %r\n", VarStatus));
+  DEBUG((DEBUG_INFO, "SetLastAttempt - %r\n", VarStatus));
 
   if (!EFI_ERROR(Status)) {
     InitializeMicrocodeDescriptor(MicrocodeFmpPrivate);
@@ -415,6 +415,212 @@ FmpSetPackageInfo (
 }
 
 /**
+  Sort FIT microcode entries based upon MicrocodeEntryPoint, from low to high.
+
+  @param[in] MicrocodeFmpPrivate private data structure to be initialized.
+
+**/
+VOID
+SortFitMicrocodeInfo (
+  IN MICROCODE_FMP_PRIVATE_DATA     *MicrocodeFmpPrivate
+  )
+{
+  FIT_MICROCODE_INFO        *FitMicrocodeEntry;
+  FIT_MICROCODE_INFO        *NextFitMicrocodeEntry;
+  FIT_MICROCODE_INFO        TempFitMicrocodeEntry;
+  FIT_MICROCODE_INFO        *FitMicrocodeEntryEnd;
+
+  FitMicrocodeEntry = MicrocodeFmpPrivate->FitMicrocodeInfo;
+  NextFitMicrocodeEntry = FitMicrocodeEntry + 1;
+  FitMicrocodeEntryEnd = MicrocodeFmpPrivate->FitMicrocodeInfo + MicrocodeFmpPrivate->FitMicrocodeEntryCount;
+  while (FitMicrocodeEntry < FitMicrocodeEntryEnd) {
+    while (NextFitMicrocodeEntry < FitMicrocodeEntryEnd) {
+      if (FitMicrocodeEntry->MicrocodeEntryPoint > NextFitMicrocodeEntry->MicrocodeEntryPoint) {
+        CopyMem (&TempFitMicrocodeEntry, FitMicrocodeEntry, sizeof (FIT_MICROCODE_INFO));
+        CopyMem (FitMicrocodeEntry, NextFitMicrocodeEntry, sizeof (FIT_MICROCODE_INFO));
+        CopyMem (NextFitMicrocodeEntry, &TempFitMicrocodeEntry, sizeof (FIT_MICROCODE_INFO));
+      }
+
+      NextFitMicrocodeEntry = NextFitMicrocodeEntry + 1;
+    }
+
+    FitMicrocodeEntry     = FitMicrocodeEntry + 1;
+    NextFitMicrocodeEntry = FitMicrocodeEntry + 1;
+  }
+}
+
+/**
+  Initialize FIT microcode information.
+
+  @param[in] MicrocodeFmpPrivate private data structure to be initialized.
+
+  @return EFI_SUCCESS           FIT microcode information is initialized.
+  @return EFI_OUT_OF_RESOURCES  No enough resource for the initialization.
+  @return EFI_DEVICE_ERROR      There is something wrong in FIT microcode entry.
+**/
+EFI_STATUS
+InitializeFitMicrocodeInfo (
+  IN MICROCODE_FMP_PRIVATE_DATA     *MicrocodeFmpPrivate
+  )
+{
+  UINT64                            FitPointer;
+  FIRMWARE_INTERFACE_TABLE_ENTRY    *FitEntry;
+  UINT32                            EntryNum;
+  UINT32                            MicrocodeEntryNum;
+  UINT32                            Index;
+  UINTN                             Address;
+  VOID                              *MicrocodePatchAddress;
+  UINTN                             MicrocodePatchRegionSize;
+  FIT_MICROCODE_INFO                *FitMicrocodeInfo;
+  FIT_MICROCODE_INFO                *FitMicrocodeInfoNext;
+  CPU_MICROCODE_HEADER              *MicrocodeEntryPoint;
+  CPU_MICROCODE_HEADER              *MicrocodeEntryPointNext;
+  UINTN                             FitMicrocodeIndex;
+  MICROCODE_INFO                    *MicrocodeInfo;
+  UINTN                             MicrocodeIndex;
+
+  if (MicrocodeFmpPrivate->FitMicrocodeInfo != NULL) {
+    FreePool (MicrocodeFmpPrivate->FitMicrocodeInfo);
+    MicrocodeFmpPrivate->FitMicrocodeInfo = NULL;
+    MicrocodeFmpPrivate->FitMicrocodeEntryCount = 0;
+  }
+
+  FitPointer = *(UINT64 *) (UINTN) FIT_POINTER_ADDRESS;
+  if ((FitPointer == 0) ||
+      (FitPointer == 0xFFFFFFFFFFFFFFFF) ||
+      (FitPointer == 0xEEEEEEEEEEEEEEEE)) {
+    //
+    // No FIT table.
+    //
+    return EFI_SUCCESS;
+  }
+  FitEntry = (FIRMWARE_INTERFACE_TABLE_ENTRY *) (UINTN) FitPointer;
+  if ((FitEntry[0].Type != FIT_TYPE_00_HEADER) ||
+      (FitEntry[0].Address != FIT_TYPE_00_SIGNATURE)) {
+    //
+    // Invalid FIT table, treat it as no FIT table.
+    //
+    return EFI_SUCCESS;
+  }
+
+  EntryNum = *(UINT32 *)(&FitEntry[0].Size[0]) & 0xFFFFFF;
+
+  //
+  // Calculate microcode entry number.
+  //
+  MicrocodeEntryNum = 0;
+  for (Index = 0; Index < EntryNum; Index++) {
+    if (FitEntry[Index].Type == FIT_TYPE_01_MICROCODE) {
+      MicrocodeEntryNum++;
+    }
+  }
+  if (MicrocodeEntryNum == 0) {
+    //
+    // No FIT microcode entry.
+    //
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Allocate buffer.
+  //
+  MicrocodeFmpPrivate->FitMicrocodeInfo = AllocateZeroPool (MicrocodeEntryNum * sizeof (FIT_MICROCODE_INFO));
+  if (MicrocodeFmpPrivate->FitMicrocodeInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  MicrocodeFmpPrivate->FitMicrocodeEntryCount = MicrocodeEntryNum;
+
+  MicrocodePatchAddress = MicrocodeFmpPrivate->MicrocodePatchAddress;
+  MicrocodePatchRegionSize = MicrocodeFmpPrivate->MicrocodePatchRegionSize;
+
+  //
+  // Collect microcode entry info.
+  //
+  MicrocodeEntryNum = 0;
+  for (Index = 0; Index < EntryNum; Index++) {
+    if (FitEntry[Index].Type == FIT_TYPE_01_MICROCODE) {
+      Address = (UINTN) FitEntry[Index].Address;
+      if ((Address < (UINTN) MicrocodePatchAddress) ||
+          (Address >= ((UINTN) MicrocodePatchAddress + MicrocodePatchRegionSize))) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "InitializeFitMicrocodeInfo - Address (0x%x) is not in Microcode Region\n",
+          Address
+          ));
+        goto ErrorExit;
+      }
+      FitMicrocodeInfo = &MicrocodeFmpPrivate->FitMicrocodeInfo[MicrocodeEntryNum];
+      FitMicrocodeInfo->MicrocodeEntryPoint = (CPU_MICROCODE_HEADER *) Address;
+      if ((*(UINT32 *) Address) == 0xFFFFFFFF) {
+        //
+        // It is the empty slot as long as the first dword is 0xFFFF_FFFF.
+        //
+        FitMicrocodeInfo->Empty = TRUE;
+      } else {
+        FitMicrocodeInfo->Empty = FALSE;
+      }
+      MicrocodeEntryNum++;
+    }
+  }
+
+  //
+  // Every microcode should have a FIT microcode entry.
+  //
+  for (MicrocodeIndex = 0; MicrocodeIndex < MicrocodeFmpPrivate->DescriptorCount; MicrocodeIndex++) {
+    MicrocodeInfo = &MicrocodeFmpPrivate->MicrocodeInfo[MicrocodeIndex];
+    for (FitMicrocodeIndex = 0; FitMicrocodeIndex < MicrocodeFmpPrivate->FitMicrocodeEntryCount; FitMicrocodeIndex++) {
+      FitMicrocodeInfo = &MicrocodeFmpPrivate->FitMicrocodeInfo[FitMicrocodeIndex];
+      if (MicrocodeInfo->MicrocodeEntryPoint == FitMicrocodeInfo->MicrocodeEntryPoint) {
+        FitMicrocodeInfo->TotalSize = MicrocodeInfo->TotalSize;
+        FitMicrocodeInfo->InUse = MicrocodeInfo->InUse;
+        break;
+      }
+    }
+    if (FitMicrocodeIndex >= MicrocodeFmpPrivate->FitMicrocodeEntryCount) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "InitializeFitMicrocodeInfo - There is no FIT microcode entry for Microcode (0x%x)\n",
+        MicrocodeInfo->MicrocodeEntryPoint
+        ));
+      goto ErrorExit;
+    }
+  }
+
+  SortFitMicrocodeInfo (MicrocodeFmpPrivate);
+
+  //
+  // Check overlap.
+  //
+  for (FitMicrocodeIndex = 0; FitMicrocodeIndex < MicrocodeFmpPrivate->FitMicrocodeEntryCount - 1; FitMicrocodeIndex++) {
+    FitMicrocodeInfo = &MicrocodeFmpPrivate->FitMicrocodeInfo[FitMicrocodeIndex];
+    MicrocodeEntryPoint = FitMicrocodeInfo->MicrocodeEntryPoint;
+    FitMicrocodeInfoNext = &MicrocodeFmpPrivate->FitMicrocodeInfo[FitMicrocodeIndex + 1];
+    MicrocodeEntryPointNext = FitMicrocodeInfoNext->MicrocodeEntryPoint;
+    if ((MicrocodeEntryPoint >= MicrocodeEntryPointNext) ||
+        ((FitMicrocodeInfo->TotalSize != 0) &&
+         ((UINTN) MicrocodeEntryPoint + FitMicrocodeInfo->TotalSize) >
+          (UINTN) MicrocodeEntryPointNext)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "InitializeFitMicrocodeInfo - There is overlap between FIT microcode entries (0x%x 0x%x)\n",
+        MicrocodeEntryPoint,
+        MicrocodeEntryPointNext
+        ));
+      goto ErrorExit;
+    }
+  }
+
+  return EFI_SUCCESS;
+
+ErrorExit:
+  FreePool (MicrocodeFmpPrivate->FitMicrocodeInfo);
+  MicrocodeFmpPrivate->FitMicrocodeInfo = NULL;
+  MicrocodeFmpPrivate->FitMicrocodeEntryCount = 0;
+  return EFI_DEVICE_ERROR;
+}
+
+/**
   Initialize Processor Microcode Index.
 
   @param[in] MicrocodeFmpPrivate private data structure to be initialized.
@@ -460,14 +666,16 @@ InitializedProcessorMicrocodeIndex (
 
   @param[in] MicrocodeFmpPrivate private data structure to be initialized.
 
-  @return EFI_SUCCESS Microcode Descriptor is initialized.
+  @return EFI_SUCCESS           Microcode Descriptor is initialized.
+  @return EFI_OUT_OF_RESOURCES  No enough resource for the initialization.
 **/
 EFI_STATUS
 InitializeMicrocodeDescriptor (
   IN MICROCODE_FMP_PRIVATE_DATA *MicrocodeFmpPrivate
   )
 {
-  UINT8    CurrentMicrocodeCount;
+  EFI_STATUS Status;
+  UINT8      CurrentMicrocodeCount;
 
   CurrentMicrocodeCount = (UINT8)GetMicrocodeInfo (MicrocodeFmpPrivate, 0, NULL, NULL);
 
@@ -496,6 +704,7 @@ InitializeMicrocodeDescriptor (
   if (MicrocodeFmpPrivate->MicrocodeInfo == NULL) {
     MicrocodeFmpPrivate->MicrocodeInfo = AllocateZeroPool(MicrocodeFmpPrivate->DescriptorCount * sizeof(MICROCODE_INFO));
     if (MicrocodeFmpPrivate->MicrocodeInfo == NULL) {
+      FreePool (MicrocodeFmpPrivate->ImageDescriptor);
       return EFI_OUT_OF_RESOURCES;
     }
   }
@@ -505,6 +714,14 @@ InitializeMicrocodeDescriptor (
 
   InitializedProcessorMicrocodeIndex (MicrocodeFmpPrivate);
 
+  Status = InitializeFitMicrocodeInfo (MicrocodeFmpPrivate);
+  if (EFI_ERROR(Status)) {
+    FreePool (MicrocodeFmpPrivate->ImageDescriptor);
+    FreePool (MicrocodeFmpPrivate->MicrocodeInfo);
+    DEBUG((DEBUG_ERROR, "InitializeFitMicrocodeInfo - %r\n", Status));
+    return Status;
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -513,7 +730,8 @@ InitializeMicrocodeDescriptor (
 
   @param[in] MicrocodeFmpPrivate private data structure to be initialized.
 
-  @return EFI_SUCCESS private data is initialized.
+  @return EFI_SUCCESS           Processor information is initialized.
+  @return EFI_OUT_OF_RESOURCES  No enough resource for the initialization.
 **/
 EFI_STATUS
 InitializeProcessorInfo (
@@ -583,6 +801,7 @@ DumpPrivateInfo (
   PROCESSOR_INFO                       *ProcessorInfo;
   MICROCODE_INFO                       *MicrocodeInfo;
   EFI_FIRMWARE_IMAGE_DESCRIPTOR        *ImageDescriptor;
+  FIT_MICROCODE_INFO                   *FitMicrocodeInfo;
 
   DEBUG ((DEBUG_INFO, "ProcessorInfo:\n"));
   DEBUG ((DEBUG_INFO, "  ProcessorCount - 0x%x\n", MicrocodeFmpPrivate->ProcessorCount));
@@ -635,6 +854,23 @@ DumpPrivateInfo (
     DEBUG((DEBUG_VERBOSE, "    LastAttemptStatus           - 0x%x\n", ImageDescriptor[Index].LastAttemptStatus));
     DEBUG((DEBUG_VERBOSE, "    HardwareInstance            - 0x%lx\n", ImageDescriptor[Index].HardwareInstance));
   }
+
+  if (MicrocodeFmpPrivate->FitMicrocodeInfo != NULL) {
+    DEBUG ((DEBUG_INFO, "FitMicrocodeInfo:\n"));
+    FitMicrocodeInfo = MicrocodeFmpPrivate->FitMicrocodeInfo;
+    DEBUG ((DEBUG_INFO, "  FitMicrocodeEntryCount - 0x%x\n", MicrocodeFmpPrivate->FitMicrocodeEntryCount));
+    for (Index = 0; Index < MicrocodeFmpPrivate->FitMicrocodeEntryCount; Index++) {
+      DEBUG ((
+        DEBUG_INFO,
+        "  FitMicrocodeInfo[0x%x] - 0x%08x, 0x%08x, (0x%x, 0x%x)\n",
+        Index,
+        FitMicrocodeInfo[Index].MicrocodeEntryPoint,
+        FitMicrocodeInfo[Index].TotalSize,
+        FitMicrocodeInfo[Index].InUse,
+        FitMicrocodeInfo[Index].Empty
+        ));
+    }
+  }
 }
 
 /**
@@ -671,8 +907,8 @@ InitializePrivateData (
                      &VarSize,
                      &MicrocodeFmpPrivate->LastAttempt
                      );
-  DEBUG((DEBUG_INFO, "GetLastAttemp - %r\n", VarStatus));
-  DEBUG((DEBUG_INFO, "GetLastAttemp Version - 0x%x, State - 0x%x\n", MicrocodeFmpPrivate->LastAttempt.LastAttemptVersion, MicrocodeFmpPrivate->LastAttempt.LastAttemptStatus));
+  DEBUG((DEBUG_INFO, "GetLastAttempt - %r\n", VarStatus));
+  DEBUG((DEBUG_INFO, "GetLastAttempt Version - 0x%x, State - 0x%x\n", MicrocodeFmpPrivate->LastAttempt.LastAttemptVersion, MicrocodeFmpPrivate->LastAttempt.LastAttemptStatus));
 
   Result = GetMicrocodeRegion(&MicrocodeFmpPrivate->MicrocodePatchAddress, &MicrocodeFmpPrivate->MicrocodePatchRegionSize);
   if (!Result) {
@@ -688,6 +924,7 @@ InitializePrivateData (
 
   Status = InitializeMicrocodeDescriptor(MicrocodeFmpPrivate);
   if (EFI_ERROR(Status)) {
+    FreePool (MicrocodeFmpPrivate->ProcessorInfo);
     DEBUG((DEBUG_ERROR, "InitializeMicrocodeDescriptor - %r\n", Status));
     return Status;
   }

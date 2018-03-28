@@ -20,6 +20,8 @@
 #include <Guid/SystemResourceTable.h>
 #include <Guid/MicrocodeFmp.h>
 
+#include <IndustryStandard/FirmwareInterfaceTable.h>
+
 #include <Protocol/FirmwareManagement.h>
 #include <Protocol/MpService.h>
 
@@ -58,6 +60,13 @@ typedef struct {
 } MICROCODE_INFO;
 
 typedef struct {
+  CPU_MICROCODE_HEADER   *MicrocodeEntryPoint;
+  UINTN                  TotalSize;
+  BOOLEAN                InUse;
+  BOOLEAN                Empty;
+} FIT_MICROCODE_INFO;
+
+typedef struct {
   UINTN                  CpuIndex;
   UINT32                 ProcessorSignature;
   UINT8                  PlatformId;
@@ -86,11 +95,13 @@ struct _MICROCODE_FMP_PRIVATE_DATA {
   UINTN                                BspIndex;
   UINTN                                ProcessorCount;
   PROCESSOR_INFO                       *ProcessorInfo;
+  UINT32                               FitMicrocodeEntryCount;
+  FIT_MICROCODE_INFO                   *FitMicrocodeInfo;
 };
 
 typedef struct _MICROCODE_FMP_PRIVATE_DATA  MICROCODE_FMP_PRIVATE_DATA;
 
-#define MICROCODE_FMP_LAST_ATTEMPT_VARIABLE_NAME  L"MicrocodeLastAttempVar"
+#define MICROCODE_FMP_LAST_ATTEMPT_VARIABLE_NAME  L"MicrocodeLastAttemptVar"
 
 /**
   Returns a pointer to the MICROCODE_FMP_PRIVATE_DATA structure from the input a as Fmp.
