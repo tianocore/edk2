@@ -444,14 +444,22 @@
 !if ($(FD_SIZE_IN_KB) == 1024) || ($(FD_SIZE_IN_KB) == 2048)
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x2000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x2800
+!if $(TLS_ENABLE) == FALSE
   # match PcdFlashNvStorageVariableSize purely for convenience
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0xe000
+!endif
 !endif
 !if $(FD_SIZE_IN_KB) == 4096
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x8400
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x8400
+!if $(TLS_ENABLE) == FALSE
   # match PcdFlashNvStorageVariableSize purely for convenience
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x40000
+!endif
+!endif
+!if $(TLS_ENABLE) == TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x80000
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x40000
 !endif
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
@@ -803,7 +811,10 @@
 !endif
 !if $(TLS_ENABLE) == TRUE
   NetworkPkg/TlsDxe/TlsDxe.inf
-  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf
+  NetworkPkg/TlsAuthConfigDxe/TlsAuthConfigDxe.inf {
+    <LibraryClasses>
+      NULL|OvmfPkg/Library/TlsAuthConfigLib/TlsAuthConfigLib.inf
+  }
 !endif
   OvmfPkg/VirtioNetDxe/VirtioNet.inf
 
