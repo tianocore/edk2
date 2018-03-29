@@ -110,10 +110,7 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
                 ValueNumber = 1
             elif ValueString == 'FALSE':
                 ValueNumber = 0
-            elif ValueString.startswith('0X'):
-                ValueNumber = int (ValueString, 16)
-            else:
-                ValueNumber = int (ValueString)
+            ValueNumber = int (ValueString, 0)
             if ValueNumber != 0:
                 ValueNumber = 1
         except:
@@ -127,10 +124,7 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
         # Get PCD value for UINT* data type
         #
         try:
-            if ValueString.startswith('0X'):
-                ValueNumber = int (ValueString, 16)
-            else:
-                ValueNumber = int (ValueString)
+            ValueNumber = int (ValueString, 0)
         except:
             return PARAMETER_INVALID, "PCD Value %s is not valid dec or hex string." % (ValueString)
         #

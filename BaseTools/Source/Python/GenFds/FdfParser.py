@@ -1146,10 +1146,7 @@ class FdfParser:
         if Scope in ['UINT64', 'UINT8']:
             ValueNumber = 0
             try:
-                if Value.upper().startswith('0X'):
-                    ValueNumber = int (Value, 16)
-                else:
-                    ValueNumber = int (Value)
+                ValueNumber = int (Value, 0)
             except:
                 EdkLogger.error("FdfParser", FORMAT_INVALID, "The value is not valid dec or hex number for %s." % Name)
             if ValueNumber < 0:

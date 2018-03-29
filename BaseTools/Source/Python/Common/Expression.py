@@ -845,7 +845,7 @@ class ValueExpressionEx(ValueExpression):
 
                         if ItemSize == 0:
                             try:
-                                tmpValue = int(Item, 16) if Item.upper().startswith('0X') else int(Item, 0)
+                                tmpValue = int(Item, 0)
                                 if tmpValue > 255:
                                     raise BadExpression("Byte  array number %s should less than 0xFF." % Item)
                             except BadExpression, Value:
@@ -857,7 +857,7 @@ class ValueExpressionEx(ValueExpression):
                             ItemValue = ParseFieldValue(Item)[0]
 
                         if type(ItemValue) == type(''):
-                            ItemValue = int(ItemValue, 16) if ItemValue.startswith('0x') else int(ItemValue)
+                            ItemValue = int(ItemValue, 0)
 
                         TmpValue = (ItemValue << (Size * 8)) | TmpValue
                         Size = Size + ItemSize
