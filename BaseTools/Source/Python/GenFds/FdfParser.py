@@ -60,7 +60,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from Capsule import EFI_CERT_TYPE_PKCS7_GUID
 from Capsule import EFI_CERT_TYPE_RSA2048_SHA256_GUID
 from Common.RangeExpression import RangeExpression
-from Common.FdfParserLite import FileExtensionPattern
+from Common.FdfParserLite import FileExtensionPattern,TokenFindPattern
 
 ##define T_CHAR_SPACE                ' '
 ##define T_CHAR_NULL                 '\0'
@@ -2797,12 +2797,11 @@ class FdfParser:
     def __GetFileOpts(self, FfsFileObj):
 
         if self.__GetNextToken():
-            Pattern = re.compile(r'([a-zA-Z0-9\-]+|\$\(TARGET\)|\*)_([a-zA-Z0-9\-]+|\$\(TOOL_CHAIN_TAG\)|\*)_([a-zA-Z0-9\-]+|\$\(ARCH\)|\*)')
-            if Pattern.match(self.__Token):
+            if TokenFindPattern.match(self.__Token):
                 FfsFileObj.KeyStringList.append(self.__Token)
                 if self.__IsToken(","):
                     while self.__GetNextToken():
-                        if not Pattern.match(self.__Token):
+                        if not TokenFindPattern.match(self.__Token):
                             raise Warning("expected KeyString \"Target_Tag_Arch\"", self.FileName, self.CurrentLineNumber)
                         FfsFileObj.KeyStringList.append(self.__Token)
 
@@ -3746,12 +3745,11 @@ class FdfParser:
 
         KeyStringList = []
         if self.__GetNextToken():
-            Pattern = re.compile(r'([a-zA-Z0-9\-]+|\$\(TARGET\)|\*)_([a-zA-Z0-9\-]+|\$\(TOOL_CHAIN_TAG\)|\*)_([a-zA-Z0-9\-]+|\$\(ARCH\)|\*)')
-            if Pattern.match(self.__Token):
+            if TokenFindPattern.match(self.__Token):
                 KeyStringList.append(self.__Token)
                 if self.__IsToken(","):
                     while self.__GetNextToken():
-                        if not Pattern.match(self.__Token):
+                        if not TokenFindPattern.match(self.__Token):
                             raise Warning("expected KeyString \"Target_Tag_Arch\"", self.FileName, self.CurrentLineNumber)
                         KeyStringList.append(self.__Token)
 
