@@ -835,7 +835,7 @@ class ValueExpressionEx(ValueExpression):
                         elif Item.startswith('UINT64'):
                             ItemSize = 8
                             ValueType = 'UINT64'
-                        elif Item.startswith('"') or Item.startswith("'") or Item.startswith('L'):
+                        elif Item[0] in ['"',"'",'L']:
                             ItemSize = 0
                             ValueType = 'VOID*'
                         else:
