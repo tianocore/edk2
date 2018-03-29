@@ -1495,21 +1495,8 @@ def AnalyzePcdExpression(Setting):
     return FieldList
 
 def ParseDevPathValue (Value):
-    DevPathList = [ "Path","HardwarePath","Pci","PcCard","MemoryMapped","VenHw","Ctrl","BMC","AcpiPath","Acpi","PciRoot",
-                    "PcieRoot","Floppy","Keyboard","Serial","ParallelPort","AcpiEx","AcpiExp","AcpiAdr","Msg","Ata","Scsi",
-                    "Fibre","FibreEx","I1394","USB","I2O","Infiniband","VenMsg","VenPcAnsi","VenVt100","VenVt100Plus",
-                    "VenUtf8","UartFlowCtrl","SAS","SasEx","NVMe","UFS","SD","eMMC","DebugPort","MAC","IPv4","IPv6","Uart",
-                    "UsbClass","UsbAudio","UsbCDCControl","UsbHID","UsbImage","UsbPrinter","UsbMassStorage","UsbHub",
-                    "UsbCDCData","UsbSmartCard","UsbVideo","UsbDiagnostic","UsbWireless","UsbDeviceFirmwareUpdate",
-                    "UsbIrdaBridge","UsbTestAndMeasurement","UsbWwid","Unit","iSCSI","Vlan","Uri","Bluetooth","Wi-Fi",
-                    "MediaPath","HD","CDROM","VenMedia","Media","Fv","FvFile","Offset","RamDisk","VirtualDisk","VirtualCD",
-                    "PersistentVirtualDisk","PersistentVirtualCD","BbsPath","BBS","Sata" ]
     if '\\' in Value:
         Value.replace('\\', '/').replace(' ', '')
-    for Item in Value.split('/'):
-        Key = Item.strip().split('(')[0]
-        if Key not in DevPathList:
-            pass
 
     Cmd = 'DevicePath ' + '"' + Value + '"'
     try:
