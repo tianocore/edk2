@@ -673,11 +673,6 @@ ConverToCpuArchAttributes (
 {
   UINT64      CpuArchAttributes;
 
-  if ((Attributes & ~(EXCLUSIVE_MEMORY_ATTRIBUTES |
-                      NONEXCLUSIVE_MEMORY_ATTRIBUTES)) != 0) {
-    return INVALID_CPU_ARCH_ATTRIBUTES;
-  }
-
   CpuArchAttributes = Attributes & NONEXCLUSIVE_MEMORY_ATTRIBUTES;
 
   if ( (Attributes & EFI_MEMORY_UC) == EFI_MEMORY_UC) {
