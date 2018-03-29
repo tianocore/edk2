@@ -1900,25 +1900,14 @@ class DecParser(MetaFileParser):
     }
 
 
-## FdfObject
-#
-# This class defined basic Fdf object which is used by inheriting
-# 
-# @param object:       Inherited from object class
-#
-class FdfObject(object):
-    def __init__(self):
-        object.__init__()
-
 ## Fdf
 #
 # This class defined the structure used in Fdf object
 # 
-# @param FdfObject:     Inherited from FdfObject class
 # @param Filename:      Input value for Ffilename of Fdf file, default is None
 # @param WorkspaceDir:  Input value for current workspace directory, default is None
 #
-class Fdf(FdfObject):
+class Fdf(object):
     def __init__(self, Filename = None, IsToDatabase = False, WorkspaceDir = None, Database = None):
         self.WorkspaceDir = WorkspaceDir
         self.IsToDatabase = IsToDatabase

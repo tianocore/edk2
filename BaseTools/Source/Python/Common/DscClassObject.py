@@ -54,21 +54,10 @@ Section = {TAB_UNKNOWN.upper() : MODEL_UNKNOWN,
            TAB_USER_EXTENSIONS.upper() : MODEL_META_DATA_USER_EXTENSION
            }
 
-## DscObject
-#
-# This class defined basic Dsc object which is used by inheriting
-#
-# @param object:       Inherited from object class
-#
-class DscObject(object):
-    def __init__(self):
-        object.__init__()
-
 ## Dsc
 #
 # This class defined the structure used in Dsc object
 #
-# @param DscObject:         Inherited from InfObject class
 # @param Ffilename:         Input value for Ffilename of Inf file, default is None
 # @param IsMergeAllArches:  Input value for IsMergeAllArches
 #                           True is to merge all arches
@@ -89,7 +78,7 @@ class DscObject(object):
 # @var WorkspaceDir:        To store value for WorkspaceDir
 # @var KeyList:             To store value for KeyList, a list for all Keys used in Dec
 #
-class Dsc(DscObject):
+class Dsc(object):
     _NullClassIndex = 0
 
     def __init__(self, Filename=None, IsToDatabase=False, IsToPlatform=False, WorkspaceDir=None, Database=None):

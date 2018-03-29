@@ -48,21 +48,10 @@ Section = {TAB_UNKNOWN.upper() : MODEL_UNKNOWN,
            }
 
 
-## DecObject
-#
-# This class defined basic Dec object which is used by inheriting
-# 
-# @param object:       Inherited from object class
-#
-class DecObject(object):
-    def __init__(self):
-        object.__init__()
-
 ## Dec
 #
 # This class defined the structure used in Dec object
 # 
-# @param DecObject:         Inherited from DecObject class
 # @param Filename:          Input value for Filename of Dec file, default is None
 # @param IsMergeAllArches:  Input value for IsMergeAllArches
 #                           True is to merge all arches
@@ -82,7 +71,7 @@ class DecObject(object):
 # @var Contents:            To store value for Contents, it is a structure as DecContents
 # @var KeyList:             To store value for KeyList, a list for all Keys used in Dec
 #
-class Dec(DecObject):
+class Dec(object):
     def __init__(self, Filename=None, IsToDatabase=False, IsToPackage=False, WorkspaceDir=None, Database=None, SupArchList=DataType.ARCH_LIST):
         self.Identification = Identification()
         self.Package = PackageClass()

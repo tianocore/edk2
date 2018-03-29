@@ -131,21 +131,10 @@ class InfHeader(ModuleHeaderClass):
     def __contains__(self, key):
         return key in self._Mapping_
 
-## InfObject
-#
-# This class defined basic Inf object which is used by inheriting
-#
-# @param object:       Inherited from object class
-#
-class InfObject(object):
-    def __init__(self):
-        object.__init__()
-
 ## Inf
 #
 # This class defined the structure used in Inf object
 #
-# @param InfObject:         Inherited from InfObject class
 # @param Ffilename:         Input value for Ffilename of Inf file, default is None
 # @param IsMergeAllArches:  Input value for IsMergeAllArches
 #                           True is to merge all arches
@@ -163,7 +152,7 @@ class InfObject(object):
 # @var WorkspaceDir:        To store value for WorkspaceDir
 # @var KeyList:             To store value for KeyList, a list for all Keys used in Inf
 #
-class Inf(InfObject):
+class Inf(object):
     def __init__(self, Filename=None, IsToDatabase=False, IsToModule=False, WorkspaceDir=None, Database=None, SupArchList=DataType.ARCH_LIST):
         self.Identification = Identification()
         self.Module = ModuleClass()
