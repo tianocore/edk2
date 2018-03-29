@@ -49,6 +49,7 @@ InputMacroDict = {}
 AllMacroList = []
 
 FileExtensionPattern = re.compile(r'([a-zA-Z][a-zA-Z0-9]*)')
+TokenFindPattern = re.compile(r'([a-zA-Z0-9\-]+|\$\(TARGET\)|\*)_([a-zA-Z0-9\-]+|\$\(TOOL_CHAIN_TAG\)|\*)_([a-zA-Z0-9\-]+|\$\(ARCH\)|\*)')
 
 def GetRealFileLine (File, Line):
     
@@ -2094,8 +2095,7 @@ class FdfParser(object):
 
                 
         if self.__GetNextToken():
-            p = re.compile(r'([a-zA-Z0-9\-]+|\$\(TARGET\)|\*)_([a-zA-Z0-9\-]+|\$\(TOOL_CHAIN_TAG\)|\*)_([a-zA-Z0-9\-]+|\$\(ARCH\)|\*)')
-            if p.match(self.__Token):
+            if TokenFindPattern.match(self.__Token):
                 FfsInfObj.KeyStringList.append(self.__Token)
                 if not self.__IsToken(","):
                     return
@@ -2104,7 +2104,7 @@ class FdfParser(object):
                 return
                 
             while self.__GetNextToken():
-                if not p.match(self.__Token):
+                if not TokenFindPattern.match(self.__Token):
                     raise Warning("expected KeyString \"Target_Tag_Arch\" At Line ", self.FileName, self.CurrentLineNumber)
                 FfsInfObj.KeyStringList.append(self.__Token)
     
@@ -2252,12 +2252,11 @@ class FdfParser(object):
     def __GetFileOpts(self, FfsFileObj):
         
         if self.__GetNextToken():
-            Pattern = re.compile(r'([a-zA-Z0-9\-]+|\$\(TARGET\)|\*)_([a-zA-Z0-9\-]+|\$\(TOOL_CHAIN_TAG\)|\*)_([a-zA-Z0-9\-]+|\$\(ARCH\)|\*)')
-            if Pattern.match(self.__Token):
+            if TokenFindPattern.match(self.__Token):
                 FfsFileObj.KeyStringList.append(self.__Token)
                 if self.__IsToken(","):
                     while self.__GetNextToken():
-                        if not Pattern.match(self.__Token):
+                        if not TokenFindPattern.match(self.__Token):
                             raise Warning("expected KeyString \"Target_Tag_Arch\" At Line ", self.FileName, self.CurrentLineNumber)
                         FfsFileObj.KeyStringList.append(self.__Token)
 
@@ -2902,12 +2901,11 @@ class FdfParser(object):
         
         KeyStringList = []
         if self.__GetNextToken():
-            Pattern = re.compile(r'([a-zA-Z0-9\-]+|\$\(TARGET\)|\*)_([a-zA-Z0-9\-]+|\$\(TOOL_CHAIN_TAG\)|\*)_([a-zA-Z0-9\-]+|\$\(ARCH\)|\*)')
-            if Pattern.match(self.__Token):
+            if TokenFindPattern.match(self.__Token):
                 KeyStringList.append(self.__Token)
                 if self.__IsToken(","):
                     while self.__GetNextToken():
-                        if not Pattern.match(self.__Token):
+                        if not TokenFindPattern.match(self.__Token):
                             raise Warning("expected KeyString \"Target_Tag_Arch\" At Line ", self.FileName, self.CurrentLineNumber)
                         KeyStringList.append(self.__Token)
 
