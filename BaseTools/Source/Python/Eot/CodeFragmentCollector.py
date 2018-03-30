@@ -73,25 +73,6 @@ class CodeFragmentCollector:
         self.__Token = ""
         self.__SkippedChars = ""
 
-    ## __SkipWhiteSpace() method
-    #
-    #   Skip white spaces from current char, return number of chars skipped
-    #
-    #   @param  self        The object pointer
-    #   @retval Count       The number of chars skipped
-    #
-    def __SkipWhiteSpace(self):
-        Count = 0
-        while not self.__EndOfFile():
-            Count += 1
-            if self.__CurrentChar() in (T_CHAR_NULL, T_CHAR_CR, T_CHAR_LF, T_CHAR_SPACE, T_CHAR_TAB):
-                self.__SkippedChars += str(self.__CurrentChar())
-                self.__GetOneChar()
-
-            else:
-                Count = Count - 1
-                return Count
-
     ## __EndOfFile() method
     #
     #   Judge current buffer pos is at file end
