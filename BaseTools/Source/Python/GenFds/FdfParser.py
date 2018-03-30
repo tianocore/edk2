@@ -42,6 +42,7 @@ import ComponentStatement
 import OptionRom
 import OptRomInfStatement
 import OptRomFileStatement
+import string
 
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from Common.BuildToolError import *
@@ -1192,32 +1193,13 @@ class FdfParser:
 
         self.__GetOneChar()
 
-    ## __HexDigit() method
-    #
-    #   Whether char input is a Hex data bit
-    #
-    #   @param  self        The object pointer
-    #   @param  TempChar    The char to test
-    #   @retval True        The char is a Hex data bit
-    #   @retval False       The char is NOT a Hex data bit
-    #
-    def __HexDigit(self, TempChar):
-        if (TempChar >= 'a' and TempChar <= 'f') or (TempChar >= 'A' and TempChar <= 'F') \
-                or (TempChar >= '0' and TempChar <= '9'):
-                    return True
-        else:
-            return False
-
     def __IsHex(self, HexStr):
         if not HexStr.upper().startswith("0X"):
             return False
         if len(self.__Token) <= 2:
             return False
-        charList = [c for c in HexStr[2 : ] if not self.__HexDigit( c)]
-        if len(charList) == 0:
-            return True
-        else:
-            return False
+        return True if all(x in string.hexdigits for x in HexStr[2:]) else False
+
     ## __GetNextHexNumber() method
     #
     #   Get next HEX data before a seperator
@@ -4294,7 +4276,7 @@ class FdfParser:
             raise Warning("expected Component type", self.FileName, self.CurrentLineNumber)
         if self.__Token not in ("FIT", "PAL_B", "PAL_A", "OEM"):
             if not self.__Token.startswith("0x") or len(self.__Token) < 3 or len(self.__Token) > 4 or \
-                not self.__HexDigit(self.__Token[2]) or not self.__HexDigit(self.__Token[-1]):
+                not self.__Token[2] in string.hexdigits or not self.__Token[-1] in string.hexdigits:
                 raise Warning("Unknown location type '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
         CompStatementObj.CompType = self.__Token
 
