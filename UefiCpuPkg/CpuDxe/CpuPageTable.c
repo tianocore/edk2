@@ -24,9 +24,19 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/MpService.h>
 #include <Protocol/SmmBase2.h>
+#include <Register/Cpuid.h>
+#include <Register/Msr.h>
 
 #include "CpuDxe.h"
 #include "CpuPageTable.h"
+
+///
+/// Paging registers
+///
+#define CR0_WP                      BIT16
+#define CR0_PG                      BIT31
+#define CR4_PSE                     BIT4
+#define CR4_PAE                     BIT5
 
 ///
 /// Page Table Entry
@@ -139,8 +149,9 @@ GetCurrentPagingContext (
   IN OUT PAGE_TABLE_LIB_PAGING_CONTEXT     *PagingContext
   )
 {
-  UINT32                         RegEax;
-  UINT32                         RegEdx;
+  UINT32                          RegEax;
+  CPUID_EXTENDED_CPU_SIG_EDX      RegEdx;
+  MSR_IA32_EFER_REGISTER          MsrEfer;
 
   //
   // Don't retrieve current paging context from processor if in SMM mode.
@@ -152,33 +163,36 @@ GetCurrentPagingContext (
     } else {
       mPagingContext.MachineType = IMAGE_FILE_MACHINE_I386;
     }
-    if ((AsmReadCr0 () & BIT31) != 0) {
+    if ((AsmReadCr0 () & CR0_PG) != 0) {
       mPagingContext.ContextData.X64.PageTableBase = (AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64);
     } else {
       mPagingContext.ContextData.X64.PageTableBase = 0;
     }
 
-    if ((AsmReadCr4 () & BIT4) != 0) {
+    if ((AsmReadCr4 () & CR4_PSE) != 0) {
       mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PSE;
     }
-    if ((AsmReadCr4 () & BIT5) != 0) {
+    if ((AsmReadCr4 () & CR4_PAE) != 0) {
       mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PAE;
     }
-    if ((AsmReadCr0 () & BIT16) != 0) {
+    if ((AsmReadCr0 () & CR0_WP) != 0) {
       mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_WP_ENABLE;
     }
 
-    AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-    if (RegEax > 0x80000000) {
-      AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
-      if ((RegEdx & BIT20) != 0) {
+    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= CPUID_EXTENDED_CPU_SIG) {
+      AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx.Uint32);
+
+      if (RegEdx.Bits.NX != 0) {
         // XD supported
-        if ((AsmReadMsr64 (0xC0000080) & BIT11) != 0) {
+        MsrEfer.Uint64 = AsmReadMsr64(MSR_CORE_IA32_EFER);
+        if (MsrEfer.Bits.NXE != 0) {
           // XD activated
           mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_XD_ACTIVATED;
         }
       }
-      if ((RegEdx & BIT26) != 0) {
+
+      if (RegEdx.Bits.Page1GB != 0) {
         mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PAGE_1G_SUPPORT;
       }
     }
@@ -563,7 +577,7 @@ IsReadOnlyPageWriteProtected (
   // in this driver.
   //
   if (!IsInSmm ()) {
-    return ((AsmReadCr0 () & BIT16) != 0);
+    return ((AsmReadCr0 () & CR0_WP) != 0);
   }
   return FALSE;
 }
@@ -581,7 +595,7 @@ DisableReadOnlyPageWriteProtect (
   // in this driver.
   //
   if (!IsInSmm ()) {
-    AsmWriteCr0 (AsmReadCr0 () & ~BIT16);
+    AsmWriteCr0 (AsmReadCr0 () & ~CR0_WP);
   }
 }
 
@@ -598,7 +612,7 @@ EnableReadOnlyPageWriteProtect (
   // in this driver.
   //
   if (!IsInSmm ()) {
-    AsmWriteCr0 (AsmReadCr0 () | BIT16);
+    AsmWriteCr0 (AsmReadCr0 () | CR0_WP);
   }
 }
 
