@@ -2130,13 +2130,12 @@ class FdfParser(object):
     #
     #   Check whether reloc strip flag can be set for a file type.
     #
-    #   @param  self        The object pointer
     #   @param  FileType    The file type to check with
     #   @retval True        This type could have relocation strip flag
     #   @retval False       No way to have it
     #
-    
-    def __FileCouldHaveRelocFlag (self, FileType):
+    @staticmethod
+    def __FileCouldHaveRelocFlag (FileType):
         if FileType in ('SEC', 'PEI_CORE', 'PEIM', 'PEI_DXE_COMBO'):
             return True
         else:
@@ -2146,13 +2145,12 @@ class FdfParser(object):
     #
     #   Check whether reloc strip flag can be set for a section type.
     #
-    #   @param  self        The object pointer
     #   @param  SectionType The section type to check with
     #   @retval True        This type could have relocation strip flag
     #   @retval False       No way to have it
     #
-    
-    def __SectionCouldHaveRelocFlag (self, SectionType):
+    @staticmethod
+    def __SectionCouldHaveRelocFlag (SectionType):
         if SectionType in ('TE', 'PE32'):
             return True
         else:
@@ -3152,12 +3150,12 @@ class FdfParser(object):
     #
     #   Get whether a section could be optional
     #
-    #   @param  self        The object pointer
     #   @param  SectionType The section type to check
     #   @retval True        section could be optional
     #   @retval False       section never optional
     #
-    def __RuleSectionCouldBeOptional(self, SectionType):
+    @staticmethod
+    def __RuleSectionCouldBeOptional(SectionType):
         if SectionType in ("DXE_DEPEX", "UI", "VERSION", "PEI_DEPEX", "RAW", "SMM_DEPEX"):
             return True
         else:
@@ -3167,12 +3165,12 @@ class FdfParser(object):
     #
     #   Get whether a section could have build number information
     #
-    #   @param  self        The object pointer
     #   @param  SectionType The section type to check
     #   @retval True        section could have build number information
     #   @retval False       section never have build number information
     #
-    def __RuleSectionCouldHaveBuildNum(self, SectionType):
+    @staticmethod
+    def __RuleSectionCouldHaveBuildNum(SectionType):
         if SectionType in ("VERSION"):
             return True
         else:
@@ -3182,12 +3180,12 @@ class FdfParser(object):
     #
     #   Get whether a section could have string
     #
-    #   @param  self        The object pointer
     #   @param  SectionType The section type to check
     #   @retval True        section could have string
     #   @retval False       section never have string
     #
-    def __RuleSectionCouldHaveString(self, SectionType):
+    @staticmethod
+    def __RuleSectionCouldHaveString(SectionType):
         if SectionType in ("UI", "VERSION"):
             return True
         else:
