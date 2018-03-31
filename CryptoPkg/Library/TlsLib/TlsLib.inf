@@ -40,11 +40,12 @@
 
 [LibraryClasses]
   BaseCryptLib
-  BaseLib
   BaseMemoryLib
   DebugLib
   IntrinsicLib
+  MemoryAllocationLib
   OpensslLib
+  SafeIntLib
 
 [BuildOptions]
   #

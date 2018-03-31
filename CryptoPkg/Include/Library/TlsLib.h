@@ -348,13 +348,16 @@ TlsSetConnectionEnd (
   This function sets the ciphers for use by a specified TLS object.
 
   @param[in]  Tls          Pointer to a TLS object.
-  @param[in]  CipherId     Pointer to a string that contains one or more
-                           ciphers separated by a colon.
+  @param[in]  CipherId     Array of UINT16 cipher identifiers. Each UINT16
+                           cipher identifier comes from the TLS Cipher Suite
+                           Registry of the IANA, interpreting Byte1 and Byte2
+                           in network (big endian) byte order.
   @param[in]  CipherNum    The number of cipher in the list.
 
   @retval  EFI_SUCCESS           The ciphers list was set successfully.
   @retval  EFI_INVALID_PARAMETER The parameter is invalid.
-  @retval  EFI_UNSUPPORTED       Unsupported TLS cipher in the list.
+  @retval  EFI_UNSUPPORTED       No supported TLS cipher was found in CipherId.
+  @retval  EFI_OUT_OF_RESOURCES  Memory allocation failed.
 
 **/
 EFI_STATUS
