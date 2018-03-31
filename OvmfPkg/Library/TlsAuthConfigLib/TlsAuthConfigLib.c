@@ -20,6 +20,7 @@
 #include <Uefi/UefiBaseType.h>
 #include <Uefi/UefiSpec.h>
 
+#include <Guid/HttpTlsCipherList.h>
 #include <Guid/TlsAuthentication.h>
 
 #include <Library/BaseLib.h>
@@ -121,6 +122,102 @@ FreeHttpsCaCerts:
   FreePool (HttpsCaCerts);
 }
 
+/**
+  Read the list of trusted cipher suites from the fw_cfg file
+  "etc/edk2/https/ciphers", and store it to
+  gEdkiiHttpTlsCipherListGuid:EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE.
+
+  The contents are propagated by NetworkPkg/HttpDxe to NetworkPkg/TlsDxe; the
+  list is processed by the latter.
+**/
+STATIC
+VOID
+SetCipherSuites (
+  VOID
+  )
+{
+  EFI_STATUS           Status;
+  FIRMWARE_CONFIG_ITEM HttpsCiphersItem;
+  UINTN                HttpsCiphersSize;
+  VOID                 *HttpsCiphers;
+
+  Status = QemuFwCfgFindFile ("etc/edk2/https/ciphers", &HttpsCiphersItem,
+             &HttpsCiphersSize);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_VERBOSE, "%a:%a: not touching cipher suites\n",
+      gEfiCallerBaseName, __FUNCTION__));
+    return;
+  }
+  //
+  // From this point on, any failure is fatal. An ordered cipher preference
+  // list is available from QEMU, thus we cannot let the firmware attempt HTTPS
+  // boot with either pre-existent or non-existent preferences. An empty set of
+  // cipher suites does not fail HTTPS boot automatically; the default cipher
+  // suite preferences would take effect, and we must prevent that.
+  //
+  // Delete the current EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE if it exists. If
+  // the variable exists with EFI_VARIABLE_NON_VOLATILE attribute, we cannot
+  // make it volatile without deleting it first.
+  //
+  Status = gRT->SetVariable (
+                  EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE, // VariableName
+                  &gEdkiiHttpTlsCipherListGuid,        // VendorGuid
+                  0,                                   // Attributes
+                  0,                                   // DataSize
+                  NULL                                 // Data
+                  );
+  if (EFI_ERROR (Status) && (Status != EFI_NOT_FOUND)) {
+    DEBUG ((DEBUG_ERROR, "%a:%a: failed to delete %g:\"%s\"\n",
+      gEfiCallerBaseName, __FUNCTION__, &gEdkiiHttpTlsCipherListGuid,
+      EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE));
+    goto Done;
+  }
+
+  if (HttpsCiphersSize == 0) {
+    DEBUG ((DEBUG_ERROR, "%a:%a: list of cipher suites must not be empty\n",
+      gEfiCallerBaseName, __FUNCTION__));
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  HttpsCiphers = AllocatePool (HttpsCiphersSize);
+  if (HttpsCiphers == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a:%a: failed to allocate HttpsCiphers\n",
+      gEfiCallerBaseName, __FUNCTION__));
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
+  }
+
+  QemuFwCfgSelectItem (HttpsCiphersItem);
+  QemuFwCfgReadBytes (HttpsCiphersSize, HttpsCiphers);
+
+  Status = gRT->SetVariable (
+                  EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE, // VariableName
+                  &gEdkiiHttpTlsCipherListGuid,        // VendorGuid
+                  EFI_VARIABLE_BOOTSERVICE_ACCESS,     // Attributes
+                  HttpsCiphersSize,                    // DataSize
+                  HttpsCiphers                         // Data
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a:%a: failed to set %g:\"%s\"\n",
+      gEfiCallerBaseName, __FUNCTION__, &gEdkiiHttpTlsCipherListGuid,
+      EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE));
+    goto FreeHttpsCiphers;
+  }
+
+  DEBUG ((DEBUG_VERBOSE, "%a:%a: stored list of cipher suites (%Lu byte(s))\n",
+    gEfiCallerBaseName, __FUNCTION__, (UINT64)HttpsCiphersSize));
+
+FreeHttpsCiphers:
+  FreePool (HttpsCiphers);
+
+Done:
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    CpuDeadLoop ();
+  }
+}
+
 RETURN_STATUS
 EFIAPI
 TlsAuthConfigInit (
@@ -128,6 +225,7 @@ TlsAuthConfigInit (
   )
 {
   SetCaCerts ();
+  SetCipherSuites ();
 
   return RETURN_SUCCESS;
 }
