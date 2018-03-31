@@ -8,7 +8,7 @@
 
   FmpSetImage() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -477,52 +477,353 @@ FmpSetImage (
 }
 
 /**
+  Get the set of EFI_FIRMWARE_IMAGE_DESCRIPTOR structures from an FMP Protocol.
+
+  @param[in]  Handle             Handle with an FMP Protocol or a System FMP
+                                 Protocol.
+  @param[in]  ProtocolGuid       Pointer to the FMP Protocol GUID or System FMP
+                                 Protocol GUID.
+  @param[out] FmpImageInfoCount  Pointer to the number of
+                                 EFI_FIRMWARE_IMAGE_DESCRIPTOR structures.
+  @param[out] DescriptorSize     Pointer to the size, in bytes, of each
+                                 EFI_FIRMWARE_IMAGE_DESCRIPTOR structure.
+
+  @return NULL   No EFI_FIRMWARE_IMAGE_DESCRIPTOR structures found.
+  @return !NULL  Pointer to a buffer of EFI_FIRMWARE_IMAGE_DESCRIPTOR structures
+                 allocated using AllocatePool().  Caller must free buffer with
+                 FreePool().
+**/
+EFI_FIRMWARE_IMAGE_DESCRIPTOR *
+GetFmpImageDescriptors (
+  IN  EFI_HANDLE  Handle,
+  IN  EFI_GUID    *ProtocolGuid,
+  OUT UINT8       *FmpImageInfoCount,
+  OUT UINTN       *DescriptorSize
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *Fmp;
+  UINTN                             ImageInfoSize;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR     *FmpImageInfoBuf;
+  UINT32                            FmpImageInfoDescriptorVer;
+  UINT32                            PackageVersion;
+  CHAR16                            *PackageVersionName;
+
+  *FmpImageInfoCount = 0;
+  *DescriptorSize    = 0;
+
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  ProtocolGuid,
+                  (VOID **)&Fmp
+                  );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  //
+  // Determine the size required for the set of EFI_FIRMWARE_IMAGE_DESCRIPTORs.
+  //
+  ImageInfoSize = 0;
+  Status = Fmp->GetImageInfo (
+                  Fmp,                         // FMP Pointer
+                  &ImageInfoSize,              // Buffer Size (in this case 0)
+                  NULL,                        // NULL so we can get size
+                  &FmpImageInfoDescriptorVer,  // DescriptorVersion
+                  FmpImageInfoCount,           // DescriptorCount
+                  DescriptorSize,              // DescriptorSize
+                  &PackageVersion,             // PackageVersion
+                  &PackageVersionName          // PackageVersionName
+                  );
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    DEBUG ((DEBUG_ERROR, "SystemFirmwareUpdateDxe: Unexpected Failure.  Status = %r\n", Status));
+    return NULL;
+  }
+
+  //
+  // Allocate buffer for the set of EFI_FIRMWARE_IMAGE_DESCRIPTORs.
+  //
+  FmpImageInfoBuf = NULL;
+  FmpImageInfoBuf = AllocateZeroPool (ImageInfoSize);
+  if (FmpImageInfoBuf == NULL) {
+    DEBUG ((DEBUG_ERROR, "SystemFirmwareUpdateDxe: Failed to allocate memory for descriptors.\n"));
+    return NULL;
+  }
+
+  //
+  // Retrieve the set of EFI_FIRMWARE_IMAGE_DESCRIPTORs.
+  //
+  PackageVersionName = NULL;
+  Status = Fmp->GetImageInfo (
+                  Fmp,
+                  &ImageInfoSize,              // ImageInfoSize
+                  FmpImageInfoBuf,             // ImageInfo
+                  &FmpImageInfoDescriptorVer,  // DescriptorVersion
+                  FmpImageInfoCount,           // DescriptorCount
+                  DescriptorSize,              // DescriptorSize
+                  &PackageVersion,             // PackageVersion
+                  &PackageVersionName          // PackageVersionName
+                  );
+
+  //
+  // Free unused PackageVersionName return buffer
+  //
+  if (PackageVersionName != NULL) {
+    FreePool (PackageVersionName);
+    PackageVersionName = NULL;
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "SystemFirmwareUpdateDxe: Failure in GetImageInfo.  Status = %r\n", Status));
+    if (FmpImageInfoBuf != NULL) {
+      FreePool (FmpImageInfoBuf);
+    }
+    return NULL;
+  }
+
+  return FmpImageInfoBuf;
+}
+
+/**
+  Search for handles with an FMP protocol whose EFI_FIRMWARE_IMAGE_DESCRIPTOR
+  ImageTypeId matches the ImageTypeId produced by this module.
+
+  @param[in]  ProtocolGuid  Pointer to the GUID of the protocol to search.
+  @param[out] HandleCount   Pointer to the number of returned handles.
+
+  @return NULL   No matching handles found.
+  @return !NULL  Pointer to a buffer of handles allocated using AllocatePool().
+                 Caller must free buffer with FreePool().
+**/
+EFI_HANDLE *
+FindMatchingFmpHandles (
+  IN  EFI_GUID  *ProtocolGuid,
+  OUT UINTN     *HandleCount
+  )
+{
+  EFI_STATUS                     Status;
+  EFI_HANDLE                     *HandleBuffer;
+  UINTN                          Index;
+  UINTN                          Index2;
+  UINTN                          Index3;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR  *OriginalFmpImageInfoBuf;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR  *FmpImageInfoBuf;
+  UINT8                          FmpImageInfoCount;
+  UINTN                          DescriptorSize;
+  BOOLEAN                        MatchFound;
+
+  *HandleCount  = 0;
+  HandleBuffer = NULL;
+  Status = gBS->LocateHandleBuffer (
+                   ByProtocol,
+                   ProtocolGuid,
+                   NULL,
+                   HandleCount,
+                   &HandleBuffer
+                   );
+  if (EFI_ERROR (Status)) {
+    *HandleCount  = 0;
+    return NULL;
+  }
+
+  for (Index = 0; Index < *HandleCount; Index++) {
+    OriginalFmpImageInfoBuf = GetFmpImageDescriptors (
+                                HandleBuffer[Index],
+                                ProtocolGuid,
+                                &FmpImageInfoCount,
+                                &DescriptorSize
+                                );
+
+    //
+    // Loop through the set of EFI_FIRMWARE_IMAGE_DESCRIPTORs.
+    //
+    FmpImageInfoBuf = OriginalFmpImageInfoBuf;
+    MatchFound = FALSE;
+    for (Index2 = 0; Index2 < FmpImageInfoCount; Index2++) {
+      for (Index3 = 0; Index3 < mSystemFmpPrivate->DescriptorCount; Index3++) {
+        MatchFound = CompareGuid (
+                       &FmpImageInfoBuf->ImageTypeId,
+                       &mSystemFmpPrivate->ImageDescriptor[Index3].ImageTypeId
+                       );
+        if (MatchFound) {
+          break;
+        }
+      }
+      if (MatchFound) {
+        break;
+      }
+      //
+      // Increment the buffer pointer ahead by the size of the descriptor
+      //
+      FmpImageInfoBuf = (EFI_FIRMWARE_IMAGE_DESCRIPTOR *)(((UINT8 *)FmpImageInfoBuf) + DescriptorSize);
+    }
+    if (!MatchFound) {
+      HandleBuffer[Index] = NULL;
+    }
+
+    FreePool (OriginalFmpImageInfoBuf);
+  }
+  return HandleBuffer;
+}
+
+/**
+  Uninstall System FMP Protocol instances that may have been installed by
+  SystemFirmwareUpdateDxe drivers dispatches by other capsules.
+
+  @retval EFI_SUCCESS  All System FMP Protocols found were uninstalled.
+  @return Other        One or more System FMP Protocols could not be uninstalled.
+
+**/
+EFI_STATUS
+UninstallMatchingSystemFmpProtocols (
+  VOID
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_HANDLE                        *HandleBuffer;
+  UINTN                             HandleCount;
+  UINTN                             Index;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *SystemFmp;
+
+  //
+  // Uninstall SystemFmpProtocol instances that may have been produced by
+  // the SystemFirmwareUpdate drivers in FVs dispatched by other capsules.
+  //
+  HandleBuffer = FindMatchingFmpHandles (
+                   &gSystemFmpProtocolGuid,
+                   &HandleCount
+                   );
+  DEBUG ((DEBUG_INFO, "SystemFirmwareUpdateDxe: Found %d matching System FMP instances\n", HandleCount));
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol(
+                    HandleBuffer[Index],
+                    &gSystemFmpProtocolGuid,
+                    (VOID **)&SystemFmp
+                    );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+    DEBUG ((DEBUG_INFO, "SystemFirmwareUpdateDxe: Uninstall SystemFmp produced by another capsule\n"));
+    Status = gBS->UninstallProtocolInterface (
+                    HandleBuffer[Index],
+                    &gSystemFmpProtocolGuid,
+                    SystemFmp
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "SystemFirmwareUpdateDxe: Failed to uninstall SystemFmp %r.  Exiting.\n", Status));
+      FreePool (HandleBuffer);
+      return Status;
+    }
+  }
+  if (HandleBuffer != NULL) {
+    FreePool (HandleBuffer);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   System FMP module entrypoint
 
-  @param  ImageHandle       The firmware allocated handle for the EFI image.
-  @param  SystemTable       A pointer to the EFI System Table.
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
+  @param[in] SystemTable  A pointer to the EFI System Table.
 
-  @return EFI_SUCCESS System FMP module is initialized.
+  @retval EFI_SUCCESS           System FMP module is initialized.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources avaulable to
+                                initialize this module.
+  @retval Other                 System FMP Protocols could not be uninstalled.
+  @retval Other                 System FMP Protocol could not be installed.
+  @retval Other                 FMP Protocol could not be installed.
 **/
 EFI_STATUS
 EFIAPI
 SystemFirmwareUpdateMainDxe (
-  IN EFI_HANDLE                         ImageHandle,
-  IN EFI_SYSTEM_TABLE                   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                                      Status;
+  EFI_STATUS  Status;
+  EFI_HANDLE  *HandleBuffer;
+  UINTN       HandleCount;
 
   //
   // Initialize SystemFmpPrivateData
   //
-  mSystemFmpPrivate = AllocateZeroPool (sizeof(SYSTEM_FMP_PRIVATE_DATA));
+  mSystemFmpPrivate = AllocateZeroPool (sizeof (SYSTEM_FMP_PRIVATE_DATA));
   if (mSystemFmpPrivate == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = InitializePrivateData(mSystemFmpPrivate);
-  if (EFI_ERROR(Status)) {
-    FreePool(mSystemFmpPrivate);
+  Status = InitializePrivateData (mSystemFmpPrivate);
+  if (EFI_ERROR (Status)) {
+    FreePool (mSystemFmpPrivate);
     mSystemFmpPrivate = NULL;
     return Status;
   }
 
   //
-  // Install FMP protocol.
+  // Uninstall SystemFmpProtocol instances that may have been produced by
+  // the SystemFirmwareUpdate drivers in FVs dispatched by other capsules.
   //
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mSystemFmpPrivate->Handle,
-                  &gEfiFirmwareManagementProtocolGuid,
-                  &mSystemFmpPrivate->Fmp,
-                  &gSystemFmpProtocolGuid,
-                  &mSystemFmpPrivate->Fmp,
-                  NULL
-                  );
+  Status = UninstallMatchingSystemFmpProtocols ();
   if (EFI_ERROR (Status)) {
-    FreePool(mSystemFmpPrivate);
+    FreePool (mSystemFmpPrivate);
     mSystemFmpPrivate = NULL;
     return Status;
+  }
+
+  //
+  // Look for a handle with matching Firmware Management Protocol
+  //
+  HandleCount = 0;
+  HandleBuffer = FindMatchingFmpHandles (
+                   &gEfiFirmwareManagementProtocolGuid,
+                   &HandleCount
+                   );
+  DEBUG ((DEBUG_INFO, "SystemFirmwareUpdateDxe: Found %d matching FMP instances\n", HandleCount));
+
+  switch (HandleCount) {
+  case 0:
+    //
+    // Install FMP protocol onto a new handle.
+    //
+    DEBUG ((DEBUG_INFO, "SystemFirmwareUpdateDxe: Install FMP onto a new handle\n"));
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mSystemFmpPrivate->Handle,
+                    &gEfiFirmwareManagementProtocolGuid,
+                    &mSystemFmpPrivate->Fmp,
+                    NULL
+                    );
+    break;
+  case 1:
+    //
+    // Install System FMP protocol onto handle with matching FMP Protocol
+    //
+    DEBUG ((DEBUG_INFO, "SystemFirmwareUpdateDxe: Install System FMP onto matching FMP handle\n"));
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &HandleBuffer[0],
+                    &gSystemFmpProtocolGuid,
+                    &mSystemFmpPrivate->Fmp,
+                    NULL
+                    );
+    break;
+  default:
+    //
+    // More than one matching handle is not expected.  Unload driver.
+    //
+    DEBUG ((DEBUG_ERROR, "SystemFirmwareUpdateDxe: More than one matching FMP handle.  Unload driver.\n"));
+    Status = EFI_DEVICE_ERROR;
+    break;
+  }
+
+  if (HandleBuffer != NULL) {
+    FreePool (HandleBuffer);
+  }
+
+  if (EFI_ERROR (Status)) {
+    FreePool (mSystemFmpPrivate);
+    mSystemFmpPrivate = NULL;
   }
 
   return Status;
