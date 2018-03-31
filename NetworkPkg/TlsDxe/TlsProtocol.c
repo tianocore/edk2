@@ -60,6 +60,7 @@ TlsSetSessionData (
   EFI_STATUS                Status;
   TLS_INSTANCE              *Instance;
   UINT16                    *CipherId;
+  CONST EFI_TLS_CIPHER      *TlsCipherList;
   UINTN                     CipherCount;
   UINTN                     Index;
 
@@ -113,9 +114,11 @@ TlsSetSessionData (
       goto ON_EXIT;
     }
 
+    TlsCipherList = (CONST EFI_TLS_CIPHER *) Data;
     CipherCount = DataSize / sizeof (EFI_TLS_CIPHER);
     for (Index = 0; Index < CipherCount; Index++) {
-      *(CipherId +Index) = HTONS (*(((UINT16 *) Data) + Index));
+      CipherId[Index] = ((TlsCipherList[Index].Data1 << 8) |
+                         TlsCipherList[Index].Data2);
     }
 
     Status = TlsSetCipherList (Instance->TlsConn, CipherId, CipherCount);
