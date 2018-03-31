@@ -30,6 +30,8 @@ typedef struct {
 // The mapping table between IANA/IETF Cipher Suite definitions and
 // OpenSSL-used Cipher Suite name.
 //
+// Keep the table uniquely sorted by the IanaCipher field, in increasing order.
+//
 STATIC CONST TLS_CIPHER_MAPPING TlsCipherMappingTable[] = {
   { 0x0001, "NULL-MD5" },                 /// TLS_RSA_WITH_NULL_MD5
   { 0x0002, "NULL-SHA" },                 /// TLS_RSA_WITH_NULL_SHA
@@ -71,22 +73,30 @@ TlsGetCipherMapping (
   IN     UINT16                   CipherId
   )
 {
-  CONST TLS_CIPHER_MAPPING  *CipherEntry;
-  UINTN                     TableSize;
-  UINTN                     Index;
-
-  CipherEntry = TlsCipherMappingTable;
-  TableSize = sizeof (TlsCipherMappingTable) / sizeof (TLS_CIPHER_MAPPING);
+  INTN                      Left;
+  INTN                      Right;
+  INTN                      Middle;
 
   //
-  // Search Cipher Mapping Table for IANA-OpenSSL Cipher Translation
+  // Binary Search Cipher Mapping Table for IANA-OpenSSL Cipher Translation
   //
-  for (Index = 0; Index < TableSize; Index++, CipherEntry++) {
-    //
-    // Translate IANA cipher suite name to OpenSSL name.
-    //
-    if (CipherEntry->IanaCipher == CipherId) {
-      return CipherEntry;
+  Left  = 0;
+  Right = ARRAY_SIZE (TlsCipherMappingTable) - 1;
+
+  while (Right >= Left) {
+    Middle = (Left + Right) / 2;
+
+    if (CipherId == TlsCipherMappingTable[Middle].IanaCipher) {
+      //
+      // Translate IANA cipher suite ID to OpenSSL name.
+      //
+      return &TlsCipherMappingTable[Middle];
+    }
+
+    if (CipherId < TlsCipherMappingTable[Middle].IanaCipher) {
+      Right = Middle - 1;
+    } else {
+      Left  = Middle + 1;
     }
   }
 
