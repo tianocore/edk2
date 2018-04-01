@@ -24,13 +24,13 @@ typedef struct {
   // OpenSSL-used Cipher Suite String
   //
   CONST CHAR8                     *OpensslCipher;
-} TLS_CIPHER_PAIR;
+} TLS_CIPHER_MAPPING;
 
 //
 // The mapping table between IANA/IETF Cipher Suite definitions and
 // OpenSSL-used Cipher Suite name.
 //
-STATIC CONST TLS_CIPHER_PAIR TlsCipherMappingTable[] = {
+STATIC CONST TLS_CIPHER_MAPPING TlsCipherMappingTable[] = {
   { 0x0001, "NULL-MD5" },                 /// TLS_RSA_WITH_NULL_MD5
   { 0x0002, "NULL-SHA" },                 /// TLS_RSA_WITH_NULL_SHA
   { 0x0004, "RC4-MD5" },                  /// TLS_RSA_WITH_RC4_128_MD5
@@ -57,26 +57,26 @@ STATIC CONST TLS_CIPHER_PAIR TlsCipherMappingTable[] = {
 };
 
 /**
-  Gets the OpenSSL cipher suite string for the supplied IANA TLS cipher suite.
+  Gets the OpenSSL cipher suite mapping for the supplied IANA TLS cipher suite.
 
   @param[in]  CipherId    The supplied IANA TLS cipher suite ID.
 
-  @return  The corresponding OpenSSL cipher suite string if found,
+  @return  The corresponding OpenSSL cipher suite mapping if found,
            NULL otherwise.
 
 **/
 STATIC
-CONST CHAR8 *
-TlsGetCipherString (
+CONST TLS_CIPHER_MAPPING *
+TlsGetCipherMapping (
   IN     UINT16                   CipherId
   )
 {
-  CONST TLS_CIPHER_PAIR  *CipherEntry;
-  UINTN                  TableSize;
-  UINTN                  Index;
+  CONST TLS_CIPHER_MAPPING  *CipherEntry;
+  UINTN                     TableSize;
+  UINTN                     Index;
 
   CipherEntry = TlsCipherMappingTable;
-  TableSize = sizeof (TlsCipherMappingTable) / sizeof (TLS_CIPHER_PAIR);
+  TableSize = sizeof (TlsCipherMappingTable) / sizeof (TLS_CIPHER_MAPPING);
 
   //
   // Search Cipher Mapping Table for IANA-OpenSSL Cipher Translation
@@ -86,7 +86,7 @@ TlsGetCipherString (
     // Translate IANA cipher suite name to OpenSSL name.
     //
     if (CipherEntry->IanaCipher == CipherId) {
-      return CipherEntry->OpensslCipher;
+      return CipherEntry;
     }
   }
 
@@ -229,16 +229,18 @@ TlsSetCipherList (
   IN     UINTN                    CipherNum
   )
 {
-  TLS_CONNECTION  *TlsConn;
-  UINTN           Index;
-  CONST CHAR8     *MappingName;
-  CHAR8           CipherString[500];
+  TLS_CONNECTION           *TlsConn;
+  UINTN                    Index;
+  CONST TLS_CIPHER_MAPPING *Mapping;
+  CONST CHAR8              *MappingName;
+  CHAR8                    CipherString[500];
 
   TlsConn = (TLS_CONNECTION *) Tls;
   if (TlsConn == NULL || TlsConn->Ssl == NULL || CipherId == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
+  Mapping     = NULL;
   MappingName = NULL;
 
   memset (CipherString, 0, sizeof (CipherString));
@@ -247,10 +249,11 @@ TlsSetCipherList (
     //
     // Handling OpenSSL / RFC Cipher name mapping.
     //
-    MappingName = TlsGetCipherString (*(CipherId + Index));
-    if (MappingName == NULL) {
+    Mapping = TlsGetCipherMapping (*(CipherId + Index));
+    if (Mapping == NULL) {
       return EFI_UNSUPPORTED;
     }
+    MappingName = Mapping->OpensslCipher;
 
     if (Index != 0) {
       //
