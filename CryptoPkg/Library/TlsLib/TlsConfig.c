@@ -24,7 +24,19 @@ typedef struct {
   // OpenSSL-used Cipher Suite String
   //
   CONST CHAR8                     *OpensslCipher;
+  //
+  // Length of OpensslCipher
+  //
+  UINTN                           OpensslCipherLength;
 } TLS_CIPHER_MAPPING;
+
+//
+// Create a TLS_CIPHER_MAPPING initializer from IanaCipher and OpensslCipher so
+// that OpensslCipherLength is filled in automatically. IanaCipher must be an
+// integer constant expression, and OpensslCipher must be a string literal.
+//
+#define MAP(IanaCipher, OpensslCipher) \
+  { (IanaCipher), (OpensslCipher), sizeof (OpensslCipher) - 1 }
 
 //
 // The mapping table between IANA/IETF Cipher Suite definitions and
@@ -33,29 +45,29 @@ typedef struct {
 // Keep the table uniquely sorted by the IanaCipher field, in increasing order.
 //
 STATIC CONST TLS_CIPHER_MAPPING TlsCipherMappingTable[] = {
-  { 0x0001, "NULL-MD5" },                 /// TLS_RSA_WITH_NULL_MD5
-  { 0x0002, "NULL-SHA" },                 /// TLS_RSA_WITH_NULL_SHA
-  { 0x0004, "RC4-MD5" },                  /// TLS_RSA_WITH_RC4_128_MD5
-  { 0x0005, "RC4-SHA" },                  /// TLS_RSA_WITH_RC4_128_SHA
-  { 0x000A, "DES-CBC3-SHA" },             /// TLS_RSA_WITH_3DES_EDE_CBC_SHA, mandatory TLS 1.1
-  { 0x0016, "DHE-RSA-DES-CBC3-SHA" },     /// TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA
-  { 0x002F, "AES128-SHA" },               /// TLS_RSA_WITH_AES_128_CBC_SHA, mandatory TLS 1.2
-  { 0x0030, "DH-DSS-AES128-SHA" },        /// TLS_DH_DSS_WITH_AES_128_CBC_SHA
-  { 0x0031, "DH-RSA-AES128-SHA" },        /// TLS_DH_RSA_WITH_AES_128_CBC_SHA
-  { 0x0033, "DHE-RSA-AES128-SHA" },       /// TLS_DHE_RSA_WITH_AES_128_CBC_SHA
-  { 0x0035, "AES256-SHA" },               /// TLS_RSA_WITH_AES_256_CBC_SHA
-  { 0x0036, "DH-DSS-AES256-SHA" },        /// TLS_DH_DSS_WITH_AES_256_CBC_SHA
-  { 0x0037, "DH-RSA-AES256-SHA" },        /// TLS_DH_RSA_WITH_AES_256_CBC_SHA
-  { 0x0039, "DHE-RSA-AES256-SHA" },       /// TLS_DHE_RSA_WITH_AES_256_CBC_SHA
-  { 0x003B, "NULL-SHA256" },              /// TLS_RSA_WITH_NULL_SHA256
-  { 0x003C, "AES128-SHA256" },            /// TLS_RSA_WITH_AES_128_CBC_SHA256
-  { 0x003D, "AES256-SHA256" },            /// TLS_RSA_WITH_AES_256_CBC_SHA256
-  { 0x003E, "DH-DSS-AES128-SHA256" },     /// TLS_DH_DSS_WITH_AES_128_CBC_SHA256
-  { 0x003F, "DH-RSA-AES128-SHA256" },     /// TLS_DH_RSA_WITH_AES_128_CBC_SHA256
-  { 0x0067, "DHE-RSA-AES128-SHA256" },    /// TLS_DHE_RSA_WITH_AES_128_CBC_SHA256
-  { 0x0068, "DH-DSS-AES256-SHA256" },     /// TLS_DH_DSS_WITH_AES_256_CBC_SHA256
-  { 0x0069, "DH-RSA-AES256-SHA256" },     /// TLS_DH_RSA_WITH_AES_256_CBC_SHA256
-  { 0x006B, "DHE-RSA-AES256-SHA256" }     /// TLS_DHE_RSA_WITH_AES_256_CBC_SHA256
+  MAP ( 0x0001, "NULL-MD5" ),                       /// TLS_RSA_WITH_NULL_MD5
+  MAP ( 0x0002, "NULL-SHA" ),                       /// TLS_RSA_WITH_NULL_SHA
+  MAP ( 0x0004, "RC4-MD5" ),                        /// TLS_RSA_WITH_RC4_128_MD5
+  MAP ( 0x0005, "RC4-SHA" ),                        /// TLS_RSA_WITH_RC4_128_SHA
+  MAP ( 0x000A, "DES-CBC3-SHA" ),                   /// TLS_RSA_WITH_3DES_EDE_CBC_SHA, mandatory TLS 1.1
+  MAP ( 0x0016, "DHE-RSA-DES-CBC3-SHA" ),           /// TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA
+  MAP ( 0x002F, "AES128-SHA" ),                     /// TLS_RSA_WITH_AES_128_CBC_SHA, mandatory TLS 1.2
+  MAP ( 0x0030, "DH-DSS-AES128-SHA" ),              /// TLS_DH_DSS_WITH_AES_128_CBC_SHA
+  MAP ( 0x0031, "DH-RSA-AES128-SHA" ),              /// TLS_DH_RSA_WITH_AES_128_CBC_SHA
+  MAP ( 0x0033, "DHE-RSA-AES128-SHA" ),             /// TLS_DHE_RSA_WITH_AES_128_CBC_SHA
+  MAP ( 0x0035, "AES256-SHA" ),                     /// TLS_RSA_WITH_AES_256_CBC_SHA
+  MAP ( 0x0036, "DH-DSS-AES256-SHA" ),              /// TLS_DH_DSS_WITH_AES_256_CBC_SHA
+  MAP ( 0x0037, "DH-RSA-AES256-SHA" ),              /// TLS_DH_RSA_WITH_AES_256_CBC_SHA
+  MAP ( 0x0039, "DHE-RSA-AES256-SHA" ),             /// TLS_DHE_RSA_WITH_AES_256_CBC_SHA
+  MAP ( 0x003B, "NULL-SHA256" ),                    /// TLS_RSA_WITH_NULL_SHA256
+  MAP ( 0x003C, "AES128-SHA256" ),                  /// TLS_RSA_WITH_AES_128_CBC_SHA256
+  MAP ( 0x003D, "AES256-SHA256" ),                  /// TLS_RSA_WITH_AES_256_CBC_SHA256
+  MAP ( 0x003E, "DH-DSS-AES128-SHA256" ),           /// TLS_DH_DSS_WITH_AES_128_CBC_SHA256
+  MAP ( 0x003F, "DH-RSA-AES128-SHA256" ),           /// TLS_DH_RSA_WITH_AES_128_CBC_SHA256
+  MAP ( 0x0067, "DHE-RSA-AES128-SHA256" ),          /// TLS_DHE_RSA_WITH_AES_128_CBC_SHA256
+  MAP ( 0x0068, "DH-DSS-AES256-SHA256" ),           /// TLS_DH_DSS_WITH_AES_256_CBC_SHA256
+  MAP ( 0x0069, "DH-RSA-AES256-SHA256" ),           /// TLS_DH_RSA_WITH_AES_256_CBC_SHA256
+  MAP ( 0x006B, "DHE-RSA-AES256-SHA256" ),          /// TLS_DHE_RSA_WITH_AES_256_CBC_SHA256
 };
 
 /**
