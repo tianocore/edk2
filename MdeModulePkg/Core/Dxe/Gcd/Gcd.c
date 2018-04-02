@@ -48,8 +48,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define NONEXCLUSIVE_MEMORY_ATTRIBUTES (EFI_MEMORY_XP | EFI_MEMORY_RP | \
                                         EFI_MEMORY_RO)
 
-#define INVALID_CPU_ARCH_ATTRIBUTES   0xffffffff
-
 //
 // Module Variables
 //
@@ -873,7 +871,21 @@ CoreConvertSpace (
     // Call CPU Arch Protocol to attempt to set attributes on the range
     //
     CpuArchAttributes = ConverToCpuArchAttributes (Attributes);
-    if (CpuArchAttributes != INVALID_CPU_ARCH_ATTRIBUTES) {
+    //
+    // CPU arch attributes include page attributes and cache attributes. 
+    // Only page attributes supports to be cleared, but not cache attributes.
+    // Caller is expected to use GetMemorySpaceDescriptor() to get the current
+    // attributes, AND/OR attributes, and then calls SetMemorySpaceAttributes()
+    // to set the new attributes.
+    // So 0 CPU arch attributes should not happen as memory should always have
+    // a cache attribute (no matter UC or WB, etc). 
+    //
+    // Here, 0 CPU arch attributes will be filtered to be compatible with the
+    // case that caller just calls SetMemorySpaceAttributes() with none CPU
+    // arch attributes (for example, RUNTIME) as the purpose of the case is not
+    // to clear CPU arch attributes.
+    //
+    if (CpuArchAttributes != 0) {
       if (gCpu == NULL) {
         Status = EFI_NOT_AVAILABLE_YET;
       } else {
@@ -936,6 +948,13 @@ CoreConvertSpace (
     // Set attributes operation
     //
     case GCD_SET_ATTRIBUTES_MEMORY_OPERATION:
+      if (CpuArchAttributes == 0) {
+        //
+        // Keep original CPU arch attributes when caller just calls
+        // SetMemorySpaceAttributes() with none CPU arch attributes (for example, RUNTIME).
+        //
+        Attributes |= (Entry->Attributes & (EXCLUSIVE_MEMORY_ATTRIBUTES | NONEXCLUSIVE_MEMORY_ATTRIBUTES));
+      }
       Entry->Attributes = Attributes;
       break;
     //
