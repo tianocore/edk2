@@ -8,7 +8,7 @@
   CheckImage(), GetPackageInfo(), and SetPackageInfo() shall return
   EFI_UNSUPPORTED if not supported by the driver.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2013 - 2014, Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -154,6 +154,7 @@ typedef struct {
 //
 // Image Compatibility Definitions
 //
+///
 /// Values from 0x0000000000000002 thru 0x000000000000FFFF are reserved for future assignments.
 /// Values from 0x0000000000010000 thru 0xFFFFFFFFFFFFFFFF are used by firmware vendor for
 /// compatibility check.
@@ -167,7 +168,7 @@ typedef struct {
 
 
 ///
-/// Image Attribute -Authentication Required
+/// Image Attribute - Authentication Required
 ///
 typedef struct {
   ///
@@ -330,7 +331,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_NOT_FOUND          The current image is not copied to the buffer.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 typedef
@@ -385,7 +386,7 @@ EFI_STATUS
   @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 typedef
@@ -417,7 +418,7 @@ EFI_STATUS
   @retval EFI_SUCCESS            The image was successfully checked.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 typedef
@@ -501,7 +502,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER  The PackageVersionName length is longer than the value
                                  returned in PackageVersionNameMaxLen.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 typedef
