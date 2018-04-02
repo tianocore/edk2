@@ -877,10 +877,11 @@ class PcdReport(object):
                     self.DscPcdDefault[(TokenCName, TokenSpaceGuidCName)] = DscDefaultValue
 
     def GenerateReport(self, File, ModulePcdSet):
-        if self.ConditionalPcds:
-            self.GenerateReportDetail(File, ModulePcdSet, 1)
-        if self.UnusedPcds:
-            self.GenerateReportDetail(File, ModulePcdSet, 2)
+        if not ModulePcdSet:
+            if self.ConditionalPcds:
+                self.GenerateReportDetail(File, ModulePcdSet, 1)
+            if self.UnusedPcds:
+                self.GenerateReportDetail(File, ModulePcdSet, 2)
         self.GenerateReportDetail(File, ModulePcdSet)
 
     ##
@@ -904,7 +905,7 @@ class PcdReport(object):
         elif ReportSubType == 2:
             PcdDict = self.UnusedPcds
 
-        if ModulePcdSet is None:
+        if not ModulePcdSet:
             FileWrite(File, gSectionStart)
             if ReportSubType == 1:
                 FileWrite(File, "Conditional Directives used by the build system")
