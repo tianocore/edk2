@@ -971,6 +971,7 @@ class PcdReport(object):
                         if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type) not in ModulePcdSet:
                             continue
                         InfDefault, PcdValue = ModulePcdSet[Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type]
+                        Pcd.DefaultValue = PcdValue
                         if InfDefault == "":
                             InfDefault = None
 
