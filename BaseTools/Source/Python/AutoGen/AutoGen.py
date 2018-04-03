@@ -50,6 +50,16 @@ from collections import OrderedDict
 ## Regular expression for splitting Dependency Expression string into tokens
 gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
 
+## Regular expression for match: PCD(xxxx.yyy)
+gPCDAsGuidPattern = re.compile(r"^PCD\(.+\..+\)$")
+
+#
+# Regular expression for finding Include Directories, the difference between MSFT and INTEL/GCC/RVCT
+# is the former use /I , the Latter used -I to specify include directories
+#
+gBuildOptIncludePatternMsft = re.compile(r"(?:.*?)/I[ \t]*([^ ]*)", re.MULTILINE | re.DOTALL)
+gBuildOptIncludePatternOther = re.compile(r"(?:.*?)-I[ \t]*([^ ]*)", re.MULTILINE | re.DOTALL)
+
 #
 # Match name = variable
 #
@@ -819,13 +829,11 @@ class WorkspaceAutoGen(AutoGen):
                         InfFoundFlag = False
 
                 if FfsFile.NameGuid is not None:
-                    _CheckPCDAsGuidPattern = re.compile("^PCD\(.+\..+\)$")
-
                     #
                     # If the NameGuid reference a PCD name. 
                     # The style must match: PCD(xxxx.yyy)
                     #
-                    if _CheckPCDAsGuidPattern.match(FfsFile.NameGuid):
+                    if gPCDAsGuidPattern.match(FfsFile.NameGuid):
                         #
                         # Replace the PCD value.
                         #
@@ -3316,9 +3324,9 @@ class ModuleAutoGen(AutoGen):
             # is the former use /I , the Latter used -I to specify include directories
             #
             if self.PlatformInfo.ToolChainFamily in ('MSFT'):
-                gBuildOptIncludePattern = re.compile(r"(?:.*?)/I[ \t]*([^ ]*)", re.MULTILINE | re.DOTALL)
+                BuildOptIncludeRegEx = gBuildOptIncludePatternMsft
             elif self.PlatformInfo.ToolChainFamily in ('INTEL', 'GCC', 'RVCT'):
-                gBuildOptIncludePattern = re.compile(r"(?:.*?)-I[ \t]*([^ ]*)", re.MULTILINE | re.DOTALL)
+                BuildOptIncludeRegEx = gBuildOptIncludePatternOther
             else:
                 #
                 # New ToolChainFamily, don't known whether there is option to specify include directories
@@ -3335,13 +3343,13 @@ class ModuleAutoGen(AutoGen):
                     FlagOption = ''
                 
                 if self.PlatformInfo.ToolChainFamily != 'RVCT':
-                    IncPathList = [NormPath(Path, self.Macros) for Path in gBuildOptIncludePattern.findall(FlagOption)]
+                    IncPathList = [NormPath(Path, self.Macros) for Path in BuildOptIncludeRegEx.findall(FlagOption)]
                 else:
                     #
                     # RVCT may specify a list of directory seperated by commas
                     #
                     IncPathList = []
-                    for Path in gBuildOptIncludePattern.findall(FlagOption):
+                    for Path in BuildOptIncludeRegEx.findall(FlagOption):
                         PathList = GetSplitList(Path, TAB_COMMA_SPLIT)
                         IncPathList += [NormPath(PathEntry, self.Macros) for PathEntry in PathList]
 
