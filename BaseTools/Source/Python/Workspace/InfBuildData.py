@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -17,6 +17,7 @@ from Common.DataType import *
 from Common.Misc import *
 from types import *
 from MetaFileParser import *
+from collections import OrderedDict
 
 from Workspace.BuildClassObject import ModuleBuildClassObject, LibraryClassObject, PcdClassObject
 ## Module build information from INF file
@@ -156,7 +157,7 @@ class InfBuildData(ModuleBuildClassObject):
         self._ModuleUnloadImageList = None
         self._ConstructorList       = None
         self._DestructorList        = None
-        self._Defs                  = None
+        self._Defs                  = OrderedDict()
         self._Binaries              = None
         self._Sources               = None
         self._LibraryClasses        = None
@@ -166,7 +167,7 @@ class InfBuildData(ModuleBuildClassObject):
         self._Ppis                  = None
         self._PpiComments           = None
         self._Guids                 = None
-        self._GuidsUsedByPcd        = sdict()
+        self._GuidsUsedByPcd        = OrderedDict()
         self._GuidComments          = None
         self._Includes              = None
         self._Packages              = None
@@ -246,8 +247,6 @@ class InfBuildData(ModuleBuildClassObject):
             # items defined _PROPERTY_ don't need additional processing
             if Name in self:
                 self[Name] = Value
-                if self._Defs is None:
-                    self._Defs = sdict()
                 self._Defs[Name] = Value
                 self._Macros[Name] = Value
             # some special items in [Defines] section need special treatment
@@ -255,7 +254,7 @@ class InfBuildData(ModuleBuildClassObject):
                 if Name in ('EFI_SPECIFICATION_VERSION', 'UEFI_SPECIFICATION_VERSION'):
                     Name = 'UEFI_SPECIFICATION_VERSION'
                 if self._Specification is None:
-                    self._Specification = sdict()
+                    self._Specification = OrderedDict()
                 self._Specification[Name] = GetHexVerValue(Value)
                 if self._Specification[Name] is None:
                     EdkLogger.error("build", FORMAT_NOT_SUPPORTED,
@@ -307,8 +306,6 @@ class InfBuildData(ModuleBuildClassObject):
                                         File=self.MetaFile, Line=Record[-1])
                     self._CustomMakefile[TokenList[0]] = TokenList[1]
             else:
-                if self._Defs is None:
-                    self._Defs = sdict()
                 self._Defs[Name] = Value
                 self._Macros[Name] = Value
 
@@ -337,14 +334,14 @@ class InfBuildData(ModuleBuildClassObject):
                     EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "MM_CORE_STANDALONE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x00010032", File=self.MetaFile)
                 if self._ModuleType == SUP_MODULE_MM_STANDALONE:
                     EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "MM_STANDALONE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x00010032", File=self.MetaFile)
-            if self._Defs and 'PCI_DEVICE_ID' in self._Defs and 'PCI_VENDOR_ID' in self._Defs \
+            if 'PCI_DEVICE_ID' in self._Defs and 'PCI_VENDOR_ID' in self._Defs \
                and 'PCI_CLASS_CODE' in self._Defs and 'PCI_REVISION' in self._Defs:
                 self._BuildType = 'UEFI_OPTIONROM'
                 if 'PCI_COMPRESS' in self._Defs:
                     if self._Defs['PCI_COMPRESS'] not in ('TRUE', 'FALSE'):
                         EdkLogger.error("build", FORMAT_INVALID, "Expected TRUE/FALSE for PCI_COMPRESS: %s" % self.MetaFile)
 
-            elif self._Defs and 'UEFI_HII_RESOURCE_SECTION' in self._Defs \
+            elif 'UEFI_HII_RESOURCE_SECTION' in self._Defs \
                and self._Defs['UEFI_HII_RESOURCE_SECTION'] == 'TRUE':
                 self._BuildType = 'UEFI_HII'
             else:
@@ -398,7 +395,7 @@ class InfBuildData(ModuleBuildClassObject):
 #                                       File=self.MetaFile, Line=LineNo)
                     else:
                         if self._BuildOptions is None:
-                            self._BuildOptions = sdict()
+                            self._BuildOptions = OrderedDict()
 
                         if ToolList[0] in self._TOOL_CODE_:
                             Tool = self._TOOL_CODE_[ToolList[0]]
@@ -590,11 +587,8 @@ class InfBuildData(ModuleBuildClassObject):
 
     ## Retrieve definies other than above ones
     def _GetDefines(self):
-        if self._Defs is None:
-            if self._Header_ is None:
-                self._GetHeaderInfo()
-            if self._Defs is None:
-                self._Defs = sdict()
+        if len(self._Defs) == 0 and self._Header_ is None:
+            self._GetHeaderInfo()
         return self._Defs
 
     ## Retrieve binary files
@@ -688,7 +682,7 @@ class InfBuildData(ModuleBuildClassObject):
     ## Retrieve library classes employed by this module
     def _GetLibraryClassUses(self):
         if self._LibraryClasses is None:
-            self._LibraryClasses = sdict()
+            self._LibraryClasses = OrderedDict()
             RecordList = self._RawData[MODEL_EFI_LIBRARY_CLASS, self._Arch, self._Platform]
             for Record in RecordList:
                 Lib = Record[0]
@@ -717,8 +711,8 @@ class InfBuildData(ModuleBuildClassObject):
     ## Retrieve protocols consumed/produced by this module
     def _GetProtocols(self):
         if self._Protocols is None:
-            self._Protocols = sdict()
-            self._ProtocolComments = sdict()
+            self._Protocols = OrderedDict()
+            self._ProtocolComments = OrderedDict()
             RecordList = self._RawData[MODEL_EFI_PROTOCOL, self._Arch, self._Platform]
             for Record in RecordList:
                 CName = Record[0]
@@ -742,8 +736,8 @@ class InfBuildData(ModuleBuildClassObject):
     ## Retrieve PPIs consumed/produced by this module
     def _GetPpis(self):
         if self._Ppis is None:
-            self._Ppis = sdict()
-            self._PpiComments = sdict()
+            self._Ppis = OrderedDict()
+            self._PpiComments = OrderedDict()
             RecordList = self._RawData[MODEL_EFI_PPI, self._Arch, self._Platform]
             for Record in RecordList:
                 CName = Record[0]
@@ -767,8 +761,8 @@ class InfBuildData(ModuleBuildClassObject):
     ## Retrieve GUIDs consumed/produced by this module
     def _GetGuids(self):
         if self._Guids is None:
-            self._Guids = sdict()
-            self._GuidComments = sdict()
+            self._Guids = OrderedDict()
+            self._GuidComments = OrderedDict()
             RecordList = self._RawData[MODEL_EFI_GUID, self._Arch, self._Platform]
             for Record in RecordList:
                 CName = Record[0]
@@ -869,8 +863,8 @@ class InfBuildData(ModuleBuildClassObject):
     ## Retrieve PCDs used in this module
     def _GetPcds(self):
         if self._Pcds is None:
-            self._Pcds = sdict()
-            self._PcdComments = sdict()
+            self._Pcds = OrderedDict()
+            self._PcdComments = OrderedDict()
             self._Pcds.update(self._GetPcd(MODEL_PCD_FIXED_AT_BUILD))
             self._Pcds.update(self._GetPcd(MODEL_PCD_PATCHABLE_IN_MODULE))
             self._Pcds.update(self._GetPcd(MODEL_PCD_FEATURE_FLAG))
@@ -881,7 +875,7 @@ class InfBuildData(ModuleBuildClassObject):
     ## Retrieve build options specific to this module
     def _GetBuildOptions(self):
         if self._BuildOptions is None:
-            self._BuildOptions = sdict()
+            self._BuildOptions = OrderedDict()
             RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, self._Platform]
             for Record in RecordList:
                 ToolChainFamily = Record[0]
@@ -920,7 +914,7 @@ class InfBuildData(ModuleBuildClassObject):
                                         "'%s' module must specify the type of [Depex] section" % self.ModuleType,
                                         File=self.MetaFile)
 
-            Depex = sdict()
+            Depex = OrderedDict()
             for Record in RecordList:
                 DepexStr = ReplaceMacro(Record[0], self._Macros, False)
                 Arch = Record[3]
@@ -961,7 +955,7 @@ class InfBuildData(ModuleBuildClassObject):
         if self._DepexExpression is None:
             self._DepexExpression = tdict(False, 2)
             RecordList = self._RawData[MODEL_EFI_DEPEX, self._Arch]
-            DepexExpression = sdict()
+            DepexExpression = OrderedDict()
             for Record in RecordList:
                 DepexStr = ReplaceMacro(Record[0], self._Macros, False)
                 Arch = Record[3]
@@ -979,7 +973,7 @@ class InfBuildData(ModuleBuildClassObject):
         return self._GuidsUsedByPcd
     ## Retrieve PCD for given type
     def _GetPcd(self, Type):
-        Pcds = sdict()
+        Pcds = OrderedDict()
         PcdDict = tdict(True, 4)
         PcdList = []
         RecordList = self._RawData[Type, self._Arch, self._Platform]

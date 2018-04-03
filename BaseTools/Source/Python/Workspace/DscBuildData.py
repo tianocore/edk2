@@ -635,7 +635,7 @@ class DscBuildData(PlatformBuildClassObject):
     ## Retrieve [SkuIds] section information
     def _GetSkuIds(self):
         if self._SkuIds is None:
-            self._SkuIds = sdict()
+            self._SkuIds = OrderedDict()
             RecordList = self._RawData[MODEL_EFI_SKU_ID, self._Arch]
             for Record in RecordList:
                 if Record[0] in [None, '']:
@@ -662,7 +662,7 @@ class DscBuildData(PlatformBuildClassObject):
         return int(intstr,16) if intstr.upper().startswith("0X") else int(intstr)
     def _GetDefaultStores(self):
         if self.DefaultStores is None:
-            self.DefaultStores = sdict()
+            self.DefaultStores = OrderedDict()
             RecordList = self._RawData[MODEL_EFI_DEFAULT_STORES, self._Arch]
             for Record in RecordList:
                 if Record[0] in [None, '']:
@@ -692,7 +692,7 @@ class DscBuildData(PlatformBuildClassObject):
         if self._Modules is not None:
             return self._Modules
 
-        self._Modules = sdict()
+        self._Modules = OrderedDict()
         RecordList = self._RawData[MODEL_META_DATA_COMPONENT, self._Arch]
         Macros = self._Macros
         Macros["EDK_SOURCE"] = GlobalData.gEcpSource
@@ -1122,7 +1122,7 @@ class DscBuildData(PlatformBuildClassObject):
     ## Retrieve all PCD settings in platform
     def _GetPcds(self):
         if self._Pcds is None:
-            self._Pcds = sdict()
+            self._Pcds = OrderedDict()
             self.__ParsePcdFromCommandLine()
             self._Pcds.update(self._GetPcd(MODEL_PCD_FIXED_AT_BUILD))
             self._Pcds.update(self._GetPcd(MODEL_PCD_PATCHABLE_IN_MODULE))
@@ -1157,7 +1157,7 @@ class DscBuildData(PlatformBuildClassObject):
     ## Retrieve [BuildOptions]
     def _GetBuildOptions(self):
         if self._BuildOptions is None:
-            self._BuildOptions = sdict()
+            self._BuildOptions = OrderedDict()
             #
             # Retrieve build option for EDKII and EDK style module
             #
@@ -1179,9 +1179,9 @@ class DscBuildData(PlatformBuildClassObject):
 
     def GetBuildOptionsByModuleType(self, Edk, ModuleType):
         if self._ModuleTypeOptions is None:
-            self._ModuleTypeOptions = sdict()
+            self._ModuleTypeOptions = OrderedDict()
         if (Edk, ModuleType) not in self._ModuleTypeOptions:
-            options = sdict()
+            options = OrderedDict()
             self._ModuleTypeOptions[Edk, ModuleType] = options
             DriverType = '%s.%s' % (Edk, ModuleType)
             CommonDriverType = '%s.%s' % ('COMMON', ModuleType)
@@ -1446,7 +1446,7 @@ class DscBuildData(PlatformBuildClassObject):
     #   @retval a dict object contains settings of given PCD type
     #
     def _GetPcd(self, Type):
-        Pcds = sdict()
+        Pcds = OrderedDict()
         #
         # tdict is a special dict kind of type, used for selecting correct
         # PCD settings for certain ARCH
@@ -1457,7 +1457,7 @@ class DscBuildData(PlatformBuildClassObject):
         PcdSet = set()
         # Find out all possible PCD candidates for self._Arch
         RecordList = self._RawData[Type, self._Arch]
-        PcdValueDict = sdict()
+        PcdValueDict = OrderedDict()
         for TokenSpaceGuid, PcdCName, Setting, Arch, SkuName, Dummy3, Dummy4,Dummy5 in RecordList:
             SkuName = SkuName.upper()
             SkuName = 'DEFAULT' if SkuName == 'COMMON' else SkuName
@@ -2230,7 +2230,7 @@ class DscBuildData(PlatformBuildClassObject):
     def _GetDynamicPcd(self, Type):
 
 
-        Pcds = sdict()
+        Pcds = OrderedDict()
         #
         # tdict is a special dict kind of type, used for selecting correct
         # PCD settings for certain ARCH and SKU
@@ -2395,7 +2395,7 @@ class DscBuildData(PlatformBuildClassObject):
 
         VariableAttrs = {}
 
-        Pcds = sdict()
+        Pcds = OrderedDict()
         #
         # tdict is a special dict kind of type, used for selecting correct
         # PCD settings for certain ARCH and SKU
@@ -2557,7 +2557,7 @@ class DscBuildData(PlatformBuildClassObject):
     def _GetDynamicVpdPcd(self, Type):
 
 
-        Pcds = sdict()
+        Pcds = OrderedDict()
         #
         # tdict is a special dict kind of type, used for selecting correct
         # PCD settings for certain ARCH and SKU

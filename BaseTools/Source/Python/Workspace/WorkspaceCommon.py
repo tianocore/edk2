@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-from Common.Misc import sdict
 from collections import OrderedDict, defaultdict
 from Common.DataType import SUP_MODULE_USER_DEFINED
 from BuildClassObject import LibraryClassObject
@@ -113,7 +112,7 @@ def _GetModuleLibraryInstances(Module, Platform, BuildDatabase, Arch, Target, To
     LibraryConsumerList = [Module]
     Constructor = []
     ConsumedByList = OrderedListDict()
-    LibraryInstance = sdict()
+    LibraryInstance = OrderedDict()
 
     while len(LibraryConsumerList) > 0:
         M = LibraryConsumerList.pop()
