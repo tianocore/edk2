@@ -14,7 +14,7 @@
 # Import Modules
 #
 from CommonClass import *
-from Common.Misc import sdict
+from collections import OrderedDict
 
 ## PackageHeaderClass
 #
@@ -107,7 +107,7 @@ class PackageClass(object):
         self.IndustryStdHeaders = []
         self.ModuleFiles = []
         # {[Guid, Value, Path(relative to WORKSPACE)]: ModuleClassObj}
-        self.Modules = sdict()
+        self.Modules = OrderedDict()
         self.PackageIncludePkgHeaders = []
         self.GuidDeclarations = []
         self.ProtocolDeclarations = []

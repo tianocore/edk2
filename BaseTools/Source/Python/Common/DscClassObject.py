@@ -25,7 +25,7 @@ from Dictionary import *
 from CommonDataClass.PlatformClass import *
 from CommonDataClass.CommonClass import SkuInfoClass
 from BuildToolError import *
-from Misc import sdict
+from collections import OrderedDict
 import GlobalData
 from Table.TableDsc import TableDsc
 from Common.LongFilePathSupport import OpenLongFilePath as open
@@ -732,7 +732,7 @@ class Dsc(object):
     #
     def GenComponents(self, ContainerFile):
         EdkLogger.debug(2, "Generate %s ..." % TAB_COMPONENTS)
-        Components = sdict()
+        Components = OrderedDict()
         #
         # Get all include files
         #

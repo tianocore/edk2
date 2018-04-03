@@ -22,7 +22,7 @@ from DecClassObject import *
 from DscClassObject import *
 from String import *
 from BuildToolError import *
-from Misc import sdict
+from collections import OrderedDict
 import Database as Database
 import time as time
 
@@ -189,7 +189,7 @@ class ModuleBuildClassObject(object):
 
         self.Binaries                = []
         self.Sources                 = []
-        self.LibraryClasses          = sdict()
+        self.LibraryClasses          = OrderedDict()
         self.Libraries               = []
         self.Protocols               = []
         self.Ppis                    = []
@@ -955,8 +955,8 @@ class WorkspaceBuild(object):
         # EdkII module
         LibraryConsumerList = [Module]
         Constructor         = []
-        ConsumedByList      = sdict()
-        LibraryInstance     = sdict()
+        ConsumedByList      = OrderedDict()
+        LibraryInstance     = OrderedDict()
 
         EdkLogger.verbose("")
         EdkLogger.verbose("Library instances of module [%s] [%s]:" % (str(Module), Arch))
@@ -1097,7 +1097,7 @@ class WorkspaceBuild(object):
         # The DAG Topo sort produces the destructor order, so the list of constructors must generated in the reverse order
         #
         SortedLibraryList.reverse()
-        Module.LibraryClasses = sdict()
+        Module.LibraryClasses = OrderedDict()
         for L in SortedLibraryList:
             for Lc in L.LibraryClass:
                 Module.LibraryClasses[Lc.LibraryClass, ModuleType] = str(L)

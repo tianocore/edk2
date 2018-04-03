@@ -21,7 +21,6 @@ from Common.DataType import *
 from CommonDataClass.DataClass import *
 from Common.String import CleanString, GetSplitValueList, ReplaceMacro
 import EotGlobalData
-from Common.Misc import sdict
 from Common.String import GetSplitList
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
@@ -623,7 +622,7 @@ def SearchProtocols(SqlCommand, Table, SourceFileID, SourceFileFullPath, ItemMod
 #  @param ItemMode: Mode of item
 #
 def SearchFunctionCalling(Table, SourceFileID, SourceFileFullPath, ItemType, ItemMode):
-    LibraryList = sdict()
+    LibraryList = {}
     Db = EotGlobalData.gDb.TblReport
     Parameters, ItemName, GuidName, GuidMacro, GuidValue, BelongsToFunction = [], '', '', '', '', ''
     if ItemType == 'Protocol' and ItemMode == 'Produced':

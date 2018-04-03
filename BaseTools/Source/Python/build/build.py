@@ -53,6 +53,8 @@ import Common.EdkLogger
 import Common.GlobalData as GlobalData
 from GenFds.GenFds import GenFds
 
+from collections import OrderedDict
+
 # Version and Copyright
 VersionNumber = "0.60" + ' ' + gBUILD_VERSION
 __version__ = "%prog Version " + VersionNumber
@@ -438,19 +440,19 @@ class PlatformMakeUnit(BuildUnit):
 #
 class BuildTask:
     # queue for tasks waiting for schedule
-    _PendingQueue = sdict()
+    _PendingQueue = OrderedDict()
     _PendingQueueLock = threading.Lock()
 
     # queue for tasks ready for running
-    _ReadyQueue = sdict()
+    _ReadyQueue = OrderedDict()
     _ReadyQueueLock = threading.Lock()
 
     # queue for run tasks
-    _RunningQueue = sdict()
+    _RunningQueue = OrderedDict()
     _RunningQueueLock = threading.Lock()
 
     # queue containing all build tasks, in case duplicate build
-    _TaskQueue = sdict()
+    _TaskQueue = OrderedDict()
 
     # flag indicating error occurs in a running thread
     _ErrorFlag = threading.Event()

@@ -199,9 +199,9 @@ class DecBuildData(PackageBuildClassObject):
                 if Name not in NameList:
                     NameList.append(Name)
                 ProtocolDict[Arch, Name] = Guid
-            # use sdict to keep the order
-            self._Protocols = sdict()
-            self._PrivateProtocols = sdict()
+            # use OrderedDict to keep the order
+            self._Protocols = OrderedDict()
+            self._PrivateProtocols = OrderedDict()
             for Name in NameList:
                 #
                 # limit the ARCH to self._Arch, if no self._Arch found, tdict
@@ -241,9 +241,9 @@ class DecBuildData(PackageBuildClassObject):
                 if Name not in NameList:
                     NameList.append(Name)
                 PpiDict[Arch, Name] = Guid
-            # use sdict to keep the order
-            self._Ppis = sdict()
-            self._PrivatePpis = sdict()
+            # use OrderedDict to keep the order
+            self._Ppis = OrderedDict()
+            self._PrivatePpis = OrderedDict()
             for Name in NameList:
                 #
                 # limit the ARCH to self._Arch, if no self._Arch found, tdict
@@ -283,9 +283,9 @@ class DecBuildData(PackageBuildClassObject):
                 if Name not in NameList:
                     NameList.append(Name)
                 GuidDict[Arch, Name] = Guid
-            # use sdict to keep the order
-            self._Guids = sdict()
-            self._PrivateGuids = sdict()
+            # use OrderedDict to keep the order
+            self._Guids = OrderedDict()
+            self._PrivateGuids = OrderedDict()
             for Name in NameList:
                 #
                 # limit the ARCH to self._Arch, if no self._Arch found, tdict
@@ -350,7 +350,7 @@ class DecBuildData(PackageBuildClassObject):
                     EdkLogger.error('build', ErrorCode, ExtraData=ErrorInfo, File=self.MetaFile, Line=LineNo)
                 LibraryClassSet.add(LibraryClass)
                 LibraryClassDict[Arch, LibraryClass] = File
-            self._LibraryClasses = sdict()
+            self._LibraryClasses = OrderedDict()
             for LibraryClass in LibraryClassSet:
                 self._LibraryClasses[LibraryClass] = LibraryClassDict[self._Arch, LibraryClass]
         return self._LibraryClasses
@@ -358,7 +358,7 @@ class DecBuildData(PackageBuildClassObject):
     ## Retrieve PCD declarations
     def _GetPcds(self):
         if self._Pcds is None:
-            self._Pcds = sdict()
+            self._Pcds = OrderedDict()
             self._Pcds.update(self._GetPcd(MODEL_PCD_FIXED_AT_BUILD))
             self._Pcds.update(self._GetPcd(MODEL_PCD_PATCHABLE_IN_MODULE))
             self._Pcds.update(self._GetPcd(MODEL_PCD_FEATURE_FLAG))
@@ -399,7 +399,7 @@ class DecBuildData(PackageBuildClassObject):
 
     ## Retrieve PCD declarations for given type
     def _GetPcd(self, Type):
-        Pcds = sdict()
+        Pcds = OrderedDict()
         #
         # tdict is a special kind of dict, used for selecting correct
         # PCD declaration for given ARCH

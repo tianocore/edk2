@@ -13,7 +13,7 @@
 
 import Common.LongFilePathOs as os
 
-from Common.Misc import sdict
+from collections import OrderedDict
 from Common.Misc import RealPath2
 from Common.BuildToolError import *
 from Common.DataType import *
@@ -281,7 +281,7 @@ class ModuleBuildClassObject(object):
 
         self.Binaries                = []
         self.Sources                 = []
-        self.LibraryClasses          = sdict()
+        self.LibraryClasses          = OrderedDict()
         self.Libraries               = []
         self.Protocols               = []
         self.Ppis                    = []
