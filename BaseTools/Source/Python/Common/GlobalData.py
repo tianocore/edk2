@@ -63,6 +63,9 @@ gGuidPatternEnd = re.compile(r'{}$'.format(_GuidPattern))
 g4HexChar = re.compile(r'{}{{4}}'.format(_HexChar))
 gHexPattern = re.compile(r'0[xX]{}+'.format(_HexChar))
 
+## Regular expressions for string identifier checking
+gIdentifierPattern = re.compile('^[a-zA-Z][a-zA-Z0-9_]*$', re.UNICODE)
+
 #
 # A global variable for whether current build in AutoGen phase or not.
 #
