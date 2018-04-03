@@ -138,7 +138,6 @@ class FirmwareVolume(Image):
         self.FfsDict = sdict()
         self.OrderedFfsDict = sdict()
         self.UnDispatchedFfsDict = sdict()
-        self.NoDepexFfsDict = sdict()
         self.ProtocolList = sdict()
 
     def CheckArchProtocol(self):
@@ -283,26 +282,6 @@ class FirmwareVolume(Image):
                                 self.LoadProtocol(Db, GuidString)
 
         self.DisPatchDxe(Db)
-
-    def DisPatchNoDepexFfs(self, Db):
-        # Last Load Drivers without Depex
-        for FfsID in self.NoDepexFfsDict:
-            NewFfs = self.NoDepexFfsDict.pop(FfsID)
-            self.OrderedFfsDict[FfsID] = NewFfs
-            self.LoadProtocol(Db, FfsID)
-
-        return True
-
-    def LoadCallbackProtocol(self):
-        IsLoad = True
-        for Protocol in self.ProtocolList:
-            for Callback in self.ProtocolList[Protocol][1]:
-                if Callback[0] not in self.OrderedFfsDict.keys():
-                    IsLoad = False
-                    continue
-            if IsLoad:
-                EotGlobalData.gProtocolList[Protocol.lower()] = self.ProtocolList[Protocol][0]
-                self.ProtocolList.pop(Protocol)
 
     def LoadProtocol(self, Db, ModuleGuid):
         SqlCommand = """select GuidValue from Report
