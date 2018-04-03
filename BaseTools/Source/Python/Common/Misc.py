@@ -287,32 +287,6 @@ def ClearDuplicatedInf():
         if os.path.exists(File):
             os.remove(File)
 
-## callback routine for processing variable option
-#
-# This function can be used to process variable number of option values. The
-# typical usage of it is specify architecure list on command line.
-# (e.g. <tool> -a IA32 X64 IPF)
-#
-# @param  Option        Standard callback function parameter
-# @param  OptionString  Standard callback function parameter
-# @param  Value         Standard callback function parameter
-# @param  Parser        Standard callback function parameter
-#
-# @retval
-#
-def ProcessVariableArgument(Option, OptionString, Value, Parser):
-    assert Value is None
-    Value = []
-    RawArgs = Parser.rargs
-    while RawArgs:
-        Arg = RawArgs[0]
-        if (Arg[:2] == "--" and len(Arg) > 2) or \
-           (Arg[:1] == "-" and len(Arg) > 1 and Arg[1] != "-"):
-            break
-        Value.append(Arg)
-        del RawArgs[0]
-    setattr(Parser.values, Option.dest, Value)
-
 ## Convert GUID string in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx style to C structure style
 #
 #   @param      Guid    The GUID string
@@ -449,32 +423,6 @@ def RemoveDirectory(Directory, Recursively=False):
                 os.remove(File)
         os.chdir(CurrentDirectory)
     os.rmdir(Directory)
-
-## Check if given file is changed or not
-#
-#  This method is used to check if a file is changed or not between two build
-#  actions. It makes use a cache to store files timestamp.
-#
-#   @param      File    The path of file
-#
-#   @retval     True    If the given file is changed, doesn't exist, or can't be
-#                       found in timestamp cache
-#   @retval     False   If the given file is changed
-#
-def IsChanged(File):
-    if not os.path.exists(File):
-        return True
-
-    FileState = os.stat(File)
-    TimeStamp = FileState[-2]
-
-    if File in gFileTimeStampCache and TimeStamp == gFileTimeStampCache[File]:
-        FileChanged = False
-    else:
-        FileChanged = True
-        gFileTimeStampCache[File] = TimeStamp
-
-    return FileChanged
 
 ## Store content in file
 #
@@ -635,47 +583,6 @@ class DirCache:
             return os.path.join(self._Root, self._UPPER_CACHE_[UpperPath])
         return None
 
-## Get all files of a directory
-#
-# @param Root:       Root dir
-# @param SkipList :  The files need be skipped
-#
-# @retval  A list of all files
-#
-def GetFiles(Root, SkipList=None, FullPath=True):
-    OriPath = Root
-    FileList = []
-    for Root, Dirs, Files in os.walk(Root):
-        if SkipList:
-            for Item in SkipList:
-                if Item in Dirs:
-                    Dirs.remove(Item)
-
-        for File in Files:
-            File = os.path.normpath(os.path.join(Root, File))
-            if not FullPath:
-                File = File[len(OriPath) + 1:]
-            FileList.append(File)
-
-    return FileList
-
-## Check if gvien file exists or not
-#
-#   @param      File    File name or path to be checked
-#   @param      Dir     The directory the file is relative to
-#
-#   @retval     True    if file exists
-#   @retval     False   if file doesn't exists
-#
-def ValidFile(File, Ext=None):
-    if Ext is not None:
-        Dummy, FileExt = os.path.splitext(File)
-        if FileExt.lower() != Ext.lower():
-            return False
-    if not os.path.exists(File):
-        return False
-    return True
-
 def RealPath(File, Dir='', OverrideDir=''):
     NewFile = os.path.normpath(os.path.join(Dir, File))
     NewFile = GlobalData.gAllFiles[NewFile]
@@ -709,115 +616,6 @@ def RealPath2(File, Dir='', OverrideDir=''):
             return NewFile, ''
 
     return None, None
-
-## Check if gvien file exists or not
-#
-#
-def ValidFile2(AllFiles, File, Ext=None, Workspace='', EfiSource='', EdkSource='', Dir='.', OverrideDir=''):
-    NewFile = File
-    if Ext is not None:
-        Dummy, FileExt = os.path.splitext(File)
-        if FileExt.lower() != Ext.lower():
-            return False, File
-
-    # Replace the Edk macros
-    if OverrideDir != '' and OverrideDir is not None:
-        if OverrideDir.find('$(EFI_SOURCE)') > -1:
-            OverrideDir = OverrideDir.replace('$(EFI_SOURCE)', EfiSource)
-        if OverrideDir.find('$(EDK_SOURCE)') > -1:
-            OverrideDir = OverrideDir.replace('$(EDK_SOURCE)', EdkSource)
-
-    # Replace the default dir to current dir
-    if Dir == '.':
-        Dir = os.getcwd()
-        Dir = Dir[len(Workspace) + 1:]
-
-    # First check if File has Edk definition itself
-    if File.find('$(EFI_SOURCE)') > -1 or File.find('$(EDK_SOURCE)') > -1:
-        NewFile = File.replace('$(EFI_SOURCE)', EfiSource)
-        NewFile = NewFile.replace('$(EDK_SOURCE)', EdkSource)
-        NewFile = AllFiles[os.path.normpath(NewFile)]
-        if NewFile is not None:
-            return True, NewFile
-
-    # Second check the path with override value
-    if OverrideDir != '' and OverrideDir is not None:
-        NewFile = AllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
-        if NewFile is not None:
-            return True, NewFile
-
-    # Last check the path with normal definitions
-    File = os.path.join(Dir, File)
-    NewFile = AllFiles[os.path.normpath(File)]
-    if NewFile is not None:
-        return True, NewFile
-
-    return False, File
-
-## Check if gvien file exists or not
-#
-#
-def ValidFile3(AllFiles, File, Workspace='', EfiSource='', EdkSource='', Dir='.', OverrideDir=''):
-    # Replace the Edk macros
-    if OverrideDir != '' and OverrideDir is not None:
-        if OverrideDir.find('$(EFI_SOURCE)') > -1:
-            OverrideDir = OverrideDir.replace('$(EFI_SOURCE)', EfiSource)
-        if OverrideDir.find('$(EDK_SOURCE)') > -1:
-            OverrideDir = OverrideDir.replace('$(EDK_SOURCE)', EdkSource)
-
-    # Replace the default dir to current dir
-    # Dir is current module dir related to workspace
-    if Dir == '.':
-        Dir = os.getcwd()
-        Dir = Dir[len(Workspace) + 1:]
-
-    NewFile = File
-    RelaPath = AllFiles[os.path.normpath(Dir)]
-    NewRelaPath = RelaPath
-
-    while(True):
-        # First check if File has Edk definition itself
-        if File.find('$(EFI_SOURCE)') > -1 or File.find('$(EDK_SOURCE)') > -1:
-            File = File.replace('$(EFI_SOURCE)', EfiSource)
-            File = File.replace('$(EDK_SOURCE)', EdkSource)
-            NewFile = AllFiles[os.path.normpath(File)]
-            if NewFile is not None:
-                NewRelaPath = os.path.dirname(NewFile)
-                File = os.path.basename(NewFile)
-                #NewRelaPath = NewFile[:len(NewFile) - len(File.replace("..\\", '').replace("../", '')) - 1]
-                break
-
-        # Second check the path with override value
-        if OverrideDir != '' and OverrideDir is not None:
-            NewFile = AllFiles[os.path.normpath(os.path.join(OverrideDir, File))]
-            if NewFile is not None:
-                #NewRelaPath = os.path.dirname(NewFile)
-                NewRelaPath = NewFile[:len(NewFile) - len(File.replace("..\\", '').replace("../", '')) - 1]
-                break
-
-        # Last check the path with normal definitions
-        NewFile = AllFiles[os.path.normpath(os.path.join(Dir, File))]
-        if NewFile is not None:
-            break
-
-        # No file found
-        break
-
-    return NewRelaPath, RelaPath, File
-
-
-def GetRelPath(Path1, Path2):
-    FileName = os.path.basename(Path2)
-    L1 = os.path.normpath(Path1).split(os.path.normpath('/'))
-    L2 = os.path.normpath(Path2).split(os.path.normpath('/'))
-    for Index in range(0, len(L1)):
-        if L1[Index] != L2[Index]:
-            FileName = '../' * (len(L1) - Index)
-            for Index2 in range(Index, len(L2)):
-                FileName = os.path.join(FileName, L2[Index2])
-            break
-    return os.path.normpath(FileName)
-
 
 ## Get GUID value from given packages
 #
@@ -1411,36 +1209,6 @@ class tdict:
                 keys |= self.data[Key].GetKeys(KeyIndex - 1)
             return keys
 
-## Boolean chain list
-#
-class Blist(UserList):
-    def __init__(self, initlist=None):
-        UserList.__init__(self, initlist)
-    def __setitem__(self, i, item):
-        if item not in [True, False]:
-            if item == 0:
-                item = False
-            else:
-                item = True
-        self.data[i] = item
-    def _GetResult(self):
-        Value = True
-        for item in self.data:
-            Value &= item
-        return Value
-    Result = property(_GetResult)
-
-def ParseConsoleLog(Filename):
-    Opr = open(os.path.normpath(Filename), 'r')
-    Opw = open(os.path.normpath(Filename + '.New'), 'w+')
-    for Line in Opr.readlines():
-        if Line.find('.efi') > -1:
-            Line = Line[Line.rfind(' ') : Line.rfind('.efi')].strip()
-            Opw.write('%s\n' % Line)
-
-    Opr.close()
-    Opw.close()
-
 def IsFieldValueAnArray (Value):
     Value = Value.strip()
     if Value.startswith('GUID') and Value.endswith(')'):
@@ -1649,7 +1417,7 @@ def ParseFieldValue (Value):
 ## AnalyzeDscPcd
 #
 #  Analyze DSC PCD value, since there is no data type info in DSC
-#  This fuction is used to match functions (AnalyzePcdData, AnalyzeHiiPcdData, AnalyzeVpdPcdData) used for retrieving PCD value from database
+#  This fuction is used to match functions (AnalyzePcdData) used for retrieving PCD value from database
 #  1. Feature flag: TokenSpace.PcdCName|PcdValue
 #  2. Fix and Patch:TokenSpace.PcdCName|PcdValue[|MaxSize]
 #  3. Dynamic default:
@@ -1785,52 +1553,6 @@ def AnalyzePcdData(Setting):
         
     return ValueList   
  
-## AnalyzeHiiPcdData
-#
-#  Analyze the pcd Value, variable name, variable Guid and variable offset.
-#  Used to avoid split issue while the value string contain "|" character
-#
-#  @param[in] Setting:  A String contain VariableName, VariableGuid, VariableOffset, DefaultValue information;
-#  
-#  @retval   ValueList: A List contaian VariableName, VariableGuid, VariableOffset, DefaultValue. 
-#
-def AnalyzeHiiPcdData(Setting):
-    ValueList = ['', '', '', '']
-
-    TokenList = GetSplitValueList(Setting)
-    ValueList[0:len(TokenList)] = TokenList
-
-    return ValueList
-
-## AnalyzeVpdPcdData
-#
-#  Analyze the vpd pcd VpdOffset, MaxDatumSize and InitialValue.
-#  Used to avoid split issue while the value string contain "|" character
-#
-#  @param[in] Setting:  A String contain VpdOffset/MaxDatumSize/InitialValue information;
-#  
-#  @retval   ValueList: A List contain VpdOffset, MaxDatumSize and InitialValue. 
-#
-def AnalyzeVpdPcdData(Setting):
-    ValueList = ['', '', '']
-
-    ValueRe = re.compile(r'\s*L?\".*\|.*\"\s*$')
-    PtrValue = ValueRe.findall(Setting)
-    
-    ValueUpdateFlag = False
-    
-    if len(PtrValue) >= 1:
-        Setting = re.sub(ValueRe, '', Setting)
-        ValueUpdateFlag = True
-
-    TokenList = Setting.split(TAB_VALUE_SPLIT)
-    ValueList[0:len(TokenList)] = TokenList
-    
-    if ValueUpdateFlag:
-        ValueList[2] = PtrValue[0]
-        
-    return ValueList     
-
 ## check format of PCD value against its the datum type
 #
 # For PCD value setting

@@ -27,7 +27,6 @@ import Database
 from FvImage import *
 from array import array
 from Report import Report
-from Common.Misc import ParseConsoleLog
 from Common.BuildVersion import gBUILD_VERSION
 from Parser import ConvertGuid
 from Common.LongFilePathSupport import OpenLongFilePath as open
