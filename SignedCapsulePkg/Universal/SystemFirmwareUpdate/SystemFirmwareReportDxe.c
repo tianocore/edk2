@@ -145,7 +145,7 @@ DispatchSystemFmpImages (
   @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
