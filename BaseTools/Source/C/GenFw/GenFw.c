@@ -2781,6 +2781,7 @@ Returns:
   EFI_IMAGE_OPTIONAL_HEADER64     *Optional64Hdr;
   EFI_IMAGE_SECTION_HEADER        *SectionHeader;
   EFI_IMAGE_DEBUG_DIRECTORY_ENTRY *DebugEntry;
+  EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY *RsdsEntry;
   UINT32                          *NewTimeStamp;  
 
   //
@@ -2809,6 +2810,7 @@ Returns:
   // Resource Directory entry need to review.
   //
   Optional32Hdr = (EFI_IMAGE_OPTIONAL_HEADER32 *) ((UINT8*) FileHdr + sizeof (EFI_IMAGE_FILE_HEADER));
+  Optional64Hdr = (EFI_IMAGE_OPTIONAL_HEADER64 *) ((UINT8*) FileHdr + sizeof (EFI_IMAGE_FILE_HEADER));
   if (Optional32Hdr->Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     SectionHeader = (EFI_IMAGE_SECTION_HEADER *) ((UINT8 *) Optional32Hdr +  FileHdr->SizeOfOptionalHeader);
     if (Optional32Hdr->NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_EXPORT && \
@@ -2828,7 +2830,6 @@ Returns:
       }
     }
   } else {
-    Optional64Hdr = (EFI_IMAGE_OPTIONAL_HEADER64 *) ((UINT8*) FileHdr + sizeof (EFI_IMAGE_FILE_HEADER));
     SectionHeader = (EFI_IMAGE_SECTION_HEADER *) ((UINT8 *) Optional64Hdr +  FileHdr->SizeOfOptionalHeader);
     if (Optional64Hdr->NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_EXPORT && \
         Optional64Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_EXPORT].Size != 0) {
@@ -2891,6 +2892,19 @@ Returns:
     if (ZeroDebugFlag) {
       memset (FileBuffer + DebugEntry->FileOffset, 0, DebugEntry->SizeOfData);
       memset (DebugEntry, 0, sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY));
+    }
+    if (DebugEntry->Type == EFI_IMAGE_DEBUG_TYPE_CODEVIEW) {
+      RsdsEntry = (EFI_IMAGE_DEBUG_CODEVIEW_RSDS_ENTRY *) (FileBuffer + DebugEntry->FileOffset);
+      if (RsdsEntry->Signature == CODEVIEW_SIGNATURE_MTOC) {
+        // MTOC sets DebugDirectoryEntrySize to size of the .debug section, so fix it.
+        if (!ZeroDebugFlag) {
+          if (Optional32Hdr->Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+            Optional32Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size = sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+          } else {
+            Optional64Hdr->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_DEBUG].Size = sizeof (EFI_IMAGE_DEBUG_DIRECTORY_ENTRY);
+          }
+        }
+      }
     }
   }
 
