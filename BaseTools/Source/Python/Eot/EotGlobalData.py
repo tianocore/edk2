@@ -70,7 +70,7 @@ gSOURCE_FILES = 'Log_SourceFiles.log'
 gOP_SOURCE_FILES = open(gSOURCE_FILES, 'w+')
 
 # Dict for GUID found in DEC files
-gGuidDict = sdict()
+gGuidDict = dict()
 
 # Dict for hard coded GUID Macros
 # {GuidName : [GuidMacro : GuidValue]}
