@@ -85,6 +85,7 @@ RegionSizePattern = re.compile("\s*(?P<base>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<s
 RegionSizeGuidPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*\|\s*(?P<size>\w+\.\w+)\s*")
 RegionOffsetPcdPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*$")
 ShortcutPcdPattern = re.compile("\s*\w+\s*=\s*(?P<value>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<name>\w+\.\w+)\s*")
+BaseAddrValuePattern = re.compile('^0[xX][0-9a-fA-F]+')
 
 AllIncludeFileList = []
 
@@ -2211,9 +2212,7 @@ class FdfParser:
         if not self.__GetNextToken():
             raise Warning("expected FV base address value", self.FileName, self.CurrentLineNumber)
 
-        IsValidBaseAddrValue = re.compile('^0[x|X][0-9a-fA-F]+')
-
-        if not IsValidBaseAddrValue.match(self.__Token.upper()):
+        if not BaseAddrValuePattern.match(self.__Token.upper()):
             raise Warning("Unknown FV base address value '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
         Obj.FvBaseAddress = self.__Token
         return True  
