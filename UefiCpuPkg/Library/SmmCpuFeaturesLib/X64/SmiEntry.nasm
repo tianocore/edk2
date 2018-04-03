@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -159,7 +159,8 @@ Base:
     mov     cr0, rbx
     retf
 @LongMode:                              ; long mode (64-bit code) starts here
-    mov     rax, ASM_PFX(gStmSmiHandlerIdtr)
+    mov     rax, strict qword 0         ;  mov     rax, ASM_PFX(gStmSmiHandlerIdtr)
+StmSmiEntrySmiHandlerIdtrAbsAddr:
     lidt    [rax]
     lea     ebx, [rdi + DSC_OFFSET]
     mov     ax, [rbx + DSC_DS]
@@ -170,7 +171,9 @@ Base:
     mov     gs, eax
     mov     ax, [rbx + DSC_SS]
     mov     ss, eax
-
+    mov     rax, strict qword 0           ;   mov     rax, CommonHandler
+StmSmiEntryCommonHandlerAbsAddr:
+    jmp     rax
 CommonHandler:
     mov     rbx, [rsp + 0x08]             ; rbx <- CpuIndex
 
@@ -184,16 +187,13 @@ CommonHandler:
     add     rsp, -0x20
 
     mov     rcx, rbx
-    mov     rax, ASM_PFX(CpuSmmDebugEntry)
-    call    rax
+    call    ASM_PFX(CpuSmmDebugEntry)
 
     mov     rcx, rbx
-    mov     rax, ASM_PFX(SmiRendezvous)          ; rax <- absolute addr of SmiRedezvous
-    call    rax
+    call    ASM_PFX(SmiRendezvous)          ; rax <- absolute addr of SmiRedezvous
 
     mov     rcx, rbx
-    mov     rax, ASM_PFX(CpuSmmDebugExit)
-    call    rax
+    call    ASM_PFX(CpuSmmDebugExit)
 
     add     rsp, 0x20
 
@@ -205,7 +205,7 @@ CommonHandler:
 
     add     rsp, 0x200
 
-    mov     rax, ASM_PFX(gStmXdSupported)
+    lea     rax, [ASM_PFX(gStmXdSupported)]
     mov     al, [rax]
     cmp     al, 0
     jz      .1
@@ -225,7 +225,7 @@ _StmSmiHandler:
 ; Check XD disable bit
 ;
     xor     r8, r8
-    mov     rax, ASM_PFX(gStmXdSupported)
+    lea     rax, [ASM_PFX(gStmXdSupported)]
     mov     al, [rax]
     cmp     al, 0
     jz      @StmXdDone
@@ -246,8 +246,8 @@ _StmSmiHandler:
 
     ; below step is needed, because STM does not run above code.
     ; we have to run below code to set IDT/CR0/CR4
-
-    mov     rax, ASM_PFX(gStmSmiHandlerIdtr)
+    mov     rax, strict qword 0        ;  mov     rax, ASM_PFX(gStmSmiHandlerIdtr)
+StmSmiHandlerIdtrAbsAddr:
     lidt    [rax]
 
     mov     rax, cr0
@@ -261,3 +261,16 @@ _StmSmiHandler:
 
 ASM_PFX(gcStmSmiHandlerSize)   : DW      $ - _StmSmiEntryPoint
 ASM_PFX(gcStmSmiHandlerOffset) : DW      _StmSmiHandler - _StmSmiEntryPoint
+
+global ASM_PFX(SmmCpuFeaturesLibStmSmiEntryFixupAddress)
+ASM_PFX(SmmCpuFeaturesLibStmSmiEntryFixupAddress):
+    lea    rax, [ASM_PFX(gStmSmiHandlerIdtr)]
+    lea    rcx, [StmSmiEntrySmiHandlerIdtrAbsAddr]
+    mov    qword [rcx - 8], rax
+    lea    rcx, [StmSmiHandlerIdtrAbsAddr]
+    mov    qword [rcx - 8], rax
+
+    lea    rax, [CommonHandler]
+    lea    rcx, [StmSmiEntryCommonHandlerAbsAddr]
+    mov    qword [rcx - 8], rax
+    ret
