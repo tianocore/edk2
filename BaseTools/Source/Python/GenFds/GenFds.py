@@ -24,7 +24,6 @@ import Common.BuildToolError as BuildToolError
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from Workspace.WorkspaceDatabase import WorkspaceDatabase
 from Workspace.BuildClassObject import PcdClassObject
-from Workspace.BuildClassObject import ModuleBuildClassObject
 import RuleComplexFile
 from EfiSection import EfiSection
 import StringIO
