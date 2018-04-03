@@ -25,6 +25,7 @@ from Common.Misc import *
 from Common.String import *
 from BuildEngine import *
 import Common.GlobalData as GlobalData
+from collections import OrderedDict
 
 ## Regular expression for finding header file inclusions
 gIncludePattern = re.compile(r"^[ \t]*#?[ \t]*include(?:[ \t]*(?:\\(?:\r\n|\r|\n))*[ \t]*)*(?:\(?[\"<]?[ \t]*)([-\w.\\/() \t]+)(?:[ \t]*[\">]?\)?)", re.MULTILINE | re.UNICODE | re.IGNORECASE)
@@ -442,7 +443,7 @@ cleanlib:
         self.LibraryMakefileList = []
         self.LibraryBuildDirectoryList = []
         self.SystemLibraryList = []
-        self.Macros = sdict()
+        self.Macros = OrderedDict()
         self.Macros["OUTPUT_DIR"      ] = self._AutoGenObject.Macros["OUTPUT_DIR"]
         self.Macros["DEBUG_DIR"       ] = self._AutoGenObject.Macros["DEBUG_DIR"]
         self.Macros["MODULE_BUILD_DIR"] = self._AutoGenObject.Macros["MODULE_BUILD_DIR"]

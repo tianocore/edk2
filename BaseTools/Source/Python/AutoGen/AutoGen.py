@@ -45,6 +45,7 @@ import InfSectionParser
 import datetime
 import hashlib
 from GenVar import VariableMgr,var_info
+from collections import OrderedDict
 
 ## Regular expression for splitting Dependency Expression string into tokens
 gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
@@ -892,7 +893,7 @@ class WorkspaceAutoGen(AutoGen):
         ]
 
         # This dict store PCDs which are not used by any modules with specified arches
-        UnusedPcd = sdict()
+        UnusedPcd = OrderedDict()
         for Pa in self.AutoGenObjectList:
             # Key of DSC's Pcds dictionary is PcdCName, TokenSpaceGuid
             for Pcd in Pa.Platform.Pcds:
@@ -2084,7 +2085,7 @@ class PlatformAutoGen(AutoGen):
     ## Generate Token Number for all PCD
     def _GetPcdTokenNumbers(self):
         if self._PcdTokenNumber is None:
-            self._PcdTokenNumber = sdict()
+            self._PcdTokenNumber = OrderedDict()
             TokenNumber = 1
             #
             # Make the Dynamic and DynamicEx PCD use within different TokenNumber area. 
@@ -2207,8 +2208,8 @@ class PlatformAutoGen(AutoGen):
         # EdkII module
         LibraryConsumerList = [Module]
         Constructor         = []
-        ConsumedByList      = sdict()
-        LibraryInstance     = sdict()
+        ConsumedByList      = OrderedDict()
+        LibraryInstance     = OrderedDict()
 
         EdkLogger.verbose("")
         EdkLogger.verbose("Library instances of module [%s] [%s]:" % (str(Module), self.Arch))
@@ -2880,14 +2881,14 @@ class ModuleAutoGen(AutoGen):
         self._DerivedPackageList      = None
         self._ModulePcdList           = None
         self._LibraryPcdList          = None
-        self._PcdComments = sdict()
+        self._PcdComments = OrderedDict()
         self._GuidList                = None
         self._GuidsUsedByPcd = None
-        self._GuidComments = sdict()
+        self._GuidComments = OrderedDict()
         self._ProtocolList            = None
-        self._ProtocolComments = sdict()
+        self._ProtocolComments = OrderedDict()
         self._PpiList                 = None
-        self._PpiComments = sdict()
+        self._PpiComments = OrderedDict()
         self._DepexList               = None
         self._DepexExpressionList     = None
         self._BuildOption             = None
@@ -2943,7 +2944,7 @@ class ModuleAutoGen(AutoGen):
     # Macros could be used in build_rule.txt (also Makefile)
     def _GetMacros(self):
         if self._Macro is None:
-            self._Macro = sdict()
+            self._Macro = OrderedDict()
             self._Macro["WORKSPACE"             ] = self.WorkspaceDir
             self._Macro["MODULE_NAME"           ] = self.Name
             self._Macro["MODULE_NAME_GUID"      ] = self._GetUniqueBaseName()
@@ -3695,7 +3696,7 @@ class ModuleAutoGen(AutoGen):
     #
     def _GetLibraryPcdList(self):
         if self._LibraryPcdList is None:
-            Pcds = sdict()
+            Pcds = OrderedDict()
             if not self.IsLibrary:
                 # get PCDs from dependent libraries
                 for Library in self.DependentLibraryList:
@@ -3717,7 +3718,7 @@ class ModuleAutoGen(AutoGen):
     #
     def _GetGuidList(self):
         if self._GuidList is None:
-            self._GuidList = sdict()
+            self._GuidList = OrderedDict()
             self._GuidList.update(self.Module.Guids)
             for Library in self.DependentLibraryList:
                 self._GuidList.update(Library.Guids)
@@ -3727,7 +3728,7 @@ class ModuleAutoGen(AutoGen):
 
     def GetGuidsUsedByPcd(self):
         if self._GuidsUsedByPcd is None:
-            self._GuidsUsedByPcd = sdict()
+            self._GuidsUsedByPcd = OrderedDict()
             self._GuidsUsedByPcd.update(self.Module.GetGuidsUsedByPcd())
             for Library in self.DependentLibraryList:
                 self._GuidsUsedByPcd.update(Library.GetGuidsUsedByPcd())
@@ -3738,7 +3739,7 @@ class ModuleAutoGen(AutoGen):
     #
     def _GetProtocolList(self):
         if self._ProtocolList is None:
-            self._ProtocolList = sdict()
+            self._ProtocolList = OrderedDict()
             self._ProtocolList.update(self.Module.Protocols)
             for Library in self.DependentLibraryList:
                 self._ProtocolList.update(Library.Protocols)
@@ -3752,7 +3753,7 @@ class ModuleAutoGen(AutoGen):
     #
     def _GetPpiList(self):
         if self._PpiList is None:
-            self._PpiList = sdict()
+            self._PpiList = OrderedDict()
             self._PpiList.update(self.Module.Ppis)
             for Library in self.DependentLibraryList:
                 self._PpiList.update(Library.Ppis)
@@ -3983,7 +3984,7 @@ class ModuleAutoGen(AutoGen):
                     PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, 'DynamicEx'))
                     PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, 'Dynamic'))
                     PcdTokenSpaceList.append(Pcd.TokenSpaceGuidCName)
-        GuidList = sdict()
+        GuidList = OrderedDict()
         GuidList.update(self.GuidList)
         for TokenSpace in self.GetGuidsUsedByPcd():
             # If token space is not referred by patch PCD or Ex PCD, remove the GUID from GUID list
