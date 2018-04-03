@@ -107,7 +107,7 @@ class IdfFileClassObject(object):
                 if Len == 4 and LineDetails[2] != 'TRANSPARENT':
                     EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'Please use the keyword "TRANSPARENT" to describe the transparency setting in Line %s of File %s.' % (LineNo, File.Path))
                 MatchString = gIdentifierPattern.match(LineDetails[1])
-                if MatchString is None or MatchString.end(0) != len(LineDetails[1]):
+                if MatchString is None:
                     EdkLogger.error('Image Definition  File Parser', FORMAT_INVALID, 'The Image token name %s defined in Idf file %s contains the invalid character.' % (LineDetails[1], File.Path))
                 if LineDetails[1] not in self.ImageIDList:
                     self.ImageIDList.append(LineDetails[1])
