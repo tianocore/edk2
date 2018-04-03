@@ -680,7 +680,8 @@ PeiCheckAndSwitchStack (
       for (StackPointer = (UINT32*)SecCoreData->StackBase;
            (StackPointer < (UINT32*)((UINTN)SecCoreData->StackBase + SecCoreData->StackSize)) \
            && (*StackPointer == INIT_CAR_VALUE);
-           StackPointer ++);
+           StackPointer ++) {
+      }
 
       DEBUG ((EFI_D_INFO, "Temp Stack : BaseAddress=0x%p Length=0x%X\n", SecCoreData->StackBase, (UINT32)SecCoreData->StackSize));
       DEBUG ((EFI_D_INFO, "Temp Heap  : BaseAddress=0x%p Length=0x%X\n", Private->HobList.Raw, (UINT32)((UINTN) Private->HobList.HandoffInformationTable->EfiFreeMemoryTop - (UINTN) Private->HobList.Raw)));
