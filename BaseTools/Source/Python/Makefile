@@ -37,15 +37,11 @@ APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BI
 COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Database.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\DataType.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\DecClassObject.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\DscClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\EdkIIWorkspace.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\EdkLogger.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Expression.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\FdfClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\GlobalData.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Identification.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\InfClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathOs.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathOsPath.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathSupport.py \
