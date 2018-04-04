@@ -40,7 +40,6 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\DecClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\DscClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\EdkIIWorkspace.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\EdkIIWorkspaceBuild.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\EdkLogger.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Expression.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\FdfClassObject.py \
