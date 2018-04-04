@@ -43,6 +43,7 @@ ERR_IN_OPERAND          = 'Macro after IN operator can only be: $(FAMILY), $(ARC
 __ValidString = re.compile(r'[_a-zA-Z][_0-9a-zA-Z]*$')
 _ReLabel = re.compile('LABEL\((\w+)\)')
 _ReOffset = re.compile('OFFSET_OF\((\w+)\)')
+PcdPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
 
 ## SplitString
 #  Split string to list according double quote
@@ -214,7 +215,6 @@ class ValueExpression(object):
 
     NonLetterOpLst = ['+', '-', '*', '/', '%', '&', '|', '^', '~', '<<', '>>', '!', '=', '>', '<', '?', ':']
 
-    PcdPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
 
     SymbolPattern = re.compile("("
                                  "\$\([A-Z][A-Z0-9_]*\)|\$\(\w+\.\w+\)|\w+\.\w+|"
@@ -616,7 +616,7 @@ class ValueExpression(object):
             raise BadExpression(ERR_EMPTY_TOKEN)
 
         # PCD token
-        if self.PcdPattern.match(self._Token):
+        if PcdPattern.match(self._Token):
             if self._Token not in self._Symb:
                 Ex = BadExpression(ERR_PCD_RESOLVE % self._Token)
                 Ex.Pcd = self._Token
