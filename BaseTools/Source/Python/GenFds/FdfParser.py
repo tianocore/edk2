@@ -61,7 +61,6 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from Capsule import EFI_CERT_TYPE_PKCS7_GUID
 from Capsule import EFI_CERT_TYPE_RSA2048_SHA256_GUID
 from Common.RangeExpression import RangeExpression
-from Common.FdfParserLite import FileExtensionPattern,TokenFindPattern
 
 ##define T_CHAR_SPACE                ' '
 ##define T_CHAR_NULL                 '\0'
@@ -86,6 +85,8 @@ RegionSizeGuidPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*\|\s*(?P<size>\w+\.\
 RegionOffsetPcdPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*$")
 ShortcutPcdPattern = re.compile("\s*\w+\s*=\s*(?P<value>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<name>\w+\.\w+)\s*")
 BaseAddrValuePattern = re.compile('^0[xX][0-9a-fA-F]+')
+FileExtensionPattern = re.compile(r'([a-zA-Z][a-zA-Z0-9]*)')
+TokenFindPattern = re.compile(r'([a-zA-Z0-9\-]+|\$\(TARGET\)|\*)_([a-zA-Z0-9\-]+|\$\(TOOL_CHAIN_TAG\)|\*)_([a-zA-Z0-9\-]+|\$\(ARCH\)|\*)')
 
 AllIncludeFileList = []
 

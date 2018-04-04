@@ -1,7 +1,7 @@
 ## @file
 # Windows makefile for Python tools build.
 #
-# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -45,7 +45,6 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\EdkLogger.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Expression.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\FdfClassObject.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\FdfParserLite.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\GlobalData.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Identification.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\InfClassObject.py \
