@@ -415,8 +415,8 @@ class WorkspaceAutoGen(AutoGen):
 
 
 
-            SourcePcdDict = {'DynamicEx':[], 'PatchableInModule':[],'Dynamic':[],'FixedAtBuild':[]}
-            BinaryPcdDict = {'DynamicEx':[], 'PatchableInModule':[]}
+            SourcePcdDict = {'DynamicEx':set(), 'PatchableInModule':set(),'Dynamic':set(),'FixedAtBuild':set()}
+            BinaryPcdDict = {'DynamicEx':set(), 'PatchableInModule':set()}
             SourcePcdDict_Keys = SourcePcdDict.keys()
             BinaryPcdDict_Keys = BinaryPcdDict.keys()
 
@@ -442,27 +442,21 @@ class WorkspaceAutoGen(AutoGen):
 
                         if 'DynamicEx' in BuildData.Pcds[key].Type:
                             if BuildData.IsBinaryModule:
-                                if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in BinaryPcdDict['DynamicEx']:
-                                    BinaryPcdDict['DynamicEx'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                                BinaryPcdDict['DynamicEx'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
                             else:
-                                if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in SourcePcdDict['DynamicEx']:
-                                    SourcePcdDict['DynamicEx'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                                SourcePcdDict['DynamicEx'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
 
                         elif 'PatchableInModule' in BuildData.Pcds[key].Type:
                             if BuildData.MetaFile.Ext == '.inf':
                                 if BuildData.IsBinaryModule:
-                                    if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in BinaryPcdDict['PatchableInModule']:
-                                        BinaryPcdDict['PatchableInModule'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                                    BinaryPcdDict['PatchableInModule'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
                                 else:
-                                    if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in SourcePcdDict['PatchableInModule']:
-                                        SourcePcdDict['PatchableInModule'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                                    SourcePcdDict['PatchableInModule'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
 
                         elif 'Dynamic' in BuildData.Pcds[key].Type:
-                            if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in SourcePcdDict['Dynamic']:
-                                SourcePcdDict['Dynamic'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                            SourcePcdDict['Dynamic'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
                         elif 'FixedAtBuild' in BuildData.Pcds[key].Type:
-                            if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) not in SourcePcdDict['FixedAtBuild']:
-                                SourcePcdDict['FixedAtBuild'].append((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                            SourcePcdDict['FixedAtBuild'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
                 else:
                     pass
             #
@@ -471,13 +465,13 @@ class WorkspaceAutoGen(AutoGen):
             for i in SourcePcdDict_Keys:
                 for j in SourcePcdDict_Keys:
                     if i != j:
-                        IntersectionList = list(set(SourcePcdDict[i]).intersection(set(SourcePcdDict[j])))
-                        if len(IntersectionList) > 0:
+                        Intersections = SourcePcdDict[i].intersection(SourcePcdDict[j])
+                        if len(Intersections) > 0:
                             EdkLogger.error(
                             'build',
                             FORMAT_INVALID,
                             "Building modules from source INFs, following PCD use %s and %s access method. It must be corrected to use only one access method." % (i, j),
-                            ExtraData="%s" % '\n\t'.join([str(P[1]+'.'+P[0]) for P in IntersectionList])
+                            ExtraData="%s" % '\n\t'.join([str(P[1]+'.'+P[0]) for P in Intersections])
                             )
                     else:
                         pass
@@ -488,8 +482,8 @@ class WorkspaceAutoGen(AutoGen):
             for i in BinaryPcdDict_Keys:
                 for j in BinaryPcdDict_Keys:
                     if i != j:
-                        IntersectionList = list(set(BinaryPcdDict[i]).intersection(set(BinaryPcdDict[j])))
-                        for item in IntersectionList:
+                        Intersections = BinaryPcdDict[i].intersection(BinaryPcdDict[j])
+                        for item in Intersections:
                             NewPcd1 = (item[0] + '_' + i, item[1])
                             NewPcd2 = (item[0] + '_' + j, item[1])
                             if item not in GlobalData.MixedPcd:
@@ -508,8 +502,8 @@ class WorkspaceAutoGen(AutoGen):
             for i in SourcePcdDict_Keys:
                 for j in BinaryPcdDict_Keys:
                     if i != j:
-                        IntersectionList = list(set(SourcePcdDict[i]).intersection(set(BinaryPcdDict[j])))
-                        for item in IntersectionList:
+                        Intersections = SourcePcdDict[i].intersection(BinaryPcdDict[j])
+                        for item in Intersections:
                             NewPcd1 = (item[0] + '_' + i, item[1])
                             NewPcd2 = (item[0] + '_' + j, item[1])
                             if item not in GlobalData.MixedPcd:
