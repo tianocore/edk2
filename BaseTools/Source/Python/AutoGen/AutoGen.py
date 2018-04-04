@@ -410,11 +410,6 @@ class WorkspaceAutoGen(AutoGen):
         for Arch in self.ArchList:
             Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
 
-
-
-
-
-
             SourcePcdDict = {'DynamicEx':set(), 'PatchableInModule':set(),'Dynamic':set(),'FixedAtBuild':set()}
             BinaryPcdDict = {'DynamicEx':set(), 'PatchableInModule':set()}
             SourcePcdDict_Keys = SourcePcdDict.keys()
@@ -473,8 +468,6 @@ class WorkspaceAutoGen(AutoGen):
                             "Building modules from source INFs, following PCD use %s and %s access method. It must be corrected to use only one access method." % (i, j),
                             ExtraData="%s" % '\n\t'.join([str(P[1]+'.'+P[0]) for P in Intersections])
                             )
-                    else:
-                        pass
 
             #
             # intersection the BinaryPCD for Mixed PCD
@@ -493,8 +486,6 @@ class WorkspaceAutoGen(AutoGen):
                                     GlobalData.MixedPcd[item].append(NewPcd1)
                                 if NewPcd2 not in GlobalData.MixedPcd[item]:
                                     GlobalData.MixedPcd[item].append(NewPcd2)
-                    else:
-                        pass
 
             #
             # intersection the SourcePCD and BinaryPCD for Mixed PCD
@@ -513,8 +504,6 @@ class WorkspaceAutoGen(AutoGen):
                                     GlobalData.MixedPcd[item].append(NewPcd1)
                                 if NewPcd2 not in GlobalData.MixedPcd[item]:
                                     GlobalData.MixedPcd[item].append(NewPcd2)
-                    else:
-                        pass
 
             for BuildData in PGen.BuildDatabase._CACHE_.values():
                 if BuildData.Arch != Arch:
@@ -535,11 +524,7 @@ class WorkspaceAutoGen(AutoGen):
                                     del BuildData.Pcds[key]
                                     BuildData.Pcds[newkey] = Value
                                     break
-                                else:
-                                    pass
                             break
-                        else:
-                            pass
 
             # handle the mixed pcd in FDF file
             for key in PcdSet:
