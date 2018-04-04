@@ -33,7 +33,6 @@ from Common import EdkLogger
 from Common.Misc import SaveFileOnChange
 from Common.Misc import GuidStructureByteArrayToGuidString
 from Common.Misc import GuidStructureStringToGuidString
-from Common.InfClassObject import gComponentType2ModuleType
 from Common.BuildToolError import FILE_WRITE_FAILURE
 from Common.BuildToolError import CODE_ERROR
 from Common.BuildToolError import COMMAND_FAILURE
@@ -47,6 +46,21 @@ from Common.String import NormPath
 from Common.DataType import *
 import collections
 from Common.Expression import *
+
+gComponentType2ModuleType = {
+    "LIBRARY"               :   "BASE",
+    "SECURITY_CORE"         :   "SEC",
+    "PEI_CORE"              :   "PEI_CORE",
+    "COMBINED_PEIM_DRIVER"  :   "PEIM",
+    "PIC_PEIM"              :   "PEIM",
+    "RELOCATABLE_PEIM"      :   "PEIM",
+    "PE32_PEIM"             :   "PEIM",
+    "BS_DRIVER"             :   "DXE_DRIVER",
+    "RT_DRIVER"             :   "DXE_RUNTIME_DRIVER",
+    "SAL_RT_DRIVER"         :   "DXE_SAL_DRIVER",
+    "APPLICATION"           :   "UEFI_APPLICATION",
+    "LOGO"                  :   "BASE",
+}
 
 ## Pattern to extract contents in EDK DXS files
 gDxsDependencyPattern = re.compile(r"DEPENDENCY_START(.+)DEPENDENCY_END", re.DOTALL)
