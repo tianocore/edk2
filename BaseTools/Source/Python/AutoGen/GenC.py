@@ -1138,16 +1138,14 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
             #
             # For unicode, UINT16 array will be generated, so the alignment of unicode is guaranteed.
             #
+            AutoGenH.Append('#define %s  %s%s\n' %(PcdValueName, Type, PcdVariableName))
             if Unicode:
-                AutoGenH.Append('#define %s  %s%s\n' %(PcdValueName, Type, PcdVariableName))
                 AutoGenC.Append('GLOBAL_REMOVE_IF_UNREFERENCED %s UINT16 %s%s = %s;\n' % (Const, PcdVariableName, Array, Value))
                 AutoGenH.Append('extern %s UINT16 %s%s;\n' %(Const, PcdVariableName, Array))
-                AutoGenH.Append('#define %s  %s%s\n' %(GetModeName, Type, PcdVariableName))
             else:
-                AutoGenH.Append('#define %s  %s%s\n' %(PcdValueName, Type, PcdVariableName))
                 AutoGenC.Append('GLOBAL_REMOVE_IF_UNREFERENCED %s UINT8 %s%s = %s;\n' % (Const, PcdVariableName, Array, Value))
                 AutoGenH.Append('extern %s UINT8 %s%s;\n' %(Const, PcdVariableName, Array))
-                AutoGenH.Append('#define %s  %s%s\n' %(GetModeName, Type, PcdVariableName))
+            AutoGenH.Append('#define %s  %s%s\n' %(GetModeName, Type, PcdVariableName))
                 
             PcdDataSize = GetPcdSize(Pcd)
             if Pcd.Type == TAB_PCDS_FIXED_AT_BUILD:
