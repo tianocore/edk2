@@ -2352,17 +2352,15 @@ class PlatformAutoGen(AutoGen):
                                              ToPcd.Type, Module, FromPcd.Type),
                                           File=self.MetaFile)
 
-            if FromPcd.MaxDatumSize not in [None, '']:
+            if FromPcd.MaxDatumSize:
                 ToPcd.MaxDatumSize = FromPcd.MaxDatumSize
-            if FromPcd.DefaultValue not in [None, '']:
+            if FromPcd.DefaultValue:
                 ToPcd.DefaultValue = FromPcd.DefaultValue
-            if FromPcd.TokenValue not in [None, '']:
+            if FromPcd.TokenValue:
                 ToPcd.TokenValue = FromPcd.TokenValue
-            if FromPcd.MaxDatumSize not in [None, '']:
-                ToPcd.MaxDatumSize = FromPcd.MaxDatumSize
-            if FromPcd.DatumType not in [None, '']:
+            if FromPcd.DatumType:
                 ToPcd.DatumType = FromPcd.DatumType
-            if FromPcd.SkuInfoList not in [None, '', []]:
+            if FromPcd.SkuInfoList:
                 ToPcd.SkuInfoList = FromPcd.SkuInfoList
             # Add Flexible PCD format parse
             if ToPcd.DefaultValue:
@@ -3933,11 +3931,11 @@ class ModuleAutoGen(AutoGen):
             return
             
         # Skip the following code for modules with no source files
-        if self.SourceFileList is None or self.SourceFileList == []:
+        if not self.SourceFileList:
             return
 
         # Skip the following code for modules without any binary files
-        if self.BinaryFileList <> None and self.BinaryFileList <> []:
+        if not self.BinaryFileList:
             return
             
         ### TODO: How to handles mixed source and binary modules
