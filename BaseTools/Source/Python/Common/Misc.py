@@ -631,7 +631,7 @@ def GuidValue(CName, PackageList, Inffile = None):
         GuidKeys = P.Guids.keys()
         if Inffile and P._PrivateGuids:
             if not Inffile.startswith(P.MetaFile.Dir):
-                GuidKeys = (dict.fromkeys(x for x in P.Guids if x not in P._PrivateGuids)).keys()
+                GuidKeys = [x for x in P.Guids if x not in P._PrivateGuids]
         if CName in GuidKeys:
             return P.Guids[CName]
     return None
@@ -650,7 +650,7 @@ def ProtocolValue(CName, PackageList, Inffile = None):
         ProtocolKeys = P.Protocols.keys()
         if Inffile and P._PrivateProtocols:
             if not Inffile.startswith(P.MetaFile.Dir):
-                ProtocolKeys = (dict.fromkeys(x for x in P.Protocols if x not in P._PrivateProtocols)).keys()
+                ProtocolKeys = [x for x in P.Protocols if x not in P._PrivateProtocols]
         if CName in ProtocolKeys:
             return P.Protocols[CName]
     return None
@@ -669,7 +669,7 @@ def PpiValue(CName, PackageList, Inffile = None):
         PpiKeys = P.Ppis.keys()
         if Inffile and P._PrivatePpis:
             if not Inffile.startswith(P.MetaFile.Dir):
-                PpiKeys = (dict.fromkeys(x for x in P.Ppis if x not in P._PrivatePpis)).keys()
+                PpiKeys = [x for x in P.Ppis if x not in P._PrivatePpis]
         if CName in PpiKeys:
             return P.Ppis[CName]
     return None
