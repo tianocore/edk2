@@ -544,11 +544,11 @@ class WorkspaceAutoGen(AutoGen):
                 ModuleData = self.BuildDatabase[ModuleFile, Arch, Target, Toolchain]
                 PkgSet.update(ModuleData.Packages)
             Pkgs = list(PkgSet) + list(PGen.PackageList)
-            DecPcds = {}
+            DecPcds = set()
             DecPcdsKey = set()
             for Pkg in Pkgs:
                 for Pcd in Pkg.Pcds:
-                    DecPcds[Pcd[0], Pcd[1]] = Pkg.Pcds[Pcd]
+                    DecPcds.add((Pcd[0], Pcd[1]))
                     DecPcdsKey.add((Pcd[0], Pcd[1], Pcd[2]))
 
             Platform.SkuName = self.SkuId
