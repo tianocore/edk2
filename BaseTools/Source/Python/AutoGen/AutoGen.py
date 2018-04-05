@@ -1388,8 +1388,6 @@ class PlatformAutoGen(AutoGen):
 
         # for gathering error information
         NoDatumTypePcdList = set()
-        PcdNotInDb = []
-        self._GuidValue = {}
         FdfModuleList = []
         for InfName in self._AsBuildInfList:
             InfName = mws.join(self.WorkspaceDir, InfName)
@@ -1427,8 +1425,6 @@ class PlatformAutoGen(AutoGen):
                         if PcdFromModule.Type in GenC.gDynamicPcd and \
                             PcdFromModule.IsFromBinaryInf == False:
                             # Print warning message to let the developer make a determine.
-                            if PcdFromModule not in PcdNotInDb:
-                                PcdNotInDb.append(PcdFromModule)
                             continue
                         # If one of the Source built modules listed in the DSC is not listed in 
                         # FDF modules, and the INF lists a PCD can only use the PcdsDynamicEx 
@@ -1436,8 +1432,6 @@ class PlatformAutoGen(AutoGen):
                         # PCD as PcdsDynamicEx), then DO NOT break the build; DO NOT add the 
                         # PCD to the Platform's PCD Database.
                         if PcdFromModule.Type in GenC.gDynamicExPcd:
-                            if PcdFromModule not in PcdNotInDb:
-                                PcdNotInDb.append(PcdFromModule)
                             continue
                     #
                     # If a dynamic PCD used by a PEM module/PEI module & DXE module,
@@ -1918,7 +1912,6 @@ class PlatformAutoGen(AutoGen):
                 self._ToolDefinitions[Tool][Attr] = Value
 
             ToolsDef = ''
-            MakePath = ''
             if GlobalData.gOptions.SilentMode and "MAKE" in self._ToolDefinitions:
                 if "FLAGS" not in self._ToolDefinitions["MAKE"]:
                     self._ToolDefinitions["MAKE"]["FLAGS"] = ""
@@ -1939,9 +1932,7 @@ class PlatformAutoGen(AutoGen):
 
                     if Attr == "PATH":
                         # Don't put MAKE definition in the file
-                        if Tool == "MAKE":
-                            MakePath = Value
-                        else:
+                        if Tool != "MAKE":
                             ToolsDef += "%s = %s\n" % (Tool, Value)
                     elif Attr != "DLL":
                         # Don't put MAKE definition in the file
