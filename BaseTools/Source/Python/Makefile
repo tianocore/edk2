@@ -38,7 +38,6 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Database.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\DataType.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\DecClassObject.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\Dictionary.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\DscClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\EdkIIWorkspace.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\EdkIIWorkspaceBuild.py \
