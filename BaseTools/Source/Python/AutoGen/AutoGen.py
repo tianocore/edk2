@@ -3915,7 +3915,7 @@ class ModuleAutoGen(AutoGen):
     ## Create AsBuilt INF file the module
     #
     def CreateAsBuiltInf(self, IsOnlyCopy = False):
-        self.OutputFile = []
+        self.OutputFile = set()
         if IsOnlyCopy:
             if GlobalData.gBinCacheDest:
                 self.CopyModuleToCache()
@@ -4056,8 +4056,7 @@ class ModuleAutoGen(AutoGen):
         DebugDir = self.DebugDir.replace('\\', '/').strip('/')
         for Item in self.CodaTargetList:
             File = Item.Target.Path.replace('\\', '/').strip('/').replace(DebugDir, '').replace(OutputDir, '').strip('/')
-            if File not in self.OutputFile:
-                self.OutputFile.append(File)
+            self.OutputFile.add(File)
             if os.path.isabs(File):
                 File = File.replace('\\', '/').strip('/').replace(OutputDir, '').strip('/')
             if Item.Target.Ext.lower() == '.aml':
@@ -4069,8 +4068,7 @@ class ModuleAutoGen(AutoGen):
             else:
                 AsBuiltInfDict['binary_item'] += ['BIN|' + File]
         if self.DepexGenerated:
-            if self.Name + '.depex' not in self.OutputFile:
-                self.OutputFile.append(self.Name + '.depex')
+            self.OutputFile.add(self.Name + '.depex')
             if self.ModuleType in ['PEIM']:
                 AsBuiltInfDict['binary_item'] += ['PEI_DEPEX|' + self.Name + '.depex']
             if self.ModuleType in ['DXE_DRIVER', 'DXE_RUNTIME_DRIVER', 'DXE_SAL_DRIVER', 'UEFI_DRIVER']:
@@ -4081,15 +4079,13 @@ class ModuleAutoGen(AutoGen):
         Bin = self._GenOffsetBin()
         if Bin:
             AsBuiltInfDict['binary_item'] += ['BIN|%s' % Bin]
-            if Bin not in self.OutputFile:
-                self.OutputFile.append(Bin)
+            self.OutputFile.add(Bin)
 
         for Root, Dirs, Files in os.walk(OutputDir):
             for File in Files:
                 if File.lower().endswith('.pdb'):
                     AsBuiltInfDict['binary_item'] += ['DISPOSABLE|' + File]
-                    if File not in self.OutputFile:
-                        self.OutputFile.append(File)
+                    self.OutputFile.add(File)
         HeaderComments = self.Module.HeaderComments
         StartPos = 0
         for Index in range(len(HeaderComments)):
