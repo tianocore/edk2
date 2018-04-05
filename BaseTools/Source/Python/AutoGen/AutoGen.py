@@ -46,6 +46,7 @@ import datetime
 import hashlib
 from GenVar import VariableMgr,var_info
 from collections import OrderedDict
+from collections import defaultdict
 
 ## Regular expression for splitting Dependency Expression string into tokens
 gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
@@ -3483,8 +3484,8 @@ class ModuleAutoGen(AutoGen):
         if self._BuildTargets is None:
             self._IntroBuildTargetList = set()
             self._FinalBuildTargetList = set()
-            self._BuildTargets = {}
-            self._FileTypes = {}
+            self._BuildTargets = defaultdict(set)
+            self._FileTypes = defaultdict(set)
 
         SubDirectory = os.path.join(self.OutputDir, File.SubDir)
         if not os.path.exists(SubDirectory):
@@ -3521,8 +3522,6 @@ class ModuleAutoGen(AutoGen):
                 break
 
             FileType = RuleObject.SourceFileType
-            if FileType not in self._FileTypes:
-                self._FileTypes[FileType] = set()
             self._FileTypes[FileType].add(Source)
 
             # stop at STATIC_LIBRARY for library
@@ -3540,8 +3539,6 @@ class ModuleAutoGen(AutoGen):
                 # Only do build for target with outputs
                 self._FinalBuildTargetList.add(Target)
 
-            if FileType not in self._BuildTargets:
-                self._BuildTargets[FileType] = set()
             self._BuildTargets[FileType].add(Target)
 
             if not Source.IsBinary and Source == File:
@@ -3560,8 +3557,8 @@ class ModuleAutoGen(AutoGen):
         if self._BuildTargets is None:
             self._IntroBuildTargetList = set()
             self._FinalBuildTargetList = set()
-            self._BuildTargets = {}
-            self._FileTypes = {}
+            self._BuildTargets = defaultdict(set)
+            self._FileTypes = defaultdict(set)
 
         #TRICK: call _GetSourceFileList to apply build rule for source files
         if self.SourceFileList:
