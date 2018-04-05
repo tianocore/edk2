@@ -365,9 +365,9 @@ class WorkspaceAutoGen(AutoGen):
                     MetaFile_cache = {}
                     for Arch in self.ArchList:
                         Platform_cache[Arch] = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
-                        MetaFile_cache[Arch] = []
-                        for Pkey in Platform_cache[Arch].Modules.keys():
-                            MetaFile_cache[Arch].append(Platform_cache[Arch].Modules[Pkey].MetaFile)
+                        MetaFile_cache[Arch] = set()
+                        for Pkey in Platform_cache[Arch].Modules:
+                            MetaFile_cache[Arch].add(Platform_cache[Arch].Modules[Pkey].MetaFile)
                     for Inf in self.FdfProfile.InfDict[key]:
                         ModuleFile = PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch)
                         for Arch in self.ArchList:
@@ -382,9 +382,9 @@ class WorkspaceAutoGen(AutoGen):
                     for Arch in self.ArchList:
                         if Arch == key:
                             Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
-                            MetaFileList = []
-                            for Pkey in Platform.Modules.keys():
-                                MetaFileList.append(Platform.Modules[Pkey].MetaFile)
+                            MetaFileList = set()
+                            for Pkey in Platform.Modules:
+                                MetaFileList.add(Platform.Modules[Pkey].MetaFile)
                             for Inf in self.FdfProfile.InfDict[key]:
                                 ModuleFile = PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch)
                                 if ModuleFile in MetaFileList:
