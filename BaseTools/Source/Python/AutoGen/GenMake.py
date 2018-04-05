@@ -492,7 +492,7 @@ cleanlib:
             ImageEntryPoint = "_ModuleEntryPoint"
 
         for k, v in self._AutoGenObject.Module.Defines.iteritems():
-            if k not in self._AutoGenObject.Macros.keys():
+            if k not in self._AutoGenObject.Macros:
                 self._AutoGenObject.Macros[k] = v
 
         if 'MODULE_ENTRY_POINT' not in self._AutoGenObject.Macros.keys():

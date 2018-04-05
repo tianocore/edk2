@@ -204,7 +204,7 @@ def genGuidString(guidreffile):
         if len(guidLineList) == 2:
             guid = guidLineList[0]
             guidName = guidLineList[1]
-            if guid not in dictGuid.keys() :
+            if guid not in dictGuid :
                 dictGuid[guid] = guidName
 
 def createSym(symbolName):
@@ -256,7 +256,7 @@ def main():
         for smiEntry in SmiEntry:
             if smiEntry.hasAttribute("HandlerType"):
                 guidValue = smiEntry.getAttribute("HandlerType")
-                if guidValue in dictGuid.keys() :
+                if guidValue in dictGuid:
                     smiEntry.setAttribute("HandlerType", dictGuid[guidValue])
             SmiHandler = smiEntry.getElementsByTagName("SmiHandler")
             for smiHandler in SmiHandler:

@@ -1423,9 +1423,7 @@ class Build():
     def _RebaseModule (self, MapBuffer, BaseAddress, ModuleList, AddrIsOffset = True, ModeIsSmm = False):
         if ModeIsSmm:
             AddrIsOffset = False
-        InfFileNameList = ModuleList.keys()
-        #InfFileNameList.sort()
-        for InfFile in InfFileNameList:
+        for InfFile in ModuleList:
             sys.stdout.write (".")
             sys.stdout.flush()
             ModuleInfo = ModuleList[InfFile]

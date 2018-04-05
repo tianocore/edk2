@@ -486,10 +486,7 @@ class InfPomAlignment(ModuleObject):
             #
             # Get all LibraryClasses
             #
-            LibClassObj = self.Parser.InfLibraryClassSection.LibraryClasses
-            Keys = LibClassObj.keys()
-            for Key in Keys:
-                LibraryClassData = LibClassObj[Key]
+            for LibraryClassData in self.Parser.InfLibraryClassSection.LibraryClasses.values():
                 for Item in LibraryClassData:
                     LibraryClass = CommonObject.LibraryClassObject()
                     LibraryClass.SetUsage(DT.USAGE_ITEM_CONSUMES)

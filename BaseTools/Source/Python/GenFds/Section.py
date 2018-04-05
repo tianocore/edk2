@@ -111,10 +111,7 @@ class Section (SectionClassObject):
     #   @retval tuple       (File list, boolean)
     #
     def GetFileList(FfsInf, FileType, FileExtension, Dict = {}, IsMakefile=False):
-        if FileType in Section.SectFileType.keys() :
-            IsSect = True
-        else :
-            IsSect = False
+        IsSect = FileType in Section.SectFileType
 
         if FileExtension is not None:
             Suffix = FileExtension

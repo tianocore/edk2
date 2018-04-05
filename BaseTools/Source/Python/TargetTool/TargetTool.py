@@ -80,9 +80,8 @@ class TargetTool():
             traceback.print_exception(last_type, last_value, last_tb)
 
     def Print(self):
-        KeyList = self.TargetTxtDictionary.keys()
         errMsg  = ''
-        for Key in KeyList:
+        for Key in self.TargetTxtDictionary:
             if type(self.TargetTxtDictionary[Key]) == type([]):
                 print "%-30s = %s" % (Key, ''.join(elem + ' ' for elem in self.TargetTxtDictionary[Key]))
             elif self.TargetTxtDictionary[Key] is None:
