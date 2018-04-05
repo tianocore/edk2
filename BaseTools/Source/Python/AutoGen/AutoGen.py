@@ -3778,7 +3778,7 @@ class ModuleAutoGen(AutoGen):
         if not self.SourceFileList:
             return []
 
-        NameGuids = []
+        NameGuids = set()
         for SrcFile in self.SourceFileList:
             if SrcFile.Ext.lower() != '.vfr':
                 continue
@@ -3810,7 +3810,7 @@ class ModuleAutoGen(AutoGen):
                 if not Guid:
                     break
                 NameArray = ConvertStringToByteArray('L"' + Name.group(1) + '"')
-                NameGuids.append((NameArray, GuidStructureStringToGuidString(Guid.group(1))))
+                NameGuids.add((NameArray, GuidStructureStringToGuidString(Guid.group(1))))
                 Pos = Content.find('efivarstore', Name.end())
         if not NameGuids:
             return []
