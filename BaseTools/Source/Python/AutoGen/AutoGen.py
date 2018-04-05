@@ -2686,40 +2686,31 @@ class PlatformAutoGen(AutoGen):
         AllTools = set(ModuleOptions.keys() + PlatformOptions.keys() +
                        PlatformModuleOptions.keys() + ModuleTypeOptions.keys() +
                        self.ToolDefinition.keys())
-        BuildOptions = {}
+        BuildOptions = defaultdict(lambda: defaultdict(str))
         for Tool in AllTools:
-            if Tool not in BuildOptions:
-                BuildOptions[Tool] = {}
-
             for Options in [self.ToolDefinition, ModuleOptions, PlatformOptions, ModuleTypeOptions, PlatformModuleOptions]:
                 if Tool not in Options:
                     continue
                 for Attr in Options[Tool]:
-                    Value = Options[Tool][Attr]
                     #
                     # Do not generate it in Makefile
                     #
                     if Attr == TAB_TOD_DEFINES_BUILDRULEORDER:
                         continue
-                    if Attr not in BuildOptions[Tool]:
-                        BuildOptions[Tool][Attr] = ""
+                    Value = Options[Tool][Attr]
                     # check if override is indicated
                     if Value.startswith('='):
-                        ToolPath = Value[1:]
-                        ToolPath = mws.handleWsMacro(ToolPath)
-                        BuildOptions[Tool][Attr] = ToolPath
+                        BuildOptions[Tool][Attr] = mws.handleWsMacro(Value[1:])
                     else:
-                        Value = mws.handleWsMacro(Value)
                         if Attr != 'PATH':
-                            BuildOptions[Tool][Attr] += " " + Value
+                            BuildOptions[Tool][Attr] += " " + mws.handleWsMacro(Value)
                         else:
-                            BuildOptions[Tool][Attr] = Value
+                            BuildOptions[Tool][Attr] = mws.handleWsMacro(Value)
+
         if Module.AutoGenVersion < 0x00010005 and self.Workspace.UniFlag is not None:
             #
             # Override UNI flag only for EDK module.
             #
-            if 'BUILD' not in BuildOptions:
-                BuildOptions['BUILD'] = {}
             BuildOptions['BUILD']['FLAGS'] = self.Workspace.UniFlag
         return BuildOptions, BuildRuleOrder
 
