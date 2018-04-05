@@ -161,7 +161,7 @@ class FileBuildRule:
 
         # Check input files
         self.IsMultipleInput = False
-        self.SourceFileExtList = []
+        self.SourceFileExtList = set()
         for File in Input:
             Base, Ext = os.path.splitext(File)
             if Base.find("*") >= 0:
@@ -172,8 +172,7 @@ class FileBuildRule:
                 # There's no "*" and "?" in file name
                 self.ExtraSourceFileList.append(File)
                 continue
-            if Ext not in self.SourceFileExtList:
-                self.SourceFileExtList.append(Ext)
+            self.SourceFileExtList.add(Ext)
 
         # Check output files
         self.DestFileList = []
@@ -193,16 +192,6 @@ class FileBuildRule:
         DestString = ", ".join(self.DestFileList)
         CommandString = "\n\t".join(self.CommandList)
         return "%s : %s\n\t%s" % (DestString, SourceString, CommandString)
-
-    ## Check if given file extension is supported by this rule
-    #
-    #   @param  FileExt     The extension of a file
-    #
-    #   @retval True        If the extension is supported
-    #   @retval False       If the extension is not supported
-    #
-    def IsSupported(self, FileExt):
-        return FileExt in self.SourceFileExtList
 
     def Instantiate(self, Macros={}):
         NewRuleObject = copy.copy(self)
@@ -365,8 +354,8 @@ class BuildRule:
         self._State = ""
         self._RuleInfo = tdict(True, 2)     # {toolchain family : {"InputFile": {}, "OutputFile" : [], "Command" : []}}
         self._FileType = ''
-        self._BuildTypeList = []
-        self._ArchList = []
+        self._BuildTypeList = set()
+        self._ArchList = set()
         self._FamilyList = []
         self._TotalToolChainFamilySet = set()
         self._RuleObjectList = [] # FileBuildRule object list
@@ -456,8 +445,8 @@ class BuildRule:
     #
     def ParseSectionHeader(self, LineIndex):
         self._RuleInfo = tdict(True, 2)
-        self._BuildTypeList = []
-        self._ArchList = []
+        self._BuildTypeList = set()
+        self._ArchList = set()
         self._FamilyList = []
         self._TotalToolChainFamilySet = set()
         FileType = ''
@@ -494,10 +483,8 @@ class BuildRule:
                     BuildType = TokenList[1]
                 if len(TokenList) > 2:
                     Arch = TokenList[2]
-            if BuildType not in self._BuildTypeList:
-                self._BuildTypeList.append(BuildType)
-            if Arch not in self._ArchList:
-                self._ArchList.append(Arch)
+            self._BuildTypeList.add(BuildType)
+            self._ArchList.add(Arch)
 
         if 'COMMON' in self._BuildTypeList and len(self._BuildTypeList) > 1:
             EdkLogger.error("build", FORMAT_INVALID,

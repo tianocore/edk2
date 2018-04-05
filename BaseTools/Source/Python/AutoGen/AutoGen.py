@@ -4179,7 +4179,7 @@ class ModuleAutoGen(AutoGen):
                     PcdItem = PcdComments + '\n  ' + PcdItem
                 AsBuiltInfDict['patchablepcd_item'].append(PcdItem)
 
-        HiiPcds = []
+        HiiPcds = set()
         for Pcd in Pcds + VfrPcds:
             PcdComments = ''
             PcdCommentList = []
@@ -4202,8 +4202,7 @@ class ModuleAutoGen(AutoGen):
                 #
                 if (SkuId, Pcd.TokenSpaceGuidCName, Pcd.TokenCName) in HiiPcds:
                     continue
-                else:
-                    HiiPcds.append((SkuId, Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
+                HiiPcds.add((SkuId, Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
             if (Pcd.TokenSpaceGuidCName, Pcd.TokenCName) in self._PcdComments:
                 PcdCommentList = self._PcdComments[Pcd.TokenSpaceGuidCName, Pcd.TokenCName][:]
             if HiiInfo:
