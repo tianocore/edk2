@@ -3,7 +3,7 @@
   The GCD services are used to manage the memory and I/O regions that
   are accessible to the CPU that is executing the DXE core.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -866,6 +866,10 @@ CoreConvertSpace (
   }
   ASSERT (TopEntry != NULL && BottomEntry != NULL);
 
+  //
+  // Initialize CpuArchAttributes to suppress incorrect compiler/analyzer warnings.
+  //
+  CpuArchAttributes = 0;
   if (Operation == GCD_SET_ATTRIBUTES_MEMORY_OPERATION) {
     //
     // Call CPU Arch Protocol to attempt to set attributes on the range
