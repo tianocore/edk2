@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -280,7 +280,7 @@ determine whether database file is out of date!\n")
     def GetPackageList(self, Platform, Arch, TargetName, ToolChainTag):
         self.Platform = Platform
         PackageList = []
-        Pa = self.BuildObject[self.Platform, Arch]
+        Pa = self.BuildObject[self.Platform, Arch, TargetName, ToolChainTag]
         #
         # Get Package related to Modules
         #
