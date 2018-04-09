@@ -8,7 +8,7 @@
 
   FmpSetImage() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -194,9 +194,13 @@ FmpSetImage (
   }
 
   //
-  // Pass Thru
+  // Pass Thru to System FMP Protocol on same handle as FMP Protocol
   //
-  Status = gBS->LocateProtocol(&gSystemFmpProtocolGuid, NULL, (VOID **)&SystemFmp);
+  Status = gBS->HandleProtocol(
+                  SystemFmpPrivate->Handle,
+                  &gSystemFmpProtocolGuid,
+                  (VOID **)&SystemFmp
+                  );
   if (EFI_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "(Agent)SetImage - SystemFmpProtocol - %r\n", Status));
     SystemFmpPrivate->LastAttempt.LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
