@@ -3040,7 +3040,8 @@ CVfrQuestionDB::RegisterNewDateQuestion (
 
   for (Index = 0; Index < 3; Index++) {
     if (VarIdStr[Index] != NULL) {
-      delete VarIdStr[Index];
+      delete[] VarIdStr[Index];
+      VarIdStr[Index] = NULL;
     }
   }
 
@@ -3057,7 +3058,8 @@ Err:
     }
 
     if (VarIdStr[Index] != NULL) {
-      delete VarIdStr[Index];
+      delete[] VarIdStr [Index];
+      VarIdStr [Index] = NULL;
     }
   }
 }
@@ -3216,7 +3218,8 @@ CVfrQuestionDB::RegisterNewTimeQuestion (
 
   for (Index = 0; Index < 3; Index++) {
     if (VarIdStr[Index] != NULL) {
-      delete VarIdStr[Index];
+      delete[] VarIdStr[Index];
+      VarIdStr[Index] = NULL;
     }
   }
 
@@ -3233,7 +3236,8 @@ Err:
     }
 
     if (VarIdStr[Index] != NULL) {
-      delete VarIdStr[Index];
+      delete[] VarIdStr[Index];
+      VarIdStr[Index] = NULL;
     }
   }
 }
