@@ -1,7 +1,7 @@
 /** @file
 Creates output file that is a properly formed section per the PI spec.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -1376,6 +1376,7 @@ Returns:
       }
       if (DummyFileBuffer != NULL) {
         free (DummyFileBuffer);
+        DummyFileBuffer = NULL;
       }
       if (InFileBuffer != NULL) {
         free (InFileBuffer);
