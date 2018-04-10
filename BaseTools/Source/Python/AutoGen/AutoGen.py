@@ -1450,13 +1450,10 @@ class PlatformAutoGen(AutoGen):
                         self._NonDynaPcdList_.remove (self._NonDynaPcdList_[Index])
                         PcdFromModule.Pending = False
                         self._NonDynaPcdList_.append (PcdFromModule)
-        # Parse the DynamicEx PCD from the AsBuild INF module list of FDF.
-        DscModuleList = []
-        for ModuleInf in self.Platform.Modules.keys():
-            DscModuleList.append (os.path.normpath(ModuleInf.Path))
+        DscModuleSet = {os.path.normpath(ModuleInf.Path) for ModuleInf in self.Platform.Modules}
         # add the PCD from modules that listed in FDF but not in DSC to Database 
         for InfName in FdfModuleList:
-            if InfName not in DscModuleList:
+            if InfName not in DscModuleSet:
                 InfClass = PathClass(InfName)
                 M = self.BuildDatabase[InfClass, self.Arch, self.BuildTarget, self.ToolChain]
                 # If a module INF in FDF but not in current arch's DSC module list, it must be module (either binary or source) 
