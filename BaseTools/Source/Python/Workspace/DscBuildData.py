@@ -594,7 +594,7 @@ class DscBuildData(PlatformBuildClassObject):
         #
         # If command line defined, should override the value in DSC file.
         #
-        if 'FIX_LOAD_TOP_MEMORY_ADDRESS' in GlobalData.gCommandLineDefines.keys():
+        if 'FIX_LOAD_TOP_MEMORY_ADDRESS' in GlobalData.gCommandLineDefines:
             try:
                 self._LoadFixAddress = int(GlobalData.gCommandLineDefines['FIX_LOAD_TOP_MEMORY_ADDRESS'], 0)
             except:
@@ -682,9 +682,7 @@ class DscBuildData(PlatformBuildClassObject):
                 self.DefaultStores[Record[1].upper()] = (DscBuildData.ToInt(Record[0]),Record[1].upper())
             if TAB_DEFAULT_STORES_DEFAULT not in self.DefaultStores:
                 self.DefaultStores[TAB_DEFAULT_STORES_DEFAULT] = (0,TAB_DEFAULT_STORES_DEFAULT)
-            GlobalData.gDefaultStores = self.DefaultStores.keys()
-            if GlobalData.gDefaultStores:
-                GlobalData.gDefaultStores.sort()
+            GlobalData.gDefaultStores = sorted(self.DefaultStores.keys())
         return self.DefaultStores
 
     ## Retrieve [Components] section information
@@ -1423,11 +1421,11 @@ class DscBuildData(PlatformBuildClassObject):
 
             for pcdkey in Pcds:
                 pcd = Pcds[pcdkey]
-                if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
+                if 'DEFAULT' not in pcd.SkuInfoList and 'COMMON' in pcd.SkuInfoList:
                     pcd.SkuInfoList['DEFAULT'] = pcd.SkuInfoList['COMMON']
-                    del(pcd.SkuInfoList['COMMON'])
-                elif 'DEFAULT' in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
-                    del(pcd.SkuInfoList['COMMON'])
+                    del pcd.SkuInfoList['COMMON']
+                elif 'DEFAULT' in pcd.SkuInfoList and 'COMMON' in pcd.SkuInfoList:
+                    del pcd.SkuInfoList['COMMON']
 
         map(self.FilterSkuSettings,[Pcds[pcdkey] for pcdkey in Pcds if Pcds[pcdkey].Type in DynamicPcdType])
         return Pcds
@@ -1472,10 +1470,7 @@ class DscBuildData(PlatformBuildClassObject):
             else:
                 PcdValueDict[PcdCName, TokenSpaceGuid] = {SkuName:(PcdValue, DatumType, MaxDatumSize)}
 
-        PcdsKeys = PcdValueDict.keys()
-        for PcdCName, TokenSpaceGuid in PcdsKeys:
-
-            PcdSetting = PcdValueDict[PcdCName, TokenSpaceGuid]
+        for ((PcdCName,TokenSpaceGuid),PcdSetting) in PcdValueDict.iteritems():
             PcdValue = None
             DatumType = None
             MaxDatumSize = None
@@ -1872,7 +1867,7 @@ class DscBuildData(PlatformBuildClassObject):
         OverrideValues = {DefaultStore:""}
         if Pcd.SkuOverrideValues:
             OverrideValues = Pcd.SkuOverrideValues[SkuName]
-        for DefaultStoreName in OverrideValues.keys():
+        for DefaultStoreName in OverrideValues:
             CApp = CApp + 'void\n'
             CApp = CApp + 'Initialize_%s_%s_%s_%s(\n' % (SkuName, DefaultStoreName, Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
             CApp = CApp + '  void\n'
@@ -2251,7 +2246,7 @@ class DscBuildData(PlatformBuildClassObject):
 
             PcdValue, DatumType, MaxDatumSize = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
             SkuInfo = SkuInfoClass(SkuName, self.SkuIds[SkuName][0], '', '', '', '', '', PcdValue)
-            if (PcdCName, TokenSpaceGuid) in Pcds.keys():
+            if (PcdCName, TokenSpaceGuid) in Pcds:
                 pcdObject = Pcds[PcdCName, TokenSpaceGuid]
                 pcdObject.SkuInfoList[SkuName] = SkuInfo
                 if MaxDatumSize.strip():
@@ -2284,15 +2279,15 @@ class DscBuildData(PlatformBuildClassObject):
             for sku in pcd.SkuInfoList.values():
                 if not sku.DefaultValue:
                     sku.DefaultValue = pcdDecObject.DefaultValue
-            if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
+            if 'DEFAULT' not in pcd.SkuInfoList and 'COMMON' not in pcd.SkuInfoList:
                 valuefromDec = pcdDecObject.DefaultValue
                 SkuInfo = SkuInfoClass('DEFAULT', '0', '', '', '', '', '', valuefromDec)
                 pcd.SkuInfoList['DEFAULT'] = SkuInfo
-            elif 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
+            elif 'DEFAULT' not in pcd.SkuInfoList and 'COMMON' in pcd.SkuInfoList:
                 pcd.SkuInfoList['DEFAULT'] = pcd.SkuInfoList['COMMON']
-                del(pcd.SkuInfoList['COMMON'])
-            elif 'DEFAULT' in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
-                del(pcd.SkuInfoList['COMMON'])
+                del pcd.SkuInfoList['COMMON']
+            elif 'DEFAULT' in pcd.SkuInfoList and 'COMMON' in pcd.SkuInfoList:
+                del pcd.SkuInfoList['COMMON']
 
         map(self.FilterSkuSettings,Pcds.values())
 
@@ -2301,7 +2296,7 @@ class DscBuildData(PlatformBuildClassObject):
     def FilterSkuSettings(self, PcdObj):
 
         if self.SkuIdMgr.SkuUsageType == self.SkuIdMgr.SINGLE:
-            if 'DEFAULT' in PcdObj.SkuInfoList.keys() and self.SkuIdMgr.SystemSkuId not in PcdObj.SkuInfoList.keys():
+            if 'DEFAULT' in PcdObj.SkuInfoList and self.SkuIdMgr.SystemSkuId not in PcdObj.SkuInfoList:
                 PcdObj.SkuInfoList[self.SkuIdMgr.SystemSkuId] = PcdObj.SkuInfoList['DEFAULT']
             PcdObj.SkuInfoList = {'DEFAULT':PcdObj.SkuInfoList[self.SkuIdMgr.SystemSkuId]}
             PcdObj.SkuInfoList['DEFAULT'].SkuIdName = 'DEFAULT'
@@ -2456,7 +2451,7 @@ class DscBuildData(PlatformBuildClassObject):
                     EdkLogger.error('Build', PCD_VARIABLE_ATTRIBUTES_CONFLICT_ERROR, "The variable %s.%s for DynamicHii PCDs has conflicting attributes [%s] and [%s] " % (VariableGuid, VariableName, VarAttribute, VariableAttrs[(VariableName, VariableGuid)]))
 
             pcdDecObject = self._DecPcds[PcdCName, TokenSpaceGuid]
-            if (PcdCName, TokenSpaceGuid) in Pcds.keys():
+            if (PcdCName, TokenSpaceGuid) in Pcds:
                 pcdObject = Pcds[PcdCName, TokenSpaceGuid]
                 if SkuName in pcdObject.SkuInfoList:
                     Skuitem = pcdObject.SkuInfoList[SkuName]
@@ -2494,15 +2489,15 @@ class DscBuildData(PlatformBuildClassObject):
                     for default_store in sku.DefaultStoreDict:
                         sku.DefaultStoreDict[default_store]=pcdDecObject.DefaultValue
                     pcd.DefaultValue = pcdDecObject.DefaultValue
-            if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
+            if 'DEFAULT' not in pcd.SkuInfoList and 'COMMON' not in pcd.SkuInfoList:
                 valuefromDec = pcdDecObject.DefaultValue
                 SkuInfo = SkuInfoClass('DEFAULT', '0', SkuInfoObj.VariableName, SkuInfoObj.VariableGuid, SkuInfoObj.VariableOffset, valuefromDec,VariableAttribute=SkuInfoObj.VariableAttribute,DefaultStore={DefaultStore:valuefromDec})
                 pcd.SkuInfoList['DEFAULT'] = SkuInfo
-            elif 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
+            elif 'DEFAULT' not in pcd.SkuInfoList and 'COMMON' in pcd.SkuInfoList:
                 pcd.SkuInfoList['DEFAULT'] = pcd.SkuInfoList['COMMON']
-                del(pcd.SkuInfoList['COMMON'])
-            elif 'DEFAULT' in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
-                del(pcd.SkuInfoList['COMMON'])
+                del pcd.SkuInfoList['COMMON']
+            elif 'DEFAULT' in pcd.SkuInfoList and 'COMMON' in pcd.SkuInfoList:
+                del pcd.SkuInfoList['COMMON']
 
             if pcd.MaxDatumSize.strip():
                 MaxSize = int(pcd.MaxDatumSize, 0)
@@ -2584,7 +2579,7 @@ class DscBuildData(PlatformBuildClassObject):
             #
             VpdOffset, MaxDatumSize, InitialValue = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
             SkuInfo = SkuInfoClass(SkuName, self.SkuIds[SkuName][0], '', '', '', '', VpdOffset, InitialValue)
-            if (PcdCName, TokenSpaceGuid) in Pcds.keys():
+            if (PcdCName, TokenSpaceGuid) in Pcds:
                 pcdObject = Pcds[PcdCName, TokenSpaceGuid]
                 pcdObject.SkuInfoList[SkuName] = SkuInfo
                 if MaxDatumSize.strip():
@@ -2618,15 +2613,15 @@ class DscBuildData(PlatformBuildClassObject):
             for sku in pcd.SkuInfoList.values():
                 if not sku.DefaultValue:
                     sku.DefaultValue = pcdDecObject.DefaultValue
-            if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
+            if 'DEFAULT' not in pcd.SkuInfoList and 'COMMON' not in pcd.SkuInfoList:
                 valuefromDec = pcdDecObject.DefaultValue
                 SkuInfo = SkuInfoClass('DEFAULT', '0', '', '', '', '', SkuInfoObj.VpdOffset, valuefromDec)
                 pcd.SkuInfoList['DEFAULT'] = SkuInfo
-            elif 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
+            elif 'DEFAULT' not in pcd.SkuInfoList and 'COMMON' in pcd.SkuInfoList:
                 pcd.SkuInfoList['DEFAULT'] = pcd.SkuInfoList['COMMON']
-                del(pcd.SkuInfoList['COMMON'])
-            elif 'DEFAULT' in pcd.SkuInfoList.keys() and 'COMMON' in pcd.SkuInfoList.keys():
-                del(pcd.SkuInfoList['COMMON'])
+                del pcd.SkuInfoList['COMMON']
+            elif 'DEFAULT' in pcd.SkuInfoList and 'COMMON' in pcd.SkuInfoList:
+                del pcd.SkuInfoList['COMMON']
 
 
         map(self.FilterSkuSettings,Pcds.values())
