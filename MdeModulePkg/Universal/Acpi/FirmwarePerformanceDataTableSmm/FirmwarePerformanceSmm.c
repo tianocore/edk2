@@ -106,6 +106,11 @@ FpdtStatusCodeListenerSmm (
     return EFI_SUCCESS;
   }
 
+  if (Data != NULL && CompareGuid (&Data->Type, &gEfiFirmwarePerformanceGuid)) {
+    DEBUG ((DEBUG_ERROR, "FpdtStatusCodeListenerSmm: Performance data reported through gEfiFirmwarePerformanceGuid will not be collected by FirmwarePerformanceDataTableSmm\n"));
+    return EFI_UNSUPPORTED;
+  }
+
   if ((Value != PcdGet32 (PcdProgressCodeS3SuspendStart)) &&
       (Value != PcdGet32 (PcdProgressCodeS3SuspendEnd))) {
     return EFI_UNSUPPORTED;

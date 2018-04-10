@@ -554,6 +554,9 @@ FpdtStatusCodeListenerDxe (
     // Get the Boot performance table and then install it to ACPI table.
     //
     CopyMem (&mReceivedAcpiBootPerformanceTable, Data + 1, Data->Size);
+  } else if (Data != NULL && CompareGuid (&Data->Type, &gEfiFirmwarePerformanceGuid)) {
+    DEBUG ((DEBUG_ERROR, "FpdtStatusCodeListenerDxe: Performance data reported through gEfiFirmwarePerformanceGuid will not be collected by FirmwarePerformanceDataTableDxe\n"));
+    Status = EFI_UNSUPPORTED;
   } else {
     //
     // Ignore else progress code.
