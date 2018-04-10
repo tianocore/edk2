@@ -1538,9 +1538,13 @@ class DscParser(MetaFileParser):
             self._FileWithError = IncludedFile1
 
             IncludedFileTable = MetaFileStorage(self._Table.Cur, IncludedFile1, MODEL_FILE_DSC, False)
-            Owner = self._Content[self._ContentIndex - 1][0]
+            FromItem = self._Content[self._ContentIndex - 1][0]
+            if self._Content[self._ContentIndex - 1][8] != -1.0:
+                Owner = self._Content[self._ContentIndex - 1][8]
+            else:
+                Owner = self._Content[self._ContentIndex - 1][0]
             Parser = DscParser(IncludedFile1, self._FileType, self._Arch, IncludedFileTable,
-                               Owner=Owner, From=Owner)
+                               Owner=Owner, From=FromItem)
 
             self.IncludedFiles.add (IncludedFile1)
 
@@ -1552,7 +1556,10 @@ class DscParser(MetaFileParser):
 
             # set the parser status with current status
             Parser._SectionName = self._SectionName
-            Parser._SectionType = self._SectionType
+            if self._InSubsection:
+                Parser._SectionType = self._SubsectionType
+            else:
+                Parser._SectionType = self._SectionType
             Parser._Scope = self._Scope
             Parser._Enabled = self._Enabled
             # Parse the included file
