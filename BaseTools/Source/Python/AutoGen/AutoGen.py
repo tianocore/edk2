@@ -1279,7 +1279,7 @@ class PlatformAutoGen(AutoGen):
             FixedAtBuildPcds = {}  
             ShareFixedAtBuildPcdsSameValue = {} 
             for Module in LibAuto._ReferenceModules:                
-                for Pcd in Module.FixedAtBuildPcds:
+                for Pcd in Module.FixedAtBuildPcds + LibAuto.FixedAtBuildPcds:
                     key = ".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName))  
                     if key not in FixedAtBuildPcds:
                         ShareFixedAtBuildPcdsSameValue[key] = True
