@@ -1,7 +1,7 @@
 ## @file
 # Trim files preprocessed by compiler
 #
-# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -437,7 +437,7 @@ def GenerateVfrBinSec(ModuleName, DebugDir, OutputFile):
         for CurrentDir, Dirs, Files in os.walk(DebugDir):
             for FileName in Files:
                 Name, Ext = os.path.splitext(FileName)
-                if Ext == '.lst':
+                if Ext == '.c' and Name != 'AutoGen':
                     VfrNameList.append (Name + 'Bin')
 
     VfrNameList.append (ModuleName + 'Strings')

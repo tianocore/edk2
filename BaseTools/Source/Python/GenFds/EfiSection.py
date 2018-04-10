@@ -1,7 +1,7 @@
 ## @file
 # process rule section generation
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -64,6 +64,7 @@ class EfiSection (EfiSectionClassObject):
             Filename = FfsInf.__ExtendMacro__(self.FileName)
             BuildNum = FfsInf.__ExtendMacro__(self.BuildNum)
             StringData = FfsInf.__ExtendMacro__(self.StringData)
+            ModuleNameStr = FfsInf.__ExtendMacro__('$(MODULE_NAME)')
             NoStrip = True
             if FfsInf.ModuleType in ('SEC', 'PEI_CORE', 'PEIM') and SectionType in ('TE', 'PE32'):
                 if FfsInf.KeepReloc is not None:
@@ -91,8 +92,9 @@ class EfiSection (EfiSectionClassObject):
                 FileList.append(Filename)
             elif os.path.exists(Filename):
                 FileList.append(Filename)
-            elif '.depex' in FfsInf.FinalTargetSuffixMap or FfsInf.Depex:
-                if IsMakefile:
+            elif IsMakefile:
+                SuffixMap = FfsInf.GetFinalTargetSuffixMap()
+                if '.depex' in SuffixMap:
                     FileList.append(Filename)
         else:
             FileList, IsSect = Section.Section.GetFileList(FfsInf, self.FileType, self.FileExtension, Dict, IsMakefile=IsMakefile)
@@ -179,6 +181,8 @@ class EfiSection (EfiSectionClassObject):
 
             if InfOverrideUiString:
                 Num = SecNum
+                if IsMakefile and StringData == ModuleNameStr:
+                    StringData = "$(MODULE_NAME)"
                 OutputFile = os.path.join( OutputPath, ModuleName + 'SEC' + str(Num) + Ffs.SectionSuffix.get(SectionType))
                 GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_USER_INTERFACE',
                                                      Ui=StringData, IsMakefile=IsMakefile)
@@ -192,6 +196,8 @@ class EfiSection (EfiSectionClassObject):
                     f = open(File, 'r')
                     UiString = f.read()
                     f.close()
+                    if IsMakefile and UiString == ModuleNameStr:
+                        UiString = "$(MODULE_NAME)"
                     GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_USER_INTERFACE',
                                                         Ui=UiString, IsMakefile=IsMakefile)
                     OutputFileList.append(OutputFile)
@@ -208,6 +214,8 @@ class EfiSection (EfiSectionClassObject):
                         EdkLogger.error("GenFds", GENFDS_ERROR, "File: %s miss UI Section value" %InfFileName)
 
                 Num = SecNum
+                if IsMakefile and StringData == ModuleNameStr:
+                    StringData = "$(MODULE_NAME)"
                 OutputFile = os.path.join( OutputPath, ModuleName + 'SEC' + str(Num) + Ffs.SectionSuffix.get(SectionType))
                 GenFdsGlobalVariable.GenerateSection(OutputFile, [], 'EFI_SECTION_USER_INTERFACE',
                                                      Ui=StringData, IsMakefile=IsMakefile)

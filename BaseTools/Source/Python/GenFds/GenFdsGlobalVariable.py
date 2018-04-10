@@ -464,9 +464,11 @@ class GenFdsGlobalVariable:
         if Ui not in [None, '']:
             #Cmd += ["-n", '"' + Ui + '"']
             if IsMakefile:
-                Cmd += ["-n", "$(MODULE_NAME)"]
+                if Ui == "$(MODULE_NAME)":
+                    Cmd += ['-n', Ui]
+                else:
+                    Cmd += ["-n", '"' + Ui + '"']
                 Cmd += ["-o", Output]
-                #SaveFileOnChange(CommandFile, ' '.join(Cmd), False)
                 if ' '.join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:
                     GenFdsGlobalVariable.SecCmdList.append(' '.join(Cmd).strip())
             else:

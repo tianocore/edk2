@@ -502,9 +502,11 @@ class FfsInfStatement(FfsInfStatementClassObject):
         # For the rule only has simpleFile
         #
         MakefilePath = None
+        if self.IsBinaryModule:
+            IsMakefile = False
         if IsMakefile:
             MakefilePath = self.InfFileName, Arch
-        if isinstance (Rule, RuleSimpleFile.RuleSimpleFile) :
+        if isinstance (Rule, RuleSimpleFile.RuleSimpleFile):
             SectionOutputList = self.__GenSimpleFileSection__(Rule, IsMakefile=IsMakefile)
             FfsOutput = self.__GenSimpleFileFfs__(Rule, SectionOutputList, MakefilePath=MakefilePath)
             return FfsOutput
