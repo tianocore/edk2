@@ -813,7 +813,7 @@ def DynExPcdTokenNumberMapping(Info, AutoGenH):
     # AutoGen for each PCD listed in a [PcdEx] section of a Module/Lib INF file.
     # Auto generate a macro for each TokenName that takes a Guid pointer as a parameter.  
     # Use the Guid pointer to see if it matches any of the token space GUIDs.
-    TokenCNameList = []
+    TokenCNameList = set()
     for TokenCName in ExTokenCNameList:
         if TokenCName in TokenCNameList:
             continue
@@ -836,9 +836,9 @@ def DynExPcdTokenNumberMapping(Info, AutoGenH):
                                     % (Pcd.TokenSpaceGuidCName, Pcd.TokenSpaceGuidCName, RealTokenCName))
                 if Index == Count:
                     AutoGenH.Append('0 \\\n  )\n')
-                TokenCNameList.append(TokenCName)
+                TokenCNameList.add(TokenCName)
     
-    TokenCNameList = []
+    TokenCNameList = set()
     for TokenCName in ExTokenCNameList:
         if TokenCName in TokenCNameList:
             continue
@@ -868,7 +868,7 @@ def DynExPcdTokenNumberMapping(Info, AutoGenH):
                     #  COMPAREGUID() will only be used if the Guid passed in is local to the module.
                     AutoGenH.Append('#define _PCD_TOKEN_EX_%s(GuidPtr)   __PCD_%s_ADDR_CMP(GuidPtr) ? __PCD_%s_ADDR_CMP(GuidPtr) : __PCD_%s_VAL_CMP(GuidPtr)  \n'
                                     % (RealTokenCName, RealTokenCName, RealTokenCName, RealTokenCName))
-                TokenCNameList.append(TokenCName)
+                TokenCNameList.add(TokenCName)
 
 def GetPcdSize(Pcd):
     if Pcd.DatumType not in _NumericDataTypesList:
@@ -962,19 +962,22 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
     SetModeStatusName = '_PCD_SET_MODE_' + gDatumSizeStringDatabaseH[Pcd.DatumType] + '_S_' + TokenCName if Pcd.DatumType in gDatumSizeStringDatabaseH else '_PCD_SET_MODE_' + gDatumSizeStringDatabaseH['VOID*'] + '_S_' + TokenCName
     GetModeSizeName = '_PCD_GET_MODE_SIZE' + '_' + TokenCName
     
-    PcdExCNameList  = []
     if Pcd.Type in gDynamicExPcd:
         if Info.IsLibrary:
             PcdList = Info.LibraryPcdList
         else:
             PcdList = Info.ModulePcdList
+        PcdExCNameTest = 0
         for PcdModule in PcdList:
-            if PcdModule.Type in gDynamicExPcd:
-                PcdExCNameList.append(PcdModule.TokenCName)
+            if PcdModule.Type in gDynamicExPcd and Pcd.TokenCName == PcdModule.TokenCName:
+                PcdExCNameTest += 1
+            # get out early once we found > 1...
+            if PcdExCNameTest > 1:
+                break
         # Be compatible with the current code which using PcdToken and PcdGet/Set for DynamicEx Pcd.
         # If only PcdToken and PcdGet/Set used in all Pcds with different CName, it should succeed to build.
         # If PcdToken and PcdGet/Set used in the Pcds with different Guids but same CName, it should failed to build.
-        if PcdExCNameList.count(Pcd.TokenCName) > 1:
+        if PcdExCNameTest > 1:
             AutoGenH.Append('// Disabled the macros, as PcdToken and PcdGet/Set are not allowed in the case that more than one DynamicEx Pcds are different Guids but same CName.\n')
             AutoGenH.Append('// #define %s  %s\n' % (PcdTokenName, PcdExTokenName))
             AutoGenH.Append('// #define %s  LibPcdGetEx%s(&%s, %s)\n' % (GetModeName, DatumSizeLib, Pcd.TokenSpaceGuidCName, PcdTokenName))
@@ -996,14 +999,14 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                 AutoGenH.Append('#define %s(Value)  LibPcdSetEx%s(&%s, %s, (Value))\n' % (SetModeName, DatumSizeLib, Pcd.TokenSpaceGuidCName, PcdTokenName))
                 AutoGenH.Append('#define %s(Value)  LibPcdSetEx%sS(&%s, %s, (Value))\n' % (SetModeStatusName, DatumSizeLib, Pcd.TokenSpaceGuidCName, PcdTokenName))
     elif Pcd.Type in gDynamicPcd:
-        PcdList = []
-        PcdCNameList = []
-        PcdList.extend(Info.LibraryPcdList)
-        PcdList.extend(Info.ModulePcdList)
-        for PcdModule in PcdList:
-            if PcdModule.Type in gDynamicPcd:
-                PcdCNameList.append(PcdModule.TokenCName)
-        if PcdCNameList.count(Pcd.TokenCName) > 1:
+        PcdCNameTest = 0
+        for PcdModule in Info.LibraryPcdList + Info.ModulePcdList:
+            if PcdModule.Type in gDynamicPcd and Pcd.TokenCName == PcdModule.TokenCName:
+                PcdCNameTest += 1
+            # get out early once we found > 1...
+            if PcdCNameTest > 1:
+                break
+        if PcdCNameTest > 1:
             EdkLogger.error("build", AUTOGEN_ERROR, "More than one Dynamic Pcds [%s] are different Guids but same CName. They need to be changed to DynamicEx type to avoid the confliction.\n" % (TokenCName), ExtraData="[%s]" % str(Info.MetaFile.Path))
         else:
             AutoGenH.Append('#define %s  LibPcdGet%s(%s)\n' % (GetModeName, DatumSizeLib, PcdTokenName))
@@ -1265,7 +1268,6 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
             Type = '(VOID *)'
         Array = '[]'
     PcdItemType = Pcd.Type
-    PcdExCNameList  = []
     if PcdItemType in gDynamicExPcd:
         PcdExTokenName = '_PCD_TOKEN_' + TokenSpaceGuidCName + '_' + TokenCName
         AutoGenH.Append('\n#define %s  %dU\n' % (PcdExTokenName, TokenNumber))
@@ -1274,13 +1276,17 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
             PcdList = Info.LibraryPcdList
         else:
             PcdList = Info.ModulePcdList
+        PcdExCNameTest = 0
         for PcdModule in PcdList:
-            if PcdModule.Type in gDynamicExPcd:
-                PcdExCNameList.append(PcdModule.TokenCName)
+            if PcdModule.Type in gDynamicExPcd and Pcd.TokenCName == PcdModule.TokenCName:
+                PcdExCNameTest += 1
+            # get out early once we found > 1...
+            if PcdExCNameTest > 1:
+                break
         # Be compatible with the current code which using PcdGet/Set for DynamicEx Pcd.
         # If only PcdGet/Set used in all Pcds with different CName, it should succeed to build.
         # If PcdGet/Set used in the Pcds with different Guids but same CName, it should failed to build.
-        if PcdExCNameList.count(Pcd.TokenCName) > 1:
+        if PcdExCNameTest > 1:
             AutoGenH.Append('// Disabled the macros, as PcdToken and PcdGet/Set are not allowed in the case that more than one DynamicEx Pcds are different Guids but same CName.\n')
             AutoGenH.Append('// #define %s  %s\n' % (PcdTokenName, PcdExTokenName))
             AutoGenH.Append('// #define %s  LibPcdGetEx%s(&%s, %s)\n' % (GetModeName, DatumSizeLib, Pcd.TokenSpaceGuidCName, PcdTokenName))
@@ -1696,7 +1702,7 @@ def CreatePcdCode(Info, AutoGenC, AutoGenH):
     AutoGenH.Append("\n// Definition of SkuId Array\n")
     AutoGenH.Append("extern UINT64 _gPcd_SkuId_Array[];\n")
     # Add extern declarations to AutoGen.h if one or more Token Space GUIDs were found
-    if TokenSpaceList <> []:            
+    if TokenSpaceList:
         AutoGenH.Append("\n// Definition of PCD Token Space GUIDs used in this module\n\n")
         if Info.ModuleType in ["USER_DEFINED", "BASE"]:
             GuidType = "GUID"
