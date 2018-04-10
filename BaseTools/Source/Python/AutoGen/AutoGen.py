@@ -256,12 +256,6 @@ class WorkspaceAutoGen(AutoGen):
     def _InitWorker(self, WorkspaceDir, ActivePlatform, Target, Toolchain, ArchList, MetaFileDb,
               BuildConfig, ToolDefinition, FlashDefinitionFile='', Fds=None, Fvs=None, Caps=None, SkuId='', UniFlag=None,
               Progress=None, BuildModule=None):
-        if Fds is None:
-            Fds = []
-        if Fvs is None:
-            Fvs = []
-        if Caps is None:
-            Caps = []
         self.BuildDatabase  = MetaFileDb
         self.MetaFile       = ActivePlatform
         self.WorkspaceDir   = WorkspaceDir
@@ -276,9 +270,9 @@ class WorkspaceAutoGen(AutoGen):
         self.TargetTxt      = BuildConfig
         self.ToolDef        = ToolDefinition
         self.FdfFile        = FlashDefinitionFile
-        self.FdTargetList   = Fds
-        self.FvTargetList   = Fvs
-        self.CapTargetList  = Caps
+        self.FdTargetList   = Fds if Fds else []
+        self.FvTargetList   = Fvs if Fvs else []
+        self.CapTargetList  = Caps if Caps else []
         self.AutoGenObjectList = []
         self._BuildDir      = None
         self._FvDir         = None
