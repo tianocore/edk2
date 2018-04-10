@@ -1922,7 +1922,7 @@ class DefaultStore():
             return (str(minvalue), self.DefaultStores[str(minvalue)])
     def GetMin(self,DefaultSIdList):
         if not DefaultSIdList:
-            return "STANDARD"
+            return TAB_DEFAULT_STORES_DEFAULT
         storeidset = {storeid for storeid, storename in self.DefaultStores.values() if storename in DefaultSIdList}
         if not storeidset:
             return ""

@@ -947,10 +947,10 @@ class DscBuildData(PlatformBuildClassObject):
         for pcd in HiiPcd:
             for skuid in pcd.SkuInfoList:
                 skuobj = pcd.SkuInfoList.get(skuid)
-                if "STANDARD" not in skuobj.DefaultStoreDict:
+                if TAB_DEFAULT_STORES_DEFAULT not in skuobj.DefaultStoreDict:
                     PcdDefaultStoreSet = set([defaultstorename  for defaultstorename in skuobj.DefaultStoreDict])
                     mindefaultstorename = DefaultStoreMgr.GetMin(PcdDefaultStoreSet)
-                    skuobj.DefaultStoreDict['STANDARD'] = copy.deepcopy(skuobj.DefaultStoreDict[mindefaultstorename])
+                    skuobj.DefaultStoreDict[TAB_DEFAULT_STORES_DEFAULT] = copy.deepcopy(skuobj.DefaultStoreDict[mindefaultstorename])
         return Pcds
 
     def RecoverCommandLinePcd(self):
@@ -1325,7 +1325,7 @@ class DscBuildData(PlatformBuildClassObject):
                         str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].DefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
                 for str_pcd_data in StrPcdSet[str_pcd]:
                     if str_pcd_data[3] in SkuIds:
-                        str_pcd_obj_str.AddOverrideValue(str_pcd_data[2], str(str_pcd_data[6]), 'DEFAULT' if str_pcd_data[3] == 'COMMON' else str_pcd_data[3],'STANDARD' if str_pcd_data[4] == 'COMMON' else str_pcd_data[4], self.MetaFile.File if self.WorkspaceDir not in self.MetaFile.File else self.MetaFile.File[len(self.WorkspaceDir) if self.WorkspaceDir.endswith(os.path.sep) else len(self.WorkspaceDir)+1:],LineNo=str_pcd_data[5])
+                        str_pcd_obj_str.AddOverrideValue(str_pcd_data[2], str(str_pcd_data[6]), 'DEFAULT' if str_pcd_data[3] == 'COMMON' else str_pcd_data[3],TAB_DEFAULT_STORES_DEFAULT if str_pcd_data[4] == 'COMMON' else str_pcd_data[4], self.MetaFile.File if self.WorkspaceDir not in self.MetaFile.File else self.MetaFile.File[len(self.WorkspaceDir) if self.WorkspaceDir.endswith(os.path.sep) else len(self.WorkspaceDir)+1:],LineNo=str_pcd_data[5])
                 S_pcd_set[str_pcd[1], str_pcd[0]] = str_pcd_obj_str
             else:
                 EdkLogger.error('build', PARSER_ERROR,
@@ -1359,7 +1359,7 @@ class DscBuildData(PlatformBuildClassObject):
                             NoDefault = True
                             break
                         nextskuid = self.SkuIdMgr.GetNextSkuId(nextskuid)
-                    stru_pcd.SkuOverrideValues[skuid] = copy.deepcopy(stru_pcd.SkuOverrideValues[nextskuid]) if not NoDefault else copy.deepcopy({defaultstorename: stru_pcd.DefaultValues for defaultstorename in DefaultStores} if DefaultStores else {'STANDARD':stru_pcd.DefaultValues})
+                    stru_pcd.SkuOverrideValues[skuid] = copy.deepcopy(stru_pcd.SkuOverrideValues[nextskuid]) if not NoDefault else copy.deepcopy({defaultstorename: stru_pcd.DefaultValues for defaultstorename in DefaultStores} if DefaultStores else {TAB_DEFAULT_STORES_DEFAULT:stru_pcd.DefaultValues})
                     if not NoDefault:
                         stru_pcd.ValueChain[(skuid,'')]= (nextskuid,'')
             if stru_pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
@@ -1744,10 +1744,10 @@ class DscBuildData(PlatformBuildClassObject):
         CApp = CApp + '  UINT32  FieldSize;\n'
         CApp = CApp + '  CHAR8   *Value;\n'
 
-        CApp = CApp + "// SkuName: %s,  DefaultStoreName: %s \n" % ('DEFAULT', 'STANDARD')
+        CApp = CApp + "// SkuName: %s,  DefaultStoreName: %s \n" % ('DEFAULT', TAB_DEFAULT_STORES_DEFAULT)
         inherit_OverrideValues = Pcd.SkuOverrideValues[SkuName]
-        if (SkuName,DefaultStoreName) == ('DEFAULT','STANDARD'):
-            pcddefaultvalue = Pcd.DefaultFromDSC.get('DEFAULT',{}).get('STANDARD', Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue
+        if (SkuName,DefaultStoreName) == ('DEFAULT',TAB_DEFAULT_STORES_DEFAULT):
+            pcddefaultvalue = Pcd.DefaultFromDSC.get('DEFAULT',{}).get(TAB_DEFAULT_STORES_DEFAULT, Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue
         else:
             if not Pcd.DscRawValue:
                 # handle the case that structure pcd is not appear in DSC
@@ -1766,14 +1766,14 @@ class DscBuildData(PlatformBuildClassObject):
                                         (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, FieldList))
                 Value, ValueSize = ParseFieldValue (FieldList)
 
-                if (SkuName,DefaultStoreName) == ('DEFAULT','STANDARD'):
+                if (SkuName,DefaultStoreName) == ('DEFAULT',TAB_DEFAULT_STORES_DEFAULT):
                     if isinstance(Value, str):
-                        CApp = CApp + '  Pcd = %s; // From DSC Default Value %s\n' % (Value, Pcd.DefaultFromDSC.get('DEFAULT',{}).get('STANDARD', Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue)
+                        CApp = CApp + '  Pcd = %s; // From DSC Default Value %s\n' % (Value, Pcd.DefaultFromDSC.get('DEFAULT',{}).get(TAB_DEFAULT_STORES_DEFAULT, Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue)
                     elif IsArray:
                     #
                     # Use memcpy() to copy value into field
                     #
-                        CApp = CApp + '  Value     = %s; // From DSC Default Value %s\n' % (self.IntToCString(Value, ValueSize), Pcd.DefaultFromDSC.get('DEFAULT',{}).get('STANDARD', Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue)
+                        CApp = CApp + '  Value     = %s; // From DSC Default Value %s\n' % (self.IntToCString(Value, ValueSize), Pcd.DefaultFromDSC.get('DEFAULT',{}).get(TAB_DEFAULT_STORES_DEFAULT, Pcd.DefaultValue) if Pcd.DefaultFromDSC else Pcd.DefaultValue)
                         CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
                 else:
                     if isinstance(Value, str):
@@ -1785,7 +1785,7 @@ class DscBuildData(PlatformBuildClassObject):
                         CApp = CApp + '  Value     = %s; // From DSC Default Value %s\n' % (self.IntToCString(Value, ValueSize), Pcd.DscRawValue.get(SkuName,{}).get(DefaultStoreName))
                         CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
                 continue
-            if (SkuName,DefaultStoreName) == ('DEFAULT','STANDARD') or (( (SkuName,'') not in Pcd.ValueChain) and ( (SkuName,DefaultStoreName) not in Pcd.ValueChain )):
+            if (SkuName,DefaultStoreName) == ('DEFAULT',TAB_DEFAULT_STORES_DEFAULT) or (( (SkuName,'') not in Pcd.ValueChain) and ( (SkuName,DefaultStoreName) not in Pcd.ValueChain )):
                 for FieldName in FieldList:
                     IsArray = IsFieldValueAnArray(FieldList[FieldName][0])
                     if IsArray:
@@ -1941,7 +1941,7 @@ class DscBuildData(PlatformBuildClassObject):
             if Pcd.Type not in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],
                         self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
                 for skuname in self.SkuIdMgr.GetSkuChain(SkuName):
-                    storeset = [DefaultStoreName] if DefaultStoreName == 'STANDARD' else ['STANDARD', DefaultStoreName]
+                    storeset = [DefaultStoreName] if DefaultStoreName == TAB_DEFAULT_STORES_DEFAULT else [TAB_DEFAULT_STORES_DEFAULT, DefaultStoreName]
                     for defaultstorenameitem in storeset:
                         CApp = CApp + "// SkuName: %s,  DefaultStoreName: %s \n" % (skuname, defaultstorenameitem)
                         CApp = CApp + self.GenerateInitValueStatement(Pcd,skuname,defaultstorenameitem)
@@ -1949,7 +1949,7 @@ class DscBuildData(PlatformBuildClassObject):
                         break
             else:
                 CApp = CApp + "// SkuName: %s,  DefaultStoreName: STANDARD \n" % self.SkuIdMgr.SystemSkuId
-                CApp = CApp + self.GenerateInitValueStatement(Pcd,self.SkuIdMgr.SystemSkuId,"STANDARD")
+                CApp = CApp + self.GenerateInitValueStatement(Pcd,self.SkuIdMgr.SystemSkuId,TAB_DEFAULT_STORES_DEFAULT)
             CApp = CApp + self.GenerateCommandLineValueStatement(Pcd)
             #
             # Set new PCD value and size
@@ -1991,7 +1991,7 @@ class DscBuildData(PlatformBuildClassObject):
             CApp = CApp + self.GenerateCommandLineValue(Pcd)
             if not Pcd.SkuOverrideValues or Pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],
                         self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
-                CApp = CApp + self.GenerateInitValueFunction(Pcd,self.SkuIdMgr.SystemSkuId, 'STANDARD')
+                CApp = CApp + self.GenerateInitValueFunction(Pcd,self.SkuIdMgr.SystemSkuId, TAB_DEFAULT_STORES_DEFAULT)
             else:
                 for SkuName in self.SkuIdMgr.SkuOverrideOrder():
                     if SkuName not in Pcd.SkuOverrideValues:
@@ -2000,7 +2000,7 @@ class DscBuildData(PlatformBuildClassObject):
                         CApp = CApp + self.GenerateInitValueFunction(Pcd,SkuName,DefaultStoreName)
             if not Pcd.SkuOverrideValues or Pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],
                         self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
-                InitByteValue, CApp = self.GenerateInitializeFunc(self.SkuIdMgr.SystemSkuId, 'STANDARD', Pcd, InitByteValue, CApp)
+                InitByteValue, CApp = self.GenerateInitializeFunc(self.SkuIdMgr.SystemSkuId, TAB_DEFAULT_STORES_DEFAULT, Pcd, InitByteValue, CApp)
             else:
                 for SkuName in self.SkuIdMgr.SkuOverrideOrder():
                     if SkuName not in Pcd.SkuOverrideValues:
@@ -2016,7 +2016,7 @@ class DscBuildData(PlatformBuildClassObject):
         CApp = CApp + '{\n'
         for Pcd in StructuredPcds.values():
             if not Pcd.SkuOverrideValues or Pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
-                CApp = CApp + '  Initialize_%s_%s_%s_%s();\n' % (self.SkuIdMgr.SystemSkuId, 'STANDARD', Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
+                CApp = CApp + '  Initialize_%s_%s_%s_%s();\n' % (self.SkuIdMgr.SystemSkuId, TAB_DEFAULT_STORES_DEFAULT, Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
             else:
                 for SkuName in self.SkuIdMgr.SkuOverrideOrder():
                     if SkuName not in Pcd.SkuOverrideValues:
@@ -2340,14 +2340,14 @@ class DscBuildData(PlatformBuildClassObject):
         if Pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD], self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE]]:
             if self.SkuIdMgr.SystemSkuId not in Pcd.DscRawValue:
                 Pcd.DscRawValue[self.SkuIdMgr.SystemSkuId] = {}
-            Pcd.DscRawValue[self.SkuIdMgr.SystemSkuId]['STANDARD'] = Pcd.DefaultValue
+            Pcd.DscRawValue[self.SkuIdMgr.SystemSkuId][TAB_DEFAULT_STORES_DEFAULT] = Pcd.DefaultValue
         for skuname in Pcd.SkuInfoList:
             Pcd.DscRawValue[skuname] = {}
             if Pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
                 for defaultstore in Pcd.SkuInfoList[skuname].DefaultStoreDict:
                     Pcd.DscRawValue[skuname][defaultstore] = Pcd.SkuInfoList[skuname].DefaultStoreDict[defaultstore]
             else:
-                Pcd.DscRawValue[skuname]['STANDARD'] = Pcd.SkuInfoList[skuname].DefaultValue
+                Pcd.DscRawValue[skuname][TAB_DEFAULT_STORES_DEFAULT] = Pcd.SkuInfoList[skuname].DefaultValue
     def CompletePcdValues(self,PcdSet):
         Pcds = {}
         DefaultStoreObj = DefaultStore(self._GetDefaultStores())
@@ -2412,7 +2412,7 @@ class DscBuildData(PlatformBuildClassObject):
             SkuName = 'DEFAULT' if SkuName == 'COMMON' else SkuName
             DefaultStore = DefaultStore.upper()
             if DefaultStore == "COMMON":
-                DefaultStore = "STANDARD"
+                DefaultStore = TAB_DEFAULT_STORES_DEFAULT
             if SkuName not in AvailableSkuIdSet:
                 EdkLogger.error('build', PARAMETER_INVALID, 'Sku %s is not defined in [SkuIds] section' % SkuName,
                                             File=self.MetaFile, Line=Dummy5)
