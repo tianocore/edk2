@@ -4105,6 +4105,7 @@ vfrStatementExpression [UINT32 RootLevel, UINT32 ExpOpCount = 0] :
                                                           }
                                                           
                                                           if ($RootLevel == 0) {
+                                                            _CLEAR_SAVED_OPHDR ();
                                                             mCIfrOpHdrIndex --;
                                                           }
                                                        >>
@@ -4389,6 +4390,12 @@ vareqvalExp [UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                        << IdEqValDoSpecial ($ExpOpCount, L->getLine(), QId, VarIdStr, Mask, ConstVal, GREATER_THAN); >>
     )
   )
+  <<
+     if (VarIdStr != NULL) {
+       delete[] VarIdStr;
+       VarIdStr = NULL;
+     }
+  >>
   ;
 
 ideqvalExp [UINT32 & RootLevel, UINT32 & ExpOpCount] :
@@ -4442,6 +4449,12 @@ ideqvalExp [UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                        << IdEqValDoSpecial ($ExpOpCount, L->getLine(), QId, VarIdStr, Mask, ConstVal, GREATER_THAN); >>
     )
   )
+  <<
+     if (VarIdStr != NULL) {
+       delete[] VarIdStr;
+       VarIdStr = NULL;
+     }
+  >>
   ;
 
 ideqidExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
@@ -4494,6 +4507,16 @@ ideqidExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                        << IdEqIdDoSpecial ($ExpOpCount, L->getLine(), QId[0], VarIdStr[0], Mask[0], QId[1], VarIdStr[1], Mask[1], GREATER_THAN); >>
     )
   )
+  <<
+     if (VarIdStr[0] != NULL) {
+       delete[] VarIdStr[0];
+       VarIdStr[0] = NULL;
+     }
+     if (VarIdStr[1] != NULL) {
+       delete[] VarIdStr[1];
+       VarIdStr[1] = NULL;
+     }
+  >>
   ;
 
 ideqvallistExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
@@ -4532,6 +4555,10 @@ ideqvallistExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                               EILObj.SetQuestionId (QId, VarIdStr, LineNo);
                                                             }
                                                             $ExpOpCount++;
+                                                          }
+                                                          if (VarIdStr != NULL) {
+                                                            delete[] VarIdStr;
+                                                            VarIdStr = NULL;
                                                           }
                                                         >>
   ;
@@ -5057,7 +5084,10 @@ EfiVfrParser::_CLEAR_SAVED_OPHDR (
   VOID
   )
 {
-  mCIfrOpHdr[mCIfrOpHdrIndex]       = NULL;
+  if (mCIfrOpHdr[mCIfrOpHdrIndex] != NULL) {
+    delete mCIfrOpHdr[mCIfrOpHdrIndex];
+    mCIfrOpHdr[mCIfrOpHdrIndex]     = NULL;
+  }
   mCIfrOpHdrLineNo[mCIfrOpHdrIndex] = 0;
 }
 
