@@ -44,11 +44,11 @@
   ArmLib
 
 [Protocols]
-  gHardwareInterruptProtocolGuid
-  gEfiCpuArchProtocolGuid
+  gHardwareInterruptProtocolGuid  ## PRODUCES
+  gEfiCpuArchProtocolGuid         ## CONSUMES ## NOTIFY
 
 [FixedPcd.common]
   gEmbeddedTokenSpaceGuid.PcdInterruptBaseAddress
 
 [Depex]
-  gEfiCpuArchProtocolGuid
+  TRUE
