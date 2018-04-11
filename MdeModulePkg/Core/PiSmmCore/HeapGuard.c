@@ -592,14 +592,17 @@ SetGuardPage (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress
   )
 {
+  EFI_STATUS      Status;
+
   if (mSmmMemoryAttribute != NULL) {
     mOnGuarding = TRUE;
-    mSmmMemoryAttribute->SetMemoryAttributes (
-                           mSmmMemoryAttribute,
-                           BaseAddress,
-                           EFI_PAGE_SIZE,
-                           EFI_MEMORY_RP
-                           );
+    Status = mSmmMemoryAttribute->SetMemoryAttributes (
+                                    mSmmMemoryAttribute,
+                                    BaseAddress,
+                                    EFI_PAGE_SIZE,
+                                    EFI_MEMORY_RP
+                                    );
+    ASSERT_EFI_ERROR (Status);
     mOnGuarding = FALSE;
   }
 }
@@ -619,14 +622,17 @@ UnsetGuardPage (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress
   )
 {
+  EFI_STATUS      Status;
+
   if (mSmmMemoryAttribute != NULL) {
     mOnGuarding = TRUE;
-    mSmmMemoryAttribute->ClearMemoryAttributes (
-                           mSmmMemoryAttribute,
-                           BaseAddress,
-                           EFI_PAGE_SIZE,
-                           EFI_MEMORY_RP
-                           );
+    Status = mSmmMemoryAttribute->ClearMemoryAttributes (
+                                    mSmmMemoryAttribute,
+                                    BaseAddress,
+                                    EFI_PAGE_SIZE,
+                                    EFI_MEMORY_RP
+                                    );
+    ASSERT_EFI_ERROR (Status);
     mOnGuarding = FALSE;
   }
 }
