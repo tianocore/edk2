@@ -1,7 +1,7 @@
 ## @file
 # Parse FV image
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -363,7 +363,7 @@ class FirmwareVolume(Image):
                     NewFfs = self.UnDispatchedFfsDict.pop(FfsID)
                     NewFfs.Depex = DepexString
                     if FileDepex is not None:
-                        ScheduleList.insert.insert(FileDepex[1], FfsID, NewFfs, FileDepex[0])
+                        ScheduleList.insert(FileDepex[1], FfsID, NewFfs, FileDepex[0])
                     else:
                         ScheduleList[FfsID] = NewFfs
                 else:
