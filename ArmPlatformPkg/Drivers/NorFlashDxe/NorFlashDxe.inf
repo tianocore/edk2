@@ -69,4 +69,4 @@
   gArmPlatformTokenSpaceGuid.PcdNorFlashCheckBlockLocked
 
 [Depex]
-  TRUE
+  gEfiCpuArchProtocolGuid
