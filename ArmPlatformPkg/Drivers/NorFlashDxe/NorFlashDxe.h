@@ -122,8 +122,6 @@
 
 typedef struct _NOR_FLASH_INSTANCE                NOR_FLASH_INSTANCE;
 
-typedef EFI_STATUS (*NOR_FLASH_INITIALIZE)        (NOR_FLASH_INSTANCE* Instance);
-
 typedef struct {
   VENDOR_DEVICE_PATH                  Vendor;
   EFI_DEVICE_PATH_PROTOCOL            End;
@@ -132,9 +130,6 @@ typedef struct {
 struct _NOR_FLASH_INSTANCE {
   UINT32                              Signature;
   EFI_HANDLE                          Handle;
-
-  BOOLEAN                             Initialized;
-  NOR_FLASH_INITIALIZE                Initialize;
 
   UINTN                               DeviceBaseAddress;
   UINTN                               RegionBaseAddress;
@@ -145,7 +140,6 @@ struct _NOR_FLASH_INSTANCE {
   EFI_BLOCK_IO_MEDIA                  Media;
   EFI_DISK_IO_PROTOCOL                DiskIoProtocol;
 
-  BOOLEAN                             SupportFvb;
   EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL FvbProtocol;
   VOID*                               ShadowBuffer;
 
