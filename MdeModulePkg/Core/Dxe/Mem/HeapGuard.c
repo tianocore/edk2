@@ -580,6 +580,8 @@ SetGuardPage (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress
   )
 {
+  EFI_STATUS      Status;
+
   if (gCpu == NULL) {
     return;
   }
@@ -593,7 +595,8 @@ SetGuardPage (
   // Note: This might overwrite other attributes needed by other features,
   // such as NX memory protection.
   //
-  gCpu->SetMemoryAttributes (gCpu, BaseAddress, EFI_PAGE_SIZE, EFI_MEMORY_RP);
+  Status = gCpu->SetMemoryAttributes (gCpu, BaseAddress, EFI_PAGE_SIZE, EFI_MEMORY_RP);
+  ASSERT_EFI_ERROR (Status);
   mOnGuarding = FALSE;
 }
 
@@ -613,6 +616,7 @@ UnsetGuardPage (
   )
 {
   UINT64          Attributes;
+  EFI_STATUS      Status;
 
   if (gCpu == NULL) {
     return;
@@ -638,7 +642,8 @@ UnsetGuardPage (
   // such as memory protection (NX). Please make sure they are not enabled
   // at the same time.
   //
-  gCpu->SetMemoryAttributes (gCpu, BaseAddress, EFI_PAGE_SIZE, Attributes);
+  Status = gCpu->SetMemoryAttributes (gCpu, BaseAddress, EFI_PAGE_SIZE, Attributes);
+  ASSERT_EFI_ERROR (Status);
   mOnGuarding = FALSE;
 }
 
