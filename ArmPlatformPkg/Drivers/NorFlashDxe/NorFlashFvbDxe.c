@@ -25,6 +25,7 @@
 
 #include <Guid/VariableFormat.h>
 #include <Guid/SystemNvDataGuid.h>
+#include <Guid/NvVarStoreFormatted.h>
 
 #include "NorFlashDxe.h"
 
@@ -775,6 +776,18 @@ NorFlashFvbInitialize (
       return Status;
     }
   }
+
+  //
+  // The driver implementing the variable read service can now be dispatched;
+  // the varstore headers are in place.
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &gImageHandle,
+                  &gEdkiiNvVarStoreFormattedGuid,
+                  EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Register for the virtual address change event

@@ -31,6 +31,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
 
 [LibraryClasses]
   IoLib
@@ -49,6 +50,7 @@
   gEfiVariableGuid
   gEfiAuthenticatedVariableGuid
   gEfiEventVirtualAddressChangeGuid
+  gEdkiiNvVarStoreFormattedGuid     ## PRODUCES ## PROTOCOL
 
 [Protocols]
   gEfiBlockIoProtocolGuid
@@ -67,7 +69,4 @@
   gArmPlatformTokenSpaceGuid.PcdNorFlashCheckBlockLocked
 
 [Depex]
-  #
-  # NorFlashDxe must be loaded before VariableRuntimeDxe in case empty flash needs populating with default values
-  #
-  BEFORE gVariableRuntimeDxeFileGuid
+  TRUE
