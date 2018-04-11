@@ -47,14 +47,12 @@ import Common.GlobalData as GlobalData
 from DepexSection import DepexSection
 from Common.Misc import SaveFileOnChange
 from Common.Expression import *
-from Common.DataType import TAB_COMMON
+from Common.DataType import *
 
 ## generate FFS from INF
 #
 #
 class FfsInfStatement(FfsInfStatementClassObject):
-    ## The mapping dictionary from datum type to its maximum number.
-    _MAX_SIZE_TYPE = {"BOOLEAN":0x01, "UINT8":0xFF, "UINT16":0xFFFF, "UINT32":0xFFFFFFFF, "UINT64":0xFFFFFFFFFFFFFFFF}
     ## The constructor
     #
     #   @param  self        The object pointer
@@ -333,8 +331,8 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     EdkLogger.error("GenFds", GENFDS_ERROR, "The size of VOID* type PCD '%s.%s' exceeds its maximum size %d bytes." \
                                     % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, int(MaxDatumSize) - int(Pcd.MaxDatumSize)))
             else:
-                if PcdValueInDscOrFdf > FfsInfStatement._MAX_SIZE_TYPE[Pcd.DatumType] \
-                    or PcdValueInImg > FfsInfStatement._MAX_SIZE_TYPE[Pcd.DatumType]:
+                if PcdValueInDscOrFdf > MAX_VAL_TYPE[Pcd.DatumType] \
+                    or PcdValueInImg > MAX_VAL_TYPE[Pcd.DatumType]:
                     EdkLogger.error("GenFds", GENFDS_ERROR, "The size of %s type PCD '%s.%s' doesn't match its data type." \
                                     % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
             self.PatchPcds.append((Pcd, DefaultValue))

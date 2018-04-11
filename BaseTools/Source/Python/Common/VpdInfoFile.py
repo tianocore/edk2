@@ -23,6 +23,7 @@ import subprocess
 import Common.GlobalData as GlobalData
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.Misc import SaveFileOnChange
+from Common.DataType import *
 
 FILE_COMMENT_TEMPLATE = \
 """
@@ -67,9 +68,7 @@ FILE_COMMENT_TEMPLATE = \
 #  <NList>           ::=  <HexNumber> ["," <HexNumber>]*
 #
 class VpdInfoFile:
-    
-    ## The mapping dictionary from datum type to size string.
-    _MAX_SIZE_TYPE = {"BOOLEAN":"1", "UINT8":"1", "UINT16":"2", "UINT32":"4", "UINT64":"8"}
+
     _rVpdPcdLine = None 
     ## Constructor
     def __init__(self):
@@ -101,7 +100,7 @@ class VpdInfoFile:
                                 "Invalid max datum size for VPD PCD %s.%s" % (Vpd.TokenSpaceGuidCName, Vpd.TokenCName))
         elif Vpd.DatumType in ["BOOLEAN", "UINT8", "UINT16", "UINT32", "UINT64"]: 
             if Vpd.MaxDatumSize is None or Vpd.MaxDatumSize == "":
-                Vpd.MaxDatumSize = VpdInfoFile._MAX_SIZE_TYPE[Vpd.DatumType]
+                Vpd.MaxDatumSize = MAX_SIZE_TYPE[Vpd.DatumType]
         else:
             if Vpd.MaxDatumSize <= 0:
                 EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID,

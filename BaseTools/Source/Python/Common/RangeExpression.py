@@ -17,6 +17,7 @@ from CommonDataClass.Exceptions import BadExpression
 from CommonDataClass.Exceptions import WrnExpression
 import uuid
 from Common.Expression import PcdPattern
+from Common.DataType import *
 
 ERR_STRING_EXPR = 'This operator cannot be used in string expression: [%s].'
 ERR_SNYTAX = 'Syntax error, the rest of expression cannot be evaluated: [%s].'
@@ -38,16 +39,6 @@ ERR_ARRAY_TOKEN = 'Bad C array or C format GUID token: [%s].'
 ERR_ARRAY_ELE = 'This must be HEX value for NList or Array: [%s].'
 ERR_EMPTY_EXPR = 'Empty expression is not allowed.'
 ERR_IN_OPERAND = 'Macro after IN operator can only be: $(FAMILY), $(ARCH), $(TOOL_CHAIN_TAG) and $(TARGET).'
-
-def MaxOfType(DataType):
-    if DataType == 'UINT8':
-        return int('0xFF', 16)
-    if DataType == 'UINT16':
-        return int('0xFFFF', 16)
-    if DataType == 'UINT32':
-        return int('0xFFFFFFFF', 16)
-    if DataType == 'UINT64':
-        return int('0xFFFFFFFFFFFFFFFF', 16)
 
 class RangeObject(object):
     def __init__(self, start, end, empty = False):
@@ -111,7 +102,7 @@ class XOROperatorObject(object):
         rangeId = str(uuid.uuid1())
         rangeContainer = RangeContainer()
         rangeContainer.push(RangeObject(0, int(Operand) - 1))
-        rangeContainer.push(RangeObject(int(Operand) + 1, MaxOfType(DataType)))
+        rangeContainer.push(RangeObject(int(Operand) + 1, MAX_VAL_TYPE[DataType]))
         SymbolTable[rangeId] = rangeContainer
         return rangeId
 
@@ -149,7 +140,7 @@ class GEOperatorObject(object):
             raise BadExpression(ERR_SNYTAX % Expr)
         rangeId1 = str(uuid.uuid1())
         rangeContainer = RangeContainer()
-        rangeContainer.push(RangeObject(int(Operand), MaxOfType(DataType)))
+        rangeContainer.push(RangeObject(int(Operand), MAX_VAL_TYPE[DataType]))
         SymbolTable[rangeId1] = rangeContainer
         return rangeId1   
       
@@ -162,7 +153,7 @@ class GTOperatorObject(object):
             raise BadExpression(ERR_SNYTAX % Expr)
         rangeId1 = str(uuid.uuid1())
         rangeContainer = RangeContainer()
-        rangeContainer.push(RangeObject(int(Operand) + 1, MaxOfType(DataType)))
+        rangeContainer.push(RangeObject(int(Operand) + 1, MAX_VAL_TYPE[DataType]))
         SymbolTable[rangeId1] = rangeContainer
         return rangeId1   
     
@@ -307,18 +298,18 @@ class RangeExpression(object):
             rangeContainer = RangeContainer()
             rangeid = str(uuid.uuid1())
             if rangeobj.empty:
-                rangeContainer.push(RangeObject(0, MaxOfType(self.PcdDataType)))
+                rangeContainer.push(RangeObject(0, MAX_VAL_TYPE[self.PcdDataType]))
             else:
                 if rangeobj.start > 0:
                     rangeContainer.push(RangeObject(0, rangeobj.start - 1))
-                if rangeobj.end < MaxOfType(self.PcdDataType):
-                    rangeContainer.push(RangeObject(rangeobj.end + 1, MaxOfType(self.PcdDataType)))
+                if rangeobj.end < MAX_VAL_TYPE[self.PcdDataType]:
+                    rangeContainer.push(RangeObject(rangeobj.end + 1, MAX_VAL_TYPE[self.PcdDataType]))
             self.operanddict[rangeid] = rangeContainer
             rangeids.append(rangeid)
 
         if len(rangeids) == 0:
             rangeContainer = RangeContainer()
-            rangeContainer.push(RangeObject(0, MaxOfType(self.PcdDataType)))
+            rangeContainer.push(RangeObject(0, MAX_VAL_TYPE[self.PcdDataType]))
             rangeid = str(uuid.uuid1())
             self.operanddict[rangeid] = rangeContainer
             return rangeid

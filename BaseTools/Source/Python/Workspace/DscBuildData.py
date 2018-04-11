@@ -1542,25 +1542,19 @@ class DscBuildData(PlatformBuildClassObject):
 
     @staticmethod
     def GetPcdMaxSize(Pcd):
+        if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
+            return MAX_SIZE_TYPE[Pcd.DatumType]
+
         MaxSize = int(Pcd.MaxDatumSize,10) if Pcd.MaxDatumSize else 0
-        if Pcd.DatumType not in ['BOOLEAN','UINT8','UINT16','UINT32','UINT64']:
-            if Pcd.PcdValueFromComm:
-                if Pcd.PcdValueFromComm.startswith("{") and Pcd.PcdValueFromComm.endswith("}"):
-                    MaxSize = max([len(Pcd.PcdValueFromComm.split(",")),MaxSize])
-                elif Pcd.PcdValueFromComm.startswith("\"") or Pcd.PcdValueFromComm.startswith("\'"):
-                    MaxSize = max([len(Pcd.PcdValueFromComm)-2+1,MaxSize])
-                elif Pcd.PcdValueFromComm.startswith("L\""):
-                    MaxSize = max([2*(len(Pcd.PcdValueFromComm)-3+1),MaxSize])
-                else:
-                    MaxSize = max([len(Pcd.PcdValueFromComm),MaxSize])
-        elif Pcd.DatumType not in ['BOOLEAN','UINT8']:
-            MaxSize = 1
-        elif Pcd.DatumType  == 'UINT16':
-            MaxSize = 2
-        elif Pcd.DatumType  == 'UINT32':
-            MaxSize = 4
-        elif Pcd.DatumType  == 'UINT64':
-            MaxSize = 8
+        if Pcd.PcdValueFromComm:
+            if Pcd.PcdValueFromComm.startswith("{") and Pcd.PcdValueFromComm.endswith("}"):
+                return max([len(Pcd.PcdValueFromComm.split(",")),MaxSize])
+            elif Pcd.PcdValueFromComm.startswith("\"") or Pcd.PcdValueFromComm.startswith("\'"):
+                return max([len(Pcd.PcdValueFromComm)-2+1,MaxSize])
+            elif Pcd.PcdValueFromComm.startswith("L\""):
+                return max([2*(len(Pcd.PcdValueFromComm)-3+1),MaxSize])
+            else:
+                return max([len(Pcd.PcdValueFromComm),MaxSize])
         return MaxSize
 
     def GenerateSizeFunction(self,Pcd):
