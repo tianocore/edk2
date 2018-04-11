@@ -94,6 +94,7 @@
   gEfiSimpleTextOutProtocolGuid                 ## TO_START
   gEfiPciIoProtocolGuid                         ## SOMETIMES_CONSUMES
   gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiUsbIoProtocolGuid                         ## SOMETIMES_CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   ConPlatformDxeExtra.uni
