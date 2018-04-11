@@ -47,4 +47,4 @@
   gArmVirtTokenSpaceGuid.PcdForceNoAcpi
 
 [Depex]
-  TRUE
+  gEfiVariableArchProtocolGuid
