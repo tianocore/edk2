@@ -74,4 +74,4 @@
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport
 
 [Depex]
-  AFTER gArmGicDxeFileGuid
+  gHardwareInterruptProtocolGuid OR gHardwareInterrupt2ProtocolGuid
