@@ -1394,7 +1394,7 @@ class PlatformAutoGen(AutoGen):
 
             for PcdFromModule in M.ModulePcdList + M.LibraryPcdList:
                 # make sure that the "VOID*" kind of datum has MaxDatumSize set
-                if PcdFromModule.DatumType == "VOID*" and PcdFromModule.MaxDatumSize in [None, '']:
+                if PcdFromModule.DatumType == TAB_VOID and PcdFromModule.MaxDatumSize in [None, '']:
                     NoDatumTypePcdList.add("%s.%s [%s]" % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, F))
 
                 # Check the PCD from Binary INF or Source INF
@@ -1471,7 +1471,7 @@ class PlatformAutoGen(AutoGen):
                                         ExtraData="\n\tExisted %s PCD %s in:\n\t\t%s\n"
                                         % (PcdFromModule.Type, PcdFromModule.TokenCName, InfName))
                     # make sure that the "VOID*" kind of datum has MaxDatumSize set
-                    if PcdFromModule.DatumType == "VOID*" and PcdFromModule.MaxDatumSize in [None, '']:
+                    if PcdFromModule.DatumType == TAB_VOID and PcdFromModule.MaxDatumSize in [None, '']:
                         NoDatumTypePcdList.add("%s.%s [%s]" % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, InfName))
                     if M.ModuleType in ["PEIM", "PEI_CORE"]:
                         PcdFromModule.Phase = "PEI"
@@ -1536,7 +1536,7 @@ class PlatformAutoGen(AutoGen):
 
         for item in self._PlatformPcds:
             if self._PlatformPcds[item].DatumType and self._PlatformPcds[item].DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
-                self._PlatformPcds[item].DatumType = "VOID*"
+                self._PlatformPcds[item].DatumType = TAB_VOID
 
         if (self.Workspace.ArchList[-1] == self.Arch): 
             for Pcd in self._DynamicPcdList:
@@ -1545,7 +1545,7 @@ class PlatformAutoGen(AutoGen):
                 Sku.VpdOffset = Sku.VpdOffset.strip()
 
                 if Pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
-                    Pcd.DatumType = "VOID*"
+                    Pcd.DatumType = TAB_VOID
 
                     # if found PCD which datum value is unicode string the insert to left size of UnicodeIndex
                     # if found HII type PCD then insert to right of UnicodeIndex
@@ -1697,7 +1697,7 @@ class PlatformAutoGen(AutoGen):
                                 SkuValueMap[PcdValue].append(Sku)
                                 if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
                                     NeedProcessVpdMapFile = True 
-                            if DscPcdEntry.DatumType == 'VOID*' and PcdValue.startswith("L"):
+                            if DscPcdEntry.DatumType == TAB_VOID and PcdValue.startswith("L"):
                                 UnicodePcdArray.add(DscPcdEntry)
                             elif len(Sku.VariableName) > 0:
                                 HiiPcdArray.add(DscPcdEntry)
@@ -1744,10 +1744,10 @@ class PlatformAutoGen(AutoGen):
                 Sku.VpdOffset = Sku.VpdOffset.strip()
 
                 if Pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
-                    Pcd.DatumType = "VOID*"
+                    Pcd.DatumType = TAB_VOID
 
                 PcdValue = Sku.DefaultValue
-                if Pcd.DatumType == 'VOID*' and PcdValue.startswith("L"):
+                if Pcd.DatumType == TAB_VOID and PcdValue.startswith("L"):
                     # if found PCD which datum value is unicode string the insert to left size of UnicodeIndex
                     UnicodePcdArray.add(Pcd)
                 elif len(Sku.VariableName) > 0:
@@ -2369,7 +2369,7 @@ class PlatformAutoGen(AutoGen):
             ToPcd.validlists = FromPcd.validlists
             ToPcd.expressions = FromPcd.expressions
 
-        if FromPcd is not None and ToPcd.DatumType == "VOID*" and ToPcd.MaxDatumSize in ['', None]:
+        if FromPcd is not None and ToPcd.DatumType == TAB_VOID and ToPcd.MaxDatumSize in ['', None]:
             EdkLogger.debug(EdkLogger.DEBUG_9, "No MaxDatumSize specified for PCD %s.%s" \
                             % (ToPcd.TokenSpaceGuidCName, TokenCName))
             Value = ToPcd.DefaultValue
@@ -2445,7 +2445,7 @@ class PlatformAutoGen(AutoGen):
         # use PCD value to calculate the MaxDatumSize when it is not specified
         for Name, Guid in Pcds:
             Pcd = Pcds[Name, Guid]
-            if Pcd.DatumType == "VOID*" and Pcd.MaxDatumSize in ['', None]:
+            if Pcd.DatumType == TAB_VOID and Pcd.MaxDatumSize in ['', None]:
                 Pcd.MaxSizeUserSet = None
                 Value = Pcd.DefaultValue
                 if Value in [None, '']:
@@ -4113,13 +4113,13 @@ class ModuleAutoGen(AutoGen):
                     elif BoolValue == 'FALSE':
                         Pcd.DefaultValue = '0'
 
-                if Pcd.DatumType in ['UINT8', 'UINT16', 'UINT32', 'UINT64', 'BOOLEAN']:
+                if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
                     HexFormat = '0x%02x'
-                    if Pcd.DatumType == 'UINT16':
+                    if Pcd.DatumType == TAB_UINT16:
                         HexFormat = '0x%04x'
-                    elif Pcd.DatumType == 'UINT32':
+                    elif Pcd.DatumType == TAB_UINT32:
                         HexFormat = '0x%08x'
-                    elif Pcd.DatumType == 'UINT64':
+                    elif Pcd.DatumType == TAB_UINT64:
                         HexFormat = '0x%016x'
                     PcdValue = HexFormat % int(Pcd.DefaultValue, 0)
                 else:

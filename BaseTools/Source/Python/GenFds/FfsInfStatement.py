@@ -296,7 +296,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     EdkLogger.error("GenFds", GENFDS_ERROR, 'PCD [%s.%s] Value "%s"' %(Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Pcd.DefaultValue),File=self.InfFileName)
 
             # Check value, if value are equal, no need to patch
-            if Pcd.DatumType == "VOID*":
+            if Pcd.DatumType == TAB_VOID:
                 if Pcd.InfDefaultValue == DefaultValue or DefaultValue in [None, '']:
                     continue
                 # Get the string size from FDF or DSC
@@ -326,7 +326,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 except:
                     continue
             # Check the Pcd size and data type
-            if Pcd.DatumType == "VOID*":
+            if Pcd.DatumType == TAB_VOID:
                 if int(MaxDatumSize) > int(Pcd.MaxDatumSize):
                     EdkLogger.error("GenFds", GENFDS_ERROR, "The size of VOID* type PCD '%s.%s' exceeds its maximum size %d bytes." \
                                     % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, int(MaxDatumSize) - int(Pcd.MaxDatumSize)))

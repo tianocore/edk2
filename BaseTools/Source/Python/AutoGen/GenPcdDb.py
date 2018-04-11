@@ -20,7 +20,7 @@ from ValidCheckingInfoObject import VAR_VALID_OBJECT_FACTORY
 from Common.VariableAttributes import VariableAttributes
 import copy
 from struct import unpack
-from Common.DataType import TAB_DEFAULT
+from Common.DataType import *
 
 DATABASE_VERSION = 7
 
@@ -1026,7 +1026,7 @@ def NewCreatePcdDatabasePhaseSpecificAutoGen(Platform,Phase):
         new_pcd = copy.deepcopy(pcd)
         new_pcd.SkuInfoList = {skuname:pcd.SkuInfoList[skuname]}
         new_pcd.isinit = 'INIT'
-        if new_pcd.DatumType in ['UINT8','UINT16','UINT32','UINT64']:
+        if new_pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
             for skuobj in pcd.SkuInfoList.values():
                 if skuobj.DefaultValue:
                     defaultvalue = int(skuobj.DefaultValue,16) if skuobj.DefaultValue.upper().startswith("0X") else int(skuobj.DefaultValue,10)
@@ -1105,7 +1105,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
 
     Dict['PCD_INFO_FLAG'] = Platform.Platform.PcdInfoFlag
 
-    for DatumType in ['UINT64','UINT32','UINT16','UINT8','BOOLEAN', "VOID*"]:
+    for DatumType in TAB_PCD_NUMERIC_TYPES_VOID:
         Dict['VARDEF_CNAME_' + DatumType] = []
         Dict['VARDEF_GUID_' + DatumType]  = []
         Dict['VARDEF_SKUID_' + DatumType] = []
@@ -1177,7 +1177,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
     ReorderedDynPcdList = GetOrderedDynamicPcdList(DynamicPcdList, Platform.PcdTokenNumber)
     for item in ReorderedDynPcdList:
         if item.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
-            item.DatumType = "VOID*"
+            item.DatumType = TAB_VOID
     for Pcd in ReorderedDynPcdList:
         VoidStarTypeCurrSize = []
         i += 1
@@ -1218,7 +1218,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
         VariableDbValueList = []
         Pcd.InitString = 'UNINIT'
 
-        if Pcd.DatumType == 'VOID*':
+        if Pcd.DatumType == TAB_VOID:
             if Pcd.Type not in ["DynamicVpd", "DynamicExVpd"]:
                 Pcd.TokenTypeList = ['PCD_TYPE_STRING']
             else:
@@ -1322,9 +1322,9 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                     #
                     Dict['VARDEF_DB_VALUE_'+Pcd.DatumType].append(Sku.HiiDefaultValue)
                     
-                    if Pcd.DatumType == "UINT64":
+                    if Pcd.DatumType == TAB_UINT64:
                         Dict['VARDEF_VALUE_'+Pcd.DatumType].append(Sku.HiiDefaultValue + "ULL")
-                    elif Pcd.DatumType in ("UINT32", "UINT16", "UINT8"):
+                    elif Pcd.DatumType in (TAB_UINT32, TAB_UINT16, TAB_UINT8):
                         Dict['VARDEF_VALUE_'+Pcd.DatumType].append(Sku.HiiDefaultValue + "U")
                     elif Pcd.DatumType == "BOOLEAN":
                         if eval(Sku.HiiDefaultValue) in [1,0]:
@@ -1355,13 +1355,13 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                 VpdHeadOffsetList.append(str(Sku.VpdOffset) + 'U')
                 VpdDbOffsetList.append(Sku.VpdOffset)
                 # Also add the VOID* string of VPD PCD to SizeTable 
-                if Pcd.DatumType == 'VOID*':
+                if Pcd.DatumType == TAB_VOID:
                     NumberOfSizeItems += 1
                     # For VPD type of PCD, its current size is equal to its MAX size.
                     VoidStarTypeCurrSize = [str(Pcd.MaxDatumSize) + 'U']                 
                 continue
           
-            if Pcd.DatumType == 'VOID*':
+            if Pcd.DatumType == TAB_VOID:
                 Pcd.TokenTypeList += ['PCD_TYPE_STRING']
                 Pcd.InitString = 'INIT'
                 if Sku.HiiDefaultValue != '' and Sku.DefaultValue == '':
@@ -1420,9 +1420,9 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                 # For UNIT64 type PCD's value, ULL should be append to avoid
                 # warning under linux building environment.
                 #
-                if Pcd.DatumType == "UINT64":
+                if Pcd.DatumType == TAB_UINT64:
                     ValueList.append(Sku.DefaultValue + "ULL")
-                elif Pcd.DatumType in ("UINT32", "UINT16", "UINT8"):
+                elif Pcd.DatumType in (TAB_UINT32, TAB_UINT16, TAB_UINT8):
                     ValueList.append(Sku.DefaultValue + "U")
                 elif Pcd.DatumType == "BOOLEAN":
                     if Sku.DefaultValue in ["1", "0"]:
@@ -1433,7 +1433,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                 DbValueList.append(Sku.DefaultValue)
 
         Pcd.TokenTypeList = list(set(Pcd.TokenTypeList))
-        if Pcd.DatumType == 'VOID*':  
+        if Pcd.DatumType == TAB_VOID:
             Dict['SIZE_TABLE_CNAME'].append(CName)
             Dict['SIZE_TABLE_GUID'].append(TokenSpaceGuid)
             Dict['SIZE_TABLE_MAXIMUM_LENGTH'].append(str(Pcd.MaxDatumSize) + 'U')

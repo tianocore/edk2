@@ -1,4 +1,4 @@
-# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,7 @@ from Common.RangeExpression import RangeExpression
 from Common.Misc import *
 from StringIO import StringIO
 from struct import pack
+from Common.DataType import *
 
 class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
     def __init__(self):
@@ -250,13 +251,13 @@ class VAR_CHECK_PCD_VALID_OBJ(object):
         self.ValidData = True
         self.updateStorageWidth()
     def updateStorageWidth(self):
-        if self.PcdDataType == "UINT8" or self.PcdDataType == "BOOLEAN":
+        if self.PcdDataType == TAB_UINT8 or self.PcdDataType == "BOOLEAN":
             self.StorageWidth = 1
-        elif self.PcdDataType == "UINT16":
+        elif self.PcdDataType == TAB_UINT16:
             self.StorageWidth = 2
-        elif self.PcdDataType == "UINT32":
+        elif self.PcdDataType == TAB_UINT32:
             self.StorageWidth = 4
-        elif self.PcdDataType == "UINT64":
+        elif self.PcdDataType == TAB_UINT64:
             self.StorageWidth = 8
         else:
             self.StorageWidth = 0

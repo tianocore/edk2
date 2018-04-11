@@ -94,11 +94,11 @@ class VpdInfoFile:
         if not (Offset >= 0 or Offset == "*"):
             EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID, "Invalid offset parameter: %s." % Offset)
         
-        if Vpd.DatumType == "VOID*":
+        if Vpd.DatumType == TAB_VOID:
             if Vpd.MaxDatumSize <= 0:
                 EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID, 
                                 "Invalid max datum size for VPD PCD %s.%s" % (Vpd.TokenSpaceGuidCName, Vpd.TokenCName))
-        elif Vpd.DatumType in ["BOOLEAN", "UINT8", "UINT16", "UINT32", "UINT64"]: 
+        elif Vpd.DatumType in TAB_PCD_NUMERIC_TYPES: 
             if Vpd.MaxDatumSize is None or Vpd.MaxDatumSize == "":
                 Vpd.MaxDatumSize = MAX_SIZE_TYPE[Vpd.DatumType]
         else:

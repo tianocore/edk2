@@ -1,7 +1,7 @@
 ## @file
 # Patch value into the binary file.
 #
-# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -25,6 +25,7 @@ from Common.BuildToolError import *
 import Common.EdkLogger as EdkLogger
 from Common.BuildVersion import gBUILD_VERSION
 import array
+from Common.DataType import *
 
 # Version and Copyright
 __version_number__ = ("0.10" + " " + gBUILD_VERSION)
@@ -62,15 +63,15 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
     ValueLength = 0
     if TypeName == 'BOOLEAN':
         ValueLength = 1
-    elif TypeName == 'UINT8':
+    elif TypeName == TAB_UINT8:
         ValueLength = 1
-    elif TypeName == 'UINT16':
+    elif TypeName == TAB_UINT16:
         ValueLength = 2
-    elif TypeName == 'UINT32':
+    elif TypeName == TAB_UINT32:
         ValueLength = 4
-    elif TypeName == 'UINT64':
+    elif TypeName == TAB_UINT64:
         ValueLength = 8
-    elif TypeName == 'VOID*':
+    elif TypeName == TAB_VOID:
         if MaxSize == 0:
             return OPTION_MISSING, "PcdMaxSize is not specified for VOID* type PCD."
         ValueLength = int(MaxSize)
@@ -119,7 +120,7 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
         # Set PCD value into binary data
         #
         ByteList[ValueOffset] = ValueNumber
-    elif TypeName in ['UINT8', 'UINT16', 'UINT32', 'UINT64']:
+    elif TypeName in TAB_PCD_CLEAN_NUMERIC_TYPES:
         #
         # Get PCD value for UINT* data type
         #
@@ -133,7 +134,7 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
         for Index in range(ValueLength):
             ByteList[ValueOffset + Index] = ValueNumber % 0x100
             ValueNumber = ValueNumber / 0x100
-    elif TypeName == 'VOID*':
+    elif TypeName == TAB_VOID:
         ValueString = SavedStr
         if ValueString.startswith('L"'):
             #
@@ -264,10 +265,10 @@ def Main():
         if CommandOptions.PcdOffset is None or CommandOptions.PcdValue is None or CommandOptions.PcdTypeName is None:
             EdkLogger.error("PatchPcdValue", OPTION_MISSING, ExtraData="PcdOffset or PcdValue of PcdTypeName is not specified.")
             return 1
-        if CommandOptions.PcdTypeName.upper() not in ["BOOLEAN", "UINT8", "UINT16", "UINT32", "UINT64", "VOID*"]:
+        if CommandOptions.PcdTypeName.upper() not in TAB_PCD_NUMERIC_TYPES_VOID:
             EdkLogger.error("PatchPcdValue", PARAMETER_INVALID, ExtraData="PCD type %s is not valid." % (CommandOptions.PcdTypeName))
             return 1
-        if CommandOptions.PcdTypeName.upper() == "VOID*" and CommandOptions.PcdMaxSize is None:
+        if CommandOptions.PcdTypeName.upper() == TAB_VOID and CommandOptions.PcdMaxSize is None:
             EdkLogger.error("PatchPcdValue", OPTION_MISSING, ExtraData="PcdMaxSize is not specified for VOID* type PCD.")
             return 1
         #

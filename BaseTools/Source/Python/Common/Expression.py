@@ -18,6 +18,7 @@ from CommonDataClass.Exceptions import WrnExpression
 from Misc import GuidStringToGuidStructureString, ParseFieldValue, IsFieldValueAnArray
 import Common.EdkLogger as EdkLogger
 import copy
+from Common.DataType import *
 
 ERR_STRING_EXPR         = 'This operator cannot be used in string expression: [%s].'
 ERR_SNYTAX              = 'Syntax error, the rest of expression cannot be evaluated: [%s].'
@@ -136,7 +137,7 @@ def BuildOptionValue(PcdValue, GuidDict):
         InputValue = PcdValue
     if IsFieldValueAnArray(InputValue):
         try:
-            PcdValue = ValueExpressionEx(InputValue, 'VOID*', GuidDict)(True)
+            PcdValue = ValueExpressionEx(InputValue, TAB_VOID, GuidDict)(True)
         except:
             pass
     return PcdValue
@@ -800,20 +801,20 @@ class ValueExpressionEx(ValueExpression):
         PcdValue = self.PcdValue
         try:
             PcdValue = ValueExpression.__call__(self, RealValue, Depth)
-            if self.PcdType == 'VOID*' and (PcdValue.startswith("'") or PcdValue.startswith("L'")):
+            if self.PcdType == TAB_VOID and (PcdValue.startswith("'") or PcdValue.startswith("L'")):
                 PcdValue, Size = ParseFieldValue(PcdValue)
                 PcdValueList = []
                 for I in range(Size):
                     PcdValueList.append('0x%02X'%(PcdValue & 0xff))
                     PcdValue = PcdValue >> 8
                 PcdValue = '{' + ','.join(PcdValueList) + '}'
-            elif self.PcdType in ['UINT8', 'UINT16', 'UINT32', 'UINT64', 'BOOLEAN'] and (PcdValue.startswith("'") or \
+            elif self.PcdType in TAB_PCD_NUMERIC_TYPES and (PcdValue.startswith("'") or \
                       PcdValue.startswith('"') or PcdValue.startswith("L'") or PcdValue.startswith('L"') or PcdValue.startswith('{')):
                 raise BadExpression
         except WrnExpression, Value:
             PcdValue = Value.result
         except BadExpression, Value:
-            if self.PcdType in ['UINT8', 'UINT16', 'UINT32', 'UINT64', 'BOOLEAN']:
+            if self.PcdType in TAB_PCD_NUMERIC_TYPES:
                 PcdValue = PcdValue.strip()
                 if type(PcdValue) == type('') and PcdValue.startswith('{') and PcdValue.endswith('}'):
                     PcdValue = SplitPcdValueString(PcdValue[1:-1])
@@ -823,24 +824,24 @@ class ValueExpressionEx(ValueExpression):
                     ValueType = ''
                     for Item in PcdValue:
                         Item = Item.strip()
-                        if Item.startswith('UINT8'):
+                        if Item.startswith(TAB_UINT8):
                             ItemSize = 1
-                            ValueType = 'UINT8'
-                        elif Item.startswith('UINT16'):
+                            ValueType = TAB_UINT8
+                        elif Item.startswith(TAB_UINT16):
                             ItemSize = 2
-                            ValueType = 'UINT16'
-                        elif Item.startswith('UINT32'):
+                            ValueType = TAB_UINT16
+                        elif Item.startswith(TAB_UINT32):
                             ItemSize = 4
-                            ValueType = 'UINT32'
-                        elif Item.startswith('UINT64'):
+                            ValueType = TAB_UINT32
+                        elif Item.startswith(TAB_UINT64):
                             ItemSize = 8
-                            ValueType = 'UINT64'
+                            ValueType = TAB_UINT64
                         elif Item[0] in ['"',"'",'L']:
                             ItemSize = 0
-                            ValueType = 'VOID*'
+                            ValueType = TAB_VOID
                         else:
                             ItemSize = 0
-                            ValueType = 'UINT8'
+                            ValueType = TAB_UINT8
                         Item = ValueExpressionEx(Item, ValueType, self._Symb)(True)
 
                         if ItemSize == 0:
@@ -875,13 +876,13 @@ class ValueExpressionEx(ValueExpression):
                     PcdValue = '0x%0{}X'.format(Size) % (TmpValue)
                 if TmpValue < 0:
                     raise  BadExpression('Type %s PCD Value is negative' % self.PcdType)
-                if self.PcdType == 'UINT8' and Size > 1:
+                if self.PcdType == TAB_UINT8 and Size > 1:
                     raise BadExpression('Type %s PCD Value Size is Larger than 1 byte' % self.PcdType)
-                if self.PcdType == 'UINT16' and Size > 2:
+                if self.PcdType == TAB_UINT16 and Size > 2:
                     raise BadExpression('Type %s PCD Value Size is Larger than 2 byte' % self.PcdType)
-                if self.PcdType == 'UINT32' and Size > 4:
+                if self.PcdType == TAB_UINT32 and Size > 4:
                     raise BadExpression('Type %s PCD Value Size is Larger than 4 byte' % self.PcdType)
-                if self.PcdType == 'UINT64' and Size > 8:
+                if self.PcdType == TAB_UINT64 and Size > 8:
                     raise BadExpression('Type %s PCD Value Size is Larger than 8 byte' % self.PcdType)
             else:
                 try:
@@ -910,13 +911,13 @@ class ValueExpressionEx(ValueExpression):
                                         raise BadExpression('%s is not a valid c variable name' % Label)
                                     if Label not in LabelDict:
                                         LabelDict[Label] = str(LabelOffset)
-                            if Item.startswith('UINT8'):
+                            if Item.startswith(TAB_UINT8):
                                 LabelOffset = LabelOffset + 1
-                            elif Item.startswith('UINT16'):
+                            elif Item.startswith(TAB_UINT16):
                                 LabelOffset = LabelOffset + 2
-                            elif Item.startswith('UINT32'):
+                            elif Item.startswith(TAB_UINT32):
                                 LabelOffset = LabelOffset + 4
-                            elif Item.startswith('UINT64'):
+                            elif Item.startswith(TAB_UINT64):
                                 LabelOffset = LabelOffset + 8
                             else:
                                 try:
@@ -971,18 +972,18 @@ class ValueExpressionEx(ValueExpression):
                                 continue
                             else:
                                 ValueType = ""
-                                if Item.startswith('UINT8'):
+                                if Item.startswith(TAB_UINT8):
                                     ItemSize = 1
-                                    ValueType = "UINT8"
-                                elif Item.startswith('UINT16'):
+                                    ValueType = TAB_UINT8
+                                elif Item.startswith(TAB_UINT16):
                                     ItemSize = 2
-                                    ValueType = "UINT16"
-                                elif Item.startswith('UINT32'):
+                                    ValueType = TAB_UINT16
+                                elif Item.startswith(TAB_UINT32):
                                     ItemSize = 4
-                                    ValueType = "UINT32"
-                                elif Item.startswith('UINT64'):
+                                    ValueType = TAB_UINT32
+                                elif Item.startswith(TAB_UINT64):
                                     ItemSize = 8
-                                    ValueType = "UINT64"
+                                    ValueType = TAB_UINT64
                                 else:
                                     ItemSize = 0
                                 if ValueType:

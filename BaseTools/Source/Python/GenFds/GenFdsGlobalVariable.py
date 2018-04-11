@@ -811,7 +811,7 @@ class GenFdsGlobalVariable:
                 if (PcdObj.TokenCName == TokenCName) and (PcdObj.TokenSpaceGuidCName == TokenSpace):
                     if PcdObj.Type != 'FixedAtBuild':
                         EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not FixedAtBuild type." % PcdPattern)
-                    if PcdObj.DatumType != 'VOID*':
+                    if PcdObj.DatumType != DataType.TAB_VOID:
                         EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not VOID* datum type." % PcdPattern)
                         
                     PcdValue = PcdObj.DefaultValue
@@ -827,7 +827,7 @@ class GenFdsGlobalVariable:
                     if (PcdObj.TokenCName == TokenCName) and (PcdObj.TokenSpaceGuidCName == TokenSpace):
                         if PcdObj.Type != 'FixedAtBuild':
                             EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not FixedAtBuild type." % PcdPattern)
-                        if PcdObj.DatumType != 'VOID*':
+                        if PcdObj.DatumType != DataType.TAB_VOID:
                             EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not VOID* datum type." % PcdPattern)
                             
                         PcdValue = PcdObj.DefaultValue

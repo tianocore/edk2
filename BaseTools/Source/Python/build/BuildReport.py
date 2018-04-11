@@ -1007,7 +1007,7 @@ class PcdReport(object):
                         First = False
 
 
-                    if Pcd.DatumType in ('UINT8', 'UINT16', 'UINT32', 'UINT64'):
+                    if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
                         PcdValueNumber = int(PcdValue.strip(), 0)
                         if DecDefaultValue is None:
                             DecMatch = True
@@ -1112,7 +1112,7 @@ class PcdReport(object):
                             ModuleOverride = self.ModulePcdOverride.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName), {})
                             for ModulePath in ModuleOverride:
                                 ModuleDefault = ModuleOverride[ModulePath]
-                                if Pcd.DatumType in ('UINT8', 'UINT16', 'UINT32', 'UINT64'):
+                                if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
                                     ModulePcdDefaultValueNumber = int(ModuleDefault.strip(), 0)
                                     Match = (ModulePcdDefaultValueNumber == PcdValueNumber)
                                 else:

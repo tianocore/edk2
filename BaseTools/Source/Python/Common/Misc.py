@@ -1288,22 +1288,22 @@ def ParseFieldValue (Value):
     if type(Value) <> type(''):
         raise BadExpression('Type %s is %s' %(Value, type(Value)))
     Value = Value.strip()
-    if Value.startswith('UINT8') and Value.endswith(')'):
+    if Value.startswith(TAB_UINT8) and Value.endswith(')'):
         Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
         if Size > 1:
             raise BadExpression('Value (%s) Size larger than %d' %(Value, Size))
         return Value, 1
-    if Value.startswith('UINT16') and Value.endswith(')'):
+    if Value.startswith(TAB_UINT16) and Value.endswith(')'):
         Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
         if Size > 2:
             raise BadExpression('Value (%s) Size larger than %d' %(Value, Size))
         return Value, 2
-    if Value.startswith('UINT32') and Value.endswith(')'):
+    if Value.startswith(TAB_UINT32) and Value.endswith(')'):
         Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
         if Size > 4:
             raise BadExpression('Value (%s) Size larger than %d' %(Value, Size))
         return Value, 4
-    if Value.startswith('UINT64') and Value.endswith(')'):
+    if Value.startswith(TAB_UINT64) and Value.endswith(')'):
         Value, Size = ParseFieldValue(Value.split('(', 1)[1][:-1])
         if Size > 8:
             raise BadExpression('Value (%s) Size larger than %d' % (Value, Size))
@@ -1490,7 +1490,7 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
     elif PcdType in (MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_VPD):
         VpdOffset = FieldList[0]
         Value = Size = ''
-        if not DataType == 'VOID*':
+        if not DataType == TAB_VOID:
             if len(FieldList) > 1:
                 Value = FieldList[1]
         else:
@@ -1558,7 +1558,7 @@ def AnalyzePcdData(Setting):
 # For PCD value setting
 #
 def CheckPcdDatum(Type, Value):
-    if Type == "VOID*":
+    if Type == TAB_VOID:
         ValueRe = re.compile(r'\s*L?\".*\"\s*$')
         if not (((Value.startswith('L"') or Value.startswith('"')) and Value.endswith('"'))
                 or (Value.startswith('{') and Value.endswith('}')) or (Value.startswith("L'") or Value.startswith("'") and Value.endswith("'"))
