@@ -42,6 +42,14 @@
 
 #include "PiSmmCorePrivateData.h"
 
+#define SMRAM_CAPABILITIES  (EFI_MEMORY_WB | EFI_MEMORY_UC)
+
+#define MEMORY_CACHE_ATTRIBUTES (EFI_MEMORY_UC | EFI_MEMORY_WC | \
+                                 EFI_MEMORY_WT | EFI_MEMORY_WB | \
+                                 EFI_MEMORY_WP | EFI_MEMORY_UCE)
+
+#define MEMORY_PAGE_ATTRIBUTES  (EFI_MEMORY_XP | EFI_MEMORY_RP | EFI_MEMORY_RO)
+
 //
 // Function prototypes from produced protocols
 //
@@ -1617,34 +1625,48 @@ SmmIplEntry (
 
     GetSmramCacheRange (mCurrentSmramRange, &mSmramCacheBase, &mSmramCacheSize);
     //
+    // Make sure we can change the desired memory attributes.
+    //
+    Status = gDS->GetMemorySpaceDescriptor (
+                    mSmramCacheBase,
+                    &MemDesc
+                    );
+    ASSERT_EFI_ERROR (Status);
+    if ((MemDesc.Capabilities & SMRAM_CAPABILITIES) != SMRAM_CAPABILITIES) {
+      gDS->SetMemorySpaceCapabilities (
+             mSmramCacheBase,
+             mSmramCacheSize,
+             MemDesc.Capabilities | SMRAM_CAPABILITIES
+             );
+    }
+    //
     // If CPU AP is present, attempt to set SMRAM cacheability to WB and clear
-    // XP if it's set.
+    // all paging attributes.
     // Note that it is expected that cacheability of SMRAM has been set to WB if CPU AP
     // is not available here.
     //
     CpuArch = NULL;
     Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&CpuArch);
     if (!EFI_ERROR (Status)) {
-      Status = gDS->SetMemorySpaceAttributes(
-                      mSmramCacheBase, 
+      MemDesc.Attributes &= ~(MEMORY_CACHE_ATTRIBUTES | MEMORY_PAGE_ATTRIBUTES);
+      MemDesc.Attributes |= EFI_MEMORY_WB;
+      Status = gDS->SetMemorySpaceAttributes (
+                      mSmramCacheBase,
                       mSmramCacheSize,
-                      EFI_MEMORY_WB
+                      MemDesc.Attributes
                       );
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_WARN, "SMM IPL failed to set SMRAM window to EFI_MEMORY_WB\n"));
       }
 
-      Status = gDS->GetMemorySpaceDescriptor(
-                      mCurrentSmramRange->PhysicalStart,
-                      &MemDesc
-                      );
-      if (!EFI_ERROR (Status) && (MemDesc.Attributes & EFI_MEMORY_XP) != 0) {
-        gDS->SetMemorySpaceAttributes (
-               mCurrentSmramRange->PhysicalStart,
-               mCurrentSmramRange->PhysicalSize,
-               MemDesc.Attributes & (~EFI_MEMORY_XP)
+      DEBUG_CODE (
+        gDS->GetMemorySpaceDescriptor (
+               mSmramCacheBase,
+               &MemDesc
                );
-      }
+        DEBUG ((DEBUG_INFO, "SMRAM attributes: %016lx\n", MemDesc.Attributes));
+        ASSERT ((MemDesc.Attributes & MEMORY_PAGE_ATTRIBUTES) == 0);
+      );
     }
     //
     // if Loading module at Fixed Address feature is enabled, save the SMRAM base to Load
