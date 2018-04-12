@@ -40,7 +40,7 @@ or
   And use the following combined commands to pull the remote submodule updates
 (e.g. Updating the new supported OpenSSL release tag):
      $ git pull --recurse-submodules && \
-       git submodule update --recursive --remote
+       git submodule update --recursive
 
 =============================================================================
                       About process_files.pl
