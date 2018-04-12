@@ -19,7 +19,7 @@
   FILE_GUID                      = 470DFB96-E205-4515-A75E-2E60F853E79D
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = RealTimeClockLib
+  LIBRARY_CLASS                  = RealTimeClockLib|DXE_RUNTIME_DRIVER
 
 [Sources.common]
   PL031RealTimeClockLib.c
@@ -44,3 +44,6 @@
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdPL031RtcBase
   gArmPlatformTokenSpaceGuid.PcdPL031RtcPpmAccuracy
+
+[Depex.common.DXE_RUNTIME_DRIVER]
+  gEfiCpuArchProtocolGuid
