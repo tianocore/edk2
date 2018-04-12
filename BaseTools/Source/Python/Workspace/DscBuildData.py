@@ -1200,7 +1200,7 @@ class DscBuildData(PlatformBuildClassObject):
         for item in GlobalData.BuildOptionPcd:
             if len(item) == 5 and (item[1],item[0]) in StruPcds:
                 StructurePcdInCom[(item[0],item[1],item[2] )] = (item[3],item[4])
-        GlobalPcds = set([(item[0],item[1]) for item in StructurePcdInCom.keys()])
+        GlobalPcds = {(item[0],item[1]) for item in StructurePcdInCom}
         for Pcd in StruPcds.values():
             if (Pcd.TokenSpaceGuidCName,Pcd.TokenCName) not in GlobalPcds:
                 continue
@@ -1276,7 +1276,7 @@ class DscBuildData(PlatformBuildClassObject):
         DefaultStoreMgr = DefaultStore(self.DefaultStores)
         SkuIds = self.SkuIdMgr.AvailableSkuIdSet
         SkuIds.update({TAB_DEFAULT:0})
-        DefaultStores = set([storename for pcdobj in AllPcds.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict.keys()])
+        DefaultStores = {storename for pcdobj in AllPcds.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict}
 
         S_PcdSet = []
         # Find out all possible PCD candidates for self._Arch
@@ -2332,7 +2332,7 @@ class DscBuildData(PlatformBuildClassObject):
         Pcds = {}
         DefaultStoreObj = DefaultStore(self._GetDefaultStores())
         SkuIds = {skuname:skuid for skuname,skuid in self.SkuIdMgr.AvailableSkuIdSet.items() if skuname != TAB_COMMON}
-        DefaultStores = set([storename for pcdobj in PcdSet.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict.keys()])
+        DefaultStores = set([storename for pcdobj in PcdSet.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict])
         for PcdCName, TokenSpaceGuid in PcdSet:
             PcdObj = PcdSet[(PcdCName, TokenSpaceGuid)]
             self.CopyDscRawValue(PcdObj)

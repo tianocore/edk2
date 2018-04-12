@@ -439,7 +439,7 @@ class FV (FvClassObject):
         # Add [Files]
         #
         self.FvInfFile.writelines("[files]" + T_CHAR_LF)
-        if VtfDict is not None and self.UiFvName in VtfDict:
+        if VtfDict and self.UiFvName in VtfDict:
             self.FvInfFile.writelines("EFI_FILE_NAME = "                   + \
                                        VtfDict[self.UiFvName]              + \
                                        T_CHAR_LF)
