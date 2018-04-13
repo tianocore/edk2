@@ -1065,27 +1065,6 @@ class FfsInfStatement(FfsInfStatementClassObject):
                                              )
         return FfsOutput
 
-    ## __GetGenFfsCmdParameter__() method
-    #
-    #   Create parameter string for GenFfs
-    #
-    #   @param  Rule        The rule object used to generate section
-    #   @retval tuple       (FileType, Fixed, CheckSum, Alignment)
-    #
-    @staticmethod
-    def __GetGenFfsCmdParameter__(Rule):
-        result = tuple()
-        result += ('-t', Ffs.Ffs.FdfFvFileTypeToFileType[Rule.FvFileType])
-        if Rule.Fixed != False:
-            result += ('-x',)
-        if Rule.CheckSum != False:
-            result += ('-s',)
-
-        if Rule.Alignment is not None and Rule.Alignment != '':
-            result += ('-a', Rule.Alignment)
-
-        return result
- 
     ## __GetBuildOutputMapFileVfrUniInfo() method
     #
     #   Find the offset of UNI/INF object offset in the EFI image file.
