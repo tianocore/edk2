@@ -997,6 +997,7 @@ class InfBuildData(ModuleBuildClassObject):
             self._PcdComments[TokenSpaceGuid, PcdCName] = Comments
 
         # resolve PCD type, value, datum info, etc. by getting its definition from package
+        _GuidDict = self.Guids.copy()
         for PcdCName, TokenSpaceGuid in PcdList:
             PcdRealName = PcdCName
             Setting, LineNo = PcdDict[self._Arch, self.Platform, PcdCName, TokenSpaceGuid]
@@ -1050,7 +1051,7 @@ class InfBuildData(ModuleBuildClassObject):
                 #
                 #   "FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"
                 #
-                self.Guids.update(Package.Guids)
+                _GuidDict.update(Package.Guids)
                 PcdType = self._PCD_TYPE_STRING_[Type]
                 if Type == MODEL_PCD_DYNAMIC:
                     Pcd.Pending = True
@@ -1142,7 +1143,7 @@ class InfBuildData(ModuleBuildClassObject):
                         Pcd.DefaultValue = PcdInPackage.DefaultValue
                     else:
                         try:
-                            Pcd.DefaultValue = ValueExpressionEx(Pcd.DefaultValue, Pcd.DatumType, self.Guids)(True)
+                            Pcd.DefaultValue = ValueExpressionEx(Pcd.DefaultValue, Pcd.DatumType, _GuidDict)(True)
                         except BadExpression, Value:
                             EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %(TokenSpaceGuid, PcdRealName, Pcd.DefaultValue, Value),
                                             File=self.MetaFile, Line=LineNo)
