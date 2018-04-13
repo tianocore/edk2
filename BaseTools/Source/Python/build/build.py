@@ -1604,9 +1604,7 @@ class Build():
                         SmmModuleList[Module.MetaFile] = ImageInfo
                         SmmSize += ImageInfo.Image.Size
                         if Module.ModuleType == 'DXE_SMM_DRIVER':
-                            PiSpecVersion = '0x00000000'
-                            if 'PI_SPECIFICATION_VERSION' in Module.Module.Specification:
-                                PiSpecVersion = Module.Module.Specification['PI_SPECIFICATION_VERSION']
+                            PiSpecVersion = Module.Module.Specification.get('PI_SPECIFICATION_VERSION', '0x00000000')
                             # for PI specification < PI1.1, DXE_SMM_DRIVER also runs as BOOT time driver.
                             if int(PiSpecVersion, 16) < 0x0001000A:
                                 BtModuleList[Module.MetaFile] = ImageInfo
