@@ -250,7 +250,7 @@ ValidateFmpCapsule (
     //
     if (Index > 0) {
       if (ItemOffsetList[Index] <= ItemOffsetList[Index - 1]) {
-        DEBUG((DEBUG_ERROR, "ItemOffsetList[%d](0x%lx) < ItemOffsetList[%d](0x%x)\n", Index, ItemOffsetList[Index], Index, ItemOffsetList[Index - 1]));
+        DEBUG((DEBUG_ERROR, "ItemOffsetList[%d](0x%lx) < ItemOffsetList[%d](0x%x)\n", Index, ItemOffsetList[Index], Index - 1, ItemOffsetList[Index - 1]));
         return EFI_INVALID_PARAMETER;
       }
     }
