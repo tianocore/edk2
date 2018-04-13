@@ -279,8 +279,6 @@ class DscBuildData(PlatformBuildClassObject):
     ## handle Override Path of Module
     def _HandleOverridePath(self):
         RecordList = self._RawData[MODEL_META_DATA_COMPONENT, self._Arch]
-        Macros = self._Macros
-        Macros["EDK_SOURCE"] = GlobalData.gEcpSource
         for Record in RecordList:
             ModuleId = Record[6]
             LineNo = Record[7]
