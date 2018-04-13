@@ -58,7 +58,6 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\DataClass.py \
               $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\Exceptions.py \
               $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\FdfClass.py \
-              $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\PackageClass.py \
               $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\PlatformClass.py \
               $(BASE_TOOLS_PATH)\Source\Python\Table\Table.py \
               $(BASE_TOOLS_PATH)\Source\Python\Table\TableDataModel.py \
