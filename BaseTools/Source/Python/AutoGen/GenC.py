@@ -1540,7 +1540,7 @@ def CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH):
     }
 
     if Info.ModuleType in ['PEI_CORE', 'DXE_CORE', 'SMM_CORE', 'MM_CORE_STANDALONE']:
-        if Info.SourceFileList <> None and Info.SourceFileList <> []:
+        if Info.SourceFileList:
           if NumEntryPoints != 1:
               EdkLogger.error(
                   "build",

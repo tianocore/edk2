@@ -9,7 +9,7 @@
 # on STDOUT.
 # This tool has been tested with OpenSSL 1.0.1e 11 Feb 2013
 #
-# Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -89,7 +89,7 @@ if __name__ == '__main__':
   #
   # Check for output file argument
   #
-  if args.OutputFile <> None:
+  if args.OutputFile is not None:
     for Item in args.OutputFile:
       #
       # Save PEM filename and close output file
@@ -109,7 +109,7 @@ if __name__ == '__main__':
   #
   # Check for input file argument
   #
-  if args.InputFile <> None:
+  if args.InputFile is not None:
     for Item in args.InputFile:
       #
       # Save PEM filename and close input file

@@ -1665,7 +1665,7 @@ class PlatformAutoGen(AutoGen):
                                             DscPcdEntry.TokenValue = DecPcdEntry.TokenValue
                                             DscPcdEntry.TokenSpaceGuidValue = eachDec.Guids[DecPcdEntry.TokenSpaceGuidCName]
                                             # Only fix the value while no value provided in DSC file.
-                                            if (Sku.DefaultValue == "" or Sku.DefaultValue==None):
+                                            if not Sku.DefaultValue:
                                                 DscPcdEntry.SkuInfoList[DscPcdEntry.SkuInfoList.keys()[0]].DefaultValue = DecPcdEntry.DefaultValue
                                                                                                                     
                                 if DscPcdEntry not in self._DynamicPcdList:

@@ -2292,7 +2292,7 @@ class DscBuildData(PlatformBuildClassObject):
             pcdDecObject = self._DecPcds[pcd.TokenCName, pcd.TokenSpaceGuidCName]
             # Only fix the value while no value provided in DSC file.
             for sku in pcd.SkuInfoList.values():
-                if (sku.DefaultValue == "" or sku.DefaultValue==None):
+                if not sku.DefaultValue:
                     sku.DefaultValue = pcdDecObject.DefaultValue
             if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
                 valuefromDec = pcdDecObject.DefaultValue
@@ -2624,7 +2624,7 @@ class DscBuildData(PlatformBuildClassObject):
             pcd.DatumType = pcdDecObject.DatumType
             # Only fix the value while no value provided in DSC file.
             for sku in pcd.SkuInfoList.values():
-                if (sku.DefaultValue == "" or sku.DefaultValue==None):
+                if not sku.DefaultValue:
                     sku.DefaultValue = pcdDecObject.DefaultValue
             if 'DEFAULT' not in pcd.SkuInfoList.keys() and 'COMMON' not in pcd.SkuInfoList.keys():
                 valuefromDec = pcdDecObject.DefaultValue
