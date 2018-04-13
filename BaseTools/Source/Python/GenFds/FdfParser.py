@@ -2158,7 +2158,7 @@ class FdfParser:
         self.__GetAprioriSection(FvObj, FvObj.DefineVarDict.copy())
 
         while True:
-            isInf = self.__GetInfStatement(FvObj, MacroDict = FvObj.DefineVarDict.copy())
+            isInf = self.__GetInfStatement(FvObj)
             isFile = self.__GetFileStatement(FvObj, MacroDict = FvObj.DefineVarDict.copy())
             if not isInf and not isFile:
                 break
@@ -2423,7 +2423,7 @@ class FdfParser:
         MacroDict.update(AprSectionObj.DefineVarDict)
 
         while True:
-            IsInf = self.__GetInfStatement( AprSectionObj, MacroDict = MacroDict)
+            IsInf = self.__GetInfStatement(AprSectionObj)
             IsFile = self.__GetFileStatement( AprSectionObj)
             if not IsInf and not IsFile:
                 break
@@ -2486,11 +2486,10 @@ class FdfParser:
     #
     #   @param  self        The object pointer
     #   @param  Obj         for whom inf statement is got
-    #   @param  MacroDict   dictionary used to replace macro
     #   @retval True        Successfully find inf statement
     #   @retval False       Not able to find inf statement
     #
-    def __GetInfStatement(self, Obj, ForCapsule=False, MacroDict={}):
+    def __GetInfStatement(self, Obj, ForCapsule=False):
         ffsInf = self.__ParseInfStatement()
         if not ffsInf:
             return False
@@ -2926,7 +2925,7 @@ class FdfParser:
                 self.__GetAprioriSection(FvObj, MacroDict.copy())
 
                 while True:
-                    IsInf = self.__GetInfStatement(FvObj, MacroDict.copy())
+                    IsInf = self.__GetInfStatement(FvObj)
                     IsFile = self.__GetFileStatement(FvObj, MacroDict.copy())
                     if not IsInf and not IsFile:
                         break
