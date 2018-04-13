@@ -702,7 +702,7 @@ UpdateSectionEntries (
       Descriptor |= EntryValue;
 
       if (CurrentDescriptor  != Descriptor) {
-        Mva = (VOID *)(UINTN)(((UINTN)FirstLevelTable) << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
+        Mva = (VOID *)(UINTN)(((UINTN)FirstLevelIdx + i) << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
 
         // Only need to update if we are changing the descriptor
         FirstLevelTable[FirstLevelIdx + i] = Descriptor;
