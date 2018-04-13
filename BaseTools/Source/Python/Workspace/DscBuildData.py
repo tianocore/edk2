@@ -1141,17 +1141,6 @@ class DscBuildData(PlatformBuildClassObject):
             self.RecoverCommandLinePcd()
         return self._Pcds
 
-    def _dumpPcdInfo(self,Pcds):
-        for pcd in Pcds:
-            pcdobj = Pcds[pcd]
-            if not pcdobj.TokenCName.startswith("Test"):
-                continue
-            for skuid in pcdobj.SkuInfoList:
-                if pcdobj.Type in (self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII],self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]):
-                    for storename in pcdobj.SkuInfoList[skuid].DefaultStoreDict:
-                        print "PcdCName: %s, SkuName: %s, StoreName: %s, Value: %s" % (".".join((pcdobj.TokenSpaceGuidCName, pcdobj.TokenCName)), skuid,storename,str(pcdobj.SkuInfoList[skuid].DefaultStoreDict[storename]))
-                else:
-                    print "PcdCName: %s, SkuName: %s, Value: %s" % (".".join((pcdobj.TokenSpaceGuidCName, pcdobj.TokenCName)), skuid,str(pcdobj.SkuInfoList[skuid].DefaultValue))
     ## Retrieve [BuildOptions]
     def _GetBuildOptions(self):
         if self._BuildOptions is None:
@@ -1506,26 +1495,6 @@ class DscBuildData(PlatformBuildClassObject):
 
 
         return Pcds
-
-    def __UNICODE2OCTList(self,Value):
-        Value = Value.strip()
-        Value = Value[2:-1]
-        List = []
-        for Item in Value:
-            Temp = '%04X' % ord(Item)
-            List.append('0x' + Temp[2:4])
-            List.append('0x' + Temp[0:2])
-        List.append('0x00')
-        List.append('0x00')
-        return List
-    def __STRING2OCTList(self,Value):
-        OCTList = []
-        Value = Value.strip('"')
-        for char in Value:
-            Temp = '%02X' % ord(char)
-            OCTList.append('0x' + Temp)
-        OCTList.append('0x00')
-        return OCTList
 
     def GetStructurePcdMaxSize(self, str_pcd):
         pcd_default_value = str_pcd.DefaultValue
