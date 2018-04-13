@@ -95,6 +95,9 @@ MAKEROOT ?= $(EDK_TOOLS_PATH)/Source/C
 LIBS = -lCommon
 '''
 
+## regular expressions for finding decimal and hex numbers
+Pattern = re.compile('^[1-9]\d*|0$')
+HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
 ## Regular expression for finding header file inclusions
 from AutoGen.GenMake import gIncludePattern
 
@@ -642,9 +645,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if Record[1] in [None, '']:
                     EdkLogger.error('build', FORMAT_INVALID, 'No Sku ID name',
                                     File=self.MetaFile, Line=Record[-1])
-                Pattern = re.compile('^[1-9]\d*|0$')
-                HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
-                if Pattern.match(Record[0]) is None and HexPattern.match(Record[0]) is None:
+                if not Pattern.match(Record[0]) and not HexPattern.match(Record[0]):
                     EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID number is invalid. It only support Integer and HexNumber",
                                     File=self.MetaFile, Line=Record[-1])
                 if not IsValidWord(Record[1]):
@@ -669,9 +670,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if Record[1] in [None, '']:
                     EdkLogger.error('build', FORMAT_INVALID, 'No DefaultStores ID name',
                                     File=self.MetaFile, Line=Record[-1])
-                Pattern = re.compile('^[1-9]\d*|0$')
-                HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
-                if Pattern.match(Record[0]) is None and HexPattern.match(Record[0]) is None:
+                if not Pattern.match(Record[0]) and not HexPattern.match(Record[0]):
                     EdkLogger.error('build', FORMAT_INVALID, "The format of the DefaultStores ID number is invalid. It only support Integer and HexNumber",
                                     File=self.MetaFile, Line=Record[-1])
                 if not IsValidWord(Record[1]):
