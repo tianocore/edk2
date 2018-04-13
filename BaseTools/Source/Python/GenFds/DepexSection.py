@@ -1,7 +1,7 @@
 ## @file
 # process depex section generation
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -76,12 +76,10 @@ class DepexSection (DepexSectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name list, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, keyStringList, FfsFile = None, Dict = {}, IsMakefile = False):
-        
+    def GenSection(self, OutputPath, ModuleName, SecNum, keyStringList, FfsFile = None, Dict = None, IsMakefile = False):
         if self.ExpressionProcessed == False:
             self.Expression = self.Expression.replace("\n", " ").replace("\r", " ")
             ExpList = self.Expression.split()
-            ExpGuidDict = {}
 
             for Exp in ExpList:
                 if Exp.upper() not in ('AND', 'OR', 'NOT', 'TRUE', 'FALSE', 'SOR', 'BEFORE', 'AFTER', 'END'):
@@ -90,10 +88,7 @@ class DepexSection (DepexSectionClassObject):
                         EdkLogger.error("GenFds", RESOURCE_NOT_AVAILABLE,
                                         "Depex GUID %s could not be found in build DB! (ModuleName: %s)" % (Exp, ModuleName))
 
-                    ExpGuidDict[Exp] = GuidStr
-
-            for Item in ExpGuidDict:
-                self.Expression = self.Expression.replace(Item, ExpGuidDict[Item])
+                    self.Expression = self.Expression.replace(Exp, GuidStr)
 
             self.Expression = self.Expression.strip()
             self.ExpressionProcessed = True
@@ -120,5 +115,4 @@ class DepexSection (DepexSectionClassObject):
         OutputFile = os.path.normpath(OutputFile)
 
         GenFdsGlobalVariable.GenerateSection(OutputFile, [InputFile], Section.Section.SectionType.get (SecType), IsMakefile=IsMakefile)
-        FileList = [OutputFile]
-        return FileList, self.Alignment
+        return [OutputFile], self.Alignment
