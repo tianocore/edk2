@@ -602,6 +602,7 @@ FindMatchingFmpHandles (
   )
 {
   EFI_STATUS                     Status;
+  UINTN                          TempHandleCount;
   EFI_HANDLE                     *HandleBuffer;
   UINTN                          Index;
   UINTN                          Index2;
@@ -613,20 +614,20 @@ FindMatchingFmpHandles (
   BOOLEAN                        MatchFound;
 
   *HandleCount  = 0;
+  TempHandleCount = 0;
   HandleBuffer = NULL;
   Status = gBS->LocateHandleBuffer (
                    ByProtocol,
                    ProtocolGuid,
                    NULL,
-                   HandleCount,
+                   &TempHandleCount,
                    &HandleBuffer
                    );
   if (EFI_ERROR (Status)) {
-    *HandleCount  = 0;
     return NULL;
   }
 
-  for (Index = 0; Index < *HandleCount; Index++) {
+  for (Index = 0; Index < TempHandleCount; Index++) {
     OriginalFmpImageInfoBuf = GetFmpImageDescriptors (
                                 HandleBuffer[Index],
                                 ProtocolGuid,
@@ -657,11 +658,20 @@ FindMatchingFmpHandles (
       //
       FmpImageInfoBuf = (EFI_FIRMWARE_IMAGE_DESCRIPTOR *)(((UINT8 *)FmpImageInfoBuf) + DescriptorSize);
     }
-    if (!MatchFound) {
-      HandleBuffer[Index] = NULL;
+    if (MatchFound) {
+      HandleBuffer[*HandleCount] = HandleBuffer[Index];
+      (*HandleCount)++;
     }
 
     FreePool (OriginalFmpImageInfoBuf);
+  }
+
+  if ((*HandleCount) == 0) {
+    //
+    // No any matching handle.
+    //
+    FreePool (HandleBuffer);
+    return NULL;
   }
   return HandleBuffer;
 }
@@ -801,6 +811,7 @@ SystemFirmwareUpdateMainDxe (
     // Install System FMP protocol onto handle with matching FMP Protocol
     //
     DEBUG ((DEBUG_INFO, "SystemFirmwareUpdateDxe: Install System FMP onto matching FMP handle\n"));
+    mSystemFmpPrivate->Handle = HandleBuffer[0];
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &HandleBuffer[0],
                     &gSystemFmpProtocolGuid,
