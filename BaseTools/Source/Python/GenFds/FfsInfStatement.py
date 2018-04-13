@@ -1011,7 +1011,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                         if VfrUniOffsetList:
                             UniVfrOffsetFileName = os.path.join(self.OutputPath, self.BaseName + '.offset')
                             UniVfrOffsetFileSection = os.path.join(self.OutputPath, self.BaseName + 'Offset' + '.raw')
-                            self.__GenUniVfrOffsetFile (VfrUniOffsetList, UniVfrOffsetFileName)
+                            FfsInfStatement.__GenUniVfrOffsetFile (VfrUniOffsetList, UniVfrOffsetFileName)
                             UniVfrOffsetFileNameList = []
                             UniVfrOffsetFileNameList.append(UniVfrOffsetFileName)
                             """Call GenSection"""
@@ -1069,11 +1069,11 @@ class FfsInfStatement(FfsInfStatementClassObject):
     #
     #   Create parameter string for GenFfs
     #
-    #   @param  self        The object pointer
     #   @param  Rule        The rule object used to generate section
     #   @retval tuple       (FileType, Fixed, CheckSum, Alignment)
     #
-    def __GetGenFfsCmdParameter__(self, Rule):
+    @staticmethod
+    def __GetGenFfsCmdParameter__(Rule):
         result = tuple()
         result += ('-t', Ffs.Ffs.FdfFvFileTypeToFileType[Rule.FvFileType])
         if Rule.Fixed != False:
@@ -1103,11 +1103,11 @@ class FfsInfStatement(FfsInfStatementClassObject):
     #
     #   Generate the offset file for the module which contain VFR or UNI file.
     #
-    #   @param  self                    The object pointer
     #   @param  VfrUniOffsetList        A list contain the VFR/UNI offsets in the EFI image file.
     #   @param  UniVfrOffsetFileName    The output offset file name.
     #
-    def __GenUniVfrOffsetFile(self, VfrUniOffsetList, UniVfrOffsetFileName):
+    @staticmethod
+    def __GenUniVfrOffsetFile(VfrUniOffsetList, UniVfrOffsetFileName):
 
         # Use a instance of StringIO to cache data
         fStringIO = StringIO.StringIO('')  

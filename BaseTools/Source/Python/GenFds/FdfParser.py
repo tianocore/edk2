@@ -1131,7 +1131,8 @@ class FdfParser:
             self.__UndoToken()
             return False
 
-    def __Verify(self, Name, Value, Scope):
+    @staticmethod
+    def __Verify(Name, Value, Scope):
         if Scope in ['UINT64', 'UINT8']:
             ValueNumber = 0
             try:
@@ -3200,16 +3201,16 @@ class FdfParser:
                     raise Warning("expected value of %s" % Name, self.FileName, self.CurrentLineNumber)
                 Value = self.__Token
                 if Name == 'IMAGE_HEADER_INIT_VERSION':
-                    if self.__Verify(Name, Value, 'UINT8'):
+                    if FdfParser.__Verify(Name, Value, 'UINT8'):
                         FmpData.Version = Value
                 elif Name == 'IMAGE_INDEX':
-                    if self.__Verify(Name, Value, 'UINT8'):
+                    if FdfParser.__Verify(Name, Value, 'UINT8'):
                         FmpData.ImageIndex = Value
                 elif Name == 'HARDWARE_INSTANCE':
-                    if self.__Verify(Name, Value, 'UINT8'):
+                    if FdfParser.__Verify(Name, Value, 'UINT8'):
                         FmpData.HardwareInstance = Value
                 elif Name == 'MONOTONIC_COUNT':
-                    if self.__Verify(Name, Value, 'UINT64'):
+                    if FdfParser.__Verify(Name, Value, 'UINT64'):
                         FmpData.MonotonicCount = Value
                         if FmpData.MonotonicCount.upper().startswith('0X'):
                             FmpData.MonotonicCount = (long)(FmpData.MonotonicCount, 16)
