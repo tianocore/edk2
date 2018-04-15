@@ -27,6 +27,16 @@ typedef struct {
 } VENDOR_UART_DEVICE_PATH;
 #pragma pack()
 
+//
+// USB Keyboard Device Path structure
+//
+#pragma pack (1)
+typedef struct {
+  USB_CLASS_DEVICE_PATH    Keyboard;
+  EFI_DEVICE_PATH_PROTOCOL End;
+} USB_KEYBOARD_DEVICE_PATH;
+#pragma pack ()
+
 ACPI_HID_DEVICE_PATH       gPnpPs2KeyboardDeviceNode  = gPnpPs2Keyboard;
 ACPI_HID_DEVICE_PATH       gPnp16550ComPortDeviceNode = gPnp16550ComPort;
 UART_DEVICE_PATH           gUartDeviceNode            = gUart;
@@ -71,6 +81,24 @@ VENDOR_UART_DEVICE_PATH gDebugAgentUartDevicePath = {
   gEndEntire
 };
 
+STATIC USB_KEYBOARD_DEVICE_PATH gUsbKeyboardDevicePath = {
+  {
+    {
+      MESSAGING_DEVICE_PATH,
+      MSG_USB_CLASS_DP,
+      {
+        (UINT8)sizeof (USB_CLASS_DEVICE_PATH),
+        (UINT8)(sizeof (USB_CLASS_DEVICE_PATH) >> 8)
+      }
+    },
+    0xFFFF, // VendorId: any
+    0xFFFF, // ProductId: any
+    3,      // DeviceClass: HID
+    1,      // DeviceSubClass: boot
+    1       // DeviceProtocol: keyboard
+  },
+  gEndEntire
+};
 
 //
 // Predefined platform default console device path
@@ -79,6 +107,10 @@ PLATFORM_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
   {
     (EFI_DEVICE_PATH_PROTOCOL *) &gDebugAgentUartDevicePath,
     (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
+  },
+  {
+    (EFI_DEVICE_PATH_PROTOCOL *)&gUsbKeyboardDevicePath,
+    CONSOLE_IN
   },
   {
     NULL,
