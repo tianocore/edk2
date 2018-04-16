@@ -1,7 +1,7 @@
 ## @file
 # The engine for building files
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -364,7 +364,7 @@ class BuildRule:
         self.Parse()
 
         # some intrinsic rules
-        self.RuleDatabase[TAB_DEFAULT_BINARY_FILE, "COMMON", "COMMON", "COMMON"] = self._BinaryFileRule
+        self.RuleDatabase[TAB_DEFAULT_BINARY_FILE, TAB_COMMON, TAB_COMMON, TAB_COMMON] = self._BinaryFileRule
         self.FileTypeList.add(TAB_DEFAULT_BINARY_FILE)
 
     ## Parse the build rule strings
@@ -424,8 +424,8 @@ class BuildRule:
     def EndOfSection(self):
         Database = self.RuleDatabase
         # if there's specific toochain family, 'COMMON' doesn't make sense any more
-        if len(self._TotalToolChainFamilySet) > 1 and 'COMMON' in self._TotalToolChainFamilySet:
-            self._TotalToolChainFamilySet.remove('COMMON')
+        if len(self._TotalToolChainFamilySet) > 1 and TAB_COMMON in self._TotalToolChainFamilySet:
+            self._TotalToolChainFamilySet.remove(TAB_COMMON)
         for Family in self._TotalToolChainFamilySet:
             Input = self._RuleInfo[Family, self._InputFile]
             Output = self._RuleInfo[Family, self._OutputFile]
@@ -452,8 +452,8 @@ class BuildRule:
         FileType = ''
         RuleNameList = self.RuleContent[LineIndex][1:-1].split(',')
         for RuleName in RuleNameList:
-            Arch = 'COMMON'
-            BuildType = 'COMMON'
+            Arch = TAB_COMMON
+            BuildType = TAB_COMMON
             TokenList = [Token.strip().upper() for Token in RuleName.split('.')]
             # old format: Build.File-Type
             if TokenList[0] == "BUILD":
@@ -486,12 +486,12 @@ class BuildRule:
             self._BuildTypeList.add(BuildType)
             self._ArchList.add(Arch)
 
-        if 'COMMON' in self._BuildTypeList and len(self._BuildTypeList) > 1:
+        if TAB_COMMON in self._BuildTypeList and len(self._BuildTypeList) > 1:
             EdkLogger.error("build", FORMAT_INVALID,
                             "Specific build types must not be mixed with common one",
                             File=self.RuleFile, Line=LineIndex + 1,
                             ExtraData=self.RuleContent[LineIndex])
-        if 'COMMON' in self._ArchList and len(self._ArchList) > 1:
+        if TAB_COMMON in self._ArchList and len(self._ArchList) > 1:
             EdkLogger.error("build", FORMAT_INVALID,
                             "Specific ARCH must not be mixed with common one",
                             File=self.RuleFile, Line=LineIndex + 1,
@@ -524,7 +524,7 @@ class BuildRule:
             if len(TokenList) > 1:
                 Family = TokenList[1].strip().upper()
             else:
-                Family = "COMMON"
+                Family = TAB_COMMON
 
             if Family not in FamilyList:
                 FamilyList.append(Family)
@@ -532,7 +532,7 @@ class BuildRule:
         self._FamilyList = FamilyList
         self._TotalToolChainFamilySet.update(FamilyList)
         self._State = SectionType.upper()
-        if 'COMMON' in FamilyList and len(FamilyList) > 1:
+        if TAB_COMMON in FamilyList and len(FamilyList) > 1:
             EdkLogger.error("build", FORMAT_INVALID,
                             "Specific tool chain family should not be mixed with general one",
                             File=self.RuleFile, Line=LineIndex + 1,

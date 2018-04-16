@@ -259,7 +259,7 @@ class WorkspaceAutoGen(AutoGen):
         self.BuildDatabase  = MetaFileDb
         self.MetaFile       = ActivePlatform
         self.WorkspaceDir   = WorkspaceDir
-        self.Platform       = self.BuildDatabase[self.MetaFile, 'COMMON', Target, Toolchain]
+        self.Platform       = self.BuildDatabase[self.MetaFile, TAB_COMMON, Target, Toolchain]
         GlobalData.gActivePlatform = self.Platform
         self.BuildTarget    = Target
         self.ToolChain      = Toolchain
@@ -788,7 +788,7 @@ class WorkspaceAutoGen(AutoGen):
                             # Here we just need to get FILE_GUID from INF file, use 'COMMON' as ARCH attribute. and use 
                             # BuildObject from one of AutoGenObjectList is enough.
                             #
-                            InfObj = self.AutoGenObjectList[0].BuildDatabase.WorkspaceDb.BuildObject[PathClassObj, 'COMMON', self.BuildTarget, self.ToolChain]
+                            InfObj = self.AutoGenObjectList[0].BuildDatabase.WorkspaceDb.BuildObject[PathClassObj, TAB_COMMON, self.BuildTarget, self.ToolChain]
                             if not InfObj.Guid.upper() in _GuidDict.keys():
                                 _GuidDict[InfObj.Guid.upper()] = FfsFile
                             else:
@@ -1338,7 +1338,7 @@ class PlatformAutoGen(AutoGen):
                     EdkLogger.error("build", FILE_READ_FAILURE, "Can not find VPD map file %s to fix up VPD offset." % VpdMapFilePath)
 
                 NvStoreOffset = int(NvStoreOffset,16) if NvStoreOffset.upper().startswith("0X") else int(NvStoreOffset)
-                default_skuobj = PcdNvStoreDfBuffer[0].SkuInfoList.get("DEFAULT")
+                default_skuobj = PcdNvStoreDfBuffer[0].SkuInfoList.get(TAB_DEFAULT)
                 maxsize = self.VariableInfo.VpdRegionSize  - NvStoreOffset if self.VariableInfo.VpdRegionSize else len(default_skuobj.DefaultValue.split(","))
                 var_data = self.VariableInfo.PatchNVStoreDefaultMaxSize(maxsize)
 
@@ -1346,7 +1346,7 @@ class PlatformAutoGen(AutoGen):
                     default_skuobj.DefaultValue = var_data
                     PcdNvStoreDfBuffer[0].DefaultValue = var_data
                     PcdNvStoreDfBuffer[0].SkuInfoList.clear()
-                    PcdNvStoreDfBuffer[0].SkuInfoList['DEFAULT'] = default_skuobj
+                    PcdNvStoreDfBuffer[0].SkuInfoList[TAB_DEFAULT] = default_skuobj
                     PcdNvStoreDfBuffer[0].MaxDatumSize = str(len(default_skuobj.DefaultValue.split(",")))
 
         return OrgVpdFile
@@ -1577,12 +1577,12 @@ class PlatformAutoGen(AutoGen):
                    PcdKey in VpdPcdDict:
                     Pcd = VpdPcdDict[PcdKey]
                     SkuValueMap = {}
-                    DefaultSku = Pcd.SkuInfoList.get('DEFAULT')
+                    DefaultSku = Pcd.SkuInfoList.get(TAB_DEFAULT)
                     if DefaultSku:
                         PcdValue = DefaultSku.DefaultValue
                         if PcdValue not in SkuValueMap:
                             SkuValueMap[PcdValue] = []
-                            VpdFile.Add(Pcd, 'DEFAULT',DefaultSku.VpdOffset)
+                            VpdFile.Add(Pcd, TAB_DEFAULT,DefaultSku.VpdOffset)
                         SkuValueMap[PcdValue].append(DefaultSku)
 
                     for (SkuName,Sku) in Pcd.SkuInfoList.items():
@@ -1641,9 +1641,9 @@ class PlatformAutoGen(AutoGen):
                             # just pick the a value to determine whether is unicode string type
                             SkuValueMap = {}
                             SkuObjList = DscPcdEntry.SkuInfoList.items()
-                            DefaultSku = DscPcdEntry.SkuInfoList.get('DEFAULT')
+                            DefaultSku = DscPcdEntry.SkuInfoList.get(TAB_DEFAULT)
                             if DefaultSku:
-                                defaultindex = SkuObjList.index(('DEFAULT',DefaultSku))
+                                defaultindex = SkuObjList.index((TAB_DEFAULT,DefaultSku))
                                 SkuObjList[0],SkuObjList[defaultindex] = SkuObjList[defaultindex],SkuObjList[0]
                             for (SkuName,Sku) in SkuObjList:
                                 Sku.VpdOffset = Sku.VpdOffset.strip() 
@@ -1767,7 +1767,7 @@ class PlatformAutoGen(AutoGen):
                 for (SkuName,SkuId) in allskuset:
                     if type(SkuId) in (str,unicode) and eval(SkuId) == 0 or SkuId == 0:
                         continue
-                    pcd.SkuInfoList[SkuName] = copy.deepcopy(pcd.SkuInfoList['DEFAULT'])
+                    pcd.SkuInfoList[SkuName] = copy.deepcopy(pcd.SkuInfoList[TAB_DEFAULT])
                     pcd.SkuInfoList[SkuName].SkuId = SkuId
         self.AllPcdList = self._NonDynamicPcdList + self._DynamicPcdList
 
@@ -2390,7 +2390,7 @@ class PlatformAutoGen(AutoGen):
             if self.Platform.SkuName in self.Platform.SkuIds:
                 SkuName = self.Platform.SkuName
             else:
-                SkuName = 'DEFAULT'
+                SkuName = TAB_DEFAULT
             ToPcd.SkuInfoList = {
                 SkuName : SkuInfoClass(SkuName, self.Platform.SkuIds[SkuName][0], '', '', '', '', '', ToPcd.DefaultValue)
             }
@@ -3420,7 +3420,7 @@ class ModuleAutoGen(AutoGen):
         if self._BinaryFileList is None:
             self._BinaryFileList = []
             for F in self.Module.Binaries:
-                if F.Target not in ['COMMON', '*'] and F.Target != self.BuildTarget:
+                if F.Target not in [TAB_COMMON, '*'] and F.Target != self.BuildTarget:
                     continue
                 self._BinaryFileList.append(F)
                 self._ApplyBuildRule(F, F.Type)

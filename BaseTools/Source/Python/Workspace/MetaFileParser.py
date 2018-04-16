@@ -219,7 +219,7 @@ class MetaFileParser(object):
         NewRecordList = []
         for Record in RecordList:
             Arch = Record[3]
-            if Arch == 'COMMON' or Arch == FilterArch:
+            if Arch == TAB_ARCH_COMMON or Arch == FilterArch:
                 NewRecordList.append(Record)
         return NewRecordList
 
@@ -319,7 +319,7 @@ class MetaFileParser(object):
             if len(ItemList) > 1:
                 S1 = ItemList[1].upper()
             else:
-                S1 = 'COMMON'
+                S1 = TAB_ARCH_COMMON
             ArchList.add(S1)
 
             # S2 may be Platform or ModuleType
@@ -329,15 +329,15 @@ class MetaFileParser(object):
                 else:
                     S2 = ItemList[2].upper()
             else:
-                S2 = 'COMMON'
+                S2 = TAB_COMMON
             if len(ItemList) > 3:
                 S3 = ItemList[3]
             else:
-                S3 = "COMMON"
+                S3 = TAB_COMMON
             self._Scope.append([S1, S2, S3])
 
         # 'COMMON' must not be used with specific ARCHs at the same section
-        if 'COMMON' in ArchList and len(ArchList) > 1:
+        if TAB_ARCH_COMMON in ArchList and len(ArchList) > 1:
             EdkLogger.error('Parser', FORMAT_INVALID, "'common' ARCH must not be used with specific ARCHs",
                             File=self.MetaFile, Line=self._LineIndex + 1, ExtraData=self._CurrentLine)
         # If the section information is needed later, it should be stored in database
@@ -455,12 +455,12 @@ class MetaFileParser(object):
 
             for ActiveScope in self._Scope:
                 Scope0, Scope1,Scope2 = ActiveScope[0], ActiveScope[1],ActiveScope[2]
-                if(Scope0, Scope1,Scope2) not in Scope and (Scope0, "COMMON","COMMON") not in Scope and ("COMMON", Scope1,"COMMON") not in Scope:
+                if(Scope0, Scope1,Scope2) not in Scope and (Scope0, TAB_COMMON, TAB_COMMON) not in Scope and (TAB_COMMON, Scope1, TAB_COMMON) not in Scope:
                     break
             else:
                 ComSpeMacroDict.update(self._SectionsMacroDict[(SectionType, Scope)])
 
-            if ("COMMON", "COMMON","COMMON") in Scope:
+            if (TAB_COMMON, TAB_COMMON, TAB_COMMON) in Scope:
                 ComComMacroDict.update(self._SectionsMacroDict[(SectionType, Scope)])
 
         Macros.update(ComComMacroDict)
@@ -568,8 +568,8 @@ class InfParser(MetaFileParser):
             if Line[0] == TAB_SECTION_START and Line[-1] == TAB_SECTION_END:
                 if not GetHeaderComment:
                     for Cmt, LNo in Comments:
-                        self._Store(MODEL_META_DATA_HEADER_COMMENT, Cmt, '', '', 'COMMON',
-                                    'COMMON', self._Owner[-1], LNo, -1, LNo, -1, 0)
+                        self._Store(MODEL_META_DATA_HEADER_COMMENT, Cmt, '', '', TAB_COMMON,
+                                    TAB_COMMON, self._Owner[-1], LNo, -1, LNo, -1, 0)
                     GetHeaderComment = True
                 else:
                     TailComments.extend(SectionComments + Comments)
@@ -658,8 +658,8 @@ class InfParser(MetaFileParser):
 
         # If there are tail comments in INF file, save to database whatever the comments are
         for Comment in TailComments:
-            self._Store(MODEL_META_DATA_TAIL_COMMENT, Comment[0], '', '', 'COMMON',
-                                'COMMON', self._Owner[-1], -1, -1, -1, -1, 0)
+            self._Store(MODEL_META_DATA_TAIL_COMMENT, Comment[0], '', '', TAB_COMMON,
+                                TAB_COMMON, self._Owner[-1], -1, -1, -1, -1, 0)
         self._Done()
 
     ## Data parser for the format in which there's path
@@ -1022,7 +1022,7 @@ class DscParser(MetaFileParser):
                             ExtraData=self._CurrentLine)
 
         ItemType = self.DataType[DirectiveName]
-        Scope = [['COMMON', 'COMMON','COMMON']]
+        Scope = [[TAB_COMMON, TAB_COMMON, TAB_COMMON]]
         if ItemType == MODEL_META_DATA_INCLUDE:
             Scope = self._Scope
         if ItemType == MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF:
@@ -1832,7 +1832,7 @@ class DecParser(MetaFileParser):
             if len(ItemList) > 1:
                 S1 = ItemList[1].upper()
             else:
-                S1 = 'COMMON'
+                S1 = TAB_ARCH_COMMON
             ArchList.add(S1)
             # S2 may be Platform or ModuleType
             if len(ItemList) > 2:
@@ -1843,18 +1843,18 @@ class DecParser(MetaFileParser):
                         EdkLogger.error("Parser", FORMAT_INVALID, 'Please use keyword "Private" as section tag modifier.',
                                         File=self.MetaFile, Line=self._LineIndex + 1, ExtraData=self._CurrentLine)
             else:
-                S2 = 'COMMON'
+                S2 = TAB_COMMON
             PrivateList.add(S2)
             if [S1, S2, self.DataType[self._SectionName]] not in self._Scope:
                 self._Scope.append([S1, S2, self.DataType[self._SectionName]])
 
         # 'COMMON' must not be used with specific ARCHs at the same section
-        if 'COMMON' in ArchList and len(ArchList) > 1:
+        if TAB_ARCH_COMMON in ArchList and len(ArchList) > 1:
             EdkLogger.error('Parser', FORMAT_INVALID, "'common' ARCH must not be used with specific ARCHs",
                             File=self.MetaFile, Line=self._LineIndex + 1, ExtraData=self._CurrentLine)
 
         # It is not permissible to mix section tags without the Private attribute with section tags with the Private attribute
-        if 'COMMON' in PrivateList and len(PrivateList) > 1:
+        if TAB_COMMON in PrivateList and len(PrivateList) > 1:
             EdkLogger.error('Parser', FORMAT_INVALID, "Can't mix section tags without the Private attribute with section tags with the Private attribute",
                             File=self.MetaFile, Line=self._LineIndex + 1, ExtraData=self._CurrentLine)
 

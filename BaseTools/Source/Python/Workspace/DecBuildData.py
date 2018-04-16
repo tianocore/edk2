@@ -63,7 +63,7 @@ class DecBuildData(PackageBuildClassObject):
     #   @param      Platform        (not used for DecBuildData)
     #   @param      Macros          Macros used for replacement in DSC file
     #
-    def __init__(self, File, RawData, BuildDataBase, Arch='COMMON', Target=None, Toolchain=None):
+    def __init__(self, File, RawData, BuildDataBase, Arch=TAB_ARCH_COMMON, Target=None, Toolchain=None):
         self.MetaFile = File
         self._PackageDir = File.Dir
         self._RawData = RawData
@@ -327,7 +327,7 @@ class DecBuildData(PackageBuildClassObject):
                         PublicInclues.append(File)
                     if File in self._PrivateIncludes:
                         EdkLogger.error('build', OPTION_CONFLICT, "Can't determine %s's attribute, it is both defined as Private and non-Private attribute in DEC file." % File, File=self.MetaFile, Line=LineNo)
-                if Record[3] == "COMMON":
+                if Record[3] == TAB_COMMON:
                     self._CommonIncludes.append(File)
         return self._Includes
 

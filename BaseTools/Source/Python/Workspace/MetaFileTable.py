@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create/update/query/erase a meta file table
 #
-# Copyright (c) 2008 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -109,7 +109,7 @@ class ModuleTable(MetaFileTable):
     # @param EndColumn:      EndColumn of a Inf item
     # @param Enabled:        If this item enabled
     #
-    def Insert(self, Model, Value1, Value2, Value3, Scope1='COMMON', Scope2='COMMON',
+    def Insert(self, Model, Value1, Value2, Value3, Scope1=TAB_ARCH_COMMON, Scope2=TAB_COMMON,
                BelongsToItem=-1, StartLine=-1, StartColumn=-1, EndLine=-1, EndColumn=-1, Enabled=0):
         (Value1, Value2, Value3, Scope1, Scope2) = ConvertToSqlString((Value1, Value2, Value3, Scope1, Scope2))
         return Table.Insert(
@@ -140,9 +140,9 @@ class ModuleTable(MetaFileTable):
         ConditionString = "Model=%s AND Enabled>=0" % Model
         ValueString = "Value1,Value2,Value3,Scope1,Scope2,ID,StartLine"
 
-        if Arch is not None and Arch != 'COMMON':
+        if Arch is not None and Arch != TAB_ARCH_COMMON:
             ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Arch
-        if Platform is not None and Platform != 'COMMON':
+        if Platform is not None and Platform != TAB_COMMON:
             ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT')" % Platform
         if BelongsToItem is not None:
             ConditionString += " AND BelongsToItem=%s" % BelongsToItem
@@ -191,7 +191,7 @@ class PackageTable(MetaFileTable):
     # @param EndColumn:      EndColumn of a Dec item
     # @param Enabled:        If this item enabled
     #
-    def Insert(self, Model, Value1, Value2, Value3, Scope1='COMMON', Scope2='COMMON',
+    def Insert(self, Model, Value1, Value2, Value3, Scope1=TAB_ARCH_COMMON, Scope2=TAB_COMMON,
                BelongsToItem=-1, StartLine=-1, StartColumn=-1, EndLine=-1, EndColumn=-1, Enabled=0):
         (Value1, Value2, Value3, Scope1, Scope2) = ConvertToSqlString((Value1, Value2, Value3, Scope1, Scope2))
         return Table.Insert(
@@ -221,7 +221,7 @@ class PackageTable(MetaFileTable):
         ConditionString = "Model=%s AND Enabled>=0" % Model
         ValueString = "Value1,Value2,Value3,Scope1,Scope2,ID,StartLine"
 
-        if Arch is not None and Arch != 'COMMON':
+        if Arch is not None and Arch != TAB_ARCH_COMMON:
             ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Arch
 
         SqlCommand = "SELECT %s FROM %s WHERE %s" % (ValueString, self.Table, ConditionString)
@@ -306,7 +306,7 @@ class PlatformTable(MetaFileTable):
     # @param EndColumn:      EndColumn of a Dsc item
     # @param Enabled:        If this item enabled
     #
-    def Insert(self, Model, Value1, Value2, Value3, Scope1='COMMON', Scope2='COMMON', Scope3=TAB_DEFAULT_STORES_DEFAULT,BelongsToItem=-1,
+    def Insert(self, Model, Value1, Value2, Value3, Scope1=TAB_ARCH_COMMON, Scope2=TAB_COMMON, Scope3=TAB_DEFAULT_STORES_DEFAULT,BelongsToItem=-1,
                FromItem=-1, StartLine=-1, StartColumn=-1, EndLine=-1, EndColumn=-1, Enabled=1):
         (Value1, Value2, Value3, Scope1, Scope2,Scope3) = ConvertToSqlString((Value1, Value2, Value3, Scope1, Scope2,Scope3))
         return Table.Insert(
@@ -341,13 +341,13 @@ class PlatformTable(MetaFileTable):
         ConditionString = "Model=%s AND Enabled>0" % Model
         ValueString = "Value1,Value2,Value3,Scope1,Scope2,Scope3,ID,StartLine"
 
-        if Scope1 is not None and Scope1 != 'COMMON':
+        if Scope1 is not None and Scope1 != TAB_ARCH_COMMON:
             ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Scope1
-        if Scope2 is not None and Scope2 != 'COMMON':
+        if Scope2 is not None and Scope2 != TAB_COMMON:
             # Cover the case that CodeBase is 'COMMON' for BuildOptions section
             if '.' in Scope2:
                 Index = Scope2.index('.')
-                NewScope = 'COMMON'+ Scope2[Index:]
+                NewScope = TAB_COMMON + Scope2[Index:]
                 ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT' OR Scope2='%s')" % (Scope2, NewScope)
             else:
                 ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT')" % Scope2

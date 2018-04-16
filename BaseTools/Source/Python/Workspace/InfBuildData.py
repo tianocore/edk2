@@ -107,7 +107,7 @@ class InfBuildData(ModuleBuildClassObject):
     #   @param      Platform        The name of platform employing this module
     #   @param      Macros          Macros used for replacement in DSC file
     #
-    def __init__(self, FilePath, RawData, BuildDatabase, Arch='COMMON', Target=None, Toolchain=None):
+    def __init__(self, FilePath, RawData, BuildDatabase, Arch=TAB_ARCH_COMMON, Target=None, Toolchain=None):
         self.MetaFile = FilePath
         self._ModuleDir = FilePath.Dir
         self._RawData = RawData
@@ -115,7 +115,7 @@ class InfBuildData(ModuleBuildClassObject):
         self._Arch = Arch
         self._Target = Target
         self._Toolchain = Toolchain
-        self._Platform = 'COMMON'
+        self._Platform = TAB_COMMON
         self._SourceOverridePath = None
         if FilePath.Key in GlobalData.gOverrideDir:
             self._SourceOverridePath = GlobalData.gOverrideDir[FilePath.Key]
@@ -602,7 +602,7 @@ class InfBuildData(ModuleBuildClassObject):
             for Record in RecordList:
                 FileType = Record[0]
                 LineNo = Record[-1]
-                Target = 'COMMON'
+                Target = TAB_COMMON
                 FeatureFlag = []
                 if Record[2]:
                     TokenList = GetSplitValueList(Record[2], TAB_VALUE_SPLIT)

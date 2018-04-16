@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define common static strings used by INF/DEC/DSC files
 #
-# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -312,6 +312,8 @@ TAB_DEFINE = 'DEFINE'
 TAB_NMAKE = 'Nmake'
 TAB_USER_EXTENSIONS = 'UserExtensions'
 TAB_INCLUDE = '!include'
+TAB_DEFAULT = 'DEFAULT'
+TAB_COMMON = 'COMMON'
 
 #
 # Common Define

@@ -238,11 +238,11 @@ def main():
             ArchList = Options.archList.split(',')
         else:
 #            EdkLogger.error("GenFds", OPTION_MISSING, "Missing build ARCH")
-            ArchList = BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'COMMON', Options.BuildTarget, Options.ToolChain].SupArchList
+            ArchList = BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, TAB_COMMON, Options.BuildTarget, Options.ToolChain].SupArchList
 
-        TargetArchList = set(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'COMMON', Options.BuildTarget, Options.ToolChain].SupArchList) & set(ArchList)
+        TargetArchList = set(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, TAB_COMMON, Options.BuildTarget, Options.ToolChain].SupArchList) & set(ArchList)
         if len(TargetArchList) == 0:
-            EdkLogger.error("GenFds", GENFDS_ERROR, "Target ARCH %s not in platform supported ARCH %s" % (str(ArchList), str(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, 'COMMON'].SupArchList)))
+            EdkLogger.error("GenFds", GENFDS_ERROR, "Target ARCH %s not in platform supported ARCH %s" % (str(ArchList), str(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, TAB_COMMON].SupArchList)))
         
         for Arch in ArchList:
             GenFdsGlobalVariable.OutputDirFromDscDict[Arch] = NormPath(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, Options.BuildTarget, Options.ToolChain].OutputDirectory)
@@ -674,7 +674,7 @@ class GenFds :
     #   @retval None
     #
     def PreprocessImage(BuildDb, DscFile):
-        PcdDict = BuildDb.BuildObject[DscFile, 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag].Pcds
+        PcdDict = BuildDb.BuildObject[DscFile, TAB_COMMON, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag].Pcds
         PcdValue = ''
         for Key in PcdDict:
             PcdObj = PcdDict[Key]
@@ -693,9 +693,9 @@ class GenFds :
         if Int64PcdValue > 0:
             TopAddress = Int64PcdValue
             
-        ModuleDict = BuildDb.BuildObject[DscFile, 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag].Modules
+        ModuleDict = BuildDb.BuildObject[DscFile, TAB_COMMON, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag].Modules
         for Key in ModuleDict:
-            ModuleObj = BuildDb.BuildObject[Key, 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+            ModuleObj = BuildDb.BuildObject[Key, TAB_COMMON, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             print ModuleObj.BaseName + ' ' + ModuleObj.ModuleType
 
     def GenerateGuidXRefFile(BuildDb, ArchList, FdfParserObj):

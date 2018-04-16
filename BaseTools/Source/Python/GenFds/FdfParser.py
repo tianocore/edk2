@@ -52,6 +52,7 @@ from Common.String import NormPath
 import Common.GlobalData as GlobalData
 from Common.Expression import *
 from Common import GlobalData
+from Common.DataType import *
 from Common.String import ReplaceMacro
 import uuid
 from Common.Misc import tdict
@@ -511,8 +512,8 @@ class FdfParser:
         if Item == '' or Item == 'RULE':
             return
 
-        if Item == 'DEFINES':
-            self.__CurSection = ['COMMON', 'COMMON', 'COMMON']
+        if Item == TAB_COMMON_DEFINES.upper():
+            self.__CurSection = [TAB_COMMON, TAB_COMMON, TAB_COMMON]
         elif Item == 'VTF' and len(ItemList) == 3:
             UiName = ItemList[2]
             Pos = UiName.find(',')
@@ -520,9 +521,9 @@ class FdfParser:
                 UiName = UiName[:Pos]
             self.__CurSection = ['VTF', UiName, ItemList[1]]
         elif len(ItemList) > 1:
-            self.__CurSection = [ItemList[0], ItemList[1], 'COMMON']
+            self.__CurSection = [ItemList[0], ItemList[1], TAB_COMMON]
         elif len(ItemList) > 0:
-            self.__CurSection = [ItemList[0], 'DUMMY', 'COMMON']
+            self.__CurSection = [ItemList[0], 'DUMMY', TAB_COMMON]
 
     ## PreprocessFile() method
     #
@@ -886,7 +887,7 @@ class FdfParser:
 
         if self.__CurSection:
             # Defines macro
-            ScopeMacro = self.__MacroDict['COMMON', 'COMMON', 'COMMON']
+            ScopeMacro = self.__MacroDict[TAB_COMMON, TAB_COMMON, TAB_COMMON]
             if ScopeMacro:
                 MacroDict.update(ScopeMacro)
     
@@ -3586,7 +3587,7 @@ class FdfParser:
             raise Warning("expected '.'", self.FileName, self.CurrentLineNumber)
 
         Arch = self.__SkippedChars.rstrip(".")
-        if Arch.upper() not in ("IA32", "X64", "IPF", "EBC", "ARM", "AARCH64", "COMMON"):
+        if Arch.upper() not in ARCH_LIST_FULL:
             raise Warning("Unknown Arch '%s'" % Arch, self.FileName, self.CurrentLineNumber)
 
         ModuleType = self.__GetModuleType()

@@ -1,7 +1,7 @@
 ## @file
 # process APRIORI file data and generate PEI/DXE APRIORI file
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -25,6 +25,7 @@ from Common.String import *
 from Common.Misc import SaveFileOnChange,PathClass
 from Common import EdkLogger
 from Common.BuildToolError import *
+from Common.DataType import TAB_COMMON
 
 ## process APRIORI file data and generate PEI/DXE APRIORI file
 #
@@ -84,7 +85,7 @@ class AprioriSection (AprioriSectionClassObject):
                     Guid = Inf.Guid
 
                 else:
-                    Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(InfFileName, GenFdsGlobalVariable.WorkSpaceDir), 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+                    Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(InfFileName, GenFdsGlobalVariable.WorkSpaceDir), TAB_COMMON, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
                     Guid = Inf.Guid
 
                     self.BinFileList = Inf.Module.Binaries

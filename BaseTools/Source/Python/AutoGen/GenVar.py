@@ -1,4 +1,4 @@
-# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -142,7 +142,7 @@ class VariableMgr(object):
             default_data_buffer = ""
             others_data_buffer = ""
             tail = None
-            default_sku_default = indexedvarinfo.get(index).get(("DEFAULT",DataType.TAB_DEFAULT_STORES_DEFAULT))
+            default_sku_default = indexedvarinfo.get(index).get((DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT))
 
             if default_sku_default.data_type not in ["UINT8","UINT16","UINT32","UINT64","BOOLEAN"]:
                 var_max_len = max([len(var_item.default_value.split(",")) for var_item in sku_var_info.values()])
@@ -155,13 +155,13 @@ class VariableMgr(object):
             for item in default_data_buffer:
                 default_data_array += unpack("B",item)
 
-            if ("DEFAULT",DataType.TAB_DEFAULT_STORES_DEFAULT) not in var_data:
-                var_data[("DEFAULT",DataType.TAB_DEFAULT_STORES_DEFAULT)] = collections.OrderedDict()
-            var_data[("DEFAULT",DataType.TAB_DEFAULT_STORES_DEFAULT)][index] = (default_data_buffer,sku_var_info[("DEFAULT",DataType.TAB_DEFAULT_STORES_DEFAULT)])
+            if (DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT) not in var_data:
+                var_data[(DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT)] = collections.OrderedDict()
+            var_data[(DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT)][index] = (default_data_buffer,sku_var_info[(DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT)])
 
             for (skuid,defaultstoragename) in indexedvarinfo.get(index):
                 tail = None
-                if (skuid,defaultstoragename) == ("DEFAULT",DataType.TAB_DEFAULT_STORES_DEFAULT):
+                if (skuid,defaultstoragename) == (DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT):
                     continue
                 other_sku_other = indexedvarinfo.get(index).get((skuid,defaultstoragename))
 
@@ -190,7 +190,7 @@ class VariableMgr(object):
         if not var_data:
             return []
 
-        pcds_default_data = var_data.get(("DEFAULT",DataType.TAB_DEFAULT_STORES_DEFAULT),{})
+        pcds_default_data = var_data.get((DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT),{})
         NvStoreDataBuffer = ""
         var_data_offset = collections.OrderedDict()
         offset = NvStorageHeaderSize
@@ -220,7 +220,7 @@ class VariableMgr(object):
 
         data_delta_structure_buffer = ""
         for skuname,defaultstore in var_data:
-            if (skuname,defaultstore) == ("DEFAULT",DataType.TAB_DEFAULT_STORES_DEFAULT):
+            if (skuname,defaultstore) == (DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT):
                 continue
             pcds_sku_data = var_data.get((skuname,defaultstore))
             delta_data_set = []

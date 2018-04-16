@@ -1,7 +1,7 @@
 ## @file
 # section base class
 #
-#  Copyright (c) 2007-2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007-2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,6 +20,7 @@ from GenFdsGlobalVariable import GenFdsGlobalVariable
 import Common.LongFilePathOs as os, glob
 from Common import EdkLogger
 from Common.BuildToolError import *
+from Common.DataType import TAB_ARCH_COMMON
 
 ## section base class
 #
@@ -125,7 +126,7 @@ class Section (SectionClassObject):
         FileList = []
         if FileType is not None:
             for File in FfsInf.BinFileList:
-                if File.Arch == "COMMON" or FfsInf.CurrentArch == File.Arch:
+                if File.Arch == TAB_ARCH_COMMON or FfsInf.CurrentArch == File.Arch:
                     if File.Type == FileType or (int(FfsInf.PiSpecVersion, 16) >= 0x0001000A \
                                                  and FileType == 'DXE_DPEX'and File.Type == 'SMM_DEPEX') \
                                                  or (FileType == 'TE'and File.Type == 'PE32'):

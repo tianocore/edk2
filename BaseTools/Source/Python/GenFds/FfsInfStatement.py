@@ -47,6 +47,7 @@ import Common.GlobalData as GlobalData
 from DepexSection import DepexSection
 from Common.Misc import SaveFileOnChange
 from Common.Expression import *
+from Common.DataType import TAB_COMMON
 
 ## generate FFS from INF
 #
@@ -205,7 +206,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 self.ShadowFromInfFile = Inf.Shadow
 
         else:
-            Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClassObj, 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+            Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClassObj, TAB_COMMON, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             self.BaseName = Inf.BaseName
             self.ModuleGuid = Inf.Guid
             self.ModuleType = Inf.ModuleType
@@ -570,7 +571,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
         RuleName = 'RULE'      + \
                    '.'         + \
-                   'COMMON'    + \
+                   TAB_COMMON    + \
                    '.'         + \
                    self.ModuleType.upper()
 
