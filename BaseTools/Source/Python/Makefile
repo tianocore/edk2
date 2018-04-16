@@ -110,7 +110,6 @@ CMD_BUILD=$(BASE_TOOLS_PATH)\Source\Python\build\BuildReport.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\EotGlobalData.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\EotToolError.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\FileProfile.py \
-    $(BASE_TOOLS_PATH)\Source\Python\Eot\FvImage.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\InfParserLite.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\LzmaCompressor.pyd \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\Parser.py \

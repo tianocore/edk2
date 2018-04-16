@@ -1,7 +1,7 @@
 ## @file
 # This file is used to be the main entrance of EOT tool
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -24,12 +24,34 @@ from Common.Misc import GuidStructureStringToGuidString
 from InfParserLite import *
 import c
 import Database
-from FvImage import *
 from array import array
 from Report import Report
 from Common.BuildVersion import gBUILD_VERSION
 from Parser import ConvertGuid
 from Common.LongFilePathSupport import OpenLongFilePath as open
+
+## MultipleFv() class
+#
+#  A class for Multiple FV
+#
+class MultipleFv(FirmwareVolume):
+    def __init__(self, FvList):
+        FirmwareVolume.__init__(self)
+        self.BasicInfo = []
+        for FvPath in FvList:
+            FvName = os.path.splitext(os.path.split(FvPath)[1])[0]
+            Fd = open(FvPath, 'rb')
+            Buf = array('B')
+            try:
+                Buf.fromfile(Fd, os.path.getsize(FvPath))
+            except EOFError:
+                pass
+
+            Fv = FirmwareVolume(FvName)
+            Fv.frombuffer(Buf, 0, len(Buf))
+
+            self.BasicInfo.append([Fv.Name, Fv.FileSystemGuid, Fv.Size])
+            self.FfsDict.append(Fv.FfsDict)    
 
 ## Class Eot
 #
