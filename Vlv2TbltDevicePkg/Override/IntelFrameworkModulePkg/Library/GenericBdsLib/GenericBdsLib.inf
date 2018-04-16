@@ -138,6 +138,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdErrorCodeSetVariable      ## CONSUMES
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTestKeyUsed                       ## CONSUMES
 
 #
 # [BootMode] 
