@@ -116,3 +116,43 @@ Convert Key and Certificate for signing. Password is removed with -nodes flag fo
 
     openssl smime -verify -inform DER -in test.bin.p7 -content test.bin -CAfile TestRoot.pub.pem -out test.org.bin
 
+## Generate DSC PCD include files for Certificate
+
+The `BinToPcd` utility can be used to convert the binary Certificate file to a
+text file can be included from a DSC file to set a PCD to the contents of the
+Certificate file.
+
+The following 2 PCDs can be set to the PKCS7 Certificate value.  The first one
+supports a single certificate.  The second one supports multiple certificate
+values using the XDR format.
+* `gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer`
+* `gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr`
+
+Generate DSC PCD include files:
+```
+BinToPcd.py -i TestRoot.cer -p gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer -o TestRoot.cer.gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer.inc
+BinToPcd.py -i TestRoot.cer -p gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr -x -o TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
+```
+
+These files can be used in `!include` statements in DSC file PCD sections.  For example:
+
+* Platform scoped fixed at build PCD section
+```
+[PcdsFixedAtBuild]
+  !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer.inc
+```
+
+* Platform scoped patchable in module PCD section
+```
+[PcdsPatchableInModule]
+  !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
+```
+
+* Module scoped fixed at build PCD section
+```
+[Components]
+  FmpDevicePkg/FmpDxe/FmpDxe.inf {
+    <PcdsFixedAtBuild>
+      !include BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer.gFmpDevicePkgTokenSpaceGuid.PcdFmpDevicePkcs7CertBufferXdr.inc
+  }
+```
