@@ -1,7 +1,7 @@
 ## @file
 # generate capsule
 #
-#  Copyright (c) 2007-2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007-2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -80,8 +80,8 @@ class CapsuleFv (CapsuleData):
     #
     def GenCapsuleSubItem(self):
         if self.FvName.find('.fv') == -1:
-            if self.FvName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
-                FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName.upper())
+            if self.FvName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict:
+                FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict[self.FvName.upper()]
                 FdBuffer = StringIO.StringIO('')
                 FvObj.CapsuleName = self.CapsuleName
                 FvFile = FvObj.AddToBuffer(FdBuffer)
@@ -112,8 +112,8 @@ class CapsuleFd (CapsuleData):
     #
     def GenCapsuleSubItem(self):
         if self.FdName.find('.fd') == -1:
-            if self.FdName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
-                FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict.get(self.FdName.upper())
+            if self.FdName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict:
+                FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[self.FdName.upper()]
                 FdFile = FdObj.GenFd()
                 return FdFile
         else:

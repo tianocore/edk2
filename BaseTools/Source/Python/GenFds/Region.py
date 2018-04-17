@@ -1,7 +1,7 @@
 ## @file
 # process FD Region generation
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -102,7 +102,7 @@ class Region(RegionClassObject):
                         EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=RegionData)
 
                     FileName = RegionData
-                elif RegionData.upper() + 'fv' in ImageBinDict.keys():
+                elif RegionData.upper() + 'fv' in ImageBinDict:
                     if not Flag:
                         GenFdsGlobalVariable.InfLogger('   Region Name = FV')
                     FileName = ImageBinDict[RegionData.upper() + 'fv']
@@ -111,8 +111,8 @@ class Region(RegionClassObject):
                     # Generate FvImage.
                     #
                     FvObj = None
-                    if RegionData.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
-                        FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(RegionData.upper())
+                    if RegionData.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict:
+                        FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict[RegionData.upper()]
 
                     if FvObj is not None :
                         if not Flag:
@@ -182,7 +182,7 @@ class Region(RegionClassObject):
                         EdkLogger.error("GenFds", FILE_NOT_FOUND, ExtraData=RegionData)
 
                     FileName = RegionData
-                elif RegionData.upper() + 'cap' in ImageBinDict.keys():
+                elif RegionData.upper() + 'cap' in ImageBinDict:
                     GenFdsGlobalVariable.InfLogger('   Region Name = CAPSULE')
                     FileName = ImageBinDict[RegionData.upper() + 'cap']
                 else:
@@ -190,7 +190,7 @@ class Region(RegionClassObject):
                     # Generate Capsule image and Put it into FD buffer
                     #
                     CapsuleObj = None
-                    if RegionData.upper() in GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict.keys():
+                    if RegionData.upper() in GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict:
                         CapsuleObj = GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict[RegionData.upper()]
 
                     if CapsuleObj is not None :

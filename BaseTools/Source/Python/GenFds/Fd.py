@@ -1,7 +1,7 @@
 ## @file
 # process FD generation
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -46,7 +46,7 @@ class FD(FDClassObject):
     #   @retval string      Generated FD file name
     #
     def GenFd (self, Flag = False):
-        if self.FdUiName.upper() + 'fd' in GenFds.ImageBinDict.keys():
+        if self.FdUiName.upper() + 'fd' in GenFds.ImageBinDict:
             return GenFds.ImageBinDict[self.FdUiName.upper() + 'fd']
 
         #

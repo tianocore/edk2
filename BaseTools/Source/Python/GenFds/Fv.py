@@ -70,7 +70,7 @@ class FV (FvClassObject):
     #
     def AddToBuffer (self, Buffer, BaseAddress=None, BlockSize= None, BlockNum=None, ErasePloarity='1', VtfDict=None, MacroDict = {}, Flag=False) :
 
-        if BaseAddress is None and self.UiFvName.upper() + 'fv' in GenFds.ImageBinDict.keys():
+        if BaseAddress is None and self.UiFvName.upper() + 'fv' in GenFds.ImageBinDict:
             return GenFds.ImageBinDict[self.UiFvName.upper() + 'fv']
         
         #
@@ -78,14 +78,13 @@ class FV (FvClassObject):
         # If yes, return error. Doesn't support FV in Capsule image is also in FD flash region.
         #
         if self.CapsuleName is not None:
-            for FdName in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
-                FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[FdName]
+            for FdObj in GenFdsGlobalVariable.FdfParser.Profile.FdDict.values():
                 for RegionObj in FdObj.RegionList:
                     if RegionObj.RegionType == 'FV':
                         for RegionData in RegionObj.RegionDataList:
                             if RegionData.endswith(".fv"):
                                 continue
-                            elif RegionData.upper() + 'fv' in GenFds.ImageBinDict.keys():
+                            elif RegionData.upper() + 'fv' in GenFds.ImageBinDict:
                                 continue
                             elif self.UiFvName.upper() == RegionData.upper():
                                 GenFdsGlobalVariable.ErrorLogger("Capsule %s in FD region can't contain a FV %s in FD region." % (self.CapsuleName, self.UiFvName.upper()))
@@ -235,8 +234,7 @@ class FV (FvClassObject):
         if self.BlockSizeList:
             return True
 
-        for FdName in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
-            FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[FdName]
+        for FdObj in GenFdsGlobalVariable.FdfParser.Profile.FdDict.values():
             for RegionObj in FdObj.RegionList:
                 if RegionObj.RegionType != 'FV':
                     continue
@@ -441,7 +439,7 @@ class FV (FvClassObject):
         # Add [Files]
         #
         self.FvInfFile.writelines("[files]" + T_CHAR_LF)
-        if VtfDict is not None and self.UiFvName in VtfDict.keys():
+        if VtfDict is not None and self.UiFvName in VtfDict:
             self.FvInfFile.writelines("EFI_FILE_NAME = "                   + \
-                                       VtfDict.get(self.UiFvName)          + \
+                                       VtfDict[self.UiFvName]              + \
                                        T_CHAR_LF)

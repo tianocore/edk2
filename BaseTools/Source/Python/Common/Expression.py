@@ -151,7 +151,7 @@ def ReplaceExprMacro(String, Macros, ExceptionList = None):
             InQuote = True
         MacroStartPos = String.find('$(')
         if MacroStartPos < 0:
-            for Pcd in gPlatformPcds.keys():
+            for Pcd in gPlatformPcds:
                 if Pcd in String:
                     if Pcd not in gConditionalPcds:
                         gConditionalPcds.append(Pcd)
@@ -908,7 +908,7 @@ class ValueExpressionEx(ValueExpression):
                                 for Label in LabelList:
                                     if not IsValidCName(Label):
                                         raise BadExpression('%s is not a valid c variable name' % Label)
-                                    if Label not in LabelDict.keys():
+                                    if Label not in LabelDict:
                                         LabelDict[Label] = str(LabelOffset)
                             if Item.startswith('UINT8'):
                                 LabelOffset = LabelOffset + 1

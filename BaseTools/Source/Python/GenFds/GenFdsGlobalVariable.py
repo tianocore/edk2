@@ -549,7 +549,7 @@ class GenFdsGlobalVariable:
 
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
         if MakefilePath:
-            if (tuple(Cmd),tuple(GenFdsGlobalVariable.SecCmdList),tuple(GenFdsGlobalVariable.CopyList)) not in GenFdsGlobalVariable.FfsCmdDict.keys():
+            if (tuple(Cmd),tuple(GenFdsGlobalVariable.SecCmdList),tuple(GenFdsGlobalVariable.CopyList)) not in GenFdsGlobalVariable.FfsCmdDict:
                 GenFdsGlobalVariable.FfsCmdDict[tuple(Cmd), tuple(GenFdsGlobalVariable.SecCmdList), tuple(GenFdsGlobalVariable.CopyList)] = MakefilePath
             GenFdsGlobalVariable.SecCmdList = []
             GenFdsGlobalVariable.CopyList = []
@@ -779,7 +779,7 @@ class GenFdsGlobalVariable:
         if MacroDict is not None  and len (MacroDict) != 0:
             Dict.update(MacroDict)
 
-        for key in Dict.keys():
+        for key in Dict:
             if Str.find(key) >= 0 :
                 Str = Str.replace (key, Dict[key])
 

@@ -1504,12 +1504,12 @@ class DscParser(MetaFileParser):
             # Allow using system environment variables  in path after !include
             #
             __IncludeMacros['WORKSPACE'] = GlobalData.gGlobalDefines['WORKSPACE']
-            if "ECP_SOURCE" in GlobalData.gGlobalDefines.keys():
+            if "ECP_SOURCE" in GlobalData.gGlobalDefines:
                 __IncludeMacros['ECP_SOURCE'] = GlobalData.gGlobalDefines['ECP_SOURCE']
             #
             # During GenFds phase call DSC parser, will go into this branch.
             #
-            elif "ECP_SOURCE" in GlobalData.gCommandLineDefines.keys():
+            elif "ECP_SOURCE" in GlobalData.gCommandLineDefines:
                 __IncludeMacros['ECP_SOURCE'] = GlobalData.gCommandLineDefines['ECP_SOURCE']
 
             __IncludeMacros['EFI_SOURCE'] = GlobalData.gGlobalDefines['EFI_SOURCE']

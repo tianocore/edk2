@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by workspace
 #
-# Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -63,11 +63,11 @@ def GetDeclaredPcd(Platform, BuildDatabase, Arch, Target, Toolchain,additionalPk
             PcdCName = Pcd[0]
             PcdTokenName = Pcd[1]
             if GlobalData.MixedPcd:
-                for PcdItem in GlobalData.MixedPcd.keys():
+                for PcdItem in GlobalData.MixedPcd:
                     if (PcdCName, PcdTokenName) in GlobalData.MixedPcd[PcdItem]:
                         PcdCName = PcdItem[0]
                         break
-            if (PcdCName, PcdTokenName) not in DecPcds.keys():
+            if (PcdCName, PcdTokenName) not in DecPcds:
                 DecPcds[PcdCName, PcdTokenName] = Pkg.Pcds[Pcd]
     return DecPcds, GuidDict
 
@@ -243,7 +243,7 @@ def _ResolveLibraryReference(Module, Platform):
         for LibraryName in M.Libraries:
             Library = Platform.LibraryClasses[LibraryName, ':dummy:']
             if Library is None:
-                for Key in Platform.LibraryClasses.data.keys():
+                for Key in Platform.LibraryClasses.data:
                     if LibraryName.upper() == Key.upper():
                         Library = Platform.LibraryClasses[Key, ':dummy:']
                         break

@@ -838,7 +838,7 @@ class PcdReport(object):
                 for PcdItem in GlobalData.gConditionalPcds:
                     if '.' in PcdItem:
                         (TokenSpaceGuidCName, TokenCName) = PcdItem.split('.')
-                        if (TokenCName, TokenSpaceGuidCName) in Pa.Platform.Pcds.keys():
+                        if (TokenCName, TokenSpaceGuidCName) in Pa.Platform.Pcds:
                             Pcd = Pa.Platform.Pcds[(TokenCName, TokenSpaceGuidCName)]
                             PcdList = self.ConditionalPcds.setdefault(Pcd.TokenSpaceGuidCName, {}).setdefault(Pcd.Type, [])
                             if Pcd not in PcdList:
@@ -1043,7 +1043,7 @@ class PcdReport(object):
                             DscMatch = (DscDefaultValue.strip() == PcdValue.strip())
 
                     IsStructure = False
-                    if GlobalData.gStructurePcd and (self.Arch in GlobalData.gStructurePcd.keys()) and ((Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.gStructurePcd[self.Arch]):
+                    if GlobalData.gStructurePcd and (self.Arch in GlobalData.gStructurePcd) and ((Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.gStructurePcd[self.Arch]):
                         IsStructure = True
                         if TypeName in ('DYNVPD', 'DEXVPD'):
                             SkuInfoList = Pcd.SkuInfoList

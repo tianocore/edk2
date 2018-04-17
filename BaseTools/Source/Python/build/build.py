@@ -53,7 +53,7 @@ import Common.EdkLogger
 import Common.GlobalData as GlobalData
 from GenFds.GenFds import GenFds
 
-from collections import OrderedDict
+from collections import OrderedDict,defaultdict
 
 # Version and Copyright
 VersionNumber = "0.60" + ' ' + gBUILD_VERSION
@@ -524,8 +524,7 @@ class BuildTask:
                     BuildTask._Thread.acquire(True)
 
                     # start a new build thread
-                    Bo = BuildTask._ReadyQueue.keys()[0]
-                    Bt = BuildTask._ReadyQueue.pop(Bo)
+                    Bo,Bt = BuildTask._ReadyQueue.popitem()
 
                     # move into running queue
                     BuildTask._RunningQueueLock.acquire()
@@ -1000,7 +999,7 @@ class Build():
             GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = self.ToolChainList[0]
         if self.ToolChainFamily:
             GlobalData.gGlobalDefines['FAMILY'] = self.ToolChainFamily[0]
-        if 'PREBUILD' in GlobalData.gCommandLineDefines.keys():
+        if 'PREBUILD' in GlobalData.gCommandLineDefines:
             self.Prebuild   = GlobalData.gCommandLineDefines.get('PREBUILD')
         else:
             self.Db.InitDatabase()
@@ -1041,7 +1040,7 @@ class Build():
             self.Prebuild += self.PassCommandOption(self.BuildTargetList, self.ArchList, self.ToolChainList, self.PlatformFile, self.Target)
 
     def InitPostBuild(self):
-        if 'POSTBUILD' in GlobalData.gCommandLineDefines.keys():
+        if 'POSTBUILD' in GlobalData.gCommandLineDefines:
             self.Postbuild = GlobalData.gCommandLineDefines.get('POSTBUILD')
         else:
             Platform = self.Db._MapPlatform(str(self.PlatformFile))
@@ -1524,7 +1523,7 @@ class Build():
             # First get the XIP base address for FV map file.
             GuidPattern = re.compile("[-a-fA-F0-9]+")
             GuidName = re.compile("\(GUID=[-a-fA-F0-9]+")
-            for FvName in Wa.FdfProfile.FvDict.keys():
+            for FvName in Wa.FdfProfile.FvDict:
                 FvMapBuffer = os.path.join(Wa.FvDir, FvName + '.Fv.map')
                 if not os.path.exists(FvMapBuffer):
                     continue
@@ -1961,15 +1960,14 @@ class Build():
                     self._SaveMapFile (MapBuffer, Wa)
 
     def _GenFfsCmd(self):
-        CmdListDict = {}
+        # convert dictionary of Cmd:(Inf,Arch) 
+        # to a new dictionary of (Inf,Arch):Cmd,Cmd,Cmd...
+        CmdSetDict = defaultdict(set)
         GenFfsDict = GenFds.GenFfsMakefile('', GlobalData.gFdfParser, self, self.ArchList, GlobalData)
         for Cmd in GenFfsDict:
             tmpInf, tmpArch = GenFfsDict[Cmd]
-            if (tmpInf, tmpArch) not in CmdListDict.keys():
-                CmdListDict[tmpInf, tmpArch] = [Cmd]
-            else:
-                CmdListDict[tmpInf, tmpArch].append(Cmd)
-        return CmdListDict
+            CmdSetDict[tmpInf, tmpArch].add(Cmd)
+        return CmdSetDict
 
     ## Build a platform in multi-thread mode
     #

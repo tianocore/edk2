@@ -92,7 +92,7 @@ def main():
         else:
             Workspace = os.path.normcase(Options.Workspace)
             GenFdsGlobalVariable.WorkSpaceDir = Workspace
-            if 'EDK_SOURCE' in os.environ.keys():
+            if 'EDK_SOURCE' in os.environ:
                 GenFdsGlobalVariable.EdkSourceDir = os.path.normcase(os.environ['EDK_SOURCE'])
             if (Options.debug):
                 GenFdsGlobalVariable.VerboseLogger("Using Workspace:" + Workspace)
@@ -156,7 +156,7 @@ def main():
                 # This also handles someone specifying the Conf directory in the workspace. Using --conf=Conf
                 ConfDirectoryPath = os.path.join(GenFdsGlobalVariable.WorkSpaceDir, ConfDirectoryPath)
         else:
-            if "CONF_PATH" in os.environ.keys():
+            if "CONF_PATH" in os.environ:
                 ConfDirectoryPath = os.path.normcase(os.environ["CONF_PATH"])
             else:
                 # Get standard WORKSPACE/Conf, use the absolute path to the WORKSPACE/Conf
@@ -216,11 +216,11 @@ def main():
         os.environ["WORKSPACE"] = Workspace
 
         # Use the -t and -b option as gGlobalDefines's TOOLCHAIN and TARGET if they are not defined
-        if "TARGET" not in GlobalData.gGlobalDefines.keys():
+        if "TARGET" not in GlobalData.gGlobalDefines:
             GlobalData.gGlobalDefines["TARGET"] = GenFdsGlobalVariable.TargetName
-        if "TOOLCHAIN" not in GlobalData.gGlobalDefines.keys():
+        if "TOOLCHAIN" not in GlobalData.gGlobalDefines:
             GlobalData.gGlobalDefines["TOOLCHAIN"] = GenFdsGlobalVariable.ToolChainTag
-        if "TOOL_CHAIN_TAG" not in GlobalData.gGlobalDefines.keys():
+        if "TOOL_CHAIN_TAG" not in GlobalData.gGlobalDefines:
             GlobalData.gGlobalDefines['TOOL_CHAIN_TAG'] = GenFdsGlobalVariable.ToolChainTag
 
         """call Workspace build create database"""
@@ -278,21 +278,21 @@ def main():
             EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "Cycle Reference Detected in FDF file")
 
         if (Options.uiFdName) :
-            if Options.uiFdName.upper() in FdfParserObj.Profile.FdDict.keys():
+            if Options.uiFdName.upper() in FdfParserObj.Profile.FdDict:
                 GenFds.OnlyGenerateThisFd = Options.uiFdName
             else:
                 EdkLogger.error("GenFds", OPTION_VALUE_INVALID,
                                 "No such an FD in FDF file: %s" % Options.uiFdName)
 
         if (Options.uiFvName) :
-            if Options.uiFvName.upper() in FdfParserObj.Profile.FvDict.keys():
+            if Options.uiFvName.upper() in FdfParserObj.Profile.FvDict:
                 GenFds.OnlyGenerateThisFv = Options.uiFvName
             else:
                 EdkLogger.error("GenFds", OPTION_VALUE_INVALID,
                                 "No such an FV in FDF file: %s" % Options.uiFvName)
 
         if (Options.uiCapName) :
-            if Options.uiCapName.upper() in FdfParserObj.Profile.CapsuleDict.keys():
+            if Options.uiCapName.upper() in FdfParserObj.Profile.CapsuleDict:
                 GenFds.OnlyGenerateThisCap = Options.uiCapName
             else:
                 EdkLogger.error("GenFds", OPTION_VALUE_INVALID,
@@ -388,7 +388,7 @@ def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
                 KeyStringList.append(Target + '_' + ToolChain + '_' + Arch)
 
     if GenFdsGlobalVariable.GuidToolDefinition:
-        if NameGuid in GenFdsGlobalVariable.GuidToolDefinition.keys():
+        if NameGuid in GenFdsGlobalVariable.GuidToolDefinition:
             return GenFdsGlobalVariable.GuidToolDefinition[NameGuid]
 
     ToolDefinition = ToolDefClassObject.ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDictionary
@@ -450,10 +450,10 @@ def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
                     if Key in KeyStringList and KeyList[4] == 'GUID':
                         ToolPathKey   = Key + '_' + KeyList[3] + '_PATH'
                         ToolOptionKey = Key + '_' + KeyList[3] + '_FLAGS'
-        if ToolPathKey in BuildOption.keys():
-            ToolPathTmp = BuildOption.get(ToolPathKey)
-        if ToolOptionKey in BuildOption.keys():
-            ToolOption = BuildOption.get(ToolOptionKey)
+        if ToolPathKey in BuildOption:
+            ToolPathTmp = BuildOption[ToolPathKey]
+        if ToolOptionKey in BuildOption:
+            ToolOption = BuildOption[ToolOptionKey]
 
     GenFdsGlobalVariable.GuidToolDefinition[NameGuid] = (ToolPathTmp, ToolOption)
     return ToolPathTmp, ToolOption
@@ -522,63 +522,56 @@ class GenFds :
         GenFdsGlobalVariable.SetDir ('', FdfParser, WorkSpace, ArchList)
 
         GenFdsGlobalVariable.VerboseLogger(" Generate all Fd images and their required FV and Capsule images!")
-        if GenFds.OnlyGenerateThisCap is not None and GenFds.OnlyGenerateThisCap.upper() in GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict.keys():
-            CapsuleObj = GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict.get(GenFds.OnlyGenerateThisCap.upper())
+        if GenFds.OnlyGenerateThisCap is not None and GenFds.OnlyGenerateThisCap.upper() in GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict:
+            CapsuleObj = GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict[GenFds.OnlyGenerateThisCap.upper()]
             if CapsuleObj is not None:
                 CapsuleObj.GenCapsule()
                 return
 
-        if GenFds.OnlyGenerateThisFd is not None and GenFds.OnlyGenerateThisFd.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
-            FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict.get(GenFds.OnlyGenerateThisFd.upper())
+        if GenFds.OnlyGenerateThisFd is not None and GenFds.OnlyGenerateThisFd.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict:
+            FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[GenFds.OnlyGenerateThisFd.upper()]
             if FdObj is not None:
                 FdObj.GenFd()
                 return
         elif GenFds.OnlyGenerateThisFd is None and GenFds.OnlyGenerateThisFv is None:
-            for FdName in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
-                FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[FdName]
+            for FdObj in GenFdsGlobalVariable.FdfParser.Profile.FdDict.values():
                 FdObj.GenFd()
 
         GenFdsGlobalVariable.VerboseLogger("\n Generate other FV images! ")
-        if GenFds.OnlyGenerateThisFv is not None and GenFds.OnlyGenerateThisFv.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
-            FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(GenFds.OnlyGenerateThisFv.upper())
+        if GenFds.OnlyGenerateThisFv is not None and GenFds.OnlyGenerateThisFv.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict:
+            FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict[GenFds.OnlyGenerateThisFv.upper()]
             if FvObj is not None:
                 Buffer = StringIO.StringIO()
                 FvObj.AddToBuffer(Buffer)
                 Buffer.close()
                 return
         elif GenFds.OnlyGenerateThisFv is None:
-            for FvName in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
+            for FvObj in GenFdsGlobalVariable.FdfParser.Profile.FvDict.values():
                 Buffer = StringIO.StringIO('')
-                FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict[FvName]
                 FvObj.AddToBuffer(Buffer)
                 Buffer.close()
         
         if GenFds.OnlyGenerateThisFv is None and GenFds.OnlyGenerateThisFd is None and GenFds.OnlyGenerateThisCap is None:
             if GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict != {}:
                 GenFdsGlobalVariable.VerboseLogger("\n Generate other Capsule images!")
-                for CapsuleName in GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict.keys():
-                    CapsuleObj = GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict[CapsuleName]
+                for CapsuleObj in GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict.values():
                     CapsuleObj.GenCapsule()
 
             if GenFdsGlobalVariable.FdfParser.Profile.OptRomDict != {}:
                 GenFdsGlobalVariable.VerboseLogger("\n Generate all Option ROM!")
-                for DriverName in GenFdsGlobalVariable.FdfParser.Profile.OptRomDict.keys():
-                    OptRomObj = GenFdsGlobalVariable.FdfParser.Profile.OptRomDict[DriverName]
+                for OptRomObj in GenFdsGlobalVariable.FdfParser.Profile.OptRomDict.values():
                     OptRomObj.AddToBuffer(None)
     @staticmethod
     def GenFfsMakefile(OutputDir, FdfParser, WorkSpace, ArchList, GlobalData):
         GenFdsGlobalVariable.SetEnv(FdfParser, WorkSpace, ArchList, GlobalData)
-        for FdName in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
-            FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[FdName]
+        for FdObj in GenFdsGlobalVariable.FdfParser.Profile.FdDict.values():
             FdObj.GenFd(Flag=True)
 
-        for FvName in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
-            FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict[FvName]
+        for FvObj in GenFdsGlobalVariable.FdfParser.Profile.FvDict.values():
             FvObj.AddToBuffer(Buffer=None, Flag=True)
 
         if GenFdsGlobalVariable.FdfParser.Profile.OptRomDict != {}:
-            for DriverName in GenFdsGlobalVariable.FdfParser.Profile.OptRomDict.keys():
-                OptRomObj = GenFdsGlobalVariable.FdfParser.Profile.OptRomDict[DriverName]
+            for OptRomObj in GenFdsGlobalVariable.FdfParser.Profile.OptRomDict.values():
                 OptRomObj.AddToBuffer(Buffer=None, Flag=True)
 
         return GenFdsGlobalVariable.FfsCmdDict
@@ -591,7 +584,7 @@ class GenFds :
     def GetFvBlockSize(FvObj):
         DefaultBlockSize = 0x1
         FdObj = None
-        if GenFds.OnlyGenerateThisFd is not None and GenFds.OnlyGenerateThisFd.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
+        if GenFds.OnlyGenerateThisFd is not None and GenFds.OnlyGenerateThisFd.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict:
             FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[GenFds.OnlyGenerateThisFd.upper()]
         if FdObj is None:
             for ElementFd in GenFdsGlobalVariable.FdfParser.Profile.FdDict.values():

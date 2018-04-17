@@ -1,7 +1,7 @@
 ## @file
 # This is the base class for applications that operate on an EDK II Workspace 
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -259,10 +259,7 @@ def ConvertDictionaryToTextFile(FileName, Dictionary, CommentCharacter, KeySplit
     except:
         Lines = []
     Keys = Dictionary.keys()
-    MaxLength = 0
-    for Key in Keys:
-        if len(Key) > MaxLength:
-            MaxLength = len(Key)
+    MaxLength = max(map(len,Keys))
     Index = 0
     for Line in Lines:
         LineList = Line.split(KeySplitCharacter, 1)

@@ -1918,7 +1918,7 @@ class DefaultStore():
         if not self.DefaultStores or "0" in self.DefaultStores:
             return "0",TAB_DEFAULT_STORES_DEFAULT
         else:
-            minvalue = min([int(value_str) for value_str in self.DefaultStores.keys()])
+            minvalue = min([int(value_str) for value_str in self.DefaultStores])
             return (str(minvalue), self.DefaultStores[str(minvalue)])
     def GetMin(self,DefaultSIdList):
         if not DefaultSIdList:

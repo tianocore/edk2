@@ -613,7 +613,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     # the file name FILE_GUIDmodule.inf, then PlatformDataBase.Modules use FILE_GUIDmodule.inf as key,
                     # but the path (self.MetaFile.Path) is the real path
                     #
-                    for key in PlatformDataBase.Modules.keys():
+                    for key in PlatformDataBase.Modules:
                         if InfFileKey == str((PlatformDataBase.Modules[key]).MetaFile.Path):
                             DscArchList.append (Arch)
                             break

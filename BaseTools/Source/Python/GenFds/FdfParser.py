@@ -3402,7 +3402,7 @@ class FdfParser:
         if not self.__GetNextToken():
             raise Warning("expected FV name", self.FileName, self.CurrentLineNumber)
 
-        if self.__Token.upper() not in self.Profile.FvDict.keys():
+        if self.__Token.upper() not in self.Profile.FvDict:
             raise Warning("FV name does not exist", self.FileName, self.CurrentLineNumber)
 
         CapsuleFv = CapsuleData.CapsuleFv()
@@ -3436,7 +3436,7 @@ class FdfParser:
         if not self.__GetNextToken():
             raise Warning("expected FD name", self.FileName, self.CurrentLineNumber)
 
-        if self.__Token.upper() not in self.Profile.FdDict.keys():
+        if self.__Token.upper() not in self.Profile.FdDict:
             raise Warning("FD name does not exist", self.FileName, self.CurrentLineNumber)
 
         CapsuleFd = CapsuleData.CapsuleFd()
@@ -4532,7 +4532,7 @@ class FdfParser:
     def __GetCapInFd (self, FdName):
 
         CapList = []
-        if FdName.upper() in self.Profile.FdDict.keys():
+        if FdName.upper() in self.Profile.FdDict:
             FdObj = self.Profile.FdDict[FdName.upper()]
             for elementRegion in FdObj.RegionList:
                 if elementRegion.RegionType == 'CAPSULE':
@@ -4579,7 +4579,7 @@ class FdfParser:
     def __GetFvInFd (self, FdName):
 
         FvList = []
-        if FdName.upper() in self.Profile.FdDict.keys():
+        if FdName.upper() in self.Profile.FdDict:
             FdObj = self.Profile.FdDict[FdName.upper()]
             for elementRegion in FdObj.RegionList:
                 if elementRegion.RegionType == 'FV':
@@ -4648,7 +4648,7 @@ class FdfParser:
         # Check the cycle between FV and FD image
         #
         MaxLength = len (self.Profile.FvDict)
-        for FvName in self.Profile.FvDict.keys():
+        for FvName in self.Profile.FvDict:
             LogStr = "\nCycle Reference Checking for FV: %s\n" % FvName
             RefFvStack = []
             RefFvStack.append(FvName)
@@ -4658,7 +4658,7 @@ class FdfParser:
             while RefFvStack != [] and Index < MaxLength:
                 Index = Index + 1
                 FvNameFromStack = RefFvStack.pop()
-                if FvNameFromStack.upper() in self.Profile.FvDict.keys():
+                if FvNameFromStack.upper() in self.Profile.FvDict:
                     FvObj = self.Profile.FvDict[FvNameFromStack.upper()]
                 else:
                     continue
@@ -4697,7 +4697,7 @@ class FdfParser:
         # Check the cycle between Capsule and FD image
         #
         MaxLength = len (self.Profile.CapsuleDict)
-        for CapName in self.Profile.CapsuleDict.keys():
+        for CapName in self.Profile.CapsuleDict:
             #
             # Capsule image to be checked.
             #
@@ -4711,7 +4711,7 @@ class FdfParser:
             while RefCapStack != [] and Index < MaxLength:
                 Index = Index + 1
                 CapNameFromStack = RefCapStack.pop()
-                if CapNameFromStack.upper() in self.Profile.CapsuleDict.keys():
+                if CapNameFromStack.upper() in self.Profile.CapsuleDict:
                     CapObj = self.Profile.CapsuleDict[CapNameFromStack.upper()]
                 else:
                     continue
@@ -4756,7 +4756,7 @@ class FdfParser:
                         if RefFvName in FvAnalyzedList:
                             continue
                         LogStr += "Capsule %s contains FV %s\n" % (CapNameFromStack, RefFvName)
-                        if RefFvName.upper() in self.Profile.FvDict.keys():
+                        if RefFvName.upper() in self.Profile.FvDict:
                             FvObj = self.Profile.FvDict[RefFvName.upper()]
                         else:
                             continue

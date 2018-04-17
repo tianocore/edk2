@@ -1,7 +1,7 @@
 ## @file
 # Target Tool Parser
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -65,7 +65,7 @@ class TargetTool():
                 LineList = Line.split(KeySplitCharacter,1)
                 if len(LineList) >= 2:
                     Key = LineList[0].strip()
-                    if Key.startswith(CommentCharacter) == False and Key in self.TargetTxtDictionary.keys():
+                    if Key.startswith(CommentCharacter) == False and Key in self.TargetTxtDictionary:
                         if Key == TAB_TAT_DEFINES_ACTIVE_PLATFORM or Key == TAB_TAT_DEFINES_TOOL_CHAIN_CONF \
                           or Key == TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER \
                           or Key == TAB_TAT_DEFINES_ACTIVE_MODULE:
@@ -105,7 +105,7 @@ class TargetTool():
                     LineList = Line.split(KeySplitCharacter,1)
                     if len(LineList) >= 2:
                         Key = LineList[0].strip()
-                        if Key.startswith(CommentCharacter) == False and Key in self.TargetTxtDictionary.keys():
+                        if Key.startswith(CommentCharacter) == False and Key in self.TargetTxtDictionary:
                             if Key not in existKeys:
                                 existKeys.append(Key)
                             else:
@@ -118,7 +118,7 @@ class TargetTool():
                                 if ret is not None:
                                     Line = ret
                             fw.write(Line)
-            for key in self.TargetTxtDictionary.keys():
+            for key in self.TargetTxtDictionary:
                 if key not in existKeys:
                     print "Warning: %s does not exist in original configuration file" % key
                     Line = GetConfigureKeyValue(self, key)

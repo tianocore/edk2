@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation from FILE statement
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -83,14 +83,14 @@ class FileStatement (FileStatementClassObject) :
         SectionAlignments = None
         if self.FvName is not None :
             Buffer = StringIO.StringIO('')
-            if self.FvName.upper() not in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
+            if self.FvName.upper() not in GenFdsGlobalVariable.FdfParser.Profile.FvDict:
                 EdkLogger.error("GenFds", GENFDS_ERROR, "FV (%s) is NOT described in FDF file!" % (self.FvName))
             Fv = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName.upper())
             FileName = Fv.AddToBuffer(Buffer)
             SectionFiles = [FileName]
 
         elif self.FdName is not None:
-            if self.FdName.upper() not in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
+            if self.FdName.upper() not in GenFdsGlobalVariable.FdfParser.Profile.FdDict:
                 EdkLogger.error("GenFds", GENFDS_ERROR, "FD (%s) is NOT described in FDF file!" % (self.FdName))
             Fd = GenFdsGlobalVariable.FdfParser.Profile.FdDict.get(self.FdName.upper())
             FileName = Fd.GenFd()

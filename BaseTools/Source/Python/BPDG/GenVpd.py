@@ -120,7 +120,7 @@ class PcdEntry:
     # 
     #                                
     def _PackIntValue(self, IntValue, Size):
-        if Size not in _FORMAT_CHAR.keys():
+        if Size not in _FORMAT_CHAR:
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
                             "Invalid size %d for PCD %s in integer datum size(File: %s Line: %s)." % (Size, self.PcdCName, self.FileName, self.Lineno))
 

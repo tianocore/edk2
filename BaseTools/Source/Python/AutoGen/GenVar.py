@@ -114,8 +114,8 @@ class VariableMgr(object):
         self.VarInfo = [item[0] for item in indexedvarinfo.values()]
 
     def assemble_variable(self, valuelist):
-        ordered_value = [valuelist[k] for k in sorted(valuelist.keys())]
         ordered_offset = sorted(valuelist.keys())
+        ordered_value = [valuelist[k] for k in ordered_offset]
         var_value = []
         num = 0
         for offset in ordered_offset:

@@ -6,7 +6,7 @@
 # is pointed by *_*_*_VPD_TOOL_GUID in conf/tools_def.txt 
 #
 #
-# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -107,7 +107,7 @@ class VpdInfoFile:
                 EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID,
                                 "Invalid max datum size for VPD PCD %s.%s" % (Vpd.TokenSpaceGuidCName, Vpd.TokenCName))
             
-        if Vpd not in self._VpdArray.keys():
+        if Vpd not in self._VpdArray:
             #
             # If there is no Vpd instance in dict, that imply this offset for a given SKU is a new one 
             #
@@ -180,12 +180,12 @@ class VpdInfoFile:
             if (TokenSpaceName, PcdTokenName) not in self._VpdInfo:
                 self._VpdInfo[(TokenSpaceName, PcdTokenName)] = []
             self._VpdInfo[(TokenSpaceName, PcdTokenName)].append((SkuId,Offset, Value))
-            for VpdObject in self._VpdArray.keys():
+            for VpdObject in self._VpdArray:
                 VpdObjectTokenCName = VpdObject.TokenCName
                 for PcdItem in GlobalData.MixedPcd:
                     if (VpdObject.TokenCName, VpdObject.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
                         VpdObjectTokenCName = PcdItem[0]
-                for sku in VpdObject.SkuInfoList.keys():
+                for sku in VpdObject.SkuInfoList:
                     if VpdObject.TokenSpaceGuidCName == TokenSpaceName and VpdObjectTokenCName == PcdTokenName.strip() and sku == SkuId:
                         if self._VpdArray[VpdObject][sku] == "*":
                             if Offset == "*":

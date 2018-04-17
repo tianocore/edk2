@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define common parsing related functions used in parsing INF/DEC/DSC process
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -37,16 +37,14 @@ def ParseDefineMacro2(Table, RecordSets, GlobalMacro):
     #
     # Overrided by Global Macros
     #
-    for Key in GlobalMacro.keys():
-        Macros[Key] = GlobalMacro[Key]
+    Macros.update(GlobalMacro)
 
     #
     # Replace the Macros
     #
-    for Key in RecordSets.keys():
-        if RecordSets[Key] != []:
-            for Item in RecordSets[Key]:
-                Item[0] = ReplaceMacro(Item[0], Macros)
+    for Value in (v for v in RecordSets.values() if v):
+        for Item in Value:
+            Item[0] = ReplaceMacro(Item[0], Macros)
 
 ## ParseDefineMacro
 #
@@ -79,8 +77,7 @@ def ParseDefineMacro(Table, GlobalMacro):
     #
     # Overrided by Global Macros
     #
-    for Key in GlobalMacro.keys():
-        Macros[Key] = GlobalMacro[Key]
+    Macros.update(GlobalMacro)
 
     #
     # Found all defined macro and replaced

@@ -788,10 +788,7 @@ class InfBuildData(ModuleBuildClassObject):
                 self._Includes.append(self._SourceOverridePath)
 
             Macros = self._Macros
-            if 'PROCESSOR' in GlobalData.gEdkGlobal.keys():
-                Macros['PROCESSOR'] = GlobalData.gEdkGlobal['PROCESSOR']
-            else:
-                Macros['PROCESSOR'] = self._Arch
+            Macros['PROCESSOR'] = GlobalData.gEdkGlobal.get('PROCESSOR', self._Arch)
             RecordList = self._RawData[MODEL_EFI_INCLUDE, self._Arch, self._Platform]
             for Record in RecordList:
                 if Record[0].find('EDK_SOURCE') > -1:
