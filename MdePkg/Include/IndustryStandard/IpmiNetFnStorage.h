@@ -10,7 +10,7 @@
   See IPMI specification, Appendix G, Command Assignments
   and Appendix H, Sub-function Assignments.
 
-  Copyright (c) 1999 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -45,14 +45,23 @@
 //
 //  Constants and Structure definitions for "Get Fru Inventory Area Info" command to follow here
 //
+typedef struct {
+  UINT8  DeviceId;
+} IPMI_GET_FRU_INVENTORY_AREA_INFO_REQUEST;
+
+typedef struct {
+  UINT8   CompletionCode;
+  UINT16  InventoryAreaSize;
+  UINT8   AccessType;
+} IPMI_GET_FRU_INVENTORY_AREA_INFO_RESPONSE;
 
 //
-//  Definitions for Get Fru Data command
+//  Definitions for Read Fru Data command
 //
 #define IPMI_STORAGE_READ_FRU_DATA 0x11
 
 //
-//  Constants and Structure definitions for "Get Fru Data" command to follow here
+//  Constants and Structure definitions for "Read Fru Data" command to follow here
 //
 typedef struct {
   UINT8   FruDeviceId;
@@ -63,6 +72,18 @@ typedef struct {
   IPMI_FRU_COMMON_DATA Data;
   UINT8                Count;
 } IPMI_FRU_READ_COMMAND;
+
+typedef struct {
+  UINT8   DeviceId;
+  UINT16  InventoryOffset;
+  UINT8   CountToRead;
+} IPMI_READ_FRU_DATA_REQUEST;
+
+typedef struct {
+  UINT8   CompletionCode;
+  UINT8   CountReturned;
+  UINT8   Data[0];
+} IPMI_READ_FRU_DATA_RESPONSE;
 
 //
 //  Definitions for Write Fru Data command
@@ -76,6 +97,17 @@ typedef struct {
   IPMI_FRU_COMMON_DATA Data;
   UINT8                FruData[16];
 } IPMI_FRU_WRITE_COMMAND;
+
+typedef struct {
+  UINT8   DeviceId;
+  UINT16  InventoryOffset;
+  UINT8   Data[0];
+} IPMI_WRITE_FRU_DATA_REQUEST;
+
+typedef struct {
+  UINT8   CompletionCode;
+  UINT8   CountWritten;
+} IPMI_WRITE_FRU_DATA_RESPONSE;
 
 //
 //  Below is Definitions for SDR Repository (Chapter 33)
@@ -103,7 +135,7 @@ typedef struct {
   UINT8   Reserved : 1;
   UINT8   SdrRepUpdateOp : 2;
   UINT8   Overflow : 1;
-} IPMI_GET_SDR_REPOSITORY_INFO;
+} IPMI_GET_SDR_REPOSITORY_INFO_RESPONSE;
 
 //
 //  Definitions for Get SDR Repository Allocateion Info command
@@ -122,6 +154,10 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Reserve SDR Repository" command to follow here
 //
+typedef struct {
+  UINT8  CompletionCode;
+  UINT8  ReservationId[2];  // Reservation ID. LS byte first.
+} IPMI_RESERVE_SDR_REPOSITORY_RESPONSE;
 
 //
 //  Definitions for Get SDR command
@@ -253,27 +289,25 @@ typedef struct {
 } IPMI_SDR_RECORD_STRUCT_11;
 
 typedef struct {
-  UINT16              NextRecordId;       //1
-  UINT16              RecordId;           //3
-  UINT8               Version;            //5
-  UINT8               RecordType;         //6
-  UINT8               RecordLength;       //7
-  UINT8               ManufacturerId[3];  //8
+  UINT16              RecordId;           //1
+  UINT8               Version;            //3
+  UINT8               RecordType;         //4
+  UINT8               RecordLength;       //5
+  UINT8               ManufacturerId[3];  //6
   UINT8               StringChars[20];
 } IPMI_SDR_RECORD_STRUCT_C0;
 
 typedef struct {
-  UINT16              NextRecordId;       //1
-  UINT16              RecordId;           //3
-  UINT8               Version;            //5
-  UINT8               RecordType;         //6
-  UINT8               RecordLength;       //7
+  UINT16              RecordId;           //1
+  UINT8               Version;            //3
+  UINT8               RecordType;         //4
+  UINT8               RecordLength;       //5
 } IPMI_SDR_RECORD_STRUCT_HEADER;
 
 typedef union {
-  IPMI_SDR_RECORD_STRUCT_1  SensorType1;
-  IPMI_SDR_RECORD_STRUCT_2  SensorType2;
-  IPMI_SDR_RECORD_STRUCT_11 SensorType11;
+  IPMI_SDR_RECORD_STRUCT_1        SensorType1;
+  IPMI_SDR_RECORD_STRUCT_2        SensorType2;
+  IPMI_SDR_RECORD_STRUCT_11       SensorType11;
   IPMI_SDR_RECORD_STRUCT_C0       SensorTypeC0;
   IPMI_SDR_RECORD_STRUCT_HEADER   SensorHeader;
 } IPMI_SENSOR_RECORD_STRUCT;
@@ -284,6 +318,12 @@ typedef struct {
   UINT8       RecordOffset;
   UINT8       BytesToRead;
 } IPMI_GET_SDR_REQUEST;
+
+typedef struct {
+  UINT8                        CompletionCode;
+  UINT16                       NextRecordId;
+  IPMI_SENSOR_RECORD_STRUCT    RecordData;
+} IPMI_GET_SDR_RESPONSE;
 
 //
 //  Definitions for Add SDR command
@@ -378,6 +418,12 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get SEL Info" command to follow here
 //
+#define IPMI_GET_SEL_INFO_OPERATION_SUPPORT_GET_SEL_ALLOCATION_INFO_CMD    BIT0
+#define IPMI_GET_SEL_INFO_OPERATION_SUPPORT_RESERVE_SEL_CMD                BIT1
+#define IPMI_GET_SEL_INFO_OPERATION_SUPPORT_PARTIAL_ADD_SEL_ENTRY_CMD      BIT2
+#define IPMI_GET_SEL_INFO_OPERATION_SUPPORT_DELETE_SEL_CMD                 BIT3
+#define IPMI_GET_SEL_INFO_OPERATION_SUPPORT_OVERFLOW_FLAG                  BIT7
+
 typedef struct {
   UINT8   CompletionCode;
   UINT8   Version;              // Version of SEL
@@ -405,6 +451,10 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Reserve SEL" command to follow here
 //
+typedef struct {
+  UINT8  CompletionCode;
+  UINT8  ReservationId[2];  // Reservation ID. LS byte first.
+} IPMI_RESERVE_SEL_RESPONSE;
 
 //
 //  Definitions for Get SEL Entry command
@@ -414,12 +464,50 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get SEL Entry" command to follow here
 //
+
+//
+//  Below is Definitions for SEL Record Formats (Chapter 32)
+//
+typedef struct {
+  UINT16  RecordId;
+  UINT8   RecordType;
+  UINT32  TimeStamp;
+  UINT16  GeneratorId;
+  UINT8   EvMRevision;
+  UINT8   SensorType;
+  UINT8   SensorNumber;
+  UINT8   EventDirType;
+  UINT8   OEMEvData1;
+  UINT8   OEMEvData2;
+  UINT8   OEMEvData3;
+} IPMI_SEL_EVENT_RECORD_DATA;
+
+typedef struct {
+  UINT16  RecordId;
+  UINT8   RecordType;  // C0h-DFh = OEM system event record
+  UINT32  TimeStamp;
+  UINT8   ManufacturerId[3];
+  UINT8   OEMDefined[6];
+} IPMI_TIMESTAMPED_OEM_SEL_RECORD_DATA;
+
+typedef struct {
+  UINT16  RecordId;
+  UINT8   RecordType;  // E0h-FFh = OEM system event record
+  UINT8   OEMDefined[13];
+} IPMI_NON_TIMESTAMPED_OEM_SEL_RECORD_DATA;
+
 typedef struct {
   UINT8 ReserveId[2]; // Reservation ID, LS Byte First
   UINT8 SelRecID[2];  // Sel Record ID, LS Byte First
   UINT8 Offset;       // Offset Into Record
   UINT8 BytesToRead;  // Bytes to be Read, 0xFF for entire record
 } IPMI_GET_SEL_ENTRY_REQUEST;
+
+typedef struct {
+  UINT8                       CompletionCode;
+  UINT16                      NextSelRecordId; // Next SEL Record ID, LS Byte first
+  IPMI_SEL_EVENT_RECORD_DATA  RecordData;
+} IPMI_GET_SEL_ENTRY_RESPONSE;
 
 //
 //  Definitions for Add SEL Entry command
@@ -429,6 +517,14 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Add SEL Entry" command to follow here
 //
+typedef struct {
+  IPMI_SEL_EVENT_RECORD_DATA  RecordData;
+} IPMI_ADD_SEL_ENTRY_REQUEST;
+
+typedef struct {
+  UINT8   CompletionCode;
+  UINT16  RecordId;  // Record ID for added record, LS Byte first
+} IPMI_ADD_SEL_ENTRY_RESPONSE;
 
 //
 //  Definitions for Partial Add SEL Entry command
@@ -438,6 +534,18 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Partial Add SEL Entry" command to follow here
 //
+typedef struct {
+  UINT16  ReservationId;
+  UINT16  RecordId;
+  UINT8   OffsetIntoRecord;
+  UINT8   InProgress;
+  UINT8   RecordData[0];
+} IPMI_PARTIAL_ADD_SEL_ENTRY_REQUEST;
+
+typedef struct {
+  UINT8   CompletionCode;
+  UINT16  RecordId;
+} IPMI_PARTIAL_ADD_SEL_ENTRY_RESPONSE;
 
 //
 //  Definitions for Delete SEL Entry command
@@ -450,7 +558,15 @@ typedef struct {
 typedef struct {
   UINT8 ReserveId[2];       // Reservation ID, LS byte first
   UINT8 RecordToDelete[2];  // Record to Delete, LS Byte First
-} IPMI_DELETE_SEL_REQUEST;
+} IPMI_DELETE_SEL_ENTRY_REQUEST;
+
+#define IPMI_DELETE_SEL_ENTRY_RESPONSE_TYPE_UNSUPPORTED     0x80
+#define IPMI_DELETE_SEL_ENTRY_RESPONSE_ERASE_IN_PROGRESS    0x81
+
+typedef struct {
+  UINT8   CompletionCode;
+  UINT16  RecordId;  // Record ID added. LS byte first
+} IPMI_DELETE_SEL_ENTRY_RESPONSE;
 
 //
 //  Definitions for Clear SEL command
@@ -460,6 +576,12 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Clear SEL" command to follow here
 //
+#define IPMI_CLEAR_SEL_REQUEST_C_CHAR_ASCII        0x43
+#define IPMI_CLEAR_SEL_REQUEST_L_CHAR_ASCII        0x4C
+#define IPMI_CLEAR_SEL_REQUEST_R_CHAR_ASCII        0x52
+#define IPMI_CLEAR_SEL_REQUEST_INITIALIZE_ERASE    0xAA
+#define IPMI_CLEAR_SEL_REQUEST_GET_ERASE_STATUS    0x00
+
 typedef struct {
   UINT8 Reserve[2]; // Reserve ID, LSB first
   UINT8 AscC;       // Ascii for 'C' (0x43)
@@ -467,6 +589,14 @@ typedef struct {
   UINT8 AscR;       // Ascii for 'R' (0x52)
   UINT8 Erase;      // 0xAA, Initiate Erase, 0x00 Get Erase Status
 } IPMI_CLEAR_SEL_REQUEST;
+
+#define IPMI_CLEAR_SEL_RESPONSE_ERASURE_IN_PROGRESS    0x00
+#define IPMI_CLEAR_SEL_RESPONSE_ERASURE_COMPLETED      0x01
+
+typedef struct {
+  UINT8  CompletionCode;
+  UINT8  ErasureProgress;
+} IPMI_CLEAR_SEL_RESPONSE;
 
 //
 //  Definitions for Get SEL Time command
@@ -476,6 +606,10 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get SEL Time" command to follow here
 //
+typedef struct {
+  UINT8   CompletionCode;
+  UINT32  Timestamp;  // Present Timestamp clock reading. LS byte first.
+} IPMI_GET_SEL_TIME_RESPONSE;
 
 //
 //  Definitions for Set SEL Time command
@@ -485,6 +619,9 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Set SEL Time" command to follow here
 //
+typedef struct {
+  UINT32  Timestamp;
+} IPMI_SET_SEL_TIME_REQUEST;
 
 //
 //  Definitions for Get Auxillary Log Status command
@@ -504,39 +641,88 @@ typedef struct {
 //  Constants and Structure definitions for "Set Auxillary Log Status" command to follow here
 //
 
-#define IPMI_COMPLETE_SEL_RECORD 0xFF
+//
+//  Definitions for Get SEL Time UTC Offset command
+//
+#define IPMI_STORAGE_GET_SEL_TIME_UTC_OFFSET   0x5C
 
 //
-//  Below is Definitions for SEL Record Formats (Chapter 32)
+//  Constants and Structure definitions for "Get SEL Time UTC Offset" command to follow here
 //
 typedef struct {
-  UINT16  RecordId;
-  UINT8   RecordType;
-  UINT32  TimeStamp;
-  UINT16  GeneratorId;
-  UINT8   EvMRevision;
-  UINT8   SensorType;
-  UINT8   SensorNumber;
-  UINT8   EventDirType;
-  UINT8   OEMEvData1;
-  UINT8   OEMEvData2;
-  UINT8   OEMEvData3;
-} IPMI_SEL_EVENT_RECORD_DATA;
+  UINT8  CompletionCode;
+  //
+  // 16-bit, 2s-complement signed integer for the offset in minutes from UTC to SEL Time.
+  // LS-byte first. (ranges from -1440 to 1440)
+  //
+  INT16  UtcOffset;
+} IPMI_GET_SEL_TIME_UTC_OFFSET_RESPONSE;
 
-#define IPMI_SEL_SYSTEM_RECORD                     0x02
+//
+//  Definitions for Set SEL Time UTC Offset command
+//
+#define IPMI_STORAGE_SET_SEL_TIME_UTC_OFFSET   0x5D
 
-#define IPMI_EVM_REVISION                          0x04
-#define IPMI_BIOS_ID                               0x18
-#define IPMI_FORMAT_REV                            0x00
-#define IPMI_FORMAT_REV1                           0x01
-#define IPMI_SOFTWARE_ID                           0x01
-#define IPMI_PLATFORM_VAL_ID                       0x01
-#define IPMI_GENERATOR_ID(i,f)                     ((i << 1) | (f << 1) | IPMI_SOFTWARE_ID)
+//
+//  Constants and Structure definitions for "Set SEL Time UTC Offset" command to follow here
+//
 
-#define IPMI_SENSOR_TYPE_EVENT_CODE_DISCRETE       0x6F
+#define IPMI_COMPLETE_SEL_RECORD 0xFF
 
-#define IPMI_OEM_SPECIFIC_DATA                     0x02
-#define IPMI_SENSOR_SPECIFIC_DATA                  0x03
+#define IPMI_SEL_SYSTEM_RECORD                          0x02
+#define IPMI_SEL_OEM_TIME_STAMP_RECORD_START            0xC0
+#define IPMI_SEL_OEM_TIME_STAMP_RECORD_END              0xDF
+#define IPMI_SEL_OEM_NO_TIME_STAMP_RECORD_START         0xE0
+#define IPMI_SEL_OEM_NO_TIME_STAMP_RECORD_END           0xFF
+
+#define IPMI_SEL_EVENT_DIR(EventDirType)                (EventDirType >> 7)
+#define IPMI_SEL_EVENT_DIR_ASSERTION_EVENT              0x00
+#define IPMI_SEL_EVENT_DIR_DEASSERTION_EVENT            0x01
+
+#define IPMI_SEL_EVENT_TYPE(EventDirType)               (EventDirType & 0x7F)
+//
+// Event/Reading Type Code Ranges (Chapter 42)
+//
+#define IPMI_SEL_EVENT_TYPE_UNSPECIFIED                 0x00
+#define IPMI_SEL_EVENT_TYPE_THRESHOLD                   0x01
+#define IPMI_SEL_EVENT_TYPE_GENERIC_START               0x02
+#define IPMI_SEL_EVENT_TYPE_GENERIC_END                 0x0C
+#define IPMI_SEL_EVENT_TYPE_SENSOR_SPECIFIC             0x6F
+#define IPMI_SEL_EVENT_TYPE_OEM_START                   0x70
+#define IPMI_SEL_EVENT_TYPE_OEM_END                     0x7F
+
+#define SOFTWARE_ID_FROM_GENERATOR_ID(GeneratorId)      ((GeneratorId & 0xFF) >> 1)
+//
+// System Software IDs definitions (Section 5.5)
+//
+#define IPMI_SWID_BIOS_RANGE_START                      0x00
+#define IPMI_SWID_BIOS_RANGE_END                        0x0F
+#define IPMI_SWID_SMI_HANDLER_RANGE_START               0x10
+#define IPMI_SWID_SMI_HANDLER_RANGE_END                 0x1F
+#define IPMI_SWID_SMS_RANGE_START                       0x20
+#define IPMI_SWID_SMS_RANGE_END                         0x2F
+#define IPMI_SWID_OEM_RANGE_START                       0x30
+#define IPMI_SWID_OEM_RANGE_END                         0x3F
+#define IPMI_SWID_REMOTE_CONSOLE_RANGE_START            0x40
+#define IPMI_SWID_REMOTE_CONSOLE_RANGE_END              0x46
+#define IPMI_SWID_TERMINAL_REMOTE_CONSOLE_ID            0x47
+
+#define SLAVE_ADDRESS_FROM_GENERATOR_ID(GeneratorId)    ((GeneratorId & 0xFF) >> 1)
+#define LUN_FROM_GENERATOR_ID(GeneratorId)              ((GeneratorId >> 8) & 0x03)
+#define CHANNEL_NUMBER_FROM_GENERATOR_ID(GeneratorId)   ((GeneratorId >> 12) & 0x0F)
+
+#define IPMI_EVM_REVISION                               0x04
+#define IPMI_BIOS_ID                                    0x18
+#define IPMI_FORMAT_REV                                 0x00
+#define IPMI_FORMAT_REV1                                0x01
+#define IPMI_SOFTWARE_ID                                0x01
+#define IPMI_PLATFORM_VAL_ID                            0x01
+#define IPMI_GENERATOR_ID(i,f)                          ((i << 1) | (f << 1) | IPMI_SOFTWARE_ID)
+
+#define IPMI_SENSOR_TYPE_EVENT_CODE_DISCRETE            0x6F
+
+#define IPMI_OEM_SPECIFIC_DATA                          0x02
+#define IPMI_SENSOR_SPECIFIC_DATA                       0x03
 
 #pragma pack()
 #endif

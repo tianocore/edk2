@@ -11,7 +11,7 @@
   See IPMI specification, Appendix G, Command Assignments
   and Appendix H, Sub-function Assignments.
 
-  Copyright (c) 1999 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -128,6 +128,43 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Set ACPI Power State" command to follow here
 //
+
+//
+//  Definitions for System Power State
+//
+// Working
+#define IPMI_SYSTEM_POWER_STATE_S0_G0        0x0
+#define IPMI_SYSTEM_POWER_STATE_S1           0x1
+#define IPMI_SYSTEM_POWER_STATE_S2           0x2
+#define IPMI_SYSTEM_POWER_STATE_S3           0x3
+#define IPMI_SYSTEM_POWER_STATE_S4           0x4
+// Soft off
+#define IPMI_SYSTEM_POWER_STATE_S5_G2        0x5
+// Sent when message source cannot differentiate between S4 and S5
+#define IPMI_SYSTEM_POWER_STATE_S4_S5        0x6
+// Mechanical off
+#define IPMI_SYSTEM_POWER_STATE_G3           0x7
+// Sleeping - cannot differentiate between S1-S3
+#define IPMI_SYSTEM_POWER_STATE_SLEEPING     0x8
+// Sleeping - cannot differentiate between S1-S4
+#define IPMI_SYSTEM_POWER_STATE_G1_SLEEPING  0x9
+// S5 entered by override
+#define IPMI_SYSTEM_POWER_STATE_OVERRIDE     0xA
+#define IPMI_SYSTEM_POWER_STATE_LEGACY_ON    0x20
+#define IPMI_SYSTEM_POWER_STATE_LEGACY_OFF   0x21
+#define IPMI_SYSTEM_POWER_STATE_UNKNOWN      0x2A
+#define IPMI_SYSTEM_POWER_STATE_NO_CHANGE    0x7F
+
+//
+//  Definitions for Device Power State
+//
+#define IPMI_DEVICE_POWER_STATE_D0           0x0
+#define IPMI_DEVICE_POWER_STATE_D1           0x1
+#define IPMI_DEVICE_POWER_STATE_D2           0x2
+#define IPMI_DEVICE_POWER_STATE_D3           0x3
+#define IPMI_DEVICE_POWER_STATE_UNKNOWN      0x2A
+#define IPMI_DEVICE_POWER_STATE_NO_CHANGE    0x7F
+
 typedef struct {
   UINT8  AcpiSystemPowerState  : 7;
   UINT8  AcpiSystemStateChange : 1;
@@ -170,7 +207,25 @@ typedef struct {
 #define IPMI_APP_RESET_WATCHDOG_TIMER  0x22
 
 //
-//  Constants and Structure definitions for "Reset WatchDog Timer" command to follow here
+//  Definitions for Set WatchDog Timer command
+//
+#define IPMI_APP_SET_WATCHDOG_TIMER  0x24
+
+//
+//  Constants and Structure definitions for "Set WatchDog Timer" command to follow here
+//
+
+//
+// Definitions for watchdog timer use
+//
+#define IPMI_WATCHDOG_TIMER_BIOS_FRB2  0x1
+#define IPMI_WATCHDOG_TIMER_BIOS_POST  0x2
+#define IPMI_WATCHDOG_TIMER_OS_LOADER  0x3
+#define IPMI_WATCHDOG_TIMER_SMS        0x4
+#define IPMI_WATCHDOG_TIMER_OEM        0x5
+
+//
+//  Structure definition for timer Use
 //
 typedef struct {
   UINT8 TimerUse : 3;
@@ -180,16 +235,43 @@ typedef struct {
 } IPMI_WATCHDOG_TIMER_USE;
 
 //
-//  Definitions for Set WatchDog Timer command
+//  Definitions for watchdog timeout action
 //
-#define IPMI_APP_SET_WATCHDOG_TIMER  0x24
+#define IPMI_WATCHDOG_TIMER_ACTION_NO_ACTION    0x0
+#define IPMI_WATCHDOG_TIMER_ACTION_HARD_RESET   0x1
+#define IPMI_WATCHDOG_TIMER_ACTION_POWER_DONW   0x2
+#define IPMI_WATCHDOG_TIMER_ACTION_POWER_CYCLE  0x3
 
 //
-//  Constants and Structure definitions for "Set WatchDog Timer" command to follow here
+//  Definitions for watchdog pre-timeout interrupt
+//
+#define IPMI_WATCHDOG_PRE_TIMEOUT_INTERRUPT_NONE       0x0
+#define IPMI_WATCHDOG_PRE_TIMEOUT_INTERRUPT_SMI        0x1
+#define IPMI_WATCHDOG_PRE_TIMEOUT_INTERRUPT_NMI        0x2
+#define IPMI_WATCHDOG_PRE_TIMEOUT_INTERRUPT_MESSAGING  0x3
+
+//
+//  Structure definitions for Timer Actions
 //
 typedef struct {
+  UINT8  TimeoutAction : 3;
+  UINT8  Reserved1 : 1;
+  UINT8  PreTimeoutInterrupt : 3;
+  UINT8  Reserved2 : 1;
+} IPMI_WATCHDOG_TIMER_ACTIONS;
+
+//
+//  Bit definitions for Timer use expiration flags
+//
+#define IPMI_WATCHDOG_TIMER_EXPIRATION_FLAG_BIOS_FRB2  BIT1
+#define IPMI_WATCHDOG_TIMER_EXPIRATION_FLAG_BIOS_POST  BIT2
+#define IPMI_WATCHDOG_TIMER_EXPIRATION_FLAG_OS_LOAD    BIT3
+#define IPMI_WATCHDOG_TIMER_EXPIRATION_FLAG_SMS_OS     BIT4
+#define IPMI_WATCHDOG_TIMER_EXPIRATION_FLAG_OEM        BIT5
+
+typedef struct {
   IPMI_WATCHDOG_TIMER_USE         TimerUse;
-  UINT8                           TimerActions;
+  IPMI_WATCHDOG_TIMER_ACTIONS     TimerActions;
   UINT8                           PretimeoutInterval;
   UINT8                           TimerUseExpirationFlagsClear;
   UINT16                          InitialCountdownValue;
@@ -206,7 +288,7 @@ typedef struct {
 typedef struct {
   UINT8                           CompletionCode;
   IPMI_WATCHDOG_TIMER_USE         TimerUse;
-  UINT8                           TimerActions;
+  IPMI_WATCHDOG_TIMER_ACTIONS     TimerActions;
   UINT8                           PretimeoutInterval;
   UINT8                           TimerUseExpirationFlagsClear;
   UINT16                          InitialCountdownValue;
@@ -225,6 +307,16 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Set BMC Global Enables " command to follow here
 //
+typedef struct {
+  UINT8  EnableReceiveMessageQueueInterrupt : 1;
+  UINT8  EnableEventMessageBufferFullInterrupt : 1;
+  UINT8  EnableEventMessageBuffer : 1;
+  UINT8  EnableSystemEventLogging : 1;
+  UINT8  Reserved : 1;
+  UINT8  Oem0Enable : 1;
+  UINT8  Oem1Enable : 1;
+  UINT8  Oem2Enable : 1;
+} IPMI_SET_BMC_GLOBAL_ENABLES_REQUEST;
 
 //
 //  Definitions for Get BMC Global Enables command
@@ -234,6 +326,17 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get BMC Global Enables " command to follow here
 //
+typedef struct {
+  UINT8  CompletionCode;
+  UINT8  ReceiveMessageQueueInterrupt : 1;
+  UINT8  EventMessageBufferFullInterrupt : 1;
+  UINT8  EventMessageBuffer : 1;
+  UINT8  SystemEventLogging : 1;
+  UINT8  Reserved : 1;
+  UINT8  Oem0Enable : 1;
+  UINT8  Oem1Enable : 1;
+  UINT8  Oem2Enable : 1;
+} IPMI_GET_BMC_GLOBAL_ENABLES_RESPONSE;
 
 //
 //  Definitions for Clear Message Flags command
@@ -243,6 +346,16 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Clear Message Flags" command to follow here
 //
+typedef struct {
+  UINT8  ClearReceiveMessageQueue : 1;
+  UINT8  ClearEventMessageBuffer : 1;
+  UINT8  Reserved0 : 1;
+  UINT8  ClearWatchdogPerTimeoutInterruptFlag : 1;
+  UINT8  Reserved : 1;
+  UINT8  ClearOem0Enable : 1;
+  UINT8  ClearOem1Enable : 1;
+  UINT8  ClearOem2Enable : 1;
+} IPMI_CLEAR_MESSAGE_FLAGS_REQUEST;
 
 //
 //  Definitions for Get Message Flags command
@@ -252,6 +365,17 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get Message Flags" command to follow here
 //
+typedef struct {
+  UINT8  CompletionCode;
+  UINT8  ReceiveMessageAvailable : 1;
+  UINT8  EventMessageBufferFull : 1;
+  UINT8  Reserved0 : 1;
+  UINT8  WatchdogPerTimeoutInterruptOccurred : 1;
+  UINT8  Reserved : 1;
+  UINT8  Oem0DataAvailable : 1;
+  UINT8  Oem1DataAvailable : 1;
+  UINT8  Oem2DataAvailable : 1;
+} IPMI_GET_MESSAGE_FLAGS_RESPONSE;
 
 //
 //  Definitions for Enable Message Channel Receive command
@@ -270,6 +394,12 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get Message" command to follow here
 //
+typedef struct {
+  UINT8  CompletionCode;
+  UINT8  ChannelNumber : 4;
+  UINT8  InferredPrivilegeLevel : 4;
+  UINT8  MessageData[0];
+} IPMI_GET_MESSAGE_RESPONSE;
 
 //
 //  Definitions for Send Message command
@@ -279,6 +409,19 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Send Message" command to follow here
 //
+typedef struct {
+  UINT8  CompletionCode;
+  UINT8  ChannelNumber : 4;
+  UINT8  Authentication : 1;
+  UINT8  Encryption : 1;
+  UINT8  Tracking : 2;
+  UINT8  MessageData[0];
+} IPMI_SEND_MESSAGE_REQUEST;
+
+typedef struct {
+  UINT8  CompletionCode;
+  UINT8  ResponseData[0];
+} IPMI_SEND_MESSAGE_RESPONSE;
 
 //
 //  Definitions for Read Event Message Buffer command
@@ -387,6 +530,21 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get Channel Access" command to follow here
 //
+
+//
+//  Definitions for channel access memory type in Get Channel Access command request
+//
+#define IPMI_CHANNEL_ACCESS_MEMORY_TYPE_NON_VOLATILE              0x1
+#define IPMI_CHANNEL_ACCESS_MEMORY_TYPE_PRESENT_VOLATILE_SETTING  0x2
+
+//
+//  Definitions for channel access modes in Get Channel Access command response
+//
+#define IPMI_CHANNEL_ACCESS_MODES_DISABLED          0x0
+#define IPMI_CHANNEL_ACCESS_MODES_PRE_BOOT_ONLY     0x1
+#define IPMI_CHANNEL_ACCESS_MODES_ALWAYS_AVAILABLE  0x2
+#define IPMI_CHANNEL_ACCESS_MODES_SHARED            0x3
+
 typedef struct {
   UINT8  ChannelNo : 4;
   UINT8  Reserve1 : 4;
@@ -413,6 +571,38 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get Channel Info" command to follow here
 //
+
+//
+//  Definitions for channel media type
+//
+// IPMB (I2C)
+#define IPMI_CHANNEL_MEDIA_TYPE_IPMB              0x1
+// ICMB v1.0
+#define IPMI_CHANNEL_MEDIA_TYPE_ICMB_1_0          0x2
+// ICMB v0.9
+#define IPMI_CHANNEL_MEDIA_TYPE_ICMB_0_9          0x3
+// 802.3 LAN
+#define IPMI_CHANNEL_MEDIA_TYPE_802_3_LAN         0x4
+// Asynch. Serial/Modem (RS-232)
+#define IPMI_CHANNEL_MEDIA_TYPE_RS_232            0x5
+// Other LAN
+#define IPMI_CHANNEL_MEDIA_TYPE_OTHER_LAN         0x6
+// PCI SMBus
+#define IPMI_CHANNEL_MEDIA_TYPE_PCI_SM_BUS        0x7
+// SMBus v1.0/1.1
+#define IPMI_CHANNEL_MEDIA_TYPE_SM_BUS_V1         0x8
+// SMBus v2.0
+#define IPMI_CHANNEL_MEDIA_TYPE_SM_BUS_V2         0x9
+// USB 1.x
+#define IPMI_CHANNEL_MEDIA_TYPE_USB1              0xA
+// USB 2.x
+#define IPMI_CHANNEL_MEDIA_TYPE_USB2              0xB
+// System Interface (KCS, SMIC, or BT)
+#define IPMI_CHANNEL_MEDIA_TYPE_SYSTEM_INTERFACE  0xC
+// OEM
+#define IPMI_CHANNEL_MEDIA_TYPE_OEM_START         0x60
+#define IPMI_CHANNEL_MEDIA_TYPE_OEM_END           0x7F
+
 typedef struct {
   UINT8   CompletionCode;
   UINT8   ChannelNo : 4;
@@ -453,6 +643,27 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get User Access" command to follow here
 //
+typedef struct {
+  UINT8   ChannelNo : 4;
+  UINT8   Reserved1 : 4;
+  UINT8   UserId : 6;
+  UINT8   Reserved2 : 2;
+} IPMI_GET_USER_ACCESS_REQUEST;
+
+typedef struct {
+  UINT8   CompletionCode;
+  UINT8   MaxUserId : 6;
+  UINT8   Reserved1 : 2;
+  UINT8   CurrentUserId : 6;
+  UINT8   UserIdEnableStatus : 2;
+  UINT8   FixedUserId : 6;
+  UINT8   Reserved2 : 2;
+  UINT8   UserPrivilegeLimit : 4;
+  UINT8   EnableIpmiMessaging : 1;
+  UINT8   EnableUserLinkAuthetication : 1;
+  UINT8   UserAccessAvailable : 1;
+  UINT8   Reserved3 : 1;
+} IPMI_GET_USER_ACCESS_RESPONSE;
 
 //
 //  Definitions for Set User Name command
@@ -462,6 +673,11 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Set User Name" command to follow here
 //
+typedef struct {
+  UINT8  UserId : 6;
+  UINT8  Reserved : 2;
+  UINT8  UserName[16];
+} IPMI_SET_USER_NAME_REQUEST;
 
 //
 //  Definitions for Get User Name command
@@ -471,6 +687,15 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get User Name" command to follow here
 //
+typedef struct {
+  UINT8  UserId : 6;
+  UINT8  Reserved : 2;
+} IPMI_GET_USER_NAME_REQUEST;
+
+typedef struct {
+  UINT8  CompletionCode;
+  UINT8  UserName[16];
+} IPMI_GET_USER_NAME_RESPONSE;
 
 //
 //  Definitions for Set User Password command
@@ -480,6 +705,29 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Set User Password" command to follow here
 //
+
+//
+//  Definitions for Set User password command operation type
+//
+#define IPMI_SET_USER_PASSWORD_OPERATION_TYPE_DISABLE_USER   0x0
+#define IPMI_SET_USER_PASSWORD_OPERATION_TYPE_ENABLE_USER    0x1
+#define IPMI_SET_USER_PASSWORD_OPERATION_TYPE_SET_PASSWORD   0x2
+#define IPMI_SET_USER_PASSWORD_OPERATION_TYPE_TEST_PASSWORD  0x3
+
+//
+//  Definitions for Set user password command password size
+//
+#define IPMI_SET_USER_PASSWORD_PASSWORD_SIZE_16  0x0
+#define IPMI_SET_USER_PASSWORD_PASSWORD_SIZE_20  0x1
+
+typedef struct {
+  UINT8   UserId : 6;
+  UINT8   Reserved1 : 1;
+  UINT8   PasswordSize : 1;
+  UINT8   Operation : 2;
+  UINT8   Reserved2 : 6;
+  UINT8   PasswordData[0];  // 16 or 20 bytes, depending on the 'PasswordSize' field
+} IPMI_SET_USER_PASSWORD_REQUEST;
 
 //
 //  Below is Definitions for RMCP+ Support and Payload Commands (Chapter 24)
@@ -618,6 +866,13 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get System Interface Capabilities" command to follow here
 //
+
+//
+//  Definitions for Get System Interface Capabilities command SSIF transaction support
+//
+#define IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_SSIF_TRANSACTION_SUPPORT_SINGLE_PARTITION_RW             0x0
+#define IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_SSIF_TRANSACTION_SUPPORT_MULTI_PARTITION_RW              0x1
+#define IPMI_GET_SYSTEM_INTERFACE_CAPABILITIES_SSIF_TRANSACTION_SUPPORT_MULTI_PARTITION_RW_WITH_MIDDLE  0x2
 
 #pragma pack()
 #endif

@@ -10,7 +10,7 @@
   See IPMI specification, Appendix G, Command Assignments
   and Appendix H, Sub-function Assignments.
 
-  Copyright (c) 1999 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -65,7 +65,22 @@ typedef enum {
   IpmiLanCommunityString,
   IpmiLanReserved3,
   IpmiLanDestinationType,
-  IpmiLanDestinationAddress
+  IpmiLanDestinationAddress,
+  IpmiIpv4OrIpv6Support = 0x32,
+  IpmiIpv4OrIpv6AddressEnable,
+  IpmiIpv6HdrStatTrafficClass,
+  IpmiIpv6HdrStatHopLimit,
+  IpmiIpv6HdrFlowLabel,
+  IpmiIpv6Status,
+  IpmiIpv6StaticAddress,
+  IpmiIpv6DhcpStaticDuidLen,
+  IpmiIpv6DhcpStaticDuid,
+  IpmiIpv6DhcpAddress,
+  IpmiIpv6DhcpDynamicDuidLen,
+  IpmiIpv6DhcpDynamicDuid,
+  IpmiIpv6RouterConfig = 0x40,
+  IpmiIpv6StaticRouter1IpAddr,
+  IpmiIpv6DynamicRouterIpAddr = 0x4a
 } IPMI_LAN_OPTION_TYPE;
 
 //
@@ -183,6 +198,32 @@ typedef union {
   IPMI_LAN_DEST_ADDRESS              IpmiLanDestAddress;
 } IPMI_LAN_OPTIONS;
 
+typedef struct {
+  UINT8  SetSelector;
+  UINT8  AddressSourceType : 4;
+  UINT8  Reserved : 3;
+  UINT8  EnableStatus : 1;
+  UINT8  Ipv6Address[16];
+  UINT8  AddressPrefixLen;
+  UINT8  AddressStatus;
+} IPMI_LAN_IPV6_STATIC_ADDRESS;
+
+//
+//  Set in progress parameter
+//
+typedef struct {
+  UINT8  SetInProgress:2;
+  UINT8  Reserved:6;
+} IPMI_LAN_SET_IN_PROGRESS;
+
+
+typedef struct {
+  UINT8  ChannelNo : 4;
+  UINT8  Reserved : 4;
+  UINT8  ParameterSelector;
+  UINT8  ParameterData[0];
+} IPMI_SET_LAN_CONFIGURATION_PARAMETERS_COMMAND_REQUEST;
+
 //
 //  Definitions for Get Lan Configuration Parameters command
 //
@@ -191,6 +232,20 @@ typedef union {
 //
 //  Constants and Structure definitions for "Get Lan Configuration Parameters" command to follow here
 //
+typedef struct {
+  UINT8  ChannelNo : 4;
+  UINT8  Reserved : 3;
+  UINT8  GetParameter : 1;
+  UINT8  ParameterSelector;
+  UINT8  SetSelector;
+  UINT8  BlockSelector;
+} IPMI_GET_LAN_CONFIGURATION_PARAMETERS_REQUEST;
+
+typedef struct {
+  UINT8  CompletionCode;
+  UINT8  ParameterRevision;
+  UINT8  ParameterData[0];
+} IPMI_GET_LAN_CONFIGURATION_PARAMETERS_RESPONSE;
 
 //
 //  Definitions for Suspend BMC ARPs command
@@ -434,6 +489,26 @@ typedef union {
 //
 //  Constants and Structure definitions for "Set Serial/Modem Mux" command to follow here
 //
+
+//
+// Set Serial/Modem Mux command request return status
+//
+#define IPMI_MUX_SETTING_REQUEST_REJECTED  0x00
+#define IPMI_MUX_SETTING_REQUEST_ACCEPTED  0x01
+
+//
+//  Definitions for serial multiplex settings
+//
+#define IPMI_MUX_SETTING_GET_MUX_SETTING              0x0
+#define IPMI_MUX_SETTING_REQUEST_MUX_TO_SYSTEM        0x1
+#define IPMI_MUX_SETTING_REQUEST_MUX_TO_BMC           0x2
+#define IPMI_MUX_SETTING_FORCE_MUX_TO_SYSTEM          0x3
+#define IPMI_MUX_SETTING_FORCE_MUX_TO_BMC             0x4
+#define IPMI_MUX_SETTING_BLOCK_REQUEST_MUX_TO_SYSTEM  0x5
+#define IPMI_MUX_SETTING_ALLOW_REQUEST_MUX_TO_SYSTEM  0x6
+#define IPMI_MUX_SETTING_BLOCK_REQUEST_MUX_TO_BMC     0x7
+#define IPMI_MUX_SETTING_ALLOW_REQUEST_MUX_TO_BMC     0x8
+
 typedef struct {
   UINT8 ChannelNo : 4;
   UINT8 Reserved1 : 4;
@@ -442,6 +517,7 @@ typedef struct {
 } IPMI_SET_SERIAL_MODEM_MUX_COMMAND_REQUEST;
 
 typedef struct {
+  UINT8 CompletionCode;
   UINT8 MuxSetToBmc : 1;
   UINT8 CommandStatus : 1;
   UINT8 MessagingSessionActive : 1;
@@ -544,6 +620,13 @@ typedef struct {
 //
 //  Constants and Structure definitions for "SOL activating" command to follow here
 //
+typedef struct {
+  UINT8  SessionState : 4;
+  UINT8  Reserved : 4;
+  UINT8  PayloadInstance;
+  UINT8  FormatVersionMajor; // 1
+  UINT8  FormatVersionMinor; // 0
+} IPMI_SOL_ACTIVATING_REQUEST;
 
 //
 //  Definitions for Set SOL Configuration Parameters command
@@ -555,6 +638,26 @@ typedef struct {
 //
 
 //
+// SOL Configuration Parameters selector
+//
+#define IPMI_SOL_CONFIGURATION_PARAMETER_SET_IN_PROGRESS       0
+#define IPMI_SOL_CONFIGURATION_PARAMETER_SOL_ENABLE            1
+#define IPMI_SOL_CONFIGURATION_PARAMETER_SOL_AUTHENTICATION    2
+#define IPMI_SOL_CONFIGURATION_PARAMETER_SOL_CHARACTER_PARAM   3
+#define IPMI_SOL_CONFIGURATION_PARAMETER_SOL_RETRY             4
+#define IPMI_SOL_CONFIGURATION_PARAMETER_SOL_NV_BIT_RATE       5
+#define IPMI_SOL_CONFIGURATION_PARAMETER_SOL_VOLATILE_BIT_RATE 6
+#define IPMI_SOL_CONFIGURATION_PARAMETER_SOL_PAYLOAD_CHANNEL   7
+#define IPMI_SOL_CONFIGURATION_PARAMETER_SOL_PAYLOAD_PORT      8
+
+typedef struct {
+  UINT8  ChannelNumber : 4;
+  UINT8  Reserved : 4;
+  UINT8  ParameterSelector;
+  UINT8  ParameterData[0];
+} IPMI_SET_SOL_CONFIGURATION_PARAMETERS_REQUEST;
+
+//
 //  Definitions for Get SOL Configuration Parameters command
 //
 #define IPMI_TRANSPORT_GET_SOL_CONFIG_PARAM  0x22
@@ -562,5 +665,20 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get SOL Configuration Parameters" command to follow here
 //
+typedef struct {
+  UINT8  ChannelNumber : 4;
+  UINT8  Reserved : 3;
+  UINT8  GetParameter : 1;
+  UINT8  ParameterSelector;
+  UINT8  SetSelector;
+  UINT8  BlockSelector;
+} IPMI_GET_SOL_CONFIGURATION_PARAMETERS_REQUEST;
+
+typedef struct {
+  UINT8  CompletionCode;
+  UINT8  ParameterRevision;
+  UINT8  ParameterData[0];
+} IPMI_GET_SOL_CONFIGURATION_PARAMETERS_RESPONSE;
+
 #pragma pack()
 #endif
