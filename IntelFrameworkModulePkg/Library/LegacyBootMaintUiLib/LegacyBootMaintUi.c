@@ -2,6 +2,7 @@
   Legacy Boot Maintainence UI implementation.
 
 Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -562,6 +563,8 @@ LegacyBootOptionRouteConfig (
   if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  *Progress = Configuration;
 
   //
   // Check routing data in <ConfigHdr>.
