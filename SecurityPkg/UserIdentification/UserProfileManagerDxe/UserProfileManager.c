@@ -5,6 +5,7 @@
   policy, etc.
 
 Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials 
 are licensed and made available under the terms and conditions of the BSD License 
 which accompanies this distribution.  The full text of the license may be found at 
@@ -804,6 +805,8 @@ FakeRouteConfig (
   if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  *Progress = Configuration;
 
   return EFI_NOT_FOUND;
 }
