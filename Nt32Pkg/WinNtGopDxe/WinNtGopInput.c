@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -270,6 +270,68 @@ WinNtGopSimpleTextInTimerHandler (
 }
 
 /**
+  Initialize the key state.
+
+  @param  Private               The GOP_PRIVATE_DATA instance.
+  @param  KeyState              A pointer to receive the key state information.
+**/
+VOID
+InitializeKeyState (
+  IN  GOP_PRIVATE_DATA    *Private,
+  IN  EFI_KEY_STATE       *KeyState
+  )
+{
+  KeyState->KeyShiftState  = EFI_SHIFT_STATE_VALID;
+  KeyState->KeyToggleState = EFI_TOGGLE_STATE_VALID;
+
+  //
+  // Record Key shift state and toggle state
+  //
+  if (Private->LeftCtrl) {
+    KeyState->KeyShiftState  |= EFI_LEFT_CONTROL_PRESSED;
+  }
+  if (Private->RightCtrl) {
+    KeyState->KeyShiftState  |= EFI_RIGHT_CONTROL_PRESSED;
+  }
+  if (Private->LeftAlt) {
+    KeyState->KeyShiftState  |= EFI_LEFT_ALT_PRESSED;
+  }
+  if (Private->RightAlt) {
+    KeyState->KeyShiftState  |= EFI_RIGHT_ALT_PRESSED;
+  }
+  if (Private->LeftShift) {
+    KeyState->KeyShiftState  |= EFI_LEFT_SHIFT_PRESSED;
+  }
+  if (Private->RightShift) {
+    KeyState->KeyShiftState  |= EFI_RIGHT_SHIFT_PRESSED;
+  }
+  if (Private->LeftLogo) {
+    KeyState->KeyShiftState  |= EFI_LEFT_LOGO_PRESSED;
+  }
+  if (Private->RightLogo) {
+    KeyState->KeyShiftState  |= EFI_RIGHT_LOGO_PRESSED;
+  }
+  if (Private->Menu) {
+    KeyState->KeyShiftState  |= EFI_MENU_KEY_PRESSED;
+  }
+  if (Private->SysReq) {
+    KeyState->KeyShiftState  |= EFI_SYS_REQ_PRESSED;
+  }
+  if (Private->CapsLock) {
+    KeyState->KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
+  }
+  if (Private->NumLock) {
+    KeyState->KeyToggleState |= EFI_NUM_LOCK_ACTIVE;
+  }
+  if (Private->ScrollLock) {
+    KeyState->KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
+  }
+  if (Private->IsPartialKeySupport) {
+    KeyState->KeyToggleState |= EFI_KEY_STATE_EXPOSED;
+  }
+}
+
+/**
   TODO: Add function description
 
   @param  Private               TODO: add argument description
@@ -288,55 +350,7 @@ GopPrivateAddKey (
   EFI_KEY_DATA            KeyData;
 
   KeyData.Key = Key;
-
-  KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID;
-  KeyData.KeyState.KeyToggleState = EFI_TOGGLE_STATE_VALID;
-
-  //
-  // Record Key shift state and toggle state
-  //
-  if (Private->LeftCtrl) {
-    KeyData.KeyState.KeyShiftState  |= EFI_LEFT_CONTROL_PRESSED;
-  }
-  if (Private->RightCtrl) {
-    KeyData.KeyState.KeyShiftState  |= EFI_RIGHT_CONTROL_PRESSED;
-  }
-  if (Private->LeftAlt) {
-    KeyData.KeyState.KeyShiftState  |= EFI_LEFT_ALT_PRESSED;
-  }
-  if (Private->RightAlt) {
-    KeyData.KeyState.KeyShiftState  |= EFI_RIGHT_ALT_PRESSED;
-  }
-  if (Private->LeftShift) {
-    KeyData.KeyState.KeyShiftState  |= EFI_LEFT_SHIFT_PRESSED;
-  }
-  if (Private->RightShift) {
-    KeyData.KeyState.KeyShiftState  |= EFI_RIGHT_SHIFT_PRESSED;
-  }
-  if (Private->LeftLogo) {
-    KeyData.KeyState.KeyShiftState  |= EFI_LEFT_LOGO_PRESSED;
-  }
-  if (Private->RightLogo) {
-    KeyData.KeyState.KeyShiftState  |= EFI_RIGHT_LOGO_PRESSED;
-  }
-  if (Private->Menu) {
-    KeyData.KeyState.KeyShiftState  |= EFI_MENU_KEY_PRESSED;
-  }
-  if (Private->SysReq) {
-    KeyData.KeyState.KeyShiftState  |= EFI_SYS_REQ_PRESSED;
-  }
-  if (Private->CapsLock) {
-    KeyData.KeyState.KeyToggleState |= EFI_CAPS_LOCK_ACTIVE;
-  }
-  if (Private->NumLock) {
-    KeyData.KeyState.KeyToggleState |= EFI_NUM_LOCK_ACTIVE;
-  }
-  if (Private->ScrollLock) {
-    KeyData.KeyState.KeyToggleState |= EFI_SCROLL_LOCK_ACTIVE;
-  }
-  if (Private->IsPartialKeySupport) {
-    KeyData.KeyState.KeyToggleState |= EFI_KEY_STATE_EXPOSED;
-  }
+  InitializeKeyState (Private, &KeyData.KeyState);
 
   //
   // Convert Ctrl+[1-26] to Ctrl+[A-Z]
@@ -502,6 +516,9 @@ GopPrivateReadKeyStrokeWorker (
   // Call hot key callback before telling caller there is a key available
   //
   WinNtGopSimpleTextInTimerHandler (NULL, Private);
+
+  ZeroMem (&KeyData->Key, sizeof (KeyData->Key));
+  InitializeKeyState (Private, &KeyData->KeyState);
 
   Status  = GopPrivateCheckQ (&Private->QueueForRead);
   if (!EFI_ERROR (Status)) {
