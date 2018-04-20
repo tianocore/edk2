@@ -44,7 +44,6 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathOs.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathOsPath.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathSupport.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\MigrationUtilities.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Misc.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Parsing.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\String.py \
