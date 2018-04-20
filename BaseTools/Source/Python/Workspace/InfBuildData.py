@@ -66,26 +66,6 @@ class InfBuildData(ModuleBuildClassObject):
         TAB_COMPONENTS_SOURCE_OVERRIDE_PATH         : "_SourceOverridePath",
     }
 
-    # dict used to convert Component type to Module type
-    _MODULE_TYPE_ = {
-        "LIBRARY"               :   SUP_MODULE_BASE,
-        "SECURITY_CORE"         :   SUP_MODULE_SEC,
-        SUP_MODULE_PEI_CORE              :   SUP_MODULE_PEI_CORE,
-        "COMBINED_PEIM_DRIVER"  :   SUP_MODULE_PEIM,
-        "PIC_PEIM"              :   SUP_MODULE_PEIM,
-        "RELOCATABLE_PEIM"      :   SUP_MODULE_PEIM,
-        "PE32_PEIM"             :   SUP_MODULE_PEIM,
-        "BS_DRIVER"             :   SUP_MODULE_DXE_DRIVER,
-        "RT_DRIVER"             :   SUP_MODULE_DXE_RUNTIME_DRIVER,
-        "SAL_RT_DRIVER"         :   SUP_MODULE_DXE_SAL_DRIVER,
-        SUP_MODULE_DXE_SMM_DRIVER        :   SUP_MODULE_DXE_SMM_DRIVER,
-    #    "SMM_DRIVER"            :   SUP_MODULE_DXE_SMM_DRIVER,
-    #    "BS_DRIVER"             :   SUP_MODULE_DXE_SMM_DRIVER,
-    #    "BS_DRIVER"             :   SUP_MODULE_UEFI_DRIVER,
-        "APPLICATION"           :   SUP_MODULE_UEFI_APPLICATION,
-        "LOGO"                  :   SUP_MODULE_BASE,
-    }
-
     # regular expression for converting XXX_FLAGS in [nmake] section to new type
     _NMAKE_FLAG_PATTERN_ = re.compile("(?:EBC_)?([A-Z]+)_(?:STD_|PROJ_|ARCH_)?FLAGS(?:_DLL|_ASL|_EXE)?", re.UNICODE)
     # dict used to convert old tool name used in [nmake] section to new ones
@@ -362,8 +342,8 @@ class InfBuildData(ModuleBuildClassObject):
                 EdkLogger.error("build", ATTRIBUTE_NOT_AVAILABLE,
                                 "COMPONENT_TYPE is not given", File=self.MetaFile)
             self._BuildType = self._ComponentType.upper()
-            if self._ComponentType in self._MODULE_TYPE_:
-                self._ModuleType = self._MODULE_TYPE_[self._ComponentType]
+            if self._ComponentType in COMPONENT_TO_MODULE_MAP_DICT:
+                self._ModuleType = COMPONENT_TO_MODULE_MAP_DICT[self._ComponentType]
             if self._ComponentType == 'LIBRARY':
                 self._LibraryClass = [LibraryClassObject(self._BaseName, SUP_MODULE_LIST)]
             # make use some [nmake] section macros

@@ -47,21 +47,6 @@ from Common.DataType import *
 import collections
 from Common.Expression import *
 
-gComponentType2ModuleType = {
-    "LIBRARY"               :   SUP_MODULE_BASE,
-    "SECURITY_CORE"         :   SUP_MODULE_SEC,
-    SUP_MODULE_PEI_CORE     :   SUP_MODULE_PEI_CORE,
-    "COMBINED_PEIM_DRIVER"  :   SUP_MODULE_PEIM,
-    "PIC_PEIM"              :   SUP_MODULE_PEIM,
-    "RELOCATABLE_PEIM"      :   SUP_MODULE_PEIM,
-    "PE32_PEIM"             :   SUP_MODULE_PEIM,
-    "BS_DRIVER"             :   SUP_MODULE_DXE_DRIVER,
-    "RT_DRIVER"             :   SUP_MODULE_DXE_RUNTIME_DRIVER,
-    "SAL_RT_DRIVER"         :   SUP_MODULE_DXE_SAL_DRIVER,
-    "APPLICATION"           :   SUP_MODULE_UEFI_APPLICATION,
-    "LOGO"                  :   SUP_MODULE_BASE,
-}
-
 ## Pattern to extract contents in EDK DXS files
 gDxsDependencyPattern = re.compile(r"DEPENDENCY_START(.+)DEPENDENCY_END", re.DOTALL)
 
@@ -422,7 +407,7 @@ class DepexReport(object):
         self._DepexFileName = os.path.join(M.BuildDir, "OUTPUT", M.Module.BaseName + ".depex")
         ModuleType = M.ModuleType
         if not ModuleType:
-            ModuleType = gComponentType2ModuleType.get(M.ComponentType, "")
+            ModuleType = COMPONENT_TO_MODULE_MAP_DICT.get(M.ComponentType, "")
 
         if ModuleType in [SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_DXE_CORE, SUP_MODULE_SMM_CORE, SUP_MODULE_MM_CORE_STANDALONE, SUP_MODULE_UEFI_APPLICATION]:
             return
@@ -587,7 +572,7 @@ class ModuleReport(object):
         if not M.IsLibrary:
             ModuleType = M.ModuleType
             if not ModuleType:
-                ModuleType = gComponentType2ModuleType.get(M.ComponentType, "")
+                ModuleType = COMPONENT_TO_MODULE_MAP_DICT.get(M.ComponentType, "")
             #
             # If a module complies to PI 1.1, promote Module type to "SMM_DRIVER"
             #
