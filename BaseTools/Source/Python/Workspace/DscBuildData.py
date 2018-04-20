@@ -39,7 +39,7 @@ import Common.GlobalData as GlobalData
 import subprocess
 from Common.Misc import SaveFileOnChange
 from Workspace.BuildClassObject import PlatformBuildClassObject, StructurePcd, PcdClassObject, ModuleBuildClassObject
-from collections import OrderedDict
+from collections import OrderedDict,defaultdict
 
 PcdValueInitName = 'PcdValueInit'
 
@@ -1181,11 +1181,10 @@ class DscBuildData(PlatformBuildClassObject):
                             options[Key] += ' ' + Option
         return self._ModuleTypeOptions[Edk, ModuleType]
 
-    def GetStructurePcdInfo(self, PcdSet):
-        structure_pcd_data = {}
+    @staticmethod
+    def GetStructurePcdInfo(PcdSet):
+        structure_pcd_data = defaultdict(list)
         for item in PcdSet:
-            if (item[0],item[1]) not in structure_pcd_data:
-                structure_pcd_data[(item[0],item[1])] = []
             structure_pcd_data[(item[0],item[1])].append(item)
 
         return structure_pcd_data
@@ -1292,7 +1291,7 @@ class DscBuildData(PlatformBuildClassObject):
                 S_PcdSet.append([ TokenSpaceGuid.split(".")[0],TokenSpaceGuid.split(".")[1], PcdCName,SkuName, default_store,Dummy5, AnalyzePcdExpression(Setting)[0]])
 
         # handle pcd value override
-        StrPcdSet = self.GetStructurePcdInfo(S_PcdSet)
+        StrPcdSet = DscBuildData.GetStructurePcdInfo(S_PcdSet)
         S_pcd_set = OrderedDict()
         for str_pcd in StrPcdSet:
             str_pcd_obj = Pcds.get((str_pcd[1], str_pcd[0]), None)
