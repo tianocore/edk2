@@ -419,14 +419,14 @@ class WorkspaceAutoGen(AutoGen):
                         if BuildData.Pcds[key].Pending:
                             if key in Platform.Pcds:
                                 PcdInPlatform = Platform.Pcds[key]
-                                if PcdInPlatform.Type not in [None, '']:
+                                if PcdInPlatform.Type:
                                     BuildData.Pcds[key].Type = PcdInPlatform.Type
 
                             if BuildData.MetaFile in Platform.Modules:
                                 PlatformModule = Platform.Modules[str(BuildData.MetaFile)]
                                 if key in PlatformModule.Pcds:
                                     PcdInPlatform = PlatformModule.Pcds[key]
-                                    if PcdInPlatform.Type not in [None, '']:
+                                    if PcdInPlatform.Type:
                                         BuildData.Pcds[key].Type = PcdInPlatform.Type
 
                         if TAB_PCDS_DYNAMIC_EX in BuildData.Pcds[key].Type:
@@ -1393,7 +1393,7 @@ class PlatformAutoGen(AutoGen):
 
             for PcdFromModule in M.ModulePcdList + M.LibraryPcdList:
                 # make sure that the "VOID*" kind of datum has MaxDatumSize set
-                if PcdFromModule.DatumType == TAB_VOID and PcdFromModule.MaxDatumSize in [None, '']:
+                if PcdFromModule.DatumType == TAB_VOID and not PcdFromModule.MaxDatumSize:
                     NoDatumTypePcdList.add("%s.%s [%s]" % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, F))
 
                 # Check the PCD from Binary INF or Source INF
@@ -1470,7 +1470,7 @@ class PlatformAutoGen(AutoGen):
                                         ExtraData="\n\tExisted %s PCD %s in:\n\t\t%s\n"
                                         % (PcdFromModule.Type, PcdFromModule.TokenCName, InfName))
                     # make sure that the "VOID*" kind of datum has MaxDatumSize set
-                    if PcdFromModule.DatumType == TAB_VOID and PcdFromModule.MaxDatumSize in [None, '']:
+                    if PcdFromModule.DatumType == TAB_VOID and not PcdFromModule.MaxDatumSize:
                         NoDatumTypePcdList.add("%s.%s [%s]" % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, InfName))
                     if M.ModuleType in SUP_MODULE_SET_PEI:
                         PcdFromModule.Phase = "PEI"
@@ -1998,7 +1998,7 @@ class PlatformAutoGen(AutoGen):
             BuildRuleFile = None
             if TAB_TAT_DEFINES_BUILD_RULE_CONF in self.Workspace.TargetTxt.TargetTxtDictionary:
                 BuildRuleFile = self.Workspace.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_BUILD_RULE_CONF]
-            if BuildRuleFile in [None, '']:
+            if not BuildRuleFile:
                 BuildRuleFile = gDefaultBuildRuleFile
             self._BuildRule = BuildRule(BuildRuleFile)
             if self._BuildRule._FileVersion == "":
@@ -2326,13 +2326,13 @@ class PlatformAutoGen(AutoGen):
                 TokenCName = PcdItem[0]
                 break
         if FromPcd is not None:
-            if ToPcd.Pending and FromPcd.Type not in [None, '']:
+            if ToPcd.Pending and FromPcd.Type:
                 ToPcd.Type = FromPcd.Type
-            elif (ToPcd.Type not in [None, '']) and (FromPcd.Type not in [None, ''])\
+            elif (ToPcd.Type) and (FromPcd.Type)\
                 and (ToPcd.Type != FromPcd.Type) and (ToPcd.Type in FromPcd.Type):
                 if ToPcd.Type.strip() == TAB_PCDS_DYNAMIC_EX:
                     ToPcd.Type = FromPcd.Type
-            elif ToPcd.Type not in [None, ''] and FromPcd.Type not in [None, ''] \
+            elif ToPcd.Type and FromPcd.Type \
                 and ToPcd.Type != FromPcd.Type:
                 EdkLogger.error("build", OPTION_CONFLICT, "Mismatched PCD type",
                                 ExtraData="%s.%s is defined as [%s] in module %s, but as [%s] in platform."\
@@ -2368,11 +2368,11 @@ class PlatformAutoGen(AutoGen):
             ToPcd.validlists = FromPcd.validlists
             ToPcd.expressions = FromPcd.expressions
 
-        if FromPcd is not None and ToPcd.DatumType == TAB_VOID and ToPcd.MaxDatumSize in ['', None]:
+        if FromPcd is not None and ToPcd.DatumType == TAB_VOID and not ToPcd.MaxDatumSize:
             EdkLogger.debug(EdkLogger.DEBUG_9, "No MaxDatumSize specified for PCD %s.%s" \
                             % (ToPcd.TokenSpaceGuidCName, TokenCName))
             Value = ToPcd.DefaultValue
-            if Value in [None, '']:
+            if not Value:
                 ToPcd.MaxDatumSize = '1'
             elif Value[0] == 'L':
                 ToPcd.MaxDatumSize = str((len(Value) - 2) * 2)
@@ -2383,7 +2383,7 @@ class PlatformAutoGen(AutoGen):
 
         # apply default SKU for dynamic PCDS if specified one is not available
         if (ToPcd.Type in PCD_DYNAMIC_TYPE_SET or ToPcd.Type in PCD_DYNAMIC_EX_TYPE_SET) \
-            and ToPcd.SkuInfoList in [None, {}, '']:
+            and not ToPcd.SkuInfoList:
             if self.Platform.SkuName in self.Platform.SkuIds:
                 SkuName = self.Platform.SkuName
             else:
@@ -2444,10 +2444,10 @@ class PlatformAutoGen(AutoGen):
         # use PCD value to calculate the MaxDatumSize when it is not specified
         for Name, Guid in Pcds:
             Pcd = Pcds[Name, Guid]
-            if Pcd.DatumType == TAB_VOID and Pcd.MaxDatumSize in ['', None]:
+            if Pcd.DatumType == TAB_VOID and not Pcd.MaxDatumSize:
                 Pcd.MaxSizeUserSet = None
                 Value = Pcd.DefaultValue
-                if Value in [None, '']:
+                if not Value:
                     Pcd.MaxDatumSize = '1'
                 elif Value[0] == 'L':
                     Pcd.MaxDatumSize = str((len(Value) - 2) * 2)

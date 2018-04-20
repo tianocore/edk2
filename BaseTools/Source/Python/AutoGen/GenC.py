@@ -866,7 +866,7 @@ def DynExPcdTokenNumberMapping(Info, AutoGenH):
 def GetPcdSize(Pcd):
     if Pcd.DatumType not in TAB_PCD_NUMERIC_TYPES:
         Value = Pcd.DefaultValue
-        if Value in [None, '']:
+        if not Value:
             return 1
         elif Value[0] == 'L':
             return (len(Value) - 2) * 2

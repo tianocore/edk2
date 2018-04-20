@@ -102,7 +102,7 @@ class GenFdsGlobalVariable:
             TargetTxt.LoadTargetTxtFile(BuildConfigurationFile)
             if DataType.TAB_TAT_DEFINES_BUILD_RULE_CONF in TargetTxt.TargetTxtDictionary:
                 BuildRuleFile = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_BUILD_RULE_CONF]
-            if BuildRuleFile in [None, '']:
+            if not BuildRuleFile:
                 BuildRuleFile = 'Conf/build_rule.txt'
             GenFdsGlobalVariable.__BuildRuleDatabase = BuildRule(BuildRuleFile)
             ToolDefinitionFile = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
@@ -441,15 +441,15 @@ class GenFdsGlobalVariable:
     def GenerateSection(Output, Input, Type=None, CompressionType=None, Guid=None,
                         GuidHdrLen=None, GuidAttr=[], Ui=None, Ver=None, InputAlign=None, BuildNumber=None, DummyFile=None, IsMakefile=False):
         Cmd = ["GenSec"]
-        if Type not in [None, '']:
+        if Type:
             Cmd += ["-s", Type]
-        if CompressionType not in [None, '']:
+        if CompressionType:
             Cmd += ["-c", CompressionType]
         if Guid is not None:
             Cmd += ["-g", Guid]
         if DummyFile is not None:
             Cmd += ["--dummy", DummyFile]
-        if GuidHdrLen not in [None, '']:
+        if GuidHdrLen:
             Cmd += ["-l", GuidHdrLen]
         if len(GuidAttr) != 0:
             #Add each guided attribute
@@ -461,7 +461,7 @@ class GenFdsGlobalVariable:
                 Cmd += ["--sectionalign", SecAlign]
 
         CommandFile = Output + '.txt'
-        if Ui not in [None, '']:
+        if Ui:
             #Cmd += ["-n", '"' + Ui + '"']
             if IsMakefile:
                 if Ui == "$(MODULE_NAME)":
@@ -480,7 +480,7 @@ class GenFdsGlobalVariable:
                 GenFdsGlobalVariable.SectionHeader.pack_into(SectionData, 0, Len & 0xff, (Len >> 8) & 0xff, (Len >> 16) & 0xff, 0x15)
                 SaveFileOnChange(Output, SectionData.tostring())
 
-        elif Ver not in [None, '']:
+        elif Ver:
             Cmd += ["-n", Ver]
             if BuildNumber:
                 Cmd += ["-j", BuildNumber]
@@ -529,7 +529,7 @@ class GenFdsGlobalVariable:
             Cmd += ["-x"]
         if CheckSum:
             Cmd += ["-s"]
-        if Align not in [None, '']:
+        if Align:
             if Align not in mFfsValidAlign:
                 Align = GenFdsGlobalVariable.GetAlignment (Align)
                 for index in range(0, len(mFfsValidAlign) - 1):
@@ -541,7 +541,7 @@ class GenFdsGlobalVariable:
         Cmd += ["-o", Output]
         for I in range(0, len(Input)):
             Cmd += ("-i", Input[I])
-            if SectionAlign not in [None, '', []] and SectionAlign[I] not in [None, '']:
+            if SectionAlign and SectionAlign[I]:
                 Cmd += ("-n", SectionAlign[I])
 
         CommandFile = Output + '.txt'
@@ -566,7 +566,7 @@ class GenFdsGlobalVariable:
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
 
         Cmd = ["GenFv"]
-        if BaseAddress not in [None, '']:
+        if BaseAddress:
             Cmd += ["-r", BaseAddress]
 
         if ForceRebase == False:
@@ -578,9 +578,9 @@ class GenFdsGlobalVariable:
             Cmd += ["-c"]
         if Dump:
             Cmd += ["-p"]
-        if AddressFile not in [None, '']:
+        if AddressFile:
             Cmd += ["-a", AddressFile]
-        if MapFile not in [None, '']:
+        if MapFile:
             Cmd += ["-m", MapFile]
         if FileSystemGuid:
             Cmd += ["-g", FileSystemGuid]
@@ -597,7 +597,7 @@ class GenFdsGlobalVariable:
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
 
         Cmd = ["GenVtf"]
-        if BaseAddress not in [None, ''] and FvSize not in [None, ''] \
+        if BaseAddress and FvSize \
             and len(BaseAddress) == len(FvSize):
             for I in range(0, len(BaseAddress)):
                 Cmd += ["-r", BaseAddress[I], "-s", FvSize[I]]
@@ -618,13 +618,13 @@ class GenFdsGlobalVariable:
         Cmd = ["GenFw"]
         if Type.lower() == "te":
             Cmd += ["-t"]
-        if SubType not in [None, '']:
+        if SubType:
             Cmd += ["-e", SubType]
-        if TimeStamp not in [None, '']:
+        if TimeStamp:
             Cmd += ["-s", TimeStamp]
-        if Align not in [None, '']:
+        if Align:
             Cmd += ["-a", Align]
-        if Padding not in [None, '']:
+        if Padding:
             Cmd += ["-p", Padding]
         if Zero:
             Cmd += ["-z"]

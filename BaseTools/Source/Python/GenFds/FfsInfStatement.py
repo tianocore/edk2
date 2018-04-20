@@ -297,7 +297,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
             # Check value, if value are equal, no need to patch
             if Pcd.DatumType == TAB_VOID:
-                if Pcd.InfDefaultValue == DefaultValue or DefaultValue in [None, '']:
+                if Pcd.InfDefaultValue == DefaultValue or not DefaultValue:
                     continue
                 # Get the string size from FDF or DSC
                 if DefaultValue[0] == 'L':
@@ -310,7 +310,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 if DscOverride:
                     Pcd.MaxDatumSize = PatchPcd.MaxDatumSize
                 # If no defined the maximum size in DSC, try to get current size from INF
-                if Pcd.MaxDatumSize in ['', None]:
+                if not Pcd.MaxDatumSize:
                     Pcd.MaxDatumSize = str(len(Pcd.InfDefaultValue.split(',')))
             else:
                 Base1 = Base2 = 10

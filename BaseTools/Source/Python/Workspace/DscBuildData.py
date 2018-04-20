@@ -635,10 +635,10 @@ class DscBuildData(PlatformBuildClassObject):
             self._SkuIds = OrderedDict()
             RecordList = self._RawData[MODEL_EFI_SKU_ID, self._Arch]
             for Record in RecordList:
-                if Record[0] in [None, '']:
+                if not Record[0]:
                     EdkLogger.error('build', FORMAT_INVALID, 'No Sku ID number',
                                     File=self.MetaFile, Line=Record[-1])
-                if Record[1] in [None, '']:
+                if not Record[1]:
                     EdkLogger.error('build', FORMAT_INVALID, 'No Sku ID name',
                                     File=self.MetaFile, Line=Record[-1])
                 if not Pattern.match(Record[0]) and not HexPattern.match(Record[0]):
@@ -663,10 +663,10 @@ class DscBuildData(PlatformBuildClassObject):
             self.DefaultStores = OrderedDict()
             RecordList = self._RawData[MODEL_EFI_DEFAULT_STORES, self._Arch]
             for Record in RecordList:
-                if Record[0] in [None, '']:
+                if not Record[0]:
                     EdkLogger.error('build', FORMAT_INVALID, 'No DefaultStores ID number',
                                     File=self.MetaFile, Line=Record[-1])
-                if Record[1] in [None, '']:
+                if not Record[1]:
                     EdkLogger.error('build', FORMAT_INVALID, 'No DefaultStores ID name',
                                     File=self.MetaFile, Line=Record[-1])
                 if not Pattern.match(Record[0]) and not HexPattern.match(Record[0]):

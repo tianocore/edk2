@@ -1116,7 +1116,7 @@ class InfBuildData(ModuleBuildClassObject):
                     Pcd.DatumType = PcdInPackage.DatumType
                     Pcd.MaxDatumSize = PcdInPackage.MaxDatumSize
                     Pcd.InfDefaultValue = Pcd.DefaultValue
-                    if Pcd.DefaultValue in [None, '']:
+                    if not Pcd.DefaultValue:
                         Pcd.DefaultValue = PcdInPackage.DefaultValue
                     else:
                         try:
