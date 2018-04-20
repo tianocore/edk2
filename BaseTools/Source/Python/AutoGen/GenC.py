@@ -1409,7 +1409,7 @@ def CreateLibraryConstructorCode(Info, AutoGenC, AutoGenH):
         if Lib.ModuleType in [SUP_MODULE_BASE, SUP_MODULE_SEC]:
             ConstructorPrototypeString.Append(gLibraryStructorPrototype[SUP_MODULE_BASE].Replace(Dict))
             ConstructorCallingString.Append(gLibraryStructorCall[SUP_MODULE_BASE].Replace(Dict))
-        elif Lib.ModuleType in [SUP_MODULE_PEI_CORE,SUP_MODULE_PEIM]:
+        elif Lib.ModuleType in SUP_MODULE_SET_PEI:
             ConstructorPrototypeString.Append(gLibraryStructorPrototype['PEI'].Replace(Dict))
             ConstructorCallingString.Append(gLibraryStructorCall['PEI'].Replace(Dict))
         elif Lib.ModuleType in [SUP_MODULE_DXE_CORE,SUP_MODULE_DXE_DRIVER,SUP_MODULE_DXE_SMM_DRIVER,SUP_MODULE_DXE_RUNTIME_DRIVER,
@@ -1439,7 +1439,7 @@ def CreateLibraryConstructorCode(Info, AutoGenC, AutoGenH):
     else:
         if Info.ModuleType in [SUP_MODULE_BASE, SUP_MODULE_SEC]:
             AutoGenC.Append(gLibraryString[SUP_MODULE_BASE].Replace(Dict))
-        elif Info.ModuleType in [SUP_MODULE_PEI_CORE,SUP_MODULE_PEIM]:
+        elif Info.ModuleType in SUP_MODULE_SET_PEI:
             AutoGenC.Append(gLibraryString['PEI'].Replace(Dict))
         elif Info.ModuleType in [SUP_MODULE_DXE_CORE,SUP_MODULE_DXE_DRIVER,SUP_MODULE_DXE_SMM_DRIVER,SUP_MODULE_DXE_RUNTIME_DRIVER,
                                  SUP_MODULE_DXE_SAL_DRIVER,SUP_MODULE_UEFI_DRIVER,SUP_MODULE_UEFI_APPLICATION,SUP_MODULE_SMM_CORE]:
@@ -1471,7 +1471,7 @@ def CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH):
         if Lib.ModuleType in [SUP_MODULE_BASE, SUP_MODULE_SEC]:
             DestructorPrototypeString.Append(gLibraryStructorPrototype[SUP_MODULE_BASE].Replace(Dict))
             DestructorCallingString.Append(gLibraryStructorCall[SUP_MODULE_BASE].Replace(Dict))
-        elif Lib.ModuleType in [SUP_MODULE_PEI_CORE,SUP_MODULE_PEIM]:
+        elif Lib.ModuleType in SUP_MODULE_SET_PEI:
             DestructorPrototypeString.Append(gLibraryStructorPrototype['PEI'].Replace(Dict))
             DestructorCallingString.Append(gLibraryStructorCall['PEI'].Replace(Dict))
         elif Lib.ModuleType in [SUP_MODULE_DXE_CORE,SUP_MODULE_DXE_DRIVER,SUP_MODULE_DXE_SMM_DRIVER,SUP_MODULE_DXE_RUNTIME_DRIVER,
@@ -1501,7 +1501,7 @@ def CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH):
     else:
         if Info.ModuleType in [SUP_MODULE_BASE, SUP_MODULE_SEC]:
             AutoGenC.Append(gLibraryString[SUP_MODULE_BASE].Replace(Dict))
-        elif Info.ModuleType in [SUP_MODULE_PEI_CORE,SUP_MODULE_PEIM]:
+        elif Info.ModuleType in SUP_MODULE_SET_PEI:
             AutoGenC.Append(gLibraryString['PEI'].Replace(Dict))
         elif Info.ModuleType in [SUP_MODULE_DXE_CORE,SUP_MODULE_DXE_DRIVER,SUP_MODULE_DXE_SMM_DRIVER,SUP_MODULE_DXE_RUNTIME_DRIVER,
                                  SUP_MODULE_DXE_SAL_DRIVER,SUP_MODULE_UEFI_DRIVER,SUP_MODULE_UEFI_APPLICATION,SUP_MODULE_SMM_CORE]:
