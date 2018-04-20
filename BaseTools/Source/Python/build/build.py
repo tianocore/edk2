@@ -1616,12 +1616,12 @@ class Build():
             if OutputImageFile != '':
                 ModuleIsPatch = False
                 for Pcd in Module.ModulePcdList:
-                    if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE and Pcd.TokenCName in TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_LIST:
+                    if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE and Pcd.TokenCName in TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_SET:
                         ModuleIsPatch = True
                         break
                 if not ModuleIsPatch:
                     for Pcd in Module.LibraryPcdList:
-                        if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE and Pcd.TokenCName in TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_LIST:
+                        if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE and Pcd.TokenCName in TAB_PCDS_PATCHABLE_LOAD_FIX_ADDRESS_SET:
                             ModuleIsPatch = True
                             break
 

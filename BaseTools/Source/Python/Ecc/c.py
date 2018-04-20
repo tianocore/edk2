@@ -830,7 +830,7 @@ def GetDataTypeFromModifier(ModifierStr):
     MList = ModifierStr.split()
     ReturnType = ''
     for M in MList:
-        if M in EccGlobalData.gConfig.ModifierList:
+        if M in EccGlobalData.gConfig.ModifierSet:
             continue
         # remove array sufix
         if M.startswith('[') or M.endswith(']'):

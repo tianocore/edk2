@@ -901,7 +901,7 @@ class InfBuildData(ModuleBuildClassObject):
                     Depex[Arch, ModuleType] = []
                 DepexList = Depex[Arch, ModuleType]
                 for Token in TokenList:
-                    if Token in DEPEX_SUPPORTED_OPCODE:
+                    if Token in DEPEX_SUPPORTED_OPCODE_SET:
                         DepexList.append(Token)
                     elif Token.endswith(".inf"):  # module file name
                         ModuleFile = os.path.normpath(Token)

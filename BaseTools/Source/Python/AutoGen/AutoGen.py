@@ -507,8 +507,8 @@ class WorkspaceAutoGen(AutoGen):
                         if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) == SinglePcd:
                             for item in GlobalData.MixedPcd[SinglePcd]:
                                 Pcd_Type = item[0].split('_')[-1]
-                                if (Pcd_Type == BuildData.Pcds[key].Type) or (Pcd_Type == TAB_PCDS_DYNAMIC_EX and BuildData.Pcds[key].Type in GenC.gDynamicExPcd) or \
-                                   (Pcd_Type == TAB_PCDS_DYNAMIC and BuildData.Pcds[key].Type in GenC.gDynamicPcd):
+                                if (Pcd_Type == BuildData.Pcds[key].Type) or (Pcd_Type == TAB_PCDS_DYNAMIC_EX and BuildData.Pcds[key].Type in PCD_DYNAMIC_EX_TYPE_SET) or \
+                                   (Pcd_Type == TAB_PCDS_DYNAMIC and BuildData.Pcds[key].Type in PCD_DYNAMIC_TYPE_SET):
                                     Value = BuildData.Pcds[key]
                                     Value.TokenCName = BuildData.Pcds[key].TokenCName + '_' + Pcd_Type
                                     if len(key) == 2:
@@ -1362,8 +1362,8 @@ class PlatformAutoGen(AutoGen):
                 if (self.Platform.Pcds[key].TokenCName, self.Platform.Pcds[key].TokenSpaceGuidCName) == SinglePcd:
                     for item in GlobalData.MixedPcd[SinglePcd]:
                         Pcd_Type = item[0].split('_')[-1]
-                        if (Pcd_Type == self.Platform.Pcds[key].Type) or (Pcd_Type == TAB_PCDS_DYNAMIC_EX and self.Platform.Pcds[key].Type in GenC.gDynamicExPcd) or \
-                           (Pcd_Type == TAB_PCDS_DYNAMIC and self.Platform.Pcds[key].Type in GenC.gDynamicPcd):
+                        if (Pcd_Type == self.Platform.Pcds[key].Type) or (Pcd_Type == TAB_PCDS_DYNAMIC_EX and self.Platform.Pcds[key].Type in PCD_DYNAMIC_EX_TYPE_SET) or \
+                           (Pcd_Type == TAB_PCDS_DYNAMIC and self.Platform.Pcds[key].Type in PCD_DYNAMIC_TYPE_SET):
                             Value = self.Platform.Pcds[key]
                             Value.TokenCName = self.Platform.Pcds[key].TokenCName + '_' + Pcd_Type
                             if len(key) == 2:
@@ -1403,7 +1403,7 @@ class PlatformAutoGen(AutoGen):
                 # Check the PCD from DSC or not 
                 PcdFromModule.IsFromDsc = (PcdFromModule.TokenCName, PcdFromModule.TokenSpaceGuidCName) in self.Platform.Pcds
 
-                if PcdFromModule.Type in GenC.gDynamicPcd or PcdFromModule.Type in GenC.gDynamicExPcd:
+                if PcdFromModule.Type in PCD_DYNAMIC_TYPE_SET or PcdFromModule.Type in PCD_DYNAMIC_EX_TYPE_SET:
                     if F.Path not in FdfModuleList:
                         # If one of the Source built modules listed in the DSC is not listed 
                         # in FDF modules, and the INF lists a PCD can only use the PcdsDynamic 
@@ -1413,7 +1413,7 @@ class PlatformAutoGen(AutoGen):
                         # be included in a flash image in order to be functional. These Dynamic 
                         # PCD will not be added into the Database unless it is used by other 
                         # modules that are included in the FDF file.
-                        if PcdFromModule.Type in GenC.gDynamicPcd and \
+                        if PcdFromModule.Type in PCD_DYNAMIC_TYPE_SET and \
                             PcdFromModule.IsFromBinaryInf == False:
                             # Print warning message to let the developer make a determine.
                             continue
@@ -1422,7 +1422,7 @@ class PlatformAutoGen(AutoGen):
                         # access method (it is only listed in the DEC file that declares the 
                         # PCD as PcdsDynamicEx), then DO NOT break the build; DO NOT add the 
                         # PCD to the Platform's PCD Database.
-                        if PcdFromModule.Type in GenC.gDynamicExPcd:
+                        if PcdFromModule.Type in PCD_DYNAMIC_EX_TYPE_SET:
                             continue
                     #
                     # If a dynamic PCD used by a PEM module/PEI module & DXE module,
@@ -1464,7 +1464,7 @@ class PlatformAutoGen(AutoGen):
                     PcdFromModule.IsFromBinaryInf = True
                     PcdFromModule.IsFromDsc = False
                     # Only allow the DynamicEx and Patchable PCD in AsBuild INF
-                    if PcdFromModule.Type not in GenC.gDynamicExPcd and PcdFromModule.Type not in TAB_PCDS_PATCHABLE_IN_MODULE:
+                    if PcdFromModule.Type not in PCD_DYNAMIC_EX_TYPE_SET and PcdFromModule.Type not in TAB_PCDS_PATCHABLE_IN_MODULE:
                         EdkLogger.error("build", AUTOGEN_ERROR, "PCD setting error",
                                         File=self.MetaFile,
                                         ExtraData="\n\tExisted %s PCD %s in:\n\t\t%s\n"
@@ -1474,11 +1474,11 @@ class PlatformAutoGen(AutoGen):
                         NoDatumTypePcdList.add("%s.%s [%s]" % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, InfName))
                     if M.ModuleType in SUP_MODULE_SET_PEI:
                         PcdFromModule.Phase = "PEI"
-                    if PcdFromModule not in self._DynaPcdList_ and PcdFromModule.Type in GenC.gDynamicExPcd:
+                    if PcdFromModule not in self._DynaPcdList_ and PcdFromModule.Type in PCD_DYNAMIC_EX_TYPE_SET:
                         self._DynaPcdList_.append(PcdFromModule)
                     elif PcdFromModule not in self._NonDynaPcdList_ and PcdFromModule.Type in TAB_PCDS_PATCHABLE_IN_MODULE:
                         self._NonDynaPcdList_.append(PcdFromModule)
-                    if PcdFromModule in self._DynaPcdList_ and PcdFromModule.Phase == 'PEI' and PcdFromModule.Type in GenC.gDynamicExPcd:
+                    if PcdFromModule in self._DynaPcdList_ and PcdFromModule.Phase == 'PEI' and PcdFromModule.Type in PCD_DYNAMIC_EX_TYPE_SET:
                         # Overwrite the phase of any the same PCD existing, if Phase is PEI.
                         # It is to solve the case that a dynamic PCD used by a PEM module/PEI 
                         # module & DXE module at a same time.
@@ -2065,28 +2065,28 @@ class PlatformAutoGen(AutoGen):
             #
             for Pcd in self.DynamicPcdList:
                 if Pcd.Phase == "PEI":
-                    if Pcd.Type in [TAB_PCDS_DYNAMIC, "DynamicDefault", "DynamicVpd", "DynamicHii"]:
+                    if Pcd.Type in PCD_DYNAMIC_TYPE_SET:
                         EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
                         self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
                         TokenNumber += 1
 
             for Pcd in self.DynamicPcdList:
                 if Pcd.Phase == "PEI":
-                    if Pcd.Type in [TAB_PCDS_DYNAMIC_EX, "DynamicExDefault", "DynamicExVpd", "DynamicExHii"]:
+                    if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
                         EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
                         self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
                         TokenNumber += 1
 
             for Pcd in self.DynamicPcdList:
                 if Pcd.Phase == "DXE":
-                    if Pcd.Type in [TAB_PCDS_DYNAMIC, "DynamicDefault", "DynamicVpd", "DynamicHii"]:
+                    if Pcd.Type in PCD_DYNAMIC_TYPE_SET:
                         EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
                         self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
                         TokenNumber += 1
 
             for Pcd in self.DynamicPcdList:
                 if Pcd.Phase == "DXE":
-                    if Pcd.Type in [TAB_PCDS_DYNAMIC_EX, "DynamicExDefault", "DynamicExVpd", "DynamicExHii"]:
+                    if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
                         EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
                         self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
                         TokenNumber += 1
@@ -2382,7 +2382,7 @@ class PlatformAutoGen(AutoGen):
                 ToPcd.MaxDatumSize = str(len(Value) - 1)
 
         # apply default SKU for dynamic PCDS if specified one is not available
-        if (ToPcd.Type in PCD_DYNAMIC_TYPE_LIST or ToPcd.Type in PCD_DYNAMIC_EX_TYPE_LIST) \
+        if (ToPcd.Type in PCD_DYNAMIC_TYPE_SET or ToPcd.Type in PCD_DYNAMIC_EX_TYPE_SET) \
             and ToPcd.SkuInfoList in [None, {}, '']:
             if self.Platform.SkuName in self.Platform.SkuIds:
                 SkuName = self.Platform.SkuName
@@ -3931,7 +3931,7 @@ class ModuleAutoGen(AutoGen):
             if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE:
                 PatchablePcds += [Pcd]
                 PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, TAB_PCDS_PATCHABLE_IN_MODULE))
-            elif Pcd.Type in GenC.gDynamicExPcd:
+            elif Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
                 if Pcd not in Pcds:
                     Pcds += [Pcd]
                     PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, TAB_PCDS_DYNAMIC_EX))

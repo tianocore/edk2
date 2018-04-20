@@ -3580,7 +3580,7 @@ class FdfParser:
             raise Warning("expected '.'", self.FileName, self.CurrentLineNumber)
 
         Arch = self.__SkippedChars.rstrip(".")
-        if Arch.upper() not in ARCH_LIST_FULL:
+        if Arch.upper() not in ARCH_SET_FULL:
             raise Warning("Unknown Arch '%s'" % Arch, self.FileName, self.CurrentLineNumber)
 
         ModuleType = self.__GetModuleType()

@@ -93,7 +93,6 @@ class OptRomInfStatement (FfsInfStatement):
         #
         Rule = self.__GetRule__()
         GenFdsGlobalVariable.VerboseLogger( "Packing binaries from inf file : %s" %self.InfFileName)
-        #FileType = Ffs.Ffs.ModuleTypeToFileType[Rule.ModuleType]
         #
         # For the rule only has simpleFile
         #

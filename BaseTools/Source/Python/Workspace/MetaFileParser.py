@@ -310,7 +310,7 @@ class MetaFileParser(object):
             if self._SectionName in self.DataType:
                 self._SectionType = self.DataType[self._SectionName]
                 # Check if the section name is valid
-                if self._SectionName not in SECTIONS_HAVE_ITEM_AFTER_ARCH and len(ItemList) > 3:
+                if self._SectionName not in SECTIONS_HAVE_ITEM_AFTER_ARCH_SET and len(ItemList) > 3:
                     EdkLogger.error("Parser", FORMAT_UNKNOWN_ERROR, "%s is not a valid section name" % Item,
                                     self.MetaFile, self._LineIndex + 1, self._CurrentLine)
             elif self._Version >= 0x00010005:
@@ -328,7 +328,7 @@ class MetaFileParser(object):
 
             # S2 may be Platform or ModuleType
             if len(ItemList) > 2:
-                if self._SectionName.upper() in SECTIONS_HAVE_ITEM_PCD:
+                if self._SectionName.upper() in SECTIONS_HAVE_ITEM_PCD_SET:
                     S2 = ItemList[2]
                 else:
                     S2 = ItemList[2].upper()

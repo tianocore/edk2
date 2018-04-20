@@ -41,11 +41,6 @@ gItemTypeStringDatabase  = {
     TAB_PCDS_DYNAMIC_EX_HII     :   '',
 }
 
-## Dynamic PCD types
-gDynamicPcd = [TAB_PCDS_DYNAMIC, TAB_PCDS_DYNAMIC_DEFAULT, TAB_PCDS_DYNAMIC_VPD, TAB_PCDS_DYNAMIC_HII]
-
-## Dynamic-ex PCD types
-gDynamicExPcd = [TAB_PCDS_DYNAMIC_EX, TAB_PCDS_DYNAMIC_EX_DEFAULT, TAB_PCDS_DYNAMIC_EX_VPD, TAB_PCDS_DYNAMIC_EX_HII]
 
 ## Datum size
 gDatumSizeStringDatabase = {TAB_UINT8:'8',TAB_UINT16:'16',TAB_UINT32:'32',TAB_UINT64:'64','BOOLEAN':'BOOLEAN',TAB_VOID:'8'}
@@ -802,7 +797,7 @@ def DynExPcdTokenNumberMapping(Info, AutoGenH):
     # Even it is the Library, the PCD is saved in the ModulePcdList
     PcdList = Info.ModulePcdList
     for Pcd in PcdList:
-        if Pcd.Type in gDynamicExPcd:
+        if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
             ExTokenCNameList.append(Pcd.TokenCName)
             PcdExList.append(Pcd)
     if len(ExTokenCNameList) == 0:
@@ -848,7 +843,7 @@ def DynExPcdTokenNumberMapping(Info, AutoGenH):
                 if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.MixedPcd[PcdItem]:
                     RealTokenCName = PcdItem[0]
                     break
-            if Pcd.Type in gDynamicExPcd and Pcd.TokenCName == TokenCName:
+            if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET and Pcd.TokenCName == TokenCName:
                 Index = Index + 1
                 if Index == 1:
                     AutoGenH.Append('\n#define __PCD_%s_VAL_CMP(GuidPtr)  (' % (RealTokenCName))
@@ -921,7 +916,7 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
     if Pcd.PcdValueFromComm:
         Pcd.DefaultValue = Pcd.PcdValueFromComm
     
-    if Pcd.Type in gDynamicExPcd:
+    if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
         TokenNumber = int(Pcd.TokenValue, 0)
         # Add TokenSpaceGuidValue value to PcdTokenName to discriminate the DynamicEx PCDs with 
         # different Guids but same TokenCName
@@ -937,7 +932,7 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
             # will not be added into the Database unless it is used by other modules that are 
             # included in the FDF file. 
             # In this case, just assign an invalid token number to make it pass build.
-            if Pcd.Type in PCD_DYNAMIC_TYPE_LIST:
+            if Pcd.Type in PCD_DYNAMIC_TYPE_SET:
                 TokenNumber = 0
             else:
                 EdkLogger.error("build", AUTOGEN_ERROR,
@@ -960,14 +955,14 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
     SetModeStatusName = '_PCD_SET_MODE_' + gDatumSizeStringDatabaseH[Pcd.DatumType] + '_S_' + TokenCName if Pcd.DatumType in gDatumSizeStringDatabaseH else '_PCD_SET_MODE_' + gDatumSizeStringDatabaseH[TAB_VOID] + '_S_' + TokenCName
     GetModeSizeName = '_PCD_GET_MODE_SIZE' + '_' + TokenCName
     
-    if Pcd.Type in gDynamicExPcd:
+    if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
         if Info.IsLibrary:
             PcdList = Info.LibraryPcdList
         else:
             PcdList = Info.ModulePcdList
         PcdExCNameTest = 0
         for PcdModule in PcdList:
-            if PcdModule.Type in gDynamicExPcd and Pcd.TokenCName == PcdModule.TokenCName:
+            if PcdModule.Type in PCD_DYNAMIC_EX_TYPE_SET and Pcd.TokenCName == PcdModule.TokenCName:
                 PcdExCNameTest += 1
             # get out early once we found > 1...
             if PcdExCNameTest > 1:
@@ -996,10 +991,10 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
             else:
                 AutoGenH.Append('#define %s(Value)  LibPcdSetEx%s(&%s, %s, (Value))\n' % (SetModeName, DatumSizeLib, Pcd.TokenSpaceGuidCName, PcdTokenName))
                 AutoGenH.Append('#define %s(Value)  LibPcdSetEx%sS(&%s, %s, (Value))\n' % (SetModeStatusName, DatumSizeLib, Pcd.TokenSpaceGuidCName, PcdTokenName))
-    elif Pcd.Type in gDynamicPcd:
+    elif Pcd.Type in PCD_DYNAMIC_TYPE_SET:
         PcdCNameTest = 0
         for PcdModule in Info.LibraryPcdList + Info.ModulePcdList:
-            if PcdModule.Type in gDynamicPcd and Pcd.TokenCName == PcdModule.TokenCName:
+            if PcdModule.Type in PCD_DYNAMIC_TYPE_SET and Pcd.TokenCName == PcdModule.TokenCName:
                 PcdCNameTest += 1
             # get out early once we found > 1...
             if PcdCNameTest > 1:
@@ -1225,7 +1220,7 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
     #
     # Write PCDs
     #
-    if Pcd.Type in gDynamicExPcd:
+    if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
         TokenNumber = int(Pcd.TokenValue, 0)
     else:
         if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) not in PcdTokenNumber:
@@ -1237,7 +1232,7 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
             # will not be added into the Database unless it is used by other modules that are 
             # included in the FDF file. 
             # In this case, just assign an invalid token number to make it pass build.
-            if Pcd.Type in PCD_DYNAMIC_TYPE_LIST:
+            if Pcd.Type in PCD_DYNAMIC_TYPE_SET:
                 TokenNumber = 0
             else:
                 EdkLogger.error("build", AUTOGEN_ERROR,
@@ -1266,7 +1261,7 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
             Type = '(VOID *)'
         Array = '[]'
     PcdItemType = Pcd.Type
-    if PcdItemType in gDynamicExPcd:
+    if PcdItemType in PCD_DYNAMIC_EX_TYPE_SET:
         PcdExTokenName = '_PCD_TOKEN_' + TokenSpaceGuidCName + '_' + TokenCName
         AutoGenH.Append('\n#define %s  %dU\n' % (PcdExTokenName, TokenNumber))
         
@@ -1276,7 +1271,7 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
             PcdList = Info.ModulePcdList
         PcdExCNameTest = 0
         for PcdModule in PcdList:
-            if PcdModule.Type in gDynamicExPcd and Pcd.TokenCName == PcdModule.TokenCName:
+            if PcdModule.Type in PCD_DYNAMIC_EX_TYPE_SET and Pcd.TokenCName == PcdModule.TokenCName:
                 PcdExCNameTest += 1
             # get out early once we found > 1...
             if PcdExCNameTest > 1:
@@ -1307,13 +1302,13 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
                 AutoGenH.Append('#define %s(Value)  LibPcdSetEx%sS(&%s, %s, (Value))\n' % (SetModeStatusName, DatumSizeLib, Pcd.TokenSpaceGuidCName, PcdTokenName))
     else:
         AutoGenH.Append('#define _PCD_TOKEN_%s  %dU\n' % (TokenCName, TokenNumber))
-    if PcdItemType in gDynamicPcd:
+    if PcdItemType in PCD_DYNAMIC_TYPE_SET:
         PcdList = []
         PcdCNameList = []
         PcdList.extend(Info.LibraryPcdList)
         PcdList.extend(Info.ModulePcdList)
         for PcdModule in PcdList:
-            if PcdModule.Type in gDynamicPcd:
+            if PcdModule.Type in PCD_DYNAMIC_TYPE_SET:
                 PcdCNameList.append(PcdModule.TokenCName)
         if PcdCNameList.count(Pcd.TokenCName) > 1:
             EdkLogger.error("build", AUTOGEN_ERROR, "More than one Dynamic Pcds [%s] are different Guids but same CName.They need to be changed to DynamicEx type to avoid the confliction.\n" % (TokenCName), ExtraData="[%s]" % str(Info.MetaFile.Path))
@@ -1693,7 +1688,7 @@ def CreatePcdCode(Info, AutoGenC, AutoGenH):
     # Collect Token Space GUIDs used by DynamicEc PCDs
     TokenSpaceList = []
     for Pcd in Info.ModulePcdList:
-        if Pcd.Type in gDynamicExPcd and Pcd.TokenSpaceGuidCName not in TokenSpaceList:
+        if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET and Pcd.TokenSpaceGuidCName not in TokenSpaceList:
             TokenSpaceList += [Pcd.TokenSpaceGuidCName]
             
     SkuMgr = Info.Workspace.Platform.SkuIdMgr

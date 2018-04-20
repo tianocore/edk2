@@ -53,7 +53,7 @@ class Configuration(object):
 
         # List customized Modifer here, split with ','
         # Defaultly use the definition in class DataType
-        self.ModifierList = MODIFIER_LIST
+        self.ModifierSet = MODIFIER_SET
 
         ## General Checking
         self.GeneralCheckAll = 0

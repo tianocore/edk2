@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation
 #
-#  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007-2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,24 +22,6 @@ from Common.DataType import *
 #
 #
 class Ffs(FDClassObject):
-    
-    # mapping between MODULE type in FDF (from INF) and file type for GenFfs
-    ModuleTypeToFileType = {
-        SUP_MODULE_SEC               : 'EFI_FV_FILETYPE_SECURITY_CORE',
-        SUP_MODULE_PEI_CORE          : 'EFI_FV_FILETYPE_PEI_CORE',
-        SUP_MODULE_PEIM              : 'EFI_FV_FILETYPE_PEIM',
-        SUP_MODULE_DXE_CORE          : 'EFI_FV_FILETYPE_DXE_CORE',
-        SUP_MODULE_DXE_DRIVER        : 'EFI_FV_FILETYPE_DRIVER',
-        SUP_MODULE_DXE_SAL_DRIVER    : 'EFI_FV_FILETYPE_DRIVER',
-        SUP_MODULE_DXE_SMM_DRIVER    : 'EFI_FV_FILETYPE_DRIVER',
-        SUP_MODULE_DXE_RUNTIME_DRIVER: 'EFI_FV_FILETYPE_DRIVER',
-        SUP_MODULE_UEFI_DRIVER       : 'EFI_FV_FILETYPE_DRIVER',
-        SUP_MODULE_UEFI_APPLICATION  : 'EFI_FV_FILETYPE_APPLICATION',
-        SUP_MODULE_SMM_CORE          : 'EFI_FV_FILETYPE_SMM_CORE',
-        SUP_MODULE_MM_STANDALONE     : 'EFI_FV_FILETYPE_MM_STANDALONE',
-        SUP_MODULE_MM_CORE_STANDALONE : 'EFI_FV_FILETYPE_MM_CORE_STANDALONE'
-    }
-    
     # mapping between FILE type in FDF and file type for GenFfs
     FdfFvFileTypeToFileType = {
         SUP_MODULE_SEC               : 'EFI_FV_FILETYPE_SECURITY_CORE',

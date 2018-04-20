@@ -1200,7 +1200,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
         #
         TokenSpaceGuidStructure = Pcd.TokenSpaceGuidValue
         TokenSpaceGuid = GuidStructureStringToGuidValueName(TokenSpaceGuidStructure)
-        if Pcd.Type in gDynamicExPcd:
+        if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
             if TokenSpaceGuid not in GuidList:
                 GuidList += [TokenSpaceGuid]
                 Dict['GUID_STRUCTURE'].append(TokenSpaceGuidStructure)
@@ -1568,7 +1568,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
             Dict['VARDEF_HEADER'][GeneratedTokenNumber] = ''
        
         
-        if Pcd.Type in gDynamicExPcd:
+        if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
             
             if Phase == 'DXE':
                 GeneratedTokenNumber += NumberOfPeiLocalTokens
