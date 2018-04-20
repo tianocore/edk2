@@ -1947,13 +1947,11 @@ class DscBuildData(PlatformBuildClassObject):
         InitByteValue = ""
         CApp = PcdMainCHeader
 
-        Includes = {}
         IncludeFiles = set()
         for PcdName in StructuredPcds:
             Pcd = StructuredPcds[PcdName]
             for IncludeFile in Pcd.StructuredPcdIncludeFile:
-                if IncludeFile not in Includes:
-                    Includes[IncludeFile] = True
+                if IncludeFile not in IncludeFiles:
                     IncludeFiles.add(IncludeFile)
                     CApp = CApp + '#include <%s>\n' % (IncludeFile)
         CApp = CApp + '\n'
