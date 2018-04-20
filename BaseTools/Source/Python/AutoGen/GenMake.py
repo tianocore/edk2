@@ -427,8 +427,6 @@ cleanlib:
         self.ResultFileList = []
         self.IntermediateDirectoryList = ["$(DEBUG_DIR)", "$(OUTPUT_DIR)"]
 
-        self.SourceFileDatabase = {}        # {file type : file path}
-        self.DestFileDatabase = {}          # {file type : file path}
         self.FileBuildTargetList = []       # [(src, target string)]
         self.BuildTargetList = []           # [target string]
         self.PendingBuildTargetList = []    # [FileBuildRule objects]
