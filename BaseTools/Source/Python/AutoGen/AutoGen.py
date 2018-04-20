@@ -355,10 +355,9 @@ class WorkspaceAutoGen(AutoGen):
             # but the path (self.MetaFile.Path) is the real path
             for key in self.FdfProfile.InfDict:
                 if key == 'ArchTBD':
-                    MetaFile_cache = {}
+                    MetaFile_cache = defaultdict(set)
                     for Arch in self.ArchList:
                         Current_Platform_cache = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
-                        MetaFile_cache[Arch] = set()
                         for Pkey in Current_Platform_cache.Modules:
                             MetaFile_cache[Arch].add(Current_Platform_cache.Modules[Pkey].MetaFile)
                     for Inf in self.FdfProfile.InfDict[key]:
