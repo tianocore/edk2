@@ -190,7 +190,7 @@ CreateEsrtEntry (
     }
 
     NewSize  = ((mTable->FwResourceCountMax + GROWTH_STEP) * sizeof (EFI_SYSTEM_RESOURCE_ENTRY)) + sizeof (EFI_SYSTEM_RESOURCE_TABLE);
-    NewTable = AllocateRuntimeZeroPool (NewSize);
+    NewTable = AllocateZeroPool (NewSize);
     if (NewTable == NULL) {
       DEBUG ((DEBUG_ERROR, "EsrtFmpDxe: Failed to allocate memory larger table for ESRT. \n"));
       return EFI_OUT_OF_RESOURCES;
@@ -439,7 +439,7 @@ EsrtFmpEntryPoint (
   //
   // Allocate Memory for table
   //
-  mTable = AllocateRuntimeZeroPool (
+  mTable = AllocateZeroPool (
              (GROWTH_STEP * sizeof (EFI_SYSTEM_RESOURCE_ENTRY)) + sizeof (EFI_SYSTEM_RESOURCE_TABLE)
              );
   ASSERT (mTable != NULL);
