@@ -128,7 +128,7 @@ class VariableMgr(object):
         return var_value
     def process_variable_data(self):
 
-        var_data = dict()
+        var_data = collections.defaultdict(collections.OrderedDict)
 
         indexedvarinfo = collections.OrderedDict()
         for item in self.VarInfo:
@@ -155,8 +155,6 @@ class VariableMgr(object):
             for item in default_data_buffer:
                 default_data_array += unpack("B",item)
 
-            if (DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT) not in var_data:
-                var_data[(DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT)] = collections.OrderedDict()
             var_data[(DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT)][index] = (default_data_buffer,sku_var_info[(DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT)])
 
             for (skuid,defaultstoragename) in indexedvarinfo.get(index):
@@ -177,8 +175,6 @@ class VariableMgr(object):
 
                 data_delta = self.calculate_delta(default_data_array, others_data_array)
 
-                if (skuid,defaultstoragename) not in var_data:
-                    var_data[(skuid,defaultstoragename)] = collections.OrderedDict()
                 var_data[(skuid,defaultstoragename)][index] = (data_delta,sku_var_info[(skuid,defaultstoragename)])
         return var_data
 
