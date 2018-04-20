@@ -1183,13 +1183,6 @@ class FdfParser:
 
         self.__GetOneChar()
 
-    def __IsHex(self, HexStr):
-        if not HexStr.upper().startswith("0X"):
-            return False
-        if len(self.__Token) <= 2:
-            return False
-        return True if all(x in string.hexdigits for x in HexStr[2:]) else False
-
     ## __GetNextHexNumber() method
     #
     #   Get next HEX data before a seperator
@@ -1202,7 +1195,7 @@ class FdfParser:
     def __GetNextHexNumber(self):
         if not self.__GetNextToken():
             return False
-        if self.__IsHex(self.__Token):
+        if gHexPatternAll.match(self.__Token):
             return True
         else:
             self.__UndoToken()
