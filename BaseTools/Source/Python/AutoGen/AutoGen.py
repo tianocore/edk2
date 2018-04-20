@@ -259,7 +259,7 @@ class WorkspaceAutoGen(AutoGen):
         self.BuildDatabase  = MetaFileDb
         self.MetaFile       = ActivePlatform
         self.WorkspaceDir   = WorkspaceDir
-        self.Platform       = self.BuildDatabase[self.MetaFile, TAB_COMMON, Target, Toolchain]
+        self.Platform       = self.BuildDatabase[self.MetaFile, TAB_ARCH_COMMON, Target, Toolchain]
         GlobalData.gActivePlatform = self.Platform
         self.BuildTarget    = Target
         self.ToolChain      = Toolchain
@@ -405,8 +405,8 @@ class WorkspaceAutoGen(AutoGen):
             Platform = self.BuildDatabase[self.MetaFile, Arch, Target, Toolchain]
             PlatformPcds = Platform.Pcds
             self._GuidDict = Platform._GuidDict
-            SourcePcdDict = {'DynamicEx':set(), 'PatchableInModule':set(),'Dynamic':set(),'FixedAtBuild':set()}
-            BinaryPcdDict = {'DynamicEx':set(), 'PatchableInModule':set()}
+            SourcePcdDict = {TAB_PCDS_DYNAMIC_EX:set(), TAB_PCDS_PATCHABLE_IN_MODULE:set(),TAB_PCDS_DYNAMIC:set(),TAB_PCDS_FIXED_AT_BUILD:set()}
+            BinaryPcdDict = {TAB_PCDS_DYNAMIC_EX:set(), TAB_PCDS_PATCHABLE_IN_MODULE:set()}
             SourcePcdDict_Keys = SourcePcdDict.keys()
             BinaryPcdDict_Keys = BinaryPcdDict.keys()
 
@@ -430,23 +430,23 @@ class WorkspaceAutoGen(AutoGen):
                                     if PcdInPlatform.Type not in [None, '']:
                                         BuildData.Pcds[key].Type = PcdInPlatform.Type
 
-                        if 'DynamicEx' in BuildData.Pcds[key].Type:
+                        if TAB_PCDS_DYNAMIC_EX in BuildData.Pcds[key].Type:
                             if BuildData.IsBinaryModule:
-                                BinaryPcdDict['DynamicEx'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                                BinaryPcdDict[TAB_PCDS_DYNAMIC_EX].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
                             else:
-                                SourcePcdDict['DynamicEx'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                                SourcePcdDict[TAB_PCDS_DYNAMIC_EX].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
 
-                        elif 'PatchableInModule' in BuildData.Pcds[key].Type:
+                        elif TAB_PCDS_PATCHABLE_IN_MODULE in BuildData.Pcds[key].Type:
                             if BuildData.MetaFile.Ext == '.inf':
                                 if BuildData.IsBinaryModule:
-                                    BinaryPcdDict['PatchableInModule'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                                    BinaryPcdDict[TAB_PCDS_PATCHABLE_IN_MODULE].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
                                 else:
-                                    SourcePcdDict['PatchableInModule'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                                    SourcePcdDict[TAB_PCDS_PATCHABLE_IN_MODULE].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
 
-                        elif 'Dynamic' in BuildData.Pcds[key].Type:
-                            SourcePcdDict['Dynamic'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
-                        elif 'FixedAtBuild' in BuildData.Pcds[key].Type:
-                            SourcePcdDict['FixedAtBuild'].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                        elif TAB_PCDS_DYNAMIC in BuildData.Pcds[key].Type:
+                            SourcePcdDict[TAB_PCDS_DYNAMIC].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
+                        elif TAB_PCDS_FIXED_AT_BUILD in BuildData.Pcds[key].Type:
+                            SourcePcdDict[TAB_PCDS_FIXED_AT_BUILD].add((BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName))
                 else:
                     pass
             #
@@ -788,7 +788,7 @@ class WorkspaceAutoGen(AutoGen):
                             # Here we just need to get FILE_GUID from INF file, use 'COMMON' as ARCH attribute. and use 
                             # BuildObject from one of AutoGenObjectList is enough.
                             #
-                            InfObj = self.AutoGenObjectList[0].BuildDatabase.WorkspaceDb.BuildObject[PathClassObj, TAB_COMMON, self.BuildTarget, self.ToolChain]
+                            InfObj = self.AutoGenObjectList[0].BuildDatabase.WorkspaceDb.BuildObject[PathClassObj, TAB_ARCH_COMMON, self.BuildTarget, self.ToolChain]
                             if InfObj.Guid.upper() not in _GuidDict:
                                 _GuidDict[InfObj.Guid.upper()] = FfsFile
                             else:
@@ -869,9 +869,9 @@ class WorkspaceAutoGen(AutoGen):
 
     def _CheckPcdDefineAndType(self):
         PcdTypeList = [
-            "FixedAtBuild", "PatchableInModule", "FeatureFlag",
-            "Dynamic", #"DynamicHii", "DynamicVpd",
-            "DynamicEx", # "DynamicExHii", "DynamicExVpd"
+            TAB_PCDS_FIXED_AT_BUILD, TAB_PCDS_PATCHABLE_IN_MODULE, TAB_PCDS_FEATURE_FLAG,
+            TAB_PCDS_DYNAMIC, #"DynamicHii", "DynamicVpd",
+            TAB_PCDS_DYNAMIC_EX, # "DynamicExHii", "DynamicExVpd"
         ]
 
         # This dict store PCDs which are not used by any modules with specified arches
@@ -886,10 +886,10 @@ class WorkspaceAutoGen(AutoGen):
                     continue
 
                 # Try to remove Hii and Vpd suffix
-                if PcdType.startswith("DynamicEx"):
-                    PcdType = "DynamicEx"
-                elif PcdType.startswith("Dynamic"):
-                    PcdType = "Dynamic"
+                if PcdType.startswith(TAB_PCDS_DYNAMIC_EX):
+                    PcdType = TAB_PCDS_DYNAMIC_EX
+                elif PcdType.startswith(TAB_PCDS_DYNAMIC):
+                    PcdType = TAB_PCDS_DYNAMIC
 
                 for Package in Pa.PackageList:
                     # Key of DEC's Pcds dictionary is PcdCName, TokenSpaceGuid, PcdType
@@ -1286,7 +1286,7 @@ class PlatformAutoGen(AutoGen):
                     continue
                 else:
                     DscPcd = self.NonDynamicPcdDict[(Pcd.TokenCName,Pcd.TokenSpaceGuidCName)]
-                    if DscPcd.Type != "FixedAtBuild":
+                    if DscPcd.Type != TAB_PCDS_FIXED_AT_BUILD:
                         continue
                 if key in ShareFixedAtBuildPcdsSameValue and ShareFixedAtBuildPcdsSameValue[key]:                    
                     LibAuto.ConstPcd[key] = FixedAtBuildPcds[key]
@@ -2066,28 +2066,28 @@ class PlatformAutoGen(AutoGen):
             #
             for Pcd in self.DynamicPcdList:
                 if Pcd.Phase == "PEI":
-                    if Pcd.Type in ["Dynamic", "DynamicDefault", "DynamicVpd", "DynamicHii"]:
+                    if Pcd.Type in [TAB_PCDS_DYNAMIC, "DynamicDefault", "DynamicVpd", "DynamicHii"]:
                         EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
                         self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
                         TokenNumber += 1
 
             for Pcd in self.DynamicPcdList:
                 if Pcd.Phase == "PEI":
-                    if Pcd.Type in ["DynamicEx", "DynamicExDefault", "DynamicExVpd", "DynamicExHii"]:
+                    if Pcd.Type in [TAB_PCDS_DYNAMIC_EX, "DynamicExDefault", "DynamicExVpd", "DynamicExHii"]:
                         EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
                         self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
                         TokenNumber += 1
 
             for Pcd in self.DynamicPcdList:
                 if Pcd.Phase == "DXE":
-                    if Pcd.Type in ["Dynamic", "DynamicDefault", "DynamicVpd", "DynamicHii"]:
+                    if Pcd.Type in [TAB_PCDS_DYNAMIC, "DynamicDefault", "DynamicVpd", "DynamicHii"]:
                         EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
                         self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
                         TokenNumber += 1
 
             for Pcd in self.DynamicPcdList:
                 if Pcd.Phase == "DXE":
-                    if Pcd.Type in ["DynamicEx", "DynamicExDefault", "DynamicExVpd", "DynamicExHii"]:
+                    if Pcd.Type in [TAB_PCDS_DYNAMIC_EX, "DynamicExDefault", "DynamicExVpd", "DynamicExHii"]:
                         EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
                         self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
                         TokenNumber += 1
@@ -2331,7 +2331,7 @@ class PlatformAutoGen(AutoGen):
                 ToPcd.Type = FromPcd.Type
             elif (ToPcd.Type not in [None, '']) and (FromPcd.Type not in [None, ''])\
                 and (ToPcd.Type != FromPcd.Type) and (ToPcd.Type in FromPcd.Type):
-                if ToPcd.Type.strip() == "DynamicEx":
+                if ToPcd.Type.strip() == TAB_PCDS_DYNAMIC_EX:
                     ToPcd.Type = FromPcd.Type
             elif ToPcd.Type not in [None, ''] and FromPcd.Type not in [None, ''] \
                 and ToPcd.Type != FromPcd.Type:
@@ -2881,7 +2881,7 @@ class ModuleAutoGen(AutoGen):
         if self._FixedAtBuildPcds:
             return self._FixedAtBuildPcds
         for Pcd in self.ModulePcdList:
-            if Pcd.Type != "FixedAtBuild":
+            if Pcd.Type != TAB_PCDS_FIXED_AT_BUILD:
                 continue
             if Pcd not in self._FixedAtBuildPcds:
                 self._FixedAtBuildPcds.append(Pcd)
@@ -3418,7 +3418,7 @@ class ModuleAutoGen(AutoGen):
         if self._BinaryFileList is None:
             self._BinaryFileList = []
             for F in self.Module.Binaries:
-                if F.Target not in [TAB_COMMON, '*'] and F.Target != self.BuildTarget:
+                if F.Target not in [TAB_ARCH_COMMON, '*'] and F.Target != self.BuildTarget:
                     continue
                 self._BinaryFileList.append(F)
                 self._ApplyBuildRule(F, F.Type)
@@ -3931,12 +3931,12 @@ class ModuleAutoGen(AutoGen):
         for Pcd in self.ModulePcdList + self.LibraryPcdList:
             if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE:
                 PatchablePcds += [Pcd]
-                PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, 'PatchableInModule'))
+                PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, TAB_PCDS_PATCHABLE_IN_MODULE))
             elif Pcd.Type in GenC.gDynamicExPcd:
                 if Pcd not in Pcds:
                     Pcds += [Pcd]
-                    PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, 'DynamicEx'))
-                    PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, 'Dynamic'))
+                    PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, TAB_PCDS_DYNAMIC_EX))
+                    PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, TAB_PCDS_DYNAMIC))
                     PcdTokenSpaceList.append(Pcd.TokenSpaceGuidCName)
         GuidList = OrderedDict()
         GuidList.update(self.GuidList)
@@ -3964,8 +3964,8 @@ class ModuleAutoGen(AutoGen):
             if Pkg in Packages:
                 continue
             for VfrPcd in VfrPcds:
-                if ((VfrPcd.TokenCName, VfrPcd.TokenSpaceGuidCName, 'DynamicEx') in Pkg.Pcds or
-                    (VfrPcd.TokenCName, VfrPcd.TokenSpaceGuidCName, 'Dynamic') in Pkg.Pcds):
+                if ((VfrPcd.TokenCName, VfrPcd.TokenSpaceGuidCName, TAB_PCDS_DYNAMIC_EX) in Pkg.Pcds or
+                    (VfrPcd.TokenCName, VfrPcd.TokenSpaceGuidCName, TAB_PCDS_DYNAMIC) in Pkg.Pcds):
                     Packages += [Pkg]
                     break
 
