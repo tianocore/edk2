@@ -89,6 +89,8 @@ MAKEROOT ?= $(EDK_TOOLS_PATH)/Source/C
 LIBS = -lCommon
 '''
 
+variablePattern = re.compile(r'[\t\s]*0[xX][a-fA-F0-9]+$')
+
 ## regular expressions for finding decimal and hex numbers
 Pattern = re.compile('^[1-9]\d*|0$')
 HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
@@ -2415,7 +2417,7 @@ class DscBuildData(PlatformBuildClassObject):
             if VariableOffset.isdigit():
                 if int(VariableOffset, 10) > 0xFFFF:
                     ExceedMax = True
-            elif re.match(r'[\t\s]*0[xX][a-fA-F0-9]+$', VariableOffset):
+            elif variablePattern.match(VariableOffset):
                 if int(VariableOffset, 16) > 0xFFFF:
                     ExceedMax = True
             # For Offset written in "A.B"

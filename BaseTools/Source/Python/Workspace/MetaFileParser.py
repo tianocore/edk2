@@ -35,6 +35,10 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from MetaFileTable import MetaFileStorage
 from MetaFileCommentParser import CheckInfComment
 
+## RegEx for finding file versions
+hexVersionPattern = re.compile(r'0[xX][\da-f-A-F]{5,8}')
+decVersionPattern = re.compile(r'\d+\.\d+')
+
 ## A decorator used to parse macro definition
 def ParseMacro(Parser):
     def MacroParser(self):
@@ -366,9 +370,9 @@ class MetaFileParser(object):
                 EdkLogger.error("Parser", FORMAT_INVALID, "%s not defined" % (Macro), ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
         # Sometimes, we need to make differences between EDK and EDK2 modules 
         if Name == 'INF_VERSION':
-            if re.match(r'0[xX][\da-f-A-F]{5,8}', Value):
+            if hexVersionPattern.match(Value):
                 self._Version = int(Value, 0)   
-            elif re.match(r'\d+\.\d+', Value):
+            elif decVersionPattern.match(Value):
                 ValueList = Value.split('.')
                 Major = '%04o' % int(ValueList[0], 0)
                 Minor = '%04o' % int(ValueList[1], 0)
