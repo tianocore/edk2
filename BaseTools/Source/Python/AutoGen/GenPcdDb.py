@@ -980,7 +980,6 @@ def CreatePcdDatabaseCode (Info, AutoGenC, AutoGenH):
     Changed = SaveFileOnChange(DbFileName, DbFile.getvalue(), True)
 def CreatePcdDataBase(PcdDBData):
     delta = {}
-    basedata = {}
     for skuname,skuid in PcdDBData:
         if len(PcdDBData[(skuname,skuid)][1]) != len(PcdDBData[(TAB_DEFAULT,"0")][1]):
             EdkLogger.ERROR("The size of each sku in one pcd are not same")
@@ -988,7 +987,6 @@ def CreatePcdDataBase(PcdDBData):
         if skuname == TAB_DEFAULT:
             continue
         delta[(skuname,skuid)] = [(index,data,hex(data)) for index,data in enumerate(PcdDBData[(skuname,skuid)][1]) if PcdDBData[(skuname,skuid)][1][index] != PcdDBData[(TAB_DEFAULT,"0")][1][index]]
-        basedata[(skuname,skuid)] = [(index,PcdDBData[(TAB_DEFAULT,"0")][1][index],hex(PcdDBData[(TAB_DEFAULT,"0")][1][index])) for index,data in enumerate(PcdDBData[(skuname,skuid)][1]) if PcdDBData[(skuname,skuid)][1][index] != PcdDBData[(TAB_DEFAULT,"0")][1][index]]
     databasebuff = PcdDBData[(TAB_DEFAULT,"0")][0]
 
     for skuname,skuid in delta:
