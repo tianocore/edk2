@@ -329,7 +329,11 @@ BmAddOptionNumberToOrderVariable (
   This function will register the new Boot####, Driver#### or SysPrep#### option.
   After the *#### is updated, the *Order will also be updated.
 
-  @param  Option            Pointer to load option to add.
+  @param  Option            Pointer to load option to add. If on input
+                            Option->OptionNumber is LoadOptionNumberUnassigned,
+                            then on output Option->OptionNumber is updated to
+                            the number of the new Boot####,
+                            Driver#### or SysPrep#### option.
   @param  Position          Position of the new load option to put in the ****Order variable.
 
   @retval EFI_SUCCESS           The *#### have been successfully registered.
@@ -338,14 +342,14 @@ BmAddOptionNumberToOrderVariable (
                                 Note: this API only adds new load option, no replacement support.
   @retval EFI_OUT_OF_RESOURCES  There is no free option number that can be used when the
                                 option number specified in the Option is LoadOptionNumberUnassigned.
-  @retval EFI_STATUS            Return the status of gRT->SetVariable ().
+  @return                       Status codes of gRT->SetVariable ().
 
 **/
 EFI_STATUS
 EFIAPI
 EfiBootManagerAddLoadOptionVariable (
-  IN EFI_BOOT_MANAGER_LOAD_OPTION *Option,
-  IN UINTN                        Position
+  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION *Option,
+  IN     UINTN                        Position
   )
 {
   EFI_STATUS                      Status;
