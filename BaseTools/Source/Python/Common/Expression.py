@@ -816,7 +816,7 @@ class ValueExpressionEx(ValueExpression):
         except BadExpression, Value:
             if self.PcdType in TAB_PCD_NUMERIC_TYPES:
                 PcdValue = PcdValue.strip()
-                if type(PcdValue) == type('') and PcdValue.startswith('{') and PcdValue.endswith('}'):
+                if PcdValue.startswith('{') and PcdValue.endswith('}'):
                     PcdValue = SplitPcdValueString(PcdValue[1:-1])
                 if type(PcdValue) == type([]):
                     TmpValue = 0
