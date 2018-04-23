@@ -2,7 +2,7 @@
 
   PCI Root Bridge Io Protocol code.
 
-Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -469,6 +469,85 @@ RootBridgeIoGetMemTranslationByAddress (
 }
 
 /**
+  Return the result of (Multiplicand * Multiplier / Divisor).
+
+  @param Multiplicand A 64-bit unsigned value.
+  @param Multiplier   A 64-bit unsigned value.
+  @param Divisor      A 32-bit unsigned value.
+  @param Remainder    A pointer to a 32-bit unsigned value. This parameter is
+                      optional and may be NULL.
+
+  @return Multiplicand * Multiplier / Divisor.
+**/
+UINT64
+MultThenDivU64x64x32 (
+  IN      UINT64                    Multiplicand,
+  IN      UINT64                    Multiplier,
+  IN      UINT32                    Divisor,
+  OUT     UINT32                    *Remainder  OPTIONAL
+  )
+{
+  UINT64                            Uint64;
+  UINT32                            LocalRemainder;
+  UINT32                            Uint32;
+  if (Multiplicand > DivU64x64Remainder (MAX_UINT64, Multiplier, NULL)) {
+    //
+    // Make sure Multiplicand is the bigger one.
+    //
+    if (Multiplicand < Multiplier) {
+      Uint64       = Multiplicand;
+      Multiplicand = Multiplier;
+      Multiplier   = Uint64;
+    }
+    //
+    // Because Multiplicand * Multiplier overflows,
+    //   Multiplicand * Multiplier / Divisor
+    // = (2 * Multiplicand' + 1) * Multiplier / Divisor
+    // = 2 * (Multiplicand' * Multiplier / Divisor) + Multiplier / Divisor
+    //
+    Uint64 = MultThenDivU64x64x32 (RShiftU64 (Multiplicand, 1), Multiplier, Divisor, &LocalRemainder);
+    Uint64 = LShiftU64 (Uint64, 1);
+    Uint32 = 0;
+    if ((Multiplicand & 0x1) == 1) {
+      Uint64 += DivU64x32Remainder (Multiplier, Divisor, &Uint32);
+    }
+    return Uint64 + DivU64x32Remainder (Uint32 + LShiftU64 (LocalRemainder, 1), Divisor, Remainder);
+  } else {
+    return DivU64x32Remainder (MultU64x64 (Multiplicand, Multiplier), Divisor, Remainder);
+  }
+}
+
+/**
+  Return the elapsed tick count from CurrentTick.
+
+  @param  CurrentTick  On input, the previous tick count.
+                       On output, the current tick count.
+  @param  StartTick    The value the performance counter starts with when it
+                       rolls over.
+  @param  EndTick      The value that the performance counter ends with before
+                       it rolls over.
+
+  @return  The elapsed tick count from CurrentTick.
+**/
+UINT64
+GetElapsedTick (
+  UINT64  *CurrentTick,
+  UINT64  StartTick,
+  UINT64  EndTick
+  )
+{
+  UINT64  PreviousTick;
+  
+  PreviousTick = *CurrentTick;
+  *CurrentTick = GetPerformanceCounter();
+  if (StartTick < EndTick) {
+    return *CurrentTick - PreviousTick;
+  } else {
+    return PreviousTick - *CurrentTick;
+  }
+}
+
+/**
   Polls an address in memory mapped I/O space until an exit condition is met,
   or a timeout occurs.
 
@@ -517,6 +596,11 @@ RootBridgeIoPollMem (
   EFI_STATUS  Status;
   UINT64      NumberOfTicks;
   UINT32      Remainder;
+  UINT64      StartTick;
+  UINT64      EndTick;
+  UINT64      CurrentTick;
+  UINT64      ElapsedTick;
+  UINT64      Frequency;
 
   if (Result == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -542,28 +626,18 @@ RootBridgeIoPollMem (
     return EFI_SUCCESS;
 
   } else {
-
     //
-    // Determine the proper # of metronome ticks to wait for polling the
-    // location.  The nuber of ticks is Roundup (Delay /
-    // mMetronome->TickPeriod)+1
-    // The "+1" to account for the possibility of the first tick being short
-    // because we started in the middle of a tick.
+    // NumberOfTicks = Frenquency * Delay / EFI_TIMER_PERIOD_SECONDS(1)
     //
-    // BugBug: overriding mMetronome->TickPeriod with UINT32 until Metronome
-    // protocol definition is updated.
-    //
-    NumberOfTicks = DivU64x32Remainder (Delay, (UINT32) mMetronome->TickPeriod,
-                      &Remainder);
-    if (Remainder != 0) {
-      NumberOfTicks += 1;
+    Frequency     = GetPerformanceCounterProperties (&StartTick, &EndTick);
+    NumberOfTicks = MultThenDivU64x64x32 (Frequency, Delay, (UINT32)EFI_TIMER_PERIOD_SECONDS(1), &Remainder);
+    if (Remainder >= (UINTN)EFI_TIMER_PERIOD_SECONDS(1) / 2) {
+      NumberOfTicks++;
     }
-    NumberOfTicks += 1;
-
-    while (NumberOfTicks != 0) {
-
-      mMetronome->WaitForTick (mMetronome, 1);
-
+    for ( ElapsedTick = 0, CurrentTick = GetPerformanceCounter()
+        ; ElapsedTick <= NumberOfTicks
+        ; ElapsedTick += GetElapsedTick (&CurrentTick, StartTick, EndTick)
+        ) {
       Status = This->Mem.Read (This, Width, Address, 1, Result);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -572,8 +646,6 @@ RootBridgeIoPollMem (
       if ((*Result & Mask) == Value) {
         return EFI_SUCCESS;
       }
-
-      NumberOfTicks -= 1;
     }
   }
   return EFI_TIMEOUT;
@@ -626,6 +698,11 @@ RootBridgeIoPollIo (
   EFI_STATUS  Status;
   UINT64      NumberOfTicks;
   UINT32      Remainder;
+  UINT64      StartTick;
+  UINT64      EndTick;
+  UINT64      CurrentTick;
+  UINT64      ElapsedTick;
+  UINT64      Frequency;
 
   //
   // No matter what, always do a single poll.
@@ -651,25 +728,18 @@ RootBridgeIoPollIo (
     return EFI_SUCCESS;
 
   } else {
-
     //
-    // Determine the proper # of metronome ticks to wait for polling the
-    // location.  The number of ticks is Roundup (Delay /
-    // mMetronome->TickPeriod)+1
-    // The "+1" to account for the possibility of the first tick being short
-    // because we started in the middle of a tick.
+    // NumberOfTicks = Frenquency * Delay / EFI_TIMER_PERIOD_SECONDS(1)
     //
-    NumberOfTicks = DivU64x32Remainder (Delay, (UINT32)mMetronome->TickPeriod,
-                      &Remainder);
-    if (Remainder != 0) {
-      NumberOfTicks += 1;
+    Frequency     = GetPerformanceCounterProperties (&StartTick, &EndTick);
+    NumberOfTicks = MultThenDivU64x64x32 (Frequency, Delay, (UINT32)EFI_TIMER_PERIOD_SECONDS(1), &Remainder);
+    if (Remainder >= (UINTN)EFI_TIMER_PERIOD_SECONDS(1) / 2) {
+      NumberOfTicks++;
     }
-    NumberOfTicks += 1;
-
-    while (NumberOfTicks != 0) {
-
-      mMetronome->WaitForTick (mMetronome, 1);
-
+    for ( ElapsedTick = 0, CurrentTick = GetPerformanceCounter()
+        ; ElapsedTick <= NumberOfTicks
+        ; ElapsedTick += GetElapsedTick (&CurrentTick, StartTick, EndTick)
+        ) {
       Status = This->Io.Read (This, Width, Address, 1, Result);
       if (EFI_ERROR (Status)) {
         return Status;
@@ -678,8 +748,6 @@ RootBridgeIoPollIo (
       if ((*Result & Mask) == Value) {
         return EFI_SUCCESS;
       }
-
-      NumberOfTicks -= 1;
     }
   }
   return EFI_TIMEOUT;

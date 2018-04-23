@@ -2,7 +2,7 @@
 
   Provides the basic interfaces to abstract a PCI Host Bridge Resource Allocation.
 
-Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,8 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciRootBridge.h"
 #include "PciHostResource.h"
 
-
-EFI_METRONOME_ARCH_PROTOCOL *mMetronome;
 EFI_CPU_IO2_PROTOCOL        *mCpuIo;
 
 GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mAcpiAddressSpaceTypeStr[] = {
@@ -406,8 +404,6 @@ InitializePciHostBridge (
     return EFI_UNSUPPORTED;
   }
 
-  Status = gBS->LocateProtocol (&gEfiMetronomeArchProtocolGuid, NULL, (VOID **) &mMetronome);
-  ASSERT_EFI_ERROR (Status);
   Status = gBS->LocateProtocol (&gEfiCpuIo2ProtocolGuid, NULL, (VOID **) &mCpuIo);
   ASSERT_EFI_ERROR (Status);
 

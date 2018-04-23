@@ -2,7 +2,7 @@
 
   The Header file of the Pci Host Bridge Driver.
 
-Copyright (c) 1999 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -268,6 +268,5 @@ GetTranslationByResourceType (
   IN  PCI_RESOURCE_TYPE            ResourceType
   );
 
-extern EFI_METRONOME_ARCH_PROTOCOL *mMetronome;
 extern EFI_CPU_IO2_PROTOCOL        *mCpuIo;
 #endif
