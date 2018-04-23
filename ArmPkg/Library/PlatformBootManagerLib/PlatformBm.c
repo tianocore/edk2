@@ -30,6 +30,7 @@
 #include <Protocol/LoadedImage.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
+#include <Protocol/PlatformBootManager.h>
 #include <Guid/EventGroup.h>
 #include <Guid/TtyTerm.h>
 
@@ -392,6 +393,106 @@ PlatformRegisterFvBootOption (
 
 STATIC
 VOID
+GetPlatformOptions (
+  VOID
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_BOOT_MANAGER_LOAD_OPTION    *CurrentBootOptions;
+  EFI_BOOT_MANAGER_LOAD_OPTION    *BootOptions;
+  EFI_INPUT_KEY                   *BootKeys;
+  PLATFORM_BOOT_MANAGER_PROTOCOL  *PlatformBootManager;
+  UINTN                           CurrentBootOptionCount;
+  UINTN                           Index;
+  UINTN                           BootCount;
+
+  Status = gBS->LocateProtocol (&gPlatformBootManagerProtocolGuid, NULL,
+                  (VOID **)&PlatformBootManager);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+  Status = PlatformBootManager->GetPlatformBootOptionsAndKeys (
+                                  &BootCount,
+                                  &BootOptions,
+                                  &BootKeys
+                                  );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+  //
+  // Fetch the existent boot options. If there are none, CurrentBootCount
+  // will be zeroed.
+  //
+  CurrentBootOptions = EfiBootManagerGetLoadOptions (
+                         &CurrentBootOptionCount,
+                         LoadOptionTypeBoot
+                         );
+  //
+  // Process the platform boot options.
+  //
+  for (Index = 0; Index < BootCount; Index++) {
+    INTN    Match;
+    UINTN   BootOptionNumber;
+
+    //
+    // If there are any preexistent boot options, and the subject platform boot
+    // option is already among them, then don't try to add it. Just get its
+    // assigned boot option number so we can associate a hotkey with it. Note
+    // that EfiBootManagerFindLoadOption() deals fine with (CurrentBootOptions
+    // == NULL) if (CurrentBootCount == 0).
+    //
+    Match = EfiBootManagerFindLoadOption (
+              &BootOptions[Index],
+              CurrentBootOptions,
+              CurrentBootOptionCount
+              );
+    if (Match >= 0) {
+      BootOptionNumber = CurrentBootOptions[Match].OptionNumber;
+    } else {
+      //
+      // Add the platform boot options as a new one, at the end of the boot
+      // order. Note that if the platform provided this boot option with an
+      // unassigned option number, then the below function call will assign a
+      // number.
+      //
+      Status = EfiBootManagerAddLoadOptionVariable (
+                 &BootOptions[Index],
+                 MAX_UINTN
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a: failed to register \"%s\": %r\n",
+          __FUNCTION__, BootOptions[Index].Description, Status));
+        continue;
+      }
+      BootOptionNumber = BootOptions[Index].OptionNumber;
+    }
+
+    //
+    // Register a hotkey with the boot option, if requested.
+    //
+    if (BootKeys[Index].UnicodeChar == L'\0') {
+      continue;
+    }
+
+    Status = EfiBootManagerAddKeyOptionVariable (
+               NULL,
+               BootOptionNumber,
+               0,
+               BootKeys[Index],
+               NULL
+               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: failed to register hotkey for \"%s\": %r\n",
+        __FUNCTION__, BootOptions[Index].Description, Status));
+    }
+  }
+  EfiBootManagerFreeLoadOptions (CurrentBootOptions, CurrentBootOptionCount);
+  EfiBootManagerFreeLoadOptions (BootOptions, BootCount);
+  FreePool (BootKeys);
+}
+
+STATIC
+VOID
 PlatformRegisterOptionsAndKeys (
   VOID
   )
@@ -401,6 +502,8 @@ PlatformRegisterOptionsAndKeys (
   EFI_INPUT_KEY                F2;
   EFI_INPUT_KEY                Esc;
   EFI_BOOT_MANAGER_LOAD_OPTION BootOption;
+
+  GetPlatformOptions ();
 
   //
   // Register ENTER as CONTINUE key
