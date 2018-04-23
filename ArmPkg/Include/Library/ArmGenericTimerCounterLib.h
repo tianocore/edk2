@@ -24,6 +24,12 @@ ArmGenericTimerEnableTimer (
 
 VOID
 EFIAPI
+ArmGenericTimerReenableTimer (
+  VOID
+  );
+
+VOID
+EFIAPI
 ArmGenericTimerDisableTimer (
   VOID
   );
