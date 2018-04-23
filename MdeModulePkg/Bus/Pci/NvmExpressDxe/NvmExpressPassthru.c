@@ -656,6 +656,7 @@ NvmExpressPassThru (
     PhyAddr = (Sq->Prp[0] + EFI_PAGE_SIZE) & ~(EFI_PAGE_SIZE - 1);
     Prp = NvmeCreatePrpList (PciIo, PhyAddr, EFI_SIZE_TO_PAGES(Offset + Bytes) - 1, &PrpListHost, &PrpListNo, &MapPrpList);
     if (Prp == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
       goto EXIT;
     }
 
