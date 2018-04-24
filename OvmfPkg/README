@@ -254,6 +254,94 @@ longer.)
     VirtioNetDxe         |                                        x
     Intel BootUtil (X64) |   x
 
+=== HTTPS Boot ===
+
+HTTPS Boot is an alternative solution to PXE. It replaces the tftp server
+with a HTTPS server so the firmware can download the images through a trusted
+and encrypted connection.
+
+* To enable HTTPS Boot, you have to build OVMF with -D HTTP_BOOT_ENABLE and
+  -D TLS_ENABLE. The former brings in the HTTP stack from NetworkPkg while
+  the latter enables TLS support in both NetworkPkg and CryptoPkg.
+
+* By default, there is no trusted certificate. The user has to import the
+  certificates either manually with "Tls Auth Configuration" utility in the
+  firmware UI or through the fw_cfg entry, etc/edk2/https/cacerts.
+
+  -fw_cfg name=etc/edk2/https/cacerts,file=<certdb>
+
+  The blob for etc/edk2/https/cacerts has to be in the format of Signature
+  Database(*1). You can use p11-kit(*2) or efisiglit(*3) to create the
+  certificate list.
+
+  If you want to create the certificate list based on the CA certificates
+  in your local host, p11-kit will be a good choice. Here is the command to
+  create the list:
+
+  p11-kit extract --format=edk2-cacerts --filter=ca-anchors \
+    --overwrite --purpose=server-auth <certdb>
+
+  If you only want to import one certificate, efisiglist is the tool for you:
+
+  efisiglist -a <cert file> -o <certdb>
+
+  Please note that the certificate has to be in the DER format.
+
+  You can also append a certificate to the existing list with the following
+  command:
+
+  efisiglist -i <old certdb> -a <cert file> -o <new certdb>
+
+  NOTE: You may need the patch to make efisiglist generate the correct header.
+  (https://github.com/rhboot/pesign/pull/40)
+
+* Besides the trusted certificates, it's also possible to configure the trusted
+  cipher suites for HTTPS through another fw_cfg entry: etc/edk2/https/ciphers.
+
+  -fw_cfg name=etc/edk2/https/ciphers,file=<cipher suites>
+
+  OVMF expects a binary UINT16 array which comprises the cipher suites HEX
+  IDs(*4). If the cipher suite list is given, OVMF will choose the cipher
+  suite from the intersection of the given list and the built-in cipher
+  suites. Otherwise, OVMF just chooses whatever proper cipher suites from the
+  built-in ones.
+
+  While the tool(*5) to create the cipher suite array is still under
+  development, the array can be generated with the following script:
+
+  export LC_ALL=C
+  openssl ciphers -V \
+  | sed -r -n \
+     -e 's/^ *0x([0-9A-F]{2}),0x([0-9A-F]{2}) - .*$/\\\\x\1 \\\\x\2/p' \
+  | xargs -r -- printf -- '%b' > ciphers.bin
+
+  This script creates ciphers.bin that contains all the cipher suite IDs
+  supported by openssl according to the local host configuration.
+
+  You may want to enable only a limited set of cipher suites. Then, you
+  should check the validity of your list first:
+
+  openssl ciphers -V <cipher list>
+
+  If all the cipher suites in your list map to the proper HEX IDs, go ahead
+  to modify the script and execute it:
+
+  export LC_ALL=C
+  openssl ciphers -V <cipher list> \
+  | sed -r -n \
+     -e 's/^ *0x([0-9A-F]{2}),0x([0-9A-F]{2}) - .*$/\\\\x\1 \\\\x\2/p' \
+  | xargs -r -- printf -- '%b' > ciphers.bin
+
+* In the future (after release 2.12), QEMU should populate both above fw_cfg
+  files automatically from the local host configuration, and enable the user
+  to override either with dedicated options or properties.
+
+(*1) See "31.4.1 Signature Database" in UEFI specification 2.7 errata A.
+(*2) p11-kit: https://github.com/p11-glue/p11-kit/
+(*3) efisiglist: https://github.com/rhboot/pesign/blob/master/src/efisiglist.c
+(*4) https://wiki.mozilla.org/Security/Server_Side_TLS#Cipher_names_correspondence_table
+(*5) update-crypto-policies: https://gitlab.com/redhat-crypto/fedora-crypto-policies
+
 === OVMF Flash Layout ===
 
 Like all current IA32/X64 system designs, OVMF's firmware device (rom/flash)
