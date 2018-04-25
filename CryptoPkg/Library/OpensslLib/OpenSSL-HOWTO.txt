@@ -18,7 +18,6 @@ on the cryptography.
                              OpenSSL-Version
 =============================================================================
   EDKII supports building with the latest release of OpenSSL.
-  The latest official release is OpenSSL-1.1.0g (Released at 2017-Nov-02).
   NOTE: Only latest release version was fully validated.
         And no guarantees on build & functionality if using other versions.
 
