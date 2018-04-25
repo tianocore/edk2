@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -1261,10 +1261,10 @@ GenerateSoftInit (
   );
 
 /**
-  Do an AllocatePages () of type AllocateMaxAddress for EfiBootServicesCode
-  memory.
+  Allocate memory for legacy usage.
 
-  @param  AllocateType               Allocated Legacy Memory Type
+  @param  AllocateType               The type of allocation to perform.
+  @param  MemoryType                 The type of memory to allocate.
   @param  StartPageAddress           Start address of range
   @param  Pages                      Number of pages to allocate
   @param  Result                     Result of allocation
@@ -1276,6 +1276,7 @@ GenerateSoftInit (
 EFI_STATUS
 AllocateLegacyMemory (
   IN  EFI_ALLOCATE_TYPE         AllocateType,
+  IN  EFI_MEMORY_TYPE           MemoryType,
   IN  EFI_PHYSICAL_ADDRESS      StartPageAddress,
   IN  UINTN                     Pages,
   OUT EFI_PHYSICAL_ADDRESS      *Result

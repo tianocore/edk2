@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -43,10 +43,10 @@ UINTN                 mStructureTablePages     = 0;
 BOOLEAN               mEndOfDxe                = FALSE;
 
 /**
-  Do an AllocatePages () of type AllocateMaxAddress for EfiBootServicesCode
-  memory.
+  Allocate memory for legacy usage.
 
-  @param  AllocateType               Allocated Legacy Memory Type
+  @param  AllocateType               The type of allocation to perform.
+  @param  MemoryType                 The type of memory to allocate.
   @param  StartPageAddress           Start address of range
   @param  Pages                      Number of pages to allocate
   @param  Result                     Result of allocation
@@ -58,6 +58,7 @@ BOOLEAN               mEndOfDxe                = FALSE;
 EFI_STATUS
 AllocateLegacyMemory (
   IN  EFI_ALLOCATE_TYPE         AllocateType,
+  IN  EFI_MEMORY_TYPE           MemoryType,
   IN  EFI_PHYSICAL_ADDRESS      StartPageAddress,
   IN  UINTN                     Pages,
   OUT EFI_PHYSICAL_ADDRESS      *Result
@@ -72,7 +73,7 @@ AllocateLegacyMemory (
   MemPage = (EFI_PHYSICAL_ADDRESS) (UINTN) StartPageAddress;
   Status = gBS->AllocatePages (
                   AllocateType,
-                  EfiBootServicesCode,
+                  MemoryType,
                   Pages,
                   &MemPage
                   );
@@ -974,6 +975,7 @@ LegacyBiosInstall (
   //
   AllocateLegacyMemory (
     AllocateAddress,
+    EfiReservedMemoryType,
     0,
     1,
     &MemoryAddress
@@ -999,6 +1001,7 @@ LegacyBiosInstall (
 
   Status = AllocateLegacyMemory (
              AllocateAddress,
+             EfiReservedMemoryType,
              CONVENTIONAL_MEMORY_TOP - MemorySize,
              EFI_SIZE_TO_PAGES (MemorySize),
              &MemoryAddress
@@ -1027,6 +1030,7 @@ LegacyBiosInstall (
   for (MemStart = MemoryAddress; MemStart < MemoryAddress + MemorySize; MemStart += 0x1000) {
     Status = AllocateLegacyMemory (
                AllocateAddress,
+               EfiBootServicesCode,
                MemStart,
                1,
                &StartAddress
@@ -1046,6 +1050,7 @@ LegacyBiosInstall (
   ASSERT ((MemorySize & 0xFFF) == 0);  
   Status = AllocateLegacyMemory (
              AllocateMaxAddress,
+             EfiBootServicesCode,
              CONVENTIONAL_MEMORY_TOP,
              EFI_SIZE_TO_PAGES (MemorySize),
              &MemoryAddressUnder1MB
@@ -1059,6 +1064,7 @@ LegacyBiosInstall (
   //
   Status = AllocateLegacyMemory (
              AllocateMaxAddress,
+             EfiReservedMemoryType,
              CONVENTIONAL_MEMORY_TOP,
              (sizeof (LOW_MEMORY_THUNK) / EFI_PAGE_SIZE) + 2,
              &MemoryAddress
@@ -1086,6 +1092,7 @@ LegacyBiosInstall (
   //   
   Status = AllocateLegacyMemory (
              AllocateMaxAddress,
+             EfiBootServicesCode,
              0x1000000,
              EFI_SIZE_TO_PAGES (MemorySize),
              &MemoryAddress
@@ -1096,6 +1103,7 @@ LegacyBiosInstall (
     //   
     Status = AllocateLegacyMemory (
                AllocateMaxAddress,
+               EfiBootServicesCode,
                0xFFFFFFFF,
                EFI_SIZE_TO_PAGES (MemorySize),
                &MemoryAddress
