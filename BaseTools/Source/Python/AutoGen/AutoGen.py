@@ -3915,7 +3915,7 @@ class ModuleAutoGen(AutoGen):
             return
 
         # Skip the following code for modules without any binary files
-        if not self.BinaryFileList:
+        if self.BinaryFileList:
             return
             
         ### TODO: How to handles mixed source and binary modules
