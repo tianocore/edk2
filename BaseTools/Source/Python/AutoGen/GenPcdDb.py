@@ -1217,7 +1217,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
         Pcd.InitString = 'UNINIT'
 
         if Pcd.DatumType == TAB_VOID:
-            if Pcd.Type not in ["DynamicVpd", "DynamicExVpd"]:
+            if Pcd.Type not in [TAB_PCDS_DYNAMIC_VPD, TAB_PCDS_DYNAMIC_EX_VPD]:
                 Pcd.TokenTypeList = ['PCD_TYPE_STRING']
             else:
                 Pcd.TokenTypeList = []

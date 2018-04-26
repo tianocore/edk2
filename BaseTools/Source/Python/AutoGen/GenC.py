@@ -28,8 +28,8 @@ from IdfClassObject import *
 
 ## PCD type string
 gItemTypeStringDatabase  = {
-    TAB_PCDS_FEATURE_FLAG       :   'FixedAtBuild',
-    TAB_PCDS_FIXED_AT_BUILD     :   'FixedAtBuild',
+    TAB_PCDS_FEATURE_FLAG       :   TAB_PCDS_FIXED_AT_BUILD,
+    TAB_PCDS_FIXED_AT_BUILD     :   TAB_PCDS_FIXED_AT_BUILD,
     TAB_PCDS_PATCHABLE_IN_MODULE:   'BinaryPatch',
     TAB_PCDS_DYNAMIC            :   '',
     TAB_PCDS_DYNAMIC_DEFAULT    :   '',

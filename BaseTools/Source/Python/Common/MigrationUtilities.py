@@ -34,7 +34,7 @@ def SetCommon(Common, XmlCommon):
     XmlTag = "Usage"
     Common.Usage = XmlAttribute(XmlCommon, XmlTag).split()
 
-    XmlTag = "FeatureFlag"
+    XmlTag = TAB_PCDS_FEATURE_FLAG
     Common.FeatureFlag = XmlAttribute(XmlCommon, XmlTag)
     
     XmlTag = "SupArchList"

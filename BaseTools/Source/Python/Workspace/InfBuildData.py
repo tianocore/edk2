@@ -28,17 +28,17 @@ from Workspace.BuildClassObject import ModuleBuildClassObject, LibraryClassObjec
 class InfBuildData(ModuleBuildClassObject):
     # dict used to convert PCD type in database to string used by build tool
     _PCD_TYPE_STRING_ = {
-        MODEL_PCD_FIXED_AT_BUILD        :   "FixedAtBuild",
-        MODEL_PCD_PATCHABLE_IN_MODULE   :   "PatchableInModule",
-        MODEL_PCD_FEATURE_FLAG          :   "FeatureFlag",
-        MODEL_PCD_DYNAMIC               :   "Dynamic",
-        MODEL_PCD_DYNAMIC_DEFAULT       :   "Dynamic",
-        MODEL_PCD_DYNAMIC_HII           :   "DynamicHii",
-        MODEL_PCD_DYNAMIC_VPD           :   "DynamicVpd",
-        MODEL_PCD_DYNAMIC_EX            :   "DynamicEx",
-        MODEL_PCD_DYNAMIC_EX_DEFAULT    :   "DynamicEx",
-        MODEL_PCD_DYNAMIC_EX_HII        :   "DynamicExHii",
-        MODEL_PCD_DYNAMIC_EX_VPD        :   "DynamicExVpd",
+        MODEL_PCD_FIXED_AT_BUILD        :   TAB_PCDS_FIXED_AT_BUILD,
+        MODEL_PCD_PATCHABLE_IN_MODULE   :   TAB_PCDS_PATCHABLE_IN_MODULE,
+        MODEL_PCD_FEATURE_FLAG          :   TAB_PCDS_FEATURE_FLAG,
+        MODEL_PCD_DYNAMIC               :   TAB_PCDS_DYNAMIC,
+        MODEL_PCD_DYNAMIC_DEFAULT       :   TAB_PCDS_DYNAMIC,
+        MODEL_PCD_DYNAMIC_HII           :   TAB_PCDS_DYNAMIC_HII,
+        MODEL_PCD_DYNAMIC_VPD           :   TAB_PCDS_DYNAMIC_VPD,
+        MODEL_PCD_DYNAMIC_EX            :   TAB_PCDS_DYNAMIC_EX,
+        MODEL_PCD_DYNAMIC_EX_DEFAULT    :   TAB_PCDS_DYNAMIC_EX,
+        MODEL_PCD_DYNAMIC_EX_HII        :   TAB_PCDS_DYNAMIC_EX_HII,
+        MODEL_PCD_DYNAMIC_EX_VPD        :   TAB_PCDS_DYNAMIC_EX_VPD,
     }
 
     # dict used to convert part of [Defines] to members of InfBuildData directly
@@ -1026,13 +1026,13 @@ class InfBuildData(ModuleBuildClassObject):
                 # if platform doesn't give its type, use 'lowest' one in the
                 # following order, if any
                 #
-                #   "FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"
+                #   TAB_PCDS_FIXED_AT_BUILD, TAB_PCDS_PATCHABLE_IN_MODULE, TAB_PCDS_FEATURE_FLAG, TAB_PCDS_DYNAMIC, TAB_PCDS_DYNAMIC_EX
                 #
                 _GuidDict.update(Package.Guids)
                 PcdType = self._PCD_TYPE_STRING_[Type]
                 if Type == MODEL_PCD_DYNAMIC:
                     Pcd.Pending = True
-                    for T in ["FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"]:
+                    for T in PCD_TYPE_LIST:
                         if (PcdRealName, TokenSpaceGuid) in GlobalData.MixedPcd:
                             for item in GlobalData.MixedPcd[(PcdRealName, TokenSpaceGuid)]:
                                 if str(item[0]).endswith(T) and (item[0], item[1], T) in Package.Pcds:

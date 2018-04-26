@@ -249,7 +249,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
             Pcd = InfPcds[PcdKey]
             if not hasattr(Pcd, 'Offset'):
                 continue
-            if Pcd.Type != 'PatchableInModule':
+            if Pcd.Type != TAB_PCDS_PATCHABLE_IN_MODULE:
                 continue
             # Override Patchable PCD value by the value from DSC
             PatchPcd = None

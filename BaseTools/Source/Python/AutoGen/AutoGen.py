@@ -869,8 +869,8 @@ class WorkspaceAutoGen(AutoGen):
     def _CheckPcdDefineAndType(self):
         PcdTypeList = [
             TAB_PCDS_FIXED_AT_BUILD, TAB_PCDS_PATCHABLE_IN_MODULE, TAB_PCDS_FEATURE_FLAG,
-            TAB_PCDS_DYNAMIC, #"DynamicHii", "DynamicVpd",
-            TAB_PCDS_DYNAMIC_EX, # "DynamicExHii", "DynamicExVpd"
+            TAB_PCDS_DYNAMIC, #TAB_PCDS_DYNAMIC_HII, TAB_PCDS_DYNAMIC_VPD,
+            TAB_PCDS_DYNAMIC_EX, # TAB_PCDS_DYNAMIC_EX_HII, TAB_PCDS_DYNAMIC_EX_VPD
         ]
 
         # This dict store PCDs which are not used by any modules with specified arches

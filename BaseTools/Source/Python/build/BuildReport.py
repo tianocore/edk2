@@ -94,15 +94,15 @@ gSubSectionSep = "-" * gLineMaxLength
 
 ## The look up table to map PCD type to pair of report display type and DEC type
 gPcdTypeMap = {
-  'FixedAtBuild'     : ('FIXED',  'FixedAtBuild'),
-  'PatchableInModule': ('PATCH',  'PatchableInModule'),
-  'FeatureFlag'      : ('FLAG',   'FeatureFlag'),
-  'Dynamic'          : ('DYN',    'Dynamic'),
-  'DynamicHii'       : ('DYNHII', 'Dynamic'),
-  'DynamicVpd'       : ('DYNVPD', 'Dynamic'),
-  'DynamicEx'        : ('DEX',    'DynamicEx'),
-  'DynamicExHii'     : ('DEXHII', 'DynamicEx'),
-  'DynamicExVpd'     : ('DEXVPD', 'DynamicEx'),
+  TAB_PCDS_FIXED_AT_BUILD     : ('FIXED',  TAB_PCDS_FIXED_AT_BUILD),
+  TAB_PCDS_PATCHABLE_IN_MODULE: ('PATCH',  TAB_PCDS_PATCHABLE_IN_MODULE),
+  TAB_PCDS_FEATURE_FLAG       : ('FLAG',   TAB_PCDS_FEATURE_FLAG),
+  TAB_PCDS_DYNAMIC            : ('DYN',    TAB_PCDS_DYNAMIC),
+  TAB_PCDS_DYNAMIC_HII        : ('DYNHII', TAB_PCDS_DYNAMIC),
+  TAB_PCDS_DYNAMIC_VPD        : ('DYNVPD', TAB_PCDS_DYNAMIC),
+  TAB_PCDS_DYNAMIC_EX         : ('DEX',    TAB_PCDS_DYNAMIC_EX),
+  TAB_PCDS_DYNAMIC_EX_HII     : ('DEXHII', TAB_PCDS_DYNAMIC_EX),
+  TAB_PCDS_DYNAMIC_EX_VPD     : ('DEXVPD', TAB_PCDS_DYNAMIC_EX),
   }
 
 ## The look up table to map module type to driver type
@@ -784,7 +784,7 @@ class PcdReport(object):
                 Pcd = Pa.Platform.Pcds[item]
                 if not Pcd.Type:
                     # check the Pcd in FDF file, whether it is used in module first
-                    for T in ["FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"]:
+                    for T in PCD_TYPE_LIST:
                         PcdList = self.AllPcds.setdefault(Pcd.TokenSpaceGuidCName, {}).setdefault(T, [])
                         if Pcd in PcdList:
                             Pcd.Type = T
@@ -792,7 +792,7 @@ class PcdReport(object):
                 if not Pcd.Type:
                     PcdTypeFlag = False
                     for package in Pa.PackageList:
-                        for T in ["FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"]:
+                        for T in PCD_TYPE_LIST:
                             if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, T) in package.Pcds:
                                 Pcd.Type = T
                                 PcdTypeFlag = True
@@ -804,10 +804,10 @@ class PcdReport(object):
                 if not Pcd.DatumType:
                     PcdType = Pcd.Type
                     # Try to remove Hii and Vpd suffix
-                    if PcdType.startswith("DynamicEx"):
-                        PcdType = "DynamicEx"
-                    elif PcdType.startswith("Dynamic"):
-                        PcdType = "Dynamic"
+                    if PcdType.startswith(TAB_PCDS_DYNAMIC_EX):
+                        PcdType = TAB_PCDS_DYNAMIC_EX
+                    elif PcdType.startswith(TAB_PCDS_DYNAMIC):
+                        PcdType = TAB_PCDS_DYNAMIC
                     for package in Pa.PackageList:
                         if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, PcdType) in package.Pcds:
                             Pcd.DatumType = package.Pcds[(Pcd.TokenCName, Pcd.TokenSpaceGuidCName, PcdType)].DatumType
