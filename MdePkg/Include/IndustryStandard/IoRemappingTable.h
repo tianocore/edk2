@@ -4,6 +4,7 @@
   http://infocenter.arm.com/help/topic/com.arm.doc.den0049c/DEN0049C_IO_Remapping_Table.pdf
 
   Copyright (c) 2017, Linaro Limited. All rights reserved.<BR>
+  Copyright (c) 2018, ARM Limited. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -53,6 +54,11 @@
 
 #define EFI_ACPI_IORT_SMMUv3_FLAG_COHAC_OVERRIDE    BIT0
 #define EFI_ACPI_IORT_SMMUv3_FLAG_HTTU_OVERRIDE     BIT1
+#define EFI_ACPI_IORT_SMMUv3_FLAG_PROXIMITY_DOMAIN  BIT3
+
+#define EFI_ACPI_IORT_SMMUv3_MODEL_GENERIC          0x0
+#define EFI_ACPI_IORT_SMMUv3_MODEL_HISILICON_HI161X 0x1
+#define EFI_ACPI_IORT_SMMUv3_MODEL_CAVIUM_CN99XX    0x2
 
 #define EFI_ACPI_IORT_ROOT_COMPLEX_ATS_UNSUPPORTED  0x0
 #define EFI_ACPI_IORT_ROOT_COMPLEX_ATS_SUPPORTED    0x1
@@ -165,7 +171,7 @@ typedef struct {
 } EFI_ACPI_6_0_IO_REMAPPING_SMMU_NODE;
 
 ///
-/// Node type 4: SMMUv4 node
+/// Node type 4: SMMUv3 node
 ///
 typedef struct {
   EFI_ACPI_6_0_IO_REMAPPING_NODE          Node;
@@ -179,6 +185,9 @@ typedef struct {
   UINT32                                  Pri;
   UINT32                                  Gerr;
   UINT32                                  Sync;
+  UINT8                                   ProximityDomain;
+  UINT8                                   Reserved1[3];
+  UINT32                                  DeviceIdMappingIndex;
 } EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE;
 
 ///
