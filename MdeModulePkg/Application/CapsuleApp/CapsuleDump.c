@@ -1,7 +1,7 @@
 /** @file
   Dump Capsule image information.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -242,6 +242,7 @@ DumpCapsule (
   EFI_CAPSULE_HEADER                            *CapsuleHeader;
   EFI_STATUS                                    Status;
 
+  Buffer = NULL;
   Status = ReadFileToBuffer(CapsuleName, &FileSize, &Buffer);
   if (EFI_ERROR(Status)) {
     Print(L"CapsuleApp: Capsule (%s) is not found.\n", CapsuleName);
@@ -269,7 +270,9 @@ DumpCapsule (
   }
 
 Done:
-  FreePool(Buffer);
+  if (Buffer != NULL) {
+    FreePool(Buffer);
+  }
   return Status;
 }
 
