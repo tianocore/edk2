@@ -28,6 +28,7 @@ from Common.BuildToolError import *
 from FvImageSection import FvImageSection
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from GenFds import FindExtendTool
+from Common.DataType import *
 
 ## generate GUIDed section
 #
@@ -121,7 +122,7 @@ class GuidSection(GuidSectionClassObject) :
         OutputFile = OutputPath + \
                      os.sep + \
                      ModuleName + \
-                     'SEC' + \
+                     SUP_MODULE_SEC + \
                      SecNum + \
                      Ffs.SectionSuffix['GUIDED']
         OutputFile = os.path.normpath(OutputFile)
@@ -156,7 +157,7 @@ class GuidSection(GuidSectionClassObject) :
             TempFile = OutputPath + \
                        os.sep + \
                        ModuleName + \
-                       'SEC' + \
+                       SUP_MODULE_SEC + \
                        SecNum + \
                        '.tmp'
             TempFile = os.path.normpath(TempFile)

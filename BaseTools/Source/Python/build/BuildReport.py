@@ -48,18 +48,18 @@ import collections
 from Common.Expression import *
 
 gComponentType2ModuleType = {
-    "LIBRARY"               :   "BASE",
-    "SECURITY_CORE"         :   "SEC",
-    "PEI_CORE"              :   "PEI_CORE",
-    "COMBINED_PEIM_DRIVER"  :   "PEIM",
-    "PIC_PEIM"              :   "PEIM",
-    "RELOCATABLE_PEIM"      :   "PEIM",
-    "PE32_PEIM"             :   "PEIM",
-    "BS_DRIVER"             :   "DXE_DRIVER",
-    "RT_DRIVER"             :   "DXE_RUNTIME_DRIVER",
-    "SAL_RT_DRIVER"         :   "DXE_SAL_DRIVER",
-    "APPLICATION"           :   "UEFI_APPLICATION",
-    "LOGO"                  :   "BASE",
+    "LIBRARY"               :   SUP_MODULE_BASE,
+    "SECURITY_CORE"         :   SUP_MODULE_SEC,
+    SUP_MODULE_PEI_CORE     :   SUP_MODULE_PEI_CORE,
+    "COMBINED_PEIM_DRIVER"  :   SUP_MODULE_PEIM,
+    "PIC_PEIM"              :   SUP_MODULE_PEIM,
+    "RELOCATABLE_PEIM"      :   SUP_MODULE_PEIM,
+    "PE32_PEIM"             :   SUP_MODULE_PEIM,
+    "BS_DRIVER"             :   SUP_MODULE_DXE_DRIVER,
+    "RT_DRIVER"             :   SUP_MODULE_DXE_RUNTIME_DRIVER,
+    "SAL_RT_DRIVER"         :   SUP_MODULE_DXE_SAL_DRIVER,
+    "APPLICATION"           :   SUP_MODULE_UEFI_APPLICATION,
+    "LOGO"                  :   SUP_MODULE_BASE,
 }
 
 ## Pattern to extract contents in EDK DXS files
@@ -122,20 +122,20 @@ gPcdTypeMap = {
 
 ## The look up table to map module type to driver type
 gDriverTypeMap = {
-  'SEC'               : '0x3 (SECURITY_CORE)',
-  'PEI_CORE'          : '0x4 (PEI_CORE)',
-  'PEIM'              : '0x6 (PEIM)',
-  'DXE_CORE'          : '0x5 (DXE_CORE)',
-  'DXE_DRIVER'        : '0x7 (DRIVER)',
-  'DXE_SAL_DRIVER'    : '0x7 (DRIVER)',
-  'DXE_SMM_DRIVER'    : '0x7 (DRIVER)',
-  'DXE_RUNTIME_DRIVER': '0x7 (DRIVER)',
-  'UEFI_DRIVER'       : '0x7 (DRIVER)',
-  'UEFI_APPLICATION'  : '0x9 (APPLICATION)',
-  'SMM_CORE'          : '0xD (SMM_CORE)',
+  SUP_MODULE_SEC               : '0x3 (SECURITY_CORE)',
+  SUP_MODULE_PEI_CORE          : '0x4 (PEI_CORE)',
+  SUP_MODULE_PEIM              : '0x6 (PEIM)',
+  SUP_MODULE_DXE_CORE          : '0x5 (DXE_CORE)',
+  SUP_MODULE_DXE_DRIVER        : '0x7 (DRIVER)',
+  SUP_MODULE_DXE_SAL_DRIVER    : '0x7 (DRIVER)',
+  SUP_MODULE_DXE_SMM_DRIVER    : '0x7 (DRIVER)',
+  SUP_MODULE_DXE_RUNTIME_DRIVER: '0x7 (DRIVER)',
+  SUP_MODULE_UEFI_DRIVER       : '0x7 (DRIVER)',
+  SUP_MODULE_UEFI_APPLICATION  : '0x9 (APPLICATION)',
+  SUP_MODULE_SMM_CORE          : '0xD (SMM_CORE)',
   'SMM_DRIVER'        : '0xA (SMM)', # Extension of module type to support PI 1.1 SMM drivers
-  'MM_STANDALONE'     : '0xE (MM_STANDALONE)',
-  'MM_CORE_STANDALONE' : '0xF (MM_CORE_STANDALONE)'
+  SUP_MODULE_MM_STANDALONE     : '0xE (MM_STANDALONE)',
+  SUP_MODULE_MM_CORE_STANDALONE : '0xF (MM_CORE_STANDALONE)'
   }
 
 ## The look up table of the supported opcode in the dependency expression binaries
@@ -424,7 +424,7 @@ class DepexReport(object):
         if not ModuleType:
             ModuleType = gComponentType2ModuleType.get(M.ComponentType, "")
 
-        if ModuleType in ["SEC", "PEI_CORE", "DXE_CORE", "SMM_CORE", "MM_CORE_STANDALONE", "UEFI_APPLICATION"]:
+        if ModuleType in [SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_DXE_CORE, SUP_MODULE_SMM_CORE, SUP_MODULE_MM_CORE_STANDALONE, SUP_MODULE_UEFI_APPLICATION]:
             return
       
         for Source in M.SourceFileList:
@@ -591,7 +591,7 @@ class ModuleReport(object):
             #
             # If a module complies to PI 1.1, promote Module type to "SMM_DRIVER"
             #
-            if ModuleType == "DXE_SMM_DRIVER":
+            if ModuleType == SUP_MODULE_DXE_SMM_DRIVER:
                 PiSpec = M.Module.Specification.get("PI_SPECIFICATION_VERSION", "0x00010000")
                 if int(PiSpec, 0) >= 0x0001000A:
                     ModuleType = "SMM_DRIVER"
@@ -1382,7 +1382,7 @@ class PredictionReport(object):
                 # their source code to find PPI/Protocol produce or consume
                 # information.
                 #
-                if Module.ModuleType == "BASE":
+                if Module.ModuleType == SUP_MODULE_BASE:
                     continue
                 #
                 # Add module referenced source files

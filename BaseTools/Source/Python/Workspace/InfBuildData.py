@@ -68,22 +68,22 @@ class InfBuildData(ModuleBuildClassObject):
 
     # dict used to convert Component type to Module type
     _MODULE_TYPE_ = {
-        "LIBRARY"               :   "BASE",
-        "SECURITY_CORE"         :   "SEC",
-        "PEI_CORE"              :   "PEI_CORE",
-        "COMBINED_PEIM_DRIVER"  :   "PEIM",
-        "PIC_PEIM"              :   "PEIM",
-        "RELOCATABLE_PEIM"      :   "PEIM",
-        "PE32_PEIM"             :   "PEIM",
-        "BS_DRIVER"             :   "DXE_DRIVER",
-        "RT_DRIVER"             :   "DXE_RUNTIME_DRIVER",
-        "SAL_RT_DRIVER"         :   "DXE_SAL_DRIVER",
-        "DXE_SMM_DRIVER"        :   "DXE_SMM_DRIVER",
-    #    "SMM_DRIVER"            :   "DXE_SMM_DRIVER",
-    #    "BS_DRIVER"             :   "DXE_SMM_DRIVER",
-    #    "BS_DRIVER"             :   "UEFI_DRIVER",
-        "APPLICATION"           :   "UEFI_APPLICATION",
-        "LOGO"                  :   "BASE",
+        "LIBRARY"               :   SUP_MODULE_BASE,
+        "SECURITY_CORE"         :   SUP_MODULE_SEC,
+        SUP_MODULE_PEI_CORE              :   SUP_MODULE_PEI_CORE,
+        "COMBINED_PEIM_DRIVER"  :   SUP_MODULE_PEIM,
+        "PIC_PEIM"              :   SUP_MODULE_PEIM,
+        "RELOCATABLE_PEIM"      :   SUP_MODULE_PEIM,
+        "PE32_PEIM"             :   SUP_MODULE_PEIM,
+        "BS_DRIVER"             :   SUP_MODULE_DXE_DRIVER,
+        "RT_DRIVER"             :   SUP_MODULE_DXE_RUNTIME_DRIVER,
+        "SAL_RT_DRIVER"         :   SUP_MODULE_DXE_SAL_DRIVER,
+        SUP_MODULE_DXE_SMM_DRIVER        :   SUP_MODULE_DXE_SMM_DRIVER,
+    #    "SMM_DRIVER"            :   SUP_MODULE_DXE_SMM_DRIVER,
+    #    "BS_DRIVER"             :   SUP_MODULE_DXE_SMM_DRIVER,
+    #    "BS_DRIVER"             :   SUP_MODULE_UEFI_DRIVER,
+        "APPLICATION"           :   SUP_MODULE_UEFI_APPLICATION,
+        "LOGO"                  :   SUP_MODULE_BASE,
     }
 
     # regular expression for converting XXX_FLAGS in [nmake] section to new type
@@ -461,9 +461,9 @@ class InfBuildData(ModuleBuildClassObject):
             if self._Header_ is None:
                 self._GetHeaderInfo()
             if self._ModuleType is None:
-                self._ModuleType = 'BASE'
+                self._ModuleType = SUP_MODULE_BASE
             if self._ModuleType not in SUP_MODULE_LIST:
-                self._ModuleType = "USER_DEFINED"
+                self._ModuleType = SUP_MODULE_USER_DEFINED
         return self._ModuleType
 
     ## Retrieve COMPONENT_TYPE
@@ -472,7 +472,7 @@ class InfBuildData(ModuleBuildClassObject):
             if self._Header_ is None:
                 self._GetHeaderInfo()
             if self._ComponentType is None:
-                self._ComponentType = 'USER_DEFINED'
+                self._ComponentType = SUP_MODULE_USER_DEFINED
         return self._ComponentType
 
     ## Retrieve "BUILD_TYPE"
@@ -481,7 +481,7 @@ class InfBuildData(ModuleBuildClassObject):
             if self._Header_ is None:
                 self._GetHeaderInfo()
             if not self._BuildType:
-                self._BuildType = "BASE"
+                self._BuildType = SUP_MODULE_BASE
         return self._BuildType
 
     ## Retrieve file guid
@@ -899,14 +899,14 @@ class InfBuildData(ModuleBuildClassObject):
 
             # PEIM and DXE drivers must have a valid [Depex] section
             if len(self.LibraryClass) == 0 and len(RecordList) == 0:
-                if self.ModuleType == 'DXE_DRIVER' or self.ModuleType == 'PEIM' or self.ModuleType == 'DXE_SMM_DRIVER' or \
-                    self.ModuleType == 'DXE_SAL_DRIVER' or self.ModuleType == 'DXE_RUNTIME_DRIVER':
+                if self.ModuleType == SUP_MODULE_DXE_DRIVER or self.ModuleType == SUP_MODULE_PEIM or self.ModuleType == SUP_MODULE_DXE_SMM_DRIVER or \
+                    self.ModuleType == SUP_MODULE_DXE_SAL_DRIVER or self.ModuleType == SUP_MODULE_DXE_RUNTIME_DRIVER:
                     EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, "No [Depex] section or no valid expression in [Depex] section for [%s] module" \
                                     % self.ModuleType, File=self.MetaFile)
 
-            if len(RecordList) != 0 and self.ModuleType == 'USER_DEFINED':
+            if len(RecordList) != 0 and self.ModuleType == SUP_MODULE_USER_DEFINED:
                 for Record in RecordList:
-                    if Record[4] not in ['PEIM', 'DXE_DRIVER', 'DXE_SMM_DRIVER']:
+                    if Record[4] not in [SUP_MODULE_PEIM, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_SMM_DRIVER]:
                         EdkLogger.error('build', FORMAT_INVALID,
                                         "'%s' module must specify the type of [Depex] section" % self.ModuleType,
                                         File=self.MetaFile)

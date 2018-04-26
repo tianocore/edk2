@@ -1430,7 +1430,7 @@ class PlatformAutoGen(AutoGen):
                     # used by DXE module, it should be stored in DXE PCD database.
                     # The default Phase is DXE
                     #
-                    if M.ModuleType in ["PEIM", "PEI_CORE"]:
+                    if M.ModuleType in [SUP_MODULE_PEIM, SUP_MODULE_PEI_CORE]:
                         PcdFromModule.Phase = "PEI"
                     if PcdFromModule not in self._DynaPcdList_:
                         self._DynaPcdList_.append(PcdFromModule)
@@ -1472,7 +1472,7 @@ class PlatformAutoGen(AutoGen):
                     # make sure that the "VOID*" kind of datum has MaxDatumSize set
                     if PcdFromModule.DatumType == TAB_VOID and PcdFromModule.MaxDatumSize in [None, '']:
                         NoDatumTypePcdList.add("%s.%s [%s]" % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, InfName))
-                    if M.ModuleType in ["PEIM", "PEI_CORE"]:
+                    if M.ModuleType in [SUP_MODULE_PEIM, SUP_MODULE_PEI_CORE]:
                         PcdFromModule.Phase = "PEI"
                     if PcdFromModule not in self._DynaPcdList_ and PcdFromModule.Type in GenC.gDynamicExPcd:
                         self._DynaPcdList_.append(PcdFromModule)
@@ -2203,7 +2203,7 @@ class PlatformAutoGen(AutoGen):
                         LibraryModule.LibraryClass.append(LibraryClassObject(LibraryClassName, [ModuleType]))
                     elif LibraryModule.LibraryClass is None \
                          or len(LibraryModule.LibraryClass) == 0 \
-                         or (ModuleType != 'USER_DEFINED'
+                         or (ModuleType != SUP_MODULE_USER_DEFINED
                              and ModuleType not in LibraryModule.LibraryClass[0].SupModList):
                         # only USER_DEFINED can link against any library instance despite of its SupModList
                         EdkLogger.error("build", OPTION_MISSING,
@@ -3969,8 +3969,8 @@ class ModuleAutoGen(AutoGen):
                     break
 
         ModuleType = self.ModuleType
-        if ModuleType == 'UEFI_DRIVER' and self.DepexGenerated:
-            ModuleType = 'DXE_DRIVER'
+        if ModuleType == SUP_MODULE_UEFI_DRIVER and self.DepexGenerated:
+            ModuleType = SUP_MODULE_DXE_DRIVER
 
         DriverType = ''
         if self.PcdIsDriver != '':
@@ -4047,11 +4047,11 @@ class ModuleAutoGen(AutoGen):
                 AsBuiltInfDict['binary_item'] += ['BIN|' + File]
         if self.DepexGenerated:
             self.OutputFile.add(self.Name + '.depex')
-            if self.ModuleType in ['PEIM']:
+            if self.ModuleType in [SUP_MODULE_PEIM]:
                 AsBuiltInfDict['binary_item'] += ['PEI_DEPEX|' + self.Name + '.depex']
-            if self.ModuleType in ['DXE_DRIVER', 'DXE_RUNTIME_DRIVER', 'DXE_SAL_DRIVER', 'UEFI_DRIVER']:
+            if self.ModuleType in [SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_UEFI_DRIVER]:
                 AsBuiltInfDict['binary_item'] += ['DXE_DEPEX|' + self.Name + '.depex']
-            if self.ModuleType in ['DXE_SMM_DRIVER']:
+            if self.ModuleType in [SUP_MODULE_DXE_SMM_DRIVER]:
                 AsBuiltInfDict['binary_item'] += ['SMM_DEPEX|' + self.Name + '.depex']
 
         Bin = self._GenOffsetBin()
@@ -4377,8 +4377,8 @@ class ModuleAutoGen(AutoGen):
             return
 
         for ModuleType in self.DepexList:
-            # Ignore empty [depex] section or [depex] section for "USER_DEFINED" module
-            if len(self.DepexList[ModuleType]) == 0 or ModuleType == "USER_DEFINED":
+            # Ignore empty [depex] section or [depex] section for SUP_MODULE_USER_DEFINED module
+            if len(self.DepexList[ModuleType]) == 0 or ModuleType == SUP_MODULE_USER_DEFINED:
                 continue
 
             Dpx = GenDepex.DependencyExpression(self.DepexList[ModuleType], ModuleType, True)

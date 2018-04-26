@@ -134,7 +134,7 @@ def _GetModuleLibraryInstances(Module, Platform, BuildDatabase, Arch, Target, To
                     LibraryModule.LibraryClass.append(LibraryClassObject(LibraryClassName, [ModuleType]))
                 elif LibraryModule.LibraryClass is None \
                      or len(LibraryModule.LibraryClass) == 0 \
-                     or (ModuleType != 'USER_DEFINED'
+                     or (ModuleType != SUP_MODULE_USER_DEFINED
                          and ModuleType not in LibraryModule.LibraryClass[0].SupModList):
                     # only USER_DEFINED can link against any library instance despite of its SupModList
                     return []

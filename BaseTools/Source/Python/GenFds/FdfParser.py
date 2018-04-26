@@ -2626,7 +2626,7 @@ class FdfParser:
     #
     @staticmethod
     def __FileCouldHaveRelocFlag (FileType):
-        if FileType in ('SEC', 'PEI_CORE', 'PEIM', 'PEI_DXE_COMBO'):
+        if FileType in (SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM, 'PEI_DXE_COMBO'):
             return True
         else:
             return False
@@ -3626,12 +3626,12 @@ class FdfParser:
 
         if not self.__GetNextWord():
             raise Warning("expected Module type", self.FileName, self.CurrentLineNumber)
-        if self.__Token.upper() not in ("SEC", "PEI_CORE", "PEIM", "DXE_CORE", \
-                             "DXE_DRIVER", "DXE_SAL_DRIVER", \
-                             "DXE_SMM_DRIVER", "DXE_RUNTIME_DRIVER", \
-                             "UEFI_DRIVER", "UEFI_APPLICATION", "USER_DEFINED", "DEFAULT", "BASE", \
+        if self.__Token.upper() not in (SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM, SUP_MODULE_DXE_CORE, \
+                             SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, \
+                             SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER, \
+                             SUP_MODULE_UEFI_DRIVER, SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_USER_DEFINED, "DEFAULT", SUP_MODULE_BASE, \
                              "SECURITY_CORE", "COMBINED_PEIM_DRIVER", "PIC_PEIM", "RELOCATABLE_PEIM", \
-                                        "PE32_PEIM", "BS_DRIVER", "RT_DRIVER", "SAL_RT_DRIVER", "APPLICATION", "ACPITABLE", "SMM_CORE", "MM_STANDALONE", "MM_CORE_STANDALONE"):
+                                        "PE32_PEIM", "BS_DRIVER", "RT_DRIVER", "SAL_RT_DRIVER", "APPLICATION", "ACPITABLE", SUP_MODULE_SMM_CORE, SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE):
             raise Warning("Unknown Module type '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
         return self.__Token
 
@@ -3673,8 +3673,8 @@ class FdfParser:
             raise Warning("expected FFS type", self.FileName, self.CurrentLineNumber)
 
         Type = self.__Token.strip().upper()
-        if Type not in ("RAW", "FREEFORM", "SEC", "PEI_CORE", "PEIM",\
-                             "PEI_DXE_COMBO", "DRIVER", "DXE_CORE", "APPLICATION", "FV_IMAGE", "SMM", "SMM_CORE", "MM_STANDALONE", "MM_CORE_STANDALONE"):
+        if Type not in ("RAW", "FREEFORM", SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM,\
+                             "PEI_DXE_COMBO", "DRIVER", SUP_MODULE_DXE_CORE, "APPLICATION", "FV_IMAGE", "SMM", SUP_MODULE_SMM_CORE, SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE):
             raise Warning("Unknown FV type '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
 
         if not self.__IsToken("="):

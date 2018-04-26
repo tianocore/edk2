@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define checkpoints used by ECC tool
 #
-# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -744,7 +744,7 @@ class Check(object):
                         if Item not in LibraryClasses[List[0]]:
                             LibraryClasses[List[0]].append(Item)
 
-                if Record[2] != 'BASE' and Record[2] not in SupModType:
+                if Record[2] != DT.SUP_MODULE_BASE and Record[2] not in SupModType:
                     EccGlobalData.gDb.TblReport.Insert(ERROR_META_DATA_FILE_CHECK_LIBRARY_INSTANCE_2, OtherMsg="The Library Class '%s' does not specify its supported module types" % (List[0]), BelongsToTable='Inf', BelongsToItem=Record[0])
 
             SqlCommand = """select A.ID, A.Value1, B.Value3 from Inf as A left join Inf as B
@@ -763,7 +763,7 @@ class Check(object):
 
             for Record in RecordSet:
                 if Record[1] in LibraryClasses:
-                    if Record[2] not in LibraryClasses[Record[1]] and 'BASE' not in RecordDict[Record[1]]:
+                    if Record[2] not in LibraryClasses[Record[1]] and DT.SUP_MODULE_BASE not in RecordDict[Record[1]]:
                         if not EccGlobalData.gException.IsException(ERROR_META_DATA_FILE_CHECK_LIBRARY_INSTANCE_1, Record[1]):
                             EccGlobalData.gDb.TblReport.Insert(ERROR_META_DATA_FILE_CHECK_LIBRARY_INSTANCE_1, OtherMsg="The type of Library Class [%s] defined in Inf file does not match the type of the module" % (Record[1]), BelongsToTable='Inf', BelongsToItem=Record[0])
                 else:

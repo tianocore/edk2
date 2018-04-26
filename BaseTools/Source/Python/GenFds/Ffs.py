@@ -16,6 +16,7 @@
 # Import Modules
 #
 from CommonDataClass.FdfClass import FDClassObject
+from Common.DataType import *
 
 ## generate FFS
 #
@@ -24,27 +25,27 @@ class Ffs(FDClassObject):
     
     # mapping between MODULE type in FDF (from INF) and file type for GenFfs
     ModuleTypeToFileType = {
-        'SEC'               : 'EFI_FV_FILETYPE_SECURITY_CORE',
-        'PEI_CORE'          : 'EFI_FV_FILETYPE_PEI_CORE',
-        'PEIM'              : 'EFI_FV_FILETYPE_PEIM',
-        'DXE_CORE'          : 'EFI_FV_FILETYPE_DXE_CORE',
-        'DXE_DRIVER'        : 'EFI_FV_FILETYPE_DRIVER',
-        'DXE_SAL_DRIVER'    : 'EFI_FV_FILETYPE_DRIVER',
-        'DXE_SMM_DRIVER'    : 'EFI_FV_FILETYPE_DRIVER',
-        'DXE_RUNTIME_DRIVER': 'EFI_FV_FILETYPE_DRIVER',
-        'UEFI_DRIVER'       : 'EFI_FV_FILETYPE_DRIVER',
-        'UEFI_APPLICATION'  : 'EFI_FV_FILETYPE_APPLICATION',
-        'SMM_CORE'          : 'EFI_FV_FILETYPE_SMM_CORE',
-        'MM_STANDALONE'     : 'EFI_FV_FILETYPE_MM_STANDALONE',
-        'MM_CORE_STANDALONE' : 'EFI_FV_FILETYPE_MM_CORE_STANDALONE'
+        SUP_MODULE_SEC               : 'EFI_FV_FILETYPE_SECURITY_CORE',
+        SUP_MODULE_PEI_CORE          : 'EFI_FV_FILETYPE_PEI_CORE',
+        SUP_MODULE_PEIM              : 'EFI_FV_FILETYPE_PEIM',
+        SUP_MODULE_DXE_CORE          : 'EFI_FV_FILETYPE_DXE_CORE',
+        SUP_MODULE_DXE_DRIVER        : 'EFI_FV_FILETYPE_DRIVER',
+        SUP_MODULE_DXE_SAL_DRIVER    : 'EFI_FV_FILETYPE_DRIVER',
+        SUP_MODULE_DXE_SMM_DRIVER    : 'EFI_FV_FILETYPE_DRIVER',
+        SUP_MODULE_DXE_RUNTIME_DRIVER: 'EFI_FV_FILETYPE_DRIVER',
+        SUP_MODULE_UEFI_DRIVER       : 'EFI_FV_FILETYPE_DRIVER',
+        SUP_MODULE_UEFI_APPLICATION  : 'EFI_FV_FILETYPE_APPLICATION',
+        SUP_MODULE_SMM_CORE          : 'EFI_FV_FILETYPE_SMM_CORE',
+        SUP_MODULE_MM_STANDALONE     : 'EFI_FV_FILETYPE_MM_STANDALONE',
+        SUP_MODULE_MM_CORE_STANDALONE : 'EFI_FV_FILETYPE_MM_CORE_STANDALONE'
     }
     
     # mapping between FILE type in FDF and file type for GenFfs
     FdfFvFileTypeToFileType = {
-        'SEC'               : 'EFI_FV_FILETYPE_SECURITY_CORE',
-        'PEI_CORE'          : 'EFI_FV_FILETYPE_PEI_CORE',
-        'PEIM'              : 'EFI_FV_FILETYPE_PEIM',
-        'DXE_CORE'          : 'EFI_FV_FILETYPE_DXE_CORE',
+        SUP_MODULE_SEC               : 'EFI_FV_FILETYPE_SECURITY_CORE',
+        SUP_MODULE_PEI_CORE          : 'EFI_FV_FILETYPE_PEI_CORE',
+        SUP_MODULE_PEIM              : 'EFI_FV_FILETYPE_PEIM',
+        SUP_MODULE_DXE_CORE          : 'EFI_FV_FILETYPE_DXE_CORE',
         'FREEFORM'          : 'EFI_FV_FILETYPE_FREEFORM',
         'DRIVER'            : 'EFI_FV_FILETYPE_DRIVER',
         'APPLICATION'       : 'EFI_FV_FILETYPE_APPLICATION',
@@ -52,9 +53,9 @@ class Ffs(FDClassObject):
         'RAW'               : 'EFI_FV_FILETYPE_RAW',
         'PEI_DXE_COMBO'     : 'EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER',
         'SMM'               : 'EFI_FV_FILETYPE_SMM',
-        'SMM_CORE'          : 'EFI_FV_FILETYPE_SMM_CORE',
-        'MM_STANDALONE'     : 'EFI_FV_FILETYPE_MM_STANDALONE',
-        'MM_CORE_STANDALONE' : 'EFI_FV_FILETYPE_MM_CORE_STANDALONE'
+        SUP_MODULE_SMM_CORE          : 'EFI_FV_FILETYPE_SMM_CORE',
+        SUP_MODULE_MM_STANDALONE     : 'EFI_FV_FILETYPE_MM_STANDALONE',
+        SUP_MODULE_MM_CORE_STANDALONE : 'EFI_FV_FILETYPE_MM_CORE_STANDALONE'
     }
     
     # mapping between section type in FDF and file suffix

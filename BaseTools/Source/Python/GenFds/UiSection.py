@@ -22,6 +22,7 @@ import Common.LongFilePathOs as os
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import UiSectionClassObject
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.DataType import SUP_MODULE_SEC
 
 ## generate UI section
 #
@@ -57,7 +58,7 @@ class UiSection (UiSectionClassObject):
             self.StringData = FfsInf.__ExtendMacro__(self.StringData)
             self.FileName = FfsInf.__ExtendMacro__(self.FileName)
 
-        OutputFile = os.path.join(OutputPath, ModuleName + 'SEC' + SecNum + Ffs.SectionSuffix.get('UI'))
+        OutputFile = os.path.join(OutputPath, ModuleName + SUP_MODULE_SEC + SecNum + Ffs.SectionSuffix.get('UI'))
 
         if self.StringData is not None :
             NameString = self.StringData

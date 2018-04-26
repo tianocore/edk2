@@ -1,7 +1,7 @@
 ## @file
 # process data section generation
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -23,6 +23,7 @@ import Common.LongFilePathOs as os
 from CommonDataClass.FdfClass import DataSectionClassObject
 from Common.Misc import PeImageClass
 from Common.LongFilePathSupport import CopyLongFilePath
+from Common.DataType import *
 
 ## generate data section
 #
@@ -119,7 +120,7 @@ class DataSection (DataSectionClassObject):
                 )
             self.SectFileName = TeFile
 
-        OutputFile = os.path.join (OutputPath, ModuleName + 'SEC' + SecNum + Ffs.SectionSuffix.get(self.SecType))
+        OutputFile = os.path.join (OutputPath, ModuleName + SUP_MODULE_SEC + SecNum + Ffs.SectionSuffix.get(self.SecType))
         OutputFile = os.path.normpath(OutputFile)
         GenFdsGlobalVariable.GenerateSection(OutputFile, [self.SectFileName], Section.Section.SectionType.get(self.SecType), IsMakefile = IsMakefile)
         FileList = [OutputFile]

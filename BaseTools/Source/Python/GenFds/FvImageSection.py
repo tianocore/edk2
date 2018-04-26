@@ -24,6 +24,7 @@ import Common.LongFilePathOs as os
 from CommonDataClass.FdfClass import FvImageSectionClassObject
 from Common import EdkLogger
 from Common.BuildToolError import *
+from Common.DataType import *
 
 ## generate FV image section
 #
@@ -74,7 +75,7 @@ class FvImageSection(FvImageSectionClassObject):
                 if FvAlignmentValue > MaxFvAlignment:
                     MaxFvAlignment = FvAlignmentValue
 
-                OutputFile = os.path.join(OutputPath, ModuleName + 'SEC' + Num + Ffs.SectionSuffix.get("FV_IMAGE"))
+                OutputFile = os.path.join(OutputPath, ModuleName + SUP_MODULE_SEC + Num + Ffs.SectionSuffix.get("FV_IMAGE"))
                 GenFdsGlobalVariable.GenerateSection(OutputFile, [FvFileName], 'EFI_SECTION_FIRMWARE_VOLUME_IMAGE', IsMakefile=IsMakefile)
                 OutputFileList.append(OutputFile)
 
@@ -138,7 +139,7 @@ class FvImageSection(FvImageSectionClassObject):
             #
             # Prepare the parameter of GenSection
             #
-            OutputFile = os.path.join(OutputPath, ModuleName + 'SEC' + SecNum + Ffs.SectionSuffix.get("FV_IMAGE"))
+            OutputFile = os.path.join(OutputPath, ModuleName + SUP_MODULE_SEC + SecNum + Ffs.SectionSuffix.get("FV_IMAGE"))
             GenFdsGlobalVariable.GenerateSection(OutputFile, [FvFileName], 'EFI_SECTION_FIRMWARE_VOLUME_IMAGE', IsMakefile=IsMakefile)
             OutputFileList.append(OutputFile)
 

@@ -25,6 +25,7 @@ from AutoGen.GenDepex import DependencyExpression
 from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.Misc import PathClass
+from Common.DataType import *
 
 ## generate data section
 #
@@ -94,24 +95,24 @@ class DepexSection (DepexSectionClassObject):
             self.ExpressionProcessed = True
 
         if self.DepexType == 'PEI_DEPEX_EXP':
-            ModuleType = 'PEIM'
+            ModuleType = SUP_MODULE_PEIM
             SecType    = 'PEI_DEPEX'
         elif self.DepexType == 'DXE_DEPEX_EXP':
-            ModuleType = 'DXE_DRIVER'
+            ModuleType = SUP_MODULE_DXE_DRIVER
             SecType    = 'DXE_DEPEX'
         elif self.DepexType == 'SMM_DEPEX_EXP':
-            ModuleType = 'DXE_SMM_DRIVER'
+            ModuleType = SUP_MODULE_DXE_SMM_DRIVER
             SecType    = 'SMM_DEPEX'
         else:
             EdkLogger.error("GenFds", FORMAT_INVALID,
                             "Depex type %s is not valid for module %s" % (self.DepexType, ModuleName))
 
-        InputFile = os.path.join (OutputPath, ModuleName + 'SEC' + SecNum + '.depex')
+        InputFile = os.path.join (OutputPath, ModuleName + SUP_MODULE_SEC + SecNum + '.depex')
         InputFile = os.path.normpath(InputFile)
         Depex = DependencyExpression(self.Expression, ModuleType)
         Depex.Generate(InputFile)
 
-        OutputFile = os.path.join (OutputPath, ModuleName + 'SEC' + SecNum + '.dpx')
+        OutputFile = os.path.join (OutputPath, ModuleName + SUP_MODULE_SEC + SecNum + '.dpx')
         OutputFile = os.path.normpath(OutputFile)
 
         GenFdsGlobalVariable.GenerateSection(OutputFile, [InputFile], Section.Section.SectionType.get (SecType), IsMakefile=IsMakefile)

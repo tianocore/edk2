@@ -21,6 +21,7 @@ import subprocess
 import Common.LongFilePathOs as os
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import CompressSectionClassObject
+from Common.DataType import *
 
 ## generate compress section
 #
@@ -82,7 +83,7 @@ class CompressSection (CompressSectionClassObject) :
         OutputFile = OutputPath + \
                      os.sep     + \
                      ModuleName + \
-                     'SEC'      + \
+                     SUP_MODULE_SEC      + \
                      SecNum     + \
                      Ffs.SectionSuffix['COMPRESS']
         OutputFile = os.path.normpath(OutputFile)
