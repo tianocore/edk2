@@ -1,7 +1,7 @@
 /** @file
-  ACPI IO Remapping Table (IORT) as specified in ARM spec DEN0049C
+  ACPI IO Remapping Table (IORT) as specified in ARM spec DEN0049D
 
-  http://infocenter.arm.com/help/topic/com.arm.doc.den0049c/DEN0049C_IO_Remapping_Table.pdf
+  http://infocenter.arm.com/help/topic/com.arm.doc.den0049d/DEN0049D_IO_Remapping_Table.pdf
 
   Copyright (c) 2017, Linaro Limited. All rights reserved.<BR>
   Copyright (c) 2018, ARM Limited. All rights reserved.<BR>
@@ -123,6 +123,8 @@ typedef struct {
 
   UINT32                                  AtsAttribute;
   UINT32                                  PciSegmentNumber;
+  UINT8                                   MemoryAddressSize;
+  UINT8                                   Reserved1[3];
 } EFI_ACPI_6_0_IO_REMAPPING_RC_NODE;
 
 ///
@@ -185,8 +187,7 @@ typedef struct {
   UINT32                                  Pri;
   UINT32                                  Gerr;
   UINT32                                  Sync;
-  UINT8                                   ProximityDomain;
-  UINT8                                   Reserved1[3];
+  UINT32                                  ProximityDomain;
   UINT32                                  DeviceIdMappingIndex;
 } EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE;
 
@@ -199,6 +200,7 @@ typedef struct {
   UINT64                                  Base;
   UINT32                                  OverflowInterruptGsiv;
   UINT32                                  NodeReference;
+  UINT64                                  Page1Base;
 //EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE      OverflowInterruptMsiMapping[1];
 } EFI_ACPI_6_0_IO_REMAPPING_PMCG_NODE;
 
