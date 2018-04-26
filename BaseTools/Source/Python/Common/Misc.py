@@ -1219,7 +1219,7 @@ class tdict:
 
 def IsFieldValueAnArray (Value):
     Value = Value.strip()
-    if Value.startswith('GUID') and Value.endswith(')'):
+    if Value.startswith(TAB_GUID) and Value.endswith(')'):
         return True
     if Value.startswith('L"') and Value.endswith('"')  and len(list(Value[2:-1])) > 1:
         return True
@@ -1316,7 +1316,7 @@ def ParseFieldValue (Value):
         if Size > 8:
             raise BadExpression('Value (%s) Size larger than %d' % (Value, Size))
         return Value, 8
-    if Value.startswith('GUID') and Value.endswith(')'):
+    if Value.startswith(TAB_GUID) and Value.endswith(')'):
         Value = Value.split('(', 1)[1][:-1].strip()
         if Value[0] == '{' and Value[-1] == '}':
             TmpValue = GuidStructureStringToGuidString(Value)

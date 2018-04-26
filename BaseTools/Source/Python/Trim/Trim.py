@@ -23,6 +23,7 @@ from optparse import OptionParser
 from optparse import make_option
 from Common.BuildToolError import *
 from Common.Misc import *
+from Common.DataType import *
 from Common.BuildVersion import gBUILD_VERSION
 import Common.EdkLogger as EdkLogger
 from Common.LongFilePathSupport import OpenLongFilePath as open
@@ -303,7 +304,7 @@ def TrimPreprocessedVfr(Source, Target):
             FoundTypedef = False
             TypedefEnd = Index
             # keep all "typedef struct" except to GUID, EFI_PLABEL and PAL_CALL_RETURN
-            if Line.strip("} ;\r\n") in ["GUID", "EFI_PLABEL", "PAL_CALL_RETURN"]:
+            if Line.strip("} ;\r\n") in [TAB_GUID, "EFI_PLABEL", "PAL_CALL_RETURN"]:
                 for i in range(TypedefStart, TypedefEnd+1):
                     Lines[i] = "\n"
 

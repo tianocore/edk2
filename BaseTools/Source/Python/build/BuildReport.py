@@ -208,7 +208,7 @@ def FindIncludeFiles(Source, IncludePathList, IncludeFiles):
             FileName = "Protocol/%(Key)s/%(Key)s.h" % {"Key" : Key}
         elif "PPI" in Type:
             FileName = "Ppi/%(Key)s/%(Key)s.h" % {"Key" : Key}
-        elif "GUID" in Type:
+        elif TAB_GUID in Type:
             FileName = "Guid/%(Key)s/%(Key)s.h" % {"Key" : Key}
         else:
             continue
@@ -1410,7 +1410,7 @@ class PredictionReport(object):
         if Wa.FdfProfile:
             for Fd in Wa.FdfProfile.FdDict:
                 for FdRegion in Wa.FdfProfile.FdDict[Fd].RegionList:
-                    if FdRegion.RegionType != "FV":
+                    if FdRegion.RegionType != BINARY_FILE_TYPE_FV:
                         continue
                     for FvName in FdRegion.RegionDataList:
                         if FvName in self._FvList:
@@ -1686,7 +1686,7 @@ class FdRegionReport(object):
         # If the input FdRegion is not a firmware volume,
         # we are done.
         #
-        if self.Type != "FV":
+        if self.Type != BINARY_FILE_TYPE_FV:
             return
 
         #
@@ -1780,7 +1780,7 @@ class FdRegionReport(object):
         FileWrite(File, "Type:               %s" % Type)
         FileWrite(File, "Base Address:       0x%X" % BaseAddress)
 
-        if self.Type == "FV":
+        if self.Type == BINARY_FILE_TYPE_FV:
             FvTotalSize = 0
             FvTakenSize = 0
             FvFreeSize  = 0
@@ -1843,7 +1843,7 @@ class FdRegionReport(object):
         if (len(self.FvList) > 0):
             for FvItem in self.FvList:
                 Info = self.FvInfo[FvItem]
-                self._GenerateReport(File, Info[0], "FV", Info[1], Info[2], FvItem)
+                self._GenerateReport(File, Info[0], TAB_FV_DIRECTORY, Info[1], Info[2], FvItem)
         else:
             self._GenerateReport(File, "FD Region", self.Type, self.BaseAddress, self.Size)
 
@@ -1869,7 +1869,7 @@ class FdReport(object):
         self.BaseAddress = Fd.BaseAddress
         self.Size = Fd.Size
         self.FdRegionList = [FdRegionReport(FdRegion, Wa) for FdRegion in Fd.RegionList]
-        self.FvPath = os.path.join(Wa.BuildDir, "FV")
+        self.FvPath = os.path.join(Wa.BuildDir, TAB_FV_DIRECTORY)
         self.VpdFilePath = os.path.join(self.FvPath, "%s.map" % Wa.Platform.VpdToolGuid)
         self.VPDBaseAddress = 0
         self.VPDSize = 0

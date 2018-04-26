@@ -1843,7 +1843,7 @@ class FdfParser:
         if not self.__GetNextWord():
             return True
 
-        if not self.__Token in ("SET", "FV", "FILE", "DATA", "CAPSULE", "INF"):
+        if not self.__Token in ("SET", BINARY_FILE_TYPE_FV, "FILE", "DATA", "CAPSULE", "INF"):
             #
             # If next token is a word which is not a valid FV type, it might be part of [PcdOffset[|PcdSize]]
             # Or it might be next region's offset described by an expression which starts with a PCD.
@@ -1874,7 +1874,7 @@ class FdfParser:
             if not self.__GetNextWord():
                 return True
 
-        elif self.__Token == "FV":
+        elif self.__Token == BINARY_FILE_TYPE_FV:
             self.__UndoToken()
             self.__GetRegionFvType( RegionObj)
 
@@ -1918,8 +1918,8 @@ class FdfParser:
     #
     def __GetRegionFvType(self, RegionObj):
 
-        if not self.__IsKeyword( "FV"):
-            raise Warning("expected Keyword 'FV'", self.FileName, self.CurrentLineNumber)
+        if not self.__IsKeyword( BINARY_FILE_TYPE_FV):
+            raise Warning("expected Keyword BINARY_FILE_TYPE_FV", self.FileName, self.CurrentLineNumber)
 
         if not self.__IsToken( "="):
             raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
@@ -1927,10 +1927,10 @@ class FdfParser:
         if not self.__GetNextToken():
             raise Warning("expected FV name", self.FileName, self.CurrentLineNumber)
 
-        RegionObj.RegionType = "FV"
+        RegionObj.RegionType = BINARY_FILE_TYPE_FV
         RegionObj.RegionDataList.append((self.__Token).upper())
 
-        while self.__IsKeyword( "FV"):
+        while self.__IsKeyword( BINARY_FILE_TYPE_FV):
 
             if not self.__IsToken( "="):
                 raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
@@ -2528,7 +2528,7 @@ class FdfParser:
             if self.__GetStringData():
                 FfsInfObj.Version = self.__Token
 
-        if self.__IsKeyword( "UI"):
+        if self.__IsKeyword( BINARY_FILE_TYPE_UI):
             if not self.__IsToken( "="):
                 raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
             if not self.__GetNextToken():
@@ -2641,7 +2641,7 @@ class FdfParser:
     #
     @staticmethod
     def __SectionCouldHaveRelocFlag (SectionType):
-        if SectionType in ('TE', 'PE32'):
+        if SectionType in (BINARY_FILE_TYPE_TE, BINARY_FILE_TYPE_PE32):
             return True
         else:
             return False
@@ -2674,7 +2674,7 @@ class FdfParser:
         if not self.__GetNextToken():
             raise Warning("expected File name or section data", self.FileName, self.CurrentLineNumber)
 
-        if self.__Token == "FV":
+        if self.__Token == BINARY_FILE_TYPE_FV:
             if not self.__IsToken( "="):
                 raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
             if not self.__GetNextToken():
@@ -2881,7 +2881,7 @@ class FdfParser:
                 VerSectionObj.FileName = self.__Token
             Obj.SectionList.append(VerSectionObj)
             
-        elif self.__IsKeyword( "UI"):
+        elif self.__IsKeyword( BINARY_FILE_TYPE_UI):
             if AlignValue == 'Auto':
                 raise Warning("Auto alignment can only be used in PE32 or TE section ", self.FileName, self.CurrentLineNumber)
             if not self.__IsToken( "="):
@@ -2965,10 +2965,10 @@ class FdfParser:
                 self.SetFileBufferPos(OldPos)
                 return False
 
-            if self.__Token not in ("COMPAT16", "PE32", "PIC", "TE", "FV_IMAGE", "RAW", "DXE_DEPEX",\
-                               "UI", "VERSION", "PEI_DEPEX", "SUBTYPE_GUID", "SMM_DEPEX"):
+            if self.__Token not in ("COMPAT16", BINARY_FILE_TYPE_PE32, BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,\
+                               BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, "SUBTYPE_GUID", BINARY_FILE_TYPE_SMM_DEPEX):
                 raise Warning("Unknown section type '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
-            if AlignValue == 'Auto'and (not self.__Token == 'PE32') and (not self.__Token == 'TE'):
+            if AlignValue == 'Auto'and (not self.__Token == BINARY_FILE_TYPE_PE32) and (not self.__Token == BINARY_FILE_TYPE_TE):
                 raise Warning("Auto alignment can only be used in PE32 or TE section ", self.FileName, self.CurrentLineNumber)
 
             # DataSection
@@ -3386,7 +3386,7 @@ class FdfParser:
     #
     def __GetFvStatement(self, CapsuleObj, FMPCapsule = False):
 
-        if not self.__IsKeyword("FV"):
+        if not self.__IsKeyword(BINARY_FILE_TYPE_FV):
             return False
 
         if not self.__IsToken("="):
@@ -3534,7 +3534,7 @@ class FdfParser:
         AfileBaseName = os.path.basename(AfileName)
         
         if os.path.splitext(AfileBaseName)[1]  not in [".bin",".BIN",".Bin",".dat",".DAT",".Dat",".data",".DATA",".Data"]:
-            raise Warning('invalid binary file type, should be one of "bin","BIN","Bin","dat","DAT","Dat","data","DATA","Data"', \
+            raise Warning('invalid binary file type, should be one of "bin",BINARY_FILE_TYPE_BIN,"Bin","dat","DAT","Dat","data","DATA","Data"', \
                           self.FileName, self.CurrentLineNumber)
         
         if not os.path.isabs(AfileName):
@@ -3767,8 +3767,8 @@ class FdfParser:
 
             SectionName = self.__Token
 
-            if SectionName not in ("COMPAT16", "PE32", "PIC", "TE", "FV_IMAGE", "RAW", "DXE_DEPEX",\
-                                    "UI", "PEI_DEPEX", "VERSION", "SUBTYPE_GUID", "SMM_DEPEX"):
+            if SectionName not in ("COMPAT16", BINARY_FILE_TYPE_PE32, BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,\
+                                    BINARY_FILE_TYPE_UI, BINARY_FILE_TYPE_PEI_DEPEX, "VERSION", "SUBTYPE_GUID", BINARY_FILE_TYPE_SMM_DEPEX):
                 raise Warning("Unknown leaf section name '%s'" % SectionName, self.FileName, self.CurrentLineNumber)
 
 
@@ -3783,7 +3783,7 @@ class FdfParser:
                 if self.__Token not in ("Auto", "8", "16", "32", "64", "128", "512", "1K", "4K", "32K" ,"64K", "128K",
                                         "256K", "512K", "1M", "2M", "4M", "8M", "16M"):
                     raise Warning("Incorrect alignment '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
-                if self.__Token == 'Auto' and (not SectionName == 'PE32') and (not SectionName == 'TE'):
+                if self.__Token == 'Auto' and (not SectionName == BINARY_FILE_TYPE_PE32) and (not SectionName == BINARY_FILE_TYPE_TE):
                     raise Warning("Auto alignment can only be used in PE32 or TE section ", self.FileName, self.CurrentLineNumber)
                 SectAlignment = self.__Token
 
@@ -3824,8 +3824,8 @@ class FdfParser:
             return False
         SectionName = self.__Token
 
-        if SectionName not in ("COMPAT16", "PE32", "PIC", "TE", "FV_IMAGE", "RAW", "DXE_DEPEX",\
-                               "UI", "VERSION", "PEI_DEPEX", "GUID", "SMM_DEPEX"):
+        if SectionName not in ("COMPAT16", BINARY_FILE_TYPE_PE32, BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,\
+                               BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, BINARY_FILE_TYPE_GUID, BINARY_FILE_TYPE_SMM_DEPEX):
             self.__UndoToken()
             return False
 
@@ -3855,8 +3855,8 @@ class FdfParser:
                 FvImageSectionObj.FvName = None
 
             else:
-                if not self.__IsKeyword("FV"):
-                    raise Warning("expected 'FV'", self.FileName, self.CurrentLineNumber)
+                if not self.__IsKeyword(BINARY_FILE_TYPE_FV):
+                    raise Warning("expected BINARY_FILE_TYPE_FV", self.FileName, self.CurrentLineNumber)
                 FvImageSectionObj.FvFileType = self.__Token
 
                 if self.__GetAlignment():
@@ -3868,8 +3868,8 @@ class FdfParser:
                 if self.__IsToken('|'):
                     FvImageSectionObj.FvFileExtension = self.__GetFileExtension()
                 elif self.__GetNextToken():
-                    if self.__Token not in ("}", "COMPAT16", "PE32", "PIC", "TE", "FV_IMAGE", "RAW", "DXE_DEPEX",\
-                               "UI", "VERSION", "PEI_DEPEX", "GUID", "SMM_DEPEX"):
+                    if self.__Token not in ("}", "COMPAT16", BINARY_FILE_TYPE_PE32, BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,\
+                               BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, BINARY_FILE_TYPE_GUID, BINARY_FILE_TYPE_SMM_DEPEX):
                         FvImageSectionObj.FvFileName = self.__Token
                     else:
                         self.__UndoToken()
@@ -3931,7 +3931,7 @@ class FdfParser:
             if self.__Token not in ("Auto", "8", "16", "32", "64", "128", "512", "1K", "4K", "32K" ,"64K", "128K",
                                     "256K", "512K", "1M", "2M", "4M", "8M", "16M"):
                 raise Warning("Incorrect alignment '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
-            if self.__Token == 'Auto' and (not SectionName == 'PE32') and (not SectionName == 'TE'):
+            if self.__Token == 'Auto' and (not SectionName == BINARY_FILE_TYPE_PE32) and (not SectionName == BINARY_FILE_TYPE_TE):
                 raise Warning("Auto alignment can only be used in PE32 or TE section ", self.FileName, self.CurrentLineNumber)
             EfiSectionObj.Alignment = self.__Token
 
@@ -3950,8 +3950,8 @@ class FdfParser:
         if self.__IsToken('|'):
             EfiSectionObj.FileExtension = self.__GetFileExtension()
         elif self.__GetNextToken():
-            if self.__Token not in ("}", "COMPAT16", "PE32", "PIC", "TE", "FV_IMAGE", "RAW", "DXE_DEPEX",\
-                       "UI", "VERSION", "PEI_DEPEX", "GUID", "SMM_DEPEX"):
+            if self.__Token not in ("}", "COMPAT16", BINARY_FILE_TYPE_PE32, BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,\
+                       BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, BINARY_FILE_TYPE_GUID, BINARY_FILE_TYPE_SMM_DEPEX):
                 
                 if self.__Token.startswith('PCD'):
                     self.__UndoToken()
@@ -3985,7 +3985,7 @@ class FdfParser:
     #
     @staticmethod
     def __RuleSectionCouldBeOptional(SectionType):
-        if SectionType in ("DXE_DEPEX", "UI", "VERSION", "PEI_DEPEX", "RAW", "SMM_DEPEX"):
+        if SectionType in (BINARY_FILE_TYPE_DXE_DEPEX, BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, "RAW", BINARY_FILE_TYPE_SMM_DEPEX):
             return True
         else:
             return False
@@ -4015,7 +4015,7 @@ class FdfParser:
     #
     @staticmethod
     def __RuleSectionCouldHaveString(SectionType):
-        if SectionType in ("UI", "VERSION"):
+        if SectionType in (BINARY_FILE_TYPE_UI, "VERSION"):
             return True
         else:
             return False
@@ -4032,32 +4032,32 @@ class FdfParser:
         if SectionType == "COMPAT16":
             if FileType not in ("COMPAT16", "SEC_COMPAT16"):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
-        elif SectionType == "PE32":
-            if FileType not in ("PE32", "SEC_PE32"):
+        elif SectionType == BINARY_FILE_TYPE_PE32:
+            if FileType not in (BINARY_FILE_TYPE_PE32, "SEC_PE32"):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
-        elif SectionType == "PIC":
-            if FileType not in ("PIC", "PIC"):
+        elif SectionType == BINARY_FILE_TYPE_PIC:
+            if FileType not in (BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_PIC):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
-        elif SectionType == "TE":
-            if FileType not in ("TE", "SEC_TE"):
+        elif SectionType == BINARY_FILE_TYPE_TE:
+            if FileType not in (BINARY_FILE_TYPE_TE, "SEC_TE"):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == "RAW":
-            if FileType not in ("BIN", "SEC_BIN", "RAW", "ASL", "ACPI"):
+            if FileType not in (BINARY_FILE_TYPE_BIN, "SEC_BIN", "RAW", "ASL", "ACPI"):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
-        elif SectionType == "DXE_DEPEX" or SectionType == "SMM_DEPEX":
-            if FileType not in ("DXE_DEPEX", "SEC_DXE_DEPEX", "SMM_DEPEX"):
+        elif SectionType == BINARY_FILE_TYPE_DXE_DEPEX or SectionType == BINARY_FILE_TYPE_SMM_DEPEX:
+            if FileType not in (BINARY_FILE_TYPE_DXE_DEPEX, "SEC_DXE_DEPEX", BINARY_FILE_TYPE_SMM_DEPEX):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
-        elif SectionType == "UI":
-            if FileType not in ("UI", "SEC_UI"):
+        elif SectionType == BINARY_FILE_TYPE_UI:
+            if FileType not in (BINARY_FILE_TYPE_UI, "SEC_UI"):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == "VERSION":
             if FileType not in ("VERSION", "SEC_VERSION"):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
-        elif SectionType == "PEI_DEPEX":
-            if FileType not in ("PEI_DEPEX", "SEC_PEI_DEPEX"):
+        elif SectionType == BINARY_FILE_TYPE_PEI_DEPEX:
+            if FileType not in (BINARY_FILE_TYPE_PEI_DEPEX, "SEC_PEI_DEPEX"):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
-        elif SectionType == "GUID":
-            if FileType not in ("PE32", "SEC_GUID"):
+        elif SectionType == BINARY_FILE_TYPE_GUID:
+            if FileType not in (BINARY_FILE_TYPE_PE32, "SEC_GUID"):
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
 
     ## __GetRuleEncapsulationSection() method
@@ -4494,7 +4494,7 @@ class FdfParser:
 
         FfsFileObj = OptRomFileStatement.OptRomFileStatement()
 
-        if not self.__IsKeyword("EFI") and not self.__IsKeyword("BIN"):
+        if not self.__IsKeyword("EFI") and not self.__IsKeyword(BINARY_FILE_TYPE_BIN):
             raise Warning("expected Binary type (EFI/BIN)", self.FileName, self.CurrentLineNumber)
         FfsFileObj.FileType = self.__Token
 
@@ -4575,7 +4575,7 @@ class FdfParser:
         if FdName.upper() in self.Profile.FdDict:
             FdObj = self.Profile.FdDict[FdName.upper()]
             for elementRegion in FdObj.RegionList:
-                if elementRegion.RegionType == 'FV':
+                if elementRegion.RegionType == BINARY_FILE_TYPE_FV:
                     for elementRegionData in elementRegion.RegionDataList:
                         if elementRegionData.endswith(".fv"):
                             continue

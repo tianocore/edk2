@@ -288,7 +288,7 @@ class GenFdsGlobalVariable:
 #        GenFdsGlobalVariable.OutputDirDict = OutputDir
         GenFdsGlobalVariable.FdfParser = FdfParser
         GenFdsGlobalVariable.WorkSpace = WorkSpace
-        GenFdsGlobalVariable.FvDir = os.path.join(GenFdsGlobalVariable.OutputDirDict[ArchList[0]], 'FV')
+        GenFdsGlobalVariable.FvDir = os.path.join(GenFdsGlobalVariable.OutputDirDict[ArchList[0]], DataType.TAB_FV_DIRECTORY)
         if not os.path.exists(GenFdsGlobalVariable.FvDir) :
             os.makedirs(GenFdsGlobalVariable.FvDir)
         GenFdsGlobalVariable.FfsDir = os.path.join(GenFdsGlobalVariable.FvDir, 'Ffs')
@@ -349,7 +349,7 @@ class GenFdsGlobalVariable:
             GenFdsGlobalVariable.PlatformName = WorkSpace.Db.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch,
                                                                       GlobalData.gGlobalDefines['TARGET'],
                                                                       GlobalData.gGlobalDefines['TOOLCHAIN']].PlatformName
-        GenFdsGlobalVariable.FvDir = os.path.join(GenFdsGlobalVariable.OutputDirDict[ArchList[0]], 'FV')
+        GenFdsGlobalVariable.FvDir = os.path.join(GenFdsGlobalVariable.OutputDirDict[ArchList[0]], DataType.TAB_FV_DIRECTORY)
         if not os.path.exists(GenFdsGlobalVariable.FvDir):
             os.makedirs(GenFdsGlobalVariable.FvDir)
         GenFdsGlobalVariable.FfsDir = os.path.join(GenFdsGlobalVariable.FvDir, 'Ffs')

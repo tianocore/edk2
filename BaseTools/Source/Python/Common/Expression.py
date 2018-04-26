@@ -951,7 +951,7 @@ class ValueExpressionEx(ValueExpression):
                             Size = 0
                             ValueStr = ''
                             TokenSpaceGuidName = ''
-                            if Item.startswith('GUID') and Item.endswith(')'):
+                            if Item.startswith(TAB_GUID) and Item.endswith(')'):
                                 try:
                                     TokenSpaceGuidName = re.search('GUID\((\w+)\)', Item).group(1)
                                 except:

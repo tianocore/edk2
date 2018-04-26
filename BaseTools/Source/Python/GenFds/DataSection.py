@@ -82,7 +82,7 @@ class DataSection (DataSectionClassObject):
                         CopyLongFilePath(MapFile, CopyMapFile)
 
         #Get PE Section alignment when align is set to AUTO
-        if self.Alignment == 'Auto' and self.SecType in ('TE', 'PE32'):
+        if self.Alignment == 'Auto' and self.SecType in (BINARY_FILE_TYPE_TE, BINARY_FILE_TYPE_PE32):
             ImageObj = PeImageClass (Filename)
             if ImageObj.SectionAlignment < 0x400:
                 self.Alignment = str (ImageObj.SectionAlignment)
@@ -92,7 +92,7 @@ class DataSection (DataSectionClassObject):
                 self.Alignment = str (ImageObj.SectionAlignment / 0x100000) + 'M'
 
         NoStrip = True
-        if self.SecType in ('TE', 'PE32'):
+        if self.SecType in (BINARY_FILE_TYPE_TE, BINARY_FILE_TYPE_PE32):
             if self.KeepReloc is not None:
                 NoStrip = self.KeepReloc
 
@@ -110,7 +110,7 @@ class DataSection (DataSectionClassObject):
                 )
             self.SectFileName = StrippedFile
 
-        if self.SecType == 'TE':
+        if self.SecType == BINARY_FILE_TYPE_TE:
             TeFile = os.path.join( OutputPath, ModuleName + 'Te.raw')
             GenFdsGlobalVariable.GenerateFirmwareImage(
                     TeFile,

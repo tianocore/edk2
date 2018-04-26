@@ -67,7 +67,7 @@ class EfiSection (EfiSectionClassObject):
             StringData = FfsInf.__ExtendMacro__(self.StringData)
             ModuleNameStr = FfsInf.__ExtendMacro__('$(MODULE_NAME)')
             NoStrip = True
-            if FfsInf.ModuleType in (SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM) and SectionType in ('TE', 'PE32'):
+            if FfsInf.ModuleType in (SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM) and SectionType in (BINARY_FILE_TYPE_TE, BINARY_FILE_TYPE_PE32):
                 if FfsInf.KeepReloc is not None:
                     NoStrip = FfsInf.KeepReloc
                 elif FfsInf.KeepRelocFromRule is not None:
@@ -171,9 +171,9 @@ class EfiSection (EfiSectionClassObject):
                 OutputFileList.append(OutputFile)
 
         #
-        # If Section Type is 'UI'
+        # If Section Type is BINARY_FILE_TYPE_UI
         #
-        elif SectionType == 'UI':
+        elif SectionType == BINARY_FILE_TYPE_UI:
 
             InfOverrideUiString = False
             if FfsInf.Ui is not None:
@@ -242,7 +242,7 @@ class EfiSection (EfiSectionClassObject):
                     File = GenFdsGlobalVariable.MacroExtend(File, Dict)
                     
                     #Get PE Section alignment when align is set to AUTO
-                    if self.Alignment == 'Auto' and (SectionType == 'PE32' or SectionType == 'TE'):
+                    if self.Alignment == 'Auto' and (SectionType == BINARY_FILE_TYPE_PE32 or SectionType == BINARY_FILE_TYPE_TE):
                         ImageObj = PeImageClass (File)
                         if ImageObj.SectionAlignment < 0x400:
                             Align = str (ImageObj.SectionAlignment)
@@ -287,7 +287,7 @@ class EfiSection (EfiSectionClassObject):
                     
                     """For TE Section call GenFw to generate TE image"""
 
-                    if SectionType == 'TE':
+                    if SectionType == BINARY_FILE_TYPE_TE:
                         TeFile = os.path.join( OutputPath, ModuleName + 'Te.raw')
                         GenFdsGlobalVariable.GenerateFirmwareImage(
                                 TeFile,

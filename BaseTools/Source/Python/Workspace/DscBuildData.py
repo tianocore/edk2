@@ -1500,7 +1500,7 @@ class DscBuildData(PlatformBuildClassObject):
         def get_length(value):
             Value = value.strip()
             if len(value) > 1:
-                if Value.startswith('GUID') and Value.endswith(')'):
+                if Value.startswith(TAB_GUID) and Value.endswith(')'):
                     return 16
                 if Value.startswith('L"') and Value.endswith('"'):
                     return len(Value[2:-1])

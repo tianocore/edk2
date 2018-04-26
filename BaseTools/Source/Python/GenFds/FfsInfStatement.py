@@ -381,7 +381,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
         #
         # Only patch file if FileType is PE32 or ModuleType is USER_DEFINED
         #  
-        if FileType != 'PE32' and self.ModuleType != SUP_MODULE_USER_DEFINED:
+        if FileType != BINARY_FILE_TYPE_PE32 and self.ModuleType != SUP_MODULE_USER_DEFINED:
             return EfiFile
 
         #
@@ -739,13 +739,13 @@ class FfsInfStatement(FfsInfStatementClassObject):
         # Convert Fv Section Type for PI1.1 SMM driver.
         #
         if self.ModuleType == SUP_MODULE_DXE_SMM_DRIVER and int(self.PiSpecVersion, 16) >= 0x0001000A:
-            if SectionType == 'DXE_DEPEX':
-                SectionType = 'SMM_DEPEX'
+            if SectionType == BINARY_FILE_TYPE_DXE_DEPEX:
+                SectionType = BINARY_FILE_TYPE_SMM_DEPEX
         #
         # Framework SMM Driver has no SMM_DEPEX section type
         #
         if self.ModuleType == SUP_MODULE_DXE_SMM_DRIVER and int(self.PiSpecVersion, 16) < 0x0001000A:
-            if SectionType == 'SMM_DEPEX':
+            if SectionType == BINARY_FILE_TYPE_SMM_DEPEX:
                 EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "Framework SMM module doesn't support SMM_DEPEX section type", File=self.InfFileName)
         NoStrip = True
         if self.ModuleType in (SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM):
@@ -767,7 +767,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 File = GenFdsGlobalVariable.MacroExtend(File, Dict, self.CurrentArch)
 
                 #Get PE Section alignment when align is set to AUTO
-                if self.Alignment == 'Auto' and (SectionType == 'PE32' or SectionType == 'TE'):
+                if self.Alignment == 'Auto' and (SectionType == BINARY_FILE_TYPE_PE32 or SectionType == BINARY_FILE_TYPE_TE):
                     ImageObj = PeImageClass (File)
                     if ImageObj.SectionAlignment < 0x400:
                         self.Alignment = str (ImageObj.SectionAlignment)
@@ -790,7 +790,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                         )
                     File = StrippedFile
 
-                if SectionType == 'TE':
+                if SectionType == BINARY_FILE_TYPE_TE:
                     TeFile = os.path.join( self.OutputPath, self.ModuleGuid + 'Te.raw')
                     GenFdsGlobalVariable.GenerateFirmwareImage(
                             TeFile,
@@ -809,7 +809,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
             GenSecInputFile = GenFdsGlobalVariable.MacroExtend(GenSecInputFile, Dict, self.CurrentArch)
 
             #Get PE Section alignment when align is set to AUTO
-            if self.Alignment == 'Auto' and (SectionType == 'PE32' or SectionType == 'TE'):
+            if self.Alignment == 'Auto' and (SectionType == BINARY_FILE_TYPE_PE32 or SectionType == BINARY_FILE_TYPE_TE):
                 ImageObj = PeImageClass (GenSecInputFile)
                 if ImageObj.SectionAlignment < 0x400:
                     self.Alignment = str (ImageObj.SectionAlignment)
@@ -833,7 +833,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     )
                 GenSecInputFile = StrippedFile
 
-            if SectionType == 'TE':
+            if SectionType == BINARY_FILE_TYPE_TE:
                 TeFile = os.path.join( self.OutputPath, self.ModuleGuid + 'Te.raw')
                 GenFdsGlobalVariable.GenerateFirmwareImage(
                         TeFile,
@@ -942,13 +942,13 @@ class FfsInfStatement(FfsInfStatementClassObject):
             # Convert Fv Section Type for PI1.1 SMM driver.
             #
             if self.ModuleType == SUP_MODULE_DXE_SMM_DRIVER and int(self.PiSpecVersion, 16) >= 0x0001000A:
-                if Sect.SectionType == 'DXE_DEPEX':
-                    Sect.SectionType = 'SMM_DEPEX'
+                if Sect.SectionType == BINARY_FILE_TYPE_DXE_DEPEX:
+                    Sect.SectionType = BINARY_FILE_TYPE_SMM_DEPEX
             #
             # Framework SMM Driver has no SMM_DEPEX section type
             #
             if self.ModuleType == SUP_MODULE_DXE_SMM_DRIVER and int(self.PiSpecVersion, 16) < 0x0001000A:
-                if Sect.SectionType == 'SMM_DEPEX':
+                if Sect.SectionType == BINARY_FILE_TYPE_SMM_DEPEX:
                     EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "Framework SMM module doesn't support SMM_DEPEX section type", File=self.InfFileName)
             #
             # process the inside FvImage from FvSection or GuidSection

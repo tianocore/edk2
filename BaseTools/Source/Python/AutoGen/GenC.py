@@ -1613,7 +1613,7 @@ def CreateModuleUnloadImageCode(Info, AutoGenC, AutoGenH):
 #
 def CreateGuidDefinitionCode(Info, AutoGenC, AutoGenH):
     if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_BASE]:
-        GuidType = "GUID"
+        GuidType = TAB_GUID
     else:
         GuidType = "EFI_GUID"
 
@@ -1637,7 +1637,7 @@ def CreateGuidDefinitionCode(Info, AutoGenC, AutoGenH):
 #
 def CreateProtocolDefinitionCode(Info, AutoGenC, AutoGenH):
     if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_BASE]:
-        GuidType = "GUID"
+        GuidType = TAB_GUID
     else:
         GuidType = "EFI_GUID"
 
@@ -1661,7 +1661,7 @@ def CreateProtocolDefinitionCode(Info, AutoGenC, AutoGenH):
 #
 def CreatePpiDefinitionCode(Info, AutoGenC, AutoGenH):
     if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_BASE]:
-        GuidType = "GUID"
+        GuidType = TAB_GUID
     else:
         GuidType = "EFI_GUID"
 
@@ -1698,7 +1698,7 @@ def CreatePcdCode(Info, AutoGenC, AutoGenH):
     if TokenSpaceList:
         AutoGenH.Append("\n// Definition of PCD Token Space GUIDs used in this module\n\n")
         if Info.ModuleType in [SUP_MODULE_USER_DEFINED, SUP_MODULE_BASE]:
-            GuidType = "GUID"
+            GuidType = TAB_GUID
         else:
             GuidType = "EFI_GUID"              
         for Item in TokenSpaceList:

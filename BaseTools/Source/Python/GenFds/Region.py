@@ -26,6 +26,7 @@ from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
+from Common.DataType import BINARY_FILE_TYPE_FV
 
 ## generate Region
 #
@@ -80,10 +81,10 @@ class Region(RegionClassObject):
             GenFdsGlobalVariable.InfLogger('\nGenerate Region at Offset 0x%X' % self.Offset)
             GenFdsGlobalVariable.InfLogger("   Region Size = 0x%X" % Size)
         GenFdsGlobalVariable.SharpCounter = 0
-        if Flag and (self.RegionType != 'FV'):
+        if Flag and (self.RegionType != BINARY_FILE_TYPE_FV):
             return
 
-        if self.RegionType == 'FV':
+        if self.RegionType == BINARY_FILE_TYPE_FV:
             #
             # Get Fv from FvDict
             #

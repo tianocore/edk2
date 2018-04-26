@@ -141,7 +141,7 @@ class OptRomInfStatement (FfsInfStatement):
 
         OutputFileList = []
         for Sect in Rule.SectionList:
-            if Sect.SectionType == 'PE32':
+            if Sect.SectionType == BINARY_FILE_TYPE_PE32:
                 if Sect.FileName is not None:
                     GenSecInputFile = self.__ExtendMacro__(Sect.FileName)
                     OutputFileList.append(GenSecInputFile)

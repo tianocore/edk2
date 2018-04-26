@@ -29,6 +29,7 @@ from CommonDataClass.FdfClass import FvClassObject
 from Common.Misc import SaveFileOnChange
 from Common.LongFilePathSupport import CopyLongFilePath
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.DataType import *
 
 T_CHAR_LF = '\n'
 FV_UI_EXT_ENTY_GUID = 'A67DF1FA-8DE8-4E98-AF09-4BDF2EFFBC7C'
@@ -80,7 +81,7 @@ class FV (FvClassObject):
         if self.CapsuleName is not None:
             for FdObj in GenFdsGlobalVariable.FdfParser.Profile.FdDict.values():
                 for RegionObj in FdObj.RegionList:
-                    if RegionObj.RegionType == 'FV':
+                    if RegionObj.RegionType == BINARY_FILE_TYPE_FV:
                         for RegionData in RegionObj.RegionDataList:
                             if RegionData.endswith(".fv"):
                                 continue
@@ -236,7 +237,7 @@ class FV (FvClassObject):
 
         for FdObj in GenFdsGlobalVariable.FdfParser.Profile.FdDict.values():
             for RegionObj in FdObj.RegionList:
-                if RegionObj.RegionType != 'FV':
+                if RegionObj.RegionType != BINARY_FILE_TYPE_FV:
                     continue
                 for RegionData in RegionObj.RegionDataList:
                     #

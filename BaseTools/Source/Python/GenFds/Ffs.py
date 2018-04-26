@@ -42,12 +42,12 @@ class Ffs(FDClassObject):
     
     # mapping between section type in FDF and file suffix
     SectionSuffix = {
-        'PE32'                 : '.pe32',
-        'PIC'                  : '.pic',
-        'TE'                   : '.te',
-        'DXE_DEPEX'            : '.dpx',
+        BINARY_FILE_TYPE_PE32                 : '.pe32',
+        BINARY_FILE_TYPE_PIC                  : '.pic',
+        BINARY_FILE_TYPE_TE                   : '.te',
+        BINARY_FILE_TYPE_DXE_DEPEX            : '.dpx',
         'VERSION'              : '.ver',
-        'UI'                   : '.ui',
+        BINARY_FILE_TYPE_UI                   : '.ui',
         'COMPAT16'             : '.com16',
         'RAW'                  : '.raw',
         'FREEFORM_SUBTYPE_GUID': '.guid',
@@ -55,8 +55,8 @@ class Ffs(FDClassObject):
         'FV_IMAGE'             : 'fv.sec',
         'COMPRESS'             : '.com',
         'GUIDED'               : '.guided',
-        'PEI_DEPEX'            : '.dpx',
-        'SMM_DEPEX'            : '.dpx'
+        BINARY_FILE_TYPE_PEI_DEPEX            : '.dpx',
+        BINARY_FILE_TYPE_SMM_DEPEX            : '.dpx'
     }
     
     ## The constructor

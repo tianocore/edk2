@@ -96,13 +96,13 @@ class DepexSection (DepexSectionClassObject):
 
         if self.DepexType == 'PEI_DEPEX_EXP':
             ModuleType = SUP_MODULE_PEIM
-            SecType    = 'PEI_DEPEX'
+            SecType    = BINARY_FILE_TYPE_PEI_DEPEX
         elif self.DepexType == 'DXE_DEPEX_EXP':
             ModuleType = SUP_MODULE_DXE_DRIVER
-            SecType    = 'DXE_DEPEX'
+            SecType    = BINARY_FILE_TYPE_DXE_DEPEX
         elif self.DepexType == 'SMM_DEPEX_EXP':
             ModuleType = SUP_MODULE_DXE_SMM_DRIVER
-            SecType    = 'SMM_DEPEX'
+            SecType    = BINARY_FILE_TYPE_SMM_DEPEX
         else:
             EdkLogger.error("GenFds", FORMAT_INVALID,
                             "Depex type %s is not valid for module %s" % (self.DepexType, ModuleName))
