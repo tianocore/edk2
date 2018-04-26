@@ -787,7 +787,7 @@ class Check(object):
                         continue
                     SqlCommand = """select Value3 from Inf where BelongsToFile =
                                     (select ID from File where lower(FullPath) = lower('%s'))
-                                    and Value2 = '%s'""" % (LibraryIns, 'LIBRARY_CLASS')
+                                    and Value2 = '%s'""" % (LibraryIns, DT.PLATFORM_COMPONENT_TYPE_LIBRARY_CLASS)
                     RecordSet = EccGlobalData.gDb.TblInf.Exec(SqlCommand)
                     IsFound = False
                     for Record in RecordSet:
