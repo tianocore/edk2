@@ -253,7 +253,7 @@ class UniFileClassObject(object):
         Lang = distutils.util.split_quoted((Line.split(u"//")[0]))
         if len(Lang) != 3:
             try:
-                FileIn = self.OpenUniFile(LongFilePath(File.Path))
+                FileIn = UniFileClassObject.OpenUniFile(LongFilePath(File.Path))
             except UnicodeError, X:
                 EdkLogger.error("build", FILE_READ_FAILURE, "File read failure: %s" % str(X), ExtraData=File);
             except:
@@ -297,7 +297,8 @@ class UniFileClassObject(object):
                     self.OrderedStringDict[LangName][Item.StringName] = len(self.OrderedStringList[LangName]) - 1
         return True
 
-    def OpenUniFile(self, FileName):
+    @staticmethod
+    def OpenUniFile(FileName):
         #
         # Read file
         #
@@ -316,14 +317,15 @@ class UniFileClassObject(object):
             FileIn.startswith(codecs.BOM_UTF16_LE)):
             Encoding = 'utf-16'
 
-        self.VerifyUcs2Data(FileIn, FileName, Encoding)
+        UniFileClassObject.VerifyUcs2Data(FileIn, FileName, Encoding)
 
         UniFile = StringIO.StringIO(FileIn)
         Info = codecs.lookup(Encoding)
         (Reader, Writer) = (Info.streamreader, Info.streamwriter)
         return codecs.StreamReaderWriter(UniFile, Reader, Writer)
 
-    def VerifyUcs2Data(self, FileIn, FileName, Encoding):
+    @staticmethod
+    def VerifyUcs2Data(FileIn, FileName, Encoding):
         Ucs2Info = codecs.lookup('ucs-2')
         #
         # Convert to unicode
@@ -390,7 +392,7 @@ class UniFileClassObject(object):
             EdkLogger.error("Unicode File Parser", FILE_NOT_FOUND, ExtraData=File.Path)
 
         try:
-            FileIn = self.OpenUniFile(LongFilePath(File.Path))
+            FileIn = UniFileClassObject.OpenUniFile(LongFilePath(File.Path))
         except UnicodeError, X:
             EdkLogger.error("build", FILE_READ_FAILURE, "File read failure: %s" % str(X), ExtraData=File.Path);
         except:
