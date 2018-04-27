@@ -136,7 +136,7 @@ class StructurePcd(PcdClassObject):
         self.PcdDefineLineNo = 0
         self.PkgPath = ""
         self.DefaultValueFromDec = ""
-        self.ValueChain = dict()
+        self.ValueChain = set()
         self.PcdFieldValueFromComm = collections.OrderedDict()
     def __repr__(self):
         return self.TypeName
