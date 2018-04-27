@@ -302,9 +302,6 @@ class Eot(object):
         EotGlobalData.gINF_FILES = mFileList
         EotGlobalData.gOP_INF.close()
 
-        EotGlobalData.gDEC_FILES = mDecFileList
-
-
     ## GenerateReport() method
     #
     #  Generate final HTML report
@@ -393,8 +390,6 @@ class Eot(object):
         SqlCommand = """select DISTINCT GuidValue, ItemType from Report where ModuleID = -2 and ItemMode = 'Produced'"""
         RecordSet = EotGlobalData.gDb.TblReport.Exec(SqlCommand)
         for Record in RecordSet:
-            if Record[1] == 'Ppi':
-                EotGlobalData.gPpiList[Record[0].lower()] = -2
             if Record[1] == 'Protocol':
                 EotGlobalData.gProtocolList[Record[0].lower()] = -2
 

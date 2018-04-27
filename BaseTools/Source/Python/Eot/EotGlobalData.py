@@ -36,11 +36,6 @@ gMACRO['EDK_SOURCE'] = gEDK_SOURCE
 gMACRO['SHELL_INF'] = gSHELL_INF
 gMACRO['CAPSULE_INF'] = ''
 
-gNOT_FOUND_FILES = []
-gSOURCE_FILES = []
-gINF_FILES = {}
-gDEC_FILES = []
-
 # Log file for unmatched variables
 gUN_MATCHED_LOG = 'Log_UnMatched.log'
 gOP_UN_MATCHED = open(gUN_MATCHED_LOG, 'w+')
@@ -61,19 +56,12 @@ gOP_UN_MATCHED_IN_LIBRARY_CALLING = open(gUN_MATCHED_IN_LIBRARY_CALLING_LOG, 'w+
 gDISPATCH_ORDER_LOG = 'Log_DispatchOrder.log'
 gOP_DISPATCH_ORDER = open(gDISPATCH_ORDER_LOG, 'w+')
 
-# Log file for source files not found
-gUN_FOUND_FILES = 'Log_UnFoundSourceFiles.log'
-gOP_UN_FOUND_FILES = open(gUN_FOUND_FILES, 'w+')
-
 # Log file for found source files
 gSOURCE_FILES = 'Log_SourceFiles.log'
 gOP_SOURCE_FILES = open(gSOURCE_FILES, 'w+')
 
 # Dict for GUID found in DEC files
 gGuidDict = dict()
-
-# Dict for PPI
-gPpiList = {}
 
 # Dict for PROTOCOL
 gProtocolList = {}
