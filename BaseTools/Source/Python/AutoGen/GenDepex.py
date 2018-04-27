@@ -1,7 +1,7 @@
 ## @file
 # This file is used to generate DEPEX file for module's dependency expression
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.    The full text of the license may be found at
@@ -71,65 +71,62 @@ class DependencyExpression:
                     )
 
     OpcodePriority = {
-        "AND"   :   1,
-        "OR"    :   1,
-        "NOT"   :   2,
-        # "SOR"   :   9,
-        # "BEFORE":   9,
-        # "AFTER" :   9,
+        DEPEX_OPCODE_AND   :   1,
+        DEPEX_OPCODE_OR    :   1,
+        DEPEX_OPCODE_NOT   :   2,
     }
 
     Opcode = {
         "PEI"   : {
-            "PUSH"  :   0x02,
-            "AND"   :   0x03,
-            "OR"    :   0x04,
-            "NOT"   :   0x05,
-            "TRUE"  :   0x06,
-            "FALSE" :   0x07,
-            "END"   :   0x08
+            DEPEX_OPCODE_PUSH  :   0x02,
+            DEPEX_OPCODE_AND   :   0x03,
+            DEPEX_OPCODE_OR    :   0x04,
+            DEPEX_OPCODE_NOT   :   0x05,
+            DEPEX_OPCODE_TRUE  :   0x06,
+            DEPEX_OPCODE_FALSE :   0x07,
+            DEPEX_OPCODE_END   :   0x08
         },
 
         "DXE"   : {
-            "BEFORE":   0x00,
-            "AFTER" :   0x01,
-            "PUSH"  :   0x02,
-            "AND"   :   0x03,
-            "OR"    :   0x04,
-            "NOT"   :   0x05,
-            "TRUE"  :   0x06,
-            "FALSE" :   0x07,
-            "END"   :   0x08,
-            "SOR"   :   0x09
+            DEPEX_OPCODE_BEFORE:   0x00,
+            DEPEX_OPCODE_AFTER :   0x01,
+            DEPEX_OPCODE_PUSH  :   0x02,
+            DEPEX_OPCODE_AND   :   0x03,
+            DEPEX_OPCODE_OR    :   0x04,
+            DEPEX_OPCODE_NOT   :   0x05,
+            DEPEX_OPCODE_TRUE  :   0x06,
+            DEPEX_OPCODE_FALSE :   0x07,
+            DEPEX_OPCODE_END   :   0x08,
+            DEPEX_OPCODE_SOR   :   0x09
         },
 
         "MM"   : {
-            "BEFORE":   0x00,
-            "AFTER" :   0x01,
-            "PUSH"  :   0x02,
-            "AND"   :   0x03,
-            "OR"    :   0x04,
-            "NOT"   :   0x05,
-            "TRUE"  :   0x06,
-            "FALSE" :   0x07,
-            "END"   :   0x08,
-            "SOR"   :   0x09
+            DEPEX_OPCODE_BEFORE:   0x00,
+            DEPEX_OPCODE_AFTER :   0x01,
+            DEPEX_OPCODE_PUSH  :   0x02,
+            DEPEX_OPCODE_AND   :   0x03,
+            DEPEX_OPCODE_OR    :   0x04,
+            DEPEX_OPCODE_NOT   :   0x05,
+            DEPEX_OPCODE_TRUE  :   0x06,
+            DEPEX_OPCODE_FALSE :   0x07,
+            DEPEX_OPCODE_END   :   0x08,
+            DEPEX_OPCODE_SOR   :   0x09
         }
     }
 
     # all supported op codes and operands
-    SupportedOpcode = ["BEFORE", "AFTER", "PUSH", "AND", "OR", "NOT", "END", "SOR"]
-    SupportedOperand = ["TRUE", "FALSE"]
+    SupportedOpcode = [DEPEX_OPCODE_BEFORE, DEPEX_OPCODE_AFTER, DEPEX_OPCODE_PUSH, DEPEX_OPCODE_AND, DEPEX_OPCODE_OR, DEPEX_OPCODE_NOT, DEPEX_OPCODE_END, DEPEX_OPCODE_SOR]
+    SupportedOperand = [DEPEX_OPCODE_TRUE, DEPEX_OPCODE_FALSE]
 
-    OpcodeWithSingleOperand = ['NOT', 'BEFORE', 'AFTER']
-    OpcodeWithTwoOperand = ['AND', 'OR']
+    OpcodeWithSingleOperand = [DEPEX_OPCODE_NOT, DEPEX_OPCODE_BEFORE, DEPEX_OPCODE_AFTER]
+    OpcodeWithTwoOperand = [DEPEX_OPCODE_AND, DEPEX_OPCODE_OR]
 
     # op code that should not be the last one
-    NonEndingOpcode = ["AND", "OR", "NOT", 'SOR']
+    NonEndingOpcode = [DEPEX_OPCODE_AND, DEPEX_OPCODE_OR, DEPEX_OPCODE_NOT, DEPEX_OPCODE_SOR]
     # op code must not present at the same time
-    ExclusiveOpcode = ["BEFORE", "AFTER"]
+    ExclusiveOpcode = [DEPEX_OPCODE_BEFORE, DEPEX_OPCODE_AFTER]
     # op code that should be the first one if it presents
-    AboveAllOpcode = ["SOR", "BEFORE", "AFTER"]
+    AboveAllOpcode = [DEPEX_OPCODE_SOR, DEPEX_OPCODE_BEFORE, DEPEX_OPCODE_AFTER]
 
     #
     # open and close brace must be taken as individual tokens
@@ -201,7 +198,7 @@ class DependencyExpression:
                         break
                     self.PostfixNotation.append(Stack.pop())
             elif Token in self.OpcodePriority:
-                if Token == "NOT":
+                if Token == DEPEX_OPCODE_NOT:
                     if LastToken not in self.SupportedOpcode + ['(', '', None]:
                         EdkLogger.error("GenDepex", PARSER_ERROR, "Invalid dependency expression: missing operator before NOT",
                                         ExtraData="Near %s" % LastToken)
@@ -223,10 +220,10 @@ class DependencyExpression:
                                         ExtraData="Near %s" % LastToken)
                     if len(self.OpcodeList) == 0 or self.OpcodeList[-1] not in self.ExclusiveOpcode:
                         if Token not in self.SupportedOperand:
-                            self.PostfixNotation.append("PUSH")
+                            self.PostfixNotation.append(DEPEX_OPCODE_PUSH)
                 # check if OP is valid in this phase
                 elif Token in self.Opcode[self.Phase]:
-                    if Token == "END":
+                    if Token == DEPEX_OPCODE_END:
                         break
                     self.OpcodeList.append(Token)
                 else:
@@ -242,8 +239,8 @@ class DependencyExpression:
                             ExtraData=str(self))
         while len(Stack) > 0:
             self.PostfixNotation.append(Stack.pop())
-        if self.PostfixNotation[-1] != 'END':
-            self.PostfixNotation.append("END")
+        if self.PostfixNotation[-1] != DEPEX_OPCODE_END:
+            self.PostfixNotation.append(DEPEX_OPCODE_END)
 
     ## Validate the dependency expression
     def ValidateOpcode(self):
@@ -263,20 +260,20 @@ class DependencyExpression:
                 if len(self.PostfixNotation) < 3:
                     EdkLogger.error("GenDepex", PARSER_ERROR, "Missing operand for %s" % Op,
                                     ExtraData=str(self))
-        if self.TokenList[-1] != 'END' and self.TokenList[-1] in self.NonEndingOpcode:
+        if self.TokenList[-1] != DEPEX_OPCODE_END and self.TokenList[-1] in self.NonEndingOpcode:
             EdkLogger.error("GenDepex", PARSER_ERROR, "Extra %s at the end of the dependency expression" % self.TokenList[-1],
                             ExtraData=str(self))
-        if self.TokenList[-1] == 'END' and self.TokenList[-2] in self.NonEndingOpcode:
+        if self.TokenList[-1] == DEPEX_OPCODE_END and self.TokenList[-2] in self.NonEndingOpcode:
             EdkLogger.error("GenDepex", PARSER_ERROR, "Extra %s at the end of the dependency expression" % self.TokenList[-2],
                             ExtraData=str(self))
-        if "END" in self.TokenList and "END" != self.TokenList[-1]:
+        if DEPEX_OPCODE_END in self.TokenList and DEPEX_OPCODE_END != self.TokenList[-1]:
             EdkLogger.error("GenDepex", PARSER_ERROR, "Extra expressions after END",
                             ExtraData=str(self))
 
     ## Simply optimize the dependency expression by removing duplicated operands
     def Optimize(self):
         ValidOpcode = list(set(self.OpcodeList))
-        if len(ValidOpcode) != 1 or ValidOpcode[0] not in ['AND', 'OR']:
+        if len(ValidOpcode) != 1 or ValidOpcode[0] not in [DEPEX_OPCODE_AND, DEPEX_OPCODE_OR]:
             return
         Op = ValidOpcode[0]
         NewOperand = []
@@ -285,14 +282,14 @@ class DependencyExpression:
             if Token in self.SupportedOpcode or Token in NewOperand:
                 continue
             AllOperand.add(Token)
-            if Token == 'TRUE':
-                if Op == 'AND':
+            if Token == DEPEX_OPCODE_TRUE:
+                if Op == DEPEX_OPCODE_AND:
                     continue
                 else:
                     NewOperand.append(Token)
                     break
-            elif Token == 'FALSE':
-                if Op == 'OR':
+            elif Token == DEPEX_OPCODE_FALSE:
+                if Op == DEPEX_OPCODE_OR:
                     continue
                 else:
                     NewOperand.append(Token)
@@ -300,13 +297,13 @@ class DependencyExpression:
             NewOperand.append(Token)
 
         # don't generate depex if only TRUE operand left
-        if self.ModuleType == SUP_MODULE_PEIM and len(NewOperand) == 1 and NewOperand[0] == 'TRUE':
+        if self.ModuleType == SUP_MODULE_PEIM and len(NewOperand) == 1 and NewOperand[0] == DEPEX_OPCODE_TRUE:
             self.PostfixNotation = []
             return
 
         # don't generate depex if all operands are architecture protocols
         if self.ModuleType in [SUP_MODULE_UEFI_DRIVER, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_MM_STANDALONE] and \
-           Op == 'AND' and \
+           Op == DEPEX_OPCODE_AND and \
            self.ArchProtocols == set([GuidStructureStringToGuidString(Guid) for Guid in AllOperand]):
             self.PostfixNotation = []
             return
@@ -372,7 +369,7 @@ class DependencyExpression:
 
 versionNumber = ("0.04" + " " + gBUILD_VERSION)
 __version__ = "%prog Version " + versionNumber
-__copyright__ = "Copyright (c) 2007-2010, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007-2018, Intel Corporation  All rights reserved."
 __usage__ = "%prog [options] [dependency_expression_file]"
 
 ## Parse command line options
