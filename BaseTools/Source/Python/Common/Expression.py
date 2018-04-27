@@ -171,7 +171,7 @@ def ReplaceExprMacro(String, Macros, ExceptionList = None):
                 RetStr += '0'
             elif not InQuote:
                 Tklst = RetStr.split()
-                if Tklst and Tklst[-1] in ['IN', 'in'] and ExceptionList and Macro not in ExceptionList:
+                if Tklst and Tklst[-1] in {'IN', 'in'} and ExceptionList and Macro not in ExceptionList:
                     raise BadExpression(ERR_IN_OPERAND)
                 # Make sure the macro in exception list is encapsulated by double quote
                 # For example: DEFINE ARCH = IA32 X64
@@ -243,10 +243,10 @@ class ValueExpression(BaseExpression):
     def Eval(Operator, Oprand1, Oprand2 = None):
         WrnExp = None
 
-        if Operator not in ["==", "!=", ">=", "<=", ">", "<", "in", "not in"] and \
+        if Operator not in {"==", "!=", ">=", "<=", ">", "<", "in", "not in"} and \
             (type(Oprand1) == type('') or type(Oprand2) == type('')):
             raise BadExpression(ERR_STRING_EXPR % Operator)
-        if Operator in ['in', 'not in']:
+        if Operator in {'in', 'not in'}:
             if type(Oprand1) != type(''):
                 Oprand1 = IntToStr(Oprand1)
             if type(Oprand2) != type(''):
@@ -259,19 +259,19 @@ class ValueExpression(BaseExpression):
         }
 
         EvalStr = ''
-        if Operator in ["!", "NOT", "not"]:
+        if Operator in {"!", "NOT", "not"}:
             if type(Oprand1) == type(''):
                 raise BadExpression(ERR_STRING_EXPR % Operator)
             EvalStr = 'not Oprand1'
-        elif Operator in ["~"]:
+        elif Operator in {"~"}:
             if type(Oprand1) == type(''):
                 raise BadExpression(ERR_STRING_EXPR % Operator)
             EvalStr = '~ Oprand1'
         else:
-            if Operator in ["+", "-"] and (type(True) in [type(Oprand1), type(Oprand2)]):
+            if Operator in {"+", "-"} and (type(True) in {type(Oprand1), type(Oprand2)}):
                 # Boolean in '+'/'-' will be evaluated but raise warning
                 WrnExp = WrnExpression(WRN_BOOL_EXPR)
-            elif type('') in [type(Oprand1), type(Oprand2)] and type(Oprand1)!= type(Oprand2):
+            elif type('') in {type(Oprand1), type(Oprand2)} and type(Oprand1)!= type(Oprand2):
                 # == between string and number/boolean will always return False, != return True
                 if Operator == "==":
                     WrnExp = WrnExpression(WRN_EQCMP_STR_OTHERS)
@@ -284,10 +284,10 @@ class ValueExpression(BaseExpression):
                 else:
                     raise BadExpression(ERR_RELCMP_STR_OTHERS % Operator)
             elif TypeDict[type(Oprand1)] != TypeDict[type(Oprand2)]:
-                if Operator in ["==", "!=", ">=", "<=", ">", "<"] and set((TypeDict[type(Oprand1)], TypeDict[type(Oprand2)])) == set((TypeDict[type(True)], TypeDict[type(0)])):
+                if Operator in {"==", "!=", ">=", "<=", ">", "<"} and set((TypeDict[type(Oprand1)], TypeDict[type(Oprand2)])) == set((TypeDict[type(True)], TypeDict[type(0)])):
                     # comparison between number and boolean is allowed
                     pass
-                elif Operator in ['&', '|', '^', "and", "or"] and set((TypeDict[type(Oprand1)], TypeDict[type(Oprand2)])) == set((TypeDict[type(True)], TypeDict[type(0)])):
+                elif Operator in {'&', '|', '^', "and", "or"} and set((TypeDict[type(Oprand1)], TypeDict[type(Oprand2)])) == set((TypeDict[type(True)], TypeDict[type(0)])):
                     # bitwise and logical operation between number and boolean is allowed
                     pass
                 else:
@@ -310,7 +310,7 @@ class ValueExpression(BaseExpression):
         except Exception, Excpt:
             raise BadExpression(str(Excpt))
 
-        if Operator in ['and', 'or']:
+        if Operator in {'and', 'or'}:
             if Val:
                 Val = True
             else:
@@ -410,13 +410,13 @@ class ValueExpression(BaseExpression):
 
     # Template function to parse binary operators which have same precedence
     # Expr [Operator Expr]*
-    def _ExprFuncTemplate(self, EvalFunc, OpLst):
+    def _ExprFuncTemplate(self, EvalFunc, OpSet):
         Val = EvalFunc()
-        while self._IsOperator(OpLst):
+        while self._IsOperator(OpSet):
             Op = self._Token
             if Op == '?':
                 Val2 = EvalFunc()
-                if self._IsOperator(':'):
+                if self._IsOperator({':'}):
                     Val3 = EvalFunc()
                 if Val:
                     Val = Val2
@@ -431,35 +431,35 @@ class ValueExpression(BaseExpression):
         return Val
     # A [? B]*
     def _ConExpr(self):
-        return self._ExprFuncTemplate(self._OrExpr, ['?', ':'])
+        return self._ExprFuncTemplate(self._OrExpr, {'?', ':'})
 
     # A [|| B]*
     def _OrExpr(self):
-        return self._ExprFuncTemplate(self._AndExpr, ["OR", "or", "||"])
+        return self._ExprFuncTemplate(self._AndExpr, {"OR", "or", "||"})
 
     # A [&& B]*
     def _AndExpr(self):
-        return self._ExprFuncTemplate(self._BitOr, ["AND", "and", "&&"])
+        return self._ExprFuncTemplate(self._BitOr, {"AND", "and", "&&"})
 
     # A [ | B]*
     def _BitOr(self):
-        return self._ExprFuncTemplate(self._BitXor, ["|"])
+        return self._ExprFuncTemplate(self._BitXor, {"|"})
 
     # A [ ^ B]*
     def _BitXor(self):
-        return self._ExprFuncTemplate(self._BitAnd, ["XOR", "xor", "^"])
+        return self._ExprFuncTemplate(self._BitAnd, {"XOR", "xor", "^"})
 
     # A [ & B]*
     def _BitAnd(self):
-        return self._ExprFuncTemplate(self._EqExpr, ["&"])
+        return self._ExprFuncTemplate(self._EqExpr, {"&"})
 
     # A [ == B]*
     def _EqExpr(self):
         Val = self._RelExpr()
-        while self._IsOperator(["==", "!=", "EQ", "NE", "IN", "in", "!", "NOT", "not"]):
+        while self._IsOperator({"==", "!=", "EQ", "NE", "IN", "in", "!", "NOT", "not"}):
             Op = self._Token
-            if Op in ["!", "NOT", "not"]:
-                if not self._IsOperator(["IN", "in"]):
+            if Op in {"!", "NOT", "not"}:
+                if not self._IsOperator({"IN", "in"}):
                     raise BadExpression(ERR_REL_NOT_IN)
                 Op += ' ' + self._Token
             try:
@@ -471,29 +471,29 @@ class ValueExpression(BaseExpression):
 
     # A [ > B]*
     def _RelExpr(self):
-        return self._ExprFuncTemplate(self._ShiftExpr, ["<=", ">=", "<", ">", "LE", "GE", "LT", "GT"])
+        return self._ExprFuncTemplate(self._ShiftExpr, {"<=", ">=", "<", ">", "LE", "GE", "LT", "GT"})
 
     def _ShiftExpr(self):
-        return self._ExprFuncTemplate(self._AddExpr, ["<<", ">>"])
+        return self._ExprFuncTemplate(self._AddExpr, {"<<", ">>"})
 
     # A [ + B]*
     def _AddExpr(self):
-        return self._ExprFuncTemplate(self._MulExpr, ["+", "-"])
+        return self._ExprFuncTemplate(self._MulExpr, {"+", "-"})
 
     # A [ * B]*
     def _MulExpr(self):
-        return self._ExprFuncTemplate(self._UnaryExpr, ["*", "/", "%"])
+        return self._ExprFuncTemplate(self._UnaryExpr, {"*", "/", "%"})
 
     # [!]*A
     def _UnaryExpr(self):
-        if self._IsOperator(["!", "NOT", "not"]):
+        if self._IsOperator({"!", "NOT", "not"}):
             Val = self._UnaryExpr()
             try:
                 return self.Eval('not', Val)
             except WrnExpression, Warn:
                 self._WarnExcept = Warn
                 return Warn.result
-        if self._IsOperator(["~"]):
+        if self._IsOperator({"~"}):
             Val = self._UnaryExpr()
             try:
                 return self.Eval('~', Val)
@@ -531,7 +531,7 @@ class ValueExpression(BaseExpression):
         if self._Token.startswith('"') or self._Token.startswith('L"'):
             Flag = 0
             for Index in range(len(self._Token)):
-                if self._Token[Index] in ['"']:
+                if self._Token[Index] in {'"'}:
                     if self._Token[Index - 1] == '\\':
                         continue
                     Flag += 1
@@ -540,7 +540,7 @@ class ValueExpression(BaseExpression):
         if self._Token.startswith("'") or self._Token.startswith("L'"):
             Flag = 0
             for Index in range(len(self._Token)):
-                if self._Token[Index] in ["'"]:
+                if self._Token[Index] in {"'"}:
                     if self._Token[Index - 1] == '\\':
                         continue
                     Flag += 1
@@ -645,9 +645,9 @@ class ValueExpression(BaseExpression):
 
         if self._Token.startswith('"'):
             self._Token = self._Token[1:-1]
-        elif self._Token in ["FALSE", "false", "False"]:
+        elif self._Token in {"FALSE", "false", "False"}:
             self._Token = False
-        elif self._Token in ["TRUE", "true", "True"]:
+        elif self._Token in {"TRUE", "true", "True"}:
             self._Token = True
         else:
             self.__IsNumberToken()
@@ -841,7 +841,7 @@ class ValueExpressionEx(ValueExpression):
                         elif Item.startswith(TAB_UINT64):
                             ItemSize = 8
                             ValueType = TAB_UINT64
-                        elif Item[0] in ['"',"'",'L']:
+                        elif Item[0] in {'"',"'",'L'}:
                             ItemSize = 0
                             ValueType = TAB_VOID
                         else:
@@ -998,7 +998,7 @@ class ValueExpressionEx(ValueExpression):
                                 Item = '0x%x' % TmpValue if type(TmpValue) != type('') else TmpValue
                                 if ItemSize == 0:
                                     ItemValue, ItemSize = ParseFieldValue(Item)
-                                    if Item[0] not in ['"','L','{'] and ItemSize > 1:
+                                    if Item[0] not in {'"','L','{'} and ItemSize > 1:
                                         raise BadExpression("Byte  array number %s should less than 0xFF." % Item)
                                 else:
                                     ItemValue = ParseFieldValue(Item)[0]
