@@ -21,6 +21,7 @@ from Common.VariableAttributes import VariableAttributes
 import copy
 from struct import unpack
 from Common.DataType import *
+from GenVar import PackGUID
 
 DATABASE_VERSION = 7
 
@@ -287,21 +288,7 @@ class DbItemList:
         #
         def PackGuid(GuidStructureValue):
             GuidString = GuidStructureStringToGuidString(GuidStructureValue)
-            Guid = GuidString.split('-')
-            Buffer = pack('=LHHBBBBBBBB', 
-                        int(Guid[0], 16), 
-                        int(Guid[1], 16), 
-                        int(Guid[2], 16), 
-                        int(Guid[3][-4:-2], 16), 
-                        int(Guid[3][-2:], 16),
-                        int(Guid[4][-12:-10], 16),
-                        int(Guid[4][-10:-8], 16),
-                        int(Guid[4][-8:-6], 16),
-                        int(Guid[4][-6:-4], 16),
-                        int(Guid[4][-4:-2], 16),
-                        int(Guid[4][-2:], 16)
-                        )
-            return Buffer
+            return PackGUID(GuidString.split('-'))
 
         if self.ItemSize == 8:
             PackStr = "=Q"
