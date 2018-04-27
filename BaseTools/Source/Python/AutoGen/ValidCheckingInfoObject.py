@@ -259,10 +259,7 @@ class VAR_CHECK_PCD_VALID_OBJ(object):
             self.ValidData = False
             
     def __eq__(self, validObj):       
-        if self.VarOffset == validObj.VarOffset:
-            return True
-        else:
-            return False
+        return validObj and self.VarOffset == validObj.VarOffset
          
 class VAR_CHECK_PCD_VALID_LIST(VAR_CHECK_PCD_VALID_OBJ):
     def __init__(self, VarOffset, validlist, PcdDataType):

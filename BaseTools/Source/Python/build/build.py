@@ -377,7 +377,8 @@ class BuildUnit:
     #   @param  Other       The other BuildUnit object compared to
     #
     def __eq__(self, Other):
-        return Other is not None and self.BuildObject == Other.BuildObject \
+        return Other and self.BuildObject == Other.BuildObject \
+                and Other.BuildObject \
                 and self.BuildObject.Arch == Other.BuildObject.Arch
 
     ## hash() method
