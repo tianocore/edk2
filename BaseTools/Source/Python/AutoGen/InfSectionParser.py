@@ -26,7 +26,6 @@ class InfSectionParser():
         self._ParserInf()
     
     def _ParserInf(self):
-        Filename = self._FilePath
         FileLinesList = []
         UserExtFind = False
         FindEnd = True
@@ -35,9 +34,9 @@ class InfSectionParser():
         SectionData = []
         
         try:
-            FileLinesList = open(Filename, "r", 0).readlines()
+            FileLinesList = open(self._FilePath, "r", 0).readlines()
         except BaseException:
-            EdkLogger.error("build", AUTOGEN_ERROR, 'File %s is opened failed.' % Filename)
+            EdkLogger.error("build", AUTOGEN_ERROR, 'File %s is opened failed.' % self._FilePath)
         
         for Index in range(0, len(FileLinesList)):
             line = str(FileLinesList[Index]).strip()
@@ -49,7 +48,7 @@ class InfSectionParser():
             if UserExtFind and FindEnd == False:
                 if line:
                     SectionData.append(line)
-            if line.lower().startswith(TAB_SECTION_START) and line.lower().endswith(TAB_SECTION_END):
+            if line.startswith(TAB_SECTION_START) and line.endswith(TAB_SECTION_END):
                 SectionLine = line
                 UserExtFind = True
                 FindEnd = False
@@ -59,7 +58,7 @@ class InfSectionParser():
                 UserExtFind = False
                 FindEnd = True
                 self._FileSectionDataList.append({SectionLine: SectionData[:]})
-                SectionData = []
+                del SectionData[:]
                 SectionLine = ''
     
     # Get user extension TianoCore data
