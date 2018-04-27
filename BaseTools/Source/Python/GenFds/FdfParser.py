@@ -1134,21 +1134,20 @@ class FdfParser:
 
     @staticmethod
     def __Verify(Name, Value, Scope):
-        if Scope in [TAB_UINT64, TAB_UINT8]:
-            ValueNumber = 0
-            try:
-                ValueNumber = int (Value, 0)
-            except:
-                EdkLogger.error("FdfParser", FORMAT_INVALID, "The value is not valid dec or hex number for %s." % Name)
-            if ValueNumber < 0:
-                EdkLogger.error("FdfParser", FORMAT_INVALID, "The value can't be set to negative value for %s." % Name)
-            if Scope == TAB_UINT64:
-                if ValueNumber >= 0x10000000000000000:
-                    EdkLogger.error("FdfParser", FORMAT_INVALID, "Too large value for %s." % Name)
-            if Scope == TAB_UINT8:
-                if ValueNumber >= 0x100:
-                    EdkLogger.error("FdfParser", FORMAT_INVALID, "Too large value for %s." % Name)
-            return True
+        # value verification only applies to numeric values.
+        if scope not in TAB_PCD_NUMERIC_TYPES:
+            return
+
+        ValueNumber = 0
+        try:
+            ValueNumber = int(Value, 0)
+        except:
+            EdkLogger.error("FdfParser", FORMAT_INVALID, "The value is not valid dec or hex number for %s." % Name)
+        if ValueNumber < 0:
+            EdkLogger.error("FdfParser", FORMAT_INVALID, "The value can't be set to negative value for %s." % Name)
+        if ValueNumber > MAX_VAL_TYPE[Scope]:
+            EdkLogger.error("FdfParser", FORMAT_INVALID, "Too large value for %s." % Name)
+        return True
 
     ## __UndoToken() method
     #
