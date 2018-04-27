@@ -3630,8 +3630,8 @@ class FdfParser:
                              SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, \
                              SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER, \
                              SUP_MODULE_UEFI_DRIVER, SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_USER_DEFINED, "DEFAULT", SUP_MODULE_BASE, \
-                             "SECURITY_CORE", "COMBINED_PEIM_DRIVER", "PIC_PEIM", "RELOCATABLE_PEIM", \
-                                        "PE32_PEIM", "BS_DRIVER", "RT_DRIVER", "SAL_RT_DRIVER", "APPLICATION", "ACPITABLE", SUP_MODULE_SMM_CORE, SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE):
+                             EDK_COMPONENT_TYPE_SECURITY_CORE, EDK_COMPONENT_TYPE_COMBINED_PEIM_DRIVER, EDK_COMPONENT_TYPE_PIC_PEIM, EDK_COMPONENT_TYPE_RELOCATABLE_PEIM, \
+                                        "PE32_PEIM", EDK_COMPONENT_TYPE_BS_DRIVER, EDK_COMPONENT_TYPE_RT_DRIVER, EDK_COMPONENT_TYPE_SAL_RT_DRIVER, EDK_COMPONENT_TYPE_APPLICATION, "ACPITABLE", SUP_MODULE_SMM_CORE, SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE):
             raise Warning("Unknown Module type '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
         return self.__Token
 
@@ -3674,7 +3674,7 @@ class FdfParser:
 
         Type = self.__Token.strip().upper()
         if Type not in ("RAW", "FREEFORM", SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM,\
-                             "PEI_DXE_COMBO", "DRIVER", SUP_MODULE_DXE_CORE, "APPLICATION", "FV_IMAGE", "SMM", SUP_MODULE_SMM_CORE, SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE):
+                             "PEI_DXE_COMBO", "DRIVER", SUP_MODULE_DXE_CORE, EDK_COMPONENT_TYPE_APPLICATION, "FV_IMAGE", "SMM", SUP_MODULE_SMM_CORE, SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE):
             raise Warning("Unknown FV type '%s'" % self.__Token, self.FileName, self.CurrentLineNumber)
 
         if not self.__IsToken("="):

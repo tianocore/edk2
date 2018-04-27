@@ -1587,13 +1587,13 @@ class Build():
                     if not ImageClass.IsValid:
                         EdkLogger.error("build", FILE_PARSE_FAILURE, ExtraData=ImageClass.ErrorInfo)
                     ImageInfo = PeImageInfo(Module.Name, Module.Guid, Module.Arch, Module.OutputDir, Module.DebugDir, ImageClass)
-                    if Module.ModuleType in [SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM, 'COMBINED_PEIM_DRIVER', 'PIC_PEIM', 'RELOCATABLE_PEIM', SUP_MODULE_DXE_CORE]:
+                    if Module.ModuleType in [SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM, EDK_COMPONENT_TYPE_COMBINED_PEIM_DRIVER, EDK_COMPONENT_TYPE_PIC_PEIM, EDK_COMPONENT_TYPE_RELOCATABLE_PEIM, SUP_MODULE_DXE_CORE]:
                         PeiModuleList[Module.MetaFile] = ImageInfo
                         PeiSize += ImageInfo.Image.Size
-                    elif Module.ModuleType in ['BS_DRIVER', SUP_MODULE_DXE_DRIVER, SUP_MODULE_UEFI_DRIVER]:
+                    elif Module.ModuleType in [EDK_COMPONENT_TYPE_BS_DRIVER, SUP_MODULE_DXE_DRIVER, SUP_MODULE_UEFI_DRIVER]:
                         BtModuleList[Module.MetaFile] = ImageInfo
                         BtSize += ImageInfo.Image.Size
-                    elif Module.ModuleType in [SUP_MODULE_DXE_RUNTIME_DRIVER, 'RT_DRIVER', SUP_MODULE_DXE_SAL_DRIVER, 'SAL_RT_DRIVER']:
+                    elif Module.ModuleType in [SUP_MODULE_DXE_RUNTIME_DRIVER, EDK_COMPONENT_TYPE_RT_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, EDK_COMPONENT_TYPE_SAL_RT_DRIVER]:
                         RtModuleList[Module.MetaFile] = ImageInfo
                         #IPF runtime driver needs to be at 2 page alignment.
                         if IsIpfPlatform and ImageInfo.Image.Size % 0x2000 != 0:

@@ -344,7 +344,7 @@ class InfBuildData(ModuleBuildClassObject):
             self._BuildType = self._ComponentType.upper()
             if self._ComponentType in COMPONENT_TO_MODULE_MAP_DICT:
                 self._ModuleType = COMPONENT_TO_MODULE_MAP_DICT[self._ComponentType]
-            if self._ComponentType == 'LIBRARY':
+            if self._ComponentType == EDK_COMPONENT_TYPE_LIBRARY:
                 self._LibraryClass = [LibraryClassObject(self._BaseName, SUP_MODULE_LIST)]
             # make use some [nmake] section macros
             Macros = self._Macros
