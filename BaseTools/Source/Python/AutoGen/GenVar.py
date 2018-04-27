@@ -26,22 +26,6 @@ var_info = collections.namedtuple("uefi_var", "pcdindex,pcdname,defaultstoragena
 NvStorageHeaderSize = 28
 VariableHeaderSize = 32
 
-def PackGUID(Guid):
-    GuidBuffer = pack('=LHHBBBBBBBB',
-                int(Guid[0], 16),
-                int(Guid[1], 16),
-                int(Guid[2], 16),
-                int(Guid[3][-4:-2], 16),
-                int(Guid[3][-2:], 16),
-                int(Guid[4][-12:-10], 16),
-                int(Guid[4][-10:-8], 16),
-                int(Guid[4][-8:-6], 16),
-                int(Guid[4][-6:-4], 16),
-                int(Guid[4][-4:-2], 16),
-                int(Guid[4][-2:], 16)
-                )
-    return GuidBuffer
-
 class VariableMgr(object):
     def __init__(self, DefaultStoreMap,SkuIdMap):
         self.VarInfo = []
@@ -87,14 +71,7 @@ class VariableMgr(object):
                 data_type = item.data_type
                 value_list = item.default_value.strip("{").strip("}").split(",")
                 if data_type in DataType.TAB_PCD_NUMERIC_TYPES:
-                    if data_type == ["BOOLEAN", DataType.TAB_UINT8]:
-                        data_flag = "=B"
-                    elif data_type == DataType.TAB_UINT16:
-                        data_flag = "=H"
-                    elif data_type == DataType.TAB_UINT32:
-                        data_flag = "=L"
-                    elif data_type == DataType.TAB_UINT64:
-                        data_flag = "=Q"
+                    data_flag = DataType.PACK_CODE_BY_SIZE[MAX_SIZE_TYPE[data_type]]
                     data = value_list[0]
                     value_list = []
                     for data_byte in pack(data_flag,int(data,16) if data.upper().startswith('0X') else int(data)):

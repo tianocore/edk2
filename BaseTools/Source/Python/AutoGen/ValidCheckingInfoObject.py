@@ -35,12 +35,6 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
     
     def dump(self, dest, Phase):
         
-        FormatMap = {}
-        FormatMap[1] = "=B"
-        FormatMap[2] = "=H"
-        FormatMap[4] = "=L"
-        FormatMap[8] = "=Q"
-        
         if not os.path.isabs(dest):
             return
         if not os.path.exists(dest):
@@ -106,19 +100,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
             realLength += 4
 
             Guid = var_check_tab.Guid
-            b = pack('=LHHBBBBBBBB',
-                Guid[0],
-                Guid[1],
-                Guid[2],
-                Guid[3],
-                Guid[4],
-                Guid[5],
-                Guid[6],
-                Guid[7],
-                Guid[8],
-                Guid[9],
-                Guid[10],
-                )
+            b = PackByteFormatGUID(Guid)
             Buffer += b
             realLength += 16
 
@@ -156,14 +138,14 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
                 realLength += 1
                 for v_data in item.data:
                     if type(v_data) in (int, long):
-                        b = pack(FormatMap[item.StorageWidth], v_data)
+                        b = pack(PACK_CODE_BY_SIZE[item.StorageWidth], v_data)
                         Buffer += b
                         realLength += item.StorageWidth
                     else:
-                        b = pack(FormatMap[item.StorageWidth], v_data[0])
+                        b = pack(PACK_CODE_BY_SIZE[item.StorageWidth], v_data[0])
                         Buffer += b
                         realLength += item.StorageWidth
-                        b = pack(FormatMap[item.StorageWidth], v_data[1])
+                        b = pack(PACK_CODE_BY_SIZE[item.StorageWidth], v_data[1])
                         Buffer += b
                         realLength += item.StorageWidth
 

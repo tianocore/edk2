@@ -21,7 +21,6 @@ from Common.VariableAttributes import VariableAttributes
 import copy
 from struct import unpack
 from Common.DataType import *
-from GenVar import PackGUID
 
 DATABASE_VERSION = 7
 
@@ -290,22 +289,7 @@ class DbItemList:
             GuidString = GuidStructureStringToGuidString(GuidStructureValue)
             return PackGUID(GuidString.split('-'))
 
-        if self.ItemSize == 8:
-            PackStr = "=Q"
-        elif self.ItemSize == 4:
-            PackStr = "=L"
-        elif self.ItemSize == 2:
-            PackStr = "=H"
-        elif self.ItemSize == 1:
-            PackStr = "=B"
-        elif self.ItemSize == 0:
-            PackStr = "=B"
-        elif self.ItemSize == 16:
-            # pack Guid
-            PackStr = ''
-        else:
-            # should not reach here
-            assert(False)
+        PackStr = PACK_CODE_BY_SIZE[self.ItemSize]
 
         Buffer = ''
         for Datas in self.RawDataList:
@@ -379,18 +363,7 @@ class DbComItemList (DbItemList):
         return self.ListSize
 
     def PackData(self):
-        if self.ItemSize == 8:
-            PackStr = "=Q"
-        elif self.ItemSize == 4:
-            PackStr = "=L"
-        elif self.ItemSize == 2:
-            PackStr = "=H"
-        elif self.ItemSize == 1:
-            PackStr = "=B"
-        elif self.ItemSize == 0:
-            PackStr = "=B"
-        else:
-            assert(False)
+        PackStr = PACK_CODE_BY_SIZE[self.ItemSize]
 
         Buffer = ''
         for DataList in self.RawDataList:
@@ -818,19 +791,7 @@ def BuildExDataBase(Dict):
     # Construct the database buffer
     Guid = "{0x3c7d193c, 0x682c, 0x4c14, 0xa6, 0x8f, 0x55, 0x2d, 0xea, 0x4f, 0x43, 0x7e}"
     Guid = StringArrayToList(Guid)
-    Buffer = pack('=LHHBBBBBBBB', 
-                Guid[0], 
-                Guid[1], 
-                Guid[2], 
-                Guid[3], 
-                Guid[4],  
-                Guid[5],
-                Guid[6],
-                Guid[7],
-                Guid[8],
-                Guid[9],
-                Guid[10],
-                )
+    Buffer = PackByteFormatGUID(Guid)
 
     b = pack("=L", DATABASE_VERSION)
     Buffer += b

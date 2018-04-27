@@ -26,7 +26,7 @@ import FfsFileStatement
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from GenFds import GenFds
 from CommonDataClass.FdfClass import FvClassObject
-from Common.Misc import SaveFileOnChange
+from Common.Misc import SaveFileOnChange, PackGUID
 from Common.LongFilePathSupport import CopyLongFilePath
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.DataType import *
@@ -367,10 +367,7 @@ class FV (FvClassObject):
                 #   FV UI name
                 #
                 Buffer += (pack('HH', (FvUiLen + 16 + 4), 0x0002)
-                           + pack('=LHHBBBBBBBB', int(Guid[0], 16), int(Guid[1], 16), int(Guid[2], 16),
-                                  int(Guid[3][-4:-2], 16), int(Guid[3][-2:], 16), int(Guid[4][-12:-10], 16),
-                                  int(Guid[4][-10:-8], 16), int(Guid[4][-8:-6], 16), int(Guid[4][-6:-4], 16),
-                                  int(Guid[4][-4:-2], 16), int(Guid[4][-2:], 16))
+                           + PackGUID(Guid)
                            + self.UiFvName)
 
             for Index in range (0, len(self.FvExtEntryType)):
@@ -404,20 +401,7 @@ class FV (FvClassObject):
                         Buffer += pack('B', int(ByteList[Index1], 16))
 
             Guid = self.FvNameGuid.split('-')
-            Buffer = pack('=LHHBBBBBBBBL', 
-                        int(Guid[0], 16), 
-                        int(Guid[1], 16), 
-                        int(Guid[2], 16), 
-                        int(Guid[3][-4:-2], 16), 
-                        int(Guid[3][-2:], 16),  
-                        int(Guid[4][-12:-10], 16),
-                        int(Guid[4][-10:-8], 16),
-                        int(Guid[4][-8:-6], 16),
-                        int(Guid[4][-6:-4], 16),
-                        int(Guid[4][-4:-2], 16),
-                        int(Guid[4][-2:], 16),
-                        TotalSize
-                        ) + Buffer
+            Buffer = PackGUID(Guid) + pack('=L', TotalSize) + Buffer
 
             #
             # Generate FV extension header file if the total size is not zero
