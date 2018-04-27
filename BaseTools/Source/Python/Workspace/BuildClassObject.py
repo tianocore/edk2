@@ -123,16 +123,16 @@ class StructurePcd(PcdClassObject):
         self.StructuredPcdIncludeFile = [] if StructuredPcdIncludeFile is None else StructuredPcdIncludeFile
         self.PackageDecs = Packages
         self.DefaultStoreName = [default_store]
-        self.DefaultValues = collections.OrderedDict({})
+        self.DefaultValues = collections.OrderedDict()
         self.PcdMode = None
-        self.SkuOverrideValues = collections.OrderedDict({})
+        self.SkuOverrideValues = collections.OrderedDict()
         self.FlexibleFieldName = None
         self.StructName = None
         self.PcdDefineLineNo = 0
         self.PkgPath = ""
         self.DefaultValueFromDec = ""
         self.ValueChain = dict()
-        self.PcdFieldValueFromComm = collections.OrderedDict({})
+        self.PcdFieldValueFromComm = collections.OrderedDict()
     def __repr__(self):
         return self.TypeName
 
@@ -146,9 +146,9 @@ class StructurePcd(PcdClassObject):
         self.DefaultValueFromDec = DefaultValue
     def AddOverrideValue (self, FieldName, Value, SkuName, DefaultStoreName, FileName="", LineNo=0):
         if SkuName not in self.SkuOverrideValues:
-            self.SkuOverrideValues[SkuName] = collections.OrderedDict({})
+            self.SkuOverrideValues[SkuName] = collections.OrderedDict()
         if DefaultStoreName not in self.SkuOverrideValues[SkuName]:
-            self.SkuOverrideValues[SkuName][DefaultStoreName] = collections.OrderedDict({})
+            self.SkuOverrideValues[SkuName][DefaultStoreName] = collections.OrderedDict()
         if FieldName in self.SkuOverrideValues[SkuName][DefaultStoreName]:
             del self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName]
         self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName] = [Value.strip(), FileName, LineNo]
