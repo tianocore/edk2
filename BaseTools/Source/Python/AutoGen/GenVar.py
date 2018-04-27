@@ -71,7 +71,7 @@ class VariableMgr(object):
         if not self.NVHeaderBuff:
             return ""
         self.NVHeaderBuff = self.NVHeaderBuff[:8] + pack("=Q",maxsize)
-        default_var_bin = self.format_data(self.NVHeaderBuff + self.VarDefaultBuff + self.VarDeltaBuff)
+        default_var_bin = VariableMgr.format_data(self.NVHeaderBuff + self.VarDefaultBuff + self.VarDeltaBuff)
         value_str = "{"
         default_var_bin_strip = [ data.strip("""'""") for data in default_var_bin]
         value_str += ",".join(default_var_bin_strip)
@@ -106,7 +106,7 @@ class VariableMgr(object):
                         value_list += [hex(unpack("B",data_byte)[0])]
                 newvalue[int(item.var_offset,16) if item.var_offset.upper().startswith("0X") else int(item.var_offset)] = value_list
             try:
-                newvaluestr = "{" + ",".join(self.assemble_variable(newvalue)) +"}"
+                newvaluestr = "{" + ",".join(VariableMgr.assemble_variable(newvalue)) +"}"
             except:
                 EdkLogger.error("build", AUTOGEN_ERROR, "Variable offset conflict in PCDs: %s \n" % (" and ".join([item.pcdname for item in sku_var_info_offset_list])))
             n = sku_var_info_offset_list[0]
@@ -151,7 +151,7 @@ class VariableMgr(object):
                 if len(default_sku_default.default_value.split(",")) < var_max_len:
                     tail = ",".join([ "0x00" for i in range(var_max_len-len(default_sku_default.default_value.split(",")))])
 
-            default_data_buffer = self.PACK_VARIABLES_DATA(default_sku_default.default_value,default_sku_default.data_type,tail)
+            default_data_buffer = VariableMgr.PACK_VARIABLES_DATA(default_sku_default.default_value,default_sku_default.data_type,tail)
 
             default_data_array = ()
             for item in default_data_buffer:
@@ -169,13 +169,13 @@ class VariableMgr(object):
                     if len(other_sku_other.default_value.split(",")) < var_max_len:
                         tail = ",".join([ "0x00" for i in range(var_max_len-len(other_sku_other.default_value.split(",")))])
 
-                others_data_buffer = self.PACK_VARIABLES_DATA(other_sku_other.default_value,other_sku_other.data_type,tail)
+                others_data_buffer = VariableMgr.PACK_VARIABLES_DATA(other_sku_other.default_value,other_sku_other.data_type,tail)
 
                 others_data_array = ()
                 for item in others_data_buffer:
                     others_data_array += unpack("B",item)
 
-                data_delta = self.calculate_delta(default_data_array, others_data_array)
+                data_delta = VariableMgr.calculate_delta(default_data_array, others_data_array)
 
                 var_data[(skuid,defaultstoragename)][index] = (data_delta,sku_var_info[(skuid,defaultstoragename)])
         return var_data
@@ -193,7 +193,7 @@ class VariableMgr(object):
         var_data_offset = collections.OrderedDict()
         offset = NvStorageHeaderSize
         for default_data,default_info in pcds_default_data.values():
-            var_name_buffer = self.PACK_VARIABLE_NAME(default_info.var_name)
+            var_name_buffer = VariableMgr.PACK_VARIABLE_NAME(default_info.var_name)
 
             vendorguid = default_info.var_guid.split('-')
 
@@ -202,19 +202,19 @@ class VariableMgr(object):
             else:
                 var_attr_value = 0x07
 
-            DataBuffer = self.AlignData(var_name_buffer + default_data)
+            DataBuffer = VariableMgr.AlignData(var_name_buffer + default_data)
 
             data_size = len(DataBuffer)
             offset += VariableHeaderSize + len(default_info.var_name.split(","))
             var_data_offset[default_info.pcdindex] = offset
             offset += data_size - len(default_info.var_name.split(","))
 
-            var_header_buffer = self.PACK_VARIABLE_HEADER(var_attr_value, len(default_info.var_name.split(",")), len (default_data), vendorguid)
+            var_header_buffer = VariableMgr.PACK_VARIABLE_HEADER(var_attr_value, len(default_info.var_name.split(",")), len (default_data), vendorguid)
             NvStoreDataBuffer += (var_header_buffer + DataBuffer)
 
-        variable_storage_header_buffer = self.PACK_VARIABLE_STORE_HEADER(len(NvStoreDataBuffer) + 28)
+        variable_storage_header_buffer = VariableMgr.PACK_VARIABLE_STORE_HEADER(len(NvStoreDataBuffer) + 28)
 
-        nv_default_part = self.AlignData(self.PACK_DEFAULT_DATA(0, 0, self.unpack_data(variable_storage_header_buffer+NvStoreDataBuffer)), 8)
+        nv_default_part = VariableMgr.AlignData(VariableMgr.PACK_DEFAULT_DATA(0, 0, VariableMgr.unpack_data(variable_storage_header_buffer+NvStoreDataBuffer)), 8)
 
         data_delta_structure_buffer = ""
         for skuname,defaultstore in var_data:
@@ -228,29 +228,31 @@ class VariableMgr(object):
                 delta_data = [(item[0] + offset, item[1]) for item in delta_data]
                 delta_data_set.extend(delta_data)
 
-            data_delta_structure_buffer += self.AlignData(self.PACK_DELTA_DATA(skuname,defaultstore,delta_data_set), 8)
+            data_delta_structure_buffer += VariableMgr.AlignData(self.PACK_DELTA_DATA(skuname,defaultstore,delta_data_set), 8)
 
         size = len(nv_default_part + data_delta_structure_buffer) + 16
         maxsize = self.VpdRegionSize if self.VpdRegionSize else size
-        NV_Store_Default_Header = self.PACK_NV_STORE_DEFAULT_HEADER(size,maxsize)
+        NV_Store_Default_Header = VariableMgr.PACK_NV_STORE_DEFAULT_HEADER(size,maxsize)
 
         self.NVHeaderBuff =  NV_Store_Default_Header
         self.VarDefaultBuff =nv_default_part
         self.VarDeltaBuff =  data_delta_structure_buffer
-        return self.format_data(NV_Store_Default_Header + nv_default_part + data_delta_structure_buffer)
+        return VariableMgr.format_data(NV_Store_Default_Header + nv_default_part + data_delta_structure_buffer)
 
 
-    def format_data(self,data):
+    @staticmethod
+    def format_data(data):
+        return  [hex(item) for item in VariableMgr.unpack_data(data)]
 
-        return  [hex(item) for item in self.unpack_data(data)]
-
-    def unpack_data(self,data):
+    @staticmethod
+    def unpack_data(data):
         final_data = ()
         for item in data:
             final_data += unpack("B",item)
         return final_data
 
-    def calculate_delta(self, default, theother):
+    @staticmethod
+    def calculate_delta(default, theother):
         if len(default) - len(theother) != 0:
             EdkLogger.error("build", FORMAT_INVALID, 'The variable data length is not the same for the same PCD.')
         data_delta = []
@@ -270,7 +272,8 @@ class VariableMgr(object):
             return value_str
         return ""
 
-    def PACK_VARIABLE_STORE_HEADER(self,size):
+    @staticmethod
+    def PACK_VARIABLE_STORE_HEADER(size):
         #Signature: gEfiVariableGuid
         Guid = "{ 0xddcf3616, 0x3275, 0x4164, { 0x98, 0xb6, 0xfe, 0x85, 0x70, 0x7f, 0xfe, 0x7d }}"
         Guid = GuidStructureStringToGuidString(Guid)
@@ -284,7 +287,8 @@ class VariableMgr(object):
 
         return GuidBuffer + SizeBuffer + FormatBuffer + StateBuffer + reservedBuffer
 
-    def PACK_NV_STORE_DEFAULT_HEADER(self,size,maxsize):
+    @staticmethod
+    def PACK_NV_STORE_DEFAULT_HEADER(size,maxsize):
         Signature = pack('=B',ord('N'))
         Signature += pack("=B",ord('S'))
         Signature += pack("=B",ord('D'))
@@ -295,7 +299,8 @@ class VariableMgr(object):
 
         return Signature + SizeBuffer + MaxSizeBuffer
 
-    def PACK_VARIABLE_HEADER(self,attribute,namesize,datasize,vendorguid):
+    @staticmethod
+    def PACK_VARIABLE_HEADER(attribute,namesize,datasize,vendorguid):
 
         Buffer = pack('=H',0x55AA) # pack StartID
         Buffer += pack('=B',0x3F)  # pack State
@@ -309,7 +314,8 @@ class VariableMgr(object):
 
         return Buffer
 
-    def PACK_VARIABLES_DATA(self, var_value,data_type, tail = None):
+    @staticmethod
+    def PACK_VARIABLES_DATA(var_value,data_type, tail = None):
         Buffer = ""
         data_len = 0
         if data_type == DataType.TAB_VOID:
@@ -338,7 +344,8 @@ class VariableMgr(object):
 
         return Buffer
 
-    def PACK_DEFAULT_DATA(self, defaultstoragename,skuid,var_value):
+    @staticmethod
+    def PACK_DEFAULT_DATA(defaultstoragename,skuid,var_value):
         Buffer = ""
         Buffer += pack("=L",4+8+8)
         Buffer += pack("=Q",int(skuid))
@@ -355,10 +362,12 @@ class VariableMgr(object):
         if skuname not in self.SkuIdMap:
             return None
         return self.SkuIdMap.get(skuname)[0]
+
     def GetDefaultStoreId(self,dname):
         if dname not in self.DefaultStoreMap:
             return None
         return self.DefaultStoreMap.get(dname)[0]
+
     def PACK_DELTA_DATA(self,skuname,defaultstoragename,delta_list):
         skuid = self.GetSkuId(skuname)
         defaultstorageid = self.GetDefaultStoreId(defaultstoragename)
@@ -374,7 +383,8 @@ class VariableMgr(object):
 
         return Buffer
 
-    def AlignData(self,data, align = 4):
+    @staticmethod
+    def AlignData(data, align = 4):
         mybuffer = data
         if (len(data) % align) > 0:
             for i in range(align - (len(data) % align)):
@@ -382,7 +392,8 @@ class VariableMgr(object):
 
         return mybuffer
 
-    def PACK_VARIABLE_NAME(self, var_name):
+    @staticmethod
+    def PACK_VARIABLE_NAME(var_name):
         Buffer = ""
         for name_char in var_name.strip("{").strip("}").split(","):
             Buffer += pack("=B",int(name_char,16))
