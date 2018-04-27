@@ -144,7 +144,7 @@ class VariableMgr(object):
             default_data_buffer = ""
             others_data_buffer = ""
             tail = None
-            default_sku_default = indexedvarinfo.get(index).get((DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT))
+            default_sku_default = indexedvarinfo[index].get((DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT))
 
             if default_sku_default.data_type not in DataType.TAB_PCD_NUMERIC_TYPES:
                 var_max_len = max([len(var_item.default_value.split(",")) for var_item in sku_var_info.values()])
@@ -159,11 +159,11 @@ class VariableMgr(object):
 
             var_data[(DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT)][index] = (default_data_buffer,sku_var_info[(DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT)])
 
-            for (skuid,defaultstoragename) in indexedvarinfo.get(index):
+            for (skuid,defaultstoragename) in indexedvarinfo[index]:
                 tail = None
                 if (skuid,defaultstoragename) == (DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT):
                     continue
-                other_sku_other = indexedvarinfo.get(index).get((skuid,defaultstoragename))
+                other_sku_other = indexedvarinfo[index][(skuid,defaultstoragename)]
 
                 if default_sku_default.data_type not in DataType.TAB_PCD_NUMERIC_TYPES:
                     if len(other_sku_other.default_value.split(",")) < var_max_len:
@@ -220,7 +220,7 @@ class VariableMgr(object):
         for skuname,defaultstore in var_data:
             if (skuname,defaultstore) == (DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT):
                 continue
-            pcds_sku_data = var_data.get((skuname,defaultstore))
+            pcds_sku_data = var_data[(skuname,defaultstore)]
             delta_data_set = []
             for pcdindex in pcds_sku_data:
                 offset = var_data_offset[pcdindex]
