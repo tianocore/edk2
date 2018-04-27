@@ -16,7 +16,7 @@ from Common.String import StringToArray
 from struct import pack
 from ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER
 from ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB
-from ValidCheckingInfoObject import VAR_VALID_OBJECT_FACTORY
+from ValidCheckingInfoObject import GetValidationObject
 from Common.VariableAttributes import VariableAttributes
 import copy
 from struct import unpack
@@ -1247,7 +1247,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                 if Platform.Platform.VarCheckFlag:
                     var_check_obj = VAR_CHECK_PCD_VARIABLE_TAB(VariableGuidStructure, StringToArray(Sku.VariableName))
                     try:
-                        var_check_obj.push_back(VAR_VALID_OBJECT_FACTORY.Get_valid_object(Pcd, Sku.VariableOffset))
+                        var_check_obj.push_back(GetValidationObject(Pcd, Sku.VariableOffset))
                         VarAttr, _ = VariableAttributes.GetVarAttributes(Sku.VariableAttribute)
                         var_check_obj.SetAttributes(VarAttr)
                         var_check_obj.UpdateSize()

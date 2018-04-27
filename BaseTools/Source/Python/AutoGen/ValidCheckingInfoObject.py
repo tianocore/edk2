@@ -295,14 +295,10 @@ class VAR_CHECK_PCD_VALID_RANGE(VAR_CHECK_PCD_VALID_OBJ):
         self.Length = 5 + len(self.data) * 2 * self.StorageWidth
         
 
-class VAR_VALID_OBJECT_FACTORY(object):
-    def __init__(self):
-        pass
-    @staticmethod
-    def Get_valid_object(PcdClass, VarOffset):
-        if PcdClass.validateranges:
-            return VAR_CHECK_PCD_VALID_RANGE(VarOffset, PcdClass.validateranges, PcdClass.DatumType)
-        if PcdClass.validlists:
-            return VAR_CHECK_PCD_VALID_LIST(VarOffset, PcdClass.validlists, PcdClass.DatumType)
-        else:
-            return None
+def GetValidationObject(PcdClass, VarOffset):
+    if PcdClass.validateranges:
+        return VAR_CHECK_PCD_VALID_RANGE(VarOffset, PcdClass.validateranges, PcdClass.DatumType)
+    if PcdClass.validlists:
+        return VAR_CHECK_PCD_VALID_LIST(VarOffset, PcdClass.validlists, PcdClass.DatumType)
+    else:
+        return None
