@@ -31,7 +31,7 @@ from Common.Misc import GuidStructureStringToGuidString, CheckPcdDatum, PathClas
 from Common.Expression import *
 from CommonDataClass.Exceptions import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
-
+from collections import defaultdict
 from MetaFileTable import MetaFileStorage
 from MetaFileCommentParser import CheckInfComment
 
@@ -163,7 +163,7 @@ class MetaFileParser(object):
         self._FileDir = self.MetaFile.Dir
         self._Defines = {}
         self._FileLocalMacros = {}
-        self._SectionsMacroDict = {}
+        self._SectionsMacroDict = defaultdict(dict)
 
         # for recursive parsing
         self._Owner = [Owner]
@@ -421,17 +421,16 @@ class MetaFileParser(object):
     def _ConstructSectionMacroDict(self, Name, Value):
         ScopeKey = [(Scope[0], Scope[1],Scope[2]) for Scope in self._Scope]
         ScopeKey = tuple(ScopeKey)
-        SectionDictKey = self._SectionType, ScopeKey
         #
         # DecParser SectionType is a list, will contain more than one item only in Pcd Section
         # As Pcd section macro usage is not alllowed, so here it is safe
         #
         if type(self) == DecParser:
             SectionDictKey = self._SectionType[0], ScopeKey
-        if SectionDictKey not in self._SectionsMacroDict:
-            self._SectionsMacroDict[SectionDictKey] = {}
-        SectionLocalMacros = self._SectionsMacroDict[SectionDictKey]
-        SectionLocalMacros[Name] = Value
+        else:
+            SectionDictKey = self._SectionType, ScopeKey
+
+        self._SectionsMacroDict[SectionDictKey][Name] = Value
 
     ## Get section Macros that are applicable to current line, which may come from other sections 
     ## that share the same name while scope is wider
@@ -936,7 +935,7 @@ class DscParser(MetaFileParser):
                 self._SubsectionType = MODEL_UNKNOWN
                 self._SubsectionName = ''
                 self._Owner[-1] = -1
-                OwnerId = {}
+                OwnerId.clear()
                 continue
             # subsection header
             elif Line[0] == TAB_OPTION_START and Line[-1] == TAB_OPTION_END:
@@ -1296,7 +1295,7 @@ class DscParser(MetaFileParser):
         self._DirectiveEvalStack = []
         self._FileWithError = self.MetaFile
         self._FileLocalMacros = {}
-        self._SectionsMacroDict = {}
+        self._SectionsMacroDict.clear()
         GlobalData.gPlatformDefines = {}
 
         # Get all macro and PCD which has straitforward value
