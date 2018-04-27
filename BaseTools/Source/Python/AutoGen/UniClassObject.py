@@ -218,6 +218,19 @@ class StringDefClassObject(object):
             self.StringValueByteList = UniToHexList(self.StringValue)
             self.Length = len(self.StringValueByteList)
 
+def StripComments(Line):
+    Comment = u'//'
+    CommentPos = Line.find(Comment)
+    while CommentPos >= 0:
+    # if there are non matched quotes before the comment header
+    # then we are in the middle of a string
+    # but we need to ignore the escaped quotes and backslashes.
+        if ((Line.count(u'"', 0, CommentPos) - Line.count(u'\\"', 0, CommentPos)) & 1) == 1:
+            CommentPos = Line.find (Comment, CommentPos + 1)
+        else:
+            return Line[:CommentPos].strip()
+    return Line.strip()
+
 ## UniFileClassObject
 #
 # A structure for .uni file definition
@@ -371,20 +384,6 @@ class UniFileClassObject(object):
         FileName = Item[Item.find(u'#include ') + len(u'#include ') :Item.find(u' ', len(u'#include '))][1:-1]
         self.LoadUniFile(FileName)
 
-    def StripComments(self, Line):
-        Comment = u'//'
-        CommentPos = Line.find(Comment)
-        while CommentPos >= 0:
-        # if there are non matched quotes before the comment header
-        # then we are in the middle of a string
-        # but we need to ignore the escaped quotes and backslashes.
-            if ((Line.count(u'"', 0, CommentPos) - Line.count(u'\\"', 0, CommentPos)) & 1) == 1:
-                CommentPos = Line.find (Comment, CommentPos + 1)
-            else:
-                return Line[:CommentPos].strip()
-        return Line.strip()
-                
-
     #
     # Pre-process before parse .uni file
     #
@@ -406,7 +405,7 @@ class UniFileClassObject(object):
         for Line in FileIn:
             Line = Line.strip()
             Line = Line.replace(u'\\\\', BACK_SLASH_PLACEHOLDER)
-            Line = self.StripComments(Line)
+            Line = StripComments(Line)
 
             #
             # Ignore empty line

@@ -22,6 +22,7 @@ from Common.LongFilePathSupport import LongFilePath
 import re
 import os
 from Common.GlobalData import gIdentifierPattern
+from UniClassObject import StripComments
 
 IMAGE_TOKEN = re.compile('IMAGE_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
 
@@ -91,7 +92,7 @@ class IdfFileClassObject(object):
         ImageFileList = []
         for Line in FileIn.splitlines():
             Line = Line.strip()
-            Line = self.StripComments(Line)
+            Line = StripComments(Line)
             if len(Line) == 0:
                 continue
 
@@ -120,22 +121,6 @@ class IdfFileClassObject(object):
                 ImageFileList.append(ImageFile)
         if ImageFileList:
             self.ImageFilesDict[File] = ImageFileList
-
-    def StripComments(self, Line):
-        Comment = '//'
-        CommentPos = Line.find(Comment)
-        while CommentPos >= 0:
-        # if there are non matched quotes before the comment header
-        # then we are in the middle of a string
-        # but we need to ignore the escaped quotes and backslashes.
-            if ((Line.count('"', 0, CommentPos) - Line.count('\\"', 0, CommentPos)) & 1) == 1:
-                CommentPos = Line.find (Comment, CommentPos + 1)
-            else:
-                return Line[:CommentPos].strip()
-        return Line.strip()
-
-    def ImageDecoder(self, File):
-        pass
 
 def SearchImageID(ImageFileObject, FileList):
     if FileList == []:
