@@ -71,7 +71,6 @@ class IdfFileClassObject(object):
         for File in FileList:
             if File is None:
                 EdkLogger.error("Image Definition File Parser", PARSER_ERROR, 'No Image definition file is given.')
-            self.File = File
 
             try:
                 IdfFile = open(LongFilePath(File.Path), mode='r')
