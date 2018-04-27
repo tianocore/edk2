@@ -235,32 +235,6 @@ ${PHASE}_PCD_DATABASE_INIT g${PHASE}PcdDbInit = {
 #endif
 """)
 
-## PackGuid
-#
-# Pack the GUID value in C structure format into data array
-#
-# @param GuidStructureValue:   The GUID value in C structure format
-#
-# @retval Buffer:  a data array contains the Guid
-#
-def PackGuid(GuidStructureValue):
-    GuidString = GuidStructureStringToGuidString(GuidStructureValue)
-    Guid = GuidString.split('-')
-    Buffer = pack('=LHHBBBBBBBB', 
-                int(Guid[0], 16), 
-                int(Guid[1], 16), 
-                int(Guid[2], 16), 
-                int(Guid[3][-4:-2], 16), 
-                int(Guid[3][-2:], 16),
-                int(Guid[4][-12:-10], 16),
-                int(Guid[4][-10:-8], 16),
-                int(Guid[4][-8:-6], 16),
-                int(Guid[4][-6:-4], 16),
-                int(Guid[4][-4:-2], 16),
-                int(Guid[4][-2:], 16)
-                )
-    return Buffer
-
 ## DbItemList
 #
 #  The class holds the Pcd database items. ItemSize if not zero should match the item datum type in the C structure. 
@@ -303,6 +277,32 @@ class DbItemList:
         return self.ListSize
 
     def PackData(self):
+        ## PackGuid
+        #
+        # Pack the GUID value in C structure format into data array
+        #
+        # @param GuidStructureValue:   The GUID value in C structure format
+        #
+        # @retval Buffer:  a data array contains the Guid
+        #
+        def PackGuid(GuidStructureValue):
+            GuidString = GuidStructureStringToGuidString(GuidStructureValue)
+            Guid = GuidString.split('-')
+            Buffer = pack('=LHHBBBBBBBB', 
+                        int(Guid[0], 16), 
+                        int(Guid[1], 16), 
+                        int(Guid[2], 16), 
+                        int(Guid[3][-4:-2], 16), 
+                        int(Guid[3][-2:], 16),
+                        int(Guid[4][-12:-10], 16),
+                        int(Guid[4][-10:-8], 16),
+                        int(Guid[4][-8:-6], 16),
+                        int(Guid[4][-6:-4], 16),
+                        int(Guid[4][-4:-2], 16),
+                        int(Guid[4][-2:], 16)
+                        )
+            return Buffer
+
         if self.ItemSize == 8:
             PackStr = "=Q"
         elif self.ItemSize == 4:
