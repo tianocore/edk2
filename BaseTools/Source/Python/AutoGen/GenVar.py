@@ -113,9 +113,10 @@ class VariableMgr(object):
             indexedvarinfo[key] =  [var_info(n.pcdindex,n.pcdname,n.defaultstoragename,n.skuname,n.var_name, n.var_guid, "0x00",n.var_attribute,newvaluestr  , newvaluestr , DataType.TAB_VOID)]
         self.VarInfo = [item[0] for item in indexedvarinfo.values()]
 
-    def assemble_variable(self, valuelist):
-        ordered_offset = sorted(valuelist.keys())
-        ordered_value = [valuelist[k] for k in ordered_offset]
+    @staticmethod
+    def assemble_variable(valuedict):
+        ordered_offset = sorted(valuedict.keys())
+        ordered_value = [valuedict[k] for k in ordered_offset]
         var_value = []
         num = 0
         for offset in ordered_offset:
@@ -126,6 +127,7 @@ class VariableMgr(object):
             var_value += ordered_value[num]
             num +=1
         return var_value
+
     def process_variable_data(self):
 
         var_data = collections.defaultdict(collections.OrderedDict)
