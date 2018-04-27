@@ -152,7 +152,7 @@ def _parseGeneral(lines, efifilepath):
             status = 3
             continue
         if status == 1 and len(line) != 0:
-            m = secRe.match(line)
+            m = secReGeneral.match(line)
             assert m is not None, "Fail to parse the section in map file , line is %s" % line
             sec_no, sec_start, sec_length, sec_name, sec_class = m.groups(0)
             secs.append([int(sec_no, 16), int(sec_start, 16), int(sec_length, 16), sec_name, sec_class])
