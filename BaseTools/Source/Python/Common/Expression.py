@@ -201,7 +201,22 @@ def IntToStr(Value):
 
 SupportedInMacroList = ['TARGET', 'TOOL_CHAIN_TAG', 'ARCH', 'FAMILY']
 
-class ValueExpression(object):
+class BaseExpression(object):
+    def __init__(self, *args, **kwargs):
+        super(BaseExpression, self).__init__()
+
+    # Check if current token matches the operators given from parameter
+    def _IsOperator(self, OpSet):
+        Idx = self._Idx
+        self._GetOperator()
+        if self._Token in OpSet:
+            if self._Token in self.LogicalOperators:
+                self._Token = self.LogicalOperators[self._Token]
+            return True
+        self._Idx = Idx
+        return False
+
+class ValueExpression(BaseExpression):
     # Logical operator mapping
     LogicalOperators = {
         '&&' : 'and', '||' : 'or',
@@ -307,6 +322,7 @@ class ValueExpression(object):
         return Val
 
     def __init__(self, Expression, SymbolTable={}):
+        super(ValueExpression, self).__init__(self, Expression, SymbolTable)
         self._NoProcess = False
         if type(Expression) != type(''):
             self._Expr = Expression
@@ -779,17 +795,6 @@ class ValueExpression(object):
             raise BadExpression(ERR_OPERATOR_UNSUPPORT % OpToken)
         self._Token = OpToken
         return OpToken
-
-    # Check if current token matches the operators given from OpList
-    def _IsOperator(self, OpList):
-        Idx = self._Idx
-        self._GetOperator()
-        if self._Token in OpList:
-            if self._Token in self.LogicalOperators:
-                self._Token = self.LogicalOperators[self._Token]
-            return True
-        self._Idx = Idx
-        return False
 
 class ValueExpressionEx(ValueExpression):
     def __init__(self, PcdValue, PcdType, SymbolTable={}):

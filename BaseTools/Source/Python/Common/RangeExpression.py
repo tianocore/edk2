@@ -16,7 +16,7 @@ from Common.GlobalData import *
 from CommonDataClass.Exceptions import BadExpression
 from CommonDataClass.Exceptions import WrnExpression
 import uuid
-from Common.Expression import PcdPattern
+from Common.Expression import PcdPattern,BaseExpression
 from Common.DataType import *
 
 ERR_STRING_EXPR = 'This operator cannot be used in string expression: [%s].'
@@ -186,7 +186,7 @@ def GetOperatorObject(Operator):
     else:
         raise BadExpression("Bad Operator")
 
-class RangeExpression(object):
+class RangeExpression(BaseExpression):
     # Logical operator mapping
     LogicalOperators = {
         '&&' : 'and', '||' : 'or',
@@ -347,6 +347,7 @@ class RangeExpression(object):
 
 
     def __init__(self, Expression, PcdDataType, SymbolTable = {}):
+        super(RangeExpression, self).__init__(self, Expression, PcdDataType, SymbolTable)
         self._NoProcess = False
         if type(Expression) != type(''):
             self._Expr = Expression
@@ -693,25 +694,3 @@ class RangeExpression(object):
             raise BadExpression(ERR_OPERATOR_UNSUPPORT % OpToken)
         self._Token = OpToken
         return OpToken
-
-    # Check if current token matches the operators given from OpList
-    def _IsOperator(self, OpList):
-        Idx = self._Idx
-        self._GetOperator()
-        if self._Token in OpList:
-            if self._Token in self.LogicalOperators:
-                self._Token = self.LogicalOperators[self._Token]
-            return True
-        self._Idx = Idx
-        return False
-
-
-    
-    
-    
-    
-
-
-
-
-#    UTRangeList()
