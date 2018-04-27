@@ -324,20 +324,3 @@ class VAR_VALID_OBJECT_FACTORY(object):
             return VAR_CHECK_PCD_VALID_LIST(VarOffset, PcdClass.validlists, PcdClass.DatumType)
         else:
             return None
-
-if __name__ == "__main__":
-    class TestObj(object):
-        def __init__(self, number1):
-            self.number_1 = number1
-        def __eq__(self, testobj):
-            if self.number_1 == testobj.number_1:
-                return True
-            else:
-                return False
-    test1 = TestObj(1)
-    test2 = TestObj(2)
-    
-    testarr = [test1, test2]
-    print TestObj(2) in testarr
-    print TestObj(2) == test2
-    
