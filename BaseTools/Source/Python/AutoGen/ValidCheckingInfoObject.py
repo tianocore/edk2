@@ -244,16 +244,12 @@ class VAR_CHECK_PCD_VALID_OBJ(object):
         self.Type = 1
         self.Length = 0  # Length include this header
         self.VarOffset = VarOffset
-        self.StorageWidth = 0
         self.PcdDataType = PcdDataType.strip()
         self.rawdata = data
         self.data = set()
-        self.ValidData = True
-        self.updateStorageWidth()
-
-    def updateStorageWidth(self):
         try:
             self.StorageWidth = MAX_SIZE_TYPE[self.PcdDataType]
+            self.ValidData = True
         except:
             self.StorageWidth = 0
             self.ValidData = False
@@ -265,9 +261,6 @@ class VAR_CHECK_PCD_VALID_LIST(VAR_CHECK_PCD_VALID_OBJ):
     def __init__(self, VarOffset, validlist, PcdDataType):
         super(VAR_CHECK_PCD_VALID_LIST, self).__init__(VarOffset, validlist, PcdDataType)
         self.Type = 1
-        self.update_data()
-        self.update_size()
-    def update_data(self):
         valid_num_list = []
         data_list = []
         for item in self.rawdata:
@@ -283,8 +276,6 @@ class VAR_CHECK_PCD_VALID_LIST(VAR_CHECK_PCD_VALID_OBJ):
 
                 
         self.data = set(data_list)
-        
-    def update_size(self):
         self.Length = 5 + len(self.data) * self.StorageWidth
         
            
@@ -292,9 +283,6 @@ class VAR_CHECK_PCD_VALID_RANGE(VAR_CHECK_PCD_VALID_OBJ):
     def __init__(self, VarOffset, validrange, PcdDataType):
         super(VAR_CHECK_PCD_VALID_RANGE, self).__init__(VarOffset, validrange, PcdDataType)
         self.Type = 2
-        self.update_data()
-        self.update_size()
-    def update_data(self):
         RangeExpr = ""
         data_list = []
         i = 0
@@ -308,8 +296,6 @@ class VAR_CHECK_PCD_VALID_RANGE(VAR_CHECK_PCD_VALID_OBJ):
             for obj in rangelist.pop():
                 data_list.append((obj.start, obj.end))
         self.data = set(data_list)
-    
-    def update_size(self):
         self.Length = 5 + len(self.data) * 2 * self.StorageWidth
         
 
