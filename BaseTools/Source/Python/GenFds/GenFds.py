@@ -428,7 +428,7 @@ def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
         if BuildOption:
             ToolList = [TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG, TAB_TOD_DEFINES_TARGET_ARCH]
             for Index in range(2, -1, -1):
-                for Key in dict(BuildOption):
+                for Key in list(BuildOption.keys()):
                     List = Key.split('_')
                     if List[Index] == '*':
                         for String in ToolDb[ToolList[Index]]:

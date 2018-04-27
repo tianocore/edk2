@@ -92,7 +92,9 @@ class ToolDefClassObject(object):
 
         KeyList = [TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG, TAB_TOD_DEFINES_TARGET_ARCH, TAB_TOD_DEFINES_COMMAND_TYPE]
         for Index in range(3, -1, -1):
-            for Key in dict(self.ToolsDefTxtDictionary):
+            # make a copy of the keys to enumerate over to prevent issues when
+            # adding/removing items from the original dict.
+            for Key in list(self.ToolsDefTxtDictionary.keys()):
                 List = Key.split('_')
                 if List[Index] == '*':
                     for String in self.ToolsDefTxtDatabase[KeyList[Index]]:
@@ -100,7 +102,6 @@ class ToolDefClassObject(object):
                         NewKey = '%s_%s_%s_%s_%s' % tuple(List)
                         if NewKey not in self.ToolsDefTxtDictionary:
                             self.ToolsDefTxtDictionary[NewKey] = self.ToolsDefTxtDictionary[Key]
-                        continue
                     del self.ToolsDefTxtDictionary[Key]
                 elif List[Index] not in self.ToolsDefTxtDatabase[KeyList[Index]]:
                     del self.ToolsDefTxtDictionary[Key]
