@@ -818,27 +818,27 @@ def StringToArray(String):
     if isinstance(String, unicode):
         if len(unicode) == 0:
             return "{0x00,0x00}"
-        return "{%s,0x00,0x00}" % ",".join(["0x%02x,0x00" % ord(C) for C in String])
+        return "{%s,0x00,0x00}" % ",".join("0x%02x,0x00" % ord(C) for C in String)
     elif String.startswith('L"'):
         if String == "L\"\"":
             return "{0x00,0x00}"
         else:
-            return "{%s,0x00,0x00}" % ",".join(["0x%02x,0x00" % ord(C) for C in String[2:-1]])
+            return "{%s,0x00,0x00}" % ",".join("0x%02x,0x00" % ord(C) for C in String[2:-1])
     elif String.startswith('"'):
         if String == "\"\"":
             return "{0x00,0x00}"
         else:
             StringLen = len(String[1:-1])
             if StringLen % 2:
-                return "{%s,0x00}" % ",".join(["0x%02x" % ord(C) for C in String[1:-1]])
+                return "{%s,0x00}" % ",".join("0x%02x" % ord(C) for C in String[1:-1])
             else:
-                return "{%s,0x00,0x00}" % ",".join(["0x%02x" % ord(C) for C in String[1:-1]])
+                return "{%s,0x00,0x00}" % ",".join("0x%02x" % ord(C) for C in String[1:-1])
     elif String.startswith('{'):
         StringLen = len(String.split(","))
         if StringLen % 2:
-            return "{%s,0x00}" % ",".join([ C.strip() for C in String[1:-1].split(',')])
+            return "{%s,0x00}" % ",".join(C.strip() for C in String[1:-1].split(','))
         else:
-            return "{%s}" % ",".join([ C.strip() for C in String[1:-1].split(',')])
+            return "{%s}" % ",".join(C.strip() for C in String[1:-1].split(','))
         
     else:
         if len(String.split()) % 2:

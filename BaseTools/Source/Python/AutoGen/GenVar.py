@@ -80,7 +80,7 @@ class VariableMgr(object):
             try:
                 newvaluestr = "{" + ",".join(VariableMgr.assemble_variable(newvalue)) +"}"
             except:
-                EdkLogger.error("build", AUTOGEN_ERROR, "Variable offset conflict in PCDs: %s \n" % (" and ".join([item.pcdname for item in sku_var_info_offset_list])))
+                EdkLogger.error("build", AUTOGEN_ERROR, "Variable offset conflict in PCDs: %s \n" % (" and ".join(item.pcdname for item in sku_var_info_offset_list)))
             n = sku_var_info_offset_list[0]
             indexedvarinfo[key] =  [var_info(n.pcdindex,n.pcdname,n.defaultstoragename,n.skuname,n.var_name, n.var_guid, "0x00",n.var_attribute,newvaluestr  , newvaluestr , DataType.TAB_VOID)]
         self.VarInfo = [item[0] for item in indexedvarinfo.values()]
@@ -116,9 +116,9 @@ class VariableMgr(object):
             default_sku_default = indexedvarinfo[index].get((DataType.TAB_DEFAULT,DataType.TAB_DEFAULT_STORES_DEFAULT))
 
             if default_sku_default.data_type not in DataType.TAB_PCD_NUMERIC_TYPES:
-                var_max_len = max([len(var_item.default_value.split(",")) for var_item in sku_var_info.values()])
+                var_max_len = max(len(var_item.default_value.split(",")) for var_item in sku_var_info.values())
                 if len(default_sku_default.default_value.split(",")) < var_max_len:
-                    tail = ",".join([ "0x00" for i in range(var_max_len-len(default_sku_default.default_value.split(",")))])
+                    tail = ",".join("0x00" for i in range(var_max_len-len(default_sku_default.default_value.split(","))))
 
             default_data_buffer = VariableMgr.PACK_VARIABLES_DATA(default_sku_default.default_value,default_sku_default.data_type,tail)
 
@@ -136,7 +136,7 @@ class VariableMgr(object):
 
                 if default_sku_default.data_type not in DataType.TAB_PCD_NUMERIC_TYPES:
                     if len(other_sku_other.default_value.split(",")) < var_max_len:
-                        tail = ",".join([ "0x00" for i in range(var_max_len-len(other_sku_other.default_value.split(",")))])
+                        tail = ",".join("0x00" for i in range(var_max_len-len(other_sku_other.default_value.split(","))))
 
                 others_data_buffer = VariableMgr.PACK_VARIABLES_DATA(other_sku_other.default_value,other_sku_other.data_type,tail)
 

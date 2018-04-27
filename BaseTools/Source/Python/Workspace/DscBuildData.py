@@ -1514,7 +1514,7 @@ class DscBuildData(PlatformBuildClassObject):
                     return len(Value) - 2
             return len(Value)
 
-        return str(max([pcd_size for pcd_size in [get_length(item) for item in sku_values]]))
+        return str(max(get_length(item) for item in sku_values))
 
     @staticmethod
     def ExecuteCommand (Command):
@@ -2078,7 +2078,7 @@ class DscBuildData(PlatformBuildClassObject):
         SearchPathList = []
         SearchPathList.append(os.path.normpath(mws.join(GlobalData.gWorkspace, "BaseTools/Source/C/Include")))
         SearchPathList.append(os.path.normpath(mws.join(GlobalData.gWorkspace, "BaseTools/Source/C/Common")))
-        SearchPathList.extend([str(item) for item in IncSearchList])
+        SearchPathList.extend(str(item) for item in IncSearchList)
         IncFileList = GetDependencyList(IncludeFileFullPaths,SearchPathList)
         for include_file in IncFileList:
             MakeApp += "$(OBJECTS) : %s\n" % include_file
@@ -2324,7 +2324,7 @@ class DscBuildData(PlatformBuildClassObject):
             if PcdType in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
                 for skuid in PcdObj.SkuInfoList:
                     skuobj = PcdObj.SkuInfoList[skuid]
-                    mindefaultstorename = DefaultStoreObj.GetMin(set([defaultstorename  for defaultstorename in skuobj.DefaultStoreDict]))
+                    mindefaultstorename = DefaultStoreObj.GetMin(set(defaultstorename for defaultstorename in skuobj.DefaultStoreDict))
                     for defaultstorename in DefaultStores:
                         if defaultstorename not in skuobj.DefaultStoreDict:
                             skuobj.DefaultStoreDict[defaultstorename] = copy.deepcopy(skuobj.DefaultStoreDict[mindefaultstorename])

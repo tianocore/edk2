@@ -833,7 +833,7 @@ class TemplateString(object):
     def Append(self, AppendString, Dictionary=None):
         if Dictionary:
             SectionList = self._Parse(AppendString)
-            self.String += "".join([S.Instantiate(Dictionary) for S in SectionList])
+            self.String += "".join(S.Instantiate(Dictionary) for S in SectionList)
         else:
             self.String += AppendString
 
@@ -844,7 +844,7 @@ class TemplateString(object):
     #   @retval     str             The string replaced with placeholder values
     #
     def Replace(self, Dictionary=None):
-        return "".join([S.Instantiate(Dictionary) for S in self._TemplateSectionList])
+        return "".join(S.Instantiate(Dictionary) for S in self._TemplateSectionList)
 
 ## Progress indicator class
 #
@@ -1926,7 +1926,7 @@ class DefaultStore():
         if not self.DefaultStores or "0" in self.DefaultStores:
             return "0",TAB_DEFAULT_STORES_DEFAULT
         else:
-            minvalue = min([int(value_str) for value_str in self.DefaultStores])
+            minvalue = min(int(value_str) for value_str in self.DefaultStores)
             return (str(minvalue), self.DefaultStores[str(minvalue)])
     def GetMin(self,DefaultSIdList):
         if not DefaultSIdList:
@@ -2023,7 +2023,7 @@ class SkuClass():
             skuorderset.append(self.GetSkuChain(skuname))
         
         skuorder = []
-        for index in range(max([len(item) for item in skuorderset])):
+        for index in range(max(len(item) for item in skuorderset)):
             for subset in skuorderset:
                 if index > len(subset)-1:
                     continue

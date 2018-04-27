@@ -460,7 +460,7 @@ class WorkspaceAutoGen(AutoGen):
                             'build',
                             FORMAT_INVALID,
                             "Building modules from source INFs, following PCD use %s and %s access method. It must be corrected to use only one access method." % (i, j),
-                            ExtraData="%s" % '\n\t'.join([str(P[1]+'.'+P[0]) for P in Intersections])
+                            ExtraData="%s" % '\n\t'.join(str(P[1]+'.'+P[0]) for P in Intersections)
                             )
 
             #
@@ -2295,7 +2295,7 @@ class PlatformAutoGen(AutoGen):
         #
         for Item in LibraryList:
             if ConsumedByList[Item] != [] and Item in Constructor and len(Constructor) > 1:
-                ErrorMessage = "\tconsumed by " + "\n\tconsumed by ".join([str(L) for L in ConsumedByList[Item]])
+                ErrorMessage = "\tconsumed by " + "\n\tconsumed by ".join(str(L) for L in ConsumedByList[Item])
                 EdkLogger.error("build", BUILD_ERROR, 'Library [%s] with constructors has a cycle' % str(Item),
                                 ExtraData=ErrorMessage, File=self.MetaFile)
             if Item not in SortedLibraryList:
@@ -2415,7 +2415,7 @@ class PlatformAutoGen(AutoGen):
                 if Sku.VariableGuid == '': continue
                 Sku.VariableGuidValue = GuidValue(Sku.VariableGuid, self.PackageList, self.MetaFile.Path)
                 if Sku.VariableGuidValue is None:
-                    PackageList = "\n\t".join([str(P) for P in self.PackageList])
+                    PackageList = "\n\t".join(str(P) for P in self.PackageList)
                     EdkLogger.error(
                                 'build',
                                 RESOURCE_NOT_AVAILABLE,
@@ -3122,7 +3122,7 @@ class ModuleAutoGen(AutoGen):
             for Depex in DepexList:
                 for key in Depex:
                     DepexStr += '[Depex.%s.%s]\n' % key
-                    DepexStr += '\n'.join(['# '+ val for val in Depex[key]])
+                    DepexStr += '\n'.join('# '+ val for val in Depex[key])
                     DepexStr += '\n\n'
             if not DepexStr:
                 return '[Depex.%s]\n' % self.Arch
@@ -3136,7 +3136,7 @@ class ModuleAutoGen(AutoGen):
                 DepexStr += ' AND '
             DepexStr += '('
             for D in Depex.values():
-                DepexStr += ' '.join([val for val in D])
+                DepexStr += ' '.join(val for val in D)
             Index = DepexStr.find('END')
             if Index > -1 and Index == len(DepexStr) - 3:
                 DepexStr = DepexStr[:-3]

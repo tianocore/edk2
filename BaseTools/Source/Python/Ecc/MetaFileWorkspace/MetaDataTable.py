@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create/update/query/erase table for files
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -73,7 +73,7 @@ class Table(object):
         self.ID = self.ID + self._ID_STEP_
         if self.ID >= (self.IdBase + self._ID_MAX_):
             self.ID = self.IdBase + self._ID_STEP_
-        Values = ", ".join([str(Arg) for Arg in Args])
+        Values = ", ".join(str(Arg) for Arg in Args)
         SqlCommand = "insert into %s values(%s, %s)" % (self.Table, self.ID, Values)
         EdkLogger.debug(EdkLogger.DEBUG_5, SqlCommand)
         self.Cur.execute(SqlCommand)
