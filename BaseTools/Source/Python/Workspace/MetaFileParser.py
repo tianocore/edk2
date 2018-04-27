@@ -1543,7 +1543,7 @@ class DscParser(MetaFileParser):
 
             IncludedFileTable = MetaFileStorage(self._Table.Cur, IncludedFile1, MODEL_FILE_DSC, False)
             FromItem = self._Content[self._ContentIndex - 1][0]
-            if self._Content[self._ContentIndex - 1][8] != -1.0:
+            if self._InSubsection:
                 Owner = self._Content[self._ContentIndex - 1][8]
             else:
                 Owner = self._Content[self._ContentIndex - 1][0]
