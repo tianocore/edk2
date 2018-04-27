@@ -282,13 +282,9 @@ def toHex(s):
 #
 class DbItemList:
     def __init__(self, ItemSize, DataList=None, RawDataList=None):
-        if DataList is None:
-            DataList = []
-        if RawDataList is None:
-            RawDataList = []
         self.ItemSize = ItemSize
-        self.DataList = DataList
-        self.RawDataList = RawDataList
+        self.DataList = DataList if DataList else []
+        self.RawDataList = RawDataList if RawDataList else []
         self.ListSize = 0
 
     def GetInterOffset(self, Index):
@@ -357,11 +353,8 @@ class DbItemList:
 #
 class DbExMapTblItemList (DbItemList):
     def __init__(self, ItemSize, DataList=None, RawDataList=None):
-        if DataList is None:
-            DataList = []
-        if RawDataList is None:
-            RawDataList = []
         DbItemList.__init__(self, ItemSize, DataList, RawDataList)
+
     def PackData(self):
         Buffer = ''
         PackStr = "=LHH"
@@ -379,11 +372,8 @@ class DbExMapTblItemList (DbItemList):
 #
 class DbComItemList (DbItemList):
     def __init__(self, ItemSize, DataList=None, RawDataList=None):
-        if DataList is None:
-            DataList = []
-        if RawDataList is None:
-            RawDataList = []
         DbItemList.__init__(self, ItemSize, DataList, RawDataList)
+
     def GetInterOffset(self, Index):
         Offset = 0
         if self.ItemSize == 0:
@@ -443,11 +433,8 @@ class DbComItemList (DbItemList):
 #
 class DbVariableTableItemList (DbComItemList):
     def __init__(self, ItemSize, DataList=None, RawDataList=None):
-        if DataList is None:
-            DataList = []
-        if RawDataList is None:
-            RawDataList = []
         DbComItemList.__init__(self, ItemSize, DataList, RawDataList)
+
     def PackData(self):
         PackStr = "=LLHHLHH"
         Buffer = ''
@@ -465,10 +452,6 @@ class DbVariableTableItemList (DbComItemList):
 
 class DbStringHeadTableItemList(DbItemList):
     def __init__(self,ItemSize,DataList=None,RawDataList=None):
-        if DataList is None:
-            DataList = []
-        if RawDataList is None:
-            RawDataList = []        
         DbItemList.__init__(self, ItemSize, DataList, RawDataList)
         
     def GetInterOffset(self, Index):
@@ -511,11 +494,8 @@ class DbStringHeadTableItemList(DbItemList):
 #
 class DbSkuHeadTableItemList (DbItemList):
     def __init__(self, ItemSize, DataList=None, RawDataList=None):
-        if DataList is None:
-            DataList = []
-        if RawDataList is None:
-            RawDataList = []        
         DbItemList.__init__(self, ItemSize, DataList, RawDataList)
+
     def PackData(self):
         PackStr = "=LL"
         Buffer = ''
@@ -531,11 +511,8 @@ class DbSkuHeadTableItemList (DbItemList):
 #
 class DbSizeTableItemList (DbItemList):
     def __init__(self, ItemSize, DataList=None, RawDataList=None):
-        if DataList is None:
-            DataList = []
-        if RawDataList is None:
-            RawDataList = []        
         DbItemList.__init__(self, ItemSize, DataList, RawDataList)
+
     def GetListSize(self):
         length = 0
         for Data in self.RawDataList:
