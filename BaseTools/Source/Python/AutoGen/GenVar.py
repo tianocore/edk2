@@ -26,11 +26,6 @@ var_info = collections.namedtuple("uefi_var", "pcdindex,pcdname,defaultstoragena
 NvStorageHeaderSize = 28
 VariableHeaderSize = 32
 
-def StringArrayToList(StringArray):
-    StringArray = StringArray[1:-1]
-    StringArray = '[' + StringArray + ']'
-    return eval(StringArray)
-
 def PackGUID(Guid):
     GuidBuffer = pack('=LHHBBBBBBBB',
                 int(Guid[0], 16),
