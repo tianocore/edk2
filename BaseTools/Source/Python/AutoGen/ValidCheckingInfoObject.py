@@ -250,16 +250,11 @@ class VAR_CHECK_PCD_VALID_OBJ(object):
         self.data = set()
         self.ValidData = True
         self.updateStorageWidth()
+
     def updateStorageWidth(self):
-        if self.PcdDataType == TAB_UINT8 or self.PcdDataType == "BOOLEAN":
-            self.StorageWidth = 1
-        elif self.PcdDataType == TAB_UINT16:
-            self.StorageWidth = 2
-        elif self.PcdDataType == TAB_UINT32:
-            self.StorageWidth = 4
-        elif self.PcdDataType == TAB_UINT64:
-            self.StorageWidth = 8
-        else:
+        try:
+            self.StorageWidth = int(MAX_SIZE_TYPE[self.PcdDataType])
+        except:
             self.StorageWidth = 0
             self.ValidData = False
             
