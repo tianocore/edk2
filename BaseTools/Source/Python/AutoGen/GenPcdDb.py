@@ -301,8 +301,7 @@ class DbItemList:
             for ItemIndex in xrange(Index):
                 Offset += len(self.RawDataList[ItemIndex])
         else:
-            for Datas in self.RawDataList:
-                Offset = self.ItemSize * Index
+            Offset = self.ItemSize * Index
 
         return Offset
 
