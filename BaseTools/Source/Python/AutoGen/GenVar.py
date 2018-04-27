@@ -110,17 +110,14 @@ class VariableMgr(object):
 
     @staticmethod
     def assemble_variable(valuedict):
-        ordered_offset = sorted(valuedict.keys())
-        ordered_value = [valuedict[k] for k in ordered_offset]
+        ordered_valuedict_keys = sorted(valuedict.keys())
         var_value = []
-        num = 0
-        for offset in ordered_offset:
-            if offset < len(var_value):
+        for current_valuedict_key in ordered_valuedict_keys:
+            if current_valuedict_key < len(var_value):
                 raise
-            for _ in xrange(offset - len(var_value)):
+            for _ in xrange(current_valuedict_key - len(var_value)):
                 var_value.append('0x00')
-            var_value += ordered_value[num]
-            num +=1
+            var_value += valuedict[current_valuedict_key]
         return var_value
 
     def process_variable_data(self):
