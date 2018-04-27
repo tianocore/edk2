@@ -271,10 +271,14 @@ class DependencyExpression:
 
     ## Simply optimize the dependency expression by removing duplicated operands
     def Optimize(self):
-        ValidOpcode = list(set(self.OpcodeList))
-        if len(ValidOpcode) != 1 or ValidOpcode[0] not in [DEPEX_OPCODE_AND, DEPEX_OPCODE_OR]:
+        OpcodeSet = set(self.OpcodeList)
+        # if there are isn't one in the set, return
+        if len(OpcodeSet) != 1:
+          return
+        Op = OpcodeSet.pop()
+        #if Op isn't either OR or AND, return
+        if Op not in [DEPEX_OPCODE_AND, DEPEX_OPCODE_OR]:
             return
-        Op = ValidOpcode[0]
         NewOperand = []
         AllOperand = set()
         for Token in self.PostfixNotation:
