@@ -118,8 +118,6 @@ LangConvTable = {'eng':'en', 'fra':'fr', \
 # @retval LangName:  Valid lanugage code in RFC 4646 format or None
 #
 def GetLanguageCode(LangName, IsCompatibleMode, File):
-    global LangConvTable
-
     length = len(LangName)
     if IsCompatibleMode:
         if length == 3 and LangName.isalpha():
