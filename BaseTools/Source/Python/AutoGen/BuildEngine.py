@@ -47,21 +47,10 @@ def ListFileMacro(FileType):
     return "%s_LIST" % FileListMacro(FileType)
 
 class TargetDescBlock(object):
-    _Cache_ = {}    # {TargetFile : TargetDescBlock object}
+    def __init__(self, Inputs, Outputs, Commands, Dependencies):
+        self.InitWorker(Inputs, Outputs, Commands, Dependencies)
 
-    # Factory method
-    def __new__(Class, Inputs, Outputs, Commands, Dependencies):
-        if Outputs[0] in Class._Cache_:
-            Tdb = Class._Cache_[Outputs[0]]
-            for File in Inputs:
-                Tdb.AddInput(File)
-        else:
-            Tdb = super(TargetDescBlock, Class).__new__(Class)
-            Tdb._Init(Inputs, Outputs, Commands, Dependencies)
-            #Class._Cache_[Outputs[0]] = Tdb
-        return Tdb
-
-    def _Init(self, Inputs, Outputs, Commands, Dependencies):
+    def InitWorker(self, Inputs, Outputs, Commands, Dependencies):
         self.Inputs = Inputs
         self.Outputs = Outputs
         self.Commands = Commands
@@ -89,10 +78,6 @@ class TargetDescBlock(object):
 
     def IsMultipleInput(self):
         return len(self.Inputs) > 1
-
-    @staticmethod
-    def Renew():
-        TargetDescBlock._Cache_ = {}
 
 ## Class for one build rule
 #
@@ -278,7 +263,7 @@ class FileBuildRule:
                         # Command line should be regenerated since some macros are different
                         #
                         CommandList = self._BuildCommand(BuildRulePlaceholderDict)
-                        TargetDesc._Init([SourceFile], DstFile, CommandList, self.ExtraSourceFileList)
+                        TargetDesc.InitWorker([SourceFile], DstFile, CommandList, self.ExtraSourceFileList)
                         break
             else:
                 TargetDesc.AddInput(SourceFile)
