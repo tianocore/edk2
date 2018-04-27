@@ -262,7 +262,6 @@ class VAR_CHECK_PCD_VALID_LIST(VAR_CHECK_PCD_VALID_OBJ):
         super(VAR_CHECK_PCD_VALID_LIST, self).__init__(VarOffset, validlist, PcdDataType)
         self.Type = 1
         valid_num_list = []
-        data_list = []
         for item in self.rawdata:
             valid_num_list.extend(item.split(','))
         
@@ -270,12 +269,11 @@ class VAR_CHECK_PCD_VALID_LIST(VAR_CHECK_PCD_VALID_OBJ):
             valid_num = valid_num.strip()
 
             if valid_num.startswith('0x') or valid_num.startswith('0X'):
-                data_list.append(int(valid_num, 16))
+                self.data.add(int(valid_num, 16))
             else:
-                data_list.append(int(valid_num))
+                self.data.add(int(valid_num))
 
                 
-        self.data = set(data_list)
         self.Length = 5 + len(self.data) * self.StorageWidth
         
            
@@ -284,7 +282,6 @@ class VAR_CHECK_PCD_VALID_RANGE(VAR_CHECK_PCD_VALID_OBJ):
         super(VAR_CHECK_PCD_VALID_RANGE, self).__init__(VarOffset, validrange, PcdDataType)
         self.Type = 2
         RangeExpr = ""
-        data_list = []
         i = 0
         for item in self.rawdata:
             if i == 0:
@@ -294,8 +291,7 @@ class VAR_CHECK_PCD_VALID_RANGE(VAR_CHECK_PCD_VALID_OBJ):
         range_result = RangeExpression(RangeExpr, self.PcdDataType)(True)
         for rangelist in range_result:
             for obj in rangelist.pop():
-                data_list.append((obj.start, obj.end))
-        self.data = set(data_list)
+                self.data.add((obj.start, obj.end))
         self.Length = 5 + len(self.data) * 2 * self.StorageWidth
         
 
