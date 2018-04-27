@@ -253,7 +253,7 @@ class VAR_CHECK_PCD_VALID_OBJ(object):
 
     def updateStorageWidth(self):
         try:
-            self.StorageWidth = int(MAX_SIZE_TYPE[self.PcdDataType])
+            self.StorageWidth = MAX_SIZE_TYPE[self.PcdDataType]
         except:
             self.StorageWidth = 0
             self.ValidData = False

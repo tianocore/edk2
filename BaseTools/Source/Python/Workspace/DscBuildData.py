@@ -1535,23 +1535,6 @@ class DscBuildData(PlatformBuildClassObject):
         Result = Result + '"'
         return Result
 
-    @staticmethod
-    def GetPcdMaxSize(Pcd):
-        if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
-            return MAX_SIZE_TYPE[Pcd.DatumType]
-
-        MaxSize = int(Pcd.MaxDatumSize,10) if Pcd.MaxDatumSize else 0
-        if Pcd.PcdValueFromComm:
-            if Pcd.PcdValueFromComm.startswith("{") and Pcd.PcdValueFromComm.endswith("}"):
-                return max([len(Pcd.PcdValueFromComm.split(",")),MaxSize])
-            elif Pcd.PcdValueFromComm.startswith("\"") or Pcd.PcdValueFromComm.startswith("\'"):
-                return max([len(Pcd.PcdValueFromComm)-2+1,MaxSize])
-            elif Pcd.PcdValueFromComm.startswith("L\""):
-                return max([2*(len(Pcd.PcdValueFromComm)-3+1),MaxSize])
-            else:
-                return max([len(Pcd.PcdValueFromComm),MaxSize])
-        return MaxSize
-
     def GenerateSizeFunction(self,Pcd):
         CApp = "// Default Value in Dec \n"
         CApp = CApp + "void Cal_%s_%s_Size(UINT32 *Size){\n" % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
@@ -1634,7 +1617,7 @@ class DscBuildData(PlatformBuildClassObject):
                 while '[' in FieldName:
                     FieldName = FieldName.rsplit('[', 1)[0]
                     CApp = CApp + '  __FLEXIBLE_SIZE(*Size, %s, %s, %d); // From %s Line %d Value %s \n' % (Pcd.DatumType, FieldName.strip("."), ArrayIndex + 1, Pcd.PcdFieldValueFromComm[FieldName_ori][1], Pcd.PcdFieldValueFromComm[FieldName_ori][2], Pcd.PcdFieldValueFromComm[FieldName_ori][0])
-        CApp = CApp + "  *Size = (%d > *Size ? %d : *Size); // The Pcd maxsize is %d \n" % (DscBuildData.GetPcdMaxSize(Pcd),DscBuildData.GetPcdMaxSize(Pcd),DscBuildData.GetPcdMaxSize(Pcd))
+        CApp = CApp + "  *Size = (%d > *Size ? %d : *Size); // The Pcd maxsize is %d \n" % (Pcd.GetPcdMaxSize(),Pcd.GetPcdMaxSize(),Pcd.GetPcdMaxSize())
         CApp = CApp + "}\n"
         return CApp
 

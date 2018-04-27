@@ -72,6 +72,37 @@ class PcdClassObject(object):
         self.PcdValueFromComm = ""
         self.DefinitionPosition = ("","")
 
+    ## Get the maximum number of bytes
+    def GetPcdMaxSize(self):
+        if self.DatumType in TAB_PCD_NUMERIC_TYPES:
+            return MAX_SIZE_TYPE[self.DatumType]
+
+        MaxSize = int(self.MaxDatumSize,10) if self.MaxDatumSize else 0
+        if self.PcdValueFromComm:
+            if self.PcdValueFromComm.startswith("{") and self.PcdValueFromComm.endswith("}"):
+                return max([len(self.PcdValueFromComm.split(",")),MaxSize])
+            elif self.PcdValueFromComm.startswith("\"") or self.PcdValueFromComm.startswith("\'"):
+                return max([len(self.PcdValueFromComm)-2+1,MaxSize])
+            elif self.PcdValueFromComm.startswith("L\""):
+                return max([2*(len(self.PcdValueFromComm)-3+1),MaxSize])
+            else:
+                return max([len(self.PcdValueFromComm),MaxSize])
+        return MaxSize
+
+    ## Get the number of bytes
+    def GetPcdSize(self):
+        if self.DatumType in TAB_PCD_NUMERIC_TYPES:
+            return MAX_SIZE_TYPE[self.DatumType]
+        if not self.DefaultValue:
+            return 1
+        elif self.DefaultValue[0] == 'L':
+            return (len(self.DefaultValue) - 2) * 2
+        elif self.DefaultValue[0] == '{':
+            return len(self.DefaultValue.split(','))
+        else:
+            return len(self.DefaultValue) - 1
+
+
     ## Convert the class to a string
     #
     #  Convert each member of the class to string
