@@ -54,7 +54,7 @@ gType2Phase = {
 #
 class DependencyExpression:
 
-    ArchProtocols = set([
+    ArchProtocols = {
                         '665e3ff6-46cc-11d4-9a38-0090273fc14d',     #   'gEfiBdsArchProtocolGuid'
                         '26baccb1-6f42-11d4-bce7-0080c73c8881',     #   'gEfiCpuArchProtocolGuid'
                         '26baccb2-6f42-11d4-bce7-0080c73c8881',     #   'gEfiMetronomeArchProtocolGuid'
@@ -67,8 +67,7 @@ class DependencyExpression:
                         '6441f818-6362-4e44-b570-7dba31dd2453',     #   'gEfiVariableWriteArchProtocolGuid'
                         '1e5668e2-8481-11d4-bcf1-0080c73c8881',     #   'gEfiVariableArchProtocolGuid'
                         '665e3ff5-46cc-11d4-9a38-0090273fc14d'      #   'gEfiWatchdogTimerArchProtocolGuid'
-                        ]
-                    )
+                    }
 
     OpcodePriority = {
         DEPEX_OPCODE_AND   :   1,
@@ -304,7 +303,7 @@ class DependencyExpression:
         # don't generate depex if all operands are architecture protocols
         if self.ModuleType in [SUP_MODULE_UEFI_DRIVER, SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_MM_STANDALONE] and \
            Op == DEPEX_OPCODE_AND and \
-           self.ArchProtocols == set([GuidStructureStringToGuidString(Guid) for Guid in AllOperand]):
+           self.ArchProtocols == set(GuidStructureStringToGuidString(Guid) for Guid in AllOperand):
             self.PostfixNotation = []
             return
 

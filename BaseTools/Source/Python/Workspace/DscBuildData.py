@@ -942,7 +942,7 @@ class DscBuildData(PlatformBuildClassObject):
             for skuid in pcd.SkuInfoList:
                 skuobj = pcd.SkuInfoList.get(skuid)
                 if TAB_DEFAULT_STORES_DEFAULT not in skuobj.DefaultStoreDict:
-                    PcdDefaultStoreSet = set([defaultstorename  for defaultstorename in skuobj.DefaultStoreDict])
+                    PcdDefaultStoreSet = set(defaultstorename  for defaultstorename in skuobj.DefaultStoreDict)
                     mindefaultstorename = DefaultStoreMgr.GetMin(PcdDefaultStoreSet)
                     skuobj.DefaultStoreDict[TAB_DEFAULT_STORES_DEFAULT] = copy.deepcopy(skuobj.DefaultStoreDict[mindefaultstorename])
         return Pcds
@@ -1360,7 +1360,7 @@ class DscBuildData(PlatformBuildClassObject):
                             nextskuid = self.SkuIdMgr.GetNextSkuId(nextskuid)
                     if NoDefault:
                         continue
-                    PcdDefaultStoreSet = set([defaultstorename  for defaultstorename in stru_pcd.SkuOverrideValues[nextskuid]])
+                    PcdDefaultStoreSet = set(defaultstorename  for defaultstorename in stru_pcd.SkuOverrideValues[nextskuid])
                     mindefaultstorename = DefaultStoreMgr.GetMin(PcdDefaultStoreSet)
 
                     for defaultstoreid in DefaultStores:
@@ -1404,7 +1404,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if str_pcd_obj.Type not in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
                     continue
-                PcdDefaultStoreSet = set([defaultstorename  for skuobj in str_pcd_obj.SkuInfoList.values() for defaultstorename in skuobj.DefaultStoreDict])
+                PcdDefaultStoreSet = set(defaultstorename for skuobj in str_pcd_obj.SkuInfoList.values() for defaultstorename in skuobj.DefaultStoreDict)
                 DefaultStoreObj = DefaultStore(self._GetDefaultStores())
                 mindefaultstorename = DefaultStoreObj.GetMin(PcdDefaultStoreSet)
                 str_pcd_obj.SkuInfoList[self.SkuIdMgr.SystemSkuId].HiiDefaultValue = str_pcd_obj.SkuInfoList[self.SkuIdMgr.SystemSkuId].DefaultStoreDict[mindefaultstorename]
@@ -2308,7 +2308,7 @@ class DscBuildData(PlatformBuildClassObject):
         Pcds = {}
         DefaultStoreObj = DefaultStore(self._GetDefaultStores())
         SkuIds = {skuname:skuid for skuname,skuid in self.SkuIdMgr.AvailableSkuIdSet.items() if skuname != TAB_COMMON}
-        DefaultStores = set([storename for pcdobj in PcdSet.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict])
+        DefaultStores = set(storename for pcdobj in PcdSet.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict)
         for PcdCName, TokenSpaceGuid in PcdSet:
             PcdObj = PcdSet[(PcdCName, TokenSpaceGuid)]
             self.CopyDscRawValue(PcdObj)
@@ -2498,7 +2498,7 @@ class DscBuildData(PlatformBuildClassObject):
         invalidhii = []
         for pcdname in Pcds:
             pcd = Pcds[pcdname]
-            varnameset = set([sku.VariableName for (skuid,sku) in pcd.SkuInfoList.items()])
+            varnameset = set(sku.VariableName for (skuid,sku) in pcd.SkuInfoList.items())
             if len(varnameset) > 1:
                 invalidhii.append(".".join((pcdname[1],pcdname[0])))
         if len(invalidhii):
