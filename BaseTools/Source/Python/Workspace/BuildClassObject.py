@@ -114,11 +114,16 @@ class PcdClassObject(object):
 
 class StructurePcd(PcdClassObject):
     def __init__(self, StructuredPcdIncludeFile=None, Packages=None, Name=None, Guid=None, Type=None, DatumType=None, Value=None, Token=None, MaxDatumSize=None, SkuInfoList=None, IsOverrided=False, GuidValue=None, validateranges=None, validlists=None, expressions=None,default_store = TAB_DEFAULT_STORES_DEFAULT):
-        if SkuInfoList is None: SkuInfoList={}
-        if validateranges is None: validateranges=[]
-        if validlists is None: validlists=[]
-        if expressions is None : expressions=[]
-        if Packages is None : Packages = []
+        if SkuInfoList is None:
+            SkuInfoList = {}
+        if validateranges is None:
+            validateranges = []
+        if validlists is None:
+            validlists = []
+        if expressions is None:
+            expressions = []
+        if Packages is None:
+            Packages = []
         super(StructurePcd, self).__init__(Name, Guid, Type, DatumType, Value, Token, MaxDatumSize, SkuInfoList, IsOverrided, GuidValue, validateranges, validlists, expressions)
         self.StructuredPcdIncludeFile = [] if StructuredPcdIncludeFile is None else StructuredPcdIncludeFile
         self.PackageDecs = Packages
