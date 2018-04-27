@@ -31,7 +31,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 # Version and Copyright
 __version_number__ = ("0.10" + " " + gBUILD_VERSION)
 __version__ = "%prog Version " + __version_number__
-__copyright__ = "Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved."
+__copyright__ = "Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved."
 
 #======================================  Internal Libraries ========================================
 
