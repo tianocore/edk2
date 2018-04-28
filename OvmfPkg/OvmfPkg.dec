@@ -35,6 +35,11 @@
   #                  config space.
   PciCapLib|Include/Library/PciCapLib.h
 
+  ##  @libraryclass  Layered on top of PciCapLib, allows clients to plug an
+  #                  EFI_PCI_IO_PROTOCOL backend into PciCapLib, for config
+  #                  space access.
+  PciCapPciIoLib|Include/Library/PciCapPciIoLib.h
+
   ##  @libraryclass  Layered on top of PciCapLib, allows clients to plug a
   #                  PciSegmentLib backend into PciCapLib, for config space
   #                  access.
