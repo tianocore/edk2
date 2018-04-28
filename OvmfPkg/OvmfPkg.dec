@@ -31,6 +31,10 @@
   #
   NvVarsFileLib|Include/Library/NvVarsFileLib.h
 
+  ##  @libraryclass  Provides services to work with PCI capabilities in PCI
+  #                  config space.
+  PciCapLib|Include/Library/PciCapLib.h
+
   ##  @libraryclass  Access QEMU's firmware configuration interface
   #
   QemuFwCfgLib|Include/Library/QemuFwCfgLib.h
