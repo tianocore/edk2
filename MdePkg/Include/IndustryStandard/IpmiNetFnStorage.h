@@ -121,20 +121,27 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get SDR Repository Info" command to follow here
 //
+typedef union {
+  struct {
+    UINT8  SdrRepAllocInfoCmd : 1;
+    UINT8  SdrRepReserveCmd : 1;
+    UINT8  PartialAddSdrCmd : 1;
+    UINT8  DeleteSdrRepCmd : 1;
+    UINT8  Reserved : 1;
+    UINT8  SdrRepUpdateOp : 2;
+    UINT8  Overflow : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SDR_OPERATION_SUPPORT;
+
 typedef struct {
-  UINT8   CompletionCode;
-  UINT8   Version;
-  UINT16  RecordCount;
-  UINT16  FreeSpace;
-  UINT32  RecentAdditionTimeStamp;
-  UINT32  RecentEraseTimeStamp;
-  UINT8   SdrRepAllocInfoCmd : 1;
-  UINT8   SdrRepReserveCmd : 1;
-  UINT8   PartialAddSdrCmd : 1;
-  UINT8   DeleteSdrRepCmd : 1;
-  UINT8   Reserved : 1;
-  UINT8   SdrRepUpdateOp : 2;
-  UINT8   Overflow : 1;
+  UINT8                       CompletionCode;
+  UINT8                       Version;
+  UINT16                      RecordCount;
+  UINT16                      FreeSpace;
+  UINT32                      RecentAdditionTimeStamp;
+  UINT32                      RecentEraseTimeStamp;
+  IPMI_SDR_OPERATION_SUPPORT  OperationSupport;
 } IPMI_GET_SDR_REPOSITORY_INFO_RESPONSE;
 
 //
@@ -167,125 +174,179 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get SDR" command to follow here
 //
+typedef union {
+  struct {
+    UINT8  EventScanningEnabled : 1;
+    UINT8  EventScanningDisabled : 1;
+    UINT8  InitSensorType : 1;
+    UINT8  InitHysteresis : 1;
+    UINT8  InitThresholds : 1;
+    UINT8  InitEvent : 1;
+    UINT8  InitScanning : 1;
+    UINT8  SettableSensor : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SDR_RECORD_SENSOR_INIT;
+
+typedef union {
+  struct {
+    UINT8  EventMessageControl : 2;
+    UINT8  ThresholdAccessSupport : 2;
+    UINT8  HysteresisSupport : 2;
+    UINT8  ReArmSupport : 1;
+    UINT8  IgnoreSensor : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SDR_RECORD_SENSOR_CAP;
+
+typedef union {
+  struct {
+    UINT8  Linearization : 7;
+    UINT8  Reserved : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SDR_RECORD_LINEARIZATION;
+
+typedef union {
+  struct {
+    UINT8  Toleremce : 6;
+    UINT8  MHi : 2;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SDR_RECORD_M_TOLERANCE;
+
+typedef union {
+  struct {
+    UINT8  AccuracyLow : 6;
+    UINT8  BHi : 2;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SDR_RECORD_B_ACCURACY;
+
+typedef union {
+  struct {
+    UINT8  Reserved : 2;
+    UINT8  AccuracyExp : 2;
+    UINT8  AccuracyHi : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SDR_RECORD_ACCURACY_SENSOR_DIR;
+
+typedef union {
+  struct {
+    UINT8  BExp : 4;
+    UINT8  RExp : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SDR_RECORD_R_EXP_B_EXP;
+
+typedef union {
+  struct {
+    UINT8  NominalReadingSpscified : 1;
+    UINT8  NominalMaxSpscified : 1;
+    UINT8  NominalMinSpscified : 1;
+    UINT8  Reserved : 5;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SDR_RECORD_ANALOG_FLAGS;
 
 typedef struct {
-  UINT16  RecordId;                     // 1
-  UINT8   Version;                      // 3
-  UINT8   RecordType;                   // 4
-  UINT8   RecordLength;                 // 5
-  UINT8   OwnerId;                      // 6
-  UINT8   OwnerLun;                     // 7
-  UINT8   SensorNumber;                 // 8
-  UINT8   EntityId;                     // 9
-  UINT8   EntityInstance;               // 10
-  UINT8   EventScanningEnabled : 1;     // 11
-  UINT8   EventScanningDisabled : 1;    // 11
-  UINT8   InitSensorType : 1;           // 11
-  UINT8   InitHysteresis : 1;           // 11
-  UINT8   InitThresholds : 1;           // 11
-  UINT8   InitEvent : 1;                // 11
-  UINT8   InitScanning : 1;             // 11
-  UINT8   Reserved : 1;                 // 11
-  UINT8   EventMessageControl : 2;      // 12
-  UINT8   ThresholdAccessSupport : 2;   // 12
-  UINT8   HysteresisSupport : 2;        // 12
-  UINT8   ReArmSupport : 1;             // 12
-  UINT8   IgnoreSensor : 1;             // 12
-  UINT8   SensorType;                   // 13
-  UINT8   EventType;                    // 14
-  UINT8   Reserved1[7];                 // 15
-  UINT8   UnitType;                     // 22
-  UINT8   Reserved2;                    // 23
-  UINT8   Linearization : 7;            // 24
-  UINT8   Reserved3 : 1;                // 24
-  UINT8   MLo;                          // 25
-  UINT8   Toleremce : 6;                // 26
-  UINT8   MHi : 2;                      // 26
-  UINT8   BLo;                          // 27
-  UINT8   AccuracyLow : 6;              // 28
-  UINT8   BHi : 2;                      // 28
-  UINT8   Reserved4 : 2;                // 29
-  UINT8   AccuracyExp : 2;              // 29
-  UINT8   AccuracyHi : 4;               // 29
-  UINT8   BExp : 4;                     // 30
-  UINT8   RExp : 4;                     // 30
-  UINT8   NominalReadingSpscified : 1;  // 31
-  UINT8   NominalMaxSpscified : 1;      // 31
-  UINT8   NominalMinSpscified : 1;      // 31
-  UINT8   Reserved5 : 5;                // 31
-  UINT8   NominalReading;               // 32
-  UINT8   Reserved6[4];                 // 33
-  UINT8   UpperNonRecoverThreshold;     // 37
-  UINT8   UpperCriticalThreshold;       // 38
-  UINT8   UpperNonCriticalThreshold;    // 39
-  UINT8   LowerNonRecoverThreshold;     // 40
-  UINT8   LowerCriticalThreshold;       // 41
-  UINT8   LowerNonCriticalThreshold;    // 42
-  UINT8   Reserved7[5];                 // 43
-  UINT8   IdStringLength;               // 48
-  UINT8   AsciiIdString[16];            // 49 - 64
+  UINT16                         RecordId;                   // 1
+  UINT8                          Version;                    // 3
+  UINT8                          RecordType;                 // 4
+  UINT8                          RecordLength;               // 5
+  UINT8                          OwnerId;                    // 6
+  UINT8                          OwnerLun;                   // 7
+  UINT8                          SensorNumber;               // 8
+  UINT8                          EntityId;                   // 9
+  UINT8                          EntityInstance;             // 10
+  IPMI_SDR_RECORD_SENSOR_INIT    SensorInitialization;       // 11
+  IPMI_SDR_RECORD_SENSOR_CAP     SensorCapabilities;         // 12
+  UINT8                          SensorType;                 // 13
+  UINT8                          EventType;                  // 14
+  UINT8                          Reserved1[7];               // 15
+  UINT8                          UnitType;                   // 22
+  UINT8                          Reserved2;                  // 23
+  IPMI_SDR_RECORD_LINEARIZATION  Linearization;              // 24
+  UINT8                          MLo;                        // 25
+  IPMI_SDR_RECORD_M_TOLERANCE    MHiTolerance;               // 26
+  UINT8                          BLo;                        // 27
+  IPMI_SDR_RECORD_B_ACCURACY     BHiAccuracyLo;              // 28
+  IPMI_SDR_RECORD_ACCURACY_SENSOR_DIR  AccuracySensorDirection;  // 29
+  IPMI_SDR_RECORD_R_EXP_B_EXP    RExpBExp;                   // 30
+  IPMI_SDR_RECORD_ANALOG_FLAGS   AnalogFlags;                // 31
+  UINT8                          NominalReading;             // 32
+  UINT8                          Reserved3[4];               // 33
+  UINT8                          UpperNonRecoverThreshold;   // 37
+  UINT8                          UpperCriticalThreshold;     // 38
+  UINT8                          UpperNonCriticalThreshold;  // 39
+  UINT8                          LowerNonRecoverThreshold;   // 40
+  UINT8                          LowerCriticalThreshold;     // 41
+  UINT8                          LowerNonCriticalThreshold;  // 42
+  UINT8                          Reserved4[5];               // 43
+  UINT8                          IdStringLength;             // 48
+  UINT8                          AsciiIdString[16];          // 49 - 64
 } IPMI_SDR_RECORD_STRUCT_1;
 
 typedef struct {
-  UINT16  RecordId;                     // 1
-  UINT8   Version;                      // 3
-  UINT8   RecordType;                   // 4
-  UINT8   RecordLength;                 // 5
-  UINT8   OwnerId;                      // 6
-  UINT8   OwnerLun;                     // 7
-  UINT8   SensorNumber;                 // 8
-  UINT8   EntityId;                     // 9
-  UINT8   EntityInstance;               // 10
-  UINT8   SensorScanning : 1;           // 11
-  UINT8   EventScanning : 1;            // 11
-  UINT8   InitSensorType : 1;           // 11
-  UINT8   InitHysteresis : 1;           // 11
-  UINT8   InitThresholds : 1;           // 11
-  UINT8   InitEvent : 1;                // 11
-  UINT8   InitScanning : 1;             // 11
-  UINT8   Reserved : 1;                 // 11
-  UINT8   EventMessageControl : 2;      // 12
-  UINT8   ThresholdAccessSupport : 2;   // 12
-  UINT8   HysteresisSupport : 2;        // 12
-  UINT8   ReArmSupport : 1;             // 12
-  UINT8   IgnoreSensor : 1;             // 12
-  UINT8   SensorType;                   // 13
-  UINT8   EventType;                    // 14
-  UINT8   Reserved1[7];                 // 15
-  UINT8   UnitType;                     // 22
-  UINT8   Reserved2[9];                 // 23
-  UINT8   IdStringLength;               // 32
-  UINT8   AsciiIdString[16];            // 33 - 48
+  UINT16                       RecordId;              // 1
+  UINT8                        Version;               // 3
+  UINT8                        RecordType;            // 4
+  UINT8                        RecordLength;          // 5
+  UINT8                        OwnerId;               // 6
+  UINT8                        OwnerLun;              // 7
+  UINT8                        SensorNumber;          // 8
+  UINT8                        EntityId;              // 9
+  UINT8                        EntityInstance;        // 10
+  IPMI_SDR_RECORD_SENSOR_INIT  SensorInitialization;  // 11
+  IPMI_SDR_RECORD_SENSOR_CAP   SensorCapabilities;    // 12
+  UINT8                        SensorType;            // 13
+  UINT8                        EventType;             // 14
+  UINT8                        Reserved1[7];          // 15
+  UINT8                        UnitType;              // 22
+  UINT8                        Reserved2[9];          // 23
+  UINT8                        IdStringLength;        // 32
+  UINT8                        AsciiIdString[16];     // 33 - 48
 } IPMI_SDR_RECORD_STRUCT_2;
 
-typedef struct {
-  UINT8 Reserved1 : 1;
-  UINT8 ControllerSlaveAddress : 7;
-  UINT8 FruDeviceId;
-  UINT8 BusId : 3;
-  UINT8 Lun : 2;
-  UINT8 Reserved : 2;
-  UINT8 LogicalFruDevice : 1;
-  UINT8 Reserved3 : 4;
-  UINT8 ChannelNumber : 4;
+typedef union {
+  struct {
+    UINT8  Reserved1 : 1;
+    UINT8  ControllerSlaveAddress : 7;
+    UINT8  FruDeviceId;
+    UINT8  BusId : 3;
+    UINT8  Lun : 2;
+    UINT8  Reserved2 : 2;
+    UINT8  LogicalFruDevice : 1;
+    UINT8  Reserved3 : 4;
+    UINT8  ChannelNumber : 4;
+  } Bits;
+  UINT32  Uint32;
 } IPMI_FRU_DATA_INFO;
 
+typedef union {
+  struct {
+    UINT8  Length : 4;
+    UINT8  Reserved : 1;
+    UINT8  StringType : 3;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SDR_RECORD_DEV_ID_STR_TYPE_LENGTH;
+
 typedef struct {
-  UINT16            RecordId;           // 1
-  UINT8             Version;            // 3
-  UINT8             RecordType;         // 4
-  UINT8             RecordLength;       // 5
-  IPMI_FRU_DATA_INFO FruDeviceData;      // 6
-  UINT8             Reserved1;          // 10
-  UINT8             DeviceType;         // 11
-  UINT8             DeviceTypeModifier; // 12
-  UINT8             FruEntityId;        // 13
-  UINT8             FruEntityInstance;  // 14
-  UINT8             OemReserved;        // 15
-  UINT8             Length : 4;         // 16
-  UINT8             Reserved2 : 1;      // 16
-  UINT8             StringType : 3;     // 16
-  UINT8             String[16];         // 17
+  UINT16                                  RecordId;            // 1
+  UINT8                                   Version;             // 3
+  UINT8                                   RecordType;          // 4
+  UINT8                                   RecordLength;        // 5
+  IPMI_FRU_DATA_INFO                      FruDeviceData;       // 6
+  UINT8                                   Reserved;            // 10
+  UINT8                                   DeviceType;          // 11
+  UINT8                                   DeviceTypeModifier;  // 12
+  UINT8                                   FruEntityId;         // 13
+  UINT8                                   FruEntityInstance;   // 14
+  UINT8                                   OemReserved;         // 15
+  IPMI_SDR_RECORD_DEV_ID_STR_TYPE_LENGTH  StringTypeLength;    // 16
+  UINT8                                   String[16];          // 17
 } IPMI_SDR_RECORD_STRUCT_11;
 
 typedef struct {

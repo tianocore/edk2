@@ -42,27 +42,48 @@
 //
 //  Constants and Structure definitions for "Get Device ID" command to follow here
 //
+typedef union {
+  struct {
+    UINT8  DeviceRevision : 4;
+    UINT8  Reserved : 3;
+    UINT8  DeviceSdr : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_DEVICE_ID_DEVICE_REV;
+
+typedef union {
+  struct {
+    UINT8  MajorFirmwareRev : 7;
+    UINT8  UpdateMode : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_DEVICE_ID_FIRMWARE_REV_1;
+
+typedef union {
+  struct {
+    UINT8  SensorDeviceSupport : 1;
+    UINT8  SdrRepositorySupport : 1;
+    UINT8  SelDeviceSupport : 1;
+    UINT8  FruInventorySupport : 1;
+    UINT8  IpmbMessageReceiver : 1;
+    UINT8  IpmbMessageGenerator : 1;
+    UINT8  BridgeSupport : 1;
+    UINT8  ChassisSupport : 1;
+  } Bits;
+  UINT8    Uint8;
+} IPMI_GET_DEVICE_ID_DEVICE_SUPPORT;
+
 typedef struct {
-  UINT8   CompletionCode;
-  UINT8   DeviceId;
-  UINT8   DeviceRevision : 4;
-  UINT8   Reserved : 3;
-  UINT8   DeviceSdr : 1;
-  UINT8   MajorFirmwareRev : 7;
-  UINT8   UpdateMode : 1;
-  UINT8   MinorFirmwareRev;
-  UINT8   SpecificationVersion;
-  UINT8   SensorDeviceSupport : 1;
-  UINT8   SdrRepositorySupport : 1;
-  UINT8   SelDeviceSupport : 1;
-  UINT8   FruInventorySupport : 1;
-  UINT8   IpmbMessageReceiver : 1;
-  UINT8   IpmbMessageGenerator : 1;
-  UINT8   BridgeSupport : 1;
-  UINT8   ChassisSupport : 1;
-  UINT8   ManufacturerId[3];
-  UINT16  ProductId;
-  UINT32  AuxFirmwareRevInfo;
+  UINT8                              CompletionCode;
+  UINT8                              DeviceId;
+  IPMI_GET_DEVICE_ID_DEVICE_REV      DeviceRevision;
+  IPMI_GET_DEVICE_ID_FIRMWARE_REV_1  FirmwareRev1;
+  UINT8                              MinorFirmwareRev;
+  UINT8                              SpecificationVersion;
+  IPMI_GET_DEVICE_ID_DEVICE_SUPPORT  DeviceSupport;
+  UINT8                              ManufacturerId[3];
+  UINT16                             ProductId;
+  UINT32                             AuxFirmwareRevInfo;
 } IPMI_GET_DEVICE_ID_RESPONSE;
 
 
@@ -165,11 +186,17 @@ typedef struct {
 #define IPMI_DEVICE_POWER_STATE_UNKNOWN      0x2A
 #define IPMI_DEVICE_POWER_STATE_NO_CHANGE    0x7F
 
+typedef union {
+  struct {
+    UINT8  PowerState  : 7;
+    UINT8  StateChange : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_ACPI_POWER_STATE;
+
 typedef struct {
-  UINT8  AcpiSystemPowerState  : 7;
-  UINT8  AcpiSystemStateChange : 1;
-  UINT8  AcpiDevicePowerState  : 7;
-  UINT8  AcpiDeviceStateChange : 1;
+  IPMI_ACPI_POWER_STATE  SystemPowerState;
+  IPMI_ACPI_POWER_STATE  DevicePowerState;
 } IPMI_SET_ACPI_POWER_STATE_REQUEST;
 
 //
@@ -227,11 +254,14 @@ typedef struct {
 //
 //  Structure definition for timer Use
 //
-typedef struct {
-  UINT8 TimerUse : 3;
-  UINT8 Reserved : 3;
-  UINT8 TimerRunning : 1;
-  UINT8 TimerUseExpirationFlagLog : 1;
+typedef union {
+  struct {
+    UINT8  TimerUse : 3;
+    UINT8  Reserved : 3;
+    UINT8  TimerRunning : 1;
+    UINT8  TimerUseExpirationFlagLog : 1;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_WATCHDOG_TIMER_USE;
 
 //
@@ -253,11 +283,14 @@ typedef struct {
 //
 //  Structure definitions for Timer Actions
 //
-typedef struct {
-  UINT8  TimeoutAction : 3;
-  UINT8  Reserved1 : 1;
-  UINT8  PreTimeoutInterrupt : 3;
-  UINT8  Reserved2 : 1;
+typedef union {
+  struct {
+    UINT8  TimeoutAction : 3;
+    UINT8  Reserved1 : 1;
+    UINT8  PreTimeoutInterrupt : 3;
+    UINT8  Reserved2 : 1;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_WATCHDOG_TIMER_ACTIONS;
 
 //
@@ -307,15 +340,22 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Set BMC Global Enables " command to follow here
 //
+typedef union {
+  struct {
+    UINT8  ReceiveMessageQueueInterrupt : 1;
+    UINT8  EventMessageBufferFullInterrupt : 1;
+    UINT8  EventMessageBuffer : 1;
+    UINT8  SystemEventLogging : 1;
+    UINT8  Reserved : 1;
+    UINT8  Oem0Enable : 1;
+    UINT8  Oem1Enable : 1;
+    UINT8  Oem2Enable : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_BMC_GLOBAL_ENABLES;
+
 typedef struct {
-  UINT8  EnableReceiveMessageQueueInterrupt : 1;
-  UINT8  EnableEventMessageBufferFullInterrupt : 1;
-  UINT8  EnableEventMessageBuffer : 1;
-  UINT8  EnableSystemEventLogging : 1;
-  UINT8  Reserved : 1;
-  UINT8  Oem0Enable : 1;
-  UINT8  Oem1Enable : 1;
-  UINT8  Oem2Enable : 1;
+  IPMI_BMC_GLOBAL_ENABLES  SetEnables;
 } IPMI_SET_BMC_GLOBAL_ENABLES_REQUEST;
 
 //
@@ -327,15 +367,8 @@ typedef struct {
 //  Constants and Structure definitions for "Get BMC Global Enables " command to follow here
 //
 typedef struct {
-  UINT8  CompletionCode;
-  UINT8  ReceiveMessageQueueInterrupt : 1;
-  UINT8  EventMessageBufferFullInterrupt : 1;
-  UINT8  EventMessageBuffer : 1;
-  UINT8  SystemEventLogging : 1;
-  UINT8  Reserved : 1;
-  UINT8  Oem0Enable : 1;
-  UINT8  Oem1Enable : 1;
-  UINT8  Oem2Enable : 1;
+  UINT8                    CompletionCode;
+  IPMI_BMC_GLOBAL_ENABLES  GetEnables;
 } IPMI_GET_BMC_GLOBAL_ENABLES_RESPONSE;
 
 //
@@ -346,15 +379,22 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Clear Message Flags" command to follow here
 //
+typedef union {
+  struct {
+    UINT8  ReceiveMessageQueue : 1;
+    UINT8  EventMessageBuffer : 1;
+    UINT8  Reserved1 : 1;
+    UINT8  WatchdogPerTimeoutInterrupt : 1;
+    UINT8  Reserved2 : 1;
+    UINT8  Oem0 : 1;
+    UINT8  Oem1 : 1;
+    UINT8  Oem2 : 1;
+  } Bits;
+  UINT8    Uint8;
+} IPMI_MESSAGE_FLAGS;
+
 typedef struct {
-  UINT8  ClearReceiveMessageQueue : 1;
-  UINT8  ClearEventMessageBuffer : 1;
-  UINT8  Reserved0 : 1;
-  UINT8  ClearWatchdogPerTimeoutInterruptFlag : 1;
-  UINT8  Reserved : 1;
-  UINT8  ClearOem0Enable : 1;
-  UINT8  ClearOem1Enable : 1;
-  UINT8  ClearOem2Enable : 1;
+  IPMI_MESSAGE_FLAGS  ClearFlags;
 } IPMI_CLEAR_MESSAGE_FLAGS_REQUEST;
 
 //
@@ -366,15 +406,8 @@ typedef struct {
 //  Constants and Structure definitions for "Get Message Flags" command to follow here
 //
 typedef struct {
-  UINT8  CompletionCode;
-  UINT8  ReceiveMessageAvailable : 1;
-  UINT8  EventMessageBufferFull : 1;
-  UINT8  Reserved0 : 1;
-  UINT8  WatchdogPerTimeoutInterruptOccurred : 1;
-  UINT8  Reserved : 1;
-  UINT8  Oem0DataAvailable : 1;
-  UINT8  Oem1DataAvailable : 1;
-  UINT8  Oem2DataAvailable : 1;
+  UINT8               CompletionCode;
+  IPMI_MESSAGE_FLAGS  GetFlags;
 } IPMI_GET_MESSAGE_FLAGS_RESPONSE;
 
 //
@@ -394,11 +427,18 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get Message" command to follow here
 //
+typedef union {
+  struct {
+    UINT8  ChannelNumber : 4;
+    UINT8  InferredPrivilegeLevel : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_MESSAGE_CHANNEL_NUMBER;
+
 typedef struct {
-  UINT8  CompletionCode;
-  UINT8  ChannelNumber : 4;
-  UINT8  InferredPrivilegeLevel : 4;
-  UINT8  MessageData[0];
+  UINT8                            CompletionCode;
+  IPMI_GET_MESSAGE_CHANNEL_NUMBER  ChannelNumber;
+  UINT8                            MessageData[0];
 } IPMI_GET_MESSAGE_RESPONSE;
 
 //
@@ -409,13 +449,20 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Send Message" command to follow here
 //
+typedef union {
+  struct {
+    UINT8  ChannelNumber : 4;
+    UINT8  Authentication : 1;
+    UINT8  Encryption : 1;
+    UINT8  Tracking : 2;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SEND_MESSAGE_CHANNEL_NUMBER;
+
 typedef struct {
-  UINT8  CompletionCode;
-  UINT8  ChannelNumber : 4;
-  UINT8  Authentication : 1;
-  UINT8  Encryption : 1;
-  UINT8  Tracking : 2;
-  UINT8  MessageData[0];
+  UINT8                             CompletionCode;
+  IPMI_SEND_MESSAGE_CHANNEL_NUMBER  ChannelNumber;
+  UINT8                             MessageData[0];
 } IPMI_SEND_MESSAGE_REQUEST;
 
 typedef struct {
@@ -545,22 +592,50 @@ typedef struct {
 #define IPMI_CHANNEL_ACCESS_MODES_ALWAYS_AVAILABLE  0x2
 #define IPMI_CHANNEL_ACCESS_MODES_SHARED            0x3
 
-typedef struct {
-  UINT8  ChannelNo : 4;
-  UINT8  Reserve1 : 4;
-  UINT8  Reserve2 : 6;
-  UINT8  MemoryType : 2;
-} IPMI_GET_CHANNEL_ACCESS_REQUEST;
+typedef union {
+  struct {
+    UINT8  ChannelNo : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_CHANNEL_ACCESS_CHANNEL_NUMBER;
+
+typedef union {
+  struct {
+    UINT8  Reserved : 6;
+    UINT8  MemoryType : 2;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_CHANNEL_ACCESS_TYPE;
 
 typedef struct {
-  UINT8  CompletionCode;
-  UINT8  AccessMode : 3;
-  UINT8  UserLevelAuthEnabled : 1;
-  UINT8  MessageAuthEnable : 1;
-  UINT8  Alert : 1;
-  UINT8  Reserve1 : 2;
-  UINT8  ChannelPriviledgeLimit : 4;
-  UINT8  Reserve2 : 4;
+  IPMI_GET_CHANNEL_ACCESS_CHANNEL_NUMBER  ChannelNumber;
+  IPMI_GET_CHANNEL_ACCESS_TYPE            AccessType;
+} IPMI_GET_CHANNEL_ACCESS_REQUEST;
+
+typedef union {
+  struct {
+    UINT8  AccessMode : 3;
+    UINT8  UserLevelAuthEnabled : 1;
+    UINT8  MessageAuthEnable : 1;
+    UINT8  Alert : 1;
+    UINT8  Reserved : 2;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_CHANNEL_ACCESS_CHANNEL_ACCESS;
+
+typedef union {
+  struct {
+    UINT8  ChannelPriviledgeLimit : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_CHANNEL_ACCESS_PRIVILEGE_LIMIT;
+
+typedef struct {
+  UINT8                                    CompletionCode;
+  IPMI_GET_CHANNEL_ACCESS_CHANNEL_ACCESS   ChannelAccess;
+  IPMI_GET_CHANNEL_ACCESS_PRIVILEGE_LIMIT  PrivilegeLimit;
 } IPMI_GET_CHANNEL_ACCESS_RESPONSE;
 
 //
@@ -603,18 +678,46 @@ typedef struct {
 #define IPMI_CHANNEL_MEDIA_TYPE_OEM_START         0x60
 #define IPMI_CHANNEL_MEDIA_TYPE_OEM_END           0x7F
 
+typedef union {
+  struct {
+    UINT8  ChannelNo : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_CHANNEL_INFO_CHANNEL_NUMBER;
+
+typedef union {
+  struct {
+    UINT8  ChannelMediumType : 7;
+    UINT8  Reserved : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_CHANNEL_INFO_MEDIUM_TYPE;
+
+typedef union {
+  struct {
+    UINT8  ChannelProtocolType : 5;
+    UINT8  Reserved : 3;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_CHANNEL_INFO_PROTOCOL_TYPE;
+
+typedef union {
+  struct {
+    UINT8  ActiveSessionCount : 6;
+    UINT8  SessionSupport : 2;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_CHANNEL_INFO_SESSION_SUPPORT;
+
 typedef struct {
   UINT8   CompletionCode;
-  UINT8   ChannelNo : 4;
-  UINT8   Reserve1 : 4;
-  UINT8   ChannelMediumType : 7;
-  UINT8   Reserve2 : 1;
-  UINT8   ChannelProtocolType : 5;
-  UINT8   Reserve3 : 3;
-  UINT8   ActiveSessionCount : 6;
-  UINT8   SessionSupport : 2;
-  UINT8   VendorId[3];
-  UINT16  AuxChannelInfo;
+  IPMI_CHANNEL_INFO_CHANNEL_NUMBER   ChannelNumber;
+  IPMI_CHANNEL_INFO_MEDIUM_TYPE      MediumType;
+  IPMI_CHANNEL_INFO_PROTOCOL_TYPE    ProtocolType;
+  IPMI_CHANNEL_INFO_SESSION_SUPPORT  SessionSupport;
+  UINT8                              VendorId[3];
+  UINT16                             AuxChannelInfo;
 } IPMI_GET_CHANNEL_INFO_RESPONSE;
 
 //
@@ -643,26 +746,68 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get User Access" command to follow here
 //
-typedef struct {
-  UINT8   ChannelNo : 4;
-  UINT8   Reserved1 : 4;
-  UINT8   UserId : 6;
-  UINT8   Reserved2 : 2;
-} IPMI_GET_USER_ACCESS_REQUEST;
+typedef union {
+  struct {
+    UINT8  ChannelNo : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_USER_ACCESS_CHANNEL_NUMBER;
+
+typedef union {
+  struct {
+    UINT8  UserId : 6;
+    UINT8  Reserved : 2;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_USER_ID;
 
 typedef struct {
-  UINT8   CompletionCode;
-  UINT8   MaxUserId : 6;
-  UINT8   Reserved1 : 2;
-  UINT8   CurrentUserId : 6;
-  UINT8   UserIdEnableStatus : 2;
-  UINT8   FixedUserId : 6;
-  UINT8   Reserved2 : 2;
-  UINT8   UserPrivilegeLimit : 4;
-  UINT8   EnableIpmiMessaging : 1;
-  UINT8   EnableUserLinkAuthetication : 1;
-  UINT8   UserAccessAvailable : 1;
-  UINT8   Reserved3 : 1;
+  IPMI_GET_USER_ACCESS_CHANNEL_NUMBER  ChannelNumber;
+  IPMI_USER_ID                         UserId;
+} IPMI_GET_USER_ACCESS_REQUEST;
+
+typedef union {
+  struct {
+    UINT8  MaxUserId : 6;
+    UINT8  Reserved : 2;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_USER_ACCESS_MAX_USER_ID;
+
+typedef union {
+  struct {
+    UINT8  CurrentUserId : 6;
+    UINT8  UserIdEnableStatus : 2;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_USER_ACCESS_CURRENT_USER;
+
+typedef union {
+  struct {
+    UINT8  FixedUserId : 6;
+    UINT8  Reserved : 2;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_USER_ACCESS_FIXED_NAME_USER;
+
+typedef union {
+  struct {
+    UINT8  UserPrivilegeLimit : 4;
+    UINT8  EnableIpmiMessaging : 1;
+    UINT8  EnableUserLinkAuthetication : 1;
+    UINT8  UserAccessAvailable : 1;
+    UINT8  Reserved : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_USER_ACCESS_CHANNEL_ACCESS;
+
+typedef struct {
+  UINT8                                 CompletionCode;
+  IPMI_GET_USER_ACCESS_MAX_USER_ID      MaxUserId;
+  IPMI_GET_USER_ACCESS_CURRENT_USER     CurrentUser;
+  IPMI_GET_USER_ACCESS_FIXED_NAME_USER  FixedNameUser;
+  IPMI_GET_USER_ACCESS_CHANNEL_ACCESS   ChannelAccess;
 } IPMI_GET_USER_ACCESS_RESPONSE;
 
 //
@@ -674,9 +819,8 @@ typedef struct {
 //  Constants and Structure definitions for "Set User Name" command to follow here
 //
 typedef struct {
-  UINT8  UserId : 6;
-  UINT8  Reserved : 2;
-  UINT8  UserName[16];
+  IPMI_USER_ID  UserId;
+  UINT8         UserName[16];
 } IPMI_SET_USER_NAME_REQUEST;
 
 //
@@ -688,8 +832,7 @@ typedef struct {
 //  Constants and Structure definitions for "Get User Name" command to follow here
 //
 typedef struct {
-  UINT8  UserId : 6;
-  UINT8  Reserved : 2;
+  IPMI_USER_ID  UserId;
 } IPMI_GET_USER_NAME_REQUEST;
 
 typedef struct {
@@ -720,13 +863,27 @@ typedef struct {
 #define IPMI_SET_USER_PASSWORD_PASSWORD_SIZE_16  0x0
 #define IPMI_SET_USER_PASSWORD_PASSWORD_SIZE_20  0x1
 
+typedef union {
+  struct {
+    UINT8  UserId : 6;
+    UINT8  Reserved : 1;
+    UINT8  PasswordSize : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SET_USER_PASSWORD_USER_ID;
+
+typedef union {
+  struct {
+    UINT8  Operation : 2;
+    UINT8  Reserved : 6;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SET_USER_PASSWORD_OPERATION;
+
 typedef struct {
-  UINT8   UserId : 6;
-  UINT8   Reserved1 : 1;
-  UINT8   PasswordSize : 1;
-  UINT8   Operation : 2;
-  UINT8   Reserved2 : 6;
-  UINT8   PasswordData[0];  // 16 or 20 bytes, depending on the 'PasswordSize' field
+  IPMI_SET_USER_PASSWORD_USER_ID    UserId;
+  IPMI_SET_USER_PASSWORD_OPERATION  Operation;
+  UINT8                             PasswordData[0];  // 16 or 20 bytes, depending on the 'PasswordSize' field
 } IPMI_SET_USER_PASSWORD_REQUEST;
 
 //

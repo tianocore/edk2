@@ -109,23 +109,29 @@ typedef enum {
   IpmiOem2
 } IPMI_LAN_DEST_TYPE_DEST_TYPE;
 
-typedef struct {
-  UINT8 NoAuth : 1;
-  UINT8 MD2Auth : 1;
-  UINT8 MD5Auth : 1;
-  UINT8 Reserved1 : 1;
-  UINT8 StraightPswd : 1;
-  UINT8 OemType : 1;
-  UINT8 Reserved2 : 2;
+typedef union {
+  struct {
+    UINT8  NoAuth : 1;
+    UINT8  MD2Auth : 1;
+    UINT8  MD5Auth : 1;
+    UINT8  Reserved1 : 1;
+    UINT8  StraightPswd : 1;
+    UINT8  OemType : 1;
+    UINT8  Reserved2 : 2;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_LAN_AUTH_TYPE;
 
 typedef struct {
   UINT8 IpAddress[4];
 } IPMI_LAN_IP_ADDRESS;
 
-typedef struct {
-  UINT8 AddressSrc : 4;
-  UINT8 Reserved : 4;
+typedef union {
+  struct {
+    UINT8  AddressSrc : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_LAN_IP_ADDRESS_SRC;
 
 typedef struct {
@@ -136,13 +142,27 @@ typedef struct {
   UINT8 IpAddress[4];
 } IPMI_LAN_SUBNET_MASK;
 
+typedef union {
+  struct {
+    UINT8  IpFlag : 3;
+    UINT8  Reserved : 5;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_LAN_IPV4_HDR_PARAM_DATA_2;
+
+typedef union {
+  struct {
+    UINT8  Precedence : 3;
+    UINT8  Reserved : 1;
+    UINT8  ServiceType : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_LAN_IPV4_HDR_PARAM_DATA_3;
+
 typedef struct {
-  UINT8 TimeToLive;
-  UINT8 IpFlag : 3;
-  UINT8 Reserved1 : 5;
-  UINT8 Precedence : 3;
-  UINT8 Reserved2 : 1;
-  UINT8 ServiceType : 4;
+  UINT8                           TimeToLive;
+  IPMI_LAN_IPV4_HDR_PARAM_DATA_2  Data2;
+  IPMI_LAN_IPV4_HDR_PARAM_DATA_3  Data3;
 } IPMI_LAN_IPV4_HDR_PARAM;
 
 typedef struct {
@@ -150,10 +170,13 @@ typedef struct {
   UINT8 RcmpPortLsb;
 } IPMI_LAN_RCMP_PORT;
 
-typedef struct {
-  UINT8 EnableBmcArpResponse : 1;
-  UINT8 EnableBmcGratuitousArp : 1;
-  UINT8 Reserved : 6;
+typedef union {
+  struct {
+    UINT8  EnableBmcArpResponse : 1;
+    UINT8  EnableBmcGratuitousArp : 1;
+    UINT8  Reserved : 6;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_LAN_BMC_GENERATED_ARP_CONTROL;
 
 typedef struct {
@@ -164,23 +187,50 @@ typedef struct {
   UINT8 Data[18];
 } IPMI_LAN_COMMUNITY_STRING;
 
-typedef struct {
-  UINT8 DestinationSelector : 4;
-  UINT8 Reserved2 : 4;
-  UINT8 DestinationType : 3;
-  UINT8 Reserved1 : 4;
-  UINT8 AlertAcknowledged : 1;
-} IPMI_LAN_DEST_TYPE;
+typedef union {
+  struct {
+    UINT8  DestinationSelector : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_LAN_SET_SELECTOR;
+
+typedef union {
+  struct {
+    UINT8  DestinationType : 3;
+    UINT8  Reserved : 4;
+    UINT8  AlertAcknowledged : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_LAN_DEST_TYPE_DESTINATION_TYPE;
 
 typedef struct {
-  UINT8               DestinationSelector : 4;
-  UINT8               Reserved1 : 4;
-  UINT8               AlertingIpAddressSelector : 4;
-  UINT8               AddressFormat : 4;
-  UINT8               UseDefaultGateway : 1;
-  UINT8               Reserved2 : 7;
-  IPMI_LAN_IP_ADDRESS  AlertingIpAddress;
-  IPMI_LAN_MAC_ADDRESS AlertingMacAddress;
+  IPMI_LAN_SET_SELECTOR                SetSelector;
+  IPMI_LAN_DEST_TYPE_DESTINATION_TYPE  DestinationType;
+} IPMI_LAN_DEST_TYPE;
+
+typedef union {
+  struct {
+    UINT8  AlertingIpAddressSelector : 4;
+    UINT8  AddressFormat : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_LAN_ADDRESS_FORMAT;
+
+typedef union {
+  struct {
+    UINT8  UseDefaultGateway : 1;
+    UINT8  Reserved2 : 7;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_LAN_GATEWAY_SELECTOR;
+
+typedef struct {
+  IPMI_LAN_SET_SELECTOR      SetSelector;
+  IPMI_LAN_ADDRESS_FORMAT    AddressFormat;
+  IPMI_LAN_GATEWAY_SELECTOR  GatewaySelector;
+  IPMI_LAN_IP_ADDRESS        AlertingIpAddress;
+  IPMI_LAN_MAC_ADDRESS       AlertingMacAddress;
 } IPMI_LAN_DEST_ADDRESS;
 
 typedef union {
@@ -198,30 +248,46 @@ typedef union {
   IPMI_LAN_DEST_ADDRESS              IpmiLanDestAddress;
 } IPMI_LAN_OPTIONS;
 
+typedef union {
+  struct {
+    UINT8  AddressSourceType : 4;
+    UINT8  Reserved : 3;
+    UINT8  EnableStatus : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_LAN_IPV6_ADDRESS_SOURCE_TYPE;
+
 typedef struct {
-  UINT8  SetSelector;
-  UINT8  AddressSourceType : 4;
-  UINT8  Reserved : 3;
-  UINT8  EnableStatus : 1;
-  UINT8  Ipv6Address[16];
-  UINT8  AddressPrefixLen;
-  UINT8  AddressStatus;
+  UINT8                              SetSelector;
+  IPMI_LAN_IPV6_ADDRESS_SOURCE_TYPE  AddressSourceType;
+  UINT8                              Ipv6Address[16];
+  UINT8                              AddressPrefixLen;
+  UINT8                              AddressStatus;
 } IPMI_LAN_IPV6_STATIC_ADDRESS;
 
 //
 //  Set in progress parameter
 //
-typedef struct {
-  UINT8  SetInProgress:2;
-  UINT8  Reserved:6;
+typedef union {
+  struct {
+    UINT8  SetInProgress:2;
+    UINT8  Reserved:6;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_LAN_SET_IN_PROGRESS;
 
+typedef union {
+  struct {
+    UINT8  ChannelNo : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SET_LAN_CONFIG_CHANNEL_NUM;
 
 typedef struct {
-  UINT8  ChannelNo : 4;
-  UINT8  Reserved : 4;
-  UINT8  ParameterSelector;
-  UINT8  ParameterData[0];
+  IPMI_SET_LAN_CONFIG_CHANNEL_NUM  ChannelNumber;
+  UINT8                            ParameterSelector;
+  UINT8                            ParameterData[0];
 } IPMI_SET_LAN_CONFIGURATION_PARAMETERS_COMMAND_REQUEST;
 
 //
@@ -232,13 +298,20 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get Lan Configuration Parameters" command to follow here
 //
+typedef union {
+  struct {
+    UINT8  ChannelNo : 4;
+    UINT8  Reserved : 3;
+    UINT8  GetParameter : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_LAN_CONFIG_CHANNEL_NUM;
+
 typedef struct {
-  UINT8  ChannelNo : 4;
-  UINT8  Reserved : 3;
-  UINT8  GetParameter : 1;
-  UINT8  ParameterSelector;
-  UINT8  SetSelector;
-  UINT8  BlockSelector;
+  IPMI_GET_LAN_CONFIG_CHANNEL_NUM  ChannelNumber;
+  UINT8                            ParameterSelector;
+  UINT8                            SetSelector;
+  UINT8                            BlockSelector;
 } IPMI_GET_LAN_CONFIGURATION_PARAMETERS_REQUEST;
 
 typedef struct {
@@ -281,67 +354,100 @@ typedef struct {
 //
 // EMP OPTION DATA
 //
-typedef struct {
-  UINT8 NoAuthentication : 1;
-  UINT8 MD2Authentication : 1;
-  UINT8 MD5Authentication : 1;
-  UINT8 Reserved1 : 1;
-  UINT8 StraightPassword : 1;
-  UINT8 OemProprietary : 1;
-  UINT8 Reservd2 : 2;
+typedef union {
+  struct {
+    UINT8  NoAuthentication : 1;
+    UINT8  MD2Authentication : 1;
+    UINT8  MD5Authentication : 1;
+    UINT8  Reserved1 : 1;
+    UINT8  StraightPassword : 1;
+    UINT8  OemProprietary : 1;
+    UINT8  Reservd2 : 2;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_EMP_AUTH_TYPE;
 
-typedef struct {
-  UINT8 EnableBasicMode : 1;
-  UINT8 EnablePPPMode : 1;
-  UINT8 EnableTerminalMode : 1;
-  UINT8 Reserved1 : 2;
-  UINT8 SnoopOsPPPNegotiation : 1;
-  UINT8 Reserved2 : 1;
-  UINT8 DirectConnect : 1;
+typedef union {
+  struct {
+    UINT8  EnableBasicMode : 1;
+    UINT8  EnablePPPMode : 1;
+    UINT8  EnableTerminalMode : 1;
+    UINT8  Reserved1 : 2;
+    UINT8  SnoopOsPPPNegotiation : 1;
+    UINT8  Reserved2 : 1;
+    UINT8  DirectConnect : 1;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_EMP_CONNECTION_TYPE;
 
-typedef struct {
-  UINT8 InactivityTimeout : 4;
-  UINT8 Reserved : 4;
+typedef union {
+  struct {
+    UINT8  InactivityTimeout : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_EMP_INACTIVITY_TIMEOUT;
 
+typedef union {
+  struct {
+    UINT8  IpmiCallback : 1;
+    UINT8  CBCPCallback : 1;
+    UINT8  Reserved : 6;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_CHANNEL_CALLBACK_CONTROL_ENABLE;
+
+typedef union {
+  struct {
+    UINT8  CbcpEnableNoCallback : 1;
+    UINT8  CbcpEnablePreSpecifiedNumber : 1;
+    UINT8  CbcpEnableUserSpecifiedNumber : 1;
+    UINT8  CbcpEnableCallbackFromList : 1;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_CHANNEL_CALLBACK_CONTROL_CBCP;
+
 typedef struct {
-  UINT8 IpmiCallback : 1;
-  UINT8 CBCPCallback : 1;
-  UINT8 Reserved1 : 6;
-  UINT8 CbcpEnableNoCallback : 1;
-  UINT8 CbcpEnablePreSpecifiedNumber : 1;
-  UINT8 CbcpEnableUserSpecifiedNumber : 1;
-  UINT8 CbcpEnableCallbackFromList : 1;
-  UINT8 Reserved : 4;
-  UINT8 CallbackDestination1;
-  UINT8 CallbackDestination2;
-  UINT8 CallbackDestination3;
+  IPMI_CHANNEL_CALLBACK_CONTROL_ENABLE  CallbackEnable;
+  IPMI_CHANNEL_CALLBACK_CONTROL_CBCP    CBCPNegotiation;
+  UINT8                                 CallbackDestination1;
+  UINT8                                 CallbackDestination2;
+  UINT8                                 CallbackDestination3;
 } IPMI_EMP_CHANNEL_CALLBACK_CONTROL;
 
-typedef struct {
-  UINT8 CloseSessionOnDCDLoss : 1;
-  UINT8 EnableSessionInactivityTimeout : 1;
-  UINT8 Reserved : 6;
+typedef union {
+  struct {
+    UINT8  CloseSessionOnDCDLoss : 1;
+    UINT8  EnableSessionInactivityTimeout : 1;
+    UINT8  Reserved : 6;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_EMP_SESSION_TERMINATION;
 
-typedef struct {
-  UINT8 Reserved1 : 5;
-  UINT8 EnableDtrHangup : 1;
-  UINT8 FlowControl : 2;
-  UINT8 BitRate : 4;
-  UINT8 Reserved2 : 4;
-  UINT8 SaveSetting : 1;
-  UINT8 SetComPort : 1;
-  UINT8 Reserved3 : 6;
+typedef union {
+  struct {
+    UINT8  Reserved1 : 5;
+    UINT8  EnableDtrHangup : 1;
+    UINT8  FlowControl : 2;
+    UINT8  BitRate : 4;
+    UINT8  Reserved2 : 4;
+    UINT8  SaveSetting : 1;
+    UINT8  SetComPort : 1;
+    UINT8  Reserved3 : 6;
+  } Bits;
+  UINT8   Uint8;
+  UINT16  Uint16;
 } IPMI_EMP_MESSAGING_COM_SETTING;
 
-typedef struct {
-  UINT8 RingDurationInterval : 6;
-  UINT8 Reserved1 : 2;
-  UINT8 RingDeadTime : 4;
-  UINT8 Reserved : 4;
+typedef union {
+  struct {
+    UINT8  RingDurationInterval : 6;
+    UINT8  Reserved1 : 2;
+    UINT8  RingDeadTime : 4;
+    UINT8  Reserved2 : 4;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_EMP_MODEM_RING_TIME;
 
 typedef struct {
@@ -369,14 +475,20 @@ typedef struct {
   UINT8 CommunityString[18];
 } IPMI_EMP_COMMUNITY_STRING;
 
-typedef struct {
-  UINT8 Reserved5 : 4;
-  UINT8 DialStringSelector : 4;
+typedef union {
+  struct {
+    UINT8  Reserved : 4;
+    UINT8  DialStringSelector : 4;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_DIAL_PAGE_DESTINATION;
 
-typedef struct {
-  UINT8 TapAccountSelector : 4;
-  UINT8 Reserved : 4;
+typedef union {
+  struct {
+    UINT8  TapAccountSelector : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
 } IPMI_TAP_PAGE_DESTINATION;
 
 typedef struct {
@@ -390,40 +502,78 @@ typedef union {
   IPMI_PPP_ALERT_DESTINATION    PppAlertDestination;
 } IPMI_DEST_TYPE_SPECIFIC;
 
+typedef union {
+  struct {
+    UINT8 DestinationSelector : 4;
+    UINT8 Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_EMP_DESTINATION_SELECTOR;
+
+typedef union {
+  struct {
+    UINT8  DestinationType : 4;
+    UINT8  Reserved : 3;
+    UINT8  AlertAckRequired : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_EMP_DESTINATION_TYPE;
+
+typedef union {
+  struct {
+    UINT8  NumRetriesCall : 3;
+    UINT8  Reserved1 : 1;
+    UINT8  NumRetryAlert : 3;
+    UINT8  Reserved2 : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_EMP_RETRIES;
+
 typedef struct {
-  UINT8 DestinationSelector : 4;
-  UINT8 Reserved1 : 4;
-  UINT8 DestinationType : 4;
-  UINT8 Reserved2 : 3;
-  UINT8 AlertAckRequired : 1;
-  UINT8 AlertAckTimeoutSeconds;
-  UINT8 NumRetriesCall : 3;
-  UINT8 Reserved3 : 1;
-  UINT8 NumRetryAlert : 3;
-  UINT8 Reserved4 : 1;
-  IPMI_DEST_TYPE_SPECIFIC DestinationTypeSpecific;
+  IPMI_EMP_DESTINATION_SELECTOR  DestinationSelector;
+  IPMI_EMP_DESTINATION_TYPE      DestinationType;
+  UINT8                          AlertAckTimeoutSeconds;
+  IPMI_EMP_RETRIES               Retries;
+  IPMI_DEST_TYPE_SPECIFIC        DestinationTypeSpecific;
 } IPMI_EMP_DESTINATION_INFO;
 
-typedef struct {
-  UINT8 DestinationSelector : 4;
-  UINT8 Reserved1 : 4;
-  UINT8 Parity : 3;
-  UINT8 CharacterSize : 1;
-  UINT8 StopBit : 1;
-  UINT8 DtrHangup : 1;
-  UINT8 FlowControl : 2;
-  UINT8 BitRate : 4;
-  UINT8 Reserved2 : 4;
-  UINT8 SaveSetting : 1;
-  UINT8 SetComPort : 1;
-  UINT8 Reserved3 : 6;
-} IPMI_EMP_DESTINATION_COM_SETTING;
+typedef union {
+  struct {
+    UINT8  Parity : 3;
+    UINT8  CharacterSize : 1;
+    UINT8  StopBit : 1;
+    UINT8  DtrHangup : 1;
+    UINT8  FlowControl : 2;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_EMP_DESTINATION_COM_SETTING_DATA_2;
+
+typedef union {
+  struct {
+    UINT8  BitRate : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_EMP_BIT_RATE;
 
 typedef struct {
-  UINT8 DialStringSelector : 4;
-  UINT8 Reserved1 : 4;
-  UINT8 Reserved2;
-  UINT8 DialString[48];
+  IPMI_EMP_DESTINATION_SELECTOR            DestinationSelector;
+  IPMI_EMP_DESTINATION_COM_SETTING_DATA_2  Data2;
+  IPMI_EMP_BIT_RATE                        BitRate;
+} IPMI_EMP_DESTINATION_COM_SETTING;
+
+typedef union {
+  struct {
+    UINT8  DialStringSelector : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_DIAL_STRING_SELECTOR;
+
+typedef struct {
+  IPMI_DIAL_STRING_SELECTOR  DestinationSelector;
+  UINT8                      Reserved;
+  UINT8                      DialString[48];
 } IPMI_DESTINATION_DIAL_STRING;
 
 typedef union {
@@ -431,16 +581,31 @@ typedef union {
   UINT8   IpAddress[4];
 } IPMI_PPP_IP_ADDRESS;
 
-typedef struct {
-  UINT8 IpAddressSelector : 4;
-  UINT8 Reserved1 : 4;
-  IPMI_PPP_IP_ADDRESS PppIpAddress;
-} IPMI_DESTINATION_IP_ADDRESS;
+typedef union {
+  struct {
+    UINT8  IpAddressSelector : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_DESTINATION_IP_ADDRESS_SELECTOR;
 
 typedef struct {
-  UINT8 TapSelector;
-  UINT8 TapServiceSelector : 4;
-  UINT8 TapDialStringSelector : 4;
+  IPMI_DESTINATION_IP_ADDRESS_SELECTOR  DestinationSelector;
+  IPMI_PPP_IP_ADDRESS                   PppIpAddress;
+} IPMI_DESTINATION_IP_ADDRESS;
+
+typedef union {
+  struct {
+    UINT8  TapServiceSelector : 4;
+    UINT8  TapDialStringSelector : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_TAP_DIAL_STRING_SERVICE_SELECTOR;
+
+
+typedef struct {
+  UINT8                                  TapSelector;
+  IPMI_TAP_DIAL_STRING_SERVICE_SELECTOR  TapDialStringServiceSelector;
 } IPMI_DESTINATION_TAP_ACCOUNT;
 
 typedef struct {
@@ -509,22 +674,43 @@ typedef union {
 #define IPMI_MUX_SETTING_BLOCK_REQUEST_MUX_TO_BMC     0x7
 #define IPMI_MUX_SETTING_ALLOW_REQUEST_MUX_TO_BMC     0x8
 
-typedef struct {
-  UINT8 ChannelNo : 4;
-  UINT8 Reserved1 : 4;
-  UINT8 MuxSetting : 4;
-  UINT8 Reserved2 : 4;
-} IPMI_SET_SERIAL_MODEM_MUX_COMMAND_REQUEST;
+typedef union {
+  struct {
+    UINT8  ChannelNo : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_MUX_CHANNEL_NUM;
+
+typedef union {
+  struct {
+    UINT8  MuxSetting : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_MUX_SETTING_REQUEST;
 
 typedef struct {
-  UINT8 CompletionCode;
-  UINT8 MuxSetToBmc : 1;
-  UINT8 CommandStatus : 1;
-  UINT8 MessagingSessionActive : 1;
-  UINT8 AlertInProgress : 1;
-  UINT8 Reserved2 : 2;
-  UINT8 MuxToBmcAllowed : 1;
-  UINT8 MuxToSystemBlocked : 1;
+  IPMI_MUX_CHANNEL_NUM      ChannelNumber;
+  IPMI_MUX_SETTING_REQUEST  MuxSetting;
+} IPMI_SET_SERIAL_MODEM_MUX_COMMAND_REQUEST;
+
+typedef union {
+  struct {
+    UINT8  MuxSetToBmc : 1;
+    UINT8  CommandStatus : 1;
+    UINT8  MessagingSessionActive : 1;
+    UINT8  AlertInProgress : 1;
+    UINT8  Reserved : 2;
+    UINT8  MuxToBmcAllowed : 1;
+    UINT8  MuxToSystemBlocked : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_MUX_SETTING_PRESENT_STATE;
+
+typedef struct {
+  UINT8                           CompletionCode;
+  IPMI_MUX_SETTING_PRESENT_STATE  MuxSetting;
 } IPMI_SET_SERIAL_MODEM_MUX_COMMAND_RESPONSE;
 
 //
@@ -620,12 +806,19 @@ typedef struct {
 //
 //  Constants and Structure definitions for "SOL activating" command to follow here
 //
+typedef union {
+  struct {
+    UINT8  SessionState : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SOL_SESSION_STATE;
+
 typedef struct {
-  UINT8  SessionState : 4;
-  UINT8  Reserved : 4;
-  UINT8  PayloadInstance;
-  UINT8  FormatVersionMajor; // 1
-  UINT8  FormatVersionMinor; // 0
+  IPMI_SOL_SESSION_STATE  SessionState;
+  UINT8                   PayloadInstance;
+  UINT8                   FormatVersionMajor; // 1
+  UINT8                   FormatVersionMinor; // 0
 } IPMI_SOL_ACTIVATING_REQUEST;
 
 //
@@ -650,11 +843,18 @@ typedef struct {
 #define IPMI_SOL_CONFIGURATION_PARAMETER_SOL_PAYLOAD_CHANNEL   7
 #define IPMI_SOL_CONFIGURATION_PARAMETER_SOL_PAYLOAD_PORT      8
 
+typedef union {
+  struct {
+    UINT8  ChannelNumber : 4;
+    UINT8  Reserved : 4;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_SET_SOL_CONFIG_PARAM_CHANNEL_NUM;
+
 typedef struct {
-  UINT8  ChannelNumber : 4;
-  UINT8  Reserved : 4;
-  UINT8  ParameterSelector;
-  UINT8  ParameterData[0];
+  IPMI_SET_SOL_CONFIG_PARAM_CHANNEL_NUM  ChannelNumber;
+  UINT8                                  ParameterSelector;
+  UINT8                                  ParameterData[0];
 } IPMI_SET_SOL_CONFIGURATION_PARAMETERS_REQUEST;
 
 //
@@ -665,13 +865,20 @@ typedef struct {
 //
 //  Constants and Structure definitions for "Get SOL Configuration Parameters" command to follow here
 //
+typedef union {
+  struct {
+    UINT8  ChannelNumber : 4;
+    UINT8  Reserved : 3;
+    UINT8  GetParameter : 1;
+  } Bits;
+  UINT8  Uint8;
+} IPMI_GET_SOL_CONFIG_PARAM_CHANNEL_NUM;
+
 typedef struct {
-  UINT8  ChannelNumber : 4;
-  UINT8  Reserved : 3;
-  UINT8  GetParameter : 1;
-  UINT8  ParameterSelector;
-  UINT8  SetSelector;
-  UINT8  BlockSelector;
+  IPMI_GET_SOL_CONFIG_PARAM_CHANNEL_NUM  ChannelNumber;
+  UINT8                                  ParameterSelector;
+  UINT8                                  SetSelector;
+  UINT8                                  BlockSelector;
 } IPMI_GET_SOL_CONFIGURATION_PARAMETERS_REQUEST;
 
 typedef struct {
