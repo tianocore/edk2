@@ -1304,6 +1304,14 @@ Returns:
     printf ("EFI_FV_FILETYPE_SMM_CORE\n");
     break;
 
+  case EFI_FV_FILETYPE_MM_STANDALONE:
+    printf ("EFI_FV_FILETYPE_MM_STANDALONE\n");
+    break;
+
+  case EFI_FV_FILETYPE_MM_CORE_STANDALONE:
+    printf ("EFI_FV_FILETYPE_MM_CORE_STANDALONE\n");
+    break;
+
   case EFI_FV_FILETYPE_FFS_PAD:
     printf ("EFI_FV_FILETYPE_FFS_PAD\n");
     break;
