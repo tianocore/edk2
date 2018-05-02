@@ -471,6 +471,9 @@
   ## Include/Ppi/PlatformSpecificResetHandler.h
   gEdkiiPlatformSpecificResetHandlerPpiGuid = { 0x75cf14ae, 0x3441, 0x49dc, { 0xaa, 0x10, 0xbb, 0x35, 0xa7, 0xba, 0x8b, 0xab } }
 
+  ## Include/Ppi/NvmExpressHostController.h
+  gEdkiiPeiNvmExpressHostControllerPpiGuid  = { 0xcae3aa63, 0x676f, 0x4da3, { 0xbd, 0x50, 0x6c, 0xc5, 0xed, 0xde, 0x9a, 0xad } }
+
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
