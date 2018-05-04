@@ -45,6 +45,7 @@
   PeCoffGetEntryPointLib|MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
   DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
+  SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   NetLib|MdeModulePkg/Library/DxeNetLib/DxeNetLib.inf
