@@ -21,6 +21,8 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PciCapLib.h>
+#include <Library/PciCapPciIoLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 
@@ -184,48 +186,6 @@ GetBarType (
 }
 
 
-/**
-  Read a slice from PCI config space at the given offset, then advance the
-  offset.
-
-  @param [in]     PciIo   The EFI_PCI_IO_PROTOCOL instance that represents the
-                          device.
-
-  @param [in,out] Offset  On input, the offset in PCI config space to start
-                          reading from. On output, the offset of the first byte
-                          that was not read. On error, Offset is not modified.
-
-  @param [in]     Size    The number of bytes to read.
-
-  @param [out]    Buffer  On output, the bytes read from PCI config space are
-                          stored in this object.
-
-  @retval EFI_SUCCESS  Size bytes have been transferred from PCI config space
-                       (from Offset) to Buffer, and Offset has been incremented
-                       by Size.
-
-  @return              Error codes from PciIo->Pci.Read().
-**/
-STATIC
-EFI_STATUS
-ReadConfigSpace (
-  IN     EFI_PCI_IO_PROTOCOL *PciIo,
-  IN OUT UINT32              *Offset,
-  IN     UINTN               Size,
-     OUT VOID                *Buffer
-  )
-{
-  EFI_STATUS Status;
-
-  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, *Offset, Size, Buffer);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  *Offset += (UINT32)Size;
-  return EFI_SUCCESS;
-}
-
-
 /*
   Traverse the PCI capabilities list of a virtio-1.0 device, and capture the
   locations of the interesting virtio-1.0 register blocks.
@@ -239,57 +199,51 @@ ReadConfigSpace (
                                 will have been updated from the PCI
                                 capabilities found.
 
-  @param[in]     CapabilityPtr  The offset of the first capability in PCI
-                                config space, taken from the standard PCI
-                                device header.
-
   @retval EFI_SUCCESS  Traversal successful.
 
-  @return              Error codes from the ReadConfigSpace() and GetBarType()
-                       helper functions.
+  @return              Error codes from PciCapPciIoLib, PciCapLib, and the
+                       GetBarType() helper function.
 */
 STATIC
 EFI_STATUS
 ParseCapabilities (
-  IN OUT VIRTIO_1_0_DEV *Device,
-  IN     UINT8          CapabilityPtr
+  IN OUT VIRTIO_1_0_DEV *Device
   )
 {
-  UINT32              Offset;
-  VIRTIO_PCI_CAP_LINK CapLink;
+  EFI_STATUS   Status;
+  PCI_CAP_DEV  *PciDevice;
+  PCI_CAP_LIST *CapList;
+  UINT16       VendorInstance;
+  PCI_CAP      *VendorCap;
 
-  for (Offset = CapabilityPtr & 0xFC;
-       Offset > 0;
-       Offset = CapLink.CapNext & 0xFC
-       ) {
-    EFI_STATUS        Status;
+  Status = PciCapPciIoDeviceInit (Device->PciIo, &PciDevice);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = PciCapListInit (PciDevice, &CapList);
+  if (EFI_ERROR (Status)) {
+    goto UninitPciDevice;
+  }
+
+  for (VendorInstance = 0;
+       !EFI_ERROR (PciCapListFindCap (CapList, PciCapNormal,
+                     EFI_PCI_CAPABILITY_ID_VENDOR, VendorInstance,
+                     &VendorCap));
+       VendorInstance++) {
     UINT8             CapLen;
     VIRTIO_PCI_CAP    VirtIoCap;
     VIRTIO_1_0_CONFIG *ParsedConfig;
 
     //
-    // Read capability identifier and link to next capability.
-    //
-    Status = ReadConfigSpace (Device->PciIo, &Offset, sizeof CapLink,
-               &CapLink);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-    if (CapLink.CapId != 0x09) {
-      //
-      // Not a vendor-specific capability, move to the next one.
-      //
-      continue;
-    }
-
-    //
     // Big enough to accommodate a VIRTIO_PCI_CAP structure?
     //
-    Status = ReadConfigSpace (Device->PciIo, &Offset, sizeof CapLen, &CapLen);
+    Status = PciCapRead (PciDevice, VendorCap,
+               OFFSET_OF (EFI_PCI_CAPABILITY_VENDOR_HDR, Length), &CapLen,
+               sizeof CapLen);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto UninitCapList;
     }
-    if (CapLen < sizeof CapLink + sizeof CapLen + sizeof VirtIoCap) {
+    if (CapLen < sizeof VirtIoCap) {
       //
       // Too small, move to next.
       //
@@ -299,11 +253,11 @@ ParseCapabilities (
     //
     // Read interesting part of capability.
     //
-    Status = ReadConfigSpace (Device->PciIo, &Offset, sizeof VirtIoCap,
-               &VirtIoCap);
+    Status = PciCapRead (PciDevice, VendorCap, 0, &VirtIoCap, sizeof VirtIoCap);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto UninitCapList;
     }
+
     switch (VirtIoCap.ConfigType) {
     case VIRTIO_PCI_CAP_COMMON_CFG:
       ParsedConfig = &Device->CommonConfig;
@@ -326,7 +280,7 @@ ParseCapabilities (
     //
     Status = GetBarType (Device->PciIo, VirtIoCap.Bar, &ParsedConfig->BarType);
     if (EFI_ERROR (Status)) {
-      return Status;
+      goto UninitCapList;
     }
     ParsedConfig->Bar    = VirtIoCap.Bar;
     ParsedConfig->Offset = VirtIoCap.Offset;
@@ -337,19 +291,18 @@ ParseCapabilities (
       // This capability has an additional field called NotifyOffsetMultiplier;
       // parse it too.
       //
-      if (CapLen < sizeof CapLink + sizeof CapLen + sizeof VirtIoCap +
-                   sizeof Device->NotifyOffsetMultiplier) {
+      if (CapLen < sizeof VirtIoCap + sizeof Device->NotifyOffsetMultiplier) {
         //
         // Too small, move to next.
         //
         continue;
       }
 
-      Status = ReadConfigSpace (Device->PciIo, &Offset,
-                 sizeof Device->NotifyOffsetMultiplier,
-                 &Device->NotifyOffsetMultiplier);
+      Status = PciCapRead (PciDevice, VendorCap, sizeof VirtIoCap,
+                 &Device->NotifyOffsetMultiplier,
+                 sizeof Device->NotifyOffsetMultiplier);
       if (EFI_ERROR (Status)) {
-        return Status;
+        goto UninitCapList;
       }
     }
 
@@ -359,7 +312,15 @@ ParseCapabilities (
     ParsedConfig->Exists = TRUE;
   }
 
-  return EFI_SUCCESS;
+  ASSERT_EFI_ERROR (Status);
+
+UninitCapList:
+  PciCapListUninit (CapList);
+
+UninitPciDevice:
+  PciCapPciIoDeviceUninit (PciDevice);
+
+  return Status;
 }
 
 
@@ -1015,7 +976,7 @@ Virtio10BindingStart (
 
   Device->VirtIo.SubSystemDeviceId = Pci.Hdr.DeviceId - 0x1040;
 
-  Status = ParseCapabilities (Device, Pci.Device.CapabilityPtr);
+  Status = ParseCapabilities (Device);
   if (EFI_ERROR (Status)) {
     goto ClosePciIo;
   }

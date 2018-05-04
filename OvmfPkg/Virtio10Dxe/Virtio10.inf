@@ -32,6 +32,8 @@
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
+  PciCapLib
+  PciCapPciIoLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
