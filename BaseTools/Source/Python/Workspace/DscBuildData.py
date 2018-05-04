@@ -2057,11 +2057,11 @@ class DscBuildData(PlatformBuildClassObject):
                         ValueList = Value.split()
                         if ValueList:
                             for Id, Item in enumerate(ValueList):
-                                if Item == '-D' or Item == '/D':
+                                if Item in ['-D', '/D', '-U', '/U']:
                                     CC_FLAGS += ' ' + Item
                                     if Id + 1 < len(ValueList):
                                         CC_FLAGS += ' ' + ValueList[Id + 1]
-                                elif Item.startswith('/D') or Item.startswith('-D'):
+                                elif Item.startswith(('-D', '/D', '-U', '/U')):
                                     CC_FLAGS += ' ' + Item
         MakeApp += CC_FLAGS
 
