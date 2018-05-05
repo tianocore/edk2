@@ -587,10 +587,10 @@ LookupUnicodeString2 (
 EFI_STATUS
 EFIAPI
 AddUnicodeString (
-  IN CONST CHAR8               *Language,
-  IN CONST CHAR8               *SupportedLanguages,
-  IN EFI_UNICODE_STRING_TABLE  **UnicodeStringTable,
-  IN CONST CHAR16              *UnicodeString
+  IN     CONST CHAR8               *Language,
+  IN     CONST CHAR8               *SupportedLanguages,
+  IN OUT EFI_UNICODE_STRING_TABLE  **UnicodeStringTable,
+  IN     CONST CHAR16              *UnicodeString
   );
 
 /**
@@ -638,11 +638,11 @@ AddUnicodeString (
 EFI_STATUS
 EFIAPI
 AddUnicodeString2 (
-  IN CONST CHAR8               *Language,
-  IN CONST CHAR8               *SupportedLanguages,
-  IN EFI_UNICODE_STRING_TABLE  **UnicodeStringTable,
-  IN CONST CHAR16              *UnicodeString,
-  IN BOOLEAN                   Iso639Language
+  IN     CONST CHAR8               *Language,
+  IN     CONST CHAR8               *SupportedLanguages,
+  IN OUT EFI_UNICODE_STRING_TABLE  **UnicodeStringTable,
+  IN     CONST CHAR16              *UnicodeString,
+  IN     BOOLEAN                   Iso639Language
   );
 
 /**
