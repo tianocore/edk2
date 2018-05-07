@@ -75,6 +75,13 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gOpalComponentName2;
 #define PSID_CHARACTER_LENGTH   0x20
 #define MAX_PSID_TRY_COUNT      5
 
+//
+// The max timeout value assume the user can wait for the revert action. The unit of this macro is second.
+// If the revert time value bigger than this one, driver needs to popup a dialog to let user confirm the 
+// revert action.
+//
+#define MAX_ACCEPTABLE_REVERTING_TIME    10
+
 #pragma pack(1)
 
 //
@@ -140,6 +147,8 @@ typedef struct {
   TCG_LOCKING_FEATURE_DESCRIPTOR                  LockingFeature;         // Locking Feature Descriptor retrieved from performing a Level 0 Discovery
   UINT8                                           PasswordLength;
   UINT8                                           Password[OPAL_MAX_PASSWORD_SIZE];
+
+  UINT32                                          EstimateTimeCost;
 } OPAL_DISK;
 
 //

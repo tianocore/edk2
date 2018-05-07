@@ -635,6 +635,7 @@ UnlockOpalPassword (
     BlockSIDEnabled = FALSE;
   }
   if (BlockSIDEnabled && BlockSidSupport) {
+    DEBUG ((DEBUG_INFO, "OpalPassword: S3 phase send BlockSid command to device!\n"));
     ZeroMem(&Session, sizeof (Session));
     Session.Sscp = &OpalDev->Sscp;
     Session.MediaId = 0;

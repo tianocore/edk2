@@ -13,6 +13,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "OpalHii.h"
+//
+// Character definitions
+//
+#define UPPER_LOWER_CASE_OFFSET 0x20
 
 //
 // This is the generated IFR binary Data for each formset defined in VFR.
@@ -521,6 +525,59 @@ GetDiskNameStringId(
 }
 
 /**
+  Confirm whether user truly want to do the revert action.
+
+  @param     OpalDisk            The device which need to do the revert action.
+
+  @retval  EFI_SUCCESS           Confirmed user want to do the revert action.
+**/
+EFI_STATUS
+HiiConfirmRevertAction (
+  IN OPAL_DISK                  *OpalDisk
+
+  )
+{
+  CHAR16                        Unicode[512];
+  EFI_INPUT_KEY                 Key;
+  CHAR16                        ApproveResponse;
+  CHAR16                        RejectResponse;
+
+  //
+  // When the estimate cost time bigger than MAX_ACCEPTABLE_REVERTING_TIME, pop up dialog to let user confirm
+  // the revert action.
+  //
+  if (OpalDisk->EstimateTimeCost < MAX_ACCEPTABLE_REVERTING_TIME) {
+    return EFI_SUCCESS;
+  }
+
+  ApproveResponse = L'Y';
+  RejectResponse  = L'N';
+
+  UnicodeSPrint(Unicode, StrSize(L"WARNING: Revert device needs about ####### seconds"), L"WARNING: Revert device needs about %d seconds", OpalDisk->EstimateTimeCost);
+
+  do {
+    CreatePopUp(
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &Key,
+        Unicode,
+        L" System should not be powered off until revert completion ",
+        L" ",
+        L" Press 'Y/y' to continue, press 'N/n' to cancal ",
+        NULL
+    );
+  } while (
+      ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (ApproveResponse | UPPER_LOWER_CASE_OFFSET)) &&
+      ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (RejectResponse | UPPER_LOWER_CASE_OFFSET))
+    );
+
+  if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (RejectResponse | UPPER_LOWER_CASE_OFFSET)) {
+    return EFI_ABORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   This function processes the results of changes in configuration.
 
   @param  This                   Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
@@ -588,6 +645,17 @@ DriverCallback(
     switch (HiiKeyId) {
       case HII_KEY_ID_GOTO_DISK_INFO:
         return HiiSelectDisk((UINT8)HiiKey.KeyBits.Index);
+
+      case HII_KEY_ID_REVERT:
+      case HII_KEY_ID_PSID_REVERT:
+        OpalDisk = HiiGetOpalDiskCB(gHiiConfiguration.SelectedDiskIndex);
+        if (OpalDisk != NULL) {
+          return HiiConfirmRevertAction (OpalDisk);
+        } else {
+          ASSERT (FALSE);
+          return EFI_SUCCESS;
+        }
+
     }
   } else if (Action == EFI_BROWSER_ACTION_CHANGED) {
     switch (HiiKeyId) {
@@ -1112,6 +1180,8 @@ OpalDiskInitialize (
 {
   TCG_RESULT                  TcgResult;
   OPAL_SESSION                Session;
+  UINT8                       ActiveDataRemovalMechanism;
+  UINT32                      RemovalMechanishLists[ResearvedMechanism];
 
   ZeroMem(&Dev->OpalDisk, sizeof(OPAL_DISK));
   Dev->OpalDisk.Sscp = Dev->Sscp;
@@ -1131,6 +1201,20 @@ OpalDiskInitialize (
   TcgResult = OpalUtilGetMsid (&Session, Dev->OpalDisk.Msid, OPAL_MSID_LENGHT, &Dev->OpalDisk.MsidLength);
   if (TcgResult != TcgResultSuccess) {
     return EFI_DEVICE_ERROR;
+  }
+
+  if (Dev->OpalDisk.SupportedAttributes.DataRemoval) {
+    TcgResult = OpalUtilGetDataRemovalMechanismLists (&Session, RemovalMechanishLists);
+    if (TcgResult != TcgResultSuccess) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    TcgResult = OpalUtilGetActiveDataRemovalMechanism (&Session, Dev->OpalDisk.Msid, Dev->OpalDisk.MsidLength, &ActiveDataRemovalMechanism);
+    if (TcgResult != TcgResultSuccess) {
+      return EFI_DEVICE_ERROR;
+    }
+
+    Dev->OpalDisk.EstimateTimeCost = RemovalMechanishLists[ActiveDataRemovalMechanism];
   }
 
   return OpalDiskUpdateStatus (&Dev->OpalDisk);

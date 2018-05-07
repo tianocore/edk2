@@ -105,13 +105,12 @@ OpalSupportGetAvailableActions(
   }
 
   //
-  // Psid revert is available for any device with media encryption support
-  // Revert is allowed for any device with media encryption support, however it requires
+  // Psid revert is available for any device with media encryption support or pyrite 2.0 type support.
   //
-  if (SupportedAttributes->MediaEncryption) {
+  if (SupportedAttributes->PyriteSscV2 || SupportedAttributes->MediaEncryption) {
 
     //
-    // Only allow psid revert if media encryption is enabled.
+    // Only allow psid revert if media encryption is enabled or pyrite 2.0 type support..
     // Otherwise, someone who steals a disk can psid revert the disk and the user Data is still
     // intact and accessible
     //
@@ -657,6 +656,8 @@ OpalEndOfDxeEventNotify (
   @param[in]  Dev           The device which need Psid to process Psid Revert
                             OPAL request.
   @param[in]  PopUpString   Pop up string.
+  @param[in]  PopUpString2  Pop up string in line 2.
+
   @param[out] PressEsc      Whether user escape function through Press ESC.
 
   @retval Psid string if success. NULL if failed.
@@ -666,6 +667,7 @@ CHAR8 *
 OpalDriverPopUpPsidInput (
   IN OPAL_DRIVER_DEVICE     *Dev,
   IN CHAR16                 *PopUpString,
+  IN CHAR16                 *PopUpString2,
   OUT BOOLEAN               *PressEsc
   )
 {
@@ -689,6 +691,7 @@ OpalDriverPopUpPsidInput (
       EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
       &InputKey,
       PopUpString,
+      PopUpString2,
       L"---------------------",
       Mask,
       NULL
@@ -1369,6 +1372,8 @@ ProcessOpalRequestPsidRevert (
   EFI_INPUT_KEY         Key;
   TCG_RESULT            Ret;
   CHAR16                *PopUpString;
+  CHAR16                *PopUpString2;
+  UINTN                 BufferSize;
 
   if (Dev == NULL) {
     return;
@@ -1378,6 +1383,20 @@ ProcessOpalRequestPsidRevert (
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
+  if (Dev->OpalDisk.EstimateTimeCost > MAX_ACCEPTABLE_REVERTING_TIME) {
+    BufferSize = StrSize (L"Warning: Revert action will take about ####### seconds, DO NOT power off system during the revert action!");
+    PopUpString2 = AllocateZeroPool (BufferSize);
+    ASSERT (PopUpString2 != NULL);
+    UnicodeSPrint (
+        PopUpString2,
+        BufferSize,
+        L"WARNING: Revert action will take about %d seconds, DO NOT power off system during the revert action!",
+        Dev->OpalDisk.EstimateTimeCost
+      );
+  } else {
+    PopUpString2 = NULL;
+  }
+
   Count = 0;
 
   ZeroMem(&Session, sizeof(Session));
@@ -1386,7 +1405,7 @@ ProcessOpalRequestPsidRevert (
   Session.OpalBaseComId = Dev->OpalDisk.OpalBaseComId;
 
   while (Count < MAX_PSID_TRY_COUNT) {
-    Psid = OpalDriverPopUpPsidInput (Dev, PopUpString, &PressEsc);
+    Psid = OpalDriverPopUpPsidInput (Dev, PopUpString, PopUpString2, &PressEsc);
     if (PressEsc) {
         do {
           CreatePopUp (
@@ -1400,7 +1419,7 @@ ProcessOpalRequestPsidRevert (
 
         if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
           gST->ConOut->ClearScreen(gST->ConOut);
-          return;
+          goto Done;
         } else {
           //
           // Let user input Psid again.
@@ -1456,6 +1475,11 @@ ProcessOpalRequestPsidRevert (
     } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
     gST->ConOut->ClearScreen(gST->ConOut);
   }
+
+Done:
+  if (PopUpString2 != NULL) {
+    FreePool (PopUpString2);
+  }
 }
 
 /**
@@ -1482,6 +1506,8 @@ ProcessOpalRequestRevert (
   TCG_RESULT            Ret;
   BOOLEAN               PasswordFailed;
   CHAR16                *PopUpString;
+  CHAR16                *PopUpString2;
+  UINTN                 BufferSize;
 
   if (Dev == NULL) {
     return;
@@ -1491,6 +1517,20 @@ ProcessOpalRequestRevert (
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
+  if (Dev->OpalDisk.EstimateTimeCost > MAX_ACCEPTABLE_REVERTING_TIME) {
+    BufferSize = StrSize (L"Warning: Revert action will take about ####### seconds, DO NOT power off system during the revert action!");
+    PopUpString2 = AllocateZeroPool (BufferSize);
+    ASSERT (PopUpString2 != NULL);
+    UnicodeSPrint (
+        PopUpString2,
+        BufferSize,
+        L"WARNING: Revert action will take about %d seconds, DO NOT power off system during the revert action!",
+        Dev->OpalDisk.EstimateTimeCost
+      );
+  } else {
+    PopUpString2 = NULL;
+  }
+
   Count = 0;
 
   ZeroMem(&Session, sizeof(Session));
@@ -1499,7 +1539,7 @@ ProcessOpalRequestRevert (
   Session.OpalBaseComId = Dev->OpalDisk.OpalBaseComId;
 
   while (Count < MAX_PASSWORD_TRY_COUNT) {
-    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, NULL, &PressEsc);
+    Password = OpalDriverPopUpPasswordInput (Dev, PopUpString, PopUpString2, &PressEsc);
     if (PressEsc) {
         do {
           CreatePopUp (
@@ -1513,7 +1553,7 @@ ProcessOpalRequestRevert (
 
         if (Key.UnicodeChar == CHAR_CARRIAGE_RETURN) {
           gST->ConOut->ClearScreen(gST->ConOut);
-          return;
+          goto Done;
         } else {
           //
           // Let user input password again.
@@ -1595,6 +1635,11 @@ ProcessOpalRequestRevert (
         );
     } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
     gST->ConOut->ClearScreen(gST->ConOut);
+  }
+
+Done:
+  if (PopUpString2 != NULL) {
+    FreePool (PopUpString2);
   }
 }
 
@@ -2337,6 +2382,7 @@ ReadyToBootCallback (
         Session.MediaId = Itr->OpalDisk.MediaId;
         Session.OpalBaseComId = Itr->OpalDisk.OpalBaseComId;
 
+        DEBUG ((DEBUG_INFO, "OpalPassword: ReadyToBoot point, send BlockSid command to device!\n"));
         Result = OpalBlockSid (&Session, TRUE);  // HardwareReset must always be TRUE
         if (Result != TcgResultSuccess) {
           DEBUG ((DEBUG_ERROR, "OpalBlockSid fail\n"));
