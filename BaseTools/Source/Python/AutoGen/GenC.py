@@ -1057,7 +1057,7 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                 if not Value.endswith('U'):
                     Value += 'U'
         if Pcd.DatumType not in TAB_PCD_NUMERIC_TYPES:
-            if Pcd.MaxDatumSize is None or Pcd.MaxDatumSize == '':
+            if not Pcd.MaxDatumSize:
                 EdkLogger.error("build", AUTOGEN_ERROR,
                                 "Unknown [MaxDatumSize] of PCD [%s.%s]" % (Pcd.TokenSpaceGuidCName, TokenCName),
                                 ExtraData="[%s]" % str(Info))
@@ -1065,11 +1065,13 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
             ArraySize = int(Pcd.MaxDatumSize, 0)
             if Value[0] == '{':
                 Type = '(VOID *)'
+                ValueSize = len(Value.split(','))
             else:
                 if Value[0] == 'L':
                     Unicode = True
                 Value = Value.lstrip('L')   #.strip('"')
                 Value = eval(Value)         # translate escape character
+                ValueSize = len(Value) + 1
                 NewValue = '{'
                 for Index in range(0,len(Value)):
                     if Unicode:
@@ -1077,18 +1079,17 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                     else:
                         NewValue = NewValue + str(ord(Value[Index]) % 0x100) + ', '
                 if Unicode:
-                    ArraySize = ArraySize / 2;
-
-                if ArraySize < (len(Value) + 1):
-                    if Pcd.MaxSizeUserSet:
-                        EdkLogger.error("build", AUTOGEN_ERROR,
-                                    "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, TokenCName),
-                                    ExtraData="[%s]" % str(Info))
-                    else:
-                        ArraySize = Pcd.GetPcdSize()
-                        if Unicode:
-                            ArraySize = ArraySize / 2
+                    ArraySize = ArraySize / 2
                 Value = NewValue + '0 }'
+            if ArraySize < ValueSize:
+                if Pcd.MaxSizeUserSet:
+                    EdkLogger.error("build", AUTOGEN_ERROR,
+                                "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, TokenCName),
+                                ExtraData="[%s]" % str(Info))
+                else:
+                    ArraySize = Pcd.GetPcdSize()
+                    if Unicode:
+                        ArraySize = ArraySize / 2
             Array = '[%d]' % ArraySize
         #
         # skip casting for fixed at build since it breaks ARM assembly.
