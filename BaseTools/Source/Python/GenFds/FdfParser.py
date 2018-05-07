@@ -1135,7 +1135,7 @@ class FdfParser:
     @staticmethod
     def __Verify(Name, Value, Scope):
         # value verification only applies to numeric values.
-        if scope not in TAB_PCD_NUMERIC_TYPES:
+        if Scope not in TAB_PCD_NUMERIC_TYPES:
             return
 
         ValueNumber = 0
