@@ -29,6 +29,7 @@
 [Sources]
   TcgStorageOpalCore.c
   TcgStorageOpalUtil.c
+  TcgStorageOpalLibInternal.h
 
 [LibraryClasses]
   BaseLib

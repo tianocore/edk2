@@ -1,7 +1,7 @@
 /** @file
   Public API for Opal Core library.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -18,6 +18,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/TcgStorageOpalLib.h>
+
+#include "TcgStorageOpalLibInternal.h"
 
 #pragma pack(1)
 typedef struct {
@@ -89,6 +91,7 @@ OpalTrustedSend(
   @param[in]      SpSpecific            Security Protocol Specific
   @param[in]      Buffer                Address of Data to transfer
   @param[in]      BufferSize            Full Size of Buffer, including space that may be used for padding.
+  @param[in]      EstimateTimeCost      Estimate the time needed.
 
 **/
 TCG_RESULT
@@ -98,10 +101,10 @@ OpalTrustedRecv(
   UINT8                                  SecurityProtocol,
   UINT16                                 SpSpecific,
   VOID                                   *Buffer,
-  UINTN                                  BufferSize
+  UINTN                                  BufferSize,
+  UINT32                                 EstimateTimeCost
   )
 {
-
   UINTN           TransferLength512;
   UINT32          Tries;
   TCG_COM_PACKET  *ComPacket;
@@ -129,9 +132,15 @@ OpalTrustedRecv(
   // so we need to retry the IF-RECV to get the actual Data.
   // See TCG Core Spec v2 Table 45 IF-RECV ComPacket Field Values Summary
   // This is an arbitrary number of retries, not from the spec.
-  // have a max timeout of 10 seconds, 5000 tries * 2ms = 10s
   //
-  Tries = 5000;
+  // if user input estimate time cost(second level) value bigger than 10s, base on user input value to wait.
+  // Else, Use a max timeout of 10 seconds to wait, 5000 tries * 2ms = 10s
+  //
+  if (EstimateTimeCost > 10) {
+    Tries = EstimateTimeCost * 500; // 500 = 1000 * 1000 / 2000;
+  } else {
+    Tries = 5000;
+  }
   while ((Tries--) > 0) {
     ZeroMem( Buffer, BufferSize );
     TransferSize = 0;
@@ -146,7 +155,6 @@ OpalTrustedRecv(
                  Buffer,
                  &TransferSize
              );
-
     if (EFI_ERROR (Status)) {
       return TcgResultFailure;
     }
@@ -179,23 +187,24 @@ OpalTrustedRecv(
 /**
   The function performs send, recv, check comIDs, check method status action.
 
-  @param[in]      Session         OPAL_SESSION related to this method..
-  @param[in]      SendSize        Transfer Length of Buffer (in bytes) - always a multiple of 512
-  @param[in]      Buffer          Address of Data to transfer
-  @param[in]      BufferSize      Full Size of Buffer, including space that may be used for padding.
-  @param[in]      ParseStruct     Structure used to parse received TCG response.
-  @param[in]      MethodStatus    Method status of last action performed.  If action succeeded, it should be TCG_METHOD_STATUS_CODE_SUCCESS.
-
+  @param[in]      Session           OPAL_SESSION related to this method..
+  @param[in]      SendSize          Transfer Length of Buffer (in bytes) - always a multiple of 512
+  @param[in]      Buffer            Address of Data to transfer
+  @param[in]      BufferSize        Full Size of Buffer, including space that may be used for padding.
+  @param[in]      ParseStruct       Structure used to parse received TCG response.
+  @param[in]      MethodStatus      Method status of last action performed.  If action succeeded, it should be TCG_METHOD_STATUS_CODE_SUCCESS.
+  @param[in]      EstimateTimeCost  Estimate the time need to for the method.
 **/
 TCG_RESULT
 EFIAPI
-OpalPerformMethod(
+OpalPerformMethod (
   OPAL_SESSION     *Session,
   UINT32           SendSize,
   VOID             *Buffer,
   UINT32           BufferSize,
   TCG_PARSE_STRUCT *ParseStruct,
-  UINT8            *MethodStatus
+  UINT8            *MethodStatus,
+  UINT32           EstimateTimeCost
   )
 {
   NULL_CHECK(Session);
@@ -217,7 +226,8 @@ OpalPerformMethod(
                   TCG_OPAL_SECURITY_PROTOCOL_1,
                   Session->OpalBaseComId,
                   Buffer,
-                  BufferSize
+                  BufferSize,
+                  EstimateTimeCost
               ));
 
   ERROR_CHECK(TcgInitTcgParseStruct(ParseStruct, Buffer, BufferSize));
@@ -309,7 +319,60 @@ OpalPsidRevert(
   //
   // Send Revert Method Call
   //
-  ERROR_CHECK(OpalPerformMethod(AdminSpSession, Size, Buffer, BUFFER_SIZE, &ParseStruct, &MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(AdminSpSession, Size, Buffer, BUFFER_SIZE, &ParseStruct, &MethodStatus, 0));
+  METHOD_STATUS_ERROR_CHECK(MethodStatus, TcgResultFailure);
+
+  return TcgResultSuccess;
+}
+
+/**
+
+  Reverts device using Admin SP Revert method.
+
+  @param[in]  AdminSpSession      OPAL_SESSION with OPAL_UID_ADMIN_SP as OPAL_ADMIN_SP_PSID_AUTHORITY to perform PSID revert.
+  @param[in]  EstimateTimeCost    Estimate the time needed.
+
+**/
+TCG_RESULT
+EFIAPI
+OpalPyrite2PsidRevert(
+  OPAL_SESSION              *AdminSpSession,
+  UINT32                    EstimateTimeCost
+  )
+{
+  //
+  // Now that base comid is known, start Session
+  // we'll attempt to start Session as PSID authority
+  // verify PSID Authority is defined in ADMIN SP authority table... is this possible?
+  //
+  TCG_CREATE_STRUCT  CreateStruct;
+  TCG_PARSE_STRUCT   ParseStruct;
+  UINT32             Size;
+  UINT8              Buffer[BUFFER_SIZE];
+  UINT8              MethodStatus;
+
+
+  NULL_CHECK(AdminSpSession);
+
+  //
+  // Send Revert action on Admin SP
+  //
+  ERROR_CHECK(TcgInitTcgCreateStruct(&CreateStruct, Buffer, BUFFER_SIZE));
+  ERROR_CHECK(TcgStartComPacket(&CreateStruct, AdminSpSession->OpalBaseComId, AdminSpSession->ComIdExtension));
+  ERROR_CHECK(TcgStartPacket(&CreateStruct, AdminSpSession->TperSessionId, AdminSpSession->HostSessionId, 0x0, 0x0, 0x0));
+  ERROR_CHECK(TcgStartSubPacket(&CreateStruct, 0x0));
+  ERROR_CHECK(TcgStartMethodCall(&CreateStruct, OPAL_UID_ADMIN_SP, OPAL_ADMIN_SP_REVERT_METHOD));
+  ERROR_CHECK(TcgStartParameters(&CreateStruct));
+  ERROR_CHECK(TcgEndParameters(&CreateStruct));
+  ERROR_CHECK(TcgEndMethodCall(&CreateStruct));
+  ERROR_CHECK(TcgEndSubPacket(&CreateStruct));
+  ERROR_CHECK(TcgEndPacket(&CreateStruct));
+  ERROR_CHECK(TcgEndComPacket(&CreateStruct, &Size));
+
+  //
+  // Send Revert Method Call
+  //
+  ERROR_CHECK(OpalPerformMethod(AdminSpSession, Size, Buffer, BUFFER_SIZE, &ParseStruct, &MethodStatus, EstimateTimeCost));
   METHOD_STATUS_ERROR_CHECK(MethodStatus, TcgResultFailure);
 
   return TcgResultSuccess;
@@ -339,7 +402,8 @@ OpalRetrieveLevel0DiscoveryHeader(
               TCG_OPAL_SECURITY_PROTOCOL_1,   // SP
               TCG_SP_SPECIFIC_PROTOCOL_LEVEL0_DISCOVERY, // SP_Specific
               BuffAddress,
-              BufferSize
+              BufferSize,
+              0
             ));
 }
 
@@ -367,7 +431,8 @@ OpalRetrieveSupportedProtocolList(
               TCG_SECURITY_PROTOCOL_INFO, // SP
               TCG_SP_SPECIFIC_PROTOCOL_LIST, // SP_Specific
               BuffAddress,
-              BufferSize
+              BufferSize,
+              0
           ));
 }
 
@@ -430,7 +495,7 @@ OpalStartSession(
                     HostChallenge,
                     HostSigningAuthority
                 ));
-  ERROR_CHECK(OpalPerformMethod(Session, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(Session, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
   if (*MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
     return TcgResultSuccess; // return early if method failed - user must check MethodStatus
   }
@@ -487,7 +552,8 @@ OpalEndSession(
                   TCG_OPAL_SECURITY_PROTOCOL_1,
                   Session->OpalBaseComId,
                   Buffer,
-                  sizeof(Buffer)
+                  sizeof(Buffer),
+                  0
               ));
 
   ERROR_CHECK(TcgInitTcgParseStruct(&ParseStruct, Buffer, sizeof(Buffer)));
@@ -558,7 +624,7 @@ OpalGetMsid(
   //
   // Send MSID Method Call
   //
-  ERROR_CHECK(OpalPerformMethod(AdminSpSession, Size, Buffer, BUFFER_SIZE, &ParseStruct, &MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(AdminSpSession, Size, Buffer, BUFFER_SIZE, &ParseStruct, &MethodStatus, 0));
   METHOD_STATUS_ERROR_CHECK(MethodStatus, TcgResultFailure);
 
   ERROR_CHECK(TcgGetNextStartList(&ParseStruct));
@@ -589,6 +655,86 @@ OpalGetMsid(
   // copy msid into Buffer
   //
   CopyMem(Msid, RecvMsid, *MsidLength);
+  return TcgResultSuccess;
+}
+
+/**
+
+  The function retrieves the MSID from the device specified
+
+  @param[in]  AdminSpSession              OPAL_SESSION with OPAL_UID_ADMIN_SP as OPAL_ADMIN_SP_ANYBODY_AUTHORITY
+  @param[out] ActiveDataRemovalMechanism  Active Data Removal Mechanism that the device will use for Revert/RevertSP calls.
+
+**/
+TCG_RESULT
+EFIAPI
+OpalPyrite2GetActiveDataRemovalMechanism (
+  IN  OPAL_SESSION    *AdminSpSession,
+  OUT UINT8           *ActiveDataRemovalMechanism
+  )
+{
+  TCG_CREATE_STRUCT CreateStruct;
+  TCG_PARSE_STRUCT  ParseStruct;
+  UINT32            Size;
+  UINT8             MethodStatus;
+  UINT32            Col;
+  UINT8             RecvActiveDataRemovalMechanism;
+  UINT8             Buffer[BUFFER_SIZE];
+
+  NULL_CHECK(AdminSpSession);
+  NULL_CHECK(ActiveDataRemovalMechanism);
+
+  ERROR_CHECK(TcgInitTcgCreateStruct(&CreateStruct, Buffer, BUFFER_SIZE));
+  ERROR_CHECK(TcgStartComPacket(&CreateStruct, AdminSpSession->OpalBaseComId, AdminSpSession->ComIdExtension));
+  ERROR_CHECK(TcgStartPacket(&CreateStruct, AdminSpSession->TperSessionId, AdminSpSession->HostSessionId, 0x0, 0x0, 0x0));
+  ERROR_CHECK(TcgStartSubPacket(&CreateStruct, 0x0));
+  ERROR_CHECK(TcgStartMethodCall(&CreateStruct, OPAL_UID_ADMIN_SP_DATA_REMOVAL_MECHANISM, TCG_UID_METHOD_GET));
+  ERROR_CHECK(TcgStartParameters(&CreateStruct));
+  ERROR_CHECK(TcgAddStartList(&CreateStruct));
+  ERROR_CHECK(TcgAddStartName(&CreateStruct));
+  ERROR_CHECK(TcgAddUINT8(&CreateStruct, TCG_CELL_BLOCK_START_COLUMN_NAME));
+  ERROR_CHECK(TcgAddUINT8(&CreateStruct, OPAL_ADMIN_SP_ACTIVE_DATA_REMOVAL_MECHANISM_COL));
+  ERROR_CHECK(TcgAddEndName(&CreateStruct));
+  ERROR_CHECK(TcgAddStartName(&CreateStruct));
+  ERROR_CHECK(TcgAddUINT8(&CreateStruct, TCG_CELL_BLOCK_END_COLUMN_NAME));
+  ERROR_CHECK(TcgAddUINT8(&CreateStruct, OPAL_ADMIN_SP_ACTIVE_DATA_REMOVAL_MECHANISM_COL));
+  ERROR_CHECK(TcgAddEndName(&CreateStruct));
+  ERROR_CHECK(TcgAddEndList(&CreateStruct));
+  ERROR_CHECK(TcgEndParameters(&CreateStruct));
+  ERROR_CHECK(TcgEndMethodCall(&CreateStruct));
+  ERROR_CHECK(TcgEndSubPacket(&CreateStruct));
+  ERROR_CHECK(TcgEndPacket(&CreateStruct));
+  ERROR_CHECK(TcgEndComPacket(&CreateStruct, &Size));
+
+  //
+  // Send Get Active Data Removal Mechanism Method Call
+  //
+  ERROR_CHECK(OpalPerformMethod(AdminSpSession, Size, Buffer, BUFFER_SIZE, &ParseStruct, &MethodStatus, 0));
+  METHOD_STATUS_ERROR_CHECK(MethodStatus, TcgResultFailure);
+
+  ERROR_CHECK(TcgGetNextStartList(&ParseStruct));
+  ERROR_CHECK(TcgGetNextStartList(&ParseStruct));
+  ERROR_CHECK(TcgGetNextStartName(&ParseStruct));
+  ERROR_CHECK(TcgGetNextUINT32(&ParseStruct, &Col));
+  ERROR_CHECK(TcgGetNextUINT8(&ParseStruct, &RecvActiveDataRemovalMechanism));
+  ERROR_CHECK(TcgGetNextEndName(&ParseStruct));
+  ERROR_CHECK(TcgGetNextEndList(&ParseStruct));
+  ERROR_CHECK(TcgGetNextEndList(&ParseStruct));
+  ERROR_CHECK(TcgGetNextEndOfData(&ParseStruct));
+
+  if (Col != OPAL_ADMIN_SP_ACTIVE_DATA_REMOVAL_MECHANISM_COL) {
+    DEBUG ((DEBUG_INFO, "ERROR: got col %u, expected %u\n", Col, OPAL_ADMIN_SP_ACTIVE_DATA_REMOVAL_MECHANISM_COL));
+    return TcgResultFailure;
+  }
+
+  if (RecvActiveDataRemovalMechanism >= ResearvedMechanism) {
+    return TcgResultFailure;
+  }
+
+  //
+  // Copy active data removal mechanism into Buffer
+  //
+  CopyMem(ActiveDataRemovalMechanism, &RecvActiveDataRemovalMechanism, sizeof(RecvActiveDataRemovalMechanism));
   return TcgResultSuccess;
 }
 
@@ -666,7 +812,104 @@ OpalAdminRevert(
   //
   // Send RevertSP method call
   //
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
+
+  //
+  // Session is immediately ended by device after successful revertsp, so no need to end Session
+  //
+  if (*MethodStatus == TCG_METHOD_STATUS_CODE_SUCCESS) {
+    //
+    // Caller should take ownership again
+    //
+    return TcgResultSuccess;
+  } else {
+    //
+    // End Session
+    //
+    METHOD_STATUS_ERROR_CHECK(*MethodStatus, TcgResultSuccess);     // exit with success on method failure - user must inspect MethodStatus
+  }
+
+  return TcgResultSuccess;
+}
+
+
+/**
+
+  The function calls the Admin SP RevertSP method on the Locking SP.  If KeepUserData is True, then the optional parameter
+  to keep the user Data is set to True, otherwise the optional parameter is not provided.
+
+  @param[in]      LockingSpSession    OPAL_SESSION with OPAL_UID_LOCKING_SP as OPAL_LOCKING_SP_ADMIN1_AUTHORITY to revertSP
+  @param[in]      KeepUserData        Specifies whether or not to keep user Data when performing RevertSP action. True = keeps user Data.
+  @param[in/out]  MethodStatus        Method status of last action performed.  If action succeeded, it should be TCG_METHOD_STATUS_CODE_SUCCESS.
+  @param[in]      EstimateTimeCost    Estimate the time needed.
+
+**/
+TCG_RESULT
+EFIAPI
+OpalPyrite2AdminRevert(
+  OPAL_SESSION    *LockingSpSession,
+  BOOLEAN         KeepUserData,
+  UINT8           *MethodStatus,
+  UINT32          EstimateTimeCost
+  )
+{
+  UINT8             Buf[BUFFER_SIZE];
+  TCG_CREATE_STRUCT CreateStruct;
+  UINT32            Size;
+  TCG_PARSE_STRUCT  ParseStruct;
+  TCG_RESULT        Ret;
+
+  NULL_CHECK(LockingSpSession);
+  NULL_CHECK(MethodStatus);
+
+  //
+  // ReadLocked or WriteLocked must be False (per Opal spec) to guarantee revertSP can keep user Data
+  //
+  if (KeepUserData) {
+    //
+    // set readlocked and writelocked to false
+    //
+    Ret = OpalUpdateGlobalLockingRange(
+                        LockingSpSession,
+                        FALSE,
+                        FALSE,
+                        MethodStatus);
+
+    if (Ret != TcgResultSuccess || *MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
+      //
+      // bail out
+      //
+      return Ret;
+    }
+  }
+
+  ERROR_CHECK(TcgInitTcgCreateStruct(&CreateStruct, Buf, sizeof(Buf)));
+  ERROR_CHECK(TcgStartComPacket(&CreateStruct, LockingSpSession->OpalBaseComId, LockingSpSession->ComIdExtension));
+  ERROR_CHECK(TcgStartPacket(&CreateStruct, LockingSpSession->TperSessionId, LockingSpSession->HostSessionId, 0x0, 0x0, 0x0));
+  ERROR_CHECK(TcgStartSubPacket(&CreateStruct, 0x0));
+  ERROR_CHECK(TcgStartMethodCall(&CreateStruct, TCG_UID_THIS_SP, OPAL_LOCKING_SP_REVERTSP_METHOD));
+  ERROR_CHECK(TcgStartParameters(&CreateStruct));
+
+  if (KeepUserData) {
+    //
+    // optional parameter to keep Data after revert
+    //
+    ERROR_CHECK(TcgAddStartName(&CreateStruct));
+    ERROR_CHECK(TcgAddUINT32(&CreateStruct, 0x060000));      // weird Value but that's what spec says
+    ERROR_CHECK(TcgAddBOOLEAN(&CreateStruct, KeepUserData));
+    ERROR_CHECK(TcgAddEndName(&CreateStruct));
+  }
+
+  ERROR_CHECK(TcgEndParameters(&CreateStruct));
+  ERROR_CHECK(TcgEndMethodCall(&CreateStruct));
+  ERROR_CHECK(TcgEndSubPacket(&CreateStruct));
+  ERROR_CHECK(TcgEndPacket(&CreateStruct));
+  ERROR_CHECK(TcgEndComPacket(&CreateStruct, &Size));
+
+  //
+  // Send RevertSP method call
+  //
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, EstimateTimeCost));
 
   //
   // Session is immediately ended by device after successful revertsp, so no need to end Session
@@ -729,7 +972,7 @@ OpalActivateLockingSp(
   //
   // Send Activate method call
   //
-  ERROR_CHECK(OpalPerformMethod(AdminSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(AdminSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
   METHOD_STATUS_ERROR_CHECK(*MethodStatus, TcgResultSuccess); // exit with success on method failure - user must inspect MethodStatus
 
   return TcgResultSuccess;
@@ -778,7 +1021,7 @@ OpalSetPassword(
                          NewPinLength
                          ));
 
-  ERROR_CHECK(OpalPerformMethod(Session, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(Session, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
   // exit with success on method failure - user must inspect MethodStatus
   METHOD_STATUS_ERROR_CHECK(*MethodStatus, TcgResultSuccess);
 
@@ -831,7 +1074,7 @@ OpalSetLockingSpAuthorityEnabledAndPin(
                   AuthorityUid,
                   TRUE));
 
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
 
   if (*MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
     DEBUG ((DEBUG_INFO, "Send Set Authority error\n"));
@@ -851,7 +1094,7 @@ OpalSetLockingSpAuthorityEnabledAndPin(
                   NewPin,
                   NewPinLength));
 
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
 
   //
   // allow user1 to set global range to unlocked/locked by modifying ACE_Locking_GlobalRange_SetRdLocked/SetWrLocked
@@ -870,7 +1113,7 @@ OpalSetLockingSpAuthorityEnabledAndPin(
                   OPAL_LOCKING_SP_ADMINS_AUTHORITY
               ));
 
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
 
   if (*MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
     DEBUG ((DEBUG_INFO, "Update ACE for RDLOCKED failed\n"));
@@ -891,7 +1134,7 @@ OpalSetLockingSpAuthorityEnabledAndPin(
                   OPAL_LOCKING_SP_ADMINS_AUTHORITY
               ));
 
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
 
   if (*MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
     DEBUG ((DEBUG_INFO, "Update ACE for WRLOCKED failed\n"));
@@ -900,7 +1143,7 @@ OpalSetLockingSpAuthorityEnabledAndPin(
 
   ERROR_CHECK(TcgInitTcgCreateStruct(&CreateStruct, Buf, sizeof(Buf)));
   ERROR_CHECK(OpalCreateRetrieveGlobalLockingRangeActiveKey(LockingSpSession, &CreateStruct, &Size));
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
 
   //
   // For Pyrite type SSC, it not supports Active Key. 
@@ -922,7 +1165,7 @@ OpalSetLockingSpAuthorityEnabledAndPin(
                     OPAL_LOCKING_SP_ADMINS_AUTHORITY
                 ));
 
-    ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+    ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
 
     if (*MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
       DEBUG ((DEBUG_INFO, "Update ACE for GLOBALRANGE_GENKEY failed\n"));
@@ -947,7 +1190,7 @@ OpalSetLockingSpAuthorityEnabledAndPin(
                   OPAL_LOCKING_SP_ADMINS_AUTHORITY
               ));
 
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
 
   if (*MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
     DEBUG ((DEBUG_INFO, "Update ACE for OPAL_LOCKING_SP_ACE_LOCKING_GLOBALRANGE_GET_ALL failed\n"));
@@ -991,7 +1234,7 @@ OpalDisableUser(
                   OPAL_LOCKING_SP_USER1_AUTHORITY,
                   FALSE));
 
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
 
   return TcgResultSuccess;
 }
@@ -1026,7 +1269,7 @@ OpalGlobalLockingRangeGenKey(
   // retrieve the activekey in order to know which globalrange key to generate
   //
   ERROR_CHECK(OpalCreateRetrieveGlobalLockingRangeActiveKey(LockingSpSession, &CreateStruct, &Size));
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
 
   METHOD_STATUS_ERROR_CHECK(*MethodStatus, TcgResultSuccess);
 
@@ -1047,7 +1290,7 @@ OpalGlobalLockingRangeGenKey(
   ERROR_CHECK(TcgEndPacket(&CreateStruct));
   ERROR_CHECK(TcgEndComPacket(&CreateStruct, &Size));
 
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
 
   return TcgResultSuccess;
 }
@@ -1113,7 +1356,7 @@ OpalUpdateGlobalLockingRange(
   ERROR_CHECK(TcgEndPacket(&CreateStruct));
   ERROR_CHECK(TcgEndComPacket(&CreateStruct, &Size));
 
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
   METHOD_STATUS_ERROR_CHECK(*MethodStatus, TcgResultSuccess);
 
   return TcgResultSuccess;
@@ -1214,7 +1457,7 @@ OpalSetLockingRange(
   ERROR_CHECK(TcgEndPacket(&CreateStruct));
   ERROR_CHECK(TcgEndComPacket(&CreateStruct, &Size));
 
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
   // Exit with success on method failure - user must inspect MethodStatus
   METHOD_STATUS_ERROR_CHECK(*MethodStatus, TcgResultSuccess);
 
@@ -1362,7 +1605,7 @@ OpalGetTryLimit(
   ERROR_CHECK(TcgEndPacket(&CreateStruct));
   ERROR_CHECK(TcgEndComPacket(&CreateStruct, &Size));
 
-  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, &MethodStatus));
+  ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, &MethodStatus, 0));
   METHOD_STATUS_ERROR_CHECK(MethodStatus, TcgResultFailure);
 
   ERROR_CHECK(TcgGetNextStartList(&ParseStruct));
@@ -1404,7 +1647,9 @@ OpalGetSupportedAttributesInfo(
   TCG_SUPPORTED_SECURITY_PROTOCOLS   *SupportedProtocols;
   TCG_LEVEL0_DISCOVERY_HEADER        *DiscoveryHeader;
   OPAL_LEVEL0_FEATURE_DESCRIPTOR     *Feat;
+  OPAL_LEVEL0_FEATURE_DESCRIPTOR     *Feat2;
   UINTN                              Size;
+  UINTN                              Size2;
 
   NULL_CHECK(Session);
   NULL_CHECK(SupportedAttributes);
@@ -1491,18 +1736,37 @@ OpalGetSupportedAttributesInfo(
     }
   }
 
+  //
+  // For some pyrite 2.0 device, it contains both pyrite 1.0 and 2.0 feature data.
+  // so here try to get data from pyrite 2.0 feature data first.
+  //
   Size = 0;
   Feat = (OPAL_LEVEL0_FEATURE_DESCRIPTOR*) TcgGetFeature (DiscoveryHeader, TCG_FEATURE_PYRITE_SSC, &Size);
-  SupportedAttributes->PyriteSsc = (Feat != NULL);
-  if (Feat != NULL && Size >= sizeof (PYRITE_SSC_FEATURE_DESCRIPTOR)) {
+  Size2 = 0;
+  Feat2 = (OPAL_LEVEL0_FEATURE_DESCRIPTOR*) TcgGetFeature (DiscoveryHeader, TCG_FEATURE_PYRITE_SSC_V2_0_0, &Size2);
+  if (Feat2 != NULL && Size2 >= sizeof (PYRITE_SSCV2_FEATURE_DESCRIPTOR)) {
+    SupportedAttributes->PyriteSscV2 = TRUE;
     if (*OpalBaseComId == TCG_RESERVED_COMID) {
-      *OpalBaseComId = SwapBytes16 (Feat->PyriteSsc.BaseComdIdBE);
-      SupportedAttributes->InitCpinIndicator = (Feat->PyriteSsc.InitialCPINSIDPIN == 0);
-      SupportedAttributes->CpinUponRevert = (Feat->PyriteSsc.CPINSIDPINRevertBehavior == 0);
-      DEBUG ((DEBUG_INFO, "Pyrite SSC InitCpinIndicator %d  CpinUponRevert %d \n",
+      *OpalBaseComId = SwapBytes16 (Feat2->PyriteSscV2.BaseComdIdBE);
+      SupportedAttributes->InitCpinIndicator = (Feat2->PyriteSscV2.InitialCPINSIDPIN == 0);
+      SupportedAttributes->CpinUponRevert = (Feat2->PyriteSscV2.CPINSIDPINRevertBehavior == 0);
+      DEBUG ((DEBUG_INFO, "Pyrite SSC V2 InitCpinIndicator %d  CpinUponRevert %d \n",
                SupportedAttributes->InitCpinIndicator,
                SupportedAttributes->CpinUponRevert
               ));
+    }
+  } else {
+    SupportedAttributes->PyriteSsc = (Feat != NULL);
+    if (Feat != NULL && Size >= sizeof (PYRITE_SSC_FEATURE_DESCRIPTOR)) {
+      if (*OpalBaseComId == TCG_RESERVED_COMID) {
+        *OpalBaseComId = SwapBytes16 (Feat->PyriteSsc.BaseComdIdBE);
+        SupportedAttributes->InitCpinIndicator = (Feat->PyriteSsc.InitialCPINSIDPIN == 0);
+        SupportedAttributes->CpinUponRevert = (Feat->PyriteSsc.CPINSIDPINRevertBehavior == 0);
+        DEBUG ((DEBUG_INFO, "Pyrite SSC InitCpinIndicator %d  CpinUponRevert %d \n",
+                 SupportedAttributes->InitCpinIndicator,
+                 SupportedAttributes->CpinUponRevert
+                ));
+      }
     }
   }
 
@@ -1519,16 +1783,33 @@ OpalGetSupportedAttributesInfo(
   Feat = (OPAL_LEVEL0_FEATURE_DESCRIPTOR*) TcgGetFeature (DiscoveryHeader, TCG_FEATURE_LOCKING, &Size);
   if (Feat != NULL && Size >= sizeof (TCG_LOCKING_FEATURE_DESCRIPTOR)) {
     SupportedAttributes->MediaEncryption = Feat->Locking.MediaEncryption;
+    DEBUG ((DEBUG_INFO, "SupportedAttributes->MediaEncryption 0x%X \n", SupportedAttributes->MediaEncryption));
   }
 
   Size = 0;
   Feat = (OPAL_LEVEL0_FEATURE_DESCRIPTOR*) TcgGetFeature (DiscoveryHeader, TCG_FEATURE_BLOCK_SID, &Size);
   if (Feat != NULL && Size >= sizeof (TCG_BLOCK_SID_FEATURE_DESCRIPTOR)) {
     SupportedAttributes->BlockSid = TRUE;
+    DEBUG ((DEBUG_INFO, "BlockSid Supported!!! Current Status is 0x%X \n", Feat->BlockSid.SIDBlockedState));
+  } else {
+    DEBUG ((DEBUG_INFO, "BlockSid Unsupported!!!"));
+  }
+
+  Size = 0;
+  Feat = (OPAL_LEVEL0_FEATURE_DESCRIPTOR*) TcgGetFeature (DiscoveryHeader, TCG_FEATURE_DATA_REMOVAL, &Size);
+  if (Feat != NULL && Size >= sizeof (DATA_REMOVAL_FEATURE_DESCRIPTOR)) {
+    SupportedAttributes->DataRemoval = TRUE;
+    DEBUG ((DEBUG_INFO, "DataRemoval Feature Supported!\n"));
+    DEBUG ((DEBUG_INFO, "Operation Processing = 0x%x\n", Feat->DataRemoval.OperationProcessing));
+    DEBUG ((DEBUG_INFO, "RemovalMechanism = 0x%x\n", Feat->DataRemoval.RemovalMechanism));
+    DEBUG ((DEBUG_INFO, "BIT0 :: Format = 0x%x, Time = 0x%x\n", Feat->DataRemoval.FormatBit0, SwapBytes16 (Feat->DataRemoval.TimeBit0)));
+    DEBUG ((DEBUG_INFO, "BIT1 :: Format = 0x%x, Time = 0x%x\n", Feat->DataRemoval.FormatBit1, SwapBytes16 (Feat->DataRemoval.TimeBit1)));
+    DEBUG ((DEBUG_INFO, "BIT2 :: Format = 0x%x, Time = 0x%x\n", Feat->DataRemoval.FormatBit2, SwapBytes16 (Feat->DataRemoval.TimeBit2)));
+    DEBUG ((DEBUG_INFO, "BIT3 :: Format = 0x%x, Time = 0x%x\n", Feat->DataRemoval.FormatBit3, SwapBytes16 (Feat->DataRemoval.TimeBit3)));
+    DEBUG ((DEBUG_INFO, "BIT4 :: Format = 0x%x, Time = 0x%x\n", Feat->DataRemoval.FormatBit4, SwapBytes16 (Feat->DataRemoval.TimeBit4)));
   }
 
   DEBUG ((DEBUG_INFO, "Base COMID 0x%04X \n", *OpalBaseComId));
-
 
   return TcgResultSuccess;
 }
@@ -1576,6 +1857,58 @@ OpalGetLockingInfo(
 
 /**
 
+  Get the descriptor for the specific feature code.
+
+  @param[in]      Session             OPAL_SESSION with OPAL_UID_LOCKING_SP to retrieve info.
+  @param[in]      FeatureCode         The feature code user request.
+  @param[in, out] DataSize            The data size.
+  @param[out]     Data                The data buffer used to save the feature descriptor.
+
+**/
+TCG_RESULT
+EFIAPI
+OpalGetFeatureDescriptor (
+  IN     OPAL_SESSION              *Session,
+  IN     UINT16                    FeatureCode,
+  IN OUT UINTN                     *DataSize,
+  OUT    VOID                      *Data
+  )
+{
+  UINT8                              Buffer[BUFFER_SIZE];
+  TCG_LEVEL0_DISCOVERY_HEADER        *DiscoveryHeader;
+  OPAL_LEVEL0_FEATURE_DESCRIPTOR     *Feat;
+  UINTN                              Size;
+
+  NULL_CHECK(Session);
+  NULL_CHECK(DataSize);
+  NULL_CHECK(Data);
+
+  ZeroMem(Buffer, BUFFER_SIZE);
+  ASSERT(sizeof(Buffer) >= sizeof(TCG_SUPPORTED_SECURITY_PROTOCOLS));
+
+  if (OpalRetrieveLevel0DiscoveryHeader (Session, BUFFER_SIZE, Buffer) == TcgResultFailure) {
+    DEBUG ((DEBUG_INFO, "OpalRetrieveLevel0DiscoveryHeader failed\n"));
+    return TcgResultFailure;
+  }
+  DiscoveryHeader = (TCG_LEVEL0_DISCOVERY_HEADER*) Buffer;
+
+  Size = 0;
+  Feat = (OPAL_LEVEL0_FEATURE_DESCRIPTOR*) TcgGetFeature (DiscoveryHeader, FeatureCode, &Size);
+  if (Feat != NULL) {
+    if (Size > *DataSize) {
+      *DataSize = Size;
+      return TcgResultFailureBufferTooSmall;
+    }
+
+    *DataSize = Size;
+    CopyMem (Data, Feat, Size);
+  }
+
+  return TcgResultSuccess;
+}
+
+/**
+
   The function determines whether or not all of the requirements for the Opal Feature (not full specification)
   are met by the specified device.
 
@@ -1597,7 +1930,8 @@ OpalFeatureSupported(
   if (SupportedAttributes->OpalSscLite == 0 &&
       SupportedAttributes->OpalSsc1 == 0 &&
       SupportedAttributes->OpalSsc2 == 0 &&
-      SupportedAttributes->PyriteSsc == 0
+      SupportedAttributes->PyriteSsc == 0 &&
+      SupportedAttributes->PyriteSscV2 == 0
      ) {
     return FALSE;
   }

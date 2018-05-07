@@ -82,6 +82,15 @@ typedef struct {
     //
     UINT32 BlockSid : 1;
 
+    //
+    // Pyrite SSC V2 support  (0 - not supported, 1 - supported)
+    //
+    UINT32 PyriteSscV2 : 1;
+
+    //
+    // Supported Data Removal Mechanism support  (0 - not supported, 1 - supported)
+    //
+    UINT32 DataRemoval : 1;
 } OPAL_DISK_SUPPORT_ATTRIBUTE;
 
 //
@@ -832,6 +841,38 @@ EFIAPI
 OpalUtilAdminPasswordExists(
   IN  UINT16                           OwnerShip,
   IN  TCG_LOCKING_FEATURE_DESCRIPTOR   *LockingFeature
+  );
+
+/**
+  Get Active Data Removal Mechanism Value.
+
+  @param[in]      Session,                       The session info for one opal device.
+  @param[in]      GeneratedSid                   Generated SID of disk
+  @param[in]      SidLength                      Length of generatedSid in bytes
+  @param[out]     ActiveDataRemovalMechanism     Return the active data removal mechanism.
+
+**/
+TCG_RESULT
+EFIAPI
+OpalUtilGetActiveDataRemovalMechanism (
+  OPAL_SESSION      *Session,
+  const VOID        *GeneratedSid,
+  UINT32            SidLength,
+  UINT8             *ActiveDataRemovalMechanism
+  );
+
+/**
+  Get the supported Data Removal Mechanism list.
+
+  @param[in]      Session,                       The session info for one opal device.
+  @param[out]     RemovalMechanismLists          Return the supported data removal mechanism lists.
+
+**/
+TCG_RESULT
+EFIAPI
+OpalUtilGetDataRemovalMechanismLists (
+  IN  OPAL_SESSION      *Session,
+  OUT UINT32            *RemovalMechanismLists
   );
 
 #endif // _OPAL_CORE_H_
