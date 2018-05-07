@@ -163,6 +163,7 @@ gid_t          getgid      (void);
 gid_t          getegid     (void);
 void           qsort       (void *, size_t, size_t, int (*)(const void *, const void *));
 char           *getenv     (const char *);
+char           *secure_getenv (const char *);
 #if defined(__GNUC__) && (__GNUC__ >= 2)
 void           abort       (void) __attribute__((__noreturn__));
 #else
