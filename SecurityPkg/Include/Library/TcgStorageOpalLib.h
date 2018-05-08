@@ -1,7 +1,27 @@
 /** @file
   Public API for Opal Core library.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  (TCG Storage Architecture Core Specification, Version 2.01, Revision 1.00,
+  @https://trustedcomputinggroup.org/tcg-storage-architecture-core-specification/
+
+  Storage Work Group Storage Security Subsystem Class: Pyrite, Version 1.00 Final, Revision 1.00,
+  @https://trustedcomputinggroup.org/tcg-storage-security-subsystem-class-pyrite/
+
+  Storage Work Group Storage Security Subsystem Class: Opal, Version 2.01 Final, Revision 1.00,
+  @https://trustedcomputinggroup.org/storage-work-group-storage-security-subsystem-class-opal/
+
+  TCG Storage Security Subsystem Class: Opalite Version 1.00 Revision 1.00,
+  @https://trustedcomputinggroup.org/tcg-storage-security-subsystem-class-opalite/
+
+  TCG Storage Feature Set: Block SID Authentication, Version 1.00 Final, Revision 1.00,
+  @https://trustedcomputinggroup.org/tcg-storage-feature-set-block-sid-authentication-specification/
+
+  TCG Storage Opal SSC Feature Set: PSID Version 1.00, Revision 1.00,
+  @https://trustedcomputinggroup.org/tcg-storage-opal-feature-set-psid/)
+
+  Check http://trustedcomputinggroup.org for latest specification updates.
+
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
