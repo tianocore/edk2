@@ -1,7 +1,7 @@
 ## @file
 # process FV image section generation
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -83,7 +83,7 @@ class FvImageSection(FvImageSectionClassObject):
             if MaxFvAlignment >= 0x400:
                 if MaxFvAlignment >= 0x100000:
                     #The max alignment supported by FFS is 16M.
-                    if MaxFvAlignment >=1000000:
+                    if MaxFvAlignment >= 0x1000000:
                         self.Alignment = "16M"
                     else:
                         self.Alignment = str(MaxFvAlignment / 0x100000) + "M"
