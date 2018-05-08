@@ -1,7 +1,7 @@
 /** @file
   This library abstract how to access TPM2 hardware device.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _TPM2_DEVICE_LIB_H_
 
 #include <Uefi.h>
+
+//
+// Used in PcdActiveTpmInterfaceType to identify TPM interface type
+//
+typedef enum {
+  Tpm2PtpInterfaceTis,
+  Tpm2PtpInterfaceFifo,
+  Tpm2PtpInterfaceCrb,
+  Tpm2PtpInterfaceMax,
+} TPM2_PTP_INTERFACE_TYPE;
 
 /**
   This service enables the sending of commands to the TPM2.

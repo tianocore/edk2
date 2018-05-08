@@ -463,6 +463,16 @@
   # linked, and the value of this PCD should be got in module entrypoint.
   # @Prompt Hash Algorithm bitmap.
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap|0xFFFFFFFF|UINT32|0x00010016
-  
+
+  ## This PCD indicates current active TPM interface type.
+  #  Accodingt to TCG PTP spec 1.3, there are 3 types defined in TPM2_PTP_INTERFACE_TYPE.<BR>
+  #  0x00 - FIFO interface as defined in TIS 1.3 is active.<BR>
+  #  0x01 - FIFO interface as defined in PTP for TPM 2.0 is active.<BR>
+  #  0x02 - CRB interface is active.<BR>
+  #  0xFF - Contains no current active TPM interface type.<BR>
+  #
+  # @Prompt current active TPM interface type.
+  gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType|0xFF|UINT8|0x0001001E
+
 [UserExtensions.TianoCore."ExtraFiles"]
   SecurityPkgExtra.uni

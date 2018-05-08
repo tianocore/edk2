@@ -40,6 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/IoLib.h>
 #include <Library/PrintLib.h>
 #include <Library/PcdLib.h>
+#include <Library/Tpm2DeviceLib.h>
 
 #include <IndustryStandard/TpmPtp.h>
 

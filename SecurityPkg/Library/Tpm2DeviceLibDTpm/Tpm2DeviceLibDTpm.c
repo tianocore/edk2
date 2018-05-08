@@ -2,7 +2,7 @@
   This library is TPM2 DTPM device lib.
   Choosing this library means platform uses and only uses DTPM device as TPM2 engine.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
+#include <Library/PcdLib.h>
+
+/**
+  Return PTP interface type.
+
+  @param[in] Register                Pointer to PTP register.
+
+  @return PTP interface type.
+**/
+TPM2_PTP_INTERFACE_TYPE
+Tpm2GetPtpInterface (
+  IN VOID *Register
+  );
 
 /**
   This service enables the sending of commands to the TPM2.
@@ -113,4 +126,27 @@ Tpm2RegisterTpm2DeviceLib (
   )
 {
   return EFI_UNSUPPORTED;
+}
+
+/**
+  The function caches current active TPM interface type.
+  
+  @retval EFI_SUCCESS   DTPM2.0 instance is registered, or system dose not surpport registr DTPM2.0 instance
+**/
+EFI_STATUS
+EFIAPI
+Tpm2DeviceLibConstructor (
+  VOID
+  )
+{
+  TPM2_PTP_INTERFACE_TYPE  PtpInterface;
+
+  //
+  // Cache current active TpmInterfaceType only when needed
+  //
+  if (PcdGet8(PcdActiveTpmInterfaceType) == 0xFF) {
+    PtpInterface = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+    PcdSet8S(PcdActiveTpmInterfaceType, PtpInterface);
+  }
+  return EFI_SUCCESS;
 }

@@ -10,7 +10,7 @@
 #  used for every TPM 2.0 command. Choosing this library means platform uses and
 #  only uses TPM 2.0 DTPM device.
 #
-# Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -27,8 +27,8 @@
   FILE_GUID                      = E54A3327-A345-4068-8842-70AC0D519855
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = Tpm2DeviceLib
-
+  LIBRARY_CLASS                  = Tpm2DeviceLib|PEIM DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  Constructor                    = Tpm2DeviceLibConstructor
 #
 # The following information is for reference only and not required by the build tools.
 #
@@ -50,6 +50,8 @@
   IoLib
   TimerLib
   DebugLib
+  PcdLib
 
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress            ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType    ## PRODUCES

@@ -22,56 +22,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Tcg2Smm.h"
 
-typedef enum {
-  PtpInterfaceTis,
-  PtpInterfaceFifo,
-  PtpInterfaceCrb,
-  PtpInterfaceMax,
-} PTP_INTERFACE_TYPE;
-
-/**
-  Return PTP interface type.
-
-  @param[in] Register                Pointer to PTP register.
-
-  @return PTP interface type.
-**/
-PTP_INTERFACE_TYPE
-GetPtpInterface (
-  IN VOID *Register
-  )
-{
-  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
-  PTP_FIFO_INTERFACE_CAPABILITY InterfaceCapability;
-
-  //
-  // Check interface id
-  //
-  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
-  InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
-
-  if (InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_TIS) {
-    return PtpInterfaceTis;
-  }
-
-  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) &&
-      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) &&
-      (InterfaceId.Bits.CapCRB != 0)) {
-    return PtpInterfaceCrb;
-  }
-
-  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO) &&
-      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO) &&
-      (InterfaceId.Bits.CapFIFO != 0) &&
-      (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP)) {
-    return PtpInterfaceFifo;
-  }
-
-  //
-  // No Ptp interface available
-  //
-  return PtpInterfaceMax;
-}
 
 EFI_TPM2_ACPI_TABLE  mTpm2AcpiTemplate = {
   {
@@ -785,7 +735,7 @@ PublishTpm2 (
   UINTN                          TableKey;
   UINT64                         OemTableId;
   EFI_TPM2_ACPI_CONTROL_AREA     *ControlArea;
-  PTP_INTERFACE_TYPE             InterfaceType;
+  TPM2_PTP_INTERFACE_TYPE        InterfaceType;
 
   mTpm2AcpiTemplate.Header.Revision = PcdGet8(PcdTpm2AcpiTableRev);
   DEBUG((DEBUG_INFO, "Tpm2 ACPI table revision is %d\n", mTpm2AcpiTemplate.Header.Revision));
@@ -812,9 +762,9 @@ PublishTpm2 (
     sizeof(mTpm2AcpiTemplate)
     );
 
-  InterfaceType = GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  InterfaceType = PcdGet8(PcdActiveTpmInterfaceType);
   switch (InterfaceType) {
-  case PtpInterfaceCrb:
+  case Tpm2PtpInterfaceCrb:
     mTpm2AcpiTemplate.StartMethod = EFI_TPM2_ACPI_TABLE_START_METHOD_COMMAND_RESPONSE_BUFFER_INTERFACE;
     mTpm2AcpiTemplate.AddressOfControlArea = PcdGet64 (PcdTpmBaseAddress) + 0x40;
     ControlArea = (EFI_TPM2_ACPI_CONTROL_AREA *)(UINTN)mTpm2AcpiTemplate.AddressOfControlArea;
@@ -823,8 +773,8 @@ PublishTpm2 (
     ControlArea->Command      = PcdGet64 (PcdTpmBaseAddress) + 0x80;
     ControlArea->Response     = PcdGet64 (PcdTpmBaseAddress) + 0x80;
     break;
-  case PtpInterfaceFifo:
-  case PtpInterfaceTis:
+  case Tpm2PtpInterfaceFifo:
+  case Tpm2PtpInterfaceTis:
     break;
   default:
     DEBUG((EFI_D_ERROR, "TPM2 InterfaceType get error! %d\n", InterfaceType));

@@ -85,6 +85,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass                 ## SOMETIMES_CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2CurrentIrqNum            ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2PossibleIrqNumBuf        ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType       ## CONSUMES
 
 [Depex]
   gEfiAcpiTableProtocolGuid AND

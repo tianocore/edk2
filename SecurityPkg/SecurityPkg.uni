@@ -247,3 +247,11 @@
 
 #string STR_gEfiSecurityPkgTokenSpaceGuid_PcdTpm2PossibleIrqNumBuf_HELP  #language en-US "This PCD defines possible TPM2 interrupt number in a platform reported by _PRS control method.\n"
                                                                                          "If PcdTpm2CurrentIrqNum set to 0, _PRS will not report any possible TPM2 interrupt numbers."
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdActiveTpmInterfaceType_PROMPT  #language en-US "Current active TPM interface type"
+
+#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdActiveTpmInterfaceType_HELP  #language en-US "This PCD indicates current active TPM interface type.\n"
+                                                                                          "0x00 - FIFO interface as defined in TIS 1.3 is active.<BR>\n"
+                                                                                          "0x01 - FIFO interface as defined in PTP for TPM 2.0 is active.<BR>\n"
+                                                                                          "0x02 - CRB interface is active.<BR>\n"
+                                                                                          "0xFF - Contains no current active TPM interface type<BR>"

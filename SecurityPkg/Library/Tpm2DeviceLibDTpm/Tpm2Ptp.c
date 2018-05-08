@@ -25,13 +25,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/TpmPtp.h>
 #include <IndustryStandard/TpmTis.h>
 
-typedef enum {
-  PtpInterfaceTis,
-  PtpInterfaceFifo,
-  PtpInterfaceCrb,
-  PtpInterfaceMax,
-} PTP_INTERFACE_TYPE;
-
 //
 // Execution of the command may take from several seconds to minutes for certain
 // commands, such as key generation.
@@ -370,7 +363,7 @@ TisPcRequestUseTpm (
 
   @return PTP interface type.
 **/
-PTP_INTERFACE_TYPE
+TPM2_PTP_INTERFACE_TYPE
 Tpm2GetPtpInterface (
   IN VOID *Register
   )
@@ -379,7 +372,7 @@ Tpm2GetPtpInterface (
   PTP_FIFO_INTERFACE_CAPABILITY InterfaceCapability;
 
   if (!Tpm2IsPtpPresence (Register)) {
-    return PtpInterfaceMax;
+    return Tpm2PtpInterfaceMax;
   }
   //
   // Check interface id
@@ -390,15 +383,15 @@ Tpm2GetPtpInterface (
   if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) &&
       (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) &&
       (InterfaceId.Bits.CapCRB != 0)) {
-    return PtpInterfaceCrb;
+    return Tpm2PtpInterfaceCrb;
   }
   if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO) &&
       (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO) &&
       (InterfaceId.Bits.CapFIFO != 0) &&
       (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP)) {
-    return PtpInterfaceFifo;
+    return Tpm2PtpInterfaceFifo;
   }
-  return PtpInterfaceTis;
+  return Tpm2PtpInterfaceTis;
 }
 
 /**
@@ -417,7 +410,7 @@ DumpPtpInfo (
   UINT16                        Vid;
   UINT16                        Did;
   UINT8                         Rid;
-  PTP_INTERFACE_TYPE            PtpInterface;
+  TPM2_PTP_INTERFACE_TYPE       PtpInterface;
 
   if (!Tpm2IsPtpPresence (Register)) {
     return ;
@@ -458,16 +451,16 @@ DumpPtpInfo (
   Vid = 0xFFFF;
   Did = 0xFFFF;
   Rid = 0xFF;
-  PtpInterface = Tpm2GetPtpInterface (Register);
+  PtpInterface = PcdGet8(PcdActiveTpmInterfaceType);
   DEBUG ((EFI_D_INFO, "PtpInterface - %x\n", PtpInterface));
   switch (PtpInterface) {
-  case PtpInterfaceCrb:
+  case Tpm2PtpInterfaceCrb:
     Vid = MmioRead16 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->Vid);
     Did = MmioRead16 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->Did);
     Rid = (UINT8)InterfaceId.Bits.Rid;
     break;
-  case PtpInterfaceFifo:
-  case PtpInterfaceTis:
+  case Tpm2PtpInterfaceFifo:
+  case Tpm2PtpInterfaceTis:
     Vid = MmioRead16 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Vid);
     Did = MmioRead16 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Did);
     Rid = MmioRead8 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->Rid);
@@ -501,11 +494,11 @@ DTpm2SubmitCommand (
   IN UINT8             *OutputParameterBlock
   )
 {
-  PTP_INTERFACE_TYPE  PtpInterface;
+  TPM2_PTP_INTERFACE_TYPE  PtpInterface;
 
-  PtpInterface = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  PtpInterface = PcdGet8(PcdActiveTpmInterfaceType);
   switch (PtpInterface) {
-  case PtpInterfaceCrb:
+  case Tpm2PtpInterfaceCrb:
     return PtpCrbTpmCommand (
            (PTP_CRB_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress),
            InputParameterBlock,
@@ -513,8 +506,8 @@ DTpm2SubmitCommand (
            OutputParameterBlock,
            OutputParameterBlockSize
            );
-  case PtpInterfaceFifo:
-  case PtpInterfaceTis:
+  case Tpm2PtpInterfaceFifo:
+  case Tpm2PtpInterfaceTis:
     return Tpm2TisTpmCommand (
            (TIS_PC_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress),
            InputParameterBlock,
@@ -540,14 +533,14 @@ DTpm2RequestUseTpm (
   VOID
   )
 {
-  PTP_INTERFACE_TYPE  PtpInterface;
+  TPM2_PTP_INTERFACE_TYPE  PtpInterface;
 
-  PtpInterface = Tpm2GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+  PtpInterface = PcdGet8(PcdActiveTpmInterfaceType);
   switch (PtpInterface) {
-  case PtpInterfaceCrb:
+  case Tpm2PtpInterfaceCrb:
     return PtpCrbRequestUseTpm ((PTP_CRB_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress));
-  case PtpInterfaceFifo:
-  case PtpInterfaceTis:
+  case Tpm2PtpInterfaceFifo:
+  case Tpm2PtpInterfaceTis:
     return TisPcRequestUseTpm ((TIS_PC_REGISTERS_PTR) (UINTN) PcdGet64 (PcdTpmBaseAddress));
   default:
     return EFI_NOT_FOUND;
