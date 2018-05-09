@@ -2,6 +2,8 @@
 # Generate AutoGen.h, AutoGen.c and *.depex files
 #
 # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2018, Hewlett Packard Enterprise Development, L.P.<BR>
+#
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -670,6 +672,9 @@ class WorkspaceAutoGen(AutoGen):
         return True
 
     def _GenPkgLevelHash(self, Pkg):
+        if Pkg.PackageName in GlobalData.gPackageHash[Pkg.Arch]:
+            return
+
         PkgDir = os.path.join(self.BuildDir, Pkg.Arch, Pkg.PackageName)
         CreateDirectory(PkgDir)
         HashFile = os.path.join(PkgDir, Pkg.PackageName + '.hash')
@@ -681,17 +686,16 @@ class WorkspaceAutoGen(AutoGen):
         m.update(Content)
         # Get include files hash value
         if Pkg.Includes:
-            for inc in Pkg.Includes:
+            for inc in sorted(Pkg.Includes, key=lambda x: str(x)):
                 for Root, Dirs, Files in os.walk(str(inc)):
-                    for File in Files:
+                    for File in sorted(Files):
                         File_Path = os.path.join(Root, File)
                         f = open(File_Path, 'r')
                         Content = f.read()
                         f.close()
                         m.update(Content)
         SaveFileOnChange(HashFile, m.hexdigest(), True)
-        if Pkg.PackageName not in GlobalData.gPackageHash[Pkg.Arch]:
-            GlobalData.gPackageHash[Pkg.Arch][Pkg.PackageName] = m.hexdigest()
+        GlobalData.gPackageHash[Pkg.Arch][Pkg.PackageName] = m.hexdigest()
 
     def _GetMetaFiles(self, Target, Toolchain, Arch):
         AllWorkSpaceMetaFiles = set()
@@ -4432,13 +4436,13 @@ class ModuleAutoGen(AutoGen):
         m.update(GlobalData.gPlatformHash)
         # Add Package level hash
         if self.DependentPackageList:
-            for Pkg in self.DependentPackageList:
+            for Pkg in sorted(self.DependentPackageList, key=lambda x: x.PackageName):
                 if Pkg.PackageName in GlobalData.gPackageHash[self.Arch]:
                     m.update(GlobalData.gPackageHash[self.Arch][Pkg.PackageName])
 
         # Add Library hash
         if self.LibraryAutoGenList:
-            for Lib in self.LibraryAutoGenList:
+            for Lib in sorted(self.LibraryAutoGenList, key=lambda x: x.Name):
                 if Lib.Name not in GlobalData.gModuleHash[self.Arch]:
                     Lib.GenModuleHash()
                 m.update(GlobalData.gModuleHash[self.Arch][Lib.Name])
@@ -4450,7 +4454,7 @@ class ModuleAutoGen(AutoGen):
         m.update(Content)
         # Add Module's source files
         if self.SourceFileList:
-            for File in self.SourceFileList:
+            for File in sorted(self.SourceFileList, key=lambda x: str(x)):
                 f = open(str(File), 'r')
                 Content = f.read()
                 f.close()
