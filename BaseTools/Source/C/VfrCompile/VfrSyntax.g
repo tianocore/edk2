@@ -4086,7 +4086,15 @@ vfrStatementInvalidSaveRestoreDefaults :
 // Root expression extension function called by other function.
 //
 vfrStatementExpression [UINT32 RootLevel, UINT32 ExpOpCount = 0] :
-  << if ($RootLevel == 0) {mCIfrOpHdrIndex ++; if (mCIfrOpHdrIndex >= MAX_IFR_EXPRESSION_DEPTH) _PCATCH (VFR_RETURN_INVALID_PARAMETER, 0, "The depth of expression exceeds the max supported level 8!"); _CLEAR_SAVED_OPHDR ();} >>
+                                                       <<
+                                                          if ($RootLevel == 0) {
+                                                            mCIfrOpHdrIndex ++;
+                                                            if (mCIfrOpHdrIndex >= MAX_IFR_EXPRESSION_DEPTH) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, 0, "The depth of expression exceeds the max supported level 8!");
+                                                            }
+                                                            _INIT_OPHDR_COND ();
+                                                          }
+                                                       >>
   andTerm[$RootLevel, $ExpOpCount]
   (
     L:OR andTerm[$RootLevel, $ExpOpCount]              << $ExpOpCount++; CIfrOr OObj(L->getLine()); >>
@@ -4990,6 +4998,7 @@ private:
   UINT8               mCIfrOpHdrIndex;
   VOID                _SAVE_OPHDR_COND (IN CIfrOpHeader &, IN BOOLEAN, UINT32 LineNo = 0);
   VOID                _CLEAR_SAVED_OPHDR (VOID);
+  VOID                _INIT_OPHDR_COND (VOID);
   BOOLEAN             _SET_SAVED_OPHDR_SCOPE (VOID);
 
 
@@ -5080,15 +5089,23 @@ EfiVfrParser::_SAVE_OPHDR_COND (
 }
 
 VOID
+EfiVfrParser::_INIT_OPHDR_COND (
+  VOID
+  )
+{
+  mCIfrOpHdr[mCIfrOpHdrIndex]       = NULL;
+  mCIfrOpHdrLineNo[mCIfrOpHdrIndex] = 0;
+}
+
+VOID
 EfiVfrParser::_CLEAR_SAVED_OPHDR (
   VOID
   )
 {
   if (mCIfrOpHdr[mCIfrOpHdrIndex] != NULL) {
     delete mCIfrOpHdr[mCIfrOpHdrIndex];
-    mCIfrOpHdr[mCIfrOpHdrIndex]     = NULL;
+    mCIfrOpHdr[mCIfrOpHdrIndex] = NULL;
   }
-  mCIfrOpHdrLineNo[mCIfrOpHdrIndex] = 0;
 }
 
 BOOLEAN
