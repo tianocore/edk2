@@ -2,7 +2,7 @@
 # This file is used to parse meta files
 #
 # Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
-# (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
+# (C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1551,10 +1551,21 @@ class DscParser(MetaFileParser):
 
             self.IncludedFiles.add (IncludedFile1)
 
+            # todo: rework the nested include checking logic
+            # Current nested include checking rely on dsc file order inside build.db.
+            # It is not reliable and will lead to build fail in some case.
+            #
+            # When project A and B include a common dsc file C.
+            # Build project A. It give dsc file A = ID 1 in build.db, and C ID = 2.
+            # Build project B. It give dsc file B ID = 3, and C ID still = 2.
+            # Then, we build project B fail, unless we clean build.db.
+            # In oldder BaseTools, the project B ID will still be 1,
+            # that's why it work before.
+
             # Does not allow lower level included file to include upper level included file
-            if Parser._From != Owner and int(Owner) > int (Parser._From):
-                EdkLogger.error('parser', FILE_ALREADY_EXIST, File=self._FileWithError,
-                    Line=self._LineIndex + 1, ExtraData="{0} is already included at a higher level.".format(IncludedFile1))
+            #if Parser._From != Owner and int(Owner) > int (Parser._From):
+            #   EdkLogger.error('parser', FILE_ALREADY_EXIST, File=self._FileWithError,
+            #       Line=self._LineIndex + 1, ExtraData="{0} is already included at a higher level.".format(IncludedFile1))
 
 
             # set the parser status with current status
