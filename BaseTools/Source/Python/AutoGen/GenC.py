@@ -1098,16 +1098,6 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
         elif Pcd.Type != TAB_PCDS_FIXED_AT_BUILD and Pcd.DatumType in TAB_PCD_NUMERIC_TYPES_VOID:
             Value = "((%s)%s)" % (Pcd.DatumType, Value)
 
-        if Pcd.DatumType not in TAB_PCD_NUMERIC_TYPES_VOID:
-            # handle structure PCD
-            if Pcd.MaxDatumSize is None or Pcd.MaxDatumSize == '':
-                EdkLogger.error("build", AUTOGEN_ERROR,
-                                "Unknown [MaxDatumSize] of PCD [%s.%s]" % (Pcd.TokenSpaceGuidCName, TokenCName),
-                                ExtraData="[%s]" % str(Info))
-
-            ArraySize = int(Pcd.MaxDatumSize, 0)
-            Array = '[%d]' % ArraySize
-
         if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE:
             PcdValueName = '_PCD_PATCHABLE_VALUE_' + TokenCName
         else:
