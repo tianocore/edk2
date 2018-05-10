@@ -1,7 +1,7 @@
 ## @file
 # Override built in module os to provide support for long file path
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -15,6 +15,7 @@ import os
 import LongFilePathOsPath
 from Common.LongFilePathSupport import LongFilePath
 from Common.LongFilePathSupport import UniToStr
+import time
 
 path = LongFilePathOsPath
 
@@ -22,7 +23,14 @@ def access(path, mode):
     return os.access(LongFilePath(path), mode)
 
 def remove(path):
-    return os.remove(LongFilePath(path))
+   Timeout = 0.0
+   while Timeout < 5.0:
+       try:
+           return os.remove(LongFilePath(path))
+       except:
+           time.sleep(0.1)
+           Timeout = Timeout + 0.1
+   return os.remove(LongFilePath(path))
 
 def removedirs(name):
     return os.removedirs(LongFilePath(name))
