@@ -423,6 +423,7 @@ class WorkspaceAutoGen(AutoGen):
                                 PcdInPlatform = Platform.Pcds[key]
                                 if PcdInPlatform.Type:
                                     BuildData.Pcds[key].Type = PcdInPlatform.Type
+                                    BuildData.Pcds[key].Pending = False
 
                             if BuildData.MetaFile in Platform.Modules:
                                 PlatformModule = Platform.Modules[str(BuildData.MetaFile)]
@@ -430,6 +431,7 @@ class WorkspaceAutoGen(AutoGen):
                                     PcdInPlatform = PlatformModule.Pcds[key]
                                     if PcdInPlatform.Type:
                                         BuildData.Pcds[key].Type = PcdInPlatform.Type
+                                        BuildData.Pcds[key].Pending = False
 
                         if TAB_PCDS_DYNAMIC_EX in BuildData.Pcds[key].Type:
                             if BuildData.IsBinaryModule:
