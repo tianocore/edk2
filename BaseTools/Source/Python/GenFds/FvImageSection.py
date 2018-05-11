@@ -133,6 +133,12 @@ class FvImageSection(FvImageSectionClassObject):
                             # FvAlignmentValue is less than 1K
                             self.Alignment = str (FvAlignmentValue)
                         FvFileObj.close()
+                    else:
+                        if len (mws.getPkgPath()) == 0:
+                            EdkLogger.error("GenFds", FILE_NOT_FOUND, "%s is not found in WORKSPACE: %s" % self.FvFileName, GenFdsGlobalVariable.WorkSpaceDir)
+                        else:
+                            EdkLogger.error("GenFds", FILE_NOT_FOUND, "%s is not found in packages path:\n\t%s" % (self.FvFileName, '\n\t'.join(mws.getPkgPath())))
+
                 else:
                     EdkLogger.error("GenFds", GENFDS_ERROR, "FvImageSection Failed! %s NOT found in FDF" % self.FvName)
 
