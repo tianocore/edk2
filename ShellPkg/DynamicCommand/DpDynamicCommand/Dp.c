@@ -392,7 +392,7 @@ BuildCachedGuidHandleTable (
     FreePool (HandleBuffer);
     HandleBuffer = NULL;
   }
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -732,35 +732,6 @@ RunDp (
   ASSERT_EFI_ERROR(Status);
 
   //
-  // DP dump performance data by parsing FPDT table in ACPI table.
-  // Folloing 3 steps are to get the measurement form the FPDT table.
-  //
-
-  //
-  //1. Get FPDT from ACPI table.
-  //
-  Status = GetBootPerformanceTable ();
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
-  //
-  //2. Cache the ModuleGuid and hanlde mapping table.
-  //
-  Status = BuildCachedGuidHandleTable();
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  //
-  //3. Build the measurement array form the FPDT records.
-  //
-  Status = BuildMeasurementList ();
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
-  //
   // Process Command Line arguments
   //
   Status = ShellCommandLineParse (ParamList, &ParamPackage, NULL, TRUE);
@@ -812,6 +783,38 @@ RunDp (
   }
 
   //
+  // DP dump performance data by parsing FPDT table in ACPI table.
+  // Folloing 3 steps are to get the measurement form the FPDT table.
+  //
+
+  //
+  //1. Get FPDT from ACPI table.
+  //
+  Status = GetBootPerformanceTable ();
+  if (EFI_ERROR (Status)) {
+    ShellStatus = Status;
+    goto Done;
+  }
+
+  //
+  //2. Cache the ModuleGuid and hanlde mapping table.
+  //
+  Status = BuildCachedGuidHandleTable();
+  if (EFI_ERROR (Status)) {
+    ShellStatus = Status;
+    goto Done;
+  }
+
+  //
+  //3. Build the measurement array form the FPDT records.
+  //
+  Status = BuildMeasurementList ();
+  if (EFI_ERROR (Status)) {
+    ShellStatus = SHELL_OUT_OF_RESOURCES;
+    goto Done;
+  }
+
+  //
   // Initialize the pre-defined cumulative data.
   //
   InitCumulativeData ();
@@ -823,7 +826,8 @@ RunDp (
   if (CustomCumulativeToken != NULL) {
     CustomCumulativeData = AllocateZeroPool (sizeof (PERF_CUM_DATA));
     if (CustomCumulativeData == NULL) {
-      return SHELL_OUT_OF_RESOURCES;
+      ShellStatus = SHELL_OUT_OF_RESOURCES;
+      goto Done;
     }
     CustomCumulativeData->MinDur = PERF_MAXDUR;
     CustomCumulativeData->MaxDur = 0;
@@ -832,8 +836,8 @@ RunDp (
     NameSize = StrLen (CustomCumulativeToken) + 1;
     CustomCumulativeData->Name   = AllocateZeroPool (NameSize);
     if (CustomCumulativeData->Name == NULL) {
-      FreePool (CustomCumulativeData);
-      return SHELL_OUT_OF_RESOURCES;
+      ShellStatus = SHELL_OUT_OF_RESOURCES;
+      goto Done;
     }
     UnicodeStrToAsciiStrS (CustomCumulativeToken, CustomCumulativeData->Name, NameSize);
   }
