@@ -17,7 +17,7 @@
   integer overflow. It should also check attribute to avoid authentication bypass.
 
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -288,7 +288,7 @@ UpdateVariableStore (
       DataPtr += mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase;
     }
 
-    if ((DataPtr + DataSize) >= ((EFI_PHYSICAL_ADDRESS) (UINTN) ((UINT8 *) FwVolHeader + FwVolHeader->FvLength))) {
+    if ((DataPtr + DataSize) > ((EFI_PHYSICAL_ADDRESS) (UINTN) ((UINT8 *) FwVolHeader + FwVolHeader->FvLength))) {
       return EFI_INVALID_PARAMETER;
     }
   } else {
@@ -301,7 +301,7 @@ UpdateVariableStore (
       DataPtr += mVariableModuleGlobal->VariableGlobal.VolatileVariableBase;
     }
 
-    if ((DataPtr + DataSize) >= ((UINTN) ((UINT8 *) VolatileBase + VolatileBase->Size))) {
+    if ((DataPtr + DataSize) > ((UINTN) ((UINT8 *) VolatileBase + VolatileBase->Size))) {
       return EFI_INVALID_PARAMETER;
     }
 
