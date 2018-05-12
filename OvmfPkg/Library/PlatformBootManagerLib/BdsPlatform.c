@@ -26,7 +26,6 @@ VOID          *mEfiDevPathNotifyReg;
 EFI_EVENT     mEfiDevPathEvent;
 VOID          *mEmuVariableEventReg;
 EFI_EVENT     mEmuVariableEvent;
-BOOLEAN       mDetectVgaOnly;
 UINT16        mHostBridgeDevId;
 
 //
@@ -830,35 +829,33 @@ DetectAndPreparePlatformPciDevicePath (
     );
   ASSERT_EFI_ERROR (Status);
 
-  if (!mDetectVgaOnly) {
+  //
+  // Here we decide whether it is LPC Bridge
+  //
+  if ((IS_PCI_LPC (Pci)) ||
+      ((IS_PCI_ISA_PDECODE (Pci)) &&
+       (Pci->Hdr.VendorId == 0x8086) &&
+       (Pci->Hdr.DeviceId == 0x7000)
+      )
+     ) {
     //
-    // Here we decide whether it is LPC Bridge
+    // Add IsaKeyboard to ConIn,
+    // add IsaSerial to ConOut, ConIn, ErrOut
     //
-    if ((IS_PCI_LPC (Pci)) ||
-        ((IS_PCI_ISA_PDECODE (Pci)) &&
-         (Pci->Hdr.VendorId == 0x8086) &&
-         (Pci->Hdr.DeviceId == 0x7000)
-        )
-       ) {
-      //
-      // Add IsaKeyboard to ConIn,
-      // add IsaSerial to ConOut, ConIn, ErrOut
-      //
-      DEBUG ((EFI_D_INFO, "Found LPC Bridge device\n"));
-      PrepareLpcBridgeDevicePath (Handle);
-      return EFI_SUCCESS;
-    }
+    DEBUG ((EFI_D_INFO, "Found LPC Bridge device\n"));
+    PrepareLpcBridgeDevicePath (Handle);
+    return EFI_SUCCESS;
+  }
+  //
+  // Here we decide which Serial device to enable in PCI bus
+  //
+  if (IS_PCI_16550SERIAL (Pci)) {
     //
-    // Here we decide which Serial device to enable in PCI bus
+    // Add them to ConOut, ConIn, ErrOut.
     //
-    if (IS_PCI_16550SERIAL (Pci)) {
-      //
-      // Add them to ConOut, ConIn, ErrOut.
-      //
-      DEBUG ((EFI_D_INFO, "Found PCI 16550 SERIAL device\n"));
-      PreparePciSerialDevicePath (Handle);
-      return EFI_SUCCESS;
-    }
+    DEBUG ((EFI_D_INFO, "Found PCI 16550 SERIAL device\n"));
+    PreparePciSerialDevicePath (Handle);
+    return EFI_SUCCESS;
   }
 
   //
@@ -878,26 +875,6 @@ DetectAndPreparePlatformPciDevicePath (
 
 
 /**
-  Do platform specific PCI Device check and add them to ConOut, ConIn, ErrOut
-
-  @param[in]  DetectVgaOnly - Only detect VGA device if it's TRUE.
-
-  @retval EFI_SUCCESS - PCI Device check and Console variable update
-                        successfully.
-  @retval EFI_STATUS - PCI Device check or Console variable update fail.
-
-**/
-EFI_STATUS
-DetectAndPreparePlatformPciDevicePaths (
-  BOOLEAN DetectVgaOnly
-  )
-{
-  mDetectVgaOnly = DetectVgaOnly;
-  return VisitAllPciInstances (DetectAndPreparePlatformPciDevicePath);
-}
-
-
-/**
   Connect the predefined platform default console device.
 
   Always try to find and enable PCI display devices.
@@ -910,50 +887,34 @@ PlatformInitializeConsole (
   )
 {
   UINTN                              Index;
-  EFI_DEVICE_PATH_PROTOCOL           *VarConout;
-  EFI_DEVICE_PATH_PROTOCOL           *VarConin;
 
   //
-  // Connect RootBridge
+  // Do platform specific PCI Device check and add them to ConOut, ConIn,
+  // ErrOut
   //
-  GetEfiGlobalVariable2 (EFI_CON_OUT_VARIABLE_NAME, (VOID **) &VarConout,
-    NULL);
-  GetEfiGlobalVariable2 (EFI_CON_IN_VARIABLE_NAME, (VOID **) &VarConin, NULL);
+  VisitAllPciInstances (DetectAndPreparePlatformPciDevicePath);
 
-  if (VarConout == NULL || VarConin == NULL) {
+  //
+  // Have chance to connect the platform default console,
+  // the platform default console is the minimum device group
+  // the platform should support
+  //
+  for (Index = 0; PlatformConsole[Index].DevicePath != NULL; ++Index) {
     //
-    // Do platform specific PCI Device check and add them to ConOut, ConIn,
-    // ErrOut
+    // Update the console variable with the connect type
     //
-    DetectAndPreparePlatformPciDevicePaths (FALSE);
-
-    //
-    // Have chance to connect the platform default console,
-    // the platform default console is the minimum device group
-    // the platform should support
-    //
-    for (Index = 0; PlatformConsole[Index].DevicePath != NULL; ++Index) {
-      //
-      // Update the console variable with the connect type
-      //
-      if ((PlatformConsole[Index].ConnectType & CONSOLE_IN) == CONSOLE_IN) {
-        EfiBootManagerUpdateConsoleVariable (ConIn,
-          PlatformConsole[Index].DevicePath, NULL);
-      }
-      if ((PlatformConsole[Index].ConnectType & CONSOLE_OUT) == CONSOLE_OUT) {
-        EfiBootManagerUpdateConsoleVariable (ConOut,
-          PlatformConsole[Index].DevicePath, NULL);
-      }
-      if ((PlatformConsole[Index].ConnectType & STD_ERROR) == STD_ERROR) {
-        EfiBootManagerUpdateConsoleVariable (ErrOut,
-          PlatformConsole[Index].DevicePath, NULL);
-      }
+    if ((PlatformConsole[Index].ConnectType & CONSOLE_IN) == CONSOLE_IN) {
+      EfiBootManagerUpdateConsoleVariable (ConIn,
+        PlatformConsole[Index].DevicePath, NULL);
     }
-  } else {
-    //
-    // Only detect VGA device and add them to ConOut
-    //
-    DetectAndPreparePlatformPciDevicePaths (TRUE);
+    if ((PlatformConsole[Index].ConnectType & CONSOLE_OUT) == CONSOLE_OUT) {
+      EfiBootManagerUpdateConsoleVariable (ConOut,
+        PlatformConsole[Index].DevicePath, NULL);
+    }
+    if ((PlatformConsole[Index].ConnectType & STD_ERROR) == STD_ERROR) {
+      EfiBootManagerUpdateConsoleVariable (ErrOut,
+        PlatformConsole[Index].DevicePath, NULL);
+    }
   }
 }
 
