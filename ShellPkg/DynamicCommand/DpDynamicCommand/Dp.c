@@ -84,10 +84,6 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"-A", TypeFlag},   // -A   All, Cooked
   {L"-R", TypeFlag},   // -R   RAW All
   {L"-s", TypeFlag},   // -s   Summary
-#if PROFILING_IMPLEMENTED
-  {L"-P", TypeFlag},   // -P   Dump Profile Data
-  {L"-T", TypeFlag},   // -T   Dump Trace Data
-#endif // PROFILING_IMPLEMENTED
   {L"-x", TypeFlag},   // -x   eXclude Cumulative Items
   {L"-i", TypeFlag},   // -i   Display Identifier
   {L"-c", TypeValue},  // -c   Display cumulative data.
@@ -116,9 +112,6 @@ DumpStatistics( void )
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMHANDLES), mDpHiiHandle,    SummaryData.NumHandles, SummaryData.NumTrace - SummaryData.NumHandles);
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPEIMS), mDpHiiHandle,      SummaryData.NumPEIMs);
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMGLOBALS), mDpHiiHandle,    SummaryData.NumGlobal);
-#if PROFILING_IMPLEMENTED
-  ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_STATS_NUMPROFILE), mDpHiiHandle,    SummaryData.NumProfile);
-#endif // PROFILING_IMPLEMENTED
   SHELL_FREE_NON_NULL (StringPtr);
   SHELL_FREE_NON_NULL (StringPtrUnknown);
 }
@@ -684,7 +677,6 @@ InitSummaryData (
   )
 {
   SummaryData.NumTrace      = 0;
-  SummaryData.NumProfile    = 0 ;
   SummaryData.NumIncomplete = 0;
   SummaryData.NumSummary    = 0;
   SummaryData.NumHandles    = 0;
@@ -721,8 +713,6 @@ RunDp (
   BOOLEAN                   VerboseMode;
   BOOLEAN                   AllMode;
   BOOLEAN                   RawMode;
-  BOOLEAN                   TraceMode;
-  BOOLEAN                   ProfileMode;
   BOOLEAN                   ExcludeMode;
   BOOLEAN                   CumulativeMode;
   CONST CHAR16              *CustomCumulativeToken;
@@ -736,8 +726,6 @@ RunDp (
   VerboseMode = FALSE;
   AllMode     = FALSE;
   RawMode     = FALSE;
-  TraceMode   = FALSE;
-  ProfileMode = FALSE;
   ExcludeMode = FALSE;
   CumulativeMode = FALSE;
   CustomCumulativeData = NULL;
@@ -765,10 +753,6 @@ RunDp (
   SummaryMode = (BOOLEAN) (ShellCommandLineGetFlag (ParamPackage, L"-S") || ShellCommandLineGetFlag (ParamPackage, L"-s"));
   AllMode     = ShellCommandLineGetFlag (ParamPackage, L"-A");
   RawMode     = ShellCommandLineGetFlag (ParamPackage, L"-R");
-#if PROFILING_IMPLEMENTED
-  TraceMode   = ShellCommandLineGetFlag (ParamPackage, L"-T");
-  ProfileMode = ShellCommandLineGetFlag (ParamPackage, L"-P");
-#endif  // PROFILING_IMPLEMENTED
   ExcludeMode = ShellCommandLineGetFlag (ParamPackage, L"-x");
   mShowId     = ShellCommandLineGetFlag (ParamPackage, L"-i");
   CumulativeMode = ShellCommandLineGetFlag (ParamPackage, L"-c");
@@ -791,14 +775,6 @@ RunDp (
     mInterestThreshold = StrDecimalToUint64(CmdLineArg);
   }
 
-  // Handle Flag combinations and default behaviors
-  // If both TraceMode and ProfileMode are FALSE, set them both to TRUE
-  if ((! TraceMode) && (! ProfileMode)) {
-    TraceMode   = TRUE;
-#if PROFILING_IMPLEMENTED
-    ProfileMode = TRUE;
-#endif  // PROFILING_IMPLEMENTED
-  }
 
   //
   // DP dump performance data by parsing FPDT table in ACPI table.
@@ -919,67 +895,45 @@ RunDp (
 ****    R Raw         --  S option is ignored
 ****    s Summary     --  Modifies "Cooked" output only
 ****    Cooked (Default)
-****
-****  The All, Raw, and Cooked modes are modified by the Trace and Profile
-****  options.
-****    !T && !P  := (0) Default, Both are displayed
-****     T && !P  := (1) Only Trace records are displayed
-****    !T &&  P  := (2) Only Profile records are displayed
-****     T &&  P  := (3) Same as Default, both are displayed
 ****************************************************************************/
   GatherStatistics (CustomCumulativeData);
   if (CumulativeMode) {                       
     ProcessCumulative (CustomCumulativeData);
   } else if (AllMode) {
-    if (TraceMode) {
-      Status = DumpAllTrace( Number2Display, ExcludeMode);
-      if (Status == EFI_ABORTED) {
-        ShellStatus = SHELL_ABORTED;
-        goto Done;
-      }
-    }
-    if (ProfileMode) {
-      DumpAllProfile( Number2Display, ExcludeMode);
+    Status = DumpAllTrace( Number2Display, ExcludeMode);
+    if (Status == EFI_ABORTED) {
+      ShellStatus = SHELL_ABORTED;
+      goto Done;
     }
   } else if (RawMode) {
-    if (TraceMode) {
-      Status = DumpRawTrace( Number2Display, ExcludeMode);
-      if (Status == EFI_ABORTED) {
-        ShellStatus = SHELL_ABORTED;
-        goto Done;
-      }
-    }
-    if (ProfileMode) {
-      DumpRawProfile( Number2Display, ExcludeMode);
+    Status = DumpRawTrace( Number2Display, ExcludeMode);
+    if (Status == EFI_ABORTED) {
+      ShellStatus = SHELL_ABORTED;
+      goto Done;
     }
   } else {
     //------------- Begin Cooked Mode Processing
-    if (TraceMode) {
-      ProcessPhases ();
-      if ( ! SummaryMode) {
-        Status = ProcessHandles ( ExcludeMode);
-        if (Status == EFI_ABORTED) {
-          ShellStatus = SHELL_ABORTED;
-          goto Done;
-        }
-
-        Status = ProcessPeims ();
-        if (Status == EFI_ABORTED) {
-          ShellStatus = SHELL_ABORTED;
-          goto Done;
-        }
-
-        Status = ProcessGlobal ();
-        if (Status == EFI_ABORTED) {
-          ShellStatus = SHELL_ABORTED;
-          goto Done;
-        }
-
-        ProcessCumulative (NULL);
+    ProcessPhases ();
+    if ( ! SummaryMode) {
+      Status = ProcessHandles ( ExcludeMode);
+      if (Status == EFI_ABORTED) {
+        ShellStatus = SHELL_ABORTED;
+        goto Done;
       }
-    }
-    if (ProfileMode) {
-      DumpAllProfile( Number2Display, ExcludeMode);
+
+      Status = ProcessPeims ();
+      if (Status == EFI_ABORTED) {
+        ShellStatus = SHELL_ABORTED;
+        goto Done;
+      }
+
+      Status = ProcessGlobal ();
+      if (Status == EFI_ABORTED) {
+        ShellStatus = SHELL_ABORTED;
+        goto Done;
+      }
+
+       ProcessCumulative (NULL);
     }
   } //------------- End of Cooked Mode Processing
   if ( VerboseMode || SummaryMode) {

@@ -33,7 +33,6 @@
   DpInternal.h
   DpUtilities.c
   DpTrace.c
-  DpProfile.c
   DpApp.c
 
 [Packages]

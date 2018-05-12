@@ -34,7 +34,6 @@
   DpInternal.h
   DpUtilities.c
   DpTrace.c
-  DpProfile.c
   DpDynamicCommand.c
 
 [Packages]

@@ -53,12 +53,6 @@ extern EFI_HANDLE mDpHiiHandle;
 **/
 #define DP_DEBUG                0
 
-/**
-  * Set to 1 once Profiling has been implemented in order to enable
-  * profiling related options and report output.
-**/
-#define PROFILING_IMPLEMENTED   0
-
 #define DEFAULT_THRESHOLD       1000    ///< One millisecond.
 #define DEFAULT_DISPLAYCOUNT    50
 #define MAXIMUM_DISPLAYCOUNT    999999  ///< Arbitrary maximum reasonable number.
@@ -97,7 +91,6 @@ typedef struct {
 
 typedef struct {
   UINT32                NumTrace;         ///< Number of recorded TRACE performance measurements.
-  UINT32                NumProfile;       ///< Number of recorded PROFILE performance measurements.
   UINT32                NumIncomplete;    ///< Number of measurements with no END value.
   UINT32                NumSummary;       ///< Number of summary section measurements.
   UINT32                NumHandles;       ///< Number of measurements with handles.
