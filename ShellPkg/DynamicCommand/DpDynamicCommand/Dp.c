@@ -675,6 +675,24 @@ InitCumulativeData (
 }
 
 /**
+  Initialize the Summary data.
+
+**/
+VOID
+InitSummaryData (
+  VOID
+  )
+{
+  SummaryData.NumTrace      = 0;
+  SummaryData.NumProfile    = 0 ;
+  SummaryData.NumIncomplete = 0;
+  SummaryData.NumSummary    = 0;
+  SummaryData.NumHandles    = 0;
+  SummaryData.NumPEIMs      = 0;
+  SummaryData.NumGlobal     = 0;
+}
+
+/**
   Dump performance data.
   
   @param[in]  ImageHandle     The image handle.
@@ -818,6 +836,11 @@ RunDp (
   // Initialize the pre-defined cumulative data.
   //
   InitCumulativeData ();
+
+  //
+  // Initialize the Summary data.
+  //
+  InitSummaryData ();
 
   //
   // Init the custom cumulative data.
