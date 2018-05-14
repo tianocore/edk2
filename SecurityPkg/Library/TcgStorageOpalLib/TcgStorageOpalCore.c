@@ -334,7 +334,6 @@ OpalPsidRevert(
 
 **/
 TCG_RESULT
-EFIAPI
 OpalPyrite2PsidRevert(
   OPAL_SESSION              *AdminSpSession,
   UINT32                    EstimateTimeCost
@@ -667,7 +666,6 @@ OpalGetMsid(
 
 **/
 TCG_RESULT
-EFIAPI
 OpalPyrite2GetActiveDataRemovalMechanism (
   IN  OPAL_SESSION    *AdminSpSession,
   OUT UINT8           *ActiveDataRemovalMechanism
@@ -845,7 +843,6 @@ OpalAdminRevert(
 
 **/
 TCG_RESULT
-EFIAPI
 OpalPyrite2AdminRevert(
   OPAL_SESSION    *LockingSpSession,
   BOOLEAN         KeepUserData,
@@ -1866,7 +1863,6 @@ OpalGetLockingInfo(
 
 **/
 TCG_RESULT
-EFIAPI
 OpalGetFeatureDescriptor (
   IN     OPAL_SESSION              *Session,
   IN     UINT16                    FeatureCode,

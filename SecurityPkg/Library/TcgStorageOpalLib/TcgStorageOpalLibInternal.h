@@ -27,7 +27,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 TCG_RESULT
-EFIAPI
 OpalPyrite2GetActiveDataRemovalMechanism (
   OPAL_SESSION    *AdminSpSession,
   UINT8           *ActiveDataRemovalMechanism
