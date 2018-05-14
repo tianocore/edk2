@@ -429,6 +429,22 @@ class WorkspaceAutoGen(AutoGen):
                                     if PcdInPlatform.Type not in [None, '']:
                                         BuildData.Pcds[key].Type = PcdInPlatform.Type
                                         BuildData.Pcds[key].Pending = False
+                            else:
+                                #Pcd used in Library, Pcd Type from reference module if Pcd Type is Pending
+                                if BuildData.Pcds[key].Pending:
+                                    MGen = ModuleAutoGen(self, BuildData.MetaFile, Target, Toolchain, Arch, self.MetaFile)
+                                    if MGen and MGen.IsLibrary:
+                                        if MGen in PGen.LibraryAutoGenList:
+                                            ReferenceModules = MGen._ReferenceModules
+                                            for ReferenceModule in ReferenceModules:
+                                                if ReferenceModule.MetaFile in Platform.Modules:
+                                                    RefPlatformModule = Platform.Modules[str(ReferenceModule.MetaFile)]
+                                                    if key in RefPlatformModule.Pcds:
+                                                        PcdInReferenceModule = RefPlatformModule.Pcds[key]
+                                                        if PcdInReferenceModule.Type:
+                                                            BuildData.Pcds[key].Type = PcdInReferenceModule.Type
+                                                            BuildData.Pcds[key].Pending = False
+                                                            break
 
                         if 'DynamicEx' in BuildData.Pcds[key].Type:
                             if BuildData.IsBinaryModule:
