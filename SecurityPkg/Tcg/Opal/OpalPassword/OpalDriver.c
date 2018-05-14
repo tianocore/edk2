@@ -687,15 +687,26 @@ OpalDriverPopUpPsidInput (
   InputLength = 0;
   while (TRUE) {
     Mask[InputLength] = L'_';
-    CreatePopUp (
-      EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
-      &InputKey,
-      PopUpString,
-      PopUpString2,
-      L"---------------------",
-      Mask,
-      NULL
-    );
+    if (PopUpString2 == NULL) {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &InputKey,
+        PopUpString,
+        L"---------------------",
+        Mask,
+        NULL
+      );
+    } else {
+      CreatePopUp (
+        EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
+        &InputKey,
+        PopUpString,
+        PopUpString2,
+        L"---------------------",
+        Mask,
+        NULL
+      );
+    }
 
     //
     // Check key.
