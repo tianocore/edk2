@@ -2358,7 +2358,7 @@ class PlatformAutoGen(AutoGen):
     #   @param  ToPcd       The PCD to be overrided
     #   @param  FromPcd     The PCD overrideing from
     #
-    def _OverridePcd(self, ToPcd, FromPcd, Module=""):
+    def _OverridePcd(self, ToPcd, FromPcd, Module="", Msg="", Library=""):
         #
         # in case there's PCDs coming from FDF file, which have no type given.
         # at this point, ToPcd.Type has the type found from dependent
@@ -2378,10 +2378,12 @@ class PlatformAutoGen(AutoGen):
                     ToPcd.Type = FromPcd.Type
             elif ToPcd.Type not in [None, ''] and FromPcd.Type not in [None, ''] \
                 and ToPcd.Type != FromPcd.Type:
+                if Library:
+                    Module = str(Module) + " 's library file (" + str(Library) + ")"
                 EdkLogger.error("build", OPTION_CONFLICT, "Mismatched PCD type",
-                                ExtraData="%s.%s is defined as [%s] in module %s, but as [%s] in platform."\
+                                ExtraData="%s.%s is used as [%s] in module %s, but as [%s] in %s."\
                                           % (ToPcd.TokenSpaceGuidCName, TokenCName,
-                                             ToPcd.Type, Module, FromPcd.Type),
+                                             ToPcd.Type, Module, FromPcd.Type, Msg),
                                           File=self.MetaFile)
 
             if FromPcd.MaxDatumSize not in [None, '']:
@@ -2444,7 +2446,7 @@ class PlatformAutoGen(AutoGen):
     #
     #   @retval PCD_list    The list PCDs with settings from platform
     #
-    def ApplyPcdSetting(self, Module, Pcds):
+    def ApplyPcdSetting(self, Module, Pcds, Library=""):
         # for each PCD in module
         for Name, Guid in Pcds:
             PcdInModule = Pcds[Name, Guid]
@@ -2454,7 +2456,7 @@ class PlatformAutoGen(AutoGen):
             else:
                 PcdInPlatform = None
             # then override the settings if any
-            self._OverridePcd(PcdInModule, PcdInPlatform, Module)
+            self._OverridePcd(PcdInModule, PcdInPlatform, Module, Msg="DSC PCD sections", Library=Library)
             # resolve the VariableGuid value
             for SkuId in PcdInModule.SkuInfoList:
                 Sku = PcdInModule.SkuInfoList[SkuId]
@@ -2486,7 +2488,7 @@ class PlatformAutoGen(AutoGen):
                             Flag = True
                             break
                 if Flag:
-                    self._OverridePcd(ToPcd, PlatformModule.Pcds[Key], Module)
+                    self._OverridePcd(ToPcd, PlatformModule.Pcds[Key], Module, Msg="DSC Components Module scoped PCD section", Library=Library)
         # use PCD value to calculate the MaxDatumSize when it is not specified
         for Name, Guid in Pcds:
             Pcd = Pcds[Name, Guid]
@@ -3703,15 +3705,17 @@ class ModuleAutoGen(AutoGen):
             Pcds = sdict()
             if not self.IsLibrary:
                 # get PCDs from dependent libraries
+                self._LibraryPcdList = []
                 for Library in self.DependentLibraryList:
+                    PcdsInLibrary = OrderedDict()
                     self.UpdateComments(self._PcdComments, Library.PcdComments)
                     for Key in Library.Pcds:
                         # skip duplicated PCDs
                         if Key in self.Module.Pcds or Key in Pcds:
                             continue
                         Pcds[Key] = copy.copy(Library.Pcds[Key])
-                # apply PCD settings from platform
-                self._LibraryPcdList = self.PlatformInfo.ApplyPcdSetting(self.Module, Pcds)
+                        PcdsInLibrary[Key] = Pcds[Key]
+                    self._LibraryPcdList.extend(self.PlatformInfo.ApplyPcdSetting(self.Module, PcdsInLibrary, Library=Library))
             else:
                 self._LibraryPcdList = []
         return self._LibraryPcdList
