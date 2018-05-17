@@ -319,6 +319,15 @@ ConnectRootBridge (
   );
 
 STATIC
+EFI_STATUS
+EFIAPI
+ConnectVirtioPciRng (
+  IN EFI_HANDLE Handle,
+  IN VOID       *Instance,
+  IN VOID       *Context
+  );
+
+STATIC
 VOID
 SaveS3BootScript (
   VOID
@@ -399,6 +408,13 @@ PlatformBootManagerBeforeConsole (
   ASSERT_RETURN_ERROR (PcdStatus);
 
   PlatformRegisterOptionsAndKeys ();
+
+  //
+  // Install both VIRTIO_DEVICE_PROTOCOL and (dependent) EFI_RNG_PROTOCOL
+  // instances on Virtio PCI RNG devices.
+  //
+  VisitAllInstancesOfProtocol (&gEfiPciIoProtocolGuid, ConnectVirtioPciRng,
+    NULL);
 }
 
 
@@ -423,6 +439,95 @@ ConnectRootBridge (
                                     //   children
                   FALSE             // Recursive
                   );
+  return Status;
+}
+
+
+STATIC
+EFI_STATUS
+EFIAPI
+ConnectVirtioPciRng (
+  IN EFI_HANDLE Handle,
+  IN VOID       *Instance,
+  IN VOID       *Context
+  )
+{
+  EFI_PCI_IO_PROTOCOL *PciIo;
+  EFI_STATUS          Status;
+  UINT16              VendorId;
+  UINT16              DeviceId;
+  UINT8               RevisionId;
+  BOOLEAN             Virtio10;
+  UINT16              SubsystemId;
+
+  PciIo = Instance;
+
+  //
+  // Read and check VendorId.
+  //
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16, PCI_VENDOR_ID_OFFSET,
+                        1, &VendorId);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+  if (VendorId != VIRTIO_VENDOR_ID) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Read DeviceId and RevisionId.
+  //
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16, PCI_DEVICE_ID_OFFSET,
+                        1, &DeviceId);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, PCI_REVISION_ID_OFFSET,
+                        1, &RevisionId);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+
+  //
+  // From DeviceId and RevisionId, determine whether the device is a
+  // modern-only Virtio 1.0 device. In case of Virtio 1.0, DeviceId can
+  // immediately be restricted to VIRTIO_SUBSYSTEM_ENTROPY_SOURCE, and
+  // SubsystemId will only play a sanity-check role. Otherwise, DeviceId can
+  // only be sanity-checked, and SubsystemId will decide.
+  //
+  if (DeviceId == 0x1040 + VIRTIO_SUBSYSTEM_ENTROPY_SOURCE &&
+      RevisionId >= 0x01) {
+    Virtio10 = TRUE;
+  } else if (DeviceId >= 0x1000 && DeviceId <= 0x103F && RevisionId == 0x00) {
+    Virtio10 = FALSE;
+  } else {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Read and check SubsystemId as dictated by Virtio10.
+  //
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16,
+                        PCI_SUBSYSTEM_ID_OFFSET, 1, &SubsystemId);
+  if (EFI_ERROR (Status)) {
+    goto Error;
+  }
+  if ((Virtio10 && SubsystemId >= 0x40) ||
+      (!Virtio10 && SubsystemId == VIRTIO_SUBSYSTEM_ENTROPY_SOURCE)) {
+    Status = gBS->ConnectController (
+                    Handle, // ControllerHandle
+                    NULL,   // DriverImageHandle -- connect all drivers
+                    NULL,   // RemainingDevicePath -- produce all child handles
+                    FALSE   // Recursive -- don't follow child handles
+                    );
+    if (EFI_ERROR (Status)) {
+      goto Error;
+    }
+  }
+  return EFI_SUCCESS;
+
+Error:
+  DEBUG ((DEBUG_ERROR, "%a: %r\n", __FUNCTION__, Status));
   return Status;
 }
 
