@@ -15,8 +15,8 @@
 
 **/
 
-#ifndef _MM_SW_DISPATCH2_H_
-#define _MM_SW_DISPATCH2_H_
+#ifndef _MM_SW_DISPATCH_H_
+#define _MM_SW_DISPATCH_H_
 
 #include <Pi/PiMmCis.h>
 
@@ -117,7 +117,7 @@ EFI_STATUS
 ///
 /// Interface structure for the MM Software MMI Dispatch Protocol.
 ///
-/// The EFI_MM_SW_DISPATCH2_PROTOCOL provides the ability to install child handlers for the
+/// The EFI_MM_SW_DISPATCH_PROTOCOL provides the ability to install child handlers for the
 /// given software.  These handlers will respond to software interrupts, and the maximum software
 /// interrupt in the EFI_MM_SW_REGISTER_CONTEXT is denoted by MaximumSwiValue.
 ///
