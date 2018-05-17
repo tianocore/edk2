@@ -16,6 +16,7 @@
 **/
 
 #include <IndustryStandard/Pci22.h>
+#include <IndustryStandard/Virtio095.h>
 #include <Library/BootLogoLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
@@ -27,6 +28,7 @@
 #include <Protocol/LoadedImage.h>
 #include <Protocol/PciIo.h>
 #include <Protocol/PciRootBridgeIo.h>
+#include <Protocol/VirtioDevice.h>
 #include <Guid/EventGroup.h>
 #include <Guid/RootBridgesConnectedEventGroup.h>
 
@@ -257,6 +259,121 @@ IsPciDisplay (
   }
 
   return IS_PCI_DISPLAY (&Pci);
+}
+
+
+/**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio RNG device at
+  the VIRTIO_DEVICE_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioRng (
+  IN EFI_HANDLE   Handle,
+  IN CONST CHAR16 *ReportText
+  )
+{
+  EFI_STATUS             Status;
+  VIRTIO_DEVICE_PROTOCOL *VirtIo;
+
+  Status = gBS->HandleProtocol (Handle, &gVirtioDeviceProtocolGuid,
+                  (VOID**)&VirtIo);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+  return (BOOLEAN)(VirtIo->SubSystemDeviceId ==
+                   VIRTIO_SUBSYSTEM_ENTROPY_SOURCE);
+}
+
+
+/**
+  This FILTER_FUNCTION checks if a handle corresponds to a Virtio RNG device at
+  the EFI_PCI_IO_PROTOCOL level.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsVirtioPciRng (
+  IN EFI_HANDLE   Handle,
+  IN CONST CHAR16 *ReportText
+  )
+{
+  EFI_STATUS          Status;
+  EFI_PCI_IO_PROTOCOL *PciIo;
+  UINT16              VendorId;
+  UINT16              DeviceId;
+  UINT8               RevisionId;
+  BOOLEAN             Virtio10;
+  UINT16              SubsystemId;
+
+  Status = gBS->HandleProtocol (Handle, &gEfiPciIoProtocolGuid,
+                  (VOID**)&PciIo);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  //
+  // Read and check VendorId.
+  //
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16, PCI_VENDOR_ID_OFFSET,
+                        1, &VendorId);
+  if (EFI_ERROR (Status)) {
+    goto PciError;
+  }
+  if (VendorId != VIRTIO_VENDOR_ID) {
+    return FALSE;
+  }
+
+  //
+  // Read DeviceId and RevisionId.
+  //
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16, PCI_DEVICE_ID_OFFSET,
+                        1, &DeviceId);
+  if (EFI_ERROR (Status)) {
+    goto PciError;
+  }
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint8, PCI_REVISION_ID_OFFSET,
+                        1, &RevisionId);
+  if (EFI_ERROR (Status)) {
+    goto PciError;
+  }
+
+  //
+  // From DeviceId and RevisionId, determine whether the device is a
+  // modern-only Virtio 1.0 device. In case of Virtio 1.0, DeviceId can
+  // immediately be restricted to VIRTIO_SUBSYSTEM_ENTROPY_SOURCE, and
+  // SubsystemId will only play a sanity-check role. Otherwise, DeviceId can
+  // only be sanity-checked, and SubsystemId will decide.
+  //
+  if (DeviceId == 0x1040 + VIRTIO_SUBSYSTEM_ENTROPY_SOURCE &&
+      RevisionId >= 0x01) {
+    Virtio10 = TRUE;
+  } else if (DeviceId >= 0x1000 && DeviceId <= 0x103F && RevisionId == 0x00) {
+    Virtio10 = FALSE;
+  } else {
+    return FALSE;
+  }
+
+  //
+  // Read and check SubsystemId as dictated by Virtio10.
+  //
+  Status = PciIo->Pci.Read (PciIo, EfiPciIoWidthUint16,
+                        PCI_SUBSYSTEM_ID_OFFSET, 1, &SubsystemId);
+  if (EFI_ERROR (Status)) {
+    goto PciError;
+  }
+  if (Virtio10 && SubsystemId >= 0x40) {
+    return TRUE;
+  }
+  if (!Virtio10 && SubsystemId == VIRTIO_SUBSYSTEM_ENTROPY_SOURCE) {
+    return TRUE;
+  }
+  return FALSE;
+
+PciError:
+  DEBUG ((DEBUG_ERROR, "%a: %s: %r\n", __FUNCTION__, ReportText, Status));
+  return FALSE;
 }
 
 
@@ -644,6 +761,18 @@ PlatformBootManagerBeforeConsole (
   // Register platform-specific boot options and keyboard shortcuts.
   //
   PlatformRegisterOptionsAndKeys ();
+
+  //
+  // At this point, VIRTIO_DEVICE_PROTOCOL instances exist only for Virtio MMIO
+  // transports. Install EFI_RNG_PROTOCOL instances on Virtio MMIO RNG devices.
+  //
+  FilterAndProcess (&gVirtioDeviceProtocolGuid, IsVirtioRng, Connect);
+
+  //
+  // Install both VIRTIO_DEVICE_PROTOCOL and (dependent) EFI_RNG_PROTOCOL
+  // instances on Virtio PCI RNG devices.
+  //
+  FilterAndProcess (&gEfiPciIoProtocolGuid, IsVirtioPciRng, Connect);
 }
 
 /**

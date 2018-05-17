@@ -83,3 +83,4 @@
   gEfiLoadedImageProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
+  gVirtioDeviceProtocolGuid
