@@ -54,6 +54,12 @@ QEMU_VIDEO_CARD gQemuVideoCardList[] = {
         QEMU_VIDEO_BOCHS_MMIO,
         L"QEMU Standard VGA"
     },{
+        PCI_CLASS_DISPLAY_OTHER,
+        0x1234,
+        0x1111,
+        QEMU_VIDEO_BOCHS_MMIO,
+        L"QEMU Standard VGA (secondary)"
+    },{
         PCI_CLASS_DISPLAY_VGA,
         0x1b36,
         0x0100,
