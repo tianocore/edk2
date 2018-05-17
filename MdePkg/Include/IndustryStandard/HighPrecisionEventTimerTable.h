@@ -23,6 +23,22 @@
 #pragma pack(1)
 
 ///
+/// HPET Event Timer Block ID described in IA-PC HPET Specification, 3.2.4.
+///
+typedef union {
+  struct {
+    UINT32 Revision       : 8;
+    UINT32 NumberOfTimers : 5;
+    UINT32 CounterSize    : 1;
+    UINT32 Reserved       : 1;
+    UINT32 LegacyRoute    : 1;
+    UINT32 VendorId       : 16;
+  }      Bits;
+  UINT32 Uint32;
+} EFI_ACPI_HIGH_PRECISION_EVENT_TIMER_BLOCK_ID;
+
+
+///
 /// High Precision Event Timer Table header definition.
 ///
 typedef struct {
