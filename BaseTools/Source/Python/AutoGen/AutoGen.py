@@ -42,6 +42,7 @@ from GenPatchPcdTable.GenPatchPcdTable import parsePcdInfoFromMapFile
 import Common.VpdInfoFile as VpdInfoFile
 from GenPcdDb import CreatePcdDatabaseCode
 from Workspace.MetaFileCommentParser import UsageList
+from Workspace.WorkspaceCommon import GetModuleLibInstances
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 import InfSectionParser
 import datetime
@@ -2174,162 +2175,14 @@ class PlatformAutoGen(AutoGen):
         if str(Module) not in self.Platform.Modules:
             return []
 
-        ModuleType = Module.ModuleType
-
-        # for overridding library instances with module specific setting
-        PlatformModule = self.Platform.Modules[str(Module)]
-
-        # add forced library instances (specified under LibraryClasses sections)
-        #
-        # If a module has a MODULE_TYPE of USER_DEFINED,
-        # do not link in NULL library class instances from the global [LibraryClasses.*] sections.
-        #
-        if Module.ModuleType != SUP_MODULE_USER_DEFINED:
-            for LibraryClass in self.Platform.LibraryClasses.GetKeys():
-                if LibraryClass.startswith("NULL") and self.Platform.LibraryClasses[LibraryClass, Module.ModuleType]:
-                    Module.LibraryClasses[LibraryClass] = self.Platform.LibraryClasses[LibraryClass, Module.ModuleType]
-
-        # add forced library instances (specified in module overrides)
-        for LibraryClass in PlatformModule.LibraryClasses:
-            if LibraryClass.startswith("NULL"):
-                Module.LibraryClasses[LibraryClass] = PlatformModule.LibraryClasses[LibraryClass]
-
-        # EdkII module
-        LibraryConsumerList = [Module]
-        Constructor         = []
-        ConsumedByList      = OrderedDict()
-        LibraryInstance     = OrderedDict()
-
-        EdkLogger.verbose("")
-        EdkLogger.verbose("Library instances of module [%s] [%s]:" % (str(Module), self.Arch))
-        while len(LibraryConsumerList) > 0:
-            M = LibraryConsumerList.pop()
-            for LibraryClassName in M.LibraryClasses:
-                if LibraryClassName not in LibraryInstance:
-                    # override library instance for this module
-                    if LibraryClassName in PlatformModule.LibraryClasses:
-                        LibraryPath = PlatformModule.LibraryClasses[LibraryClassName]
-                    else:
-                        LibraryPath = self.Platform.LibraryClasses[LibraryClassName, ModuleType]
-                    if LibraryPath is None or LibraryPath == "":
-                        LibraryPath = M.LibraryClasses[LibraryClassName]
-                        if LibraryPath is None or LibraryPath == "":
-                            EdkLogger.error("build", RESOURCE_NOT_AVAILABLE,
-                                            "Instance of library class [%s] is not found" % LibraryClassName,
-                                            File=self.MetaFile,
-                                            ExtraData="in [%s] [%s]\n\tconsumed by module [%s]" % (str(M), self.Arch, str(Module)))
-
-                    LibraryModule = self.BuildDatabase[LibraryPath, self.Arch, self.BuildTarget, self.ToolChain]
-                    # for those forced library instance (NULL library), add a fake library class
-                    if LibraryClassName.startswith("NULL"):
-                        LibraryModule.LibraryClass.append(LibraryClassObject(LibraryClassName, [ModuleType]))
-                    elif LibraryModule.LibraryClass is None \
-                         or len(LibraryModule.LibraryClass) == 0 \
-                         or (ModuleType != SUP_MODULE_USER_DEFINED
-                             and ModuleType not in LibraryModule.LibraryClass[0].SupModList):
-                        # only USER_DEFINED can link against any library instance despite of its SupModList
-                        EdkLogger.error("build", OPTION_MISSING,
-                                        "Module type [%s] is not supported by library instance [%s]" \
-                                        % (ModuleType, LibraryPath), File=self.MetaFile,
-                                        ExtraData="consumed by [%s]" % str(Module))
-
-                    LibraryInstance[LibraryClassName] = LibraryModule
-                    LibraryConsumerList.append(LibraryModule)
-                    EdkLogger.verbose("\t" + str(LibraryClassName) + " : " + str(LibraryModule))
-                else:
-                    LibraryModule = LibraryInstance[LibraryClassName]
-
-                if LibraryModule is None:
-                    continue
-
-                if LibraryModule.ConstructorList != [] and LibraryModule not in Constructor:
-                    Constructor.append(LibraryModule)
-
-                if LibraryModule not in ConsumedByList:
-                    ConsumedByList[LibraryModule] = []
-                # don't add current module itself to consumer list
-                if M != Module:
-                    if M in ConsumedByList[LibraryModule]:
-                        continue
-                    ConsumedByList[LibraryModule].append(M)
-        #
-        # Initialize the sorted output list to the empty set
-        #
-        SortedLibraryList = []
-        #
-        # Q <- Set of all nodes with no incoming edges
-        #
-        LibraryList = [] #LibraryInstance.values()
-        Q = []
-        for LibraryClassName in LibraryInstance:
-            M = LibraryInstance[LibraryClassName]
-            LibraryList.append(M)
-            if ConsumedByList[M] == []:
-                Q.append(M)
-
-        #
-        # start the  DAG algorithm
-        #
-        while True:
-            EdgeRemoved = True
-            while Q == [] and EdgeRemoved:
-                EdgeRemoved = False
-                # for each node Item with a Constructor
-                for Item in LibraryList:
-                    if Item not in Constructor:
-                        continue
-                    # for each Node without a constructor with an edge e from Item to Node
-                    for Node in ConsumedByList[Item]:
-                        if Node in Constructor:
-                            continue
-                        # remove edge e from the graph if Node has no constructor
-                        ConsumedByList[Item].remove(Node)
-                        EdgeRemoved = True
-                        if ConsumedByList[Item] == []:
-                            # insert Item into Q
-                            Q.insert(0, Item)
-                            break
-                    if Q != []:
-                        break
-            # DAG is done if there's no more incoming edge for all nodes
-            if Q == []:
-                break
-
-            # remove node from Q
-            Node = Q.pop()
-            # output Node
-            SortedLibraryList.append(Node)
-
-            # for each node Item with an edge e from Node to Item do
-            for Item in LibraryList:
-                if Node not in ConsumedByList[Item]:
-                    continue
-                # remove edge e from the graph
-                ConsumedByList[Item].remove(Node)
-
-                if ConsumedByList[Item] != []:
-                    continue
-                # insert Item into Q, if Item has no other incoming edges
-                Q.insert(0, Item)
-
-        #
-        # if any remaining node Item in the graph has a constructor and an incoming edge, then the graph has a cycle
-        #
-        for Item in LibraryList:
-            if ConsumedByList[Item] != [] and Item in Constructor and len(Constructor) > 1:
-                ErrorMessage = "\tconsumed by " + "\n\tconsumed by ".join(str(L) for L in ConsumedByList[Item])
-                EdkLogger.error("build", BUILD_ERROR, 'Library [%s] with constructors has a cycle' % str(Item),
-                                ExtraData=ErrorMessage, File=self.MetaFile)
-            if Item not in SortedLibraryList:
-                SortedLibraryList.append(Item)
-
-        #
-        # Build the list of constructor and destructir names
-        # The DAG Topo sort produces the destructor order, so the list of constructors must generated in the reverse order
-        #
-        SortedLibraryList.reverse()
-        return SortedLibraryList
-
+        return GetModuleLibInstances(Module,
+                                     self.Platform,
+                                     self.BuildDatabase,
+                                     self.Arch,
+                                     self.BuildTarget,
+                                     self.ToolChain,
+                                     self.MetaFile,
+                                     EdkLogger)
 
     ## Override PCD setting (type, value, ...)
     #
