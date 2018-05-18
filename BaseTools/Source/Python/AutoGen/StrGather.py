@@ -258,7 +258,7 @@ def GetFilteredLanguage(UniLanguageList, LanguageFilterList):
         # first check for exact match
         if Language in UniLanguageList:
             if Language not in UniLanguageListFiltered:
-                UniLanguageListFiltered += [Language]
+                UniLanguageListFiltered.append(Language)
         # find the first one with the same/equivalent primary tag
         else:
             if Language.find('-') != -1:
@@ -280,7 +280,7 @@ def GetFilteredLanguage(UniLanguageList, LanguageFilterList):
 
                 if PrimaryTag == UniLanguagePrimaryTag:
                     if UniLanguage not in UniLanguageListFiltered:
-                        UniLanguageListFiltered += [UniLanguage]
+                        UniLanguageListFiltered.append(UniLanguage)
                     break
             else:
                 # Here is rule 3 for "get best language"
@@ -292,10 +292,10 @@ def GetFilteredLanguage(UniLanguageList, LanguageFilterList):
                     for UniLanguage in UniLanguageList:
                         if UniLanguage.startswith('en-') or UniLanguage.startswith('eng-'):
                             if UniLanguage not in UniLanguageListFiltered:
-                                UniLanguageListFiltered += [UniLanguage]
+                                UniLanguageListFiltered.append(UniLanguage)
                             break
                     else:
-                        UniLanguageListFiltered += [DefaultTag]
+                        UniLanguageListFiltered.append(DefaultTag)
     return  UniLanguageListFiltered
 
 

@@ -1655,7 +1655,7 @@ def CreatePcdCode(Info, AutoGenC, AutoGenH):
     TokenSpaceList = []
     for Pcd in Info.ModulePcdList:
         if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET and Pcd.TokenSpaceGuidCName not in TokenSpaceList:
-            TokenSpaceList += [Pcd.TokenSpaceGuidCName]
+            TokenSpaceList.append(Pcd.TokenSpaceGuidCName)
             
     SkuMgr = Info.Workspace.Platform.SkuIdMgr
     AutoGenH.Append("\n// Definition of SkuId Array\n")

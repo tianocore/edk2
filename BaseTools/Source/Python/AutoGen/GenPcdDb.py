@@ -1115,7 +1115,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
         TokenSpaceGuid = GuidStructureStringToGuidValueName(TokenSpaceGuidStructure)
         if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
             if TokenSpaceGuid not in GuidList:
-                GuidList += [TokenSpaceGuid]
+                GuidList.append(TokenSpaceGuid)
                 Dict['GUID_STRUCTURE'].append(TokenSpaceGuidStructure)
             NumberOfExTokens += 1
 
@@ -1140,7 +1140,6 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
             Pcd.TokenTypeList = ['PCD_DATUM_TYPE_' + Pcd.DatumType]
 
         if len(Pcd.SkuInfoList) > 1:
-#             Pcd.TokenTypeList += ['PCD_TYPE_SKU_ENABLED']
             NumberOfSkuEnabledPcd += 1
         
         SkuIdIndex = 1  
@@ -1178,7 +1177,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                         else:
                             EdkLogger.error("build", PCD_VALIDATION_INFO_ERROR,
                                                 "The PCD '%s.%s' Validation information defined in DEC file has incorrect format." % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
-                Pcd.TokenTypeList += ['PCD_TYPE_HII']
+                Pcd.TokenTypeList.append('PCD_TYPE_HII')
                 Pcd.InitString = 'INIT'
                 # Store all variable names of one HII PCD under different SKU to stringTable
                 # and calculate the VariableHeadStringIndex
@@ -1209,7 +1208,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                 # store VariableGuid to GuidTable and get the VariableHeadGuidIndex
 
                 if VariableGuid not in GuidList:
-                    GuidList += [VariableGuid]
+                    GuidList.append(VariableGuid)
                     Dict['GUID_STRUCTURE'].append(VariableGuidStructure)
                 VariableHeadGuidIndex = GuidList.index(VariableGuid)
 
@@ -1261,7 +1260,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                 VariableDbValueList.append([VariableHeadGuidIndex, VariableHeadStringIndex, Sku.VariableOffset, VariableOffset, VariableRefTable, Sku.VariableAttribute])
 
             elif Sku.VpdOffset != '':
-                Pcd.TokenTypeList += ['PCD_TYPE_VPD']
+                Pcd.TokenTypeList.append('PCD_TYPE_VPD')
                 Pcd.InitString = 'INIT'
                 VpdHeadOffsetList.append(str(Sku.VpdOffset) + 'U')
                 VpdDbOffsetList.append(Sku.VpdOffset)
@@ -1273,7 +1272,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                 continue
           
             if Pcd.DatumType == TAB_VOID:
-                Pcd.TokenTypeList += ['PCD_TYPE_STRING']
+                Pcd.TokenTypeList.append('PCD_TYPE_STRING')
                 Pcd.InitString = 'INIT'
                 if Sku.HiiDefaultValue != '' and Sku.DefaultValue == '':
                     Sku.DefaultValue = Sku.HiiDefaultValue
@@ -1322,7 +1321,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                     StringTableSize += (StringTabLen)
             else:
                 if "PCD_TYPE_HII" not in Pcd.TokenTypeList:
-                    Pcd.TokenTypeList += ['PCD_TYPE_DATA']
+                    Pcd.TokenTypeList.append('PCD_TYPE_DATA')
                     if Sku.DefaultValue == 'TRUE':
                         Pcd.InitString = 'INIT'
                     else:

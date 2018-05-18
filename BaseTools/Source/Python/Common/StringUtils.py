@@ -447,7 +447,7 @@ def GetMultipleValuesOfKeyFromLines(Lines, Key, KeyValues, CommentCharacter):
     for Line in LineList:
         Line = CleanString(Line, CommentCharacter)
         if Line != '' and Line[0] != CommentCharacter:
-            KeyValues += [Line]
+            KeyValues.append(Line)
 
     return True
 

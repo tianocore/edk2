@@ -439,36 +439,33 @@ class GenFdsGlobalVariable:
 
     @staticmethod
     def GenerateSection(Output, Input, Type=None, CompressionType=None, Guid=None,
-                        GuidHdrLen=None, GuidAttr=[], Ui=None, Ver=None, InputAlign=None, BuildNumber=None, DummyFile=None, IsMakefile=False):
+                        GuidHdrLen=None, GuidAttr=[], Ui=None, Ver=None, InputAlign=[], BuildNumber=None, DummyFile=None, IsMakefile=False):
         Cmd = ["GenSec"]
         if Type:
-            Cmd += ["-s", Type]
+            Cmd += ("-s", Type)
         if CompressionType:
-            Cmd += ["-c", CompressionType]
+            Cmd += ("-c", CompressionType)
         if Guid is not None:
-            Cmd += ["-g", Guid]
+            Cmd += ("-g", Guid)
         if DummyFile is not None:
-            Cmd += ["--dummy", DummyFile]
+            Cmd += ("--dummy", DummyFile)
         if GuidHdrLen:
-            Cmd += ["-l", GuidHdrLen]
-        if len(GuidAttr) != 0:
-            #Add each guided attribute
-            for Attr in GuidAttr:
-                Cmd += ["-r", Attr]
-        if InputAlign is not None:
-            #Section Align is only for dummy section without section type
-            for SecAlign in InputAlign:
-                Cmd += ["--sectionalign", SecAlign]
+            Cmd += ("-l", GuidHdrLen)
+        #Add each guided attribute
+        for Attr in GuidAttr:
+            Cmd += ("-r", Attr)
+        #Section Align is only for dummy section without section type
+        for SecAlign in InputAlign:
+            Cmd += ("--sectionalign", SecAlign)
 
         CommandFile = Output + '.txt'
         if Ui:
-            #Cmd += ["-n", '"' + Ui + '"']
             if IsMakefile:
                 if Ui == "$(MODULE_NAME)":
-                    Cmd += ['-n', Ui]
+                    Cmd += ('-n', Ui)
                 else:
-                    Cmd += ["-n", '"' + Ui + '"']
-                Cmd += ["-o", Output]
+                    Cmd += ("-n", '"' + Ui + '"')
+                Cmd += ("-o", Output)
                 if ' '.join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:
                     GenFdsGlobalVariable.SecCmdList.append(' '.join(Cmd).strip())
             else:
@@ -481,10 +478,10 @@ class GenFdsGlobalVariable:
                 SaveFileOnChange(Output, SectionData.tostring())
 
         elif Ver:
-            Cmd += ["-n", Ver]
+            Cmd += ("-n", Ver)
             if BuildNumber:
-                Cmd += ["-j", BuildNumber]
-            Cmd += ["-o", Output]
+                Cmd += ("-j", BuildNumber)
+            Cmd += ("-o", Output)
 
             SaveFileOnChange(CommandFile, ' '.join(Cmd), False)
             if IsMakefile:
@@ -495,7 +492,7 @@ class GenFdsGlobalVariable:
                     return
                 GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate section")
         else:
-            Cmd += ["-o", Output]
+            Cmd += ("-o", Output)
             Cmd += Input
 
             SaveFileOnChange(CommandFile, ' '.join(Cmd), False)
@@ -526,9 +523,9 @@ class GenFdsGlobalVariable:
         Cmd = ["GenFfs", "-t", Type, "-g", Guid]
         mFfsValidAlign = ["0", "8", "16", "128", "512", "1K", "4K", "32K", "64K", "128K", "256K", "512K", "1M", "2M", "4M", "8M", "16M"]
         if Fixed == True:
-            Cmd += ["-x"]
+            Cmd.append("-x")
         if CheckSum:
-            Cmd += ["-s"]
+            Cmd.append("-s")
         if Align:
             if Align not in mFfsValidAlign:
                 Align = GenFdsGlobalVariable.GetAlignment (Align)
@@ -536,9 +533,9 @@ class GenFdsGlobalVariable:
                     if ((Align > GenFdsGlobalVariable.GetAlignment(mFfsValidAlign[index])) and (Align <= GenFdsGlobalVariable.GetAlignment(mFfsValidAlign[index + 1]))):
                         break
                 Align = mFfsValidAlign[index + 1]
-            Cmd += ["-a", Align]
+            Cmd += ("-a", Align)
 
-        Cmd += ["-o", Output]
+        Cmd += ("-o", Output)
         for I in range(0, len(Input)):
             Cmd += ("-i", Input[I])
             if SectionAlign and SectionAlign[I]:
@@ -567,26 +564,26 @@ class GenFdsGlobalVariable:
 
         Cmd = ["GenFv"]
         if BaseAddress:
-            Cmd += ["-r", BaseAddress]
+            Cmd += ("-r", BaseAddress)
 
         if ForceRebase == False:
-            Cmd += ["-F", "FALSE"]
+            Cmd += ("-F", "FALSE")
         elif ForceRebase == True:
-            Cmd += ["-F", "TRUE"]
+            Cmd += ("-F", "TRUE")
 
         if Capsule:
-            Cmd += ["-c"]
+            Cmd.append("-c")
         if Dump:
-            Cmd += ["-p"]
+            Cmd.append("-p")
         if AddressFile:
-            Cmd += ["-a", AddressFile]
+            Cmd += ("-a", AddressFile)
         if MapFile:
-            Cmd += ["-m", MapFile]
+            Cmd += ("-m", MapFile)
         if FileSystemGuid:
-            Cmd += ["-g", FileSystemGuid]
-        Cmd += ["-o", Output]
+            Cmd += ("-g", FileSystemGuid)
+        Cmd += ("-o", Output)
         for I in Input:
-            Cmd += ["-i", I]
+            Cmd += ("-i", I)
 
         GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate FV")
 
@@ -600,10 +597,10 @@ class GenFdsGlobalVariable:
         if BaseAddress and FvSize \
             and len(BaseAddress) == len(FvSize):
             for I in range(0, len(BaseAddress)):
-                Cmd += ["-r", BaseAddress[I], "-s", FvSize[I]]
-        Cmd += ["-o", Output]
+                Cmd += ("-r", BaseAddress[I], "-s", FvSize[I])
+        Cmd += ("-o", Output)
         for F in Input:
-            Cmd += ["-f", F]
+            Cmd += ("-f", F)
 
         GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate VTF")
 
@@ -617,26 +614,26 @@ class GenFdsGlobalVariable:
 
         Cmd = ["GenFw"]
         if Type.lower() == "te":
-            Cmd += ["-t"]
+            Cmd.append("-t")
         if SubType:
-            Cmd += ["-e", SubType]
+            Cmd += ("-e", SubType)
         if TimeStamp:
-            Cmd += ["-s", TimeStamp]
+            Cmd += ("-s", TimeStamp)
         if Align:
-            Cmd += ["-a", Align]
+            Cmd += ("-a", Align)
         if Padding:
-            Cmd += ["-p", Padding]
+            Cmd += ("-p", Padding)
         if Zero:
-            Cmd += ["-z"]
+            Cmd.append("-z")
         if Strip:
-            Cmd += ["-l"]
+            Cmd.append("-l")
         if Replace:
-            Cmd += ["-r"]
+            Cmd.append("-r")
         if Join:
-            Cmd += ["-j"]
+            Cmd.append("-j")
         if Convert:
-            Cmd += ["-m"]
-        Cmd += ["-o", Output]
+            Cmd.append("-m")
+        Cmd += ("-o", Output)
         Cmd += Input
         if IsMakefile:
             if " ".join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:
@@ -652,18 +649,18 @@ class GenFdsGlobalVariable:
         if len(EfiInput) > 0:
             
             if Compress:
-                Cmd += ["-ec"]
+                Cmd.append("-ec")
             else:
-                Cmd += ["-e"]
+                Cmd.append("-e")
                 
             for EfiFile in EfiInput:
-                Cmd += [EfiFile]
+                Cmd.append(EfiFile)
                 InputList.append (EfiFile)
         
         if len(BinaryInput) > 0:
-            Cmd += ["-b"]
+            Cmd.append("-b")
             for BinFile in BinaryInput:
-                Cmd += [BinFile]
+                Cmd.append(BinFile)
                 InputList.append (BinFile)
 
         # Check List
@@ -672,15 +669,15 @@ class GenFdsGlobalVariable:
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, InputList))
                         
         if ClassCode is not None:
-            Cmd += ["-l", ClassCode]
+            Cmd += ("-l", ClassCode)
         if Revision is not None:
-            Cmd += ["-r", Revision]
+            Cmd += ("-r", Revision)
         if DeviceId is not None:
-            Cmd += ["-i", DeviceId]
+            Cmd += ("-i", DeviceId)
         if VendorId is not None:
-            Cmd += ["-f", VendorId]
+            Cmd += ("-f", VendorId)
 
-        Cmd += ["-o", Output]
+        Cmd += ("-o", Output)
         if IsMakefile:
             if " ".join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:
                 GenFdsGlobalVariable.SecCmdList.append(" ".join(Cmd).strip())
@@ -695,7 +692,7 @@ class GenFdsGlobalVariable:
 
         Cmd = [ToolPath, ]
         Cmd += Options.split(' ')
-        Cmd += ["-o", Output]
+        Cmd += ("-o", Output)
         Cmd += Input
         if IsMakefile:
             if " ".join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:

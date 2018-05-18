@@ -1328,7 +1328,7 @@ def ParseFieldValue (Value):
         try:
             Value = "'" + uuid.UUID(Value).get_bytes_le() + "'"
         except ValueError, Message:
-            raise BadExpression('%s' % Message)
+            raise BadExpression(Message)
         Value, Size = ParseFieldValue(Value)
         return Value, 16
     if Value.startswith('L"') and Value.endswith('"'):

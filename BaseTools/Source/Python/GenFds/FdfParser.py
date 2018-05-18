@@ -2328,7 +2328,7 @@ class FdfParser:
         if not self.__GetNextHexNumber() and not self.__GetNextDecimalNumber():
             raise Warning("expected Hex FV extension entry type value At Line ", self.FileName, self.CurrentLineNumber)
 
-        FvObj.FvExtEntryTypeValue += [self.__Token]
+        FvObj.FvExtEntryTypeValue.append(self.__Token)
 
         if not self.__IsToken( "{"):
             raise Warning("expected '{'", self.FileName, self.CurrentLineNumber)
@@ -2336,7 +2336,7 @@ class FdfParser:
         if not self.__IsKeyword ("FILE") and not self.__IsKeyword ("DATA"):
             raise Warning("expected 'FILE' or 'DATA'", self.FileName, self.CurrentLineNumber)
 
-        FvObj.FvExtEntryType += [self.__Token]
+        FvObj.FvExtEntryType.append(self.__Token)
 
         if self.__Token == 'DATA':
 
@@ -2370,7 +2370,7 @@ class FdfParser:
                 raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)
 
             DataString = DataString.rstrip(",")
-            FvObj.FvExtEntryData += [DataString]
+            FvObj.FvExtEntryData.append(DataString)
 
         if self.__Token == 'FILE':
         
@@ -2380,7 +2380,7 @@ class FdfParser:
             if not self.__GetNextToken():
                 raise Warning("expected FV Extension Entry file path At Line ", self.FileName, self.CurrentLineNumber)
                 
-            FvObj.FvExtEntryData += [self.__Token]
+            FvObj.FvExtEntryData.append(self.__Token)
 
             if not self.__IsToken( "}"):
                 raise Warning("expected '}'", self.FileName, self.CurrentLineNumber)

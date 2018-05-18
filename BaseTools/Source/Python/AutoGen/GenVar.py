@@ -75,7 +75,7 @@ class VariableMgr(object):
                     data = value_list[0]
                     value_list = []
                     for data_byte in pack(data_flag,int(data,16) if data.upper().startswith('0X') else int(data)):
-                        value_list += [hex(unpack("B",data_byte)[0])]
+                        value_list.append(hex(unpack("B",data_byte)[0]))
                 newvalue[int(item.var_offset,16) if item.var_offset.upper().startswith("0X") else int(item.var_offset)] = value_list
             try:
                 newvaluestr = "{" + ",".join(VariableMgr.assemble_variable(newvalue)) +"}"

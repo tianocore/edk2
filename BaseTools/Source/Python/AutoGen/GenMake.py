@@ -698,7 +698,7 @@ cleanlib:
                     Src = self.ReplaceMacro(Src)
                     Dst = self.ReplaceMacro(Dst)
                     if Dst not in self.ResultFileList:
-                        self.ResultFileList.append('%s' % Dst)
+                        self.ResultFileList.append(Dst)
                     if '%s :' %(Dst) not in self.BuildTargetList:
                         self.BuildTargetList.append("%s :" %(Dst))
                         self.BuildTargetList.append('\t' + self._CP_TEMPLATE_[self._FileType] %{'Src': Src, 'Dst': Dst})
@@ -716,7 +716,7 @@ cleanlib:
             if DepsFileString == '':
                 continue
             OutputFile = self.ReplaceMacro(OutputFile)
-            self.ResultFileList.append('%s' % OutputFile)
+            self.ResultFileList.append(OutputFile)
             DepsFileString = self.ReplaceMacro(DepsFileString)
             self.BuildTargetList.append('%s : %s' % (OutputFile, DepsFileString))
             CmdString = ' '.join(FfsCmdList).strip()

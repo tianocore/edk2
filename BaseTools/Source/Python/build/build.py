@@ -105,7 +105,7 @@ def CheckEnvVariable():
 
     WorkspaceDir = os.path.normcase(os.path.normpath(os.environ["WORKSPACE"]))
     if not os.path.exists(WorkspaceDir):
-        EdkLogger.error("build", FILE_NOT_FOUND, "WORKSPACE doesn't exist", ExtraData="%s" % WorkspaceDir)
+        EdkLogger.error("build", FILE_NOT_FOUND, "WORKSPACE doesn't exist", ExtraData=WorkspaceDir)
     elif ' ' in WorkspaceDir:
         EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in WORKSPACE path",
                         ExtraData=WorkspaceDir)
@@ -117,7 +117,7 @@ def CheckEnvVariable():
     if mws.PACKAGES_PATH:
         for Path in mws.PACKAGES_PATH:
             if not os.path.exists(Path):
-                EdkLogger.error("build", FILE_NOT_FOUND, "One Path in PACKAGES_PATH doesn't exist", ExtraData="%s" % Path)
+                EdkLogger.error("build", FILE_NOT_FOUND, "One Path in PACKAGES_PATH doesn't exist", ExtraData=Path)
             elif ' ' in Path:
                 EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in PACKAGES_PATH", ExtraData=Path)
 
@@ -1543,7 +1543,7 @@ class Build():
                         GuidString = MatchGuid.group()
                         if GuidString.upper() in ModuleList:
                             Line = Line.replace(GuidString, ModuleList[GuidString.upper()].Name)
-                    MapBuffer.write('%s' % (Line))
+                    MapBuffer.write(Line)
                     #
                     # Add the debug image full path.
                     #
