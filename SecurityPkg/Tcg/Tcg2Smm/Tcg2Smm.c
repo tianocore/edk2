@@ -310,15 +310,17 @@ UpdatePPVersion (
   @param[in, out] Table            The TPM item in ACPI table.
   @param[in]      IrqBuffer        Input new IRQ buffer.
   @param[in]      IrqBuffserSize   Input new IRQ buffer size.
+  @param[out]     IsShortFormPkgLength   If _PRS returns Short length Package(ACPI spec 20.2.4).
 
   @return                          patch status.
 
 **/
 EFI_STATUS
 UpdatePossibleResource (
-  EFI_ACPI_DESCRIPTION_HEADER    *Table,
-  UINT32                         *IrqBuffer,
-  UINT32                         IrqBuffserSize
+  IN  EFI_ACPI_DESCRIPTION_HEADER    *Table,
+  IN  UINT32                         *IrqBuffer,
+  IN  UINT32                         IrqBuffserSize,
+  OUT BOOLEAN                        *IsShortFormPkgLength
   )
 {
   UINT8       *DataPtr;
@@ -431,7 +433,7 @@ UpdatePossibleResource (
       //
       // Notify _PRS to report short formed ResourceTemplate
       //
-      mTcgNvs->IsShortFormPkgLength = TRUE;
+      *IsShortFormPkgLength = TRUE;
 
       break;
     }
@@ -503,7 +505,7 @@ UpdatePossibleResource (
         //
         // Notify _PRS to report long formed ResourceTemplate
         //
-        mTcgNvs->IsShortFormPkgLength = FALSE;
+        *IsShortFormPkgLength = FALSE;
         break;
       }
     }
@@ -672,6 +674,9 @@ PublishAcpiTable (
   UINTN                          TableSize;
   UINT32                         *PossibleIrqNumBuf;
   UINT32                         PossibleIrqNumBufSize;
+  BOOLEAN                        IsShortFormPkgLength;
+
+  IsShortFormPkgLength = FALSE;
 
   Status = GetSectionFromFv (
              &gEfiCallerIdGuid,
@@ -710,7 +715,7 @@ PublishAcpiTable (
     PossibleIrqNumBufSize = (UINT32)PcdGetSize(PcdTpm2PossibleIrqNumBuf);
 
     if (PossibleIrqNumBufSize <= MAX_PRS_INT_BUF_SIZE && (PossibleIrqNumBufSize % sizeof(UINT32)) == 0) {
-      Status = UpdatePossibleResource(Table, PossibleIrqNumBuf, PossibleIrqNumBufSize);
+      Status = UpdatePossibleResource(Table, PossibleIrqNumBuf, PossibleIrqNumBufSize, &IsShortFormPkgLength);
       DEBUG ((
         DEBUG_INFO,
         "UpdatePossibleResource status - %x. TPM2 service may not ready in OS.\n",
@@ -743,7 +748,7 @@ PublishAcpiTable (
   mTcgNvs = AssignOpRegion (Table, SIGNATURE_32 ('T', 'N', 'V', 'S'), (UINT16) sizeof (TCG_NVS));
   ASSERT (mTcgNvs != NULL);
   mTcgNvs->TpmIrqNum            = PcdGet32(PcdTpm2CurrentIrqNum);
-  mTcgNvs->IsShortFormPkgLength = FALSE;
+  mTcgNvs->IsShortFormPkgLength = IsShortFormPkgLength;
 
   //
   // Publish the TPM ACPI table. Table is re-checksumed.
