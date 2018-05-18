@@ -865,6 +865,7 @@ LookupUnicodeString2 (
 **/
 EFI_STATUS
 EFIAPI
+AddUnicodeString (
   IN     CONST CHAR8               *Language,
   IN     CONST CHAR8               *SupportedLanguages,
   IN OUT EFI_UNICODE_STRING_TABLE  **UnicodeStringTable,
