@@ -16,6 +16,7 @@
 #include <Guid/XenInfo.h>
 #include <Guid/RootBridgesConnectedEventGroup.h>
 #include <Protocol/FirmwareVolume2.h>
+#include <Library/Tcg2PhysicalPresenceLib.h>
 
 
 //
@@ -1514,6 +1515,11 @@ PlatformBootManagerAfterConsole (
   // Set PCI Interrupt Line registers and ACPI SCI_EN
   //
   PciAcpiInitialization ();
+
+  //
+  // Process TPM PPI request
+  //
+  Tcg2PhysicalPresenceLibProcessRequest (NULL);
 
   //
   // Process QEMU's -kernel command line option
