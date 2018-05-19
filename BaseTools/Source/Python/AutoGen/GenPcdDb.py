@@ -12,7 +12,7 @@
 #
 from StringIO import StringIO
 from Common.Misc import *
-from Common.String import StringToArray
+from Common.StringUtils import StringToArray
 from struct import pack
 from ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER
 from ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB

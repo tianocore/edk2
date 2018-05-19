@@ -17,7 +17,7 @@
 import Common.LongFilePathOs as os
 import Common.EdkLogger as EdkLogger
 from Common.DataType import *
-from Common.String import *
+from Common.StringUtils import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
 _ConfigFileToInternalTranslation = {

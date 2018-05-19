@@ -19,7 +19,7 @@ import Common.EdkLogger as EdkLogger
 from Common.DataType import *
 from CommonDataClass.DataClass import *
 from Common.Identification import *
-from Common.String import *
+from Common.StringUtils import *
 from Parser import *
 import Database
 

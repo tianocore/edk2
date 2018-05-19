@@ -33,7 +33,7 @@ from Common.LongFilePathSupport import CopyLongFilePath
 from Common.BuildToolError import *
 from Common.DataType import *
 from Common.Misc import *
-from Common.String import *
+from Common.StringUtils import *
 import Common.GlobalData as GlobalData
 from GenFds.FdfParser import *
 from CommonDataClass.CommonClass import SkuInfoClass

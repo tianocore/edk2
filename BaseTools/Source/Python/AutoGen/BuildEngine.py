@@ -23,7 +23,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.GlobalData import *
 from Common.BuildToolError import *
 from Common.Misc import tdict, PathClass
-from Common.String import NormPath
+from Common.StringUtils import NormPath
 from Common.DataType import *
 
 import Common.EdkLogger as EdkLogger

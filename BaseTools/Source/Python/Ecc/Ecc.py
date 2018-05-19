@@ -24,7 +24,7 @@ from Configuration import Configuration
 from Check import Check
 import Common.GlobalData as GlobalData
 
-from Common.String import NormPath
+from Common.StringUtils import NormPath
 from Common.BuildVersion import gBUILD_VERSION
 from Common import BuildToolError
 from Common.Misc import PathClass

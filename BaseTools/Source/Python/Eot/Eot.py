@@ -18,7 +18,7 @@ import Common.LongFilePathOs as os, time, glob
 import Common.EdkLogger as EdkLogger
 import EotGlobalData
 from optparse import OptionParser
-from Common.String import NormPath
+from Common.StringUtils import NormPath
 from Common import BuildToolError
 from Common.Misc import GuidStructureStringToGuidString, sdict
 from InfParserLite import *

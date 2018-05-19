@@ -22,7 +22,7 @@ from BuildToolError import *
 from TargetTxtClassObject import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.Misc import PathClass
-from Common.String import NormPath
+from Common.StringUtils import NormPath
 import Common.GlobalData as GlobalData
 from Common import GlobalData
 from Common.MultipleWorkspace import MultipleWorkspace as mws

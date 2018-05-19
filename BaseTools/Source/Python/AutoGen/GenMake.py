@@ -22,7 +22,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 from Common.BuildToolError import *
 from Common.Misc import *
-from Common.String import *
+from Common.StringUtils import *
 from BuildEngine import *
 import Common.GlobalData as GlobalData
 from collections import OrderedDict

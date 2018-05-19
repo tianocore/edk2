@@ -29,7 +29,7 @@ import RuleSimpleFile
 import RuleComplexFile
 from CommonDataClass.FdfClass import FfsInfStatementClassObject
 from Common.MultipleWorkspace import MultipleWorkspace as mws
-from Common.String import *
+from Common.StringUtils import *
 from Common.Misc import PathClass
 from Common.Misc import GuidStructureByteArrayToGuidString
 from Common.Misc import ProcessDuplicatedInf

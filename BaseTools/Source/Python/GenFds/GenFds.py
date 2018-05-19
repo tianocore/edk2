@@ -32,7 +32,7 @@ import Common.ToolDefClassObject as ToolDefClassObject
 from Common.DataType import *
 import Common.GlobalData as GlobalData
 from Common import EdkLogger
-from Common.String import *
+from Common.StringUtils import *
 from Common.Misc import DirCache, PathClass
 from Common.Misc import SaveFileOnChange
 from Common.Misc import ClearDuplicatedInf

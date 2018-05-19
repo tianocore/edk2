@@ -14,7 +14,7 @@
 ##
 # Import Modules
 #
-from String import *
+from StringUtils import *
 from CommonDataClass.DataClass import *
 from DataType import *
 

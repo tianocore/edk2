@@ -42,7 +42,7 @@ from Common.MultipleWorkspace import MultipleWorkspace as mws
 import Common.GlobalData as GlobalData
 from AutoGen.AutoGen import ModuleAutoGen
 from Common.Misc import PathClass
-from Common.String import NormPath
+from Common.StringUtils import NormPath
 from Common.DataType import *
 import collections
 from Common.Expression import *

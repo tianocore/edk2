@@ -17,7 +17,7 @@
 import Common.EdkLogger as EdkLogger
 import Common.LongFilePathOs as os, time
 from Table import Table
-from Common.String import ConvertToSqlString2
+from Common.StringUtils import ConvertToSqlString2
 import EccToolError as EccToolError
 import EccGlobalData as EccGlobalData
 from Common.LongFilePathSupport import OpenLongFilePath as open

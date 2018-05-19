@@ -11,7 +11,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-from Common.String import *
+from Common.StringUtils import *
 from Common.DataType import *
 from Common.Misc import *
 from types import *

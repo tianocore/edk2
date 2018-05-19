@@ -26,7 +26,7 @@ import EccToolError
 
 from CommonDataClass.DataClass import *
 from Common.DataType import *
-from Common.String import *
+from Common.StringUtils import *
 from Common.Misc import GuidStructureStringToGuidString, CheckPcdDatum, PathClass, AnalyzePcdData
 from Common.Expression import *
 from CommonDataClass.Exceptions import *

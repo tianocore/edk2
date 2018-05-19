@@ -22,7 +22,7 @@ import OptionRom
 import Common.GlobalData as GlobalData
 
 from Common.DataType import *
-from Common.String import *
+from Common.StringUtils import *
 from FfsInfStatement import FfsInfStatement
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 
