@@ -1,7 +1,7 @@
 /** @file
   FAT recovery PEIM entry point, Ppi Functions and FAT Api functions.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -483,6 +483,10 @@ GetRecoveryCapsuleInfo (
 
           case MSG_USB_DP:
             CopyGuid (CapsuleType, &gRecoveryOnFatUsbDiskGuid);
+            break;
+
+          case MSG_NVME_NAMESPACE_DP:
+            CopyGuid (CapsuleType, &gRecoveryOnFatNvmeDiskGuid);
             break;
 
           default:
