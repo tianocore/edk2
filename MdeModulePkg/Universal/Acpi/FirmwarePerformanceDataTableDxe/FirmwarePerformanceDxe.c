@@ -32,6 +32,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DxeServicesLib.h>
 #include <Library/TimerLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -180,46 +181,6 @@ FpdtAcpiTableChecksum (
 }
 
 /**
-  Allocate EfiReservedMemoryType below 4G memory address.
-
-  This function allocates EfiReservedMemoryType below 4G memory address.
-
-  @param[in]  Size   Size of memory to allocate.
-
-  @return Allocated address for output.
-
-**/
-VOID *
-FpdtAllocateReservedMemoryBelow4G (
-  IN UINTN       Size
-  )
-{
-  UINTN                 Pages;
-  EFI_PHYSICAL_ADDRESS  Address;
-  EFI_STATUS            Status;
-  VOID                  *Buffer;
-
-  Buffer  = NULL;
-  Pages   = EFI_SIZE_TO_PAGES (Size);
-  Address = 0xffffffff;
-
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  Pages,
-                  &Address
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  if (!EFI_ERROR (Status)) {
-    Buffer = (VOID *) (UINTN) Address;
-    ZeroMem (Buffer, Size);
-  }
-
-  return Buffer;
-}
-
-/**
   Callback function upon VariableArchProtocol and LockBoxProtocol
   to allocate S3 performance table memory and save the pointer to LockBox.
 
@@ -287,7 +248,10 @@ FpdtAllocateS3PerformanceTableMemory (
         //
         // Fail to allocate at specified address, continue to allocate at any address.
         //
-        mAcpiS3PerformanceTable = (S3_PERFORMANCE_TABLE *) FpdtAllocateReservedMemoryBelow4G (sizeof (S3_PERFORMANCE_TABLE));
+        mAcpiS3PerformanceTable = (S3_PERFORMANCE_TABLE *) AllocatePeiAccessiblePages (
+                                                             EfiReservedMemoryType,
+                                                             EFI_SIZE_TO_PAGES (sizeof (S3_PERFORMANCE_TABLE))
+                                                             );
       }
       DEBUG ((EFI_D_INFO, "FPDT: ACPI S3 Performance Table address = 0x%x\n", mAcpiS3PerformanceTable));
       if (mAcpiS3PerformanceTable != NULL) {
@@ -368,7 +332,10 @@ InstallFirmwarePerformanceDataTable (
       //
       // Fail to allocate at specified address, continue to allocate at any address.
       //
-      mAcpiBootPerformanceTable = (BOOT_PERFORMANCE_TABLE *) FpdtAllocateReservedMemoryBelow4G (BootPerformanceDataSize);
+      mAcpiBootPerformanceTable = (BOOT_PERFORMANCE_TABLE *) AllocatePeiAccessiblePages (
+                                                               EfiReservedMemoryType,
+                                                               EFI_SIZE_TO_PAGES (BootPerformanceDataSize)
+                                                               );
     }
     DEBUG ((DEBUG_INFO, "FPDT: ACPI Boot Performance Table address = 0x%x\n", mAcpiBootPerformanceTable));
     if (mAcpiBootPerformanceTable == NULL) {
