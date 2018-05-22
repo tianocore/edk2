@@ -981,7 +981,7 @@ OpalUtilGetActiveDataRemovalMechanism (
 /**
   Calculate the estimated time.
 
-  @param[in]      IsMinite               Whether the input time value is minute type or second type.
+  @param[in]      IsMinute               Whether the input time value is minute type or second type.
   @param[in]      Time                   The input time value.
 
 **/
