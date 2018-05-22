@@ -166,46 +166,6 @@ IsKnownID (
 }
 
 /**
-  Allocate EfiReservedMemoryType below 4G memory address.
-
-  This function allocates EfiReservedMemoryType below 4G memory address.
-
-  @param[in]  Size   Size of memory to allocate.
-
-  @return Allocated address for output.
-
-**/
-VOID *
-FpdtAllocateReservedMemoryBelow4G (
-  IN UINTN       Size
-  )
-{
-  UINTN                 Pages;
-  EFI_PHYSICAL_ADDRESS  Address;
-  EFI_STATUS            Status;
-  VOID                  *Buffer;
-
-  Buffer  = NULL;
-  Pages   = EFI_SIZE_TO_PAGES (Size);
-  Address = 0xffffffff;
-
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  Pages,
-                  &Address
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  if (!EFI_ERROR (Status)) {
-    Buffer = (VOID *) (UINTN) Address;
-    ZeroMem (Buffer, Size);
-  }
-
-  return Buffer;
-}
-
-/**
   Allocate buffer for Boot Performance table.
 
   @return Status code.
@@ -348,7 +308,13 @@ AllocateBootPerformanceTable (
     //
     // Fail to allocate at specified address, continue to allocate at any address.
     //
-    mAcpiBootPerformanceTable = (BOOT_PERFORMANCE_TABLE *) FpdtAllocateReservedMemoryBelow4G (BootPerformanceDataSize);
+    mAcpiBootPerformanceTable = (BOOT_PERFORMANCE_TABLE *) AllocatePeiAccessiblePages (
+                                                             EfiReservedMemoryType,
+                                                             EFI_SIZE_TO_PAGES (BootPerformanceDataSize)
+                                                             );
+    if (mAcpiBootPerformanceTable != NULL) {
+      ZeroMem (mAcpiBootPerformanceTable, BootPerformanceDataSize);
+    }
   }
   DEBUG ((DEBUG_INFO, "DxeCorePerformanceLib: ACPI Boot Performance Table address = 0x%x\n", mAcpiBootPerformanceTable));
 
