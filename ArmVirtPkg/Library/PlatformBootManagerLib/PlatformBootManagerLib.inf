@@ -53,6 +53,7 @@
   PrintLib
   QemuBootOrderLib
   QemuFwCfgLib
+  ReportStatusCodeLib
   UefiBootManagerLib
   UefiBootServicesTableLib
   UefiLib
