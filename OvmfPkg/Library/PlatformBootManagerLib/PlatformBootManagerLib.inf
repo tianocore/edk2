@@ -56,6 +56,7 @@
   QemuFwCfgS3Lib
   LoadLinuxLib
   QemuBootOrderLib
+  ReportStatusCodeLib
   UefiLib
   Tcg2PhysicalPresenceLib
 
