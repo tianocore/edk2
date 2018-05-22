@@ -2,7 +2,7 @@
   TCG defined values and structures.
 
   (TCG Storage Architecture Core Specification, Version 2.01, Revision 1.00,
-  @https://trustedcomputinggroup.org/tcg-storage-architecture-core-specification/)
+  https://trustedcomputinggroup.org/tcg-storage-architecture-core-specification/)
 
   Check http://trustedcomputinggroup.org for latest specification updates.
 
