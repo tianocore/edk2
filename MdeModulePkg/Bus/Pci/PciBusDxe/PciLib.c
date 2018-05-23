@@ -30,6 +30,43 @@ CHAR16 *mBarTypeStr[] = {
   };
 
 /**
+  Retrieve the max bus number that is assigned to the Root Bridge hierarchy.
+  It can support the case that there are multiple bus ranges.
+
+  @param  Bridge           Bridge device instance.
+
+  @retval                  The max bus number that is assigned to this Root Bridge hierarchy.
+
+**/
+UINT16
+PciGetMaxBusNumber (
+  IN PCI_IO_DEVICE                      *Bridge
+  )
+{
+  PCI_IO_DEVICE                      *RootBridge;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *BusNumberRanges;
+  UINT64                             MaxNumberInRange;
+
+  //
+  // Get PCI Root Bridge device
+  //
+  RootBridge = Bridge;
+  while (RootBridge->Parent != NULL) {
+    RootBridge = RootBridge->Parent;
+  }
+  MaxNumberInRange = 0;
+  //
+  // Iterate the bus number ranges to get max PCI bus number
+  //
+  BusNumberRanges = RootBridge->BusNumberRanges;
+  while (BusNumberRanges->Desc != ACPI_END_TAG_DESCRIPTOR) {
+    MaxNumberInRange = BusNumberRanges->AddrRangeMin + BusNumberRanges->AddrLen - 1;
+    BusNumberRanges++;
+  }
+  return (UINT16) MaxNumberInRange;
+}
+
+/**
   Retrieve the PCI Card device BAR information via PciIo interface.
 
   @param PciIoDevice        PCI Card device instance.
@@ -1193,7 +1230,7 @@ PciScanBus (
           // Temporarily initialize SubBusNumber to maximum bus number to ensure the
           // PCI configuration transaction to go through any PPB
           //
-          Register  = 0xFF;
+          Register  = PciGetMaxBusNumber (Bridge);
           Address   = EFI_PCI_ADDRESS (StartBusNumber, Device, Func, PCI_BRIDGE_SUBORDINATE_BUS_REGISTER_OFFSET);
           Status = PciRootBridgeIo->Pci.Write (
                                           PciRootBridgeIo,
