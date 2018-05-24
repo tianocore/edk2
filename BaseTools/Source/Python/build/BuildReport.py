@@ -1140,6 +1140,11 @@ class PcdReport(object):
                 for Array in ArrayList:
                     FileWrite(File, '%s' % (Array))
             else:
+                if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+                    if Value.startswith(('0x', '0X')):
+                        Value = '{} ({:d})'.format(Value, int(Value, 0))
+                    else:
+                        Value = "0x{:X} ({})".format(int(Value, 0), Value)
                 FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DSC DEFAULT', Value))
         if not InfMatch and InfDefaultValue is not None:
             Value = InfDefaultValue.strip()
@@ -1149,6 +1154,11 @@ class PcdReport(object):
                 for Array in ArrayList:
                     FileWrite(File, '%s' % (Array))
             else:
+                if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+                    if Value.startswith(('0x', '0X')):
+                        Value = '{} ({:d})'.format(Value, int(Value, 0))
+                    else:
+                        Value = "0x{:X} ({})".format(int(Value, 0), Value)
                 FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'INF DEFAULT', Value))
 
         if not DecMatch and DecDefaultValue is not None:
@@ -1159,6 +1169,11 @@ class PcdReport(object):
                 for Array in ArrayList:
                     FileWrite(File, '%s' % (Array))
             else:
+                if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+                    if Value.startswith(('0x', '0X')):
+                        Value = '{} ({:d})'.format(Value, int(Value, 0))
+                    else:
+                        Value = "0x{:X} ({})".format(int(Value, 0), Value)
                 FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DEC DEFAULT', Value))
             if IsStructure:
                 self.PrintStructureInfo(File, Pcd.DefaultValues)
@@ -1174,6 +1189,11 @@ class PcdReport(object):
                 for Array in ArrayList:
                     FileWrite(File, '%s' % (Array))
             else:
+                if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+                    if Value.startswith(('0x','0X')):
+                        Value = '{} ({:d})'.format(Value, int(Value, 0))
+                    else:
+                        Value = "0x{:X} ({})".format(int(Value, 0), Value)
                 FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', Value))
             if IsStructure:
                 OverrideValues = Pcd.SkuOverrideValues
@@ -1210,6 +1230,11 @@ class PcdReport(object):
                                     for Array in ArrayList:
                                         FileWrite(File, '%s' % (Array))
                                 else:
+                                    if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+                                        if Value.startswith(('0x', '0X')):
+                                            Value = '{} ({:d})'.format(Value, int(Value, 0))
+                                        else:
+                                            Value = "0x{:X} ({})".format(int(Value, 0), Value)
                                     if self.DefaultStoreSingle and self.SkuSingle:
                                         FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', Value))
                                     elif self.DefaultStoreSingle and not self.SkuSingle:
@@ -1231,6 +1256,11 @@ class PcdReport(object):
                                     for Array in ArrayList:
                                         FileWrite(File, '%s' % (Array))
                                 else:
+                                    if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+                                        if Value.startswith(('0x', '0X')):
+                                            Value = '{} ({:d})'.format(Value, int(Value, 0))
+                                        else:
+                                            Value = "0x{:X} ({})".format(int(Value, 0), Value)
                                     if self.DefaultStoreSingle and self.SkuSingle:
                                         FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')',  Value))
                                     elif self.DefaultStoreSingle and not self.SkuSingle:
@@ -1258,6 +1288,11 @@ class PcdReport(object):
                             for Array in ArrayList:
                                 FileWrite(File, '%s' % (Array))
                         else:
+                            if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+                                if Value.startswith(('0x', '0X')):
+                                    Value = '{} ({:d})'.format(Value, int(Value, 0))
+                                else:
+                                    Value = "0x{:X} ({})".format(int(Value, 0), Value)
                             if self.SkuSingle:
                                 FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', Value))
                             else:
@@ -1271,6 +1306,11 @@ class PcdReport(object):
                             for Array in ArrayList:
                                 FileWrite(File, '%s' % (Array))
                         else:
+                            if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+                                if Value.startswith(('0x', '0X')):
+                                    Value = '{} ({:d})'.format(Value, int(Value, 0))
+                                else:
+                                    Value = "0x{:X} ({})".format(int(Value, 0), Value)
                             if self.SkuSingle:
                                 FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, ' ' , TypeName, '(' + Pcd.DatumType + ')', Value))
                             else:
