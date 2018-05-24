@@ -3,6 +3,8 @@
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018, AMD Incorporated. All rights reserved.<BR>
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -30,10 +32,11 @@
 //
 // 16550 UART register offsets and bitfields
 //
-#define R_UART_RXBUF          0
-#define R_UART_TXBUF          0
-#define R_UART_BAUD_LOW       0
-#define R_UART_BAUD_HIGH      1
+#define R_UART_RXBUF          0   // LCR_DLAB = 0
+#define R_UART_TXBUF          0   // LCR_DLAB = 0
+#define R_UART_BAUD_LOW       0   // LCR_DLAB = 1
+#define R_UART_BAUD_HIGH      1   // LCR_DLAB = 1
+#define R_UART_IER            1   // LCR_DLAB = 0
 #define R_UART_FCR            2
 #define   B_UART_FCR_FIFOE    BIT0
 #define   B_UART_FCR_FIFO64   BIT5
@@ -552,6 +555,11 @@ SerialPortInitialize (
   //
   SerialPortWriteRegister (SerialRegisterBase, R_UART_FCR, 0x00);
   SerialPortWriteRegister (SerialRegisterBase, R_UART_FCR, (UINT8)(PcdGet8 (PcdSerialFifoControl) & (B_UART_FCR_FIFOE | B_UART_FCR_FIFO64)));
+
+  //
+  // Set FIFO Polled Mode by clearing IER after setting FCR
+  //
+  SerialPortWriteRegister (SerialRegisterBase, R_UART_IER, 0x00);
 
   //
   // Put Modem Control Register(MCR) into its reset state of 0x00.
