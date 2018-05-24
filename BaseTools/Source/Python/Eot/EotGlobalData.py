@@ -65,6 +65,9 @@ gGuidDict = dict()
 
 # Dict for PROTOCOL
 gProtocolList = {}
+# Dict for PPI
+gPpiList = {}
+
 
 # Dict for consumed PPI function calling
 gConsumedPpiLibrary = OrderedDict()
@@ -92,3 +95,17 @@ gConsumedProtocolLibrary['EfiHandleProtocol'] = 1
 # Dict for callback PROTOCOL function callling
 gCallbackProtocolLibrary = OrderedDict()
 gCallbackProtocolLibrary['EfiRegisterProtocolCallback'] = 2
+
+gArchProtocolGuids = {'665e3ff6-46cc-11d4-9a38-0090273fc14d',
+                      '26baccb1-6f42-11d4-bce7-0080c73c8881',
+                      '26baccb2-6f42-11d4-bce7-0080c73c8881',
+                      '1da97072-bddc-4b30-99f1-72a0b56fff2a',
+                      '27cfac87-46cc-11d4-9a38-0090273fc14d',
+                      '27cfac88-46cc-11d4-9a38-0090273fc14d',
+                      'b7dfb4e1-052f-449f-87be-9818fc91b733',
+                      'a46423e3-4617-49f1-b9ff-d1bfa9115839',
+                      'd2b2b828-0826-48a7-b3df-983c006024f0',
+                      '26baccb3-6f42-11d4-bce7-0080c73c8881',
+                      '1e5668e2-8481-11d4-bcf1-0080c73c8881',
+                      '6441f818-6362-4e44-b570-7dba31dd2453',
+                      '665e3ff5-46cc-11d4-9a38-0090273fc14d'}
