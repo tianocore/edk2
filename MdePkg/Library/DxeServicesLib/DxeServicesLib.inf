@@ -27,11 +27,17 @@
   LIBRARY_CLASS                  = DxeServicesLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER SMM_CORE UEFI_APPLICATION UEFI_DRIVER
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
 #
 
 [Sources]
   DxeServicesLib.c
+
+[Sources.IA32, Sources.IPF, Sources.EBC, Sources.ARM, Sources.AARCH64]
+  Allocate.c
+
+[Sources.X64]
+  X64/Allocate.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -43,6 +49,9 @@
   DevicePathLib
   UefiLib
   UefiBootServicesTableLib
+
+[LibraryClasses.X64]
+  HobLib
 
 [Guids]
   gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## UNDEFINED
