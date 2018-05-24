@@ -4,7 +4,7 @@
   primitives (Hash Serials, HMAC, RSA, Diffie-Hellman, etc) for UEFI security
   functionality enabling.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -2177,7 +2177,7 @@ X509GetSubjectName (
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
   @param[out]     CommonName       Buffer to contain the retrieved certificate common
-                                   name string. At most CommonNameSize bytes will be
+                                   name string (UTF8). At most CommonNameSize bytes will be
                                    written and the string will be null terminated. May be
                                    NULL in order to determine the size buffer needed.
   @param[in,out]  CommonNameSize   The size in bytes of the CommonName buffer on input,

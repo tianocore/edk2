@@ -1,7 +1,7 @@
 /** @file
   X.509 Certificate Handler Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -303,7 +303,7 @@ _Exit:
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
   @param[out]     CommonName       Buffer to contain the retrieved certificate common
-                                   name string. At most CommonNameSize bytes will be
+                                   name string (UTF8). At most CommonNameSize bytes will be
                                    written and the string will be null terminated. May be
                                    NULL in order to determine the size buffer needed.
   @param[in,out]  CommonNameSize   The size in bytes of the CommonName buffer on input,
@@ -332,13 +332,18 @@ X509GetCommonName (
   IN OUT  UINTN        *CommonNameSize
   )
 {
-  RETURN_STATUS  ReturnStatus;
-  BOOLEAN        Status;
-  X509           *X509Cert;
-  X509_NAME      *X509Name;
-  INTN           Length;
+  RETURN_STATUS    ReturnStatus;
+  BOOLEAN          Status;
+  X509             *X509Cert;
+  X509_NAME        *X509Name;
+  INT32            Index;
+  INTN             Length;
+  X509_NAME_ENTRY  *Entry;
+  ASN1_STRING      *EntryData;
+  UINT8            *UTF8Name;
 
   ReturnStatus = RETURN_INVALID_PARAMETER;
+  UTF8Name     = NULL;
 
   //
   // Check input parameters.
@@ -378,8 +383,8 @@ X509GetCommonName (
   //
   // Retrieve the CommonName information from X.509 Subject
   //
-  Length = (INTN) X509_NAME_get_text_by_NID (X509Name, NID_commonName, CommonName, (int)(*CommonNameSize));
-  if (Length < 0) {
+  Index = X509_NAME_get_index_by_NID (X509Name, NID_commonName, -1);
+  if (Index < 0) {
     //
     // No CommonName entry exists in X509_NAME object
     //
@@ -388,10 +393,35 @@ X509GetCommonName (
     goto _Exit;
   }
 
-  *CommonNameSize = (UINTN)(Length + 1);
+  Entry = X509_NAME_get_entry (X509Name, Index);
+  if (Entry == NULL) {
+    //
+    // Fail to retrieve name entry data
+    //
+    *CommonNameSize = 0;
+    ReturnStatus    = RETURN_NOT_FOUND;
+    goto _Exit;
+  }
+
+  EntryData = X509_NAME_ENTRY_get_data (Entry);
+
+  Length = ASN1_STRING_to_UTF8 (&UTF8Name, EntryData);
+  if (Length < 0) {
+    //
+    // Fail to convert the commonName string
+    //
+    *CommonNameSize = 0;
+    ReturnStatus    = RETURN_INVALID_PARAMETER;
+    goto _Exit;
+  }
+
   if (CommonName == NULL) {
+    *CommonNameSize = Length + 1;
     ReturnStatus = RETURN_BUFFER_TOO_SMALL;
   } else {
+    *CommonNameSize = MIN ((UINTN)Length, *CommonNameSize - 1) + 1;
+    CopyMem (CommonName, UTF8Name, *CommonNameSize - 1);
+    CommonName[*CommonNameSize - 1] = '\0';
     ReturnStatus = RETURN_SUCCESS;
   }
 
@@ -401,6 +431,9 @@ _Exit:
   //
   if (X509Cert != NULL) {
     X509_free (X509Cert);
+  }
+  if (UTF8Name != NULL) {
+    OPENSSL_free (UTF8Name);
   }
 
   return ReturnStatus;
