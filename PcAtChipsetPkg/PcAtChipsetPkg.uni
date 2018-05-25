@@ -4,7 +4,7 @@
 // This package is designed to public interfaces and implementation which follows
 // PcAt defacto standard.
 //
-// Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -165,3 +165,9 @@
 
 #string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterD_PROMPT  #language en-US "Initial value for Register_D in RTC."
 #string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdInitialValueRtcRegisterD_HELP    #language en-US "Specifies the initial value for Register_D in RTC."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcIndexRegister_PROMPT          #language en-US "RTC Index Register address"
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcIndexRegister_HELP            #language en-US "Specifies RTC Index Register address in I/O space."
+
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcTargetRegister_PROMPT         #language en-US "RTC Target Register address"
+#string STR_gPcAtChipsetPkgTokenSpaceGuid_PcdRtcTargetRegister_HELP           #language en-US "Specifies RTC Target Register address in I/O space."

@@ -1,7 +1,7 @@
 /** @file
   RTC Architectural Protocol GUID as defined in DxeCis 0.96.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -72,8 +72,8 @@ RtcRead (
   IN  UINT8 Address
   )
 {
-  IoWrite8 (PCAT_RTC_ADDRESS_REGISTER, (UINT8) (Address | (UINT8) (IoRead8 (PCAT_RTC_ADDRESS_REGISTER) & 0x80)));
-  return IoRead8 (PCAT_RTC_DATA_REGISTER);
+  IoWrite8 (PcdGet8 (PcdRtcIndexRegister), (UINT8) (Address | (UINT8) (IoRead8 (PcdGet8 (PcdRtcIndexRegister)) & 0x80)));
+  return IoRead8 (PcdGet8 (PcdRtcTargetRegister));
 }
 
 /**
@@ -90,8 +90,8 @@ RtcWrite (
   IN  UINT8   Data
   )
 {
-  IoWrite8 (PCAT_RTC_ADDRESS_REGISTER, (UINT8) (Address | (UINT8) (IoRead8 (PCAT_RTC_ADDRESS_REGISTER) & 0x80)));
-  IoWrite8 (PCAT_RTC_DATA_REGISTER, Data);
+  IoWrite8 (PcdGet8 (PcdRtcIndexRegister), (UINT8) (Address | (UINT8) (IoRead8 (PcdGet8 (PcdRtcIndexRegister)) & 0x80)));
+  IoWrite8 (PcdGet8 (PcdRtcTargetRegister), Data);
 }
 
 /**

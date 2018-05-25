@@ -4,7 +4,7 @@
 # This package is designed to public interfaces and implementation which follows
 # PcAt defacto standard.
 #
-# Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials
@@ -193,6 +193,14 @@
   ## Specifies the initial value for Register_D in RTC.
   # @Prompt Initial value for Register_D in RTC.
   gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterD|0x00|UINT8|0x0000001D
+
+  ## Specifies RTC Index Register address in I/O space.
+  # @Prompt RTC Index Register address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister|0x70|UINT8|0x0000001E
+
+  ## Specifies RTC Target Register address in I/O space.
+  # @Prompt RTC Target Register address
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister|0x71|UINT8|0x0000001F
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PcAtChipsetPkgExtra.uni

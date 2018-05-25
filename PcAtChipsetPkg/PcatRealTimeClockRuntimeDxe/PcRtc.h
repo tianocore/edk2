@@ -1,7 +1,7 @@
 /** @file
   Header file for real time clock driver.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -46,9 +46,6 @@ typedef struct {
 } PC_RTC_MODULE_GLOBALS;
 
 extern PC_RTC_MODULE_GLOBALS  mModuleGlobal;
-
-#define PCAT_RTC_ADDRESS_REGISTER 0x70
-#define PCAT_RTC_DATA_REGISTER    0x71
 
 //
 // Dallas DS12C887 Real Time Clock

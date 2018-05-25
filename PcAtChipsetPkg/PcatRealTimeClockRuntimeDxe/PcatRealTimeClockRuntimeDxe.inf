@@ -4,7 +4,7 @@
 # This driver provides GetTime, SetTime, GetWakeupTime, SetWakeupTime services to Runtime Service Table.
 # It will install a tagging protocol with gEfiRealTimeClockArchProtocolGuid.
 #
-# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials
@@ -77,6 +77,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout  ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear             ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdMaximalValidYear             ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcIndexRegister             ## CONSUMES
+  gPcAtChipsetPkgTokenSpaceGuid.PcdRtcTargetRegister            ## CONSUMES
 
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid
