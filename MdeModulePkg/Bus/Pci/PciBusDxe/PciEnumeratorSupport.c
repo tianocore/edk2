@@ -1,7 +1,7 @@
 /** @file
   PCI emumeration support functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1254,9 +1254,11 @@ DetermineDeviceAttribute (
     PciSetDeviceAttribute (PciIoDevice, OldCommand, OldBridgeControl, EFI_SET_ATTRIBUTES);
 
     //
-    // Enable other supported attributes but not defined in PCI_IO_PROTOCOL
-    //
-    PCI_ENABLE_COMMAND_REGISTER (PciIoDevice, EFI_PCI_COMMAND_MEMORY_WRITE_AND_INVALIDATE);
+    // Enable other PCI supported attributes but not defined in PCI_IO_PROTOCOL
+    // For PCI Express devices, Memory Write and Invalidate is hardwired to 0b so only enable it for PCI devices.
+    if (!PciIoDevice->IsPciExp) {
+      PCI_ENABLE_COMMAND_REGISTER (PciIoDevice, EFI_PCI_COMMAND_MEMORY_WRITE_AND_INVALIDATE);
+    }
   }
 
   FastB2BSupport = TRUE;
