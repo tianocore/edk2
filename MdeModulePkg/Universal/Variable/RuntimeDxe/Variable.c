@@ -16,7 +16,7 @@
   VariableServiceSetVariable() should also check authenticate data to avoid buffer overflow,
   integer overflow. It should also check attribute to avoid authentication bypass.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1533,8 +1533,8 @@ GetLangFromSupportedLangCodes (
   @param[in]  SupportedLanguages  A pointer to a Null-terminated ASCII string that
                                   contains a set of language codes in the format
                                   specified by Iso639Language.
-  @param[in]  Iso639Language      If TRUE, then all language codes are assumed to be
-                                  in ISO 639-2 format.  If FALSE, then all language
+  @param[in]  Iso639Language      If not zero, then all language codes are assumed to be
+                                  in ISO 639-2 format.  If zero, then all language
                                   codes are assumed to be in RFC 4646 language format
   @param[in]  ...                 A variable argument list that contains pointers to
                                   Null-terminated ASCII strings that contain one or more
@@ -1588,7 +1588,7 @@ VariableGetBestLanguage (
     //
     // If in RFC 4646 mode, then determine the length of the first RFC 4646 language code in Language
     //
-    if (!Iso639Language) {
+    if (Iso639Language == 0) {
       for (LanguageLength = 0; Language[LanguageLength] != 0 && Language[LanguageLength] != ';'; LanguageLength++);
     }
 
@@ -1603,7 +1603,7 @@ VariableGetBestLanguage (
         //
         // In RFC 4646 mode, then Loop through all language codes in SupportedLanguages
         //
-        if (!Iso639Language) {
+        if (Iso639Language == 0) {
           //
           // Skip ';' characters in Supported
           //
@@ -1625,13 +1625,13 @@ VariableGetBestLanguage (
         if (AsciiStrnCmp (Supported, Language, LanguageLength) == 0) {
           VA_END (Args);
 
-          Buffer = Iso639Language ? mVariableModuleGlobal->Lang : mVariableModuleGlobal->PlatformLang;
+          Buffer = (Iso639Language != 0) ? mVariableModuleGlobal->Lang : mVariableModuleGlobal->PlatformLang;
           Buffer[CompareLength] = '\0';
           return CopyMem (Buffer, Supported, CompareLength);
         }
       }
 
-      if (Iso639Language) {
+      if (Iso639Language != 0) {
         //
         // If ISO 639 mode, then each language can only be tested once
         //
