@@ -317,10 +317,10 @@ UpdatePPVersion (
 **/
 EFI_STATUS
 UpdatePossibleResource (
-  IN  EFI_ACPI_DESCRIPTION_HEADER    *Table,
-  IN  UINT32                         *IrqBuffer,
-  IN  UINT32                         IrqBuffserSize,
-  OUT BOOLEAN                        *IsShortFormPkgLength
+  IN OUT  EFI_ACPI_DESCRIPTION_HEADER    *Table,
+  IN      UINT32                         *IrqBuffer,
+  IN      UINT32                         IrqBuffserSize,
+  OUT     BOOLEAN                        *IsShortFormPkgLength
   )
 {
   UINT8       *DataPtr;
