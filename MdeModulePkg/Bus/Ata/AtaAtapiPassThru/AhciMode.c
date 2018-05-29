@@ -1,7 +1,7 @@
 /** @file
   The file for AHCI mode of ATA host controller.
 
-  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1826,6 +1826,7 @@ AhciIdentifyPacket (
   @param  PortMultiplier      The port multiplier port number.
   @param  Feature             The data to send Feature register.
   @param  FeatureSpecificData The specific data for SET FEATURE cmd.
+  @param  Timeout             The timeout value of SET FEATURE cmd, uses 100ns as a unit.
 
   @retval EFI_DEVICE_ERROR    The cmd abort with error occurs.
   @retval EFI_TIMEOUT         The operation is time out.
@@ -1841,7 +1842,8 @@ AhciDeviceSetFeature (
   IN UINT8                  Port,
   IN UINT8                  PortMultiplier,
   IN UINT16                 Feature,
-  IN UINT32                 FeatureSpecificData
+  IN UINT32                 FeatureSpecificData,
+  IN UINT64                 Timeout
   )
 {
   EFI_STATUS               Status;
@@ -1868,7 +1870,7 @@ AhciDeviceSetFeature (
              0,
              &AtaCommandBlock,
              &AtaStatusBlock,
-             ATA_ATAPI_TIMEOUT,
+             Timeout,
              NULL
              );
 
@@ -2216,6 +2218,104 @@ Error6:
   return Status;
 }
 
+
+/**
+  Spin-up disk if IDD was incomplete or PUIS feature is enabled
+
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The multiplier of port.
+  @param  IdentifyData        A pointer to data buffer which is used to contain IDENTIFY data.
+
+**/
+EFI_STATUS
+AhciSpinUpDisk (
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_AHCI_REGISTERS            *AhciRegisters,
+  IN UINT8                         Port,
+  IN UINT8                         PortMultiplier,
+  IN OUT EFI_IDENTIFY_DATA         *IdentifyData
+  )
+{
+  EFI_STATUS               Status;
+  EFI_ATA_COMMAND_BLOCK    AtaCommandBlock;
+  EFI_ATA_STATUS_BLOCK     AtaStatusBlock;
+  UINT8                    Buffer[512];
+
+  if (IdentifyData->AtaData.specific_config == ATA_SPINUP_CFG_REQUIRED_IDD_INCOMPLETE) {
+    //
+    // Use SET_FEATURE subcommand to spin up the device.
+    //
+    Status = AhciDeviceSetFeature (
+               PciIo, AhciRegisters, Port, PortMultiplier,
+               ATA_SUB_CMD_PUIS_SET_DEVICE_SPINUP, 0x00, ATA_SPINUP_TIMEOUT
+               );
+    DEBUG ((DEBUG_INFO, "CMD_PUIS_SET_DEVICE_SPINUP for device at port [%d] PortMultiplier [%d] - %r!\n",
+            Port, PortMultiplier, Status));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  } else {
+    ASSERT (IdentifyData->AtaData.specific_config == ATA_SPINUP_CFG_NOT_REQUIRED_IDD_INCOMPLETE);
+
+    //
+    // Use READ_SECTORS to spin up the device if SpinUp SET FEATURE subcommand is not supported
+    //
+    ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
+    ZeroMem (&AtaStatusBlock, sizeof (EFI_ATA_STATUS_BLOCK));
+    //
+    // Perform READ SECTORS PIO Data-In command to Read LBA 0
+    //
+    AtaCommandBlock.AtaCommand      = ATA_CMD_READ_SECTORS;
+    AtaCommandBlock.AtaSectorCount  = 0x1;
+
+    Status = AhciPioTransfer (
+               PciIo,
+               AhciRegisters,
+               Port,
+               PortMultiplier,
+               NULL,
+               0,
+               TRUE,
+               &AtaCommandBlock,
+               &AtaStatusBlock,
+               &Buffer,
+               sizeof (Buffer),
+               ATA_SPINUP_TIMEOUT,
+               NULL
+               );
+    DEBUG ((DEBUG_INFO, "Read LBA 0 for device at port [%d] PortMultiplier [%d] - %r!\n",
+            Port, PortMultiplier, Status));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  //
+  // Read the complete IDENTIFY DEVICE data.
+  //
+  ZeroMem (IdentifyData, sizeof (*IdentifyData));
+  Status = AhciIdentify (PciIo, AhciRegisters, Port, PortMultiplier, IdentifyData);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Read IDD failed for device at port [%d] PortMultiplier [%d] - %r!\n",
+            Port, PortMultiplier, Status));
+    return Status;
+  }
+
+  DEBUG ((DEBUG_INFO, "IDENTIFY DEVICE: [0] = %016x, [2] = %016x, [83] = %016x, [86] = %016x\n",
+          IdentifyData->AtaData.config, IdentifyData->AtaData.specific_config,
+          IdentifyData->AtaData.command_set_supported_83, IdentifyData->AtaData.command_set_feature_enb_86));
+  //
+  // Check if IDD is incomplete
+  //
+  if ((IdentifyData->AtaData.config & BIT2) != 0) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  return EFI_SUCCESS;
+}
+
 /**
   Initialize ATA host controller at AHCI mode.
 
@@ -2458,6 +2558,28 @@ AhciModeInitialization (
           continue;
         }
 
+        DEBUG ((
+          DEBUG_INFO, "IDENTIFY DEVICE: [0] = %016x, [2] = %016x, [83] = %016x, [86] = %016x\n",
+          Buffer.AtaData.config, Buffer.AtaData.specific_config,
+          Buffer.AtaData.command_set_supported_83, Buffer.AtaData.command_set_feature_enb_86
+          ));
+        if ((Buffer.AtaData.config & BIT2) != 0) {
+          //
+          // SpinUp disk if device reported incomplete IDENTIFY DEVICE.
+          //
+          Status = AhciSpinUpDisk (
+                     PciIo,
+                     AhciRegisters,
+                     Port,
+                     0,
+                     &Buffer
+                     );
+          if (EFI_ERROR (Status)) {
+            DEBUG ((DEBUG_ERROR, "Spin up standby device failed - %r\n", Status));
+            continue;
+          }
+        }
+
         DeviceType = EfiIdeHarddisk;
       } else {
         continue;
@@ -2523,7 +2645,7 @@ AhciModeInitialization (
         TransferMode.ModeNumber = (UINT8) SupportedModes->MultiWordDmaMode.Mode;
       }
 
-      Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, 0, 0x03, (UINT32)(*(UINT8 *)&TransferMode));
+      Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, 0, 0x03, (UINT32)(*(UINT8 *)&TransferMode), ATA_ATAPI_TIMEOUT);
       if (EFI_ERROR (Status)) {
         DEBUG ((EFI_D_ERROR, "Set transfer Mode Fail, Status = %r\n", Status));
         continue;
