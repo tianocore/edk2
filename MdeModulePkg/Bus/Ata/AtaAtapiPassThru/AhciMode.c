@@ -2218,6 +2218,213 @@ Error6:
   return Status;
 }
 
+/**
+  Read logs from SATA device.
+
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The multiplier of port.
+  @param  Buffer              The data buffer to store SATA logs.
+  @param  LogNumber           The address of the log.
+  @param  PageNumber          The page number of the log.
+
+  @retval EFI_INVALID_PARAMETER  PciIo, AhciRegisters or Buffer is NULL.
+  @retval others                 Return status of AhciPioTransfer().
+**/
+EFI_STATUS
+AhciReadLogExt (
+  IN EFI_PCI_IO_PROTOCOL       *PciIo,
+  IN EFI_AHCI_REGISTERS        *AhciRegisters,
+  IN UINT8                     Port,
+  IN UINT8                     PortMultiplier,
+  IN OUT UINT8                 *Buffer,
+  IN UINT8                     LogNumber,
+  IN UINT8                     PageNumber
+  )
+{
+  EFI_ATA_COMMAND_BLOCK        AtaCommandBlock;
+  EFI_ATA_STATUS_BLOCK         AtaStatusBlock;
+
+  if (PciIo == NULL || AhciRegisters == NULL || Buffer == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ///
+  /// Read log from device
+  ///
+  ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
+  ZeroMem (&AtaStatusBlock, sizeof (EFI_ATA_STATUS_BLOCK));
+  ZeroMem (Buffer, 512);
+
+  AtaCommandBlock.AtaCommand      = ATA_CMD_READ_LOG_EXT;
+  AtaCommandBlock.AtaSectorCount  = 1;
+  AtaCommandBlock.AtaSectorNumber = LogNumber;
+  AtaCommandBlock.AtaCylinderLow  = PageNumber;
+
+  return AhciPioTransfer (
+           PciIo,
+           AhciRegisters,
+           Port,
+           PortMultiplier,
+           NULL,
+           0,
+           TRUE,
+           &AtaCommandBlock,
+           &AtaStatusBlock,
+           Buffer,
+           512,
+           ATA_ATAPI_TIMEOUT,
+           NULL
+           );
+}
+
+/**
+  Enable DEVSLP of the disk if supported.
+
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The multiplier of port.
+  @param  IdentifyData        A pointer to data buffer which is used to contain IDENTIFY data.
+
+  @retval EFI_SUCCESS         The DEVSLP is enabled per policy successfully.
+  @retval EFI_UNSUPPORTED     The DEVSLP isn't supported by the controller/device and policy requires to enable it.
+**/
+EFI_STATUS
+AhciEnableDevSlp (
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_AHCI_REGISTERS            *AhciRegisters,
+  IN UINT8                         Port,
+  IN UINT8                         PortMultiplier,
+  IN EFI_IDENTIFY_DATA             *IdentifyData
+  )
+{
+  EFI_STATUS               Status;
+  UINT32                   Offset;
+  UINT32                   Capability2;
+  UINT8                    LogData[512];
+  DEVSLP_TIMING_VARIABLES  DevSlpTiming;
+  UINT32                   PortCmd;
+  UINT32                   PortDevSlp;
+
+  if (mAtaAtapiPolicy->DeviceSleepEnable != 1) {
+    return EFI_SUCCESS;
+  }
+
+  //
+  // Do not enable DevSlp if DevSlp is not supported.
+  //
+  Capability2 = AhciReadReg (PciIo, AHCI_CAPABILITY2_OFFSET);
+  DEBUG ((DEBUG_INFO, "AHCI CAPABILITY2 = %08x\n", Capability2));
+  if ((Capability2 & AHCI_CAP2_SDS) == 0) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Do not enable DevSlp if DevSlp is not present
+  // Do not enable DevSlp if Hot Plug or Mechanical Presence Switch is supported
+  //
+  Offset     = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH;
+  PortCmd    = AhciReadReg (PciIo, Offset + EFI_AHCI_PORT_CMD);
+  PortDevSlp = AhciReadReg (PciIo, Offset + AHCI_PORT_DEVSLP);
+  DEBUG ((DEBUG_INFO, "Port CMD/DEVSLP = %08x / %08x\n", PortCmd, PortDevSlp));
+  if (((PortDevSlp & AHCI_PORT_DEVSLP_DSP) == 0) ||
+      ((PortCmd & (EFI_AHCI_PORT_CMD_HPCP | EFI_AHCI_PORT_CMD_MPSP)) != 0)
+     ) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Do not enable DevSlp if the device doesn't support DevSlp
+  //
+  DEBUG ((DEBUG_INFO, "IDENTIFY DEVICE: [77] = %04x, [78] = %04x, [79] = %04x\n",
+          IdentifyData->AtaData.reserved_77,
+          IdentifyData->AtaData.serial_ata_features_supported, IdentifyData->AtaData.serial_ata_features_enabled));
+  if ((IdentifyData->AtaData.serial_ata_features_supported & BIT8) == 0) {
+    DEBUG ((DEBUG_INFO, "DevSlp feature is not supported for device at port [%d] PortMultiplier [%d]!\n",
+            Port, PortMultiplier));
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Enable DevSlp when it is not enabled.
+  //
+  if ((IdentifyData->AtaData.serial_ata_features_enabled & BIT8) != 0) {
+    Status = AhciDeviceSetFeature (
+      PciIo, AhciRegisters, Port, 0, ATA_SUB_CMD_ENABLE_SATA_FEATURE, 0x09, ATA_ATAPI_TIMEOUT
+    );
+    DEBUG ((DEBUG_INFO, "DevSlp set feature for device at port [%d] PortMultiplier [%d] - %r\n",
+            Port, PortMultiplier, Status));
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  Status = AhciReadLogExt(PciIo, AhciRegisters, Port, PortMultiplier, LogData, 0x30, 0x08);
+
+  //
+  // Clear PxCMD.ST and PxDEVSLP.ADSE before updating PxDEVSLP.DITO and PxDEVSLP.MDAT.
+  //
+  AhciWriteReg (PciIo, Offset + EFI_AHCI_PORT_CMD, PortCmd & ~EFI_AHCI_PORT_CMD_ST);
+  PortDevSlp &= ~AHCI_PORT_DEVSLP_ADSE;
+  AhciWriteReg (PciIo, Offset + AHCI_PORT_DEVSLP, PortDevSlp);
+
+  //
+  // Set PxDEVSLP.DETO and PxDEVSLP.MDAT to 0.
+  //
+  PortDevSlp &= ~AHCI_PORT_DEVSLP_DETO_MASK;
+  PortDevSlp &= ~AHCI_PORT_DEVSLP_MDAT_MASK;
+  AhciWriteReg (PciIo, Offset + AHCI_PORT_DEVSLP, PortDevSlp);
+  DEBUG ((DEBUG_INFO, "Read Log Ext at port [%d] PortMultiplier [%d] - %r\n", Port, PortMultiplier, Status));
+  if (EFI_ERROR (Status)) {
+    //
+    // Assume DEVSLP TIMING VARIABLES is not supported if the Identify Device Data log (30h, 8) fails
+    //
+    DevSlpTiming.Supported = 0;
+  } else {
+    CopyMem (&DevSlpTiming, &LogData[48], sizeof (DevSlpTiming));
+    DEBUG ((DEBUG_INFO, "DevSlpTiming: Supported(%d), Deto(%d), Madt(%d)\n",
+            DevSlpTiming.Supported, DevSlpTiming.Deto, DevSlpTiming.Madt));
+  }
+
+  //
+  // Use 20ms as default DETO when DEVSLP TIMING VARIABLES is not supported or the DETO is 0.
+  //
+  if ((DevSlpTiming.Supported == 0) || (DevSlpTiming.Deto == 0)) {
+    DevSlpTiming.Deto = 20;
+  }
+
+  //
+  // Use 10ms as default MADT when DEVSLP TIMING VARIABLES is not supported or the MADT is 0.
+  //
+  if ((DevSlpTiming.Supported == 0) || (DevSlpTiming.Madt == 0)) {
+    DevSlpTiming.Madt = 10;
+  }
+
+  PortDevSlp |= DevSlpTiming.Deto << 2;
+  PortDevSlp |= DevSlpTiming.Madt << 10;
+  AhciOrReg (PciIo, Offset + AHCI_PORT_DEVSLP, PortDevSlp);
+
+  if (mAtaAtapiPolicy->AggressiveDeviceSleepEnable == 1) {
+    if ((Capability2 & AHCI_CAP2_SADM) != 0) {
+      PortDevSlp &= ~AHCI_PORT_DEVSLP_DITO_MASK;
+      PortDevSlp |= (625 << 15);
+      AhciWriteReg (PciIo, Offset + AHCI_PORT_DEVSLP, PortDevSlp);
+
+      PortDevSlp |= AHCI_PORT_DEVSLP_ADSE;
+      AhciWriteReg (PciIo, Offset + AHCI_PORT_DEVSLP, PortDevSlp);
+    }
+  }
+
+
+  AhciWriteReg (PciIo, Offset + EFI_AHCI_PORT_CMD, PortCmd);
+
+  DEBUG ((DEBUG_INFO, "Enabled DevSlp feature at port [%d] PortMultiplier [%d], Port CMD/DEVSLP = %08x / %08x\n",
+          Port, PortMultiplier, PortCmd, PortDevSlp));
+
+  return EFI_SUCCESS;
+}
 
 /**
   Spin-up disk if IDD was incomplete or PUIS feature is enabled
@@ -2689,6 +2896,13 @@ AhciModeInitialization (
       CreateNewDeviceInfo (Instance, Port, 0xFFFF, DeviceType, &Buffer);
       if (DeviceType == EfiIdeHarddisk) {
         REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_PC_ENABLE));
+        AhciEnableDevSlp (
+          PciIo,
+          AhciRegisters,
+          Port,
+          0,
+          &Buffer
+          );
       }
 
       //

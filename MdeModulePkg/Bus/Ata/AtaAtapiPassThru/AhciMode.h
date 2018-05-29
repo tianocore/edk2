@@ -1,7 +1,7 @@
 /** @file
   Header file for AHCI mode of ATA host controller.
   
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials                          
   are licensed and made available under the terms and conditions of the BSD License         
   which accompanies this distribution.  The full text of the license may be found at        
@@ -28,6 +28,10 @@
 #define EFI_AHCI_PI_OFFSET                     0x000C
 
 #define EFI_AHCI_MAX_PORTS                     32
+
+#define AHCI_CAPABILITY2_OFFSET                0x0024
+#define   AHCI_CAP2_SDS                        BIT3
+#define   AHCI_CAP2_SADM                       BIT4
 
 typedef struct {
   UINT32  Lower32;
@@ -182,7 +186,13 @@ typedef union {
 #define EFI_AHCI_PORT_SACT                     0x0034
 #define EFI_AHCI_PORT_CI                       0x0038
 #define EFI_AHCI_PORT_SNTF                     0x003C
-
+#define AHCI_PORT_DEVSLP                       0x0044
+#define   AHCI_PORT_DEVSLP_ADSE                BIT0
+#define   AHCI_PORT_DEVSLP_DSP                 BIT1
+#define   AHCI_PORT_DEVSLP_DETO_MASK           0x000003FC
+#define   AHCI_PORT_DEVSLP_MDAT_MASK           0x00007C00
+#define   AHCI_PORT_DEVSLP_DITO_MASK           0x01FF8000
+#define   AHCI_PORT_DEVSLP_DM_MASK             0x1E000000
 
 #pragma pack(1)
 //
@@ -282,6 +292,15 @@ typedef struct {
   UINT8    AhciUnknownFis[0x40];          // Unkonwn Fis: offset 0x60
   UINT8    AhciUnknownFisRsvd[0x60];      
 } EFI_AHCI_RECEIVED_FIS; 
+
+typedef struct {
+  UINT8  Madt : 5;
+  UINT8  Reserved_5 : 3;
+  UINT8  Deto;
+  UINT16 Reserved_16;
+  UINT32 Reserved_32 : 31;
+  UINT32 Supported : 1;
+} DEVSLP_TIMING_VARIABLES;
 
 #pragma pack()
 
