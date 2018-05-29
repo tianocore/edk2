@@ -613,8 +613,8 @@ PciCapListInit (
       }
 
       Status = InsertPciCap (OutCapList, CapHdrOffsets, PciCapExtended,
-                 ExtendedCapHdr.CapabilityId, ExtendedCapHdrOffset,
-                 ExtendedCapHdr.CapabilityVersion);
+                 (UINT16)ExtendedCapHdr.CapabilityId, ExtendedCapHdrOffset,
+                 (UINT8)ExtendedCapHdr.CapabilityVersion);
       if (RETURN_ERROR (Status)) {
         goto FreeCapHdrOffsets;
       }
