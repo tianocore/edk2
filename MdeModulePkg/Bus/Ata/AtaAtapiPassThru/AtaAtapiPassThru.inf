@@ -4,7 +4,7 @@
 #  This driver installs AtaPassThru and ExtScsiPassThru protocol in each ide/sata controller
 #  to access to all attached Ata/Atapi devices.
 #
-#  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -67,6 +67,7 @@
   gEfiIdeControllerInitProtocolGuid             ## TO_START
   gEfiDevicePathProtocolGuid                    ## TO_START
   gEfiPciIoProtocolGuid                         ## TO_START
+  gEdkiiAtaAtapiPolicyProtocolGuid              ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAtaSmartEnable   ## SOMETIMES_CONSUMES

@@ -24,6 +24,7 @@
 #include <Protocol/IdeControllerInit.h>
 #include <Protocol/AtaPassThru.h>
 #include <Protocol/ScsiPassThruExt.h>
+#include <Protocol/AtaAtapiPolicy.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
@@ -44,6 +45,8 @@
 extern EFI_DRIVER_BINDING_PROTOCOL  gAtaAtapiPassThruDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL  gAtaAtapiPassThruComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL gAtaAtapiPassThruComponentName2;
+
+extern EDKII_ATA_ATAPI_POLICY_PROTOCOL *mAtaAtapiPolicy;
 
 #define ATA_ATAPI_PASS_THRU_SIGNATURE  SIGNATURE_32 ('a', 'a', 'p', 't')
 #define ATA_ATAPI_DEVICE_SIGNATURE     SIGNATURE_32 ('a', 'd', 'e', 'v')

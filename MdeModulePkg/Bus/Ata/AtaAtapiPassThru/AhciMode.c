@@ -2317,6 +2317,38 @@ AhciSpinUpDisk (
 }
 
 /**
+  Enable/disable/skip PUIS of the disk according to policy.
+
+  @param  PciIo               The PCI IO protocol instance.
+  @param  AhciRegisters       The pointer to the EFI_AHCI_REGISTERS.
+  @param  Port                The number of port.
+  @param  PortMultiplier      The multiplier of port.
+
+**/
+EFI_STATUS
+AhciPuisEnable (
+  IN EFI_PCI_IO_PROTOCOL           *PciIo,
+  IN EFI_AHCI_REGISTERS            *AhciRegisters,
+  IN UINT8                         Port,
+  IN UINT8                         PortMultiplier
+  )
+{
+  EFI_STATUS                       Status;
+
+  Status = EFI_SUCCESS;
+  if (mAtaAtapiPolicy->PuisEnable == 0) {
+    Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, PortMultiplier, ATA_SUB_CMD_DISABLE_PUIS, 0x00, ATA_ATAPI_TIMEOUT);
+  } else if (mAtaAtapiPolicy->PuisEnable == 1) {
+    Status = AhciDeviceSetFeature (PciIo, AhciRegisters, Port, PortMultiplier, ATA_SUB_CMD_ENABLE_PUIS, 0x00, ATA_ATAPI_TIMEOUT);
+  }
+  DEBUG ((DEBUG_INFO, "%a PUIS feature at port [%d] PortMultiplier [%d] - %r!\n",
+    (mAtaAtapiPolicy->PuisEnable == 0) ? "Disable" : (
+    (mAtaAtapiPolicy->PuisEnable == 1) ? "Enable" : "Skip"
+      ), Port, PortMultiplier, Status));
+  return Status;
+}
+
+/**
   Initialize ATA host controller at AHCI mode.
 
   The function is designed to initialize ATA host controller.
@@ -2657,6 +2689,22 @@ AhciModeInitialization (
       CreateNewDeviceInfo (Instance, Port, 0xFFFF, DeviceType, &Buffer);
       if (DeviceType == EfiIdeHarddisk) {
         REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_PERIPHERAL_FIXED_MEDIA | EFI_P_PC_ENABLE));
+      }
+
+      //
+      // Enable/disable PUIS according to policy setting if PUIS is capable (Word[83].BIT5 is set).
+      //
+      if ((Buffer.AtaData.command_set_supported_83 & BIT5) != 0) {
+        Status = AhciPuisEnable (
+                   PciIo,
+                   AhciRegisters,
+                   Port,
+                   0
+                   );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_ERROR, "PUIS enable/disable failed, Status = %r\n", Status));
+          continue;
+        }
       }
     }
   }
