@@ -701,6 +701,11 @@
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugLoadImageMethod|2
 !endif
 
+  #
+  # Set SMM stack size to 16 KB.
+  #
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x4000
+
 [PcdsFixedAtBuild.IA32]
 !if $(TARGET) == RELEASE
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0
