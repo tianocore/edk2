@@ -123,7 +123,6 @@ SET gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize = $(FLASH_REGION_VL
 $(FLASH_REGION_VLVMICROCODE_OFFSET)|$(FLASH_REGION_VLVMICROCODE_SIZE)
 gPlatformModuleTokenSpaceGuid.PcdFlashMicroCodeAddress|gPlatformModuleTokenSpaceGuid.PcdFlashMicroCodeSize
 FV = MICROCODE_FV
-
 $(FLASH_REGION_VPD_OFFSET)|$(FLASH_REGION_VPD_SIZE)
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 FILE = $(WORKSPACE)/Vlv2TbltDevicePkg/Stitch/Gcc/NvStorageVariable.bin
@@ -369,11 +368,6 @@ INF RuleOverride = BINARY $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET
 !endif
 
 INF MdeModulePkg/Universal/PCD/Pei/Pcd.inf
-
-!if $(CAPSULE_ENABLE) || $(RECOVERY_ENABLE)
-  # FMP image decriptor
-INF RuleOverride = FMP_IMAGE_DESC Vlv2TbltDevicePkg/Feature/Capsule/SystemFirmwareDescriptor/SystemFirmwareDescriptor.inf
-!endif
 
 [FV.FVMAIN]
 BlockSize          = $(FLASH_BLOCK_SIZE)
@@ -732,27 +726,31 @@ FILE FREEFORM = 878AC2CC-5343-46F2-B563-51F89DAF56BA {
   !endif
 !endif
 
-!if $(CAPSULE_ENABLE) || $(MICOCODE_CAPSULE_ENABLE)
-INF  MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
-!endif
 !if $(CAPSULE_ENABLE)
-INF  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareReportDxe.inf
+INF  MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
+
+#
+# Minnow Max System Firmware FMP
+#
+INF  FILE_GUID = $(FMP_MINNOW_MAX_SYSTEM) FmpDevicePkg/FmpDxe/FmpDxe.inf
+
+#
+# Sample Device FMP
+#
+INF  FILE_GUID = $(FMP_GREEN_SAMPLE_DEVICE) FmpDevicePkg/FmpDxe/FmpDxe.inf
+INF  FILE_GUID = $(FMP_BLUE_SAMPLE_DEVICE)  FmpDevicePkg/FmpDxe/FmpDxe.inf
+INF  FILE_GUID = $(FMP_RED_SAMPLE_DEVICE)   FmpDevicePkg/FmpDxe/FmpDxe.inf
+
 !endif
+
 !if $(MICOCODE_CAPSULE_ENABLE)
-INF  UefiCpuPkg/Feature/Capsule/MicrocodeUpdateDxe/MicrocodeUpdateDxe.inf
+INF  IntelSiliconPkg/Feature/Capsule/MicrocodeUpdateDxe/MicrocodeUpdateDxe.inf
 !endif
 
 !if $(RECOVERY_ENABLE)
 FILE FREEFORM = PCD(gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiRsa2048Sha256TestPublicKeyFileGuid) {
      SECTION RAW = BaseTools/Source/Python/Rsa2048Sha256Sign/TestSigningPublicKey.bin
      SECTION UI = "Rsa2048Sha256TestSigningPublicKey"
-     }
-!endif
-     
-!if $(CAPSULE_ENABLE)
-FILE FREEFORM = PCD(gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiPkcs7TestPublicKeyFileGuid) {
-     SECTION RAW = BaseTools/Source/Python/Pkcs7Sign/TestRoot.cer
-     SECTION UI = "Pkcs7TestRoot"
      }
 !endif
 
@@ -817,32 +815,6 @@ READ_ENABLED_CAP   = TRUE
 READ_STATUS        = TRUE
 READ_LOCK_CAP      = TRUE
 READ_LOCK_STATUS   = TRUE
-
-
-!if $(CAPSULE_ENABLE) || $(RECOVERY_ENABLE)
-[FV.CapsuleDispatchFv]
-FvAlignment        = 16
-ERASE_POLARITY     = 1
-MEMORY_MAPPED      = TRUE
-STICKY_WRITE       = TRUE
-LOCK_CAP           = TRUE
-LOCK_STATUS        = TRUE
-WRITE_DISABLED_CAP = TRUE
-WRITE_ENABLED_CAP  = TRUE
-WRITE_STATUS       = TRUE
-WRITE_LOCK_CAP     = TRUE
-WRITE_LOCK_STATUS  = TRUE
-READ_DISABLED_CAP  = TRUE
-READ_ENABLED_CAP   = TRUE
-READ_STATUS        = TRUE
-READ_LOCK_CAP      = TRUE
-READ_LOCK_STATUS   = TRUE
-
-!if $(CAPSULE_ENABLE)
-INF  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareUpdateDxe.inf
-!endif
-
-!endif
 
 ################################################################################
 #
@@ -1086,4 +1058,3 @@ INF  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareUpdateDxe.inf
      UI       STRING="$(MODULE_NAME)" Optional
      VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
-

@@ -35,23 +35,9 @@ FILE RAW = AF9C9EB2-12AD-4D3E-A4D4-96F6C9966215 { # PcdEdkiiSystemFirmwareFileGu
     $(WORKSPACE)/$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/FV/Vlv.ROM
   }
 
-FILE RAW = ce57b167-b0e4-41e8-a897-5f4feb781d40 { # gEdkiiSystemFmpCapsuleDriverFvFileGuid
-    $(WORKSPACE)/$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/FV/CAPSULEDISPATCHFV.Fv
-  }
-
 FILE RAW = 812136D3-4D3A-433A-9418-29BB9BF78F6E { # gEdkiiSystemFmpCapsuleConfigFileGuid
     Vlv2TbltDevicePkg/Feature/Capsule/SystemFirmwareUpdateConfig/SystemFirmwareUpdateConfig.ini
   }
-
-[FmpPayload.FmpPayloadSystemFirmwarePkcs7]
-IMAGE_HEADER_INIT_VERSION = 0x02
-IMAGE_TYPE_ID             = 4096267b-da0a-42eb-b5eb-fef31d207cb4 # PcdSystemFmpCapsuleImageTypeIdGuid
-IMAGE_INDEX               = 0x1
-HARDWARE_INSTANCE         = 0x0
-MONOTONIC_COUNT           = 0x2
-CERTIFICATE_GUID          = 4AAFD29D-68DF-49EE-8AA9-347D375665A7 # PKCS7
-
-FILE DATA = $(WORKSPACE)/$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/FV/SYSTEMFIRMWAREUPDATECARGO.Fv
 
 [FmpPayload.FmpPayloadSystemFirmwareRsa2048]
 IMAGE_HEADER_INIT_VERSION = 0x02
@@ -63,14 +49,6 @@ CERTIFICATE_GUID          = A7717414-C616-4977-9420-844712A735BF # RSA2048SHA256
 
 FILE DATA = $(WORKSPACE)/$(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/FV/SYSTEMFIRMWAREUPDATECARGO.Fv
 
-[Capsule.Vlv2FirmwareUpdateCapsuleFmpPkcs7]
-CAPSULE_GUID                = 6dcbd5ed-e82d-4c44-bda1-7194199ad92a # gEfiFmpCapsuleGuid
-CAPSULE_FLAGS               = PersistAcrossReset,InitiateReset
-CAPSULE_HEADER_SIZE         = 0x20
-CAPSULE_HEADER_INIT_VERSION = 0x1
-
-FMP_PAYLOAD = FmpPayloadSystemFirmwarePkcs7
-
 [Capsule.Vlv2Rec]
 CAPSULE_GUID                = 6dcbd5ed-e82d-4c44-bda1-7194199ad92a # gEfiFmpCapsuleGuid
 CAPSULE_FLAGS               = PersistAcrossReset,InitiateReset
@@ -78,4 +56,3 @@ CAPSULE_HEADER_SIZE         = 0x20
 CAPSULE_HEADER_INIT_VERSION = 0x1
 
 FMP_PAYLOAD = FmpPayloadSystemFirmwareRsa2048
-
