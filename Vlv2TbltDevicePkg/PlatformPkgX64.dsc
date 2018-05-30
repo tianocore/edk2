@@ -190,7 +190,6 @@
 !else
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
 !endif
-  EdkiiSystemCapsuleLib|SignedCapsulePkg/Library/EdkiiSystemCapsuleLib/EdkiiSystemCapsuleLib.inf
   FmpAuthenticationLib|MdeModulePkg/Library/FmpAuthenticationLibNull/FmpAuthenticationLibNull.inf
   IniParsingLib|SignedCapsulePkg/Library/IniParsingLib/IniParsingLib.inf
   PlatformFlashAccessLib|Vlv2TbltDevicePkg/Feature/Capsule/Library/PlatformFlashAccessLib/PlatformFlashAccessLib.inf
@@ -706,6 +705,22 @@
   #
   gUefiCpuPkgTokenSpaceGuid.PcdCpuSmmStackSize|0x4000
 
+  #
+  # Clear unused single certificate PCD
+  #
+  gEfiSecurityPkgTokenSpaceGuid.PcdPkcs7CertBuffer|{0}
+
+  #
+  # Lock all updatable firmware devices at End of DXE
+  #
+  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceLockEventGuid|{GUID(gEfiEndOfDxeEventGroupGuid)}
+#  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceLockEventGuid|{GUID(gEfiEventReadyToBootGuid)}
+
+  #
+  # Set PcdFmpDeviceTestKeySha256Digest to {0} to disable test key detection
+  #
+#  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceTestKeySha256Digest|{0}
+
 [PcdsFixedAtBuild.IA32]
 !if $(TARGET) == RELEASE
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0
@@ -910,10 +925,10 @@
   gEfiVLVTokenSpaceGuid.PcdCpuSmramCpuDataAddress|0
   gEfiVLVTokenSpaceGuid.PcdCpuLockBoxSize|0
 
-!if $(CAPSULE_ENABLE) || $(RECOVERY_ENABLE)
-  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareImageDescriptor|{0x0}|VOID*|0x100
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemFmpCapsuleImageTypeIdGuid|{0x7b, 0x26, 0x96, 0x40, 0x0a, 0xda, 0xeb, 0x42, 0xb5, 0xeb, 0xfe, 0xf3, 0x1d, 0x20, 0x7c, 0xb4}
-  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareFileGuid|{0xb2, 0x9e, 0x9c, 0xaf, 0xad, 0x12, 0x3e, 0x4d, 0xa4, 0xd4, 0x96, 0xf6, 0xc9, 0x96, 0x62, 0x15}
+[PcdsDynamicExDefault.X64.DEFAULT]
+!if $(RECOVERY_ENABLE)
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareFileGuid|{GUID("AF9C9EB2-12AD-4D3E-A4D4-96F6C9966215")}|VOID*|0x10
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemFmpCapsuleImageTypeIdGuid|{GUID("4096267b-da0a-42eb-b5eb-fef31d207cb4")}|VOID*|0x10
 !endif
 
 [Components.IA32]
@@ -936,14 +951,6 @@
     !endif
   }
   !endif
-
-!if $(CAPSULE_ENABLE) || $(RECOVERY_ENABLE)
-  # FMP image decriptor
-  Vlv2TbltDevicePkg/Feature/Capsule/SystemFirmwareDescriptor/SystemFirmwareDescriptor.inf {
-    <LibraryClasses>
-      PcdLib|MdePkg/Library/PeiPcdLib/PeiPcdLib.inf
-  }
-!endif
 
   MdeModulePkg/Core/Pei/PeiMain.inf {
 !if $(TARGET) == DEBUG
@@ -1199,11 +1206,6 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
       DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
       SerialPortLib|$(PLATFORM_PACKAGE)/Library/SerialPortLib/SerialPortLib.inf
-!if $(CAPSULE_ENABLE)
-      FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
-!else
-      FmpAuthenticationLib|MdeModulePkg/Library/FmpAuthenticationLibNull/FmpAuthenticationLibNull.inf
-!endif
     !if $(FTPM_ENABLE) == TRUE
       Tpm2DeviceLib|Vlv2TbltDevicePkg/Library/Tpm2DeviceLibSeCDxe/Tpm2DeviceLibSeC.inf
     !else
@@ -1574,32 +1576,20 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
     !endif
 !endif
 
-  Vlv2TbltDevicePkg/Application/FirmwareUpdate/FirmwareUpdate.inf
-
 !if $(CAPSULE_ENABLE) || $(MICOCODE_CAPSULE_ENABLE)
   MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
   MdeModulePkg/Application/CapsuleApp/CapsuleApp.inf
 !endif
 
 !if $(CAPSULE_ENABLE)
-  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareReportDxe.inf {
-    <LibraryClasses>
-      DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-      SerialPortLib|$(PLATFORM_PACKAGE)/Library/SerialPortLib/SerialPortLib.inf
-      FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
-  }
-  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareUpdateDxe.inf {
-    <LibraryClasses>
-      DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
-      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-      SerialPortLib|$(PLATFORM_PACKAGE)/Library/SerialPortLib/SerialPortLib.inf
-      FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
-  }
+  !include Vlv2TbltDevicePkg/FmpMinnowMaxSystem.dsc
+  !include Vlv2TbltDevicePkg/FmpGreenSampleDevice.dsc
+  !include Vlv2TbltDevicePkg/FmpBlueSampleDevice.dsc
+  !include Vlv2TbltDevicePkg/FmpRedSampleDevice.dsc
 !endif
 
 !if $(MICOCODE_CAPSULE_ENABLE)
-  UefiCpuPkg/Feature/Capsule/MicrocodeUpdateDxe/MicrocodeUpdateDxe.inf {
+  IntelSiliconPkg/Feature/Capsule/MicrocodeUpdateDxe/MicrocodeUpdateDxe.inf {
     <LibraryClasses>
       DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
@@ -1790,8 +1780,6 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
 
 
 [Components.X64]
- $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/SysFwUpdateCapsuleDxe.inf
-
   $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/$(DXE_ARCHITECTURE)/I2cBus.inf {
     <PcdsPatchableInModule>
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0xF0000043
