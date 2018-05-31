@@ -102,6 +102,19 @@ Flat32Start:                                   ; protected mode entry point
 
     mov         eax, cr4
     bts         eax, 5
+
+    mov         edi, esi
+    add         edi, Enable5LevelPagingLocation
+    cmp         byte [edi], 0
+    jz          SkipEnable5Paging
+
+    ;
+    ; Enable 5 Level Paging
+    ;
+    bts         eax, 12                     ; Set LA57=1.
+
+SkipEnable5Paging:
+
     mov         cr4, eax
 
     mov         eax, cr0
