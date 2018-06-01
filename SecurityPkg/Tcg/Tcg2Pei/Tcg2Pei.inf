@@ -60,6 +60,7 @@
   gTcgEventEntryHobGuid                                                ## PRODUCES               ## HOB
   gTpmErrorHobGuid                                                     ## SOMETIMES_PRODUCES     ## HOB
   gMeasuredFvHobGuid                                                   ## PRODUCES               ## HOB
+  gExcludedFvHobGuid                                                   ## SOMETIMES_PRODUCES     ## HOB
   gTcgEvent2EntryHobGuid                                               ## PRODUCES               ## HOB
   gEfiTpmDeviceInstanceNoneGuid                                        ## SOMETIMES_PRODUCES     ## GUID       # TPM device identifier
   gEfiTpmDeviceInstanceTpm12Guid                                       ## SOMETIMES_PRODUCES     ## GUID       # TPM device identifier
