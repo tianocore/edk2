@@ -670,6 +670,9 @@ WriteSections64 (
       switch (Shdr->sh_type) {
       case SHT_PROGBITS:
         /* Copy.  */
+        if (Shdr->sh_offset + Shdr->sh_size > mFileBufferSize) {
+          return FALSE;
+        }
         memcpy(mCoffFile + mCoffSectionsOffset[Idx],
               (UINT8*)mEhdr + Shdr->sh_offset,
               (size_t) Shdr->sh_size);
