@@ -19,7 +19,7 @@
   FILE_GUID                      = C2BDE4F6-65EE-440B-87B5-83ABF10EF45B
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = ResetSystemLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = ResetSystemLib|DXE_CORE DXE_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -35,5 +35,4 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  UefiRuntimeLib
-
+  UefiRuntimeServicesTableLib
