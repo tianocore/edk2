@@ -14,7 +14,7 @@
 
 #include <PiDxe.h>
 #include <Library/ResetSystemLib.h>
-#include <Library/UefiRuntimeLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 
 /**
   This function causes a system-wide reset (cold reset), in which
@@ -30,7 +30,7 @@ ResetCold (
   VOID
   )
 {
-  EfiResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+  gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
 }
 
 /**
@@ -45,7 +45,7 @@ ResetWarm (
   VOID
   )
 {
-  EfiResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
+  gRT->ResetSystem (EfiResetWarm, EFI_SUCCESS, 0, NULL);
 }
 
 /**
@@ -60,7 +60,7 @@ ResetShutdown (
   VOID
   )
 {
-  EfiResetSystem (EfiResetShutdown, EFI_SUCCESS, 0, NULL);
+  gRT->ResetSystem (EfiResetShutdown, EFI_SUCCESS, 0, NULL);
 }
 
 /**
@@ -94,5 +94,5 @@ ResetPlatformSpecific (
   IN VOID    *ResetData
   )
 {
-  EfiResetSystem (EfiResetPlatformSpecific, EFI_SUCCESS, DataSize, ResetData);
+  gRT->ResetSystem (EfiResetPlatformSpecific, EFI_SUCCESS, DataSize, ResetData);
 }
