@@ -495,12 +495,13 @@ PeiInitializeFv (
   //
   // Get handle of BFV
   //
-  FvPpi->ProcessVolume (
-           FvPpi, 
-           SecCoreData->BootFirmwareVolumeBase,
-           (UINTN)BfvHeader->FvLength,
-           &FvHandle
-           );
+  Status = FvPpi->ProcessVolume (
+                    FvPpi,
+                    SecCoreData->BootFirmwareVolumeBase,
+                    (UINTN)BfvHeader->FvLength,
+                    &FvHandle
+                    );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Update internal PEI_CORE_FV array.
