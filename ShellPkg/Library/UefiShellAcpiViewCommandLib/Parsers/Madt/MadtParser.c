@@ -1,4 +1,4 @@
-/**
+/** @file
   MADT table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -24,18 +24,24 @@ STATIC CONST UINT8* MadtInterruptControllerType;
 STATIC CONST UINT8* MadtInterruptControllerLength;
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
-// Forward declarations
+/**
+  This function validates the System Vector Base in the GICD.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
 STATIC
 VOID
 EFIAPI
 ValidateGICDSystemVectorBase (
   IN UINT8* Ptr,
   IN VOID*  Context
-);
+  );
 
-/** An ACPI_PARSER array describing the GICC Interrupt
-    Controller Structure.
-*/
+/**
+  An ACPI_PARSER array describing the GICC Interrupt Controller Structure.
+**/
 STATIC CONST ACPI_PARSER GicCParser[] = {
   {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
@@ -59,9 +65,9 @@ STATIC CONST ACPI_PARSER GicCParser[] = {
   {L"Reserved", 3, 77, L"%x %x %x", Dump3Chars, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the GICD Interrupt
-    Controller Structure.
-*/
+/**
+  An ACPI_PARSER array describing the GICD Interrupt Controller Structure.
+**/
 STATIC CONST ACPI_PARSER GicDParser[] = {
   {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
@@ -75,9 +81,9 @@ STATIC CONST ACPI_PARSER GicDParser[] = {
   {L"Reserved", 3, 21, L"%x %x %x", Dump3Chars, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the MSI Frame Interrupt
-    Controller Structure.
-*/
+/**
+  An ACPI_PARSER array describing the MSI Frame Interrupt Controller Structure.
+**/
 STATIC CONST ACPI_PARSER GicMSIFrameParser[] = {
   {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
@@ -91,9 +97,9 @@ STATIC CONST ACPI_PARSER GicMSIFrameParser[] = {
   {L"SPI Base", 2, 22, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the GICR Interrupt
-    Controller Structure.
-*/
+/**
+  An ACPI_PARSER array describing the GICR Interrupt Controller Structure.
+**/
 STATIC CONST ACPI_PARSER GicRParser[] = {
   {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
@@ -104,9 +110,9 @@ STATIC CONST ACPI_PARSER GicRParser[] = {
   {L"Discovery Range Length", 4, 12, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the GIC ITS Interrupt
-    Controller Structure.
-*/
+/**
+  An ACPI_PARSER array describing the GIC ITS Interrupt Controller Structure.
+**/
 STATIC CONST ACPI_PARSER GicITSParser[] = {
   {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Length", 1, 1, L"%d", NULL, NULL, NULL, NULL},
@@ -117,8 +123,9 @@ STATIC CONST ACPI_PARSER GicITSParser[] = {
   {L"Reserved", 4, 16, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the ACPI MADT Table.
-*/
+/**
+  An ACPI_PARSER array describing the ACPI MADT Table.
+**/
 STATIC CONST ACPI_PARSER MadtParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
   {L"Local Interrupt Controller Address", 4, 36, L"0x%x", NULL, NULL, NULL,
@@ -126,9 +133,9 @@ STATIC CONST ACPI_PARSER MadtParser[] = {
   {L"Flags", 4, 40, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the MADT Interrupt
-    Controller Structure Header Structure.
-*/
+/**
+  An ACPI_PARSER array describing the MADT Interrupt Controller Structure Header Structure.
+**/
 STATIC CONST ACPI_PARSER MadtInterruptControllerHeaderParser[] = {
   {NULL, 1, 0, NULL, NULL, (VOID**)&MadtInterruptControllerType, NULL, NULL},
   {L"Length", 1, 1, NULL, NULL, (VOID**)&MadtInterruptControllerLength, NULL,
@@ -136,12 +143,13 @@ STATIC CONST ACPI_PARSER MadtInterruptControllerHeaderParser[] = {
   {L"Reserved", 2, 2, NULL, NULL, NULL, NULL, NULL}
 };
 
-/** This function validates the System Vector Base in the GICD.
+/**
+  This function validates the System Vector Base in the GICD.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -158,7 +166,8 @@ ValidateGICDSystemVectorBase (
   }
 }
 
-/** This function parses the ACPI MADT table.
+/**
+  This function parses the ACPI MADT table.
   When trace is enabled this function parses the MADT table and
   traces the ACPI table fields.
 
@@ -176,7 +185,7 @@ ValidateGICDSystemVectorBase (
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiMadt (

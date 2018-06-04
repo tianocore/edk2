@@ -1,4 +1,4 @@
-/**
+/** @file
   FADT table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -25,43 +25,68 @@ STATIC CONST UINT64* X_DsdtAddress;
 STATIC CONST UINT8*  FadtMinorRevision;
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
-/** A macro defining the Hardware reduced ACPI flag
-*/
+/**
+  A macro defining the Hardware reduced ACPI flag
+**/
 #define HW_REDUCED_ACPI   BIT20
 
-// Forward declarations
+/**
+  Get the ACPI XSDT header info.
+**/
 CONST ACPI_DESCRIPTION_HEADER_INFO* CONST
 EFIAPI
 GetAcpiXsdtHeaderInfo (
   VOID
-);
+  );
 
+/**
+  This function validates the Firmware Control Field.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
 STATIC
 VOID
 EFIAPI
 ValidateFirmwareCtrl (
   IN UINT8* Ptr,
   IN VOID*  Context
-);
+  );
 
+/**
+  This function validates the X_Firmware Control Field.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
 STATIC
 VOID
 EFIAPI
 ValidateXFirmwareCtrl (
   IN UINT8* Ptr,
   IN VOID*  Context
-);
+  );
 
+/**
+  This function validates the flags.
+
+  @param [in] Ptr     Pointer to the start of the field data.
+  @param [in] Context Pointer to context specific information e.g. this
+                      could be a pointer to the ACPI table header.
+**/
 STATIC
 VOID
 EFIAPI
 ValidateFlags (
   IN UINT8* Ptr,
   IN VOID*  Context
-);
+  );
 
-/** An ACPI_PARSER array describing the ACPI FADT Table.
-*/
+/**
+  An ACPI_PARSER array describing the ACPI FADT Table.
+**/
 STATIC CONST ACPI_PARSER FadtParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
   {L"FIRMWARE_CTRL", 4, 36, L"0x%x", NULL, NULL, ValidateFirmwareCtrl, NULL},
@@ -123,12 +148,13 @@ STATIC CONST ACPI_PARSER FadtParser[] = {
   {L"Hypervisor VendorIdentity", 8, 268, L"%lx", NULL, NULL, NULL, NULL}
 };
 
-/** This function validates the Firmware Control Field.
+/**
+  This function validates the Firmware Control Field.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -147,12 +173,13 @@ ValidateFirmwareCtrl (
 #endif
 }
 
-/** This function validates the X_Firmware Control Field.
+/**
+  This function validates the X_Firmware Control Field.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -171,12 +198,13 @@ ValidateXFirmwareCtrl (
 #endif
 }
 
-/** This function validates the flags.
+/**
+  This function validates the flags.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -195,9 +223,9 @@ ValidateFlags (
 #endif
 }
 
-/** This function parses the ACPI FADT table.
-  This function parses the FADT table and optionally traces the ACPI
-  table fields.
+/**
+  This function parses the ACPI FADT table.
+  This function parses the FADT table and optionally traces the ACPI table fields.
 
   This function also performs validation of the ACPI table fields.
 
@@ -205,7 +233,7 @@ ValidateFlags (
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiFadt (

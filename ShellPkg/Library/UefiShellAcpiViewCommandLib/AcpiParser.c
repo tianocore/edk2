@@ -1,4 +1,4 @@
-/**
+/** @file
   ACPI parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -21,8 +21,9 @@ STATIC UINT32   gIndent;
 STATIC UINT32   mTableErrorCount;
 STATIC UINT32   mTableWarningCount;
 
-/** This function resets the ACPI table error counter to Zero.
-*/
+/**
+  This function resets the ACPI table error counter to Zero.
+**/
 VOID
 ResetErrorCount (
   VOID
@@ -31,10 +32,11 @@ ResetErrorCount (
   mTableErrorCount = 0;
 }
 
-/** This function returns the ACPI table error count.
+/**
+  This function returns the ACPI table error count.
 
   @retval Returns the count of errors detected in the ACPI tables.
-*/
+**/
 UINT32
 GetErrorCount (
   VOID
@@ -43,8 +45,9 @@ GetErrorCount (
   return mTableErrorCount;
 }
 
-/** This function resets the ACPI table warning counter to Zero.
-*/
+/**
+  This function resets the ACPI table warning counter to Zero.
+**/
 VOID
 ResetWarningCount (
   VOID
@@ -53,10 +56,11 @@ ResetWarningCount (
   mTableWarningCount = 0;
 }
 
-/** This function returns the ACPI table warning count.
+/**
+  This function returns the ACPI table warning count.
 
   @retval Returns the count of warning detected in the ACPI tables.
-*/
+**/
 UINT32
 GetWarningCount (
   VOID
@@ -65,8 +69,9 @@ GetWarningCount (
   return mTableWarningCount;
 }
 
-/** This function increments the ACPI table error counter.
-*/
+/**
+  This function increments the ACPI table error counter.
+**/
 VOID
 EFIAPI
 IncrementErrorCount (
@@ -76,8 +81,9 @@ IncrementErrorCount (
   mTableErrorCount++;
 }
 
-/** This function increments the ACPI table warning counter.
-*/
+/**
+  This function increments the ACPI table warning counter.
+**/
 VOID
 EFIAPI
 IncrementWarningCount (
@@ -87,7 +93,8 @@ IncrementWarningCount (
   mTableWarningCount++;
 }
 
-/** This function verifies the ACPI table checksum.
+/**
+  This function verifies the ACPI table checksum.
 
   This function verifies the checksum for the ACPI table and optionally
   prints the status.
@@ -98,7 +105,7 @@ IncrementWarningCount (
 
   @retval TRUE        The checksum is OK.
   @retval FALSE       The checksum failed.
-*/
+**/
 BOOLEAN
 EFIAPI
 VerifyChecksum (
@@ -146,11 +153,12 @@ VerifyChecksum (
   return (Checksum == 0);
 }
 
-/** This function performs a raw data dump of the ACPI table.
+/**
+  This function performs a raw data dump of the ACPI table.
 
   @param [in] Ptr     Pointer to the start of the table buffer.
   @param [in] Length  The length of the buffer.
-*/
+**/
 VOID
 EFIAPI
 DumpRaw (
@@ -205,12 +213,12 @@ DumpRaw (
   Print (L"  %a", AsciiBuffer);
 }
 
-/** This function traces 1 byte of data as specified in the
-    format string.
+/**
+  This function traces 1 byte of data as specified in the format string.
 
   @param [in] Format  The format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
-*/
+**/
 VOID
 EFIAPI
 DumpUint8 (
@@ -221,12 +229,12 @@ DumpUint8 (
   Print (Format, *Ptr);
 }
 
-/** This function traces 2 bytes of data as specified in the
-    format string.
+/**
+  This function traces 2 bytes of data as specified in the format string.
 
   @param [in] Format  The format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
-*/
+**/
 VOID
 EFIAPI
 DumpUint16 (
@@ -237,12 +245,12 @@ DumpUint16 (
   Print (Format, *(UINT16*)Ptr);
 }
 
-/** This function traces 4 bytes of data as specified in the
-    format string.
+/**
+  This function traces 4 bytes of data as specified in the format string.
 
   @param [in] Format  The format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
-*/
+**/
 VOID
 EFIAPI
 DumpUint32 (
@@ -253,12 +261,12 @@ DumpUint32 (
   Print (Format, *(UINT32*)Ptr);
 }
 
-/** This function traces 8 bytes of data as specified by the
-    format string.
+/**
+  This function traces 8 bytes of data as specified by the format string.
 
   @param [in] Format  The format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
-*/
+**/
 VOID
 EFIAPI
 DumpUint64 (
@@ -276,14 +284,15 @@ DumpUint64 (
   Print (Format, Val);
 }
 
-/** This function traces 3 characters which can be optionally
-   formated using the format string if specified.
+/**
+  This function traces 3 characters which can be optionally
+  formated using the format string if specified.
 
   If no format string is specified the Format must be NULL.
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
-*/
+**/
 VOID
 EFIAPI
 Dump3Chars (
@@ -299,14 +308,15 @@ Dump3Chars (
     );
 }
 
-/** This function traces 4 characters which can be optionally
-   formated using the format string if specified.
+/**
+  This function traces 4 characters which can be optionally
+  formated using the format string if specified.
 
   If no format string is specified the Format must be NULL.
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
-*/
+**/
 VOID
 EFIAPI
 Dump4Chars (
@@ -323,14 +333,15 @@ Dump4Chars (
     );
 }
 
-/** This function traces 6 characters which can be optionally
-   formated using the format string if specified.
+/**
+  This function traces 6 characters which can be optionally
+  formated using the format string if specified.
 
   If no format string is specified the Format must be NULL.
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
-*/
+**/
 VOID
 EFIAPI
 Dump6Chars (
@@ -349,14 +360,15 @@ Dump6Chars (
     );
 }
 
-/** This function traces 8 characters which can be optionally
-   formated using the format string if specified.
+/**
+  This function traces 8 characters which can be optionally
+  formated using the format string if specified.
 
   If no format string is specified the Format must be NULL.
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
-*/
+**/
 VOID
 EFIAPI
 Dump8Chars (
@@ -377,7 +389,8 @@ Dump8Chars (
     );
 }
 
-/** This function indents and prints the ACPI table Field Name.
+/**
+  This function indents and prints the ACPI table Field Name.
 
   @param [in] Indent      Number of spaces to add to the global table indent.
                           The global table indent is 0 by default; however
@@ -387,7 +400,7 @@ Dump8Chars (
                           Therefore the total indent in the output is
                           dependent on from where this function is called.
   @param [in] FieldName   Pointer to the Field Name.
-*/
+**/
 VOID
 EFIAPI
 PrintFieldName (
@@ -404,7 +417,8 @@ PrintFieldName (
     );
 }
 
-/** This function is used to parse an ACPI table buffer.
+/**
+  This function is used to parse an ACPI table buffer.
 
   The ACPI table buffer is parsed using the ACPI table parser information
   specified by a pointer to an array of ACPI_PARSER elements. This parser
@@ -428,7 +442,7 @@ PrintFieldName (
   @param [in] ParserItems  Number of items in the ACPI_PARSER array.
 
   @retval Number of bytes parsed.
-*/
+**/
 UINT32
 EFIAPI
 ParseAcpi (
@@ -540,10 +554,11 @@ ParseAcpi (
   return Offset;
 }
 
-/** An array describing the ACPI Generic Address Structure.
+/**
+  An array describing the ACPI Generic Address Structure.
   The GasParser array is used by the ParseAcpi function to parse and/or trace
   the GAS structure.
-*/
+**/
 STATIC CONST ACPI_PARSER GasParser[] = {
   {L"Address Space ID", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Register Bit Width", 1, 1, L"0x%x", NULL, NULL, NULL, NULL},
@@ -552,12 +567,12 @@ STATIC CONST ACPI_PARSER GasParser[] = {
   {L"Address", 8, 4, L"0x%lx", NULL, NULL, NULL, NULL}
 };
 
-/** This function indents and traces the GAS structure as described
-    by the GasParser.
+/**
+  This function indents and traces the GAS structure as described by the GasParser.
 
   @param [in] Ptr     Pointer to the start of the buffer.
   @param [in] Indent  Number of spaces to indent the output.
-*/
+**/
 VOID
 EFIAPI
 DumpGasStruct (
@@ -576,11 +591,12 @@ DumpGasStruct (
     );
 }
 
-/** This function traces the GAS structure as described by the GasParser.
+/**
+  This function traces the GAS structure as described by the GasParser.
 
   @param [in] Format  Optional format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
-*/
+**/
 VOID
 EFIAPI
 DumpGas (
@@ -591,12 +607,13 @@ DumpGas (
   DumpGasStruct (Ptr, 2);
 }
 
-/** This function traces the ACPI header as described by the AcpiHeaderParser.
+/**
+  This function traces the ACPI header as described by the AcpiHeaderParser.
 
   @param [in] Ptr          Pointer to the start of the buffer.
 
   @retval Number of bytes parsed.
-*/
+**/
 UINT32
 EFIAPI
 DumpAcpiHeader (
@@ -618,7 +635,8 @@ DumpAcpiHeader (
            );
 }
 
-/** This function parses the ACPI header as described by the AcpiHeaderParser.
+/**
+  This function parses the ACPI header as described by the AcpiHeaderParser.
 
   This function optionally returns the signature, length and revision of the
   ACPI table.
@@ -629,7 +647,7 @@ DumpAcpiHeader (
   @param [out] Revision   Gets location of the revision of the ACPI table.
 
   @retval Number of bytes parsed.
-*/
+**/
 UINT32
 EFIAPI
 ParseAcpiHeader (

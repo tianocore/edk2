@@ -1,4 +1,4 @@
-/**
+/** @file
   XSDT table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -29,6 +29,9 @@ STATIC CONST ACPI_PARSER XsdtParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo)
 };
 
+/**
+  Get the ACPI XSDT header info.
+**/
 CONST ACPI_DESCRIPTION_HEADER_INFO* CONST
 EFIAPI
 GetAcpiXsdtHeaderInfo (
@@ -38,8 +41,8 @@ GetAcpiXsdtHeaderInfo (
   return &AcpiHdrInfo;
 }
 
-/** This function parses the ACPI XSDT table
-  and optionally traces the ACPI table fields.
+/**
+  This function parses the ACPI XSDT table and optionally traces the ACPI table fields.
 
   This function also performs validation of the XSDT table.
 
@@ -47,7 +50,7 @@ GetAcpiXsdtHeaderInfo (
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiXsdt (

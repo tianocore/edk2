@@ -1,4 +1,4 @@
-/**
+/** @file
   GTDT table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -29,12 +29,13 @@ STATIC CONST UINT32* GtBlockTimerOffset;
 STATIC CONST UINT16* GtBlockLength;
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
-/** This function validates the GT Block timer count.
+/**
+  This function validates the GT Block timer count.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -43,8 +44,9 @@ ValidateGtBlockTimerCount (
   IN VOID*  Context
   );
 
-/** An ACPI_PARSER array describing the ACPI GTDT Table.
-*/
+/**
+  An ACPI_PARSER array describing the ACPI GTDT Table.
+**/
 STATIC CONST ACPI_PARSER GtdtParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
   {L"CntControlBase Physical Address", 8, 36, L"0x%lx", NULL, NULL,
@@ -69,16 +71,18 @@ STATIC CONST ACPI_PARSER GtdtParser[] = {
    (VOID**)&GtdtPlatformTimerOffset, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the Platform timer header.
-*/
+/**
+  An ACPI_PARSER array describing the Platform timer header.
+**/
 STATIC CONST ACPI_PARSER GtPlatformTimerHeaderParser[] = {
   {L"Type", 1, 0, NULL, NULL, (VOID**)&PlatformTimerType, NULL, NULL},
   {L"Length", 2, 1, NULL, NULL, (VOID**)&PlatformTimerLength, NULL, NULL},
   {L"Reserved", 1, 3, NULL, NULL, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the Platform GT Block.
-*/
+/**
+  An ACPI_PARSER array describing the Platform GT Block.
+**/
 STATIC CONST ACPI_PARSER GtBlockParser[] = {
   {L"Type", 1, 0, L"%d", NULL, NULL, NULL, NULL},
   {L"Length", 2, 1, L"%d", NULL, (VOID**)&GtBlockLength, NULL, NULL},
@@ -90,8 +94,9 @@ STATIC CONST ACPI_PARSER GtBlockParser[] = {
     NULL}
 };
 
-/** An ACPI_PARSER array describing the GT Block timer.
-*/
+/**
+  An ACPI_PARSER array describing the GT Block timer.
+**/
 STATIC CONST ACPI_PARSER GtBlockTimerParser[] = {
   {L"Frame Number", 1, 0, L"%d", NULL, NULL, NULL, NULL},
   {L"Reserved", 3, 1, L"%x %x %x", Dump3Chars, NULL, NULL, NULL},
@@ -105,8 +110,9 @@ STATIC CONST ACPI_PARSER GtBlockTimerParser[] = {
   {L"Common Flags", 4, 36, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the Platform Watchdog.
-*/
+/**
+  An ACPI_PARSER array describing the Platform Watchdog.
+**/
 STATIC CONST ACPI_PARSER SBSAGenericWatchdogParser[] = {
   {L"Type", 1, 0, L"%d", NULL, NULL, NULL, NULL},
   {L"Length", 2, 1, L"%d", NULL, NULL, NULL, NULL},
@@ -117,12 +123,13 @@ STATIC CONST ACPI_PARSER SBSAGenericWatchdogParser[] = {
   {L"Watchdog Timer Flags", 4, 24, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
-/** This function validates the GT Block timer count.
+/**
+  This function validates the GT Block timer count.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -141,11 +148,12 @@ ValidateGtBlockTimerCount (
   }
 }
 
-/** This function parses the Platform GT Block.
+/**
+  This function parses the Platform GT Block.
 
   @param [in] Ptr     Pointer to the start of the GT Block data.
   @param [in] Length  Length of the GT Block structure.
-*/
+**/
 STATIC
 VOID
 DumpGTBlock (
@@ -196,11 +204,12 @@ DumpGTBlock (
   }
 }
 
-/** This function parses the Platform Watchdog timer.
+/**
+  This function parses the Platform Watchdog timer.
 
   @param [in] Ptr     Pointer to the start of the watchdog timer data.
   @param [in] Length  Length of the watchdog timer structure.
-*/
+**/
 STATIC
 VOID
 DumpWatchdogTimer (
@@ -218,7 +227,8 @@ DumpWatchdogTimer (
     );
 }
 
-/** This function parses the ACPI GTDT table.
+/**
+  This function parses the ACPI GTDT table.
   When trace is enabled this function parses the GTDT table and
   traces the ACPI table fields.
 
@@ -232,7 +242,7 @@ DumpWatchdogTimer (
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiGtdt (

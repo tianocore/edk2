@@ -1,4 +1,4 @@
-/**
+/** @file
   SLIT table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -24,19 +24,22 @@
 STATIC CONST UINT64* SlitSystemLocalityCount;
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
-/** An ACPI_PARSER array describing the ACPI SLIT table.
-*/
+/**
+  An ACPI_PARSER array describing the ACPI SLIT table.
+**/
 STATIC CONST ACPI_PARSER SlitParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
   {L"Number of System Localities", 8, 36, L"0x%lx", NULL,
    (VOID**)&SlitSystemLocalityCount, NULL, NULL}
 };
 
-/** Macro to get the value of a System Locality
-*/
+/**
+  Macro to get the value of a System Locality
+**/
 #define SLIT_ELEMENT(Ptr, i, j) *(Ptr + (i * LocalityCount) + j)
 
-/** This function parses the ACPI SLIT table.
+/**
+  This function parses the ACPI SLIT table.
   When trace is enabled this function parses the SLIT table and
   traces the ACPI table fields.
 
@@ -49,7 +52,7 @@ STATIC CONST ACPI_PARSER SlitParser[] = {
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiSlit (

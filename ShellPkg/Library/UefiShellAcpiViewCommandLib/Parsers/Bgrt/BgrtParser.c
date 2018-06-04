@@ -1,4 +1,4 @@
-/**
+/** @file
   BGRT table parser
 
   Copyright (c) 2017 - 2018, ARM Limited. All rights reserved.
@@ -22,8 +22,9 @@
 // Local variables
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
-/** An ACPI_PARSER array describing the ACPI BDRT Table.
-*/
+/**
+  An ACPI_PARSER array describing the ACPI BDRT Table.
+**/
 STATIC CONST ACPI_PARSER BgrtParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
   {L"Version", 2, 36, L"0x%x", NULL, NULL, NULL, NULL},
@@ -34,7 +35,8 @@ STATIC CONST ACPI_PARSER BgrtParser[] = {
   {L"Image Offset Y", 4, 52, L"%d", NULL, NULL, NULL, NULL}
 };
 
-/** This function parses the ACPI BGRT table.
+/**
+  This function parses the ACPI BGRT table.
   When trace is enabled this function parses the BGRT table and
   traces the ACPI table fields.
 
@@ -44,7 +46,7 @@ STATIC CONST ACPI_PARSER BgrtParser[] = {
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiBgrt (

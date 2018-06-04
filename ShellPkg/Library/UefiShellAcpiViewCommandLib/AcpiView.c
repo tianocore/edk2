@@ -1,4 +1,4 @@
-/**
+/** @file
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
   This program and the accompanying materials
@@ -35,8 +35,9 @@ STATIC BOOLEAN            mVerbose;
 STATIC BOOLEAN            mConsistencyCheck;
 STATIC BOOLEAN            mColourHighlighting;
 
-/** An array of acpiview command line parameters.
-*/
+/**
+  An array of acpiview command line parameters.
+**/
 STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {L"/?", TypeFlag},
   {L"-c", TypeFlag},
@@ -48,10 +49,11 @@ STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
   {NULL, TypeMax}
 };
 
-/** This function returns the colour highlighting status.
+/**
+  This function returns the colour highlighting status.
 
   @retval TRUE if colour highlighting is enabled.
-*/
+**/
 BOOLEAN
 GetColourHighlighting (
   VOID
@@ -60,9 +62,12 @@ GetColourHighlighting (
   return mColourHighlighting;
 }
 
-/** This function sets the colour highlighting status.
+/**
+  This function sets the colour highlighting status.
 
-*/
+  @param  Highlight       The Highlight status.
+
+**/
 VOID
 SetColourHighlighting (
   BOOLEAN Highlight
@@ -71,10 +76,11 @@ SetColourHighlighting (
   mColourHighlighting = Highlight;
 }
 
-/** This function returns the report options.
+/**
+  This function returns the report options.
 
   @retval Returns the report option.
-*/
+**/
 STATIC
 EREPORT_OPTION
 GetReportOption (
@@ -84,10 +90,11 @@ GetReportOption (
   return mReportType;
 }
 
-/** This function returns the selected ACPI table.
+/**
+  This function returns the selected ACPI table.
 
   @retval Returns signature of the selected ACPI table.
-*/
+**/
 STATIC
 UINT32
 GetSelectedAcpiTable (
@@ -97,13 +104,15 @@ GetSelectedAcpiTable (
   return mSelectedAcpiTable;
 }
 
-/** This function dumps the ACPI table to a file.
+/**
+  This function dumps the ACPI table to a file.
+
   @param [in] Ptr       Pointer to the ACPI table data.
   @param [in] Length    The length of the ACPI table.
 
   @retval TRUE          Success.
   @retval FALSE         Failure.
-*/
+**/
 STATIC
 BOOLEAN
 DumpAcpiTableToFile (
@@ -160,14 +169,15 @@ DumpAcpiTableToFile (
   return (Length == TransferBytes);
 }
 
-/** This function processes the table reporting options for the ACPI table.
+/**
+  This function processes the table reporting options for the ACPI table.
 
   @param [in] Signature The ACPI table Signature.
   @param [in] TablePtr  Pointer to the ACPI table data.
   @param [in] Length    The length fo the ACPI table.
 
   @retval Returns TRUE if the ACPI table should be traced.
-*/
+**/
 BOOLEAN
 ProcessTableReportOptions (
   IN CONST UINT32  Signature,
@@ -249,13 +259,14 @@ ProcessTableReportOptions (
   return Log;
 }
 
-/** This function converts a string to ACPI table signature.
+/**
+  This function converts a string to ACPI table signature.
 
   @param [in] Str   Pointer to the string to be converted to the
                     ACPI table signature.
 
   @retval The ACPI table signature.
-*/
+**/
 STATIC
 UINT32
 ConvertStrToAcpiSignature (
@@ -277,16 +288,16 @@ ConvertStrToAcpiSignature (
   return *(UINT32*)Ptr;
 }
 
-/** This function iterates the configuration table entries in the
-    system table, retrieves the RSDP pointer and starts parsing
-    the ACPI tables.
+/**
+  This function iterates the configuration table entries in the
+  system table, retrieves the RSDP pointer and starts parsing the ACPI tables.
 
   @param [in] SystemTable Pointer to the EFI system table.
 
   @retval Returns EFI_NOT_FOUND   if the RSDP pointer is not found.
           Returns EFI_UNSUPPORTED if the RSDP version is less than 2.
           Returns EFI_SUCCESS     if successful.
-*/
+**/
 STATIC
 EFI_STATUS
 EFIAPI
@@ -406,7 +417,7 @@ AcpiView (
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
   @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
-*/
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunAcpiView (

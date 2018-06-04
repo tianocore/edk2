@@ -1,4 +1,4 @@
-/**
+/** @file
   Header file for 'acpiview' Shell command functions.
 
   Copyright (c) 2016 - 2017, ARM Limited. All rights reserved.<BR>
@@ -21,7 +21,7 @@ extern EFI_HII_HANDLE gShellAcpiViewHiiHandle;
 
   @param[in] ImageHandle  Handle to the Image (NULL if Internal).
   @param[in] SystemTable  Pointer to the System Table (NULL if Internal).
-*/
+**/
 SHELL_STATUS
 EFIAPI
 ShellCommandRunAcpiView (

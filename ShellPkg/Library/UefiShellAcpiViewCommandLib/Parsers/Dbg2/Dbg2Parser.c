@@ -1,4 +1,4 @@
-/**
+/** @file
   DBG2 table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -32,12 +32,13 @@ STATIC CONST UINT16* BaseAddrRegOffset;
 STATIC CONST UINT16* AddrSizeOffset;
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
-/** This function Validates the NameSpace string length.
+/**
+  This function Validates the NameSpace string length.
 
   @param [in] Ptr     Pointer to the start of the buffer.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -46,12 +47,13 @@ ValidateNameSpaceStrLen (
   IN  VOID*  Context
   );
 
-/** This function parses the debug device information structure.
+/**
+  This function parses the debug device information structure.
 
   @param [in]  Ptr     Pointer to the start of the buffer.
   @param [out] Length  Pointer in which the length of the debug
                        device information is returned.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -95,12 +97,13 @@ STATIC CONST ACPI_PARSER DbgDevInfoParser[] = {
    (VOID**)&AddrSizeOffset, NULL, NULL}
 };
 
-/** This function validates the NameSpace string length.
+/**
+  This function validates the NameSpace string length.
 
   @param [in] Ptr     Pointer to the start of the buffer.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -120,12 +123,13 @@ ValidateNameSpaceStrLen (
   }
 }
 
-/** This function parses the debug device information structure.
+/**
+  This function parses the debug device information structure.
 
   @param [in]  Ptr     Pointer to the start of the buffer.
-  @param [out] Ptr     Pointer in which the length of the debug
+  @param [out] Length  Pointer in which the length of the debug
                        device information is returned.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -193,7 +197,8 @@ DumpDbgDeviceInfo (
   *Length = *DbgDevInfoLen;
 }
 
-/** This function parses the ACPI DBG2 table.
+/**
+  This function parses the ACPI DBG2 table.
   When trace is enabled this function parses the DBG2 table and
   traces the ACPI table fields.
 
@@ -203,7 +208,7 @@ DumpDbgDeviceInfo (
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiDbg2 (

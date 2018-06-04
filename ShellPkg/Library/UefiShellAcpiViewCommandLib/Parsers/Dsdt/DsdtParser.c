@@ -1,4 +1,4 @@
-/**
+/** @file
   DSDT table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -19,7 +19,8 @@
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 
-/** This function parses the ACPI DSDT table.
+/**
+  This function parses the ACPI DSDT table.
   When trace is enabled this function parses the DSDT table and
   traces the ACPI table fields.
   For the DSDT table only the ACPI header fields are parsed and
@@ -29,7 +30,7 @@
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiDsdt (

@@ -1,4 +1,4 @@
-/**
+/** @file
   SRAT table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -25,12 +25,13 @@ STATIC CONST UINT8* SratRAType;
 STATIC CONST UINT8* SratRALength;
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
-/** This function validates the Reserved field in the SRAT table header.
+/**
+  This function validates the Reserved field in the SRAT table header.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -39,11 +40,12 @@ ValidateSratReserved (
   IN VOID*  Context
   );
 
-/** This function traces the APIC Proximity Domain field.
+/**
+  This function traces the APIC Proximity Domain field.
 
   @param [in] Format  Format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
-*/
+**/
 STATIC
 VOID
 DumpSratApicProximity (
@@ -51,24 +53,26 @@ DumpSratApicProximity (
   IN  UINT8*         Ptr
   );
 
-/** An ACPI_PARSER array describing the SRAT Table.
-*/
+/**
+  An ACPI_PARSER array describing the SRAT Table.
+**/
 STATIC CONST ACPI_PARSER SratParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
   {L"Reserved", 4, 36, L"0x%x", NULL, NULL, ValidateSratReserved, NULL},
   {L"Reserved", 8, 40, L"0x%lx", NULL, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the Resource Allocation
-    structure header.
-*/
+/**
+  An ACPI_PARSER array describing the Resource Allocation structure header.
+**/
 STATIC CONST ACPI_PARSER SratResourceAllocationParser[] = {
   {L"Type", 1, 0, NULL, NULL, (VOID**)&SratRAType, NULL, NULL},
   {L"Length", 1, 1, NULL, NULL, (VOID**)&SratRALength, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the GICC Affinity structure.
-*/
+/**
+  An ACPI_PARSER array describing the GICC Affinity structure.
+**/
 STATIC CONST ACPI_PARSER SratGicCAffinityParser[] = {
   {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Length", 1, 1, L"0x%x", NULL, NULL, NULL, NULL},
@@ -79,8 +83,9 @@ STATIC CONST ACPI_PARSER SratGicCAffinityParser[] = {
   {L"Clock Domain", 4, 14, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the GIC ITS Affinity structure.
-*/
+/**
+  An ACPI_PARSER array describing the GIC ITS Affinity structure.
+**/
 STATIC CONST ACPI_PARSER SratGicITSAffinityParser[] = {
   {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Length", 1, 1, L"0x%x", NULL, NULL, NULL, NULL},
@@ -90,8 +95,9 @@ STATIC CONST ACPI_PARSER SratGicITSAffinityParser[] = {
   {L"ITS Id", 4, 8, L"0x%x", NULL, NULL, NULL, NULL},
 };
 
-/** An ACPI_PARSER array describing the Memory Affinity structure.
-*/
+/**
+  An ACPI_PARSER array describing the Memory Affinity structure.
+**/
 STATIC CONST ACPI_PARSER SratMemAffinityParser[] = {
   {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Length", 1, 1, L"0x%x", NULL, NULL, NULL, NULL},
@@ -107,8 +113,9 @@ STATIC CONST ACPI_PARSER SratMemAffinityParser[] = {
   {L"Reserved", 8, 32, L"0x%lx", NULL, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the APIC/SAPIC Affinity structure.
-*/
+/**
+  An ACPI_PARSER array describing the APIC/SAPIC Affinity structure.
+**/
 STATIC CONST ACPI_PARSER SratApciSapicAffinityParser[] = {
   {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Length", 1, 1, L"0x%x", NULL, NULL, NULL, NULL},
@@ -122,9 +129,9 @@ STATIC CONST ACPI_PARSER SratApciSapicAffinityParser[] = {
   {L"Clock Domain", 4, 12, L"0x%x", NULL, NULL, NULL, NULL}
 };
 
-/** An ACPI_PARSER array describing the Processor Local x2APIC
-    Affinity structure.
-*/
+/**
+  An ACPI_PARSER array describing the Processor Local x2APIC Affinity structure.
+**/
 STATIC CONST ACPI_PARSER SratX2ApciAffinityParser[] = {
   {L"Type", 1, 0, L"0x%x", NULL, NULL, NULL, NULL},
   {L"Length", 1, 1, L"0x%x", NULL, NULL, NULL, NULL},
@@ -142,7 +149,7 @@ STATIC CONST ACPI_PARSER SratX2ApciAffinityParser[] = {
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -157,11 +164,12 @@ ValidateSratReserved (
   }
 }
 
-/** This function traces the APIC Proximity Domain field.
+/**
+  This function traces the APIC Proximity Domain field.
 
   @param [in] Format  Format string for tracing the data.
   @param [in] Ptr     Pointer to the start of the buffer.
-*/
+**/
 STATIC
 VOID
 DumpSratApicProximity (
@@ -173,7 +181,8 @@ DumpSratApicProximity (
   Print (Format, ProximityDomain);
 }
 
-/** This function parses the ACPI SRAT table.
+/**
+  This function parses the ACPI SRAT table.
   When trace is enabled this function parses the SRAT table and
   traces the ACPI table fields.
 
@@ -189,7 +198,7 @@ DumpSratApicProximity (
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiSrat (

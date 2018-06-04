@@ -1,4 +1,4 @@
-/**
+/** @file
   RSDP table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -21,12 +21,13 @@
 // Local Variables
 STATIC CONST UINT64* XsdtAddress;
 
-/** This function validates the RSDT Address.
+/**
+  This function validates the RSDT Address.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -35,12 +36,13 @@ ValidateRsdtAddress (
   IN VOID*  Context
   );
 
-/** This function validates the XSDT Address.
+/**
+  This function validates the XSDT Address.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -49,8 +51,9 @@ ValidateXsdtAddress (
   IN VOID*  Context
   );
 
-/** An array describing the ACPI RSDP Table.
-*/
+/**
+  An array describing the ACPI RSDP Table.
+**/
 STATIC CONST ACPI_PARSER RsdpParser[] = {
   {L"Signature", 8, 0, NULL, Dump8Chars, NULL, NULL, NULL},
   {L"Checksum", 1, 8, L"0x%x", NULL, NULL, NULL, NULL},
@@ -64,12 +67,13 @@ STATIC CONST ACPI_PARSER RsdpParser[] = {
   {L"Reserved", 3, 33, L"%x %x %x", Dump3Chars, NULL, NULL, NULL}
 };
 
-/** This function validates the RSDT Address.
+/**
+  This function validates the RSDT Address.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -95,12 +99,13 @@ ValidateRsdtAddress (
 #endif
 }
 
-/** This function validates the XSDT Address.
+/**
+  This function validates the XSDT Address.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -126,7 +131,8 @@ ValidateXsdtAddress (
 #endif
 }
 
-/** This function parses the ACPI RSDP table.
+/**
+  This function parses the ACPI RSDP table.
 
   This function invokes the parser for the XSDT table.
   * Note - This function does not support parsing of RSDT table.
@@ -138,7 +144,7 @@ ValidateXsdtAddress (
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiRsdp (

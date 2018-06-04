@@ -1,4 +1,4 @@
-/**
+/** @file
   SSDT table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -19,7 +19,8 @@
 #include "AcpiParser.h"
 #include "AcpiTableParser.h"
 
-/** This function parses the ACPI SSDT table.
+/**
+  This function parses the ACPI SSDT table.
   When trace is enabled this function parses the SSDT table and
   traces the ACPI table fields.
   For the SSDT table only the ACPI header fields are
@@ -29,7 +30,7 @@
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiSsdt (

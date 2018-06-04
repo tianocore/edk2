@@ -1,4 +1,4 @@
-/**
+/** @file
   SPCR table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -24,12 +24,13 @@
 // Local variables
 STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
 
-/** This function validates the Interrupt Type.
+/**
+  This function validates the Interrupt Type.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -38,12 +39,13 @@ ValidateInterruptType (
   IN VOID*  Context
   );
 
-/** This function validates the Irq.
+/**
+  This function validates the Irq.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -52,8 +54,9 @@ ValidateIrq (
   IN VOID*  Context
   );
 
-/** An ACPI_PARSER array describing the ACPI SPCR Table.
-*/
+/**
+  An ACPI_PARSER array describing the ACPI SPCR Table.
+**/
 STATIC CONST ACPI_PARSER SpcrParser[] = {
   PARSE_ACPI_HEADER (&AcpiHdrInfo),
   {L"Interface Type", 1, 36, L"%d", NULL, NULL, NULL, NULL},
@@ -79,12 +82,13 @@ STATIC CONST ACPI_PARSER SpcrParser[] = {
   {L"Reserved", 4, 76, L"%x", NULL, NULL, NULL, NULL}
 };
 
-/** This function validates the Interrupt Type.
+/**
+  This function validates the Interrupt Type.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -106,12 +110,13 @@ ValidateInterruptType (
 #endif
 }
 
-/** This function validates the Irq.
+/**
+  This function validates the Irq.
 
   @param [in] Ptr     Pointer to the start of the field data.
   @param [in] Context Pointer to context specific information e.g. this
                       could be a pointer to the ACPI table header.
-*/
+**/
 STATIC
 VOID
 EFIAPI
@@ -132,7 +137,8 @@ ValidateIrq (
 #endif
 }
 
-/** This function parses the ACPI SPCR table.
+/**
+  This function parses the ACPI SPCR table.
   When trace is enabled this function parses the SPCR table and
   traces the ACPI table fields.
 
@@ -142,7 +148,7 @@ ValidateIrq (
   @param [in] Ptr                Pointer to the start of the buffer.
   @param [in] AcpiTableLength    Length of the ACPI table.
   @param [in] AcpiTableRevision  Revision of the ACPI table.
-*/
+**/
 VOID
 EFIAPI
 ParseAcpiSpcr (

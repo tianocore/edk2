@@ -1,4 +1,4 @@
-/**
+/** @file
   ACPI table parser
 
   Copyright (c) 2016 - 2018, ARM Limited. All rights reserved.
@@ -18,11 +18,13 @@
 #include "AcpiTableParser.h"
 #include "AcpiView.h"
 
-/** A list of registered ACPI table parsers.
-*/
+/**
+  A list of registered ACPI table parsers.
+**/
 STATIC ACPI_TABLE_PARSER mTableParserList[MAX_ACPI_TABLE_PARSERS];
 
-/** Register the ACPI table Parser
+/**
+  Register the ACPI table Parser
 
   This function registers the ACPI table parser.
 
@@ -35,7 +37,7 @@ STATIC ACPI_TABLE_PARSER mTableParserList[MAX_ACPI_TABLE_PARSERS];
                                 was already registered.
   @retval EFI_OUT_OF_RESOURCES  No space to register the
                                 parser.
-*/
+**/
 EFI_STATUS
 EFIAPI
 RegisterParser (
@@ -77,7 +79,8 @@ RegisterParser (
   return EFI_OUT_OF_RESOURCES;
 }
 
-/** Deregister the ACPI table Parser
+/**
+  Deregister the ACPI table Parser
 
   This function deregisters the ACPI table parser.
 
@@ -86,7 +89,7 @@ RegisterParser (
   @retval EFI_SUCCESS           The parser was deregistered.
   @retval EFI_INVALID_PARAMETER A parameter is invalid.
   @retval EFI_NOT_FOUND         A registered parser was not found.
-*/
+**/
 EFI_STATUS
 EFIAPI
 DeregisterParser (
@@ -114,7 +117,8 @@ DeregisterParser (
   return EFI_NOT_FOUND;
 }
 
-/** Get the ACPI table Parser
+/**
+  Get the ACPI table Parser
 
   This function returns the ACPI table parser proc from the list of
   registered parsers.
@@ -125,7 +129,7 @@ DeregisterParser (
   @retval EFI_SUCCESS           The parser was returned successfully.
   @retval EFI_INVALID_PARAMETER A parameter is invalid.
   @retval EFI_NOT_FOUND         A registered parser was not found.
-*/
+**/
 EFI_STATUS
 EFIAPI
 GetParser (
@@ -153,7 +157,8 @@ GetParser (
   return EFI_NOT_FOUND;
 }
 
-/** This function processes the ACPI tables.
+/**
+  This function processes the ACPI tables.
   This function calls ProcessTableReportOptions() to list the ACPI
   tables, perform binary dump of the tables and determine if the
   ACPI fields should be traced.
@@ -165,7 +170,7 @@ GetParser (
 
   @param [in] Ptr                Pointer to the start of the ACPI
                                  table data buffer.
-*/
+**/
 VOID
 EFIAPI
 ProcessAcpiTable (
