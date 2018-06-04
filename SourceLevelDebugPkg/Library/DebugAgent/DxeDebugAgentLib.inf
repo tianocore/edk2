@@ -1,7 +1,7 @@
 ## @file
 #  Debug Agent library instance for Dxe Core and Dxe modules.
 #
-#  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -43,7 +43,6 @@
 
 [Sources.Ia32]
   DebugAgentCommon/Ia32/AsmFuncs.S
-  DebugAgentCommon/Ia32/AsmFuncs.asm
   DebugAgentCommon/Ia32/AsmFuncs.nasm
   DebugAgentCommon/Ia32/ArchDebugSupport.h
   DebugAgentCommon/Ia32/ArchDebugSupport.c
@@ -51,7 +50,6 @@
 
 [Sources.X64]
   DebugAgentCommon/X64/AsmFuncs.S
-  DebugAgentCommon/X64/AsmFuncs.asm
   DebugAgentCommon/X64/AsmFuncs.nasm
   DebugAgentCommon/X64/ArchDebugSupport.h
   DebugAgentCommon/X64/ArchDebugSupport.c
