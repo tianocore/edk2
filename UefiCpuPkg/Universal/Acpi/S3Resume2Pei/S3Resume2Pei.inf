@@ -37,14 +37,10 @@
   S3Resume.c
 
 [Sources.IA32]
-  Ia32/AsmFuncs.asm
   Ia32/AsmFuncs.nasm
-  Ia32/AsmFuncs.S
 
 [Sources.X64]
-  X64/AsmFuncs.asm
   X64/AsmFuncs.nasm
-  X64/AsmFuncs.S
 
 [Packages]
   MdePkg/MdePkg.dec
