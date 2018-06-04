@@ -37,7 +37,8 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
-  DebugLib
+  IoLib
+  DebugLib
   PcdLib
 
 [Pcd]    
