@@ -1,7 +1,7 @@
 ## @file
 #  EFI Byte Code (EBC) Debugger.
 #
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -68,14 +68,10 @@
 [Sources.Ia32]
   Ia32/EbcSupport.c
   Ia32/EbcLowLevel.nasm
-  Ia32/EbcLowLevel.S
-  Ia32/EbcLowLevel.asm
 
 [Sources.X64]
   X64/EbcSupport.c
   X64/EbcLowLevel.nasm
-  X64/EbcLowLevel.S
-  X64/EbcLowLevel.asm
 
 [Sources.IPF]
   Ipf/EbcSupport.h

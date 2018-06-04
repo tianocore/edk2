@@ -4,7 +4,7 @@
 # This is a standalone Boot Script Executor. Standalone means it does not
 # depends on any PEI or DXE service.
 #
-# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
@@ -40,14 +40,10 @@
 [Sources.X64]
   X64/SetIdtEntry.c  
   X64/S3Asm.nasm
-  X64/S3Asm.asm
-  X64/S3Asm.S
   
 [Sources.Ia32]
   IA32/SetIdtEntry.c   
   IA32/S3Asm.nasm
-  IA32/S3Asm.asm
-  IA32/S3Asm.S
 
 [Packages]
   MdePkg/MdePkg.dec
