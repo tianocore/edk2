@@ -1650,6 +1650,10 @@ EfiLocateProtocolBuffer (
                   (VOID **)Buffer
                   );
   if (EFI_ERROR (Status)) {
+    //
+    // Free the handle buffer
+    //
+    gBS->FreePool (HandleBuffer);
     return EFI_OUT_OF_RESOURCES;
   }
   ZeroMem (*Buffer, NoHandles * sizeof (VOID *));
