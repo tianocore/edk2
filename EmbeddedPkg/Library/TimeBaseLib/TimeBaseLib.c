@@ -77,11 +77,11 @@ EpochToEfiTime (
 }
 
 /**
-  Converts EFI_TIME to Epoch seconds (elapsed since 1970 JANUARY 01, 00:00:00 UTC)
+  Calculate Epoch days
  **/
 UINTN
 EFIAPI
-EfiTimeToEpoch (
+EfiGetEpochDays (
   IN  EFI_TIME  *Time
   )
 {
@@ -90,7 +90,6 @@ EfiTimeToEpoch (
   UINTN m;
   UINTN JulianDate;  // Absolute Julian Date representation of the supplied Time
   UINTN EpochDays;   // Number of days elapsed since EPOCH_JULIAN_DAY
-  UINTN EpochSeconds;
 
   a = (14 - Time->Month) / 12 ;
   y = Time->Year + 4800 - a;
@@ -101,9 +100,42 @@ EfiTimeToEpoch (
   ASSERT (JulianDate >= EPOCH_JULIAN_DATE);
   EpochDays = JulianDate - EPOCH_JULIAN_DATE;
 
+  return EpochDays;
+}
+/**
+  Converts EFI_TIME to Epoch seconds (elapsed since 1970 JANUARY 01, 00:00:00 UTC)
+ **/
+UINTN
+EFIAPI
+EfiTimeToEpoch (
+  IN  EFI_TIME  *Time
+  )
+{
+  UINTN EpochDays;   // Number of days elapsed since EPOCH_JULIAN_DAY
+  UINTN EpochSeconds;
+
+  EpochDays = EfiGetEpochDays (Time);
+
   EpochSeconds = (EpochDays * SEC_PER_DAY) + ((UINTN)Time->Hour * SEC_PER_HOUR) + (Time->Minute * SEC_PER_MIN) + Time->Second;
 
   return EpochSeconds;
+}
+
+/**
+  returns Day of the week [0-6] 0=Sunday
+ **/
+UINTN
+EfiTimeToWday (
+  IN  EFI_TIME  *Time
+  )
+{
+  UINTN EpochDays;   // Number of days elapsed since EPOCH_JULIAN_DAY
+
+  EpochDays = EfiGetEpochDays (Time);
+
+  // 4=1/1/1970 was a Thursday
+
+  return (EpochDays + 4) % 7;
 }
 
 BOOLEAN
