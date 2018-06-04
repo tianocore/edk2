@@ -3,7 +3,7 @@
 #
 # This driver installs Legacy Bios Protocol to support CSM module work in EFI system.
 #
-# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -41,8 +41,6 @@
   LegacyPci.c
 
 [Sources.Ia32]
-  IA32/InterruptTable.S
-  IA32/InterruptTable.asm
   IA32/InterruptTable.nasm
   Thunk.c
   LegacyBootSupport.c
@@ -51,8 +49,6 @@
 
 [Sources.X64]
   X64/InterruptTable.nasm
-  X64/InterruptTable.asm
-  X64/InterruptTable.S
   Thunk.c
   LegacyBootSupport.c
   LegacyBbs.c
