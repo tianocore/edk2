@@ -37,18 +37,14 @@
   Ia32/CpuFlushTlb.c | MSFT 
 
   Ia32/CpuSleep.nasm| INTEL
-  Ia32/CpuSleep.asm | INTEL 
   Ia32/CpuFlushTlb.nasm| INTEL
-  Ia32/CpuFlushTlb.asm | INTEL 
 
   Ia32/CpuSleepGcc.c | GCC 
   Ia32/CpuFlushTlbGcc.c | GCC 
 
 [Sources.X64]
   X64/CpuFlushTlb.nasm
-  X64/CpuFlushTlb.asm 
   X64/CpuSleep.nasm
-  X64/CpuSleep.asm
 
   X64/CpuSleep.nasm| GCC
   X64/CpuSleep.S | GCC 
