@@ -1,4 +1,4 @@
-/**  @file
+/** @file
   Provides services to display completion progress of a firmware update on a
   text console.
 
