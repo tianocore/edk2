@@ -1,4 +1,4 @@
-/**  @file
+/** @file
   Provides services to display completion progress of a firmware update on a
   graphical console that supports the Graphics Output Protocol.
 
@@ -118,13 +118,13 @@ const EFI_GRAPHICS_OUTPUT_BLT_PIXEL_UNION  mProgressBarDefaultColor = {
 //
 BOOLEAN mGraphicsGood = FALSE;
 
-/*
+/**
   Internal function used to find the bounds of the white logo (on black or
   red background).
 
   These bounds are then computed to find the block size, 0%, 100%, etc.
 
-*/
+**/
 VOID
 FindDim (
    VOID
