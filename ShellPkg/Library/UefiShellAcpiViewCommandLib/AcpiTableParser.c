@@ -45,32 +45,32 @@ RegisterParser (
   IN  PARSE_ACPI_TABLE_PROC   ParserProc
   )
 {
-  UINT32 index;
+  UINT32 Index;
 
   if ((ParserProc == NULL) || (Signature == ACPI_PARSER_SIGNATURE_NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
   // Search if a parser is already installed
-  for (index = 0;
-       index < (sizeof (mTableParserList) / sizeof (mTableParserList[0]));
-       index++)
+  for (Index = 0;
+       Index < (sizeof (mTableParserList) / sizeof (mTableParserList[0]));
+       Index++)
   {
-    if (Signature == mTableParserList[index].Signature) {
-      if (mTableParserList[index].Parser != NULL) {
+    if (Signature == mTableParserList[Index].Signature) {
+      if (mTableParserList[Index].Parser != NULL) {
         return EFI_ALREADY_STARTED;
       }
     }
   }
 
   // Find the first free slot and register the parser
-  for (index = 0;
-      index < (sizeof (mTableParserList) / sizeof (mTableParserList[0]));
-      index++)
+  for (Index = 0;
+      Index < (sizeof (mTableParserList) / sizeof (mTableParserList[0]));
+      Index++)
   {
-    if (mTableParserList[index].Signature == ACPI_PARSER_SIGNATURE_NULL) {
-      mTableParserList[index].Signature = Signature;
-      mTableParserList[index].Parser = ParserProc;
+    if (mTableParserList[Index].Signature == ACPI_PARSER_SIGNATURE_NULL) {
+      mTableParserList[Index].Signature = Signature;
+      mTableParserList[Index].Parser = ParserProc;
       return EFI_SUCCESS;
     }
   }
@@ -96,19 +96,19 @@ DeregisterParser (
   IN  UINT32                  Signature
   )
 {
-  UINT32 index;
+  UINT32 Index;
 
   if (Signature == ACPI_PARSER_SIGNATURE_NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  for (index = 0;
-       index < (sizeof (mTableParserList) / sizeof (mTableParserList[0]));
-       index++)
+  for (Index = 0;
+       Index < (sizeof (mTableParserList) / sizeof (mTableParserList[0]));
+       Index++)
   {
-    if (Signature == mTableParserList[index].Signature) {
-      mTableParserList[index].Signature = ACPI_PARSER_SIGNATURE_NULL;
-      mTableParserList[index].Parser = NULL;
+    if (Signature == mTableParserList[Index].Signature) {
+      mTableParserList[Index].Signature = ACPI_PARSER_SIGNATURE_NULL;
+      mTableParserList[Index].Parser = NULL;
       return EFI_SUCCESS;
     }
   }
@@ -137,18 +137,18 @@ GetParser (
   OUT PARSE_ACPI_TABLE_PROC *  ParserProc
   )
 {
-  UINT32 index;
+  UINT32 Index;
 
   if ((ParserProc == NULL) || (Signature == ACPI_PARSER_SIGNATURE_NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
-  for (index = 0;
-       index < (sizeof (mTableParserList) / sizeof (mTableParserList[0]));
-       index++)
+  for (Index = 0;
+       Index < (sizeof (mTableParserList) / sizeof (mTableParserList[0]));
+       Index++)
   {
-    if (Signature == mTableParserList[index].Signature) {
-      *ParserProc = mTableParserList[index].Parser;
+    if (Signature == mTableParserList[Index].Signature) {
+      *ParserProc = mTableParserList[Index].Parser;
       return EFI_SUCCESS;
     }
   }

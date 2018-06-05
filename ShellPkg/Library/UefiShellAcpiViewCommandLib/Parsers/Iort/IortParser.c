@@ -27,13 +27,13 @@ STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
   The EIORT_NODE enum describes the IORT Node types.
 **/
 typedef enum IortNode {
-  EIORT_NODE_ITS_GROUP,        ///< ITS Group node
-  EIORT_NODE_NAMED_COMPONENT,  ///< Named Component node
-  EIORT_NODE_ROOT_COMPLEX,     ///< Root Complex node
-  EIORT_NODE_SMMUV1_V2,        ///< SMMU v1/v2 node
-  EIORT_NODE_SMMUV3,           ///< SMMU v3 node
-  EIORT_NODE_PMCG,             ///< PMC group node
-  EIORT_NODE_MAX
+  Iort_Node_ITS_Group,        ///< ITS Group node
+  Iort_Node_Named_Component,  ///< Named Component node
+  Iort_Node_Root_Complex,     ///< Root Complex node
+  Iort_Node_SMMUV1_V2,        ///< SMMU v1/v2 node
+  Iort_Node_SMMUV3,           ///< SMMU v3 node
+  Iort_Node_PMCG,             ///< PMC group node
+  Iort_Node_Max
 } EIORT_NODE;
 
 // Local Variables
@@ -665,13 +665,13 @@ ParseAcpiIort (
     Print (L"0x%x\n", Offset);
 
     switch (*IortNodeType) {
-      case EIORT_NODE_ITS_GROUP:
+      case Iort_Node_ITS_Group:
         DumpIortNodeIts (
           NodePtr,
           *IortNodeLength
           );
         break;
-      case EIORT_NODE_NAMED_COMPONENT:
+      case Iort_Node_Named_Component:
         DumpIortNodeNamedComponent (
           NodePtr,
           *IortNodeLength,
@@ -679,7 +679,7 @@ ParseAcpiIort (
           *IortIdMappingOffset
           );
         break;
-      case EIORT_NODE_ROOT_COMPLEX:
+      case Iort_Node_Root_Complex:
         DumpIortNodeRootComplex (
           NodePtr,
           *IortNodeLength,
@@ -687,7 +687,7 @@ ParseAcpiIort (
           *IortIdMappingOffset
           );
         break;
-      case EIORT_NODE_SMMUV1_V2:
+      case Iort_Node_SMMUV1_V2:
         DumpIortNodeSmmuV1V2 (
           NodePtr,
           *IortNodeLength,
@@ -695,7 +695,7 @@ ParseAcpiIort (
           *IortIdMappingOffset
           );
         break;
-      case EIORT_NODE_SMMUV3:
+      case Iort_Node_SMMUV3:
         DumpIortNodeSmmuV3 (
           NodePtr,
           *IortNodeLength,
@@ -703,7 +703,7 @@ ParseAcpiIort (
           *IortIdMappingOffset
           );
         break;
-      case EIORT_NODE_PMCG:
+      case Iort_Node_PMCG:
         DumpIortNodePmcg (
           NodePtr,
           *IortNodeLength,

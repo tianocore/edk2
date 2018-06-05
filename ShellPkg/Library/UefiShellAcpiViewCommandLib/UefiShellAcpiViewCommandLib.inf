@@ -27,6 +27,9 @@
   UefiShellAcpiViewCommandLib.uni
   UefiShellAcpiViewCommandLib.c
   UefiShellAcpiViewCommandLib.h
+  AcpiParser.h
+  AcpiTableParser.h
+  AcpiView.h
   AcpiParser.c
   AcpiTableParser.c
   AcpiView.c

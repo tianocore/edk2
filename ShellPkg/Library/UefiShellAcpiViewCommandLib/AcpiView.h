@@ -33,11 +33,11 @@
   The EREPORT_OPTION enum describes ACPI table Reporting options.
 **/
 typedef enum ReportOption {
-  EREPORT_ALL,            ///< Report All tables.
-  EREPORT_SELECTED,       ///< Report Selected table.
-  EREPORT_TABLE_LIST,     ///< Report List of tables.
-  EREPORT_DUMP_BIN_FILE,  ///< Dump selected table to a file.
-  EREPORT_MAX
+  ReportAll,            ///< Report All tables.
+  ReportSelected,       ///< Report Selected table.
+  ReportTableList,      ///< Report List of tables.
+  ReportDumpBinFile,    ///< Dump selected table to a file.
+  ReportMax,
 } EREPORT_OPTION;
 
 /**

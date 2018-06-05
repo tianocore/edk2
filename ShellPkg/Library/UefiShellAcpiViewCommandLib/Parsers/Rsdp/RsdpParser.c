@@ -88,7 +88,10 @@ ValidateRsdtAddress (
   // Root System Description Pointer (RSDP), ACPI ? 5.2.5.
   //   - Within the RSDP, the RsdtAddress field must be null (zero) and the
   //     XsdtAddresss MUST be a valid, non-null, 64-bit value.
-  UINT32 RsdtAddr = *(UINT32*)Ptr;
+  UINT32 RsdtAddr;
+
+  RsdtAddr = *(UINT32*)Ptr;
+
   if (RsdtAddr != 0) {
     IncrementErrorCount ();
     Print (
@@ -120,7 +123,10 @@ ValidateXsdtAddress (
   // Root System Description Pointer (RSDP), ACPI ? 5.2.5.
   //   - Within the RSDP, the RsdtAddress field must be null (zero) and the
   //     XsdtAddresss MUST be a valid, non-null, 64-bit value.
-  UINT64 XsdtAddr = *(UINT64*)Ptr;
+  UINT64 XsdtAddr;
+
+  XsdtAddr = *(UINT64*)Ptr;
+
   if (XsdtAddr == 0) {
     IncrementErrorCount ();
     Print (

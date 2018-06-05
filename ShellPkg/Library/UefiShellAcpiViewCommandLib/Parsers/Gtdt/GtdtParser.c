@@ -138,7 +138,10 @@ ValidateGtBlockTimerCount (
   IN VOID*  Context
   )
 {
-  UINT32 BlockTimerCount = *(UINT32*)Ptr;
+  UINT32 BlockTimerCount;
+
+  BlockTimerCount = *(UINT32*)Ptr;
+
   if (BlockTimerCount > 8) {
     IncrementErrorCount ();
     Print (

@@ -112,7 +112,10 @@ ValidateNameSpaceStrLen (
   IN VOID*  Context
   )
 {
-  UINT16 NameSpaceStrLen = *(UINT16*)Ptr;
+  UINT16 NameSpaceStrLen;
+
+  NameSpaceStrLen = *(UINT16*)Ptr;
+
   if (NameSpaceStrLen < 2) {
     IncrementErrorCount ();
     Print (

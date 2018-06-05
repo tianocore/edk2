@@ -98,7 +98,10 @@ ValidateInterruptType (
   )
 {
 #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-  UINT8 InterruptType = *Ptr;
+  UINT8 InterruptType;
+
+  InterruptType = *Ptr;
+
   if (InterruptType !=
         EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC) {
     IncrementErrorCount ();
@@ -126,7 +129,10 @@ ValidateIrq (
   )
 {
 #if defined (MDE_CPU_ARM) || defined (MDE_CPU_AARCH64)
-  UINT8 Irq = *Ptr;
+  UINT8 Irq;
+
+  Irq = *Ptr;
+
   if (Irq != 0) {
     IncrementErrorCount ();
     Print (

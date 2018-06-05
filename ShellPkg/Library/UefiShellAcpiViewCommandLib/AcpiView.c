@@ -122,8 +122,11 @@ DumpAcpiTableToFile (
 {
   EFI_STATUS         Status;
   CHAR16             FileNameBuffer[MAX_FILE_NAME_LEN];
-  SHELL_FILE_HANDLE  DumpFileHandle = NULL;
-  UINTN              TransferBytes = Length;
+  SHELL_FILE_HANDLE  DumpFileHandle;
+  UINTN              TransferBytes;
+
+  DumpFileHandle = NULL;
+  TransferBytes = Length;
 
   UnicodeSPrint (
     FileNameBuffer,
@@ -186,20 +189,25 @@ ProcessTableReportOptions (
   )
 {
   UINTN   OriginalAttribute;
-  UINT8*  SignaturePtr = (UINT8*)(UINTN)&Signature;
-  BOOLEAN Log = FALSE;
-  BOOLEAN HighLight = GetColourHighlighting ();
+  UINT8*  SignaturePtr;
+  BOOLEAN Log;
+  BOOLEAN HighLight;
+
+  SignaturePtr = (UINT8*)(UINTN)&Signature;
+  Log = FALSE;
+  HighLight = GetColourHighlighting ();
+
   switch (GetReportOption ()) {
-    case EREPORT_ALL:
+    case ReportAll:
       Log = TRUE;
       break;
-    case EREPORT_SELECTED:
+    case ReportSelected:
       if (Signature == GetSelectedAcpiTable ()) {
         Log = TRUE;
         mSelectedAcpiTableFound = TRUE;
       }
       break;
-    case EREPORT_TABLE_LIST:
+    case ReportTableList:
       if (mTableCount == 0) {
         if (HighLight) {
           OriginalAttribute = gST->ConOut->Mode->Attribute;
@@ -223,13 +231,13 @@ ProcessTableReportOptions (
         SignaturePtr[3]
         );
       break;
-    case EREPORT_DUMP_BIN_FILE:
+    case ReportDumpBinFile:
       if (Signature == GetSelectedAcpiTable ()) {
         mSelectedAcpiTableFound = TRUE;
         DumpAcpiTableToFile (TablePtr, Length);
       }
       break;
-    case EREPORT_MAX:
+    case ReportMax:
       // We should never be here.
       // This case is only present to prevent compiler warning.
       break;
@@ -273,8 +281,10 @@ ConvertStrToAcpiSignature (
   IN  CONST CHAR16* Str
   )
 {
-  UINT8 Index = 0;
+  UINT8 Index;
   CHAR8 Ptr[4];
+
+  Index = 0;
 
   // Convert to Upper case and convert to ASCII
   while ((Index < 4) && (Str[Index] != 0)) {
@@ -371,12 +381,12 @@ AcpiView (
   }
 
   ReportOption = GetReportOption ();
-  if (EREPORT_TABLE_LIST != ReportOption) {
-    if (((EREPORT_SELECTED == ReportOption)  ||
-         (EREPORT_DUMP_BIN_FILE == ReportOption)) &&
+  if (ReportTableList != ReportOption) {
+    if (((ReportSelected == ReportOption)  ||
+         (ReportDumpBinFile == ReportOption)) &&
         (!mSelectedAcpiTableFound)) {
       Print (L"\nRequested ACPI Table not found.\n");
-    } else if (EREPORT_DUMP_BIN_FILE != ReportOption) {
+    } else if (ReportDumpBinFile != ReportOption) {
       OriginalAttribute = gST->ConOut->Mode->Attribute;
 
       Print (L"\nTable Statistics:\n");
@@ -426,15 +436,15 @@ ShellCommandRunAcpiView (
   )
 {
   EFI_STATUS         Status;
-  SHELL_STATUS       ShellStatus = SHELL_SUCCESS;
-  LIST_ENTRY*        Package = NULL;
+  SHELL_STATUS       ShellStatus;
+  LIST_ENTRY*        Package;
   CHAR16*            ProblemParam;
   CONST CHAR16*      Temp;
   CHAR8              ColourOption[8];
-  SHELL_FILE_HANDLE  TmpDumpFileHandle = NULL;
+  SHELL_FILE_HANDLE  TmpDumpFileHandle;
 
   // Set Defaults
-  mReportType = EREPORT_ALL;
+  mReportType = ReportAll;
   mTableCount = 0;
   mBinTableCount = 0;
   mSelectedAcpiTable = 0;
@@ -442,6 +452,10 @@ ShellCommandRunAcpiView (
   mSelectedAcpiTableFound = FALSE;
   mVerbose = TRUE;
   mConsistencyCheck = TRUE;
+
+  ShellStatus = SHELL_SUCCESS;
+  Package = NULL;
+  TmpDumpFileHandle = NULL;
 
   // Reset The error/warning counters
   ResetErrorCount ();
@@ -547,19 +561,19 @@ ShellCommandRunAcpiView (
       }
 
       if (ShellCommandLineGetFlag (Package, L"-l")) {
-        mReportType = EREPORT_TABLE_LIST;
+        mReportType = ReportTableList;
       } else {
         mSelectedAcpiTableName = ShellCommandLineGetValue (Package, L"-s");
         if (mSelectedAcpiTableName != NULL) {
           mSelectedAcpiTable = (UINT32)ConvertStrToAcpiSignature (
                                          mSelectedAcpiTableName
                                          );
-          mReportType = EREPORT_SELECTED;
+          mReportType = ReportSelected;
 
           if (ShellCommandLineGetFlag (Package, L"-d"))  {
             // Create a temporary file to check if the media is writable.
             CHAR16 FileNameBuffer[MAX_FILE_NAME_LEN];
-            mReportType = EREPORT_DUMP_BIN_FILE;
+            mReportType = ReportDumpBinFile;
 
             UnicodeSPrint (
               FileNameBuffer,

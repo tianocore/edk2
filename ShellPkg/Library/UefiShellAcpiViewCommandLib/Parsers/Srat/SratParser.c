@@ -177,7 +177,10 @@ DumpSratApicProximity (
  IN UINT8*        Ptr
  )
 {
-  UINT32 ProximityDomain = Ptr[0] | (Ptr[1] << 8) | (Ptr[2] << 16);
+  UINT32 ProximityDomain;
+
+  ProximityDomain = Ptr[0] | (Ptr[1] << 8) | (Ptr[2] << 16);
+
   Print (Format, ProximityDomain);
 }
 
@@ -210,12 +213,18 @@ ParseAcpiSrat (
 {
   UINT32 Offset;
   UINT8* ResourcePtr;
-  UINT32 GicCAffinityIndex = 0;
-  UINT32 GicITSAffinityIndex = 0;
-  UINT32 MemoryAffinityIndex = 0;
-  UINT32 ApicSapicAffinityIndex = 0;
-  UINT32 X2ApicAffinityIndex = 0;
+  UINT32 GicCAffinityIndex;
+  UINT32 GicITSAffinityIndex;
+  UINT32 MemoryAffinityIndex;
+  UINT32 ApicSapicAffinityIndex;
+  UINT32 X2ApicAffinityIndex;
   CHAR8  Buffer[80];  // Used for AsciiName param of ParseAcpi
+
+  GicCAffinityIndex = 0;
+  GicITSAffinityIndex = 0;
+  MemoryAffinityIndex = 0;
+  ApicSapicAffinityIndex = 0;
+  X2ApicAffinityIndex = 0;
 
   if (!Trace) {
     return;

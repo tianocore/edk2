@@ -21,6 +21,15 @@ STATIC UINT32   gIndent;
 STATIC UINT32   mTableErrorCount;
 STATIC UINT32   mTableWarningCount;
 
+STATIC ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
+
+/**
+  An ACPI_PARSER array describing the ACPI header.
+**/
+STATIC CONST ACPI_PARSER AcpiHeaderParser[] = {
+  PARSE_ACPI_HEADER (&AcpiHdrInfo)
+};
+
 /**
   This function resets the ACPI table error counter to Zero.
 **/
@@ -114,9 +123,12 @@ VerifyChecksum (
   IN UINT32  Length
   )
 {
-  UINTN ByteCount = 0;
-  UINT8 Checksum = 0;
+  UINTN ByteCount;
+  UINT8 Checksum;
   UINTN OriginalAttribute;
+
+  ByteCount = 0;
+  Checksum = 0;
 
   while (ByteCount < Length) {
     Checksum += *(Ptr++);
@@ -166,10 +178,13 @@ DumpRaw (
   IN UINT32 Length
   )
 {
-  UINTN ByteCount = 0;
+  UINTN ByteCount;
   UINTN PartLineChars;
-  UINTN AsciiBufferIndex = 0;
+  UINTN AsciiBufferIndex;
   CHAR8 AsciiBuffer[17];
+
+  ByteCount = 0;
+  AsciiBufferIndex = 0;
 
   Print (L"Address  : 0x%p\n", Ptr);
   Print (L"Length   : %d\n", Length);
@@ -277,7 +292,10 @@ DumpUint64 (
   // Some fields are not aligned and this causes alignment faults
   // on ARM platforms if the compiler generates LDRD instructions.
   // Perform word access so that LDRD instructions are not generated.
-  UINT64 Val = *(UINT32*)(Ptr + sizeof (UINT32));
+  UINT64 Val;
+
+  Val = *(UINT32*)(Ptr + sizeof (UINT32));
+
   Val <<= 32;
   Val |= *(UINT32*)Ptr;
 
@@ -456,13 +474,16 @@ ParseAcpi (
 )
 {
   UINT32  Index;
-  UINT32  Offset = 0;
+  UINT32  Offset;
+  BOOLEAN HighLight;
+
+  Offset = 0;
 
   // Increment the Indent
   gIndent += Indent;
 
   if (Trace && (AsciiName != NULL)){
-    BOOLEAN HighLight = GetColourHighlighting ();
+    HighLight = GetColourHighlighting ();
     UINTN   OriginalAttribute;
 
     if (HighLight) {
@@ -620,11 +641,6 @@ DumpAcpiHeader (
   IN UINT8* Ptr
   )
 {
-  ACPI_DESCRIPTION_HEADER_INFO AcpiHdrInfo;
-  ACPI_PARSER AcpiHeaderParser[] = {
-    PARSE_ACPI_HEADER (&AcpiHdrInfo)
-  };
-
   return ParseAcpi (
            TRUE,
            0,
@@ -658,10 +674,6 @@ ParseAcpiHeader (
   )
 {
   UINT32                        BytesParsed;
-  ACPI_DESCRIPTION_HEADER_INFO  AcpiHdrInfo;
-  ACPI_PARSER AcpiHeaderParser[] = {
-    PARSE_ACPI_HEADER (&AcpiHdrInfo)
-  };
 
   BytesParsed = ParseAcpi (
                   FALSE,

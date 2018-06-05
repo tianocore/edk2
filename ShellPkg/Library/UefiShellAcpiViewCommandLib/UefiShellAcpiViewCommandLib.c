@@ -64,7 +64,10 @@ RegisterAllParsers (
   )
 {
   EFI_STATUS Status;
-  UINTN Count = sizeof (ParserList) / sizeof (ParserList[0]);
+  UINTN Count;
+
+  Count = sizeof (ParserList) / sizeof (ParserList[0]);
+
   while (Count-- != 0) {
     Status = RegisterParser (
                ParserList[Count].Signature,

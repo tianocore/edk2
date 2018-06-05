@@ -63,8 +63,8 @@ ParseAcpiSlit (
   )
 {
   UINT32 Offset;
-  UINT64 i;
-  UINT64 j;
+  UINT64 Count;
+  UINT64 Index;
   UINT64 LocalityCount;
   UINT8* LocalityPtr;
   CHAR16 Buffer[80];  // Used for AsciiName param of ParseAcpi
@@ -98,46 +98,46 @@ ParseAcpiSlit (
     PrintFieldName (0, Buffer);
     Print (L"\n");
     Print (L"       ");
-    for (j = 0; j < LocalityCount; j++) {
-      Print (L" (%3d) ", j);
+    for (Index = 0; Index < LocalityCount; Index++) {
+      Print (L" (%3d) ", Index);
     }
     Print (L"\n");
-    for (i = 0; i < LocalityCount; i++) {
-      Print (L" (%3d) ", i);
-      for (j = 0; j < LocalityCount; j++) {
-        Print (L"  %3d  ", SLIT_ELEMENT (LocalityPtr, i, j));
+    for (Count = 0; Count< LocalityCount; Count++) {
+      Print (L" (%3d) ", Count);
+      for (Index = 0; Index < LocalityCount; Index++) {
+        Print (L"  %3d  ", SLIT_ELEMENT (LocalityPtr, Count, Index));
       }
       Print (L"\n");
     }
   }
 
   // Validate
-  for (i = 0; i < LocalityCount; i++) {
-    for (j = 0; j < LocalityCount; j++) {
+  for (Count = 0; Count < LocalityCount; Count++) {
+    for (Index = 0; Index < LocalityCount; Index++) {
       // Element[x][x] must be equal to 10
-      if ((i == j) && (SLIT_ELEMENT (LocalityPtr, i, j) != 10)) {
+      if ((Count == Index) && (SLIT_ELEMENT (LocalityPtr, Count,Index) != 10)) {
         IncrementErrorCount ();
         Print (
           L"ERROR: Diagonal Element[0x%lx][0x%lx] (%3d)."
             " Normalized Value is not 10\n",
-          i,
-          j,
-          SLIT_ELEMENT (LocalityPtr, i, j)
+          Count,
+          Index,
+          SLIT_ELEMENT (LocalityPtr, Count, Index)
           );
       }
       // Element[i][j] must be equal to Element[j][i]
-      if (SLIT_ELEMENT (LocalityPtr, i, j) !=
-          SLIT_ELEMENT (LocalityPtr, j, i)) {
+      if (SLIT_ELEMENT (LocalityPtr, Count, Index) !=
+          SLIT_ELEMENT (LocalityPtr, Index, Count)) {
         IncrementErrorCount ();
         Print (
           L"ERROR: Relative distances for Element[0x%lx][0x%lx] (%3d) and \n"
            "Element[0x%lx][0x%lx] (%3d) do not match.\n",
-          i,
-          j,
-          SLIT_ELEMENT (LocalityPtr, i, j),
-          j,
-          i,
-          SLIT_ELEMENT (LocalityPtr, j, i)
+          Count,
+          Index,
+          SLIT_ELEMENT (LocalityPtr, Count, Index),
+          Index,
+          Count,
+          SLIT_ELEMENT (LocalityPtr, Index, Count)
           );
       }
     }

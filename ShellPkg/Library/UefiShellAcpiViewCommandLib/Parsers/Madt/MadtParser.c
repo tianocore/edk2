@@ -197,7 +197,9 @@ ParseAcpiMadt (
 {
   UINT32 Offset;
   UINT8* InterruptContollerPtr;
-  UINT32 GICDCount = 0;
+  UINT32 GICDCount;
+
+  GICDCount = 0;
 
   if (!Trace) {
     return;
