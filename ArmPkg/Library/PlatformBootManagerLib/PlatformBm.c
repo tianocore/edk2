@@ -24,6 +24,7 @@
 #include <Library/PcdLib.h>
 #include <Library/UefiBootManagerLib.h>
 #include <Library/UefiLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/EsrtManagement.h>
 #include <Protocol/GraphicsOutput.h>
@@ -553,21 +554,6 @@ PlatformBootManagerBeforeConsole (
   VOID
   )
 {
-  EFI_STATUS                    Status;
-  ESRT_MANAGEMENT_PROTOCOL      *EsrtManagement;
-
-  if (GetBootModeHob() == BOOT_ON_FLASH_UPDATE) {
-    DEBUG ((DEBUG_INFO, "ProcessCapsules Before EndOfDxe ......\n"));
-    Status = ProcessCapsules ();
-    DEBUG ((DEBUG_INFO, "ProcessCapsules returned %r\n", Status));
-  } else {
-    Status = gBS->LocateProtocol (&gEsrtManagementProtocolGuid, NULL,
-                    (VOID **)&EsrtManagement);
-    if (!EFI_ERROR (Status)) {
-      EsrtManagement->SyncEsrtFmp ();
-    }
-  }
-
   //
   // Signal EndOfDxe PI Event
   //
@@ -618,6 +604,56 @@ PlatformBootManagerBeforeConsole (
   PlatformRegisterOptionsAndKeys ();
 }
 
+STATIC
+VOID
+HandleCapsules (
+  VOID
+  )
+{
+  ESRT_MANAGEMENT_PROTOCOL    *EsrtManagement;
+  EFI_PEI_HOB_POINTERS        HobPointer;
+  EFI_CAPSULE_HEADER          *CapsuleHeader;
+  BOOLEAN                     NeedReset;
+  EFI_STATUS                  Status;
+
+  DEBUG ((DEBUG_INFO, "%a: processing capsules ...\n", __FUNCTION__));
+
+  Status = gBS->LocateProtocol (&gEsrtManagementProtocolGuid, NULL,
+                  (VOID **)&EsrtManagement);
+  if (!EFI_ERROR (Status)) {
+    EsrtManagement->SyncEsrtFmp ();
+  }
+
+  //
+  // Find all capsule images from hob
+  //
+  HobPointer.Raw = GetHobList ();
+  NeedReset = FALSE;
+  while ((HobPointer.Raw = GetNextHob (EFI_HOB_TYPE_UEFI_CAPSULE,
+                             HobPointer.Raw)) != NULL) {
+    CapsuleHeader = (VOID *)(UINTN)HobPointer.Capsule->BaseAddress;
+
+    Status = ProcessCapsuleImage (CapsuleHeader);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: failed to process capsule %p - %r\n",
+        __FUNCTION__, CapsuleHeader, Status));
+      return;
+    }
+
+    NeedReset = TRUE;
+    HobPointer.Raw = GET_NEXT_HOB (HobPointer);
+  }
+
+  if (NeedReset) {
+      DEBUG ((DEBUG_WARN, "%a: capsule update successful, resetting ...\n",
+        __FUNCTION__));
+
+      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
+      CpuDeadLoop();
+  }
+}
+
+
 #define VERSION_STRING_PREFIX    L"Tianocore/EDK2 firmware version "
 
 /**
@@ -637,7 +673,6 @@ PlatformBootManagerAfterConsole (
   VOID
   )
 {
-  ESRT_MANAGEMENT_PROTOCOL      *EsrtManagement;
   EFI_STATUS                    Status;
   EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
   UINTN                         FirmwareVerLength;
@@ -675,17 +710,14 @@ PlatformBootManagerAfterConsole (
   //
   EfiBootManagerConnectAll ();
 
-  Status = gBS->LocateProtocol (&gEsrtManagementProtocolGuid, NULL,
-                  (VOID **)&EsrtManagement);
-  if (!EFI_ERROR (Status)) {
-    EsrtManagement->SyncEsrtFmp ();
-  }
-
-  if (GetBootModeHob() == BOOT_ON_FLASH_UPDATE) {
-    DEBUG((DEBUG_INFO, "ProcessCapsules After EndOfDxe ......\n"));
-    Status = ProcessCapsules ();
-    DEBUG((DEBUG_INFO, "ProcessCapsules returned %r\n", Status));
-  }
+  //
+  // On ARM, there is currently no reason to use the phased capsule
+  // update approach where some capsules are dispatched before EndOfDxe
+  // and some are dispatched after. So just handle all capsules here,
+  // when the console is up and we can actually give the user some
+  // feedback about what is going on.
+  //
+  HandleCapsules ();
 
   //
   // Enumerate all possible boot options.
