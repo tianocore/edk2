@@ -102,7 +102,7 @@ DEFINE WINSDK81_BIN       = ENV(WINSDK81_PREFIX)x86\
 DEFINE WINSDK81x86_BIN    = ENV(WINSDK81x86_PREFIX)x64
 
 # Microsoft Visual Studio 2017 Professional Edition
-DEFINE WINSDK10_BIN       = ENV(WINSDK10_PREFIX)DEF(VS2017_HOST)
+DEFINE WINSDK10_BIN       = ENV(WINSDK10_PREFIX)ENV(WindowsSDKVersion)DEF(VS2017_HOST)
 
 # These defines are needed for certain Microsoft Visual Studio tools that
 # are used by other toolchains.  An example is that ICC on Windows normally
