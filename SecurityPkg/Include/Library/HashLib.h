@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Uefi.h>
 #include <Protocol/Hash.h>
-
+#include <IndustryStandard/Tpm20.h>
 typedef UINTN  HASH_HANDLE;
 
 /**

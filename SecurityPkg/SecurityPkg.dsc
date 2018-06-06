@@ -219,6 +219,8 @@
   #
   SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
   SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
+  SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha384.inf
+  SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha512.inf
 
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf {
     <LibraryClasses>
@@ -231,6 +233,8 @@
       NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
       NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
       NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
   }
 
   SecurityPkg/Tcg/Tcg2Dxe/Tcg2Dxe.inf {
@@ -239,6 +243,8 @@
       NULL|SecurityPkg/Library/Tpm2DeviceLibDTpm/Tpm2InstanceLibDTpm.inf
       NULL|SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
       NULL|SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
+      NULL|SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigDxe.inf {
