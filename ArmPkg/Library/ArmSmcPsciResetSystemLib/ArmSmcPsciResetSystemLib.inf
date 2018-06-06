@@ -30,6 +30,15 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  ArmMmuLib
   ArmSmcLib
   BaseLib
   DebugLib
+  UefiBootServicesTableLib
+  UefiRuntimeLib
+
+[FeaturePcd]
+  gArmTokenSpaceGuid.PcdArmReenterPeiForCapsuleWarmReboot
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFvBaseAddress
