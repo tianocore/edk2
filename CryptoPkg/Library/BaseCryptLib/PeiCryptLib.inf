@@ -6,14 +6,14 @@
 #  This external input must be validated carefully to avoid security issues such as
 #  buffer overflow or integer overflow.
 #
-#  Note: MD4 Digest functions, SHA-384 Digest functions, SHA-512 Digest functions,
+#  Note: MD4 Digest functions, 
 #  HMAC-MD5 functions, HMAC-SHA1/SHA256 functions, AES/TDES/ARC4 functions, RSA external
 #  functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, X.509 
 #  certificate handler functions, authenticode signature verification functions, 
 #  PEM handler functions, and pseudorandom number generator functions are not 
 #  supported in this instance.
 #
-#  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -44,7 +44,7 @@
   Hash/CryptMd5.c
   Hash/CryptSha1.c
   Hash/CryptSha256.c
-  Hash/CryptSha512Null.c
+  Hash/CryptSha512.c
   Hmac/CryptHmacMd5Null.c
   Hmac/CryptHmacSha1Null.c
   Hmac/CryptHmacSha256Null.c
