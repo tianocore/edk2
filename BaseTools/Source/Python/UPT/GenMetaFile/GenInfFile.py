@@ -2,7 +2,7 @@
 #
 # This file contained the logical of transfer package object to INF files.
 #
-# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -20,7 +20,7 @@ import stat
 import codecs
 import md5
 from Core.FileHook import __FileHookOpen__
-from Library.String import GetSplitValueList
+from Library.StringUtils import GetSplitValueList
 from Library.Parsing import GenSection
 from Library.Parsing import GetWorkspacePackage
 from Library.Parsing import ConvertArchForInstall
@@ -41,7 +41,7 @@ import Logger.Log as Logger
 from Library import DataType as DT
 from GenMetaFile import GenMetaFileMisc
 from Library.UniClassObject import FormatUniEntry
-from Library.String import GetUniFileName
+from Library.StringUtils import GetUniFileName
 
 
 ## Transfer Module Object to Inf files

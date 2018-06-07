@@ -1,7 +1,7 @@
 ## @file InfPomAlignmentMisc.py
 # This file contained the routines for InfPomAlignment
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -24,7 +24,7 @@ from Library import DataType as DT
 from Library.Misc import ConvertArchList
 from Object.POM.ModuleObject import BinaryFileObject
 from Object.POM import CommonObject
-from Library.String import FORMAT_INVALID
+from Library.StringUtils import FORMAT_INVALID
 from Library.Misc import CheckGuidRegFormat
 from Logger import StringTable as ST
 

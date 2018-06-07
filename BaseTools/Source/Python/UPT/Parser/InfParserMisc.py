@@ -1,7 +1,7 @@
 ## @file
 # This file contained the miscellaneous functions for INF parser 
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -25,8 +25,8 @@ import re
 from Library import DataType as DT
 
 
-from Library.String import gMACRO_PATTERN
-from Library.String import ReplaceMacro
+from Library.StringUtils import gMACRO_PATTERN
+from Library.StringUtils import ReplaceMacro
 from Object.Parser.InfMisc import ErrorInInf
 from Logger.StringTable import ERR_MARCO_DEFINITION_MISS_ERROR
 

@@ -1,7 +1,7 @@
 ## @file
 # This file contained the parser for INF file
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -23,8 +23,8 @@ import re
 import os
 from copy import deepcopy
 
-from Library.String import GetSplitValueList
-from Library.String import ConvertSpecialChar
+from Library.StringUtils import GetSplitValueList
+from Library.StringUtils import ConvertSpecialChar
 from Library.Misc import ProcessLineExtender
 from Library.Misc import ProcessEdkComment
 from Library.Parsing import NormPath

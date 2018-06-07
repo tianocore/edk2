@@ -1,7 +1,7 @@
 ## @file
 # This file is used to provide method for process AsBuilt INF file. It will consumed by InfParser
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -23,7 +23,7 @@ import Logger.Log as Logger
 from Logger import StringTable as ST
 from Logger import ToolError
 
-from Library.String import GetSplitValueList
+from Library.StringUtils import GetSplitValueList
 from Library.Misc import GetHelpStringByRemoveHashKey
 from Library.Misc import ValidFile
 from Library.Misc import ProcessLineExtender

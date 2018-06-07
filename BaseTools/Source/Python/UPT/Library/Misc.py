@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -45,7 +45,7 @@ from Library.DataType import TAB_LANGUAGE_EN_US
 from Library.DataType import TAB_LANGUAGE_EN
 from Library.DataType import TAB_LANGUAGE_EN_X
 from Library.DataType import TAB_UNI_FILE_SUFFIXS
-from Library.String import GetSplitValueList
+from Library.StringUtils import GetSplitValueList
 from Library.ParserValidate import IsValidHexVersion
 from Library.ParserValidate import IsValidPath
 from Object.POM.CommonObject import TextObject

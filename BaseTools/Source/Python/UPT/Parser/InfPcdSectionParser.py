@@ -1,7 +1,7 @@
 ## @file
 # This file contained the parser for [Pcds] sections in INF file 
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -26,7 +26,7 @@ from Library import DataType as DT
 from Library.Parsing import MacroParser
 from Library.Misc import GetSplitValueList
 from Library import GlobalData
-from Library.String import SplitPcdEntry
+from Library.StringUtils import SplitPcdEntry
 from Parser.InfParserMisc import InfParserSectionRoot
 
 class InfPcdSectionParser(InfParserSectionRoot):

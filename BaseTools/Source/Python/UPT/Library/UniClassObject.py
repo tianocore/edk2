@@ -23,7 +23,7 @@ import distutils.util
 from Logger import ToolError
 from Logger import Log as EdkLogger
 from Logger import StringTable as ST
-from Library.String import GetLineNo
+from Library.StringUtils import GetLineNo
 from Library.Misc import PathClass
 from Library.Misc import GetCharIndexOutStr
 from Library import DataType as DT

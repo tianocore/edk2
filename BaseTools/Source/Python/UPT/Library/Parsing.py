@@ -2,7 +2,7 @@
 # This file is used to define common parsing related functions used in parsing 
 # INF/DEC/DSC process
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -23,12 +23,12 @@ Parsing
 import os.path
 import re
 
-from Library.String import RaiseParserError
-from Library.String import GetSplitValueList
-from Library.String import CheckFileType
-from Library.String import CheckFileExist
-from Library.String import CleanString
-from Library.String import NormPath
+from Library.StringUtils import RaiseParserError
+from Library.StringUtils import GetSplitValueList
+from Library.StringUtils import CheckFileType
+from Library.StringUtils import CheckFileExist
+from Library.StringUtils import CleanString
+from Library.StringUtils import NormPath
 
 from Logger.ToolError import FILE_NOT_FOUND
 from Logger.ToolError import FatalError

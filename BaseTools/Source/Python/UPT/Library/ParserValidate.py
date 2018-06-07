@@ -1,7 +1,7 @@
 ## @file ParserValidate.py
 # Functions for parser validation
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -24,7 +24,7 @@ from Library.DataType import MODULE_LIST
 from Library.DataType import COMPONENT_TYPE_LIST
 from Library.DataType import PCD_USAGE_TYPE_LIST_OF_MODULE
 from Library.DataType import TAB_SPACE_SPLIT
-from Library.String import GetSplitValueList
+from Library.StringUtils import GetSplitValueList
 from Library.ExpressionValidate import IsValidBareCString
 from Library.ExpressionValidate import IsValidFeatureFlagExp
 from Common.MultipleWorkspace import MultipleWorkspace as mws

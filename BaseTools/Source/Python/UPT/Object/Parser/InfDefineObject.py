@@ -2,7 +2,7 @@
 # This file is used to define class objects of [Defines] section for INF file. 
 # It will consumed by InfParser
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -23,7 +23,7 @@ from Logger import StringTable as ST
 from Logger import ToolError
 from Library import GlobalData 
 from Library import DataType as DT
-from Library.String import GetSplitValueList
+from Library.StringUtils import GetSplitValueList
 from Library.Misc import CheckGuidRegFormat
 from Library.Misc import Sdict
 from Library.Misc import ConvPathFromAbsToRel

@@ -2,7 +2,7 @@
 # This file is used to define class objects of INF file [Pcds] section. 
 # It will consumed by InfParser. 
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -31,8 +31,8 @@ from Library.ParserValidate import IsValidCVariableName
 from Library.ParserValidate import IsValidPcdValue
 from Library.ParserValidate import IsValidArch
 from Library.CommentParsing import ParseComment
-from Library.String import GetSplitValueList
-from Library.String import IsHexDigitUINT32
+from Library.StringUtils import GetSplitValueList
+from Library.StringUtils import IsHexDigitUINT32
 from Library.ExpressionValidate import IsValidFeatureFlagExp
 from Parser.InfAsBuiltProcess import GetPackageListInfo
 from Parser.DecParser import Dec

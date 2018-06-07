@@ -1,7 +1,7 @@
 ## @file InfPomAlignment.py
 # This file contained the adapter for convert INF parser object to POM Object
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -20,10 +20,10 @@ InfPomAlignment
 import os.path
 from Logger import StringTable as ST
 import Logger.Log as Logger
-from Library.String import FORMAT_INVALID
-from Library.String import PARSER_ERROR
-from Library.String import NormPath
-from Library.String import GetSplitValueList
+from Library.StringUtils import FORMAT_INVALID
+from Library.StringUtils import PARSER_ERROR
+from Library.StringUtils import NormPath
+from Library.StringUtils import GetSplitValueList
 from Library.Misc import ConvertVersionToDecimal
 from Library.Misc import GetHelpStringByRemoveHashKey
 from Library.Misc import ConvertArchList
