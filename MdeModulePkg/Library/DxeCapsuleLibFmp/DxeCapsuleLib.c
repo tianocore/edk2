@@ -841,6 +841,7 @@ SetFmpImageData (
   UINT8                                         *Image;
   VOID                                          *VendorCode;
   CHAR16                                        *AbortReason;
+  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS ProgressCallback;
 
   Status = gBS->HandleProtocol(
                   Handle,
@@ -892,7 +893,11 @@ SetFmpImageData (
   //
   // Before calling SetImage(), reset the progress bar to 0%
   //
-  UpdateImageProgress (0);
+  ProgressCallback = UpdateImageProgress;
+  Status = UpdateImageProgress (0);
+  if (EFI_ERROR (Status)) {
+    ProgressCallback = NULL;
+  }
 
   Status = Fmp->SetImage(
                   Fmp,
@@ -900,13 +905,15 @@ SetFmpImageData (
                   Image,                                  // Image
                   ImageHeader->UpdateImageSize,           // ImageSize
                   VendorCode,                             // VendorCode
-                  UpdateImageProgress,                    // Progress
+                  ProgressCallback,                       // Progress
                   &AbortReason                            // AbortReason
                   );
   //
   // Set the progress bar to 100% after returning from SetImage()
   //
-  UpdateImageProgress (100);
+  if (ProgressCallback != NULL) {
+    UpdateImageProgress (100);
+  }
 
   DEBUG((DEBUG_INFO, "Fmp->SetImage - %r\n", Status));
   if (AbortReason != NULL) {
