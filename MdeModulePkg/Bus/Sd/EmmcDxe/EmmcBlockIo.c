@@ -901,7 +901,10 @@ EmmcReadWrite (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    DEBUG ((EFI_D_INFO, "Emmc%a(): Part %d Lba 0x%x BlkNo 0x%x Event %p with %r\n", IsRead ? "Read " : "Write", Partition->PartitionType, Lba, BlockNum, (Token != NULL) ? Token->Event : NULL, Status));
+    DEBUG ((DEBUG_BLKIO,
+      "Emmc%a(): Part %d Lba 0x%x BlkNo 0x%x Event %p with %r\n",
+      IsRead ? "Read " : "Write", Partition->PartitionType, Lba, BlockNum,
+      (Token != NULL) ? Token->Event : NULL, Status));
 
     Lba   += BlockNum;
     Buffer = (UINT8*)Buffer + BufferSize;
