@@ -186,6 +186,7 @@
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
 [Components.ARM, Components.AARCH64]
+  MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicArmVirt.inf
   MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
 [BuildOptions]
