@@ -1581,7 +1581,11 @@ class DscParser(MetaFileParser):
 
             # update current status with sub-parser's status
             self._SectionName = Parser._SectionName
-            self._SectionType = Parser._SectionType
+            if not self._InSubsection:
+                self._SectionType = Parser._SectionType
+            self._SubsectionType = Parser._SubsectionType
+            self._InSubsection = Parser._InSubsection
+
             self._Scope = Parser._Scope
             self._Enabled = Parser._Enabled
 
