@@ -4,7 +4,7 @@
 # This SMM driver performs SMM initialization, deploy SMM Entry Vector,
 # provides CPU specific services in SMM.
 #
-# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 #
 # This program and the accompanying materials
@@ -112,8 +112,6 @@
 
 [Guids]
   gEfiAcpiVariableGuid                     ## SOMETIMES_CONSUMES ## HOB # it is used for S3 boot.
-  gEfiAcpi20TableGuid                      ## SOMETIMES_CONSUMES ## SystemTable
-  gEfiAcpi10TableGuid                      ## SOMETIMES_CONSUMES ## SystemTable
   gEdkiiPiSmmMemoryAttributesTableGuid     ## CONSUMES ## SystemTable
   gEfiMemoryAttributesTableGuid            ## CONSUMES ## SystemTable
 

@@ -1,7 +1,7 @@
 /** @file
 Enable SMM profile.
 
-Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -726,84 +726,6 @@ InitPaging (
 }
 
 /**
-  To find FADT in ACPI tables.
-
-  @param AcpiTableGuid   The GUID used to find ACPI table in UEFI ConfigurationTable.
-
-  @return  FADT table pointer.
-**/
-EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE  *
-FindAcpiFadtTableByAcpiGuid (
-  IN EFI_GUID  *AcpiTableGuid
-  )
-{
-  EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_POINTER  *Rsdp;
-  EFI_ACPI_DESCRIPTION_HEADER                   *Rsdt;
-  EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE     *Fadt;
-  UINTN                                         Index;
-  UINT32                                        Data32;
-  Rsdp  = NULL;
-  Rsdt  = NULL;
-  Fadt  = NULL;
-  //
-  // found ACPI table RSD_PTR from system table
-  //
-  for (Index = 0; Index < gST->NumberOfTableEntries; Index++) {
-    if (CompareGuid (&(gST->ConfigurationTable[Index].VendorGuid), AcpiTableGuid)) {
-      //
-      // A match was found.
-      //
-      Rsdp = gST->ConfigurationTable[Index].VendorTable;
-      break;
-    }
-  }
-
-  if (Rsdp == NULL) {
-    return NULL;
-  }
-
-  Rsdt = (EFI_ACPI_DESCRIPTION_HEADER *)(UINTN) Rsdp->RsdtAddress;
-  if (Rsdt == NULL || Rsdt->Signature != EFI_ACPI_2_0_ROOT_SYSTEM_DESCRIPTION_TABLE_SIGNATURE) {
-    return NULL;
-  }
-
-  for (Index = sizeof (EFI_ACPI_DESCRIPTION_HEADER); Index < Rsdt->Length; Index = Index + sizeof (UINT32)) {
-
-    Data32  = *(UINT32 *) ((UINT8 *) Rsdt + Index);
-    Fadt    = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *) (UINT32 *) (UINTN) Data32;
-    if (Fadt->Header.Signature == EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-      break;
-    }
-  }
-
-  if (Fadt == NULL || Fadt->Header.Signature != EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE) {
-    return NULL;
-  }
-
-  return Fadt;
-}
-
-/**
-  To find FADT in ACPI tables.
-
-  @return  FADT table pointer.
-**/
-EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE  *
-FindAcpiFadtTable (
-  VOID
-  )
-{
-  EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *Fadt;
-
-  Fadt = FindAcpiFadtTableByAcpiGuid (&gEfiAcpi20TableGuid);
-  if (Fadt != NULL) {
-    return Fadt;
-  }
-
-  return FindAcpiFadtTableByAcpiGuid (&gEfiAcpi10TableGuid);
-}
-
-/**
   To get system port address of the SMI Command Port in FADT table.
 
 **/
@@ -814,7 +736,9 @@ GetSmiCommandPort (
 {
   EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *Fadt;
 
-  Fadt = FindAcpiFadtTable ();
+  Fadt = (EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE *) EfiLocateFirstAcpiTable (
+                                                         EFI_ACPI_2_0_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE
+                                                         );
   ASSERT (Fadt != NULL);
 
   mSmiCommandPort = Fadt->SmiCmd;

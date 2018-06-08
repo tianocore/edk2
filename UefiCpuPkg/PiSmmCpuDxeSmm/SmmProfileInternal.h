@@ -1,7 +1,7 @@
 /** @file
 SMM profile internal header file.
 
-Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _SMM_PROFILE_INTERNAL_H_
 #define _SMM_PROFILE_INTERNAL_H_
 
-#include <Guid/Acpi.h>
 #include <Protocol/SmmReadyToLock.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/DxeServicesTableLib.h>
