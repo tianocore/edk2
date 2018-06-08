@@ -21,7 +21,6 @@
 #include <Guid/Performance.h>
 #include <Guid/ExtendedFirmwarePerformance.h>
 #include <Guid/FirmwarePerformance.h>
-#include <Guid/Acpi.h>
 
 #include <Protocol/HiiPackageList.h>
 #include <Protocol/DevicePath.h>

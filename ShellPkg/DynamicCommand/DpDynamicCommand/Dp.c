@@ -118,116 +118,6 @@ DumpStatistics( void )
 }
 
 /**
-  This function scan ACPI table in RSDT.
-
-  @param  Rsdt        ACPI RSDT
-  @param  Signature   ACPI table signature
-
-  @return ACPI table
-**/
-VOID *
-ScanTableInRSDT (
-  IN RSDT_TABLE                   *Rsdt,
-  IN UINT32                       Signature
-  )
-{
-  UINTN                         Index;
-  UINT32                        EntryCount;
-  UINT32                        *EntryPtr;
-  EFI_ACPI_DESCRIPTION_HEADER   *Table;
-
-  EntryCount = (Rsdt->Header.Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof(UINT32);
-
-  EntryPtr = &Rsdt->Entry;
-  for (Index = 0; Index < EntryCount; Index ++, EntryPtr ++) {
-    Table = (EFI_ACPI_DESCRIPTION_HEADER*)((UINTN)(*EntryPtr));
-    if (Table->Signature == Signature) {
-      return Table;
-    }
-  }
-
-  return NULL;
-}
-
-/**
-  This function scan ACPI table in XSDT.
-
-  @param  Xsdt       ACPI XSDT
-  @param  Signature  ACPI table signature
-
-  @return ACPI table
-**/
-VOID *
-ScanTableInXSDT (
-  IN XSDT_TABLE                   *Xsdt,
-  IN UINT32                       Signature
-  )
-{
-  UINTN                        Index;
-  UINT32                       EntryCount;
-  UINT64                       EntryPtr;
-  UINTN                        BasePtr;
-  EFI_ACPI_DESCRIPTION_HEADER  *Table;
-
-  EntryCount = (Xsdt->Header.Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof(UINT64);
-
-  BasePtr = (UINTN)(&(Xsdt->Entry));
-  for (Index = 0; Index < EntryCount; Index ++) {
-    CopyMem (&EntryPtr, (VOID *)(BasePtr + Index * sizeof(UINT64)), sizeof(UINT64));
-    Table = (EFI_ACPI_DESCRIPTION_HEADER*)((UINTN)(EntryPtr));
-    if (Table->Signature == Signature) {
-      return Table;
-    }
-  }
-
-  return NULL;
-}
-
-/**
-  This function scan ACPI table in RSDP.
-
-  @param  Rsdp       ACPI RSDP
-  @param  Signature  ACPI table signature
-
-  @return ACPI table
-**/
-VOID *
-FindAcpiPtr (
-  IN EFI_ACPI_5_0_ROOT_SYSTEM_DESCRIPTION_POINTER *Rsdp,
-  IN UINT32                                       Signature
-  )
-{
-  EFI_ACPI_DESCRIPTION_HEADER                    *AcpiTable;
-  RSDT_TABLE                                     *Rsdt;
-  XSDT_TABLE                                     *Xsdt;
-
-  AcpiTable = NULL;
-
-  //
-  // Check ACPI2.0 table
-  //
-  Rsdt = (RSDT_TABLE *)(UINTN)Rsdp->RsdtAddress;
-  Xsdt = NULL;
-  if ((Rsdp->Revision >= 2) && (Rsdp->XsdtAddress < (UINT64)(UINTN)-1)) {
-    Xsdt = (XSDT_TABLE *)(UINTN)Rsdp->XsdtAddress;
-  }
-  //
-  // Check Xsdt
-  //
-  if (Xsdt != NULL) {
-    AcpiTable = ScanTableInXSDT (Xsdt, Signature);
-  }
-  //
-  // Check Rsdt
-  //
-  if ((AcpiTable == NULL) && (Rsdt != NULL)) {
-    AcpiTable = ScanTableInRSDT (Rsdt, Signature);
-  }
-
-  return AcpiTable;
-}
-
-/**
   Get Boot performance table form Acpi table.
 
 **/
@@ -235,31 +125,11 @@ EFI_STATUS
 GetBootPerformanceTable (
   )
 {
-  EFI_STATUS                  Status;
-  VOID                        *AcpiTable;
   FIRMWARE_PERFORMANCE_TABLE  *FirmwarePerformanceTable;
 
-  AcpiTable = NULL;
-
-  Status = EfiGetSystemConfigurationTable (
-             &gEfiAcpi20TableGuid,
-             &AcpiTable
-             );
-  if (EFI_ERROR (Status)) {
-    Status = EfiGetSystemConfigurationTable (
-               &gEfiAcpi10TableGuid,
-               &AcpiTable
-                 );
-  }
-  if (EFI_ERROR(Status) || AcpiTable == NULL) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GET_ACPI_TABLE_FAIL), mDpHiiHandle);
-    return Status;
-  }
-
-  FirmwarePerformanceTable = FindAcpiPtr (
-                      (EFI_ACPI_5_0_ROOT_SYSTEM_DESCRIPTION_POINTER *)AcpiTable,
-                      EFI_ACPI_5_0_FIRMWARE_PERFORMANCE_DATA_TABLE_SIGNATURE
-                      );
+  FirmwarePerformanceTable = (FIRMWARE_PERFORMANCE_TABLE *) EfiLocateFirstAcpiTable (
+                                                              EFI_ACPI_5_0_FIRMWARE_PERFORMANCE_DATA_TABLE_SIGNATURE
+                                                              );
   if (FirmwarePerformanceTable == NULL) {
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_DP_GET_ACPI_FPDT_FAIL), mDpHiiHandle);
     return EFI_NOT_FOUND;

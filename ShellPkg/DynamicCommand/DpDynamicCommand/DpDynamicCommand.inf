@@ -60,8 +60,6 @@
 
 [Guids]
   gPerformanceProtocolGuid                                ## CONSUMES ## SystemTable
-  gEfiAcpi20TableGuid                                     ## CONSUMES
-  gEfiAcpi10TableGuid                                     ## CONSUMES
 
 [Protocols]
   gEfiLoadedImageProtocolGuid                             ## CONSUMES
