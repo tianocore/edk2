@@ -49,12 +49,11 @@
   PcdLib
   HobLib
   LockBoxLib
+  UefiLib
 
 [Guids]
   gEfiAcpiVariableGuid                       ## PRODUCES  ## UNDEFINED # LockBox Save Data.
   gEfiAcpiS3ContextGuid                      ## PRODUCES  ## UNDEFINED # LockBox Save Data.
-  gEfiAcpi20TableGuid                        ## SOMETIMES_CONSUMES  ## SystemTable
-  gEfiAcpi10TableGuid                        ## SOMETIMES_CONSUMES  ## SystemTable
   gEfiEndOfDxeEventGroupGuid                 ## CONSUMES  ## Event
 
 [Protocols]
