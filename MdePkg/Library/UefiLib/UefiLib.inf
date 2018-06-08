@@ -41,6 +41,7 @@
   Console.c
   UefiLib.c
   UefiLibInternal.h
+  Acpi.c
 
 
 [Packages]
@@ -62,6 +63,8 @@
   gEfiEventReadyToBootGuid                      ## SOMETIMES_CONSUMES  ## Event
   gEfiEventLegacyBootGuid                       ## SOMETIMES_CONSUMES  ## Event
   gEfiGlobalVariableGuid                        ## SOMETIMES_CONSUMES  ## Variable
+  gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES  ## SystemTable
+  gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES  ## SystemTable
 
 [Protocols]
   gEfiDriverBindingProtocolGuid                   ## SOMETIMES_PRODUCES
