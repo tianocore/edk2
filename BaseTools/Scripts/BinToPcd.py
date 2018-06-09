@@ -186,11 +186,8 @@ if __name__ == '__main__':
       print '    [PcdsDynamicVpd]'
       print '    [PcdsDynamicExVpd]'
   elif args.PcdType == 'HII':
-    if args.VariableGuid is None:
-      print 'BinToPcd: error: argument --variable-guid is required for --type HII.'
-      sys.exit()
-    if args.VariableName is None:
-      print 'BinToPcd: error: argument --variable-name is required for --type HII.'
+    if args.VariableGuid is None or args.VariableName is None:
+      print 'BinToPcd: error: arguments --variable-guid and --variable-name are required for --type HII.'
       sys.exit()
     if args.Offset is None:
       #
