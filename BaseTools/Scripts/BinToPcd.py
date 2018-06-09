@@ -135,7 +135,7 @@ if __name__ == '__main__':
     #
     Pcd = PcdValue
     if args.Verbose:
-      print 'PcdToBin: Convert binary file to PCD Value'
+      print 'BinToPcd: Convert binary file to PCD Value'
   elif args.PcdType is None:
     #
     # If --type is neither VPD nor HII, then use PCD statement syntax that is
@@ -155,7 +155,7 @@ if __name__ == '__main__':
       Pcd = '  %s|%s|VOID*|%d' % (args.PcdName, PcdValue, args.MaxSize)
 
     if args.Verbose:
-      print 'PcdToBin: Convert binary file to PCD statement compatible with PCD sections:'
+      print 'BinToPcd: Convert binary file to PCD statement compatible with PCD sections:'
       print '    [PcdsFixedAtBuild]'
       print '    [PcdsPatchableInModule]'
       print '    [PcdsDynamicDefault]'
@@ -182,7 +182,7 @@ if __name__ == '__main__':
       #
       Pcd = '  %s|%d|%d|%s' % (args.PcdName, args.Offset, args.MaxSize, PcdValue)
     if args.Verbose:
-      print 'PcdToBin: Convert binary file to PCD statement compatible with PCD sections'
+      print 'BinToPcd: Convert binary file to PCD statement compatible with PCD sections'
       print '    [PcdsDynamicVpd]'
       print '    [PcdsDynamicExVpd]'
   elif args.PcdType == 'HII':
@@ -199,7 +199,7 @@ if __name__ == '__main__':
       args.Offset = 0
     Pcd = '  %s|L"%s"|%s|%d|%s' % (args.PcdName, args.VariableName, args.VariableGuid, args.Offset, PcdValue)
     if args.Verbose:
-      print 'PcdToBin: Convert binary file to PCD statement compatible with PCD sections'
+      print 'BinToPcd: Convert binary file to PCD statement compatible with PCD sections'
       print '    [PcdsDynamicHii]'
       print '    [PcdsDynamicExHii]'
 
