@@ -89,7 +89,7 @@ if __name__ == '__main__':
   parser.add_argument("-m", "--max-size", dest = 'MaxSize', type = ValidateUnsignedInteger,
                       help = "Maximum size of the PCD.  Ignored with --type HII.")
   parser.add_argument("-f", "--offset", dest = 'Offset', type = ValidateUnsignedInteger,
-                      help = "VPD offset if --type is VPD.  UEFI Variable offset if --type is HII.")
+                      help = "VPD offset if --type is VPD.  UEFI Variable offset if --type is HII.  Must be 8-byte aligned.")
   parser.add_argument("-n", "--variable-name", dest = 'VariableName',
                       help = "UEFI variable name.  Only used with --type HII.")
   parser.add_argument("-g", "--variable-guid", type = ValidateGuidName, dest = 'VariableGuid',
@@ -178,6 +178,12 @@ if __name__ == '__main__':
       Pcd = '  %s|*|%d|%s' % (args.PcdName, args.MaxSize, PcdValue)
     else:
       #
+      # --offset value must be 8-byte aligned
+      #
+      if (args.Offset % 8) != 0:
+        print 'BinToPcd: error: argument --offset must be 8-byte aligned.'
+        sys.exit()
+      #
       # Use the --offset value provided.
       #
       Pcd = '  %s|%d|%d|%s' % (args.PcdName, args.Offset, args.MaxSize, PcdValue)
@@ -194,6 +200,12 @@ if __name__ == '__main__':
       # Use UEFI Variable offset of 0 if --offset is not provided
       #
       args.Offset = 0
+    #
+    # --offset value must be 8-byte aligned
+    #
+    if (args.Offset % 8) != 0:
+      print 'BinToPcd: error: argument --offset must be 8-byte aligned.'
+      sys.exit()
     Pcd = '  %s|L"%s"|%s|%d|%s' % (args.PcdName, args.VariableName, args.VariableGuid, args.Offset, PcdValue)
     if args.Verbose:
       print 'BinToPcd: Convert binary file to PCD statement compatible with PCD sections'
