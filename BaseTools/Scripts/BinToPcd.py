@@ -24,7 +24,6 @@ import xdrlib
 # Globals for help information
 #
 __prog__        = 'BinToPcd'
-__version__     = '%s Version %s' % (__prog__, '0.91 ')
 __copyright__   = 'Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.'
 __description__ = 'Convert one or more binary files to a VOID* PCD value or DSC file VOID* PCD statement.\n'
 
@@ -33,22 +32,22 @@ if __name__ == '__main__':
     try:
       Value = int (Argument, 0)
     except:
-      Message = '%s is not a valid integer value.' % (Argument)
+      Message = '{Argument} is not a valid integer value.'.format (Argument = Argument)
       raise argparse.ArgumentTypeError(Message)
     if Value < 0:
-      Message = '%s is a negative value.' % (Argument)
+      Message = '{Argument} is a negative value.'.format (Argument = Argument)
       raise argparse.ArgumentTypeError(Message)
     return Value
 
   def ValidatePcdName (Argument):
-    if re.split('[a-zA-Z\_][a-zA-Z0-9\_]*\.[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) <> ['','']:
-      Message = '%s is not in the form <PcdTokenSpaceGuidCName>.<PcdCName>' % (Argument)
+    if re.split('[a-zA-Z\_][a-zA-Z0-9\_]*\.[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) != ['','']:
+      Message = '{Argument} is not in the form <PcdTokenSpaceGuidCName>.<PcdCName>'.format (Argument = Argument)
       raise argparse.ArgumentTypeError(Message)
     return Argument
 
   def ValidateGuidName (Argument):
-    if re.split('[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) <> ['','']:
-      Message = '%s is not a valid GUID C name' % (Argument)
+    if re.split('[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) != ['','']:
+      Message = '{Argument} is not a valid GUID C name'.format (Argument = Argument)
       raise argparse.ArgumentTypeError(Message)
     return Argument
 
@@ -61,21 +60,21 @@ if __name__ == '__main__':
       XdrEncoder = xdrlib.Packer()
       for Item in Buffer:
         XdrEncoder.pack_bytes(Item)
-      Buffer = XdrEncoder.get_buffer()
+      Buffer = bytearray(XdrEncoder.get_buffer())
     else:
       #
       # If Xdr flag is not set, then concatenate all the data
       #
-      Buffer = ''.join(Buffer)
+      Buffer = b''.join(Buffer)
     #
     # Return a PCD value of the form '{0x01, 0x02, ...}' along with the PCD length in bytes
     #
-    return '{%s}' % (', '.join(['0x%02x' % (ord(Item)) for Item in Buffer])), len (Buffer)
+    return '{' + (', '.join(['0x{Byte:02X}'.format(Byte = Item) for Item in Buffer])) + '}', len (Buffer)
 
   #
   # Create command line argument parser object
   #
-  parser = argparse.ArgumentParser(prog = __prog__, version = __version__,
+  parser = argparse.ArgumentParser(prog = __prog__,
                                    description = __description__ + __copyright__,
                                    conflict_handler = 'resolve')
   parser.add_argument("-i", "--input", dest = 'InputFile', type = argparse.FileType('rb'), action='append', required = True,
@@ -117,8 +116,8 @@ if __name__ == '__main__':
       Buffer.append(File.read())
       File.close()
     except:
-      print 'BinToPcd: error: can not read binary input file', File
-      sys.exit()
+      print ('BinToPcd: error: can not read binary input file {File}'.format (File = File))
+      sys.exit(1)
 
   #
   # Convert PCD to an encoded string of hex values and determine the size of
@@ -135,7 +134,7 @@ if __name__ == '__main__':
     #
     Pcd = PcdValue
     if args.Verbose:
-      print 'BinToPcd: Convert binary file to PCD Value'
+      print ('BinToPcd: Convert binary file to PCD Value')
   elif args.PcdType is None:
     #
     # If --type is neither VPD nor HII, then use PCD statement syntax that is
@@ -147,19 +146,19 @@ if __name__ == '__main__':
       # If --max-size is not provided, then do not generate the syntax that
       # includes the maximum size.
       #
-      Pcd = '  %s|%s' % (args.PcdName, PcdValue)
+      Pcd = '  {Name}|{Value}'.format (Name = args.PcdName, Value = PcdValue)
     elif args.MaxSize < PcdSize:
-      print 'BinToPcd: error: argument --max-size is smaller than input file.'
-      sys.exit()
+      print ('BinToPcd: error: argument --max-size is smaller than input file.')
+      sys.exit(1)
     else:
-      Pcd = '  %s|%s|VOID*|%d' % (args.PcdName, PcdValue, args.MaxSize)
+      Pcd = '  {Name}|{Value}|VOID*|{Size}'.format (Name = args.PcdName, Value = PcdValue, Size = args.MaxSize)
 
     if args.Verbose:
-      print 'BinToPcd: Convert binary file to PCD statement compatible with PCD sections:'
-      print '    [PcdsFixedAtBuild]'
-      print '    [PcdsPatchableInModule]'
-      print '    [PcdsDynamicDefault]'
-      print '    [PcdsDynamicExDefault]'
+      print ('BinToPcd: Convert binary file to PCD statement compatible with PCD sections:')
+      print ('    [PcdsFixedAtBuild]')
+      print ('    [PcdsPatchableInModule]')
+      print ('    [PcdsDynamicDefault]')
+      print ('    [PcdsDynamicExDefault]')
   elif args.PcdType == 'VPD':
     if args.MaxSize is None:
       #
@@ -168,33 +167,33 @@ if __name__ == '__main__':
       #
       args.MaxSize = PcdSize
     if args.MaxSize < PcdSize:
-      print 'BinToPcd: error: argument --max-size is smaller than input file.'
-      sys.exit()
+      print ('BinToPcd: error: argument --max-size is smaller than input file.')
+      sys.exit(1)
     if args.Offset is None:
       #
       # if --offset is not provided, then set offset field to '*' so build
       # tools will compute offset of PCD in VPD region.
       #
-      Pcd = '  %s|*|%d|%s' % (args.PcdName, args.MaxSize, PcdValue)
+      Pcd = '  {Name}|*|{Size}|{Value}'.format (Name = args.PcdName, Size = args.MaxSize, Value = PcdValue)
     else:
       #
       # --offset value must be 8-byte aligned
       #
       if (args.Offset % 8) != 0:
-        print 'BinToPcd: error: argument --offset must be 8-byte aligned.'
-        sys.exit()
+        print ('BinToPcd: error: argument --offset must be 8-byte aligned.')
+        sys.exit(1)
       #
       # Use the --offset value provided.
       #
-      Pcd = '  %s|%d|%d|%s' % (args.PcdName, args.Offset, args.MaxSize, PcdValue)
+      Pcd = '  {Name}|{Offset}|{Size}|{Value}'.format (Name = args.PcdName, Offset = args.Offset, Size = args.MaxSize, Value = PcdValue)
     if args.Verbose:
-      print 'BinToPcd: Convert binary file to PCD statement compatible with PCD sections'
-      print '    [PcdsDynamicVpd]'
-      print '    [PcdsDynamicExVpd]'
+      print ('BinToPcd: Convert binary file to PCD statement compatible with PCD sections')
+      print ('    [PcdsDynamicVpd]')
+      print ('    [PcdsDynamicExVpd]')
   elif args.PcdType == 'HII':
     if args.VariableGuid is None or args.VariableName is None:
-      print 'BinToPcd: error: arguments --variable-guid and --variable-name are required for --type HII.'
-      sys.exit()
+      print ('BinToPcd: error: arguments --variable-guid and --variable-name are required for --type HII.')
+      sys.exit(1)
     if args.Offset is None:
       #
       # Use UEFI Variable offset of 0 if --offset is not provided
@@ -204,13 +203,13 @@ if __name__ == '__main__':
     # --offset value must be 8-byte aligned
     #
     if (args.Offset % 8) != 0:
-      print 'BinToPcd: error: argument --offset must be 8-byte aligned.'
-      sys.exit()
-    Pcd = '  %s|L"%s"|%s|%d|%s' % (args.PcdName, args.VariableName, args.VariableGuid, args.Offset, PcdValue)
+      print ('BinToPcd: error: argument --offset must be 8-byte aligned.')
+      sys.exit(1)
+    Pcd = '  {Name}|L"{VarName}"|{VarGuid}|{Offset}|{Value}'.format (Name = args.PcdName, VarName = args.VariableName, VarGuid = args.VariableGuid, Offset = args.Offset, Value = PcdValue)
     if args.Verbose:
-      print 'BinToPcd: Convert binary file to PCD statement compatible with PCD sections'
-      print '    [PcdsDynamicHii]'
-      print '    [PcdsDynamicExHii]'
+      print ('BinToPcd: Convert binary file to PCD statement compatible with PCD sections')
+      print ('    [PcdsDynamicHii]')
+      print ('    [PcdsDynamicExHii]')
 
   #
   # Write PCD value or PCD statement to the output file
@@ -223,4 +222,4 @@ if __name__ == '__main__':
     # If output file is not specified or it can not be written, then write the
     # PCD value or PCD statement to the console
     #
-    print Pcd
+    print (Pcd)
