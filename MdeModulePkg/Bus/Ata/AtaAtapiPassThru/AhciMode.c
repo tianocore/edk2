@@ -2381,7 +2381,7 @@ AhciEnableDevSlp (
     //
     // Assume DEVSLP TIMING VARIABLES is not supported if the Identify Device Data log (30h, 8) fails
     //
-    DevSlpTiming.Supported = 0;
+    ZeroMem (&DevSlpTiming, sizeof (DevSlpTiming));
   } else {
     CopyMem (&DevSlpTiming, &LogData[48], sizeof (DevSlpTiming));
     DEBUG ((DEBUG_INFO, "DevSlpTiming: Supported(%d), Deto(%d), Madt(%d)\n",
