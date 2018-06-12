@@ -36,6 +36,7 @@
   LcdHwLib|Include/Library/LcdHwLib.h
   LcdPlatformLib|Include/Library/LcdPlatformLib.h
   NorFlashPlatformLib|Include/Library/NorFlashPlatformLib.h
+  PL011UartClockLib|Include/Library/PL011UartClockLib.h
   PL011UartLib|Include/Library/PL011UartLib.h
 
 [Guids.common]

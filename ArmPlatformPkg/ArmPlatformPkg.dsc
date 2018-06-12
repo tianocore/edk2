@@ -105,6 +105,7 @@
   ArmPlatformPkg/Library/LcdPlatformNullLib/LcdPlatformNullLib.inf
   ArmPlatformPkg/Library/NorFlashPlatformNullLib/NorFlashPlatformNullLib.inf
   ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
+  ArmPlatformPkg/Library/PL011UartClockLib/PL011UartClockLib.inf
   ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
   ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
   ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
