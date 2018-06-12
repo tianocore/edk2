@@ -15,22 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <Uefi.h>
+#include "CapsuleService.h"
 
-#include <Protocol/Capsule.h>
-#include <Guid/CapsuleVendor.h>
-#include <Guid/FmpCapsule.h>
-
-#include <Library/DebugLib.h>
-#include <Library/PcdLib.h>
-#include <Library/CapsuleLib.h>
-#include <Library/UefiDriverEntryPoint.h>
-#include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/UefiRuntimeLib.h>
-#include <Library/BaseLib.h>
-#include <Library/PrintLib.h>
-#include <Library/BaseMemoryLib.h>
 //
 // Handle for the installation of Capsule Architecture Protocol.
 //
@@ -43,15 +29,6 @@ UINTN       mTimes      = 0;
 
 UINT32      mMaxSizePopulateCapsule     = 0;
 UINT32      mMaxSizeNonPopulateCapsule  = 0;
-
-/**
-  Create the variable to save the base address of page table and stack
-  for transferring into long mode in IA32 PEI.
-**/
-VOID
-SaveLongModeContext (
-  VOID
-  );
 
 /**
   Passes capsules to the firmware with both virtual and physical mapping. Depending on the intended
@@ -194,9 +171,11 @@ UpdateCapsule (
   //
   // Check if the platform supports update capsule across a system reset
   //
-  if (!FeaturePcdGet(PcdSupportUpdateCapsuleReset)) {
+  if (!IsPersistAcrossResetCapsuleSupported ()) {
     return EFI_UNSUPPORTED;
   }
+
+  CapsuleCacheWriteBack (ScatterGatherList);
 
   //
   // Construct variable name CapsuleUpdateData, CapsuleUpdateData1, CapsuleUpdateData2...
@@ -344,7 +323,7 @@ QueryCapsuleCapabilities (
     //
     //Check if the platform supports update capsule across a system reset
     //
-    if (!FeaturePcdGet(PcdSupportUpdateCapsuleReset)) {
+    if (!IsPersistAcrossResetCapsuleSupported ()) {
       return EFI_UNSUPPORTED;
     }
     *ResetType = EfiResetWarm;

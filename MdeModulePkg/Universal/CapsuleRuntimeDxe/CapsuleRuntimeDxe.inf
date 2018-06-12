@@ -27,17 +27,24 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
 #
 
 [Sources]
   CapsuleService.c
+  CapsuleService.h
 
-[Sources.Ia32, Sources.IPF, Sources.EBC, Sources.ARM, Sources.AARCH64]
+[Sources.Ia32, Sources.IPF, Sources.EBC]
   SaveLongModeContext.c
+  CapsuleReset.c
 
 [Sources.X64]
   X64/SaveLongModeContext.c
+  CapsuleReset.c
+
+[Sources.ARM, Sources.AARCH64]
+  SaveLongModeContext.c
+  Arm/CapsuleReset.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -58,6 +65,9 @@
 [LibraryClasses.X64]
   UefiLib
   BaseMemoryLib
+
+[LibraryClasses.ARM, LibraryClasses.AARCH64]
+  CacheMaintenanceLib
 
 [Guids]
   ## SOMETIMES_PRODUCES   ## Variable:L"CapsuleUpdateData" # (Process across reset capsule image) for capsule updated data
