@@ -26,6 +26,7 @@
   PL011SerialPortLib.c
 
 [LibraryClasses]
+  PL011UartClockLib
   PL011UartLib
   PcdLib
 
