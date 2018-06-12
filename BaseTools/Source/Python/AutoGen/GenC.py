@@ -2013,9 +2013,7 @@ def CreateHeaderCode(Info, AutoGenC, AutoGenH):
     AutoGenH.Append(gAutoGenHCppPrologueString)
     if Info.AutoGenVersion >= 0x00010005:
         # header files includes
-        AutoGenH.Append("#include <%s>\n" % gBasicHeaderFile)
-        if Info.ModuleType in gModuleTypeHeaderFile \
-           and gModuleTypeHeaderFile[Info.ModuleType][0] != gBasicHeaderFile:
+        if Info.ModuleType in gModuleTypeHeaderFile:
             AutoGenH.Append("#include <%s>\n" % gModuleTypeHeaderFile[Info.ModuleType][0])
         #
         # if either PcdLib in [LibraryClasses] sections or there exist Pcd section, add PcdLib.h 
