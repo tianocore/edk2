@@ -86,11 +86,11 @@
   ## SOMETIMES_CONSUMES
   ## SOMETIMES_PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask
-  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap                  ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2HashAlgorithmBitmap             ## CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdForceReallocatePcrBanks             ## CONSUMES
 
 [Depex]
-  gEfiPeiMasterBootModePpiGuid AND
-  gEfiTpmDeviceSelectedGuid
+  gEfiPeiMasterBootModePpiGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   Tcg2PeiExtra.uni

@@ -354,6 +354,10 @@
   # @Prompt SMI Command IO port.
   gEfiSecurityPkgTokenSpaceGuid.PcdSmiCommandIoPort|0xB2|UINT16|0x00000009
 
+  ## This fixed at build flag tells the TPM stack whether to update the TPM allocation if a
+  #  mismatch is found between PcdTpm2HashMask and the active banks.
+  gEfiSecurityPkgTokenSpaceGuid.PcdForceReallocatePcrBanks|TRUE|BOOLEAN|0x0000000A
+
   ## Progress Code for FV verification result.<BR><BR>
   #  (EFI_SOFTWARE_PEI_MODULE | EFI_SUBCLASS_SPECIFIC | XXX)
   # @Prompt Status Code for FV verification result
