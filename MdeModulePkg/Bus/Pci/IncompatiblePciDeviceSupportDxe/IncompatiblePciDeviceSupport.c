@@ -5,7 +5,7 @@
   Incompatible PCI Device Support protocol allows the PCI bus driver to support
   resource allocation for some PCI devices that do not comply with the PCI Specification.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -344,7 +344,7 @@ PCheckDevice (
         Dsc = (EFI_PCI_RESOUCE_DESCRIPTOR *) (ListPtr + 1);
 
         AcpiPtr->Desc = ACPI_ADDRESS_SPACE_DESCRIPTOR;
-        AcpiPtr->Len = (UINT16) sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR);
+        AcpiPtr->Len = (UINT16) sizeof (EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR) - 3;
         AcpiPtr->ResType = (UINT8) Dsc->ResType;
         AcpiPtr->GenFlag = (UINT8) Dsc->GenFlag;
         AcpiPtr->SpecificFlag = (UINT8) Dsc->SpecificFlag;
