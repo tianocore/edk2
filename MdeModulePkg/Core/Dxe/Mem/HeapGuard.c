@@ -667,18 +667,8 @@ IsMemoryTypeToGuard (
 {
   UINT64 TestBit;
   UINT64 ConfigBit;
-  BOOLEAN     InSmm;
 
   if (AllocateType == AllocateAddress) {
-    return FALSE;
-  }
-
-  InSmm = FALSE;
-  if (gSmmBase2 != NULL) {
-    gSmmBase2->InSmm (gSmmBase2, &InSmm);
-  }
-
-  if (InSmm) {
     return FALSE;
   }
 
