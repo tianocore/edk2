@@ -45,6 +45,7 @@ import InfSectionParser
 import datetime
 import hashlib
 from GenVar import VariableMgr,var_info
+from collections import OrderedDict
 
 ## Regular expression for splitting Dependency Expression string into tokens
 gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
