@@ -137,30 +137,6 @@
     <Command.XCODE>
         "$(CC)" $(CC_FLAGS) -o ${dst} $(INC) ${src}
 
-[C-Code-File.COMMON.IPF]
-    <InputFile>
-        ?.c
-        ?.C
-        ?.cc
-        ?.CC
-        ?.cpp
-        ?.Cpp
-        ?.CPP
-
-    <ExtraDependency>
-        $(MAKE_FILE)
-
-    <OutputFile>
-        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
-
-    <Command.MSFT, Command.INTEL>
-        "$(CC)" /Fo${dst} $(CC_FLAGS) $(INC) ${src}
-
-    <Command.GCC, Command.GCCLD, Command.RVCT>
-        # For RVCTCYGWIN CC_FLAGS must be first to work around pathing issues
-        "$(CC)" $(CC_FLAGS) -c -o ${dst} $(INC) ${src}
-        "$(SYMRENAME)" $(SYMRENAME_FLAGS) ${dst}
-
 [C-Code-File.BASE.AARCH64,C-Code-File.SEC.AARCH64,C-Code-File.PEI_CORE.AARCH64,C-Code-File.PEIM.AARCH64,C-Code-File.BASE.ARM,C-Code-File.SEC.ARM,C-Code-File.PEI_CORE.ARM,C-Code-File.PEIM.ARM]
     <InputFile>
         ?.c
@@ -250,22 +226,6 @@
         "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
         Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
         "$(NASM)" -I${s_path}(+) $(NASM_FLAGS) -o $dst ${d_path}(+)${s_base}.iii
-
-[Assembly-Code-File.COMMON.IPF]
-    <InputFile>
-        ?.s
-
-    <ExtraDependency>
-        $(MAKE_FILE)
-
-    <OutputFile>
-        $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.obj
-
-    <Command.MSFT, Command.INTEL>
-        "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
-        Trim --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
-        # For RVCTCYGWIN ASM_FLAGS must be first to work around pathing issues
-        "$(ASM)" $(ASM_FLAGS) -o ${dst} ${d_path}(+)${s_base}.iii
 
 [Device-Tree-Source-File]
     <InputFile>
