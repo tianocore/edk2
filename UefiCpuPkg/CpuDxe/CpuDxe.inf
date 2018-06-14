@@ -66,6 +66,7 @@
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## PRODUCES
   gEfiMpServiceProtocolGuid                     ## PRODUCES
+  gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
 
 [Guids]
   gIdleLoopEventGuid                            ## CONSUMES           ## Event
