@@ -1048,8 +1048,11 @@ Ip4Groups (
   // is decreamented each time an address is removed..
   //
   for (Index = IpInstance->GroupCount; Index > 0 ; Index--) {
-    Group = IpInstance->Groups[Index - 1];
-
+    Group = 0;  	
+    if(IpInstance->Groups != NULL) {
+  	  Group = IpInstance->Groups[Index - 1];
+  	}
+  	
     if ((GroupAddress == NULL) || EFI_IP4_EQUAL (&Group, GroupAddress)) {
       if (EFI_ERROR (Ip4LeaveGroup (IpInstance, NTOHL (Group)))) {
         return EFI_DEVICE_ERROR;

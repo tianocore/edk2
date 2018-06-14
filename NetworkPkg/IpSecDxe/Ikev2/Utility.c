@@ -2438,7 +2438,7 @@ Ikev2ChildSaParseSaPayload (
   IntegrityAlgorithm       = 0;
   EncryptAlgorithm         = 0;
   EncryptKeylength         = 0;
-  IsMatch                  = TRUE;
+  IsMatch                  = FALSE;
   IsSupportEsn             = FALSE;
   PreferIsSupportEsn       = FALSE;
 

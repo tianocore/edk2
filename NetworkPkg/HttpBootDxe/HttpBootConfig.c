@@ -473,6 +473,9 @@ HttpBootFormCallback (
     // Get user input URI string
     //
     Uri = HiiGetString (CallbackInfo->RegisteredHandle, Value->string, NULL);
+    if(Uri == NULL) {
+    	return EFI_INVALID_PARAMETER;
+    }        
 
     //
     // The URI should be either an empty string (for corporate environment) ,or http(s) for home environment.
