@@ -16,6 +16,9 @@ from Common.DataType import SUP_MODULE_USER_DEFINED
 from BuildClassObject import LibraryClassObject
 import Common.GlobalData as GlobalData
 from Workspace.BuildClassObject import StructurePcd
+from Common.BuildToolError import RESOURCE_NOT_AVAILABLE
+from Common.BuildToolError import OPTION_MISSING
+from Common.BuildToolError import BUILD_ERROR
 
 class OrderedListDict(OrderedDict, defaultdict):
     def __init__(self, *args, **kwargs):
