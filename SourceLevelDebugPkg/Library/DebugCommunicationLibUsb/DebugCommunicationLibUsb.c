@@ -132,6 +132,14 @@ typedef struct _USB_DEBUG_PORT_HANDLE{
   //
   UINT32       EhciMemoryBase;
   //
+  // The usb debug device In endpoint.
+  //
+  UINT8        InEndpoint;
+  //
+  // The usb debug device Out endpoint.
+  //
+  UINT8        OutEndpoint;
+  //
   // The Bulk In endpoint toggle bit.
   //
   UINT8        BulkInToggle;
@@ -723,6 +731,12 @@ InitializeUsbDebugHardware (
     }
 
     //
+    // Determine the usb debug device endpoints.
+    //
+    Handle->InEndpoint  = UsbDebugPortDescriptor.DebugInEndpoint;
+    Handle->OutEndpoint = UsbDebugPortDescriptor.DebugOutEndpoint;
+
+    //
     // enable the usb debug feature.
     //
     Status = UsbDebugPortControlTransfer (UsbDebugPortRegister, &mDebugCommunicationLibUsbSetDebugFeature, 0x7F, 0x0, NULL, NULL);
@@ -879,7 +893,7 @@ DebugPortWriteBuffer (
       Sent = (UINT8)(NumberOfBytes - Total);
     }
 
-    Status = UsbDebugPortOut(UsbDebugPortRegister, Buffer + Total, Sent, OUTPUT_PID, 0x7F, 0x01, UsbDebugPortHandle->BulkOutToggle);
+    Status = UsbDebugPortOut(UsbDebugPortRegister, Buffer + Total, Sent, OUTPUT_PID, 0x7F, UsbDebugPortHandle->OutEndpoint, UsbDebugPortHandle->BulkOutToggle);
 
     if (RETURN_ERROR(Status)) {
       return Total;
@@ -959,7 +973,7 @@ DebugPortPollBuffer (
     UsbDebugPortRegister->SendPid  = DATA1_PID;
   }
   UsbDebugPortRegister->UsbAddress  = 0x7F;
-  UsbDebugPortRegister->UsbEndPoint = 0x82 & 0x0F;
+  UsbDebugPortRegister->UsbEndPoint = UsbDebugPortHandle->InEndpoint & 0x0F;
 
   //
   // Clearing W/R bit to indicate it's a READ operation
