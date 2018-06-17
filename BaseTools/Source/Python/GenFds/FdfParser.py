@@ -1361,6 +1361,7 @@ class FdfParser:
 
         try:
             self.Preprocess()
+            self.__GetError()
             #
             # Keep processing sections of the FDF until no new sections or a syntax error is found
             #
@@ -1440,6 +1441,17 @@ class FdfParser:
             Value = self.__Token
 
         return False
+
+    ##__GetError() method
+    def __GetError(self):
+        #save the Current information
+        CurrentLine = self.CurrentLineNumber
+        CurrentOffset = self.CurrentOffsetWithinLine
+        while self.__GetNextToken():
+            if self.__Token == TAB_ERROR:
+                EdkLogger.error('FdfParser', ERROR_STATEMENT, self.__CurrentLine().replace(TAB_ERROR, '', 1), File=self.FileName, Line=self.CurrentLineNumber)
+        self.CurrentLineNumber = CurrentLine
+        self.CurrentOffsetWithinLine = CurrentOffset
 
     ## __GetFd() method
     #

@@ -838,6 +838,7 @@ class DscParser(MetaFileParser):
         TAB_ELSE.upper()                            :   MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSE,
         TAB_END_IF.upper()                          :   MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF,
         TAB_USER_EXTENSIONS.upper()                 :   MODEL_META_DATA_USER_EXTENSION,
+        TAB_ERROR.upper()                           :   MODEL_META_DATA_CONDITIONAL_STATEMENT_ERROR,
     }
 
     # Valid names in define section
@@ -1028,6 +1029,8 @@ class DscParser(MetaFileParser):
         Scope = [[TAB_COMMON, TAB_COMMON, TAB_COMMON]]
         if ItemType == MODEL_META_DATA_INCLUDE:
             Scope = self._Scope
+        elif ItemType == MODEL_META_DATA_CONDITIONAL_STATEMENT_ERROR:
+            Scope = self._Scope
         if ItemType == MODEL_META_DATA_CONDITIONAL_STATEMENT_ENDIF:
             # Remove all directives between !if and !endif, including themselves
             while self._DirectiveStack:
@@ -1041,7 +1044,7 @@ class DscParser(MetaFileParser):
                 EdkLogger.error("Parser", FORMAT_INVALID, "Redundant '!endif'",
                                 File=self.MetaFile, Line=self._LineIndex + 1,
                                 ExtraData=self._CurrentLine)
-        elif ItemType != MODEL_META_DATA_INCLUDE:
+        elif ItemType not in {MODEL_META_DATA_INCLUDE, MODEL_META_DATA_CONDITIONAL_STATEMENT_ERROR}:
             # Break if there's a !else is followed by a !elseif
             if ItemType == MODEL_META_DATA_CONDITIONAL_STATEMENT_ELSEIF and \
                self._DirectiveStack and \
@@ -1287,6 +1290,7 @@ class DscParser(MetaFileParser):
             MODEL_META_DATA_BUILD_OPTION                    :   self.__ProcessBuildOption,
             MODEL_UNKNOWN                                   :   self._Skip,
             MODEL_META_DATA_USER_EXTENSION                  :   self._SkipUserExtension,
+            MODEL_META_DATA_CONDITIONAL_STATEMENT_ERROR     :   self._ProcessError,
         }
 
         self._Table = MetaFileStorage(self._RawTable.Cur, self.MetaFile, MODEL_FILE_DSC, True)
@@ -1390,6 +1394,10 @@ class DscParser(MetaFileParser):
         GlobalData.gPlatformDefines.update(self._FileLocalMacros)
         self._PostProcessed = True
         self._Content = None
+    def _ProcessError(self):
+        if not self._Enabled:
+            return
+        EdkLogger.error('Parser', ERROR_STATEMENT, self._ValueList[1], File=self.MetaFile, Line=self._LineIndex + 1)
 
     def __ProcessSectionHeader(self):
         self._SectionName = self._ValueList[0]
