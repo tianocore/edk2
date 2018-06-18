@@ -40,11 +40,11 @@
 //---------------------------------------------
 // UART Register Bit Defines
 //---------------------------------------------
-#define LSR_TXRDY               0x20
-#define LSR_RXDA                0x01
-#define DLAB                    0x01
-#define ENABLE_FIFO             0x01
-#define CLEAR_FIFOS             0x06
+#define LSR_TXRDY               0x20U
+#define LSR_RXDA                0x01U
+#define DLAB                    0x01U
+#define ENABLE_FIFO             0x01U
+#define CLEAR_FIFOS             0x06U
 
 
 
