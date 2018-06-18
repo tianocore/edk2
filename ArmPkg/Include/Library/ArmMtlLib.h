@@ -68,7 +68,7 @@ typedef struct {
 EFI_STATUS
 MtlWaitUntilChannelFree (
   IN MTL_CHANNEL  *Channel,
-  IN UINT64       TimeOutInMicroSeconds
+  IN UINTN        TimeOutInMicroSeconds
   );
 
 /** Return the address of the message payload.
