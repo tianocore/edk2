@@ -83,7 +83,7 @@
 [Protocols]
   gEfiBdsArchProtocolGuid                       ## PRODUCES
   gEfiSimpleTextInputExProtocolGuid             ## CONSUMES
-  gEdkiiVariableLockProtocolGuid                ## CONSUMES
+  gEdkiiVariableLockProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiDeferredImageLoadProtocolGuid             ## CONSUMES
 
 [FeaturePcd]
