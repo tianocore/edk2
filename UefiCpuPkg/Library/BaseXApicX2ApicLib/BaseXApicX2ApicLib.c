@@ -649,8 +649,10 @@ SendInitSipiSipi (
   IcrLow.Bits.DeliveryMode = LOCAL_APIC_DELIVERY_MODE_STARTUP;
   IcrLow.Bits.Level = 1;
   SendIpi (IcrLow.Uint32, ApicId);
-  MicroSecondDelay (200);
-  SendIpi (IcrLow.Uint32, ApicId);
+  if (!StandardSignatureIsAuthenticAMD ()) {
+    MicroSecondDelay (200);
+    SendIpi (IcrLow.Uint32, ApicId);
+  }
 }
 
 /**
@@ -683,8 +685,10 @@ SendInitSipiSipiAllExcludingSelf (
   IcrLow.Bits.Level = 1;
   IcrLow.Bits.DestinationShorthand = LOCAL_APIC_DESTINATION_SHORTHAND_ALL_EXCLUDING_SELF;
   SendIpi (IcrLow.Uint32, 0);
-  MicroSecondDelay (200);
-  SendIpi (IcrLow.Uint32, 0);
+  if (!StandardSignatureIsAuthenticAMD ()) {
+    MicroSecondDelay (200);
+    SendIpi (IcrLow.Uint32, 0);
+  }
 }
 
 /**
