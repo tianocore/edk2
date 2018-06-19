@@ -480,6 +480,9 @@
   ## Include/Ppi/NvmExpressHostController.h
   gEdkiiPeiNvmExpressHostControllerPpiGuid  = { 0xcae3aa63, 0x676f, 0x4da3, { 0xbd, 0x50, 0x6c, 0xc5, 0xed, 0xde, 0x9a, 0xad } }
 
+  ## Include/Ppi/AtaAhciController.h
+  gEdkiiPeiAtaAhciHostControllerPpiGuid     = { 0x61dd33ea, 0x421f, 0x4cc0, { 0x89, 0x29, 0xff, 0xee, 0xa9, 0xa1, 0xa2, 0x61 } }
+
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
   #  Include/Protocol/LoadPe32Image.h
