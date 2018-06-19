@@ -2095,15 +2095,16 @@ def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer, 
             GuidMacros.append('#define %s %s' % (Guid, Info.Module.Guids[Guid]))
         for Guid, Value in Info.Module.Protocols.items() + Info.Module.Ppis.items():
             GuidMacros.append('#define %s %s' % (Guid, Value))
-        # supports FixedAtBuild usage in VFR file
+        # supports FixedAtBuild and FeaturePcd usage in VFR file
         if Info.VfrFileList and Info.ModulePcdList:
             GuidMacros.append('#define %s %s' % ('FixedPcdGetBool(TokenName)', '_PCD_VALUE_##TokenName'))
             GuidMacros.append('#define %s %s' % ('FixedPcdGet8(TokenName)', '_PCD_VALUE_##TokenName'))
             GuidMacros.append('#define %s %s' % ('FixedPcdGet16(TokenName)', '_PCD_VALUE_##TokenName'))
             GuidMacros.append('#define %s %s' % ('FixedPcdGet32(TokenName)', '_PCD_VALUE_##TokenName'))
             GuidMacros.append('#define %s %s' % ('FixedPcdGet64(TokenName)', '_PCD_VALUE_##TokenName'))
+            GuidMacros.append('#define %s %s' % ('FeaturePcdGet(TokenName)', '_PCD_VALUE_##TokenName'))
             for Pcd in Info.ModulePcdList:
-                if Pcd.Type == TAB_PCDS_FIXED_AT_BUILD:
+                if Pcd.Type in [TAB_PCDS_FIXED_AT_BUILD, TAB_PCDS_FEATURE_FLAG]:
                     TokenCName = Pcd.TokenCName
                     Value = Pcd.DefaultValue
                     if Pcd.DatumType == 'BOOLEAN':
