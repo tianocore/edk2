@@ -1117,7 +1117,7 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                                 "The maximum size of VOID* type PCD '%s.%s' is less than its actual size occupied." % (Pcd.TokenSpaceGuidCName, TokenCName),
                                 ExtraData="[%s]" % str(Info))
                 else:
-                    ArraySize = Pcd.GetPcdSize()
+                    ArraySize = GetPcdSize(Pcd)
                     if Unicode:
                         ArraySize = ArraySize / 2
             Array = '[%d]' % ArraySize
