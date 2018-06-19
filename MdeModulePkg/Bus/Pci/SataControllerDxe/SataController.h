@@ -2,6 +2,7 @@
   Header file for Sata Controller driver.
 
   Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018, ARM Ltd. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -104,6 +105,17 @@ typedef struct _EFI_SATA_CONTROLLER_PRIVATE_DATA {
   //
   EFI_IDENTIFY_DATA                 *IdentifyData;
   BOOLEAN                           *IdentifyValid;
+
+  //
+  // Track the state so that the PCI attributes that were modified
+  // can be restored to the original value later.
+  //
+  BOOLEAN                           PciAttributesChanged;
+
+  //
+  // Copy of the original PCI Attributes
+  //
+  UINT64                            OriginalPciAttributes;
 } EFI_SATA_CONTROLLER_PRIVATE_DATA;
 
 #define SATA_CONTROLLER_PRIVATE_DATA_FROM_THIS(a) CR(a, EFI_SATA_CONTROLLER_PRIVATE_DATA, IdeInit, SATA_CONTROLLER_SIGNATURE)

@@ -2,6 +2,7 @@
   This driver module produces IDE_CONTROLLER_INIT protocol for Sata Controllers.
 
   Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018, ARM Ltd. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -364,6 +365,7 @@ SataControllerStart (
   EFI_SATA_CONTROLLER_PRIVATE_DATA  *Private;
   UINT32                            Data32;
   UINTN                             TotalCount;
+  UINT64                            Supports;
 
   DEBUG ((EFI_D_INFO, "SataControllerStart start\n"));
 
@@ -406,6 +408,52 @@ SataControllerStart (
   Private->IdeInit.CalculateMode  = IdeInitCalculateMode;
   Private->IdeInit.SetTiming      = IdeInitSetTiming;
   Private->IdeInit.EnumAll        = SATA_ENUMER_ALL;
+  Private->PciAttributesChanged   = FALSE;
+
+  //
+  // Save original PCI attributes
+  //
+  Status = PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationGet,
+                    0,
+                    &Private->OriginalPciAttributes
+                    );
+  if (EFI_ERROR (Status)) {
+      goto Done;
+  }
+
+  DEBUG ((
+    EFI_D_INFO,
+    "Original PCI Attributes = 0x%llx\n",
+    Private->OriginalPciAttributes
+    ));
+
+  Status = PciIo->Attributes (
+                    PciIo,
+                    EfiPciIoAttributeOperationSupported,
+                    0,
+                    &Supports
+                    );
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  DEBUG ((EFI_D_INFO, "Supported PCI Attributes = 0x%llx\n", Supports));
+
+  Supports &= (UINT64)EFI_PCI_DEVICE_ENABLE;
+  Status = PciIo->Attributes (
+                      PciIo,
+                      EfiPciIoAttributeOperationEnable,
+                      Supports,
+                      NULL
+                      );
+  if (EFI_ERROR (Status)) {
+    goto Done;
+  }
+
+  DEBUG ((EFI_D_INFO, "Enabled PCI Attributes = 0x%llx\n", Supports));
+  Private->PciAttributesChanged = TRUE;
 
   Status = PciIo->Pci.Read (
                         PciIo,
@@ -414,7 +462,10 @@ SataControllerStart (
                         sizeof (PciData.Hdr.ClassCode),
                         PciData.Hdr.ClassCode
                         );
-  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    ASSERT (FALSE);
+    goto Done;
+  }
 
   if (IS_PCI_IDE (&PciData)) {
     Private->IdeInit.ChannelCount = IDE_MAX_CHANNEL;
@@ -480,6 +531,17 @@ Done:
       }
       if (Private->IdentifyValid != NULL) {
         FreePool (Private->IdentifyValid);
+      }
+      if (Private->PciAttributesChanged) {
+        //
+        // Restore original PCI attributes
+        //
+        PciIo->Attributes (
+                 PciIo,
+                 EfiPciIoAttributeOperationSet,
+                 Private->OriginalPciAttributes,
+                 NULL
+                 );
       }
       FreePool (Private);
     }
@@ -555,6 +617,17 @@ SataControllerStop (
     }
     if (Private->IdentifyValid != NULL) {
       FreePool (Private->IdentifyValid);
+    }
+    if (Private->PciAttributesChanged) {
+      //
+      // Restore original PCI attributes
+      //
+      Private->PciIo->Attributes (
+                        Private->PciIo,
+                        EfiPciIoAttributeOperationSet,
+                        Private->OriginalPciAttributes,
+                        NULL
+                        );
     }
     FreePool (Private);
   }
