@@ -59,6 +59,9 @@ ParseUpdateDataFile (
   @param[in]  ConfigData              Points to the component configuration structure.
   @param[out] LastAttemptVersion      The last attempt version, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
   @param[out] LastAttemptStatus       The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+  @param[in]  Progress                A function used by the driver to report the progress of the firmware update.
+  @param[in]  StartPercentage         The start completion percentage value that may be used to report progress during the flash write operation.
+  @param[in]  EndPercentage           The end completion percentage value that may be used to report progress during the flash write operation.
 
   @retval EFI_SUCCESS             The System Firmware image is updated.
   @retval EFI_WRITE_PROTECTED     The flash device is read only.
@@ -117,6 +120,7 @@ PerformUpdate (
   @param[in]  ConfigImageSize         The length of the config file image in bytes.
   @param[out] LastAttemptVersion      The last attempt version, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
   @param[out] LastAttemptStatus       The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+  @param[in]  Progress                A function used by the driver to report the progress of the firmware update.
 
   @retval EFI_SUCCESS             The System Firmware image is updated.
   @retval EFI_WRITE_PROTECTED     The flash device is read only.
@@ -245,6 +249,7 @@ UpdateImage (
   @param[in]  ImageSize          The size of the EDKII system FMP capsule image in bytes.
   @param[out] LastAttemptVersion The last attempt version, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
   @param[out] LastAttemptStatus  The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+  @param[in]  Progress           A function used by the driver to report the progress of the firmware update.
 
   @retval EFI_SUCCESS             EDKII system FMP capsule passes authentication and the System Firmware image is updated.
   @retval EFI_SECURITY_VIOLATION  EDKII system FMP capsule fails authentication and the System Firmware image is not updated.
