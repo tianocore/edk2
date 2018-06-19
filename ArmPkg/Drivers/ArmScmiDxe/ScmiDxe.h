@@ -19,7 +19,6 @@
 
 #include "ScmiPrivate.h"
 
-#define MAX_PROTOCOLS        6
 #define MAX_VENDOR_LEN       SCMI_MAX_STR_LEN
 
 /** Pointer to protocol initialization function.

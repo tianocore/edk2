@@ -22,11 +22,6 @@
 
 #include "ScmiPrivate.h"
 
-// SCMI Specification 1.0
-#define  MAX_PROTOCOLS       6
-
-#define  PROTOCOL_MASK     0xF
-
 // Arbitrary timeout value 20ms.
 #define  RESPONSE_TIMEOUT  20000
 
