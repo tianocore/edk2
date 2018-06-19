@@ -2,7 +2,7 @@
   Implement ReadOnly Variable Services required by PEIM and install
   PEI ReadOnly Varaiable2 PPI. These services operates the non volatile storage space.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -496,6 +496,31 @@ CompareWithValidVariable (
 }
 
 /**
+  Get HOB variable store.
+
+**/
+VOID
+GetHobVariableStore (
+  OUT VARIABLE_STORE_INFO        *StoreInfo,
+  OUT VARIABLE_STORE_HEADER      **VariableStoreHeader
+  )
+{
+  EFI_HOB_GUID_TYPE              *GuidHob;
+
+  GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
+  if (GuidHob != NULL) {
+    *VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+    StoreInfo->AuthFlag = TRUE;
+  } else {
+    GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
+    if (GuidHob != NULL) {
+      *VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
+      StoreInfo->AuthFlag = FALSE;
+    }
+  }
+}
+
+/**
   Return the variable store header and the store info based on the Index.
 
   @param Type       The type of the variable store.
@@ -523,17 +548,8 @@ GetVariableStore (
   VariableStoreHeader = NULL;
   switch (Type) {
     case VariableStoreTypeHob:
-      GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
-      if (GuidHob != NULL) {
-        VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
-        StoreInfo->AuthFlag = TRUE;
-      } else {
-        GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
-        if (GuidHob != NULL) {
-          VariableStoreHeader = (VARIABLE_STORE_HEADER *) GET_GUID_HOB_DATA (GuidHob);
-          StoreInfo->AuthFlag = FALSE;
-        }
-      }
+      GetHobVariableStore (StoreInfo, &VariableStoreHeader);
+
       break;
 
     case VariableStoreTypeNv:

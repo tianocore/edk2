@@ -4169,6 +4169,64 @@ ConvertNormalVarStorageToAuthVarStorage (
   mVariableModuleGlobal->VariableGlobal.AuthFormat = TRUE;
   return AuthVarStorage;
 }
+
+/**
+  Get HOB variable store.
+
+  @param[out] VariableGuid      NV variable store signature.
+
+  @retval EFI_SUCCESS           Function successfully executed.
+  @retval EFI_OUT_OF_RESOURCES  Fail to allocate enough memory resource.
+
+**/
+EFI_STATUS
+GetHobVariableStore (
+  IN EFI_GUID                   *VariableGuid
+  )
+{
+  VARIABLE_STORE_HEADER         *VariableStoreHeader;
+  UINT64                        VariableStoreLength;
+  EFI_HOB_GUID_TYPE             *GuidHob;
+  BOOLEAN                       NeedConvertNormalToAuth;
+
+  //
+  // Combinations supported:
+  // 1. Normal NV variable store +
+  //    Normal HOB variable store
+  // 2. Auth NV variable store +
+  //    Auth HOB variable store
+  // 3. Auth NV variable store +
+  //    Normal HOB variable store (code will convert it to Auth Format)
+  //
+  NeedConvertNormalToAuth = FALSE;
+  GuidHob = GetFirstGuidHob (VariableGuid);
+  if (GuidHob == NULL && VariableGuid == &gEfiAuthenticatedVariableGuid) {
+    //
+    // Try getting it from normal variable HOB
+    //
+    GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
+    NeedConvertNormalToAuth = TRUE;
+  }
+  if (GuidHob != NULL) {
+    VariableStoreHeader = GET_GUID_HOB_DATA (GuidHob);
+    VariableStoreLength = GuidHob->Header.HobLength - sizeof (EFI_HOB_GUID_TYPE);
+    if (GetVariableStoreStatus (VariableStoreHeader) == EfiValid) {
+      if (!NeedConvertNormalToAuth) {
+        mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) AllocateRuntimeCopyPool ((UINTN) VariableStoreLength, (VOID *) VariableStoreHeader);
+      } else {
+        mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) ConvertNormalVarStorageToAuthVarStorage ((VOID *) VariableStoreHeader);
+      }
+      if (mVariableModuleGlobal->VariableGlobal.HobVariableBase == 0) {
+        return EFI_OUT_OF_RESOURCES;
+      }
+    } else {
+      DEBUG ((EFI_D_ERROR, "HOB Variable Store header is corrupted!\n"));
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
 /**
   Initializes variable store area for non-volatile and volatile variable.
 
@@ -4183,13 +4241,9 @@ VariableCommonInitialize (
 {
   EFI_STATUS                      Status;
   VARIABLE_STORE_HEADER           *VolatileVariableStore;
-  VARIABLE_STORE_HEADER           *VariableStoreHeader;
-  UINT64                          VariableStoreLength;
   UINTN                           ScratchSize;
-  EFI_HOB_GUID_TYPE               *GuidHob;
   EFI_GUID                        *VariableGuid;
   EFI_FIRMWARE_VOLUME_HEADER      *NvFvHeader;
-  BOOLEAN                         IsNormalVariableHob;
 
   //
   // Allocate runtime memory for variable driver global structure.
@@ -4231,32 +4285,11 @@ VariableCommonInitialize (
   //
   // Get HOB variable store.
   //
-  IsNormalVariableHob = FALSE;
-  GuidHob = GetFirstGuidHob (VariableGuid);
-  if (GuidHob == NULL && VariableGuid == &gEfiAuthenticatedVariableGuid) {
-    //
-    // Try getting it from normal variable HOB
-    //
-    GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
-    IsNormalVariableHob = TRUE;
-  }
-  if (GuidHob != NULL) {
-    VariableStoreHeader = GET_GUID_HOB_DATA (GuidHob);
-    VariableStoreLength = GuidHob->Header.HobLength - sizeof (EFI_HOB_GUID_TYPE);
-    if (GetVariableStoreStatus (VariableStoreHeader) == EfiValid) {
-      if (!IsNormalVariableHob) {
-        mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) AllocateRuntimeCopyPool ((UINTN) VariableStoreLength, (VOID *) VariableStoreHeader);
-      } else {
-        mVariableModuleGlobal->VariableGlobal.HobVariableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) ConvertNormalVarStorageToAuthVarStorage ((VOID *) VariableStoreHeader);
-      }
-      if (mVariableModuleGlobal->VariableGlobal.HobVariableBase == 0) {
-        FreePool (NvFvHeader);
-        FreePool (mVariableModuleGlobal);
-        return EFI_OUT_OF_RESOURCES;
-      }
-    } else {
-      DEBUG ((EFI_D_ERROR, "HOB Variable Store header is corrupted!\n"));
-    }
+  Status = GetHobVariableStore (VariableGuid);
+  if (EFI_ERROR (Status)) {
+    FreePool (NvFvHeader);
+    FreePool (mVariableModuleGlobal);
+    return Status;
   }
 
   mVariableModuleGlobal->MaxVolatileVariableSize = ((PcdGet32 (PcdMaxVolatileVariableSize) != 0) ?
