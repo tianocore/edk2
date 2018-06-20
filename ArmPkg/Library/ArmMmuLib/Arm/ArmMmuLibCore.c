@@ -597,12 +597,6 @@ UpdatePageEntries (
     if (CurrentPageTableEntry  != PageTableEntry) {
       Mva = (VOID *)(UINTN)((((UINTN)FirstLevelIdx) << TT_DESCRIPTOR_SECTION_BASE_SHIFT) + (PageTableIndex << TT_DESCRIPTOR_PAGE_BASE_SHIFT));
 
-      // Clean/invalidate the cache for this page, but only
-      // if we are modifying the memory type attributes
-      if (((CurrentPageTableEntry ^ PageTableEntry) & TT_DESCRIPTOR_PAGE_CACHE_POLICY_MASK) != 0) {
-        WriteBackInvalidateDataCacheRange (Mva, TT_DESCRIPTOR_PAGE_SIZE);
-      }
-
       // Only need to update if we are changing the entry
       PageTable[PageTableIndex] = PageTableEntry;
       ArmUpdateTranslationTableEntry ((VOID *)&PageTable[PageTableIndex], Mva);
@@ -717,12 +711,6 @@ UpdateSectionEntries (
 
       if (CurrentDescriptor  != Descriptor) {
         Mva = (VOID *)(UINTN)(((UINTN)FirstLevelTable) << TT_DESCRIPTOR_SECTION_BASE_SHIFT);
-
-        // Clean/invalidate the cache for this section, but only
-        // if we are modifying the memory type attributes
-        if (((CurrentDescriptor ^ Descriptor) & TT_DESCRIPTOR_SECTION_CACHE_POLICY_MASK) != 0) {
-          WriteBackInvalidateDataCacheRange (Mva, SIZE_1MB);
-        }
 
         // Only need to update if we are changing the descriptor
         FirstLevelTable[FirstLevelIdx + i] = Descriptor;
