@@ -886,7 +886,7 @@ class DscParser(MetaFileParser):
     #
     def __init__(self, FilePath, FileType, Arch, Table, Owner= -1, From= -1):
         # prevent re-initialization
-        if hasattr(self, "_Table"):
+        if hasattr(self, "_Table") and self._Table is Table:
             return
         MetaFileParser.__init__(self, FilePath, FileType, Arch, Table, Owner, From)
         self._Version = 0x00010005  # Only EDK2 dsc file is supported
@@ -1557,12 +1557,12 @@ class DscParser(MetaFileParser):
 
             self._FileWithError = IncludedFile1
 
-            IncludedFileTable = MetaFileStorage(self._Table.Cur, IncludedFile1, MODEL_FILE_DSC, False)
             FromItem = self._Content[self._ContentIndex - 1][0]
             if self._InSubsection:
                 Owner = self._Content[self._ContentIndex - 1][8]
             else:
                 Owner = self._Content[self._ContentIndex - 1][0]
+            IncludedFileTable = MetaFileStorage(self._Table.Cur, IncludedFile1, MODEL_FILE_DSC, False, FromItem=FromItem)
             Parser = DscParser(IncludedFile1, self._FileType, self._Arch, IncludedFileTable,
                                Owner=Owner, From=FromItem)
 

@@ -168,7 +168,8 @@ class TableFile(Table):
         Path VARCHAR,
         FullPath VARCHAR NOT NULL,
         Model INTEGER DEFAULT 0,
-        TimeStamp SINGLE NOT NULL
+        TimeStamp SINGLE NOT NULL,
+        FromItem REAL NOT NULL
         '''
     def __init__(self, Cursor):
         Table.__init__(self, Cursor, 'File')
@@ -184,7 +185,7 @@ class TableFile(Table):
     # @param Model:     Model of a File
     # @param TimeStamp: TimeStamp of a File
     #
-    def Insert(self, Name, ExtName, Path, FullPath, Model, TimeStamp):
+    def Insert(self, Name, ExtName, Path, FullPath, Model, TimeStamp, FromItem=0):
         (Name, ExtName, Path, FullPath) = ConvertToSqlString((Name, ExtName, Path, FullPath))
         return Table.Insert(
             self,
@@ -193,7 +194,8 @@ class TableFile(Table):
             Path,
             FullPath,
             Model,
-            TimeStamp
+            TimeStamp,
+            FromItem
             )
 
     ## InsertFile
@@ -205,7 +207,17 @@ class TableFile(Table):
     #
     # @retval FileID:       The ID after record is inserted
     #
-    def InsertFile(self, File, Model):
+    def InsertFile(self, File, Model, FromItem=''):
+        if FromItem:
+            return self.Insert(
+                        File.Name,
+                        File.Ext,
+                        File.Dir,
+                        File.Path,
+                        Model,
+                        File.TimeStamp,
+                        FromItem
+                        )
         return self.Insert(
                         File.Name,
                         File.Ext,
@@ -221,8 +233,11 @@ class TableFile(Table):
     #
     #   @retval ID          ID value of given file in the table
     #
-    def GetFileId(self, File):
-        QueryScript = "select ID from %s where FullPath = '%s'" % (self.Table, str(File))
+    def GetFileId(self, File, FromItem=None):
+        if FromItem:
+            QueryScript = "select ID from %s where FullPath = '%s' and FromItem = %s" % (self.Table, str(File), str(FromItem))
+        else:
+            QueryScript = "select ID from %s where FullPath = '%s'" % (self.Table, str(File))
         RecordList = self.Exec(QueryScript)
         if len(RecordList) == 0:
             return None
