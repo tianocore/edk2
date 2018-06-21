@@ -343,17 +343,12 @@ ArmConfigureMmu (
   }
 
   // Translate the Memory Attributes into Translation Table Register Attributes
-  if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED) ||
-      (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_UNCACHED_UNBUFFERED)) {
-    TTBRAttributes = ArmHasMpExtensions () ? TTBR_MP_NON_CACHEABLE : TTBR_NON_CACHEABLE;
-  } else if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK) ||
+  if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK) ||
       (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_BACK)) {
     TTBRAttributes = ArmHasMpExtensions () ? TTBR_MP_WRITE_BACK_ALLOC : TTBR_WRITE_BACK_ALLOC;
-  } else if ((TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_WRITE_THROUGH) ||
-      (TranslationTableAttribute == ARM_MEMORY_REGION_ATTRIBUTE_NONSECURE_WRITE_THROUGH)) {
-    TTBRAttributes = ArmHasMpExtensions () ? TTBR_MP_WRITE_THROUGH : TTBR_WRITE_THROUGH;
   } else {
-    ASSERT (0); // No support has been found for the attributes of the memory region that the translation table belongs to.
+    // Page tables must reside in memory mapped as write-back cacheable
+    ASSERT (0);
     return RETURN_UNSUPPORTED;
   }
 
@@ -460,9 +455,6 @@ ConvertSectionToPages (
   for (Index = 0; Index < TRANSLATION_TABLE_PAGE_COUNT; Index++) {
     PageTable[Index] = TT_DESCRIPTOR_PAGE_BASE_ADDRESS(BaseAddress + (Index << 12)) | PageDescriptor;
   }
-
-  // Flush d-cache so descriptors make it back to uncached memory for subsequent table walks
-  WriteBackInvalidateDataCacheRange ((VOID *)PageTable, TT_DESCRIPTOR_PAGE_SIZE);
 
   // Formulate page table entry, Domain=0, NS=0
   PageTableDescriptor = (((UINTN)PageTable) & TT_DESCRIPTOR_SECTION_PAGETABLE_ADDRESS_MASK) | TT_DESCRIPTOR_SECTION_TYPE_PAGE_TABLE;
