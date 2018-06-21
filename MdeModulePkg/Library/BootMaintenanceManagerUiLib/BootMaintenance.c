@@ -1111,6 +1111,7 @@ BootMaintCallback (
         // 2. Re-scan the BootOption menus (including the legacy boot option).
         //
         CustomizeMenus ();
+        EfiBootManagerRefreshAllBootOption ();
         BOpt_GetBootOptions (Private);
         mFirstEnterBMMForm = TRUE;
       }
@@ -1689,8 +1690,6 @@ BootMaintenanceManagerUiLibConstructor (
   //
   Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &mBmmCallbackInfo->FormBrowser2);
   ASSERT_EFI_ERROR (Status);
-
-  EfiBootManagerRefreshAllBootOption ();
 
   //
   // Create LoadOption in BmmCallbackInfo for Driver Callback
