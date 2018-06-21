@@ -944,7 +944,14 @@ class DscParser(MetaFileParser):
                 self._SubsectionType = MODEL_META_DATA_SUBSECTION_HEADER
             # directive line
             elif Line[0] == '!':
-                self._DirectiveParser()
+                TokenList = GetSplitValueList(Line, ' ', 1)
+                if TokenList[0] == TAB_INCLUDE:
+                    for Arch, ModuleType, DefaultStore in self._Scope:
+                        if self._SubsectionType != MODEL_UNKNOWN and Arch in OwnerId:
+                            self._Owner[-1] = OwnerId[Arch]
+                        self._DirectiveParser()
+                else:
+                    self._DirectiveParser()
                 continue
             if Line[0] == TAB_OPTION_START and not self._InSubsection:
                 EdkLogger.error("Parser", FILE_READ_FAILURE, "Missing the '{' before %s in Line %s" % (Line, Index+1), ExtraData=self.MetaFile)
@@ -965,7 +972,7 @@ class DscParser(MetaFileParser):
             #
             for Arch, ModuleType, DefaultStore in self._Scope:
                 Owner = self._Owner[-1]
-                if self._SubsectionType != MODEL_UNKNOWN:
+                if self._SubsectionType != MODEL_UNKNOWN and Arch in OwnerId:
                     Owner = OwnerId[Arch]
                 self._LastItem = self._Store(
                                         self._ItemType,
@@ -1190,6 +1197,7 @@ class DscParser(MetaFileParser):
         if self._CurrentLine[-1] == '{':
             self._ValueList[0] = self._CurrentLine[0:-1].strip()
             self._InSubsection = True
+            self._SubsectionType = MODEL_UNKNOWN
         else:
             self._ValueList[0] = self._CurrentLine
 
@@ -1562,24 +1570,14 @@ class DscParser(MetaFileParser):
 
             # set the parser status with current status
             Parser._SectionName = self._SectionName
-            if self._InSubsection:
-                Parser._SectionType = self._SubsectionType
-            else:
-                Parser._SectionType = self._SectionType
+            Parser._SubsectionType = self._SubsectionType
+            Parser._InSubsection = self._InSubsection
+            Parser._SectionType = self._SectionType
             Parser._Scope = self._Scope
             Parser._Enabled = self._Enabled
             # Parse the included file
             Parser.Start()
 
-            # update current status with sub-parser's status
-            self._SectionName = Parser._SectionName
-            if not self._InSubsection:
-                self._SectionType = Parser._SectionType
-            self._SubsectionType = Parser._SubsectionType
-            self._InSubsection = Parser._InSubsection
-
-            self._Scope = Parser._Scope
-            self._Enabled = Parser._Enabled
 
             # Insert all records in the table for the included file into dsc file table
             Records = IncludedFileTable.GetAll()
