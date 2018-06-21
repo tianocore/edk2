@@ -42,10 +42,6 @@ typedef struct _EFI_TLS_PROTOCOL EFI_TLS_PROTOCOL;
 ///
 typedef enum {
   ///
-  /// Session Configuration
-  ///
-
-  ///
   /// TLS session Version. The corresponding Data is of type EFI_TLS_VERSION.
   ///
   EfiTlsVersion,
@@ -86,11 +82,6 @@ typedef enum {
   /// The corresponding Data is of type EFI_TLS_SESSION_STATE.
   ///
   EfiTlsSessionState,
-
-  ///
-  /// Session information
-  ///
-
   ///
   /// TLS session data client random.
   /// The corresponding Data is of type EFI_TLS_RANDOM.
@@ -106,9 +97,15 @@ typedef enum {
   /// The corresponding Data is of type EFI_TLS_MASTER_SECRET.
   ///
   EfiTlsKeyMaterial,
+  ///
+  /// TLS session hostname for validation which is used to verify whether the name
+  /// within the peer certificate matches a given host name.
+  /// This parameter is invalid when EfiTlsVerifyMethod is EFI_TLS_VERIFY_NONE.
+  /// The corresponding Data is of type EFI_TLS_VERIFY_HOST.
+  ///
+  EfiTlsVerifyHost,
 
   EfiTlsSessionDataTypeMaximum
-
 } EFI_TLS_SESSION_DATA_TYPE;
 
 ///
@@ -178,7 +175,8 @@ typedef UINT32  EFI_TLS_VERIFY;
 ///
 #define EFI_TLS_VERIFY_PEER                  0x1
 ///
-/// TLS session will fail peer certificate is absent.
+/// EFI_TLS_VERIFY_FAIL_IF_NO_PEER_CERT is only meaningful in the server mode.
+/// TLS session will fail if client certificate is absent.
 ///
 #define EFI_TLS_VERIFY_FAIL_IF_NO_PEER_CERT  0x2
 ///
@@ -186,6 +184,54 @@ typedef UINT32  EFI_TLS_VERIFY;
 /// re-negotiation.
 ///
 #define EFI_TLS_VERIFY_CLIENT_ONCE           0x4
+
+///
+/// EFI_TLS_VERIFY_HOST_FLAG
+///
+typedef UINT32 EFI_TLS_VERIFY_HOST_FLAG;
+///
+/// There is no additional flags set for hostname validation.
+/// Wildcards are supported and they match only in the left-most label.
+///
+#define EFI_TLS_VERIFY_FLAG_NONE                    0x00
+///
+/// Always check the Subject Distinguished Name (DN) in the peer certificate even if the
+/// certificate contains Subject Alternative Name (SAN).
+///
+#define EFI_TLS_VERIFY_FLAG_ALWAYS_CHECK_SUBJECT    0x01
+///
+/// Disable the match of all wildcards.
+///
+#define EFI_TLS_VERIFY_FLAG_NO_WILDCARDS            0x02
+///
+/// Disable the "*" as wildcard in labels that have a prefix or suffix (e.g. "www*" or "*www").
+///
+#define EFI_TLS_VERIFY_FLAG_NO_PARTIAL_WILDCARDS    0x04
+///
+/// Allow the "*" to match more than one labels. Otherwise, only matches a single label.
+///
+#define EFI_TLS_VERIFY_FLAG_MULTI_LABEL_WILDCARDS   0x08
+///
+/// Restrict to only match direct child sub-domains which start with ".".
+/// For example, a name of ".example.com" would match "www.example.com" with this flag,
+/// but would not match "www.sub.example.com".
+///
+#define EFI_TLS_VERIFY_FLAG_SINGLE_LABEL_SUBDOMAINS 0x10
+///
+/// Never check the Subject Distinguished Name (DN) even there is no
+/// Subject Alternative Name (SAN) in the certificate.
+///
+#define EFI_TLS_VERIFY_FLAG_NEVER_CHECK_SUBJECT     0x20
+
+///
+/// EFI_TLS_VERIFY_HOST
+///
+#pragma pack (1)
+typedef struct {
+  EFI_TLS_VERIFY_HOST_FLAG Flags;
+  CHAR8                    *HostName;
+} EFI_TLS_VERIFY_HOST;
+#pragma pack ()
 
 ///
 /// EFI_TLS_RANDOM
