@@ -4190,6 +4190,30 @@ GetHobVariableStore (
   BOOLEAN                       NeedConvertNormalToAuth;
 
   //
+  // Make sure there is no more than one Variable HOB.
+  //
+  DEBUG_CODE (
+    GuidHob = GetFirstGuidHob (&gEfiAuthenticatedVariableGuid);
+    if (GuidHob != NULL) {
+      if ((GetNextGuidHob (&gEfiAuthenticatedVariableGuid, GET_NEXT_HOB (GuidHob)) != NULL)) {
+        DEBUG ((DEBUG_ERROR, "ERROR: Found two Auth Variable HOBs\n"));
+        ASSERT (FALSE);
+      } else if (GetFirstGuidHob (&gEfiVariableGuid) != NULL) {
+        DEBUG ((DEBUG_ERROR, "ERROR: Found one Auth + one Normal Variable HOBs\n"));
+        ASSERT (FALSE);
+      }
+    } else {
+      GuidHob = GetFirstGuidHob (&gEfiVariableGuid);
+      if (GuidHob != NULL) {
+        if ((GetNextGuidHob (&gEfiVariableGuid, GET_NEXT_HOB (GuidHob)) != NULL)) {
+          DEBUG ((DEBUG_ERROR, "ERROR: Found two Normal Variable HOBs\n"));
+          ASSERT (FALSE);
+        }
+      }
+    }
+  );
+
+  //
   // Combinations supported:
   // 1. Normal NV variable store +
   //    Normal HOB variable store
