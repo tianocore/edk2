@@ -31,15 +31,15 @@ class MetaFileTable(Table):
     _ID_MAX_ = 0.99999999
 
     ## Constructor
-    def __init__(self, Cursor, MetaFile, FileType, Temporary):
+    def __init__(self, Cursor, MetaFile, FileType, Temporary, FromItem=None):
         self.MetaFile = MetaFile
 
         self._FileIndexTable = TableFile(Cursor)
         self._FileIndexTable.Create(False)
 
-        FileId = self._FileIndexTable.GetFileId(MetaFile)
+        FileId = self._FileIndexTable.GetFileId(MetaFile, FromItem)
         if not FileId:
-            FileId = self._FileIndexTable.InsertFile(MetaFile, FileType)
+            FileId = self._FileIndexTable.InsertFile(MetaFile, FileType, FromItem)
 
         if Temporary:
             TableName = "_%s_%s_%s" % (FileType, FileId, uuid.uuid4().hex)
@@ -285,8 +285,8 @@ class PlatformTable(MetaFileTable):
     _DUMMY_ = "-1, -1, '====', '====', '====', '====', '====','====', -1, -1, -1, -1, -1, -1, -1"
 
     ## Constructor
-    def __init__(self, Cursor, MetaFile, Temporary):
-        MetaFileTable.__init__(self, Cursor, MetaFile, MODEL_FILE_DSC, Temporary)
+    def __init__(self, Cursor, MetaFile, Temporary, FromItem=0):
+        MetaFileTable.__init__(self, Cursor, MetaFile, MODEL_FILE_DSC, Temporary, FromItem)
 
     ## Insert table
     #
@@ -379,7 +379,7 @@ class MetaFileStorage(object):
     }
 
     ## Constructor
-    def __new__(Class, Cursor, MetaFile, FileType=None, Temporary=False):
+    def __new__(Class, Cursor, MetaFile, FileType=None, Temporary=False, FromItem=None):
         # no type given, try to find one
         if not FileType:
             if MetaFile.Type in self._FILE_TYPE_:
@@ -392,6 +392,8 @@ class MetaFileStorage(object):
             Args = (Cursor, MetaFile, FileType, Temporary)
         else:
             Args = (Cursor, MetaFile, Temporary)
+        if FromItem:
+            Args = Args + (FromItem,)
 
         # create the storage object and return it to caller
         return Class._FILE_TABLE_[FileType](*Args)
