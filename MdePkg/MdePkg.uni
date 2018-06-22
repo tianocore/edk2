@@ -245,6 +245,12 @@
 
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdPerformanceLibraryPropertyMask_HELP  #language en-US "The mask is used to control PerformanceLib behavior.<BR><BR>\n"
                                                                                              "BIT0 - Enable Performance Measurement.<BR>"
+                                                                                             "BIT1 - Disable Start Image Logging.<BR>"
+                                                                                             "BIT2 - Disable Load Image logging.<BR>"
+                                                                                             "BIT3 - Disable Binding Support logging.<BR>"
+                                                                                             "BIT4 - Disable Binding Start logging.<BR>"
+                                                                                             "BIT5 - Disable Binding Stop logging.<BR>"
+                                                                                             "BIT6 - Disable all other general Perfs.<BR>"
 
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdPostCodePropertyMask_PROMPT  #language en-US "Post Code Property"
 

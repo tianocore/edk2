@@ -1,7 +1,7 @@
 /** @file
   Base Performance Library which provides no service.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -303,4 +303,59 @@ PerformanceMeasurementEnabled (
   )
 {
   return (BOOLEAN) ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
+}
+
+/**
+  Create performance record with event description and a timestamp.
+
+  @param CallerIdentifier  - Image handle or pointer to caller ID GUID
+  @param Guid              - Pointer to a GUID
+  @param String            - Pointer to a string describing the measurement
+  @param Address           - Pointer to a location in memory relevant to the measurement
+  @param Identifier        - Performance identifier describing the type of measurement
+
+  @retval RETURN_SUCCESS           - Successfully created performance record
+  @retval RETURN_OUT_OF_RESOURCES  - Ran out of space to store the records
+  @retval RETURN_INVALID_PARAMETER - Invalid parameter passed to function - NULL
+                                     pointer or invalid PerfId
+
+**/
+RETURN_STATUS
+EFIAPI
+LogPerformanceMeasurement (
+  IN CONST VOID   *CallerIdentifier,OPTIONAL
+  IN CONST VOID   *Guid,    OPTIONAL
+  IN CONST CHAR8  *String,  OPTIONAL
+  IN UINT64       Address,  OPTIONAL
+  IN UINT32       Identifier
+  )
+{
+  return RETURN_SUCCESS;
+}
+
+/**
+  Check whether the specified performance measurement can be logged.
+
+  This function returns TRUE when the PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED bit of PcdPerformanceLibraryPropertyMask is set
+  and the Type disable bit in PcdPerformanceLibraryPropertyMask is not set.
+
+  @param Type        - Type of the performance measurement entry.
+
+  @retval TRUE         The performance measurement can be logged.
+  @retval FALSE        The performance measurement can NOT be logged.
+
+**/
+BOOLEAN
+EFIAPI
+LogPerformanceMeasurementEnabled (
+  IN  CONST UINTN        Type
+  )
+{
+  //
+  // When Performance measurement is enabled and the type is not filtered, the performance can be logged.
+  //
+  if (PerformanceMeasurementEnabled () && (PcdGet8(PcdPerformanceLibraryPropertyMask) & Type) == 0) {
+    return TRUE;
+  }
+  return FALSE;
 }
