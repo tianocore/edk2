@@ -45,7 +45,7 @@ BmEndOfBdsPerfCode (
   //
   // Record the performance data for End of BDS
   //
-  PERF_END(NULL, "BDS", NULL, 0);
+  PERF_CROSSMODULE_END("BDS");
 
   return ;
 }

@@ -1000,9 +1000,9 @@ PeiDispatcher (
             //
             PeimEntryPoint = (EFI_PEIM_ENTRY_POINT2)(UINTN)EntryPoint;
 
-            PERF_START (PeimFileHandle, "PEIM", NULL, 0);
+            PERF_START_IMAGE_BEGIN (PeimFileHandle);
             PeimEntryPoint(PeimFileHandle, (const EFI_PEI_SERVICES **) &Private->Ps);
-            PERF_END (PeimFileHandle, "PEIM", NULL, 0);
+            PERF_START_IMAGE_END (PeimFileHandle);
           }
 
           //
@@ -1109,7 +1109,7 @@ PeiDispatcher (
                 // The PEIM has its dependencies satisfied, and its entry point
                 // has been found, so invoke it.
                 //
-                PERF_START (PeimFileHandle, "PEIM", NULL, 0);
+                PERF_START_IMAGE_BEGIN (PeimFileHandle);
 
                 REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
                   EFI_PROGRESS_CODE,
@@ -1145,7 +1145,7 @@ PeiDispatcher (
                   (VOID *)(&PeimFileHandle),
                   sizeof (PeimFileHandle)
                   );
-                PERF_END (PeimFileHandle, "PEIM", NULL, 0);
+                PERF_START_IMAGE_END (PeimFileHandle);
 
               }
             }

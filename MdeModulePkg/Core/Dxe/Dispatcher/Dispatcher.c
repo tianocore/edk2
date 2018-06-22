@@ -419,6 +419,7 @@ CoreDispatcher (
   BOOLEAN                         ReadyToRun;
   EFI_EVENT                       DxeDispatchEvent;
   
+  PERF_FUNCTION_BEGIN ();
 
   if (gDispatcherRunning) {
     //
@@ -583,6 +584,8 @@ CoreDispatcher (
   CoreCloseEvent (DxeDispatchEvent);
 
   gDispatcherRunning = FALSE;
+
+  PERF_FUNCTION_END ();
 
   return ReturnStatus;
 }
@@ -1437,6 +1440,8 @@ CoreInitializeDispatcher (
   VOID
   )
 {
+  PERF_FUNCTION_BEGIN ();
+
   mFwVolEvent = EfiCreateProtocolNotifyEvent (
                   &gEfiFirmwareVolume2ProtocolGuid,
                   TPL_CALLBACK,
@@ -1444,6 +1449,8 @@ CoreInitializeDispatcher (
                   NULL,
                   &mFwVolEventRegistration
                   );
+
+  PERF_FUNCTION_END ();
 }
 
 //

@@ -725,8 +725,8 @@ BdsEntry (
   //
   // Insert the performance probe
   //
-  PERF_END (NULL, "DXE", NULL, 0);
-  PERF_START (NULL, "BDS", NULL, 0);
+  PERF_CROSSMODULE_END("DXE");
+  PERF_CROSSMODULE_BEGIN("BDS");
   DEBUG ((EFI_D_INFO, "[Bds] Entry...\n"));
 
   //
@@ -888,9 +888,9 @@ BdsEntry (
   // > Signal ReadyToLock event
   // > Authentication action: 1. connect Auth devices; 2. Identify auto logon user.
   //
-  PERF_START (NULL, "PlatformBootManagerBeforeConsole", "BDS", 0);
+  PERF_INMODULE_BEGIN("PlatformBootManagerBeforeConsole");
   PlatformBootManagerBeforeConsole ();
-  PERF_END   (NULL, "PlatformBootManagerBeforeConsole", "BDS", 0);
+  PERF_INMODULE_END("PlatformBootManagerBeforeConsole");
 
   //
   // Initialize hotkey service
@@ -907,7 +907,7 @@ BdsEntry (
   //
   // Connect consoles
   //
-  PERF_START (NULL, "EfiBootManagerConnectAllDefaultConsoles", "BDS", 0);
+  PERF_INMODULE_BEGIN("EfiBootManagerConnectAllDefaultConsoles");
   if (PcdGetBool (PcdConInConnectOnDemand)) {
     EfiBootManagerConnectConsoleVariable (ConOut);
     EfiBootManagerConnectConsoleVariable (ErrOut);
@@ -917,7 +917,7 @@ BdsEntry (
   } else {
     EfiBootManagerConnectAllDefaultConsoles ();
   }
-  PERF_END   (NULL, "EfiBootManagerConnectAllDefaultConsoles", "BDS", 0);
+  PERF_INMODULE_END("EfiBootManagerConnectAllDefaultConsoles");
 
   //
   // Do the platform specific action after the console is ready
@@ -930,9 +930,9 @@ BdsEntry (
   // > Dispatch aditional option roms
   // > Special boot: e.g.: USB boot, enter UI
   // 
-  PERF_START (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
+  PERF_INMODULE_BEGIN("PlatformBootManagerAfterConsole");
   PlatformBootManagerAfterConsole ();
-  PERF_END   (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
+  PERF_INMODULE_END("PlatformBootManagerAfterConsole");
   //
   // Boot to Boot Manager Menu when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
   //
@@ -1025,10 +1025,9 @@ BdsEntry (
     //
     // Execute Key####
     //
-    PERF_START (NULL, "BdsWait", "BDS", 0);
+    PERF_INMODULE_BEGIN ("BdsWait");
     BdsWait (HotkeyTriggered);
-    PERF_END   (NULL, "BdsWait", "BDS", 0);
-
+    PERF_INMODULE_END ("BdsWait");
     //
     // BdsReadKeys() can be removed after all keyboard drivers invoke callback in timer callback.
     //
