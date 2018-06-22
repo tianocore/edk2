@@ -430,17 +430,17 @@ S3ResumeBootOs (
   // by soft debugger.
   //
 
-  PERF_END (NULL, "ScriptExec", NULL, 0);
+  PERF_INMODULE_END ("ScriptExec");
 
   //
   // Install BootScriptDonePpi
   //
-  PERF_START_EX (NULL, "BootScriptDonePpi", NULL, 0, PERF_INMODULE_START_ID);
+  PERF_INMODULE_BEGIN ("BootScriptDonePpi");
 
   Status = PeiServicesInstallPpi (&mPpiListPostScriptTable);
   ASSERT_EFI_ERROR (Status);
 
-  PERF_END_EX (NULL, "BootScriptDonePpi", NULL, 0, PERF_INMODULE_END_ID);
+  PERF_INMODULE_END ("BootScriptDonePpi");
 
   //
   // Get ACPI Table Address
@@ -464,14 +464,14 @@ S3ResumeBootOs (
   //
   // Install EndOfPeiPpi
   //
-  PERF_START_EX (NULL, "EndOfPeiPpi", NULL, 0, PERF_INMODULE_START_ID);
+  PERF_INMODULE_BEGIN("EndOfPeiPpi");
 
   Status = PeiServicesInstallPpi (&mPpiListEndOfPeiTable);
   ASSERT_EFI_ERROR (Status);
 
-  PERF_END_EX (NULL, "EndOfPeiPpi", NULL, 0, PERF_INMODULE_END_ID);
+  PERF_INMODULE_END("EndOfPeiPpi");
 
-  PERF_START_EX (NULL, "EndOfS3Resume", NULL, 0, PERF_INMODULE_START_ID);
+  PERF_INMODULE_BEGIN("EndOfS3Resume");
 
   DEBUG ((DEBUG_INFO, "Signal EndOfS3Resume\n"));
   //
@@ -479,7 +479,7 @@ S3ResumeBootOs (
   //
   SignalToSmmByCommunication (&gEdkiiEndOfS3ResumeGuid);
 
-  PERF_END_EX (NULL, "EndOfS3Resume", NULL, 0, PERF_INMODULE_END_ID);
+  PERF_INMODULE_END ("EndOfS3Resume");
 
   //
   // report status code on S3 resume
@@ -880,7 +880,7 @@ S3ResumeExecuteBootScript (
   //
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, EFI_SOFTWARE_PEI_MODULE | EFI_SW_PEI_PC_S3_BOOT_SCRIPT);
 
-  PERF_START (NULL, "ScriptExec", NULL, 0);
+  PERF_INMODULE_BEGIN ("ScriptExec");
 
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     //
