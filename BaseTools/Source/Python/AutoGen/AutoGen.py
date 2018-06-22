@@ -568,7 +568,7 @@ class WorkspaceAutoGen(AutoGen):
                     DecPcdsKey.add((Pcd[0], Pcd[1], Pcd[2]))
 
             Platform.SkuName = self.SkuId
-            for Name, Guid in PcdSet:
+            for Name, Guid,Fileds in PcdSet:
                 if (Name, Guid) not in DecPcds:
                     EdkLogger.error(
                         'build',
@@ -582,7 +582,6 @@ class WorkspaceAutoGen(AutoGen):
                     if (Name, Guid, TAB_PCDS_FIXED_AT_BUILD) in DecPcdsKey \
                         or (Name, Guid, TAB_PCDS_PATCHABLE_IN_MODULE) in DecPcdsKey \
                         or (Name, Guid, TAB_PCDS_FEATURE_FLAG) in DecPcdsKey:
-                        Platform.AddPcd(Name, Guid, PcdSet[Name, Guid])
                         continue
                     elif (Name, Guid, TAB_PCDS_DYNAMIC) in DecPcdsKey or (Name, Guid, TAB_PCDS_DYNAMIC_EX) in DecPcdsKey:
                         EdkLogger.error(

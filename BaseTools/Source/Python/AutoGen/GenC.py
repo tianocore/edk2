@@ -890,6 +890,8 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
 
     if Pcd.PcdValueFromComm:
         Pcd.DefaultValue = Pcd.PcdValueFromComm
+    elif Pcd.PcdValueFromFdf:
+        Pcd.DefaultValue = Pcd.PcdValueFromFdf
 
     if Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
         TokenNumber = int(Pcd.TokenValue, 0)
@@ -1183,6 +1185,8 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
 
     if Pcd.PcdValueFromComm:
         Pcd.DefaultValue = Pcd.PcdValueFromComm
+    elif Pcd.PcdValueFromFdf:
+        Pcd.DefaultValue = Pcd.PcdValueFromFdf
     #
     # Write PCDs
     #

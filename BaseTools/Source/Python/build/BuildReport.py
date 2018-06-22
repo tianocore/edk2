@@ -1331,6 +1331,9 @@ class PcdReport(object):
             for Key, Values in OverrideStruct.items():
                 if Values[1] and Values[1].endswith('.dsc'):
                     OverrideFieldStruct[Key] = Values
+        if Pcd.PcdFieldValueFromFdf:
+            for Key, Values in Pcd.PcdFieldValueFromFdf.items():
+                OverrideFieldStruct[Key] = Values
         if Pcd.PcdFieldValueFromComm:
             for Key, Values in Pcd.PcdFieldValueFromComm.items():
                 OverrideFieldStruct[Key] = Values

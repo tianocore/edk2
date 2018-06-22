@@ -70,7 +70,8 @@ class PcdClassObject(object):
         if IsDsc:
             self.DscDefaultValue = Value
         self.PcdValueFromComm = ""
-        self.DefinitionPosition = ("", "")
+        self.PcdValueFromFdf = ""
+        self.DefinitionPosition = ("","")
 
     ## Get the maximum number of bytes
     def GetPcdMaxSize(self):
@@ -78,6 +79,16 @@ class PcdClassObject(object):
             return MAX_SIZE_TYPE[self.DatumType]
 
         MaxSize = int(self.MaxDatumSize, 10) if self.MaxDatumSize else 0
+        if self.PcdValueFromFdf:
+            if self.PcdValueFromFdf.startswith("{") and self.PcdValueFromFdf.endswith("}"):
+                MaxSize =  max([len(self.PcdValueFromFdf.split(",")),MaxSize])
+            elif self.PcdValueFromFdf.startswith("\"") or self.PcdValueFromFdf.startswith("\'"):
+                MaxSize =  max([len(self.PcdValueFromFdf)-2+1,MaxSize])
+            elif self.PcdValueFromFdf.startswith("L\""):
+                MaxSize =  max([2*(len(self.PcdValueFromFdf)-3+1),MaxSize])
+            else:
+                MaxSize = max([len(self.PcdValueFromFdf),MaxSize])
+
         if self.PcdValueFromComm:
             if self.PcdValueFromComm.startswith("{") and self.PcdValueFromComm.endswith("}"):
                 return max([len(self.PcdValueFromComm.split(",")), MaxSize])
@@ -169,6 +180,7 @@ class StructurePcd(PcdClassObject):
         self.DefaultValueFromDec = ""
         self.ValueChain = set()
         self.PcdFieldValueFromComm = collections.OrderedDict()
+        self.PcdFieldValueFromFdf = collections.OrderedDict()
     def __repr__(self):
         return self.TypeName
 
@@ -216,6 +228,7 @@ class StructurePcd(PcdClassObject):
         self.expressions = PcdObject.expressions if PcdObject.expressions else self.expressions
         self.DscRawValue = PcdObject.DscRawValue if PcdObject.DscRawValue else self.DscRawValue
         self.PcdValueFromComm = PcdObject.PcdValueFromComm if PcdObject.PcdValueFromComm else self.PcdValueFromComm
+        self.PcdValueFromFdf = PcdObject.PcdValueFromFdf if PcdObject.PcdValueFromFdf else self.PcdValueFromFdf
         self.DefinitionPosition = PcdObject.DefinitionPosition if PcdObject.DefinitionPosition else self.DefinitionPosition
         if isinstance(PcdObject, StructurePcd):
             self.StructuredPcdIncludeFile = PcdObject.StructuredPcdIncludeFile if PcdObject.StructuredPcdIncludeFile else self.StructuredPcdIncludeFile
@@ -231,6 +244,7 @@ class StructurePcd(PcdClassObject):
             self.PkgPath = PcdObject.PkgPath if PcdObject.PkgPath else self.PkgPath
             self.ValueChain = PcdObject.ValueChain if PcdObject.ValueChain else self.ValueChain
             self.PcdFieldValueFromComm = PcdObject.PcdFieldValueFromComm if PcdObject.PcdFieldValueFromComm else self.PcdFieldValueFromComm
+            self.PcdFieldValueFromFdf = PcdObject.PcdFieldValueFromFdf if PcdObject.PcdFieldValueFromFdf else self.PcdFieldValueFromFdf
 
 ## LibraryClassObject
 #

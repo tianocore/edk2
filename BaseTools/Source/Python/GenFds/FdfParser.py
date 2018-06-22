@@ -83,13 +83,12 @@ T_CHAR_BACKSLASH, T_CHAR_DOUBLE_QUOTE, T_CHAR_SINGLE_QUOTE, T_CHAR_STAR, T_CHAR_
 SEPERATOR_TUPLE = ('=', '|', ',', '{', '}')
 
 RegionSizePattern = re.compile("\s*(?P<base>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<size>(?:0x|0X)?[a-fA-F0-9]+)\s*")
-RegionSizeGuidPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*\|\s*(?P<size>\w+\.\w+)\s*")
-RegionOffsetPcdPattern = re.compile("\s*(?P<base>\w+\.\w+)\s*$")
+RegionSizeGuidPattern = re.compile("\s*(?P<base>\w+\.\w+[\.\w\[\]]*)\s*\|\s*(?P<size>\w+\.\w+[\.\w\[\]]*)\s*")
+RegionOffsetPcdPattern = re.compile("\s*(?P<base>\w+\.\w+[\.\w\[\]]*)\s*$")
 ShortcutPcdPattern = re.compile("\s*\w+\s*=\s*(?P<value>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<name>\w+\.\w+)\s*")
 BaseAddrValuePattern = re.compile('^0[xX][0-9a-fA-F]+')
 FileExtensionPattern = re.compile(r'([a-zA-Z][a-zA-Z0-9]*)')
 TokenFindPattern = re.compile(r'([a-zA-Z0-9\-]+|\$\(TARGET\)|\*)_([a-zA-Z0-9\-]+|\$\(TOOL_CHAIN_TAG\)|\*)_([a-zA-Z0-9\-]+|\$\(ARCH\)|\*)')
-
 AllIncludeFileList = []
 
 # Get the closest parent
@@ -226,8 +225,9 @@ class FileProfile :
         except:
             EdkLogger.error("FdfParser", FILE_OPEN_FAILURE, ExtraData=FileName)
 
-
+        self.FileName = FileName
         self.PcdDict = {}
+        self.PcdLocalDict = {}
         self.InfList = []
         self.InfDict = {'ArchTBD':[]}
         # ECC will use this Dict and List information
@@ -787,7 +787,7 @@ class FdfParser:
                     continue
                 SetLine = self.CurrentLineNumber - 1
                 SetOffset = self.CurrentOffsetWithinLine - len('SET')
-                PcdPair = self.__GetNextPcdName()
+                PcdPair = self.__GetNextPcdSettings()
                 PcdName = "%s.%s" % (PcdPair[1], PcdPair[0])
                 if not self.__IsToken( "="):
                     raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
@@ -798,6 +798,7 @@ class FdfParser:
                 self.__PcdDict[PcdName] = Value
 
                 self.Profile.PcdDict[PcdPair] = Value
+                self.SetPcdLocalation(PcdPair)
                 FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
                 self.Profile.PcdFileLineDict[PcdPair] = FileLineTuple
 
@@ -1049,6 +1050,29 @@ class FdfParser:
 
         return False
 
+    def __GetNextPcdWord(self):
+        self.__SkipWhiteSpace()
+        if self.__EndOfFile():
+            return False
+
+        TempChar = self.__CurrentChar()
+        StartPos = self.CurrentOffsetWithinLine
+        if (TempChar >= 'a' and TempChar <= 'z') or (TempChar >= 'A' and TempChar <= 'Z') or TempChar == '_' or TempChar == '[' or TempChar == ']':
+            self.__GetOneChar()
+            while not self.__EndOfLine():
+                TempChar = self.__CurrentChar()
+                if (TempChar >= 'a' and TempChar <= 'z') or (TempChar >= 'A' and TempChar <= 'Z') \
+                or (TempChar >= '0' and TempChar <= '9') or TempChar == '_' or TempChar == '-' or TempChar == '[' or TempChar == ']':
+                    self.__GetOneChar()
+
+                else:
+                    break
+
+            self.__Token = self.__CurrentLine()[StartPos : self.CurrentOffsetWithinLine]
+            return True
+
+        return False
+
     ## __GetNextToken() method
     #
     #   Get next token unit before a seperator
@@ -1239,6 +1263,26 @@ class FdfParser:
         pcdCName = self.__Token
 
         return (pcdCName, pcdTokenSpaceCName)
+
+    def __GetNextPcdSettings(self):
+        if not self.__GetNextWord():
+            raise Warning("expected format of <PcdTokenSpaceCName>.<PcdCName>", self.FileName, self.CurrentLineNumber)
+        pcdTokenSpaceCName = self.__Token
+
+        if not self.__IsToken( "."):
+            raise Warning("expected format of <PcdTokenSpaceCName>.<PcdCName>", self.FileName, self.CurrentLineNumber)
+
+        if not self.__GetNextWord():
+            raise Warning("expected format of <PcdTokenSpaceCName>.<PcdCName>", self.FileName, self.CurrentLineNumber)
+        pcdCName = self.__Token
+
+        Fields = []
+        while self.__IsToken("."):
+            if not self.__GetNextPcdWord():
+                raise Warning("expected format of <PcdTokenSpaceCName>.<PcdCName>", self.FileName, self.CurrentLineNumber)
+            Fields.append(self.__Token)
+
+        return (pcdCName, pcdTokenSpaceCName,".".join(Fields))
 
     ## __GetStringData() method
     #
@@ -1567,6 +1611,9 @@ class FdfParser:
 
         return True
 
+    def SetPcdLocalation(self,pcdpair):
+        self.Profile.PcdLocalDict[pcdpair] = (self.Profile.FileName,self.CurrentLineNumber)
+
     ## __GetTokenStatements() method
     #
     #   Get token statements
@@ -1585,9 +1632,10 @@ class FdfParser:
             Obj.BaseAddress = self.__Token
 
             if self.__IsToken( "|"):
-                pcdPair = self.__GetNextPcdName()
+                pcdPair = self.__GetNextPcdSettings()
                 Obj.BaseAddressPcd = pcdPair
                 self.Profile.PcdDict[pcdPair] = Obj.BaseAddress
+                self.SetPcdLocalation(pcdPair)
                 FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
                 self.Profile.PcdFileLineDict[pcdPair] = FileLineTuple
             return True
@@ -1601,9 +1649,10 @@ class FdfParser:
 
             Size = self.__Token
             if self.__IsToken( "|"):
-                pcdPair = self.__GetNextPcdName()
+                pcdPair = self.__GetNextPcdSettings()
                 Obj.SizePcd = pcdPair
                 self.Profile.PcdDict[pcdPair] = Size
+                self.SetPcdLocalation(pcdPair)
                 FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
                 self.Profile.PcdFileLineDict[pcdPair] = FileLineTuple
             Obj.Size = long(Size, 0)
@@ -1694,9 +1743,10 @@ class FdfParser:
         BlockSize = self.__Token
         BlockSizePcd = None
         if self.__IsToken( "|"):
-            PcdPair = self.__GetNextPcdName()
+            PcdPair = self.__GetNextPcdSettings()
             BlockSizePcd = PcdPair
             self.Profile.PcdDict[PcdPair] = BlockSize
+            self.SetPcdLocalation(PcdPair)
             FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
             self.Profile.PcdFileLineDict[PcdPair] = FileLineTuple
         BlockSize = long(BlockSize, 0)
@@ -1777,7 +1827,7 @@ class FdfParser:
     #
     def __GetSetStatement(self, Obj):
         if self.__IsKeyword("SET"):
-            PcdPair = self.__GetNextPcdName()
+            PcdPair = self.__GetNextPcdSettings()
 
             if not self.__IsToken( "="):
                 raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
@@ -1788,6 +1838,7 @@ class FdfParser:
             if Obj:
                 Obj.SetVarDict[PcdPair] = Value
             self.Profile.PcdDict[PcdPair] = Value
+            self.SetPcdLocalation(PcdPair)
             FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
             self.Profile.PcdFileLineDict[PcdPair] = FileLineTuple
             return True
@@ -1864,14 +1915,16 @@ class FdfParser:
             IsRegionPcd = (RegionSizeGuidPattern.match(self.__CurrentLine()[self.CurrentOffsetWithinLine:]) or
                            RegionOffsetPcdPattern.match(self.__CurrentLine()[self.CurrentOffsetWithinLine:]))
             if IsRegionPcd:
-                RegionObj.PcdOffset = self.__GetNextPcdName()
+                RegionObj.PcdOffset = self.__GetNextPcdSettings()
                 self.Profile.PcdDict[RegionObj.PcdOffset] = "0x%08X" % (RegionObj.Offset + long(Fd.BaseAddress, 0))
+                self.SetPcdLocalation(RegionObj.PcdOffset)
                 self.__PcdDict['%s.%s' % (RegionObj.PcdOffset[1], RegionObj.PcdOffset[0])] = "0x%x" % RegionObj.Offset
                 FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
                 self.Profile.PcdFileLineDict[RegionObj.PcdOffset] = FileLineTuple
                 if self.__IsToken( "|"):
-                    RegionObj.PcdSize = self.__GetNextPcdName()
+                    RegionObj.PcdSize = self.__GetNextPcdSettings()
                     self.Profile.PcdDict[RegionObj.PcdSize] = "0x%08X" % RegionObj.Size
+                    self.SetPcdLocalation(RegionObj.PcdSize)
                     self.__PcdDict['%s.%s' % (RegionObj.PcdSize[1], RegionObj.PcdSize[0])] = "0x%x" % RegionObj.Size
                     FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
                     self.Profile.PcdFileLineDict[RegionObj.PcdSize] = FileLineTuple
@@ -2609,7 +2662,7 @@ class FdfParser:
             if self.__Token == 'PCD':
                 if not self.__IsToken( "("):
                     raise Warning("expected '('", self.FileName, self.CurrentLineNumber)
-                PcdPair = self.__GetNextPcdName()
+                PcdPair = self.__GetNextPcdSettings()
                 if not self.__IsToken( ")"):
                     raise Warning("expected ')'", self.FileName, self.CurrentLineNumber)
                 self.__Token = 'PCD('+PcdPair[1]+'.'+PcdPair[0]+')'
@@ -3697,7 +3750,7 @@ class FdfParser:
             if self.__Token == 'PCD':
                 if not self.__IsToken( "("):
                     raise Warning("expected '('", self.FileName, self.CurrentLineNumber)
-                PcdPair = self.__GetNextPcdName()
+                PcdPair = self.__GetNextPcdSettings()
                 if not self.__IsToken( ")"):
                     raise Warning("expected ')'", self.FileName, self.CurrentLineNumber)
                 self.__Token = 'PCD('+PcdPair[1]+'.'+PcdPair[0]+')'
@@ -3971,7 +4024,7 @@ class FdfParser:
                     if self.__Token == 'PCD':
                         if not self.__IsToken( "("):
                             raise Warning("expected '('", self.FileName, self.CurrentLineNumber)
-                        PcdPair = self.__GetNextPcdName()
+                        PcdPair = self.__GetNextPcdSettings()
                         if not self.__IsToken( ")"):
                             raise Warning("expected ')'", self.FileName, self.CurrentLineNumber)
                         self.__Token = 'PCD('+PcdPair[1]+'.'+PcdPair[0]+')'
