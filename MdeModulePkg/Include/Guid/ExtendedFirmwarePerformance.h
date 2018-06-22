@@ -33,31 +33,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define PEIM_TOK                        "PEIM"            ///< PEIM Modules Entry Point execution
 
 //
-// Public Progress Identifiers for Event Records to map the above known token
-//
-#define MODULE_START_ID                 0x01
-#define MODULE_END_ID                   0x02
-#define MODULE_LOADIMAGE_START_ID       0x03
-#define MODULE_LOADIMAGE_END_ID         0x04
-#define MODULE_DB_START_ID              0x05
-#define MODULE_DB_END_ID                0x06
-#define MODULE_DB_SUPPORT_START_ID      0x07
-#define MODULE_DB_SUPPORT_END_ID        0x08
-#define MODULE_DB_STOP_START_ID         0x09
-#define MODULE_DB_STOP_END_ID           0x0A
-
-#define PERF_EVENTSIGNAL_START_ID       0x10
-#define PERF_EVENTSIGNAL_END_ID         0x11
-#define PERF_CALLBACK_START_ID          0x20
-#define PERF_CALLBACK_END_ID            0x21
-#define PERF_FUNCTION_START_ID          0x30
-#define PERF_FUNCTION_END_ID            0x31
-#define PERF_INMODULE_START_ID          0x40
-#define PERF_INMODULE_END_ID            0x41
-#define PERF_CROSSMODULE_START_ID       0x50
-#define PERF_CROSSMODULE_END_ID         0x51
-
-//
 // Misc defines
 //
 #define FPDT_RECORD_REVISION_1      (0x01)
