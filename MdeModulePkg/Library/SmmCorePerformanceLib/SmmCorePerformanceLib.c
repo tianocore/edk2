@@ -54,21 +54,10 @@ SPIN_LOCK            mSmmFpdtLock;
 PERFORMANCE_PROPERTY  mPerformanceProperty;
 
 //
-// Interfaces for SMM Performance Protocol.
+// Interfaces for SMM PerformanceMeasurement Protocol.
 //
-PERFORMANCE_PROTOCOL mPerformanceInterface = {
-  StartGauge,
-  EndGauge,
-  GetGauge
-};
-
-//
-// Interfaces for SMM PerformanceEx Protocol.
-//
-PERFORMANCE_EX_PROTOCOL mPerformanceExInterface = {
-  StartGaugeEx,
-  EndGaugeEx,
-  GetGaugeEx
+EDKII_PERFORMANCE_MEASUREMENT_PROTOCOL mPerformanceMeasurementInterface = {
+  CreatePerformanceMeasurement,
 };
 
 /**
@@ -644,235 +633,6 @@ InsertFpdtMeasurement (
 }
 
 /**
-  Adds a record at the end of the performance measurement log
-  that records the start time of a performance measurement.
-
-  Adds a record to the end of the performance measurement log
-  that contains the Handle, Token, Module and Identifier.
-  The end time of the new record must be set to zero.
-  If TimeStamp is not zero, then TimeStamp is used to fill in the start time in the record.
-  If TimeStamp is zero, the start time in the record is filled in with the value
-  read from the current time stamp.
-
-  @param  Handle                  Pointer to environment specific context used
-                                  to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
-                                  that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
-                                  that identifies the module being measured.
-  @param  TimeStamp               64-bit time stamp.
-  @param  Identifier              32-bit identifier. If the value is 0, the created record
-                                  is same as the one created by StartGauge of PERFORMANCE_PROTOCOL.
-
-  @retval EFI_SUCCESS             The data was read correctly from the device.
-  @retval EFI_OUT_OF_RESOURCES    There are not enough resources to record the measurement.
-
-**/
-EFI_STATUS
-EFIAPI
-StartGaugeEx (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
-  IN UINT64       TimeStamp,
-  IN UINT32       Identifier
-  )
-{
-  EFI_STATUS    Status;
-
-  AcquireSpinLock (&mSmmFpdtLock);
-
-  Status = InsertFpdtMeasurement (TRUE, Handle, Token, Module, TimeStamp, Identifier);
-
-  ReleaseSpinLock (&mSmmFpdtLock);
-
-  return Status;
-}
-
-/**
-  Searches the performance measurement log from the beginning of the log
-  for the first matching record that contains a zero end time and fills in a valid end time.
-
-  Searches the performance measurement log from the beginning of the log
-  for the first record that matches Handle, Token, Module and Identifier and has an end time value of zero.
-  If the record can not be found then return EFI_NOT_FOUND.
-  If the record is found and TimeStamp is not zero,
-  then the end time in the record is filled in with the value specified by TimeStamp.
-  If the record is found and TimeStamp is zero, then the end time in the matching record
-  is filled in with the current time stamp value.
-
-  @param  Handle                  Pointer to environment specific context used
-                                  to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
-                                  that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
-                                  that identifies the module being measured.
-  @param  TimeStamp               64-bit time stamp.
-  @param  Identifier              32-bit identifier. If the value is 0, the found record
-                                  is same as the one found by EndGauge of PERFORMANCE_PROTOCOL.
-
-  @retval EFI_SUCCESS             The end of  the measurement was recorded.
-  @retval EFI_NOT_FOUND           The specified measurement record could not be found.
-
-**/
-EFI_STATUS
-EFIAPI
-EndGaugeEx (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
-  IN UINT64       TimeStamp,
-  IN UINT32       Identifier
-  )
-{
-  EFI_STATUS     Status;
-
-  AcquireSpinLock (&mSmmFpdtLock);
-
-  Status = InsertFpdtMeasurement (FALSE, Handle, Token, Module, TimeStamp, Identifier);
-
-  ReleaseSpinLock (&mSmmFpdtLock);
-
-  return Status;
-}
-
-/**
-  Retrieves a previously logged performance measurement.
-  It can also retrieve the log created by StartGauge and EndGauge of PERFORMANCE_PROTOCOL,
-  and then assign the Identifier with 0.
-
-  !!! Not Support!!!
-
-  Retrieves the performance log entry from the performance log specified by LogEntryKey.
-  If it stands for a valid entry, then EFI_SUCCESS is returned and
-  GaugeDataEntryEx stores the pointer to that entry.
-
-  @param  LogEntryKey             The key for the previous performance measurement log entry.
-                                  If 0, then the first performance measurement log entry is retrieved.
-  @param  GaugeDataEntryEx        The indirect pointer to the extended gauge data entry specified by LogEntryKey
-                                  if the retrieval is successful.
-
-  @retval EFI_SUCCESS             The GuageDataEntryEx is successfully found based on LogEntryKey.
-  @retval EFI_NOT_FOUND           The LogEntryKey is the last entry (equals to the total entry number).
-  @retval EFI_INVALIDE_PARAMETER  The LogEntryKey is not a valid entry (greater than the total entry number).
-  @retval EFI_INVALIDE_PARAMETER  GaugeDataEntryEx is NULL.
-
-**/
-EFI_STATUS
-EFIAPI
-GetGaugeEx (
-  IN  UINTN                 LogEntryKey,
-  OUT GAUGE_DATA_ENTRY_EX   **GaugeDataEntryEx
-  )
-{
-  return EFI_UNSUPPORTED;
-}
-
-/**
-  Adds a record at the end of the performance measurement log
-  that records the start time of a performance measurement.
-
-  Adds a record to the end of the performance measurement log
-  that contains the Handle, Token, and Module.
-  The end time of the new record must be set to zero.
-  If TimeStamp is not zero, then TimeStamp is used to fill in the start time in the record.
-  If TimeStamp is zero, the start time in the record is filled in with the value
-  read from the current time stamp.
-
-  @param  Handle                  Pointer to environment specific context used
-                                  to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
-                                  that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
-                                  that identifies the module being measured.
-  @param  TimeStamp               64-bit time stamp.
-
-  @retval EFI_SUCCESS             The data was read correctly from the device.
-  @retval EFI_OUT_OF_RESOURCES    There are not enough resources to record the measurement.
-
-**/
-EFI_STATUS
-EFIAPI
-StartGauge (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
-  IN UINT64       TimeStamp
-  )
-{
-  return StartGaugeEx (Handle, Token, Module, TimeStamp, 0);
-}
-
-/**
-  Searches the performance measurement log from the beginning of the log
-  for the first matching record that contains a zero end time and fills in a valid end time.
-
-  Searches the performance measurement log from the beginning of the log
-  for the first record that matches Handle, Token, and Module and has an end time value of zero.
-  If the record can not be found then return EFI_NOT_FOUND.
-  If the record is found and TimeStamp is not zero,
-  then the end time in the record is filled in with the value specified by TimeStamp.
-  If the record is found and TimeStamp is zero, then the end time in the matching record
-  is filled in with the current time stamp value.
-
-  @param  Handle                  Pointer to environment specific context used
-                                  to identify the component being measured.
-  @param  Token                   Pointer to a Null-terminated ASCII string
-                                  that identifies the component being measured.
-  @param  Module                  Pointer to a Null-terminated ASCII string
-                                  that identifies the module being measured.
-  @param  TimeStamp               64-bit time stamp.
-
-  @retval EFI_SUCCESS             The end of  the measurement was recorded.
-  @retval EFI_NOT_FOUND           The specified measurement record could not be found.
-
-**/
-EFI_STATUS
-EFIAPI
-EndGauge (
-  IN CONST VOID   *Handle,  OPTIONAL
-  IN CONST CHAR8  *Token,   OPTIONAL
-  IN CONST CHAR8  *Module,  OPTIONAL
-  IN UINT64       TimeStamp
-  )
-{
-  return EndGaugeEx (Handle, Token, Module, TimeStamp, 0);
-}
-
-/**
-  Retrieves a previously logged performance measurement.
-  It can also retrieve the log created by StartGaugeEx and EndGaugeEx of PERFORMANCE_EX_PROTOCOL,
-  and then eliminate the Identifier.
-
-  !!! Not Support!!!
-
-  Retrieves the performance log entry from the performance log specified by LogEntryKey.
-  If it stands for a valid entry, then EFI_SUCCESS is returned and
-  GaugeDataEntry stores the pointer to that entry.
-
-  @param  LogEntryKey             The key for the previous performance measurement log entry.
-                                  If 0, then the first performance measurement log entry is retrieved.
-  @param  GaugeDataEntry          The indirect pointer to the gauge data entry specified by LogEntryKey
-                                  if the retrieval is successful.
-
-  @retval EFI_SUCCESS             The GuageDataEntry is successfully found based on LogEntryKey.
-  @retval EFI_NOT_FOUND           The LogEntryKey is the last entry (equals to the total entry number).
-  @retval EFI_INVALIDE_PARAMETER  The LogEntryKey is not a valid entry (greater than the total entry number).
-  @retval EFI_INVALIDE_PARAMETER  GaugeDataEntry is NULL.
-
-**/
-EFI_STATUS
-EFIAPI
-GetGauge (
-  IN  UINTN               LogEntryKey,
-  OUT GAUGE_DATA_ENTRY    **GaugeDataEntry
-  )
-{
-  return EFI_UNSUPPORTED;
-}
-
-
-/**
   SmmReadyToBoot protocol notification event handler.
 
   @param  Protocol   Points to the protocol's unique identifier
@@ -942,16 +702,9 @@ InitializeSmmCorePerformanceLib (
   Handle = NULL;
   Status = gSmst->SmmInstallProtocolInterface (
                     &Handle,
-                    &gSmmPerformanceProtocolGuid,
+                    &gEdkiiSmmPerformanceMeasurementProtocolGuid,
                     EFI_NATIVE_INTERFACE,
-                    &mPerformanceInterface
-                    );
-  ASSERT_EFI_ERROR (Status);
-  Status = gSmst->SmmInstallProtocolInterface (
-                    &Handle,
-                    &gSmmPerformanceExProtocolGuid,
-                    EFI_NATIVE_INTERFACE,
-                    &mPerformanceExInterface
+                    &mPerformanceMeasurementInterface
                     );
   ASSERT_EFI_ERROR (Status);
 
@@ -1032,6 +785,48 @@ SmmCorePerformanceLibConstructor (
 }
 
 /**
+  Create performance record with event description and a timestamp.
+
+  @param CallerIdentifier  - Image handle or pointer to caller ID GUID.
+  @param Guid              - Pointer to a GUID.
+  @param String            - Pointer to a string describing the measurement.
+  @param TimeStamp         - 64-bit time stamp.
+  @param Address           - Pointer to a location in memory relevant to the measurement.
+  @param Identifier        - Performance identifier describing the type of measurement.
+  @param Attribute         - The attribute of the measurement. According to attribute can create a start
+                             record for PERF_START/PERF_START_EX, or a end record for PERF_END/PERF_END_EX,
+                             or a general record for other Perf macros.
+
+  @retval EFI_SUCCESS           - Successfully created performance record.
+  @retval EFI_OUT_OF_RESOURCES  - Ran out of space to store the records.
+  @retval EFI_INVALID_PARAMETER - Invalid parameter passed to function - NULL
+                                  pointer or invalid PerfId.
+**/
+EFI_STATUS
+EFIAPI
+CreatePerformanceMeasurement(
+  IN CONST VOID                        *CallerIdentifier, OPTIONAL
+  IN CONST VOID                        *Guid,     OPTIONAL
+  IN CONST CHAR8                       *String,   OPTIONAL
+  IN       UINT64                      TimeStamp, OPTIONAL
+  IN       UINT64                      Address,   OPTIONAL
+  IN       UINT32                      Identifier,
+  IN       PERF_MEASUREMENT_ATTRIBUTE  Attribute
+  )
+{
+  EFI_STATUS   Status;
+
+  AcquireSpinLock (&mSmmFpdtLock);
+  if (Attribute == PerfStartEntry) {
+    Status = InsertFpdtMeasurement (TRUE, CallerIdentifier, String, String, TimeStamp, Identifier);
+  } else if (Attribute == PerfEndEntry) {
+    Status = InsertFpdtMeasurement (FALSE, CallerIdentifier, String, String, TimeStamp, Identifier);
+  }
+  ReleaseSpinLock (&mSmmFpdtLock);
+  return Status;
+}
+
+/**
   Adds a record at the end of the performance measurement log
   that records the start time of a performance measurement.
 
@@ -1066,7 +861,17 @@ StartPerformanceMeasurementEx (
   IN UINT32       Identifier
   )
 {
-  return (RETURN_STATUS) StartGaugeEx (Handle, Token, Module, TimeStamp, Identifier);
+  CONST CHAR8     *String;
+
+  if (Token != NULL) {
+    String = Token;
+  } else if (Module != NULL) {
+    String = Module;
+  } else {
+    String = NULL;
+  }
+
+  return (RETURN_STATUS)CreatePerformanceMeasurement (Handle, NULL, String, TimeStamp, 0, Identifier, PerfStartEntry);
 }
 
 /**
@@ -1105,7 +910,17 @@ EndPerformanceMeasurementEx (
   IN UINT32       Identifier
   )
 {
-  return (RETURN_STATUS) EndGaugeEx (Handle, Token, Module, TimeStamp, Identifier);
+  CONST CHAR8     *String;
+
+  if (Token != NULL) {
+    String = Token;
+  } else if (Module != NULL) {
+    String = Module;
+  } else {
+    String = NULL;
+  }
+
+  return (RETURN_STATUS)CreatePerformanceMeasurement (Handle, NULL, String, TimeStamp, 0, Identifier, PerfEndEntry);
 }
 
 /**
@@ -1198,7 +1013,7 @@ StartPerformanceMeasurement (
   IN UINT64       TimeStamp
   )
 {
-  return StartGaugeEx (Handle, Token, Module, TimeStamp, 0);
+  return StartPerformanceMeasurementEx (Handle, Token, Module, TimeStamp, 0);
 }
 
 /**
@@ -1234,7 +1049,7 @@ EndPerformanceMeasurement (
   IN UINT64       TimeStamp
   )
 {
-  return EndGaugeEx (Handle, Token, Module, TimeStamp, 0);
+  return EndPerformanceMeasurementEx (Handle, Token, Module, TimeStamp, 0);
 }
 
 /**

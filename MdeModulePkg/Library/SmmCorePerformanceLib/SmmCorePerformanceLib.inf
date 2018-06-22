@@ -66,16 +66,11 @@
   gEdkiiSmmReadyToBootProtocolGuid          ## NOTIFY
 
 [Guids]
-  ## PRODUCES ## UNDEFINED # Install protocol
-  ## CONSUMES ## UNDEFINED # SmiHandlerRegister
-  gSmmPerformanceProtocolGuid
-  ## PRODUCES ## UNDEFINED # Install protocol
-  ## CONSUMES ## UNDEFINED # SmiHandlerRegister
-  gSmmPerformanceExProtocolGuid
   ## PRODUCES ## SystemTable
   gPerformanceProtocolGuid
   gEdkiiFpdtExtendedFirmwarePerformanceGuid ## SOMETIMES_PRODUCES ## UNDEFINED # StatusCode Data
   gZeroGuid                                 ## SOMETIMES_CONSUMES ## GUID
+  gEdkiiSmmPerformanceMeasurementProtocolGuid             ## PRODUCES ## UNDEFINED # Install protocol
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask        ## CONSUMES

@@ -67,18 +67,14 @@
 
 
 [Guids]
-  ## SOMETIMES_CONSUMES   ## HOB
-  ## PRODUCES             ## UNDEFINED # Install protocol
   ## PRODUCES             ## SystemTable
   gPerformanceProtocolGuid
-  ## SOMETIMES_CONSUMES   ## HOB
-  ## PRODUCES             ## UNDEFINED # Install protocol
-  gPerformanceExProtocolGuid
   gZeroGuid                                     ## SOMETIMES_CONSUMES ## GUID
   gEfiFirmwarePerformanceGuid                   ## SOMETIMES_PRODUCES ## UNDEFINED # StatusCode Data
   gEdkiiFpdtExtendedFirmwarePerformanceGuid     ## SOMETIMES_CONSUMES ## HOB # StatusCode Data
   gEfiEventReadyToBootGuid                      ## CONSUMES           ## Event
   gEdkiiPiSmmCommunicationRegionTableGuid       ## SOMETIMES_CONSUMES    ## SystemTable
+  gEdkiiPerformanceMeasurementProtocolGuid      ## PRODUCES           ## UNDEFINED # Install protocol
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask         ## CONSUMES

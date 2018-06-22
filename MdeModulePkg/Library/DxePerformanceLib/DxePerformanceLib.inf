@@ -6,7 +6,7 @@
 #  to log performance data. If both PerformanceEx and Performance Protocol are not available,
 #  it does not log any performance information.
 #  
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -48,8 +48,7 @@
 
 
 [Guids]
-  gPerformanceProtocolGuid      ## SOMETIMES_CONSUMES   ## UNDEFINED # Locate protocol
-  gPerformanceExProtocolGuid    ## SOMETIMES_CONSUMES   ## UNDEFINED # Locate protocol
+  gEdkiiPerformanceMeasurementProtocolGuid    ## SOMETIMES_CONSUMES   ## UNDEFINED # Locate protocol
 
 
 [Pcd]

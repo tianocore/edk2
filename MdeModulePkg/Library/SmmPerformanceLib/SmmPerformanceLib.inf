@@ -6,7 +6,7 @@
 #  to log performance data. If both SMM PerformanceEx and Performance Protocol are not available,
 #  it does not log any performance information.
 #  
-#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -50,8 +50,7 @@
   BaseMemoryLib
 
 [Guids]
-  gSmmPerformanceProtocolGuid           ## SOMETIMES_CONSUMES   ## UNDEFINED # Locate protocol
-  gSmmPerformanceExProtocolGuid         ## SOMETIMES_CONSUMES   ## UNDEFINED # Locate protocol
+  gEdkiiSmmPerformanceMeasurementProtocolGuid          ## SOMETIMES_CONSUMES   ## UNDEFINED # Locate protocol
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask    ## CONSUMES
