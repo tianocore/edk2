@@ -604,7 +604,7 @@ ProcessHandles(
       ElapsedTime = DurationInMicroSeconds ( Duration );
       if ((ElapsedTime < mInterestThreshold)                 ||
           (Measurement.EndTimeStamp == 0)                    ||
-          (Measurement.Handle == NULL)                       ||
+          (!IsCorePerf (&Measurement))                       ||
           ((ExcludeFlag) && (GetCumulativeItem(&Measurement) >= 0))
          ) { // Ignore "uninteresting" or excluded records
         continue;
@@ -794,7 +794,7 @@ ProcessGlobal(
     mGaugeString[25] = 0;
     mUnicodeToken[31] = 0;
     if ( ! ( IsPhase( &Measurement)  ||
-        (Measurement.Handle != NULL)      ||
+        IsCorePerf (&Measurement)      ||
         (Measurement.EndTimeStamp == 0)
         ))
     {

@@ -41,6 +41,7 @@
 #include <Library/HiiLib.h>
 #include <Library/FileHandleLib.h>
 #include <Library/UefiHiiServicesLib.h>
+#include <Library/Performancelib.h>
 
 extern EFI_HANDLE mDpHiiHandle;
 

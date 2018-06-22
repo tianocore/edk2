@@ -85,6 +85,20 @@ IsPhase(
   IN MEASUREMENT_RECORD *Measurement
   );
 
+/**
+  Determine whether the Measurement record is for core code.
+
+  @param[in] Measurement  A pointer to the Measurement record to test.
+
+  @retval     TRUE        The measurement record is used for core.
+  @retval     FALSE       The measurement record is NOT used for core.
+
+**/
+BOOLEAN
+IsCorePerf(
+  IN MEASUREMENT_RECORD        *Measurement
+  );
+
 /** 
   Get the file name portion of the Pdb File Name.
   

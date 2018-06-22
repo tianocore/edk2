@@ -108,6 +108,37 @@ IsPhase(
   return RetVal;
 }
 
+/**
+  Determine whether the Measurement record is for core code.
+
+  @param[in] Measurement  A pointer to the Measurement record to test.
+
+  @retval     TRUE        The measurement record is used for core.
+  @retval     FALSE       The measurement record is NOT used for core.
+
+**/
+BOOLEAN
+IsCorePerf(
+  IN MEASUREMENT_RECORD        *Measurement
+  )
+{
+  BOOLEAN   RetVal;
+
+  RetVal = (BOOLEAN)(
+            ((Measurement->Identifier == MODULE_START_ID)            ||
+             (Measurement->Identifier == MODULE_END_ID)              ||
+             (Measurement->Identifier == MODULE_LOADIMAGE_START_ID)  ||
+             (Measurement->Identifier == MODULE_LOADIMAGE_END_ID)    ||
+             (Measurement->Identifier == MODULE_DB_START_ID)         ||
+             (Measurement->Identifier == MODULE_DB_END_ID)           ||
+             (Measurement->Identifier == MODULE_DB_SUPPORT_START_ID) ||
+             (Measurement->Identifier == MODULE_DB_SUPPORT_END_ID)   ||
+             (Measurement->Identifier == MODULE_DB_STOP_START_ID)    ||
+             (Measurement->Identifier == MODULE_DB_STOP_START_ID))
+            );
+  return RetVal;
+}
+
 /** 
   Get the file name portion of the Pdb File Name.
   

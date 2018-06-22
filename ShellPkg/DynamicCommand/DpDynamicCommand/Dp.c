@@ -430,11 +430,25 @@ GetMeasurementInfo (
       ASSERT(FALSE);
     }
 
-    if (AsciiStrCmp (Measurement->Token, ALit_PEIM) == 0) {
-      Measurement->Handle         = &(((FPDT_GUID_EVENT_RECORD *)RecordHeader)->Guid);
+    if (Measurement->Token != NULL && AsciiStrCmp (Measurement->Token, ALit_PEIM) == 0) {
+      Measurement->Handle         = &(((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Guid);
     } else {
       GetHandleFormModuleGuid(ModuleGuid, &StartHandle);
-      Measurement->Handle         = StartHandle;
+      Measurement->Handle = StartHandle;
+      //
+      // When no perf entry to record the PEI and DXE phase,
+      // For start image, we need detect the PEIM and non PEIM here.
+      //
+      if (Measurement->Token == NULL) {
+        if (StartHandle == NULL && !IsZeroGuid (ModuleGuid)) {
+          Measurement->Token      = ALit_PEIM;
+          Measurement->Module     = ALit_PEIM;
+          Measurement->Handle     = ModuleGuid;
+        } else {
+          Measurement->Token      = ALit_START_IMAGE;
+          Measurement->Module     = ALit_START_IMAGE;
+        }
+      }
     }
     break;
 
@@ -483,11 +497,23 @@ GetMeasurementInfo (
 
     Measurement->Module           = ((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->String;
 
-    if (AsciiStrCmp (Measurement->Token, ALit_PEIM) == 0) {
+    if (Measurement->Token != NULL && AsciiStrCmp (Measurement->Token, ALit_PEIM) == 0) {
       Measurement->Handle         = &(((FPDT_DYNAMIC_STRING_EVENT_RECORD *)RecordHeader)->Guid);
     } else {
       GetHandleFormModuleGuid(ModuleGuid, &StartHandle);
       Measurement->Handle = StartHandle;
+      //
+      // When no perf entry to record the PEI and DXE phase,
+      // For start image, we need detect the PEIM and non PEIM here.
+      //
+      if (Measurement->Token == NULL  && (Measurement->Identifier == MODULE_START_ID || Measurement->Identifier == MODULE_END_ID)) {
+        if (StartHandle == NULL && !IsZeroGuid (ModuleGuid)) {
+          Measurement->Token      = ALit_PEIM;
+          Measurement->Handle     = ModuleGuid;
+        } else {
+          Measurement->Token      = ALit_START_IMAGE;
+        }
+      }
     }
     break;
 
@@ -553,6 +579,20 @@ GetMeasurementInfo (
     Measurement->Handle = StartHandle;
     break;
 
+  case FPDT_DUAL_GUID_STRING_EVENT_TYPE:
+    ModuleGuid                    = &(((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->Guid1);
+    Measurement->Identifier       = ((UINT32)((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->ProgressID);
+    if (IsStart) {
+      Measurement->StartTimeStamp = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
+    } else {
+      Measurement->EndTimeStamp   = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->Timestamp;
+    }
+    Measurement->Token            = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->String;
+    Measurement->Module           = ((FPDT_DUAL_GUID_STRING_EVENT_RECORD *)RecordHeader)->String;
+    GetHandleFormModuleGuid(ModuleGuid, &StartHandle);
+    Measurement->Handle = StartHandle;
+    break;
+
   default:
     break;
   }
@@ -577,6 +617,14 @@ SearchMeasurement (
           CompareGuid(mMeasurementList[Index].Handle, EndMeasureMent->Handle) &&
           (AsciiStrCmp (mMeasurementList[Index].Token, EndMeasureMent->Token) == 0) &&
           (AsciiStrCmp (mMeasurementList[Index].Module, EndMeasureMent->Module) == 0)) {
+        mMeasurementList[Index].EndTimeStamp = EndMeasureMent->EndTimeStamp;
+        break;
+      }
+    } else if (EndMeasureMent->Identifier == PERF_CROSSMODULE_END_ID) {
+      if (mMeasurementList[Index].EndTimeStamp == 0 &&
+         (AsciiStrCmp (mMeasurementList[Index].Token, EndMeasureMent->Token) == 0) &&
+         (AsciiStrCmp (mMeasurementList[Index].Module, EndMeasureMent->Module) == 0) &&
+         mMeasurementList[Index].Identifier == PERF_CROSSMODULE_START_ID) {
         mMeasurementList[Index].EndTimeStamp = EndMeasureMent->EndTimeStamp;
         break;
       }
@@ -620,25 +668,32 @@ BuildMeasurementList (
     StartProgressId   = ((FPDT_GUID_EVENT_RECORD *)StartRecordEvent)->ProgressID;
 
     //
+    // If the record with ProgressId 0, the record doesn't appear in pairs. The timestamp in the record is the EndTimeStamp, its StartTimeStamp is 0.
     // If the record is the start record, fill the info to the measurement in the mMeasurementList.
     // If the record is the end record, find the related start measurement in the mMeasurementList and fill the EndTimeStamp.
     //
-    if (((StartProgressId >= PERF_EVENTSIGNAL_START_ID && ((StartProgressId & 0x000F) == 0)) ||
+    if (StartProgressId == 0) {
+      GetMeasurementInfo (RecordHeader, FALSE, &(mMeasurementList[mMeasurementNum]));
+      mMeasurementNum ++;
+    } else if (((StartProgressId >= PERF_EVENTSIGNAL_START_ID && ((StartProgressId & 0x000F) == 0)) ||
         (StartProgressId < PERF_EVENTSIGNAL_START_ID && ((StartProgressId & 0x0001) != 0)))) {
       //
       // Since PEIM and StartImage has same Type and ID when PCD PcdEdkiiFpdtStringRecordEnableOnly = FALSE
       // So we need to identify these two kinds of record through different phase.
       //
-      if (AsciiStrCmp (((FPDT_DYNAMIC_STRING_EVENT_RECORD *)StartRecordEvent)->String, ALit_PEI) == 0) {
-        mPeiPhase = TRUE;
-      } else if (AsciiStrCmp (((FPDT_DYNAMIC_STRING_EVENT_RECORD *)StartRecordEvent)->String, ALit_DXE) == 0) {
-        mDxePhase = TRUE;
-        mPeiPhase = FALSE;
+      if(StartProgressId == PERF_CROSSMODULE_START_ID ){
+        if (AsciiStrCmp (((FPDT_DYNAMIC_STRING_EVENT_RECORD *)StartRecordEvent)->String, ALit_PEI) == 0) {
+          mPeiPhase = TRUE;
+        } else if (AsciiStrCmp (((FPDT_DYNAMIC_STRING_EVENT_RECORD *)StartRecordEvent)->String, ALit_DXE) == 0) {
+          mDxePhase = TRUE;
+          mPeiPhase = FALSE;
+        }
       }
       // Get measurement info form the start record to the mMeasurementList.
       GetMeasurementInfo (RecordHeader, TRUE, &(mMeasurementList[mMeasurementNum]));
       mMeasurementNum ++;
     } else {
+      ZeroMem(&MeasureMent, sizeof(MEASUREMENT_RECORD));
       GetMeasurementInfo (RecordHeader, FALSE, &MeasureMent);
       SearchMeasurement (&MeasureMent);
     }
