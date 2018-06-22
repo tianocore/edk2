@@ -220,12 +220,6 @@ typedef struct {
 
 #pragma pack()
 
-typedef struct {
-  UINT16                                      ProgressID;
-  UINT16                                      Type;
-  UINT8                                       RecordSize;
-} FPDT_BASIC_RECORD_INFO;
-
 //
 // Union of all FPDT records
 //
