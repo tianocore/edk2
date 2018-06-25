@@ -115,7 +115,7 @@ class DoxygenFile(Page):
             f = open(self.mFilename, 'w')
             f.write('\n'.join(str))
             f.close()
-        except IOError, e:
+        except IOError as e:
             ErrorMsg ('Fail to write file %s' % self.mFilename)
             return False
 
@@ -429,7 +429,7 @@ class DoxygenConfigFile:
             f = open(path, 'w')
             f.write(text)
             f.close()
-        except IOError, e:
+        except IOError as e:
             ErrorMsg ('Fail to generate doxygen config file %s' % path)
             return False
 

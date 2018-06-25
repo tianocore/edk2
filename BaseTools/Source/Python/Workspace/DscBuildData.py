@@ -120,7 +120,7 @@ def GetDependencyList(FileStack,SearchPathList):
             try:
                 Fd = open(F, 'r')
                 FileContent = Fd.read()
-            except BaseException, X:
+            except BaseException as X:
                 EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=F + "\n\t" + str(X))
             finally:
                 if "Fd" in dir(locals()):
@@ -887,11 +887,11 @@ class DscBuildData(PlatformBuildClassObject):
             DatumType = self._DecPcds[PcdCName, TokenSpaceGuid].DatumType
             try:
                 ValueList[Index] = ValueExpressionEx(ValueList[Index], DatumType, self._GuidDict)(True)
-            except BadExpression, Value:
+            except BadExpression as Value:
                 EdkLogger.error('Parser', FORMAT_INVALID, Value, File=self.MetaFile, Line=LineNo,
                                 ExtraData="PCD [%s.%s] Value \"%s\" " % (
                                 TokenSpaceGuid, PcdCName, ValueList[Index]))
-            except EvaluationException, Excpt:
+            except EvaluationException as Excpt:
                 if hasattr(Excpt, 'Pcd'):
                     if Excpt.Pcd in GlobalData.gPlatformOtherPcds:
                         EdkLogger.error('Parser', FORMAT_INVALID, "Cannot use this PCD (%s) in an expression as"
@@ -1059,7 +1059,7 @@ class DscBuildData(PlatformBuildClassObject):
                 return PcdValue
             try:
                 PcdValue = ValueExpressionEx(PcdValue[1:], PcdDatumType, GuidDict)(True)
-            except BadExpression, Value:     
+            except BadExpression as Value:
                 EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
                                 (TokenSpaceGuidCName, TokenCName, PcdValue, Value))
         elif PcdValue.startswith("L'") or PcdValue.startswith("'"):
@@ -1070,7 +1070,7 @@ class DscBuildData(PlatformBuildClassObject):
                 return PcdValue
             try:
                 PcdValue = ValueExpressionEx(PcdValue, PcdDatumType, GuidDict)(True)
-            except BadExpression, Value:
+            except BadExpression as Value:
                 EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
                                 (TokenSpaceGuidCName, TokenCName, PcdValue, Value))
         elif PcdValue.startswith('L'):
@@ -1082,7 +1082,7 @@ class DscBuildData(PlatformBuildClassObject):
                 return PcdValue
             try:
                 PcdValue = ValueExpressionEx(PcdValue, PcdDatumType, GuidDict)(True)
-            except BadExpression, Value:
+            except BadExpression as Value:
                 EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
                                 (TokenSpaceGuidCName, TokenCName, PcdValue, Value))
         else:
@@ -1109,7 +1109,7 @@ class DscBuildData(PlatformBuildClassObject):
                     return PcdValue
             try:
                 PcdValue = ValueExpressionEx(PcdValue, PcdDatumType, GuidDict)(True)
-            except BadExpression, Value:
+            except BadExpression as Value:
                 EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
                                 (TokenSpaceGuidCName, TokenCName, PcdValue, Value))
         return PcdValue

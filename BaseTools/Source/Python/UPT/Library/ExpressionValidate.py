@@ -297,7 +297,7 @@ class _LogicalExpressionParser(_ExprBase):
         try:
             if self.LogicalExpression() not in [self.ARITH, self.LOGICAL, self.REALLOGICAL, self.STRINGITEM]:
                 return False, ST.ERR_EXPR_LOGICAL % self.Token
-        except _ExprError, XExcept:
+        except _ExprError as XExcept:
             return False, XExcept.Error
         self.SkipWhitespace()
         if self.Index != self.Len:
@@ -327,7 +327,7 @@ class _ValidRangeExpressionParser(_ExprBase):
         try:
             if self.RangeExpression() not in [self.HEX, self.INT]:
                 return False, ST.ERR_EXPR_RANGE % self.Token
-        except _ExprError, XExcept:
+        except _ExprError as XExcept:
             return False, XExcept.Error
         
         self.SkipWhitespace()
@@ -423,7 +423,7 @@ class _ValidListExpressionParser(_ExprBase):
         try:
             if self.ListExpression() not in [self.NUM]:
                 return False, ST.ERR_EXPR_LIST % self.Token
-        except _ExprError, XExcept:
+        except _ExprError as XExcept:
             return False, XExcept.Error
 
         self.SkipWhitespace()
@@ -457,7 +457,7 @@ class _StringTestParser(_ExprBase):
             return False, ST.ERR_EXPR_EMPTY
         try:
             self.StringTest()
-        except _ExprError, XExcept:
+        except _ExprError as XExcept:
             return False, XExcept.Error
         return True, ''
 

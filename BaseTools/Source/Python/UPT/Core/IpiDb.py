@@ -230,7 +230,7 @@ class IpiDatabase(object):
             self._AddDp(DpObj.Header.GetGuid(), DpObj.Header.GetVersion(), \
                         NewDpPkgFileName, DpPkgFileName, RePackage)
     
-        except sqlite3.IntegrityError, DetailMsg:
+        except sqlite3.IntegrityError as DetailMsg:
             Logger.Error("UPT",
                          UPT_DB_UPDATE_ERROR,
                          ST.ERR_UPT_DB_UPDATE_ERROR,

@@ -245,7 +245,7 @@ def CallExtenalBPDGTool(ToolPath, VpdFileName):
                                         stdout=subprocess.PIPE, 
                                         stderr= subprocess.PIPE,
                                         shell=True)
-    except Exception, X:
+    except Exception as X:
         EdkLogger.error("BPDG", BuildToolError.COMMAND_FAILURE, ExtraData=str(X))
     (out, error) = PopenObject.communicate()
     print out

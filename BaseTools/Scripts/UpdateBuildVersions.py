@@ -90,7 +90,8 @@ def ShellCommandResults(CmdLine, Opt):
             sys.stderr.flush()
         returnValue = err_val.returncode
 
-    except IOError as (errno, strerror):
+    except IOError as err_val:
+        (errno, strerror) = err_val.args
         file_list.close()
         if not Opt.silent:
             sys.stderr.write("I/O ERROR : %s : %s\n" % (str(errno), strerror))
@@ -100,7 +101,8 @@ def ShellCommandResults(CmdLine, Opt):
             sys.stderr.flush()
         returnValue = errno
 
-    except OSError as (errno, strerror):
+    except OSError as err_val:
+        (errno, strerror) = err_val.args
         file_list.close()
         if not Opt.silent:
             sys.stderr.write("OS ERROR : %s : %s\n" % (str(errno), strerror))
@@ -210,13 +212,15 @@ def RevertCmd(Filename, Opt):
             sys.stderr.write("Subprocess ERROR : %s\n" % err_val)
             sys.stderr.flush()
 
-    except IOError as (errno, strerror):
+    except IOError as err_val:
+        (errno, strerror) = err_val.args
         if not Opt.silent:
             sys.stderr.write("I/O ERROR : %d : %s\n" % (str(errno), strerror))
             sys.stderr.write("ERROR : this command failed : %s\n" % CmdLine)
             sys.stderr.flush()
 
-    except OSError as (errno, strerror):
+    except OSError as err_val:
+        (errno, strerror) = err_val.args
         if not Opt.silent:
             sys.stderr.write("OS ERROR : %d : %s\n" % (str(errno), strerror))
             sys.stderr.write("ERROR : this command failed : %s\n" % CmdLine)

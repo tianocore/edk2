@@ -68,12 +68,12 @@ def Main(Options=None):
         else:
             Logger.Quiet(ST.MSG_TEST_INSTALL_FAIL)
 
-    except TE.FatalError, XExcept:
+    except TE.FatalError as XExcept:
         ReturnCode = XExcept.args[0]
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())
 
-    except Exception, x:
+    except Exception as x:
         ReturnCode = TE.CODE_ERROR
         Logger.Error(
                     "\nTestInstallPkg",

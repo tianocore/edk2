@@ -1183,7 +1183,7 @@ class DscParser(MetaFileParser):
 
             try:
                 Processer[self._ItemType]()
-            except EvaluationException, Excpt:
+            except EvaluationException as Excpt:
                 # 
                 # Only catch expression evaluation error here. We need to report
                 # the precise number of line on which the error occurred
@@ -1192,7 +1192,7 @@ class DscParser(MetaFileParser):
 #                 EdkLogger.error('Parser', FORMAT_INVALID, "Invalid expression: %s" % str(Excpt),
 #                                 File=self._FileWithError, ExtraData=' '.join(self._ValueList),
 #                                 Line=self._LineIndex+1)
-            except MacroException, Excpt:
+            except MacroException as Excpt:
                 EdkLogger.error('Parser', FORMAT_INVALID, str(Excpt),
                                 File=self._FileWithError, ExtraData=' '.join(self._ValueList), 
                                 Line=self._LineIndex+1)
@@ -1305,10 +1305,10 @@ class DscParser(MetaFileParser):
             Macros.update(GlobalData.gGlobalDefines)
             try:
                 Result = ValueExpression(self._ValueList[1], Macros)()
-            except SymbolNotFound, Exc:
+            except SymbolNotFound as Exc:
                 EdkLogger.debug(EdkLogger.DEBUG_5, str(Exc), self._ValueList[1])
                 Result = False
-            except WrnExpression, Excpt:
+            except WrnExpression as Excpt:
                 # 
                 # Catch expression evaluation warning here. We need to report
                 # the precise number of line and return the evaluation result
@@ -1317,7 +1317,7 @@ class DscParser(MetaFileParser):
                                 File=self._FileWithError, ExtraData=' '.join(self._ValueList), 
                                 Line=self._LineIndex+1)
                 Result = Excpt.result
-            except BadExpression, Exc:
+            except BadExpression as Exc:
                 EdkLogger.debug(EdkLogger.DEBUG_5, str(Exc), self._ValueList[1])
                 Result = False
 
@@ -1437,13 +1437,13 @@ class DscParser(MetaFileParser):
             PcdValue = ValueList[0]      
             try:
                 ValueList[0] = ValueExpression(PcdValue, self._Macros)(True)
-            except WrnExpression, Value:
+            except WrnExpression as Value:
                 ValueList[0] = Value.result          
         else:
             PcdValue = ValueList[-1]
             try:
                 ValueList[-1] = ValueExpression(PcdValue, self._Macros)(True)
-            except WrnExpression, Value:
+            except WrnExpression as Value:
                 ValueList[-1] = Value.result
             
             if ValueList[-1] == 'True':

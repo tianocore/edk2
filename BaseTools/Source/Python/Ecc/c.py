@@ -2633,7 +2633,7 @@ if __name__ == '__main__':
 #    CollectSourceCodeDataIntoDB(sys.argv[1])
     try:
         test_file = sys.argv[1]
-    except IndexError, v:
+    except IndexError as v:
         print "Usage: %s filename" % sys.argv[0]
         sys.exit(1)
     MsgList = CheckFuncHeaderDoxygenComments(test_file)

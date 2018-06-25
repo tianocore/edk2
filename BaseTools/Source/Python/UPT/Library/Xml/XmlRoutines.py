@@ -224,6 +224,6 @@ def XmlParseFile(FileName):
         Dom = xml.dom.minidom.parse(XmlFile)
         XmlFile.close()
         return Dom
-    except BaseException, XExcept:
+    except BaseException as XExcept:
         XmlFile.close()
         Logger.Error('\nUPT', PARSER_ERROR, XExcept, File=FileName, RaiseError=True)

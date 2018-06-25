@@ -92,7 +92,7 @@ def Main(Options = None):
         DataBase = GlobalData.gDB
         InventoryDistInstalled(DataBase)     
         ReturnCode = 0       
-    except FatalError, XExcept:
+    except FatalError as XExcept:
         ReturnCode = XExcept.args[0]
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())

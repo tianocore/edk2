@@ -254,7 +254,7 @@ class UniFileClassObject(object):
         if len(Lang) != 3:
             try:
                 FileIn = UniFileClassObject.OpenUniFile(LongFilePath(File.Path))
-            except UnicodeError, X:
+            except UnicodeError as X:
                 EdkLogger.error("build", FILE_READ_FAILURE, "File read failure: %s" % str(X), ExtraData=File);
             except:
                 EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=File);
@@ -393,7 +393,7 @@ class UniFileClassObject(object):
 
         try:
             FileIn = UniFileClassObject.OpenUniFile(LongFilePath(File.Path))
-        except UnicodeError, X:
+        except UnicodeError as X:
             EdkLogger.error("build", FILE_READ_FAILURE, "File read failure: %s" % str(X), ExtraData=File.Path);
         except:
             EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=File.Path);

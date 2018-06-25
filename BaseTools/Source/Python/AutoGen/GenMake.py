@@ -1030,7 +1030,7 @@ cleanlib:
             else:
                 try:
                     Fd = open(F.Path, 'r')
-                except BaseException, X:
+                except BaseException as X:
                     EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=F.Path + "\n\t" + str(X))
 
                 FileContent = Fd.read()

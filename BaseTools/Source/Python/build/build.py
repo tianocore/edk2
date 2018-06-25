@@ -548,7 +548,7 @@ class BuildTask:
                 EdkLogger.debug(EdkLogger.DEBUG_8, "Threads [%s]" % ", ".join(Th.getName() for Th in threading.enumerate()))
                 # avoid tense loop
                 time.sleep(0.1)
-        except BaseException, X:
+        except BaseException as X:
             #
             # TRICK: hide the output of threads left runing, so that the user can
             #        catch the error message easily
@@ -1324,7 +1324,7 @@ class Build():
             try:
                 #os.rmdir(AutoGenObject.BuildDir)
                 RemoveDirectory(AutoGenObject.BuildDir, True)
-            except WindowsError, X:
+            except WindowsError as X:
                 EdkLogger.error("build", FILE_DELETE_FAILURE, ExtraData=str(X))
         return True
 
@@ -1414,7 +1414,7 @@ class Build():
             try:
                 #os.rmdir(AutoGenObject.BuildDir)
                 RemoveDirectory(AutoGenObject.BuildDir, True)
-            except WindowsError, X:
+            except WindowsError as X:
                 EdkLogger.error("build", FILE_DELETE_FAILURE, ExtraData=str(X))
         return True
 
@@ -2500,14 +2500,14 @@ def Main():
         # All job done, no error found and no exception raised
         #
         BuildError = False
-    except FatalError, X:
+    except FatalError as X:
         if MyBuild is not None:
             # for multi-thread build exits safely
             MyBuild.Relinquish()
         if Option is not None and Option.debug is not None:
             EdkLogger.quiet("(Python %s on %s) " % (platform.python_version(), sys.platform) + traceback.format_exc())
         ReturnCode = X.args[0]
-    except Warning, X:
+    except Warning as X:
         # error from Fdf parser
         if MyBuild is not None:
             # for multi-thread build exits safely

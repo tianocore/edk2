@@ -29,7 +29,7 @@ class Tests(TestTools.BaseToolsTest):
     def SingleFileTest(self, filename):
         try:
             py_compile.compile(filename, doraise=True)
-        except Exception, e:
+        except Exception as e:
             self.fail('syntax error: %s, Error is %s' % (filename, str(e)))
 
 def MakePythonSyntaxCheckTests():

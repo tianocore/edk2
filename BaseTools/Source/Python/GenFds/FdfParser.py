@@ -921,7 +921,7 @@ class FdfParser:
                     return ValueExpression(Expression, MacroPcdDict)(True)
                 else:
                     return ValueExpression(Expression, MacroPcdDict)()
-            except WrnExpression, Excpt:
+            except WrnExpression as Excpt:
                 # 
                 # Catch expression evaluation warning here. We need to report
                 # the precise number of line and return the evaluation result
@@ -930,7 +930,7 @@ class FdfParser:
                                 File=self.FileName, ExtraData=self.__CurrentLine(), 
                                 Line=Line)
                 return Excpt.result
-            except Exception, Excpt:
+            except Exception as Excpt:
                 if hasattr(Excpt, 'Pcd'):
                     if Excpt.Pcd in GlobalData.gPlatformOtherPcds:
                         Info = GlobalData.gPlatformOtherPcds[Excpt.Pcd]
@@ -1368,7 +1368,7 @@ class FdfParser:
             while self.__GetFd() or self.__GetFv() or self.__GetFmp() or self.__GetCapsule() or self.__GetVtf() or self.__GetRule() or self.__GetOptionRom():
                 pass
 
-        except Warning, X:
+        except Warning as X:
             self.__UndoToken()
             #'\n\tGot Token: \"%s\" from File %s\n' % (self.__Token, FileLineTuple[0]) + \
             # At this point, the closest parent would be the included file itself
@@ -4776,7 +4776,7 @@ if __name__ == "__main__":
     import sys
     try:
         test_file = sys.argv[1]
-    except IndexError, v:
+    except IndexError as v:
         print "Usage: %s filename" % sys.argv[0]
         sys.exit(1)
 
@@ -4784,7 +4784,7 @@ if __name__ == "__main__":
     try:
         parser.ParseFile()
         parser.CycleReferenceCheck()
-    except Warning, X:
+    except Warning as X:
         print str(X)
     else:
         print "Success!"

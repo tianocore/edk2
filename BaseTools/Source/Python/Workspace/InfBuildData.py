@@ -1121,7 +1121,7 @@ class InfBuildData(ModuleBuildClassObject):
                     else:
                         try:
                             Pcd.DefaultValue = ValueExpressionEx(Pcd.DefaultValue, Pcd.DatumType, _GuidDict)(True)
-                        except BadExpression, Value:
+                        except BadExpression as Value:
                             EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %(TokenSpaceGuid, PcdRealName, Pcd.DefaultValue, Value),
                                             File=self.MetaFile, Line=LineNo)
                     break

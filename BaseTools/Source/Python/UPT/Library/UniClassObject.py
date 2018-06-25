@@ -327,9 +327,9 @@ class UniFileClassObject(object):
         if len(Lang) != 3:
             try:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').readlines()
-            except UnicodeError, Xstr:
+            except UnicodeError as Xstr:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16').readlines()
-            except UnicodeError, Xstr:
+            except UnicodeError as Xstr:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16_le').readlines()
             except:
                 EdkLogger.Error("Unicode File Parser", 
@@ -436,7 +436,7 @@ class UniFileClassObject(object):
 
         try:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').readlines()
-        except UnicodeError, Xstr:
+        except UnicodeError as Xstr:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16').readlines()
         except UnicodeError:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16_le').readlines()
@@ -1042,7 +1042,7 @@ class UniFileClassObject(object):
                              ExtraData=FilaPath)
         try:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_8').readlines()
-        except UnicodeError, Xstr:
+        except UnicodeError as Xstr:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_16').readlines()
         except UnicodeError:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_16_le').readlines()

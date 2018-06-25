@@ -179,7 +179,7 @@ def Main():
 
     try:
         GlobalData.gWORKSPACE, GlobalData.gPACKAGE_PATH = GetWorkspace()
-    except FatalError, XExcept:
+    except FatalError as XExcept:
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())
         return XExcept.args[0]
@@ -294,7 +294,7 @@ def Main():
             return OPTION_MISSING
 
         ReturnCode = RunModule(Opt)
-    except FatalError, XExcept:
+    except FatalError as XExcept:
         ReturnCode = XExcept.args[0]
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + \

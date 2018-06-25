@@ -63,7 +63,7 @@ class MetaFileTable(Table):
                 # update the timestamp in database
                 self._FileIndexTable.SetFileTimeStamp(self.IdBase, TimeStamp)
                 return False
-        except Exception, Exc:
+        except Exception as Exc:
             EdkLogger.debug(EdkLogger.DEBUG_5, str(Exc))
             return False
         return True
@@ -250,7 +250,7 @@ class PackageTable(MetaFileTable):
                 if comment.startswith("@Expression"):
                     comment = comment.replace("@Expression", "", 1)
                     expressions.append(comment.split("|")[1].strip())
-        except Exception, Exc:
+        except Exception as Exc:
             ValidType = ""
             if oricomment.startswith("@ValidRange"):
                 ValidType = "@ValidRange"

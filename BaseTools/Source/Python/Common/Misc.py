@@ -478,7 +478,7 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
             Fd = open(File, "wb")
             Fd.write(Content)
             Fd.close()
-    except IOError, X:
+    except IOError as X:
         EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s' % X)
 
     return True
@@ -512,7 +512,7 @@ def DataRestore(File):
     try:
         Fd = open(File, 'rb')
         Data = cPickle.load(Fd)
-    except Exception, e:
+    except Exception as e:
         EdkLogger.verbose("Failed to load [%s]\n\t%s" % (File, str(e)))
         Data = None
     finally:
@@ -1278,7 +1278,7 @@ def ParseDevPathValue (Value):
     try:
         p = subprocess.Popen(Cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out, err = p.communicate()
-    except Exception, X:
+    except Exception as X:
         raise BadExpression("DevicePath: %s" % (str(X)) )
     finally:
         subprocess._cleanup()
@@ -1327,7 +1327,7 @@ def ParseFieldValue (Value):
             Value = Value[1:-1]
         try:
             Value = "'" + uuid.UUID(Value).get_bytes_le() + "'"
-        except ValueError, Message:
+        except ValueError as Message:
             raise BadExpression(Message)
         Value, Size = ParseFieldValue(Value)
         return Value, 16

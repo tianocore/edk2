@@ -214,7 +214,7 @@ def XmlParseFile(FileName):
         Dom = xml.dom.minidom.parse(XmlFile)
         XmlFile.close()
         return Dom
-    except Exception, X:
+    except Exception as X:
         print X
         return ""
 

@@ -394,7 +394,7 @@ def VerifyRemoveModuleDep(Path, DpPackagePathList):
                 return False
         else:
             return True
-    except FatalError, ErrCode:
+    except FatalError as ErrCode:
         if ErrCode.message == EDK1_INF_ERROR:
             Logger.Warn("UPT",
                         ST.WRN_EDK1_INF_FOUND%Path)
@@ -446,7 +446,7 @@ def VerifyReplaceModuleDep(Path, DpPackagePathList, OtherPkgList):
                     return False
         else:
             return True
-    except FatalError, ErrCode:
+    except FatalError as ErrCode:
         if ErrCode.message == EDK1_INF_ERROR:
             Logger.Warn("UPT",
                         ST.WRN_EDK1_INF_FOUND%Path)

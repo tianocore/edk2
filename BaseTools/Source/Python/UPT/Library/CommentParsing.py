@@ -217,7 +217,7 @@ def ParsePcdErrorCode (Value = None, ContainerFile = None, LineNum = None):
         # To delete the tailing 'L'
         #
         return hex(ErrorCode)[:-1]
-    except ValueError, XStr:
+    except ValueError as XStr:
         if XStr:
             pass
         Logger.Error('Parser', 

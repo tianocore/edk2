@@ -253,7 +253,7 @@ if __name__ == '__main__':
             FileHandle.RWFile('#', '=', 0)
         else:
             FileHandle.RWFile('#', '=', 1)
-    except Exception, e:
+    except Exception as e:
         last_type, last_value, last_tb = sys.exc_info()
         traceback.print_exception(last_type, last_value, last_tb)
 

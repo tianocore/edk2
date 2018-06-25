@@ -422,7 +422,7 @@ class RangeExpression(BaseExpression):
             Op = self._Token
             try:
                 Val = self.Eval(Op, Val, EvalFunc())
-            except WrnExpression, Warn:
+            except WrnExpression as Warn:
                 self._WarnExcept = Warn
                 Val = Warn.result
         return Val
@@ -445,7 +445,7 @@ class RangeExpression(BaseExpression):
                 Op += ' ' + self._Token
             try:
                 Val = self.Eval(Op, Val, self._RelExpr())
-            except WrnExpression, Warn:
+            except WrnExpression as Warn:
                 self._WarnExcept = Warn
                 Val = Warn.result
         return Val
@@ -457,7 +457,7 @@ class RangeExpression(BaseExpression):
             Val = self._NeExpr()
             try:
                 return self.Eval(Token, Val)
-            except WrnExpression, Warn:
+            except WrnExpression as Warn:
                 self._WarnExcept = Warn
                 return Warn.result
         return self._IdenExpr()

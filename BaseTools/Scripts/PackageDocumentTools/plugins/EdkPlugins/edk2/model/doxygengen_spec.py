@@ -1004,7 +1004,7 @@ class PackageDocumentAction(DoxygenAction):
 
         try:
             file = open(path, 'rb')
-        except (IOError, OSError), msg:
+        except (IOError, OSError) as msg:
             return None
 
         t = file.read()

@@ -668,7 +668,7 @@ def Main():
             EdkLogger.SetLevel(CommandOptions.LogLevel + 1)
         else:
             EdkLogger.SetLevel(CommandOptions.LogLevel)
-    except FatalError, X:
+    except FatalError as X:
         return 1
     
     try:
@@ -688,7 +688,7 @@ def Main():
             if CommandOptions.OutputFile is None:
                 CommandOptions.OutputFile = os.path.splitext(InputFile)[0] + '.iii'
             TrimPreprocessedFile(InputFile, CommandOptions.OutputFile, CommandOptions.ConvertHex, CommandOptions.TrimLong)
-    except FatalError, X:
+    except FatalError as X:
         import platform
         import traceback
         if CommandOptions is not None and CommandOptions.LogLevel <= EdkLogger.DEBUG_9:

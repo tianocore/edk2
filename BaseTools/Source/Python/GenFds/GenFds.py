@@ -335,10 +335,10 @@ def main():
         """Display FV space info."""
         GenFds.DisplayFvSpaceInfo(FdfParserObj)
 
-    except FdfParser.Warning, X:
+    except FdfParser.Warning as X:
         EdkLogger.error(X.ToolName, FORMAT_INVALID, File=X.FileName, Line=X.LineNumber, ExtraData=X.Message, RaiseError=False)
         ReturnCode = FORMAT_INVALID
-    except FatalError, X:
+    except FatalError as X:
         if Options.debug is not None:
             import traceback
             EdkLogger.quiet(traceback.format_exc())

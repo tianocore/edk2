@@ -449,7 +449,7 @@ def Main():
                     os.utime(Option.OutputFile, None)
         else:
             Dpx.Generate()
-    except BaseException, X:
+    except BaseException as X:
         EdkLogger.quiet("")
         if Option is not None and Option.debug is not None:
             EdkLogger.quiet(traceback.format_exc())

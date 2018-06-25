@@ -337,7 +337,7 @@ class SourceFiles:
                     print '[KeyboardInterrupt]'
                     return False
 
-                except Exception, e:
+                except Exception as e:
                     print e
 
             if not completed: return False

@@ -649,7 +649,7 @@ class ModuleReport(object):
                 cmd = ["GenFw", "--rebase", str(0), "-o", Tempfile, DefaultEFIfile]
                 try:
                     PopenObject = subprocess.Popen(' '.join(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-                except Exception, X:
+                except Exception as X:
                     EdkLogger.error("GenFw", COMMAND_FAILURE, ExtraData="%s: %s" % (str(X), cmd[0]))
                 EndOfProcedure = threading.Event()
                 EndOfProcedure.clear()
@@ -962,7 +962,7 @@ class PcdReport(object):
                 if DscDefaultValue != DscDefaultValBak:
                     try:
                         DscDefaultValue = ValueExpressionEx(DscDefaultValue, Pcd.DatumType, self._GuidDict)(True)
-                    except BadExpression, DscDefaultValue:
+                    except BadExpression as DscDefaultValue:
                         EdkLogger.error('BuildReport', FORMAT_INVALID, "PCD Value: %s, Type: %s" %(DscDefaultValue, Pcd.DatumType))
 
                 InfDefaultValue = None

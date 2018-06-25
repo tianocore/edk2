@@ -155,7 +155,7 @@ class DistributionPackageClass(object):
                                     ModuleObj.GetName(), \
                                     ModuleObj.GetCombinePath())] = ModuleObj
                         PackageObj.SetModuleDict(ModuleDict)
-                    except FatalError, ErrCode:
+                    except FatalError as ErrCode:
                         if ErrCode.message == EDK1_INF_ERROR:
                             Logger.Warn("UPT",
                                         ST.WRN_EDK1_INF_FOUND%Filename)
@@ -181,7 +181,7 @@ class DistributionPackageClass(object):
                                  ModuleObj.GetName(), 
                                  ModuleObj.GetCombinePath())
                     self.ModuleSurfaceArea[ModuleKey] = ModuleObj
-                except FatalError, ErrCode:
+                except FatalError as ErrCode:
                     if ErrCode.message == EDK1_INF_ERROR:
                         Logger.Error("UPT",
                                      EDK1_INF_ERROR,
