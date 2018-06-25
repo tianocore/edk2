@@ -211,7 +211,7 @@ class VpdInfoFile:
     #
     #  @param vpd    A given VPD PCD 
     def GetOffset(self, vpd):
-        if not self._VpdArray.has_key(vpd):
+        if vpd not in self._VpdArray:
             return None
         
         if len(self._VpdArray[vpd]) == 0:

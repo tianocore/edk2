@@ -338,7 +338,7 @@ class InfGuidObject():
                                 #
                                 pass
                                                 
-            if self.Guids.has_key((InfGuidItemObj)):           
+            if (InfGuidItemObj) in self.Guids:
                 GuidList = self.Guids[InfGuidItemObj]                 
                 GuidList.append(InfGuidItemObj)
                 self.Guids[InfGuidItemObj] = GuidList

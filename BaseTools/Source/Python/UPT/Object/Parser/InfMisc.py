@@ -114,7 +114,7 @@ class InfSpecialCommentObject(InfSectionCommonDef):
            Type == DT.TYPE_EVENT_SECTION or \
            Type == DT.TYPE_BOOTMODE_SECTION:
             for Item in SepcialSectionList:
-                if self.SpecialComments.has_key(Type):           
+                if Type in self.SpecialComments:
                     ObjList = self.SpecialComments[Type]
                     ObjList.append(Item)
                     self.SpecialComments[Type] = ObjList

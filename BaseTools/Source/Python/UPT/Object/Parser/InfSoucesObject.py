@@ -224,7 +224,7 @@ class InfSourcesObject(InfSectionCommonDef):
                 
             ItemObj.SetSupArchList(__SupArchList) 
                                                                                                       
-            if self.Sources.has_key((ItemObj)):           
+            if (ItemObj) in self.Sources:
                 SourceContent = self.Sources[ItemObj]
                 SourceContent.append(ItemObj)
                 self.Sources[ItemObj] = SourceContent
@@ -237,4 +237,3 @@ class InfSourcesObject(InfSectionCommonDef):
      
     def GetSources(self):
         return self.Sources
-    

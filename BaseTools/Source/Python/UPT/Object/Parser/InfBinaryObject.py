@@ -272,7 +272,7 @@ class InfBinariesObject(InfSectionCommonDef):
                                 pass
 
             if InfBianryVerItemObj is not None:
-                if self.Binaries.has_key((InfBianryVerItemObj)):
+                if (InfBianryVerItemObj) in self.Binaries:
                     BinariesList = self.Binaries[InfBianryVerItemObj]
                     BinariesList.append((InfBianryVerItemObj, VerComment))
                     self.Binaries[InfBianryVerItemObj] = BinariesList
@@ -522,7 +522,7 @@ class InfBinariesObject(InfSectionCommonDef):
 #                                pass
 
             if InfBianryCommonItemObj is not None:
-                if self.Binaries.has_key((InfBianryCommonItemObj)):
+                if (InfBianryCommonItemObj) in self.Binaries:
                     BinariesList = self.Binaries[InfBianryCommonItemObj]
                     BinariesList.append((InfBianryCommonItemObj, ItemComment))
                     self.Binaries[InfBianryCommonItemObj] = BinariesList
@@ -673,7 +673,7 @@ class InfBinariesObject(InfSectionCommonDef):
 #                                        pass
 
                     if InfBianryUiItemObj is not None:
-                        if self.Binaries.has_key((InfBianryUiItemObj)):
+                        if (InfBianryUiItemObj) in self.Binaries:
                             BinariesList = self.Binaries[InfBianryUiItemObj]
                             BinariesList.append((InfBianryUiItemObj, UiComment))
                             self.Binaries[InfBianryUiItemObj] = BinariesList

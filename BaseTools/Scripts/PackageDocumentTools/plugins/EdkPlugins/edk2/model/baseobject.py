@@ -26,7 +26,7 @@ class SurfaceObject(object):
 
         """
         obj = object.__new__(cls, *args, **kwargs)
-        if not cls._objs.has_key("None"):
+        if "None" not in cls._objs:
             cls._objs["None"] = []
         cls._objs["None"].append(obj)
 
@@ -47,7 +47,7 @@ class SurfaceObject(object):
         self.GetFileObj().Destroy(self)
         del self._fileObj
         # dereference self from _objs arrary
-        assert self._objs.has_key(key), "when destory, object is not in obj list"
+        assert key in self._objs, "when destory, object is not in obj list"
         assert self in self._objs[key], "when destory, object is not in obj list"
         self._objs[key].remove(self)
         if len(self._objs[key]) == 0:
@@ -95,7 +95,7 @@ class SurfaceObject(object):
         if self not in cls._objs["None"]:
             ErrorMsg("Sufrace object does not be create into None list")
         cls._objs["None"].remove(self)
-        if not cls._objs.has_key(relativePath):
+        if relativePath not in cls._objs:
             cls._objs[relativePath] = []
         cls._objs[relativePath].append(self)
 

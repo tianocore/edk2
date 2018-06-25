@@ -238,7 +238,7 @@ class InfLibraryClassObject():
                 LibItemObj.SetVersion(LibItem[1])
                 LibItemObj.SetSupArchList(__SupArchList)
 
-            if self.LibraryClasses.has_key((LibItemObj)):
+            if (LibItemObj) in self.LibraryClasses:
                 LibraryList = self.LibraryClasses[LibItemObj]
                 LibraryList.append(LibItemObj)
                 self.LibraryClasses[LibItemObj] = LibraryList

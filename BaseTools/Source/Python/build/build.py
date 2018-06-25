@@ -77,7 +77,7 @@ TmpTableDict = {}
 #   Otherwise, False is returned
 #
 def IsToolInPath(tool):
-    if os.environ.has_key('PATHEXT'):
+    if 'PATHEXT' in os.environ:
         extns = os.environ['PATHEXT'].split(os.path.pathsep)
     else:
         extns = ('',)

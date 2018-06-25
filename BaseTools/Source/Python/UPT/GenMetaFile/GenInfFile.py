@@ -438,14 +438,14 @@ def GenLibraryClasses(ModuleObject):
                 Statement = '# Guid: ' + LibraryItem.Guid + ' Version: ' + LibraryItem.Version
 
                 if len(BinaryFile.SupArchList) == 0:
-                    if LibraryClassDict.has_key('COMMON') and Statement not in LibraryClassDict['COMMON']:
+                    if 'COMMON' in LibraryClassDict and Statement not in LibraryClassDict['COMMON']:
                         LibraryClassDict['COMMON'].append(Statement)
                     else:
                         LibraryClassDict['COMMON'] = ['## @LIB_INSTANCES']
                         LibraryClassDict['COMMON'].append(Statement)
                 else:
                     for Arch in BinaryFile.SupArchList:
-                        if LibraryClassDict.has_key(Arch):
+                        if Arch in LibraryClassDict:
                             if Statement not in LibraryClassDict[Arch]:
                                 LibraryClassDict[Arch].append(Statement)
                             else:
@@ -917,14 +917,14 @@ def GenAsBuiltPacthPcdSections(ModuleObject):
             if FileNameObjList:
                 ArchList = FileNameObjList[0].GetSupArchList()
             if len(ArchList) == 0:
-                if PatchPcdDict.has_key(DT.TAB_ARCH_COMMON):
+                if DT.TAB_ARCH_COMMON in PatchPcdDict:
                     if Statement not in PatchPcdDict[DT.TAB_ARCH_COMMON]:
                         PatchPcdDict[DT.TAB_ARCH_COMMON].append(Statement)
                 else:
                     PatchPcdDict[DT.TAB_ARCH_COMMON] = [Statement]
             else:
                 for Arch in ArchList:
-                    if PatchPcdDict.has_key(Arch):
+                    if Arch in PatchPcdDict:
                         if Statement not in PatchPcdDict[Arch]:
                             PatchPcdDict[Arch].append(Statement)
                     else:
@@ -967,13 +967,13 @@ def GenAsBuiltPcdExSections(ModuleObject):
                 ArchList = FileNameObjList[0].GetSupArchList()
 
             if len(ArchList) == 0:
-                if PcdExDict.has_key('COMMON'):
+                if 'COMMON' in PcdExDict:
                     PcdExDict['COMMON'].append(Statement)
                 else:
                     PcdExDict['COMMON'] = [Statement]
             else:
                 for Arch in ArchList:
-                    if PcdExDict.has_key(Arch):
+                    if Arch in PcdExDict:
                         if Statement not in PcdExDict[Arch]:
                             PcdExDict[Arch].append(Statement)
                     else:
@@ -1071,7 +1071,7 @@ def GenBuildOptions(ModuleObject):
             for BuilOptionItem in BinaryFile.AsBuiltList[0].BinaryBuildFlagList:
                 Statement = '#' + BuilOptionItem.AsBuiltOptionFlags
                 if len(BinaryFile.SupArchList) == 0:
-                    if BuildOptionDict.has_key('COMMON'):
+                    if 'COMMON' in BuildOptionDict:
                         if Statement not in BuildOptionDict['COMMON']:
                             BuildOptionDict['COMMON'].append(Statement)
                     else:
@@ -1079,7 +1079,7 @@ def GenBuildOptions(ModuleObject):
                         BuildOptionDict['COMMON'].append(Statement)
                 else:
                     for Arch in BinaryFile.SupArchList:
-                        if BuildOptionDict.has_key(Arch):
+                        if Arch in BuildOptionDict:
                             if Statement not in BuildOptionDict[Arch]:
                                 BuildOptionDict[Arch].append(Statement)
                         else:

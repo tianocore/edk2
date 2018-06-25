@@ -411,7 +411,7 @@ class InfPcdObject():
                 else:
                     PcdItemObj.SetSupportArchList(SupArchList)
 
-                if self.Pcds.has_key((PcdTypeItem, PcdItemObj)):
+                if (PcdTypeItem, PcdItemObj) in self.Pcds:
                     PcdsList = self.Pcds[PcdTypeItem, PcdItemObj]
                     PcdsList.append(PcdItemObj)
                     self.Pcds[PcdTypeItem, PcdItemObj] = PcdsList
@@ -456,7 +456,7 @@ class InfPcdObject():
                                                       PackageInfo)
 
             PcdTypeItem = KeysList[0][0]
-            if self.Pcds.has_key((PcdTypeItem, PcdItemObj)):
+            if (PcdTypeItem, PcdItemObj) in self.Pcds:
                 PcdsList = self.Pcds[PcdTypeItem, PcdItemObj]
                 PcdsList.append(PcdItemObj)
                 self.Pcds[PcdTypeItem, PcdItemObj] = PcdsList

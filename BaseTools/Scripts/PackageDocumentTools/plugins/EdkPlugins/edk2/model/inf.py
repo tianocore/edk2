@@ -61,7 +61,7 @@ class INFFile(ini.BaseINIFile):
         classname = self.GetProduceLibraryClass()
         if classname is not None:
             libobjdict = INFFile._libobjs
-            if libobjdict.has_key(classname):
+            if classname in libobjdict:
                 if self not in libobjdict[classname]:
                     libobjdict[classname].append(self)
             else:
@@ -169,7 +169,7 @@ class INFLibraryClassObject(INFSectionObject):
     def Parse(self):
         self._classname = self.GetLineByOffset(self._start).split('#')[0].strip()
         objdict = INFLibraryClassObject._objs
-        if objdict.has_key(self._classname):
+        if self._classname in objdict:
             objdict[self._classname].append(self)
         else:
             objdict[self._classname] = [self]
@@ -241,7 +241,7 @@ class INFSourceObject(INFSectionObject):
 
         self.mFilename = os.path.basename(self.GetSourceFullPath())
         objdict = INFSourceObject._objs
-        if not objdict.has_key(self.mFilename):
+        if self.mFilename not in objdict:
             objdict[self.mFilename] = [self]
         else:
             objdict[self.mFilename].append(self)
@@ -303,7 +303,7 @@ class INFPcdObject(INFSectionObject):
             self.mDefaultValue = arr[1].strip()
 
         objdict = INFPcdObject._objs
-        if objdict.has_key(self.GetName()):
+        if self.GetName() in objdict:
             if self not in objdict[self.GetName()]:
                 objdict[self.GetName()].append(self)
         else:

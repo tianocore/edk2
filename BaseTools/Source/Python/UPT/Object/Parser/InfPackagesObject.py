@@ -171,7 +171,7 @@ class InfPackageObject():
                                 #
                                 pass
                                             
-            if self.Packages.has_key((PackageItemObj)):   
+            if (PackageItemObj) in self.Packages:
                 PackageList = self.Packages[PackageItemObj]
                 PackageList.append(PackageItemObj)
                 self.Packages[PackageItemObj] = PackageList

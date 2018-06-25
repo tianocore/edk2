@@ -296,7 +296,7 @@ class InfProtocolObject():
                                 #
                                 pass      
                                       
-            if self.Protocols.has_key((InfProtocolItemObj)):           
+            if (InfProtocolItemObj) in self.Protocols:
                 ProcotolList = self.Protocols[InfProtocolItemObj]
                 ProcotolList.append(InfProtocolItemObj)
                 self.Protocols[InfProtocolItemObj] = ProcotolList

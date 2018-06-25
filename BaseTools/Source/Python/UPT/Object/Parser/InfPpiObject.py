@@ -327,7 +327,7 @@ class InfPpiObject():
                                 # 
                                 pass
             
-            if self.Ppis.has_key((InfPpiItemObj)):           
+            if (InfPpiItemObj) in self.Ppis:
                 PpiList = self.Ppis[InfPpiItemObj]
                 PpiList.append(InfPpiItemObj)
                 self.Ppis[InfPpiItemObj] = PpiList

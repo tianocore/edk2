@@ -957,7 +957,7 @@ class InfDefObject(InfSectionCommonDef):
                     SpecValue = Name[Name.find("SPEC") + len("SPEC"):].strip()
                     Name = "SPEC"
                     Value = SpecValue + " = " + Value
-                if self.Defines.has_key(ArchListString):
+                if ArchListString in self.Defines:
                     DefineList = self.Defines[ArchListString]                 
                     LineInfo[0] = InfDefMemberObj.CurrentLine.GetFileName()
                     LineInfo[1] = InfDefMemberObj.CurrentLine.GetLineNo()
