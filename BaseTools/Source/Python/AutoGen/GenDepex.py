@@ -17,7 +17,7 @@ import Common.LongFilePathOs as os
 import re
 import traceback
 from Common.LongFilePathSupport import OpenLongFilePath as open
-from StringIO import StringIO
+from io import BytesIO
 from struct import pack
 from Common.BuildToolError import *
 from Common.Misc import SaveFileOnChange
@@ -345,7 +345,7 @@ class DependencyExpression:
     #   @retval False   If file exists and is not changed.
     #
     def Generate(self, File=None):
-        Buffer = StringIO()
+        Buffer = BytesIO()
         if len(self.PostfixNotation) == 0:
             return False
 

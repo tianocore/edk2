@@ -25,7 +25,7 @@ import uuid
 import GenC
 import GenMake
 import GenDepex
-from StringIO import StringIO
+from io import BytesIO
 
 from StrGather import *
 from BuildEngine import BuildRule
@@ -3437,8 +3437,8 @@ class ModuleAutoGen(AutoGen):
     def _GetAutoGenFileList(self):
         UniStringAutoGenC = True
         IdfStringAutoGenC = True
-        UniStringBinBuffer = StringIO()
-        IdfGenBinBuffer = StringIO()
+        UniStringBinBuffer = BytesIO()
+        IdfGenBinBuffer = BytesIO()
         if self.BuildType == 'UEFI_HII':
             UniStringAutoGenC = False
             IdfStringAutoGenC = False
@@ -3713,8 +3713,8 @@ class ModuleAutoGen(AutoGen):
         except:
             EdkLogger.error("build", FILE_OPEN_FAILURE, "File open failed for %s" % UniVfrOffsetFileName, None)
 
-        # Use a instance of StringIO to cache data
-        fStringIO = StringIO('')  
+        # Use a instance of BytesIO to cache data
+        fStringIO = BytesIO('')
 
         for Item in VfrUniOffsetList:
             if (Item[0].find("Strings") != -1):

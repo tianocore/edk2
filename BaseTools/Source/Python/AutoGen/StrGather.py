@@ -18,7 +18,7 @@ import re
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import *
 from UniClassObject import *
-from StringIO import StringIO
+from io import BytesIO
 from struct import pack, unpack
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
@@ -341,7 +341,7 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer,
         if Language not in UniLanguageListFiltered:
             continue
         
-        StringBuffer = StringIO()
+        StringBuffer = BytesIO()
         StrStringValue = ''
         ArrayLength = 0
         NumberOfUseOtherLangDef = 0

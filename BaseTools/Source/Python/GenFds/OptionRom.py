@@ -17,7 +17,6 @@
 #
 import Common.LongFilePathOs as os
 import subprocess
-import StringIO
 
 import OptRomInfStatement
 from GenFdsGlobalVariable import GenFdsGlobalVariable
@@ -138,5 +137,3 @@ class OverrideAttribs:
         self.PciDeviceId = None
         self.PciRevision = None
         self.NeedCompress = None
-        
-        

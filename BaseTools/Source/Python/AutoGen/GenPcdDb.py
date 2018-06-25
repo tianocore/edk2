@@ -10,7 +10,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-from StringIO import StringIO
+from io import BytesIO
 from Common.Misc import *
 from Common.StringUtils import StringToArray
 from struct import pack
@@ -888,7 +888,7 @@ def CreatePcdDatabaseCode (Info, AutoGenC, AutoGenH):
         DbFileName = os.path.join(Info.PlatformInfo.BuildDir, TAB_FV_DIRECTORY, Phase + "PcdDataBase.raw")
     else:
         DbFileName = os.path.join(Info.OutputDir, Phase + "PcdDataBase.raw")
-    DbFile = StringIO()
+    DbFile = BytesIO()
     DbFile.write(PcdDbBuffer)
     Changed = SaveFileOnChange(DbFileName, DbFile.getvalue(), True)
 def CreatePcdDataBase(PcdDBData):

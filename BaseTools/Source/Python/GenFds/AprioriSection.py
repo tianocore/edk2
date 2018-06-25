@@ -17,7 +17,7 @@
 #
 from struct import *
 import Common.LongFilePathOs as os
-import StringIO
+from io import BytesIO
 import FfsFileStatement
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import AprioriSectionClassObject
@@ -51,7 +51,7 @@ class AprioriSection (AprioriSectionClassObject):
     def GenFfs (self, FvName, Dict = {}, IsMakefile = False):
         DXE_GUID = "FC510EE7-FFDC-11D4-BD41-0080C73C8881"
         PEI_GUID = "1B45CC0A-156A-428A-AF62-49864DA0E6E6"
-        Buffer = StringIO.StringIO('')
+        Buffer = BytesIO('')
         AprioriFileGuid = DXE_GUID
         if self.AprioriType == "PEI":
             AprioriFileGuid = PEI_GUID

@@ -17,7 +17,7 @@
 import os
 from Common.RangeExpression import RangeExpression
 from Common.Misc import *
-from StringIO import StringIO
+from io import BytesIO
 from struct import pack
 from Common.DataType import *
 
@@ -162,7 +162,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
                             Buffer += b
                             realLength += 1
         
-        DbFile = StringIO()
+        DbFile = BytesIO()
         if Phase == 'DXE' and os.path.exists(BinFilePath):
             BinFile = open(BinFilePath, "rb")
             BinBuffer = BinFile.read()

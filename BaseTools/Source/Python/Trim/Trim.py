@@ -17,7 +17,7 @@
 import Common.LongFilePathOs as os
 import sys
 import re
-import StringIO
+from io import BytesIO
 
 from optparse import OptionParser
 from optparse import make_option
@@ -455,8 +455,8 @@ def GenerateVfrBinSec(ModuleName, DebugDir, OutputFile):
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, "File open failed for %s" %OutputFile, None)
 
-    # Use a instance of StringIO to cache data
-    fStringIO = StringIO.StringIO('')
+    # Use a instance of BytesIO to cache data
+    fStringIO = BytesIO('')
 
     for Item in VfrUniOffsetList:
         if (Item[0].find("Strings") != -1):

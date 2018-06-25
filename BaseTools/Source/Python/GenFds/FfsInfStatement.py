@@ -18,7 +18,7 @@
 #
 import Rule
 import Common.LongFilePathOs as os
-import StringIO
+from io import BytesIO
 from struct import *
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 import Ffs
@@ -1088,7 +1088,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
     def __GenUniVfrOffsetFile(VfrUniOffsetList, UniVfrOffsetFileName):
 
         # Use a instance of StringIO to cache data
-        fStringIO = StringIO.StringIO('')  
+        fStringIO = BytesIO('')
         
         for Item in VfrUniOffsetList:
             if (Item[0].find("Strings") != -1):

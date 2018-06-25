@@ -14,7 +14,7 @@
 #
 
 import Common.LongFilePathOs as os
-import StringIO
+from io import BytesIO
 import StringTable as st
 import array
 import re
@@ -673,8 +673,8 @@ class GenVPD :
             # Open failed
             EdkLogger.error("BPDG", BuildToolError.FILE_OPEN_FAILURE, "File open failed for %s" % self.MapFileName, None)
 
-        # Use a instance of StringIO to cache data
-        fStringIO = StringIO.StringIO('')
+        # Use a instance of BytesIO to cache data
+        fStringIO = BytesIO('')
 
         # Write the header of map file.
         try :

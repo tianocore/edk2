@@ -18,7 +18,7 @@
 import Region
 import Fv
 import Common.LongFilePathOs as os
-import StringIO
+from io import BytesIO
 import sys
 from struct import *
 from GenFdsGlobalVariable import GenFdsGlobalVariable
@@ -75,7 +75,7 @@ class FD(FDClassObject):
                 HasCapsuleRegion = True
                 break
         if HasCapsuleRegion:
-            TempFdBuffer = StringIO.StringIO('')
+            TempFdBuffer = BytesIO('')
             PreviousRegionStart = -1
             PreviousRegionSize = 1
 
@@ -104,7 +104,7 @@ class FD(FDClassObject):
                 GenFdsGlobalVariable.VerboseLogger('Call each region\'s AddToBuffer function')
                 RegionObj.AddToBuffer (TempFdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFds.ImageBinDict, self.vtfRawDict, self.DefineVarDict)
         
-        FdBuffer = StringIO.StringIO('')
+        FdBuffer = BytesIO('')
         PreviousRegionStart = -1
         PreviousRegionSize = 1
         for RegionObj in self.RegionList :

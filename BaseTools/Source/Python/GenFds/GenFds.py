@@ -27,7 +27,7 @@ from Workspace.WorkspaceDatabase import WorkspaceDatabase
 from Workspace.BuildClassObject import PcdClassObject
 import RuleComplexFile
 from EfiSection import EfiSection
-import StringIO
+from io import BytesIO
 import Common.TargetTxtClassObject as TargetTxtClassObject
 import Common.ToolDefClassObject as ToolDefClassObject
 from Common.DataType import *
@@ -542,13 +542,13 @@ class GenFds :
         if GenFds.OnlyGenerateThisFv is not None and GenFds.OnlyGenerateThisFv.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict:
             FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict[GenFds.OnlyGenerateThisFv.upper()]
             if FvObj is not None:
-                Buffer = StringIO.StringIO()
+                Buffer = BytesIO()
                 FvObj.AddToBuffer(Buffer)
                 Buffer.close()
                 return
         elif GenFds.OnlyGenerateThisFv is None:
             for FvObj in GenFdsGlobalVariable.FdfParser.Profile.FvDict.values():
-                Buffer = StringIO.StringIO('')
+                Buffer = BytesIO('')
                 FvObj.AddToBuffer(Buffer)
                 Buffer.close()
         
@@ -694,7 +694,7 @@ class GenFds :
 
     def GenerateGuidXRefFile(BuildDb, ArchList, FdfParserObj):
         GuidXRefFileName = os.path.join(GenFdsGlobalVariable.FvDir, "Guid.xref")
-        GuidXRefFile = StringIO.StringIO('')
+        GuidXRefFile = BytesIO('')
         GuidDict = {}
         ModuleList = []
         FileGuidList = []

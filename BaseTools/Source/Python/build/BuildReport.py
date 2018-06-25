@@ -28,7 +28,7 @@ import hashlib
 import subprocess
 import threading
 from datetime import datetime
-from StringIO import StringIO
+from io import BytesIO
 from Common import EdkLogger
 from Common.Misc import SaveFileOnChange
 from Common.Misc import GuidStructureByteArrayToGuidString
@@ -2169,7 +2169,7 @@ class BuildReport(object):
     def GenerateReport(self, BuildDuration, AutoGenTime, MakeTime, GenFdsTime):
         if self.ReportFile:
             try:
-                File = StringIO('')
+                File = BytesIO('')
                 for (Wa, MaList) in self.ReportList:
                     PlatformReport(Wa, MaList, self.ReportType).GenerateReport(File, BuildDuration, AutoGenTime, MakeTime, GenFdsTime, self.ReportType)
                 Content = FileLinesSplit(File.getvalue(), gLineMaxLength)
