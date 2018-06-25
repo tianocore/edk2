@@ -15,6 +15,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 import sys
 import Common.LongFilePathOs as os
 import re
@@ -384,4 +385,4 @@ if __name__ == '__main__':
     EdkLogger.SetLevel(EdkLogger.QUIET)
     CollectSourceCodeDataIntoDB(sys.argv[1])
 
-    print 'Done!'
+    print('Done!')

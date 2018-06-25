@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
+from __future__ import print_function
 import sys
 import Common.LongFilePathOs as os
 import re
@@ -2285,7 +2286,7 @@ def CheckDoxygenTripleForwardSlash(FullFileName):
         for Result in ResultSet:
             CommentSet.append(Result)
     except:
-        print 'Unrecognized chars in comment of file %s', FullFileName
+        print('Unrecognized chars in comment of file %s', FullFileName)
 
 
     for Result in CommentSet:
@@ -2438,7 +2439,7 @@ def CheckFuncHeaderDoxygenComments(FullFileName):
         for Result in ResultSet:
             CommentSet.append(Result)
     except:
-        print 'Unrecognized chars in comment of file %s', FullFileName
+        print('Unrecognized chars in comment of file %s', FullFileName)
 
     # Func Decl check
     SqlStatement = """ select Modifier, Name, StartLine, ID, Value
@@ -2469,7 +2470,7 @@ def CheckFuncHeaderDoxygenComments(FullFileName):
         for Result in ResultSet:
             CommentSet.append(Result)
     except:
-        print 'Unrecognized chars in comment of file %s', FullFileName
+        print('Unrecognized chars in comment of file %s', FullFileName)
 
     SqlStatement = """ select Modifier, Header, StartLine, ID, Name
                        from Function
@@ -2634,9 +2635,9 @@ if __name__ == '__main__':
     try:
         test_file = sys.argv[1]
     except IndexError as v:
-        print "Usage: %s filename" % sys.argv[0]
+        print("Usage: %s filename" % sys.argv[0])
         sys.exit(1)
     MsgList = CheckFuncHeaderDoxygenComments(test_file)
     for Msg in MsgList:
-        print Msg
-    print 'Done!'
+        print(Msg)
+    print('Done!')

@@ -17,6 +17,7 @@
 '''
 Rsa2048Sha256Sign
 '''
+from __future__ import print_function
 
 import os
 import sys
@@ -96,14 +97,14 @@ if __name__ == '__main__':
   try:
     Process = subprocess.Popen('%s version' % (OpenSslCommand), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
   except:  
-    print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
+    print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(1)
     
   Version = Process.communicate()
   if Process.returncode <> 0:
-    print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
+    print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
-  print Version[0]
+  print(Version[0])
   
   #
   # Read input file into a buffer and save input filename
@@ -117,7 +118,7 @@ if __name__ == '__main__':
   #
   OutputDir = os.path.dirname(args.OutputFile)
   if not os.path.exists(OutputDir):
-    print 'ERROR: The output path does not exist: %s' % OutputDir
+    print('ERROR: The output path does not exist: %s' % OutputDir)
     sys.exit(1)
   args.OutputFileName = args.OutputFile
 
@@ -144,7 +145,7 @@ if __name__ == '__main__':
       args.PrivateKeyFile = open(args.PrivateKeyFileName, 'rb')
       args.PrivateKeyFile.close()
     except:
-      print 'ERROR: test signing private key file %s missing' % (args.PrivateKeyFileName)
+      print('ERROR: test signing private key file %s missing' % (args.PrivateKeyFileName))
       sys.exit(1)
 
   #
@@ -202,14 +203,14 @@ if __name__ == '__main__':
     # Verify that the Hash Type matches the expected SHA256 type
     #
     if uuid.UUID(bytes_le = Header.HashType) <> EFI_HASH_ALGORITHM_SHA256_GUID:
-      print 'ERROR: unsupport hash GUID'
+      print('ERROR: unsupport hash GUID')
       sys.exit(1)
 
     #
     # Verify the public key
     #
     if Header.PublicKey <> PublicKey:
-      print 'ERROR: Public key in input file does not match public key from private key file'
+      print('ERROR: Public key in input file does not match public key from private key file')
       sys.exit(1)
 
     FullInputFileBuffer = args.InputFileBuffer
@@ -228,7 +229,7 @@ if __name__ == '__main__':
     Process = subprocess.Popen('%s dgst -sha256 -prverify "%s" -signature %s' % (OpenSslCommand, args.PrivateKeyFileName, args.OutputFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Process.communicate(input=FullInputFileBuffer)
     if Process.returncode <> 0:
-      print 'ERROR: Verification failed'
+      print('ERROR: Verification failed')
       os.remove (args.OutputFileName)
       sys.exit(Process.returncode)
 

@@ -22,6 +22,7 @@
 '''
 Rsa2048Sha256GenerateKeys
 '''
+from __future__ import print_function
 
 import os
 import sys
@@ -75,14 +76,14 @@ if __name__ == '__main__':
   try:
     Process = subprocess.Popen('%s version' % (OpenSslCommand), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
   except:  
-    print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
+    print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(1)
     
   Version = Process.communicate()
   if Process.returncode <> 0:
-    print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
+    print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
-  print Version[0]
+  print(Version[0])
   
   args.PemFileName = []
   
@@ -103,7 +104,7 @@ if __name__ == '__main__':
       Process = subprocess.Popen('%s genrsa -out %s 2048' % (OpenSslCommand, Item.name), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
       Process.communicate()
       if Process.returncode <> 0:
-        print 'ERROR: RSA 2048 key generation failed'
+        print('ERROR: RSA 2048 key generation failed')
         sys.exit(Process.returncode)
       
   #
@@ -125,7 +126,7 @@ if __name__ == '__main__':
     Process = subprocess.Popen('%s rsa -in %s -modulus -noout' % (OpenSslCommand, Item), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     PublicKeyHexString = Process.communicate()[0].split('=')[1].strip()
     if Process.returncode <> 0:
-      print 'ERROR: Unable to extract public key from private key'
+      print('ERROR: Unable to extract public key from private key')
       sys.exit(Process.returncode)
     PublicKey = ''
     for Index in range (0, len(PublicKeyHexString), 2):
@@ -138,7 +139,7 @@ if __name__ == '__main__':
     Process.stdin.write (PublicKey)
     PublicKeyHash = PublicKeyHash + Process.communicate()[0]
     if Process.returncode <> 0:
-      print 'ERROR: Unable to extract SHA 256 hash of public key'
+      print('ERROR: Unable to extract SHA 256 hash of public key')
       sys.exit(Process.returncode)
 
   #
@@ -171,4 +172,4 @@ if __name__ == '__main__':
   # If verbose is enabled display the public key in C structure format
   #
   if args.Verbose:
-    print 'PublicKeySha256 = ' + PublicKeyHashC    
+    print('PublicKeySha256 = ' + PublicKeyHashC)

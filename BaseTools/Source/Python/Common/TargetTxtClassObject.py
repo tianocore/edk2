@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os
 import EdkLogger
 import DataType
@@ -158,6 +159,6 @@ def TargetTxtDict(ConfDir):
 if __name__ == '__main__':
     pass
     Target = TargetTxtDict(os.getenv("WORKSPACE"))
-    print Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER]
-    print Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TARGET]
-    print Target.TargetTxtDictionary
+    print(Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER])
+    print(Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TARGET])
+    print(Target.TargetTxtDictionary)

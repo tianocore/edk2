@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
+from __future__ import print_function
 import os
 
 from message import *
@@ -446,4 +447,4 @@ if __name__== '__main__':
     p.AddPage(Page('PCD', 'pcds'))
 
     df.Generate()
-    print df
+    print(df)

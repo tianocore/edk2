@@ -15,6 +15,7 @@
 '''
 DecPomAlignment
 '''
+from __future__ import print_function
 
 ##
 # Import Modules
@@ -902,47 +903,47 @@ class DecPomAlignment(PackageObject):
     # Print all members and their values of Package class
     #
     def ShowPackage(self):
-        print '\nName =', self.GetName()
-        print '\nBaseName =', self.GetBaseName()
-        print '\nVersion =', self.GetVersion() 
-        print '\nGuid =', self.GetGuid()
+        print('\nName =', self.GetName())
+        print('\nBaseName =', self.GetBaseName())
+        print('\nVersion =', self.GetVersion())
+        print('\nGuid =', self.GetGuid())
         
-        print '\nStandardIncludes = %d ' \
-            % len(self.GetStandardIncludeFileList()),
+        print('\nStandardIncludes = %d ' \
+            % len(self.GetStandardIncludeFileList()), end=' ')
         for Item in self.GetStandardIncludeFileList():
-            print Item.GetFilePath(), '  ', Item.GetSupArchList()
-        print '\nPackageIncludes = %d \n' \
-            % len(self.GetPackageIncludeFileList()),
+            print(Item.GetFilePath(), '  ', Item.GetSupArchList())
+        print('\nPackageIncludes = %d \n' \
+            % len(self.GetPackageIncludeFileList()), end=' ')
         for Item in self.GetPackageIncludeFileList():
-            print Item.GetFilePath(), '  ', Item.GetSupArchList()
+            print(Item.GetFilePath(), '  ', Item.GetSupArchList())
              
-        print '\nGuids =', self.GetGuidList()
+        print('\nGuids =', self.GetGuidList())
         for Item in self.GetGuidList():
-            print Item.GetCName(), Item.GetGuid(), Item.GetSupArchList()
-        print '\nProtocols =', self.GetProtocolList()
+            print(Item.GetCName(), Item.GetGuid(), Item.GetSupArchList())
+        print('\nProtocols =', self.GetProtocolList())
         for Item in self.GetProtocolList():
-            print Item.GetCName(), Item.GetGuid(), Item.GetSupArchList()
-        print '\nPpis =', self.GetPpiList()
+            print(Item.GetCName(), Item.GetGuid(), Item.GetSupArchList())
+        print('\nPpis =', self.GetPpiList())
         for Item in self.GetPpiList():
-            print Item.GetCName(), Item.GetGuid(), Item.GetSupArchList()
-        print '\nLibraryClasses =', self.GetLibraryClassList()
+            print(Item.GetCName(), Item.GetGuid(), Item.GetSupArchList())
+        print('\nLibraryClasses =', self.GetLibraryClassList())
         for Item in self.GetLibraryClassList():
-            print Item.GetLibraryClass(), Item.GetRecommendedInstance(), \
-            Item.GetSupArchList()
-        print '\nPcds =', self.GetPcdList()
+            print(Item.GetLibraryClass(), Item.GetRecommendedInstance(), \
+            Item.GetSupArchList())
+        print('\nPcds =', self.GetPcdList())
         for Item in self.GetPcdList():
-            print 'CName=', Item.GetCName(), 'TokenSpaceGuidCName=', \
+            print('CName=', Item.GetCName(), 'TokenSpaceGuidCName=', \
                 Item.GetTokenSpaceGuidCName(), \
                 'DefaultValue=', Item.GetDefaultValue(), \
                 'ValidUsage=', Item.GetValidUsage(), \
                 'SupArchList', Item.GetSupArchList(), \
-                'Token=', Item.GetToken(), 'DatumType=', Item.GetDatumType()
+                'Token=', Item.GetToken(), 'DatumType=', Item.GetDatumType())
  
         for Item in self.GetMiscFileList():
-            print Item.GetName()
+            print(Item.GetName())
             for FileObjectItem in Item.GetFileList():
-                print FileObjectItem.GetURI()
-        print '****************\n'
+                print(FileObjectItem.GetURI())
+        print('****************\n')
 
 ## GenPcdDeclaration
 #

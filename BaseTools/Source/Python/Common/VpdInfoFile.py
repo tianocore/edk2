@@ -15,6 +15,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os
 import re
 import Common.EdkLogger as EdkLogger
@@ -248,7 +249,7 @@ def CallExtenalBPDGTool(ToolPath, VpdFileName):
     except Exception as X:
         EdkLogger.error("BPDG", BuildToolError.COMMAND_FAILURE, ExtraData=str(X))
     (out, error) = PopenObject.communicate()
-    print out
+    print(out)
     while PopenObject.returncode is None :
         PopenObject.wait()
     

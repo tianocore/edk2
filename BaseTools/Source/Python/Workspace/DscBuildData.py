@@ -17,6 +17,7 @@
 #  This class is used to retrieve information stored in database and convert them
 # into PlatformBuildClassObject form for easier use for AutoGen.
 #
+from __future__ import print_function
 from Common.StringUtils import *
 from Common.DataType import *
 from Common.Misc import *
@@ -1373,7 +1374,7 @@ class DscBuildData(PlatformBuildClassObject):
             for (skuname,StoreName,PcdGuid,PcdName,PcdValue) in Str_Pcd_Values:
                 str_pcd_obj = S_pcd_set.get((PcdName, PcdGuid))
                 if str_pcd_obj is None:
-                    print PcdName, PcdGuid
+                    print(PcdName, PcdGuid)
                     raise
                 if str_pcd_obj.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
@@ -1808,7 +1809,7 @@ class DscBuildData(PlatformBuildClassObject):
                         EdkLogger.error('Build', FORMAT_INVALID, "Invalid value format for %s. From %s Line %d " %
                                         (".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName, FieldName)), FieldList[FieldName][1], FieldList[FieldName][2]))
                     except:
-                        print "error"
+                        print("error")
                 try:
                     Value, ValueSize = ParseFieldValue (FieldList[FieldName][0])
                 except Exception:

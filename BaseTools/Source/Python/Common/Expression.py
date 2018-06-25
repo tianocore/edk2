@@ -12,6 +12,7 @@
 
 ## Import Modules
 #
+from __future__ import print_function
 from Common.GlobalData import *
 from CommonDataClass.Exceptions import BadExpression
 from CommonDataClass.Exceptions import WrnExpression
@@ -1028,10 +1029,10 @@ if __name__ == '__main__':
         if input in 'qQ':
             break
         try:
-            print ValueExpression(input)(True)
-            print ValueExpression(input)(False)
+            print(ValueExpression(input)(True))
+            print(ValueExpression(input)(False))
         except WrnExpression as Ex:
-            print Ex.result
-            print str(Ex)
+            print(Ex.result)
+            print(str(Ex))
         except Exception as Ex:
-            print str(Ex)
+            print(str(Ex))

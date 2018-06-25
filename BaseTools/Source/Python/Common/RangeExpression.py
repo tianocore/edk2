@@ -12,6 +12,7 @@
 
 # # Import Modules
 #
+from __future__ import print_function
 from Common.GlobalData import *
 from CommonDataClass.Exceptions import BadExpression
 from CommonDataClass.Exceptions import WrnExpression
@@ -85,11 +86,11 @@ class RangeContainer(object):
         self.__clean__()
         
     def dump(self):
-        print "----------------------"
+        print("----------------------")
         rangelist = ""
         for object in self.rangelist:
             rangelist = rangelist + "[%d , %d]" % (object.start, object.end)
-        print rangelist
+        print(rangelist)
         
         
 class XOROperatorObject(object):   

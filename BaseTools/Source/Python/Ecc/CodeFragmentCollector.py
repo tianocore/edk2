@@ -16,6 +16,7 @@
 # Import Modules
 #
 
+from __future__ import print_function
 import re
 import Common.LongFilePathOs as os
 import sys
@@ -533,58 +534,58 @@ class CodeFragmentCollector:
         
     def PrintFragments(self):
         
-        print '################# ' + self.FileName + '#####################'
+        print('################# ' + self.FileName + '#####################')
         
-        print '/****************************************/'
-        print '/*************** COMMENTS ***************/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/*************** COMMENTS ***************/')
+        print('/****************************************/')
         for comment in FileProfile.CommentList:
-            print str(comment.StartPos) + comment.Content
+            print(str(comment.StartPos) + comment.Content)
         
-        print '/****************************************/'
-        print '/********* PREPROCESS DIRECTIVES ********/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/********* PREPROCESS DIRECTIVES ********/')
+        print('/****************************************/')
         for pp in FileProfile.PPDirectiveList:
-            print str(pp.StartPos) + pp.Content
+            print(str(pp.StartPos) + pp.Content)
         
-        print '/****************************************/'
-        print '/********* VARIABLE DECLARATIONS ********/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/********* VARIABLE DECLARATIONS ********/')
+        print('/****************************************/')
         for var in FileProfile.VariableDeclarationList:
-            print str(var.StartPos) + var.Modifier + ' '+ var.Declarator
+            print(str(var.StartPos) + var.Modifier + ' '+ var.Declarator)
             
-        print '/****************************************/'
-        print '/********* FUNCTION DEFINITIONS *********/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/********* FUNCTION DEFINITIONS *********/')
+        print('/****************************************/')
         for func in FileProfile.FunctionDefinitionList:
-            print str(func.StartPos) + func.Modifier + ' '+ func.Declarator + ' ' + str(func.NamePos)
+            print(str(func.StartPos) + func.Modifier + ' '+ func.Declarator + ' ' + str(func.NamePos))
             
-        print '/****************************************/'
-        print '/************ ENUMERATIONS **************/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/************ ENUMERATIONS **************/')
+        print('/****************************************/')
         for enum in FileProfile.EnumerationDefinitionList:
-            print str(enum.StartPos) + enum.Content
+            print(str(enum.StartPos) + enum.Content)
         
-        print '/****************************************/'
-        print '/*********** STRUCTS/UNIONS *************/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/*********** STRUCTS/UNIONS *************/')
+        print('/****************************************/')
         for su in FileProfile.StructUnionDefinitionList:
-            print str(su.StartPos) + su.Content
+            print(str(su.StartPos) + su.Content)
             
-        print '/****************************************/'
-        print '/********* PREDICATE EXPRESSIONS ********/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/********* PREDICATE EXPRESSIONS ********/')
+        print('/****************************************/')
         for predexp in FileProfile.PredicateExpressionList:
-            print str(predexp.StartPos) + predexp.Content
+            print(str(predexp.StartPos) + predexp.Content)
         
-        print '/****************************************/'    
-        print '/************** TYPEDEFS ****************/'
-        print '/****************************************/'
+        print('/****************************************/')
+        print('/************** TYPEDEFS ****************/')
+        print('/****************************************/')
         for typedef in FileProfile.TypedefDefinitionList:
-            print str(typedef.StartPos) + typedef.ToType
+            print(str(typedef.StartPos) + typedef.ToType)
         
 if __name__ == "__main__":
     
     collector = CodeFragmentCollector(sys.argv[1])
     collector.PreprocessFile()
-    print "For Test."
+    print("For Test.")

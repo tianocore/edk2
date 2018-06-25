@@ -20,6 +20,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os
 import sys
 import encodings.ascii
@@ -132,7 +133,7 @@ def MyOptionParser():
 #
 def StartBpdg(InputFileName, MapFileName, VpdFileName, Force):
     if os.path.exists(VpdFileName) and not Force:
-        print "\nFile %s already exist, Overwrite(Yes/No)?[Y]: " % VpdFileName
+        print("\nFile %s already exist, Overwrite(Yes/No)?[Y]: " % VpdFileName)
         choice = sys.stdin.readline()
         if choice.strip().lower() not in ['y', 'yes', '']:
             return

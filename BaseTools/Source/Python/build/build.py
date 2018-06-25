@@ -16,6 +16,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os
 import re
 import StringIO
@@ -2195,7 +2196,7 @@ class Build():
                     toolsFile = os.path.join(FvDir, 'GuidedSectionTools.txt')
                     toolsFile = open(toolsFile, 'wt')
                     for guidedSectionTool in guidAttribs:
-                        print >> toolsFile, ' '.join(guidedSectionTool)
+                        print(' '.join(guidedSectionTool), file=toolsFile)
                     toolsFile.close()
 
     ## Returns the full path of the tool.

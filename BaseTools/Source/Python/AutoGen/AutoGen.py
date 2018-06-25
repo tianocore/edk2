@@ -15,6 +15,7 @@
 
 ## Import Modules
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os
 import re
 import os.path as path
@@ -688,7 +689,7 @@ class WorkspaceAutoGen(AutoGen):
             os.makedirs(self.BuildDir)
         with open(os.path.join(self.BuildDir, 'AutoGen'), 'w+') as file:
             for f in AllWorkSpaceMetaFiles:
-                print >> file, f
+                print(f, file=file)
         return True
 
     def _GenPkgLevelHash(self, Pkg):
@@ -4362,7 +4363,7 @@ class ModuleAutoGen(AutoGen):
             os.remove (self.GetTimeStampPath())
         with open(self.GetTimeStampPath(), 'w+') as file:
             for f in FileSet:
-                print >> file, f
+                print(f, file=file)
 
     Module          = property(_GetModule)
     Name            = property(_GetBaseName)

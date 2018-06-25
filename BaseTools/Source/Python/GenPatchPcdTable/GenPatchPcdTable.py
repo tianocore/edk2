@@ -17,6 +17,7 @@
 #
 
 #======================================  External Libraries ========================================
+from __future__ import print_function
 import optparse
 import Common.LongFilePathOs as os
 import re
@@ -216,7 +217,7 @@ if __name__ == '__main__':
     (options, args) = parser.parse_args()
 
     if options.mapfile is None or options.efifile is None:
-        print parser.get_usage()
+        print(parser.get_usage())
     elif os.path.exists(options.mapfile) and os.path.exists(options.efifile):
         list = parsePcdInfoFromMapFile(options.mapfile, options.efifile)
         if list is not None:
@@ -225,6 +226,6 @@ if __name__ == '__main__':
             else:
                 generatePcdTable(list, options.mapfile.replace('.map', '.BinaryPcdTable.txt'))
         else:
-            print 'Fail to generate Patch PCD Table based on map file and efi file'
+            print('Fail to generate Patch PCD Table based on map file and efi file')
     else:
-        print 'Fail to generate Patch PCD Table for fail to find map file or efi file!'
+        print('Fail to generate Patch PCD Table for fail to find map file or efi file!')

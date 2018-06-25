@@ -14,6 +14,7 @@
 """
 Collect all defined strings in multiple uni files
 """
+from __future__ import print_function
 
 ##
 # Import Modules
@@ -730,7 +731,7 @@ class UniFileClassObject(object):
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
                 NewLines.append(Line)
             else:
-                print Line
+                print(Line)
                 EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
                     
         if StrName and not StrName.split()[1].startswith(u'STR_'):
@@ -1022,12 +1023,12 @@ class UniFileClassObject(object):
     # Show the instance itself
     #
     def ShowMe(self):
-        print self.LanguageDef
+        print(self.LanguageDef)
         #print self.OrderedStringList
         for Item in self.OrderedStringList:
-            print Item
+            print(Item)
             for Member in self.OrderedStringList[Item]:
-                print str(Member)
+                print(str(Member))
     
     #
     # Read content from '!include' UNI file 

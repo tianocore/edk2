@@ -1,5 +1,6 @@
 # $ANTLR 3.0.1 C.g 2010-02-23 09:58:53
 
+from __future__ import print_function
 from antlr3 import *
 from antlr3.compat import set, frozenset
          
@@ -102,8 +103,8 @@ class CParser(Parser):
         self.postfix_expression_stack = []
 
     def printTokenInfo(self, line, offset, tokenText):
-    	print str(line)+ ',' + str(offset) + ':' + str(tokenText)
-        
+        print(str(line)+ ',' + str(offset) + ':' + str(tokenText))
+
     def StorePredicateExpression(self, StartLine, StartOffset, EndLine, EndOffset, Text):
     	PredExp = CodeFragment.PredicateExpression(Text, (StartLine, StartOffset), (EndLine, EndOffset))
     	FileProfile.PredicateExpressionList.append(PredExp)

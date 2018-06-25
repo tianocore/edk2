@@ -16,6 +16,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os, codecs, re
 import distutils.util
 import Common.EdkLogger as EdkLogger
@@ -684,12 +685,12 @@ class UniFileClassObject(object):
     # Show the instance itself
     #
     def ShowMe(self):
-        print self.LanguageDef
+        print(self.LanguageDef)
         #print self.OrderedStringList
         for Item in self.OrderedStringList:
-            print Item
+            print(Item)
             for Member in self.OrderedStringList[Item]:
-                print str(Member)
+                print(str(Member))
 
 # This acts like the main() function for the script, unless it is 'import'ed into another
 # script.

@@ -1,3 +1,4 @@
+from __future__ import print_function
 ## @file
 # Utility functions and classes for BaseTools unit tests
 #
@@ -91,9 +92,9 @@ class BaseToolsTest(unittest.TestCase):
             os.remove(path)
 
     def DisplayBinaryData(self, description, data):
-        print description, '(base64 encoded):'
+        print(description, '(base64 encoded):')
         b64data = base64.b64encode(data)
-        print b64data
+        print(b64data)
 
     def DisplayFile(self, fileName):
         sys.stdout.write(self.ReadTmpFile(fileName))

@@ -17,6 +17,7 @@
 #
 
 
+from __future__ import print_function
 from optparse import OptionParser
 import os
 import shutil
@@ -34,7 +35,7 @@ if sys.version_info < (2, 5):
     #
     # This script (and edk2 BaseTools) require Python 2.5 or newer
     #
-    print 'Python version 2.5 or later is required.'
+    print('Python version 2.5 or later is required.')
     sys.exit(-1)
 
 #
@@ -146,37 +147,37 @@ class Config:
         if not self.options.skip_gcc:
             building.append('gcc')
         if len(building) == 0:
-            print "Nothing will be built!"
-            print
-            print "Please try using --help and then change the configuration."
+            print("Nothing will be built!")
+            print()
+            print("Please try using --help and then change the configuration.")
             return False
 
-        print "Current directory:"
-        print "   ", self.base_dir
-        print "Sources download/extraction:", self.Relative(self.src_dir)
-        print "Build directory            :", self.Relative(self.build_dir)
-        print "Prefix (install) directory :", self.Relative(self.prefix)
-        print "Create symlinks directory  :", self.Relative(self.symlinks)
-        print "Building                   :", ', '.join(building)
-        print
+        print("Current directory:")
+        print("   ", self.base_dir)
+        print("Sources download/extraction:", self.Relative(self.src_dir))
+        print("Build directory            :", self.Relative(self.build_dir))
+        print("Prefix (install) directory :", self.Relative(self.prefix))
+        print("Create symlinks directory  :", self.Relative(self.symlinks))
+        print("Building                   :", ', '.join(building))
+        print()
         answer = raw_input("Is this configuration ok? (default = no): ")
         if (answer.lower() not in ('y', 'yes')):
-            print
-            print "Please try using --help and then change the configuration."
+            print()
+            print("Please try using --help and then change the configuration.")
             return False
 
         if self.arch.lower() == 'ipf':
-            print
-            print 'Please note that the IPF compiler built by this script has'
-            print 'not yet been validated!'
-            print
+            print()
+            print('Please note that the IPF compiler built by this script has')
+            print('not yet been validated!')
+            print()
             answer = raw_input("Are you sure you want to build it? (default = no): ")
             if (answer.lower() not in ('y', 'yes')):
-                print
-                print "Please try using --help and then change the configuration."
+                print()
+                print("Please try using --help and then change the configuration.")
                 return False
 
-        print
+        print()
         return True
 
     def Relative(self, path):
@@ -275,7 +276,7 @@ class SourceFiles:
             wDots = (100 * received * blockSize) / fileSize / 10
             if wDots > self.dots:
                 for i in range(wDots - self.dots):
-                    print '.',
+                    print('.', end=' ')
                     sys.stdout.flush()
                     self.dots += 1
 
@@ -286,18 +287,18 @@ class SourceFiles:
                     self.dots = 0
                     local_file = os.path.join(self.config.src_dir, fdata['filename'])
                     url = fdata['url']
-                    print 'Downloading %s:' % fname, url
+                    print('Downloading %s:' % fname, url)
                     if retries > 0:
-                        print '(retry)',
+                        print('(retry)', end=' ')
                     sys.stdout.flush()
 
                     completed = False
                     if os.path.exists(local_file):
                         md5_pass = self.checkHash(fdata)
                         if md5_pass:
-                            print '[md5 match]',
+                            print('[md5 match]', end=' ')
                         else:
-                            print '[md5 mismatch]',
+                            print('[md5 mismatch]', end=' ')
                         sys.stdout.flush()
                         completed = md5_pass
 
@@ -313,32 +314,32 @@ class SourceFiles:
                     if not completed and os.path.exists(local_file):
                         md5_pass = self.checkHash(fdata)
                         if md5_pass:
-                            print '[md5 match]',
+                            print('[md5 match]', end=' ')
                         else:
-                            print '[md5 mismatch]',
+                            print('[md5 mismatch]', end=' ')
                         sys.stdout.flush()
                         completed = md5_pass
 
                     if completed:
-                        print '[done]'
+                        print('[done]')
                         break
                     else:
-                        print '[failed]'
-                        print '  Tried to retrieve', url
-                        print '  to', local_file
-                        print 'Possible fixes:'
-                        print '* If you are behind a web-proxy, try setting the',
-                        print 'http_proxy environment variable'
-                        print '* You can try to download this file separately',
-                        print 'and rerun this script'
+                        print('[failed]')
+                        print('  Tried to retrieve', url)
+                        print('  to', local_file)
+                        print('Possible fixes:')
+                        print('* If you are behind a web-proxy, try setting the', end=' ')
+                        print('http_proxy environment variable')
+                        print('* You can try to download this file separately', end=' ')
+                        print('and rerun this script')
                         raise Exception()
                 
                 except KeyboardInterrupt:
-                    print '[KeyboardInterrupt]'
+                    print('[KeyboardInterrupt]')
                     return False
 
                 except Exception as e:
-                    print e
+                    print(e)
 
             if not completed: return False
 
@@ -396,7 +397,7 @@ class Extracter:
             extractedMd5 = open(extracted).read()
 
         if extractedMd5 != moduleMd5:
-            print 'Extracting %s:' % self.config.Relative(local_file)
+            print('Extracting %s:' % self.config.Relative(local_file))
             tar = tarfile.open(local_file)
             tar.extractall(extractDst)
             open(extracted, 'w').write(moduleMd5)
@@ -480,7 +481,7 @@ class Builder:
 
         os.chdir(base_dir)
 
-        print '%s module is now built and installed' % module
+        print('%s module is now built and installed' % module)
 
     def RunCommand(self, cmd, module, stage, skipable=False):
         if skipable:
@@ -495,13 +496,13 @@ class Builder:
                 stderr=subprocess.STDOUT
                 )
 
-        print '%s [%s] ...' % (module, stage),
+        print('%s [%s] ...' % (module, stage), end=' ')
         sys.stdout.flush()
         p = popen(cmd)
         output = p.stdout.read()
         p.wait()
         if p.returncode != 0:
-            print '[failed!]'
+            print('[failed!]')
             logFile = os.path.join(self.config.build_dir, 'log.txt')
             f = open(logFile, "w")
             f.write(output)
@@ -509,7 +510,7 @@ class Builder:
             raise Exception, 'Failed to %s %s\n' % (stage, module) + \
                 'See output log at %s' % self.config.Relative(logFile)
         else:
-            print '[done]'
+            print('[done]')
 
         if skipable:
             self.MarkBuildStepComplete('%s.%s' % (module, stage))
@@ -526,13 +527,13 @@ class Builder:
             linkdst = os.path.join(links_dir, link)
             if not os.path.lexists(linkdst):
                 if not startPrinted:
-                    print 'Making symlinks in %s:' % self.config.Relative(links_dir),
+                    print('Making symlinks in %s:' % self.config.Relative(links_dir), end=' ')
                     startPrinted = True
-                print link,
+                print(link, end=' ')
                 os.symlink(src, linkdst)
 
         if startPrinted:
-            print '[done]'
+            print('[done]')
 
 class App:
     """class App
@@ -551,9 +552,9 @@ class App:
         sources = SourceFiles(config)
         result = sources.GetAll()
         if result:
-            print 'All files have been downloaded & verified'
+            print('All files have been downloaded & verified')
         else:
-            print 'An error occured while downloading a file'
+            print('An error occured while downloading a file')
             return
 
         Extracter(sources, config).ExtractAll()

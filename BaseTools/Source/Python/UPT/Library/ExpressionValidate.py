@@ -14,6 +14,7 @@
 '''
 ExpressionValidate
 '''
+from __future__ import print_function
 
 ##
 # Import Modules
@@ -566,7 +567,7 @@ def IsValidFeatureFlagExp(Token, Flag=False):
 
 if __name__ == '__main__':
 #    print IsValidRangeExpr('LT 9')
-    print _LogicalExpressionParser('gCrownBayTokenSpaceGuid.PcdPciDevice1BridgeAddressLE0').IsValidLogicalExpression()
+    print(_LogicalExpressionParser('gCrownBayTokenSpaceGuid.PcdPciDevice1BridgeAddressLE0').IsValidLogicalExpression())
 
 
     

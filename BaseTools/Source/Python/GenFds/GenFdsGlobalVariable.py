@@ -15,6 +15,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os
 import sys
 import subprocess
@@ -736,7 +737,7 @@ class GenFdsGlobalVariable:
             GenFdsGlobalVariable.InfLogger (out)
             GenFdsGlobalVariable.InfLogger (error)
             if PopenObject.returncode != 0:
-                print "###", cmd
+                print("###", cmd)
                 EdkLogger.error("GenFds", COMMAND_FAILURE, errorMess)
 
     def VerboseLogger (msg):
