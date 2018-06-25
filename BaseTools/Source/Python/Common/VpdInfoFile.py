@@ -88,7 +88,7 @@ class VpdInfoFile:
     #
     #  @param offset integer value for VPD's offset in specific SKU.
     #
-    def Add(self, Vpd, skuname,Offset):
+    def Add(self, Vpd, skuname, Offset):
         if (Vpd is None):
             EdkLogger.error("VpdInfoFile", BuildToolError.ATTRIBUTE_UNKNOWN_ERROR, "Invalid VPD PCD entry.")
         
@@ -140,7 +140,7 @@ class VpdInfoFile:
                 if PcdValue == "" :
                     PcdValue  = Pcd.DefaultValue
 
-                Content += "%s.%s|%s|%s|%s|%s  \n" % (Pcd.TokenSpaceGuidCName, PcdTokenCName, skuname,str(self._VpdArray[Pcd][skuname]).strip(), str(Pcd.MaxDatumSize).strip(),PcdValue)
+                Content += "%s.%s|%s|%s|%s|%s  \n" % (Pcd.TokenSpaceGuidCName, PcdTokenCName, skuname, str(self._VpdArray[Pcd][skuname]).strip(), str(Pcd.MaxDatumSize).strip(), PcdValue)
                 i += 1
 
         return SaveFileOnChange(FilePath, Content, False)
@@ -169,8 +169,8 @@ class VpdInfoFile:
             # the line must follow output format defined in BPDG spec.
             #
             try:
-                PcdName, SkuId,Offset, Size, Value = Line.split("#")[0].split("|")
-                PcdName, SkuId,Offset, Size, Value = PcdName.strip(), SkuId.strip(),Offset.strip(), Size.strip(), Value.strip()
+                PcdName, SkuId, Offset, Size, Value = Line.split("#")[0].split("|")
+                PcdName, SkuId, Offset, Size, Value = PcdName.strip(), SkuId.strip(), Offset.strip(), Size.strip(), Value.strip()
                 TokenSpaceName, PcdTokenName = PcdName.split(".")
             except:
                 EdkLogger.error("BPDG", BuildToolError.PARSER_ERROR, "Fail to parse VPD information file %s" % FilePath)
@@ -179,7 +179,7 @@ class VpdInfoFile:
             
             if (TokenSpaceName, PcdTokenName) not in self._VpdInfo:
                 self._VpdInfo[(TokenSpaceName, PcdTokenName)] = []
-            self._VpdInfo[(TokenSpaceName, PcdTokenName)].append((SkuId,Offset, Value))
+            self._VpdInfo[(TokenSpaceName, PcdTokenName)].append((SkuId, Offset, Value))
             for VpdObject in self._VpdArray:
                 VpdObjectTokenCName = VpdObject.TokenCName
                 for PcdItem in GlobalData.MixedPcd:

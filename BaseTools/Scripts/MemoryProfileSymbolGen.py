@@ -191,7 +191,7 @@ def processLine(newline):
 
     driverPrefixLen = len("Driver - ")
     # get driver name
-    if cmp(newline[0:driverPrefixLen],"Driver - ") == 0 :
+    if cmp(newline[0:driverPrefixLen], "Driver - ") == 0 :
         driverlineList = newline.split(" ")
         driverName = driverlineList[2]
         #print "Checking : ", driverName
@@ -214,7 +214,7 @@ def processLine(newline):
         else :
             symbolsFile.symbolsTable[driverName].parse_debug_file (driverName, pdbName)
 
-    elif cmp(newline,"") == 0 :
+    elif cmp(newline, "") == 0 :
         driverName = ""
 
     # check entry line
@@ -227,7 +227,7 @@ def processLine(newline):
         rvaName = ""
         symbolName = ""
 
-    if cmp(rvaName,"") == 0 :
+    if cmp(rvaName, "") == 0 :
         return newline
     else :
         return newline + symbolName

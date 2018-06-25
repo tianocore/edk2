@@ -48,7 +48,7 @@ def ConvertCygPathToDos(CygPath):
     DosPath = CygPath
   
   # pipes.quote will add the extra \\ for us.
-  return DosPath.replace('/','\\')
+  return DosPath.replace('/', '\\')
 
 
 # we receive our options as a list, but we will be passing them to the shell as a line

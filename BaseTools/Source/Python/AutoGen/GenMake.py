@@ -745,7 +745,7 @@ cleanlib:
                         if CmdName == 'Trim':
                             SecDepsFileList.append(os.path.join('$(DEBUG_DIR)', os.path.basename(OutputFile).replace('offset', 'efi')))
                         if OutputFile.endswith('.ui') or OutputFile.endswith('.ver'):
-                            SecDepsFileList.append(os.path.join('$(MODULE_DIR)','$(MODULE_FILE)'))
+                            SecDepsFileList.append(os.path.join('$(MODULE_DIR)', '$(MODULE_FILE)'))
                         self.FfsOutputFileList.append((OutputFile, ' '.join(SecDepsFileList), SecCmdStr))
                         if len(SecDepsFileList) > 0:
                             self.ParseSecCmd(SecDepsFileList, CmdTuple)
@@ -867,7 +867,7 @@ cleanlib:
                         for Target in BuildTargets:
                             for i, SingleCommand in enumerate(BuildTargets[Target].Commands):
                                 if FlagDict[Flag]['Macro'] in SingleCommand:
-                                    BuildTargets[Target].Commands[i] = SingleCommand.replace('$(INC)','').replace(FlagDict[Flag]['Macro'], RespMacro)
+                                    BuildTargets[Target].Commands[i] = SingleCommand.replace('$(INC)', '').replace(FlagDict[Flag]['Macro'], RespMacro)
         return RespDict
 
     def ProcessBuildTargetList(self):

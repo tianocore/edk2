@@ -207,7 +207,7 @@ class CapsulePayload(CapsuleData):
         #
         Guid = self.ImageTypeId.split('-')
         Buffer = pack('=ILHHBBBBBBBBBBBBIIQ',
-                       int(self.Version,16),
+                       int(self.Version, 16),
                        int(Guid[0], 16), 
                        int(Guid[1], 16), 
                        int(Guid[2], 16), 

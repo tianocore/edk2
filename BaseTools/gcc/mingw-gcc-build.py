@@ -186,7 +186,7 @@ class Config:
         return path
 
     def MakeDirs(self):
-        for path in (self.src_dir, self.build_dir,self.prefix, self.symlinks):
+        for path in (self.src_dir, self.build_dir, self.prefix, self.symlinks):
             if not os.path.exists(path):
                 os.makedirs(path)
 

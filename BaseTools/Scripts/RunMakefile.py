@@ -149,7 +149,7 @@ if __name__ == '__main__':
     for Item in gArgs.Define:
       if '=' not in Item[0]:
         continue
-      Item = Item[0].split('=',1)
+      Item = Item[0].split('=', 1)
       CommandLine.append('%s="%s"' % (Item[0], Item[1]))
   CommandLine.append('EXTRA_FLAGS="%s"' % (gArgs.Remaining))
   CommandLine.append(gArgs.BuildType)

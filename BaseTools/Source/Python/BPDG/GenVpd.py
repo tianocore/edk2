@@ -349,7 +349,7 @@ class GenVPD :
                 #
                 # Enhanced for support "|" character in the string.
                 #
-                ValueList = ['', '', '', '','']
+                ValueList = ['', '', '', '', '']
 
                 ValueRe = re.compile(r'\s*L?\".*\|.*\"\s*$')
                 PtrValue = ValueRe.findall(line)
@@ -399,7 +399,7 @@ class GenVPD :
         count = 0
         for line in self.FileLinesList:
             if line is not None :
-                PCD = PcdEntry(line[0], line[1], line[2], line[3], line[4],line[5], self.InputFileName)   
+                PCD = PcdEntry(line[0], line[1], line[2], line[3], line[4], line[5], self.InputFileName)
                 # Strip the space char
                 PCD.PcdCName     = PCD.PcdCName.strip(' ')
                 PCD.SkuId        = PCD.SkuId.strip(' ')
@@ -513,10 +513,10 @@ class GenVPD :
         index =0
         for pcd in self.PcdUnknownOffsetList:
             index += 1
-            if pcd.PcdCName == ".".join(("gEfiMdeModulePkgTokenSpaceGuid","PcdNvStoreDefaultValueBuffer")):
+            if pcd.PcdCName == ".".join(("gEfiMdeModulePkgTokenSpaceGuid", "PcdNvStoreDefaultValueBuffer")):
                 if index != len(self.PcdUnknownOffsetList):
                     for i in range(len(self.PcdUnknownOffsetList) - index):
-                        self.PcdUnknownOffsetList[index+i -1 ] , self.PcdUnknownOffsetList[index+i] = self.PcdUnknownOffsetList[index+i] , self.PcdUnknownOffsetList[index+i -1]
+                        self.PcdUnknownOffsetList[index+i -1 ], self.PcdUnknownOffsetList[index+i] = self.PcdUnknownOffsetList[index+i], self.PcdUnknownOffsetList[index+i -1]
 
         #
         # Process all Offset value are "*"
@@ -597,7 +597,7 @@ class GenVPD :
                                 eachUnfixedPcd.PcdOffset    = str(hex(LastOffset))
                                 eachUnfixedPcd.PcdBinOffset = LastOffset
                                 # Insert this pcd into fixed offset pcd list.
-                                self.PcdFixedOffsetSizeList.insert(FixOffsetSizeListCount,eachUnfixedPcd)
+                                self.PcdFixedOffsetSizeList.insert(FixOffsetSizeListCount, eachUnfixedPcd)
                                 
                                 # Delete the item's offset that has been fixed and added into fixed offset list
                                 self.PcdUnknownOffsetList.pop(countOfUnfixedList)
@@ -685,7 +685,7 @@ class GenVPD :
         for eachPcd in self.PcdFixedOffsetSizeList  :
             # write map file
             try :
-                fMapFile.write("%s | %s | %s | %s | %s  \n" % (eachPcd.PcdCName, eachPcd.SkuId,eachPcd.PcdOffset, eachPcd.PcdSize,eachPcd.PcdUnpackValue))
+                fMapFile.write("%s | %s | %s | %s | %s  \n" % (eachPcd.PcdCName, eachPcd.SkuId, eachPcd.PcdOffset, eachPcd.PcdSize, eachPcd.PcdUnpackValue))
             except:
                 EdkLogger.error("BPDG", BuildToolError.FILE_WRITE_FAILURE, "Write data to file %s failed, please check whether the file been locked or using by other applications." % self.MapFileName, None)
 

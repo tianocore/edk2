@@ -341,7 +341,7 @@ class GenFdsGlobalVariable:
         for Arch in ArchList:
             GenFdsGlobalVariable.OutputDirDict[Arch] = os.path.normpath(
                 os.path.join(GlobalData.gWorkspace,
-                             WorkSpace.Db.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch,GlobalData.gGlobalDefines['TARGET'],
+                             WorkSpace.Db.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GlobalData.gGlobalDefines['TARGET'],
                              GlobalData.gGlobalDefines['TOOLCHAIN']].OutputDirectory,
                              GlobalData.gGlobalDefines['TARGET'] +'_' + GlobalData.gGlobalDefines['TOOLCHAIN']))
             GenFdsGlobalVariable.OutputDirFromDscDict[Arch] = os.path.normpath(
@@ -547,7 +547,7 @@ class GenFdsGlobalVariable:
 
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
         if MakefilePath:
-            if (tuple(Cmd),tuple(GenFdsGlobalVariable.SecCmdList),tuple(GenFdsGlobalVariable.CopyList)) not in GenFdsGlobalVariable.FfsCmdDict:
+            if (tuple(Cmd), tuple(GenFdsGlobalVariable.SecCmdList), tuple(GenFdsGlobalVariable.CopyList)) not in GenFdsGlobalVariable.FfsCmdDict:
                 GenFdsGlobalVariable.FfsCmdDict[tuple(Cmd), tuple(GenFdsGlobalVariable.SecCmdList), tuple(GenFdsGlobalVariable.CopyList)] = MakefilePath
             GenFdsGlobalVariable.SecCmdList = []
             GenFdsGlobalVariable.CopyList = []

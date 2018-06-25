@@ -51,7 +51,7 @@ if __name__ == '__main__':
   parser.add_argument("--public-key-hash-c", dest='PublicKeyHashCFile', type=argparse.FileType('wb'), help="specify the public key hash filename that is SHA 256 hash of 2048 bit RSA public key in C structure format")
   parser.add_argument("-v", "--verbose", dest='Verbose', action="store_true", help="increase output messages")
   parser.add_argument("-q", "--quiet", dest='Quiet', action="store_true", help="reduce output messages")
-  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0,10), default=0, help="set debug level")
+  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0, 10), default=0, help="set debug level")
 
   #
   # Parse command line arguments

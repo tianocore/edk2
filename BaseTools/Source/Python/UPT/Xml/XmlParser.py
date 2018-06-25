@@ -103,7 +103,7 @@ class DistributionPackageXml(object):
                 IsRequiredItemListNull(CheckDict, XmlTreeLevel)
             else:
                 XmlTreeLevel = ['DistributionPackage', 'DistributionHeader']
-                CheckDict = CheckDict = {'DistributionHeader':'', }
+                CheckDict = CheckDict = {'DistributionHeader': '', }
                 IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
             #
@@ -123,16 +123,16 @@ class DistributionPackageXml(object):
             #
             if self.DistP.Tools:
                 XmlTreeLevel = ['DistributionPackage', 'Tools', 'Header']
-                CheckDict = {'Name':self.DistP.Tools.GetName(), }
+                CheckDict = {'Name': self.DistP.Tools.GetName(), }
                 IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
                 if not self.DistP.Tools.GetFileList():
                     XmlTreeLevel = ['DistributionPackage', 'Tools']
-                    CheckDict = {'FileName':None, }
+                    CheckDict = {'FileName': None, }
                     IsRequiredItemListNull(CheckDict, XmlTreeLevel)
                 for Item in self.DistP.Tools.GetFileList():
                     XmlTreeLevel = ['DistributionPackage', 'Tools']
-                    CheckDict = {'FileName':Item.GetURI(), }
+                    CheckDict = {'FileName': Item.GetURI(), }
                     IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
             #
@@ -140,16 +140,16 @@ class DistributionPackageXml(object):
             #
             if self.DistP.MiscellaneousFiles:
                 XmlTreeLevel = ['DistributionPackage', 'MiscellaneousFiles', 'Header']
-                CheckDict = {'Name':self.DistP.MiscellaneousFiles.GetName(), }
+                CheckDict = {'Name': self.DistP.MiscellaneousFiles.GetName(), }
                 IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
                 if not self.DistP.MiscellaneousFiles.GetFileList():
                     XmlTreeLevel = ['DistributionPackage', 'MiscellaneousFiles']
-                    CheckDict = {'FileName':None, }
+                    CheckDict = {'FileName': None, }
                     IsRequiredItemListNull(CheckDict, XmlTreeLevel)
                 for Item in self.DistP.MiscellaneousFiles.GetFileList():
                     XmlTreeLevel = ['DistributionPackage', 'MiscellaneousFiles']
-                    CheckDict = {'FileName':Item.GetURI(), }
+                    CheckDict = {'FileName': Item.GetURI(), }
                     IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
             #
@@ -157,7 +157,7 @@ class DistributionPackageXml(object):
             #
             for Item in self.DistP.UserExtensions:
                 XmlTreeLevel = ['DistributionPackage', 'UserExtensions']
-                CheckDict = {'UserId':Item.GetUserID(), }
+                CheckDict = {'UserId': Item.GetUserID(), }
                 IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
 
@@ -449,10 +449,10 @@ def ValidateMS1(Module, TopXmlTreeLevel):
     XmlTreeLevel = TopXmlTreeLevel + ['MiscellaneousFiles']
     for Item in Module.GetMiscFileList():
         if not Item.GetFileList():
-            CheckDict = {'Filename':'', }
+            CheckDict = {'Filename': '', }
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
         for File in Item.GetFileList():
-            CheckDict = {'Filename':File.GetURI(), }
+            CheckDict = {'Filename': File.GetURI(), }
 
 ## ValidateMS2
 #
@@ -915,10 +915,10 @@ def ValidatePS2(Package):
     XmlTreeLevel = ['DistributionPackage', 'PackageSurfaceArea', 'MiscellaneousFiles']
     for Item in Package.GetMiscFileList():
         if not Item.GetFileList():
-            CheckDict = {'Filename':'', }
+            CheckDict = {'Filename': '', }
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
         for File in Item.GetFileList():
-            CheckDict = {'Filename':File.GetURI(), }
+            CheckDict = {'Filename': File.GetURI(), }
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
 ## ValidatePackageSurfaceArea

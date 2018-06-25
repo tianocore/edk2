@@ -48,7 +48,7 @@ from Common.MultipleWorkspace import MultipleWorkspace as mws
 import InfSectionParser
 import datetime
 import hashlib
-from GenVar import VariableMgr,var_info
+from GenVar import VariableMgr, var_info
 from collections import OrderedDict
 from collections import defaultdict
 from Workspace.WorkspaceCommon import OrderedListDict
@@ -1293,7 +1293,7 @@ class PlatformAutoGen(AutoGen):
             ShareFixedAtBuildPcdsSameValue = {} 
             for Module in LibAuto._ReferenceModules:                
                 for Pcd in Module.FixedAtBuildPcds + LibAuto.FixedAtBuildPcds:
-                    key = ".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName))  
+                    key = ".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
                     if key not in FixedAtBuildPcds:
                         ShareFixedAtBuildPcdsSameValue[key] = True
                         FixedAtBuildPcds[key] = Pcd.DefaultValue
@@ -1301,11 +1301,11 @@ class PlatformAutoGen(AutoGen):
                         if FixedAtBuildPcds[key] != Pcd.DefaultValue:
                             ShareFixedAtBuildPcdsSameValue[key] = False      
             for Pcd in LibAuto.FixedAtBuildPcds:
-                key = ".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName))
-                if (Pcd.TokenCName,Pcd.TokenSpaceGuidCName) not in self.NonDynamicPcdDict:
+                key = ".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
+                if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName) not in self.NonDynamicPcdDict:
                     continue
                 else:
-                    DscPcd = self.NonDynamicPcdDict[(Pcd.TokenCName,Pcd.TokenSpaceGuidCName)]
+                    DscPcd = self.NonDynamicPcdDict[(Pcd.TokenCName, Pcd.TokenSpaceGuidCName)]
                     if DscPcd.Type != TAB_PCDS_FIXED_AT_BUILD:
                         continue
                 if key in ShareFixedAtBuildPcdsSameValue and ShareFixedAtBuildPcdsSameValue[key]:                    
@@ -1325,12 +1325,12 @@ class PlatformAutoGen(AutoGen):
                         break
 
 
-        VariableInfo = VariableMgr(self.DscBuildDataObj._GetDefaultStores(),self.DscBuildDataObj._GetSkuIds())
+        VariableInfo = VariableMgr(self.DscBuildDataObj._GetDefaultStores(), self.DscBuildDataObj._GetSkuIds())
         VariableInfo.SetVpdRegionMaxSize(VpdRegionSize)
         VariableInfo.SetVpdRegionOffset(VpdRegionBase)
         Index = 0
         for Pcd in DynamicPcdSet:
-            pcdname = ".".join((Pcd.TokenSpaceGuidCName,Pcd.TokenCName))
+            pcdname = ".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
             for SkuName in Pcd.SkuInfoList:
                 Sku = Pcd.SkuInfoList[SkuName]
                 SkuId = Sku.SkuId
@@ -1340,11 +1340,11 @@ class PlatformAutoGen(AutoGen):
                     VariableGuidStructure = Sku.VariableGuidValue
                     VariableGuid = GuidStructureStringToGuidString(VariableGuidStructure)
                     for StorageName in Sku.DefaultStoreDict:
-                        VariableInfo.append_variable(var_info(Index,pcdname,StorageName,SkuName, StringToArray(Sku.VariableName),VariableGuid, Sku.VariableOffset, Sku.VariableAttribute , Sku.HiiDefaultValue,Sku.DefaultStoreDict[StorageName],Pcd.DatumType))
+                        VariableInfo.append_variable(var_info(Index, pcdname, StorageName, SkuName, StringToArray(Sku.VariableName), VariableGuid, Sku.VariableOffset, Sku.VariableAttribute, Sku.HiiDefaultValue, Sku.DefaultStoreDict[StorageName], Pcd.DatumType))
             Index += 1
         return VariableInfo
 
-    def UpdateNVStoreMaxSize(self,OrgVpdFile):
+    def UpdateNVStoreMaxSize(self, OrgVpdFile):
         if self.VariableInfo:
             VpdMapFilePath = os.path.join(self.BuildDir, TAB_FV_DIRECTORY, "%s.map" % self.Platform.VpdToolGuid)
             PcdNvStoreDfBuffer = [item for item in self._DynamicPcdList if item.TokenCName == "PcdNvStoreDefaultValueBuffer" and item.TokenSpaceGuidCName == "gEfiMdeModulePkgTokenSpaceGuid"]
@@ -1357,7 +1357,7 @@ class PlatformAutoGen(AutoGen):
                 else:
                     EdkLogger.error("build", FILE_READ_FAILURE, "Can not find VPD map file %s to fix up VPD offset." % VpdMapFilePath)
 
-                NvStoreOffset = int(NvStoreOffset,16) if NvStoreOffset.upper().startswith("0X") else int(NvStoreOffset)
+                NvStoreOffset = int(NvStoreOffset, 16) if NvStoreOffset.upper().startswith("0X") else int(NvStoreOffset)
                 default_skuobj = PcdNvStoreDfBuffer[0].SkuInfoList.get(TAB_DEFAULT)
                 maxsize = self.VariableInfo.VpdRegionSize  - NvStoreOffset if self.VariableInfo.VpdRegionSize else len(default_skuobj.DefaultValue.split(","))
                 var_data = self.VariableInfo.PatchNVStoreDefaultMaxSize(maxsize)
@@ -1569,7 +1569,7 @@ class PlatformAutoGen(AutoGen):
                     VpdPcdDict[(Pcd.TokenCName, Pcd.TokenSpaceGuidCName)] = Pcd
 
             #Collect DynamicHii PCD values and assign it to DynamicExVpd PCD gEfiMdeModulePkgTokenSpaceGuid.PcdNvStoreDefaultValueBuffer
-            PcdNvStoreDfBuffer = VpdPcdDict.get(("PcdNvStoreDefaultValueBuffer","gEfiMdeModulePkgTokenSpaceGuid"))
+            PcdNvStoreDfBuffer = VpdPcdDict.get(("PcdNvStoreDefaultValueBuffer", "gEfiMdeModulePkgTokenSpaceGuid"))
             if PcdNvStoreDfBuffer:
                 self.VariableInfo = self.CollectVariables(self._DynamicPcdList)
                 vardump = self.VariableInfo.dump()
@@ -1595,10 +1595,10 @@ class PlatformAutoGen(AutoGen):
                         PcdValue = DefaultSku.DefaultValue
                         if PcdValue not in SkuValueMap:
                             SkuValueMap[PcdValue] = []
-                            VpdFile.Add(Pcd, TAB_DEFAULT,DefaultSku.VpdOffset)
+                            VpdFile.Add(Pcd, TAB_DEFAULT, DefaultSku.VpdOffset)
                         SkuValueMap[PcdValue].append(DefaultSku)
 
-                    for (SkuName,Sku) in Pcd.SkuInfoList.items():
+                    for (SkuName, Sku) in Pcd.SkuInfoList.items():
                         Sku.VpdOffset = Sku.VpdOffset.strip()
                         PcdValue = Sku.DefaultValue
                         if PcdValue == "":
@@ -1624,7 +1624,7 @@ class PlatformAutoGen(AutoGen):
                                     EdkLogger.error("build", FORMAT_INVALID, 'The offset value of PCD %s.%s should be %s-byte aligned.' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Alignment))
                         if PcdValue not in SkuValueMap:
                             SkuValueMap[PcdValue] = []
-                            VpdFile.Add(Pcd, SkuName,Sku.VpdOffset)
+                            VpdFile.Add(Pcd, SkuName, Sku.VpdOffset)
                         SkuValueMap[PcdValue].append(Sku)
                         # if the offset of a VPD is *, then it need to be fixed up by third party tool.
                         if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
@@ -1656,9 +1656,9 @@ class PlatformAutoGen(AutoGen):
                             SkuObjList = DscPcdEntry.SkuInfoList.items()
                             DefaultSku = DscPcdEntry.SkuInfoList.get(TAB_DEFAULT)
                             if DefaultSku:
-                                defaultindex = SkuObjList.index((TAB_DEFAULT,DefaultSku))
-                                SkuObjList[0],SkuObjList[defaultindex] = SkuObjList[defaultindex],SkuObjList[0]
-                            for (SkuName,Sku) in SkuObjList:
+                                defaultindex = SkuObjList.index((TAB_DEFAULT, DefaultSku))
+                                SkuObjList[0], SkuObjList[defaultindex] = SkuObjList[defaultindex], SkuObjList[0]
+                            for (SkuName, Sku) in SkuObjList:
                                 Sku.VpdOffset = Sku.VpdOffset.strip() 
                                 
                                 # Need to iterate DEC pcd information to get the value & datumtype
@@ -1708,7 +1708,7 @@ class PlatformAutoGen(AutoGen):
                                             EdkLogger.error("build", FORMAT_INVALID, 'The offset value of PCD %s.%s should be %s-byte aligned.' % (DscPcdEntry.TokenSpaceGuidCName, DscPcdEntry.TokenCName, Alignment))
                                 if PcdValue not in SkuValueMap:
                                     SkuValueMap[PcdValue] = []
-                                    VpdFile.Add(DscPcdEntry, SkuName,Sku.VpdOffset)
+                                    VpdFile.Add(DscPcdEntry, SkuName, Sku.VpdOffset)
                                 SkuValueMap[PcdValue].append(Sku)
                                 if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
                                     NeedProcessVpdMapFile = True 
@@ -1774,17 +1774,17 @@ class PlatformAutoGen(AutoGen):
         self._DynamicPcdList.extend(list(UnicodePcdArray))
         self._DynamicPcdList.extend(list(HiiPcdArray))
         self._DynamicPcdList.extend(list(OtherPcdArray))
-        allskuset = [(SkuName,Sku.SkuId) for pcd in self._DynamicPcdList for (SkuName,Sku) in pcd.SkuInfoList.items()]
+        allskuset = [(SkuName, Sku.SkuId) for pcd in self._DynamicPcdList for (SkuName, Sku) in pcd.SkuInfoList.items()]
         for pcd in self._DynamicPcdList:
             if len(pcd.SkuInfoList) == 1:
-                for (SkuName,SkuId) in allskuset:
-                    if type(SkuId) in (str,unicode) and eval(SkuId) == 0 or SkuId == 0:
+                for (SkuName, SkuId) in allskuset:
+                    if type(SkuId) in (str, unicode) and eval(SkuId) == 0 or SkuId == 0:
                         continue
                     pcd.SkuInfoList[SkuName] = copy.deepcopy(pcd.SkuInfoList[TAB_DEFAULT])
                     pcd.SkuInfoList[SkuName].SkuId = SkuId
         self.AllPcdList = self._NonDynamicPcdList + self._DynamicPcdList
 
-    def FixVpdOffset(self,VpdFile ):
+    def FixVpdOffset(self, VpdFile ):
         FvPath = os.path.join(self.BuildDir, TAB_FV_DIRECTORY)
         if not os.path.exists(FvPath):
             try:
@@ -2050,7 +2050,7 @@ class PlatformAutoGen(AutoGen):
         if self._NonDynamicPcdDict:
             return self._NonDynamicPcdDict
         for Pcd in self.NonDynamicPcdList:
-            self._NonDynamicPcdDict[(Pcd.TokenCName,Pcd.TokenSpaceGuidCName)] = Pcd
+            self._NonDynamicPcdDict[(Pcd.TokenCName, Pcd.TokenSpaceGuidCName)] = Pcd
         return self._NonDynamicPcdDict
 
     ## Get list of non-dynamic PCDs
@@ -3711,7 +3711,7 @@ class ModuleAutoGen(AutoGen):
         try:
             fInputfile = open(UniVfrOffsetFileName, "wb+", 0)
         except:
-            EdkLogger.error("build", FILE_OPEN_FAILURE, "File open failed for %s" % UniVfrOffsetFileName,None)
+            EdkLogger.error("build", FILE_OPEN_FAILURE, "File open failed for %s" % UniVfrOffsetFileName, None)
 
         # Use a instance of StringIO to cache data
         fStringIO = StringIO('')  
@@ -3746,7 +3746,7 @@ class ModuleAutoGen(AutoGen):
             fInputfile.write (fStringIO.getvalue())
         except:
             EdkLogger.error("build", FILE_WRITE_FAILURE, "Write data to file %s failed, please check whether the "
-                            "file been locked or using by other applications." %UniVfrOffsetFileName,None)
+                            "file been locked or using by other applications." %UniVfrOffsetFileName, None)
 
         fStringIO.close ()
         fInputfile.close ()
@@ -4181,7 +4181,7 @@ class ModuleAutoGen(AutoGen):
     def CopyBinaryFiles(self):
         for File in self.Module.Binaries:
             SrcPath = File.Path
-            DstPath = os.path.join(self.OutputDir , os.path.basename(SrcPath))
+            DstPath = os.path.join(self.OutputDir, os.path.basename(SrcPath))
             CopyLongFilePath(SrcPath, DstPath)
     ## Create autogen code for the module and its dependent libraries
     #
@@ -4331,7 +4331,7 @@ class ModuleAutoGen(AutoGen):
         if SrcTimeStamp > DstTimeStamp:
             return False
 
-        with open(self.GetTimeStampPath(),'r') as f:
+        with open(self.GetTimeStampPath(), 'r') as f:
             for source in f:
                 source = source.rstrip('\n')
                 if not os.path.exists(source):

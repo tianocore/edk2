@@ -54,7 +54,7 @@ import Common.EdkLogger
 import Common.GlobalData as GlobalData
 from GenFds.GenFds import GenFds
 
-from collections import OrderedDict,defaultdict
+from collections import OrderedDict, defaultdict
 
 # Version and Copyright
 VersionNumber = "0.60" + ' ' + gBUILD_VERSION
@@ -526,7 +526,7 @@ class BuildTask:
                     BuildTask._Thread.acquire(True)
 
                     # start a new build thread
-                    Bo,Bt = BuildTask._ReadyQueue.popitem()
+                    Bo, Bt = BuildTask._ReadyQueue.popitem()
 
                     # move into running queue
                     BuildTask._RunningQueueLock.acquire()
@@ -840,7 +840,7 @@ class Build():
         self.HashSkipModules = []
         self.Db_Flag = False
         self.LaunchPrebuildFlag = False
-        self.PlatformBuildPath = os.path.join(GlobalData.gConfDirectory,'.cache', '.PlatformBuild')
+        self.PlatformBuildPath = os.path.join(GlobalData.gConfDirectory, '.cache', '.PlatformBuild')
         if BuildOptions.CommandLength:
             GlobalData.gCommandMaxLength = BuildOptions.CommandLength
 
@@ -1133,7 +1133,7 @@ class Build():
             # and preserve them for the rest of the main build step, because the child process environment will
             # evaporate as soon as it exits, we cannot get it in build step.
             #
-            PrebuildEnvFile = os.path.join(GlobalData.gConfDirectory,'.cache','.PrebuildEnv')
+            PrebuildEnvFile = os.path.join(GlobalData.gConfDirectory, '.cache', '.PrebuildEnv')
             if os.path.isfile(PrebuildEnvFile):
                 os.remove(PrebuildEnvFile)
             if os.path.isfile(self.PlatformBuildPath):
@@ -1173,7 +1173,7 @@ class Build():
                 f = open(PrebuildEnvFile)
                 envs = f.readlines()
                 f.close()
-                envs = itertools.imap(lambda l: l.split('=',1), envs)
+                envs = itertools.imap(lambda l: l.split('=', 1), envs)
                 envs = itertools.ifilter(lambda l: len(l) == 2, envs)
                 envs = itertools.imap(lambda l: [i.strip() for i in l], envs)
                 os.environ.update(dict(envs))
@@ -2358,7 +2358,7 @@ def MyOptionParser():
     Parser.add_option("-D", "--define", action="append", type="string", dest="Macros", help="Macro: \"Name [= Value]\".")
 
     Parser.add_option("-y", "--report-file", action="store", dest="ReportFile", help="Create/overwrite the report to the specified filename.")
-    Parser.add_option("-Y", "--report-type", action="append", type="choice", choices=['PCD','LIBRARY','FLASH','DEPEX','BUILD_FLAGS','FIXED_ADDRESS','HASH','EXECUTION_ORDER'], dest="ReportType", default=[],
+    Parser.add_option("-Y", "--report-type", action="append", type="choice", choices=['PCD', 'LIBRARY', 'FLASH', 'DEPEX', 'BUILD_FLAGS', 'FIXED_ADDRESS', 'HASH', 'EXECUTION_ORDER'], dest="ReportType", default=[],
         help="Flags that control the type of build report to generate.  Must be one of: [PCD, LIBRARY, FLASH, DEPEX, BUILD_FLAGS, FIXED_ADDRESS, HASH, EXECUTION_ORDER].  "\
              "To specify more than one flag, repeat this option on the command line and the default flag set is [PCD, LIBRARY, FLASH, DEPEX, HASH, BUILD_FLAGS, FIXED_ADDRESS]")
     Parser.add_option("-F", "--flag", action="store", type="string", dest="Flag",

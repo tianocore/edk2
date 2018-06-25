@@ -132,7 +132,7 @@ def _parseForGCC(lines, efifilepath, varnames):
                     if Str:
                         m = pcdPatternGcc.match(Str.strip())
                         if m is not None:
-                            varoffset.append((varname, int(m.groups(0)[0], 16) , int(sections[-1][1], 16), sections[-1][0]))
+                            varoffset.append((varname, int(m.groups(0)[0], 16), int(sections[-1][1], 16), sections[-1][0]))
 
     if not varoffset:
         return []
@@ -1469,7 +1469,7 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
 #         Value, Size = ParseFieldValue(Value)
         if Size:
             try:
-                int(Size,16) if Size.upper().startswith("0X") else int(Size)
+                int(Size, 16) if Size.upper().startswith("0X") else int(Size)
             except:
                 IsValid = False
                 Size = -1
@@ -1490,7 +1490,7 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
 
         if Size:
             try:
-                int(Size,16) if Size.upper().startswith("0X") else int(Size)
+                int(Size, 16) if Size.upper().startswith("0X") else int(Size)
             except:
                 IsValid = False
                 Size = -1
@@ -1512,7 +1512,7 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
             IsValid = (len(FieldList) <= 3)
         if Size:
             try:
-                int(Size,16) if Size.upper().startswith("0X") else int(Size)
+                int(Size, 16) if Size.upper().startswith("0X") else int(Size)
             except:
                 IsValid = False
                 Size = -1
@@ -1670,7 +1670,7 @@ def ConvertStringToByteArray(Value):
 
     Value = eval(Value)         # translate escape character
     NewValue = '{'
-    for Index in range(0,len(Value)):
+    for Index in range(0, len(Value)):
         if Unicode:
             NewValue = NewValue + str(ord(Value[Index]) % 0x10000) + ','
         else:
@@ -1914,28 +1914,28 @@ class PeImageClass():
         return Value
 
 class DefaultStore():
-    def __init__(self,DefaultStores ):
+    def __init__(self, DefaultStores ):
 
         self.DefaultStores = DefaultStores
-    def DefaultStoreID(self,DefaultStoreName):
-        for key,value in self.DefaultStores.items():
+    def DefaultStoreID(self, DefaultStoreName):
+        for key, value in self.DefaultStores.items():
             if value == DefaultStoreName:
                 return key
         return None
     def GetDefaultDefault(self):
         if not self.DefaultStores or "0" in self.DefaultStores:
-            return "0",TAB_DEFAULT_STORES_DEFAULT
+            return "0", TAB_DEFAULT_STORES_DEFAULT
         else:
             minvalue = min(int(value_str) for value_str in self.DefaultStores)
             return (str(minvalue), self.DefaultStores[str(minvalue)])
-    def GetMin(self,DefaultSIdList):
+    def GetMin(self, DefaultSIdList):
         if not DefaultSIdList:
             return TAB_DEFAULT_STORES_DEFAULT
         storeidset = {storeid for storeid, storename in self.DefaultStores.values() if storename in DefaultSIdList}
         if not storeidset:
             return ""
         minid = min(storeidset )
-        for sid,name in self.DefaultStores.values():
+        for sid, name in self.DefaultStores.values():
             if sid == minid:
                 return name
 class SkuClass():
@@ -1950,7 +1950,7 @@ class SkuClass():
 
         for SkuName in SkuIds:
             SkuId = SkuIds[SkuName][0]
-            skuid_num = int(SkuId,16) if SkuId.upper().startswith("0X") else int(SkuId)
+            skuid_num = int(SkuId, 16) if SkuId.upper().startswith("0X") else int(SkuId)
             if skuid_num > 0xFFFFFFFFFFFFFFFF:
                 EdkLogger.error("build", PARAMETER_INVALID,
                             ExtraData = "SKU-ID [%s] value %s exceeds the max value of UINT64"
@@ -2003,9 +2003,9 @@ class SkuClass():
             self.__SkuInherit = {}
             for item in self.SkuData.values():
                 self.__SkuInherit[item[1]]=item[2] if item[2] else "DEFAULT"
-        return self.__SkuInherit.get(skuname,"DEFAULT")
+        return self.__SkuInherit.get(skuname, "DEFAULT")
 
-    def GetSkuChain(self,sku):
+    def GetSkuChain(self, sku):
         if sku == "DEFAULT":
             return ["DEFAULT"]
         skulist = [sku]

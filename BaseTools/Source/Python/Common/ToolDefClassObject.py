@@ -26,9 +26,9 @@ from Common.StringUtils import NormPath
 import Common.GlobalData as GlobalData
 from Common import GlobalData
 from Common.MultipleWorkspace import MultipleWorkspace as mws
-from DataType import TAB_TOD_DEFINES_TARGET,TAB_TOD_DEFINES_TOOL_CHAIN_TAG,\
-                     TAB_TOD_DEFINES_TARGET_ARCH,TAB_TOD_DEFINES_COMMAND_TYPE\
-                     ,TAB_TOD_DEFINES_FAMILY,TAB_TOD_DEFINES_BUILDRULEFAMILY
+from DataType import TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG,\
+                     TAB_TOD_DEFINES_TARGET_ARCH, TAB_TOD_DEFINES_COMMAND_TYPE\
+                     , TAB_TOD_DEFINES_FAMILY, TAB_TOD_DEFINES_BUILDRULEFAMILY
 
 
 ##

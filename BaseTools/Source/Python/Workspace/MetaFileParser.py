@@ -302,7 +302,7 @@ class MetaFileParser(object):
         for Item in GetSplitValueList(self._CurrentLine[1:-1], TAB_COMMA_SPLIT):
             if Item == '':
                 continue
-            ItemList = GetSplitValueList(Item, TAB_SPLIT,3)
+            ItemList = GetSplitValueList(Item, TAB_SPLIT, 3)
             # different section should not mix in one section
             if self._SectionName != '' and self._SectionName != ItemList[0].upper():
                 EdkLogger.error('Parser', FORMAT_INVALID, "Different section names in the same section",
@@ -420,7 +420,7 @@ class MetaFileParser(object):
 
     ## Construct section Macro dict 
     def _ConstructSectionMacroDict(self, Name, Value):
-        ScopeKey = [(Scope[0], Scope[1],Scope[2]) for Scope in self._Scope]
+        ScopeKey = [(Scope[0], Scope[1], Scope[2]) for Scope in self._Scope]
         ScopeKey = tuple(ScopeKey)
         #
         # DecParser SectionType is a list, will contain more than one item only in Pcd Section
@@ -451,15 +451,15 @@ class MetaFileParser(object):
                 continue
 
             for ActiveScope in self._Scope:
-                Scope0, Scope1 ,Scope2= ActiveScope[0], ActiveScope[1],ActiveScope[2]
-                if(Scope0, Scope1,Scope2) not in Scope:
+                Scope0, Scope1, Scope2= ActiveScope[0], ActiveScope[1], ActiveScope[2]
+                if(Scope0, Scope1, Scope2) not in Scope:
                     break
             else:
                 SpeSpeMacroDict.update(self._SectionsMacroDict[(SectionType, Scope)])
 
             for ActiveScope in self._Scope:
-                Scope0, Scope1,Scope2 = ActiveScope[0], ActiveScope[1],ActiveScope[2]
-                if(Scope0, Scope1,Scope2) not in Scope and (Scope0, TAB_COMMON, TAB_COMMON) not in Scope and (TAB_COMMON, Scope1, TAB_COMMON) not in Scope:
+                Scope0, Scope1, Scope2 = ActiveScope[0], ActiveScope[1], ActiveScope[2]
+                if(Scope0, Scope1, Scope2) not in Scope and (Scope0, TAB_COMMON, TAB_COMMON) not in Scope and (TAB_COMMON, Scope1, TAB_COMMON) not in Scope:
                     break
             else:
                 ComSpeMacroDict.update(self._SectionsMacroDict[(SectionType, Scope)])
@@ -636,7 +636,7 @@ class InfParser(MetaFileParser):
             # Model, Value1, Value2, Value3, Arch, Platform, BelongsToItem=-1,
             # LineBegin=-1, ColumnBegin=-1, LineEnd=-1, ColumnEnd=-1, Enabled=-1
             #
-            for Arch, Platform,_ in self._Scope:
+            for Arch, Platform, _ in self._Scope:
                 LastItem = self._Store(self._SectionType,
                             self._ValueList[0],
                             self._ValueList[1],
@@ -947,7 +947,7 @@ class DscParser(MetaFileParser):
                 self._DirectiveParser()
                 continue
             if Line[0] == TAB_OPTION_START and not self._InSubsection:
-                EdkLogger.error("Parser", FILE_READ_FAILURE, "Missing the '{' before %s in Line %s" % (Line, Index+1),ExtraData=self.MetaFile)
+                EdkLogger.error("Parser", FILE_READ_FAILURE, "Missing the '{' before %s in Line %s" % (Line, Index+1), ExtraData=self.MetaFile)
 
             if self._InSubsection:
                 SectionType = self._SubsectionType
@@ -1104,7 +1104,7 @@ class DscParser(MetaFileParser):
     @ParseMacro
     def _SkuIdParser(self):
         TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT)
-        if len(TokenList) not in (2,3):
+        if len(TokenList) not in (2, 3):
             EdkLogger.error('Parser', FORMAT_INVALID, "Correct format is '<Number>|<UiName>[|<UiName>]'",
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
         self._ValueList[0:len(TokenList)] = TokenList
@@ -1164,7 +1164,7 @@ class DscParser(MetaFileParser):
 
         # Validate the datum type of Dynamic Defaul PCD and DynamicEx Default PCD
         ValueList = GetSplitValueList(self._ValueList[2])
-        if len(ValueList) > 1 and ValueList[1] in [TAB_UINT8 , TAB_UINT16, TAB_UINT32 , TAB_UINT64] \
+        if len(ValueList) > 1 and ValueList[1] in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64] \
                               and self._ItemType in [MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT]:
             EdkLogger.error('Parser', FORMAT_INVALID, "The datum type '%s' of PCD is wrong" % ValueList[1],
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
@@ -1172,7 +1172,7 @@ class DscParser(MetaFileParser):
         # Validate the VariableName of DynamicHii and DynamicExHii for PCD Entry must not be an empty string
         if self._ItemType in [MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_EX_HII]:
             DscPcdValueList = GetSplitValueList(TokenList[1], TAB_VALUE_SPLIT, 1)
-            if len(DscPcdValueList[0].replace('L','').replace('"','').strip()) == 0:
+            if len(DscPcdValueList[0].replace('L', '').replace('"', '').strip()) == 0:
                 EdkLogger.error('Parser', FORMAT_INVALID, "The VariableName field in the HII format PCD entry must not be an empty string",
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
 
@@ -1309,7 +1309,7 @@ class DscParser(MetaFileParser):
         self._ContentIndex = 0
         self._InSubsection = False
         while self._ContentIndex < len(self._Content) :
-            Id, self._ItemType, V1, V2, V3, S1, S2, S3,Owner, self._From, \
+            Id, self._ItemType, V1, V2, V3, S1, S2, S3, Owner, self._From, \
                 LineStart, ColStart, LineEnd, ColEnd, Enabled = self._Content[self._ContentIndex]
 
             if self._From < 0:
@@ -1327,8 +1327,8 @@ class DscParser(MetaFileParser):
                     break
                 Record = self._Content[self._ContentIndex]
                 if LineStart == Record[10] and LineEnd == Record[12]:
-                    if [Record[5], Record[6],Record[7]] not in self._Scope:
-                        self._Scope.append([Record[5], Record[6],Record[7]])
+                    if [Record[5], Record[6], Record[7]] not in self._Scope:
+                        self._Scope.append([Record[5], Record[6], Record[7]])
                     self._ContentIndex += 1
                 else:
                     break
@@ -1421,7 +1421,7 @@ class DscParser(MetaFileParser):
                         MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_DEFAULT, MODEL_PCD_DYNAMIC_EX_HII,
                         MODEL_PCD_DYNAMIC_EX_VPD):
             Records = self._RawTable.Query(PcdType, BelongsToItem= -1.0)
-            for TokenSpaceGuid, PcdName, Value, Dummy2, Dummy3, Dummy4,ID, Line in Records:
+            for TokenSpaceGuid, PcdName, Value, Dummy2, Dummy3, Dummy4, ID, Line in Records:
                 Name = TokenSpaceGuid + '.' + PcdName
                 if Name not in GlobalData.gPlatformOtherPcds:
                     PcdLine = Line
@@ -1800,7 +1800,7 @@ class DecParser(MetaFileParser):
         if self._DefinesCount > 1:
             EdkLogger.error('Parser', FORMAT_INVALID, 'Multiple [Defines] section is exist.', self.MetaFile )
         if self._DefinesCount == 0:
-            EdkLogger.error('Parser', FORMAT_INVALID, 'No [Defines] section exist.',self.MetaFile)
+            EdkLogger.error('Parser', FORMAT_INVALID, 'No [Defines] section exist.', self.MetaFile)
         self._Done()
 
 
@@ -1944,7 +1944,7 @@ class DecParser(MetaFileParser):
                     self._CurrentStructurePcdName = ""
                 else:
                     if self._CurrentStructurePcdName != TAB_SPLIT.join(PcdNames[:2]):
-                        EdkLogger.error('Parser', FORMAT_INVALID, "Pcd Name does not match: %s and %s " % (self._CurrentStructurePcdName , TAB_SPLIT.join(PcdNames[:2])),
+                        EdkLogger.error('Parser', FORMAT_INVALID, "Pcd Name does not match: %s and %s " % (self._CurrentStructurePcdName, TAB_SPLIT.join(PcdNames[:2])),
                                 File=self.MetaFile, Line=self._LineIndex + 1)
                     self._ValueList[1] = TAB_SPLIT.join(PcdNames[2:])
                     self._ValueList[2] = PcdTockens[1]

@@ -50,7 +50,7 @@ EFI_HASH_ALGORITHM_SHA256_GUID = uuid.UUID('{51aa59de-fdf2-4ea3-bc63-875fb7842ee
 #     UINT8 Signature[256];
 #   } EFI_CERT_BLOCK_RSA_2048_SHA256;
 #
-EFI_CERT_BLOCK_RSA_2048_SHA256        = collections.namedtuple('EFI_CERT_BLOCK_RSA_2048_SHA256', ['HashType','PublicKey','Signature'])
+EFI_CERT_BLOCK_RSA_2048_SHA256        = collections.namedtuple('EFI_CERT_BLOCK_RSA_2048_SHA256', ['HashType', 'PublicKey', 'Signature'])
 EFI_CERT_BLOCK_RSA_2048_SHA256_STRUCT = struct.Struct('16s256s256s')
 
 #
@@ -71,7 +71,7 @@ if __name__ == '__main__':
   parser.add_argument("--private-key", dest='PrivateKeyFile', type=argparse.FileType('rb'), help="specify the private key filename.  If not specified, a test signing key is used.")
   parser.add_argument("-v", "--verbose", dest='Verbose', action="store_true", help="increase output messages")
   parser.add_argument("-q", "--quiet", dest='Quiet', action="store_true", help="reduce output messages")
-  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0,10), default=0, help="set debug level")
+  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0, 10), default=0, help="set debug level")
   parser.add_argument(metavar="input_file", dest='InputFile', type=argparse.FileType('rb'), help="specify the input filename")
 
   #
@@ -155,7 +155,7 @@ if __name__ == '__main__':
   PublicKeyHexString = Process.communicate()[0].split('=')[1].strip()
   PublicKey = ''
   while len(PublicKeyHexString) > 0:
-    PublicKey = PublicKey + chr(int(PublicKeyHexString[0:2],16))
+    PublicKey = PublicKey + chr(int(PublicKeyHexString[0:2], 16))
     PublicKeyHexString=PublicKeyHexString[2:]
   if Process.returncode != 0:
     sys.exit(Process.returncode)

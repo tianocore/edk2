@@ -785,10 +785,10 @@ class CParser(Parser):
                 if self.backtracking == 0:
                           
                     if d is not None:
-                      self.function_definition_stack[-1].ModifierText = self.input.toString(d.start,d.stop)
+                      self.function_definition_stack[-1].ModifierText = self.input.toString(d.start, d.stop)
                     else:
                       self.function_definition_stack[-1].ModifierText = ''
-                    self.function_definition_stack[-1].DeclText = self.input.toString(declarator1.start,declarator1.stop)
+                    self.function_definition_stack[-1].DeclText = self.input.toString(declarator1.start, declarator1.stop)
                     self.function_definition_stack[-1].DeclLine = declarator1.start.line
                     self.function_definition_stack[-1].DeclOffset = declarator1.start.charPositionInLine
                     if a is not None:
@@ -922,9 +922,9 @@ class CParser(Parser):
                     if self.backtracking == 0:
                             
                         if b is not None:
-                          self.StoreTypedefDefinition(a.line, a.charPositionInLine, d.line, d.charPositionInLine, self.input.toString(b.start,b.stop), self.input.toString(c.start,c.stop))
+                          self.StoreTypedefDefinition(a.line, a.charPositionInLine, d.line, d.charPositionInLine, self.input.toString(b.start, b.stop), self.input.toString(c.start, c.stop))
                         else:
-                          self.StoreTypedefDefinition(a.line, a.charPositionInLine, d.line, d.charPositionInLine, '', self.input.toString(c.start,c.stop))
+                          self.StoreTypedefDefinition(a.line, a.charPositionInLine, d.line, d.charPositionInLine, '', self.input.toString(c.start, c.stop))
                         	  
 
 
@@ -959,7 +959,7 @@ class CParser(Parser):
                     if self.backtracking == 0:
                           
                         if t is not None:
-                          self.StoreVariableDeclaration(s.start.line, s.start.charPositionInLine, t.start.line, t.start.charPositionInLine, self.input.toString(s.start,s.stop), self.input.toString(t.start,t.stop))
+                          self.StoreVariableDeclaration(s.start.line, s.start.charPositionInLine, t.start.line, t.start.charPositionInLine, self.input.toString(s.start, s.stop), self.input.toString(t.start, t.stop))
                         	
 
 
@@ -1403,7 +1403,7 @@ class CParser(Parser):
                     if self.backtracking == 0:
                           
                         if s.stop is not None:
-                          self.StoreStructUnionDefinition(s.start.line, s.start.charPositionInLine, s.stop.line, s.stop.charPositionInLine, self.input.toString(s.start,s.stop))
+                          self.StoreStructUnionDefinition(s.start.line, s.start.charPositionInLine, s.stop.line, s.stop.charPositionInLine, self.input.toString(s.start, s.stop))
                         	
 
 
@@ -1418,7 +1418,7 @@ class CParser(Parser):
                     if self.backtracking == 0:
                           
                         if e.stop is not None:
-                          self.StoreEnumerationDefinition(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                          self.StoreEnumerationDefinition(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
                         	
 
 
@@ -5401,7 +5401,7 @@ class CParser(Parser):
                 if self.failed:
                     return 
                 if self.backtracking == 0:
-                    self.postfix_expression_stack[-1].FuncCallText += self.input.toString(p.start,p.stop)
+                    self.postfix_expression_stack[-1].FuncCallText += self.input.toString(p.start, p.stop)
 
                 # C.g:407:9: ( '[' expression ']' | '(' a= ')' | '(' c= argument_expression_list b= ')' | '(' macro_parameter_list ')' | '.' x= IDENTIFIER | '*' y= IDENTIFIER | '->' z= IDENTIFIER | '++' | '--' )*
                 while True: #loop65
@@ -5501,7 +5501,7 @@ class CParser(Parser):
                         if self.failed:
                             return 
                         if self.backtracking == 0:
-                            self.StoreFunctionCalling(p.start.line, p.start.charPositionInLine, b.line, b.charPositionInLine, self.postfix_expression_stack[-1].FuncCallText, self.input.toString(c.start,c.stop))
+                            self.StoreFunctionCalling(p.start.line, p.start.charPositionInLine, b.line, b.charPositionInLine, self.postfix_expression_stack[-1].FuncCallText, self.input.toString(c.start, c.stop))
 
 
 
@@ -8277,7 +8277,7 @@ class CParser(Parser):
                     if self.failed:
                         return 
                     if self.backtracking == 0:
-                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
 
 
 
@@ -16384,7 +16384,7 @@ class CParser(Parser):
                     if self.failed:
                         return 
                     if self.backtracking == 0:
-                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
 
                     self.following.append(self.FOLLOW_statement_in_selection_statement2284)
                     self.statement()
@@ -16503,7 +16503,7 @@ class CParser(Parser):
                     if self.failed:
                         return 
                     if self.backtracking == 0:
-                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
 
 
 
@@ -16535,7 +16535,7 @@ class CParser(Parser):
                     if self.failed:
                         return 
                     if self.backtracking == 0:
-                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
 
 
 
@@ -16582,7 +16582,7 @@ class CParser(Parser):
                     if self.failed:
                         return 
                     if self.backtracking == 0:
-                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
 
 
 

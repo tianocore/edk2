@@ -53,7 +53,7 @@ def GetPackageList(Platform, BuildDatabase, Arch, Target, Toolchain):
 #  @retval: A dictionary contains instances of PcdClassObject with key (PcdCName, TokenSpaceGuid)
 #  @retval: A dictionary contains real GUIDs of TokenSpaceGuid
 #
-def GetDeclaredPcd(Platform, BuildDatabase, Arch, Target, Toolchain,additionalPkgs):
+def GetDeclaredPcd(Platform, BuildDatabase, Arch, Target, Toolchain, additionalPkgs):
     PkgList = GetPackageList(Platform, BuildDatabase, Arch, Target, Toolchain)
     PkgList = set(PkgList)
     PkgList |= additionalPkgs

@@ -94,7 +94,7 @@ PRINTABLE_LANGUAGE_NAME_STRING_NAME = '$PRINTABLE_LANGUAGE_NAME'
 # @retval:       The formatted hex string
 #
 def DecToHexStr(Dec, Digit = 8):
-    return '0x{0:0{1}X}'.format(Dec,Digit)
+    return '0x{0:0{1}X}'.format(Dec, Digit)
 
 ## Convert a dec number to a hex list
 #
@@ -109,7 +109,7 @@ def DecToHexStr(Dec, Digit = 8):
 # @retval:       A list for formatted hex string
 #
 def DecToHexList(Dec, Digit = 8):
-    Hex = '{0:0{1}X}'.format(Dec,Digit)
+    Hex = '{0:0{1}X}'.format(Dec, Digit)
     return ["0x" + Hex[Bit:Bit + 2] for Bit in range(Digit - 2, -1, -2)]
 
 ## Convert a acsii string to a hex list

@@ -355,7 +355,7 @@ class PackageHeaderXml(object):
     def FromXml(self, Item, Key, PackageObject2):
         if not Item:
             XmlTreeLevel = ['DistributionPackage', 'PackageSurfaceArea']
-            CheckDict = {'PackageHeader':None, }
+            CheckDict = {'PackageHeader': None, }
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
         self.PackagePath = XmlElement(Item, '%s/PackagePath' % Key)
         self.Header.FromXml(Item, Key)

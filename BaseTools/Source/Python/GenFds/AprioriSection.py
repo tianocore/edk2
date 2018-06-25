@@ -22,7 +22,7 @@ import FfsFileStatement
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import AprioriSectionClassObject
 from Common.StringUtils import *
-from Common.Misc import SaveFileOnChange,PathClass
+from Common.Misc import SaveFileOnChange, PathClass
 from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.DataType import TAB_COMMON

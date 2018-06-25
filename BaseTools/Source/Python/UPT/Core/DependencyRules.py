@@ -285,8 +285,8 @@ class DependencyRules(object):
                 pass
             DecPath = dirname(DecFile)
             if DecPath.find(WorkSP) > -1:
-                InstallPath = GetRelativePath(DecPath,WorkSP)
-                DecFileRelaPath = GetRelativePath(DecFile,WorkSP)
+                InstallPath = GetRelativePath(DecPath, WorkSP)
+                DecFileRelaPath = GetRelativePath(DecFile, WorkSP)
             else:
                 InstallPath = DecPath
                 DecFileRelaPath = DecFile
@@ -348,8 +348,8 @@ class DependencyRules(object):
                 pass
             DecPath = dirname(DecFile)
             if DecPath.find(WorkSP) > -1:
-                InstallPath = GetRelativePath(DecPath,WorkSP)
-                DecFileRelaPath = GetRelativePath(DecFile,WorkSP)
+                InstallPath = GetRelativePath(DecPath, WorkSP)
+                DecFileRelaPath = GetRelativePath(DecFile, WorkSP)
             else:
                 InstallPath = DecPath
                 DecFileRelaPath = DecFile

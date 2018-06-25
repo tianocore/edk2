@@ -258,8 +258,8 @@ class PackageTable(MetaFileTable):
                 ValidType = "@ValidList"
             if oricomment.startswith("@Expression"):
                 ValidType = "@Expression"
-            EdkLogger.error('Parser', FORMAT_INVALID, "The syntax for %s of PCD %s.%s is incorrect" % (ValidType,TokenSpaceGuid, PcdCName),
-                            ExtraData=oricomment,File=self.MetaFile, Line=LineNum)
+            EdkLogger.error('Parser', FORMAT_INVALID, "The syntax for %s of PCD %s.%s is incorrect" % (ValidType, TokenSpaceGuid, PcdCName),
+                            ExtraData=oricomment, File=self.MetaFile, Line=LineNum)
             return set(), set(), set()
         return set(validateranges), set(validlists), set(expressions)
 ## Python class representation of table storing platform data
@@ -308,7 +308,7 @@ class PlatformTable(MetaFileTable):
     #
     def Insert(self, Model, Value1, Value2, Value3, Scope1=TAB_ARCH_COMMON, Scope2=TAB_COMMON, Scope3=TAB_DEFAULT_STORES_DEFAULT,BelongsToItem=-1,
                FromItem=-1, StartLine=-1, StartColumn=-1, EndLine=-1, EndColumn=-1, Enabled=1):
-        (Value1, Value2, Value3, Scope1, Scope2,Scope3) = ConvertToSqlString((Value1, Value2, Value3, Scope1, Scope2,Scope3))
+        (Value1, Value2, Value3, Scope1, Scope2, Scope3) = ConvertToSqlString((Value1, Value2, Value3, Scope1, Scope2, Scope3))
         return Table.Insert(
                         self, 
                         Model, 

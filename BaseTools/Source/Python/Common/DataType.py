@@ -531,8 +531,8 @@ PCDS_DYNAMICEX_DEFAULT = "PcdsDynamicExDefault"
 PCDS_DYNAMICEX_VPD = "PcdsDynamicExVpd"
 PCDS_DYNAMICEX_HII = "PcdsDynamicExHii"
 
-SECTIONS_HAVE_ITEM_PCD_SET = {PCDS_DYNAMIC_DEFAULT.upper(),PCDS_DYNAMIC_VPD.upper(),PCDS_DYNAMIC_HII.upper(), \
-                              PCDS_DYNAMICEX_DEFAULT.upper(),PCDS_DYNAMICEX_VPD.upper(),PCDS_DYNAMICEX_HII.upper()}
+SECTIONS_HAVE_ITEM_PCD_SET = {PCDS_DYNAMIC_DEFAULT.upper(), PCDS_DYNAMIC_VPD.upper(), PCDS_DYNAMIC_HII.upper(), \
+                              PCDS_DYNAMICEX_DEFAULT.upper(), PCDS_DYNAMICEX_VPD.upper(), PCDS_DYNAMICEX_HII.upper()}
 # Section allowed to have items after arch
 SECTIONS_HAVE_ITEM_AFTER_ARCH_SET = {TAB_LIBRARY_CLASSES.upper(), TAB_DEPEX.upper(), TAB_USER_EXTENSIONS.upper(),
                                  PCDS_DYNAMIC_DEFAULT.upper(),

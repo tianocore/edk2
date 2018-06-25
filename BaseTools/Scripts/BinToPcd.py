@@ -41,13 +41,13 @@ if __name__ == '__main__':
         return Value
 
     def ValidatePcdName (Argument):
-        if re.split ('[a-zA-Z\_][a-zA-Z0-9\_]*\.[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) != ['','']:
+        if re.split ('[a-zA-Z\_][a-zA-Z0-9\_]*\.[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) != ['', '']:
             Message = '{Argument} is not in the form <PcdTokenSpaceGuidCName>.<PcdCName>'.format (Argument = Argument)
             raise argparse.ArgumentTypeError (Message)
         return Argument
 
     def ValidateGuidName (Argument):
-        if re.split ('[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) != ['','']:
+        if re.split ('[a-zA-Z\_][a-zA-Z0-9\_]*', Argument) != ['', '']:
             Message = '{Argument} is not a valid GUID C name'.format (Argument = Argument)
             raise argparse.ArgumentTypeError (Message)
         return Argument
@@ -84,7 +84,7 @@ if __name__ == '__main__':
                          help = "Output filename for PCD value or PCD statement")
     parser.add_argument ("-p", "--pcd", dest = 'PcdName', type = ValidatePcdName,
                          help = "Name of the PCD in the form <PcdTokenSpaceGuidCName>.<PcdCName>")
-    parser.add_argument ("-t", "--type", dest = 'PcdType', default = None, choices = ['VPD','HII'],
+    parser.add_argument ("-t", "--type", dest = 'PcdType', default = None, choices = ['VPD', 'HII'],
                          help = "PCD statement type (HII or VPD).  Default is standard.")
     parser.add_argument ("-m", "--max-size", dest = 'MaxSize', type = ValidateUnsignedInteger,
                          help = "Maximum size of the PCD.  Ignored with --type HII.")

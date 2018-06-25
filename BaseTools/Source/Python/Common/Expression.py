@@ -569,7 +569,7 @@ class ValueExpression(BaseExpression):
         IsArray = IsGuid = False
         if len(Token.split(',')) == 11 and len(Token.split(',{')) == 2 \
             and len(Token.split('},')) == 1:
-            HexLen = [11,6,6,5,4,4,4,4,4,4,6]
+            HexLen = [11, 6, 6, 5, 4, 4, 4, 4, 4, 4, 6]
             HexList= Token.split(',')
             if HexList[3].startswith('{') and \
                 not [Index for Index, Hex in enumerate(HexList) if len(Hex) > HexLen[Index]]:
@@ -765,7 +765,7 @@ class ValueExpression(BaseExpression):
     # Parse operator
     def _GetOperator(self):
         self.__SkipWS()
-        LegalOpLst = ['&&', '||', '!=', '==', '>=', '<='] + self.NonLetterOpLst + ['?',':']
+        LegalOpLst = ['&&', '||', '!=', '==', '>=', '<='] + self.NonLetterOpLst + ['?', ':']
 
         self._Token = ''
         Expr = self._Expr[self._Idx:]
@@ -842,7 +842,7 @@ class ValueExpressionEx(ValueExpression):
                         elif Item.startswith(TAB_UINT64):
                             ItemSize = 8
                             ValueType = TAB_UINT64
-                        elif Item[0] in {'"',"'",'L'}:
+                        elif Item[0] in {'"', "'", 'L'}:
                             ItemSize = 0
                             ValueType = TAB_VOID
                         else:
@@ -946,7 +946,7 @@ class ValueExpressionEx(ValueExpression):
                             # replace each offset, except errors
                             for Offset in OffsetList:
                                 try:
-                                    Item = Item.replace('OFFSET_OF({})'.format(Offset),LabelDict[Offset])
+                                    Item = Item.replace('OFFSET_OF({})'.format(Offset), LabelDict[Offset])
                                 except:
                                     raise BadExpression('%s not defined' % Offset)
 
@@ -999,7 +999,7 @@ class ValueExpressionEx(ValueExpression):
                                 Item = '0x%x' % TmpValue if type(TmpValue) != type('') else TmpValue
                                 if ItemSize == 0:
                                     ItemValue, ItemSize = ParseFieldValue(Item)
-                                    if Item[0] not in {'"','L','{'} and ItemSize > 1:
+                                    if Item[0] not in {'"', 'L', '{'} and ItemSize > 1:
                                         raise BadExpression("Byte  array number %s should less than 0xFF." % Item)
                                 else:
                                     ItemValue = ParseFieldValue(Item)[0]

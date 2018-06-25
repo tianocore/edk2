@@ -632,7 +632,7 @@ def SplitString(String):
 # @param StringList:  A list for strings to be converted
 #
 def ConvertToSqlString(StringList):
-    return map(lambda s: s.replace("'", "''") , StringList)
+    return map(lambda s: s.replace("'", "''"), StringList)
 
 ## Convert To Sql String
 #

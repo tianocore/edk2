@@ -59,11 +59,11 @@ class TargetTool():
     def ConvertTextFileToDict(self, FileName, CommentCharacter, KeySplitCharacter):
         """Convert a text file to a dictionary of (name:value) pairs."""
         try:
-            f = open(FileName,'r')
+            f = open(FileName, 'r')
             for Line in f:
                 if Line.startswith(CommentCharacter) or Line.strip() == '':
                     continue
-                LineList = Line.split(KeySplitCharacter,1)
+                LineList = Line.split(KeySplitCharacter, 1)
                 if len(LineList) >= 2:
                     Key = LineList[0].strip()
                     if Key.startswith(CommentCharacter) == False and Key in self.TargetTxtDictionary:
@@ -103,7 +103,7 @@ class TargetTool():
                 if Line.startswith(CommentCharacter) or Line.strip() == '':
                     fw.write(Line)
                 else:
-                    LineList = Line.split(KeySplitCharacter,1)
+                    LineList = Line.split(KeySplitCharacter, 1)
                     if len(LineList) >= 2:
                         Key = LineList[0].strip()
                         if Key.startswith(CommentCharacter) == False and Key in self.TargetTxtDictionary:
@@ -202,14 +202,14 @@ def RangeCheckCallback(option, opt_str, value, parser):
         parser.error("Option %s only allows one instance in command line!" % option)
         
 def MyOptionParser():
-    parser = OptionParser(version=__version__,prog="TargetTool.exe",usage=__usage__,description=__copyright__)
-    parser.add_option("-a", "--arch", action="append", type="choice", choices=['IA32','X64','IPF','EBC', 'ARM', 'AARCH64','0'], dest="TARGET_ARCH",
+    parser = OptionParser(version=__version__, prog="TargetTool.exe", usage=__usage__, description=__copyright__)
+    parser.add_option("-a", "--arch", action="append", type="choice", choices=['IA32', 'X64', 'IPF', 'EBC', 'ARM', 'AARCH64', '0'], dest="TARGET_ARCH",
         help="ARCHS is one of list: IA32, X64, IPF, ARM, AARCH64 or EBC, which replaces target.txt's TARGET_ARCH definition. To specify more archs, please repeat this option. 0 will clear this setting in target.txt and can't combine with other value.")
     parser.add_option("-p", "--platform", action="callback", type="string", dest="DSCFILE", callback=SingleCheckCallback,
         help="Specify a DSC file, which replace target.txt's ACTIVE_PLATFORM definition. 0 will clear this setting in target.txt and can't combine with other value.")
     parser.add_option("-c", "--tooldef", action="callback", type="string", dest="TOOL_DEFINITION_FILE", callback=SingleCheckCallback,
         help="Specify the WORKSPACE relative path of tool_def.txt file, which replace target.txt's TOOL_CHAIN_CONF definition. 0 will clear this setting in target.txt and can't combine with other value.")
-    parser.add_option("-t", "--target", action="append", type="choice", choices=['DEBUG','RELEASE','0'], dest="TARGET",
+    parser.add_option("-t", "--target", action="append", type="choice", choices=['DEBUG', 'RELEASE', '0'], dest="TARGET",
         help="TARGET is one of list: DEBUG, RELEASE, which replaces target.txt's TARGET definition. To specify more TARGET, please repeat this option. 0 will clear this setting in target.txt and can't combine with other value.")
     parser.add_option("-n", "--tagname", action="callback", type="string", dest="TOOL_CHAIN_TAG", callback=SingleCheckCallback,
         help="Specify the Tool Chain Tagname, which replaces target.txt's TOOL_CHAIN_TAG definition. 0 will clear this setting in target.txt and can't combine with other value.")

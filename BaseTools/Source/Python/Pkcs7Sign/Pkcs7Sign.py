@@ -88,7 +88,7 @@ if __name__ == '__main__':
   parser.add_argument("--signature-size", dest='SignatureSizeStr', type=str, help="specify the signature size for decode process.")
   parser.add_argument("-v", "--verbose", dest='Verbose', action="store_true", help="increase output messages")
   parser.add_argument("-q", "--quiet", dest='Quiet', action="store_true", help="reduce output messages")
-  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0,10), default=0, help="set debug level")
+  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0, 10), default=0, help="set debug level")
   parser.add_argument(metavar="input_file", dest='InputFile', type=argparse.FileType('rb'), help="specify the input filename")
 
   #

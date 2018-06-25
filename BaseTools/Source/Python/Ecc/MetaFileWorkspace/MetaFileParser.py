@@ -561,7 +561,7 @@ class InfParser(MetaFileParser):
                     NmakeLine = ''
 
             # section content
-            self._ValueList = ['','','']
+            self._ValueList = ['', '', '']
             # parse current line, result will be put in self._ValueList
             self._SectionParser[self._SectionType](self)
             if self._ValueList is None or self._ItemType == MODEL_META_DATA_DEFINE:
@@ -920,7 +920,7 @@ class DscParser(MetaFileParser):
 
     ## Directive statement parser
     def _DirectiveParser(self):
-        self._ValueList = ['','','']
+        self._ValueList = ['', '', '']
         TokenList = GetSplitValueList(self._CurrentLine, ' ', 1)
         self._ValueList[0:len(TokenList)] = TokenList
 
@@ -1110,7 +1110,7 @@ class DscParser(MetaFileParser):
 
     ## Override parent's method since we'll do all macro replacements in parser
     def _GetMacros(self):
-        Macros = dict( [('ARCH','IA32'), ('FAMILY','MSFT'),('TOOL_CHAIN_TAG','VS2008x86'),('TARGET','DEBUG')])
+        Macros = dict( [('ARCH', 'IA32'), ('FAMILY', 'MSFT'), ('TOOL_CHAIN_TAG', 'VS2008x86'), ('TARGET', 'DEBUG')])
         Macros.update(self._FileLocalMacros)
         Macros.update(self._GetApplicableSectionMacro())
         Macros.update(GlobalData.gEdkGlobal)
@@ -1225,7 +1225,7 @@ class DscParser(MetaFileParser):
         self._RawTable.Drop()
         self._Table.Drop()
         for Record in RecordList:
-            EccGlobalData.gDb.TblDsc.Insert(Record[1],Record[2],Record[3],Record[4],Record[5],Record[6],Record[7],Record[8],Record[9],Record[10],Record[11],Record[12],Record[13],Record[14])
+            EccGlobalData.gDb.TblDsc.Insert(Record[1], Record[2], Record[3], Record[4], Record[5], Record[6], Record[7], Record[8], Record[9], Record[10], Record[11], Record[12], Record[13], Record[14])
         GlobalData.gPlatformDefines.update(self._FileLocalMacros)
         self._PostProcessed = True
         self._Content = None
@@ -1246,7 +1246,7 @@ class DscParser(MetaFileParser):
 
     def __RetrievePcdValue(self):
         Records = self._RawTable.Query(MODEL_PCD_FEATURE_FLAG, BelongsToItem=-1.0)
-        for TokenSpaceGuid,PcdName,Value,Dummy2,Dummy3,ID,Line in Records:
+        for TokenSpaceGuid, PcdName, Value, Dummy2, Dummy3, ID, Line in Records:
             Value, DatumType, MaxDatumSize = AnalyzePcdData(Value)
             # Only use PCD whose value is straitforward (no macro and PCD)
             if self.SymbolPattern.findall(Value):
@@ -1259,7 +1259,7 @@ class DscParser(MetaFileParser):
             self._Symbols[Name] = Value
 
         Records = self._RawTable.Query(MODEL_PCD_FIXED_AT_BUILD, BelongsToItem=-1.0)
-        for TokenSpaceGuid,PcdName,Value,Dummy2,Dummy3,ID,Line in Records:
+        for TokenSpaceGuid, PcdName, Value, Dummy2, Dummy3, ID, Line in Records:
             Value, DatumType, MaxDatumSize = AnalyzePcdData(Value)
             # Only use PCD whose value is straitforward (no macro and PCD)
             if self.SymbolPattern.findall(Value):
@@ -1571,7 +1571,7 @@ class DecParser(MetaFileParser):
                 continue
 
             # section content
-            self._ValueList = ['','','']
+            self._ValueList = ['', '', '']
             self._SectionParser[self._SectionType[0]](self)
             if self._ValueList is None or self._ItemType == MODEL_META_DATA_DEFINE:
                 self._ItemType = -1
@@ -1717,7 +1717,7 @@ class DecParser(MetaFileParser):
                         GuidValue = GuidValue.lstrip(' {')
                         HexList.append('0x' + str(GuidValue[2:]))
                         Index += 1
-            self._ValueList[1] = "{ %s, %s, %s, { %s, %s, %s, %s, %s, %s, %s, %s }}" % (HexList[0], HexList[1], HexList[2],HexList[3],HexList[4],HexList[5],HexList[6],HexList[7],HexList[8],HexList[9],HexList[10])
+            self._ValueList[1] = "{ %s, %s, %s, { %s, %s, %s, %s, %s, %s, %s, %s }}" % (HexList[0], HexList[1], HexList[2], HexList[3], HexList[4], HexList[5], HexList[6], HexList[7], HexList[8], HexList[9], HexList[10])
         else:
             EdkLogger.error('Parser', FORMAT_INVALID, "Invalid GUID value format",
                             ExtraData=self._CurrentLine + \

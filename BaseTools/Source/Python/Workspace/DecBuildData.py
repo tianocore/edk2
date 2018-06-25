@@ -369,16 +369,16 @@ class DecBuildData(PackageBuildClassObject):
 
     def ProcessStructurePcd(self, StructurePcdRawDataSet):
         s_pcd_set = OrderedDict()
-        for s_pcd,LineNo in StructurePcdRawDataSet:
+        for s_pcd, LineNo in StructurePcdRawDataSet:
             if s_pcd.TokenSpaceGuidCName not in s_pcd_set:
                 s_pcd_set[s_pcd.TokenSpaceGuidCName] = []
-            s_pcd_set[s_pcd.TokenSpaceGuidCName].append((s_pcd,LineNo))
+            s_pcd_set[s_pcd.TokenSpaceGuidCName].append((s_pcd, LineNo))
 
         str_pcd_set = []
         for pcdname in s_pcd_set:
             dep_pkgs = []
             struct_pcd = StructurePcd()
-            for item,LineNo in s_pcd_set[pcdname]:
+            for item, LineNo in s_pcd_set[pcdname]:
                 if "<HeaderFiles>" in item.TokenCName:
                     struct_pcd.StructuredPcdIncludeFile.append(item.DefaultValue)
                 elif "<Packages>" in item.TokenCName:
@@ -391,7 +391,7 @@ class DecBuildData(PackageBuildClassObject):
                     struct_pcd.PkgPath = self.MetaFile.File
                     struct_pcd.SetDecDefaultValue(item.DefaultValue)
                 else:
-                    struct_pcd.AddDefaultValue(item.TokenCName, item.DefaultValue,self.MetaFile.File,LineNo)
+                    struct_pcd.AddDefaultValue(item.TokenCName, item.DefaultValue, self.MetaFile.File, LineNo)
 
             struct_pcd.PackageDecs = dep_pkgs
             str_pcd_set.append(struct_pcd)
@@ -412,7 +412,7 @@ class DecBuildData(PackageBuildClassObject):
         StrPcdSet = []
         RecordList = self._RawData[Type, self._Arch]
         for TokenSpaceGuid, PcdCName, Setting, Arch, PrivateFlag, Dummy1, Dummy2 in RecordList:
-            PcdDict[Arch, PcdCName, TokenSpaceGuid] = (Setting,Dummy2)
+            PcdDict[Arch, PcdCName, TokenSpaceGuid] = (Setting, Dummy2)
             if not (PcdCName, TokenSpaceGuid) in PcdSet:
                 PcdSet.append((PcdCName, TokenSpaceGuid))
 
@@ -421,7 +421,7 @@ class DecBuildData(PackageBuildClassObject):
             # limit the ARCH to self._Arch, if no self._Arch found, tdict
             # will automatically turn to 'common' ARCH and try again
             #
-            Setting,LineNo = PcdDict[self._Arch, PcdCName, TokenSpaceGuid]
+            Setting, LineNo = PcdDict[self._Arch, PcdCName, TokenSpaceGuid]
             if Setting is None:
                 continue
 
@@ -442,9 +442,9 @@ class DecBuildData(PackageBuildClassObject):
                                         list(validlists),
                                         list(expressions)
                                         )
-            PcdObj.DefinitionPosition = (self.MetaFile.File,LineNo)
+            PcdObj.DefinitionPosition = (self.MetaFile.File, LineNo)
             if "." in TokenSpaceGuid:
-                StrPcdSet.append((PcdObj,LineNo))
+                StrPcdSet.append((PcdObj, LineNo))
             else:
                 Pcds[PcdCName, TokenSpaceGuid, self._PCD_TYPE_STRING_[Type]] = PcdObj
 
@@ -455,10 +455,10 @@ class DecBuildData(PackageBuildClassObject):
         for pcd in Pcds.values():
             if pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
                 if StructPattern.match(pcd.DatumType) is None:
-                    EdkLogger.error('build', FORMAT_INVALID, "DatumType only support BOOLEAN, UINT8, UINT16, UINT32, UINT64, VOID* or a valid struct name.", pcd.DefinitionPosition[0],pcd.DefinitionPosition[1])
+                    EdkLogger.error('build', FORMAT_INVALID, "DatumType only support BOOLEAN, UINT8, UINT16, UINT32, UINT64, VOID* or a valid struct name.", pcd.DefinitionPosition[0], pcd.DefinitionPosition[1])
         for struct_pcd in Pcds.values():
-            if isinstance(struct_pcd,StructurePcd) and not struct_pcd.StructuredPcdIncludeFile:
-                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "The structure Pcd %s.%s header file is not found in %s line %s \n" % (struct_pcd.TokenSpaceGuidCName, struct_pcd.TokenCName,struct_pcd.DefinitionPosition[0],struct_pcd.DefinitionPosition[1] ))
+            if isinstance(struct_pcd, StructurePcd) and not struct_pcd.StructuredPcdIncludeFile:
+                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "The structure Pcd %s.%s header file is not found in %s line %s \n" % (struct_pcd.TokenSpaceGuidCName, struct_pcd.TokenCName, struct_pcd.DefinitionPosition[0], struct_pcd.DefinitionPosition[1] ))
 
         return Pcds
     @property

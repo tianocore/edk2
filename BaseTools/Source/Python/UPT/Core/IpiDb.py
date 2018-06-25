@@ -459,7 +459,7 @@ class IpiDatabase(object):
             (select InstallPath from ModInPkgInfo where 
             ModInPkgInfo.PackageGuid ='%s' 
             and ModInPkgInfo.PackageVersion = '%s')""" \
-                            % (Pkg[0], Pkg[1], Pkg[0], Pkg[1], Pkg[0], Pkg[1],Pkg[0], Pkg[1])
+                            % (Pkg[0], Pkg[1], Pkg[0], Pkg[1], Pkg[0], Pkg[1], Pkg[0], Pkg[1])
             
             self.Cur.execute(SqlCommand)
         #
@@ -921,7 +921,7 @@ class IpiDatabase(object):
     def __ConvertToSqlString(self, StringList):
         if self.DpTable:
             pass
-        return map(lambda s: s.replace("'", "''") , StringList)
+        return map(lambda s: s.replace("'", "''"), StringList)
 
 
 

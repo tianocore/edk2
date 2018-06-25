@@ -62,7 +62,7 @@ def FormatFilesInDir(DirPath, ExtList, Args):
         FormatFile(File, Args)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog=__prog__,description=__description__ + __copyright__, conflict_handler = 'resolve')
+    parser = argparse.ArgumentParser(prog=__prog__, description=__description__ + __copyright__, conflict_handler = 'resolve')
 
     parser.add_argument('Path', nargs='+',
                         help='the path for files to be converted.It could be directory or file path.')

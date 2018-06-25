@@ -379,8 +379,8 @@ class FV (FvClassObject):
                     # check if the file path exists or not
                     if not os.path.isfile(FileFullPath):
                         GenFdsGlobalVariable.ErrorLogger("Error opening FV Extension Header Entry file %s." % (self.FvExtEntryData[Index]))
-                    FvExtFile = open (FileFullPath,'rb')
-                    FvExtFile.seek(0,2)
+                    FvExtFile = open (FileFullPath, 'rb')
+                    FvExtFile.seek(0, 2)
                     Size = FvExtFile.tell()
                     if Size >= 0x10000:
                         GenFdsGlobalVariable.ErrorLogger("The size of FV Extension Header Entry file %s exceeds 0x10000." % (self.FvExtEntryData[Index]))
