@@ -23,7 +23,6 @@ import random
 import shutil
 import subprocess
 import sys
-import types
 import unittest
 
 TestsDir = os.path.realpath(os.path.split(sys.argv[0])[0])
@@ -42,7 +41,7 @@ if PythonSourceDir not in sys.path:
 def MakeTheTestSuite(localItems):
     tests = []
     for name, item in localItems.iteritems():
-        if isinstance(item, types.TypeType):
+        if isinstance(item, type):
             if issubclass(item, unittest.TestCase):
                 tests.append(unittest.TestLoader().loadTestsFromTestCase(item))
             elif issubclass(item, unittest.TestSuite):
