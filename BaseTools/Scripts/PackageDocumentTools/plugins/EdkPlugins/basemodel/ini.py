@@ -122,7 +122,7 @@ class BaseINIFile(object):
                 continue
 
             m = section_re.match(templine)
-            if mis not None: # found a section
+            if m is not None: # found a section
                 inGlobal = False
                 # Finish the latest section first
                 if len(sObjs) != 0:
