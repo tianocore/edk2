@@ -166,7 +166,7 @@ def _hookrm(path):
     else:
         __built_in_remove__(path)
 
-def _hookmkdir(path, mode=0777):
+def _hookmkdir(path, mode=0o777):
     if GlobalData.gRECOVERMGR:
         GlobalData.gRECOVERMGR.bkmkdir(path, mode)
     else:
