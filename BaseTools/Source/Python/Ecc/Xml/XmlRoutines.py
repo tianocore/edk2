@@ -35,7 +35,7 @@ def CreateXmlElement(Name, String, NodeList, AttributeList):
         Element.appendChild(Doc.createTextNode(String))
     
     for Item in NodeList:
-        if type(Item) == type([]):
+        if isinstance(Item, type([])):
             Key = Item[0]
             Value = Item[1]
             if Key != '' and Key is not None and Value != '' and Value is not None:

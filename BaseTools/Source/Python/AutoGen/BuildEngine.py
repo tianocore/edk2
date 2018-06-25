@@ -68,7 +68,7 @@ class TargetDescBlock(object):
         return hash(self.Target.Path)
 
     def __eq__(self, Other):
-        if type(Other) == type(self):
+        if isinstance(Other, type(self)):
             return Other.Target.Path == self.Target.Path
         else:
             return str(Other) == self.Target.Path

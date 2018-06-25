@@ -251,7 +251,7 @@ def SplitModuleType(Key):
 def ReplaceMacros(StringList, MacroDefinitions={}, SelfReplacement=False):
     NewList = []
     for String in StringList:
-        if type(String) == type(''):
+        if isinstance(String, type('')):
             NewList.append(ReplaceMacro(String, MacroDefinitions, SelfReplacement))
         else:
             NewList.append(String)
@@ -793,7 +793,7 @@ def RemoveBlockComment(Lines):
 # Get String of a List
 #
 def GetStringOfList(List, Split=' '):
-    if type(List) != type([]):
+    if not isinstance(List, type([])):
         return List
     Str = ''
     for Item in List:

@@ -493,8 +493,7 @@ def GenPackages(ModuleObject):
         Statement += RelaPath.replace('\\', '/')
         if FFE:
             Statement += '|' + FFE
-        ArchList = PackageDependency.GetSupArchList()
-        ArchList.sort()
+        ArchList = sorted(PackageDependency.GetSupArchList())
         SortedArch = ' '.join(ArchList)
         if SortedArch in NewSectionDict:
             NewSectionDict[SortedArch] = NewSectionDict[SortedArch] + [Statement]
@@ -513,8 +512,7 @@ def GenSources(ModuleObject):
         SourceFile = Source.GetSourceFile()
         Family = Source.GetFamily()
         FeatureFlag = Source.GetFeatureFlag()
-        SupArchList = Source.GetSupArchList()
-        SupArchList.sort()
+        SupArchList = sorted(Source.GetSupArchList())
         SortedArch = ' '.join(SupArchList)
         Statement = GenSourceStatement(ConvertPath(SourceFile), Family, FeatureFlag)
         if SortedArch in NewSectionDict:
@@ -722,8 +720,7 @@ def GenGuidSections(GuidObjList):
         #
         # merge duplicate items
         #
-        ArchList = Guid.GetSupArchList()
-        ArchList.sort()
+        ArchList = sorted(Guid.GetSupArchList())
         SortedArch = ' '.join(ArchList)
         if (Statement, SortedArch) in GuidDict:
             PreviousComment = GuidDict[Statement, SortedArch]
@@ -782,8 +779,7 @@ def GenProtocolPPiSections(ObjList, IsProtocol):
         #
         # merge duplicate items
         #
-        ArchList = Object.GetSupArchList()
-        ArchList.sort()
+        ArchList = sorted(Object.GetSupArchList())
         SortedArch = ' '.join(ArchList)
         if (Statement, SortedArch) in Dict:
             PreviousComment = Dict[Statement, SortedArch]
@@ -857,8 +853,7 @@ def GenPcdSections(ModuleObject):
             #
             # Merge duplicate entries
             #
-            ArchList = Pcd.GetSupArchList()
-            ArchList.sort()
+            ArchList = sorted(Pcd.GetSupArchList())
             SortedArch = ' '.join(ArchList)
             if (Statement, SortedArch) in Dict:
                 PreviousComment = Dict[Statement, SortedArch]
@@ -1025,8 +1020,7 @@ def GenSpecialSections(ObjectList, SectionName, UserExtensionsContent=''):
         if CommentStr and not CommentStr.endswith('\n#\n'):
             CommentStr = CommentStr + '#\n'
         NewStateMent = CommentStr + Statement
-        SupArch = Obj.GetSupArchList()
-        SupArch.sort()
+        SupArch = sorted(Obj.GetSupArchList())
         SortedArch = ' '.join(SupArch)
         if SortedArch in NewSectionDict:
             NewSectionDict[SortedArch] = NewSectionDict[SortedArch] + [NewStateMent]
@@ -1104,8 +1098,7 @@ def GenBinaries(ModuleObject):
             FileName = ConvertPath(FileNameObj.GetFilename())
             FileType = FileNameObj.GetFileType()
             FFE = FileNameObj.GetFeatureFlag()
-            ArchList = FileNameObj.GetSupArchList()
-            ArchList.sort()
+            ArchList = sorted(FileNameObj.GetSupArchList())
             SortedArch = ' '.join(ArchList)
             Key = (FileName, FileType, FFE, SortedArch)
             if Key in BinariesDict:

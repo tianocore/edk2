@@ -83,7 +83,7 @@ class TargetTool():
     def Print(self):
         errMsg  = ''
         for Key in self.TargetTxtDictionary:
-            if type(self.TargetTxtDictionary[Key]) == type([]):
+            if isinstance(self.TargetTxtDictionary[Key], type([])):
                 print("%-30s = %s" % (Key, ''.join(elem + ' ' for elem in self.TargetTxtDictionary[Key])))
             elif self.TargetTxtDictionary[Key] is None:
                 errMsg += "  Missing %s configuration information, please use TargetTool to set value!" % Key + os.linesep 

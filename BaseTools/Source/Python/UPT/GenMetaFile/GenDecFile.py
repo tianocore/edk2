@@ -123,8 +123,7 @@ def GenPcd(Package, Content):
         if Pcd.GetSupModuleList():
             Statement += GenDecTailComment(Pcd.GetSupModuleList())
 
-        ArchList = Pcd.GetSupArchList()
-        ArchList.sort()
+        ArchList = sorted(Pcd.GetSupArchList())
         SortedArch = ' '.join(ArchList)
         if SortedArch in NewSectionDict:
             NewSectionDict[SortedArch] = \
@@ -205,8 +204,7 @@ def GenGuidProtocolPpi(Package, Content):
         #
         if Guid.GetSupModuleList():
             Statement += GenDecTailComment(Guid.GetSupModuleList())     
-        ArchList = Guid.GetSupArchList()
-        ArchList.sort()
+        ArchList = sorted(Guid.GetSupArchList())
         SortedArch = ' '.join(ArchList)
         if SortedArch in NewSectionDict:
             NewSectionDict[SortedArch] = \
@@ -246,8 +244,7 @@ def GenGuidProtocolPpi(Package, Content):
         #
         if Protocol.GetSupModuleList():
             Statement += GenDecTailComment(Protocol.GetSupModuleList())
-        ArchList = Protocol.GetSupArchList()
-        ArchList.sort()
+        ArchList = sorted(Protocol.GetSupArchList())
         SortedArch = ' '.join(ArchList)
         if SortedArch in NewSectionDict:
             NewSectionDict[SortedArch] = \
@@ -287,8 +284,7 @@ def GenGuidProtocolPpi(Package, Content):
         #
         if Ppi.GetSupModuleList():
             Statement += GenDecTailComment(Ppi.GetSupModuleList())
-        ArchList = Ppi.GetSupArchList()
-        ArchList.sort()
+        ArchList = sorted(Ppi.GetSupArchList())
         SortedArch = ' '.join(ArchList)
         if SortedArch in NewSectionDict:
             NewSectionDict[SortedArch] = \
@@ -463,8 +459,7 @@ def PackageToDec(Package, DistHeader = None):
         if LibraryClass.GetSupModuleList():
             Statement += \
             GenDecTailComment(LibraryClass.GetSupModuleList())
-        ArchList = LibraryClass.GetSupArchList()
-        ArchList.sort()
+        ArchList = sorted(LibraryClass.GetSupArchList())
         SortedArch = ' '.join(ArchList)
         if SortedArch in NewSectionDict:
             NewSectionDict[SortedArch] = \

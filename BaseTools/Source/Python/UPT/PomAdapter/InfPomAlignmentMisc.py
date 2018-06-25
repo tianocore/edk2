@@ -194,8 +194,7 @@ def GenBinaryData(BinaryData, BinaryObj, BinariesDict, AsBuildIns, BinaryFileObj
         # can be used for the attribute.
         # If both not have VALID_ARCHITECTURE comment and no architecturie specified, then keep it empty.
         #        
-        SupArchList = ConvertArchList(ItemObj.GetSupArchList())
-        SupArchList.sort()
+        SupArchList = sorted(ConvertArchList(ItemObj.GetSupArchList()))
         if len(SupArchList) == 1 and SupArchList[0] == 'COMMON':
             if not (len(OriSupArchList) == 1 or OriSupArchList[0] == 'COMMON'):
                 SupArchList = OriSupArchList

@@ -927,13 +927,13 @@ class DscBuildData(PlatformBuildClassObject):
             for pcdname in Pcds:
                 pcd = Pcds[pcdname]
                 Pcds[pcdname].SkuInfoList = {TAB_DEFAULT:pcd.SkuInfoList[skuid] for skuid in pcd.SkuInfoList if skuid in available_sku}
-                if type(pcd) is StructurePcd and pcd.SkuOverrideValues:
+                if isinstance(pcd, StructurePcd) and pcd.SkuOverrideValues:
                     Pcds[pcdname].SkuOverrideValues = {TAB_DEFAULT:pcd.SkuOverrideValues[skuid] for skuid in pcd.SkuOverrideValues if skuid in available_sku}
         else:
             for pcdname in Pcds:
                 pcd = Pcds[pcdname]
                 Pcds[pcdname].SkuInfoList = {skuid:pcd.SkuInfoList[skuid] for skuid in pcd.SkuInfoList if skuid in available_sku}
-                if type(pcd) is StructurePcd and pcd.SkuOverrideValues:
+                if isinstance(pcd, StructurePcd) and pcd.SkuOverrideValues:
                     Pcds[pcdname].SkuOverrideValues = {skuid:pcd.SkuOverrideValues[skuid] for skuid in pcd.SkuOverrideValues if skuid in available_sku}
         return Pcds
     def CompleteHiiPcdsDefaultStores(self, Pcds):
@@ -964,7 +964,7 @@ class DscBuildData(PlatformBuildClassObject):
     def __ParsePcdFromCommandLine(self):
         if GlobalData.BuildOptionPcd:
             for i, pcd in enumerate(GlobalData.BuildOptionPcd):
-                if type(pcd) is tuple:
+                if isinstance(pcd, tuple):
                     continue
                 (pcdname, pcdvalue) = pcd.split('=')
                 if not pcdvalue:
@@ -1320,7 +1320,7 @@ class DscBuildData(PlatformBuildClassObject):
                             File=self.MetaFile, Line = StrPcdSet[str_pcd][0][5])
         # Add the Structure PCD that only defined in DEC, don't have override in DSC file
         for Pcd in self.DecPcds:
-            if type (self._DecPcds[Pcd]) is StructurePcd:
+            if isinstance(self._DecPcds[Pcd], StructurePcd):
                 if Pcd not in S_pcd_set:
                     str_pcd_obj_str = StructurePcd()
                     str_pcd_obj_str.copy(self._DecPcds[Pcd])

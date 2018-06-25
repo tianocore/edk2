@@ -341,7 +341,7 @@ def IsValidCFormatGuid(Guid):
                 #
                 # Index may out of bound
                 #
-                if type(List[Index]) != type(1) or \
+                if not isinstance(List[Index], type(1)) or \
                    len(Value) > List[Index] or len(Value) < 3:
                     return False
                 

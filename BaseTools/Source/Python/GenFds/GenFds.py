@@ -785,7 +785,7 @@ class GenFds :
                         if not Name:
                             continue
 
-                        Name = ' '.join(Name) if type(Name) == type([]) else Name
+                        Name = ' '.join(Name) if isinstance(Name, type([])) else Name
                         GuidXRefFile.write("%s %s\n" %(FileStatementGuid, Name))
 
        # Append GUIDs, Protocols, and PPIs to the Xref file

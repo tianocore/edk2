@@ -305,7 +305,7 @@ def LaunchCommand(Command, WorkingDir):
         if EndOfProcedure is not None:
             EndOfProcedure.set()
         if Proc is None:
-            if type(Command) != type(""):
+            if not isinstance(Command, type("")):
                 Command = " ".join(Command)
             EdkLogger.error("build", COMMAND_FAILURE, "Failed to start command", ExtraData="%s [%s]" % (Command, WorkingDir))
 
@@ -316,7 +316,7 @@ def LaunchCommand(Command, WorkingDir):
 
     # check the return code of the program
     if Proc.returncode != 0:
-        if type(Command) != type(""):
+        if not isinstance(Command, type("")):
             Command = " ".join(Command)
         # print out the Response file and its content when make failure
         RespFile = os.path.join(WorkingDir, 'OUTPUT', 'respfilelist.txt')

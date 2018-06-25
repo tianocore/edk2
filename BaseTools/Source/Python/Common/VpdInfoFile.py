@@ -127,8 +127,7 @@ class VpdInfoFile:
                             "Invalid parameter FilePath: %s." % FilePath)        
 
         Content = FILE_COMMENT_TEMPLATE
-        Pcds = self._VpdArray.keys()
-        Pcds.sort()
+        Pcds = sorted(self._VpdArray.keys())
         for Pcd in Pcds:
             i = 0
             PcdTokenCName = Pcd.TokenCName

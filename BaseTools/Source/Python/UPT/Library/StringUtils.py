@@ -651,7 +651,7 @@ def ConvertToSqlString2(String):
 # @param Split: split character
 #
 def GetStringOfList(List, Split=' '):
-    if type(List) != type([]):
+    if not isinstance(List, type([])):
         return List
     Str = ''
     for Item in List:

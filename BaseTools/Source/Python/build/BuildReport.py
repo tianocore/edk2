@@ -1865,8 +1865,7 @@ class FdRegionReport(object):
                 for Match in gOffsetGuidPattern.finditer(FvReport):
                     Guid = Match.group(2).upper()
                     OffsetInfo[Match.group(1)] = self._GuidsDb.get(Guid, Guid)
-                OffsetList = OffsetInfo.keys()
-                OffsetList.sort()
+                OffsetList = sorted(OffsetInfo.keys())
                 for Offset in OffsetList:
                     FileWrite (File, "%s %s" % (Offset, OffsetInfo[Offset]))
             except IOError:

@@ -68,7 +68,7 @@ def ParseMacro(Parser):
         self._ItemType = MODEL_META_DATA_DEFINE
         # DEFINE defined macros
         if Type == TAB_DSC_DEFINES_DEFINE:
-            if type(self) == DecParser:
+            if isinstance(self, DecParser):
                 if MODEL_META_DATA_HEADER in self._SectionType:
                     self._FileLocalMacros[Name] = Value
                 else:
@@ -83,7 +83,7 @@ def ParseMacro(Parser):
                 SectionLocalMacros = self._SectionsMacroDict[SectionDictKey]
                 SectionLocalMacros[Name] = Value
         # EDK_GLOBAL defined macros
-        elif type(self) != DscParser:
+        elif not isinstance(self, DscParser):
             EdkLogger.error('Parser', FORMAT_INVALID, "EDK_GLOBAL can only be used in .dsc file",
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex+1)
         elif self._SectionType != MODEL_META_DATA_HEADER:
@@ -215,7 +215,7 @@ class MetaFileParser(object):
     #   DataInfo = [data_type, scope1(arch), scope2(platform/moduletype)]
     #
     def __getitem__(self, DataInfo):
-        if type(DataInfo) != type(()):
+        if not isinstance(DataInfo, type(())):
             DataInfo = (DataInfo,)
 
         # Parse the file first, if necessary
@@ -257,7 +257,7 @@ class MetaFileParser(object):
         TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT)
         self._ValueList[0:len(TokenList)] = TokenList
         # Don't do macro replacement for dsc file at this point
-        if type(self) != DscParser:
+        if not isinstance(self, DscParser):
             Macros = self._Macros
             self._ValueList = [ReplaceMacro(Value, Macros) for Value in self._ValueList]
 
@@ -355,7 +355,7 @@ class MetaFileParser(object):
             if os.path.exists(UniFile):
                 self._UniObj = UniParser(UniFile, IsExtraUni=False, IsModuleUni=False)
         
-        if type(self) == InfParser and self._Version < 0x00010005:
+        if isinstance(self, InfParser) and self._Version < 0x00010005:
             # EDK module allows using defines as macros
             self._FileLocalMacros[Name] = Value
         self._Defines[Name] = Value
@@ -370,7 +370,7 @@ class MetaFileParser(object):
             self._ValueList[1] = TokenList2[1]              # keys
         else:
             self._ValueList[1] = TokenList[0]
-        if len(TokenList) == 2 and type(self) != DscParser: # value
+        if len(TokenList) == 2 and not isinstance(self, DscParser): # value
             self._ValueList[2] = ReplaceMacro(TokenList[1], self._Macros)
 
         if self._ValueList[1].count('_') != 4:

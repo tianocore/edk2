@@ -514,7 +514,7 @@ class PathClass(object):
     # Check whether PathClass are the same
     #
     def __eq__(self, Other):
-        if type(Other) == type(self):
+        if isinstance(Other, type(self)):
             return self.Path == Other.Path
         else:
             return self.Path == str(Other)
@@ -819,11 +819,11 @@ def ConvertArchList(ArchList):
     if not ArchList:
         return NewArchList
 
-    if type(ArchList) == list:
+    if isinstance(ArchList, list):
         for Arch in ArchList:
             Arch = Arch.upper()
             NewArchList.append(Arch)
-    elif type(ArchList) == str:
+    elif isinstance(ArchList, str):
         ArchList = ArchList.upper()
         NewArchList.append(ArchList)
 

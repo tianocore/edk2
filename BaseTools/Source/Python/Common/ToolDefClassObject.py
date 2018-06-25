@@ -158,7 +158,7 @@ class ToolDefClassObject(object):
                             if ErrorCode != 0:
                                 EdkLogger.error("tools_def.txt parser", FILE_NOT_FOUND, ExtraData=IncFile)
 
-                    if type(IncFileTmp) is PathClass:
+                    if isinstance(IncFileTmp, PathClass):
                         IncFile = IncFileTmp.Path
                     else:
                         IncFile = IncFileTmp

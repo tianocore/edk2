@@ -409,8 +409,7 @@ class DecPomAlignment(PackageObject):
         # 
         PackagePath = os.path.split(self.GetFullPath())[0]
         IncludePathList = \
-            [os.path.normpath(Path) + sep for Path in IncludesDict.keys()]
-        IncludePathList.sort()
+            sorted([os.path.normpath(Path) + sep for Path in IncludesDict.keys()])
         
         #
         # get a non-overlap set of include path, IncludePathList should be 

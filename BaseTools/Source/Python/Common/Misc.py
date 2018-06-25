@@ -1291,9 +1291,9 @@ def ParseDevPathValue (Value):
     return '{' + out + '}', Size
 
 def ParseFieldValue (Value):
-    if type(Value) == type(0):
+    if isinstance(Value, type(0)):
         return Value, (Value.bit_length() + 7) / 8
-    if type(Value) != type(''):
+    if not isinstance(Value, type('')):
         raise BadExpression('Type %s is %s' %(Value, type(Value)))
     Value = Value.strip()
     if Value.startswith(TAB_UINT8) and Value.endswith(')'):
@@ -1584,8 +1584,7 @@ def CheckPcdDatum(Type, Value):
             Printset.add(TAB_PRINTCHAR_BS)
             Printset.add(TAB_PRINTCHAR_NUL)
             if not set(Value).issubset(Printset):
-                PrintList = list(Printset)
-                PrintList.sort()
+                PrintList = sorted(Printset)
                 return False, "Invalid PCD string value of type [%s]; must be printable chars %s." % (Type, PrintList)
     elif Type == 'BOOLEAN':
         if Value not in ['TRUE', 'True', 'true', '0x1', '0x01', '1', 'FALSE', 'False', 'false', '0x0', '0x00', '0']:
@@ -1747,7 +1746,7 @@ class PathClass(object):
     # @retval True  The two PathClass are the same
     #
     def __eq__(self, Other):
-        if type(Other) == type(self):
+        if isinstance(Other, type(self)):
             return self.Path == Other.Path
         else:
             return self.Path == str(Other)
@@ -1760,7 +1759,7 @@ class PathClass(object):
     # @retval -1    The first PathClass is less than the second PathClass
     # @retval 1     The first PathClass is Bigger than the second PathClass
     def __cmp__(self, Other):
-        if type(Other) == type(self):
+        if isinstance(Other, type(self)):
             OtherKey = Other.Path
         else:
             OtherKey = str(Other)
@@ -2010,7 +2009,7 @@ class SkuClass():
             return ["DEFAULT"]
         skulist = [sku]
         nextsku = sku
-        while 1:
+        while True:
             nextsku = self.GetNextSkuId(nextsku)
             skulist.append(nextsku)
             if nextsku == "DEFAULT":

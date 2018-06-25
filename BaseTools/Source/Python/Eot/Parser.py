@@ -730,7 +730,7 @@ def GetParameter(Parameter, Index = 1):
 #  @return: The name of parameter
 #
 def GetParameterName(Parameter):
-    if type(Parameter) == type('') and Parameter.startswith('&'):
+    if isinstance(Parameter, type('')) and Parameter.startswith('&'):
         return Parameter[1:].replace('{', '').replace('}', '').replace('\r', '').replace('\n', '').strip()
     else:
         return Parameter.strip()

@@ -245,12 +245,12 @@ class ValueExpression(BaseExpression):
         WrnExp = None
 
         if Operator not in {"==", "!=", ">=", "<=", ">", "<", "in", "not in"} and \
-            (type(Oprand1) == type('') or type(Oprand2) == type('')):
+            (isinstance(Oprand1, type('')) or isinstance(Oprand2, type(''))):
             raise BadExpression(ERR_STRING_EXPR % Operator)
         if Operator in {'in', 'not in'}:
-            if type(Oprand1) != type(''):
+            if not isinstance(Oprand1, type('')):
                 Oprand1 = IntToStr(Oprand1)
-            if type(Oprand2) != type(''):
+            if not isinstance(Oprand2, type('')):
                 Oprand2 = IntToStr(Oprand2)
         TypeDict = {
             type(0)  : 0,
@@ -261,18 +261,18 @@ class ValueExpression(BaseExpression):
 
         EvalStr = ''
         if Operator in {"!", "NOT", "not"}:
-            if type(Oprand1) == type(''):
+            if isinstance(Oprand1, type('')):
                 raise BadExpression(ERR_STRING_EXPR % Operator)
             EvalStr = 'not Oprand1'
         elif Operator in {"~"}:
-            if type(Oprand1) == type(''):
+            if isinstance(Oprand1, type('')):
                 raise BadExpression(ERR_STRING_EXPR % Operator)
             EvalStr = '~ Oprand1'
         else:
             if Operator in {"+", "-"} and (type(True) in {type(Oprand1), type(Oprand2)}):
                 # Boolean in '+'/'-' will be evaluated but raise warning
                 WrnExp = WrnExpression(WRN_BOOL_EXPR)
-            elif type('') in {type(Oprand1), type(Oprand2)} and type(Oprand1)!= type(Oprand2):
+            elif type('') in {type(Oprand1), type(Oprand2)} and not isinstance(Oprand1, type(Oprand2)):
                 # == between string and number/boolean will always return False, != return True
                 if Operator == "==":
                     WrnExp = WrnExpression(WRN_EQCMP_STR_OTHERS)
@@ -293,11 +293,11 @@ class ValueExpression(BaseExpression):
                     pass
                 else:
                     raise BadExpression(ERR_EXPR_TYPE)
-            if type(Oprand1) == type('') and type(Oprand2) == type(''):
+            if isinstance(Oprand1, type('')) and isinstance(Oprand2, type('')):
                 if (Oprand1.startswith('L"') and not Oprand2.startswith('L"')) or \
                     (not Oprand1.startswith('L"') and Oprand2.startswith('L"')):
                     raise BadExpression(ERR_STRING_CMP % (Oprand1, Operator, Oprand2))
-            if 'in' in Operator and type(Oprand2) == type(''):
+            if 'in' in Operator and isinstance(Oprand2, type('')):
                 Oprand2 = Oprand2.split()
             EvalStr = 'Oprand1 ' + Operator + ' Oprand2'
 
@@ -325,7 +325,7 @@ class ValueExpression(BaseExpression):
     def __init__(self, Expression, SymbolTable={}):
         super(ValueExpression, self).__init__(self, Expression, SymbolTable)
         self._NoProcess = False
-        if type(Expression) != type(''):
+        if not isinstance(Expression, type('')):
             self._Expr = Expression
             self._NoProcess = True
             return
@@ -373,7 +373,7 @@ class ValueExpression(BaseExpression):
                 Token = self._GetToken()
             except BadExpression:
                 pass
-            if type(Token) == type('') and Token.startswith('{') and Token.endswith('}') and self._Idx >= self._Len:
+            if isinstance(Token, type('')) and Token.startswith('{') and Token.endswith('}') and self._Idx >= self._Len:
                 return self._Expr
 
             self._Idx = 0
@@ -381,7 +381,7 @@ class ValueExpression(BaseExpression):
 
         Val = self._ConExpr()
         RealVal = Val
-        if type(Val) == type(''):
+        if isinstance(Val, type('')):
             if Val == 'L""':
                 Val = False
             elif not Val:
@@ -640,7 +640,7 @@ class ValueExpression(BaseExpression):
                 Ex.Pcd = self._Token
                 raise Ex
             self._Token = ValueExpression(self._Symb[self._Token], self._Symb)(True, self._Depth+1)
-            if type(self._Token) != type(''):
+            if not isinstance(self._Token, type('')):
                 self._LiteralToken = hex(self._Token)
                 return
 
@@ -735,7 +735,7 @@ class ValueExpression(BaseExpression):
                 if Ch == ')':
                     TmpValue = self._Expr[Idx :self._Idx - 1]
                     TmpValue = ValueExpression(TmpValue)(True)
-                    TmpValue = '0x%x' % int(TmpValue) if type(TmpValue) != type('') else TmpValue
+                    TmpValue = '0x%x' % int(TmpValue) if not isinstance(TmpValue, type('')) else TmpValue
                     break
             self._Token, Size = ParseFieldValue(Prefix + '(' + TmpValue + ')')
             return  self._Token
@@ -824,7 +824,7 @@ class ValueExpressionEx(ValueExpression):
                 PcdValue = PcdValue.strip()
                 if PcdValue.startswith('{') and PcdValue.endswith('}'):
                     PcdValue = SplitPcdValueString(PcdValue[1:-1])
-                if type(PcdValue) == type([]):
+                if isinstance(PcdValue, type([])):
                     TmpValue = 0
                     Size = 0
                     ValueType = ''
@@ -863,7 +863,7 @@ class ValueExpressionEx(ValueExpression):
                         else:
                             ItemValue = ParseFieldValue(Item)[0]
 
-                        if type(ItemValue) == type(''):
+                        if isinstance(ItemValue, type('')):
                             ItemValue = int(ItemValue, 0)
 
                         TmpValue = (ItemValue << (Size * 8)) | TmpValue
@@ -873,7 +873,7 @@ class ValueExpressionEx(ValueExpression):
                         TmpValue, Size = ParseFieldValue(PcdValue)
                     except BadExpression as Value:
                         raise BadExpression("Type: %s, Value: %s, %s" % (self.PcdType, PcdValue, Value))
-                if type(TmpValue) == type(''):
+                if isinstance(TmpValue, type('')):
                     try:
                         TmpValue = int(TmpValue)
                     except:
@@ -996,7 +996,7 @@ class ValueExpressionEx(ValueExpression):
                                     TmpValue = ValueExpressionEx(Item, ValueType, self._Symb)(True)
                                 else:
                                     TmpValue = ValueExpressionEx(Item, self.PcdType, self._Symb)(True)
-                                Item = '0x%x' % TmpValue if type(TmpValue) != type('') else TmpValue
+                                Item = '0x%x' % TmpValue if not isinstance(TmpValue, type('')) else TmpValue
                                 if ItemSize == 0:
                                     ItemValue, ItemSize = ParseFieldValue(Item)
                                     if Item[0] not in {'"', 'L', '{'} and ItemSize > 1:

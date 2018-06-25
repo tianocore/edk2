@@ -257,9 +257,9 @@ class SourceFiles:
             replaceables = ('extract-dir', 'filename', 'url')
             for replaceItem in fdata:
                 if replaceItem in replaceables: continue
-                if type(fdata[replaceItem]) != str: continue
+                if not isinstance(fdata[replaceItem], str): continue
                 for replaceable in replaceables:
-                    if type(fdata[replaceable]) != str: continue
+                    if not isinstance(fdata[replaceable], str): continue
                     if replaceable in fdata:
                         fdata[replaceable] = \
                             fdata[replaceable].replace(
