@@ -148,6 +148,11 @@ TranslateBmpToGopBlt (
     return RETURN_UNSUPPORTED;
   }
 
+  if ((BmpHeader->PixelHeight == 0) || (BmpHeader->PixelWidth == 0)) {
+    DEBUG ((DEBUG_ERROR, "TranslateBmpToGopBlt: BmpHeader->PixelHeight or BmpHeader->PixelWidth is 0.\n"));
+    return RETURN_UNSUPPORTED;
+  }
+
   //
   // Only support BITMAPINFOHEADER format.
   // BITMAPFILEHEADER + BITMAPINFOHEADER = BMP_IMAGE_HEADER
@@ -482,6 +487,10 @@ TranslateGopBltToBmp (
 
   if (GopBlt == NULL || BmpImage == NULL || BmpImageSize == NULL) {
     return RETURN_INVALID_PARAMETER;
+  }
+
+  if ((PixelHeight == 0) || (PixelWidth == 0)) {
+    return RETURN_UNSUPPORTED;
   }
 
   //
