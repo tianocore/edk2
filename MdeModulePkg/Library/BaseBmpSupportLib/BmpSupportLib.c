@@ -288,7 +288,7 @@ TranslateBmpToGopBlt (
     DEBUG ((
       DEBUG_ERROR,
       "TranslateBmpToGopBlt: invalid BltBuffer needed size... PixelWidth:0x%x PixelHeight:0x%x\n",
-      BltBufferSize
+      BmpHeader->PixelWidth, BmpHeader->PixelHeight
       ));
 
     return RETURN_UNSUPPORTED;
@@ -304,7 +304,7 @@ TranslateBmpToGopBlt (
   if (EFI_ERROR (Status)) {
     DEBUG ((
       DEBUG_ERROR,
-      "TranslateBmpToGopBlt: invalid BltBuffer needed size... BltBufferSize:0x%lx struct size:0x%x\n",
+      "TranslateBmpToGopBlt: invalid BltBuffer needed size... PixelWidth x PixelHeight:0x%x struct size:0x%x\n",
       Temp, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
       ));
 
