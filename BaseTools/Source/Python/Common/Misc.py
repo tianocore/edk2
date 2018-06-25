@@ -1293,7 +1293,7 @@ def ParseDevPathValue (Value):
 def ParseFieldValue (Value):
     if type(Value) == type(0):
         return Value, (Value.bit_length() + 7) / 8
-    if type(Value) <> type(''):
+    if type(Value) != type(''):
         raise BadExpression('Type %s is %s' %(Value, type(Value)))
     Value = Value.strip()
     if Value.startswith(TAB_UINT8) and Value.endswith(')'):

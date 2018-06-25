@@ -4233,7 +4233,7 @@ class ModuleAutoGen(AutoGen):
             Dpx = GenDepex.DependencyExpression(self.DepexList[ModuleType], ModuleType, True)
             DpxFile = gAutoGenDepexFileName % {"module_name" : self.Name}
 
-            if len(Dpx.PostfixNotation) <> 0:
+            if len(Dpx.PostfixNotation) != 0:
                 self.DepexGenerated = True
 
             if Dpx.Generate(path.join(self.OutputDir, DpxFile)):

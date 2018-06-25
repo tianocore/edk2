@@ -2153,7 +2153,7 @@ class DscBuildData(PlatformBuildClassObject):
         if DscBuildData.NeedUpdateOutput(OutputValueFile, PcdValueInitExe ,InputValueFile):
             Command = PcdValueInitExe + ' -i %s -o %s' % (InputValueFile, OutputValueFile)
             returncode, StdOut, StdErr = DscBuildData.ExecuteCommand (Command)
-            if returncode <> 0:
+            if returncode != 0:
                 EdkLogger.warn('Build', COMMAND_FAILURE, 'Can not collect output from command: %s' % Command)
 
         File = open (OutputValueFile, 'r')

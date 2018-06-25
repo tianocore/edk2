@@ -561,7 +561,7 @@ cleanlib:
 
         # convert source files and binary files to build targets
         self.ResultFileList = [str(T.Target) for T in self._AutoGenObject.CodaTargetList]
-        if len(self.ResultFileList) == 0 and len(self._AutoGenObject.SourceFileList) <> 0:
+        if len(self.ResultFileList) == 0 and len(self._AutoGenObject.SourceFileList) != 0:
             EdkLogger.error("build", AUTOGEN_ERROR, "Nothing to build",
                             ExtraData="[%s]" % str(self._AutoGenObject))
 

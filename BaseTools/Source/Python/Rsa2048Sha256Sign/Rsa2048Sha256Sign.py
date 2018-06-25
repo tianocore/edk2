@@ -101,7 +101,7 @@ if __name__ == '__main__':
     sys.exit(1)
     
   Version = Process.communicate()
-  if Process.returncode <> 0:
+  if Process.returncode != 0:
     print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
   print(Version[0])
@@ -157,7 +157,7 @@ if __name__ == '__main__':
   while len(PublicKeyHexString) > 0:
     PublicKey = PublicKey + chr(int(PublicKeyHexString[0:2],16))
     PublicKeyHexString=PublicKeyHexString[2:]
-  if Process.returncode <> 0:
+  if Process.returncode != 0:
     sys.exit(Process.returncode)
 
   if args.MonotonicCountStr:
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     #
     Process = subprocess.Popen('%s dgst -sha256 -sign "%s"' % (OpenSslCommand, args.PrivateKeyFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Signature = Process.communicate(input=FullInputFileBuffer)[0]
-    if Process.returncode <> 0:
+    if Process.returncode != 0:
       sys.exit(Process.returncode)
       
     #
@@ -202,14 +202,14 @@ if __name__ == '__main__':
     #
     # Verify that the Hash Type matches the expected SHA256 type
     #
-    if uuid.UUID(bytes_le = Header.HashType) <> EFI_HASH_ALGORITHM_SHA256_GUID:
+    if uuid.UUID(bytes_le = Header.HashType) != EFI_HASH_ALGORITHM_SHA256_GUID:
       print('ERROR: unsupport hash GUID')
       sys.exit(1)
 
     #
     # Verify the public key
     #
-    if Header.PublicKey <> PublicKey:
+    if Header.PublicKey != PublicKey:
       print('ERROR: Public key in input file does not match public key from private key file')
       sys.exit(1)
 
@@ -228,7 +228,7 @@ if __name__ == '__main__':
     #    
     Process = subprocess.Popen('%s dgst -sha256 -prverify "%s" -signature %s' % (OpenSslCommand, args.PrivateKeyFileName, args.OutputFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Process.communicate(input=FullInputFileBuffer)
-    if Process.returncode <> 0:
+    if Process.returncode != 0:
       print('ERROR: Verification failed')
       os.remove (args.OutputFileName)
       sys.exit(Process.returncode)

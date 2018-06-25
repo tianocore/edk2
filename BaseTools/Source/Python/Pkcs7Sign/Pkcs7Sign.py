@@ -118,7 +118,7 @@ if __name__ == '__main__':
     sys.exit(1)
 
   Version = Process.communicate()
-  if Process.returncode <> 0:
+  if Process.returncode != 0:
     print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
   print(Version[0])
@@ -208,7 +208,7 @@ if __name__ == '__main__':
     #
     Process = subprocess.Popen('%s smime -sign -binary -signer "%s" -outform DER -md sha256 -certfile "%s"' % (OpenSslCommand, args.SignerPrivateCertFileName, args.OtherPublicCertFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Signature = Process.communicate(input=FullInputFileBuffer)[0]
-    if Process.returncode <> 0:
+    if Process.returncode != 0:
       sys.exit(Process.returncode)
 
     #
@@ -277,7 +277,7 @@ if __name__ == '__main__':
     #
     Process = subprocess.Popen('%s smime -verify -inform DER -content %s -CAfile %s' % (OpenSslCommand, args.OutputFileName, args.TrustedPublicCertFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Process.communicate(input=args.SignatureBuffer)[0]
-    if Process.returncode <> 0:
+    if Process.returncode != 0:
       print('ERROR: Verification failed')
       os.remove (args.OutputFileName)
       sys.exit(Process.returncode)

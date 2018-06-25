@@ -816,8 +816,8 @@ class Check(object):
                     EccGlobalData.gDb.TblReport.Insert(ERROR_META_DATA_FILE_CHECK_LIBRARY_NO_USE, OtherMsg="The Library Class [%s] is not used in any platform" % (Record[1]), BelongsToTable='Inf', BelongsToItem=Record[0])
             SqlCommand = """
                          select A.ID, A.Value1, A.BelongsToFile, A.StartLine, B.StartLine from Dsc as A left join Dsc as B
-                         where A.Model = %s and B.Model = %s and A.Scope1 = B.Scope1 and A.Scope2 = B.Scope2 and A.ID <> B.ID
-                         and A.Value1 = B.Value1 and A.Value2 <> B.Value2 and A.BelongsToItem = -1 and B.BelongsToItem = -1 and A.StartLine <> B.StartLine and B.BelongsToFile = A.BelongsToFile""" \
+                         where A.Model = %s and B.Model = %s and A.Scope1 = B.Scope1 and A.Scope2 = B.Scope2 and A.ID != B.ID
+                         and A.Value1 = B.Value1 and A.Value2 != B.Value2 and A.BelongsToItem = -1 and B.BelongsToItem = -1 and A.StartLine != B.StartLine and B.BelongsToFile = A.BelongsToFile""" \
                             % (MODEL_EFI_LIBRARY_CLASS, MODEL_EFI_LIBRARY_CLASS)
             RecordSet = EccGlobalData.gDb.TblDsc.Exec(SqlCommand)
             for Record in RecordSet:
@@ -903,7 +903,7 @@ class Check(object):
                          and A.Value1 = B.Value1
                          and A.Value2 = B.Value2
                          and A.Scope1 = B.Scope1
-                         and A.ID <> B.ID
+                         and A.ID != B.ID
                          and A.Model = B.Model
                          and A.Enabled > -1
                          and B.Enabled > -1
@@ -1055,7 +1055,7 @@ class Check(object):
             SqlCommand = """
                          select A.ID, A.Value3, A.BelongsToFile, B.BelongsToFile from %s as A, %s as B
                          where A.Value2 = 'FILE_GUID' and B.Value2 = 'FILE_GUID' and
-                         A.Value3 = B.Value3 and A.ID <> B.ID group by A.ID
+                         A.Value3 = B.Value3 and A.ID != B.ID group by A.ID
                          """ % (Table.Table, Table.Table)
             RecordSet = Table.Exec(SqlCommand)
             for Record in RecordSet:
@@ -1215,7 +1215,7 @@ class Check(object):
         SqlCommand = """
                      select A.ID, A.Value1 from %s as A, %s as B
                      where A.Model = %s and B.Model = %s
-                     and A.Value1 like B.Value1 and A.ID <> B.ID
+                     and A.Value1 like B.Value1 and A.ID != B.ID
                      and A.Scope1 = B.Scope1
                      and A.Enabled > -1
                      and B.Enabled > -1
@@ -1239,8 +1239,8 @@ class Check(object):
         SqlCommand = """
                      select A.ID, A.Value1, A.Value2 from %s as A, %s as B
                      where A.Model = %s and B.Model = %s
-                     and A.Value2 like B.Value2 and A.ID <> B.ID
-                     and A.Scope1 = B.Scope1 and A.Value1 <> B.Value1
+                     and A.Value2 like B.Value2 and A.ID != B.ID
+                     and A.Scope1 = B.Scope1 and A.Value1 != B.Value1
                      group by A.ID
                      """ % (Table.Table, Table.Table, Model, Model)
         RecordSet = Table.Exec(SqlCommand)

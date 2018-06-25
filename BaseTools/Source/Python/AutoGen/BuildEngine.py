@@ -362,8 +362,8 @@ class BuildRule:
             self.RuleContent[Index] = Line
             
             # find the build_rule_version
-            if Line and Line[0] == "#" and Line.find(TAB_BUILD_RULE_VERSION) <> -1:
-                if Line.find("=") <> -1 and Line.find("=") < (len(Line) - 1) and (Line[(Line.find("=") + 1):]).split():
+            if Line and Line[0] == "#" and Line.find(TAB_BUILD_RULE_VERSION) != -1:
+                if Line.find("=") != -1 and Line.find("=") < (len(Line) - 1) and (Line[(Line.find("=") + 1):]).split():
                     self._FileVersion = (Line[(Line.find("=") + 1):]).split()[0]
             # skip empty or comment line
             if Line == "" or Line[0] == "#":
