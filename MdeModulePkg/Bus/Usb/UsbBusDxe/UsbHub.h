@@ -2,7 +2,7 @@
 
     The definition for USB hub.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -114,18 +114,6 @@ typedef struct {
   UINT8           HubContrCurrent;
   UINT8           Filler[16];
 } EFI_USB_HUB_DESCRIPTOR;
-
-typedef struct {
-  UINT8           Length;
-  UINT8           DescType;
-  UINT8           NumPorts;
-  UINT16          HubCharacter;
-  UINT8           PwrOn2PwrGood;
-  UINT8           HubContrCurrent;
-  UINT8           HubHdrDecLat;
-  UINT8           HubDelay;
-  UINT8           DeviceRemovable;
-} EFI_USB_SUPER_SPEED_HUB_DESCRIPTOR;
 
 #pragma pack()
 
