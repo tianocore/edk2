@@ -218,7 +218,8 @@ class VpdInfoFile:
             return None
         
         return self._VpdArray[vpd]
-    def GetVpdInfo(self,(PcdTokenName,TokenSpaceName)):
+    def GetVpdInfo(self, arg):
+        (PcdTokenName, TokenSpaceName) = arg
         return self._VpdInfo.get((TokenSpaceName, PcdTokenName))
     
 ## Call external BPDG tool to process VPD file
