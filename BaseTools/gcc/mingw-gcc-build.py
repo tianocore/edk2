@@ -507,8 +507,8 @@ class Builder:
             f = open(logFile, "w")
             f.write(output)
             f.close()
-            raise Exception, 'Failed to %s %s\n' % (stage, module) + \
-                'See output log at %s' % self.config.Relative(logFile)
+            raise Exception('Failed to %s %s\n' % (stage, module) + \
+                'See output log at %s' % self.config.Relative(logFile))
         else:
             print('[done]')
 
