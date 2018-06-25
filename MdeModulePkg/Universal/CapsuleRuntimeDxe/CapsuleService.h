@@ -17,6 +17,9 @@
 
 **/
 
+#ifndef _CAPSULE_SERVICE_H_
+#define _CAPSULE_SERVICE_H_
+
 #include <Uefi.h>
 
 #include <Protocol/Capsule.h>
@@ -69,3 +72,5 @@ VOID
 CapsuleCacheWriteBack (
   IN  EFI_PHYSICAL_ADDRESS    ScatterGatherList
   );
+
+#endif

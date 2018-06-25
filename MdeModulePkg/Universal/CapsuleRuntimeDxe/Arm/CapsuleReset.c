@@ -1,4 +1,4 @@
- /** @file
+/** @file
   ARM implementation of architecture specific routines related to
   PersistAcrossReset capsules
 
