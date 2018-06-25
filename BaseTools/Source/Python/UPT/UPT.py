@@ -309,7 +309,7 @@ def Main():
             else:
                 GlobalData.gDB.Commit()
                 Mgr.commit()
-        except StandardError:
+        except Exception:
             Logger.Quiet(ST.MSG_RECOVER_FAIL)
         GlobalData.gDB.CloseDb()
 
