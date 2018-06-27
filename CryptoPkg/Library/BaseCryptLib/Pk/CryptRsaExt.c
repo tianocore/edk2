@@ -7,7 +7,7 @@
   3) RsaCheckKey
   4) RsaPkcs1Sign
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -174,7 +174,7 @@ RsaGetKey (
   @param[in, out]  RsaContext           Pointer to RSA context being set.
   @param[in]       ModulusLength        Length of RSA modulus N in bits.
   @param[in]       PublicExponent       Pointer to RSA public exponent.
-  @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes. 
+  @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes.
 
   @retval  TRUE   RSA key component was generated successfully.
   @retval  FALSE  Invalid RSA key component tag.
@@ -226,7 +226,7 @@ _Exit:
 }
 
 /**
-  Validates key components of RSA context. 
+  Validates key components of RSA context.
   NOTE: This function performs integrity checks on all the RSA key material, so
         the RSA key structure must contain all the private key data.
 
@@ -332,7 +332,7 @@ RsaPkcs1Sign (
 
   //
   // Determine the message digest algorithm according to digest size.
-  //   Only MD5, SHA-1 or SHA-256 algorithm is supported. 
+  //   Only MD5, SHA-1 or SHA-256 algorithm is supported.
   //
   switch (HashSize) {
   case MD5_DIGEST_SIZE:

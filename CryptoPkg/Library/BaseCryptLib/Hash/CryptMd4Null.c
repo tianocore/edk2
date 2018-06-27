@@ -1,7 +1,7 @@
 /** @file
   MD4 Digest Wrapper Implementation which does not provide real capabilities.
 
-Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -103,7 +103,7 @@ Md4Update (
 /**
   Completes computation of the MD4 digest value.
 
-  Return FALSE to indicate this interface is not supported.  
+  Return FALSE to indicate this interface is not supported.
 
   @param[in, out]  Md4Context  Pointer to the MD4 context.
   @param[out]      HashValue   Pointer to a buffer that receives the MD4 digest

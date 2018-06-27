@@ -50,7 +50,7 @@ X509ConstructCertificate (
   @param           ...        A list of DER-encoded single certificate data followed
                               by certificate size. A NULL terminates the list. The
                               pairs are the arguments to X509ConstructCertificate().
-                                 
+
   @retval FALSE  This interface is not supported.
 
 **/
@@ -58,7 +58,7 @@ BOOLEAN
 EFIAPI
 X509ConstructCertificateStack (
   IN OUT  UINT8  **X509Stack,
-  ...  
+  ...
   )
 {
   ASSERT (FALSE);
@@ -78,7 +78,7 @@ EFIAPI
 X509Free (
   IN  VOID  *X509Cert
   )
-{ 
+{
   ASSERT (FALSE);
 }
 
@@ -196,7 +196,7 @@ RsaGetPublicKeyFromX509 (
   @param[in]      CACertSize   Size of the CA Certificate in bytes.
 
   @retval FALSE  This interface is not supported.
- 
+
 **/
 BOOLEAN
 EFIAPI

@@ -318,7 +318,7 @@ _Exit:
                                    If Certificate is invalid.
   @retval RETURN_NOT_FOUND         If no CommonName entry exists.
   @retval RETURN_BUFFER_TOO_SMALL  If the CommonName is NULL. The required buffer size
-                                   (including the final null) is returned in the 
+                                   (including the final null) is returned in the
                                    CommonNameSize parameter.
   @retval RETURN_UNSUPPORTED       The operation is not supported.
 

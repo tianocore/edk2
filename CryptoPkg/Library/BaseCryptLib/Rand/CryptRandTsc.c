@@ -1,7 +1,7 @@
 /** @file
   Pseudorandom Number Generator Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2012 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -69,7 +69,7 @@ RandomSeed (
       sizeof (DefaultSeed),
       "UEFI Crypto Library default seed (%ld)",
       AsmReadTsc ()
-      ); 
+      );
 
     RAND_seed (DefaultSeed, sizeof (DefaultSeed));
   }

@@ -8,10 +8,10 @@
 #
 #  Note: MD4 Digest functions, SHA-384 Digest functions, SHA-512 Digest functions,
 #  HMAC-MD5 functions, HMAC-SHA1/SHA256 functions, AES/TDES/ARC4 functions, RSA external
-#  functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, and 
+#  functions, PKCS#7 SignedData sign functions, Diffie-Hellman functions, and
 #  authenticode signature verification functions are not supported in this instance.
 #
-#  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at

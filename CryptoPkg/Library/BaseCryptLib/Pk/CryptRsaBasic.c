@@ -7,7 +7,7 @@
   3) RsaSetKey
   4) RsaPkcs1Verify
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -294,7 +294,7 @@ RsaPkcs1Verify (
 
   //
   // Determine the message digest algorithm according to digest size.
-  //   Only MD5, SHA-1 or SHA-256 algorithm is supported. 
+  //   Only MD5, SHA-1 or SHA-256 algorithm is supported.
   //
   switch (HashSize) {
   case MD5_DIGEST_SIZE:
