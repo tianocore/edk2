@@ -78,7 +78,7 @@
   gEfiCertX509Guid                                 ## SOMETIMES_CONSUMES  ## GUID  # Check the cert type
 
 [Pcd]
-  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections       ## CONSUMES  
+  gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections       ## CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   HttpDxeExtra.uni

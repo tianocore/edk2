@@ -2,7 +2,7 @@
   The implementation of Payloads Creation.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -55,7 +55,7 @@ Ikev2GenerateSaPayload (
   if (SaPayload == NULL) {
     return NULL;
   }
-  
+
   //
   // TODO: Get the Proposal Number and Transform Number from IPsec Config,
   // after the Ipsecconfig Application is support it.
@@ -127,7 +127,7 @@ Ikev2GenerateNoncePayload (
   if (Nonce == NULL) {
     return NULL;
   }
-  
+
   CopyMem (Nonce + 1, NonceBlock, Size - sizeof (IKEV2_NONCE));
 
   Nonce->Header.NextPayload   = NextPayload;
@@ -137,7 +137,7 @@ Ikev2GenerateNoncePayload (
     FreePool (Nonce);
     return NULL;
   }
-  
+
   NoncePayload->PayloadType = IKEV2_PAYLOAD_TYPE_NONCE;
   NoncePayload->PayloadBuf  = (UINT8 *) Nonce;
   NoncePayload->PayloadSize = Size;
@@ -428,11 +428,11 @@ Ikev2PskGenerateAuthPayload (
   if (Digest == NULL) {
     return NULL;
   }
-  
+
   if (IdPayload == NULL) {
     return NULL;
   }
-  
+
   //
   // Calcualte Prf(Seceret, "Key Pad for IKEv2");
   //
@@ -460,7 +460,7 @@ Ikev2PskGenerateAuthPayload (
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
-  
+
   CopyMem (KeyBuf, Digest, DigestSize);
   KeySize = DigestSize;
 
@@ -522,7 +522,7 @@ Ikev2PskGenerateAuthPayload (
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
-  
+
   Fragments[2].DataSize = DigestSize;
   CopyMem (Fragments[2].Data, Digest, DigestSize);
 
@@ -557,7 +557,7 @@ Ikev2PskGenerateAuthPayload (
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
-  
+
   //
   // Fill in Auth payload.
   //
@@ -761,7 +761,7 @@ Ikev2CertGenerateAuthPayload (
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
-  
+
   Fragments[2].DataSize = DigestSize;
   CopyMem (Fragments[2].Data, Digest, DigestSize);
 
@@ -820,7 +820,7 @@ Ikev2CertGenerateAuthPayload (
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
-  
+
   //
   // Fill in Auth payload.
   //
@@ -1229,7 +1229,7 @@ Ikev2GenerateNotifyPayload (
     FreePool (Notify);
     return NULL;
   }
-  
+
   NotifyPayload->PayloadType  = IKEV2_PAYLOAD_TYPE_NOTIFY;
   NotifyPayload->PayloadBuf   = (UINT8 *) Notify;
   NotifyPayload->PayloadSize  = NotifyPayloadLen;
@@ -1320,7 +1320,7 @@ Ikev2GenerateDeletePayload (
     FreePool (Del);
     return NULL;
   }
-  
+
   DelPayload->PayloadType = IKEV2_PAYLOAD_TYPE_DELETE;
   DelPayload->PayloadBuf  = (UINT8 *) Del;
   DelPayload->PayloadSize = DelPayloadLen;
@@ -1687,7 +1687,7 @@ Ikev2EncodeSa (
   if (Sa == NULL) {
     return NULL;
   }
-  
+
   CopyMem (Sa, SaData, sizeof (IKEV2_SA));
   Sa->Header.PayloadLength  = (UINT16) sizeof (IKEV2_SA);
   ProposalsSize             = 0;
@@ -1884,7 +1884,7 @@ Ikev2DecodeSa (
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
-  
+
   CopyMem (SaData, Sa, sizeof (IKEV2_SA));
   SaData->NumProposals        = TotalProposals;
   ProposalData                = (IKEV2_PROPOSAL_DATA *) (SaData + 1);
@@ -1921,7 +1921,7 @@ Ikev2DecodeSa (
         Status = EFI_OUT_OF_RESOURCES;
         goto Exit;
       }
-      
+
       CopyMem (Spi, (UINT32 *) (Proposal + 1), Proposal->SpiSize);
       *((UINT32*) Spi) = NTOHL (*((UINT32*) Spi));
       ProposalData->Spi = Spi;
@@ -2357,7 +2357,7 @@ Ikev2DecodePacket (
       Status = EFI_OUT_OF_RESOURCES;
       goto Exit;
     }
-    
+
     CopyMem (IkeHeader, IkePacket->Header, sizeof (IKE_HEADER));
 
     //
@@ -2565,7 +2565,7 @@ Ikev2EncodePacket (
       if (IkeSaSession->InitPacket == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
-      
+
       CopyMem (IkeSaSession->InitPacket, IkePacket->Header, sizeof (IKE_HEADER));
       PayloadTotalSize = 0;
       for (Entry = IkePacket->PayloadList.ForwardLink; Entry != &(IkePacket->PayloadList);) {
@@ -2584,7 +2584,7 @@ Ikev2EncodePacket (
       if (IkeSaSession->RespPacket == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
-      
+
       CopyMem (IkeSaSession->RespPacket, IkePacket->Header, sizeof (IKE_HEADER));
       PayloadTotalSize = 0;
       for (Entry = IkePacket->PayloadList.ForwardLink; Entry != &(IkePacket->PayloadList);) {
@@ -2695,7 +2695,7 @@ Ikev2DecryptPacket (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-  
+
   CopyMem (IntegrityBuffer, IkePacket->Header, sizeof(IKE_HEADER));
   CopyMem (IntegrityBuffer + sizeof (IKE_HEADER), IkePacket->PayloadsBuf, IkePacket->PayloadTotalSize);
 
@@ -2910,7 +2910,7 @@ Ikev2EncryptPacket (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-  
+
   //
   // Copy all payload into EncryptedIkePayload
   //

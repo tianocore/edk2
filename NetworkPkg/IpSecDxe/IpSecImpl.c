@@ -2,7 +2,7 @@
   The implementation of IPsec.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1220,7 +1220,7 @@ IpSecTunnelOutboundPacket (
     if (InnerHead == NULL) {
       return NULL;
     }
-    
+
     CopyMem (
       InnerHead,
       IpHead,
@@ -1236,7 +1236,7 @@ IpSecTunnelOutboundPacket (
     if (InnerHead == NULL) {
       return NULL;
     }
-    
+
     CopyMem (
       InnerHead,
       IpHead,
@@ -1271,7 +1271,7 @@ IpSecTunnelOutboundPacket (
     FreePool (InnerHead);
     return NULL;
   }
-  
+
   //
   // 3. Check the Last Header, if it is TCP, UDP or ICMP recalcualate its pesudo
   //    CheckSum.

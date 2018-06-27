@@ -1,13 +1,13 @@
 /** @file
   The declaration of UEFI HTTP boot function.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -26,7 +26,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_NOT_STARTED          The driver is in stopped state.
   @retval EFI_DEVICE_ERROR         An unexpected network error occurred.
   @retval Others                   Other errors as indicated.
-  
+
 **/
 EFI_STATUS
 HttpBootDhcp (
@@ -42,7 +42,7 @@ HttpBootDhcp (
   @retval EFI_NOT_STARTED          The driver is already in stopped state.
   @retval EFI_INVALID_PARAMETER    Private is NULL.
   @retval Others                   Unexpected error when stop the function.
-  
+
 **/
 EFI_STATUS
 HttpBootStop (

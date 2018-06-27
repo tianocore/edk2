@@ -1,7 +1,7 @@
 /** @file
   iSCSI DHCP6 related configuration routines.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,7 +47,7 @@ IScsiDhcp6ExtractRootPath (
   UINT8                       Index;
   ISCSI_SESSION_CONFIG_NVDATA *ConfigNvData;
   EFI_IP_ADDRESS              Ip;
-  UINT8                       IpMode;  
+  UINT8                       IpMode;
 
   ConfigNvData = &ConfigData->SessionConfigData;
   ConfigNvData->DnsMode = FALSE;
@@ -156,7 +156,7 @@ IScsiDhcp6ExtractRootPath (
   //
   // Get the IP address of the target.
   //
-  Field   = &Fields[RP_FIELD_IDX_SERVERNAME];  
+  Field   = &Fields[RP_FIELD_IDX_SERVERNAME];
   if (ConfigNvData->IpMode < IP_MODE_AUTOCONFIG) {
     IpMode = ConfigNvData->IpMode;
   } else {
@@ -238,11 +238,11 @@ ON_EXIT:
 }
 
 /**
-  EFI_DHCP6_INFO_CALLBACK is provided by the consumer of the EFI DHCPv6 Protocol 
+  EFI_DHCP6_INFO_CALLBACK is provided by the consumer of the EFI DHCPv6 Protocol
   instance to intercept events that occurs in the DHCPv6 Information Request
   exchange process.
 
-  @param[in]  This              Pointer to the EFI_DHCP6_PROTOCOL instance that 
+  @param[in]  This              Pointer to the EFI_DHCP6_PROTOCOL instance that
                                 is used to configure this  callback function.
   @param[in]  Context           Pointer to the context that is initialized in
                                 the EFI_DHCP6_PROTOCOL.InfoRequest().
@@ -276,10 +276,10 @@ IScsiDhcp6ParseReply (
   EFI_DHCP6_PACKET_OPTION     **OptionList;
   ISCSI_ATTEMPT_CONFIG_NVDATA *ConfigData;
   UINT16                      ParaLen;
- 
+
   OptionCount = 0;
   BootFileOpt = NULL;
-  
+
   Status      = This->Parse (This, Packet, &OptionCount, NULL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
     return EFI_NOT_READY;
@@ -353,7 +353,7 @@ IScsiDhcp6ParseReply (
     Status = EFI_UNSUPPORTED;
     goto Exit;
   }
-  
+
   //
   // Get iSCSI root path from Boot File Uniform Resource Locator (URL) Option
   //
@@ -524,7 +524,7 @@ ON_EXIT:
 
   if (Oro != NULL) {
     FreePool (Oro);
-  }  
+  }
 
   if (Timer != NULL) {
     gBS->CloseEvent (Timer);

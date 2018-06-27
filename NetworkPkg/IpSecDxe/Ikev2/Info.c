@@ -2,7 +2,7 @@
   The Implementations for Information Exchange.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -11,7 +11,7 @@
 
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-  
+
 **/
 
 #include "Utility.h"
@@ -21,14 +21,14 @@
 /**
   Generate Information Packet.
 
-  The information Packet may contain one Delete Payload, or Notify Payload, which 
+  The information Packet may contain one Delete Payload, or Notify Payload, which
   dependes on the Context's parameters.
 
-  @param[in]  SaSession   Pointer to IKE SA Session or Child SA Session which is 
+  @param[in]  SaSession   Pointer to IKE SA Session or Child SA Session which is
                           related to the information Exchange.
   @param[in]  Context     The Data passed from the caller. If the Context is not NULL
                           it should contain the information for Notification Data.
-                          
+
   @retval     Pointer of IKE_PACKET generated.
 
 **/
@@ -55,7 +55,7 @@ Ikev2InfoGenerator (
   // Fill IkePacket Header.
   //
   IkePacket->Header->ExchangeType    = IKEV2_EXCHANGE_TYPE_INFO;
-  IkePacket->Header->Version         = (UINT8) (2 << 4); 
+  IkePacket->Header->Version         = (UINT8) (2 << 4);
 
   if (Context != NULL) {
     InfoContext = (IKEV2_INFO_EXCHANGE_CONTEXT *) Context;
@@ -64,8 +64,8 @@ Ikev2InfoGenerator (
   //
   // For Liveness Check
   //
-  if (InfoContext != NULL && 
-      (InfoContext->InfoType == Ikev2InfoLiveCheck || InfoContext->InfoType == Ikev2InfoNotify) 
+  if (InfoContext != NULL &&
+      (InfoContext->InfoType == Ikev2InfoLiveCheck || InfoContext->InfoType == Ikev2InfoNotify)
     ) {
     IkePacket->Header->MessageId       = InfoContext->MessageId;
     IkePacket->Header->InitiatorCookie = IkeSaSession->InitiatorCookie;
@@ -77,10 +77,10 @@ Ikev2InfoGenerator (
     //
     return IkePacket;
   }
-  
+
   //
   // For delete SAs
-  //  
+  //
   if (IkeSaSession->SessionCommon.IkeSessionType == IkeSessionTypeIkeSa) {
 
     IkePacket->Header->InitiatorCookie = IkeSaSession->InitiatorCookie;
@@ -101,12 +101,12 @@ Ikev2InfoGenerator (
     //
     if (IkeSaSession->SessionCommon.State == IkeStateSaDeleting ) {
       IkePayload = Ikev2GenerateDeletePayload (
-                     IkeSaSession, 
-                     IKEV2_PAYLOAD_TYPE_NONE, 
-                     0, 
-                     0, 
+                     IkeSaSession,
+                     IKEV2_PAYLOAD_TYPE_NONE,
+                     0,
+                     0,
                      NULL
-                     );  
+                     );
       if (IkePayload == NULL) {
         goto ERROR_EXIT;
       }
@@ -118,7 +118,7 @@ Ikev2InfoGenerator (
       IkePacket->Private           = IkeSaSession->SessionCommon.Private;
       IkePacket->Spi               = 0;
       IkePacket->IsDeleteInfo      = TRUE;
-            
+
     } else if (Context != NULL) {
       //
       // TODO: If contest is not NULL Generate a Notify Payload.
@@ -132,7 +132,7 @@ Ikev2InfoGenerator (
 
     if (IkeSaSession->SessionCommon.IsInitiator) {
       IkePacket->Header->Flags = IKE_HEADER_FLAGS_INIT ;
-    }  
+    }
   } else {
     //
     // Delete the Child SA Information Exchagne
@@ -152,7 +152,7 @@ Ikev2InfoGenerator (
       IkePacket->Header->MessageId     = ChildSaSession->IkeSaSession->MessageId;
       Ikev2SaSessionIncreaseMessageId (IkeSaSession);
     }
-    
+
     IkePayload     = Ikev2GenerateDeletePayload (
                        ChildSaSession->IkeSaSession,
                        IKEV2_PAYLOAD_TYPE_DELETE,
@@ -193,7 +193,7 @@ Ikev2InfoGenerator (
   if (InfoContext != NULL) {
     IkePacket->Header->Flags |= IKE_HEADER_FLAGS_RESPOND;
   }
-  
+
   return IkePacket;
 
 ERROR_EXIT:
@@ -233,16 +233,16 @@ Ikev2InfoParser (
   UINT8                  Value;
   EFI_STATUS             Status;
   IKE_PACKET             *RespondPacket;
-  
+
   IKEV2_INFO_EXCHANGE_CONTEXT Context;
-  
+
   IkeSaSession   = (IKEV2_SA_SESSION *) SaSession;
 
   DeletePayload  = NULL;
   Private        = NULL;
   RespondPacket  = NULL;
   Status         = EFI_SUCCESS;
-  
+
   //
   // For Liveness Check
   //
@@ -279,13 +279,13 @@ Ikev2InfoParser (
   //
   // For SA Delete
   //
-  NET_LIST_FOR_EACH (Entry, &(IkePacket)->PayloadList) {   
+  NET_LIST_FOR_EACH (Entry, &(IkePacket)->PayloadList) {
 
   //
   // Iterate payloads to find the Delete/Notify Payload.
   //
     IkePayload  = IKE_PAYLOAD_BY_PACKET (Entry);
-    
+
     if (IkePayload->PayloadType == IKEV2_PAYLOAD_TYPE_DELETE) {
       DeletePayload = IkePayload;
       Delete = (IKEV2_DELETE *)DeletePayload->PayloadBuf;
@@ -310,7 +310,7 @@ Ikev2InfoParser (
             // After all IKE SAs were deleted, set the IPSEC_STATUS_DISABLED value in
             // IPsec status variable.
             //
-            if (IsListEmpty (&Private->Ikev1EstablishedList) && 
+            if (IsListEmpty (&Private->Ikev1EstablishedList) &&
                 (IsListEmpty (&Private->Ikev2EstablishedList))
                ) {
               Value  = IPSEC_STATUS_DISABLED;
@@ -341,9 +341,9 @@ Ikev2InfoParser (
             return Status;
           }
           Status = Ikev2SendIkePacket (
-                     IkeSaSession->SessionCommon.UdpService, 
-                     (UINT8 *)(&IkeSaSession->SessionCommon), 
-                     RespondPacket, 
+                     IkeSaSession->SessionCommon.UdpService,
+                     (UINT8 *)(&IkeSaSession->SessionCommon),
+                     RespondPacket,
                      0
                      );
         }
@@ -373,7 +373,7 @@ Ikev2InfoParser (
 
                 Context.InfoType = Ikev2InfoDelete;
                 Context.MessageId = IkePacket->Header->MessageId;
-          
+
                 RespondPacket = Ikev2InfoGenerator ((UINT8 *)ChildSaSession, &Context);
                 if (RespondPacket == NULL) {
                   Status = EFI_INVALID_PARAMETER;
@@ -382,7 +382,7 @@ Ikev2InfoParser (
                 Status = Ikev2SendIkePacket (
                            ChildSaSession->SessionCommon.UdpService,
                            (UINT8 *)(&ChildSaSession->SessionCommon),
-                           RespondPacket, 
+                           RespondPacket,
                            0
                            );
               } else {
@@ -399,7 +399,7 @@ Ikev2InfoParser (
       }
     }
   }
-  
+
   return Status;
 }
 

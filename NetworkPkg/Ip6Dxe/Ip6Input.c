@@ -1,7 +1,7 @@
 /** @file
   IP6 internal functions to process the incoming packets.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
   This program and the accompanying materials
@@ -531,7 +531,7 @@ Ip6IpSecProcessPacket (
     goto ON_EXIT;
   }
   ASSERT (mIpSec != NULL);
-  
+
   Packet        = *Netbuf;
   RecycleEvent  = NULL;
   IpSecWrap     = NULL;
@@ -647,7 +647,7 @@ Ip6IpSecProcessPacket (
       IP6_GET_CLIP_INFO (Packet),
       sizeof (IP6_CLIP_INFO)
       );
-    
+
     NetIpSecNetbufFree(Packet);
     *Netbuf = TxWrap->Packet;
 
@@ -724,13 +724,13 @@ ON_EXIT:
   @param[in, out] Packet        The received IP6 packet to be processed.
   @param[in]      Flag          The link layer flag for the packet received, such
                                 as multicast.
-  @param[out]     Payload       The pointer to the payload of the recieved packet. 
-                                it starts from the first byte of the extension header.                                 
+  @param[out]     Payload       The pointer to the payload of the recieved packet.
+                                it starts from the first byte of the extension header.
   @param[out]     LastHead      The pointer of NextHeader of the last extension
                                 header processed by IP6.
   @param[out]     ExtHdrsLen    The length of the whole option.
   @param[out]     UnFragmentLen The length of unfragmented length of extension headers.
-  @param[out]     Fragmented    Indicate whether the packet is fragmented. 
+  @param[out]     Fragmented    Indicate whether the packet is fragmented.
   @param[out]     Head          The pointer to the EFI_IP6_Header.
 
   @retval     EFI_SUCCESS              The received packet is well format.
@@ -746,7 +746,7 @@ Ip6PreProcessPacket (
      OUT UINT8           **LastHead,
      OUT UINT32          *ExtHdrsLen,
      OUT UINT32          *UnFragmentLen,
-     OUT BOOLEAN         *Fragmented, 
+     OUT BOOLEAN         *Fragmented,
      OUT EFI_IP6_HEADER  **Head
   )
 {
@@ -964,7 +964,7 @@ Ip6PreProcessPacket (
   // and Packet->TotalLen == Info->Length.
   //
   NetbufTrim (*Packet, sizeof (EFI_IP6_HEADER) + *ExtHdrsLen, TRUE);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -1009,18 +1009,18 @@ Ip6AcceptFrame (
   if (EFI_ERROR (IoStatus) || (IpSb->State == IP6_SERVICE_DESTROY)) {
     goto Drop;
   }
-  
+
   //
   // Pre-Process the Ipv6 Packet and then reassemble if it is necessary.
   //
   Status = Ip6PreProcessPacket (
-             IpSb, 
-             &Packet, 
-             Flag, 
-             &Payload, 
-             &LastHead, 
-             &ExtHdrsLen, 
-             &UnFragmentLen, 
+             IpSb,
+             &Packet,
+             Flag,
+             &Payload,
+             &LastHead,
+             &ExtHdrsLen,
+             &UnFragmentLen,
              &Fragmented,
              &Head
              );
@@ -1052,14 +1052,14 @@ Ip6AcceptFrame (
   ZeroMem (&ZeroHead, sizeof (EFI_IP6_HEADER));
   if (0 == CompareMem (Head, &ZeroHead, sizeof (EFI_IP6_HEADER))) {
     Status = Ip6PreProcessPacket (
-               IpSb, 
-               &Packet, 
-               Flag, 
-               &Payload, 
-               &LastHead, 
-               &ExtHdrsLen, 
-               &UnFragmentLen, 
-               &Fragmented, 
+               IpSb,
+               &Packet,
+               Flag,
+               &Payload,
+               &LastHead,
+               &ExtHdrsLen,
+               &UnFragmentLen,
+               &Fragmented,
                &Head
                );
     if (EFI_ERROR (Status)) {
@@ -1073,7 +1073,7 @@ Ip6AcceptFrame (
   if (Packet == NULL) {
     goto Restart;
   }
-  
+
   //
   // Packet may have been changed. The ownership of the packet
   // is transfered to the packet process logic.

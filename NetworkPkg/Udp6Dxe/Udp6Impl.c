@@ -372,7 +372,7 @@ ON_ERROR:
 
   IpIoDestroy (Udp6Service->IpIo);
   Udp6Service->IpIo = NULL;
-  
+
   return Status;
 }
 
@@ -398,7 +398,7 @@ Udp6CleanService (
   //
   IpIoDestroy (Udp6Service->IpIo);
   Udp6Service->IpIo = NULL;
-  
+
   ZeroMem (Udp6Service, sizeof (UDP6_SERVICE_DATA));
 }
 
@@ -1621,7 +1621,7 @@ Udp6Demultiplex (
     NetbufFree (Packet);
     return;
   }
-  
+
   //
   // Get the datagram header from the packet buffer.
   //
@@ -1873,7 +1873,7 @@ Udp6IcmpHandler (
     NetbufFree (Packet);
     return;
   }
-  
+
   Udp6Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
   ASSERT (Udp6Header != NULL);
   if (Udp6Header == NULL) {
@@ -1975,7 +1975,7 @@ Udp6NetVectorExtFree (
   IN VOID  *Context
   )
 {
-} 
+}
 
 /**
   Find the key in the netmap.

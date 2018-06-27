@@ -2,7 +2,7 @@
   The Common operations used by IKE Exchange Process.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -21,7 +21,7 @@
 
 UINT16 mIkev2EncryptAlgorithmList[IKEV2_SUPPORT_ENCRYPT_ALGORITHM_NUM] = {
   IKEV2_TRANSFORM_ID_ENCR_3DES,
-  IKEV2_TRANSFORM_ID_ENCR_AES_CBC, 
+  IKEV2_TRANSFORM_ID_ENCR_AES_CBC,
 };
 
 UINT16 mIkev2PrfAlgorithmList[IKEV2_SUPPORT_PRF_ALGORITHM_NUM] = {
@@ -69,7 +69,7 @@ Ikev2SaSessionAlloc (
   IkeSaSession->InitiatorCookie      = IkeGenerateCookie ();
   IkeSaSession->ResponderCookie      = 0;
   //
-  // BUGBUG: Message ID starts from 2 is to match the OpenSwan requirement, but it 
+  // BUGBUG: Message ID starts from 2 is to match the OpenSwan requirement, but it
   // might not match the IPv6 Logo. In its test specification, it mentions that
   // the Message ID should start from zero after the IKE_SA_INIT exchange.
   //
@@ -143,7 +143,7 @@ Ikev2SaSessionReg (
 
   //
   // Cleanup the fields of SessionCommon for processing.
-  // 
+  //
   Ikev2SessionCommonRefresh (SessionCommon);
 
   //
@@ -163,8 +163,8 @@ Ikev2SaSessionReg (
                   );
   if (EFI_ERROR(Status)){
     //
-    // If TimerEvent creation failed, the SA will be alive untill user disable it or 
-    // receiving a Delete Payload from peer. 
+    // If TimerEvent creation failed, the SA will be alive untill user disable it or
+    // receiving a Delete Payload from peer.
     //
     return;
   }
@@ -177,7 +177,7 @@ Ikev2SaSessionReg (
   } else {
     Lifetime = IkeSaSession->Spd->Data->ProcessingPolicy->SaLifetime.HardLifetime;
   }
-  
+
   Status = gBS->SetTimer (
                   SessionCommon->TimeoutEvent,
                   TimerRelative,
@@ -185,8 +185,8 @@ Ikev2SaSessionReg (
                   );
   if (EFI_ERROR(Status)){
     //
-    // If SetTimer failed, the SA will be alive untill user disable it or 
-    // receiving a Delete Payload from peer. 
+    // If SetTimer failed, the SA will be alive untill user disable it or
+    // receiving a Delete Payload from peer.
     //
     return ;
   }
@@ -239,8 +239,8 @@ Ikev2SaSessionLookup (
   Private->Ikev2SaSession list or Private->Ikev2EstablishedList list.
 
   @param[in]  SaSessionList   Pointer to list to be inserted into.
-  @param[in]  IkeSaSession    Pointer to IKEV2_SA_SESSION to be inserted. 
-  @param[in]  RemotePeerIp    Pointer to EFI_IP_ADDRESSS to indicate the 
+  @param[in]  IkeSaSession    Pointer to IKEV2_SA_SESSION to be inserted.
+  @param[in]  RemotePeerIp    Pointer to EFI_IP_ADDRESSS to indicate the
                               unique IKEV2_SA_SESSION.
 
 **/
@@ -261,7 +261,7 @@ Ikev2SaSessionInsert (
   @param[in]  SaSessionList   Pointer to list to be searched.
   @param[in]  RemotePeerIp    Pointer to EFI_IP_ADDRESS to use for SA Session search.
 
-  @retval Pointer to IKEV2_SA_SESSION with the specified remote IP address or NULL. 
+  @retval Pointer to IKEV2_SA_SESSION with the specified remote IP address or NULL.
 
 **/
 IKEV2_SA_SESSION *
@@ -307,7 +307,7 @@ Ikev2SaSessionOnDeleting (
 }
 
 /**
-  Free specified Seession Common. The session common would belong to a IKE SA or 
+  Free specified Seession Common. The session common would belong to a IKE SA or
   a Child SA.
 
   @param[in]   SessionCommon   Pointer to a Session Common.
@@ -358,7 +358,7 @@ Ikev2SessionCommonRefresh (
   return ;
 }
 /**
-  Free specified IKEV2 SA Session. 
+  Free specified IKEV2 SA Session.
 
   @param[in]    IkeSaSession   Pointer to IKEV2_SA_SESSION to be freed.
 
@@ -374,7 +374,7 @@ Ikev2SaSessionFree (
   IKEV2_DH_BUFFER         *DhBuffer;
 
   ASSERT (IkeSaSession != NULL);
-  
+
   //
   // Delete Common Session
   //
@@ -419,7 +419,7 @@ Ikev2SaSessionFree (
 
     //
     // Delete Keys
-    //    
+    //
     if (IkeKeys->SkAiKey != NULL) {
       FreePool (IkeKeys->SkAiKey);
     }
@@ -495,9 +495,9 @@ Ikev2SaSessionIncreaseMessageId (
 
 /**
   Allocate memory for IKEV2 Child SA Session.
-  
+
   @param[in]   UdpService     Pointer to IKE_UDP_SERVICE.
-  @param[in]   IkeSaSession   Pointer to IKEV2_SA_SESSION related to this Child SA 
+  @param[in]   IkeSaSession   Pointer to IKEV2_SA_SESSION related to this Child SA
                               Session.
 
   @retval  Pointer of a new created IKEV2 Child SA Session or NULL.
@@ -534,7 +534,7 @@ Ikev2ChildSaSessionAlloc (
     FreePool (ChildSaSession);
     return NULL;
   }
-  
+
   ChildSaCommon                      = &ChildSaSession->SessionCommon;
   ChildSaCommon->UdpService          = UdpService;
   ChildSaCommon->Private             = IkeSaSession->SessionCommon.Private;
@@ -566,8 +566,8 @@ Ikev2ChildSaSessionAlloc (
 }
 
 /**
-  Register a established IKEv2 Child SA into IkeSaSession->ChildSaEstablishSessionList. 
-  If the there is IKEV2_CHILD_SA_SESSION with same remote peer IP, remove the old one 
+  Register a established IKEv2 Child SA into IkeSaSession->ChildSaEstablishSessionList.
+  If the there is IKEV2_CHILD_SA_SESSION with same remote peer IP, remove the old one
   then register the new one.
 
   @param[in]  ChildSaSession  Pointer to IKEV2_CHILD_SA_SESSION to be registered.
@@ -610,9 +610,9 @@ Ikev2ChildSaSessionReg (
 
   //
   // Cleanup the fields of SessionCommon for processing.
-  // 
+  //
   Ikev2SessionCommonRefresh (SessionCommon);
- 
+
   //
   // Insert the ready child SA session into established list.
   //
@@ -692,7 +692,7 @@ Ikev2ChildSaSessionLookupByMid (
 
   This functin find a ChildSA session by searching the ChildSaSessionlist of
   the input IKEV2_SA_SESSION by specified MessageID.
-  
+
   @param[in]  SaSessionList      Pointer to List to be searched.
   @param[in]  Spi                Specified SPI.
 
@@ -737,19 +737,19 @@ Ikev2ChildSaSessionInsert (
 
 /**
   Remove the IKEV2_CHILD_SA_SESSION from IkeSaSessionList.
-  
+
   @param[in]  SaSessionList      The SA Session List to be iterated.
   @param[in]  Spi                Spi used to identified the IKEV2_CHILD_SA_SESSION.
-  @param[in]  ListType           The type of the List to indicate whether it is a 
-                                 Established. 
+  @param[in]  ListType           The type of the List to indicate whether it is a
+                                 Established.
 
   @return The point to IKEV2_CHILD_SA_SESSION or NULL.
-  
+
 **/
 IKEV2_CHILD_SA_SESSION *
 Ikev2ChildSaSessionRemove (
   IN LIST_ENTRY           *SaSessionList,
-  IN UINT32               Spi, 
+  IN UINT32               Spi,
   IN UINT8                ListType
   )
 {
@@ -758,7 +758,7 @@ Ikev2ChildSaSessionRemove (
   IKEV2_CHILD_SA_SESSION  *ChildSaSession;
 
   NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, SaSessionList) {
-    
+
     if (ListType == IKEV2_ESTABLISHED_CHILDSA_LIST || ListType == IKEV2_ESTABLISHING_CHILDSA_LIST) {
       ChildSaSession = IKEV2_CHILD_SA_SESSION_BY_IKE_SA (Entry);
     } else if (ListType == IKEV2_DELET_CHILDSA_LIST) {
@@ -793,7 +793,7 @@ Ikev2ChildSaSessionOnDeleting (
 }
 
 /**
-  Free the memory located for the specified IKEV2_CHILD_SA_SESSION. 
+  Free the memory located for the specified IKEV2_CHILD_SA_SESSION.
 
   @param[in]  ChildSaSession  Pointer to IKEV2_CHILD_SA_SESSION.
 
@@ -907,7 +907,7 @@ Ikev2ChildSaSilentDelete (
   //
   ChildSession = Ikev2ChildSaSessionRemove(
                    &(IkeSaSession->ChildSaEstablishSessionList),
-                   Spi, 
+                   Spi,
                    IKEV2_ESTABLISHED_CHILDSA_LIST
                    );
   if (ChildSession == NULL) {
@@ -916,7 +916,7 @@ Ikev2ChildSaSilentDelete (
 
   LocalSpi  = ChildSession->LocalPeerSpi;
   RemoteSpi = ChildSession->RemotePeerSpi;
-  
+
   SelectorSize  = sizeof (EFI_IPSEC_CONFIG_SELECTOR);
   Selector      = AllocateZeroPool (SelectorSize);
   if (Selector == NULL) {
@@ -938,7 +938,7 @@ Ikev2ChildSaSilentDelete (
         Status = EFI_OUT_OF_RESOURCES;
         break;
       }
-      
+
       Status   = EfiIpSecConfigGetNextSelector (
                    &Private->IpSecConfig,
                    IPsecConfigDataTypeSad,
@@ -962,7 +962,7 @@ Ikev2ChildSaSilentDelete (
         Status = EFI_OUT_OF_RESOURCES;
         break;
       }
-      
+
       CopyMem (RemoteSelector, Selector, SelectorSize);
     }
 
@@ -977,7 +977,7 @@ Ikev2ChildSaSilentDelete (
         Status = EFI_OUT_OF_RESOURCES;
         break;
       }
-      
+
       CopyMem (LocalSelector, Selector, SelectorSize);
     }
   }
@@ -1032,12 +1032,12 @@ Ikev2ChildSaSilentDelete (
   Free the specified DhBuffer.
 
   @param[in] DhBuffer   Pointer to IKEV2_DH_BUFFER to be freed.
-  
+
 **/
 VOID
 Ikev2DhBufferFree (
   IKEV2_DH_BUFFER *DhBuffer
-) 
+)
 {
   if (DhBuffer != NULL) {
     if (DhBuffer->GxBuffer != NULL) {
@@ -1058,7 +1058,7 @@ Ikev2DhBufferFree (
 
 /**
   This function is to parse a request IKE packet and return its request type.
-  The request type is one of IKE CHILD SA creation, IKE SA rekeying and 
+  The request type is one of IKE CHILD SA creation, IKE SA rekeying and
   IKE CHILD SA rekeying.
 
   @param[in] IkePacket  IKE packet to be prased.
@@ -1085,10 +1085,10 @@ Ikev2ChildExchangeRequestType(
       //
       Flag = TRUE;
     }
-    if (IkePayload->PayloadType == IKEV2_PAYLOAD_TYPE_NOTIFY) { 
+    if (IkePayload->PayloadType == IKEV2_PAYLOAD_TYPE_NOTIFY) {
       if (((IKEV2_NOTIFY*)IkePayload)->MessageType == IKEV2_NOTIFICATION_REKEY_SA) {
         //
-        // If notify payload with REKEY_SA message type, the IkePacket is for 
+        // If notify payload with REKEY_SA message type, the IkePacket is for
         // rekeying Child SA.
         //
         return IkeRequestTypeRekeyChildSa;
@@ -1103,7 +1103,7 @@ Ikev2ChildExchangeRequestType(
     return IkeRequestTypeRekeyIkeSa;
   } else {
     //
-    // If the Notify payloaad with transport mode message type, the IkePacket is 
+    // If the Notify payloaad with transport mode message type, the IkePacket is
     // for create Child SA.
     //
     return IkeRequestTypeCreateChildSa;
@@ -1113,10 +1113,10 @@ Ikev2ChildExchangeRequestType(
 /**
   Associate a SPD selector to the Child SA Session.
 
-  This function is called when the Child SA is not the first child SA of its 
+  This function is called when the Child SA is not the first child SA of its
   IKE SA. It associate a SPD to this Child SA.
 
-  @param[in, out]  ChildSaSession     Pointer to the Child SA Session to be associated to 
+  @param[in, out]  ChildSaSession     Pointer to the Child SA Session to be associated to
                                       a SPD selector.
 
   @retval EFI_SUCCESS        Associate one SPD selector to this Child SA Session successfully.
@@ -1139,7 +1139,7 @@ Ikev2ChildSaAssociateSpdEntry (
 
 /**
   This function finds the SPI from Create Child SA Exchange Packet.
- 
+
   @param[in] IkePacket       Pointer to IKE_PACKET to be searched.
 
   @retval SPI number or 0 if it is not supported.
@@ -1152,7 +1152,7 @@ Ikev2ChildExchangeRekeySpi (
 {
   //
   // Not support yet.
-  // 
+  //
   return 0;
 }
 
@@ -1202,7 +1202,7 @@ Ikev2ValidateHeader (
   //
   // Information Exchagne and Create Child Exchange can be started from each part.
   //
-  if (IkeHdr->ExchangeType != IKEV2_EXCHANGE_TYPE_INFO && 
+  if (IkeHdr->ExchangeType != IKEV2_EXCHANGE_TYPE_INFO &&
       IkeHdr->ExchangeType != IKEV2_EXCHANGE_TYPE_CREATE_CHILD
       ) {
     if (IkeSaSession->SessionCommon.IsInitiator) {
@@ -1277,7 +1277,7 @@ Ikev2InitializeSaData (
   ProposalData->ProposalIndex   = 1;
 
   //
-  // If SA data for IKE_SA_INIT exchage, contains 4 transforms. If SA data for 
+  // If SA data for IKE_SA_INIT exchage, contains 4 transforms. If SA data for
   // IKE_AUTH exchange contains 3 transforms.
   //
   if (SessionCommon->IkeSessionType == IkeSessionTypeIkeSa) {
@@ -1297,7 +1297,7 @@ Ikev2InitializeSaData (
       FreePool (SaData);
       return NULL;
     }
-    
+
     CopyMem (
       ProposalData->Spi,
       &ChildSaSession->LocalPeerSpi,
@@ -1370,7 +1370,7 @@ Ikev2InitializeSaData (
       FreePool (SaData);
       return NULL;
     }
-    
+
     CopyMem (
       ProposalData->Spi,
       &ChildSaSession->LocalPeerSpi,
@@ -1456,9 +1456,9 @@ Ikev2StoreSaData (
 
   //
   // Create a SpdSelector. In this implementation, one SPD represents
-  // 2 direction traffic, so in here, there needs to reverse the local address 
+  // 2 direction traffic, so in here, there needs to reverse the local address
   // and remote address for Remote Peer's SA, then reverse again for the locate
-  // SA. 
+  // SA.
   //
   TempAddressCount = ChildSaSession->SpdSelector->LocalAddressCount;
   TempAddressInfo  = ChildSaSession->SpdSelector->LocalAddress;
@@ -1483,7 +1483,7 @@ Ikev2StoreSaData (
   //
   if (SaData.Mode == EfiIPsecTunnel) {
     CopyMem (
-      &SaData.TunnelSourceAddress, 
+      &SaData.TunnelSourceAddress,
       &ChildSaSession->Spd->Data->ProcessingPolicy->TunnelOption->RemoteTunnelAddress,
       sizeof (EFI_IP_ADDRESS)
       );
@@ -1512,13 +1512,13 @@ Ikev2StoreSaData (
 
   //
   // Store the local SA into SAD.
-  //  
+  //
   ChildSaSession->SpdSelector->RemoteAddressCount = ChildSaSession->SpdSelector->LocalAddressCount;
   ChildSaSession->SpdSelector->RemoteAddress      = ChildSaSession->SpdSelector->LocalAddress;
 
   ChildSaSession->SpdSelector->LocalAddress       = TempAddressInfo;
   ChildSaSession->SpdSelector->LocalAddressCount  = TempAddressCount;
-  
+
   SaId.Spi = ChildSaSession->RemotePeerSpi;
 
   CopyMem (&SaId.DestAddress, &ChildSaSession->SessionCommon.RemotePeerIp, sizeof (EFI_IP_ADDRESS));
@@ -1555,12 +1555,12 @@ Ikev2StoreSaData (
 /**
   Call back function of the IKE life time is over.
 
-  This function will mark the related IKE SA Session as deleting and trigger a 
+  This function will mark the related IKE SA Session as deleting and trigger a
   Information negotiation.
 
   @param[in]    Event     The signaled Event.
   @param[in]    Context   Pointer to data passed by caller.
-  
+
 **/
 VOID
 EFIAPI
@@ -1602,7 +1602,7 @@ Ikev2LifetimeNotify (
 
     //
     // Change the Child SA Session's State to IKE_STATE_SA_DELETING.
-    //    
+    //
     DEBUG ((
       DEBUG_INFO,
       "\n------ChildSa Lifetime is out(SPI):(0x%x)------\n",
@@ -1638,7 +1638,7 @@ Ikev2ResendNotify (
   UINT8                        Value;
   EFI_STATUS                   Status;
 
-  ASSERT (Context != NULL); 
+  ASSERT (Context != NULL);
   IkeSaSession   = NULL;
   ChildSaSession = NULL;
   SessionCommon  = (IKEV2_SESSION_COMMON *) Context;
@@ -1714,9 +1714,9 @@ Ikev2ResendNotify (
       if (ChildSaSession->SessionCommon.State == IkeStateSaDeleting) {
 
         //
-        // Established Child SA should be remove from the SAD entry and 
-        // DeleteList. The function of Ikev2DeleteChildSaSilent() will remove 
-        // the childSA from the IkeSaSession->ChildSaEstablishedList. So there 
+        // Established Child SA should be remove from the SAD entry and
+        // DeleteList. The function of Ikev2DeleteChildSaSilent() will remove
+        // the childSA from the IkeSaSession->ChildSaEstablishedList. So there
         // is no need to remove it here.
         //
         Ikev2ChildSaSilentDelete (IkeSaSession, ChildSaSession->LocalPeerSpi);
@@ -1759,19 +1759,19 @@ Ikev2ResendNotify (
   Copy ChildSaSession->Spd->Selector to ChildSaSession->SpdSelector.
 
   ChildSaSession->SpdSelector stores the real Spdselector for its SA. Sometime,
-  the SpdSelector in ChildSaSession is more accurated or the scope is smaller 
+  the SpdSelector in ChildSaSession is more accurated or the scope is smaller
   than the one in ChildSaSession->Spd, especially for the tunnel mode.
-    
+
   @param[in, out]  ChildSaSession  Pointer to IKEV2_CHILD_SA_SESSION related to.
 
   @retval EFI_SUCCESS            The operation complete successfully.
   @retval EFI_OUT_OF_RESOURCES   If the required resource can't be allocated.
-  
+
 **/
 EFI_STATUS
 Ikev2ChildSaSessionSpdSelectorCreate (
   IN OUT IKEV2_CHILD_SA_SESSION *ChildSaSession
-  ) 
+  )
 {
   EFI_STATUS          Status;
 
@@ -1786,26 +1786,26 @@ Ikev2ChildSaSessionSpdSelectorCreate (
       }
     }
     CopyMem (
-      ChildSaSession->SpdSelector, 
-      ChildSaSession->Spd->Selector, 
+      ChildSaSession->SpdSelector,
+      ChildSaSession->Spd->Selector,
       sizeof (EFI_IPSEC_SPD_SELECTOR)
       );
     ChildSaSession->SpdSelector->RemoteAddress = AllocateCopyPool (
-                                                   ChildSaSession->Spd->Selector->RemoteAddressCount * 
-                                                   sizeof (EFI_IP_ADDRESS_INFO), 
+                                                   ChildSaSession->Spd->Selector->RemoteAddressCount *
+                                                   sizeof (EFI_IP_ADDRESS_INFO),
                                                    ChildSaSession->Spd->Selector->RemoteAddress
                                                    );
     if (ChildSaSession->SpdSelector->RemoteAddress == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
 
       FreePool (ChildSaSession->SpdSelector);
-      
+
       return Status;
     }
-    
+
     ChildSaSession->SpdSelector->LocalAddress = AllocateCopyPool (
-                                                  ChildSaSession->Spd->Selector->LocalAddressCount * 
-                                                  sizeof (EFI_IP_ADDRESS_INFO), 
+                                                  ChildSaSession->Spd->Selector->LocalAddressCount *
+                                                  sizeof (EFI_IP_ADDRESS_INFO),
                                                   ChildSaSession->Spd->Selector->LocalAddress
                                                   );
     if (ChildSaSession->SpdSelector->LocalAddress == NULL) {
@@ -1814,12 +1814,12 @@ Ikev2ChildSaSessionSpdSelectorCreate (
       FreePool (ChildSaSession->SpdSelector->RemoteAddress);
 
       FreePool (ChildSaSession->SpdSelector);
-      
+
       return Status;
     }
 
     ChildSaSession->SpdSelector->RemoteAddressCount = ChildSaSession->Spd->Selector->RemoteAddressCount;
-    ChildSaSession->SpdSelector->LocalAddressCount = ChildSaSession->Spd->Selector->LocalAddressCount; 
+    ChildSaSession->SpdSelector->LocalAddressCount = ChildSaSession->Spd->Selector->LocalAddressCount;
   }
 
   return Status;
@@ -1853,7 +1853,7 @@ Ikev2ChildSaSessionCreate (
 
   //
   // Set the specific parameters.
-  // 
+  //
   ChildSaSession->Spd        = IkeSaSession->Spd;
   ChildSaCommon              = &ChildSaSession->SessionCommon;
   ChildSaCommon->IsInitiator = IkeSaSession->SessionCommon.IsInitiator;
@@ -1883,7 +1883,7 @@ Ikev2ChildSaSessionCreate (
     Ikev2ChildSaSessionFree (ChildSaSession);
     return NULL;
   }
-  
+
   ChildSaSession->NiBlkSize = IkeSaSession->NiBlkSize;
   CopyMem (ChildSaSession->NiBlock, IkeSaSession->NiBlock, IkeSaSession->NiBlkSize);
 
@@ -1892,13 +1892,13 @@ Ikev2ChildSaSessionCreate (
     Ikev2ChildSaSessionFree (ChildSaSession);
     return NULL;
   }
-  
+
   ChildSaSession->NrBlkSize = IkeSaSession->NrBlkSize;
   CopyMem (ChildSaSession->NrBlock, IkeSaSession->NrBlock, IkeSaSession->NrBlkSize);
 
   //
-  //  Only if the Create Child SA is called for the IKE_INIT Exchange and 
-  //  IkeSaSession is initiator (Only Initiator's SPD is not NULL), Set the 
+  //  Only if the Create Child SA is called for the IKE_INIT Exchange and
+  //  IkeSaSession is initiator (Only Initiator's SPD is not NULL), Set the
   //  Traffic Selectors related information here.
   //
   if (IkeSaSession->SessionCommon.State == IkeStateAuth && IkeSaSession->Spd != NULL) {
@@ -1918,20 +1918,20 @@ Ikev2ChildSaSessionCreate (
   Check if the SPD is related to the input Child SA Session.
 
   This function is the subfunction of Ikev1AssociateSpdEntry(). It is the call
-  back function of IpSecVisitConfigData(). 
-  
+  back function of IpSecVisitConfigData().
+
 
   @param[in]  Type               Type of the input Config Selector.
-  @param[in]  Selector           Pointer to the Configure Selector to be checked. 
-  @param[in]  Data               Pointer to the Configure Selector's Data passed 
+  @param[in]  Selector           Pointer to the Configure Selector to be checked.
+  @param[in]  Data               Pointer to the Configure Selector's Data passed
                                  from the caller.
   @param[in]  SelectorSize       The buffer size of Selector.
   @param[in]  DataSize           The buffer size of the Data.
   @param[in]  Context            The data passed from the caller. It is a Child
                                  SA Session in this context.
 
-  @retval EFI_SUCCESS        The SPD Selector is not related to the Child SA Session. 
-  @retval EFI_ABORTED        The SPD Selector is related to the Child SA session and 
+  @retval EFI_SUCCESS        The SPD Selector is not related to the Child SA Session.
+  @retval EFI_ABORTED        The SPD Selector is related to the Child SA session and
                              set the ChildSaSession->Spd to point to this SPD Selector.
 
 **/
@@ -1962,7 +1962,7 @@ Ikev2MatchSpdEntry (
 
   ChildSaSession  = (IKEV2_CHILD_SA_SESSION *) Context;
   IpVersion       = ChildSaSession->SessionCommon.UdpService->IpVersion;
-  SpdSelector     = (EFI_IPSEC_SPD_SELECTOR *) Selector;  
+  SpdSelector     = (EFI_IPSEC_SPD_SELECTOR *) Selector;
   IsMatch         = TRUE;
 
   if (SpdSelector->NextLayerProtocol == EFI_IP_PROTO_UDP &&
@@ -1991,7 +1991,7 @@ Ikev2MatchSpdEntry (
     IsMatch = FALSE;
   }
 
-  IsMatch = (BOOLEAN) (IsMatch && 
+  IsMatch = (BOOLEAN) (IsMatch &&
                        IpSecMatchIpAddress (
                          IpVersion,
                          &ChildSaSession->SessionCommon.LocalPeerIp,
@@ -1999,7 +1999,7 @@ Ikev2MatchSpdEntry (
                          SpdSelector->LocalAddressCount
                          ));
 
-  IsMatch = (BOOLEAN) (IsMatch && 
+  IsMatch = (BOOLEAN) (IsMatch &&
                        IpSecMatchIpAddress (
                          IpVersion,
                          &ChildSaSession->SessionCommon.RemotePeerIp,
@@ -2073,12 +2073,12 @@ Ikev2IsSupportAlg (
 
   @param[in]  ProposalData              Pointer to related IKEV2_PROPOSAL_DATA.
   @param[out] PreferEncryptAlgorithm    Output of preferred encrypt algorithm.
-  @param[out] PreferIntegrityAlgorithm  Output of preferred integrity algorithm. 
-  @param[out] PreferPrfAlgorithm        Output of preferred PRF algorithm. Only 
+  @param[out] PreferIntegrityAlgorithm  Output of preferred integrity algorithm.
+  @param[out] PreferPrfAlgorithm        Output of preferred PRF algorithm. Only
                                         for IKE SA.
-  @param[out] PreferDhGroup             Output of preferred DH group. Only for 
+  @param[out] PreferDhGroup             Output of preferred DH group. Only for
                                         IKE SA.
-  @param[out] PreferEncryptKeylength    Output of preferred encrypt key length 
+  @param[out] PreferEncryptKeylength    Output of preferred encrypt key length
                                         in bytes.
   @param[out] IsSupportEsn              Output of value about the Extented Sequence
                                         Number is support or not. Only for Child SA.
@@ -2088,7 +2088,7 @@ Ikev2IsSupportAlg (
 **/
 VOID
 Ikev2ParseProposalData (
-  IN     IKEV2_PROPOSAL_DATA  *ProposalData, 
+  IN     IKEV2_PROPOSAL_DATA  *ProposalData,
      OUT UINT16               *PreferEncryptAlgorithm,
      OUT UINT16               *PreferIntegrityAlgorithm,
      OUT UINT16               *PreferPrfAlgorithm,
@@ -2096,7 +2096,7 @@ Ikev2ParseProposalData (
      OUT UINTN                *PreferEncryptKeylength,
      OUT BOOLEAN              *IsSupportEsn,
   IN     BOOLEAN              IsChildSa
-) 
+)
 {
   IKEV2_TRANSFORM_DATA *TransformData;
   UINT8                TransformIndex;
@@ -2105,7 +2105,7 @@ Ikev2ParseProposalData (
   // Check input parameters.
   //
   if (ProposalData == NULL ||
-      PreferEncryptAlgorithm == NULL || 
+      PreferEncryptAlgorithm == NULL ||
       PreferIntegrityAlgorithm == NULL ||
       PreferEncryptKeylength == NULL
       ) {
@@ -2120,14 +2120,14 @@ Ikev2ParseProposalData (
     if (PreferPrfAlgorithm == NULL || PreferDhGroup == NULL) {
       return;
     }
-  }  
+  }
 
   TransformData = (IKEV2_TRANSFORM_DATA *)(ProposalData + 1);
   for (TransformIndex = 0; TransformIndex < ProposalData->NumTransforms; TransformIndex++) {
-    switch (TransformData->TransformType) {          
+    switch (TransformData->TransformType) {
     //
-    // For IKE SA there are four algorithm types. Encryption Algorithm, Pseudo-random Function, 
-    // Integrity Algorithm, Diffie-Hellman Group. For Child SA, there are three algorithm types. 
+    // For IKE SA there are four algorithm types. Encryption Algorithm, Pseudo-random Function,
+    // Integrity Algorithm, Diffie-Hellman Group. For Child SA, there are three algorithm types.
     // Encryption Algorithm, Integrity Algorithm, Extended Sequence Number.
     //
     case IKEV2_TRANSFORM_TYPE_ENCR:
@@ -2154,7 +2154,7 @@ Ikev2ParseProposalData (
         if (*PreferPrfAlgorithm == 0 && Ikev2IsSupportAlg (TransformData->TransformId, IKE_PRF_TYPE)) {
           *PreferPrfAlgorithm = TransformData->TransformId;
         }
-      }       
+      }
       break;
 
     case IKEV2_TRANSFORM_TYPE_INTEG :
@@ -2162,21 +2162,21 @@ Ikev2ParseProposalData (
         *PreferIntegrityAlgorithm = TransformData->TransformId;
       }
       break;
-      
+
     case IKEV2_TRANSFORM_TYPE_DH :
       if (!IsChildSa) {
         if (*PreferDhGroup == 0 && Ikev2IsSupportAlg (TransformData->TransformId, IKE_DH_TYPE)) {
           *PreferDhGroup = TransformData->TransformId;
         }
-      }        
+      }
       break;
-    
+
     case IKEV2_TRANSFORM_TYPE_ESN :
       if (IsChildSa) {
         if (TransformData->TransformId != 0) {
           *IsSupportEsn = TRUE;
         }
-      }        
+      }
       break;
 
     default:
@@ -2188,14 +2188,14 @@ Ikev2ParseProposalData (
 
 /**
   Parse the received Initial Exchange Packet.
-  
-  This function parse the SA Payload and Key Payload to find out the cryptographic 
-  suite for the further IKE negotiation and fill it into the IKE SA Session's 
+
+  This function parse the SA Payload and Key Payload to find out the cryptographic
+  suite for the further IKE negotiation and fill it into the IKE SA Session's
   CommonSession->SaParams.
 
   @param[in, out]  IkeSaSession  Pointer to related IKEV2_SA_SESSION.
   @param[in]       SaPayload     The received packet.
-  @param[in]       Type          The received packet IKE header flag. 
+  @param[in]       Type          The received packet IKE header flag.
 
   @retval          TRUE          If the SA proposal in Packet is acceptable.
   @retval          FALSE         If the SA proposal in Packet is not acceptable.
@@ -2246,7 +2246,7 @@ Ikev2SaParseSaPayload (
         // Get the preferred algorithms.
         //
         Ikev2ParseProposalData (
-          ProposalData, 
+          ProposalData,
           &PreferEncryptAlgorithm,
           &PreferIntegrityAlgorithm,
           &PreferPrfAlgorithm,
@@ -2258,17 +2258,17 @@ Ikev2SaParseSaPayload (
 
         if (PreferEncryptAlgorithm != 0 &&
               PreferIntegrityAlgorithm != 0 &&
-              PreferPrfAlgorithm != 0 && 
+              PreferPrfAlgorithm != 0 &&
               PreferDhGroup != 0
               ) {
             //
-            // Find the matched one. 
+            // Find the matched one.
             //
             IkeSaSession->SessionCommon.SaParams = AllocateZeroPool (sizeof (IKEV2_SA_PARAMS));
             if (IkeSaSession->SessionCommon.SaParams == NULL) {
               return FALSE;
             }
-            
+
             IkeSaSession->SessionCommon.SaParams->EncAlgId   = PreferEncryptAlgorithm;
             IkeSaSession->SessionCommon.SaParams->EnckeyLen  = PreferEncryptKeylength;
             IkeSaSession->SessionCommon.SaParams->DhGroup    = PreferDhGroup;
@@ -2296,13 +2296,13 @@ Ikev2SaParseSaPayload (
             // one than one transform with same type.
             //
             CopyMem (
-              (IKEV2_PROPOSAL_DATA *) (IkeSaSession->SaData + 1), 
-               ProposalData, 
+              (IKEV2_PROPOSAL_DATA *) (IkeSaSession->SaData + 1),
+               ProposalData,
                SaDataSize - sizeof (IKEV2_SA_DATA)
               );
 
             ((IKEV2_PROPOSAL_DATA *) (IkeSaSession->SaData + 1))->ProposalIndex = 1;
-            
+
             return TRUE;
           } else {
             PreferEncryptAlgorithm   = 0;
@@ -2315,21 +2315,21 @@ Ikev2SaParseSaPayload (
       //
       // Point to next Proposal.
       //
-      ProposalData = (IKEV2_PROPOSAL_DATA*)((UINT8*)(ProposalData + 1) + 
+      ProposalData = (IKEV2_PROPOSAL_DATA*)((UINT8*)(ProposalData + 1) +
                      ProposalData->NumTransforms * sizeof (IKEV2_TRANSFORM_DATA));
     }
   } else if (Type == IKE_HEADER_FLAGS_RESPOND) {
     //
-    // First check the SA proposal's ProtoctolID and Transform Numbers. Since it is 
-    // the responded SA proposal, suppose it only has one proposal and the transform Numbers 
-    // is 4. 
+    // First check the SA proposal's ProtoctolID and Transform Numbers. Since it is
+    // the responded SA proposal, suppose it only has one proposal and the transform Numbers
+    // is 4.
     //
     ProposalData  = (IKEV2_PROPOSAL_DATA *)((IKEV2_SA_DATA *) SaPayload->PayloadBuf + 1);
     if (ProposalData->ProtocolId != IPSEC_PROTO_ISAKMP || ProposalData->NumTransforms != 4) {
       return FALSE;
     }
     //
-    // Get the preferred algorithms. 
+    // Get the preferred algorithms.
     //
     Ikev2ParseProposalData (
       ProposalData,
@@ -2338,17 +2338,17 @@ Ikev2SaParseSaPayload (
       &PreferPrfAlgorithm,
       &PreferDhGroup,
       &PreferEncryptKeylength,
-      NULL, 
+      NULL,
       FALSE
       );
-    // 
+    //
     // Check if the Sa proposal data from received packet is in the IkeSaSession->SaData.
     //
     ProposalData = (IKEV2_PROPOSAL_DATA *) (IkeSaSession->SaData + 1);
 
     for (ProposalIndex = 0; ProposalIndex < IkeSaSession->SaData->NumProposals && (!IsMatch); ProposalIndex++) {
       Ikev2ParseProposalData (
-          ProposalData, 
+          ProposalData,
           &EncryptAlgorithm,
           &IntegrityAlgorithm,
           &PrfAlgorithm,
@@ -2369,11 +2369,11 @@ Ikev2SaParseSaPayload (
         IntegrityAlgorithm = 0;
         PrfAlgorithm       = 0;
         DhGroup            = 0;
-        EncryptKeylength   = 0; 
+        EncryptKeylength   = 0;
       }
 
-      ProposalData = (IKEV2_PROPOSAL_DATA*)((UINT8*)(ProposalData + 1) + 
-                     ProposalData->NumTransforms * sizeof (IKEV2_TRANSFORM_DATA));    
+      ProposalData = (IKEV2_PROPOSAL_DATA*)((UINT8*)(ProposalData + 1) +
+                     ProposalData->NumTransforms * sizeof (IKEV2_TRANSFORM_DATA));
     }
 
     if (IsMatch) {
@@ -2381,32 +2381,32 @@ Ikev2SaParseSaPayload (
         if (IkeSaSession->SessionCommon.SaParams == NULL) {
           return FALSE;
         }
-        
+
         IkeSaSession->SessionCommon.SaParams->EncAlgId   = PreferEncryptAlgorithm;
         IkeSaSession->SessionCommon.SaParams->EnckeyLen  = PreferEncryptKeylength;
         IkeSaSession->SessionCommon.SaParams->DhGroup    = PreferDhGroup;
         IkeSaSession->SessionCommon.SaParams->Prf        = PreferPrfAlgorithm;
         IkeSaSession->SessionCommon.SaParams->IntegAlgId = PreferIntegrityAlgorithm;
         IkeSaSession->SessionCommon.PreferDhGroup        = PreferDhGroup;
-      
+
         return TRUE;
     }
   }
-  
+
   return FALSE;
 }
 
 /**
   Parse the received Authentication Exchange Packet.
-  
+
   This function parse the SA Payload and Key Payload to find out the cryptographic
   suite for the ESP and fill it into the Child SA Session's CommonSession->SaParams.
-  
-  @param[in, out]  ChildSaSession  Pointer to IKEV2_CHILD_SA_SESSION related to 
+
+  @param[in, out]  ChildSaSession  Pointer to IKEV2_CHILD_SA_SESSION related to
                                    this Authentication Exchange.
   @param[in]       SaPayload       The received packet.
-  @param[in]       Type            The IKE header's flag of received packet . 
-  
+  @param[in]       Type            The IKE header's flag of received packet .
+
   @retval          TRUE            If the SA proposal in Packet is acceptable.
   @retval          FALSE           If the SA proposal in Packet is not acceptable.
 
@@ -2465,18 +2465,18 @@ Ikev2ChildSaParseSaPayload (
         //
         // Don't support the ESN now.
         //
-        if (PreferEncryptAlgorithm != 0 && 
+        if (PreferEncryptAlgorithm != 0 &&
             PreferIntegrityAlgorithm != 0 &&
             !IsSupportEsn
             ) {
           //
-          // Find the matched one. 
+          // Find the matched one.
           //
           ChildSaSession->SessionCommon.SaParams = AllocateZeroPool (sizeof (IKEV2_SA_PARAMS));
           if (ChildSaSession->SessionCommon.SaParams == NULL) {
             return FALSE;
           }
-          
+
           ChildSaSession->SessionCommon.SaParams->EncAlgId   = PreferEncryptAlgorithm;
           ChildSaSession->SessionCommon.SaParams->EnckeyLen  = PreferEncryptKeylength;
           ChildSaSession->SessionCommon.SaParams->IntegAlgId = PreferIntegrityAlgorithm;
@@ -2499,7 +2499,7 @@ Ikev2ChildSaParseSaPayload (
 
           //
           // BUGBUG: Suppose there are 4 transforms in the matched proposal. If
-          // the matched Proposal has more than 4 transforms that means there 
+          // the matched Proposal has more than 4 transforms that means there
           // are more than one transform with same type.
           //
           CopyMem (
@@ -2511,17 +2511,17 @@ Ikev2ChildSaParseSaPayload (
           ((IKEV2_PROPOSAL_DATA *) (ChildSaSession->SaData + 1))->ProposalIndex = 1;
 
           ((IKEV2_PROPOSAL_DATA *) (ChildSaSession->SaData + 1))->Spi = AllocateCopyPool (
-                                                                          sizeof (ChildSaSession->LocalPeerSpi), 
+                                                                          sizeof (ChildSaSession->LocalPeerSpi),
                                                                           &ChildSaSession->LocalPeerSpi
                                                                           );
           if (((IKEV2_PROPOSAL_DATA *) (ChildSaSession->SaData + 1))->Spi == NULL) {
             FreePool (ChildSaSession->SessionCommon.SaParams);
 
             FreePool (ChildSaSession->SaData );
-            
+
             return FALSE;
           }
-          
+
           return TRUE;
 
         } else {
@@ -2533,14 +2533,14 @@ Ikev2ChildSaParseSaPayload (
       //
       // Point to next Proposal
       //
-      ProposalData = (IKEV2_PROPOSAL_DATA *)((UINT8 *)(ProposalData + 1) + 
+      ProposalData = (IKEV2_PROPOSAL_DATA *)((UINT8 *)(ProposalData + 1) +
                      ProposalData->NumTransforms * sizeof (IKEV2_TRANSFORM_DATA));
     }
   } else if (Type == IKE_HEADER_FLAGS_RESPOND) {
     //
-    // First check the SA proposal's ProtoctolID and Transform Numbers. Since it is 
-    // the responded SA proposal, suppose it only has one proposal and the transform Numbers 
-    // is 3. 
+    // First check the SA proposal's ProtoctolID and Transform Numbers. Since it is
+    // the responded SA proposal, suppose it only has one proposal and the transform Numbers
+    // is 3.
     //
     ProposalData  = (IKEV2_PROPOSAL_DATA *)((IKEV2_SA_DATA *)SaPayload->PayloadBuf + 1);
     if (ProposalData->ProtocolId != IPSEC_PROTO_IPSEC_ESP || ProposalData->NumTransforms != 3) {
@@ -2564,7 +2564,7 @@ Ikev2ChildSaParseSaPayload (
 
     for (ProposalIndex = 0; ProposalIndex < ChildSaSession->SaData->NumProposals && (!IsMatch); ProposalIndex++) {
       Ikev2ParseProposalData (
-          ProposalData, 
+          ProposalData,
           &EncryptAlgorithm,
           &IntegrityAlgorithm,
           NULL,
@@ -2576,7 +2576,7 @@ Ikev2ChildSaParseSaPayload (
       if (EncryptAlgorithm == PreferEncryptAlgorithm &&
           EncryptKeylength == PreferEncryptKeylength &&
           IntegrityAlgorithm == PreferIntegrityAlgorithm &&
-          IsSupportEsn == PreferIsSupportEsn          
+          IsSupportEsn == PreferIsSupportEsn
           ) {
         IsMatch = TRUE;
       } else {
@@ -2584,17 +2584,17 @@ Ikev2ChildSaParseSaPayload (
         PreferIntegrityAlgorithm = 0;
         IsSupportEsn             = TRUE;
       }
-       ProposalData = (IKEV2_PROPOSAL_DATA*)((UINT8*)(ProposalData + 1) + 
-                     ProposalData->NumTransforms * sizeof (IKEV2_TRANSFORM_DATA));  
+       ProposalData = (IKEV2_PROPOSAL_DATA*)((UINT8*)(ProposalData + 1) +
+                     ProposalData->NumTransforms * sizeof (IKEV2_TRANSFORM_DATA));
     }
-  
+
     ProposalData  = (IKEV2_PROPOSAL_DATA *)((IKEV2_SA_DATA *)SaPayload->PayloadBuf + 1);
     if (IsMatch) {
         ChildSaSession->SessionCommon.SaParams = AllocateZeroPool (sizeof (IKEV2_SA_PARAMS));
         if (ChildSaSession->SessionCommon.SaParams == NULL) {
           return FALSE;
         }
-        
+
         ChildSaSession->SessionCommon.SaParams->EncAlgId   = PreferEncryptAlgorithm;
         ChildSaSession->SessionCommon.SaParams->EnckeyLen  = PreferEncryptKeylength;
         ChildSaSession->SessionCommon.SaParams->IntegAlgId = PreferIntegrityAlgorithm;
@@ -2609,17 +2609,17 @@ Ikev2ChildSaParseSaPayload (
 /**
   Generate Key buffer from fragments.
 
-  If the digest length of specified HashAlgId is larger than or equal with the 
-  required output key length, derive the key directly. Otherwise, Key Material 
-  needs to be PRF-based concatenation according to 2.13 of RFC 4306: 
+  If the digest length of specified HashAlgId is larger than or equal with the
+  required output key length, derive the key directly. Otherwise, Key Material
+  needs to be PRF-based concatenation according to 2.13 of RFC 4306:
   prf+ (K,S) = T1 | T2 | T3 | T4 | ..., T1 = prf (K, S | 0x01),
   T2 = prf (K, T1 | S | 0x02), T3 = prf (K, T2 | S | 0x03),T4 = prf (K, T3 | S | 0x04)
   then derive the key from this key material.
-  
+
   @param[in]       HashAlgId        The Hash Algorithm ID used to generate key.
   @param[in]       HashKey          Pointer to a key buffer which contains hash key.
   @param[in]       HashKeyLength    The length of HashKey in bytes.
-  @param[in, out]  OutputKey        Pointer to buffer which is used to receive the 
+  @param[in, out]  OutputKey        Pointer to buffer which is used to receive the
                                     output key.
   @param[in]       OutputKeyLength  The length of OutPutKey buffer.
   @param[in]       Fragments        Pointer to the data to be used to generate key.
@@ -2682,11 +2682,11 @@ Ikev2SaGenerateKey (
   if (OutputKeyLength <=  DigestSize) {
     Status = IpSecCryptoIoHmac (
                HashAlgId,
-               HashKey, 
-               HashKeyLength, 
-               (HASH_DATA_FRAGMENT *) Fragments, 
-               NumFragments, 
-               Digest, 
+               HashKey,
+               HashKeyLength,
+               (HASH_DATA_FRAGMENT *) Fragments,
+               NumFragments,
+               Digest,
                DigestSize
                );
     if (EFI_ERROR (Status)) {
@@ -2713,7 +2713,7 @@ Ikev2SaGenerateKey (
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
-  
+
   LocalFragments[1].DataSize = FragmentsSize;
 
   //
@@ -2722,7 +2722,7 @@ Ikev2SaGenerateKey (
   FragmentsSize = 0;
   for (Index = 0; Index < NumFragments; Index++) {
     CopyMem (
-      LocalFragments[1].Data + FragmentsSize, 
+      LocalFragments[1].Data + FragmentsSize,
       Fragments[Index].Data,
       Fragments[Index].DataSize
       );
@@ -2743,17 +2743,17 @@ Ikev2SaGenerateKey (
     Status = EFI_OUT_OF_RESOURCES;
     goto Exit;
   }
-  
+
   LocalFragments[0].DataSize = AuthKeyLength;
 
   Round = (OutputKeyLength - 1) / AuthKeyLength + 1;
   for (Index = 0; Index < Round; Index++) {
     Status = IpSecCryptoIoHmac (
-               HashAlgId, 
-               HashKey, 
-               HashKeyLength, 
+               HashAlgId,
+               HashKey,
+               HashKeyLength,
                (HASH_DATA_FRAGMENT *)(Index == 0 ? &LocalFragments[1] : LocalFragments),
-               Index == 0 ? 2 : 3, 
+               Index == 0 ? 2 : 3,
                Digest,
                DigestSize
                );
@@ -2761,25 +2761,25 @@ Ikev2SaGenerateKey (
       goto Exit;
     }
     CopyMem (
-      LocalFragments[0].Data, 
-      Digest, 
+      LocalFragments[0].Data,
+      Digest,
       DigestSize
       );
     if (OutputKeyLength > DigestSize * (Index + 1)) {
       CopyMem (
-        OutputKey + Index * DigestSize, 
-        Digest, 
+        OutputKey + Index * DigestSize,
+        Digest,
         DigestSize
         );
       LocalFragments[0].DataSize = DigestSize;
       TailData ++;
     } else {
-      // 
+      //
       // The last round
       //
       CopyMem (
-        OutputKey + Index * DigestSize, 
-        Digest, 
+        OutputKey + Index * DigestSize,
+        Digest,
         OutputKeyLength - Index * DigestSize
       );
     }

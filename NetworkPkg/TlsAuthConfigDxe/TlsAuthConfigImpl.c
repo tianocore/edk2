@@ -1,7 +1,7 @@
 /** @file
   The Miscellaneous Routines for TlsAuthConfigDxe driver.
 
-Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1560,7 +1560,7 @@ TlsAuthConfigAccessCallback (
   HiiGetBrowserData (&gTlsAuthConfigGuid, mTlsAuthConfigStorageName, BufferSize, (UINT8 *) IfrNvData);
 
   if ((Action != EFI_BROWSER_ACTION_CHANGED) &&
-      (Action != EFI_BROWSER_ACTION_CHANGING) && 
+      (Action != EFI_BROWSER_ACTION_CHANGING) &&
       (Action != EFI_BROWSER_ACTION_FORM_CLOSE)) {
     Status = EFI_UNSUPPORTED;
     goto EXIT;
@@ -1593,10 +1593,10 @@ TlsAuthConfigAccessCallback (
       break;
     case KEY_TLS_AUTH_CONFIG_ENROLL_CERT_FROM_FILE:
       //
-      // If the file is already opened, clean the file related resource first. 
+      // If the file is already opened, clean the file related resource first.
       //
       CleanFileContext (Private);
-      
+
       ChooseFile( NULL, NULL, UpdateCAFromFile, &File);
       break;
 

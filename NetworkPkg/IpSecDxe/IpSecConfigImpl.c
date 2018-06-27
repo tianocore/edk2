@@ -1,7 +1,7 @@
 /** @file
   The implementation of IPSEC_CONFIG_PROTOCOL.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -97,7 +97,7 @@ EFI_IPSEC_CONFIG_PROTOCOL mIpSecConfigInstance = {
   Get the all IPSec configuration variables and store those variables
   to the internal data structure.
 
-  This founction is called by IpSecConfigInitialize() that is to intialize the 
+  This founction is called by IpSecConfigInitialize() that is to intialize the
   IPsecConfiguration Protocol.
 
   @param[in]  Private            Point to IPSEC_PRIVATE_DATA.
@@ -121,7 +121,7 @@ IpSecConfigRestore (
 
   @retval  TRUE    The specified AddressInfo is in the AddressInfoList.
   @retval  FALSE   The specified AddressInfo is not in the AddressInfoList.
-  
+
 **/
 BOOLEAN
 IsInAddressInfoList(
@@ -152,20 +152,20 @@ IsInAddressInfoList(
           AddressInfo,
           &AddressInfoList[Index].Address,
           sizeof (EFI_IP_ADDRESS)
-          ) == 0 && 
+          ) == 0 &&
           AddressInfo->PrefixLength == AddressInfoList[Index].PrefixLength
-          ) { 
+          ) {
        return TRUE;
      }
   }
   return FALSE;
 }
- 
+
 /**
   Compare two SPD Selectors.
 
   Compare two SPD Selector by the fields of LocalAddressCount/RemoteAddressCount/
-  NextLayerProtocol/LocalPort/LocalPortRange/RemotePort/RemotePortRange and the 
+  NextLayerProtocol/LocalPort/LocalPortRange/RemotePort/RemotePortRange and the
   Local Addresses and remote Addresses.
 
   @param[in]   Selector1           Pointer of first SPD Selector.
@@ -173,7 +173,7 @@ IsInAddressInfoList(
 
   @retval  TRUE    This two Selector have the same value in above fields.
   @retval  FALSE   Not all above fields have the same value in these two Selectors.
-  
+
 **/
 BOOLEAN
 CompareSpdSelector (
@@ -193,7 +193,7 @@ CompareSpdSelector (
   //
   // Compare the LocalAddressCount/RemoteAddressCount/NextLayerProtocol/
   // LocalPort/LocalPortRange/RemotePort/RemotePortRange fields in the
-  // two Spdselectors. Since the SPD supports two directions, it needs to 
+  // two Spdselectors. Since the SPD supports two directions, it needs to
   // compare two directions.
   //
   if ((SpdSel1->LocalAddressCount != SpdSel2->LocalAddressCount &&
@@ -209,10 +209,10 @@ CompareSpdSelector (
     IsMatch = FALSE;
     return IsMatch;
   }
-  
+
   //
   // Compare the all LocalAddress and RemoteAddress fields in the two Spdselectors.
-  // First, SpdSel1->LocalAddress to SpdSel2->LocalAddress && Compare 
+  // First, SpdSel1->LocalAddress to SpdSel2->LocalAddress && Compare
   // SpdSel1->RemoteAddress to SpdSel2->RemoteAddress. If all match, return
   // TRUE.
   //
@@ -263,14 +263,14 @@ CompareSpdSelector (
     }
   }
   //
-  // Finish the one direction compare. If it is matched, return; otherwise, 
+  // Finish the one direction compare. If it is matched, return; otherwise,
   // compare the other direction.
   //
   if (IsMatch) {
     return IsMatch;
   }
   //
-  // Secondly, the SpdSel1->LocalAddress doesn't equal to  SpdSel2->LocalAddress and 
+  // Secondly, the SpdSel1->LocalAddress doesn't equal to  SpdSel2->LocalAddress and
   // SpdSel1->RemoteAddress doesn't equal to SpdSel2->RemoteAddress. Try to compare
   // the RemoteAddress to LocalAddress.
   //
@@ -328,16 +328,16 @@ CompareSpdSelector (
   Find if the two SPD Selectors has subordinative.
 
   Compare two SPD Selector by the fields of LocalAddressCount/RemoteAddressCount/
-  NextLayerProtocol/LocalPort/LocalPortRange/RemotePort/RemotePortRange and the 
+  NextLayerProtocol/LocalPort/LocalPortRange/RemotePort/RemotePortRange and the
   Local Addresses and remote Addresses.
 
   @param[in]   Selector1           Pointer of first SPD Selector.
   @param[in]   Selector2           Pointer of second SPD Selector.
 
   @retval  TRUE    The first SPD Selector is subordinate Selector of second SPD Selector.
-  @retval  FALSE   The first SPD Selector is not subordinate Selector of second 
+  @retval  FALSE   The first SPD Selector is not subordinate Selector of second
                    SPD Selector.
-  
+
 **/
 BOOLEAN
 IsSubSpdSelector (
@@ -357,7 +357,7 @@ IsSubSpdSelector (
   //
   // Compare the LocalAddressCount/RemoteAddressCount/NextLayerProtocol/
   // LocalPort/LocalPortRange/RemotePort/RemotePortRange fields in the
-  // two Spdselectors. Since the SPD supports two directions, it needs to 
+  // two Spdselectors. Since the SPD supports two directions, it needs to
   // compare two directions.
   //
   if (SpdSel1->LocalAddressCount > SpdSel2->LocalAddressCount ||
@@ -370,10 +370,10 @@ IsSubSpdSelector (
       ) {
     IsMatch = FALSE;
   }
-  
+
   //
   // Compare the all LocalAddress and RemoteAddress fields in the two Spdselectors.
-  // First, SpdSel1->LocalAddress to SpdSel2->LocalAddress && Compare 
+  // First, SpdSel1->LocalAddress to SpdSel2->LocalAddress && Compare
   // SpdSel1->RemoteAddress to SpdSel2->RemoteAddress. If all match, return
   // TRUE.
   //
@@ -405,14 +405,14 @@ IsSubSpdSelector (
   if (IsMatch) {
     return IsMatch;
   }
-  
+
   //
   //
   // The SPD selector in SPD entry is two way.
   //
   // Compare the LocalAddressCount/RemoteAddressCount/NextLayerProtocol/
   // LocalPort/LocalPortRange/RemotePort/RemotePortRange fields in the
-  // two Spdselectors. Since the SPD supports two directions, it needs to 
+  // two Spdselectors. Since the SPD supports two directions, it needs to
   // compare two directions.
   //
   IsMatch = TRUE;
@@ -427,10 +427,10 @@ IsSubSpdSelector (
     IsMatch = FALSE;
     return IsMatch;
   }
-  
+
   //
   // Compare the all LocalAddress and RemoteAddress fields in the two Spdselectors.
-  // First, SpdSel1->LocalAddress to SpdSel2->RemoteAddress && Compare 
+  // First, SpdSel1->LocalAddress to SpdSel2->RemoteAddress && Compare
   // SpdSel1->RemoteAddress to SpdSel2->LocalAddress. If all match, return
   // TRUE.
   //
@@ -458,7 +458,7 @@ IsSubSpdSelector (
     }
   }
   return IsMatch;
-  
+
 }
 
 /**
@@ -469,7 +469,7 @@ IsSubSpdSelector (
 
   @retval  TRUE    This two Selectors have the same SA ID.
   @retval  FALSE   This two Selecotrs don't have the same SA ID.
-  
+
 **/
 BOOLEAN
 CompareSaId (
@@ -500,7 +500,7 @@ CompareSaId (
 
   @retval  TRUE    This two Selectors have the same PAD ID.
   @retval  FALSE   This two Selecotrs don't have the same PAD ID.
-  
+
 **/
 BOOLEAN
 ComparePadId (
@@ -589,7 +589,7 @@ IsZeroSaId (
 {
   BOOLEAN                   IsZero;
   EFI_IPSEC_CONFIG_SELECTOR ZeroSelector;
-  
+
   IsZero    = FALSE;
 
   ZeroMem (&ZeroSelector, sizeof (EFI_IPSEC_CONFIG_SELECTOR));
@@ -636,14 +636,14 @@ IsZeroPadId (
 
   @param[in, out] DstSel             Pointer of Destination SPD Selector.
   @param[in]      SrcSel             Pointer of Source SPD Selector.
-  @param[in, out] Size               The size of the Destination SPD Selector. If it 
-                                     not NULL and its value less than the size of 
-                                     Source SPD Selector, the value of Source SPD 
+  @param[in, out] Size               The size of the Destination SPD Selector. If it
+                                     not NULL and its value less than the size of
+                                     Source SPD Selector, the value of Source SPD
                                      Selector's size will be passed to caller by this
                                      parameter.
 
   @retval EFI_INVALID_PARAMETER  If the Destination or Source SPD Selector is NULL
-  @retval EFI_BUFFER_TOO_SMALL   If the input Size is less than size of the Source SPD Selector. 
+  @retval EFI_BUFFER_TOO_SMALL   If the input Size is less than size of the Source SPD Selector.
   @retval EFI_SUCCESS            Copy Source SPD Selector to the Destination SPD
                                  Selector successfully.
 
@@ -702,13 +702,13 @@ DuplicateSpdSelector (
 
   @param[in, out] DstSel             Pointer of Destination SA ID.
   @param[in]      SrcSel             Pointer of Source SA ID.
-  @param[in, out] Size               The size of the Destination SA ID. If it 
-                                     not NULL and its value less than the size of 
-                                     Source SA ID, the value of Source SA ID's size 
+  @param[in, out] Size               The size of the Destination SA ID. If it
+                                     not NULL and its value less than the size of
+                                     Source SA ID, the value of Source SA ID's size
                                      will be passed to caller by this parameter.
 
   @retval EFI_INVALID_PARAMETER  If the Destination or Source SA ID is NULL.
-  @retval EFI_BUFFER_TOO_SMALL   If the input Size less than size of source SA ID. 
+  @retval EFI_BUFFER_TOO_SMALL   If the input Size less than size of source SA ID.
   @retval EFI_SUCCESS            Copy Source SA ID  to the Destination SA ID successfully.
 
 **/
@@ -744,9 +744,9 @@ DuplicateSaId (
 
   @param[in, out] DstSel             Pointer of Destination PAD ID.
   @param[in]      SrcSel             Pointer of Source PAD ID.
-  @param[in, out] Size               The size of the Destination PAD ID. If it 
-                                     not NULL and its value less than the size of 
-                                     Source PAD ID, the value of Source PAD ID's size 
+  @param[in, out] Size               The size of the Destination PAD ID. If it
+                                     not NULL and its value less than the size of
+                                     Source PAD ID, the value of Source PAD ID's size
                                      will be passed to caller by this parameter.
 
   @retval EFI_INVALID_PARAMETER  If the Destination or Source PAD ID is NULL.
@@ -782,11 +782,11 @@ DuplicatePadId (
 }
 
 /**
-  Fix the value of some members of SPD Selector. 
+  Fix the value of some members of SPD Selector.
 
-  This function is called by IpSecCopyPolicyEntry()which copy the Policy 
-  Entry into the Variable. Since some members in SPD Selector are pointers, 
-  a physical address to relative address convertion is required before copying 
+  This function is called by IpSecCopyPolicyEntry()which copy the Policy
+  Entry into the Variable. Since some members in SPD Selector are pointers,
+  a physical address to relative address convertion is required before copying
   this SPD entry into the variable.
 
   @param[in]       Selector              Pointer of SPD Selector.
@@ -817,11 +817,11 @@ FixSpdEntry (
 }
 
 /**
-  Fix the value of some members of SA ID. 
+  Fix the value of some members of SA ID.
 
-  This function is called by IpSecCopyPolicyEntry()which copy the Policy 
-  Entry into the Variable. Since some members in SA ID are pointers, 
-  a physical address to relative address conversion is required before copying 
+  This function is called by IpSecCopyPolicyEntry()which copy the Policy
+  Entry into the Variable. Since some members in SA ID are pointers,
+  a physical address to relative address conversion is required before copying
   this SAD into the variable.
 
   @param[in]       SaId                  Pointer of SA ID
@@ -858,10 +858,10 @@ FixSadEntry (
 }
 
 /**
-  Fix the value of some members of PAD ID. 
+  Fix the value of some members of PAD ID.
 
-  This function is called by IpSecCopyPolicyEntry()which copy the Policy 
-  Entry into the Variable. Since some members in PAD ID are pointers, 
+  This function is called by IpSecCopyPolicyEntry()which copy the Policy
+  Entry into the Variable. Since some members in PAD ID are pointers,
   a physical address to relative address conversion is required before copying
   this PAD into the variable.
 
@@ -890,7 +890,7 @@ FixPadEntry (
 }
 
 /**
-  Recover the value of some members of SPD Selector. 
+  Recover the value of some members of SPD Selector.
 
   This function is corresponding to FixSpdEntry(). It recovers the value of members
   of SPD Selector that are fixed by FixSpdEntry().
@@ -918,11 +918,11 @@ UnfixSpdEntry (
       UNFIX_REF_BUF_ADDR (Data->ProcessingPolicy->TunnelOption, Data);
     }
   }
-  
+
 }
 
 /**
-  Recover the value of some members of SA ID. 
+  Recover the value of some members of SA ID.
 
   This function is corresponding to FixSadEntry(). It recovers the value of members
   of SAD ID that are fixed by FixSadEntry().
@@ -961,7 +961,7 @@ UnfixSadEntry (
 }
 
 /**
-  Recover the value of some members of PAD ID. 
+  Recover the value of some members of PAD ID.
 
   This function is corresponding to FixPadEntry(). It recovers the value of members
   of PAD ID that are fixed by FixPadEntry().
@@ -993,32 +993,32 @@ UnfixPadEntry (
 /**
   Set the security policy information for the EFI IPsec driver.
 
-  The IPsec configuration data has a unique selector/identifier separately to 
+  The IPsec configuration data has a unique selector/identifier separately to
   identify a data entry.
 
-  @param[in]  Selector           Pointer to an entry selector on operated 
-                                 configuration data specified by DataType. 
-                                 A NULL Selector causes the entire specified-type 
+  @param[in]  Selector           Pointer to an entry selector on operated
+                                 configuration data specified by DataType.
+                                 A NULL Selector causes the entire specified-type
                                  configuration information to be flushed.
-  @param[in]  Data               The data buffer to be set. The structure 
+  @param[in]  Data               The data buffer to be set. The structure
                                  of the data buffer should be EFI_IPSEC_SPD_DATA.
-  @param[in]  Context            Pointer to one entry selector that describes 
-                                 the expected position the new data entry will 
+  @param[in]  Context            Pointer to one entry selector that describes
+                                 the expected position the new data entry will
                                  be added. If Context is NULL, the new entry will
                                  be appended the end of database.
 
   @retval EFI_INVALID_PARAMETER  One or more of the following are TRUE:
-                                   - Selector is not NULL and its LocalAddress 
+                                   - Selector is not NULL and its LocalAddress
                                      is NULL or its RemoteAddress is NULL.
-                                   - Data is not NULL and its Action is Protected 
+                                   - Data is not NULL and its Action is Protected
                                      and its plolicy is NULL.
                                    - Data is not NULL, its Action is not protected,
                                      and its policy is not NULL.
-                                   - The Action of Data is Protected, its policy 
+                                   - The Action of Data is Protected, its policy
                                      mode is Tunnel, and its tunnel option is NULL.
-                                   - The Action of Data is protected and its policy 
+                                   - The Action of Data is protected and its policy
                                      mode is not Tunnel and it tunnel option is not NULL.
-                                   - SadEntry requied to be set into new SpdEntry's Sas has 
+                                   - SadEntry requied to be set into new SpdEntry's Sas has
                                      been found but it is invalid.
   @retval EFI_OUT_OF_RESOURCED  The required system resource could not be allocated.
   @retval EFI_SUCCESS           The specified configuration data was obtained successfully.
@@ -1085,7 +1085,7 @@ SetSpdEntry (
 
     SpdEntry = IPSEC_SPD_ENTRY_FROM_LIST (Entry);
 
-    if (SpdSel == NULL || 
+    if (SpdSel == NULL ||
         CompareSpdSelector ((EFI_IPSEC_CONFIG_SELECTOR *) SpdEntry->Selector, (EFI_IPSEC_CONFIG_SELECTOR *) SpdSel)
         ) {
       //
@@ -1098,26 +1098,26 @@ SetSpdEntry (
       // Update the reverse ref of SAD entry in the SPD.sas list.
       //
       SpdSas = &SpdEntry->Data->Sas;
-      
+
       //
-      // Remove the related SAs from Sas(SadEntry->BySpd). If the SA entry is established by 
-      // IKE, remove from mConfigData list(SadEntry->List) and then free it directly since its 
+      // Remove the related SAs from Sas(SadEntry->BySpd). If the SA entry is established by
+      // IKE, remove from mConfigData list(SadEntry->List) and then free it directly since its
       // SpdEntry will be freed later.
       //
       NET_LIST_FOR_EACH_SAFE (Entry2, NextEntry2, SpdSas) {
         SadEntry = IPSEC_SAD_ENTRY_FROM_SPD (Entry2);
-        
+
         if (SadEntry->Data->SpdEntry != NULL) {
           RemoveEntryList (&SadEntry->BySpd);
           SadEntry->Data->SpdEntry = NULL;
         }
-        
+
         if (!(SadEntry->Data->ManualSet)) {
           RemoveEntryList (&SadEntry->List);
           FreePool (SadEntry);
         }
       }
-      
+
       //
       // Free the existed SPD entry
       //
@@ -1184,7 +1184,7 @@ SetSpdEntry (
   SpdEntry->Data->PackageFlag      = SpdData->PackageFlag;
   SpdEntry->Data->TrafficDirection = SpdData->TrafficDirection;
   SpdEntry->Data->Action           = SpdData->Action;
-  
+
   //
   // Fix the address of ProcessingPolicy and copy it if need, which is continous
   // memory and close to the base structure of SAD data.
@@ -1229,9 +1229,9 @@ SetSpdEntry (
             return EFI_INVALID_PARAMETER;
           }
         }
-      }      
+      }
   }
-  
+
   //
   // Insert the new SPD entry.
   //
@@ -1243,17 +1243,17 @@ SetSpdEntry (
 /**
   Set the security association information for the EFI IPsec driver.
 
-  The IPsec configuration data has a unique selector/identifier separately to 
+  The IPsec configuration data has a unique selector/identifier separately to
   identify a data entry.
 
-  @param[in]  Selector           Pointer to an entry selector on operated 
-                                 configuration data specified by DataType. 
-                                 A NULL Selector causes the entire specified-type 
+  @param[in]  Selector           Pointer to an entry selector on operated
+                                 configuration data specified by DataType.
+                                 A NULL Selector causes the entire specified-type
                                  configuration information to be flushed.
-  @param[in]  Data               The data buffer to be set. The structure 
+  @param[in]  Data               The data buffer to be set. The structure
                                  of the data buffer should be EFI_IPSEC_SA_DATA.
-  @param[in]  Context            Pointer to one entry selector which describes 
-                                 the expected position the new data entry will 
+  @param[in]  Context            Pointer to one entry selector which describes
+                                 the expected position the new data entry will
                                  be added. If Context is NULL,the new entry will
                                  be appended the end of database.
 
@@ -1279,7 +1279,7 @@ SetSadEntry (
   EFI_IPSEC_SA_ID   *InsertBefore;
   LIST_ENTRY        *EntryInsertBefore;
   UINTN             SadEntrySize;
-  
+
   SaId          = (Selector == NULL) ? NULL : &Selector->SaId;
   SaData        = (Data == NULL) ? NULL : (EFI_IPSEC_SA_DATA2 *) Data;
   InsertBefore  = (Context == NULL) ? NULL : &((EFI_IPSEC_CONFIG_SELECTOR *) Context)->SaId;
@@ -1297,7 +1297,7 @@ SetSadEntry (
 
     SadEntry = IPSEC_SAD_ENTRY_FROM_LIST (Entry);
 
-    if (SaId == NULL || 
+    if (SaId == NULL ||
         CompareSaId (
           (EFI_IPSEC_CONFIG_SELECTOR *) SadEntry->Id,
           (EFI_IPSEC_CONFIG_SELECTOR *) SaId
@@ -1348,7 +1348,7 @@ SetSadEntry (
   SadEntrySize  = ALIGN_VARIABLE (sizeof (IPSEC_SAD_ENTRY));
   SadEntrySize  = ALIGN_VARIABLE (SadEntrySize + sizeof (EFI_IPSEC_SA_ID));
   SadEntrySize  = ALIGN_VARIABLE (SadEntrySize + sizeof (IPSEC_SAD_DATA));
-  
+
   if (SaId->Proto == EfiIPsecAH) {
     SadEntrySize += SaData->AlgoInfo.AhAlgoInfo.AuthKeyLength;
   } else {
@@ -1405,7 +1405,7 @@ SetSadEntry (
 
     if (SadEntry->Data->AlgoInfo.EspAlgoInfo.EncKeyLength != 0) {
       SadEntry->Data->AlgoInfo.EspAlgoInfo.EncKey = (VOID *) ALIGN_POINTER (
-                                                               ((UINT8 *) (SadEntry->Data + 1) + 
+                                                               ((UINT8 *) (SadEntry->Data + 1) +
                                                                  SadEntry->Data->AlgoInfo.EspAlgoInfo.AuthKeyLength),
                                                                  sizeof (UINTN)
                                                                  );
@@ -1479,17 +1479,17 @@ SetSadEntry (
 /**
   Set the peer authorization configuration information for the EFI IPsec driver.
 
-  The IPsec configuration data has a unique selector/identifier separately to 
+  The IPsec configuration data has a unique selector/identifier separately to
   identify a data entry.
 
-  @param[in]  Selector           Pointer to an entry selector on operated 
-                                 configuration data specified by DataType. 
-                                 A NULL Selector causes the entire specified-type 
+  @param[in]  Selector           Pointer to an entry selector on operated
+                                 configuration data specified by DataType.
+                                 A NULL Selector causes the entire specified-type
                                  configuration information to be flushed.
-  @param[in]  Data               The data buffer to be set. The structure 
+  @param[in]  Data               The data buffer to be set. The structure
                                  of the data buffer should be EFI_IPSEC_PAD_DATA.
-  @param[in]  Context            Pointer to one entry selector that describes 
-                                 the expected position the new data entry will 
+  @param[in]  Context            Pointer to one entry selector that describes
+                                 the expected position the new data entry will
                                  be added. If Context is NULL, the new entry will
                                  be appended the end of database.
 
@@ -1513,7 +1513,7 @@ SetPadEntry (
   EFI_IPSEC_PAD_ID    *InsertBefore;
   LIST_ENTRY          *EntryInsertBefore;
   UINTN               PadEntrySize;
-   
+
   PadId         = (Selector == NULL) ? NULL : &Selector->PadId;
   PadData       = (Data == NULL) ? NULL : (EFI_IPSEC_PAD_DATA *) Data;
   InsertBefore  = (Context == NULL) ? NULL : &((EFI_IPSEC_CONFIG_SELECTOR *) Context)->PadId;
@@ -1531,7 +1531,7 @@ SetPadEntry (
 
     PadEntry = IPSEC_PAD_ENTRY_FROM_LIST (Entry);
 
-    if (PadId == NULL || 
+    if (PadId == NULL ||
         ComparePadId ((EFI_IPSEC_CONFIG_SELECTOR *) PadEntry->Id, (EFI_IPSEC_CONFIG_SELECTOR *) PadId)
         ) {
       //
@@ -1631,16 +1631,16 @@ SetPadEntry (
 }
 
 /**
-  This function lookup the data entry from IPsec SPD. Return the configuration 
+  This function lookup the data entry from IPsec SPD. Return the configuration
   value of the specified SPD Entry.
 
-  @param[in]      Selector      Pointer to an entry selector which is an identifier 
+  @param[in]      Selector      Pointer to an entry selector which is an identifier
                                 of the SPD entry.
   @param[in, out] DataSize      On output the size of data returned in Data.
-  @param[out]     Data          The buffer to return the contents of the IPsec 
-                                configuration data. The type of the data buffer 
-                                is associated with the DataType. 
- 
+  @param[out]     Data          The buffer to return the contents of the IPsec
+                                configuration data. The type of the data buffer
+                                is associated with the DataType.
+
   @retval EFI_SUCCESS           The specified configuration data was obtained successfully.
   @retval EFI_INVALID_PARAMETER Data is NULL and *DataSize is not zero.
   @retval EFI_NOT_FOUND         The configuration data specified by Selector is not found.
@@ -1713,7 +1713,7 @@ GetSpdEntry (
       SpdData->PackageFlag      = SpdEntry->Data->PackageFlag;
       SpdData->TrafficDirection = SpdEntry->Data->TrafficDirection;
       SpdData->Action           = SpdEntry->Data->Action;
-      
+
       if (SpdData->Action != EfiIPsecActionProtect) {
         SpdData->ProcessingPolicy = NULL;
       } else {
@@ -1733,16 +1733,16 @@ GetSpdEntry (
 }
 
 /**
-  This function lookup the data entry from IPsec SAD. Return the configuration 
+  This function lookup the data entry from IPsec SAD. Return the configuration
   value of the specified SAD Entry.
 
-  @param[in]      Selector      Pointer to an entry selector which is an identifier 
+  @param[in]      Selector      Pointer to an entry selector which is an identifier
                                 of the SAD entry.
   @param[in, out] DataSize      On output, the size of data returned in Data.
-  @param[out]     Data          The buffer to return the contents of the IPsec 
-                                configuration data. The type of the data buffer 
-                                is associated with the DataType. 
- 
+  @param[out]     Data          The buffer to return the contents of the IPsec
+                                configuration data. The type of the data buffer
+                                is associated with the DataType.
+
   @retval EFI_SUCCESS           The specified configuration data was obtained successfully.
   @retval EFI_NOT_FOUND         The configuration data specified by Selector is not found.
   @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the result. DataSize has been
@@ -1783,8 +1783,8 @@ GetSadEntry (
       // |EFI_IPSEC_SA_DATA
       // |AuthKey
       // |EncryptKey  (Optional)
-      // |SpdSelector (Optional)     
-      // 
+      // |SpdSelector (Optional)
+      //
       RequiredSize  = ALIGN_VARIABLE (sizeof (EFI_IPSEC_SA_DATA2));
 
       if (SaId->Proto == EfiIPsecAH) {
@@ -1797,12 +1797,12 @@ GetSadEntry (
       if (SadEntry->Data->SpdSelector != NULL) {
         RequiredSize += SIZE_OF_SPD_SELECTOR (SadEntry->Data->SpdSelector);
       }
-      
+
       if (*DataSize < RequiredSize) {
         *DataSize = RequiredSize;
         return EFI_BUFFER_TOO_SMALL;
       }
-      
+
       //
       // Fill the data fields of SAD entry.
       //
@@ -1895,7 +1895,7 @@ GetSadEntry (
                                 RequiredSize -
                                 SIZE_OF_SPD_SELECTOR (SadEntry->Data->SpdSelector)
                                 );
-       
+
         DuplicateSpdSelector (
           (EFI_IPSEC_CONFIG_SELECTOR *) SaData->SpdSelector,
           (EFI_IPSEC_CONFIG_SELECTOR *) SadEntry->Data->SpdSelector,
@@ -1917,16 +1917,16 @@ GetSadEntry (
 }
 
 /**
-  This function lookup the data entry from IPsec PAD. Return the configuration 
+  This function lookup the data entry from IPsec PAD. Return the configuration
   value of the specified PAD Entry.
 
-  @param[in]      Selector      Pointer to an entry selector which is an identifier 
+  @param[in]      Selector      Pointer to an entry selector which is an identifier
                                 of the PAD entry.
   @param[in, out] DataSize      On output the size of data returned in Data.
-  @param[out]     Data          The buffer to return the contents of the IPsec 
-                                configuration data. The type of the data buffer 
-                                is associated with the DataType. 
- 
+  @param[out]     Data          The buffer to return the contents of the IPsec
+                                configuration data. The type of the data buffer
+                                is associated with the DataType.
+
   @retval EFI_SUCCESS           The specified configuration data was obtained successfully.
   @retval EFI_NOT_FOUND         The configuration data specified by Selector is not found.
   @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the result. DataSize has been
@@ -2089,7 +2089,7 @@ IpSecGetSizeOfEfiSpdData (
 
 /**
   Calculate the a whole size of IPSEC_SPD_DATA which includes the buffer size pointed
-  to by the pointer members and the buffer size used by the Sa List. 
+  to by the pointer members and the buffer size used by the Sa List.
 
   @param[in]  SpdData       Pointer to the specified IPSEC_SPD_DATA.
 
@@ -2125,25 +2125,25 @@ IpSecGetSizeOfSpdData (
   Get the IPsec Variable.
 
   Get the all variables which start with the string contained in VaraiableName.
-  Since all IPsec related variable store in continual space, those kinds of 
-  variable can be searched by the EfiGetNextVariableName. Those variables also are 
+  Since all IPsec related variable store in continual space, those kinds of
+  variable can be searched by the EfiGetNextVariableName. Those variables also are
   returned in a continual buffer.
-  
+
   @param[in]      VariableName          Pointer to a specified Variable Name.
   @param[in]      VendorGuid            Pointer to a specified Vendor Guid.
-  @param[in]      Attributes            Point to memory location to return the attributes 
-                                        of variable. If the point is NULL, the parameter 
+  @param[in]      Attributes            Point to memory location to return the attributes
+                                        of variable. If the point is NULL, the parameter
                                         would be ignored.
-  @param[in, out] DataSize              As input, point to the maximum size of return 
-                                        Data-Buffer. As output, point to the actual 
+  @param[in, out] DataSize              As input, point to the maximum size of return
+                                        Data-Buffer. As output, point to the actual
                                         size of the returned Data-Buffer.
   @param[in]      Data                  Point to return Data-Buffer.
-        
+
   @retval  EFI_ABORTED           If the Variable size which contained in the variable
-                                 structure doesn't match the variable size obtained 
+                                 structure doesn't match the variable size obtained
                                  from the EFIGetVariable.
   @retval  EFI_BUFFER_TOO_SMALL  The DataSize is too small for the result. DataSize has
-                                 been updated with the size needed to complete the request.   
+                                 been updated with the size needed to complete the request.
   @retval  EFI_SUCCESS           The function completed successfully.
   @retval  others                Other errors found during the variable getting.
 **/
@@ -2179,7 +2179,7 @@ IpSecGetVariable (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-  
+
   //
   // Construct the varible name of ipsecconfig meta data.
   //
@@ -2318,14 +2318,14 @@ ON_EXIT:
   @param[in]  VariableName  The name of the vendor's variable. It is a
                             Null-Terminated Unicode String.
   @param[in]  VendorGuid    Unify identifier for vendor.
-  @param[in]  Attributes    Point to memory location to return the attributes of 
+  @param[in]  Attributes    Point to memory location to return the attributes of
                             variable. If the point is NULL, the parameter would be ignored.
   @param[in]  DataSize      The size in bytes of Data-Buffer.
   @param[in]  Data          Points to the content of the variable.
 
   @retval  EFI_SUCCESS      The firmware successfully stored the variable and its data, as
                             defined by the Attributes.
-  @retval  others           Storing the variables failed.      
+  @retval  others           Storing the variables failed.
 
 **/
 EFI_STATUS
@@ -2355,7 +2355,7 @@ IpSecSetVariable (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // "VariableName + Info/0001/0002/... + NULL"
   //
@@ -2372,7 +2372,7 @@ IpSecSetVariable (
   //
   UnicodeSPrint (VariableNameI, VariableNameSize, L"%s%s", VariableName, L"Info");
   MaximumVariableSize -= VariableNameSize;
-  
+
   IpSecVariableInfo.VariableCount       = (UINT32) ((DataSize + (UINTN) MaximumVariableSize - 1) / (UINTN) MaximumVariableSize);
   IpSecVariableInfo.VariableSize        = (UINT32) DataSize;
   IpSecVariableInfo.SingleVariableSize  = (UINT32) MaximumVariableSize;
@@ -2397,7 +2397,7 @@ IpSecSetVariable (
     // Construct and set the variable of ipsecconfig data one by one.
     // The index of variable name begin from 0001, and the varaible name
     // likes "VariableName0001", "VaraiableName0002"....
-    // 
+    //
     UnicodeSPrint (VariableNameI, VariableNameSize, L"%s%04d", VariableName, VariableIndex + 1);
     Status = gRT->SetVariable (
                     VariableNameI,
@@ -2424,20 +2424,20 @@ ON_EXIT:
 }
 
 /**
-  Return the configuration value for the EFI IPsec driver. 
+  Return the configuration value for the EFI IPsec driver.
 
   This function lookup the data entry from IPsec database or IKEv2 configuration
   information. The expected data type and unique identification are described in
-  DataType and Selector parameters.        
+  DataType and Selector parameters.
 
   @param[in]      This          Pointer to the EFI_IPSEC_CONFIG_PROTOCOL instance.
   @param[in]      DataType      The type of data to retrieve.
-  @param[in]      Selector      Pointer to an entry selector that is an identifier of the IPsec 
+  @param[in]      Selector      Pointer to an entry selector that is an identifier of the IPsec
                                 configuration data entry.
   @param[in, out] DataSize      On output the size of data returned in Data.
-  @param[out]     Data          The buffer to return the contents of the IPsec configuration data. 
-                                The type of the data buffer associated with the DataType. 
- 
+  @param[out]     Data          The buffer to return the contents of the IPsec configuration data.
+                                The type of the data buffer associated with the DataType.
+
   @retval EFI_SUCCESS           The specified configuration data was obtained successfully.
   @retval EFI_INVALID_PARAMETER One or more of the followings are TRUE:
                                 - This is NULL.
@@ -2477,26 +2477,26 @@ EfiIpSecConfigGetData (
 
 /**
   Set the security association, security policy and peer authorization configuration
-  information for the EFI IPsec driver. 
+  information for the EFI IPsec driver.
 
   This function is used to set the IPsec configuration information of type DataType for
   the EFI IPsec driver.
   The IPsec configuration data has a unique selector/identifier separately to identify
   a data entry. The selector structure depends on DataType's definition.
   Using SetData() with a Data of NULL causes the IPsec configuration data entry identified
-  by DataType and Selector to be deleted.        
+  by DataType and Selector to be deleted.
 
   @param[in] This               Pointer to the EFI_IPSEC_CONFIG_PROTOCOL instance.
   @param[in] DataType           The type of data to be set.
-  @param[in] Selector           Pointer to an entry selector on operated configuration data 
-                                specified by DataType. A NULL Selector causes the entire 
+  @param[in] Selector           Pointer to an entry selector on operated configuration data
+                                specified by DataType. A NULL Selector causes the entire
                                 specified-type configuration information to be flushed.
-  @param[in] Data               The data buffer to be set. The structure of the data buffer is 
+  @param[in] Data               The data buffer to be set. The structure of the data buffer is
                                 associated with the DataType.
   @param[in] InsertBefore       Pointer to one entry selector which describes the expected
                                 position the new data entry will be added. If InsertBefore is NULL,
                                 the new entry will be appended to the end of the database.
- 
+
   @retval EFI_SUCCESS           The specified configuration entry data was set successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following are TRUE:
                                 - This is NULL.
@@ -2523,7 +2523,7 @@ EfiIpSecConfigSetData (
   if (DataType >= IPsecConfigDataTypeMaximum) {
     return EFI_UNSUPPORTED;
   }
-  
+
   Status = mSetPolicyEntry[DataType](Selector, Data, InsertBefore);
 
   if (!EFI_ERROR (Status) && !mSetBySelf) {
@@ -2537,30 +2537,30 @@ EfiIpSecConfigSetData (
 }
 
 /**
-  Enumerates the current selector for IPsec configuration data entry. 
+  Enumerates the current selector for IPsec configuration data entry.
 
   This function is called multiple times to retrieve the entry Selector in IPsec
-  configuration database. On each call to GetNextSelector(), the next entry 
+  configuration database. On each call to GetNextSelector(), the next entry
   Selector are retrieved into the output interface.
- 
-  If the entire IPsec configuration database has been iterated, the error 
+
+  If the entire IPsec configuration database has been iterated, the error
   EFI_NOT_FOUND is returned.
-  If the Selector buffer is too small for the next Selector copy, an 
-  EFI_BUFFER_TOO_SMALL error is returned, and SelectorSize is updated to reflect 
+  If the Selector buffer is too small for the next Selector copy, an
+  EFI_BUFFER_TOO_SMALL error is returned, and SelectorSize is updated to reflect
   the size of buffer needed.
 
   On the initial call to GetNextSelector() to start the IPsec configuration database
-  search, a pointer to the buffer with all zero value is passed in Selector. Calls 
-  to SetData() between calls to GetNextSelector may produce unpredictable results.         
+  search, a pointer to the buffer with all zero value is passed in Selector. Calls
+  to SetData() between calls to GetNextSelector may produce unpredictable results.
 
   @param[in]      This          Pointer to the EFI_IPSEC_CONFIG_PROTOCOL instance.
   @param[in]      DataType      The type of IPsec configuration data to retrieve.
   @param[in, out] SelectorSize  The size of the Selector buffer.
-  @param[in, out] Selector      On input, supplies the pointer to last Selector that was 
+  @param[in, out] Selector      On input, supplies the pointer to last Selector that was
                                 returned by GetNextSelector().
                                 On output, returns one copy of the current entry Selector
-                                of a given DataType. 
- 
+                                of a given DataType.
+
   @retval EFI_SUCCESS           The specified configuration data was obtained successfully.
   @retval EFI_INVALID_PARAMETER One or more of the followings are TRUE:
                                 - This is NULL.
@@ -2569,7 +2569,7 @@ EfiIpSecConfigSetData (
   @retval EFI_NOT_FOUND         The next configuration data entry was not found.
   @retval EFI_UNSUPPORTED       The specified DataType is not supported.
   @retval EFI_BUFFER_TOO_SMALL  The SelectorSize is too small for the result. This parameter
-                                has been updated with the size needed to complete the search 
+                                has been updated with the size needed to complete the search
                                 request.
 
 **/
@@ -2618,14 +2618,14 @@ EfiIpSecConfigGetNextSelector (
 
 /**
   Register an event that is to be signaled whenever a configuration process on the
-  specified IPsec configuration information is done. 
+  specified IPsec configuration information is done.
 
   The register function is not surpport now and always returns EFI_UNSUPPORTED.
-  
+
   @param[in] This               Pointer to the EFI_IPSEC_CONFIG_PROTOCOL instance.
   @param[in] DataType           The type of data to be registered the event for.
   @param[in] Event              The event to be registered.
- 
+
   @retval EFI_SUCCESS           The event is registered successfully.
   @retval EFI_INVALID_PARAMETER This is NULL or Event is NULL.
   @retval EFI_ACCESS_DENIED     The Event is already registered for the DataType.
@@ -2646,16 +2646,16 @@ EfiIpSecConfigRegisterNotify (
 
 /**
   Remove the specified event that was previously registered on the specified IPsec
-  configuration data. 
+  configuration data.
 
   This function is not support now and alwasy return EFI_UNSUPPORTED.
 
   @param[in] This               Pointer to the EFI_IPSEC_CONFIG_PROTOCOL instance.
   @param[in] DataType           The configuration data type to remove the registered event for.
   @param[in] Event              The event to be unregistered.
- 
+
   @retval EFI_SUCCESS           The event was removed successfully.
-  @retval EFI_NOT_FOUND         The Event specified by DataType could not be found in the 
+  @retval EFI_NOT_FOUND         The Event specified by DataType could not be found in the
                                 database.
   @retval EFI_INVALID_PARAMETER This is NULL or Event is NULL.
   @retval EFI_UNSUPPORTED       The notify registration is unsupported, or the specified
@@ -2677,10 +2677,10 @@ EfiIpSecConfigUnregisterNotify (
   Copy whole data in specified EFI_SIPEC_CONFIG_SELECTOR and the Data to a buffer.
 
   This function is a caller defined function, and it is called by the IpSecVisitConfigData().
-  The orignal caller is IpSecConfigSave(), which calls the IpsecVisitConfigData() to 
+  The orignal caller is IpSecConfigSave(), which calls the IpsecVisitConfigData() to
   copy all types of IPsec Config datas into one buffer and store this buffer into firmware in
   the form of several variables.
-  
+
   @param[in]      Type              A specified IPSEC_CONFIG_DATA_TYPE.
   @param[in]      Selector          Points to a EFI_IPSEC_CONFIG_SELECTOR to be copied
                                     to the buffer.
@@ -2708,7 +2708,7 @@ IpSecCopyPolicyEntry (
   IPSEC_VAR_ITEM_HEADER DataHeader;
   UINTN                 EntrySize;
   UINT8                 *TempPoint;
-  
+
   if (Type == IPsecConfigDataTypeSad) {
     //
     // Don't save automatically-generated SA entry into variable.
@@ -2724,7 +2724,7 @@ IpSecCopyPolicyEntry (
   EntrySize  = ALIGN_VARIABLE (EntrySize + SelectorSize);
   EntrySize  = ALIGN_VARIABLE (EntrySize + sizeof (SelectorHeader));
   EntrySize  = ALIGN_VARIABLE (EntrySize + DataSize);
-  
+
   //EntrySize = SelectorSize + DataSize + 2 * sizeof (SelectorHeader);
   if (Buffer->Capacity - Buffer->Size < EntrySize) {
     //
@@ -2732,7 +2732,7 @@ IpSecCopyPolicyEntry (
     //
     Buffer->Capacity += EntrySize;
     TempPoint         = AllocatePool (Buffer->Capacity);
-    
+
     if (TempPoint == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -2741,8 +2741,8 @@ IpSecCopyPolicyEntry (
     //
     CopyMem (TempPoint, Buffer->Ptr, Buffer->Size);
     FreePool (Buffer->Ptr);
-    
-    Buffer->Ptr       =  TempPoint;    
+
+    Buffer->Ptr       =  TempPoint;
   }
 
   mFixPolicyEntry[Type](Selector, Data);
@@ -2759,7 +2759,7 @@ IpSecCopyPolicyEntry (
     sizeof (SelectorHeader)
     );
   Buffer->Size  = ALIGN_VARIABLE (Buffer->Size + sizeof (SelectorHeader));
-  
+
   //
   // Copy the selector into buffer.
   //
@@ -2791,7 +2791,7 @@ IpSecCopyPolicyEntry (
     DataSize
     );
   Buffer->Size  = ALIGN_VARIABLE (Buffer->Size + DataSize);
-  
+
   mUnfixPolicyEntry[Type](Selector, Data);
 
   return EFI_SUCCESS;
@@ -3002,7 +3002,7 @@ IpSecConfigSave (
   Get the all IPSec configuration variables and store those variables
   to the internal data structure.
 
-  This founction is called by IpSecConfigInitialize() which is to intialize the 
+  This founction is called by IpSecConfigInitialize() which is to intialize the
   IPsecConfiguration Protocol.
 
   @param[in]  Private            Point to IPSEC_PRIVATE_DATA.
@@ -3080,10 +3080,10 @@ IpSecConfigRestore (
       Header  = (IPSEC_VAR_ITEM_HEADER *) Ptr;
       Type    = (EFI_IPSEC_CONFIG_DATA_TYPE) (Header->Type & IPSEC_VAR_ITEM_HEADER_CONTENT_BIT);
       ASSERT (((Header->Type & 0x80) == IPSEC_VAR_ITEM_HEADER_LOGO_BIT) && (Type < IPsecConfigDataTypeMaximum));
-      
+
       Selector  = (EFI_IPSEC_CONFIG_SELECTOR *) ALIGN_POINTER (Header + 1, sizeof (UINTN));
       Header    = (IPSEC_VAR_ITEM_HEADER *) ALIGN_POINTER (
-                                              (UINT8 *) Selector + Header->Size, 
+                                              (UINT8 *) Selector + Header->Size,
                                               sizeof (UINTN)
                                               );
       ASSERT (Header->Type == Type);

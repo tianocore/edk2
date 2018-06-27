@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or obtaining the parameters relating to IP6.
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -994,7 +994,7 @@ Exit:
 
 /**
   Convert IFR data into IP6 configuration data. The policy, alternative interface
-  ID, and DAD transmit counts, and will be saved. 
+  ID, and DAD transmit counts, and will be saved.
 
   @param[in]       IfrNvData       The IFR NV data.
   @param[in, out]  Instance        The IP6 config instance data.
@@ -1541,7 +1541,7 @@ Ip6GetCurrentSetting (
   EFI_STATUS                    Status;
   CHAR16                        PortString[ADDRESS_STR_MAX_SIZE];
   EFI_IP6_CONFIG_INTERFACE_INFO *IfInfo;
-  
+
 
   Ip6Config = &Instance->Ip6Config;
   HiiHandle = Instance->CallbackInfo.RegisteredHandle;
@@ -1794,7 +1794,7 @@ Ip6FormCallback (
       }
       *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
       break;
-    
+
     case KEY_INTERFACE_ID:
       Status = Ip6ParseInterfaceIdFromString (IfrNvData->InterfaceId, &Ip6NvData->InterfaceId);
       if (EFI_ERROR (Status)) {
@@ -1805,9 +1805,9 @@ Ip6FormCallback (
           NULL
           );
       }
-    
+
       break;
-    
+
     case KEY_MANUAL_ADDRESS:
       Status = Ip6ParseAddressListFromString (
                  IfrNvData->ManualAddress,
@@ -1822,9 +1822,9 @@ Ip6FormCallback (
           NULL
           );
       }
-    
+
       break;
-    
+
     case KEY_GATEWAY_ADDRESS:
       Status = Ip6ParseAddressListFromString (
                  IfrNvData->GatewayAddress,
@@ -1839,9 +1839,9 @@ Ip6FormCallback (
           NULL
           );
       }
-    
+
       break;
-    
+
     case KEY_DNS_ADDRESS:
       Status = Ip6ParseAddressListFromString (
                  IfrNvData->DnsAddress,
@@ -1856,7 +1856,7 @@ Ip6FormCallback (
           NULL
           );
       }
-    
+
       break;
 
     default:

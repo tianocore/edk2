@@ -1,7 +1,7 @@
 /** @file
   TCP output process routines.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -295,7 +295,7 @@ TcpTransmitSegment (
   ASSERT ((Nbuf != NULL) && (Nbuf->Tcp == NULL));
 
   if (TcpVerifySegment (Nbuf) == 0) {
-    return -1; 
+    return -1;
   }
 
   DataLen = Nbuf->TotalSize;
@@ -642,7 +642,7 @@ TcpGetSegment (
     NetbufFree (Nbuf);
     return NULL;
   }
-  
+
   return Nbuf;
 }
 
@@ -688,10 +688,10 @@ TcpRetransmit (
       "TcpRetransmit: retransmission without regard to the receiver window for TCB %p\n",
       Tcb)
       );
-    
+
   } else if (TCP_SEQ_GEQ (Tcb->SndWl2 + Tcb->SndWnd, Seq)) {
     Len = TCP_SUB_SEQ (Tcb->SndWl2 + Tcb->SndWnd, Seq);
-    
+
   } else {
     DEBUG (
       (EFI_D_WARN,

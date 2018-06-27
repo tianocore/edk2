@@ -3,8 +3,8 @@
 #
 #  The iSCSI driver provides iSCSI service in the preboot environment and supports
 #  booting over iSCSI.
-#                                                    
-# Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+#
+# Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -57,7 +57,7 @@
   IScsiExtScsiPassThru.c
   IScsiIbft.c
   IScsiIbft.h
-  IScsiInitiatorName.c 
+  IScsiInitiatorName.c
   IScsiImpl.h
   IScsiMisc.c
   IScsiMisc.h
@@ -82,7 +82,7 @@
   PrintLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  UefiLib  
+  UefiLib
   UefiRuntimeServicesTableLib
   UefiHiiServicesLib
   BaseCryptLib
@@ -113,7 +113,7 @@
   ## PRODUCES
   ## UNDEFINED # Variable
   gEfiIScsiInitiatorNameProtocolGuid
-  ## PRODUCES       
+  ## PRODUCES
   gEfiAuthenticationInfoProtocolGuid
   ## SOMETIMES_CONSUMES
   gEfiAdapterInformationProtocolGuid
@@ -127,7 +127,7 @@
   gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAdapterInfoNetworkBootGuid                ## SOMETIMES_CONSUMES ## UNDEFINED
   gEfiAdapterInfoUndiIpv6SupportGuid            ## SOMETIMES_CONSUMES ## GUID
-  
+
   ## SOMETIMES_PRODUCES ## Variable:L"AttemptOrder"
   ## SOMETIMES_CONSUMES ## Variable:L"AttemptOrder"
   ## SOMETIMES_PRODUCES ## Variable:L"InitialAttemptOrder"

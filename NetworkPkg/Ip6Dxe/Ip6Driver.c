@@ -1,7 +1,7 @@
 /** @file
   The driver binding and service binding protocol for IP6 driver.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
   This program and the accompanying materials
@@ -182,7 +182,7 @@ Ip6CleanService (
     Status = Ip6LeaveGroup (IpSb, &AllNodes);
     if (EFI_ERROR (Status)) {
       return Status;
-    }  
+    }
   }
 
   if (IpSb->DefaultInterface != NULL) {
@@ -568,14 +568,14 @@ Ip6DriverBindingStart (
   }
 
   //
-  // Read the config data from NV variable again. 
+  // Read the config data from NV variable again.
   // The default data can be changed by other drivers.
   //
   Status = Ip6ConfigReadConfigData (IpSb->MacString, &IpSb->Ip6ConfigInstance);
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  
+
   //
   // If there is any default manual address, set it.
   //
@@ -638,7 +638,7 @@ Ip6DriverBindingStart (
                   );
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
-  }    
+  }
 
   //
   // Initialize the IP6 ID
@@ -655,7 +655,7 @@ ON_ERROR:
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
-  
+
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 
@@ -786,7 +786,7 @@ Ip6DriverBindingStop (
     FreePool (IpSb);
     Status = EFI_SUCCESS;
   }
-  
+
 Exit:
   return Status;
 }

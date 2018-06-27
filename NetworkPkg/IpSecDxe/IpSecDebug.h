@@ -1,7 +1,7 @@
 /** @file
   The definition of functions and MACROs used for IPsec debug information printting.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -57,7 +57,7 @@ IpSecDumpAddress (
 VOID
 IkeDumpState (
   IN UINT32              Previous,
-  IN UINT32              Current, 
+  IN UINT32              Current,
   IN UINT8               IkeVersion
   );
 
@@ -81,7 +81,7 @@ IpSecDumpPacket (
 
   @param[in]  IkePayload  Point to payload to be printed.
   @param[in]  IkeVersion  The specified version of IKE.
- 
+
 **/
 VOID
 IpSecDumpPayload (

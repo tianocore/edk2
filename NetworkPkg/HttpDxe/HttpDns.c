@@ -1,7 +1,7 @@
 /** @file
   Routines for HttpDxe driver to perform DNS resolution based on UEFI DNS protocols.
 
-Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,13 +25,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate needed resources.
   @retval EFI_DEVICE_ERROR        An unexpected network error occurred.
   @retval Others                  Other errors as indicated.
-  
+
 **/
 EFI_STATUS
 HttpDns4 (
   IN     HTTP_PROTOCOL            *HttpInstance,
   IN     CHAR16                   *HostName,
-     OUT EFI_IPv4_ADDRESS         *IpAddress                
+     OUT EFI_IPv4_ADDRESS         *IpAddress
   )
 {
   EFI_STATUS                      Status;
@@ -45,7 +45,7 @@ HttpDns4 (
   UINTN                           DnsServerListCount;
   EFI_IPv4_ADDRESS                *DnsServerList;
   UINTN                           DataSize;
-  
+
 
   Service = HttpInstance->Service;
   ASSERT (Service != NULL);
@@ -82,7 +82,7 @@ HttpDns4 (
 
   Dns4Handle = NULL;
   Dns4       = NULL;
-  
+
   //
   // Create a DNS child instance and get the protocol.
   //
@@ -94,7 +94,7 @@ HttpDns4 (
              );
   if (EFI_ERROR (Status)) {
     goto Exit;
-  }  
+  }
 
   Status = gBS->OpenProtocol (
                   Dns4Handle,
@@ -128,7 +128,7 @@ HttpDns4 (
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
-  
+
   //
   // Create event to set the is done flag when name resolution is finished.
   //
@@ -161,7 +161,7 @@ HttpDns4 (
   //
   // Name resolution is done, check result.
   //
-  Status = Token.Status;  
+  Status = Token.Status;
   if (!EFI_ERROR (Status)) {
     if (Token.RspData.H2AData == NULL) {
       Status = EFI_DEVICE_ERROR;
@@ -179,7 +179,7 @@ HttpDns4 (
   }
 
 Exit:
-  
+
   if (Token.Event != NULL) {
     gBS->CloseEvent (Token.Event);
   }
@@ -192,7 +192,7 @@ Exit:
 
   if (Dns4 != NULL) {
     Dns4->Configure (Dns4, NULL);
-    
+
     gBS->CloseProtocol (
            Dns4Handle,
            &gEfiDns4ProtocolGuid,
@@ -213,7 +213,7 @@ Exit:
   if (DnsServerList != NULL) {
     FreePool (DnsServerList);
   }
-  
+
   return Status;
 }
 
@@ -228,13 +228,13 @@ Exit:
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate needed resources.
   @retval EFI_DEVICE_ERROR        An unexpected network error occurred.
   @retval Others                  Other errors as indicated.
-  
+
 **/
 EFI_STATUS
 HttpDns6 (
   IN     HTTP_PROTOCOL            *HttpInstance,
   IN     CHAR16                   *HostName,
-     OUT EFI_IPv6_ADDRESS         *IpAddress                
+     OUT EFI_IPv6_ADDRESS         *IpAddress
   )
 {
   EFI_STATUS                      Status;
@@ -248,7 +248,7 @@ HttpDns6 (
   UINTN                           DnsServerListCount;
   UINTN                           DataSize;
   BOOLEAN                         IsDone;
-  
+
 
   Service = HttpInstance->Service;
   ASSERT (Service != NULL);
@@ -258,7 +258,7 @@ HttpDns6 (
   Dns6                = NULL;
   Dns6Handle          = NULL;
   ZeroMem (&Token, sizeof (EFI_DNS6_COMPLETION_TOKEN));
-  
+
   //
   // Get DNS server list from EFI IPv6 Configuration protocol.
   //
@@ -273,7 +273,7 @@ HttpDns6 (
       DnsServerList = AllocatePool (DataSize);
       if (DnsServerList == NULL) {
         return EFI_OUT_OF_RESOURCES;
-      }  
+      }
 
       Status = Ip6Config->GetData (Ip6Config, Ip6ConfigDataTypeDnsServer, &DataSize, DnsServerList);
       if (EFI_ERROR (Status)) {
@@ -296,8 +296,8 @@ HttpDns6 (
              );
   if (EFI_ERROR (Status)) {
     goto Exit;
-  } 
-  
+  }
+
   Status = gBS->OpenProtocol (
                   Dns6Handle,
                   &gEfiDns6ProtocolGuid,
@@ -358,7 +358,7 @@ HttpDns6 (
   //
   // Name resolution is done, check result.
   //
-  Status = Token.Status;  
+  Status = Token.Status;
   if (!EFI_ERROR (Status)) {
     if (Token.RspData.H2AData == NULL) {
       Status = EFI_DEVICE_ERROR;
@@ -374,7 +374,7 @@ HttpDns6 (
     IP6_COPY_ADDRESS (IpAddress, Token.RspData.H2AData->IpList);
     Status = EFI_SUCCESS;
   }
-  
+
 Exit:
 
   if (Token.Event != NULL) {
@@ -389,7 +389,7 @@ Exit:
 
   if (Dns6 != NULL) {
     Dns6->Configure (Dns6, NULL);
-    
+
     gBS->CloseProtocol (
            Dns6Handle,
            &gEfiDns6ProtocolGuid,
@@ -410,6 +410,6 @@ Exit:
   if (DnsServerList != NULL) {
     FreePool (DnsServerList);
   }
-  
-  return Status;  
+
+  return Status;
 }

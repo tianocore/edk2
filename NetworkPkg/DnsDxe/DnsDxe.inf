@@ -1,7 +1,7 @@
 ## @file
 # Implementation of EFI_DNS4_PROTOCOL and EFI_DNS6_PROTOCOL interfaces.
 #
-# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -37,8 +37,8 @@
   DnsProtocol.c
   DnsDhcp.h
   DnsDhcp.c
-  
-  
+
+
 [LibraryClasses]
   BaseLib
   UefiLib
@@ -52,7 +52,7 @@
   DpcLib
   PrintLib
   UdpIoLib
-  
+
 
 [Protocols]
   gEfiDns4ServiceBindingProtocolGuid              ## BY_START
@@ -64,7 +64,7 @@
   gEfiIp4Config2ProtocolGuid                      ## SOMETIMES_CONSUMES
   gEfiManagedNetworkServiceBindingProtocolGuid    ## SOMETIMES_CONSUMES
   gEfiManagedNetworkProtocolGuid                  ## SOMETIMES_CONSUMES
-  
+
   gEfiDns6ServiceBindingProtocolGuid              ## BY_START
   gEfiDns6ProtocolGuid                            ## BY_START
   gEfiUdp6ServiceBindingProtocolGuid              ## TO_START

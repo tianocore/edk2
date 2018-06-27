@@ -1,7 +1,7 @@
 /** @file
   Mtftp6 support functions implementation.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -538,7 +538,7 @@ Mtftp6SendRequest (
 
   Packet->OpCode = HTONS (Operation);
   BufferLength  -= sizeof (Packet->OpCode);
-  
+
   Cur            = Packet->Rrq.Filename;
   Status         = AsciiStrCpyS ((CHAR8 *) Cur, BufferLength, (CHAR8 *) Token->Filename);
   ASSERT_EFI_ERROR (Status);
@@ -555,17 +555,17 @@ Mtftp6SendRequest (
   for (Index = 0; Index < Token->OptionCount; ++Index) {
     OptionStrLength = AsciiStrLen ((CHAR8 *) Options[Index].OptionStr);
     ValueStrLength  = AsciiStrLen ((CHAR8 *) Options[Index].ValueStr);
-    
+
     Status          = AsciiStrCpyS ((CHAR8 *) Cur, BufferLength, (CHAR8 *) Options[Index].OptionStr);
     ASSERT_EFI_ERROR (Status);
     BufferLength   -= (UINT32) (OptionStrLength + 1);
     Cur            += OptionStrLength + 1;
-    
+
     Status          = AsciiStrCpyS ((CHAR8 *) Cur, BufferLength, (CHAR8 *) Options[Index].ValueStr);
     ASSERT_EFI_ERROR (Status);
     BufferLength   -= (UINT32) (ValueStrLength + 1);
     Cur            += ValueStrLength + 1;
-    
+
   }
 
   //

@@ -1,12 +1,12 @@
 ## @file
 #  Access PXE-compatible devices for network access and network booting.
-#  
+#
 #  This driver provides PXE Base Code Protocol which is used to accessing
 #  PXE-compatible device for network access or booting. It could work together
 #  with an IPv4 stack, an IPv6 stack or both.
 #
 #
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -73,7 +73,7 @@
 [Protocols]
   ## TO_START
   ## SOMETIMES_CONSUMES
-  gEfiDevicePathProtocolGuid                           
+  gEfiDevicePathProtocolGuid
   gEfiNetworkInterfaceIdentifierProtocolGuid_31        ## SOMETIMES_CONSUMES
   gEfiArpServiceBindingProtocolGuid                    ## TO_START
   gEfiArpProtocolGuid                                  ## TO_START

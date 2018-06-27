@@ -1,13 +1,13 @@
 /** @file
   Functions implementation related with DHCPv4 for HTTP boot driver.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -267,7 +267,7 @@ HttpBootParseDhcp4Packet (
   HTTP_BOOT_OFFER_TYPE           OfferType;
   EFI_IPv4_ADDRESS               IpAddr;
   BOOLEAN                        FileFieldOverloaded;
-  
+
   IsDnsOffer     = FALSE;
   IpExpressedUri = FALSE;
   IsProxyOffer   = FALSE;
@@ -291,7 +291,7 @@ HttpBootParseDhcp4Packet (
                        );
   }
   //
-  // Second, Check if bootfilename and serverhostname is overloaded to carry DHCP options refers to rfc-2132. 
+  // Second, Check if bootfilename and serverhostname is overloaded to carry DHCP options refers to rfc-2132.
   // If yes, try to parse options from the BootFileName field, then ServerName field.
   //
   Option = Options[HTTP_BOOT_DHCP4_TAG_INDEX_OVERLOAD];
@@ -379,7 +379,7 @@ HttpBootParseDhcp4Packet (
   }
 
   //
-  // Try to retrieve the IP of HTTP server from URI. 
+  // Try to retrieve the IP of HTTP server from URI.
   //
   if (IsHttpOffer) {
     Status = HttpParseUrl (
@@ -428,7 +428,7 @@ HttpBootParseDhcp4Packet (
       return EFI_DEVICE_ERROR;
     }
   }
-  
+
   Cache4->OfferType = OfferType;
   return EFI_SUCCESS;
 }
@@ -506,70 +506,70 @@ HttpBootSelectDhcpOffer (
     // The offer with DNS server address takes priority here.
     //
     if (Private->OfferCount[HttpOfferTypeDhcpDns] > 0) {
-      
+
       Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpDns][0] + 1;
-      
+
     } else if (Private->OfferCount[HttpOfferTypeDhcpIpUriDns] > 0) {
-    
+
       Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpIpUriDns][0] + 1;
-      
+
     } else if (Private->OfferCount[HttpOfferTypeDhcpNameUriDns] > 0) {
-    
+
       Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpNameUriDns][0] + 1;
-      
+
     }  else if (Private->OfferCount[HttpOfferTypeDhcpOnly] > 0) {
-    
+
       Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpOnly][0] + 1;
-      
+
     }  else if (Private->OfferCount[HttpOfferTypeDhcpIpUri] > 0) {
-    
+
       Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpIpUri][0] + 1;
     }
-    
+
   } else {
     //
     // We are in corporate environment.
     //
     // Priority1: HttpOfferTypeDhcpIpUri or HttpOfferTypeDhcpIpUriDns
-    // Priority2: HttpOfferTypeDhcpNameUriDns                      
-    // Priority3: HttpOfferTypeDhcpOnly + HttpOfferTypeProxyIpUri  
-    // Priority4: HttpOfferTypeDhcpDns  + HttpOfferTypeProxyIpUri  
+    // Priority2: HttpOfferTypeDhcpNameUriDns
+    // Priority3: HttpOfferTypeDhcpOnly + HttpOfferTypeProxyIpUri
+    // Priority4: HttpOfferTypeDhcpDns  + HttpOfferTypeProxyIpUri
     // Priority5: HttpOfferTypeDhcpDns  + HttpOfferTypeProxyNameUri
-    // Priority6: HttpOfferTypeDhcpDns  + HttpOfferTypeDhcpNameUri 
-    //    
+    // Priority6: HttpOfferTypeDhcpDns  + HttpOfferTypeDhcpNameUri
+    //
     if (Private->OfferCount[HttpOfferTypeDhcpIpUri] > 0) {
-      
+
       Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpIpUri][0] + 1;
-      
+
     } else if (Private->OfferCount[HttpOfferTypeDhcpIpUriDns] > 0) {
-      
+
       Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpIpUriDns][0] + 1;
-      
+
     }else if (Private->OfferCount[HttpOfferTypeDhcpNameUriDns] > 0) {
-    
+
       Private->SelectIndex = Private->OfferIndex[HttpOfferTypeDhcpNameUriDns][0] + 1;
-      
+
     } else if (Private->OfferCount[HttpOfferTypeDhcpOnly] > 0 &&
                Private->OfferCount[HttpOfferTypeProxyIpUri] > 0) {
-               
+
       Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpOnly][0] + 1;
       Private->SelectProxyType = HttpOfferTypeProxyIpUri;
-      
+
     } else if (Private->OfferCount[HttpOfferTypeDhcpDns] > 0 &&
                Private->OfferCount[HttpOfferTypeProxyIpUri] > 0) {
-               
+
       Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpDns][0] + 1;
       Private->SelectProxyType = HttpOfferTypeProxyIpUri;
-      
+
     } else if (Private->OfferCount[HttpOfferTypeDhcpDns] > 0 &&
                Private->OfferCount[HttpOfferTypeProxyNameUri] > 0) {
-               
+
       Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpDns][0] + 1;
       Private->SelectProxyType = HttpOfferTypeProxyNameUri;
-      
+
     } else if (Private->OfferCount[HttpOfferTypeDhcpDns] > 0 &&
                Private->OfferCount[HttpOfferTypeDhcpNameUri] > 0) {
-               
+
       Private->SelectIndex     = Private->OfferIndex[HttpOfferTypeDhcpDns][0] + 1;
       Private->SelectProxyType = HttpOfferTypeDhcpNameUri;
     }
@@ -614,14 +614,14 @@ HttpBootDhcp4CallBack (
   EFI_STATUS                           Status;
   BOOLEAN                              Received;
 
-  if ((Dhcp4Event != Dhcp4SendDiscover) && 
-      (Dhcp4Event != Dhcp4RcvdOffer) && 
-      (Dhcp4Event != Dhcp4SendRequest) && 
-      (Dhcp4Event != Dhcp4RcvdAck) && 
+  if ((Dhcp4Event != Dhcp4SendDiscover) &&
+      (Dhcp4Event != Dhcp4RcvdOffer) &&
+      (Dhcp4Event != Dhcp4SendRequest) &&
+      (Dhcp4Event != Dhcp4RcvdAck) &&
       (Dhcp4Event != Dhcp4SelectOffer)) {
     return EFI_SUCCESS;
   }
-  
+
   Private = (HTTP_BOOT_PRIVATE_DATA *) Context;
 
   //
@@ -636,14 +636,14 @@ HttpBootDhcp4CallBack (
     Value = HTONS (HTTP_BOOT_DHCP4_PACKET_MAX_SIZE);
     CopyMem (MaxMsgSize->Data, &Value, sizeof (Value));
   }
-  
+
   //
   // Callback to user if any packets sent or received.
   //
   if (Private->HttpBootCallback != NULL && Dhcp4Event != Dhcp4SelectOffer) {
     Received = (BOOLEAN) (Dhcp4Event == Dhcp4RcvdOffer || Dhcp4Event == Dhcp4RcvdAck);
     Status = Private->HttpBootCallback->Callback (
-               Private->HttpBootCallback, 
+               Private->HttpBootCallback,
                HttpBootDhcp4,
                Received,
                Packet->Length,
@@ -676,7 +676,7 @@ HttpBootDhcp4CallBack (
 
   case Dhcp4SelectOffer:
     //
-    // Select offer according to the priority in UEFI spec, and record the SelectIndex 
+    // Select offer according to the priority in UEFI spec, and record the SelectIndex
     // and SelectProxyType.
     //
     HttpBootSelectDhcpOffer (Private);
@@ -687,7 +687,7 @@ HttpBootDhcp4CallBack (
       *NewPacket = &Private->OfferBuffer[Private->SelectIndex - 1].Dhcp4.Packet.Offer;
     }
     break;
-    
+
   default:
     break;
   }
@@ -697,7 +697,7 @@ HttpBootDhcp4CallBack (
 
 /**
   This function will register the IPv4 gateway address to the network device.
-  
+
   @param[in]  Private             The pointer to HTTP_BOOT_PRIVATE_DATA.
 
   @retval     EFI_SUCCESS         The new IP configuration has been configured successfully.
@@ -736,7 +736,7 @@ HttpBootRegisterIp4Gateway (
 
 /**
   This function will register the default DNS addresses to the network device.
-  
+
   @param[in]  Private             The pointer to HTTP_BOOT_PRIVATE_DATA.
   @param[in]  DataLength          Size of the buffer pointed to by DnsServerData in bytes.
   @param[in]  DnsServerData       Point a list of DNS server address in an array
@@ -754,11 +754,11 @@ HttpBootRegisterIp4Dns (
   )
 {
   EFI_IP4_CONFIG2_PROTOCOL        *Ip4Config2;
-  
+
   ASSERT (!Private->UsingIpv6);
 
   Ip4Config2 = Private->Ip4Config2;
-  
+
   return Ip4Config2->SetData (
                        Ip4Config2,
                        Ip4Config2DataTypeDnsServer,
@@ -810,7 +810,7 @@ HttpBootSetIp4Policy (
                           );
     if (EFI_ERROR (Status)) {
       return Status;
-    } 
+    }
   }
 
   return EFI_SUCCESS;
@@ -837,7 +837,7 @@ HttpBootDhcp4Dora (
   EFI_DHCP4_CONFIG_DATA        Config;
   EFI_STATUS                   Status;
   EFI_DHCP4_MODE_DATA          Mode;
-  
+
   Dhcp4 = Private->Dhcp4;
   ASSERT (Dhcp4 != NULL);
 

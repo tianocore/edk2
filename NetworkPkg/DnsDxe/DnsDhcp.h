@@ -1,7 +1,7 @@
 /** @file
 Functions implementation related with DHCPv4/v6 for DNS driver.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -78,11 +78,11 @@ ParseDhcp4Ack (
   );
 
 /**
-  EFI_DHCP6_INFO_CALLBACK is provided by the consumer of the EFI DHCPv6 Protocol 
+  EFI_DHCP6_INFO_CALLBACK is provided by the consumer of the EFI DHCPv6 Protocol
   instance to intercept events that occurs in the DHCPv6 Information Request
   exchange process.
 
-  @param  This                  Pointer to the EFI_DHCP6_PROTOCOL instance that 
+  @param  This                  Pointer to the EFI_DHCP6_PROTOCOL instance that
                                 is used to configure this  callback function.
   @param  Context               Pointer to the context that is initialized in
                                 the EFI_DHCP6_PROTOCOL.InfoRequest().
@@ -143,5 +143,5 @@ GetDns6ServerFromDhcp6 (
   OUT UINT32                     *DnsServerCount,
   OUT EFI_IPv6_ADDRESS           **DnsServerList
   );
-  
+
 #endif

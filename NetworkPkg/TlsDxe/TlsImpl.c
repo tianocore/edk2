@@ -106,7 +106,7 @@ TlsEncryptPacket (
     BufferInPtr += TLS_RECORD_HEADER_LENGTH + RecordHeaderIn->Length;
     RecordCount ++;
   }
-  
+
   //
   // Allocate enough buffer to hold TLS Ciphertext.
   //

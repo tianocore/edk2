@@ -1,7 +1,7 @@
 /** @file
   The function declaration that provided for Socket Interface.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -80,13 +80,13 @@ SockConnFlush (
 /**
   Cancel the tokens in the specific token list.
 
-  @param[in]       Token                 Pointer to the Token. If NULL, all tokens 
-                                         in SpecifiedTokenList will be canceled.  
+  @param[in]       Token                 Pointer to the Token. If NULL, all tokens
+                                         in SpecifiedTokenList will be canceled.
   @param[in, out]  SpecifiedTokenList    Pointer to the token list to be checked.
-  
+
   @retval EFI_SUCCESS          Cancel the tokens in the specific token listsuccessfully.
   @retval EFI_NOT_FOUND        The Token is not found in SpecifiedTokenList.
-  
+
 **/
 EFI_STATUS
 SockCancelToken (

@@ -1,7 +1,7 @@
 /** @file
   iSCSI DHCP4 related configuration routines.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -201,14 +201,14 @@ ON_EXIT:
 /**
   The callback function registerd to the DHCP4 instance that is used to select
   the qualified DHCP OFFER.
-  
+
   @param[in]  This         The DHCP4 protocol.
   @param[in]  Context      The context set when configuring the DHCP4 protocol.
   @param[in]  CurrentState The current state of the DHCP4 protocol.
   @param[in]  Dhcp4Event   The event occurs in the current state.
-  @param[in]  Packet       The DHCP packet that is to be sent or was already received. 
+  @param[in]  Packet       The DHCP packet that is to be sent or was already received.
   @param[out] NewPacket    The packet used to replace the above Packet.
-  
+
   @retval EFI_SUCCESS      Either the DHCP OFFER is qualified or we're not intereseted
                            in the Dhcp4Event.
   @retval EFI_NOT_READY    The DHCP OFFER packet doesn't match our requirements.
@@ -411,7 +411,7 @@ IScsiSetIp4Policy (
                           );
     if (EFI_ERROR (Status)) {
       return Status;
-    } 
+    }
   }
 
   return EFI_SUCCESS;
@@ -462,10 +462,10 @@ IScsiDoDhcp (
   }
 
   //
-  // DHCP4 service allows only one of its children to be configured in  
-  // the active state, If the DHCP4 D.O.R.A started by IP4 auto  
-  // configuration and has not been completed, the Dhcp4 state machine 
-  // will not be in the right state for the iSCSI to start a new round D.O.R.A. 
+  // DHCP4 service allows only one of its children to be configured in
+  // the active state, If the DHCP4 D.O.R.A started by IP4 auto
+  // configuration and has not been completed, the Dhcp4 state machine
+  // will not be in the right state for the iSCSI to start a new round D.O.R.A.
   // So, we need to switch it's policy to static.
   //
   Status = gBS->HandleProtocol (Controller, &gEfiIp4Config2ProtocolGuid, (VOID **) &Ip4Config2);

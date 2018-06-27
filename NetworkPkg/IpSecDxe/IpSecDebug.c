@@ -1,7 +1,7 @@
 /** @file
   The Interfaces of IPsec debug information printing.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -167,21 +167,21 @@ IkeDumpState (
   )
 {
   if (Previous >= IKE_STATE_NUM || Current >= IKE_STATE_NUM) {
-    return; 
+    return;
   }
-  
+
   if (Previous == Current) {
     if (IkeVersion == 1) {
       DEBUG ((DEBUG_INFO, "\n****Current state is %a\n", mIkev1StateStr[Previous]));
     } else if (IkeVersion == 2) {
       DEBUG ((DEBUG_INFO, "\n****Current state is %a\n", mIkev2StateStr[Previous]));
-    }    
+    }
   } else {
     if (IkeVersion == 1) {
       DEBUG ((DEBUG_INFO, "\n****Change state from %a to %a\n", mIkev1StateStr[Previous], mIkev1StateStr[Current]));
     } else {
       DEBUG ((DEBUG_INFO, "\n****Change state from %a to %a\n", mIkev2StateStr[Previous], mIkev2StateStr[Current]));
-    }    
+    }
   }
 }
 
@@ -223,7 +223,7 @@ IpSecDumpPacket (
   case IKE_XCG_TYPE_QM:
     TypeStr = mExchangeStr[2];
     break;
-    
+
   case IKE_XCG_TYPE_SA_INIT:
     TypeStr = mExchangeStr[3];
     break;
@@ -239,7 +239,7 @@ IpSecDumpPacket (
   case IKE_XCG_TYPE_INFO2:
     TypeStr = mExchangeStr[6];
     break;
-    
+
   default:
     TypeStr = mExchangeStr[7];
     break;
@@ -275,7 +275,7 @@ IpSecDumpPacket (
 
   @param[in]  IkePayload  Point to payload to be printed.
   @param[in]  IkeVersion  The specified version of IKE.
- 
+
 **/
 VOID
 IpSecDumpPayload (

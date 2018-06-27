@@ -1,7 +1,7 @@
 /** @file
   Helper functions for configuring or getting the parameters relating to HTTP Boot.
 
-Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -24,7 +24,7 @@ CHAR16  mHttpBootConfigStorageName[]     = L"HTTP_BOOT_CONFIG_IFR_NVDATA";
   @param[in]  UsingIpv6           Set to TRUE if creating boot option for IPv6.
   @param[in]  Description         The description text of the boot option.
   @param[in]  Uri                 The URI string of the boot file.
-  
+
   @retval EFI_SUCCESS             The boot option is created successfully.
   @retval Others                  Failed to create new boot option.
 
@@ -72,7 +72,7 @@ HttpBootAddBootOption (
   if ((StrLen (Uri) != 0) && (StrnCmp (Uri, L"http://", 7) != 0) && (StrnCmp (Uri, L"https://", 8) != 0)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Create a new device path by appending the IP node and URI node to
   // the driver's parent device path
@@ -154,7 +154,7 @@ ON_EXIT:
 }
 
 /**
-   
+
   This function allows the caller to request the current
   configuration for one or more named elements. The resulting
   string is in <ConfigAltResp> format. Also, any and all alternative
@@ -183,7 +183,7 @@ ON_EXIT:
                          to the most recent "&" before the first
                          failing name / value pair (or the beginning
                          of the string if the failure is in the first
-                         name / value pair) if the request was not successful.                        
+                         name / value pair) if the request was not successful.
 
   @param[out] Results    A null-terminated Unicode string in
                          <ConfigAltResp> format which has all values
@@ -204,7 +204,7 @@ ON_EXIT:
                                   would result in this type of
                                   error. In this case, the
                                   Progress parameter would be
-                                  set to NULL. 
+                                  set to NULL.
 
   @retval EFI_NOT_FOUND           Routing data doesn't match any
                                   known driver. Progress set to the
@@ -249,7 +249,7 @@ HttpBootFormExtractConfig (
   if ((Request != NULL) && !HiiIsConfigHdrMatch (Request, &gHttpBootConfigGuid, mHttpBootConfigStorageName)) {
     return EFI_NOT_FOUND;
   }
-  
+
   ConfigRequestHdr = NULL;
   ConfigRequest    = NULL;
   AllocatedRequest = FALSE;
@@ -289,7 +289,7 @@ HttpBootFormExtractConfig (
                                 Results,
                                 Progress
                                 );
-  
+
   //
   // Free the allocated config request string.
   //
@@ -310,7 +310,7 @@ HttpBootFormExtractConfig (
 }
 
 /**
-   
+
   This function applies changes in a driver's configuration.
   Input is a Configuration, which has the routing data for this
   driver followed by name / value configuration pairs. The driver
@@ -323,8 +323,8 @@ HttpBootFormExtractConfig (
   @param[in]  This           Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
 
   @param[in]  Configuration  A null-terminated Unicode string in
-                             <ConfigString> format. 
-  
+                             <ConfigString> format.
+
   @param[out] Progress       A pointer to a string filled in with the
                              offset of the most recent '&' before the
                              first failing name / value pair (or the
@@ -335,16 +335,16 @@ HttpBootFormExtractConfig (
 
   @retval EFI_SUCCESS             The results have been distributed or are
                                   awaiting distribution.
-  
+
   @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
                                   parts of the results that must be
                                   stored awaiting possible future
                                   protocols.
-  
+
   @retval EFI_INVALID_PARAMETERS  Passing in a NULL for the
                                   Results parameter would result
                                   in this type of error.
-  
+
   @retval EFI_NOT_FOUND           Target for the specified routing data
                                   was not found.
 
@@ -381,7 +381,7 @@ HttpBootFormRouteConfig (
 
   CallbackInfo = HTTP_BOOT_FORM_CALLBACK_INFO_FROM_CONFIG_ACCESS (This);
   Private      = HTTP_BOOT_PRIVATE_DATA_FROM_CALLBACK_INFO (CallbackInfo);
-  
+
   BufferSize = sizeof (HTTP_BOOT_CONFIG_IFR_NVDATA);
   ZeroMem (&CallbackInfo->HttpBootNvData, BufferSize);
 
@@ -405,12 +405,12 @@ HttpBootFormRouteConfig (
     CallbackInfo->HttpBootNvData.Description,
     CallbackInfo->HttpBootNvData.Uri
     );
-  
+
   return EFI_SUCCESS;
 }
 
 /**
-   
+
   This function is called to provide results data to the driver.
   This data consists of a unique key that is used to identify
   which data is either being passed back or being asked for.
@@ -419,7 +419,7 @@ HttpBootFormRouteConfig (
   @param[in]       Action        Specifies the type of action taken by the browser.
   @param[in]       QuestionId    A unique value which is sent to the original
                                  exporting driver so that it can identify the type
-                                 of data to expect. The format of the data tends to 
+                                 of data to expect. The format of the data tends to
                                  vary based on the opcode that generated the callback.
   @param[in]       Type          The type of value for the question.
   @param[in, out]  Value         A pointer to the data being sent to the original
@@ -456,17 +456,17 @@ HttpBootFormCallback (
   UriLen   = 0;
   AsciiUri = NULL;
   Status   = EFI_SUCCESS;
-  
+
   if (This == NULL || Value == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
   CallbackInfo = HTTP_BOOT_FORM_CALLBACK_INFO_FROM_CONFIG_ACCESS (This);
-  
+
   if (Action != EFI_BROWSER_ACTION_CHANGING) {
     return EFI_UNSUPPORTED;
   }
-  
+
   switch (QuestionId) {
   case KEY_INITIATOR_URI:
     //
@@ -474,8 +474,8 @@ HttpBootFormCallback (
     //
     Uri = HiiGetString (CallbackInfo->RegisteredHandle, Value->string, NULL);
     if(Uri == NULL) {
-    	return EFI_INVALID_PARAMETER;
-    }        
+      return EFI_INVALID_PARAMETER;
+    }
 
     //
     // The URI should be either an empty string (for corporate environment) ,or http(s) for home environment.
@@ -492,7 +492,7 @@ HttpBootFormCallback (
       UnicodeStrToAsciiStrS (Uri, AsciiUri, UriLen);
 
       Status = HttpBootCheckUriScheme (AsciiUri);
-      
+
       if (Status == EFI_INVALID_PARAMETER) {
 
         DEBUG ((EFI_D_ERROR, "HttpBootFormCallback: %r.\n", Status));
@@ -503,11 +503,11 @@ HttpBootFormCallback (
           L"ERROR: Unsupported URI!",
           L"Only supports HTTP and HTTPS",
           NULL
-          ); 
+          );
       } else if (Status == EFI_ACCESS_DENIED) {
-      
+
         DEBUG ((EFI_D_ERROR, "HttpBootFormCallback: %r.\n", Status));
-      
+
         CreatePopUp (
           EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE,
           &Key,
@@ -524,8 +524,8 @@ HttpBootFormCallback (
 
     if (AsciiUri != NULL) {
       FreePool (AsciiUri);
-    }   
-    
+    }
+
     break;
 
   default:
@@ -561,7 +561,7 @@ HttpBootConfigFormInit (
   if (CallbackInfo->Initilized) {
     return EFI_SUCCESS;
   }
-  
+
   CallbackInfo->Signature = HTTP_BOOT_FORM_CALLBACK_INFO_SIGNATURE;
 
   //
@@ -586,7 +586,7 @@ HttpBootConfigFormInit (
   CallbackInfo->ConfigAccess.ExtractConfig = HttpBootFormExtractConfig;
   CallbackInfo->ConfigAccess.RouteConfig   = HttpBootFormRouteConfig;
   CallbackInfo->ConfigAccess.Callback      = HttpBootFormCallback;
-  
+
   //
   // Install Device Path Protocol and Config Access protocol to driver handle.
   //
@@ -623,25 +623,25 @@ HttpBootConfigFormInit (
   Status = NetLibGetMacString (Private->Controller, NULL, &MacString);
   if (!EFI_ERROR (Status)) {
     OldMenuString = HiiGetString (
-                      CallbackInfo->RegisteredHandle, 
-                      STRING_TOKEN (STR_HTTP_BOOT_CONFIG_FORM_HELP), 
+                      CallbackInfo->RegisteredHandle,
+                      STRING_TOKEN (STR_HTTP_BOOT_CONFIG_FORM_HELP),
                       NULL
                       );
     UnicodeSPrint (MenuString, 128, L"%s (MAC:%s)", OldMenuString, MacString);
     HiiSetString (
-      CallbackInfo->RegisteredHandle, 
-      STRING_TOKEN (STR_HTTP_BOOT_CONFIG_FORM_HELP), 
-      MenuString, 
+      CallbackInfo->RegisteredHandle,
+      STRING_TOKEN (STR_HTTP_BOOT_CONFIG_FORM_HELP),
+      MenuString,
       NULL
       );
-    
+
     FreePool (MacString);
     FreePool (OldMenuString);
 
     CallbackInfo->Initilized = TRUE;
     return EFI_SUCCESS;
   }
-  
+
 Error:
 
   HttpBootConfigFormUnload (Private);

@@ -1,7 +1,7 @@
 /** @file
   Common operation of the IKE
-  
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -26,7 +26,7 @@
 
   @retval  TRUE    This SpiValue has existed in the Child SA Session
   @retval  FALSE   This SpiValue doesn't exist in the Child SA Session.
-  
+
 **/
 BOOLEAN
 IkeSpiValueExisted (
@@ -40,8 +40,8 @@ IkeSpiValueExisted (
 
   Entry     = NULL;
   Next      = NULL;
-  SaSession = NULL; 
-    
+  SaSession = NULL;
+
   //
   // Check whether the SPI value has existed in ChildSaEstablishSessionList.
   //
@@ -67,7 +67,7 @@ IkeSpiValueExisted (
 
 /**
   Call Crypto Lib to generate a random value with eight-octet length.
-  
+
   @return the 64 byte vaule.
 
 **/
@@ -91,8 +91,8 @@ IkeGenerateCookie (
   Generate the random data for Nonce payload.
 
   @param[in]  NonceSize      Size of the data in bytes.
-  
-  @return Buffer which contains the random data of the spcified size. 
+
+  @return Buffer which contains the random data of the spcified size.
 
 **/
 UINT8 *
@@ -168,7 +168,7 @@ IkePayloadAlloc (
   if (IkePayload == NULL) {
     return NULL;
   }
-  
+
   IkePayload->Signature = IKE_PAYLOAD_SIGNATURE;
 
   return IkePayload;
@@ -200,11 +200,11 @@ IkePayloadFree (
 
 /**
   Generate an new SPI.
-  
-  @param[in]       IkeSaSession   Pointer to IKEV2_SA_SESSION related to this Child SA 
+
+  @param[in]       IkeSaSession   Pointer to IKEV2_SA_SESSION related to this Child SA
                                   Session.
-  @param[in, out]  SpiValue       Pointer to the new generated SPI value. 
-                              
+  @param[in, out]  SpiValue       Pointer to the new generated SPI value.
+
   @retval EFI_SUCCESS         The operation performs successfully.
   @retval Otherwise           The operation is failed.
 
@@ -218,7 +218,7 @@ IkeGenerateSpi (
   EFI_STATUS   Status;
 
   Status = EFI_SUCCESS;
- 
+
   while (TRUE) {
     //
     // Generate SPI randomly
@@ -229,13 +229,13 @@ IkeGenerateSpi (
     }
 
     //
-    // The set of SPI values in the range 1 through 255 are reserved by the 
-    // Internet Assigned Numbers Authority (IANA) for future use; a reserved 
-    // SPI value will not normally be assigned by IANA unless the use of the 
+    // The set of SPI values in the range 1 through 255 are reserved by the
+    // Internet Assigned Numbers Authority (IANA) for future use; a reserved
+    // SPI value will not normally be assigned by IANA unless the use of the
     // assigned SPI value is specified in an RFC.
     //
     if (*SpiValue < IKE_SPI_BASE) {
-      *SpiValue += IKE_SPI_BASE; 
+      *SpiValue += IKE_SPI_BASE;
     }
 
     //
@@ -245,7 +245,7 @@ IkeGenerateSpi (
       break;
     }
   }
-  
+
   return Status;
 }
 

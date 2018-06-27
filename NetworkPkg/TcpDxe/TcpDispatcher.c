@@ -2,7 +2,7 @@
   The implementation of a dispatch routine for processing TCP requests.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -360,7 +360,7 @@ TcpAttachPcb (
   } else {
     IpProtocolGuid = &gEfiIp6ProtocolGuid;
   }
-  
+
   Tcb = AllocateZeroPool (sizeof (TCP_CB));
 
   if (Tcb == NULL) {
@@ -398,7 +398,7 @@ TcpAttachPcb (
     IpIoRemoveIp (IpIo, Tcb->IpInfo);
     return Status;
   }
-  
+
   InitializeListHead (&Tcb->List);
   InitializeListHead (&Tcb->SndQue);
   InitializeListHead (&Tcb->RcvQue);
@@ -430,7 +430,7 @@ TcpDetachPcb (
   ASSERT (Tcb != NULL);
 
   TcpFlushPcb (Tcb);
-  
+
   IpIoRemoveIp (ProtoData->TcpService->IpIo, Tcb->IpInfo);
 
   FreePool (Tcb);

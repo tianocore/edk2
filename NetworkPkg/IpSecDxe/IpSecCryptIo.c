@@ -1,7 +1,7 @@
 /** @file
   Common interfaces to call Security library.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,7 @@
 //
 GLOBAL_REMOVE_IF_UNREFERENCED ENCRYPT_ALGORITHM mIpsecEncryptAlgorithmList[IPSEC_ENCRYPT_ALGORITHM_LIST_SIZE] = {
   {IKE_EALG_NULL, 0, 0, 1, NULL, NULL, NULL, NULL},
-  {IKE_EALG_NONE, 0, 0, 1, NULL, NULL, NULL, NULL},  
+  {IKE_EALG_NONE, 0, 0, 1, NULL, NULL, NULL, NULL},
   {IKE_EALG_3DESCBC, 24, 8, 8, TdesGetContextSize, TdesInit, TdesCbcEncrypt, TdesCbcDecrypt},
   {IKE_EALG_AESCBC, 16, 16, 16, AesGetContextSize, AesInit, AesCbcEncrypt, AesCbcDecrypt}
 };
@@ -186,7 +186,7 @@ IpSecGenerateIv (
   if (IvSize != 0) {
     return IpSecCryptoIoGenerateRandomBytes (IvBuffer, IvSize);
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -196,7 +196,7 @@ IpSecGenerateIv (
   @param[in]  AlgorithmId          The encryption algorithm ID.
 
   @return the index.
-  
+
 **/
 UINTN
 IpSecGetIndexFromEncList (
@@ -204,13 +204,13 @@ IpSecGetIndexFromEncList (
   )
 {
   UINT8 Index;
-  
+
   for (Index = 0; Index < IPSEC_ENCRYPT_ALGORITHM_LIST_SIZE; Index++) {
     if (AlgorithmId == mIpsecEncryptAlgorithmList[Index].AlgorithmId) {
       return Index;
     }
   }
-  
+
   return (UINTN) -1;
 }
 
@@ -220,7 +220,7 @@ IpSecGetIndexFromEncList (
   @param[in]  AlgorithmId          The encryption algorithm ID.
 
   @return the index.
-  
+
 **/
 UINTN
 IpSecGetIndexFromAuthList (
@@ -228,7 +228,7 @@ IpSecGetIndexFromAuthList (
   )
 {
   UINT8 Index;
-  
+
   for (Index = 0; Index < IPSEC_AUTH_ALGORITHM_LIST_SIZE; Index++) {
     if (AlgorithmId == mIpsecAuthAlgorithmList[Index].AlgorithmId) {
       //
@@ -237,7 +237,7 @@ IpSecGetIndexFromAuthList (
       return Index;
     }
   }
-  
+
   return (UINTN) -1;
 }
 
@@ -275,14 +275,14 @@ IpSecCryptoIoEncrypt (
   IN       UINTN      InDataLength,
      OUT   UINT8      *OutData
   )
-{  
+{
   UINTN         Index;
   UINTN         ContextSize;
   UINT8         *Context;
   EFI_STATUS    Status;
-  
+
   Status = EFI_UNSUPPORTED;
-  
+
   switch (AlgorithmId) {
 
   case IKE_EALG_NULL:
@@ -323,7 +323,7 @@ IpSecCryptoIoEncrypt (
   if (Context != NULL) {
     FreePool (Context);
   }
-  
+
   return Status;
 }
 
@@ -361,7 +361,7 @@ IpSecCryptoIoDecrypt (
   IN       UINTN      InDataLength,
      OUT   UINT8      *OutData
   )
-{  
+{
   UINTN         Index;
   UINTN         ContextSize;
   UINT8         *Context;
@@ -397,7 +397,7 @@ IpSecCryptoIoDecrypt (
     //
     if (mIpsecEncryptAlgorithmList[Index].CipherInitiate (Context, Key, KeyBits)) {
       if (mIpsecEncryptAlgorithmList[Index].CipherDecrypt (Context, InData, InDataLength, Ivec, OutData)) {
-        Status = EFI_SUCCESS;      
+        Status = EFI_SUCCESS;
       }
     }
     break;
@@ -420,7 +420,7 @@ IpSecCryptoIoDecrypt (
   the input algorithm ID. It computes all datas from InDataFragment and output
   the result into the OutData buffer. If the OutDataSize is larger than the related
   HMAC algorithm output size, return EFI_INVALID_PARAMETER.
-  
+
   @param[in]      AlgorithmId     The authentication Identification.
   @param[in]      Key             Pointer of the authentication key.
   @param[in]      KeyLength       The length of the Key in bytes.
@@ -519,8 +519,8 @@ IpSecCryptoIoHmac (
       }
 
       goto Exit;
-    }    
-      
+    }
+
   default:
     return Status;
   }
@@ -577,11 +577,11 @@ IpSecCryptoIoHash (
 
   Status      = EFI_UNSUPPORTED;
   OutHashData = NULL;
-  
+
   OutHashSize = IpSecGetHmacDigestLength (AlgorithmId);
   //
   // If the expected hash data size is larger than the related Hash algorithm
-  // output length, return EFI_INVALID_PARAMETER.  
+  // output length, return EFI_INVALID_PARAMETER.
   //
   if (OutDataSize > OutHashSize) {
     return EFI_INVALID_PARAMETER;
@@ -590,7 +590,7 @@ IpSecCryptoIoHash (
   if (OutHashData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   switch (AlgorithmId) {
 
   case IKE_AALG_NONE:
@@ -611,7 +611,7 @@ IpSecCryptoIoHash (
       Status = EFI_OUT_OF_RESOURCES;
       goto Exit;
     }
-    
+
     //
     // Initiate Hash context and hash the input data.
     //
@@ -631,13 +631,13 @@ IpSecCryptoIoHash (
         // In some cases, like the Icv computing, the Icv size might be less than
         // the key length size, so copy the part of hash data to the OutData.
         //
-        CopyMem (OutData, OutHashData, OutDataSize);            
+        CopyMem (OutData, OutHashData, OutDataSize);
         Status = EFI_SUCCESS;
       }
-      
-      goto Exit;        
-    }    
-    
+
+      goto Exit;
+    }
+
   default:
     return Status;
   }
@@ -685,10 +685,10 @@ IpSecCryptoIoDhGetPublicKey (
   IN CONST UINT8  *Prime,
      OUT   UINT8  *PublicKey,
   IN OUT   UINTN  *PublicKeySize
-  ) 
+  )
 {
   EFI_STATUS   Status;
-  
+
   *DhContext = DhNew ();
   ASSERT (*DhContext != NULL);
   if (!DhSetParameter (*DhContext, Generator, PrimeLength, Prime)) {
@@ -707,7 +707,7 @@ Exit:
     DhFree (*DhContext);
     DhContext = NULL;
   }
-  
+
   return Status;
 }
 
@@ -731,7 +731,7 @@ Exit:
 **/
 EFI_STATUS
 IpSecCryptoIoDhComputeKey (
-  IN   OUT   UINT8  *DhContext,     
+  IN   OUT   UINT8  *DhContext,
   IN   CONST UINT8  *PeerPublicKey,
   IN         UINTN  PeerPublicKeySize,
        OUT   UINT8  *Key,
@@ -752,13 +752,13 @@ IpSecCryptoIoDhComputeKey (
 
   @retval EFI_SUCCESS              The operation performs successfully.
   @retval EFI_INVALID_PARAMETER    The DhContext is NULL.
-  
+
 **/
 EFI_STATUS
 IpSecCryptoIoFreeDh (
   IN   OUT   UINT8  **DhContext
   )
-{ 
+{
   if (*DhContext == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -807,7 +807,7 @@ IpSecCryptoIoGenerateRandomBytes (
   @param[in]      KeyPwdSize      The size of Key Password in bytes.
   @param[out]     OutData         The pointer to the signed data.
   @param[in, out] OutDataSize     Pointer to contain the size of out data.
- 
+
 **/
 VOID
 IpSecCryptoIoAuthDataWithCertificate (
@@ -824,7 +824,7 @@ IpSecCryptoIoAuthDataWithCertificate (
   UINT8         *RsaContext;
   UINT8         *Signature;
   UINTN         SigSize;
-   
+
   SigSize   = 0;
   RsaContext = NULL;
 
@@ -844,12 +844,12 @@ IpSecCryptoIoAuthDataWithCertificate (
   //
   // Sign data
   //
-  Signature = NULL;  
+  Signature = NULL;
   if (!RsaPkcs1Sign (RsaContext, InData, InDataSize, Signature, &SigSize)) {
     Signature = AllocateZeroPool (SigSize);
   } else {
     return;
-  } 
+  }
 
   RsaPkcs1Sign (RsaContext, InData, InDataSize, Signature, &SigSize);
 
@@ -876,7 +876,7 @@ IpSecCryptoIoAuthDataWithCertificate (
 
   @retval  TRUE   Valid signature encoded in PKCS1-v1_5.
   @retval  FALSE  Invalid signature or invalid RSA context.
- 
+
 **/
 BOOLEAN
 IpSecCryptoIoVerifySignDataByCertificate (
@@ -912,7 +912,7 @@ IpSecCryptoIoVerifySignDataByCertificate (
   // Retrieve the RSA public Key from Certificate
   //
   RsaGetPublicKeyFromX509 ((CONST UINT8 *)InCert, CertLen, (VOID **)&RsaContext);
- 
+
   //
   // Verify data
   //
@@ -964,9 +964,9 @@ IpSecCryptoIoGetPublicKeyFromCert (
   }
 
   *PublicKeyLen = 0;
- 
+
   RsaGetKey (RsaContext, RsaKeyN, NULL, PublicKeyLen);
- 
+
   *PublicKey = AllocateZeroPool (*PublicKeyLen);
   if (*PublicKey == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -992,10 +992,10 @@ EXIT:
   @param[in]     CertSize          The size of the X509 certificate in bytes.
   @param[out]    CertSubject       Pointer to the retrieved certificate subject.
   @param[out]    SubjectSize       The size of Certificate Subject in bytes.
-  
+
   @retval  EFI_SUCCESS            Retrieved the certificate subject successfully.
   @retval  EFI_INVALID_PARAMETER  The certificate is malformed.
- 
+
 **/
 EFI_STATUS
 IpSecCryptoIoGetSubjectFromCert (

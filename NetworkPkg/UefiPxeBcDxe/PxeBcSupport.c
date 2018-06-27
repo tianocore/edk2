@@ -48,7 +48,7 @@ PxeBcFlushStationIp (
     //
     CopyMem (&Private->Udp6CfgData.StationAddress, StationIp, sizeof (EFI_IPv6_ADDRESS));
     CopyMem (&Private->Ip6CfgData.StationAddress, StationIp, sizeof (EFI_IPv6_ADDRESS));
-    
+
     //
     // Reconfigure the Ip6 instance to capture background ICMP6 packets with new station Ip address.
     //
@@ -79,7 +79,7 @@ PxeBcFlushStationIp (
       CopyMem (&Private->Udp4CfgData.StationAddress, StationIp, sizeof (EFI_IPv4_ADDRESS));
       CopyMem (&Private->Ip4CfgData.StationAddress, StationIp, sizeof (EFI_IPv4_ADDRESS));
     }
-    
+
     if (SubnetMask != NULL) {
       //
       // Overwrite Udp4CfgData/Ip4CfgData SubnetMask.
@@ -97,7 +97,7 @@ PxeBcFlushStationIp (
       Mode->RouteTable[0].SubnetMask.Addr[0] = SubnetMask->Addr[0];
       Mode->RouteTable[0].GwAddr.Addr[0]     = 0;
     }
-    
+
     if (StationIp != NULL || SubnetMask != NULL) {
       //
       // Reconfigure the Ip4 instance to capture background ICMP packets with new station Ip address.
@@ -306,7 +306,7 @@ PxeBcIcmpErrorDpcHandle (
     //
     goto ON_RECYCLE;
   }
-  
+
   //
   // The protocol has been configured to only receive ICMP packet.
   //
@@ -482,7 +482,7 @@ PxeBcIcmp6ErrorDpcHandle (
 
 ON_RECYCLE:
   gBS->SignalEvent (RxData->RecycleSignal);
-  
+
 ON_EXIT:
   Private->Icmp6Token.Status = EFI_NOT_READY;
   Ip6->Receive (Ip6, &Private->Icmp6Token);
@@ -517,7 +517,7 @@ PxeBcIcmp6ErrorUpdate (
   @param[in, out]  SrcPort              The pointer to the source port.
   @param[in]       DoNotFragment        If TRUE, fragment is not enabled.
                                         Otherwise, fragment is enabled.
-  @param[in]       Ttl                  The time to live field of the IP header. 
+  @param[in]       Ttl                  The time to live field of the IP header.
   @param[in]       ToS                  The type of service field of the IP header.
 
   @retval          EFI_SUCCESS          Successfully configured this instance.

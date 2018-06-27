@@ -1,7 +1,7 @@
 /** @file
   The implementation of EFI_EXT_SCSI_PASS_THRU_PROTOCOL.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -29,19 +29,19 @@ EFI_EXT_SCSI_PASS_THRU_PROTOCOL gIScsiExtScsiPassThruProtocolTemplate = {
 /**
   Sends a SCSI Request Packet to a SCSI device that is attached to the SCSI channel.
   This function supports both blocking I/O and nonblocking I/O. The blocking I/O
-  functionality is required, and the nonblocking I/O functionality is optional.  
+  functionality is required, and the nonblocking I/O functionality is optional.
 
   @param[in]       This    A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
   @param[in]       Target  The Target is an array of size TARGET_MAX_BYTES and it
                            represents the id of the SCSI device to send the SCSI
                            Request Packet. Each transport driver may choose to
                            utilize a subset of this size to suit the needs
-                           of transport target representation. For example, a 
+                           of transport target representation. For example, a
                            Fibre Channel driver may use only 8 bytes (WWN)
                            to represent an FC target.
   @param[in]       Lun     The LUN of the SCSI device to send the SCSI Request Packet.
   @param[in, out]  Packet  A pointer to the SCSI Request Packet to send to the
-                           SCSI device specified by Target and Lun.                  
+                           SCSI device specified by Target and Lun.
   @param[in]       Event   If nonblocking I/O is not supported then Event is ignored,
                            and blocking I/O is performed. If Event is NULL, then
                            blocking I/O is performed. If Event is not NULL and non
@@ -50,7 +50,7 @@ EFI_EXT_SCSI_PASS_THRU_PROTOCOL gIScsiExtScsiPassThruProtocolTemplate = {
                            completes.
 
   @retval EFI_SUCCESS           The SCSI Request Packet was sent by the host. For
-                                bi-directional commands, InTransferLength bytes 
+                                bi-directional commands, InTransferLength bytes
                                 were transferred from InDataBuffer.
                                 For write and bi-directional commands, OutTransferLength
                                 bytes were transferred by OutDataBuffer.
@@ -63,7 +63,7 @@ EFI_EXT_SCSI_PASS_THRU_PROTOCOL gIScsiExtScsiPassThruProtocolTemplate = {
                                 there are too many SCSI Request Packets already
                                 queued. The caller may retry later.
   @retval EFI_DEVICE_ERROR      A device error occurred while attempting to send
-                                the SCSI Request Packet.                                
+                                the SCSI Request Packet.
   @retval EFI_INVALID_PARAMETER Target, Lun, or the contents of ScsiRequestPacket,
                                 are invalid.
   @retval EFI_UNSUPPORTED       The command described by the SCSI Request Packet
@@ -88,7 +88,7 @@ IScsiExtScsiPassThruFunction (
 {
   EFI_STATUS         Status;
   ISCSI_DRIVER_DATA  *Private;
-  
+
   if (Target[0] != 0) {
     return EFI_INVALID_PARAMETER;
   }
@@ -118,9 +118,9 @@ IScsiExtScsiPassThruFunction (
   Used to retrieve the list of legal Target IDs and LUNs for SCSI devices on
   a SCSI channel. These can either be the list SCSI devices that are actually
   present on the SCSI channel, or the list of legal Target Ids and LUNs for the
-  SCSI channel. Regardless, the caller of this function must probe the Target ID      
-  and LUN returned to see if a SCSI device is actually present at that location    
-  on the SCSI channel. 
+  SCSI channel. Regardless, the caller of this function must probe the Target ID
+  and LUN returned to see if a SCSI device is actually present at that location
+  on the SCSI channel.
 
   @param[in]       This          The EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
   @param[in, out]  Target        On input, a pointer to the Target ID of a SCSI
@@ -298,7 +298,7 @@ IScsiExtScsiPassThruBuildDevicePath (
   @retval EFI_INVALID_PARAMETER  DevicePath/Target/Lun is NULL.
   @retval EFI_UNSUPPORTED        This driver does not support the device path  node
                                  type in DevicePath.
-  @retval EFI_NOT_FOUND          A valid translation does not exist from DevicePath 
+  @retval EFI_NOT_FOUND          A valid translation does not exist from DevicePath
                                  to a TargetID and LUN.
 
 **/
@@ -382,7 +382,7 @@ IScsiExtScsiPassThruResetTargetLun (
 }
 
 /**
-  Retrieve the list of legal Target IDs for SCSI devices on a SCSI channel.                         
+  Retrieve the list of legal Target IDs for SCSI devices on a SCSI channel.
 
   @param[in]       This         A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL
                                 instance.
@@ -392,7 +392,7 @@ IScsiExtScsiPassThruResetTargetLun (
                                 next SCSI device present on a SCSI channel.
                                 An input value of 0xF(all bytes in the array are 0xF)
                                 in the Target array retrieves the Target ID of the
-                                first SCSI device present on a SCSI channel.                 
+                                first SCSI device present on a SCSI channel.
 
   @retval EFI_SUCCESS           The Target ID of the next SCSI device on the SCSI
                                 channel was returned in Target.

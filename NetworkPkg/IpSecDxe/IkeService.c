@@ -1,7 +1,7 @@
 /** @file
   Provide IPsec Key Exchange (IKE) service general interfaces.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -273,7 +273,7 @@ IkeOpenOutputUdp (
                        &BufSize,
                        IfInfo
                        );
-    
+
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }

@@ -284,7 +284,7 @@ Udp6Configure (
 
     ASSERT (IsListEmpty (&Instance->DeliveredDgramQue));
   }
- 
+
 ON_EXIT:
 
   gBS->RestoreTPL (OldTpl);
@@ -384,7 +384,7 @@ Udp6Groups (
     Status = NetMapIterate (&Instance->McastIps, Udp6LeaveGroup, MulticastAddress);
     if ((MulticastAddress != NULL) && (Status == EFI_ABORTED)) {
       Status = EFI_SUCCESS;
-    } 
+    }
   }
 
 ON_EXIT:
@@ -535,7 +535,7 @@ Udp6Transmit (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-  
+
   ConfigData = &Instance->ConfigData;
 
   //

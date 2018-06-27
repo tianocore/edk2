@@ -1,6 +1,6 @@
 // *++
 //
-// Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
@@ -26,8 +26,8 @@
 #langdef en-US "English"
 #langdef x-UEFI-ns "UefiNameSpace"
 
-#string STR_ISCSI_CONFIG_FORM_TITLE     #language en-US "iSCSI Configuration"  
-#string STR_ISCSI_CONFIG_FORM_HELP      #language en-US "Configure the iSCSI parameters."   
+#string STR_ISCSI_CONFIG_FORM_TITLE     #language en-US "iSCSI Configuration"
+#string STR_ISCSI_CONFIG_FORM_HELP      #language en-US "Configure the iSCSI parameters."
 #string STR_ISCSI_MAIN_FORM_TITLE       #language en-US "iSCSI Configuration"
 #string STR_ISCSI_MAC_FORM_TITLE        #language en-US "MAC Selection"
 #string STR_ISCSI_CONFIG_INIT_NAME      #language en-US "iSCSI Initiator Name"

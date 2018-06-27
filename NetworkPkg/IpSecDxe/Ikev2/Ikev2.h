@@ -1,7 +1,7 @@
 /** @file
   IKEv2 related definitions.
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -231,7 +231,7 @@ typedef struct {
   UINT8 *Data;
 } PRF_DATA_FRAGMENT;
 
-typedef 
+typedef
 IKE_PACKET *
 (*IKEV2_PACKET_GENERATOR) (
   IN UINT8                             *SaSession,

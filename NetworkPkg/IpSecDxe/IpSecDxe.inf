@@ -6,7 +6,7 @@
 #  packet-level security for IP datagram. It provides the IP packet protection via
 #  ESP and it supports IKEv2 for key negotiation.
 #
-#  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -63,7 +63,7 @@
   Ikev2/Info.c
   Ikev2/Payload.c
   Ikev2/Exchange.c
-  
+
 
 
 [Packages]
@@ -85,18 +85,18 @@
   BaseCryptLib
   DpcLib
   UdpIoLib
-  NetLib  
+  NetLib
   PcdLib
-  
+
 [Protocols]
   gEfiIp4Config2ProtocolGuid                    ## SOMETIMES_CONSUMES
-  gEfiUdp4ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES  
+  gEfiUdp4ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES
   gEfiUdp4ProtocolGuid                          ## SOMETIMES_CONSUMES
-  gEfiUdp6ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES  
+  gEfiUdp6ServiceBindingProtocolGuid            ## SOMETIMES_CONSUMES
   gEfiUdp6ProtocolGuid                          ## SOMETIMES_CONSUMES
   gEfiIpSecConfigProtocolGuid                   ## PRODUCES
   gEfiIpSec2ProtocolGuid                        ## PRODUCES
-  
+
 [Pcd]
   gEfiNetworkPkgTokenSpaceGuid.PcdIpsecCertificateEnabled       ## SOMETIMES_CONSUMES
   gEfiNetworkPkgTokenSpaceGuid.PcdIpsecUefiCaFile               ## SOMETIMES_CONSUMES

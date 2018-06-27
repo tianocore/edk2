@@ -1,7 +1,7 @@
 /** @file
   Definitions for EFI IPv6 Configuartion Protocol implementation.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -70,7 +70,7 @@ typedef struct _IP6_CONFIG_INSTANCE IP6_CONFIG_INSTANCE;
                                8 bytes.
   @retval EFI_SUCCESS          The specified configuration data for the EFI IPv6
                                network stack was set successfully.
-  
+
 **/
 typedef
 EFI_STATUS
@@ -87,14 +87,14 @@ EFI_STATUS
   @param[in, out] DataSize On input, in bytes, the size of Data. On output, in
                            bytes, the size of buffer required to store the specified
                            configuration data.
-  @param[in]      Data     The data buffer in which the configuration data is returned.  
+  @param[in]      Data     The data buffer in which the configuration data is returned.
                            Ignored if DataSize is ZERO.
 
   @retval EFI_BUFFER_TOO_SMALL The size of Data is too small for the specified
-                               configuration data, and the required size is 
+                               configuration data, and the required size is
                                returned in DataSize.
-  @retval EFI_SUCCESS          The specified configuration data was obtained successfully.                               
-  
+  @retval EFI_SUCCESS          The specified configuration data was obtained successfully.
+
 **/
 typedef
 EFI_STATUS
@@ -162,9 +162,9 @@ typedef struct {
 } IP6_ADDRESS_INFO_ENTRY;
 
 typedef struct {
-  EFI_IP6_CONFIG_POLICY                    Policy;              ///< manual or automatic  
+  EFI_IP6_CONFIG_POLICY                    Policy;              ///< manual or automatic
   EFI_IP6_CONFIG_DUP_ADDR_DETECT_TRANSMITS DadTransmitCount;    ///< dad transmits count
-  EFI_IP6_CONFIG_INTERFACE_ID              InterfaceId;         ///< alternative interface id 
+  EFI_IP6_CONFIG_INTERFACE_ID              InterfaceId;         ///< alternative interface id
   LIST_ENTRY                               ManualAddress;       ///< IP addresses
   UINT32                                   ManualAddressCount;  ///< IP addresses count
   LIST_ENTRY                               GatewayAddress;      ///< Gateway address
@@ -236,13 +236,13 @@ Ip6ConfigReadConfigData (
 /**
   The event process routine when the DHCPv6 server is answered with a reply packet
   for an information request.
-  
+
   @param[in]     This          Points to the EFI_DHCP6_PROTOCOL.
   @param[in]     Context       The pointer to the IP6 configuration instance data.
   @param[in]     Packet        The DHCPv6 reply packet.
 
   @retval EFI_SUCCESS      The DNS server address was retrieved from the reply packet.
-  @retval EFI_NOT_READY    The reply packet does not contain the DNS server option, or 
+  @retval EFI_NOT_READY    The reply packet does not contain the DNS server option, or
                            the DNS server address is not valid.
 
 **/
@@ -256,7 +256,7 @@ Ip6ConfigOnDhcp6Reply (
 
 /**
   The work function to trigger the DHCPv6 process to perform a stateful autoconfiguration.
-  
+
   @param[in]     Instance      Pointer to the IP6 config instance data.
   @param[in]     OtherInfoOnly If FALSE, get stateful address and other information
                                via DHCPv6. Otherwise, only get the other information.
@@ -275,10 +275,10 @@ Ip6ConfigStartStatefulAutoConfig (
   Initialize an IP6_CONFIG_INSTANCE.
 
   @param[out]    Instance       The buffer of IP6_CONFIG_INSTANCE to be initialized.
-  
+
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resources to complete the operation.
   @retval EFI_SUCCESS           The IP6_CONFIG_INSTANCE initialized successfully.
-  
+
 **/
 EFI_STATUS
 Ip6ConfigInitInstance (
@@ -289,7 +289,7 @@ Ip6ConfigInitInstance (
   Release an IP6_CONFIG_INSTANCE.
 
   @param[in, out] Instance    The buffer of IP6_CONFIG_INSTANCE to be freed.
-  
+
 **/
 VOID
 Ip6ConfigCleanInstance (
@@ -303,7 +303,7 @@ Ip6ConfigCleanInstance (
 
   @retval EFI_SUCCESS         The child was successfully destroyed.
   @retval Others              Failed to destroy the child.
-  
+
 **/
 EFI_STATUS
 Ip6ConfigDestroyDhcp6 (

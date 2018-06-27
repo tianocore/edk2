@@ -1,7 +1,7 @@
 /** @file
   This EFI_DHCP6_PROTOCOL interface implementation.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -237,7 +237,7 @@ EfiDhcp6Stop (
     }
     Status = Instance->UdpSts;
   }
-  
+
 ON_EXIT:
   //
   // Clean up the session data for the released Ia.
@@ -678,7 +678,7 @@ EfiDhcp6InfoRequest (
       return Status;
     }
 
-    do {  
+    do {
       TimerStatus = gBS->CheckEvent (Timer);
       if (!EFI_ERROR (TimerStatus)) {
         Status = Dhcp6StartInfoRequest (
@@ -694,7 +694,7 @@ EfiDhcp6InfoRequest (
                    );
       }
     } while (TimerStatus == EFI_NOT_READY);
-    
+
     gBS->CloseEvent (Timer);
   }
   if (EFI_ERROR (Status)) {

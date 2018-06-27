@@ -3,12 +3,12 @@
 
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -23,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_SUCCESS              Device patch successfully updated.
   @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
   @retval Others                   Unexpected error happened.
-  
+
 **/
 EFI_STATUS
 HttpBootUpdateDevicePath (
@@ -39,7 +39,7 @@ HttpBootUpdateDevicePath (
 
   TmpIpDevicePath  = NULL;
   TmpDnsDevicePath = NULL;
-  
+
   //
   // Update the IP node with DHCP assigned information.
   //
@@ -67,13 +67,13 @@ HttpBootUpdateDevicePath (
     SetDevicePathNodeLength (Node, sizeof (IPv6_DEVICE_PATH));
     Node->Ipv6.PrefixLength    = IP6_PREFIX_LENGTH;
     Node->Ipv6.RemotePort      = Private->Port;
-    Node->Ipv6.Protocol        = EFI_IP_PROTO_TCP; 
+    Node->Ipv6.Protocol        = EFI_IP_PROTO_TCP;
     Node->Ipv6.IpAddressOrigin = 0;
     CopyMem (&Node->Ipv6.LocalIpAddress, &Private->StationIp.v6, sizeof (EFI_IPv6_ADDRESS));
     CopyMem (&Node->Ipv6.RemoteIpAddress, &Private->ServerIp.v6, sizeof (EFI_IPv6_ADDRESS));
     CopyMem (&Node->Ipv6.GatewayIpAddress, &Private->GatewayIp.v6, sizeof (EFI_IPv6_ADDRESS));
   }
-  
+
   TmpIpDevicePath = AppendDevicePathNode (Private->ParentDevicePath, (EFI_DEVICE_PATH_PROTOCOL*) Node);
   FreePool (Node);
   if (TmpIpDevicePath == NULL) {
@@ -95,7 +95,7 @@ HttpBootUpdateDevicePath (
     SetDevicePathNodeLength (Node, Length);
     Node->Dns.IsIPv6 = Private->UsingIpv6 ? 0x01 : 0x00;
     CopyMem ((UINT8*) Node + sizeof (EFI_DEVICE_PATH_PROTOCOL) + sizeof (Node->Dns.IsIPv6), Private->DnsServerIp, Private->DnsServerCount * sizeof (EFI_IP_ADDRESS));
-    
+
     TmpDnsDevicePath = AppendDevicePathNode (TmpIpDevicePath, (EFI_DEVICE_PATH_PROTOCOL*) Node);
     FreePool (Node);
     FreePool (TmpIpDevicePath);
@@ -150,7 +150,7 @@ HttpBootUpdateDevicePath (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    
+
     FreePool (Private->Ip4Nic->DevicePath);
     Private->Ip4Nic->DevicePath = NewDevicePath;
   } else {
@@ -169,7 +169,7 @@ HttpBootUpdateDevicePath (
     FreePool (Private->Ip6Nic->DevicePath);
     Private->Ip6Nic->DevicePath = NewDevicePath;
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -201,7 +201,7 @@ HttpBootDhcp4ExtractUriInfo (
   ASSERT (SelectIndex < HTTP_BOOT_OFFER_MAX_NUM);
 
   DnsServerIndex = 0;
-  
+
   Status = EFI_SUCCESS;
 
   //
@@ -213,7 +213,7 @@ HttpBootDhcp4ExtractUriInfo (
     //
     // In Corporate environment, we need a HttpOffer.
     //
-    if ((SelectOffer->OfferType == HttpOfferTypeDhcpIpUri) || 
+    if ((SelectOffer->OfferType == HttpOfferTypeDhcpIpUri) ||
         (SelectOffer->OfferType == HttpOfferTypeDhcpIpUriDns) ||
         (SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns)) {
       HttpOffer = SelectOffer;
@@ -246,7 +246,7 @@ HttpBootDhcp4ExtractUriInfo (
     return Status;
   }
 
-  if ((SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns) || 
+  if ((SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns) ||
       (SelectOffer->OfferType == HttpOfferTypeDhcpDns) ||
       (SelectOffer->OfferType == HttpOfferTypeDhcpIpUriDns)) {
     Option = SelectOffer->OptList[HTTP_BOOT_DHCP4_TAG_INDEX_DNS_SERVER];
@@ -265,10 +265,10 @@ HttpBootDhcp4ExtractUriInfo (
     for (DnsServerIndex = 0; DnsServerIndex < Private->DnsServerCount; DnsServerIndex++) {
       CopyMem (&(Private->DnsServerIp[DnsServerIndex].v4), &(((EFI_IPv4_ADDRESS *) Option->Data)[DnsServerIndex]), sizeof (EFI_IPv4_ADDRESS));
     }
-    
+
     //
     // Configure the default DNS server if server assigned.
-    //    
+    //
     Status = HttpBootRegisterIp4Dns (
                Private,
                Option->Length,
@@ -292,7 +292,7 @@ HttpBootDhcp4ExtractUriInfo (
   if (EFI_ERROR (Status) || Private->Port == 0) {
     Private->Port = 80;
   }
-  
+
   //
   // All boot informations are valid here.
   //
@@ -402,7 +402,7 @@ HttpBootDhcp6ExtractUriInfo (
     return Status;
   }
 
-  if ((SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns) || 
+  if ((SelectOffer->OfferType == HttpOfferTypeDhcpNameUriDns) ||
       (SelectOffer->OfferType == HttpOfferTypeDhcpDns) ||
       (SelectOffer->OfferType == HttpOfferTypeDhcpIpUriDns)) {
     Option = SelectOffer->OptList[HTTP_BOOT_DHCP6_IDX_DNS_SERVER];
@@ -434,9 +434,9 @@ HttpBootDhcp6ExtractUriInfo (
       goto Error;
     }
   }
-  
+
   //
-  // Extract the HTTP server Ip from URL. This is used to Check route table 
+  // Extract the HTTP server Ip from URL. This is used to Check route table
   // whether can send message to HTTP Server Ip through the GateWay.
   //
   Status = HttpUrlGetIp6 (
@@ -444,7 +444,7 @@ HttpBootDhcp6ExtractUriInfo (
              Private->BootFileUriParser,
              &IpAddr
              );
-  
+
   if (EFI_ERROR (Status)) {
     //
     // The Http server address is expressed by Name Ip, so perform DNS resolution
@@ -464,23 +464,23 @@ HttpBootDhcp6ExtractUriInfo (
       Status = EFI_OUT_OF_RESOURCES;
       goto Error;
     }
-    
+
     AsciiStrToUnicodeStrS (HostName, HostNameStr, HostNameSize);
 
     if (HostName != NULL) {
       FreePool (HostName);
     }
-    
+
     Status = HttpBootDns (Private, HostNameStr, &IpAddr);
     FreePool (HostNameStr);
     if (EFI_ERROR (Status)) {
       AsciiPrint ("\n  Error: Could not retrieve the host address from DNS server.\n");
       goto Error;
-    }  
-  } 
-  
+    }
+  }
+
   CopyMem (&Private->ServerIp.v6, &IpAddr, sizeof (EFI_IPv6_ADDRESS));
-  
+
   //
   // Extract the port from URL, and use default HTTP port 80 if not provided.
   //
@@ -492,7 +492,7 @@ HttpBootDhcp6ExtractUriInfo (
   if (EFI_ERROR (Status) || Private->Port == 0) {
     Private->Port = 80;
   }
-  
+
   //
   // All boot informations are valid here.
   //
@@ -504,7 +504,7 @@ HttpBootDhcp6ExtractUriInfo (
   if (EFI_ERROR (Status)) {
     goto Error;
   }
-  
+
   return Status;
 
 Error:
@@ -512,7 +512,7 @@ Error:
     FreePool (Private->DnsServerIp);
     Private->DnsServerIp = NULL;
   }
-  
+
   return Status;
 }
 
@@ -532,7 +532,7 @@ HttpBootDiscoverBootInfo (
   )
 {
   EFI_STATUS              Status;
-  
+
   //
   // Start D.O.R.A/S.A.R.R exchange to acquire station ip address and
   // other Http boot information.
@@ -557,7 +557,7 @@ HttpBootDiscoverBootInfo (
   @param[in]    EventType      Indicate the Event type that occurs in the current callback.
   @param[in]    Message        HTTP message which will be send to, or just received from HTTP server.
   @param[in]    Context        The Callback Context pointer.
-  
+
   @retval EFI_SUCCESS          Tells the HttpIo to continue the HTTP process.
   @retval Others               Tells the HttpIo to abort the current HTTP process.
 **/
@@ -706,7 +706,7 @@ HttpBootFreeCacheList (
   LIST_ENTRY                  *Entry;
   LIST_ENTRY                  *NextEntry;
   HTTP_BOOT_CACHE_CONTENT     *Cache;
-  
+
   NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, &Private->CacheList) {
     Cache = NET_LIST_USER_STRUCT (Entry, HTTP_BOOT_CACHE_CONTENT, Link);
     RemoveEntryList (&Cache->Link);
@@ -746,7 +746,7 @@ HttpBootGetFileFromCache (
   HTTP_BOOT_CACHE_CONTENT     *Cache;
   HTTP_BOOT_ENTITY_DATA       *EntityData;
   UINTN                       CopyedSize;
-  
+
   if (Uri == NULL || BufferSize == NULL || Buffer == NULL || ImageType == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -808,7 +808,7 @@ HttpBootGetFileFromCache (
 
   @retval EFI_SUCCESS              Continue to parser the message body.
   @retval Others                   Abort the parse.
- 
+
 **/
 EFI_STATUS
 EFIAPI
@@ -878,7 +878,7 @@ HttpBootGetBootFileCallback (
 
 /**
   This function download the boot file by using UEFI HTTP protocol.
-  
+
   @param[in]       Private         The pointer to the driver's private data.
   @param[in]       HeaderOnly      Only request the response header, it could save a lot of time if
                                    the caller only want to know the size of the requested file.
@@ -926,7 +926,7 @@ HttpBootGetBootFile (
   CHAR16                     *Url;
   BOOLEAN                    IdentityMode;
   UINTN                      ReceivedSize;
-  
+
   ASSERT (Private != NULL);
   ASSERT (Private->HttpCreated);
 
@@ -1116,7 +1116,7 @@ HttpBootGetBootFile (
     Cache->ResponseData = ResponseData;
     Cache->ImageType = *ImageType;
   }
-  
+
   //
   // 3.3 Init a message-body parser from the header information.
   //
@@ -1278,7 +1278,7 @@ HttpBootGetBootFile (
   }
 
   return Status;
-  
+
 ERROR_6:
   if (Parser != NULL) {
     HttpFreeMsgParser (Parser);
@@ -1287,7 +1287,7 @@ ERROR_6:
     FreePool (Context.Block);
   }
   HttpBootFreeCache (Cache);
-  
+
 ERROR_5:
   if (ResponseData != NULL) {
     FreePool (ResponseData);
