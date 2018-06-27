@@ -1,6 +1,6 @@
 ## @ PatchFv.py
 #
-# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -136,8 +136,8 @@ class Symbols:
         fvInfo['Offset']  = self.getFvOffsetInFd(fvFile)
         fvInfo['Size']    = readDataFromFile (fvFile, 0x20, 4)
         fdIn        = open(infFile, "r")
-        rptLines    = fdIn.readlines() 
-        fdIn.close()       
+        rptLines    = fdIn.readlines()
+        fdIn.close()
         fvInfo['Base'] = 0
         for rptLine in rptLines:
             match = re.match("^EFI_BASE_ADDRESS\s*=\s*(0x[a-fA-F0-9]+)", rptLine)
@@ -289,7 +289,7 @@ class Symbols:
     #
     def parseInfFile(self, infFile):
         #
-        # Get FV offset and search EFI_BASE_ADDRESS in the FD file 
+        # Get FV offset and search EFI_BASE_ADDRESS in the FD file
         # then assign the value of EFI_BASE_ADDRESS to fdBase
         #
         fvOffset    = self.getFvOffsetInFd(infFile[0:-4] + ".Fv")

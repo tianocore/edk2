@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -516,7 +516,7 @@ FspApiReturnStatusReset (
   )
 {
   volatile BOOLEAN  LoopUntilReset;
-  
+
   LoopUntilReset = TRUE;
   DEBUG ((DEBUG_INFO, "FSP returning control to Bootloader with reset required return status %x\n",FspResetType));
   ///

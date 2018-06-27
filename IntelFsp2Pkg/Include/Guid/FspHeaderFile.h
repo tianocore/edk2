@@ -2,7 +2,7 @@
   Intel FSP Header File definition from Intel Firmware Support Package External
   Architecture Specification v2.0.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -144,7 +144,7 @@ typedef struct {
   ///
   UINT8   Reserved;
   ///
-  /// Byte 0x0A: FSP producer identification string 
+  /// Byte 0x0A: FSP producer identification string
   ///
   CHAR8   FspProducerId[6];
   ///

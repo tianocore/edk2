@@ -2,7 +2,7 @@
   Intel FSP API definition from Intel Firmware Support Package External
   Architecture Specification v2.0.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -216,7 +216,7 @@ EFI_STATUS
   and defined for each FSP binary. This will be documented in Integration guide with
   each FSP release.
   After FspMemInit completes its execution, it passes the pointer to the HobList and
-  returns to the boot loader from where it was called. BootLoader is responsible to 
+  returns to the boot loader from where it was called. BootLoader is responsible to
   migrate it's stack and data to Memory.
   FspMemoryInit, TempRamExit and FspSiliconInit APIs provide an alternate method to
   complete the silicon initialization and provides bootloader an opportunity to get
