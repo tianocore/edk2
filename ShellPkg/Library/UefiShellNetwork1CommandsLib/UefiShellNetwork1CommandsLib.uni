@@ -1,7 +1,7 @@
 // /**
 //
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
 // (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -73,7 +73,7 @@
 #string STR_IFCONFIG_CONFLICT_COMMAND         #language en-US    "Conflict commands. Bad command %H%s%N is skipped.\n"
 #string STR_IFCONFIG_UNKNOWN_COMMAND          #language en-US    "Unknown commands. Bad command %H%s%N is skipped.\n"
 #string STR_IFCONFIG_SET_ADDR_FAILED          #language en-US    "Failed to set address.\n"
-#string STR_IFCONFIG_ROUTES_SIZE              #language en-US  	 "\n%H  Routes (%d entries):\n"
+#string STR_IFCONFIG_ROUTES_SIZE              #language en-US     "\n%H  Routes (%d entries):\n"
 #string STR_IFCONFIG_ROUTES_ENTRY_INDEX       #language en-US    "%H    Entry[%d]\n"
 #string STR_IFCONFIG_SHOW_IP_ADDR             #language en-US    "%12s: %N%d.%d.%d.%d\n"
 #string STR_IFCONFIG_INFO_NEWLINE             #language en-US    "\n"
@@ -177,6 +177,6 @@
 " \r\n"
 "  * To configure DNS server address for the eth0 interface:\r\n"
 "    fs0:\> ifconfig -s eth0 dns 192.168.0.8 192.168.0.9\r\n"
-                                                                  
+
 
 

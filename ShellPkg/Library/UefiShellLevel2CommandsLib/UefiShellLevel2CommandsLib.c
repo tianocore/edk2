@@ -269,7 +269,7 @@ VerifyIntermediateDirectories (
 
   @retval 0    Source and Target are identical strings without regard to case.
   @retval !=0  Source is not identical to Target.
-  
+
 **/
 INTN
 StrniCmp(
@@ -301,7 +301,7 @@ StrniCmp(
     FreePool (SourceCopy);
     return -1;
   }
-  
+
   SourceCopy[SourceLength] = L'\0';
   TargetCopy[TargetLength] = L'\0';
   Result = gUnicodeCollation->StriColl (gUnicodeCollation, SourceCopy, TargetCopy);
@@ -315,8 +315,8 @@ StrniCmp(
   Cleans off all the quotes in the string.
 
   @param[in]     OriginalString   pointer to the string to be cleaned.
-  @param[out]   CleanString      The new string with all quotes removed. 
-                                                  Memory allocated in the function and free 
+  @param[out]   CleanString      The new string with all quotes removed.
+                                                  Memory allocated in the function and free
                                                   by caller.
 
   @retval EFI_SUCCESS   The operation was successful.
@@ -328,7 +328,7 @@ ShellLevel2StripQuotes (
   )
 {
   CHAR16            *Walker;
-  
+
   if (OriginalString == NULL || CleanString == NULL) {
     return EFI_INVALID_PARAMETER;
   }

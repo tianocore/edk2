@@ -105,7 +105,7 @@
 
   ## This determines how many bytes are read out of files at a time for file operations (type, copy, etc...)
   gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize|0x1000|UINT32|0x0000000A
-  
+
   ## This determines the max count of history commands
   gEfiShellPkgTokenSpaceGuid.PcdShellMaxHistoryCommandCount|0x0020|UINT16|0x00000014
 

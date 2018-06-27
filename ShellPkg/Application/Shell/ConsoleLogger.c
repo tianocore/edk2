@@ -990,7 +990,7 @@ ConsoleLoggerSetMode (
     ConsoleInfo->CurrentStartRow = 0;
     ConsoleInfo->OurConOut.ClearScreen (&ConsoleInfo->OurConOut);
   }
-   
+
   return Status;
 }
 

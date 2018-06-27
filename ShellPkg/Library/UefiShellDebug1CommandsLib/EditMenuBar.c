@@ -47,7 +47,7 @@ MenuBarInit (
   CONST EDITOR_MENU_ITEM  *ItemsWalker;
 
   for (NumItems = 0, ItemsWalker = Items ; ItemsWalker != NULL && ItemsWalker->Function != NULL ; ItemsWalker++,NumItems++);
-  
+
   MenuItems = AllocateZeroPool((NumItems+1) * sizeof(EDITOR_MENU_ITEM));
   if (MenuItems == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -69,7 +69,7 @@ ControlHotKeyInit (
   )
 {
   ControlBasedMenuFunctions = Items;
-  return EFI_SUCCESS; 
+  return EFI_SUCCESS;
 }
 /**
   Refresh function for the menu bar.
@@ -138,7 +138,7 @@ MenuBarRefresh (
 
   @param[in] Key                The pressed key.
 
-  @retval EFI_NOT_FOUND         The key was not a valid function key 
+  @retval EFI_NOT_FOUND         The key was not a valid function key
                                 (an error was sent to the status bar).
   @return The return value from the called dispatch function.
 **/
@@ -167,7 +167,7 @@ MenuBarDispatchFunctionKey (
 
   @param[in] KeyData                The pressed key.
 
-  @retval EFI_NOT_FOUND         The key was not a valid control-based key 
+  @retval EFI_NOT_FOUND         The key was not a valid control-based key
                                 (an error was sent to the status bar).
   @return EFI_SUCCESS.
 **/

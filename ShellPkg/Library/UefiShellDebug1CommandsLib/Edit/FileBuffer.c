@@ -1,7 +1,7 @@
 /** @file
   Implements filebuffer interface functions.
 
-  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -53,7 +53,7 @@ EFI_EDITOR_FILE_BUFFER  FileBufferConst = {
 //
 // the whole edit area needs to be refreshed
 //
-BOOLEAN          FileBufferNeedRefresh;	
+BOOLEAN          FileBufferNeedRefresh;
 
 //
 // only the current line in edit area needs to be refresh
@@ -144,7 +144,7 @@ FileBufferBackup (
 
 /**
   Advance to the next Count lines
-  
+
   @param[in] Count              The line number to advance by.
   @param[in] CurrentLine        The pointer to the current line structure.
   @param[in] LineList           The pointer to the linked list of lines.
@@ -183,7 +183,7 @@ InternalEditorMiscLineAdvance (
 
 /**
   Retreat to the previous Count lines.
-  
+
   @param[in] Count              The line number to retreat by.
   @param[in] CurrentLine        The pointer to the current line structure.
   @param[in] LineList           The pointer to the linked list of lines.
@@ -222,7 +222,7 @@ InternalEditorMiscLineRetreat (
 
 /**
   Advance/Retreat lines
-  
+
   @param[in] Count  line number to advance/retreat
                        >0 : advance
                        <0 : retreat
@@ -484,7 +484,7 @@ FileBufferPrintLine (
   UINTN   Limit;
   CHAR16  *PrintLine;
   CHAR16  *PrintLine2;
-  UINTN   BufLen; 
+  UINTN   BufLen;
 
   //
   // print start from correct character
@@ -710,7 +710,7 @@ FileBufferCreateLine (
   Set FileName field in FileBuffer.
 
   @param Str                    The file name to set.
-  
+
   @retval EFI_SUCCESS           The filename was successfully set.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_INVALID_PARAMETER Str is not a valid filename.
@@ -763,10 +763,10 @@ FileBufferFree (
 
 /**
   Read a file from disk into the FileBuffer.
-  
+
   @param[in] FileName           The filename to read.
   @param[in] Recover            TRUE if is for recover mode, no information printouts.
-  
+
   @retval EFI_SUCCESS            The load was successful.
   @retval EFI_LOAD_ERROR         The load failed.
   @retval EFI_OUT_OF_RESOURCES   A memory allocation failed.
@@ -823,7 +823,7 @@ FileBufferRead (
     }
 
     Info = ShellGetFileInfo(FileHandle);
-    
+
     if (Info->Attribute & EFI_FILE_DIRECTORY) {
       StatusBarSetStatusString (L"Directory Can Not Be Edited");
       FreePool (Info);
@@ -1397,7 +1397,7 @@ UnicodeToAscii (
   @param[in] FileName           The file name for writing.
 
   @retval EFI_SUCCESS           Data was written.
-  @retval EFI_LOAD_ERROR        
+  @retval EFI_LOAD_ERROR
   @retval EFI_OUT_OF_RESOURCES  There were not enough resources to write the file.
 **/
 EFI_STATUS
@@ -1472,7 +1472,7 @@ FileBufferSave (
       FreePool(Info);
       return EFI_LOAD_ERROR;
     }
-    
+
     if (Info != NULL) {
       Attribute = Info->Attribute & ~EFI_FILE_READ_ONLY;
       FreePool(Info);
@@ -1550,7 +1550,7 @@ FileBufferSave (
       Size    = TotalSize - LeftSize;
       Status  = ShellWriteFile (FileHandle, &Size, Cache);
       if (EFI_ERROR (Status)) {
-        ShellDeleteFile (&FileHandle);        
+        ShellDeleteFile (&FileHandle);
         FreePool (Cache);
         return EFI_LOAD_ERROR;
       }
@@ -1911,7 +1911,7 @@ FileBufferDoReturn (
 }
 
 /**
-  Delete current character from current line.  This is the effect caused 
+  Delete current character from current line.  This is the effect caused
   by the 'del' key.
 
   @retval EFI_SUCCESS
@@ -2023,7 +2023,7 @@ FileBufferScrollRight (
 /**
   Insert a char into line
 
-  
+
   @param[in] Line     The line to insert into.
   @param[in] Char     The char to insert.
   @param[in] Pos      The position to insert the char at ( start from 0 ).
@@ -2395,7 +2395,7 @@ FileBufferEnd (
   return EFI_SUCCESS;
 }
 
-/** 
+/**
   Dispatch input to different handler
   @param[in] Key                The input key.  One of:
                                     ASCII KEY
@@ -2610,7 +2610,7 @@ RightCurrentScreen (
 
 /**
   Advance/Retreat lines and set CurrentLine in FileBuffer to it
-  
+
   @param[in] Count The line number to advance/retreat
                      >0 : advance
                      <0: retreat
@@ -2756,7 +2756,7 @@ FileBufferMovePosition (
 /**
   Cut current line out and return a pointer to it.
 
-  @param[out] CutLine    Upon a successful return pointer to the pointer to 
+  @param[out] CutLine    Upon a successful return pointer to the pointer to
                         the allocated cut line.
 
   @retval EFI_SUCCESS             The cut was successful.
@@ -2930,7 +2930,7 @@ FileBufferSearch (
 
   Column = 0;
   Position = 0;
-  
+
   //
   // search if in current line
   //
@@ -2949,7 +2949,7 @@ FileBufferSearch (
   if (CharPos != NULL) {
     Position = CharPos - Current + 1;
     Found   = TRUE;
-  } 
+  }
 
   //
   // found
@@ -2971,8 +2971,8 @@ FileBufferSearch (
       if (CharPos != NULL) {
         Position = CharPos - Line->Buffer + 1;
         Found   = TRUE;
-      } 
-      
+      }
+
       if (Found) {
         //
         // found

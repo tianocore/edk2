@@ -7,7 +7,7 @@
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
 // http://opensource.org/licenses/bsd-license.php
-// 
+//
 // THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 // WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
@@ -108,7 +108,7 @@
 "  -t VALUE - Sets display threshold to VALUE microseconds\r\n"
 "  -n COUNT - Limits display to COUNT lines in All and Raw modes\r\n"
 "  -i       - Displays identifier\r\n"
-"  -c TOKEN - Display pre-defined and custom cumulative data\r\n" 
+"  -c TOKEN - Display pre-defined and custom cumulative data\r\n"
 "             Pre-defined cumulative token are:\r\n"
 "             1. LoadImage:\r\n"
 "             2. StartImage:\r\n"

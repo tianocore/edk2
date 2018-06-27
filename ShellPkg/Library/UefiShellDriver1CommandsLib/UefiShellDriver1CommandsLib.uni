@@ -2,7 +2,7 @@
 //
 // (C) Copyright 2016-2017 Hewlett Packard Enterprise Development LP<BR>
 // (C) Copyright 2012-2015 Hewlett-Packard Development Company, L.P.<BR>
-// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -469,7 +469,7 @@
 "       CTRL         - The handle number of the UEFI device\r\n"
 "       TYPE         - The device type:\r\n"
 "                        [R] - Root Controller\r\n"
-"                        [B] - Bus Controller\r\n" 
+"                        [B] - Bus Controller\r\n"
 "                        [D] - Device Controller\r\n"
 "       CFG          - A managing driver supports the Driver Configuration\r\n"
 "                      Protocol.  Yes if 'Y' or 'X'; No if 'N' or '-'.\r\n"
@@ -522,7 +522,7 @@
 "  6. If only a single handle is specified and the handle has an\r\n"
 "     EFI_DRIVER_BINDING_PROTOCOL on it, then the handle is assumed to be a\r\n"
 "     driver handle. Otherwise, it is assumed to be a device handle.\r\n"
-"  7. If no parameters are specified, then the command will attempt to bind\r\n" 
+"  7. If no parameters are specified, then the command will attempt to bind\r\n"
 "     all proper drivers to all devices without recursion. Each connection\r\n"
 "     status will be displayed.\r\n"
 "  8. Output redirection is not supported for 'connect -r' usage.\r\n"

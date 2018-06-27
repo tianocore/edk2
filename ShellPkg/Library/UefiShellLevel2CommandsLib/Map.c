@@ -4,7 +4,7 @@
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  
+
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -56,12 +56,12 @@ IsNumberLetterOnly(
 
   @param[in] List         The list to seatch in.
   @param[in] MetaTarget   The item to search for. MetaMatching supported.
-  @param[out] FullName    Optional pointer to an allocated buffer containing 
+  @param[out] FullName    Optional pointer to an allocated buffer containing
                           the match.
   @param[in] Meta         TRUE to use MetaMatching.
   @param[in] SkipTrailingNumbers  TRUE to allow for numbers after the MetaTarget.
-  @param[in] Target       The single character that delimits list 
-                          items (";" normally). 
+  @param[in] Target       The single character that delimits list
+                          items (";" normally).
 **/
 BOOLEAN
 SearchList(
@@ -119,7 +119,7 @@ SearchList(
 }
 
 /**
-  Determine what type of device is represented and return it's string.  The 
+  Determine what type of device is represented and return it's string.  The
   string is in allocated memory and must be callee freed.  The HII is is listed below.
   The actual string cannot be determined.
 
@@ -223,7 +223,7 @@ MappingListHasType(
   CHAR16              *NewSpecific;
   RETURN_STATUS       Status;
   UINTN               Length;
-  
+
   //
   // specific has priority
   //
@@ -529,7 +529,7 @@ PerformMappingDisplay(
   BOOLEAN                   Found;
 
   if (!Consist && !Normal && Specific == NULL && TypeString == NULL) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"map");  
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"map");
     return (SHELL_INVALID_PARAMETER);
   }
 
@@ -540,7 +540,7 @@ PerformMappingDisplay(
       if (StrnCmp(TypeString, Test, StrLen(Test)-1) != 0) {
         Test = (CHAR16*)Fp;
         if (StrnCmp(TypeString, Test, StrLen(Test)-1) != 0) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"map", TypeString);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"map", TypeString);
           return (SHELL_INVALID_PARAMETER);
         }
       } else if (Test == NULL) {
@@ -665,9 +665,9 @@ PerformMappingDisplay(
   }
   if (!Found) {
     if (Specific != NULL) {
-      ShellPrintHiiEx(gST->ConOut->Mode->CursorColumn, gST->ConOut->Mode->CursorRow-1, NULL, STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, L"map", Specific);  
+      ShellPrintHiiEx(gST->ConOut->Mode->CursorColumn, gST->ConOut->Mode->CursorRow-1, NULL, STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, L"map", Specific);
     } else {
-      ShellPrintHiiEx(gST->ConOut->Mode->CursorColumn, gST->ConOut->Mode->CursorRow-1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"map");  
+      ShellPrintHiiEx(gST->ConOut->Mode->CursorColumn, gST->ConOut->Mode->CursorRow-1, NULL, STRING_TOKEN (STR_CD_NF), gShellLevel2HiiHandle, L"map");
     }
   }
   return (SHELL_SUCCESS);
@@ -879,7 +879,7 @@ AddMappingFromMapping(
   EFI_STATUS                      Status;
   CHAR16                          *NewSName;
   RETURN_STATUS                   StrRetStatus;
-  
+
   NewSName = AllocateCopyPool(StrSize(SName) + sizeof(CHAR16), SName);
   if (NewSName == NULL) {
     return (SHELL_OUT_OF_RESOURCES);
@@ -935,7 +935,7 @@ AddMappingFromHandle(
   EFI_STATUS                Status;
   CHAR16                    *NewSName;
   RETURN_STATUS             StrRetStatus;
-  
+
   NewSName = AllocateCopyPool(StrSize(SName) + sizeof(CHAR16), SName);
   if (NewSName == NULL) {
     return (SHELL_OUT_OF_RESOURCES);
@@ -1084,7 +1084,7 @@ ShellCommandRunMap (
   Status = ShellCommandLineParse (MapParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"map", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"map", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -1100,7 +1100,7 @@ ShellCommandRunMap (
     if (ShellCommandLineGetFlag(Package, L"-?")) {
       ASSERT(FALSE);
     } else if (ShellCommandLineGetRawValue(Package, 3) != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"map");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"map");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -1114,7 +1114,7 @@ ShellCommandRunMap (
           || ShellCommandLineGetFlag(Package, L"-u")
           || ShellCommandLineGetFlag(Package, L"-t")
          ){
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel2HiiHandle, L"map");  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel2HiiHandle, L"map");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           SName = ShellCommandLineGetValue(Package, L"-d");
@@ -1122,18 +1122,18 @@ ShellCommandRunMap (
             Status = PerformMappingDelete(SName);
             if (EFI_ERROR(Status)) {
               if (Status == EFI_ACCESS_DENIED) {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel2HiiHandle, L"map");  
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellLevel2HiiHandle, L"map");
                 ShellStatus = SHELL_ACCESS_DENIED;
               } else if (Status == EFI_NOT_FOUND) {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, L"map", SName);  
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_MAP_NF), gShellLevel2HiiHandle, L"map", SName);
                 ShellStatus = SHELL_INVALID_PARAMETER;
               } else {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);  
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);
                 ShellStatus = SHELL_UNSUPPORTED;
               }
             }
           } else {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"map");  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"map");
             ShellStatus = SHELL_INVALID_PARAMETER;
           }
         }
@@ -1151,7 +1151,7 @@ ShellCommandRunMap (
           //
           Status = ShellCommandCreateInitialMappingsAndPaths();
           if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);
             ShellStatus = SHELL_UNSUPPORTED;
           }
         }
@@ -1161,7 +1161,7 @@ ShellCommandRunMap (
           //
           Status = ShellCommandUpdateMapping ();
           if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_UK), gShellLevel2HiiHandle, L"map", Status);
             ShellStatus = SHELL_UNSUPPORTED;
           }
         }
@@ -1241,7 +1241,7 @@ ShellCommandRunMap (
             MapAsHandle = NULL;
           }
           if (MapAsHandle == NULL && Mapping[StrLen(Mapping)-1] != L':') {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"map", Mapping);  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"map", Mapping);
             ShellStatus = SHELL_INVALID_PARAMETER;
           } else {
             TempStringLength = StrLen(SName);

@@ -2,7 +2,7 @@
   Main file for Echo shell level 3 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -61,7 +61,7 @@ ShellCommandRunEcho (
   Status = ShellCommandLineParseEx (ParamList, &Package, &ProblemParam, TRUE, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"echo", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"echo", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -104,7 +104,7 @@ ShellCommandRunEcho (
         StrnCatGrow(&PrintString, &Size, ShellCommandLineGetRawValue(Package, ParamCount), 0);
         if (ShellCommandLineGetRawValue(Package, ParamCount+1) != NULL) {
           StrnCatGrow(&PrintString, &Size, L" ", 0);
-        } 
+        }
       }
       ShellPrintEx(-1, -1, L"%s\r\n", PrintString);
       SHELL_FREE_NON_NULL(PrintString);

@@ -2,7 +2,7 @@
   The implementation for the 'tftp' Shell command.
 
   Copyright (c) 2015, ARM Ltd. All rights reserved.<BR>
-  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved. <BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -50,8 +50,8 @@ STATIC CONST CHAR16 mTftpProgressDelete[] = L"\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b
   @return     TRUE      The value was returned.
   @return     FALSE     A parsing error occured.
 **/
-STATIC 
-BOOLEAN 
+STATIC
+BOOLEAN
 StringToUint16 (
   IN   CONST CHAR16  *ValueStr,
   OUT  UINT16        *Value
@@ -64,7 +64,7 @@ StringToUint16 (
   @param[in]   NicNumber         The network physical device number.
   @param[out]  NicName           Address where to store the NIC name.
                                  The memory area has to be at least
-                                 IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH 
+                                 IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH
                                  double byte wide.
 
   @return  EFI_SUCCESS  The name of the NIC was returned.
@@ -75,8 +75,8 @@ StringToUint16 (
                         Managed Network Protocol could not be
                         read.
 **/
-STATIC 
-EFI_STATUS 
+STATIC
+EFI_STATUS
 GetNicName (
   IN   EFI_HANDLE  ControllerHandle,
   IN   UINTN       NicNumber,
@@ -102,8 +102,8 @@ GetNicName (
   @return  Others       Either the creation of the child or the opening
                         of the protocol failed.
 **/
-STATIC 
-EFI_STATUS 
+STATIC
+EFI_STATUS
 CreateServiceChildAndOpenProtocol (
   IN   EFI_HANDLE  ControllerHandle,
   IN   EFI_GUID    *ServiceBindingProtocolGuid,
@@ -124,8 +124,8 @@ CreateServiceChildAndOpenProtocol (
   @param[in]  ChildHandle                 Handle of the child to be destroyed.
 
 **/
-STATIC 
-VOID 
+STATIC
+VOID
 CloseProtocolAndDestroyServiceChild (
   IN  EFI_HANDLE  ControllerHandle,
   IN  EFI_GUID    *ServiceBindingProtocolGuid,
@@ -148,8 +148,8 @@ CloseProtocolAndDestroyServiceChild (
                             (see EFI_MTFTP4_PROTOCOL.GetInfo() status codes)
                             or error when parsing the response of the server.
 **/
-STATIC 
-EFI_STATUS 
+STATIC
+EFI_STATUS
 GetFileSize (
   IN   EFI_MTFTP4_PROTOCOL  *Mtftp4,
   IN   CONST CHAR8          *FilePath,
@@ -175,8 +175,8 @@ GetFileSize (
                                  (see EFI_MTFTP4_PROTOCOL.ReadFile() status codes).
 
 **/
-STATIC 
-EFI_STATUS 
+STATIC
+EFI_STATUS
 DownloadFile (
   IN   EFI_MTFTP4_PROTOCOL  *Mtftp4,
   IN   CONST CHAR16         *FilePath,
@@ -198,8 +198,8 @@ DownloadFile (
   @retval  EFI_SUCCESS  All packets are accepted.
 
 **/
-STATIC 
-EFI_STATUS 
+STATIC
+EFI_STATUS
 EFIAPI
 CheckPacket (
   IN EFI_MTFTP4_PROTOCOL  *This,
@@ -623,7 +623,7 @@ StringToUint16 (
   @param[in]   NicNumber         The network physical device number.
   @param[out]  NicName           Address where to store the NIC name.
                                  The memory area has to be at least
-                                 IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH 
+                                 IP4_CONFIG2_INTERFACE_INFO_NAME_LENGTH
                                  double byte wide.
 
   @return  EFI_SUCCESS  The name of the NIC was returned.

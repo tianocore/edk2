@@ -2,7 +2,7 @@
   Main file for Parse shell level 2 function.
 
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,9 +19,9 @@
   Check if data is coming from StdIn output.
 
   @param[in] None
- 
-  @retval TRUE  StdIn stream data available to parse 
-  @retval FALSE StdIn stream data is not available to parse. 
+
+  @retval TRUE  StdIn stream data available to parse
+  @retval FALSE StdIn stream data is not available to parse.
 **/
 BOOLEAN
 IsStdInDataAvailable (
@@ -30,11 +30,11 @@ IsStdInDataAvailable (
 {
   SHELL_FILE_HANDLE FileHandle;
   EFI_STATUS        Status;
-  CHAR16            CharBuffer; 
+  CHAR16            CharBuffer;
   UINTN             CharSize;
   UINT64            OriginalFilePosition;
 
-  Status               = EFI_SUCCESS; 
+  Status               = EFI_SUCCESS;
   FileHandle           = NULL;
   OriginalFilePosition = 0;
 
@@ -57,11 +57,11 @@ IsStdInDataAvailable (
 
 /**
   Handle stings for SFO Output with escape character ^ in a string
-  1. Quotation marks in the string must be escaped by using a ^ character (i.e. ^"). 
+  1. Quotation marks in the string must be escaped by using a ^ character (i.e. ^").
   2. The ^ character may be inserted using ^^.
 
   @param[in]  String  The Unicode NULL-terminated string.
- 
+
   @retval NewString   The new string handled for SFO.
 **/
 EFI_STRING
@@ -76,7 +76,7 @@ HandleStringWithEscapeCharForParse (
   if (String == NULL) {
     return NULL;
   }
-  
+
   //
   // start to parse the input string.
   //
@@ -96,13 +96,13 @@ HandleStringWithEscapeCharForParse (
     StrWalker++;
     NewStr++;
   }
-  
+
   return ReturnStr;
 }
 
 
 /**
-  Do the actual parsing of the file.  the file should be SFO output from a 
+  Do the actual parsing of the file.  the file should be SFO output from a
   shell command or a similar format.
 
   @param[in] FileName               The filename to open.
@@ -143,14 +143,14 @@ PerformParsing(
 
   Status = ShellOpenFileByName(FileName, &FileHandle, EFI_FILE_MODE_READ, 0);
   if (EFI_ERROR(Status)) {
-    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, L"parse", FileName);  
+    ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, L"parse", FileName);
     ShellStatus = SHELL_NOT_FOUND;
   } else if (!EFI_ERROR (FileHandleIsDirectory (FileHandle))) {
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_FILE), gShellLevel2HiiHandle, L"parse", FileName);  
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_NOT_FILE), gShellLevel2HiiHandle, L"parse", FileName);
     ShellStatus = SHELL_NOT_FOUND;
   } else {
     for (LoopVariable = 0 ; LoopVariable < ShellCommandInstance && !ShellFileHandleEof(FileHandle);) {
-     TempLine = ShellFileHandleReturnLine (FileHandle, &Ascii); 
+     TempLine = ShellFileHandleReturnLine (FileHandle, &Ascii);
 
       if ((TempLine == NULL) || (*TempLine == CHAR_NULL && StreamingUnicode)) {
          break;
@@ -169,7 +169,7 @@ PerformParsing(
     if (LoopVariable == ShellCommandInstance) {
       LoopVariable = 0;
       while(1) {
-        TempLine = ShellFileHandleReturnLine (FileHandle, &Ascii); 
+        TempLine = ShellFileHandleReturnLine (FileHandle, &Ascii);
         if (TempLine == NULL
             || *TempLine == CHAR_NULL
             || StrStr (TempLine, L"ShellCommand,") == TempLine) {
@@ -188,7 +188,7 @@ PerformParsing(
             }
             if (ColumnLoop == ColumnIndex) {
               if (ColumnPointer == NULL) {
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"parse", L"Column Index");  
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellLevel2HiiHandle, L"parse", L"Column Index");
                 ShellStatus = SHELL_INVALID_PARAMETER;
               } else {
                 TempSpot = StrStr (ColumnPointer, L",\"");
@@ -266,7 +266,7 @@ ShellCommandRunParse (
   Status = ShellCommandLineParseEx (ParamList, &Package, &ProblemParam, TRUE, FALSE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"parse", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"parse", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -276,11 +276,11 @@ ShellCommandRunParse (
     StreamingUnicode = IsStdInDataAvailable ();
     if ((!StreamingUnicode && (ShellCommandLineGetCount(Package) < 4)) ||
         (ShellCommandLineGetCount(Package) < 3)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"parse");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"parse");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if ((StreamingUnicode && (ShellCommandLineGetCount(Package) > 3)) ||
                 (ShellCommandLineGetCount(Package) > 4)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"parse");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"parse");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       if (StreamingUnicode) {

@@ -2,7 +2,7 @@
   Function definitions for shell simple text in and out on top of file handles.
 
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -17,7 +17,7 @@
 #define _SHELL_CONSOLE_WRAPPERS_HEADER_
 
 /**
-  Function to create a EFI_SIMPLE_TEXT_INPUT_PROTOCOL on top of a 
+  Function to create a EFI_SIMPLE_TEXT_INPUT_PROTOCOL on top of a
   SHELL_FILE_HANDLE to support redirecting input from a file.
 
   @param[in]  FileHandleToUse The pointer to the SHELL_FILE_HANDLE to use.
@@ -33,7 +33,7 @@ CreateSimpleTextInOnFile(
   );
 
 /**
-  Function to close a EFI_SIMPLE_TEXT_INPUT_PROTOCOL on top of a 
+  Function to close a EFI_SIMPLE_TEXT_INPUT_PROTOCOL on top of a
   SHELL_FILE_HANDLE to support redirecting input from a file.
 
   @param[in]  SimpleTextIn    The pointer to the SimpleTextIn to close.
@@ -46,7 +46,7 @@ CloseSimpleTextInOnFile(
   );
 
 /**
-  Function to create a EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL on top of a 
+  Function to create a EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL on top of a
   SHELL_FILE_HANDLE to support redirecting output from a file.
 
   @param[in]  FileHandleToUse  The pointer to the SHELL_FILE_HANDLE to use.
@@ -64,7 +64,7 @@ CreateSimpleTextOutOnFile(
   );
 
 /**
-  Function to close a EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL on top of a 
+  Function to close a EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL on top of a
   SHELL_FILE_HANDLE to support redirecting output from a file.
 
   @param[in] SimpleTextOut    The pointer to the SimpleTextOUT to close.

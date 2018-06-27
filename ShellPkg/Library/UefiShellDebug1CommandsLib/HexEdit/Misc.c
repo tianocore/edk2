@@ -1,7 +1,7 @@
 /** @file
   Implementation of various string and line routines
-  
-  Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved. <BR>
+
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,7 +18,7 @@ extern BOOLEAN  HEditorMouseAction;
 
 /**
   Free a line and it's internal buffer.
-  
+
   @param[in] Src    The line to be freed.
 **/
 VOID
@@ -109,7 +109,7 @@ HLineRetreat (
 
   @param[in] Count      The line number to advance/retreat.
                             >0 : advance
-                            <0: retreat  
+                            <0: retreat
 
   @retval NULL An error occured.
   @return A pointer to the line after move.
@@ -182,7 +182,7 @@ HMoveCurrentLine (
     Lines
     CurrentLine
     NumLines
-    ListHead 
+    ListHead
 
   @param[in] ListHead     The list head.
   @param[in] Lines        The lines.

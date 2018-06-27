@@ -1,6 +1,6 @@
 // /**
 //
-// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
 // (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
@@ -1041,7 +1041,7 @@
 "  2. The variable value is printed as a hexadecimal dump.\r\n"
 "  3. Option -d is used to delete variables. Option -s and -l are used to save\r\n"
 "     and load variables to and from a file. The variable name can be specified\r\n"
-"     when using these flags so that the operation only takes effect on\r\n" 
+"     when using these flags so that the operation only takes effect on\r\n"
 "     that variable.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"

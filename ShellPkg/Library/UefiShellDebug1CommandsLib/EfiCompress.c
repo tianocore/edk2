@@ -2,7 +2,7 @@
   Main file for EfiCompress shell Debug1 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -70,7 +70,7 @@ ShellCommandRunEfiCompress (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"eficompress", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"eficompress", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -78,10 +78,10 @@ ShellCommandRunEfiCompress (
     }
   } else {
     if (ShellCommandLineGetCount(Package) > 3) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"eficompress");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"eficompress");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetCount(Package) < 3) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"eficompress");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"eficompress");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       TempParam = ShellCommandLineGetRawValue(Package, 1);
@@ -89,26 +89,26 @@ ShellCommandRunEfiCompress (
       InFileName = ShellFindFilePath(TempParam);
       OutFileName = ShellCommandLineGetRawValue(Package, 2);
       if (InFileName == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"eficompress", TempParam);  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_FIND_FAIL), gShellDebug1HiiHandle, L"eficompress", TempParam);
         ShellStatus = SHELL_NOT_FOUND;
       } else {
         if (ShellIsDirectory(InFileName) == EFI_SUCCESS){
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"eficompress", InFileName);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"eficompress", InFileName);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
         if (ShellIsDirectory(OutFileName) == EFI_SUCCESS){
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"eficompress", OutFileName);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_NOT_DIR), gShellDebug1HiiHandle, L"eficompress", OutFileName);
           ShellStatus = SHELL_INVALID_PARAMETER;
         }
         if (ShellStatus == SHELL_SUCCESS) {
           Status = ShellOpenFileByName(InFileName, &InShellFileHandle, EFI_FILE_MODE_READ, 0);
           if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"eficompress", ShellCommandLineGetRawValue(Package, 1));  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"eficompress", ShellCommandLineGetRawValue(Package, 1));
             ShellStatus = SHELL_NOT_FOUND;
           }
           Status = ShellOpenFileByName(OutFileName, &OutShellFileHandle, EFI_FILE_MODE_READ|EFI_FILE_MODE_WRITE|EFI_FILE_MODE_CREATE, 0);
           if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"eficompress", ShellCommandLineGetRawValue(Package, 2));  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellDebug1HiiHandle, L"eficompress", ShellCommandLineGetRawValue(Package, 2));
             ShellStatus = SHELL_NOT_FOUND;
           }
         }
@@ -140,7 +140,7 @@ ShellCommandRunEfiCompress (
             OutSize2 = (UINTN)OutSize;
             Status = gEfiShellProtocol->WriteFile(OutShellFileHandle, &OutSize2, OutBuffer);
             if (EFI_ERROR(Status)) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, L"eficompress", OutFileName);  
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_FILE_WRITE_FAIL), gShellDebug1HiiHandle, L"eficompress", OutFileName);
               ShellStatus = SHELL_DEVICE_ERROR;
             }
           }

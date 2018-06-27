@@ -12,14 +12,14 @@
   and start and end time values.
   Dp uses this information to group records in different ways.  It also uses
   timer information to calculate elapsed time for each measurement.
- 
+
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php
- 
+
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
@@ -741,10 +741,10 @@ InitSummaryData (
 
 /**
   Dump performance data.
-  
+
   @param[in]  ImageHandle     The image handle.
   @param[in]  SystemTable     The system table.
-  
+
   @retval SHELL_SUCCESS            Command completed successfully.
   @retval SHELL_INVALID_PARAMETER  Command usage error.
   @retval SHELL_ABORTED            The user aborts the operation.
@@ -952,7 +952,7 @@ RunDp (
 ****    Cooked (Default)
 ****************************************************************************/
   GatherStatistics (CustomCumulativeData);
-  if (CumulativeMode) {                       
+  if (CumulativeMode) {
     ProcessCumulative (CustomCumulativeData);
   } else if (AllMode) {
     Status = DumpAllTrace( Number2Display, ExcludeMode);

@@ -2,7 +2,7 @@
   Main file for Alias shell level 3 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -186,7 +186,7 @@ ShellCommandRunAlias (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"alias", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel3HiiHandle, L"alias", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -257,7 +257,7 @@ ShellCommandRunAlias (
       // Set volatile alias.
       //
       ASSERT (VolatileFlag);
-      ASSERT (!DeleteFlag); 
+      ASSERT (!DeleteFlag);
       switch (ShellCommandLineGetCount (Package)) {
         case 1:
         case 2:

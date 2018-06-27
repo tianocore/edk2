@@ -1,7 +1,7 @@
 /** @file
   Main file for support of shell consist mapping.
 
-  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -56,10 +56,10 @@ typedef struct {
   @retval EFI_OUT_OF_RESOURCES    Out of resources.
   @retval EFI_SUCCESS             The appending was successful.
 **/
-typedef 
-EFI_STATUS 
+typedef
+EFI_STATUS
 (*SERIAL_DECODE_FUNCTION) (
-  EFI_DEVICE_PATH_PROTOCOL    *DevPath, 
+  EFI_DEVICE_PATH_PROTOCOL    *DevPath,
   DEVICE_CONSIST_MAPPING_INFO *MapInfo,
   EFI_DEVICE_PATH_PROTOCOL    *OrigDevPath
   );
@@ -640,7 +640,7 @@ DevPathSerialUsb (
     UsbIo = NULL;
     if (!EFI_ERROR(Status)) {
       Status = gBS->OpenProtocol(TempHandle, &gEfiUsbIoProtocolGuid, (VOID**)&UsbIo, gImageHandle, NULL, EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-    } 
+    }
 
     if (!EFI_ERROR(Status)) {
       ASSERT(UsbIo != NULL);
@@ -661,7 +661,7 @@ DevPathSerialUsb (
           }
         }
       }
-    } 
+    }
   }
   return Status;
 }
@@ -1520,13 +1520,13 @@ ShellCommandConsistMappingInitialize (
       continue;
     }
 
-    Status = gBS->HandleProtocol( HandleBuffer[HandleLoop], 
-                                  &gEfiBlockIoProtocolGuid, 
+    Status = gBS->HandleProtocol( HandleBuffer[HandleLoop],
+                                  &gEfiBlockIoProtocolGuid,
                                   (VOID **)&BlockIo
                                   );
     if (EFI_ERROR(Status)) {
-      Status = gBS->HandleProtocol( HandleBuffer[HandleLoop], 
-                                    &gEfiSimpleFileSystemProtocolGuid, 
+      Status = gBS->HandleProtocol( HandleBuffer[HandleLoop],
+                                    &gEfiSimpleFileSystemProtocolGuid,
                                     (VOID **)&SimpleFileSystem
                                     );
       if (EFI_ERROR(Status)) {

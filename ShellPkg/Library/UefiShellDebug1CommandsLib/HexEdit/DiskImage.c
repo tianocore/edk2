@@ -39,7 +39,7 @@ HEFI_EDITOR_DISK_IMAGE            HDiskImageConst = {
 
 /**
   Initialization function for HDiskImage.
- 
+
   @retval EFI_SUCCESS     The operation was successful.
   @retval EFI_LOAD_ERROR  A load error occured.
 **/
@@ -59,7 +59,7 @@ HDiskImageInit (
 }
 
 /**
-  Backup function for HDiskImage. Only a few fields need to be backup.   
+  Backup function for HDiskImage. Only a few fields need to be backup.
   This is for making the Disk buffer refresh as few as possible.
 
   @retval EFI_SUCCESS           The operation was successful.
@@ -154,7 +154,7 @@ HDiskImageSetDiskNameOffsetSize (
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_LOAD_ERROR        A load error occured.
-  @retval EFI_INVALID_PARAMETER A parameter was invalid.  
+  @retval EFI_INVALID_PARAMETER A parameter was invalid.
 **/
 EFI_STATUS
 HDiskImageRead (
@@ -326,7 +326,7 @@ HDiskImageRead (
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_LOAD_ERROR        A load error occured.
-  @retval EFI_INVALID_PARAMETER A parameter was invalid.  
+  @retval EFI_INVALID_PARAMETER A parameter was invalid.
 **/
 EFI_STATUS
 HDiskImageSave (

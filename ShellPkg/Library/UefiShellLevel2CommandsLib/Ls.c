@@ -2,7 +2,7 @@
   Main file for ls shell level 2 function.
 
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -154,10 +154,10 @@ PrintSfoVolumeInfoTableEntry(
 **/
 VOID
 PrintFileInformation(
-  IN CONST BOOLEAN              Sfo, 
-  IN CONST EFI_SHELL_FILE_INFO  *TheNode, 
-  IN UINT64                     *Files, 
-  IN UINT64                     *Size, 
+  IN CONST BOOLEAN              Sfo,
+  IN CONST EFI_SHELL_FILE_INFO  *TheNode,
+  IN UINT64                     *Files,
+  IN UINT64                     *Size,
   IN UINT64                     *Dirs
   )
 {
@@ -300,8 +300,8 @@ PrintNonSfoHeader(
 **/
 VOID
 PrintNonSfoFooter(
-  IN UINT64                     Files, 
-  IN UINT64                     Size, 
+  IN UINT64                     Files,
+  IN UINT64                     Size,
   IN UINT64                     Dirs
   )
 {
@@ -370,7 +370,7 @@ FileTimeToLocalTime (
   //
   HourNumberOfTempMinute = TempMinute / 60;
   if(TempMinute < 0) {
-    HourNumberOfTempMinute --; 
+    HourNumberOfTempMinute --;
   }
   TempHour = Time->Hour + HourNumberOfTempMinute;
   Time->Minute = (UINT8)(TempMinute - 60 * HourNumberOfTempMinute);
@@ -582,7 +582,7 @@ PrintLsOutput(
     }
     CorrectedPath = StrnCatGrow(&CorrectedPath, &LongestPath, L"*",     0);
     Status = ShellOpenFileMetaArg((CHAR16*)CorrectedPath, EFI_FILE_MODE_READ, &ListHead);
-   
+
     if (!EFI_ERROR(Status)) {
       for ( Node = (EFI_SHELL_FILE_INFO *)GetFirstNode(&ListHead->Link)
           ; !IsNull(&ListHead->Link, &Node->Link) && ShellStatus == SHELL_SUCCESS
@@ -609,7 +609,7 @@ PrintLsOutput(
             &FoundOne,
             Count,
             TimeZone);
-            
+
           //
           // Since it's running recursively, we have to break immediately when returned SHELL_ABORTED
           //
@@ -698,7 +698,7 @@ ShellCommandRunLs (
   Status = ShellCommandLineParse (LsParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"ls", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"ls", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -713,7 +713,7 @@ ShellCommandRunLs (
     }
 
     if (ShellCommandLineGetCount(Package) > 2) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"ls");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellLevel2HiiHandle, L"ls");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -751,7 +751,7 @@ ShellCommandRunLs (
               Count++;
               continue;
             default:
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ATTRIBUTE), gShellLevel2HiiHandle, L"ls", ShellCommandLineGetValue(Package, L"-a"));  
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_ATTRIBUTE), gShellLevel2HiiHandle, L"ls", ShellCommandLineGetValue(Package, L"-a"));
               ShellStatus = SHELL_INVALID_PARAMETER;
               break;
           } // switch
@@ -772,7 +772,7 @@ ShellCommandRunLs (
           CurDir = gEfiShellProtocol->GetCurDir(NULL);
           if (CurDir == NULL) {
             ShellStatus = SHELL_NOT_FOUND;
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");
           }
           //
           // Copy to the 2 strings for starting path and file search string
@@ -789,7 +789,7 @@ ShellCommandRunLs (
             // If we got something and it doesnt have a fully qualified path, then we needed to have a CWD.
             //
             ShellStatus = SHELL_NOT_FOUND;
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_CWD), gShellLevel2HiiHandle, L"ls");
           } else {
             //
             // We got a valid fully qualified path or we have a CWD
@@ -809,7 +809,7 @@ ShellCommandRunLs (
                 ShellCommandLineFreeVarList (Package);
                 return SHELL_OUT_OF_RESOURCES;
             }
-               
+
             if  (ShellIsDirectory(PathName) == EFI_SUCCESS) {
               //
               // is listing ends with a directory, then we list all files in that directory
@@ -832,7 +832,7 @@ ShellCommandRunLs (
         }
         Status = gRT->GetTime(&TheTime, NULL);
         if (EFI_ERROR(Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"ls", L"gRT->GetTime", Status);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_UEFI_FUNC_WARN), gShellLevel2HiiHandle, L"ls", L"gRT->GetTime", Status);
           TheTime.TimeZone = EFI_UNSPECIFIED_TIMEZONE;
         }
 
@@ -848,15 +848,15 @@ ShellCommandRunLs (
             TheTime.TimeZone
            );
           if (ShellStatus == SHELL_NOT_FOUND) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_LS_FILE_NOT_FOUND), gShellLevel2HiiHandle, L"ls", FullPath);  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_LS_FILE_NOT_FOUND), gShellLevel2HiiHandle, L"ls", FullPath);
           } else if (ShellStatus == SHELL_INVALID_PARAMETER) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"ls", FullPath);  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"ls", FullPath);
           } else if (ShellStatus == SHELL_ABORTED) {
             //
             // Ignore aborting.
             //
           } else if (ShellStatus != SHELL_SUCCESS) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"ls", FullPath);  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellLevel2HiiHandle, L"ls", FullPath);
           }
         }
       }

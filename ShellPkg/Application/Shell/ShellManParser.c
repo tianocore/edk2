@@ -146,14 +146,14 @@ GetManFileName(
   } else {
     Buffer = AllocateZeroPool(StrSize(ManFileName) + 4*sizeof(CHAR16));
     if (Buffer != NULL) {
-      StrnCpyS( Buffer, 
-                (StrSize(ManFileName) + 4*sizeof(CHAR16))/sizeof(CHAR16), 
-                ManFileName, 
+      StrnCpyS( Buffer,
+                (StrSize(ManFileName) + 4*sizeof(CHAR16))/sizeof(CHAR16),
+                ManFileName,
                 StrLen(ManFileName)
                 );
-      StrnCatS( Buffer, 
+      StrnCatS( Buffer,
                 (StrSize(ManFileName) + 4*sizeof(CHAR16))/sizeof(CHAR16),
-                L".man", 
+                L".man",
                 4
                 );
     }

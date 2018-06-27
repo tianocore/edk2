@@ -37,7 +37,7 @@ HEFI_EDITOR_BUFFER_IMAGE          HFileImageConst = {
 
 /**
   Initialization function for HFileImage
- 
+
   @retval EFI_SUCCESS     The operation was successful.
 **/
 EFI_STATUS
@@ -60,7 +60,7 @@ HFileImageInit (
 }
 
 /**
-  Backup function for HFileImage. Only a few fields need to be backup. 
+  Backup function for HFileImage. Only a few fields need to be backup.
   This is for making the file buffer refresh as few as possible.
 
   @retval EFI_SUCCESS           The operation was successful.

@@ -77,7 +77,7 @@ MainCommandGotoLine (
 /**
   Save current file to disk, you can save to current file name or
   save to another file name.
-  
+
   @retval EFI_SUCCESS           The file was saved correctly.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_LOAD_ERROR          A file access error occured.
@@ -1136,7 +1136,7 @@ MainCommandGotoLine (
 /**
   Save current file to disk, you can save to current file name or
   save to another file name.
-  
+
   @retval EFI_SUCCESS           The file was saved correctly.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_LOAD_ERROR          A file access error occured.
@@ -1150,7 +1150,7 @@ MainCommandSaveFile (
   CHAR16            *FileName;
   BOOLEAN           OldFile;
   CHAR16            *Str;
-  SHELL_FILE_HANDLE FileHandle;  
+  SHELL_FILE_HANDLE FileHandle;
   EFI_FILE_INFO     *Info;
 
   //
@@ -1280,15 +1280,15 @@ MainCommandSaveFile (
         StatusBarSetStatusString (L"Open Failed");
         FreePool (FileName);
         return EFI_SUCCESS;
-      } 
+      }
 
       Info = ShellGetFileInfo(FileHandle);
       if (Info == NULL) {
         StatusBarSetStatusString (L"Access Denied");
         FreePool (FileName);
         return (EFI_SUCCESS);
-      } 
-      
+      }
+
       if (Info->Attribute & EFI_FILE_READ_ONLY) {
         StatusBarSetStatusString (L"Access Denied - Read Only");
         FreePool (Info);
@@ -1365,13 +1365,13 @@ MainCommandDisplayHelp (
   EFI_KEY_DATA    KeyData;
   EFI_STATUS      Status;
   UINTN           EventIndex;
-  
+
   //
-  // print helpInfo      
+  // print helpInfo
   //
   for (CurrentLine = 0; 0 != MainMenuHelpInfo[CurrentLine]; CurrentLine++) {
     InfoString = HiiGetString(gShellDebug1HiiHandle, MainMenuHelpInfo[CurrentLine], NULL);
-    ShellPrintEx (0, CurrentLine+1, L"%E%s%N", InfoString);        
+    ShellPrintEx (0, CurrentLine+1, L"%E%s%N", InfoString);
   }
 
   //
@@ -1414,7 +1414,7 @@ MainCommandDisplayHelp (
   FileBufferRestorePosition ();
   FileBufferNeedRefresh = TRUE;
   FileBufferOnlyLineNeedRefresh = FALSE;
-  FileBufferRefresh ();  
+  FileBufferRefresh ();
 
   return EFI_SUCCESS;
 }
@@ -1649,10 +1649,10 @@ MainEditorRefresh (
   //
   // call the components refresh function
   //
-  if (EditorFirst 
-    || StrCmp (FileBufferBackupVar.FileName, FileBuffer.FileName) != 0 
-    || FileBufferBackupVar.FileType != FileBuffer.FileType 
-    || FileBufferBackupVar.FileModified != FileBuffer.FileModified 
+  if (EditorFirst
+    || StrCmp (FileBufferBackupVar.FileName, FileBuffer.FileName) != 0
+    || FileBufferBackupVar.FileType != FileBuffer.FileType
+    || FileBufferBackupVar.FileModified != FileBuffer.FileModified
     || FileBufferBackupVar.ReadOnly != FileBuffer.ReadOnly) {
 
     MainTitleBarRefresh (MainEditor.FileBuffer->FileName, MainEditor.FileBuffer->FileType, MainEditor.FileBuffer->ReadOnly, MainEditor.FileBuffer->FileModified, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row, 0, 0);
@@ -1660,8 +1660,8 @@ MainEditorRefresh (
   }
 
   if (EditorFirst
-    || FileBufferBackupVar.FilePosition.Row != FileBuffer.FilePosition.Row 
-    || FileBufferBackupVar.FilePosition.Column != FileBuffer.FilePosition.Column 
+    || FileBufferBackupVar.FilePosition.Row != FileBuffer.FilePosition.Row
+    || FileBufferBackupVar.FilePosition.Column != FileBuffer.FilePosition.Column
     || FileBufferBackupVar.ModeInsert != FileBuffer.ModeInsert
     || StatusBarGetRefresh()) {
 
@@ -1906,9 +1906,9 @@ MainEditorKeyInput (
           Status = MenuBarDispatchFunctionKey (&KeyData.Key);
         } else {
           StatusBarSetStatusString (L"Unknown Command");
-          FileBufferMouseNeedRefresh = FALSE;  
+          FileBufferMouseNeedRefresh = FALSE;
         }
-        
+
         if (Status != EFI_SUCCESS && Status != EFI_OUT_OF_RESOURCES) {
           //
           // not already has some error status
@@ -1975,6 +1975,6 @@ MainEditorBackup (
   )
 {
   FileBufferBackup ();
-  
+
   return EFI_SUCCESS;
 }

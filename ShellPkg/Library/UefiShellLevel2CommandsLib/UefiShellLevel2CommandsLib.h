@@ -9,7 +9,7 @@
   * functions are non-interactive only
 
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -288,7 +288,7 @@ VerifyIntermediateDirectories (
 
   @retval 0    Source and Target are identical strings without regard to case.
   @retval !=0  Source is not identical to Target.
-  
+
 **/
 INTN
 StrniCmp(
@@ -301,8 +301,8 @@ StrniCmp(
   Cleans off all the quotes in the string.
 
   @param[in]     OriginalString   pointer to the string to be cleaned.
-  @param[out]   CleanString      The new string with all quotes removed. 
-                                                  Memory allocated in the function and free 
+  @param[out]   CleanString      The new string with all quotes removed.
+                                                  Memory allocated in the function and free
                                                   by caller.
 
   @retval EFI_SUCCESS   The operation was successful.
