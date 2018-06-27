@@ -649,14 +649,13 @@ InsertFpdtRecord (
   case PERF_EVENTSIGNAL_END_ID:
   case PERF_CALLBACK_START_ID:
   case PERF_CALLBACK_END_ID:
-    if (String == NULL) {
+    if (String == NULL || Guid == NULL) {
       return EFI_INVALID_PARAMETER;
     }
-    //
-    // Cache the event guid in string event record when PcdEdkiiFpdtStringRecordEnableOnly == TRUE
-    //
-    CopyGuid (&ModuleGuid, Guid);
     StringPtr = String;
+    if (AsciiStrLen (String) == 0) {
+      StringPtr = "unknown name";
+    }
     if (!PcdGetBool (PcdEdkiiFpdtStringRecordEnableOnly)) {
       FpdtRecordPtr.DualGuidStringEvent->Header.Type      = FPDT_DUAL_GUID_STRING_EVENT_TYPE;
       FpdtRecordPtr.DualGuidStringEvent->Header.Length    = sizeof (FPDT_DUAL_GUID_STRING_EVENT_RECORD);
@@ -734,7 +733,14 @@ InsertFpdtRecord (
     FpdtRecordPtr.DynamicStringEvent->Header.Revision   = FPDT_RECORD_REVISION_1;
     FpdtRecordPtr.DynamicStringEvent->ProgressID        = PerfId;
     FpdtRecordPtr.DynamicStringEvent->Timestamp         = TimeStamp;
-    CopyMem (&FpdtRecordPtr.DynamicStringEvent->Guid, &ModuleGuid, sizeof (FpdtRecordPtr.DynamicStringEvent->Guid));
+    if (Guid != NULL) {
+      //
+      // Cache the event guid in string event record.
+      //
+      CopyMem (&FpdtRecordPtr.DynamicStringEvent->Guid, Guid, sizeof (FpdtRecordPtr.DynamicStringEvent->Guid));
+    } else {
+      CopyMem (&FpdtRecordPtr.DynamicStringEvent->Guid, &ModuleGuid, sizeof (FpdtRecordPtr.DynamicStringEvent->Guid));
+    }
     if (AsciiStrLen (StringPtr) == 0) {
       StringPtr = "unknown name";
     }
