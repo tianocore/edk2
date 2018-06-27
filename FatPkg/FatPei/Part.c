@@ -1,8 +1,8 @@
 /** @file
-  Routines supporting partition discovery and 
+  Routines supporting partition discovery and
   logical device reading
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -22,11 +22,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   This function finds Eltorito partitions. Main algorithm
   is ported from DXE partition driver.
 
-  @param  PrivateData       The global memory map 
-  @param  ParentBlockDevNo  The parent block device 
+  @param  PrivateData       The global memory map
+  @param  ParentBlockDevNo  The parent block device
 
-  @retval TRUE              New partitions are detected and logical block devices 
-                            are  added to block device array 
+  @retval TRUE              New partitions are detected and logical block devices
+                            are  added to block device array
   @retval FALSE             No New partitions are added;
 
 **/
@@ -40,11 +40,11 @@ FatFindEltoritoPartitions (
   This function finds Mbr partitions. Main algorithm
   is ported from DXE partition driver.
 
-  @param  PrivateData       The global memory map 
-  @param  ParentBlockDevNo  The parent block device 
+  @param  PrivateData       The global memory map
+  @param  ParentBlockDevNo  The parent block device
 
-  @retval TRUE              New partitions are detected and logical block devices 
-                            are  added to block device array 
+  @retval TRUE              New partitions are detected and logical block devices
+                            are  added to block device array
   @retval FALSE             No New partitions are added;
 
 **/
@@ -88,11 +88,11 @@ FatFindPartitions (
   This function finds Eltorito partitions. Main algorithm
   is ported from DXE partition driver.
 
-  @param  PrivateData       The global memory map 
-  @param  ParentBlockDevNo  The parent block device 
+  @param  PrivateData       The global memory map
+  @param  ParentBlockDevNo  The parent block device
 
-  @retval TRUE              New partitions are detected and logical block devices 
-                            are  added to block device array 
+  @retval TRUE              New partitions are detected and logical block devices
+                            are  added to block device array
   @retval FALSE             No New partitions are added;
 
 **/
@@ -309,10 +309,10 @@ FatFindEltoritoPartitions (
 /**
   Test to see if the Mbr buffer is a valid MBR
 
-  @param  Mbr               Parent Handle 
-  @param  LastLba           Last Lba address on the device. 
+  @param  Mbr               Parent Handle
+  @param  LastLba           Last Lba address on the device.
 
-  @retval TRUE              Mbr is a Valid MBR 
+  @retval TRUE              Mbr is a Valid MBR
   @retval FALSE             Mbr is not a Valid MBR
 
 **/
@@ -384,11 +384,11 @@ PartitionValidMbr (
   This function finds Mbr partitions. Main algorithm
   is ported from DXE partition driver.
 
-  @param  PrivateData       The global memory map 
-  @param  ParentBlockDevNo  The parent block device 
+  @param  PrivateData       The global memory map
+  @param  ParentBlockDevNo  The parent block device
 
-  @retval TRUE              New partitions are detected and logical block devices 
-                            are  added to block device array 
+  @retval TRUE              New partitions are detected and logical block devices
+                            are  added to block device array
   @retval FALSE             No New partitions are added;
 
 **/

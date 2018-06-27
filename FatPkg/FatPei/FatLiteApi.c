@@ -21,12 +21,12 @@ PEI_FAT_PRIVATE_DATA  *mPrivateData = NULL;
   BlockIo installation nofication function. Find out all the current BlockIO
   PPIs in the system and add them into private data. Assume there is
 
-  @param  PeiServices             General purpose services available to every 
-                                  PEIM. 
-  @param  NotifyDescriptor        The typedef structure of the notification 
-                                  descriptor. Not used in this function. 
-  @param  Ppi                     The typedef structure of the PPI descriptor. 
-                                  Not used in this function. 
+  @param  PeiServices             General purpose services available to every
+                                  PEIM.
+  @param  NotifyDescriptor        The typedef structure of the notification
+                                  descriptor. Not used in this function.
+  @param  Ppi                     The typedef structure of the PPI descriptor.
+                                  Not used in this function.
 
   @retval EFI_SUCCESS             The function completed successfully.
 
@@ -43,8 +43,8 @@ BlockIoNotifyEntry (
 /**
   Discover all the block I/O devices to find the FAT volume.
 
-  @param  PrivateData             Global memory map for accessing global 
-                                  variables. 
+  @param  PrivateData             Global memory map for accessing global
+                                  variables.
   @param  BlockIo2                Boolean to show whether using BlockIo2 or BlockIo
 
   @retval EFI_SUCCESS             The function completed successfully.
@@ -203,12 +203,12 @@ UpdateBlocksAndVolumes (
   BlockIo installation notification function. Find out all the current BlockIO
   PPIs in the system and add them into private data. Assume there is
 
-  @param  PeiServices             General purpose services available to every 
-                                  PEIM. 
-  @param  NotifyDescriptor        The typedef structure of the notification 
-                                  descriptor. Not used in this function. 
-  @param  Ppi                     The typedef structure of the PPI descriptor. 
-                                  Not used in this function. 
+  @param  PeiServices             General purpose services available to every
+                                  PEIM.
+  @param  NotifyDescriptor        The typedef structure of the notification
+                                  descriptor. Not used in this function.
+  @param  Ppi                     The typedef structure of the PPI descriptor.
+                                  Not used in this function.
 
   @retval EFI_SUCCESS             The function completed successfully.
 
@@ -234,13 +234,13 @@ BlockIoNotifyEntry (
   Installs the Device Recovery Module PPI, Initialize BlockIo Ppi
   installation notification
 
-  @param  FileHandle              Handle of the file being invoked. Type 
-                                  EFI_PEI_FILE_HANDLE is defined in  
-                                  FfsFindNextFile(). 
-  @param  PeiServices             Describes the list of possible PEI Services. 
+  @param  FileHandle              Handle of the file being invoked. Type
+                                  EFI_PEI_FILE_HANDLE is defined in
+                                  FfsFindNextFile().
+  @param  PeiServices             Describes the list of possible PEI Services.
 
-  @retval EFI_SUCCESS             The entry point was executed successfully. 
-  @retval EFI_OUT_OF_RESOURCES    There is no enough memory to complete the 
+  @retval EFI_SUCCESS             The entry point was executed successfully.
+  @retval EFI_OUT_OF_RESOURCES    There is no enough memory to complete the
                                   operations.
 
 **/
@@ -330,18 +330,18 @@ FatPeimEntry (
   Returns the number of DXE capsules residing on the device.
 
   This function searches for DXE capsules from the associated device and returns
-  the number and maximum size in bytes of the capsules discovered. Entry 1 is 
-  assumed to be the highest load priority and entry N is assumed to be the lowest 
+  the number and maximum size in bytes of the capsules discovered. Entry 1 is
+  assumed to be the highest load priority and entry N is assumed to be the lowest
   priority.
 
-  @param[in]  PeiServices              General-purpose services that are available 
+  @param[in]  PeiServices              General-purpose services that are available
                                        to every PEIM
   @param[in]  This                     Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI
                                        instance.
-  @param[out] NumberRecoveryCapsules   Pointer to a caller-allocated UINTN. On 
-                                       output, *NumberRecoveryCapsules contains 
-                                       the number of recovery capsule images 
-                                       available for retrieval from this PEIM 
+  @param[out] NumberRecoveryCapsules   Pointer to a caller-allocated UINTN. On
+                                       output, *NumberRecoveryCapsules contains
+                                       the number of recovery capsule images
+                                       available for retrieval from this PEIM
                                        instance.
 
   @retval EFI_SUCCESS        One or more capsules were discovered.
@@ -394,18 +394,18 @@ GetNumberRecoveryCapsules (
   This function gets the size and type of the capsule specified by CapsuleInstance.
 
   @param[in]  PeiServices       General-purpose services that are available to every PEIM
-  @param[in]  This              Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI 
+  @param[in]  This              Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI
                                 instance.
-  @param[in]  CapsuleInstance   Specifies for which capsule instance to retrieve 
-                                the information.  This parameter must be between 
-                                one and the value returned by GetNumberRecoveryCapsules() 
+  @param[in]  CapsuleInstance   Specifies for which capsule instance to retrieve
+                                the information.  This parameter must be between
+                                one and the value returned by GetNumberRecoveryCapsules()
                                 in NumberRecoveryCapsules.
-  @param[out] Size              A pointer to a caller-allocated UINTN in which 
-                                the size of the requested recovery module is 
+  @param[out] Size              A pointer to a caller-allocated UINTN in which
+                                the size of the requested recovery module is
                                 returned.
-  @param[out] CapsuleType       A pointer to a caller-allocated EFI_GUID in which 
-                                the type of the requested recovery capsule is 
-                                returned.  The semantic meaning of the value 
+  @param[out] CapsuleType       A pointer to a caller-allocated EFI_GUID in which
+                                the type of the requested recovery capsule is
+                                returned.  The semantic meaning of the value
                                 returned is defined by the implementation.
 
   @retval EFI_SUCCESS        One or more capsules were discovered.
@@ -530,12 +530,12 @@ GetRecoveryCapsuleInfo (
   This function, by whatever mechanism, retrieves a DXE capsule from some device
   and loads it into memory. Note that the published interface is device neutral.
 
-  @param[in]     PeiServices       General-purpose services that are available 
+  @param[in]     PeiServices       General-purpose services that are available
                                    to every PEIM
   @param[in]     This              Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI
                                    instance.
   @param[in]     CapsuleInstance   Specifies which capsule instance to retrieve.
-  @param[out]    Buffer            Specifies a caller-allocated buffer in which 
+  @param[out]    Buffer            Specifies a caller-allocated buffer in which
                                    the requested recovery capsule will be returned.
 
   @retval EFI_SUCCESS        The capsule was loaded correctly.
@@ -608,16 +608,16 @@ LoadRecoveryCapsule (
   This function finds the the recovery file named FileName on a specified FAT volume and returns
   its FileHandle pointer.
 
-  @param  PrivateData             Global memory map for accessing global 
-                                  variables. 
-  @param  VolumeIndex             The index of the volume. 
-  @param  FileName                The recovery file name to find. 
-  @param  Handle                  The output file handle. 
+  @param  PrivateData             Global memory map for accessing global
+                                  variables.
+  @param  VolumeIndex             The index of the volume.
+  @param  FileName                The recovery file name to find.
+  @param  Handle                  The output file handle.
 
-  @retval EFI_DEVICE_ERROR        Some error occured when operating the FAT 
-                                  volume. 
-  @retval EFI_NOT_FOUND           The recovery file was not found. 
-  @retval EFI_SUCCESS             The recovery file was successfully found on the 
+  @retval EFI_DEVICE_ERROR        Some error occured when operating the FAT
+                                  volume.
+  @retval EFI_NOT_FOUND           The recovery file was not found.
+  @retval EFI_SUCCESS             The recovery file was successfully found on the
                                   FAT volume.
 
 **/

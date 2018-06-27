@@ -1,7 +1,7 @@
 /** @file
   General purpose supporting routines for FAT recovery PEIM
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -25,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   If the input Letter is not a lower-cased letter,
   the original value is returned.
 
-  @param  Letter            The input unicode character. 
+  @param  Letter            The input unicode character.
 
   @return The upper cased letter.
 
@@ -47,15 +47,15 @@ ToUpper (
   Reads a block of data from the block device by calling
   underlying Block I/O service.
 
-  @param  PrivateData       Global memory map for accessing global variables 
-  @param  BlockDeviceNo     The index for the block device number. 
-  @param  Lba               The logic block address to read data from. 
-  @param  BufferSize        The size of data in byte to read. 
-  @param  Buffer            The buffer of the 
+  @param  PrivateData       Global memory map for accessing global variables
+  @param  BlockDeviceNo     The index for the block device number.
+  @param  Lba               The logic block address to read data from.
+  @param  BufferSize        The size of data in byte to read.
+  @param  Buffer            The buffer of the
 
-  @retval EFI_DEVICE_ERROR  The specified block device number exceeds the maximum 
-                            device number. 
-  @retval EFI_DEVICE_ERROR  The maximum address has exceeded the maximum address 
+  @retval EFI_DEVICE_ERROR  The specified block device number exceeds the maximum
+                            device number.
+  @retval EFI_DEVICE_ERROR  The maximum address has exceeded the maximum address
                             of the block device.
 
 **/
@@ -125,11 +125,11 @@ FatReadBlock (
   Find a cache block designated to specific Block device and Lba.
   If not found, invalidate an oldest one and use it. (LRU cache)
 
-  @param  PrivateData       the global memory map. 
-  @param  BlockDeviceNo     the Block device. 
-  @param  Lba               the Logical Block Address 
-  @param  CachePtr          Ptr to the starting address of the memory holding the 
-                            data; 
+  @param  PrivateData       the global memory map.
+  @param  BlockDeviceNo     the Block device.
+  @param  Lba               the Logical Block Address
+  @param  CachePtr          Ptr to the starting address of the memory holding the
+                            data;
 
   @retval EFI_SUCCESS       The function completed successfully.
   @retval EFI_DEVICE_ERROR  Something error while accessing media.
@@ -179,9 +179,9 @@ FatGetCacheBlock (
   if (Index == PEI_FAT_CACHE_SIZE) {
     Index = (Seed++) % PEI_FAT_CACHE_SIZE;
   }
-  
+
   //
-  // Current device ID should be less than maximum device ID. 
+  // Current device ID should be less than maximum device ID.
   //
   if (BlockDeviceNo >= PEI_FAT_MAX_BLOCK_DEVICE) {
     return EFI_DEVICE_ERROR;
@@ -217,11 +217,11 @@ FatGetCacheBlock (
 /**
   Disk reading.
 
-  @param  PrivateData       the global memory map; 
-  @param  BlockDeviceNo     the block device to read; 
-  @param  StartingAddress   the starting address. 
-  @param  Size              the amount of data to read. 
-  @param  Buffer            the buffer holding the data 
+  @param  PrivateData       the global memory map;
+  @param  BlockDeviceNo     the block device to read;
+  @param  StartingAddress   the starting address.
+  @param  Size              the amount of data to read.
+  @param  Buffer            the buffer holding the data
 
   @retval EFI_SUCCESS       The function completed successfully.
   @retval EFI_DEVICE_ERROR  Something error.
@@ -306,11 +306,11 @@ FatReadDisk (
   to a Null-terminated Unicode string.
   Here does not expand DBCS FAT chars.
 
-  @param  FatSize           The size of the string Fat in bytes. 
-  @param  Fat               A pointer to a Null-terminated string that contains 
-                            an 8.3 file name using an OEM character set. 
-  @param  Str               A pointer to a Null-terminated Unicode string. The 
-                            string must be allocated in advance to hold FatSize 
+  @param  FatSize           The size of the string Fat in bytes.
+  @param  Fat               A pointer to a Null-terminated string that contains
+                            an 8.3 file name using an OEM character set.
+  @param  Str               A pointer to a Null-terminated Unicode string. The
+                            string must be allocated in advance to hold FatSize
                             Unicode characters
 
 **/
@@ -344,8 +344,8 @@ EngFatToStr (
 /**
   Performs a case-insensitive comparison of two Null-terminated Unicode strings.
 
-  @param  PrivateData       Global memory map for accessing global variables 
-  @param  Str1              First string to perform case insensitive comparison. 
+  @param  PrivateData       Global memory map for accessing global variables
+  @param  Str1              First string to perform case insensitive comparison.
   @param  Str2              Second string to perform case insensitive comparison.
 
 **/
