@@ -366,6 +366,7 @@ SataControllerStart (
   UINT32                            Data32;
   UINTN                             TotalCount;
   UINT64                            Supports;
+  UINT8                             MaxPortNumber;
 
   DEBUG ((EFI_D_INFO, "SataControllerStart start\n"));
 
@@ -472,12 +473,31 @@ SataControllerStart (
     Private->DeviceCount          = IDE_MAX_DEVICES;
   } else if (IS_PCI_SATADPA (&PciData)) {
     //
-    // Read Host Capability Register(CAP) to get Number of Ports(NPS) and Supports Port Multiplier(SPM)
-    //   NPS is 0's based value indicating the maximum number of ports supported by the HBA silicon.
-    //   A maximum of 32 ports can be supported. A value of '0h', indicating one port, is the minimum requirement.
+    // Read Ports Implemented(PI) to calculate max port number (0 based).
+    //
+    Data32 = AhciReadReg (PciIo, R_AHCI_PI);
+    DEBUG ((DEBUG_INFO, "Ports Implemented(PI) = 0x%x\n", Data32));
+    if (Data32 == 0) {
+      Status = EFI_UNSUPPORTED;
+      goto Done;
+    }
+    MaxPortNumber = 31;
+    while (MaxPortNumber > 0) {
+      if (Data32 & (1 << MaxPortNumber)) {
+        break;
+      }
+      MaxPortNumber--;
+    }
+    //
+    // Make the ChannelCount equal to the max port number (0 based) plus 1.
+    //
+    Private->IdeInit.ChannelCount = MaxPortNumber + 1;
+
+    //
+    // Read HBA Capabilities(CAP) to get Supports Port Multiplier(SPM).
     //
     Data32 = AhciReadReg (PciIo, R_AHCI_CAP);
-    Private->IdeInit.ChannelCount = (UINT8) ((Data32 & B_AHCI_CAP_NPS) + 1);
+    DEBUG ((DEBUG_INFO, "HBA Capabilities(CAP) = 0x%x\n", Data32));
     Private->DeviceCount          = AHCI_MAX_DEVICES;
     if ((Data32 & B_AHCI_CAP_SPM) == B_AHCI_CAP_SPM) {
       Private->DeviceCount = AHCI_MULTI_MAX_DEVICES;
