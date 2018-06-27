@@ -3202,14 +3202,16 @@ class ModuleAutoGen(AutoGen):
     def _GetSourceFileList(self):
         if self._SourceFileList is None:
             self._SourceFileList = []
+            ToolChainTagSet = {"", "*", self.ToolChain}
+            ToolChainFamilySet = {"", "*", self.ToolChainFamily, self.BuildRuleFamily}
             for F in self.Module.Sources:
                 # match tool chain
-                if F.TagName not in ("", "*", self.ToolChain):
+                if F.TagName not in ToolChainTagSet:
                     EdkLogger.debug(EdkLogger.DEBUG_9, "The toolchain [%s] for processing file [%s] is found, "
                                     "but [%s] is needed" % (F.TagName, str(F), self.ToolChain))
                     continue
                 # match tool chain family or build rule family
-                if F.ToolChainFamily not in ("", "*", self.ToolChainFamily, self.BuildRuleFamily):
+                if F.ToolChainFamily not in ToolChainFamilySet:
                     EdkLogger.debug(
                                 EdkLogger.DEBUG_0,
                                 "The file [%s] must be built by tools of [%s], " \
