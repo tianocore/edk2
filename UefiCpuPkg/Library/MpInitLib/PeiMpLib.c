@@ -13,6 +13,87 @@
 **/
 
 #include "MpLib.h"
+#include <Library/PeiServicesLib.h>
+#include <Guid/S3SmmInitDone.h>
+
+/**
+  S3 SMM Init Done notification function.
+
+  @param  PeiServices      Indirect reference to the PEI Services Table.
+  @param  NotifyDesc       Address of the notification descriptor data structure.
+  @param  InvokePpi        Address of the PPI that was invoked.
+
+  @retval EFI_SUCCESS      The function completes successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+NotifyOnS3SmmInitDonePpi (
+  IN  EFI_PEI_SERVICES                              **PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR                     *NotifyDesc,
+  IN  VOID                                          *InvokePpi
+  );
+
+
+//
+// Global function
+//
+EFI_PEI_NOTIFY_DESCRIPTOR        mS3SmmInitDoneNotifyDesc = {
+  EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST,
+  &gEdkiiS3SmmInitDoneGuid,
+  NotifyOnS3SmmInitDonePpi
+};
+
+/**
+  The function prototype for invoking a function on an Application Processor.
+
+  This definition is used by the UEFI MP Serices Protocol, and the
+  PI SMM System Table.
+
+  @param[in,out] Buffer  The pointer to private data buffer.
+**/
+VOID
+EmptyApProcedure (
+  IN OUT VOID * Buffer
+  )
+{
+}
+
+/**
+  S3 SMM Init Done notification function.
+
+  @param  PeiServices      Indirect reference to the PEI Services Table.
+  @param  NotifyDesc       Address of the notification descriptor data structure.
+  @param  InvokePpi        Address of the PPI that was invoked.
+
+  @retval EFI_SUCCESS      The function completes successfully.
+
+**/
+EFI_STATUS
+EFIAPI
+NotifyOnS3SmmInitDonePpi (
+  IN  EFI_PEI_SERVICES                              **PeiServices,
+  IN  EFI_PEI_NOTIFY_DESCRIPTOR                     *NotifyDesc,
+  IN  VOID                                          *InvokePpi
+  )
+{
+  CPU_MP_DATA     *CpuMpData;
+
+  CpuMpData = GetCpuMpData ();
+
+  //
+  // PiSmmCpuDxeSmm driver hardcode change the loop mode to HLT mode.
+  // So in this notify function, code need to check the current loop
+  // mode, if it is not HLT mode, code need to change loop mode back
+  // to the original mode.
+  //
+  if (CpuMpData->ApLoopMode != ApInHltLoop) {
+    CpuMpData->WakeUpByInitSipiSipi = TRUE;
+  }
+
+  return EFI_SUCCESS;
+}
+
 
 /**
   Enable Debug Agent to support source debugging on AP function.
@@ -240,7 +321,15 @@ InitMpGlobalData (
   IN CPU_MP_DATA               *CpuMpData
   )
 {
+  EFI_STATUS  Status;
+
   SaveCpuMpData (CpuMpData);
+
+  ///
+  /// Install Notify
+  ///
+  Status = PeiServicesNotifyPpi (&mS3SmmInitDoneNotifyDesc);
+  ASSERT_EFI_ERROR (Status);
 }
 
 /**

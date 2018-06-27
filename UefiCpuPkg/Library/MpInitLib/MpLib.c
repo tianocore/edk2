@@ -985,13 +985,15 @@ WakeUpAP (
   CpuMpData->FinishedCount = 0;
   ResetVectorRequired = FALSE;
 
-  if (CpuMpData->ApLoopMode == ApInHltLoop ||
+  if (CpuMpData->WakeUpByInitSipiSipi ||
       CpuMpData->InitFlag   != ApInitDone) {
     ResetVectorRequired = TRUE;
     AllocateResetVector (CpuMpData);
     FillExchangeInfoData (CpuMpData);
     SaveLocalApicTimerSetting (CpuMpData);
-  } else if (CpuMpData->ApLoopMode == ApInMwaitLoop) {
+  }
+
+  if (CpuMpData->ApLoopMode == ApInMwaitLoop) {
     //
     // Get AP target C-state each time when waking up AP,
     // for it maybe updated by platform again
@@ -1076,6 +1078,13 @@ WakeUpAP (
   if (ResetVectorRequired) {
     FreeResetVector (CpuMpData);
   }
+
+  //
+  // After one round of Wakeup Ap actions, need to re-sync ApLoopMode with
+  // WakeUpByInitSipiSipi flag. WakeUpByInitSipiSipi flag maybe changed by
+  // S3SmmInitDone Ppi.
+  //
+  CpuMpData->WakeUpByInitSipiSipi = (CpuMpData->ApLoopMode == ApInHltLoop);
 }
 
 /**
@@ -1648,6 +1657,9 @@ MpInitLibInitialize (
   //
   CpuMpData->ApLoopMode = ApLoopMode;
   DEBUG ((DEBUG_INFO, "AP Loop Mode is %d\n", CpuMpData->ApLoopMode));
+
+  CpuMpData->WakeUpByInitSipiSipi = (CpuMpData->ApLoopMode == ApInHltLoop);
+
   //
   // Set up APs wakeup signal buffer
   //
