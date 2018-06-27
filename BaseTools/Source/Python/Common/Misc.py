@@ -55,6 +55,13 @@ gFileTimeStampCache = {}    # {file path : file time stamp}
 ## Dictionary used to store dependencies of files
 gDependencyDatabase = {}    # arch : {file path : [dependent files list]}
 
+#
+# If a module is built more than once with different PCDs or library classes
+# a temporary INF file with same content is created, the temporary file is removed
+# when build exits.
+#
+_TempInfs = []
+
 def GetVariableOffset(mapfilepath, efifilepath, varnames):
     """ Parse map file to get variable offset in current EFI file 
     @param mapfilepath    Map file absolution path
@@ -280,18 +287,18 @@ def ProcessDuplicatedInf(Path, BaseName, Workspace):
     # If file exists, compare contents
     #
     if os.path.exists(TempFullPath):
-        with open(str(Path), 'rb') as f1: Src = f1.read()
-        with open(TempFullPath, 'rb') as f2: Dst = f2.read()
-        if Src == Dst:
-            return RtPath
-    GlobalData.gTempInfs.append(TempFullPath)
+        with open(str(Path), 'rb') as f1, open(TempFullPath, 'rb') as f2: 
+            if f1.read() == f2.read():
+                return RtPath
+    _TempInfs.append(TempFullPath)
     shutil.copy2(str(Path), TempFullPath)
     return RtPath
 
-## Remove temporary created INFs whose paths were saved in gTempInfs
+## Remove temporary created INFs whose paths were saved in _TempInfs
 #
 def ClearDuplicatedInf():
-    for File in GlobalData.gTempInfs:
+    while _TempInfs:
+        File = _TempInfs.pop()
         if os.path.exists(File):
             os.remove(File)
 

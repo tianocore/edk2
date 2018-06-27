@@ -93,13 +93,6 @@ gIgnoreSource = False
 #
 gFdfParser = None
 
-#
-# If a module is built more than once with different PCDs or library classes
-# a temporary INF file with same content is created, the temporary file is removed
-# when build exits.
-#
-gTempInfs = []
-
 BuildOptionPcd = []
 
 #
