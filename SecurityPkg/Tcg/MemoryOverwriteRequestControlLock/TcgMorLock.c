@@ -4,13 +4,13 @@
   This driver initilize MemoryOverwriteRequestControlLock variable.
   This module will add Variable Hook and allow MemoryOverwriteRequestControlLock variable set only once.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -51,7 +51,7 @@ IsAnyMorVariable (
   UINTN   Index;
 
   for (Index = 0; Index < sizeof(mMorVariableType)/sizeof(mMorVariableType[0]); Index++) {
-    if ((StrCmp (VariableName, mMorVariableType[Index].VariableName) == 0) && 
+    if ((StrCmp (VariableName, mMorVariableType[Index].VariableName) == 0) &&
         (CompareGuid (VendorGuid, mMorVariableType[Index].VendorGuid))) {
       return TRUE;
     }
@@ -74,7 +74,7 @@ IsMorLockVariable (
   IN EFI_GUID                               *VendorGuid
   )
 {
-  if ((StrCmp (VariableName, MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME) == 0) && 
+  if ((StrCmp (VariableName, MEMORY_OVERWRITE_REQUEST_CONTROL_LOCK_NAME) == 0) &&
       (CompareGuid (VendorGuid, &gEfiMemoryOverwriteRequestControlLockGuid))) {
     return TRUE;
   }
@@ -142,7 +142,7 @@ SetVariableCheckHandlerMor (
     //
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Delete not OK
   //
@@ -173,7 +173,7 @@ SetVariableCheckHandlerMor (
   @param[in] ImageHandle  Image handle of this driver.
   @param[in] SystemTable  A Pointer to the EFI System Table.
 
-  @retval EFI_SUCEESS     
+  @retval EFI_SUCEESS
   @return Others          Some error occurs.
 **/
 EFI_STATUS

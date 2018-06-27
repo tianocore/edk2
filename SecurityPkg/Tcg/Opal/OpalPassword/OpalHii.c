@@ -728,7 +728,7 @@ DriverCallback(
         }
         *ActionRequest = EFI_BROWSER_ACTION_REQUEST_FORM_APPLY;
         return EFI_SUCCESS;
- 
+
       case HII_KEY_ID_REVERT:
         DEBUG ((DEBUG_INFO,  "HII_KEY_ID_REVERT\n"));
         gHiiConfiguration.OpalRequest.Revert = Value->b;

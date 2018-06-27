@@ -1,13 +1,13 @@
 /** @file
   Load the deferred images after user is identified.
-    
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -39,7 +39,7 @@ LoadDeferredImage (
   UINTN                              DriverIndex;
   EFI_DEVICE_PATH_PROTOCOL           *ImageDevicePath;
   VOID                               *DriverImage;
-  UINTN                              ImageSize; 
+  UINTN                              ImageSize;
   BOOLEAN                            BootOption;
   EFI_HANDLE                         ImageHandle;
   UINTN                              ExitDataSize;
@@ -77,16 +77,16 @@ LoadDeferredImage (
       // Load all the deferred images in this protocol instance.
       //
       Status = DeferredImage->GetImageInfo(
-                                DeferredImage, 
-                                DriverIndex, 
-                                &ImageDevicePath, 
+                                DeferredImage,
+                                DriverIndex,
+                                &ImageDevicePath,
                                 (VOID **) &DriverImage,
-                                &ImageSize, 
+                                &ImageSize,
                                 &BootOption
                                 );
       if (EFI_ERROR (Status)) {
         break;
-      } 
+      }
 
       //
       // Load and start the image.
@@ -106,7 +106,7 @@ LoadDeferredImage (
         //
         gBS->SetWatchdogTimer (5 * 60, 0x0000, 0x00, NULL);
         Status = gBS->StartImage (ImageHandle, &ExitDataSize, &ExitData);
-    
+
         //
         // Clear the Watchdog Timer after the image returns.
         //
@@ -115,7 +115,7 @@ LoadDeferredImage (
       DriverIndex++;
     } while (TRUE);
   }
-  FreePool (HandleBuf); 
+  FreePool (HandleBuf);
 }
 
 
@@ -134,7 +134,7 @@ LoadDeferredImageInit (
   EFI_EVENT     Event;
 
   mDeferredImageHandle = ImageHandle;
-  
+
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,

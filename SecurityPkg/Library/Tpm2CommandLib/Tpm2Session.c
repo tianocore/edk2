@@ -53,7 +53,7 @@ typedef struct {
   @param[in]  AuthHash           Hash algorithm to use for the session.
   @param[out] SessionHandle      Handle for the newly created session.
   @param[out] NonceTPM           The initial nonce from the TPM, used in the computation of the sessionKey.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -136,7 +136,7 @@ Tpm2StartAuthSession (
 
   WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16 (AuthHash));
   Buffer += sizeof(UINT16);
- 
+
   SendBufferSize = (UINT32) ((UINTN)Buffer - (UINTN)&SendBuffer);
   SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
 

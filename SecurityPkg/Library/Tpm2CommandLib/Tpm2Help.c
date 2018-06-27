@@ -97,7 +97,7 @@ CopyAuthSessionCommand (
   UINT8  *Buffer;
 
   Buffer = (UINT8 *)AuthSessionOut;
-  
+
   //
   // Add in Auth session
   //

@@ -77,7 +77,7 @@ extern EFI_COMPONENT_NAME2_PROTOCOL  gOpalComponentName2;
 
 //
 // The max timeout value assume the user can wait for the revert action. The unit of this macro is second.
-// If the revert time value bigger than this one, driver needs to popup a dialog to let user confirm the 
+// If the revert time value bigger than this one, driver needs to popup a dialog to let user confirm the
 // revert action.
 //
 #define MAX_ACCEPTABLE_REVERTING_TIME    10
@@ -258,7 +258,7 @@ OpalSupportGetAvailableActions(
   @param[in]      Msid               Msid
   @param[in]      MsidLength         Msid Length
   @param[in]      Password           Admin password
-  @param[in]      PassLength         Length of password in bytes 
+  @param[in]      PassLength         Length of password in bytes
 
 **/
 TCG_RESULT

@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of SecureBoot configuration module.
 
-Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -1816,7 +1816,7 @@ LoadPeImage (
   Calculate hash of Pe/Coff image based on the authenticode image hashing in
   PE/COFF Specification 8.0 Appendix A
 
-  Notes: PE/COFF image has been checked by BasePeCoffLib PeCoffLoaderGetImageInfo() in 
+  Notes: PE/COFF image has been checked by BasePeCoffLib PeCoffLoaderGetImageInfo() in
   the function LoadPeImage ().
 
   @param[in]    HashAlg   Hash algorithm type.
@@ -3327,12 +3327,12 @@ SecureBootExtractConfigFromVariable (
   }
 
   //
-  // Check SecureBootEnable & Pk status, fix the inconsistence. 
+  // Check SecureBootEnable & Pk status, fix the inconsistence.
   // If the SecureBootEnable Variable doesn't exist, hide the SecureBoot Enable/Disable
   // Checkbox.
   //
   ConfigData->AttemptSecureBoot = FALSE;
-  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);  
+  GetVariable2 (EFI_SECURE_BOOT_ENABLE_NAME, &gEfiSecureBootEnableDisableGuid, (VOID**)&SecureBootEnable, NULL);
 
   //
   // Fix Pk, SecureBootEnable inconsistence
@@ -4385,7 +4385,7 @@ SecureBootCallback (
         Value->u8 = SECURE_BOOT_MODE_STANDARD;
         Status = EFI_SUCCESS;
       }
-    } 
+    }
     goto EXIT;
   }
 

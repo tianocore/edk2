@@ -1,13 +1,13 @@
 /** @file
   The functions for access policy modification.
-    
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -15,7 +15,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "UserProfileManager.h"
 
 /**
-  Collect all the access policy data to mUserInfo.AccessPolicy, 
+  Collect all the access policy data to mUserInfo.AccessPolicy,
   and save it to user profile.
 
 **/
@@ -38,7 +38,7 @@ SaveAccessPolicy (
   mUserInfo.AccessPolicyLen       = 0;
   mUserInfo.AccessPolicyModified  = TRUE;
   OffSet                          = 0;
-  
+
   //
   // Save access right.
   //
@@ -51,7 +51,7 @@ SaveAccessPolicy (
   Control.Size = (UINT32) Size;
   CopyMem (mUserInfo.AccessPolicy + OffSet, &Control, sizeof (Control));
   OffSet += sizeof (Control);
-  
+
   //
   // Save access setup.
   //
@@ -61,10 +61,10 @@ SaveAccessPolicy (
   }
 
   Control.Type = EFI_USER_INFO_ACCESS_SETUP;
-  Control.Size = (UINT32) Size;  
+  Control.Size = (UINT32) Size;
   CopyMem (mUserInfo.AccessPolicy + OffSet, &Control, sizeof (Control));
   OffSet += sizeof (Control);
-  
+
   if (mAccessInfo.AccessSetup == ACCESS_SETUP_NORMAL) {
     CopyGuid ((EFI_GUID *) (mUserInfo.AccessPolicy + OffSet), &gEfiUserInfoAccessSetupNormalGuid);
   } else if (mAccessInfo.AccessSetup == ACCESS_SETUP_RESTRICTED) {
@@ -73,7 +73,7 @@ SaveAccessPolicy (
     CopyGuid ((EFI_GUID *) (mUserInfo.AccessPolicy + OffSet), &gEfiUserInfoAccessSetupAdminGuid);
   }
   OffSet += sizeof (EFI_GUID);
-  
+
   //
   // Save access of boot order.
   //
@@ -83,13 +83,13 @@ SaveAccessPolicy (
   }
 
   Control.Type = EFI_USER_INFO_ACCESS_BOOT_ORDER;
-  Control.Size = (UINT32) Size;  
+  Control.Size = (UINT32) Size;
   CopyMem (mUserInfo.AccessPolicy + OffSet, &Control, sizeof (Control));
   OffSet += sizeof (Control);
 
   CopyMem ((UINT8 *) (mUserInfo.AccessPolicy + OffSet), &mAccessInfo.AccessBootOrder, sizeof (UINT32));
   OffSet += sizeof (UINT32);
-  
+
   //
   // Save permit load.
   //
@@ -100,14 +100,14 @@ SaveAccessPolicy (
     }
 
     Control.Type = EFI_USER_INFO_ACCESS_PERMIT_LOAD;
-    Control.Size = (UINT32) Size;  
+    Control.Size = (UINT32) Size;
     CopyMem (mUserInfo.AccessPolicy + OffSet, &Control, sizeof (Control));
     OffSet += sizeof (Control);
-  
+
     CopyMem (mUserInfo.AccessPolicy + OffSet, mAccessInfo.LoadPermit, mAccessInfo.LoadPermitLen);
     OffSet += mAccessInfo.LoadPermitLen;
   }
-  
+
   //
   // Save forbid load.
   //
@@ -118,14 +118,14 @@ SaveAccessPolicy (
     }
 
     Control.Type = EFI_USER_INFO_ACCESS_FORBID_LOAD;
-    Control.Size = (UINT32) Size;  
+    Control.Size = (UINT32) Size;
     CopyMem (mUserInfo.AccessPolicy + OffSet, &Control, sizeof (Control));
     OffSet += sizeof (Control);
-    
+
     CopyMem (mUserInfo.AccessPolicy + OffSet, mAccessInfo.LoadForbid, mAccessInfo.LoadForbidLen);
     OffSet += mAccessInfo.LoadForbidLen;
   }
-  
+
   //
   // Save permit connect.
   //
@@ -136,14 +136,14 @@ SaveAccessPolicy (
     }
 
     Control.Type = EFI_USER_INFO_ACCESS_PERMIT_CONNECT;
-    Control.Size = (UINT32) Size;  
+    Control.Size = (UINT32) Size;
     CopyMem (mUserInfo.AccessPolicy + OffSet, &Control, sizeof (Control));
     OffSet += sizeof (Control);
-    
+
     CopyMem (mUserInfo.AccessPolicy + OffSet, mAccessInfo.ConnectPermit, mAccessInfo.ConnectPermitLen);
     OffSet += mAccessInfo.ConnectPermitLen;
   }
-  
+
   //
   // Save forbid connect.
   //
@@ -154,10 +154,10 @@ SaveAccessPolicy (
     }
 
     Control.Type = EFI_USER_INFO_ACCESS_FORBID_CONNECT;
-    Control.Size = (UINT32) Size;  
+    Control.Size = (UINT32) Size;
     CopyMem (mUserInfo.AccessPolicy + OffSet, &Control, sizeof (Control));
     OffSet += sizeof (Control);
-    
+
     CopyMem (mUserInfo.AccessPolicy + OffSet, mAccessInfo.ConnectForbid, mAccessInfo.ConnectForbidLen);
     OffSet += mAccessInfo.ConnectForbidLen;
   }
@@ -264,11 +264,11 @@ AddDevicePath (
 
 
 /**
-  Check whether the DevicePath is in the device path forbid list 
+  Check whether the DevicePath is in the device path forbid list
   (mAccessInfo.LoadForbid).
 
   @param[in]  DevicePath           Points to device path.
-  
+
   @retval TRUE     The DevicePath is in the device path forbid list.
   @retval FALSE    The DevicePath is not in the device path forbid list.
 
@@ -330,10 +330,10 @@ DisplayLoadPermit(
   //
   OrderSize = 0;
   Status    = gRT->GetVariable (
-                     L"DriverOrder", 
-                     &gEfiGlobalVariableGuid, 
-                     NULL, 
-                     &OrderSize, 
+                     L"DriverOrder",
+                     &gEfiGlobalVariableGuid,
+                     NULL,
+                     &OrderSize,
                      NULL
                      );
   if (Status != EFI_BUFFER_TOO_SMALL) {
@@ -346,16 +346,16 @@ DisplayLoadPermit(
   }
 
   Status = gRT->GetVariable (
-                  L"DriverOrder", 
-                  &gEfiGlobalVariableGuid, 
-                  NULL, 
-                  &OrderSize, 
+                  L"DriverOrder",
+                  &gEfiGlobalVariableGuid,
+                  NULL,
+                  &OrderSize,
                   Order
                   );
   if (EFI_ERROR (Status)) {
     return ;
   }
-  
+
   //
   // Initialize the container for dynamic opcodes.
   //
@@ -400,11 +400,11 @@ DisplayLoadPermit(
     if (Var == NULL) {
       continue;
     }
-    
+
     //
     // Check whether the driver is already forbidden.
     //
-    
+
     VarPtr = Var;
     //
     // Skip attribute.
@@ -545,7 +545,7 @@ DisplayConnectPermit (
   )
 {
   //
-  // Note: 
+  // Note:
   // As no architect protocol/interface to be called in ConnectController()
   // to verify the device path, just add a place holder for permitted connect
   // device path.
@@ -563,7 +563,7 @@ DisplayConnectForbid (
   )
 {
   //
-  // Note: 
+  // Note:
   // As no architect protocol/interface to be called in ConnectController()
   // to verify the device path, just add a place holder for forbidden connect
   // device path.
@@ -572,11 +572,11 @@ DisplayConnectForbid (
 
 
 /**
-  Delete the specified device path by DriverIndex from the forbid device path 
+  Delete the specified device path by DriverIndex from the forbid device path
   list (mAccessInfo.LoadForbid).
 
   @param[in]  DriverIndex   The index of driver in forbidden device path list.
-  
+
 **/
 VOID
 DeleteFromForbidLoad (
@@ -598,7 +598,7 @@ DeleteFromForbidLoad (
     OffSet += DPSize;
     DriverIndex--;
   }
-  
+
   //
   // Specified device path found.
   //
@@ -608,8 +608,8 @@ DeleteFromForbidLoad (
     OffLen  = mAccessInfo.LoadForbidLen - OffSet - DPSize;
     if (OffLen > 0) {
       CopyMem (
-        mAccessInfo.LoadForbid + OffSet, 
-        mAccessInfo.LoadForbid + OffSet + DPSize, 
+        mAccessInfo.LoadForbid + OffSet,
+        mAccessInfo.LoadForbid + OffSet + DPSize,
         OffLen
         );
     }
@@ -619,11 +619,11 @@ DeleteFromForbidLoad (
 
 
 /**
-  Add the specified device path by DriverIndex to the forbid device path 
+  Add the specified device path by DriverIndex to the forbid device path
   list (mAccessInfo.LoadForbid).
 
   @param[in]  DriverIndex   The index of driver saved in driver options.
-  
+
 **/
 VOID
 AddToForbidLoad (
@@ -645,11 +645,11 @@ AddToForbidLoad (
   if (Var == NULL) {
     return;
   }
-  
+
   //
   // Save forbid load driver.
   //
-  
+
   VarPtr = Var;
   //
   // Skip attribute.

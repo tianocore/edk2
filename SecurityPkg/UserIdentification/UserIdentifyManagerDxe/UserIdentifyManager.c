@@ -1,14 +1,14 @@
 /** @file
   This driver manages user information and produces user manager protocol.
-  
-Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -81,20 +81,20 @@ EFI_USER_MANAGER_PROTOCOL gUserIdentifyManager = {
 /**
   Find the specified user in the user database.
 
-  This function searches the specified user from the beginning of the user database. 
-  And if NextUser is TRUE, return the next User in the user database.  
-  
-  @param[in, out] User         On entry, points to the user profile entry to search. 
+  This function searches the specified user from the beginning of the user database.
+  And if NextUser is TRUE, return the next User in the user database.
+
+  @param[in, out] User         On entry, points to the user profile entry to search.
                                On return, points to the user profile entry or NULL if not found.
   @param[in]      NextUser     If FALSE, find the user in user profile database specifyed by User
-                               If TRUE, find the next user in user profile database specifyed 
-                               by User. 
-  @param[out]     ProfileIndex A pointer to the index of user profile database that matches the 
+                               If TRUE, find the next user in user profile database specifyed
+                               by User.
+  @param[out]     ProfileIndex A pointer to the index of user profile database that matches the
                                user specifyed by User.
 
   @retval EFI_NOT_FOUND        User was NULL, or User was not found, or the next user was not found.
   @retval EFI_SUCCESS          User or the next user are found in user profile database
-  
+
 **/
 EFI_STATUS
 FindUserProfile (
@@ -111,7 +111,7 @@ FindUserProfile (
   if ((mUserProfileDb == NULL) || (User == NULL)) {
     return EFI_NOT_FOUND;
   }
-  
+
   //
   // Check whether the user profile is in the user profile database.
   //
@@ -152,22 +152,22 @@ FindUserProfile (
 /**
   Find the specified user information record in the specified User profile.
 
-  This function searches the specified user information record from the beginning of the user 
-  profile. And if NextInfo is TRUE, return the next info in the user profile.  
-  
-  @param[in]      User     Points to the user profile entry.                             
+  This function searches the specified user information record from the beginning of the user
+  profile. And if NextInfo is TRUE, return the next info in the user profile.
+
+  @param[in]      User     Points to the user profile entry.
   @param[in, out] Info     On entry, points to the user information record or NULL to start
                            searching with the first user information record.
-                           On return, points to the user information record or NULL if not found.                           
+                           On return, points to the user information record or NULL if not found.
   @param[in]      NextInfo If FALSE, find the user information record in profile specifyed by User.
-                           If TRUE, find the next user information record in profile specifyed 
-                           by User. 
+                           If TRUE, find the next user information record in profile specifyed
+                           by User.
   @param[out]     Offset   A pointer to the offset of the information record in the user profile.
 
   @retval EFI_INVALID_PARAMETER Info is NULL
   @retval EFI_NOT_FOUND         Info was not found, or the next Info was not found.
   @retval EFI_SUCCESS           Info or the next info are found in user profile.
-  
+
 **/
 EFI_STATUS
 FindUserInfo (
@@ -184,7 +184,7 @@ FindUserInfo (
   if (Info == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check user profile entry
   //
@@ -207,7 +207,7 @@ FindUserInfo (
     }
     InfoLen += ALIGN_VARIABLE (UserInfo->InfoSize);
   }
-  
+
   //
   // Check whether to find the next user information.
   //
@@ -245,21 +245,21 @@ FindUserInfo (
 /**
   Find a user infomation record by the information record type.
 
-  This function searches all user information records of User. The search starts with the 
-  user information record following Info and continues until either the information is found 
+  This function searches all user information records of User. The search starts with the
+  user information record following Info and continues until either the information is found
   or there are no more user infomation record.
   A match occurs when a Info.InfoType field matches the user information record type.
 
-  @param[in]      User     Points to the user profile record to search.                          
+  @param[in]      User     Points to the user profile record to search.
   @param[in, out] Info     On entry, points to the user information record or NULL to start
                            searching with the first user information record.
                            On return, points to the user information record or NULL if not found.
   @param[in]      InfoType The infomation type to be searched.
 
   @retval EFI_SUCCESS           User information was found. Info points to the user information record.
-  @retval EFI_NOT_FOUND         User information was not found.                           
+  @retval EFI_NOT_FOUND         User information was not found.
   @retval EFI_INVALID_PARAMETER User is NULL or Info is NULL.
-  
+
 **/
 EFI_STATUS
 FindUserInfoByType (
@@ -275,7 +275,7 @@ FindUserInfoByType (
   if (Info == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check whether the user has the specified user information.
   //
@@ -289,7 +289,7 @@ FindUserInfoByType (
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
   }
-  
+
   while (InfoLen < User->UserProfileSize) {
     UserInfo = (EFI_USER_INFO *) (User->ProfileInfo + InfoLen);
     if (UserInfo->InfoType == InfoType) {
@@ -309,27 +309,27 @@ FindUserInfoByType (
 /**
   Find a user using a user information record.
 
-  This function searches all user profiles for the specified user information record. The 
-  search starts with the user information record handle following UserInfo and continues 
+  This function searches all user profiles for the specified user information record. The
+  search starts with the user information record handle following UserInfo and continues
   until either the information is found or there are no more user profiles.
-  A match occurs when the Info.InfoType field matches the user information record type and the 
+  A match occurs when the Info.InfoType field matches the user information record type and the
   user information record data matches the portion of Info passed the EFI_USER_INFO header.
 
-  @param[in, out] User     On entry, points to the previously returned user profile record, 
-                           or NULL to start searching with the first user profile. 
+  @param[in, out] User     On entry, points to the previously returned user profile record,
+                           or NULL to start searching with the first user profile.
                            On return, points to the user profile entry, or NULL if not found.
-  @param[in, out] UserInfo On entry, points to the previously returned user information record, 
-                           or NULL to start searching with the first. 
+  @param[in, out] UserInfo On entry, points to the previously returned user information record,
+                           or NULL to start searching with the first.
                            On return, points to the user information record, or NULL if not found.
-  @param[in]      Info     Points to the buffer containing the user information to be compared 
+  @param[in]      Info     Points to the buffer containing the user information to be compared
                            to the user information record.
   @param[in]      InfoSize The size of Info, in bytes. Same as Info->InfoSize.
 
-  @retval EFI_SUCCESS           User information was found. User points to the user profile record, 
+  @retval EFI_SUCCESS           User information was found. User points to the user profile record,
                                 and UserInfo points to the user information record.
-  @retval EFI_NOT_FOUND         User information was not found.                           
+  @retval EFI_NOT_FOUND         User information was not found.
   @retval EFI_INVALID_PARAMETER User is NULL; Info is NULL; or, InfoSize is too small.
-  
+
 **/
 EFI_STATUS
 FindUserProfileByInfo (
@@ -362,7 +362,7 @@ FindUserProfileByInfo (
   if (*User == NULL) {
     *User = mUserProfileDb->UserProfile[0];
   }
-  
+
   //
   // Check user profile handle.
   //
@@ -377,7 +377,7 @@ FindUserProfileByInfo (
       if (EFI_ERROR (Status)) {
         break;
       }
-      
+
       if (InfoSize == Info->InfoSize) {
         if (CompareMem ((UINT8 *) (InfoEntry + 1), (UINT8 *) (Info + 1), InfoSize - sizeof (EFI_USER_INFO)) == 0) {
           //
@@ -388,9 +388,9 @@ FindUserProfileByInfo (
           }
           return EFI_SUCCESS;
         }
-      }      
+      }
     }
-    
+
     //
     // Get next user profile.
     //
@@ -410,7 +410,7 @@ FindUserProfileByInfo (
 
   @retval TRUE     The policy is a valid access policy.
   @retval FALSE    The access policy is not a valid access policy.
-  
+
 **/
 BOOLEAN
 CheckAccessPolicy (
@@ -430,7 +430,7 @@ CheckAccessPolicy (
     //
     // Check access policy according to type.
     //
-    CopyMem (&Access, PolicyInfo + TotalLen, sizeof (Access));    
+    CopyMem (&Access, PolicyInfo + TotalLen, sizeof (Access));
     ValueLen = Access.Size - sizeof (EFI_USER_INFO_ACCESS_CONTROL);
     switch (Access.Type) {
     case EFI_USER_INFO_ACCESS_FORBID_LOAD:
@@ -492,7 +492,7 @@ CheckAccessPolicy (
 
   @retval TRUE     The policy is a valid identity policy.
   @retval FALSE    The access policy is not a valid identity policy.
-  
+
 **/
 BOOLEAN
 CheckIdentityPolicy (
@@ -602,7 +602,7 @@ CheckIdentityPolicy (
 
   @retval TRUE     The info is a valid user information record.
   @retval FALSE    The info is not a valid user information record.
-  
+
 **/
 BOOLEAN
 CheckUserInfo (
@@ -697,7 +697,7 @@ CheckUserInfo (
 
   @retval TRUE     It is a valid user profile.
   @retval FALSE    It is not a valid user profile.
-  
+
 **/
 BOOLEAN
 CheckProfileInfo (
@@ -711,7 +711,7 @@ CheckProfileInfo (
   if (UserProfileInfo == NULL) {
     return FALSE;
   }
-  
+
   //
   // Check user profile information length.
   //
@@ -742,10 +742,10 @@ CheckProfileInfo (
   @param[in]  RightType      Could be EFI_USER_INFO_ACCESS_MANAGE,
                              EFI_USER_INFO_ACCESS_ENROLL_OTHERS or
                              EFI_USER_INFO_ACCESS_ENROLL_SELF.
-  
+
   @retval TRUE     Find the specified RightType in current user profile.
   @retval FALSE    Can't find the right in the profile.
-  
+
 **/
 BOOLEAN
 CheckCurrentUserAccessRight (
@@ -882,7 +882,7 @@ GenerateUserId (
 
   @retval TRUE     Success to expand user profile database.
   @retval FALSE    Fail to expand user profile database.
-  
+
 **/
 BOOLEAN
 ExpandUsermUserProfileDb (
@@ -935,11 +935,11 @@ ExpandUsermUserProfileDb (
   Expand user profile
 
   @param[in]  User                    Points to user profile.
-  @param[in]  ExpandSize              The size of user profile. 
+  @param[in]  ExpandSize              The size of user profile.
 
   @retval TRUE     Success to expand user profile size.
   @retval FALSE    Fail to expand user profile size.
-  
+
 **/
 BOOLEAN
 ExpandUserProfile (
@@ -959,7 +959,7 @@ ExpandUserProfile (
   if (Info == NULL) {
     return FALSE;
   }
-  
+
   //
   // Copy exist information.
   //
@@ -981,7 +981,7 @@ ExpandUserProfile (
                            If FALSE, save the user profile.
   @retval EFI_SUCCESS      Save or delete user profile successfully.
   @retval Others           Fail to change the profile.
-  
+
 **/
 EFI_STATUS
 SaveNvUserProfile (
@@ -998,7 +998,7 @@ SaveNvUserProfile (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Save the user profile to non-volatile memory.
   //
@@ -1040,7 +1040,7 @@ AddUserInfo (
   if ((Info == NULL) || (User == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check user profile handle.
   //
@@ -1048,7 +1048,7 @@ AddUserInfo (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Check user information memory size.
   //
@@ -1057,7 +1057,7 @@ AddUserInfo (
       return EFI_OUT_OF_RESOURCES;
     }
   }
-  
+
   //
   // Add new user information.
   //
@@ -1083,9 +1083,9 @@ AddUserInfo (
 
   @param[in]      User            Point to the user profile.
   @param[in]      UserInfo        Point to the user information record to get.
-  @param[out]     Info            On entry, points to a buffer of at least *InfoSize bytes. 
+  @param[out]     Info            On entry, points to a buffer of at least *InfoSize bytes.
                                   On exit, holds the user information.
-  @param[in, out] InfoSize        On entry, points to the size of Info. 
+  @param[in, out] InfoSize        On entry, points to the size of Info.
                                   On return, points to the size of the user information.
   @param[in]      ChkRight        If TRUE, check the user info attribute.
                                   If FALSE, don't check the user info attribute.
@@ -1093,7 +1093,7 @@ AddUserInfo (
 
   @retval EFI_ACCESS_DENIED       The information cannot be accessed by the current user.
   @retval EFI_INVALID_PARAMETER   InfoSize is NULL or UserInfo is NULL.
-  @retval EFI_BUFFER_TOO_SMALL    The number of bytes specified by *InfoSize is too small to hold the 
+  @retval EFI_BUFFER_TOO_SMALL    The number of bytes specified by *InfoSize is too small to hold the
                                   returned data. The actual size required is returned in *InfoSize.
   @retval EFI_SUCCESS             Information returned successfully.
 
@@ -1116,7 +1116,7 @@ GetUserInfo (
   if ((*InfoSize != 0) && (Info == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Find the user information to get.
   //
@@ -1124,7 +1124,7 @@ GetUserInfo (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Check information attributes.
   //
@@ -1145,7 +1145,7 @@ GetUserInfo (
       break;
     }
   }
-  
+
   //
   // Get user information.
   //
@@ -1197,7 +1197,7 @@ DelUserInfo (
   if (Info->InfoType == EFI_USER_INFO_IDENTIFIER_RECORD) {
     return EFI_ACCESS_DENIED;
   }
-  
+
   //
   // Delete the specified user information.
   //
@@ -1220,7 +1220,7 @@ DelUserInfo (
 
   @param[in]      User           Point to the user profile.
   @param[in, out] UserInfo       On entry, points to the user information to modify,
-                                 or NULL to add a new UserInfo. 
+                                 or NULL to add a new UserInfo.
                                  On return, points to the modified user information.
   @param[in]      Info           Points to the new user information.
   @param[in]      InfoSize       The size of Info,in bytes.
@@ -1249,14 +1249,14 @@ ModifyUserInfo (
   if (InfoSize < sizeof (EFI_USER_INFO) || InfoSize != Info->InfoSize) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check user information.
   //
   if (Info->InfoType == EFI_USER_INFO_IDENTIFIER_RECORD) {
     return EFI_ACCESS_DENIED;
   }
-  
+
   if (!CheckUserInfo (Info)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -1274,7 +1274,7 @@ ModifyUserInfo (
       }
       ASSERT (OldInfo != NULL);
 
-      if (((OldInfo->InfoAttribs & EFI_USER_INFO_EXCLUSIVE) != 0) || 
+      if (((OldInfo->InfoAttribs & EFI_USER_INFO_EXCLUSIVE) != 0) ||
            ((Info->InfoAttribs & EFI_USER_INFO_EXCLUSIVE) != 0)) {
         //
         //  Same type can not co-exist for exclusive information.
@@ -1292,7 +1292,7 @@ ModifyUserInfo (
       if (!CompareGuid (&OldInfo->Credential, &Info->Credential)) {
         continue;
       }
-  
+
       PayloadLen = Info->InfoSize - sizeof (EFI_USER_INFO);
       if (PayloadLen == 0) {
         continue;
@@ -1311,7 +1311,7 @@ ModifyUserInfo (
     Status = AddUserInfo (User, (UINT8 *) Info, InfoSize, UserInfo, TRUE);
     return Status;
   }
-  
+
   //
   // Modify existing user information.
   //
@@ -1319,11 +1319,11 @@ ModifyUserInfo (
   if (OldInfo->InfoType != Info->InfoType) {
     return EFI_INVALID_PARAMETER;
   }
-  
-  if (((Info->InfoAttribs & EFI_USER_INFO_EXCLUSIVE) != 0) && 
+
+  if (((Info->InfoAttribs & EFI_USER_INFO_EXCLUSIVE) != 0) &&
        (OldInfo->InfoAttribs & EFI_USER_INFO_EXCLUSIVE) == 0) {
     //
-    // Try to add exclusive attrib in new info. 
+    // Try to add exclusive attrib in new info.
     // Check whether there is another information with the same type in profile.
     //
     OldInfo = NULL;
@@ -1339,7 +1339,7 @@ ModifyUserInfo (
         //
         return EFI_ACCESS_DENIED;
       }
-    } while (TRUE);    
+    } while (TRUE);
   }
 
   Status = DelUserInfo (User, *UserInfo, FALSE);
@@ -1358,7 +1358,7 @@ ModifyUserInfo (
 
   @retval EFI_SUCCESS      Delete user from the user profile successfully.
   @retval Others           Fail to delete user from user profile
-  
+
 **/
 EFI_STATUS
 DelUserProfile (
@@ -1375,14 +1375,14 @@ DelUserProfile (
   if (EFI_ERROR (Status)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check whether it is the current user.
   //
   if (User == mCurrentUser) {
     return EFI_ACCESS_DENIED;
   }
-  
+
   //
   // Delete user profile from the non-volatile memory.
   //
@@ -1449,7 +1449,7 @@ AddUserProfile (
   if (!CheckProfileInfo (ProfileInfo, ProfileSize)) {
     return EFI_SECURITY_VIOLATION;
   }
-  
+
   //
   // Create user profile entry.
   //
@@ -1468,9 +1468,9 @@ AddUserProfile (
   }
 
   UnicodeSPrint (
-    User->UserVarName, 
+    User->UserVarName,
     sizeof (User->UserVarName),
-    L"User%04x", 
+    L"User%04x",
     mUserProfileDb->UserProfileNum
     );
   User->UserProfileSize = 0;
@@ -1532,7 +1532,7 @@ CreateUserProfile (
   UserInfo->InfoSize    = sizeof (EFI_USER_INFO) + sizeof (EFI_USER_INFO_IDENTIFIER);
   UserInfo->InfoAttribs = EFI_USER_INFO_STORAGE_PLATFORM_NV | EFI_USER_INFO_PUBLIC | EFI_USER_INFO_EXCLUSIVE;
   GenerateUserId ((UINT8 *) (UserInfo + 1));
-  
+
   //
   // Add user profile to the user profile database.
   //
@@ -1547,7 +1547,7 @@ CreateUserProfile (
 
   @retval EFI_SUCCESS             A default user profile is added successfully.
   @retval Others                  Fail to add a default user profile
-  
+
 **/
 EFI_STATUS
 AddDefaultUserProfile (
@@ -1562,7 +1562,7 @@ AddDefaultUserProfile (
   EFI_USER_INFO_USAGE_COUNT     UsageCount;
   EFI_USER_INFO_ACCESS_CONTROL  *Access;
   EFI_USER_INFO_IDENTITY_POLICY *Policy;
-  
+
   //
   // Create a user profile.
   //
@@ -1570,7 +1570,7 @@ AddDefaultUserProfile (
   if (EFI_ERROR (Status)) {
     return Status;
   }
- 
+
   //
   // Allocate a buffer to add all default user information.
   //
@@ -1591,7 +1591,7 @@ AddDefaultUserProfile (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
-  
+
   //
   // Add user profile create date record.
   //
@@ -1609,7 +1609,7 @@ AddDefaultUserProfile (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
-  
+
   //
   // Add user profile usage count record.
   //
@@ -1623,7 +1623,7 @@ AddDefaultUserProfile (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
- 
+
   //
   // Add user access right.
   //
@@ -1638,7 +1638,7 @@ AddDefaultUserProfile (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
-  
+
   //
   // Add user identity policy.
   //
@@ -1646,7 +1646,7 @@ AddDefaultUserProfile (
   Info->InfoAttribs = EFI_USER_INFO_STORAGE_PLATFORM_NV | EFI_USER_INFO_PRIVATE | EFI_USER_INFO_EXCLUSIVE;
   Policy            = (EFI_USER_INFO_IDENTITY_POLICY *) (Info + 1);
   Policy->Type      = EFI_USER_INFO_IDENTITY_TRUE;
-  Policy->Length    = sizeof (EFI_USER_INFO_IDENTITY_POLICY);  
+  Policy->Length    = sizeof (EFI_USER_INFO_IDENTITY_POLICY);
   Info->InfoSize    = sizeof (EFI_USER_INFO) + Policy->Length;
   NewInfo = NULL;
   Status  = ModifyUserInfo (User, &NewInfo, Info, Info->InfoSize);
@@ -1660,7 +1660,7 @@ Done:
 /**
   Publish current user information into EFI System Configuration Table.
 
-  By UEFI spec, the User Identity Manager will publish the current user profile 
+  By UEFI spec, the User Identity Manager will publish the current user profile
   into the EFI System Configuration Table. Currently, only the user identifier and user
   name are published.
 
@@ -1685,7 +1685,7 @@ PublishUserTable (
              );
   if (!EFI_ERROR (Status)) {
     //
-    // The table existed! 
+    // The table existed!
     //
     return EFI_SUCCESS;
   }
@@ -1707,13 +1707,13 @@ PublishUserTable (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Allocate a buffer for user information table.
   //
   UserInfoTable = (EFI_USER_INFO_TABLE *) AllocateRuntimePool (
-                                            sizeof (EFI_USER_INFO_TABLE) + 
-                                            IdInfo->InfoSize + 
+                                            sizeof (EFI_USER_INFO_TABLE) +
+                                            IdInfo->InfoSize +
                                             NameInfo->InfoSize
                                             );
   if (UserInfoTable == NULL) {
@@ -1721,8 +1721,8 @@ PublishUserTable (
     return Status;
   }
 
-  UserInfoTable->Size = sizeof (EFI_USER_INFO_TABLE);  
-  
+  UserInfoTable->Size = sizeof (EFI_USER_INFO_TABLE);
+
   //
   // Append the user information to the user info table
   //
@@ -1740,7 +1740,7 @@ PublishUserTable (
 /**
   Get the user's identity type.
 
-  The identify manager only supports the identity policy in which the credential 
+  The identify manager only supports the identity policy in which the credential
   provider handles are connected by the operator 'AND' or 'OR'.
 
 
@@ -1771,7 +1771,7 @@ GetIdentifyType (
     return Status;
   }
   ASSERT (IdentifyInfo != NULL);
-  
+
   //
   // Search the user identify policy according to type.
   //
@@ -1823,7 +1823,7 @@ IdentifyByProviderId (
   if (Provider == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check the user ID identified by the specified credential provider.
   //
@@ -1843,12 +1843,12 @@ IdentifyByProviderId (
         // Get credential provider form.
         //
         Status = UserCredential->Form (
-                                   UserCredential, 
-                                   &HiiHandle, 
-                                   &FormSetId, 
+                                   UserCredential,
+                                   &HiiHandle,
+                                   &FormSetId,
                                    &FormId
                                    );
-        if (!EFI_ERROR (Status)) {        
+        if (!EFI_ERROR (Status)) {
           //
           // Send form to get user input.
           //
@@ -1863,8 +1863,8 @@ IdentifyByProviderId (
                                                   );
           if (EFI_ERROR (Status)) {
             return Status;
-          }                                            
-        }        
+          }
+        }
       }
 
       Status = UserCredential->User (UserCredential, User, &UserId);
@@ -1876,7 +1876,7 @@ IdentifyByProviderId (
       if (EFI_ERROR (Status)) {
         return Status;
       }
-      
+
       return EFI_SUCCESS;
     }
   }
@@ -1914,7 +1914,7 @@ UpdateUserInfo (
   if (Info == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Check create date record.
   //
@@ -1938,7 +1938,7 @@ UpdateUserInfo (
       return Status;
     }
   }
-  
+
   //
   // Update usage date record.
   //
@@ -1961,7 +1961,7 @@ UpdateUserInfo (
       return Status;
     }
   }
-  
+
   //
   // Update usage count record.
   //
@@ -2043,7 +2043,7 @@ AddProviderSelection (
   Add a username item in form.
 
   @param[in]  Index            The index of the user in the user name list.
-  @param[in]  User             Points to the user profile whose username is added. 
+  @param[in]  User             Points to the user profile whose username is added.
   @param[in]  OpCodeHandle     Points to container for dynamic created opcodes.
 
   @retval EFI_SUCCESS          Add a username successfully.
@@ -2066,7 +2066,7 @@ AddUserSelection (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Add user name selection.
   //
@@ -2090,12 +2090,12 @@ AddUserSelection (
 
 /**
   Identify the user whose identity policy does not contain the operator 'OR'.
-  
+
   @param[in]  User             Points to the user profile.
 
   @retval EFI_SUCCESS          The specified user is identified successfully.
   @retval Others               Fail to identify the user.
-  
+
 **/
 EFI_STATUS
 IdentifyAndTypeUser (
@@ -2118,7 +2118,7 @@ IdentifyAndTypeUser (
     return Status;
   }
   ASSERT (IdentifyInfo != NULL);
-  
+
   //
   // Check each part of identification policy expression.
   //
@@ -2213,12 +2213,12 @@ IdentifyAndTypeUser (
 
 /**
   Identify the user whose identity policy does not contain the operator 'AND'.
-  
+
   @param[in]  User             Points to the user profile.
 
   @retval EFI_SUCCESS          The specified user is identified successfully.
   @retval Others               Fail to identify the user.
-  
+
 **/
 EFI_STATUS
 IdentifyOrTypeUser (
@@ -2244,7 +2244,7 @@ IdentifyOrTypeUser (
     return Status;
   }
   ASSERT (IdentifyInfo != NULL);
-  
+
   //
   // Initialize the container for dynamic opcodes.
   //
@@ -2354,16 +2354,16 @@ UserIdentifyManagerCallback (
       if (QuestionId != FORM_OPEN_QUESTION_ID) {
         return EFI_SUCCESS;
       }
-  
+
       //
       // Initialize the container for dynamic opcodes.
       //
       StartOpCodeHandle = HiiAllocateOpCodeHandle ();
       ASSERT (StartOpCodeHandle != NULL);
-  
+
       EndOpCodeHandle = HiiAllocateOpCodeHandle ();
       ASSERT (EndOpCodeHandle != NULL);
-  
+
       //
       // Create Hii Extend Label OpCode.
       //
@@ -2375,7 +2375,7 @@ UserIdentifyManagerCallback (
                                             );
       StartLabel->ExtendOpCode  = EFI_IFR_EXTEND_OP_LABEL;
       StartLabel->Number        = LABEL_USER_NAME;
-  
+
       EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (
                                           EndOpCodeHandle,
                                           &gEfiIfrTianoGuid,
@@ -2384,7 +2384,7 @@ UserIdentifyManagerCallback (
                                           );
       EndLabel->ExtendOpCode  = EFI_IFR_EXTEND_OP_LABEL;
       EndLabel->Number        = LABEL_END;
-  
+
       //
       // Add all the user profile in the user profile database.
       //
@@ -2392,7 +2392,7 @@ UserIdentifyManagerCallback (
         User = (USER_PROFILE_ENTRY *) mUserProfileDb->UserProfile[Index];
         AddUserSelection ((UINT16)(LABEL_USER_NAME + Index), User, StartOpCodeHandle);
       }
-  
+
       HiiUpdateForm (
         mCallbackInfo->HiiHandle, // HII handle
         &gUserIdentifyManagerGuid,// Formset GUID
@@ -2400,10 +2400,10 @@ UserIdentifyManagerCallback (
         StartOpCodeHandle,        // Label for where to insert opcodes
         EndOpCodeHandle           // Replace data
         );
-  
+
       HiiFreeOpCodeHandle (StartOpCodeHandle);
       HiiFreeOpCodeHandle (EndOpCodeHandle);
-  
+
       return EFI_SUCCESS;
     }
     break;
@@ -2415,7 +2415,7 @@ UserIdentifyManagerCallback (
   case EFI_BROWSER_ACTION_CHANGED:
     if (QuestionId >= LABEL_PROVIDER_NAME) {
       //
-      // QuestionId comes from the second Form (Select a Credential Provider if identity  
+      // QuestionId comes from the second Form (Select a Credential Provider if identity
       // policy is OR type). Identify the user by the selected provider.
       //
       Status = IdentifyByProviderId (mCurrentUser, &mProviderDb->Provider[QuestionId & 0xFFF]->Identifier);
@@ -2426,7 +2426,7 @@ UserIdentifyManagerCallback (
       return EFI_SUCCESS;
     }
     break;
-    
+
   case EFI_BROWSER_ACTION_CHANGING:
     //
     // QuestionId comes from the first Form (Select a user to identify).
@@ -2483,12 +2483,12 @@ UserIdentifyManagerCallback (
 
 /**
   This function construct user profile database from user data saved in the Flash.
-  If no user is found in Flash, add one default user "administrator" in the user 
+  If no user is found in Flash, add one default user "administrator" in the user
   profile database.
 
   @retval EFI_SUCCESS            Init user profile database successfully.
   @retval Others                 Fail to init user profile database.
-  
+
 **/
 EFI_STATUS
 InitUserProfileDb (
@@ -2522,7 +2522,7 @@ InitUserProfileDb (
   if (VarData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Get all user proifle entries.
   //
@@ -2532,9 +2532,9 @@ InitUserProfileDb (
     // Get variable name.
     //
     UnicodeSPrint (
-      VarName, 
+      VarName,
       sizeof (VarName),
-      L"User%04x", 
+      L"User%04x",
       Index
       );
     Index++;
@@ -2562,7 +2562,7 @@ InitUserProfileDb (
       }
       break;
     }
-    
+
     //
     // Check variable attributes.
     //
@@ -2570,7 +2570,7 @@ InitUserProfileDb (
       Status = gRT->SetVariable (VarName, &gUserIdentifyManagerGuid, VarAttr, 0, NULL);
       continue;
     }
-    
+
     //
     // Add user profile to the user profile database.
     //
@@ -2602,7 +2602,7 @@ InitUserProfileDb (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Check whether the user profile database is empty.
   //
@@ -2629,7 +2629,7 @@ InitProviderInfo (
   EFI_STATUS  Status;
   UINTN       HandleCount;
   EFI_HANDLE  *HandleBuf;
-  UINTN       Index; 
+  UINTN       Index;
 
   if (mProviderDb != NULL) {
     //
@@ -2658,8 +2658,8 @@ InitProviderInfo (
   // Get provider infomation.
   //
   mProviderDb = AllocateZeroPool (
-                  sizeof (CREDENTIAL_PROVIDER_INFO) - 
-                  sizeof (EFI_USER_CREDENTIAL2_PROTOCOL *) + 
+                  sizeof (CREDENTIAL_PROVIDER_INFO) -
+                  sizeof (EFI_USER_CREDENTIAL2_PROTOCOL *) +
                   HandleCount * sizeof (EFI_USER_CREDENTIAL2_PROTOCOL *)
                   );
   if (mProviderDb == NULL) {
@@ -2818,7 +2818,7 @@ InitFormBrowser (
 
   CallbackInfo->FormBrowser2  = FormBrowser2;
   CallbackInfo->DriverHandle  = NULL;
-  
+
   //
   // Install Device Path Protocol and Config Access protocol to driver handle.
   //
@@ -2892,7 +2892,7 @@ IdentifyAutoLogonUser (
     FreePool (Info);
     return Status;
   }
-  
+
   //
   // Find user with the specified user ID.
   //
@@ -2911,7 +2911,7 @@ IdentifyAutoLogonUser (
     //
     return EFI_NOT_READY;
   }
-  
+
   return Status;
 }
 
@@ -2920,22 +2920,22 @@ IdentifyAutoLogonUser (
   Check whether the given console is ready.
 
   @param[in]   ProtocolGuid   Points to the protocol guid of sonsole .
-  
+
   @retval TRUE     The given console is ready.
   @retval FALSE    The given console is not ready.
-  
+
 **/
 BOOLEAN
 CheckConsole (
-  EFI_GUID                     *ProtocolGuid  
+  EFI_GUID                     *ProtocolGuid
   )
 {
   EFI_STATUS                   Status;
   UINTN                        HandleCount;
   EFI_HANDLE                   *HandleBuf;
-  UINTN                        Index; 
+  UINTN                        Index;
   EFI_DEVICE_PATH_PROTOCOL     *DevicePath;
-  
+
   //
   // Try to find all the handle driver.
   //
@@ -2959,7 +2959,7 @@ CheckConsole (
       return TRUE;
     }
   }
-  FreePool (HandleBuf);  
+  FreePool (HandleBuf);
   return FALSE;
 }
 
@@ -2969,7 +2969,7 @@ CheckConsole (
 
   @retval TRUE     The console is ready.
   @retval FALSE    The console is not ready.
-  
+
 **/
 BOOLEAN
 IsConsoleReady (
@@ -2985,7 +2985,7 @@ IsConsoleReady (
     return FALSE;
     }
   }
-  
+
   return TRUE;
 }
 
@@ -3041,7 +3041,7 @@ IdentifyUser (
       return EFI_SUCCESS;
     }
   }
-  
+
   //
   // Find and login the default & AutoLogon user.
   //
@@ -3062,7 +3062,7 @@ IdentifyUser (
       }
     }
   }
-  
+
   if (!IsConsoleReady ()) {
     //
     // The console is still not ready for user selection.
@@ -3082,20 +3082,20 @@ IdentifyUser (
                                  NULL,
                                  NULL
                                  );
-  
+
   if (mIdentified) {
     *User = (USER_PROFILE_ENTRY *) mCurrentUser;
     UpdateUserInfo (*User);
     return EFI_SUCCESS;
   }
-  
+
   return EFI_ACCESS_DENIED;
 }
 
 
 /**
   An empty function to pass error checking of CreateEventEx ().
- 
+
   @param  Event         Event whose notification function is being invoked.
   @param  Context       Pointer to the notification function's context,
                         which is implementation-dependent.
@@ -3140,19 +3140,19 @@ SignalEventUserProfileChanged (
 /**
   Create a new user profile.
 
-  This function creates a new user profile with only a new user identifier attached and returns 
+  This function creates a new user profile with only a new user identifier attached and returns
   its handle. The user profile is non-volatile, but the handle User can change across reboots.
 
   @param[in]  This               Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
-  @param[out] User               On return, points to the new user profile handle. 
+  @param[out] User               On return, points to the new user profile handle.
                                  The user profile handle is unique only during this boot.
- 
+
   @retval EFI_SUCCESS            User profile was successfully created.
-  @retval EFI_ACCESS_DENIED      Current user does not have sufficient permissions to create a 
+  @retval EFI_ACCESS_DENIED      Current user does not have sufficient permissions to create a
                                  user profile.
   @retval EFI_UNSUPPORTED        Creation of new user profiles is not supported.
   @retval EFI_INVALID_PARAMETER  The User parameter is NULL.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -3175,7 +3175,7 @@ UserProfileCreate (
       return EFI_ACCESS_DENIED;
     }
   }
-  
+
   //
   // Create new user profile
   //
@@ -3191,14 +3191,14 @@ UserProfileCreate (
   Delete an existing user profile.
 
   @param[in] This                Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
-  @param[in] User                User profile handle. 
+  @param[in] User                User profile handle.
 
   @retval EFI_SUCCESS            User profile was successfully deleted.
   @retval EFI_ACCESS_DENIED      Current user does not have sufficient permissions to delete a user
                                  profile or there is only one user profile.
   @retval EFI_UNSUPPORTED        Deletion of new user profiles is not supported.
   @retval EFI_INVALID_PARAMETER  User does not refer to a valid user profile.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -3212,14 +3212,14 @@ UserProfileDelete (
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check the right of the current user.
   //
   if (!CheckCurrentUserAccessRight (EFI_USER_INFO_ACCESS_MANAGE)) {
     return EFI_ACCESS_DENIED;
   }
-  
+
   //
   // Delete user profile.
   //
@@ -3238,16 +3238,16 @@ UserProfileDelete (
 /**
   Enumerate all of the enrolled users on the platform.
 
-  This function returns the next enrolled user profile. To retrieve the first user profile handle,  
-  point User at a NULL. Each subsequent call will retrieve another user profile handle until there 
-  are no more, at which point User will point to NULL. 
+  This function returns the next enrolled user profile. To retrieve the first user profile handle,
+  point User at a NULL. Each subsequent call will retrieve another user profile handle until there
+  are no more, at which point User will point to NULL.
 
   @param[in]      This           Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
-  @param[in, out] User           On entry, points to the previous user profile handle or NULL to 
+  @param[in, out] User           On entry, points to the previous user profile handle or NULL to
                                  start enumeration. On exit, points to the next user profile handle
                                  or NULL if there are no more user profiles.
 
-  @retval EFI_SUCCESS            Next enrolled user profile successfully returned. 
+  @retval EFI_SUCCESS            Next enrolled user profile successfully returned.
   @retval EFI_ACCESS_DENIED      Next enrolled user profile was not successfully returned.
   @retval EFI_INVALID_PARAMETER  The User parameter is NULL.
 **/
@@ -3263,7 +3263,7 @@ UserProfileGetNext (
   if ((This == NULL) || (User == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Status = FindUserProfile ((USER_PROFILE_ENTRY **) User, TRUE, NULL);
   if (EFI_ERROR (Status)) {
     return EFI_ACCESS_DENIED;
@@ -3278,9 +3278,9 @@ UserProfileGetNext (
   @param[in]  This               Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
   @param[out] CurrentUser        On return, points to the current user profile handle.
 
-  @retval EFI_SUCCESS            Current user profile handle returned successfully. 
+  @retval EFI_SUCCESS            Current user profile handle returned successfully.
   @retval EFI_INVALID_PARAMETER  The CurrentUser parameter is NULL.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -3288,7 +3288,7 @@ UserProfileCurrent (
   IN CONST  EFI_USER_MANAGER_PROTOCOL           *This,
   OUT       EFI_USER_PROFILE_HANDLE             *CurrentUser
   )
-{  
+{
   //
   // Get current user profile.
   //
@@ -3306,8 +3306,8 @@ UserProfileCurrent (
 
   Identify the user and, if authenticated, returns the user handle and changes the current
   user profile. All user information marked as private in a previously selected profile
-  is no longer available for inspection. 
-  Whenever the current user profile is changed then the an event with the GUID 
+  is no longer available for inspection.
+  Whenever the current user profile is changed then the an event with the GUID
   EFI_EVENT_GROUP_USER_PROFILE_CHANGED is signaled.
 
   @param[in]  This               Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
@@ -3317,7 +3317,7 @@ UserProfileCurrent (
   @retval EFI_SUCCESS            User was successfully identified.
   @retval EFI_ACCESS_DENIED      User was not successfully identified.
   @retval EFI_INVALID_PARAMETER  The User parameter is NULL.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -3336,7 +3336,7 @@ UserProfileIdentify (
     *User = mCurrentUser;
     return EFI_SUCCESS;
   }
-  
+
   //
   // Identify user
   //
@@ -3344,7 +3344,7 @@ UserProfileIdentify (
   if (EFI_ERROR (Status)) {
     return EFI_ACCESS_DENIED;
   }
-  
+
   //
   // Publish the user info into the EFI system configuration table.
   //
@@ -3361,35 +3361,35 @@ UserProfileIdentify (
   Find a user using a user information record.
 
   This function searches all user profiles for the specified user information record.
-  The search starts with the user information record handle following UserInfo and 
+  The search starts with the user information record handle following UserInfo and
   continues until either the information is found or there are no more user profiles.
   A match occurs when the Info.InfoType field matches the user information record
   type and the user information record data matches the portion of Info.
 
   @param[in]      This           Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
-  @param[in, out] User           On entry, points to the previously returned user profile 
+  @param[in, out] User           On entry, points to the previously returned user profile
                                  handle, or NULL to start searching with the first user profile.
                                  On return, points to the user profile handle, or NULL if not
                                  found.
   @param[in, out] UserInfo       On entry, points to the previously returned user information
-                                 handle, or NULL to start searching with the first. On return, 
+                                 handle, or NULL to start searching with the first. On return,
                                  points to the user information handle of the user information
-                                 record, or NULL if not found. Can be NULL, in which case only 
-                                 one user information record per user can be returned. 
-  @param[in]      Info           Points to the buffer containing the user information to be 
-                                 compared to the user information record. If the user information 
-                                 record data is empty, then only the user information record type 
-                                 is compared. If InfoSize is 0, then the user information record 
+                                 record, or NULL if not found. Can be NULL, in which case only
+                                 one user information record per user can be returned.
+  @param[in]      Info           Points to the buffer containing the user information to be
+                                 compared to the user information record. If the user information
+                                 record data is empty, then only the user information record type
+                                 is compared. If InfoSize is 0, then the user information record
                                  must be empty.
 
-  @param[in]      InfoSize       The size of Info, in bytes. 
+  @param[in]      InfoSize       The size of Info, in bytes.
 
   @retval EFI_SUCCESS            User information was found. User points to the user profile
                                  handle, and UserInfo points to the user information handle.
-  @retval EFI_NOT_FOUND          User information was not found. User points to NULL, and  
+  @retval EFI_NOT_FOUND          User information was not found. User points to NULL, and
                                  UserInfo points to NULL.
-  @retval EFI_INVALID_PARAMETER  User is NULL. Or Info is NULL.                           
-  
+  @retval EFI_INVALID_PARAMETER  User is NULL. Or Info is NULL.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -3420,8 +3420,8 @@ UserProfileFind (
       return EFI_INVALID_PARAMETER;
     }
   }
-  Size = Info->InfoSize;  
-  
+  Size = Info->InfoSize;
+
   //
   // Find user profile accdoring to user information.
   //
@@ -3438,7 +3438,7 @@ UserProfileFind (
     }
     return EFI_NOT_FOUND;
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -3446,31 +3446,31 @@ UserProfileFind (
 /**
   Return information attached to the user.
 
-  This function returns user information. The format of the information is described in User 
-  Information. The function may return EFI_ACCESS_DENIED if the information is marked private 
-  and the handle specified by User is not the current user profile. The function may return 
-  EFI_ACCESS_DENIED if the information is marked protected and the information is associated 
+  This function returns user information. The format of the information is described in User
+  Information. The function may return EFI_ACCESS_DENIED if the information is marked private
+  and the handle specified by User is not the current user profile. The function may return
+  EFI_ACCESS_DENIED if the information is marked protected and the information is associated
   with a credential provider for which the user has not been authenticated.
 
   @param[in]      This           Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
-  @param[in]      User           Handle of the user whose profile will be retrieved. 
-  @param[in]      UserInfo       Handle of the user information data record.   
-  @param[out]     Info           On entry, points to a buffer of at least *InfoSize bytes. On exit,  
-                                 holds the user information. If the buffer is too small to hold the  
-                                 information, then EFI_BUFFER_TOO_SMALL is returned and InfoSize is 
-                                 updated to contain the number of bytes actually required. 
-  @param[in, out] InfoSize       On entry, points to the size of Info. On return, points to the size  
-                                 of the user information. 
+  @param[in]      User           Handle of the user whose profile will be retrieved.
+  @param[in]      UserInfo       Handle of the user information data record.
+  @param[out]     Info           On entry, points to a buffer of at least *InfoSize bytes. On exit,
+                                 holds the user information. If the buffer is too small to hold the
+                                 information, then EFI_BUFFER_TOO_SMALL is returned and InfoSize is
+                                 updated to contain the number of bytes actually required.
+  @param[in, out] InfoSize       On entry, points to the size of Info. On return, points to the size
+                                 of the user information.
 
   @retval EFI_SUCCESS            Information returned successfully.
-  @retval EFI_ACCESS_DENIED      The information about the specified user cannot be accessed by the 
+  @retval EFI_ACCESS_DENIED      The information about the specified user cannot be accessed by the
                                  current user.
-  @retval EFI_BUFFER_TOO_SMALL   The number of bytes specified by *InfoSize is too small to hold the 
+  @retval EFI_BUFFER_TOO_SMALL   The number of bytes specified by *InfoSize is too small to hold the
                                  returned data. The actual size required is returned in *InfoSize.
-  @retval EFI_NOT_FOUND          User does not refer to a valid user profile or UserInfo does not refer 
+  @retval EFI_NOT_FOUND          User does not refer to a valid user profile or UserInfo does not refer
                                  to a valid user info handle.
   @retval EFI_INVALID_PARAMETER  Info is NULL or InfoSize is NULL.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -3491,11 +3491,11 @@ UserProfileGetInfo (
   if ((*InfoSize != 0) && (Info == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if ((User == NULL) || (UserInfo == NULL)) {
     return EFI_NOT_FOUND;
   }
-  
+
   Status = GetUserInfo (User, UserInfo, Info, InfoSize, TRUE);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_BUFFER_TOO_SMALL) {
@@ -3510,32 +3510,32 @@ UserProfileGetInfo (
 /**
   Add or update user information.
 
-  This function changes user information.  If NULL is pointed to by UserInfo, then a new user 
-  information record is created and its handle is returned in UserInfo. Otherwise, the existing  
+  This function changes user information.  If NULL is pointed to by UserInfo, then a new user
+  information record is created and its handle is returned in UserInfo. Otherwise, the existing
   one is replaced.
-  If EFI_USER_INFO_IDENITTY_POLICY_RECORD is changed, it is the caller's responsibility to keep 
+  If EFI_USER_INFO_IDENITTY_POLICY_RECORD is changed, it is the caller's responsibility to keep
   it to be synced with the information on credential providers.
-  If EFI_USER_INFO_EXCLUSIVE is specified in Info and a user information record of the same 
+  If EFI_USER_INFO_EXCLUSIVE is specified in Info and a user information record of the same
   type already exists in the user profile, then EFI_ACCESS_DENIED will be returned and UserInfo
   will point to the handle of the existing record.
 
   @param[in]      This            Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
-  @param[in]      User            Handle of the user whose profile will be retrieved. 
-  @param[in, out] UserInfo        Handle of the user information data record.   
-  @param[in]      Info            On entry, points to a buffer of at least *InfoSize bytes. On exit, 
-                                  holds the user information. If the buffer is too small to hold the 
-                                  information, then EFI_BUFFER_TOO_SMALL is returned and InfoSize is 
-                                  updated to contain the number of bytes actually required. 
-  @param[in]      InfoSize        On entry, points to the size of Info. On return, points to the size 
-                                  of the user information. 
+  @param[in]      User            Handle of the user whose profile will be retrieved.
+  @param[in, out] UserInfo        Handle of the user information data record.
+  @param[in]      Info            On entry, points to a buffer of at least *InfoSize bytes. On exit,
+                                  holds the user information. If the buffer is too small to hold the
+                                  information, then EFI_BUFFER_TOO_SMALL is returned and InfoSize is
+                                  updated to contain the number of bytes actually required.
+  @param[in]      InfoSize        On entry, points to the size of Info. On return, points to the size
+                                  of the user information.
 
   @retval EFI_SUCCESS             Information returned successfully.
   @retval EFI_ACCESS_DENIED       The record is exclusive.
-  @retval EFI_SECURITY_VIOLATION  The current user does not have permission to change the specified 
+  @retval EFI_SECURITY_VIOLATION  The current user does not have permission to change the specified
                                   user profile or user information record.
-  @retval EFI_NOT_FOUND           User does not refer to a valid user profile or UserInfo does not  
+  @retval EFI_NOT_FOUND           User does not refer to a valid user profile or UserInfo does not
                                   refer to a valid user info handle.
-  @retval EFI_INVALID_PARAMETER   UserInfo is NULL or Info is NULL. 
+  @retval EFI_INVALID_PARAMETER   UserInfo is NULL or Info is NULL.
 **/
 EFI_STATUS
 EFIAPI
@@ -3552,7 +3552,7 @@ UserProfileSetInfo (
   if ((This == NULL) || (User == NULL) || (UserInfo == NULL) || (Info == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check the right of the current user.
   //
@@ -3564,7 +3564,7 @@ UserProfileSetInfo (
         //
         return EFI_SECURITY_VIOLATION;
       }
-      
+
       if (!CheckCurrentUserAccessRight (EFI_USER_INFO_ACCESS_ENROLL_OTHERS)) {
         //
         // Can't add info into other profiles.
@@ -3584,14 +3584,14 @@ UserProfileSetInfo (
       }
     }
   }
-  
+
   //
   // Modify user information.
   //
   Status = ModifyUserInfo (User, (EFI_USER_INFO **) UserInfo, Info, InfoSize);
   if (EFI_ERROR (Status)) {
     if (Status == EFI_ACCESS_DENIED) {
-      return EFI_ACCESS_DENIED;      
+      return EFI_ACCESS_DENIED;
     }
     return EFI_SECURITY_VIOLATION;
   }
@@ -3602,25 +3602,25 @@ UserProfileSetInfo (
 /**
   Called by credential provider to notify of information change.
 
-  This function allows the credential provider to notify the User Identity Manager when user status  
+  This function allows the credential provider to notify the User Identity Manager when user status
   has changed.
-  If the User Identity Manager doesn't support asynchronous changes in credentials, then this function 
-  should return EFI_UNSUPPORTED. 
-  If current user does not exist, and the credential provider can identify a user, then make the user 
+  If the User Identity Manager doesn't support asynchronous changes in credentials, then this function
+  should return EFI_UNSUPPORTED.
+  If current user does not exist, and the credential provider can identify a user, then make the user
   to be current user and signal the EFI_EVENT_GROUP_USER_PROFILE_CHANGED event.
-  If current user already exists, and the credential provider can identify another user, then switch 
+  If current user already exists, and the credential provider can identify another user, then switch
   current user to the newly identified user, and signal the EFI_EVENT_GROUP_USER_PROFILE_CHANGED event.
-  If current user was identified by this credential provider and now the credential provider cannot identify 
+  If current user was identified by this credential provider and now the credential provider cannot identify
   current user, then logout current user and signal the EFI_EVENT_GROUP_USER_PROFILE_CHANGED event.
 
   @param[in] This          Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
-  @param[in] Changed       Handle on which is installed an instance of the EFI_USER_CREDENTIAL2_PROTOCOL 
+  @param[in] Changed       Handle on which is installed an instance of the EFI_USER_CREDENTIAL2_PROTOCOL
                            where the user has changed.
 
   @retval EFI_SUCCESS      The User Identity Manager has handled the notification.
   @retval EFI_NOT_READY    The function was called while the specified credential provider was not selected.
   @retval EFI_UNSUPPORTED  The User Identity Manager doesn't support asynchronous notifications.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -3628,7 +3628,7 @@ UserProfileNotify (
   IN CONST  EFI_USER_MANAGER_PROTOCOL           *This,
   IN        EFI_HANDLE                          Changed
   )
-{    
+{
   return EFI_UNSUPPORTED;
 }
 
@@ -3644,8 +3644,8 @@ UserProfileNotify (
 
   @retval EFI_SUCCESS        User information deleted successfully.
   @retval EFI_NOT_FOUND      User information record UserInfo does not exist in the user profile.
-  @retval EFI_ACCESS_DENIED  The current user does not have permission to delete this user information. 
-  
+  @retval EFI_ACCESS_DENIED  The current user does not have permission to delete this user information.
+
 **/
 EFI_STATUS
 EFIAPI
@@ -3660,7 +3660,7 @@ UserProfileDeleteInfo (
   if (This == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Check the right of the current user.
   //
@@ -3669,7 +3669,7 @@ UserProfileDeleteInfo (
       return EFI_ACCESS_DENIED;
     }
   }
-  
+
   //
   // Delete user information.
   //
@@ -3679,7 +3679,7 @@ UserProfileDeleteInfo (
       return EFI_NOT_FOUND;
     }
     return EFI_ACCESS_DENIED;
-  } 
+  }
   return EFI_SUCCESS;
 }
 
@@ -3687,10 +3687,10 @@ UserProfileDeleteInfo (
 /**
   Enumerate user information of all the enrolled users on the platform.
 
-  This function returns the next user information record. To retrieve the first user   
-  information record handle, point UserInfo at a NULL. Each subsequent call will retrieve 
-  another user information record handle until there are no more, at which point UserInfo 
-  will point to NULL. 
+  This function returns the next user information record. To retrieve the first user
+  information record handle, point UserInfo at a NULL. Each subsequent call will retrieve
+  another user information record handle until there are no more, at which point UserInfo
+  will point to NULL.
 
   @param[in]      This           Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
   @param[in]      User           Handle of the user whose information will be deleted.
@@ -3699,7 +3699,7 @@ UserProfileDeleteInfo (
   @retval EFI_SUCCESS            User information returned.
   @retval EFI_NOT_FOUND          No more user information found.
   @retval EFI_INVALID_PARAMETER  UserInfo is NULL.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -3757,7 +3757,7 @@ UserIdentifyManagerInit (
                   EFI_NATIVE_INTERFACE,
                   &gUserIdentifyManager
                   );
-  ASSERT_EFI_ERROR (Status);  
+  ASSERT_EFI_ERROR (Status);
 
   LoadDeferredImageInit (ImageHandle);
   return EFI_SUCCESS;

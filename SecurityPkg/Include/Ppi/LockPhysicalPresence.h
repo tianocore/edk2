@@ -1,15 +1,15 @@
 /** @file
-  This file defines the lock physical Presence PPI. This PPI is 
-  produced by a platform specific PEIM and consumed by the TPM 
+  This file defines the lock physical Presence PPI. This PPI is
+  produced by a platform specific PEIM and consumed by the TPM
   PEIM.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -18,7 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __PEI_LOCK_PHYSICAL_PRESENCE_H__
 
 ///
-/// Global ID for the PEI_LOCK_PHYSICAL_PRESENCE_PPI_GUID.  
+/// Global ID for the PEI_LOCK_PHYSICAL_PRESENCE_PPI_GUID.
 ///
 #define PEI_LOCK_PHYSICAL_PRESENCE_PPI_GUID  \
   { \
@@ -46,9 +46,9 @@ BOOLEAN
 );
 
 ///
-/// This service abstracts TPM physical presence lock interface. It is necessary for  
-/// safety to convey this information to the TPM driver so that TPM physical presence  
-/// can be locked as early as possible. This PPI is produced by a platform specific 
+/// This service abstracts TPM physical presence lock interface. It is necessary for
+/// safety to convey this information to the TPM driver so that TPM physical presence
+/// can be locked as early as possible. This PPI is produced by a platform specific
 /// PEIM and consumed by the TPM PEIM.
 ///
 struct _PEI_LOCK_PHYSICAL_PRESENCE_PPI {

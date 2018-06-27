@@ -7,13 +7,13 @@
 
   Tpm2ExecutePendingTpmRequest() will receive untrusted input and do validation.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -109,7 +109,7 @@ Done:
   Change EPS.
 
   @param[in]  PlatformAuth      platform auth value. NULL means no platform auth change.
-  
+
   @retval EFI_SUCCESS Operation completed successfully.
 **/
 EFI_STATUS
@@ -145,9 +145,9 @@ Tpm2CommandChangeEps (
   @param[in]      CommandCode         Physical presence operation value.
   @param[in]      CommandParameter    Physical presence operation parameter.
   @param[in, out] PpiFlags            The physical presence interface flags.
-  
+
   @retval TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE   Unknown physical presence operation.
-  @retval TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE   Error occurred during sending command to TPM or 
+  @retval TCG_PP_OPERATION_RESPONSE_BIOS_FAILURE   Error occurred during sending command to TPM or
                                                    receiving response from TPM.
   @retval Others                                   Return code from the TPM device after command execution.
 **/
@@ -274,8 +274,8 @@ Tcg2ReadUserKey (
   EFI_STATUS                        Status;
   EFI_INPUT_KEY                     Key;
   UINT16                            InputKey;
-      
-  InputKey = 0; 
+
+  InputKey = 0;
   do {
     Status = gBS->CheckEvent (gST->ConIn->WaitForKey);
     if (!EFI_ERROR (Status)) {
@@ -289,13 +289,13 @@ Tcg2ReadUserKey (
       if ((Key.ScanCode == SCAN_F12) && CautionKey) {
         InputKey = Key.ScanCode;
       }
-    }      
+    }
   } while (InputKey == 0);
 
   if (InputKey != SCAN_ESC) {
     return TRUE;
   }
-  
+
   return FALSE;
 }
 
@@ -364,7 +364,7 @@ Tcg2UserConfirm (
 {
   CHAR16                            *ConfirmText;
   CHAR16                            *TmpStr1;
-  CHAR16                            *TmpStr2; 
+  CHAR16                            *TmpStr2;
   UINTN                             BufSize;
   BOOLEAN                           CautionKey;
   BOOLEAN                           NoPpiInfo;
@@ -376,7 +376,7 @@ Tcg2UserConfirm (
   EFI_TCG2_BOOT_SERVICE_CAPABILITY  ProtocolCapability;
   UINT32                            CurrentPCRBanks;
   EFI_STATUS                        Status;
-  
+
   TmpStr2     = NULL;
   CautionKey  = FALSE;
   NoPpiInfo   = FALSE;
@@ -403,7 +403,7 @@ Tcg2UserConfirm (
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CLEAR));
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), L" \n\n", (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
-      FreePool (TmpStr1);      
+      FreePool (TmpStr1);
 
       break;
 
@@ -423,7 +423,7 @@ Tcg2UserConfirm (
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CLEAR));
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), L" \n\n", (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
-      FreePool (TmpStr1); 
+      FreePool (TmpStr1);
 
       break;
 
@@ -453,11 +453,11 @@ Tcg2UserConfirm (
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_SET_PCR_BANKS_1));
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
-      FreePool (TmpStr1);      
+      FreePool (TmpStr1);
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_SET_PCR_BANKS_2));
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
-      FreePool (TmpStr1);      
+      FreePool (TmpStr1);
 
       Tcg2FillBufferWithBootHashAlg (TempBuffer, sizeof(TempBuffer), TpmPpCommandParameter);
       Tcg2FillBufferWithBootHashAlg (TempBuffer2, sizeof(TempBuffer2), CurrentPCRBanks);
@@ -468,7 +468,7 @@ Tcg2UserConfirm (
 
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), L" \n", (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
-      FreePool (TmpStr1);      
+      FreePool (TmpStr1);
 
       break;
 
@@ -482,11 +482,11 @@ Tcg2UserConfirm (
 
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CHANGE_EPS_1));
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
-      FreePool (TmpStr1);      
-      
+      FreePool (TmpStr1);
+
       TmpStr1 = Tcg2PhysicalPresenceGetStringById (STRING_TOKEN (TPM_WARNING_CHANGE_EPS_2));
       StrnCatS (ConfirmText, BufSize / sizeof (CHAR16), TmpStr1, (BufSize / sizeof (CHAR16)) - StrLen (ConfirmText) - 1);
-      FreePool (TmpStr1);      
+      FreePool (TmpStr1);
 
       break;
 
@@ -571,10 +571,10 @@ Tcg2UserConfirm (
 
   DstStr[80] = L'\0';
   for (Index = 0; Index < StrLen (ConfirmText); Index += 80) {
-    StrnCpyS (DstStr, sizeof (DstStr) / sizeof (CHAR16), ConfirmText + Index, sizeof (DstStr) / sizeof (CHAR16) - 1);    
-    Print (DstStr);    
+    StrnCpyS (DstStr, sizeof (DstStr) / sizeof (CHAR16), ConfirmText + Index, sizeof (DstStr) / sizeof (CHAR16) - 1);
+    Print (DstStr);
   }
-  
+
   FreePool (TmpStr1);
   FreePool (TmpStr2);
   FreePool (ConfirmText);
@@ -584,17 +584,17 @@ Tcg2UserConfirm (
     return TRUE;
   }
 
-  return FALSE;  
+  return FALSE;
 }
 
 /**
-  Check if there is a valid physical presence command request. Also updates parameter value 
+  Check if there is a valid physical presence command request. Also updates parameter value
   to whether the requested physical presence command already confirmed by user
- 
-   @param[in]  TcgPpData                 EFI Tcg2 Physical Presence request data. 
+
+   @param[in]  TcgPpData                 EFI Tcg2 Physical Presence request data.
    @param[in]  Flags                     The physical presence interface flags.
    @param[out] RequestConfirmed          If the physical presence operation command required user confirm from UI.
-                                           True, it indicates the command doesn't require user confirm, or already confirmed 
+                                           True, it indicates the command doesn't require user confirm, or already confirmed
                                                  in last boot cycle by user.
                                            False, it indicates the command need user confirm from UI.
 
@@ -657,7 +657,7 @@ Tcg2HaveValidTpmRequest  (
         *RequestConfirmed = TRUE;
       }
       break;
-      
+
     case TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS:
       *RequestConfirmed = TRUE;
       break;
@@ -778,7 +778,7 @@ Tcg2ExecutePendingTpmRequest (
   } else {
     if (!RequestConfirmed) {
       //
-      // Print confirm text and wait for approval. 
+      // Print confirm text and wait for approval.
       //
       RequestConfirmed = Tcg2UserConfirm (TcgPpData->PPRequest, TcgPpData->PPRequestParameter);
     }
@@ -791,8 +791,8 @@ Tcg2ExecutePendingTpmRequest (
     if (RequestConfirmed) {
       TcgPpData->PPResponse = Tcg2ExecutePhysicalPresence (
                                 PlatformAuth,
-                                TcgPpData->PPRequest, 
-                                TcgPpData->PPRequestParameter, 
+                                TcgPpData->PPRequest,
+                                TcgPpData->PPRequestParameter,
                                 &NewFlags
                                 );
     }
@@ -809,7 +809,7 @@ Tcg2ExecutePendingTpmRequest (
                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                       sizeof (EFI_TCG2_PHYSICAL_PRESENCE_FLAGS),
                       &NewFlags
-                      ); 
+                      );
   }
 
   //
@@ -817,7 +817,7 @@ Tcg2ExecutePendingTpmRequest (
   //
   if ((NewFlags.PPFlags & TCG2_LIB_PP_FLAG_RESET_TRACK) == 0) {
     TcgPpData->LastPPRequest = TcgPpData->PPRequest;
-    TcgPpData->PPRequest = TCG2_PHYSICAL_PRESENCE_NO_ACTION;    
+    TcgPpData->PPRequest = TCG2_PHYSICAL_PRESENCE_NO_ACTION;
     TcgPpData->PPRequestParameter = 0;
   }
 
@@ -879,19 +879,19 @@ Tcg2ExecutePendingTpmRequest (
 
   Print (L"Rebooting system to make TPM2 settings in effect\n");
   gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
-  ASSERT (FALSE);  
+  ASSERT (FALSE);
 }
 
 /**
   Check and execute the pending TPM request.
 
-  The TPM request may come from OS or BIOS. This API will display request information and wait 
+  The TPM request may come from OS or BIOS. This API will display request information and wait
   for user confirmation if TPM request exists. The TPM request will be sent to TPM device after
-  the TPM request is confirmed, and one or more reset may be required to make TPM request to 
+  the TPM request is confirmed, and one or more reset may be required to make TPM request to
   take effect.
-  
+
   This API should be invoked after console in and console out are all ready as they are required
-  to display request information and get user input to confirm the request.  
+  to display request information and get user input to confirm the request.
 
   @param[in]  PlatformAuth                   platform auth value. NULL means no platform auth change.
 **/
@@ -908,7 +908,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  PpiFlags;
 
   //
-  // This flags variable controls whether physical presence is required for TPM command. 
+  // This flags variable controls whether physical presence is required for TPM command.
   // It should be protected from malicious software. We set it as read-only variable here.
   //
   Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **)&VariableLockProtocol);
@@ -923,7 +923,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
       ASSERT_EFI_ERROR (Status);
     }
   }
-  
+
   //
   // Check S4 resume
   //
@@ -958,7 +958,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
     }
     DEBUG((DEBUG_INFO, "[TPM2] Initial physical presence flags value is 0x%x\n", PpiFlags.PPFlags));
   }
-  
+
   //
   // Initialize physical presence variable.
   //
@@ -990,7 +990,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
 
   //
   // Execute pending TPM request.
-  //  
+  //
   Tcg2ExecutePendingTpmRequest (PlatformAuth, &TcgPpData, &PpiFlags);
   DEBUG ((EFI_D_INFO, "[TPM2] PPResponse = %x (LastPPRequest=%x, Flags=%x)\n", TcgPpData.PPResponse, TcgPpData.LastPPRequest, PpiFlags.PPFlags));
 
@@ -1001,7 +1001,7 @@ Tcg2PhysicalPresenceLibProcessRequest (
 
   The TPM request may come from OS. This API will check if TPM request exists and need user
   input to confirmation.
-  
+
   @retval    TRUE        TPM needs input to confirm user physical presence.
   @retval    FALSE       TPM doesn't need input to confirm user physical presence.
 
@@ -1052,7 +1052,7 @@ Tcg2PhysicalPresenceLibNeedUserConfirm(
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
-  
+
   if (TcgPpData.PPRequest == TCG2_PHYSICAL_PRESENCE_NO_ACTION) {
     //
     // No operation request
@@ -1097,7 +1097,7 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
   EFI_STATUS                        Status;
   UINTN                             DataSize;
   EFI_TCG2_PHYSICAL_PRESENCE        PpData;
-  
+
   DEBUG ((EFI_D_INFO, "[TPM2] ReturnOperationResponseToOsFunction\n"));
 
   //
@@ -1117,7 +1117,7 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
     DEBUG ((EFI_D_ERROR, "[TPM2] Get PP variable failure! Status = %r\n", Status));
     return TCG_PP_RETURN_TPM_OPERATION_RESPONSE_FAILURE;
   }
-  
+
   *MostRecentRequest = PpData.LastPPRequest;
   *Response          = PpData.PPResponse;
 
@@ -1130,7 +1130,7 @@ Tcg2PhysicalPresenceLibReturnOperationResponseToOsFunction (
   Submit TPM Operation Request to Pre-OS Environment 2.
 
   Caution: This function may receive untrusted input.
-  
+
   @param[in]      OperationRequest TPM physical presence operation request.
   @param[in]      RequestParameter TPM physical presence operation request parameter.
 
@@ -1148,9 +1148,9 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
   UINTN                             DataSize;
   EFI_TCG2_PHYSICAL_PRESENCE        PpData;
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  Flags;
-  
+
   DEBUG ((EFI_D_INFO, "[TPM2] SubmitRequestToPreOSFunction, Request = %x, %x\n", OperationRequest, RequestParameter));
-  
+
   //
   // Get the Physical Presence variable
   //
@@ -1184,7 +1184,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
                     DataSize,
                     &PpData
                     );
-    if (EFI_ERROR (Status)) { 
+    if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "[TPM2] Set PP variable failure! Status = %r\n", Status));
       return TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
     }

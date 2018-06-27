@@ -1,7 +1,7 @@
 /** @file
   String definitions for Secure Boot Configuration form.
 
-Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -98,7 +98,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string STR_SECURE_BOOT_ENROLL_PK_FILE     #language en-US "Enroll PK Using File"
 
 #string STR_DELETE_PK                      #language en-US "Delete Pk"
-#string STR_DELETE_PK_HELP	               #language en-US "Choose to Delete PK, Otherwise keep the PK"
+#string STR_DELETE_PK_HELP                 #language en-US "Choose to Delete PK, Otherwise keep the PK"
 
 #string STR_ENROLL_PK_TITLE                #language en-US "Enroll PK"
 
@@ -106,7 +106,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #string STR_ENROLL_KEK_HELP                #language en-US "Enter into Enroll KEK Form"
 
 #string STR_DELETE_KEK                     #language en-US "Delete KEK"
-#string STR_DELETE_KEK_HELP	               #language en-US "Enter into Delete KEK Form"
+#string STR_DELETE_KEK_HELP                 #language en-US "Enter into Delete KEK Form"
 
 #string STR_ENROLL_KEK_TITLE                #language en-US "Enroll KEK"
 #string STR_DELETE_KEK_TITLE                #language en-US "Delete KEK"

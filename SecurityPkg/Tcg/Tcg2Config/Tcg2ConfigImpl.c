@@ -4,12 +4,12 @@
 
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -53,7 +53,7 @@ HII_VENDOR_DEVICE_PATH          mTcg2HiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -66,7 +66,7 @@ UINT8  mCurrentPpRequest;
   Return if PTP CRB is supported.
 
   @param[in] Register                Pointer to PTP register.
-  
+
   @retval TRUE  PTP CRB is supported.
   @retval FALSE PTP CRB is unsupported.
 **/
@@ -94,7 +94,7 @@ IsPtpCrbSupported (
   Return if PTP FIFO is supported.
 
   @param[in] Register                Pointer to PTP register.
-  
+
   @retval TRUE  PTP FIFO is supported.
   @retval FALSE PTP FIFO is unsupported.
 **/
@@ -124,7 +124,7 @@ IsPtpFifoSupported (
 
   @param[in] Register                Pointer to PTP register.
   @param[in] PtpInterface            PTP interface type.
-  
+
   @retval EFI_SUCCESS                PTP interface type is set.
   @retval EFI_INVALID_PARAMETER      PTP interface type is invalid.
   @retval EFI_UNSUPPORTED            PTP interface type is unsupported.
@@ -299,7 +299,7 @@ SaveTcg2PCRBanksRequest (
   } else {
     mTcg2ConfigPrivateDate->PCRBanksDesired &= ~(0x1 << PCRBankIndex);
   }
-  
+
   ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS, mTcg2ConfigPrivateDate->PCRBanksDesired);
   if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
     Status = EFI_SUCCESS;
@@ -580,7 +580,7 @@ Tcg2Callback (
       }
     }
   }
-  
+
   if (Action == EFI_BROWSER_ACTION_CHANGED) {
     if (QuestionId == KEY_TPM_DEVICE) {
       return EFI_SUCCESS;
@@ -829,11 +829,11 @@ InstallTcg2ConfigForm (
            &gEfiHiiConfigAccessProtocolGuid,
            ConfigAccess,
            NULL
-           );  
+           );
 
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   PrivateData->HiiHandle = HiiHandle;
 
   //
@@ -962,7 +962,7 @@ InstallTcg2ConfigForm (
     DEBUG ((EFI_D_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_STORAGE_INFO_NAME\n"));
   }
 
-  return EFI_SUCCESS;  
+  return EFI_SUCCESS;
 }
 
 /**
@@ -998,6 +998,6 @@ UninstallTcg2ConfigForm (
            );
     PrivateData->DriverHandle = NULL;
   }
-  
+
   FreePool (PrivateData);
 }

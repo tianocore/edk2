@@ -2,13 +2,13 @@
   Implement authentication services for the authenticated variable
   service in UEFI2.2.
 
-Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -61,13 +61,13 @@ AutenticatedVariableServiceInitialize (
   mVariableModuleGlobal->HashContext[Physical] = AllocateRuntimePool (CtxSize);
   ASSERT (mVariableModuleGlobal->HashContext[Physical] != NULL);
   //
-  // Check "AuthVarKeyDatabase" variable's existence. 
-  // If it doesn't exist, create a new one with initial value of 0 and EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set. 
+  // Check "AuthVarKeyDatabase" variable's existence.
+  // If it doesn't exist, create a new one with initial value of 0 and EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
   //
   Status = FindVariable (
-             mVariableModuleGlobal->VariableName[Physical][VAR_AUTH_KEY_DB], 
-             &gEfiAuthenticatedVariableGuid, 
-             &Variable, 
+             mVariableModuleGlobal->VariableName[Physical][VAR_AUTH_KEY_DB],
+             &gEfiAuthenticatedVariableGuid,
+             &Variable,
              &mVariableModuleGlobal->VariableGlobal[Physical],
              mVariableModuleGlobal->FvbInstance
              );
@@ -96,10 +96,10 @@ AutenticatedVariableServiceInitialize (
     // Load database in global variable for cache.
     //
     Valid = IsValidVariableHeader (
-              Variable.CurrPtr, 
-              Variable.Volatile, 
-              &mVariableModuleGlobal->VariableGlobal[Physical], 
-              mVariableModuleGlobal->FvbInstance, 
+              Variable.CurrPtr,
+              Variable.Volatile,
+              &mVariableModuleGlobal->VariableGlobal[Physical],
+              mVariableModuleGlobal->FvbInstance,
               &VariableHeader
               );
     ASSERT (Valid);
@@ -117,23 +117,23 @@ AutenticatedVariableServiceInitialize (
     mPubKeyNumber = (UINT32) (DataSize / EFI_CERT_TYPE_RSA2048_SIZE);
   }
   //
-  // Check "SetupMode" variable's existence. 
+  // Check "SetupMode" variable's existence.
   // If it doesn't exist, check PK database's existence to determine the value.
-  // Then create a new one with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set. 
+  // Then create a new one with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
   //
   Status = FindVariable (
-             mVariableModuleGlobal->VariableName[Physical][VAR_SETUP_MODE], 
-             &gEfiGlobalVariableGuid, 
-             &Variable, 
+             mVariableModuleGlobal->VariableName[Physical][VAR_SETUP_MODE],
+             &gEfiGlobalVariableGuid,
+             &Variable,
              &mVariableModuleGlobal->VariableGlobal[Physical],
              mVariableModuleGlobal->FvbInstance
              );
 
   if (Variable.CurrPtr == 0x0) {
     Status = FindVariable (
-               mVariableModuleGlobal->VariableName[Physical][VAR_PLATFORM_KEY], 
-               &gEfiGlobalVariableGuid, 
-               &Variable, 
+               mVariableModuleGlobal->VariableName[Physical][VAR_PLATFORM_KEY],
+               &gEfiGlobalVariableGuid,
+               &Variable,
                &mVariableModuleGlobal->VariableGlobal[Physical],
                mVariableModuleGlobal->FvbInstance
                );
@@ -169,13 +169,13 @@ AutenticatedVariableServiceInitialize (
       );
   }
   //
-  // Check "SignatureSupport" variable's existence. 
-  // If it doesn't exist, then create a new one with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set. 
+  // Check "SignatureSupport" variable's existence.
+  // If it doesn't exist, then create a new one with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
   //
   Status = FindVariable (
-             EFI_SIGNATURE_SUPPORT_NAME, 
-             &gEfiGlobalVariableGuid, 
-             &Variable, 
+             EFI_SIGNATURE_SUPPORT_NAME,
+             &gEfiGlobalVariableGuid,
+             &Variable,
              &mVariableModuleGlobal->VariableGlobal[Physical],
              mVariableModuleGlobal->FvbInstance
              );
@@ -364,7 +364,7 @@ VerifyDataPayload (
   //
   Rsa = RsaNew ();
   ASSERT (Rsa != NULL);
-  // 
+  //
   // Set RSA Key Components.
   // NOTE: Only N and E are needed to be set as RSA public key for signature verification.
   //
@@ -380,10 +380,10 @@ VerifyDataPayload (
   // Verify the signature.
   //
   Status = RsaPkcs1Verify (
-             Rsa, 
-             Digest, 
-             SHA256_DIGEST_SIZE, 
-             CertBlock->Signature, 
+             Rsa,
+             Digest,
+             SHA256_DIGEST_SIZE,
+             CertBlock->Signature,
              EFI_CERT_TYPE_RSA2048_SHA256_SIZE
              );
 
@@ -419,9 +419,9 @@ UpdatePlatformMode (
   UINT32                  VarAttr;
 
   Status = FindVariable (
-             Global->VariableName[VirtualMode][VAR_SETUP_MODE], 
-             Global->GlobalVariableGuid[VirtualMode], 
-             &Variable, 
+             Global->VariableName[VirtualMode][VAR_SETUP_MODE],
+             Global->GlobalVariableGuid[VirtualMode],
+             &Variable,
              &Global->VariableGlobal[VirtualMode],
              Global->FvbInstance
              );
@@ -459,8 +459,8 @@ UpdatePlatformMode (
   @param[in]  IsPk                        Indicates whether to process pk.
 
   @retval EFI_INVALID_PARAMETER           Invalid parameter.
-  @retval EFI_SECURITY_VIOLATION          The variable does NOT pass the validation 
-                                          check carried out by the firmware. 
+  @retval EFI_SECURITY_VIOLATION          The variable does NOT pass the validation
+                                          check carried out by the firmware.
   @retval EFI_SUCCESS                     The variable passed validation successfully.
 
 **/
@@ -507,10 +507,10 @@ ProcessVarWithPk (
 
     if (Variable->CurrPtr != 0x0) {
       Valid = IsValidVariableHeader (
-                Variable->CurrPtr, 
-                Variable->Volatile, 
-                &Global->VariableGlobal[VirtualMode], 
-                Global->FvbInstance, 
+                Variable->CurrPtr,
+                Variable->Volatile,
+                &Global->VariableGlobal[VirtualMode],
+                Global->FvbInstance,
                 &VariableHeader
                 );
       ASSERT (Valid);
@@ -526,9 +526,9 @@ ProcessVarWithPk (
     // Get platform key from variable.
     //
     Status = FindVariable (
-               Global->VariableName[VirtualMode][VAR_PLATFORM_KEY], 
-               Global->GlobalVariableGuid[VirtualMode], 
-               &PkVariable, 
+               Global->VariableName[VirtualMode][VAR_PLATFORM_KEY],
+               Global->GlobalVariableGuid[VirtualMode],
+               &PkVariable,
                &Global->VariableGlobal[VirtualMode],
                Global->FvbInstance
                );
@@ -548,14 +548,14 @@ ProcessVarWithPk (
     Status    = VerifyDataPayload (VirtualMode, Global, Data, DataSize, OldPkData->SignatureData);
     if (!EFI_ERROR (Status)) {
       Status = UpdateVariable (
-                 VariableName, 
-                 VendorGuid, 
-                 (UINT8*)Data + AUTHINFO_SIZE, 
-                 DataSize - AUTHINFO_SIZE, 
-                 Attributes, 
-                 0, 
-                 CertData->MonotonicCount, 
-                 VirtualMode, 
+                 VariableName,
+                 VendorGuid,
+                 (UINT8*)Data + AUTHINFO_SIZE,
+                 DataSize - AUTHINFO_SIZE,
+                 Attributes,
+                 0,
+                 CertData->MonotonicCount,
+                 VirtualMode,
                  Global,
                  Variable
                  );
@@ -596,8 +596,8 @@ ProcessVarWithPk (
   @param[in]  Attributes                  The attribute value of the variable.
 
   @retval EFI_INVALID_PARAMETER           Invalid parameter.
-  @retval EFI_SECURITY_VIOLATION          The variable did NOT pass the validation 
-                                          check carried out by the firmware. 
+  @retval EFI_SECURITY_VIOLATION          The variable did NOT pass the validation
+                                          check carried out by the firmware.
   @retval EFI_SUCCESS                     The variable passed validation successfully.
 
 **/
@@ -640,10 +640,10 @@ ProcessVarWithKek (
     CertBlock = (EFI_CERT_BLOCK_RSA_2048_SHA256 *) (CertData->AuthInfo.CertData);
     if (Variable->CurrPtr != 0x0) {
       Valid = IsValidVariableHeader (
-                Variable->CurrPtr, 
-                Variable->Volatile, 
-                &Global->VariableGlobal[VirtualMode], 
-                Global->FvbInstance, 
+                Variable->CurrPtr,
+                Variable->Volatile,
+                &Global->VariableGlobal[VirtualMode],
+                Global->FvbInstance,
                 &VariableHeader
                 );
       ASSERT (Valid);
@@ -659,9 +659,9 @@ ProcessVarWithKek (
     // Get KEK database from variable.
     //
     Status = FindVariable (
-               Global->VariableName[VirtualMode][VAR_KEY_EXCHANGE_KEY], 
-               Global->GlobalVariableGuid[VirtualMode], 
-               &KekVariable, 
+               Global->VariableName[VirtualMode][VAR_KEY_EXCHANGE_KEY],
+               Global->GlobalVariableGuid[VirtualMode],
+               &KekVariable,
                &Global->VariableGlobal[VirtualMode],
                Global->FvbInstance
                );
@@ -698,13 +698,13 @@ ProcessVarWithKek (
     Status = VerifyDataPayload (VirtualMode, Global, Data, DataSize, CertBlock->PublicKey);
     if (!EFI_ERROR (Status)) {
       Status = UpdateVariable (
-                 VariableName, 
-                 VendorGuid, 
-                 (UINT8*)Data + AUTHINFO_SIZE, 
-                 DataSize - AUTHINFO_SIZE, 
-                 Attributes, 
-                 0, 
-                 CertData->MonotonicCount, 
+                 VariableName,
+                 VendorGuid,
+                 (UINT8*)Data + AUTHINFO_SIZE,
+                 DataSize - AUTHINFO_SIZE,
+                 Attributes,
+                 0,
+                 CertData->MonotonicCount,
                  VirtualMode,
                  Global,
                  Variable
@@ -715,13 +715,13 @@ ProcessVarWithKek (
     // If in setup mode, no authentication needed.
     //
     Status = UpdateVariable (
-               VariableName, 
-               VendorGuid, 
-               Data, 
-               DataSize, 
-               Attributes, 
-               0, 
-               0, 
+               VariableName,
+               VendorGuid,
+               Data,
+               DataSize,
+               Attributes,
+               0,
+               0,
                VirtualMode,
                Global,
                Variable
@@ -748,8 +748,8 @@ ProcessVarWithKek (
   @retval EFI_WRITE_PROTECTED             The variable is write-protected and needs authentication with
                                           EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
   @retval EFI_SECURITY_VIOLATION          The variable is with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
-                                          set, but the AuthInfo does NOT pass the validation 
-                                          check carried out by the firmware. 
+                                          set, but the AuthInfo does NOT pass the validation
+                                          check carried out by the firmware.
   @retval EFI_SUCCESS                     The variable is not write-protected, or passed validation successfully.
 
 **/
@@ -789,10 +789,10 @@ VerifyVariable (
   ZeroMem (&VariableHeader, sizeof (AUTHENTICATED_VARIABLE_HEADER));
   if (Variable->CurrPtr != 0x0) {
     Valid = IsValidVariableHeader (
-              Variable->CurrPtr, 
-              Variable->Volatile, 
-              &Global->VariableGlobal[VirtualMode], 
-              Global->FvbInstance, 
+              Variable->CurrPtr,
+              Variable->Volatile,
+              &Global->VariableGlobal[VirtualMode],
+              Global->FvbInstance,
               &VariableHeader
               );
     ASSERT (Valid);
@@ -820,7 +820,7 @@ VerifyVariable (
       *KeyIndex   = VariableHeader.PubKeyIndex;
       IsFirstTime = FALSE;
     }
-  } else if (Valid && (VariableHeader.Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) { 
+  } else if (Valid && (VariableHeader.Attributes & EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS) != 0) {
       //
       // If the variable is already write-protected, it always needs authentication before update.
       //
@@ -864,7 +864,7 @@ VerifyVariable (
       //
       return EFI_SECURITY_VIOLATION;
     }
-  } 
+  }
   //
   // Verify the certificate in Data payload.
   //

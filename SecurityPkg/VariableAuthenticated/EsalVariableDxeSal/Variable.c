@@ -1,13 +1,13 @@
 /** @file
   The implementation of Extended SAL variable services.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -162,7 +162,7 @@ AccessVariableStore (
     if ((StartAddress + DataSize) > ((UINTN) ((UINT8 *) VolatileBase + VolatileBase->Size))) {
       return EFI_INVALID_PARAMETER;
     }
-    
+
     //
     // For volatile variable, a simple memory copy is enough.
     //
@@ -181,13 +181,13 @@ AccessVariableStore (
   Status = (EFI_STATUS) EsalCall (
                           EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO,
                           EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI,
-                          GetPhysicalAddressFunctionId, 
-                          Instance, 
-                          (UINT64) &FvVolHdr, 
-                          0, 
-                          0, 
-                          0, 
-                          0, 
+                          GetPhysicalAddressFunctionId,
+                          Instance,
+                          (UINT64) &FvVolHdr,
+                          0,
+                          0,
+                          0,
+                          0,
                           0
                           ).Status;
   ASSERT_EFI_ERROR (Status);
@@ -199,7 +199,7 @@ AccessVariableStore (
   if ((StartAddress + DataSize) > ((EFI_PHYSICAL_ADDRESS) (UINTN) ((CHAR8 *)VariableStoreHeader + VariableStoreHeader->Size))) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   LinearOffset  = (UINTN) FwVolHeader;
   CurrWritePtr  = StartAddress;
   CurrWriteSize = DataSize;
@@ -227,26 +227,26 @@ AccessVariableStore (
             Status = (EFI_STATUS) EsalCall (
                                     EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO,
                                     EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI,
-                                    WriteFunctionId, 
-                                    Instance, 
-                                    LbaNumber, 
-                                    (CurrWritePtr - LinearOffset), 
-                                    (UINT64) &CurrWriteSize, 
-                                    (UINT64) CurrBuffer, 
-                                    0, 
+                                    WriteFunctionId,
+                                    Instance,
+                                    LbaNumber,
+                                    (CurrWritePtr - LinearOffset),
+                                    (UINT64) &CurrWriteSize,
+                                    (UINT64) CurrBuffer,
+                                    0,
                                     0
                                     ).Status;
           } else {
             Status = (EFI_STATUS) EsalCall (
                                     EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO,
                                     EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI,
-                                    ReadFunctionId, 
-                                    Instance, 
-                                    LbaNumber, 
-                                    (CurrWritePtr - LinearOffset), 
-                                    (UINT64) &CurrWriteSize, 
-                                    (UINT64) CurrBuffer, 
-                                    0, 
+                                    ReadFunctionId,
+                                    Instance,
+                                    LbaNumber,
+                                    (CurrWritePtr - LinearOffset),
+                                    (UINT64) &CurrWriteSize,
+                                    (UINT64) CurrBuffer,
+                                    0,
                                     0
                                     ).Status;
           }
@@ -260,26 +260,26 @@ AccessVariableStore (
             Status = (EFI_STATUS) EsalCall (
                                     EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO,
                                     EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI,
-                                    WriteFunctionId, 
-                                    Instance, 
-                                    LbaNumber, 
-                                    (CurrWritePtr - LinearOffset), 
-                                    (UINT64) &Size, 
-                                    (UINT64) CurrBuffer, 
-                                    0, 
+                                    WriteFunctionId,
+                                    Instance,
+                                    LbaNumber,
+                                    (CurrWritePtr - LinearOffset),
+                                    (UINT64) &Size,
+                                    (UINT64) CurrBuffer,
+                                    0,
                                     0
                                     ).Status;
           } else {
             Status = (EFI_STATUS) EsalCall (
                                     EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO,
                                     EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI,
-                                    ReadFunctionId, 
-                                    Instance, 
-                                    LbaNumber, 
-                                    (CurrWritePtr - LinearOffset), 
-                                    (UINT64) &Size, 
-                                    (UINT64) CurrBuffer, 
-                                    0, 
+                                    ReadFunctionId,
+                                    Instance,
+                                    LbaNumber,
+                                    (CurrWritePtr - LinearOffset),
+                                    (UINT64) &Size,
+                                    (UINT64) CurrBuffer,
+                                    0,
                                     0
                                     ).Status;
           }
@@ -332,7 +332,7 @@ GetVarStoreHeader (
              Instance,
              VarStoreAddress,
              sizeof (VARIABLE_STORE_HEADER),
-             VarStoreHeader    
+             VarStoreHeader
              );
   ASSERT_EFI_ERROR (Status);
 }
@@ -372,7 +372,7 @@ IsValidVariableHeader (
              Instance,
              VariableAddress,
              sizeof (AUTHENTICATED_VARIABLE_HEADER),
-             &LocalVariableHeader    
+             &LocalVariableHeader
              );
 
   if (EFI_ERROR (Status) || LocalVariableHeader.StartId != VARIABLE_DATA) {
@@ -520,7 +520,7 @@ GetVariableNamePtr (
              Instance,
              Address,
              VariableHeader.NameSize,
-             VariableName    
+             VariableName
              );
   ASSERT_EFI_ERROR (Status);
 }
@@ -571,7 +571,7 @@ GetVariableDataPtr (
              Instance,
              Address,
              VariableHeader.DataSize,
-             VariableData    
+             VariableData
              );
   ASSERT_EFI_ERROR (Status);
 }
@@ -626,7 +626,7 @@ GetNextVariablePtr (
 /**
   Gets the pointer to the first variable header in given variable store area.
 
-  This function gets the pointer to the first variable header in given variable 
+  This function gets the pointer to the first variable header in given variable
   store area. The variable store area is given by its start address.
 
   @param[in] VarStoreHeaderAddress  Pointer to the header of variable store area.
@@ -675,7 +675,7 @@ GetEndPointer (
              Instance,
              VarStoreHeaderAddress,
              sizeof (VARIABLE_STORE_HEADER),
-             &VariableStoreHeader    
+             &VariableStoreHeader
              );
 
   ASSERT_EFI_ERROR (Status);
@@ -685,12 +685,12 @@ GetEndPointer (
 /**
   Updates variable info entry in EFI system table for statistical information.
 
-  Routine used to track statistical information about variable usage. 
+  Routine used to track statistical information about variable usage.
   The data is stored in the EFI system table so it can be accessed later.
-  VariableInfo.efi can dump out the table. Only Boot Services variable 
+  VariableInfo.efi can dump out the table. Only Boot Services variable
   accesses are tracked by this code. The PcdVariableCollectStatistics
-  build flag controls if this feature is enabled. 
-  A read that hits in the cache will have Read and Cache true for 
+  build flag controls if this feature is enabled.
+  A read that hits in the cache will have Read and Cache true for
   the transaction. Data is allocated by this routine, but never
   freed.
 
@@ -742,7 +742,7 @@ UpdateVariableInfo (
       gBS->InstallConfigurationTable (&gEfiAuthenticatedVariableGuid, gVariableInfo);
     }
 
-    
+
     for (Entry = gVariableInfo; Entry != NULL; Entry = Entry->Next) {
       if (CompareGuid (VendorGuid, &Entry->VendorGuid)) {
         if (StrCmp (VariableName, Entry->Name) == 0) {
@@ -826,7 +826,7 @@ UpdateVariableCache (
   //
   for (Index = 0, Entry = mVariableCache; Index < sizeof (mVariableCache)/sizeof (VARIABLE_CACHE_ENTRY); Index++, Entry++) {
     if (CompareGuid (VendorGuid, Entry->Guid)) {
-      if (StrCmp (VariableName, Entry->Name) == 0) { 
+      if (StrCmp (VariableName, Entry->Name) == 0) {
         Entry->Attributes = Attributes;
         if (DataSize == 0) {
           //
@@ -928,7 +928,7 @@ FindVariableInCache (
       }
     }
   }
-  
+
   return EFI_NOT_FOUND;
 }
 
@@ -1003,7 +1003,7 @@ FindVariable (
       Volatile = FALSE;
     }
     while (IsValidVariableHeader (Variable[Index], Volatile, Global, Instance, &VariableHeader)) {
-      if (VariableHeader.State == VAR_ADDED || 
+      if (VariableHeader.State == VAR_ADDED ||
           VariableHeader.State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
          ) {
         if (!EfiAtRuntime () || ((VariableHeader.Attributes & EFI_VARIABLE_RUNTIME_ACCESS) != 0)) {
@@ -1162,7 +1162,7 @@ Reclaim (
     //
     // Collect VAR_ADDED variables, and variables in delete transition status.
     //
-    if (VariableHeader.State == VAR_ADDED || 
+    if (VariableHeader.State == VAR_ADDED ||
         VariableHeader.State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)
        ) {
       VariableSize = NextVariable - Variable;
@@ -1173,9 +1173,9 @@ Reclaim (
   }
 
   //
-  // Reserve the 1 Bytes with Oxff to identify the 
-  // end of the variable buffer. 
-  // 
+  // Reserve the 1 Bytes with Oxff to identify the
+  // end of the variable buffer.
+  //
   MaximumBufferSize += 1;
   ValidBuffer = AllocatePool (MaximumBufferSize);
   if (ValidBuffer == NULL) {
@@ -1192,7 +1192,7 @@ Reclaim (
 
   //
   // Reinstall all ADDED variables
-  // 
+  //
   Variable = GetStartPointer (VariableBase);
   while (IsValidVariableHeader (Variable, IsVolatile, VariableGlobal, Instance, &VariableHeader)) {
     NextVariable = GetNextVariablePtr (Variable, IsVolatile, VariableGlobal, Instance);
@@ -1210,17 +1210,17 @@ Reclaim (
   }
   //
   // Reinstall in delete transition variables
-  // 
+  //
   Variable = GetStartPointer (VariableBase);
   while (IsValidVariableHeader (Variable, IsVolatile, VariableGlobal, Instance, &VariableHeader)) {
     NextVariable = GetNextVariablePtr (Variable, IsVolatile, VariableGlobal, Instance);
     if (VariableHeader.State == (VAR_IN_DELETED_TRANSITION & VAR_ADDED)) {
 
       //
-      // Buffer has cached all ADDED variable. 
+      // Buffer has cached all ADDED variable.
       // Per IN_DELETED variable, we have to guarantee that
-      // no ADDED one in previous buffer. 
-      // 
+      // no ADDED one in previous buffer.
+      //
       FoundAdded = FALSE;
       AddedVariable = GetStartPointer ((EFI_PHYSICAL_ADDRESS) ValidBuffer);
       while (IsValidVariableHeader (AddedVariable, IsVolatile, VariableGlobal, Instance, &AddedVariableHeader)) {
@@ -1327,7 +1327,7 @@ GetIndexFromSupportedLangCodes(
   IN  CHAR8            *SupportedLang,
   IN  CHAR8            *Lang,
   IN  BOOLEAN          Iso639Language
-  ) 
+  )
 {
   UINTN    Index;
   UINTN    CompareLength;
@@ -1362,8 +1362,8 @@ GetIndexFromSupportedLangCodes(
       // Determine the length of the next language code in SupportedLang
       //
       for (CompareLength = 0; SupportedLang[CompareLength] != '\0' && SupportedLang[CompareLength] != ';'; CompareLength++);
-      
-      if ((CompareLength == LanguageLength) && 
+
+      if ((CompareLength == LanguageLength) &&
           (AsciiStrnCmp (Lang, SupportedLang, CompareLength) == 0)) {
         //
         // Successfully find the index of Lang string in SupportedLang string.
@@ -1465,10 +1465,10 @@ GetLangFromSupportedLangCodes (
 }
 
 /**
-  Returns a pointer to an allocated buffer that contains the best matching language 
-  from a set of supported languages.  
-  
-  This function supports both ISO 639-2 and RFC 4646 language codes, but language 
+  Returns a pointer to an allocated buffer that contains the best matching language
+  from a set of supported languages.
+
+  This function supports both ISO 639-2 and RFC 4646 language codes, but language
   code types may not be mixed in a single call to this function. This function
   supports a variable argument list that allows the caller to pass in a prioritized
   list of language codes to test against all the language codes in SupportedLanguages.
@@ -1476,37 +1476,37 @@ GetLangFromSupportedLangCodes (
   If SupportedLanguages is NULL, then ASSERT().
 
   @param[in]  SupportedLanguages  A pointer to a Null-terminated ASCII string that
-                                  contains a set of language codes in the format 
+                                  contains a set of language codes in the format
                                   specified by Iso639Language.
   @param[in]  Iso639Language      If TRUE, then all language codes are assumed to be
                                   in ISO 639-2 format.  If FALSE, then all language
                                   codes are assumed to be in RFC 4646 language format.
   @param[in]  VirtualMode         Current calling mode for this function.
-  @param[in]  ...                 A variable argument list that contains pointers to 
+  @param[in]  ...                 A variable argument list that contains pointers to
                                   Null-terminated ASCII strings that contain one or more
                                   language codes in the format specified by Iso639Language.
                                   The first language code from each of these language
                                   code lists is used to determine if it is an exact or
-                                  close match to any of the language codes in 
+                                  close match to any of the language codes in
                                   SupportedLanguages.  Close matches only apply to RFC 4646
                                   language codes, and the matching algorithm from RFC 4647
-                                  is used to determine if a close match is present.  If 
+                                  is used to determine if a close match is present.  If
                                   an exact or close match is found, then the matching
                                   language code from SupportedLanguages is returned.  If
                                   no matches are found, then the next variable argument
-                                  parameter is evaluated.  The variable argument list 
+                                  parameter is evaluated.  The variable argument list
                                   is terminated by a NULL.
 
   @retval NULL   The best matching language could not be found in SupportedLanguages.
-  @retval NULL   There are not enough resources available to return the best matching 
+  @retval NULL   There are not enough resources available to return the best matching
                  language.
-  @retval Other  A pointer to a Null-terminated ASCII string that is the best matching 
+  @retval Other  A pointer to a Null-terminated ASCII string that is the best matching
                  language in SupportedLanguages.
 
 **/
 CHAR8 *
 VariableGetBestLanguage (
-  IN CONST CHAR8  *SupportedLanguages, 
+  IN CONST CHAR8  *SupportedLanguages,
   IN BOOLEAN      Iso639Language,
   IN BOOLEAN      VirtualMode,
   ...
@@ -1582,7 +1582,7 @@ VariableGetBestLanguage (
         LanguageLength = 0;
       } else {
         //
-        // If RFC 4646 mode, then trim Language from the right to the next '-' character 
+        // If RFC 4646 mode, then trim Language from the right to the next '-' character
         //
         for (LanguageLength--; LanguageLength > 0 && Language[LanguageLength] != '-'; LanguageLength--);
       }
@@ -1591,7 +1591,7 @@ VariableGetBestLanguage (
   VA_END (Args);
 
   //
-  // No matches were found 
+  // No matches were found
   //
   return NULL;
 }
@@ -1664,7 +1664,7 @@ AutoUpdateLangVariable(
     ASSERT (Global->PlatformLangCodes[VirtualMode] != NULL);
 
     //
-    // PlatformLang holds a single language from PlatformLangCodes, 
+    // PlatformLang holds a single language from PlatformLangCodes,
     // so the size of PlatformLangCodes is enough for the PlatformLang.
     //
     if (Global->PlatformLang[VirtualMode] != NULL) {
@@ -1694,7 +1694,7 @@ AutoUpdateLangVariable(
     ASSERT (Global->LangCodes[VirtualMode] != NULL);
   }
 
-  if (SetLanguageCodes 
+  if (SetLanguageCodes
       && (Global->PlatformLangCodes[VirtualMode] != NULL)
       && (Global->LangCodes[VirtualMode] != NULL)) {
     //
@@ -1732,7 +1732,7 @@ AutoUpdateLangVariable(
                (UINTN) &(((AUTHENTICATED_VARIABLE_HEADER *)Variable.CurrPtr)->DataSize),
                sizeof (DataSize),
                &DataSize
-               ); 
+               );
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -1811,15 +1811,15 @@ AutoUpdateLangVariable(
         FindVariable (PredefinedVariableName[VAR_PLATFORM_LANG], Global->GlobalVariableGuid[VirtualMode], &Variable, VariableGlobal, Instance);
 
         Status = UpdateVariable (
-                   PredefinedVariableName[VAR_PLATFORM_LANG], 
-                   Global->GlobalVariableGuid[VirtualMode], 
-                   BestPlatformLang, 
-                   AsciiStrSize (BestPlatformLang), 
-                   Attributes, 
+                   PredefinedVariableName[VAR_PLATFORM_LANG],
+                   Global->GlobalVariableGuid[VirtualMode],
+                   BestPlatformLang,
+                   AsciiStrSize (BestPlatformLang),
+                   Attributes,
                    0,
                    0,
-                   VirtualMode, 
-                   Global, 
+                   VirtualMode,
+                   Global,
                    &Variable
                    );
 
@@ -1831,7 +1831,7 @@ AutoUpdateLangVariable(
 }
 
 /**
-  Update the variable region with Variable information. These are the same 
+  Update the variable region with Variable information. These are the same
   arguments as the EFI Variable services.
 
   @param[in] VariableName       Name of variable.
@@ -1840,7 +1840,7 @@ AutoUpdateLangVariable(
   @param[in] DataSize           Size of data. 0 means delete.
   @param[in] Attributes         Attributes of the variable.
   @param[in] KeyIndex           Index of associated public key.
-  @param[in] MonotonicCount     Value of associated monotonic count. 
+  @param[in] MonotonicCount     Value of associated monotonic count.
   @param[in] VirtualMode        Current calling mode for this function.
   @param[in] Global             Context of this Extended SAL Variable Services Class call.
   @param[in] Variable           The variable information which is used to keep track of variable usage.
@@ -1856,7 +1856,7 @@ UpdateVariable (
   IN      EFI_GUID                *VendorGuid,
   IN      VOID                    *Data,
   IN      UINTN                   DataSize,
-  IN      UINT32                  Attributes OPTIONAL,  
+  IN      UINT32                  Attributes OPTIONAL,
   IN      UINT32                  KeyIndex  OPTIONAL,
   IN      UINT64                  MonotonicCount  OPTIONAL,
   IN      BOOLEAN                 VirtualMode,
@@ -1898,11 +1898,11 @@ UpdateVariable (
     // Update/Delete existing variable
     //
     Volatile = Variable->Volatile;
-    
-    if (EfiAtRuntime ()) {        
+
+    if (EfiAtRuntime ()) {
       //
-      // If EfiAtRuntime and the variable is Volatile and Runtime Access,  
-      // the volatile is ReadOnly, and SetVariable should be aborted and 
+      // If EfiAtRuntime and the variable is Volatile and Runtime Access,
+      // the volatile is ReadOnly, and SetVariable should be aborted and
       // return EFI_WRITE_PROTECTED.
       //
       if (Variable->Volatile) {
@@ -1914,14 +1914,14 @@ UpdateVariable (
       //
       if ((VariableHeader.Attributes & EFI_VARIABLE_NON_VOLATILE) == 0) {
         Status = EFI_INVALID_PARAMETER;
-        goto Done;      
+        goto Done;
       }
     }
     //
     // Setting a data variable with no access, or zero DataSize attributes
     // specified causes it to be deleted.
     //
-    if (DataSize == 0 || (Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0) {    
+    if (DataSize == 0 || (Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0) {
       State = VariableHeader.State;
       State &= VAR_DELETED;
 
@@ -1933,12 +1933,12 @@ UpdateVariable (
                  (UINTN) &(((AUTHENTICATED_VARIABLE_HEADER *)Variable->CurrPtr)->State),
                  sizeof (UINT8),
                  &State
-                 ); 
+                 );
       if (!EFI_ERROR (Status)) {
         UpdateVariableInfo (VariableName, VendorGuid, Volatile, FALSE, FALSE, TRUE, FALSE);
         UpdateVariableCache (VariableName, VendorGuid, Attributes, DataSize, Data);
       }
-      goto Done;     
+      goto Done;
     }
     //
     // Logic comes here to update variable.
@@ -1971,25 +1971,25 @@ UpdateVariable (
                  (UINTN) &(((AUTHENTICATED_VARIABLE_HEADER *)Variable->CurrPtr)->State),
                  sizeof (UINT8),
                  &State
-                 );      
+                 );
       if (EFI_ERROR (Status)) {
-        goto Done;  
+        goto Done;
       }
-    }    
+    }
   } else {
     //
     // Create a new variable
-    //  
-    
+    //
+
     //
     // Make sure we are trying to create a new variable.
-    // Setting a data variable with no access, or zero DataSize attributes means to delete it.    
+    // Setting a data variable with no access, or zero DataSize attributes means to delete it.
     //
     if (DataSize == 0 || (Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0) {
       Status = EFI_NOT_FOUND;
       goto Done;
     }
-    
+
     //
     // Only variable have NV|RT attribute can be created in Runtime
     //
@@ -1997,7 +1997,7 @@ UpdateVariable (
         (((Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0) || ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0))) {
       Status = EFI_INVALID_PARAMETER;
       goto Done;
-    }         
+    }
   }
 
   //
@@ -2050,11 +2050,11 @@ UpdateVariable (
     // Create a nonvolatile variable
     //
     Volatile = FALSE;
-    
+
     GetVarStoreHeader (VariableGlobal->NonVolatileVariableBase, FALSE, VariableGlobal, Instance, &VariableStoreHeader);
-    if ((((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) 
+    if ((((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0)
              && ((HEADER_ALIGN (VarSize) + Global->HwErrVariableTotalSize) > PcdGet32(PcdHwErrStorageSize)))
-             || (((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == 0) 
+             || (((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == 0)
              && ((HEADER_ALIGN (VarSize) + Global->CommonVariableTotalSize) > VariableStoreHeader.Size - sizeof (VARIABLE_STORE_HEADER) - PcdGet32(PcdHwErrStorageSize)))) {
       if (EfiAtRuntime ()) {
         Status = EFI_OUT_OF_RESOURCES;
@@ -2072,9 +2072,9 @@ UpdateVariable (
       //
       // If still no enough space, return out of resources
       //
-      if ((((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) 
+      if ((((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0)
                && ((HEADER_ALIGN (VarSize) + Global->HwErrVariableTotalSize) > PcdGet32(PcdHwErrStorageSize)))
-               || (((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == 0) 
+               || (((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == 0)
                && ((HEADER_ALIGN (VarSize) + Global->CommonVariableTotalSize) > VariableStoreHeader.Size - sizeof (VARIABLE_STORE_HEADER) - PcdGet32(PcdHwErrStorageSize)))) {
         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
@@ -2083,7 +2083,7 @@ UpdateVariable (
     //
     // Four steps
     // 1. Write variable header
-    // 2. Set variable state to header valid  
+    // 2. Set variable state to header valid
     // 3. Write variable data
     // 4. Set variable state to valid
     //
@@ -2165,7 +2165,7 @@ UpdateVariable (
   } else {
     //
     // Create a volatile variable
-    //      
+    //
     Volatile = TRUE;
 
     if ((UINT32) (HEADER_ALIGN(VarSize) + Global->VolatileLastVariableOffset) >
@@ -2240,22 +2240,22 @@ Done:
 
   This function implements EsalGetVariable function of Extended SAL Variable Services Class.
   It is equivalent in functionality to the EFI Runtime Service GetVariable().
-  
+
   @param[in]      VariableName    A Null-terminated Unicode string that is the name of
                                   the vendor's variable.
   @param[in]      VendorGuid      A unique identifier for the vendor.
-  @param[out]     Attributes      If not NULL, a pointer to the memory location to return the 
+  @param[out]     Attributes      If not NULL, a pointer to the memory location to return the
                                   attributes bitmask for the variable.
   @param[in, out] DataSize        Size of Data found. If size is less than the
                                   data, this value contains the required size.
-  @param[out]     Data            On input, the size in bytes of the return Data buffer.  
+  @param[out]     Data            On input, the size in bytes of the return Data buffer.
                                   On output, the size of data returned in Data.
   @param[in]      VirtualMode     Current calling mode for this function.
   @param[in]      Global          Context of this Extended SAL Variable Services Class call.
 
-  @retval EFI_SUCCESS            The function completed successfully. 
+  @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_NOT_FOUND          The variable was not found.
-  @retval EFI_BUFFER_TOO_SMALL   DataSize is too small for the result.  DataSize has 
+  @retval EFI_BUFFER_TOO_SMALL   DataSize is too small for the result.  DataSize has
                                  been updated with the size needed to complete the request.
   @retval EFI_INVALID_PARAMETER  VariableName is NULL.
   @retval EFI_INVALID_PARAMETER  VendorGuid is NULL.
@@ -2349,7 +2349,7 @@ EsalGetVariable (
     *DataSize = VarDataSize;
     UpdateVariableInfo (VariableName, VendorGuid, Variable.Volatile, TRUE, FALSE, FALSE, FALSE);
     UpdateVariableCache (VariableName, VendorGuid, VariableHeader.Attributes, VarDataSize, Data);
- 
+
     Status = EFI_SUCCESS;
     goto Done;
   } else {
@@ -2371,18 +2371,18 @@ Done:
 
   This function implements EsalGetNextVariableName function of Extended SAL Variable Services Class.
   It is equivalent in functionality to the EFI Runtime Service GetNextVariableName().
-  
+
   @param[in, out] VariableNameSize Size of the variable
   @param[in, out] VariableName     On input, supplies the last VariableName that was returned by GetNextVariableName().
                                    On output, returns the Null-terminated Unicode string of the current variable.
   @param[in, out] VendorGuid       On input, supplies the last VendorGuid that was returned by GetNextVariableName().
-                                   On output, returns the VendorGuid of the current variable.  
+                                   On output, returns the VendorGuid of the current variable.
   @param[in]      VirtualMode      Current calling mode for this function.
   @param[in]      Global           Context of this Extended SAL Variable Services Class call.
 
-  @retval EFI_SUCCESS             The function completed successfully. 
+  @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_NOT_FOUND           The next variable was not found.
-  @retval EFI_BUFFER_TOO_SMALL    VariableNameSize is too small for the result. 
+  @retval EFI_BUFFER_TOO_SMALL    VariableNameSize is too small for the result.
                                   VariableNameSize has been updated with the size needed to complete the request.
   @retval EFI_INVALID_PARAMETER   VariableNameSize is NULL.
   @retval EFI_INVALID_PARAMETER   VariableName is NULL.
@@ -2512,11 +2512,11 @@ Done:
 
   This function implements EsalSetVariable function of Extended SAL Variable Services Class.
   It is equivalent in functionality to the EFI Runtime Service SetVariable().
-  
+
   @param[in]  VariableName       A Null-terminated Unicode string that is the name of the vendor's
-                                 variable.  Each VariableName is unique for each 
-                                 VendorGuid.  VariableName must contain 1 or more 
-                                 Unicode characters.  If VariableName is an empty Unicode 
+                                 variable.  Each VariableName is unique for each
+                                 VendorGuid.  VariableName must contain 1 or more
+                                 Unicode characters.  If VariableName is an empty Unicode
                                  string, then EFI_INVALID_PARAMETER is returned.
   @param[in]  VendorGuid         A unique identifier for the vendor.
   @param[in]  Attributes         Attributes bitmask to set for the variable.
@@ -2526,9 +2526,9 @@ Done:
   @param[in]  VirtualMode        Current calling mode for this function.
   @param[in]  Global             Context of this Extended SAL Variable Services Class call.
 
-  @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as 
+  @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as
                                  defined by the Attributes.
-  @retval EFI_INVALID_PARAMETER  An invalid combination of attribute bits was supplied, or the 
+  @retval EFI_INVALID_PARAMETER  An invalid combination of attribute bits was supplied, or the
                                  DataSize exceeds the maximum allowed.
   @retval EFI_INVALID_PARAMETER  VariableName is an empty Unicode string.
   @retval EFI_OUT_OF_RESOURCES   Not enough storage is available to hold the variable and its data.
@@ -2566,7 +2566,7 @@ EsalSetVariable (
   //
   if (VariableName == NULL || VariableName[0] == 0 || VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
-  }  
+  }
 
   if (DataSize != 0 && Data == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -2585,17 +2585,17 @@ EsalSetVariable (
       // Try to write Authencated Variable without AuthInfo
       //
       return EFI_SECURITY_VIOLATION;
-    } 
-    PayloadSize = DataSize - AUTHINFO_SIZE; 
+    }
+    PayloadSize = DataSize - AUTHINFO_SIZE;
   } else {
-    PayloadSize = DataSize; 
+    PayloadSize = DataSize;
   }
 
-  
+
   if ((UINTN)(~0) - PayloadSize < StrSize(VariableName)){
     //
-    // Prevent whole variable size overflow 
-    // 
+    // Prevent whole variable size overflow
+    //
     return EFI_INVALID_PARAMETER;
   }
 
@@ -2625,8 +2625,8 @@ EsalSetVariable (
     //
     if (StrSize (VariableName) + PayloadSize > PcdGet32(PcdMaxVariableSize) - sizeof (AUTHENTICATED_VARIABLE_HEADER)) {
       return EFI_INVALID_PARAMETER;
-    }  
-  }  
+    }
+  }
 
   AcquireLockOnlyAtBootTime(&VariableGlobal->VariableServicesLock);
 
@@ -2676,31 +2676,31 @@ EsalSetVariable (
         // Cut the certificate size before set
         //
         Status = UpdateVariable (
-                   VariableName, 
-                   VendorGuid, 
-                   (UINT8*)Data + AUTHINFO_SIZE, 
-                   DataSize - AUTHINFO_SIZE, 
-                   Attributes, 
-                   KeyIndex, 
-                   MonotonicCount, 
-                   VirtualMode, 
-                   Global, 
+                   VariableName,
+                   VendorGuid,
+                   (UINT8*)Data + AUTHINFO_SIZE,
+                   DataSize - AUTHINFO_SIZE,
+                   Attributes,
+                   KeyIndex,
+                   MonotonicCount,
+                   VirtualMode,
+                   Global,
                    &Variable
                    );
       } else {
         //
-        // Update variable as usual 
+        // Update variable as usual
         //
         Status = UpdateVariable (
-                   VariableName, 
-                   VendorGuid, 
-                   Data, 
-                   DataSize, 
-                   Attributes, 
-                   0, 
-                   0, 
-                   VirtualMode, 
-                   Global, 
+                   VariableName,
+                   VendorGuid,
+                   Data,
+                   DataSize,
+                   Attributes,
+                   0,
+                   0,
+                   VirtualMode,
+                   Global,
                    &Variable
                    );
       }
@@ -2720,19 +2720,19 @@ EsalSetVariable (
 
   @param[in]  Attributes                   Attributes bitmask to specify the type of variables
                                            on which to return information.
-  @param[out] MaximumVariableStorageSize   On output the maximum size of the storage space available for 
-                                           the EFI variables associated with the attributes specified.  
-  @param[out] RemainingVariableStorageSize Returns the remaining size of the storage space available for EFI 
+  @param[out] MaximumVariableStorageSize   On output the maximum size of the storage space available for
+                                           the EFI variables associated with the attributes specified.
+  @param[out] RemainingVariableStorageSize Returns the remaining size of the storage space available for EFI
                                            variables associated with the attributes specified.
-  @param[out] MaximumVariableSize          Returns the maximum size of an individual EFI variable 
+  @param[out] MaximumVariableSize          Returns the maximum size of an individual EFI variable
                                            associated with the attributes specified.
   @param[in]  VirtualMode                  Current calling mode for this function
   @param[in]  Global                       Context of this Extended SAL Variable Services Class call
 
   @retval EFI_SUCCESS                      Valid answer returned.
   @retval EFI_INVALID_PARAMETER            An invalid combination of attribute bits was supplied.
-  @retval EFI_UNSUPPORTED                  The attribute is not supported on this platform, and the 
-                                           MaximumVariableStorageSize, RemainingVariableStorageSize, 
+  @retval EFI_UNSUPPORTED                  The attribute is not supported on this platform, and the
+                                           MaximumVariableStorageSize, RemainingVariableStorageSize,
                                            MaximumVariableSize are undefined.
 **/
 EFI_STATUS
@@ -2764,12 +2764,12 @@ EsalQueryVariableInfo (
   if(MaximumVariableStorageSize == NULL || RemainingVariableStorageSize == NULL || MaximumVariableSize == NULL || Attributes == 0) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == 0) {
     //
     // Make sure the Attributes combination is supported by the platform.
     //
-    return EFI_UNSUPPORTED;  
+    return EFI_UNSUPPORTED;
   } else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS) {
     //
     // Make sure if runtime bit is set, boot service bit is set also.
@@ -2917,20 +2917,20 @@ ReclaimForOS(
   UINTN                           RemainingHwErrVariableSpace;
 
   VarSize = ((VARIABLE_STORE_HEADER *) ((UINTN) mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase))->Size;
-  Status  = EFI_SUCCESS; 
+  Status  = EFI_SUCCESS;
   //
   //Allowable max size of common variable storage space
   //
   CommonVariableSpace = VarSize - sizeof (VARIABLE_STORE_HEADER) - PcdGet32(PcdHwErrStorageSize);
 
   RemainingCommonVariableSpace = CommonVariableSpace - mVariableModuleGlobal->CommonVariableTotalSize;
- 
+
   RemainingHwErrVariableSpace = PcdGet32 (PcdHwErrStorageSize) - mVariableModuleGlobal->HwErrVariableTotalSize;
   //
   // If the free area is below a threshold, then performs reclaim operation.
   //
   if ((RemainingCommonVariableSpace < PcdGet32 (PcdMaxVariableSize))
-    || ((PcdGet32 (PcdHwErrStorageSize) != 0) && 
+    || ((PcdGet32 (PcdHwErrStorageSize) != 0) &&
        (RemainingHwErrVariableSpace < PcdGet32 (PcdMaxHardwareErrorVariableSize)))){
     Status = Reclaim (
                mVariableModuleGlobal->VariableGlobal[Physical].NonVolatileVariableBase,
@@ -3056,7 +3056,7 @@ VariableCommonInitialize (
   //
   // Note that in EdkII variable driver implementation, Hardware Error Record type variable
   // is stored with common variable in the same NV region. So the platform integrator should
-  // ensure that the value of PcdHwErrStorageSize is less than or equal to the value of 
+  // ensure that the value of PcdHwErrStorageSize is less than or equal to the value of
   // PcdFlashNvStorageVariableSize.
   //
   ASSERT (PcdGet32(PcdHwErrStorageSize) <= PcdGet32 (PcdFlashNvStorageVariableSize));
@@ -3133,13 +3133,13 @@ VariableCommonInitialize (
     Status    = (EFI_STATUS) EsalCall (
                                EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_LO,
                                EFI_EXTENDED_SAL_FV_BLOCK_SERVICES_PROTOCOL_GUID_HI,
-                               GetPhysicalAddressFunctionId, 
-                               Instance, 
-                               (UINT64) &FvVolHdr, 
-                               0, 
-                               0, 
-                               0, 
-                               0, 
+                               GetPhysicalAddressFunctionId,
+                               Instance,
+                               (UINT64) &FvVolHdr,
+                               0,
+                               0,
+                               0,
+                               0,
                                0
                                ).Status;
     if (EFI_ERROR (Status)) {
@@ -3237,9 +3237,9 @@ VariableCommonInitialize (
     // Register the event handling function to reclaim variable for OS usage.
     //
     Status = EfiCreateEventReadyToBootEx (
-               TPL_NOTIFY, 
-               ReclaimForOS, 
-               NULL, 
+               TPL_NOTIFY,
+               ReclaimForOS,
+               NULL,
                &ReadyToBootEvent
                );
   } else {

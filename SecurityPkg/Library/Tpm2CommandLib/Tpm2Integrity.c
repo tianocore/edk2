@@ -120,16 +120,16 @@ Tpm2PcrExtend (
   // Add in Auth session
   //
   Buffer = (UINT8 *)&Cmd.AuthSessionPcr;
-  
+
   // sessionInfoSize
   SessionInfoSize = CopyAuthSessionCommand (NULL, Buffer);
   Buffer += SessionInfoSize;
   Cmd.AuthorizationSize = SwapBytes32(SessionInfoSize);
-  
+
   //Digest Count
   WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32(Digests->count));
   Buffer += sizeof(UINT32);
-  
+
   //Digest
   for (Index = 0; Index < Digests->count; Index++) {
     WriteUnaligned16 ((UINT16 *)Buffer, SwapBytes16(Digests->digests[Index].hashAlg));
@@ -241,7 +241,7 @@ Tpm2PcrEvent (
 
   CopyMem (Buffer, EventData->buffer, EventData->size);
   Buffer += EventData->size;
-  
+
   CmdSize              = (UINT32)((UINTN)Buffer - (UINTN)&Cmd);
   Cmd.Header.paramSize = SwapBytes32(CmdSize);
 
@@ -311,7 +311,7 @@ Tpm2PcrEvent (
   @param[out] PcrUpdateCounter   The current value of the PCR update counter.
   @param[out] PcrSelectionOut    The PCR in the returned list.
   @param[out] PcrValues          The contents of the PCR indicated in pcrSelect.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -338,7 +338,7 @@ Tpm2PcrRead (
   //
   SendBuffer.Header.tag = SwapBytes16(TPM_ST_NO_SESSIONS);
   SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_PCR_Read);
- 
+
   SendBuffer.PcrSelectionIn.count = SwapBytes32(PcrSelectionIn->count);
   for (Index = 0; Index < PcrSelectionIn->count; Index++) {
     SendBuffer.PcrSelectionIn.pcrSelections[Index].hash = SwapBytes16(PcrSelectionIn->pcrSelections[Index].hash);
@@ -442,7 +442,7 @@ Tpm2PcrRead (
   @param[out] MaxPCR             maximum number of PCR that may be in a bank
   @param[out] SizeNeeded         number of octets required to satisfy the request
   @param[out] SizeAvailable      Number of octets available. Computed before the allocation
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -509,8 +509,8 @@ Tpm2PcrAllocate (
   // Call the TPM
   //
   Status = Tpm2SubmitCommand (
-             CmdSize, 
-             (UINT8 *)&Cmd, 
+             CmdSize,
+             (UINT8 *)&Cmd,
              &ResultBufSize,
              ResultBuf
              );
@@ -566,7 +566,7 @@ Done:
   @param[in]  PlatformAuth      platform auth value. NULL means no platform auth change.
   @param[in]  SupportedPCRBanks Supported PCR banks
   @param[in]  PCRBanks          PCR banks
-  
+
   @retval EFI_SUCCESS Operation completed successfully.
 **/
 EFI_STATUS

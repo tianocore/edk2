@@ -2,13 +2,13 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by AuthService module.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -46,8 +46,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_WRITE_PROTECTED             The variable is write-protected and needs authentication with
                                           EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS set.
   @retval EFI_SECURITY_VIOLATION          The variable is with EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
-                                          set, but the AuthInfo does NOT pass the validation 
-                                          check carried out by the firmware. 
+                                          set, but the AuthInfo does NOT pass the validation
+                                          check carried out by the firmware.
   @retval EFI_SUCCESS                     The variable is not write-protected, or passed validation successfully.
 
 **/
@@ -99,8 +99,8 @@ CryptLibraryInitialize (
   @param[in]  IsPk                        Indicates whether to process pk.
 
   @retval EFI_INVALID_PARAMETER           Invalid parameter.
-  @retval EFI_SECURITY_VIOLATION          The variable does NOT pass the validation 
-                                          check carried out by the firmware. 
+  @retval EFI_SECURITY_VIOLATION          The variable does NOT pass the validation
+                                          check carried out by the firmware.
   @retval EFI_SUCCESS                     The variable passed validation successfully.
 
 **/
@@ -131,8 +131,8 @@ ProcessVarWithPk (
   @param[in]  Attributes                  The attribute value of the variable.
 
   @retval EFI_INVALID_PARAMETER           Invalid parameter.
-  @retval EFI_SECURITY_VIOLATION          The variable does NOT pass the validation 
-                                          check carried out by the firmware. 
+  @retval EFI_SECURITY_VIOLATION          The variable does NOT pass the validation
+                                          check carried out by the firmware.
   @retval EFI_SUCCESS                     The variable passed validation successfully.
 
 **/

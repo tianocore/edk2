@@ -1143,7 +1143,7 @@ OpalSetLockingSpAuthorityEnabledAndPin(
   ERROR_CHECK(OpalPerformMethod(LockingSpSession, Size, Buf, sizeof(Buf), &ParseStruct, MethodStatus, 0));
 
   //
-  // For Pyrite type SSC, it not supports Active Key. 
+  // For Pyrite type SSC, it not supports Active Key.
   // So here add check logic before enable it.
   //
   Ret = OpalParseRetrieveGlobalLockingRangeActiveKey(&ParseStruct, &ActiveKey);

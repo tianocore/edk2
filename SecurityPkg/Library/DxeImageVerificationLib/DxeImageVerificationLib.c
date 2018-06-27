@@ -12,7 +12,7 @@
   DxeImageVerificationHandler(), HashPeImageByType(), HashPeImage() function will accept
   untrusted PE/COFF image and validate its data structure within this image buffer before use.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -275,12 +275,12 @@ GetImageType (
 /**
   Calculate hash of Pe/Coff image based on the authenticode image hashing in
   PE/COFF Specification 8.0 Appendix A
-  
+
   Caution: This function may receive untrusted input.
   PE/COFF image is external input, so this function will validate its data structure
   within this image buffer before use.
 
-  Notes: PE/COFF image has been checked by BasePeCoffLib PeCoffLoaderGetImageInfo() in 
+  Notes: PE/COFF image has been checked by BasePeCoffLib PeCoffLoaderGetImageInfo() in
   its caller function DxeImageVerificationHandler().
 
   @param[in]    HashAlg   Hash algorithm type.
@@ -1109,14 +1109,14 @@ IsTimeZero (
 }
 
 /**
-  Check whether the timestamp signature is valid and the signing time is also earlier than 
+  Check whether the timestamp signature is valid and the signing time is also earlier than
   the revocation time.
 
   @param[in]  AuthData        Pointer to the Authenticode signature retrieved from signed image.
   @param[in]  AuthDataSize    Size of the Authenticode signature in bytes.
   @param[in]  RevocationTime  The time that the certificate was revoked.
 
-  @retval TRUE      Timestamp signature is valid and signing time is no later than the 
+  @retval TRUE      Timestamp signature is valid and signing time is no later than the
                     revocation time.
   @retval FALSE     Timestamp signature is not valid or the signing time is later than the
                     revocation time.
@@ -1226,9 +1226,9 @@ Done:
 
 **/
 BOOLEAN
-IsForbiddenByDbx (  
+IsForbiddenByDbx (
   IN UINT8                  *AuthData,
-  IN UINTN                  AuthDataSize  
+  IN UINTN                  AuthDataSize
   )
 {
   EFI_STATUS                Status;

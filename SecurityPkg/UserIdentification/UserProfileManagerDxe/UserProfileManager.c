@@ -1,17 +1,17 @@
 /** @file
-  This driver is a configuration tool for adding, deleting or modifying user 
-  profiles, including gathering the necessary information to ascertain their 
-  identity in the future, updating user access policy and identification 
+  This driver is a configuration tool for adding, deleting or modifying user
+  profiles, including gathering the necessary information to ascertain their
+  identity in the future, updating user access policy and identification
   policy, etc.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -71,12 +71,12 @@ GetStringById (
 
 
 /**
-  This function gets all the credential providers in the system and saved them 
+  This function gets all the credential providers in the system and saved them
   to mProviderInfo.
 
   @retval EFI_SUCESS     Init credential provider database successfully.
   @retval Others         Fail to init credential provider database.
-  
+
 **/
 EFI_STATUS
 InitProviderInfo (
@@ -86,8 +86,8 @@ InitProviderInfo (
   EFI_STATUS  Status;
   UINTN       HandleCount;
   EFI_HANDLE  *HandleBuf;
-  UINTN       Index;  
-  
+  UINTN       Index;
+
   //
   // Try to find all the user credential provider driver.
   //
@@ -103,7 +103,7 @@ InitProviderInfo (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Get provider infomation.
   //
@@ -111,7 +111,7 @@ InitProviderInfo (
     FreePool (mProviderInfo);
   }
   mProviderInfo = AllocateZeroPool (
-                    sizeof (CREDENTIAL_PROVIDER_INFO) - 
+                    sizeof (CREDENTIAL_PROVIDER_INFO) -
                     sizeof (EFI_USER_CREDENTIAL2_PROTOCOL *) +
                     HandleCount * sizeof (EFI_USER_CREDENTIAL2_PROTOCOL *)
                     );
@@ -192,7 +192,7 @@ UserProfileManagerCallback (
       if (QuestionId != QUESTIONID_USER_MANAGE) {
         return EFI_SUCCESS;
       }
-  
+
       //
       // Get current user
       //
@@ -202,7 +202,7 @@ UserProfileManagerCallback (
         DEBUG ((DEBUG_ERROR, "Error: current user does not exist!\n"));
         return EFI_NOT_READY;
       }
-      
+
       //
       // Get current user's right information.
       //
@@ -210,7 +210,7 @@ UserProfileManagerCallback (
       if (EFI_ERROR (Status)) {
         CurrentAccessRight = EFI_USER_INFO_ACCESS_ENROLL_SELF;
       }
-  
+
       //
       // Init credential provider information.
       //
@@ -218,16 +218,16 @@ UserProfileManagerCallback (
       if (EFI_ERROR (Status)) {
         return Status;
       }
-      
+
       //
       // Initialize the container for dynamic opcodes.
       //
       StartOpCodeHandle = HiiAllocateOpCodeHandle ();
       ASSERT (StartOpCodeHandle != NULL);
-  
+
       EndOpCodeHandle = HiiAllocateOpCodeHandle ();
       ASSERT (EndOpCodeHandle != NULL);
-  
+
       //
       // Create Hii Extend Label OpCode.
       //
@@ -239,7 +239,7 @@ UserProfileManagerCallback (
                                             );
       StartLabel->ExtendOpCode  = EFI_IFR_EXTEND_OP_LABEL;
       StartLabel->Number        = LABEL_USER_MANAGE_FUNC;
-  
+
       EndLabel = (EFI_IFR_GUID_LABEL *) HiiCreateGuidOpCode (
                                           EndOpCodeHandle,
                                           &gEfiIfrTianoGuid,
@@ -248,7 +248,7 @@ UserProfileManagerCallback (
                                           );
       EndLabel->ExtendOpCode  = EFI_IFR_EXTEND_OP_LABEL;
       EndLabel->Number        = LABEL_END;
-  
+
       //
       // Add user profile option.
       //
@@ -264,7 +264,7 @@ UserProfileManagerCallback (
           0                                   // Action String ID
           );
       }
-      
+
       //
       // Add modify user profile option.
       //
@@ -276,7 +276,7 @@ UserProfileManagerCallback (
         EFI_IFR_FLAG_CALLBACK,                // Question flag
         KEY_MODIFY_USER                       // Question ID
         );
-  
+
       //
       // Add delete user profile option
       //
@@ -290,7 +290,7 @@ UserProfileManagerCallback (
           KEY_DEL_USER                          // Question ID
           );
       }
-  
+
       HiiUpdateForm (
         mCallbackInfo->HiiHandle,               // HII handle
         &gUserProfileManagerGuid,               // Formset GUID
@@ -298,10 +298,10 @@ UserProfileManagerCallback (
         StartOpCodeHandle,                      // Label for where to insert opcodes
         EndOpCodeHandle                         // Replace data
         );
-  
+
       HiiFreeOpCodeHandle (StartOpCodeHandle);
       HiiFreeOpCodeHandle (EndOpCodeHandle);
-  
+
       return EFI_SUCCESS;
     }
     break;
@@ -311,14 +311,14 @@ UserProfileManagerCallback (
     break;
 
   case EFI_BROWSER_ACTION_CHANGED:
-  {  
+  {
     //
     // Handle the request from form.
     //
     if ((Value == NULL) || (ActionRequest == NULL)) {
       return EFI_INVALID_PARAMETER;
     }
-    
+
     //
     // Judge first 2 bits.
     //
@@ -392,7 +392,7 @@ UserProfileManagerCallback (
           //
           // Change credential provider option.
           //
-          case KEY_MODIFY_PROV:         
+          case KEY_MODIFY_PROV:
             mProviderChoice = Value->u8;
             break;
 
@@ -556,14 +556,14 @@ UserProfileManagerCallback (
 
 
   case EFI_BROWSER_ACTION_CHANGING:
-  {  
+  {
     //
     // Handle the request from form.
     //
     if (Value == NULL) {
       return EFI_INVALID_PARAMETER;
     }
-    
+
     //
     // Judge first 2 bits.
     //
@@ -666,19 +666,19 @@ UserProfileManagerCallback (
             case KEY_PERMIT_MODIFY:
               DisplayLoadPermit ();
               break;
-          
+
             //
             // Forbid load device path.
             //
             case KEY_FORBID_MODIFY:
               DisplayLoadForbid ();
               break;
-          
+
             default:
               break;
             }
             break;
-            
+
           //
           // Connect device path form.
           //
@@ -693,14 +693,14 @@ UserProfileManagerCallback (
             case KEY_PERMIT_MODIFY:
               DisplayConnectPermit ();
               break;
-          
+
             //
             // Forbid connect device path.
             //
             case KEY_FORBID_MODIFY:
               DisplayConnectForbid ();
               break;
-          
+
             default:
               break;
             }
@@ -839,7 +839,7 @@ UserProfileManagerInit (
   if (EFI_ERROR (Status)) {
     return EFI_SUCCESS;
   }
-  
+
   //
   // Initialize driver private data.
   //
@@ -847,14 +847,14 @@ UserProfileManagerInit (
   ZeroMem (&mAccessInfo, sizeof (mAccessInfo));
 
   CallbackInfo = AllocateZeroPool (sizeof (USER_PROFILE_MANAGER_CALLBACK_INFO));
-  ASSERT (CallbackInfo != NULL);  
+  ASSERT (CallbackInfo != NULL);
 
   CallbackInfo->Signature                   = USER_PROFILE_MANAGER_SIGNATURE;
   CallbackInfo->ConfigAccess.ExtractConfig  = FakeExtractConfig;
   CallbackInfo->ConfigAccess.RouteConfig    = FakeRouteConfig;
   CallbackInfo->ConfigAccess.Callback       = UserProfileManagerCallback;
   CallbackInfo->DriverHandle                = NULL;
-  
+
   //
   // Install Device Path Protocol and Config Access protocol to driver handle.
   //
@@ -878,10 +878,10 @@ UserProfileManagerInit (
                               UserProfileManagerVfrBin,
                               NULL
                               );
-  ASSERT (CallbackInfo->HiiHandle != NULL);                              
+  ASSERT (CallbackInfo->HiiHandle != NULL);
   mCallbackInfo = CallbackInfo;
 
   return Status;
 }
 
-  
+

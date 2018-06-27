@@ -162,7 +162,7 @@ typedef struct {
   @param[in]  NvIndex            The NV Index.
   @param[out] NvPublic           The public area of the index.
   @param[out] NvName             The Name of the nvIndex.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
   @retval EFI_NOT_FOUND          The command was returned successfully, but NvIndex is not found.
@@ -192,7 +192,7 @@ Tpm2NvReadPublic (
   SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_NV_ReadPublic);
 
   SendBuffer.NvIndex = SwapBytes32 (NvIndex);
- 
+
   SendBufferSize = (UINT32) sizeof (SendBuffer);
   SendBuffer.Header.paramSize = SwapBytes32 (SendBufferSize);
 
@@ -265,7 +265,7 @@ Tpm2NvReadPublic (
 
   CopyMem (NvName->name, (UINT8 *)&RecvBuffer + sizeof(TPM2_RESPONSE_HEADER) + sizeof(UINT16) + NvPublicSize + sizeof(UINT16), NvNameSize);
   NvName->size = NvNameSize;
-  
+
   return EFI_SUCCESS;
 }
 
@@ -278,7 +278,7 @@ Tpm2NvReadPublic (
   @param[in]  AuthSession        Auth Session context
   @param[in]  Auth               The authorization data.
   @param[in]  NvPublic           The public area of the index.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
   @retval EFI_ALREADY_STARTED    The command was returned successfully, but NvIndex is already defined.
@@ -414,7 +414,7 @@ Done:
   @param[in]  AuthHandle         TPM_RH_OWNER or TPM_RH_PLATFORM+{PP}.
   @param[in]  NvIndex            The NV Index.
   @param[in]  AuthSession        Auth Session context
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
   @retval EFI_NOT_FOUND          The command was returned successfully, but NvIndex is not found.
@@ -521,7 +521,7 @@ Done:
   @param[in]     Size               Number of bytes to read.
   @param[in]     Offset             Byte offset into the area.
   @param[in,out] OutData            The data read.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
   @retval EFI_NOT_FOUND          The command was returned successfully, but NvIndex is not found.
@@ -648,7 +648,7 @@ Tpm2NvRead (
   }
 
   CopyMem (OutData->buffer, &RecvBuffer.Data.buffer, OutData->size);
-  
+
 Done:
   //
   // Clear AuthSession Content
@@ -666,7 +666,7 @@ Done:
   @param[in]  AuthSession        Auth Session context
   @param[in]  InData             The data to write.
   @param[in]  Offset             The offset into the NV Area.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
   @retval EFI_NOT_FOUND          The command was returned successfully, but NvIndex is not found.

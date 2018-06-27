@@ -1,13 +1,13 @@
 /** @file
   The functions to add a user profile.
-    
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -17,11 +17,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Get user name from the popup windows.
-  
+
   @param[in, out]  UserNameLen  On entry, point to UserName buffer lengh, in bytes.
                                 On exit, point to input user name length, in bytes.
   @param[out]      UserName     The buffer to hold the input user name.
- 
+
   @retval EFI_ABORTED           It is given up by pressing 'ESC' key.
   @retval EFI_NOT_READY         Not a valid input at all.
   @retval EFI_SUCCESS           Get a user name successfully.
@@ -100,7 +100,7 @@ GetUserNameInput (
 
   *UserNameLen = NameLen * sizeof (CHAR16);
   CopyMem (UserName, Name, *UserNameLen);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -112,7 +112,7 @@ GetUserNameInput (
   @param[in]   UserName      Point to the buffer of user name.
 
   @retval EFI_NOT_READY      The usernme in mAddUserName had been used.
-  @retval EFI_SUCCESS        Change the user's username successfully with 
+  @retval EFI_SUCCESS        Change the user's username successfully with
                              username in mAddUserName.
 
 **/
@@ -127,13 +127,13 @@ SetUserName (
   EFI_USER_INFO_HANDLE    UserInfo;
   EFI_USER_PROFILE_HANDLE TempUser;
   EFI_USER_INFO           *NewUserInfo;
-   
+
   NewUserInfo = AllocateZeroPool (sizeof (EFI_USER_INFO) + UserNameLen);
   ASSERT (NewUserInfo != NULL);
 
   NewUserInfo->InfoType    = EFI_USER_INFO_NAME_RECORD;
-  NewUserInfo->InfoAttribs = EFI_USER_INFO_STORAGE_PLATFORM_NV | 
-                             EFI_USER_INFO_PUBLIC | 
+  NewUserInfo->InfoAttribs = EFI_USER_INFO_STORAGE_PLATFORM_NV |
+                             EFI_USER_INFO_PUBLIC |
                              EFI_USER_INFO_EXCLUSIVE;
   NewUserInfo->InfoSize    = (UINT32) (sizeof (EFI_USER_INFO) + UserNameLen);
   CopyMem ((UINT8 *) (NewUserInfo + 1), UserName, UserNameLen);
@@ -181,7 +181,7 @@ SetCreateDate (
   EFI_USER_INFO_HANDLE      UserInfo;
   EFI_USER_INFO_CREATE_DATE Date;
   EFI_USER_INFO             *NewUserInfo;
-  
+
   NewUserInfo = AllocateZeroPool (
                   sizeof (EFI_USER_INFO) +
                   sizeof (EFI_USER_INFO_CREATE_DATE)
@@ -189,8 +189,8 @@ SetCreateDate (
   ASSERT (NewUserInfo != NULL);
 
   NewUserInfo->InfoType    = EFI_USER_INFO_CREATE_DATE_RECORD;
-  NewUserInfo->InfoAttribs = EFI_USER_INFO_STORAGE_PLATFORM_NV | 
-                             EFI_USER_INFO_PUBLIC | 
+  NewUserInfo->InfoAttribs = EFI_USER_INFO_STORAGE_PLATFORM_NV |
+                             EFI_USER_INFO_PUBLIC |
                              EFI_USER_INFO_EXCLUSIVE;
   NewUserInfo->InfoSize    = sizeof (EFI_USER_INFO) + sizeof (EFI_USER_INFO_CREATE_DATE);
   Status                   = gRT->GetTime (&Date, NULL);
@@ -215,7 +215,7 @@ SetCreateDate (
 /**
   Set the default identity policy of the specified user.
 
-  @param[in]  User               Handle of a user profile. 
+  @param[in]  User               Handle of a user profile.
 
 **/
 VOID
@@ -226,20 +226,20 @@ SetIdentityPolicy (
   EFI_USER_INFO_IDENTITY_POLICY *Policy;
   EFI_USER_INFO_HANDLE          UserInfo;
   EFI_USER_INFO                 *NewUserInfo;
-  
+
   NewUserInfo = AllocateZeroPool (
-                  sizeof (EFI_USER_INFO) + 
+                  sizeof (EFI_USER_INFO) +
                   sizeof (EFI_USER_INFO_IDENTITY_POLICY)
                   );
   ASSERT (NewUserInfo != NULL);
-  
+
   Policy                   = (EFI_USER_INFO_IDENTITY_POLICY *) (NewUserInfo + 1);
   Policy->Type             = EFI_USER_INFO_IDENTITY_TRUE;
   Policy->Length           = sizeof (EFI_USER_INFO_IDENTITY_POLICY);
 
   NewUserInfo->InfoType    = EFI_USER_INFO_IDENTITY_POLICY_RECORD;
-  NewUserInfo->InfoAttribs = EFI_USER_INFO_STORAGE_PLATFORM_NV | 
-                             EFI_USER_INFO_PUBLIC | 
+  NewUserInfo->InfoAttribs = EFI_USER_INFO_STORAGE_PLATFORM_NV |
+                             EFI_USER_INFO_PUBLIC |
                              EFI_USER_INFO_EXCLUSIVE;
   NewUserInfo->InfoSize    = sizeof (EFI_USER_INFO) + Policy->Length;
   UserInfo                 = NULL;
@@ -257,7 +257,7 @@ SetIdentityPolicy (
 /**
   Set the default access policy of the specified user.
 
-  @param[in]  User               Handle of a user profile. 
+  @param[in]  User               Handle of a user profile.
 
 **/
 VOID
@@ -268,20 +268,20 @@ SetAccessPolicy (
   EFI_USER_INFO_ACCESS_CONTROL  *Control;
   EFI_USER_INFO_HANDLE          UserInfo;
   EFI_USER_INFO                 *NewUserInfo;
-  
+
   NewUserInfo = AllocateZeroPool (
-                  sizeof (EFI_USER_INFO) + 
+                  sizeof (EFI_USER_INFO) +
                   sizeof (EFI_USER_INFO_ACCESS_CONTROL)
                   );
   ASSERT (NewUserInfo != NULL);
-  
+
   Control                  = (EFI_USER_INFO_ACCESS_CONTROL *) (NewUserInfo + 1);
   Control->Type            = EFI_USER_INFO_ACCESS_ENROLL_SELF;
   Control->Size            = sizeof (EFI_USER_INFO_ACCESS_CONTROL);
 
   NewUserInfo->InfoType    = EFI_USER_INFO_ACCESS_POLICY_RECORD;
-  NewUserInfo->InfoAttribs = EFI_USER_INFO_STORAGE_PLATFORM_NV | 
-                             EFI_USER_INFO_PUBLIC | 
+  NewUserInfo->InfoAttribs = EFI_USER_INFO_STORAGE_PLATFORM_NV |
+                             EFI_USER_INFO_PUBLIC |
                              EFI_USER_INFO_EXCLUSIVE;
   NewUserInfo->InfoSize    = sizeof (EFI_USER_INFO) + Control->Size;
   UserInfo                 = NULL;
@@ -315,7 +315,7 @@ CallAddUser (
 
   QuestionStr = NULL;
   PromptStr   = NULL;
-  
+
   //
   // Get user name to add.
   //
@@ -324,7 +324,7 @@ CallAddUser (
   if (EFI_ERROR (Status)) {
     if (Status != EFI_ABORTED) {
       QuestionStr = GetStringById (STRING_TOKEN (STR_GET_USERNAME_FAILED));
-      PromptStr   = GetStringById (STRING_TOKEN (STR_STROKE_KEY_CONTINUE)); 
+      PromptStr   = GetStringById (STRING_TOKEN (STR_STROKE_KEY_CONTINUE));
       goto Done;
     }
     return ;
@@ -337,7 +337,7 @@ CallAddUser (
   Status  = mUserManager->Create (mUserManager, &User);
   if (EFI_ERROR (Status)) {
     QuestionStr = GetStringById (STRING_TOKEN (STR_CREATE_PROFILE_FAILED));
-    PromptStr   = GetStringById (STRING_TOKEN (STR_STROKE_KEY_CONTINUE)); 
+    PromptStr   = GetStringById (STRING_TOKEN (STR_STROKE_KEY_CONTINUE));
   } else {
     //
     // Add default user information.
@@ -345,7 +345,7 @@ CallAddUser (
     Status = SetUserName (User, UserNameLen, UserName);
     if (EFI_ERROR (Status)) {
       QuestionStr = GetStringById (STRING_TOKEN (STR_USER_ALREADY_EXISTED));
-      PromptStr   = GetStringById (STRING_TOKEN (STR_STROKE_KEY_CONTINUE)); 
+      PromptStr   = GetStringById (STRING_TOKEN (STR_STROKE_KEY_CONTINUE));
       goto Done;
     }
 
@@ -354,7 +354,7 @@ CallAddUser (
     SetAccessPolicy (User);
 
     QuestionStr = GetStringById (STRING_TOKEN (STR_CREATE_PROFILE_SUCCESS));
-    PromptStr   = GetStringById (STRING_TOKEN (STR_STROKE_KEY_CONTINUE)); 
+    PromptStr   = GetStringById (STRING_TOKEN (STR_STROKE_KEY_CONTINUE));
   }
 
 Done:

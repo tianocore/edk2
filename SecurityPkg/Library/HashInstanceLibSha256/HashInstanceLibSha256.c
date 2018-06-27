@@ -2,7 +2,7 @@
   This library is BaseCrypto SHA256 hash instance.
   It can be registered to BaseCrypto router, to serve as hash engine.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -118,7 +118,7 @@ Sha256HashFinal (
   Sha256Final (Sha256Ctx, Digest);
 
   FreePool (Sha256Ctx);
-  
+
   Tpm2SetSha256ToDigestList (DigestList, Digest);
 
   return EFI_SUCCESS;
@@ -133,7 +133,7 @@ HASH_INTERFACE  mSha256InternalHashInstance = {
 
 /**
   The function register SHA256 instance.
-  
+
   @retval EFI_SUCCESS   SHA256 instance is registered, or system dose not surpport registr SHA256 instance
 **/
 EFI_STATUS

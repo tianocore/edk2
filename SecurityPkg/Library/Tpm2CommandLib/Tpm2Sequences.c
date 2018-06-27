@@ -90,7 +90,7 @@ typedef struct {
   @param[in]  HashAlg           The hash algorithm to use for the hash sequence
                                 An Event sequence starts if this is TPM_ALG_NULL.
   @param[out] SequenceHandle    A handle to reference the sequence
- 
+
   @retval EFI_SUCCESS      Operation completed successfully.
   @retval EFI_DEVICE_ERROR Unexpected device behavior.
 **/
@@ -178,7 +178,7 @@ Tpm2HashSequenceStart (
 
   @param[in] SequenceHandle    Handle for the sequence object
   @param[in] Buffer            Data to be added to hash
- 
+
   @retval EFI_SUCCESS      Operation completed successfully.
   @retval EFI_DEVICE_ERROR Unexpected device behavior.
 **/
@@ -277,7 +277,7 @@ Tpm2SequenceUpdate (
   @param[in]  SequenceHandle    Authorization for the sequence
   @param[in]  Buffer            Data to be added to the Event
   @param[out] Results           List of digests computed for the PCR
- 
+
   @retval EFI_SUCCESS      Operation completed successfully.
   @retval EFI_DEVICE_ERROR Unexpected device behavior.
 **/
@@ -408,7 +408,7 @@ Tpm2EventSequenceComplete (
   @param[in]  SequenceHandle    Authorization for the sequence
   @param[in]  Buffer            Data to be added to the hash/HMAC
   @param[out] Result            The returned HMAC or digest in a sized buffer
- 
+
   @retval EFI_SUCCESS      Operation completed successfully.
   @retval EFI_DEVICE_ERROR Unexpected device behavior.
 **/

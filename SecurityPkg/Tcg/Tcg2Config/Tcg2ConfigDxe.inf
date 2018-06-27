@@ -1,6 +1,6 @@
 ## @file
 #  TPM device configuration for TPM 2.0
-#  
+#
 #  By this module, user may select TPM device, clear TPM state, etc.
 #  NOTE: This module is only for reference only, each platform should have its own setup page.
 #
@@ -87,6 +87,6 @@
   gEfiHiiDatabaseProtocolGuid       AND
   gEfiVariableArchProtocolGuid      AND
   gEfiVariableWriteArchProtocolGuid
-  
+
 [UserExtensions.TianoCore."ExtraFiles"]
   Tcg2ConfigDxeExtra.uni

@@ -87,7 +87,7 @@ typedef struct {
   @param[in]  Expiration         Time when authorization will expire, measured in seconds from the time that nonceTPM was generated.
   @param[out] Timeout            Time value used to indicate to the TPM when the ticket expires.
   @param[out] PolicyTicket       A ticket that includes a value indicating when the authorization expires.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -120,7 +120,7 @@ Tpm2PolicySecret (
   SendBuffer.Header.commandCode = SwapBytes32(TPM_CC_PolicySecret);
   SendBuffer.AuthHandle = SwapBytes32 (AuthHandle);
   SendBuffer.PolicySession = SwapBytes32 (PolicySession);
-  
+
   //
   // Add in Auth session
   //
@@ -148,7 +148,7 @@ Tpm2PolicySecret (
   Buffer += sizeof(UINT16);
   CopyMem (Buffer, PolicyRef->buffer, PolicyRef->size);
   Buffer += PolicyRef->size;
-  
+
   WriteUnaligned32 ((UINT32 *)Buffer, SwapBytes32((UINT32)Expiration));
   Buffer += sizeof(UINT32);
 
@@ -220,7 +220,7 @@ Done:
 
   @param[in] PolicySession      Handle for the policy session being extended.
   @param[in] HashList           the list of hashes to check for a match.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -285,7 +285,7 @@ Tpm2PolicyOR (
 
   @param[in]  PolicySession      Handle for the policy session being extended.
   @param[in]  Code               The allowed commandCode.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/
@@ -341,7 +341,7 @@ Tpm2PolicyCommandCode (
 
   @param[in]  PolicySession      Handle for the policy session.
   @param[out] PolicyHash         the current value of the policyHash of policySession.
-  
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_DEVICE_ERROR       The command was unsuccessful.
 **/

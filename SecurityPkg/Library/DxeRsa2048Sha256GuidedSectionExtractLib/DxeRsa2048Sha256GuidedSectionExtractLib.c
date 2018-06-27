@@ -1,17 +1,17 @@
 /** @file
 
-  This library registers RSA 2048 SHA 256 guided section handler 
+  This library registers RSA 2048 SHA 256 guided section handler
   to parse RSA 2048 SHA 256 encapsulation section and extract raw data.
   It uses the BaseCrypyLib based on OpenSSL to authenticate the signature.
 
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -50,7 +50,7 @@ CONST UINT8 mRsaE[] = { 0x01, 0x00, 0x01 };
 /**
 
   GetInfo gets raw data size and attribute of the input guided section.
-  It first checks whether the input guid section is supported. 
+  It first checks whether the input guid section is supported.
   If not, EFI_INVALID_PARAMETER will return.
 
   @param InputSection       Buffer containing the input GUIDed section to be processed.
@@ -58,7 +58,7 @@ CONST UINT8 mRsaE[] = { 0x01, 0x00, 0x01 };
   @param ScratchBufferSize  The size of ScratchBuffer.
   @param SectionAttribute   The attribute of the input guided section.
 
-  @retval EFI_SUCCESS            The size of destination buffer, the size of scratch buffer and 
+  @retval EFI_SUCCESS            The size of destination buffer, the size of scratch buffer and
                                  the attribute of the input section are successfully retrieved.
   @retval EFI_INVALID_PARAMETER  The GUID in InputSection does not match this instance guid.
 
@@ -111,7 +111,7 @@ Rsa2048Sha256GuidedSectionGetInfo (
 
   Extraction handler tries to extract raw data from the input guided section.
   It also does authentication check for RSA 2048 SHA 256 signature in the input guided section.
-  It first checks whether the input guid section is supported. 
+  It first checks whether the input guid section is supported.
   If not, EFI_INVALID_PARAMETER will return.
 
   @param InputSection    Buffer containing the input GUIDed section to be processed.
@@ -143,10 +143,10 @@ Rsa2048Sha256GuidedSectionHandler (
   UINTN                           PublicKeyBufferSize;
   VOID                            *HashContext;
   VOID                            *Rsa;
-  
+
   HashContext = NULL;
   Rsa         = NULL;
-  
+
   if (IS_SECTION2 (InputSection)) {
     //
     // Check whether the input guid section is recognized.
@@ -156,7 +156,7 @@ Rsa2048Sha256GuidedSectionHandler (
         &(((EFI_GUID_DEFINED_SECTION2 *)InputSection)->SectionDefinitionGuid))) {
       return EFI_INVALID_PARAMETER;
     }
-  
+
     //
     // Get the RSA 2048 SHA 256 information.
     //
@@ -184,7 +184,7 @@ Rsa2048Sha256GuidedSectionHandler (
         &(((EFI_GUID_DEFINED_SECTION *)InputSection)->SectionDefinitionGuid))) {
       return EFI_INVALID_PARAMETER;
     }
-  
+
     //
     // Get the RSA 2048 SHA 256 information.
     //
@@ -214,7 +214,7 @@ Rsa2048Sha256GuidedSectionHandler (
     // If SecurityPolicy Protocol exist, AUTH platform override bit is set.
     //
     *AuthenticationStatus |= EFI_AUTH_STATUS_PLATFORM_OVERRIDE;
-    
+
     return EFI_SUCCESS;
   }
 
@@ -222,7 +222,7 @@ Rsa2048Sha256GuidedSectionHandler (
   // All paths from here return EFI_SUCESS and result is returned in AuthenticationStatus
   //
   Status = EFI_SUCCESS;
-  
+
   //
   // Fail if the HashType is not SHA 256
   //
@@ -264,7 +264,7 @@ Rsa2048Sha256GuidedSectionHandler (
     *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
     goto Done;
   }
-  
+
   //
   // Fail if the PublicKey is not one of the public keys in PcdRsa2048Sha256PublicKeyBuffer
   //
@@ -299,8 +299,8 @@ Rsa2048Sha256GuidedSectionHandler (
     *AuthenticationStatus |= EFI_AUTH_STATUS_TEST_FAILED;
     goto Done;
   }
-  
-  // 
+
+  //
   // Set RSA Key Components.
   // NOTE: Only N and E are needed to be set as RSA public key for signature verification.
   //
@@ -347,10 +347,10 @@ Rsa2048Sha256GuidedSectionHandler (
   //
   PERF_INMODULE_BEGIN ("DxeRsaVerify");
   CryptoStatus = RsaPkcs1Verify (
-                   Rsa, 
-                   Digest, 
-                   SHA256_DIGEST_SIZE, 
-                   CertBlockRsa2048Sha256->Signature, 
+                   Rsa,
+                   Digest,
+                   SHA256_DIGEST_SIZE,
+                   CertBlockRsa2048Sha256->Signature,
                    sizeof (CertBlockRsa2048Sha256->Signature)
                    );
   PERF_INMODULE_END ("DxeRsaVerify");

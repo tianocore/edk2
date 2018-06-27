@@ -369,7 +369,7 @@ typedef struct _EFI_ATA_COMMAND_BLOCK {
   UINT8 AtaDeviceHead;
   UINT8 AtaSectorNumberExp;
   UINT8 AtaCylinderLowExp;
-  UINT8 AtaCylinderHighExp; 
+  UINT8 AtaCylinderHighExp;
   UINT8 AtaFeaturesExp;
   UINT8 AtaSectorCount;
   UINT8 AtaSectorCountExp;
@@ -386,7 +386,7 @@ typedef struct _EFI_ATA_STATUS_BLOCK {
   UINT8 AtaDeviceHead;
   UINT8 AtaSectorNumberExp;
   UINT8 AtaCylinderLowExp;
-  UINT8 AtaCylinderHighExp; 
+  UINT8 AtaCylinderHighExp;
   UINT8 Reserved2;
   UINT8 AtaSectorCount;
   UINT8 AtaSectorCountExp;

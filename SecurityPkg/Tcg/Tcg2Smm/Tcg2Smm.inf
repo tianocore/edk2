@@ -8,8 +8,8 @@
 #    TPM2.0 ACPI device object
 #     "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 00.21"
 #
-#  This driver implements TPM 2.0 definition block in ACPI table and 
-#  registers SMI callback functions for Tcg2 physical presence and 
+#  This driver implements TPM 2.0 definition block in ACPI table and
+#  registers SMI callback functions for Tcg2 physical presence and
 #  MemoryClear to handle the requests from ACPI method.
 #
 #  Caution: This module requires additional review when modified.
@@ -62,9 +62,9 @@
 
 [Guids]
   ## SOMETIMES_PRODUCES ## Variable:L"MemoryOverwriteRequestControl"
-  ## SOMETIMES_CONSUMES ## Variable:L"MemoryOverwriteRequestControl"  
+  ## SOMETIMES_CONSUMES ## Variable:L"MemoryOverwriteRequestControl"
   gEfiMemoryOverwriteControlDataGuid
-  
+
   gEfiTpmDeviceInstanceTpm20DtpmGuid                            ## PRODUCES           ## GUID       # TPM device identifier
 
 [Protocols]

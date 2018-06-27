@@ -1,13 +1,13 @@
 /** @file
   The module entry point for SecureBoot configuration module.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -35,7 +35,7 @@ SecureBootConfigDriverEntryPoint (
 {
   EFI_STATUS                       Status;
   SECUREBOOT_CONFIG_PRIVATE_DATA   *PrivateData;
-  
+
   //
   // If already started, return.
   //
@@ -50,7 +50,7 @@ SecureBootConfigDriverEntryPoint (
   if (!EFI_ERROR (Status)) {
     return EFI_ALREADY_STARTED;
   }
-  
+
   //
   // Create a private data structure.
   //
@@ -58,7 +58,7 @@ SecureBootConfigDriverEntryPoint (
   if (PrivateData == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-    
+
   //
   // Install SecureBoot configuration form
   //
@@ -69,7 +69,7 @@ SecureBootConfigDriverEntryPoint (
 
   //
   // Install private GUID.
-  //    
+  //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &ImageHandle,
                   &gEfiCallerIdGuid,
@@ -86,8 +86,8 @@ SecureBootConfigDriverEntryPoint (
 ErrorExit:
   if (PrivateData != NULL) {
     UninstallSecureBootConfigForm (PrivateData);
-  }  
-  
+  }
+
   return Status;
 }
 
@@ -113,11 +113,11 @@ SecureBootConfigDriverUnload (
                   ImageHandle,
                   &gEfiCallerIdGuid,
                   (VOID **) &PrivateData
-                  );  
+                  );
   if (EFI_ERROR (Status)) {
-    return Status;  
+    return Status;
   }
-  
+
   ASSERT (PrivateData->Signature == SECUREBOOT_CONFIG_PRIVATE_DATA_SIGNATURE);
 
   gBS->UninstallMultipleProtocolInterfaces (
@@ -126,7 +126,7 @@ SecureBootConfigDriverUnload (
          PrivateData,
          NULL
          );
-  
+
   UninstallSecureBootConfigForm (PrivateData);
 
   return EFI_SUCCESS;

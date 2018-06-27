@@ -1,7 +1,7 @@
 /** @file
   This library is used by other modules to measure data to TPM.
 
-Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -171,7 +171,7 @@ Tpm20MeasureAndLogData (
   @retval EFI_DEVICE_ERROR      The operation was unsuccessful.
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 TpmMeasureAndLogData (
   IN UINT32             PcrIndex,
   IN UINT32             EventType,

@@ -10,12 +10,12 @@
   PhysicalPresenceCallback() and MemoryClearCallback() will receive untrusted input and do some check.
 
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -82,7 +82,7 @@ PhysicalPresenceCallback (
     mTcgNvs->PhysicalPresence.LastRequest = MostRecentRequest;
     mTcgNvs->PhysicalPresence.Response = Response;
     return EFI_SUCCESS;
-  } else if ((mTcgNvs->PhysicalPresence.Parameter == TCG_ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS) 
+  } else if ((mTcgNvs->PhysicalPresence.Parameter == TCG_ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS)
           || (mTcgNvs->PhysicalPresence.Parameter == TCG_ACPI_FUNCTION_SUBMIT_REQUEST_TO_BIOS_2)) {
 
     OperationRequest = mTcgNvs->PhysicalPresence.Request;
@@ -163,7 +163,7 @@ MemoryClearCallback (
                            DataSize,
                            &MorControl
                            );
-  if (EFI_ERROR (Status)) { 
+  if (EFI_ERROR (Status)) {
     mTcgNvs->MemoryClear.ReturnCode = MOR_REQUEST_GENERAL_FAILURE;
     DEBUG ((EFI_D_ERROR, "[TPM] Set MOR variable failure! Status = %r\n", Status));
   }
@@ -201,7 +201,7 @@ AssignOpRegion (
   for (OpRegion  = (AML_OP_REGION_32_8 *) (Table + 1);
        OpRegion <= (AML_OP_REGION_32_8 *) ((UINT8 *) Table + Table->Length);
        OpRegion  = (AML_OP_REGION_32_8 *) ((UINT8 *) OpRegion + 1)) {
-    if ((OpRegion->OpRegionOp  == AML_EXT_REGION_OP) && 
+    if ((OpRegion->OpRegionOp  == AML_EXT_REGION_OP) &&
         (OpRegion->NameString  == Name) &&
         (OpRegion->DWordPrefix == AML_DWORD_PREFIX) &&
         (OpRegion->BytePrefix  == AML_BYTE_PREFIX)) {
@@ -219,7 +219,7 @@ AssignOpRegion (
 }
 
 /**
-  Patch version string of Physical Presence interface supported by platform. The initial string tag in TPM 
+  Patch version string of Physical Presence interface supported by platform. The initial string tag in TPM
 ACPI table is "$PV".
 
   @param[in, out] Table          The TPM item in ACPI table.
@@ -536,7 +536,7 @@ UpdateHID (
   if (!EFI_ERROR(Status)) {
     DEBUG((EFI_D_INFO, "TPM_PT_MANUFACTURER 0x%08x\n", ManufacturerID));
     //
-    // ManufacturerID defined in TCG Vendor ID Registry 
+    // ManufacturerID defined in TCG Vendor ID Registry
     // may tailed with 0x00 or 0x20
     //
     if ((ManufacturerID >> 24) == 0x00 || ((ManufacturerID >> 24) == 0x20)) {
@@ -571,7 +571,7 @@ UpdateHID (
     } else {
       AsciiSPrint(Hid + 4, TPM_HID_ACPI_SIZE - 4, "%02d%02d", ((FirmwareVersion1 & 0xFFFF0000) >> 16), (FirmwareVersion1 & 0x0000FFFF));
     }
-    
+
   } else {
     DEBUG ((EFI_D_ERROR, "Get TPM_PT_FIRMWARE_VERSION_X failed %x!\n", Status));
     ASSERT(FALSE);
@@ -742,7 +742,7 @@ PublishTpm2 (
 
   //
   // PlatformClass is only valid for version 4 and above
-  //    BIT0~15:  PlatformClass 
+  //    BIT0~15:  PlatformClass
   //    BIT16~31: Reserved
   //
   if (mTpm2AcpiTemplate.Header.Revision >= EFI_TPM2_ACPI_TABLE_REVISION_4) {
@@ -808,12 +808,12 @@ PublishTpm2 (
 /**
   The driver's entry point.
 
-  It install callbacks for TPM physical presence and MemoryClear, and locate 
+  It install callbacks for TPM physical presence and MemoryClear, and locate
   SMM variable to be used in the callback function.
 
-  @param[in] ImageHandle  The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
   @param[in] SystemTable  A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS     The entry point is executed successfully.
   @retval Others          Some error occurs when executing this entry point.
 
@@ -858,7 +858,7 @@ InitializeTcgSmm (
     return Status;
   }
   mTcgNvs->MemoryClear.SoftwareSmi = (UINT8) SwContext.SwSmiInputValue;
-  
+
   //
   // Locate SmmVariableProtocol.
   //

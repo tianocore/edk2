@@ -30,46 +30,46 @@
 
 [LibraryClasses]
   ##  @libraryclass  Provides hash interfaces from different implementations.
-  # 
+  #
   HashLib|Include/Library/HashLib.h
-  
+
   ##  @libraryclass  Provides a platform specific interface to detect physically present user.
   #
   PlatformSecureLib|Include/Library/PlatformSecureLib.h
-  
+
   ##  @libraryclass  Provides interfaces to handle TPM 1.2 request.
   #
   TcgPhysicalPresenceLib|Include/Library/TcgPhysicalPresenceLib.h
-  
+
   ##  @libraryclass  Provides support for TCG PP >= 128 Vendor Specific PPI Operation.
   #
   TcgPpVendorLib|Include/Library/TcgPpVendorLib.h
-  
+
   ##  @libraryclass  Provides interfaces for other modules to send TPM 2.0 command.
   #
   Tpm2CommandLib|Include/Library/Tpm2CommandLib.h
-  
+
   ##  @libraryclass  Provides interfaces on how to access TPM 2.0 hardware device.
   #
   Tpm2DeviceLib|Include/Library/Tpm2DeviceLib.h
-  
+
   ##  @libraryclass  Provides interfaces for other modules to send TPM 1.2 command.
   #
   Tpm12CommandLib|Include/Library/Tpm12CommandLib.h
-  
+
   ##  @libraryclass  Provides interfaces on how to access TPM 1.2 hardware device.
   #
   Tpm12DeviceLib|Include/Library/Tpm12DeviceLib.h
-  
+
   ##  @libraryclass  Provides TPM Interface Specification (TIS) interfaces for TPM command.
   #
   TpmCommLib|Include/Library/TpmCommLib.h
 
-  ##  @libraryclass  Provides support for TCG Physical Presence Interface (PPI) specification 
+  ##  @libraryclass  Provides support for TCG Physical Presence Interface (PPI) specification
   #   >= 128 Vendor Specific PPI Operation.
   #
   Tcg2PpVendorLib|Include/Library/TcgPpVendorLib.h
-  
+
   ##  @libraryclass  Handle TPM 2.0 physical presence request from OS.
   #
   Tcg2PhysicalPresenceLib|Include/Library/Tcg2PhysicalPresenceLib.h
@@ -102,7 +102,7 @@
   gEfiCustomModeEnableGuid           = { 0xc076ec0c, 0x7028, 0x4399, { 0xa0, 0x72, 0x71, 0xee, 0x5c, 0x44, 0x8b, 0x9f } }
 
   ## GUID used to "VendorKeysNv" variable to record the out of band secure boot keys modification.
-  #  This variable is a read-only NV variable that indicates whether someone other than the platform vendor has used a 
+  #  This variable is a read-only NV variable that indicates whether someone other than the platform vendor has used a
   #  mechanism not defined by the UEFI Specification to transition the system to setup mode or to update secure boot keys.
   #  Include/Guid/AuthenticatedVariableFormat.h
   gEfiVendorKeysNvGuid               = { 0x9073e4e0, 0x60ec, 0x4b6e, { 0x99, 0x3, 0x4c, 0x22, 0x3c, 0x26, 0xf, 0x3c } }
@@ -134,7 +134,7 @@
   ## GUID used to "PhysicalPresence" variable and "PhysicalPresenceFlags" variable for TPM request and response.
   #  Include/Guid/PhysicalPresenceData.h
   gEfiPhysicalPresenceGuid           = { 0xf6499b1, 0xe9ad, 0x493d, { 0xb9, 0xc2, 0x2f, 0x90, 0x81, 0x5c, 0x6c, 0xbc }}
-  
+
   ## GUID used to "Tcg2PhysicalPresence" variable and "Tcg2PhysicalPresenceFlags" variable for TPM2 request and response.
   #  Include/Guid/Tcg2PhysicalPresenceData.h
   gEfiTcg2PhysicalPresenceGuid = { 0xaeb9c5c1, 0x94f1, 0x4d02, { 0xbf, 0xd9, 0x46, 0x2, 0xdb, 0x2d, 0x3c, 0x54 }}
@@ -158,11 +158,11 @@
   ## GUID used for FormSet.
   #  Include/Guid/TcgConfigHii.h
   gTcgConfigFormSetGuid              = { 0xb0f901e4, 0xc424, 0x45de, { 0x90, 0x81, 0x95, 0xe2, 0xb, 0xde, 0x6f, 0xb5 }}
-  
+
   ## GUID used for FormSet and config variable.
   #  Include/Guid/Tcg2ConfigHii.h
   gTcg2ConfigFormSetGuid    = {0x6339d487, 0x26ba, 0x424b, { 0x9a, 0x5d, 0x68, 0x7e, 0x25, 0xd7, 0x40, 0xbc }}
-  
+
   ## GUID used for FormSet.
   #  Include/Guid/SecureBootConfigHii.h
   gSecureBootConfigFormSetGuid       = { 0x5daf50a5, 0xea81, 0x4de2, {0x8f, 0x9b, 0xca, 0xbd, 0xa9, 0xcf, 0x5c, 0x14}}
@@ -170,15 +170,15 @@
   ## GUID value used for PcdTpmInstanceGuid to indicate TPM is disabled.
   #  Include/Guid/TpmInstance.h
   gEfiTpmDeviceInstanceNoneGuid      = { 0x00000000, 0x0000, 0x0000, { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
-  
+
   ## GUID value used for PcdTpmInstanceGuid to indicate TPM 1.2 device is selected to support.
   #  Include/Guid/TpmInstance.h
   gEfiTpmDeviceInstanceTpm12Guid     = { 0x8b01e5b6, 0x4f19, 0x46e8, { 0xab, 0x93, 0x1c, 0x53, 0x67, 0x1b, 0x90, 0xcc } }
-  
+
   ## GUID value used for PcdTpmInstanceGuid to indicate discrete TPM 2.0 device is selected to support.
   #  Include/Guid/TpmInstance.h
   gEfiTpmDeviceInstanceTpm20DtpmGuid = { 0x286bf25a, 0xc2c3, 0x408c, { 0xb3, 0xb4, 0x25, 0xe6, 0x75, 0x8b, 0x73, 0x17 } }
-  
+
   ## GUID used to select supported TPM instance from UI.
   #  Include/Guid/TpmInstance.h
   gEfiTpmDeviceSelectedGuid          = { 0x7f4158d3, 0x74d, 0x456d, { 0x8c, 0xb2, 0x1, 0xf9, 0xc8, 0xf7, 0x9d, 0xaa } }
@@ -237,11 +237,11 @@
   #  0x00000004      Deny execution when there is security violation.<BR>
   #  0x00000005      Query user when there is security violation.<BR>
   # @Prompt Set policy for the image from fixed media.
-  # @ValidRange 0x80000001 | 0x00000000 - 0x00000005 
+  # @ValidRange 0x80000001 | 0x00000000 - 0x00000005
   gEfiSecurityPkgTokenSpaceGuid.PcdFixedMediaImageVerificationPolicy|0x04|UINT32|0x00000003
 
-  ## Defer Image Load policy settings. The policy is bitwise. 
-  #  If a bit is set, the image from corresponding device will be trusted when loading. Or  
+  ## Defer Image Load policy settings. The policy is bitwise.
+  #  If a bit is set, the image from corresponding device will be trusted when loading. Or
   #  the image will be deferred. The deferred image will be checked after user is identified.<BR><BR>
   #    BIT0       - Image from unknown device. <BR>
   #    BIT1       - Image from firmware volume.<BR>
@@ -249,7 +249,7 @@
   #    BIT3       - Image from removable media which includes CD-ROM, Floppy, USB and network.<BR>
   #    BIT4       - Image from fixed media device which includes hard disk.<BR>
   # @Prompt Set policy whether trust image before user identification.
-  # @ValidRange 0x80000002 | 0x00000000 - 0x0000001F 
+  # @ValidRange 0x80000002 | 0x00000000 - 0x0000001F
   gEfiSecurityPkgTokenSpaceGuid.PcdDeferImageLoadPolicy|0x0000001F|UINT32|0x0000004
 
   ## Null-terminated Unicode string of the file name that is the default name to save USB credential.
@@ -260,15 +260,15 @@
   ## The size of Append variable buffer. This buffer is reserved for runtime use, OS can append data into one existing variable.
   #  Note: This PCD is not been used.
   # @Prompt Max variable size for append operation.
-  gEfiSecurityPkgTokenSpaceGuid.PcdMaxAppendVariableSize|0x2000|UINT32|0x30000005  
+  gEfiSecurityPkgTokenSpaceGuid.PcdMaxAppendVariableSize|0x2000|UINT32|0x30000005
 
   ## Specifies the type of TCG platform that contains TPM chip.<BR><BR>
   #  If 0, TCG platform type is PC client.<BR>
   #  If 1, TCG platform type is PC server.<BR>
   # @Prompt Select platform type.
-  # @ValidRange 0x80000001 | 0x00 - 0x1 
+  # @ValidRange 0x80000001 | 0x00 - 0x1
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass|0|UINT8|0x00000006
-  
+
   ## Progress Code for TPM device subclass definitions.<BR><BR>
   #  EFI_PERIPHERAL_TPM  = (EFI_PERIPHERAL | 0x000D0000) = 0x010D0000<BR>
   # @Prompt Status Code for TPM device definitions
@@ -289,7 +289,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdOptionRomImageVerificationPolicy|0x04|UINT32|0x00000001
 
   ## Indicates the presence or absence of the platform operator during firmware booting.
-  #  If platform operator is not physical presence during boot. TPM will be locked and the TPM commands 
+  #  If platform operator is not physical presence during boot. TPM will be locked and the TPM commands
   #  that required operator physical presence can not run.<BR><BR>
   #   TRUE  - The platform operator is physically present.<BR>
   #   FALSE - The platform operator is not physically present.<BR>
@@ -297,7 +297,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPhysicalPresence|TRUE|BOOLEAN|0x00010001
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
-  ## Indicates whether TPM physical presence is locked during platform initialization.  
+  ## Indicates whether TPM physical presence is locked during platform initialization.
   #  Once it is locked, it can not be unlocked for TPM life time.<BR><BR>
   #   TRUE  - Lock TPM physical presence asserting method.<BR>
   #   FALSE - Not lock TPM physical presence asserting method.<BR>
@@ -329,35 +329,35 @@
   #  If 0, no initialization needed - most likely used for chipset SRTM solution, in which TPM is already initialized.<BR>
   #  If 1, initialization needed.<BR>
   # @Prompt TPM 2.0 device initialization policy.<BR>
-  # @ValidRange 0x80000001 | 0x00 - 0x1 
+  # @ValidRange 0x80000001 | 0x00 - 0x1
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2InitializationPolicy|1|UINT8|0x0001000A
 
   ## This PCD indicates the initialization policy for TPM 1.2.<BR><BR>
   #  If 0, no initialization needed - most likely used for chipset SRTM solution, in which TPM is already initialized.<BR>
   #  If 1, initialization needed.<BR>
   # @Prompt TPM 1.2 device initialization policy.
-  # @ValidRange 0x80000001 | 0x00 - 0x1 
+  # @ValidRange 0x80000001 | 0x00 - 0x1
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy|1|UINT8|0x0001000B
 
   ## This PCD indicates the TPM 2.0 SelfTest policy.<BR><BR>
   #  if 0, no SelfTest needed - most likely used for fTPM, because it might already be tested.<BR>
   #  if 1, SelfTest needed.<BR>
   # @Prompt TPM 2.0 device selftest.
-  # @ValidRange 0x80000001 | 0x00 - 0x1 
+  # @ValidRange 0x80000001 | 0x00 - 0x1
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2SelfTestPolicy|1|UINT8|0x0001000C
 
   ## This PCD indicates Static Core Root of Trust for Measurement (SCRTM) policy using TPM 2.0.<BR><BR>
   #  if 0, no SCRTM measurement needed - In this case, it is already done.<BR>
   #  if 1, SCRTM measurement done by BIOS.<BR>
   # @Prompt SCRTM policy setting for TPM 2.0 device.
-  # @ValidRange 0x80000001 | 0x00 - 0x1 
+  # @ValidRange 0x80000001 | 0x00 - 0x1
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2ScrtmPolicy|1|UINT8|0x0001000D
 
   ## This PCD indicates Static Core Root of Trust for Measurement (SCRTM) policy using TPM 1.2.<BR><BR>
   #  if 0, no SCRTM measurement needed - In this case, it is already done.<BR>
   #  if 1, SCRTM measurement done by BIOS.<BR>
   # @Prompt SCRTM policy setting for TPM 1.2 device
-  # @ValidRange 0x80000001 | 0x00 - 0x1 
+  # @ValidRange 0x80000001 | 0x00 - 0x1
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmScrtmPolicy|1|UINT8|0x0001000E
 
   ## Guid name to identify TPM instance.<BR><BR>
@@ -382,7 +382,7 @@
   #  0 means dynamic get from supported HASH algorithm
   # @Prompt OEM configurated number of PCR banks.
   gEfiSecurityPkgTokenSpaceGuid.PcdTcg2NumberOfPCRBanks|0x0|UINT32|0x00010015
-  
+
   ## Provides one or more SHA 256 Hashes of the RSA 2048 public keys used to verify Recovery and Capsule Update images
   #  WARNING: The default value is treated as test key. Please do not use default value in the production.
   # @Prompt One or more SHA 256 Hashes of RSA 2048 bit public keys used to verify Recovery and Capsule Update images
@@ -412,7 +412,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTcgPhysicalPresenceInterfaceVer|"1.3"|VOID*|0x00000008
 
   ## Indicate whether a physical presence user exist.
-  # When it is configured to Dynamic or DynamicEx, it can be set through detection using 
+  # When it is configured to Dynamic or DynamicEx, it can be set through detection using
   # a platform-specific method (e.g. Button pressed) in a actual platform in early boot phase.<BR><BR>
   # @Prompt A physical presence user status
   gEfiSecurityPkgTokenSpaceGuid.PcdUserPhysicalPresence|FALSE|BOOLEAN|0x00010019
@@ -451,7 +451,7 @@
   #    BIT2  -  SHA384.<BR>
   #    BIT3  -  SHA512.<BR>
   # @Prompt Hash mask for TPM 2.0
-  # @ValidRange 0x80000001 | 0x00000000 - 0x0000000F 
+  # @ValidRange 0x80000001 | 0x00000000 - 0x0000000F
   gEfiSecurityPkgTokenSpaceGuid.PcdTpm2HashMask|0x0000000F|UINT32|0x00010010
 
   ## This PCD indicated final BIOS supported Hash mask.
@@ -475,7 +475,7 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdActiveTpmInterfaceType|0xFF|UINT8|0x0001001E
 
   ## This PCD records IdleByass status supported by current active TPM interface.
-  #  Accodingt to TCG PTP spec 1.3, TPM with CRB interface can skip idle state and 
+  #  Accodingt to TCG PTP spec 1.3, TPM with CRB interface can skip idle state and
   #  diretcly move to CmdReady state. <BR>
   #  0x00 - Do not support IdleByPass.<BR>
   #  0x01 - Support IdleByPass.<BR>

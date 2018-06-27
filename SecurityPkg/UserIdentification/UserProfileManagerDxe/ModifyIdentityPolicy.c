@@ -1,13 +1,13 @@
 /** @file
   The functions for identification policy modification.
-    
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   provider can't appear twice in one identity policy.
 
   @param[in] NewGuid       Points to the credential provider guid.
-  
+
   @retval TRUE     The NewGuid was found in the identity policy.
   @retval FALSE    The NewGuid was not found.
 
@@ -52,7 +52,7 @@ ProviderAlreadyInPolicy (
     }
     Offset += Identity->Length;
   }
-  
+
   return FALSE;
 }
 
@@ -70,12 +70,12 @@ ProviderAlreadyInPolicy (
 EFI_STATUS
 EnrollUserOnProvider (
   IN  EFI_USER_INFO_IDENTITY_POLICY              *Identity,
-  IN  EFI_USER_PROFILE_HANDLE                    User 
+  IN  EFI_USER_PROFILE_HANDLE                    User
   )
 {
   UINTN                          Index;
   EFI_USER_CREDENTIAL2_PROTOCOL  *UserCredential;
-  
+
   //
   // Find the specified credential provider.
   //
@@ -86,7 +86,7 @@ EnrollUserOnProvider (
     }
   }
 
-  return EFI_NOT_FOUND;  
+  return EFI_NOT_FOUND;
 }
 
 
@@ -103,12 +103,12 @@ EnrollUserOnProvider (
 EFI_STATUS
 DeleteUserOnProvider (
   IN  EFI_USER_INFO_IDENTITY_POLICY              *Identity,
-  IN  EFI_USER_PROFILE_HANDLE                    User 
+  IN  EFI_USER_PROFILE_HANDLE                    User
   )
 {
   UINTN                          Index;
   EFI_USER_CREDENTIAL2_PROTOCOL  *UserCredential;
-  
+
   //
   // Find the specified credential provider.
   //
@@ -119,13 +119,13 @@ DeleteUserOnProvider (
     }
   }
 
-  return EFI_NOT_FOUND;  
+  return EFI_NOT_FOUND;
 }
 
 
 /**
   Delete User's credental from all the providers that exist in User's identity policy.
-  
+
   @param[in]  IdentityPolicy     Point to User's identity policy.
   @param[in]  IdentityPolicyLen  The length of the identity policy.
   @param[in]  User               Points to user profile.
@@ -135,7 +135,7 @@ VOID
 DeleteCredentialFromProviders (
   IN     UINT8                                *IdentityPolicy,
   IN     UINTN                                 IdentityPolicyLen,
-  IN     EFI_USER_PROFILE_HANDLE               User 
+  IN     EFI_USER_PROFILE_HANDLE               User
   )
 {
   EFI_USER_INFO_IDENTITY_POLICY    *Identity;
@@ -158,7 +158,7 @@ DeleteCredentialFromProviders (
 
 /**
   Remove the provider specified by Offset from the new user identification record.
-  
+
   @param[in]  IdentityPolicy    Point to user identity item in new identification policy.
   @param[in]  Offset            The item offset in the new identification policy.
 
@@ -187,11 +187,11 @@ DeleteProviderFromPolicy (
   if ((Offset + IdentityPolicy->Length) != mUserInfo.NewIdentityPolicyLen) {
     //
     // This provider is not the last item in the identification policy, delete it and the connector.
-    //    
+    //
     RemainingLen = mUserInfo.NewIdentityPolicyLen - Offset - DeleteLen;
     CopyMem ((UINT8 *) IdentityPolicy, (UINT8 *) IdentityPolicy + DeleteLen, RemainingLen);
   }
-  mUserInfo.NewIdentityPolicyLen -= DeleteLen;  
+  mUserInfo.NewIdentityPolicyLen -= DeleteLen;
 }
 
 
@@ -201,7 +201,7 @@ DeleteProviderFromPolicy (
   It is invoked when 'add option' in UI is pressed.
 
   @param[in] NewGuid       Points to the credential provider guid.
-  
+
 **/
 VOID
 AddProviderToPolicy (
@@ -248,7 +248,7 @@ AddProviderToPolicy (
     NewPolicyInfoLen = mUserInfo.NewIdentityPolicyLen + Policy->Length;
     FreePool (mUserInfo.NewIdentityPolicy);
   }
-  
+
   //
   // Save credential provider.
   //
@@ -325,7 +325,7 @@ UpdateCredentialProvider (
 
   @retval TRUE     The policy is a valid identity policy.
   @retval FALSE    The policy is not a valid identity policy.
-  
+
 **/
 BOOLEAN
 CheckNewIdentityPolicy (
@@ -337,7 +337,7 @@ CheckNewIdentityPolicy (
   EFI_INPUT_KEY                 Key;
   UINTN                         Offset;
   UINT32                        OpCode;
-  
+
   //
   // Check policy expression.
   //
@@ -349,7 +349,7 @@ CheckNewIdentityPolicy (
     //
     Identity = (EFI_USER_INFO_IDENTITY_POLICY *) (PolicyInfo + Offset);
     switch (Identity->Type) {
-      
+
     case EFI_USER_INFO_IDENTITY_TRUE:
       break;
 
@@ -408,11 +408,11 @@ CheckNewIdentityPolicy (
 
 /**
   Save the identity policy and update UI with it.
-  
-  This function will verify the new identity policy, in current implementation, 
+
+  This function will verify the new identity policy, in current implementation,
   the identity policy can be:  T, P & P & P & ..., P | P | P | ...
   Here, "T" means "True", "P" means "Credential Provider", "&" means "and", "|" means "or".
-  Other identity policies are not supported.  
+  Other identity policies are not supported.
 
 **/
 VOID
@@ -439,7 +439,7 @@ SaveIdentityPolicy (
   if (EFI_ERROR (Status)) {
     return ;
   }
-  
+
   //
   // Update the informantion on credential provider.
   //
@@ -447,7 +447,7 @@ SaveIdentityPolicy (
   if (EFI_ERROR (Status)) {
     return ;
   }
-  
+
   //
   // Save new identification policy.
   //
@@ -461,7 +461,7 @@ SaveIdentityPolicy (
 
   Status = mUserManager->SetInfo (mUserManager, mModifyUser, &UserInfo, Info, Info->InfoSize);
   FreePool (Info);
-   
+
   //
   // Update the mUserInfo.IdentityPolicy by mUserInfo.NewIdentityPolicy
   //
@@ -473,7 +473,7 @@ SaveIdentityPolicy (
 
   mUserInfo.NewIdentityPolicy         = NULL;
   mUserInfo.NewIdentityPolicyLen      = 0;
-  mUserInfo.NewIdentityPolicyModified = FALSE;   
+  mUserInfo.NewIdentityPolicyModified = FALSE;
 
   //
   // Update identity policy choice.
@@ -494,7 +494,7 @@ AddIdentityPolicyItem (
   if (mProviderInfo->Count == 0) {
     return ;
   }
-  
+
   //
   // Check the identity policy.
   //

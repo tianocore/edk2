@@ -1,13 +1,13 @@
 /** @file
   Internal header file for Extended SAL variable service module.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -63,7 +63,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define AUTHVAR_KEYDB_NAME_SIZE 38
 
 ///
-/// The maximum size of the public key database, restricted by maximum individal EFI 
+/// The maximum size of the public key database, restricted by maximum individal EFI
 /// varible size, and excluding the variable header and name size.
 ///
 #define MAX_KEYDB_SIZE  (FixedPcdGet32 (PcdMaxVariableSize) - sizeof (AUTHENTICATED_VARIABLE_HEADER) - AUTHVAR_KEYDB_NAME_SIZE)
@@ -191,22 +191,22 @@ VariableClassAddressChangeEvent (
 
   This function implements EsalGetVariable function of Extended SAL Variable Services Class.
   It is equivalent in functionality to the EFI Runtime Service GetVariable().
-  
+
   @param[in]      VariableName    A Null-terminated Unicode string that is the name of
                                   the vendor's variable.
   @param[in]      VendorGuid      A unique identifier for the vendor.
-  @param[out]     Attributes      If not NULL, a pointer to the memory location to return the 
+  @param[out]     Attributes      If not NULL, a pointer to the memory location to return the
                                   attributes bitmask for the variable.
   @param[in, out] DataSize        Size of Data found. If size is less than the
                                   data, this value contains the required size.
-  @param[out]     Data            On input, the size in bytes of the return Data buffer.  
+  @param[out]     Data            On input, the size in bytes of the return Data buffer.
                                   On output, the size of data returned in Data.
   @param[in]      VirtualMode     Current calling mode for this function.
   @param[in]      Global          Context of this Extended SAL Variable Services Class call.
 
-  @retval EFI_SUCCESS            The function completed successfully. 
+  @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_NOT_FOUND          The variable was not found.
-  @retval EFI_BUFFER_TOO_SMALL   DataSize is too small for the result.  DataSize has 
+  @retval EFI_BUFFER_TOO_SMALL   DataSize is too small for the result.  DataSize has
                                  been updated with the size needed to complete the request.
   @retval EFI_INVALID_PARAMETER  VariableName is NULL.
   @retval EFI_INVALID_PARAMETER  VendorGuid is NULL.
@@ -233,18 +233,18 @@ EsalGetVariable (
 
   This function implements EsalGetNextVariableName function of Extended SAL Variable Services Class.
   It is equivalent in functionality to the EFI Runtime Service GetNextVariableName().
-  
+
   @param[in, out] VariableNameSize Size of the variable
   @param[in, out] VariableName     On input, supplies the last VariableName that was returned by GetNextVariableName().
                                    On output, returns the Null-terminated Unicode string of the current variable.
   @param[in, out] VendorGuid       On input, supplies the last VendorGuid that was returned by GetNextVariableName().
-                                   On output, returns the VendorGuid of the current variable.  
+                                   On output, returns the VendorGuid of the current variable.
   @param[in]      VirtualMode      Current calling mode for this function.
   @param[in]      Global           Context of this Extended SAL Variable Services Class call.
 
-  @retval EFI_SUCCESS             The function completed successfully. 
+  @retval EFI_SUCCESS             The function completed successfully.
   @retval EFI_NOT_FOUND           The next variable was not found.
-  @retval EFI_BUFFER_TOO_SMALL    VariableNameSize is too small for the result. 
+  @retval EFI_BUFFER_TOO_SMALL    VariableNameSize is too small for the result.
                                   VariableNameSize has been updated with the size needed to complete the request.
   @retval EFI_INVALID_PARAMETER   VariableNameSize is NULL.
   @retval EFI_INVALID_PARAMETER   VariableName is NULL.
@@ -267,11 +267,11 @@ EsalGetNextVariableName (
 
   This function implements EsalSetVariable function of Extended SAL Variable Services Class.
   It is equivalent in functionality to the EFI Runtime Service SetVariable().
-  
+
   @param[in]  VariableName       A Null-terminated Unicode string that is the name of the vendor's
-                                 variable.  Each VariableName is unique for each 
-                                 VendorGuid.  VariableName must contain 1 or more 
-                                 Unicode characters.  If VariableName is an empty Unicode 
+                                 variable.  Each VariableName is unique for each
+                                 VendorGuid.  VariableName must contain 1 or more
+                                 Unicode characters.  If VariableName is an empty Unicode
                                  string, then EFI_INVALID_PARAMETER is returned.
   @param[in]  VendorGuid         A unique identifier for the vendor.
   @param[in]  Attributes         Attributes bitmask to set for the variable.
@@ -281,9 +281,9 @@ EsalGetNextVariableName (
   @param[in]  VirtualMode        Current calling mode for this function.
   @param[in]  Global             Context of this Extended SAL Variable Services Class call.
 
-  @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as 
+  @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as
                                  defined by the Attributes.
-  @retval EFI_INVALID_PARAMETER  An invalid combination of attribute bits was supplied, or the 
+  @retval EFI_INVALID_PARAMETER  An invalid combination of attribute bits was supplied, or the
                                  DataSize exceeds the maximum allowed.
   @retval EFI_INVALID_PARAMETER  VariableName is an empty Unicode string.
   @retval EFI_OUT_OF_RESOURCES   Not enough storage is available to hold the variable and its data.
@@ -314,19 +314,19 @@ EsalSetVariable (
 
   @param[in]  Attributes                   Attributes bitmask to specify the type of variables
                                            on which to return information.
-  @param[out] MaximumVariableStorageSize   On output the maximum size of the storage space available for 
-                                           the EFI variables associated with the attributes specified.  
-  @param[out] RemainingVariableStorageSize Returns the remaining size of the storage space available for EFI 
+  @param[out] MaximumVariableStorageSize   On output the maximum size of the storage space available for
+                                           the EFI variables associated with the attributes specified.
+  @param[out] RemainingVariableStorageSize Returns the remaining size of the storage space available for EFI
                                            variables associated with the attributes specified.
-  @param[out] MaximumVariableSize          Returns the maximum size of an individual EFI variable 
+  @param[out] MaximumVariableSize          Returns the maximum size of an individual EFI variable
                                            associated with the attributes specified.
   @param[in]  VirtualMode                  Current calling mode for this function
   @param[in]  Global                       Context of this Extended SAL Variable Services Class call
 
   @retval EFI_SUCCESS                      Valid answer returned.
   @retval EFI_INVALID_PARAMETER            An invalid combination of attribute bits was supplied.
-  @retval EFI_UNSUPPORTED                  The attribute is not supported on this platform, and the 
-                                           MaximumVariableStorageSize, RemainingVariableStorageSize, 
+  @retval EFI_UNSUPPORTED                  The attribute is not supported on this platform, and the
+                                           MaximumVariableStorageSize, RemainingVariableStorageSize,
                                            MaximumVariableSize are undefined.
 **/
 EFI_STATUS
@@ -436,7 +436,7 @@ DataSizeOfVariable (
   );
 
 /**
-  Update the variable region with Variable information. These are the same 
+  Update the variable region with Variable information. These are the same
   arguments as the EFI Variable services.
 
   @param[in] VariableName       Name of variable.
@@ -445,7 +445,7 @@ DataSizeOfVariable (
   @param[in] DataSize           Size of data. 0 means delete.
   @param[in] Attributes         Attributes of the variable.
   @param[in] KeyIndex           Index of associated public key.
-  @param[in] MonotonicCount     Value of associated monotonic count. 
+  @param[in] MonotonicCount     Value of associated monotonic count.
   @param[in] VirtualMode        Current calling mode for this function.
   @param[in] Global             Context of this Extended SAL Variable Services Class call.
   @param[in] Variable           The variable information which is used to keep track of variable usage.
@@ -461,7 +461,7 @@ UpdateVariable (
   IN      EFI_GUID                *VendorGuid,
   IN      VOID                    *Data,
   IN      UINTN                   DataSize,
-  IN      UINT32                  Attributes OPTIONAL,  
+  IN      UINT32                  Attributes OPTIONAL,
   IN      UINT32                  KeyIndex  OPTIONAL,
   IN      UINT64                  MonotonicCount  OPTIONAL,
   IN      BOOLEAN                 VirtualMode,

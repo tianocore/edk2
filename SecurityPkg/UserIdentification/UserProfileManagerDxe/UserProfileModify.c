@@ -1,13 +1,13 @@
 /** @file
   The functions to modify a user profile.
-    
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -127,7 +127,7 @@ GetAllUserInfo (
   mUserInfo.CreateDateExist         = FALSE;
   mUserInfo.UsageDateExist          = FALSE;
   mUserInfo.UsageCount              = 0;
-  
+
   mUserInfo.AccessPolicyLen         = 0;
   mUserInfo.AccessPolicyModified    = FALSE;
   if (mUserInfo.AccessPolicy != NULL) {
@@ -140,7 +140,7 @@ GetAllUserInfo (
     FreePool (mUserInfo.IdentityPolicy);
     mUserInfo.IdentityPolicy = NULL;
   }
-  
+
   //
   // Allocate user information memory.
   //
@@ -149,7 +149,7 @@ GetAllUserInfo (
   if (Info == NULL) {
     return ;
   }
-  
+
   //
   // Get each user information.
   //
@@ -164,10 +164,10 @@ GetAllUserInfo (
     //
     InfoSize  = MemSize;
     Status    = mUserManager->GetInfo (
-                                mUserManager, 
-                                mModifyUser, 
-                                UserInfo, 
-                                Info, 
+                                mUserManager,
+                                mModifyUser,
+                                UserInfo,
+                                Info,
                                 &InfoSize
                                 );
     if (Status == EFI_BUFFER_TOO_SMALL) {
@@ -281,12 +281,12 @@ ResolveDate (
   UnicodeSPrint (
     Str + StrLen (Str),
     DateBufLen,
-    L"%2d:%2d:%2d", 
+    L"%2d:%2d:%2d",
     Date->Hour,
     Date->Minute,
     Date->Second
     );
-  
+
   HiiSetString (mCallbackInfo->HiiHandle, DateId, Str, NULL);
   FreePool (Str);
 }
@@ -308,7 +308,7 @@ ResolveCount (
 {
   CHAR16  Count[10];
 
-  UnicodeSPrint (Count, 20, L"%d", CountVal);  
+  UnicodeSPrint (Count, 20, L"%d", CountVal);
   HiiSetString (mCallbackInfo->HiiHandle, CountId, Count, NULL);
 }
 
@@ -318,7 +318,7 @@ ResolveCount (
   Unicode string.
 
   @param[in, out]  Source1      On entry, point to a Null-terminated Unicode string.
-                                On exit, point to a new concatenated Unicode string                                
+                                On exit, point to a new concatenated Unicode string
   @param[in]       Source2      Pointer to a Null-terminated Unicode string.
 
 **/
@@ -380,9 +380,9 @@ ResolveIdentityPolicy (
   EFI_STRING_ID                 ProvId;
   EFI_HII_HANDLE                HiiHandle;
   EFI_USER_CREDENTIAL2_PROTOCOL *UserCredential;
- 
+
   TmpStr = NULL;
-  
+
   //
   // Resolve each policy.
   //
@@ -413,10 +413,10 @@ ResolveIdentityPolicy (
     case EFI_USER_INFO_IDENTITY_CREDENTIAL_TYPE:
       for (Index = 0; Index < mProviderInfo->Count; Index++) {
         UserCredential = mProviderInfo->Provider[Index];
-        if (CompareGuid ((EFI_GUID *) (Identity + 1), &UserCredential->Type)) {     
+        if (CompareGuid ((EFI_GUID *) (Identity + 1), &UserCredential->Type)) {
           UserCredential->Title (
-                            UserCredential, 
-                            &HiiHandle, 
+                            UserCredential,
+                            &HiiHandle,
                             &ProvId
                             );
           ProvStr = HiiGetString (HiiHandle, ProvId, NULL);
@@ -432,7 +432,7 @@ ResolveIdentityPolicy (
     case EFI_USER_INFO_IDENTITY_CREDENTIAL_PROVIDER:
       for (Index = 0; Index < mProviderInfo->Count; Index++) {
         UserCredential = mProviderInfo->Provider[Index];
-        if (CompareGuid ((EFI_GUID *) (Identity + 1), &UserCredential->Identifier)) {          
+        if (CompareGuid ((EFI_GUID *) (Identity + 1), &UserCredential->Identifier)) {
           UserCredential->Title (
                             UserCredential,
                             &HiiHandle,
@@ -466,7 +466,7 @@ ResolveIdentityPolicy (
   and access policy.
 
   @param[in] UserIndex       The index of the user in display list to modify.
-  
+
 **/
 VOID
 ModifyUserInfo (
@@ -527,7 +527,7 @@ ModifyUserInfo (
     }
     UserIndex--;
   }
-  
+
   //
   // Get user profile information.
   //
@@ -541,7 +541,7 @@ ModifyUserInfo (
     mUserInfo.UserName,
     NULL
     );
-  
+
   //
   // Update create date.
   //
@@ -555,7 +555,7 @@ ModifyUserInfo (
       NULL
       );
   }
-  
+
   //
   // Add usage date.
   //
@@ -569,12 +569,12 @@ ModifyUserInfo (
       NULL
       );
   }
-  
+
   //
   // Add usage count.
   //
   ResolveCount ((UINT32) mUserInfo.UsageCount, STRING_TOKEN (STR_USAGE_COUNT_VAL));
-  
+
   //
   // Add identity policy.
   //
@@ -594,7 +594,7 @@ ModifyUserInfo (
       KEY_MODIFY_USER | KEY_SELECT_USER | KEY_MODIFY_IP   // Question ID
       );
   }
-  
+
   //
   // Add access policy.
   //
@@ -643,7 +643,7 @@ ResolveAccessPolicy (
   UINT8                         *AccessData;
 
   //
-  // Set default value 
+  // Set default value
   //
   mAccessInfo.AccessRight       = EFI_USER_INFO_ACCESS_ENROLL_SELF;
   mAccessInfo.AccessSetup       = ACCESS_SETUP_RESTRICTED;
@@ -653,13 +653,13 @@ ResolveAccessPolicy (
   mAccessInfo.LoadForbidLen     = 0;
   mAccessInfo.ConnectPermitLen  = 0;
   mAccessInfo.ConnectForbidLen  = 0;
-  
+
   //
   // Get each user access policy.
   //
   OffSet = 0;
   while (OffSet < mUserInfo.AccessPolicyLen) {
-    CopyMem (&Control, mUserInfo.AccessPolicy + OffSet, sizeof (Control));    
+    CopyMem (&Control, mUserInfo.AccessPolicy + OffSet, sizeof (Control));
     ValLen = Control.Size - sizeof (Control);
     switch (Control.Type) {
     case EFI_USER_INFO_ACCESS_ENROLL_SELF:
@@ -754,7 +754,7 @@ ResolveAccessPolicy (
   @param[in]  User         Handle of the user whose information will be searched.
   @param[in]  InfoType     The user information type to find.
   @param[out] UserInfo     Points to user information handle found.
-  
+
   @retval EFI_SUCCESS      Find the user information successfully.
   @retval Others           Fail to find the user information.
 
@@ -784,7 +784,7 @@ FindInfoByType (
   if (Info == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Get each user information.
   //
@@ -836,7 +836,7 @@ FindInfoByType (
 
   In this form, access right, access setup and access boot order are dynamically
   added. Load devicepath and connect devicepath are displayed too.
-  
+
 **/
 VOID
 ModidyAccessPolicy (
@@ -849,7 +849,7 @@ ModidyAccessPolicy (
   EFI_IFR_GUID_LABEL  *StartLabel;
   EFI_IFR_GUID_LABEL  *EndLabel;
   VOID                *DefaultOpCodeHandle;
-  
+
   //
   // Initialize the container for dynamic opcodes.
   //
@@ -893,7 +893,7 @@ ModidyAccessPolicy (
   ASSERT (OptionsOpCodeHandle != NULL);
   DefaultOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (DefaultOpCodeHandle != NULL);
-  
+
   HiiCreateOneOfOptionOpCode (
     OptionsOpCodeHandle,
     STRING_TOKEN (STR_NORMAL),
@@ -919,12 +919,12 @@ ModidyAccessPolicy (
     );
 
   HiiCreateDefaultOpCode (
-    DefaultOpCodeHandle, 
-    EFI_HII_DEFAULT_CLASS_STANDARD, 
-    EFI_IFR_NUMERIC_SIZE_1, 
+    DefaultOpCodeHandle,
+    EFI_HII_DEFAULT_CLASS_STANDARD,
+    EFI_IFR_NUMERIC_SIZE_1,
     mAccessInfo.AccessRight
     );
- 
+
   HiiCreateOneOfOpCode (
     StartOpCodeHandle,                    // Container for dynamic created opcodes
     KEY_MODIFY_USER | KEY_SELECT_USER | KEY_MODIFY_AP | KEY_MODIFY_RIGHT, // Question ID
@@ -948,7 +948,7 @@ ModidyAccessPolicy (
   ASSERT (OptionsOpCodeHandle != NULL);
   DefaultOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (DefaultOpCodeHandle != NULL);
-  
+
   HiiCreateOneOfOptionOpCode (
     OptionsOpCodeHandle,
     STRING_TOKEN (STR_RESTRICTED),
@@ -956,7 +956,7 @@ ModidyAccessPolicy (
     EFI_IFR_NUMERIC_SIZE_1,
     ACCESS_SETUP_RESTRICTED
     );
-    
+
   HiiCreateOneOfOptionOpCode (
     OptionsOpCodeHandle,
     STRING_TOKEN (STR_NORMAL),
@@ -974,11 +974,11 @@ ModidyAccessPolicy (
     );
 
   HiiCreateDefaultOpCode (
-    DefaultOpCodeHandle, 
-    EFI_HII_DEFAULT_CLASS_STANDARD, 
-    EFI_IFR_NUMERIC_SIZE_1, 
+    DefaultOpCodeHandle,
+    EFI_HII_DEFAULT_CLASS_STANDARD,
+    EFI_IFR_NUMERIC_SIZE_1,
     mAccessInfo.AccessSetup
-    );    
+    );
 
   HiiCreateOneOfOpCode (
     StartOpCodeHandle,                    // Container for dynamic created opcodes
@@ -994,7 +994,7 @@ ModidyAccessPolicy (
     );
   HiiFreeOpCodeHandle (DefaultOpCodeHandle);
   HiiFreeOpCodeHandle (OptionsOpCodeHandle);
-  
+
   //
   // Add boot order one-of-code.
   //
@@ -1002,7 +1002,7 @@ ModidyAccessPolicy (
   ASSERT (OptionsOpCodeHandle != NULL);
   DefaultOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (DefaultOpCodeHandle != NULL);
-  
+
   HiiCreateOneOfOptionOpCode (
     OptionsOpCodeHandle,
     STRING_TOKEN (STR_INSERT),
@@ -1026,7 +1026,7 @@ ModidyAccessPolicy (
     EFI_IFR_NUMERIC_SIZE_4,
     EFI_USER_INFO_ACCESS_BOOT_ORDER_REPLACE
     );
-    
+
   HiiCreateOneOfOptionOpCode (
     OptionsOpCodeHandle,
     STRING_TOKEN (STR_NODEFAULT),
@@ -1036,12 +1036,12 @@ ModidyAccessPolicy (
     );
 
   HiiCreateDefaultOpCode (
-    DefaultOpCodeHandle, 
-    EFI_HII_DEFAULT_CLASS_STANDARD, 
-    EFI_IFR_NUMERIC_SIZE_4, 
+    DefaultOpCodeHandle,
+    EFI_HII_DEFAULT_CLASS_STANDARD,
+    EFI_IFR_NUMERIC_SIZE_4,
     mAccessInfo.AccessBootOrder
     );
-    
+
   HiiCreateOneOfOpCode (
     StartOpCodeHandle,                  // Container for dynamic created opcodes
     KEY_MODIFY_USER | KEY_SELECT_USER | KEY_MODIFY_AP | KEY_MODIFY_BOOT, // Question ID
@@ -1054,7 +1054,7 @@ ModidyAccessPolicy (
     OptionsOpCodeHandle,                // Option Opcode list
     DefaultOpCodeHandle                 // Default Opcode
     );
-  HiiFreeOpCodeHandle (DefaultOpCodeHandle);    
+  HiiFreeOpCodeHandle (DefaultOpCodeHandle);
   HiiFreeOpCodeHandle (OptionsOpCodeHandle);
 
   //
@@ -1078,7 +1078,7 @@ ModidyAccessPolicy (
 
   @param[in] ValidLen       The valid access policy length.
   @param[in] ExpandLen      The length that is needed to expand.
-    
+
 **/
 VOID
 ExpandMemory (
@@ -1107,7 +1107,7 @@ ExpandMemory (
 
 
 /**
-  Get the username from user input, and update username string in the Hii 
+  Get the username from user input, and update username string in the Hii
   database with it.
 
 **/
@@ -1142,7 +1142,7 @@ ModifyUserName (
     }
     return ;
   }
-  
+
   //
   // Check whether the username had been used or not.
   //
@@ -1178,15 +1178,15 @@ ModifyUserName (
     FreePool (Info);
     return ;
   }
-  
+
   //
   // Update username display in the form.
   //
   CopyMem (mUserInfo.UserName, UserName, Len);
   HiiSetString (
-    mCallbackInfo->HiiHandle, 
-    STRING_TOKEN (STR_USER_NAME_VAL), 
-    mUserInfo.UserName, 
+    mCallbackInfo->HiiHandle,
+    STRING_TOKEN (STR_USER_NAME_VAL),
+    mUserInfo.UserName,
     NULL
     );
 
@@ -1303,7 +1303,7 @@ ModifyIdentityPolicy (
 
     HiiFreeOpCodeHandle (OptionsOpCodeHandle);
   }
-  
+
   //
   // Add logical connector Option OpCode.
   //
@@ -1345,8 +1345,8 @@ ModifyIdentityPolicy (
   // Update identity policy in the form.
   //
   ResolveIdentityPolicy (
-    mUserInfo.IdentityPolicy, 
-    mUserInfo.IdentityPolicyLen, 
+    mUserInfo.IdentityPolicy,
+    mUserInfo.IdentityPolicyLen,
     STRING_TOKEN (STR_IDENTIFY_POLICY_VALUE)
     );
 
@@ -1404,7 +1404,7 @@ GetAccessRight (
   if (Info == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
- 
+
   //
   // Get user access information.
   //
@@ -1445,7 +1445,7 @@ GetAccessRight (
     if (EFI_ERROR (Status)) {
       break;
     }
-    
+
     //
     // Check user information.
     //
