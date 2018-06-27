@@ -1,16 +1,16 @@
 /** @file
   Provides services to access PCI Configuration Space.
-  
-  These functions perform PCI configuration cycles using the default PCI configuration 
-  access method. This may use I/O ports 0xCF8 and 0xCFC to perform PCI configuration accesses, 
-  or it may use MMIO registers relative to the PcdPciExpressBaseAddress, or it may use some 
-  alternate access method.  Modules will typically use the PCI Library for its PCI configuration 
-  accesses.  However, if a module requires a mix of PCI access methods, the PCI CF8 Library or 
-  PCI Express Library may be used in conjunction with the PCI Library.  The functionality of 
-  these three libraries is identical.  The PCI CF8 Library and PCI Express Library simply use 
+
+  These functions perform PCI configuration cycles using the default PCI configuration
+  access method. This may use I/O ports 0xCF8 and 0xCFC to perform PCI configuration accesses,
+  or it may use MMIO registers relative to the PcdPciExpressBaseAddress, or it may use some
+  alternate access method.  Modules will typically use the PCI Library for its PCI configuration
+  accesses.  However, if a module requires a mix of PCI access methods, the PCI CF8 Library or
+  PCI Express Library may be used in conjunction with the PCI Library.  The functionality of
+  these three libraries is identical.  The PCI CF8 Library and PCI Express Library simply use
   explicit access methods.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -41,19 +41,19 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   (((Register) & 0xfff) | (((Function) & 0x07) << 12) | (((Device) & 0x1f) << 15) | (((Bus) & 0xff) << 20))
 
 /**
-  Registers a PCI device so PCI configuration registers may be accessed after 
+  Registers a PCI device so PCI configuration registers may be accessed after
   SetVirtualAddressMap().
-  
-  Registers the PCI device specified by Address so all the PCI configuration registers 
+
+  Registers the PCI device specified by Address so all the PCI configuration registers
   associated with that PCI device may be accessed after SetVirtualAddressMap() is called.
-  
+
   If Address > 0x0FFFFFFF, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  
+
   @retval RETURN_SUCCESS           The PCI device was registered for runtime access.
-  @retval RETURN_UNSUPPORTED       An attempt was made to call this function 
+  @retval RETURN_UNSUPPORTED       An attempt was made to call this function
                                    after ExitBootServices().
   @retval RETURN_UNSUPPORTED       The resources required to access the PCI device
                                    at runtime could not be mapped.

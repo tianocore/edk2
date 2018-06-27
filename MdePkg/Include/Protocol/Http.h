@@ -4,7 +4,7 @@
   HTTP Service Binding Protocol (HTTPSB)
   HTTP Protocol (HTTP)
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -305,16 +305,16 @@ typedef struct {
 
   @param[in]  This                Pointer to EFI_HTTP_PROTOCOL instance.
   @param[out] HttpConfigData      Point to buffer for operational parameters of this
-                                  HTTP instance. It is the responsibility of the caller 
-                                  to allocate the memory for HttpConfigData and 
-                                  HttpConfigData->AccessPoint.IPv6Node/IPv4Node. In fact, 
-                                  it is recommended to allocate sufficient memory to record 
+                                  HTTP instance. It is the responsibility of the caller
+                                  to allocate the memory for HttpConfigData and
+                                  HttpConfigData->AccessPoint.IPv6Node/IPv4Node. In fact,
+                                  it is recommended to allocate sufficient memory to record
                                   IPv6Node since it is big enough for all possibilities.
 
   @retval EFI_SUCCESS             Operation succeeded.
   @retval EFI_INVALID_PARAMETER   This is NULL.
                                   HttpConfigData is NULL.
-                                  HttpConfigData->AccessPoint.IPv4Node or 
+                                  HttpConfigData->AccessPoint.IPv4Node or
                                   HttpConfigData->AccessPoint.IPv6Node is NULL.
   @retval EFI_NOT_STARTED         This EFI HTTP Protocol instance has not been started.
 **/
@@ -364,7 +364,7 @@ EFI_STATUS
   );
 
 /**
-  The Request() function queues an HTTP request to this HTTP instance, 
+  The Request() function queues an HTTP request to this HTTP instance,
   similar to Transmit() function in the EFI TCP driver. When the HTTP request is sent
   successfully, or if there is an error, Status in token will be updated and Event will
   be signaled.

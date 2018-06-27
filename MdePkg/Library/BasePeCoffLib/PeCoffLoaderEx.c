@@ -1,7 +1,7 @@
 /** @file
   Specific relocation fixups for none Itanium architecture.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -43,7 +43,7 @@ PeCoffLoaderRelocateImageEx (
   does not mean the image can be executed it means the PE/COFF loader supports
   loading and relocating of the image type. It's up to the caller to support
   the entry point.
-  
+
   The IA32/X64 version PE/COFF loader/relocater both support IA32, X64 and EBC images.
 
   @param  Machine   The machine type from the PE Header.
@@ -56,9 +56,9 @@ PeCoffLoaderImageFormatSupported (
   IN  UINT16  Machine
   )
 {
-  if ((Machine == IMAGE_FILE_MACHINE_I386) || (Machine == IMAGE_FILE_MACHINE_X64) || 
+  if ((Machine == IMAGE_FILE_MACHINE_I386) || (Machine == IMAGE_FILE_MACHINE_X64) ||
       (Machine == IMAGE_FILE_MACHINE_EBC) || (Machine == IMAGE_FILE_MACHINE_ARM64)) {
-    return TRUE; 
+    return TRUE;
   }
 
   return FALSE;

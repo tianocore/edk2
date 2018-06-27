@@ -1,7 +1,7 @@
 ## @file
 #  Instance of Base Memory Library optimized for use in DXE phase.
 #
-#  Base Memory Library that is optimized for use in DXE phase.  
+#  Base Memory Library that is optimized for use in DXE phase.
 #  Uses REP, MMX, XMM registers as required for best performance.
 #
 #  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -23,7 +23,7 @@
   FILE_GUID                      = 02BD55C2-AB1D-4b75-B0FD-9A63AE09B31D
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = BaseMemoryLib 
+  LIBRARY_CLASS                  = BaseMemoryLib
 
 
 #

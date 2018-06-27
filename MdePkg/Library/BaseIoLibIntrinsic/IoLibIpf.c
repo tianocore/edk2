@@ -1,7 +1,7 @@
 /** @file
   Common I/O Library routines.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -26,7 +26,7 @@
 
   This function translates I/O port address to memory address by adding the 64MB
   aligned I/O Port space to the I/O address.
-  If I/O Port space base is not 64MB aligned, then ASSERT ().  
+  If I/O Port space base is not 64MB aligned, then ASSERT ().
 
   @param  Port  The I/O port to read.
 
@@ -46,7 +46,7 @@ InternalGetMemoryMapAddress (
 
   //
   // Make sure that the I/O Port space base is 64MB aligned.
-  // 
+  //
   ASSERT ((IoBlockBaseAddress & 0x3ffffff) == 0);
   Address += IoBlockBaseAddress;
 
@@ -109,7 +109,7 @@ IoRead16 (
 
   If 32-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 32-bit boundary, then ASSERT().
-  
+
   @param  Port  The I/O port to read.
 
   @return The value read.
@@ -184,7 +184,7 @@ IoWrite8 (
 
   If 16-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 16-bit boundary, then ASSERT().
-  
+
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
@@ -210,7 +210,7 @@ IoWrite16 (
 
   If 32-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 32-bit boundary, then ASSERT().
-  
+
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
@@ -508,7 +508,7 @@ MmioRead16 (
 
   //
   // Make sure that Address is 16-bit aligned.
-  // 
+  //
   ASSERT ((Address & 1) == 0);
 
   Address |= BIT63;
@@ -545,7 +545,7 @@ MmioRead32 (
 
   //
   // Make sure that Address is 32-bit aligned.
-  // 
+  //
   ASSERT ((Address & 3) == 0);
 
   Address |= BIT63;
@@ -582,7 +582,7 @@ MmioRead64 (
 
   //
   // Make sure that Address is 64-bit aligned.
-  // 
+  //
   ASSERT ((Address & 7) == 0);
 
   Address |= BIT63;
@@ -606,7 +606,7 @@ MmioRead64 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
-  
+
   @return Value.
 
 **/
@@ -638,7 +638,7 @@ MmioWrite8 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
-  
+
   @return Value.
 
 **/
@@ -651,7 +651,7 @@ MmioWrite16 (
 {
   //
   // Make sure that Address is 16-bit aligned.
-  // 
+  //
   ASSERT ((Address & 1) == 0);
 
   Address |= BIT63;
@@ -675,7 +675,7 @@ MmioWrite16 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
-  
+
   @return Value.
 
 **/
@@ -688,7 +688,7 @@ MmioWrite32 (
 {
   //
   // Make sure that Address is 32-bit aligned.
-  // 
+  //
   ASSERT ((Address & 3) == 0);
 
   Address |= BIT63;
@@ -723,7 +723,7 @@ MmioWrite64 (
 {
   //
   // Make sure that Address is 64-bit aligned.
-  // 
+  //
   ASSERT ((Address & 7) == 0);
 
   Address |= BIT63;

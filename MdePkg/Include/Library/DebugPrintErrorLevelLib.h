@@ -1,7 +1,7 @@
 /** @file
   Debug Print Error Level Library class
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -28,9 +28,9 @@ GetDebugPrintErrorLevel (
 
 /**
   Sets the global debug print error level mask fpr the entire platform.
-  
+
   @param   ErrorLevel     Global debug print error level
-  
+
   @retval  TRUE           The debug print error level mask was successfully set.
   @retval  FALSE          The debug print error level mask could not be set.
 

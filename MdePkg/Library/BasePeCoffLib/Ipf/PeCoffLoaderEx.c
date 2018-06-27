@@ -1,7 +1,7 @@
 /** @file
   Fixes Intel Itanium(TM) specific relocation types.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -218,8 +218,8 @@ PeCoffLoaderRelocateImageEx (
   Returns TRUE if the machine type of PE/COFF image is supported. Supported
   does not mean the image can be executed it means the PE/COFF loader supports
   loading and relocating of the image type. It's up to the caller to support
-  the entry point. 
-  
+  the entry point.
+
   The itanium version PE/COFF loader/relocater supports itanium and EBC image.
 
   @param  Machine   Machine type from the PE Header.

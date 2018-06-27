@@ -1,7 +1,7 @@
 /** @file
   Guid & data structure used for Capsule process result variables
-  
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -84,14 +84,14 @@ typedef struct {
 
   ///
   /// In case of capsule loaded from disk, the zero-terminated array containing file name of capsule that was processed.
-  /// In case of capsule submitted directly to UpdateCapsule() there is no file name, and this field is required to contain a single 16-bit zero character 
+  /// In case of capsule submitted directly to UpdateCapsule() there is no file name, and this field is required to contain a single 16-bit zero character
   ///  which is included in VariableTotalSize.
   ///
   /// CHAR16 CapsuleFileName[];
   ///
 
   ///
-  /// This field will contain a zero-terminated CHAR16 string containing the text representation of the device path of device publishing Firmware Management Protocol  
+  /// This field will contain a zero-terminated CHAR16 string containing the text representation of the device path of device publishing Firmware Management Protocol
   /// (if present). In case where device path is not present and the target is not otherwise known to firmware, or when payload was blocked by policy, or skipped,
   /// this field is required to contain a single 16-bit zero character which is included in VariableTotalSize.
   ///

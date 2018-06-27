@@ -1,8 +1,8 @@
 /** @file
   Processor or Compiler specific defines and types for Intel Itanium(TM) processors.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available 
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php.
@@ -271,7 +271,7 @@ typedef INT64   INTN;
 #elif defined(_MSC_EXTENSIONS)
   ///
   /// Microsoft* compiler-specific method for EFIAPI calling convention.
-  /// 
+  ///
   #define EFIAPI __cdecl
 #else
   #define EFIAPI
@@ -303,16 +303,16 @@ typedef struct {
 
 /**
   Return the pointer to the first instruction of a function given a function pointer.
-  For Itanium processors, all function calls are made through a PLABEL, so a pointer to a function 
-  is actually a pointer to a PLABEL.  The pointer to the first instruction of the function 
-  is contained within the PLABEL.  This macro may be used to retrieve a pointer to the first 
-  instruction of a function independent of the CPU architecture being used.  This is very 
+  For Itanium processors, all function calls are made through a PLABEL, so a pointer to a function
+  is actually a pointer to a PLABEL.  The pointer to the first instruction of the function
+  is contained within the PLABEL.  This macro may be used to retrieve a pointer to the first
+  instruction of a function independent of the CPU architecture being used.  This is very
   useful when printing function addresses through DEBUG() macros.
-  
+
   @param  FunctionPointer   A pointer to a function.
 
   @return The pointer to the first instruction of a function given a function pointer.
-  
+
 **/
 #define FUNCTION_ENTRY_POINT(FunctionPointer) (VOID *)(UINTN)(((EFI_PLABEL *)(FunctionPointer))->EntryPoint)
 

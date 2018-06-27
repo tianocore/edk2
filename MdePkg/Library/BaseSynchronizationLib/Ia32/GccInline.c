@@ -1,7 +1,7 @@
 /** @file
   GCC inline implementation of BaseSynchronizationLib processor specific functions.
-  
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -42,12 +42,12 @@ InternalSyncIncrement (
     "movl    %2, %%eax      "
     : "=a" (Result),          // %0
       "=m" (*Value)           // %1
-    : "m"  (*Value)           // %2 
+    : "m"  (*Value)           // %2
     : "memory",
       "cc"
     );
-    
-  return Result;    
+
+  return Result;
 
 }
 
@@ -72,18 +72,18 @@ InternalSyncDecrement (
   )
 {
    UINT32  Result;
-  
+
   __asm__ __volatile__ (
     "lock               \n\t"
     "decl    %2         \n\t"
     "movl    %2, %%eax      "
     : "=a" (Result),          // %0
       "=m" (*Value)           // %1
-    : "m"  (*Value)           // %2 
+    : "m"  (*Value)           // %2
     : "memory",
       "cc"
     );
-    
+
   return Result;
 }
 
@@ -163,7 +163,7 @@ InternalSyncCompareExchange32 (
     : "=a" (CompareValue)     // %0
     : "q"  (ExchangeValue),   // %1
       "m"  (*Value),          // %2
-      "0"  (CompareValue)     // %4 
+      "0"  (CompareValue)     // %4
     : "memory",
       "cc"
     );
@@ -198,8 +198,8 @@ InternalSyncCompareExchange64 (
 {
   __asm__ __volatile__ (
     "                       \n\t"
-    "push        %%ebx      \n\t" 
-    "movl        %2,%%ebx   \n\t"   
+    "push        %%ebx      \n\t"
+    "movl        %2,%%ebx   \n\t"
     "lock                   \n\t"
     "cmpxchg8b   (%1)       \n\t"
     "pop         %%ebx      \n\t"
@@ -210,6 +210,6 @@ InternalSyncCompareExchange64 (
     : "memory",
       "cc"
     );
-  
+
   return CompareValue;
 }

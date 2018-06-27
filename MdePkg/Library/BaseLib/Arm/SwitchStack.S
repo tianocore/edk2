@@ -1,6 +1,6 @@
-//------------------------------------------------------------------------------ 
+//------------------------------------------------------------------------------
 //
-// Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 // Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 // Portions copyright (c) 2011, ARM Limited. All rights reserved.<BR>
 // This program and the accompanying materials
@@ -12,13 +12,13 @@
 // WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 //------------------------------------------------------------------------------
-  
+
 .text
 .align 5
 
 GCC_ASM_EXPORT(InternalSwitchStackAsm)
-GCC_ASM_EXPORT(CpuPause)            
-  
+GCC_ASM_EXPORT(CpuPause)
+
 /**
 //
 //  This allows the caller to switch the stack and goes to the new entry point

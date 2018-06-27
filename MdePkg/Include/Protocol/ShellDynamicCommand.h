@@ -2,7 +2,7 @@
   EFI Shell Dynamic Command registration protocol
 
   (C) Copyright 2012-2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -73,7 +73,7 @@ CHAR16*
 
 /// EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL protocol structure.
 struct _EFI_SHELL_DYNAMIC_COMMAND_PROTOCOL {
-  
+
   CONST CHAR16           *CommandName;
   SHELL_COMMAND_HANDLER  Handler;
   SHELL_COMMAND_GETHELP  GetHelp;

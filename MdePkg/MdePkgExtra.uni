@@ -1,7 +1,7 @@
 // /** @file
 // Mde Package Localized Strings and Content.
 //
-// Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 //
 // Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 //
@@ -15,6 +15,6 @@
 //
 // **/
 
-#string STR_PROPERTIES_PACKAGE_NAME 
-#language en-US 
+#string STR_PROPERTIES_PACKAGE_NAME
+#language en-US
 "Mde package"

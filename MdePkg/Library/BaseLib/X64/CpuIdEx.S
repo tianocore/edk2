@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -44,19 +44,19 @@ ASM_PFX(AsmCpuidEx):
     test    %r10, %r10
     jz      L1
     mov     %ecx,(%r10)
-L1: 
+L1:
     mov     %r8, %rcx
     jrcxz   L2
     movl    %eax,(%rcx)
-L2: 
+L2:
     mov     %r9, %rcx
     jrcxz   L3
     mov     %ebx, (%rcx)
-L3: 
+L3:
     mov     0x40(%rsp), %rcx
     jrcxz   L4
     mov     %edx, (%rcx)
-L4: 
+L4:
     pop     %rax                  # restore Index to rax as return value
     pop     %rbx
     ret

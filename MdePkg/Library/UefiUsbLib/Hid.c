@@ -2,13 +2,13 @@
 
   The library provides USB HID Class standard and specific requests defined
   in USB HID Firmware Specification 7 section : Requests.
-  
-  Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php.
-  
+
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -16,7 +16,7 @@
 
 #include "UefiUsbLibInternal.h"
 
-//  
+//
 //  Hid RequestType Bits specifying characteristics of request.
 //  Valid values are 10100001b (0xa1) or 00100001b (0x21).
 //  The following description:
@@ -228,7 +228,7 @@ UsbSetProtocolRequest (
   EFI_USB_DEVICE_REQUEST  Request;
 
   ASSERT (UsbIo != NULL);
-  
+
   //
   // Fill Device request packet
   //
@@ -334,7 +334,7 @@ UsbGetIdleRequest (
   UINT32                  Status;
   EFI_STATUS              Result;
   EFI_USB_DEVICE_REQUEST  Request;
-  
+
   ASSERT (UsbIo != NULL);
   ASSERT (Duration != NULL);
   //

@@ -1,7 +1,7 @@
 /** @file
   Internal include file of DXE CPU IO2 Library.
-  
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -157,7 +157,7 @@ MmioReadWorker (
                         The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
   @param  Data          The value to write to the I/O port.
-  
+
   @return Data read from registers in the EFI system memory space.
 
 **/

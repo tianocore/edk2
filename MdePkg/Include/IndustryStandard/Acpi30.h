@@ -1,14 +1,14 @@
-/** @file   
+/** @file
   ACPI 3.0 definitions from the ACPI Specification Revision 3.0b October 10, 2006
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #ifndef _ACPI_3_0_H_
@@ -128,7 +128,7 @@ typedef struct {
 
 //
 // Root System Description Table
-// No definition needed as it is a common description table header, the same with 
+// No definition needed as it is a common description table header, the same with
 // EFI_ACPI_DESCRIPTION_HEADER, followed by a variable number of UINT32 table pointers.
 //
 
@@ -139,7 +139,7 @@ typedef struct {
 
 //
 // Extended System Description Table
-// No definition needed as it is a common description table header, the same with 
+// No definition needed as it is a common description table header, the same with
 // EFI_ACPI_DESCRIPTION_HEADER, followed by a variable number of UINT64 table pointers.
 //
 
@@ -597,7 +597,7 @@ typedef struct {
 ///
 /// "RSD PTR " Root System Description Pointer
 ///
-#define EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE  SIGNATURE_64('R', 'S', 'D', ' ', 'P', 'T', 'R', ' ') 
+#define EFI_ACPI_3_0_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE  SIGNATURE_64('R', 'S', 'D', ' ', 'P', 'T', 'R', ' ')
 
 ///
 /// "APIC" Multiple APIC Description Table

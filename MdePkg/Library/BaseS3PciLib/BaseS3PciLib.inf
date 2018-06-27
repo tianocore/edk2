@@ -1,10 +1,10 @@
 ## @file
 # Instance of S3 PCI Library based on PCI and S3 BootScript Library.
 #
-# S3 PCI Services that perform PCI Configuration cycles and 
+# S3 PCI Services that perform PCI Configuration cycles and
 # also enable the PCI operation to be replayed during an S3 resume.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -23,7 +23,7 @@
   FILE_GUID                      = F66B6BD2-513F-441d-B367-2D5BD4998A50
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = S3PciLib 
+  LIBRARY_CLASS                  = S3PciLib
 
 
 #

@@ -6,7 +6,7 @@
   environment. There are a set of base libraries in the Mde Package that can
   be used to implement base modules.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -65,8 +65,8 @@ VERIFY_SIZE_OF (CHAR16, 2);
 
 //
 // The following three enum types are used to verify that the compiler
-// configuration for enum types is compliant with Section 2.3.1 of the 
-// UEFI 2.3 Specification. These enum types and enum values are not 
+// configuration for enum types is compliant with Section 2.3.1 of the
+// UEFI 2.3 Specification. These enum types and enum values are not
 // intended to be used. A prefix of '__' is used avoid conflicts with
 // other types.
 //
@@ -785,7 +785,7 @@ typedef CHAR8 *VA_LIST;
 
   This macro initializes Dest as a copy of Start, as if the VA_START macro had been applied to Dest
   followed by the same sequence of uses of the VA_ARG macro as had previously been used to reach
-  the present state of Start. 
+  the present state of Start.
 
   @param   Dest   VA_LIST used to traverse the list of arguments.
   @param   Start  VA_LIST used to traverse the list of arguments.

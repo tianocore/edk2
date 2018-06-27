@@ -3,7 +3,7 @@
 
   This protocol provides PCI I/O and memory access within SMM.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,8 +22,8 @@
 #define EFI_SMM_PCI_ROOT_BRIDGE_IO_PROTOCOL_GUID EFI_MM_PCI_ROOT_BRIDGE_IO_PROTOCOL_GUID
 
 ///
-/// This protocol provides the same functionality as the PCI Root Bridge I/O Protocol defined in the 
-/// UEFI 2.1 Specifcation, section 13.2, except that the functions for Map() and Unmap() may return 
+/// This protocol provides the same functionality as the PCI Root Bridge I/O Protocol defined in the
+/// UEFI 2.1 Specifcation, section 13.2, except that the functions for Map() and Unmap() may return
 /// EFI_UNSUPPORTED.
 ///
 typedef EFI_MM_PCI_ROOT_BRIDGE_IO_PROTOCOL  EFI_SMM_PCI_ROOT_BRIDGE_IO_PROTOCOL;

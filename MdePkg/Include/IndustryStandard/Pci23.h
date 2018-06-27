@@ -1,14 +1,14 @@
 /** @file
   Support for PCI 2.3 standard.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php.                                            
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php.
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -96,7 +96,7 @@
 
 #pragma pack(1)
 ///
-/// PCI-X Capabilities List, 
+/// PCI-X Capabilities List,
 /// Section 7.2, PCI-X Addendum to the PCI Local Bus Specification, Revision 1.0b.
 ///
 typedef struct {
@@ -106,7 +106,7 @@ typedef struct {
 } EFI_PCI_CAPABILITY_PCIX;
 
 ///
-/// PCI-X Bridge Capabilities List, 
+/// PCI-X Bridge Capabilities List,
 /// Section 8.6.2, PCI-X Addendum to the PCI Local Bus Specification, Revision 1.0b.
 ///
 typedef struct {

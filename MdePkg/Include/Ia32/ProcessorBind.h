@@ -1,14 +1,14 @@
 /** @file
   Processor or Compiler specific defines and types for IA-32 architecture.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -100,17 +100,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 
 //
-// This warning is for potentially uninitialized local variable, and it may cause false 
+// This warning is for potentially uninitialized local variable, and it may cause false
 // positive issues in VS2013 and VS2015 build
 //
 #pragma warning ( disable : 4701 )
-  
+
 //
-// This warning is for potentially uninitialized local pointer variable, and it may cause 
+// This warning is for potentially uninitialized local pointer variable, and it may cause
 // false positive issues in VS2013 and VS2015 build
 //
 #pragma warning ( disable : 4703 )
-  
+
 #endif
 
 #endif
@@ -168,7 +168,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   /// 1-byte signed value.
   ///
   typedef signed char         INT8;
-#else  
+#else
   ///
   /// 8-byte unsigned value.
   ///
@@ -280,17 +280,17 @@ typedef INT32   INTN;
 #elif defined(_MSC_EXTENSIONS)
   ///
   /// Microsoft* compiler specific method for EFIAPI calling convention.
-  /// 
-  #define EFIAPI __cdecl  
+  ///
+  #define EFIAPI __cdecl
 #elif defined(__GNUC__)
   ///
   /// GCC specific method for EFIAPI calling convention.
-  /// 
-  #define EFIAPI __attribute__((cdecl))  
+  ///
+  #define EFIAPI __attribute__((cdecl))
 #else
   ///
   /// The default for a non Microsoft* or GCC compiler is to assume the EFI ABI
-  /// is the standard. 
+  /// is the standard.
   ///
   #define EFIAPI
 #endif
@@ -305,13 +305,13 @@ typedef INT32   INTN;
 
 /**
   Return the pointer to the first instruction of a function given a function pointer.
-  On IA-32 CPU architectures, these two pointer values are the same, 
+  On IA-32 CPU architectures, these two pointer values are the same,
   so the implementation of this macro is very simple.
-  
+
   @param  FunctionPointer   A pointer to a function.
 
   @return The pointer to the first instruction of a function given a function pointer.
-  
+
 **/
 #define FUNCTION_ENTRY_POINT(FunctionPointer) (VOID *)(UINTN)(FunctionPointer)
 

@@ -5,16 +5,16 @@
   The DebugSupport protocol is used by source level debuggers to abstract the
   processor and handle context save and restore operations.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -183,7 +183,7 @@ typedef struct {
   UINT8   Xmm6[16];
   UINT8   Xmm7[16];
   //
-  // NOTE: UEFI 2.0 spec definition as follows. 
+  // NOTE: UEFI 2.0 spec definition as follows.
   //
   UINT8   Reserved11[14 * 16];
 } EFI_FX_SAVE_STATE_X64;
@@ -626,12 +626,12 @@ typedef union {
 // DebugSupport callback function prototypes
 //
 
-/**                                                                 
+/**
   Registers and enables an exception callback function for the specified exception.
-    
+
   @param  ExceptionType         Exception types in EBC, IA-32, x64, or IPF.
   @param  SystemContext         Exception content.
-                                   
+
 **/
 typedef
 VOID
@@ -640,11 +640,11 @@ VOID
   IN OUT EFI_SYSTEM_CONTEXT               SystemContext
   );
 
-/**                                                                 
+/**
   Registers and enables the on-target debug agent's periodic entry point.
-      
+
   @param  SystemContext         Exception content.
-                                   
+
 **/
 typedef
 VOID
@@ -669,16 +669,16 @@ typedef enum {
 // DebugSupport member function definitions
 //
 
-/**                                                                 
+/**
   Returns the maximum value that may be used for the ProcessorIndex parameter in
-  RegisterPeriodicCallback() and RegisterExceptionCallback().                   
-    
+  RegisterPeriodicCallback() and RegisterExceptionCallback().
+
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  MaxProcessorIndex     Pointer to a caller-allocated UINTN in which the maximum supported
-                                processor index is returned.                                      
-                                
-  @retval EFI_SUCCESS           The function completed successfully.  
-                                   
+                                processor index is returned.
+
+  @retval EFI_SUCCESS           The function completed successfully.
+
 **/
 typedef
 EFI_STATUS
@@ -687,20 +687,20 @@ EFI_STATUS
   OUT UINTN                              *MaxProcessorIndex
   );
 
-/**                                                                 
+/**
   Registers a function to be called back periodically in interrupt context.
-    
+
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  ProcessorIndex        Specifies which processor the callback function applies to.
   @param  PeriodicCallback      A pointer to a function of type PERIODIC_CALLBACK that is the main
                                 periodic entry point of the debug agent.
-                                
-  @retval EFI_SUCCESS           The function completed successfully.  
+
+  @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_ALREADY_STARTED   Non-NULL PeriodicCallback parameter when a callback
-                                function was previously registered.                
-  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback                               
-                                function.                                                           
-                                
+                                function was previously registered.
+  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback
+                                function.
+
 **/
 typedef
 EFI_STATUS
@@ -710,21 +710,21 @@ EFI_STATUS
   IN EFI_PERIODIC_CALLBACK               PeriodicCallback
   );
 
-/**                                                                 
+/**
   Registers a function to be called when a given processor exception occurs.
-    
+
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  ProcessorIndex        Specifies which processor the callback function applies to.
   @param  ExceptionCallback     A pointer to a function of type EXCEPTION_CALLBACK that is called
-                                when the processor exception specified by ExceptionType occurs.  
-  @param  ExceptionType         Specifies which processor exception to hook.                       
-                                
-  @retval EFI_SUCCESS           The function completed successfully.  
+                                when the processor exception specified by ExceptionType occurs.
+  @param  ExceptionType         Specifies which processor exception to hook.
+
+  @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_ALREADY_STARTED   Non-NULL PeriodicCallback parameter when a callback
-                                function was previously registered.                
-  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback                               
-                                function.                                                           
-                                
+                                function was previously registered.
+  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback
+                                function.
+
 **/
 typedef
 EFI_STATUS
@@ -735,18 +735,18 @@ EFI_STATUS
   IN EFI_EXCEPTION_TYPE                  ExceptionType
   );
 
-/**                                                                 
+/**
   Invalidates processor instruction cache for a memory range. Subsequent execution in this range
-  causes a fresh memory fetch to retrieve code to be executed.                                  
-    
+  causes a fresh memory fetch to retrieve code to be executed.
+
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  ProcessorIndex        Specifies which processor's instruction cache is to be invalidated.
-  @param  Start                 Specifies the physical base of the memory range to be invalidated.                                
+  @param  Start                 Specifies the physical base of the memory range to be invalidated.
   @param  Length                Specifies the minimum number of bytes in the processor's instruction
-                                cache to invalidate.                                                 
-                                
-  @retval EFI_SUCCESS           The function completed successfully.  
-                                
+                                cache to invalidate.
+
+  @retval EFI_SUCCESS           The function completed successfully.
+
 **/
 typedef
 EFI_STATUS
@@ -758,8 +758,8 @@ EFI_STATUS
   );
 
 ///
-/// This protocol provides the services to allow the debug agent to register 
-/// callback functions that are called either periodically or when specific 
+/// This protocol provides the services to allow the debug agent to register
+/// callback functions that are called either periodically or when specific
 /// processor exceptions occur.
 ///
 struct _EFI_DEBUG_SUPPORT_PROTOCOL {
@@ -775,4 +775,4 @@ struct _EFI_DEBUG_SUPPORT_PROTOCOL {
 
 extern EFI_GUID gEfiDebugSupportProtocolGuid;
 
-#endif 
+#endif

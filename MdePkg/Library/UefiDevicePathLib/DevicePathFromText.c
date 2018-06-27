@@ -279,7 +279,7 @@ IsHexStr (
   while ((*Str != 0) && *Str == L'0') {
     Str ++;
   }
-  
+
   return (BOOLEAN) (*Str == L'x' || *Str == L'X');
 }
 
@@ -980,7 +980,7 @@ DevPathFromTextAcpiAdr (
       ASSERT (AcpiAdr != NULL);
       SetDevicePathNodeLength (AcpiAdr, Length + sizeof (UINT32));
     }
-    
+
     (&AcpiAdr->ADR)[Index] = (UINT32) Strtoi (DisplayDeviceStr);
   }
 
@@ -2757,18 +2757,18 @@ DevPathFromTextDns (
   }
 
   DeviceNodeStrPtr = DeviceNodeStr;
-  
+
   DnsServerIpCount = 0;
   while (DeviceNodeStrPtr != NULL && *DeviceNodeStrPtr != L'\0') {
     GetNextParamStr (&DeviceNodeStrPtr);
-    DnsServerIpCount ++; 
+    DnsServerIpCount ++;
   }
 
   FreePool (DeviceNodeStr);
   DeviceNodeStr = NULL;
 
   //
-  // One or more instances of the DNS server address in EFI_IP_ADDRESS, 
+  // One or more instances of the DNS server address in EFI_IP_ADDRESS,
   // otherwise, NULL will be returned.
   //
   if (DnsServerIpCount == 0) {
@@ -2814,7 +2814,7 @@ DevPathFromTextDns (
       StrToIpv6Address (DnsServerIp, NULL, &(DnsDeviceNode->DnsServerIp[DnsServerIpIndex].v6), NULL);
     }
   }
-  
+
   return (EFI_DEVICE_PATH_PROTOCOL *) DnsDeviceNode;
 }
 

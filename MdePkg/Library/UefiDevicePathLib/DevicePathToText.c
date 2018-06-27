@@ -56,7 +56,7 @@ UefiDevicePathLibCatPrint (
   VA_START (Args, Fmt);
   UnicodeVSPrint (&Str->Str[Str->Count], Str->Capacity - Str->Count * sizeof (CHAR16), Fmt, Args);
   Str->Count += Count;
-  
+
   VA_END (Args);
   return Str->Str;
 }
@@ -435,7 +435,7 @@ DevPathToTextAcpiEx (
 
   //
   // Converts EISA identification to string.
-  // 
+  //
   UnicodeSPrint (
     HIDText,
     sizeof (HIDText),
@@ -1364,7 +1364,7 @@ DevPathToTextIPv6 (
     UefiDevicePathLibCatPrint (Str, L")");
     return ;
   }
-  
+
   UefiDevicePathLibCatPrint (Str, L",");
   CatNetworkProtocol (Str, IPDevPath->Protocol);
 
@@ -1727,7 +1727,7 @@ DevPathToTextDns (
   DnsServerIpCount = (UINT32) (DevicePathNodeLength(DnsDevPath) - sizeof (EFI_DEVICE_PATH_PROTOCOL) - sizeof (DnsDevPath->IsIPv6)) / sizeof (EFI_IP_ADDRESS);
 
   UefiDevicePathLibCatPrint (Str, L"Dns(");
-  
+
   for (DnsServerIpIndex = 0; DnsServerIpIndex < DnsServerIpCount; DnsServerIpIndex++) {
     if (DnsDevPath->IsIPv6 == 0x00) {
       CatIPv4Address (Str, &(DnsDevPath->DnsServerIp[DnsServerIpIndex].v4));
@@ -2409,14 +2409,14 @@ UefiDevicePathLibConvertDevicePathToText (
         UefiDevicePathLibCatPrint (&Str, L"/");
       }
     }
-    
+
     AlignedNode = AllocateCopyPool (DevicePathNodeLength (Node), Node);
     //
     // Print this node of the device path
     //
     ToText (&Str, AlignedNode, DisplayOnly, AllowShortcuts);
     FreePool (AlignedNode);
-    
+
     //
     // Next device path node
     //

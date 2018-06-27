@@ -179,8 +179,8 @@
   MdePkg/Library/DxePciSegmentLibEsal/DxePciSegmentLibEsal.inf
   MdePkg/Library/DxeRuntimeExtendedSalLib/DxeRuntimeExtendedSalLib.inf
   MdePkg/Library/DxeSalLibEsal/DxeSalLibEsal.inf
-  MdePkg/Library/DxeTimerLibEsal/DxeTimerLibEsal.inf  
-  
+  MdePkg/Library/DxeTimerLibEsal/DxeTimerLibEsal.inf
+
 [Components.EBC]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf

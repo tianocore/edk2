@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,7 @@ ASM_PFX(InternalMathLShiftU64):
     jnz     L0
     movl    %edx, %eax
     movl    0x8(%esp), %edx
-L0:    
+L0:
     shld    %cl, %eax, %edx
     shl     %cl, %eax
     ret

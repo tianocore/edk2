@@ -91,13 +91,13 @@ typedef struct {
 
 //
 // The length (in bytes) of the TLSPlaintext records payload MUST NOT exceed 2^14.
-// Refers to section 6.2 of RFC5246. 
+// Refers to section 6.2 of RFC5246.
 //
 #define TLS_PLAINTEXT_RECORD_MAX_PAYLOAD_LENGTH   16384
 
 //
 // The length (in bytes) of the TLSCiphertext records payload MUST NOT exceed 2^14 + 2048.
-// Refers to section 6.2 of RFC5246. 
+// Refers to section 6.2 of RFC5246.
 //
 #define TLS_CIPHERTEXT_RECORD_MAX_PAYLOAD_LENGTH   18432
 

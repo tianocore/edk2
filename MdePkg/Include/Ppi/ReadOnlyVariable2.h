@@ -2,14 +2,14 @@
   This file declares Read-only Variable Service2 PPI.
   This ppi permits read-only access to the UEFI variable store during the PEI phase.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                             
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This PPI is introduced in PI Version 1.0.
@@ -28,8 +28,8 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE2_PPI  EFI_PEI_READ_ONLY_VARIABLE2_PPI
 /**
   This service retrieves a variable's value using its name and GUID.
 
-  Read the specified variable from the UEFI variable store. If the Data 
-  buffer is too small to hold the contents of the variable, 
+  Read the specified variable from the UEFI variable store. If the Data
+  buffer is too small to hold the contents of the variable,
   the error EFI_BUFFER_TOO_SMALL is returned and DataSize is set to the
   required buffer size to obtain the data.
 
@@ -45,8 +45,8 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE2_PPI  EFI_PEI_READ_ONLY_VARIABLE2_PPI
 
   @retval EFI_SUCCESS           The variable was read successfully.
   @retval EFI_NOT_FOUND         The variable was not found.
-  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the resulting data. 
-                                DataSize is updated with the size required for 
+  @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the resulting data.
+                                DataSize is updated with the size required for
                                 the specified variable.
   @retval EFI_INVALID_PARAMETER VariableName, VariableGuid, DataSize or Data is NULL.
   @retval EFI_DEVICE_ERROR      The variable could not be retrieved because of a device error.
@@ -67,11 +67,11 @@ EFI_STATUS
 /**
   Return the next variable name and GUID.
 
-  This function is called multiple times to retrieve the VariableName 
-  and VariableGuid of all variables currently available in the system. 
-  On each call, the previous results are passed into the interface, 
-  and, on return, the interface returns the data for the next 
-  interface. When the entire variable list has been returned, 
+  This function is called multiple times to retrieve the VariableName
+  and VariableGuid of all variables currently available in the system.
+  On each call, the previous results are passed into the interface,
+  and, on return, the interface returns the data for the next
+  interface. When the entire variable list has been returned,
   EFI_NOT_FOUND is returned.
 
   @param  This              A pointer to this instance of the EFI_PEI_READ_ONLY_VARIABLE2_PPI.
@@ -81,7 +81,7 @@ EFI_STATUS
   @param  VariableName      On entry, a pointer to a null-terminated string that is the variable's name.
                             On return, points to the next variable's null-terminated name string.
 
-  @param  VariableGuid      On entry, a pointer to an EFI_GUID that is the variable's GUID. 
+  @param  VariableGuid      On entry, a pointer to an EFI_GUID that is the variable's GUID.
                             On return, a pointer to the next variable's GUID.
 
   @retval EFI_SUCCESS           The variable was read successfully.
@@ -104,8 +104,8 @@ EFI_STATUS
   );
 
 ///
-/// This PPI provides a lightweight, read-only variant of the full EFI 
-/// variable services. 
+/// This PPI provides a lightweight, read-only variant of the full EFI
+/// variable services.
 ///
 struct _EFI_PEI_READ_ONLY_VARIABLE2_PPI {
   EFI_PEI_GET_VARIABLE2           GetVariable;

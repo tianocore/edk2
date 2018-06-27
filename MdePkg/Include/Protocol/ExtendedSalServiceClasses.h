@@ -1,14 +1,14 @@
 /** @file
   The standard set of Extended SAL service classes.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -51,7 +51,7 @@ typedef enum {
 ///
 ///@{
 #define EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_LO 0x4d02efdb7e97a470
-#define EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_HI 0x96a27bd29061ce8f 
+#define EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID_HI 0x96a27bd29061ce8f
 #define EFI_EXTENDED_SAL_RTC_SERVICES_PROTOCOL_GUID  \
   { 0x7e97a470, 0xefdb, 0x4d02, {0x8f, 0xce, 0x61, 0x90, 0xd2, 0x7b, 0xa2, 0x96 } }
 
@@ -71,7 +71,7 @@ typedef enum {
 /// Extended SAL Variable Services Class
 ///
 ///@{
-#define EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID_LO 0x4370c6414ecb6c53 
+#define EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID_LO 0x4370c6414ecb6c53
 #define EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID_HI 0x78836e490e3bb28c
 #define EFI_EXTENDED_SAL_VARIABLE_SERVICES_PROTOCOL_GUID  \
   { 0x4ecb6c53, 0xc641, 0x4370, {0x8c, 0xb2, 0x3b, 0x0e, 0x49, 0x6e, 0x83, 0x78 } }
@@ -165,7 +165,7 @@ typedef enum {
   CurrentProcInfoFunctionId,
   NumProcessorsFunctionId,
   SetMinStateFunctionId,
-  GetMinStateFunctionId               
+  GetMinStateFunctionId
 } EFI_EXTENDED_SAL_MP_SERVICES_FUNC_ID;
 ///@}
 
@@ -204,7 +204,7 @@ typedef enum {
   EsalMcGetMcParamsFunctionId,
   EsalGetMcCheckinFlagsFunctionId,
   EsalGetPlatformBaseFreqFunctionId,
-  EsalPhysicalIdInfoFunctionId, 
+  EsalPhysicalIdInfoFunctionId,
   EsalRegisterPhysicalAddrFunctionId
 } EFI_EXTENDED_SAL_BASE_SERVICES_FUNC_ID;
 ///@}

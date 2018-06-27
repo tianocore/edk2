@@ -11,7 +11,7 @@
     PeiMemoryLib
     UefiMemoryLib
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -32,7 +32,7 @@
   address to the highest address for a 32-bit value that matches Value.  If a match is found,
   then a pointer to the matching byte in the target buffer is returned.  If no match is found,
   then NULL is returned.  If Length is 0, then NULL is returned.
-  
+
   If Length > 0 and Buffer is NULL, then ASSERT().
   If Buffer is not aligned on a 32-bit boundary, then ASSERT().
   If Length is not aligned on a 32-bit boundary, then ASSERT().

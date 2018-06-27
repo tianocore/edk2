@@ -225,7 +225,7 @@ PeiServicesFfsFindSectionData (
 
   @param  SectionType           The value of the section type to find.
   @param  SectionInstance       Section instance to find.
-  @param  FileHandle            A pointer to the file header that contains the set 
+  @param  FileHandle            A pointer to the file header that contains the set
                                 of sections to be searched.
   @param  SectionData           A pointer to the discovered section, if successful.
   @param  AuthenticationStatus  A pointer to the authentication status for this section.
@@ -337,9 +337,9 @@ PeiServicesResetSystem (
 
 
 /**
-  This service is a wrapper for the PEI Service FfsFindByName(), except the pointer to the PEI Services 
-  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
-  Specification for details. 
+  This service is a wrapper for the PEI Service FfsFindByName(), except the pointer to the PEI Services
+  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface
+  Specification for details.
 
   @param FileName       A pointer to the name of the file to
                         find within the firmware volume.
@@ -347,7 +347,7 @@ PeiServicesResetSystem (
   @param VolumeHandle   The firmware volume to search FileHandle
                         Upon exit, points to the found file's
                         handle or NULL if it could not be found.
-  @param FileHandle     Pointer to found file handle 
+  @param FileHandle     Pointer to found file handle
 
   @retval EFI_SUCCESS             File was found.
 
@@ -367,9 +367,9 @@ PeiServicesFfsFindFileByName (
 
 
 /**
-  This service is a wrapper for the PEI Service FfsGetFileInfo(), except the pointer to the PEI Services 
-  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
-  Specification for details. 
+  This service is a wrapper for the PEI Service FfsGetFileInfo(), except the pointer to the PEI Services
+  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface
+  Specification for details.
 
   @param FileHandle   Handle of the file.
 
@@ -377,15 +377,15 @@ PeiServicesFfsFindFileByName (
                       information.
 
   @retval EFI_SUCCESS             File information returned.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
-  
+
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 PeiServicesFfsGetFileInfo (
   IN CONST  EFI_PEI_FILE_HANDLE   FileHandle,
   OUT EFI_FV_FILE_INFO            *FileInfo
@@ -402,12 +402,12 @@ PeiServicesFfsGetFileInfo (
                       information.
 
   @retval EFI_SUCCESS             File information returned.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -417,9 +417,9 @@ PeiServicesFfsGetFileInfo2 (
   );
 
 /**
-  This service is a wrapper for the PEI Service FfsGetVolumeInfo(), except the pointer to the PEI Services 
-  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
-  Specification for details. 
+  This service is a wrapper for the PEI Service FfsGetVolumeInfo(), except the pointer to the PEI Services
+  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface
+  Specification for details.
 
   @param VolumeHandle   Handle of the volume.
 
@@ -427,10 +427,10 @@ PeiServicesFfsGetFileInfo2 (
                         information.
 
   @retval EFI_SUCCESS             File information returned.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
-  
+
   @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
 
 **/
@@ -443,13 +443,13 @@ PeiServicesFfsGetVolumeInfo (
 
 
 /**
-  This service is a wrapper for the PEI Service RegisterForShadow(), except the pointer to the PEI Services 
-  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface 
-  Specification for details. 
+  This service is a wrapper for the PEI Service RegisterForShadow(), except the pointer to the PEI Services
+  Table has been removed.  See the Platform Initialization Pre-EFI Initialization Core Interface
+  Specification for details.
 
   @param FileHandle   PEIM's file handle. Must be the currently
                       executing PEIM.
-  
+
   @retval EFI_SUCCESS   The PEIM was successfully registered for
                         shadowing.
 
@@ -467,25 +467,25 @@ PeiServicesRegisterForShadow (
 
 /**
   Install a EFI_PEI_FIRMWARE_VOLUME_INFO_PPI instance so the PEI Core will be notified about a new firmware volume.
-  
-  This function allocates, initializes, and installs a new EFI_PEI_FIRMWARE_VOLUME_INFO_PPI using 
+
+  This function allocates, initializes, and installs a new EFI_PEI_FIRMWARE_VOLUME_INFO_PPI using
   the parameters passed in to initialize the fields of the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI instance.
   If the resources can not be allocated for EFI_PEI_FIRMWARE_VOLUME_INFO_PPI, then ASSERT().
   If the EFI_PEI_FIRMWARE_VOLUME_INFO_PPI can not be installed, then ASSERT().
 
-  
+
   @param  FvFormat             Unique identifier of the format of the memory-mapped firmware volume.
-                               This parameter is optional and may be NULL.  
+                               This parameter is optional and may be NULL.
                                If NULL is specified, the EFI_FIRMWARE_FILE_SYSTEM2_GUID format is assumed.
-  @param  FvInfo               Points to a buffer which allows the EFI_PEI_FIRMWARE_VOLUME_PPI to process the volume. 
-                               The format of this buffer is specific to the FvFormat. For memory-mapped firmware volumes, 
+  @param  FvInfo               Points to a buffer which allows the EFI_PEI_FIRMWARE_VOLUME_PPI to process the volume.
+                               The format of this buffer is specific to the FvFormat. For memory-mapped firmware volumes,
                                this typically points to the first byte of the firmware volume.
-  @param  FvInfoSize           The size, in bytes, of FvInfo. For memory-mapped firmware volumes, 
+  @param  FvInfoSize           The size, in bytes, of FvInfo. For memory-mapped firmware volumes,
                                this is typically the size of the firmware volume.
-  @param  ParentFvName         If the new firmware volume originated from a file in a different firmware volume, 
+  @param  ParentFvName         If the new firmware volume originated from a file in a different firmware volume,
                                then this parameter specifies the GUID name of the originating firmware volume.
                                Otherwise, this parameter must be NULL.
-  @param  ParentFileName       If the new firmware volume originated from a file in a different firmware volume, 
+  @param  ParentFileName       If the new firmware volume originated from a file in a different firmware volume,
                                then this parameter specifies the GUID file name of the originating firmware file.
                                Otherwise, this parameter must be NULL.
 **/

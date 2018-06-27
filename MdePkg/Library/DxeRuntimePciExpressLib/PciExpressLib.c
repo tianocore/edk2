@@ -5,7 +5,7 @@
   All assertions for I/O operations are handled in MMIO functions in the IoLib
   Library.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -103,12 +103,12 @@ DxeRuntimePciExpressLibVirtualNotify (
 }
 
 /**
-  The constructor function caches the PCI Express Base Address and creates a 
+  The constructor function caches the PCI Express Base Address and creates a
   Set Virtual Address Map event to convert physical address to virtual addresses.
-  
+
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor completed successfully.
   @retval Other value   The constructor did not complete successfully.
 
@@ -144,12 +144,12 @@ DxeRuntimePciExpressLibConstructor (
 }
 
 /**
-  The destructor function frees any allocated buffers and closes the Set Virtual 
+  The destructor function frees any allocated buffers and closes the Set Virtual
   Address Map event.
-  
+
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The destructor completed successfully.
   @retval Other value   The destructor did not complete successfully.
 
@@ -164,7 +164,7 @@ DxeRuntimePciExpressLibDestructor (
   EFI_STATUS  Status;
 
   //
-  // If one or more PCI devices have been registered for runtime access, then 
+  // If one or more PCI devices have been registered for runtime access, then
   // free the registration table.
   //
   if (mDxeRuntimePciExpressLibRegistrationTable != NULL) {
@@ -182,10 +182,10 @@ DxeRuntimePciExpressLibDestructor (
 
 /**
   Gets the base address of PCI Express.
-  
+
   This internal functions retrieves PCI Express Base Address via a PCD entry
   PcdPciExpressBaseAddress.
-  
+
   @param  Address  The address that encodes the PCI Bus, Device, Function and Register.
   @return          The base address of PCI Express.
 
@@ -247,26 +247,26 @@ GetPciExpressAddress (
   CpuBreakpoint();
 
   //
-  // Return the physical address 
+  // Return the physical address
   //
   return Address;
 }
 
 /**
-  Registers a PCI device so PCI configuration registers may be accessed after 
+  Registers a PCI device so PCI configuration registers may be accessed after
   SetVirtualAddressMap().
-  
-  Registers the PCI device specified by Address so all the PCI configuration 
-  registers associated with that PCI device may be accessed after SetVirtualAddressMap() 
+
+  Registers the PCI device specified by Address so all the PCI configuration
+  registers associated with that PCI device may be accessed after SetVirtualAddressMap()
   is called.
-  
+
   If Address > 0x0FFFFFFF, then ASSERT().
 
   @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
-  
+
   @retval RETURN_SUCCESS           The PCI device was registered for runtime access.
-  @retval RETURN_UNSUPPORTED       An attempt was made to call this function 
+  @retval RETURN_UNSUPPORTED       An attempt was made to call this function
                                    after ExitBootServices().
   @retval RETURN_UNSUPPORTED       The resources required to access the PCI device
                                    at runtime could not be mapped.
@@ -334,8 +334,8 @@ PciExpressRegisterForRuntimeAccess (
   // Grow the size of the registration table
   //
   NewTable = ReallocateRuntimePool (
-               (mDxeRuntimePciExpressLibNumberOfRuntimeRanges + 0) * sizeof (PCI_EXPRESS_RUNTIME_REGISTRATION_TABLE), 
-               (mDxeRuntimePciExpressLibNumberOfRuntimeRanges + 1) * sizeof (PCI_EXPRESS_RUNTIME_REGISTRATION_TABLE), 
+               (mDxeRuntimePciExpressLibNumberOfRuntimeRanges + 0) * sizeof (PCI_EXPRESS_RUNTIME_REGISTRATION_TABLE),
+               (mDxeRuntimePciExpressLibNumberOfRuntimeRanges + 1) * sizeof (PCI_EXPRESS_RUNTIME_REGISTRATION_TABLE),
                mDxeRuntimePciExpressLibRegistrationTable
                );
   if (NewTable == NULL) {

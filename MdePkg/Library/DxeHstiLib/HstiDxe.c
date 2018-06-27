@@ -115,7 +115,7 @@ InternalHstiFindAip (
     }
 
     Hsti = InformationBlock;
-    if ((Hsti->Role == Role) && 
+    if ((Hsti->Role == Role) &&
         ((ImplementationID == NULL) || (StrCmp (ImplementationID, Hsti->ImplementationID) == 0))) {
       break;
     } else {
@@ -311,7 +311,7 @@ HstiLibSetTable (
   CopyMem (&HstiAip->Aip, &mAdapterInformationProtocol, sizeof(EFI_ADAPTER_INFORMATION_PROTOCOL));
   HstiAip->HstiSize = HstiSize;
   HstiAip->HstiMaxSize = HstiSize;
-  
+
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,

@@ -2,7 +2,7 @@
   Common definitions in the Platform Initialization Specification version 1.4a
   VOLUME 4 System Management Mode Core Interface version.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -69,24 +69,24 @@ typedef  EFI_MM_INTERRUPT_UNREGISTER           EFI_SMM_INTERRUPT_UNREGISTER;
 typedef struct _EFI_SMM_ENTRY_CONTEXT {
   EFI_SMM_STARTUP_THIS_AP  SmmStartupThisAp;
   ///
-  /// A number between zero and the NumberOfCpus field. This field designates which 
+  /// A number between zero and the NumberOfCpus field. This field designates which
   /// processor is executing the SMM Foundation.
   ///
   UINTN                    CurrentlyExecutingCpu;
   ///
-  /// The number of possible processors in the platform.  This is a 1 based 
+  /// The number of possible processors in the platform.  This is a 1 based
   /// counter.  This does not indicate the number of processors that entered SMM.
   ///
   UINTN                    NumberOfCpus;
   ///
-  /// Points to an array, where each element describes the number of bytes in the 
-  /// corresponding save state specified by CpuSaveState. There are always 
-  /// NumberOfCpus entries in the array. 
+  /// Points to an array, where each element describes the number of bytes in the
+  /// corresponding save state specified by CpuSaveState. There are always
+  /// NumberOfCpus entries in the array.
   ///
   UINTN                    *CpuSaveStateSize;
   ///
-  /// Points to an array, where each element is a pointer to a CPU save state. The 
-  /// corresponding element in CpuSaveStateSize specifies the number of bytes in the 
+  /// Points to an array, where each element is a pointer to a CPU save state. The
+  /// corresponding element in CpuSaveStateSize specifies the number of bytes in the
   /// save state area. There are always NumberOfCpus entries in the array.
   ///
   VOID                     **CpuSaveState;
@@ -106,8 +106,8 @@ VOID
 ///
 /// System Management System Table (SMST)
 ///
-/// The System Management System Table (SMST) is a table that contains a collection of common 
-/// services for managing SMRAM allocation and providing basic I/O services. These services are 
+/// The System Management System Table (SMST) is a table that contains a collection of common
+/// services for managing SMRAM allocation and providing basic I/O services. These services are
 /// intended for both preboot and runtime usage.
 ///
 struct _EFI_SMM_SYSTEM_TABLE2 {
@@ -150,7 +150,7 @@ struct _EFI_SMM_SYSTEM_TABLE2 {
   ///
 
   ///
-  /// A number between zero and and the NumberOfCpus field. This field designates 
+  /// A number between zero and and the NumberOfCpus field. This field designates
   /// which processor is executing the SMM infrastructure.
   ///
   UINTN                                CurrentlyExecutingCpu;
@@ -159,14 +159,14 @@ struct _EFI_SMM_SYSTEM_TABLE2 {
   ///
   UINTN                                NumberOfCpus;
   ///
-  /// Points to an array, where each element describes the number of bytes in the 
-  /// corresponding save state specified by CpuSaveState. There are always 
-  /// NumberOfCpus entries in the array. 
+  /// Points to an array, where each element describes the number of bytes in the
+  /// corresponding save state specified by CpuSaveState. There are always
+  /// NumberOfCpus entries in the array.
   ///
   UINTN                                *CpuSaveStateSize;
   ///
-  /// Points to an array, where each element is a pointer to a CPU save state. The 
-  /// corresponding element in CpuSaveStateSize specifies the number of bytes in the 
+  /// Points to an array, where each element is a pointer to a CPU save state. The
+  /// corresponding element in CpuSaveStateSize specifies the number of bytes in the
   /// save state area. There are always NumberOfCpus entries in the array.
   ///
   VOID                                 **CpuSaveState;
@@ -180,8 +180,8 @@ struct _EFI_SMM_SYSTEM_TABLE2 {
   ///
   UINTN                                NumberOfTableEntries;
   ///
-  /// A pointer to the UEFI Configuration Tables. The number of entries in the table is 
-  /// NumberOfTableEntries. 
+  /// A pointer to the UEFI Configuration Tables. The number of entries in the table is
+  /// NumberOfTableEntries.
   ///
   EFI_CONFIGURATION_TABLE              *SmmConfigurationTable;
 

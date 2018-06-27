@@ -11,8 +11,8 @@
     BaseMemoryLibOptPei
     PeiMemoryLib
     UefiMemoryLib
-    
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -29,7 +29,7 @@
   Fills a target buffer with zeros, and returns the target buffer.
 
   This function fills Length bytes of Buffer with zeros, and returns Buffer.
-  
+
   If Length > 0 and Buffer is NULL, then ASSERT().
   If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
 

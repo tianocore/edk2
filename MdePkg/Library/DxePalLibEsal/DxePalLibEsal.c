@@ -1,7 +1,7 @@
 /** @file
   PAL Library Class implementation built upon Extended SAL Procedures.
 
-  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -59,13 +59,13 @@ PalCall (
   SalReturn = EsalCall (
                 EFI_EXTENDED_SAL_PAL_SERVICES_PROTOCOL_GUID_LO,
                 EFI_EXTENDED_SAL_PAL_SERVICES_PROTOCOL_GUID_HI,
-                PalProcFunctionId, 
-                Index, 
-                Arg2, 
-                Arg3, 
-                Arg4, 
-                0, 
-                0, 
+                PalProcFunctionId,
+                Index,
+                Arg2,
+                Arg3,
+                Arg4,
+                0,
+                0,
                 0
                 );
   PalReturn = (PAL_CALL_RETURN *) (UINTN) (&SalReturn);

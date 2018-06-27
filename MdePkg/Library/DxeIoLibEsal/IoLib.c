@@ -1,7 +1,7 @@
 /** @file
   I/O Library basic function implementation and worker functions.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -47,13 +47,13 @@ IoReadWorker (
   ReturnReg = EsalCall (
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_LO,
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_HI,
-                IoReadFunctionId, 
-                (UINT64)Width, 
-                Port, 
-                1, 
-                (UINT64)&Data, 
-                0, 
-                0, 
+                IoReadFunctionId,
+                (UINT64)Width,
+                Port,
+                1,
+                (UINT64)&Data,
+                0,
+                0,
                 0
                 );
   ASSERT (ReturnReg.Status == EFI_SAL_SUCCESS);
@@ -90,13 +90,13 @@ IoWriteWorker (
   ReturnReg = EsalCall (
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_LO,
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_HI,
-                IoWriteFunctionId, 
-                (UINT64)Width, 
-                Port, 
-                1, 
-                (UINT64)&Data, 
-                0, 
-                0, 
+                IoWriteFunctionId,
+                (UINT64)Width,
+                Port,
+                1,
+                (UINT64)&Data,
+                0,
+                0,
                 0
                 );
   ASSERT (ReturnReg.Status == EFI_SAL_SUCCESS);
@@ -133,13 +133,13 @@ IoReadFifoWorker (
   ReturnReg = EsalCall (
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_LO,
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_HI,
-                IoReadFunctionId, 
-                (UINT64)Width, 
-                Port, 
-                Count, 
-                (UINT64)Buffer, 
-                0, 
-                0, 
+                IoReadFunctionId,
+                (UINT64)Width,
+                Port,
+                Count,
+                (UINT64)Buffer,
+                0,
+                0,
                 0
                 );
   ASSERT (ReturnReg.Status == EFI_SAL_SUCCESS);
@@ -175,13 +175,13 @@ IoWriteFifoWorker (
   ReturnReg = EsalCall (
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_LO,
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_HI,
-                IoWriteFunctionId, 
-                (UINT64)Width, 
-                Port, 
-                Count, 
-                (UINT64)Buffer, 
-                0, 
-                0, 
+                IoWriteFunctionId,
+                (UINT64)Width,
+                Port,
+                Count,
+                (UINT64)Buffer,
+                0,
+                0,
                 0
                 );
   ASSERT (ReturnReg.Status == EFI_SAL_SUCCESS);
@@ -216,13 +216,13 @@ MmioReadWorker (
   ReturnReg = EsalCall (
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_LO,
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_HI,
-                MemReadFunctionId, 
-                (UINT64)Width, 
-                Address, 
-                1, 
-                (UINT64)&Data, 
-                0, 
-                0, 
+                MemReadFunctionId,
+                (UINT64)Width,
+                Address,
+                1,
+                (UINT64)&Data,
+                0,
+                0,
                 0
                 );
   ASSERT (ReturnReg.Status == EFI_SAL_SUCCESS);
@@ -257,13 +257,13 @@ MmioWriteWorker (
   ReturnReg = EsalCall (
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_LO,
                 EFI_EXTENDED_SAL_BASE_IO_SERVICES_PROTOCOL_GUID_HI,
-                MemWriteFunctionId, 
-                (UINT64)Width, 
-                Address, 
-                1, 
-                (UINT64)&Data, 
-                0, 
-                0, 
+                MemWriteFunctionId,
+                (UINT64)Width,
+                Address,
+                1,
+                (UINT64)&Data,
+                0,
+                0,
                 0
                 );
   ASSERT (ReturnReg.Status == EFI_SAL_SUCCESS);

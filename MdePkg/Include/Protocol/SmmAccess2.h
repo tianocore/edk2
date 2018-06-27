@@ -5,20 +5,20 @@
   It abstracts the location and characteristics of SMRAM.  The expectation is
   that the north bridge or memory controller would publish this protocol.
 
-  The principal functionality found in the memory controller includes the following: 
+  The principal functionality found in the memory controller includes the following:
   - Exposing the SMRAM to all non-SMM agents, or the "open" state
   - Shrouding the SMRAM to all but the SMM agents, or the "closed" state
-  - Preserving the system integrity, or "locking" the SMRAM, such that the settings cannot be 
-    perturbed by either boot service or runtime agents 
+  - Preserving the system integrity, or "locking" the SMRAM, such that the settings cannot be
+    perturbed by either boot service or runtime agents
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 

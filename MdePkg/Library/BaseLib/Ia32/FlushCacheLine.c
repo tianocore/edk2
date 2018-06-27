@@ -1,7 +1,7 @@
 /** @file
   AsmFlushCacheLine function
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,7 @@ AsmFlushCacheLine (
   )
 {
   //
-  // If the CPU does not support CLFLUSH instruction, 
+  // If the CPU does not support CLFLUSH instruction,
   // then promote flush range to flush entire cache.
   //
   _asm {
@@ -52,7 +52,7 @@ NoClflush:
     wbinvd
 Done:
   }
-  
+
   return LinearAddress;
 }
 

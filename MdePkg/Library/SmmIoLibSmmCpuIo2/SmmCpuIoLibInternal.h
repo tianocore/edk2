@@ -1,10 +1,10 @@
 /** @file
   Internal include file of SMM CPU IO Library.
   It includes all necessary protocol/library class's header file
-  for implementation of IoLib library instance. It is included 
+  for implementation of IoLib library instance. It is included
   all source code of this library instance.
-  
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -103,7 +103,7 @@ MmioReadWorker (
                         The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
   @param  Data          The value to write to the I/O port.
-  
+
   @return Data read from registers in the EFI system memory space.
 
 **/

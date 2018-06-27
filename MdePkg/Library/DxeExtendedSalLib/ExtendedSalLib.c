@@ -1,7 +1,7 @@
 /** @file
   The library implements the Extended SAL Library Class for boot service only modules.
 
-  Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -64,7 +64,7 @@ EFI_PLABEL                          mPlabel;
 /**
   Constructor function to get Extended SAL Boot Service Protocol, and initializes
   physical plabel of ESAL entrypoint.
-  
+
   This function first locates Extended SAL Boot Service Protocol and caches it in global variable.
   Then it initializes the physical plable of ESAL entrypoint, and stores
   it where GetEsalEntryPoint() can easily retrieve.
@@ -109,7 +109,7 @@ DxeExtendedSalLibConstruct (
 
 /**
   Registers function of ESAL class and it's associated global.
-  
+
   This function registers function of ESAL class, together with its associated global.
   It is worker function for RegisterEsalClass().
   It is only for boot time.
@@ -144,7 +144,7 @@ RegisterEsalFunction (
 
 /**
   Registers ESAL Class and it's associated global.
-  
+
   This function registers one or more Extended SAL services in a given
   class along with the associated global context.
   This function is only available prior to ExitBootServices().
@@ -153,11 +153,11 @@ RegisterEsalFunction (
   @param  ClassGuidHi          GUID of function class, upper 64-bits
   @param  ModuleGlobal         Module global for the class.
   @param  ...                  List of Function/FunctionId pairs, ended by NULL
-  
+
   @retval EFI_SUCCESS          The Extended SAL services were registered.
   @retval EFI_UNSUPPORTED      This function was called after ExitBootServices().
   @retval EFI_OUT_OF_RESOURCES There are not enough resources available to register one or more of the specified services.
-  @retval Other                ClassGuid could not be installed onto a new handle.  
+  @retval Other                ClassGuid could not be installed onto a new handle.
 
 **/
 EFI_STATUS
@@ -215,7 +215,7 @@ RegisterEsalClass (
 
 /**
   Calls an Extended SAL Class service that was previously registered with RegisterEsalClass().
-  
+
   This function gets the entrypoint of Extended SAL, and calls an Extended SAL Class service
   that was previously registered with RegisterEsalClass() through this entrypoint.
 
@@ -229,12 +229,12 @@ RegisterEsalClass (
   @param  Arg6            Argument 6 ClassGuid/FunctionId defined
   @param  Arg7            Argument 7 ClassGuid/FunctionId defined
   @param  Arg8            Argument 8 ClassGuid/FunctionId defined
-  
+
   @retval EFI_SAL_SUCCESS ESAL procedure successfully called.
   @retval EFI_SAL_ERROR   The address of ExtendedSalProc() can not be correctly
                           initialized.
   @retval Other           Status returned from ExtendedSalProc() service of
-                          EXTENDED_SAL_BOOT_SERVICE_PROTOCOL.  
+                          EXTENDED_SAL_BOOT_SERVICE_PROTOCOL.
 
 **/
 SAL_RETURN_REGS
@@ -298,7 +298,7 @@ EsalCall (
 
 /**
   Wrapper for the EsalStallFunctionId service of Extended SAL Stall Services Class.
-  
+
   This function is a wrapper for the EsalStallFunctionId service of Extended SAL
   Stall Services Class. See EsalStallFunctionId of Extended SAL Specification.
 
@@ -316,22 +316,22 @@ EsalStall (
   )
 {
   return EsalCall (
-           EFI_EXTENDED_SAL_STALL_SERVICES_PROTOCOL_GUID_LO, 
-           EFI_EXTENDED_SAL_STALL_SERVICES_PROTOCOL_GUID_HI, 
-           StallFunctionId, 
-           Microseconds, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           EFI_EXTENDED_SAL_STALL_SERVICES_PROTOCOL_GUID_LO,
+           EFI_EXTENDED_SAL_STALL_SERVICES_PROTOCOL_GUID_HI,
+           StallFunctionId,
+           Microseconds,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalSetNewPalEntryFunctionId service of Extended SAL PAL Services Services Class.
-  
+
   This function is a wrapper for the EsalSetNewPalEntryFunctionId service of Extended SAL
   PAL Services Services Class. See EsalSetNewPalEntryFunctionId of Extended SAL Specification.
 
@@ -353,22 +353,22 @@ EsalSetNewPalEntry (
   )
 {
   return EsalCall (
-           EFI_EXTENDED_SAL_PAL_SERVICES_PROTOCOL_GUID_LO, 
+           EFI_EXTENDED_SAL_PAL_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_PAL_SERVICES_PROTOCOL_GUID_HI,
-           SetNewPalEntryFunctionId, 
-           PhysicalAddress, 
-           PalEntryPoint, 
-           0, 
-           0, 
-           0, 
-           0, 
+           SetNewPalEntryFunctionId,
+           PhysicalAddress,
+           PalEntryPoint,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalGetNewPalEntryFunctionId service of Extended SAL PAL Services Services Class.
-  
+
   This function is a wrapper for the EsalGetNewPalEntryFunctionId service of Extended SAL
   PAL Services Services Class. See EsalGetNewPalEntryFunctionId of Extended SAL Specification.
 
@@ -392,20 +392,20 @@ EsalGetNewPalEntry (
   return EsalCall (
            EFI_EXTENDED_SAL_PAL_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_PAL_SERVICES_PROTOCOL_GUID_HI,
-           GetNewPalEntryFunctionId, 
-           PhysicalAddress, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           GetNewPalEntryFunctionId,
+           PhysicalAddress,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalGetStateBufferFunctionId service of Extended SAL MCA Log Services Class.
-  
+
   This function is a wrapper for the EsalGetStateBufferFunctionId service of Extended SAL
   MCA Log Services Class. See EsalGetStateBufferFunctionId of Extended SAL Specification.
 
@@ -434,13 +434,13 @@ EsalGetStateBuffer (
   Regs = EsalCall (
            EFI_EXTENDED_SAL_MCA_LOG_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MCA_LOG_SERVICES_PROTOCOL_GUID_HI,
-           EsalGetStateBufferFunctionId, 
-           McaType, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           EsalGetStateBufferFunctionId,
+           McaType,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 
@@ -452,7 +452,7 @@ EsalGetStateBuffer (
 
 /**
   Wrapper for the EsalSaveStateBufferFunctionId service of Extended SAL MCA Log Services Class.
-  
+
   This function is a wrapper for the EsalSaveStateBufferFunctionId service of Extended SAL
   MCA Log Services Class. See EsalSaveStateBufferFunctionId of Extended SAL Specification.
 
@@ -470,20 +470,20 @@ EsalSaveStateBuffer (
   return EsalCall (
            EFI_EXTENDED_SAL_MCA_LOG_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MCA_LOG_SERVICES_PROTOCOL_GUID_HI,
-           EsalSaveStateBufferFunctionId, 
-           McaType, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           EsalSaveStateBufferFunctionId,
+           McaType,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalGetVectorsFunctionId service of Extended SAL Base Services Class.
-  
+
   This function is a wrapper for the EsalGetVectorsFunctionId service of Extended SAL
   Base Services Class. See EsalGetVectorsFunctionId of Extended SAL Specification.
 
@@ -505,20 +505,20 @@ EsalGetVectors (
   return EsalCall (
            EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_HI,
-           EsalGetVectorsFunctionId, 
-           VectorType, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           EsalGetVectorsFunctionId,
+           VectorType,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalMcGetParamsFunctionId service of Extended SAL Base Services Class.
-  
+
   This function is a wrapper for the EsalMcGetParamsFunctionId service of Extended SAL
   Base Services Class. See EsalMcGetParamsFunctionId of Extended SAL Specification.
 
@@ -542,20 +542,20 @@ EsalMcGetParams (
   return EsalCall (
            EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_HI,
-           EsalMcGetParamsFunctionId, 
-           ParamInfoType, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           EsalMcGetParamsFunctionId,
+           ParamInfoType,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalMcGetParamsFunctionId service of Extended SAL Base Services Class.
-  
+
   This function is a wrapper for the EsalMcGetParamsFunctionId service of Extended SAL
   Base Services Class. See EsalMcGetParamsFunctionId of Extended SAL Specification.
 
@@ -573,20 +573,20 @@ EsalMcGetMcParams (
   return EsalCall (
            EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_HI,
-           EsalMcGetMcParamsFunctionId, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           EsalMcGetMcParamsFunctionId,
+           0,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalGetMcCheckinFlagsFunctionId service of Extended SAL Base Services Class.
-  
+
   This function is a wrapper for the EsalGetMcCheckinFlagsFunctionId service of Extended SAL
   Base Services Class. See EsalGetMcCheckinFlagsFunctionId of Extended SAL Specification.
 
@@ -604,20 +604,20 @@ EsalGetMcCheckinFlags (
   return EsalCall (
            EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_HI,
-           EsalGetMcCheckinFlagsFunctionId, 
-           CpuIndex, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           EsalGetMcCheckinFlagsFunctionId,
+           CpuIndex,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalAddCpuDataFunctionId service of Extended SAL MP Services Class.
-  
+
   This function is a wrapper for the EsalAddCpuDataFunctionId service of Extended SAL
   MP Services Class. See EsalAddCpuDataFunctionId of Extended SAL Specification.
 
@@ -642,20 +642,20 @@ EsalAddCpuData (
   return EsalCall (
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_HI,
-           AddCpuDataFunctionId, 
-           CpuGlobalId, 
-           Enabled, 
-           PalCompatibility, 
-           0, 
-           0, 
-           0, 
+           AddCpuDataFunctionId,
+           CpuGlobalId,
+           Enabled,
+           PalCompatibility,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalRemoveCpuDataFunctionId service of Extended SAL MP Services Class.
-  
+
   This function is a wrapper for the EsalRemoveCpuDataFunctionId service of Extended SAL
   MP Services Class. See EsalRemoveCpuDataFunctionId of Extended SAL Specification.
 
@@ -674,20 +674,20 @@ EsalRemoveCpuData (
   return EsalCall (
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_HI,
-           RemoveCpuDataFunctionId, 
-           CpuGlobalId, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           RemoveCpuDataFunctionId,
+           CpuGlobalId,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalModifyCpuDataFunctionId service of Extended SAL MP Services Class.
-  
+
   This function is a wrapper for the EsalModifyCpuDataFunctionId service of Extended SAL
   MP Services Class. See EsalModifyCpuDataFunctionId of Extended SAL Specification.
 
@@ -712,20 +712,20 @@ EsalModifyCpuData (
   return EsalCall (
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_HI,
-           ModifyCpuDataFunctionId, 
-           CpuGlobalId, 
-           Enabled, 
-           PalCompatibility, 
-           0, 
-           0, 
-           0, 
+           ModifyCpuDataFunctionId,
+           CpuGlobalId,
+           Enabled,
+           PalCompatibility,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalGetCpuDataByIdFunctionId service of Extended SAL MP Services Class.
-  
+
   This function is a wrapper for the EsalGetCpuDataByIdFunctionId service of Extended SAL
   MP Services Class. See EsalGetCpuDataByIdFunctionId of Extended SAL Specification.
 
@@ -747,20 +747,20 @@ EsalGetCpuDataById (
   return EsalCall (
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_HI,
-           GetCpuDataByIDFunctionId, 
-           CpuGlobalId, 
-           IndexByEnabledCpu, 
-           0, 
-           0, 
-           0, 
-           0, 
+           GetCpuDataByIDFunctionId,
+           CpuGlobalId,
+           IndexByEnabledCpu,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalGetCpuDataByIndexFunctionId service of Extended SAL MP Services Class.
-  
+
   This function is a wrapper for the EsalGetCpuDataByIndexFunctionId service of Extended SAL
   MP Services Class. See EsalGetCpuDataByIndexFunctionId of Extended SAL Specification.
 
@@ -782,20 +782,20 @@ EsalGetCpuDataByIndex (
   return EsalCall (
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_HI,
-           GetCpuDataByIndexFunctionId, 
-           Index, 
-           IndexByEnabledCpu, 
-           0, 
-           0, 
-           0, 
-           0, 
+           GetCpuDataByIndexFunctionId,
+           Index,
+           IndexByEnabledCpu,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalWhoAmIFunctionId service of Extended SAL MP Services Class.
-  
+
   This function is a wrapper for the EsalWhoAmIFunctionId service of Extended SAL
   MP Services Class. See EsalWhoAmIFunctionId of Extended SAL Specification.
 
@@ -815,20 +815,20 @@ EsalWhoAmI (
   return EsalCall (
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_HI,
-           CurrentProcInfoFunctionId, 
-           IndexByEnabledCpu, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           CurrentProcInfoFunctionId,
+           IndexByEnabledCpu,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalNumProcessors service of Extended SAL MP Services Class.
-  
+
   This function is a wrapper for the EsalNumProcessors service of Extended SAL
   MP Services Class. See EsalNumProcessors of Extended SAL Specification.
 
@@ -845,20 +845,20 @@ EsalNumProcessors (
   return EsalCall (
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_HI,
-           NumProcessorsFunctionId, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           NumProcessorsFunctionId,
+           0,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalSetMinStateFnctionId service of Extended SAL MP Services Class.
-  
+
   This function is a wrapper for the EsalSetMinStateFnctionId service of Extended SAL
   MP Services Class. See EsalSetMinStateFnctionId of Extended SAL Specification.
 
@@ -880,20 +880,20 @@ EsalSetMinState (
   return EsalCall (
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_HI,
-           SetMinStateFunctionId, 
-           CpuGlobalId, 
-           MinStatePointer, 
-           0, 
-           0, 
-           0, 
-           0, 
+           SetMinStateFunctionId,
+           CpuGlobalId,
+           MinStatePointer,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalGetMinStateFunctionId service of Extended SAL MP Services Class.
-  
+
   This function is a wrapper for the EsalGetMinStateFunctionId service of Extended SAL
   MP Services Class. See EsalGetMinStateFunctionId of Extended SAL Specification.
 
@@ -912,20 +912,20 @@ EsalGetMinState (
   return EsalCall (
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MP_SERVICES_PROTOCOL_GUID_HI,
-           GetMinStateFunctionId, 
-           CpuGlobalId, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           GetMinStateFunctionId,
+           CpuGlobalId,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }
 
 /**
   Wrapper for the EsalMcsGetStateInfoFunctionId service of Extended SAL MCA Services Class.
-  
+
   This function is a wrapper for the EsalMcsGetStateInfoFunctionId service of Extended SAL
   MCA Services Class. See EsalMcsGetStateInfoFunctionId of Extended SAL Specification.
 
@@ -950,13 +950,13 @@ EsalMcaGetStateInfo (
   Regs = EsalCall (
            EFI_EXTENDED_SAL_MCA_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MCA_SERVICES_PROTOCOL_GUID_HI,
-           McaGetStateInfoFunctionId, 
-           CpuGlobalId, 
-           0, 
-           0, 
-           0, 
-           0, 
-           0, 
+           McaGetStateInfoFunctionId,
+           CpuGlobalId,
+           0,
+           0,
+           0,
+           0,
+           0,
            0
            );
 
@@ -968,7 +968,7 @@ EsalMcaGetStateInfo (
 
 /**
   Wrapper for the EsalMcaRegisterCpuFunctionId service of Extended SAL MCA Services Class.
-  
+
   This function is a wrapper for the EsalMcaRegisterCpuFunctionId service of Extended SAL
   MCA Services Class. See EsalMcaRegisterCpuFunctionId of Extended SAL Specification.
 
@@ -989,13 +989,13 @@ EsalMcaRegisterCpu (
   return EsalCall (
            EFI_EXTENDED_SAL_MCA_SERVICES_PROTOCOL_GUID_LO,
            EFI_EXTENDED_SAL_MCA_SERVICES_PROTOCOL_GUID_HI,
-           McaRegisterCpuFunctionId, 
-           CpuGlobalId, 
-           StateBufferPointer, 
-           0, 
-           0, 
-           0, 
-           0, 
+           McaRegisterCpuFunctionId,
+           CpuGlobalId,
+           StateBufferPointer,
+           0,
+           0,
+           0,
+           0,
            0
            );
 }

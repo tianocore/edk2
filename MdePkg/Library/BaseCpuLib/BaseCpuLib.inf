@@ -25,7 +25,7 @@
   FILE_GUID                      = 4FBD2538-249C-4b50-8F4A-A9E66609CBF6
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = CpuLib 
+  LIBRARY_CLASS                  = CpuLib
 
 
 #
@@ -33,23 +33,23 @@
 #
 
 [Sources.IA32]
-  Ia32/CpuSleep.c | MSFT 
-  Ia32/CpuFlushTlb.c | MSFT 
+  Ia32/CpuSleep.c | MSFT
+  Ia32/CpuFlushTlb.c | MSFT
 
   Ia32/CpuSleep.nasm| INTEL
   Ia32/CpuFlushTlb.nasm| INTEL
 
-  Ia32/CpuSleepGcc.c | GCC 
-  Ia32/CpuFlushTlbGcc.c | GCC 
+  Ia32/CpuSleepGcc.c | GCC
+  Ia32/CpuFlushTlbGcc.c | GCC
 
 [Sources.X64]
   X64/CpuFlushTlb.nasm
   X64/CpuSleep.nasm
 
   X64/CpuSleep.nasm| GCC
-  X64/CpuSleep.S | GCC 
+  X64/CpuSleep.S | GCC
   X64/CpuFlushTlb.nasm| GCC
-  X64/CpuFlushTlb.S | GCC 
+  X64/CpuFlushTlb.S | GCC
 
 [Sources.IPF]
   Ipf/CpuFlushTlb.s
@@ -60,11 +60,11 @@
 
 [Sources.ARM]
   Arm/CpuFlushTlb.asm | RVCT
-  Arm/CpuSleep.asm    | RVCT  
+  Arm/CpuSleep.asm    | RVCT
   Arm/CpuFlushTlb.asm | MSFT
   Arm/CpuSleep.asm    | MSFT
   Arm/CpuFlushTlb.S   | GCC
-  Arm/CpuSleep.S      | GCC  
+  Arm/CpuSleep.S      | GCC
 
 [Sources.AARCH64]
   AArch64/CpuFlushTlb.S   | GCC

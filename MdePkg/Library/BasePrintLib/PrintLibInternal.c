@@ -1,7 +1,7 @@
 /** @file
   Print Library internal worker functions.
 
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -83,7 +83,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 * CONST mStatusString[] = {
 
   @param  Buffer      The buffer to place the Unicode or ASCII string.
   @param  EndBuffer   The end of the input Buffer. No characters will be
-                      placed after that. 
+                      placed after that.
   @param  Length      The count of character to be placed into Buffer.
                       (Negative value indicates no buffer fill.)
   @param  Character   The character to be placed into Buffer.
@@ -102,7 +102,7 @@ BasePrintLibFillBuffer (
   )
 {
   INTN  Index;
-  
+
   for (Index = 0; Index < Length && Buffer < EndBuffer; Index++) {
     *Buffer = (CHAR8) Character;
     if (Increment != 1) {
@@ -128,8 +128,8 @@ BasePrintLibFillBuffer (
 **/
 CHAR8 *
 BasePrintLibValueToString (
-  IN OUT CHAR8  *Buffer, 
-  IN INT64      Value, 
+  IN OUT CHAR8  *Buffer,
+  IN INT64      Value,
   IN UINTN      Radix
   )
 {
@@ -152,23 +152,23 @@ BasePrintLibValueToString (
 
 /**
   Internal function that converts a decimal value to a Null-terminated string.
-  
-  Converts the decimal number specified by Value to a Null-terminated  
+
+  Converts the decimal number specified by Value to a Null-terminated
   string specified by Buffer containing at most Width characters.
   If Width is 0 then a width of  MAXIMUM_VALUE_CHARACTERS is assumed.
   The total number of characters placed in Buffer is returned.
   If the conversion contains more than Width characters, then only the first
-  Width characters are returned, and the total number of characters 
+  Width characters are returned, and the total number of characters
   required to perform the conversion is returned.
-  Additional conversion parameters are specified in Flags.  
+  Additional conversion parameters are specified in Flags.
   The Flags bit LEFT_JUSTIFY is always ignored.
   All conversions are left justified in Buffer.
   If Width is 0, PREFIX_ZERO is ignored in Flags.
   If COMMA_TYPE is set in Flags, then PREFIX_ZERO is ignored in Flags, and commas
   are inserted every 3rd digit starting from the right.
   If Value is < 0, then the fist character in Buffer is a '-'.
-  If PREFIX_ZERO is set in Flags and PREFIX_ZERO is not being ignored, 
-  then Buffer is padded with '0' characters so the combination of the optional '-' 
+  If PREFIX_ZERO is set in Flags and PREFIX_ZERO is not being ignored,
+  then Buffer is padded with '0' characters so the combination of the optional '-'
   sign character, '0' characters, digit characters for Value, and the Null-terminator
   add up to Width characters.
 
@@ -184,7 +184,7 @@ BasePrintLibValueToString (
   @param  Width     The maximum number of characters to place in Buffer, not including
                     the Null-terminator.
   @param  Increment The character increment in Buffer.
-  
+
   @return Total number of characters required to perform the conversion.
 
 **/
@@ -222,7 +222,7 @@ BasePrintLibConvertValueToString (
   ASSERT (((Flags & COMMA_TYPE) == 0) || ((Flags & RADIX_HEX) == 0));
 
   OriginalBuffer = Buffer;
-  
+
   //
   // Width is 0 or COMMA_TYPE is set, PREFIX_ZERO is ignored.
   //
@@ -239,7 +239,7 @@ BasePrintLibConvertValueToString (
   // Set the tag for the end of the input Buffer.
   //
   EndBuffer = Buffer + Width * Increment;
-  
+
   //
   // Convert decimal negative
   //
@@ -248,21 +248,21 @@ BasePrintLibConvertValueToString (
     Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, 1, '-', Increment);
     Width--;
   }
-  
+
   //
   // Count the length of the value string.
   //
   Radix = ((Flags & RADIX_HEX) == 0)? 10 : 16;
   ValueBufferPtr = BasePrintLibValueToString (ValueBuffer, Value, Radix);
   Count = ValueBufferPtr - ValueBuffer;
-  
+
   //
   // Append Zero
   //
   if ((Flags & PREFIX_ZERO) != 0) {
     Buffer = BasePrintLibFillBuffer (Buffer, EndBuffer, Width - Count, '0', Increment);
   }
-  
+
   //
   // Print Comma type for every 3 characters
   //
@@ -282,7 +282,7 @@ BasePrintLibConvertValueToString (
       }
     }
   }
-  
+
   //
   // Print Null-terminator
   //
@@ -496,21 +496,21 @@ BasePrintLibConvertValueToStringS (
 }
 
 /**
-  Worker function that produces a Null-terminated string in an output buffer 
+  Worker function that produces a Null-terminated string in an output buffer
   based on a Null-terminated format string and a VA_LIST argument list.
 
-  VSPrint function to process format and place the results in Buffer. Since a 
-  VA_LIST is used this routine allows the nesting of Vararg routines. Thus 
+  VSPrint function to process format and place the results in Buffer. Since a
+  VA_LIST is used this routine allows the nesting of Vararg routines. Thus
   this is the main print working routine.
 
   If COUNT_ONLY_NO_PRINT is set in Flags, Buffer will not be modified at all.
 
-  @param[out] Buffer          The character buffer to print the results of the 
+  @param[out] Buffer          The character buffer to print the results of the
                               parsing of Format into.
-  @param[in]  BufferSize      The maximum number of characters to put into 
+  @param[in]  BufferSize      The maximum number of characters to put into
                               buffer.
   @param[in]  Flags           Initial flags value.
-                              Can only have FORMAT_UNICODE, OUTPUT_UNICODE, 
+                              Can only have FORMAT_UNICODE, OUTPUT_UNICODE,
                               and COUNT_ONLY_NO_PRINT set.
   @param[in]  Format          A Null-terminated format string.
   @param[in]  VaListMarker    VA_LIST style variable argument list consumed by
@@ -566,7 +566,7 @@ BasePrintLibSPrintMarker (
 
   //
   // If you change this code be sure to match the 2 versions of this function.
-  // Nearly identical logic is found in the BasePrintLib and 
+  // Nearly identical logic is found in the BasePrintLib and
   // DxePrintLibPrint2Protocol (both PrintLib instances).
   //
 
@@ -687,24 +687,24 @@ BasePrintLibSPrintMarker (
         Format += BytesPerFormatCharacter;
         FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
         switch (FormatCharacter) {
-        case '.': 
-          Flags |= PRECISION; 
+        case '.':
+          Flags |= PRECISION;
           break;
-        case '-': 
-          Flags |= LEFT_JUSTIFY; 
+        case '-':
+          Flags |= LEFT_JUSTIFY;
           break;
-        case '+': 
-          Flags |= PREFIX_SIGN;  
+        case '+':
+          Flags |= PREFIX_SIGN;
           break;
-        case ' ': 
-          Flags |= PREFIX_BLANK; 
+        case ' ':
+          Flags |= PREFIX_BLANK;
           break;
-        case ',': 
-          Flags |= COMMA_TYPE; 
+        case ',':
+          Flags |= COMMA_TYPE;
           break;
         case 'L':
-        case 'l': 
-          Flags |= LONG_TYPE;    
+        case 'l':
+          Flags |= LONG_TYPE;
           break;
         case '*':
           if ((Flags & PRECISION) == 0) {
@@ -748,11 +748,11 @@ BasePrintLibSPrintMarker (
             Precision = Count;
           }
           break;
-       
+
         case '\0':
           //
           // Make no output if Format string terminates unexpectedly when
-          // looking up for flag, width, precision and type. 
+          // looking up for flag, width, precision and type.
           //
           Format   -= BytesPerFormatCharacter;
           Precision = 0;
@@ -763,7 +763,7 @@ BasePrintLibSPrintMarker (
           Done = TRUE;
           break;
         }
-      } 
+      }
 
       //
       // Handle each argument type
@@ -803,9 +803,9 @@ BasePrintLibSPrintMarker (
           //
           // 'd', 'u', 'x', and 'X' that are not preceded by 'l' or 'L' are assumed to be type "int".
           // This assumption is made so the format string definition is compatible with the ANSI C
-          // Specification for formatted strings.  It is recommended that the Base Types be used 
-          // everywhere, but in this one case, compliance with ANSI C is more important, and 
-          // provides an implementation that is compatible with that largest possible set of CPU 
+          // Specification for formatted strings.  It is recommended that the Base Types be used
+          // everywhere, but in this one case, compliance with ANSI C is more important, and
+          // provides an implementation that is compatible with that largest possible set of CPU
           // architectures.  This is why the type "int" is used in this one case.
           //
           if (BaseListMarker == NULL) {
@@ -843,9 +843,9 @@ BasePrintLibSPrintMarker (
             //
             // 'd', 'u', 'x', and 'X' that are not preceded by 'l' or 'L' are assumed to be type "int".
             // This assumption is made so the format string definition is compatible with the ANSI C
-            // Specification for formatted strings.  It is recommended that the Base Types be used 
-            // everywhere, but in this one case, compliance with ANSI C is more important, and 
-            // provides an implementation that is compatible with that largest possible set of CPU 
+            // Specification for formatted strings.  It is recommended that the Base Types be used
+            // everywhere, but in this one case, compliance with ANSI C is more important, and
+            // provides an implementation that is compatible with that largest possible set of CPU
             // architectures.  This is why the type "unsigned int" is used in this one case.
             //
             Value = (unsigned int)Value;
@@ -857,9 +857,9 @@ BasePrintLibSPrintMarker (
             //
             // 'd', 'u', 'x', and 'X' that are not preceded by 'l' or 'L' are assumed to be type "int".
             // This assumption is made so the format string definition is compatible with the ANSI C
-            // Specification for formatted strings.  It is recommended that the Base Types be used 
-            // everywhere, but in this one case, compliance with ANSI C is more important, and 
-            // provides an implementation that is compatible with that largest possible set of CPU 
+            // Specification for formatted strings.  It is recommended that the Base Types be used
+            // everywhere, but in this one case, compliance with ANSI C is more important, and
+            // provides an implementation that is compatible with that largest possible set of CPU
             // architectures.  This is why the type "unsigned int" is used in this one case.
             //
             Value = (unsigned int)Value;
@@ -873,7 +873,7 @@ BasePrintLibSPrintMarker (
           Count = 0;
         }
         ArgumentString = (CHAR8 *)ValueBuffer + Count;
-        
+
         Digits = Count % 3;
         if (Digits != 0) {
           Digits = 3 - Digits;
@@ -946,7 +946,7 @@ BasePrintLibSPrintMarker (
           GuidData3 = ReadUnaligned16 (&(TmpGuid->Data3));
           BasePrintLibSPrint (
             ValueBuffer,
-            MAXIMUM_VALUE_CHARACTERS, 
+            MAXIMUM_VALUE_CHARACTERS,
             0,
             "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x",
             GuidData1,
@@ -967,9 +967,9 @@ BasePrintLibSPrintMarker (
 
       case 't':
         if (BaseListMarker == NULL) {
-          TmpTime = VA_ARG (VaListMarker, TIME *); 
+          TmpTime = VA_ARG (VaListMarker, TIME *);
         } else {
-          TmpTime = BASE_ARG (BaseListMarker, TIME *); 
+          TmpTime = BASE_ARG (BaseListMarker, TIME *);
         }
         if (TmpTime == NULL) {
           ArgumentString = "<null time>";
@@ -1054,7 +1054,7 @@ BasePrintLibSPrintMarker (
         break;
       }
       break;
- 
+
     case '\r':
       Format += BytesPerFormatCharacter;
       FormatCharacter = ((*Format & 0xff) | ((BytesPerFormatCharacter == 1) ? 0 : (*(Format + 1) << 8))) & FormatMask;
@@ -1230,11 +1230,11 @@ BasePrintLibSPrintMarker (
 }
 
 /**
-  Worker function that produces a Null-terminated string in an output buffer 
+  Worker function that produces a Null-terminated string in an output buffer
   based on a Null-terminated format string and variable argument list.
 
-  VSPrint function to process format and place the results in Buffer. Since a 
-  VA_LIST is used this routine allows the nesting of Vararg routines. Thus 
+  VSPrint function to process format and place the results in Buffer. Since a
+  VA_LIST is used this routine allows the nesting of Vararg routines. Thus
   this is the main print working routine
 
   @param  StartOfBuffer The character buffer to print the results of the parsing

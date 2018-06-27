@@ -1,7 +1,7 @@
 ## @file
 #  Instance of Performance Library with empty functions.
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,7 +20,7 @@
   FILE_GUID                      = FC120ED3-40E1-46dc-8C9C-AAE3CA139ACF
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PerformanceLib 
+  LIBRARY_CLASS                  = PerformanceLib
 
 
 #

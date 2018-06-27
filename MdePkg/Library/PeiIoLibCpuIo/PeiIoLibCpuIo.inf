@@ -4,7 +4,7 @@
 # I/O Library implementation that uses the CPU I/O PPI for I/O
 #  and MMIO operations.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -34,7 +34,7 @@
   IoHighLevel.c
   IoLib.c
   IoLibMmioBuffer.c
- 
+
 [Packages]
   MdePkg/MdePkg.dec
 
