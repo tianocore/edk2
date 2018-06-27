@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #*
-#*   Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+#*   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #*   This program and the accompanying materials
 #*   are licensed and made available under the terms and conditions of the BSD License
 #*   which accompanies this distribution.  The full text of the license may be found at
@@ -13,7 +13,7 @@
 #------------------------------------------------------------------------------
 
 #
-# Float control word initial value: 
+# Float control word initial value:
 # all exceptions masked, double-precision, round-to-nearest
 #
 ASM_PFX(mFpuControlWord): .word     0x027F
@@ -41,7 +41,7 @@ ASM_PFX(InitializeFloatingPointUnits):
     #
     finit
     fldcw   ASM_PFX(mFpuControlWord)
-    
+
     #
     # Use CpuId instructuion (CPUID.01H:EDX.SSE[bit 25] = 1) to test
     # whether the processor supports SSE instruction.
@@ -50,14 +50,14 @@ ASM_PFX(InitializeFloatingPointUnits):
     cpuid
     btl     $25, %edx
     jnc     Done
-    
+
     #
     # Set OSFXSR bit 9 in CR4
     #
-    movl    %cr4, %eax 
+    movl    %cr4, %eax
     or      $0x200, %eax
     movl    %eax, %cr4
-    
+
     #
     # The processor should support SSE instruction and we can use
     # ldmxcsr instruction

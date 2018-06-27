@@ -193,11 +193,11 @@ GetNextProcNumber:
     jz          ProgramStack
     add         edi, 20
     inc         ebx
-    jmp         GetNextProcNumber    
+    jmp         GetNextProcNumber
 
 ProgramStack:
     mov         esp, [edi + 12]
-   
+
 CProcedureInvoke:
     push       ebp               ; push BIST data at top of AP stack
     xor        ebp, ebp          ; clear ebp for call stack trace

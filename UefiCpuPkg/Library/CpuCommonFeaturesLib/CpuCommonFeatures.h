@@ -1,7 +1,7 @@
 /** @file
   CPU Common features library header file.
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -855,7 +855,7 @@ FeatureControlGetConfigData (
   );
 
 /**
-  Detects if Protected Processor Inventory Number feature supported on current 
+  Detects if Protected Processor Inventory Number feature supported on current
   processor.
 
   @param[in]  ProcessorNumber  The index of the CPU executing this function.
@@ -889,14 +889,14 @@ PpinSupport (
                                by CPU_FEATURE_GET_CONFIG_DATA.  NULL if
                                CPU_FEATURE_GET_CONFIG_DATA was not provided in
                                RegisterCpuFeature().
-  @param[in]  State            If TRUE, then the Protected Processor Inventory 
+  @param[in]  State            If TRUE, then the Protected Processor Inventory
                                Number feature must be enabled.
-                               If FALSE, then the Protected Processor Inventory 
+                               If FALSE, then the Protected Processor Inventory
                                Number feature must be disabled.
 
-  @retval RETURN_SUCCESS       Protected Processor Inventory Number feature is 
+  @retval RETURN_SUCCESS       Protected Processor Inventory Number feature is
                                initialized.
-  @retval RETURN_DEVICE_ERROR  Device can't change state because it has been 
+  @retval RETURN_DEVICE_ERROR  Device can't change state because it has been
                                locked.
 
 **/
@@ -910,7 +910,7 @@ PpinInitialize (
   );
 
 /**
-  Detects if Local machine check exception feature supported on current 
+  Detects if Local machine check exception feature supported on current
   processor.
 
   @param[in]  ProcessorNumber  The index of the CPU executing this function.

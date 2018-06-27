@@ -1,7 +1,7 @@
 /** @file
   MP initialize support functions for DXE phase.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -268,7 +268,7 @@ RelocateApLoop (
   ASM_RELOCATE_AP_LOOP   AsmRelocateApLoopFunc;
   UINTN                  ProcessorNumber;
 
-  MpInitLibWhoAmI (&ProcessorNumber); 
+  MpInitLibWhoAmI (&ProcessorNumber);
   CpuMpData    = GetCpuMpData ();
   MwaitSupport = IsMwaitSupport ();
   AsmRelocateApLoopFunc = (ASM_RELOCATE_AP_LOOP) (UINTN) mReservedApLoopFunc;
@@ -406,7 +406,7 @@ InitMpGlobalData (
   //
   // Make sure that the buffer memory is executable if NX protection is enabled
   // for EfiReservedMemoryType.
-  // 
+  //
   // TODO: Check EFI_MEMORY_XP bit set or not once it's available in DXE GCD
   //       service.
   //

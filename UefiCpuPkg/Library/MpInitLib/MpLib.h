@@ -1,7 +1,7 @@
 /** @file
   Common header file for MP Initialize Library.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -463,7 +463,7 @@ StartupThisAPWorker (
                                enabled AP. Otherwise, it will be disabled.
 
   @retval EFI_SUCCESS          BSP successfully switched.
-  @retval others               Failed to switch BSP. 
+  @retval others               Failed to switch BSP.
 
 **/
 EFI_STATUS

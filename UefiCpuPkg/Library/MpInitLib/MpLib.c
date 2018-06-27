@@ -655,7 +655,7 @@ ApWakeupFunction (
           SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateBusy);
           //
           // Enable source debugging on AP function
-          //         
+          //
           EnableDebugAgent ();
           //
           // Invoke AP function here
@@ -1115,7 +1115,7 @@ CalculateTimeout (
 
   //
   // GetPerformanceCounterProperties () returns the timestamp counter's frequency
-  // in Hz. 
+  // in Hz.
   //
   TimestampCounterFreq = GetPerformanceCounterProperties (NULL, NULL);
 
@@ -1737,7 +1737,7 @@ MpInitLibGetProcessorInfo (
                                enabled AP. Otherwise, it will be disabled.
 
   @retval EFI_SUCCESS          BSP successfully switched.
-  @retval others               Failed to switch BSP. 
+  @retval others               Failed to switch BSP.
 
 **/
 EFI_STATUS

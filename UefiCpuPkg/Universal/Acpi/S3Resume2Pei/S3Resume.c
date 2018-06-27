@@ -118,7 +118,7 @@ typedef union {
     UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
     UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
     UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
-    UINT64  MustBe1:1;                // Must be 1 
+    UINT64  MustBe1:1;                // Must be 1
     UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
     UINT64  Available:3;              // Available for use by system software
     UINT64  PAT:1;                    //
@@ -142,7 +142,7 @@ typedef union {
     UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
     UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
     UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
-    UINT64  MustBe1:1;                // Must be 1 
+    UINT64  MustBe1:1;                // Must be 1
     UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
     UINT64  Available:3;              // Available for use by system software
     UINT64  PAT:1;                    //
@@ -177,9 +177,9 @@ typedef struct {
 //
 /**
   a ASM function to transfer control to OS.
-  
+
   @param  S3WakingVector  The S3 waking up vector saved in ACPI Facs table
-  @param  AcpiLowMemoryBase a buffer under 1M which could be used during the transfer             
+  @param  AcpiLowMemoryBase a buffer under 1M which could be used during the transfer
 **/
 typedef
 VOID
@@ -425,7 +425,7 @@ S3ResumeBootOs (
   }
 
   //
-  // NOTE: Because Debug Timer interrupt and system interrupts will be disabled 
+  // NOTE: Because Debug Timer interrupt and system interrupts will be disabled
   // in BootScriptExecuteDxe, the rest code in S3ResumeBootOs() cannot be halted
   // by soft debugger.
   //
@@ -563,7 +563,7 @@ S3ResumeBootOs (
 
 /**
   Restore S3 page table because we do not trust ACPINvs content.
-  If BootScriptExector driver will not run in 64-bit mode, this function will do nothing. 
+  If BootScriptExector driver will not run in 64-bit mode, this function will do nothing.
 
   @param S3NvsPageTableAddress   PageTableAddress in ACPINvs
   @param Build4GPageTableOnly    If BIOS just build 4G page table only
@@ -611,7 +611,7 @@ RestoreS3PageTables (
     //
     PageMap = (PAGE_MAP_AND_DIRECTORY_POINTER *)S3NvsPageTableAddress;
     S3NvsPageTableAddress += SIZE_4KB;
-    
+
     Page1GSupport = FALSE;
     if (PcdGetBool(PcdUse1GPageTable)) {
       AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
@@ -622,7 +622,7 @@ RestoreS3PageTables (
         }
       }
     }
-    
+
     //
     // Get physical address bits supported.
     //
@@ -638,7 +638,7 @@ RestoreS3PageTables (
         PhysicalAddressBits = 36;
       }
     }
-    
+
     //
     // IA-32e paging translates 48-bit linear addresses to 52-bit physical addresses.
     //
@@ -665,7 +665,7 @@ RestoreS3PageTables (
       NumberOfPml4EntriesNeeded = (UINT32)LShiftU64 (1, (PhysicalAddressBits - 39));
       NumberOfPdpEntriesNeeded = 512;
     }
-    
+
     PageMapLevel4Entry = PageMap;
     PageAddress        = 0;
     for (IndexOfPml4Entries = 0; IndexOfPml4Entries < NumberOfPml4EntriesNeeded; IndexOfPml4Entries++, PageMapLevel4Entry++) {
@@ -675,7 +675,7 @@ RestoreS3PageTables (
       //
       PageDirectoryPointerEntry = (PAGE_MAP_AND_DIRECTORY_POINTER *)S3NvsPageTableAddress;
       S3NvsPageTableAddress += SIZE_4KB;
-    
+
       //
       // Make a PML4 Entry
       //
@@ -685,7 +685,7 @@ RestoreS3PageTables (
 
       if (Page1GSupport) {
         PageDirectory1GEntry = (VOID *) PageDirectoryPointerEntry;
-    
+
         for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectory1GEntry++, PageAddress += SIZE_1GB) {
           //
           // Fill in the Page Directory entries
@@ -700,17 +700,17 @@ RestoreS3PageTables (
           //
           // Each Directory Pointer entries points to a page of Page Directory entires.
           // So allocate space for them and fill them in in the IndexOfPageDirectoryEntries loop.
-          //       
+          //
           PageDirectoryEntry = (PAGE_TABLE_ENTRY *)S3NvsPageTableAddress;
           S3NvsPageTableAddress += SIZE_4KB;
-    
+
           //
           // Fill in a Page Directory Pointer Entries
           //
           PageDirectoryPointerEntry->Uint64 = (UINT64)(UINTN)PageDirectoryEntry | AddressEncMask;
           PageDirectoryPointerEntry->Bits.ReadWrite = 1;
           PageDirectoryPointerEntry->Bits.Present = 1;
-    
+
           for (IndexOfPageDirectoryEntries = 0; IndexOfPageDirectoryEntries < 512; IndexOfPageDirectoryEntries++, PageDirectoryEntry++, PageAddress += SIZE_2MB) {
             //
             // Fill in the Page Directory entries
@@ -725,9 +725,9 @@ RestoreS3PageTables (
     }
     return ;
   } else {
-  	//
-  	// If DXE is running 32-bit mode, no need to establish page table.
-  	//
+    //
+    // If DXE is running 32-bit mode, no need to establish page table.
+    //
     return ;
   }
 }
@@ -770,7 +770,7 @@ S3ResumeExecuteBootScript (
 
     //
     // Send SMI to APs
-    //    
+    //
     SendSmiIpiAllExcludingSelf ();
     //
     // Send SMI to BSP
@@ -785,13 +785,13 @@ S3ResumeExecuteBootScript (
                               );
     if (!EFI_ERROR (Status)) {
       DEBUG ((DEBUG_INFO, "Close all SMRAM regions before executing boot script\n"));
-  
+
       for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
         Status = SmmAccess->Close ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
       }
 
       DEBUG ((DEBUG_INFO, "Lock all SMRAM regions before executing boot script\n"));
-  
+
       for (Index = 0, Status = EFI_SUCCESS; !EFI_ERROR (Status); Index++) {
         Status = SmmAccess->Lock ((EFI_PEI_SERVICES **)GetPeiServicesTablePointer (), SmmAccess, Index);
       }
@@ -816,12 +816,12 @@ S3ResumeExecuteBootScript (
   if (FeaturePcdGet (PcdFrameworkCompatibilitySupport)) {
     //
     // On some platform, such as ECP, a dispatch node in boot script table may execute a 32-bit PEIM which may need PeiServices
-    // pointer. So PeiServices need preserve in (IDTBase- sizeof (UINTN)). 
+    // pointer. So PeiServices need preserve in (IDTBase- sizeof (UINTN)).
     //
     IdtDescriptor = (IA32_DESCRIPTOR *) (UINTN) (AcpiS3Context->IdtrProfile);
     //
     // Make sure the newly allocated IDT align with 16-bytes
-    // 
+    //
     IdtBuffer = AllocatePages (EFI_SIZE_TO_PAGES((IdtDescriptor->Limit + 1) + 16));
     if (IdtBuffer == NULL) {
       REPORT_STATUS_CODE (
@@ -833,7 +833,7 @@ S3ResumeExecuteBootScript (
     //
     // Additional 16 bytes allocated to save IA32 IDT descriptor and Pei Service Table Pointer
     // IA32 IDT descriptor will be used to setup IA32 IDT table for 32-bit Framework Boot Script code
-    // 
+    //
     ZeroMem (IdtBuffer, 16);
     AsmReadIdtr ((IA32_DESCRIPTOR *)IdtBuffer);
     CopyMem ((VOID*)((UINT8*)IdtBuffer + 16),(VOID*)(IdtDescriptor->Base), (IdtDescriptor->Limit + 1));
@@ -874,7 +874,7 @@ S3ResumeExecuteBootScript (
   // Save IDT
   //
   AsmReadIdtr (&PeiS3ResumeState->Idtr);
-  
+
   //
   // Report Status Code to indicate S3 boot script execution
   //
@@ -1011,7 +1011,7 @@ S3RestoreConfig2 (
   DEBUG (( DEBUG_INFO, "AcpiS3Context = %x\n", AcpiS3Context));
   DEBUG (( DEBUG_INFO, "Waking Vector = %x\n", ((EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE *) ((UINTN) (AcpiS3Context->AcpiFacsTable)))->FirmwareWakingVector));
   DEBUG (( DEBUG_INFO, "AcpiS3Context->AcpiFacsTable = %x\n", AcpiS3Context->AcpiFacsTable));
-  DEBUG (( DEBUG_INFO, "AcpiS3Context->IdtrProfile = %x\n", AcpiS3Context->IdtrProfile));  
+  DEBUG (( DEBUG_INFO, "AcpiS3Context->IdtrProfile = %x\n", AcpiS3Context->IdtrProfile));
   DEBUG (( DEBUG_INFO, "AcpiS3Context->S3NvsPageTableAddress = %x\n", AcpiS3Context->S3NvsPageTableAddress));
   DEBUG (( DEBUG_INFO, "AcpiS3Context->S3DebugBufferAddress = %x\n", AcpiS3Context->S3DebugBufferAddress));
   DEBUG (( DEBUG_INFO, "AcpiS3Context->BootScriptStackBase = %x\n", AcpiS3Context->BootScriptStackBase));
@@ -1100,7 +1100,7 @@ S3RestoreConfig2 (
       AsmWriteGdtr (&mGdt);
       //
       // update segment selectors per the new GDT.
-      //      
+      //
       AsmSetDataSelectors (DATA_SEGEMENT_SELECTOR);
       //
       // Restore interrupt state.
@@ -1134,7 +1134,7 @@ S3RestoreConfig2 (
   Main entry for S3 Resume PEIM.
 
   This routine is to install EFI_PEI_S3_RESUME2_PPI.
-  
+
   @param  FileHandle              Handle of the file being invoked.
   @param  PeiServices             Pointer to PEI Services table.
 

@@ -1,7 +1,7 @@
 /** @file
 SMM MP service implementation
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -199,7 +199,7 @@ AllCpusInSmmWithExceptions (
 
 /**
   Has OS enabled Lmce in the MSR_IA32_MCG_EXT_CTL
-  
+
   @retval TRUE     Os enable lmce.
   @retval FALSE    Os not enable lmce.
 
@@ -228,9 +228,9 @@ IsLmceOsEnabled (
 }
 
 /**
-  Return if Local machine check exception signaled. 
+  Return if Local machine check exception signaled.
 
-  Indicates (when set) that a local machine check exception was generated. This indicates that the current machine-check event was 
+  Indicates (when set) that a local machine check exception was generated. This indicates that the current machine-check event was
   delivered to only the logical processor.
 
   @retval TRUE    LMCE was signaled.
@@ -1046,7 +1046,7 @@ CpuSmmDebugEntry (
   )
 {
   SMRAM_SAVE_STATE_MAP *CpuSaveState;
-  
+
   if (FeaturePcdGet (PcdCpuSmmDebug)) {
     ASSERT(CpuIndex < mMaxNumberOfCpus);
     CpuSaveState = (SMRAM_SAVE_STATE_MAP *)gSmmCpuPrivate->CpuSaveState[CpuIndex];

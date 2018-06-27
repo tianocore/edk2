@@ -1,14 +1,14 @@
 /** @file
   Internal include file for the CPU I/O PPI.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -40,7 +40,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_INVALID_PARAMETER  Width is invalid for this EFI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this EFI system.
 
 **/
@@ -69,7 +69,7 @@ CpuMemoryServiceRead (
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_INVALID_PARAMETER  Width is invalid for this EFI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this EFI system.
 
 **/
@@ -98,7 +98,7 @@ CpuMemoryServiceWrite (
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_INVALID_PARAMETER  Width is invalid for this EFI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this EFI system.
 
 **/
@@ -127,7 +127,7 @@ CpuIoServiceRead (
   @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_INVALID_PARAMETER  Width is invalid for this EFI system.
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
-  @retval EFI_UNSUPPORTED        The address range specified by Address, Width, 
+  @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
                                  and Count is not valid for this EFI system.
 
 **/
@@ -145,7 +145,7 @@ CpuIoServiceWrite (
 /**
   8-bit I/O read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -163,7 +163,7 @@ CpuIoRead8 (
 /**
   16-bit I/O read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -182,7 +182,7 @@ CpuIoRead16 (
 /**
   32-bit I/O read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -201,7 +201,7 @@ CpuIoRead32 (
 /**
   64-bit I/O read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -220,7 +220,7 @@ CpuIoRead64 (
 /**
   8-bit I/O write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -239,7 +239,7 @@ CpuIoWrite8 (
 /**
   16-bit I/O write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -258,7 +258,7 @@ CpuIoWrite16 (
 /**
   32-bit I/O write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -277,7 +277,7 @@ CpuIoWrite32 (
 /**
   64-bit I/O write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -296,7 +296,7 @@ CpuIoWrite64 (
 /**
   8-bit memory read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -315,7 +315,7 @@ CpuMemRead8 (
 /**
   16-bit memory read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -334,7 +334,7 @@ CpuMemRead16 (
 /**
   32-bit memory read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -353,7 +353,7 @@ CpuMemRead32 (
 /**
   64-bit memory read operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -372,7 +372,7 @@ CpuMemRead64 (
 /**
   8-bit memory write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -391,7 +391,7 @@ CpuMemWrite8 (
 /**
   16-bit memory write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -410,7 +410,7 @@ CpuMemWrite16 (
 /**
   32-bit memory write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -429,7 +429,7 @@ CpuMemWrite32 (
 /**
   64-bit memory write operations.
 
-  @param[in] PeiServices  An indirect pointer to the PEI Services Table published 
+  @param[in] PeiServices  An indirect pointer to the PEI Services Table published
                           by the PEI Foundation.
   @param[in] This         Pointer to local data for the interface.
   @param[in] Address      The physical address of the access.
@@ -444,5 +444,5 @@ CpuMemWrite64 (
   IN  UINT64                      Address,
   IN  UINT64                      Data
   );
-  
+
 #endif

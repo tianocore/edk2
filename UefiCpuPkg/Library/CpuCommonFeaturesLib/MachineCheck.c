@@ -235,7 +235,7 @@ McgCtlInitialize (
 }
 
 /**
-  Detects if Local machine check exception feature supported on current 
+  Detects if Local machine check exception feature supported on current
   processor.
 
   @param[in]  ProcessorNumber  The index of the CPU executing this function.

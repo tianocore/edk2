@@ -1,7 +1,7 @@
 /** @file
   UEFI Application to display CPUID leaf information.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1020,7 +1020,7 @@ CpuidEnumerationOfIntelSgxResourcesSubLeaf (
   CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_ECX  Ecx;
   CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF_EDX  Edx;
   UINT32                                               SubLeaf;
- 
+
   SubLeaf = CPUID_INTEL_SGX_CAPABILITIES_RESOURCES_SUB_LEAF;
   do {
     AsmCpuidEx (
@@ -1068,7 +1068,7 @@ CpuidEnumerationOfIntelSgx (
     //
     return;
   }
-  
+
   CpuidEnumerationOfIntelSgxCapabilities0SubLeaf ();
   CpuidEnumerationOfIntelSgxCapabilities1SubLeaf ();
   CpuidEnumerationOfIntelSgxResourcesSubLeaf ();

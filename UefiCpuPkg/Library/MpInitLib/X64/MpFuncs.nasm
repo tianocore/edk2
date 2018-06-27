@@ -216,7 +216,7 @@ GetNextProcNumber:
     jz          ProgramStack
     add         edi, 20
     inc         ebx
-    jmp         GetNextProcNumber    
+    jmp         GetNextProcNumber
 
 ProgramStack:
     mov         rsp, qword [edi + 12]

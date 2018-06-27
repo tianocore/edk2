@@ -1,7 +1,7 @@
 /** @file
   CPU DXE Module to produce CPU ARCH Protocol.
 
-  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1107,7 +1107,7 @@ FreeMemorySpaceMap:
 }
 
 /**
-  Add and allocate CPU local APIC memory mapped space. 
+  Add and allocate CPU local APIC memory mapped space.
 
   @param[in]ImageHandle     Image handle this driver.
 
@@ -1125,7 +1125,7 @@ AddLocalApicMemorySpace (
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Try to allocate APIC memory mapped space, does not check return 
+  // Try to allocate APIC memory mapped space, does not check return
   // status because it may be allocated by other driver, or DXE Core if
   // this range is built into Memory Allocation HOB.
   //
@@ -1164,7 +1164,7 @@ InitializeCpu (
 {
   EFI_STATUS  Status;
   EFI_EVENT   IdleLoopEvent;
-  
+
   InitializePageTableLib();
 
   InitializeFloatingPointUnits ();
