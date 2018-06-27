@@ -1,14 +1,14 @@
 /** @file
-  ISA I/O Protocol is used by ISA device drivers to perform I/O, MMIO and DMA 
+  ISA I/O Protocol is used by ISA device drivers to perform I/O, MMIO and DMA
   operations on the ISA controllers they manage.
-  
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -84,7 +84,7 @@ typedef enum {
   EfiIsaIoOperationBusMasterWrite,
   ///
   /// Provides both read and write access to system memory by both the processor
-  /// and a bus master. The buffer is coherent from both the processor's and the 
+  /// and a bus master. The buffer is coherent from both the processor's and the
   /// bus master's point of view.
   ///
   EfiIsaIoOperationBusMasterCommonBuffer,
@@ -102,15 +102,15 @@ typedef enum {
 /**
   Performs ISA I/O and MMIO Read/Write Cycles
 
-  @param[in]      This     A pointer to the EFI_ISA_IO_PROTOCOL instance.  
+  @param[in]      This     A pointer to the EFI_ISA_IO_PROTOCOL instance.
   @param[in]      Width    Specifies the width of the I/O or MMIO operation.
-  @param[in]      Offset   The offset into the ISA I/O or MMIO space to start the 
-                           operation.  
+  @param[in]      Offset   The offset into the ISA I/O or MMIO space to start the
+                           operation.
   @param[in]      Count    The number of I/O or MMIO operations to perform.
-  @param[in, out] Buffer   For read operations, the destination buffer to store 
-                           the results. For write operations, the source buffer to 
-                           write data from. 
-                                 
+  @param[in, out] Buffer   For read operations, the destination buffer to store
+                           the results. For write operations, the source buffer to
+                           write data from.
+
   @retval EFI_SUCCESS             The data was successfully read from or written to the device.
   @retval EFI_UNSUPPORTED         The Offset is not valid for this device.
   @retval EFI_INVALID_PARAMETER   Width or Count, or both, were invalid.
@@ -171,48 +171,48 @@ EFI_STATUS
   Maps a memory region for DMA.
 
   This function returns the device-specific addresses required to access system memory.
-  This function is used to map system memory for ISA DMA operations.  All ISA DMA 
-  operations must be performed through their mapped addresses, and such mappings must 
+  This function is used to map system memory for ISA DMA operations.  All ISA DMA
+  operations must be performed through their mapped addresses, and such mappings must
   be freed with EFI_ISA_IO_PROTOCOL.Unmap() after the DMA operation is completed.
-    
-  If the DMA operation is a single read or write data transfer through an ISA bus 
-  master, then EfiIsaIoOperationBusMasterRead or EfiIsaIoOperationBusMasterWrite 
+
+  If the DMA operation is a single read or write data transfer through an ISA bus
+  master, then EfiIsaIoOperationBusMasterRead or EfiIsaIoOperationBusMasterWrite
   is used and the range is unmapped to complete the operation. If the DMA operation
-  is a single read or write data transfer through an ISA slave controller, then 
-  EfiIsaIoOperationSlaveRead or EfiIsaIoOperationSlaveWrite is used and the range 
-  is unmapped to complete the operation.  
-  
-  If performing a DMA read operation, all the data must be present in system memory before the Map() is performed.  Similarly, 
-  if performing a DMA write operation, the data must not be accessed in system 
-  memory until EFI_ISA_IO_PROTOCOL.Unmap() is performed.  Bus master operations that 
-  require both read and write access or require multiple host device interactions 
-  within the same mapped region must use EfiIsaIoOperationBusMasterCommonBuffer.  
-  However, only memory allocated via the EFI_ISA_IO_PROTOCOL.AllocateBuffer() interface 
-  is guaranteed to be able to be mapped for this operation type.  In all mapping 
+  is a single read or write data transfer through an ISA slave controller, then
+  EfiIsaIoOperationSlaveRead or EfiIsaIoOperationSlaveWrite is used and the range
+  is unmapped to complete the operation.
+
+  If performing a DMA read operation, all the data must be present in system memory before the Map() is performed.  Similarly,
+  if performing a DMA write operation, the data must not be accessed in system
+  memory until EFI_ISA_IO_PROTOCOL.Unmap() is performed.  Bus master operations that
+  require both read and write access or require multiple host device interactions
+  within the same mapped region must use EfiIsaIoOperationBusMasterCommonBuffer.
+  However, only memory allocated via the EFI_ISA_IO_PROTOCOL.AllocateBuffer() interface
+  is guaranteed to be able to be mapped for this operation type.  In all mapping
   requests the NumberOfBytes returned may be less than originally requested.  It is
   the caller's responsibility to make additional requests to complete the entire
   transfer.
 
   @param[in]      This                A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param[in]      Operation           Indicates the type of DMA (slave or bus master), 
-                                      and if the DMA operation is going to read or 
-                                      write to system memory. 
-  @param[in]      ChannelNumber       The slave channel number to use for this DMA 
-                                      operation.  If Operation and ChannelAttributes 
-                                      shows that this device performs bus mastering 
-                                      DMA, then this field is ignored.  The legal 
+  @param[in]      Operation           Indicates the type of DMA (slave or bus master),
+                                      and if the DMA operation is going to read or
+                                      write to system memory.
+  @param[in]      ChannelNumber       The slave channel number to use for this DMA
+                                      operation.  If Operation and ChannelAttributes
+                                      shows that this device performs bus mastering
+                                      DMA, then this field is ignored.  The legal
                                       range for this field is 0..7.
   @param[in]      ChannelAttributes   A bitmask of the attributes used to configure
-                                      the slave DMA channel for this DMA operation.  
+                                      the slave DMA channel for this DMA operation.
                                       See EFI_ISA_IO_SLAVE_DMA_ATTRIBUTE_* for the
                                       legal bit combinations.
   @param[in]      HostAddress         The system memory address to map to the device.
-  @param[in, out] NumberOfBytes       On input the number of bytes to map.  On 
+  @param[in, out] NumberOfBytes       On input the number of bytes to map.  On
                                       output the number of bytes that were mapped.
-  @param[out]     DeviceAddress       The resulting map address for the bus master 
-                                      device to use to access the hosts HostAddress.  
+  @param[out]     DeviceAddress       The resulting map address for the bus master
+                                      device to use to access the hosts HostAddress.
   @param[out]     Mapping             A returned value that must be passed to into
-                                      EFI_ISA_IO_PROTOCOL.Unmap() to free all the the 
+                                      EFI_ISA_IO_PROTOCOL.Unmap() to free all the the
                                       resources associated with this map request.
 
   @retval EFI_SUCCESS             The range was mapped for the returned NumberOfBytes.
@@ -239,9 +239,9 @@ EFI_STATUS
 /**
   Unmaps a memory region that was previously mapped with EFI_ISA_IO_PROTOCOL.Map().
 
-  The EFI_ISA_IO_PROTOCOL.Map() operation is completed and any corresponding 
-  resources are released.  If the operation was EfiIsaIoOperationSlaveWrite 
-  or EfiIsaIoOperationBusMasterWrite, the data is committed to system memory.  
+  The EFI_ISA_IO_PROTOCOL.Map() operation is completed and any corresponding
+  resources are released.  If the operation was EfiIsaIoOperationSlaveWrite
+  or EfiIsaIoOperationBusMasterWrite, the data is committed to system memory.
   Any resources used for the mapping are freed.
 
   @param[in] This           A pointer to the EFI_ISA_IO_PROTOCOL instance.
@@ -259,10 +259,10 @@ EFI_STATUS
 
 /**
   Allocates pages that are suitable for an EfiIsaIoOperationBusMasterCommonBuffer
-  mapping.                                                                       
+  mapping.
 
   @param[in]  This          A pointer to the EFI_ISA_IO_PROTOCOL instance.
-  @param[in]  Type          The type allocation to perform. 
+  @param[in]  Type          The type allocation to perform.
   @param[in]  MemoryType    The type of memory to allocate.
   @param[in]  Pages         The number of pages to allocate.
   @param[out] HostAddress   A pointer to store the base address of the allocated range.
@@ -325,10 +325,10 @@ EFI_STATUS
   );
 
 ///
-/// The EFI_ISA_IO_PROTOCOL provides the basic Memory, I/O, and DMA interfaces 
-/// used to abstract accesses to ISA controllers.  There is one EFI_ISA_IO_PROTOCOL 
-/// instance for each ISA controller on a ISA bus. A device driver that wishes 
-/// to manage an ISA controller in a system will have to retrieve the 
+/// The EFI_ISA_IO_PROTOCOL provides the basic Memory, I/O, and DMA interfaces
+/// used to abstract accesses to ISA controllers.  There is one EFI_ISA_IO_PROTOCOL
+/// instance for each ISA controller on a ISA bus. A device driver that wishes
+/// to manage an ISA controller in a system will have to retrieve the
 /// ISA_PCI_IO_PROTOCOL instance associated with the ISA controller.
 ///
 struct _EFI_ISA_IO_PROTOCOL {
@@ -350,10 +350,10 @@ struct _EFI_ISA_IO_PROTOCOL {
   ///
   UINT32                               RomSize;
   ///
-  /// A pointer to the in memory copy of the ROM image. The ISA Bus Driver is responsible 
+  /// A pointer to the in memory copy of the ROM image. The ISA Bus Driver is responsible
   /// for allocating memory for the ROM image, and copying the contents of the ROM to memory
   /// during ISA Bus initialization.
-  /// 
+  ///
   VOID                                 *RomImage;
 };
 

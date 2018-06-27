@@ -1,7 +1,7 @@
 /** @file
   Library constructor & destructor, event handlers, and other internal worker functions.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,7 +26,7 @@ EFI_SMM_STATUS_CODE_PROTOCOL  *mSmmStatusCodeProtocol;
 
 /**
   Locates and caches SMM Status Code Protocol.
- 
+
 **/
 VOID
 SmmStatusCodeInitialize (
@@ -43,20 +43,20 @@ SmmStatusCodeInitialize (
 
 /**
   Report status code via SMM Status Code Protocol.
- 
+
   @param  Type          Indicates the type of status code being reported.
-  @param  Value         Describes the current status of a hardware or software entity.  
-                        This included information about the class and subclass that is used to classify the entity 
-                        as well as an operation.  For progress codes, the operation is the current activity. 
-                        For error codes, it is the exception.  For debug codes, it is not defined at this time. 
-  @param  Instance      The enumeration of a hardware or software entity within the system.  
-                        A system may contain multiple entities that match a class/subclass pairing. 
-                        The instance differentiates between them.  An instance of 0 indicates that instance information is unavailable, 
+  @param  Value         Describes the current status of a hardware or software entity.
+                        This included information about the class and subclass that is used to classify the entity
+                        as well as an operation.  For progress codes, the operation is the current activity.
+                        For error codes, it is the exception.  For debug codes, it is not defined at this time.
+  @param  Instance      The enumeration of a hardware or software entity within the system.
+                        A system may contain multiple entities that match a class/subclass pairing.
+                        The instance differentiates between them.  An instance of 0 indicates that instance information is unavailable,
                         not meaningful, or not relevant.  Valid instance numbers start with 1.
-  @param  CallerId      This optional parameter may be used to identify the caller. 
-                        This parameter allows the status code driver to apply different rules to different callers. 
+  @param  CallerId      This optional parameter may be used to identify the caller.
+                        This parameter allows the status code driver to apply different rules to different callers.
   @param  Data          This optional parameter may be used to pass additional data
- 
+
   @retval EFI_SUCCESS   Always return EFI_SUCCESS.
 
 **/
@@ -99,9 +99,9 @@ InternalGetReportStatusCode (
   } else if (mInternalRT != NULL && mInternalRT->Hdr.Revision < 0x20000) {
     return ((FRAMEWORK_EFI_RUNTIME_SERVICES*)mInternalRT)->ReportStatusCode;
   } else if (!mHaveExitedBootServices) {
-  	//
-  	// Check gBS just in case. ReportStatusCode is called before gBS is initialized.
-  	//
+    //
+    // Check gBS just in case. ReportStatusCode is called before gBS is initialized.
+    //
     if (gBS != NULL) {
       Status = gBS->LocateProtocol (&gEfiStatusCodeRuntimeProtocolGuid, NULL, (VOID**)&StatusCodeProtocol);
       if (!EFI_ERROR (Status) && StatusCodeProtocol != NULL) {
@@ -156,13 +156,13 @@ InternalReportStatusCode (
         return EFI_UNSUPPORTED;
       }
     }
-  
+
     //
     // A status code service is present in system, so pass in all the parameters to the service.
     //
     return (*mReportStatusCode) (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
   }
-  
+
   return EFI_UNSUPPORTED;
 }
 
@@ -220,7 +220,7 @@ ReportStatusCodeLibExitBootServices (
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/
@@ -242,8 +242,8 @@ ReportStatusCodeLibConstruct (
     if (mInSmm) {
       Status = mSmmBase->SmmAllocatePool (
                            mSmmBase,
-                           EfiRuntimeServicesData, 
-                           sizeof (EFI_STATUS_CODE_DATA) + EFI_STATUS_CODE_DATA_MAX_SIZE, 
+                           EfiRuntimeServicesData,
+                           sizeof (EFI_STATUS_CODE_DATA) + EFI_STATUS_CODE_DATA_MAX_SIZE,
                            (VOID **) &mStatusCodeData
                            );
       ASSERT_EFI_ERROR (Status);
@@ -257,7 +257,7 @@ ReportStatusCodeLibConstruct (
   // If not in SMM mode, then allocate runtime memory for extended status code data.
   //
   // Library should not use the gRT directly, for it may be converted by other library instance.
-  // 
+  //
   mInternalRT = gRT;
   mInSmm      = FALSE;
 
@@ -265,12 +265,12 @@ ReportStatusCodeLibConstruct (
   ASSERT (mStatusCodeData != NULL);
   //
   // Cache the report status code service
-  // 
+  //
   mReportStatusCode = InternalGetReportStatusCode ();
 
   //
   // Register notify function for EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE
-  // 
+  //
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
@@ -283,7 +283,7 @@ ReportStatusCodeLibConstruct (
 
   //
   // Register notify function for EVT_SIGNAL_EXIT_BOOT_SERVICES
-  // 
+  //
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
@@ -299,13 +299,13 @@ ReportStatusCodeLibConstruct (
 
 /**
   The destructor function of SMM Runtime DXE Report Status Code Lib.
-  
+
   The destructor function frees memory allocated by constructor, and closes related events.
-  It will ASSERT() if that related operation fails and it will always return EFI_SUCCESS. 
+  It will ASSERT() if that related operation fails and it will always return EFI_SUCCESS.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/

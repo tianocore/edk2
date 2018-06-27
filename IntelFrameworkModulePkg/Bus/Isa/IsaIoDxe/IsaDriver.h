@@ -1,7 +1,7 @@
 /** @file
   The header file for ISA driver
-  
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -148,18 +148,18 @@ typedef struct {
 // EFI Driver Binding Protocol Interface Functions
 //
 
-/** 
+/**
   Tests to see if a controller can be managed by the ISA Driver.
 
   How the Start() function of a driver is implemented can affect how the Supported() function is implemented.
 
-  @param[in] This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.  
+  @param[in] This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param[in] Controller           The handle of the controller to test.
   @param[in] RemainingDevicePath  A pointer to the remaining portion of a device path.
-  
+
   @retval EFI_SUCCESS             The device is supported by this driver.
   @retval EFI_ALREADY_STARTED     The device is already being managed by this driver.
-  @retval EFI_ACCESS_DENIED       The device is already being managed by a different driver 
+  @retval EFI_ACCESS_DENIED       The device is already being managed by a different driver
                                   or an application that requires exclusive access.
   @retval EFI_UNSUPPORTED         The device is is not supported by this driver.
 
@@ -173,23 +173,23 @@ IsaIoDriverSupported (
   );
 
 /**
-  Start this driver on ControllerHandle. 
-  
-  The Start() function is designed to be invoked from the EFI boot service ConnectController(). 
-  As a result, much of the error checking on the parameters to Start() has been moved into this 
-  common boot service. It is legal to call Start() from other locations, but the following calling 
+  Start this driver on ControllerHandle.
+
+  The Start() function is designed to be invoked from the EFI boot service ConnectController().
+  As a result, much of the error checking on the parameters to Start() has been moved into this
+  common boot service. It is legal to call Start() from other locations, but the following calling
   restrictions must be followed or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE.
   2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
      EFI_DEVICE_PATH_PROTOCOL.
   3. Prior to calling Start(), the Supported() function for the driver specified by This must
-     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
+     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path. 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.
                                    This parameter is ignored by device drivers, and is optional for bus drivers.
 
   @retval EFI_SUCCESS              The device was started.
@@ -207,11 +207,11 @@ IsaIoDriverStart (
   );
 
 /**
-  Stop this driver on ControllerHandle. 
-  
-  The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
-  As a result, much of the error checking on the parameters to Stop() has been moved 
-  into this common boot service. It is legal to call Stop() from other locations, 
+  Stop this driver on ControllerHandle.
+
+  The Stop() function is designed to be invoked from the EFI boot service DisconnectController().
+  As a result, much of the error checking on the parameters to Stop() has been moved
+  into this common boot service. It is legal to call Stop() from other locations,
   but the following calling restrictions must be followed or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
      same driver's Start() function.
@@ -219,13 +219,13 @@ IsaIoDriverStart (
      EFI_HANDLE. In addition, all of these handles must have been created in this driver's
      Start() function, and the Start() function must have called OpenProtocol() on
      ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
-  
+
   @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
-                                support a bus specific I/O protocol for the driver 
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must
+                                support a bus specific I/O protocol for the driver
                                 to use to stop the device.
   @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
-  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL
                                 if NumberOfChildren is 0.
 
   @retval EFI_SUCCESS           The device was stopped.
@@ -250,7 +250,7 @@ IsaIoDriverStop (
   @param[in] IsaIoDevice            The isa device to be initialized.
   @param[in] DevicePath             The device path of the isa device.
   @param[in] Resources              The ACPI resource list.
-  
+
 **/
 VOID
 InitializeIsaIoInstance (

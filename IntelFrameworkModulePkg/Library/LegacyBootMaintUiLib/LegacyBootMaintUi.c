@@ -1,7 +1,7 @@
 /** @file
   Legacy Boot Maintainence UI implementation.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -84,13 +84,13 @@ HII_VENDOR_DEVICE_PATH  mLegacyBootOptionHiiVendorDevicePath = {
         (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
         (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
       }
-    }, 
+    },
     { 0x6bc75598, 0x89b4, 0x483d, { 0x91, 0x60, 0x7f, 0x46, 0x9a, 0x96, 0x35, 0x31 } }
   },
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -151,9 +151,9 @@ OrderLegacyBootOption4SameType (
   UINTN                    BootOrderSize;
   UINTN                    Index;
   UINTN                    StartPosition;
-  
+
   EFI_BOOT_MANAGER_LOAD_OPTION    BootOption;
-  
+
   CHAR16                           OptionName[sizeof ("Boot####")];
   UINT16                   *BbsIndexArray;
   UINT16                   *DeviceTypeArray;
@@ -176,11 +176,11 @@ OrderLegacyBootOption4SameType (
   ASSERT (*DisBootOption != NULL);
 
   for (Index = 0; Index < BootOrderSize / sizeof (UINT16); Index++) {
-  
+
     UnicodeSPrint (OptionName, sizeof (OptionName), L"Boot%04x", BootOrder[Index]);
     Status = EfiBootManagerVariableToLoadOption (OptionName, &BootOption);
     ASSERT_EFI_ERROR (Status);
-    
+
     if ((DevicePathType (BootOption.FilePath) == BBS_DEVICE_PATH) &&
         (DevicePathSubType (BootOption.FilePath) == BBS_BBS_DP)) {
       //
@@ -209,7 +209,7 @@ OrderLegacyBootOption4SameType (
       if (BbsIndexArray[Index] == (DevOrder[DevOrderCount] & 0xFF)) {
         StartPosition = MIN (StartPosition, Index);
         NewBootOption[DevOrderCount] = BootOrder[Index];
-        
+
         if ((DevOrder[DevOrderCount] & 0xFF00) == 0xFF00) {
           (*DisBootOption)[*DisBootOptionCount] = BootOrder[Index];
           (*DisBootOptionCount)++;
@@ -283,7 +283,7 @@ UpdateBBSOption (
   UINT16                      *DisBootOption;
   UINTN                       DisBootOptionCount;
   UINTN                       BufferSize;
-  
+
 
   DisMap              = NULL;
   NewOrder            = NULL;
@@ -291,7 +291,7 @@ UpdateBBSOption (
   EnBootOption        = NULL;
   DisBootOption       = NULL;
 
-  
+
   DisMap  = mLegacyBootOptionPrivate->MaintainMapData->DisableMap;
   Status  = EFI_SUCCESS;
 
@@ -470,7 +470,7 @@ UpdateBBSOption (
 
     CurrentType++;
   }
-  
+
   Status = gRT->SetVariable (
                   VAR_LEGACY_DEV_ORDER,
                   &gEfiLegacyDevOrderVariableGuid,
@@ -575,8 +575,8 @@ LegacyBootOptionRouteConfig (
   }
 
   Status = gBS->LocateProtocol (
-                  &gEfiHiiConfigRoutingProtocolGuid, 
-                  NULL, 
+                  &gEfiHiiConfigRoutingProtocolGuid,
+                  NULL,
                   (VOID **) &ConfigRouting
                   );
   if (EFI_ERROR (Status)) {
@@ -594,7 +594,7 @@ LegacyBootOptionRouteConfig (
                             &BufferSize,
                             Progress
                             );
-  ASSERT_EFI_ERROR (Status);    
+  ASSERT_EFI_ERROR (Status);
 
   Status = UpdateBBSOption (CurrentNVMapData);
 
@@ -690,7 +690,7 @@ GetMenuEntry (
 
 /**
   Create string tokens for a menu from its help strings and display strings
-  
+
   @param HiiHandle          Hii Handle of the package to be updated.
   @param MenuOption         The Menu whose string tokens need to be created
 
@@ -817,7 +817,7 @@ UpdateLegacyDeviceOrderPage (
     DEBUG ((EFI_D_ERROR, "Invalid command ID for updating page!\n"));
     return;
   }
-  
+
   HiiSetString (mLegacyBootOptionPrivate->HiiHandle, STRING_TOKEN(STR_ORDER_CHANGE_PROMPT), FormTitle, NULL);
 
   CreateLegacyMenuStringToken (mLegacyBootOptionPrivate->HiiHandle, OptionMenu);
@@ -859,12 +859,12 @@ UpdateLegacyDeviceOrderPage (
     ASSERT (DefaultOpCodeHandle != NULL);
 
     HiiCreateDefaultOpCode (
-      DefaultOpCodeHandle, 
-      EFI_HII_DEFAULT_CLASS_STANDARD, 
-      EFI_IFR_TYPE_NUM_SIZE_16, 
+      DefaultOpCodeHandle,
+      EFI_HII_DEFAULT_CLASS_STANDARD,
+      EFI_IFR_TYPE_NUM_SIZE_16,
       *Default++
       );
-  
+
     //
     // Create the string for oneof tag
     //
@@ -886,7 +886,7 @@ UpdateLegacyDeviceOrderPage (
       OptionsOpCodeHandle,
       DefaultOpCodeHandle //NULL //
       );
-      
+
     HiiFreeOpCodeHandle (DefaultOpCodeHandle);
   }
 
@@ -894,8 +894,8 @@ UpdateLegacyDeviceOrderPage (
     mLegacyBootOptionPrivate->HiiHandle,
     &mLegacyBootOptionGuid,
     LEGACY_ORDER_CHANGE_FORM_ID,
-    mLegacyStartOpCodeHandle, 
-    mLegacyEndOpCodeHandle   
+    mLegacyStartOpCodeHandle,
+    mLegacyEndOpCodeHandle
     );
 
   HiiFreeOpCodeHandle (OptionsOpCodeHandle);
@@ -966,7 +966,7 @@ AdjustOptionValue (
     CurrentVal  = CurrentNVMap->LegacyBEV;
     Default     = mLegacyBootOptionPrivate->MaintainMapData->LastTimeNvData.LegacyBEV;
   }
-  
+
   //
   //  First, find the different position
   //  if there is change, it should be only one
@@ -1245,27 +1245,27 @@ GetLegacyOptionsOrder (
         LegacyDev = mLegacyBootOptionPrivate->MaintainMapData->InitialNvData.LegacyFD;
         OptionMenu = &LegacyFDMenu;
         break;
-      
+
       case BBS_HARDDISK:
         LegacyDev = mLegacyBootOptionPrivate->MaintainMapData->InitialNvData.LegacyHD;
         OptionMenu = &LegacyHDMenu;
         break;
-      
+
       case BBS_CDROM:
         LegacyDev = mLegacyBootOptionPrivate->MaintainMapData->InitialNvData.LegacyCD;
         OptionMenu = &LegacyCDMenu;
         break;
-      
+
       case BBS_EMBED_NETWORK:
         LegacyDev = mLegacyBootOptionPrivate->MaintainMapData->InitialNvData.LegacyNET;
         OptionMenu = &LegacyNETMenu;
         break;
-      
+
       case BBS_BEV_DEVICE:
         LegacyDev = mLegacyBootOptionPrivate->MaintainMapData->InitialNvData.LegacyBEV;
         OptionMenu = &LegacyBEVMenu;
         break;
-      
+
       case BBS_UNKNOWN:
       default:
         ASSERT (FALSE);
@@ -1337,7 +1337,7 @@ GetLegacyOptions (
   BEVNum  = 0;
 
   EfiBootManagerConnectAll ();
-  
+
   //
   // for better user experience
   // 1. User changes HD configuration (e.g.: unplug HDD), here we have a chance to remove the HDD boot option
@@ -1431,7 +1431,7 @@ LegacyBootMaintUiLibConstructor (
     //
     LegacyBootOptionData = AllocateZeroPool (sizeof (LEGACY_BOOT_OPTION_CALLBACK_DATA));
     ASSERT (LegacyBootOptionData != NULL);
-    
+
     LegacyBootOptionData->MaintainMapData = AllocateZeroPool (sizeof (LEGACY_BOOT_MAINTAIN_DATA));
     ASSERT (LegacyBootOptionData->MaintainMapData != NULL);
 
@@ -1499,7 +1499,7 @@ LegacyBootMaintUiLibDestructor (
                     NULL
                     );
     ASSERT_EFI_ERROR (Status);
-    
+
     HiiRemovePackages (mLegacyBootOptionPrivate->HiiHandle);
 
     FreePool (mLegacyBootOptionPrivate->MaintainMapData);

@@ -1,7 +1,7 @@
 /** @file
   ConsoleOut Routines that speak VGA.
 
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -188,7 +188,7 @@ BiosVideoDriverBindingSupported (
     if (RemainingDevicePath != NULL) {
       Node = (EFI_DEV_PATH *) RemainingDevicePath;
       //
-      // Check if RemainingDevicePath is the End of Device Path Node, 
+      // Check if RemainingDevicePath is the End of Device Path Node,
       // if yes, return EFI_SUCCESS
       //
       if (!IsDevicePathEnd (Node)) {
@@ -295,7 +295,7 @@ BiosVideoDriverBindingStart (
                       0,
                       &mOriginalPciAttributes
                       );
-    
+
     if (EFI_ERROR (Status)) {
       goto Done;
     }
@@ -319,7 +319,7 @@ BiosVideoDriverBindingStart (
   if (Supports == 0 || Supports == (EFI_PCI_IO_ATTRIBUTE_VGA_IO | EFI_PCI_IO_ATTRIBUTE_VGA_IO_16)) {
     Status = EFI_UNSUPPORTED;
     goto Done;
-  }  
+  }
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
@@ -384,7 +384,7 @@ BiosVideoDriverBindingStart (
   }
 
   if (RemainingDevicePath != NULL) {
-    if (IsDevicePathEnd (RemainingDevicePath) && 
+    if (IsDevicePathEnd (RemainingDevicePath) &&
         (FeaturePcdGet (PcdBiosVideoCheckVbeEnable) || FeaturePcdGet (PcdBiosVideoCheckVgaEnable))) {
       //
       // If RemainingDevicePath is the End of Device Path Node,
@@ -509,7 +509,7 @@ BiosVideoDriverBindingStop (
                       (VOID **) &PciIo
                       );
       ASSERT_EFI_ERROR (Status);
-      
+
       //
       // Restore original PCI attributes
       //
@@ -562,10 +562,10 @@ BiosVideoChildHandleInstall (
   // Allocate the private device structure for video device
   //
   BiosVideoPrivate = (BIOS_VIDEO_DEV *) AllocateZeroPool (
-																					sizeof (BIOS_VIDEO_DEV)
-																					);
+                                          sizeof (BIOS_VIDEO_DEV)
+                                          );
   if (NULL == BiosVideoPrivate) {
-		Status = EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -668,7 +668,7 @@ BiosVideoChildHandleInstall (
       AcpiDeviceNode.Header.SubType = ACPI_ADR_DP;
       AcpiDeviceNode.ADR = ACPI_DISPLAY_ADR (1, 0, 0, 1, 0, ACPI_ADR_DISPLAY_TYPE_VGA, 0, 0);
       SetDevicePathNodeLength (&AcpiDeviceNode.Header, sizeof (ACPI_ADR_DEVICE_PATH));
-    
+
       BiosVideoPrivate->GopDevicePath = AppendDevicePathNode (
                                           ParentDevicePath,
                                           (EFI_DEVICE_PATH_PROTOCOL *) &AcpiDeviceNode
@@ -676,7 +676,7 @@ BiosVideoChildHandleInstall (
     } else {
       BiosVideoPrivate->GopDevicePath = AppendDevicePathNode (ParentDevicePath, RemainingDevicePath);
     }
-    
+
     //
     // Creat child handle and device path protocol firstly
     //
@@ -816,7 +816,7 @@ Done:
   if (EFI_ERROR (Status)) {
     if ((BiosVideoPrivate != NULL) && (BiosVideoPrivate->ExitBootServicesEvent != NULL)) {
       gBS->CloseEvent (BiosVideoPrivate->ExitBootServicesEvent);
-    }  
+    }
     //
     // Free private data structure
     //
@@ -1271,7 +1271,7 @@ HasChildHandle (
       HasChild = TRUE;
     }
   }
-  
+
   return HasChild;
 }
 
@@ -1343,7 +1343,7 @@ BiosVideoCheckForVbe (
   }
 
   ZeroMem (&ValidEdidTiming, sizeof (VESA_BIOS_EXTENSIONS_VALID_EDID_TIMING));
-  	
+
   //
   // Fill in the VBE related data structures
   //
@@ -1405,7 +1405,7 @@ BiosVideoCheckForVbe (
     //
     EdidOverrideDataBlock = AllocatePool (VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE * 2);
     if (NULL == EdidOverrideDataBlock) {
-  		Status = EFI_OUT_OF_RESOURCES;
+      Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
 
@@ -1449,13 +1449,13 @@ BiosVideoCheckForVbe (
       // Set EDID Discovered Data
       //
       BiosVideoPrivate->EdidDiscovered.SizeOfEdid = VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE;
- 		  BiosVideoPrivate->EdidDiscovered.Edid = (UINT8 *) AllocateCopyPool (
+       BiosVideoPrivate->EdidDiscovered.Edid = (UINT8 *) AllocateCopyPool (
                                                           VESA_BIOS_EXTENSIONS_EDID_BLOCK_SIZE,
                                                           BiosVideoPrivate->VbeEdidDataBlock
- 																												  );
+                                                           );
 
       if (NULL == BiosVideoPrivate->EdidDiscovered.Edid) {
- 			  Status = EFI_OUT_OF_RESOURCES;
+         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
 
@@ -1470,9 +1470,9 @@ BiosVideoCheckForVbe (
     EdidActiveDataSize  = EdidOverrideDataSize;
     EdidActiveDataBlock = EdidOverrideDataBlock;
     EdidFound = TRUE;
- 	}
+   }
 
- 	if (EdidFound) {
+   if (EdidFound) {
     //
     // Parse EDID data structure to retrieve modes supported by monitor
     //
@@ -1486,7 +1486,7 @@ BiosVideoCheckForVbe (
                                                       EdidActiveDataBlock
                                                       );
       if (NULL ==  BiosVideoPrivate->EdidActive.Edid) {
-   		  Status = EFI_OUT_OF_RESOURCES;
+         Status = EFI_OUT_OF_RESOURCES;
         goto Done;
       }
     }
@@ -1507,7 +1507,7 @@ BiosVideoCheckForVbe (
 
   PreferMode = 0;
   ModeNumber = 0;
-  
+
   //
   // ModeNumberPtr may be not 16-byte aligned, so ReadUnaligned16 is used to access the buffer pointed by ModeNumberPtr.
   //
@@ -1635,7 +1635,7 @@ BiosVideoCheckForVbe (
     // Record the highest resolution mode to set later
     //
     if ((BiosVideoPrivate->VbeModeInformationBlock->XResolution > HighestHorizontalResolution) ||
-        ((BiosVideoPrivate->VbeModeInformationBlock->XResolution == HighestHorizontalResolution) && 
+        ((BiosVideoPrivate->VbeModeInformationBlock->XResolution == HighestHorizontalResolution) &&
          (BiosVideoPrivate->VbeModeInformationBlock->YResolution > HighestVerticalResolution))) {
       HighestHorizontalResolution = BiosVideoPrivate->VbeModeInformationBlock->XResolution;
       HighestVerticalResolution = BiosVideoPrivate->VbeModeInformationBlock->YResolution;
@@ -1647,10 +1647,10 @@ BiosVideoCheckForVbe (
     //
     ModeNumber ++;
     ModeBuffer = (BIOS_VIDEO_MODE_DATA *) AllocatePool (
-																						ModeNumber * sizeof (BIOS_VIDEO_MODE_DATA)
-																						);
+                                            ModeNumber * sizeof (BIOS_VIDEO_MODE_DATA)
+                                            );
     if (NULL == ModeBuffer) {
-			Status = EFI_OUT_OF_RESOURCES;
+      Status = EFI_OUT_OF_RESOURCES;
       goto Done;
     }
 
@@ -1715,7 +1715,7 @@ BiosVideoCheckForVbe (
     // Make sure the FrameBufferSize does not exceed the max available frame buffer size reported by VEB.
     //
     ASSERT (CurrentModeData->FrameBufferSize <= ((UINT32)BiosVideoPrivate->VbeInformationBlock->TotalMemory * 64 * 1024));
-    
+
     BiosVideoPrivate->ModeData = ModeBuffer;
   }
   //
@@ -1821,7 +1821,7 @@ BiosVideoCheckForVga (
                                           sizeof (BIOS_VIDEO_MODE_DATA)
                                           );
   if (NULL == ModeBuffer) {
-		Status = EFI_OUT_OF_RESOURCES;
+    Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
 
@@ -1913,8 +1913,8 @@ BiosVideoGraphicsOutputQueryMode (
   }
 
   *Info = (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *) AllocatePool (
-																										sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION)
-																										);
+                                                    sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION)
+                                                    );
   if (NULL == *Info) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1969,8 +1969,8 @@ BiosVideoSetModeWorker (
   }
 
   BiosVideoPrivate->LineBuffer = (UINT8 *) AllocatePool (
-																					   ModeData->BytesPerScanLine
-																					   );
+                                             ModeData->BytesPerScanLine
+                                             );
   if (NULL == BiosVideoPrivate->LineBuffer) {
     return EFI_OUT_OF_RESOURCES;
   }
@@ -1998,9 +1998,9 @@ BiosVideoSetModeWorker (
     // Allocate a working buffer for BLT operations to the VBE frame buffer
     //
     BiosVideoPrivate->VbeFrameBuffer =
-			(EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) AllocatePool (
-																					ModeData->BytesPerScanLine * ModeData->VerticalResolution
-																				  );
+      (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) AllocatePool (
+                                          ModeData->BytesPerScanLine * ModeData->VerticalResolution
+                                          );
     if (NULL == BiosVideoPrivate->VbeFrameBuffer) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -2079,11 +2079,11 @@ BiosVideoGraphicsOutputSetMode (
   if (ModeNumber >= This->Mode->MaxMode) {
     return EFI_UNSUPPORTED;
   }
-  
+
   if (ModeNumber == This->Mode->Mode) {
     //
     // Clear screen to black
-    //    
+    //
     ZeroMem (&Background, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
     BiosVideoGraphicsOutputVbeBlt (
                         This,

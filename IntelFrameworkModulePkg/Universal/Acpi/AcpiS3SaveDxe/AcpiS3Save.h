@@ -1,8 +1,8 @@
 /** @file
-  This is an implementation of the ACPI S3 Save protocol.  This is defined in 
+  This is an implementation of the ACPI S3 Save protocol.  This is defined in
   S3 boot path specification 0.9.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _ACPI_S3_SAVE_H_
 
 /**
-  Gets the buffer of legacy memory below 1 MB 
+  Gets the buffer of legacy memory below 1 MB
   This function is to get the buffer in legacy memory below 1MB that is required during S3 resume.
 
   @param This           A pointer to the EFI_ACPI_S3_SAVE_PROTOCOL instance.
@@ -38,9 +38,9 @@ LegacyGetS3MemorySize (
 
 /**
   Prepares all information that is needed in the S3 resume boot path.
-  
-  Allocate the resources or prepare informations and save in ACPI variable set for S3 resume boot path  
-  
+
+  Allocate the resources or prepare informations and save in ACPI variable set for S3 resume boot path
+
   @param This                 A pointer to the EFI_ACPI_S3_SAVE_PROTOCOL instance.
   @param LegacyMemoryAddress  The base address of legacy memory.
 
@@ -54,6 +54,6 @@ EFI_STATUS
 EFIAPI
 S3Ready (
   IN EFI_ACPI_S3_SAVE_PROTOCOL     *This,
-  IN VOID                          *LegacyMemoryAddress   
+  IN VOID                          *LegacyMemoryAddress
   );
 #endif

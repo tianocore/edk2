@@ -2,7 +2,7 @@
   This is an implementation of the ACPI S3 Save protocol.  This is defined in
   S3 boot path specification 0.9.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -55,7 +55,7 @@ EFI_ACPI_S3_SAVE_PROTOCOL mS3Save = {
 
   @param  MemoryType   Memory type of memory to allocate.
   @param  Size         Size of memory to allocate.
-  
+
   @return Allocated address for output.
 
 **/
@@ -88,7 +88,7 @@ AllocateMemoryBelow4G (
 }
 
 /**
-  Gets the buffer of legacy memory below 1 MB 
+  Gets the buffer of legacy memory below 1 MB
   This function is to get the buffer in legacy memory below 1MB that is required during S3 resume.
 
   @param This           A pointer to the EFI_ACPI_S3_SAVE_PROTOCOL instance.
@@ -115,9 +115,9 @@ LegacyGetS3MemorySize (
 
 /**
   Prepares all information that is needed in the S3 resume boot path.
-  
-  Allocate the resources or prepare informations and save in ACPI variable set for S3 resume boot path  
-  
+
+  Allocate the resources or prepare informations and save in ACPI variable set for S3 resume boot path
+
   @param This                 A pointer to the EFI_ACPI_S3_SAVE_PROTOCOL instance.
   @param LegacyMemoryAddress  The base address of legacy memory.
 
@@ -156,9 +156,9 @@ S3Ready (
 
 /**
   The Driver Entry Point.
-  
+
   The function is the driver Entry point which will produce AcpiS3SaveProtocol.
-  
+
   @param ImageHandle   A handle for the image that is initializing this driver
   @param SystemTable   A pointer to the EFI system table
 

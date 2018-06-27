@@ -1,7 +1,7 @@
 /** @file
   Definitions for data structures used in S3 resume.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -62,8 +62,8 @@ typedef struct {
   //
   // S3 Debug extension
   //
-  EFI_PHYSICAL_ADDRESS  S3DebugBufferAddress; 
-  EFI_PHYSICAL_ADDRESS  S3ResumeNvsEntryPoint;    
+  EFI_PHYSICAL_ADDRESS  S3DebugBufferAddress;
+  EFI_PHYSICAL_ADDRESS  S3ResumeNvsEntryPoint;
 } ACPI_VARIABLE_SET_COMPATIBILITY;
 
 #endif

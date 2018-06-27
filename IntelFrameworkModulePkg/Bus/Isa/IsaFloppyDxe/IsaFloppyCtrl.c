@@ -1,7 +1,7 @@
 /** @file
   Internal floppy disk controller programming functions for the floppy driver.
-  
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Detect whether a floppy drive is present or not.
- 
+
   @param[in] FdcDev  A pointer to the FDC_BLK_IO_DEV
 
   @retval EFI_SUCCESS    The floppy disk drive is present
@@ -49,7 +49,7 @@ DiscoverFddDevice (
 /**
   Do recalibrate and check if the drive is present or not
   and set the media parameters if the driver is present.
-  
+
   @param[in] FdcDev  A pointer to the FDC_BLK_IO_DEV
 
   @retval EFI_SUCCESS       The floppy disk drive is present
@@ -123,9 +123,9 @@ FddIdentify (
 
 /**
   Reset the Floppy Logic Drive.
-  
+
   @param  FdcDev FDC_BLK_IO_DEV * : A pointer to the FDC_BLK_IO_DEV
-  
+
   @retval EFI_SUCCESS:    The Floppy Logic Drive is reset
   @retval EFI_DEVICE_ERROR: The Floppy Logic Drive is not functioning correctly and
                       can not be reset
@@ -222,9 +222,9 @@ FddReset (
 /**
   Turn the floppy disk drive's motor on.
   The drive's motor must be on before any command can be executed.
-  
+
   @param[in] FdcDev  A pointer to the FDC_BLK_IO_DEV
-  
+
   @retval  EFI_SUCCESS            The drive's motor was turned on successfully
   @retval  EFI_DEVICE_ERROR       The drive is busy, so can not turn motor on
 **/
@@ -298,9 +298,9 @@ MotorOn (
 
 /**
   Set a Timer and when Timer goes off, turn the motor off.
-  
+
   @param[in] FdcDev  A pointer to the FDC_BLK_IO_DEV
-  
+
   @retval  EFI_SUCCESS            Set the Timer successfully
   @retval  EFI_INVALID_PARAMETER  Fail to Set the timer
 **/
@@ -317,9 +317,9 @@ MotorOff (
 
 /**
   Detect whether the disk in the drive is changed or not.
-  
+
   @param[in] FdcDev  A pointer to FDC_BLK_IO_DEV
-  
+
   @retval  EFI_SUCCESS        No disk media change
   @retval  EFI_DEVICE_ERROR   Fail to do the recalibrate or seek operation
   @retval  EFI_NO_MEDIA       No disk in the drive
@@ -382,9 +382,9 @@ DisketChanged (
   Do the Specify command, this command sets DMA operation
   and the initial values for each of the three internal
   times: HUT, SRT and HLT.
-  
+
   @param[in] FdcDev  Pointer to instance of FDC_BLK_IO_DEV
-  
+
   @retval EFI_SUCCESS       Execute the Specify command successfully
   @retval EFI_DEVICE_ERROR  Fail to execute the command
 **/
@@ -422,7 +422,7 @@ Specify (
 
 /**
   Set the head of floppy drive to track 0.
- 
+
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
   @retval EFI_SUCCESS:    Execute the Recalibrate operation successfully
   @retval EFI_DEVICE_ERROR: Fail to execute the Recalibrate operation
@@ -496,10 +496,10 @@ Recalibrate (
 
 /**
   Set the head of floppy drive to the new cylinder.
-  
+
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
   @param  Lba EFI_LBA     : The logic block address want to seek
-  
+
   @retval  EFI_SUCCESS:    Execute the Seek operation successfully
   @retval  EFI_DEVICE_ERROR: Fail to execute the Seek operation
 
@@ -600,12 +600,12 @@ Seek (
 /**
   Do the Sense Interrupt Status command, this command
   resets the interrupt signal.
-  
+
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
   @param  StatusRegister0 UINT8 *: Be used to save Status Register 0 read from FDC
   @param  PresentCylinderNumber  UINT8 *: Be used to save present cylinder number
                                     read from FDC
-  
+
   @retval  EFI_SUCCESS:    Execute the Sense Interrupt Status command successfully
   @retval  EFI_DEVICE_ERROR: Fail to execute the command
 
@@ -637,10 +637,10 @@ SenseIntStatus (
 
 /**
   Do the Sense Drive Status command.
-  
+
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
   @param  Lba EFI_LBA     : Logic block address
-  
+
   @retval  EFI_SUCCESS:    Execute the Sense Drive Status command successfully
   @retval  EFI_DEVICE_ERROR: Fail to execute the command
   @retval  EFI_WRITE_PROTECTED:The disk is write protected
@@ -700,9 +700,9 @@ SenseDrvStatus (
 
 /**
   Update the disk media properties and if necessary reinstall Block I/O interface.
- 
+
   @param  FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
-  
+
   @retval  EFI_SUCCESS:    Do the operation successfully
   @retval  EFI_DEVICE_ERROR: Fail to the operation
 
@@ -778,7 +778,7 @@ DetectMedia (
 
 /**
   Set the data rate and so on.
- 
+
   @param  FdcDev  A pointer to FDC_BLK_IO_DEV
 
   @retval EFI_SUCCESS success to set the data rate
@@ -811,13 +811,13 @@ Setup (
 
 /**
   Read or Write a number of blocks in the same cylinder.
- 
+
   @param  FdcDev      A pointer to FDC_BLK_IO_DEV
-  @param  HostAddress device address 
+  @param  HostAddress device address
   @param  Lba         The starting logic block address to read from on the device
   @param  NumberOfBlocks The number of block wanted to be read or write
   @param  Read        Operation type: read or write
-  
+
   @retval EFI_SUCCESS Success operate
 
 **/
@@ -961,7 +961,7 @@ ReadWriteDataSector (
 
 /**
   Fill in FDD command's parameter.
-  
+
   @param FdcDev   Pointer to instance of FDC_BLK_IO_DEV
   @param Lba      The starting logic block address to read from on the device
   @param Command  FDD command
@@ -1002,10 +1002,10 @@ FillPara (
 
 /**
   Read result byte from Data Register of FDC.
-  
+
   @param FdcDev   Pointer to instance of FDC_BLK_IO_DEV
   @param Pointer  Buffer to store the byte read from FDC
-  
+
   @retval EFI_SUCCESS       Read result byte from FDC successfully
   @retval EFI_DEVICE_ERROR  The FDC is not ready to be read
 
@@ -1041,10 +1041,10 @@ DataInByte (
 
 /**
   Write command byte to Data Register of FDC.
-  
+
   @param FdcDev  Pointer to instance of FDC_BLK_IO_DEV
   @param Pointer Be used to save command byte written to FDC
-  
+
   @retval  EFI_SUCCESS:    Write command byte to FDC successfully
   @retval  EFI_DEVICE_ERROR: The FDC is not ready to be written
 
@@ -1081,10 +1081,10 @@ DataOutByte (
 
 /**
   Detect the specified floppy logic drive is busy or not within a period of time.
-  
+
   @param FdcDev           Indicate it is drive A or drive B
   @param Timeout          The time period for waiting
-  
+
   @retval EFI_SUCCESS:  The drive and command are not busy
   @retval EFI_TIMEOUT:  The drive or command is still busy after a period time that
                         set by Timeout
@@ -1135,11 +1135,11 @@ FddWaitForBSYClear (
 
 /**
   Determine whether FDC is ready to write or read.
-  
+
   @param  FdcDev Pointer to instance of FDC_BLK_IO_DEV
   @param  Dio BOOLEAN:      Indicate the FDC is waiting to write or read
   @param  Timeout           The time period for waiting
-  
+
   @retval EFI_SUCCESS:  FDC is ready to write or read
   @retval EFI_NOT_READY:  FDC is not ready within the specified time period
 
@@ -1196,7 +1196,7 @@ FddDRQReady (
 }
 
 /**
-  Set FDC control structure's attribute according to result. 
+  Set FDC control structure's attribute according to result.
 
   @param Result  Point to result structure
   @param FdcDev  FDC control structure
@@ -1247,9 +1247,9 @@ CheckResult (
 
 /**
   Check the drive status information.
-  
+
   @param StatusRegister3  the value of Status Register 3
-  
+
   @retval EFI_SUCCESS           The disk is not write protected
   @retval EFI_WRITE_PROTECTED:  The disk is write protected
 
@@ -1268,11 +1268,11 @@ CheckStatus3 (
 
 /**
   Calculate the number of block in the same cylinder according to LBA.
-  
+
   @param FdcDev FDC_BLK_IO_DEV *: A pointer to FDC_BLK_IO_DEV
   @param LBA EFI_LBA:      The starting logic block address
   @param NumberOfBlocks UINTN: The number of blocks
-  
+
   @return The number of blocks in the same cylinder which the starting
         logic block address is LBA
 
@@ -1304,7 +1304,7 @@ GetTransferBlockCount (
 
 /**
   When the Timer(2s) off, turn the drive's motor off.
-  
+
   @param Event EFI_EVENT: Event(the timer) whose notification function is being
                      invoked
   @param Context VOID *:  Pointer to the notification function's context
@@ -1343,7 +1343,7 @@ FddTimerProc (
 
 /**
   Read an I/O port of FDC.
- 
+
   @param[in] FdcDev  A pointer to FDC_BLK_IO_DEV.
   @param[in] Offset  The address offset of the I/O port.
 
@@ -1372,7 +1372,7 @@ FdcReadPort (
 
 /**
   Write an I/O port of FDC.
- 
+
   @param[in] FdcDev  A pointer to FDC_BLK_IO_DEV
   @param[in] Offset  The address offset of the I/O port
   @param[in] Data    8-bit Value written to the I/O port

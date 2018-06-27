@@ -1,7 +1,7 @@
 /** @file
-  This file contains all helper functions on the ATA command 
-  
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  This file contains all helper functions on the ATA command
+
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -31,9 +31,9 @@
   @param IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used to record
                 all the information of the IDE device.
 
-  @retval EFI_SUCCESS       The disk specified by IdeDev is a Atapi6 supported one and 
+  @retval EFI_SUCCESS       The disk specified by IdeDev is a Atapi6 supported one and
                             48-bit addressing must be used
-  @retval EFI_UNSUPPORTED   The disk dosn't not support Atapi6 or it supports but the 
+  @retval EFI_UNSUPPORTED   The disk dosn't not support Atapi6 or it supports but the
                             capacity is below 120G, 48bit addressing is not needed
   @retval  EFI_DEVICE_ERROR      The identify data in IdeDev is incorrect
   @retval  EFI_INVALID_PARAMETER The identify data in IdeDev is NULL.
@@ -110,7 +110,7 @@ AtaAtapi6Identify (
 /**
   Enable SMART of the disk if supported
 
-  @param IdeDev pointer pointing to IDE_BLK_IO_DEV data structure,used to record 
+  @param IdeDev pointer pointing to IDE_BLK_IO_DEV data structure,used to record
                 all the information of the IDE device.
 **/
 VOID
@@ -263,7 +263,7 @@ AtaSMARTSupport (
   information it needs to fill the IDE_BLK_IO_DEV data structure,
   including device type, media block size, media capacity, and etc.
 
-  @param IdeDev  pointer pointing to IDE_BLK_IO_DEV data structure,used to record 
+  @param IdeDev  pointer pointing to IDE_BLK_IO_DEV data structure,used to record
                  all the information of the IDE device.
 
   @retval EFI_SUCCESS      Identify ATA device successfully.
@@ -280,7 +280,7 @@ ATAIdentify (
   EFI_IDENTIFY_DATA *AtaIdentifyPointer;
   UINT32            Capacity;
   UINT8             DeviceSelect;
-  UINTN				Retry;
+  UINTN        Retry;
 
   //
   //  AtaIdentifyPointer is used for accommodating returned IDENTIFY data of
@@ -297,9 +297,9 @@ ATAIdentify (
   //
   DeviceSelect  = (UINT8) ((IdeDev->Device) << 4);
 
-  
+
   Retry = 3;
-  while (Retry > 0) {	
+  while (Retry > 0) {
     Status = AtaPioDataIn (
               IdeDev,
               (VOID *) AtaIdentifyPointer,
@@ -348,20 +348,20 @@ ATAIdentify (
           //
           return EFI_SUCCESS;
         } else if (Status == EFI_DEVICE_ERROR) {
-		  //
-		  // Some disk with big capacity (>200GB) is slow when being identified
-		  // and will return all zero for word83.
-		  // We try twice at first. If it fails, we do a SoftRest and try again.
-		  //
-		  Retry--;
-		  if (Retry == 1) {
-		    //
-		    // Do a SoftRest before the third attempt.
-		    //
-		    AtaSoftReset (IdeDev);
-		  }
-		  continue;
-	    }
+      //
+      // Some disk with big capacity (>200GB) is slow when being identified
+      // and will return all zero for word83.
+      // We try twice at first. If it fails, we do a SoftRest and try again.
+      //
+      Retry--;
+      if (Retry == 1) {
+        //
+        // Do a SoftRest before the third attempt.
+        //
+        AtaSoftReset (IdeDev);
+      }
+      continue;
+      }
         //
         // This is a hard disk <= 120GB capacity, treat it as normal hard disk
         //
@@ -390,7 +390,7 @@ ATAIdentify (
       }
 
     }
-  	break;
+    break;
   }
 
   gBS->FreePool (AtaIdentifyPointer);
@@ -404,12 +404,12 @@ ATAIdentify (
 
 /**
   This function is a helper function used to change the char order in a string. It
-  is designed specially for the PrintAtaModuleName() function. After the IDE device 
-  is detected, the IDE driver gets the device module name by sending ATA command 
+  is designed specially for the PrintAtaModuleName() function. After the IDE device
+  is detected, the IDE driver gets the device module name by sending ATA command
   called ATA Identify Command or ATAPI Identify Command to the specified IDE device.
   The module name returned is a string of ASCII characters: the first character is bit8--bit15
   of the first word, the second character is BIT0--bit7 of the first word and so on. Thus
-  the string can not be print directly before it is preprocessed by this func to change 
+  the string can not be print directly before it is preprocessed by this func to change
   the order of characters in each word in the string.
 
   @param Destination Indicates the destination string.
@@ -455,7 +455,7 @@ PrintAtaModuleName (
 /**
   This function is used to send out ATA commands conforms to the PIO Data In Protocol.
 
-  @param IdeDev       pointer pointing to IDE_BLK_IO_DEV data structure, used to record 
+  @param IdeDev       pointer pointing to IDE_BLK_IO_DEV data structure, used to record
                       all the information of the IDE device.
   @param Buffer       buffer contained data transferred from device to host.
   @param ByteCount    data size in byte unit of the buffer.
@@ -465,7 +465,7 @@ PrintAtaModuleName (
   @param SectorNumber value of the Sector Number Register
   @param CylinderLsb  value of the low byte of the Cylinder Register
   @param CylinderMsb  value of the high byte of the Cylinder Register
-  
+
   @retval EFI_SUCCESS      send out the ATA command and device send required data successfully.
   @retval EFI_DEVICE_ERROR command sent failed.
 
@@ -752,7 +752,7 @@ AtaPioDataOut (
   some debug information and if there is ERR bit set in the Status
   Register, the Error Register's value is also be parsed and print out.
 
-  @param IdeDev  pointer pointing to IDE_BLK_IO_DEV data structure, used to 
+  @param IdeDev  pointer pointing to IDE_BLK_IO_DEV data structure, used to
                  record all the information of the IDE device.
 
   @retval EFI_SUCCESS       No err information in the Status Register.
@@ -850,15 +850,15 @@ CheckErrorStatus (
 }
 
 /**
-  This function is called by the AtaBlkIoReadBlocks() to perform reading from 
+  This function is called by the AtaBlkIoReadBlocks() to perform reading from
   media in block unit.
 
-  @param IdeDev         pointer pointing to IDE_BLK_IO_DEV data structure, used to record 
+  @param IdeDev         pointer pointing to IDE_BLK_IO_DEV data structure, used to record
                         all the information of the IDE device.
   @param DataBuffer     A pointer to the destination buffer for the data.
   @param Lba            The starting logical block address to read from on the device media.
   @param NumberOfBlocks The number of transfer data blocks.
-  
+
   @return status is fully dependent on the return status of AtaPioDataIn() function.
 
 **/
@@ -959,7 +959,7 @@ AtaReadSectors (
 }
 
 /**
-  This function is called by the AtaBlkIoWriteBlocks() to perform writing onto 
+  This function is called by the AtaBlkIoWriteBlocks() to perform writing onto
   media in block unit.
 
   @param IdeDev         pointer pointing to IDE_BLK_IO_DEV data structure,used to record
@@ -967,7 +967,7 @@ AtaReadSectors (
   @param BufferData     A pointer to the source buffer for the data.
   @param Lba            The starting logical block address to write onto the device media.
   @param NumberOfBlocks The number of transfer data blocks.
-  
+
   @return status is fully dependent on the return status of AtaPioDataIn() function.
 
 **/
@@ -1055,7 +1055,7 @@ AtaWriteSectors (
 }
 /**
   This function is used to implement the Soft Reset on the specified device. But,
-  the ATA Soft Reset mechanism is so strong a reset method that it will force 
+  the ATA Soft Reset mechanism is so strong a reset method that it will force
   resetting on both devices connected to the same cable.
 
   It is called by IdeBlkIoReset(), a interface function of Block
@@ -1120,7 +1120,7 @@ AtaSoftReset (
   return EFI_SUCCESS;
 }
 /**
-  This function is used to send out ATA commands conforms to the PIO Data In 
+  This function is used to send out ATA commands conforms to the PIO Data In
   Protocol, supporting ATA/ATAPI-6 standard
 
   Comparing with ATA-3 data in protocol, we have two differents here:
@@ -1595,27 +1595,27 @@ DoAtaUdma (
   // Read BMIS register and clear ERROR and INTR bit
   //
   IdeDev->PciIo->Io.Read (
-					  IdeDev->PciIo,
-					  EfiPciIoWidthUint8,
-					  EFI_PCI_IO_PASS_THROUGH_BAR,
-					  IoPortForBmis,
-					  1,
-					  &RegisterValue
-					  );
-  
+            IdeDev->PciIo,
+            EfiPciIoWidthUint8,
+            EFI_PCI_IO_PASS_THROUGH_BAR,
+            IoPortForBmis,
+            1,
+            &RegisterValue
+            );
+
   RegisterValue |= (BMIS_INTERRUPT | BMIS_ERROR);
-  
+
   IdeDev->PciIo->Io.Write (
-					  IdeDev->PciIo,
-					  EfiPciIoWidthUint8,
-					  EFI_PCI_IO_PASS_THROUGH_BAR,
-					  IoPortForBmis,
-					  1,
-					  &RegisterValue
-					  );
+            IdeDev->PciIo,
+            EfiPciIoWidthUint8,
+            EFI_PCI_IO_PASS_THROUGH_BAR,
+            IoPortForBmis,
+            1,
+            &RegisterValue
+            );
 
   Status = EFI_SUCCESS;
-  
+
   RemainBlockNum = NumberOfBlocks;
   while (RemainBlockNum > 0) {
 
@@ -1813,8 +1813,8 @@ DoAtaUdma (
                           );
       if (((RegisterValue & (BMIS_INTERRUPT | BMIS_ERROR)) != 0) || (Count == 0)) {
         if (((RegisterValue & BMIS_ERROR) != 0) || (Count == 0)) {
-		  Status = EFI_DEVICE_ERROR;
-		  break;
+      Status = EFI_DEVICE_ERROR;
+      break;
         }
         break;
       }
@@ -1847,7 +1847,7 @@ DoAtaUdma (
                         1,
                         &RegisterValue
                         );
-	//
+  //
     // Read Status Register of IDE device to clear interrupt
     //
     RegisterValue = IDEReadPortB(IdeDev->PciIo,IdeDev->IoPort->Reg.Status);
@@ -1878,9 +1878,9 @@ DoAtaUdma (
       return EFI_DEVICE_ERROR;
     }
 
-	if (EFI_ERROR (Status)) {
-	  break;
-	}
+  if (EFI_ERROR (Status)) {
+    break;
+  }
     DataBuffer = (UINT8 *) DataBuffer + NumberOfBlocks * IdeDev->BlkIo.Media->BlockSize;
     StartLba += NumberOfBlocks;
   }
@@ -1898,10 +1898,10 @@ DoAtaUdma (
 
 /**
   This function is called by the AtaBlkIoReadBlocks() to perform reading from
-  media in block unit. The function has been enhanced to support >120GB access 
+  media in block unit. The function has been enhanced to support >120GB access
   and transfer at most 65536 blocks per command
 
-  @param IdeDev         pointer pointing to IDE_BLK_IO_DEV data structure, used to record 
+  @param IdeDev         pointer pointing to IDE_BLK_IO_DEV data structure, used to record
                         all the information of the IDE device.
   @param DataBuffer     A pointer to the destination buffer for the data.
   @param StartLba       The starting logical block address to read from on the device media.
@@ -1930,7 +1930,7 @@ AtaUdmaReadExt (
   @param StartLba       The starting logical block address to read from
                         on the device media.
   @param NumberOfBlocks The number of transfer data blocks.
-  
+
   @return status depends on the function DoAtaUdma() returns.
 **/
 EFI_STATUS
@@ -2313,7 +2313,7 @@ AtaUdmaWriteExt (
 
 /**
   This function is called by the AtaBlkIoWriteBlocks() to perform
-  writing to media in block unit. 
+  writing to media in block unit.
 
   @param IdeDev         pointer pointing to IDE_BLK_IO_DEV data structure, used
                         to record all the information of the IDE device.
@@ -2321,7 +2321,7 @@ AtaUdmaWriteExt (
   @param StartLba       The starting logical block address to write to
                         on the device media.
   @param NumberOfBlocks The number of transfer data blocks.
-  
+
   @return status depends on the function DoAtaUdma() returns.
 **/
 EFI_STATUS
@@ -2342,7 +2342,7 @@ AtaUdmaWrite (
   @param IdeDev         pointer pointing to IDE_BLK_IO_DEV data structure,used
                         to record all the information of the IDE device.
   @param DataBuffer     A pointer to the source buffer for the data.
-  @param StartLba       The starting logical block address to write onto the device 
+  @param StartLba       The starting logical block address to write onto the device
                         media.
   @param NumberOfBlocks The number of transfer data blocks.
 
@@ -2423,7 +2423,7 @@ AtaWriteSectorsExt (
   @param BufferSize      The size of the Buffer in bytes. This must be a multiple
                          of the intrinsic block size of the device.
   @param Buffer          A pointer to the source buffer for the data.The caller
-                         is responsible for either having implicit or explicit 
+                         is responsible for either having implicit or explicit
                          ownership of the memory that data is written from.
 
   @retval EFI_SUCCESS       Write Blocks successfully.

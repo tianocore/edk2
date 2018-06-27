@@ -179,7 +179,7 @@ BdsBootDeviceSelect (
   BdsLibBuildOptionFromVar (&BootLists, L"BootOrder");
 
   //
-  // When we didn't have chance to build boot option variables in the first 
+  // When we didn't have chance to build boot option variables in the first
   // full configuration boot (e.g.: Reset in the first page or in Device Manager),
   // we have no boot options in the following mini configuration boot.
   // Give the last chance to enumerate the boot options.
@@ -260,7 +260,7 @@ BdsBootDeviceSelect (
     // Restore to original mode before launching boot option.
     //
     BdsSetConsoleMode (FALSE);
-    
+
     //
     // All the driver options should have been processed since
     // now boot will be performed.
@@ -325,10 +325,10 @@ BdsBootDeviceSelect (
 
 /**
 
-  Validate input console variable data. 
+  Validate input console variable data.
 
   If found the device path is not a valid device path, remove the variable.
-  
+
   @param VariableName             Input console variable name.
 
 **/
@@ -346,7 +346,7 @@ BdsFormalizeConsoleVariable (
                       &gEfiGlobalVariableGuid,
                       &VariableSize
                       );
-  if ((DevicePath != NULL) && !IsDevicePathValid (DevicePath, VariableSize)) { 
+  if ((DevicePath != NULL) && !IsDevicePathValid (DevicePath, VariableSize)) {
     Status = gRT->SetVariable (
                     VariableName,
                     &gEfiGlobalVariableGuid,
@@ -363,15 +363,15 @@ BdsFormalizeConsoleVariable (
 
 /**
 
-  Formalize Bds global variables. 
+  Formalize Bds global variables.
 
  1. For ConIn/ConOut/ConErr, if found the device path is not a valid device path, remove the variable.
- 2. For OsIndicationsSupported, Create a BS/RT/UINT64 variable to report caps 
+ 2. For OsIndicationsSupported, Create a BS/RT/UINT64 variable to report caps
  3. Delete OsIndications variable if it is not NV/BS/RT UINT64
  Item 3 is used to solve case when OS corrupts OsIndications. Here simply delete this NV variable.
- 
+
 **/
-VOID 
+VOID
 BdsFormalizeEfiGlobalVariable (
   VOID
   )
@@ -381,7 +381,7 @@ BdsFormalizeEfiGlobalVariable (
   UINT64     OsIndication;
   UINTN      DataSize;
   UINT32     Attributes;
-  
+
   //
   // Validate Console variable.
   //
@@ -604,15 +604,15 @@ BdsEntry (
                                  then EFI_INVALID_PARAMETER is returned.
   @param  VendorGuid             A unique identifier for the vendor.
   @param  Attributes             Attributes bitmask to set for the variable.
-  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE, 
-                                 EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, or 
-                                 EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero 
-                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is 
-                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to 
-                                 the variable value (the timestamp associated with the variable may be updated however 
-                                 even if no new data value is provided,see the description of the 
-                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not 
-                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated). 
+  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE,
+                                 EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, or
+                                 EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero
+                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is
+                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to
+                                 the variable value (the timestamp associated with the variable may be updated however
+                                 even if no new data value is provided,see the description of the
+                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not
+                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated).
   @param  Data                   The contents for the variable.
 
   @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as
@@ -624,8 +624,8 @@ BdsEntry (
   @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
   @retval EFI_WRITE_PROTECTED    The variable in question is read-only.
   @retval EFI_WRITE_PROTECTED    The variable in question cannot be deleted.
-  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS 
-                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set, but the AuthInfo 
+  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
+                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set, but the AuthInfo
                                  does NOT pass the validation check carried out by the firmware.
 
   @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.

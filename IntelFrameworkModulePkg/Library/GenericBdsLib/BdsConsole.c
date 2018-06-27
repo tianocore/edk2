@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Check if we need to save the EFI variable with "ConVarName" as name
   as NV type
   If ConVarName is NULL, then ASSERT().
-  
+
   @param ConVarName The name of the EFI variable.
 
   @retval TRUE    Set the EFI variable as NV type.
@@ -33,7 +33,7 @@ IsNvNeed (
   CHAR16 *Ptr;
 
   ASSERT (ConVarName != NULL);
-  
+
   Ptr = ConVarName;
 
   //
@@ -47,7 +47,7 @@ IsNvNeed (
   if (((INTN)((UINTN)Ptr - (UINTN)ConVarName) / sizeof (CHAR16)) <= 3) {
     return TRUE;
   }
-  
+
   if ((*(Ptr - 3) == 'D') && (*(Ptr - 2) == 'e') && (*(Ptr - 1) == 'v')) {
     return FALSE;
   } else {
@@ -59,20 +59,20 @@ IsNvNeed (
   Fill console handle in System Table if there are no valid console handle in.
 
   Firstly, check the validation of console handle in System Table. If it is invalid,
-  update it by the first console device handle from EFI console variable. 
+  update it by the first console device handle from EFI console variable.
 
   @param  VarName            The name of the EFI console variable.
   @param  ConsoleGuid        Specified Console protocol GUID.
-  @param  ConsoleHandle      On IN,  console handle in System Table to be checked. 
+  @param  ConsoleHandle      On IN,  console handle in System Table to be checked.
                              On OUT, new console handle in system table.
-  @param  ProtocolInterface  On IN,  console protocol on console handle in System Table to be checked. 
+  @param  ProtocolInterface  On IN,  console protocol on console handle in System Table to be checked.
                              On OUT, new console protocol on new console handle in system table.
 
   @retval TRUE               System Table has been updated.
   @retval FALSE              System Table hasn't been updated.
 
 **/
-BOOLEAN 
+BOOLEAN
 UpdateSystemTableConsole (
   IN     CHAR16                          *VarName,
   IN     EFI_GUID                        *ConsoleGuid,
@@ -108,7 +108,7 @@ UpdateSystemTableConsole (
       return FALSE;
     }
   }
-  
+
   //
   // Get all possible consoles device path from EFI variable
   //
@@ -135,7 +135,7 @@ UpdateSystemTableConsole (
       FreePool (FullDevicePath);
       ASSERT (FALSE);
     }
-    
+
     //
     // Find console device handle by device path instance
     //
@@ -371,7 +371,7 @@ BdsLibConnectConsoleVariable (
       FreePool (StartDevicePath);
       return EFI_UNSUPPORTED;
     }
-    
+
     Next      = Instance;
     while (!IsDevicePathEndType (Next)) {
       Next = NextDevicePathNode (Next);
@@ -380,7 +380,7 @@ BdsLibConnectConsoleVariable (
     SetDevicePathEndNode (Next);
     //
     // Connect the USB console
-    // USB console device path is a short-form device path that 
+    // USB console device path is a short-form device path that
     //  starts with the first element being a USB WWID
     //  or a USB Class device path
     //
@@ -791,7 +791,7 @@ EnableQuietBoot (
         Attribute   = EfiBadgingDisplayAttributeCenter;
       } else {
         Attribute   = EfiBadgingDisplayAttributeCustomized;
-      } 
+      }
     }
 
     if (Blt != NULL) {
@@ -968,7 +968,7 @@ Done:
     Status = EFI_SUCCESS;
   } else {
     //
-    // More than one Logo displayed, get merged BltBuffer using VideoToBuffer operation. 
+    // More than one Logo displayed, get merged BltBuffer using VideoToBuffer operation.
     //
     if (Blt != NULL) {
       FreePool (Blt);
@@ -1034,7 +1034,7 @@ Done:
 }
 
 /**
-  Use SystemTable Conout to turn on video based Simple Text Out consoles. The 
+  Use SystemTable Conout to turn on video based Simple Text Out consoles. The
   Simple Text Out screens will now be synced up with all non video output devices
 
   @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.

@@ -3,7 +3,7 @@
   for the image to be programmed, and the flash area that is going to be
   programed.
 
-  Copyright (c) 2002 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2002 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -22,7 +22,7 @@ EFI_HII_HANDLE  gHiiHandle;
 
 /**
   Update the whole FV, or certain files in the FV.
-  
+
   @param ConfigData      Pointer to the config data on updating file.
   @param ImageBuffer     Image buffer to be updated.
   @param ImageSize       Image size.
@@ -89,7 +89,7 @@ PerformUpdateOnFirmwareVolume (
     //
     Status = FvbProtocol->GetAttributes (FvbProtocol, &Attributes);
     if (EFI_ERROR (Status) || ((Attributes & EFI_FVB2_WRITE_STATUS) == 0)) {
-      continue;     
+      continue;
     }
 
     Status            = FvbProtocol->GetPhysicalAddress (
@@ -197,7 +197,7 @@ PerformUpdateOnFlashArea (
     Print (TmpStr, FlashAddress, ((UINT64)SizeLeft + FlashAddress));
     FreePool (TmpStr);
   }
-  
+
   //
   // Locate all Fvb protocol
   //
@@ -242,7 +242,7 @@ PerformUpdateOnFlashArea (
       //
       Status = FvbProtocol->GetAttributes (FvbProtocol, &Attributes);
       if (EFI_ERROR (Status) || ((Attributes & EFI_FVB2_WRITE_STATUS) == 0)) {
-        continue;     
+        continue;
       }
 
       Status        = FvbProtocol->GetPhysicalAddress (
@@ -326,7 +326,7 @@ PerformUpdateOnFlashArea (
     if (EFI_ERROR (Status)) {
       return Status;
     }
- 
+
     //
     // Check if we are done with the update
     //
@@ -540,7 +540,7 @@ ProcessUpdateImage (
   FvAlignment = 1 << ((FwVolHeader->Attributes & EFI_FVB2_ALIGNMENT) >> 16);
   //
   // FvAlignment must be greater than or equal to 8 bytes of the minimum FFS alignment value.
-  // 
+  //
   if (FvAlignment < 8) {
     FvAlignment = 8;
   }
@@ -583,7 +583,7 @@ ProcessUpdateImage (
 /**
   Find the image in the same FV and program it in a target Firmware Volume device.
   After update image, it will reset system and no return.
-  
+
   @param ImageHandle   A handle for the image that is initializing this driver
   @param SystemTable   A pointer to the EFI system table
 
@@ -602,7 +602,7 @@ InitializeUpdateDriver (
   EFI_LOADED_IMAGE_PROTOCOL             *LoadedImageProtocol;
   EFI_FIRMWARE_VOLUME2_PROTOCOL         *FwVolProtocol;
   EFI_FIRMWARE_VOLUME2_PROTOCOL         *DataFwVolProtocol;
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH     *FwVolFilePathNode; 
+  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH     *FwVolFilePathNode;
   MEDIA_FW_VOL_FILEPATH_DEVICE_PATH     *AlignedDevPathNode;
   EFI_DEVICE_PATH_PROTOCOL              *FilePathNode;
   EFI_SECTION_TYPE                      SectionType;
@@ -815,7 +815,7 @@ InitializeUpdateDriver (
                UpdateConfigData
                );
     //
-    // Shall updates be serialized so that if an update is not successfully completed, 
+    // Shall updates be serialized so that if an update is not successfully completed,
     // the remaining updates won't be performed.
     //
     if (EFI_ERROR (Status)) {

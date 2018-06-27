@@ -1,8 +1,8 @@
 /** @file
 Private include file for IsaFloppyPei PEIM.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -104,7 +104,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// ISA memory range
 ///
-#define ISA_MAX_MEMORY_ADDRESS  0x1000000 
+#define ISA_MAX_MEMORY_ADDRESS  0x1000000
 
 //
 // Macro for time delay & interval

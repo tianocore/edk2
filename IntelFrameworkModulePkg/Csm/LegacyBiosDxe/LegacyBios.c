@@ -271,7 +271,7 @@ ShadowAndStartLegacy16 (
     if (EFI_ERROR (Status)) {
       //
       // Bugbug: need to figure out whether C/D/E/F segment should be marked as reserved memory.
-      // 
+      //
       DEBUG ((DEBUG_ERROR, "Failed to allocate the C/D/E/F segment Status = %r", Status));
     }
   }
@@ -415,7 +415,7 @@ ShadowAndStartLegacy16 (
   Private->Legacy8259->GetMask(Private->Legacy8259, &OldMask, NULL, NULL, NULL);
   NewMask = 0xFFFF;
   Private->Legacy8259->SetMask(Private->Legacy8259, &NewMask, NULL, NULL, NULL);
-  
+
   //
   // Call into Legacy16 code to do an INIT
   //
@@ -437,7 +437,7 @@ ShadowAndStartLegacy16 (
   // Restore original legacy interrupt mask value
   //
   Private->Legacy8259->SetMask(Private->Legacy8259, &OldMask, NULL, NULL, NULL);
-  
+
   if (Regs.X.AX != 0) {
     return EFI_DEVICE_ERROR;
   }
@@ -653,7 +653,7 @@ GetPciInterfaceVersion (
   UINT16                PciInterfaceVersion;
 
   PciInterfaceVersion = 0;
-  
+
   Reg.X.AX = 0xB101;
   Reg.E.EDI = 0;
 
@@ -693,7 +693,7 @@ InstallSmbiosEventCallback (
 {
   EFI_STATUS                  Status;
   SMBIOS_TABLE_ENTRY_POINT    *EntryPointStructure;
-  
+
   //
   // Get SMBIOS table from EFI configuration table
   //
@@ -704,7 +704,7 @@ InstallSmbiosEventCallback (
   if ((EFI_ERROR (Status)) || (mRuntimeSmbiosEntryPoint == NULL)) {
     return;
   }
-  
+
   EntryPointStructure = (SMBIOS_TABLE_ENTRY_POINT *) mRuntimeSmbiosEntryPoint;
 
   //
@@ -728,8 +728,8 @@ InstallSmbiosEventCallback (
     }
     DEBUG ((EFI_D_INFO, "Allocate memory for Smbios Entry Point Structure\n"));
   }
-  
-  if ((mStructureTableAddress != 0) && 
+
+  if ((mStructureTableAddress != 0) &&
       (mStructureTablePages < EFI_SIZE_TO_PAGES ((UINT32)EntryPointStructure->TableLength))) {
     //
     // If original buffer is not enough for the new SMBIOS table, free original buffer and re-allocate
@@ -739,7 +739,7 @@ InstallSmbiosEventCallback (
     mStructureTablePages   = 0;
     DEBUG ((EFI_D_INFO, "Original size is not enough. Re-allocate the memory.\n"));
   }
-  
+
   if (mStructureTableAddress == 0) {
     //
     // Allocate reserved memory below 4GB.
@@ -755,7 +755,7 @@ InstallSmbiosEventCallback (
                     );
     if (EFI_ERROR (Status)) {
       gBS->FreePages (
-        mReserveSmbiosEntryPoint, 
+        mReserveSmbiosEntryPoint,
         EFI_SIZE_TO_PAGES ((UINTN) (EntryPointStructure->EntryPointLength))
         );
       mReserveSmbiosEntryPoint = 0;
@@ -843,7 +843,7 @@ LegacyBiosInstall (
     FreePool (SecureBoot);
     return EFI_SECURITY_VIOLATION;
   }
-  
+
   if (SecureBoot != NULL) {
     FreePool (SecureBoot);
   }
@@ -1047,7 +1047,7 @@ LegacyBiosInstall (
   // Allocate low PMM memory and zero it out
   //
   MemorySize = PcdGet32 (PcdLowPmmMemorySize);
-  ASSERT ((MemorySize & 0xFFF) == 0);  
+  ASSERT ((MemorySize & 0xFFF) == 0);
   Status = AllocateLegacyMemory (
              AllocateMaxAddress,
              EfiBootServicesCode,
@@ -1089,7 +1089,7 @@ LegacyBiosInstall (
   ASSERT ((MemorySize & 0xFFF) == 0);
   //
   // Allocate high PMM Memory under 16 MB
-  //   
+  //
   Status = AllocateLegacyMemory (
              AllocateMaxAddress,
              EfiBootServicesCode,
@@ -1100,19 +1100,19 @@ LegacyBiosInstall (
   if (EFI_ERROR (Status)) {
     //
     // If it fails, allocate high PMM Memory under 4GB
-    //   
+    //
     Status = AllocateLegacyMemory (
                AllocateMaxAddress,
                EfiBootServicesCode,
                0xFFFFFFFF,
                EFI_SIZE_TO_PAGES (MemorySize),
                &MemoryAddress
-               );    
+               );
   }
   if (!EFI_ERROR (Status)) {
     EfiToLegacy16InitTable->HiPmmMemory            = (UINT32) (EFI_PHYSICAL_ADDRESS) (UINTN) MemoryAddress;
     EfiToLegacy16InitTable->HiPmmMemorySizeInBytes = MemorySize;
-  } 
+  }
 
   //
   //  ShutdownAPs();
@@ -1149,7 +1149,7 @@ LegacyBiosInstall (
   // Save EFI value
   //
   Private->ThunkSeg = (UINT16) (EFI_SEGMENT (IntRedirCode));
-  
+
   //
   // Allocate reserved memory for SMBIOS table used in legacy boot if SMBIOS table exists
   //
@@ -1166,7 +1166,7 @@ LegacyBiosInstall (
                   &gEfiSmbiosTableGuid,
                   &InstallSmbiosEvent
                   );
-  ASSERT_EFI_ERROR (Status);  
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Create callback to update status of EndOfDxe, which is needed by NULL
@@ -1193,9 +1193,9 @@ LegacyBiosInstall (
                   &Private->LegacyBios
                   );
   Private->Csm16PciInterfaceVersion = GetPciInterfaceVersion (Private);
-  
-  DEBUG ((EFI_D_INFO, "CSM16 PCI BIOS Interface Version: %02x.%02x\n", 
-          (UINT8) (Private->Csm16PciInterfaceVersion >> 8), 
+
+  DEBUG ((EFI_D_INFO, "CSM16 PCI BIOS Interface Version: %02x.%02x\n",
+          (UINT8) (Private->Csm16PciInterfaceVersion >> 8),
           (UINT8) Private->Csm16PciInterfaceVersion
         ));
   ASSERT (Private->Csm16PciInterfaceVersion != 0);

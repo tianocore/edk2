@@ -1,15 +1,15 @@
 /** @file
   This code produces the Data Hub protocol. It preloads the data hub
   with status information copied in from PEI HOBs.
-  
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -32,7 +32,7 @@ DATA_HUB_INSTANCE mPrivateData;
   @param RawDataSize            Size of Data Log data in bytes
 
   @retval EFI_SUCCESS           If data was logged
-  @retval EFI_OUT_OF_RESOURCES  If data was not logged due to lack of system 
+  @retval EFI_OUT_OF_RESOURCES  If data was not logged due to lack of system
                                 resources.
 **/
 EFI_STATUS
@@ -68,7 +68,7 @@ DataHubLogData (
   //
   RecordSize  = sizeof (EFI_DATA_RECORD_HEADER) + RawDataSize;
   TotalSize   = sizeof (EFI_DATA_ENTRY) + RecordSize;
-  
+
   //
   // First try to get log time at TPL level <= TPL_CALLBACK.
   //
@@ -149,7 +149,7 @@ DataHubLogData (
 }
 
 /**
-  Search the Head doubly linked list for the passed in MTC. Return the 
+  Search the Head doubly linked list for the passed in MTC. Return the
   matching element in Head and the MTC on the next entry.
 
   @param Head             Head of Data Log linked list.
@@ -157,7 +157,7 @@ DataHubLogData (
                           ClassFilter.
   @param PtrCurrentMTC    On IN contians MTC to search for. On OUT contians next
                           MTC in the data log list or zero if at end of the list.
-  
+
   @retval EFI_DATA_LOG_ENTRY  Return pointer to data log data from Head list.
   @retval NULL                If no data record exists.
 
@@ -257,20 +257,20 @@ FindFilterDriverByEvent (
   Get a previously logged data record and the MonotonicCount for the next
   available Record. This allows all records or all records later
   than a give MonotonicCount to be returned. If an optional FilterDriverEvent
-  is passed in with a MonotonicCout of zero return the first record 
-  not yet read by the filter driver. If FilterDriverEvent is NULL and 
+  is passed in with a MonotonicCout of zero return the first record
+  not yet read by the filter driver. If FilterDriverEvent is NULL and
   MonotonicCount is zero return the first data record.
 
   @param This                     Pointer to the EFI_DATA_HUB_PROTOCOL instance.
   @param MonotonicCount           Specifies the Record to return. On input, zero means
                                   return the first record. On output, contains the next
                                   record to available. Zero indicates no more records.
-  @param FilterDriverEvent        If FilterDriverEvent is not passed in a MonotonicCount 
-                                  of zero, it means to return the first data record. 
-                                  If FilterDriverEvent is passed in, then a MonotonicCount 
-                                  of zero means to return the first data not yet read by 
+  @param FilterDriverEvent        If FilterDriverEvent is not passed in a MonotonicCount
+                                  of zero, it means to return the first data record.
+                                  If FilterDriverEvent is passed in, then a MonotonicCount
+                                  of zero means to return the first data not yet read by
                                   FilterDriverEvent.
-  @param Record                   Returns a dynamically allocated memory buffer with a data 
+  @param Record                   Returns a dynamically allocated memory buffer with a data
                                   record that matches MonotonicCount.
 
   @retval EFI_SUCCESS             Data was returned in Record.
@@ -312,7 +312,7 @@ DataHubGetNextRecord (
     }
     return EFI_SUCCESS;
   }
-    
+
   //
   // For events the beginning is the last unread record. This info is
   // stored in the instance structure, so we must look up the event
@@ -332,16 +332,16 @@ DataHubGetNextRecord (
 
   //
   // Retrieve the next record or the first record.
-  //   
-  if (*MonotonicCount != 0 || FilterDriver->GetNextMonotonicCount == 0) { 
+  //
+  if (*MonotonicCount != 0 || FilterDriver->GetNextMonotonicCount == 0) {
     *Record = GetNextDataRecord (&Private->DataListHead, ClassFilter, MonotonicCount);
     if (*Record == NULL) {
       return EFI_NOT_FOUND;
     }
-    
+
     if (*MonotonicCount != 0) {
       //
-      // If this was not the last record then update the count associated with the filter 
+      // If this was not the last record then update the count associated with the filter
       //
       FilterDriver->GetNextMonotonicCount = *MonotonicCount;
     } else {
@@ -352,13 +352,13 @@ DataHubGetNextRecord (
     }
     return EFI_SUCCESS;
   }
-  
+
   //
-  // This is a request to read the first record that has not been read yet.  
+  // This is a request to read the first record that has not been read yet.
   // Set MonotoicCount to the last record successfuly read
   //
   *MonotonicCount = FilterDriver->GetNextMonotonicCount;
-  
+
   //
   // Retrieve the last record successfuly read again, but do not return it since
   // it has already been returned before.
@@ -367,51 +367,51 @@ DataHubGetNextRecord (
   if (*Record == NULL) {
     return EFI_NOT_FOUND;
   }
-  
+
   if (*MonotonicCount != 0) {
     //
-    // Update the count associated with the filter 
+    // Update the count associated with the filter
     //
     FilterDriver->GetNextMonotonicCount = *MonotonicCount;
 
     //
-    // Retrieve the record after the last record successfuly read 
-    //  
+    // Retrieve the record after the last record successfuly read
+    //
     *Record = GetNextDataRecord (&Private->DataListHead, ClassFilter, MonotonicCount);
     if (*Record == NULL) {
       return EFI_NOT_FOUND;
     }
   }
-  
+
   return EFI_SUCCESS;
 }
 
 /**
-  This function registers the data hub filter driver that is represented 
+  This function registers the data hub filter driver that is represented
   by FilterEvent. Only one instance of each FilterEvent can be registered.
-  After the FilterEvent is registered, it will be signaled so it can sync 
-  with data records that have been recorded prior to the FilterEvent being 
+  After the FilterEvent is registered, it will be signaled so it can sync
+  with data records that have been recorded prior to the FilterEvent being
   registered.
-    
+
   @param This                   Pointer to  The EFI_DATA_HUB_PROTOCOL instance.
-  @param FilterEvent            The EFI_EVENT to signal whenever data that matches 
+  @param FilterEvent            The EFI_EVENT to signal whenever data that matches
                                 FilterClass is logged in the system.
-  @param FilterTpl              The maximum EFI_TPL at which FilterEvent can be 
-                                signaled. It is strongly recommended that you use the 
+  @param FilterTpl              The maximum EFI_TPL at which FilterEvent can be
+                                signaled. It is strongly recommended that you use the
                                 lowest EFI_TPL possible.
-  @param FilterClass            FilterEvent will be signaled whenever a bit in 
-                                EFI_DATA_RECORD_HEADER.DataRecordClass is also set in 
-                                FilterClass. If FilterClass is zero, no class-based 
+  @param FilterClass            FilterEvent will be signaled whenever a bit in
+                                EFI_DATA_RECORD_HEADER.DataRecordClass is also set in
+                                FilterClass. If FilterClass is zero, no class-based
                                 filtering will be performed.
-  @param FilterDataRecordGuid   FilterEvent will be signaled whenever FilterDataRecordGuid 
-                                matches EFI_DATA_RECORD_HEADER.DataRecordGuid. If 
-                                FilterDataRecordGuid is NULL, then no GUID-based filtering 
-                                will be performed.              
+  @param FilterDataRecordGuid   FilterEvent will be signaled whenever FilterDataRecordGuid
+                                matches EFI_DATA_RECORD_HEADER.DataRecordGuid. If
+                                FilterDataRecordGuid is NULL, then no GUID-based filtering
+                                will be performed.
 
   @retval EFI_SUCCESS           The filter driver event was registered.
-  @retval EFI_ALREADY_STARTED   FilterEvent was previously registered and cannot be 
+  @retval EFI_ALREADY_STARTED   FilterEvent was previously registered and cannot be
                                 registered again.
-  @retval EFI_OUT_OF_RESOURCES  The filter driver event was not registered due to lack of 
+  @retval EFI_OUT_OF_RESOURCES  The filter driver event was not registered due to lack of
                                 system resources.
 
 **/
@@ -480,12 +480,12 @@ DataHubRegisterFilterDriver (
 }
 
 /**
-  Remove a Filter Driver, so it no longer gets called when data 
+  Remove a Filter Driver, so it no longer gets called when data
    information is logged.
 
   @param This           Protocol instance structure
 
-  @param FilterEvent    Event that represents a filter driver that is to be 
+  @param FilterEvent    Event that represents a filter driver that is to be
                         Unregistered.
 
   @retval EFI_SUCCESS   If FilterEvent was unregistered
@@ -526,7 +526,7 @@ DataHubUnregisterFilterDriver (
 
 
 /**
-  Driver's Entry point routine that install Driver to produce Data Hub protocol. 
+  Driver's Entry point routine that install Driver to produce Data Hub protocol.
 
   @param ImageHandle    Module's image handle
   @param SystemTable    Pointer of EFI_SYSTEM_TABLE

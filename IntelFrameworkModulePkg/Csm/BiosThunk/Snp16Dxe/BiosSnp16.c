@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -42,9 +42,9 @@ BOOLEAN     mCachedInt1A = FALSE;
 
   @param SimpleNetworkDevice A pointer to EFI_SIMPLE_NETWORK_DEV data structure.
   @param Ax                  PCI address of Undi device.
-  
-  @retval EFI_DEVICE_ERROR Fail to start 16 bit UNDI ROM. 
-  @retval Others           Status of start 16 bit UNDI ROM. 
+
+  @retval EFI_DEVICE_ERROR Fail to start 16 bit UNDI ROM.
+  @retval Others           Status of start 16 bit UNDI ROM.
 **/
 EFI_STATUS
 Undi16SimpleNetworkStartUndi (
@@ -56,9 +56,9 @@ Undi16SimpleNetworkStartUndi (
   Start the UNDI interface
 
   @param SimpleNetworkDevice A pointer to EFI_SIMPLE_NETWORK_DEV data structure.
-  
-  @retval EFI_DEVICE_ERROR Fail to start 16 bit UNDI ROM. 
-  @retval Others           Status of start 16 bit UNDI ROM. 
+
+  @retval EFI_DEVICE_ERROR Fail to start 16 bit UNDI ROM.
+  @retval Others           Status of start 16 bit UNDI ROM.
 **/
 EFI_STATUS
 Undi16SimpleNetworkStopUndi (
@@ -69,9 +69,9 @@ Undi16SimpleNetworkStopUndi (
   Stop the UNDI interface
 
   @param SimpleNetworkDevice A pointer to EFI_SIMPLE_NETWORK_DEV data structure.
-  
-  @retval EFI_DEVICE_ERROR Fail to stop 16 bit UNDI ROM. 
-  @retval Others           Status of stop 16 bit UNDI ROM. 
+
+  @retval EFI_DEVICE_ERROR Fail to stop 16 bit UNDI ROM.
+  @retval Others           Status of stop 16 bit UNDI ROM.
 **/
 EFI_STATUS
 Undi16SimpleNetworkCleanupUndi (
@@ -82,9 +82,9 @@ Undi16SimpleNetworkCleanupUndi (
   Get runtime information for Undi network interface
 
   @param This A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  
-  @retval EFI_SUCCESS Sucess operation. 
-  @retval Others      Fail to get runtime information for Undi network interface. 
+
+  @retval EFI_SUCCESS Sucess operation.
+  @retval Others      Fail to get runtime information for Undi network interface.
 **/
 EFI_STATUS
 Undi16SimpleNetworkGetInformation (
@@ -95,8 +95,8 @@ Undi16SimpleNetworkGetInformation (
   Get NIC type
 
   @param This A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  
-  @retval EFI_SUCCESS Sucess operation. 
+
+  @retval EFI_SUCCESS Sucess operation.
   @retval Others      Fail to get NIC type.
 **/
 EFI_STATUS
@@ -108,8 +108,8 @@ Undi16SimpleNetworkGetNicType (
   Get NDIS information
 
   @param This A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  
-  @retval EFI_SUCCESS Sucess operation. 
+
+  @retval EFI_SUCCESS Sucess operation.
   @retval Others      Fail to get NDIS information.
 **/
 EFI_STATUS
@@ -119,11 +119,11 @@ Undi16SimpleNetworkGetNdisInfo (
 
 /**
   Signal handlers for ExitBootServices event.
-  
-  Clean up any Real-mode UNDI residue from the system 
-   
+
+  Clean up any Real-mode UNDI residue from the system
+
   @param Event      ExitBootServices event
-  @param Context 
+  @param Context
 **/
 VOID
 EFIAPI
@@ -136,7 +136,7 @@ Undi16SimpleNetworkEvent (
   Loads the undi driver.
 
   @param SimpleNetworkDevice A pointer to EFI_SIMPLE_NETWORK_DEV data structure.
-  
+
   @retval   EFI_SUCCESS   - Successfully loads undi driver.
   @retval   EFI_NOT_FOUND - Doesn't find undi driver or undi driver load failure.
 **/
@@ -149,8 +149,8 @@ Undi16SimpleNetworkLoadUndi (
   Unload 16 bit UNDI Option ROM from memory
 
   @param SimpleNetworkDevice A pointer to EFI_SIMPLE_NETWORK_DEV data structure.
-  
-  @return EFI_STATUS 
+
+  @return EFI_STATUS
 **/
 EFI_STATUS
 Undi16SimpleNetworkUnloadUndi (
@@ -162,8 +162,8 @@ Undi16SimpleNetworkUnloadUndi (
 
   @param ImageHandle Handle that identifies the loaded image.
   @param SystemTable System Table for this image.
-  
-  @return EFI_STATUS Return status from EfiLibInstallAllDriverProtocols. 
+
+  @return EFI_STATUS Return status from EfiLibInstallAllDriverProtocols.
 **/
 EFI_STATUS
 EFIAPI
@@ -191,7 +191,7 @@ BiosSnp16DriverEntryPoint (
   @param This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param Controller           The handle of the controller to test.
   @param RemainingDevicePath  A pointer to the remaining portion of a device path.
-  
+
   @retval EFI_SUCCESS    The driver supports given controller.
   @retval EFI_UNSUPPORT  The driver doesn't support given controller.
   @retval Other          Other errors prevent driver finishing to test
@@ -286,8 +286,8 @@ Done:
   @param This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param Controller           The handle of the controller to test.
   @param RemainingDevicePath  A pointer to the remaining portion of a device path.
-  
-  @retval  EFI_SUCCESS          - The device was started.   
+
+  @retval  EFI_SUCCESS          - The device was started.
   @retval  EFI_DEVICE_ERROR     - The device could not be started due to a device error.
   @retval  EFI_OUT_OF_RESOURCES - The request could not be completed due to a lack of resources.
 **/
@@ -506,12 +506,12 @@ BiosSnp16DriverBindingStart (
   // Create an event to be signalled when Legacy Boot occurs to clean up the IVT
   //
   Status = EfiCreateEventLegacyBootEx(
-             TPL_NOTIFY, 
-             Undi16SimpleNetworkEvent, 
-             NULL, 
+             TPL_NOTIFY,
+             Undi16SimpleNetworkEvent,
+             NULL,
              &SimpleNetworkDevice->LegacyBootEvent
              );
-  
+
   if (EFI_ERROR(Status)) {
     DEBUG ((DEBUG_ERROR,"ERROR : Could not create event.  Status = %r\n",Status));
     goto Done;
@@ -750,7 +750,7 @@ Done:
       if (SimpleNetworkDevice->LegacyBootEvent != NULL) {
         gBS->CloseEvent (SimpleNetworkDevice->LegacyBootEvent);
       }
-      
+
       if (SimpleNetworkDevice->EfiBootEvent != NULL) {
         gBS->CloseEvent (SimpleNetworkDevice->EfiBootEvent);
       }
@@ -775,7 +775,7 @@ Done:
       }
 
       gBS->FreePool (SimpleNetworkDevice);
-      
+
       //
       //  Only restore the vector if it was cached.
       //
@@ -819,7 +819,7 @@ Done:
     if (Status != EFI_OUT_OF_RESOURCES) {
       Status = EFI_DEVICE_ERROR;
     }
-  }  
+  }
   return Status;
 }
 
@@ -831,7 +831,7 @@ Done:
   @param NumberOfChildren   The number of child device handles in ChildHandleBuffer.
   @param ChildHandleBuffer  An array of child handles to be freed. May be NULL if
                             NumberOfChildren is 0.
-  
+
   @retval  EFI_SUCCESS      - The device was stopped.
   @retval  EFI_DEVICE_ERROR - The device could not be stopped due to a device error.
 **/
@@ -899,7 +899,7 @@ BiosSnp16DriverBindingStop (
                     This->DriverBindingHandle,
                     Controller
                     );
-                    
+
     if (EFI_ERROR (Status)) {
       Status = EFI_DEVICE_ERROR;
     }
@@ -973,7 +973,7 @@ BiosSnp16DriverBindingStop (
         if (SimpleNetworkDevice->LegacyBootEvent != NULL) {
           gBS->CloseEvent (SimpleNetworkDevice->LegacyBootEvent);
         }
-      
+
         if (SimpleNetworkDevice->EfiBootEvent != NULL) {
           gBS->CloseEvent (SimpleNetworkDevice->EfiBootEvent);
         }
@@ -1021,7 +1021,7 @@ BiosSnp16DriverBindingStop (
   Judge whether transmit FIFO is full.
 
   @param Fifo Point to trasmit FIFO structure.
-  
+
   @return BOOLEAN whether transmit FIFO is full.
 **/
 BOOLEAN
@@ -1040,7 +1040,7 @@ SimpleNetworkTransmitFifoFull (
   Judge whether transmit FIFO is empty.
 
   @param Fifo Point to trasmit FIFO structure.
-  
+
   @return BOOLEAN whether transmit FIFO is empty.
 **/
 BOOLEAN
@@ -1061,9 +1061,9 @@ SimpleNetworkTransmitFifoEmpty (
 
   @param Fifo Point to trasmit FIFO structure.
   @param Data The data point want to be added.
-  
-  @retval EFI_OUT_OF_RESOURCES  FIFO is full 
-  @retval EFI_SUCCESS           Success operation. 
+
+  @retval EFI_OUT_OF_RESOURCES  FIFO is full
+  @retval EFI_SUCCESS           Success operation.
 **/
 EFI_STATUS
 SimpleNetworkTransmitFifoAdd (
@@ -1085,9 +1085,9 @@ SimpleNetworkTransmitFifoAdd (
 
   @param Fifo Point to trasmit FIFO structure.
   @param Data On return, point to the data point want to be got and removed.
-  
-  @retval EFI_OUT_OF_RESOURCES network transmit buffer is empty. 
-  @retval EFI_SUCCESS           Success operation. 
+
+  @retval EFI_OUT_OF_RESOURCES network transmit buffer is empty.
+  @retval EFI_SUCCESS           Success operation.
 **/
 EFI_STATUS
 SimpleNetworkTransmitFifoRemove (
@@ -1108,7 +1108,7 @@ SimpleNetworkTransmitFifoRemove (
   Get recive filter setting according to EFI mask value.
 
   @param ReceiveFilterSetting  filter setting EFI mask value.
-  
+
   @return UINT16 Undi filter setting value.
 **/
 UINT16
@@ -1149,11 +1149,11 @@ Undi16GetPacketFilterSetting (
 
 /**
   Get filter setting from multi cast buffer .
-   
+
   @param Mode           Point to mode structure.
-  @param McastBuffer    The multi cast buffer 
+  @param McastBuffer    The multi cast buffer
   @param HwAddressSize  Size of filter value.
-  
+
 **/
 VOID
 Undi16GetMCastFilters (
@@ -1183,7 +1183,7 @@ Undi16GetMCastFilters (
   Loads the undi driver.
 
   @param SimpleNetworkDevice A pointer to EFI_SIMPLE_NETWORK_DEV data structure.
-  
+
   @retval   EFI_SUCCESS   - Successfully loads undi driver.
   @retval   EFI_NOT_FOUND - Doesn't find undi driver or undi driver load failure.
 **/
@@ -1198,11 +1198,11 @@ Undi16SimpleNetworkLoadUndi (
   PCI_EXPANSION_ROM_HEADER  *PciExpansionRomHeader;
   PCI_DATA_STRUCTURE        *PciDataStructure;
   PCI_TYPE00                Pci;
-  
+
   if (!mCachedInt1A) {
     Status = CacheVectorAddress (0x1A);
     if (!EFI_ERROR (Status)) {
-      mCachedInt1A = TRUE;    
+      mCachedInt1A = TRUE;
     }
   }
 
@@ -1227,8 +1227,8 @@ Undi16SimpleNetworkLoadUndi (
     DEBUG ((DEBUG_INIT, "Option ROM found at %X\n", RomAddress));
 
     //
-    // If the pointer to the PCI Data Structure is invalid, no further images can be located. 
-    // The PCI Data Structure must be DWORD aligned. 
+    // If the pointer to the PCI Data Structure is invalid, no further images can be located.
+    // The PCI Data Structure must be DWORD aligned.
     //
     if (PciExpansionRomHeader->PcirOffset == 0 ||
         (PciExpansionRomHeader->PcirOffset & 3) != 0 ||
@@ -1249,7 +1249,7 @@ Undi16SimpleNetworkLoadUndi (
     }
 
     DEBUG (
-        (DEBUG_INIT, 
+        (DEBUG_INIT,
          "PCI device with matchinng VendorId and DeviceId (%d,%d)\n",
          (UINTN) PciDataStructure->VendorId,
          (UINTN) PciDataStructure->DeviceId)
@@ -1260,7 +1260,7 @@ Undi16SimpleNetworkLoadUndi (
     if (!EFI_ERROR (Status)) {
       return EFI_SUCCESS;
     }
-    
+
     //
     // Free resources allocated in LaunchBaseCode
     //
@@ -1274,8 +1274,8 @@ Undi16SimpleNetworkLoadUndi (
   Unload 16 bit UNDI Option ROM from memory
 
   @param SimpleNetworkDevice A pointer to EFI_SIMPLE_NETWORK_DEV data structure.
-  
-  @return EFI_STATUS 
+
+  @return EFI_STATUS
 **/
 EFI_STATUS
 Undi16SimpleNetworkUnloadUndi (
@@ -1331,9 +1331,9 @@ Undi16SimpleNetworkUnloadUndi (
 
   @param SimpleNetworkDevice A pointer to EFI_SIMPLE_NETWORK_DEV data structure.
   @param Ax                  PCI address of Undi device.
-  
-  @retval EFI_DEVICE_ERROR Fail to start 16 bit UNDI ROM. 
-  @retval Others           Status of start 16 bit UNDI ROM. 
+
+  @retval EFI_DEVICE_ERROR Fail to start 16 bit UNDI ROM.
+  @retval Others           Status of start 16 bit UNDI ROM.
 **/
 EFI_STATUS
 Undi16SimpleNetworkStartUndi (
@@ -1376,9 +1376,9 @@ Undi16SimpleNetworkStartUndi (
   Stop the UNDI interface
 
   @param SimpleNetworkDevice A pointer to EFI_SIMPLE_NETWORK_DEV data structure.
-  
-  @retval EFI_DEVICE_ERROR Fail to stop 16 bit UNDI ROM. 
-  @retval Others           Status of stop 16 bit UNDI ROM. 
+
+  @retval EFI_DEVICE_ERROR Fail to stop 16 bit UNDI ROM.
+  @retval Others           Status of stop 16 bit UNDI ROM.
 **/
 EFI_STATUS
 Undi16SimpleNetworkStopUndi (
@@ -1411,9 +1411,9 @@ Undi16SimpleNetworkStopUndi (
   Cleanup Unid network interface
 
   @param SimpleNetworkDevice A pointer to EFI_SIMPLE_NETWORK_DEV data structure.
-  
-  @retval EFI_DEVICE_ERROR Fail to cleanup 16 bit UNDI ROM. 
-  @retval Others           Status of cleanup 16 bit UNDI ROM. 
+
+  @retval EFI_DEVICE_ERROR Fail to cleanup 16 bit UNDI ROM.
+  @retval Others           Status of cleanup 16 bit UNDI ROM.
 **/
 EFI_STATUS
 Undi16SimpleNetworkCleanupUndi (
@@ -1446,9 +1446,9 @@ Undi16SimpleNetworkCleanupUndi (
   Get runtime information for Undi network interface
 
   @param This A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  
-  @retval EFI_SUCCESS Sucess operation. 
-  @retval Others      Fail to get runtime information for Undi network interface. 
+
+  @retval EFI_SUCCESS Sucess operation.
+  @retval Others      Fail to get runtime information for Undi network interface.
 **/
 EFI_STATUS
 Undi16SimpleNetworkGetInformation (
@@ -1577,8 +1577,8 @@ Undi16SimpleNetworkGetInformation (
   Get NIC type
 
   @param This A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  
-  @retval EFI_SUCCESS Sucess operation. 
+
+  @retval EFI_SUCCESS Sucess operation.
   @retval Others      Fail to get NIC type.
 **/
 EFI_STATUS
@@ -1628,8 +1628,8 @@ Undi16SimpleNetworkGetNicType (
   Get NDIS information
 
   @param This A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  
-  @retval EFI_SUCCESS Sucess operation. 
+
+  @retval EFI_SUCCESS Sucess operation.
   @retval Others      Fail to get NDIS information.
 **/
 EFI_STATUS
@@ -1687,9 +1687,9 @@ Undi16SimpleNetworkGetNdisInfo (
   @param Frame              The frame buffer to process network interrupt.
   @param ProtType           The type network transmit protocol
   @param PktType            The type of package.
-  
-  @retval EFI_DEVICE_ERROR  Fail to execute 16 bit ROM's ISR, or status is invalid. 
-  @retval EFI_SUCCESS       Success operation. 
+
+  @retval EFI_DEVICE_ERROR  Fail to execute 16 bit ROM's ISR, or status is invalid.
+  @retval EFI_SUCCESS       Success operation.
 **/
 EFI_STATUS
 Undi16SimpleNetworkIsr (
@@ -1902,7 +1902,7 @@ Undi16SimpleNetworkIsr (
   Call 16 bit UNDI ROM to start the network interface
 
   @param This       A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  
+
   @retval EFI_DEVICE_ERROR Network interface has not be initialized.
   @retval EFI_DEVICE_ERROR Fail to execute 16 bit ROM call.
   @retval EFI_SUCESS       Success operation.
@@ -1976,7 +1976,7 @@ Undi16SimpleNetworkStart (
   Call 16 bit UNDI ROM to stop the network interface
 
   @param This       A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  
+
   @retval EFI_DEVICE_ERROR Network interface has not be initialized.
   @retval EFI_DEVICE_ERROR Fail to execute 16 bit ROM call.
   @retval EFI_SUCESS       Success operation.
@@ -2024,12 +2024,12 @@ Undi16SimpleNetworkStop (
 // Initialize()
 //
 /**
-  Initialize network interface 
+  Initialize network interface
 
   @param This                 A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
   @param ExtraRxBufferSize    The size of extra request receive buffer.
   @param ExtraTxBufferSize    The size of extra request transmit buffer.
- 
+
   @retval EFI_DEVICE_ERROR Fail to execute 16 bit ROM call.
   @retval EFI_SUCESS       Success operation.
 **/
@@ -2147,7 +2147,7 @@ Undi16SimpleNetworkInitialize (
 
   @param This                 A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
   @param ExtendedVerification Need extended verfication.
-  
+
   @retval EFI_INVALID_PARAMETER Invalid This parameter.
   @retval EFI_DEVICE_ERROR      Network device has not been initialized.
   @retval EFI_NOT_STARTED       Network device has been stopped.
@@ -2228,7 +2228,7 @@ Undi16SimpleNetworkReset (
   Shutdown network interface.
 
   @param This                 A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
-  
+
   @retval EFI_INVALID_PARAMETER Invalid This parameter.
   @retval EFI_DEVICE_ERROR      Network device has not been initialized.
   @retval EFI_NOT_STARTED       Network device has been stopped.
@@ -2341,7 +2341,7 @@ Undi16SimpleNetworkShutdown (
   @param ResetMCastFilter     Whether reset multi cast filter or not
   @param MCastFilterCnt       Count of mutli cast filter for different MAC address
   @param MCastFilter          Buffer for mustli cast filter for different MAC address.
-  
+
   @retval EFI_INVALID_PARAMETER Invalid This parameter.
   @retval EFI_DEVICE_ERROR      Network device has not been initialized.
   @retval EFI_NOT_STARTED       Network device has been stopped.
@@ -2481,7 +2481,7 @@ Undi16SimpleNetworkReceiveFilters (
         &SimpleNetworkDevice->SimpleNetworkMode.MCastFilter[Index],
         &MCastFilter[Index],
         sizeof (EFI_MAC_ADDRESS)
-        );      
+        );
     }
   }
   //
@@ -2498,7 +2498,7 @@ Undi16SimpleNetworkReceiveFilters (
   @param This                 A pointer to EFI_SIMPLE_NETWORK_PROTOCOL structure.
   @param Reset                Whether reset station MAC address to permanent address
   @param New                  A pointer to New address
-  
+
   @retval EFI_INVALID_PARAMETER Invalid This parameter.
   @retval EFI_DEVICE_ERROR      Network device has not been initialized.
   @retval EFI_NOT_STARTED       Network device has been stopped.
@@ -2852,11 +2852,11 @@ Undi16SimpleNetworkStatistics (
   @param IPv6                 IPv6 or IPv4
   @param IP                   A pointer to given Ip address.
   @param MAC                  On return, translated MAC address.
-  
+
   @retval EFI_INVALID_PARAMETER Invalid This parameter.
   @retval EFI_INVALID_PARAMETER Invalid IP address.
   @retval EFI_INVALID_PARAMETER Invalid return buffer for holding MAC address.
-  @retval EFI_UNSUPPORTED       Do not support IPv6 
+  @retval EFI_UNSUPPORTED       Do not support IPv6
   @retval EFI_DEVICE_ERROR      Network device has not been initialized.
   @retval EFI_NOT_STARTED       Network device has been stopped.
   @retval EFI_DEVICE_ERROR      Invalid status for network device
@@ -2937,7 +2937,7 @@ Undi16SimpleNetworkMCastIpToMac (
 // NvData()
 //
 /**
-  Performs read and write operations on the NVRAM device attached to a 
+  Performs read and write operations on the NVRAM device attached to a
   network interface.
 
   @param  This       The protocol instance pointer.
@@ -2972,7 +2972,7 @@ Undi16SimpleNetworkNvData (
 // GetStatus()
 //
 /**
-  Reads the current interrupt status and recycled transmit buffer status from 
+  Reads the current interrupt status and recycled transmit buffer status from
   a network interface.
 
   @param  This            The protocol instance pointer.
@@ -3089,7 +3089,7 @@ Undi16SimpleNetworkGetStatus (
 
   @retval EFI_SUCCESS           The packet was placed on the transmit queue.
   @retval EFI_NOT_STARTED       The network interface has not been started.
-  @retval EFI_NOT_READY         The network interface is too busy to accept this transmit request.                      
+  @retval EFI_NOT_READY         The network interface is too busy to accept this transmit request.
   @retval EFI_BUFFER_TOO_SMALL  The BufferSize parameter is too small.
   @retval EFI_INVALID_PARAMETER One or more of the parameters has an unsupported value.
   @retval EFI_DEVICE_ERROR      The command could not be sent to the network interface.
@@ -3257,7 +3257,7 @@ Undi16SimpleNetworkTransmit (
 
 /**
   Receives a packet from a network interface.
-  
+
   @param  This       The protocol instance pointer.
   @param  HeaderSize The size, in bytes, of the media header received on the network
                      interface. If this parameter is NULL, then the media header size
@@ -3377,7 +3377,7 @@ Undi16SimpleNetworkReceive (
 
   @param Event      Event used with WaitForEvent() to wait for a packet to be received.
   @param Context    Event Context
-  
+
 **/
 VOID
 EFIAPI
@@ -3401,7 +3401,7 @@ Undi16SimpleNetworkWaitForPacket (
   Check whether packet is ready for receive.
 
   @param This The protocol instance pointer.
-  
+
   @retval  EFI_SUCCESS           Receive data is ready.
   @retval  EFI_NOT_STARTED       The network interface has not been started.
   @retval  EFI_NOT_READY         The network interface is too busy to accept this transmit
@@ -3466,11 +3466,11 @@ Undi16SimpleNetworkCheckForPacket (
 
 /**
   Signal handlers for ExitBootServices event.
-  
-  Clean up any Real-mode UNDI residue from the system 
-   
+
+  Clean up any Real-mode UNDI residue from the system
+
   @param Event      ExitBootServices event
-  @param Context 
+  @param Context
 **/
 VOID
 EFIAPI
@@ -3494,7 +3494,7 @@ Undi16SimpleNetworkEvent (
 
   @param NumPages     The number pages want to be allocated.
   @param Buffer       On return, allocated buffer.
-  
+
   @return Status of allocating pages.
 **/
 EFI_STATUS

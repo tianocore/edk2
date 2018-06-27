@@ -1,8 +1,8 @@
 /** @file
-  This is an implementation of the ACPI Support protocol.  This is defined in 
+  This is an implementation of the ACPI Support protocol.  This is defined in
   the Tiano ACPI External Product Specification, revision 0.3.6.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -26,14 +26,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 EFI_HANDLE    mHandle = NULL;
 
 /**
-  Entry point of the ACPI support driver. This function creates and initializes an instance of the ACPI Support 
+  Entry point of the ACPI support driver. This function creates and initializes an instance of the ACPI Support
   Protocol and installs it on a new handle.
 
   @param ImageHandle   A handle for the image that is initializing this driver
-  @param SystemTable   A pointer to the EFI system table        
+  @param SystemTable   A pointer to the EFI system table
 
   @retval EFI_SUCCESS              Driver initialized successfully
-  @retval EFI_LOAD_ERROR           Failed to Initialize or has been loaded 
+  @retval EFI_LOAD_ERROR           Failed to Initialize or has been loaded
   @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources
 **/
 EFI_STATUS
@@ -85,7 +85,7 @@ InstallAcpiSupport (
                     NULL
                     );
     ASSERT_EFI_ERROR (Status);
-  }  
+  }
 
   return Status;
 }

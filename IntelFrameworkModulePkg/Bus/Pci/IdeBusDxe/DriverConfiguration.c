@@ -1,15 +1,15 @@
 /** @file
-  Implementation of UEFI Driver Configuration Protocol for IDE bus driver which 
+  Implementation of UEFI Driver Configuration Protocol for IDE bus driver which
   provides ability to set IDE bus controller specific options.
-  
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -80,7 +80,7 @@ GetResponse (
 }
 
 /**
-  Allows the user to set controller specific options for a controller that a 
+  Allows the user to set controller specific options for a controller that a
   driver is currently managing.
 
   @param  This              A pointer to the EFI_DRIVER_CONFIGURATION_ PROTOCOL instance.
@@ -91,26 +91,26 @@ GetResponse (
                             that wish to set options for the bus controller.
                             It will not be NULL for a bus driver that wishes to set
                             options for one of its child controllers.
-  @param  Language          A pointer to a three character ISO 639-2 language identifier. 
-                            This is the language of the user interface that should be presented 
-                            to the user, and it must match one of the languages specified in 
+  @param  Language          A pointer to a three character ISO 639-2 language identifier.
+                            This is the language of the user interface that should be presented
+                            to the user, and it must match one of the languages specified in
                             SupportedLanguages. The number of languages supported by a driver is up to
                             the driver writer.
-  @param  ActionRequired    A pointer to the action that the calling agent is required 
+  @param  ActionRequired    A pointer to the action that the calling agent is required
                             to perform when this function returns.
-  
 
-  @retval  EFI_SUCCESS           The driver specified by This successfully set the configuration 
+
+  @retval  EFI_SUCCESS           The driver specified by This successfully set the configuration
                                  options for the controller specified by ControllerHandle..
   @retval  EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
   @retval  EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid EFI_HANDLE.
   @retval  EFI_INVALID_PARAMETER ActionRequired is NULL.
-  @retval  EFI_UNSUPPORTED       The driver specified by This does not support setting configuration options for 
+  @retval  EFI_UNSUPPORTED       The driver specified by This does not support setting configuration options for
                                  the controller specified by ControllerHandle and ChildHandle.
   @retval  EFI_UNSUPPORTED       The driver specified by This does not support the language specified by Language.
-  @retval  EFI_DEVICE_ERROR      A device error occurred while attempt to set the configuration options for the 
+  @retval  EFI_DEVICE_ERROR      A device error occurred while attempt to set the configuration options for the
                                  controller specified by ControllerHandle and ChildHandle.
-  @retval  EFI_OUT_RESOURCES     There are not enough resources available to set the configuration options for the 
+  @retval  EFI_OUT_RESOURCES     There are not enough resources available to set the configuration options for the
                                  controller specified by ControllerHandle and ChildHandle
 **/
 EFI_STATUS
@@ -182,20 +182,20 @@ IDEBusDriverConfigurationSetOptions (
   Tests to see if a controller's current configuration options are valid.
 
   @param  This             A pointer to the EFI_DRIVER_CONFIGURATION_PROTOCOL instance.
-  @param  ControllerHandle The handle of the controller to test if it's current configuration options 
+  @param  ControllerHandle The handle of the controller to test if it's current configuration options
                            are valid.
-  @param  ChildHandle      The handle of the child controller to test if it's current configuration 
-                           options are valid.  This is an optional parameter that may be NULL. It will 
+  @param  ChildHandle      The handle of the child controller to test if it's current configuration
+                           options are valid.  This is an optional parameter that may be NULL. It will
                            be NULL for device drivers.  It will also be NULL for a bus drivers that
-                           wish to test the configuration options for the bus controller. It will 
-                           not be NULL for a bus driver that wishes to test configuration options for 
+                           wish to test the configuration options for the bus controller. It will
+                           not be NULL for a bus driver that wishes to test configuration options for
                            one of its child controllers.
   @retval  EFI_SUCCESS           The controller specified by ControllerHandle and ChildHandle that is being
                                  managed by the driver specified by This has a valid set of  configuration
                                  options.
   @retval  EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
   @retval  EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid EFI_HANDLE.
-  @retval  EFI_UNSUPPORTED       The driver specified by This is not currently  managing the controller 
+  @retval  EFI_UNSUPPORTED       The driver specified by This is not currently  managing the controller
                                  specified by ControllerHandle and ChildHandle.
   @retval  EFI_DEVICE_ERROR      The controller specified by ControllerHandle and ChildHandle that is being
                                  managed by the driver specified by This has an invalid set of configuration
@@ -236,31 +236,31 @@ IDEBusDriverConfigurationOptionsValid (
 
   @param  This             A pointer to the EFI_DRIVER_CONFIGURATION_ PROTOCOL instance.
   @param  ControllerHandle The handle of the controller to force default configuration options on.
-  @param  ChildHandle      The handle of the child controller to force default configuration 
-                           options on  This is an optional parameter that may be NULL.  It 
-                           will be NULL for device drivers. It will also be NULL for a bus 
+  @param  ChildHandle      The handle of the child controller to force default configuration
+                           options on  This is an optional parameter that may be NULL.  It
+                           will be NULL for device drivers. It will also be NULL for a bus
                            drivers that wish to force default configuration options for the bus
                            controller.  It will not be NULL for a bus driver that wishes to force
                            default configuration options for one of its child controllers.
-  @param  DefaultType      The type of default configuration options to force on the controller 
-                           specified by ControllerHandle and ChildHandle. 
-  @param  ActionRequired   A pointer to the action that the calling agent is required to perform 
+  @param  DefaultType      The type of default configuration options to force on the controller
+                           specified by ControllerHandle and ChildHandle.
+  @param  ActionRequired   A pointer to the action that the calling agent is required to perform
                            when this function returns.
 
-  @retval  EFI_SUCCESS           The driver specified by This successfully forced the 
-                                 default configuration options on the controller specified by 
+  @retval  EFI_SUCCESS           The driver specified by This successfully forced the
+                                 default configuration options on the controller specified by
                                  ControllerHandle and ChildHandle.
   @retval  EFI_INVALID_PARAMETER ControllerHandle is not a valid EFI_HANDLE.
   @retval  EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid EFI_HANDLE.
   @retval  EFI_INVALID_PARAMETER ActionRequired is NULL.
-  @retval  EFI_UNSUPPORTED       The driver specified by This does not support forcing the default 
+  @retval  EFI_UNSUPPORTED       The driver specified by This does not support forcing the default
                                  configuration options on the controller specified by ControllerHandle
                                  and ChildHandle.
-  @retval  EFI_UNSUPPORTED       The driver specified by This does not support the configuration type 
+  @retval  EFI_UNSUPPORTED       The driver specified by This does not support the configuration type
                                  specified by DefaultType.
-  @retval  EFI_DEVICE_ERROR      A device error occurred while attempt to force the default configuration 
+  @retval  EFI_DEVICE_ERROR      A device error occurred while attempt to force the default configuration
                                  options on the controller specified by  ControllerHandle and ChildHandle.
-  @retval  EFI_OUT_RESOURCES     There are not enough resources available to force the default configuration 
+  @retval  EFI_OUT_RESOURCES     There are not enough resources available to force the default configuration
                                  options on the controller specified by ControllerHandle and ChildHandle.
 **/
 EFI_STATUS

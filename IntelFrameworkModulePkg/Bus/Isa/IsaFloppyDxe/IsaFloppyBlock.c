@@ -1,7 +1,7 @@
-/** @file 
+/** @file
   Implementation of the EFI Block IO Protocol for ISA Floppy driver
-  
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -71,7 +71,7 @@ FddFlushBlocks (
 
 /**
   Common report status code interface.
-  
+
   @param This  Pointer of FDC_BLK_IO_DEV instance
   @param Read  Read or write operation when error occurrs
 **/
@@ -107,7 +107,7 @@ FddReportStatus (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/
@@ -148,7 +148,7 @@ FddReadBlocks (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/
@@ -189,7 +189,7 @@ FddWriteBlocks (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
   @retval EFI_WRITE_PROTECTED   The device can not be written to.
 
@@ -359,9 +359,9 @@ FddReadWriteBlocks (
 
 /**
   Free cache for a floppy disk.
-  
+
   @param FdcDev  A Pointer to FDC_BLK_IO_DEV instance
-  
+
 **/
 VOID
 FdcFreeCache (

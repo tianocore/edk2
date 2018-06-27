@@ -1,7 +1,7 @@
 /** @file
   Routines that use BIOS to support INT 13 devices.
 
-Copyright (c) 1999 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -130,7 +130,7 @@ BiosInitBlockIo (
   @param  Drive          Legacy drive.
 
   @return  Result of device parameter retrieval.
- 
+
 **/
 UINTN
 Int13GetDeviceParameters (
@@ -185,7 +185,7 @@ Int13GetDeviceParameters (
   @param  Drive          Legacy drive.
 
   @return  Result of this extension.
- 
+
 **/
 UINTN
 Int13Extensions (
@@ -227,7 +227,7 @@ Int13Extensions (
   @param  Drive          Legacy drive.
 
   @return  Result of drive parameter retrieval.
- 
+
 **/
 UINTN
 GetDriveParameters (
@@ -406,7 +406,7 @@ GetDriveParameters (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/
@@ -554,7 +554,7 @@ Edd30BiosReadBlocks (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/
@@ -789,7 +789,7 @@ BiosBlockIoReset (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/
@@ -942,7 +942,7 @@ Edd11BiosReadBlocks (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/
@@ -1103,7 +1103,7 @@ Edd11BiosWriteBlocks (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHANGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/
@@ -1305,7 +1305,7 @@ BiosReadLegacyDrive (
   @retval EFI_NO_MEDIA          There is no media in the device.
   @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
 
 **/

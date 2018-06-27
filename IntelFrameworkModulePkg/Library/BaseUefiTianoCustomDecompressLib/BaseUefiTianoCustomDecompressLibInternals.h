@@ -1,7 +1,7 @@
 /** @file
   Internal data structure and interfaces defintions for UEFI and Tiano Decompress Library.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -115,7 +115,7 @@ GetBits (
 /**
   Creates Huffman Code mapping table according to code length array.
 
-  Creates Huffman Code mapping table for Extra Set, Char&Len Set 
+  Creates Huffman Code mapping table for Extra Set, Char&Len Set
   and Position Set according to code length array.
 
   @param  Sd        The global scratch data
@@ -141,7 +141,7 @@ MakeTable (
   Decodes a position value.
 
   Get a position value according to Position Huffman Table.
-  
+
   @param  Sd the global scratch data
 
   @return The position value decoded.
@@ -177,7 +177,7 @@ ReadPTLen (
 
 /**
   Reads code lengths for Char&Len Set.
-  
+
   Read in and decode the Char&Len Set Code Length Array, then
   generate the Huffman Code mapping table for the Char&Len Set.
 
@@ -191,7 +191,7 @@ ReadCLen (
 
 /**
   Decode a character/length value.
-  
+
   Read one value from mBitBuf, Get one code from mBitBuf. If it is at block boundary, generates
   Huffman code mapping table for Extra Set, Code&Len Set and
   Position Set.

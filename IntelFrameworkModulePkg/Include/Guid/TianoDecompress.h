@@ -1,13 +1,13 @@
 /** @file
   Tiano Custom decompress Guid definition.
-  
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -16,8 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __TIANO_CUSTOM_DECOMPRESS_GUID_H__
 
 ///
-/// The Global ID used to identify a section of an FFS file of type 
-/// EFI_SECTION_GUID_DEFINED, whose contents have been compressed using 
+/// The Global ID used to identify a section of an FFS file of type
+/// EFI_SECTION_GUID_DEFINED, whose contents have been compressed using
 /// Tiano Custom compression.
 ///
 #define TIANO_CUSTOM_DECOMPRESS_GUID  \

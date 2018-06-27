@@ -101,9 +101,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define PROTECTED_MODE_BASE_VECTOR_SLAVE   0x70
 
 //
-// When we call CSM16 functions, some CSM16 use es:[offset + 0xabcd] to get data passed from CSM32, 
-// offset + 0xabcd could overflow which exceeds 0xFFFF which is invalid in real mode. 
-// So this will keep offset as small as possible to avoid offset overflow in real mode. 
+// When we call CSM16 functions, some CSM16 use es:[offset + 0xabcd] to get data passed from CSM32,
+// offset + 0xabcd could overflow which exceeds 0xFFFF which is invalid in real mode.
+// So this will keep offset as small as possible to avoid offset overflow in real mode.
 //
 #define NORMALIZE_EFI_SEGMENT(_Adr)      (UINT16) (((UINTN) (_Adr)) >> 4)
 #define NORMALIZE_EFI_OFFSET(_Adr)       (UINT16) (((UINT16) ((UINTN) (_Adr))) & 0xf)
@@ -544,7 +544,7 @@ extern BOOLEAN mEndOfDxe;
 //
 // Timer 0, Read/Write LSB then MSB, Square wave output, binary count use.
 //
-#define TIMER0_CONTROL_WORD         0x36      
+#define TIMER0_CONTROL_WORD         0x36
 
 #define LEGACY_BIOS_INSTANCE_SIGNATURE  SIGNATURE_32 ('L', 'B', 'I', 'T')
 typedef struct {
@@ -556,16 +556,16 @@ typedef struct {
   EFI_HANDLE                        ImageHandle;
 
   //
-  // CPU Architectural Protocol 
+  // CPU Architectural Protocol
   //
   EFI_CPU_ARCH_PROTOCOL             *Cpu;
 
   //
-  // Timer Architectural Protocol 
+  // Timer Architectural Protocol
   //
   EFI_TIMER_ARCH_PROTOCOL           *Timer;
-  BOOLEAN                           TimerUses8254; 
-  
+  BOOLEAN                           TimerUses8254;
+
   //
   // Protocol to Lock and Unlock 0xc0000 - 0xfffff
   //
@@ -577,7 +577,7 @@ typedef struct {
   // Interrupt control for thunk and PCI IRQ
   //
   EFI_LEGACY_8259_PROTOCOL          *Legacy8259;
-  
+
   //
   // PCI Interrupt PIRQ control
   //
@@ -673,7 +673,7 @@ typedef struct {
   //
   // Indicate that whether GenericLegacyBoot is entered or not
   //
-  BOOLEAN                           LegacyBootEntered;                              
+  BOOLEAN                           LegacyBootEntered;
 
   //
   // CSM16 PCI Interface Version
@@ -1350,7 +1350,7 @@ ShadowAndStartLegacy16 (
 
 /**
   Checks the state of the floppy and if media is inserted.
-  
+
   This routine checks the state of the floppy and if media is inserted.
   There are 3 cases:
   No floppy present         - Set BBS entry to ignore

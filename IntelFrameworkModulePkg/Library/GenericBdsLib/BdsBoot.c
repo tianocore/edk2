@@ -43,12 +43,12 @@ BmEndOfBdsPerfCode (
 
 /**
   The constructor function register UNI strings into imageHandle.
-  
-  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS. 
+
+  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor successfully added string package.
   @retval Other value   The constructor can't add string package.
 
@@ -432,7 +432,7 @@ BdsCreateLegacyBootOption (
                   );
 
   FreePool (Buffer);
-  
+
   Buffer = NULL;
 
   NewBootOrderList = AllocateZeroPool (*BootOrderListSize + sizeof (UINT16));
@@ -593,10 +593,10 @@ BdsDeleteAllInvalidLegacyBootOptions (
         return EFI_OUT_OF_RESOURCES;
       }
     }
-  
+
     //
     // Skip Non-Legacy boot option
-    // 
+    //
     if (!BdsIsLegacyBootOption (BootOptionVar, &BbsEntry, &BbsIndex)) {
       if (BootOptionVar!= NULL) {
         FreePool (BootOptionVar);
@@ -803,7 +803,7 @@ BdsCreateOneLegacyBootOption (
 /**
   Add the legacy boot options from BBS table if they do not exist.
 
-  @retval EFI_SUCCESS          The boot options are added successfully 
+  @retval EFI_SUCCESS          The boot options are added successfully
                                or they are already in boot options.
   @retval EFI_NOT_FOUND        No legacy boot options is found.
   @retval EFI_OUT_OF_RESOURCE  No enough memory.
@@ -953,7 +953,7 @@ BdsFillDevOrderBuf (
   @param BbsTable        The BBS table.
   @param BbsCount        The BBS Count.
 
-  @retval EFI_SUCCES             The buffer is created and the EFI variable named 
+  @retval EFI_SUCCES             The buffer is created and the EFI variable named
                                  VAR_LEGACY_DEV_ORDER and gEfiLegacyDevOrderVariableGuid is
                                  set correctly.
   @retval EFI_OUT_OF_RESOURCES   Memmory or storage is not enough.
@@ -1044,11 +1044,11 @@ BdsCreateDevOrder (
   DevOrderPtr->BbsType = BBS_HARDDISK;
   DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + HDCount * sizeof (UINT16));
   DevOrderPtr          = (LEGACY_DEV_ORDER_ENTRY *) BdsFillDevOrderBuf (BbsTable, BBS_HARDDISK, BbsCount, DevOrderPtr->Data);
-  
+
   DevOrderPtr->BbsType = BBS_CDROM;
   DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + CDCount * sizeof (UINT16));
   DevOrderPtr          = (LEGACY_DEV_ORDER_ENTRY *) BdsFillDevOrderBuf (BbsTable, BBS_CDROM, BbsCount, DevOrderPtr->Data);
-  
+
   DevOrderPtr->BbsType = BBS_EMBED_NETWORK;
   DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + NETCount * sizeof (UINT16));
   DevOrderPtr          = (LEGACY_DEV_ORDER_ENTRY *) BdsFillDevOrderBuf (BbsTable, BBS_EMBED_NETWORK, BbsCount, DevOrderPtr->Data);
@@ -1075,7 +1075,7 @@ BdsCreateDevOrder (
 }
 
 /**
-  Add the legacy boot devices from BBS table into 
+  Add the legacy boot devices from BBS table into
   the legacy device boot order.
 
   @retval EFI_SUCCESS           The boot devices are added successfully.
@@ -1293,7 +1293,7 @@ BdsUpdateLegacyDevOrder (
     NETIndex++;
   }
   NewNETPtr = NewPtr->Data;
-  
+
   //
   // copy BEV
   //
@@ -1517,7 +1517,7 @@ PrintBbsTable (
   Set the boot priority for BBS entries based on boot option entry and boot order.
 
   @param  Entry             The boot option is to be checked for refresh BBS table.
-  
+
   @retval EFI_SUCCESS           The boot priority for BBS entries is refreshed successfully.
   @retval EFI_NOT_FOUND         BBS entries can't be found.
   @retval EFI_OUT_OF_RESOURCES  Failed to get the legacy device boot order.
@@ -1719,7 +1719,7 @@ BdsLibDoLegacyBoot (
     Status = EfiCreateEventLegacyBootEx(
                TPL_NOTIFY,
                BmEndOfBdsPerfCode,
-               NULL, 
+               NULL,
                &LegacyBootEvent
                );
     ASSERT_EFI_ERROR (Status);
@@ -1976,7 +1976,7 @@ BdsMatchUsbWwid (
 
 /**
   Find a USB device path which match the specified short-form device path start
-  with USB Class or USB WWID device path and load the boot file then return the 
+  with USB Class or USB WWID device path and load the boot file then return the
   image handle. If ParentDevicePath is NULL, this function will search in all USB
   devices of the platform. If ParentDevicePath is not NULL,this function will only
   search in its child devices.
@@ -2133,7 +2133,7 @@ BdsFindUsbDevice (
 
 /**
   Expand USB Class or USB WWID device path node to be full device path of a USB
-  device in platform then load the boot file on this full device path and return the 
+  device in platform then load the boot file on this full device path and return the
   image handle.
 
   This function support following 4 cases:
@@ -2365,9 +2365,9 @@ BdsLibBootViaBootOption (
     } else {
       DEBUG ((DEBUG_INFO | DEBUG_LOAD, "Booting %S\n", Option->Description));
     }
-        
+
     DEBUG_CODE_END();
-  
+
     //
     // Report status code for OS Loader LoadImage.
     //
@@ -2421,7 +2421,7 @@ BdsLibBootViaBootOption (
     REPORT_STATUS_CODE (
       EFI_ERROR_CODE | EFI_ERROR_MINOR,
       (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_EC_BOOT_OPTION_LOAD_ERROR)
-      );    
+      );
     goto Done;
   }
 
@@ -2690,7 +2690,7 @@ BdsExpandPartitionPartialDevicePathToFull (
 
         //
         // Here limit the device path instance number to 12, which is max number for a system support 3 IDE controller
-        // If the user try to boot many OS in different HDs or partitions, in theory, 
+        // If the user try to boot many OS in different HDs or partitions, in theory,
         // the HD_BOOT_DEVICE_PATH_VARIABLE_NAME variable maybe become larger and larger.
         //
         InstanceNum = 0;
@@ -3214,7 +3214,7 @@ BdsLibEnumerateAllBootOption (
 
   //
   // Parse removable media followed by fixed media.
-  // The Removable[] array is used by the for-loop below to create removable media boot options 
+  // The Removable[] array is used by the for-loop below to create removable media boot options
   // at first, and then to create fixed media boot options.
   //
   Removable[0]  = FALSE;
@@ -3629,7 +3629,7 @@ BdsLibGetBootableHandle (
   UpdatedDevicePath = DevicePath;
 
   //
-  // Enter to critical section to protect the acquired BlockIo instance 
+  // Enter to critical section to protect the acquired BlockIo instance
   // from getting released due to the USB mass storage hotplug event
   //
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
@@ -3653,10 +3653,10 @@ BdsLibGetBootableHandle (
     }
   } else {
     //
-    // For removable device boot option, its contained device path only point to the removable device handle, 
-    // should make sure all its children handles (its child partion or media handles) are created and connected. 
+    // For removable device boot option, its contained device path only point to the removable device handle,
+    // should make sure all its children handles (its child partion or media handles) are created and connected.
     //
-    gBS->ConnectController (Handle, NULL, NULL, TRUE); 
+    gBS->ConnectController (Handle, NULL, NULL, TRUE);
     //
     // Get BlockIo protocol and check removable attribute
     //
@@ -4030,7 +4030,7 @@ BdsLibIsValidEFIBootOptDevicePathExt (
 
   //
   // Check if it's a valid boot option for network boot device.
-  // Check if there is EfiLoadFileProtocol installed. 
+  // Check if there is EfiLoadFileProtocol installed.
   // If yes, that means there is a boot option for network.
   //
   Status = gBS->LocateDevicePath (
@@ -4068,7 +4068,7 @@ BdsLibIsValidEFIBootOptDevicePathExt (
       }
     } else {
       return TRUE;
-    }    
+    }
   }
 
   //

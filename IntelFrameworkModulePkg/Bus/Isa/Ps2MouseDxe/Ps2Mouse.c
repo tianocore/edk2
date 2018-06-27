@@ -1,8 +1,8 @@
 /** @file
   PS/2 Mouse driver. Routines that interacts with callers,
   conforming to EFI driver model.
-  
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -109,7 +109,7 @@ PS2MouseDriverSupported (
 }
 
 /**
-  Start this driver on ControllerHandle by opening a IsaIo protocol, creating 
+  Start this driver on ControllerHandle by opening a IsaIo protocol, creating
   PS2_MOUSE_ABSOLUTE_POINTER_DEV device and install gEfiAbsolutePointerProtocolGuid
   finally.
 
@@ -239,7 +239,7 @@ PS2MouseDriverStart (
     Status     = EFI_DEVICE_ERROR;
     StatusCode = EFI_PERIPHERAL_MOUSE | EFI_P_EC_NOT_DETECTED;
     goto ErrorExit;
-  } 
+  }
 
   REPORT_STATUS_CODE_WITH_DEVICE_PATH (
     EFI_PROGRESS_CODE,
@@ -381,7 +381,7 @@ ErrorExit:
   if ((MouseDev != NULL) && (MouseDev->ControllerNameTable != NULL)) {
     FreeUnicodeStringTable (MouseDev->ControllerNameTable);
   }
-  
+
   if (Status != EFI_DEVICE_ERROR) {
     //
     // Since there will be no timer handler for mouse input any more,
@@ -655,7 +655,7 @@ CheckMouseConnect (
 
 /**
   Get and Clear mouse status.
-  
+
   @param This                 - Pointer of simple pointer Protocol.
   @param State                - Output buffer holding status.
 
@@ -757,9 +757,9 @@ PollMouse (
 /**
   The user Entry Point for module Ps2Mouse. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 

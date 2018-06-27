@@ -1548,8 +1548,8 @@ InitKeyboard (
     // Exceed the max try times. The device may be error.
     //
     if (TryTime == KEYBOARD_MAX_TRY) {
-    	Status = EFI_DEVICE_ERROR;
-    	goto Done;
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
     }
   }
   //
@@ -1579,7 +1579,7 @@ InitKeyboard (
         KeyboardError (ConsoleIn, L"\n\r");
         goto Done;
       }
-      
+
       Status = KeyboardRead (ConsoleIn, &CommandByte);
       if (EFI_ERROR (Status)) {
         KeyboardError (ConsoleIn, L"\n\r");
@@ -1595,7 +1595,7 @@ InitKeyboard (
       }
     } else {
       mEnableMouseInterface = FALSE;
-    } 
+    }
   } else {
     //
     // 8042 controller is not setup yet:
@@ -1611,13 +1611,13 @@ InitKeyboard (
         KeyboardError (ConsoleIn, L"\n\r");
         goto Done;
       }
-      
+
       Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_DISABLE_MOUSE_INTERFACE);
       if (EFI_ERROR (Status)) {
         KeyboardError (ConsoleIn, L"\n\r");
         goto Done;
       }
-      
+
       REPORT_STATUS_CODE_WITH_DEVICE_PATH (
         EFI_PROGRESS_CODE,
         EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST,
@@ -1631,7 +1631,7 @@ InitKeyboard (
         KeyboardError (ConsoleIn, L"8042 controller command write error!\n\r");
         goto Done;
       }
-      
+
       Status = KeyboardWaitForValue (ConsoleIn, 0x55);
       if (EFI_ERROR (Status)) {
         KeyboardError (ConsoleIn, L"8042 controller self test failed!\n\r");
@@ -1903,7 +1903,7 @@ CheckKeyboardConnect (
                ConsoleIn,
                KEYBOARD_KBEN
                );
-    
+
     if (EFI_ERROR (Status)) {
       return FALSE;
     }
@@ -1917,11 +1917,11 @@ CheckKeyboardConnect (
                KEYBOARD_CMDECHO_ACK
                );
     mWaitForValueTimeOut = WaitForValueTimeOutBcakup;
-    
+
     if (EFI_ERROR (Status)) {
       return FALSE;
     }
-    
+
     return TRUE;
   } else {
     return TRUE;

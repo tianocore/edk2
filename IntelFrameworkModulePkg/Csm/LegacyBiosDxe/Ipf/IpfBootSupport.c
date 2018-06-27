@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -248,7 +248,7 @@ RelocateImageUnder4GIfNeeded (
 
       //
       // Create a new handle with gEfiCallerIdGuid to be used as the ImageHandle fore the reloaded image
-      // 
+      //
       NewImageHandle = NULL;
       Status = gBS->InstallProtocolInterface (
                       &NewImageHandle,

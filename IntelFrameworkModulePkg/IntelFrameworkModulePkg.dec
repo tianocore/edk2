@@ -4,7 +4,7 @@
 # This package contains the definitions and module implementation
 # which follows Intel EFI Framework Specification.
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -51,16 +51,16 @@
 
   ## Include/Guid/LegacyBios.h
   gEfiLegacyBiosGuid                 = { 0x2E3044AC, 0x879F, 0x490F, { 0x97, 0x60, 0xBB, 0xDF, 0xAF, 0x69, 0x5F, 0x50 }}
-  
+
   ## Include/Guid/LegacyDevOrder.h
   gEfiLegacyDevOrderVariableGuid     = { 0xa56074db, 0x65fe, 0x45f7, {0xbd, 0x21, 0x2d, 0x2b, 0xdd, 0x8e, 0x96, 0x52 }}
 
   ## Include/Guid/CapsuleDataFile.h
   gEfiUpdateDataFileGuid             = { 0x283fa2ee, 0x532c, 0x484d, { 0x93, 0x83, 0x9f, 0x93, 0xb3, 0x6f, 0xb, 0x7e }}
-  
+
   ## Include/Guid/BlockIoVendor.h
   gBlockIoVendorGuid                 = { 0xcf31fac5, 0xc24e, 0x11d2,  {0x85, 0xf3, 0x0, 0xa0, 0xc9, 0x3e, 0xc9, 0x3b }}
-  
+
   ## Include/Guid/BdsHii.h
   gFrontPageFormSetGuid              = { 0x9e0c30bc, 0x3f06, 0x4ba6, {0x82, 0x88, 0x9, 0x17, 0x9b, 0x85, 0x5d, 0xbe }}
   gBootManagerFormSetGuid            = { 0x847bc3fe, 0xb974, 0x446d, {0x94, 0x49, 0x5a, 0xd5, 0x41, 0x2e, 0x99, 0x3b }}
@@ -68,10 +68,10 @@
   gDriverHealthFormSetGuid           = { 0xf76e0a70, 0xb5ed, 0x4c38, {0xac, 0x9a, 0xe5, 0xf5, 0x4b, 0xf1, 0x6e, 0x34 }}
   gBootMaintFormSetGuid              = { 0x642237c7, 0x35d4, 0x472d, {0x83, 0x65, 0x12, 0xe0, 0xcc, 0xf2, 0x7a, 0x22 }}
   gFileExploreFormSetGuid            = { 0x1f2d63e1, 0xfebd, 0x4dc7, {0x9c, 0xc5, 0xba, 0x2b, 0x1c, 0xef, 0x9c, 0x5b }}
-  
+
   ## Include/Guid/BdsLibHii.h
   gBdsLibStringPackageGuid           = { 0x3b4d9b23, 0x95ac, 0x44f6, {0x9f, 0xcd, 0xe, 0x95, 0x94, 0x58, 0x6c, 0x72 }}
-  
+
   ## Include/Guid/LastEnumLang.h
   gLastEnumLangGuid                  = { 0xe8c545b, 0xa2ee, 0x470d, {0x8e, 0x26, 0xbd, 0xa1, 0xa1, 0x3c, 0xa, 0xa3 }}
 
@@ -130,7 +130,7 @@
   # @Prompt Turn on Legacy Support in S3 Boot
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdPlatformCsmSupport|TRUE|BOOLEAN|0x00010044
 
-  ## Indicates if Framework Acpi Support protocol is installed.<BR><BR>  
+  ## Indicates if Framework Acpi Support protocol is installed.<BR><BR>
   #   TRUE  - Install Framework Acpi Support protocol.<BR>
   #   FALSE - Doesn't install Framework Acpi Support protocol.<BR>
   # @Prompt Enable Framework Acpi Support
@@ -201,30 +201,30 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLegacyBiosCacheLegacyRegion|TRUE|BOOLEAN|0x00000004
 
   ## Specify memory size with bytes to reserve EBDA below 640K for OPROM.
-  # The value should be a multiple of 4KB. 
+  # The value should be a multiple of 4KB.
   # @Prompt Reserved EBDA Memory Size
   # @Expression 0x80000001 | (gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEbdaReservedMemorySize < 0xA0000) AND ((gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEbdaReservedMemorySize & 0x1000) == 0)
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEbdaReservedMemorySize|0x8000|UINT32|0x30000005
 
   ## Specify memory base address for OPROM to find free memory.
-  # Some OPROMs do not use EBDA or PMM to allocate memory for its usage, 
+  # Some OPROMs do not use EBDA or PMM to allocate memory for its usage,
   # instead they find the memory filled with zero from 0x20000.
   # The value should be a multiple of 4KB.
-  # The range should be below the EBDA reserved range from 
+  # The range should be below the EBDA reserved range from
   # (CONVENTIONAL_MEMORY_TOP - Reserved EBDA Memory Size) to CONVENTIONAL_MEMORY_TOP.
   # @Prompt Reserved Memory Base Address for OPROM
   # @Expression 0x80000001 | (gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemoryBase >= 0x20000) AND ((gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemoryBase & 0x1000) == 0)
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemoryBase|0x60000|UINT32|0x3000000c
-  
+
   ## Specify memory size with bytes for OPROM to find free memory.
-  #  The value should be a multiple of 4KB. And the range should be below the EBDA reserved range from 
+  #  The value should be a multiple of 4KB. And the range should be below the EBDA reserved range from
   # (CONVENTIONAL_MEMORY_TOP - Reserved EBDA Memory Size) to CONVENTIONAL_MEMORY_TOP.
   # @Prompt Reserved Memory Size for OPROM
   # @Expression 0x80000001 | (gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemorySize < 0x80000) AND ((gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemorySize & 0x1000) == 0)
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdOpromReservedMemorySize|0x28000|UINT32|0x3000000d
 
   ## Specify memory size with page number for a pre-allocated reserved memory to be used
-  #  by PEI in S3 phase. The default size 32K. When changing the value make sure the memory size 
+  #  by PEI in S3 phase. The default size 32K. When changing the value make sure the memory size
   #  is large enough to meet PEI requirement in the S3 phase.
   # @Prompt Reserved S3 Boot ACPI Memory Size
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdS3AcpiReservedMemorySize|0x8000|UINT32|0x30000006
@@ -234,13 +234,13 @@
   # @Prompt Top Address of Shadowed Legacy OpROM
   # @Expression 0x80000001 | gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEndOpromShadowAddress < 0x100000
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEndOpromShadowAddress|0xdffff|UINT32|0x30000008
-  
+
   ## Specify the low PMM (Post Memory Manager) size with bytes below 1MB.
   #  The value should be a multiple of 4KB.
   # @Prompt Low PMM (Post Memory Manager) Size
   # @Expression 0x80000001 | (gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLowPmmMemorySize < 0x100000) AND ((gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLowPmmMemorySize & 0x1000) == 0)
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLowPmmMemorySize|0x10000|UINT32|0x30000009
-  
+
   ## Specify the high PMM (Post Memory Manager) size with bytes above 1MB.
   #  The value should be a multiple of 4KB.
   # @Prompt High PMM (Post Memory Manager) Size

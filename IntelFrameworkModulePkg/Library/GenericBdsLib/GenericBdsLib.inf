@@ -1,20 +1,20 @@
 ## @file
 #  General BDS library.
-#  
+#
 #  General BDS defines and produce general interfaces for platform BDS driver including:
 #  1) BDS boot policy interface;
 #  2) BDS boot device connect interface;
 #  3) BDS Misc interfaces for mainting boot variable, ouput string, etc.
-#  
+#
 #  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 ##
 
 [Defines]
@@ -24,7 +24,7 @@
   FILE_GUID                      = e405ec31-ccaa-4dd4-83e8-0aec01703f7e
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = GenericBdsLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION 
+  LIBRARY_CLASS                  = GenericBdsLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION
   CONSTRUCTOR                    = GenericBdsLibConstructor
 
 #
@@ -43,7 +43,7 @@
   String.h
   String.c
   GenericBdsStrings.uni
-  
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -76,7 +76,7 @@
   ## SOMETIMES_CONSUMES ## SystemTable # The identifier of memory type information type in system table
   ## SOMETIMES_CONSUMES ## Variable:L"MemoryTypeInformation"
   ## SOMETIMES_PRODUCES ## Variable:L"MemoryTypeInformation"
-  gEfiMemoryTypeInformationGuid                 
+  gEfiMemoryTypeInformationGuid
   ## SOMETIMES_CONSUMES ## Variable:L"BootXXXX"    # Boot option variable
   ## SOMETIMES_PRODUCES ## Variable:L"BootXXXX"    # Boot option variable
   ## SOMETIMES_CONSUMES ## Variable:L"DriverXXXX"  # Driver load option.
@@ -138,7 +138,7 @@
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile      ## CONSUMES
 
 #
-# [BootMode] 
+# [BootMode]
 #   RECOVERY_FULL    ## SOMETIMES_CONSUMES # Memory Type Information variable
 #
 

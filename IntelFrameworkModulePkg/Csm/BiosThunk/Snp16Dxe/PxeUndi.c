@@ -1,15 +1,15 @@
-/** @file 
-  Wrapper routines that use a PXE-enabled NIC option ROM to 
-  supply internal routines for an EFI SNI (Simple Network 
+/** @file
+  Wrapper routines that use a PXE-enabled NIC option ROM to
+  supply internal routines for an EFI SNI (Simple Network
   Interface) Protocol.
 
   This file relies upon the existence of a PXE-compliant ROM
-  in memory, as defined by the Preboot Execution Environment 
+  in memory, as defined by the Preboot Execution Environment
   Specification (PXE), Version 2.1, located at
 
   http://developer.intel.com/ial/wfm/wfmspecs.htm
 
-Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -25,7 +25,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "BiosSnp16.h"
 
 /**
-  PXE 
+  PXE
   START UNDI
   Op-Code: PXENV_START_UNDI (0000h)
   Input: Far pointer to a PXENV_START_UNDI_T parameter structure that has been initialized by the caller.
@@ -54,13 +54,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   contents of these registers can be found in the [PnP], [PCI] and
   [BBS] specifications.
   Returned from API service
-  Status: See the PXENV_STATUS_xxx constants.    
+  Status: See the PXENV_STATUS_xxx constants.
 
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                                
-  @return Return value of PXE option ROM far call.                                
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeStartUndi (
@@ -77,8 +77,8 @@ PxeStartUndi (
 }
 
 /**
-  PXE 
-  UNDI STARTUP    
+  PXE
+  UNDI STARTUP
   Op-Code: PXENV_UNDI_STARTUP (0001h)
   Input: Far pointer to a PXENV_UNDI_STARTUP_T parameter structure that has been initialized by the
   caller.
@@ -95,7 +95,7 @@ PxeStartUndi (
   chaining interrupt 1Ah. This must be done by the PXENV_START_UNDI and
   PXENV_STOP_UNDI API calls.
   This service cannot be used in protected mode.
-  typedef struct 
+  typedef struct
   {
       PXENV_STATUS Status;
   } PXENV_UNDI_STARTUP_T;
@@ -105,10 +105,10 @@ PxeStartUndi (
   Status: See the PXENV_STATUS_xxx constants.
 
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                                
-  @return Return value of PXE option ROM far call.    
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiStartup (
@@ -125,7 +125,7 @@ PxeUndiStartup (
 }
 
 /**
-  PXE 
+  PXE
   UNDI CLEANUP
   Op-Code: PXENV_UNDI_CLEANUP (0002h)
   Input: Far pointer to a PXENV_UNDI_CLEANUP_T parameter structure.
@@ -145,10 +145,10 @@ PxeUndiStartup (
   Status: See the PXENV_STATUS_xxx constants.
 
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                                
-  @return Return value of PXE option ROM far call. 
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiCleanup (
@@ -165,7 +165,7 @@ PxeUndiCleanup (
 }
 
 /**
-  PXE 
+  PXE
   UNDI INITIALIZE
   Op-Code: PXENV_UNDI_INITIALIZE (0003h)
   Input: Far pointer to a PXENV_UNDI_INITIALIZE_T parameter structure that has been initialized by the
@@ -195,13 +195,13 @@ PxeUndiCleanup (
   protocol.ini file was done by NDIS.) This value can be NULL for any
   other application interfacing to the universal NIC driver
   Returned from API service
-  Status: See the PXENV_STATUS_xxx constants.    
-  
+  Status: See the PXENV_STATUS_xxx constants.
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                                
-  @return Return value of PXE option ROM far call. 
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiInitialize (
@@ -219,8 +219,8 @@ PxeUndiInitialize (
 
 /**
   Wrapper routine for reset adapter.
-  
-  PXE 
+
+  PXE
   UNDI RESET ADAPTER
   Op-Code: PXENV_UNDI_RESET_ADAPTER (0004h)
   Input: Far pointer to a PXENV_UNDI_RESET_ADAPTER_t parameter structure that has been initialized
@@ -252,13 +252,13 @@ PxeUndiInitialize (
   addresses.
   Returned from API service
   Status: See the PXENV_STATUS_xxx constants.
-  
+
   @param  SimpleNetworkDevice   Device instance.
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-  @param  RxFilter             Filter setting mask value for PXE recive .     
-                               
-  @return Return value of PXE option ROM far call. 
+  @param  RxFilter             Filter setting mask value for PXE recive .
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiResetNic (
@@ -310,8 +310,8 @@ PxeUndiResetNic (
     &Open.McastBuffer,
     &PxeUndiTable->R_Mcast_Buf,
     sizeof (PXENV_UNDI_MCAST_ADDR_T)
-    );      
-  
+    );
+
 
   Status = MakePxeCall (
             SimpleNetworkDevice,
@@ -327,7 +327,7 @@ PxeUndiResetNic (
 }
 
 /**
-  PXE 
+  PXE
   UNDI SHUTDOWN
   Op-Code: PXENV_UNDI_SHUTDOWN (0005h)
   Input: Far pointer to a PXENV_UNDI_SHUTDOWN_T parameter.
@@ -337,7 +337,7 @@ PxeUndiResetNic (
   Description: This call resets the network adapter and leaves it in a safe state for another driver to program it.
   Note: The contents of the PXENV_UNDI_STARTUP parameter structure need to be saved by the
   Universal NIC Driver in case PXENV_UNDI_INITIALIZE is called again.
-  typedef struct 
+  typedef struct
   {
     PXENV_STATUS Status;
   } PXENV_UNDI_SHUTDOWN_T;
@@ -345,12 +345,12 @@ PxeUndiResetNic (
   N/A
   Returned from API service
   Status: See the PXENV_STATUS_xxx constants.
-  
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.   
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiShutdown (
@@ -367,7 +367,7 @@ PxeUndiShutdown (
 }
 
 /**
-  PXE 
+  PXE
   UNDI OPEN
   Op-Code: PXENV_UNDI_OPEN (0006h)
   Input: Far pointer to a PXENV_UNDI_OPEN_T parameter structure that has been initialized by the caller.
@@ -399,12 +399,12 @@ PxeUndiShutdown (
   R_Mcast_Buf: See definition in UNDI RESET ADAPTER (0004h).
   Returned from API service
   Status: See the PXENV_STATUS_xxx constants.
-  
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiOpen (
@@ -421,7 +421,7 @@ PxeUndiOpen (
 }
 
 /**
-  PXE 
+  PXE
   UNDI CLOSE
   Op-Code: PXENV_UNDI_CLOSE (0007h)
   Input: Far pointer to a PXENV_UNDI_CLOSE_T parameter.
@@ -437,12 +437,12 @@ PxeUndiOpen (
   N/A
   Returned from API service
   Status: See the PXENV_STATUS_xxx constants.
-  
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiClose (
@@ -459,7 +459,7 @@ PxeUndiClose (
 }
 
 /**
-  PXE 
+  PXE
   UNDI TRANSMIT PACKET
   Op-Code: PXENV_UNDI_TRANSMIT (0008h)
   Input: Far pointer to a PXENV_UNDI_TRANSMIT_T parameter structure that
@@ -529,13 +529,13 @@ PxeUndiClose (
   TDDataPtr: Segment:Offset of the transmit block.
   DataBlock: Array of transmit data blocks.
   Returned from API service
-  Status: See the PXENV_STATUS_xxx constants  
-  
+  Status: See the PXENV_STATUS_xxx constants
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiTransmit (
@@ -565,7 +565,7 @@ PxeUndiTransmit (
 }
 
 /**
-  PXE 
+  PXE
   UNDI SET MULTICAST ADDRESS
   Op-Code: PXENV_UNDI_SET_MCAST_ADDRESS (0009h)
   Input: Far pointer to a PXENV_TFTP_SET_MCAST_ADDRESS_t parameter structure that has been
@@ -583,13 +583,13 @@ PxeUndiTransmit (
   R_Mcast_Buf: See description in the UNDI RESET ADAPTER
   (0004h) API.
   Returned from API service
-  Status: See the PXENV_STATUS_xxx constants        
-  
+  Status: See the PXENV_STATUS_xxx constants
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiSetMcastAddr (
@@ -606,7 +606,7 @@ PxeUndiSetMcastAddr (
 }
 
 /**
-  PXE 
+  PXE
   UNDI SET STATION ADDRESS
   Op-Code: PXENV_UNDI_SET_STATION_ADDRESS (000Ah)
   Input: Far pointer to a PXENV_UNDI_SET_STATION_ADDRESS_t parameter structure that has been
@@ -625,13 +625,13 @@ PxeUndiSetMcastAddr (
   StationAddress: Temporary MAC address to be used for
   transmit and receive.
   Returned from API service
-  Status: See the PXENV_STATUS_xxx constants.     
-  
+  Status: See the PXENV_STATUS_xxx constants.
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiSetStationAddr (
@@ -648,7 +648,7 @@ PxeUndiSetStationAddr (
 }
 
 /**
-  PXE 
+  PXE
   UNDI SET PACKET FILTER
   Op-Code: PXENV_UNDI_SET_PACKET_FILTER (000Bh)
   Input: Far pointer to a PXENV_UNDI_SET_PACKET_FILTER_T parameter structure that has been
@@ -666,13 +666,13 @@ PxeUndiSetStationAddr (
   Filter: See the receive filter values in the UNDI OPEN
   (0006h) API description.
   Returned from API service
-  Status: See the PXENV_STATUS_xxx constants.   
-  
+  Status: See the PXENV_STATUS_xxx constants.
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiSetPacketFilter (
@@ -689,7 +689,7 @@ PxeUndiSetPacketFilter (
 }
 
 /**
-  PXE 
+  PXE
   UNDI GET INFORMATION
   Op-Code: PXENV_UNDI_GET_INFORMATION (000Ch)
   Input: Far pointer to a PXENV_UNDI_GET_INFORMATION_T parameter structure that has been
@@ -732,13 +732,13 @@ PxeUndiSetPacketFilter (
   PermNodeAddress: Permanent hardware address.
   ROMAddress: Real mode ROM segment address.
   RxBufCnt: Receive queue length.
-  TxBufCnt: Transmit queue length.  
-  
+  TxBufCnt: Transmit queue length.
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiGetInformation (
@@ -755,7 +755,7 @@ PxeUndiGetInformation (
 }
 
 /**
-  PXE 
+  PXE
   UNDI GET STATISTICS
   Op-Code: PXENV_UNDI_GET_STATISTICS (000Dh)
   Input: Far pointer to a PXENV_UNDI_GET_STATISTICS_T parameter structure that has been initialized
@@ -781,12 +781,12 @@ PxeUndiGetInformation (
   error.
   RcvResourceErrors: Number of frames discarded
   because receive queue was full.
-  
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiGetStatistics (
@@ -803,7 +803,7 @@ PxeUndiGetStatistics (
 }
 
 /**
-  PXE 
+  PXE
   UNDI CLEAR STATISTICS
   Op-Code: PXENV_UNDI_CLEAR_STATISTICS (000Eh)
   Input: Far pointer to a PXENV_UNDI_CLEAR_STATISTICS_T parameter.
@@ -818,12 +818,12 @@ PxeUndiGetStatistics (
   N/A
   Returned from API service
   Status: See the PXENV_STATUS_xxx constants.
-  
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiClearStatistics (
@@ -840,7 +840,7 @@ PxeUndiClearStatistics (
 }
 
 /**
-  PXE 
+  PXE
   UNDI INITIATE DIAGS
   Op-Code: PXENV_UNDI_INITIATE_DIAGS (000Fh)
   Input: Far pointer to a PXENV_UNDI_INITIATE_DIAGS_T parameter.
@@ -855,13 +855,13 @@ PxeUndiClearStatistics (
   Set before calling API service
   N/A
   Returned from API service
-  Status: See the PXENV_STATUS_xxx constants.    
-  
+  Status: See the PXENV_STATUS_xxx constants.
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiInitiateDiags (
@@ -878,7 +878,7 @@ PxeUndiInitiateDiags (
 }
 
 /**
-  PXE 
+  PXE
   UNDI FORCE INTERRUPT
   Op-Code: PXENV_UNDI_FORCE_INTERRUPT (0010h)
   Input: Far pointer to a PXENV_UNDI_FORCE_INTERRUPT_T parameter structure that has been
@@ -899,13 +899,13 @@ PxeUndiInitiateDiags (
   Set before calling API service
   N/A
   Returned from API service
-  Status: See the PXENV_STATUS_xxx constants.  
-  
+  Status: See the PXENV_STATUS_xxx constants.
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiForceInterrupt (
@@ -922,7 +922,7 @@ PxeUndiForceInterrupt (
 }
 
 /**
-  PXE 
+  PXE
   UNDI GET MULTICAST ADDRESS
   Op-Code: PXENV_UNDI_GET_MCAST_ADDRESS (0011h)
   Input: Far pointer to a PXENV_GET_MCAST_ADDRESS_t parameter structure that has been initialized
@@ -941,12 +941,12 @@ PxeUndiForceInterrupt (
   Returned from API service
   Status: See the PXENV_STATUS_xxx constants.
   MediaAddr: MAC multicast address.
-  
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiGetMcastAddr (
@@ -963,7 +963,7 @@ PxeUndiGetMcastAddr (
 }
 
 /**
-  PXE 
+  PXE
   UNDI GET NIC TYPE
   Op-Code: PXENV_UNDI_GET_NIC_TYPE (0012h)
   Input: Far pointer to a PXENV_UNDI_GET_NIC_TYPE parameter structure that has been initialized by
@@ -1013,13 +1013,13 @@ PxeUndiGetMcastAddr (
   NICType: Type of NIC information stored in the parameter
   structure.
   Info: Information about the fields in this union can be found
-  in the [PnP] and [PCI] specifications    
-  
+  in the [PnP] and [PCI] specifications
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiGetNicType (
@@ -1036,7 +1036,7 @@ PxeUndiGetNicType (
 }
 
 /**
-  PXE 
+  PXE
   UNDI GET IFACE INFO
   Op-Code: PXENV_UNDI_GET_IFACE_INFO (0013h)
   Input: Far pointer to a PXENV_UNDI_GET_IFACE_INFO_t parameter structure that has been initialized
@@ -1069,13 +1069,13 @@ PxeUndiGetNicType (
   to the protocol driver.
   LinkSpeed: Defined in the NDIS 2.0 specification.
   ServiceFlags: Defined in the NDIS 2.0 specification.
-  Reserved: Must be zero.       
-  
+  Reserved: Must be zero.
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiGetNdisInfo (
@@ -1092,7 +1092,7 @@ PxeUndiGetNdisInfo (
 }
 
 /**
-  PXE 
+  PXE
   UNDI ISR
   Op-Code: PXENV_UNDI_ISR (0014h)
   Input: Far pointer to a PXENV_UNDI_ISR_T parameter structure that has been initialized by the caller.
@@ -1134,13 +1134,13 @@ PxeUndiGetNdisInfo (
   if there is no other interrupt status to be processed, UNDI re-enables the interrupt at the
   NETWORK INTERFACE level and returns PXENV_UNDI_ISR_OUT_DONE in the FuncFlag.
   IMPORTANT: It is possible for the protocol driver to be interrupted again while in the
-  strategy routine when the UNDI re-enables interrupts.   
-  
+  strategy routine when the UNDI re-enables interrupts.
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiIsr (
@@ -1157,7 +1157,7 @@ PxeUndiIsr (
 }
 
 /**
-  PXE 
+  PXE
   STOP UNDI
   Op-Code: PXENV_STOP_UNDI (0015h)
   Input: Far pointer to a PXENV_STOP_UNDI_T parameter structure that has been initialized by the caller.
@@ -1176,13 +1176,13 @@ PxeUndiIsr (
   Set before calling API service
   N/A
   Returned from API service
-  Status: See the PXENV_STATUS_xxx constants.      
-  
+  Status: See the PXENV_STATUS_xxx constants.
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiStop (
@@ -1199,7 +1199,7 @@ PxeUndiStop (
 }
 
 /**
-  PXE 
+  PXE
   UNDI GET STATE
   Op-Code: PXENV_UNDI_GET_STATE (0015h)
   Input: Far pointer to a PXENV_UNDI_GET_STATE_T parameter.
@@ -1231,13 +1231,13 @@ PxeUndiStop (
   constants.
   Description: This API function will be called at different levels of processing the interrupt. The FuncFlag field in
   the parameter block indicates the operation to be performed for the call. This field is filled with the
-  status of that operation on return.     
-  
+  status of that operation on return.
+
   @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value 
+  @param  PxeUndiTable          Point to structure which hold parameter and return value
                                 for option ROM call.
-                              
-  @return Return value of PXE option ROM far call.  
+
+  @return Return value of PXE option ROM far call.
 **/
 EFI_STATUS
 PxeUndiGetState (

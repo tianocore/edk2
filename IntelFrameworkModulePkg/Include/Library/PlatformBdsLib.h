@@ -1,14 +1,14 @@
 /** @file
-  Platform BDS library definition. A platform can implement 
+  Platform BDS library definition. A platform can implement
   instances to support platform-specific behavior.
 
-Copyright (c) 2008 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -54,7 +54,7 @@ EFI_STATUS
   @retval EFI_SUCCESS             There is no error when processing a capsule.
 
 **/
-typedef 
+typedef
 EFI_STATUS
 (EFIAPI *PROCESS_CAPSULES)(
   IN EFI_BOOT_MODE BootMode
@@ -92,7 +92,7 @@ PlatformBdsPolicyBehavior (
   );
 
 /**
-  Hook point for a user-provided function, for after a boot attempt fails. 
+  Hook point for a user-provided function, for after a boot attempt fails.
 
   @param  Option                  A pointer to Boot Option that failed to boot.
   @param  Status                  The status returned from failed boot.

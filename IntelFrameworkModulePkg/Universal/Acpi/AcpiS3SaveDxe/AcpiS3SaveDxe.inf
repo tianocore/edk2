@@ -1,7 +1,7 @@
 ## @file
 # AcpiS3Save module installs ACPI S3 Save protocol to prepare S3 boot data.
 #
-# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -73,7 +73,7 @@
 [Depex]
   #
   # Note: the extra dependency of gEfiMpServiceProtocolGuid is to ensure that ACPI variable is set by MpDxe driver before
-  # AcpiS3SaveDxe module is executed. 
+  # AcpiS3SaveDxe module is executed.
   #
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid AND gEfiMpServiceProtocolGuid
 

@@ -107,7 +107,7 @@ BdsLibGetImageHeader (
   );
 
 /**
-  This routine adjust the memory information for different memory type and 
+  This routine adjust the memory information for different memory type and
   save them into the variables for next boot.
 **/
 VOID
@@ -125,7 +125,7 @@ BdsSetMemoryTypeInformationVariable (
   @retval FALSE                 The variable data is corrupted.
 
 **/
-BOOLEAN 
+BOOLEAN
 ValidateOption (
   UINT8                     *Variable,
   UINTN                     VariableSize
@@ -140,15 +140,15 @@ ValidateOption (
                                  then EFI_INVALID_PARAMETER is returned.
   @param  VendorGuid             A unique identifier for the vendor.
   @param  Attributes             Attributes bitmask to set for the variable.
-  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE, 
-                                 EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, or 
-                                 EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero 
-                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is 
-                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to 
-                                 the variable value (the timestamp associated with the variable may be updated however 
-                                 even if no new data value is provided,see the description of the 
-                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not 
-                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated). 
+  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE,
+                                 EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, or
+                                 EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero
+                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is
+                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to
+                                 the variable value (the timestamp associated with the variable may be updated however
+                                 even if no new data value is provided,see the description of the
+                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not
+                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated).
   @param  Data                   The contents for the variable.
 
   @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as
@@ -160,8 +160,8 @@ ValidateOption (
   @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
   @retval EFI_WRITE_PROTECTED    The variable in question is read-only.
   @retval EFI_WRITE_PROTECTED    The variable in question cannot be deleted.
-  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS 
-                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set, but the AuthInfo 
+  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
+                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set, but the AuthInfo
                                  does NOT pass the validation check carried out by the firmware.
 
   @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.

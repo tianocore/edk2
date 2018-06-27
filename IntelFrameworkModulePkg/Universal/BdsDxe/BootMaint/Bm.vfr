@@ -1,16 +1,16 @@
 ///** @file
-//  
+//
 //    Boot Maintenance Utility Formset
-//  
-//  Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+//
+//  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
 //  http://opensource.org/licenses/bsd-license.php
-//  
+//
 //  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-//  
+//
 //**/
 
 #include "FormGuid.h"
@@ -114,9 +114,9 @@ formset
 
        subtitle text = STRING_TOKEN(STR_NULL_STRING);
            //
-	   // We will add "Select Legacy Boot Floppy Drive" and "Select Legacy Boot Hard Drive"
-	   // here dynamically
-	   //
+     // We will add "Select Legacy Boot Floppy Drive" and "Select Legacy Boot Hard Drive"
+     // here dynamically
+     //
        label FORM_BOOT_LEGACY_DEVICE_ID;
        label LABEL_END;
 

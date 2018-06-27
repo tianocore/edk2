@@ -1,7 +1,7 @@
 /** @file
   PS/2 Mouse driver header file.
-  
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -322,7 +322,7 @@ MouseReset (
 
 /**
   Get and Clear mouse status.
-  
+
   @param This                 - Pointer of simple pointer Protocol.
   @param State                - Output buffer holding status.
 
@@ -370,10 +370,10 @@ PollMouse (
 
 /**
   I/O work flow of in 8042 data.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Data value
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/

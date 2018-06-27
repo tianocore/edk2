@@ -90,7 +90,7 @@ SERIAL_DEV  gSerialDevTempate = {
   Check the device path node whether it's the Flow Control node or not.
 
   @param[in] FlowControl    The device path node to be checked.
-  
+
   @retval TRUE              It's the Flow Control node.
   @retval FALSE             It's not.
 
@@ -111,7 +111,7 @@ IsUartFlowControlNode (
   Check the device path node whether it contains Flow Control node or not.
 
   @param[in] DevicePath     The device path to be checked.
-  
+
   @retval TRUE              It contains the Flow Control node.
   @retval FALSE             It doesn't.
 
@@ -134,9 +134,9 @@ ContainsFlowControl (
 /**
   The user Entry Point for module IsaSerial. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -213,7 +213,7 @@ SerialControllerDriverSupported (
   //
   if (RemainingDevicePath != NULL) {
     //
-    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // Check if RemainingDevicePath is the End of Device Path Node,
     // if yes, go on checking other conditions
     //
     if (!IsDevicePathEnd (RemainingDevicePath)) {
@@ -230,27 +230,27 @@ SerialControllerDriverSupported (
                                         ) {
         goto Error;
       }
-  
+
       if (UartNode->BaudRate > SERIAL_PORT_MAX_BAUD_RATE) {
         goto Error;
       }
-  
+
       if (UartNode->Parity < NoParity || UartNode->Parity > SpaceParity) {
         goto Error;
       }
-  
+
       if (UartNode->DataBits < 5 || UartNode->DataBits > 8) {
         goto Error;
       }
-  
+
       if (UartNode->StopBits < OneStopBit || UartNode->StopBits > TwoStopBits) {
         goto Error;
       }
-  
+
       if ((UartNode->DataBits == 5) && (UartNode->StopBits == TwoStopBits)) {
         goto Error;
       }
-  
+
       if ((UartNode->DataBits >= 6) && (UartNode->DataBits <= 8) && (UartNode->StopBits == OneFiveStopBits)) {
         goto Error;
       }
@@ -510,7 +510,7 @@ SerialControllerDriverStart (
               // Clear the bits that are not allowed to pass to SetControl
               //
               Control &= (EFI_SERIAL_REQUEST_TO_SEND | EFI_SERIAL_DATA_TERMINAL_READY |
-                          EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE | EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE | 
+                          EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE | EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE |
                           EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE);
               Status = SerialIo->SetControl (SerialIo, Control);
             }
@@ -529,7 +529,7 @@ SerialControllerDriverStart (
       //
       // If RemainingDevicePath is the End of Device Path Node,
       // skip enumerate any device and return EFI_SUCESSS
-      // 
+      //
       return EFI_SUCCESS;
     }
   }
@@ -550,13 +550,13 @@ SerialControllerDriverStart (
   FlowControlMap                    = 0;
 
   //
-  // Check if RemainingDevicePath is NULL, 
+  // Check if RemainingDevicePath is NULL,
   // if yes, use the values from the gSerialDevTempate as no remaining device path was
   // passed in.
   //
   if (RemainingDevicePath != NULL) {
     //
-    // If RemainingDevicePath isn't NULL, 
+    // If RemainingDevicePath isn't NULL,
     // match the configuration of the RemainingDevicePath. IsHandleSupported()
     // already checked to make sure the RemainingDevicePath contains settings
     // that we can support.
@@ -577,7 +577,7 @@ SerialControllerDriverStart (
       SerialDevice->BaseAddress = (UINT16) SerialDevice->IsaIo->ResourceList->ResourceItem[Index].StartRange;
     }
   }
-  
+
   SerialDevice->HardwareFlowControl = (BOOLEAN) (FlowControlMap == UART_FLOW_CONTROL_HARDWARE);
 
   //
@@ -601,7 +601,7 @@ SerialControllerDriverStart (
 
   //
   // Build the device path by appending the UART node to the ParentDevicePath.
-  // The Uart setings are zero here, since  SetAttribute() will update them to match 
+  // The Uart setings are zero here, since  SetAttribute() will update them to match
   // the default setings.
   //
   SerialDevice->DevicePath = AppendDevicePathNode (
@@ -853,7 +853,7 @@ IsaSerialFifoFull (
 
 /**
   Detect whether specific FIFO is empty or not.
- 
+
   @param  Fifo    A pointer to the Data Structure SERIAL_DEV_FIFO
 
   @return whether specific FIFO is empty or not
@@ -1022,7 +1022,7 @@ IsaSerialReceiveTransmit (
           Data = READ_RBR (SerialDevice->IsaIo, SerialDevice->BaseAddress);
 
           IsaSerialFifoAdd (&SerialDevice->Receive, Data);
-          
+
           //
           // For full handshake flow control, if receive buffer full
           // tell the peer to stop sending data.
@@ -1571,7 +1571,7 @@ IsaSerialSetControl (
   // first determine the parameter is invalid
   //
   if ((Control & (~(EFI_SERIAL_REQUEST_TO_SEND | EFI_SERIAL_DATA_TERMINAL_READY |
-                    EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE | EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE | 
+                    EFI_SERIAL_HARDWARE_LOOPBACK_ENABLE | EFI_SERIAL_SOFTWARE_LOOPBACK_ENABLE |
                     EFI_SERIAL_HARDWARE_FLOW_CONTROL_ENABLE))) != 0) {
     return EFI_UNSUPPORTED;
   }
@@ -1783,20 +1783,20 @@ IsaSerialWrite (
   //
   // Compute the number of bits in a single character.  This is a start bit,
   // followed by the number of data bits, followed by the number of stop bits.
-  // The number of stop bits is specified by an enumeration that includes 
+  // The number of stop bits is specified by an enumeration that includes
   // support for 1.5 stop bits.  Treat 1.5 stop bits as 2 stop bits.
   //
-  BitsPerCharacter = 
-    1 + 
-    This->Mode->DataBits + 
+  BitsPerCharacter =
+    1 +
+    This->Mode->DataBits +
     ((This->Mode->StopBits == TwoStopBits) ? 2 : This->Mode->StopBits);
 
   //
-  // Compute the timeout in microseconds to wait for a single byte to be 
-  // transmitted.  The Mode structure contans a Timeout field that is the 
-  // maximum time to transmit or receive a character.  However, many UARTs 
+  // Compute the timeout in microseconds to wait for a single byte to be
+  // transmitted.  The Mode structure contans a Timeout field that is the
+  // maximum time to transmit or receive a character.  However, many UARTs
   // have a FIFO for transmits, so the time required to add one new character
-  // to the transmit FIFO may be the time required to flush a full FIFO.  If 
+  // to the transmit FIFO may be the time required to flush a full FIFO.  If
   // the Timeout in the Mode structure is smaller than the time required to
   // flush a full FIFO at the current baud rate, then use a timeout value that
   // is required to flush a full transmit FIFO.
@@ -1809,7 +1809,7 @@ IsaSerialWrite (
                 NULL
                 )
               );
-  
+
   for (Index = 0; Index < *BufferSize; Index++) {
     IsaSerialFifoAdd (&SerialDevice->Transmit, CharBuffer[Index]);
 

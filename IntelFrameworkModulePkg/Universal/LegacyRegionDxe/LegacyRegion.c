@@ -1,13 +1,13 @@
 /** @file
   Produces the Legacy Region Protocol.
 
-  This generic implementation of the Legacy Region Protocol does not actually 
-  perform any lock/unlock operations.  This module may be used on platforms 
-  that do not provide HW locking of the legacy memory regions.  It can also 
+  This generic implementation of the Legacy Region Protocol does not actually
+  perform any lock/unlock operations.  This module may be used on platforms
+  that do not provide HW locking of the legacy memory regions.  It can also
   be used as a template driver for implementing the Legacy Region Protocol on
   a platform that does support HW locking of the legacy memory regions.
 
-Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -135,9 +135,9 @@ EFI_LEGACY_REGION_PROTOCOL  mLegacyRegion = {
 /**
   The user Entry Point for module LegacyRegionDxe.  The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -150,12 +150,12 @@ LegacyRegionInstall (
   )
 {
   EFI_STATUS  Status;
-  
+
   //
   // Make sure the Legacy Region Protocol is not already installed in the system
   //
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiLegacyRegionProtocolGuid);
-  
+
   //
   // Install the protocol on a new handle.
   //

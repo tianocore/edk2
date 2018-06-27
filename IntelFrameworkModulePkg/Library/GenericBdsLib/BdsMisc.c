@@ -1,7 +1,7 @@
 /** @file
   Misc BDS library function
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -51,7 +51,7 @@ BdsLibLoadDrivers (
   //
   for (Link = BdsDriverLists->ForwardLink; Link != BdsDriverLists; Link = Link->ForwardLink) {
     Option = CR (Link, BDS_COMMON_OPTION, Link, BDS_LOAD_OPTION_SIGNATURE);
-    
+
     //
     // If a load option is not marked as LOAD_OPTION_ACTIVE,
     // the boot manager will not automatically load the option.
@@ -59,7 +59,7 @@ BdsLibLoadDrivers (
     if (!IS_LOAD_OPTION_TYPE (Option->Attribute, LOAD_OPTION_ACTIVE)) {
       continue;
     }
-    
+
     //
     // If a driver load option is marked as LOAD_OPTION_FORCE_RECONNECT,
     // then all of the EFI drivers in the system will be disconnected and
@@ -68,7 +68,7 @@ BdsLibLoadDrivers (
     if (IS_LOAD_OPTION_TYPE (Option->Attribute, LOAD_OPTION_FORCE_RECONNECT)) {
       ReconnectAll = TRUE;
     }
-    
+
     //
     // Make sure the driver path is connected.
     //
@@ -117,7 +117,7 @@ BdsLibLoadDrivers (
       gBS->SetWatchdogTimer (0x0000, 0x0000, 0x0000, NULL);
     }
   }
-  
+
   //
   // Process the LOAD_OPTION_FORCE_RECONNECT driver option
   //
@@ -280,7 +280,7 @@ BdsLibRegisterNewOption (
     // Notes: the description may will change base on the GetStringToken
     //
     if (CompareMem (OptionDevicePath, DevicePath, GetDevicePathSize (OptionDevicePath)) == 0) {
-      if (CompareMem (Description, String, StrSize (Description)) == 0) { 
+      if (CompareMem (Description, String, StrSize (Description)) == 0) {
         //
         // Got the option, so just return
         //
@@ -304,7 +304,7 @@ BdsLibRegisterNewOption (
   OptionSize          += GetDevicePathSize (DevicePath);
   OptionPtr           = AllocateZeroPool (OptionSize);
   ASSERT (OptionPtr != NULL);
-  
+
   TempPtr             = OptionPtr;
   *(UINT32 *) TempPtr = LOAD_OPTION_ACTIVE;
   TempPtr             += sizeof (UINT32);
@@ -316,7 +316,7 @@ BdsLibRegisterNewOption (
 
   if (UpdateDescription) {
     //
-    // The number in option#### to be updated. 
+    // The number in option#### to be updated.
     // In this case, we must have non-NULL TempOptionPtr.
     //
     ASSERT (TempOptionPtr != NULL);
@@ -375,7 +375,7 @@ BdsLibRegisterNewOption (
     }
     return Status;
   }
-  
+
   //
   // TempOptionPtr must not be NULL if TempOptionSize is not zero.
   //
@@ -406,15 +406,15 @@ BdsLibRegisterNewOption (
 /**
   Returns the size of a device path in bytes.
 
-  This function returns the size, in bytes, of the device path data structure 
-  specified by DevicePath including the end of device path node. If DevicePath 
+  This function returns the size, in bytes, of the device path data structure
+  specified by DevicePath including the end of device path node. If DevicePath
   is NULL, then 0 is returned. If the length of the device path is bigger than
   MaxSize, also return 0 to indicate this is an invalidate device path.
 
   @param  DevicePath         A pointer to a device path data structure.
-  @param  MaxSize            Max valid device path size. If big than this size, 
+  @param  MaxSize            Max valid device path size. If big than this size,
                              return error.
-  
+
   @retval 0                  An invalid device path.
   @retval Others             The size of a device path in bytes.
 
@@ -456,12 +456,12 @@ GetDevicePathSizeEx (
 }
 
 /**
-  Returns the length of a Null-terminated Unicode string. If the length is 
-  bigger than MaxStringLen, return length 0 to indicate that this is an 
+  Returns the length of a Null-terminated Unicode string. If the length is
+  bigger than MaxStringLen, return length 0 to indicate that this is an
   invalidate string.
 
   This function returns the byte length of Unicode characters in the Null-terminated
-  Unicode string specified by String. 
+  Unicode string specified by String.
 
   If String is NULL, then ASSERT().
   If String is not aligned on a 16-bit boundary, then ASSERT().
@@ -503,7 +503,7 @@ StrSizeEx (
   @retval FALSE                 The variable data is corrupted.
 
 **/
-BOOLEAN 
+BOOLEAN
 ValidateOption (
   UINT8                     *Variable,
   UINTN                     VariableSize
@@ -559,9 +559,9 @@ ValidateOption (
 /**
   Convert a single character to number.
   It assumes the input Char is in the scope of L'0' ~ L'9' and L'A' ~ L'F'
-  
+
   @param Char    The input char which need to change to a hex number.
-  
+
 **/
 UINTN
 CharToUint (
@@ -703,7 +703,7 @@ BdsLibVariableToOption (
   //
   if (*VariableName == 'B') {
     NumOff = (UINT8) (sizeof (L"Boot") / sizeof (CHAR16) - 1);
-    Option->BootCurrent = (UINT16) (CharToUint (VariableName[NumOff+0]) * 0x1000) 
+    Option->BootCurrent = (UINT16) (CharToUint (VariableName[NumOff+0]) * 0x1000)
                + (UINT16) (CharToUint (VariableName[NumOff+1]) * 0x100)
                + (UINT16) (CharToUint (VariableName[NumOff+2]) * 0x10)
                + (UINT16) (CharToUint (VariableName[NumOff+3]) * 0x1);
@@ -1004,7 +1004,7 @@ BdsLibOutputStrings (
       break;
     }
   }
-  
+
   VA_END(Args);
   return Status;
 }
@@ -1298,7 +1298,7 @@ BdsLibGetImageHeader (
 }
 
 /**
-  This routine adjust the memory information for different memory type and 
+  This routine adjust the memory information for different memory type and
   save them into the variables for next boot.
 **/
 VOID
@@ -1333,7 +1333,7 @@ BdsSetMemoryTypeInformationVariable (
   }
 
   //
-  // Only check the the Memory Type Information variable in the boot mode 
+  // Only check the the Memory Type Information variable in the boot mode
   // other than BOOT_WITH_DEFAULT_SETTINGS because the Memory Type
   // Information is not valid in this boot mode.
   //
@@ -1342,8 +1342,8 @@ BdsSetMemoryTypeInformationVariable (
     Status = gRT->GetVariable (
                     EFI_MEMORY_TYPE_INFORMATION_VARIABLE_NAME,
                     &gEfiMemoryTypeInformationGuid,
-                    NULL, 
-                    &VariableSize, 
+                    NULL,
+                    &VariableSize,
                     NULL
                     );
     if (Status == EFI_BUFFER_TOO_SMALL) {
@@ -1474,7 +1474,7 @@ BdsLibSaveMemoryTypeInformation (
   Identify a user and, if authenticated, returns the current user profile handle.
 
   @param[out]  User           Point to user profile handle.
-  
+
   @retval EFI_SUCCESS         User is successfully identified, or user identification
                               is not supported.
   @retval EFI_ACCESS_DENIED   User is not successfully identified
@@ -1488,7 +1488,7 @@ BdsLibUserIdentify (
 {
   EFI_STATUS                          Status;
   EFI_USER_MANAGER_PROTOCOL           *Manager;
-  
+
   Status = gBS->LocateProtocol (
                   &gEfiUserManagerProtocolGuid,
                   NULL,
@@ -1510,15 +1510,15 @@ BdsLibUserIdentify (
                                  then EFI_INVALID_PARAMETER is returned.
   @param  VendorGuid             A unique identifier for the vendor.
   @param  Attributes             Attributes bitmask to set for the variable.
-  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE, 
-                                 EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, or 
-                                 EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero 
-                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is 
-                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to 
-                                 the variable value (the timestamp associated with the variable may be updated however 
-                                 even if no new data value is provided,see the description of the 
-                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not 
-                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated). 
+  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE,
+                                 EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS, or
+                                 EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero
+                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is
+                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to
+                                 the variable value (the timestamp associated with the variable may be updated however
+                                 even if no new data value is provided,see the description of the
+                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not
+                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated).
   @param  Data                   The contents for the variable.
 
   @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as
@@ -1530,8 +1530,8 @@ BdsLibUserIdentify (
   @retval EFI_DEVICE_ERROR       The variable could not be retrieved due to a hardware error.
   @retval EFI_WRITE_PROTECTED    The variable in question is read-only.
   @retval EFI_WRITE_PROTECTED    The variable in question cannot be deleted.
-  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS 
-                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set, but the AuthInfo 
+  @retval EFI_SECURITY_VIOLATION The variable could not be written due to EFI_VARIABLE_AUTHENTICATED_WRITE_ACCESS
+                                 or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACESS being set, but the AuthInfo
                                  does NOT pass the validation check carried out by the firmware.
 
   @retval EFI_NOT_FOUND          The variable trying to be updated or deleted was not found.

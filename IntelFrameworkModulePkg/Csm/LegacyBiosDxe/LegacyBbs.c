@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -31,7 +31,7 @@ BOOLEAN             IsHaveMediaInFloppy = TRUE;
 
 /**
   Checks the state of the floppy and if media is inserted.
-  
+
   This routine checks the state of the floppy and if media is inserted.
   There are 3 cases:
   No floppy present         - Set BBS entry to ignore

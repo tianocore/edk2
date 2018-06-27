@@ -1,7 +1,7 @@
 /** @file
   FrontPage routines to handle the callbacks and browser calls
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -236,9 +236,9 @@ PlatformBdsEnterFrontPage (
 
 /**
   This function will change video resolution and text mode
-  according to defined setup mode or defined boot mode  
+  according to defined setup mode or defined boot mode
 
-  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode. 
+  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode.
 
   @retval  EFI_SUCCESS  Mode is changed successfully.
   @retval  Others             Mode failed to be changed.

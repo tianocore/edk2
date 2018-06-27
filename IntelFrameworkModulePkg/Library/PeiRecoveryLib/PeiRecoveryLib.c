@@ -3,9 +3,9 @@
 
   This library instance is no longer used and module using this library
   class should update to directly locate EFI_PEI_RECOVERY_MODULE_PPI defined
-  in PI 1.2 specification. 
+  in PI 1.2 specification.
 
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -24,7 +24,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Calling this function causes the system do recovery.
-  
+
   @retval EFI_SUCESS   Sucess to do recovery.
   @retval Others       Fail to do recovery.
 **/
@@ -36,7 +36,7 @@ PeiRecoverFirmware (
 {
   EFI_STATUS                      Status;
   EFI_PEI_RECOVERY_MODULE_PPI     *PeiRecovery;
-  
+
   Status = PeiServicesLocatePpi (
              &gEfiPeiRecoveryModulePpiGuid,
              0,

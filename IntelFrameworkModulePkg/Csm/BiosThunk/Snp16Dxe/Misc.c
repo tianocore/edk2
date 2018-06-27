@@ -1,7 +1,7 @@
 /** @file
   Helper Routines that use a PXE-enabled NIC option ROM.
- 
-Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -39,7 +39,7 @@ UINT32 CachedVectorAddress[0x100];
  Cache Interrupt verctor address converted from IVT number.
 
  @param VectorNumber  IVT number
- 
+
  @retval EFI_SUCCESS Success to operation.
 **/
 EFI_STATUS
@@ -55,10 +55,10 @@ CacheVectorAddress (
 }
 
 /**
- Get interrupt vector address according to IVT number. 
-  
+ Get interrupt vector address according to IVT number.
+
  @param VectorNumber    Given IVT number
- 
+
  @return cached interrupt vector address.
 **/
 EFI_STATUS
@@ -74,10 +74,10 @@ RestoreCachedVectorAddress (
 }
 
 /**
- Print Undi loader table. 
+ Print Undi loader table.
 
- @param UndiLoaderStructure Point to Undi Loader table structure. 
- 
+ @param UndiLoaderStructure Point to Undi Loader table structure.
+
 **/
 VOID
 Print_Undi_Loader_Table (
@@ -108,12 +108,12 @@ Print_Undi_Loader_Table (
 /**
   Simple table dumper.  The ROMID table is necessary in order to effect
   the "Early UNDI" trick.  Herein, the UNDI layer can be loaded in the
-  pre-boot phase without having to download a Network Boot Program 
+  pre-boot phase without having to download a Network Boot Program
   across the wire.  It is required in the implementation in that we
   are not using PXE.
 
   @param RomIDStructure Point to RomID structure.
- 
+
 **/
 VOID
 Print_ROMID_Table (
@@ -199,7 +199,7 @@ Print_ROMID_Table (
   Print PXE table.
 
   @param PxeTable Point to PXE table structure
-  
+
 **/
 VOID
 Print_PXE_Table (
@@ -351,7 +351,7 @@ Print_PXE_Table (
   Print PXENV table.
 
   @param PxenvTable Point to PXENV
-  
+
 **/
 VOID
 Print_PXENV_Table (
@@ -425,14 +425,14 @@ Print_PXENV_Table (
   If available, launch the BaseCode from a NIC option ROM.
   This should install the !PXE and PXENV+ structures in memory for
   subsequent use.
-  
+
 
   @param SimpleNetworkDevice    Simple network device instance
   @param RomAddress             The ROM base address for NIC rom.
-  
-  @retval EFI_NOT_FOUND         The check sum does not match 
-  @retval EFI_NOT_FOUND         Rom ID offset is wrong 
-  @retval EFI_NOT_FOUND         No Rom ID structure is found 
+
+  @retval EFI_NOT_FOUND         The check sum does not match
+  @retval EFI_NOT_FOUND         Rom ID offset is wrong
+  @retval EFI_NOT_FOUND         No Rom ID structure is found
 **/
 EFI_STATUS
 LaunchBaseCode (
@@ -819,14 +819,14 @@ LaunchBaseCode (
       push offset pxe_data_call_struct        ;is pushed onto stack.
       push Index                              ;UINT16 is pushed onto stack.
       call dword ptr (s_PXE ptr es:[di]).EntryPointSP
-      add sp, 6 ;Caller cleans up stack.  
+      add sp, 6 ;Caller cleans up stack.
 
   @param SimpleNetworkDevice    Device instance for simple network
   @param Table                 Point to parameter/retun value table for legacy far call
   @param TableSize              The size of parameter/return value table
   @param CallIndex              The index of legacy call.
-  
-  @return EFI_STATUS 
+
+  @return EFI_STATUS
 **/
 EFI_STATUS
 MakePxeCall (
