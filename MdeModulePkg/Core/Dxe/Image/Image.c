@@ -1,7 +1,7 @@
 /** @file
   Core image handling services to load and unload PeImage.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -73,7 +73,7 @@ LOADED_IMAGE_PRIVATE_DATA mCorePrivateImage  = {
 //
 // The field is define for Loading modules at fixed address feature to tracker the PEI code
 // memory range usage. It is a bit mapped array in which every bit indicates the correspoding memory page
-// available or not. 
+// available or not.
 //
 GLOBAL_REMOVE_IF_UNREFERENCED    UINT64                *mDxeCodeMemoryRangeUsageBitMap=NULL;
 
@@ -108,7 +108,7 @@ GetMachineTypeName (
   )
 {
   UINTN  Index;
-  
+
   for (Index = 0; Index < sizeof(mMachineTypeInfo)/sizeof(mMachineTypeInfo[0]); Index++) {
     if (mMachineTypeInfo[Index].MachineType == MachineType) {
       return mMachineTypeInfo[Index].MachineTypeName;
@@ -138,7 +138,7 @@ CoreInitializeImageServices (
   UINT64                            DxeCoreImageLength;
   VOID                              *DxeCoreEntryPoint;
   EFI_PEI_HOB_POINTERS              DxeCoreHob;
- 
+
   //
   // Searching for image hob
   //
@@ -158,7 +158,7 @@ CoreInitializeImageServices (
   DxeCoreImageLength      = DxeCoreHob.MemoryAllocationModule->MemoryAllocationHeader.MemoryLength;
   DxeCoreEntryPoint       = (VOID *) (UINTN) DxeCoreHob.MemoryAllocationModule->EntryPoint;
   gDxeCoreFileName        = &DxeCoreHob.MemoryAllocationModule->ModuleName;
-  
+
   //
   // Initialize the fields for an internal driver
   //
@@ -263,11 +263,11 @@ CoreReadImageFile (
 /**
   To check memory usage bit map array to figure out if the memory range the image will be loaded in is available or not. If
   memory range is available, the function will mark the corresponding bits to 1 which indicates the memory range is used.
-  The function is only invoked when load modules at fixed address feature is enabled. 
-  
+  The function is only invoked when load modules at fixed address feature is enabled.
+
   @param  ImageBase                The base address the image will be loaded at.
   @param  ImageSize                The size of the image
-  
+
   @retval EFI_SUCCESS              The memory range the image will be loaded in is available
   @retval EFI_NOT_FOUND            The memory range the image will be loaded in is not available
 **/
@@ -278,23 +278,23 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
   )
 {
    UINT32                             DxeCodePageNumber;
-   UINT64                             DxeCodeSize; 
+   UINT64                             DxeCodeSize;
    EFI_PHYSICAL_ADDRESS               DxeCodeBase;
    UINTN                              BaseOffsetPageNumber;
    UINTN                              TopOffsetPageNumber;
    UINTN                              Index;
    //
    // The DXE code range includes RuntimeCodePage range and Boot time code range.
-   //  
+   //
    DxeCodePageNumber = PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber);
    DxeCodePageNumber += PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber);
    DxeCodeSize       = EFI_PAGES_TO_SIZE(DxeCodePageNumber);
    DxeCodeBase       =  gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress - DxeCodeSize;
-   
+
    //
-   // If the memory usage bit map is not initialized,  do it. Every bit in the array 
+   // If the memory usage bit map is not initialized,  do it. Every bit in the array
    // indicate the status of the corresponding memory page, available or not
-   // 
+   //
    if (mDxeCodeMemoryRangeUsageBitMap == NULL) {
      mDxeCodeMemoryRangeUsageBitMap = AllocateZeroPool(((DxeCodePageNumber/64) + 1)*sizeof(UINT64));
    }
@@ -309,11 +309,11 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
    //
    if (gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress <  ImageBase + ImageSize ||
        DxeCodeBase >  ImageBase) {
-     return EFI_NOT_FOUND;   
-   }   
+     return EFI_NOT_FOUND;
+   }
    //
    // Test if the memory is avalaible or not.
-   // 
+   //
    BaseOffsetPageNumber = EFI_SIZE_TO_PAGES((UINT32)(ImageBase - DxeCodeBase));
    TopOffsetPageNumber  = EFI_SIZE_TO_PAGES((UINT32)(ImageBase + ImageSize - DxeCodeBase));
    for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
@@ -321,17 +321,17 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
        //
        // This page is already used.
        //
-       return EFI_NOT_FOUND;  
+       return EFI_NOT_FOUND;
      }
    }
-   
+
    //
    // Being here means the memory range is available.  So mark the bits for the memory range
-   // 
+   //
    for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
      mDxeCodeMemoryRangeUsageBitMap[Index / 64] |= LShiftU64(1, (Index % 64));
    }
-   return  EFI_SUCCESS;   
+   return  EFI_SUCCESS;
 }
 /**
 
@@ -358,10 +358,10 @@ GetPeCoffImageFixLoadingAssignedAddress(
    UINT16                             NumberOfSections;
    IMAGE_FILE_HANDLE                  *Handle;
    UINT64                             ValueInSectionHeader;
-                             
+
 
    Status = EFI_NOT_FOUND;
- 
+
    //
    // Get PeHeader pointer
    //
@@ -395,30 +395,30 @@ GetPeCoffImageFixLoadingAssignedAddress(
      }
 
      Status = EFI_NOT_FOUND;
-     
+
      if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_CNT_CODE) == 0) {
        //
        // Build tool will save the address in PointerToRelocations & PointerToLineNumbers fields in the first section header
-       // that doesn't point to code section in image header, as well as ImageBase field of image header. And there is an 
-       // assumption that when the feature is enabled, if a module is assigned a loading address by tools, PointerToRelocations  
+       // that doesn't point to code section in image header, as well as ImageBase field of image header. And there is an
+       // assumption that when the feature is enabled, if a module is assigned a loading address by tools, PointerToRelocations
        // & PointerToLineNumbers fields should NOT be Zero, or else, these 2 fields should be set to Zero
        //
        ValueInSectionHeader = ReadUnaligned64((UINT64*)&SectionHeader.PointerToRelocations);
        if (ValueInSectionHeader != 0) {
          //
-         // When the feature is configured as load module at fixed absolute address, the ImageAddress field of ImageContext 
+         // When the feature is configured as load module at fixed absolute address, the ImageAddress field of ImageContext
          // hold the spcified address. If the feature is configured as load module at fixed offset, ImageAddress hold an offset
          // relative to top address
          //
          if ((INT64)PcdGet64(PcdLoadModuleAtFixAddressEnable) < 0) {
-         	 ImageContext->ImageAddress = gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress + (INT64)(INTN)ImageContext->ImageAddress;
+            ImageContext->ImageAddress = gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress + (INT64)(INTN)ImageContext->ImageAddress;
          }
          //
          // Check if the memory range is available.
          //
          Status = CheckAndMarkFixLoadingMemoryUsageBitMap (ImageContext->ImageAddress, (UINTN)(ImageContext->ImageSize + ImageContext->SectionAlignment));
        }
-       break; 
+       break;
      }
      SectionHeaderOffset += sizeof (EFI_IMAGE_SECTION_HEADER);
    }
@@ -541,17 +541,17 @@ CoreLoadPeImage (
 
       if (EFI_ERROR (Status))  {
           //
-      	  // If the code memory is not ready, invoke CoreAllocatePage with AllocateAnyPages to load the driver.
-      	  //
+          // If the code memory is not ready, invoke CoreAllocatePage with AllocateAnyPages to load the driver.
+          //
           DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Loading module at fixed address failed since specified memory is not available.\n"));
-        
+
           Status = CoreAllocatePages (
                      AllocateAnyPages,
                      (EFI_MEMORY_TYPE) (Image->ImageContext.ImageCodeMemoryType),
                      Image->NumberOfPages,
                      &Image->ImageContext.ImageAddress
-                     );         
-      } 
+                     );
+      }
     } else {
       if (Image->ImageContext.ImageAddress >= 0x100000 || Image->ImageContext.RelocationsStripped) {
         Status = CoreAllocatePages (
@@ -1030,10 +1030,10 @@ CoreUnloadAndCloseImage (
   @retval EFI_LOAD_ERROR          Image was not loaded because the image format was corrupt or not
                                   understood.
   @retval EFI_DEVICE_ERROR        Image was not loaded because the device returned a read error.
-  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the 
+  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the
                                   image from being loaded. NULL is returned in *ImageHandle.
-  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a 
-                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current 
+  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a
+                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current
                                   platform policy specifies that the image should not be started.
 
 **/
@@ -1145,7 +1145,7 @@ CoreLoadImageCommon (
     // Get the source file buffer by its device path.
     //
     FHand.Source = GetFileBufferByFilePath (
-                      BootPolicy, 
+                      BootPolicy,
                       FilePath,
                       &FHand.SourceSize,
                       &AuthenticationStatus
@@ -1417,10 +1417,10 @@ Done:
   @retval EFI_LOAD_ERROR          Image was not loaded because the image format was corrupt or not
                                   understood.
   @retval EFI_DEVICE_ERROR        Image was not loaded because the device returned a read error.
-  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the 
+  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the
                                   image from being loaded. NULL is returned in *ImageHandle.
-  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a 
-                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current 
+  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a
+                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current
                                   platform policy specifies that the image should not be started.
 
 **/
@@ -1453,10 +1453,10 @@ CoreLoadImage (
              EFI_LOAD_PE_IMAGE_ATTRIBUTE_RUNTIME_REGISTRATION | EFI_LOAD_PE_IMAGE_ATTRIBUTE_DEBUG_IMAGE_INFO_TABLE_REGISTRATION
              );
 
-  Handle = NULL; 
+  Handle = NULL;
   if (!EFI_ERROR (Status)) {
     //
-    // ImageHandle will be valid only Status is success. 
+    // ImageHandle will be valid only Status is success.
     //
     Handle = *ImageHandle;
   }
@@ -1498,10 +1498,10 @@ CoreLoadImage (
   @retval EFI_LOAD_ERROR          Image was not loaded because the image format was corrupt or not
                                   understood.
   @retval EFI_DEVICE_ERROR        Image was not loaded because the device returned a read error.
-  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the 
+  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the
                                   image from being loaded. NULL is returned in *ImageHandle.
-  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a 
-                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current 
+  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a
+                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current
                                   platform policy specifies that the image should not be started.
 
 **/
@@ -1538,10 +1538,10 @@ CoreLoadImageEx (
            Attribute
            );
 
-  Handle = NULL; 
+  Handle = NULL;
   if (!EFI_ERROR (Status)) {
     //
-    // ImageHandle will be valid only Status is success. 
+    // ImageHandle will be valid only Status is success.
     //
     Handle = *ImageHandle;
   }

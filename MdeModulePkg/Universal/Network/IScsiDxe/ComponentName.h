@@ -1,7 +1,7 @@
 /** @file
   The header file of UEFI Component Name(2) protocol.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -34,7 +34,7 @@ extern EFI_COMPONENT_NAME_PROTOCOL        gIScsiComponentName;
   returned in DriverName, and EFI_SUCCESS is returned. If the driver specified
   by This does not support the language specified by Language,
   then EFI_UNSUPPORTED is returned.
-  
+
   @param[in]  This        A pointer to the EFI_COMPONENT_NAME_PROTOCOL instance.
   @param[in]  Language    A pointer to a three characters ISO 639-2 language identifier.
                           This is the language of the driver name that that the caller
@@ -89,7 +89,7 @@ IScsiComponentNameGetDriverName (
 
   @retval EFI_SUCCESS           The Unicode string for the user readable name in the
                                 language specified by Language for the driver
-                                specified by This was returned in DriverName.                                
+                                specified by This was returned in DriverName.
   @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
   @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid EFI_HANDLE.
   @retval EFI_INVALID_PARAMETER Language is NULL.
@@ -109,7 +109,7 @@ IScsiComponentNameGetControllerName (
   IN  CHAR8                         *Language,
   OUT CHAR16                        **ControllerName
   );
-  
+
 //
 // EFI iSCSI Initiator Name Protocol for IScsi driver.
 //

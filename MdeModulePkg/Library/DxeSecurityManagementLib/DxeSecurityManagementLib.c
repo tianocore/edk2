@@ -1,7 +1,7 @@
 /** @file
   Provides generic security measurement functions for DXE module.
 
-Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -68,8 +68,8 @@ ReallocateSecurityHandlerTable (
   // Reallocate memory for security info structure.
   //
   mSecurityTable = ReallocatePool (
-                     mMaxNumberOfSecurityHandler * sizeof (SECURITY_INFO), 
-                     (mMaxNumberOfSecurityHandler + SECURITY_HANDLER_TABLE_SIZE) * sizeof (SECURITY_INFO), 
+                     mMaxNumberOfSecurityHandler * sizeof (SECURITY_INFO),
+                     (mMaxNumberOfSecurityHandler + SECURITY_HANDLER_TABLE_SIZE) * sizeof (SECURITY_INFO),
                      mSecurityTable
                      );
 
@@ -88,7 +88,7 @@ ReallocateSecurityHandlerTable (
 }
 
 /**
- Check whether an operation is valid according to the requirement of current operation, 
+ Check whether an operation is valid according to the requirement of current operation,
  which must make sure that the measure image operation is the last one.
 
  @param CurrentAuthOperation  Current operation.
@@ -102,14 +102,14 @@ CheckAuthenticationOperation (
   IN  UINT32    CurrentAuthOperation,
   IN  UINT32    CheckAuthOperation
   )
-{ 
+{
   //
   // Make sure new auth operation can be recognized.
   //
   ASSERT ((CheckAuthOperation & ~(EFI_AUTH_IMAGE_OPERATION_MASK | EFI_AUTH_OPERATION_AUTHENTICATION_STATE | EFI_AUTH_OPERATION_IMAGE_REQUIRED)) == 0);
-  
+
   //
-  // When current operation includes measure image operation, 
+  // When current operation includes measure image operation,
   // only another measure image operation or none operation will be allowed.
   //
   if ((CurrentAuthOperation & EFI_AUTH_OPERATION_MEASURE_IMAGE) == EFI_AUTH_OPERATION_MEASURE_IMAGE) {
@@ -120,9 +120,9 @@ CheckAuthenticationOperation (
       return FALSE;
     }
   }
-  
+
   //
-  // When current operation doesn't include measure image operation, 
+  // When current operation doesn't include measure image operation,
   // any new operation will be allowed.
   //
   return TRUE;
@@ -184,12 +184,12 @@ RegisterSecurityHandler (
   Execute registered handlers until one returns an error and that error is returned.
   If none of the handlers return an error, then EFI_SUCCESS is returned.
 
-  Before exectue handler, get the image buffer by file device path if a handler 
+  Before exectue handler, get the image buffer by file device path if a handler
   requires the image file. And return the image buffer to each handler when exectue handler.
 
   The handlers are executed in same order to their registered order.
 
-  @param[in]  AuthenticationStatus 
+  @param[in]  AuthenticationStatus
                            This is the authentication type returned from the Section
                            Extraction protocol. See the Section Extraction Protocol
                            Specification for details on this type.
@@ -197,9 +197,9 @@ RegisterSecurityHandler (
                            being dispatched. This will optionally be used for logging.
 
   @retval EFI_SUCCESS            The file specified by File did authenticate when more
-                                 than one security handler services were registered, 
-                                 or the file did not authenticate when no security 
-                                 handler service was registered. And the platform policy 
+                                 than one security handler services were registered,
+                                 or the file did not authenticate when no security
+                                 handler service was registered. And the platform policy
                                  dictates that the DXE Core may use File.
   @retval EFI_INVALID_PARAMETER  File is NULL.
   @retval EFI_SECURITY_VIOLATION The file specified by File did not authenticate, and
@@ -226,7 +226,7 @@ ExecuteSecurityHandlers (
   EFI_HANDLE    Handle;
   EFI_DEVICE_PATH_PROTOCOL        *Node;
   EFI_DEVICE_PATH_PROTOCOL        *FilePathToVerfiy;
-  
+
   if (FilePath == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -237,7 +237,7 @@ ExecuteSecurityHandlers (
   if (mNumberOfSecurityHandler == 0) {
     return EFI_SUCCESS;
   }
-  
+
   Status                      = EFI_SUCCESS;
   FileBuffer                  = NULL;
   FileSize                    = 0;
@@ -309,8 +309,8 @@ ReallocateSecurity2HandlerTable (
   // Reallocate memory for security info structure.
   //
   mSecurity2Table = ReallocatePool (
-                     mMaxNumberOfSecurity2Handler * sizeof (SECURITY2_INFO), 
-                     (mMaxNumberOfSecurity2Handler + SECURITY_HANDLER_TABLE_SIZE) * sizeof (SECURITY2_INFO), 
+                     mMaxNumberOfSecurity2Handler * sizeof (SECURITY2_INFO),
+                     (mMaxNumberOfSecurity2Handler + SECURITY_HANDLER_TABLE_SIZE) * sizeof (SECURITY2_INFO),
                      mSecurity2Table
                      );
 
@@ -329,17 +329,17 @@ ReallocateSecurity2HandlerTable (
 }
 
 /**
-  Check whether an operation is valid according to the requirement of current operation, 
+  Check whether an operation is valid according to the requirement of current operation,
   which must make sure that the measure image operation is the last one.
-  
+
   If AuthenticationOperation is not recongnized, return FALSE.
   If AuthenticationOperation is EFI_AUTH_OPERATION_NONE, return FALSE.
   If AuthenticationOperation includes security operation and authentication operation, return FALSE.
   If the previous register handler can't be executed before the later register handler, return FALSE.
-  
+
   @param CurrentAuthOperation  Current operation.
   @param CheckAuthOperation    Operation to be checked.
-  
+
   @retval  TRUE   Operation is valid for current operation.
   @retval  FALSE  Operation is invalid for current operation.
 **/
@@ -348,21 +348,21 @@ CheckAuthentication2Operation (
   IN  UINT32    CurrentAuthOperation,
   IN  UINT32    CheckAuthOperation
   )
-{ 
+{
   //
   // Make sure new auth operation can be recognized.
   //
   if (CheckAuthOperation == EFI_AUTH_OPERATION_NONE) {
     return FALSE;
   }
-  if ((CheckAuthOperation & ~(EFI_AUTH_IMAGE_OPERATION_MASK | 
-                              EFI_AUTH_NONE_IMAGE_OPERATION_MASK | 
+  if ((CheckAuthOperation & ~(EFI_AUTH_IMAGE_OPERATION_MASK |
+                              EFI_AUTH_NONE_IMAGE_OPERATION_MASK |
                               EFI_AUTH_OPERATION_IMAGE_REQUIRED)) != 0) {
     return FALSE;
   }
 
   //
-  // When current operation includes measure image operation, 
+  // When current operation includes measure image operation,
   // only another measure image or none image operation will be allowed.
   //
   if ((CurrentAuthOperation & EFI_AUTH_OPERATION_MEASURE_IMAGE) == EFI_AUTH_OPERATION_MEASURE_IMAGE) {
@@ -373,7 +373,7 @@ CheckAuthentication2Operation (
       return FALSE;
     }
   }
-  
+
   //
   // Any other operation will be allowed.
   //
@@ -434,16 +434,16 @@ RegisterSecurity2Handler (
 }
 
 /**
-  Execute registered handlers based on input AuthenticationOperation until 
-  one returns an error and that error is returned. 
-  
+  Execute registered handlers based on input AuthenticationOperation until
+  one returns an error and that error is returned.
+
   If none of the handlers return an error, then EFI_SUCCESS is returned.
   The handlers those satisfy AuthenticationOperation will only be executed.
   The handlers are executed in same order to their registered order.
 
-  @param[in]  AuthenticationOperation   
+  @param[in]  AuthenticationOperation
                            The operation type specifies which handlers will be executed.
-  @param[in]  AuthenticationStatus 
+  @param[in]  AuthenticationStatus
                            The authentication status for the input file.
   @param[in]  File         This is a pointer to the device path of the file that is
                            being dispatched. This will optionally be used for logging.
@@ -461,7 +461,7 @@ RegisterSecurity2Handler (
   @retval EFI_SUCCESS             FileBuffer is NULL and current user has permission to start
                                   UEFI device drivers on the device path specified by DevicePath.
   @retval EFI_SECURITY_VIOLATION  The file specified by File or FileBuffer did not
-                                  authenticate, and the platform policy dictates that 
+                                  authenticate, and the platform policy dictates that
                                   the file should be placed in the untrusted state.
   @retval EFI_SECURITY_VIOLATION  FileBuffer FileBuffer is NULL and the user has no
                                   permission to start UEFI device drivers on the device path specified
@@ -472,7 +472,7 @@ RegisterSecurity2Handler (
   @retval EFI_ACCESS_DENIED       The file specified by File did not authenticate, and
                                   the platform policy dictates that the DXE
                                   Foundation may not use File.
-  @retval EFI_INVALID_PARAMETER   File and FileBuffer are both NULL. 
+  @retval EFI_INVALID_PARAMETER   File and FileBuffer are both NULL.
 **/
 EFI_STATUS
 EFIAPI

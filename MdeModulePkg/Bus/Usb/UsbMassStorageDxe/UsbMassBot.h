@@ -3,7 +3,7 @@
   based on the "Universal Serial Bus Mass Storage Class Bulk-Only
   Transport" Revision 1.0, September 31, 1999.
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,7 +43,7 @@ extern USB_MASS_TRANSPORT mUsbBotTransport;
 
 //
 // Usb Bot wait device reset complete, set by experience
-//  
+//
 #define USB_BOT_RESET_DEVICE_STALL  (100 * USB_MASS_1_MILLISECOND)
 
 //

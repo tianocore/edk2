@@ -1,8 +1,8 @@
 /** @file
   Define the PPI to abstract the functions that enable IDE and SATA channels, and to retrieve
   the base I/O port address for each of the enabled IDE and SATA channels.
-  
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _PEI_ATA_CONTROLLER_PPI_H_
 
 ///
-/// Global ID for the PEI_ATA_CONTROLLER_PPI. 
+/// Global ID for the PEI_ATA_CONTROLLER_PPI.
 ///
 #define PEI_ATA_CONTROLLER_PPI_GUID \
   { \
@@ -32,50 +32,50 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _PEI_ATA_CONTROLLER_PPI PEI_ATA_CONTROLLER_PPI;
 
 ///
-/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to 
-/// disable the IDE channels. 
-/// This is designed for old generation chipset with PATA/SATA controllers. 
-/// It may be ignored in PPI implementation for new generation chipset without PATA controller. 
+/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to
+/// disable the IDE channels.
+/// This is designed for old generation chipset with PATA/SATA controllers.
+/// It may be ignored in PPI implementation for new generation chipset without PATA controller.
 ///
 #define PEI_ICH_IDE_NONE        0x00
 
 ///
-/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to 
+/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to
 /// enable the Primary IDE channel.
-/// This is designed for old generation chipset with PATA/SATA controllers. 
-/// It may be ignored in PPI implementation for new generation chipset without PATA controller. 
+/// This is designed for old generation chipset with PATA/SATA controllers.
+/// It may be ignored in PPI implementation for new generation chipset without PATA controller.
 ///
 #define PEI_ICH_IDE_PRIMARY     0x01
 
 ///
-/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to 
+/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to
 /// enable the Secondary IDE channel.
-/// This is designed for old generation chipset with PATA/SATA controllers. 
-/// It may be ignored in PPI implementation for new generation chipset without PATA controller. 
+/// This is designed for old generation chipset with PATA/SATA controllers.
+/// It may be ignored in PPI implementation for new generation chipset without PATA controller.
 ///
 #define PEI_ICH_IDE_SECONDARY   0x02
 
 ///
-/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to 
+/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to
 /// disable the SATA channel.
-/// This is designed for old generation chipset with PATA/SATA controllers. 
-/// It may be ignored in PPI implementation for new generation chipset without PATA controller. 
+/// This is designed for old generation chipset with PATA/SATA controllers.
+/// It may be ignored in PPI implementation for new generation chipset without PATA controller.
 ///
 #define PEI_ICH_SATA_NONE       0x04
 
 ///
-/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to 
+/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to
 /// enable the Primary SATA channel.
-/// This is designed for old generation chipset with PATA/SATA controllers. 
-/// It may be ignored in PPI implementation for new generation chipset without PATA controller. 
+/// This is designed for old generation chipset with PATA/SATA controllers.
+/// It may be ignored in PPI implementation for new generation chipset without PATA controller.
 ///
 #define PEI_ICH_SATA_PRIMARY    0x08
 
 ///
-/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to 
+/// This bit is used in the ChannelMask parameter of EnableAtaChannel() to
 /// enable the Secondary SATA channel.
-/// This is designed for old generation chipset with PATA/SATA controllers. 
-/// It may be ignored in PPI implementation for new generation chipset without PATA controller. 
+/// This is designed for old generation chipset with PATA/SATA controllers.
+/// It may be ignored in PPI implementation for new generation chipset without PATA controller.
 ///
 #define PEI_ICH_SATA_SECONDARY  0x010
 
@@ -97,15 +97,15 @@ typedef struct {
   Sets IDE and SATA channels to an enabled or disabled state.
 
   This service enables or disables the IDE and SATA channels specified by ChannelMask.
-  It may ignore ChannelMask setting to enable or disable IDE and SATA channels based on the platform policy. 
-  The number of the enabled channels will be returned by GET_IDE_REGS_BASE_ADDR() function. 
+  It may ignore ChannelMask setting to enable or disable IDE and SATA channels based on the platform policy.
+  The number of the enabled channels will be returned by GET_IDE_REGS_BASE_ADDR() function.
 
   If the new state is set, then EFI_SUCCESS is returned.  If the new state can
   not be set, then EFI_DEVICE_ERROR is returned.
 
   @param[in] PeiServices   The pointer to the PEI Services Table.
   @param[in] This          The pointer to this instance of the PEI_ATA_CONTROLLER_PPI.
-  @param[in] ChannelMask   The bitmask that identifies the IDE and SATA channels to 
+  @param[in] ChannelMask   The bitmask that identifies the IDE and SATA channels to
                            enable or disable. This parameter is optional.
 
   @retval EFI_SUCCESS        The IDE or SATA channels were enabled or disabled successfully.
@@ -121,18 +121,18 @@ EFI_STATUS
   );
 
 /**
-  Retrieves the I/O port base addresses for command and control registers of the 
+  Retrieves the I/O port base addresses for command and control registers of the
   enabled IDE/SATA channels.
 
   This service fills in the structure poionted to by IdeRegsBaseAddr with the I/O
   port base addresses for the command and control registers of the IDE and SATA
-  channels that were previously enabled in EnableAtaChannel().  The number of 
+  channels that were previously enabled in EnableAtaChannel().  The number of
   enabled IDE and SATA channels is returned.
 
   @param[in]  PeiServices       The pointer to the PEI Services Table.
   @param[in]  This              The pointer to this instance of the PEI_ATA_CONTROLLER_PPI.
-  @param[out] IdeRegsBaseAddr   The pointer to caller allocated space to return the 
-                                I/O port base addresses of the IDE and SATA channels 
+  @param[out] IdeRegsBaseAddr   The pointer to caller allocated space to return the
+                                I/O port base addresses of the IDE and SATA channels
                                 that were previosuly enabled with EnableAtaChannel().
 
   @return   The number of enabled IDE and SATA channels in the platform.
@@ -143,7 +143,7 @@ UINT32
 (EFIAPI *GET_IDE_REGS_BASE_ADDR)(
   IN  EFI_PEI_SERVICES        **PeiServices,
   IN  PEI_ATA_CONTROLLER_PPI  *This,
-  OUT IDE_REGS_BASE_ADDR      *IdeRegsBaseAddr 
+  OUT IDE_REGS_BASE_ADDR      *IdeRegsBaseAddr
   );
 
 ///

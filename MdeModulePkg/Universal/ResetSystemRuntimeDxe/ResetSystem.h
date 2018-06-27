@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -63,9 +63,9 @@ typedef struct {
 
   It initializes the Reset Architectural Protocol.
 
-  @param[in] ImageHandle  The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
   @param[in] SystemTable  A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS     The entry point is executed successfully.
   @retval other           Cannot install ResetArch protocol.
 

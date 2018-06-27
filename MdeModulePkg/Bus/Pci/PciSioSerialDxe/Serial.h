@@ -1,7 +1,7 @@
 /** @file
   Header file for PciSioSerial Driver
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -497,7 +497,7 @@ SerialFifoFull (
 
 /**
   Detect whether specific FIFO is empty or not.
- 
+
   @param  Fifo    A pointer to the Data Structure SERIAL_DEV_FIFO
 
   @return whether specific FIFO is empty or not
@@ -777,7 +777,7 @@ SkipControllerDevicePathNode (
   Check the device path node whether it's the Flow Control node or not.
 
   @param[in] FlowControl    The device path node to be checked.
-  
+
   @retval TRUE              It's the Flow Control node.
   @retval FALSE             It's not.
 

@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core PPI services
-  
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Initialize PPI services.
 
   @param PrivateData     Pointer to the PEI Core data.
-  @param OldCoreData     Pointer to old PEI Core data. 
+  @param OldCoreData     Pointer to old PEI Core data.
                          NULL if being run in non-permament memory mode.
 
 **/
@@ -44,7 +44,7 @@ InitializePpiServices (
   @param TempBottom      Base of old temporary memory
   @param TempTop         Top of old temporary memory
   @param Offset          Offset of new memory to old temporary memory.
-  @param OffsetPositive  Positive flag of Offset value. 
+  @param OffsetPositive  Positive flag of Offset value.
 
 **/
 VOID
@@ -105,7 +105,7 @@ ConvertSinglePpiPointer (
 
   Migrate PPI Pointers from the temporary memory to PEI installed memory.
 
-  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size
                          and location of temporary RAM, the stack location and the BFV location.
   @param PrivateData     Pointer to PeiCore's private data structure.
 
@@ -145,7 +145,7 @@ ConvertPpiPointers (
         PrivateData->HeapOffset,
         PrivateData->HeapOffsetPositive
         );
-        
+
       //
       // Convert PPI pointer in old Stack
       //
@@ -156,7 +156,7 @@ ConvertPpiPointers (
         PrivateData->StackOffset,
         PrivateData->StackOffsetPositive
         );
-        
+
       //
       // Convert PPI pointer in old TempRam Hole
       //
@@ -164,7 +164,7 @@ ConvertPpiPointers (
         if (PrivateData->HoleData[IndexHole].Size == 0) {
           continue;
         }
-        
+
         ConvertSinglePpiPointer (
           &PrivateData->PpiData.PpiListPtrs[Index],
           (UINTN)PrivateData->HoleData[IndexHole].Base,
@@ -179,7 +179,7 @@ ConvertPpiPointers (
 
 /**
 
-  This function installs an interface in the PEI PPI database by GUID. 
+  This function installs an interface in the PEI PPI database by GUID.
   The purpose of the service is to publish an interface that other parties
   can use to call additional PEIMs.
 
@@ -280,7 +280,7 @@ InternalPeiInstallPpi (
 
 /**
 
-  This function installs an interface in the PEI PPI database by GUID. 
+  This function installs an interface in the PEI PPI database by GUID.
   The purpose of the service is to publish an interface that other parties
   can use to call additional PEIMs.
 
@@ -305,9 +305,9 @@ PeiInstallPpi (
 
 /**
 
-  This function reinstalls an interface in the PEI PPI database by GUID. 
-  The purpose of the service is to publish an interface that other parties can 
-  use to replace an interface of the same name in the protocol database with a 
+  This function reinstalls an interface in the PEI PPI database by GUID.
+  The purpose of the service is to publish an interface that other parties can
+  use to replace an interface of the same name in the protocol database with a
   different interface.
 
   @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
@@ -450,8 +450,8 @@ PeiLocatePpi (
 
 /**
 
-  This function installs a notification service to be called back when a given 
-  interface is installed or reinstalled. The purpose of the service is to publish 
+  This function installs a notification service to be called back when a given
+  interface is installed or reinstalled. The purpose of the service is to publish
   an interface that other parties can use to call additional PPIs that may materialize later.
 
   @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
@@ -579,8 +579,8 @@ InternalPeiNotifyPpi (
 
 /**
 
-  This function installs a notification service to be called back when a given 
-  interface is installed or reinstalled. The purpose of the service is to publish 
+  This function installs a notification service to be called back when a given
+  interface is installed or reinstalled. The purpose of the service is to publish
   an interface that other parties can use to call additional PPIs that may materialize later.
 
   @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.

@@ -3,7 +3,7 @@
 
   This library provides the performance measurement interfaces and initializes performance
   logging for DXE phase. It first initializes its private global data structure for
-  performance logging and saves the performance GUIDed HOB passed from PEI phase. 
+  performance logging and saves the performance GUIDed HOB passed from PEI phase.
   It initializes DXE phase performance logging by publishing the Performance and PerformanceEx Protocol,
   which are consumed by DxePerformanceLib to logging performance data in DXE phase.
 

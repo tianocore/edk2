@@ -1,7 +1,7 @@
 /** @file
   Header file for GraphicsConsole driver.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -209,7 +209,7 @@ GraphicsConsoleComponentNameGetControllerName (
 
 /**
   Reset the text output device hardware and optionally run diagnostics.
-  
+
   Implements SIMPLE_TEXT_OUTPUT.Reset().
   If ExtendeVerification is TRUE, then perform dependent Graphics Console
   device reset, and set display mode to mode 0.
@@ -235,7 +235,7 @@ GraphicsConsoleConOutReset (
 /**
   Write a Unicode string to the output device.
 
-  Implements SIMPLE_TEXT_OUTPUT.OutputString(). 
+  Implements SIMPLE_TEXT_OUTPUT.OutputString().
   The Unicode string will be converted to Glyphs and will be
   sent to the Graphics Console.
 
@@ -262,7 +262,7 @@ GraphicsConsoleConOutOutputString (
   );
 
 /**
-  Verifies that all characters in a Unicode string can be output to the 
+  Verifies that all characters in a Unicode string can be output to the
   target device.
 
   Implements SIMPLE_TEXT_OUTPUT.TestString().
@@ -316,7 +316,7 @@ GraphicsConsoleConOutQueryMode (
 
 /**
   Sets the output device(s) to a specified mode.
-  
+
   Implements SIMPLE_TEXT_OUTPUT.SetMode().
   Set the Graphics Console to a specified mode. In this driver, we only support mode 0.
 
@@ -324,7 +324,7 @@ GraphicsConsoleConOutQueryMode (
   @param  ModeNumber            The text mode to set.
 
   @retval EFI_SUCCESS           The requested text mode is set.
-  @retval EFI_DEVICE_ERROR      The requested text mode cannot be set because of 
+  @retval EFI_DEVICE_ERROR      The requested text mode cannot be set because of
                                 Graphics Console device error.
   @retval EFI_UNSUPPORTED       The text mode number is not valid.
 
@@ -344,7 +344,7 @@ GraphicsConsoleConOutSetMode (
 
   @param  This                  Protocol instance pointer.
   @param  Attribute             The attribute to set. Bits 0..3 are the foreground
-                                color, and bits 4..6 are the background color. 
+                                color, and bits 4..6 are the background color.
                                 All other bits are undefined and must be zero.
 
   @retval EFI_SUCCESS           The requested attribute is set.
@@ -360,7 +360,7 @@ GraphicsConsoleConOutSetAttribute (
   );
 
 /**
-  Clears the output device(s) display to the currently selected background 
+  Clears the output device(s) display to the currently selected background
   color.
 
   Implements SIMPLE_TEXT_OUTPUT.ClearScreen().
@@ -451,10 +451,10 @@ GraphicsConsoleControllerDriverSupported (
 
 
 /**
-  Start this driver on Controller by opening Graphics Output protocol or 
+  Start this driver on Controller by opening Graphics Output protocol or
   UGA Draw protocol, and installing Simple Text Out protocol on Controller.
   (UGA Draw protocol could be skipped if PcdUgaConsumeSupport is set to FALSE.)
-  
+
   @param  This                 Protocol instance pointer.
   @param  Controller           Handle of device to bind driver to
   @param  RemainingDevicePath  Optional parameter use to pick a specific child
@@ -473,10 +473,10 @@ GraphicsConsoleControllerDriverStart (
   );
 
 /**
-  Stop this driver on Controller by removing Simple Text Out protocol 
+  Stop this driver on Controller by removing Simple Text Out protocol
   and closing the Graphics Output Protocol or UGA Draw protocol on Controller.
   (UGA Draw protocol could be skipped if PcdUgaConsumeSupport is set to FALSE.)
-  
+
 
   @param  This              Protocol instance pointer.
   @param  Controller        Handle of device to stop driver on
@@ -485,7 +485,7 @@ GraphicsConsoleControllerDriverStart (
   @param  ChildHandleBuffer List of Child Handles to Stop.
 
   @retval EFI_SUCCESS       This driver is removed Controller.
-  @retval EFI_NOT_STARTED   Simple Text Out protocol could not be found the 
+  @retval EFI_NOT_STARTED   Simple Text Out protocol could not be found the
                             Controller.
   @retval other             This driver was not removed from this device.
 
@@ -503,9 +503,9 @@ GraphicsConsoleControllerDriverStop (
 /**
   Locate HII Database protocol and HII Font protocol.
 
-  @retval  EFI_SUCCESS     HII Database protocol and HII Font protocol 
+  @retval  EFI_SUCCESS     HII Database protocol and HII Font protocol
                            are located successfully.
-  @return  other           Failed to locate HII Database protocol or 
+  @return  other           Failed to locate HII Database protocol or
                            HII Font protocol.
 
 **/
@@ -554,11 +554,11 @@ DrawUnicodeWeightAtCursorN (
 
 /**
   Flush the cursor on the screen.
-  
+
   If CursorVisible is FALSE, nothing to do and return directly.
-  If CursorVisible is TRUE, 
+  If CursorVisible is TRUE,
      i) If the cursor shows on screen, it will be erased.
-    ii) If the cursor does not show on screen, it will be shown. 
+    ii) If the cursor does not show on screen, it will be shown.
 
   @param  This                  Protocol instance pointer.
 
@@ -575,17 +575,17 @@ FlushCursor (
   for the Graphics Console device based on Graphics Output Protocol.
 
   If yes, set the graphic device's current mode to this specific mode.
-  
+
   @param  GraphicsOutput        Graphics Output Protocol instance pointer.
   @param  HorizontalResolution  User defined horizontal resolution
   @param  VerticalResolution    User defined vertical resolution.
   @param  CurrentModeNumber     Current specific mode to be check.
 
   @retval EFI_SUCCESS       The mode is supported.
-  @retval EFI_UNSUPPORTED   The specific mode is out of range of graphics 
+  @retval EFI_UNSUPPORTED   The specific mode is out of range of graphics
                             device supported.
-  @retval other             The specific mode does not support user defined 
-                            resolution or failed to set the current mode to the 
+  @retval other             The specific mode does not support user defined
+                            resolution or failed to set the current mode to the
                             specific mode on graphics device.
 
 **/

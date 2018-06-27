@@ -2,13 +2,13 @@
 
   This library class defines a set of interfaces to customize Display module
 
-Copyright (c) 2013-2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2013-2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -47,10 +47,10 @@ CHAR16            *gInputErrorMessage;
   Print banner info for front page.
 
   @param[in]  FormData             Form Data to be shown in Page
-  
+
 **/
 VOID
-PrintBannerInfo ( 
+PrintBannerInfo (
   IN FORM_DISPLAY_ENGINE_FORM       *FormData
   )
 {
@@ -84,15 +84,15 @@ PrintBannerInfo (
         ) {
       RowIdx    = (UINT8) (Line - (UINT8) gScreenDimensions.TopRow);
       ColumnIdx = (UINT8) (Alignment - (UINT8) gScreenDimensions.LeftColumn);
-  
+
       ASSERT (RowIdx < BANNER_HEIGHT && ColumnIdx < BANNER_COLUMNS);
-  
+
       if (gBannerData!= NULL && gBannerData->Banner[RowIdx][ColumnIdx] != 0x0000) {
         StrFrontPageBanner = LibGetToken (gBannerData->Banner[RowIdx][ColumnIdx], FormData->HiiHandle);
       } else {
         continue;
       }
-  
+
       switch (Alignment - gScreenDimensions.LeftColumn) {
       case 0:
         //
@@ -100,7 +100,7 @@ PrintBannerInfo (
         //
         PrintStringAt (gScreenDimensions.LeftColumn + BANNER_LEFT_COLUMN_INDENT, Line, StrFrontPageBanner);
         break;
-  
+
       case 1:
         //
         // Handle center column
@@ -111,7 +111,7 @@ PrintBannerInfo (
           StrFrontPageBanner
           );
         break;
-  
+
       case 2:
         //
         // Handle right column
@@ -123,7 +123,7 @@ PrintBannerInfo (
           );
         break;
       }
-  
+
       FreePool (StrFrontPageBanner);
     }
   }
@@ -159,7 +159,7 @@ PrintFramework (
       );
     return;
   }
-    
+
   Buffer = AllocateZeroPool (0x10000);
   ASSERT (Buffer != NULL);
   Character = BOXDRAW_HORIZONTAL;
@@ -187,7 +187,7 @@ PrintFramework (
     PrintCharAt (gScreenDimensions.LeftColumn, Row, Character);
     PrintCharAt (gScreenDimensions.RightColumn - 1, Row, Character);
   }
-  
+
   //
   // Print Form Title
   //
@@ -239,7 +239,7 @@ PrintFramework (
 
   Character = BOXDRAW_UP_LEFT;
   PrintCharAt ((UINTN) -1, (UINTN) -1, Character);
-  
+
   FreePool (Buffer);
 }
 
@@ -282,7 +282,7 @@ ProcessUserOpcode(
       }
       break;
 
-    case EFI_IFR_GUID_OP:     
+    case EFI_IFR_GUID_OP:
       if (CompareGuid (&gEfiIfrTianoGuid, (EFI_GUID *)((CHAR8*) OpCodeData + sizeof (EFI_IFR_OP_HEADER)))) {
         //
         // Tiano specific GUIDed opcodes
@@ -306,7 +306,7 @@ ProcessUserOpcode(
               gBannerData = AllocateZeroPool (sizeof (BANNER_DATA));
               ASSERT (gBannerData != NULL);
             }
-            
+
             CopyMem (
               &gBannerData->Banner[((EFI_IFR_GUID_BANNER *) OpCodeData)->LineNumber][
               ((EFI_IFR_GUID_BANNER *) OpCodeData)->Alignment],
@@ -335,7 +335,7 @@ ProcessUserOpcode(
 
 /**
   Process some op codes which is out side of current form.
-  
+
   @param FormData                Pointer to the form data.
 
   @return EFI_SUCCESS            Pass the statement success.
@@ -386,7 +386,7 @@ ProcessExternedOpcode (
   @return EFI_INVALID_PARAMETER  The input screen info is not acceptable.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 ScreenDiemensionInfoValidate (
   IN FORM_DISPLAY_ENGINE_FORM       *FormData
   )
@@ -395,7 +395,7 @@ ScreenDiemensionInfoValidate (
   UINTN                Index;
 
   //
-  // Calculate total number of Register HotKeys. 
+  // Calculate total number of Register HotKeys.
   //
   Index = 0;
   if (!IsListEmpty (&FormData->HotKeyListHead)){
@@ -584,7 +584,7 @@ PrintHotKeyHelpString (
   ColumnStr              = gLibEmptyString;
 
   //
-  // Calculate total number of Register HotKeys. 
+  // Calculate total number of Register HotKeys.
   //
   Index = 0;
   Link  = GetFirstNode (&FormData->HotKeyListHead);
@@ -607,7 +607,7 @@ PrintHotKeyHelpString (
     CurrentRow = BottomRowOfHotKeyHelp - Index / 3;
 
     //
-    // Help string can't exceed ColumnWidth. One Row will show three Help information. 
+    // Help string can't exceed ColumnWidth. One Row will show three Help information.
     //
     BakChar = L'\0';
     if (StrLen (HotKey->HelpString) > ColumnIndexWidth) {
@@ -632,7 +632,7 @@ PrintHotKeyHelpString (
     Link = GetNextNode (&FormData->HotKeyListHead, Link);
     Index ++;
   }
-  
+
   if (SetState) {
     //
     // Clear KeyHelp
@@ -651,13 +651,13 @@ PrintHotKeyHelpString (
       PrintStringAtWithWidth (CurrentCol, CurrentRow, gLibEmptyString, ColumnIndexWidth);
     }
   }
-  
+
   return;
 }
 
 /**
   Get step info from numeric opcode.
-  
+
   @param[in] OpCode     The input numeric op code.
 
   @return step info for this opcode.
@@ -671,24 +671,24 @@ LibGetFieldFromNum (
   UINT64                Step;
 
   NumericOp = (EFI_IFR_NUMERIC *) OpCode;
-  
+
   switch (NumericOp->Flags & EFI_IFR_NUMERIC_SIZE) {
   case EFI_IFR_NUMERIC_SIZE_1:
     Step    = NumericOp->data.u8.Step;
     break;
-  
+
   case EFI_IFR_NUMERIC_SIZE_2:
     Step    = NumericOp->data.u16.Step;
     break;
-  
+
   case EFI_IFR_NUMERIC_SIZE_4:
     Step    = NumericOp->data.u32.Step;
     break;
-  
+
   case EFI_IFR_NUMERIC_SIZE_8:
     Step    = NumericOp->data.u64.Step;
     break;
-  
+
   default:
     Step = 0;
     break;
@@ -729,7 +729,7 @@ InitializeLibStrings (
 
   gNvUpdateMessage      = LibGetToken (STRING_TOKEN (NV_UPDATE_MESSAGE), mCDLStringPackHandle);
   gInputErrorMessage    = LibGetToken (STRING_TOKEN (INPUT_ERROR_MESSAGE), mCDLStringPackHandle);
-  
+
   //
   // SpaceBuffer;
   //
@@ -770,7 +770,7 @@ FreeLibStrings (
 
   FreePool (gNvUpdateMessage);
   FreePool (gInputErrorMessage);
-  
+
   FreePool (mSpaceBuffer);
 }
 
@@ -799,7 +799,7 @@ WaitForKeyStroke (
     if (Status != EFI_NOT_READY) {
       continue;
     }
-    
+
     gBS->WaitForEvent (1, &gST->ConIn->WaitForKey, &Index);
   }
   return Status;
@@ -845,7 +845,7 @@ LibSetUnicodeMem (
 **/
 UINTN
 PrintInternal (
-  IN UINTN                            Width, 
+  IN UINTN                            Width,
   IN UINTN                            Column,
   IN UINTN                            Row,
   IN EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL  *Out,

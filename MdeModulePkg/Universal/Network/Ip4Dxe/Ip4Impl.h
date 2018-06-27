@@ -1,6 +1,6 @@
 /** @file
   Ip4 internal functions and type defintions.
-  
+
 Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
@@ -134,7 +134,7 @@ struct _IP4_PROTOCOL {
   EFI_HANDLE                Handle;
   INTN                      State;
 
-  BOOLEAN                   InDestroy;                      
+  BOOLEAN                   InDestroy;
 
   IP4_SERVICE               *Service;
   LIST_ENTRY                Link;       // Link to all the IP protocol from the service
@@ -212,7 +212,7 @@ struct _IP4_SERVICE {
   BOOLEAN                         Reconfig;
 
   //
-  // Underlying media present status. 
+  // Underlying media present status.
   //
   BOOLEAN                         MediaPresent;
 
@@ -334,8 +334,8 @@ Ip4Groups (
   );
 
 /**
-  This heart beat timer of IP4 service instance times out all of its IP4 children's 
-  received-but-not-delivered and transmitted-but-not-recycle packets, and provides 
+  This heart beat timer of IP4 service instance times out all of its IP4 children's
+  received-but-not-delivered and transmitted-but-not-recycle packets, and provides
   time input for its IGMP protocol.
 
   @param[in]  Event                  The IP4 service instance's heart beat timer.
@@ -350,11 +350,11 @@ Ip4TimerTicking (
   );
 
 /**
-  This dedicated timer is used to poll underlying network media status. In case 
-  of cable swap or wireless network switch, a new round auto configuration will 
-  be initiated. The timer will signal the IP4 to run DHCP configuration again. 
-  IP4 driver will free old IP address related resource, such as route table and 
-  Interface, then initiate a DHCP process to acquire new IP, eventually create 
+  This dedicated timer is used to poll underlying network media status. In case
+  of cable swap or wireless network switch, a new round auto configuration will
+  be initiated. The timer will signal the IP4 to run DHCP configuration again.
+  IP4 driver will free old IP address related resource, such as route table and
+  Interface, then initiate a DHCP process to acquire new IP, eventually create
   route table for new IP address.
 
   @param[in]  Event                  The IP4 service instance's heart beat timer.

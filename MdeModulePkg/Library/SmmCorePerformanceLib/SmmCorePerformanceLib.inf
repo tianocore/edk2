@@ -1,22 +1,22 @@
 ## @file
 #  Performance library instance used by SMM Core.
-#  
+#
 #  This library provides the performance measurement interfaces and initializes performance
 #  logging for the SMM phase.
 #  It initializes SMM phase performance logging by publishing the SMM Performance and PerformanceEx Protocol,
 #  which is consumed by SmmPerformanceLib to logging performance data in SMM phase.
 #  This library is mainly used by SMM Core to start performance logging to ensure that
 #  SMM Performance and PerformanceEx Protocol are installed at the very beginning of SMM phase.
-#  
+#
 #  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 ##
 
 [Defines]

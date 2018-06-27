@@ -38,11 +38,11 @@
   ScriptExecute.c
 
 [Sources.X64]
-  X64/SetIdtEntry.c  
+  X64/SetIdtEntry.c
   X64/S3Asm.nasm
-  
+
 [Sources.Ia32]
-  IA32/SetIdtEntry.c   
+  IA32/SetIdtEntry.c
   IA32/S3Asm.nasm
 
 [Packages]

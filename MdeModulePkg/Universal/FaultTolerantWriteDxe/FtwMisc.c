@@ -2,14 +2,14 @@
 
   Internal generic functions to operate flash block.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -89,7 +89,7 @@ FtwEraseBlock (
                                 partially erased.
   @retval EFI_INVALID_PARAMETER One or more of the LBAs listed
                                 in the variable argument list do
-                                not exist in the firmware volume.  
+                                not exist in the firmware volume.
 
 
 **/
@@ -970,11 +970,11 @@ GetPreviousRecordOfWrites (
 **/
 EFI_STATUS
 InitFtwDevice (
-  OUT EFI_FTW_DEVICE               **FtwData 
+  OUT EFI_FTW_DEVICE               **FtwData
   )
 {
   EFI_FTW_DEVICE                   *FtwDevice;
-  
+
   //
   // Allocate private data of this driver,
   // Including the FtwWorkSpace[FTW_WORK_SPACE_SIZE].
@@ -1005,11 +1005,11 @@ InitFtwDevice (
   if (FtwDevice->WorkSpaceAddress == 0) {
     FtwDevice->WorkSpaceAddress = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageFtwWorkingBase);
   }
-  
+
   FtwDevice->SpareAreaAddress = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageFtwSpareBase64);
   if (FtwDevice->SpareAreaAddress == 0) {
     FtwDevice->SpareAreaAddress = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageFtwSpareBase);
-  }  
+  }
 
   *FtwData = FtwDevice;
   return EFI_SUCCESS;
@@ -1024,7 +1024,7 @@ InitFtwDevice (
   @retval EFI_SUCCESS           Find the FVB protocol successfully.
   @retval EFI_NOT_FOUND         No proper FVB protocol was found.
   @retval EFI_ABORTED           Some data can not be got or be invalid.
-  
+
 **/
 EFI_STATUS
 FindFvbForFtw (
@@ -1068,7 +1068,7 @@ FindFvbForFtw (
     //
     Status = Fvb->GetAttributes (Fvb, &Attributes);
     if (EFI_ERROR (Status) || ((Attributes & EFI_FVB2_WRITE_STATUS) == 0)) {
-      continue;     
+      continue;
     }
     //
     // Compare the address and select the right one
@@ -1188,7 +1188,7 @@ FindFvbForFtw (
 
   @retval EFI_SUCCESS           Initialize the FTW protocol successfully.
   @retval EFI_NOT_FOUND         No proper FVB protocol was found.
-  
+
 **/
 EFI_STATUS
 InitFtwProtocol (
@@ -1208,7 +1208,7 @@ InitFtwProtocol (
   Status = FindFvbForFtw (FtwDevice);
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;
-  }  
+  }
 
   //
   // Calculate the start LBA of working block.
@@ -1338,7 +1338,7 @@ InitFtwProtocol (
   if (FtwDevice->FtwWorkSpace[Offset] != FTW_ERASED_BYTE) {
     Offset += FTW_WRITE_TOTAL_SIZE (FtwHeader->NumberOfWrites, FtwHeader->PrivateDataSize);
   }
-  
+
   if (!IsErasedFlashBuffer (FtwDevice->FtwWorkSpace + Offset, FtwDevice->FtwWorkSpaceSize - Offset)) {
     Status = FtwReclaimWorkSpace (FtwDevice, TRUE);
     ASSERT_EFI_ERROR (Status);
@@ -1378,7 +1378,7 @@ InitFtwProtocol (
   FtwDevice->FtwInstance.Restart         = FtwRestart;
   FtwDevice->FtwInstance.Abort           = FtwAbort;
   FtwDevice->FtwInstance.GetLastWrite    = FtwGetLastWrite;
-    
+
   return EFI_SUCCESS;
 }
 

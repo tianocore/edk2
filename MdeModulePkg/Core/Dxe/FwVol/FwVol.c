@@ -3,7 +3,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -34,8 +34,8 @@ FV_DEVICE mFvDevice = {
     FvReadFile,
     FvReadFileSection,
     FvWriteFile,
-    FvGetNextFile,   
-	sizeof (UINTN),
+    FvGetNextFile,
+  sizeof (UINTN),
     NULL,
     FvGetVolumeInfo,
     FvSetVolumeInfo
@@ -56,7 +56,7 @@ FV_DEVICE mFvDevice = {
 // FFS helper functions
 //
 /**
-  Read data from Firmware Block by FVB protocol Read. 
+  Read data from Firmware Block by FVB protocol Read.
   The data may cross the multi block ranges.
 
   @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to read data.
@@ -86,7 +86,7 @@ ReadFvbData (
   UINTN                       BlockIndex;
   UINTN                       ReadDataSize;
   EFI_STATUS                  Status;
-  
+
   //
   // Try read data in current block
   //
@@ -102,7 +102,7 @@ ReadFvbData (
     //
     return Status;
   }
-  
+
   //
   // Data crosses the blocks, read data from next block
   //
@@ -118,7 +118,7 @@ ReadFvbData (
     //
     // Read data from the crossing blocks
     //
-    BlockIndex = 0; 
+    BlockIndex = 0;
     while (BlockIndex < NumberOfBlocks && DataSize >= BlockSize) {
       Status = Fvb->Read (Fvb, *StartLba + BlockIndex, 0, &BlockSize, Data);
       if (EFI_ERROR (Status)) {
@@ -128,20 +128,20 @@ ReadFvbData (
       DataSize -= BlockSize;
       BlockIndex ++;
     }
-    
+
     //
     // Data doesn't exceed the current block range.
     //
     if (DataSize < BlockSize) {
       break;
     }
-    
+
     //
     // Data must be got from the next block range.
     //
     *StartLba += NumberOfBlocks;
   }
-  
+
   //
   // read the remaining data
   //
@@ -151,7 +151,7 @@ ReadFvbData (
       return Status;
     }
   }
-  
+
   //
   // Update Lba and Offset used by the following read.
   //
@@ -189,7 +189,7 @@ GetFwVolHeader (
   EFI_LBA                     StartLba;
   UINTN                       Offset;
   UINT8                       *Buffer;
-  
+
   //
   // Read the standard FV header
   //
@@ -418,9 +418,9 @@ FvCheck (
           HeaderSize = 0;
         }
       }
-    
+
       //
-      // read the FV data  
+      // read the FV data
       //
       for (; Index < BlockMap->NumBlocks; Index ++) {
         Status = Fvb->Read (Fvb,
@@ -715,7 +715,7 @@ NotifyFwVolBlock (
       // Inherit the authentication status from FVB.
       //
       FvDevice->AuthenticationStatus = GetFvbAuthenticationStatus (Fvb);
-      
+
       if (!EFI_ERROR (FvCheck (FvDevice))) {
         //
         // Install an New FV protocol on the existing handle

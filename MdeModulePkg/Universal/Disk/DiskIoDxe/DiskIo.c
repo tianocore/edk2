@@ -9,7 +9,7 @@
     Aligned  - A read of N contiguous sectors.
     OverRun  - The last byte is not on a sector boundary.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -55,7 +55,7 @@ DISK_IO_PRIVATE_DATA        gDiskIoPrivateDataTemplate = {
 };
 
 /**
-  Test to see if this driver supports ControllerHandle. 
+  Test to see if this driver supports ControllerHandle.
 
   @param  This                Protocol instance pointer.
   @param  ControllerHandle    Handle of device to test
@@ -162,7 +162,7 @@ DiskIoDriverBindingStart (
   if (EFI_ERROR (Status)) {
     gDiskIoPrivateDataTemplate.BlockIo2 = NULL;
   }
-  
+
   //
   // Initialize the Disk IO device instance.
   //
@@ -171,15 +171,15 @@ DiskIoDriverBindingStart (
     Status = EFI_OUT_OF_RESOURCES;
     goto ErrorExit;
   }
-  
+
   //
   // The BlockSize and IoAlign of BlockIo and BlockIo2 should equal.
   //
   ASSERT ((Instance->BlockIo2 == NULL) ||
-          ((Instance->BlockIo->Media->IoAlign == Instance->BlockIo2->Media->IoAlign) && 
+          ((Instance->BlockIo->Media->IoAlign == Instance->BlockIo2->Media->IoAlign) &&
            (Instance->BlockIo->Media->BlockSize == Instance->BlockIo2->Media->BlockSize)
           ));
-  
+
   InitializeListHead (&Instance->TaskQueue);
   EfiInitializeLock (&Instance->TaskQueueLock, TPL_NOTIFY);
   Instance->SharedWorkingBuffer = AllocateAlignedPages (
@@ -289,7 +289,7 @@ DiskIoDriverBindingStop (
   if (EFI_ERROR (Status)) {
     DiskIo2 = NULL;
   }
-  
+
   Instance = DISK_IO_PRIVATE_DATA_FROM_DISK_IO (DiskIo);
 
   if (DiskIo2 != NULL) {
@@ -315,7 +315,7 @@ DiskIoDriverBindingStop (
                     );
   }
   if (!EFI_ERROR (Status)) {
-    
+
     do {
       EfiAcquireLock (&Instance->TaskQueueLock);
       AllTaskDone = IsListEmpty (&Instance->TaskQueue);
@@ -343,7 +343,7 @@ DiskIoDriverBindingStop (
                       );
       ASSERT_EFI_ERROR (Status);
     }
-    
+
     FreePool (Instance);
   }
 
@@ -378,7 +378,7 @@ DiskIoDestroySubtask (
   if (!Subtask->Blocking) {
     if (Subtask->WorkingBuffer != NULL) {
       FreeAlignedPages (
-        Subtask->WorkingBuffer, 
+        Subtask->WorkingBuffer,
         Subtask->Length < Instance->BlockIo->Media->BlockSize
         ? EFI_SIZE_TO_PAGES (Instance->BlockIo->Media->BlockSize)
         : EFI_SIZE_TO_PAGES (Subtask->Length)
@@ -420,7 +420,7 @@ DiskIo2OnReadWriteComplete (
   ASSERT (Instance->Signature == DISK_IO_PRIVATE_DATA_SIGNATURE);
   ASSERT (Task->Signature     == DISK_IO2_TASK_SIGNATURE);
 
-  if ((Subtask->WorkingBuffer != NULL) && !EFI_ERROR (TransactionStatus) && 
+  if ((Subtask->WorkingBuffer != NULL) && !EFI_ERROR (TransactionStatus) &&
       (Task->Token != NULL) && !Subtask->Write
      ) {
     CopyMem (Subtask->Buffer, Subtask->WorkingBuffer + Subtask->Offset, Subtask->Length);
@@ -498,7 +498,7 @@ DiskIoCreateSubtask (
     }
   }
   DEBUG ((
-    EFI_D_BLKIO, 
+    EFI_D_BLKIO,
     "  %c:Lba/Offset/Length/WorkingBuffer/Buffer = %016lx/%08x/%08x/%08x/%08x\n",
     Write ? 'W': 'R', Lba, Offset, Length, WorkingBuffer, Buffer
     ));
@@ -553,7 +553,7 @@ DiskIoCreateSubtaskList (
   if (IoAlign == 0) {
     IoAlign = 1;
   }
-  
+
   Lba       = DivU64x32Remainder (Offset, BlockSize, &UnderRun);
   BufferPtr = (UINT8 *) Buffer;
 
@@ -596,7 +596,7 @@ DiskIoCreateSubtaskList (
       goto Done;
     }
     InsertTailList (Subtasks, &Subtask->Link);
-  
+
     BufferPtr  += Length;
     Offset     += Length;
     BufferSize -= Length;
@@ -633,7 +633,7 @@ DiskIoCreateSubtaskList (
     }
     InsertTailList (Subtasks, &Subtask->Link);
   }
-  
+
   if (OverRunLba > Lba) {
     //
     // If the DiskIo maps directly to a BlockIo device do the read.
@@ -726,7 +726,7 @@ DiskIo2Cancel (
   DISK_IO_PRIVATE_DATA  *Instance;
   DISK_IO2_TASK         *Task;
   LIST_ENTRY            *Link;
-  
+
   Instance = DISK_IO_PRIVATE_DATA_FROM_DISK_IO2 (This);
 
   EfiAcquireLock (&Instance->TaskQueueLock);
@@ -799,7 +799,7 @@ DiskIo2RemoveCompletedTask (
                      If this field is NULL, synchronous/blocking IO is performed.
   @param  BufferSize            The size in bytes of Buffer. The number of bytes to read from the device.
   @param  Buffer                A pointer to the destination buffer for the data.
-                                The caller is responsible either having implicit or explicit ownership of the buffer. 
+                                The caller is responsible either having implicit or explicit ownership of the buffer.
 **/
 EFI_STATUS
 DiskIo2ReadWriteDisk (
@@ -948,7 +948,7 @@ DiskIo2ReadWriteDisk (
       break;
     }
   }
-  
+
   gBS->RaiseTPL (TPL_NOTIFY);
 
   //
@@ -1235,9 +1235,9 @@ DiskIoWriteDisk (
 /**
   The user Entry Point for module DiskIo. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 

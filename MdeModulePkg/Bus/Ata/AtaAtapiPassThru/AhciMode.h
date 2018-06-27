@@ -1,14 +1,14 @@
 /** @file
   Header file for AHCI mode of ATA host controller.
-  
-  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #ifndef __ATA_HC_AHCI_MODE_H__
@@ -68,7 +68,7 @@ typedef union {
 #define EFI_AHCI_MAX_DATA_PER_PRDT             0x400000
 
 #define EFI_AHCI_FIS_REGISTER_H2D              0x27      //Register FIS - Host to Device
-#define   EFI_AHCI_FIS_REGISTER_H2D_LENGTH     20 
+#define   EFI_AHCI_FIS_REGISTER_H2D_LENGTH     20
 #define EFI_AHCI_FIS_REGISTER_D2H              0x34      //Register FIS - Device to Host
 #define   EFI_AHCI_FIS_REGISTER_D2H_LENGTH     20
 #define EFI_AHCI_FIS_DMA_ACTIVATE              0x39      //DMA Activate FIS - Device to Host
@@ -213,12 +213,12 @@ typedef struct {
   UINT32   AhciCmdPrdbc;      //Physical Region Descriptor Byte Count
   UINT32   AhciCmdCtba;       //Command Table Descriptor Base Address
   UINT32   AhciCmdCtbau;      //Command Table Descriptor Base Address Upper 32-BITs
-  UINT32   AhciCmdRsvd1[4]; 
+  UINT32   AhciCmdRsvd1[4];
 } EFI_AHCI_COMMAND_LIST;
 
 //
 // This is a software constructed FIS.
-// For data transfer operations, this is the H2D Register FIS format as 
+// For data transfer operations, this is the H2D Register FIS format as
 // specified in the Serial ATA Revision 2.6 specification.
 //
 typedef struct {
@@ -257,7 +257,7 @@ typedef struct {
 // Physical Region Descriptor Table includes up to 65535 entries
 // The entry data structure is listed at the following.
 // the actual entry number comes from the PRDTL field in the command
-// list entry for this command slot. 
+// list entry for this command slot.
 //
 typedef struct {
   UINT32   AhciPrdtDba;       //Data Base Address
@@ -285,13 +285,13 @@ typedef struct {
   UINT8    AhciDmaSetupFis[0x1C];         // Dma Setup Fis: offset 0x00
   UINT8    AhciDmaSetupFisRsvd[0x04];
   UINT8    AhciPioSetupFis[0x14];         // Pio Setup Fis: offset 0x20
-  UINT8    AhciPioSetupFisRsvd[0x0C];     
+  UINT8    AhciPioSetupFisRsvd[0x0C];
   UINT8    AhciD2HRegisterFis[0x14];      // D2H Register Fis: offset 0x40
   UINT8    AhciD2HRegisterFisRsvd[0x04];
   UINT64   AhciSetDeviceBitsFis;          // Set Device Bits Fix: offset 0x58
   UINT8    AhciUnknownFis[0x40];          // Unkonwn Fis: offset 0x60
-  UINT8    AhciUnknownFisRsvd[0x60];      
-} EFI_AHCI_RECEIVED_FIS; 
+  UINT8    AhciUnknownFisRsvd[0x60];
+} EFI_AHCI_RECEIVED_FIS;
 
 typedef struct {
   UINT8  Madt : 5;
@@ -320,12 +320,12 @@ typedef struct {
 } EFI_AHCI_REGISTERS;
 
 /**
-  This function is used to send out ATAPI commands conforms to the Packet Command 
+  This function is used to send out ATAPI commands conforms to the Packet Command
   with PIO Protocol.
 
   @param PciIo              The PCI IO protocol instance.
   @param AhciRegisters      The pointer to the EFI_AHCI_REGISTERS.
-  @param Port               The number of port.     
+  @param Port               The number of port.
   @param PortMultiplier     The number of port multiplier.
   @param Packet             A pointer to EFI_EXT_SCSI_PASS_THRU_SCSI_REQUEST_PACKET structure.
 
@@ -346,12 +346,12 @@ AhciPacketCommandExecute (
 
 /**
   Start command for give slot on specific port.
-    
+
   @param  PciIo              The PCI IO protocol instance.
   @param  Port               The number of port.
   @param  CommandSlot        The number of CommandSlot.
   @param  Timeout            The timeout value of start, uses 100ns as a unit.
-   
+
   @retval EFI_DEVICE_ERROR   The command start unsuccessfully.
   @retval EFI_TIMEOUT        The operation is time out.
   @retval EFI_SUCCESS        The command start successfully.
@@ -368,11 +368,11 @@ AhciStartCommand (
 
 /**
   Stop command running for giving port
-    
+
   @param  PciIo              The PCI IO protocol instance.
   @param  Port               The number of port.
   @param  Timeout            The timeout value of stop, uses 100ns as a unit.
-   
+
   @retval EFI_DEVICE_ERROR   The command stop unsuccessfully.
   @retval EFI_TIMEOUT        The operation is time out.
   @retval EFI_SUCCESS        The command stop successfully.

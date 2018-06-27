@@ -2,7 +2,7 @@
   UfsPassThruDxe driver is used to produce EFI_EXT_SCSI_PASS_THRU protocol interface
   for upper layer application to execute UFS-supported SCSI cmds.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -153,7 +153,7 @@ typedef struct {
 // UFSHCI 2.0 Spec Section 5.2.5 Offset 18h: AHIT - Auto-Hibernate Idle Timer
 //
 typedef struct {
-  UINT32 Ahitv:10;     // Auto-Hibernate Idle Timer Value 
+  UINT32 Ahitv:10;     // Auto-Hibernate Idle Timer Value
   UINT32 Ts:3;         // Timer scale
   UINT32 Rsvd1:19;
 } UFS_HC_AHIT;
@@ -165,19 +165,19 @@ typedef struct {
   UINT16 Utrcs:1;      // UTP Transfer Request Completion Status
   UINT16 Udepri:1;     // UIC DME_ENDPOINT_RESET Indication
   UINT16 Ue:1;         // UIC Error
-  UINT16 Utms:1;       // UIC Test Mode Status 
+  UINT16 Utms:1;       // UIC Test Mode Status
 
-  UINT16 Upms:1;       // UIC Power Mode Status 
-  UINT16 Uhxs:1;       // UIC Hibernate Exit Status 
-  UINT16 Uhes:1;       // UIC Hibernate Enter Status 
-  UINT16 Ulls:1;       // UIC Link Lost Status 
+  UINT16 Upms:1;       // UIC Power Mode Status
+  UINT16 Uhxs:1;       // UIC Hibernate Exit Status
+  UINT16 Uhes:1;       // UIC Hibernate Enter Status
+  UINT16 Ulls:1;       // UIC Link Lost Status
 
-  UINT16 Ulss:1;       // UIC Link Startup Status 
-  UINT16 Utmrcs:1;     // UTP Task  Management Request Completion Status 
-  UINT16 Uccs:1;       // UIC Command Completion Status 
-  UINT16 Dfes:1;       // Device Fatal Error Status  
+  UINT16 Ulss:1;       // UIC Link Startup Status
+  UINT16 Utmrcs:1;     // UTP Task  Management Request Completion Status
+  UINT16 Uccs:1;       // UIC Command Completion Status
+  UINT16 Dfes:1;       // Device Fatal Error Status
 
-  UINT16 Utpes:1;      // UTP Error Status  
+  UINT16 Utpes:1;      // UTP Error Status
   UINT16 Rsvd1:3;
 
   UINT16 Hcfes:1;      // Host Controller Fatal Error Status
@@ -194,9 +194,9 @@ typedef struct {
   UINT16 Uee:1;        // UIC Error Enable
   UINT16 Utmse:1;      // UIC Test Mode Status Enable
 
-  UINT16 Upmse:1;      // UIC Power Mode Status Enable 
+  UINT16 Upmse:1;      // UIC Power Mode Status Enable
   UINT16 Uhxse:1;      // UIC Hibernate Exit Status Enable
-  UINT16 Uhese:1;      // UIC Hibernate Enter Status Enable 
+  UINT16 Uhese:1;      // UIC Hibernate Enter Status Enable
   UINT16 Ullse:1;      // UIC Link Lost Status Enable
 
   UINT16 Ulsse:1;      // UIC Link Startup Status Enable
@@ -450,22 +450,22 @@ typedef struct {
   //
   UINT32 Rsvd6:7;
   UINT32 UcdBa:25;            /* UTP Command Descriptor Base Address */
-  
+
   //
   // DW5
   //
   UINT32 UcdBaU;              /* UTP Command Descriptor Base Address Upper 32-bits */
- 
+
   //
   // DW6
   //
-  UINT16 RuL;                 /* Response UPIU Length */  
+  UINT16 RuL;                 /* Response UPIU Length */
   UINT16 RuO;                 /* Response UPIU Offset */
 
   //
   // DW7
   //
-  UINT16 PrdtL;               /* PRDT Length */  
+  UINT16 PrdtL;               /* PRDT Length */
   UINT16 PrdtO;               /* PRDT Offset */
 } UTP_TRD;
 
@@ -475,12 +475,12 @@ typedef struct {
   //
   UINT32 Rsvd1:2;
   UINT32 DbAddr:30;           /* Data Base Address */
-  
+
   //
   // DW1
   //
   UINT32 DbAddrU;             /* Data Base Address Upper 32-bits */
- 
+
   //
   // DW2
   //
@@ -846,7 +846,7 @@ typedef struct {
   // DW4 - DW11
   //
   UTP_TM_REQ_UPIU TmReq;      /* Task Management Request UPIU */
-  
+
   //
   // DW12 - DW19
   //
@@ -972,7 +972,7 @@ typedef struct {
 typedef enum {
   UfsUtpQueryResponseSuccess             = 0x00,
   UfsUtpQueryResponseParamNotReadable    = 0xF6,
-  UfsUtpQueryResponseParamNotWriteable   = 0xF7,  
+  UfsUtpQueryResponseParamNotWriteable   = 0xF7,
   UfsUtpQueryResponseParamAlreadyWritten = 0xF8,
   UfsUtpQueryResponseInvalidLen          = 0xF9,
   UfsUtpQueryResponseInvalidVal          = 0xFA,
@@ -1305,7 +1305,7 @@ typedef enum {
   UfsFlagPurgeEn         = 0x06,
   UfsFlagPhyResRemoval   = 0x08,
   UfsFlagBusyRtc         = 0x09,
-  UfsFlagPermDisFwUpdate = 0x0B    
+  UfsFlagPermDisFwUpdate = 0x0B
 } UFS_FLAGS_IDN;
 
 //

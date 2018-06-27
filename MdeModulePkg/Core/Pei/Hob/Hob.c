@@ -1,14 +1,14 @@
 /** @file
   This module provide Hand-Off Block manupulation.
-  
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -34,22 +34,22 @@ PeiGetHobList (
   )
 {
   PEI_CORE_INSTANCE *PrivateData;
-  
+
   //
   // Only check this parameter in debug mode
   //
-  
-  DEBUG_CODE_BEGIN ();  
+
+  DEBUG_CODE_BEGIN ();
     if (HobList == NULL) {
       return EFI_INVALID_PARAMETER;
     }
   DEBUG_CODE_END ();
-  
+
   PrivateData = PEI_CORE_INSTANCE_FROM_PS_THIS(PeiServices);
 
   *HobList    = PrivateData->HobList.Raw;
 
-  return EFI_SUCCESS;   
+  return EFI_SUCCESS;
 }
 
 
@@ -90,7 +90,7 @@ PeiCreateHob (
   HandOffHob = *Hob;
 
   //
-  // Check Length to avoid data overflow. 
+  // Check Length to avoid data overflow.
   //
   if (0x10000 - Length <= 0x7) {
     return EFI_INVALID_PARAMETER;
@@ -106,7 +106,7 @@ PeiCreateHob (
     DEBUG ((EFI_D_ERROR, "  FreeMemoryBottom - 0x%08x\n", (UINTN)HandOffHob->EfiFreeMemoryBottom));
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   *Hob = (VOID*) (UINTN) HandOffHob->EfiEndOfHobList;
   ((EFI_HOB_GENERIC_HEADER*) *Hob)->HobType   = Type;
   ((EFI_HOB_GENERIC_HEADER*) *Hob)->HobLength = Length;
@@ -114,14 +114,14 @@ PeiCreateHob (
 
   HobEnd = (EFI_HOB_GENERIC_HEADER*) ((UINTN) *Hob + Length);
   HandOffHob->EfiEndOfHobList = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
- 
+
   HobEnd->HobType   = EFI_HOB_TYPE_END_OF_HOB_LIST;
   HobEnd->HobLength = (UINT16) sizeof (EFI_HOB_GENERIC_HEADER);
   HobEnd->Reserved  = 0;
   HobEnd++;
   HandOffHob->EfiFreeMemoryBottom = (EFI_PHYSICAL_ADDRESS) (UINTN) HobEnd;
 
-  return EFI_SUCCESS;   
+  return EFI_SUCCESS;
 }
 
 /**
@@ -222,14 +222,14 @@ PeiCoreBuildHobHandoffInfoTable (
   Hob->Header.HobType      = EFI_HOB_TYPE_HANDOFF;
   Hob->Header.HobLength    = (UINT16) sizeof (EFI_HOB_HANDOFF_INFO_TABLE);
   Hob->Header.Reserved     = 0;
-  
+
   HobEnd->HobType          = EFI_HOB_TYPE_END_OF_HOB_LIST;
   HobEnd->HobLength        = (UINT16) sizeof (EFI_HOB_GENERIC_HEADER);
   HobEnd->Reserved         = 0;
 
   Hob->Version             = EFI_HOB_HANDOFF_TABLE_VERSION;
   Hob->BootMode            = BootMode;
-  
+
   Hob->EfiMemoryTop        = MemoryBegin + MemoryLength;
   Hob->EfiMemoryBottom     = MemoryBegin;
   Hob->EfiFreeMemoryTop    = MemoryBegin + MemoryLength;

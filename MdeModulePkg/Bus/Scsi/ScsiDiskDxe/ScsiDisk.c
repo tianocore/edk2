@@ -1,7 +1,7 @@
 /** @file
   SCSI disk driver that layers on every SCSI IO protocol in the system.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -79,9 +79,9 @@ FreeAlignedBuffer (
 
   The user code starts with this function.
 
-  @param  ImageHandle    The firmware allocated handle for the EFI image.  
+  @param  ImageHandle    The firmware allocated handle for the EFI image.
   @param  SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -356,7 +356,7 @@ ScsiDiskDriverBindingStart (
           );
         return EFI_SUCCESS;
       }
-    } 
+    }
   }
 
   gBS->FreePool (ScsiDiskDevice->SenseData);
@@ -368,7 +368,7 @@ ScsiDiskDriverBindingStart (
          Controller
          );
   return Status;
-  
+
 }
 
 
@@ -380,7 +380,7 @@ ScsiDiskDriverBindingStart (
   restrictions for this service. DisconnectController() must follow these
   calling restrictions. If any other agent wishes to call Stop() it must
   also follow these calling restrictions.
-  
+
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
@@ -1720,7 +1720,7 @@ Done:
 
   @param  ScsiDiskDevice    The pointer of SCSI_DISK_DEV
   @param  MustReadCapacity  The flag about reading device capacity
-  @param  MediaChange       The pointer of flag indicates if media has changed 
+  @param  MediaChange       The pointer of flag indicates if media has changed
 
   @retval EFI_DEVICE_ERROR  Indicates that error occurs
   @retval EFI_SUCCESS       Successfully to detect media
@@ -1855,7 +1855,7 @@ ScsiDiskDetectMedia (
         } else {
           break;
         }
-      } else {   
+      } else {
         Retry++;
         if (!NeedRetry || (Retry >= MaxRetry)) {
           goto EXIT;
@@ -2059,7 +2059,7 @@ ScsiDiskInquiryDevice (
                      EFI_SCSI_PAGE_CODE_BLOCK_LIMITS_VPD
                      );
           if (!EFI_ERROR (Status)) {
-            ScsiDiskDevice->BlkIo.Media->OptimalTransferLengthGranularity = 
+            ScsiDiskDevice->BlkIo.Media->OptimalTransferLengthGranularity =
               (BlockLimits->OptimalTransferLengthGranularity2 << 8) |
                BlockLimits->OptimalTransferLengthGranularity1;
 
@@ -2111,7 +2111,7 @@ ScsiDiskInquiryDevice (
   } else if (Status == EFI_NOT_READY) {
     *NeedRetry = TRUE;
     return EFI_DEVICE_ERROR;
- 
+
   } else if ((Status == EFI_INVALID_PARAMETER) || (Status == EFI_UNSUPPORTED)) {
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
@@ -2147,7 +2147,7 @@ ScsiDiskInquiryDevice (
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
   }
-  
+
   //
   // if goes here, meant ScsiInquiryCommand() failed.
   // if ScsiDiskRequestSenseKeys() succeeds at last,
@@ -2303,7 +2303,7 @@ ScsiDiskTestUnitReady (
 
   @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
   @param  SenseData          The pointer of EFI_SCSI_SENSE_DATA
-  @param  NumberOfSenseKeys  The number of sense key  
+  @param  NumberOfSenseKeys  The number of sense key
   @param  Action             The pointer of action which indicates what is need to do next
 
   @retval EFI_DEVICE_ERROR   Indicates that error occurs
@@ -2444,7 +2444,7 @@ ScsiDiskReadCapacity (
   *NeedRetry          = FALSE;
 
   //
-  // submit Read Capacity(10) Command. If it returns capacity of FFFFFFFFh, 
+  // submit Read Capacity(10) Command. If it returns capacity of FFFFFFFFh,
   // 16 byte command should be used to access large hard disk >2TB
   //
   CommandStatus = ScsiReadCapacityCommand (
@@ -2508,12 +2508,12 @@ ScsiDiskReadCapacity (
    // go ahead to check HostAdapterStatus and TargetStatus
    // (EFI_TIMEOUT, EFI_DEVICE_ERROR, EFI_WARN_BUFFER_TOO_SMALL)
    //
- 
+
    Status = CheckHostAdapterStatus (HostAdapterStatus);
    if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
      *NeedRetry = TRUE;
      return EFI_DEVICE_ERROR;
- 
+
    } else if (Status == EFI_DEVICE_ERROR) {
     //
     // reset the scsi channel
@@ -2536,7 +2536,7 @@ ScsiDiskReadCapacity (
     *NeedRetry = FALSE;
     return EFI_DEVICE_ERROR;
   }
-  
+
   //
   // if goes here, meant ScsiReadCapacityCommand() failed.
   // if ScsiDiskRequestSenseKeys() succeeds at last,
@@ -2616,7 +2616,7 @@ CheckHostAdapterStatus (
   @param  TargetStatus  Target status
 
   @retval EFI_NOT_READY       Device is NOT ready.
-  @retval EFI_DEVICE_ERROR 
+  @retval EFI_DEVICE_ERROR
   @retval EFI_SUCCESS
 
 **/
@@ -2708,20 +2708,20 @@ ScsiDiskRequestSenseKeys (
               );
      if ((Status == EFI_SUCCESS) || (Status == EFI_WARN_BUFFER_TOO_SMALL)) {
         FallStatus = EFI_SUCCESS;
-  
+
      } else if ((Status == EFI_TIMEOUT) || (Status == EFI_NOT_READY)) {
        *NeedRetry  = TRUE;
        FallStatus  = EFI_DEVICE_ERROR;
- 
+
      } else if ((Status == EFI_INVALID_PARAMETER) || (Status == EFI_UNSUPPORTED)) {
        *NeedRetry  = FALSE;
        FallStatus  = EFI_DEVICE_ERROR;
- 
+
      } else if (Status == EFI_DEVICE_ERROR) {
         if (AskResetIfError) {
           ScsiDiskDevice->ScsiIo->ResetDevice (ScsiDiskDevice->ScsiIo);
         }
-  
+
         FallStatus = EFI_DEVICE_ERROR;
     }
 
@@ -2743,7 +2743,7 @@ ScsiDiskRequestSenseKeys (
     // no more sense key or number of sense keys exceeds predefined,
     // skip the loop.
     //
-    if ((PtrSenseData->Sense_Key == EFI_SCSI_SK_NO_SENSE) || 
+    if ((PtrSenseData->Sense_Key == EFI_SCSI_SK_NO_SENSE) ||
         (*NumberOfSenseKeys == ScsiDiskDevice->SenseDataNumber)) {
       SenseReq = FALSE;
     }
@@ -2777,9 +2777,9 @@ GetMediaInfo (
                                               (Capacity10->LastLba2 << 16) |
                                               (Capacity10->LastLba1 << 8)  |
                                                Capacity10->LastLba0;
-  
+
     ScsiDiskDevice->BlkIo.Media->BlockSize = (Capacity10->BlockSize3 << 24) |
-                                             (Capacity10->BlockSize2 << 16) | 
+                                             (Capacity10->BlockSize2 << 16) |
                                              (Capacity10->BlockSize1 << 8)  |
                                               Capacity10->BlockSize0;
     ScsiDiskDevice->BlkIo.Media->LowestAlignedLba               = 0;
@@ -2799,7 +2799,7 @@ GetMediaInfo (
     *Ptr   = Capacity16->LastLba7;
 
     ScsiDiskDevice->BlkIo.Media->BlockSize = (Capacity16->BlockSize3 << 24) |
-                                             (Capacity16->BlockSize2 << 16) | 
+                                             (Capacity16->BlockSize2 << 16) |
                                              (Capacity16->BlockSize1 << 8)  |
                                               Capacity16->BlockSize0;
 
@@ -2870,7 +2870,7 @@ ScsiDiskReadSectors (
 
   BlocksRemaining   = NumberOfBlocks;
   BlockSize         = ScsiDiskDevice->BlkIo.Media->BlockSize;
-  
+
   //
   // limit the data bytes that can be transferred by one Read(10) or Read(16) Command
   //
@@ -3114,7 +3114,7 @@ ScsiDiskWriteSectors (
                   &ByteCount,
                   Lba,
                   SectorCount
-                  );         
+                  );
         }
       if (!EFI_ERROR (Status)) {
         break;
@@ -4994,7 +4994,7 @@ ScsiDiskIsHardwareError (
   SensePtr  = SenseData;
 
   for (Index = 0; Index < SenseCounts; Index++) {
-    
+
     //
     // Sense Key is EFI_SCSI_SK_HARDWARE_ERROR (0x4)
     //
@@ -5071,7 +5071,7 @@ ScsiDiskIsResetBefore (
   SensePtr      = SenseData;
 
   for (Index = 0; Index < SenseCounts; Index++) {
-    
+
     //
     // Sense Key is EFI_SCSI_SK_UNIT_ATTENTION (0x6)
     // Additional Sense Code is EFI_SCSI_ASC_RESET (0x29)
@@ -5092,7 +5092,7 @@ ScsiDiskIsResetBefore (
 
   @param  SenseData    The pointer of EFI_SCSI_SENSE_DATA
   @param  SenseCounts  The number of sense key
-  @param  RetryLater   The flag means if need a retry 
+  @param  RetryLater   The flag means if need a retry
 
   @retval TRUE  Drive is ready.
   @retval FALSE Drive is NOT ready.
@@ -5187,7 +5187,7 @@ ScsiDiskHaveSenseKey (
   SensePtr = SenseData;
 
   for (Index = 0; Index < SenseCounts; Index++) {
-    
+
     //
     // Sense Key is SK_NO_SENSE (0x0)
     //
@@ -5234,18 +5234,18 @@ ReleaseScsiDiskDeviceResources (
 
 /**
   Determine if Block Io & Block Io2 should be produced.
-  
+
 
   @param  ChildHandle  Child Handle to retrieve Parent information.
-  
+
   @retval  TRUE    Should produce Block Io & Block Io2.
   @retval  FALSE   Should not produce Block Io & Block Io2.
 
-**/  
+**/
 BOOLEAN
 DetermineInstallBlockIo (
   IN  EFI_HANDLE      ChildHandle
-  )  
+  )
 {
   EFI_SCSI_PASS_THRU_PROTOCOL           *ScsiPassThru;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL       *ExtScsiPassThru;
@@ -5271,7 +5271,7 @@ DetermineInstallBlockIo (
       return TRUE;
     }
   }
-  
+
   return FALSE;
 }
 
@@ -5280,23 +5280,23 @@ DetermineInstallBlockIo (
   specified by ProtocolGuid is present on a ControllerHandle and opened by
   ChildHandle with an attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
   If the ControllerHandle is found, then the protocol specified by ProtocolGuid
-  will be opened on it.  
-  
+  will be opened on it.
+
 
   @param  ProtocolGuid   ProtocolGuid pointer.
   @param  ChildHandle    Child Handle to retrieve Parent information.
-  
-**/ 
+
+**/
 VOID *
 EFIAPI
 GetParentProtocol (
   IN  EFI_GUID                          *ProtocolGuid,
   IN  EFI_HANDLE                        ChildHandle
-  ) 
+  )
 {
   UINTN                                 Index;
   UINTN                                 HandleCount;
-  VOID                                  *Interface;  
+  VOID                                  *Interface;
   EFI_STATUS                            Status;
   EFI_HANDLE                            *HandleBuffer;
 
@@ -5316,7 +5316,7 @@ GetParentProtocol (
   }
 
   //
-  // Iterate to find who is parent handle that is opened with ProtocolGuid by ChildHandle 
+  // Iterate to find who is parent handle that is opened with ProtocolGuid by ChildHandle
   //
   for (Index = 0; Index < HandleCount; Index++) {
     Status = EfiTestChildHandle (HandleBuffer[Index], ChildHandle, ProtocolGuid);
@@ -5331,7 +5331,7 @@ GetParentProtocol (
 
   gBS->FreePool (HandleBuffer);
   return NULL;
-} 
+}
 
 /**
   Determine if EFI Erase Block Protocol should be produced.
@@ -5468,7 +5468,7 @@ Done:
 
 /**
   Provides inquiry information for the controller type.
-  
+
   This function is used by the IDE bus driver to get inquiry data.  Data format
   of Identify data is defined by the Interface GUID.
 
@@ -5477,9 +5477,9 @@ Done:
   @param[in, out] InquiryDataSize   Pointer to the value for the inquiry data size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
-  @retval EFI_NOT_FOUND          Device does not support this data class 
-  @retval EFI_DEVICE_ERROR       Error reading InquiryData from device 
-  @retval EFI_BUFFER_TOO_SMALL   InquiryDataSize not big enough 
+  @retval EFI_NOT_FOUND          Device does not support this data class
+  @retval EFI_DEVICE_ERROR       Error reading InquiryData from device
+  @retval EFI_BUFFER_TOO_SMALL   InquiryDataSize not big enough
 
 **/
 EFI_STATUS
@@ -5511,16 +5511,16 @@ ScsiDiskInfoInquiry (
   This function is used by the IDE bus driver to get identify data.  Data format
   of Identify data is defined by the Interface GUID.
 
-  @param[in]      This              Pointer to the EFI_DISK_INFO_PROTOCOL 
+  @param[in]      This              Pointer to the EFI_DISK_INFO_PROTOCOL
                                     instance.
   @param[in, out] IdentifyData      Pointer to a buffer for the identify data.
   @param[in, out] IdentifyDataSize  Pointer to the value for the identify data
                                     size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
-  @retval EFI_NOT_FOUND          Device does not support this data class 
-  @retval EFI_DEVICE_ERROR       Error reading IdentifyData from device 
-  @retval EFI_BUFFER_TOO_SMALL   IdentifyDataSize not big enough 
+  @retval EFI_NOT_FOUND          Device does not support this data class
+  @retval EFI_DEVICE_ERROR       Error reading IdentifyData from device
+  @retval EFI_BUFFER_TOO_SMALL   IdentifyDataSize not big enough
 
 **/
 EFI_STATUS
@@ -5536,7 +5536,7 @@ ScsiDiskInfoIdentify (
 
   if (CompareGuid (&This->Interface, &gEfiDiskInfoScsiInterfaceGuid) || CompareGuid (&This->Interface, &gEfiDiskInfoUfsInterfaceGuid)) {
     //
-    // Physical SCSI bus does not support this data class. 
+    // Physical SCSI bus does not support this data class.
     //
     return EFI_NOT_FOUND;
   }
@@ -5554,8 +5554,8 @@ ScsiDiskInfoIdentify (
 
 /**
   Provides sense data information for the controller type.
-  
-  This function is used by the IDE bus driver to get sense data. 
+
+  This function is used by the IDE bus driver to get sense data.
   Data format of Sense data is defined by the Interface GUID.
 
   @param[in]      This              Pointer to the EFI_DISK_INFO_PROTOCOL instance.
@@ -5585,7 +5585,7 @@ ScsiDiskInfoSenseData (
 /**
   This function is used by the IDE bus driver to get controller information.
 
-  @param[in]  This         Pointer to the EFI_DISK_INFO_PROTOCOL instance. 
+  @param[in]  This         Pointer to the EFI_DISK_INFO_PROTOCOL instance.
   @param[out] IdeChannel   Pointer to the Ide Channel number.  Primary or secondary.
   @param[out] IdeDevice    Pointer to the Ide Device number.  Master or slave.
 
@@ -5626,11 +5626,11 @@ ScsiDiskInfoWhichIde (
   via SCSI Request Packet.
 
   @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV
-  
+
   @retval EFI_SUCCESS     The ATAPI device identify data were retrieved successfully.
   @retval others          Some error occurred during the identification that ATAPI device.
 
-**/  
+**/
 EFI_STATUS
 AtapiIdentifyDevice (
   IN OUT SCSI_DISK_DEV   *ScsiDiskDevice
@@ -5666,8 +5666,8 @@ AtapiIdentifyDevice (
 
   @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV.
   @param  ChildHandle     Child handle to install DiskInfo protocol.
-  
-**/  
+
+**/
 VOID
 InitializeInstallDiskInfo (
   IN  SCSI_DISK_DEV   *ScsiDiskDevice,
@@ -5683,7 +5683,7 @@ InitializeInstallDiskInfo (
 
   Status = gBS->HandleProtocol (ChildHandle, &gEfiDevicePathProtocolGuid, (VOID **) &DevicePathNode);
   //
-  // Device Path protocol must be installed on the device handle. 
+  // Device Path protocol must be installed on the device handle.
   //
   ASSERT_EFI_ERROR (Status);
   //
@@ -5715,7 +5715,7 @@ InitializeInstallDiskInfo (
             ScsiDiskDevice->Channel = AtapiDevicePath->PrimarySecondary;
             ScsiDiskDevice->Device = AtapiDevicePath->SlaveMaster;
             //
-            // Update the DiskInfo.Interface to IDE interface GUID for the physical ATAPI device. 
+            // Update the DiskInfo.Interface to IDE interface GUID for the physical ATAPI device.
             //
             CopyGuid (&ScsiDiskDevice->DiskInfo.Interface, &gEfiDiskInfoIdeInterfaceGuid);
           } else {
@@ -5726,7 +5726,7 @@ InitializeInstallDiskInfo (
             ScsiDiskDevice->Channel = SataDevicePath->HBAPortNumber;
             ScsiDiskDevice->Device = SataDevicePath->PortMultiplierPortNumber;
             //
-            // Update the DiskInfo.Interface to AHCI interface GUID for the physical AHCI device. 
+            // Update the DiskInfo.Interface to AHCI interface GUID for the physical AHCI device.
             //
             CopyGuid (&ScsiDiskDevice->DiskInfo.Interface, &gEfiDiskInfoAhciInterfaceGuid);
           }

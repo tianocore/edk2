@@ -1,7 +1,7 @@
 /** @file
 File explorer related functions.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -61,7 +61,7 @@ HII_VENDOR_DEVICE_PATH  FeHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -554,7 +554,7 @@ LibFileInfo (
 
   Buffer      = NULL;
   BufferSize  = 0;
-  
+
   Status = FHand->GetInfo (
                     FHand,
                     InfoType,
@@ -691,19 +691,19 @@ LibAppendFileName (
 
   Size1 = StrSize (Str1);
   Size2 = StrSize (Str2);
-  
+
   //
   // Check overflow
   //
   if (((MAX_UINTN - Size1) < Size2) || ((MAX_UINTN - Size1 - Size2) < sizeof(CHAR16))) {
     return NULL;
   }
-  
+
   MaxLen = (Size1 + Size2 + sizeof (CHAR16))/ sizeof (CHAR16);
   Str   = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16));
   ASSERT (Str != NULL);
 
-  TmpStr = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16)); 
+  TmpStr = AllocateZeroPool (Size1 + Size2 + sizeof (CHAR16));
   ASSERT (TmpStr != NULL);
 
   StrCpyS (Str, MaxLen, Str1);
@@ -724,7 +724,7 @@ LibAppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings 
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings
       // that overlap.
       //
       StrCpyS (TmpStr, MaxLen, Ptr + 3);
@@ -736,7 +736,7 @@ LibAppendFileName (
       //
 
       //
-      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings 
+      // Use TmpStr as a backup, as StrCpyS in BaseLib does not handle copy of two strings
       // that overlap.
       //
       StrCpyS (TmpStr, MaxLen, Ptr + 2);
@@ -750,7 +750,7 @@ LibAppendFileName (
   }
 
   FreePool (TmpStr);
-  
+
   return Str;
 }
 
@@ -845,7 +845,7 @@ LibFindFileSystem (
         VolumeLabel,
         MenuEntry->HelpString
         );
-  	  MenuEntry->DisplayStringToken = HiiSetString (
+      MenuEntry->DisplayStringToken = HiiSetString (
                                              gFileExplorerPrivate.FeHiiHandle,
                                              0,
                                              MenuEntry->DisplayString,
@@ -871,16 +871,16 @@ LibFindFileSystem (
 
 /**
   Find the file handle from the input menu info.
-  
+
   @param  MenuEntry        Input Menu info.
   @param  RetFileHandle    Return the file handle for the input device path.
-  
+
   @retval EFI_SUCESS       Find the file handle success.
   @retval Other            Find the file handle failure.
 **/
 EFI_STATUS
 LibGetFileHandleFromMenu (
-  IN  MENU_ENTRY                *MenuEntry,  
+  IN  MENU_ENTRY                *MenuEntry,
   OUT EFI_FILE_HANDLE           *RetFileHandle
   )
 {
@@ -917,18 +917,18 @@ LibGetFileHandleFromMenu (
 
 /**
   Find the file handle from the input device path info.
-  
+
   @param  RootDirectory    Device path info.
   @param  RetFileHandle    Return the file handle for the input device path.
   @param  ParentFileName   Parent file name.
   @param  DeviceHandle     Driver handle for this partition.
-  
+
   @retval EFI_SUCESS       Find the file handle success.
   @retval Other            Find the file handle failure.
 **/
 EFI_STATUS
 LibGetFileHandleFromDevicePath (
-  IN  EFI_DEVICE_PATH_PROTOCOL  *RootDirectory,  
+  IN  EFI_DEVICE_PATH_PROTOCOL  *RootDirectory,
   OUT EFI_FILE_HANDLE           *RetFileHandle,
   OUT UINT16                    **ParentFileName,
   OUT EFI_HANDLE                *DeviceHandle
@@ -953,12 +953,12 @@ LibGetFileHandleFromDevicePath (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   Status = gBS->HandleProtocol (Handle, &gEfiSimpleFileSystemProtocolGuid, (VOID**)&Volume);
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Open the Volume to get the File System handle
   //
@@ -974,7 +974,7 @@ LibGetFileHandleFromDevicePath (
     *RetFileHandle = FileHandle;
     return EFI_SUCCESS;
   }
-  
+
   //
   // Duplicate the device path to avoid the access to unaligned device path node.
   // Because the device path consists of one or more FILE PATH MEDIA DEVICE PATH
@@ -990,7 +990,7 @@ LibGetFileHandleFromDevicePath (
     Status = EFI_OUT_OF_RESOURCES;
     goto Done;
   }
-        
+
   //
   // Parse each MEDIA_FILEPATH_DP node. There may be more than one, since the
   // directory information and filename can be seperate. The goal is to inch
@@ -1123,11 +1123,11 @@ LibCreateNewFile (
 
 /**
   Find files under current directory.
-  
+
   All files and sub-directories in current directory
   will be stored in DirectoryMenu for future use.
 
-  @param FileHandle    Parent file handle. 
+  @param FileHandle    Parent file handle.
   @param FileName      Parent file name.
   @param DeviceHandle  Driver handle for this partition.
 
@@ -1223,7 +1223,7 @@ LibFindFiles (
       } else {
         NewMenuEntry->DisplayString = LibStrDuplicate (DirInfo->FileName);
       }
-      
+
       NewMenuEntry->DisplayStringToken = HiiSetString (
                                            gFileExplorerPrivate.FeHiiHandle,
                                            0,
@@ -1459,7 +1459,7 @@ LibGetDevicePath (
 }
 
 /**
-  Choose a file in the specified directory. 
+  Choose a file in the specified directory.
 
   If user input NULL for the RootDirectory, will choose file in the system.
 
@@ -1612,7 +1612,7 @@ FileExplorerLibConstructor (
   //
   Status = gBS->LocateProtocol (&gEfiFormBrowser2ProtocolGuid, NULL, (VOID **) &gFileExplorerPrivate.FormBrowser2);
   ASSERT_EFI_ERROR (Status);
-    
+
   InitializeListHead (&gFileExplorerPrivate.FsOptionMenu->Head);
 
   return EFI_SUCCESS;
@@ -1647,7 +1647,7 @@ FileExplorerLibDestructor (
                     NULL
                     );
     ASSERT_EFI_ERROR (Status);
-    
+
     HiiRemovePackages (gFileExplorerPrivate.FeHiiHandle);
   }
 

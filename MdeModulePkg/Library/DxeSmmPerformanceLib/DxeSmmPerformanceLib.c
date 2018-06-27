@@ -5,7 +5,7 @@
   StartPerformanceMeasurement(), EndPerformanceMeasurement(), StartPerformanceMeasurementEx()
   and EndPerformanceMeasurementEx() are not implemented.
 
-  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -313,7 +313,7 @@ EndPerformanceMeasurement (
 UINTN
 EFIAPI
 GetByPerformanceProtocol (
-  IN  UINTN       LogEntryKey, 
+  IN  UINTN       LogEntryKey,
   OUT CONST VOID  **Handle,
   OUT CONST CHAR8 **Token,
   OUT CONST CHAR8 **Module,
@@ -450,12 +450,12 @@ GetAllSmmGaugeData (
   mSmmPerformanceBuffer = (UINT8 *) (UINTN) Entry->PhysicalStart;
 
   //
-  // Initialize communicate buffer 
+  // Initialize communicate buffer
   //
   SmmCommBufferHeader = (EFI_SMM_COMMUNICATE_HEADER *)mSmmPerformanceBuffer;
   SmmPerfCommData = (SMM_PERF_COMMUNICATE *)SmmCommBufferHeader->Data;
   ZeroMem((UINT8*)SmmPerfCommData, sizeof(SMM_PERF_COMMUNICATE));
-    
+
   CopyGuid (&SmmCommBufferHeader->HeaderGuid, &gSmmPerformanceProtocolGuid);
   SmmCommBufferHeader->MessageLength = sizeof(SMM_PERF_COMMUNICATE);
   CommSize = SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE;
@@ -482,7 +482,7 @@ GetAllSmmGaugeData (
 
   //
   // Get all SMM gauge data
-  //  
+  //
   SmmPerfCommData->Function = SMM_PERF_FUNCTION_GET_GAUGE_DATA;
   SmmPerfCommData->GaugeData = (GAUGE_DATA_ENTRY *) Buffer;
   EntriesGot = 0;
@@ -589,12 +589,12 @@ GetAllSmmGaugeDataEx (
   ASSERT (Index < PiSmmCommunicationRegionTable->NumberOfEntries);
   mSmmPerformanceBuffer = (UINT8 *) (UINTN) Entry->PhysicalStart;
   //
-  // Initialize communicate buffer 
+  // Initialize communicate buffer
   //
   SmmCommBufferHeader = (EFI_SMM_COMMUNICATE_HEADER *)mSmmPerformanceBuffer;
   SmmPerfCommData = (SMM_PERF_COMMUNICATE_EX *)SmmCommBufferHeader->Data;
   ZeroMem((UINT8*)SmmPerfCommData, sizeof(SMM_PERF_COMMUNICATE_EX));
-    
+
   CopyGuid (&SmmCommBufferHeader->HeaderGuid, &gSmmPerformanceExProtocolGuid);
   SmmCommBufferHeader->MessageLength = sizeof(SMM_PERF_COMMUNICATE_EX);
   CommSize = SMM_PERFORMANCE_COMMUNICATION_BUFFER_SIZE;
@@ -621,7 +621,7 @@ GetAllSmmGaugeDataEx (
 
   //
   // Get all SMM gauge data
-  //  
+  //
   SmmPerfCommData->Function = SMM_PERF_FUNCTION_GET_GAUGE_DATA;
   SmmPerfCommData->GaugeDataEx = (GAUGE_DATA_ENTRY_EX *) Buffer;
   EntriesGot = 0;
@@ -691,7 +691,7 @@ GetAllSmmGaugeDataEx (
 UINTN
 EFIAPI
 GetPerformanceMeasurementEx (
-  IN  UINTN       LogEntryKey, 
+  IN  UINTN       LogEntryKey,
   OUT CONST VOID  **Handle,
   OUT CONST CHAR8 **Token,
   OUT CONST CHAR8 **Module,

@@ -1,12 +1,12 @@
 /** @file
-  Defines the PEI_USB_IO_PPI that the USB-related PEIM can use for I/O operations 
-  on the USB BUS.  This interface enables recovery from a 
-  USB-class storage device, such as USB CD/DVD, USB hard drive, or USB FLASH 
+  Defines the PEI_USB_IO_PPI that the USB-related PEIM can use for I/O operations
+  on the USB BUS.  This interface enables recovery from a
+  USB-class storage device, such as USB CD/DVD, USB hard drive, or USB FLASH
   drive.  These interfaces are modeled on the UEFI 2.3 specification EFI_USB_IO_PROTOCOL.
-  Refer to section 16.2.4 of the UEFI 2.3 Specification for more information on 
+  Refer to section 16.2.4 of the UEFI 2.3 Specification for more information on
   these interfaces.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -42,29 +42,29 @@ typedef struct _PEI_USB_IO_PPI  PEI_USB_IO_PPI;
 
   @param[in]     PeiServices   The pointer to the PEI Services Table.
   @param[in]     This          The pointer to this instance of the PEI_USB_IO_PPI.
-  @param[in]     Request       A pointer to the USB device request that will be 
+  @param[in]     Request       A pointer to the USB device request that will be
                                sent to the USB device.
-  @param[in]     Direction     Specifies the data direction for the transfer. There 
-                               are three values available: 
+  @param[in]     Direction     Specifies the data direction for the transfer. There
+                               are three values available:
                                EfiUsbDataIn, EfiUsbDataOut and EfiUsbNoData.
-  @param[in]     Timeout       Indicates the maximum time, in milliseconds, that 
+  @param[in]     Timeout       Indicates the maximum time, in milliseconds, that
                                the transfer is allowed to complete.
                                If Timeout is 0, then the caller must wait for the
                                function to be completed until EFI_SUCCESS or
                                EFI_DEVICE_ERROR is returned.
-  @param[in,out] Data          A pointer to the buffer of data that will be 
+  @param[in,out] Data          A pointer to the buffer of data that will be
                                transmitted to or received from the USB device.
-  @param[in]     DataLength    On input, indicates the size, in bytes, of the data 
+  @param[in]     DataLength    On input, indicates the size, in bytes, of the data
                                buffer specified by Data.
-                               
+
   @retval EFI_SUCCESS             The control transfer was completed successfully.
   @retval EFI_INVALID_PARAMETER   Some parameters are invalid.
-  @retval EFI_OUT_OF_RESOURCES    The control transfer could not be completed due 
+  @retval EFI_OUT_OF_RESOURCES    The control transfer could not be completed due
                                   to a lack of resources.
   @retval EFI_TIMEOUT             The control transfer failed due to timeout.
-  @retval EFI_DEVICE_ERROR        The control transfer failed due to host controller 
+  @retval EFI_DEVICE_ERROR        The control transfer failed due to host controller
                                   or device error.
-                                  Caller should check TransferResult for detailed 
+                                  Caller should check TransferResult for detailed
                                   error information.
 
 **/
@@ -95,12 +95,12 @@ EFI_STATUS
 
   @retval EFI_SUCCESS             The bulk transfer completed successfully.
   @retval EFI_INVALID_PARAMETER   Some parameters are invalid.
-  @retval EFI_OUT_OF_RESOURCES    The bulk transfer could not be completed due to 
+  @retval EFI_OUT_OF_RESOURCES    The bulk transfer could not be completed due to
                                   a lack of resources.
   @retval EFI_TIMEOUT             The bulk transfer failed due to timeout.
-  @retval EFI_DEVICE_ERROR        The bulk transfer failed due to host controller 
+  @retval EFI_DEVICE_ERROR        The bulk transfer failed due to host controller
                                   or device error.
-                                  Caller should check TransferResult for detailed 
+                                  Caller should check TransferResult for detailed
                                   error information.
 
 **/
@@ -124,7 +124,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS             The interface descriptor was returned.
   @retval EFI_INVALID_PARAMETER   Some parameters are invalid.
-  @retval EFI_DEVICE_ERROR        A device error occurred, the function failed to 
+  @retval EFI_DEVICE_ERROR        A device error occurred, the function failed to
                                   get the interface descriptor.
 
 **/
@@ -146,7 +146,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS             The endpoint descriptor was returned.
   @retval EFI_INVALID_PARAMETER   Some parameters are invalid.
-  @retval EFI_DEVICE_ERROR        A device error occurred, the function failed to 
+  @retval EFI_DEVICE_ERROR        A device error occurred, the function failed to
                                   get the endpoint descriptor.
 
 **/
@@ -180,7 +180,7 @@ EFI_STATUS
 ///
 /// This PPI contains a set of services to interact with the USB host controller.
 /// These interfaces are modeled on the UEFI 2.3 specification EFI_USB_IO_PROTOCOL.
-/// Refer to section 16.2.4 of the UEFI 2.3 Specification for more information on 
+/// Refer to section 16.2.4 of the UEFI 2.3 Specification for more information on
 /// these interfaces.
 ///
 struct _PEI_USB_IO_PPI {

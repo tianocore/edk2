@@ -1,7 +1,7 @@
 /** @file
   Library functions which relate with boot option description.
 
-Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -460,7 +460,7 @@ BmGetNetworkDescription (
   } else {
     Ip = NULL;
   }
-  
+
   //
   // Skip the optional DNS node
   //

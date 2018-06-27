@@ -28,14 +28,14 @@
   Depex - Dependency Expresion.
 
   Copyright (c) 2014, Hewlett-Packard Development Company, L.P.
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials are licensed and made available 
-  under the terms and conditions of the BSD License which accompanies this 
-  distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -127,18 +127,18 @@ EFI_SECURITY2_ARCH_PROTOCOL *mSecurity2 = NULL;
 //
 // The global variable is defined for Loading modules at fixed address feature to track the SMM code
 // memory range usage. It is a bit mapped array in which every bit indicates the corresponding
-// memory page available or not. 
+// memory page available or not.
 //
 GLOBAL_REMOVE_IF_UNREFERENCED    UINT64                *mSmmCodeMemoryRangeUsageBitMap=NULL;
 
 /**
   To check memory usage bit map array to figure out if the memory range in which the image will be loaded is available or not. If
   memory range is available, the function will mark the corresponding bits to 1 which indicates the memory range is used.
-  The function is only invoked when load modules at fixed address feature is enabled. 
-  
+  The function is only invoked when load modules at fixed address feature is enabled.
+
   @param  ImageBase                The base address the image will be loaded at.
   @param  ImageSize                The size of the image
-  
+
   @retval EFI_SUCCESS              The memory range the image will be loaded in is available
   @retval EFI_NOT_FOUND            The memory range the image will be loaded in is not available
 **/
@@ -149,7 +149,7 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
   )
 {
    UINT32                             SmmCodePageNumber;
-   UINT64                             SmmCodeSize; 
+   UINT64                             SmmCodeSize;
    EFI_PHYSICAL_ADDRESS               SmmCodeBase;
    UINTN                              BaseOffsetPageNumber;
    UINTN                              TopOffsetPageNumber;
@@ -160,11 +160,11 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
    SmmCodePageNumber = PcdGet32(PcdLoadFixAddressSmmCodePageNumber);
    SmmCodeSize = EFI_PAGES_TO_SIZE (SmmCodePageNumber);
    SmmCodeBase = gLoadModuleAtFixAddressSmramBase;
-   
+
    //
-   // If the memory usage bit map is not initialized,  do it. Every bit in the array 
+   // If the memory usage bit map is not initialized,  do it. Every bit in the array
    // indicate the status of the corresponding memory page, available or not
-   // 
+   //
    if (mSmmCodeMemoryRangeUsageBitMap == NULL) {
      mSmmCodeMemoryRangeUsageBitMap = AllocateZeroPool(((SmmCodePageNumber / 64) + 1)*sizeof(UINT64));
    }
@@ -178,11 +178,11 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
    // see if the memory range for loading the image is in the SMM code range.
    //
    if (SmmCodeBase + SmmCodeSize <  ImageBase + ImageSize || SmmCodeBase >  ImageBase) {
-     return EFI_NOT_FOUND;   
-   }   
+     return EFI_NOT_FOUND;
+   }
    //
    // Test if the memory is avalaible or not.
-   // 
+   //
    BaseOffsetPageNumber = EFI_SIZE_TO_PAGES((UINT32)(ImageBase - SmmCodeBase));
    TopOffsetPageNumber  = EFI_SIZE_TO_PAGES((UINT32)(ImageBase + ImageSize - SmmCodeBase));
    for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
@@ -190,22 +190,22 @@ CheckAndMarkFixLoadingMemoryUsageBitMap (
        //
        // This page is already used.
        //
-       return EFI_NOT_FOUND;  
+       return EFI_NOT_FOUND;
      }
    }
-   
+
    //
    // Being here means the memory range is available.  So mark the bits for the memory range
-   // 
+   //
    for (Index = BaseOffsetPageNumber; Index < TopOffsetPageNumber; Index ++) {
      mSmmCodeMemoryRangeUsageBitMap[Index / 64] |= LShiftU64(1, (Index % 64));
    }
-   return  EFI_SUCCESS;   
+   return  EFI_SUCCESS;
 }
 /**
   Get the fixed loading address from image header assigned by build tool. This function only be called
   when Loading module at Fixed address feature enabled.
-  
+
   @param  ImageContext              Pointer to the image context structure that describes the PE/COFF
                                     image that needs to be examined by this function.
   @retval EFI_SUCCESS               An fixed loading address is assigned to this image by build tools .
@@ -398,7 +398,7 @@ SmmLoadImage (
                   &AuthenticationStatus
                   );
   }
-  
+
   if (EFI_ERROR (Status)) {
     if (Buffer != NULL) {
       gBS->FreePool (Buffer);
@@ -422,7 +422,7 @@ SmmLoadImage (
   //
   // Verify the Authentication Status through the Security Architectural Protocol
   // Only on images that have been read using Firmware Volume protocol.
-  // All SMM images are from FV protocol. 
+  // All SMM images are from FV protocol.
   //
   if (!EFI_ERROR (SecurityStatus) && (mSecurity != NULL)) {
     SecurityStatus = mSecurity->FileAuthenticationState (
@@ -436,7 +436,7 @@ SmmLoadImage (
     Status = SecurityStatus;
     return Status;
   }
-  
+
   //
   // Initialize ImageContext
   //
@@ -468,7 +468,7 @@ SmmLoadImage (
       // following statements is to bypass SmmFreePages
       //
       PageCount = 0;
-      DstBuffer = (UINTN)gLoadModuleAtFixAddressSmramBase;   
+      DstBuffer = (UINTN)gLoadModuleAtFixAddressSmramBase;
     } else {
        DEBUG ((EFI_D_INFO|EFI_D_LOAD, "LOADING MODULE FIXED ERROR: Failed to load module at fixed address. \n"));
        //
@@ -476,7 +476,7 @@ SmmLoadImage (
        //
        PageCount = (UINTN)EFI_SIZE_TO_PAGES((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
        DstBuffer = (UINTN)(-1);
-     
+
        Status = SmmAllocatePages (
                    AllocateMaxAddress,
                    EfiRuntimeServicesCode,
@@ -486,15 +486,15 @@ SmmLoadImage (
        if (EFI_ERROR (Status)) {
          if (Buffer != NULL) {
            gBS->FreePool (Buffer);
-         } 
+         }
          return Status;
-       }     
+       }
       ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)DstBuffer;
     }
   } else {
      PageCount = (UINTN)EFI_SIZE_TO_PAGES((UINTN)ImageContext.ImageSize + ImageContext.SectionAlignment);
      DstBuffer = (UINTN)(-1);
-     
+
      Status = SmmAllocatePages (
                   AllocateMaxAddress,
                   EfiRuntimeServicesCode,
@@ -507,7 +507,7 @@ SmmLoadImage (
        }
        return Status;
      }
-     
+
      ImageContext.ImageAddress = (EFI_PHYSICAL_ADDRESS)DstBuffer;
   }
   //
@@ -549,7 +549,7 @@ SmmLoadImage (
   // Save Image EntryPoint in DriverEntry
   //
   DriverEntry->ImageEntryPoint  = ImageContext.EntryPoint;
-  DriverEntry->ImageBuffer      = DstBuffer; 
+  DriverEntry->ImageBuffer      = DstBuffer;
   DriverEntry->NumberOfPage     = PageCount;
 
   //
@@ -698,20 +698,20 @@ SmmLoadImage (
   //
   // Free buffer allocated by Fv->ReadSection.
   //
-  // The UEFI Boot Services FreePool() function must be used because Fv->ReadSection 
+  // The UEFI Boot Services FreePool() function must be used because Fv->ReadSection
   // used the UEFI Boot Services AllocatePool() function
   //
   Status = gBS->FreePool(Buffer);
   if (!EFI_ERROR (Status) && EFI_ERROR (SecurityStatus)) {
     Status = SecurityStatus;
   }
-  return Status;  
+  return Status;
 }
 
 /**
   Preprocess dependency expression and update DriverEntry to reflect the
   state of  Before and After dependencies. If DriverEntry->Before
-  or DriverEntry->After is set it will never be cleared. 
+  or DriverEntry->After is set it will never be cleared.
 
   @param  DriverEntry           DriverEntry element to update .
 
@@ -810,7 +810,7 @@ SmmGetDepexSectionAndPreProccess (
   drivers to run. Drain the mScheduledQueue and load and start a PE
   image for each driver. Search the mDiscoveredList to see if any driver can
   be placed on the mScheduledQueue. If no drivers are placed on the
-  mScheduledQueue exit the function. 
+  mScheduledQueue exit the function.
 
   @retval EFI_SUCCESS           All of the SMM Drivers that could be dispatched
                                 have been run and the SMM Entry Point has been
@@ -945,11 +945,11 @@ SmmDispatcher (
 
       if (!PreviousSmmEntryPointRegistered && gSmmCorePrivate->SmmEntryPointRegistered) {
         //
-        // Return immediately if the SMM Entry Point was registered by the SMM 
+        // Return immediately if the SMM Entry Point was registered by the SMM
         // Driver that was just dispatched.  The SMM IPL will reinvoke the SMM
-        // Core Dispatcher.  This is required so SMM Mode may be enabled as soon 
-        // as all the dependent SMM Drivers for SMM Mode have been dispatched.  
-        // Once the SMM Entry Point has been registered, then SMM Mode will be 
+        // Core Dispatcher.  This is required so SMM Mode may be enabled as soon
+        // as all the dependent SMM Drivers for SMM Mode have been dispatched.
+        // Once the SMM Entry Point has been registered, then SMM Mode will be
         // used.
         //
         gRequestDispatch = TRUE;
@@ -1437,14 +1437,14 @@ SmmDriverDispatchHandler (
     //
     // Free data allocated by Fv->ReadSection ()
     //
-    // The UEFI Boot Services FreePool() function must be used because Fv->ReadSection 
+    // The UEFI Boot Services FreePool() function must be used because Fv->ReadSection
     // used the UEFI Boot Services AllocatePool() function
     //
     gBS->FreePool (AprioriFile);
   }
 
   //
-  // Execute the SMM Dispatcher on any newly discovered FVs and previously 
+  // Execute the SMM Dispatcher on any newly discovered FVs and previously
   // discovered SMM drivers that have been discovered but not dispatched.
   //
   Status = SmmDispatcher ();
@@ -1456,7 +1456,7 @@ SmmDriverDispatchHandler (
     if (*CommBufferSize > 0) {
       if (Status == EFI_NOT_READY) {
         //
-        // If a the SMM Core Entry Point was just registered, then set flag to 
+        // If a the SMM Core Entry Point was just registered, then set flag to
         // request the SMM Dispatcher to be restarted.
         //
         *(UINT8 *)CommBuffer = COMM_BUFFER_SMM_DISPATCH_RESTART;

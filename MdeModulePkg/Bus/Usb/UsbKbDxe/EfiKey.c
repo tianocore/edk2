@@ -765,9 +765,9 @@ USBKeyboardWaitForKey (
 
   //
   // Enter critical section
-  //  
+  //
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  
+
   //
   // WaitforKey doesn't suppor the partial key.
   // Considering if the partial keystroke is enabled, there maybe a partial
@@ -1223,7 +1223,7 @@ KeyNotifyProcessHandler (
   while (TRUE) {
     //
     // Enter critical section
-    //  
+    //
     OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     Status = Dequeue (&UsbKeyboardDevice->EfiKeyQueueForNotify, &KeyData, sizeof (KeyData));
     //

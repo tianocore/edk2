@@ -1,7 +1,7 @@
 /** @file
   Tcp Protocol header file.
 
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -49,11 +49,11 @@ typedef struct _TCP_CB  TCP_CB;
 #define TCP_FLG_PSH      0x08
 #define TCP_FLG_ACK      0x10
 #define TCP_FLG_URG      0x20
- 
+
  //
  // mask for all the flags
  //
-#define TCP_FLG_FLAG     0x3F  
+#define TCP_FLG_FLAG     0x3F
 
 
 #define TCP_CONNECT_REFUSED      (-1) ///< TCP error status

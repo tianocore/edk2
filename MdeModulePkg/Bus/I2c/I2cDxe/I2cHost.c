@@ -1,9 +1,9 @@
 /** @file
-  This file implements I2C Host Protocol which provides callers with the ability to 
+  This file implements I2C Host Protocol which provides callers with the ability to
   do I/O transactions to all of the devices on the I2C bus.
 
   Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -26,7 +26,7 @@ EFI_DRIVER_BINDING_PROTOCOL gI2cHostDriverBinding = {
 };
 
 //
-// Driver name table 
+// Driver name table
 //
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mI2cHostDriverNameTable[] = {
   { "eng;en", L"I2c Host Driver" },
@@ -356,7 +356,7 @@ I2cHostDriverStart (
   //
   // Locate I2C Master Protocol
   //
-  Status = gBS->OpenProtocol ( 
+  Status = gBS->OpenProtocol (
                   Controller,
                   &gEfiI2cMasterProtocolGuid,
                   (VOID **)&I2cMaster,
@@ -425,7 +425,7 @@ I2cHostDriverStart (
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "I2cHost: create bus available event error, Status = %r\n", Status));
     goto Exit;
-  }  
+  }
 
   //
   // Build the I2C host protocol for the current I2C controller
@@ -451,9 +451,9 @@ Exit:
                       &gEfiI2cBusConfigurationManagementProtocolGuid,
                       This->DriverBindingHandle,
                       Controller
-                      );      
+                      );
     }
-    
+
     if ((I2cHostContext != NULL) && (I2cHostContext->I2cEvent != NULL)) {
       gBS->CloseEvent (I2cHostContext->I2cEvent);
       I2cHostContext->I2cEvent = NULL;
@@ -513,7 +513,7 @@ I2cHostDriverStop (
   IN  EFI_HANDLE                        *ChildHandleBuffer
   )
 {
-  EFI_STATUS                  Status;  
+  EFI_STATUS                  Status;
   I2C_HOST_CONTEXT            *I2cHostContext;
   EFI_I2C_HOST_PROTOCOL       *I2cHost;
   EFI_TPL                     TplPrevious;
@@ -543,14 +543,14 @@ I2cHostDriverStop (
   // Raise TPL for critical section
   //
   TplPrevious = gBS->RaiseTPL (TPL_I2C_SYNC);
-  
+
   //
   // If there is pending request or pending bus configuration, do not stop
   //
   Status = EFI_DEVICE_ERROR;
   if (( !I2cHostContext->I2cBusConfigurationManagementPending )
     && IsListEmpty (&I2cHostContext->RequestList)) {
-    
+
     //
     //  Remove the I2C host protocol
     //
@@ -561,7 +561,7 @@ I2cHostDriverStop (
                     NULL
                     );
   }
-  
+
   //
   // Leave critical section
   //
@@ -581,12 +581,12 @@ I2cHostDriverStop (
       gBS->CloseEvent (I2cHostContext->I2cBusConfigurationEvent);
       I2cHostContext->I2cBusConfigurationEvent = NULL;
     }
-    
+
     if (I2cHostContext->I2cEvent != NULL) {
       gBS->CloseEvent (I2cHostContext->I2cEvent);
       I2cHostContext->I2cEvent = NULL;
     }
-    
+
     FreePool (I2cHostContext);
   }
 
@@ -644,7 +644,7 @@ I2cHostI2cBusConfigurationAvailable (
     // Force next operation to enable the I2C bus configuration
     //
     I2cHostContext->I2cBusConfiguration = (UINTN) -1;
-    
+
     //
     // Do not continue current I2C request
     //
@@ -666,7 +666,7 @@ I2cHostI2cBusConfigurationAvailable (
   //
   // Start an I2C operation on the host, the status is returned by I2cHostContext->Status
   //
-  Status = I2cMaster->StartRequest ( 
+  Status = I2cMaster->StartRequest (
                         I2cMaster,
                         I2cRequest->SlaveAddress,
                         I2cRequest->RequestPacket,
@@ -734,7 +734,7 @@ I2cHostRequestComplete (
   if(!IsListEmpty (EntryHeader)) {
     I2cHostRequestEnable (I2cHostContext);
   }
-  
+
   return Status;
 }
 
@@ -942,7 +942,7 @@ I2cHostQueueRequest (
   if (RequestPacket == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if ((SlaveAddress & I2C_ADDRESSING_10_BIT) != 0) {
     //
     // 10-bit address, bits 0-9 are used for 10-bit I2C slave addresses,
@@ -970,7 +970,7 @@ I2cHostQueueRequest (
     //
     // For synchronous transaction, register an event used to wait for finishing synchronous transaction
     //
-    Status = gBS->CreateEvent ( 
+    Status = gBS->CreateEvent (
                 0,
                 TPL_I2C_SYNC,
                 NULL,
@@ -981,7 +981,7 @@ I2cHostQueueRequest (
       return Status;
     }
   }
- 
+
   //
   // TPL should be at or below TPL_NOTIFY.
   // For synchronous requests this routine must be called at or below TPL_CALLBACK.
@@ -1022,9 +1022,9 @@ I2cHostQueueRequest (
   // Synchronize with the other threads
   //
   gBS->RaiseTPL ( TPL_I2C_SYNC );
-  
+
   FirstRequest = IsListEmpty (&I2cHostContext->RequestList);
-  
+
   //
   // Insert new I2C request in the list
   //
@@ -1034,7 +1034,7 @@ I2cHostQueueRequest (
   // Release the thread synchronization
   //
   gBS->RestoreTPL (TplPrevious);
-  
+
   if (FirstRequest) {
     //
     // Start the first I2C request, then the subsequent of I2C request will continue

@@ -1,7 +1,7 @@
 /** @file
   This is the main routine for initializing the Graphics Console support routines.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -245,8 +245,8 @@ InitializeGraphicsConsoleTextMode (
   UINTN                       ValidCount;
   UINTN                       ValidIndex;
   UINTN                       MaxColumns;
-  UINTN                       MaxRows;  
-  
+  UINTN                       MaxRows;
+
   if ((TextModeCount == NULL) || (TextModeData == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -287,7 +287,7 @@ InitializeGraphicsConsoleTextMode (
   //
   // Mode 0 and mode 1 is for 80x25, 80x50 according to UEFI spec.
   //
-  ValidCount = 0;  
+  ValidCount = 0;
 
   NewModeBuffer[ValidCount].Columns       = 80;
   NewModeBuffer[ValidCount].Rows          = 25;
@@ -295,20 +295,20 @@ InitializeGraphicsConsoleTextMode (
   NewModeBuffer[ValidCount].GopHeight     = VerticalResolution;
   NewModeBuffer[ValidCount].GopModeNumber = GopModeNumber;
   NewModeBuffer[ValidCount].DeltaX        = (HorizontalResolution - (NewModeBuffer[ValidCount].Columns * EFI_GLYPH_WIDTH)) >> 1;
-  NewModeBuffer[ValidCount].DeltaY        = (VerticalResolution - (NewModeBuffer[ValidCount].Rows * EFI_GLYPH_HEIGHT)) >> 1;      
+  NewModeBuffer[ValidCount].DeltaY        = (VerticalResolution - (NewModeBuffer[ValidCount].Rows * EFI_GLYPH_HEIGHT)) >> 1;
   ValidCount++;
 
   if ((MaxColumns >= 80) && (MaxRows >= 50)) {
     NewModeBuffer[ValidCount].Columns = 80;
     NewModeBuffer[ValidCount].Rows    = 50;
     NewModeBuffer[ValidCount].DeltaX  = (HorizontalResolution - (80 * EFI_GLYPH_WIDTH)) >> 1;
-    NewModeBuffer[ValidCount].DeltaY  = (VerticalResolution - (50 * EFI_GLYPH_HEIGHT)) >> 1;    
+    NewModeBuffer[ValidCount].DeltaY  = (VerticalResolution - (50 * EFI_GLYPH_HEIGHT)) >> 1;
   }
   NewModeBuffer[ValidCount].GopWidth      = HorizontalResolution;
   NewModeBuffer[ValidCount].GopHeight     = VerticalResolution;
   NewModeBuffer[ValidCount].GopModeNumber = GopModeNumber;
   ValidCount++;
-  
+
   //
   // Start from mode 2 to put the valid mode other than 80x25 and 80x50 in the output mode buffer.
   //
@@ -340,14 +340,14 @@ InitializeGraphicsConsoleTextMode (
       ValidCount++;
     }
   }
- 
+
   DEBUG_CODE (
     for (Index = 0; Index < ValidCount; Index++) {
-      DEBUG ((EFI_D_INFO, "Graphics - Mode %d, Column = %d, Row = %d\n", 
-                           Index, NewModeBuffer[Index].Columns, NewModeBuffer[Index].Rows));  
+      DEBUG ((EFI_D_INFO, "Graphics - Mode %d, Column = %d, Row = %d\n",
+                           Index, NewModeBuffer[Index].Columns, NewModeBuffer[Index].Rows));
     }
   );
-  
+
   //
   // Return valid mode count and mode information buffer.
   //
@@ -388,9 +388,9 @@ GraphicsConsoleControllerDriverStart (
   UINTN                                MaxMode;
   UINT32                               ModeNumber;
   EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE    *Mode;
-  UINTN                                SizeOfInfo;  
+  UINTN                                SizeOfInfo;
   EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *Info;
-  
+
   ModeNumber = 0;
 
   //
@@ -442,9 +442,9 @@ GraphicsConsoleControllerDriverStart (
     if ((HorizontalResolution == 0x0) || (VerticalResolution == 0x0)) {
       //
       // Find the highest resolution which GOP supports.
-      //    
+      //
       MaxMode = Private->GraphicsOutput->Mode->MaxMode;
-      
+
       for (ModeIndex = 0; ModeIndex < MaxMode; ModeIndex++) {
         Status = Private->GraphicsOutput->QueryMode (
                            Private->GraphicsOutput,
@@ -581,7 +581,7 @@ GraphicsConsoleControllerDriverStart (
     Status = GraphicsConsoleConOutOutputString (&Private->SimpleTextOutput, (CHAR16 *)L"Graphics Console Started\n\r");
     if (EFI_ERROR (Status)) {
       goto Error;
-    }  
+    }
   DEBUG_CODE_END ();
 
   //
@@ -915,7 +915,7 @@ GraphicsConsoleConOutOutputString (
   }
 
   Status = EFI_SUCCESS;
-  
+
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   //
   // Current mode
@@ -1305,7 +1305,7 @@ GraphicsConsoleConOutSetMode (
     Status = EFI_UNSUPPORTED;
     goto Done;
   }
-  
+
   ModeData  = &(Private->ModeData[ModeNumber]);
 
   if (ModeData->Columns <= 0 && ModeData->Rows <= 0) {
@@ -1443,7 +1443,7 @@ GraphicsConsoleConOutSetMode (
   This->Mode->CursorColumn  = 0;
   This->Mode->CursorRow     = 0;
 
-  FlushCursor (This);  
+  FlushCursor (This);
 
   Status = EFI_SUCCESS;
 
@@ -1527,7 +1527,7 @@ GraphicsConsoleConOutClearScreen (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Foreground;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL Background;
   EFI_TPL                       OldTpl;
-  
+
   if (This->Mode->Mode == -1) {
     //
     // If current mode is not valid, return error.
@@ -1876,11 +1876,11 @@ DrawUnicodeWeightAtCursorN (
 
 /**
   Flush the cursor on the screen.
-  
+
   If CursorVisible is FALSE, nothing to do and return directly.
-  If CursorVisible is TRUE, 
+  If CursorVisible is TRUE,
      i) If the cursor shows on screen, it will be erased.
-    ii) If the cursor does not show on screen, it will be shown. 
+    ii) If the cursor does not show on screen, it will be shown.
 
   @param  This                  Protocol instance pointer.
 

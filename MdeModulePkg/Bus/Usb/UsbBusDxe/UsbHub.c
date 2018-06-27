@@ -2,7 +2,7 @@
 
     Unified interface for RootHub and Hub.
 
-Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR> 
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -716,10 +716,10 @@ UsbHubInit (
     Depth = (UINT16)(HubIf->Device->Tier - 1);
     DEBUG ((EFI_D_INFO, "UsbHubInit: Set Hub Depth as 0x%x\n", Depth));
     UsbHubCtrlSetHubDepth (HubIf->Device, Depth);
-    
+
     for (Index = 0; Index < HubDesc->NumPorts; Index++) {
       UsbHubCtrlSetPortFeature (HubIf->Device, Index, USB_HUB_PORT_REMOTE_WAKE_MASK);
-    }    
+    }
   } else {
     //
     // Feed power to all the hub ports. It should be ok

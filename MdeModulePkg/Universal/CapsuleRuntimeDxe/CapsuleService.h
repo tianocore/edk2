@@ -1,10 +1,10 @@
 /** @file
   Capsule Runtime Driver produces two UEFI capsule runtime services.
   (UpdateCapsule, QueryCapsuleCapabilities)
-  It installs the Capsule Architectural Protocol defined in PI1.0a to signify 
+  It installs the Capsule Architectural Protocol defined in PI1.0a to signify
   the capsule runtime services are ready.
 
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2018, Linaro, Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available

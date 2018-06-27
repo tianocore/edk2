@@ -1,7 +1,7 @@
 /** @file
   Interface function of the Socket.
 
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @param  List                 Pointer to the token list to be searched.
   @param  Event                The event to be checked.
 
-  @retval  TRUE                The specific Event exists in the List. 
+  @retval  TRUE                The specific Event exists in the List.
   @retval  FALSE               The specific Event is not in the List.
 
 **/
@@ -58,7 +58,7 @@ SockTokenExistedInList (
   @param  Sock                 Pointer to the instance's socket.
   @param  Event                The event to be checked.
 
-  @retval  TRUE                The Event exists in related socket's lists. 
+  @retval  TRUE                The Event exists in related socket's lists.
   @retval  FALSE               The Event is not in related socket's lists.
 
 **/
@@ -250,7 +250,7 @@ SockDestroyChild (
   data ProtoData.
 
   @param  SockInitData         Inital data to setting the socket.
-  
+
   @return Pointer to the newly created socket. If NULL, error condition occured.
 
 **/

@@ -4,14 +4,14 @@
 # This driver produces all required HII serivces that includes HiiDataBase, HiiString,
 # HiiFont, HiiConfigRouting. To support UEFI HII, this driver is required.
 #
-# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-#  This program and the accompanying materials       
-#  are licensed and made available under the terms and conditions of the BSD License   
-#  which accompanies this distribution. The full text of the license may be found at  
-#  http://opensource.org/licenses/bsd-license.php           
-#  
-#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,      
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 #
@@ -81,7 +81,7 @@
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLang ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdNvStoreDefaultValueBuffer ## CONSUMES
 
-[Guids]  
+[Guids]
   #
   # Event registered to EFI_HII_SET_KEYBOARD_LAYOUT_EVENT_GUID group,
   # which will be triggered by EFI_HII_DATABASE_PROTOCOL.SetKeyboardLayout().

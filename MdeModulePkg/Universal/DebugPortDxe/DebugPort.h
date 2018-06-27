@@ -1,7 +1,7 @@
 /** @file
   Definitions and prototypes for DebugPort driver.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -83,15 +83,15 @@ typedef struct {
 #define IS_UART_DEVICEPATH(dp)           (DevicePathType (dp) == MESSAGING_DEVICE_PATH && DevicePathSubType (dp) == MSG_UART_DP)
 
 /**
-  Debug Port Driver entry point. 
+  Debug Port Driver entry point.
 
   Reads DebugPort variable to determine what device and settings to use as the
   debug port.  Binds exclusively to SerialIo. Reverts to defaults if no variable
   is found.
 
-  @param[in] ImageHandle       The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle       The firmware allocated handle for the EFI image.
   @param[in] SystemTable       A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS          The entry point is executed successfully.
   @retval EFI_OUT_OF_RESOURCES Fails to allocate memory for device.
   @retval other                Some error occurs when executing this entry point.
@@ -105,7 +105,7 @@ InitializeDebugPortDriver (
   );
 
 /**
-  Checks to see if there's not already a DebugPort interface somewhere. 
+  Checks to see if there's not already a DebugPort interface somewhere.
 
   If there's a DEBUGPORT variable, the device path must match exactly.  If there's
   no DEBUGPORT variable, then device path is not checked and does not matter.
@@ -144,7 +144,7 @@ DebugPortSupported (
 
   @retval EFI_SUCCESS          This driver is added to ControllerHandle.
   @retval EFI_OUT_OF_RESOURCES Fails to allocate memory for device.
-  @retval others               Some error occurs.                
+  @retval others               Some error occurs.
 
 **/
 EFI_STATUS
@@ -316,7 +316,7 @@ DebugPortComponentNameGetControllerName (
 
   The port itself should be fine since it was set up during initialization.
 
-  @param  This              Protocol instance pointer.   
+  @param  This              Protocol instance pointer.
 
   @return EFI_SUCCESS       Always.
 
@@ -337,8 +337,8 @@ DebugPortReset (
                               On output, the amount of data actually written.
   @param  Buffer              Pointer to buffer to read.
 
-  @retval EFI_SUCCESS         
-  @retval others              
+  @retval EFI_SUCCESS
+  @retval others
 
 **/
 EFI_STATUS
@@ -386,7 +386,7 @@ DebugPortWrite (
                               DebugPort interface
   @retval EFI_DEVICE_ERROR    A hardware failure occured... (from SerialIo)
 
-**/ 
+**/
 EFI_STATUS
 EFIAPI
 DebugPortPoll (

@@ -1,7 +1,7 @@
 /** @file
   Definitions for EFI IPv4 Configuration II Protocol implementation.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -70,7 +70,7 @@ typedef struct _IP4_CONFIG2_INSTANCE IP4_CONFIG2_INSTANCE;
                                8 bytes.
   @retval EFI_SUCCESS          The specified configuration data for the EFI IPv4
                                network stack was set successfully.
-  
+
 **/
 typedef
 EFI_STATUS
@@ -87,14 +87,14 @@ EFI_STATUS
   @param[in, out] DataSize On input, in bytes, the size of Data. On output, in
                            bytes, the size of buffer required to store the specified
                            configuration data.
-  @param[in]      Data     The data buffer in which the configuration data is returned.  
+  @param[in]      Data     The data buffer in which the configuration data is returned.
                            Ignored if DataSize is ZERO.
 
   @retval EFI_BUFFER_TOO_SMALL The size of Data is too small for the specified
-                               configuration data, and the required size is 
+                               configuration data, and the required size is
                                returned in DataSize.
-  @retval EFI_SUCCESS          The specified configuration data was obtained successfully.                               
-  
+  @retval EFI_SUCCESS          The specified configuration data was obtained successfully.
+
 **/
 typedef
 EFI_STATUS
@@ -151,7 +151,7 @@ typedef struct {
 #pragma pack()
 
 typedef struct {
-  EFI_IP4_CONFIG2_POLICY                   Policy;               ///< manual or automatic  
+  EFI_IP4_CONFIG2_POLICY                   Policy;               ///< manual or automatic
   EFI_IP4_CONFIG2_MANUAL_ADDRESS           *ManualAddress;       ///< IP addresses
   UINT32                                   ManualAddressCount;   ///< IP addresses count
   EFI_IPv4_ADDRESS                         *GatewayAddress;      ///< Gateway address
@@ -177,7 +177,7 @@ struct _IP4_CONFIG2_INSTANCE {
   EFI_IP4_CONFIG2_PROTOCOL                  Ip4Config2;
 
   EFI_IP4_CONFIG2_INTERFACE_INFO            InterfaceInfo;
-  EFI_IP4_CONFIG2_POLICY                    Policy;  
+  EFI_IP4_CONFIG2_POLICY                    Policy;
   IP4_CONFIG2_DATA_ITEM                     DataItem[Ip4Config2DataTypeMaximum];
 
   EFI_EVENT                                 Dhcp4SbNotifyEvent;
@@ -190,7 +190,7 @@ struct _IP4_CONFIG2_INSTANCE {
   UINT32                                    FailedIaAddressCount;
   EFI_IPv4_ADDRESS                          *DeclineAddress;
   UINT32                                    DeclineAddressCount;
-  
+
   IP4_FORM_CALLBACK_INFO                    CallbackInfo;
 
   IP4_CONFIG2_NVDATA                        Ip4NvData;

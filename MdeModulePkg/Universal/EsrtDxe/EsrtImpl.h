@@ -1,7 +1,7 @@
 /** @file
   Esrt management implementation head file.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -36,12 +36,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 //
 // Name of  Variable for Non-FMP ESRT Repository
-// 
+//
 #define EFI_ESRT_NONFMP_VARIABLE_NAME    L"EsrtNonFmp"
 
 //
 // Name of Variable for FMP
-// 
+//
 #define EFI_ESRT_FMP_VARIABLE_NAME       L"EsrtFmp"
 
 //
@@ -56,7 +56,7 @@ typedef struct {
   // Ready to boot event
   //
   EFI_EVENT             Event;
-  
+
   //
   // Updates to Fmp storage must be locked.
   //
@@ -70,12 +70,12 @@ typedef struct {
 
 
 /**
-  Find Esrt Entry stored in ESRT repository. 
+  Find Esrt Entry stored in ESRT repository.
 
   @param[in]     FwClass           Firmware class guid in Esrt entry
   @param[in]     Attribute         Esrt from Non FMP or FMP instance
   @param[out]    Entry             Esrt entry returned
-  
+
   @retval EFI_SUCCESS            Successfully find an Esrt entry
   @retval EF_NOT_FOUND           No Esrt entry found
 
@@ -92,7 +92,7 @@ GetEsrtEntry (
 
   @param[in]  Entry                Esrt entry to be set
   @param[in]  Attribute            Esrt from Esrt private protocol or FMP instance
-  
+
   @retval EFI_SUCCESS          Successfully set a variable.
 
 **/
@@ -103,14 +103,14 @@ InsertEsrtEntry(
   );
 
 /**
-  Delete ESRT Entry from ESRT repository. 
+  Delete ESRT Entry from ESRT repository.
 
-  @param[in]    FwClass              FwClass of Esrt entry to delete  
+  @param[in]    FwClass              FwClass of Esrt entry to delete
   @param[in]    Attribute            Esrt from Esrt private protocol or FMP instance
-  
-  @retval EFI_SUCCESS         Insert all entries Successfully 
+
+  @retval EFI_SUCCESS         Insert all entries Successfully
   @retval EFI_NOT_FOUND       ESRT entry with FwClass doesn't exsit
-  
+
 **/
 EFI_STATUS
 DeleteEsrtEntry(
@@ -123,7 +123,7 @@ DeleteEsrtEntry(
 
   @param[in]    Entry                Esrt entry to be set
   @param[in]    Attribute            Esrt from Non Esrt or FMP instance
-  
+
   @retval EFI_SUCCESS          Successfully Update a variable.
   @retval EFI_NOT_FOUND        The Esrt enry doesn't exist
 
@@ -140,9 +140,9 @@ UpdateEsrtEntry(
   @param[in, out]    EsrtEntry             Esrt entry to be Init
   @param[in]         FmpImageInfo          FMP image info descriptor
   @param[in]         DescriptorVersion     FMP Image info descriptor version
-  
+
 **/
-VOID 
+VOID
 SetEsrtEntryFromFmpInfo (
   IN OUT EFI_SYSTEM_RESOURCE_ENTRY   *EsrtEntry,
   IN EFI_FIRMWARE_IMAGE_DESCRIPTOR   *FmpImageInfo,
@@ -150,11 +150,11 @@ SetEsrtEntryFromFmpInfo (
   );
 
 /**
-  Get ESRT entry from ESRT Cache by FwClass Guid 
+  Get ESRT entry from ESRT Cache by FwClass Guid
 
-  @param[in]       FwClass                FwClass of Esrt entry to get  
-  @param[in, out]  Entry                  Esrt entry returned 
-  
+  @param[in]       FwClass                FwClass of Esrt entry to get
+  @param[in, out]  Entry                  Esrt entry returned
+
   @retval EFI_SUCCESS                   The variable saving this Esrt Entry exists.
   @retval EF_NOT_FOUND                  No correct variable found.
   @retval EFI_WRITE_PROTECTED           ESRT Cache repository is locked
@@ -171,7 +171,7 @@ EsrtDxeGetEsrtEntry(
   Update one ESRT entry in ESRT Cache.
 
   @param[in]  Entry                         Esrt entry to be updated
-  
+
   @retval EFI_SUCCESS                   Successfully update an ESRT entry in cache.
   @retval EFI_INVALID_PARAMETER  Entry does't exist in ESRT Cache
   @retval EFI_WRITE_PROTECTED     ESRT Cache is locked
@@ -184,11 +184,11 @@ EsrtDxeUpdateEsrtEntry(
   );
 
 /**
-  Non-FMP instance to unregister Esrt Entry from ESRT Cache. 
+  Non-FMP instance to unregister Esrt Entry from ESRT Cache.
 
-  @param[in]    FwClass                FwClass of Esrt entry to Unregister  
-  
-  @retval EFI_SUCCESS             Insert all entries Successfully 
+  @param[in]    FwClass                FwClass of Esrt entry to Unregister
+
+  @retval EFI_SUCCESS             Insert all entries Successfully
   @retval EFI_NOT_FOUND           Entry of FwClass does not exsit
 
 **/
@@ -229,10 +229,10 @@ EsrtDxeSyncFmp(
   );
 
 /**
-  This function locks up Esrt repository to be readonly. It should be called 
+  This function locks up Esrt repository to be readonly. It should be called
   before gEfiEndOfDxeEventGroupGuid event signaled
 
-  @retval EFI_SUCCESS              Locks up FMP Non-FMP repository successfully 
+  @retval EFI_SUCCESS              Locks up FMP Non-FMP repository successfully
 
 **/
 EFI_STATUS

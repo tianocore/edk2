@@ -25,7 +25,7 @@
 
 /**
   The constructor reads variable and sets HOB
-  
+
   @param  FileHandle   The handle of FFS header the loaded driver.
   @param  PeiServices  The pointer to the PEI services.
 
@@ -44,7 +44,7 @@ PeiDebugPrintHobLibConstructor (
   UINTN                           Size;
   UINT64                          GlobalErrorLevel;
   UINT32                          HobErrorLevel;
-  
+
   Status = PeiServicesLocatePpi (
              &gEfiPeiReadOnlyVariable2PpiGuid,
              0,
@@ -53,8 +53,8 @@ PeiDebugPrintHobLibConstructor (
              );
   if (!EFI_ERROR (Status)) {
     Size = sizeof (GlobalErrorLevel);
-    Status = Variable->GetVariable ( 
-                         Variable, 
+    Status = Variable->GetVariable (
+                         Variable,
                          DEBUG_MASK_VARIABLE_NAME,
                          &gEfiGenericVariableGuid,
                          NULL,

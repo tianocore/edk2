@@ -1,7 +1,7 @@
 /** @file
   EFI PCI IO protocol functions implementation for PCI Bus module.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -232,7 +232,7 @@ PciIoPollMem (
 
   //
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
-  //  
+  //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
       Status  = PciIoMemRead (This, Width, BarIndex, Offset, 1, Result);
@@ -262,7 +262,7 @@ PciIoPollMem (
       } while (TRUE);
     }
   }
-  
+
   Status = PciIoDevice->PciRootBridgeIo->PollMem (
                                            PciIoDevice->PciRootBridgeIo,
                                            (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
@@ -335,7 +335,7 @@ PciIoPollIo (
 
   //
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
-  //  
+  //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
       Status  = PciIoIoRead (This, Width, BarIndex, Offset, 1, Result);
@@ -365,7 +365,7 @@ PciIoPollIo (
       } while (TRUE);
     }
   }
-  
+
   Status = PciIoDevice->PciRootBridgeIo->PollIo (
                                            PciIoDevice->PciRootBridgeIo,
                                            (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
@@ -438,14 +438,14 @@ PciIoMemRead (
 
   //
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
-  //  
+  //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
-  }  
-  
+  }
+
 
   Status = PciIoDevice->PciRootBridgeIo->Mem.Read (
                                               PciIoDevice->PciRootBridgeIo,
@@ -517,7 +517,7 @@ PciIoMemWrite (
 
   //
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
-  //  
+  //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
       Count *=  (UINTN)(1 << (Width & 0x03));
@@ -595,13 +595,13 @@ PciIoIoRead (
 
   //
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
-  //  
+  //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
-  }    
+  }
 
   Status = PciIoDevice->PciRootBridgeIo->Io.Read (
                                               PciIoDevice->PciRootBridgeIo,
@@ -673,13 +673,13 @@ PciIoIoWrite (
 
   //
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
-  //  
+  //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
-  }  
+  }
 
   Status = PciIoDevice->PciRootBridgeIo->Io.Write (
                                               PciIoDevice->PciRootBridgeIo,
@@ -739,16 +739,16 @@ PciIoConfigRead (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
-  //  
+  //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
-  }    
+  }
 
   Status = PciIoDevice->PciRootBridgeIo->Pci.Read (
                                                PciIoDevice->PciRootBridgeIo,
@@ -811,14 +811,14 @@ PciIoConfigWrite (
 
   //
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
-  //  
+  //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((Offset & ((1 << (Width & 0x03)) - 1)) != 0) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
-  }  
-  
+  }
+
   Status = PciIoDevice->PciRootBridgeIo->Pci.Write (
                                               PciIoDevice->PciRootBridgeIo,
                                               (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_WIDTH) Width,
@@ -910,13 +910,13 @@ PciIoCopyMem (
 
   //
   // If request is not aligned, then convert request to EfiPciIoWithXXXUint8
-  //  
+  //
   if (FeaturePcdGet (PcdUnalignedPciIoEnable)) {
     if ((SrcOffset & ((1 << (Width & 0x03)) - 1)) != 0 || (DestOffset & ((1 << (Width & 0x03)) - 1)) != 0) {
       Count *=  (UINTN)(1 << (Width & 0x03));
       Width = (EFI_PCI_IO_PROTOCOL_WIDTH) (Width & (~0x03));
     }
-  }  
+  }
 
   Status = PciIoDevice->PciRootBridgeIo->CopyMem (
                                           PciIoDevice->PciRootBridgeIo,
@@ -1790,7 +1790,7 @@ PciIoAttributes (
   @param AddrRangeMin    The base address of the MMIO.
   @param AddrLen         The length of the MMIO.
 
-  @retval The AddrTranslationOffset from RootBridgeIo for the 
+  @retval The AddrTranslationOffset from RootBridgeIo for the
           specified range, or (UINT64) -1 if the range is not
           found in RootBridgeIo.
 **/

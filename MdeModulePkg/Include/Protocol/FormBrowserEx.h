@@ -1,14 +1,14 @@
 /** @file
-  Extension Form Browser Protocol provides the services that can be used to 
+  Extension Form Browser Protocol provides the services that can be used to
   register the different hot keys for the standard Browser actions described in UEFI specification.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -35,8 +35,8 @@ typedef EDKII_FORM_BROWSER_EXTENSION_PROTOCOL   EFI_FORM_BROWSER_EXTENSION_PROTO
 #define BROWSER_KEEP_CURRENT        3
 
 //
-// Browser actions. They can be cominbed together. 
-// If more than one actions are specified, the action with low bit will be executed first. 
+// Browser actions. They can be cominbed together.
+// If more than one actions are specified, the action with low bit will be executed first.
 //
 #define BROWSER_ACTION_UNREGISTER   0
 #define BROWSER_ACTION_DISCARD      BIT0
@@ -61,11 +61,11 @@ typedef enum {
   All hot keys have the same scope. The mixed hot keys with the different level are not supported.
   If no scope is set, the default scope will be FormSet level.
   After all registered hot keys are removed, previous Scope can reset to another level.
-  
-  @param[in] Scope               Scope level to be set. 
-  
+
+  @param[in] Scope               Scope level to be set.
+
   @retval EFI_SUCCESS            Scope is set correctly.
-  @retval EFI_INVALID_PARAMETER  Scope is not the valid value specified in BROWSER_SETTING_SCOPE. 
+  @retval EFI_INVALID_PARAMETER  Scope is not the valid value specified in BROWSER_SETTING_SCOPE.
   @retval EFI_UNSPPORTED         Scope level is different from current one that the registered hot keys have.
 
 **/
@@ -79,15 +79,15 @@ EFI_STATUS
   Register the hot key with its browser action, or unregistered the hot key.
   If the action value is zero, the hot key will be unregistered if it has been registered.
   If the same hot key has been registered, the new action and help string will override the previous ones.
-  
+
   @param[in] KeyData     A pointer to a buffer that describes the keystroke
-                         information for the hot key. Its type is EFI_INPUT_KEY to 
+                         information for the hot key. Its type is EFI_INPUT_KEY to
                          be supported by all ConsoleIn devices.
-  @param[in] Action      Action value that describes what action will be trigged when the hot key is pressed. 
+  @param[in] Action      Action value that describes what action will be trigged when the hot key is pressed.
   @param[in] DefaultId   Specifies the type of defaults to retrieve, which is only for DEFAULT action.
   @param[in] HelpString  Help string that describes the hot key information.
                          Its value may be NULL for the unregistered hot key.
-  
+
   @retval EFI_SUCCESS            Hot key is registered or unregistered.
   @retval EFI_INVALID_PARAMETER  KeyData is NULL.
 **/
@@ -102,7 +102,7 @@ EFI_STATUS
 
 /**
   This handler is responsbile for the left things on normal boot after all UI forms are closed.
-  For example, it can continue to boot the first boot option. 
+  For example, it can continue to boot the first boot option.
 
   It will be used only when EXIT action is trigged as system level.
 **/
@@ -113,11 +113,11 @@ VOID
   );
 
 /**
-  Register Exit handler function. 
-  When more than one handler function is registered, the latter one will override the previous one. 
-  When NULL handler is specified, the previous Exit handler will be unregistered. 
-  
-  @param[in] Handler      Pointer to handler function. 
+  Register Exit handler function.
+  When more than one handler function is registered, the latter one will override the previous one.
+  When NULL handler is specified, the previous Exit handler will be unregistered.
+
+  @param[in] Handler      Pointer to handler function.
 
 **/
 typedef

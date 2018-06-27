@@ -1,8 +1,8 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -32,22 +32,22 @@ typedef struct _USBHC_MEM_BLOCK USBHC_MEM_BLOCK;
 
 struct _USBHC_MEM_BLOCK {
   UINT8                   *Bits;    // Bit array to record which unit is allocated
-  UINTN                   BitsLen; 
+  UINTN                   BitsLen;
   UINT8                   *Buf;
   UINT8                   *BufHost;
   UINTN                   BufLen;   // Memory size in bytes
-  VOID                    *Mapping;     
+  VOID                    *Mapping;
   USBHC_MEM_BLOCK         *Next;
 };
 
 //
-// USBHC_MEM_POOL is used to manage the memory used by USB 
+// USBHC_MEM_POOL is used to manage the memory used by USB
 // host controller. EHCI requires the control memory and transfer
-// data to be on the same 4G memory. 
+// data to be on the same 4G memory.
 //
 typedef struct _USBHC_MEM_POOL {
-  BOOLEAN                 Check4G;      
-  UINT32                  Which4G;      
+  BOOLEAN                 Check4G;
+  UINT32                  Which4G;
   USBHC_MEM_BLOCK         *Head;
 } USBHC_MEM_POOL;
 
@@ -71,7 +71,7 @@ typedef struct _USBHC_MEM_POOL {
               (Byte)++;       \
               (Bit) = 0;      \
             }                 \
-          } while (0)       
+          } while (0)
 
 
 /**

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,7 +30,7 @@ EFI_SERVICE_BINDING_PROTOCOL mUdp4ServiceBinding = {
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
-  
+
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 
@@ -194,7 +194,7 @@ Udp4DriverBindingStart (
   restrictions for this service. DisconnectController()
   must follow these calling restrictions. If any other agent wishes
   to call Stop() it must also follow these calling restrictions.
-  
+
   @param[in]  This              Protocol instance pointer.
   @param[in]  ControllerHandle  Handle of device to stop driver on
   @param[in]  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
@@ -266,7 +266,7 @@ Udp4DriverBindingStop (
            &Udp4Service->ServiceBinding,
            NULL
            );
- 
+
     Udp4CleanService (Udp4Service);
 
     if (gUdpControllerNameTable != NULL) {
@@ -282,14 +282,14 @@ Udp4DriverBindingStop (
 
 /**
   Creates a child handle and installs a protocol.
-  
-  The CreateChild() function installs a protocol on ChildHandle. 
-  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle. 
+
+  The CreateChild() function installs a protocol on ChildHandle.
+  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle.
   If ChildHandle is not a pointer to NULL, then the protocol installs on the existing ChildHandle.
 
   @param[in] This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param[in] ChildHandle Pointer to the handle of the child to create. If it is NULL,
-                         then a new handle is created. If it is a pointer to an existing UEFI handle, 
+                         then a new handle is created. If it is a pointer to an existing UEFI handle,
                          then the protocol is added to the existing UEFI handle.
 
   @retval EFI_SUCCES            The protocol was added to ChildHandle.
@@ -419,9 +419,9 @@ ON_ERROR:
 
 /**
   Destroys a child handle with a protocol installed on it.
-  
-  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol 
-  that was installed by CreateChild() from ChildHandle. If the removed protocol is the 
+
+  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol
+  that was installed by CreateChild() from ChildHandle. If the removed protocol is the
   last protocol on ChildHandle, then ChildHandle is destroyed.
 
   @param[in] This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
@@ -497,7 +497,7 @@ Udp4ServiceBindingDestroyChild (
          &gEfiIp4ProtocolGuid,
          gUdp4DriverBinding.DriverBindingHandle,
          Instance->ChildHandle
-         );  
+         );
 
   //
   // Uninstall the Udp4Protocol previously installed on the ChildHandle.
@@ -547,7 +547,7 @@ Udp4ServiceBindingDestroyChild (
   This is the declaration of an EFI image entry point. This entry point is
   the same for UEFI Applications, UEFI OS Loaders, and UEFI Drivers including
   both device drivers and bus drivers.
-  
+
   The entry point for Udp4 driver which installs the driver binding
   and component name protocol on its ImageHandle.
 

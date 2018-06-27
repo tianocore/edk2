@@ -1,7 +1,7 @@
 /** @file
   Header file for CD recovery PEIM
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -105,8 +105,8 @@ typedef struct {
 } PEI_CD_EXPRESS_DIR_FILE_RECORD;
 
 /**
-  BlockIo installation notification function. 
-  
+  BlockIo installation notification function.
+
   This function finds out all the current Block IO PPIs in the system and add them
   into private data.
 
@@ -144,18 +144,18 @@ UpdateBlocksAndVolumes (
   Returns the number of DXE capsules residing on the device.
 
   This function searches for DXE capsules from the associated device and returns
-  the number and maximum size in bytes of the capsules discovered. Entry 1 is 
-  assumed to be the highest load priority and entry N is assumed to be the lowest 
+  the number and maximum size in bytes of the capsules discovered. Entry 1 is
+  assumed to be the highest load priority and entry N is assumed to be the lowest
   priority.
 
-  @param[in]  PeiServices              General-purpose services that are available 
+  @param[in]  PeiServices              General-purpose services that are available
                                        to every PEIM
   @param[in]  This                     Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI
                                        instance.
-  @param[out] NumberRecoveryCapsules   Pointer to a caller-allocated UINTN. On 
-                                       output, *NumberRecoveryCapsules contains 
-                                       the number of recovery capsule images 
-                                       available for retrieval from this PEIM 
+  @param[out] NumberRecoveryCapsules   Pointer to a caller-allocated UINTN. On
+                                       output, *NumberRecoveryCapsules contains
+                                       the number of recovery capsule images
+                                       available for retrieval from this PEIM
                                        instance.
 
   @retval EFI_SUCCESS        One or more capsules were discovered.
@@ -177,18 +177,18 @@ GetNumberRecoveryCapsules (
   This function gets the size and type of the capsule specified by CapsuleInstance.
 
   @param[in]  PeiServices       General-purpose services that are available to every PEIM
-  @param[in]  This              Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI 
+  @param[in]  This              Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI
                                 instance.
-  @param[in]  CapsuleInstance   Specifies for which capsule instance to retrieve 
-                                the information.  This parameter must be between 
-                                one and the value returned by GetNumberRecoveryCapsules() 
+  @param[in]  CapsuleInstance   Specifies for which capsule instance to retrieve
+                                the information.  This parameter must be between
+                                one and the value returned by GetNumberRecoveryCapsules()
                                 in NumberRecoveryCapsules.
-  @param[out] Size              A pointer to a caller-allocated UINTN in which 
-                                the size of the requested recovery module is 
+  @param[out] Size              A pointer to a caller-allocated UINTN in which
+                                the size of the requested recovery module is
                                 returned.
-  @param[out] CapsuleType       A pointer to a caller-allocated EFI_GUID in which 
-                                the type of the requested recovery capsule is 
-                                returned.  The semantic meaning of the value 
+  @param[out] CapsuleType       A pointer to a caller-allocated EFI_GUID in which
+                                the type of the requested recovery capsule is
+                                returned.  The semantic meaning of the value
                                 returned is defined by the implementation.
 
   @retval EFI_SUCCESS        One or more capsules were discovered.
@@ -212,12 +212,12 @@ GetRecoveryCapsuleInfo (
   This function, by whatever mechanism, retrieves a DXE capsule from some device
   and loads it into memory. Note that the published interface is device neutral.
 
-  @param[in]     PeiServices       General-purpose services that are available 
+  @param[in]     PeiServices       General-purpose services that are available
                                    to every PEIM
   @param[in]     This              Indicates the EFI_PEI_DEVICE_RECOVERY_MODULE_PPI
                                    instance.
   @param[in]     CapsuleInstance   Specifies which capsule instance to retrieve.
-  @param[out]    Buffer            Specifies a caller-allocated buffer in which 
+  @param[out]    Buffer            Specifies a caller-allocated buffer in which
                                    the requested recovery capsule will be returned.
 
   @retval EFI_SUCCESS        The capsule was loaded correctly.
@@ -260,7 +260,7 @@ FindRecoveryCapsules (
 
   @retval EFI_SUCCESS                   The recovery capsule is successfully found in the volume.
   @retval EFI_NOT_FOUND                 The recovery capsule is not found in the volume.
-  @retval Others                        
+  @retval Others
 
 **/
 EFI_STATUS

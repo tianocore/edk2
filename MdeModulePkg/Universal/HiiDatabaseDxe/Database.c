@@ -1,7 +1,7 @@
 /** @file
 Implementation for EFI_HII_DATABASE_PROTOCOL.
 
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1431,7 +1431,7 @@ Error:
 
 /**
  Adjust all string packages in a single package list to have the same max string ID.
- 
+
  @param  PackageList        Pointer to a package list which will be adjusted.
 
  @retval EFI_SUCCESS  Adjust all string packages successfully.
@@ -3154,7 +3154,7 @@ AddPackages (
     PackageHdrPtr = (EFI_HII_PACKAGE_HEADER *) ((UINT8 *) PackageHdrPtr + PackageHeader.Length);
     CopyMem (&PackageHeader, PackageHdrPtr, sizeof (EFI_HII_PACKAGE_HEADER));
   }
-  
+
   //
   // Adjust String Package to make sure all string packages have the same max string ID.
   //
@@ -3520,7 +3520,7 @@ HiiNewPackageList (
     DatabaseRecord = CR (Link, HII_DATABASE_RECORD, DatabaseEntry, HII_DATABASE_RECORD_SIGNATURE);
     if (CompareGuid (
           &(DatabaseRecord->PackageList->PackageListHdr.PackageListGuid),
-          &PackageListGuid) && 
+          &PackageListGuid) &&
         DatabaseRecord->DriverHandle == DriverHandle) {
       return EFI_INVALID_PARAMETER;
     }
@@ -3992,7 +3992,7 @@ HiiListPackageLists (
   @retval EFI_NOT_FOUND          The specified Handle could not be found in the
                                  current database.
   @retval EFI_INVALID_PARAMETER  BufferSize was NULL.
-  @retval EFI_INVALID_PARAMETER  The value referenced by BufferSize was not zero 
+  @retval EFI_INVALID_PARAMETER  The value referenced by BufferSize was not zero
                                  and Buffer was NULL.
 
 **/

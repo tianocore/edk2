@@ -2,7 +2,7 @@
   Definition of the command set of USB Mass Storage Specification
   for Bootability, Revision 1.0.
 
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -21,7 +21,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // INQUIRY/REQUEST_SENSE are "No Timeout Commands" as specified
 // by Multi-Media Commands (MMC) set.
 // Others are "Group 1 Timeout Commands". That is,
-// they should be retried if driver is ready. 
+// they should be retried if driver is ready.
 //
 #define USB_BOOT_INQUIRY_OPCODE         0x12
 #define USB_BOOT_REQUEST_SENSE_OPCODE   0x03
@@ -82,17 +82,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Mass command timeout, refers to specification[USB20-9.2.6.1]
 //
-// USB2.0 Spec define the up-limit timeout 5s for all command. USB floppy, 
-// USB CD-Rom and iPod devices are much slower than USB key when reponse 
+// USB2.0 Spec define the up-limit timeout 5s for all command. USB floppy,
+// USB CD-Rom and iPod devices are much slower than USB key when reponse
 // most of commands, So we set 5s as timeout here.
-// 
+//
 #define USB_BOOT_GENERAL_CMD_TIMEOUT    (5 * USB_MASS_1_SECOND)
 
 //
 // The required commands are INQUIRY, READ CAPACITY, TEST UNIT READY,
 // READ10, WRITE10, and REQUEST SENSE. The BLOCK_IO protocol uses LBA
 // so it isn't necessary to issue MODE SENSE / READ FORMAT CAPACITY
-// command to retrieve the disk gemotrics. 
+// command to retrieve the disk gemotrics.
 //
 #pragma pack(1)
 typedef struct {

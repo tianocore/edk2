@@ -78,11 +78,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED ICMP_ERROR_INFO  mIcmp6ErrMap[10] = {
   {FALSE, TRUE}, // ICMP6_ERR_UNREACH_NET
   {FALSE, TRUE}, // ICMP6_ERR_UNREACH_HOST
   {TRUE,  TRUE}, // ICMP6_ERR_UNREACH_PROTOCOL
-  {TRUE,  TRUE}, // ICMP6_ERR_UNREACH_PORT    
+  {TRUE,  TRUE}, // ICMP6_ERR_UNREACH_PORT
   {TRUE,  TRUE}, // ICMP6_ERR_PACKAGE_TOOBIG
   {FALSE, TRUE}, // ICMP6_ERR_TIMXCEED_HOPLIMIT
   {FALSE, TRUE}, // ICMP6_ERR_TIMXCEED_REASS
-  {FALSE, TRUE}, // ICMP6_ERR_PARAMPROB_HEADER    
+  {FALSE, TRUE}, // ICMP6_ERR_PARAMPROB_HEADER
   {FALSE, TRUE}, // ICMP6_ERR_PARAMPROB_NEXHEADER
   {FALSE, TRUE}  // ICMP6_ERR_PARAMPROB_IPV6OPTION
 };
@@ -258,7 +258,7 @@ IpIoCloseProtocolDestroyIpChild (
 }
 
 /**
-  This function handles ICMPv4 packets. It is the worker function of 
+  This function handles ICMPv4 packets. It is the worker function of
   IpIoIcmpHandler.
 
   @param[in]       IpIo            Pointer to the IP_IO instance.
@@ -283,19 +283,19 @@ IpIoIcmpv4Handler (
   UINT8                Type;
   UINT8                Code;
   UINT32               TrimBytes;
-  
+
   ASSERT (IpIo != NULL);
   ASSERT (Pkt != NULL);
   ASSERT (Session != NULL);
   ASSERT (IpIo->IpVersion == IP_VERSION_4);
-  
+
   //
   // Check the ICMP packet length.
   //
   if (Pkt->TotalSize < sizeof (IP4_ICMP_ERROR_HEAD)) {
     return EFI_ABORTED;
   }
-  
+
   IcmpHdr = NET_PROTO_HDR (Pkt, IP4_ICMP_ERROR_HEAD);
   IpHdr   = (EFI_IP4_HEADER *) (&IcmpHdr->IpHead);
 
@@ -387,20 +387,20 @@ IpIoIcmpv4Handler (
   TrimBytes  = (UINT32) (PayLoadHdr - (UINT8 *) IcmpHdr);
 
   NetbufTrim (Pkt, TrimBytes, TRUE);
-  
+
   //
-  // If the input packet has invalid format, and TrimBytes is larger than 
+  // If the input packet has invalid format, and TrimBytes is larger than
   // the packet size, the NetbufTrim might trim the packet to zero.
   //
   if (Pkt->TotalSize != 0) {
     IpIo->PktRcvdNotify (EFI_ICMP_ERROR, IcmpErr, Session, Pkt, IpIo->RcvdContext);
   }
 
-  return EFI_SUCCESS;  
+  return EFI_SUCCESS;
 }
 
 /**
-  This function handles ICMPv6 packets. It is the worker function of 
+  This function handles ICMPv6 packets. It is the worker function of
   IpIoIcmpHandler.
 
   @param[in]       IpIo            Pointer to the IP_IO instance.
@@ -447,7 +447,7 @@ IpIoIcmpv6Handler (
 
   //
   // Analyze the ICMPv6 Error in this ICMPv6 packet
-  // 
+  //
   switch (Type) {
   case ICMP_V6_DEST_UNREACHABLE:
     switch (Code) {
@@ -506,7 +506,7 @@ IpIoIcmpv6Handler (
    default:
 
      return EFI_ABORTED;
-   } 
+   }
 
   //
   // Notify user the ICMPv6 packet only containing payload except
@@ -517,7 +517,7 @@ IpIoIcmpv6Handler (
   NextHeader = IpHdr->NextHeader;
   PayLoadHdr = (UINT8 *) ((UINT8 *) IcmpHdr + sizeof (IP6_ICMP_ERROR_HEAD));
   Flag       = TRUE;
-  
+
   do {
     switch (NextHeader) {
     case EFI_IP_PROTO_UDP:
@@ -555,11 +555,11 @@ IpIoIcmpv6Handler (
   } while (Flag);
 
   TrimBytes = (UINT32) (PayLoadHdr - (UINT8 *) IcmpHdr);
-  
+
   NetbufTrim (Pkt, TrimBytes, TRUE);
 
   //
-  // If the input packet has invalid format, and TrimBytes is larger than 
+  // If the input packet has invalid format, and TrimBytes is larger than
   // the packet size, the NetbufTrim might trim the packet to zero.
   //
   if (Pkt->TotalSize != 0) {
@@ -634,7 +634,7 @@ IpIoExtFree (
   @param[in]       Dest                 Pointer to the destination IP address.
   @param[in]       Override             Pointer to the overriden IP_IO data.
 
-  @return Pointer to the data structure created to wrap the packet. If any error occurs, 
+  @return Pointer to the data structure created to wrap the packet. If any error occurs,
           then return NULL.
 
 **/
@@ -650,7 +650,7 @@ IpIoCreateSndEntry (
   )
 {
   IP_IO_SEND_ENTRY          *SndEntry;
-  EFI_EVENT                 Event;  
+  EFI_EVENT                 Event;
   EFI_STATUS                Status;
   NET_FRAGMENT              *ExtFragment;
   UINT32                    FragmentCount;
@@ -700,7 +700,7 @@ IpIoCreateSndEntry (
   }
 
   //
-  // Build a fragment table to contain the fragments in the packet. 
+  // Build a fragment table to contain the fragments in the packet.
   //
   if (IpIo->IpVersion == IP_VERSION_4) {
     ExtFragment = (NET_FRAGMENT *) TxData->Ip4TxData.FragmentTable;
@@ -757,7 +757,7 @@ IpIoCreateSndEntry (
     Ip6TxData->FragmentCount = FragmentCount;
     Ip6TxData->ExtHdrsLength = 0;
     Ip6TxData->ExtHdrs       = NULL;
-    
+
     //
     // Set the fields of SndToken
     //
@@ -804,7 +804,7 @@ ON_ERROR:
 
 /**
   Destroy the SndEntry.
-  
+
   This function pairs with IpIoCreateSndEntry().
 
   @param[in]  SndEntry              Pointer to the send entry to be destroyed.
@@ -1120,19 +1120,19 @@ IpIoListenHandlerDpc (
     if (!NetIp6IsValidUnicast(&RxData->Ip6RxData.Header->SourceAddress)) {
       goto CleanUp;
     }
-    
+
     if (RxData->Ip6RxData.DataLength == 0) {
       //
       // Discard zero length data payload packet.
       //
       goto CleanUp;
     }
-    
+
     //
     // The fragment should always be valid for non-zero length packet.
     //
     ASSERT (RxData->Ip6RxData.FragmentCount != 0);
-    
+
     //
     // Create a netbuffer representing IPv6 packet
     //
@@ -1152,19 +1152,19 @@ IpIoListenHandlerDpc (
     // Create a net session
     //
     CopyMem (
-      &Session.Source, 
+      &Session.Source,
       &RxData->Ip6RxData.Header->SourceAddress,
       sizeof(EFI_IPv6_ADDRESS)
       );
     CopyMem (
-      &Session.Dest, 
-      &RxData->Ip6RxData.Header->DestinationAddress, 
+      &Session.Dest,
+      &RxData->Ip6RxData.Header->DestinationAddress,
       sizeof(EFI_IPv6_ADDRESS)
       );
     Session.IpHdr.Ip6Hdr = RxData->Ip6RxData.Header;
     Session.IpHdrLen     = RxData->Ip6RxData.HeaderLength;
     Session.IpVersion    = IP_VERSION_6;
-  } 
+  }
 
   if (EFI_SUCCESS == Status) {
 
@@ -1186,7 +1186,7 @@ CleanUp:
   if (IpIo->IpVersion == IP_VERSION_4){
     gBS->SignalEvent (RxData->Ip4RxData.RecycleSignal);
   } else {
-    gBS->SignalEvent (RxData->Ip6RxData.RecycleSignal); 
+    gBS->SignalEvent (RxData->Ip6RxData.RecycleSignal);
   }
 
 Resume:
@@ -1223,7 +1223,7 @@ IpIoListenHandler (
   Create a new IP_IO instance.
 
   If IpVersion is not IP_VERSION_4 or IP_VERSION_6, then ASSERT().
-  
+
   This function uses IP4/IP6 service binding protocol in Controller to create
   an IP4/IP6 child (aka IP4/IP6 instance).
 
@@ -1232,7 +1232,7 @@ IpIoListenHandler (
   @param[in]  Controller        The controller handle that has IP4 or IP6 service
                                 binding protocol installed.
   @param[in]  IpVersion         The version of the IP protocol to use, either
-                                IPv4 or IPv6.                            
+                                IPv4 or IPv6.
 
   @return Pointer to a newly created IP_IO instance, or NULL if failed.
 
@@ -1287,7 +1287,7 @@ IpIoCreate (
              Controller,
              Image,
              &IpIo->ChildHandle,
-             IpVersion,             
+             IpVersion,
              (VOID **) & (IpIo->Ip)
              );
   if (EFI_ERROR (Status)) {
@@ -1324,7 +1324,7 @@ ReleaseIpIo:
 
   @retval          EFI_SUCCESS            The IP_IO instance opened with OpenData
                                           successfully.
-  @retval          EFI_ACCESS_DENIED      The IP_IO instance is configured, avoid to 
+  @retval          EFI_ACCESS_DENIED      The IP_IO instance is configured, avoid to
                                           reopen it.
   @retval          EFI_UNSUPPORTED        IPv4 RawData mode is no supported.
   @retval          EFI_INVALID_PARAMETER  Invalid input parameter.
@@ -1369,7 +1369,7 @@ IpIoOpen (
       IpIo->StationIp = EFI_NTOHL (OpenData->IpConfigData.Ip4CfgData.StationAddress);
       IpIo->SubnetMask = EFI_NTOHL (OpenData->IpConfigData.Ip4CfgData.SubnetMask);
     }
-    
+
     Status = IpIo->Ip.Ip4->Configure (
                              IpIo->Ip.Ip4,
                              &OpenData->IpConfigData.Ip4CfgData
@@ -1377,7 +1377,7 @@ IpIoOpen (
   } else {
 
     Status = IpIo->Ip.Ip6->Configure (
-                             IpIo->Ip.Ip6, 
+                             IpIo->Ip.Ip6,
                              &OpenData->IpConfigData.Ip6CfgData
                              );
   }
@@ -1450,7 +1450,7 @@ IpIoOpen (
   Stop an IP_IO instance.
 
   If Ip version is not IP_VERSION_4 or IP_VERSION_6, then ASSERT().
-  
+
   This function is paired with IpIoOpen(). The IP_IO will be unconfigured and all
   the pending send/receive tokens will be canceled.
 
@@ -1532,7 +1532,7 @@ IpIoStop (
 
 /**
   Destroy an IP_IO instance.
-  
+
   This function is paired with IpIoCreate(). The IP_IO will be closed first.
   Resource will be freed afterwards. See IpIoCloseProtocolDestroyIpChild().
 
@@ -1550,7 +1550,7 @@ IpIoDestroy (
   )
 {
   EFI_STATUS    Status;
-  
+
   //
   // Stop the IpIo.
   //
@@ -1580,7 +1580,7 @@ IpIoDestroy (
 
 /**
   Send out an IP packet.
-  
+
   This function is called after IpIoOpen(). The data to be sent is wrapped in
   Pkt. The IP instance wrapped in IpIo is used for sending by default but can be
   overriden by Sender. Other sending configs, like source address and gateway
@@ -1720,7 +1720,7 @@ IpIoCancelTxToken (
 
   If IpIo is NULL, then ASSERT().
   If Ip version is not IP_VERSION_4 or IP_VERSION_6, then ASSERT().
-  
+
   The function is used to add the IP_IO to the IP_IO sending list. The caller
   can later use IpIoFindSender() to get the IP_IO and call IpIoSend() to send
   data.
@@ -1883,9 +1883,9 @@ IpIoConfigIp (
 
       if (((EFI_IP4_CONFIG_DATA *) IpConfigData)->UseDefaultAddress) {
         Status = Ip.Ip4->GetModeData (
-                           Ip.Ip4, 
-                           &Ip4ModeData, 
-                           NULL, 
+                           Ip.Ip4,
+                           &Ip4ModeData,
+                           NULL,
                            NULL
                            );
         if (EFI_ERROR (Status)) {
@@ -1898,12 +1898,12 @@ IpIoConfigIp (
       }
 
       CopyMem (
-        &IpInfo->Addr.Addr, 
-        &((EFI_IP4_CONFIG_DATA *) IpConfigData)->StationAddress, 
+        &IpInfo->Addr.Addr,
+        &((EFI_IP4_CONFIG_DATA *) IpConfigData)->StationAddress,
         sizeof (IP4_ADDR)
         );
       CopyMem (
-        &IpInfo->PreMask.SubnetMask, 
+        &IpInfo->PreMask.SubnetMask,
         &((EFI_IP4_CONFIG_DATA *) IpConfigData)->SubnetMask,
         sizeof (IP4_ADDR)
         );
@@ -1961,11 +1961,11 @@ IpIoConfigIp (
       } else {
         Status = EFI_NO_MAPPING;
         return Status;
-      } 
+      }
 
       CopyMem (
-        &IpInfo->Addr, 
-        &Ip6ModeData.ConfigData.StationAddress, 
+        &IpInfo->Addr,
+        &Ip6ModeData.ConfigData.StationAddress,
         sizeof (EFI_IPv6_ADDRESS)
         );
 
@@ -1976,7 +1976,7 @@ IpIoConfigIp (
       if (EFI_ERROR (Status)) {
         Ip.Ip6->Configure (Ip.Ip6, NULL);
       }
-    }  
+    }
   } else {
     //
     // The IP instance is reset, set the stored Addr and SubnetMask to zero.
@@ -1994,7 +1994,7 @@ IpIoConfigIp (
   sending purpose.
 
   If Ip version is not IP_VERSION_4 or IP_VERSION_6, then ASSERT().
-  
+
   This function pairs with IpIoAddIp(). The IpInfo is previously created by
   IpIoAddIp(). The IP_IO_IP_INFO::RefCnt is decremented and the IP instance
   will be dstroyed if the RefCnt is zero.
@@ -2012,7 +2012,7 @@ IpIoRemoveIp (
 {
 
   UINT8               IpVersion;
-  
+
   if (IpIo == NULL || IpInfo == NULL) {
     return;
   }
@@ -2070,7 +2070,7 @@ IpIoRemoveIp (
 /**
   Find the first IP protocol maintained in IpIo whose local
   address is the same as Src.
-  
+
   This function is called when the caller needs the IpIo to send data to the
   specified Src. The IpIo was added previously by IpIoAddIp().
 
@@ -2124,7 +2124,7 @@ IpIoFindSender (
 
         if (EFI_IP6_EQUAL (&IpInfo->Addr.v6, &Src->v6)) {
           *IpIo = IpIoPtr;
-          return IpInfo;       
+          return IpInfo;
         }
       }
     }
@@ -2139,13 +2139,13 @@ IpIoFindSender (
 
 /**
   Get the ICMP error map information.
-  
+
   The ErrorStatus will be returned. The IsHard and Notify are optional. If they
   are not NULL, this routine will fill them.
 
   @param[in]   IcmpError             IcmpError Type.
   @param[in]   IpVersion             The version of the IP protocol to use,
-                                     either IPv4 or IPv6. 
+                                     either IPv4 or IPv6.
   @param[out]  IsHard                If TRUE, indicates that it is a hard error.
   @param[out]  Notify                If TRUE, SockError needs to be notified.
 
@@ -2217,12 +2217,12 @@ IpIoGetIcmpErrStatus (
 
     case ICMP6_ERR_UNREACH_HOST:
     case ICMP6_ERR_TIMXCEED_HOPLIMIT:
-    case ICMP6_ERR_TIMXCEED_REASS:       
+    case ICMP6_ERR_TIMXCEED_REASS:
       return EFI_HOST_UNREACHABLE;
 
     case ICMP6_ERR_UNREACH_PROTOCOL:
       return EFI_PROTOCOL_UNREACHABLE;
-      
+
     case ICMP6_ERR_UNREACH_PORT:
       return EFI_PORT_UNREACHABLE;
 
@@ -2251,23 +2251,23 @@ IpIoGetIcmpErrStatus (
   Refresh the remote peer's Neighbor Cache entries.
 
   This function is called when the caller needs the IpIo to refresh the existing
-  IPv6 neighbor cache entries since the neighbor is considered reachable by the 
-  node has recently received a confirmation that packets sent recently to the 
-  neighbor were received by its IP layer. 
+  IPv6 neighbor cache entries since the neighbor is considered reachable by the
+  node has recently received a confirmation that packets sent recently to the
+  neighbor were received by its IP layer.
 
   @param[in]   IpIo                  Pointer to an IP_IO instance
   @param[in]   Neighbor              The IP address of the neighbor
   @param[in]   Timeout               Time in 100-ns units that this entry will
-                                     remain in the neighbor cache. A value of 
-                                     zero means that the entry is permanent. 
-                                     A value of non-zero means that the entry is 
+                                     remain in the neighbor cache. A value of
+                                     zero means that the entry is permanent.
+                                     A value of non-zero means that the entry is
                                      dynamic and will be deleted after Timeout.
 
   @retval      EFI_SUCCESS           The operation is completed successfully.
   @retval      EFI_NOT_STARTED       The IpIo is not configured.
   @retval      EFI_INVALID_PARAMETER Neighbor Address is invalid.
-  @retval      EFI_NOT_FOUND         The neighbor cache entry is not in the 
-                                     neighbor table.  
+  @retval      EFI_NOT_FOUND         The neighbor cache entry is not in the
+                                     neighbor table.
   @retval      EFI_UNSUPPORTED       IP version is IPv4, which doesn't support neighbor cache refresh.
   @retval      EFI_OUT_OF_RESOURCES  Failed due to resource limit.
 
@@ -2277,7 +2277,7 @@ EFIAPI
 IpIoRefreshNeighbor (
   IN IP_IO           *IpIo,
   IN EFI_IP_ADDRESS  *Neighbor,
-  IN UINT32          Timeout  
+  IN UINT32          Timeout
   )
 {
   EFI_IP6_PROTOCOL  *Ip;

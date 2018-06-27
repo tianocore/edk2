@@ -820,7 +820,7 @@ AhciPioTransfer (
         Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_TFD;
         PortTfd = AhciReadReg (PciIo, (UINT32) Offset);
         //
-        // PxTFD will be updated if there is a D2H or SetupFIS received. 
+        // PxTFD will be updated if there is a D2H or SetupFIS received.
         //
         if ((PortTfd & EFI_AHCI_PORT_TFD_ERR) != 0) {
           Status = EFI_DEVICE_ERROR;
@@ -2010,7 +2010,7 @@ AhciCreateTransferDescriptor (
   //
   MaxCommandSlotNumber = (UINT8) (((Capability & 0x1F00) >> 8) + 1);
   Support64Bit         = (BOOLEAN) (((Capability & BIT31) != 0) ? TRUE : FALSE);
-  
+
   PortImplementBitMap  = AhciReadReg(PciIo, EFI_AHCI_PI_OFFSET);
   //
   // Get the highest bit of implemented ports which decides how many bytes are allocated for recived FIS.

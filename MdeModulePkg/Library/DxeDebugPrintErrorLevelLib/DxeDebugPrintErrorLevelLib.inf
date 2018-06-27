@@ -3,7 +3,7 @@
 #  This includes support for the Debug Mask Protocol supports for global debug print error level mask
 #  stored in an EFI Variable. This library instance only support DXE Phase modules.
 #
-#  Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,7 +22,7 @@
   FILE_GUID                      = 1D564EC9-9373-49a4-9E3F-E4D7B9974C84
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DebugPrintErrorLevelLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  LIBRARY_CLASS                  = DebugPrintErrorLevelLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = DxeDebugPrintErrorLevelLibConstructor
   DESTRUCTOR                     = DxeDebugPrintErrorLevelLibDestructor
 
@@ -40,10 +40,10 @@
 [LibraryClasses]
   PcdLib
   HobLib
-  
+
 [Protocols]
   gEfiDebugMaskProtocolGuid     ## PRODUCES
-  
+
 [Guids]
   ## SOMETIMES_PRODUCES   ## Variable:L"EFIDebug"
   ## SOMETIMES_CONSUMES   ## Variable:L"EFIDebug"

@@ -1,7 +1,7 @@
 /** @file
   Reset Architectural and Reset Notification protocols implementation.
 
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -162,9 +162,9 @@ RESET_NOTIFICATION_INSTANCE mPlatformSpecificResetHandler = {
 
   It initializes the Reset Architectural Protocol.
 
-  @param[in] ImageHandle  The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
   @param[in] SystemTable  A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS     The entry point is executed successfully.
   @retval other           Cannot install ResetArch protocol.
 
@@ -207,7 +207,7 @@ InitializeResetSystem (
 }
 
 /**
-  Put the system into S3 power state.                            
+  Put the system into S3 power state.
 **/
 VOID
 DoS3 (
@@ -293,7 +293,7 @@ ResetSystem (
         Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
       }
       //
-      // call reset notification functions registered through the 
+      // call reset notification functions registered through the
       // EDKII_PLATFORM_SPECIFIC_RESET_HANDLER_PROTOCOL.
       //
       for ( Link = GetFirstNode (&mPlatformSpecificResetHandler.ResetNotifies)

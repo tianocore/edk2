@@ -1,7 +1,7 @@
 /** @file
 Variable operation that will be used by bootmaint
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -17,10 +17,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Delete Boot Option that represent a Deleted state in BootOptionMenu.
 
-  @retval EFI_SUCCESS   If all boot load option EFI Variables corresponding to  
+  @retval EFI_SUCCESS   If all boot load option EFI Variables corresponding to
                         BM_LOAD_CONTEXT marked for deletion is deleted.
   @retval EFI_NOT_FOUND If can not find the boot option want to be deleted.
-  @return Others        If failed to update the "BootOrder" variable after deletion. 
+  @return Others        If failed to update the "BootOrder" variable after deletion.
 
 **/
 EFI_STATUS
@@ -124,7 +124,7 @@ Var_DelDriverOption (
 
   This function clear the EFI variable defined by ConsoleName and
   gEfiGlobalVariableGuid. It then build the multi-instance device
-  path by appending the device path of the Console (In/Out/Err) instance 
+  path by appending the device path of the Console (In/Out/Err) instance
   in ConsoleMenu. Then it scan all corresponding console device by
   scanning Terminal (built from device supporting Serial I/O instances)
   devices in TerminalMenu. At last, it save a EFI variable specifed
@@ -188,7 +188,7 @@ Var_UpdateConsoleOption (
         ) {
       Vendor.Header.Type    = MESSAGING_DEVICE_PATH;
       Vendor.Header.SubType = MSG_VENDOR_DP;
-      
+
       ASSERT (NewTerminalContext->TerminalType < (ARRAY_SIZE (TerminalTypeGuid)));
       CopyMem (
         &Vendor.Guid,
@@ -261,7 +261,7 @@ Var_UpdateConsoleOutOption (
   console device.
 
   @retval EFI_SUCCESS    The function complete successfully.
-  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.  
+  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.
 **/
 EFI_STATUS
 Var_UpdateErrorOutOption (
@@ -272,8 +272,8 @@ Var_UpdateErrorOutOption (
 }
 
 /**
-  This function create a currently loaded Drive Option from 
-  the BMM. It then appends this Driver Option to the end of 
+  This function create a currently loaded Drive Option from
+  the BMM. It then appends this Driver Option to the end of
   the "DriverOrder" list. It append this Driver Opotion to the end
   of DriverOptionMenu.
 
@@ -401,8 +401,8 @@ Var_UpdateDriverOption (
 }
 
 /**
-  This function create a currently loaded Boot Option from 
-  the BMM. It then appends this Boot Option to the end of 
+  This function create a currently loaded Boot Option from
+  the BMM. It then appends this Boot Option to the end of
   the "BootOrder" list. It also append this Boot Opotion to the end
   of BootOptionMenu.
 
@@ -521,7 +521,7 @@ Var_UpdateBootOption (
 }
 
 /**
-  This function update the "BootNext" EFI Variable. If there is 
+  This function update the "BootNext" EFI Variable. If there is
   no "BootNext" specified in BMM, this EFI Variable is deleted.
   It also update the BMM context data specified the "BootNext"
   vaule.
@@ -529,7 +529,7 @@ Var_UpdateBootOption (
   @param CallbackData    The BMM context data.
 
   @retval EFI_SUCCESS    The function complete successfully.
-  @return                The EFI variable can be saved. See gRT->SetVariable 
+  @return                The EFI variable can be saved. See gRT->SetVariable
                          for detail return information.
 
 **/
@@ -633,7 +633,7 @@ Var_UpdateBootOrder (
                   BootOrder
                   );
   FreePool (BootOrder);
-  
+
   BOpt_FreeMenu (&BootOptionMenu);
   BOpt_GetBootOptions (CallbackData);
 

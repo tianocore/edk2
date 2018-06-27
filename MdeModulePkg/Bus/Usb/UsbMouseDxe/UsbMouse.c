@@ -1,7 +1,7 @@
 /** @file
   USB Mouse Driver that manages USB mouse and produces Simple Pointer Protocol.
 
-Copyright (c) 2004 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -335,7 +335,7 @@ USBMouseDriverBindingStart (
            );
     goto ErrorExit;
   }
-  
+
   UsbMouseDevice->ControllerNameTable = NULL;
   AddUnicodeString2 (
     "eng",
@@ -596,7 +596,7 @@ InitializeUsbMouseDevice (
 
   Total = 0;
   Start = FALSE;
-  Head  = (USB_DESC_HEAD *)Buf;  
+  Head  = (USB_DESC_HEAD *)Buf;
   MouseHidDesc = NULL;
 
   //
@@ -782,7 +782,7 @@ OnMouseInterruptComplete (
 
     //
     // Delete & Submit this interrupt again
-    // Handler of DelayedRecoveryEvent triggered by timer will re-submit the interrupt. 
+    // Handler of DelayedRecoveryEvent triggered by timer will re-submit the interrupt.
     //
     UsbIo->UsbAsyncInterruptTransfer (
              UsbIo,
@@ -839,16 +839,16 @@ OnMouseInterruptComplete (
 
 /**
   Retrieves the current state of a pointer device.
-    
-  @param  This                  A pointer to the EFI_SIMPLE_POINTER_PROTOCOL instance.                                   
+
+  @param  This                  A pointer to the EFI_SIMPLE_POINTER_PROTOCOL instance.
   @param  MouseState            A pointer to the state information on the pointer device.
-                                
+
   @retval EFI_SUCCESS           The state of the pointer device was returned in State.
   @retval EFI_NOT_READY         The state of the pointer device has not changed since the last call to
-                                GetState().                                                           
+                                GetState().
   @retval EFI_DEVICE_ERROR      A device error occurred while attempting to retrieve the pointer device's
-                                current state.                                                           
-  @retval EFI_INVALID_PARAMETER MouseState is NULL.                                                           
+                                current state.
+  @retval EFI_INVALID_PARAMETER MouseState is NULL.
 
 **/
 EFI_STATUS
@@ -892,13 +892,13 @@ GetMouseState (
 }
 
 
-/**                                                                 
+/**
   Resets the pointer device hardware.
-  
+
   @param  This                  A pointer to the EFI_SIMPLE_POINTER_PROTOCOL instance.
   @param  ExtendedVerification  Indicates that the driver may perform a more exhaustive
                                 verification operation of the device during reset.
-                                
+
   @retval EFI_SUCCESS           The device was reset.
   @retval EFI_DEVICE_ERROR      The device is not functioning correctly and could not be reset.
 
@@ -937,7 +937,7 @@ UsbMouseReset (
 
   @param  Event        Event to be signaled when there's input from mouse.
   @param  Context      Points to USB_MOUSE_DEV instance.
- 
+
 **/
 VOID
 EFIAPI

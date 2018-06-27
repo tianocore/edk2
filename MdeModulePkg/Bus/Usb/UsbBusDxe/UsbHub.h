@@ -96,7 +96,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_HUB_SUBCLASS_CODE       0x00
 
 //
-// Host software return timeout if port status doesn't change 
+// Host software return timeout if port status doesn't change
 // after 500ms(LOOP * STALL = 5000 * 0.1ms), set by experience
 //
 #define USB_WAIT_PORT_STS_CHANGE_LOOP  5000

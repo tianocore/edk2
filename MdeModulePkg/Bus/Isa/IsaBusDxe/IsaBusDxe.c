@@ -3,7 +3,7 @@
   Controller and installs the ISA Host Controller Service Binding protocol
   on the ISA Host Controller's handle.
 
-  Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,19 +19,19 @@
 #include "ComponentName.h"
 
 /**
-  Tests to see if this driver supports a given controller. If a child device is provided, 
+  Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to test. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to test. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For bus drivers, if this parameter is not NULL, then 
-                                   the bus driver must determine if the bus controller specified 
-                                   by ControllerHandle and the child controller specified 
-                                   by RemainingDevicePath are both supported by this 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For bus drivers, if this parameter is not NULL, then
+                                   the bus driver must determine if the bus controller specified
+                                   by ControllerHandle and the child controller specified
+                                   by RemainingDevicePath are both supported by this
                                    bus driver.
 
   @retval EFI_SUCCESS              The device specified by ControllerHandle and
@@ -105,14 +105,14 @@ ISA_BUS_CHILD_PRIVATE_DATA mIsaBusChildPrivateTemplate = {
 
 /**
   Creates a child handle and installs a protocol.
-  
-  The CreateChild() function installs a protocol on ChildHandle. 
-  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle. 
+
+  The CreateChild() function installs a protocol on ChildHandle.
+  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle.
   If ChildHandle is not a pointer to NULL, then the protocol installs on the existing ChildHandle.
 
   @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param  ChildHandle Pointer to the handle of the child to create. If it is NULL,
-                      then a new handle is created. If it is a pointer to an existing UEFI handle, 
+                      then a new handle is created. If it is a pointer to an existing UEFI handle,
                       then the protocol is added to the existing UEFI handle.
 
   @retval EFI_SUCCES            The protocol was added to ChildHandle.
@@ -164,9 +164,9 @@ IsaBusCreateChild (
 
 /**
   Destroys a child handle with a protocol installed on it.
-  
-  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol 
-  that was installed by CreateChild() from ChildHandle. If the removed protocol is the 
+
+  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol
+  that was installed by CreateChild() from ChildHandle. If the removed protocol is the
   last protocol on ChildHandle, then ChildHandle is destroyed.
 
   @param  This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
@@ -260,18 +260,18 @@ ISA_BUS_PRIVATE_DATA   mIsaBusPrivateTemplate = {
   Starts a device controller or a bus controller.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For a bus driver, if this parameter is NULL, then handles 
-                                   for all the children of Controller are created by this driver.  
-                                   If this parameter is not NULL and the first Device Path Node is 
-                                   not the End of Device Path Node, then only the handle for the 
-                                   child device specified by the first Device Path Node of 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For a bus driver, if this parameter is NULL, then handles
+                                   for all the children of Controller are created by this driver.
+                                   If this parameter is not NULL and the first Device Path Node is
+                                   not the End of Device Path Node, then only the handle for the
+                                   child device specified by the first Device Path Node of
                                    RemainingDevicePath is created by this driver.
-                                   If the first Device Path Node of RemainingDevicePath is 
+                                   If the first Device Path Node of RemainingDevicePath is
                                    the End of Device Path Node, no child handle is created by this
                                    driver.
 
@@ -340,13 +340,13 @@ IsaBusDriverBindingStart (
 
 /**
   Stops a device controller or a bus controller.
-  
+
   @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
-                                support a bus specific I/O protocol for the driver 
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must
+                                support a bus specific I/O protocol for the driver
                                 to use to stop the device.
   @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
-  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL
                                 if NumberOfChildren is 0.
 
   @retval EFI_SUCCESS           The device was stopped.
@@ -432,10 +432,10 @@ EFI_DRIVER_BINDING_PROTOCOL gIsaBusDriverBinding = {
 
 /**
   Entry point of the IsaBusDxe driver.
-  
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 **/
@@ -447,7 +447,7 @@ InitializeIsaBus (
   )
 {
   EFI_STATUS           Status;
-  
+
   Status = EfiLibInstallDriverBindingComponentName2 (
              ImageHandle,
              SystemTable,

@@ -11,7 +11,7 @@
 
   FpdtSmiHandler() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -90,7 +90,7 @@ FpdtStatusCodeListenerSmm (
   if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) != EFI_PROGRESS_CODE) {
     return EFI_UNSUPPORTED;
   }
-  
+
   //
   // Collect one or more Boot records in boot time
   //
@@ -163,7 +163,7 @@ FpdtStatusCodeListenerSmm (
 /**
   Communication service SMI Handler entry.
 
-  This SMI handler provides services for report SMM boot records. 
+  This SMI handler provides services for report SMM boot records.
 
   Caution: This function may receive untrusted input.
   Communicate buffer and buffer size are external input, so this function will do basic validation.
@@ -175,11 +175,11 @@ FpdtStatusCodeListenerSmm (
                                  be conveyed from a non-SMM environment into an SMM environment.
   @param[in, out] CommBufferSize The size of the CommBuffer.
 
-  @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers 
+  @retval EFI_SUCCESS                         The interrupt was handled and quiesced. No other handlers
                                               should still be called.
-  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED  The interrupt has been quiesced but other handlers should 
+  @retval EFI_WARN_INTERRUPT_SOURCE_QUIESCED  The interrupt has been quiesced but other handlers should
                                               still be called.
-  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The interrupt is still pending and other handlers should still 
+  @retval EFI_WARN_INTERRUPT_SOURCE_PENDING   The interrupt is still pending and other handlers should still
                                               be called.
   @retval EFI_INTERRUPT_PENDING               The interrupt could not be quiesced.
 
@@ -212,7 +212,7 @@ FpdtSmiHandler (
   if(TempCommBufferSize < sizeof (SMM_BOOT_RECORD_COMMUNICATE)) {
     return EFI_SUCCESS;
   }
-  
+
   if (!SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "FpdtSmiHandler: SMM communication data buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
@@ -242,7 +242,7 @@ FpdtSmiHandler (
         Status = EFI_INVALID_PARAMETER;
         break;
       }
-      
+
       //
       // Sanity check
       //
@@ -255,10 +255,10 @@ FpdtSmiHandler (
         Status = EFI_ACCESS_DENIED;
         break;
       }
-      
+
       CopyMem (
-       (UINT8*)BootRecordData, 
-       mBootRecordBuffer + BootRecordOffset, 
+       (UINT8*)BootRecordData,
+       mBootRecordBuffer + BootRecordOffset,
        BootRecordSize
        );
       break;
@@ -268,7 +268,7 @@ FpdtSmiHandler (
   }
 
   SmmCommData->ReturnStatus = Status;
-  
+
   return EFI_SUCCESS;
 }
 
@@ -295,8 +295,8 @@ FirmwarePerformanceSmmEntryPoint (
   //
   // Initialize spin lock
   //
-  InitializeSpinLock (&mSmmFpdtLock); 
-   
+  InitializeSpinLock (&mSmmFpdtLock);
+
   //
   // Get SMM Report Status Code Handler Protocol.
   //

@@ -6,7 +6,7 @@
 # 2) Dispatch PEIM from discovered FV.
 # 3) Handoff control to DxeIpl to load DXE core and enter DXE phase.
 #
-# Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -81,10 +81,10 @@
   ## CONSUMES   ## UNDEFINED # Locate ppi
   ## CONSUMES   ## GUID      # Used to compare with FV's file system guid and get the FV's file system format
   gEfiFirmwareFileSystem3Guid
-  
+
 [Ppis]
   gEfiPeiStatusCodePpiGuid                      ## SOMETIMES_CONSUMES # PeiReportStatusService is not ready if this PPI doesn't exist
-  gEfiPeiResetPpiGuid                           ## SOMETIMES_CONSUMES # PeiResetService is not ready if this PPI doesn't exist 
+  gEfiPeiResetPpiGuid                           ## SOMETIMES_CONSUMES # PeiResetService is not ready if this PPI doesn't exist
   gEfiDxeIplPpiGuid                             ## CONSUMES
   gEfiPeiMemoryDiscoveredPpiGuid                ## PRODUCES
   gEfiPeiDecompressPpiGuid                      ## SOMETIMES_CONSUMES
@@ -103,7 +103,7 @@
   gEfiPeiReset2PpiGuid                          ## SOMETIMES_CONSUMES
   gEfiSecHobDataPpiGuid                         ## SOMETIMES_CONSUMES
 
-[Pcd]  
+[Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported                   ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv                     ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported                  ## CONSUMES
@@ -114,8 +114,8 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressBootTimeCodePageNumber    ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadFixAddressRuntimeCodePageNumber     ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdLoadModuleAtFixAddressEnable            ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot                      ## CONSUMES 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot                        ## CONSUMES 
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnS3Boot                      ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdShadowPeimOnBoot                        ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack                    ## CONSUMES
 
 # [BootMode]

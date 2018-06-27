@@ -2,13 +2,13 @@
 
   This library class defines a set of interfaces to customize Display module
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -44,14 +44,14 @@ Statement
 **/
 
 /**
-  This funtion defines Page Frame and Backgroud. 
-  
-  Based on the above layout, it will be responsible for HeaderHeight, FooterHeight, 
-  StatusBarHeight and Backgroud. And, it will reserve Screen for Statement. 
+  This funtion defines Page Frame and Backgroud.
+
+  Based on the above layout, it will be responsible for HeaderHeight, FooterHeight,
+  StatusBarHeight and Backgroud. And, it will reserve Screen for Statement.
 
   @param[in]  FormData             Form Data to be shown in Page.
   @param[out] ScreenForStatement   Screen to be used for Statement. (Prompt, Value and Help)
-  
+
   @return Status
 **/
 EFI_STATUS
@@ -120,8 +120,8 @@ DisplayPageFrame (
   This function updates customized key panel's help information.
   The library will prepare those Strings for the basic key, ESC, Enter, Up/Down/Left/Right, +/-.
   and arrange them in Footer panel.
-  
-  @param[in]  FormData       Form Data to be shown in Page. FormData has the highlighted statement. 
+
+  @param[in]  FormData       Form Data to be shown in Page. FormData has the highlighted statement.
   @param[in]  Statement      The statement current selected.
   @param[in]  Selected       Whether or not a tag be selected. TRUE means Enter has hit this question.
 **/
@@ -214,7 +214,7 @@ RefreshKeyHelp (
   } else if (Statement->OpCode->OpCode == EFI_IFR_TIME_OP) {
     TimeOp  = (EFI_IFR_TIME *) Statement->OpCode;
     HexDisplay = (TimeOp->Flags & EFI_IFR_DISPLAY_UINT_HEX) == EFI_IFR_DISPLAY_UINT_HEX;
-  }  
+  }
   switch (Statement->OpCode->OpCode) {
   case EFI_IFR_ORDERED_LIST_OP:
   case EFI_IFR_ONE_OF_OP:
@@ -232,7 +232,7 @@ RefreshKeyHelp (
       if ((Statement->OpCode->OpCode == EFI_IFR_DATE_OP) ||
           (Statement->OpCode->OpCode == EFI_IFR_TIME_OP)) {
         PrintAt (
-          ColumnWidth1, 
+          ColumnWidth1,
           StartColumnOfHelp,
           BottomRowOfHelp,
           L"%c%c%c%c%s",
@@ -259,7 +259,7 @@ RefreshKeyHelp (
       //
       // If it is a selected numeric with manual input, display different message
       //
-      if ((Statement->OpCode->OpCode == EFI_IFR_NUMERIC_OP) || 
+      if ((Statement->OpCode->OpCode == EFI_IFR_NUMERIC_OP) ||
           (Statement->OpCode->OpCode == EFI_IFR_DATE_OP) ||
           (Statement->OpCode->OpCode == EFI_IFR_TIME_OP)) {
         ColumnStr2 = HexDisplay ? gHexNumericInput : gDecNumericInput;
@@ -329,16 +329,16 @@ RefreshKeyHelp (
 
   default:
     break;
-  }  
+  }
 }
 
 /**
   Update status bar.
 
-  This function updates the status bar on the bottom of menu screen. It just shows StatusBar. 
+  This function updates the status bar on the bottom of menu screen. It just shows StatusBar.
   Original logic in this function should be splitted out.
 
-  @param[in]  MessageType            The type of message to be shown. InputError or Configuration Changed. 
+  @param[in]  MessageType            The type of message to be shown. InputError or Configuration Changed.
   @param[in]  State                  Show or Clear Message.
 **/
 VOID
@@ -395,17 +395,17 @@ UpdateStatusBar (
 
   default:
     break;
-  } 
+  }
 }
 
 /**
-  Create popup window. It will replace CreateDialog(). 
+  Create popup window. It will replace CreateDialog().
 
   This function draws OEM/Vendor specific pop up windows.
 
   @param[out]  Key    User Input Key
   @param       ...    String to be shown in Popup. The variable argument list is terminated by a NULL.
-  
+
 **/
 VOID
 EFIAPI
@@ -453,17 +453,17 @@ CreateDialog (
   VA_START (Marker, Key);
   while  ((String = VA_ARG (Marker, CHAR16 *)) != NULL) {
     LineNum ++;
-    
+
     if ((LibGetStringWidth (String) / 2) > LargestString) {
       LargestString = (LibGetStringWidth (String) / 2);
     }
-  } 
+  }
   VA_END (Marker);
 
   if ((LargestString + 2) > DimensionsWidth) {
     LargestString = DimensionsWidth - 2;
   }
-  
+
   CurrentAttribute  = gST->ConOut->Mode->Attribute;
   CursorVisible     = gST->ConOut->Mode->CursorVisible;
   gST->ConOut->EnableCursor (gST->ConOut, FALSE);
@@ -551,8 +551,8 @@ CreateDialog (
 }
 
 /**
-  Confirm how to handle the changed data. 
-  
+  Confirm how to handle the changed data.
+
   @return Action BROWSER_ACTION_SUBMIT, BROWSER_ACTION_DISCARD or other values.
 **/
 UINTN
@@ -566,10 +566,10 @@ ConfirmDataChange (
   EFI_INPUT_KEY           Key;
 
   gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-  
+
   YesResponse = gYesResponse[0];
   NoResponse  = gNoResponse[0];
-  
+
   //
   // If NV flag is up, prompt user
   //
@@ -581,7 +581,7 @@ ConfirmDataChange (
     ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (NoResponse | UPPER_LOWER_CASE_OFFSET)) &&
     ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) != (YesResponse | UPPER_LOWER_CASE_OFFSET))
   );
-  
+
   if (Key.ScanCode == SCAN_ESC) {
     return BROWSER_ACTION_NONE;
   } else if ((Key.UnicodeChar | UPPER_LOWER_CASE_OFFSET) == (YesResponse | UPPER_LOWER_CASE_OFFSET)) {
@@ -594,7 +594,7 @@ ConfirmDataChange (
 /**
   OEM specifies whether Setup exits Page by ESC key.
 
-  This function customized the behavior that whether Setup exits Page so that 
+  This function customized the behavior that whether Setup exits Page so that
   system able to boot when configuration is not changed.
 
   @retval  TRUE     Exits FrontPage
@@ -610,14 +610,14 @@ FormExitPolicy (
 }
 
 /**
-  Set Timeout value for a ceratain Form to get user response. 
-  
+  Set Timeout value for a ceratain Form to get user response.
+
   This function allows to set timeout value on a ceratain form if necessary.
-  If timeout is not zero, the form will exit if user has no response in timeout. 
-  
+  If timeout is not zero, the form will exit if user has no response in timeout.
+
   @param[in]  FormData   Form Data to be shown in Page
 
-  @return 0     No timeout for this form. 
+  @return 0     No timeout for this form.
   @return > 0   Timeout value in 100 ns units.
 **/
 UINT64
@@ -898,7 +898,7 @@ GetSubTitleTextColor (
   Clear Screen to the initial state.
 **/
 VOID
-EFIAPI 
+EFIAPI
 ClearDisplayPage (
   VOID
   )
@@ -950,7 +950,7 @@ CustomizedDisplayLibDestructor (
   )
 {
   HiiRemovePackages(mCDLStringPackHandle);
-  
+
   FreeLibStrings ();
 
   return EFI_SUCCESS;

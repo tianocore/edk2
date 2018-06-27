@@ -1,7 +1,7 @@
 /** @file
   Provide Boot Manager related library APIs.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -60,14 +60,14 @@ typedef struct {
   // Used at runtime
   //
   EFI_STATUS                        Status;             // Status returned from boot attempt gBS->StartImage ()
-  CHAR16                            *ExitData;          // Exit data returned from gBS->StartImage () 
+  CHAR16                            *ExitData;          // Exit data returned from gBS->StartImage ()
   UINTN                             ExitDataSize;       // Size of ExitData
 } EFI_BOOT_MANAGER_LOAD_OPTION;
 
 /**
   Returns an array of load options based on the EFI variable
   L"BootOrder"/L"DriverOrder" and the L"Boot####"/L"Driver####" variables impled by it.
-  #### is the hex value of the UINT16 in each BootOrder/DriverOrder entry. 
+  #### is the hex value of the UINT16 in each BootOrder/DriverOrder entry.
 
   @param  LoadOptionCount   Returns number of entries in the array.
   @param  LoadOptionType    The type of the load option.
@@ -163,7 +163,7 @@ EfiBootManagerVariableToLoadOption (
 
 /**
   Create the Boot#### or Driver#### variable from the load option.
-  
+
   @param  LoadOption      Pointer to the load option.
 
   @retval EFI_SUCCESS     The variable was created.
@@ -204,9 +204,9 @@ EfiBootManagerAddLoadOptionVariable (
 
 /**
   Delete the load option according to the OptionNumber and OptionType.
-  
+
   Only the BootOrder/DriverOrder is updated to remove the reference of the OptionNumber.
-  
+
   @param  OptionNumber        Option number of the load option.
   @param  OptionType          Type of the load option.
 
@@ -221,7 +221,7 @@ EfiBootManagerDeleteLoadOptionVariable (
   );
 
 /**
-  Sort the load options. The DriverOrder/BootOrder variables will be re-created to 
+  Sort the load options. The DriverOrder/BootOrder variables will be re-created to
   reflect the new order.
 
   @param OptionType        The type of the load option.
@@ -237,7 +237,7 @@ EfiBootManagerSortLoadOptionVariable (
 /**
   Return the index of the load option in the load option array.
 
-  The function consider two load options are equal when the 
+  The function consider two load options are equal when the
   OptionType, Attributes, Description, FilePath and OptionalData are equal.
 
   @param Key    Pointer to the load option to be found.
@@ -292,7 +292,7 @@ typedef struct {
 /**
   Start the hot key service so that the key press can trigger the boot option.
 
-  @param HotkeyTriggered  Return the waitable event and it will be signaled 
+  @param HotkeyTriggered  Return the waitable event and it will be signaled
                           when a valid hot key is pressed.
 
   @retval EFI_SUCCESS     The hot key service is started.
@@ -391,7 +391,7 @@ EfiBootManagerHotkeyBoot (
   3. Non-BlockIo SimpleFileSystem - The boot option points to a device supporting
                                     SimpleFileSystem Protocol, but not supporting BlockIo
                                     protocol.
-  4. LoadFile                     - The boot option points to the media supporting 
+  4. LoadFile                     - The boot option points to the media supporting
                                     LoadFile protocol.
   Reference: UEFI Spec chapter 3.3 Boot Option Variables Default Boot Behavior
 
@@ -407,9 +407,9 @@ EfiBootManagerRefreshAllBootOption (
   Attempt to boot the EFI boot option. This routine sets L"BootCurent" and
   signals the EFI ready to boot event. If the device path for the option starts
   with a BBS device path a legacy boot is attempted. Short form device paths are
-  also supported via this rountine. A device path starting with 
+  also supported via this rountine. A device path starting with
   MEDIA_HARDDRIVE_DP, MSG_USB_WWID_DP, MSG_USB_CLASS_DP gets expaned out
-  to find the first device that matches. If the BootOption Device Path 
+  to find the first device that matches. If the BootOption Device Path
   fails the removable media boot algorithm is attempted (\EFI\BOOTIA32.EFI,
   \EFI\BOOTX64.EFI,... only one file type is tried per processor type)
 
@@ -467,7 +467,7 @@ EfiBootManagerGetLoadOptionBuffer (
   );
 
 /**
-  The function enumerates all the legacy boot options, creates them and 
+  The function enumerates all the legacy boot options, creates them and
   registers them in the BootOrder variable.
 **/
 typedef
@@ -560,7 +560,7 @@ EfiBootManagerConnectAll (
   @retval EFI_OUT_OF_RESOURCES   There is no resource to create new handles.
   @retval EFI_NOT_FOUND          Create the handle associate with one device path
                                  node failed.
-  @retval EFI_SECURITY_VIOLATION The user has no permission to start UEFI device 
+  @retval EFI_SECURITY_VIOLATION The user has no permission to start UEFI device
                                  drivers on the DevicePath.
 **/
 EFI_STATUS
@@ -571,8 +571,8 @@ EfiBootManagerConnectDevicePath (
   );
 
 /**
-  This function will disconnect all current system handles. 
-  
+  This function will disconnect all current system handles.
+
   gBS->DisconnectController() is invoked for each handle exists in system handle buffer.
   If handle is a bus type handle, all childrens also are disconnected recursively by
   gBS->DisconnectController().
@@ -656,7 +656,7 @@ EfiBootManagerConnectConsoleVariable (
   );
 
 /**
-  Query all the children of VideoController and return the device paths of all the 
+  Query all the children of VideoController and return the device paths of all the
   children that support GraphicsOutput protocol.
 
   @param VideoController       PCI handle of video controller.
@@ -698,7 +698,7 @@ typedef struct {
   EFI_HANDLE                      ChildHandle;
 
   ///
-  /// Driver health messages of the specify Driver 
+  /// Driver health messages of the specify Driver
   ///
   EFI_DRIVER_HEALTH_HII_MESSAGE   *MessageList;
 
@@ -756,7 +756,7 @@ EfiBootManagerFreeDriverHealthInfo (
 
   @param LoadOption  Pointer to the load option.
 
-  @retval EFI_INVALID_PARAMETER  The load option type is invalid, 
+  @retval EFI_INVALID_PARAMETER  The load option type is invalid,
                                  or the load option file path doesn't point to a valid file.
   @retval EFI_UNSUPPORTED        The load option type is of LoadOptionTypeBoot.
   @retval EFI_SUCCESS            The load option is inactive, or successfully loaded and executed.

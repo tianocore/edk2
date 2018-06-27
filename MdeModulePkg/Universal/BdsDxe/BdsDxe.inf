@@ -1,10 +1,10 @@
 ## @file
 #  BdsDxe module is core driver for BDS phase.
 #
-#  When DxeCore dispatching all DXE driver, this module will produce architecture protocol 
+#  When DxeCore dispatching all DXE driver, this module will produce architecture protocol
 #  gEfiBdsArchProtocolGuid. After DxeCore finish dispatching, DxeCore will invoke Entry
 #  interface of protocol gEfiBdsArchProtocolGuid, then BDS phase is entered.
-#  
+#
 #  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,7 +22,7 @@
   MODULE_UNI_FILE                = BdsDxe.uni
   FILE_GUID                      = 6D33944A-EC75-4855-A54D-809C75241F6C
   MODULE_TYPE                    = DXE_DRIVER
-  VERSION_STRING                 = 1.0 
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = BdsInitialize
 
 #

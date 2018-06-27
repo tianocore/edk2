@@ -1,14 +1,14 @@
 /** @file
-  Extension Form Browser Protocol provides the services that can be used to 
+  Extension Form Browser Protocol provides the services that can be used to
   register the different hot keys for the standard Browser actions described in UEFI specification.
 
-Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -48,8 +48,8 @@ BOOLEAN
   @retval EFI_SUCCESS              Execute the request action succss.
 
 **/
-typedef 
-EFI_STATUS 
+typedef
+EFI_STATUS
 (EFIAPI *EXECUTE_ACTION) (
   IN UINT32        Action,
   IN UINT16        DefaultId
@@ -92,7 +92,7 @@ typedef struct {
   EFI_FORM_ID      FormId;               // Find the form
   EFI_GUID         FormSetGuid;          // Find the formset.
   EFI_HII_HANDLE   HiiHandle;            // Find the HII handle
-  UINT32           Attribute;            // Hide or grayout ... 
+  UINT32           Attribute;            // Hide or grayout ...
 } QUESTION_ATTRIBUTE_OVERRIDE;
 
 #define FORM_QUESTION_ATTRIBUTE_OVERRIDE_FROM_LINK(a)  CR (a, QUESTION_ATTRIBUTE_OVERRIDE, Link, FORM_QUESTION_ATTRIBUTE_OVERRIDE_SIGNATURE)

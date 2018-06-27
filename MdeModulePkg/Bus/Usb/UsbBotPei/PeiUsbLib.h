@@ -1,8 +1,8 @@
 /** @file
 Common Libarary  for PEI USB.
 
-Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define USB_DEV_SET_FEATURE_REQ_TYPE_D      0x00 // Receiver : Device
 #define USB_DEV_SET_FEATURE_REQ_TYPE_I      0x01 // Receiver : Interface
 #define USB_DEV_SET_FEATURE_REQ_TYPE_E      0x02 // Receiver : Endpoint
- 
+
 #define USB_DEV_SET_ADDRESS                 0x05
 #define USB_DEV_SET_ADDRESS_REQ_TYPE        0x00
 

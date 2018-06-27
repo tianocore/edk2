@@ -1,7 +1,7 @@
 /** @file
   The header file of IP4Config2Nv.c
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -30,7 +30,7 @@ extern UINT8  Ip4DxeStrings[];
   @retval EFI_SUCCESS              The HII Config Access protocol is installed.
   @retval EFI_OUT_OF_RESOURCES     Failed to allocate memory.
   @retval Others                   Other errors as indicated.
-  
+
 **/
 EFI_STATUS
 Ip4Config2FormInit (

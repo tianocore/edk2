@@ -718,7 +718,7 @@ KeyNotifyProcessHandler (
   while (TRUE) {
     //
     // Enter critical section
-    //  
+    //
     OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     Status = PopEfikeyBufHead (&ConsoleIn->EfiKeyQueueForNotify, &KeyData);
     //

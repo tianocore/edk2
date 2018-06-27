@@ -1,24 +1,24 @@
 ## @file
 #  Performance library instance mainly for DxeCore usage.
-#  
+#
 #  This library provides the performance measurement interfaces and initializes performance
 #  logging for DXE phase. It first initializes its private global data structure for
-#  performance logging and saves the performance GUIDed HOB passed from PEI phase. 
+#  performance logging and saves the performance GUIDed HOB passed from PEI phase.
 #  It initializes DXE phase performance logging by publishing the Performance and PerformanceEx Protocol,
 #  which is consumed by DxePerformanceLib to logging performance data in DXE phase.
 #  This library is mainly used by DxeCore to start performance logging to ensure that
 #  Performance and PerformanceEx Protocol are installed at the very beginning of DXE phase.
-#  
+#
 #  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 ##
 
 [Defines]

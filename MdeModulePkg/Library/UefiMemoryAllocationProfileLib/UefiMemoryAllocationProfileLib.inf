@@ -1,5 +1,5 @@
 ## @file
-# Instance of Memory Allocation Library using EFI Boot Services, 
+# Instance of Memory Allocation Library using EFI Boot Services,
 #  with memory profile support.
 #
 # Memory Allocation Library that uses EFI Boot Services to allocate
@@ -8,7 +8,7 @@
 # The implementation of this instance is copied from UefiMemoryAllocationLib
 # in MdePkg and updated to support both MemoryAllocationLib and MemoryProfileLib.
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

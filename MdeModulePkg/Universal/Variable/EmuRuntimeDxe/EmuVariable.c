@@ -29,7 +29,7 @@ VARIABLE_INFO_ENTRY *gVariableInfo = NULL;
 #define ISO_639_2_ENTRY_SIZE    3
 
 /**
-  Update the variable region with Variable information. These are the same 
+  Update the variable region with Variable information. These are the same
   arguments as the EFI Variable services.
 
   @param[in] VariableName       Name of variable
@@ -40,7 +40,7 @@ VARIABLE_INFO_ENTRY *gVariableInfo = NULL;
 
   @param[in] DataSize           Size of data. 0 means delete
 
-  @param[in] Attributes 	      Attribues of the variable
+  @param[in] Attributes         Attribues of the variable
 
   @param[in] Variable           The variable information which is used to keep track of variable usage.
 
@@ -272,13 +272,13 @@ GetEndPointer (
 }
 
 /**
-  Routine used to track statistical information about variable usage. 
+  Routine used to track statistical information about variable usage.
   The data is stored in the EFI system table so it can be accessed later.
-  VariableInfo.efi can dump out the table. Only Boot Services variable 
+  VariableInfo.efi can dump out the table. Only Boot Services variable
   accesses are tracked by this code. The PcdVariableCollectStatistics
-  build flag controls if this feature is enabled. 
+  build flag controls if this feature is enabled.
 
-  A read that hits in the cache will have Read and Cache true for 
+  A read that hits in the cache will have Read and Cache true for
   the transaction. Data is allocated by this routine, but never
   freed.
 
@@ -328,7 +328,7 @@ UpdateVariableInfo (
       gBS->InstallConfigurationTable (&gEfiVariableGuid, gVariableInfo);
     }
 
-    
+
     for (Entry = gVariableInfo; Entry != NULL; Entry = Entry->Next) {
       if (CompareGuid (VendorGuid, &Entry->VendorGuid)) {
         if (StrCmp (VariableName, Entry->Name) == 0) {
@@ -399,7 +399,7 @@ GetIndexFromSupportedLangCodes(
   IN  CHAR8            *SupportedLang,
   IN  CHAR8            *Lang,
   IN  BOOLEAN          Iso639Language
-  ) 
+  )
 {
   UINTN    Index;
   UINTN    CompareLength;
@@ -434,8 +434,8 @@ GetIndexFromSupportedLangCodes(
       // Determine the length of the next language code in SupportedLang
       //
       for (CompareLength = 0; SupportedLang[CompareLength] != '\0' && SupportedLang[CompareLength] != ';'; CompareLength++);
-      
-      if ((CompareLength == LanguageLength) && 
+
+      if ((CompareLength == LanguageLength) &&
           (AsciiStrnCmp (Lang, SupportedLang, CompareLength) == 0)) {
         //
         // Successfully find the index of Lang string in SupportedLang string.
@@ -523,7 +523,7 @@ GetLangFromSupportedLangCodes (
         return CopyMem (mVariableModuleGlobal->PlatformLang, Supported - CompareLength, CompareLength);
       }
       SubIndex++;
-      
+
       //
       // Skip ';' characters in Supported
       //
@@ -533,10 +533,10 @@ GetLangFromSupportedLangCodes (
 }
 
 /**
-  Returns a pointer to an allocated buffer that contains the best matching language 
-  from a set of supported languages.  
-  
-  This function supports both ISO 639-2 and RFC 4646 language codes, but language 
+  Returns a pointer to an allocated buffer that contains the best matching language
+  from a set of supported languages.
+
+  This function supports both ISO 639-2 and RFC 4646 language codes, but language
   code types may not be mixed in a single call to this function. This function
   supports a variable argument list that allows the caller to pass in a prioritized
   list of language codes to test against all the language codes in SupportedLanguages.
@@ -544,37 +544,37 @@ GetLangFromSupportedLangCodes (
   If SupportedLanguages is NULL, then ASSERT().
 
   @param[in]  SupportedLanguages  A pointer to a Null-terminated ASCII string that
-                                  contains a set of language codes in the format 
+                                  contains a set of language codes in the format
                                   specified by Iso639Language.
   @param[in]  Iso639Language      If not zero, then all language codes are assumed to be
                                   in ISO 639-2 format.  If zero, then all language
                                   codes are assumed to be in RFC 4646 language format
-  @param[in]  ...                 A variable argument list that contains pointers to 
+  @param[in]  ...                 A variable argument list that contains pointers to
                                   Null-terminated ASCII strings that contain one or more
                                   language codes in the format specified by Iso639Language.
                                   The first language code from each of these language
                                   code lists is used to determine if it is an exact or
-                                  close match to any of the language codes in 
+                                  close match to any of the language codes in
                                   SupportedLanguages.  Close matches only apply to RFC 4646
                                   language codes, and the matching algorithm from RFC 4647
-                                  is used to determine if a close match is present.  If 
+                                  is used to determine if a close match is present.  If
                                   an exact or close match is found, then the matching
                                   language code from SupportedLanguages is returned.  If
                                   no matches are found, then the next variable argument
-                                  parameter is evaluated.  The variable argument list 
+                                  parameter is evaluated.  The variable argument list
                                   is terminated by a NULL.
 
   @retval NULL   The best matching language could not be found in SupportedLanguages.
-  @retval NULL   There are not enough resources available to return the best matching 
+  @retval NULL   There are not enough resources available to return the best matching
                  language.
-  @retval Other  A pointer to a Null-terminated ASCII string that is the best matching 
+  @retval Other  A pointer to a Null-terminated ASCII string that is the best matching
                  language in SupportedLanguages.
 
 **/
 CHAR8 *
 EFIAPI
 VariableGetBestLanguage (
-  IN CONST CHAR8  *SupportedLanguages, 
+  IN CONST CHAR8  *SupportedLanguages,
   IN UINTN        Iso639Language,
   ...
   )
@@ -649,7 +649,7 @@ VariableGetBestLanguage (
         LanguageLength = 0;
       } else {
         //
-        // If RFC 4646 mode, then trim Language from the right to the next '-' character 
+        // If RFC 4646 mode, then trim Language from the right to the next '-' character
         //
         for (LanguageLength--; LanguageLength > 0 && Language[LanguageLength] != '-'; LanguageLength--);
       }
@@ -658,7 +658,7 @@ VariableGetBestLanguage (
   VA_END (Args);
 
   //
-  // No matches were found 
+  // No matches were found
   //
   return NULL;
 }
@@ -723,7 +723,7 @@ AutoUpdateLangVariable(
     ASSERT (mVariableModuleGlobal->PlatformLangCodes != NULL);
 
     //
-    // PlatformLang holds a single language from PlatformLangCodes, 
+    // PlatformLang holds a single language from PlatformLangCodes,
     // so the size of PlatformLangCodes is enough for the PlatformLang.
     //
     if (mVariableModuleGlobal->PlatformLang != NULL) {
@@ -753,7 +753,7 @@ AutoUpdateLangVariable(
     ASSERT (mVariableModuleGlobal->LangCodes != NULL);
   }
 
-  if (SetLanguageCodes 
+  if (SetLanguageCodes
       && (mVariableModuleGlobal->PlatformLangCodes != NULL)
       && (mVariableModuleGlobal->LangCodes != NULL)) {
     //
@@ -785,7 +785,7 @@ AutoUpdateLangVariable(
       }
     }
   }
-  
+
   //
   // According to UEFI spec, "Lang" and "PlatformLang" is NV|BS|RT attributions.
   //
@@ -849,7 +849,7 @@ AutoUpdateLangVariable(
         //
         FindVariable (L"PlatformLang", &gEfiGlobalVariableGuid, &Variable, (VARIABLE_GLOBAL *)mVariableModuleGlobal);
 
-        Status = UpdateVariable (L"PlatformLang", &gEfiGlobalVariableGuid, BestPlatformLang, 
+        Status = UpdateVariable (L"PlatformLang", &gEfiGlobalVariableGuid, BestPlatformLang,
                                  AsciiStrSize (BestPlatformLang), Attributes, &Variable);
 
         DEBUG ((EFI_D_INFO, "Variable Driver Auto Update Lang, Lang:%a, PlatformLang:%a\n", BestLang, BestPlatformLang));
@@ -860,7 +860,7 @@ AutoUpdateLangVariable(
 }
 
 /**
-  Update the variable region with Variable information. These are the same 
+  Update the variable region with Variable information. These are the same
   arguments as the EFI Variable services.
 
   @param[in] VariableName       Name of variable
@@ -907,10 +907,10 @@ UpdateVariable (
     // Update/Delete existing variable
     //
 
-    if (EfiAtRuntime ()) {        
+    if (EfiAtRuntime ()) {
       //
-      // If EfiAtRuntime and the variable is Volatile and Runtime Access,  
-      // the volatile is ReadOnly, and SetVariable should be aborted and 
+      // If EfiAtRuntime and the variable is Volatile and Runtime Access,
+      // the volatile is ReadOnly, and SetVariable should be aborted and
       // return EFI_WRITE_PROTECTED.
       //
       if (Variable->Volatile) {
@@ -952,21 +952,21 @@ UpdateVariable (
       //
       Variable->CurrPtr->State &= VAR_IN_DELETED_TRANSITION;
     }
-    
+
   } else {
     //
     // No found existing variable, Create a new variable
-    //  
-    
+    //
+
     //
     // Make sure we are trying to create a new variable.
-    // Setting a data variable with no access, or zero DataSize attributes means to delete it.    
+    // Setting a data variable with no access, or zero DataSize attributes means to delete it.
     //
     if (DataSize == 0 || (Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == 0) {
       Status = EFI_NOT_FOUND;
       goto Done;
     }
-        
+
     //
     // Only variable have NV|RT attribute can be created in Runtime
     //
@@ -974,14 +974,14 @@ UpdateVariable (
         (((Attributes & EFI_VARIABLE_RUNTIME_ACCESS) == 0) || ((Attributes & EFI_VARIABLE_NON_VOLATILE) == 0))) {
       Status = EFI_INVALID_PARAMETER;
       goto Done;
-    }         
+    }
   }
-  
+
   //
   // Function part - create a new variable and copy the data.
   // Both update a variable and create a variable will come here.
   //
-  
+
   VarNameOffset = sizeof (VARIABLE_HEADER);
   VarNameSize   = StrSize (VariableName);
   VarDataOffset = VarNameOffset + VarNameSize + GET_PAD_SIZE (VarNameSize);
@@ -989,9 +989,9 @@ UpdateVariable (
 
   if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
     NonVolatileVarableStoreSize = ((VARIABLE_STORE_HEADER *)(UINTN)(Global->NonVolatileVariableBase))->Size;
-    if ((((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) 
+    if ((((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0)
       && ((HEADER_ALIGN (VarSize) + mVariableModuleGlobal->HwErrVariableTotalSize) > PcdGet32 (PcdHwErrStorageSize)))
-      || (((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == 0) 
+      || (((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) == 0)
       && ((HEADER_ALIGN (VarSize) + mVariableModuleGlobal->CommonVariableTotalSize) > NonVolatileVarableStoreSize - sizeof (VARIABLE_STORE_HEADER) - PcdGet32 (PcdHwErrStorageSize)))) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Done;
@@ -1144,21 +1144,21 @@ FindVariable (
 
 /**
   This code finds variable in storage blocks (Volatile or Non-Volatile).
-  
+
   @param  VariableName           A Null-terminated Unicode string that is the name of
                                  the vendor's variable.
   @param  VendorGuid             A unique identifier for the vendor.
-  @param  Attributes             If not NULL, a pointer to the memory location to return the 
+  @param  Attributes             If not NULL, a pointer to the memory location to return the
                                  attributes bitmask for the variable.
   @param  DataSize               Size of Data found. If size is less than the
                                  data, this value contains the required size.
-  @param  Data                   On input, the size in bytes of the return Data buffer.  
+  @param  Data                   On input, the size in bytes of the return Data buffer.
                                  On output, the size of data returned in Data.
   @param  Global                 Pointer to VARIABLE_GLOBAL structure
 
-  @retval EFI_SUCCESS            The function completed successfully. 
+  @retval EFI_SUCCESS            The function completed successfully.
   @retval EFI_NOT_FOUND          The variable was not found.
-  @retval EFI_BUFFER_TOO_SMALL   DataSize is too small for the result.  DataSize has 
+  @retval EFI_BUFFER_TOO_SMALL   DataSize is too small for the result.  DataSize has
                                  been updated with the size needed to complete the request.
   @retval EFI_INVALID_PARAMETER  VariableName or VendorGuid or DataSize is NULL.
 
@@ -1208,7 +1208,7 @@ EmuGetVariable (
     }
     VariableDataPtr = GetVariableDataPtr (Variable.CurrPtr);
     ASSERT (VariableDataPtr != NULL);
-    
+
     CopyMem (Data, VariableDataPtr, VarDataSize);
     if (Attributes != NULL) {
       *Attributes = Variable.CurrPtr->Attributes;
@@ -1368,9 +1368,9 @@ Done:
   This code sets variable in storage blocks (Volatile or Non-Volatile).
 
   @param  VariableName           A Null-terminated Unicode string that is the name of the vendor's
-                                 variable.  Each VariableName is unique for each 
-                                 VendorGuid.  VariableName must contain 1 or more 
-                                 Unicode characters.  If VariableName is an empty Unicode 
+                                 variable.  Each VariableName is unique for each
+                                 VendorGuid.  VariableName must contain 1 or more
+                                 Unicode characters.  If VariableName is an empty Unicode
                                  string, then EFI_INVALID_PARAMETER is returned.
   @param  VendorGuid             A unique identifier for the vendor
   @param  Attributes             Attributes bitmask to set for the variable
@@ -1381,10 +1381,10 @@ Done:
   @param  VolatileOffset         The offset of last volatile variable
   @param  NonVolatileOffset      The offset of last non-volatile variable
 
-  @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as 
+  @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as
                                  defined by the Attributes.
-  @retval EFI_INVALID_PARAMETER  An invalid combination of attribute bits was supplied, or the 
-                                 DataSize exceeds the maximum allowed, or VariableName is an empty 
+  @retval EFI_INVALID_PARAMETER  An invalid combination of attribute bits was supplied, or the
+                                 DataSize exceeds the maximum allowed, or VariableName is an empty
                                  Unicode string, or VendorGuid is NULL.
   @retval EFI_OUT_OF_RESOURCES   Not enough storage is available to hold the variable and its data.
   @retval EFI_DEVICE_ERROR       The variable could not be saved due to a hardware failure.
@@ -1413,7 +1413,7 @@ EmuSetVariable (
   //
   if (VariableName == NULL || VariableName[0] == 0 || VendorGuid == NULL) {
     return EFI_INVALID_PARAMETER;
-  }  
+  }
 
   if (DataSize != 0 && Data == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -1433,11 +1433,11 @@ EmuSetVariable (
     return EFI_INVALID_PARAMETER;
   }
 
-  
+
   if ((UINTN)(~0) - DataSize < StrSize(VariableName)){
     //
-    // Prevent whole variable size overflow 
-    // 
+    // Prevent whole variable size overflow
+    //
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1463,7 +1463,7 @@ EmuSetVariable (
   //
     if (StrSize (VariableName) + DataSize > PcdGet32 (PcdMaxVariableSize) - sizeof (VARIABLE_HEADER)) {
       return EFI_INVALID_PARAMETER;
-    }  
+    }
   }
 
   AcquireLockOnlyAtBootTime(&Global->VariableServicesLock);
@@ -1471,7 +1471,7 @@ EmuSetVariable (
   //
   // Check whether the input variable is already existed
   //
-  
+
   Status = FindVariable (VariableName, VendorGuid, &Variable, Global);
 
   //
@@ -1491,18 +1491,18 @@ EmuSetVariable (
 
   @param  Attributes                   Attributes bitmask to specify the type of variables
                                        on which to return information.
-  @param  MaximumVariableStorageSize   On output the maximum size of the storage space available for 
-                                       the EFI variables associated with the attributes specified.  
-  @param  RemainingVariableStorageSize Returns the remaining size of the storage space available for EFI 
+  @param  MaximumVariableStorageSize   On output the maximum size of the storage space available for
+                                       the EFI variables associated with the attributes specified.
+  @param  RemainingVariableStorageSize Returns the remaining size of the storage space available for EFI
                                        variables associated with the attributes specified.
-  @param  MaximumVariableSize          Returns the maximum size of an individual EFI variable 
+  @param  MaximumVariableSize          Returns the maximum size of an individual EFI variable
                                        associated with the attributes specified.
   @param  Global                       Pointer to VARIABLE_GLOBAL structure.
 
   @retval EFI_SUCCESS                  Valid answer returned.
   @retval EFI_INVALID_PARAMETER        An invalid combination of attribute bits was supplied
-  @retval EFI_UNSUPPORTED              The attribute is not supported on this platform, and the 
-                                       MaximumVariableStorageSize, RemainingVariableStorageSize, 
+  @retval EFI_UNSUPPORTED              The attribute is not supported on this platform, and the
+                                       MaximumVariableStorageSize, RemainingVariableStorageSize,
                                        MaximumVariableSize are undefined.
 
 **/
@@ -1529,12 +1529,12 @@ EmuQueryVariableInfo (
   if(MaximumVariableStorageSize == NULL || RemainingVariableStorageSize == NULL || MaximumVariableSize == NULL || Attributes == 0) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   if((Attributes & (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_HARDWARE_ERROR_RECORD)) == 0) {
     //
     // Make sure the Attributes combination is supported by the platform.
     //
-    return EFI_UNSUPPORTED;  
+    return EFI_UNSUPPORTED;
   } else if ((Attributes & (EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_BOOTSERVICE_ACCESS)) == EFI_VARIABLE_RUNTIME_ACCESS) {
     //
     // Make sure if runtime bit is set, boot service bit is set also.
@@ -1633,7 +1633,7 @@ EmuQueryVariableInfo (
   } else if ((*RemainingVariableStorageSize - sizeof (VARIABLE_HEADER)) < *MaximumVariableSize) {
     *MaximumVariableSize = *RemainingVariableStorageSize - sizeof (VARIABLE_HEADER);
   }
-  
+
   ReleaseLockOnlyAtBootTime (&Global->VariableServicesLock);
   return EFI_SUCCESS;
 }
@@ -1674,7 +1674,7 @@ InitializeVariableStore (
   //
   // Note that in EdkII variable driver implementation, Hardware Error Record type variable
   // is stored with common variable in the same NV region. So the platform integrator should
-  // ensure that the value of PcdHwErrStorageSize is less than or equal to the value of 
+  // ensure that the value of PcdHwErrStorageSize is less than or equal to the value of
   // PcdVariableStoreSize.
   //
   ASSERT (PcdGet32 (PcdHwErrStorageSize) <= PcdGet32 (PcdVariableStoreSize));

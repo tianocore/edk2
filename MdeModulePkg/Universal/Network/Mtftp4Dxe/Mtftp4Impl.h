@@ -1,14 +1,14 @@
 /** @file
-  
+
   Mtftp4 Implementation.
-  
+
   Mtftp4 Implementation, it supports the following RFCs:
   RFC1350 - THE TFTP PROTOCOL (REVISION 2)
   RFC2090 - TFTP Multicast Option
   RFC2347 - TFTP Option Extension
   RFC2348 - TFTP Blocksize Option
   RFC2349 - TFTP Timeout Interval and Transfer Size Options
-  
+
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -171,8 +171,8 @@ Mtftp4CleanOperation (
 
 /**
   Start the MTFTP session for upload.
-  
-  It will first init some states, then send the WRQ request packet, 
+
+  It will first init some states, then send the WRQ request packet,
   and start receiving the packet.
 
   @param  Instance              The MTFTP session
@@ -190,9 +190,9 @@ Mtftp4WrqStart (
   );
 
 /**
-  Start the MTFTP session to download. 
-  
-  It will first initialize some of the internal states then build and send a RRQ 
+  Start the MTFTP session to download.
+
+  It will first initialize some of the internal states then build and send a RRQ
   reqeuest packet, at last, it will start receive for the downloading.
 
   @param  Instance              The Mtftp session

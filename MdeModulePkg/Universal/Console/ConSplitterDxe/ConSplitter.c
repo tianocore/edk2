@@ -31,7 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "ConSplitter.h"
 
 //
-// Identify if ConIn is connected in PcdConInConnectOnDemand enabled mode. 
+// Identify if ConIn is connected in PcdConInConnectOnDemand enabled mode.
 // default not connect
 //
 BOOLEAN  mConInIsConnect = FALSE;
@@ -567,7 +567,7 @@ ConSplitterDriverEntry(
                     &mStdErr.TextOut,
                     NULL
                     );
-    if (!EFI_ERROR (Status)) {  
+    if (!EFI_ERROR (Status)) {
       //
       // Update the EFI System Table with new virtual console
       // and update the pointer to Text Output protocol.
@@ -576,7 +576,7 @@ ConSplitterDriverEntry(
       gST->StdErr               = &mStdErr.TextOut;
     }
   }
-  
+
   //
   // Update the CRC32 in the EFI System Table header
   //
@@ -2298,7 +2298,7 @@ ConSplitterGrowMapTable (
     Size        = Private->CurrentNumberOfConsoles * sizeof (INT32);
     Index       = 0;
     SrcAddress  = OldTextOutModeMap;
-    NewStepSize = NewSize / sizeof(INT32);    
+    NewStepSize = NewSize / sizeof(INT32);
     // If Private->CurrentNumberOfConsoles is not zero and OldTextOutModeMap
     // is not NULL, it indicates that the original TextOutModeMap is not enough
     // for the new console devices and has been enlarged by CONSOLE_SPLITTER_ALLOC_UNIT columns.
@@ -2972,7 +2972,7 @@ Done:
   //
   // Force GraphicsOutput mode to be set,
   //
-  
+
   Mode = &Private->GraphicsOutputModeBuffer[CurrentIndex];
   if ((GraphicsOutput != NULL) &&
       (Mode->HorizontalResolution == CurrentGraphicsOutputMode->Info->HorizontalResolution) &&
@@ -3051,7 +3051,7 @@ ConsplitterSetConsoleOutMode (
   MaxMode      = (UINTN) (TextOut->Mode->MaxMode);
 
   MaxModeInfo.Column = 0;
-  MaxModeInfo.Row    = 0; 
+  MaxModeInfo.Row    = 0;
   ModeInfo.Column    = PcdGet32 (PcdConOutColumn);
   ModeInfo.Row       = PcdGet32 (PcdConOutRow);
 
@@ -3191,7 +3191,7 @@ ConSplitterTextOutAddDevice (
 
   DeviceStatus = EFI_DEVICE_ERROR;
   Status       = EFI_DEVICE_ERROR;
-  
+
   //
   // This device display mode will be added into Graphics Ouput modes.
   //
@@ -3361,7 +3361,7 @@ ConSplitterTextOutDeleteDevice (
                       Private->VirtualHandle,
                       &gEfiUgaDrawProtocolGuid,
                       &Private->UgaDraw
-                      );      
+                      );
     } else if (!FeaturePcdGet (PcdConOutUgaSupport)) {
       Status = gBS->UninstallProtocolInterface (
                       Private->VirtualHandle,
@@ -3536,7 +3536,7 @@ ConSplitterTextInPrivateReadKeyStroke (
   EFI_STATUS    Status;
   UINTN         Index;
   EFI_KEY_DATA  KeyData;
- 
+
   //
   // Return the first saved non-NULL key.
   //
@@ -3616,7 +3616,7 @@ ConSplitterTextInReadKeyStroke (
   // Signal ConnectConIn event on first call in Lazy ConIn mode
   //
   if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
-    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));    
+    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));
     gBS->SignalEvent (Private->ConnectConInEvent);
     mConInIsConnect = TRUE;
   }
@@ -3810,7 +3810,7 @@ ConSplitterTextInReadKeyStrokeEx (
   // Signal ConnectConIn event on first call in Lazy ConIn mode
   //
   if (!mConInIsConnect && PcdGetBool (PcdConInConnectOnDemand)) {
-    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));    
+    DEBUG ((EFI_D_INFO, "Connect ConIn in first ReadKeyStoke in Lazy ConIn mode.\n"));
     gBS->SignalEvent (Private->ConnectConInEvent);
     mConInIsConnect = TRUE;
   }
@@ -3877,7 +3877,7 @@ ConSplitterTextInReadKeyStrokeEx (
   for (Index = 0; Index < Private->CurrentNumberOfKeys; Index++) {
     CopyMem (&Private->KeyQueue[Index].KeyState, &KeyState, sizeof (EFI_KEY_STATE));
   }
-  
+
   //
   // Return the first saved key.
   //
@@ -4642,7 +4642,7 @@ ConSplitterTextOutOutputString (
     Private->TextOutMode.CursorRow    = Private->TextOutList[0].TextOut->Mode->CursorRow;
   } else {
     //
-    // When there is no real console devices in system, 
+    // When there is no real console devices in system,
     // update cursor position for the virtual device in consplitter.
     //
     Private->TextOut.QueryMode (
@@ -4650,28 +4650,28 @@ ConSplitterTextOutOutputString (
                        Private->TextOutMode.Mode,
                        &MaxColumn,
                        &MaxRow
-                       );    
+                       );
     for (; *WString != CHAR_NULL; WString++) {
       switch (*WString) {
       case CHAR_BACKSPACE:
         if (Private->TextOutMode.CursorColumn == 0 && Private->TextOutMode.CursorRow > 0) {
           Private->TextOutMode.CursorRow--;
-          Private->TextOutMode.CursorColumn = (INT32) (MaxColumn - 1);          
+          Private->TextOutMode.CursorColumn = (INT32) (MaxColumn - 1);
         } else if (Private->TextOutMode.CursorColumn > 0) {
           Private->TextOutMode.CursorColumn--;
         }
         break;
-      
+
       case CHAR_LINEFEED:
         if (Private->TextOutMode.CursorRow < (INT32) (MaxRow - 1)) {
           Private->TextOutMode.CursorRow++;
         }
         break;
-      
+
       case CHAR_CARRIAGE_RETURN:
         Private->TextOutMode.CursorColumn = 0;
         break;
-      
+
       default:
         if (Private->TextOutMode.CursorColumn < (INT32) (MaxColumn - 1)) {
           Private->TextOutMode.CursorColumn++;

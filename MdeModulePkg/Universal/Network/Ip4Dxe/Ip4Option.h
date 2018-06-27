@@ -1,7 +1,7 @@
 /** @file
   IP4 option support routines.
-  
-Copyright (c) 2005 - 2009, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -54,7 +54,7 @@ Ip4OptionIsValid (
   @param[in]       Option            The original option to copy from
   @param[in]       OptionLen         The length of the original option
   @param[in]       FirstFragment     Whether it is the first fragment
-  @param[in, out]  Buf               The buffer to copy options to. NULL 
+  @param[in, out]  Buf               The buffer to copy options to. NULL
   @param[in, out]  BufLen            The length of the buffer
 
   @retval EFI_SUCCESS           The options are copied over

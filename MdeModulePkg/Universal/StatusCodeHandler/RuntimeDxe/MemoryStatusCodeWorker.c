@@ -1,7 +1,7 @@
 /** @file
   Runtime memory status code worker.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -42,7 +42,7 @@ RtMemoryStatusCodeInitializeWorker (
 
   mRtMemoryStatusCodeTable->RecordIndex      = 0;
   mRtMemoryStatusCodeTable->NumberOfRecords  = 0;
-  mRtMemoryStatusCodeTable->MaxRecordsNumber = 
+  mRtMemoryStatusCodeTable->MaxRecordsNumber =
     (PcdGet16 (PcdStatusCodeMemorySize) * 1024) / sizeof (MEMORY_STATUSCODE_RECORD);
   Status = gBS->InstallConfigurationTable (&gMemoryStatusCodeRecordGuid, mRtMemoryStatusCodeTable);
 
@@ -51,7 +51,7 @@ RtMemoryStatusCodeInitializeWorker (
 
 
 /**
-  Report status code into runtime memory. If the runtime pool is full, roll back to the 
+  Report status code into runtime memory. If the runtime pool is full, roll back to the
   first record and overwrite it.
 
   @param  CodeType                Indicates the type of status code being reported.

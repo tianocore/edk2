@@ -54,16 +54,16 @@ formset
   title     = STRING_TOKEN(STR_FORM_SET_TITLE),
   help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
   classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
-  
+
   //
-  // Notes: VfrCompiler will insert a Standard Default Storage declaration 
+  // Notes: VfrCompiler will insert a Standard Default Storage declaration
   // after the formset declaration.    >00000040: 5C 06 00 00 00 00.
   // So we don't need to declare the Standard Default.
   // Please check the vfr.lst file for details.
   // To enable list file for VFR, add "-l" to VfrCompile <Command> in [Build.Visual-Form-Representation-File] as follows:
   //          VfrCompile -l --no-pre-processing --output-directory ${d_path} $(OUTPUT_DIR)(+)${s_dir}(+)${s_base}.iii
   //
-  
+
    //
   // Define a Buffer Storage (EFI_IFR_VARSTORE)
   //
@@ -76,7 +76,7 @@ formset
   // Define a EFI variable Storage (EFI_IFR_VARSTORE_EFI)
   //
   efivarstore MY_EFI_VARSTORE_DATA,
-    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures  
+    attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,  // EFI variable attribures
     name  = MyEfiVar,
     guid  = DRIVER_SAMPLE_FORMSET_GUID;
 
@@ -415,7 +415,7 @@ formset
               step    = 1,
               default = 18, defaultstore = MyStandardDefault,     // This is standard default value
               default = 19, defaultstore = MyManufactureDefault,  // This is manufacture default value
-        
+
       endnumeric;
     endif;
 
@@ -423,7 +423,7 @@ formset
             questionid = 0x1239,
             prompt  = STRING_TOKEN(STR_DEFAULT_VALUE_FROM_ACCESS_PROMPT),
             help    = STRING_TOKEN(STR_DEFAULT_VALUE_FROM_ACCESS_HELP),
-            flags   = DISPLAY_UINT_HEX | INTERACTIVE, 
+            flags   = DISPLAY_UINT_HEX | INTERACTIVE,
             minimum = 0,
             maximum = 255,
             step    = 1,
@@ -434,7 +434,7 @@ formset
             questionid = 0x1240,
             prompt  = STRING_TOKEN(STR_DEFAULT_VALUE_FROM_CALLBACK_PROMPT),
             help    = STRING_TOKEN(STR_DEFAULT_VALUE_FROM_CALLBACK_HELP),
-            flags   = DISPLAY_UINT_HEX | INTERACTIVE, 
+            flags   = DISPLAY_UINT_HEX | INTERACTIVE,
             minimum = 0,
             maximum = 255,
             step    = 1,
@@ -451,13 +451,13 @@ formset
         option text = STRING_TOKEN(STR_ONE_OF_TEXT2), value = 2, flags = 0;
         option text = STRING_TOKEN(STR_ONE_OF_TEXT3), value = 3, flags = 0;
     endlist;
-        
+
     resetbutton
       defaultstore = MyStandardDefault,
       prompt   = STRING_TOKEN(STR_STANDARD_DEFAULT_PROMPT),
       help     = STRING_TOKEN(STR_STANDARD_DEFAULT_HELP),
     endresetbutton;
-    
+
     resetbutton
       defaultstore = MyManufactureDefault,
       prompt   = STRING_TOKEN(STR_MANUFACTURE_DEFAULT_PROMPT),
@@ -504,24 +504,24 @@ formset
     goto 5,
       prompt = STRING_TOKEN(STR_GOTO_FORM5), //FifthSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
       help   = STRING_TOKEN(STR_GOTO_FORM5_HELP);
-      
+
     goto 6,
       prompt = STRING_TOKEN(STR_GOTO_FORM6), //SixthSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
       help   = STRING_TOKEN(STR_GOTO_HELP);
 
-    goto 
+    goto
       formsetguid = DRIVER_SAMPLE_INVENTORY_GUID,
       formid  = 0x1,
       question = 0x1,
       prompt  = STRING_TOKEN(STR_GOTO_ANOTHER_FORMSET),
       help    = STRING_TOKEN(STR_GOTO_ANOTHER_FORMSET_HELP);
 
-    guidop 
+    guidop
       guid = DRIVER_SAMPLE_FORMSET_GUID,
       datatype = MY_EFI_VARSTORE_DATA,
-        data.Field8  = 0x21, 
+        data.Field8  = 0x21,
         data.Field16 = 0x2121,
-        data.OrderedList[0] = 0x21,        
+        data.OrderedList[0] = 0x21,
     endguidop;
 
      goto 7,
@@ -587,16 +587,16 @@ formset
         help    = STRING_TOKEN(STR_TIME_HELP),
         flags   = STORAGE_TIME,
       endtime;
-      
-      time 
-            name    = MyTime, 
-            varid   = MyIfrNVData.Time, 
-            prompt  = STRING_TOKEN(STR_TIME_PROMPT), 
-            help    = STRING_TOKEN(STR_TIME_PROMPT), 
+
+      time
+            name    = MyTime,
+            varid   = MyIfrNVData.Time,
+            prompt  = STRING_TOKEN(STR_TIME_PROMPT),
+            help    = STRING_TOKEN(STR_TIME_PROMPT),
             flags   = STORAGE_NORMAL | SECOND_SUPPRESS,
-            default = 15:33:33, 
+            default = 15:33:33,
       endtime;
-      
+
       checkbox varid   = MyIfrNVData.ChooseToActivateNuclearWeaponry,
               prompt   = STRING_TOKEN(STR_CHECK_BOX_PROMPT),
               help     = STRING_TOKEN(STR_CHECK_BOX_HELP),
@@ -616,7 +616,7 @@ formset
         prompt = STRING_TOKEN(STR_GOTO_FORM1), //MainSetupPage  // this too has no end-op and basically it's a jump to a form ONLY
         help   = STRING_TOKEN(STR_GOTO_HELP);
 
-    goto 
+    goto
       varid   = MyIfrNVData.RefData,
       prompt  = STRING_TOKEN(STR_GOTO_DYNAMIC3),
       help    = STRING_TOKEN(STR_GOTO_DYNAMIC3_HELP),
@@ -625,15 +625,15 @@ formset
       //
       // Set the defult value, format is QuestionId; FormId; FormsetGuid; Device Path String Token
       //
-      default = 0;0;ZERO_GUID;STRING_TOKEN(STR_NULL_STRING),  
+      default = 0;0;ZERO_GUID;STRING_TOKEN(STR_NULL_STRING),
     ;                                                         // goto opcode end flag.
 
-    goto 
+    goto
       prompt  = STRING_TOKEN(STR_GOTO_DYNAMIC4),
       help    = STRING_TOKEN(STR_GOTO_DYNAMIC4_HELP),
       flags   = INTERACTIVE,
       key     = 0x1249;
-      
+
     endform;
   endif;
 
@@ -662,7 +662,7 @@ formset
     endnumeric;
 
     grayoutif  match2 (stringref(STRING_TOKEN(STR_PATTERN)), stringref(STRING_TOKEN(STR_STRING)), PERL_GUID);
-      numeric 
+      numeric
         varid   = MyIfrNVData.Match2,
         prompt  = STRING_TOKEN(STR_MATCH2_PROMPT),
         help    = STRING_TOKEN(STR_MATCH2_HELP),
@@ -676,19 +676,19 @@ formset
 
   endform;
 
-  formmap formid = 4,            
-    maptitle = STRING_TOKEN(STR_SAMPL_MAP_METHOD);  
+  formmap formid = 4,
+    maptitle = STRING_TOKEN(STR_SAMPL_MAP_METHOD);
     mapguid  = DRIVER_SAMPLE_FORMSET_GUID;
-    maptitle = STRING_TOKEN(STR_STANDARD_MAP_METHOD);  
+    maptitle = STRING_TOKEN(STR_STANDARD_MAP_METHOD);
     mapguid  = EFI_HII_STANDARD_FORM_GUID;
 
-    oneof varid = MyIfrNVData.SerialPortNo,    
+    oneof varid = MyIfrNVData.SerialPortNo,
       prompt  = STRING_TOKEN(STR_SERIAL_PORT),
       help    = STRING_TOKEN(STR_ONE_OF_HELP),
 
       read    cond (get(MyIfrNVData.SerialPortStatus) != 0 ? 0 : cond ((get(MyIfrNVData.SerialPortIo) & 0xF00) >> 0x8 == get(MyIfrNVData.SerialPortIrq) - 1 ? UNDEFINED : map (get(MyIfrNVData.SerialPortIo) : 0x3f8,1; 0x2F8,2; 0x3E8,3; 0x2E8,4;)));
       write   set(MyIfrNVData.SerialPortStatus, pushthis != 0) AND set(MyIfrNVData.SerialPortIo, map (pushthis : 1,0x3F8; 2,0x2F8; 3,0x3E8; 4,0x2E8;)) AND set (MyIfrNVData.SerialPortIrq, map (pushthis: 1,4; 2,3; 3,4; 4,3;));
-      
+
       option text = STRING_TOKEN(STR_SERIAL_PORT_DISABLE), value = 0x0, flags = DEFAULT;
       option text = STRING_TOKEN(STR_SERIAL_PORT1), value = 0x1, flags = 0;
       option text = STRING_TOKEN(STR_SERIAL_PORT2), value = 0x2, flags = 0;
@@ -705,10 +705,10 @@ formset
 
     grayoutif TRUE;
       suppressif ideqval MyIfrNVData.SerialPortStatus == 0;
-        oneof varid = MyIfrNVData.SerialPortIo,    
+        oneof varid = MyIfrNVData.SerialPortIo,
           prompt  = STRING_TOKEN(STR_SERIAL_PORT_IO_ADDRESS),
           help    = STRING_TOKEN(STR_ONE_OF_HELP),
-          
+
           option text = STRING_TOKEN(STR_SERIAL_PORT1_IOADDR), value = 0x3F8, flags = DEFAULT;
           option text = STRING_TOKEN(STR_SERIAL_PORT2_IOADDR), value = 0x2F8, flags = 0;
           option text = STRING_TOKEN(STR_SERIAL_PORT3_IOADDR), value = 0x3E8, flags = 0;
@@ -719,10 +719,10 @@ formset
 
     grayoutif TRUE;
       suppressif ideqval MyIfrNVData.SerialPortStatus == 0;
-        oneof varid = MyIfrNVData.SerialPortIrq,    
+        oneof varid = MyIfrNVData.SerialPortIrq,
           prompt  = STRING_TOKEN(STR_SERIAL_PORT_IRQ),
           help    = STRING_TOKEN(STR_ONE_OF_HELP),
-          
+
           option text = STRING_TOKEN(STR_SERIAL_PORT13_IRQ), value = 0x4, flags = DEFAULT;
           option text = STRING_TOKEN(STR_SERIAL_PORT24_IRQ), value = 0x3, flags = 0;
         endoneof;
@@ -755,7 +755,7 @@ formset
   endform;
 
   form formid = 6,            // Form to show the refresh guid group op-code
-       title = STRING_TOKEN(STR_FORM6_TITLE); 
+       title = STRING_TOKEN(STR_FORM6_TITLE);
 
     text
       help   = STRING_TOKEN(STR_TEXT_REFRESH_GUID),

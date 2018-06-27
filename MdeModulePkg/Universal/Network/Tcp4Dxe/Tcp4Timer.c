@@ -1,7 +1,7 @@
 /** @file
   TCP timer related functions.
-    
-Copyright (c) 2005 - 2010, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,7 @@ VOID
 TcpRexmitTimeout (
   IN OUT TCP_CB *Tcb
   );
-  
+
 /**
   Timeout handler for window probe timer.
 
@@ -289,7 +289,7 @@ Tcp2MSLTimeout (
 
 
 /**
-  Update the timer status and the next expire time according to the timers 
+  Update the timer status and the next expire time according to the timers
   to expire in a specific future time slot.
 
   @param  Tcb      Pointer to the TCP_CB of this TCP instance.
@@ -555,7 +555,7 @@ TcpTickingDpc (
         }
       }
     }
-    
+
     //
     // If the Tcb still exist or some timer is set, update the timer
     //

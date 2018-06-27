@@ -1,14 +1,14 @@
 /** @file
   Header file for IDE mode of ATA host controller.
-  
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 #ifndef __ATA_HC_IDE_MODE_H__
@@ -121,7 +121,7 @@ typedef struct {
 #define IDE_SECONDARY_PROGRAMMABLE_INDICATOR  BIT3
 
 /**
-  Get IDE i/o port registers' base addresses by mode. 
+  Get IDE i/o port registers' base addresses by mode.
 
   In 'Compatibility' mode, use fixed addresses.
   In Native-PCI mode, get base addresses from BARs in the PCI IDE controller's
@@ -144,7 +144,7 @@ typedef struct {
   |___________|_______________|_______________|
 
   Table 1. Compatibility resource mappings
-  
+
   b) In Native-PCI mode, IDE registers are mapped into IO space using the BARs
   in IDE controller's PCI Configuration Space, shown in the Table 2 below.
    ___________________________________________________
@@ -161,7 +161,7 @@ typedef struct {
   @param[in]      PciIo          Pointer to the EFI_PCI_IO_PROTOCOL instance
   @param[in, out] IdeRegisters   Pointer to EFI_IDE_REGISTERS which is used to
                                  store the IDE i/o port registers' base addresses
-           
+
   @retval EFI_UNSUPPORTED        Return this value when the BARs is not IO type
   @retval EFI_SUCCESS            Get the Base address successfully
   @retval Other                  Read the pci configureation data error
@@ -175,7 +175,7 @@ GetIdeRegisterIoAddr (
   );
 
 /**
-  This function is used to send out ATAPI commands conforms to the Packet Command 
+  This function is used to send out ATAPI commands conforms to the Packet Command
   with PIO Data In Protocol.
 
   @param[in] PciIo          Pointer to the EFI_PCI_IO_PROTOCOL instance

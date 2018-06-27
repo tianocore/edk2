@@ -1,7 +1,7 @@
 /** @file
   The header file of IScsiConfig.c.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -35,23 +35,23 @@ extern UINT8  IScsi4DxeStrings[];
 
 
 /**
-  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is clear, 
+  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is clear,
   then this macro return a pointer to a data structure ISCSI_FORM_CALLBACK_INFO.
 
-  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set,  
-  The Signature field of the data structure ISCSI_FORM_CALLBACK_INFO 
-  is compared to TestSignature.  If the signatures match, then a pointer 
-  to the pointer to a data structure ISCSI_FORM_CALLBACK_INFO is returned.  
-  If the signatures do not match, then DebugAssert() is called with a description 
-  of "CR has a bad signature" and Callback is returned.  
+  If the DEBUG_PROPERTY_DEBUG_ASSERT_ENABLED bit of PcdDebugProperyMask is set,
+  The Signature field of the data structure ISCSI_FORM_CALLBACK_INFO
+  is compared to TestSignature.  If the signatures match, then a pointer
+  to the pointer to a data structure ISCSI_FORM_CALLBACK_INFO is returned.
+  If the signatures do not match, then DebugAssert() is called with a description
+  of "CR has a bad signature" and Callback is returned.
 
   If the data type ISCSI_FORM_CALLBACK_INFO_SIGNATURE does not contain the field
   specified by Callback, then the module will not compile.
 
-  If ISCSI_FORM_CALLBACK_INFO_SIGNATURE does not contain a field called Signature, 
+  If ISCSI_FORM_CALLBACK_INFO_SIGNATURE does not contain a field called Signature,
   then the module will not compile.
 
-  @param   Callback      Pointer to the specified field within the data 
+  @param   Callback      Pointer to the specified field within the data
                          structure ISCSI_FORM_CALLBACK_INFO.
   @return  A pointer to the pointer to a data structure ISCSI_FORM_CALLBACK_INFO.
   @retval  Others        Some unexpected error happened.
@@ -154,7 +154,7 @@ IScsiConfigFormInit (
   free the resources used.
 
   @param[in]  DriverBindingHandle The iSCSI driverbinding handle.
-  
+
   @retval EFI_SUCCESS             The iSCSI configuration form is unloaded.
   @retval EFI_OUT_OF_RESOURCES    Failed to allocate memory.
 **/

@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   order to make drivers as small as possible, there are a few calling
   restrictions for this service. ConnectController() must
   follow these calling restrictions. If any other agent wishes to call
-  Supported() it must also follow these calling restrictions.  
+  Supported() it must also follow these calling restrictions.
   PxeBc requires DHCP4 and MTFTP4 protocols.
 
   @param  This                Protocol instance pointer.
@@ -40,7 +40,7 @@ PxeBcDriverBindingSupported (
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
   );
-  
+
 /**
   Start this driver on ControllerHandle. This service is called by the
   EFI boot service ConnectController(). In order to make
@@ -66,7 +66,7 @@ PxeBcDriverBindingStart (
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     * RemainingDevicePath OPTIONAL
   );
-  
+
 /**
   Stop this driver on ControllerHandle. This service is called by the
   EFI boot service DisconnectController(). In order to
@@ -74,7 +74,7 @@ PxeBcDriverBindingStart (
   restrictions for this service. DisconnectController()
   must follow these calling restrictions. If any other agent wishes
   to call Stop() it must also follow these calling restrictions.
-  
+
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
@@ -93,7 +93,7 @@ PxeBcDriverBindingStop (
   IN UINTN                        NumberOfChildren,
   IN EFI_HANDLE                   *ChildHandleBuffer
   );
-  
+
 extern EFI_COMPONENT_NAME2_PROTOCOL gPxeBcComponentName2;
 extern EFI_COMPONENT_NAME_PROTOCOL  gPxeBcComponentName;
 extern EFI_DRIVER_BINDING_PROTOCOL  gPxeBcDriverBinding;

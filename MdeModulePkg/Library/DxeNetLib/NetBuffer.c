@@ -1,7 +1,7 @@
 /** @file
   Network library functions providing net buffer operation support.
 
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1847,11 +1847,11 @@ NetIp6PseudoHeadChecksum (
 }
 
 /**
-  The function frees the net buffer which allocated by the IP protocol. It releases 
-  only the net buffer and doesn't call the external free function. 
+  The function frees the net buffer which allocated by the IP protocol. It releases
+  only the net buffer and doesn't call the external free function.
 
-  This function should be called after finishing the process of mIpSec->ProcessExt() 
-  for outbound traffic. The (EFI_IPSEC2_PROTOCOL)->ProcessExt() allocates a new 
+  This function should be called after finishing the process of mIpSec->ProcessExt()
+  for outbound traffic. The (EFI_IPSEC2_PROTOCOL)->ProcessExt() allocates a new
   buffer for the ESP, so there needs a function to free the old net buffer.
 
   @param[in]  Nbuf       The network buffer to be freed.
@@ -1868,7 +1868,7 @@ NetIpSecNetbufFree (
   Nbuf->RefCnt--;
 
   if (Nbuf->RefCnt == 0) {
-    
+
     //
     // Update Vector only when NBuf is to be released. That is,
     // all the sharing of Nbuf increse Vector's RefCnt by one
@@ -1883,14 +1883,14 @@ NetIpSecNetbufFree (
     }
 
     //
-    // If NET_VECTOR_OWN_FIRST is set, release the first block since it is 
+    // If NET_VECTOR_OWN_FIRST is set, release the first block since it is
     // allocated by us
     //
     if ((Nbuf->Vector->Flag & NET_VECTOR_OWN_FIRST) != 0) {
       FreePool (Nbuf->Vector->Block[0].Bulk);
     }
     FreePool (Nbuf->Vector);
-    FreePool (Nbuf); 
-  } 
+    FreePool (Nbuf);
+  }
 }
 

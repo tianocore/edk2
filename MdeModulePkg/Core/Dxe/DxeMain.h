@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by DxeCore module.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -198,43 +198,43 @@ typedef struct {
 typedef struct {
   UINTN                       Signature;
   /// Image handle
-  EFI_HANDLE                  Handle;   
+  EFI_HANDLE                  Handle;
   /// Image type
-  UINTN                       Type;           
+  UINTN                       Type;
   /// If entrypoint has been called
-  BOOLEAN                     Started;        
+  BOOLEAN                     Started;
   /// The image's entry point
-  EFI_IMAGE_ENTRY_POINT       EntryPoint;     
+  EFI_IMAGE_ENTRY_POINT       EntryPoint;
   /// loaded image protocol
-  EFI_LOADED_IMAGE_PROTOCOL   Info;           
+  EFI_LOADED_IMAGE_PROTOCOL   Info;
   /// Location in memory
-  EFI_PHYSICAL_ADDRESS        ImageBasePage;  
+  EFI_PHYSICAL_ADDRESS        ImageBasePage;
   /// Number of pages
-  UINTN                       NumberOfPages;  
+  UINTN                       NumberOfPages;
   /// Original fixup data
-  CHAR8                       *FixupData;     
+  CHAR8                       *FixupData;
   /// Tpl of started image
-  EFI_TPL                     Tpl;            
+  EFI_TPL                     Tpl;
   /// Status returned by started image
-  EFI_STATUS                  Status;         
+  EFI_STATUS                  Status;
   /// Size of ExitData from started image
-  UINTN                       ExitDataSize;   
+  UINTN                       ExitDataSize;
   /// Pointer to exit data from started image
-  VOID                        *ExitData;      
+  VOID                        *ExitData;
   /// Pointer to pool allocation for context save/restore
-  VOID                        *JumpBuffer;    
+  VOID                        *JumpBuffer;
   /// Pointer to buffer for context save/restore
-  BASE_LIBRARY_JUMP_BUFFER    *JumpContext;  
+  BASE_LIBRARY_JUMP_BUFFER    *JumpContext;
   /// Machine type from PE image
-  UINT16                      Machine;        
+  UINT16                      Machine;
   /// EBC Protocol pointer
-  EFI_EBC_PROTOCOL            *Ebc;           
+  EFI_EBC_PROTOCOL            *Ebc;
   /// Runtime image list
-  EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;   
+  EFI_RUNTIME_IMAGE_ENTRY     *RuntimeData;
   /// Pointer to Loaded Image Device Path Protocol
-  EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;  
+  EFI_DEVICE_PATH_PROTOCOL    *LoadedImageDevicePath;
   /// PeCoffLoader ImageContext
-  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext; 
+  PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
   /// Status returned by LoadImage() service.
   EFI_STATUS                  LoadImageStatus;
 } LOADED_IMAGE_PRIVATE_DATA;
@@ -1180,8 +1180,8 @@ CoreConnectHandlesByKey (
   @retval EFI_NOT_FOUND         1) There are no EFI_DRIVER_BINDING_PROTOCOL instances
                                 present in the system.
                                 2) No drivers were connected to ControllerHandle.
-  @retval EFI_SECURITY_VIOLATION 
-                                The user has no permission to start UEFI device drivers on the device path 
+  @retval EFI_SECURITY_VIOLATION
+                                The user has no permission to start UEFI device drivers on the device path
                                 associated with the ControllerHandle or specified by the RemainingDevicePath.
 
 **/
@@ -1426,10 +1426,10 @@ CoreInternalFreePool (
   @retval EFI_LOAD_ERROR          Image was not loaded because the image format was corrupt or not
                                   understood.
   @retval EFI_DEVICE_ERROR        Image was not loaded because the device returned a read error.
-  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the 
+  @retval EFI_ACCESS_DENIED       Image was not loaded because the platform policy prohibits the
                                   image from being loaded. NULL is returned in *ImageHandle.
-  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a 
-                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current 
+  @retval EFI_SECURITY_VIOLATION  Image was loaded and an ImageHandle was created with a
+                                  valid EFI_LOADED_IMAGE_PROTOCOL. However, the current
                                   platform policy specifies that the image should not be started.
 
 **/
@@ -1836,7 +1836,7 @@ CoreGetMemorySpaceDescriptor (
   @param  Attributes             Specified attributes
 
   @retval EFI_SUCCESS           The attributes were set for the memory region.
-  @retval EFI_INVALID_PARAMETER Length is zero. 
+  @retval EFI_INVALID_PARAMETER Length is zero.
   @retval EFI_UNSUPPORTED       The processor does not support one or more bytes of the memory
                                 resource range specified by BaseAddress and Length.
   @retval EFI_UNSUPPORTED       The bit mask of attributes is not support for the memory resource
@@ -2671,7 +2671,7 @@ CoreReleaseLock (
   );
 
 /**
-  Read data from Firmware Block by FVB protocol Read. 
+  Read data from Firmware Block by FVB protocol Read.
   The data may cross the multi block ranges.
 
   @param  Fvb                   The FW_VOL_BLOCK_PROTOCOL instance from which to read data.

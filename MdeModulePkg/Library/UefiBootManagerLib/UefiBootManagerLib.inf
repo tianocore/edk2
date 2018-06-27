@@ -24,7 +24,7 @@
   FILE_GUID                      = 8D4752BC-595E-49a2-B4AF-F3F57B601DE9
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiBootManagerLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER 
+  LIBRARY_CLASS                  = UefiBootManagerLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -42,7 +42,7 @@
   BmHotkey.c
   BmDriverHealth.c
   InternalBm.h
-  
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec

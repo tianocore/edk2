@@ -1,7 +1,7 @@
 /** @file
   Library functions which relates with driver health.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
@@ -92,7 +92,7 @@ BmGetControllerName (
 
     Status = ComponentName->GetControllerName (
                               ComponentName,
-                              ControllerHandle, 
+                              ControllerHandle,
                               ChildHandle,
                               BestLanguage,
                               &ControllerName
@@ -131,7 +131,7 @@ BmDisplayMessages (
 
   ControllerName = BmGetControllerName (
                      DriverHealthInfo->DriverHealthHandle,
-                     DriverHealthInfo->ControllerHandle, 
+                     DriverHealthInfo->ControllerHandle,
                      DriverHealthInfo->ChildHandle
                      );
 
@@ -181,7 +181,7 @@ BmRepairNotify (
 
 /**
   Collect the Driver Health status of a single controller.
-  
+
   @param DriverHealthInfo        A pointer to the array containing all of the platform driver health information.
   @param Count                   Return the updated array count.
   @param DriverHealthHandle      The handle on which the Driver Health protocol instance is retrieved.
@@ -218,7 +218,7 @@ BmGetSingleControllerHealthStatus (
                   (VOID **) &DriverHealth
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
 
   if (ControllerHandle == NULL) {
     //
@@ -471,7 +471,7 @@ BmRepairAllControllers (
       if (DriverHealthInfo[Index].HealthStatus == EfiDriverHealthStatusConfigurationRequired) {
         ConfigurationRequired = TRUE;
       }
-      
+
       if (DriverHealthInfo[Index].HealthStatus == EfiDriverHealthStatusRepairRequired) {
         RepairRequired        = TRUE;
 
@@ -519,7 +519,7 @@ BmRepairAllControllers (
         FreePool (HiiHandles);
       }
     }
-  
+
     EfiBootManagerFreeDriverHealthInfo (DriverHealthInfo, Count);
     RepairCount++;
   } while ((RepairRequired || ConfigurationRequired) && ((MaxRepairCount == 0) || (RepairCount < MaxRepairCount)));

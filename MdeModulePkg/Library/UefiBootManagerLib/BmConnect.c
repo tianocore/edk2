@@ -1,7 +1,7 @@
 /** @file
   Library functions which relate with connecting the device.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -107,7 +107,7 @@ EfiBootManagerConnectAll (
   @retval EFI_OUT_OF_RESOURCES   There is no resource to create new handles.
   @retval EFI_NOT_FOUND          Create the handle associate with one device path
                                  node failed.
-  @retval EFI_SECURITY_VIOLATION The user has no permission to start UEFI device 
+  @retval EFI_SECURITY_VIOLATION The user has no permission to start UEFI device
                                  drivers on the DevicePath.
 **/
 EFI_STATUS
@@ -167,7 +167,7 @@ EfiBootManagerConnectDevicePath (
         // Connect all drivers that apply to Handle and RemainingDevicePath,
         // the Recursive flag is FALSE so only one level will be expanded.
         //
-        // If ConnectController fails to find a driver, then still give the chance to 
+        // If ConnectController fails to find a driver, then still give the chance to
         // do dispatch, because partial RemainingDevicePath may be in the new FV
         //
         // 1. If the connect fail, RemainingDevicepath and handle will not
@@ -197,8 +197,8 @@ EfiBootManagerConnectDevicePath (
 }
 
 /**
-  This function will disconnect all current system handles. 
-  
+  This function will disconnect all current system handles.
+
   gBS->DisconnectController() is invoked for each handle exists in system handle buffer.
   If handle is a bus type handle, all childrens also are disconnected recursively by
   gBS->DisconnectController().

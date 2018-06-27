@@ -1,7 +1,7 @@
 /** @file
   Interface routines for PxeBc.
 
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -354,7 +354,7 @@ EfiPxeBcStart (
 
   //
   // Configure block size for TFTP as a default value to handle all link layers.
-  // 
+  //
   Private->BlockSize   = MIN (Private->Ip4MaxPacketSize, PXEBC_DEFAULT_PACKET_SIZE) -
                            PXEBC_DEFAULT_UDP_OVERHEAD_SIZE - PXEBC_DEFAULT_TFTP_OVERHEAD_SIZE;
   //
@@ -363,7 +363,7 @@ EfiPxeBcStart (
   if (PcdGet64 (PcdTftpBlockSize) != 0) {
     Private->BlockSize   = (UINTN) PcdGet64 (PcdTftpBlockSize);
   }
-  
+
   Private->AddressIsOk = FALSE;
 
   ZeroMem (Mode, sizeof (EFI_PXE_BASE_CODE_MODE));
@@ -415,17 +415,17 @@ EfiPxeBcStart (
   }
 
   //
-  //DHCP4 service allows only one of its children to be configured in  
-  //the active state, If the DHCP4 D.O.R.A started by IP4 auto  
-  //configuration and has not been completed, the Dhcp4 state machine 
-  //will not be in the right state for the PXE to start a new round D.O.R.A. 
+  //DHCP4 service allows only one of its children to be configured in
+  //the active state, If the DHCP4 D.O.R.A started by IP4 auto
+  //configuration and has not been completed, the Dhcp4 state machine
+  //will not be in the right state for the PXE to start a new round D.O.R.A.
   //so we need to switch it's policy to static.
   //
   Status = PxeBcSetIp4Policy (Private);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
-    
+
   Status = Private->Ip4->Configure (Private->Ip4, &Private->Ip4ConfigData);
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
@@ -726,35 +726,35 @@ ON_EXIT:
       CopyMem (&Private->Udp4CfgData.SubnetMask, &Private->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
       CopyMem (&Private->Ip4ConfigData.StationAddress, &Private->StationIp, sizeof (EFI_IPv4_ADDRESS));
       CopyMem (&Private->Ip4ConfigData.SubnetMask, &Private->SubnetMask, sizeof (EFI_IPv4_ADDRESS));
-  
+
       //
       // Reconfigure the Ip4 instance to capture background ICMP packets with new station Ip address.
       //
       Private->Ip4->Cancel (Private->Ip4, &Private->IcmpErrorRcvToken);
       Private->Ip4->Configure (Private->Ip4, NULL);
-  
+
       Status = Private->Ip4->Configure (Private->Ip4, &Private->Ip4ConfigData);
       if (EFI_ERROR (Status)) {
         goto ON_EXIT;
       }
-  
+
       Status = Private->Ip4->Receive (Private->Ip4, &Private->IcmpErrorRcvToken);
       if (EFI_ERROR (Status)) {
         goto ON_EXIT;
-      } 
+      }
     }
   }
 
   Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
 
   //
-  // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
+  // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP
   // receive filter list emptied and the filter set to EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP.
   //
   ZeroMem(&IpFilter, sizeof (EFI_PXE_BASE_CODE_IP_FILTER));
   IpFilter.Filters = EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP;
   This->SetIpFilter (This, &IpFilter);
-  
+
   return Status;
 }
 
@@ -864,7 +864,7 @@ EfiPxeBcDiscover (
     if (!Mode->PxeDiscoverValid || !Mode->PxeReplyReceived || (!Mode->PxeBisReplyReceived && UseBis)) {
 
       Status = EFI_INVALID_PARAMETER;
-      goto ON_EXIT;  
+      goto ON_EXIT;
     }
 
     DefaultInfo.IpCnt                 = 1;
@@ -888,7 +888,7 @@ EfiPxeBcDiscover (
       // Address is not acquired or no discovery options.
       //
       Status = EFI_INVALID_PARAMETER;
-      goto ON_EXIT;  
+      goto ON_EXIT;
     }
 
     DefaultInfo.UseMCast    = (BOOLEAN)!IS_DISABLE_MCAST_DISCOVER (VendorOpt->DiscoverCtrl);
@@ -936,9 +936,9 @@ EfiPxeBcDiscover (
         if (CreatedInfo == NULL) {
           Status = EFI_OUT_OF_RESOURCES;
           goto ON_EXIT;
-          
-        }     
-      
+
+        }
+
         CopyMem (CreatedInfo, &DefaultInfo, sizeof (DefaultInfo));
         Info    = CreatedInfo;
         SrvList = Info->SrvList;
@@ -965,7 +965,7 @@ EfiPxeBcDiscover (
 
       if (Index != Info->IpCnt) {
         Status = EFI_INVALID_PARAMETER;
-        goto ON_EXIT;        
+        goto ON_EXIT;
       }
     }
   }
@@ -1005,7 +1005,7 @@ EfiPxeBcDiscover (
                 );
       if (!EFI_ERROR (Status)) {
         break;
-      }                
+      }
     }
 
   } else if (Info->UseMCast) {
@@ -1063,15 +1063,15 @@ EfiPxeBcDiscover (
 ON_EXIT:
 
   Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
-  
+
   //
-  // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
+  // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP
   // receive filter list emptied and the filter set to EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP.
   //
   ZeroMem(&IpFilter, sizeof (EFI_PXE_BASE_CODE_IP_FILTER));
   IpFilter.Filters = EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP;
   This->SetIpFilter (This, &IpFilter);
-  
+
   return Status;
 }
 
@@ -1172,8 +1172,8 @@ EfiPxeBcMtftp (
   if ((This == NULL)                                                          ||
       (Filename == NULL)                                                      ||
       (BufferSize == NULL)                                                    ||
-      ((ServerIp == NULL) || 
-       (IP4_IS_UNSPECIFIED (NTOHL (ServerIp->Addr[0])) || 
+      ((ServerIp == NULL) ||
+       (IP4_IS_UNSPECIFIED (NTOHL (ServerIp->Addr[0])) ||
         IP4_IS_LOCAL_BROADCAST (NTOHL (ServerIp->Addr[0]))))                  ||
       ((BufferPtr == NULL) && DontUseBuffer)                                  ||
       ((BlockSize != NULL) && (*BlockSize < 512))) {
@@ -1307,7 +1307,7 @@ EfiPxeBcMtftp (
 ON_EXIT:
   Private->Udp4Read->Configure (Private->Udp4Read, &Private->Udp4CfgData);
   //
-  // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP 
+  // Dhcp(), Discover(), and Mtftp() set the IP filter, and return with the IP
   // receive filter list emptied and the filter set to EFI_PXE_BASE_CODE_IP_FILTER_STATION_IP.
   //
   ZeroMem(&IpFilter, sizeof (EFI_PXE_BASE_CODE_IP_FILTER));
@@ -1454,7 +1454,7 @@ EfiPxeBcUdpWrite (
     Private->CurrentUdpSrcPort = 0;
     return EFI_INVALID_PARAMETER;
   }
-  
+
   ZeroMem (&Token, sizeof (EFI_UDP4_COMPLETION_TOKEN));
   ZeroMem (&Udp4Session, sizeof (EFI_UDP4_SESSION_DATA));
 
@@ -2022,13 +2022,13 @@ EfiPxeBcSetIpFilter (
       }
     }
   }
-  
+
   //
   // Check whether we need reconfigure the UDP instance.
   //
   Udp4Cfg = &Private->Udp4CfgData;
   if ((AcceptPromiscuous != Udp4Cfg->AcceptPromiscuous) ||
-  	  (AcceptBroadcast != Udp4Cfg->AcceptBroadcast)     || MultiCastUpdate) {
+      (AcceptBroadcast != Udp4Cfg->AcceptBroadcast)     || MultiCastUpdate) {
     //
     // Clear the UDP instance configuration, all joined groups will be left
     // during the operation.
@@ -2326,13 +2326,13 @@ EfiPxeBcSetStationIP (
   }
 
   if (NewStationIp != NULL) {
-    if (IP4_IS_UNSPECIFIED(NTOHL (NewStationIp->Addr[0])) || 
+    if (IP4_IS_UNSPECIFIED(NTOHL (NewStationIp->Addr[0])) ||
         IP4_IS_LOCAL_BROADCAST(NTOHL (NewStationIp->Addr[0])) ||
         (NewSubnetMask != NULL && NewSubnetMask->Addr[0] != 0 && !NetIp4IsUnicast (NTOHL (NewStationIp->Addr[0]), NTOHL (NewSubnetMask->Addr[0])))) {
       return EFI_INVALID_PARAMETER;
     }
   }
-  
+
   Private = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
   Mode    = Private->PxeBc.Mode;
 
@@ -2806,7 +2806,7 @@ EfiPxeLoadFile (
   if (FilePath == NULL || !IsDevicePathEnd (FilePath)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Private         = PXEBC_PRIVATE_DATA_FROM_LOADFILE (This);
   PxeBc           = &Private->PxeBc;
   NewMakeCallback = FALSE;
@@ -2933,7 +2933,7 @@ EfiPxeLoadFile (
     AsciiPrint ("\n  NBP file downloaded successfully.\n");
     //
     // The DHCP4 can have only one configured child instance so we need to stop
-    // reset the DHCP4 child before we return. Otherwise the other programs which 
+    // reset the DHCP4 child before we return. Otherwise the other programs which
     // also need to use DHCP4 will be impacted.
     // The functionality of PXE Base Code protocol will not be stopped,
     // when downloading is successfully.

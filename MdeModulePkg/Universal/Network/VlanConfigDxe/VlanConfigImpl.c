@@ -1,7 +1,7 @@
 /** @file
   HII Config Access protocol implementation of VLAN configuration module.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -327,7 +327,7 @@ VlanCallback (
       break;
     }
   }
-  
+
   HiiSetBrowserData (&gVlanConfigFormSetGuid, mVlanStorageName, sizeof (VLAN_CONFIGURATION), (UINT8 *) Configuration, NULL);
   FreePool (Configuration);
   return EFI_SUCCESS;
@@ -607,7 +607,7 @@ UninstallVlanConfigForm (
 {
   EFI_STATUS                   Status;
   EFI_VLAN_CONFIG_PROTOCOL     *VlanConfig;
-  
+
   //
   // End the parent-child relationship.
   //

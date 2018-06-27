@@ -1,6 +1,6 @@
 /** @file
-  
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -237,10 +237,10 @@ Ip4ComponentNameGetDriverName (
 
   @param  Ip4[in]                 A pointer to the EFI_IP4_PROTOCOL.
 
-  
+
   @retval EFI_SUCCESS             Update the ControllerNameTable of this instance successfully.
   @retval EFI_INVALID_PARAMETER   The input parameter is invalid.
-  
+
 **/
 EFI_STATUS
 UpdateName (
@@ -290,7 +290,7 @@ UpdateName (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   return AddUnicodeString2 (
            "en",
            gIp4ComponentName2.SupportedLanguages,
@@ -378,9 +378,9 @@ Ip4ComponentNameGetControllerName (
   OUT CHAR16                                          **ControllerName
   )
 {
-  EFI_STATUS                    Status;  
+  EFI_STATUS                    Status;
   EFI_IP4_PROTOCOL              *Ip4;
-  
+
   //
   // Only provide names for child handles.
   //
@@ -388,9 +388,9 @@ Ip4ComponentNameGetControllerName (
     return EFI_UNSUPPORTED;
   }
 
-  // 
-  // Make sure this driver produced ChildHandle 
-  // 
+  //
+  // Make sure this driver produced ChildHandle
+  //
   Status = EfiTestChildHandle (
              ControllerHandle,
              ChildHandle,
@@ -400,9 +400,9 @@ Ip4ComponentNameGetControllerName (
     return Status;
   }
 
-  // 
-  // Retrieve an instance of a produced protocol from ChildHandle  
-  // 
+  //
+  // Retrieve an instance of a produced protocol from ChildHandle
+  //
   Status = gBS->OpenProtocol (
                   ChildHandle,
                   &gEfiIp4ProtocolGuid,

@@ -1,7 +1,7 @@
 /** @file
   Load option library functions which relate with creating and processing load options.
 
-Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -90,7 +90,7 @@ BmGetFreeOptionNumber (
   OUT UINT16                            *FreeOptionNumber
   )
 {
-  
+
   UINTN         OptionNumber;
   UINTN         Index;
   UINT16        *OptionOrder;
@@ -98,7 +98,7 @@ BmGetFreeOptionNumber (
   UINT16        *BootNext;
 
   ASSERT (FreeOptionNumber != NULL);
-  ASSERT (LoadOptionType == LoadOptionTypeDriver || 
+  ASSERT (LoadOptionType == LoadOptionTypeDriver ||
           LoadOptionType == LoadOptionTypeBoot ||
           LoadOptionType == LoadOptionTypeSysPrep);
 
@@ -110,9 +110,9 @@ BmGetFreeOptionNumber (
     GetEfiGlobalVariable2 (L"BootNext", (VOID**) &BootNext, NULL);
   }
 
-  for (OptionNumber = 0; 
+  for (OptionNumber = 0;
        OptionNumber < OptionOrderSize / sizeof (UINT16)
-                    + ((BootNext != NULL) ? 1 : 0); 
+                    + ((BootNext != NULL) ? 1 : 0);
        OptionNumber++
        ) {
     //
@@ -125,10 +125,10 @@ BmGetFreeOptionNumber (
     }
 
     //
-    // We didn't find it in the ****Order array and it doesn't equal to BootNext 
+    // We didn't find it in the ****Order array and it doesn't equal to BootNext
     // Otherwise, OptionNumber equals to OptionOrderSize / sizeof (UINT16) + 1
     //
-    if ((Index == OptionOrderSize / sizeof (UINT16)) && 
+    if ((Index == OptionOrderSize / sizeof (UINT16)) &&
         ((BootNext == NULL) || (OptionNumber != *BootNext))
         ) {
       break;
@@ -203,12 +203,12 @@ EfiBootManagerLoadOptionToVariable (
   EFI_DEVICE_PATH_PROTOCOL    FilePathList[];
   UINT8                       OptionalData[];
 TODO: FilePathList[] IS:
-A packed array of UEFI device paths.  The first element of the 
-array is a device path that describes the device and location of the 
-Image for this load option.  The FilePathList[0] is specific 
-to the device type.  Other device paths may optionally exist in the 
-FilePathList, but their usage is OSV specific. Each element 
-in the array is variable length, and ends at the device path end 
+A packed array of UEFI device paths.  The first element of the
+array is a device path that describes the device and location of the
+Image for this load option.  The FilePathList[0] is specific
+to the device type.  Other device paths may optionally exist in the
+FilePathList, but their usage is OSV specific. Each element
+in the array is variable length, and ends at the device path end
 structure.
   */
   VariableSize = sizeof (Option->Attributes)
@@ -359,7 +359,7 @@ EfiBootManagerAddLoadOptionVariable (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (Option->OptionType != LoadOptionTypeDriver && 
+  if (Option->OptionType != LoadOptionTypeDriver &&
       Option->OptionType != LoadOptionTypeSysPrep &&
       Option->OptionType != LoadOptionTypeBoot
       ) {
@@ -399,7 +399,7 @@ EfiBootManagerAddLoadOptionVariable (
 }
 
 /**
-  Sort the load option. The DriverOrder or BootOrder will be re-created to 
+  Sort the load option. The DriverOrder or BootOrder will be re-created to
   reflect the new order.
 
   @param OptionType             Load option type
@@ -514,7 +514,7 @@ EfiBootManagerInitializeLoadOption (
 /**
   Return the index of the load option in the load option array.
 
-  The function consider two load options are equal when the 
+  The function consider two load options are equal when the
   OptionType, Attributes, Description, FilePath and OptionalData are equal.
 
   @param Key    Pointer to the load option to be found.
@@ -618,15 +618,15 @@ EfiBootManagerDeleteLoadOptionVariable (
 /**
   Returns the size of a device path in bytes.
 
-  This function returns the size, in bytes, of the device path data structure 
-  specified by DevicePath including the end of device path node. If DevicePath 
+  This function returns the size, in bytes, of the device path data structure
+  specified by DevicePath including the end of device path node. If DevicePath
   is NULL, then 0 is returned. If the length of the device path is bigger than
   MaxSize, also return 0 to indicate this is an invalidate device path.
 
   @param  DevicePath         A pointer to a device path data structure.
-  @param  MaxSize            Max valid device path size. If big than this size, 
+  @param  MaxSize            Max valid device path size. If big than this size,
                              return error.
-  
+
   @retval 0                  An invalid device path.
   @retval Others             The size of a device path in bytes.
 
@@ -668,12 +668,12 @@ BmGetDevicePathSizeEx (
 }
 
 /**
-  Returns the length of a Null-terminated Unicode string. If the length is 
-  bigger than MaxStringLen, return length 0 to indicate that this is an 
+  Returns the length of a Null-terminated Unicode string. If the length is
+  bigger than MaxStringLen, return length 0 to indicate that this is an
   invalidate string.
 
   This function returns the number of Unicode characters in the Null-terminated
-  Unicode string specified by String. 
+  Unicode string specified by String.
 
   If String is NULL, then ASSERT().
   If String is not aligned on a 16-bit boundary, then ASSERT().
@@ -716,7 +716,7 @@ BmStrSizeEx (
   @retval FALSE                 The variable data is corrupted.
 
 **/
-BOOLEAN 
+BOOLEAN
 BmValidateOption (
   UINT8                     *Variable,
   UINTN                     VariableSize
@@ -862,7 +862,7 @@ EFIAPI
 EfiBootManagerVariableToLoadOptionEx (
   IN CHAR16                           *VariableName,
   IN EFI_GUID                         *VendorGuid,
-  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION *Option  
+  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION *Option
   )
 {
   EFI_STATUS                         Status;
@@ -1034,7 +1034,7 @@ BmCollectLoadOptions (
 /**
   Returns an array of load options based on the EFI variable
   L"BootOrder"/L"DriverOrder" and the L"Boot####"/L"Driver####" variables impled by it.
-  #### is the hex value of the UINT16 in each BootOrder/DriverOrder entry. 
+  #### is the hex value of the UINT16 in each BootOrder/DriverOrder entry.
 
   @param  LoadOptionCount   Returns number of entries in the array.
   @param  LoadOptionType    The type of the load option.
@@ -1122,8 +1122,8 @@ EfiBootManagerGetLoadOptions (
 
   @param  LoadOption   Pointer to boot option to Free.
 
-  @return EFI_SUCCESS   BootOption was freed 
-  @return EFI_NOT_FOUND BootOption == NULL 
+  @return EFI_SUCCESS   BootOption was freed
+  @return EFI_NOT_FOUND BootOption == NULL
 
 **/
 EFI_STATUS
@@ -1150,14 +1150,14 @@ EfiBootManagerFreeLoadOption (
 }
 
 /**
-  Free an EFI_BOOT_MANGER_LOAD_OPTION array that was allocated by 
+  Free an EFI_BOOT_MANGER_LOAD_OPTION array that was allocated by
   EfiBootManagerGetLoadOptions().
 
   @param  Option       Pointer to boot option array to free.
   @param  OptionCount  Number of array entries in BootOption
 
-  @return EFI_SUCCESS   BootOption was freed 
-  @return EFI_NOT_FOUND BootOption == NULL 
+  @return EFI_SUCCESS   BootOption was freed
+  @return EFI_NOT_FOUND BootOption == NULL
 
 **/
 EFI_STATUS
@@ -1230,7 +1230,7 @@ BmIsLoadOptionPeHeaderValid (
       // Check PE32 or PE32+ magic, and machine type
       //
       OptionalHeader = (EFI_IMAGE_OPTIONAL_HEADER32 *) &PeHeader->Pe32.OptionalHeader;
-      if ((OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC || 
+      if ((OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC ||
            OptionalHeader->Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) &&
           EFI_IMAGE_MACHINE_TYPE_SUPPORTED (PeHeader->Pe32.FileHeader.Machine)
           ) {
@@ -1346,7 +1346,7 @@ BmGetNextLoadOptionBuffer (
 
   @param LoadOption  Pointer to the load option.
 
-  @retval EFI_INVALID_PARAMETER  The load option type is invalid, 
+  @retval EFI_INVALID_PARAMETER  The load option type is invalid,
                                  or the load option file path doesn't point to a valid file.
   @retval EFI_UNSUPPORTED        The load option type is of LoadOptionTypeBoot.
   @retval EFI_SUCCESS            The load option is inactive, or successfully loaded and executed.

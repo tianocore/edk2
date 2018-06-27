@@ -315,7 +315,7 @@ Mtftp4DriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  
+
   //
   // Install the Mtftp4ServiceBinding Protocol onto Controller
   //
@@ -341,7 +341,7 @@ ON_ERROR:
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
-  
+
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 
@@ -713,7 +713,7 @@ Mtftp4ServiceBindingDestroyChild (
            &gEfiUdp4ProtocolGuid,
            gMtftp4DriverBinding.DriverBindingHandle,
            ChildHandle
-           );  
+           );
   }
 
   //

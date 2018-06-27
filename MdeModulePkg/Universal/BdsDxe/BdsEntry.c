@@ -293,9 +293,9 @@ BdsReadKeys (
   }
 
   while (gST->ConIn != NULL) {
-    
+
     Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-    
+
     if (EFI_ERROR (Status)) {
       //
       // No more keys.
@@ -488,10 +488,10 @@ ProcessLoadOptions (
 
 /**
 
-  Validate input console variable data. 
+  Validate input console variable data.
 
   If found the device path is not a valid device path, remove the variable.
-  
+
   @param VariableName             Input console variable name.
 
 **/
@@ -505,7 +505,7 @@ BdsFormalizeConsoleVariable (
   EFI_STATUS                Status;
 
   GetEfiGlobalVariable2 (VariableName, (VOID **) &DevicePath, &VariableSize);
-  if ((DevicePath != NULL) && !IsDevicePathValid (DevicePath, VariableSize)) { 
+  if ((DevicePath != NULL) && !IsDevicePathValid (DevicePath, VariableSize)) {
     Status = gRT->SetVariable (
                     VariableName,
                     &gEfiGlobalVariableGuid,
@@ -525,17 +525,17 @@ BdsFormalizeConsoleVariable (
 }
 
 /**
-  Formalize OsIndication related variables. 
-  
-  For OsIndicationsSupported, Create a BS/RT/UINT64 variable to report caps 
+  Formalize OsIndication related variables.
+
+  For OsIndicationsSupported, Create a BS/RT/UINT64 variable to report caps
   Delete OsIndications variable if it is not NV/BS/RT UINT64.
-  
+
   Item 3 is used to solve case when OS corrupts OsIndications. Here simply delete this NV variable.
 
   Create a boot option for BootManagerMenu if it hasn't been created yet
 
 **/
-VOID 
+VOID
 BdsFormalizeOSIndicationVariable (
   VOID
   )
@@ -613,10 +613,10 @@ BdsFormalizeOSIndicationVariable (
 
 /**
 
-  Validate variables. 
+  Validate variables.
 
 **/
-VOID 
+VOID
 BdsFormalizeEfiGlobalVariable (
   VOID
   )
@@ -884,7 +884,7 @@ BdsEntry (
   // Possible things that can be done in PlatformBootManagerBeforeConsole:
   // > Update console variable: 1. include hot-plug devices; 2. Clear ConIn and add SOL for AMT
   // > Register new Driver#### or Boot####
-  // > Register new Key####: e.g.: F12 
+  // > Register new Key####: e.g.: F12
   // > Signal ReadyToLock event
   // > Authentication action: 1. connect Auth devices; 2. Identify auto logon user.
   //
@@ -929,7 +929,7 @@ BdsEntry (
   // > Connect certain devices
   // > Dispatch aditional option roms
   // > Special boot: e.g.: USB boot, enter UI
-  // 
+  //
   PERF_INMODULE_BEGIN("PlatformBootManagerAfterConsole");
   PlatformBootManagerAfterConsole ();
   PERF_INMODULE_END("PlatformBootManagerAfterConsole");
@@ -981,7 +981,7 @@ BdsEntry (
   PlatformRecovery = (BOOLEAN) ((OsIndication & EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY) != 0);
   //
   // Clear EFI_OS_INDICATIONS_BOOT_TO_FW_UI to acknowledge OS
-  // 
+  //
   if (BootFwUi || PlatformRecovery) {
     OsIndication &= ~((UINT64) (EFI_OS_INDICATIONS_BOOT_TO_FW_UI | EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY));
     Status = gRT->SetVariable (
@@ -1059,7 +1059,7 @@ BdsEntry (
       if (!EFI_ERROR (Status)) {
         EfiBootManagerBoot (&LoadOption);
         EfiBootManagerFreeLoadOption (&LoadOption);
-        if ((LoadOption.Status == EFI_SUCCESS) && 
+        if ((LoadOption.Status == EFI_SUCCESS) &&
             (BootManagerMenuStatus != EFI_NOT_FOUND) &&
             (LoadOption.OptionNumber != BootManagerMenu.OptionNumber)) {
           //
@@ -1107,14 +1107,14 @@ BdsEntry (
                                  then EFI_INVALID_PARAMETER is returned.
   @param  VendorGuid             A unique identifier for the vendor.
   @param  Attributes             Attributes bitmask to set for the variable.
-  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE, 
+  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE,
                                  or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero
-                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is 
-                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to 
-                                 the variable value (the timestamp associated with the variable may be updated however 
-                                 even if no new data value is provided,see the description of the 
-                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not 
-                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated). 
+                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is
+                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to
+                                 the variable value (the timestamp associated with the variable may be updated however
+                                 even if no new data value is provided,see the description of the
+                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not
+                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated).
   @param  Data                   The contents for the variable.
 
   @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as

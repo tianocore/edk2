@@ -235,7 +235,7 @@ UnregisterResetNotify (
 
   @param[in] FileHandle  Handle of the file being invoked.
   @param[in] PeiServices Describes the list of possible PEI Services.
-  
+
   @retval EFI_SUCCESS         The entry point is executed successfully.
   @retval EFI_ALREADY_STARTED The Reset2 PPI was already installed.
   @retval others              Status code returned from PeiServicesInstallPpi().

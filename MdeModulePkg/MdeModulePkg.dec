@@ -1906,7 +1906,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|TRUE|BOOLEAN|0x01100000
 
   ## Specify memory size for boot script executor stack usage in S3 phase.
-  #  The default size 32K. When changing the value make sure the memory size is large enough 
+  #  The default size 32K. When changing the value make sure the memory size is large enough
   #  to meet boot script executor requirement in the S3 phase.
   # @Prompt Reserved S3 Boot Script Stack ACPI Memory Size
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize|0x8000|UINT32|0x02000000

@@ -1,7 +1,7 @@
 /** @file
   Implementation for EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL protocol.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -451,7 +451,7 @@ TerminalConOutQueryMode (
   //
   // Get Terminal device data structure pointer.
   //
-  TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);  
+  TerminalDevice = TERMINAL_CON_OUT_DEV_FROM_THIS (This);
   *Columns = TerminalDevice->TerminalConsoleModeData[ModeNumber].Columns;
   *Rows    = TerminalDevice->TerminalConsoleModeData[ModeNumber].Rows;
 
@@ -469,7 +469,7 @@ TerminalConOutQueryMode (
   @param ModeNumber    The text mode to set.
 
   @retval EFI_SUCCESS       The requested text mode is set.
-  @retval EFI_DEVICE_ERROR  The requested text mode cannot be set 
+  @retval EFI_DEVICE_ERROR  The requested text mode cannot be set
                             because of serial device error.
   @retval EFI_UNSUPPORTED   The text mode number is not valid.
 
@@ -911,7 +911,7 @@ TerminalIsValidTextGraphics (
   Detects if a valid ASCII char.
 
   @param  Ascii        An ASCII character.
-                       
+
   @retval TRUE         If it is a valid ASCII character.
   @retval FALSE        If it is not a valid ASCII character.
 
@@ -935,7 +935,7 @@ TerminalIsValidAscii (
   Detects if a valid EFI control character.
 
   @param  CharC        An input EFI Control character.
-                       
+
   @retval TRUE         If it is a valid EFI control character.
   @retval FALSE        If it is not a valid EFI control character.
 

@@ -2,7 +2,7 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to access TCP service.
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -23,7 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 
 /**
-  The common notify function associated with various TcpIo events. 
+  The common notify function associated with various TcpIo events.
 
   @param[in]  Event   The event signaled.
   @param[in]  Context The context.
@@ -111,14 +111,14 @@ ON_EXIT:
 }
 
 /**
-  Create a TCP socket with the specified configuration data. 
+  Create a TCP socket with the specified configuration data.
 
   @param[in]  Image      The handle of the driver image.
   @param[in]  Controller The handle of the controller.
   @param[in]  TcpVersion The version of Tcp, TCP_VERSION_4 or TCP_VERSION_6.
   @param[in]  ConfigData The Tcp configuration data.
   @param[out] TcpIo      The TcpIo.
-  
+
   @retval EFI_SUCCESS            The TCP socket is created and configured.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_UNSUPPORTED        One or more of the control options are not
@@ -176,7 +176,7 @@ TcpIoCreateSocket (
 
   //
   // Create the TCP child instance and get the TCP protocol.
-  //  
+  //
   Status = NetLibCreateServiceChild (
              Controller,
              Image,
@@ -395,9 +395,9 @@ ON_ERROR:
 
   return Status;
 }
-  
+
 /**
-  Destroy the socket. 
+  Destroy the socket.
 
   @param[in]  TcpIo The TcpIo which wraps the socket to be destroyed.
 
@@ -531,7 +531,7 @@ TcpIoDestroySocket (
 
   @param[in, out]  TcpIo     The TcpIo wrapping the TCP socket.
   @param[in]       Timeout   The time to wait for connection done. Set to NULL for infinite wait.
-  
+
   @retval EFI_SUCCESS            Connect to the other endpoint of the TCP socket
                                  successfully.
   @retval EFI_TIMEOUT            Failed to connect to the other endpoint of the
@@ -604,7 +604,7 @@ TcpIoConnect (
   @param[in, out]  TcpIo     The TcpIo wrapping the TCP socket.
   @param[in]       Timeout   The time to wait for connection done. Set to NULL for infinite wait.
 
-  
+
   @retval EFI_SUCCESS            Connect to the other endpoint of the TCP socket
                                  successfully.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
@@ -671,7 +671,7 @@ TcpIoAccept (
   }
 
   //
-  // The new TCP instance handle created for the established connection is 
+  // The new TCP instance handle created for the established connection is
   // in ListenToken.
   //
   if (!EFI_ERROR (Status)) {
@@ -680,7 +680,7 @@ TcpIoAccept (
     } else {
       ProtocolGuid = &gEfiTcp6ProtocolGuid;
     }
-    
+
     Status = gBS->OpenProtocol (
                     TcpIo->ListenToken.Tcp4Token.NewChildHandle,
                     ProtocolGuid,
@@ -719,7 +719,7 @@ TcpIoReset (
   Tcp4               = NULL;
   Tcp6               = NULL;
 
-  if (TcpIo->TcpVersion == TCP_VERSION_4) { 
+  if (TcpIo->TcpVersion == TCP_VERSION_4) {
     TcpIo->CloseToken.Tcp4Token.AbortOnClose = TRUE;
     Tcp4 = TcpIo->Tcp.Tcp4;
     Status = Tcp4->Close (Tcp4, &TcpIo->CloseToken.Tcp4Token);
@@ -744,13 +744,13 @@ TcpIoReset (
   }
 }
 
-  
+
 /**
   Transmit the Packet to the other endpoint of the socket.
 
   @param[in]   TcpIo           The TcpIo wrapping the TCP socket.
   @param[in]   Packet          The packet to transmit.
-  
+
   @retval EFI_SUCCESS            The packet is trasmitted.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_UNSUPPORTED        One or more of the control options are not
@@ -779,7 +779,7 @@ TcpIoTransmit (
 
   if (TcpIo->TcpVersion == TCP_VERSION_4) {
 
-    Size = sizeof (EFI_TCP4_TRANSMIT_DATA) + 
+    Size = sizeof (EFI_TCP4_TRANSMIT_DATA) +
            (Packet->BlockOpNum - 1) * sizeof (EFI_TCP4_FRAGMENT_DATA);
   } else if (TcpIo->TcpVersion == TCP_VERSION_6) {
     Size = sizeof (EFI_TCP6_TRANSMIT_DATA) +
@@ -825,7 +825,7 @@ TcpIoTransmit (
     if (Tcp4 == NULL) {
       goto ON_EXIT;
     }
-    
+
     Status  = Tcp4->Transmit (Tcp4, &TcpIo->TxToken.Tcp4Token);
   } else {
     TcpIo->TxToken.Tcp6Token.Packet.TxData = (EFI_TCP6_TRANSMIT_DATA *) Data;
@@ -929,7 +929,7 @@ TcpIoReceive (
     }
 
     if (Tcp6 == NULL) {
-      return EFI_DEVICE_ERROR; 
+      return EFI_DEVICE_ERROR;
     }
 
   } else {
@@ -961,11 +961,11 @@ TcpIoReceive (
     } else {
       Status = Tcp6->Receive (Tcp6, &TcpIo->RxToken.Tcp6Token);
     }
-    
+
     if (EFI_ERROR (Status)) {
       goto ON_EXIT;
     }
-    
+
     while (!TcpIo->IsRxDone && ((Timeout == NULL) || EFI_ERROR (gBS->CheckEvent (Timeout)))) {
       //
       // Poll until some data is received or an error occurs.

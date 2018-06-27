@@ -1,7 +1,7 @@
 /** @file
   Library functions which contain all the code to connect console device.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -104,12 +104,12 @@ BmGetVideoController (
     }
   }
   FreePool (RootBridgeHandleBuffer);
-  
+
   return VideoController;
 }
 
 /**
-  Query all the children of VideoController and return the device paths of all the 
+  Query all the children of VideoController and return the device paths of all the
   children that support GraphicsOutput protocol.
 
   @param VideoController       PCI handle of video controller.
@@ -238,14 +238,14 @@ EfiBootManagerConnectVideoController (
   )
 {
   EFI_DEVICE_PATH_PROTOCOL   *Gop;
-  
+
   if (VideoController == NULL) {
     //
     // Get the platform vga device
     //
     VideoController = BmGetVideoController ();
   }
- 
+
   if (VideoController == NULL) {
     return EFI_NOT_FOUND;
   }
@@ -253,7 +253,7 @@ EfiBootManagerConnectVideoController (
   //
   // Try to connect the PCI device path, so that GOP driver could start on this
   // device and create child handles with GraphicsOutput Protocol installed
-  // on them, then we get device paths of these child handles and select 
+  // on them, then we get device paths of these child handles and select
   // them as possible console device.
   //
   gBS->ConnectController (VideoController, NULL, NULL, FALSE);
@@ -276,20 +276,20 @@ EfiBootManagerConnectVideoController (
   Fill console handle in System Table if there are no valid console handle in.
 
   Firstly, check the validation of console handle in System Table. If it is invalid,
-  update it by the first console device handle from EFI console variable. 
+  update it by the first console device handle from EFI console variable.
 
   @param  VarName            The name of the EFI console variable.
   @param  ConsoleGuid        Specified Console protocol GUID.
-  @param  ConsoleHandle      On IN,  console handle in System Table to be checked. 
+  @param  ConsoleHandle      On IN,  console handle in System Table to be checked.
                              On OUT, new console handle in system table.
-  @param  ProtocolInterface  On IN,  console protocol on console handle in System Table to be checked. 
+  @param  ProtocolInterface  On IN,  console protocol on console handle in System Table to be checked.
                              On OUT, new console protocol on new console handle in system table.
 
   @retval TRUE               System Table has been updated.
   @retval FALSE              System Table hasn't been updated.
 
 **/
-BOOLEAN 
+BOOLEAN
 BmUpdateSystemTableConsole (
   IN     CHAR16                   *VarName,
   IN     EFI_GUID                 *ConsoleGuid,
@@ -326,7 +326,7 @@ BmUpdateSystemTableConsole (
       return FALSE;
     }
   }
-  
+
   //
   // Get all possible consoles device path from EFI variable
   //
@@ -352,7 +352,7 @@ BmUpdateSystemTableConsole (
       FreePool (FullDevicePath);
       return FALSE;
     }
-    
+
     //
     // Find console device handle by device path instance
     //
@@ -559,7 +559,7 @@ EfiBootManagerConnectConsoleVariable (
       FreePool (StartDevicePath);
       return EFI_UNSUPPORTED;
     }
-    
+
     Next      = Instance;
     while (!IsDevicePathEndType (Next)) {
       Next = NextDevicePathNode (Next);
@@ -568,7 +568,7 @@ EfiBootManagerConnectConsoleVariable (
     SetDevicePathEndNode (Next);
     //
     // Connect the USB console
-    // USB console device path is a short-form device path that 
+    // USB console device path is a short-form device path that
     //  starts with the first element being a USB WWID
     //  or a USB Class device path
     //
@@ -583,7 +583,7 @@ EfiBootManagerConnectConsoleVariable (
       for (Next = Instance; !IsDevicePathEnd (Next); Next = NextDevicePathNode (Next)) {
         if (DevicePathType (Next) == ACPI_DEVICE_PATH && DevicePathSubType (Next) == ACPI_ADR_DP) {
           break;
-        } else if (DevicePathType (Next) == HARDWARE_DEVICE_PATH && 
+        } else if (DevicePathType (Next) == HARDWARE_DEVICE_PATH &&
                    DevicePathSubType (Next) == HW_CONTROLLER_DP &&
                    DevicePathType (NextDevicePathNode (Next)) == ACPI_DEVICE_PATH &&
                    DevicePathSubType (NextDevicePathNode (Next)) == ACPI_ADR_DP
@@ -724,7 +724,7 @@ EfiBootManagerConnectAllDefaultConsoles (
   }
   PERF_EVENT ("ConOutReady");
 
-  
+
   Status = EfiBootManagerConnectConsoleVariable (ConIn);
   if (!EFI_ERROR (Status)) {
     OneConnected = TRUE;

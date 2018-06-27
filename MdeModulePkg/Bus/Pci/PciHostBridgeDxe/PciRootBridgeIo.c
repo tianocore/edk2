@@ -537,7 +537,7 @@ GetElapsedTick (
   )
 {
   UINT64  PreviousTick;
-  
+
   PreviousTick = *CurrentTick;
   *CurrentTick = GetPerformanceCounter();
   if (StartTick < EndTick) {

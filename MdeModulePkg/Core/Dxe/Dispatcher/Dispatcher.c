@@ -26,7 +26,7 @@
   Depex - Dependency Expresion.
   SOR   - Schedule On Request - Don't schedule if this bit is set.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -335,13 +335,13 @@ CoreSchedule (
       CoreReleaseDispatcherLock ();
 
       DEBUG ((DEBUG_DISPATCH, "Schedule FFS(%g) - EFI_SUCCESS\n", DriverName));
-      
+
       return EFI_SUCCESS;
     }
   }
-  
+
   DEBUG ((DEBUG_DISPATCH, "Schedule FFS(%g) - EFI_NOT_FOUND\n", DriverName));
-  
+
   return EFI_NOT_FOUND;
 }
 
@@ -418,7 +418,7 @@ CoreDispatcher (
   EFI_CORE_DRIVER_ENTRY           *DriverEntry;
   BOOLEAN                         ReadyToRun;
   EFI_EVENT                       DxeDispatchEvent;
-  
+
   PERF_FUNCTION_BEGIN ();
 
   if (gDispatcherRunning) {
@@ -512,10 +512,10 @@ CoreDispatcher (
 
       CoreReleaseDispatcherLock ();
 
- 
+
       if (DriverEntry->IsFvImage) {
         //
-        // Produce a firmware volume block protocol for FvImage so it gets dispatched from. 
+        // Produce a firmware volume block protocol for FvImage so it gets dispatched from.
         //
         Status = CoreProcessFvImageFile (DriverEntry->Fv, DriverEntry->FvHandle, &DriverEntry->FileName);
       } else {
@@ -526,9 +526,9 @@ CoreDispatcher (
           sizeof (DriverEntry->ImageHandle)
           );
         ASSERT (DriverEntry->ImageHandle != NULL);
-  
+
         Status = CoreStartImage (DriverEntry->ImageHandle, NULL, NULL);
-  
+
         REPORT_STATUS_CODE_WITH_EXTENDED_DATA (
           EFI_PROGRESS_CODE,
           (EFI_SOFTWARE_DXE_CORE | EFI_SW_PC_INIT_END),
@@ -692,17 +692,17 @@ FvHasBeenProcessed (
 
 /**
   Remember that Fv protocol on FvHandle has had it's drivers placed on the
-  mDiscoveredList. This fucntion adds entries on the mFvHandleList if new 
+  mDiscoveredList. This fucntion adds entries on the mFvHandleList if new
   entry is different from one in mFvHandleList by checking FvImage Guid.
   Items are never removed/freed from the mFvHandleList.
 
   @param  FvHandle              The handle of a FV that has been processed
 
   @return A point to new added FvHandle entry. If FvHandle with the same FvImage guid
-          has been added, NULL will return. 
+          has been added, NULL will return.
 
 **/
-KNOWN_HANDLE * 
+KNOWN_HANDLE *
 FvIsBeingProcesssed (
   IN  EFI_HANDLE    FvHandle
   )
@@ -1247,7 +1247,7 @@ CoreFwVolEventProtocolNotify (
     KnownHandle = FvIsBeingProcesssed (FvHandle);
     if (KnownHandle == NULL) {
       //
-      // The FV with the same FV name guid has already been processed. 
+      // The FV with the same FV name guid has already been processed.
       // So lets skip it!
       //
       continue;
@@ -1337,7 +1337,7 @@ CoreFwVolEventProtocolNotify (
             if (!EFI_ERROR (Status)) {
               //
               // If SMM depex section is found, this FV image is invalid to be supported.
-              // ASSERT FALSE to report this FV image.  
+              // ASSERT FALSE to report this FV image.
               //
               FreePool (DepexBuffer);
               ASSERT (FALSE);
@@ -1359,7 +1359,7 @@ CoreFwVolEventProtocolNotify (
                            );
             if (EFI_ERROR (Status)) {
               //
-              // If no depex section, produce a firmware volume block protocol for it so it gets dispatched from. 
+              // If no depex section, produce a firmware volume block protocol for it so it gets dispatched from.
               //
               CoreProcessFvImageFile (Fv, FvHandle, &NameGuid);
             } else {

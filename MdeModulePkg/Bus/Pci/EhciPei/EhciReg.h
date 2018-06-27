@@ -1,8 +1,8 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -94,8 +94,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EHCI_IS_DATAIN(EndpointAddr) EHC_BIT_IS_SET((EndpointAddr), 0x80)
 
 //
-// Structure to map the hardware port states to the 
-// UEFI's port states. 
+// Structure to map the hardware port states to the
+// UEFI's port states.
 //
 typedef struct {
   UINT16                  HwState;
@@ -116,7 +116,7 @@ typedef struct {
 
 /**
   Read EHCI capability register.
-  
+
   @param  Ehc       The EHCI device.
   @param  Offset    Capability register address.
 
@@ -132,7 +132,7 @@ EhcReadCapRegister (
 
 /**
   Read Ehc Operation register.
-  
+
   @param  Ehc       The EHCI device.
   @param  Offset    The operation register offset.
 
@@ -148,7 +148,7 @@ EhcReadOpReg (
 
 /**
   Write the data to the EHCI operation register.
-  
+
   @param  Ehc       The EHCI device.
   @param  Offset    EHCI operation register offset.
   @param  Data      The data to write.
@@ -164,7 +164,7 @@ EhcWriteOpReg (
 
 /**
   Stop the legacy USB SMI support.
-  
+
   @param  Ehc       The EHCI device.
 
 **/
@@ -177,7 +177,7 @@ EhcClearLegacySupport (
 /**
   Set door bell and wait it to be ACKed by host controller.
   This function is used to synchronize with the hardware.
-  
+
   @param  Ehc       The EHCI device.
   @param  Timeout   The time to wait before abort (in millisecond, ms).
 
@@ -193,9 +193,9 @@ EhcSetAndWaitDoorBell (
 ;
 
 /**
-  Clear all the interrutp status bits, these bits 
+  Clear all the interrutp status bits, these bits
   are Write-Clean.
-  
+
   @param  Ehc       The EHCI device.
 
 **/
@@ -207,7 +207,7 @@ EhcAckAllInterrupt (
 
 /**
   Check whether Ehc is halted.
-  
+
   @param  Ehc       The EHCI device.
 
   @retval TRUE      The controller is halted.
@@ -222,7 +222,7 @@ EhcIsHalt (
 
 /**
   Check whether system error occurred.
-  
+
   @param  Ehc       The EHCI device.
 
   @retval TRUE      System error happened.
@@ -237,7 +237,7 @@ EhcIsSysError (
 
 /**
   Reset the host controller.
-  
+
   @param  Ehc             The EHCI device.
   @param  Timeout         Time to wait before abort (in millisecond, ms).
 
@@ -254,7 +254,7 @@ EhcResetHC (
 
 /**
   Halt the host controller.
-  
+
   @param  Ehc             The EHCI device.
   @param  Timeout         Time to wait before abort.
 
@@ -271,7 +271,7 @@ EhcHaltHC (
 
 /**
   Set the EHCI to run
-  
+
   @param  Ehc             The EHCI device.
   @param  Timeout         Time to wait before abort.
 
@@ -287,14 +287,14 @@ EhcRunHC (
 ;
 
 /**
-  Initialize the HC hardware. 
+  Initialize the HC hardware.
   EHCI spec lists the five things to do to initialize the hardware.
   1. Program CTRLDSSEGMENT.
   2. Set USBINTR to enable interrupts.
   3. Set periodic list base.
   4. Set USBCMD, interrupt threshold, frame list size etc.
   5. Write 1 to CONFIGFLAG to route all ports to EHCI.
-  
+
   @param  Ehc             The EHCI device.
 
   @retval EFI_SUCCESS     The EHCI has come out of halt state.

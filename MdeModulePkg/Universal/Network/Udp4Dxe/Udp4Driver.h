@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -79,7 +79,7 @@ Udp4DriverBindingStart (
   restrictions for this service. DisconnectController()
   must follow these calling restrictions. If any other agent wishes
   to call Stop() it must also follow these calling restrictions.
-  
+
   @param[in]  This              Protocol instance pointer.
   @param[in]  ControllerHandle  Handle of device to stop driver on
   @param[in]  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
@@ -101,14 +101,14 @@ Udp4DriverBindingStop (
 
 /**
   Creates a child handle and installs a protocol.
-  
-  The CreateChild() function installs a protocol on ChildHandle. 
-  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle. 
+
+  The CreateChild() function installs a protocol on ChildHandle.
+  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle.
   If ChildHandle is not a pointer to NULL, then the protocol installs on the existing ChildHandle.
 
   @param[in] This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param[in] ChildHandle Pointer to the handle of the child to create. If it is NULL,
-                         then a new handle is created. If it is a pointer to an existing UEFI handle, 
+                         then a new handle is created. If it is a pointer to an existing UEFI handle,
                          then the protocol is added to the existing UEFI handle.
 
   @retval EFI_SUCCES            The protocol was added to ChildHandle.
@@ -127,9 +127,9 @@ Udp4ServiceBindingCreateChild (
 
 /**
   Destroys a child handle with a protocol installed on it.
-  
-  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol 
-  that was installed by CreateChild() from ChildHandle. If the removed protocol is the 
+
+  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol
+  that was installed by CreateChild() from ChildHandle. If the removed protocol is the
   last protocol on ChildHandle, then ChildHandle is destroyed.
 
   @param[in] This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.

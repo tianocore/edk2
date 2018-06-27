@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol private services.
 
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -255,7 +255,7 @@ MnpAddFreeTxBuf (
 
 /**
   Allocate a free TX buffer from MnpDeviceData->FreeTxBufList. If there is none
-  in the queue, first try to recycle some from SNP, then try to allocate some and add 
+  in the queue, first try to recycle some from SNP, then try to allocate some and add
   them into the queue, then fetch the NET_BUF from the updated FreeTxBufList.
 
   @param[in, out]  MnpDeviceData        Pointer to the MNP_DEVICE_DATA.
@@ -274,7 +274,7 @@ MnpAllocTxBuf (
   EFI_STATUS        Status;
   LIST_ENTRY        *Entry;
   MNP_TX_BUF_WRAP   *TxBufWrap;
-  
+
   NET_CHECK_SIGNATURE (MnpDeviceData, MNP_DEVICE_DATA_SIGNATURE);
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
@@ -369,7 +369,7 @@ MnpFreeTxBuf (
       );
     return;
   }
-  
+
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   InsertTailList (&MnpDeviceData->FreeTxBufList, &TxBufWrap->WrapEntry);
   TxBufWrap->InUse = FALSE;
@@ -877,7 +877,7 @@ MnpDestroyServiceData (
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
-  
+
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 
@@ -917,9 +917,9 @@ MnpDestroyServiceChild (
   LIST_ENTRY                         *List;
   EFI_STATUS                         Status;
   UINTN                              ListLength;
-  
+
   List = &MnpServiceData->ChildrenList;
-  
+
   Status = NetDestroyLinkList (
              List,
              MnpDestoryChildEntry,
@@ -1160,7 +1160,7 @@ MnpStopSnp (
 {
   EFI_STATUS  Status;
   EFI_SIMPLE_NETWORK_PROTOCOL     *Snp;
-  
+
   Snp = MnpDeviceData->Snp;
   ASSERT (Snp != NULL);
 

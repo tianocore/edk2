@@ -126,7 +126,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mGcdIoTypeNames[] = {
   "NonExist",  // EfiGcdIoTypeNonExistent
   "Reserved",  // EfiGcdIoTypeReserved
   "I/O     ",  // EfiGcdIoTypeIo
-  "Unknown "   // EfiGcdIoTypeMaximum 
+  "Unknown "   // EfiGcdIoTypeMaximum
 };
 
 ///
@@ -146,7 +146,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST CHAR8 *mGcdAllocationTypeNames[] = {
   PcdDebugPrintErrorLevel has the DEBUG_GCD bit set.
 
   @param  InitialMap  TRUE if the initial GCD Memory Map is being dumped.  Otherwise, FALSE.
-  
+
 **/
 VOID
 EFIAPI
@@ -159,7 +159,7 @@ CoreDumpGcdMemorySpaceMap (
     UINTN                            NumberOfDescriptors;
     EFI_GCD_MEMORY_SPACE_DESCRIPTOR  *MemorySpaceMap;
     UINTN                            Index;
-   
+
     Status = CoreGetMemorySpaceMap (&NumberOfDescriptors, &MemorySpaceMap);
     ASSERT (Status == EFI_SUCCESS && MemorySpaceMap != NULL);
 
@@ -169,11 +169,11 @@ CoreDumpGcdMemorySpaceMap (
     DEBUG ((DEBUG_GCD, "GCDMemType Range                             Capabilities     Attributes      \n"));
     DEBUG ((DEBUG_GCD, "========== ================================= ================ ================\n"));
     for (Index = 0; Index < NumberOfDescriptors; Index++) {
-      DEBUG ((DEBUG_GCD, "%a  %016lx-%016lx %016lx %016lx%c\n", 
+      DEBUG ((DEBUG_GCD, "%a  %016lx-%016lx %016lx %016lx%c\n",
         mGcdMemoryTypeNames[MIN (MemorySpaceMap[Index].GcdMemoryType, EfiGcdMemoryTypeMaximum)],
-        MemorySpaceMap[Index].BaseAddress, 
+        MemorySpaceMap[Index].BaseAddress,
         MemorySpaceMap[Index].BaseAddress + MemorySpaceMap[Index].Length - 1,
-        MemorySpaceMap[Index].Capabilities, 
+        MemorySpaceMap[Index].Capabilities,
         MemorySpaceMap[Index].Attributes,
         MemorySpaceMap[Index].ImageHandle == NULL ? ' ' : '*'
         ));
@@ -184,11 +184,11 @@ CoreDumpGcdMemorySpaceMap (
 }
 
 /**
-  Dump the entire contents if the GCD I/O Space Map using DEBUG() macros when 
+  Dump the entire contents if the GCD I/O Space Map using DEBUG() macros when
   PcdDebugPrintErrorLevel has the DEBUG_GCD bit set.
 
   @param  InitialMap  TRUE if the initial GCD I/O Map is being dumped.  Otherwise, FALSE.
-  
+
 **/
 VOID
 EFIAPI
@@ -201,20 +201,20 @@ CoreDumpGcdIoSpaceMap (
     UINTN                        NumberOfDescriptors;
     EFI_GCD_IO_SPACE_DESCRIPTOR  *IoSpaceMap;
     UINTN                        Index;
-    
+
     Status = CoreGetIoSpaceMap (&NumberOfDescriptors, &IoSpaceMap);
     ASSERT (Status == EFI_SUCCESS && IoSpaceMap != NULL);
-    
+
     if (InitialMap) {
       DEBUG ((DEBUG_GCD, "GCD:Initial GCD I/O Space Map\n"));
-    }  
-    
+    }
+
     DEBUG ((DEBUG_GCD, "GCDIoType  Range                            \n"));
     DEBUG ((DEBUG_GCD, "========== =================================\n"));
     for (Index = 0; Index < NumberOfDescriptors; Index++) {
-      DEBUG ((DEBUG_GCD, "%a   %016lx-%016lx%c\n", 
+      DEBUG ((DEBUG_GCD, "%a   %016lx-%016lx%c\n",
         mGcdIoTypeNames[MIN (IoSpaceMap[Index].GcdIoType, EfiGcdIoTypeMaximum)],
-        IoSpaceMap[Index].BaseAddress, 
+        IoSpaceMap[Index].BaseAddress,
         IoSpaceMap[Index].BaseAddress + IoSpaceMap[Index].Length - 1,
         IoSpaceMap[Index].ImageHandle == NULL ? ' ' : '*'
         ));
@@ -223,11 +223,11 @@ CoreDumpGcdIoSpaceMap (
     FreePool (IoSpaceMap);
   );
 }
-  
+
 /**
   Validate resource descriptor HOB's attributes.
 
-  If Attributes includes some memory resource's settings, it should include 
+  If Attributes includes some memory resource's settings, it should include
   the corresponding capabilites also.
 
   @param  Attributes  Resource descriptor HOB attributes.
@@ -876,13 +876,13 @@ CoreConvertSpace (
     //
     CpuArchAttributes = ConverToCpuArchAttributes (Attributes);
     //
-    // CPU arch attributes include page attributes and cache attributes. 
+    // CPU arch attributes include page attributes and cache attributes.
     // Only page attributes supports to be cleared, but not cache attributes.
     // Caller is expected to use GetMemorySpaceDescriptor() to get the current
     // attributes, AND/OR attributes, and then calls SetMemorySpaceAttributes()
     // to set the new attributes.
     // So 0 CPU arch attributes should not happen as memory should always have
-    // a cache attribute (no matter UC or WB, etc). 
+    // a cache attribute (no matter UC or WB, etc).
     //
     // Here, 0 CPU arch attributes will be filtered to be compatible with the
     // case that caller just calls SetMemorySpaceAttributes() with none CPU
@@ -1293,7 +1293,7 @@ Done:
     DEBUG ((DEBUG_GCD, "  (BaseAddress = %016lx)", *BaseAddress));
   }
   DEBUG ((DEBUG_GCD, "\n"));
-  
+
   if ((Operation & GCD_MEMORY_SPACE_OPERATION) != 0) {
     CoreReleaseGcdMemoryLock ();
     CoreDumpGcdMemorySpaceMap (FALSE);
@@ -1384,7 +1384,7 @@ CoreAllocateMemorySpace (
   DEBUG ((DEBUG_GCD, "  Alignment       = %016lx\n", LShiftU64 (1, Alignment)));
   DEBUG ((DEBUG_GCD, "  ImageHandle     = %p\n", ImageHandle));
   DEBUG ((DEBUG_GCD, "  DeviceHandle    = %p\n", DeviceHandle));
-  
+
   return CoreAllocateSpace (
            GCD_ALLOCATE_MEMORY_OPERATION,
            GcdAllocateType,
@@ -1516,7 +1516,7 @@ CoreRemoveMemorySpace (
   )
 {
   DEBUG ((DEBUG_GCD, "GCD:RemoveMemorySpace(Base=%016lx,Length=%016lx)\n", BaseAddress, Length));
-  
+
   return CoreConvertSpace (GCD_REMOVE_MEMORY_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, 0);
 }
 
@@ -1605,7 +1605,7 @@ CoreGetMemorySpaceDescriptor (
   @param  Attributes             Specified attributes
 
   @retval EFI_SUCCESS           The attributes were set for the memory region.
-  @retval EFI_INVALID_PARAMETER Length is zero. 
+  @retval EFI_INVALID_PARAMETER Length is zero.
   @retval EFI_UNSUPPORTED       The processor does not support one or more bytes of the memory
                                 resource range specified by BaseAddress and Length.
   @retval EFI_UNSUPPORTED       The bit mask of attributes is not support for the memory resource
@@ -1762,7 +1762,7 @@ CoreAddIoSpace (
 {
   DEBUG ((DEBUG_GCD, "GCD:AddIoSpace(Base=%016lx,Length=%016lx)\n", BaseAddress, Length));
   DEBUG ((DEBUG_GCD, "  GcdIoType    = %a\n", mGcdIoTypeNames[MIN (GcdIoType, EfiGcdIoTypeMaximum)]));
-  
+
   //
   // Make sure parameters are valid
   //
@@ -1812,7 +1812,7 @@ CoreAllocateIoSpace (
   DEBUG ((DEBUG_GCD, "  Alignment       = %016lx\n", LShiftU64 (1, Alignment)));
   DEBUG ((DEBUG_GCD, "  ImageHandle     = %p\n", ImageHandle));
   DEBUG ((DEBUG_GCD, "  DeviceHandle    = %p\n", DeviceHandle));
-  
+
   return CoreAllocateSpace (
            GCD_ALLOCATE_IO_OPERATION,
            GcdAllocateType,
@@ -1868,7 +1868,7 @@ CoreRemoveIoSpace (
   )
 {
   DEBUG ((DEBUG_GCD, "GCD:RemoveIoSpace(Base=%016lx,Length=%016lx)\n", BaseAddress, Length));
-  
+
   return CoreConvertSpace (GCD_REMOVE_IO_OPERATION, (EFI_GCD_MEMORY_TYPE) 0, (EFI_GCD_IO_TYPE) 0, BaseAddress, Length, 0, 0);
 }
 
@@ -2138,15 +2138,15 @@ CoreInitializeMemoryServices (
   // Cache the PHIT HOB for later use
   //
   PhitHob = Hob.HandoffInformationTable;
-  
+
   if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
-  	ReservedCodePageNumber = PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber);
-  	ReservedCodePageNumber += PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber);
-   
-  	//
-  	// cache the Top address for loading modules at Fixed Address 
-  	//
-    gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress = PhitHob->EfiMemoryTop 
+    ReservedCodePageNumber = PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber);
+    ReservedCodePageNumber += PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber);
+
+    //
+    // cache the Top address for loading modules at Fixed Address
+    //
+    gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress = PhitHob->EfiMemoryTop
                                                                    + EFI_PAGES_TO_SIZE(ReservedCodePageNumber);
   }
   //
@@ -2213,14 +2213,14 @@ CoreInitializeMemoryServices (
     Length      = PageAlignLength  (ResourceHob->PhysicalStart + ResourceHob->ResourceLength - BaseAddress);
     if (Length < MinimalMemorySizeNeeded) {
       //
-      // If that range is not large enough to intialize the DXE Core, then 
+      // If that range is not large enough to intialize the DXE Core, then
       // Compute range between PHIT EfiFreeMemoryBottom and PHIT EfiFreeMemoryTop
       //
       BaseAddress = PageAlignAddress (PhitHob->EfiFreeMemoryBottom);
       Length      = PageAlignLength  (PhitHob->EfiFreeMemoryTop - BaseAddress);
       if (Length < MinimalMemorySizeNeeded) {
         //
-        // If that range is not large enough to intialize the DXE Core, then 
+        // If that range is not large enough to intialize the DXE Core, then
         // Compute range between the start of the Resource Descriptor HOB and the start of the HOB List
         //
         BaseAddress = PageAlignAddress (ResourceHob->PhysicalStart);
@@ -2297,7 +2297,7 @@ CoreInitializeMemoryServices (
       //
       BaseAddress = TestedMemoryBaseAddress;
       Length      = TestedMemoryLength;
-      Attributes  = ResourceHob->ResourceAttribute; 
+      Attributes  = ResourceHob->ResourceAttribute;
       HighAddress = ResourceHob->PhysicalStart;
     }
   }
@@ -2403,7 +2403,7 @@ CoreInitializeGcdServices (
   InsertHeadList (&mGcdMemorySpaceMap, &Entry->Link);
 
   CoreDumpGcdMemorySpaceMap (TRUE);
-  
+
   //
   // Initialize the GCD I/O Space Map
   //
@@ -2415,7 +2415,7 @@ CoreInitializeGcdServices (
   InsertHeadList (&mGcdIoSpaceMap, &Entry->Link);
 
   CoreDumpGcdIoSpaceMap (TRUE);
-  
+
   //
   // Walk the HOB list and add all resource descriptors to the GCD
   //

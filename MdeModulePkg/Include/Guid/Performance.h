@@ -2,15 +2,15 @@
   This file defines performance-related definitions, including the format of:
   * performance GUID HOB.
   * performance protocol interfaces.
-  * performance variables.  
+  * performance variables.
 
 Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -36,7 +36,7 @@ typedef struct {
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Handle;
-  CHAR8                 Token[PEI_PERFORMANCE_STRING_SIZE];   ///< Measured token string name. 
+  CHAR8                 Token[PEI_PERFORMANCE_STRING_SIZE];   ///< Measured token string name.
   CHAR8                 Module[PEI_PERFORMANCE_STRING_SIZE];  ///< Module string name.
   UINT64                StartTimeStamp;                       ///< Start time point.
   UINT64                EndTimeStamp;                         ///< End time point.
@@ -44,7 +44,7 @@ typedef struct {
 
 //
 // The header must be aligned at 8 bytes.
-// 
+//
 typedef struct {
   UINT32                NumberOfEntries;  ///< The number of all performance log entries.
   UINT32                Reserved;
@@ -76,7 +76,7 @@ typedef struct _PERFORMANCE_EX_PROTOCOL PERFORMANCE_EX_PROTOCOL;
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Handle;
-  CHAR8                 Token[DXE_PERFORMANCE_STRING_SIZE];  ///< Measured token string name. 
+  CHAR8                 Token[DXE_PERFORMANCE_STRING_SIZE];  ///< Measured token string name.
   CHAR8                 Module[DXE_PERFORMANCE_STRING_SIZE]; ///< Module string name.
   UINT64                StartTimeStamp;                      ///< Start time point.
   UINT64                EndTimeStamp;                        ///< End time point.
@@ -84,7 +84,7 @@ typedef struct {
 
 typedef struct {
   EFI_PHYSICAL_ADDRESS  Handle;
-  CHAR8                 Token[DXE_PERFORMANCE_STRING_SIZE];  ///< Measured token string name. 
+  CHAR8                 Token[DXE_PERFORMANCE_STRING_SIZE];  ///< Measured token string name.
   CHAR8                 Module[DXE_PERFORMANCE_STRING_SIZE]; ///< Module string name.
   UINT64                StartTimeStamp;                      ///< Start time point.
   UINT64                EndTimeStamp;                        ///< End time point.
@@ -215,7 +215,7 @@ EFI_STATUS
   @param  LogEntryKey             The key for the previous performance measurement log entry.
                                   If 0, then the first performance measurement log entry is retrieved.
   @param  GaugeDataEntry          Out parameter for the indirect pointer to the gauge data entry specified by LogEntryKey.
-                                  
+
   @retval EFI_SUCCESS             The GuageDataEntry is successfully found based on LogEntryKey.
   @retval EFI_NOT_FOUND           There is no entry after the measurement referred to by LogEntryKey.
   @retval EFI_INVALID_PARAMETER   The LogEntryKey is not a valid entry, or GaugeDataEntry is NULL.
@@ -310,7 +310,7 @@ EFI_STATUS
   @param  LogEntryKey             The key for the previous performance measurement log entry.
                                   If 0, then the first performance measurement log entry is retrieved.
   @param  GaugeDataEntryEx        Out parameter for the indirect pointer to the extented gauge data entry specified by LogEntryKey.
-                                  
+
   @retval EFI_SUCCESS             The GuageDataEntryEx is successfully found based on LogEntryKey.
   @retval EFI_NOT_FOUND           There is no entry after the measurement referred to by LogEntryKey.
   @retval EFI_INVALID_PARAMETER   The LogEntryKey is not a valid entry, or GaugeDataEntryEx is NULL.

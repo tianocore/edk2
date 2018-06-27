@@ -1,7 +1,7 @@
 /** @file
   Header file for SCSI Bus Driver.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -41,7 +41,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 typedef union {
   UINT32  Scsi;
-  UINT8   ExtScsi[4];   
+  UINT8   ExtScsi[4];
 } SCSI_ID;
 
 typedef struct _SCSI_TARGET_ID {
@@ -79,7 +79,7 @@ typedef struct _EFI_SCSI_BUS_PROTOCOL {
 typedef struct _SCSI_BUS_DEVICE {
   UINTN                                 Signature;
   EFI_SCSI_BUS_PROTOCOL                 BusIdentify;
-  BOOLEAN                               ExtScsiSupport; 
+  BOOLEAN                               ExtScsiSupport;
   EFI_SCSI_PASS_THRU_PROTOCOL           *ScsiInterface;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL       *ExtScsiInterface;
   EFI_DEVICE_PATH_PROTOCOL              *DevicePath;
@@ -92,7 +92,7 @@ typedef struct {
   EFI_HANDLE                         Handle;
   EFI_SCSI_IO_PROTOCOL               ScsiIo;
   EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
-  BOOLEAN                            ExtScsiSupport; 
+  BOOLEAN                            ExtScsiSupport;
   EFI_SCSI_PASS_THRU_PROTOCOL        *ScsiPassThru;
   EFI_EXT_SCSI_PASS_THRU_PROTOCOL    *ExtScsiPassThru;
   SCSI_BUS_DEVICE                    *ScsiBusDeviceData;
@@ -174,7 +174,7 @@ SCSIBusDriverBindingStart (
   restrictions for this service. DisconnectController() must follow these
   calling restrictions. If any other agent wishes to call Stop() it must also
   follow these calling restrictions.
-  
+
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
@@ -327,11 +327,11 @@ ScsiBusComponentNameGetControllerName (
 
   @param  This          Protocol instance pointer.
   @param  DeviceType    A pointer to the device type information retrieved from
-                        the SCSI Controller. 
+                        the SCSI Controller.
 
   @retval EFI_SUCCESS             Retrieves the device type information successfully.
   @retval EFI_INVALID_PARAMETER   The DeviceType is NULL.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -370,7 +370,7 @@ ScsiGetDeviceLocation (
   @retval  EFI_DEVICE_ERROR  Errors encountered when resetting the SCSI bus.
   @retval  EFI_UNSUPPORTED   The bus reset operation is not supported by the
                              SCSI Host Controller.
-  @retval  EFI_TIMEOUT       A timeout occurred while attempting to reset 
+  @retval  EFI_TIMEOUT       A timeout occurred while attempting to reset
                              the SCSI bus.
 **/
 EFI_STATUS
@@ -400,47 +400,47 @@ ScsiResetDevice (
   Sends a SCSI Request Packet to the SCSI Controller for execution.
 
   @param  This            Protocol instance pointer.
-  @param  CommandPacket   The SCSI request packet to send to the SCSI 
+  @param  CommandPacket   The SCSI request packet to send to the SCSI
                           Controller specified by the device handle.
   @param  Event           If the SCSI bus where the SCSI device is attached
-                          does not support non-blocking I/O, then Event is 
-                          ignored, and blocking I/O is performed.  
+                          does not support non-blocking I/O, then Event is
+                          ignored, and blocking I/O is performed.
                           If Event is NULL, then blocking I/O is performed.
-                          If Event is not NULL and non-blocking I/O is 
+                          If Event is not NULL and non-blocking I/O is
                           supported, then non-blocking I/O is performed,
                           and Event will be signaled when the SCSI Request
                           Packet completes.
 
-  @retval EFI_SUCCESS         The SCSI Request Packet was sent by the host 
-                              successfully, and TransferLength bytes were 
-                              transferred to/from DataBuffer.See 
-                              HostAdapterStatus, TargetStatus, 
+  @retval EFI_SUCCESS         The SCSI Request Packet was sent by the host
+                              successfully, and TransferLength bytes were
+                              transferred to/from DataBuffer.See
+                              HostAdapterStatus, TargetStatus,
                               SenseDataLength, and SenseData in that order
                               for additional status information.
-  @retval EFI_BAD_BUFFER_SIZE The SCSI Request Packet was executed, 
+  @retval EFI_BAD_BUFFER_SIZE The SCSI Request Packet was executed,
                               but the entire DataBuffer could not be transferred.
                               The actual number of bytes transferred is returned
-                              in TransferLength. See HostAdapterStatus, 
-                              TargetStatus, SenseDataLength, and SenseData in 
+                              in TransferLength. See HostAdapterStatus,
+                              TargetStatus, SenseDataLength, and SenseData in
                               that order for additional status information.
-  @retval EFI_NOT_READY       The SCSI Request Packet could not be sent because 
-                              there are too many SCSI Command Packets already 
+  @retval EFI_NOT_READY       The SCSI Request Packet could not be sent because
+                              there are too many SCSI Command Packets already
                               queued.The caller may retry again later.
-  @retval EFI_DEVICE_ERROR    A device error occurred while attempting to send 
-                              the SCSI Request Packet. See HostAdapterStatus, 
-                              TargetStatus, SenseDataLength, and SenseData in 
+  @retval EFI_DEVICE_ERROR    A device error occurred while attempting to send
+                              the SCSI Request Packet. See HostAdapterStatus,
+                              TargetStatus, SenseDataLength, and SenseData in
                               that order for additional status information.
-  @retval EFI_INVALID_PARAMETER  The contents of CommandPacket are invalid.  
-                                 The SCSI Request Packet was not sent, so no 
+  @retval EFI_INVALID_PARAMETER  The contents of CommandPacket are invalid.
+                                 The SCSI Request Packet was not sent, so no
                                  additional status information is available.
   @retval EFI_UNSUPPORTED     The command described by the SCSI Request Packet
-                              is not supported by the SCSI initiator(i.e., SCSI 
+                              is not supported by the SCSI initiator(i.e., SCSI
                               Host Controller). The SCSI Request Packet was not
-                              sent, so no additional status information is 
+                              sent, so no additional status information is
                               available.
-  @retval EFI_TIMEOUT         A timeout occurred while waiting for the SCSI 
+  @retval EFI_TIMEOUT         A timeout occurred while waiting for the SCSI
                               Request Packet to execute. See HostAdapterStatus,
-                              TargetStatus, SenseDataLength, and SenseData in 
+                              TargetStatus, SenseDataLength, and SenseData in
                               that order for additional status information.
 **/
 EFI_STATUS

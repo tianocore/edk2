@@ -1,7 +1,7 @@
 /** @file
   TCP output process routines.
-    
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -687,10 +687,10 @@ TcpRetransmit (
       "TcpRetransmit: retransmission without regard to the receiver window for TCB %p\n",
       Tcb)
       );
-    
+
   } else if (TCP_SEQ_GEQ (Tcb->SndWl2 + Tcb->SndWnd, Seq)) {
     Len = TCP_SUB_SEQ (Tcb->SndWl2 + Tcb->SndWnd, Seq);
-    
+
   } else {
     DEBUG (
       (EFI_D_WARN,
@@ -700,7 +700,7 @@ TcpRetransmit (
 
     return 0;
   }
-  
+
   Len = MIN (Len, Tcb->SndMss);
 
   Nbuf = TcpGetSegmentSndQue (Tcb, Seq, Len);
@@ -713,7 +713,7 @@ TcpRetransmit (
   if (TcpTransmitSegment (Tcb, Nbuf) != 0) {
     goto OnError;
   }
-  
+
   if (TCP_SEQ_GT (Seq, Tcb->RetxmitSeqMax)) {
     Tcb->RetxmitSeqMax = Seq;
   }
@@ -793,7 +793,7 @@ SEND_AGAIN:
   // only send a segment without data if SYN or
   // FIN is set.
   //
-  if ((Len == 0) && 
+  if ((Len == 0) &&
       ((Flag & (TCP_FLG_SYN | TCP_FLG_FIN)) == 0)) {
     return Sent;
   }
@@ -831,10 +831,10 @@ SEND_AGAIN:
         TCP_SEQ_LT (End + 1, Tcb->SndWnd + Tcb->SndWl2)) {
 
       DEBUG (
-	  	(EFI_D_NET, 
-	  	"TcpToSendData: send FIN "
-        "to peer for TCB %p in state %s\n", 
-        Tcb, 
+      (EFI_D_NET,
+      "TcpToSendData: send FIN "
+        "to peer for TCB %p in state %s\n",
+        Tcb,
         mTcpStateName[Tcb->State])
       );
 

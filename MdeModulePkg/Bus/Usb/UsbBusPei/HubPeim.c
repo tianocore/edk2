@@ -2,7 +2,7 @@
 Usb Hub Request Support In PEI Phase
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
-  
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -440,7 +440,7 @@ PeiDoHubConfig (
   HubDescriptor = (EFI_USB_HUB_DESCRIPTOR *) HubDescBuffer;
 
   //
-  // Get the hub descriptor 
+  // Get the hub descriptor
   //
   Status = PeiUsbHubReadDesc (
             PeiServices,

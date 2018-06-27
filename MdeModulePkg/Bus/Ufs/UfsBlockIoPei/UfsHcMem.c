@@ -1,7 +1,7 @@
 /** @file
 
-Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -44,17 +44,17 @@ UfsPeimAllocMemBlock (
   }
 
   ZeroMem ((VOID*)(UINTN)TempPtr, sizeof(UFS_PEIM_MEM_BLOCK));
-  
+
   //
   // each bit in the bit array represents UFS_PEIM_MEM_UNIT
   // bytes of memory in the memory block.
   //
   ASSERT (UFS_PEIM_MEM_UNIT * 8 <= EFI_PAGE_SIZE);
-  
+
   Block = (UFS_PEIM_MEM_BLOCK*)(UINTN)TempPtr;
   Block->BufLen   = EFI_PAGES_TO_SIZE (Pages);
   Block->BitsLen  = Block->BufLen / (UFS_PEIM_MEM_UNIT * 8);
-  
+
   Status = PeiServicesAllocatePool (Block->BitsLen, &TempPtr);
   if (EFI_ERROR (Status)) {
     return NULL;
@@ -158,7 +158,7 @@ UfsPeimAllocMemFromBlock (
   if (Available < Units) {
     return NULL;
   }
-  
+
   //
   // Mark the memory as allocated
   //
@@ -209,7 +209,7 @@ UfsPeimIsMemBlockEmpty (
 {
   UINTN                   Index;
 
-  
+
   for (Index = 0; Index < Block->BitsLen; Index++) {
     if (Block->Bits[Index] != 0) {
       return FALSE;
@@ -247,7 +247,7 @@ UfsPeimUnlinkMemBlock (
 
 /**
   Initialize the memory management pool for the host controller.
-  
+
   @param  Private               The Ufs Peim driver private data.
 
   @retval EFI_SUCCESS           The memory pool is initialized.
@@ -265,7 +265,7 @@ UfsPeimInitMemPool (
 
   TempPtr = NULL;
   Pool    = NULL;
-  
+
   Status = PeiServicesAllocatePool (sizeof (UFS_PEIM_MEM_POOL), &TempPtr);
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
@@ -287,7 +287,7 @@ UfsPeimInitMemPool (
 
 /**
   Release the memory management pool.
-  
+
   @param  Pool                  The memory pool to free.
 
   @retval EFI_DEVICE_ERROR      Fail to free the memory pool.
@@ -320,7 +320,7 @@ UfsPeimFreeMemPool (
 /**
   Allocate some memory from the host controller's memory pool
   which can be used to communicate with host controller.
-  
+
   @param  Pool      The host controller's memory pool.
   @param  Size      Size of the memory to allocate.
 
@@ -377,7 +377,7 @@ UfsPeimAllocateMem (
   if (NewBlock == NULL) {
     return NULL;
   }
-  
+
   //
   // Add the new memory block to the pool, then allocate memory from it
   //

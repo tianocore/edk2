@@ -1,7 +1,7 @@
 /** @file
   Implementation of MD5 algorithm.
 
-Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -57,14 +57,14 @@ CONST UINT8 Md5HashPadding[] =
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
 //
@@ -79,18 +79,18 @@ CONST UINT8 Md5HashPadding[] =
 
 /**
   Tf1 is one basic MD5 transform function.
-  
+
   @param[in]  A      A  32-bit quantity.
-  @param[in]  B      A  32-bit quantity. 
+  @param[in]  B      A  32-bit quantity.
   @param[in]  C      A  32-bit quantity.
 
   @return             Output was produced as a 32-bit quantity based on the
-                      three 32-bit input quantity.   
+                      three 32-bit input quantity.
 **/
-UINT32 
+UINT32
 Tf1 (
-  IN UINT32 A, 
-  IN UINT32 B, 
+  IN UINT32 A,
+  IN UINT32 B,
   IN UINT32 C
   )
 {
@@ -99,18 +99,18 @@ Tf1 (
 
 /**
   Tf2 is one basic MD5 transform function.
-  
+
   @param[in]  A      A  32-bit quantity.
-  @param[in]  B      A  32-bit quantity. 
+  @param[in]  B      A  32-bit quantity.
   @param[in]  C      A  32-bit quantity.
 
   @return             Output was produced as a 32-bit quantity based on the
-                      three 32-bit input quantity.   
+                      three 32-bit input quantity.
 **/
-UINT32 
+UINT32
 Tf2 (
-  IN UINT32 A, 
-  IN UINT32 B, 
+  IN UINT32 A,
+  IN UINT32 B,
   IN UINT32 C
   )
 {
@@ -119,18 +119,18 @@ Tf2 (
 
 /**
   Tf3 is one basic MD5 transform function.
-  
+
   @param[in]  A      A  32-bit quantity.
-  @param[in]  B      A  32-bit quantity. 
+  @param[in]  B      A  32-bit quantity.
   @param[in]  C      A  32-bit quantity.
 
   @return             Output was produced as a 32-bit quantity based on the
-                      three 32-bit input quantity.   
+                      three 32-bit input quantity.
 **/
-UINT32 
+UINT32
 Tf3 (
-  IN UINT32 A, 
-  IN UINT32 B, 
+  IN UINT32 A,
+  IN UINT32 B,
   IN UINT32 C
   )
 {
@@ -139,18 +139,18 @@ Tf3 (
 
 /**
   Tf4 is one basic MD5 transform function.
-  
+
   @param[in]  A      A  32-bit quantity.
-  @param[in]  B      A  32-bit quantity. 
+  @param[in]  B      A  32-bit quantity.
   @param[in]  C      A  32-bit quantity.
 
   @return             Output was produced as a 32-bit quantity based on the
-                      three 32-bit input quantity.   
+                      three 32-bit input quantity.
 **/
-UINT32 
+UINT32
 Tf4 (
-  IN UINT32 A, 
-  IN UINT32 B, 
+  IN UINT32 A,
+  IN UINT32 B,
   IN UINT32 C
   )
 {
@@ -220,7 +220,7 @@ MD5Transform (
   Copy data segment into the M field of MD5_CTX structure for later transform.
   If the length of data segment is larger than 64 bytes, then does the transform
   immediately and the generated Md5 code is stored in the States field of MD5_CTX
-  data struct for later accumulation. 
+  data struct for later accumulation.
   All of Md5 code generated for the sequential 64-bytes data segaments are be
   accumulated in MD5Final() function.
 
@@ -241,7 +241,7 @@ MD5UpdateBlock (
   for (Limit = 64 - Md5Ctx->Count; DataLen >= 64 - Md5Ctx->Count; Limit = 64) {
     CopyMem (Md5Ctx->M + Md5Ctx->Count, (VOID *)Data, Limit);
     MD5Transform (Md5Ctx);
-    
+
     Md5Ctx->Count = 0;
     Data         += Limit;
     DataLen      -= Limit;
@@ -271,7 +271,7 @@ MD5Init (
   Md5Ctx->States[0] = 0x67452301;
   Md5Ctx->States[1] = 0xefcdab89;
   Md5Ctx->States[2] = 0x98badcfe;
-  Md5Ctx->States[3] = 0x10325476;  
+  Md5Ctx->States[3] = 0x10325476;
 
   return EFI_SUCCESS;
 }
@@ -328,7 +328,7 @@ MD5Final (
     //
     CopyMem (HashVal, (UINT8 *) Md5Ctx->States, MD5_HASHSIZE);
     ZeroMem ((UINT8 *)Md5Ctx, sizeof (*Md5Ctx));
-    
+
     return EFI_SUCCESS;
   }
 

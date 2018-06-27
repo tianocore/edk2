@@ -6,7 +6,7 @@
 #  subset of the Internet Control Message Protocol (ICMP) and may include support for
 #  the Internet Group Management Protocol (IGMP).
 #
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -24,7 +24,7 @@
   MODULE_UNI_FILE                = Ip4Dxe.uni
   FILE_GUID                      = 9FB1A1F3-3B71-4324-B39A-745CBB015FFF
   MODULE_TYPE                    = UEFI_DRIVER
-  VERSION_STRING                 = 1.0 
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = Ip4DriverEntryPoint
   UNLOAD_IMAGE                   = NetLibDefaultUnload
 
@@ -33,7 +33,7 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gIp4DriverBinding                        
+#  DRIVER_BINDING                =  gIp4DriverBinding
 #  COMPONENT_NAME                =  gIp4ComponentName
 #  COMPONENT_NAME2               =  gIp4ComponentName2
 #
@@ -102,7 +102,7 @@
   gEfiIpSec2ProtocolGuid                        ## SOMETIMES_CONSUMES
   gEfiHiiConfigAccessProtocolGuid               ## BY_START
   gEfiDevicePathProtocolGuid                    ## TO_START
-  
+
 [Guids]
   ## SOMETIMES_CONSUMES ## GUID # HiiIsConfigHdrMatch   EFI_NIC_IP4_CONFIG_VARIABLE
   ## SOMETIMES_PRODUCES ## GUID # HiiConstructConfigHdr EFI_NIC_IP4_CONFIG_VARIABLE

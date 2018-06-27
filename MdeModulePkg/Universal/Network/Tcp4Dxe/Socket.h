@@ -1,7 +1,7 @@
 /** @file
   Socket header file.
 
-Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -85,31 +85,31 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Set socket SO_NO_MORE_DATA flag.
-  
+
   @param Sock               Pointer to the socket
-  
+
 **/
 #define SOCK_NO_MORE_DATA(Sock)     ((Sock)->Flag |= SO_NO_MORE_DATA)
 
 /**
   Check whether the socket is unconfigured.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @retval True               The socket is unconfigued
   @retval False              The socket is not unconfigued
-  
+
 **/
 #define SOCK_IS_UNCONFIGURED(Sock)  ((Sock)->ConfigureState == SO_UNCONFIGURED)
 
 /**
   Check whether the socket is configured.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @retval True               The socket is configued
   @retval False              The socket is not configued
-  
+
 **/
 #define SOCK_IS_CONFIGURED(Sock) \
     (((Sock)->ConfigureState == SO_CONFIGURED_ACTIVE) || \
@@ -117,109 +117,109 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Check whether the socket is configured to active mode.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @retval True               The socket is configued to active mode
   @retval False              The socket is not configued to active mode
-  
+
 **/
 #define SOCK_IS_CONFIGURED_ACTIVE(Sock) \
   ((Sock)->ConfigureState == SO_CONFIGURED_ACTIVE)
 
 /**
   Check whether the socket is configured to passive mode.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @retval True               The socket is configued to passive mode
   @retval False              The socket is not configued to passive mode
-  
+
 **/
 #define SOCK_IS_CONNECTED_PASSIVE(Sock) \
   ((Sock)->ConfigureState == SO_CONFIGURED_PASSIVE)
 
 /**
   Check whether the socket is mapped.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @retval True               The socket is no mapping
   @retval False              The socket is mapped
-  
+
 **/
 #define SOCK_IS_NO_MAPPING(Sock) \
   ((Sock)->ConfigureState == SO_NO_MAPPING)
 
 /**
   Check whether the socket is closed.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @retval True               The socket is closed
   @retval False              The socket is not closed
-  
+
 **/
 #define SOCK_IS_CLOSED(Sock)          ((Sock)->State == SO_CLOSED)
 
 /**
   Check whether the socket is listening.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @retval True               The socket is listening
   @retval False              The socket is not listening
-  
+
 **/
 #define SOCK_IS_LISTENING(Sock)       ((Sock)->State == SO_LISTENING)
 
 /**
   Check whether the socket is connecting.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @retval True               The socket is connecting
   @retval False              The socket is not connecting
-  
+
 **/
 #define SOCK_IS_CONNECTING(Sock)      ((Sock)->State == SO_CONNECTING)
 
 /**
   Check whether the socket has connected.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @retval True               The socket has connected
   @retval False              The socket has not connected
-  
+
 **/
 #define SOCK_IS_CONNECTED(Sock)       ((Sock)->State == SO_CONNECTED)
 
 /**
   Check whether the socket is disconnecting.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @retval True               The socket is disconnecting
   @retval False              The socket is not disconnecting
-  
+
 **/
 #define SOCK_IS_DISCONNECTING(Sock)   ((Sock)->State == SO_DISCONNECTING)
 
 /**
   Check whether the socket is no more data.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @retval True               The socket is no more data
   @retval False              The socket still has data
-  
+
 **/
 #define SOCK_IS_NO_MORE_DATA(Sock)    (0 != ((Sock)->Flag & SO_NO_MORE_DATA))
 
 /**
   Set the size of the receive buffer.
-  
+
   @param  Sock               Pointer to the socket
   @param  Size               The size to set
 
@@ -228,9 +228,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Get the size of the receive buffer.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @return The receive buffer size
 
 **/
@@ -238,9 +238,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Get the size of the receive data.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @return The received data size
 
 **/
@@ -248,7 +248,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Set the size of the send buffer.
-  
+
   @param  Sock               Pointer to the socket
   @param  Size               The size to set
 
@@ -257,9 +257,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Get the size of the send buffer.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @return The send buffer size
 
 **/
@@ -267,9 +267,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Get the size of the send data.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @return The send data size
 
 **/
@@ -277,7 +277,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Set the backlog value of the socket.
-  
+
   @param  Sock               Pointer to the socket
   @param  Value              The value to set
 
@@ -286,9 +286,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Get the backlog value of the socket.
-  
+
   @param  Sock               Pointer to the socket
-  
+
   @return The backlog value
 
 **/
@@ -296,7 +296,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Set the socket with error state.
-  
+
   @param  Sock               Pointer to the socket
   @param  Error              The error state
 
@@ -342,7 +342,7 @@ typedef struct _SOCK_IO_TOKEN {
 } SOCK_IO_TOKEN;
 
 ///
-///  The request issued from socket layer to protocol layer.  
+///  The request issued from socket layer to protocol layer.
 ///
 #define SOCK_ATTACH     0    ///< Attach current socket to a new PCB
 #define SOCK_DETACH     1    ///< Detach current socket from the PCB
@@ -379,15 +379,15 @@ typedef struct _SOCK_BUFFER {
 
 /**
   The handler of protocol for request from socket.
-  
+
   @param Socket              The socket issuing the request to protocol
   @param Request             The request issued by socket
   @param RequestData         The request related data
-  
+
   @retval EFI_SUCCESS        The socket request is completed successfully.
   @retval other              The error status returned by the corresponding TCP
                              layer function.
-                             
+
 **/
 typedef
 EFI_STATUS
@@ -396,8 +396,8 @@ EFI_STATUS
   IN UINT8        Request,
   IN VOID         *RequestData
   );
-  
-  
+
+
 //
 // Socket provided oprerations for low layer protocol
 //
@@ -420,15 +420,15 @@ SockSetState (
   );
 
 /**
-  Called by the low layer protocol to indicate the socket a connection is 
-  established. 
-  
-  This function just changes the socket's state to SO_CONNECTED 
+  Called by the low layer protocol to indicate the socket a connection is
+  established.
+
+  This function just changes the socket's state to SO_CONNECTED
   and signals the token used for connection establishment.
 
   @param  Sock                  Pointer to the socket associated with the
                                 established connection.
-                                
+
 **/
 VOID
 SockConnEstablished (
@@ -437,13 +437,13 @@ SockConnEstablished (
 
 /**
   Called by the low layer protocol to indicate the connection is closed.
-  
-  This function flushes the socket, sets the state to SO_CLOSED and signals 
+
+  This function flushes the socket, sets the state to SO_CLOSED and signals
   the close token.
 
   @param  Sock                  Pointer to the socket associated with the closed
                                 connection.
-                                
+
 **/
 VOID
 SockConnClosed (
@@ -452,8 +452,8 @@ SockConnClosed (
 
 /**
   Called by low layer protocol to indicate that some data is sent or processed.
-   
-  This function trims the sent data in the socket send buffer, signals the data 
+
+  This function trims the sent data in the socket send buffer, signals the data
   token if proper.
 
   @param  Sock                  Pointer to the socket.
@@ -490,7 +490,7 @@ SockGetDataToSend (
 /**
   Called by the low layer protocol to indicate that there
   will be no more data from the communication peer.
-  
+
   This function set the socket's state to SO_NO_MORE_DATA and
   signal all queued IO tokens with the error status EFI_CONNECTION_FIN.
 
@@ -504,8 +504,8 @@ SockNoMoreData (
 
 /**
   Called by the low layer protocol to deliver received data to socket layer.
-  
-  This function will append the data to the socket receive buffer, set ther 
+
+  This function will append the data to the socket receive buffer, set ther
   urgent data length and then check if any receive token can be signaled.
 
   @param  Sock                  Pointer to the socket.
@@ -573,9 +573,9 @@ EFI_STATUS
   IN SOCKET  *This,
   IN VOID    *Context
   );
-  
+
 ///
-/// Proto type of the destroy callback 
+/// Proto type of the destroy callback
 ///
 typedef
 VOID
@@ -618,7 +618,7 @@ typedef struct _SOCK_INIT_DATA {
 
 ///
 ///  The union type of TCP and UDP protocol.
-///  
+///
 typedef union _NET_PROTOCOL {
   EFI_TCP4_PROTOCOL TcpProtocol;   ///< Tcp protocol
   EFI_UDP4_PROTOCOL UdpProtocol;   ///< Udp protocol
@@ -637,7 +637,7 @@ struct _SOCKET {
   EFI_HANDLE            DriverBinding;  ///< Socket's driver binding protocol
   EFI_DEVICE_PATH_PROTOCOL  *ParentDevicePath;
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  LIST_ENTRY                Link;  
+  LIST_ENTRY                Link;
   UINT8                 ConfigureState;
   SOCK_TYPE             Type;
   UINT8                 State;
@@ -655,7 +655,7 @@ struct _SOCKET {
   UINT32          ConnCnt;        ///< the current count of connections to it
   SOCKET          *Parent;        ///< listening parent that accept the connection
   LIST_ENTRY      ConnectionList; ///< the connections maintained by this socket
-  
+
   //
   // The queue to buffer application's asynchronous token
   //
@@ -714,7 +714,7 @@ typedef struct _TCP_RSV_DATA {
   data ProtoData.
 
   @param  SockInitData         Inital data to setting the socket.
-  
+
   @return Pointer to the newly created socket. If NULL, error condition occured.
 
 **/
@@ -973,7 +973,7 @@ SockBufFirst (
   @param  SockEntry             Pointer to the buffer block prior to the required
                                 one.
 
-  @return Pointer to the buffer block next to SockEntry. NULL if SockEntry is 
+  @return Pointer to the buffer block next to SockEntry. NULL if SockEntry is
           the tail or head entry.
 
 **/

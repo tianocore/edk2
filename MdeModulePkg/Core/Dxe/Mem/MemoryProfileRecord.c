@@ -1,7 +1,7 @@
 /** @file
   Support routines for UEFI memory profile.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -76,10 +76,10 @@ GLOBAL_REMOVE_IF_UNREFERENCED UINTN                    mMemoryProfileDriverPathS
   @param[in, out] ProfileSize       On entry, points to the size in bytes of the ProfileBuffer.
                                     On return, points to the size of the data returned in ProfileBuffer.
   @param[out]     ProfileBuffer     Profile buffer.
-                      
+
   @return EFI_SUCCESS               Get the memory profile data successfully.
   @return EFI_UNSUPPORTED           Memory profile is unsupported.
-  @return EFI_BUFFER_TO_SMALL       The ProfileSize is too small for the resulting data. 
+  @return EFI_BUFFER_TO_SMALL       The ProfileSize is too small for the resulting data.
                                     ProfileSize is updated with the size required.
 
 **/
@@ -514,7 +514,7 @@ NeedRecordThisDriver (
     //
     return TRUE;
   }
-  
+
   //
   // Record FilePath without END node.
   //
@@ -1572,10 +1572,10 @@ MemoryProfileCopyData (
   @param[in, out] ProfileSize       On entry, points to the size in bytes of the ProfileBuffer.
                                     On return, points to the size of the data returned in ProfileBuffer.
   @param[out]     ProfileBuffer     Profile buffer.
-                      
+
   @return EFI_SUCCESS               Get the memory profile data successfully.
   @return EFI_UNSUPPORTED           Memory profile is unsupported.
-  @return EFI_BUFFER_TO_SMALL       The ProfileSize is too small for the resulting data. 
+  @return EFI_BUFFER_TO_SMALL       The ProfileSize is too small for the resulting data.
                                     ProfileSize is updated with the size required.
 
 **/

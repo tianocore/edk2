@@ -1,7 +1,7 @@
 /** @file
   The implementation of the Udp4 protocol.
-  
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -844,7 +844,7 @@ Udp4ValidateTxToken (
 
     CopyMem (&SourceAddress, &UdpSessionData->SourceAddress, sizeof (IP4_ADDR));
 
-    if ((SourceAddress != 0) && 
+    if ((SourceAddress != 0) &&
         !Instance->ConfigData.UseDefaultAddress &&
         (EFI_NTOHL(Instance->ConfigData.SubnetMask) != 0) &&
         !NetIp4IsUnicast (HTONL (SourceAddress), EFI_NTOHL(Instance->ConfigData.SubnetMask))) {
@@ -1812,7 +1812,7 @@ Udp4IcmpHandler (
     NetbufFree (Packet);
     return;
   }
-  
+
   Udp4Header = (EFI_UDP_HEADER *) NetbufGetByte (Packet, 0, NULL);
   ASSERT (Udp4Header != NULL);
 

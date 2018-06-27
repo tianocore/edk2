@@ -5,7 +5,7 @@
 
   Boot option manipulation
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -309,8 +309,8 @@ BOpt_GetBootOptions (
   UINTN                         MenuCount;
   UINT8                         *Ptr;
   EFI_BOOT_MANAGER_LOAD_OPTION  *BootOption;
-  UINTN                         BootOptionCount;  
-  
+  UINTN                         BootOptionCount;
+
   MenuCount         = 0;
   BootOrderListSize = 0;
   BootNextSize      = 0;
@@ -327,7 +327,7 @@ BOpt_GetBootOptions (
   if (BootOrderList == NULL) {
     return EFI_NOT_FOUND;
   }
-  
+
   //
   // Get the BootNext from the Var
   //
@@ -346,7 +346,7 @@ BOpt_GetBootOptions (
     if (((BootOption[Index].Attributes & LOAD_OPTION_HIDDEN) != 0) || ((BootOption[Index].Attributes & LOAD_OPTION_ACTIVE) == 0)) {
       continue;
     }
-      
+
     UnicodeSPrint (BootString, sizeof (BootString), L"Boot%04x", BootOrderList[Index]);
     //
     //  Get all loadoptions from the VAR
@@ -415,13 +415,13 @@ BOpt_GetBootOptions (
 
     NewLoadContext->FilePathListLength = *(UINT16 *) LoadOptionPtr;
     LoadOptionPtr += sizeof (UINT16);
-    
+
     StringSize = StrSize((UINT16*)LoadOptionPtr);
 
     NewLoadContext->Description = AllocateZeroPool (StrSize((UINT16*)LoadOptionPtr));
     ASSERT (NewLoadContext->Description != NULL);
     StrCpyS (NewLoadContext->Description, StrSize((UINT16*)LoadOptionPtr) / sizeof (UINT16), (UINT16*)LoadOptionPtr);
-    
+
     ASSERT (NewLoadContext->Description != NULL);
     NewMenuEntry->DisplayString = NewLoadContext->Description;
     NewMenuEntry->DisplayStringToken = HiiSetString (CallbackData->BmmHiiHandle, 0, NewMenuEntry->DisplayString, NULL);
@@ -437,7 +437,7 @@ BOpt_GetBootOptions (
       );
 
     NewMenuEntry->HelpString = UiDevicePathToStr (NewLoadContext->FilePathList);
-    NewMenuEntry->HelpStringToken = HiiSetString (CallbackData->BmmHiiHandle, 0, NewMenuEntry->HelpString, NULL); 
+    NewMenuEntry->HelpStringToken = HiiSetString (CallbackData->BmmHiiHandle, 0, NewMenuEntry->HelpString, NULL);
 
     LoadOptionPtr += NewLoadContext->FilePathListLength;
 
@@ -703,7 +703,7 @@ BOpt_GetDriverOptions (
   if (DriverOrderList == NULL) {
     return EFI_NOT_FOUND;
   }
-  
+
   for (Index = 0; Index < DriverOrderListSize / sizeof (UINT16); Index++) {
     UnicodeSPrint (
       DriverString,
@@ -767,7 +767,7 @@ BOpt_GetDriverOptions (
       );
 
     NewMenuEntry->HelpString = UiDevicePathToStr (NewLoadContext->FilePathList);
-    NewMenuEntry->HelpStringToken = HiiSetString (CallbackData->BmmHiiHandle, 0, NewMenuEntry->HelpString, NULL); 
+    NewMenuEntry->HelpStringToken = HiiSetString (CallbackData->BmmHiiHandle, 0, NewMenuEntry->HelpString, NULL);
 
     LoadOptionPtr += NewLoadContext->FilePathListLength;
 
@@ -803,29 +803,29 @@ BOpt_GetDriverOptions (
 }
 
 /**
-  Get option number according to Boot#### and BootOrder variable. 
+  Get option number according to Boot#### and BootOrder variable.
   The value is saved as #### + 1.
 
   @param CallbackData    The BMM context data.
 **/
-VOID  
+VOID
 GetBootOrder (
   IN  BMM_CALLBACK_DATA    *CallbackData
   )
 {
   BMM_FAKE_NV_DATA          *BmmConfig;
   UINT16                    Index;
-  UINT16                    OptionOrderIndex; 
+  UINT16                    OptionOrderIndex;
   UINTN                     DeviceType;
   BM_MENU_ENTRY             *NewMenuEntry;
-  BM_LOAD_CONTEXT           *NewLoadContext;  
+  BM_LOAD_CONTEXT           *NewLoadContext;
 
   ASSERT (CallbackData != NULL);
-  
-  DeviceType = (UINTN) -1;   
-  BmmConfig  = &CallbackData->BmmFakeNvData;  
+
+  DeviceType = (UINTN) -1;
+  BmmConfig  = &CallbackData->BmmFakeNvData;
   ZeroMem (BmmConfig->BootOptionOrder, sizeof (BmmConfig->BootOptionOrder));
-  
+
   for (Index = 0, OptionOrderIndex = 0; ((Index < BootOptionMenu.MenuNumber) &&
        (OptionOrderIndex < (sizeof (BmmConfig->BootOptionOrder) / sizeof (BmmConfig->BootOptionOrder[0]))));
        Index++) {
@@ -844,34 +844,34 @@ GetBootOrder (
       }
     }
     BmmConfig->BootOptionOrder[OptionOrderIndex++] = (UINT32) (NewMenuEntry->OptionNumber + 1);
-  }  
+  }
 }
 
 /**
   Get driver option order from globalc DriverOptionMenu.
 
   @param CallbackData    The BMM context data.
-  
+
 **/
-VOID  
+VOID
 GetDriverOrder (
   IN  BMM_CALLBACK_DATA    *CallbackData
   )
 {
   BMM_FAKE_NV_DATA          *BmmConfig;
   UINT16                    Index;
-  UINT16                    OptionOrderIndex; 
+  UINT16                    OptionOrderIndex;
   UINTN                     DeviceType;
   BM_MENU_ENTRY             *NewMenuEntry;
-  BM_LOAD_CONTEXT           *NewLoadContext;  
+  BM_LOAD_CONTEXT           *NewLoadContext;
 
 
   ASSERT (CallbackData != NULL);
-  
-  DeviceType = (UINTN) -1;   
-  BmmConfig  = &CallbackData->BmmFakeNvData;  
+
+  DeviceType = (UINTN) -1;
+  BmmConfig  = &CallbackData->BmmFakeNvData;
   ZeroMem (BmmConfig->DriverOptionOrder, sizeof (BmmConfig->DriverOptionOrder));
-  
+
   for (Index = 0, OptionOrderIndex = 0; ((Index < DriverOptionMenu.MenuNumber) &&
        (OptionOrderIndex < (sizeof (BmmConfig->DriverOptionOrder) / sizeof (BmmConfig->DriverOptionOrder[0]))));
        Index++) {
@@ -890,8 +890,8 @@ GetDriverOrder (
       }
     }
     BmmConfig->DriverOptionOrder[OptionOrderIndex++] = (UINT32) (NewMenuEntry->OptionNumber + 1);
-  }  
-}  
+  }
+}
 
 /**
   Boot the file specified by the input file path info.
@@ -901,7 +901,7 @@ GetDriverOrder (
   @retval TRUE   Exit caller function.
   @retval FALSE  Not exit caller function.
 **/
-BOOLEAN 
+BOOLEAN
 EFIAPI
 BootFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
@@ -982,7 +982,7 @@ ReSendForm(
   @retval TRUE   Exit caller function.
   @retval FALSE  Not exit caller function.
 **/
-BOOLEAN 
+BOOLEAN
 EFIAPI
 CreateBootOptionFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
@@ -1000,7 +1000,7 @@ CreateBootOptionFromFile (
   @retval FALSE  Not exit caller function.
 
 **/
-BOOLEAN 
+BOOLEAN
 EFIAPI
 CreateDriverOptionFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath

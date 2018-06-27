@@ -4,7 +4,7 @@
   This module sets EFI_MEMORY_XP for attributes of EfiACPIMemoryNVS and EfiReservedMemoryType
   in UEFI memory map, if and only of PropertiesTable is published and has BIT0 set.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -130,7 +130,7 @@ UpdateMemoryAttributesDefault (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
-  
+
   ASSERT (PropertiesTable != NULL);
 
   DEBUG ((EFI_D_INFO, "MemoryProtectionAttribute - 0x%016lx\n", PropertiesTable->MemoryProtectionAttribute));

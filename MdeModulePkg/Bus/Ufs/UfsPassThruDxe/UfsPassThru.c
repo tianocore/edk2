@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,7 +18,7 @@
 //
 UFS_PASS_THRU_PRIVATE_DATA gUfsPassThruTemplate = {
   UFS_PASS_THRU_SIG,              // Signature
-  NULL,                           // Handle  
+  NULL,                           // Handle
   {                               // ExtScsiPassThruMode
     0xFFFFFFFF,
     EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_PHYSICAL | EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_LOGICAL | EFI_EXT_SCSI_PASS_THRU_ATTRIBUTES_NONBLOCKIO,
@@ -209,7 +209,7 @@ UfsPassThruPassThru (
     if ((Private->Luns.BitMask & (BIT0 << Index)) == 0) {
       continue;
     }
-  
+
     if (Private->Luns.Lun[Index] == UfsLun) {
       break;
     }
@@ -413,7 +413,7 @@ UfsPassThruBuildDevicePath (
     if ((Private->Luns.BitMask & (BIT0 << Index)) == 0) {
       continue;
     }
-  
+
     if (Private->Luns.Lun[Index] == UfsLun) {
       break;
     }
@@ -504,7 +504,7 @@ UfsPassThruGetTargetLun (
     if ((Private->Luns.BitMask & (BIT0 << Index)) == 0) {
       continue;
     }
-  
+
     if (Private->Luns.Lun[Index] == UfsLun) {
       break;
     }
@@ -730,7 +730,7 @@ UfsPassThruDriverBindingSupported (
         This->DriverBindingHandle,
         Controller
         );
-        
+
   return EFI_SUCCESS;
 }
 
@@ -883,8 +883,8 @@ UfsPassThruDriverBindingStart (
 
   //
   // UFS 2.0 spec Section 13.1.3.3:
-  // At the end of the UFS Interconnect Layer initialization on both host and device side, 
-  // the host shall send a NOP OUT UPIU to verify that the device UTP Layer is ready. 
+  // At the end of the UFS Interconnect Layer initialization on both host and device side,
+  // the host shall send a NOP OUT UPIU to verify that the device UTP Layer is ready.
   //
   Status = UfsExecNopCmds (Private);
   if (EFI_ERROR (Status)) {
@@ -955,7 +955,7 @@ UfsPassThruDriverBindingStart (
 Error:
   if (Private != NULL) {
     if (Private->TmrlMapping != NULL) {
-      UfsHc->Unmap (UfsHc, Private->TmrlMapping);  
+      UfsHc->Unmap (UfsHc, Private->TmrlMapping);
     }
     if (Private->UtpTmrlBase != NULL) {
       UfsHc->FreeBuffer (UfsHc, EFI_SIZE_TO_PAGES (Private->Nutmrs * sizeof (UTP_TMRD)), Private->UtpTmrlBase);

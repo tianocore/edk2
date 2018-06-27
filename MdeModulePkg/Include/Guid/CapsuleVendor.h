@@ -5,17 +5,17 @@
   * the capsule GUID HOB data structure.
   The capsule HOB and variable can be used to store the capsule image start address and length.
   They are used by EDKII implementation of capsule update across a system reset.
-  
+
   @par Note: EDKII implementation of capsule updating has discarded this capsule GUID HOB data
              structure and used one UEFI Capsule HOB (defined in PI Specification 1.2) instead.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -24,10 +24,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __EFI_CAPSULE_VENDOR_GUID_H__
 
 ///
-/// This guid is used as a variable GUID for the capsule variable 
+/// This guid is used as a variable GUID for the capsule variable
 /// if the capsule pointer is passed through reset via a variable.
 ///
-/// This guid is also used as a hob GUID for the capsule data 
+/// This guid is also used as a hob GUID for the capsule data
 /// when the capsule pointer is passed from PEI phase to DXE phase.
 ///
 #define EFI_CAPSULE_VENDOR_GUID  \
@@ -35,12 +35,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 ///
 /// Name of capsule variable.
-/// 
+///
 #define EFI_CAPSULE_VARIABLE_NAME L"CapsuleUpdateData"
 
 ///
 /// The data structure of the capsule guid hob entry.
-/// Note: EDKII implementation has discarded this structure and used 
+/// Note: EDKII implementation has discarded this structure and used
 ///       UEFI_CAPSULE_HOB instead.
 ///
 typedef struct {

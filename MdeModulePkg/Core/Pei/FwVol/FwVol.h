@@ -1,14 +1,14 @@
 /** @file
   The internal header file for firmware volume related definitions.
-  
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -43,15 +43,15 @@ typedef struct {
   buffer which contains the necessary information for creating
   the firmware volume handle. Normally, these values are derived
   from the EFI_FIRMWARE_VOLUME_INFO_PPI.
-  
-  
+
+
   @param This                   Points to this instance of the
                                 EFI_PEI_FIRMWARE_VOLUME_PPI.
   @param Buffer                 Points to the start of the buffer.
   @param BufferSize             Size of the buffer.
   @param FvHandle               Points to the returned firmware volume
                                 handle. The firmware volume handle must
-                                be unique within the system. 
+                                be unique within the system.
 
   @retval EFI_SUCCESS           Firmware volume handle created.
   @retval EFI_VOLUME_CORRUPTED  Volume was corrupt.
@@ -65,11 +65,11 @@ PeiFfsFvPpiProcessVolume (
   IN  UINTN                              BufferSize,
   OUT EFI_PEI_FV_HANDLE                  *FvHandle
   );
-  
+
 /**
   Finds the next file of the specified type.
 
-  This service enables PEI modules to discover additional firmware files. 
+  This service enables PEI modules to discover additional firmware files.
   The FileHandle must be unique within the system.
 
   @param This           Points to this instance of the
@@ -87,7 +87,7 @@ PeiFfsFvPpiProcessVolume (
   @retval EFI_SUCCESS   The file was found.
   @retval EFI_NOT_FOUND The file was not found. FileHandle contains NULL.
 
-**/  
+**/
 EFI_STATUS
 EFIAPI
 PeiFfsFvPpiFindFileByType (
@@ -98,8 +98,8 @@ PeiFfsFvPpiFindFileByType (
   );
 
 /**
-  Find a file within a volume by its name. 
-  
+  Find a file within a volume by its name.
+
   This service searches for files with a specific name, within
   either the specified firmware volume or all firmware volumes.
 
@@ -121,22 +121,22 @@ PeiFfsFvPpiFindFileByType (
                                 FileName was NULL.
 
 
-**/    
+**/
 EFI_STATUS
 EFIAPI
 PeiFfsFvPpiFindFileByName (
   IN  CONST  EFI_PEI_FIRMWARE_VOLUME_PPI *This,
   IN  CONST  EFI_GUID                    *FileName,
   IN  EFI_PEI_FV_HANDLE                  *FvHandle,
-  OUT EFI_PEI_FILE_HANDLE                *FileHandle  
+  OUT EFI_PEI_FILE_HANDLE                *FileHandle
   );
 
 /**
   Find the next matching section in the firmware file.
-  
+
   This service enables PEI modules to discover sections
   of a given type within a valid file.
-  
+
   @param This             Points to this instance of the
                           EFI_PEI_FIRMWARE_VOLUME_PPI.
   @param SearchType       A filter to find only sections of this
@@ -145,11 +145,11 @@ PeiFfsFvPpiFindFileByName (
                           search.
   @param SectionData      Updated upon  return to point to the
                           section found.
-  
+
   @retval EFI_SUCCESS     Section was found.
   @retval EFI_NOT_FOUND   Section of the specified type was not
                           found. SectionData contains NULL.
-**/      
+**/
 EFI_STATUS
 EFIAPI
 PeiFfsFvPpiFindSectionByType (
@@ -198,8 +198,8 @@ PeiFfsFvPpiFindSectionByType2 (
 
   This function returns information about a specific
   file, including its file name, type, attributes, starting
-  address and size. 
-   
+  address and size.
+
   @param This                     Points to this instance of the
                                   EFI_PEI_FIRMWARE_VOLUME_PPI.
   @param FileHandle               Handle of the file.
@@ -210,13 +210,13 @@ PeiFfsFvPpiFindSectionByType2 (
   @retval EFI_INVALID_PARAMETER   If FileHandle does not
                                   represent a valid file.
   @retval EFI_INVALID_PARAMETER   If FileInfo is NULL.
-  
-**/         
+
+**/
 EFI_STATUS
 EFIAPI
 PeiFfsFvPpiGetFileInfo (
-  IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI   *This, 
-  IN        EFI_PEI_FILE_HANDLE           FileHandle, 
+  IN  CONST EFI_PEI_FIRMWARE_VOLUME_PPI   *This,
+  IN        EFI_PEI_FILE_HANDLE           FileHandle,
   OUT       EFI_FV_FILE_INFO              *FileInfo
   );
 
@@ -249,7 +249,7 @@ PeiFfsFvPpiGetFileInfo2 (
 
 /**
   This function returns information about the firmware volume.
-  
+
   @param This                     Points to this instance of the
                                   EFI_PEI_FIRMWARE_VOLUME_PPI.
   @param FvHandle                 Handle to the firmware handle.
@@ -260,28 +260,28 @@ PeiFfsFvPpiGetFileInfo2 (
   @retval EFI_INVALID_PARAMETER   FvHandle does not indicate a valid
                                   firmware volume or VolumeInfo is NULL.
 
-**/            
+**/
 EFI_STATUS
 EFIAPI
 PeiFfsFvPpiGetVolumeInfo (
-  IN  CONST  EFI_PEI_FIRMWARE_VOLUME_PPI   *This, 
-  IN  EFI_PEI_FV_HANDLE                    FvHandle, 
+  IN  CONST  EFI_PEI_FIRMWARE_VOLUME_PPI   *This,
+  IN  EFI_PEI_FV_HANDLE                    FvHandle,
   OUT EFI_FV_INFO                          *VolumeInfo
   );
 
 /**
   Convert the handle of FV to pointer of corresponding PEI_CORE_FV_HANDLE.
-  
+
   @param FvHandle   The handle of a FV.
-  
+
   @retval NULL if can not find.
-  @return Pointer of corresponding PEI_CORE_FV_HANDLE. 
+  @return Pointer of corresponding PEI_CORE_FV_HANDLE.
 **/
 PEI_CORE_FV_HANDLE *
 FvHandleToCoreHandle (
   IN EFI_PEI_FV_HANDLE  FvHandle
   );
-  
+
 /**
   Given the input file pointer, search for the next matching file in the
   FFS volume as defined by SearchType. The search starts from FileHeader inside
@@ -310,17 +310,17 @@ FindFileEx (
 
 /**
   Report the information for a new discoveried FV in unknown format.
-  
+
   If the EFI_PEI_FIRMWARE_VOLUME_PPI has not been installed for specifical FV format, but
   the FV in this FV format has been discoveried, then the information of this FV
   will be cached into PEI_CORE_INSTANCE's UnknownFvInfo array.
   Also a notification would be installed for unknown FV format guid, if EFI_PEI_FIRMWARE_VOLUME_PPI
   is installed later by platform's PEIM, the original unknown FV will be processed by
   using new installed EFI_PEI_FIRMWARE_VOLUME_PPI.
-  
+
   @param PrivateData  Point to instance of PEI_CORE_INSTANCE
   @param FvInfo2Ppi   Point to FvInfo2 PPI.
-  
+
   @retval EFI_OUT_OF_RESOURCES  The FV info array in PEI_CORE_INSTANCE has no more spaces.
   @retval EFI_SUCCESS           Success to add the information for unknown FV.
 **/
@@ -329,19 +329,19 @@ AddUnknownFormatFvInfo (
   IN PEI_CORE_INSTANCE                  *PrivateData,
   IN EFI_PEI_FIRMWARE_VOLUME_INFO2_PPI  *FvInfo2Ppi
   );
-  
+
 /**
   Find the FV information according to FV format guid.
-  
+
   This routine also will remove the FV information found by given FV format guid from
   PrivateData->UnknownFvInfo[].
-  
+
   @param PrivateData      Point to instance of PEI_CORE_INSTANCE
   @param Format           Point to given FV format guid
   @param FvInfo           On return, the pointer of FV information buffer in given FV format guid
   @param FvInfoSize       On return, the size of FV information buffer.
   @param AuthenticationStatus On return, the authentication status of FV information buffer.
-  
+
   @retval EFI_NOT_FOUND  The FV is not found for new installed EFI_PEI_FIRMWARE_VOLUME_PPI
   @retval EFI_SUCCESS    Success to find a FV which could be processed by new installed EFI_PEI_FIRMWARE_VOLUME_PPI.
 **/
@@ -353,17 +353,17 @@ FindUnknownFormatFvInfo (
   OUT UINT32            *FvInfoSize,
   OUT UINT32            *AuthenticationStatus
   );
-  
+
 /**
   Notification callback function for EFI_PEI_FIRMWARE_VOLUME_PPI.
-  
-  When a EFI_PEI_FIRMWARE_VOLUME_PPI is installed to support new FV format, this 
+
+  When a EFI_PEI_FIRMWARE_VOLUME_PPI is installed to support new FV format, this
   routine is called to process all discoveried FVs in this format.
-  
+
   @param PeiServices       An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation
   @param NotifyDescriptor  Address of the notification descriptor data structure.
   @param Ppi               Address of the PPI that was installed.
-  
+
   @retval EFI_SUCCESS  The notification callback is processed correctly.
 **/
 EFI_STATUS
@@ -372,6 +372,6 @@ ThirdPartyFvPpiNotifyCallback (
   IN EFI_PEI_SERVICES              **PeiServices,
   IN EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor,
   IN VOID                          *Ppi
-  );  
-  
-#endif 
+  );
+
+#endif

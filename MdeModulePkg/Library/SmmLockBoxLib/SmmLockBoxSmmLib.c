@@ -201,7 +201,7 @@ SmmLockBoxEndOfS3ResumeNotify (
   @param[in] ImageHandle  Image handle of this driver.
   @param[in] SystemTable  A Pointer to the EFI System Table.
 
-  @retval EFI_SUCEESS     
+  @retval EFI_SUCEESS
   @return Others          Some error occurs.
 **/
 EFI_STATUS
@@ -666,7 +666,7 @@ UpdateLockBox (
 
   @retval RETURN_SUCCESS            the information is restored successfully.
   @retval RETURN_INVALID_PARAMETER  the Guid is NULL, or one of Buffer and Length is NULL.
-  @retval RETURN_WRITE_PROTECTED    Buffer and Length are NULL, but the LockBox has no 
+  @retval RETURN_WRITE_PROTECTED    Buffer and Length are NULL, but the LockBox has no
                                     LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE attribute.
   @retval RETURN_BUFFER_TOO_SMALL   the Length is too small to hold the confidential information.
   @retval RETURN_NOT_FOUND          the requested GUID not found.

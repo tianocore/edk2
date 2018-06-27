@@ -682,7 +682,7 @@ Ip4ConfigProtocol (
     //
     if (IpSb->State == IP4_SERVICE_UNSTARTED) {
       //
-      // Trigger the EFI_IP4_CONFIG2_PROTOCOL to retrieve the 
+      // Trigger the EFI_IP4_CONFIG2_PROTOCOL to retrieve the
       // default IPv4 address if it is not available yet.
       //
       Policy = IpSb->Ip4Config2Instance.Policy;
@@ -1048,11 +1048,11 @@ Ip4Groups (
   // is decreamented each time an address is removed..
   //
   for (Index = IpInstance->GroupCount; Index > 0 ; Index--) {
-    Group = 0;  	
+    Group = 0;
     if(IpInstance->Groups != NULL) {
-  	  Group = IpInstance->Groups[Index - 1];
-  	}
-  	
+      Group = IpInstance->Groups[Index - 1];
+    }
+
     if ((GroupAddress == NULL) || EFI_IP4_EQUAL (&Group, GroupAddress)) {
       if (EFI_ERROR (Ip4LeaveGroup (IpInstance, NTOHL (Group)))) {
         return EFI_DEVICE_ERROR;
@@ -1663,7 +1663,7 @@ EfiIp4Transmit (
     }
 
     RawHdrLen = (UINT8) (RawHdrLen << 2);
-    
+
     CopyMem (&Head, FirstFragment, IP4_MIN_HEADLEN);
 
     Ip4NtohHead (&Head);
@@ -2253,8 +2253,8 @@ Ip4SentPacketTicking (
 }
 
 /**
-  This heart beat timer of IP4 service instance times out all of its IP4 children's 
-  received-but-not-delivered and transmitted-but-not-recycle packets, and provides 
+  This heart beat timer of IP4 service instance times out all of its IP4 children's
+  received-but-not-delivered and transmitted-but-not-recycle packets, and provides
   time input for its IGMP protocol.
 
   @param[in]  Event                  The IP4 service instance's heart beat timer.
@@ -2272,17 +2272,17 @@ Ip4TimerTicking (
 
   IpSb = (IP4_SERVICE *) Context;
   NET_CHECK_SIGNATURE (IpSb, IP4_SERVICE_SIGNATURE);
-  
+
   Ip4PacketTimerTicking (IpSb);
   Ip4IgmpTicking (IpSb);
 }
 
 /**
-  This dedicated timer is used to poll underlying network media status. In case 
-  of cable swap or wireless network switch, a new round auto configuration will 
-  be initiated. The timer will signal the IP4 to run DHCP configuration again. 
-  IP4 driver will free old IP address related resource, such as route table and 
-  Interface, then initiate a DHCP process to acquire new IP, eventually create 
+  This dedicated timer is used to poll underlying network media status. In case
+  of cable swap or wireless network switch, a new round auto configuration will
+  be initiated. The timer will signal the IP4 to run DHCP configuration again.
+  IP4 driver will free old IP address related resource, such as route table and
+  Interface, then initiate a DHCP process to acquire new IP, eventually create
   route table for new IP address.
 
   @param[in]  Event                  The IP4 service instance's heart beat timer.
@@ -2303,12 +2303,12 @@ Ip4TimerReconfigChecking (
 
   IpSb = (IP4_SERVICE *) Context;
   NET_CHECK_SIGNATURE (IpSb, IP4_SERVICE_SIGNATURE);
-  
+
   OldMediaPresent = IpSb->MediaPresent;
 
   //
-  // Get fresh mode data from MNP, since underlying media status may change. 
-  // Here, it needs to mention that the MediaPresent can also be checked even if 
+  // Get fresh mode data from MNP, since underlying media status may change.
+  // Here, it needs to mention that the MediaPresent can also be checked even if
   // EFI_NOT_STARTED returned while this MNP child driver instance isn't configured.
   //
   Status = IpSb->Mnp->GetModeData (IpSb->Mnp, NULL, &SnpModeData);
@@ -2323,8 +2323,8 @@ Ip4TimerReconfigChecking (
   if (!OldMediaPresent && IpSb->MediaPresent && (IpSb->Ip4Config2Instance.Policy == Ip4Config2PolicyDhcp)) {
     //
     // Signal the IP4 to run the dhcp configuration again. IP4 driver will free
-    // old IP address related resource, such as route table and Interface, then 
-    // initiate a DHCP round to acquire new IP, eventually 
+    // old IP address related resource, such as route table and Interface, then
+    // initiate a DHCP round to acquire new IP, eventually
     // create route table for new IP address.
     //
     if (IpSb->ReconfigEvent != NULL) {

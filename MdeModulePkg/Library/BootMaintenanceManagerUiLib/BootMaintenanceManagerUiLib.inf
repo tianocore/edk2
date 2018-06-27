@@ -1,15 +1,15 @@
 ## @file
 #  Boot Maintenance Manager Library used by UiApp.
 #
-#  Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials are licensed and made available under
 #  the terms and conditions of the BSD License that accompanies this distribution.
 #  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php.
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 ##
 [Defines]
   INF_VERSION                    = 0x00010005
@@ -62,7 +62,7 @@
   UefiHiiServicesLib
   UefiBootManagerLib
   FileExplorerLib
-  
+
 [Guids]
   gEfiGlobalVariableGuid                        ## SOMETIMES_PRODUCES ## Variable:L"BootNext" (The number of next boot option)
                                                 ## SOMETIMES_PRODUCES ## Variable:L"BootXX" (Boot option variable)
@@ -82,7 +82,7 @@
   gEfiIfrTianoGuid                              ## SOMETIMES_CONSUMES ## GUID (Extended IFR Guid Opcode)
   gEfiIfrFrontPageGuid                          ## CONSUMES ## GUID
   gEfiIfrBootMaintenanceGuid                    ## CONSUMES ## GUID
- 
+
 [Protocols]
   gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
   gEfiLoadFileProtocolGuid                      ## CONSUMES

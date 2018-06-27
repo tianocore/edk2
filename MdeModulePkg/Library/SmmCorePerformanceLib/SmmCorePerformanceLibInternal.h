@@ -14,7 +14,7 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
-  
+
 #ifndef _SMM_CORE_PERFORMANCE_LIB_INTERNAL_H_
 #define _SMM_CORE_PERFORMANCE_LIB_INTERNAL_H_
 
@@ -33,7 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseMemoryLib.h>
 #include <Library/TimerLib.h>
 #include <Library/PcdLib.h>
-#include <Library/UefiLib.h>                   
+#include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/SynchronizationLib.h>

@@ -2,7 +2,7 @@
   UfsPciHcPei driver is used to provide platform-dependent info, mainly UFS host controller
   MMIO base, to upper layer UFS drivers.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -53,7 +53,7 @@ GetUfsHcMmioBar (
   if (ControllerId >= Private->TotalUfsHcs) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   *MmioBar = (UINTN)Private->UfsHcPciAddr[ControllerId];
 
   return EFI_SUCCESS;
@@ -61,7 +61,7 @@ GetUfsHcMmioBar (
 
 /**
   The user code starts with this function.
-  
+
   @param  FileHandle             Handle of the file being invoked.
   @param  PeiServices            Describes the list of possible PEI Services.
 

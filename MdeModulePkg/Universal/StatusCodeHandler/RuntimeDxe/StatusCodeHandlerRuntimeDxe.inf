@@ -1,7 +1,7 @@
 ## @file
 #  Status Code Handler Driver which produces general handlers and hook them onto the DXE status code router.
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #
 #  This program and the accompanying materials
@@ -51,7 +51,7 @@
   ReportStatusCodeLib
   DebugLib
   BaseMemoryLib
-  
+
 [Guids]
   ## SOMETIMES_CONSUMES   ## HOB
   ## SOMETIMES_PRODUCES   ## SystemTable

@@ -2,13 +2,13 @@
   SMM Core Main Entry Point
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials are licensed and made available 
-  under the terms and conditions of the BSD License which accompanies this 
-  distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -65,7 +65,7 @@ EFI_SMM_SYSTEM_TABLE2  gSmmCoreSmst = {
 
 //
 // Flag to determine if the platform has performed a legacy boot.
-// If this flag is TRUE, then the runtime code and runtime data associated with the 
+// If this flag is TRUE, then the runtime code and runtime data associated with the
 // SMM IPL are converted to free memory, so the SMM Core must guarantee that is
 // does not touch of the code/data associated with the SMM IPL if this flag is TRUE.
 //
@@ -82,7 +82,7 @@ BOOLEAN  mDuringS3Resume = FALSE;
 //
 SMM_CORE_SMI_HANDLERS  mSmmCoreSmiHandlers[] = {
   { SmmDriverDispatchHandler,   &gEfiEventDxeDispatchGuid,           NULL, TRUE  },
-  { SmmReadyToLockHandler,      &gEfiDxeSmmReadyToLockProtocolGuid,  NULL, TRUE }, 
+  { SmmReadyToLockHandler,      &gEfiDxeSmmReadyToLockProtocolGuid,  NULL, TRUE },
   { SmmLegacyBootHandler,       &gEfiEventLegacyBootGuid,            NULL, FALSE },
   { SmmExitBootServicesHandler, &gEfiEventExitBootServicesGuid,      NULL, FALSE },
   { SmmReadyToBootHandler,      &gEfiEventReadyToBootGuid,           NULL, FALSE },
@@ -132,7 +132,7 @@ SmmEfiNotAvailableYetArg5 (
 
 /**
   Software SMI handler that is called when a Legacy Boot event is signalled.  The SMM
-  Core uses this signal to know that a Legacy Boot has been performed and that 
+  Core uses this signal to know that a Legacy Boot has been performed and that
   gSmmCorePrivate that is shared between the UEFI and SMM execution environments can
   not be accessed from SMM anymore since that structure is considered free memory by
   a legacy OS. Then the SMM Core also install SMM Legacy Boot protocol to notify SMM
@@ -316,9 +316,9 @@ SmmReadyToBootHandler (
 
 /**
   Software SMI handler that is called when the DxeSmmReadyToLock protocol is added
-  or if gEfiEventReadyToBootGuid is signalled.  This function unregisters the 
-  Software SMIs that are nor required after SMRAM is locked and installs the 
-  SMM Ready To Lock Protocol so SMM Drivers are informed that SMRAM is about 
+  or if gEfiEventReadyToBootGuid is signalled.  This function unregisters the
+  Software SMIs that are nor required after SMRAM is locked and installs the
+  SMM Ready To Lock Protocol so SMM Drivers are informed that SMRAM is about
   to be locked.  It also verifies the SMM CPU I/O 2 Protocol has been installed
   and NULLs gBS and gST because they can not longer be used after SMRAM is locked.
 
@@ -676,7 +676,7 @@ SmmEntryPoint (
     gSmmCorePrivate->InSmm = TRUE;
 
     //
-    // Check to see if this is a Synchronous SMI sent through the SMM Communication 
+    // Check to see if this is a Synchronous SMI sent through the SMM Communication
     // Protocol or an Asynchronous SMI
     //
     CommunicationBuffer = gSmmCorePrivate->CommunicationBuffer;
@@ -703,9 +703,9 @@ SmmEntryPoint (
         CommunicateHeader = (EFI_SMM_COMMUNICATE_HEADER *)CommunicationBuffer;
         BufferSize -= OFFSET_OF (EFI_SMM_COMMUNICATE_HEADER, Data);
         Status = SmiManage (
-                   &CommunicateHeader->HeaderGuid, 
-                   NULL, 
-                   CommunicateHeader->Data, 
+                   &CommunicateHeader->HeaderGuid,
+                   NULL,
+                   CommunicateHeader->Data,
                    &BufferSize
                    );
         //
@@ -723,7 +723,7 @@ SmmEntryPoint (
   // Process Asynchronous SMI sources
   //
   SmiManage (NULL, NULL, NULL, NULL);
-  
+
   //
   // Call platform hook after Smm Dispatch
   //
@@ -826,7 +826,7 @@ SmmCoreInstallLoadedImage (
 /**
   The Entry Point for SMM Core
 
-  Install DXE Protocols and reload SMM Core into SMRAM and register SMM Core 
+  Install DXE Protocols and reload SMM Core into SMRAM and register SMM Core
   EntryPoint on the SMI vector.
 
   Note: This function is called for both DXE invocation and SMRAM invocation.

@@ -2,7 +2,7 @@
   This module install ACPI Firmware Performance Data Table (FPDT).
 
   This module register report status code listener to collect performance data
-  for Firmware Basic Boot Performance Record and other boot performance records, 
+  for Firmware Basic Boot Performance Record and other boot performance records,
   and install FPDT to ACPI table.
 
   Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -438,7 +438,7 @@ FpdtStatusCodeListenerDxe (
   if ((CodeType & EFI_STATUS_CODE_TYPE_MASK) != EFI_PROGRESS_CODE) {
     return EFI_UNSUPPORTED;
   }
-  
+
   if (Value == (EFI_SOFTWARE_DXE_CORE | EFI_SW_DXE_CORE_PC_HANDOFF_TO_NEXT)) {
     //
     // DxeCore ReportStatusCode Enable so that the capability can be supported.
@@ -552,7 +552,7 @@ FpdtExitBootServicesEventNotify (
 {
   if (!mDxeCoreReportStatusCodeEnable) {
     //
-    // When DxeCore Report Status Code is disabled, 
+    // When DxeCore Report Status Code is disabled,
     // Unregister boot time report status code listener at ExitBootService Event.
     //
     mRscHandlerProtocol->Unregister (FpdtStatusCodeListenerDxe);

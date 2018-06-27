@@ -2,7 +2,7 @@
   This module contains EBC support routines that are customized based on
   the target x64 processor.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -44,7 +44,7 @@ UINT8  mInstructionBufferTemplate[] = {
   // These 8 bytes of the thunk entry is the address of the EBC
   // entry point.
   //
-  0x49, 0xBA, 
+  0x49, 0xBA,
     (UINT8)(EBC_ENTRYPOINT_SIGNATURE & 0xFF),
     (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 8) & 0xFF),
     (UINT8)((EBC_ENTRYPOINT_SIGNATURE >> 16) & 0xFF),

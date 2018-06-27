@@ -2,7 +2,7 @@
   This library is only intended to be used by PlatformBootManagerLib
   to show progress bar and LOGO.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2016, Microsoft Corporation<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
@@ -292,7 +292,7 @@ BootLogoEnableLogo (
     Status = EFI_SUCCESS;
   } else {
     //
-    // More than one Logo displayed, get merged BltBuffer using VideoToBuffer operation. 
+    // More than one Logo displayed, get merged BltBuffer using VideoToBuffer operation.
     //
     if (Blt != NULL) {
       FreePool (Blt);
@@ -366,7 +366,7 @@ BootLogoEnableLogo (
 }
 
 /**
-  Use SystemTable Conout to turn on video based Simple Text Out consoles. The 
+  Use SystemTable Conout to turn on video based Simple Text Out consoles. The
   Simple Text Out screens will now be synced up with all non video output devices
 
   @retval EFI_SUCCESS     UGA devices are back in text mode and synced up.

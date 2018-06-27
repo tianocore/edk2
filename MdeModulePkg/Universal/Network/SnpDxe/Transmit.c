@@ -1,11 +1,11 @@
 /** @file
     Implementation of transmitting a packet.
- 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed 
-and made available under the terms and conditions of the BSD License which 
-accompanies this distribution. The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php 
+
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed
+and made available under the terms and conditions of the BSD License which
+accompanies this distribution. The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -221,45 +221,45 @@ PxeTransmit (
 
 /**
   Places a packet in the transmit queue of a network interface.
-  
+
   This function places the packet specified by Header and Buffer on the transmit
-  queue. If HeaderSize is nonzero and HeaderSize is not equal to 
-  This->Mode->MediaHeaderSize, then EFI_INVALID_PARAMETER will be returned. If 
+  queue. If HeaderSize is nonzero and HeaderSize is not equal to
+  This->Mode->MediaHeaderSize, then EFI_INVALID_PARAMETER will be returned. If
   BufferSize is less than This->Mode->MediaHeaderSize, then EFI_BUFFER_TOO_SMALL
-  will be returned. If Buffer is NULL, then EFI_INVALID_PARAMETER will be 
+  will be returned. If Buffer is NULL, then EFI_INVALID_PARAMETER will be
   returned. If HeaderSize is nonzero and DestAddr or Protocol is NULL, then
   EFI_INVALID_PARAMETER will be returned. If the transmit engine of the network
-  interface is busy, then EFI_NOT_READY will be returned. If this packet can be 
-  accepted by the transmit engine of the network interface, the packet contents 
-  specified by Buffer will be placed on the transmit queue of the network 
-  interface, and EFI_SUCCESS will be returned. GetStatus() can be used to 
-  determine when the packet has actually been transmitted. The contents of the 
-  Buffer must not be modified until the packet has actually been transmitted. 
+  interface is busy, then EFI_NOT_READY will be returned. If this packet can be
+  accepted by the transmit engine of the network interface, the packet contents
+  specified by Buffer will be placed on the transmit queue of the network
+  interface, and EFI_SUCCESS will be returned. GetStatus() can be used to
+  determine when the packet has actually been transmitted. The contents of the
+  Buffer must not be modified until the packet has actually been transmitted.
   The Transmit() function performs nonblocking I/O. A caller who wants to perform
-  blocking I/O, should call Transmit(), and then GetStatus() until the 
+  blocking I/O, should call Transmit(), and then GetStatus() until the
   transmitted buffer shows up in the recycled transmit buffer.
   If the driver has not been initialized, EFI_DEVICE_ERROR will be returned.
 
   @param This       A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
-  @param HeaderSize The size, in bytes, of the media header to be filled in by the 
+  @param HeaderSize The size, in bytes, of the media header to be filled in by the
                     Transmit() function. If HeaderSize is nonzero, then it must
                     be equal to This->Mode->MediaHeaderSize and the DestAddr and
                     Protocol parameters must not be NULL.
   @param BufferSize The size, in bytes, of the entire packet (media header and
                     data) to be transmitted through the network interface.
-  @param Buffer     A pointer to the packet (media header followed by data) to be 
-                    transmitted. This parameter cannot be NULL. If HeaderSize is 
+  @param Buffer     A pointer to the packet (media header followed by data) to be
+                    transmitted. This parameter cannot be NULL. If HeaderSize is
                     zero, then the media header in Buffer must already be filled
-                    in by the caller. If HeaderSize is nonzero, then the media 
+                    in by the caller. If HeaderSize is nonzero, then the media
                     header will be filled in by the Transmit() function.
-  @param SrcAddr    The source HW MAC address. If HeaderSize is zero, then this 
-                    parameter is ignored. If HeaderSize is nonzero and SrcAddr 
-                    is NULL, then This->Mode->CurrentAddress is used for the 
+  @param SrcAddr    The source HW MAC address. If HeaderSize is zero, then this
+                    parameter is ignored. If HeaderSize is nonzero and SrcAddr
+                    is NULL, then This->Mode->CurrentAddress is used for the
                     source HW MAC address.
-  @param DestAddr   The destination HW MAC address. If HeaderSize is zero, then 
+  @param DestAddr   The destination HW MAC address. If HeaderSize is zero, then
                     this parameter is ignored.
-  @param Protocol   The type of header to build. If HeaderSize is zero, then this 
-                    parameter is ignored. See RFC 1700, section "Ether Types," 
+  @param Protocol   The type of header to build. If HeaderSize is zero, then this
+                    parameter is ignored. See RFC 1700, section "Ether Types,"
                     for examples.
 
   @retval EFI_SUCCESS           The packet was placed on the transmit queue.

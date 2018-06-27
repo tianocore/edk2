@@ -140,7 +140,7 @@ PciBusDriverBindingSupported (
   //
   if (RemainingDevicePath != NULL) {
     //
-    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // Check if RemainingDevicePath is the End of Device Path Node,
     // if yes, go on checking other conditions
     //
     if (!IsDevicePathEnd (RemainingDevicePath)) {
@@ -254,7 +254,7 @@ PciBusDriverBindingStart (
   //
   if (RemainingDevicePath != NULL) {
     //
-    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // Check if RemainingDevicePath is the End of Device Path Node,
     // if yes, return EFI_SUCCESS
     //
     if (IsDevicePathEnd (RemainingDevicePath)) {
@@ -282,14 +282,14 @@ PciBusDriverBindingStart (
   //
   // If PCI Platform protocol doesn't exist, try to Pci Override Protocol.
   //
-  if (gPciPlatformProtocol == NULL) { 
+  if (gPciPlatformProtocol == NULL) {
     gPciOverrideProtocol = NULL;
     gBS->LocateProtocol (
           &gEfiPciOverrideProtocolGuid,
           NULL,
           (VOID **) &gPciOverrideProtocol
           );
-  }  
+  }
 
   if (mIoMmuProtocol == NULL) {
     gBS->LocateProtocol (
@@ -315,7 +315,7 @@ PciBusDriverBindingStart (
                   This->DriverBindingHandle,
                   Controller,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
-                  );  
+                  );
   ASSERT_EFI_ERROR (Status);
 
   //

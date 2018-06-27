@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -237,7 +237,7 @@ InternalGetSmmLockBoxContext (
   @param Length the length of the restored confidential information
 
   @retval RETURN_SUCCESS            the information is restored successfully.
-  @retval RETURN_WRITE_PROTECTED    Buffer and Length are NULL, but the LockBox has no 
+  @retval RETURN_WRITE_PROTECTED    Buffer and Length are NULL, but the LockBox has no
                                     LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE attribute.
   @retval RETURN_BUFFER_TOO_SMALL   the Length is too small to hold the confidential information.
   @retval RETURN_NOT_FOUND          the requested GUID not found.
@@ -509,7 +509,7 @@ UpdateLockBox (
 
   @retval RETURN_SUCCESS            the information is restored successfully.
   @retval RETURN_INVALID_PARAMETER  the Guid is NULL, or one of Buffer and Length is NULL.
-  @retval RETURN_WRITE_PROTECTED    Buffer and Length are NULL, but the LockBox has no 
+  @retval RETURN_WRITE_PROTECTED    Buffer and Length are NULL, but the LockBox has no
                                     LOCK_BOX_ATTRIBUTE_RESTORE_IN_PLACE attribute.
   @retval RETURN_BUFFER_TOO_SMALL   the Length is too small to hold the confidential information.
   @retval RETURN_NOT_FOUND          the requested GUID not found.

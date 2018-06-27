@@ -1,14 +1,14 @@
 /** @file
-  OEM hook status code library. Platform can implement an instance to 
+  OEM hook status code library. Platform can implement an instance to
   initialize the OEM devices to report status code information.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -22,7 +22,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
   @return    Status of initialization of OEM status code device.
- 
+
 **/
 EFI_STATUS
 EFIAPI
@@ -32,36 +32,36 @@ OemHookStatusCodeInitialize (
 
 /**
   Report status code to OEM device.
- 
-  @param  CodeType      Indicates the type of status code being reported.  
- 
-  @param  Value         Describes the current status of a hardware or software entity.  
-                        This includes both an operation and classification information 
+
+  @param  CodeType      Indicates the type of status code being reported.
+
+  @param  Value         Describes the current status of a hardware or software entity.
+                        This includes both an operation and classification information
                         about the class and subclass.
-                        For progress codes, the operation is the current activity. 
-                        For error codes, it is the exception.  For debug codes, 
-                        it is not defined at this time. 
-                        Specific values are discussed in the Intel Platform Innovation 
+                        For progress codes, the operation is the current activity.
+                        For error codes, it is the exception.  For debug codes,
+                        it is not defined at this time.
+                        Specific values are discussed in the Intel Platform Innovation
                         Framework for EFI Status Code Specification.
- 
-  @param  Instance      The enumeration of a hardware or software entity within the system.  
-                        A system may contain multiple entities that match a class/subclass 
-                        pairing. 
-                        The instance differentiates between them.  An instance of 0 
-                        indicates that instance information is unavailable, 
-                        not meaningful, or not relevant.  Valid instance numbers 
+
+  @param  Instance      The enumeration of a hardware or software entity within the system.
+                        A system may contain multiple entities that match a class/subclass
+                        pairing.
+                        The instance differentiates between them.  An instance of 0
+                        indicates that instance information is unavailable,
+                        not meaningful, or not relevant.  Valid instance numbers
                         start with 1.
 
 
-  @param  CallerId      This optional parameter may be used to identify the caller. 
-                        This parameter allows the status code driver to apply 
-                        different rules to different callers. 
-                        Type EFI_GUID is defined in InstallProtocolInterface() 
+  @param  CallerId      This optional parameter may be used to identify the caller.
+                        This parameter allows the status code driver to apply
+                        different rules to different callers.
+                        Type EFI_GUID is defined in InstallProtocolInterface()
                         in the UEFI 2.0 Specification.
 
 
   @param  Data          This optional parameter may be used to pass additional data.
- 
+
   @return               The function always returns EFI_SUCCESS.
 
 **/

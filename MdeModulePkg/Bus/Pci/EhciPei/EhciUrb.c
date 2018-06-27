@@ -2,8 +2,8 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Delete a single asynchronous interrupt transfer for
   the device and endpoint.
-  
+
   @param  Ehc         The EHCI device.
   @param  Data        Current data not associated with a QTD.
   @param  DataLen     The length of the data.
@@ -96,7 +96,7 @@ EhcCreateQtd (
       Len += ThisBufLen;
       Data += ThisBufLen;
     }
-    
+
     //
     // Need to fix the last pointer if the Qtd can't hold all the
     // user's data to make sure that the length is in the unit of
@@ -120,7 +120,7 @@ EhcCreateQtd (
     1. SplitXState in the Status field.
     2. Microframe S-mask.
     3. Microframe C-mask.
-  
+
   @param  Ep    The queue head's related endpoint.
   @param  QhHw  The queue head to initialize.
 
@@ -142,7 +142,7 @@ EhcInitIntQh (
     QhHw->SMask = QH_MICROFRAME_0;
     return ;
   }
-  
+
   //
   // For low/full speed device, the transfer must go through
   // the split transaction. Need to update three fields
@@ -160,7 +160,7 @@ EhcInitIntQh (
 
 /**
   Allocate and initialize a EHCI queue head.
-  
+
   @param  Ehci      The EHCI device.
   @param  Ep        The endpoint to create queue head for.
 
@@ -185,7 +185,7 @@ EhcCreateQh (
   Qh->Signature       = EHC_QH_SIG;
   Qh->NextQh          = NULL;
   Qh->Interval        = Ep->PollRate;
-  
+
   InitializeListHead (&Qh->Qtds);
 
   QhHw                = &Qh->QhHw;
@@ -250,7 +250,7 @@ EhcCreateQh (
   can't support high speed endpoint with a interval less
   than 8 microframe because interval is specified in
   the unit of ms (millisecond).
-  
+
   @param Interval       The interval to convert.
 
   @retval The converted interval.
@@ -266,7 +266,7 @@ EhcConvertPollRate (
   if (Interval == 0) {
     return 1;
   }
-  
+
   //
   // Find the index (1 based) of the highest non-zero bit
   //
@@ -282,7 +282,7 @@ EhcConvertPollRate (
 
 /**
   Free a list of QTDs.
-  
+
   @param  Ehc         The EHCI device.
   @param  Qtds        The list head of the QTD.
 
@@ -307,7 +307,7 @@ EhcFreeQtds (
 
 /**
   Free an allocated URB. It is possible for it to be partially inited.
-  
+
   @param  Ehc         The EHCI device.
   @param  Urb         The URB to free.
 
@@ -338,7 +338,7 @@ EhcFreeUrb (
 
 /**
   Create a list of QTDs for the URB.
-  
+
   @param  Ehc         The EHCI device.
   @param  Urb         The URB to create QTDs for.
 
@@ -380,7 +380,7 @@ EhcCreateQtds (
   if (Ep->Direction == EfiUsbDataIn) {
     AlterNext = QTD_LINK (Ehc->ShortReadStop, FALSE);
   }
-  
+
   //
   // Build the Setup and status packets for control transfer
   //
@@ -457,7 +457,7 @@ EhcCreateQtds (
 
     Len += Qtd->DataLen;
   }
-  
+
   //
   // Insert the status packet for control transfer
   //
@@ -496,7 +496,7 @@ ON_ERROR:
 
 /**
   Create a new URB and its associated QTD.
-  
+
   @param  Ehc               The EHCI device.
   @param  DevAddr           The device address.
   @param  EpAddr            Endpoint addrress & its direction.
@@ -519,7 +519,7 @@ PEI_URB *
 EhcCreateUrb (
   IN PEI_USB2_HC_DEV                    *Ehc,
   IN UINT8                              DevAddr,
-  IN UINT8                              EpAddr,  
+  IN UINT8                              EpAddr,
   IN UINT8                              DevSpeed,
   IN UINT8                              Toggle,
   IN UINTN                              MaxPacket,
@@ -540,7 +540,7 @@ EhcCreateUrb (
   UINTN                         Len;
   PEI_URB                       *Urb;
   VOID                          *Map;
-  
+
   Urb = Ehc->Urb;
   Urb->Signature  = EHC_URB_SIG;
   InitializeListHead (&Urb->UrbList);

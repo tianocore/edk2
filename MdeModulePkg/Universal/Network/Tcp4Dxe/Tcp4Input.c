@@ -1,7 +1,7 @@
 /** @file
   TCP input process routines.
 
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -704,7 +704,7 @@ TcpInput (
   TCP_SEQNO   Right;
   TCP_SEQNO   Urg;
   INT32       Usable;
-  
+
   NET_CHECK_SIGNATURE (Nbuf, NET_BUF_SIGNATURE);
 
   Parent  = NULL;
@@ -717,7 +717,7 @@ TcpInput (
     DEBUG ((EFI_D_NET, "TcpInput: received a malformed packet\n"));
     goto DISCARD;
   }
-  
+
   Len     = Nbuf->TotalSize - (Head->HeadLen << 2);
 
   if ((Head->HeadLen < 5) || (Len < 0) ||
@@ -1315,7 +1315,7 @@ StepSix:
   TcpSetKeepaliveTimer (Tcb);
 
   if (TCP_FLG_ON (Seg->Flag, TCP_FLG_URG) &&
-      !TCP_FIN_RCVD (Tcb->State)) 
+      !TCP_FIN_RCVD (Tcb->State))
   {
 
     DEBUG ((EFI_D_NET, "TcpInput: received urgent data "

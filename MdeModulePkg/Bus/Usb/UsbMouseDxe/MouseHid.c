@@ -1,7 +1,7 @@
 /** @file
   Helper functions to parse HID report descriptor and items.
 
-Copyright (c) 2004 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -160,7 +160,7 @@ GetItemData (
   There are three item types: Main, Global, and Local.
   This function parses these types of HID items according
   to tag info.
-  
+
   @param  UsbMouse          The instance of USB_MOUSE_DEV
   @param  HidItem           The HID item to parse
 

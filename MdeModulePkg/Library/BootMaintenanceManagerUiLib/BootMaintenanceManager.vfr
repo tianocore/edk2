@@ -1,15 +1,15 @@
 ///** @file
 //  Boot Maintenance Utility Formset
 //
-//  Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
 //  http://opensource.org/licenses/bsd-license.php
-//  
+//
 //  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-//  
+//
 //**/
 
 #include "FormGuid.h"
@@ -38,10 +38,10 @@ formset
               flags = INTERACTIVE,
               key   = KEY_VALUE_TRIGGER_FORM_OPEN_ACTION;
        endif;
-         
+
     label LABEL_FORM_MAIN_START;
     //
-    // This is where we will dynamically add a Action type op-code to show 
+    // This is where we will dynamically add a Action type op-code to show
     // the platform information.
     //
     label LABEL_FORM_MAIN_END;
@@ -144,7 +144,7 @@ formset
          text   = STRING_TOKEN(STR_NO_SAVE_AND_EXIT),
          flags  = INTERACTIVE,
          key    = KEY_VALUE_NO_SAVE_AND_EXIT_BOOT;
-         
+
   endform;
 
   form formid = FORM_BOOT_DEL_ID,
@@ -181,7 +181,7 @@ formset
 
   form formid = FORM_DRV_ADD_FILE_ID,
        title = STRING_TOKEN(STR_FORM_DRV_ADD_DESC_TITLE);
-       
+
        label FORM_DRV_ADD_FILE_ID;
        label LABEL_END;
 

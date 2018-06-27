@@ -1,7 +1,7 @@
 /** @file
   VLAN Config Protocol implementation and VLAN packet process routine.
 
-Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -237,7 +237,7 @@ MnpInsertVlanTag (
   @param[in]      Buffer             Pointer to the buffer contains the array of VLAN_TCI.
   @param[in]      NumberOfVlan       Pointer to number of VLAN.
   @param[out]     NewNumberOfVlan    Pointer to number of unique VLAN.
-  
+
   @retval EFI_SUCCESS            The VLAN variable is successfully checked.
   @retval EFI_OUT_OF_RESOURCES   There is not enough resource to set the configuration.
 
@@ -259,7 +259,7 @@ MnpCheckVlanVariable (
   Count = 0;
   FoundDuplicateItem  = FALSE;
   Status = EFI_SUCCESS;
-  
+
   for (Index = 0; Index < NumberOfVlan; Index++) {
    for (Index2 = Index + 1; Index2 < NumberOfVlan; Index2++) {
      if (Buffer[Index].Bits.Vid == Buffer[Index2].Bits.Vid) {
@@ -280,7 +280,7 @@ MnpCheckVlanVariable (
   if (Count != 0) {
     Status = MnpSetVlanVariable (MnpDeviceData, *NewNumberOfVlan, Buffer);
   }
-  
+
   return Status;
 }
 

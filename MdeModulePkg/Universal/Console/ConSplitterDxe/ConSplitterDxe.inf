@@ -10,7 +10,7 @@
 # Note: If only UGA Draw protocol is installed in system, PcdUgaConsumeSupport should be
 # set to TRUE.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -92,7 +92,7 @@
   ## TO_START
   gEfiSimpleTextInputExProtocolGuid
   ## PRODUCES
-  ## TO_START 
+  ## TO_START
   gEfiSimpleTextOutProtocolGuid
   ## SOMETIMES_PRODUCES
   ## SOMETIMES_CONSUMES

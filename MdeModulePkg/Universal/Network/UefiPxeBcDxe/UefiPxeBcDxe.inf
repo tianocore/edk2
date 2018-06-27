@@ -6,7 +6,7 @@
 #  Protocol to provide one clean way to otain control from the boot manager if the
 #  boot patch is from the remote device.
 #
-#  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -34,7 +34,7 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF
 #
-#  DRIVER_BINDING                =  gPxeBcDriverBinding                        
+#  DRIVER_BINDING                =  gPxeBcDriverBinding
 #  COMPONENT_NAME                =  gPxeBcComponentName
 #  COMPONENT_NAME2               =  gPxeBcComponentName2
 #
@@ -51,7 +51,7 @@
   PxeBcDhcp.c
   PxeBcMtftp.h
   PxeBcDriver.h
- 
+
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -86,8 +86,8 @@
   gEfiIp4ProtocolGuid                              ## TO_START
   gEfiIp4Config2ProtocolGuid                       ## TO_START
 
-[Pcd]  
-  gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize  ## SOMETIMES_CONSUMES  
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize  ## SOMETIMES_CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiPxe4BcDxeExtra.uni

@@ -29,9 +29,9 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gAtaAtapiPassThruDriverBinding                         
+#  DRIVER_BINDING                =  gAtaAtapiPassThruDriverBinding
 #  COMPONENT_NAME                =  gAtaAtapiPassThruComponentName
-#  COMPONENT_NAME2               =  gAtaAtapiPassThruComponentName2                         
+#  COMPONENT_NAME2               =  gAtaAtapiPassThruComponentName2
 #
 #
 
@@ -43,7 +43,7 @@
   IdeMode.c
   IdeMode.h
   ComponentName.c
-  
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec

@@ -1,7 +1,7 @@
 ## @file
 # Description file for the Universal Flash Storage (UFS) Pass Thru driver.
 #
-# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -28,8 +28,8 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gUfsPassThruDriverBinding              
-#  COMPONENT_NAME                =  gUfsPassThruComponentName              
+#  DRIVER_BINDING                =  gUfsPassThruDriverBinding
+#  COMPONENT_NAME                =  gUfsPassThruComponentName
 #
 
 [Sources]

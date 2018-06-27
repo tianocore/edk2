@@ -1,7 +1,7 @@
 /** @file
   USB Mouse Driver that manages USB mouse and produces Absolute Pointer Protocol.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -91,7 +91,7 @@ USBMouseAbsolutePointerDriverBindingSupported (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Use the USB I/O Protocol interface to check whether Controller is
   // a mouse device that can be managed by this driver.
@@ -100,14 +100,14 @@ USBMouseAbsolutePointerDriverBindingSupported (
   if (!IsUsbMouse (UsbIo)) {
     Status = EFI_UNSUPPORTED;
   }
-  
+
   gBS->CloseProtocol (
         Controller,
         &gEfiUsbIoProtocolGuid,
         This->DriverBindingHandle,
         Controller
         );
-        
+
   return Status;
 }
 
@@ -161,12 +161,12 @@ USBMouseAbsolutePointerDriverBindingStart (
                   (VOID **) &UsbIo,
                   This->DriverBindingHandle,
                   Controller,
-                  EFI_OPEN_PROTOCOL_BY_DRIVER                  
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
                   );
   if (EFI_ERROR (Status)) {
     goto ErrorExit1;
   }
-  
+
   UsbMouseAbsolutePointerDevice = AllocateZeroPool (sizeof (USB_MOUSE_ABSOLUTE_POINTER_DEV));
   ASSERT (UsbMouseAbsolutePointerDevice != NULL);
 
@@ -271,8 +271,8 @@ USBMouseAbsolutePointerDriverBindingStart (
   // Initialize and install EFI Absolute Pointer Protocol.
   //
   UsbMouseAbsolutePointerDevice->AbsolutePointerProtocol.GetState = GetMouseAbsolutePointerState;
-  UsbMouseAbsolutePointerDevice->AbsolutePointerProtocol.Reset	  = UsbMouseAbsolutePointerReset;
-  UsbMouseAbsolutePointerDevice->AbsolutePointerProtocol.Mode	  = &UsbMouseAbsolutePointerDevice->Mode;
+  UsbMouseAbsolutePointerDevice->AbsolutePointerProtocol.Reset    = UsbMouseAbsolutePointerReset;
+  UsbMouseAbsolutePointerDevice->AbsolutePointerProtocol.Mode    = &UsbMouseAbsolutePointerDevice->Mode;
 
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
@@ -470,7 +470,7 @@ USBMouseAbsolutePointerDriverBindingStop (
   // Free all resources.
   //
   gBS->CloseEvent (UsbMouseAbsolutePointerDevice->AbsolutePointerProtocol.WaitForInput);
-  
+
   if (UsbMouseAbsolutePointerDevice->DelayedRecoveryEvent != NULL) {
     gBS->CloseEvent (UsbMouseAbsolutePointerDevice->DelayedRecoveryEvent);
     UsbMouseAbsolutePointerDevice->DelayedRecoveryEvent = NULL;
@@ -596,7 +596,7 @@ InitializeUsbMouseDevice (
 
   Total = 0;
   Start = FALSE;
-  Head  = (USB_DESC_HEAD *)Buf;  
+  Head  = (USB_DESC_HEAD *)Buf;
   MouseHidDesc = NULL;
 
   //
@@ -784,7 +784,7 @@ OnMouseInterruptComplete (
 
     //
     // Delete & Submit this interrupt again
-    // Handler of DelayedRecoveryEvent triggered by timer will re-submit the interrupt. 
+    // Handler of DelayedRecoveryEvent triggered by timer will re-submit the interrupt.
     //
     UsbIo->UsbAsyncInterruptTransfer (
              UsbIo,
@@ -856,15 +856,15 @@ OnMouseInterruptComplete (
 /**
   Retrieves the current state of a pointer device.
 
-  @param  This                  A pointer to the EFI_ABSOLUTE_POINTER_PROTOCOL instance.                                   
+  @param  This                  A pointer to the EFI_ABSOLUTE_POINTER_PROTOCOL instance.
   @param  MouseState            A pointer to the state information on the pointer device.
 
   @retval EFI_SUCCESS           The state of the pointer device was returned in State.
   @retval EFI_NOT_READY         The state of the pointer device has not changed since the last call to
-                                GetState().                                                           
+                                GetState().
   @retval EFI_DEVICE_ERROR      A device error occurred while attempting to retrieve the pointer device's
-                                current state.                                                           
-  @retval EFI_INVALID_PARAMETER State is NULL.                                                           
+                                current state.
+  @retval EFI_INVALID_PARAMETER State is NULL.
 
 **/
 EFI_STATUS

@@ -269,11 +269,11 @@ DumpBridgeResource (
 
 /**
   Find the corresponding resource node for the Device in child list of BridgeResource.
-  
+
   @param[in]  Device          Pointer to PCI_IO_DEVICE.
   @param[in]  BridgeResource  Pointer to PCI_RESOURCE_NODE.
   @param[out] DeviceResources Pointer to a buffer to receive resources for the Device.
-  
+
   @return Count of the resource descriptors returned.
 **/
 UINTN
@@ -306,7 +306,7 @@ FindResourceNode (
 
 /**
   Dump the resource map of all the devices under Bridge.
-  
+
   @param[in] Bridge        Bridge device instance.
   @param[in] Resources     Resource descriptors for the bridge device.
   @param[in] ResourceCount Count of resource descriptors.

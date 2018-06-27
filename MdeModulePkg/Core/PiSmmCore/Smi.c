@@ -2,13 +2,13 @@
   SMI management.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials are licensed and made available 
-  under the terms and conditions of the BSD License which accompanies this 
-  distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -113,7 +113,7 @@ SmiManage (
   SMI_HANDLER  *SmiHandler;
   BOOLEAN      SuccessReturn;
   EFI_STATUS   Status;
-  
+
   Status = EFI_NOT_FOUND;
   SuccessReturn = FALSE;
   if (HandlerType == NULL) {
@@ -171,7 +171,7 @@ SmiManage (
     case EFI_WARN_INTERRUPT_SOURCE_QUIESCED:
       //
       // If at least one of the handlers returns EFI_WARN_INTERRUPT_SOURCE_QUIESCED
-      // then the function will return EFI_SUCCESS. 
+      // then the function will return EFI_SUCCESS.
       //
       SuccessReturn = TRUE;
       break;

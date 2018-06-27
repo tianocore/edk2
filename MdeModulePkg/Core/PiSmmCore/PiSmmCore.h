@@ -3,13 +3,13 @@
   internal structure and functions used by SmmCore module.
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials are licensed and made available 
-  under the terms and conditions of the BSD License which accompanies this 
-  distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  This program and the accompanying materials are licensed and made available
+  under the terms and conditions of the BSD License which accompanies this
+  distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -24,10 +24,10 @@
 #include <Protocol/CpuIo2.h>
 #include <Protocol/SmmCommunication.h>
 #include <Protocol/SmmAccess2.h>
-#include <Protocol/FirmwareVolume2.h>   
-#include <Protocol/LoadedImage.h>       
-#include <Protocol/DevicePath.h>        
-#include <Protocol/Security.h>          
+#include <Protocol/FirmwareVolume2.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/DevicePath.h>
+#include <Protocol/Security.h>
 #include <Protocol/Security2.h>
 #include <Protocol/SmmExitBootServices.h>
 #include <Protocol/SmmLegacyBoot.h>
@@ -52,8 +52,8 @@
 #include <Library/DebugLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/DevicePathLib.h>             
-#include <Library/UefiLib.h>                   
+#include <Library/DevicePathLib.h>
+#include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/PcdLib.h>
 #include <Library/SmmCorePlatformHookLib.h>
@@ -136,7 +136,7 @@ typedef struct {
   //
   PHYSICAL_ADDRESS                ImageEntryPoint;
   //
-  // Image Buffer in SMRAM  
+  // Image Buffer in SMRAM
   //
   PHYSICAL_ADDRESS                ImageBuffer;
   //

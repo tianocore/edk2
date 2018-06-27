@@ -781,7 +781,7 @@ NvmExpressPassThru (
       // Copy the Respose Queue entry for this command to the callers response buffer
       //
       CopyMem(Packet->NvmeCompletion, Cq, sizeof(EFI_NVM_EXPRESS_COMPLETION));
-    
+
       //
       // Dump every completion entry status for debugging.
       //

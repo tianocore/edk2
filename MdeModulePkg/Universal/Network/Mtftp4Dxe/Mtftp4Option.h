@@ -1,7 +1,7 @@
 /** @file
   Routines to process MTFTP4 options.
-  
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,8 +38,8 @@ typedef struct {
 } MTFTP4_OPTION;
 
 /**
-  Allocate and fill in a array of Mtftp options from the Packet. 
-  
+  Allocate and fill in a array of Mtftp options from the Packet.
+
   It first calls Mtftp4FillOption to get the option number, then allocate
   the array, at last, call Mtftp4FillOption again to save the options.
 

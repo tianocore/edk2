@@ -1,7 +1,7 @@
 /** @file
   BDS library definition, include the file and data structure
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -192,7 +192,7 @@ BmGetFreeOptionNumber (
   );
 
 /**
-  This routine adjust the memory information for different memory type and 
+  This routine adjust the memory information for different memory type and
   save them into the variables for next boot. It resets the system when
   memory information is updated and the current boot option belongs to
   boot category instead of application category. It doesn't count the
@@ -245,9 +245,9 @@ BmConnectUsbShortFormDevicePath (
 
 /**
   Stop the hotkey processing.
-  
-  @param    Event          Event pointer related to hotkey service. 
-  @param    Context        Context pass to this function. 
+
+  @param    Event          Event pointer related to hotkey service.
+  @param    Context        Context pass to this function.
 **/
 VOID
 EFIAPI
@@ -265,14 +265,14 @@ BmStopHotkeyService (
                                  then EFI_INVALID_PARAMETER is returned.
   @param  VendorGuid             A unique identifier for the vendor.
   @param  Attributes             Attributes bitmask to set for the variable.
-  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE, 
+  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE,
                                  or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero
-                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is 
-                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to 
-                                 the variable value (the timestamp associated with the variable may be updated however 
-                                 even if no new data value is provided,see the description of the 
-                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not 
-                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated). 
+                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is
+                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to
+                                 the variable value (the timestamp associated with the variable may be updated however
+                                 even if no new data value is provided,see the description of the
+                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not
+                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated).
   @param  Data                   The contents for the variable.
 
   @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as

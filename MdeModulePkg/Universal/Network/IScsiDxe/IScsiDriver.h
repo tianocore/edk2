@@ -1,7 +1,7 @@
 /** @file
   The header file of IScsiDriver.c.
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -38,14 +38,14 @@ typedef struct _ISCSI_PRIVATE_PROTOCOL {
 //
 
 /**
-  Tests to see if this driver supports a given controller. If a child device is provided, 
+  Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to test. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to test. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path. 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.
                                    This parameter is ignored by device drivers, and is optional for bus drivers.
 
 
@@ -70,22 +70,22 @@ IScsiDriverBindingSupported (
   );
 
 /**
-  Start this driver on ControllerHandle. The Start() function is designed to be 
-  invoked from the EFI boot service ConnectController(). As a result, much of 
-  the error checking on the parameters to Start() has been moved into this 
-  common boot service. It is legal to call Start() from other locations, 
+  Start this driver on ControllerHandle. The Start() function is designed to be
+  invoked from the EFI boot service ConnectController(). As a result, much of
+  the error checking on the parameters to Start() has been moved into this
+  common boot service. It is legal to call Start() from other locations,
   but the following calling restrictions must be followed or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE.
   2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
      EFI_DEVICE_PATH_PROTOCOL.
   3. Prior to calling Start(), the Supported() function for the driver specified by This must
-     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
+     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path. 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.
                                    This parameter is ignored by device drivers, and is optional for bus drivers.
 
   @retval EFI_SUCCESS              The device was started.
@@ -103,12 +103,12 @@ IScsiDriverBindingStart (
   );
 
 /**
-  Stop this driver on ControllerHandle. 
-  
+  Stop this driver on ControllerHandle.
+
   Release the control of this controller and remove the IScsi functions. The Stop()
-  function is designed to be invoked from the EFI boot service DisconnectController(). 
-  As a result, much of the error checking on the parameters to Stop() has been moved 
-  into this common boot service. It is legal to call Stop() from other locations, 
+  function is designed to be invoked from the EFI boot service DisconnectController().
+  As a result, much of the error checking on the parameters to Stop() has been moved
+  into this common boot service. It is legal to call Stop() from other locations,
   but the following calling restrictions must be followed or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
      same driver's Start() function.
@@ -116,13 +116,13 @@ IScsiDriverBindingStart (
      EFI_HANDLE. In addition, all of these handles must have been created in this driver's
      Start() function, and the Start() function must have called OpenProtocol() on
      ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
-  
+
   @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
-                                support a bus specific I/O protocol for the driver 
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must
+                                support a bus specific I/O protocol for the driver
                                 to use to stop the device.
   @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.Not used.
-  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL
                                 if NumberOfChildren is 0.Not used.
 
   @retval EFI_SUCCESS           The device was stopped.

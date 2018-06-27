@@ -4,7 +4,7 @@
   It consumes FV HOBs and creates read-only Firmare Volume Block protocol
   instances for each of them.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -542,7 +542,7 @@ ProduceFVBProtocolOnBuffer (
     CoreFreePool (FvbDev);
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Last, fill in the cache with the linear address of the blocks
   //
@@ -582,11 +582,11 @@ ProduceFVBProtocolOnBuffer (
       return EFI_OUT_OF_RESOURCES;
     }
     CopyGuid (
-      &((FV_PIWG_DEVICE_PATH *)FvbDev->DevicePath)->FvDevPath.FvName, 
+      &((FV_PIWG_DEVICE_PATH *)FvbDev->DevicePath)->FvDevPath.FvName,
       (GUID *)(UINTN)(BaseAddress + FwVolHeader->ExtHeaderOffset)
       );
   }
-  
+
   //
   //
   // Attach FvVolBlock Protocol to new handle

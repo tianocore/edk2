@@ -27,7 +27,7 @@
   3) A support protocol is not found, and the data is not available to be read
      without it.  This results in EFI_PROTOCOL_ERROR.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -67,7 +67,7 @@ typedef struct {
   UINTN                       EncapsulatedStreamHandle;
   EFI_GUID                    *EncapsulationGuid;
   //
-  // If the section REQUIRES an extraction protocol, register for RPN 
+  // If the section REQUIRES an extraction protocol, register for RPN
   // when the required GUIDed extraction protocol becomes available.
   //
   EFI_EVENT                   Event;
@@ -499,7 +499,7 @@ ChildIsType (
 
   @return TRUE      The GuidedSectionGuid could be identified, and the pointer to
                     the Guided Section Extraction Protocol will be returned to *GuidedSectionExtraction.
-  @return FALSE     The GuidedSectionGuid could not be identified, or 
+  @return FALSE     The GuidedSectionGuid could not be identified, or
                     the Guided Section Extraction Protocol has not been installed yet.
 
 **/
@@ -561,9 +561,9 @@ NotifyGuidedExtraction (
   UINTN                                   NewStreamBufferSize;
   UINT32                                  AuthenticationStatus;
   RPN_EVENT_CONTEXT                       *Context;
-  
+
   Context = RpnContext;
-  
+
   GuidedHeader = (EFI_GUID_DEFINED_SECTION *) (Context->ParentStream->StreamBuffer + Context->ChildNode->OffsetInStream);
   ASSERT (GuidedHeader->CommonHeader.Type == EFI_SECTION_GUID_DEFINED);
 
@@ -612,7 +612,7 @@ NotifyGuidedExtraction (
   gBS->CloseEvent (Event);
   Context->ChildNode->Event = NULL;
   FreePool (Context);
-}  
+}
 
 /**
   Constructor for RPN event when a missing GUIDED_SECTION_EXTRACTION_PROTOCOL appears...
@@ -628,16 +628,16 @@ CreateGuidedExtractionRpnEvent (
   )
 {
   RPN_EVENT_CONTEXT *Context;
-  
+
   //
   // Allocate new event structure and context
   //
   Context = AllocatePool (sizeof (RPN_EVENT_CONTEXT));
   ASSERT (Context != NULL);
-  
+
   Context->ChildNode = ChildNode;
   Context->ParentStream = ParentStream;
- 
+
   Context->ChildNode->Event = EfiCreateProtocolNotifyEvent (
                                 Context->ChildNode->EncapsulationGuid,
                                 TPL_NOTIFY,
@@ -893,8 +893,8 @@ CreateChildNode (
         //
         if ((GuidedSectionAttributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) != 0) {
           //
-          // If the section REQUIRES an extraction protocol, register for RPN 
-          // when the required GUIDed extraction protocol becomes available. 
+          // If the section REQUIRES an extraction protocol, register for RPN
+          // when the required GUIDed extraction protocol becomes available.
           //
           CreateGuidedExtractionRpnEvent (Stream, Node);
         } else {

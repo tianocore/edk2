@@ -1,15 +1,15 @@
 /** @file
-  This sample application bases on HelloWorld PCD setting 
+  This sample application bases on HelloWorld PCD setting
   to print "UEFI Hello World!" to the UEFI Console.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -32,9 +32,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_STRING_ID mStringHelpTokenId = STRING_TOKEN (S
   The user Entry Point for Application. The user code starts with this function
   as the real entry point for the application.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 
@@ -46,19 +46,19 @@ UefiMain (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-	UINT32 Index;
-	
-	Index = 0;
-  
+  UINT32 Index;
+
+  Index = 0;
+
   //
   // Three PCD type (FeatureFlag, UINT32 and String) are used as the sample.
   //
   if (FeaturePcdGet (PcdHelloWorldPrintEnable)) {
-  	for (Index = 0; Index < PcdGet32 (PcdHelloWorldPrintTimes); Index ++) {
-  	  //
-  	  // Use UefiLib Print API to print string to UEFI console
-  	  //
-    	Print ((CHAR16*)PcdGetPtr (PcdHelloWorldPrintString));
+    for (Index = 0; Index < PcdGet32 (PcdHelloWorldPrintTimes); Index ++) {
+      //
+      // Use UefiLib Print API to print string to UEFI console
+      //
+      Print ((CHAR16*)PcdGetPtr (PcdHelloWorldPrintString));
     }
   }
 

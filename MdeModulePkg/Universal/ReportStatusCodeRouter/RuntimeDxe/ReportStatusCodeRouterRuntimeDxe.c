@@ -2,7 +2,7 @@
   Report Status Code Router Driver which produces Report Stataus Code Handler Protocol
   and Status Code Runtime Protocol.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -79,7 +79,7 @@ RscHandlerNotification (
 
 /**
   Register the callback function for ReportStatusCode() notification.
-  
+
   When this function is called the function pointer is added to an internal list and any future calls to
   ReportStatusCode() will be forwarded to the Callback function. During the bootservices,
   this is the callback for which this service can be invoked. The report status code router
@@ -93,11 +93,11 @@ RscHandlerNotification (
   2. not unregister at exit boot services so that the router will still have its callback address
   3. the caller must be self-contained (eg. Not call out into any boot-service interfaces) and be
   runtime safe, in general.
-  
+
   @param[in] Callback   A pointer to a function of type EFI_RSC_HANDLER_CALLBACK that is called when
                         a call to ReportStatusCode() occurs.
-  @param[in] Tpl        TPL at which callback can be safely invoked.   
-  
+  @param[in] Tpl        TPL at which callback can be safely invoked.
+
   @retval  EFI_SUCCESS              Function was successfully registered.
   @retval  EFI_INVALID_PARAMETER    The callback function was NULL.
   @retval  EFI_OUT_OF_RESOURCES     The internal buffer ran out of space. No more functions can be
@@ -166,13 +166,13 @@ Register (
 
 /**
   Remove a previously registered callback function from the notification list.
-  
+
   A callback function must be unregistered before it is deallocated. It is important that any registered
   callbacks that are not runtime complaint be unregistered when ExitBootServices() is called.
-  
+
   @param[in]  Callback  A pointer to a function of type EFI_RSC_HANDLER_CALLBACK that is to be
                         unregistered.
-                        
+
   @retval EFI_SUCCESS           The function was successfully unregistered.
   @retval EFI_INVALID_PARAMETER The callback function was NULL.
   @retval EFI_NOT_FOUND         The callback function was not found to be unregistered.
@@ -343,7 +343,7 @@ VirtualAddressChangeCallBack (
   IN VOID             *Context
   )
 {
-  EFI_STATUS					Status;
+  EFI_STATUS          Status;
   LIST_ENTRY                    *Link;
   RSC_HANDLER_CALLBACK_ENTRY    *CallbackEntry;
 
@@ -369,7 +369,7 @@ VirtualAddressChangeCallBack (
 
   @param  ImageHandle       The firmware allocated handle for the EFI image.
   @param  SystemTable       A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
 
 **/

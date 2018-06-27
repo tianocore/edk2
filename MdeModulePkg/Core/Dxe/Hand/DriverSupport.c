@@ -1,7 +1,7 @@
 /** @file
   Support functions to connect/disconnect UEFI Driver model Protocol
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -40,8 +40,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_NOT_FOUND         1) There are no EFI_DRIVER_BINDING_PROTOCOL instances
                                 present in the system.
                                 2) No drivers were connected to ControllerHandle.
-  @retval EFI_SECURITY_VIOLATION 
-                                The user has no permission to start UEFI device drivers on the device path 
+  @retval EFI_SECURITY_VIOLATION
+                                The user has no permission to start UEFI device drivers on the device path
                                 associated with the ControllerHandle or specified by the RemainingDevicePath.
 
 **/
@@ -112,7 +112,7 @@ CoreConnectController (
       }
     }
   }
-  
+
   Handle = ControllerHandle;
 
   //

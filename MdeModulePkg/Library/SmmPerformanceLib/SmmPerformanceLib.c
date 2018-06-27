@@ -6,7 +6,7 @@
   to log performance data. If both SMM PerformanceEx and Performance Protocol are not available, it does not log any
   performance information.
 
-  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,7 +47,7 @@ SmmPerformanceLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  
+
   mPerformanceMeasurementEnabled =  (BOOLEAN) ((PcdGet8(PcdPerformanceLibraryPropertyMask) & PERFORMANCE_LIBRARY_PROPERTY_MEASUREMENT_ENABLED) != 0);
 
   return EFI_SUCCESS;
@@ -246,7 +246,7 @@ EndPerformanceMeasurementEx (
 UINTN
 EFIAPI
 GetPerformanceMeasurementEx (
-  IN  UINTN       LogEntryKey, 
+  IN  UINTN       LogEntryKey,
   OUT CONST VOID  **Handle,
   OUT CONST CHAR8 **Token,
   OUT CONST CHAR8 **Module,

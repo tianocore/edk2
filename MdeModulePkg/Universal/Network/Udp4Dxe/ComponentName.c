@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -175,7 +175,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUdpDriverNameTable[] = {
 };
 
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE *gUdpControllerNameTable = NULL;
-  
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -237,10 +237,10 @@ UdpComponentNameGetDriverName (
 
   @param  Udp4[in]                   A pointer to the EFI_UDP4_PROTOCOL.
 
-  
+
   @retval EFI_SUCCESS                Update the ControllerNameTable of this instance successfully.
   @retval EFI_INVALID_PARAMETER      The input parameter is invalid.
-  
+
 **/
 EFI_STATUS
 UpdateName (
@@ -280,7 +280,7 @@ UpdateName (
     FreeUnicodeStringTable (gUdpControllerNameTable);
     gUdpControllerNameTable = NULL;
   }
-  
+
   Status = AddUnicodeString2 (
              "eng",
              gUdp4ComponentName.SupportedLanguages,
@@ -291,7 +291,7 @@ UpdateName (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   return AddUnicodeString2 (
            "en",
            gUdp4ComponentName2.SupportedLanguages,
@@ -388,7 +388,7 @@ UdpComponentNameGetControllerName (
   if (ChildHandle == NULL) {
     return EFI_UNSUPPORTED;
   }
-  
+
   //
   // Make sure this driver produced ChildHandle
   //

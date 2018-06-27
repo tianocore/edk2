@@ -1,7 +1,7 @@
 /** @file
   Report Status Code Router PEIM which produces Report Stataus Code Handler PPI and Status Code PPI.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -71,19 +71,19 @@ CreateRscHandlerCallbackPacket (
 
 /**
   Register the callback function for ReportStatusCode() notification.
-  
+
   When this function is called the function pointer is added to an internal list and any future calls to
   ReportStatusCode() will be forwarded to the Callback function.
 
   @param[in] Callback           A pointer to a function of type EFI_PEI_RSC_HANDLER_CALLBACK that is called
                                 when a call to ReportStatusCode() occurs.
-                        
+
   @retval EFI_SUCCESS           Function was successfully registered.
   @retval EFI_INVALID_PARAMETER The callback function was NULL.
   @retval EFI_OUT_OF_RESOURCES  The internal buffer ran out of space. No more functions can be
                                 registered.
   @retval EFI_ALREADY_STARTED   The function was already registered. It can't be registered again.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -127,7 +127,7 @@ Register (
         //
         // If the total number of handlers in current packet is max value 64,
         // search an entry with NULL pointer and fill new handler into this entry.
-        //  
+        //
         FreePacket = NumberOfEntries;
         FreeEntryIndex = Index;
       }
@@ -142,7 +142,7 @@ Register (
 
   CallbackEntry = (EFI_PEI_RSC_HANDLER_CALLBACK *) (FreePacket + 1);
   CallbackEntry[FreeEntryIndex] = Callback;
-  
+
   if (*FreePacket == FreeEntryIndex) {
     //
     // If new registered callback is added as a new entry in the packet,
@@ -156,16 +156,16 @@ Register (
 
 /**
   Remove a previously registered callback function from the notification list.
-  
+
   ReportStatusCode() messages will no longer be forwarded to the Callback function.
-  
+
   @param[in] Callback           A pointer to a function of type EFI_PEI_RSC_HANDLER_CALLBACK that is to be
                                 unregistered.
 
   @retval EFI_SUCCESS           The function was successfully unregistered.
   @retval EFI_INVALID_PARAMETER The callback function was NULL.
   @retval EFI_NOT_FOUND         The callback function was not found to be unregistered.
-                        
+
 **/
 EFI_STATUS
 EFIAPI
@@ -269,7 +269,7 @@ ReportDispatcher (
 
 /**
   Entry point of Status Code PEIM.
-  
+
   This function is the entry point of this Status Code Router PEIM.
   It produces Report Stataus Code Handler PPI and Status Code PPI.
 

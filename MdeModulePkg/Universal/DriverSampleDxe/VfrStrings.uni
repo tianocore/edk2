@@ -1,24 +1,24 @@
 // *++
-	//
+  //
 // Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
-// This program and the accompanying materials                          
-// are licensed and made available under the terms and conditions of the BSD License         
-// which accompanies this distribution.  The full text of the license may be found at        
-// http://opensource.org/licenses/bsd-license.php                                            
-//                                                                                           
-// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
-// 
+// This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution.  The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php
+//
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
 // Module Name:
 //
 //   VfrStrings.vfr
-// 
+//
 // Abstract:
-// 
+//
 //   String definitions for Sample Setup formset.
-// 
+//
 // Revision History:
-// 
+//
 // --*/
 
 
@@ -52,9 +52,9 @@
 #string STR_CPU_STRING2                #language en-US " "
                                        #language fr-FR " "
 #string STR_NUMERIC_NUM_PROMPT         #language en-US "Please select the number"
-                                       #language fr-FR "Please select the number"                                       
+                                       #language fr-FR "Please select the number"
 #string STR_NUMERIC_NUM_HELP           #language en-US "Check the input number, test the efi buffer varstore"
-                                       #language fr-FR "Check the input number, test the efi buffer varstore"                                        
+                                       #language fr-FR "Check the input number, test the efi buffer varstore"
 #string STR_ONE_OF_PROMPT              #language en-US "My one-of prompt #1"
                                        #language fr-FR "Mi uno- de guía # 1"
 #string STR_ONE_OF_PROMPT_KEYWORD      #language en-US "My Keyword Namespace Test"
@@ -142,7 +142,7 @@
 #string STR_GOTO_DYNAMIC3_HELP         #language en-US "Update the destination through "retrieve" call back type before user select it."
                                        #language fr-FR "Update the destination through "retrieve" call back type before user select it."
 #string STR_GOTO_DYNAMIC4_HELP         #language en-US "Update the destination through "changing" call back type when user select it."
-                                       #language fr-FR "Update the destination through "changing" call back type when user select it."                                                                                
+                                       #language fr-FR "Update the destination through "changing" call back type when user select it."
 #string STR_ERROR_INCONSISTENT         #language en-US "This is my inconsistent error message"
                                        #language fr-FR "Éste es mi mensaje de error contrario."
 #string STR_ERROR_POPUP                #language en-US "You typed in something bad!"
@@ -240,7 +240,7 @@
 #string STR_STRING_CHECK_ERROR_POPUP   #language en-US "String you typed in is not correct!"
                                        #language fr-FR "String you typed in is not correct!"
 #string STR_TEXT_REFRESH_GUID          #language en-US "Add new menu by press "Ctrl + C""
-                                       #language fr-FR "Add new menu by press "Ctrl + C"" 
+                                       #language fr-FR "Add new menu by press "Ctrl + C""
 #string STR_TEXT_REFRESH_GUID_COUNT    #language en-US "Refresh guid event count"
                                        #language fr-FR "Refresh guid event count"
 #string STR_MODAL_FORM_TITLE           #language en-US "First Modal Form"
@@ -262,7 +262,7 @@
 #string STR_GOTO_ANOTHER_FORMSET_HELP                #language en-US "When select this option, browser will go to another formset."
                                                      #language fr-FR "When select this option, browser will go to another formset."
 #string STR_DEVICE_PATH                              #language en-US ""
-                                                     #language fr-FR ""                                                                                                           
+                                                     #language fr-FR ""
 #string STR_SUBMITTED_CALLBACK_TEST_PROMPT           #language en-US "Submitted callback test"
                                                      #language fr-FR "Submitted callback test"
 #string STR_SUBMITTED_CALLBACK_TEST_HELP             #language en-US "Change the value and press F10 to submmit will pop up a dialogue to show SUBMITTED Callback has been triggered"
@@ -346,7 +346,7 @@
                                        #language fr-FR "Manufacture Default"
 
 #string STR_DEFAULTSTORE_SAFE          #language en-US "Safe Default"
-                                       #language fr-FR "Safe Default"                                       
+                                       #language fr-FR "Safe Default"
 
 #string STR_STANDARD_DEFAULT_PROMPT    #language en-US "Standard Default"
                                        #language fr-FR "Standard Default"
@@ -370,7 +370,7 @@
 #string STR_STANDARD_MAP_METHOD        #language en-US "UEFI Standard Map Form"
                                        #language fr-FR "UEFI Standard Map Form"
 //
-// Serial Port 
+// Serial Port
 //
 #string STR_SERIAL_PORT                #language en-US "Serial port number"
                                        #language fr-FR "Serial port number"

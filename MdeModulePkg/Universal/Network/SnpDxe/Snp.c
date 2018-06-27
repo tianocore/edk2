@@ -1,7 +1,7 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed
 and made available under the terms and conditions of the BSD License which
 accompanies this distribution. The full text of the license may be found at
@@ -275,7 +275,7 @@ SimpleNetworkDriverStart (
   EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR         *BarDesc;
   BOOLEAN                                   FoundIoBar;
   BOOLEAN                                   FoundMemoryBar;
-  
+
   DEBUG ((EFI_D_NET, "\nSnpNotifyNetworkInterfaceIdentifier()  "));
 
   Status = gBS->OpenProtocol (
@@ -411,7 +411,7 @@ SimpleNetworkDriverStart (
   }
   Snp->MaxRecycledTxBuf    = SNP_TX_BUFFER_INCREASEMENT;
   Snp->RecycledTxBufCount  = 0;
- 
+
   if (Nii->Revision >= EFI_NETWORK_INTERFACE_IDENTIFIER_PROTOCOL_REVISION) {
     Snp->IfNum = Nii->IfNum;
 

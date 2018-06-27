@@ -1,13 +1,13 @@
 /** @file
   FormDiplay protocol to show Form
 
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define EDKII_FORM_DISPLAY_ENGINE_PROTOCOL_GUID  \
   { 0x9bbe29e9, 0xfda1, 0x41ec, { 0xad, 0x52, 0x45, 0x22, 0x13, 0x74, 0x2d, 0x2e } }
 
-// 
+//
 // Do nothing.
 //
 #define BROWSER_ACTION_NONE         BIT16
@@ -101,11 +101,11 @@ typedef struct {
 
 /**
   Perform value check for a question.
-  
+
   @param  Form       Form where Statement is in.
   @param  Statement  Value will check for it.
   @param  Value      New value will be checked.
-  
+
   @retval Status     Value Status
 
 **/
@@ -114,20 +114,20 @@ UINT32
 (EFIAPI *VALIDATE_QUESTION) (
   IN FORM_DISPLAY_ENGINE_FORM      *Form,
   IN FORM_DISPLAY_ENGINE_STATEMENT *Statement,
-  IN EFI_HII_VALUE                 *Value, 
+  IN EFI_HII_VALUE                 *Value,
   OUT STATEMENT_ERROR_INFO         *ErrorInfo
   );
 
 /**
-  Perform Password check. 
+  Perform Password check.
   Passwork may be encrypted by driver that requires the specific check.
-  
+
   @param  Form             Form where Password Statement is in.
   @param  Statement        Password statement
   @param  PasswordString   Password string to be checked. It may be NULL.
                            NULL means to restore password.
                            "" string can be used to checked whether old password does exist.
-  
+
   @return Status     Status of Password check.
 **/
 typedef
@@ -171,7 +171,7 @@ struct _FORM_DISPLAY_ENGINE_STATEMENT{
   EFI_HII_VALUE         CurrentValue;
   //
   // Flag to describe whether setting is changed or not.
-  // Displayer may depend on it to show it with the different color. 
+  // Displayer may depend on it to show it with the different color.
   //
   BOOLEAN               SettingChangedFlag;
   //
@@ -192,7 +192,7 @@ struct _FORM_DISPLAY_ENGINE_STATEMENT{
   // It may be NULL if any value is valid.
   //
   VALIDATE_QUESTION     ValidateQuestion;
-  
+
   //
   // Password additional check. It may be NULL when the additional check is not required.
   //
@@ -212,7 +212,7 @@ struct _FORM_DISPLAY_ENGINE_STATEMENT{
 typedef struct {
   UINTN                 Signature;
   LIST_ENTRY            Link;
-  
+
   EFI_INPUT_KEY         *KeyData;
   //
   // Action is Discard, Default, Submit, Reset and Exit.
@@ -240,7 +240,7 @@ struct _FORM_DISPLAY_ENGINE_FORM {
   //
   LIST_ENTRY            StatementListHead;
   //
-  // Statement List outside of Form  
+  // Statement List outside of Form
   //
   LIST_ENTRY            StatementListOSF;
   //
@@ -255,7 +255,7 @@ struct _FORM_DISPLAY_ENGINE_FORM {
   // HiiHandle can be used to get String, Image or Animation
   //
   EFI_HII_HANDLE       HiiHandle;
-  
+
   //
   // Form ID and Title.
   //
@@ -289,13 +289,13 @@ struct _FORM_DISPLAY_ENGINE_FORM {
   //
   EFI_IMAGE_ID         ImageId;
   EFI_ANIMATION_ID     AnimationId;
-  
+
   //
-  // If Status is error, display needs to handle it.  
+  // If Status is error, display needs to handle it.
   //
   UINT32               BrowserStatus;
   //
-  // String for error status. It may be NULL. 
+  // String for error status. It may be NULL.
   //
   EFI_STRING           ErrorString;
 };
@@ -304,9 +304,9 @@ struct _FORM_DISPLAY_ENGINE_FORM {
 
 typedef struct {
   FORM_DISPLAY_ENGINE_STATEMENT  *SelectedStatement; // Selected Statement and InputValue
-  
+
   EFI_HII_VALUE                  InputValue;
-  
+
   UINT32                         Action;             // If SelectedStatement is NULL, Action will be used.
                                                      // Trig Action (Discard, Default, Submit, Reset and Exit)
   UINT16                         DefaultId;
@@ -314,10 +314,10 @@ typedef struct {
 
 /**
   Display one form, and return user input.
-  
+
   @param FormData                Form Data to be shown.
   @param UserInputData           User input data.
-  
+
   @retval EFI_SUCCESS            Form Data is shown, and user input is got.
 **/
 typedef
@@ -338,8 +338,8 @@ VOID
 );
 
 /**
-  Confirm how to handle the changed data. 
-  
+  Confirm how to handle the changed data.
+
   @return Action of Submit, Discard and None
 **/
 typedef

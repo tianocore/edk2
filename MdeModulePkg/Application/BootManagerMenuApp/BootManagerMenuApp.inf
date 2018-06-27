@@ -3,16 +3,16 @@
 #
 #  The application pops up a menu showing all the boot options referenced by
 #  BootOrder NV variable and user can choose to boot from one of them.
-#  
+#
 #  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
 #  http://opensource.org/licenses/bsd-license.php
-#  
+#
 #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-#  
+#
 ##
 
 [Defines]
@@ -21,7 +21,7 @@
   MODULE_UNI_FILE                = BootManagerMenuApp.uni
   FILE_GUID                      = EEC25BDC-67F2-4D95-B1D5-F81B2039D11D
   MODULE_TYPE                    = UEFI_APPLICATION
-  VERSION_STRING                 = 1.0 
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = BootManagerMenuEntry
 
 #
@@ -47,7 +47,7 @@
   UefiBootServicesTableLib
   UefiApplicationEntryPoint
   UefiBootManagerLib
-  
+
 [Guids]
 
 [Protocols]

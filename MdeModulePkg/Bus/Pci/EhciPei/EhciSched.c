@@ -2,8 +2,8 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Create helper QTD/QH for the EHCI device.
-  
+
   @param  Ehc         The EHCI device.
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource for helper QTD/QH.
@@ -95,7 +95,7 @@ EhcCreateHelpQ (
 
 /**
   Initialize the schedule data structure such as frame list.
-  
+
   @param  Ehc                   The EHCI device to init schedule data for.
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to init schedule data.
@@ -162,7 +162,7 @@ EhcInitSched (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   //
   // Initialize the frame list entries then set the registers
   //
@@ -186,8 +186,8 @@ EhcInitSched (
 
 /**
   Free the schedule data. It may be partially initialized.
-  
-  @param  Ehc   The EHCI device. 
+
+  @param  Ehc   The EHCI device.
 
 **/
 VOID
@@ -230,7 +230,7 @@ EhcFreeSched (
   due to its interfaces. This simplifies the AsynList
   management: A reclamation header is always linked to
   the AsyncListAddr, the only active QH is appended to it.
-  
+
   @param  Ehc   The EHCI device.
   @param  Qh    The queue head to link.
 
@@ -260,7 +260,7 @@ EhcLinkQhToAsync (
 /**
   Unlink a queue head from the asynchronous schedule list.
   Need to synchronize with hardware.
-  
+
   @param  Ehc   The EHCI device.
   @param  Qh    The queue head to unlink.
 
@@ -291,13 +291,13 @@ EhcUnlinkQhFromAsync (
   // Set and wait the door bell to synchronize with the hardware
   //
   EhcSetAndWaitDoorBell (Ehc, EHC_GENERIC_TIMEOUT);
-  
+
   return;
 }
 
 /**
   Check the URB's execution result and update the URB's
-  result accordingly. 
+  result accordingly.
 
   @param Ehc   The EHCI device.
   @param Urb   The URB to check result.
@@ -358,13 +358,13 @@ EhcCheckUrbResult (
 
       Finished = TRUE;
       goto ON_EXIT;
-      
+
     } else if (EHC_BIT_IS_SET (State, QTD_STAT_ACTIVE)) {
       //
       // The QTD is still active, no need to check furthur.
       //
       Urb->Result |= EFI_USB_ERR_NOTEXECUTE;
-      
+
       Finished = FALSE;
       goto ON_EXIT;
 
@@ -387,7 +387,7 @@ EhcCheckUrbResult (
         // Status Stage of the setup transfer to get the finial result
         //
         if (QtdHw->AltNext == QTD_LINK (Ehc->ShortReadStop, FALSE)) {
-          
+
           Finished = TRUE;
           goto ON_EXIT;
         }
@@ -412,7 +412,7 @@ ON_EXIT:
 
 /**
   Execute the transfer by polling the URB. This is a synchronous operation.
-  
+
   @param  Ehc               The EHCI device.
   @param  Urb               The URB to execute.
   @param  TimeOut           The time to wait before abort, in millisecond.

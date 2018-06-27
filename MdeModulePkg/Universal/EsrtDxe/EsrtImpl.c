@@ -1,7 +1,7 @@
 /** @file
   Esrt management implementation.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,12 +15,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "EsrtImpl.h"
 
 /**
-  Find Esrt Entry stored in ESRT repository. 
+  Find Esrt Entry stored in ESRT repository.
 
   @param[in]     FwClass           Firmware class guid in Esrt entry
   @param[in]     Attribute         Esrt from Non FMP or FMP instance
   @param[out]    Entry             Esrt entry returned
-  
+
   @retval EFI_SUCCESS            Successfully find an Esrt entry
   @retval EF_NOT_FOUND           No Esrt entry found
 
@@ -49,7 +49,7 @@ GetEsrtEntry (
   } else {
     VariableName = EFI_ESRT_NONFMP_VARIABLE_NAME;
   }
-  
+
   Status = GetVariable2 (
              VariableName,
              &gEfiCallerIdGuid,
@@ -90,7 +90,7 @@ EXIT:
 
   @param[in]  Entry                Esrt entry to be set
   @param[in]  Attribute            Esrt from Esrt private protocol or FMP instance
-  
+
   @retval EFI_SUCCESS          Successfully set a variable.
 
 **/
@@ -201,21 +201,21 @@ EXIT:
 }
 
 /**
-  Delete ESRT Entry from ESRT repository. 
+  Delete ESRT Entry from ESRT repository.
 
-  @param[in]    FwClass              FwClass of Esrt entry to delete  
+  @param[in]    FwClass              FwClass of Esrt entry to delete
   @param[in]    Attribute            Esrt from Esrt private protocol or FMP instance
-  
-  @retval EFI_SUCCESS         Insert all entries Successfully 
+
+  @retval EFI_SUCCESS         Insert all entries Successfully
   @retval EFI_NOT_FOUND       ESRT entry with FwClass doesn't exsit
-  
+
 **/
 EFI_STATUS
 DeleteEsrtEntry(
   IN  EFI_GUID        *FwClass,
   IN  UINTN           Attribute
   )
-{  
+{
   EFI_STATUS                 Status;
   CHAR16                     *VariableName;
   EFI_SYSTEM_RESOURCE_ENTRY  *EsrtRepository;
@@ -224,7 +224,7 @@ DeleteEsrtEntry(
   UINTN                      EsrtNum;
 
   EsrtRepository = NULL;
-  
+
   //
   // Get Esrt index buffer
   //
@@ -233,7 +233,7 @@ DeleteEsrtEntry(
   } else {
     VariableName = EFI_ESRT_NONFMP_VARIABLE_NAME;
   }
-  
+
   Status = GetVariable2 (
              VariableName,
              &gEfiCallerIdGuid,
@@ -302,7 +302,7 @@ EXIT:
 
   @param[in]    Entry                Esrt entry to be set
   @param[in]    Attribute            Esrt from Non Esrt or FMP instance
-  
+
   @retval EFI_SUCCESS          Successfully Update a variable.
   @retval EFI_NOT_FOUND        The Esrt enry doesn't exist
 
@@ -425,9 +425,9 @@ IsSystemFmp (
   @param[in, out]     EsrtEntry            Esrt entry to be Init
   @param[in]          FmpImageInfo         FMP image info descriptor
   @param[in]          DescriptorVersion    FMP Image info descriptor version
-  
+
 **/
-VOID 
+VOID
 SetEsrtEntryFromFmpInfo (
   IN OUT EFI_SYSTEM_RESOURCE_ENTRY   *EsrtEntry,
   IN EFI_FIRMWARE_IMAGE_DESCRIPTOR   *FmpImageInfo,
@@ -451,7 +451,7 @@ SetEsrtEntryFromFmpInfo (
     // LowestSupportedImageVersion only available in FMP V2 or higher
     //
     EsrtEntry->LowestSupportedFwVersion = FmpImageInfo->LowestSupportedImageVersion;
-  } 
+  }
 
   if (DescriptorVersion >= 3) {
     //
@@ -459,7 +459,7 @@ SetEsrtEntryFromFmpInfo (
     //
     EsrtEntry->LastAttemptVersion = FmpImageInfo->LastAttemptVersion;
     EsrtEntry->LastAttemptStatus  = FmpImageInfo->LastAttemptStatus;
-  } 
+  }
 
   //
   // Set capsule customized flag

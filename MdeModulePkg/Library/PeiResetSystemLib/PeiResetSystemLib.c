@@ -18,11 +18,11 @@
 
 /**
   This function causes a system-wide reset (cold reset), in which
-  all circuitry within the system returns to its initial state. This type of reset 
+  all circuitry within the system returns to its initial state. This type of reset
   is asynchronous to system operation and operates without regard to
   cycle boundaries.
 
-  If this function returns, it means that the system does not support cold reset. 
+  If this function returns, it means that the system does not support cold reset.
 **/
 VOID
 EFIAPI
@@ -34,7 +34,7 @@ ResetCold (
 }
 
 /**
-  This function causes a system-wide initialization (warm reset), in which all processors 
+  This function causes a system-wide initialization (warm reset), in which all processors
   are set to their initial state. Pending cycles are not corrupted.
 
   If this function returns, it means that the system does not support warm reset.
@@ -49,7 +49,7 @@ ResetWarm (
 }
 
 /**
-  This function causes the system to enter a power state equivalent 
+  This function causes the system to enter a power state equivalent
   to the ACPI G2/S5 or G3 states.
 
   If this function returns, it means that the system does not support shut down reset.

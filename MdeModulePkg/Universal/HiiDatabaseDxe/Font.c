@@ -2,7 +2,7 @@
 Implementation for EFI_HII_FONT_PROTOCOL.
 
 
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -304,14 +304,14 @@ NarrowGlyphToBlt (
 
   Height = EFI_GLYPH_HEIGHT;
   Width  = EFI_GLYPH_WIDTH;
-  
+
   //
   // Move position to the left-top corner of char.
   //
   Buffer = *Origin - EFI_GLYPH_HEIGHT * ImageWidth;
 
   //
-  // Char may be partially displayed when CLIP_X or CLIP_Y is not set. 
+  // Char may be partially displayed when CLIP_X or CLIP_Y is not set.
   //
   if (RowHeight < Height) {
     Height = (UINT8) RowHeight;
@@ -685,7 +685,7 @@ FindGlyphBlock (
   ASSERT (FontPackage->Signature == HII_FONT_PACKAGE_SIGNATURE);
   BaseLine  = 0;
   MinOffsetY = 0;
-  
+
   if (CharValue == (CHAR16) (-1)) {
     //
     // Collect the cell information specified in font package fixed header.
@@ -1099,8 +1099,8 @@ IsSystemFontInfo (
   }
   if ((StringInfo->FontInfoMask & EFI_FONT_INFO_SYS_FORE_COLOR) == 0) {
     if (CompareMem (
-          &StringInfo->ForegroundColor, 
-          &SystemDefault->ForegroundColor, 
+          &StringInfo->ForegroundColor,
+          &SystemDefault->ForegroundColor,
           sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
           ) != 0) {
       goto Exit;
@@ -1108,8 +1108,8 @@ IsSystemFontInfo (
   }
   if ((StringInfo->FontInfoMask & EFI_FONT_INFO_SYS_BACK_COLOR) == 0) {
     if (CompareMem (
-          &StringInfo->BackgroundColor, 
-          &SystemDefault->BackgroundColor, 
+          &StringInfo->BackgroundColor,
+          &SystemDefault->BackgroundColor,
           sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL)
           ) != 0) {
       goto Exit;
@@ -1745,7 +1745,7 @@ HiiStringToImage (
       goto Exit;
     }
   }
-  
+
   //
   // Use the maximum height of font as the base line.
   // And, use the maximum height as line height.
@@ -1753,7 +1753,7 @@ HiiStringToImage (
   LineHeight     = Height;
   LastLineHeight = Height;
   BaseLineOffset = Height - BaseLine;
-  
+
   //
   // Parse the string to be displayed to drop some ignored characters.
   //
@@ -1799,7 +1799,7 @@ HiiStringToImage (
       Index++;
       continue;
     }
-    
+
     Status = GetGlyphBuffer (Private, *StringPtr, FontInfo, &GlyphBuf[Index], &Cell[Index], &Attributes[Index]);
     if (Status == EFI_NOT_FOUND) {
       if ((Flags & EFI_HII_IGNORE_IF_NO_GLYPH) == EFI_HII_IGNORE_IF_NO_GLYPH) {
@@ -1971,8 +1971,8 @@ HiiStringToImage (
     // opportunity prior to a character whose right-most extent would exceed Width.
     // Search the right-most line-break opportunity here.
     //
-    if ((Flags & EFI_HII_OUT_FLAG_WRAP) == EFI_HII_OUT_FLAG_WRAP && 
-        (RowInfo[RowIndex].LineWidth + BltX > Image->Width || StringPtr[NextIndex] != 0) && 
+    if ((Flags & EFI_HII_OUT_FLAG_WRAP) == EFI_HII_OUT_FLAG_WRAP &&
+        (RowInfo[RowIndex].LineWidth + BltX > Image->Width || StringPtr[NextIndex] != 0) &&
         !LineBreak) {
       if ((Flags & EFI_HII_IGNORE_LINE_BREAK) == 0) {
         LineWidth = RowInfo[RowIndex].LineWidth;
@@ -2040,7 +2040,7 @@ HiiStringToImage (
         }
       }
     }
-    
+
     //
     // LineWidth can't exceed Image width.
     //
@@ -2091,7 +2091,7 @@ HiiStringToImage (
           );
         }
         if (ColumnInfoArray != NULL) {
-          if ((GlyphBuf[Index1] == NULL && Cell[Index1].AdvanceX == 0) 
+          if ((GlyphBuf[Index1] == NULL && Cell[Index1].AdvanceX == 0)
               || RowInfo[RowIndex].LineWidth == 0) {
             *ColumnInfoArray = (UINTN) ~0;
           } else {
@@ -2119,7 +2119,7 @@ HiiStringToImage (
           FreePool (BltBuffer);
           goto Exit;
         }
-  
+
         FreePool (BltBuffer);
       }
     } else {
@@ -2151,7 +2151,7 @@ HiiStringToImage (
           );
         }
         if (ColumnInfoArray != NULL) {
-          if ((GlyphBuf[Index1] == NULL && Cell[Index1].AdvanceX == 0) 
+          if ((GlyphBuf[Index1] == NULL && Cell[Index1].AdvanceX == 0)
               || RowInfo[RowIndex].LineWidth == 0) {
             *ColumnInfoArray = (UINTN) ~0;
           } else {
@@ -2392,7 +2392,7 @@ HiiStringIdToImage (
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
- 
+
   if (Language == NULL) {
     Language = "";
   }
@@ -2409,7 +2409,7 @@ HiiStringIdToImage (
     Status = EFI_NOT_FOUND;
     goto Exit;
   }
-    
+
   StringSize = MAX_STRING_LENGTH;
   String = (EFI_STRING) AllocateZeroPool (StringSize);
   if (String == NULL) {
@@ -2447,33 +2447,33 @@ HiiStringIdToImage (
   if (EFI_ERROR (Status)) {
     goto Exit;
   }
-    
+
   //
   // When StringInfo specifies that string will be output in the system default font and color,
-  // use particular stringfontinfo described in string package instead if exists. 
+  // use particular stringfontinfo described in string package instead if exists.
   // StringFontInfo equals NULL means system default font attaches with the string block.
   //
   if (StringFontInfo != NULL && IsSystemFontInfo (Private, (EFI_FONT_DISPLAY_INFO *) StringInfo, NULL, NULL)) {
     NameSize = StrSize (StringFontInfo->FontName);
     FontLen = sizeof (EFI_FONT_DISPLAY_INFO) - sizeof (CHAR16) + NameSize;
     NewStringInfo = AllocateZeroPool (FontLen);
-    if (NewStringInfo == NULL) {      
+    if (NewStringInfo == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto Exit;
     }
     NewStringInfo->FontInfoMask       = EFI_FONT_INFO_SYS_FORE_COLOR | EFI_FONT_INFO_SYS_BACK_COLOR;
     NewStringInfo->FontInfo.FontStyle = StringFontInfo->FontStyle;
-    NewStringInfo->FontInfo.FontSize  = StringFontInfo->FontSize;    
+    NewStringInfo->FontInfo.FontSize  = StringFontInfo->FontSize;
     StrCpyS (NewStringInfo->FontInfo.FontName, NameSize / sizeof (CHAR16), StringFontInfo->FontName);
-  
+
     Status = HiiStringToImage (
-               This, 
-               Flags, 
-               String, 
-               NewStringInfo, 
-               Blt, 
-               BltX, 
-               BltY, 
+               This,
+               Flags,
+               String,
+               NewStringInfo,
+               Blt,
+               BltX,
+               BltY,
                RowInfoArray,
                RowInfoArraySize,
                ColumnInfoArray
@@ -2640,7 +2640,7 @@ HiiGetGlyph (
     //
     BaseLine  = (UINT16) (Cell.Height + Cell.OffsetY);
     //
-    // Set BltBuffer to the position of Origin. 
+    // Set BltBuffer to the position of Origin.
     //
     BltBuffer = Image->Image.Bitmap + (Cell.Height + Cell.OffsetY) * Image->Width - Cell.OffsetX;
     GlyphToImage (
@@ -2715,7 +2715,7 @@ Exit:
   @param  StringInfoOut           Upon return, contains the matching font's information.
                                   If NULL, then no information is returned. This buffer
                                   is allocated with a call to the Boot Service AllocatePool().
-                                  It is the caller's responsibility to call the Boot 
+                                  It is the caller's responsibility to call the Boot
                                   Service FreePool() when the caller no longer requires
                                   the contents of StringInfoOut.
   @param  String                  Points to the string which will be tested to
@@ -2800,7 +2800,7 @@ HiiGetFontInfo (
       goto Exit;
     }
   }
-  
+
   //
   // StringInfoIn must not be NULL if it is not system default font info.
   //
@@ -2808,15 +2808,15 @@ HiiGetFontInfo (
   //
   // Check the font information mask to make sure it is valid.
   //
-  if (((StringInfoIn->FontInfoMask & (EFI_FONT_INFO_SYS_FONT  | EFI_FONT_INFO_ANY_FONT))  == 
+  if (((StringInfoIn->FontInfoMask & (EFI_FONT_INFO_SYS_FONT  | EFI_FONT_INFO_ANY_FONT))  ==
        (EFI_FONT_INFO_SYS_FONT | EFI_FONT_INFO_ANY_FONT))   ||
-      ((StringInfoIn->FontInfoMask & (EFI_FONT_INFO_SYS_SIZE  | EFI_FONT_INFO_ANY_SIZE))  == 
+      ((StringInfoIn->FontInfoMask & (EFI_FONT_INFO_SYS_SIZE  | EFI_FONT_INFO_ANY_SIZE))  ==
        (EFI_FONT_INFO_SYS_SIZE | EFI_FONT_INFO_ANY_SIZE))   ||
-      ((StringInfoIn->FontInfoMask & (EFI_FONT_INFO_SYS_STYLE | EFI_FONT_INFO_ANY_STYLE)) == 
+      ((StringInfoIn->FontInfoMask & (EFI_FONT_INFO_SYS_STYLE | EFI_FONT_INFO_ANY_STYLE)) ==
        (EFI_FONT_INFO_SYS_STYLE | EFI_FONT_INFO_ANY_STYLE)) ||
-      ((StringInfoIn->FontInfoMask & (EFI_FONT_INFO_RESIZE    | EFI_FONT_INFO_ANY_SIZE))  == 
-       (EFI_FONT_INFO_RESIZE | EFI_FONT_INFO_ANY_SIZE))     ||           
-      ((StringInfoIn->FontInfoMask & (EFI_FONT_INFO_RESTYLE   | EFI_FONT_INFO_ANY_STYLE)) == 
+      ((StringInfoIn->FontInfoMask & (EFI_FONT_INFO_RESIZE    | EFI_FONT_INFO_ANY_SIZE))  ==
+       (EFI_FONT_INFO_RESIZE | EFI_FONT_INFO_ANY_SIZE))     ||
+      ((StringInfoIn->FontInfoMask & (EFI_FONT_INFO_RESTYLE   | EFI_FONT_INFO_ANY_STYLE)) ==
        (EFI_FONT_INFO_RESTYLE | EFI_FONT_INFO_ANY_STYLE))) {
     return EFI_INVALID_PARAMETER;
   }
@@ -2838,7 +2838,7 @@ HiiGetFontInfo (
 
   if ((StringInfoIn->FontInfoMask & EFI_FONT_INFO_SYS_SIZE) == EFI_FONT_INFO_SYS_SIZE) {
     InfoOut.FontInfo.FontSize = SystemDefault->FontInfo.FontSize;
-  } 
+  }
   if ((StringInfoIn->FontInfoMask & EFI_FONT_INFO_SYS_STYLE) == EFI_FONT_INFO_SYS_STYLE) {
     InfoOut.FontInfo.FontStyle = SystemDefault->FontInfo.FontStyle;
   }
@@ -2848,7 +2848,7 @@ HiiGetFontInfo (
   if ((StringInfoIn->FontInfoMask & EFI_FONT_INFO_SYS_BACK_COLOR) == EFI_FONT_INFO_SYS_BACK_COLOR) {
     InfoOut.BackgroundColor = SystemDefault->BackgroundColor;
   }
-  
+
   ASSERT (FontInfo != NULL);
   FontInfo->FontSize  = InfoOut.FontInfo.FontSize;
   FontInfo->FontStyle = InfoOut.FontInfo.FontStyle;
@@ -2856,7 +2856,7 @@ HiiGetFontInfo (
   if (IsFontInfoExisted (Private, FontInfo, &InfoOut.FontInfoMask, LocalFontHandle, &GlobalFont)) {
     //
     // Test to guarantee all characters are available in the found font.
-    //    
+    //
     if (String != NULL) {
       StringIn = String;
       while (*StringIn != 0) {
@@ -2873,21 +2873,21 @@ HiiGetFontInfo (
     //
     if (StringInfoOut != NULL) {
       StringInfoOutLen = sizeof (EFI_FONT_DISPLAY_INFO) - sizeof (EFI_FONT_INFO) + GlobalFont->FontInfoSize;
-      *StringInfoOut   = (EFI_FONT_DISPLAY_INFO *) AllocateZeroPool (StringInfoOutLen);      
+      *StringInfoOut   = (EFI_FONT_DISPLAY_INFO *) AllocateZeroPool (StringInfoOutLen);
       if (*StringInfoOut == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         LocalFontHandle = NULL;
         goto Exit;
       }
-      
+
       CopyMem (*StringInfoOut, &InfoOut, sizeof (EFI_FONT_DISPLAY_INFO));
       CopyMem (&(*StringInfoOut)->FontInfo, GlobalFont->FontInfo, GlobalFont->FontInfoSize);
     }
-    
-    LocalFontHandle = GlobalFont->Entry.ForwardLink;    
+
+    LocalFontHandle = GlobalFont->Entry.ForwardLink;
     Status = EFI_SUCCESS;
     goto Exit;
-  }  
+  }
 
   Status = EFI_NOT_FOUND;
 

@@ -1,11 +1,11 @@
 /** @file
     Implementation of resetting a network adapter.
- 
-Copyright (c) 2004 - 2007, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under the 
-terms and conditions of the BSD License which accompanies this distribution. The 
-full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php 
+
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under the
+terms and conditions of the BSD License which accompanies this distribution. The
+full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -70,16 +70,16 @@ PxeReset (
   provided in the previous call to Initialize().
 
   This function resets a network adapter and reinitializes it with the parameters
-  that were provided in the previous call to Initialize(). The transmit and 
+  that were provided in the previous call to Initialize(). The transmit and
   receive queues are emptied and all pending interrupts are cleared.
-  Receive filters, the station address, the statistics, and the multicast-IP-to-HW 
-  MAC addresses are not reset by this call. If the network interface was 
-  successfully reset, then EFI_SUCCESS will be returned. If the driver has not 
+  Receive filters, the station address, the statistics, and the multicast-IP-to-HW
+  MAC addresses are not reset by this call. If the network interface was
+  successfully reset, then EFI_SUCCESS will be returned. If the driver has not
   been initialized, EFI_DEVICE_ERROR will be returned.
 
   @param This                 A pointer to the EFI_SIMPLE_NETWORK_PROTOCOL instance.
-  @param ExtendedVerification Indicates that the driver may perform a more 
-                              exhaustive verification operation of the device 
+  @param ExtendedVerification Indicates that the driver may perform a more
+                              exhaustive verification operation of the device
                               during reset.
 
   @retval EFI_SUCCESS           The network interface was reset.

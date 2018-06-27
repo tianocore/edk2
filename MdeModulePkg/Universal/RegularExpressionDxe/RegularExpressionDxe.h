@@ -2,7 +2,7 @@
   EFI_REGULAR_EXPRESSION_PROTOCOL Header File.
 
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-  
+
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License that accompanies this
   distribution.  The full text of the license may be found at

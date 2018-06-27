@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for ArpDxe driver.
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -187,10 +187,10 @@ ArpComponentNameGetControllerName (
   if (ChildHandle == NULL) {
     return EFI_UNSUPPORTED;
   }
-  
-  // 
-  // Make sure this driver produced ChildHandle 
-  // 
+
+  //
+  // Make sure this driver produced ChildHandle
+  //
   Status = EfiTestChildHandle (
              ControllerHandle,
              ChildHandle,
@@ -200,9 +200,9 @@ ArpComponentNameGetControllerName (
     return Status;
   }
 
-  // 
-  // Retrieve an instance of a produced protocol from ChildHandle  
-  // 
+  //
+  // Retrieve an instance of a produced protocol from ChildHandle
+  //
   Status = gBS->OpenProtocol (
                   ChildHandle,
                   &gEfiArpProtocolGuid,

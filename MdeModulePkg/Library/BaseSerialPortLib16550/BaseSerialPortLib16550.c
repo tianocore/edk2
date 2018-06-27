@@ -2,7 +2,7 @@
   16550 UART Serial Port library functions
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2018, AMD Incorporated. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -65,11 +65,11 @@ typedef struct {
 } PCI_UART_DEVICE_INFO;
 
 /**
-  Read an 8-bit 16550 register.  If PcdSerialUseMmio is TRUE, then the value is read from 
+  Read an 8-bit 16550 register.  If PcdSerialUseMmio is TRUE, then the value is read from
   MMIO space.  If PcdSerialUseMmio is FALSE, then the value is read from I/O space.  The
-  parameter Offset is added to the base address of the 16550 registers that is specified 
-  by PcdSerialRegisterBase. 
-  
+  parameter Offset is added to the base address of the 16550 registers that is specified
+  by PcdSerialRegisterBase.
+
   @param  Base    The base address register of UART device.
   @param  Offset  The offset of the 16550 register to read.
 
@@ -92,9 +92,9 @@ SerialPortReadRegister (
 /**
   Write an 8-bit 16550 register.  If PcdSerialUseMmio is TRUE, then the value is written to
   MMIO space.  If PcdSerialUseMmio is FALSE, then the value is written to I/O space.  The
-  parameter Offset is added to the base address of the 16550 registers that is specified 
-  by PcdSerialRegisterBase. 
-  
+  parameter Offset is added to the base address of the 16550 registers that is specified
+  by PcdSerialRegisterBase.
+
   @param  Base    The base address register of UART device.
   @param  Offset  The offset of the 16550 register to write.
   @param  Value   The value to write to the 16550 register specified by Offset.
@@ -117,11 +117,11 @@ SerialPortWriteRegister (
 }
 
 /**
-  Update the value of an 16-bit PCI configuration register in a PCI device.  If the  
-  PCI Configuration register specified by PciAddress is already programmed with a 
-  non-zero value, then return the current value.  Otherwise update the PCI configuration 
+  Update the value of an 16-bit PCI configuration register in a PCI device.  If the
+  PCI Configuration register specified by PciAddress is already programmed with a
+  non-zero value, then return the current value.  Otherwise update the PCI configuration
   register specified by PciAddress with the value specified by Value and return the
-  value programmed into the PCI configuration register.  All values must be masked 
+  value programmed into the PCI configuration register.  All values must be masked
   using the bitmask specified by Mask.
 
   @param  PciAddress  PCI Library address of the PCI Configuration register to update.
@@ -137,7 +137,7 @@ SerialPortLibUpdatePciRegister16 (
   )
 {
   UINT16  CurrentValue;
-  
+
   CurrentValue = PciRead16 (PciAddress) & Mask;
   if (CurrentValue != 0) {
     return CurrentValue;
@@ -146,11 +146,11 @@ SerialPortLibUpdatePciRegister16 (
 }
 
 /**
-  Update the value of an 32-bit PCI configuration register in a PCI device.  If the  
-  PCI Configuration register specified by PciAddress is already programmed with a 
-  non-zero value, then return the current value.  Otherwise update the PCI configuration 
+  Update the value of an 32-bit PCI configuration register in a PCI device.  If the
+  PCI Configuration register specified by PciAddress is already programmed with a
+  non-zero value, then return the current value.  Otherwise update the PCI configuration
   register specified by PciAddress with the value specified by Value and return the
-  value programmed into the PCI configuration register.  All values must be masked 
+  value programmed into the PCI configuration register.  All values must be masked
   using the bitmask specified by Mask.
 
   @param  PciAddress  PCI Library address of the PCI Configuration register to update.
@@ -168,7 +168,7 @@ SerialPortLibUpdatePciRegister32 (
   )
 {
   UINT32  CurrentValue;
-  
+
   CurrentValue = PciRead32 (PciAddress) & Mask;
   if (CurrentValue != 0) {
     return CurrentValue;
@@ -177,11 +177,11 @@ SerialPortLibUpdatePciRegister32 (
 }
 
 /**
-  Retrieve the I/O or MMIO base address register for the PCI UART device. 
-  
-  This function assumes Root Bus Numer is Zero, and enables I/O and MMIO in PCI UART 
-  Device if they are not already enabled. 
-  
+  Retrieve the I/O or MMIO base address register for the PCI UART device.
+
+  This function assumes Root Bus Numer is Zero, and enables I/O and MMIO in PCI UART
+  Device if they are not already enabled.
+
   @return  The base address register of the UART device.
 
 **/
@@ -210,10 +210,10 @@ GetSerialRegisterBase (
   // Get PCI Device Info
   //
   DeviceInfo = (PCI_UART_DEVICE_INFO *) PcdGetPtr (PcdSerialPciDeviceInfo);
-  
+
   //
   // If PCI Device Info is empty, then assume fixed address UART and return PcdSerialRegisterBase
-  //  
+  //
   if (DeviceInfo->Device == 0xff) {
     return (UINTN)PcdGet64 (PcdSerialRegisterBase);
   }
@@ -225,17 +225,17 @@ GetSerialRegisterBase (
   ParentMemoryLimit = 0xfff00000 >> 16;
   ParentIoBase      = 0 >> 12;
   ParentIoLimit     = 0xf000 >> 12;
-  
+
   //
   // Enable I/O and MMIO in PCI Bridge
-  // Assume Root Bus Numer is Zero. 
+  // Assume Root Bus Numer is Zero.
   //
   for (BusNumber = 0; (DeviceInfo + 1)->Device != 0xff; DeviceInfo++) {
     //
     // Compute PCI Lib Address to PCI to PCI Bridge
     //
     PciLibAddress = PCI_LIB_ADDRESS (BusNumber, DeviceInfo->Device, DeviceInfo->Function, 0);
-    
+
     //
     // Retrieve and verify the bus numbers in the PCI to PCI Bridge
     //
@@ -258,10 +258,10 @@ GetSerialRegisterBase (
       if (MemoryLimit < MemoryBase) {
         return 0;
       }
-      
+
       //
       // If PCI Bridge MMIO window is not in the address range decoded by the parent PCI Bridge, then return 0
-      //  
+      //
       if (MemoryBase < ParentMemoryBase || MemoryBase > ParentMemoryLimit || MemoryLimit > ParentMemoryLimit) {
         return 0;
       }
@@ -280,17 +280,17 @@ GetSerialRegisterBase (
       } else {
         IoBase = (PciRead16 (PciLibAddress + OFFSET_OF (PCI_TYPE01, Bridge.IoBaseUpper16)) << 4) | (IoBase >> 4);
       }
-      
+
       //
       // If PCI Bridge I/O window is disabled, then return 0
       //
       if (IoLimit < IoBase) {
         return 0;
       }
-      
+
       //
       // If PCI Bridge I/O window is not in the address range decoded by the parent PCI Bridge, then return 0
-      //  
+      //
       if (IoBase < ParentIoBase || IoBase > ParentIoLimit || IoLimit > ParentIoLimit) {
         return 0;
       }
@@ -303,7 +303,7 @@ GetSerialRegisterBase (
   // Compute PCI Lib Address to PCI UART
   //
   PciLibAddress = PCI_LIB_ADDRESS (BusNumber, DeviceInfo->Device, DeviceInfo->Function, 0);
-  
+
   //
   // Find the first IO or MMIO BAR
   //
@@ -336,16 +336,16 @@ GetSerialRegisterBase (
 
   //
   // Program UART BAR
-  //  
+  //
   SerialRegisterBase = SerialPortLibUpdatePciRegister32 (
                          PciLibAddress + PCI_BASE_ADDRESSREG_OFFSET + BarIndex * 4,
-                         (UINT32)PcdGet64 (PcdSerialRegisterBase), 
+                         (UINT32)PcdGet64 (PcdSerialRegisterBase),
                          RegisterBaseMask
                          );
 
   //
   // Verify that the UART BAR is in the address range decoded by the parent PCI Bridge
-  //  
+  //
   if (PcdGetBool (PcdSerialUseMmio)) {
     if (((SerialRegisterBase >> 16) & 0xfff0) < ParentMemoryBase || ((SerialRegisterBase >> 16) & 0xfff0) > ParentMemoryLimit) {
       return 0;
@@ -355,7 +355,7 @@ GetSerialRegisterBase (
       return 0;
     }
   }
-  
+
   //
   // Enable I/O and MMIO in PCI UART Device if they are not already enabled
   //
@@ -376,7 +376,7 @@ GetSerialRegisterBase (
       SerialPortWriteRegister (SerialRegisterBase, R_UART_FCR, (UINT8)(PcdGet8 (PcdSerialFifoControl) & (B_UART_FCR_FIFOE | B_UART_FCR_FIFO64)));
     }
   }
-  
+
   //
   // Get PCI Device Info
   //
@@ -384,22 +384,22 @@ GetSerialRegisterBase (
 
   //
   // Enable I/O or MMIO in PCI Bridge
-  // Assume Root Bus Numer is Zero. 
+  // Assume Root Bus Numer is Zero.
   //
   for (BusNumber = 0; (DeviceInfo + 1)->Device != 0xff; DeviceInfo++) {
     //
     // Compute PCI Lib Address to PCI to PCI Bridge
     //
     PciLibAddress = PCI_LIB_ADDRESS (BusNumber, DeviceInfo->Device, DeviceInfo->Function, 0);
-    
+
     //
     // Enable the I/O or MMIO decode windows in the PCI to PCI Bridge
     //
     PciOr16 (
-      PciLibAddress + PCI_COMMAND_OFFSET, 
+      PciLibAddress + PCI_COMMAND_OFFSET,
       PcdGetBool (PcdSerialUseMmio) ? EFI_PCI_COMMAND_MEMORY_SPACE : EFI_PCI_COMMAND_IO_SPACE
       );
-      
+
     //
     // Force D0 state if a Power Management and Status Register is specified
     //
@@ -408,10 +408,10 @@ GetSerialRegisterBase (
         PciAnd16 (PciLibAddress + DeviceInfo->PowerManagementStatusAndControlRegister, (UINT16)~(BIT0 | BIT1));
       }
     }
-      
+
     BusNumber = PciRead8 (PciLibAddress + PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET);
   }
-  
+
   return SerialRegisterBase;
 }
 
@@ -445,7 +445,7 @@ SerialPortWritable (
       return (BOOLEAN) ((SerialPortReadRegister (SerialRegisterBase, R_UART_MSR) & (B_UART_MSR_DSR | B_UART_MSR_CTS)) == (B_UART_MSR_DSR | B_UART_MSR_CTS));
     } else {
       //
-      // Wait for both DSR and CTS to be set OR for DSR to be clear.  
+      // Wait for both DSR and CTS to be set OR for DSR to be clear.
       //   DSR is set if a cable is connected.
       //   CTS is set if it is ok to transmit data
       //
@@ -465,11 +465,11 @@ SerialPortWritable (
 
 /**
   Initialize the serial device hardware.
-  
+
   If no initialization is required, then return RETURN_SUCCESS.
   If the serial device was successfully initialized, then return RETURN_SUCCESS.
   If the serial device could not be initialized, then return RETURN_DEVICE_ERROR.
-  
+
   @retval RETURN_SUCCESS        The serial device was initialized.
   @retval RETURN_DEVICE_ERROR   The serial device could not be initialized.
 
@@ -483,7 +483,7 @@ SerialPortInitialize (
   RETURN_STATUS  Status;
   UINTN          SerialRegisterBase;
   UINT32         Divisor;
-  UINT32         CurrentDivisor;  
+  UINT32         CurrentDivisor;
   BOOLEAN        Initialized;
 
   //
@@ -535,7 +535,7 @@ SerialPortInitialize (
   // Verify that both the transmit FIFO and the shift register are empty.
   //
   while ((SerialPortReadRegister (SerialRegisterBase, R_UART_LSR) & (B_UART_LSR_TEMT | B_UART_LSR_TXRDY)) != (B_UART_LSR_TEMT | B_UART_LSR_TXRDY));
-  
+
   //
   // Configure baud rate
   //
@@ -563,20 +563,20 @@ SerialPortInitialize (
 
   //
   // Put Modem Control Register(MCR) into its reset state of 0x00.
-  //  
+  //
   SerialPortWriteRegister (SerialRegisterBase, R_UART_MCR, 0x00);
 
   return RETURN_SUCCESS;
 }
 
 /**
-  Write data from buffer to serial device. 
+  Write data from buffer to serial device.
 
-  Writes NumberOfBytes data bytes from Buffer to the serial device.  
+  Writes NumberOfBytes data bytes from Buffer to the serial device.
   The number of bytes actually written to the serial device is returned.
   If the return value is less than NumberOfBytes, then the write operation failed.
 
-  If Buffer is NULL, then ASSERT(). 
+  If Buffer is NULL, then ASSERT().
 
   If NumberOfBytes is zero, then return 0.
 
@@ -584,7 +584,7 @@ SerialPortInitialize (
   @param  NumberOfBytes    Number of bytes to written to the serial device.
 
   @retval 0                NumberOfBytes is 0.
-  @retval >0               The number of bytes written to the serial device.  
+  @retval >0               The number of bytes written to the serial device.
                            If this value is less than NumberOfBytes, then the write operation failed.
 
 **/
@@ -608,7 +608,7 @@ SerialPortWrite (
   if (SerialRegisterBase ==0) {
     return 0;
   }
-  
+
   if (NumberOfBytes == 0) {
     //
     // Flush the hardware
@@ -671,7 +671,7 @@ SerialPortWrite (
   @param  NumberOfBytes    Number of bytes to read from the serial device.
 
   @retval 0                NumberOfBytes is 0.
-  @retval >0               The number of bytes read from the serial device.  
+  @retval >0               The number of bytes read from the serial device.
                            If this value is less than NumberOfBytes, then the read operation failed.
 
 **/
@@ -696,7 +696,7 @@ SerialPortRead (
   }
 
   Mcr = (UINT8)(SerialPortReadRegister (SerialRegisterBase, R_UART_MCR) & ~B_UART_MCR_RTS);
-  
+
   for (Result = 0; NumberOfBytes-- != 0; Result++, Buffer++) {
     //
     // Wait for the serial port to have some data.
@@ -715,13 +715,13 @@ SerialPortRead (
       //
       SerialPortWriteRegister (SerialRegisterBase, R_UART_MCR, Mcr);
     }
-    
+
     //
     // Read byte from the receive buffer.
     //
     *Buffer = SerialPortReadRegister (SerialRegisterBase, R_UART_RXBUF);
   }
-  
+
   return Result;
 }
 
@@ -744,7 +744,7 @@ SerialPortPoll (
   )
 {
   UINTN  SerialRegisterBase;
-  
+
   SerialRegisterBase = GetSerialRegisterBase ();
   if (SerialRegisterBase ==0) {
     return FALSE;
@@ -761,15 +761,15 @@ SerialPortPoll (
       SerialPortWriteRegister (SerialRegisterBase, R_UART_MCR, (UINT8)(SerialPortReadRegister (SerialRegisterBase, R_UART_MCR) & ~B_UART_MCR_RTS));
     }
     return TRUE;
-  }    
-  
+  }
+
   if (PcdGetBool (PcdSerialUseHardwareFlowControl)) {
     //
     // Set RTS to let the peer send some data
     //
     SerialPortWriteRegister (SerialRegisterBase, R_UART_MCR, (UINT8)(SerialPortReadRegister (SerialRegisterBase, R_UART_MCR) | B_UART_MCR_RTS));
   }
-  
+
   return FALSE;
 }
 

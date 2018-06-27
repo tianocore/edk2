@@ -9,7 +9,7 @@
 # 1. Universal Serial Bus HID Firmware Specification, ver 1.11
 # 2. UEFI Specification, v2.1
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -36,7 +36,7 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gUsbMouseDriverBinding                        
+#  DRIVER_BINDING                =  gUsbMouseDriverBinding
 #  COMPONENT_NAME                =  gUsbMouseComponentName
 #  COMPONENT_NAME2               =  gUsbMouseComponentName2
 #

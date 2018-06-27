@@ -1,10 +1,10 @@
 /** @file
-  This library retrieves pointers to the UEFI HII Protocol instances in the 
-  library's constructor.  All of the UEFI HII related protocols are optional, 
-  so the consumers of this library class must verify that the global variable 
-  pointers are not NULL before use.   
+  This library retrieves pointers to the UEFI HII Protocol instances in the
+  library's constructor.  All of the UEFI HII related protocols are optional,
+  so the consumers of this library class must verify that the global variable
+  pointers are not NULL before use.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -54,13 +54,13 @@ EFI_HII_CONFIG_ROUTING_PROTOCOL  *gHiiConfigRouting = NULL;
 
 /**
   The constructor function retrieves pointers to the UEFI HII protocol instances
-    
-  The constructor function retrieves pointers to the four UEFI HII protocols from the 
-  handle database.  These include the UEFI HII Font Protocol, the UEFI HII String 
-  Protocol, the UEFI HII Image Protocol, the UEFI HII Database Protocol, and the 
+
+  The constructor function retrieves pointers to the four UEFI HII protocols from the
+  handle database.  These include the UEFI HII Font Protocol, the UEFI HII String
+  Protocol, the UEFI HII Image Protocol, the UEFI HII Database Protocol, and the
   UEFI HII Config Routing Protocol.  This function always return EFI_SUCCESS.
   All of these protocols are optional if the platform does not support configuration
-  and the UEFI HII Image Protocol and the UEFI HII Font Protocol are optional if 
+  and the UEFI HII Image Protocol and the UEFI HII Font Protocol are optional if
   the platform does not support a graphical console.  As a result, the consumers
   of this library much check the protocol pointers againt NULL before using them,
   or use dependency expressions to guarantee that some of them are present before
@@ -82,30 +82,30 @@ UefiHiiServicesLibConstructor (
   EFI_STATUS Status;
 
   //
-  // Retrieve the pointer to the UEFI HII String Protocol 
+  // Retrieve the pointer to the UEFI HII String Protocol
   //
   Status = gBS->LocateProtocol (&gEfiHiiStringProtocolGuid, NULL, (VOID **) &gHiiString);
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Retrieve the pointer to the UEFI HII Database Protocol 
+  // Retrieve the pointer to the UEFI HII Database Protocol
   //
   Status = gBS->LocateProtocol (&gEfiHiiDatabaseProtocolGuid, NULL, (VOID **) &gHiiDatabase);
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Retrieve the pointer to the UEFI HII Config Routing Protocol 
+  // Retrieve the pointer to the UEFI HII Config Routing Protocol
   //
   Status = gBS->LocateProtocol (&gEfiHiiConfigRoutingProtocolGuid, NULL, (VOID **) &gHiiConfigRouting);
   ASSERT_EFI_ERROR (Status);
 
   //
-  // Retrieve the pointer to the optional UEFI HII Font Protocol 
+  // Retrieve the pointer to the optional UEFI HII Font Protocol
   //
   gBS->LocateProtocol (&gEfiHiiFontProtocolGuid, NULL, (VOID **) &gHiiFont);
 
   //
-  // Retrieve the pointer to the optional UEFI HII Image Protocol 
+  // Retrieve the pointer to the optional UEFI HII Image Protocol
   //
   gBS->LocateProtocol (&gEfiHiiImageProtocolGuid, NULL, (VOID **) &gHiiImage);
 

@@ -10,7 +10,7 @@
   for Security Protocol Specific layout. This implementation uses big endian for
   Cylinder register.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -633,7 +633,7 @@ AtaTerminateNonBlockingTask (
 
   //
   // Aborting operation has been done. From now on, don't need to abort normal operation.
-  //  
+  //
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   AtaDevice->Abort = FALSE;
   gBS->RestoreTPL (OldTpl);

@@ -2,18 +2,18 @@
 
   This is a simple fault tolerant write driver.
 
-  This boot service protocol only provides fault tolerant write capability for 
-  block devices.  The protocol has internal non-volatile intermediate storage 
-  of the data and private information. It should be able to recover 
-  automatically from a critical fault, such as power failure. 
+  This boot service protocol only provides fault tolerant write capability for
+  block devices.  The protocol has internal non-volatile intermediate storage
+  of the data and private information. It should be able to recover
+  automatically from a critical fault, such as power failure.
 
-  The implementation uses an FTW (Fault Tolerant Write) Work Space. 
+  The implementation uses an FTW (Fault Tolerant Write) Work Space.
   This work space is a memory copy of the work space on the Working Block,
   the size of the work space is the FTW_WORK_SPACE_SIZE bytes.
-  
+
   The work space stores each write record as EFI_FTW_RECORD structure.
   The spare block stores the write buffer before write to the target block.
-  
+
   The write record has three states to specify the different phase of write operation.
   1) WRITE_ALLOCATED is that the record is allocated in write space.
      The information of write operation is stored in write record structure.
@@ -27,27 +27,27 @@
   Final copy the data from the spare block to the target block.
 
   To make this drive work well, the following conditions must be satisfied:
-  1. The write NumBytes data must be fit within Spare area. 
+  1. The write NumBytes data must be fit within Spare area.
      Offset + NumBytes <= SpareAreaLength
   2. The whole flash range has the same block size.
   3. Working block is an area which contains working space in its last block and has the same size as spare block.
-  4. Working Block area must be in the single one Firmware Volume Block range which FVB protocol is produced on.  
+  4. Working Block area must be in the single one Firmware Volume Block range which FVB protocol is produced on.
   5. Spare area must be in the single one Firmware Volume Block range which FVB protocol is produced on.
-  6. Any write data area (SpareAreaLength Area) which the data will be written into must be 
+  6. Any write data area (SpareAreaLength Area) which the data will be written into must be
      in the single one Firmware Volume Block range which FVB protocol is produced on.
   7. If write data area (such as Variable range) is enlarged, the spare area range must be enlarged.
      The spare area must be enough large to store the write data before write them into the target range.
   If one of them is not satisfied, FtwWrite may fail.
   Usually, Spare area only takes one block. That's SpareAreaLength = BlockSize, NumberOfSpareBlock = 1.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -65,7 +65,7 @@ EFI_EVENT                                 mFvbRegistration = NULL;
   @retval EFI_SUCCESS           The interface information for the specified protocol was returned.
   @retval EFI_UNSUPPORTED       The device does not support the FVB protocol.
   @retval EFI_INVALID_PARAMETER FvBlockHandle is not a valid EFI_HANDLE or FvBlock is NULL.
-  
+
 **/
 EFI_STATUS
 FtwGetFvbByHandle (
@@ -104,8 +104,8 @@ FtwGetSarProtocol (
   // Locate Swap Address Range protocol
   //
   Status = gBS->LocateProtocol (
-                  &gEfiSwapAddressRangeProtocolGuid, 
-                  NULL, 
+                  &gEfiSwapAddressRangeProtocolGuid,
+                  NULL,
                   SarProtocol
                   );
   return Status;
@@ -113,7 +113,7 @@ FtwGetSarProtocol (
 
 /**
   Function returns an array of handles that support the FVB protocol
-  in a buffer allocated from pool. 
+  in a buffer allocated from pool.
 
   @param[out]  NumberHandles    The number of handles returned in Buffer.
   @param[out]  Buffer           A pointer to the buffer to return the requested
@@ -124,7 +124,7 @@ FtwGetSarProtocol (
   @retval EFI_NOT_FOUND         No FVB handle was found.
   @retval EFI_OUT_OF_RESOURCES  There is not enough pool memory to store the matching results.
   @retval EFI_INVALID_PARAMETER NumberHandles is NULL or Buffer is NULL.
-  
+
 **/
 EFI_STATUS
 GetFvbCountAndBuffer (
@@ -169,10 +169,10 @@ FvbNotificationEvent (
   //
   // Just return to avoid installing FaultTolerantWriteProtocol again
   // if Fault Tolerant Write protocol has been installed.
-  //  
+  //
   Status = gBS->LocateProtocol (
-                  &gEfiFaultTolerantWriteProtocolGuid, 
-                  NULL, 
+                  &gEfiFaultTolerantWriteProtocolGuid,
+                  NULL,
                   (VOID **) &FtwProtocol
                   );
   if (!EFI_ERROR (Status)) {
@@ -186,8 +186,8 @@ FvbNotificationEvent (
   Status = InitFtwProtocol (FtwDevice);
   if (EFI_ERROR(Status)) {
     return ;
-  }                          
-    
+  }
+
   //
   // Install protocol interface
   //
@@ -198,10 +198,10 @@ FvbNotificationEvent (
                   &FtwDevice->FtwInstance
                   );
   ASSERT_EFI_ERROR (Status);
-  
+
   Status = gBS->CloseEvent (Event);
   ASSERT_EFI_ERROR (Status);
-  
+
   return;
 }
 
@@ -215,7 +215,7 @@ FvbNotificationEvent (
   @retval EFI_SUCCESS           The initialization finished successfully.
   @retval EFI_OUT_OF_RESOURCES  Allocate memory error
   @retval EFI_INVALID_PARAMETER Workspace or Spare block does not exist
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -239,7 +239,7 @@ FaultTolerantWriteInitialize (
 
   //
   // Register FvbNotificationEvent () notify function.
-  // 
+  //
   EfiCreateProtocolNotifyEvent (
     &gEfiFirmwareVolumeBlockProtocolGuid,
     TPL_CALLBACK,
@@ -247,6 +247,6 @@ FaultTolerantWriteInitialize (
     (VOID *)FtwDevice,
     &mFvbRegistration
     );
-  
+
   return EFI_SUCCESS;
 }
