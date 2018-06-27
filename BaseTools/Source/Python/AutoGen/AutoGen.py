@@ -2780,7 +2780,7 @@ class ModuleAutoGen(AutoGen):
             self._Macro = OrderedDict()
             self._Macro["WORKSPACE"             ] = self.WorkspaceDir
             self._Macro["MODULE_NAME"           ] = self.Name
-            self._Macro["MODULE_NAME_GUID"      ] = self._GetUniqueBaseName()
+            self._Macro["MODULE_NAME_GUID"      ] = self.UniqueBaseName
             self._Macro["MODULE_GUID"           ] = self.Guid
             self._Macro["MODULE_VERSION"        ] = self.Version
             self._Macro["MODULE_TYPE"           ] = self.ModuleType
@@ -4408,6 +4408,7 @@ class ModuleAutoGen(AutoGen):
     BuildCommand            = property(_GetBuildCommand)
     
     FixedAtBuildPcds         = property(_GetFixedAtBuildPcds)
+    UniqueBaseName          = property(_GetUniqueBaseName)
 
 # This acts like the main() function for the script, unless it is 'import'ed into another script.
 if __name__ == '__main__':
