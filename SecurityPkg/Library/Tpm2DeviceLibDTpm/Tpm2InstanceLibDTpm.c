@@ -125,7 +125,7 @@ Tpm2InstanceLibDTpmConstructor (
         PcdSet8S(PcdActiveTpmInterfaceType, PtpInterface);
       }
 
-      if (PcdGet8(PcdActiveTpmInterfaceType) == PtpInterfaceCrb && PcdGet8(PcdCRBIdleByPass) == 0xFF) {
+      if (PcdGet8(PcdActiveTpmInterfaceType) == Tpm2PtpInterfaceCrb && PcdGet8(PcdCRBIdleByPass) == 0xFF) {
         IdleByPass = Tpm2GetIdleByPass((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
         PcdSet8S(PcdCRBIdleByPass, IdleByPass);
       }
