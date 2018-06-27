@@ -2108,7 +2108,7 @@ class DscBuildData(PlatformBuildClassObject):
             Messages = StdErr
         Messages = Messages.split('\n')
         MessageGroup = []
-        if returncode <>0:
+        if returncode != 0:
             CAppBaseFileName = os.path.join(self.OutputPath, PcdValueInitName)
             File = open (CAppBaseFileName + '.c', 'r')
             FileData = File.readlines()
