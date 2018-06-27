@@ -1,7 +1,7 @@
 /** @file
   Debug Agent library implementition for Dxe Core and Dxr modules.
 
-  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -237,7 +237,7 @@ GetDebugPortHandle (
 /**
   Worker function to set up Debug Agent environment.
 
-  This function will set up IDT table and initialize the IDT entries and 
+  This function will set up IDT table and initialize the IDT entries and
   initialize CPU LOCAL APIC timer.
   It also tries to connect HOST if Debug Agent was not initialized before.
 

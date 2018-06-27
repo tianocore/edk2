@@ -189,7 +189,7 @@ UINT32
 FindNextPendingBreakCpu (
   VOID
   );
-  
+
 /**
   Check if all processors are in running status.
 
@@ -205,18 +205,18 @@ IsAllCpuRunning (
 /**
   Check if the current processor is the first breaking processor.
 
-  If yes, halt other processors.  
-  
+  If yes, halt other processors.
+
   @param[in] ProcessorIndex   Processor index value.
-  
+
   @return TRUE       This processor is the first breaking processor.
   @return FALSE      This processor is not the first breaking processor.
-                            
+
 **/
 BOOLEAN
 IsFirstBreakProcessor (
   IN UINT32              ProcessorIndex
   );
-  
+
 #endif
 

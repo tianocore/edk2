@@ -1,7 +1,7 @@
 /** @file
   Ia32 arch functions to access IDT vector.
 
-  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -24,7 +24,7 @@
   @retval  FALSE    IDT entries were not setuo by Debug Agent.
 
 **/
-BOOLEAN 
+BOOLEAN
 CheckDebugAgentHandler (
   IN  IA32_DESCRIPTOR            *IdtDescriptor,
   IN  UINTN                      InterruptType
@@ -48,7 +48,7 @@ CheckDebugAgentHandler (
 }
 
 /**
-  Save IDT entry for INT1 and update it. 
+  Save IDT entry for INT1 and update it.
 
   @param[in]  IdtDescriptor      Pointer to IDT Descriptor.
   @param[out] SavedIdtEntry      Original IDT entry returned.
@@ -63,7 +63,7 @@ SaveAndUpdateIdtEntry1 (
   IA32_IDT_GATE_DESCRIPTOR   *IdtEntry;
   UINT16                     CodeSegment;
   UINTN                      InterruptHandler;
-  
+
   IdtEntry = (IA32_IDT_GATE_DESCRIPTOR *) IdtDescriptor->Base;
   CopyMem (SavedIdtEntry, &IdtEntry[1], sizeof (IA32_IDT_GATE_DESCRIPTOR));
 
@@ -80,7 +80,7 @@ SaveAndUpdateIdtEntry1 (
 }
 
 /**
-  Restore IDT entry for INT1. 
+  Restore IDT entry for INT1.
 
   @param[in]  IdtDescriptor      Pointer to IDT Descriptor.
   @param[in]  RestoredIdtEntry   IDT entry to be restored.
@@ -93,7 +93,7 @@ RestoreIdtEntry1 (
   )
 {
   IA32_IDT_GATE_DESCRIPTOR   *IdtEntry;
-  
+
   IdtEntry = (IA32_IDT_GATE_DESCRIPTOR *) IdtDescriptor->Base;
   CopyMem (&IdtEntry[1], RestoredIdtEntry, sizeof (IA32_IDT_GATE_DESCRIPTOR));
 }

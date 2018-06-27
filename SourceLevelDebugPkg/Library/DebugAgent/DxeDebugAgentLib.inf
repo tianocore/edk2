@@ -93,7 +93,7 @@
 
 [Protocols]
   gEfiSerialIoProtocolGuid                      ## SOMETIMES_PRODUCES
-  gEfiDevicePathProtocolGuid                    ## SOMETIMES_PRODUCES 
+  gEfiDevicePathProtocolGuid                    ## SOMETIMES_PRODUCES
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock                                  ## SOMETIMES_CONSUMES

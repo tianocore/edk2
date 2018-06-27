@@ -142,10 +142,10 @@ DebugAgentIsBsp (
   )
 {
   MSR_IA32_APIC_BASE_REGISTER  MsrApicBase;
-  
+
   //
   // If there are less than 2 CPUs detected, then the currently executing CPU
-  // must be the BSP.  This avoids an access to an MSR that may not be supported 
+  // must be the BSP.  This avoids an access to an MSR that may not be supported
   // on single core CPUs.
   //
   if (mDebugCpuData.CpuCount < 2) {

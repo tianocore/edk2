@@ -1,7 +1,7 @@
 /** @file
   Command header of for Debug Agent library instance.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -126,7 +126,7 @@ typedef union {
     //
     UINT32  BreakOnNextSmi    : 1;   // 1: Break on next SMI
     UINT32  PrintErrorLevel   : 4;   // Bitmask of print error level for debug message
-    UINT32  BreakOnBootScript : 1;   // 1: Break before executing boot script 
+    UINT32  BreakOnBootScript : 1;   // 1: Break before executing boot script
     UINT32  Reserved2         : 26;
   } Bits;
   UINT64  Uint64;
@@ -285,7 +285,7 @@ DebugReadBreakSymbol (
 
   @param[in] ErrorLevel  The error level of the debug message.
   @param[in] Format      Format string for the debug message to print.
-  @param[in] ...         Variable argument list whose contents are accessed 
+  @param[in] ...         Variable argument list whose contents are accessed
                          based on the format string specified by Format.
 
 **/
@@ -322,13 +322,13 @@ MultiProcessorDebugSupport (
 
 /**
   Find and report module image info to HOST.
-  
+
   @param[in] AlignSize      Image aligned size.
-  
+
 **/
-VOID 
+VOID
 FindAndReportModuleImageInfo (
-  IN UINTN          AlignSize                   
+  IN UINTN          AlignSize
   );
 
 /**
@@ -338,7 +338,7 @@ FindAndReportModuleImageInfo (
   @retval  FALSE    IDT entries were not setup by Debug Agent.
 
 **/
-BOOLEAN 
+BOOLEAN
 IsDebugAgentInitialzed (
   VOID
   );
@@ -362,7 +362,7 @@ UpdateMailboxChecksum (
   @param[in]  Mailbox  Debug Agent Mailbox pointer.
 
 **/
-VOID 
+VOID
 VerifyMailboxChecksum (
   IN DEBUG_AGENT_MAILBOX    *Mailbox
   );
@@ -374,17 +374,17 @@ VerifyMailboxChecksum (
   @param[in]  FlagValue     Debug flag value.
 
 **/
-VOID 
+VOID
 SetDebugFlag (
   IN UINT64                 FlagMask,
-  IN UINT32                 FlagValue                          
+  IN UINT32                 FlagValue
   );
 
 /**
   Get debug flag in mailbox.
 
   @param[in]  FlagMask      Debug flag mask value.
-  
+
   @return Debug flag value.
 
 **/
@@ -399,10 +399,10 @@ GetDebugFlag (
   @param[in]  Mailbox  Debug Agent Mailbox pointer.
   @param[in]  Index    Mailbox content index.
   @param[in]  Value    Value to be set into mail box.
-  
+
 **/
 VOID
-UpdateMailboxContent ( 
+UpdateMailboxContent (
   IN DEBUG_AGENT_MAILBOX    *Mailbox,
   IN UINTN                  Index,
   IN UINT64                 Value
@@ -412,7 +412,7 @@ UpdateMailboxContent (
   Retrieve exception handler from IDT table by ExceptionNum.
 
   @param[in]  ExceptionNum    Exception number
- 
+
   @return Exception handler
 
 **/
@@ -425,7 +425,7 @@ GetExceptionHandlerInIdtEntry (
   Set exception handler in IDT table by ExceptionNum.
 
   @param[in]  ExceptionNum      Exception number
-  @param[in]  ExceptionHandler  Exception Handler to be set 
+  @param[in]  ExceptionHandler  Exception Handler to be set
 
 **/
 VOID
@@ -437,15 +437,15 @@ SetExceptionHandlerInIdtEntry (
 /**
   Prints a debug message to the debug output device if the specified error level is enabled.
 
-  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function 
-  GetDebugPrintErrorLevel (), then print the message specified by Format and the 
+  If any bit in ErrorLevel is also set in DebugPrintErrorLevelLib function
+  GetDebugPrintErrorLevel (), then print the message specified by Format and the
   associated variable argument list to the debug output device.
 
   If Format is NULL, then ASSERT().
 
   @param[in] ErrorLevel  The error level of the debug message.
   @param[in] IsSend      Flag of debug message to declare that the data is being sent or being received.
-  @param[in] Data        Variable argument list whose contents are accessed 
+  @param[in] Data        Variable argument list whose contents are accessed
   @param[in] Length      based on the format string specified by Format.
 
 **/
@@ -455,7 +455,7 @@ DebugAgentDataMsgPrint (
   IN UINT8             ErrorLevel,
   IN BOOLEAN           IsSend,
   IN UINT8             *Data,
-  IN UINT8             Length  
+  IN UINT8             Length
   );
 
 /**

@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on usb debug port.
 
-  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -191,7 +191,7 @@ CalculateUsbDebugPortBar (
 
   VendorId = PciRead16 (PcdGet32(PcdUsbEhciPciAddress) + PCI_VENDOR_ID_OFFSET);
   DeviceId = PciRead16 (PcdGet32(PcdUsbEhciPciAddress) + PCI_DEVICE_ID_OFFSET);
-  
+
   if ((VendorId == 0xFFFF) || (DeviceId == 0xFFFF)) {
     return RETURN_UNSUPPORTED;
   }
@@ -199,7 +199,7 @@ CalculateUsbDebugPortBar (
   ProgInterface = PciRead8 (PcdGet32(PcdUsbEhciPciAddress) + PCI_CLASSCODE_OFFSET);
   SubClassCode  = PciRead8 (PcdGet32(PcdUsbEhciPciAddress) + PCI_CLASSCODE_OFFSET + 1);
   BaseCode      = PciRead8 (PcdGet32(PcdUsbEhciPciAddress) + PCI_CLASSCODE_OFFSET + 2);
-  
+
   if ((ProgInterface != PCI_IF_EHCI) || (SubClassCode != PCI_CLASS_SERIAL_USB) || (BaseCode != PCI_CLASS_SERIAL)) {
     return RETURN_UNSUPPORTED;
   }
@@ -312,7 +312,7 @@ UsbDebugPortIn (
       return RETURN_DEVICE_ERROR;
     }
   }
-  
+
   //
   // Clearing DONE bit by writing 1
   //
@@ -413,7 +413,7 @@ UsbDebugPortOut (
       return RETURN_DEVICE_ERROR;
     }
   }
-  
+
   //
   // Clearing DONE bit by writing 1
   //
@@ -747,7 +747,7 @@ InitializeUsbDebugHardware (
       Handle->Initialized = USBDBG_NO_DBG_CAB;
       return Status;
     }
-  
+
     Handle->Initialized = USBDBG_DBG_CAB;
   }
 
@@ -1053,7 +1053,7 @@ DebugPortInitialize (
   USB_DEBUG_PORT_HANDLE     Handle;
 
   //
-  // Validate the PCD PcdDebugPortHandleBufferSize value 
+  // Validate the PCD PcdDebugPortHandleBufferSize value
   //
   ASSERT (PcdGet16 (PcdDebugPortHandleBufferSize) == sizeof (USB_DEBUG_PORT_HANDLE));
 

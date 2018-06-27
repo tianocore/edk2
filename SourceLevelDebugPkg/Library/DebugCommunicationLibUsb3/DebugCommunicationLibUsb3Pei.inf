@@ -52,7 +52,7 @@
   # The format of pci address please refer to SourceLevelDebugPkg.dec
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciPciAddress               ## CONSUMES
 
-  # Per XHCI spec, software shall impose a timeout between the detection of the Debug Host 
+  # Per XHCI spec, software shall impose a timeout between the detection of the Debug Host
   # connection and the DbC Run transition to 1. This PCD specifies the timeout value in microsecond.
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciDebugDetectTimeout       ## SOMETIMES_CONSUMES
 

@@ -383,9 +383,9 @@ DebugAgentReadBuffer (
   UINT32                   TimerRound;
   UINT32                   TimerFrequency;
   UINT32                   TimerCycle;
-  
+
   Begin         = 0;
-  TimeoutTicker = 0;  
+  TimeoutTicker = 0;
   TimerRound    = 0;
   TimerFrequency = GetMailboxPointer()->DebugTimerFrequency;
   TimerCycle = GetApicTimerInitCount ();
@@ -405,7 +405,7 @@ DebugAgentReadBuffer (
   while (Index < NumberOfBytes) {
     if (DebugPortPollBuffer (Handle)) {
       DebugPortReadBuffer (Handle, Buffer + Index, 1, 0);
-      Index ++; 
+      Index ++;
       continue;
     }
     if (Timeout != 0) {
@@ -652,7 +652,7 @@ ReadRemainingBreakPacket (
   if (IS_REQUEST (DebugHeader)) {
     if (DebugHeader->SequenceNo == (UINT8) (Mailbox->HostSequenceNo + 1)) {
       //
-      // Only updagte HostSequenceNo for new command packet 
+      // Only updagte HostSequenceNo for new command packet
       //
       UpdateMailboxContent (Mailbox, DEBUG_MAILBOX_HOST_SEQUENCE_NO_INDEX, DebugHeader->SequenceNo);
       return EFI_SUCCESS;
@@ -1476,7 +1476,7 @@ CompressData (
         if (Send) {
           DebugPortWriteBuffer (Handle, &LastChar, 1);
         }
-        
+
       } else if (LastCharCount >= 2) {
         CompressedIndex += 3;
         LastCharCount -= 2;

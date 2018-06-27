@@ -179,7 +179,7 @@ Usb3GetIoMmu (
 /**
   Return USB3 debug instance address pointer.
 
-**/  
+**/
 EFI_PHYSICAL_ADDRESS *
 GetUsb3DebugPortInstanceAddrPtr (
   VOID
@@ -221,7 +221,7 @@ GetUsb3DebugPortInstanceAddrPtr (
   Allocate aligned memory for XHC's usage.
 
   @param BufferSize     The size, in bytes, of the Buffer.
-  
+
   @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/

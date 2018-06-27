@@ -1,7 +1,7 @@
 /** @file
   PE/Coff Extra Action library instances.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,7 +16,7 @@
 
 /**
   Check if the hardware breakpoint in Drx is enabled by checking the Lx and Gx bit in Dr7.
-  
+
   It assumes that DebugAgent will set both Lx and Gx bit when setting up the hardware breakpoint.
 
 
@@ -40,7 +40,7 @@ IsDrxEnabled (
   Common routine to report the PE/COFF image loading/relocating or unloading event.
 
   If ImageContext is NULL, then ASSERT().
-  
+
   @param  ImageContext  Pointer to the image context structure that describes the
                         PE/COFF image.
   @param  Signature     IMAGE_LOAD_SIGNATURE or IMAGE_UNLOAD_SIGNATURE.
@@ -83,7 +83,7 @@ PeCoffLoaderExtraActionCommon (
   if (LoadImageMethod == DEBUG_LOAD_IMAGE_METHOD_IO_HW_BREAKPOINT) {
     //
     // If the CPU does not support Debug Extensions(CPUID:01 EDX:BIT2)
-    // then force use of DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3 
+    // then force use of DEBUG_LOAD_IMAGE_METHOD_SOFT_INT3
     //
     AsmCpuid (1, NULL, NULL, NULL, &RegEdx);
     if ((RegEdx & BIT2) == 0) {
@@ -107,7 +107,7 @@ PeCoffLoaderExtraActionCommon (
       IdtEntryHooked = TRUE;
     }
   }
-  
+
   //
   // Save Debug Register State
   //
@@ -152,7 +152,7 @@ PeCoffLoaderExtraActionCommon (
 
   //
   // Restore Debug Register State only when Host didn't change it inside exception handler.
-  // E.g.: User halts the target and sets the HW breakpoint while target is 
+  // E.g.: User halts the target and sets the HW breakpoint while target is
   //       in the above exception handler
   //
   NewDr7 = AsmReadDr7 () | BIT10; // H/w sets bit 10, some simulators don't

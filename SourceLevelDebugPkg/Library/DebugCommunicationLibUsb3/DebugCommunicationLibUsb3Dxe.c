@@ -280,7 +280,7 @@ Usb3PciIoNotify (
                   );
   if (!EFI_ERROR (Status) &&
       (PciIoHandleBuffer != NULL) &&
-      (PciIoHandleCount != 0)) { 
+      (PciIoHandleCount != 0)) {
     for (Index = 0; Index < PciIoHandleCount; Index++) {
       Status = gBS->HandleProtocol (
                       PciIoHandleBuffer[Index],
@@ -327,7 +327,7 @@ Usb3PciIoNotify (
 /**
   Return USB3 debug instance address pointer.
 
-**/  
+**/
 EFI_PHYSICAL_ADDRESS *
 GetUsb3DebugPortInstanceAddrPtr (
   VOID
@@ -391,7 +391,7 @@ Usb3AllocateDmaBuffer (
   Allocate aligned memory for XHC's usage.
 
   @param  BufferSize      The size, in bytes, of the Buffer.
-  
+
   @return A pointer to the allocated buffer or NULL if allocation fails.
 
 **/
@@ -403,9 +403,9 @@ AllocateAlignBuffer (
   EFI_PHYSICAL_ADDRESS    TmpAddr;
   EFI_STATUS              Status;
   VOID                    *Buf;
-  
+
   Buf = NULL;
-  
+
   if (gBS != NULL) {
     if (mUsb3PciIo != NULL) {
       Usb3AllocateDmaBuffer (

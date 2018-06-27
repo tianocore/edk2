@@ -3,7 +3,7 @@
 #
 #  This DXE driver will invoke Debug Agent Library to initialize the debug agent.
 #
-# Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@
   MODULE_UNI_FILE                = DebugAgentDxe.uni
   FILE_GUID                      = 9727502C-034E-472b-8E1B-67BB28C6CFDB
   MODULE_TYPE                    = DXE_DRIVER
-  VERSION_STRING                 = 1.0  
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = DebugAgentDxeInitialize
   UNLOAD_IMAGE                   = DebugAgentDxeUnload
 
@@ -32,7 +32,7 @@
 
 [Sources]
   DebugAgentDxe.c
-  
+
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -40,7 +40,7 @@
 [LibraryClasses]
   UefiDriverEntryPoint
   UefiBootServicesTableLib
-  DebugAgentLib  
+  DebugAgentLib
 
 [Guids]
   gEfiEventExitBootServicesGuid                 ## SOMETIMES_CONSUMES ## Event

@@ -1,7 +1,7 @@
 /** @file
   Debug Port Library implementation based on serial port.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -65,7 +65,7 @@ DebugPortInitialize (
 
   Status = SerialPortInitialize ();
   if (RETURN_ERROR(Status)) {
-    DEBUG ((EFI_D_ERROR, "Debug Serial Port: Initialization failed!\n")); 
+    DEBUG ((EFI_D_ERROR, "Debug Serial Port: Initialization failed!\n"));
   }
 
   if (Function != NULL) {
