@@ -1,7 +1,7 @@
 /** @file
   ACPI Timer implements one instance of Timer Library.
 
-  Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -70,13 +70,13 @@ UINT64  mPerformanceCounterFrequency = 0;
 UINT64
 InternalGetPerformanceCounterFrequency (
   VOID
-  ) 
+  )
 {
   return  mPerformanceCounterFrequency;
 }
 
 /**
-  The constructor function enables ACPI IO space, and caches PerformanceCounterFrequency. 
+  The constructor function enables ACPI IO space, and caches PerformanceCounterFrequency.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.

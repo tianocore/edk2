@@ -72,7 +72,7 @@
   gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterA     ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterB     ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdInitialValueRtcRegisterD     ## CONSUMES
-  
+
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdRealTimeClockUpdateTimeout  ## CONSUMES
   gPcAtChipsetPkgTokenSpaceGuid.PcdMinimalValidYear             ## CONSUMES

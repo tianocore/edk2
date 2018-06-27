@@ -318,7 +318,7 @@ ConvertRtcTimeToEfiTime (
   @param    Timeout  Tell how long it should take to wait.
 
   @retval   EFI_DEVICE_ERROR   RTC device error.
-  @retval   EFI_SUCCESS        RTC is updated and ready.  
+  @retval   EFI_SUCCESS        RTC is updated and ready.
 **/
 EFI_STATUS
 RtcWaitToUpdate (

@@ -58,13 +58,13 @@ AcpiTimerLibConstructor (
   UINT8   EnableMask;
 
   //
-  // ASSERT for the invalid PCD values. They must be configured to the real value. 
+  // ASSERT for the invalid PCD values. They must be configured to the real value.
   //
   ASSERT (PcdGet16 (PcdAcpiIoPciBarRegisterOffset) != 0xFFFF);
   ASSERT (PcdGet16 (PcdAcpiIoPortBaseAddress)      != 0xFFFF);
 
   //
-  // If the register offset to the BAR for the ACPI I/O Port Base Address is 0x0000, then 
+  // If the register offset to the BAR for the ACPI I/O Port Base Address is 0x0000, then
   // no PCI register programming is required to enable access to the the ACPI registers
   // specified by PcdAcpiIoPortBaseAddress
   //
@@ -73,7 +73,7 @@ AcpiTimerLibConstructor (
   }
 
   //
-  // ASSERT for the invalid PCD values. They must be configured to the real value. 
+  // ASSERT for the invalid PCD values. They must be configured to the real value.
   //
   ASSERT (PcdGet8  (PcdAcpiIoPciDeviceNumber)   != 0xFF);
   ASSERT (PcdGet8  (PcdAcpiIoPciFunctionNumber) != 0xFF);
@@ -101,7 +101,7 @@ AcpiTimerLibConstructor (
       EnableMask
       );
   }
-  
+
   return RETURN_SUCCESS;
 }
 
@@ -119,23 +119,23 @@ InternalAcpiGetAcpiTimerIoPort (
   )
 {
   UINT16  Port;
-  
+
   Port = PcdGet16 (PcdAcpiIoPortBaseAddress);
-  
+
   //
-  // If the register offset to the BAR for the ACPI I/O Port Base Address is not 0x0000, then 
-  // read the PCI register for the ACPI BAR value in case the BAR has been programmed to a 
+  // If the register offset to the BAR for the ACPI I/O Port Base Address is not 0x0000, then
+  // read the PCI register for the ACPI BAR value in case the BAR has been programmed to a
   // value other than PcdAcpiIoPortBaseAddress
   //
   if (PcdGet16 (PcdAcpiIoPciBarRegisterOffset) != 0x0000) {
     Port = PciRead16 (PCI_LIB_ADDRESS (
-                        PcdGet8  (PcdAcpiIoPciBusNumber), 
-                        PcdGet8  (PcdAcpiIoPciDeviceNumber), 
-                        PcdGet8  (PcdAcpiIoPciFunctionNumber), 
+                        PcdGet8  (PcdAcpiIoPciBusNumber),
+                        PcdGet8  (PcdAcpiIoPciDeviceNumber),
+                        PcdGet8  (PcdAcpiIoPciFunctionNumber),
                         PcdGet16 (PcdAcpiIoPciBarRegisterOffset)
                         ));
   }
-  
+
   return (Port & PcdGet16 (PcdAcpiIoPortBaseAddressMask)) + PcdGet16 (PcdAcpiPm1TmrOffset);
 }
 
