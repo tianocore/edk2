@@ -20,6 +20,7 @@ from Misc import GuidStringToGuidStructureString, ParseFieldValue, IsFieldValueA
 import Common.EdkLogger as EdkLogger
 import copy
 from Common.DataType import *
+import sys
 
 ERR_STRING_EXPR         = 'This operator cannot be used in string expression: [%s].'
 ERR_SNYTAX              = 'Syntax error, the rest of expression cannot be evaluated: [%s].'
@@ -254,7 +255,8 @@ class ValueExpression(BaseExpression):
                 Oprand2 = IntToStr(Oprand2)
         TypeDict = {
             type(0)  : 0,
-            type(0L) : 0,
+            # For python2 long type
+            type(sys.maxsize + 1) : 0,
             type('') : 1,
             type(True) : 2
         }
@@ -892,7 +894,7 @@ class ValueExpressionEx(ValueExpression):
                     raise BadExpression('Type %s PCD Value Size is Larger than 8 byte' % self.PcdType)
             else:
                 try:
-                    TmpValue = long(PcdValue)
+                    TmpValue = int(PcdValue)
                     TmpList = []
                     if TmpValue.bit_length() == 0:
                         PcdValue = '{0x00}'
