@@ -2,7 +2,7 @@
 # Intel Framework Package Reference Implementations
 #
 # This package provides definitions and libraries that comply to Intel Framework Specifications.
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials are licensed and made available
 #    under the terms and conditions of the BSD License which accompanies this distribution.
@@ -80,7 +80,7 @@
 
   ## Include/Ppi/FindFv.h
   gEfiFindFvPpiGuid                 = { 0x36164812, 0xa023, 0x44e5, { 0xbd, 0x85, 0x05, 0xbf, 0x3c, 0x77, 0x00, 0xaa }}
-  
+
   ## Include/Ppi/S3Resume.h
   gEfiPeiS3ResumePpiGuid            = { 0x4426CCB2, 0xE684, 0x4a8a, { 0xae, 0x40, 0x20, 0xd4, 0xb0, 0x25, 0xb7, 0x10 }}
 
@@ -165,7 +165,7 @@
 
   ## Include/Protocol/SmmCpuIo.h
   gEfiSmmCpuIoGuid  = { 0x5f439a0b, 0x45d8, 0x4682, {0xa4, 0xf4, 0xf0, 0x57, 0x6b, 0x51, 0x34, 0x41}}
-  
+
   ## Include/Protocol/FrameworkFormCallback.h
   gEfiFormCallbackProtocolGuid   = { 0xF3E4543D, 0xCF35, 0x6CEF, { 0x35, 0xC4, 0x4F, 0xE6, 0x34, 0x4D, 0xFC, 0x54 }}
 
@@ -174,9 +174,9 @@
 
   ## Include/Protocol/FrameworkFormBrowser.h
   gEfiFormBrowserCompatibilityProtocolGuid    = { 0xfb7c852, 0xadca, 0x4853, { 0x8d, 0xf, 0xfb, 0xa7, 0x1b, 0x1c, 0xe1, 0x1a }}
-  
+
   ## Include/Protocol/FrameworkFirmwareVolumeBlock.h
-  gFramerworkEfiFirmwareVolumeBlockProtocolGuid = { 0xDE28BC59, 0x6228, 0x41BD, { 0xBD, 0xF6, 0xA3, 0xB9, 0xAD, 0xB5, 0x8D, 0xA1 }}    
+  gFramerworkEfiFirmwareVolumeBlockProtocolGuid = { 0xDE28BC59, 0x6228, 0x41BD, { 0xBD, 0xF6, 0xA3, 0xB9, 0xAD, 0xB5, 0x8D, 0xA1 }}
 
   ## Include/Protocol/SmmCpuSaveState.h
   gEfiSmmCpuSaveStateProtocolGuid = { 0x21f302ad, 0x6e94, 0x471b, {0x84, 0xbc, 0xb1, 0x48, 0x0, 0x40, 0x3a, 0x1d}}

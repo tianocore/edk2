@@ -15,7 +15,7 @@
 # 4. Some defintitions don't exactly match Framework specification, some new field members are introduced in EdkII
 #    to reflect the latest industry standard.
 #
-# Note: 
+# Note:
 #    The IntelFrameworkPkg contains Framework specification contents that were not adopted by UEFI/PI, and names may be
 #    changed (such as adding "FRAMEWORK_") to avoid name collisions with approved UEFI/PI specifications.
 ##
@@ -42,9 +42,9 @@
     #pragma pack()
 
     Section "Alignment" in DataHubSubclass specification say "Fields in a data hub record should be aligned at their
-    natural boundaries". But in EdkII, the data structures above are packed. 
+    natural boundaries". But in EdkII, the data structures above are packed.
     Keeping this inconsistency for backward compatibility.
-    
+
   3. Guid/DataHubRecords.h
     #define EFI_SUBCLASS_INSTANCE_RESERVED       0
     #define EFI_SUBCLASS_INSTANCE_NON_APPLICABLE 0xFFFF
@@ -75,7 +75,7 @@
 
     The field type of the definition is *NOT* consistent with CacheSubclass specification. Specification defines
     them as UINT16, which is incorrect and should be UINT32 because the total width of bit-fields is 32bits width.
-    
+
   3. Guid/DataHubRecords.h
     typedef enum {
       CacheSizeRecordType              = 1,
@@ -96,8 +96,8 @@
       #define EFI_CACHE_MAXIMUM_SIZE_RECORD_NUMBER            0x00000002
       #define EFI_CACHE_SPEED_RECORD_NUMBER                   0x00000003
       #define EFI_CACHE_SOCKET_RECORD_NUMBER                  0x00000004
-      #define EFI_CACHE_SRAM_SUPPORT_RECORD_NUMBER            0x00000005 
-      #define EFI_CACHE_SRAM_INSTALL_RECORD_NUMBER            0x00000006 
+      #define EFI_CACHE_SRAM_SUPPORT_RECORD_NUMBER            0x00000005
+      #define EFI_CACHE_SRAM_INSTALL_RECORD_NUMBER            0x00000006
       #define EFI_CACHE_ERROR_SUPPORT_RECORD_NUMBER           0x00000007
       #define EFI_CACHE_TYPE_RECORD_NUMBER                    0x00000008
       #define EFI_CACHE_ASSOCIATIVITY_RECORD_NUMBER           0x00000009
@@ -150,8 +150,8 @@
       EfiProcessorFamilyIntelCeleronD          = 0xBA,
       EfiProcessorFamilyIntelPentiumD          = 0xBB,
       EfiProcessorFamilyIntelPentiumEx         = 0xBC,
-      EfiProcessorFamilyIntelCoreSolo          = 0xBD,  
-      EfiProcessorFamilyReserved               = 0xBE,  
+      EfiProcessorFamilyIntelCoreSolo          = 0xBD,
+      EfiProcessorFamilyReserved               = 0xBE,
       EfiProcessorFamilyIntelCore2             = 0xBF,
       ...
       EfiProcessorFamilyG6                     = 0xCB,
@@ -182,7 +182,7 @@
     } EFI_PROCESSOR_SOCKET_TYPE_DATA;
 
     The fields listed here are *NOT* defined in ProcSubclass specification 0.9. They are introduced to support
-    new processor upgrade (type 4 offset 19h) defined in SmBios 2.6 specification. 
+    new processor upgrade (type 4 offset 19h) defined in SmBios 2.6 specification.
     Keeping this inconsistency to reflect the latest industry standard.
 
   5. Guid/DataHubRecords.h
@@ -195,7 +195,7 @@
     typedef enum {
       EfiProcessorHealthy        = 1,
       EfiProcessorPerfRestricted = 2,
-      EfiProcessorFuncRestricted = 3 
+      EfiProcessorFuncRestricted = 3
     } EFI_PROCESSOR_HEALTH_STATUS;
 
     The structure name "EFI_PROCESSOR_HEALTH_STATUS" is *NOT* consistent with ProcSubclass specification 0.9, in which
@@ -235,7 +235,7 @@
       ProcessorPartNumberRecordType        = 30,
     } EFI_CPU_VARIABLE_RECORD_TYPE;
 
-    The enumeration fields from ProcessorCoreFrequencyRecordType to ProcessorHealthStatusRecordType are *NOT* defined 
+    The enumeration fields from ProcessorCoreFrequencyRecordType to ProcessorHealthStatusRecordType are *NOT* defined
     in ProcSubclass specification 0.9, which only defines the following macros to specify the record number of the data record:
       #define EFI_PROCESSOR_FREQUENCY_RECORD_NUMBER           0x00000001
       #define EFI_PROCESSOR_BUS_FREQUENCY_RECORD_NUMBER       0x00000002
@@ -263,8 +263,8 @@
       #define EFI_PROCESSOR_HEALTH_STATUS_RECORD_NUMBER       0x00000018
     Keeping this inconsistency for backward compatibility.
 
-    The enumeration fields from ProcessorCoreCountRecordType to ProcessorPartNumberRecordType are *NOT* defined 
-    in ProcSubclass specification 0.9. 
+    The enumeration fields from ProcessorCoreCountRecordType to ProcessorPartNumberRecordType are *NOT* defined
+    in ProcSubclass specification 0.9.
     They are introduced to support new fields for type 4 defined in SmBios 2.6 specification.
     Keeping this inconsistency to reflect the latest industry standard.
 
@@ -274,7 +274,7 @@
       ...
       EFI_PROCESSOR_FAMILY2_DATA              ProcessorFamily2;
     } EFI_CPU_VARIABLE_RECORD;
-    
+
     typedef struct {
       EFI_SUBCLASS_TYPE1_HEADER         DataRecordHeader;
       EFI_CPU_VARIABLE_RECORD           VariableRecord;
@@ -314,7 +314,7 @@
     } EFI_PROCESSOR_CHARACTERISTICS_DATA;
 
     The fields listed here are *NOT* defined in ProcSubclass specification 0.9. They are introduced to support
-    new fields for type 4 defined in SmBios 2.6 specification. 
+    new fields for type 4 defined in SmBios 2.6 specification.
     Keeping this inconsistency to reflect the latest industry standard.
 
 ##
@@ -325,26 +325,26 @@
       ...
       EfiMemoryFormFactorFbDimm                   = 0x0F
     } EFI_MEMORY_FORM_FACTOR;
-    
+
     typedef enum _EFI_MEMORY_ARRAY_TYPE {
       ...
       EfiMemoryTypeDdr2                           = 0x13,
       EfiMemoryTypeDdr2FbDimm                     = 0x14
     } EFI_MEMORY_ARRAY_TYPE;
-    
+
     typedef enum {
       ...
       EfiMemoryStatePartial      = 6
     } EFI_MEMORY_STATE;
 
     The fields listed above are *NOT* defined in MemSubclass specification 0.9. They are introduced to support
-    new memory device (type 17) defined in SmBios 2.6 specification. 
+    new memory device (type 17) defined in SmBios 2.6 specification.
     Keeping this inconsistency to reflect the latest industry standard.
 
   2. Guid/DataHubRecords.h
-    typedef struct { 
+    typedef struct {
       ...
-      EFI_EXP_BASE10_DATA      MemorySpeed; 
+      EFI_EXP_BASE10_DATA      MemorySpeed;
       ...
     } EFI_MEMORY_ARRAY_LINK_DATA;
 
@@ -354,7 +354,7 @@
   3. Guid/DataHubRecords.h
     #define EFI_MEMORY_CONTROLLER_INFORMATION_RECORD_NUMBER    0x00000008
 
-    typedef enum {  
+    typedef enum {
       EfiErrorDetectingMethodOther   = 1,
       EfiErrorDetectingMethodUnknown = 2,
       EfiErrorDetectingMethodNone    = 3,
@@ -375,7 +375,7 @@
       UINT8                             Reserved              :2;
     } EFI_MEMORY_ERROR_CORRECT_CAPABILITY;
 
-    typedef enum {  
+    typedef enum {
       EfiMemoryInterleaveOther      = 1,
       EfiMemoryInterleaveUnknown    = 2,
       EfiMemoryInterleaveOneWay     = 3,
@@ -445,13 +445,13 @@
     } EFI_MEMORY_CONTROLLER_INFORMATION_DATA;
 
     The definitions above are *NOT* defined in MemSubclass specification 0.9. They are introduced to support
-    new memory controller information (type 5) defined in SmBios 2.6 specification. 
+    new memory controller information (type 5) defined in SmBios 2.6 specification.
     Keeping this inconsistency to reflect the latest industry standard.
 
   4. Guid/DataHubRecords.h
     #define EFI_MEMORY_32BIT_ERROR_INFORMATION_RECORD_NUMBER    0x00000009
 
-    typedef enum {  
+    typedef enum {
       EfiMemoryErrorOther             = 1,
       EfiMemoryErrorUnknown           = 2,
       EfiMemoryErrorOk                = 3,
@@ -468,14 +468,14 @@
       EfiMemoryErrorUnCorrectable     = 14
     } EFI_MEMORY_ERROR_TYPE;
 
-    typedef enum {  
+    typedef enum {
       EfiMemoryGranularityOther               = 1,
       EfiMemoryGranularityOtherUnknown        = 2,
       EfiMemoryGranularityDeviceLevel         = 3,
       EfiMemoryGranularityMemPartitionLevel   = 4
     } EFI_MEMORY_ERROR_GRANULARITY_TYPE;
 
-    typedef enum {  
+    typedef enum {
       EfiMemoryErrorOperationOther            = 1,
       EfiMemoryErrorOperationUnknown          = 2,
       EfiMemoryErrorOperationRead             = 3,
@@ -494,12 +494,12 @@
     } EFI_MEMORY_32BIT_ERROR_INFORMATION;
 
     The definitions above are *NOT* defined in MemSubclass specification 0.9. They are introduced to support
-    new 32-bit memory error information (type 18) defined in SmBios 2.6 specification. 
+    new 32-bit memory error information (type 18) defined in SmBios 2.6 specification.
     Keeping this inconsistency to reflect the latest industry standard.
 
   5. Guid/DataHubRecords.h
     #define EFI_MEMORY_64BIT_ERROR_INFORMATION_RECORD_NUMBER    0x0000000A
-    
+
     typedef struct {
       EFI_MEMORY_ERROR_TYPE             MemoryErrorType;
       EFI_MEMORY_ERROR_GRANULARITY_TYPE MemoryErrorGranularity;
@@ -511,7 +511,7 @@
     } EFI_MEMORY_64BIT_ERROR_INFORMATION;
 
     The definitions above are *NOT* defined in MemSubclass specification 0.9. They are introduced to support
-    new 64-bit memory error information (type 33) defined in SmBios 2.6 specification. 
+    new 64-bit memory error information (type 33) defined in SmBios 2.6 specification.
     Keeping this inconsistency to reflect the latest industry standard.
 
   6. Guid/DataHubRecords.h
@@ -540,27 +540,27 @@
       PCI_DEVICE_PATH                   PciBusDevicePath;
       EFI_DEVICE_PATH_PROTOCOL          EndDevicePath;
     } USB_PORT_DEVICE_PATH;
-    
+
     typedef struct _IDE_DEVICE_PATH {
       ACPI_HID_DEVICE_PATH              PciRootBridgeDevicePath;
       PCI_DEVICE_PATH                   PciBusDevicePath;
       EFI_DEVICE_PATH_PROTOCOL          EndDevicePath;
     } IDE_DEVICE_PATH;
-    
+
     typedef struct _RMC_CONN_DEVICE_PATH {
       ACPI_HID_DEVICE_PATH              PciRootBridgeDevicePath;
       PCI_DEVICE_PATH                   PciBridgeDevicePath;
       PCI_DEVICE_PATH                   PciBusDevicePath;
       EFI_DEVICE_PATH_PROTOCOL          EndDevicePath;
     } RMC_CONN_DEVICE_PATH;
-    
+
     typedef struct _RIDE_DEVICE_PATH {
       ACPI_HID_DEVICE_PATH              PciRootBridgeDevicePath;
       PCI_DEVICE_PATH                   PciBridgeDevicePath;
       PCI_DEVICE_PATH                   PciBusDevicePath;
       EFI_DEVICE_PATH_PROTOCOL          EndDevicePath;
     } RIDE_DEVICE_PATH;
-    
+
     typedef struct _GB_NIC_DEVICE_PATH {
       ACPI_HID_DEVICE_PATH              PciRootBridgeDevicePath;
       PCI_DEVICE_PATH                   PciBridgeDevicePath;
@@ -568,35 +568,35 @@
       PCI_DEVICE_PATH                   PciXBusDevicePath;
       EFI_DEVICE_PATH_PROTOCOL          EndDevicePath;
     } GB_NIC_DEVICE_PATH;
-    
+
     typedef struct _PS2_CONN_DEVICE_PATH {
       ACPI_HID_DEVICE_PATH              PciRootBridgeDevicePath;
       PCI_DEVICE_PATH                   LpcBridgeDevicePath;
       ACPI_HID_DEVICE_PATH              LpcBusDevicePath;
       EFI_DEVICE_PATH_PROTOCOL          EndDevicePath;
     } PS2_CONN_DEVICE_PATH;
-    
+
     typedef struct _SERIAL_CONN_DEVICE_PATH {
       ACPI_HID_DEVICE_PATH              PciRootBridgeDevicePath;
       PCI_DEVICE_PATH                   LpcBridgeDevicePath;
       ACPI_HID_DEVICE_PATH              LpcBusDevicePath;
       EFI_DEVICE_PATH_PROTOCOL          EndDevicePath;
     } SERIAL_CONN_DEVICE_PATH;
-    
+
     typedef struct _PARALLEL_CONN_DEVICE_PATH {
       ACPI_HID_DEVICE_PATH              PciRootBridgeDevicePath;
       PCI_DEVICE_PATH                   LpcBridgeDevicePath;
       ACPI_HID_DEVICE_PATH              LpcBusDevicePath;
       EFI_DEVICE_PATH_PROTOCOL          EndDevicePath;
     } PARALLEL_CONN_DEVICE_PATH;
-    
+
     typedef struct _FLOOPY_CONN_DEVICE_PATH {
       ACPI_HID_DEVICE_PATH              PciRootBridgeDevicePath;
       PCI_DEVICE_PATH                   LpcBridgeDevicePath;
       ACPI_HID_DEVICE_PATH              LpcBusDevicePath;
       EFI_DEVICE_PATH_PROTOCOL          EndDevicePath;
     } FLOOPY_CONN_DEVICE_PATH;
-    
+
     typedef union _EFI_MISC_PORT_DEVICE_PATH {
       USB_PORT_DEVICE_PATH              UsbDevicePath;
       IDE_DEVICE_PATH                   IdeDevicePath;
@@ -640,7 +640,7 @@
     } EFI_MISC_BIOS_VENDOR_DATA;
 
     The fields listed above are *NOT* defined in MiscSubclass specification 0.9. They are introduced to support
-    new bios information (type 0) defined in SmBios 2.6 specification. 
+    new bios information (type 0) defined in SmBios 2.6 specification.
     Keeping this inconsistency to reflect the latest industry standard.
 
   4. Guid/DataHubRecords.h
@@ -651,7 +651,7 @@
     } EFI_MISC_SYSTEM_MANUFACTURER_DATA;
 
     The fields listed above are *NOT* defined in MiscSubclass specification 0.9. They are introduced to support
-    new system information (type 1) defined in SmBios 2.6 specification. 
+    new system information (type 1) defined in SmBios 2.6 specification.
     Keeping this inconsistency to reflect the latest industry standard.
 
   5. Guid/DataHubRecords.h
@@ -662,7 +662,7 @@
     } EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION_DATA;
 
     a. The field "ManagementDeviceThresholdLink" above is *NOT* defined in MiscSubclass specification 0.9. It is introduced to support
-       new management device component (type 35) defined in SmBios 2.6 specification. 
+       new management device component (type 35) defined in SmBios 2.6 specification.
        Keeping this inconsistency to reflect the latest industry standard.
     b. The field "ComponentType" above is *NOT* defined in MiscSubclass specifications 0.9. It's implementation-specific to simplify the code logic.
        Keeping this inconsistency for backward compatibility.
@@ -705,7 +705,7 @@
       ...
     } EFI_MISC_ONBOARD_DEVICE_DATA;
 
-    The definition is *NOT* consistent with MiscSubclass specification 0.9, in which the field "OnBoardDeviceStatus" is 
+    The definition is *NOT* consistent with MiscSubclass specification 0.9, in which the field "OnBoardDeviceStatus" is
     named as "OnBoardDeviceType". Keeping this inconsistency for backward compatibility.
 
   9. Guid/DataHubRecords.h
@@ -715,7 +715,7 @@
     "EFI_MISC_BATTERY_LOCATION_RECORD_NUMBER". Keeping this inconsistency for backward compatibility.
 
   10. Guid/DataHubRecords.h
-    typedef enum {  
+    typedef enum {
       EfiPortableBatteryDeviceChemistryOther = 1,
       EfiPortableBatteryDeviceChemistryUnknown = 2,
       EfiPortableBatteryDeviceChemistryLeadAcid = 3,
@@ -727,7 +727,7 @@
     } EFI_MISC_PORTABLE_BATTERY_DEVICE_CHEMISTRY;
 
     The name of the definition is *NOT* consistent with MiscSubclass specification, in which it is defined as
-    "EFI_MISC_BATTERY_DEVICE_CHEMISTRY". And all field names have a redundant "Portable" string compared with MisSubclass 
+    "EFI_MISC_BATTERY_DEVICE_CHEMISTRY". And all field names have a redundant "Portable" string compared with MisSubclass
     specification 0.9.
     Keeping this inconsistency for backward compatibility.
 
@@ -753,7 +753,7 @@
     } EFI_MISC_PORTABLE_BATTERY;
 
     The definition is *NOT* consistent with MiscSubclass specification 0.9, in which the structure name is defined as
-    "EFI_MISC_BATTERY_LOCATION_DATA". Moreover, the name and the order of all fields are also different with MiscSubclass 
+    "EFI_MISC_BATTERY_LOCATION_DATA". Moreover, the name and the order of all fields are also different with MiscSubclass
     specification 0.9. Keeping this inconsistency for backward compatibility.
 
   12. Guid/DataHubRecords.h
@@ -770,7 +770,7 @@
       ...
     } EFI_MISC_BOOT_INFORMATION_STATUS_DATA;
 
-    The definition is *NOT* consistent with MiscSubclass specification 0.9, in which the type of the first field is 
+    The definition is *NOT* consistent with MiscSubclass specification 0.9, in which the type of the first field is
     "EFI_MISC_BOOT_INFORMATION_STATUS_TYPE". Keeping this inconsistency for backward compatibility.
 
   14. Guid/DataHubRecords.h
@@ -796,7 +796,7 @@
       ...
     } EFI_MISC_SMBIOS_STRUCT_ENCAPSULATION_DATA;
 
-    The definition is *NOT* consistent with MiscSubclass specification 0.9, in which the type of the first field is 
+    The definition is *NOT* consistent with MiscSubclass specification 0.9, in which the type of the first field is
     "EFI_SMBIOS_STRUCTURE_HDR". Keeping this inconsistency for backward compatibility.
 
   17. Guid/DataHubRecords.h
@@ -837,7 +837,7 @@
     #define ACCESS_GPNV                           0x04
 
     The definitions listed above are *NOT* defined in MiscSubclass specification 0.9. It is introduced to support
-    new system event log (type 15) defined in SmBios 2.6 specification. 
+    new system event log (type 15) defined in SmBios 2.6 specification.
     Keeping this inconsistency to reflect the latest industry standard.
 
   19. Guid/DataHubRecords.h
@@ -853,7 +853,7 @@
     } EFI_MISC_MANAGEMENT_DEVICE_THRESHOLD;
 
     The definitions listed above are *NOT* defined in MiscSubclass specification 0.9. It is introduced to support
-    new management device threshold data (type 36) defined in SmBios 2.6 specification. 
+    new management device threshold data (type 36) defined in SmBios 2.6 specification.
     Keeping this inconsistency to reflect the latest industry standard.
 
   20. Guid/DataHubRecords.h
@@ -881,7 +881,7 @@
       UINT32                            CoolingDeviceOemDefined;
     } EFI_MISC_COOLING_DEVICE_TEMP_LINK_DATA;
 
-    The "CoolingDeviceUnitGroup" field and "CoolingDeviceNominalSpeed" field are *NOT* consistent with 
+    The "CoolingDeviceUnitGroup" field and "CoolingDeviceNominalSpeed" field are *NOT* consistent with
     MiscSubclass specification 0.9. These fields are aligned with SMBIOS 2.6 specification. And user can easily
     assign any value to CoolingDeviceNominalSpeed.
 
@@ -986,7 +986,7 @@
     #define EFI_SW_EC_X64_SIMD              EXCEPT_X64_SIMD
 
     The definitions are *NOT* defined in Framework StatusCodes specification 0.92, in which IA32 and IPF exception subclass error code definitions
-    are defined but omit the corresponding definitions for X64. EdkII introduce these definitions for implementation. 
+    are defined but omit the corresponding definitions for X64. EdkII introduce these definitions for implementation.
 
 ##
 # Mismatch with Intel Platform Innovation Framework for EFI Boot Script Specification (Version 0.91)
@@ -1030,8 +1030,8 @@
     Keeping this inconsistency for backward compatibility.
 
   5. Include/Protocol/BootScriptSave.h
-    typedef  
-    EFI_STATUS  
+    typedef
+    EFI_STATUS
     (EFIAPI *EFI_BOOT_SCRIPT_CLOSE_TABLE) (
       IN  EFI_BOOT_SCRIPT_SAVE_PROTOCOL            *This,
       ...
@@ -1057,7 +1057,7 @@
 ##
   1. Include/Framework/DxeCis.h
     EFI_STATUS_CODE_ARCH_PROTOCOL is removed.
-    
+
     EdkII doesn't provide EFI_STATUS_CODE_ARCH_PROTOCOL definition due to ReportStatusCode() field has been
     removed from EFI Runtime Service Table of PI specification. EFI_STATUS_CODE_ARCH_PROTOCOL is *NOT* required,
     and is replaced with EFI_STATUS_CODE_RUNTIME_PROTOCOL.
@@ -1082,7 +1082,7 @@
       }
 
     The Framework HII specification 0.92 changed part of HII interfaces but did not update the protocol GUID.
-    This change should cause a change of GUID in both of code and HII spec. EdkII updates the GUID in code, 
+    This change should cause a change of GUID in both of code and HII spec. EdkII updates the GUID in code,
     but the Framework HII specification 0.92 is not updated. This is a known issue.
 
   2. Include/Protocol/FrameworkHii.h
@@ -1111,8 +1111,8 @@
       ...
     };
 
-    The field listed above is *NOT* defined in Framework HII specification 0.92. EdkII adds this field to provide 
-    an ability of removing any new strings that were added after the initial string export for this handle.  
+    The field listed above is *NOT* defined in Framework HII specification 0.92. EdkII adds this field to provide
+    an ability of removing any new strings that were added after the initial string export for this handle.
 
   5. Include/Protocol/FrameworkHii.h
     typedef
@@ -1134,25 +1134,25 @@
       FRAMEWORK_EFI_IFR_OP_HEADER       Header;
       UINT8                             Flags;
     } EFI_IFR_SUPPRESS;
-    
+
     typedef struct {
       FRAMEWORK_EFI_IFR_OP_HEADER       Header;
       UINT8                             Flags;
     } EFI_IFR_GRAY_OUT;
-    
+
     typedef struct {
       FRAMEWORK_EFI_IFR_OP_HEADER       Header;
       STRING_REF                        Popup;
       UINT8                             Flags;
     } EFI_IFR_INCONSISTENT;
-    
+
     typedef struct {
       FRAMEWORK_EFI_IFR_OP_HEADER       Header;
       UINT16                            QuestionId;
       UINT8                             Width;
       UINT16                            Value;
     } FRAMEWORK_EFI_IFR_EQ_ID_VAL;
-    
+
     typedef struct {
       FRAMEWORK_EFI_IFR_OP_HEADER       Header;
       UINT16                            QuestionId;
@@ -1160,14 +1160,14 @@
       UINT16                            ListLength;
       UINT16                            ValueList[1];
     } FRAMEWORK_EFI_IFR_EQ_ID_LIST;
-    
+
     typedef struct {
       FRAMEWORK_EFI_IFR_OP_HEADER       Header;
       UINT16                            QuestionId1;
       UINT8                             Width;
       UINT16                            QuestionId2;
     } FRAMEWORK_EFI_IFR_EQ_ID_ID;
-    
+
     typedef struct {
       FRAMEWORK_EFI_IFR_OP_HEADER       Header;
       UINT16                            VariableId;
@@ -1177,7 +1177,7 @@
     The defintions are not complied with Framework HII spec 0.92. Keeping the inconsistent for implementation needed.
 
   7. Include/Protocol/FrameworkFormCallback.h
-    #define RESET_REQUIRED  1 
+    #define RESET_REQUIRED  1
     #define EXIT_REQUIRED   2
     #define SAVE_REQUIRED   4
     #define NV_CHANGED      8
@@ -1231,8 +1231,8 @@
       ...
     } EFI_SMRAM_HOB_DESCRIPTOR_BLOCK;
 
-    1) The name of the definition is *NOT* consistent with Framework SmmCis specification 0.91, in which it's 
-    defined as "EFI_HOB_SMRAM_DESCRIPTOR_BLOCK" rather than "EFI_SMRAM_HOB_DESCRIPTOR_BLOCK". 
+    1) The name of the definition is *NOT* consistent with Framework SmmCis specification 0.91, in which it's
+    defined as "EFI_HOB_SMRAM_DESCRIPTOR_BLOCK" rather than "EFI_SMRAM_HOB_DESCRIPTOR_BLOCK".
     Keeping this inconsistency for backward compatibility.
 
     2) The definition of NumberOfSmmReservedRegions is *NOT* consistent with Framework SmmCis specification 0.91,
@@ -1260,7 +1260,7 @@
   3. Include/Framework/SmmCis.h
     typedef union {
       ///
-      /// The processor save-state information for IA-32 processors. 
+      /// The processor save-state information for IA-32 processors.
       ///
       EFI_SMI_CPU_SAVE_STATE     Ia32SaveState;
       ///
@@ -1291,7 +1291,7 @@
     EFI_STATUS
     (EFIAPI *EFI_ACPI_S3_SAVE) (
       IN EFI_ACPI_S3_SAVE_PROTOCOL      *This,
-      IN VOID                           *LegacyMemoryAddress 
+      IN VOID                           *LegacyMemoryAddress
       );
 
     The first parameter's type is *NOT* consistent with Framework S3Resume specification, in which it's defined as

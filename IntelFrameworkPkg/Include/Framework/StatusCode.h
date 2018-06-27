@@ -2,13 +2,13 @@
   Status Code Definitions, according to Intel Platform Innovation Framework
   for EFI Status Codes Specification
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -28,8 +28,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// Software Class DXE BS Driver Subclass Progress Code definitions.
 ///
-/// Inconsistent with specification here: 
-/// The Framework Specification, StatusCodes 0.92, does not define the macros. 
+/// Inconsistent with specification here:
+/// The Framework Specification, StatusCodes 0.92, does not define the macros.
 ///
 ///@{
 #define EFI_SW_DXE_BS_PC_BEGIN_CONNECTING_DRIVERS     (EFI_SUBCLASS_SPECIFIC | 0x00000005)
@@ -39,8 +39,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// Software Class DXE RT Driver Subclass Progress Code definitions.
 ///
-/// Inconsistent with specification here: 
-/// The Framework Specification, StatusCodes 0.92, does not define the macros. 
+/// Inconsistent with specification here:
+/// The Framework Specification, StatusCodes 0.92, does not define the macros.
 ///
 ///@{
 #define EFI_SW_DXE_RT_PC_S0 (EFI_SUBCLASS_SPECIFIC | 0x00000000)
@@ -54,8 +54,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// Software Subclass definitions.
 ///
-/// Inconsistent with specification here: 
-/// The Framework Specification, StatusCodes 0.92, does not define the macros. 
+/// Inconsistent with specification here:
+/// The Framework Specification, StatusCodes 0.92, does not define the macros.
 ///
 #define EFI_SOFTWARE_X64_EXCEPTION        (EFI_SOFTWARE | 0x00130000)
 
@@ -64,8 +64,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// These exceptions are derived from the debug protocol definitions in the EFI
 /// specification.
 ///
-/// Inconsistent with specification here: 
-/// The Framework Specification, StatusCodes 0.92, does not define the macros. 
+/// Inconsistent with specification here:
+/// The Framework Specification, StatusCodes 0.92, does not define the macros.
 ///
 ///@{
 #define EFI_SW_EC_X64_DIVIDE_ERROR      EXCEPT_X64_DIVIDE_ERROR
@@ -98,17 +98,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// Software Class DXE Core Subclass Error Code definitions.
 ///
-/// Inconsistent with specification here: 
-/// The Framework Specification, StatusCodes 0.92, does not define the macros. 
+/// Inconsistent with specification here:
+/// The Framework Specification, StatusCodes 0.92, does not define the macros.
 ///
-#define EFI_SW_CSM_LEGACY_ROM_INIT                (EFI_SUBCLASS_SPECIFIC | 0x00000000)   
+#define EFI_SW_CSM_LEGACY_ROM_INIT                (EFI_SUBCLASS_SPECIFIC | 0x00000000)
 
 ///
 /// IO Bus Class ATA/ATAPI Subclass Progress Code definitions.
 ///
 ///
-/// Inconsistent with specification here: 
-/// The Framework Specification, StatusCodes 0.92, does not define the macros. 
+/// Inconsistent with specification here:
+/// The Framework Specification, StatusCodes 0.92, does not define the macros.
 ///
 ///@{
 #define EFI_IOB_ATA_BUS_SMART_ENABLE          (EFI_SUBCLASS_SPECIFIC | 0x00000000)
@@ -121,8 +121,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /// IO Bus Class ATA/ATAPI Subclass Error Code definitions.
 ///
 ///
-/// Inconsistent with specification here: 
-/// The Framework Specification, StatusCodes 0.92, does not define the macros. 
+/// Inconsistent with specification here:
+/// The Framework Specification, StatusCodes 0.92, does not define the macros.
 ///
 ///@{
 #define EFI_IOB_ATA_BUS_SMART_NOTSUPPORTED  (EFI_SUBCLASS_SPECIFIC | 0x00000000)
@@ -132,8 +132,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// The reason that the processor was disabled.
 ///
-/// Inconsistent with specification here: 
-/// The Framework Specification, StatusCodes 0.92, does not define the macros. 
+/// Inconsistent with specification here:
+/// The Framework Specification, StatusCodes 0.92, does not define the macros.
 ///
 ///@{
 #define EFI_CPU_CAUSE_NOT_DISABLED              0x0000

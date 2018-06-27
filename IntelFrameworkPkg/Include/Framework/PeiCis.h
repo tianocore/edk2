@@ -2,14 +2,14 @@
   The Include file for definitions in the Intel Platform Innovation Framework for EFI
   Pre-EFI Initialization Core Interface Specification (PEI CIS) Version 0.91.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -35,8 +35,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _FRAMEWORK_EFI_PEI_SERVICES FRAMEWORK_EFI_PEI_SERVICES;
 
 /**
-  The PEI Dispatcher will invoke each PEIM one time.  During this pass, the PEI 
-  Dispatcher will pass control to the PEIM at the AddressOfEntryPoint in the PE Header. 
+  The PEI Dispatcher will invoke each PEIM one time.  During this pass, the PEI
+  Dispatcher will pass control to the PEIM at the AddressOfEntryPoint in the PE Header.
 
   @param  FfsHeader        The pointer to the FFS file header.
   @param  PeiServices      Describes the list of possible PEI Services.
@@ -50,11 +50,11 @@ EFI_STATUS
   IN EFI_FFS_FILE_HEADER            *FfsHeader,
   IN EFI_PEI_SERVICES               **PeiServices
   );
-  
+
 /**
-  This service abstracts the capability of the PEI 
-  Foundation to discover instances of firmware volumes in the system. 
-  Given the input file pointer, this service searches for the next 
+  This service abstracts the capability of the PEI
+  Foundation to discover instances of firmware volumes in the system.
+  Given the input file pointer, this service searches for the next
   matching file in the Firmware File System (FFS) volume.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
@@ -73,18 +73,18 @@ EFI_STATUS
   IN UINTN                          Instance,
   IN OUT EFI_FIRMWARE_VOLUME_HEADER **FwVolHeader
   );
-    
+
 /**
-  This service abstracts the capability of the PEI 
-  Foundation to discover instances of firmware files in the system. 
-  Given the input file pointer, this service searches for the next matching 
+  This service abstracts the capability of the PEI
+  Foundation to discover instances of firmware files in the system.
+  Given the input file pointer, this service searches for the next matching
   file in the Firmware File System (FFS) volume.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  SearchType       A filter to find files only of this type.
-  @param  FwVolHeader      The pointer to the firmware volume header of the volume to search. This parameter 
+  @param  FwVolHeader      The pointer to the firmware volume header of the volume to search. This parameter
                            must point to a valid FFS volume.
-  @param  FileHeader       The pointer to the current file from which to begin searching. Upon return this pointer will be 
+  @param  FileHeader       The pointer to the current file from which to begin searching. Upon return this pointer will be
                            updated to reflect the file found.
 
   @retval EFI_SUCCESS      The file was found.
@@ -102,8 +102,8 @@ EFI_STATUS
   );
 
 /**
-  Given the input file pointer, this service searches for the next 
-  matching file in the Firmware File System (FFS) volume. 
+  Given the input file pointer, this service searches for the next
+  matching file in the Firmware File System (FFS) volume.
 
   @param  PeiServices      An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
   @param  SectionType      The value of the section type to find.
@@ -125,16 +125,16 @@ EFI_STATUS
 
 ///
 ///  FRAMEWORK_EFI_PEI_SERVICES is a collection of functions whose implementation is provided by the PEI
-///  Foundation. The table may be located in the temporary or permanent memory, depending upon the capabilities 
+///  Foundation. The table may be located in the temporary or permanent memory, depending upon the capabilities
 ///  and phase of execution of PEI.
-///  
+///
 ///  These services fall into various classes, including the following:
 ///  - Managing the boot mode.
 ///  - Allocating both early and permanent memory.
 ///  - Supporting the Firmware File System (FFS).
 ///  - Abstracting the PPI database abstraction.
 ///  - Creating Hand-Off Blocks (HOBs).
-///        
+///
 struct _FRAMEWORK_EFI_PEI_SERVICES {
   EFI_TABLE_HEADER                  Hdr;
   //
@@ -178,10 +178,10 @@ struct _FRAMEWORK_EFI_PEI_SERVICES {
   //
   EFI_PEI_RESET_SYSTEM              ResetSystem;
   ///
-  /// Inconsistent with specification here: 
-  /// In Framework Spec, PeiCis0.91, CpuIo and PciCfg are NOT pointers. 
+  /// Inconsistent with specification here:
+  /// In Framework Spec, PeiCis0.91, CpuIo and PciCfg are NOT pointers.
   ///
-  
+
   //
   // I/O Abstractions
   //
@@ -193,19 +193,19 @@ struct _FRAMEWORK_EFI_PEI_SERVICES {
 ///
 typedef enum {
   ///
-  /// Used to induce a system-wide reset. This sets all circuitry within the 
+  /// Used to induce a system-wide reset. This sets all circuitry within the
   /// system to its initial state.  This type of reset is asynchronous to system
-  /// operation and operates withgout regard to cycle boundaries.  EfiColdReset 
+  /// operation and operates withgout regard to cycle boundaries.  EfiColdReset
   /// is tantamount to a system power cycle.
   ///
   EfiPeiResetCold,
   ///
   /// Used to induce a system-wide initialization. The processors are set to their
-  /// initial state, and pending cycles are not corrupted.  If the system does 
+  /// initial state, and pending cycles are not corrupted.  If the system does
   /// not support this reset type, then an EfiResetCold must be performed.
   ///
   EfiPeiResetWarm,
 } EFI_PEI_RESET_TYPE;
 
-#endif  
+#endif
 

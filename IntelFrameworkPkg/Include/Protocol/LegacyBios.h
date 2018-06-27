@@ -7,15 +7,15 @@
   well known naming conventions.
 
   Thunk is the code that switches from 32-bit protected environment into the 16-bit real-mode
-	environment. Reverse thunk is the code that does the opposite.
+  environment. Reverse thunk is the code that does the opposite.
 
-Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -28,7 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _EFI_LEGACY_BIOS_H_
 
 ///
-/// 
+///
 ///
 #pragma pack(1)
 
@@ -51,75 +51,75 @@ typedef struct {
   /// 1 is "F," byte 2 is "E," and byte 3 is "$" and is normally accessed as a DWORD or UINT32.
   ///
   UINT32                            Signature;
-  
+
   ///
   /// The value required such that byte checksum of TableLength equals zero.
   ///
   UINT8                             TableChecksum;
-  
+
   ///
   /// The length of this table.
   ///
   UINT8                             TableLength;
-  
+
   ///
   /// The major EFI revision for which this table was generated.
-  /// 
+  ///
   UINT8                             EfiMajorRevision;
-  
+
   ///
   /// The minor EFI revision for which this table was generated.
   ///
   UINT8                             EfiMinorRevision;
-  
+
   ///
   /// The major revision of this table.
   ///
   UINT8                             TableMajorRevision;
-  
+
   ///
   /// The minor revision of this table.
   ///
   UINT8                             TableMinorRevision;
-  
+
   ///
   /// Reserved for future usage.
   ///
   UINT16                            Reserved;
-  
+
   ///
   /// The segment of the entry point within the traditional BIOS for Compatibility16 functions.
   ///
   UINT16                            Compatibility16CallSegment;
-  
+
   ///
   /// The offset of the entry point within the traditional BIOS for Compatibility16 functions.
   ///
   UINT16                            Compatibility16CallOffset;
-  
+
   ///
-  /// The segment of the entry point within the traditional BIOS for EfiCompatibility 
+  /// The segment of the entry point within the traditional BIOS for EfiCompatibility
   /// to invoke the PnP installation check.
   ///
   UINT16                            PnPInstallationCheckSegment;
-  
+
   ///
-  /// The Offset of the entry point within the traditional BIOS for EfiCompatibility 
+  /// The Offset of the entry point within the traditional BIOS for EfiCompatibility
   /// to invoke the PnP installation check.
   ///
   UINT16                            PnPInstallationCheckOffset;
-  
+
   ///
-  /// EFI system resources table. Type EFI_SYSTEM_TABLE is defined in the IntelPlatform 
+  /// EFI system resources table. Type EFI_SYSTEM_TABLE is defined in the IntelPlatform
   ///Innovation Framework for EFI Driver Execution Environment Core Interface Specification (DXE CIS).
   ///
-  UINT32                            EfiSystemTable; 
-  
+  UINT32                            EfiSystemTable;
+
   ///
   /// The address of an OEM-provided identifier string. The string is null terminated.
   ///
   UINT32                            OemIdStringPointer;
-  
+
   ///
   /// The 32-bit physical address where ACPI RSD PTR is stored within the traditional
   /// BIOS. The remained of the ACPI tables are located at their EFI addresses. The size
@@ -127,93 +127,93 @@ typedef struct {
   /// RSD PTR with either the ACPI 1.0b or 2.0 values.
   ///
   UINT32                            AcpiRsdPtrPointer;
-  
+
   ///
   /// The OEM revision number. Usage is undefined but provided for OEM module usage.
   ///
   UINT16                            OemRevision;
-  
+
   ///
   /// The 32-bit physical address where INT15 E820 data is stored within the traditional
   /// BIOS. The EfiCompatibility code will fill in the E820Pointer value and copy the
   /// data to the indicated area.
   ///
   UINT32                            E820Pointer;
-  
+
   ///
   /// The length of the E820 data and is filled in by the EfiCompatibility code.
   ///
   UINT32                            E820Length;
-  
+
   ///
   /// The 32-bit physical address where the $PIR table is stored in the traditional BIOS.
   /// The EfiCompatibility code will fill in the IrqRoutingTablePointer value and
   /// copy the data to the indicated area.
   ///
   UINT32                            IrqRoutingTablePointer;
-  
+
   ///
   /// The length of the $PIR table and is filled in by the EfiCompatibility code.
   ///
   UINT32                            IrqRoutingTableLength;
-  
+
   ///
   /// The 32-bit physical address where the MP table is stored in the traditional BIOS.
-  /// The EfiCompatibility code will fill in the MpTablePtr value and copy the data 
+  /// The EfiCompatibility code will fill in the MpTablePtr value and copy the data
   /// to the indicated area.
   ///
   UINT32                            MpTablePtr;
-  
+
   ///
   /// The length of the MP table and is filled in by the EfiCompatibility code.
   ///
   UINT32                            MpTableLength;
-  
+
   ///
   /// The segment of the OEM-specific INT table/code.
-  /// 
+  ///
   UINT16                            OemIntSegment;
-  
+
   ///
   /// The offset of the OEM-specific INT table/code.
   ///
   UINT16                            OemIntOffset;
-  
+
   ///
   /// The segment of the OEM-specific 32-bit table/code.
   ///
   UINT16                            Oem32Segment;
-  
+
   ///
   /// The offset of the OEM-specific 32-bit table/code.
   ///
   UINT16                            Oem32Offset;
-  
+
   ///
   /// The segment of the OEM-specific 16-bit table/code.
   ///
   UINT16                            Oem16Segment;
-  
+
   ///
   /// The offset of the OEM-specific 16-bit table/code.
   ///
   UINT16                            Oem16Offset;
-  
+
   ///
   /// The segment of the TPM binary passed to 16-bit CSM.
   ///
   UINT16                            TpmSegment;
-  
+
   ///
   /// The offset of the TPM binary passed to 16-bit CSM.
   ///
   UINT16                            TpmOffset;
-  
+
   ///
   /// A pointer to a string identifying the independent BIOS vendor.
   ///
   UINT32                            IbvPointer;
-  
+
   ///
   /// This field is NULL for all systems not supporting PCI Express. This field is the base
   /// value of the start of the PCI Express memory-mapped configuration registers and
@@ -223,7 +223,7 @@ typedef struct {
   /// Functions.
   ///
   UINT32                            PciExpressBase;
-  
+
   ///
   /// Maximum PCI bus number assigned.
   ///
@@ -256,12 +256,12 @@ typedef struct {
 } EFI_COMPATIBILITY16_TABLE;
 
 ///
-/// Functions provided by the CSM binary which communicate between the EfiCompatibility 
+/// Functions provided by the CSM binary which communicate between the EfiCompatibility
 /// and Compatability16 code.
 ///
-/// Inconsistent with the specification here: 
-/// The member's name started with "Compatibility16" [defined in Intel Framework 
-/// Compatibility Support Module Specification / 0.97 version] 
+/// Inconsistent with the specification here:
+/// The member's name started with "Compatibility16" [defined in Intel Framework
+/// Compatibility Support Module Specification / 0.97 version]
 /// has been changed to "Legacy16" since keeping backward compatible.
 ///
 typedef enum {
@@ -274,7 +274,7 @@ typedef enum {
   ///   AX = Return Status codes
   ///
   Legacy16InitializeYourself    = 0x0000,
-  
+
   ///
   /// Causes the Compatibility16 BIOS to perform any drive number translations to match the boot sequence.
   /// Input:
@@ -284,18 +284,18 @@ typedef enum {
   ///   AX = Returned status codes
   ///
   Legacy16UpdateBbs             = 0x0001,
-  
+
   ///
   /// Allows the Compatibility16 code to perform any final actions before booting. The Compatibility16
   /// code is read/write.
   /// Input:
   ///   AX = Compatibility16PrepareToBoot
-  ///   ES:BX = Pointer to EFI_TO_COMPATIBILITY16_BOOT_TABLE structure  
+  ///   ES:BX = Pointer to EFI_TO_COMPATIBILITY16_BOOT_TABLE structure
   /// Return:
   ///   AX = Returned status codes
   ///
   Legacy16PrepareToBoot         = 0x0002,
-  
+
   ///
   /// Causes the Compatibility16 BIOS to boot. The Compatibility16 code is Read/Only.
   /// Input:
@@ -304,7 +304,7 @@ typedef enum {
   ///   AX = Returned status codes
   ///
   Legacy16Boot                  = 0x0003,
-  
+
   ///
   /// Allows the Compatibility16 code to get the last device from which a boot was attempted. This is
   /// stored in CMOS and is the priority number of the last attempted boot device.
@@ -315,7 +315,7 @@ typedef enum {
   ///   BX = Priority number of the boot device.
   ///
   Legacy16RetrieveLastBootDevice = 0x0004,
-  
+
   ///
   /// Allows the Compatibility16 code rehook INT13, INT18, and/or INT19 after dispatching a legacy OpROM.
   /// Input:
@@ -326,7 +326,7 @@ typedef enum {
   ///   BX = Number of non-BBS-compliant devices found. Equals 0 if BBS compliant.
   ///
   Legacy16DispatchOprom         = 0x0005,
-  
+
   ///
   /// Finds a free area in the 0xFxxxx or 0xExxxx region of the specified length and returns the address
   /// of that region.
@@ -343,7 +343,7 @@ typedef enum {
   ///   DS:BX = Address of the region
   ///
   Legacy16GetTableAddress       = 0x0006,
-  
+
   ///
   /// Enables the EfiCompatibility module to do any nonstandard processing of keyboard LEDs or state.
   /// Input:
@@ -356,7 +356,7 @@ typedef enum {
   ///     AX = Returned status codes
   ///
   Legacy16SetKeyboardLeds       = 0x0007,
-  
+
   ///
   /// Enables the EfiCompatibility module to install an interrupt handler for PCI mass media devices that
   /// do not have an OpROM associated with them. An example is SATA.
@@ -385,8 +385,8 @@ typedef struct {
   UINT32  BbsTablePointer;              ///< A pointer to the BBS table.
   UINT16  RuntimeSegment;               ///< The segment where the OpROM can be relocated to. If this value is 0x0000, this
                                         ///< means that the relocation of this run time code is not supported.
-                                        ///< Inconsistent with specification here: 
-                                        ///< The member's name "OpromDestinationSegment" [defined in Intel Framework Compatibility Support Module Specification / 0.97 version] 
+                                        ///< Inconsistent with specification here:
+                                        ///< The member's name "OpromDestinationSegment" [defined in Intel Framework Compatibility Support Module Specification / 0.97 version]
                                         ///< has been changed to "RuntimeSegment" since keeping backward compatible.
 
 } EFI_DISPATCH_OPROM_TABLE;
@@ -399,52 +399,52 @@ typedef struct {
   /// Starting address of memory under 1 MB. The ending address is assumed to be 640 KB or 0x9FFFF.
   ///
   UINT32                            BiosLessThan1MB;
-  
+
   ///
   /// The starting address of the high memory block.
   ///
   UINT32                            HiPmmMemory;
-  
+
   ///
   /// The length of high memory block.
   ///
   UINT32                            HiPmmMemorySizeInBytes;
-  
+
   ///
   /// The segment of the reverse thunk call code.
   ///
   UINT16                            ReverseThunkCallSegment;
-  
+
   ///
   /// The offset of the reverse thunk call code.
   ///
   UINT16                            ReverseThunkCallOffset;
-  
+
   ///
   /// The number of E820 entries copied to the Compatibility16 BIOS.
   ///
   UINT32                            NumberE820Entries;
-  
+
   ///
   /// The amount of usable memory above 1 MB, e.g., E820 type 1 memory.
   ///
   UINT32                            OsMemoryAbove1Mb;
-  
+
   ///
   /// The start of thunk code in main memory. Memory cannot be used by BIOS or PMM.
   ///
   UINT32                            ThunkStart;
-  
+
   ///
   /// The size of the thunk code.
   ///
   UINT32                            ThunkSizeInBytes;
-  
+
   ///
   /// Starting address of memory under 1 MB.
   ///
   UINT32                            LowPmmMemory;
-  
+
   ///
   /// The length of low Memory block.
   ///
@@ -535,40 +535,40 @@ typedef struct {
   /// per IDE controller. The IdentifyDrive is per drive. Index 0 is master and index
   /// 1 is slave.
   ///
-  UINT16                            Status;   
-  
+  UINT16                            Status;
+
   ///
   /// PCI bus of IDE controller.
   ///
   UINT32                            Bus;
-  
+
   ///
   /// PCI device of IDE controller.
   ///
   UINT32                            Device;
-  
+
   ///
   /// PCI function of IDE controller.
   ///
   UINT32                            Function;
-  
+
   ///
   /// Command ports base address.
   ///
   UINT16                            CommandBaseAddress;
-  
+
   ///
   /// Control ports base address.
   ///
   UINT16                            ControlBaseAddress;
-  
+
   ///
   /// Bus master address.
   ///
   UINT16                            BusMasterAddress;
-  
+
   UINT8                             HddIrq;
-  
+
   ///
   /// Data that identifies the drive data; one per possible attached drive.
   ///
@@ -596,7 +596,7 @@ typedef struct {
   UINT16                            Enabled : 1;        ///< If 0, ignore this entry.
   UINT16                            Failed : 1;         ///< 0 = Not known if boot failure occurred.
                                                         ///< 1 = Boot attempted failed.
-  
+
   ///
   /// State of media present.
   ///   00 = No bootable media is present in the device.
@@ -616,64 +616,64 @@ typedef struct {
   /// The boot priority for this boot device. Values are defined below.
   ///
   UINT16                            BootPriority;
-  
+
   ///
   /// The PCI bus for this boot device.
   ///
   UINT32                            Bus;
-  
+
   ///
   /// The PCI device for this boot device.
   ///
   UINT32                            Device;
-  
+
   ///
   /// The PCI function for the boot device.
   ///
   UINT32                            Function;
-  
+
   ///
   /// The PCI class for this boot device.
   ///
   UINT8                             Class;
-  
+
   ///
   /// The PCI Subclass for this boot device.
   ///
   UINT8                             SubClass;
-  
+
   ///
   /// Segment:offset address of an ASCIIZ description string describing the manufacturer.
   ///
   UINT16                            MfgStringOffset;
-  
+
   ///
   /// Segment:offset address of an ASCIIZ description string describing the manufacturer.
-  ///  
+  ///
   UINT16                            MfgStringSegment;
-  
+
   ///
   /// BBS device type. BBS device types are defined below.
   ///
   UINT16                            DeviceType;
-  
+
   ///
   /// Status of this boot device. Type BBS_STATUS_FLAGS is defined below.
   ///
   BBS_STATUS_FLAGS                  StatusFlags;
-  
+
   ///
   /// Segment:Offset address of boot loader for IPL devices or install INT13 handler for
   /// BCV devices.
   ///
   UINT16                            BootHandlerOffset;
-  
+
   ///
   /// Segment:Offset address of boot loader for IPL devices or install INT13 handler for
   /// BCV devices.
-  ///  
+  ///
   UINT16                            BootHandlerSegment;
-  
+
   ///
   /// Segment:offset address of an ASCIIZ description string describing this device.
   ///
@@ -683,38 +683,38 @@ typedef struct {
   /// Segment:offset address of an ASCIIZ description string describing this device.
   ///
   UINT16                            DescStringSegment;
-  
+
   ///
   /// Reserved.
   ///
   UINT32                            InitPerReserved;
-  
+
   ///
   /// The use of these fields is IBV dependent. They can be used to flag that an OpROM
   /// has hooked the specified IRQ. The OpROM may be BBS compliant as some SCSI
   /// BBS-compliant OpROMs also hook IRQ vectors in order to run their BIOS Setup
   ///
   UINT32                            AdditionalIrq13Handler;
-  
+
   ///
   /// The use of these fields is IBV dependent. They can be used to flag that an OpROM
   /// has hooked the specified IRQ. The OpROM may be BBS compliant as some SCSI
   /// BBS-compliant OpROMs also hook IRQ vectors in order to run their BIOS Setup
-  ///  
+  ///
   UINT32                            AdditionalIrq18Handler;
-  
+
   ///
   /// The use of these fields is IBV dependent. They can be used to flag that an OpROM
   /// has hooked the specified IRQ. The OpROM may be BBS compliant as some SCSI
   /// BBS-compliant OpROMs also hook IRQ vectors in order to run their BIOS Setup
-  ///  
+  ///
   UINT32                            AdditionalIrq19Handler;
-  
+
   ///
   /// The use of these fields is IBV dependent. They can be used to flag that an OpROM
   /// has hooked the specified IRQ. The OpROM may be BBS compliant as some SCSI
   /// BBS-compliant OpROMs also hook IRQ vectors in order to run their BIOS Setup
-  ///  
+  ///
   UINT32                            AdditionalIrq40Handler;
   UINT8                             AssignedDriveNumber;
   UINT32                            AdditionalIrq41Handler;
@@ -754,17 +754,17 @@ typedef struct {
   /// values are reserved for future usage.
   ///
   UINT16                            Type : 3;
-  
+
   ///
   /// The size of "port" in bits. Defined values are below.
   ///
   UINT16                            PortGranularity : 3;
-  
+
   ///
   /// The size of data in bits. Defined values are below.
   ///
   UINT16                            DataGranularity : 3;
-  
+
   ///
   /// Reserved for future use.
   ///
@@ -829,17 +829,17 @@ typedef struct {
   /// SMM_ATTRIBUTES is defined below.
   ///
   SMM_ATTRIBUTES                    SmmAttributes;
-  
+
   ///
   /// Function Soft SMI is to perform. Type SMM_FUNCTION is defined below.
   ///
   SMM_FUNCTION                      SmmFunction;
-  
+
   ///
   /// SmmPort size depends upon SmmAttributes and ranges from2 bytes to 16 bytes.
   ///
   UINT8                             SmmPort;
-  
+
   ///
   /// SmmData size depends upon SmmAttributes and ranges from2 bytes to 16 bytes.
   ///
@@ -862,18 +862,18 @@ typedef struct {
   /// This bit set indicates that the ServiceAreaData is valid.
   ///
   UINT8                             DirectoryServiceValidity : 1;
-  
+
   ///
   /// This bit set indicates to use the Reserve Area Boot Code Address (RACBA) only if
   /// DirectoryServiceValidity is 0.
   ///
   UINT8                             RabcaUsedFlag : 1;
-  
+
   ///
   /// This bit set indicates to execute hard disk diagnostics.
   ///
   UINT8                             ExecuteHddDiagnosticsFlag : 1;
-  
+
   ///
   /// Reserved for future use. Set to 0.
   ///
@@ -889,35 +889,35 @@ typedef struct {
   /// UDC_ATTRIBUTES is defined below.
   ///
   UDC_ATTRIBUTES                    Attributes;
-  
+
   ///
   /// This field contains the zero-based device on which the selected
-  /// ServiceDataArea is present. It is 0 for master and 1 for the slave device.  
+  /// ServiceDataArea is present. It is 0 for master and 1 for the slave device.
   ///
   UINT8                             DeviceNumber;
-  
+
   ///
   /// This field contains the zero-based index into the BbsTable for the parent device.
   /// This index allows the user to reference the parent device information such as PCI
   /// bus, device function.
   ///
   UINT8                             BbsTableEntryNumberForParentDevice;
-  
+
   ///
   /// This field contains the zero-based index into the BbsTable for the boot entry.
   ///
   UINT8                             BbsTableEntryNumberForBoot;
-  
+
   ///
   /// This field contains the zero-based index into the BbsTable for the HDD diagnostics entry.
   ///
   UINT8                             BbsTableEntryNumberForHddDiag;
-  
+
   ///
   /// The raw Beer data.
   ///
   UINT8                             BeerData[128];
-  
+
   ///
   /// The raw data of selected service area.
   ///
@@ -1008,8 +1008,8 @@ typedef struct _EFI_LEGACY_BIOS_PROTOCOL EFI_LEGACY_BIOS_PROTOCOL;
 #define ROM_WITH_CONFIG   0x04     ///< Not defined in the Framework CSM Specification.
 
 ///
-/// The following macros do not appear in the Framework CSM Specification and 
-/// are kept for backward compatibility only.  They convert 32-bit address (_Adr) 
+/// The following macros do not appear in the Framework CSM Specification and
+/// are kept for backward compatibility only.  They convert 32-bit address (_Adr)
 /// to Segment:Offset 16-bit form.
 ///
 ///@{
@@ -1147,7 +1147,7 @@ typedef union {
   @param[in,out] Reg       Register contexted passed into (and returned) from thunk to
                            16-bit mode.
 
-  @retval TRUE                Thunk completed with no BIOS errors in the target code. See Regs for status.  
+  @retval TRUE                Thunk completed with no BIOS errors in the target code. See Regs for status.
   @retval FALSE                  There was a BIOS error in the target code.
 **/
 typedef
@@ -1292,8 +1292,8 @@ EFI_STATUS
   );
 
 /**
-  This function takes the Leds input parameter and sets/resets the BDA accordingly. 
-  Leds is also passed to Compatibility16 code, in case any special processing is required. 
+  This function takes the Leds input parameter and sets/resets the BDA accordingly.
+  Leds is also passed to Compatibility16 code, in case any special processing is required.
   This function is normally called from EFI Setup drivers that handle user-selectable
   keyboard options such as boot with NUM LOCK on/off. This function does not
   touch the keyboard or keyboard LEDs but only the BDA.
@@ -1386,9 +1386,9 @@ EFI_STATUS
   Warning: Use this with caution. This routine disconnects all EFI
   drivers. If used externally, then  the caller must re-connect EFI
   drivers.
-  
+
   @param[in]  This   The protocol instance pointer.
-  
+
   @retval EFI_SUCCESS   OPROMs were shadowed.
 
 **/
@@ -1460,58 +1460,58 @@ struct _EFI_LEGACY_BIOS_PROTOCOL {
   /// Performs traditional software INT. See the Int86() function description.
   ///
   EFI_LEGACY_BIOS_INT86                       Int86;
-  
+
   ///
   /// Performs a far call into Compatibility16 or traditional OpROM code.
   ///
   EFI_LEGACY_BIOS_FARCALL86                   FarCall86;
-  
+
   ///
   /// Checks if a traditional OpROM exists for this device.
   ///
   EFI_LEGACY_BIOS_CHECK_ROM                   CheckPciRom;
-  
+
   ///
   /// Loads a traditional OpROM in traditional OpROM address space.
   ///
   EFI_LEGACY_BIOS_INSTALL_ROM                 InstallPciRom;
-  
+
   ///
   /// Boots a traditional OS.
   ///
   EFI_LEGACY_BIOS_BOOT                        LegacyBoot;
-  
+
   ///
   /// Updates BDA to reflect the current EFI keyboard LED status.
   ///
   EFI_LEGACY_BIOS_UPDATE_KEYBOARD_LED_STATUS  UpdateKeyboardLedStatus;
-  
+
   ///
   /// Allows an external agent, such as BIOS Setup, to get the BBS data.
   ///
   EFI_LEGACY_BIOS_GET_BBS_INFO                GetBbsInfo;
-  
+
   ///
   /// Causes all legacy OpROMs to be shadowed.
   ///
   EFI_LEGACY_BIOS_SHADOW_ALL_LEGACY_OPROMS    ShadowAllLegacyOproms;
-  
+
   ///
   /// Performs all actions prior to boot. Used when booting an EFI-aware OS
-  /// rather than a legacy OS.  
+  /// rather than a legacy OS.
   ///
   EFI_LEGACY_BIOS_PREPARE_TO_BOOT_EFI         PrepareToBootEfi;
-  
+
   ///
   /// Allows EFI to reserve an area in the 0xE0000 or 0xF0000 block.
   ///
   EFI_LEGACY_BIOS_GET_LEGACY_REGION           GetLegacyRegion;
-  
+
   ///
   /// Allows EFI to copy data to the area specified by GetLegacyRegion.
   ///
   EFI_LEGACY_BIOS_COPY_LEGACY_REGION          CopyLegacyRegion;
-  
+
   ///
   /// Allows the user to boot off an unconventional device such as a PARTIES partition.
   ///

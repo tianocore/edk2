@@ -1,14 +1,14 @@
 /** @file
   This file declares the PciCfg PPI used to access the PCI configuration space in PEI
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   This PPI is defined in PEI CIS
@@ -85,7 +85,7 @@ EFI_STATUS
   );
 
 /**
-  The EFI_PEI_PCI_CFG_PPI interfaces are used to abstract accesses to PCI 
+  The EFI_PEI_PCI_CFG_PPI interfaces are used to abstract accesses to PCI
   controllers behind a PCI root bridge controller.
 **/
 struct _EFI_PEI_PCI_CFG_PPI {
@@ -93,12 +93,12 @@ struct _EFI_PEI_PCI_CFG_PPI {
   /// PCI read services.  See the Read() function description.
   ///
   EFI_PEI_PCI_CFG_PPI_IO  Read;
-  
+
   ///
   /// PCI write services.  See the Write() function description.
   ///
   EFI_PEI_PCI_CFG_PPI_IO  Write;
-  
+
   ///
   /// PCI read-modify-write services.  See the Modify() function description.
   ///

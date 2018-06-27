@@ -1,11 +1,11 @@
 ## @file
 #  Library to abstract Framework extensions that conflict with UEFI 2.0 Specification.
 #
-#  This library is helpful to port Framework/Tinao code that has conflicts with UEFI 2.0. 
+#  This library is helpful to port Framework/Tinao code that has conflicts with UEFI 2.0.
 #  It hides the old conflicts with library functions and supporting implementations of
 #  the old (EDK/EFI 1.10) and new (EDK II/UEFI 2.0) way.
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -51,7 +51,7 @@
   BaseLib
   UefiBootServicesTableLib
   DevicePathLib
-  
+
 [Guids]
   gEfiEventReadyToBootGuid                      ## SOMETIMES_CONSUMES  ## Event
   gEfiEventLegacyBootGuid                       ## SOMETIMES_CONSUMES  ## Event

@@ -1,16 +1,16 @@
 /** @file
   This file provides control over block-oriented firmware devices.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+http://opensource.org/licenses/bsd-license.php.
 
-  @par Revision Reference: 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+  @par Revision Reference:
   This protocol is defined in framework spec: Firmware Volume Block Specification.
 
 **/
@@ -24,18 +24,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL;
 ///
 /// The type of EFI FVB attribute per the Framework specification.
-/// 
+///
 typedef UINT32  EFI_FVB_ATTRIBUTES;
 
 /**
   The GetAttributes() function retrieves the attributes and
-  current settings of the block. 
+  current settings of the block.
 
   @param This       Indicates the FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
 
   @param Attributes Pointer to EFI_FVB_ATTRIBUTES in which the
                     attributes and current settings are
-                    returned. 
+                    returned.
 
   @retval EFI_SUCCESS The firmware volume attributes were
                       returned.
@@ -59,8 +59,8 @@ EFI_STATUS
                       EFI_FVB_ATTRIBUTES that contains the
                       desired firmware volume settings. On
                       successful return, it contains the new
-                      settings of the firmware volume. 
-  
+                      settings of the firmware volume.
+
   @retval EFI_SUCCESS           The firmware volume attributes were returned.
 
   @retval EFI_INVALID_PARAMETER The attributes requested are in
@@ -83,14 +83,14 @@ EFI_STATUS
   only for memory-mapped firmware volumes.
 
   @param This     Indicates the FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
-  
+
   @param Address  Pointer to a caller-allocated
                   EFI_PHYSICAL_ADDRESS that, on successful
                   return from GetPhysicalAddress(), contains the
                   base address of the firmware volume.
-  
+
   @retval EFI_SUCCESS       The firmware volume base address is returned.
-  
+
   @retval EFI_NOT_SUPPORTED The firmware volume is not memory mapped.
 
 **/
@@ -121,9 +121,9 @@ EFI_STATUS
                         blocks in this range have a size of
                         BlockSize.
 
-  
+
   @retval EFI_SUCCESS             The firmware volume base address was returned.
-  
+
   @retval EFI_INVALID_PARAMETER   The requested LBA is out of range.
 
 **/
@@ -154,7 +154,7 @@ EFI_STATUS
   aware that a read may be partially completed.
 
   @param This     Indicates the FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
-  
+
   @param Lba      The starting logical block index
                   from which to read.
 
@@ -170,15 +170,15 @@ EFI_STATUS
 
   @retval EFI_SUCCESS         The firmware volume was read successfully
                               and contents are in Buffer.
-  
+
   @retval EFI_BAD_BUFFER_SIZE A read was attempted across an LBA
                               boundary. On output, NumBytes
                               contains the total number of bytes
                               returned in Buffer.
-  
+
   @retval EFI_ACCESS_DENIED   The firmware volume is in the
                               ReadDisabled state.
-  
+
   @retval EFI_DEVICE_ERROR    The block device is not
                               functioning correctly and could
                               not be read.
@@ -210,7 +210,7 @@ EFI_STATUS
   EraseBlocks() function first to erase the specified block to
   write. A block erase cycle will transition bits from the
   (NOT)EFI_FVB_ERASE_POLARITY state back to the
-  EFI_FVB_ERASE_POLARITY state. Implementors should note 
+  EFI_FVB_ERASE_POLARITY state. Implementors should note
   that the firmware volume might be in the WriteDisabled
   state. If it is in this state, the Write() function must
   return the status code EFI_ACCESS_DENIED without modifying the
@@ -225,27 +225,27 @@ EFI_STATUS
   returns.
 
   @param This     Indicates the FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL instance.
-  
+
   @param Lba      The starting logical block index to write to.
-  
+
   @param Offset   Offset into the block at which to begin writing.
-  
+
   @param NumBytes The pointer to a UINTN. Input: the total size of the buffer.
                   Output: the total number of bytes actually written.
-  
+
   @param Buffer   The pointer to a caller-allocated buffer that
                   contains the source for the write.
-  
+
   @retval EFI_SUCCESS         The firmware volume was written successfully.
-  
+
   @retval EFI_BAD_BUFFER_SIZE The write was attempted across an
                               LBA boundary. On output, NumBytes
                               contains the total number of bytes
                               actually written.
-  
+
   @retval EFI_ACCESS_DENIED   The firmware volume is in the
                               WriteDisabled state.
-  
+
   @retval EFI_DEVICE_ERROR    The block device is malfunctioning
                               and could not be written.
 
@@ -306,7 +306,7 @@ EFI_STATUS
 
   @retval EFI_SUCCESS The erase request successfully
                       completed.
-  
+
   @retval EFI_ACCESS_DENIED   The firmware volume is in the
                               WriteDisabled state.
   @retval EFI_DEVICE_ERROR  The block device is not functioning
@@ -315,7 +315,7 @@ EFI_STATUS
                             partially erased.
   @retval EFI_INVALID_PARAMETER One or more of the LBAs listed
                                 in the variable argument list do
-                                not exist in the firmware volume.  
+                                not exist in the firmware volume.
 
 **/
 typedef
@@ -344,7 +344,7 @@ struct _FRAMEWORK_EFI_FIRMWARE_VOLUME_BLOCK_PROTOCOL {
   FRAMEWORK_EFI_FVB_ERASE_BLOCKS          EraseBlocks;
   ///
   /// The handle of the parent firmware volume.
-  ///  
+  ///
   EFI_HANDLE                    ParentHandle;
 };
 

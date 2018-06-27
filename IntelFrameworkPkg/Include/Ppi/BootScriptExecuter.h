@@ -8,13 +8,13 @@
   execution, the PEIM looks for a relevant PPI that is available to execute it, rather than executing it
   by issuing the native IA-32 instruction.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -39,10 +39,10 @@ typedef struct _EFI_PEI_BOOT_SCRIPT_EXECUTER_PPI EFI_PEI_BOOT_SCRIPT_EXECUTER_PP
   @param  PeiServices    A pointer to the system PEI Services Table.
   @param  This           A pointer to the EFI_PEI_BOOT_SCRIPT_EXECUTER_PPI instance.
   @param  Address        The physical memory address where the table is stored.
-                         It must be zero if the table to be executed is stored in 
+                         It must be zero if the table to be executed is stored in
                          a firmware volume file.
   @param  FvFile         The firmware volume file name that contains the table to
-                         be executed. It must be NULL if the table to be executed 
+                         be executed. It must be NULL if the table to be executed
                          is stored in physical memory.
 
   @retval EFI_SUCCESS           The boot script table was executed successfully.
@@ -50,7 +50,7 @@ typedef struct _EFI_PEI_BOOT_SCRIPT_EXECUTER_PPI EFI_PEI_BOOT_SCRIPT_EXECUTER_PP
   @retval EFI_NOT_FOUND         The file name specified in FvFile cannot be found.
   @retval EFI_UNSUPPORTED       The format of the boot script table is invalid.
                                 Or, an unsupported opcode occurred in the table.
-                                Or there were opcode execution errors, such as an 
+                                Or there were opcode execution errors, such as an
                                 insufficient dependency.
 
 **/
@@ -64,14 +64,14 @@ EFI_STATUS
   );
 
 ///
-/// EFI_PEI_BOOT_SCRIPT_EXECUTER_PPI produces the function which interprets and 
+/// EFI_PEI_BOOT_SCRIPT_EXECUTER_PPI produces the function which interprets and
 /// executes the Framework boot script table.
 ///
 struct _EFI_PEI_BOOT_SCRIPT_EXECUTER_PPI {
-	///
-	/// Executes a boot script table.
-	///
-  EFI_PEI_BOOT_SCRIPT_EXECUTE Execute;  
+  ///
+  /// Executes a boot script table.
+  ///
+  EFI_PEI_BOOT_SCRIPT_EXECUTE Execute;
 };
 
 extern EFI_GUID gEfiPeiBootScriptExecuterPpiGuid;

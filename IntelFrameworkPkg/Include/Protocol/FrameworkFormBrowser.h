@@ -5,13 +5,13 @@
   packet of data.  This will also allow the caller to post messages
   into the configuration drivers internal mailbox.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   Module Name:  FrameworkFormBrowser.h
@@ -64,36 +64,36 @@ typedef struct {
 
   @param  This                  A pointer to the EFI_FORM_BROWSER_PROTOCOL instance.
   @param  UseDatabase           Determines whether the HII database is to be
-                                used to gather information. If the value is FALSE, 
-                                the configuration driver will get the information 
+                                used to gather information. If the value is FALSE,
+                                the configuration driver will get the information
                                 provided in the passed-in Packet parameters.
-  @param  Handle                A pointer to an array of HII handles to display. 
-                                This value should correspond to the value of the 
+  @param  Handle                A pointer to an array of HII handles to display.
+                                This value should correspond to the value of the
                                 HII form package that is required to be displayed.
   @param  HandleCount           The number of handles in the array specified by Handle.
   @param  Packet                A pointer to a set of data containing pointers to IFR
                                 and/or string data.
   @param  CallbackHandle        The handle to the driver's callback interface.
-                                This parameter is used only when the UseDatabase 
-                                parameter is FALSE and an application wants to 
+                                This parameter is used only when the UseDatabase
+                                parameter is FALSE and an application wants to
                                 register a callback with the browser.
   @param  NvMapOverride         This buffer is used only when there is no NV variable
-                                to define the current settings and the caller needs 
-                                to provide to the browser the current settings for 
+                                to define the current settings and the caller needs
+                                to provide to the browser the current settings for
                                 the "fake" NV variable.
   @param  ScreenDimensions      Allows the browser to be called so that it occupies
-                                a portion of the physical screen instead of dynamically 
+                                a portion of the physical screen instead of dynamically
                                 determining the screen dimensions.
   @param  ResetRequired         This BOOLEAN value denotes whether a reset is required
-                                based on the data that might have been changed. 
-                                The ResetRequired parameter is primarily applicable 
+                                based on the data that might have been changed.
+                                The ResetRequired parameter is primarily applicable
                                 for configuration applications, and is an
                                 optional parameter.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The variable was not found.
   @retval EFI_BUFFER_TOO_SMALL  The DataSize is too small for the result.
-                                DataSize has been updated with the size needed to 
+                                DataSize has been updated with the size needed to
                                 complete the request.
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
   @retval EFI_DEVICE_ERROR      The variable could not be saved due to a hardware failure.
@@ -119,10 +119,10 @@ EFI_STATUS
 
   @param  NumberOfLines         The number of lines for the dialog box.
   @param  HotKey                Defines whether a single character is parsed (TRUE)
-                                and returned in KeyValue, or if a string is returned 
+                                and returned in KeyValue, or if a string is returned
                                 in StringBuffer.
   @param  MaximumStringSize     The maximum size in bytes of a typed-in string.
-                                Because each character is a CHAR16, the minimum 
+                                Because each character is a CHAR16, the minimum
                                 string returned is two bytes.
   @param  StringBuffer          The passed-in pointer to the buffer that will hold
                                 the typed in string if HotKey is FALSE.
@@ -160,10 +160,10 @@ struct _EFI_FORM_BROWSER_PROTOCOL {
   /// a pointer to the calling driver's callback interface.
   ///
   EFI_SEND_FORM     SendForm;
-  
+
   ///
   /// Routine used to abstract a generic dialog interface and return the
-  /// selected key or string.  
+  /// selected key or string.
   ///
   EFI_CREATE_POP_UP CreatePopUp;
 };

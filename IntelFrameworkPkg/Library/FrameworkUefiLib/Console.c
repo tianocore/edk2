@@ -1,14 +1,14 @@
 /** @file
   This module provide help function for displaying unicode string.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -28,7 +28,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   //
   {(CHAR16)0x1FFF,  1},
   /*
-   * Merge the blocks and replace them with the above entry as they fall to 
+   * Merge the blocks and replace them with the above entry as they fall to
    * the same category and they are all narrow glyph. This will reduce search
    * time and table size. The merge will omit the reserved code.
    *
@@ -75,7 +75,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   //
   {(CHAR16)0x2FFF,  1},
   /*
-   * Merge the blocks and replace them with the above entry as they fall to 
+   * Merge the blocks and replace them with the above entry as they fall to
    * the same category and they are all narrow glyph. This will reduce search
    * time and table size. The merge will omit the reserved code.
    *
@@ -107,7 +107,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   //
   {(CHAR16)0x33FF,  2},
   /*
-   * Merge the blocks and replace them with the above entry as they fall to 
+   * Merge the blocks and replace them with the above entry as they fall to
    * the same category and they are all wide glyph. This will reduce search
    * time and table size. The merge will omit the reserved code.
    *
@@ -130,13 +130,13 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   //
   {(CHAR16)0x9FFF,  2},
   /*
-   * Merge the blocks and replace them with the above entry as they fall to 
+   * Merge the blocks and replace them with the above entry as they fall to
    * the same category and they are all wide glyph. This will reduce search
    * time and table size. The merge will omit the reserved code.
    *
    * Remove the above item if below is un-commented.
    *
-  {(CHAR16)0x4DFF,  0},       // Reserved. 0x3400-0x4DBF as CJK unified ideographs 
+  {(CHAR16)0x4DFF,  0},       // Reserved. 0x3400-0x4DBF as CJK unified ideographs
                       // extension A in ver3.0. 0x3400-0x4DFF
   {(CHAR16)0x9FFF,  2},       // CJK unified ideographs. 0x4E00-0x9FFF
   *
@@ -152,7 +152,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CONST UNICODE_WIDTH_ENTRY mUnicodeWidthTable[] = {
   //
   {(CHAR16)0xD7FF,  2},
   /*
-   * Merge the blocks and replace them with the above entry as they fall to 
+   * Merge the blocks and replace them with the above entry as they fall to
    * the same category and they are all wide glyph. This will reduce search
    * time and table size. The merge will omit the reserved code.
    *
@@ -215,7 +215,7 @@ GetGlyphWidth (
   Item  = NULL;
   Low   = 0;
   High  = (sizeof (mUnicodeWidthTable)) / (sizeof (UNICODE_WIDTH_ENTRY)) - 1;
-  while (Low <= High) {    
+  while (Low <= High) {
     Index = (Low + High) >> 1;
     Item  = &(mUnicodeWidthTable[Index]);
     if (Index == 0) {
@@ -253,13 +253,13 @@ GetGlyphWidth (
   of the Unicode characters in String can not be determined, then 0 is returned. The display
   width of String can be computed by summing the display widths of each Unicode character
   in String.  Unicode characters that are narrow glyphs have a width of 1, and Unicode
-  characters that are width glyphs have a width of 2. 
+  characters that are width glyphs have a width of 2.
   If String is not aligned on a 16-bit boundary, then ASSERT().
 
   @param  String   A pointer to a Null-terminated Unicode string.
 
   @return          The display length of the Null-terminated Unicode string specified by String.
-  
+
 **/
 UINTN
 EFIAPI
@@ -289,27 +289,27 @@ UnicodeStringDisplayLength (
 }
 
 /**
-  Draws a dialog box to the console output device specified by 
+  Draws a dialog box to the console output device specified by
   ConOut defined in the EFI_SYSTEM_TABLE and waits for a keystroke
-  from the console input device specified by ConIn defined in the 
+  from the console input device specified by ConIn defined in the
   EFI_SYSTEM_TABLE.
 
   If there are no strings in the variable argument list, then ASSERT().
   If all the strings in the variable argument list are empty, then ASSERT().
 
   @param[in]   Attribute  Specifies the foreground and background color of the popup.
-  @param[out]  Key        A pointer to the EFI_KEY value of the key that was 
+  @param[out]  Key        A pointer to the EFI_KEY value of the key that was
                           pressed.  This is an optional parameter that may be NULL.
                           If it is NULL then no wait for a keypress will be performed.
   @param[in]  ...         The variable argument list that contains pointers to Null-
-                          terminated Unicode strings to display in the dialog box.  
+                          terminated Unicode strings to display in the dialog box.
                           The variable argument list is terminated by a NULL.
 
 **/
 VOID
 EFIAPI
 CreatePopUp (
-  IN  UINTN          Attribute,                
+  IN  UINTN          Attribute,
   OUT EFI_INPUT_KEY  *Key,      OPTIONAL
   ...
   )
@@ -330,7 +330,7 @@ CreatePopUp (
   UINTN                            EventIndex;
 
   //
-  // Determine the length of the longest line in the popup and the the total 
+  // Determine the length of the longest line in the popup and the the total
   // number of lines in the popup
   //
   VA_START (Args, Key);
@@ -356,7 +356,7 @@ CreatePopUp (
   // Cache a pointer to the Simple Text Output Protocol in the EFI System Table
   //
   ConOut = gST->ConOut;
-  
+
   //
   // Save the current console cursor position and attributes
   //
@@ -396,7 +396,7 @@ CreatePopUp (
   ASSERT (Line != NULL);
 
   //
-  // Draw top of popup box   
+  // Draw top of popup box
   //
   SetMem16 (Line, (MaxLength + 2) * 2, BOXDRAW_HORIZONTAL);
   Line[0]             = BOXDRAW_DOWN_RIGHT;

@@ -4,13 +4,13 @@
   This PPI is defined in PEI CIS version 0.91. It supports encapsulating sections,
   such as GUIDed sections used to authenticate the file encapsulation of other domain-specific wrapping.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -40,43 +40,43 @@ typedef struct _EFI_PEI_SECTION_EXTRACTION_PPI EFI_PEI_SECTION_EXTRACTION_PPI;
 
   @param PeiServices            The pointer to the PEI Services Table.
   @param This                   Indicates the calling context
-  @param SectionType            The pointer to an EFI_SECTION_TYPE. If 
-                                SectionType == NULL, the contents of the entire 
+  @param SectionType            The pointer to an EFI_SECTION_TYPE. If
+                                SectionType == NULL, the contents of the entire
                                 section are returned in Buffer. If SectionType
                                 is not NULL, only the requested section is returned.
   @param SectionDefinitionGuid  The pointer to an EFI_GUID.
-                                If SectionType == EFI_SECTION_GUID_DEFINED, 
-                                SectionDefinitionGuid indicates for which section 
-                                GUID to search.  If SectionType != EFI_SECTION_GUID_DEFINED, 
+                                If SectionType == EFI_SECTION_GUID_DEFINED,
+                                SectionDefinitionGuid indicates for which section
+                                GUID to search.  If SectionType != EFI_SECTION_GUID_DEFINED,
                                 SectionDefinitionGuid is unused and is ignored.
   @param SectionInstance        If SectionType is not NULL, indicates which
                                 instance of the requested section type to return.
-  @param Buffer                 The pointer to a pointer to a buffer in which the 
+  @param Buffer                 The pointer to a pointer to a buffer in which the
                                 section contents are returned.
-  @param BufferSize             A pointer to a caller-allocated UINT32. On input, 
-                                *BufferSize indicates the size in bytes of the 
+  @param BufferSize             A pointer to a caller-allocated UINT32. On input,
+                                *BufferSize indicates the size in bytes of the
                                 memory region pointed to by Buffer. On output,
-                                *BufferSize contains the number of bytes required 
+                                *BufferSize contains the number of bytes required
                                 to read the section.
   @param AuthenticationStatus   A pointer to a caller-allocated UINT32 in
-                                which any metadata from encapsulating GUID-defined 
+                                which any metadata from encapsulating GUID-defined
                                 sections is returned.
 
   @retval EFI_SUCCESS           The section was successfully processed, and the section
                                 contents were returned in Buffer.
   @retval EFI_PROTOCOL_ERROR    A GUID-defined section was encountered in
-                                the file with its EFI_GUIDED_SECTION_PROCESSING_REQUIRED 
-                                bit set, but there was no corresponding GUIDed 
-                                Section Extraction Protocol in the handle database. 
+                                the file with its EFI_GUIDED_SECTION_PROCESSING_REQUIRED
+                                bit set, but there was no corresponding GUIDed
+                                Section Extraction Protocol in the handle database.
                                 *Buffer is unmodified.
-  @retval EFI_NOT_FOUND         The requested section does not exist.*Buffer is 
+  @retval EFI_NOT_FOUND         The requested section does not exist.*Buffer is
                                 unmodified.
-  @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to process 
+  @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to process
                                 the request.
   @retval EFI_INVALID_PARAMETER The SectionStreamHandle does not exist.
   @retval EFI_WARN_TOO_SMALL    The size of the input buffer is insufficient to
-                                contain the requested section. The input buffer 
-                                is filled and contents are section contents are 
+                                contain the requested section. The input buffer
+                                is filled and contents are section contents are
                                 truncated.
 
 **/

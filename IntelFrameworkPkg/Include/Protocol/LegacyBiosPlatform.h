@@ -4,13 +4,13 @@
   the Legacy BIOS protocol is generic and consumes this protocol.
   A driver that matches the Legacy16 produces this protocol
 
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -59,7 +59,7 @@ typedef enum {
   ///     Bit 1 = 1 0xE0000 64 KB block.
   ///     Multiple bits can be set.
   ///
-  ///   Alignment Bit-mapped address alignment granularity. 
+  ///   Alignment Bit-mapped address alignment granularity.
   ///     The first nonzero bit from the right is the address granularity.
   ///
   //    LegacySegment Segment in which EfiCompatibility code will place the MP table.
@@ -97,7 +97,7 @@ typedef enum {
   ///       Bit 1 = 1 0xE0000 64 KB block.
   ///       Multiple bits can be set.
   ///
-  ///   Alignment Bit mapped address alignment granularity. 
+  ///   Alignment Bit mapped address alignment granularity.
   ///     The first nonzero bit from the right is the address granularity.
   ///
   ///   LegacySegment Segment in which EfiCompatibility code will place the table or data.
@@ -116,7 +116,7 @@ typedef enum {
   /// IBVs normally use this mode for nonstandard Compatibility16 runtime 16 bit routines. It
   /// is the responsibility of this routine to coalesce multiple OEM 16 bit functions, if they
   /// exist, into one coherent package that is understandable by the Compatibility16 code.
-  /// 
+  ///
   /// Example usage: A legacy mobile BIOS that has a pre-existing runtime
   /// interface to return the battery status to calling applications.
   ///
@@ -139,7 +139,7 @@ typedef enum {
   ///      Bit 1 = 1 0xE0000 64 KB block.
   ///      Multiple bits can be set.
   ///
-  ///   Alignment Bit mapped address alignment granularity. 
+  ///   Alignment Bit mapped address alignment granularity.
   ///     The first nonzero bit from the right is the address granularity.
   ///
   ///   LegacySegment Segment in which EfiCompatibility code will place the table or data.
@@ -158,13 +158,13 @@ typedef enum {
 /// IBVs normally use this mode for nonstandard Compatibility16 runtime 32 bit routines. It
 /// is the responsibility of this routine to coalesce multiple OEM 32 bit functions, if they
 /// exist, into one coherent package that is understandable by the Compatibility16 code.
-/// 
+///
 /// Example usage: A legacy mobile BIOS that has a pre existing runtime
 /// interface to return the battery status to calling applications.
 ///
 /// This mode is invoked twice. The first invocation has LegacySegment and
 /// LegacyOffset set to 0. The mode returns the table address in EFI memory and its size.
-/// 
+///
 /// The second invocation has LegacySegment and LegacyOffset set to the location
 /// in the 0xF0000 or 0xE0000 block to which the table is to be copied. The second
 /// invocation allows any table address fix ups to occur in the EFI memory copy of the table.
@@ -191,7 +191,7 @@ typedef enum {
 ///       Bit 1 = 1 0xE0000 64 KB block.
 ///       Multiple bits can be set.
 ///
-///   Alignment Bit mapped address alignment granularity. 
+///   Alignment Bit mapped address alignment granularity.
 ///       The first nonzero bit from the right is the address granularity.
 ///
 ///   LegacySegment Segment in which EfiCompatibility code will place the table or data.
@@ -217,7 +217,7 @@ EfiGetPlatformBinaryOem32Data    = 3,
   ///      Bit 1 = 1 0xE0000 64 KB block.
   ///      Multiple bits can be set.
   ///
-  ///   Alignment Bit mapped address alignment granularity. 
+  ///   Alignment Bit mapped address alignment granularity.
   ///     The first nonzero bit from the right is the address granularity.
   ///
   ///   LegacySegment Segment in which EfiCompatibility code will place the table or data.
@@ -239,21 +239,21 @@ EfiGetPlatformBinaryOem32Data    = 3,
   /// The function parameters associated with this mode are:
   ///
   ///    System ROM image for the platform.
-  ///    
+  ///
   ///    TableSize Size of Table in bytes.
-  ///    
+  ///
   ///    Location Ignored.
-  ///    
+  ///
   ///    Alignment Ignored.
-  ///    
+  ///
   ///    LegacySegment Ignored.
-  ///    
+  ///
   ///    LegacyOffset Ignored.
   ///
   /// The return values associated with this mode are:
   ///
   ///    EFI_SUCCESS ROM image found.
-  ///    
+  ///
   ///    EFI_NOT_FOUND ROM not found.
   ///
   EfiGetPlatformBinarySystemRom    = 5,
@@ -264,15 +264,15 @@ EfiGetPlatformBinaryOem32Data    = 3,
   /// The function parameters associated with this mode are:
   ///
   ///    Table System ROM image for the platform.
-  ///    
+  ///
   ///    TableSize Size of Table in bytes.
-  ///    
+  ///
   ///    Location Ignored.
-  ///    
+  ///
   ///    Alignment Ignored.
-  ///    
+  ///
   ///    LegacySegment Ignored.
-  ///    
+  ///
   ///    LegacyOffset Ignored.
   ///
   /// The return values associated with this mode are:
@@ -306,7 +306,7 @@ typedef enum {
   ///   HandleCount Number of VGA handles found.
   ///
   ///   AdditionalData NULL.
-  /// 
+  ///
   EfiGetPlatformVgaHandle       = 0,
   ///
   /// This mode returns the Compatibility16 policy for the device that should be the IDE
@@ -368,7 +368,7 @@ typedef enum {
   ///
   ///     Type 0.
   ///
-  ///     DeviceHandle Handle of device OpROM is associated with. 
+  ///     DeviceHandle Handle of device OpROM is associated with.
   ///
   ///     ShadowAddress Address where OpROM is shadowed.
   ///
@@ -402,14 +402,14 @@ typedef enum {
   ///
   ///       Type 0.
   ///
-  ///       DeviceHandle Handle of device OpROM is associated with. 
+  ///       DeviceHandle Handle of device OpROM is associated with.
   ///
   ///       ShadowAddress Address where OpROM is shadowed.
   ///
   ///       Compatibility16Table NULL.
   ///
   ///       AdditionalData NULL.
-  /// 
+  ///
   EfiPlatformHookAfterRomInit     = 2
 } EFI_GET_PLATFORM_HOOK_MODE;
 
@@ -419,7 +419,7 @@ typedef enum {
 #define PCI_UNUSED        0x00
 ///
 /// This IRQ has been assigned to PCI.
-/// 
+///
 #define PCI_USED          0xFF
 ///
 /// This IRQ has been used by an SIO legacy device and cannot be used by PCI.
@@ -546,8 +546,8 @@ typedef struct {
   @param  This                  The protocol instance pointer.
   @param  Mode                  Specifies what data to return. See See EFI_GET_PLATFORM_INFO_MODE enum.
   @param  Table                 Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
-  @param  TableSize            	Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
-  @param  Location             	Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
+  @param  TableSize              Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
+  @param  Location               Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
   @param  Alignment             Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
   @param  LegacySegment         Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
   @param  LegacyOffset          Mode specific.  See EFI_GET_PLATFORM_INFO_MODE enum.
@@ -649,7 +649,7 @@ EFI_STATUS
     * A list of PCI IRQs and the priority order to assign them.
 
   @param  This                    The protocol instance pointer.
-  @param  RoutingTable            The pointer to PCI IRQ Routing table. 
+  @param  RoutingTable            The pointer to PCI IRQ Routing table.
                                   This location is the $PIR table minus the header.
   @param  RoutingTableEntries     The number of entries in table.
   @param  LocalPirqTable          $PIR table.
@@ -674,7 +674,7 @@ EFI_STATUS
 
 /**
   Translates the given PIRQ accounting for bridge.
-  This function translates the given PIRQ back through all buses, if required, 
+  This function translates the given PIRQ back through all buses, if required,
   and returns the true PIRQ and associated IRQ.
 
   @param  This                  The protocol instance pointer.
@@ -746,7 +746,7 @@ struct _EFI_LEGACY_BIOS_PLATFORM_PROTOCOL {
   ///
   ///  Gets $PIR table.
   EFI_LEGACY_BIOS_PLATFORM_GET_ROUTING_TABLE    GetRoutingTable;
-  /// 
+  ///
   ///  Translates the given PIRQ to the final value after traversing any PCI bridges.
   ///
   EFI_LEGACY_BIOS_PLATFORM_TRANSLATE_PIRQ       TranslatePirq;

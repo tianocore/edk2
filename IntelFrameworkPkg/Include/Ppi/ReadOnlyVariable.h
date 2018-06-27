@@ -7,13 +7,13 @@
   storage. As such, a write command to certain technologies would alter the contents of the entire part,
   making the PEIM execution in the original position not follow the required flow.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -38,17 +38,17 @@ typedef struct _EFI_PEI_READ_ONLY_VARIABLE_PPI  EFI_PEI_READ_ONLY_VARIABLE_PPI;
 #define EFI_VARIABLE_BOOTSERVICE_ACCESS 0x00000002
 #define EFI_VARIABLE_RUNTIME_ACCESS     0x00000004
 ///
-/// Inconsistent with specification here: 
+/// Inconsistent with specification here:
 /// In Framework Spec, PeiCis0.91, neither the macro or its value is defined.
 /// Keeping this inconsistancy for backward compatibility.
-/// 
+///
 #define EFI_VARIABLE_READ_ONLY          0x00000008
 ///@}
 
 /**
   Get Variable value by Name and GUID pair.
 
-  @param[in]  PeiServices    An indirect pointer to the PEI Services Table published 
+  @param[in]  PeiServices    An indirect pointer to the PEI Services Table published
                              by the PEI Foundation.
   @param[in]  VariableName   A NULL-terminated Unicode string that is the name of the vendor's variable.
   @param[in]  VendorGuid     A unique identifier for the vendor.
@@ -84,22 +84,22 @@ EFI_STATUS
   and on output the interface returns the next variable name data.  When the
   entire variable list has been returned, the error EFI_NOT_FOUND is returned.
 
-  @param[in]  PeiServices       An indirect pointer to the PEI Services Table 
+  @param[in]  PeiServices       An indirect pointer to the PEI Services Table
                                 published by the PEI Foundation.
   @param[in]  VariableNameSize  The size of the VariableName buffer.
   @param[in]  VariableName      On input, supplies the last VariableName that was
-                                returned by GetNextVariableName(). On output, 
-                                returns the Null-terminated Unicode string of the 
+                                returned by GetNextVariableName(). On output,
+                                returns the Null-terminated Unicode string of the
                                 current variable.
   @param[in]  VendorGuid        On input, supplies the last VendorGuid that was
-                                returned by GetNextVariableName(). On output, 
+                                returned by GetNextVariableName(). On output,
                                 returns the VendorGuid of the current variable.
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_NOT_FOUND         The next variable was not found.
   @retval EFI_BUFFER_TOO_SMALL  The VariableNameSize is too small for the result.
   @retval EFI_INVALID_PARAMETER One of the parameters has an invalid value.
-  @retval EFI_DEVICE_ERROR      The variable name could not be retrieved due to 
+  @retval EFI_DEVICE_ERROR      The variable name could not be retrieved due to
                                 a hardware error.
 
 **/
@@ -114,19 +114,19 @@ EFI_STATUS
 
 ///
 /// This PPI provides a lightweight, read-only variant of the full EFI
-/// variable services.  
+/// variable services.
 ///
 struct _EFI_PEI_READ_ONLY_VARIABLE_PPI {
-	///
-  /// Inconsistent with specification here: 
+  ///
+  /// Inconsistent with specification here:
   /// In Framework Spec, PeiCis0.91, the field is named as GetVariable and GetNextVariableName.
   /// Keeping this inconsistancy for backward compatibility.
-	/// 
+  ///
   EFI_PEI_GET_VARIABLE            PeiGetVariable;         ///< A service to ascertain a given variable name.
   EFI_PEI_GET_NEXT_VARIABLE_NAME  PeiGetNextVariableName; ///< A service to ascertain a variable based upon a given, known variable
 };
 
 extern EFI_GUID gEfiPeiReadOnlyVariablePpiGuid;
 
-#endif	/* __PEI_READ_ONLY_VARIABLE_PPI_H__ */
+#endif  /* __PEI_READ_ONLY_VARIABLE_PPI_H__ */
 

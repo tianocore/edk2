@@ -1,17 +1,17 @@
 /** @file
   DataHubRecord.h includes all data hub subclass GUID definitions.
 
-  This file includes all data hub sub class defitions from 
+  This file includes all data hub sub class defitions from
   Cache subclass specification 0.9, DataHub SubClass specification 0.9, Memory SubClass Spec 0.9,
   Processor Subclass specification 0.9, and Misc SubClass specification 0.9.
-  
-Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -35,7 +35,7 @@ extern  EFI_GUID gEfiProcessorSubClassGuid;
 extern  EFI_GUID gEfiCacheSubClassGuid;
 
 ///
-/// The memory subclass belongs to the data class and is identified as the memory 
+/// The memory subclass belongs to the data class and is identified as the memory
 /// subclass by the GUID.
 ///
 #define EFI_MEMORY_SUBCLASS_GUID \
@@ -50,7 +50,7 @@ extern  EFI_GUID  gEfiMiscSubClassGuid;
 
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In ProcSubclass specification 0.9, the value is 0x0100.
 /// Keep it unchanged from the perspective of binary consistency.
 ///
@@ -145,7 +145,7 @@ typedef struct _FLOOPY_CONN_DEVICE_PATH {
 } FLOOPY_CONN_DEVICE_PATH;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
 /// It's implementation-specific to simplify the code logic.
 ///
@@ -166,74 +166,74 @@ typedef union _EFI_MISC_PORT_DEVICE_PATH {
 ///
 /// String Token Definition
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// The macro isn't defined by any specification.
 /// Keep it unchanged for backward compatibility.
 ///
 #define EFI_STRING_TOKEN          UINT16
 
 ///
-/// Each data record that is a member of some subclass starts with a standard 
+/// Each data record that is a member of some subclass starts with a standard
 /// header of type EFI_SUBCLASS_TYPE1_HEADER.
-/// This header is only a guideline and applicable only to a data 
-/// subclass that is producing SMBIOS data records. A subclass can start with a 
-/// different header if needed. 
+/// This header is only a guideline and applicable only to a data
+/// subclass that is producing SMBIOS data records. A subclass can start with a
+/// different header if needed.
 ///
 typedef struct {
   ///
-  /// The version of the specification to which a specific subclass data record adheres. 
+  /// The version of the specification to which a specific subclass data record adheres.
   ///
   UINT32                            Version;
   ///
-  /// The size in bytes of this data class header. 
+  /// The size in bytes of this data class header.
   ///
   UINT32                            HeaderSize;
   ///
-  /// The instance number of the subclass with the same ProducerName. This number is 
-  /// applicable in cases where multiple subclass instances that were produced by the same 
-  /// driver exist in the system. This entry is 1 based; 0 means Reserved and -1 means Not 
-  /// Applicable. All data consumer drivers should be able to handle all the possible values 
-  /// of Instance, including Not Applicable and Reserved. 
+  /// The instance number of the subclass with the same ProducerName. This number is
+  /// applicable in cases where multiple subclass instances that were produced by the same
+  /// driver exist in the system. This entry is 1 based; 0 means Reserved and -1 means Not
+  /// Applicable. All data consumer drivers should be able to handle all the possible values
+  /// of Instance, including Not Applicable and Reserved.
   ///
   UINT16                            Instance;
   ///
-  /// The instance number of the RecordType for the same Instance. This number is 
-  /// applicable in cases where multiple instances of the RecordType exist for a specific 
-  /// Instance. This entry is 1 based; 0 means Reserved and -1 means Not Applicable. 
-  /// All data consumer drivers should be able to handle all the possible values of 
-  /// SubInstance, including Not Applicable and Reserved. 
+  /// The instance number of the RecordType for the same Instance. This number is
+  /// applicable in cases where multiple instances of the RecordType exist for a specific
+  /// Instance. This entry is 1 based; 0 means Reserved and -1 means Not Applicable.
+  /// All data consumer drivers should be able to handle all the possible values of
+  /// SubInstance, including Not Applicable and Reserved.
   ///
   UINT16                            SubInstance;
   ///
-  /// The record number for the data record being specified. The numbering scheme and 
-  /// definition is defined in the specific subclass specification. 
+  /// The record number for the data record being specified. The numbering scheme and
+  /// definition is defined in the specific subclass specification.
   ///
   UINT32                            RecordType;
 } EFI_SUBCLASS_TYPE1_HEADER;
 
 ///
-/// This structure is used to link data records in the same subclasses. A data record is 
-/// defined as a link to another data record in the same subclass using this structure. 
+/// This structure is used to link data records in the same subclasses. A data record is
+/// defined as a link to another data record in the same subclass using this structure.
 ///
 typedef struct {
   ///
-  /// An EFI_GUID that identifies the component that produced this data record. Type 
-  /// EFI_GUID is defined in InstallProtocolInterface() in the EFI 1.10 Specification. 
+  /// An EFI_GUID that identifies the component that produced this data record. Type
+  /// EFI_GUID is defined in InstallProtocolInterface() in the EFI 1.10 Specification.
   ///
   EFI_GUID                          ProducerName;
   ///
-  /// The instance number of the subclass with the same ProducerName. This number is 
-  /// applicable in cases where multiple subclass instances that were produced by the same 
-  /// driver exist in the system. This entry is 1 based; 0 means Reserved and -1 means Not 
-  /// Applicable. All data consumer drivers should be able to handle all the possible values 
-  /// of Instance, including Not Applicable and Reserved. 
+  /// The instance number of the subclass with the same ProducerName. This number is
+  /// applicable in cases where multiple subclass instances that were produced by the same
+  /// driver exist in the system. This entry is 1 based; 0 means Reserved and -1 means Not
+  /// Applicable. All data consumer drivers should be able to handle all the possible values
+  /// of Instance, including Not Applicable and Reserved.
   ///
   UINT16                            Instance;
-  /// The instance number of the RecordType for the same Instance. This number is 
-  /// applicable in cases where multiple instances of the RecordType exist for a specific 
-  /// Instance. This entry is 1 based; 0 means Reserved and -1 means Not Applicable. 
-  /// All data consumer drivers should be able to handle all the possible values of 
-  /// SubInstance, including Not Applicable and Reserved.   
+  /// The instance number of the RecordType for the same Instance. This number is
+  /// applicable in cases where multiple instances of the RecordType exist for a specific
+  /// Instance. This entry is 1 based; 0 means Reserved and -1 means Not Applicable.
+  /// All data consumer drivers should be able to handle all the possible values of
+  /// SubInstance, including Not Applicable and Reserved.
   UINT16                            SubInstance;
 } EFI_INTER_LINK_DATA;
 
@@ -241,17 +241,17 @@ typedef struct {
 // EXP data
 //
 ///
-/// This macro provides a calculation for base-10 representations. Value and Exponent are each 
+/// This macro provides a calculation for base-10 representations. Value and Exponent are each
 /// INT16. It is signed to cover negative values and is 16 bits wide (15 bits for data and 1 bit
-/// for the sign).  
+/// for the sign).
 ///
 typedef struct {
   ///
-  /// The INT16 number by which to multiply the base-10 representation. 
+  /// The INT16 number by which to multiply the base-10 representation.
   ///
   UINT16                            Value;
   ///
-  /// The INT16 number by which to raise the base-10 calculation. 
+  /// The INT16 number by which to raise the base-10 calculation.
   ///
   UINT16                            Exponent;
 } EFI_EXP_BASE2_DATA;
@@ -261,25 +261,25 @@ typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_MAX_FSB_FREQUENCY_DATA;
 typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_CORE_FREQUENCY_DATA;
 
 ///
-/// This data record refers to the list of frequencies that the processor core supports. The list of 
-/// supported frequencies is determined by the firmware based on hardware capabilities--for example, 
-/// it could be a common subset of all processors and the chipset. The unit of measurement of this data 
-/// record is in Hertz. For asynchronous processors, the content of this data record is zero.  
-/// The list is terminated by -1 in the Value field of the last element. A Value field of zero means 
-/// that the processor/driver supports automatic frequency selection. 
+/// This data record refers to the list of frequencies that the processor core supports. The list of
+/// supported frequencies is determined by the firmware based on hardware capabilities--for example,
+/// it could be a common subset of all processors and the chipset. The unit of measurement of this data
+/// record is in Hertz. For asynchronous processors, the content of this data record is zero.
+/// The list is terminated by -1 in the Value field of the last element. A Value field of zero means
+/// that the processor/driver supports automatic frequency selection.
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// According to MiscSubclass 0.9 specification, it should be a pointer since it refers to a list of frequencies.
 ///
 typedef EFI_EXP_BASE10_DATA        *EFI_PROCESSOR_CORE_FREQUENCY_LIST_DATA;
 
 ///
-/// This data record refers to the list of supported frequencies of the processor external bus. The list of 
-/// supported frequencies is determined by the firmware based on hardware capabilities--for example, 
-/// it could be a common subset of all processors and the chipset. The unit of measurement of this data 
-/// record is in Hertz. For asynchronous processors, the content of this data record is NULL.  
-/// The list is terminated by -1 in the Value field of the last element. A Value field of zero means 
-/// that the processor/driver supports automatic frequency selection. 
+/// This data record refers to the list of supported frequencies of the processor external bus. The list of
+/// supported frequencies is determined by the firmware based on hardware capabilities--for example,
+/// it could be a common subset of all processors and the chipset. The unit of measurement of this data
+/// record is in Hertz. For asynchronous processors, the content of this data record is NULL.
+/// The list is terminated by -1 in the Value field of the last element. A Value field of zero means
+/// that the processor/driver supports automatic frequency selection.
 ///
 typedef EFI_EXP_BASE10_DATA        *EFI_PROCESSOR_FSB_FREQUENCY_LIST_DATA;
 typedef EFI_EXP_BASE10_DATA        EFI_PROCESSOR_FSB_FREQUENCY_DATA;
@@ -302,7 +302,7 @@ typedef struct {
 
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// The name of third field in ProcSubClass specification 0.9 is LogicalProcessorCount.
 /// Keep it unchanged for backward compatibility.
 ///
@@ -348,10 +348,10 @@ typedef struct {
 } EFI_PROCESSOR_FEATURE_FLAGS;
 
 ///
-/// This data record refers to the unique ID that identifies a set of processors. This data record is 16 
-/// bytes in length. The data in this structure is processor specific and reserved values can be defined 
-/// for future use. The consumer of this data should not make any assumption and should use this data 
-/// with respect to the processor family defined in the Family record number.  
+/// This data record refers to the unique ID that identifies a set of processors. This data record is 16
+/// bytes in length. The data in this structure is processor specific and reserved values can be defined
+/// for future use. The consumer of this data should not make any assumption and should use this data
+/// with respect to the processor family defined in the Family record number.
 ///
 typedef struct {
   ///
@@ -359,22 +359,22 @@ typedef struct {
   ///
   EFI_PROCESSOR_SIGNATURE           Signature;
   ///
-  /// Provides additional processor information. 
+  /// Provides additional processor information.
   ///
   EFI_PROCESSOR_MISC_INFO           MiscInfo;
   ///
-  /// Reserved for future use. 
+  /// Reserved for future use.
   ///
   UINT32                            Reserved;
   ///
-  /// Provides additional processor information. 
+  /// Provides additional processor information.
   ///
   EFI_PROCESSOR_FEATURE_FLAGS       FeatureFlags;
 } EFI_PROCESSOR_ID_DATA;
 
 ///
-/// This data record refers to the general classification of the processor. This data record is 4 bytes in 
-/// length. 
+/// This data record refers to the general classification of the processor. This data record is 4 bytes in
+/// length.
 ///
 typedef enum {
   EfiProcessorOther    = 1,
@@ -386,27 +386,27 @@ typedef enum {
 } EFI_PROCESSOR_TYPE_DATA;
 
 ///
-/// This data record refers to the family of the processor as defined by the DMTF.  
-/// This data record is 4 bytes in length. 
+/// This data record refers to the family of the processor as defined by the DMTF.
+/// This data record is 4 bytes in length.
 ///
 typedef enum {
-  EfiProcessorFamilyOther                  = 0x01, 
+  EfiProcessorFamilyOther                  = 0x01,
   EfiProcessorFamilyUnknown                = 0x02,
-  EfiProcessorFamily8086                   = 0x03, 
+  EfiProcessorFamily8086                   = 0x03,
   EfiProcessorFamily80286                  = 0x04,
-  EfiProcessorFamilyIntel386               = 0x05, 
+  EfiProcessorFamilyIntel386               = 0x05,
   EfiProcessorFamilyIntel486               = 0x06,
   EfiProcessorFamily8087                   = 0x07,
   EfiProcessorFamily80287                  = 0x08,
-  EfiProcessorFamily80387                  = 0x09, 
+  EfiProcessorFamily80387                  = 0x09,
   EfiProcessorFamily80487                  = 0x0A,
-  EfiProcessorFamilyPentium                = 0x0B, 
+  EfiProcessorFamilyPentium                = 0x0B,
   EfiProcessorFamilyPentiumPro             = 0x0C,
   EfiProcessorFamilyPentiumII              = 0x0D,
   EfiProcessorFamilyPentiumMMX             = 0x0E,
   EfiProcessorFamilyCeleron                = 0x0F,
   EfiProcessorFamilyPentiumIIXeon          = 0x10,
-  EfiProcessorFamilyPentiumIII             = 0x11, 
+  EfiProcessorFamilyPentiumIII             = 0x11,
   EfiProcessorFamilyM1                     = 0x12,
   EfiProcessorFamilyM2                     = 0x13,
   EfiProcessorFamilyM1Reserved2            = 0x14,
@@ -414,7 +414,7 @@ typedef enum {
   EfiProcessorFamilyM1Reserved4            = 0x16,
   EfiProcessorFamilyM1Reserved5            = 0x17,
   EfiProcessorFamilyAmdDuron               = 0x18,
-  EfiProcessorFamilyK5                     = 0x19, 
+  EfiProcessorFamilyK5                     = 0x19,
   EfiProcessorFamilyK6                     = 0x1A,
   EfiProcessorFamilyK6_2                   = 0x1B,
   EfiProcessorFamilyK6_3                   = 0x1C,
@@ -452,7 +452,7 @@ typedef enum {
   EfiProcessorFamilyUltraSparcIIi          = 0x56,
   EfiProcessorFamilyUltraSparcIII          = 0x57,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field in ProcSubClass specification 0.9 is defined as EfiProcessorFamilyUltraSparcIIi.
   /// Change it to EfiProcessorFamilyUltraSparcIIIi to avoid build break.
   ///
@@ -494,37 +494,37 @@ typedef enum {
   EfiProcessorFamilyAMDAthlonMP            = 0xB7,
   EfiProcessorFamilyIntelItanium2          = 0xB8,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIntelPentiumM          = 0xB9,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIntelCeleronD          = 0xBA,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIntelPentiumD          = 0xBB,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIntelPentiumEx         = 0xBC,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
-  EfiProcessorFamilyIntelCoreSolo          = 0xBD,  
+  EfiProcessorFamilyIntelCoreSolo          = 0xBD,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
-  EfiProcessorFamilyReserved               = 0xBE,  
+  EfiProcessorFamilyReserved               = 0xBE,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIntelCore2             = 0xBF,
@@ -532,44 +532,44 @@ typedef enum {
   EfiProcessorFamilyG4                     = 0xC9,
   EfiProcessorFamilyG5                     = 0xCA,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification  0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyG6                     = 0xCB,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyzArchitectur           = 0xCC,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyViaC7M                 = 0xD2,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyViaC7D                 = 0xD3,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyViaC7                  = 0xD4,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyViaEden                = 0xD5,
   EfiProcessorFamilyi860                   = 0xFA,
   EfiProcessorFamilyi960                   = 0xFB,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyIndicatorFamily2       = 0xFE,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorFamilyReserved1              = 0xFF
@@ -589,26 +589,26 @@ typedef enum {
 } EFI_PROCESSOR_FAMILY2_DATA;
 
 ///
-/// This data record refers to the core voltage of the processor being defined. The unit of measurement 
-/// of this data record is in volts.  
+/// This data record refers to the core voltage of the processor being defined. The unit of measurement
+/// of this data record is in volts.
 ///
 typedef EFI_EXP_BASE10_DATA         EFI_PROCESSOR_VOLTAGE_DATA;
 
 ///
-/// This data record refers to the base address of the APIC of the processor being defined. This data 
-/// record is a physical address location. 
+/// This data record refers to the base address of the APIC of the processor being defined. This data
+/// record is a physical address location.
 ///
 typedef EFI_PHYSICAL_ADDRESS        EFI_PROCESSOR_APIC_BASE_ADDRESS_DATA;
 
 ///
-/// This data record refers to the ID of the APIC of the processor being defined. This data record is a 
-/// 4-byte entry.  
+/// This data record refers to the ID of the APIC of the processor being defined. This data record is a
+/// 4-byte entry.
 ///
 typedef UINT32                      EFI_PROCESSOR_APIC_ID_DATA;
 
 ///
-/// This data record refers to the version number of the APIC of the processor being defined. This data 
-/// record is a 4-byte entry. 
+/// This data record refers to the version number of the APIC of the processor being defined. This data
+/// record is a 4-byte entry.
 ///
 typedef UINT32                      EFI_PROCESSOR_APIC_VERSION_NUMBER_DATA;
 
@@ -619,16 +619,16 @@ typedef enum {
 } EFI_PROCESSOR_MICROCODE_TYPE;
 
 ///
-/// This data record refers to the revision of the processor microcode that is loaded in the processor. 
-/// This data record is a 4-byte entry. 
+/// This data record refers to the revision of the processor microcode that is loaded in the processor.
+/// This data record is a 4-byte entry.
 ///
 typedef struct {
   ///
-  /// Identifies what type of microcode the data is. 
-  /// 
+  /// Identifies what type of microcode the data is.
+  ///
   EFI_PROCESSOR_MICROCODE_TYPE      ProcessorMicrocodeType;
   ///
-  /// Indicates the revision number of this microcode. 
+  /// Indicates the revision number of this microcode.
   ///
   UINT32                            ProcessorMicrocodeRevisionNumber;
 } EFI_PROCESSOR_MICROCODE_REVISION_DATA;
@@ -637,13 +637,13 @@ typedef struct {
 /// This data record refers to the status of the processor.
 ///
 typedef struct {
-  UINT32       CpuStatus                 :3; ///< Indicates the status of the processor. 
-  UINT32       Reserved1                 :3; ///< Reserved for future use. Should be set to zero.  
-  UINT32       SocketPopulated           :1; ///< Indicates if the processor is socketed or not. 
-  UINT32       Reserved2                 :1; ///< Reserved for future use. Should be set to zero. 
-  UINT32       ApicEnable                :1; ///< Indicates if the APIC is enabled or not. 
-  UINT32       BootApplicationProcessor  :1; ///< Indicates if this processor is the boot processor. 
-  UINT32       Reserved3                 :22;///< Reserved for future use. Should be set to zero. 
+  UINT32       CpuStatus                 :3; ///< Indicates the status of the processor.
+  UINT32       Reserved1                 :3; ///< Reserved for future use. Should be set to zero.
+  UINT32       SocketPopulated           :1; ///< Indicates if the processor is socketed or not.
+  UINT32       Reserved2                 :1; ///< Reserved for future use. Should be set to zero.
+  UINT32       ApicEnable                :1; ///< Indicates if the APIC is enabled or not.
+  UINT32       BootApplicationProcessor  :1; ///< Indicates if this processor is the boot processor.
+  UINT32       Reserved3                 :22;///< Reserved for future use. Should be set to zero.
 } EFI_PROCESSOR_STATUS_DATA;
 
 typedef enum {
@@ -674,22 +674,22 @@ typedef enum {
   EfiProcessorSocket754              = 0x10,
   EfiProcessorSocket940              = 0x11,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorSocket939              = 0x12,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorSocketmPGA604          = 0x13,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorSocketLGA771           = 0x14,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in ProcSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiProcessorSocketLGA775           = 0x15
@@ -699,29 +699,29 @@ typedef enum {
 typedef STRING_REF                  EFI_PROCESSOR_SOCKET_NAME_DATA;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In ProcSubclass specification 0.9, the naming is EFI_PROCESSOR_CACHE_ASSOCIATION_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef EFI_INTER_LINK_DATA         EFI_CACHE_ASSOCIATION_DATA;
 
 ///
-/// This data record refers to the health status of the processor. 
+/// This data record refers to the health status of the processor.
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In ProcSubclass specification 0.9, the naming is EFI_PROCESSOR_HEALTH_STATUS_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
 typedef enum {
   EfiProcessorHealthy        = 1,
   EfiProcessorPerfRestricted = 2,
-  EfiProcessorFuncRestricted = 3 
+  EfiProcessorFuncRestricted = 3
 } EFI_PROCESSOR_HEALTH_STATUS;
 
 ///
-/// This data record refers to the package number of this processor. Multiple logical processors can 
-/// exist in a system and each logical processor can be correlated to the physical processor using this 
-/// record type. 
+/// This data record refers to the package number of this processor. Multiple logical processors can
+/// exist in a system and each logical processor can be correlated to the physical processor using this
+/// record type.
 ///
 typedef UINTN                       EFI_PROCESSOR_PACKAGE_NUMBER_DATA;
 
@@ -739,7 +739,7 @@ typedef struct {
 ///
 /// Inconsistent with specification here:
 /// In ProcSubclass specification 0.9, the enumeration type data structure is NOT defined.
-/// The equivalent in specification is 
+/// The equivalent in specification is
 ///      #define EFI_PROCESSOR_FREQUENCY_RECORD_NUMBER           0x00000001
 ///      #define EFI_PROCESSOR_BUS_FREQUENCY_RECORD_NUMBER       0x00000002
 ///      #define EFI_PROCESSOR_VERSION_RECORD_NUMBER             0x00000003
@@ -800,7 +800,7 @@ typedef enum {
 } EFI_CPU_VARIABLE_RECORD_TYPE;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In ProcSubclass specification 0.9, the union type data structure is NOT defined.
 /// It's implementation-specific to simplify the code logic.
 ///
@@ -845,7 +845,7 @@ typedef struct {
 
 typedef EFI_EXP_BASE2_DATA          EFI_CACHE_SIZE_DATA;
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In CacheSubclass specification 0.9, the naming is EFI_CACHE_MAXIMUM_SIZE_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
@@ -900,7 +900,7 @@ typedef enum {
 } EFI_CACHE_ASSOCIATIVITY_DATA;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In CacheSubclass 0.9 specification. It defines the field type as UINT16.
 /// In fact, it should be UINT32 type because it refers to a 32bit width data.
 ///
@@ -944,13 +944,13 @@ typedef enum {
 ///
 /// Inconsistent with specification here:
 /// In CacheSubclass specification 0.9, the enumeration type data structure is NOT defined.
-/// The equivalent in specification is 
+/// The equivalent in specification is
 ///      #define EFI_CACHE_SIZE_RECORD_NUMBER                    0x00000001
 ///      #define EFI_CACHE_MAXIMUM_SIZE_RECORD_NUMBER            0x00000002
 ///      #define EFI_CACHE_SPEED_RECORD_NUMBER                   0x00000003
 ///      #define EFI_CACHE_SOCKET_RECORD_NUMBER                  0x00000004
-///      #define EFI_CACHE_SRAM_SUPPORT_RECORD_NUMBER            0x00000005 
-///      #define EFI_CACHE_SRAM_INSTALL_RECORD_NUMBER            0x00000006 
+///      #define EFI_CACHE_SRAM_SUPPORT_RECORD_NUMBER            0x00000005
+///      #define EFI_CACHE_SRAM_INSTALL_RECORD_NUMBER            0x00000006
 ///      #define EFI_CACHE_ERROR_SUPPORT_RECORD_NUMBER           0x00000007
 ///      #define EFI_CACHE_TYPE_RECORD_NUMBER                    0x00000008
 ///      #define EFI_CACHE_ASSOCIATIVITY_RECORD_NUMBER           0x00000009
@@ -971,7 +971,7 @@ typedef enum {
 } EFI_CACHE_VARIABLE_RECORD_TYPE;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In CacheSubclass specification 0.9, the union type data structure is NOT defined.
 /// It's implementation-specific to simplify the code logic.
 ///
@@ -1005,39 +1005,39 @@ typedef enum _EFI_MEMORY_REGION_TYPE {
 } EFI_MEMORY_REGION_TYPE;
 
 ///
-/// This data record refers to the size of a memory region. The regions that are 
-/// described can refer to physical memory, memory-mapped I/O, or reserved BIOS memory regions. 
-/// The unit of measurement of this data record is in bytes.  
+/// This data record refers to the size of a memory region. The regions that are
+/// described can refer to physical memory, memory-mapped I/O, or reserved BIOS memory regions.
+/// The unit of measurement of this data record is in bytes.
 ///
 typedef struct {
   ///
-  /// A zero-based value that indicates which processor(s) can access the memory region. 
-  /// A value of 0xFFFF indicates the region is accessible by all processors. 
+  /// A zero-based value that indicates which processor(s) can access the memory region.
+  /// A value of 0xFFFF indicates the region is accessible by all processors.
   ///
   UINT32                            ProcessorNumber;
   ///
-  /// A zero-based value that indicates the starting bus that can access the memory region.  
+  /// A zero-based value that indicates the starting bus that can access the memory region.
   ///
   UINT16                            StartBusNumber;
   ///
-  /// A zero-based value that indicates the ending bus that can access the memory region. 
-  /// A value of 0xFF for a PCI system indicates the region is accessible by all buses and 
-  /// is global in scope. An example of the EndBusNumber not being 0xFF is a system 
-  /// with two or more peer-to-host PCI bridges. 
+  /// A zero-based value that indicates the ending bus that can access the memory region.
+  /// A value of 0xFF for a PCI system indicates the region is accessible by all buses and
+  /// is global in scope. An example of the EndBusNumber not being 0xFF is a system
+  /// with two or more peer-to-host PCI bridges.
   ///
   UINT16                            EndBusNumber;
   ///
-  /// The type of memory region from the operating system's point of view. 
-  /// MemoryRegionType values are equivalent to the legacy INT 15 AX = E820 BIOS 
-  /// command values. 
+  /// The type of memory region from the operating system's point of view.
+  /// MemoryRegionType values are equivalent to the legacy INT 15 AX = E820 BIOS
+  /// command values.
   ///
   EFI_MEMORY_REGION_TYPE            MemoryRegionType;
   ///
-  /// The size of the memory region in bytes. 
+  /// The size of the memory region in bytes.
   ///
   EFI_EXP_BASE2_DATA                MemorySize;
   ///
-  /// The starting physical address of the memory region. 
+  /// The starting physical address of the memory region.
   ///
   EFI_PHYSICAL_ADDRESS              MemoryStartAddress;
 } EFI_MEMORY_SIZE_DATA;
@@ -1083,19 +1083,19 @@ typedef enum _EFI_MEMORY_ERROR_CORRECTION {
 } EFI_MEMORY_ERROR_CORRECTION;
 
 ///
-/// This data record refers to the physical memory array. This data record is a structure.  
-/// The type definition structure for EFI_MEMORY_ARRAY_LOCATION_DATA is in SMBIOS 2.3.4: 
-/// - Table 3.3.17.1, Type 16, Offset 0x4 
-/// - Table 3.3.17.2, Type 16, Offset 0x5 
-/// - Table 3.3.17.3, Type 16, with the following offsets: 
-///     -- Offset 0x6 
-///     -- Offset 0x7 
-///     -- Offset 0xB 
-///     -- Offset 0xD 
-/// 
+/// This data record refers to the physical memory array. This data record is a structure.
+/// The type definition structure for EFI_MEMORY_ARRAY_LOCATION_DATA is in SMBIOS 2.3.4:
+/// - Table 3.3.17.1, Type 16, Offset 0x4
+/// - Table 3.3.17.2, Type 16, Offset 0x5
+/// - Table 3.3.17.3, Type 16, with the following offsets:
+///     -- Offset 0x6
+///     -- Offset 0x7
+///     -- Offset 0xB
+///     -- Offset 0xD
+///
 typedef struct {
   ///
-  /// The physical location of the memory array. 
+  /// The physical location of the memory array.
   ///
   EFI_MEMORY_ARRAY_LOCATION         MemoryArrayLocation;
   ///
@@ -1107,14 +1107,14 @@ typedef struct {
   ///
   EFI_MEMORY_ERROR_CORRECTION       MemoryErrorCorrection;
   ///
-  /// The maximum memory capacity size in kilobytes. If capacity is unknown, then 
-  /// values of MaximumMemoryCapacity.Value = 0x00 and 
+  /// The maximum memory capacity size in kilobytes. If capacity is unknown, then
+  /// values of MaximumMemoryCapacity.Value = 0x00 and
   /// MaximumMemoryCapacity.Exponent = 0x8000 are used.
   ///
   EFI_EXP_BASE2_DATA                MaximumMemoryCapacity;
   ///
-  /// The number of memory slots or sockets that are available for memory devices  
-  /// in this array.    
+  /// The number of memory slots or sockets that are available for memory devices
+  /// in this array.
   ///
   UINT16                            NumberMemoryDevices;
 } EFI_MEMORY_ARRAY_LOCATION_DATA;
@@ -1138,7 +1138,7 @@ typedef enum _EFI_MEMORY_FORM_FACTOR {
   EfiMemoryFormFactorSodimm                   = 0x0D,
   EfiMemoryFormFactorSrimm                    = 0x0E,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in MemSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiMemoryFormFactorFbDimm                   = 0x0F
@@ -1164,12 +1164,12 @@ typedef enum _EFI_MEMORY_ARRAY_TYPE {
   EfiMemoryTypeRdram                          = 0x11,
   EfiMemoryTypeDdr                            = 0x12,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in MemSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiMemoryTypeDdr2                           = 0x13,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in MemSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiMemoryTypeDdr2FbDimm                     = 0x14
@@ -1200,44 +1200,44 @@ typedef enum {
   EfiMemoryStateAbsent       = 4,
   EfiMemoryStateDisabled     = 5,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// This field is NOT defined in MemSubClass specification 0.9. It's introduced for SMBIOS2.6 specification.
   ///
   EfiMemoryStatePartial      = 6
 } EFI_MEMORY_STATE;
 
 ///
-/// This data record describes a memory device. This data record is a structure. 
+/// This data record describes a memory device. This data record is a structure.
 /// The type definition structure for EFI_MEMORY_ARRAY_LINK_DATA is in SMBIOS 2.3.4.
 ///
 typedef struct {
   ///
-  /// A string that identifies the physically labeled socket or board position where the 
+  /// A string that identifies the physically labeled socket or board position where the
   /// memory device is located.
   ///
   STRING_REF                        MemoryDeviceLocator;
   ///
-  /// A string denoting the physically labeled bank where the memory device is located. 
+  /// A string denoting the physically labeled bank where the memory device is located.
   ///
   STRING_REF                        MemoryBankLocator;
   ///
-  /// A string denoting the memory manufacturer.  
-  ///  
+  /// A string denoting the memory manufacturer.
+  ///
   STRING_REF                        MemoryManufacturer;
   ///
-  /// A string denoting the serial number of the memory device.  
+  /// A string denoting the serial number of the memory device.
   ///
   STRING_REF                        MemorySerialNumber;
   ///
-  /// The asset tag of the memory device. 
+  /// The asset tag of the memory device.
   ///
   STRING_REF                        MemoryAssetTag;
   ///
-  /// A string denoting the part number of the memory device.  
+  /// A string denoting the part number of the memory device.
   ///
   STRING_REF                        MemoryPartNumber;
   ///
-  /// A link to a memory array structure set. 
+  /// A link to a memory array structure set.
   ///
   EFI_INTER_LINK_DATA               MemoryArrayLink;
   ///
@@ -1245,49 +1245,49 @@ typedef struct {
   ///
   EFI_INTER_LINK_DATA               MemorySubArrayLink;
   ///
-  /// The total width in bits of this memory device. If there are no error correcting bits, 
-  /// then the total width equals the data width. If the width is unknown, then set the field 
-  /// to 0xFFFF. 
+  /// The total width in bits of this memory device. If there are no error correcting bits,
+  /// then the total width equals the data width. If the width is unknown, then set the field
+  /// to 0xFFFF.
   ///
   UINT16                            MemoryTotalWidth;
   ///
-  /// The data width in bits of the memory device. A data width of 0x00 and a total width 
-  /// of 0x08 indicate that the device is used solely for error correction. 
+  /// The data width in bits of the memory device. A data width of 0x00 and a total width
+  /// of 0x08 indicate that the device is used solely for error correction.
   ///
   UINT16                            MemoryDataWidth;
   ///
-  /// The size in bytes of the memory device. A value of 0x00 denotes that no device is 
+  /// The size in bytes of the memory device. A value of 0x00 denotes that no device is
   /// installed, while a value of all Fs denotes that the size is not known.
   ///
   EFI_EXP_BASE2_DATA                MemoryDeviceSize;
   ///
-  /// The form factor of the memory device. 
+  /// The form factor of the memory device.
   ///
   EFI_MEMORY_FORM_FACTOR            MemoryFormFactor;
   ///
-  /// A memory device set that must be populated with all devices of the same type and 
-  /// size. A value of 0x00 indicates that the device is not part of any set. A value of 0xFF 
-  /// indicates that the attribute is unknown. Any other value denotes the set number. 
+  /// A memory device set that must be populated with all devices of the same type and
+  /// size. A value of 0x00 indicates that the device is not part of any set. A value of 0xFF
+  /// indicates that the attribute is unknown. Any other value denotes the set number.
   ///
   UINT8                             MemoryDeviceSet;
   ///
-  /// The memory type in the socket. 
+  /// The memory type in the socket.
   ///
   EFI_MEMORY_ARRAY_TYPE             MemoryType;
   ///
-  /// The memory type details. 
+  /// The memory type details.
   ///
   EFI_MEMORY_TYPE_DETAIL            MemoryTypeDetail;
   ///
-  /// The memory speed in megahertz (MHz). A value of 0x00 denotes that 
+  /// The memory speed in megahertz (MHz). A value of 0x00 denotes that
   /// the speed is unknown.
-	/// Inconsistent with specification here:  
-	/// In MemSubclass specification 0.9, the naming is MemoryTypeSpeed.
-	/// Keep it unchanged for backward compatibilty.
-	///
+  /// Inconsistent with specification here:
+  /// In MemSubclass specification 0.9, the naming is MemoryTypeSpeed.
+  /// Keep it unchanged for backward compatibilty.
+  ///
   EFI_EXP_BASE10_DATA               MemorySpeed;
   ///
-  /// The memory state. 
+  /// The memory state.
   ///
   EFI_MEMORY_STATE                  MemoryState;
 } EFI_MEMORY_ARRAY_LINK_DATA;
@@ -1296,18 +1296,18 @@ typedef struct {
 #define EFI_MEMORY_ARRAY_START_ADDRESS_RECORD_NUMBER    0x00000004
 
 ///
-/// This data record refers to a specified physical memory array associated with 
-/// a given memory range. 
-/// 
+/// This data record refers to a specified physical memory array associated with
+/// a given memory range.
+///
 typedef struct {
   ///
-  /// The starting physical address in bytes of memory mapped to a specified physical 
-  /// memory array. 
+  /// The starting physical address in bytes of memory mapped to a specified physical
+  /// memory array.
   ///
   EFI_PHYSICAL_ADDRESS              MemoryArrayStartAddress;
   ///
-  /// The last physical address in bytes of memory mapped to a specified physical memory 
-  /// array.  
+  /// The last physical address in bytes of memory mapped to a specified physical memory
+  /// array.
   ///
   EFI_PHYSICAL_ADDRESS              MemoryArrayEndAddress;
   ///
@@ -1315,8 +1315,8 @@ typedef struct {
   ///
   EFI_INTER_LINK_DATA               PhysicalMemoryArrayLink;
   ///
-  /// The number of memory devices that form a single row of memory for the address 
-  /// partition.  
+  /// The number of memory devices that form a single row of memory for the address
+  /// partition.
   ///
   UINT16                            MemoryArrayPartitionWidth;
 } EFI_MEMORY_ARRAY_START_ADDRESS_DATA;
@@ -1325,39 +1325,39 @@ typedef struct {
 #define EFI_MEMORY_DEVICE_START_ADDRESS_RECORD_NUMBER    0x00000005
 
 ///
-/// This data record refers to a physical memory device that is associated with 
+/// This data record refers to a physical memory device that is associated with
 /// a given memory range.
-/// 
+///
 typedef struct {
   ///
-  /// The starting physical address that is associated with the device. 
+  /// The starting physical address that is associated with the device.
   ///
   EFI_PHYSICAL_ADDRESS              MemoryDeviceStartAddress;
   ///
-  /// The ending physical address that is associated with the device. 
+  /// The ending physical address that is associated with the device.
   ///
   EFI_PHYSICAL_ADDRESS              MemoryDeviceEndAddress;
   ///
-  /// A link to the memory device data structure. 
+  /// A link to the memory device data structure.
   ///
   EFI_INTER_LINK_DATA               PhysicalMemoryDeviceLink;
-  /// 
-  /// A link to the memory array data structure. 
+  ///
+  /// A link to the memory array data structure.
   ///
   EFI_INTER_LINK_DATA               PhysicalMemoryArrayLink;
   ///
-  /// The position of the memory device in a row. A value of 0x00 is reserved and a value 
-  /// of 0xFF indicates that the position is unknown. 
+  /// The position of the memory device in a row. A value of 0x00 is reserved and a value
+  /// of 0xFF indicates that the position is unknown.
   ///
   UINT8                             MemoryDevicePartitionRowPosition;
   ///
-  /// The position of the device in an interleave. 
+  /// The position of the device in an interleave.
   ///
   UINT8                             MemoryDeviceInterleavePosition;
   ///
-  /// The maximum number of consecutive rows from the device that are accessed in a 
-  /// single interleave transfer. A value of 0x00 indicates that the device is not interleaved 
-  /// and a value of 0xFF indicates that the interleave configuration is unknown. 
+  /// The maximum number of consecutive rows from the device that are accessed in a
+  /// single interleave transfer. A value of 0x00 indicates that the device is not interleaved
+  /// and a value of 0xFF indicates that the interleave configuration is unknown.
   ///
   UINT8                             MemoryDeviceInterleaveDataDepth;
 } EFI_MEMORY_DEVICE_START_ADDRESS_DATA;
@@ -1377,25 +1377,25 @@ typedef enum _EFI_MEMORY_CHANNEL_TYPE {
 } EFI_MEMORY_CHANNEL_TYPE;
 
 ///
-/// This data record refers the type of memory that is associated with the channel. This data record is a 
-/// structure. 
-/// The type definition structure for EFI_MEMORY_CHANNEL_TYPE_DATA is in SMBIOS 2.3.4, 
-/// Table 3.3.38, Type 37, with the following offsets: 
-///   - Offset 0x4 
-///   - Offset 0x5 
+/// This data record refers the type of memory that is associated with the channel. This data record is a
+/// structure.
+/// The type definition structure for EFI_MEMORY_CHANNEL_TYPE_DATA is in SMBIOS 2.3.4,
+/// Table 3.3.38, Type 37, with the following offsets:
+///   - Offset 0x4
+///   - Offset 0x5
 ///   - Offset 0x6
-/// 
+///
 typedef struct {
   ///
-  /// The type of memory that is associated with the channel. 
-  /// 
+  /// The type of memory that is associated with the channel.
+  ///
   EFI_MEMORY_CHANNEL_TYPE           MemoryChannelType;
   ///
   /// The maximum load that is supported by the channel.
   ///
   UINT8                             MemoryChannelMaximumLoad;
   ///
-  /// The number of memory devices on this channel. 
+  /// The number of memory devices on this channel.
   ///
   UINT8                             MemoryChannelDeviceCount;
 } EFI_MEMORY_CHANNEL_TYPE_DATA;
@@ -1403,25 +1403,25 @@ typedef struct {
 #define EFI_MEMORY_CHANNEL_DEVICE_RECORD_NUMBER    0x00000007
 
 ///
-/// This data record refers to the memory device that is associated with the memory channel. This data 
-/// record is a structure. 
-/// The type definition structure for EFI_MEMORY_CHANNEL_DEVICE_DATA is in SMBIOS 2.3.4, 
-/// Table 3.3.38, Type 37, with the following offsets:  
-///   - Offset 0x7 
+/// This data record refers to the memory device that is associated with the memory channel. This data
+/// record is a structure.
+/// The type definition structure for EFI_MEMORY_CHANNEL_DEVICE_DATA is in SMBIOS 2.3.4,
+/// Table 3.3.38, Type 37, with the following offsets:
+///   - Offset 0x7
 ///   - Offset 0x8
 ///
 typedef struct {
   ///
-  /// A number between one and MemoryChannelDeviceCount plus an arbitrary base.  
-  /// 
+  /// A number between one and MemoryChannelDeviceCount plus an arbitrary base.
+  ///
   UINT8                             DeviceId;
   ///
-  /// The Link of the associated memory device. See Memory Device (Type 17) for 
-  /// memory devices. 
+  /// The Link of the associated memory device. See Memory Device (Type 17) for
+  /// memory devices.
   ///
   EFI_INTER_LINK_DATA               DeviceLink;
   ///
-  /// The number of load units that this device consumes. 
+  /// The number of load units that this device consumes.
   ///
   UINT8                             MemoryChannelDeviceLoad;
 } EFI_MEMORY_CHANNEL_DEVICE_DATA;
@@ -1430,18 +1430,18 @@ typedef struct {
 //  Memory. Controller Information - SMBIOS Type 5
 //
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
 #define EFI_MEMORY_CONTROLLER_INFORMATION_RECORD_NUMBER    0x00000008
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
-typedef enum {  
+typedef enum {
   EfiErrorDetectingMethodOther   = 1,
   EfiErrorDetectingMethodUnknown = 2,
   EfiErrorDetectingMethodNone    = 3,
@@ -1453,7 +1453,7 @@ typedef enum {
 } EFI_MEMORY_ERROR_DETECT_METHOD_TYPE;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
@@ -1468,11 +1468,11 @@ typedef struct {
 } EFI_MEMORY_ERROR_CORRECT_CAPABILITY;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
-typedef enum {  
+typedef enum {
   EfiMemoryInterleaveOther      = 1,
   EfiMemoryInterleaveUnknown    = 2,
   EfiMemoryInterleaveOneWay     = 3,
@@ -1483,7 +1483,7 @@ typedef enum {
 } EFI_MEMORY_SUPPORT_INTERLEAVE_TYPE;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
@@ -1497,7 +1497,7 @@ typedef struct {
 } EFI_MEMORY_SPEED_TYPE;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
@@ -1517,7 +1517,7 @@ typedef struct {
 } EFI_MEMORY_SUPPORTED_TYPE;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
@@ -1532,7 +1532,7 @@ typedef struct {
 /// EFI_MEMORY_CONTROLLER_INFORMATION is obsolete
 /// Use EFI_MEMORY_CONTROLLER_INFORMATION_DATA instead
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
@@ -1551,7 +1551,7 @@ typedef struct {
 } EFI_MEMORY_CONTROLLER_INFORMATION;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 5.
 ///
@@ -1572,17 +1572,17 @@ typedef struct {
 ///
 /// Memory. Error Information - SMBIOS Type 18
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 18.
 ///
 #define EFI_MEMORY_32BIT_ERROR_INFORMATION_RECORD_NUMBER    0x00000009
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 18.
 ///
-typedef enum {  
+typedef enum {
   EfiMemoryErrorOther             = 1,
   EfiMemoryErrorUnknown           = 2,
   EfiMemoryErrorOk                = 3,
@@ -1599,22 +1599,22 @@ typedef enum {
   EfiMemoryErrorUnCorrectable     = 14
 } EFI_MEMORY_ERROR_TYPE;
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 18.
 ///
-typedef enum {  
+typedef enum {
   EfiMemoryGranularityOther               = 1,
   EfiMemoryGranularityOtherUnknown        = 2,
   EfiMemoryGranularityDeviceLevel         = 3,
   EfiMemoryGranularityMemPartitionLevel   = 4
 } EFI_MEMORY_ERROR_GRANULARITY_TYPE;
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 18.
 ///
-typedef enum {  
+typedef enum {
   EfiMemoryErrorOperationOther            = 1,
   EfiMemoryErrorOperationUnknown          = 2,
   EfiMemoryErrorOperationRead             = 3,
@@ -1622,7 +1622,7 @@ typedef enum {
   EfiMemoryErrorOperationPartialWrite     = 5
 } EFI_MEMORY_ERROR_OPERATION_TYPE;
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 18.
 ///
@@ -1639,14 +1639,14 @@ typedef struct {
 ///
 /// Memory. Error Information - SMBIOS Type 33.
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 33.
 ///
 #define EFI_MEMORY_64BIT_ERROR_INFORMATION_RECORD_NUMBER    0x0000000A
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 type 33.
 ///
@@ -1661,7 +1661,7 @@ typedef struct {
 } EFI_MEMORY_64BIT_ERROR_INFORMATION;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It is implementation-specific to simplify the code logic.
 ///
@@ -1759,28 +1759,28 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS              BiosStartingAddress;
   EFI_EXP_BASE2_DATA                BiosPhysicalDeviceSize;
   EFI_MISC_BIOS_CHARACTERISTICS     BiosCharacteristics1;
-  EFI_MISC_BIOS_CHARACTERISTICS_EXTENSION  
+  EFI_MISC_BIOS_CHARACTERISTICS_EXTENSION
                                     BiosCharacteristics2;
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
   /// It's introduced for SmBios 2.6 specification type 0.
   ///
   UINT8                             BiosMajorRelease;
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
   /// It's introduced for SmBios 2.6 specification type 0.
   ///
   UINT8                             BiosMinorRelease;
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
   /// It's introduced for SmBios 2.6 specification type 0.
   ///
   UINT8                             BiosEmbeddedFirmwareMajorRelease;
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
   /// It's introduced for SmBios 2.6 specification type 0.
   ///
@@ -1812,13 +1812,13 @@ typedef struct {
   EFI_GUID                          SystemUuid;
   EFI_MISC_SYSTEM_WAKEUP_TYPE       SystemWakeupType;
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
   /// It's introduced for SmBios 2.6 specification type 1.
   ///
   STRING_REF                        SystemSKUNumber;
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, this data structure and corrsponding fields are NOT defined.
   /// It's introduced for SmBios 2.6 specification type 1.
   ///
@@ -1904,7 +1904,7 @@ typedef enum {
 
 typedef struct {
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass 0.9 specification, it has the incorrect field name "EFI_MISC_CHASSIS_TYPE".
   /// Change it to "ChassisType" to pass build.
   ///
@@ -2055,9 +2055,9 @@ typedef struct {
   EFI_MISC_PORT_CONNECTOR_TYPE      PortExternalConnectorType;
   EFI_MISC_PORT_TYPE                PortType;
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, this type of field is defined as EFI_DEVICE_PATH_PROTOCOL,
-  /// which causes the implementation some complexity. Keep it unchanged for backward 
+  /// which causes the implementation some complexity. Keep it unchanged for backward
   /// compatibility.
   ///
   EFI_MISC_PORT_DEVICE_PATH         PortPath;
@@ -2085,7 +2085,7 @@ typedef enum {
   EfiSlotTypePci66MhzCapable              = 0x0E,
   EfiSlotTypeAgp                          = 0x0F,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, its naming should be EfiSlotTypeAgp2X
   /// rather than EfiSlotTypeApg2X.
   ///
@@ -2099,7 +2099,7 @@ typedef enum {
   EfiSlotTypePC98LocalBus                 = 0xA3,
   EfiSlotTypePC98Card                     = 0xA4,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, these fields aren't defined.
   /// They're introduced for SmBios 2.6 specification type 9.
   ///
@@ -2120,7 +2120,7 @@ typedef enum {
   EfiSlotDataBusWidth64Bit      = 0x06,
   EfiSlotDataBusWidth128Bit     = 0x07,
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, these fields aren't defined.
   /// They're introduced for SmBios 2.6 specification type 9.
   ///
@@ -2197,7 +2197,7 @@ typedef struct {
 typedef struct {
   STRING_REF                        OnBoardDeviceDescription;
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, the name is OnBoardDeviceType.
   /// Keep it unchanged for backward compatibilty.
   ///
@@ -2314,19 +2314,19 @@ typedef struct {
 // Portable Battery - SMBIOS Type 22
 //
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, the name is EFI_MISC_BATTERY_LOCATION_RECORD_NUMBER.
 /// Keep it unchanged for backward compatibilty.
 ///
 #define EFI_MISC_PORTABLE_BATTERY_RECORD_NUMBER   0x00000010
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, the structure name is EFI_MISC_BATTERY_DEVICE_CHEMISTRY.
 /// And all field namings are also different with specification.
 /// Keep it unchanged for backward compatibilty.
 ///
-typedef enum {  
+typedef enum {
   EfiPortableBatteryDeviceChemistryOther = 1,
   EfiPortableBatteryDeviceChemistryUnknown = 2,
   EfiPortableBatteryDeviceChemistryLeadAcid = 3,
@@ -2338,7 +2338,7 @@ typedef enum {
 } EFI_MISC_PORTABLE_BATTERY_DEVICE_CHEMISTRY;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, the structure name is EFI_MISC_BATTERY_LOCATION_DATA.
 /// Also, the name and the order of the fields vary with specifications.
 /// Keep it unchanged for backward compatibilty.
@@ -2349,7 +2349,7 @@ typedef struct {
   STRING_REF                        ManufactureDate;
   STRING_REF                        SerialNumber;
   STRING_REF                        DeviceName;
-  EFI_MISC_PORTABLE_BATTERY_DEVICE_CHEMISTRY  
+  EFI_MISC_PORTABLE_BATTERY_DEVICE_CHEMISTRY
                                     DeviceChemistry;
   UINT16                            DesignCapacity;
   UINT16                            DesignVoltage;
@@ -2359,8 +2359,8 @@ typedef struct {
   UINT16                            SBDSManufactureDate;
   STRING_REF                        SBDSDeviceChemistry;
   UINT8                             DesignCapacityMultiplier;
-  UINT32                            OEMSpecific;  
-  UINT8                             BatteryNumber; // Temporary   
+  UINT32                            OEMSpecific;
+  UINT8                             BatteryNumber; // Temporary
   BOOLEAN                           Valid; // Is entry valid - Temporary
 } EFI_MISC_PORTABLE_BATTERY;
 
@@ -2400,9 +2400,9 @@ typedef struct {
 #define EFI_MISC_HARDWARE_SECURITY_SETTINGS_DATA_RECORD_NUMBER    0x00000012
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// The MiscSubclass specification 0.9 only mentions the possible value of each field in
-/// EFI_MISC_HARDWARE_SECURITY_SETTINGS. 
+/// EFI_MISC_HARDWARE_SECURITY_SETTINGS.
 /// It's implementation-specific in order to to simplify the code logic.
 ///
 typedef enum {
@@ -2501,7 +2501,7 @@ typedef struct {
   EFI_MISC_TEMPERATURE_PROBE_LOCATION
                                     TemperatureProbeLocation;
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// MiscSubclass 0.9 specification defines the fields type as EFI_EXP_BASE10_DATA.
   /// In fact, they should be UINT16 type because they refer to 16bit width data.
   /// Keeping this inconsistency for backward compatibility.
@@ -2584,7 +2584,7 @@ typedef struct {
 #define EFI_MISC_BOOT_INFORMATION_STATUS_RECORD_NUMBER    0x0000001A
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, the structure name is EFI_MISC_BOOT_INFORMATION_STATUS_TYPE.
 /// Keep it unchanged for backward compatibilty.
 ///
@@ -2605,7 +2605,7 @@ typedef enum {
 
 typedef struct {
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, the field name is EFI_MISC_BOOT_INFORMATION_STATUS_TYPE.
   /// Keep it unchanged for backward compatibilty.
   ///
@@ -2661,13 +2661,13 @@ typedef struct {
   EFI_INTER_LINK_DATA               ManagementDeviceLink;
   EFI_INTER_LINK_DATA               ManagementDeviceComponentLink;
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, this field is NOT defined.
   /// It's introduced for SmBios 2.6 specification type 35.
   ///
   EFI_INTER_LINK_DATA               ManagementDeviceThresholdLink;
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, this field is NOT defined.
   /// It's implementation-specific to simplify the code logic.
   ///
@@ -2692,7 +2692,7 @@ typedef struct {
 
 typedef struct {
   EFI_MISC_IPMI_INTERFACE_TYPE      IpmiInterfaceType;
-  EFI_MISC_IPMI_SPECIFICATION_REVISION  
+  EFI_MISC_IPMI_SPECIFICATION_REVISION
                                     IpmiSpecificationRevision;
   UINT16                            IpmiI2CSlaveAddress;
   UINT16                            IpmiNvDeviceAddress;
@@ -2710,7 +2710,7 @@ typedef struct {
 ///
 /// System Power supply Record - SMBIOS Type 39
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, the type of all fields are UINT32.
 /// Keep it unchanged for backward compatibilty.
 ///
@@ -2725,7 +2725,7 @@ typedef struct {
 } EFI_MISC_POWER_SUPPLY_CHARACTERISTICS;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, the structure name is EFI_MISC_POWER_SUPPLY_UNIT_GROUP_DATA.
 /// Keep it unchanged for backward compatibilty.
 ///
@@ -2750,7 +2750,7 @@ typedef struct {
 ///
 /// OEM Data Record - SMBIOS Type 0x80-0xFF
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, the structure name is EFI_SMBIOS_STRUCTURE_HDR.
 /// Due to this, the structure is commonly used by vendors to construct SmBios type 0x80~0xFF table,
 /// Keep it unchanged for backward compatibilty.
@@ -2763,7 +2763,7 @@ typedef struct {
 
 typedef struct {
   ///
-  /// Inconsistent with specification here:  
+  /// Inconsistent with specification here:
   /// In MiscSubclass specification 0.9, the field name is EFI_SMBIOS_STRUCTURE_HDR.
   /// Keep it unchanged for backward compatibilty.
   ///
@@ -2776,14 +2776,14 @@ typedef struct {
 ///
 /// Misc. System Event Log  - SMBIOS Type 15
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 specification type 15.
 ///
 #define EFI_MISC_SYSTEM_EVENT_LOG_RECORD_NUMBER    0x00000020
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 specification type 15.
 ///
@@ -2805,7 +2805,7 @@ typedef struct {
 //  0x00~0x04:  as following definition
 //  0x05~0x7f:  Available for future assignment.
 //  0x80~0xff:  BIOS Vendor/OEM-specific.
-// 
+//
 #define ACCESS_INDEXIO_1INDEX8BIT_DATA8BIT    0x00
 #define ACCESS_INDEXIO_2INDEX8BIT_DATA8BIT    0X01
 #define ACCESS_INDEXIO_1INDEX16BIT_DATA8BIT   0X02
@@ -2815,13 +2815,13 @@ typedef struct {
 ///
 /// Management Device Threshold Data Record - SMBIOS Type 36
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 specification type 36.
 ///
 #define EFI_MISC_MANAGEMENT_DEVICE_THRESHOLD_RECORD_NUMBER    0x00000021
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MiscSubclass specification 0.9, the following data structures are NOT defined.
 /// It's introduced for SmBios 2.6 specification type 36.
 ///
@@ -2859,7 +2859,7 @@ typedef EFI_MISC_SCHEDULED_POWER_ON_MONTH_DATA            EFI_MISC_SCHEDULED_POW
 typedef EFI_MISC_VOLTAGE_PROBE_DESCRIPTION_DATA           EFI_MISC_VOLTAGE_PROBE_DESCRIPTION;
 typedef EFI_MISC_COOLING_DEVICE_TEMP_LINK_DATA            EFI_MISC_COOLING_DEVICE_TEMP_LINK;
 typedef EFI_MISC_TEMPERATURE_PROBE_DESCRIPTION_DATA       EFI_MISC_TEMPERATURE_PROBE_DESCRIPTION;
-typedef EFI_MISC_REMOTE_ACCESS_MANUFACTURER_DESCRIPTION_DATA 
+typedef EFI_MISC_REMOTE_ACCESS_MANUFACTURER_DESCRIPTION_DATA
                                                           EFI_MISC_REMOTE_ACCESS_MANUFACTURER_DESCRIPTION;
 typedef EFI_MISC_MANAGEMENT_DEVICE_DESCRIPTION_DATA       EFI_MISC_MANAGEMENT_DEVICE_DESCRIPTION;
 typedef EFI_MISC_ELECTRICAL_CURRENT_PROBE_DESCRIPTION_DATA EFI_MISC_ELECTRICAL_CURRENT_PROBE_DESCRIPTION;
@@ -2867,7 +2867,7 @@ typedef EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION_DATA
                                                           EFI_MISC_MANAGEMENT_DEVICE_COMPONENT_DESCRIPTION;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It is implementation-specific to simplify the code logic.
 ///
@@ -2909,7 +2909,7 @@ typedef union {
 } EFI_MISC_SUBCLASS_RECORDS;
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In MemSubclass specification 0.9, the following data structures are NOT defined.
 /// It is implementation-specific to simplify the code logic.
 ///
@@ -2920,13 +2920,13 @@ typedef struct {
 #pragma pack()
 
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In DataHubSubclass specification 0.9 page 16, the following symbol is NOT defined.
 /// But value is meaningful, 0 means Reserved.
 ///
 #define EFI_SUBCLASS_INSTANCE_RESERVED       0
 ///
-/// Inconsistent with specification here:  
+/// Inconsistent with specification here:
 /// In DataHubSubclass specification 0.9 page 16, the following symbol is NOT defined.
 /// But value is meaningful, -1 means Not Applicable.
 ///

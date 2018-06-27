@@ -3,13 +3,13 @@
   data and those wishing to be made aware of all information that
   has been logged.  This protocol may only be called <= TPL_NOTIFY.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -33,7 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //  data. The format of the data is defined by the DataRecordGuid.
 //
 // If EFI_DATA_RECORD_HEADER is extended in the future, the Version number and HeaderSize must
-//  change. 
+//  change.
 //
 // The logger is responcible for initializing:
 //  Version, HeaderSize, RecordSize, DataRecordGuid, DataRecordClass
@@ -99,27 +99,27 @@ EFI_STATUS
 
   @param  This                  The EFI_DATA_HUB_PROTOCOL instance.
   @param  MonotonicCount        On input, it specifies the Record to return.
-                                An input of zero means to return the first record, 
+                                An input of zero means to return the first record,
                                 as does an input of one.
   @param  FilterDriver          If FilterDriver is not passed in a MonotonicCount
-                                of zero, it means to return the first data record. 
-                                If FilterDriver is passed in, then a MonotonicCount 
+                                of zero, it means to return the first data record.
+                                If FilterDriver is passed in, then a MonotonicCount
                                 of zero means to return the first data not yet read
                                 by FilterDriver.
-  @param  Record                Returns a dynamically allocated memory buffer with 
+  @param  Record                Returns a dynamically allocated memory buffer with
                                 a data record that matches MonotonicCount.
 
   @retval EFI_SUCCESS           Data was returned in Record.
   @retval EFI_INVALID_PARAMETER FilterDriver was passed in but does not exist.
   @retval EFI_NOT_FOUND         MonotonicCount does not match any data record
-                                in the system. If a MonotonicCount of zero was 
+                                in the system. If a MonotonicCount of zero was
                                 passed in, then no data records exist in the system.
   @retval EFI_OUT_OF_RESOURCES  Record was not returned due to lack
                                 of system resources.
-  @note  Inconsistent with specification here: 
-         In Framework for EFI Data Hub Specification, Version 0.9, This definition 
-         is named as EFI_DATA_HUB_GET_NEXT_DATA_RECORD. The inconsistency is 
-         maintained for backward compatibility. 
+  @note  Inconsistent with specification here:
+         In Framework for EFI Data Hub Specification, Version 0.9, This definition
+         is named as EFI_DATA_HUB_GET_NEXT_DATA_RECORD. The inconsistency is
+         maintained for backward compatibility.
 **/
 typedef
 EFI_STATUS
@@ -136,28 +136,28 @@ EFI_STATUS
   @param  This                  The EFI_DATA_HUB_PROTOCOL instance.
   @param  FilterEvent           The EFI_EVENT to signal whenever data that matches
                                 FilterClass is logged in the system.
-  @param  FilterTpl             The maximum EFI_TPL at which FilterEvent can be 
-                                signaled. It is strongly recommended that you use  
-                                the lowest EFI_TPL possible. 
+  @param  FilterTpl             The maximum EFI_TPL at which FilterEvent can be
+                                signaled. It is strongly recommended that you use
+                                the lowest EFI_TPL possible.
   @param  FilterClass           FilterEvent will be signaled whenever a bit
-                                in EFI_DATA_RECORD_HEADER.DataRecordClass is also 
-                                set in FilterClass. If FilterClass is zero, no 
+                                in EFI_DATA_RECORD_HEADER.DataRecordClass is also
+                                set in FilterClass. If FilterClass is zero, no
                                 class-based filtering will be performed.
   @param  FilterDataRecordGuid  FilterEvent will be signaled whenever
-                                FilterDataRecordGuid matches 
-                                EFI_DATA_RECORD_HEADER.DataRecordGuid. 
-                                If FilterDataRecordGuid is NULL, then no GUID-based 
+                                FilterDataRecordGuid matches
+                                EFI_DATA_RECORD_HEADER.DataRecordGuid.
+                                If FilterDataRecordGuid is NULL, then no GUID-based
                                 filtering will be performed.
 
   @retval EFI_SUCCESS           The filter driver event was registered
-  @retval EFI_ALREADY_STARTED   FilterEvent was previously registered and cannot 
+  @retval EFI_ALREADY_STARTED   FilterEvent was previously registered and cannot
                                 be registered again.
   @retval EFI_OUT_OF_RESOURCES  The filter driver event was not registered
                                 due to lack of system resources.
-  @note  Inconsistent with specification here: 
-         In Framework for EFI Data Hub Specification, Version 0.9, This definition 
-         is named as EFI_DATA_HUB_REGISTER_DATA_FILTER_DRIVER. The inconsistency 
-         is maintained for backward compatibility. 
+  @note  Inconsistent with specification here:
+         In Framework for EFI Data Hub Specification, Version 0.9, This definition
+         is named as EFI_DATA_HUB_REGISTER_DATA_FILTER_DRIVER. The inconsistency
+         is maintained for backward compatibility.
 **/
 typedef
 EFI_STATUS
@@ -178,10 +178,10 @@ EFI_STATUS
 
   @retval EFI_SUCCESS           The filter driver represented by FilterEvent was shut off.
   @retval EFI_NOT_FOUND         FilterEvent did not exist.
-  @note  Inconsistent with specification here: 
-         In Framework for EFI Data Hub Specification, Version 0.9, This definition 
-         is named as EFI_DATA_HUB_UNREGISTER_DATA_FILTER_DRIVER. The inconsistency 
-         is maintained for backward compatibility.  
+  @note  Inconsistent with specification here:
+         In Framework for EFI Data Hub Specification, Version 0.9, This definition
+         is named as EFI_DATA_HUB_UNREGISTER_DATA_FILTER_DRIVER. The inconsistency
+         is maintained for backward compatibility.
 **/
 typedef
 EFI_STATUS
@@ -198,19 +198,19 @@ struct _EFI_DATA_HUB_PROTOCOL {
   ///
   /// Logs a data record.
   ///
-  EFI_DATA_HUB_LOG_DATA                 LogData; 
-  
+  EFI_DATA_HUB_LOG_DATA                 LogData;
+
   ///
   /// Gets a data record. Used both to view the memory-based log and to
   /// get information about which data records have been consumed by a filter driver.
   ///
   EFI_DATA_HUB_GET_NEXT_RECORD          GetNextRecord;
-  
+
   ///
   /// Allows the registration of an EFI event to act as a filter driver for all data records that are logged.
   ///
   EFI_DATA_HUB_REGISTER_FILTER_DRIVER   RegisterFilterDriver;
-  
+
   ///
   /// Used to remove a filter driver that was added with RegisterFilterDriver().
   ///

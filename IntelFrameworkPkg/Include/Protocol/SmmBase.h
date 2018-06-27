@@ -2,7 +2,7 @@
   This file declares SMM Base abstraction protocol.
   This protocol is used to install SMM handlers for support of subsequent SMI/PMI activations. This
   protocol is available on both IA-32 and Itanium-based systems.
- 
+
   The EFI_SMM_BASE_PROTOCOL is a set of services that is exported by a processor device. It is
   a required protocol for the platform processor. This protocol can be used in both boot services and
   runtime mode. However, only the following member functions need to exist during runtime:
@@ -19,13 +19,13 @@
   workarounds for the century rollover in CMOS should provide commensurate services throughout
   preboot and OS runtime.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -72,9 +72,9 @@ typedef struct _EFI_SMM_BASE_PROTOCOL  EFI_SMM_BASE_PROTOCOL;
   @param[in]  SmmImageHandle        A handle allocated by the SMM infrastructure code
                                     to uniquely designate a specific DXE SMM driver.
   @param[in]  CommunicationBuffer   A pointer to a collection of data in memory
-                                    that will be conveyed from a non-SMM environment 
-                                    into an SMM environment. The buffer must be 
-                                    contiguous and physically mapped, and must be 
+                                    that will be conveyed from a non-SMM environment
+                                    into an SMM environment. The buffer must be
+                                    contiguous and physically mapped, and must be
                                     a physical address.
   @param[in]  SourceSize            The size of the CommunicationBuffer.
 
@@ -101,10 +101,10 @@ EFI_STATUS
   @param[in]   SourceBuffer          An optional source buffer in case the image file
                                      is in memory.
   @param[in]   SourceSize            The size of the source image file, if in memory.
-  @param[out]  ImageHandle           The handle that the base driver uses to decode 
-                                     the handler. Unique among SMM handlers only; 
+  @param[out]  ImageHandle           The handle that the base driver uses to decode
+                                     the handler. Unique among SMM handlers only;
                                      not unique across DXE/EFI.
-  @param[in]   LegacyIA32Binary      An optional parameter specifying that the associated 
+  @param[in]   LegacyIA32Binary      An optional parameter specifying that the associated
                                      file is a real-mode IA-32 binary.
 
   @retval      EFI_SUCCESS           The operation was successful.
@@ -177,7 +177,7 @@ EFI_STATUS
   @param[in]  This                  Protocol instance pointer.
   @param[in]  SmmImageHandle        Handle of the callback service.
   @param[in]  CallbackAddress       Address of the callback service.
-  @param[in]  MakeLast              If present, will stipulate that the handler is posted to 
+  @param[in]  MakeLast              If present, will stipulate that the handler is posted to
                                     be executed last in the dispatch table.
   @param[in]  FloatingPointSave     An optional parameter that informs the
                                     EFI_SMM_ACCESS_PROTOCOL Driver core if it needs to save
@@ -209,8 +209,8 @@ EFI_STATUS
   @param[in]   This                  Protocol instance pointer.
   @param[in]   PoolType              The type of pool to allocate.
                                      The only supported type is EfiRuntimeServicesData;
-                                     the interface will internally map this runtime request to 
-                                     SMRAM for IA-32 and leave as this type for the Itanium 
+                                     the interface will internally map this runtime request to
+                                     SMRAM for IA-32 and leave as this type for the Itanium
                                      processor family. Other types can be ignored.
   @param[in]   Size                  The number of bytes to allocate from the pool.
   @param[out]  Buffer                A pointer to a pointer to the allocated buffer if the call
