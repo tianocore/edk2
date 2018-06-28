@@ -627,7 +627,7 @@ DiscoverEmmcDevice (
       );
     AddUnicodeString2 (
       "en",
-      gEmmcDxeComponentName.SupportedLanguages,
+      gEmmcDxeComponentName2.SupportedLanguages,
       &Device->ControllerNameTable,
       Device->ModelName,
       FALSE
