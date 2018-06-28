@@ -827,12 +827,11 @@ ErrorExit:
     gBS->CloseEvent (Instance->TimerEvent);
   }
 
-  //
-  // Remove all inserted ATA devices.
-  //
-  DestroyDeviceInfoList(Instance);
-
   if (Instance != NULL) {
+    //
+    // Remove all inserted ATA devices.
+    //
+    DestroyDeviceInfoList (Instance);
     FreePool (Instance);
   }
   return EFI_UNSUPPORTED;
