@@ -166,6 +166,8 @@ def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
             if len(MatchList) == 2:
                 LineNumber = int(MatchList[0], 0)
                 InjectedFile = MatchList[1]
+                InjectedFile = os.path.normpath(InjectedFile)
+                InjectedFile = os.path.normcase(InjectedFile)
                 # The first injetcted file must be the preprocessed file itself
                 if PreprocessedFile == "":
                     PreprocessedFile = InjectedFile
