@@ -71,9 +71,6 @@
 [Sources.X64]
   Rand/CryptRandTsc.c
 
-[Sources.IPF]
-  Rand/CryptRandItc.c
-
 [Sources.ARM]
   Rand/CryptRand.c
 

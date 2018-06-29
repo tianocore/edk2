@@ -23,7 +23,7 @@
   PLATFORM_VERSION               = 0.98
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/CryptoPkg
-  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|ARM|AARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|ARM|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -78,9 +78,6 @@
 [LibraryClasses.common.DXE_SMM_DRIVER]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
 
-[LibraryClasses.common.DXE_SAL_DRIVER]
-  BaseCryptLib|CryptoPkg/Library/BaseCryptLibRuntimeCryptProtocol/BaseCryptLibRuntimeCryptProtocol.inf
-
 [LibraryClasses.common.UEFI_DRIVER]
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
 
@@ -125,13 +122,8 @@
   CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
   CryptoPkg/Library/TlsLib/TlsLib.inf
 
-  CryptoPkg/CryptRuntimeDxe/CryptRuntimeDxe.inf
-
 [Components.IA32, Components.X64]
   CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf
-
-[Components.IPF]
-  CryptoPkg/Library/BaseCryptLibRuntimeCryptProtocol/BaseCryptLibRuntimeCryptProtocol.inf
 
 [BuildOptions]
   *_*_*_CC_FLAGS = -D DISABLE_NEW_DEPRECATED_INTERFACES
