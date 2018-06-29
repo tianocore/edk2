@@ -2,7 +2,7 @@
 #  This driver is a sample implementation of the Graphics Output Protocol for
 #  the QEMU (Cirrus Logic 5446) video controller.
 #
-#  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -26,7 +26,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 #  DRIVER_BINDING                =  gQemuVideoDriverBinding
 #  COMPONENT_NAME                =  gQemuVideoComponentName
@@ -48,7 +48,7 @@
   VbeShim.c
   VbeShim.h
 
-[Sources.IPF, Sources.EBC]
+[Sources.EBC]
   UnalignedIoUnsupported.c
 
 [Packages]

@@ -2,7 +2,7 @@
 #  Instance of Debug Library for the QEMU debug console port.
 #  It uses Print Library to produce formatted output strings.
 #
-#  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2017, Red Hat, Inc.<BR>
 #
 #  This program and the accompanying materials
@@ -25,7 +25,7 @@
   CONSTRUCTOR                    = PlatformRomDebugLibIoPortConstructor
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]

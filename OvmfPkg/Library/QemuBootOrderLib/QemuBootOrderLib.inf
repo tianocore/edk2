@@ -2,7 +2,7 @@
 #  Rewrite the BootOrder NvVar based on QEMU's "bootorder" fw_cfg file.
 #
 #  Copyright (C) 2012 - 2014, Red Hat, Inc.
-#  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials are licensed and made available
 #  under the terms and conditions of the BSD License which accompanies this
@@ -27,7 +27,7 @@
 # The following information is for reference only and not required by the build
 # tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
 #
 
 [Sources]
