@@ -2,7 +2,7 @@
 # Embedded Package
 #
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2012-2015, ARM Ltd. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 #
@@ -27,7 +27,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Embedded
-  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|ARM|AARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|ARM|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -199,17 +199,6 @@
   gEmbeddedTokenSpaceGuid.PcdTimerVector|7
   gEmbeddedTokenSpaceGuid.PcdTimerPeriod|100000
 
-[PcdsFixedAtBuild.IPF]
-  gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000
-
-#
-# This makes it so you can source level debug with NT32. VC++ debugger limitiation!
-#
-#[BuildOptions]
-#  DEBUG_*_IA32_DLINK_FLAGS = /EXPORT:InitializeDriver=$(IMAGE_ENTRY_POINT) /ALIGN:4096 /SUBSYSTEM:CONSOLE
-#  RELEASE_*_IA32_DLINK_FLAGS = /ALIGN:4096
-#  *_*_IA32_CC_FLAGS = /D EFI_SPECIFICATION_VERSION=0x0002000A /D TIANO_RELEASE_VERSION=0x00080006
-
 [BuildOptions]
   RVCT:*_*_ARM_PLATFORM_FLAGS == --cpu=7-A.security
   *_*_*_CC_FLAGS  = -DDISABLE_NEW_DEPRECATED_INTERFACES
@@ -264,5 +253,5 @@
   EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
   EmbeddedPkg/Drivers/AndroidFastbootTransportTcpDxe/FastbootTransportTcpDxe.inf
 
-[Components.IA32, Components.X64, Components.IPF, Components.ARM]
+[Components.IA32, Components.X64, Components.ARM]
   EmbeddedPkg/GdbStub/GdbStub.inf

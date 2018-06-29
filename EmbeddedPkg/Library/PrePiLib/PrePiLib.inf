@@ -5,6 +5,7 @@
 # directly. Helps building HOBs, reading data from the FV, and doing
 # decompression.
 #
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2008, Apple Inc. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -27,7 +28,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources.common]
