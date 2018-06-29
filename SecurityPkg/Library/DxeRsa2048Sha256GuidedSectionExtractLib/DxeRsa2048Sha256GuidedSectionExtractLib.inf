@@ -22,14 +22,14 @@
   FILE_GUID                      = 0AD6C423-4732-4cf3-9CE3-0A5416D634A5
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = NULL|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = NULL|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = DxeRsa2048Sha256GuidedSectionExtractLibConstructor
   MODULE_UNI_FILE                = DxeRsa2048Sha256GuidedSectionExtractLib.uni
 
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]

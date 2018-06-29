@@ -24,7 +24,7 @@
   ENTRY_POINT                    = Tcg2ConfigPeimEntryPoint
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 # [BootMode]
 #   S3_RESUME                 ## SOMETIMES_CONSUMES
