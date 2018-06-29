@@ -1,7 +1,7 @@
 ## @file
 # Library producing helper routines for this platform.
 #
-# Copyright (c) 2013 Intel Corporation.
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,7 @@
   FILE_GUID                      = 02805010-2591-4ed3-827B-A218F34AE0D7
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PlatformHelperLib|DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = PlatformHelperLib|DXE_DRIVER DXE_RUNTIME_DRIVER SMM_CORE DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER
 
 #
 # The following information is for reference only and not required by the build tools.

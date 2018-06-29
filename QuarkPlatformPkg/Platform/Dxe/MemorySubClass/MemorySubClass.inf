@@ -3,7 +3,7 @@
 #
 # This is the driver that locates the MemoryConfigurationData Variable, if it
 #  exists, and reports the data to the DataHub.
-# Copyright (c) 2013-2015 Intel Corporation.
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -26,7 +26,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]
