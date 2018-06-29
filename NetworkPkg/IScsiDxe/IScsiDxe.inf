@@ -28,7 +28,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 #  DRIVER_BINDING                =  gIScsiDriverBinding
 #  COMPONENT_NAME                =  gIScsiComponentName
