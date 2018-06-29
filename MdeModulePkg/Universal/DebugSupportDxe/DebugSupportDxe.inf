@@ -30,7 +30,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
@@ -49,14 +49,6 @@
   X64/PlDebugSupport.h
   X64/PlDebugSupportX64.c
   X64/AsmFuncs.nasm
-
-[Sources.IPF]
-  Ipf/PlDebugSupport.h
-  Ipf/PlDebugSupport.c
-  Ipf/Ds64Macros.i
-  Ipf/Common.i
-  Ipf/AsmFuncs.s
-
 
 [Packages]
   MdePkg/MdePkg.dec

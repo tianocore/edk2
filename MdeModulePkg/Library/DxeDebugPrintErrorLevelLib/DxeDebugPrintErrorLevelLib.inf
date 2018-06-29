@@ -22,12 +22,12 @@
   FILE_GUID                      = 1D564EC9-9373-49a4-9E3F-E4D7B9974C84
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DebugPrintErrorLevelLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  LIBRARY_CLASS                  = DebugPrintErrorLevelLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
   CONSTRUCTOR                    = DxeDebugPrintErrorLevelLibConstructor
   DESTRUCTOR                     = DxeDebugPrintErrorLevelLibDestructor
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]

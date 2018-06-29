@@ -2,7 +2,7 @@
   The variable data structures are related to EDK II-specific implementation of UEFI variables.
   VariableFormat.h defines variable data headers and variable storage region headers.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -28,13 +28,8 @@ extern EFI_GUID gEfiAuthenticatedVariableGuid;
 ///
 /// Alignment of variable name and data, according to the architecture:
 /// * For IA-32 and Intel(R) 64 architectures: 1.
-/// * For IA-64 architecture: 8.
 ///
-#if defined (MDE_CPU_IPF)
-#define ALIGNMENT         8
-#else
 #define ALIGNMENT         1
-#endif
 
 //
 // GET_PAD_SIZE calculates the miminal pad bytes needed to make the current pad size satisfy the alignment requirement.

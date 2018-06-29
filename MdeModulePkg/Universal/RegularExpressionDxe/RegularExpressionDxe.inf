@@ -1,6 +1,7 @@
 ## @file
 #  EFI_REGULAR_EXPRESSION_PROTOCOL Implementation
 #
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 #
 #  This program and the accompanying materials are licensed and made available
@@ -78,8 +79,6 @@
   MSFT:RELEASE_*_IA32_CC_FLAGS == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2  /FIAutoGen.h /EHs-c- /GR- /GF
   MSFT:DEBUG_*_X64_CC_FLAGS    == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /X
   MSFT:RELEASE_*_X64_CC_FLAGS  == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /FIAutoGen.h /EHs-c- /GR- /GF /Gy /X
-  MSFT:DEBUG_*_IPF_CC_FLAGS    == /nologo /c /WX /GS- /W4 /EHs-c- /GR- /Gy /Os /FIAutoGen.h /QIPF_fr32 /Zi /X
-  MSFT:RELEASE_*_IPF_CC_FLAGS  == /nologo /c /WX /GS- /W4 /EHs-c- /GR- /Gy /Os /FIAutoGen.h /QIPF_fr32 /X
   INTEL:*_*_*_CC_FLAGS         =  /Oi-
 
   # Oniguruma: potentially uninitialized local variable used
