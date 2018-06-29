@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -626,12 +626,6 @@ EfiLdrPeCoffCheckImageMachineType (
 
 #ifdef MDE_CPU_X64
   if (MachineType == EFI_IMAGE_MACHINE_X64) {
-    Status = EFI_SUCCESS;
-  }
-#endif
-
-#ifdef MDE_CPU_IPF
-  if (MachineType == EFI_IMAGE_MACHINE_IA64) {
     Status = EFI_SUCCESS;
   }
 #endif
