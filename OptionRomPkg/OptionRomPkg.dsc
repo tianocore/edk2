@@ -6,7 +6,7 @@
 # Option ROM image for all CPU architectures, including EBC target.
 # A single driver can support mixes of EFI 1.1, UEFI 2.0 and UEFI 2.1.
 #
-# Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 #
 # This program and the accompanying materials
@@ -30,7 +30,7 @@
   PLATFORM_VERSION               = 0.1
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/OptionRomPkg
-  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM|AARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|ARM|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -115,5 +115,5 @@
   OptionRomPkg/Bus/Usb/UsbNetworking/Ax88772/Ax88772.inf
   OptionRomPkg/Bus/Usb/UsbNetworking/Ax88772b/Ax88772b.inf
 
-[Components.IA32, Components.X64, Components.IPF]
+[Components.IA32, Components.X64]
   OptionRomPkg/Application/BltLibSample/BltLibSample.inf

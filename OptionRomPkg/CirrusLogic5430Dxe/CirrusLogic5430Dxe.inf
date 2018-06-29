@@ -9,7 +9,7 @@
 #  requires both the UGA Draw and the UGA I/O Protocol. Please refer to Microsoft's
 #  documentation on UGA for details on how to write a UGA driver that is able
 #  to function both in the EFI pre-boot environment and from the OS runtime.
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -39,7 +39,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 #  DRIVER_BINDING                =  gCirrusLogic5430DriverBinding
 #  COMPONENT_NAME                =  gCirrusLogic5430ComponentName
