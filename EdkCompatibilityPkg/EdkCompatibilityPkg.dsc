@@ -2,7 +2,7 @@
 # EDK Compatibility Package Build File
 #
 #
-# Copyright (c) 2008 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -25,7 +25,7 @@
   PLATFORM_VERSION               = 0.92
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/EdkCompatibilityPkg
-  SUPPORTED_ARCHITECTURES        = IA32|X64|IPF|EBC
+  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
 DEFINE MSFT_MACRO                = /D EFI_SPECIFICATION_VERSION=0x00020000 /D PI_SPECIFICATION_VERSION=0x00009000 /D TIANO_RELEASE_VERSION=0x00080006 /D PCD_EDKII_GLUE_PciExpressBaseAddress=0xE0000000 /D EFI_DEBUG
@@ -100,13 +100,6 @@ DEFINE GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   GCC:*_*_X64_APP_FLAGS     = -DEFIX64 $(GCC_MACRO)
   GCC:*_*_X64_PP_FLAGS      = -DEFIX64 $(GCC_MACRO)
 
-  GCC:*_*_IPF_CC_FLAGS      = -DEFI64 $(GCC_MACRO)
-  GCC:*_*_IPF_ASM_FLAGS     =
-  GCC:*_*_IPF_VFRPP_FLAGS   = -DEFI64 $(GCC_MACRO)
-  GCC:*_*_IPF_APP_FLAGS     = -DEFI64 $(GCC_MACRO)
-  GCC:*_*_IPF_PP_FLAGS      = -DEFI64 $(GCC_MACRO)
-
-
   INTEL:*_*_IA32_CC_FLAGS    = /D EFI32 $(MSFT_MACRO)
   INTEL:*_*_IA32_ASM_FLAGS   = /DEFI32
   INTEL:*_*_IA32_VFRPP_FLAGS = /D EFI32 $(MSFT_MACRO)
@@ -122,13 +115,6 @@ DEFINE GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   INTEL:*_*_X64_APP_FLAGS    = /D EFIX64 $(MSFT_MACRO)
   INTEL:*_*_X64_PP_FLAGS     = /D EFIX64 $(MSFT_MACRO)
 
-  INTEL:*_*_IPF_CC_FLAGS     = /D EFI64 $(MSFT_MACRO)
-  INTEL:*_*_IPF_ASM_FLAGS    =
-  INTEL:*_*_IPF_VFRPP_FLAGS  = /D EFI64 $(MSFT_MACRO)
-  INTEL:*_*_IPF_APP_FLAGS    = /D EFI64 $(MSFT_MACRO)
-  INTEL:*_*_IPF_PP_FLAGS     = /D EFI64 $(MSFT_MACRO)
-
-
   MSFT:*_*_IA32_CC_FLAGS    = /D EFI32 $(MSFT_MACRO)
   MSFT:*_*_IA32_ASM_FLAGS   = /DEFI32
   MSFT:*_*_IA32_VFRPP_FLAGS = /D EFI32 $(MSFT_MACRO)
@@ -140,12 +126,6 @@ DEFINE GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   MSFT:*_*_X64_VFRPP_FLAGS  = /D EFIX64 $(MSFT_MACRO)
   MSFT:*_*_X64_APP_FLAGS    = /D EFIX64 $(MSFT_MACRO)
   MSFT:*_*_X64_PP_FLAGS     = /D EFIX64 $(MSFT_MACRO)
-
-  MSFT:*_*_IPF_CC_FLAGS     = /Od /Os /D EFI64 $(MSFT_MACRO)
-  MSFT:*_*_IPF_ASM_FLAGS    =
-  MSFT:*_*_IPF_VFRPP_FLAGS  = /D EFI64 $(MSFT_MACRO)
-  MSFT:*_*_IPF_APP_FLAGS    = /D EFI64 $(MSFT_MACRO)
-  MSFT:*_*_IPF_PP_FLAGS     = /D EFI64 $(MSFT_MACRO)
 
 ###################################################################################################
 #
@@ -275,7 +255,7 @@ DEFINE GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   # }
 
 
-[Components.IA32,Components.X64,Components.IPF]
+[Components.IA32,Components.X64]
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   EdkCompatibilityPkg/Foundation/Library/Pei/PeiLib/PeiLib_Edk2.inf
   
@@ -295,11 +275,6 @@ DEFINE GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   EdkCompatibilityPkg/Compatibility/FrameworkSmmStatusCodeOnPiSmmStatusCodeThunk/FrameworkSmmStatusCodeOnPiSmmStatusCodeThunk.inf
   EdkCompatibilityPkg/Compatibility/BootScriptSaveOnS3SaveStateThunk/BootScriptSaveOnS3SaveStateThunk.inf
   EdkCompatibilityPkg/Compatibility/DxeSmmReadyToLockOnExitPmAuthThunk/DxeSmmReadyToLockOnExitPmAuthThunk.inf
-
-[Components.IPF]
-  EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIa64Lib/CpuIA64Lib.inf
-  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/EdkDxeSalLib/EdkDxeSalLib.inf
-  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesTablePointerLibKr1/PeiServicesTablePointerLibKr1.inf
 
 [Libraries]
   #
@@ -390,7 +365,7 @@ DEFINE GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
 
   EdkCompatibilityPkg/Foundation/Library/Thunk16/Thunk16Lib_Edk2.inf
 
-[Libraries.IA32,Libraries.X64,Libraries.IPF]
+[Libraries.IA32,Libraries.X64]
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   EdkCompatibilityPkg/Foundation/Library/Pei/PeiLib/PeiLib_Edk2.inf
   
@@ -399,9 +374,4 @@ DEFINE GCC_MACRO                 = -DEFI_SPECIFICATION_VERSION=0x00020000 -DPI_S
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesTablePointerLibMm7/PeiServicesTablePointerLibMm7.inf
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/DxePerformanceLib/DxePerformanceLib.inf # Use IA32/X64 specific AsmReadTsc (). 
   EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiPerformanceLib/PeiPerformanceLib.inf # Use IA32/X64 specific AsmReadTsc ().
-
-[Libraries.IPF]
-  EdkCompatibilityPkg/Foundation/Cpu/Itanium/CpuIa64Lib/CpuIA64Lib.inf
-  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/EdkDxeSalLib/EdkDxeSalLib.inf
-  EdkCompatibilityPkg/Foundation/Library/EdkIIGlueLib/Library/PeiServicesTablePointerLibKr1/PeiServicesTablePointerLibKr1.inf
 

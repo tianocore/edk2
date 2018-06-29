@@ -1,6 +1,6 @@
 #/*++
 #
-# Copyright (c) 2004 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -50,18 +50,6 @@ COMPONENT_TYPE  = LIBRARY
   X64/RuntimeLibAsm.asm     | MSFT
   X64/RuntimeLibAsm.asm     | INTEL
   X64/RuntimeLibAsm.S       | GCC
-
-[sources.ipf]
-  Ipf/RuntimeLib.c
-  Ipf/Lock.c
-  Ipf/Fvb.c
-  Ipf/EsalLib.s
-  Ipf/IpfCpuCache.s
-  #
-  # Only for CYGWINGCC IPF tool chain, EFI_BREAKPOINT and MEMORY_FENCE
-  # is defined as two functions EcpEfiBreakPoint and EcpMemoryFence.
-  #
-  Ipf/AsmCpuMisc.s | GCC
 
 [sources.ebc]
   Ebc/RuntimeLib.c

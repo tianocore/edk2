@@ -1,6 +1,6 @@
 #/*++
 #
-# Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -69,27 +69,6 @@ COMPONENT_TYPE    = LIBRARY
   X64/EfiJump.h
   X64/PeiServicePointer.c
 
-[sources.ipf]
-#  Ipf/Math.c
-  Ipf/PeCoffLoaderEx.c
-  Ipf/PeCoffLoaderEx.h
-  Ipf/PerformancePrimitives.s
-  Ipf/Processor.c
-  Ipf/EfiJump.h
-  Ipf/SetJmp.s
-  Ipf/Asm.h
-  Ipf/PioFlush.s
-  Ipf/SwitchStack.s
-  Ipf/Ia_64Gen.h
-  Ipf/HwAccess.s
-  Ipf/PeiServicePointer.c
-  #
-  # Only for CYGWINGCC IPF tool chain, EFI_BREAKPOINT and MEMORY_FENCE
-  # is defined as two functions EcpEfiBreakPoint and EcpMemoryFence.
-  #
-  Ipf/AsmCpuMisc.s | GCC
-  
-  
 [libraries.common]
   EdkGuidLib
   EfiCommonLib

@@ -1,6 +1,6 @@
 #/*++
 #
-# Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials                          
 # are licensed and made available under the terms and conditions of the BSD License         
 # which accompanies this distribution.  The full text of the license may be found at        
@@ -560,39 +560,6 @@ COMPONENT_TYPE  = LIBRARY
   SynchronizationGcc.c  | GCC 
   ChkStkGcc.c  | GCC 
 
-[Sources.IPF]
-  Ipf/asm.h
-  Ipf/ia_64gen.h
-  Ipf/PalCallStatic.s
-  Ipf/setjmp.s
-  Ipf/longjmp.s
-  Ipf/SwitchStack.s
-  Ipf/Unaligned.c
-  Ipf/InterlockedCompareExchange32.s
-  Ipf/InterlockedCompareExchange64.s
-  Ipf/Synchronization.c
-  Ipf/CpuPause.s
-  Ipf/CpuFlushTlb.s
-  Ipf/GetInterruptState.s
-  Ipf/InternalSwitchStack.c
-  Ipf/FlushCacheRange.s
-  Ipf/AccessDbr.s
-  Ipf/AccessEicr.s
-  Ipf/AccessGcr.s
-  Ipf/AccessKr.s
-  Ipf/AccessPmr.s
-  Ipf/AccessPsr.s
-  Ipf/AsmPalCall.s
-  Ipf/ExecFc.s
-  Ipf/ReadCpuid.s
-  Ipf/AccessGp.s
-  Math64.c
-  Ipf/CpuBreakpoint.c      | INTEL
-  Ipf/CpuBreakpointMsc.c   | MSFT
-  Synchronization.c     | INTEL 
-  SynchronizationMsc.c  | MSFT 
-  SynchronizationGcc.c  | GCC 
-
 [sources.ebc]
   Math64.c
   Unaligned.c
@@ -648,11 +615,8 @@ COMPONENT_TYPE  = LIBRARY
 [nmake.x64]
   C_FLAGS = $(C_FLAGS) /D MDE_CPU_X64
 
-[nmake.ipf]
-  C_FLAGS = $(C_FLAGS) /D MDE_CPU_IPF
-
 [nmake.ebc]
   EBC_C_STD_FLAGS = $(EBC_C_STD_FLAGS) /D EDKII_GLUE_LIBRARY_IMPLEMENTATION
   EBC_LIB_STD_FLAGS = $(EBC_LIB_STD_FLAGS)  /IGNORE:4006 /IGNORE:4221
   EBC_C_STD_FLAGS = $(EBC_C_STD_FLAGS) /D MDE_CPU_EBC
-  
+

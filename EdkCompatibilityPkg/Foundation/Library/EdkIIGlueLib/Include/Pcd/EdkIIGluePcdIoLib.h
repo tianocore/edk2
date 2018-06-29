@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -27,16 +27,6 @@ Abstract:
 // Following Pcd values are hard coded at compile time.
 // Override these through compiler option "/D" in PlatformTools.env if needed
 //
-
-
-//
-// IoBlockBaseAddressForIpf Pcd
-//
-#ifdef MDE_CPU_IPF
-#ifndef __EDKII_GLUE_PCD_PcdIoBlockBaseAddressForIpf__
-#define __EDKII_GLUE_PCD_PcdIoBlockBaseAddressForIpf__   EDKII_GLUE_IoBlockBaseAddressForIpf
-#endif
-#endif
 
 #include "Pcd/EdkIIGluePcd.h"
 #endif

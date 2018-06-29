@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -46,13 +46,6 @@ Abstract:
 #endif
 #include "EfiStatusCode.h"
 #include "EfiPerf.h"
-
-//
-// IPF only
-//
-#ifdef MDE_CPU_IPF
-#include "SalApi.h"
-#endif
 
 //
 // GUID definitions
@@ -228,14 +221,6 @@ Abstract:
 #include EFI_ARCH_PROTOCOL_DEFINITION (Variable)
 #include EFI_ARCH_PROTOCOL_DEFINITION (VariableWrite)
 #include EFI_ARCH_PROTOCOL_DEFINITION (WatchdogTimer)
-
-//
-// IPF only
-//
-#ifdef MDE_CPU_IPF
-#include EFI_PROTOCOL_DEFINITION (ExtendedSalGuid)
-#include EFI_PROTOCOL_DEFINITION (ExtendedSalBootService)
-#endif
 
 //
 // EDK Library headers used by EDKII Glue Libraries

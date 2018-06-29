@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -147,15 +147,5 @@ Abstract:
                                                      | REPORT_STATUS_CODE_PROPERTY_ERROR_CODE_ENABLED   \
                                                      | REPORT_STATUS_CODE_PROPERTY_DEBUG_CODE_ENABLED   \
                                                   )
-
-//
-// for IPF only
-// The base address of IPF IO Block
-//
-#ifdef MDE_CPU_IPF
-#ifndef EDKII_GLUE_IoBlockBaseAddressForIpf
-#define EDKII_GLUE_IoBlockBaseAddressForIpf     0x0ffffc000000
-#endif
-#endif
 
 #endif

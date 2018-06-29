@@ -1,6 +1,6 @@
 /*++
 
-Copyright (c) 2004 - 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -22,10 +22,6 @@ Abstract:
 
 #ifndef __EDKII_GLUE_DXE_RUNTIME_DRIVER_LIB_H__
 #define __EDKII_GLUE_DXE_RUNTIME_DRIVER_LIB_H__
-
-#ifdef MDE_CPU_IPF
-#include "EdkIIGlueEdkDxeSalLib.h"
-#endif
 
 #if (EFI_SPECIFICATION_VERSION < 0x00020000)
 

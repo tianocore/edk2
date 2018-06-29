@@ -12,7 +12,7 @@
 # This module can't be used together with ReadOnlyVariableOnReadOnlyVariable2Thunk module.
 #
 #
-# Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -36,7 +36,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]

@@ -146,48 +146,7 @@ $(DEST_DIR)\$(FILE).obj : $(SOURCE_FILE_NAME) $(INF_FILENAME) $(ALL_DEPS)
   $(ASM) $(ASM_FLAGS) $(SOURCE_FILE_NAME)
 
 [=============================================================================]
-[Compile.Ipf.s]
-
-#
-# Add build dependency check
-#
-DEP_FILE    = $(DEST_DIR)\$(FILE)S.dep
-
-!IF EXIST($(DEP_FILE))
-!INCLUDE $(DEP_FILE)
-!ENDIF
-
-!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
-
-!IF EXIST($(DEST_DIR)\$(FILE).obj)
-DEP_TARGETS = $(DEP_TARGETS) $(DEST_DIR)\$(FILE)S.dep
-!IF !EXIST($(DEP_FILE))
-CREATEDEPS = YES
-!ENDIF
-!ENDIF
-
-#
-# Update dep file for next round incremental build
-#
-$(DEP_FILE) : $(DEST_DIR)\$(FILE).obj
-  $(MAKEDEPS) -f $(SOURCE_FILE_NAME) $(DEP_FLAGS)
-
-!ENDIF
-
-#
-# Compile the file
-#
-$(DEST_DIR)\$(FILE).obj : $(SOURCE_FILE_NAME) $(INF_FILENAME) $(ALL_DEPS)
-!IF "$(EFI_USE_CL_FOR_DEP)" != "YES"
-  $(CC) $(C_FLAGS_PRO) $(SOURCE_FILE_NAME) > $(DEST_DIR)\$(FILE).pro
-!ELSE
-  -$(CC) $(C_FLAGS_PRO) $(SOURCE_FILE_NAME) /showIncludes > $(DEST_DIR)\$(FILE).pro 2> $(DEST_DIR)\$(FILE)S.cl
-  @$(MAKEDEPS) -f $(DEST_DIR)\$(FILE)S.cl $(DEP_FLAGS2)
-!ENDIF
-  $(ASM) $(ASM_FLAGS) $(DEST_DIR)\$(FILE).pro
-
-[=============================================================================]
-[Compile.Ia32.c,Compile.Ipf.c,Compile.x64.c]
+[Compile.Ia32.c,Compile.x64.c]
 
 #
 # Add build dependency check
@@ -262,7 +221,7 @@ $(DEST_DIR)\$(FILE).obj : $(SOURCE_FILE_NAME) $(INF_FILENAME) $(ALL_DEPS)
 # Commands for compiling a ".apr" Apriori source file.
 #
 [=============================================================================]
-[Compile.Ia32.Apr,Compile.Ipf.Apr,Compile.Ebc.Apr,Compile.x64.Apr]
+[Compile.Ia32.Apr,Compile.Ebc.Apr,Compile.x64.Apr]
 #
 # Create the raw binary file. If you get an error on the build saying it doesn't
 # know how to create the .apr file, then you're missing (or mispelled) the
@@ -275,7 +234,7 @@ $(DEST_DIR)\$(BASE_NAME).sec : $(DEST_DIR)\$(BASE_NAME).bin
   $(GENSECTION) -I $(DEST_DIR)\$(BASE_NAME).bin -O $(DEST_DIR)\$(BASE_NAME).sec -S EFI_SECTION_RAW
 
 [=============================================================================]
-[Build.Ia32.Apriori,Build.Ipf.Apriori,Build.Ebc.Apriori,Build.x64.Apriori]
+[Build.Ia32.Apriori,Build.Ebc.Apriori,Build.x64.Apriori]
 
 all : $(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).FFS
 
@@ -296,7 +255,7 @@ clean :
   @del /q $(DEST_OUTPUT_DIRS) 
 
 [=============================================================================]
-[Build.Ia32.Makefile,Build.Ipf.Makefile,Build.Ebc.Makefile,Build.x64.Makefile]
+[Build.Ia32.Makefile,Build.Ebc.Makefile,Build.x64.Makefile]
 
 #
 # Set some required macros
@@ -337,7 +296,7 @@ clean :
 # directory.
 #
 [=============================================================================]
-[Build.Ia32.Custom_Makefile,Build.Ipf.Custom_Makefile,Build.Ebc.Custom_Makefile,Build.x64.Custom_Makefile]
+[Build.Ia32.Custom_Makefile,Build.Ebc.Custom_Makefile,Build.x64.Custom_Makefile]
 
 #
 # Set some required macros
@@ -376,7 +335,7 @@ clean :
 # These commands are used to build libraries
 #
 [=============================================================================]
-[Build.Ia32.LIBRARY,Build.Ipf.LIBRARY,Build.x64.LIBRARY]
+[Build.Ia32.LIBRARY,Build.x64.LIBRARY]
 #
 # LIB all the object files into to our target lib file. Put
 # a dependency on the component's INF file in case it changes.
@@ -463,7 +422,7 @@ clean :
 # in the component INF file Defines section.
 #
 [=============================================================================]
-[Build.Ia32.FvImageFile,Build.x64.FvImageFile,Build.Ipf.FvImageFile]
+[Build.Ia32.FvImageFile,Build.x64.FvImageFile]
 
 all : $(BIN_DIR)\$(FILE_GUID)-$(BASE_NAME).Fvi
 
@@ -491,7 +450,7 @@ clean :
 # differ.  The entire section gets dumped to the output makefile.
 #
 [=============================================================================]
-[Build.Ia32.BS_DRIVER|RT_DRIVER|SAL_RT_DRIVER|PE32_PEIM|PEI_CORE|PIC_PEIM|RELOCATABLE_PEIM|DXE_CORE|APPLICATION|COMBINED_PEIM_DRIVER, Build.Ipf.BS_DRIVER|RT_DRIVER|SAL_RT_DRIVER|PEI_CORE|PE32_PEIM|PIC_PEIM|DXE_CORE|APPLICATION|COMBINED_PEIM_DRIVER, Build.x64.BS_DRIVER|RT_DRIVER|SAL_RT_DRIVER|PE32_PEIM|PEI_CORE|PIC_PEIM|RELOCATABLE_PEIM|DXE_CORE|APPLICATION|COMBINED_PEIM_DRIVER]
+[Build.Ia32.BS_DRIVER|RT_DRIVER|SAL_RT_DRIVER|PE32_PEIM|PEI_CORE|PIC_PEIM|RELOCATABLE_PEIM|DXE_CORE|APPLICATION|COMBINED_PEIM_DRIVER, Build.x64.BS_DRIVER|RT_DRIVER|SAL_RT_DRIVER|PE32_PEIM|PEI_CORE|PIC_PEIM|RELOCATABLE_PEIM|DXE_CORE|APPLICATION|COMBINED_PEIM_DRIVER]
 
 !IF "$(LOCALIZE)" == "YES"
 
@@ -858,15 +817,8 @@ BIN_TARGETS = $(BIN_TARGETS) $(DEST_DIR)\$(BASE_NAME)IfrBin.sec
 # Build a FFS file from the sections and package
 #
 $(TARGET_FFS_FILE) : $(TARGET_PE32) $(TARGET_DPX) $(TARGET_UI) $(TARGET_VER) $(TARGET_DXE_DPX) $(PACKAGE_FILENAME)
-#
-# Some of our components require padding to align code
-#
-!IF "$(PROCESSOR)" == "IPF"
-!IF "$(COMPONENT_TYPE)" == "PIC_PEIM" || "$(COMPONENT_TYPE)" == "PE32_PEIM" || "$(COMPONENT_TYPE)" == "RELOCATABLE_PEIM" || "$(COMPONENT_TYPE)" == "SECURITY_CORE" || "$(COMPONENT_TYPE)" == "PEI_CORE" || "$(COMPONENT_TYPE)" == "COMBINED_PEIM_DRIVER"
-  copy $(BIN_DIR)\Blank.pad $(DEST_DIR)
-!ENDIF
-!ENDIF
-  $(GENFFSFILE) -B $(DEST_DIR) -P1 $(PACKAGE_FILENAME) -V
+
+$(GENFFSFILE) -B $(DEST_DIR) -P1 $(PACKAGE_FILENAME) -V
 
 !IF "$(CREATEDEPS)"=="YES"
 all : $(DEP_TARGETS)
@@ -886,7 +838,7 @@ clean :
   @del /q $(DEST_OUTPUT_DIRS) 
 
 [=============================================================================]
-[Build.Ia32.TE_PEIM,Build.Ipf.TE_PEIM,Build.x64.TE_PEIM]
+[Build.Ia32.TE_PEIM,Build.x64.TE_PEIM]
 #
 # Define the library file we'll build if we have any objects defined.
 #
@@ -1350,7 +1302,7 @@ clean :
 # This section, as it now exists, only supports boot service drivers.
 #
 [=============================================================================]
-[Build.Ia32.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI|PE32_PEIM_EFI,Build.Ipf.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI|PE32_PEIM_EFI,Build.Ebc.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI,Build.x64.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI|PE32_PEIM_EFI]
+[Build.Ia32.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI|PE32_PEIM_EFI,Build.x64.BS_DRIVER_EFI|RT_DRIVER_EFI|APPLICATION_EFI|PE32_PEIM_EFI]
 #
 # Defines for standard intermediate files and build targets. For the source
 # .efi file, take the one in the source directory if it exists. If there's not
@@ -1495,14 +1447,14 @@ clean :
   @del /q $(DEST_OUTPUT_DIRS) 
 
 [=============================================================================]
-[Compile.Ia32.Bin|Bmp,Compile.x64.Bin|Bmp,Compile.Ipf.Bin|Bmp]
+[Compile.Ia32.Bin|Bmp,Compile.x64.Bin|Bmp]
 #
 # We simply define the binary source file name
 #
 BINARY_SOURCE_FILE = $(SOURCE_FILE_NAME)
 
 [=============================================================================]
-[Build.Ia32.BINARY|Legacy16|Logo,Build.Ipf.BINARY|Legacy16|Logo,Build.x64.BINARY|Legacy16|Logo]
+[Build.Ia32.BINARY|Legacy16|Logo,Build.x64.BINARY|Legacy16|Logo]
 #
 # Use GenFfsFile to convert it to an FFS file
 #
@@ -1523,7 +1475,7 @@ clean :
   @del /q $(DEST_OUTPUT_DIRS) 
 
 [=============================================================================]
-[Build.Ia32.RAWFILE|CONFIG,Build.Ipf.RAWFILE|CONFIG,Build.x64.RAWFILE|CONFIG]
+[Build.Ia32.RAWFILE|CONFIG,Build.x64.RAWFILE|CONFIG]
 #
 # Use GenFfsFile to convert it to an raw FFS file
 #
@@ -1548,7 +1500,7 @@ clean :
 # These are commands to compile unicode .uni files.
 #
 [=============================================================================]
-[Compile.Ia32.Uni,Compile.Ipf.Uni,Compile.Ebc.Uni,Compile.x64.Uni]
+[Compile.Ia32.Uni,Compile.Ebc.Uni,Compile.x64.Uni]
 #
 # Emit an error message if the file's base name is the same as the
 # component base name. This causes build issues.
@@ -1575,9 +1527,9 @@ STRGATHER_FLAGS = $(STRGATHER_FLAGS) -db $(DEST_DIR)\$(FILE).sdb
 LOCALIZE        = YES
 
 [=============================================================================]
-[Compile.Ia32.hfr,Compile.Ipf.hfr,Compile.Ebc.hfr,Compile.x64.hfr]
+[Compile.Ia32.hfr,Compile.Ebc.hfr,Compile.x64.hfr]
 [=============================================================================]
-[Compile.Ia32.Vfr,Compile.Ipf.Vfr,Compile.x64.Vfr]
+[Compile.Ia32.Vfr,Compile.x64.Vfr]
 
 #
 # Add build dependency check
@@ -1657,7 +1609,7 @@ $(DEST_DIR)\$(FILE).obj : $(SOURCE_FILE_NAME) $(INF_FILENAME) $(ALL_DEPS)
 # use it, set COMPILE_SELECT=.vfr=Ifr_Bin for the component in the DSC file.
 #
 [=============================================================================]
-[Compile.Ia32.Ifr_Bin,Compile.Ipf.Ifr_Bin,Compile.x64.Ifr_Bin]
+[Compile.Ia32.Ifr_Bin,Compile.x64.Ifr_Bin]
 
 #
 # Add build dependency check
@@ -1752,7 +1704,7 @@ $(DEST_DIR)\$(FILE).obj : $(SOURCE_FILE_NAME) $(INF_FILENAME) $(ALL_DEPS)
 HII_IFR_PACK_FILES = $(HII_IFR_PACK_FILES) $(DEST_DIR)\$(FILE).hpk
 
 [=============================================================================]
-[Compile.Ia32.Fv,Compile.Ipf.Fv,Compile.x64.Fv]
+[Compile.Ia32.Fv,Compile.x64.Fv]
 #
 # Run GenSection on the firmware volume image.
 #
