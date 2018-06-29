@@ -4,7 +4,7 @@
 # This driver simulates a touch pad absolute pointing device using a standard
 # PS2 mouse as the input hardware.
 #
-# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -27,7 +27,7 @@
   ENTRY_POINT                    = InitializePs2MouseAbsolutePointer
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #  DRIVER_BINDING                = gPS2MouseAbsolutePointerDriver;
 #  COMPONENT_NAME                = gPs2MouseAbsolutePointerComponentName;
 #  COMPONENT_NAME2               = gPs2MouseAbsolutePointerComponentName2;

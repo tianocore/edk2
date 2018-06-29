@@ -29,7 +29,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
@@ -53,13 +53,6 @@
   LegacyBootSupport.c
   LegacyBbs.c
   LegacySio.c
-
-[Sources.IPF]
-  Ipf/IpfThunk.s
-  Ipf/Thunk.c
-  Ipf/IpfThunk.i
-  Ipf/IpfBootSupport.c
-  Ipf/IpfThunk.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -94,11 +87,6 @@
   HobLib
   UefiRuntimeServicesTableLib
   BaseLib
-
-[LibraryClasses.IPF]
-  IoLib
-  UefiRuntimeServicesTableLib
-
 
 [Guids]
   gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_CONSUMES ##GUID #Used in LegacyBiosBuildIdeData() to assure device is a disk

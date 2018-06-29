@@ -5,7 +5,7 @@
 #  LZMA SDK 16.04 was placed in the public domain on 2016-10-04.
 #  It was released on the http://www.7-zip.org/sdk.html website.
 #
-#  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -30,7 +30,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]

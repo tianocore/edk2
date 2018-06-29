@@ -169,12 +169,6 @@ typedef struct {
 #define CONVENTIONAL_MEMORY_TOP 0xA0000   // 640 KB
 #define INITIAL_VALUE_BELOW_1K  0x0
 
-#elif defined (MDE_CPU_IPF)
-
-#define NUM_REAL_GDT_ENTRIES  3
-#define CONVENTIONAL_MEMORY_TOP 0x80000   // 512 KB
-#define INITIAL_VALUE_BELOW_1K  0xff
-
 #endif
 
 #pragma pack(1)
@@ -332,79 +326,6 @@ typedef struct {
   // A low memory stack
   //
   CHAR8                             Stack[LOW_STACK_SIZE];
-
-  //
-  // Legacy16 Init memory map info
-  //
-  EFI_TO_COMPATIBILITY16_INIT_TABLE EfiToLegacy16InitTable;
-
-  EFI_TO_COMPATIBILITY16_BOOT_TABLE EfiToLegacy16BootTable;
-
-  CHAR8                             InterruptRedirectionCode[32];
-  EFI_LEGACY_INSTALL_PCI_HANDLER    PciHandler;
-  EFI_DISPATCH_OPROM_TABLE          DispatchOpromTable;
-  BBS_TABLE                         BbsTable[MAX_BBS_ENTRIES];
-} LOW_MEMORY_THUNK;
-
-#elif defined (MDE_CPU_IPF)
-
-typedef struct {
-  //
-  // Space for the code
-  //  The address of Code is also the beginning of the relocated Thunk code
-  //
-  CHAR8                             Code[4096]; // ?
-  //
-  // The address of the Reverse Thunk code
-  //  Note that this member CONTAINS the address of the relocated reverse thunk
-  //  code unlike the member variable 'Code', which IS the address of the Thunk
-  //  code.
-  //
-  UINT32                            LowReverseThunkStart;
-
-  //
-  // Data for the code (cs releative)
-  //
-  DESCRIPTOR32                      GdtDesc;          // Protected mode GDT
-  DESCRIPTOR32                      IdtDesc;          // Protected mode IDT
-  UINT32                            FlatSs;
-  UINT32                            FlatEsp;
-
-  UINT32                            LowCodeSelector;  // Low code selector in GDT
-  UINT32                            LowDataSelector;  // Low data selector in GDT
-  UINT32                            LowStack;
-  DESCRIPTOR32                      RealModeIdtDesc;
-
-  //
-  // real-mode GDT (temporary GDT with two real mode segment descriptors)
-  //
-  GDT32                             RealModeGdt[NUM_REAL_GDT_ENTRIES];
-  DESCRIPTOR32                      RealModeGdtDesc;
-
-  //
-  // Members specifically for the reverse thunk
-  //  The RevReal* members are used to store the current state of real mode
-  //  before performing the reverse thunk.  The RevFlat* members must be set
-  //  before calling the reverse thunk assembly code.
-  //
-  UINT16                            RevRealDs;
-  UINT16                            RevRealSs;
-  UINT32                            RevRealEsp;
-  DESCRIPTOR32                      RevRealIdtDesc;
-  UINT16                            RevFlatDataSelector;  // Flat data selector in GDT
-  UINT32                            RevFlatStack;
-
-  //
-  // A low memory stack
-  //
-  CHAR8                             Stack[LOW_STACK_SIZE];
-
-  //
-  // Stack for flat mode after reverse thunk
-  // @bug - This may no longer be necessary if the reverse thunk interface
-  //           is changed to have the flat stack in a different location.
-  //
-  CHAR8                             RevThunkStack[LOW_STACK_SIZE];
 
   //
   // Legacy16 Init memory map info

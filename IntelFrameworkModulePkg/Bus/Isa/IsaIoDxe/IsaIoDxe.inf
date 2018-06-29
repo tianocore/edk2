@@ -5,7 +5,7 @@
 # I/O protocols are installed based off of the information provided by each
 # instance of the SIO Protocol found.
 #
-# Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -26,7 +26,7 @@
   ENTRY_POINT                    = InitializeIsaIo
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #  DRIVER_BINDING                = gIsaIoDriver
 #  COMPONENT_NAME                = gIsaIoComponentName;
 #  COMPONENT_NAME2               = gIsaIoComponentName2;
