@@ -4,7 +4,7 @@
 #  and extended-precision IEEE binary floating-point arithmetic, and
 #  other IEEE-like binary floating-point, including "double double".
 #
-#  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -25,17 +25,13 @@
   LIBRARY_CLASS                  = LibGdtoa
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources.X64]
   strtof.c
   strtold_px.c
   strtopx.c
-
-[Sources.IPF]
-  strtof.c
-  Ipf/strtold.c
 
 [Sources.IA32]
   strtof.c

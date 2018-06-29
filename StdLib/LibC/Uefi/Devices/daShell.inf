@@ -4,7 +4,7 @@
 #   When this library is included in an application, it creates the default device.
 #   This allows every device type not recognized to be passed to the shell for processing.
 #
-#  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials are licensed and made available
 #  under the terms and conditions of the BSD License which accompanies this
 #  distribution.  The full text of the license may be found at
@@ -28,7 +28,7 @@
   DESTRUCTOR                    = __dtor_DevShell
 
 #
-#  VALID_ARCHITECTURES          = IA32 X64 IPF
+#  VALID_ARCHITECTURES          = IA32 X64
 #
 
 [Sources]
