@@ -498,6 +498,9 @@ CompareWithValidVariable (
 /**
   Get HOB variable store.
 
+  @param[out] StoreInfo             Return the store info.
+  @param[out] VariableStoreHeader   Return variable store header.
+
 **/
 VOID
 GetHobVariableStore (

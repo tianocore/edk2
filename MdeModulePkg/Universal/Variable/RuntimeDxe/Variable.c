@@ -4173,7 +4173,7 @@ ConvertNormalVarStorageToAuthVarStorage (
 /**
   Get HOB variable store.
 
-  @param[out] VariableGuid      NV variable store signature.
+  @param[in] VariableGuid       NV variable store signature.
 
   @retval EFI_SUCCESS           Function successfully executed.
   @retval EFI_OUT_OF_RESOURCES  Fail to allocate enough memory resource.
