@@ -19,10 +19,14 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/ResetSystemLib.h>
 
+#pragma pack(1)
 typedef struct {
   CHAR16 NullTerminator;
   GUID   ResetSubtype;
 } RESET_UTILITY_GUID_SPECIFIC_RESET_DATA;
+#pragma pack()
+
+VERIFY_SIZE_OF (RESET_UTILITY_GUID_SPECIFIC_RESET_DATA, 18);
 
 /**
   This is a shorthand helper function to reset with a subtype so that
@@ -49,7 +53,10 @@ ResetPlatformSpecificGuid (
   RESET_UTILITY_GUID_SPECIFIC_RESET_DATA  ResetData;
 
   ResetData.NullTerminator = CHAR_NULL;
-  CopyGuid (&ResetData.ResetSubtype, ResetSubtype);
+  CopyGuid (
+    (GUID *)((UINT8 *)&ResetData + OFFSET_OF (RESET_UTILITY_GUID_SPECIFIC_RESET_DATA, ResetSubtype)),
+    ResetSubtype
+    );
   ResetPlatformSpecific (sizeof (ResetData), &ResetData);
 }
 
