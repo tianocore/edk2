@@ -4309,11 +4309,14 @@ class ModuleAutoGen(AutoGen):
     def CanSkipbyHash(self):
         if GlobalData.gUseHashCache:
             return not self.GenModuleHash()
+        return False
 
     ## Decide whether we can skip the ModuleAutoGen process
     #  If any source file is newer than the module than we cannot skip
     #
     def CanSkip(self):
+        if self.MetaFile in GlobalData.gSikpAutoGenCache:
+            return True
         if not os.path.exists(self.GetTimeStampPath()):
             return False
         #last creation time of the module
@@ -4332,6 +4335,7 @@ class ModuleAutoGen(AutoGen):
                     ModuleAutoGen.TimeDict[source] = os.stat(source)[8]
                 if ModuleAutoGen.TimeDict[source] > DstTimeStamp:
                     return False
+        GlobalData.gSikpAutoGenCache.add(self.MetaFile)
         return True
 
     def GetTimeStampPath(self):

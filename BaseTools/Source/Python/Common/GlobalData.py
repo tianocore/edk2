@@ -113,3 +113,4 @@ gPlatformHash = None
 gPackageHash = {}
 gModuleHash = {}
 gEnableGenfdsMultiThread = False
+gSikpAutoGenCache = set()
