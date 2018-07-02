@@ -483,7 +483,7 @@ SataControllerStart (
     }
     MaxPortNumber = 31;
     while (MaxPortNumber > 0) {
-      if (Data32 & (1 << MaxPortNumber)) {
+      if ((Data32 & ((UINT32)1 << MaxPortNumber)) != 0) {
         break;
       }
       MaxPortNumber--;
