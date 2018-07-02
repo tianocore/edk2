@@ -583,6 +583,7 @@ IsValidDnsResponse (
 
   @param  Instance              The DNS instance
   @param  RxString              Received buffer.
+  @param  Length                Received buffer length.
   @param  Completed             Flag to indicate that Dns response is valid.
 
   @retval EFI_SUCCESS           Parse Dns Response successfully.
@@ -593,6 +594,7 @@ EFI_STATUS
 ParseDnsResponse (
   IN OUT DNS_INSTANCE              *Instance,
   IN     UINT8                     *RxString,
+  IN     UINT32                    Length,
      OUT BOOLEAN                   *Completed
   );
 
