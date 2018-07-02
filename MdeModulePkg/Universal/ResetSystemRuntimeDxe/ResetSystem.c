@@ -266,7 +266,10 @@ ResetSystem (
   }
 
   mResetNotifyDepth++;
-  DEBUG ((DEBUG_INFO, "DXE ResetSystem2: Reset call depth = %d.\n", mResetNotifyDepth));
+  DEBUG ((
+    DEBUG_INFO, "DXE ResetSystem2: ResetType %s, Call Depth = %d.\n",
+    mResetTypeStr[ResetType], mResetNotifyDepth
+    ));
 
   if (mResetNotifyDepth <= MAX_RESET_NOTIFY_DEPTH) {
     if (!EfiAtRuntime ()) {
