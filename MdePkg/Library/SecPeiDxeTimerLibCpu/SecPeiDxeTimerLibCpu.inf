@@ -36,15 +36,11 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources.Ia32, Sources.X64]
   X86TimerLib.c
-
-[Sources.IPF]
-  IpfTimerLib.c
-
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -57,10 +53,6 @@
   PcdLib
   IoLib
   DebugLib
-
-[LibraryClasses.IPF]
-  PalLib
-
 
 [Pcd.IA32, Pcd.X64]
   gEfiMdePkgTokenSpaceGuid.PcdFSBClock  ## CONSUMES

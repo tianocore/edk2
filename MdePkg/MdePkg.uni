@@ -334,10 +334,6 @@
                                                                                   "2 - VT100+<BR>\n"
                                                                                   "3 - UTF8<BR>"
 
-#string STR_gEfiMdePkgTokenSpaceGuid_PcdIoBlockBaseAddressForIpf_PROMPT  #language en-US "IA64 IO Port Space Base Address."
-
-#string STR_gEfiMdePkgTokenSpaceGuid_PcdIoBlockBaseAddressForIpf_HELP  #language en-US "The base address of IO port space for IA64 arch."
-
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdComponentNameDisable_PROMPT  #language en-US "Disable Component Name Protocol"
 
 #string STR_gEfiMdePkgTokenSpaceGuid_PcdComponentNameDisable_HELP  #language en-US "Indicates if the component name protocol will be installed.<BR><BR>\n"

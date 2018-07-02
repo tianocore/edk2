@@ -24,13 +24,13 @@
   FILE_GUID                      = b1ee6c28-54aa-4d17-b705-3e28ccb27b2e
   MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = UefiRuntimeLib|DXE_RUNTIME_DRIVER DXE_SAL_DRIVER
+  LIBRARY_CLASS                  = UefiRuntimeLib|DXE_RUNTIME_DRIVER
 
   CONSTRUCTOR                    = RuntimeDriverLibConstruct
   DESTRUCTOR                     = RuntimeDriverLibDeconstruct
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 

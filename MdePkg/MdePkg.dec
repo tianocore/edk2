@@ -36,9 +36,6 @@
 [Includes.X64]
   Include/X64
 
-[Includes.IPF]
-  Include/Ipf
-
 [Includes.EBC]
   Include/Ebc
 
@@ -273,16 +270,6 @@
 
   ##  @libraryclass  Provides services to log the SMI handler registration.
   SmiHandlerProfileLib|Include/Library/SmiHandlerProfileLib.h
-
-[LibraryClasses.IPF]
-  ##  @libraryclass  The SAL Library provides a service to make a SAL CALL.
-  SalLib|Include/Library/SalLib.h
-
-  ##  @libraryclass  Provides library services to make PAL Calls.
-  PalLib|Include/Library/PalLib.h
-
-  ##  @libraryclass  Provides library services to make Extended SAL Calls.
-  ExtendedSalLib|Include/Library/ExtendedSalLib.h
 
 [Guids]
   #
@@ -2218,11 +2205,6 @@
   #  The required memory space is decided by the value of PcdMaximumGuidedExtractHandler.
   # @Prompt Memory Address of GuidedExtractHandler Table.
   gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|0x1000000|UINT64|0x30001015
-
-[PcdsFixedAtBuild.IPF, PcdsPatchableInModule.IPF]
-  ## The base address of IO port space for IA64 arch.
-  # @Prompt IA64 IO Port Space Base Address.
-  gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000|UINT64|0x0000000f
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This value is used to set the base address of PCI express hierarchy.

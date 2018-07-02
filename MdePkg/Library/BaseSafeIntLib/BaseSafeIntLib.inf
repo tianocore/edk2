@@ -4,6 +4,7 @@
 # This library provides helper functions to prevent integer overflow during
 # type conversion, addition, subtraction, and multiplication.
 #
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2017, Microsoft Corporation
 #
 # All rights reserved.
@@ -48,7 +49,7 @@
 [Sources.Ia32, Sources.ARM]
   SafeIntLib32.c
 
-[Sources.X64, Sources.IPF, Sources.AARCH64]
+[Sources.X64, Sources.AARCH64]
   SafeIntLib64.c
 
 [Sources.EBC]

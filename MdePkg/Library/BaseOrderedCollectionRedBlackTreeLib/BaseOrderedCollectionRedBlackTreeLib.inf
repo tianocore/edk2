@@ -10,6 +10,7 @@
 #
 #  The implementation is also useful as a fast priority queue.
 #
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 #  Copyright (C) 2014, Red Hat, Inc.
 #
 #  This program and the accompanying materials are licensed and made available
@@ -33,7 +34,7 @@
   LIBRARY_CLASS                  = OrderedCollectionLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]

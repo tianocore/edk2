@@ -28,7 +28,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
 #
 
 [Sources.IA32]
@@ -36,9 +36,6 @@
 
 [Sources.X64]
   X86Cache.c
-
-[Sources.IPF]
-  IpfCache.c
 
 [Sources.EBC]
   EbcCache.c
@@ -55,7 +52,4 @@
 [LibraryClasses]
   BaseLib
   DebugLib
-
-[LibraryClasses.Ipf]
-  PalLib
 

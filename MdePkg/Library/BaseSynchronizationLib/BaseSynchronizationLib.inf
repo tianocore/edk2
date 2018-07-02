@@ -24,7 +24,7 @@
   LIBRARY_CLASS                  = SynchronizationLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
 #
 [Sources]
   BaseSynchronizationLibInternals.h
@@ -67,19 +67,6 @@
 
   Ia32/InternalGetSpinLockProperties.c | GCC
   X64/GccInline.c | GCC
-  SynchronizationGcc.c  | GCC
-
-[Sources.IPF]
-  Ipf/Synchronization.c
-  Ipf/InterlockedCompareExchange64.s
-  Ipf/InterlockedCompareExchange32.s
-  Ipf/InterlockedCompareExchange16.s
-
-  Ipf/InternalGetSpinLockProperties.c | MSFT
-  Ipf/InternalGetSpinLockProperties.c | GCC
-
-  Synchronization.c     | INTEL
-  SynchronizationMsc.c  | MSFT
   SynchronizationGcc.c  | GCC
 
 [Sources.EBC]

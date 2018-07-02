@@ -33,7 +33,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
 #
 
 [Sources]
@@ -42,9 +42,6 @@
 
 [Sources.IA32, Sources.X64, Sources.EBC, Sources.AARCH64]
   PeCoffLoaderEx.c
-
-[Sources.IPF]
-  Ipf/PeCoffLoaderEx.c
 
 [Sources.ARM]
   Arm/PeCoffLoaderEx.c

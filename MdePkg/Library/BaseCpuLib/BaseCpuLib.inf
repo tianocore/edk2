@@ -29,7 +29,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
 #
 
 [Sources.IA32]
@@ -51,10 +51,6 @@
   X64/CpuFlushTlb.nasm| GCC
   X64/CpuFlushTlb.S | GCC
 
-[Sources.IPF]
-  Ipf/CpuFlushTlb.s
-  Ipf/CpuSleep.c
-
 [Sources.EBC]
   Ebc/CpuSleepFlushTlb.c
 
@@ -75,8 +71,4 @@
 [Packages]
   MdePkg/MdePkg.dec
 
-
-[LibraryClasses.IPF]
-  PalLib
-  BaseLib
 

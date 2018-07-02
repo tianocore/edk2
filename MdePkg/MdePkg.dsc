@@ -20,7 +20,7 @@
   PLATFORM_VERSION               = 1.08
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/Mde
-  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM|AARCH64
+  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|ARM|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -31,28 +31,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
   gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress|0xE0000000
-
-[PcdsFixedAtBuild.IPF]
-  gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf|0x0ffffc000000
-
-###################################################################################################
-#
-# Components Section - list of the modules and components that will be processed by compilation
-#                      tools and the EDK II tools to generate PE32/PE32+/Coff image files.
-#
-# Note: The EDK II DSC file is not used to specify how compiled binary images get placed
-#       into firmware volume images. This section is just a list of modules to compile from
-#       source into UEFI-compliant binaries.
-#       It is the FDF file that contains information on combining binary files into firmware
-#       volume images, whose concept is beyond UEFI and is described in PI specification.
-#       Binary modules do not need to be listed in this section, as they should be
-#       specified in the FDF file. For example: Shell binary (Shell_Full.efi), FAT binary (Fat.efi),
-#       Logo (Logo.bmp), and etc.
-#       There may also be modules listed in this section that are not required in the FDF file,
-#       When a module listed here is excluded from FDF file, then UEFI-compliant binary will be
-#       generated for it, but the binary will not be put into any firmware volume.
-#
-###################################################################################################
 
 [Components]
   MdePkg/Library/BaseCacheMaintenanceLib/BaseCacheMaintenanceLib.inf
@@ -163,23 +141,6 @@
   MdePkg/Library/BaseRngLib/BaseRngLib.inf
   MdePkg/Library/SmmPciExpressLib/SmmPciExpressLib.inf
   MdePkg/Library/SmiHandlerProfileLibNull/SmiHandlerProfileLibNull.inf
-
-[Components.IPF]
-  MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
-  MdePkg/Library/BasePalLibNull/BasePalLibNull.inf
-  MdePkg/Library/PeiPalLib/PeiPalLib.inf
-  MdePkg/Library/PeiServicesTablePointerLibKr7/PeiServicesTablePointerLibKr7.inf
-  MdePkg/Library/SecPeiDxeTimerLibCpu/SecPeiDxeTimerLibCpu.inf
-  MdePkg/Library/UefiPalLib/UefiPalLib.inf
-  MdePkg/Library/UefiSalLib/UefiSalLib.inf
-  MdePkg/Library/DxeExtendedSalLib/DxeExtendedSalLib.inf
-  MdePkg/Library/DxeIoLibEsal/DxeIoLibEsal.inf
-  MdePkg/Library/DxePalLibEsal/DxePalLibEsal.inf
-  MdePkg/Library/DxePciLibEsal/DxePciLibEsal.inf
-  MdePkg/Library/DxePciSegmentLibEsal/DxePciSegmentLibEsal.inf
-  MdePkg/Library/DxeRuntimeExtendedSalLib/DxeRuntimeExtendedSalLib.inf
-  MdePkg/Library/DxeSalLibEsal/DxeSalLibEsal.inf
-  MdePkg/Library/DxeTimerLibEsal/DxeTimerLibEsal.inf
 
 [Components.EBC]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf

@@ -30,7 +30,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 EBC IPF ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 EBC ARM AARCH64
 #
 
 [Sources]
@@ -56,9 +56,6 @@
   IoLibEbc.c
   IoLib.c
 
-[Sources.IPF]
-  IoLibIpf.c
-
 [Sources.ARM]
   IoLibArm.c
 
@@ -71,10 +68,4 @@
 [LibraryClasses]
   DebugLib
   BaseLib
-
-[LibraryClasses.IPF]
-  PcdLib
-
-[Pcd.IPF]
-  gEfiMdePkgTokenSpaceGuid.PcdIoBlockBaseAddressForIpf  ## SOMETIMES_CONSUMES
 

@@ -254,13 +254,6 @@ typedef union {
 
 #define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) ((Machine) == EFI_IMAGE_MACHINE_X64)
 
-#elif defined (MDE_CPU_IPF)
-
-#define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
-  (((Machine) == EFI_IMAGE_MACHINE_IA64) || ((Machine) == EFI_IMAGE_MACHINE_EBC))
-
-#define EFI_IMAGE_MACHINE_CROSS_TYPE_SUPPORTED(Machine) (FALSE)
-
 #elif defined (MDE_CPU_X64)
 
 #define EFI_IMAGE_MACHINE_TYPE_SUPPORTED(Machine) \
