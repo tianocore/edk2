@@ -91,6 +91,15 @@ typedef struct {
   EFI_TLS_SESSION_STATE         SessionState;
 } TLS_CONFIG_DATA;
 
+//
+// Callback data for HTTP_PARSER_CALLBACK()
+//
+typedef struct {
+  UINTN                         ParseDataLength;
+  VOID                          *ParseData;
+  VOID                          *Wrap;
+} HTTP_CALLBACK_DATA;
+
 typedef struct _HTTP_PROTOCOL {
   UINT32                        Signature;
   EFI_HTTP_PROTOCOL             Http;
@@ -149,6 +158,7 @@ typedef struct _HTTP_PROTOCOL {
   // HTTP message-body parser.
   //
   VOID                          *MsgParser;
+  HTTP_CALLBACK_DATA            CallbackData;
 
   EFI_HTTP_VERSION              HttpVersion;
   UINT32                        TimeOutMillisec;

@@ -916,6 +916,7 @@ HttpBodyParserCallback (
   IN VOID                       *Context
   )
 {
+  HTTP_CALLBACK_DATA            *CallbackData;
   HTTP_TOKEN_WRAP               *Wrap;
   UINTN                         BodyLength;
   CHAR8                         *Body;
@@ -928,20 +929,17 @@ HttpBodyParserCallback (
     return EFI_SUCCESS;
   }
 
-  Wrap = (HTTP_TOKEN_WRAP *) Context;
-  Body = Wrap->HttpToken->Message->Body;
-  BodyLength = Wrap->HttpToken->Message->BodyLength;
+  CallbackData = (HTTP_CALLBACK_DATA *) Context;
+
+  Wrap       = (HTTP_TOKEN_WRAP *) (CallbackData->Wrap);
+  Body       = CallbackData->ParseData;
+  BodyLength = CallbackData->ParseDataLength;
+
   if (Data < Body + BodyLength) {
     Wrap->HttpInstance->NextMsg = Data;
   } else {
     Wrap->HttpInstance->NextMsg = NULL;
   }
-
-
-  //
-  // Free Tx4Token or Tx6Token since already received corrsponding HTTP response.
-  //
-  FreePool (Wrap);
 
   return EFI_SUCCESS;
 }
@@ -1191,7 +1189,7 @@ HttpResponseWorker (
                  HttpMsg->HeaderCount,
                  HttpMsg->Headers,
                  HttpBodyParserCallback,
-                 (VOID *) ValueInItem,
+                 (VOID *) (&HttpInstance->CallbackData),
                  &HttpInstance->MsgParser
                  );
       if (EFI_ERROR (Status)) {
@@ -1202,18 +1200,28 @@ HttpResponseWorker (
       // Check whether we received a complete HTTP message.
       //
       if (HttpInstance->CacheBody != NULL) {
+        //
+        // Record the CallbackData data.
+        //
+        HttpInstance->CallbackData.Wrap = (VOID *) Wrap;
+        HttpInstance->CallbackData.ParseData = (VOID *) HttpInstance->CacheBody;
+        HttpInstance->CallbackData.ParseDataLength = HttpInstance->CacheLen;
+
+        //
+        // Parse message with CallbackData data.
+        //
         Status = HttpParseMessageBody (HttpInstance->MsgParser, HttpInstance->CacheLen, HttpInstance->CacheBody);
         if (EFI_ERROR (Status)) {
           goto Error2;
         }
+      }
 
-        if (HttpIsMessageComplete (HttpInstance->MsgParser)) {
-          //
-          // Free the MsgParse since we already have a full HTTP message.
-          //
-          HttpFreeMsgParser (HttpInstance->MsgParser);
-          HttpInstance->MsgParser = NULL;
-        }
+      if (HttpIsMessageComplete (HttpInstance->MsgParser)) {
+        //
+        // Free the MsgParse since we already have a full HTTP message.
+        //
+        HttpFreeMsgParser (HttpInstance->MsgParser);
+        HttpInstance->MsgParser = NULL;
       }
     }
 
@@ -1332,12 +1340,26 @@ HttpResponseWorker (
     }
 
     //
-    // Check whether we receive a complete HTTP message.
+    // Process the received the body packet.
+    //
+    HttpMsg->BodyLength = MIN (Fragment.Len, (UINT32) HttpMsg->BodyLength);
+
+    CopyMem (HttpMsg->Body, Fragment.Bulk, HttpMsg->BodyLength);
+
+    //
+    // Record the CallbackData data.
+    //
+    HttpInstance->CallbackData.Wrap = (VOID *) Wrap;
+    HttpInstance->CallbackData.ParseData = HttpMsg->Body;
+    HttpInstance->CallbackData.ParseDataLength = HttpMsg->BodyLength;
+
+    //
+    // Parse Body with CallbackData data.
     //
     Status = HttpParseMessageBody (
                HttpInstance->MsgParser,
-               (UINTN) Fragment.Len,
-               (CHAR8 *) Fragment.Bulk
+               HttpMsg->BodyLength,
+               HttpMsg->Body
                );
     if (EFI_ERROR (Status)) {
       goto Error2;
@@ -1352,46 +1374,28 @@ HttpResponseWorker (
     }
 
     //
-    // We receive part of header of next HTTP msg.
+    // Check whether there is the next message header in the HttpMsg->Body.
     //
     if (HttpInstance->NextMsg != NULL) {
-      HttpMsg->BodyLength = MIN ((UINTN) HttpInstance->NextMsg - (UINTN) Fragment.Bulk, HttpMsg->BodyLength);
-      CopyMem (HttpMsg->Body, Fragment.Bulk, HttpMsg->BodyLength);
+      HttpMsg->BodyLength = HttpInstance->NextMsg - (CHAR8 *) HttpMsg->Body;
+    }
 
-      HttpInstance->CacheLen = Fragment.Len - HttpMsg->BodyLength;
-      if (HttpInstance->CacheLen != 0) {
-        if (HttpInstance->CacheBody != NULL) {
-          FreePool (HttpInstance->CacheBody);
-        }
-
-        HttpInstance->CacheBody = AllocateZeroPool (HttpInstance->CacheLen);
-        if (HttpInstance->CacheBody == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto Error2;
-        }
-
-        CopyMem (HttpInstance->CacheBody, Fragment.Bulk + HttpMsg->BodyLength, HttpInstance->CacheLen);
-        HttpInstance->CacheOffset = 0;
-
-        HttpInstance->NextMsg = HttpInstance->CacheBody + ((UINTN) HttpInstance->NextMsg - (UINTN) (Fragment.Bulk + HttpMsg->BodyLength));
+    HttpInstance->CacheLen = Fragment.Len - HttpMsg->BodyLength;
+    if (HttpInstance->CacheLen != 0) {
+      if (HttpInstance->CacheBody != NULL) {
+        FreePool (HttpInstance->CacheBody);
       }
-    } else {
-      HttpMsg->BodyLength = MIN (Fragment.Len, (UINT32) HttpMsg->BodyLength);
-      CopyMem (HttpMsg->Body, Fragment.Bulk, HttpMsg->BodyLength);
-      HttpInstance->CacheLen = Fragment.Len - HttpMsg->BodyLength;
-      if (HttpInstance->CacheLen != 0) {
-        if (HttpInstance->CacheBody != NULL) {
-          FreePool (HttpInstance->CacheBody);
-        }
 
-        HttpInstance->CacheBody = AllocateZeroPool (HttpInstance->CacheLen);
-        if (HttpInstance->CacheBody == NULL) {
-          Status = EFI_OUT_OF_RESOURCES;
-          goto Error2;
-        }
+      HttpInstance->CacheBody = AllocateZeroPool (HttpInstance->CacheLen);
+      if (HttpInstance->CacheBody == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Error2;
+      }
 
-        CopyMem (HttpInstance->CacheBody, Fragment.Bulk + HttpMsg->BodyLength, HttpInstance->CacheLen);
-        HttpInstance->CacheOffset = 0;
+      CopyMem (HttpInstance->CacheBody, Fragment.Bulk + HttpMsg->BodyLength, HttpInstance->CacheLen);
+      HttpInstance->CacheOffset = 0;
+      if (HttpInstance->NextMsg != NULL) {
+        HttpInstance->NextMsg = HttpInstance->CacheBody;
       }
     }
 

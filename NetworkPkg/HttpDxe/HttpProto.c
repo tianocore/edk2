@@ -197,6 +197,16 @@ HttpTcpReceiveNotifyDpc (
     Length = (UINTN) Wrap->TcpWrap.Rx4Data.FragmentTable[0].FragmentLength;
   }
 
+  //
+  // Record the CallbackData data.
+  //
+  HttpInstance->CallbackData.Wrap = (VOID *) Wrap;
+  HttpInstance->CallbackData.ParseData = Wrap->HttpToken->Message->Body;
+  HttpInstance->CallbackData.ParseDataLength = Length;
+
+  //
+  // Parse Body with CallbackData data.
+  //
   Status = HttpParseMessageBody (
              HttpInstance->MsgParser,
              Length,
