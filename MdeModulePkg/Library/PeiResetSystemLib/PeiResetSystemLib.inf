@@ -37,3 +37,5 @@
 [LibraryClasses]
   PeiServicesLib
 
+[Depex]
+  gEfiPeiReset2PpiGuid
