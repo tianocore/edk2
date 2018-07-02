@@ -27,6 +27,8 @@ EnableDebugAgent (
 
 /**
   Get pointer to CPU MP Data structure.
+  For BSP, the pointer is retrieved from HOB.
+  For AP, the structure is just after IDT.
 
   @return  The pointer to CPU MP Data structure.
 **/
@@ -35,10 +37,18 @@ GetCpuMpData (
   VOID
   )
 {
-  CPU_MP_DATA      *CpuMpData;
+  CPU_MP_DATA                  *CpuMpData;
+  MSR_IA32_APIC_BASE_REGISTER  ApicBaseMsr;
+  IA32_DESCRIPTOR              Idtr;
 
-  CpuMpData = GetCpuMpDataFromGuidedHob ();
-  ASSERT (CpuMpData != NULL);
+  ApicBaseMsr.Uint64 = AsmReadMsr64 (MSR_IA32_APIC_BASE);
+  if (ApicBaseMsr.Bits.BSP == 1) {
+    CpuMpData = GetCpuMpDataFromGuidedHob ();
+    ASSERT (CpuMpData != NULL);
+  } else {
+    AsmReadIdtr (&Idtr);
+    CpuMpData = (CPU_MP_DATA *) (Idtr.Base + Idtr.Limit + 1);
+  }
   return CpuMpData;
 }
 

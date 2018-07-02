@@ -615,7 +615,9 @@ ApWakeupFunction (
       //
       ApInitializeSync (CpuMpData);
       //
-      // Sync BSP's Control registers to APs
+      // CpuMpData->CpuData[0].VolatileRegisters is initialized based on BSP environment,
+      //   to initialize AP in InitConfig path.
+      // NOTE: IDTR.BASE stored in CpuMpData->CpuData[0].VolatileRegisters points to a different IDT shared by all APs.
       //
       RestoreVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters, FALSE);
       InitializeApData (CpuMpData, ProcessorNumber, BistData, ApTopOfStack);
@@ -1506,6 +1508,7 @@ MpInitLibInitialize (
   UINT32                   MaxLogicalProcessorNumber;
   UINT32                   ApStackSize;
   MP_ASSEMBLY_ADDRESS_MAP  AddressMap;
+  CPU_VOLATILE_REGISTERS   VolatileRegisters;
   UINTN                    BufferSize;
   UINT32                   MonitorFilterSize;
   VOID                     *MpBuffer;
@@ -1516,6 +1519,7 @@ MpInitLibInitialize (
   UINTN                    Index;
   UINTN                    ApResetVectorSize;
   UINTN                    BackupBufferAddr;
+  UINTN                    ApIdtBase;
 
   OldCpuMpData = GetCpuMpDataFromGuidedHob ();
   if (OldCpuMpData == NULL) {
@@ -1530,19 +1534,48 @@ MpInitLibInitialize (
   ApStackSize = PcdGet32(PcdCpuApStackSize);
   ApLoopMode  = GetApLoopMode (&MonitorFilterSize);
 
+  //
+  // Save BSP's Control registers for APs
+  //
+  SaveVolatileRegisters (&VolatileRegisters);
+
   BufferSize  = ApStackSize * MaxLogicalProcessorNumber;
   BufferSize += MonitorFilterSize * MaxLogicalProcessorNumber;
-  BufferSize += sizeof (CPU_MP_DATA);
   BufferSize += ApResetVectorSize;
+  BufferSize  = ALIGN_VALUE (BufferSize, 8);
+  BufferSize += VolatileRegisters.Idtr.Limit + 1;
+  BufferSize += sizeof (CPU_MP_DATA);
   BufferSize += (sizeof (CPU_AP_DATA) + sizeof (CPU_INFO_IN_HOB))* MaxLogicalProcessorNumber;
   MpBuffer    = AllocatePages (EFI_SIZE_TO_PAGES (BufferSize));
   ASSERT (MpBuffer != NULL);
   ZeroMem (MpBuffer, BufferSize);
   Buffer = (UINTN) MpBuffer;
 
+  //
+  //  The layout of the Buffer is as below:
+  //
+  //    +--------------------+ <-- Buffer
+  //        AP Stacks (N)
+  //    +--------------------+ <-- MonitorBuffer
+  //    AP Monitor Filters (N)
+  //    +--------------------+ <-- BackupBufferAddr (CpuMpData->BackupBuffer)
+  //         Backup Buffer
+  //    +--------------------+
+  //           Padding
+  //    +--------------------+ <-- ApIdtBase (8-byte boundary)
+  //           AP IDT          All APs share one separate IDT. So AP can get address of CPU_MP_DATA from IDT Base.
+  //    +--------------------+ <-- CpuMpData
+  //         CPU_MP_DATA
+  //    +--------------------+ <-- CpuMpData->CpuData
+  //        CPU_AP_DATA (N)
+  //    +--------------------+ <-- CpuMpData->CpuInfoInHob
+  //      CPU_INFO_IN_HOB (N)
+  //    +--------------------+
+  //
   MonitorBuffer    = (UINT8 *) (Buffer + ApStackSize * MaxLogicalProcessorNumber);
   BackupBufferAddr = (UINTN) MonitorBuffer + MonitorFilterSize * MaxLogicalProcessorNumber;
-  CpuMpData = (CPU_MP_DATA *) (BackupBufferAddr + ApResetVectorSize);
+  ApIdtBase        = ALIGN_VALUE (BackupBufferAddr + ApResetVectorSize, 8);
+  CpuMpData        = (CPU_MP_DATA *) (ApIdtBase + VolatileRegisters.Idtr.Limit + 1);
   CpuMpData->Buffer           = Buffer;
   CpuMpData->CpuApStackSize   = ApStackSize;
   CpuMpData->BackupBuffer     = BackupBufferAddr;
@@ -1557,10 +1590,20 @@ MpInitLibInitialize (
   CpuMpData->MicrocodePatchAddress    = PcdGet64 (PcdCpuMicrocodePatchAddress);
   CpuMpData->MicrocodePatchRegionSize = PcdGet64 (PcdCpuMicrocodePatchRegionSize);
   InitializeSpinLock(&CpuMpData->MpLock);
+
   //
-  // Save BSP's Control registers to APs
+  // Make sure no memory usage outside of the allocated buffer.
   //
-  SaveVolatileRegisters (&CpuMpData->CpuData[0].VolatileRegisters);
+  ASSERT ((CpuMpData->CpuInfoInHob + sizeof (CPU_INFO_IN_HOB) * MaxLogicalProcessorNumber) ==
+          Buffer + BufferSize);
+
+  //
+  // Duplicate BSP's IDT to APs.
+  // All APs share one separate IDT. So AP can get the address of CpuMpData by using IDTR.BASE + IDTR.LIMIT + 1
+  //
+  CopyMem ((VOID *)ApIdtBase, (VOID *)VolatileRegisters.Idtr.Base, VolatileRegisters.Idtr.Limit + 1);
+  VolatileRegisters.Idtr.Base = ApIdtBase;
+  CopyMem (&CpuMpData->CpuData[0].VolatileRegisters, &VolatileRegisters, sizeof (VolatileRegisters));
   //
   // Set BSP basic information
   //
@@ -1618,11 +1661,7 @@ MpInitLibInitialize (
       }
       CpuMpData->CpuData[Index].CpuHealthy = (CpuInfoInHob[Index].Health == 0)? TRUE:FALSE;
       CpuMpData->CpuData[Index].ApFunction = 0;
-      CopyMem (
-        &CpuMpData->CpuData[Index].VolatileRegisters,
-        &CpuMpData->CpuData[0].VolatileRegisters,
-        sizeof (CPU_VOLATILE_REGISTERS)
-        );
+      CopyMem (&CpuMpData->CpuData[Index].VolatileRegisters, &VolatileRegisters, sizeof (CPU_VOLATILE_REGISTERS));
     }
     if (MaxLogicalProcessorNumber > 1) {
       //
