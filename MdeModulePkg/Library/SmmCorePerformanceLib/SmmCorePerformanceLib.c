@@ -45,7 +45,7 @@ typedef struct {
 HANDLE_GUID_MAP      mCacheHandleGuidTable[CACHE_HANDLE_GUID_COUNT];
 UINTN                mCachePairCount = 0;
 
-UINT32               mPerformanceLength    = 0;
+UINT32               mPerformanceLength    = sizeof (SMM_BOOT_PERFORMANCE_TABLE);
 UINT32               mMaxPerformanceLength = 0;
 UINT32               mLoadImageCount       = 0;
 BOOLEAN              mFpdtDataIsReported   = FALSE;
@@ -100,15 +100,15 @@ GetFpdtRecordPtr (
     if (mPerformanceLength + RecordSize > mMaxPerformanceLength) {
       mSmmBootPerformanceTable = ReallocatePool (
                                    mPerformanceLength,
-                                   mPerformanceLength + sizeof (SMM_BOOT_PERFORMANCE_TABLE) + RecordSize + FIRMWARE_RECORD_BUFFER,
+                                   mPerformanceLength + RecordSize + FIRMWARE_RECORD_BUFFER,
                                    mSmmBootPerformanceTable
                               );
 
       if (mSmmBootPerformanceTable == NULL) {
         return EFI_OUT_OF_RESOURCES;
       }
-      mSmmBootPerformanceTable->Header.Length = sizeof (SMM_BOOT_PERFORMANCE_TABLE) + mPerformanceLength;
-      mMaxPerformanceLength = mPerformanceLength + sizeof (SMM_BOOT_PERFORMANCE_TABLE) + RecordSize + FIRMWARE_RECORD_BUFFER;
+      mSmmBootPerformanceTable->Header.Length = mPerformanceLength;
+      mMaxPerformanceLength = mPerformanceLength + RecordSize + FIRMWARE_RECORD_BUFFER;
     }
     //
     // Covert buffer to FPDT Ptr Union type.
