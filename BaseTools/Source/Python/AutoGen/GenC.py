@@ -266,7 +266,7 @@ EFI_STATUS
 EFIAPI
 ${Function} (
   IN EFI_HANDLE            ImageHandle,
-  IN EFI_SMM_SYSTEM_TABLE2 *MmSystemTable
+  IN EFI_MM_SYSTEM_TABLE   *MmSystemTable
   );
 ${END}
 """)
@@ -279,7 +279,7 @@ EFI_STATUS
 EFIAPI
 ProcessModuleEntryPointList (
   IN EFI_HANDLE            ImageHandle,
-  IN EFI_SMM_SYSTEM_TABLE2 *MmSystemTable
+  IN EFI_MM_SYSTEM_TABLE   *MmSystemTable
   )
 
 {
@@ -293,7 +293,7 @@ EFI_STATUS
 EFIAPI
 ProcessModuleEntryPointList (
   IN EFI_HANDLE            ImageHandle,
-  IN EFI_SMM_SYSTEM_TABLE2 *MmSystemTable
+  IN EFI_MM_SYSTEM_TABLE   *MmSystemTable
   )
 
 {
@@ -308,7 +308,7 @@ EFI_STATUS
 EFIAPI
 ProcessModuleEntryPointList (
   IN EFI_HANDLE            ImageHandle,
-  IN EFI_SMM_SYSTEM_TABLE2 *MmSystemTable
+  IN EFI_MM_SYSTEM_TABLE   *MmSystemTable
   )
 
 {
@@ -676,7 +676,7 @@ EFI_STATUS
 EFIAPI
 ${Function} (
   IN EFI_HANDLE            ImageHandle,
-  IN EFI_SMM_SYSTEM_TABLE2  *MmSystemTable
+  IN EFI_MM_SYSTEM_TABLE   *MmSystemTable
   );${END}
 """),
 }
@@ -756,7 +756,7 @@ VOID
 EFIAPI
 ProcessLibrary${Type}List (
   IN EFI_HANDLE            ImageHandle,
-  IN EFI_SMM_SYSTEM_TABLE2  *MmSystemTable
+  IN EFI_MM_SYSTEM_TABLE   *MmSystemTable
   )
 {
 ${BEGIN}  EFI_STATUS  Status;
@@ -780,8 +780,8 @@ gModuleTypeHeaderFile = {
     SUP_MODULE_UEFI_DRIVER       :   ["Uefi.h",  "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiBootServicesTableLib.h", "Library/UefiDriverEntryPoint.h"],
     SUP_MODULE_UEFI_APPLICATION  :   ["Uefi.h",  "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiBootServicesTableLib.h", "Library/UefiApplicationEntryPoint.h"],
     SUP_MODULE_SMM_CORE          :   ["PiDxe.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/UefiDriverEntryPoint.h"],
-    SUP_MODULE_MM_STANDALONE     :   ["PiSmm.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/SmmDriverStandaloneEntryPoint.h"],
-    SUP_MODULE_MM_CORE_STANDALONE :  ["PiSmm.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/SmmCoreStandaloneEntryPoint.h"],
+    SUP_MODULE_MM_STANDALONE     :   ["PiMm.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/StandaloneMmDriverEntryPoint.h"],
+    SUP_MODULE_MM_CORE_STANDALONE :  ["PiMm.h", "Library/BaseLib.h", "Library/DebugLib.h", "Library/StandaloneMmCoreEntryPoint.h"],
     SUP_MODULE_USER_DEFINED      :   [gBasicHeaderFile]
 }
 
