@@ -1056,6 +1056,7 @@ class InfBuildData(ModuleBuildClassObject):
                 #
                 #   "FixedAtBuild", "PatchableInModule", "FeatureFlag", "Dynamic", "DynamicEx"
                 #
+                self.Guids.update(Package.Guids)
                 PcdType = self._PCD_TYPE_STRING_[Type]
                 if Type == MODEL_PCD_DYNAMIC:
                     Pcd.Pending = True
