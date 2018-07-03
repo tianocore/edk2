@@ -4221,11 +4221,13 @@ InitializeDisplayEngine (
     NewString         = HiiGetString (gHiiHandle, STRING_TOKEN (FUNCTION_TEN_STRING), NULL);
     ASSERT (NewString != NULL);
     FormBrowserEx2->RegisterHotKey (&HotKey, BROWSER_ACTION_SUBMIT, 0, NewString);
+    FreePool (NewString);
 
     HotKey.ScanCode   = SCAN_F9;
     NewString         = HiiGetString (gHiiHandle, STRING_TOKEN (FUNCTION_NINE_STRING), NULL);
     ASSERT (NewString != NULL);
     FormBrowserEx2->RegisterHotKey (&HotKey, BROWSER_ACTION_DEFAULT, EFI_HII_DEFAULT_CLASS_STANDARD, NewString);
+    FreePool (NewString);
   }
 
   return EFI_SUCCESS;
