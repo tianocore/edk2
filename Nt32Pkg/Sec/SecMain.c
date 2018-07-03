@@ -513,7 +513,7 @@ Returns:
   //
   VirtualAddress = MapViewOfFileEx (
                     NtMapHandle,
-                    FILE_MAP_EXECUTE | FILE_MAP_ALL_ACCESS,
+                    FILE_MAP_EXECUTE | FILE_MAP_COPY,
                     0,
                     0,
                     MapSize,
