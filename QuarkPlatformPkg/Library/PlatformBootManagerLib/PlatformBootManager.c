@@ -2,7 +2,7 @@
 This file include all platform action which can be customized
 by IBV/OEM.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -459,3 +459,20 @@ PlatformBootManagerWaitCallback (
 {
   Print (L"\r%-2d seconds remained...", TimeoutRemain);
 }
+
+/**
+  The function is called when no boot option could be launched,
+  including platform recovery options and options pointing to applications
+  built into firmware volumes.
+
+  If this function returns, BDS attempts to enter an infinite loop.
+**/
+VOID
+EFIAPI
+PlatformBootManagerUnableToBoot (
+  VOID
+  )
+{
+  return;
+}
+
