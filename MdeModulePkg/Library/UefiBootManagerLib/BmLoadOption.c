@@ -2,7 +2,7 @@
   Load option library functions which relate with creating and processing load options.
 
 Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
-(C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2015-2018 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -250,13 +250,16 @@ structure.
     VariableAttributes = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS;
   }
 
-  return gRT->SetVariable (
-                OptionName,
-                &gEfiGlobalVariableGuid,
-                VariableAttributes,
-                VariableSize,
-                Variable
-                );
+  Status = gRT->SetVariable (
+                  OptionName,
+                  &gEfiGlobalVariableGuid,
+                  VariableAttributes,
+                  VariableSize,
+                  Variable
+                  );
+  FreePool (Variable);
+
+  return Status;
 }
 
 /**
