@@ -3,7 +3,7 @@
   this GUID is installed as PPI in PEI and protocol in SMM environment.
   It allows for PEIMs or SMM drivers to hook this point and do the required tasks.
 
-  Copyright (c) 2018 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
