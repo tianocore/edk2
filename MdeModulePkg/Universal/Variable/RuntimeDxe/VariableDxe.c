@@ -412,13 +412,15 @@ FtwNotificationEvent (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_WARN, "Variable driver failed to get flash memory attribute.\n"));
   } else {
-    Status = gDS->SetMemorySpaceAttributes (
-                    BaseAddress,
-                    Length,
-                    GcdDescriptor.Attributes | EFI_MEMORY_RUNTIME
-                    );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "Variable driver failed to add EFI_MEMORY_RUNTIME attribute to Flash.\n"));
+    if ((GcdDescriptor.Attributes & EFI_MEMORY_RUNTIME) == 0) {
+      Status = gDS->SetMemorySpaceAttributes (
+                      BaseAddress,
+                      Length,
+                      GcdDescriptor.Attributes | EFI_MEMORY_RUNTIME
+                      );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_WARN, "Variable driver failed to add EFI_MEMORY_RUNTIME attribute to Flash.\n"));
+      }
     }
   }
 
