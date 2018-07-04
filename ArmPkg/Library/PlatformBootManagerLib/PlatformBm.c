@@ -3,7 +3,7 @@
 
   Copyright (C) 2015-2016, Red Hat, Inc.
   Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
-  Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -765,4 +765,20 @@ PlatformBootManagerWaitCallback (
   if (EFI_ERROR (Status)) {
     Print (L".");
   }
+}
+
+/**
+  The function is called when no boot option could be launched,
+  including platform recovery options and options pointing to applications
+  built into firmware volumes.
+
+  If this function returns, BDS attempts to enter an infinite loop.
+**/
+VOID
+EFIAPI
+PlatformBootManagerUnableToBoot (
+  VOID
+  )
+{
+  return;
 }
