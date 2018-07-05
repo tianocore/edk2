@@ -1,11 +1,11 @@
 ## @file
-# This file contained the parser for [Libraries] sections in INF file 
+# This file contained the parser for [Libraries] sections in INF file
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -34,14 +34,14 @@ from Parser.InfParserMisc import InfParserSectionRoot
 class InfLibrarySectionParser(InfParserSectionRoot):
     ## InfLibraryParser
     #
-    #                 
+    #
     def InfLibraryParser(self, SectionString, InfSectionObject, FileName):
         #
         # For Common INF file
         #
         if not GlobalData.gIS_BINARY_INF:
             #
-            # Macro defined in this section 
+            # Macro defined in this section
             #
             SectionMacros = {}
             ValueList = []
@@ -60,7 +60,7 @@ class InfLibrarySectionParser(InfParserSectionRoot):
                     continue
 
                 #
-                # Found Header Comments 
+                # Found Header Comments
                 #
                 if LibLineContent.strip().startswith(DT.TAB_COMMENT_SPLIT):
                     #
@@ -70,7 +70,7 @@ class InfLibrarySectionParser(InfParserSectionRoot):
                         LibHeaderComments.append(Line)
                         continue
                     #
-                    # First time encounter comment 
+                    # First time encounter comment
                     #
                     else:
                         #
@@ -118,7 +118,7 @@ class InfLibrarySectionParser(InfParserSectionRoot):
 
                 #
                 # Replace with Local section Macro and [Defines] section Macro.
-                #            
+                #
                 ValueList = [InfExpandMacro(Value, (FileName, LibLineContent, LibLineNo),
                                             self.FileLocalMacros, SectionMacros, True)
                                             for Value in ValueList]
@@ -134,7 +134,7 @@ class InfLibrarySectionParser(InfParserSectionRoot):
 
             #
             # Current section archs
-            #    
+            #
             KeyList = []
             for Item in self.LastSectionHeaderContent:
                 if (Item[1], Item[2]) not in KeyList:
@@ -188,7 +188,7 @@ class InfLibrarySectionParser(InfParserSectionRoot):
 
         #
         # Current section archs
-        #    
+        #
         KeyList = []
         Item = ['', '', '']
         for Item in self.LastSectionHeaderContent:

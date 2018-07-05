@@ -1,11 +1,11 @@
 /** @file
   Guid used to define the Firmware File System. See PI spec volume 3 for more
   details.
-  
+
   @par Revision Reference:
   Guids defined in PI Spec Volume 3
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this

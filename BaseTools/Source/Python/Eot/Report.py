@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create report for Eot tool
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -276,13 +276,13 @@ class Report(object):
       </tr>
       <tr id='Ffs%s' style='display:none;'>
         <td colspan="4"><table width="100%%"  border="1">""" % (self.FfsIndex, self.FfsIndex, self.FfsIndex, FfsPath, FfsName, FfsGuid, FfsOffset, FfsType, self.FfsIndex)
-            
+
             if self.DispatchList:
                 if FfsObj.Type in [0x04, 0x06]:
                     self.DispatchList.write("%s %s %s %s\n" % (FfsGuid, "P", FfsName, FfsPath))
                 if FfsObj.Type in [0x05, 0x07, 0x08, 0x0A]:
                     self.DispatchList.write("%s %s %s %s\n" % (FfsGuid, "D", FfsName, FfsPath))
-               
+
             self.WriteLn(Content)
 
             EotGlobalData.gOP_DISPATCH_ORDER.write('%s\n' %FfsName)

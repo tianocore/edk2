@@ -3,9 +3,9 @@
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -15,19 +15,19 @@ import os
 import unittest
 
 import Logger.Log as Logger
-from GenMetaFile.GenInfFile import GenGuidSections 
+from GenMetaFile.GenInfFile import GenGuidSections
 from GenMetaFile.GenInfFile import GenProtocolPPiSections
 from GenMetaFile.GenInfFile import GenPcdSections
 from GenMetaFile.GenInfFile import GenSpecialSections
 from Library.CommentGenerating import GenGenericCommentF
-from Library.CommentGenerating import _GetHelpStr 
+from Library.CommentGenerating import _GetHelpStr
 from Object.POM.CommonObject import TextObject
 from Object.POM.CommonObject import GuidObject
 from Object.POM.CommonObject import ProtocolObject
 from Object.POM.CommonObject import PpiObject
 from Object.POM.CommonObject import PcdObject
 from Object.POM.ModuleObject import HobObject
-                               
+
 from Library.StringUtils import GetSplitValueList
 from Library.DataType import TAB_SPACE_SPLIT
 from Library.DataType import TAB_LANGUAGE_EN_US
@@ -46,7 +46,7 @@ class _GetHelpStrTest(unittest.TestCase):
 
     def tearDown(self):
         pass
- 
+
     #
     # Normal case1: have one help text object with Lang = 'en-US'
     #
@@ -55,11 +55,11 @@ class _GetHelpStrTest(unittest.TestCase):
         HelpTextObj = TextObject()
         HelpTextObj.SetLang(TAB_LANGUAGE_EN_US)
         HelpTextObj.SetString(HelpStr)
-        
+
         HelpTextList = [HelpTextObj]
         Result = _GetHelpStr(HelpTextList)
         self.assertEqual(Result, HelpStr)
-        
+
     #
     # Normal case2: have two help text object with Lang = 'en-US' and other
     #
@@ -68,16 +68,16 @@ class _GetHelpStrTest(unittest.TestCase):
         HelpTextObj = TextObject()
         HelpTextObj.SetLang(TAB_LANGUAGE_ENG)
         HelpTextObj.SetString(HelpStr)
-        
+
         HelpTextList = [HelpTextObj]
 
         ExpectedStr = 'Hello world1'
         HelpTextObj = TextObject()
         HelpTextObj.SetLang(TAB_LANGUAGE_EN_US)
-        HelpTextObj.SetString(ExpectedStr)        
-        
+        HelpTextObj.SetString(ExpectedStr)
+
         HelpTextList.append(HelpTextObj)
-        
+
         Result = _GetHelpStr(HelpTextList)
         self.assertEqual(Result, ExpectedStr)
 
@@ -89,16 +89,16 @@ class _GetHelpStrTest(unittest.TestCase):
         HelpTextObj = TextObject()
         HelpTextObj.SetLang('')
         HelpTextObj.SetString(HelpStr)
-        
+
         HelpTextList = [HelpTextObj]
 
         ExpectedStr = 'Hello world1'
         HelpTextObj = TextObject()
         HelpTextObj.SetLang(TAB_LANGUAGE_ENG)
-        HelpTextObj.SetString(ExpectedStr)        
-        
+        HelpTextObj.SetString(ExpectedStr)
+
         HelpTextList.append(HelpTextObj)
-        
+
         Result = _GetHelpStr(HelpTextList)
         self.assertEqual(Result, ExpectedStr)
 
@@ -110,15 +110,15 @@ class _GetHelpStrTest(unittest.TestCase):
         ExpectedStr = 'Hello world1'
         HelpTextObj = TextObject()
         HelpTextObj.SetLang(TAB_LANGUAGE_ENG)
-        HelpTextObj.SetString(ExpectedStr)        
+        HelpTextObj.SetString(ExpectedStr)
         HelpTextList = [HelpTextObj]
-      
+
         HelpStr = 'Hello world'
         HelpTextObj = TextObject()
         HelpTextObj.SetLang('')
-        HelpTextObj.SetString(HelpStr)        
+        HelpTextObj.SetString(HelpStr)
         HelpTextList.append(HelpTextObj)
-        
+
         Result = _GetHelpStr(HelpTextList)
         self.assertEqual(Result, ExpectedStr)
 
@@ -130,27 +130,27 @@ class _GetHelpStrTest(unittest.TestCase):
         ExpectedStr = 'Hello world1'
         HelpTextObj = TextObject()
         HelpTextObj.SetLang(TAB_LANGUAGE_EN_US)
-        HelpTextObj.SetString(ExpectedStr)        
+        HelpTextObj.SetString(ExpectedStr)
         HelpTextList = [HelpTextObj]
-      
+
         HelpStr = 'Hello unknown world'
         HelpTextObj = TextObject()
         HelpTextObj.SetLang('')
-        HelpTextObj.SetString(HelpStr)        
+        HelpTextObj.SetString(HelpStr)
         HelpTextList.append(HelpTextObj)
 
         HelpStr = 'Hello mysterious world'
         HelpTextObj = TextObject()
         HelpTextObj.SetLang('')
-        HelpTextObj.SetString(HelpStr)        
+        HelpTextObj.SetString(HelpStr)
         HelpTextList.append(HelpTextObj)
-                
+
         Result = _GetHelpStr(HelpTextList)
         self.assertEqual(Result, ExpectedStr)
-        
+
         HelpTextList.sort()
         self.assertEqual(Result, ExpectedStr)
-        
+
         HelpTextList.sort(reverse=True)
         self.assertEqual(Result, ExpectedStr)
 
@@ -160,15 +160,15 @@ class _GetHelpStrTest(unittest.TestCase):
 #
 class GenGuidSectionsTest(unittest.TestCase):
     def setUp(self):
-        pass      
+        pass
 
     def tearDown(self):
         pass
-    
+
     #
     # This is the API to generate Guid Object to help UnitTest
     #
-    def GuidFactory(self, CName, FFE, Usage, GuidType, VariableName, HelpStr):           
+    def GuidFactory(self, CName, FFE, Usage, GuidType, VariableName, HelpStr):
         Guid = GuidObject()
         Guid.SetCName(CName)
         Guid.SetFeatureFlag(FFE)
@@ -180,22 +180,22 @@ class GenGuidSectionsTest(unittest.TestCase):
         HelpTextObj.SetLang('')
         HelpTextObj.SetString(HelpStr)
         Guid.SetHelpTextList([HelpTextObj])
-        
-        return Guid      
-        
+
+        return Guid
+
     #
     # Normal case: have two GuidObject
     #
     def testNormalCase1(self):
         GuidList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
         Usage = 'PRODUCES'
         GuidType = 'Event'
         VariableName = ''
         HelpStr = 'Usage comment line 1'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
 
@@ -205,10 +205,10 @@ class GenGuidSectionsTest(unittest.TestCase):
         GuidType = 'Variable'
         VariableName = ''
         HelpStr = 'Usage comment line 2'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
-        GuidList.append(Guid1)        
-        
+        GuidList.append(Guid1)
+
         Result = GenGuidSections(GuidList)
         Expected = '''[Guids]
 ## PRODUCES ## Event # Usage comment line 1
@@ -221,14 +221,14 @@ Guid1|FFE1'''
     #
     def testNormalCase2(self):
         GuidList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
         Usage = 'PRODUCES'
         GuidType = 'Event'
         VariableName = ''
         HelpStr = 'Usage comment line 1'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
 
@@ -238,10 +238,10 @@ Guid1|FFE1'''
         GuidType = 'UNDEFINED'
         VariableName = ''
         HelpStr = 'Generic comment line 1\n Generic comment line 2'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
-        GuidList.append(Guid1)        
-        
+        GuidList.append(Guid1)
+
         Result = GenGuidSections(GuidList)
         Expected = '''[Guids]
 ## PRODUCES ## Event # Usage comment line 1
@@ -252,7 +252,7 @@ Guid1|FFE1'''
         self.assertEqual(Result.strip(), Expected)
 
     #
-    # Normal case: have two GuidObject, one help goes to generic help, 
+    # Normal case: have two GuidObject, one help goes to generic help,
     # the other go into usage comment
     #
     def testNormalCase3(self):
@@ -264,20 +264,20 @@ Guid1|FFE1'''
         GuidType = 'UNDEFINED'
         VariableName = ''
         HelpStr = 'Generic comment'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
-        GuidList.append(Guid1)  
-                
+        GuidList.append(Guid1)
+
         CName = 'Guid1'
         FFE = 'FFE1'
         Usage = 'PRODUCES'
         GuidType = 'Event'
         VariableName = ''
         HelpStr = 'Usage comment line 1'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
-              
+
         Result = GenGuidSections(GuidList)
         Expected = '''[Guids]
 # Generic comment
@@ -298,10 +298,10 @@ Guid1|FFE1'''
         GuidType = 'UNDEFINED'
         VariableName = ''
         HelpStr = 'Generic comment line1 \n generic comment line 2'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
-        GuidList.append(Guid1)  
-              
+        GuidList.append(Guid1)
+
         Result = GenGuidSections(GuidList)
         Expected = '''[Guids]
 # Generic comment line1
@@ -315,17 +315,17 @@ Guid1|FFE1'''
     #
     def testNormalCase6(self):
         GuidList = []
-                
+
         CName = 'Guid1'
         FFE = 'FFE1'
         Usage = 'PRODUCES'
         GuidType = 'Event'
         VariableName = ''
         HelpStr = 'Usage comment line 1\n Usage comment line 2'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
-              
+
         Result = GenGuidSections(GuidList)
         Expected = '''[Guids]
 Guid1|FFE1 ## PRODUCES ## Event # Usage comment line 1  Usage comment line 2
@@ -337,36 +337,36 @@ Guid1|FFE1 ## PRODUCES ## Event # Usage comment line 1  Usage comment line 2
     #
     def testNormalCase7(self):
         GuidList = []
-                
+
         CName = 'Guid1'
         FFE = 'FFE1'
         Usage = 'UNDEFINED'
         GuidType = 'UNDEFINED'
         VariableName = ''
         HelpStr = 'Usage comment line 1'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
-              
+
         Result = GenGuidSections(GuidList)
         Expected = '''[Guids]
 Guid1|FFE1 # Usage comment line 1
 '''
         self.assertEqual(Result.strip(), Expected.strip())
-    
+
     #
     # Normal case: have two GuidObject
     #
     def testNormalCase8(self):
         GuidList = []
-                
+
         CName = 'Guid1'
         FFE = 'FFE1'
         Usage = 'PRODUCES'
         GuidType = 'Event'
         VariableName = ''
         HelpStr = 'Usage comment line 1\n Usage comment line 2'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
 
@@ -376,10 +376,10 @@ Guid1|FFE1 # Usage comment line 1
         GuidType = 'Event'
         VariableName = ''
         HelpStr = 'Usage comment line 3'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
-              
+
         Result = GenGuidSections(GuidList)
         Expected = '''[Guids]
 ## PRODUCES ## Event # Usage comment line 1  Usage comment line 2
@@ -403,14 +403,14 @@ Guid1|FFE1
     #
     def testNormalCase10(self):
         GuidList = []
-                
+
         CName = 'Guid1'
         FFE = 'FFE1'
         Usage = 'UNDEFINED'
         GuidType = 'UNDEFINED'
         VariableName = ''
         HelpStr = ''
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
 
@@ -425,14 +425,14 @@ Guid1|FFE1
     #
     def testNormalCase11(self):
         GuidList = []
-                
+
         CName = 'Guid1'
         FFE = 'FFE1'
         Usage = 'UNDEFINED'
         GuidType = 'UNDEFINED'
         VariableName = ''
         HelpStr = 'general comment line 1'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
 
@@ -442,7 +442,7 @@ Guid1|FFE1
         GuidType = 'Event'
         VariableName = ''
         HelpStr = 'Usage comment line 3'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
 
@@ -452,10 +452,10 @@ Guid1|FFE1
         GuidType = 'UNDEFINED'
         VariableName = ''
         HelpStr = 'general comment line 2'
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
-                      
+
         Result = GenGuidSections(GuidList)
         Expected = '''[Guids]
 # general comment line 1
@@ -470,14 +470,14 @@ Guid1|FFE1
     #
     def testNormalCase12(self):
         GuidList = []
-                
+
         CName = 'Guid1'
         FFE = 'FFE1'
         Usage = 'PRODUCES'
         GuidType = 'GUID'
         VariableName = ''
         HelpStr = ''
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
 
@@ -487,7 +487,7 @@ Guid1|FFE1
         GuidType = 'Event'
         VariableName = ''
         HelpStr = ''
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
 
@@ -497,10 +497,10 @@ Guid1|FFE1
         GuidType = 'Event'
         VariableName = ''
         HelpStr = ''
-        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType, 
+        Guid1 = self.GuidFactory(CName, FFE, Usage, GuidType,
                                  VariableName, HelpStr)
         GuidList.append(Guid1)
-                      
+
         Result = GenGuidSections(GuidList)
         Expected = '''[Guids]
 ## PRODUCES ## GUID
@@ -509,17 +509,17 @@ Guid1|FFE1
 Guid1|FFE1
 '''
         self.assertEqual(Result.strip(), Expected.strip())
-        
+
 #
 # Test GenProtocolPPiSections
 #
 class GenProtocolPPiSectionsTest(unittest.TestCase):
     def setUp(self):
-        pass      
+        pass
 
     def tearDown(self):
         pass
-    
+
     #
     # This is the API to generate Protocol/Ppi Object to help UnitTest
     #
@@ -528,7 +528,7 @@ class GenProtocolPPiSectionsTest(unittest.TestCase):
             Object = ProtocolObject()
         else:
             Object = PpiObject()
-        
+
         Object.SetCName(CName)
         Object.SetFeatureFlag(FFE)
         Object.SetUsage(Usage)
@@ -538,8 +538,8 @@ class GenProtocolPPiSectionsTest(unittest.TestCase):
         HelpTextObj.SetLang('')
         HelpTextObj.SetString(HelpStr)
         Object.SetHelpTextList([HelpTextObj])
-        
-        return Object      
+
+        return Object
 
     #    Usage        Notify    Help    INF Comment
     #1   UNDEFINED    true    Present    ## UNDEFINED ## NOTIFY # Help
@@ -557,19 +557,19 @@ class GenProtocolPPiSectionsTest(unittest.TestCase):
 
     def testNormalCase1(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'UNDEFINED'
         Notify = True
         HelpStr = 'Help'
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1 ## UNDEFINED ## NOTIFY # Help'''
@@ -577,11 +577,11 @@ Guid1|FFE1 ## UNDEFINED ## NOTIFY # Help'''
 
         IsProtocol = False
         ObjectList = []
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Ppis]
 Guid1|FFE1 ## UNDEFINED ## NOTIFY # Help'''
@@ -589,19 +589,19 @@ Guid1|FFE1 ## UNDEFINED ## NOTIFY # Help'''
 
     def testNormalCase2(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'UNDEFINED'
         Notify = True
         HelpStr = ''
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1 ## UNDEFINED ## NOTIFY'''
@@ -609,19 +609,19 @@ Guid1|FFE1 ## UNDEFINED ## NOTIFY'''
 
     def testNormalCase3(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'UNDEFINED'
         Notify = False
         HelpStr = 'Help'
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1 ## UNDEFINED # Help'''
@@ -629,19 +629,19 @@ Guid1|FFE1 ## UNDEFINED # Help'''
 
     def testNormalCase4(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'UNDEFINED'
         Notify = False
         HelpStr = ''
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1 ## UNDEFINED'''
@@ -649,19 +649,19 @@ Guid1|FFE1 ## UNDEFINED'''
 
     def testNormalCase5(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'UNDEFINED'
         Notify = ''
         HelpStr = 'Help'
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1 # Help'''
@@ -669,19 +669,19 @@ Guid1|FFE1 # Help'''
 
     def testNormalCase6(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'UNDEFINED'
         Notify = ''
         HelpStr = ''
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1'''
@@ -689,19 +689,19 @@ Guid1|FFE1'''
 
     def testNormalCase7(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'PRODUCES'
         Notify = True
         HelpStr = 'Help'
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1 ## PRODUCES ## NOTIFY # Help'''
@@ -709,19 +709,19 @@ Guid1|FFE1 ## PRODUCES ## NOTIFY # Help'''
 
     def testNormalCase8(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'PRODUCES'
         Notify = True
         HelpStr = ''
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1 ## PRODUCES ## NOTIFY'''
@@ -729,19 +729,19 @@ Guid1|FFE1 ## PRODUCES ## NOTIFY'''
 
     def testNormalCase9(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'PRODUCES'
         Notify = False
         HelpStr = 'Help'
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1 ## PRODUCES # Help'''
@@ -749,19 +749,19 @@ Guid1|FFE1 ## PRODUCES # Help'''
 
     def testNormalCaseA(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'PRODUCES'
         Notify = False
         HelpStr = ''
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1 ## PRODUCES'''
@@ -769,19 +769,19 @@ Guid1|FFE1 ## PRODUCES'''
 
     def testNormalCaseB(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'PRODUCES'
         Notify = ''
         HelpStr = 'Help'
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1 ## PRODUCES # Help'''
@@ -789,19 +789,19 @@ Guid1|FFE1 ## PRODUCES # Help'''
 
     def testNormalCaseC(self):
         ObjectList = []
-        
+
         CName = 'Guid1'
         FFE = 'FFE1'
-        
+
         Usage = 'PRODUCES'
         Notify = ''
         HelpStr = ''
         IsProtocol = True
-        Object = self.ObjectFactory(CName, FFE, Usage, Notify, 
+        Object = self.ObjectFactory(CName, FFE, Usage, Notify,
                                  HelpStr, IsProtocol)
         ObjectList.append(Object)
-      
-        
+
+
         Result = GenProtocolPPiSections(ObjectList, IsProtocol)
         Expected = '''[Protocols]
 Guid1|FFE1 ## PRODUCES'''
@@ -812,18 +812,18 @@ Guid1|FFE1 ## PRODUCES'''
 #
 class GenPcdSectionsTest(unittest.TestCase):
     def setUp(self):
-        pass      
+        pass
 
     def tearDown(self):
         pass
-    
+
     #
     # This is the API to generate Pcd Object to help UnitTest
     #
     def ObjectFactory(self, ItemType, TSCName, CName, DValue, FFE, Usage, Str):
         Object = PcdObject()
         HelpStr = Str
-        
+
         Object.SetItemType(ItemType)
         Object.SetTokenSpaceGuidCName(TSCName)
         Object.SetCName(CName)
@@ -835,8 +835,8 @@ class GenPcdSectionsTest(unittest.TestCase):
         HelpTextObj.SetLang('')
         HelpTextObj.SetString(HelpStr)
         Object.SetHelpTextList([HelpTextObj])
-        
-        return Object      
+
+        return Object
 
 
     #    Usage        Help    INF Comment
@@ -852,14 +852,14 @@ class GenPcdSectionsTest(unittest.TestCase):
         CName = 'CName'
         DValue = 'DValue'
         FFE = 'FFE'
-        
+
         Usage = 'UNDEFINED'
         Str = 'Help'
- 
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenPcdSections(ObjectList)
         Expected = \
             '[Pcd]\n' + \
@@ -873,14 +873,14 @@ class GenPcdSectionsTest(unittest.TestCase):
         CName = 'CName'
         DValue = 'DValue'
         FFE = 'FFE'
-        
+
         Usage = 'UNDEFINED'
         Str = ''
- 
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenPcdSections(ObjectList)
         Expected = '[Pcd]\nTSCName.CName|DValue|FFE'
         self.assertEqual(Result.strip(), Expected)
@@ -892,14 +892,14 @@ class GenPcdSectionsTest(unittest.TestCase):
         CName = 'CName'
         DValue = 'DValue'
         FFE = 'FFE'
-        
+
         Usage = 'CONSUMES'
         Str = 'Help'
- 
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenPcdSections(ObjectList)
         Expected = '[Pcd]\nTSCName.CName|DValue|FFE ## CONSUMES # Help'
         self.assertEqual(Result.strip(), Expected)
@@ -911,14 +911,14 @@ class GenPcdSectionsTest(unittest.TestCase):
         CName = 'CName'
         DValue = 'DValue'
         FFE = 'FFE'
-        
+
         Usage = 'CONSUMES'
         Str = ''
- 
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenPcdSections(ObjectList)
         Expected = '[Pcd]\nTSCName.CName|DValue|FFE ## CONSUMES'
         self.assertEqual(Result.strip(), Expected)
@@ -933,13 +933,13 @@ class GenPcdSectionsTest(unittest.TestCase):
         CName = 'CName'
         DValue = 'DValue'
         FFE = 'FFE'
-        
+
         Usage = 'CONSUMES'
         Str = 'commment line 1\ncomment line 2'
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenPcdSections(ObjectList)
         Expected = '''[Pcd]
 TSCName.CName|DValue|FFE ## CONSUMES # commment line 1 comment line 2'''
@@ -955,19 +955,19 @@ TSCName.CName|DValue|FFE ## CONSUMES # commment line 1 comment line 2'''
         CName = 'CName'
         DValue = 'DValue'
         FFE = 'FFE'
-        
+
         Usage = 'UNDEFINED'
         Str = 'commment line 1\ncomment line 2'
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
 
         Usage = 'UNDEFINED'
         Str = 'commment line 3'
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
-                
+
         Result = GenPcdSections(ObjectList)
         Expected = '''[Pcd]
 # commment line 1
@@ -986,25 +986,25 @@ TSCName.CName|DValue|FFE'''
         CName = 'CName'
         DValue = 'DValue'
         FFE = 'FFE'
-        
+
         Usage = 'UNDEFINED'
         Str = 'commment line 1\ncomment line 2'
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
 
         Usage = 'CONSUMES'
         Str = 'Foo'
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
-        
+
         Usage = 'UNDEFINED'
         Str = 'commment line 3'
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
-                
+
         Result = GenPcdSections(ObjectList)
         Expected = '''[Pcd]
 # commment line 1
@@ -1028,13 +1028,13 @@ TSCName.CName|DValue|FFE'''
         CName = 'CName'
         DValue = 'DValue'
         FFE = 'FFE'
-        
+
         Usage = 'CONSUMES'
         Str = 'commment line 1\ncomment line 2'
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenPcdSections(ObjectList)
         Expected = '''[FeaturePcd]
 # commment line 1
@@ -1052,13 +1052,13 @@ TSCName.CName|DValue|FFE'''
         CName = 'CName'
         DValue = 'DValue'
         FFE = 'FFE'
-        
+
         Usage = 'CONSUMES'
         Str = ''
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenPcdSections(ObjectList)
         Expected = '''[FeaturePcd]
 TSCName.CName|DValue|FFE'''
@@ -1074,13 +1074,13 @@ TSCName.CName|DValue|FFE'''
         CName = 'CName'
         DValue = 'DValue'
         FFE = 'FFE'
-        
+
         Usage = 'PRODUCES'
         Str = 'commment line 1\ncomment line 2'
-        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE, 
+        Object = self.ObjectFactory(ItemType, TSCName, CName, DValue, FFE,
                                     Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenPcdSections(ObjectList)
         Expected = '''
 
@@ -1097,28 +1097,28 @@ TSCName.CName|DValue|FFE
 #
 class GenHobSectionsTest(unittest.TestCase):
     def setUp(self):
-        pass      
+        pass
 
     def tearDown(self):
         pass
-    
+
     #
     # This is the API to generate Event Object to help UnitTest
     #
     def ObjectFactory(self, SupArchList, Type, Usage, Str):
         Object = HobObject()
         HelpStr = Str
-        
+
         Object.SetHobType(Type)
         Object.SetUsage(Usage)
         Object.SetSupArchList(SupArchList)
-        
+
         HelpTextObj = TextObject()
         HelpTextObj.SetLang('')
         HelpTextObj.SetString(HelpStr)
         Object.SetHelpTextList([HelpTextObj])
-        
-        return Object      
+
+        return Object
 
     def testNormalCase1(self):
         ObjectList = []
@@ -1126,10 +1126,10 @@ class GenHobSectionsTest(unittest.TestCase):
         Type = 'Foo'
         Usage = 'UNDEFINED'
         Str = 'Help'
- 
+
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob.X64]
 # ##
@@ -1147,10 +1147,10 @@ class GenHobSectionsTest(unittest.TestCase):
         Type = 'Foo'
         Usage = 'UNDEFINED'
         Str = 'Help'
- 
+
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob]
 # ##
@@ -1161,17 +1161,17 @@ class GenHobSectionsTest(unittest.TestCase):
 #
 '''
         self.assertEqual(Result, Expected)
-        
+
     def testNormalCase3(self):
         ObjectList = []
         SupArchList = ['X64']
         Type = 'Foo'
         Usage = 'UNDEFINED'
         Str = '\nComment Line 1\n\n'
- 
+
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob.X64]
 # ##
@@ -1189,10 +1189,10 @@ class GenHobSectionsTest(unittest.TestCase):
         Type = 'Foo'
         Usage = 'UNDEFINED'
         Str = '\nComment Line 1\n'
- 
+
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob.X64]
 # ##
@@ -1210,10 +1210,10 @@ class GenHobSectionsTest(unittest.TestCase):
         Type = 'Foo'
         Usage = 'UNDEFINED'
         Str = 'Comment Line 1\n\n'
- 
+
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob.X64]
 # ##
@@ -1231,17 +1231,17 @@ class GenHobSectionsTest(unittest.TestCase):
         Type = 'Foo'
         Usage = 'UNDEFINED'
         Str = ''
-        
+
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob.X64]
 # Foo ## UNDEFINED
 #
 #
 '''
-        self.assertEqual(Result, Expected)    
+        self.assertEqual(Result, Expected)
 
     def testNormalCase7(self):
         ObjectList = []
@@ -1250,10 +1250,10 @@ class GenHobSectionsTest(unittest.TestCase):
         Usage = 'UNDEFINED'
         Str = '\nNew Stack HoB'
 
-        
+
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob.X64]
 # ##
@@ -1272,10 +1272,10 @@ class GenHobSectionsTest(unittest.TestCase):
         Usage = 'UNDEFINED'
         Str = '\nNew Stack HoB\n\nTail Comment'
 
-        
+
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob.X64]
 # ##
@@ -1287,7 +1287,7 @@ class GenHobSectionsTest(unittest.TestCase):
 #
 #
 '''
-        self.assertEqual(Result, Expected) 
+        self.assertEqual(Result, Expected)
 
     def testNormalCase9(self):
         ObjectList = []
@@ -1296,10 +1296,10 @@ class GenHobSectionsTest(unittest.TestCase):
         Usage = 'UNDEFINED'
         Str = '\n\n'
 
-        
+
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob.X64]
 # ##
@@ -1309,7 +1309,7 @@ class GenHobSectionsTest(unittest.TestCase):
 #
 #
 '''
-        self.assertEqual(Result, Expected) 
+        self.assertEqual(Result, Expected)
 
     def testNormalCase10(self):
         ObjectList = []
@@ -1320,7 +1320,7 @@ class GenHobSectionsTest(unittest.TestCase):
 
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob.X64]
 # ##
@@ -1330,7 +1330,7 @@ class GenHobSectionsTest(unittest.TestCase):
 #
 #
 '''
-        self.assertEqual(Result, Expected) 
+        self.assertEqual(Result, Expected)
 
     def testNormalCase11(self):
         ObjectList = []
@@ -1341,7 +1341,7 @@ class GenHobSectionsTest(unittest.TestCase):
 
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob.X64]
 # ##
@@ -1351,7 +1351,7 @@ class GenHobSectionsTest(unittest.TestCase):
 #
 #
 '''
-        self.assertEqual(Result, Expected) 
+        self.assertEqual(Result, Expected)
 
     def testNormalCase12(self):
         ObjectList = []
@@ -1362,7 +1362,7 @@ class GenHobSectionsTest(unittest.TestCase):
 
         Object = self.ObjectFactory(SupArchList, Type, Usage, Str)
         ObjectList.append(Object)
-        
+
         Result = GenSpecialSections(ObjectList, 'Hob')
         Expected = '''# [Hob.X64]
 # ##
@@ -1373,18 +1373,18 @@ class GenHobSectionsTest(unittest.TestCase):
 #
 #
 '''
-        self.assertEqual(Result, Expected) 
-    
+        self.assertEqual(Result, Expected)
+
 #
 # Test GenGenericCommentF
 #
 class GenGenericCommentFTest(unittest.TestCase):
     def setUp(self):
-        pass      
+        pass
 
     def tearDown(self):
         pass
-    
+
     def testNormalCase1(self):
         CommentLines = 'Comment Line 1'
         Result = GenGenericCommentF(CommentLines)
@@ -1395,26 +1395,26 @@ class GenGenericCommentFTest(unittest.TestCase):
         CommentLines = '\n'
         Result = GenGenericCommentF(CommentLines)
         Expected = '#\n'
-        self.assertEqual(Result, Expected)        
+        self.assertEqual(Result, Expected)
 
     def testNormalCase3(self):
         CommentLines = '\n\n\n'
         Result = GenGenericCommentF(CommentLines)
         Expected = '#\n#\n#\n'
-        self.assertEqual(Result, Expected)  
+        self.assertEqual(Result, Expected)
 
     def testNormalCase4(self):
         CommentLines = 'coment line 1\n'
         Result = GenGenericCommentF(CommentLines)
         Expected = '# coment line 1\n'
-        self.assertEqual(Result, Expected)  
-        
+        self.assertEqual(Result, Expected)
+
     def testNormalCase5(self):
         CommentLines = 'coment line 1\n coment line 2\n'
         Result = GenGenericCommentF(CommentLines)
         Expected = '# coment line 1\n# coment line 2\n'
-        self.assertEqual(Result, Expected)          
-                
+        self.assertEqual(Result, Expected)
+
 if __name__ == '__main__':
     Logger.Initialize()
     unittest.main()

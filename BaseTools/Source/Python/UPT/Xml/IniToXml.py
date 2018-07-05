@@ -3,9 +3,9 @@
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -96,20 +96,20 @@ def ParseFileList(Line, Map, CurrentKey, PathFunc):
             Attr = Token.split(TAB_EQUAL_SPLIT)
             if len(Attr) != 2 or not Attr[0].strip() or not Attr[1].strip():
                 return False, ST.ERR_WRONG_FILELIST_FORMAT
-            
+
             Key = Attr[0].strip()
             Val = Attr[1].strip()
             if Key not in ['OS', 'Executable']:
                 return False, ST.ERR_UNKNOWN_FILELIST_ATTR % Key
-            
-            if Key == 'OS' and Val not in ["Win32", "Win64", "Linux32", 
-                                           "Linux64", "OS/X32", "OS/X64", 
+
+            if Key == 'OS' and Val not in ["Win32", "Win64", "Linux32",
+                                           "Linux64", "OS/X32", "OS/X64",
                                            "GenericWin", "GenericNix"]:
                 return False, ST.ERR_FILELIST_ATTR % 'OS'
             elif Key == 'Executable' and Val not in ['true', 'false']:
                 return False, ST.ERR_FILELIST_ATTR % 'Executable'
             FileList[1][Key] = Val
-        
+
         Map[CurrentKey].append(FileList)
     return True, ''
 
@@ -143,7 +143,7 @@ def CreateHeaderXml(DistMap, Root):
 #
 # @param Map: Map
 # @param Root: Root
-# @param Tag: Tag 
+# @param Tag: Tag
 #
 def CreateToolsXml(Map, Root, Tag):
     #
@@ -225,7 +225,7 @@ def ValidateRegValues(Key, Value):
 def __ValidateDistHeaderName(Name):
     if len(Name) < 1:
         return False
-    
+
     for Char in Name:
         if ord(Char) < 0x20 or ord(Char) >= 0x7f:
             return False
@@ -314,12 +314,12 @@ def IniToXml(IniFile):
                    'ToolsHeader' : ToolsMap,
                    'MiscellaneousFilesHeader' : MiscMap
                    }
-    
+
     PathValidator = {
                 'ToolsHeader' : ValidateToolsFile,
                 'MiscellaneousFilesHeader' : ValidateMiscFile
                 }
-    
+
     ParsedSection = []
 
     SectionName = ''
@@ -339,13 +339,13 @@ def IniToXml(IniFile):
             if SectionName not in SectionMap:
                 IniParseError(ST.ERR_SECTION_NAME_INVALID % SectionName,
                       IniFile, Index+1)
-            
+
             if SectionName in ParsedSection:
                 IniParseError(ST.ERR_SECTION_REDEFINE % SectionName,
                       IniFile, Index+1)
             else:
                 ParsedSection.append(SectionName)
-            
+
             Map = SectionMap[SectionName]
             continue
         if not Map:
@@ -363,7 +363,7 @@ def IniToXml(IniFile):
                 #
                 # Special for FileList
                 #
-                Valid, Cause = ParseFileList(Line, Map, CurrentKey, 
+                Valid, Cause = ParseFileList(Line, Map, CurrentKey,
                                              PathValidator[SectionName])
                 if not Valid:
                     IniParseError(Cause, IniFile, Index+1)
@@ -374,7 +374,7 @@ def IniToXml(IniFile):
                 # Or if string on the left side of '=' is not a keyword
                 #
                 Map[CurrentKey] = ''.join([Map[CurrentKey], '\n', Line])
-                Valid, Cause = ValidateValues(CurrentKey, 
+                Valid, Cause = ValidateValues(CurrentKey,
                                               Map[CurrentKey], SectionName)
                 if not Valid:
                     IniParseError(Cause, IniFile, Index+1)
@@ -390,7 +390,7 @@ def IniToXml(IniFile):
         if Map[CurrentKey]:
             IniParseError(ST.ERR_KEYWORD_REDEFINE % CurrentKey,
                           IniFile, Index+1)
-        
+
         if id(Map) != id(PreMap) and Map['Copyright']:
             PreMap = Map
             Copyright = Map['Copyright'].lower()
@@ -399,9 +399,9 @@ def IniToXml(IniFile):
                 IniParseError(ST.ERR_COPYRIGHT_CONTENT, IniFile, Index)
             if not Copyright[Pos + len('copyright'):].lstrip(' ').startswith('('):
                 IniParseError(ST.ERR_COPYRIGHT_CONTENT, IniFile, Index)
-        
+
         if CurrentKey == 'FileList':
-            Valid, Cause = ParseFileList(TokenList[1], Map, CurrentKey, 
+            Valid, Cause = ParseFileList(TokenList[1], Map, CurrentKey,
                                          PathValidator[SectionName])
             if not Valid:
                 IniParseError(Cause, IniFile, Index+1)
@@ -411,17 +411,17 @@ def IniToXml(IniFile):
                                           Map[CurrentKey], SectionName)
             if not Valid:
                 IniParseError(Cause, IniFile, Index+1)
-    
+
     if id(Map) != id(PreMap) and Map['Copyright'] and 'copyright' not in Map['Copyright'].lower():
         IniParseError(ST.ERR_COPYRIGHT_CONTENT, IniFile, LastIndex)
 
     #
     # Check mandatory keys
-    #    
-    CheckMdtKeys(DistMap, IniFile, LastIndex, 
+    #
+    CheckMdtKeys(DistMap, IniFile, LastIndex,
                  (('ToolsHeader', ToolsMap), ('MiscellaneousFilesHeader', MiscMap))
                  )
-    
+
     return CreateXml(DistMap, ToolsMap, MiscMap, IniFile)
 
 
@@ -433,15 +433,15 @@ def IniToXml(IniFile):
 # @param LastIndex: Last index of Ini file
 # @param Maps: Tools and Misc section name and map. (('section_name', map),*)
 #
-def CheckMdtKeys(DistMap, IniFile, LastIndex, Maps):    
+def CheckMdtKeys(DistMap, IniFile, LastIndex, Maps):
     MdtDistKeys = ['Name', 'GUID', 'Version', 'Vendor', 'Copyright', 'License', 'Abstract', 'XmlSpecification']
     for Key in MdtDistKeys:
         if Key not in DistMap or DistMap[Key] == '':
             IniParseError(ST.ERR_KEYWORD_MANDATORY % Key, IniFile, LastIndex+1)
-    
+
     if '.' not in DistMap['Version']:
         DistMap['Version'] = DistMap['Version'] + '.0'
-    
+
     DistMap['Date'] = str(strftime("%Y-%m-%dT%H:%M:%S", localtime()))
 
     #
@@ -464,10 +464,10 @@ def CheckMdtKeys(DistMap, IniFile, LastIndex, Maps):
         for Key in Map:
             if Map[Key]:
                 NonEmptyKey += 1
-        
+
         if NonEmptyKey > 0 and not Map['FileList']:
             IniParseError(ST.ERR_KEYWORD_MANDATORY % (Item[0] + '.FileList'), IniFile, LastIndex+1)
-        
+
         if NonEmptyKey > 0 and not Map['Name']:
             IniParseError(ST.ERR_KEYWORD_MANDATORY % (Item[0] + '.Name'), IniFile, LastIndex+1)
 
@@ -478,7 +478,7 @@ def CheckMdtKeys(DistMap, IniFile, LastIndex, Maps):
 # @param MiscMap:  Misc Content
 # @param IniFile:  Ini File
 #
-def CreateXml(DistMap, ToolsMap, MiscMap, IniFile):    
+def CreateXml(DistMap, ToolsMap, MiscMap, IniFile):
     Attrs = [['xmlns', 'http://www.uefi.org/2011/1.1'],
              ['xmlns:xsi', 'http:/www.w3.org/2001/XMLSchema-instance'],
             ]
@@ -493,7 +493,7 @@ def CreateXml(DistMap, ToolsMap, MiscMap, IniFile):
     else:
         FileName = IniFile + '.xml'
     File = open(FileName, 'w')
-    
+
     try:
         File.write(Root.toprettyxml(indent = '  '))
     finally:

@@ -3,9 +3,9 @@
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -123,7 +123,7 @@ class PromptXml(object):
         return CreateXmlElement('%s' % Key, Prompt.GetString(), [], [['Lang', Prompt.GetLang()]])
     def __str__(self):
         return "Prompt = %s Lang = %s" % (self.Prompt, self.Lang)
-        
+
 ##
 # HelpTextXml
 #
@@ -184,7 +184,7 @@ class HeaderXml(object):
             self.CopyrightList.append((HeaderCopyrightLang, XmlElement(SubItem, '%s/Copyright' % Key)))
         for SubItem in XmlList(Item, '%s/License' % Key):
             HeaderLicenseLang = XmlAttribute(SubItem, 'Lang')
-            self.LicenseList.append((HeaderLicenseLang, XmlElement(SubItem, '%s/License' % Key)))    
+            self.LicenseList.append((HeaderLicenseLang, XmlElement(SubItem, '%s/License' % Key)))
         ModuleHeader = ModuleObject()
         ModuleHeader.SetName(self.Name)
         ModuleHeader.SetBaseName(self.BaseName)
@@ -379,7 +379,7 @@ class PackageHeaderXml(object):
         NodeList = [Element1,
                     Element2
                     ]
-        
+
         UNIPackageAbrstractList = []
         UNIPackageDescriptionList = []
         # Get Abstract and Description from Uni File
@@ -391,11 +391,11 @@ class PackageHeaderXml(object):
                     if not StringDefClassObject.StringValue:
                         continue
                     if StringDefClassObject.StringName == DataType.TAB_DEC_PACKAGE_ABSTRACT:
-                        UNIPackageAbrstractList.append((GetLanguageCode1766(Lang), 
+                        UNIPackageAbrstractList.append((GetLanguageCode1766(Lang),
                                                         ConvertSpecialUnicodes(StringDefClassObject.StringValue)))
 
                     if StringDefClassObject.StringName == DataType.TAB_DEC_PACKAGE_DESCRIPTION:
-                        UNIPackageDescriptionList.append((GetLanguageCode1766(Lang), 
+                        UNIPackageDescriptionList.append((GetLanguageCode1766(Lang),
                                                           ConvertSpecialUnicodes(StringDefClassObject.StringValue)))
 
         # Get Abstract and Description from DEC File Header
@@ -411,7 +411,7 @@ class PackageHeaderXml(object):
         for (Lang, Value) in PackageObject2.GetDescription() + UNIPackageDescriptionList:
             if Value:
                 NodeList.append(CreateXmlElement(DataType.TAB_HEADER_DESCRIPTION, Value, [], [['Lang', Lang]]))
-        
+
 
         NodeList.append(['PackagePath', PackageObject2.GetPackagePath()])
         AttributeList = []
@@ -617,16 +617,16 @@ class UserExtensionsXml(object):
                 self.BinaryAbstractList.append((BinaryAbstractLang, XmlElement(SubItem, '%s/BinaryAbstract' % Key)))
             for SubItem in XmlList(Item, '%s/BinaryDescription' % Key):
                 BinaryDescriptionLang = XmlAttribute(SubItem, 'Lang')
-                self.BinaryDescriptionList.append((BinaryDescriptionLang, 
+                self.BinaryDescriptionList.append((BinaryDescriptionLang,
                                                        XmlElement(SubItem, '%s/BinaryDescription' % Key)))
             for SubItem in XmlList(Item, '%s/BinaryCopyright' % Key):
                 BinaryCopyrightLang = XmlAttribute(SubItem, 'Lang')
-                self.BinaryCopyrightList.append((BinaryCopyrightLang, 
+                self.BinaryCopyrightList.append((BinaryCopyrightLang,
                                                      XmlElement(SubItem, '%s/BinaryCopyright' % Key)))
             for SubItem in XmlList(Item, '%s/BinaryLicense' % Key):
                 BinaryLicenseLang = XmlAttribute(SubItem, 'Lang')
-                self.BinaryLicenseList.append((BinaryLicenseLang, 
-                                                   XmlElement(SubItem, '%s/BinaryLicense' % Key)))   
+                self.BinaryLicenseList.append((BinaryLicenseLang,
+                                                   XmlElement(SubItem, '%s/BinaryLicense' % Key)))
 
         DefineItem = XmlNode(Item, '%s/Define' % Key)
         for SubItem in XmlList(DefineItem, 'Define/Statement'):
@@ -697,7 +697,7 @@ class UserExtensionsXml(object):
                 if Value:
                     ChildElement = CreateXmlElement('BinaryLicense', Value, [], [])
                     Root.appendChild(ChildElement)
-                    
+
         NodeList = []
         DefineDict = UserExtension.GetDefinesDict()
         if DefineDict:
@@ -976,7 +976,7 @@ class FilenameXml(object):
         #
         if self.FileType == 'UEFI_IMAGE':
             self.FileType = 'PE32'
-        
+
         Filename.SetGuidValue(Guid)
         Filename.SetFileType(self.FileType)
         Filename.SetFilename(self.Filename)

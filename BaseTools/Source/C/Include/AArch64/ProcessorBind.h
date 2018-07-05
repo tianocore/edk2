@@ -1,7 +1,7 @@
 /** @file
   Processor or Compiler specific defines and types for AArch64.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   Portions copyright (c) 2013, ARM Ltd. All rights reserved.<BR>
 
@@ -32,7 +32,7 @@
 
 #if _MSC_EXTENSIONS
   //
-  // use Microsoft* C complier dependent integer width types 
+  // use Microsoft* C complier dependent integer width types
   //
   typedef unsigned __int64    UINT64;
   typedef __int64             INT64;
@@ -124,21 +124,21 @@ typedef INT64   INTN;
 
     #define GCC_ASM_EXPORT(func__)  \
              .global  _CONCATENATE (__USER_LABEL_PREFIX__, func__)    ;\
-             .type ASM_PFX(func__), %function  
+             .type ASM_PFX(func__), %function
 
     #define GCC_ASM_IMPORT(func__)  \
              .extern  _CONCATENATE (__USER_LABEL_PREFIX__, func__)
-             
+
   #else
     //
-    // .type not supported by Apple Xcode tools 
+    // .type not supported by Apple Xcode tools
     //
-    #define INTERWORK_FUNC(func__)  
+    #define INTERWORK_FUNC(func__)
 
     #define GCC_ASM_EXPORT(func__)  \
              .globl  _CONCATENATE (__USER_LABEL_PREFIX__, func__)    \
-  
-    #define GCC_ASM_IMPORT(name)  
+
+    #define GCC_ASM_IMPORT(name)
 
   #endif
 #endif

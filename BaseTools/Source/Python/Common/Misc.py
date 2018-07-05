@@ -63,11 +63,11 @@ gDependencyDatabase = {}    # arch : {file path : [dependent files list]}
 _TempInfs = []
 
 def GetVariableOffset(mapfilepath, efifilepath, varnames):
-    """ Parse map file to get variable offset in current EFI file 
+    """ Parse map file to get variable offset in current EFI file
     @param mapfilepath    Map file absolution path
     @param efifilepath:   EFI binary file full path
     @param varnames       iteratable container whose elements are variable names to be searched
-    
+
     @return List whos elements are tuple with variable name and raw offset
     """
     lines = []
@@ -77,7 +77,7 @@ def GetVariableOffset(mapfilepath, efifilepath, varnames):
         f.close()
     except:
         return None
-    
+
     if len(lines) == 0: return None
     firstline = lines[0].strip()
     if (firstline.startswith("Archive member included ") and
@@ -177,7 +177,7 @@ def _parseGeneral(lines, efifilepath, varnames):
             continue
         if line.startswith("entry point at"):
             status = 3
-            continue        
+            continue
         if status == 1 and len(line) != 0:
             m =  secReGeneral.match(line)
             assert m is not None, "Fail to parse the section in map file , line is %s" % line
@@ -257,7 +257,7 @@ def ProcessDuplicatedInf(Path, BaseName, Workspace):
     #
     # A temporary INF is copied to database path which must have write permission
     # The temporary will be removed at the end of build
-    # In case of name conflict, the file name is 
+    # In case of name conflict, the file name is
     # FILE_GUIDBaseName (0D1B936F-68F3-4589-AFCC-FB8B7AEBC836module.inf)
     #
     TempFullPath = os.path.join(DbDir,
@@ -268,7 +268,7 @@ def ProcessDuplicatedInf(Path, BaseName, Workspace):
     #
     # To build same module more than once, the module path with FILE_GUID overridden has
     # the file name FILE_GUIDmodule.inf, but the relative path (self.MetaFile.File) is the real path
-    # in DSC which is used as relative path by C files and other files in INF. 
+    # in DSC which is used as relative path by C files and other files in INF.
     # A trick was used: all module paths are PathClass instances, after the initialization
     # of PathClass, the PathClass.Path is overridden by the temporary INF path.
     #
@@ -287,7 +287,7 @@ def ProcessDuplicatedInf(Path, BaseName, Workspace):
     # If file exists, compare contents
     #
     if os.path.exists(TempFullPath):
-        with open(str(Path), 'rb') as f1, open(TempFullPath, 'rb') as f2: 
+        with open(str(Path), 'rb') as f1, open(TempFullPath, 'rb') as f2:
             if f1.read() == f2.read():
                 return RtPath
     _TempInfs.append(TempFullPath)
@@ -1545,29 +1545,29 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
 #  Used to avoid split issue while the value string contain "|" character
 #
 #  @param[in] Setting:  A String contain value/datum type/token number information;
-#  
-#  @retval   ValueList: A List contain value, datum type and toke number. 
+#
+#  @retval   ValueList: A List contain value, datum type and toke number.
 #
 def AnalyzePcdData(Setting):
     ValueList = ['', '', '']
 
     ValueRe = re.compile(r'^\s*L?\".*\|.*\"')
     PtrValue = ValueRe.findall(Setting)
-    
+
     ValueUpdateFlag = False
-    
+
     if len(PtrValue) >= 1:
         Setting = re.sub(ValueRe, '', Setting)
         ValueUpdateFlag = True
 
     TokenList = Setting.split(TAB_VALUE_SPLIT)
     ValueList[0:len(TokenList)] = TokenList
-    
+
     if ValueUpdateFlag:
         ValueList[0] = PtrValue[0]
-        
-    return ValueList   
- 
+
+    return ValueList
+
 ## check format of PCD value against its the datum type
 #
 # For PCD value setting
@@ -1770,7 +1770,7 @@ class PathClass(object):
             OtherKey = Other.Path
         else:
             OtherKey = str(Other)
-            
+
         SelfKey = self.Path
         if SelfKey == OtherKey:
             return 0
@@ -1908,7 +1908,7 @@ class PeImageClass():
     def _ByteListToStr(self, ByteList):
         String = ''
         for index in range(len(ByteList)):
-            if ByteList[index] == 0: 
+            if ByteList[index] == 0:
                 break
             String += chr(ByteList[index])
         return String
@@ -1945,11 +1945,11 @@ class DefaultStore():
             if sid == minid:
                 return name
 class SkuClass():
-    
+
     DEFAULT = 0
     SINGLE = 1
     MULTIPLE =2
-    
+
     def __init__(self,SkuIdentifier='', SkuIds=None):
         if SkuIds is None:
             SkuIds = {}
@@ -1961,7 +1961,7 @@ class SkuClass():
                 EdkLogger.error("build", PARAMETER_INVALID,
                             ExtraData = "SKU-ID [%s] value %s exceeds the max value of UINT64"
                                       % (SkuName, SkuId))
-        
+
         self.AvailableSkuIds = sdict()
         self.SkuIdSet = []
         self.SkuIdNumberSet = []
@@ -1975,10 +1975,10 @@ class SkuClass():
             self.SkuIdSet = SkuIds.keys()
             self.SkuIdNumberSet = [num[0].strip() + 'U' for num in SkuIds.values()]
         else:
-            r = SkuIdentifier.split('|') 
+            r = SkuIdentifier.split('|')
             self.SkuIdSet=[(r[k].strip()).upper() for k in range(len(r))]
             k = None
-            try: 
+            try:
                 self.SkuIdNumberSet = [SkuIds[k][0].strip() + 'U' for k in self.SkuIdSet]
             except Exception:
                 EdkLogger.error("build", PARAMETER_INVALID,
@@ -2027,7 +2027,7 @@ class SkuClass():
         skuorderset = []
         for skuname in self.SkuIdSet:
             skuorderset.append(self.GetSkuChain(skuname))
-        
+
         skuorder = []
         for index in range(max(len(item) for item in skuorderset)):
             for subset in skuorderset:
@@ -2039,8 +2039,8 @@ class SkuClass():
 
         return skuorder
 
-    def __SkuUsageType(self): 
-        
+    def __SkuUsageType(self):
+
         if self.__SkuIdentifier.upper() == "ALL":
             return SkuClass.MULTIPLE
 
@@ -2073,7 +2073,7 @@ class SkuClass():
         return ArrayStr
     def __GetAvailableSkuIds(self):
         return self.AvailableSkuIds
-    
+
     def __GetSystemSkuID(self):
         if self.__SkuUsageType() == SkuClass.SINGLE:
             if len(self.SkuIdSet) == 1:

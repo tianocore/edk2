@@ -114,8 +114,8 @@ class WorkspaceDatabase(object):
 
             # get the parser ready for this file
             MetaFile = self._FILE_PARSER_[FileType](
-                                FilePath, 
-                                FileType, 
+                                FilePath,
+                                FileType,
                                 Arch,
                                 MetaFileStorage(self.WorkspaceDb.Cur, FilePath, FileType)
                                 )
@@ -162,7 +162,7 @@ class WorkspaceDatabase(object):
             # remove db file in case inconsistency between db and file in file system
             if self._CheckWhetherDbNeedRenew(RenewDb, DbPath):
                 os.remove(DbPath)
-        
+
         # create db with optimized parameters
         self.Conn = sqlite3.connect(DbPath, isolation_level='DEFERRED')
         self.Conn.execute("PRAGMA synchronous=OFF")
@@ -199,11 +199,11 @@ class WorkspaceDatabase(object):
     def _CheckWhetherDbNeedRenew (self, force, DbPath):
         # if database does not exist, we need do nothing
         if not os.path.exists(DbPath): return False
-            
+
         # if user force to renew database, then not check whether database is out of date
         if force: return True
-        
-        #    
+
+        #
         # Check the time of last modified source file or build.exe
         # if is newer than time of database, then database need to be re-created.
         #
@@ -217,15 +217,15 @@ class WorkspaceDatabase(object):
             if rootPath == "" or rootPath is None:
                 EdkLogger.verbose("\nFail to find the root path of build.exe or python sources, so can not \
 determine whether database file is out of date!\n")
-        
+
             # walk the root path of source or build's binary to get the time last modified.
-        
+
             for root, dirs, files in os.walk (rootPath):
                 for dir in dirs:
-                    # bypass source control folder 
+                    # bypass source control folder
                     if dir.lower() in [".svn", "_svn", "cvs"]:
                         dirs.remove(dir)
-                        
+
                 for file in files:
                     ext = os.path.splitext(file)[1]
                     if ext.lower() == ".py":            # only check .py files
@@ -235,9 +235,9 @@ determine whether database file is out of date!\n")
         if timeOfToolModified > os.stat(DbPath).st_mtime:
             EdkLogger.verbose("\nWorkspace database is out of data!")
             return True
-            
+
         return False
-            
+
     ## Initialize build database
     def InitDatabase(self):
         EdkLogger.verbose("\nInitialize build database started ...")

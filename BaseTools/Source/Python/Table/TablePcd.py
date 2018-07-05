@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create/update/query/erase table for pcds
 #
-# Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -21,7 +21,7 @@ from Common.StringUtils import ConvertToSqlString
 ## TablePcd
 #
 # This class defined a table used for pcds
-# 
+#
 # @param object:       Inherited from object class
 #
 #
@@ -29,7 +29,7 @@ class TablePcd(Table):
     def __init__(self, Cursor):
         Table.__init__(self, Cursor)
         self.Table = 'Pcd'
-    
+
     ## Create table
     #
     # Create table Pcd

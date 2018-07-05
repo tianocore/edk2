@@ -360,7 +360,7 @@ class BuildRule:
             # Clean up the line and replace path separator with native one
             Line = self.RuleContent[Index].strip().replace(self._PATH_SEP, os.path.sep)
             self.RuleContent[Index] = Line
-            
+
             # find the build_rule_version
             if Line and Line[0] == "#" and Line.find(TAB_BUILD_RULE_VERSION) != -1:
                 if Line.find("=") != -1 and Line.find("=") < (len(Line) - 1) and (Line[(Line.find("=") + 1):]).split():

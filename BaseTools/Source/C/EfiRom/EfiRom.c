@@ -1,9 +1,9 @@
 /** @file
 Utility program to create an EFI option ROM image from binary and EFI PE32 files.
 
-Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available 
-under the terms and conditions of the BSD License which accompanies this 
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available
+under the terms and conditions of the BSD License which accompanies this
 distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
@@ -26,8 +26,8 @@ main (
 /*++
 
 Routine Description:
-  
-  Given an EFI image filename, create a ROM-able image by creating an option 
+
+  Given an EFI image filename, create a ROM-able image by creating an option
   ROM header and PCI data structure, filling them in, and then writing the
   option ROM header + PCI data structure + EFI image out to the output file.
 
@@ -71,11 +71,11 @@ Returns:
   } else if (mOptions.Debug) {
     SetPrintLevel(DebugLevel);
   }
-  
+
   if (mOptions.Verbose) {
     VerboseMsg("%s tool start.\n", UTILITY_NAME);
   }
-  
+
   //
   // If dumping an image, then do that and quit
   //
@@ -208,7 +208,7 @@ BailOut:
     VerboseMsg("%s tool done with return code is 0x%x.\n", UTILITY_NAME, GetUtilityStatus ());
   }
 
-  return GetUtilityStatus (); 
+  return GetUtilityStatus ();
 }
 
 static
@@ -221,7 +221,7 @@ ProcessBinFile (
 /*++
 
 Routine Description:
-  
+
   Process a binary input file.
 
 Arguments:
@@ -247,7 +247,7 @@ Returns:
   UINT32                    Index;
   UINT8                     ByteCheckSum;
   UINT16                    CodeType;
- 
+
   PciDs23 = NULL;
   PciDs30 = NULL;
   Status = STATUS_SUCCESS;
@@ -351,7 +351,7 @@ Returns:
   } else {
     PciDs30->ImageLength = (UINT16) (TotalSize / 512);
     CodeType = PciDs30->CodeType;
-	}
+  }
 
   //
   // If this is the last image, then set the LAST bit unless requested not
@@ -362,13 +362,13 @@ Returns:
       PciDs23->Indicator = INDICATOR_LAST;
     } else {
       PciDs30->Indicator = INDICATOR_LAST;
-		}
+    }
   } else {
     if (mOptions.Pci23 == 1) {
       PciDs23->Indicator = 0;
     } else {
       PciDs30->Indicator = 0;
-		}
+    }
   }
 
   if (CodeType != PCI_CODE_TYPE_EFI_IMAGE) {
@@ -431,7 +431,7 @@ ProcessEfiFile (
 /*++
 
 Routine Description:
-  
+
   Process a PE32 EFI file.
 
 Arguments:
@@ -502,7 +502,7 @@ Returns:
   } else {
     HeaderPadBytes = 0;
   }
-  
+
   //
   // For Pci3.0 to use the different data structure.
   //
@@ -600,7 +600,7 @@ Returns:
   // Check size
   //
   if (TotalSize > MAX_OPTION_ROM_SIZE) {
-    Error (NULL, 0, 2000, "Invalid", "Option ROM image %s size exceeds limit of 0x%X bytes.", InFile->FileName, MAX_OPTION_ROM_SIZE);	
+    Error (NULL, 0, 2000, "Invalid", "Option ROM image %s size exceeds limit of 0x%X bytes.", InFile->FileName, MAX_OPTION_ROM_SIZE);
     Status = STATUS_ERROR;
     goto BailOut;
   }
@@ -685,12 +685,12 @@ Returns:
   if ((InFile->Next == NULL) && (mOptions.NoLast == 0)) {
     if (mOptions.Pci23 == 1) {
       PciDs23.Indicator = INDICATOR_LAST;
-	  } else {
+    } else {
     PciDs30.Indicator = INDICATOR_LAST;}
   } else {
     if (mOptions.Pci23 == 1) {
       PciDs23.Indicator = 0;
-	} else {
+  } else {
       PciDs30.Indicator = 0;
     }
   }
@@ -723,13 +723,13 @@ Returns:
       Error (NULL, 0, 0002, "Failed to write PCI ROM header to output file!", NULL);
       Status = STATUS_ERROR;
       goto BailOut;
-    } 
+    }
   } else {
     if (fwrite (&PciDs30, sizeof (PciDs30), 1, OutFptr) != 1) {
       Error (NULL, 0, 0002, "Failed to write PCI ROM header to output file!", NULL);
       Status = STATUS_ERROR;
       goto BailOut;
-    } 
+    }
   }
 
   //
@@ -819,7 +819,7 @@ CheckPE32File (
 /*++
 
 Routine Description:
-  
+
   Given a file pointer to a supposed PE32 image file, verify that it is indeed a
   PE32 image file, and then return the machine type in the supplied pointer.
 
@@ -911,7 +911,7 @@ ParseCommandLine (
 /*++
 
 Routine Description:
-  
+
   Given the Argc/Argv program arguments, and a pointer to an options structure,
   parse the command-line options and check their validity.
 
@@ -973,12 +973,12 @@ Returns:
     Usage ();
     return STATUS_ERROR;
   }
-  
+
   if ((stricmp(Argv[0], "-h") == 0) || (stricmp(Argv[0], "--help") == 0)) {
     Usage();
     return STATUS_ERROR;
   }
-  
+
   if ((stricmp(Argv[0], "--version") == 0)) {
     Version();
     return STATUS_ERROR;
@@ -1222,7 +1222,7 @@ Returns:
         ReturnStatus = STATUS_ERROR;
         goto Done;
       }
-      
+
       //
       // set flag and class code for this image.
       //
@@ -1239,7 +1239,7 @@ Returns:
       } else {
         if (PrevFileList == NULL) {
           PrevFileList = FileList;
-        } else {          
+        } else {
           PrevFileList->Next = FileList;
         }
       }
@@ -1273,7 +1273,7 @@ Returns:
       ReturnStatus = STATUS_ERROR;
       goto Done;
     }
-  
+
     if (!Options->DevIdCount) {
       Error (NULL, 0, 2000, "Missing Device ID in command line", NULL);
       ReturnStatus = STATUS_ERROR;
@@ -1307,7 +1307,7 @@ Version (
 /*++
 
 Routine Description:
-  
+
   Print version information for this utility.
 
 Arguments:
@@ -1321,7 +1321,7 @@ Returns:
 {
  fprintf (stdout, "%s Version %d.%d %s \n", UTILITY_NAME, UTILITY_MAJOR_VERSION, UTILITY_MINOR_VERSION, __BUILD_VERSION);
 }
-   
+
 static
 void
 Usage (
@@ -1330,7 +1330,7 @@ Usage (
 /*++
 
 Routine Description:
-  
+
   Print usage information for this utility.
 
 Arguments:
@@ -1347,11 +1347,11 @@ Returns:
   // Summary usage
   //
   fprintf (stdout, "Usage: %s -f VendorId -i DeviceId [options] [file name<s>] \n\n", UTILITY_NAME);
-  
+
   //
   // Copyright declaration
-  // 
-  fprintf (stdout, "Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.\n\n");
+  //
+  fprintf (stdout, "Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -1386,7 +1386,7 @@ Returns:
   fprintf (stdout, "  -q, --quiet\n\
             Disable all messages except FATAL ERRORS.\n");
   fprintf (stdout, "  --debug [#,0-9]\n\
-            Enable debug messages at level #.\n");  
+            Enable debug messages at level #.\n");
 }
 
 static
@@ -1515,7 +1515,7 @@ Returns:
     fprintf (stdout, "    Device ID               0x%04X\n", PciDs30.DeviceId);
     fprintf (stdout, "    Length                  0x%04X\n", PciDs30.Length);
     fprintf (stdout, "    Revision                0x%04X\n", PciDs30.Revision);
-    fprintf (stdout, "    DeviceListOffset        0x%02X\n", PciDs30.DeviceListOffset);    
+    fprintf (stdout, "    DeviceListOffset        0x%02X\n", PciDs30.DeviceListOffset);
     if (PciDs30.DeviceListOffset) {
       //
       // Print device ID list
@@ -1549,8 +1549,8 @@ Returns:
     fprintf (stdout, "    Code revision:          0x%04X\n", PciDs30.CodeRevision);
     fprintf (stdout, "    MaxRuntimeImageLength   0x%02X\n", PciDs30.MaxRuntimeImageLength);
     fprintf (stdout, "    ConfigUtilityCodeHeaderOffset 0x%02X\n", PciDs30.ConfigUtilityCodeHeaderOffset);
-    fprintf (stdout, "    DMTFCLPEntryPointOffset 0x%02X\n", PciDs30.DMTFCLPEntryPointOffset);   
-    fprintf (stdout, "    Indicator               0x%02X", PciDs30.Indicator);    
+    fprintf (stdout, "    DMTFCLPEntryPointOffset 0x%02X\n", PciDs30.DMTFCLPEntryPointOffset);
+    fprintf (stdout, "    Indicator               0x%02X", PciDs30.Indicator);
     }
     //
     // Print the indicator, used to flag the last image
@@ -1566,7 +1566,7 @@ Returns:
     if (mOptions.Pci23 == 1) {
       fprintf (stdout, "    Code type              0x%02X", PciDs23.CodeType);
     } else {
-      fprintf (stdout, "    Code type               0x%02X", PciDs30.CodeType); 
+      fprintf (stdout, "    Code type               0x%02X", PciDs30.CodeType);
     }
     if (PciDs23.CodeType == PCI_CODE_TYPE_EFI_IMAGE || PciDs30.CodeType == PCI_CODE_TYPE_EFI_IMAGE) {
       fprintf (stdout, "   (EFI image)\n");

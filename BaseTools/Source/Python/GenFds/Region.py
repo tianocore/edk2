@@ -311,7 +311,7 @@ class Region(RegionClassObject):
             if self.Offset >= End:
                 Start = End
                 continue
-            # region located in current blocks 
+            # region located in current blocks
             else:
                 # region ended within current blocks
                 if self.Offset + self.Size <= End:
@@ -363,5 +363,5 @@ class Region(RegionClassObject):
                 else:
                     Index += 1
 
-            
+
 

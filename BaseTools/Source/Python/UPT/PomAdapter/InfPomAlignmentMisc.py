@@ -3,9 +3,9 @@
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -184,16 +184,16 @@ def GenBinaryData(BinaryData, BinaryObj, BinariesDict, AsBuildIns, BinaryFileObj
         else:
             TagName = ''
             Family = ''
-        
+
         FFE = ItemObj.GetFeatureFlagExp()
 
         #
         # If have architecturie specified, then use the specified architecturie;
         # If the section tag does not have an architecture modifier or the modifier is "common" (case in-sensitive),
-        # and the VALID_ARCHITECTURES comment exists, the list from the VALID_ARCHITECTURES comment 
+        # and the VALID_ARCHITECTURES comment exists, the list from the VALID_ARCHITECTURES comment
         # can be used for the attribute.
         # If both not have VALID_ARCHITECTURE comment and no architecturie specified, then keep it empty.
-        #        
+        #
         SupArchList = sorted(ConvertArchList(ItemObj.GetSupArchList()))
         if len(SupArchList) == 1 and SupArchList[0] == 'COMMON':
             if not (len(OriSupArchList) == 1 or OriSupArchList[0] == 'COMMON'):
@@ -208,7 +208,7 @@ def GenBinaryData(BinaryData, BinaryObj, BinariesDict, AsBuildIns, BinaryFileObj
         #
         # Get GUID value of the GUID CName in the DEC file
         #
-        if ItemObj.GetType() == DT.SUBTYPE_GUID_BINARY_FILE_TYPE:                
+        if ItemObj.GetType() == DT.SUBTYPE_GUID_BINARY_FILE_TYPE:
             if not CheckGuidRegFormat(ItemObj.GetGuidValue()):
                 if not DecObjList:
                     if DT.TAB_HORIZON_LINE_SPLIT in ItemObj.GetGuidValue() or \
@@ -231,12 +231,12 @@ def GenBinaryData(BinaryData, BinaryObj, BinariesDict, AsBuildIns, BinaryFileObj
                                 FileNameObj.SetGuidValue(GuidObj.GetGuid())
                                 break
 
-                    if not FileNameObj.GetGuidValue():                        
+                    if not FileNameObj.GetGuidValue():
                         Logger.Error("\nMkPkg",
                                          FORMAT_INVALID,
                                          ST.ERR_DECPARSE_CGUID_NOT_FOUND % \
                                          (ItemObj.GetGuidValue()),
-                                         RaiseError=True)  
+                                         RaiseError=True)
             else:
                 FileNameObj.SetGuidValue(ItemObj.GetGuidValue().strip())
 

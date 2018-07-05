@@ -3,9 +3,9 @@
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -39,21 +39,21 @@ from Library.Misc import GetLocalValue
 ## GenTailCommentLines
 #
 # @param TailCommentLines:  the tail comment lines that need to be generated
-# @param LeadingSpaceNum:   the number of leading space needed for non-first 
+# @param LeadingSpaceNum:   the number of leading space needed for non-first
 #                            line tail comment
-# 
+#
 def GenTailCommentLines (TailCommentLines, LeadingSpaceNum = 0):
     TailCommentLines = TailCommentLines.rstrip(END_OF_LINE)
     CommentStr = TAB_SPACE_SPLIT*2 + TAB_SPECIAL_COMMENT + TAB_SPACE_SPLIT + \
     (END_OF_LINE + LeadingSpaceNum * TAB_SPACE_SPLIT + TAB_SPACE_SPLIT*2 + TAB_SPECIAL_COMMENT + \
      TAB_SPACE_SPLIT).join(GetSplitValueList(TailCommentLines, END_OF_LINE))
-     
+
     return CommentStr
 
 ## GenGenericComment
 #
 # @param CommentLines:   Generic comment Text, maybe Multiple Lines
-# 
+#
 def GenGenericComment (CommentLines):
     if not CommentLines:
         return ''
@@ -68,8 +68,8 @@ def GenGenericComment (CommentLines):
 #  and for line with only <EOL>, '#\n' will be generated instead of '# \n'
 #
 # @param CommentLines:   Generic comment Text, maybe Multiple Lines
-# @return CommentStr:    Generated comment line 
-# 
+# @return CommentStr:    Generated comment line
+#
 def GenGenericCommentF (CommentLines, NumOfPound=1, IsPrompt=False, IsInfLibraryClass=False):
     if not CommentLines:
         return ''
@@ -104,7 +104,7 @@ def GenGenericCommentF (CommentLines, NumOfPound=1, IsPrompt=False, IsInfLibrary
                     CommentStr += TAB_COMMENT_SPLIT * NumOfPound + TAB_SPACE_SPLIT * 16 + Line + END_OF_LINE
                 else:
                     CommentStr += TAB_COMMENT_SPLIT * NumOfPound + TAB_SPACE_SPLIT + Line + END_OF_LINE
-     
+
     return CommentStr
 
 
@@ -112,7 +112,7 @@ def GenGenericCommentF (CommentLines, NumOfPound=1, IsPrompt=False, IsInfLibrary
 #
 # Generate Header comment sections
 #
-# @param Abstract      One line of abstract 
+# @param Abstract      One line of abstract
 # @param Description   multiple lines of Description
 # @param Copyright     possible multiple copyright lines
 # @param License       possible multiple license lines
@@ -148,9 +148,9 @@ def GenHeaderCommentSection(Abstract, Description, Copyright, License, IsBinaryH
         Content += CommChar + TAB_SPACE_SPLIT + ('\r\n' + CommChar + TAB_SPACE_SPLIT).join(GetSplitValueList\
                                                   (Description, '\n'))
         Content += '\r\n' + CommChar + '\r\n'
-  
+
     #
-    # There is no '#\n' line to separate multiple copyright lines in code base 
+    # There is no '#\n' line to separate multiple copyright lines in code base
     #
     if Copyright:
         Copyright = Copyright.rstrip('\r\n')
@@ -163,12 +163,12 @@ def GenHeaderCommentSection(Abstract, Description, Copyright, License, IsBinaryH
         Content += CommChar + TAB_SPACE_SPLIT + ('\r\n' + CommChar + TAB_SPACE_SPLIT).join(GetSplitValueList\
                                                   (License, '\n'))
         Content += '\r\n' + CommChar + '\r\n'
-    
+
     if CommChar == TAB_COMMENT_EDK1_SPLIT:
         Content += CommChar + TAB_SPACE_SPLIT + TAB_STAR + TAB_COMMENT_EDK1_END + '\r\n'
     else:
         Content += CommChar * 2 + '\r\n'
-    
+
     return Content
 
 
@@ -177,11 +177,11 @@ def GenHeaderCommentSection(Abstract, Description, Copyright, License, IsBinaryH
 #
 # @param Usage:            Usage type
 # @param TailCommentText:  Comment text for tail comment
-# 
+#
 def GenInfPcdTailComment (Usage, TailCommentText):
     if (Usage == ITEM_UNDEFINED) and (not TailCommentText):
         return ''
-    
+
     CommentLine = TAB_SPACE_SPLIT.join([Usage, TailCommentText])
     return GenTailCommentLines(CommentLine)
 
@@ -190,16 +190,16 @@ def GenInfPcdTailComment (Usage, TailCommentText):
 #
 # @param Usage:            Usage type
 # @param TailCommentText:  Comment text for tail comment
-# 
+#
 def GenInfProtocolPPITailComment (Usage, Notify, TailCommentText):
     if (not Notify) and (Usage == ITEM_UNDEFINED) and (not TailCommentText):
         return ''
-    
+
     if Notify:
         CommentLine = USAGE_ITEM_NOTIFY + " ## "
     else:
         CommentLine = ''
-    
+
     CommentLine += TAB_SPACE_SPLIT.join([Usage, TailCommentText])
     return GenTailCommentLines(CommentLine)
 
@@ -208,39 +208,39 @@ def GenInfProtocolPPITailComment (Usage, Notify, TailCommentText):
 #
 # @param Usage:            Usage type
 # @param TailCommentText:  Comment text for tail comment
-# 
+#
 def GenInfGuidTailComment (Usage, GuidTypeList, VariableName, TailCommentText):
     GuidType = GuidTypeList[0]
     if (Usage == ITEM_UNDEFINED) and (GuidType == ITEM_UNDEFINED) and \
         (not TailCommentText):
         return ''
-    
-    FirstLine = Usage + " ## " + GuidType    
+
+    FirstLine = Usage + " ## " + GuidType
     if GuidType == TAB_INF_GUIDTYPE_VAR:
         FirstLine += ":" + VariableName
-      
+
     CommentLine = TAB_SPACE_SPLIT.join([FirstLine, TailCommentText])
     return GenTailCommentLines(CommentLine)
 
 ## GenDecGuidTailComment
 #
 # @param SupModuleList:  Supported module type list
-# 
-def GenDecTailComment (SupModuleList):   
+#
+def GenDecTailComment (SupModuleList):
     CommentLine = TAB_SPACE_SPLIT.join(SupModuleList)
     return GenTailCommentLines(CommentLine)
 
 
 ## _GetHelpStr
-#  get HelpString from a list of HelpTextObject, the priority refer to 
+#  get HelpString from a list of HelpTextObject, the priority refer to
 #  related HLD
 #
 #  @param HelpTextObjList: List of HelpTextObject
-# 
+#
 #  @return HelpStr: the help text string found, '' means no help text found
 #
 def _GetHelpStr(HelpTextObjList):
-    ValueList = []        
+    ValueList = []
     for HelpObj in HelpTextObjList:
         ValueList.append((HelpObj.GetLang(), HelpObj.GetString()))
     return GetLocalValue(ValueList, True)

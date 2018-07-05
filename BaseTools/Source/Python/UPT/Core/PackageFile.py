@@ -2,11 +2,11 @@
 #
 # PackageFile class represents the zip file of a distribution package.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -52,25 +52,25 @@ class PackageFile:
             for Filename in self._ZipFile.namelist():
                 self._Files[os.path.normpath(Filename)] = Filename
         except BaseException as Xstr:
-            Logger.Error("PackagingTool", FILE_OPEN_FAILURE, 
+            Logger.Error("PackagingTool", FILE_OPEN_FAILURE,
                             ExtraData="%s (%s)" % (FileName, str(Xstr)))
 
         BadFile = self._ZipFile.testzip()
         if BadFile is not None:
-            Logger.Error("PackagingTool", FILE_CHECKSUM_FAILURE, 
+            Logger.Error("PackagingTool", FILE_CHECKSUM_FAILURE,
                             ExtraData="[%s] in %s" % (BadFile, FileName))
-    
+
     def GetZipFile(self):
         return self._ZipFile
-    
-    ## Get file name 
+
+    ## Get file name
     #
     def __str__(self):
         return self._FileName
-    
+
     ## Extract the file
-    # 
-    # @param To:  the destination file 
+    #
+    # @param To:  the destination file
     #
     def Unpack(self, ToDest):
         for FileN in self._ZipFile.namelist():
@@ -78,11 +78,11 @@ class PackageFile:
             Msg = "%s -> %s" % (FileN, ToFile)
             Logger.Info(Msg)
             self.Extract(FileN, ToFile)
-    
+
     ## Extract the file
-    # 
-    # @param File:  the extracted file 
-    # @param ToFile:  the destination file 
+    #
+    # @param File:  the extracted file
+    # @param ToFile:  the destination file
     #
     def UnpackFile(self, File, ToFile):
         File = File.replace('\\', '/')
@@ -91,13 +91,13 @@ class PackageFile:
             Logger.Info(Msg)
             self.Extract(File, ToFile)
             return ToFile
-        
+
         return ''
-    
+
     ## Extract the file
-    # 
-    # @param Which:  the source path 
-    # @param ToDest:  the destination path 
+    #
+    # @param Which:  the source path
+    # @param ToDest:  the destination path
     #
     def Extract(self, Which, ToDest):
         Which = os.path.normpath(Which)
@@ -107,7 +107,7 @@ class PackageFile:
         try:
             FileContent = self._ZipFile.read(self._Files[Which])
         except BaseException as Xstr:
-            Logger.Error("PackagingTool", FILE_DECOMPRESS_FAILURE, 
+            Logger.Error("PackagingTool", FILE_DECOMPRESS_FAILURE,
                             ExtraData="[%s] in %s (%s)" % (Which, \
                                                            self._FileName, \
                                                            str(Xstr)))
@@ -120,19 +120,19 @@ class PackageFile:
             else:
                 ToFile = __FileHookOpen__(ToDest, 'wb')
         except BaseException as Xstr:
-            Logger.Error("PackagingTool", FILE_OPEN_FAILURE, 
+            Logger.Error("PackagingTool", FILE_OPEN_FAILURE,
                             ExtraData="%s (%s)" % (ToDest, str(Xstr)))
 
         try:
             ToFile.write(FileContent)
             ToFile.close()
         except BaseException as Xstr:
-            Logger.Error("PackagingTool", FILE_WRITE_FAILURE, 
+            Logger.Error("PackagingTool", FILE_WRITE_FAILURE,
                             ExtraData="%s (%s)" % (ToDest, str(Xstr)))
 
     ## Remove the file
-    # 
-    # @param Files:  the removed files 
+    #
+    # @param Files:  the removed files
     #
     def Remove(self, Files):
         TmpDir = os.path.join(tempfile.gettempdir(), ".packaging")
@@ -144,7 +144,7 @@ class PackageFile:
         for SinF in Files:
             SinF = os.path.normpath(SinF)
             if SinF not in self._Files:
-                Logger.Error("PackagingTool", FILE_NOT_FOUND, 
+                Logger.Error("PackagingTool", FILE_NOT_FOUND,
                                 ExtraData="%s is not in %s!" % \
                                 (SinF, self._FileName))
             self._Files.pop(SinF)
@@ -159,12 +159,12 @@ class PackageFile:
         RemoveDirectory(TmpDir, True)
 
     ## Pack the files under Top directory, the directory shown in the zipFile start from BaseDir,
-    # BaseDir should be the parent directory of the Top directory, for example, 
-    # Pack(Workspace\Dir1, Workspace) will pack files under Dir1, and the path in the zipfile will 
+    # BaseDir should be the parent directory of the Top directory, for example,
+    # Pack(Workspace\Dir1, Workspace) will pack files under Dir1, and the path in the zipfile will
     # start from Workspace
-    # 
-    # @param Top:  the top directory 
-    # @param BaseDir:  the base directory 
+    #
+    # @param Top:  the top directory
+    # @param BaseDir:  the base directory
     #
     def Pack(self, Top, BaseDir):
         if not os.path.isdir(Top):
@@ -175,14 +175,14 @@ class PackageFile:
         Cwd = os.getcwd()
         os.chdir(BaseDir)
         RelaDir = Top[Top.upper().find(BaseDir.upper()).\
-                      join(len(BaseDir).join(1)):] 
+                      join(len(BaseDir).join(1)):]
 
         for Root, Dirs, Files in os.walk(RelaDir):
             if 'CVS' in Dirs:
                 Dirs.remove('CVS')
             if '.svn' in Dirs:
                 Dirs.remove('.svn')
-            
+
             for Dir in Dirs:
                 if Dir.startswith('.'):
                     Dirs.remove(Dir)
@@ -200,8 +200,8 @@ class PackageFile:
         os.chdir(Cwd)
 
     ## Pack the file
-    # 
-    # @param Files:  the files to pack 
+    #
+    # @param Files:  the files to pack
     #
     def PackFiles(self, Files):
         for File in Files:
@@ -211,9 +211,9 @@ class PackageFile:
             os.chdir(Cwd)
 
     ## Pack the file
-    # 
-    # @param File:  the files to pack 
-    # @param ArcName:  the Arc Name 
+    #
+    # @param File:  the files to pack
+    # @param ArcName:  the Arc Name
     #
     def PackFile(self, File, ArcName=None):
         try:
@@ -221,7 +221,7 @@ class PackageFile:
             # avoid packing same file multiple times
             #
             if platform.system() != 'Windows':
-                File = File.replace('\\', '/')            
+                File = File.replace('\\', '/')
             ZipedFilesNameList = self._ZipFile.namelist()
             for ZipedFile in ZipedFilesNameList:
                 if File == os.path.normpath(ZipedFile):
@@ -233,9 +233,9 @@ class PackageFile:
                             ExtraData="%s (%s)" % (File, str(Xstr)))
 
     ## Write data to the packed file
-    # 
-    # @param Data:  data to write 
-    # @param ArcName:  the Arc Name 
+    #
+    # @param Data:  data to write
+    # @param ArcName:  the Arc Name
     #
     def PackData(self, Data, ArcName):
         try:
@@ -247,7 +247,7 @@ class PackageFile:
                             ExtraData="%s (%s)" % (ArcName, str(Xstr)))
 
     ## Close file
-    # 
+    #
     #
     def Close(self):
         self._ZipFile.close()

@@ -1,11 +1,11 @@
 ## @file
-# This file contained the parser for [Guids], [Ppis], [Protocols] sections in INF file 
+# This file contained the parser for [Guids], [Ppis], [Protocols] sections in INF file
 #
-# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -37,7 +37,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
     #
     def InfGuidParser(self, SectionString, InfSectionObject, FileName):
         #
-        # Macro defined in this section 
+        # Macro defined in this section
         #
         SectionMacros = {}
         ValueList = []
@@ -88,7 +88,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
 
                 #
                 # Replace with Local section Macro and [Defines] section Macro.
-                #            
+                #
                 ValueList = [InfExpandMacro(Value, (FileName, LineContent, LineNo),
                                             self.FileLocalMacros, SectionMacros, True)
                             for Value in ValueList]
@@ -104,7 +104,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
 
         #
         # Current section archs
-        #    
+        #
         ArchList = []
         LineIndex = -1
         for Item in self.LastSectionHeaderContent:
@@ -124,7 +124,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
     #
     def InfPpiParser(self, SectionString, InfSectionObject, FileName):
         #
-        # Macro defined in this section 
+        # Macro defined in this section
         #
         SectionMacros = {}
         ValueList = []
@@ -175,7 +175,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
 
                 #
                 # Replace with Local section Macro and [Defines] section Macro.
-                #            
+                #
                 ValueList = [InfExpandMacro(Value, (FileName, LineContent, LineNo), self.FileLocalMacros, SectionMacros)
                             for Value in ValueList]
 
@@ -189,7 +189,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
 
         #
         # Current section archs
-        #    
+        #
         ArchList = []
         LineIndex = -1
         for Item in self.LastSectionHeaderContent:
@@ -206,7 +206,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
 
     ## InfUserExtensionParser
     #
-    #    
+    #
     def InfUserExtensionParser(self, SectionString, InfSectionObject, FileName):
 
         UserExtensionContent = ''
@@ -226,7 +226,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
 
         #
         # Current section UserId, IdString
-        #    
+        #
         IdContentList = []
         LastItem = ''
         SectionLineNo = None
@@ -265,14 +265,14 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
                 IdContentList.append((UserId, IdString, Arch))
             else:
                 #
-                # Each UserExtensions section header must have a unique set 
+                # Each UserExtensions section header must have a unique set
                 # of UserId, IdString and Arch values.
-                # This means that the same UserId can be used in more than one 
-                # section header, provided the IdString or Arch values are 
-                # different. The same IdString values can be used in more than 
-                # one section header if the UserId or Arch values are 
-                # different. The same UserId and the same IdString can be used 
-                # in a section header if the Arch values are different in each 
+                # This means that the same UserId can be used in more than one
+                # section header, provided the IdString or Arch values are
+                # different. The same IdString values can be used in more than
+                # one section header if the UserId or Arch values are
+                # different. The same UserId and the same IdString can be used
+                # in a section header if the Arch values are different in each
                 # of the section headers.
                 #
                 Logger.Error('InfParser',
@@ -294,7 +294,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
 
     def InfProtocolParser(self, SectionString, InfSectionObject, FileName):
         #
-        # Macro defined in this section 
+        # Macro defined in this section
         #
         SectionMacros = {}
         ValueList = []
@@ -345,7 +345,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
 
                 #
                 # Replace with Local section Macro and [Defines] section Macro.
-                #            
+                #
                 ValueList = [InfExpandMacro(Value, (FileName, LineContent, LineNo), self.FileLocalMacros, SectionMacros)
                             for Value in ValueList]
 
@@ -359,7 +359,7 @@ class InfGuidPpiProtocolSectionParser(InfParserSectionRoot):
 
         #
         # Current section archs
-        #    
+        #
         ArchList = []
         LineIndex = -1
         for Item in self.LastSectionHeaderContent:

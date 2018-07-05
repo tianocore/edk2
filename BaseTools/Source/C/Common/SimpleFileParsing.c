@@ -1,14 +1,14 @@
 /** @file
 Generic but simple file parsing routines.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 --*/
 
@@ -238,7 +238,7 @@ Arguments:
   FileName  - name of the file to parse
 
 Returns:
-  
+
 
 --*/
 {
@@ -345,7 +345,7 @@ SFPGetNextToken (
 /*++
 
 Routine Description:
-  Get the next token from the input stream. 
+  Get the next token from the input stream.
 
 Arguments:
   Str - pointer to a copy of the next token
@@ -356,7 +356,7 @@ Returns:
   FALSE - otherwise
 
 Notes:
-  Preceeding white space is ignored. 
+  Preceeding white space is ignored.
   The parser's buffer pointer is advanced past the end of the
   token.
 
@@ -580,7 +580,7 @@ Arguments:
   None.
 
 Returns:
-  STATUS_SUCCESS - the file was closed 
+  STATUS_SUCCESS - the file was closed
   STATUS_ERROR   - no file is currently open
 
 --*/
@@ -605,7 +605,7 @@ ProcessIncludeFile (
 Routine Description:
 
   Given a source file, open the file and parse it
-  
+
 Arguments:
 
   SourceFile        - name of file to parse
@@ -614,7 +614,7 @@ Arguments:
 Returns:
 
   Standard status.
-  
+
 --*/
 {
   STATIC UINTN NestDepth = 0;
@@ -674,7 +674,7 @@ Routine Description:
 
   Given a source file that's been opened, read the contents into an internal
   buffer and pre-process it to remove comments.
-  
+
 Arguments:
 
   SourceFile        - structure containing info on the file to process
@@ -682,7 +682,7 @@ Arguments:
 Returns:
 
   Standard status.
-  
+
 --*/
 {
   //
@@ -722,13 +722,13 @@ PreprocessFile (
 Routine Description:
   Preprocess a file to replace all carriage returns with NULLs so
   we can print lines (as part of error messages) from the file to the screen.
-  
+
 Arguments:
   SourceFile - structure that we use to keep track of an input file.
 
 Returns:
   Nothing.
-  
+
 --*/
 {
   BOOLEAN InComment;
@@ -826,8 +826,8 @@ SFPGetQuotedString (
 /*++
 
 Routine Description:
-  Retrieve a quoted-string from the input file. 
-  
+  Retrieve a quoted-string from the input file.
+
 Arguments:
   Str    - pointer to a copy of the quoted string parsed
   Length - size of buffer pointed to by Str
@@ -836,7 +836,7 @@ Returns:
   TRUE    - next token in input stream was a quoted string, and
             the string value was returned in Str
   FALSE   - otherwise
-  
+
 --*/
 {
   SkipWhiteSpace (&mGlobals.SourceFile);
@@ -881,14 +881,14 @@ SFPIsEOF (
 Routine Description:
   Return TRUE of FALSE to indicate whether or not we've reached the end of the
   file we're parsing.
-  
+
 Arguments:
   NA
 
 Returns:
   TRUE    - EOF reached
   FALSE   - otherwise
-  
+
 --*/
 {
   SkipWhiteSpace (&mGlobals.SourceFile);

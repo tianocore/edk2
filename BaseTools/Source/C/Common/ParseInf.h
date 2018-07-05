@@ -1,14 +1,14 @@
 /** @file
 Header file for helper functions useful for parsing INF files.
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -39,11 +39,11 @@ ReadLine (
 Routine Description:
 
   This function reads a line, stripping any comments.
-  The function reads a string from the input stream argument and stores it in 
-  the input string. ReadLine reads characters from the current file position 
-  to and including the first newline character, to the end of the stream, or 
-  until the number of characters read is equal to MaxLength - 1, whichever 
-  comes first.  The newline character, if read, is replaced with a \0. 
+  The function reads a string from the input stream argument and stores it in
+  the input string. ReadLine reads characters from the current file position
+  to and including the first newline character, to the end of the stream, or
+  until the number of characters read is equal to MaxLength - 1, whichever
+  comes first.  The newline character, if read, is replaced with a \0.
 
 Arguments:
 
@@ -124,17 +124,17 @@ StringToGuid (
 
 /*++
 
-Routine Description: 
+Routine Description:
 
-  Converts a string to an EFI_GUID.  The string must be in the 
+  Converts a string to an EFI_GUID.  The string must be in the
   xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx format.
 
-Arguments:  
+Arguments:
 
   GuidBuffer      - pointer to destination Guid
   AsciiGuidBuffer - pointer to ascii string
 
-Returns:  
+Returns:
 
   EFI_ABORTED    Could not convert the string
   EFI_SUCCESS    The string was successfully converted
@@ -152,9 +152,9 @@ AsciiStringToUint64 (
 
 Routine Description:
 
-  Converts a null terminated ascii string that represents a number into a 
-  UINT64 value.  A hex number may be preceeded by a 0x, but may not be 
-  succeeded by an h.  A number without 0x or 0X is considered to be base 10 
+  Converts a null terminated ascii string that represents a number into a
+  UINT64 value.  A hex number may be preceeded by a 0x, but may not be
+  succeeded by an h.  A number without 0x or 0X is considered to be base 10
   unless the IsHex input is true.
 
 Arguments:

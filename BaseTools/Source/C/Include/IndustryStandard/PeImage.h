@@ -4,7 +4,7 @@
 
   @bug Fix text - doc as defined in MSFT EFI specification.
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2011 - 2013, ARM Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -52,10 +52,10 @@
 //
 // Support old names for backward compatible
 //
-#define EFI_IMAGE_MACHINE_IA32      IMAGE_FILE_MACHINE_I386 
-#define EFI_IMAGE_MACHINE_IA64      IMAGE_FILE_MACHINE_IA64  
-#define EFI_IMAGE_MACHINE_IPF       IMAGE_FILE_MACHINE_IA64  
-#define EFI_IMAGE_MACHINE_EBC       IMAGE_FILE_MACHINE_EBC  
+#define EFI_IMAGE_MACHINE_IA32      IMAGE_FILE_MACHINE_I386
+#define EFI_IMAGE_MACHINE_IA64      IMAGE_FILE_MACHINE_IA64
+#define EFI_IMAGE_MACHINE_IPF       IMAGE_FILE_MACHINE_IA64
+#define EFI_IMAGE_MACHINE_EBC       IMAGE_FILE_MACHINE_EBC
 #define EFI_IMAGE_MACHINE_X64       IMAGE_FILE_MACHINE_X64
 #define EFI_IMAGE_MACHINE_ARMT      IMAGE_FILE_MACHINE_ARMT
 #define EFI_IMAGE_MACHINE_AARCH64   IMAGE_FILE_MACHINE_ARM64
@@ -475,23 +475,23 @@ typedef struct {
 //
 // x64 processor relocation types.
 //
-#define IMAGE_REL_AMD64_ABSOLUTE	0x0000
-#define IMAGE_REL_AMD64_ADDR64	  0x0001
-#define IMAGE_REL_AMD64_ADDR32	  0x0002
-#define IMAGE_REL_AMD64_ADDR32NB	0x0003
-#define IMAGE_REL_AMD64_REL32	    0x0004
-#define IMAGE_REL_AMD64_REL32_1	  0x0005
-#define IMAGE_REL_AMD64_REL32_2	  0x0006
-#define IMAGE_REL_AMD64_REL32_3	  0x0007
-#define IMAGE_REL_AMD64_REL32_4	  0x0008
-#define IMAGE_REL_AMD64_REL32_5	  0x0009
-#define IMAGE_REL_AMD64_SECTION	  0x000A
-#define IMAGE_REL_AMD64_SECREL	  0x000B
-#define IMAGE_REL_AMD64_SECREL7	  0x000C
-#define IMAGE_REL_AMD64_TOKEN	    0x000D
-#define IMAGE_REL_AMD64_SREL32	  0x000E
-#define IMAGE_REL_AMD64_PAIR	    0x000F
-#define IMAGE_REL_AMD64_SSPAN32	  0x0010
+#define IMAGE_REL_AMD64_ABSOLUTE  0x0000
+#define IMAGE_REL_AMD64_ADDR64    0x0001
+#define IMAGE_REL_AMD64_ADDR32    0x0002
+#define IMAGE_REL_AMD64_ADDR32NB  0x0003
+#define IMAGE_REL_AMD64_REL32      0x0004
+#define IMAGE_REL_AMD64_REL32_1    0x0005
+#define IMAGE_REL_AMD64_REL32_2    0x0006
+#define IMAGE_REL_AMD64_REL32_3    0x0007
+#define IMAGE_REL_AMD64_REL32_4    0x0008
+#define IMAGE_REL_AMD64_REL32_5    0x0009
+#define IMAGE_REL_AMD64_SECTION    0x000A
+#define IMAGE_REL_AMD64_SECREL    0x000B
+#define IMAGE_REL_AMD64_SECREL7    0x000C
+#define IMAGE_REL_AMD64_TOKEN      0x000D
+#define IMAGE_REL_AMD64_SREL32    0x000E
+#define IMAGE_REL_AMD64_PAIR      0x000F
+#define IMAGE_REL_AMD64_SSPAN32    0x0010
 
 ///
 /// Based relocation format.

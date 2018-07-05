@@ -3,15 +3,15 @@ Reading/writing MBR/DBR.
   NOTE:
     If we write MBR to disk, we just update the MBR code and the partition table wouldn't be over written.
     If we process DBR, we will patch MBR to set first partition active if no active partition exists.
-    
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -132,21 +132,21 @@ GetPathInfo (
   if (strncmp(PathInfo->Path, "/dev/", 5) == 0) {
     //
     // Process disk path here.
-    // 
-    
+    //
+
     // Process floppy disk
     if (PathInfo->Path[5] == 'f' && PathInfo->Path[6] == 'd' && PathInfo->Path[8] == '\0') {
       PathInfo->Type = PathFloppy;
       strcpy (PathInfo->PhysicalPath, PathInfo->Path);
-      
+
       return ErrorSuccess;
     } else {
     // Other disk types is not supported yet.
     fprintf (stderr, "ERROR: It's not a floppy disk!\n");
     return ErrorPath;
-    }  
-     
-    // Try to open the device.   
+    }
+
+    // Try to open the device.
     f = fopen (LongFilePath (PathInfo->Path),"r");
     if (f == NULL) {
       printf ("error :open device failed!\n");
@@ -155,7 +155,7 @@ GetPathInfo (
     fclose (f);
     return ErrorSuccess;
   }
- 
+
   // Process file path here.
   PathInfo->Type = PathFile;
   if (PathInfo->Input) {
@@ -183,12 +183,12 @@ ListDrive (
 }
 
 /**
-  Writing or reading boot sector or MBR according to the argument. 
-   
+  Writing or reading boot sector or MBR according to the argument.
+
   @param InputInfo PATH_INFO instance for input path
   @param OutputInfo PATH_INFO instance for output path
   @param ProcessMbr TRUE is to process MBR, otherwise, processing boot sector
-  
+
   @return ERROR_STATUS
  **/
 ERROR_STATUS
@@ -200,34 +200,34 @@ ProcessBsOrMbr (
 {
   CHAR8 FirstSector[0x200] = {0};
   CHAR8 FirstSectorBackup[0x200] = {0};
-  
+
   FILE *InputFile;
   FILE *OutputFile;
-  
-  
+
+
   InputFile = fopen (LongFilePath (InputInfo->PhysicalPath), "r");
   if (InputFile == NULL) {
     return ErrorFileReadWrite;
   }
-   
+
   if (0x200 != fread(FirstSector, 1, 0x200, InputFile)) {
     fclose(InputFile);
     return ErrorFileReadWrite;
   }
-  
+
   fclose(InputFile);
-  
+
   //Not support USB and IDE.
   if (InputInfo->Type == PathUsb) {
     printf("USB has not been supported yet!");
     return ErrorSuccess;
   }
-  
+
   if (InputInfo->Type == PathIde) {
     printf("IDE has not been supported yet!");
     return ErrorSuccess;
-  } 
-  
+  }
+
   //Process Floppy Disk
   OutputFile = fopen (LongFilePath (OutputInfo->PhysicalPath), "r+");
   if (OutputFile == NULL) {
@@ -236,7 +236,7 @@ ProcessBsOrMbr (
       return ErrorFileReadWrite;
     }
   }
-  
+
   if (OutputInfo->Type != PathFile) {
     if (ProcessMbr) {
       //
@@ -244,16 +244,16 @@ ProcessBsOrMbr (
       //
       if (0x200 != fread (FirstSectorBackup, 1, 0x200, OutputFile)) {
         fclose(OutputFile);
-        return ErrorFileReadWrite; 
+        return ErrorFileReadWrite;
         }
-      memcpy (FirstSector + 0x1BE, FirstSectorBackup + 0x1BE, 0x40);  
+      memcpy (FirstSector + 0x1BE, FirstSectorBackup + 0x1BE, 0x40);
     }
   }
   if(0x200 != fwrite(FirstSector, 1, 0x200, OutputFile)) {
     fclose(OutputFile);
     return ErrorFileReadWrite;
   }
-  
+
   fclose(OutputFile);
   return ErrorSuccess;
 }
@@ -308,20 +308,20 @@ main (
   UINT64         LogLevel;
 
   SetUtilityName (UTILITY_NAME);
-  
+
   ZeroMem(&InputPathInfo, sizeof(PATH_INFO));
   ZeroMem(&OutputPathInfo, sizeof(PATH_INFO));
-  
+
   argv ++;
   argc --;
-  
+
   ProcessMbr    = FALSE;
 
   if (argc == 0) {
     PrintUsage();
     return 0;
   }
-   
+
   //
   // Parse command line
   //
@@ -329,61 +329,61 @@ main (
     if ((stricmp (argv[Index], "-l") == 0) || (stricmp (argv[Index], "--list") == 0)) {
       ListDrive ();
       return 0;
-    } 
-    
+    }
+
     if ((stricmp (argv[Index], "-m") == 0) || (stricmp (argv[Index], "--mbr") == 0)) {
       ProcessMbr = TRUE;
       continue;
     }
-    
+
     if ((stricmp (argv[Index], "-i") == 0) || (stricmp (argv[Index], "--input") == 0)) {
       InputPathInfo.Path  = argv[Index + 1];
       InputPathInfo.Input = TRUE;
       if (InputPathInfo.Path == NULL) {
         Error (NULL, 0, 1003, "Invalid option value", "Input file name can't be NULL");
         return 1;
-      } 
+      }
       if (InputPathInfo.Path[0] == '-') {
         Error (NULL, 0, 1003, "Invalid option value", "Input file is missing");
-        return 1;       
+        return 1;
       }
       ++Index;
       continue;
     }
-    
+
     if ((stricmp (argv[Index], "-o") == 0) || (stricmp (argv[Index], "--output") == 0)) {
       OutputPathInfo.Path  = argv[Index + 1];
       OutputPathInfo.Input = FALSE;
       if (OutputPathInfo.Path == NULL) {
         Error (NULL, 0, 1003, "Invalid option value", "Output file name can't be NULL");
         return 1;
-      } 
+      }
       if (OutputPathInfo.Path[0] == '-') {
         Error (NULL, 0, 1003, "Invalid option value", "Output file is missing");
-        return 1;       
+        return 1;
       }
       ++Index;
       continue;
     }
-    
+
     if ((stricmp (argv[Index], "-h") == 0) || (stricmp (argv[Index], "--help") == 0)) {
       PrintUsage ();
       return 0;
     }
-    
+
     if (stricmp (argv[Index], "--version") == 0) {
       Version ();
       return 0;
-    } 
-    
+    }
+
     if ((stricmp (argv[Index], "-v") == 0) || (stricmp (argv[Index], "--verbose") == 0)) {
       continue;
-    } 
-    
+    }
+
     if ((stricmp (argv[Index], "-q") == 0) || (stricmp (argv[Index], "--quiet") == 0)) {
       continue;
-    } 
-    
+    }
+
     if ((stricmp (argv[Index], "-d") == 0) || (stricmp (argv[Index], "--debug") == 0)) {
       EfiStatus = AsciiStringToUint64 (argv[Index + 1], FALSE, &LogLevel);
       if (EFI_ERROR (EfiStatus)) {
@@ -406,7 +406,7 @@ main (
     Error (NULL, 0, 1000, "Unknown option", "%s", argv[Index]);
     return 1;
   }
-  
+
   if (InputPathInfo.Path == NULL) {
     Error (NULL, 0, 1001, "Missing options", "Input file is missing");
     return 1;
@@ -416,7 +416,7 @@ main (
     Error (NULL, 0, 1001, "Missing options", "Output file is missing");
     return 1;
   }
-  
+
   if (GetPathInfo(&InputPathInfo) != ErrorSuccess) {
     Error (NULL, 0, 1003, "Invalid option value", "Input file can't be found.");
     return 1;
@@ -426,7 +426,7 @@ main (
     Error (NULL, 0, 1003, "Invalid option value", "Output file can't be found.");
     return 1;
   }
-  
+
   //
   // Process DBR (Patch or Read)
   //
@@ -434,21 +434,21 @@ main (
 
   if (Status == ErrorSuccess) {
     fprintf (
-      stdout, 
-      "%s %s: successful!\n", 
-      (OutputPathInfo.Type != PathFile) ? "Write" : "Read", 
+      stdout,
+      "%s %s: successful!\n",
+      (OutputPathInfo.Type != PathFile) ? "Write" : "Read",
       ProcessMbr ? "MBR" : "DBR"
       );
     return 0;
   } else {
     fprintf (
-      stderr, 
+      stderr,
       "%s: %s %s: failed - %s (LastError: 0x%x)!\n",
       (Status == ErrorNoMbr) ? "WARNING" : "ERROR",
-      (OutputPathInfo.Type != PathFile) ? "Write" : "Read", 
-      ProcessMbr ? "MBR" : "DBR", 
+      (OutputPathInfo.Type != PathFile) ? "Write" : "Read",
+      ProcessMbr ? "MBR" : "DBR",
       ErrorStatusDesc[Status],
-      errno 
+      errno
       );
     return 1;
   }

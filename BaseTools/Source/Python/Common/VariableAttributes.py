@@ -1,9 +1,9 @@
 # # @file
-# 
+#
 # This file is used to handle the variable attributes and property information
 #
 #
-# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -12,7 +12,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-   
+
 class VariableAttributes(object):
     EFI_VARIABLE_NON_VOLATILE = 0x00000001
     EFI_VARIABLE_BOOTSERVICE_ACCESS = 0x00000002
@@ -24,22 +24,22 @@ class VariableAttributes(object):
                      "RT":EFI_VARIABLE_RUNTIME_ACCESS,
                      "RO":VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY
                      }
-    
+
     def __init__(self):
         pass
-    
+
     @staticmethod
     def GetVarAttributes(var_attr_str):
         VarAttr = 0x00000000
         VarProp = 0x00000000
-        
+
         attr_list = var_attr_str.split(",")
         for attr in attr_list:
             attr = attr.strip()
             if attr == 'RO':
                 VarProp = VariableAttributes.VAR_CHECK_VARIABLE_PROPERTY_READ_ONLY
             else:
-                VarAttr = VarAttr | VariableAttributes.VarAttributesMap.get(attr, 0x00000000)   
+                VarAttr = VarAttr | VariableAttributes.VarAttributesMap.get(attr, 0x00000000)
         return VarAttr, VarProp
     @staticmethod
     def ValidateVarAttributes(var_attr_str):

@@ -2,11 +2,11 @@
 # This is an XML API that uses a syntax similar to XPath, but it is written in
 # standard python so that no extra python packages are required to use it.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -141,8 +141,8 @@ def XmlElement(Dom, String):
 ## Get a single XML element using XPath style syntax.
 #
 # Similar with XmlElement, but do not strip all the leading and tailing space
-# and newline, instead just remove the newline and spaces introduced by 
-# toprettyxml() 
+# and newline, instead just remove the newline and spaces introduced by
+# toprettyxml()
 #
 # @param  Dom                The root XML DOM object.
 # @param  Strin              A XPath style path.

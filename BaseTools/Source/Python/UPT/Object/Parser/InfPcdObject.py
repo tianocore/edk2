@@ -1,12 +1,12 @@
 ## @file
-# This file is used to define class objects of INF file [Pcds] section. 
-# It will consumed by InfParser. 
+# This file is used to define class objects of INF file [Pcds] section.
+# It will consumed by InfParser.
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -42,7 +42,7 @@ from Object.Parser.InfPackagesObject import InfPackageItem
 def ValidateArch(ArchItem, PcdTypeItem1, LineNo, SupArchDict, SupArchList):
     #
     # Validate Arch
-    #            
+    #
     if (ArchItem == '' or ArchItem is None):
         ArchItem = 'COMMON'
 
@@ -122,7 +122,7 @@ def ParsePcdComment(CommentList, PcdTypeItem, PcdItemObj):
                     BlockFlag = 4
         #
         # Combine two comment line if they are generic comment
-        #   
+        #
         if CommentItemUsage == PreUsage == DT.ITEM_UNDEFINED:
             CommentItemHelpText = PreHelpText + DT.END_OF_LINE + CommentItemHelpText
 
@@ -141,7 +141,7 @@ def ParsePcdComment(CommentList, PcdTypeItem, PcdItemObj):
         elif BlockFlag == 3:
             #
             # Add previous help string
-            # 
+            #
             CommentItemIns = InfPcdItemCommentContent()
             CommentItemIns.SetUsageItem(DT.ITEM_UNDEFINED)
             if PreHelpText == '' or PreHelpText.endswith(DT.END_OF_LINE):
@@ -171,7 +171,7 @@ def ParsePcdComment(CommentList, PcdTypeItem, PcdItemObj):
 class InfPcdItemCommentContent():
     def __init__(self):
         #
-        # ## SOMETIMES_CONSUMES ## HelpString 
+        # ## SOMETIMES_CONSUMES ## HelpString
         #
         self.UsageItem = ''
         #
@@ -195,7 +195,7 @@ class InfPcdItemCommentContent():
 #
 # @param CName:                Input value for CName, default is ''
 # @param Token:                Input value for Token, default is ''
-# @param TokenSpaceGuidCName:  Input value for TokenSpaceGuidCName, default 
+# @param TokenSpaceGuidCName:  Input value for TokenSpaceGuidCName, default
 #                              is ''
 # @param DatumType:            Input value for DatumType, default is ''
 # @param MaxDatumSize:         Input value for MaxDatumSize, default is ''
@@ -385,7 +385,7 @@ class InfPcdObject():
                                      Line=CurrentLineOfPcdItem[1],
                                      ExtraData=CurrentLineOfPcdItem[0])
                     #
-                    # Validate FFE    
+                    # Validate FFE
                     #
                     FeatureFlagRtv = IsValidFeatureFlagExp(PcdItem[2].strip())
                     if not FeatureFlagRtv[0]:
@@ -478,7 +478,7 @@ def ParserPcdInfoInDec(String):
 
 def SetValueDatumTypeMaxSizeToken(PcdItem, CurrentLineOfPcdItem, PcdItemObj, Arch, PackageInfo=None):
     #
-    # Package information not been generated currently, we need to parser INF file to get information. 
+    # Package information not been generated currently, we need to parser INF file to get information.
     #
     if not PackageInfo:
         PackageInfo = []
@@ -507,7 +507,7 @@ def SetValueDatumTypeMaxSizeToken(PcdItem, CurrentLineOfPcdItem, PcdItemObj, Arc
             DecParser = GlobalData.gPackageDict[FullFileName]
 
         #
-        # Find PCD information.               
+        # Find PCD information.
         #
         DecPcdsDict = DecParser.GetPcdSectionObject().ValueDict
         for Key in DecPcdsDict.keys():
@@ -640,7 +640,7 @@ def ValidatePcdValueOnDatumType(Value, Type):
 
 def SetPcdName(PcdItem, CurrentLineOfPcdItem, PcdItemObj):
     #
-    # Only PCD Name specified 
+    # Only PCD Name specified
     # <PcdName> ::= <TokenSpaceGuidCName> "." <TokenCName>
     #
     PcdId = GetSplitValueList(PcdItem[0], DT.TAB_SPLIT)

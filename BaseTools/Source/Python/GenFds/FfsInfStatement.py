@@ -225,7 +225,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
             EdkLogger.warn("GenFds", GENFDS_ERROR, "Module %s NOT found in DSC file; Is it really a binary module?" % (self.InfFileName))
 
         if self.ModuleType == SUP_MODULE_SMM_CORE and int(self.PiSpecVersion, 16) < 0x0001000A:
-            EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "SMM_CORE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x0001000A", File=self.InfFileName)      
+            EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "SMM_CORE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x0001000A", File=self.InfFileName)
 
         if self.ModuleType == SUP_MODULE_MM_CORE_STANDALONE and int(self.PiSpecVersion, 16) < 0x00010032:
             EdkLogger.error("GenFds", FORMAT_NOT_SUPPORTED, "MM_CORE_STANDALONE module type can't be used in the module with PI_SPECIFICATION_VERSION less than 0x00010032", File=self.InfFileName)
@@ -374,13 +374,13 @@ class FfsInfStatement(FfsInfStatementClassObject):
     def PatchEfiFile(self, EfiFile, FileType):
         #
         # If the module does not have any patches, then return path to input file
-        #  
+        #
         if not self.PatchPcds:
             return EfiFile
 
         #
         # Only patch file if FileType is PE32 or ModuleType is USER_DEFINED
-        #  
+        #
         if FileType != BINARY_FILE_TYPE_PE32 and self.ModuleType != SUP_MODULE_USER_DEFINED:
             return EfiFile
 
@@ -398,7 +398,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
         #
         # If a different file from the same module has already been patched, then generate an error
-        #  
+        #
         if self.PatchedBinFile:
             EdkLogger.error("GenFds", GENFDS_ERROR,
                             'Only one binary file can be patched:\n'
@@ -408,12 +408,12 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
         #
         # Copy unpatched file contents to output file location to perform patching
-        #  
+        #
         CopyLongFilePath(EfiFile, Output)
 
         #
         # Apply patches to patched output file
-        #  
+        #
         for Pcd, Value in self.PatchPcds:
             RetVal, RetStr = PatchBinaryFile(Output, int(Pcd.Offset, 0), Pcd.DatumType, Value, Pcd.MaxDatumSize)
             if RetVal:
@@ -421,12 +421,12 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
         #
         # Save the path of the patched output file
-        #  
+        #
         self.PatchedBinFile = Output
 
         #
         # Return path to patched output file
-        #  
+        #
         return Output
 
     ## GenFfs() method
@@ -448,14 +448,14 @@ class FfsInfStatement(FfsInfStatementClassObject):
         Arch = self.GetCurrentArch()
         SrcFile = mws.join( GenFdsGlobalVariable.WorkSpaceDir, self.InfFileName);
         DestFile = os.path.join( self.OutputPath, self.ModuleGuid + '.ffs')
-        
+
         SrcFileDir = "."
         SrcPath = os.path.dirname(SrcFile)
         SrcFileName = os.path.basename(SrcFile)
-        SrcFileBase, SrcFileExt = os.path.splitext(SrcFileName)   
+        SrcFileBase, SrcFileExt = os.path.splitext(SrcFileName)
         DestPath = os.path.dirname(DestFile)
         DestFileName = os.path.basename(DestFile)
-        DestFileBase, DestFileExt = os.path.splitext(DestFileName)   
+        DestFileBase, DestFileExt = os.path.splitext(DestFileName)
         self.MacroDict = {
             # source file
             "${src}"      :   SrcFile,
@@ -473,7 +473,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
         }
         #
         # Allow binary type module not specify override rule in FDF file.
-        # 
+        #
         if len(self.BinFileList) > 0:
             if self.Rule is None or self.Rule == "":
                 self.Rule = "BINARY"
@@ -534,7 +534,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
             '$(NAMED_GUID)'  : self.ModuleGuid
         }
         String = GenFdsGlobalVariable.MacroExtend(String, MacroDict)
-        String = GenFdsGlobalVariable.MacroExtend(String, self.MacroDict)        
+        String = GenFdsGlobalVariable.MacroExtend(String, self.MacroDict)
         return String
 
     ## __GetRule__() method
@@ -960,14 +960,14 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     Sect.FvAddr = FvChildAddr
             if FvParentAddr is not None and isinstance(Sect, GuidSection):
                 Sect.FvParentAddr = FvParentAddr
-            
+
             if Rule.KeyStringList != []:
                 SectList, Align = Sect.GenSection(self.OutputPath, self.ModuleGuid, SecIndex, Rule.KeyStringList, self, IsMakefile = IsMakefile)
             else :
                 SectList, Align = Sect.GenSection(self.OutputPath, self.ModuleGuid, SecIndex, self.KeyStringList, self, IsMakefile = IsMakefile)
-            
+
             if not HasGeneratedFlag:
-                UniVfrOffsetFileSection = ""    
+                UniVfrOffsetFileSection = ""
                 ModuleFileName = mws.join(GenFdsGlobalVariable.WorkSpaceDir, self.InfFileName)
                 InfData = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(ModuleFileName), self.CurrentArch]
                 #
@@ -978,16 +978,16 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 for SourceFile in InfData.Sources:
                     if SourceFile.Type.upper() == ".VFR" :
                         #
-                        # search the .map file to find the offset of vfr binary in the PE32+/TE file. 
+                        # search the .map file to find the offset of vfr binary in the PE32+/TE file.
                         #
                         VfrUniBaseName[SourceFile.BaseName] = (SourceFile.BaseName + "Bin")
                     if SourceFile.Type.upper() == ".UNI" :
                         #
-                        # search the .map file to find the offset of Uni strings binary in the PE32+/TE file. 
+                        # search the .map file to find the offset of Uni strings binary in the PE32+/TE file.
                         #
                         VfrUniBaseName["UniOffsetName"] = (self.BaseName + "Strings")
-                    
-                
+
+
                 if len(VfrUniBaseName) > 0:
                     if IsMakefile:
                         if InfData.BuildType != 'UEFI_HII':
@@ -1023,7 +1023,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     if UniVfrOffsetFileSection:
                         SectList.append(UniVfrOffsetFileSection)
                         HasGeneratedFlag = True
-                
+
             for SecName in  SectList :
                 SectFiles.append(SecName)
                 SectAlignments.append(Align)
@@ -1071,12 +1071,12 @@ class FfsInfStatement(FfsInfStatementClassObject):
     #   @param  self                  The object pointer
     #   @param  VfrUniBaseName        A name list contain the UNI/INF object name.
     #   @retval RetValue              A list contain offset of UNI/INF object.
-    #    
+    #
     def __GetBuildOutputMapFileVfrUniInfo(self, VfrUniBaseName):
         MapFileName = os.path.join(self.EfiOutputPath, self.BaseName + ".map")
         EfiFileName = os.path.join(self.EfiOutputPath, self.BaseName + ".efi")
         return GetVariableOffset(MapFileName, EfiFileName, VfrUniBaseName.values())
-    
+
     ## __GenUniVfrOffsetFile() method
     #
     #   Generate the offset file for the module which contain VFR or UNI file.
@@ -1089,7 +1089,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
 
         # Use a instance of StringIO to cache data
         fStringIO = BytesIO('')
-        
+
         for Item in VfrUniOffsetList:
             if (Item[0].find("Strings") != -1):
                 #
@@ -1099,7 +1099,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 #
                 UniGuid = [0xe0, 0xc5, 0x13, 0x89, 0xf6, 0x33, 0x86, 0x4d, 0x9b, 0xf1, 0x43, 0xef, 0x89, 0xfc, 0x6, 0x66]
                 UniGuid = [chr(ItemGuid) for ItemGuid in UniGuid]
-                fStringIO.write(''.join(UniGuid))            
+                fStringIO.write(''.join(UniGuid))
                 UniValue = pack ('Q', int (Item[1], 16))
                 fStringIO.write (UniValue)
             else:
@@ -1110,11 +1110,11 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 #
                 VfrGuid = [0xb4, 0x7c, 0xbc, 0xd0, 0x47, 0x6a, 0x5f, 0x49, 0xaa, 0x11, 0x71, 0x7, 0x46, 0xda, 0x6, 0xa2]
                 VfrGuid = [chr(ItemGuid) for ItemGuid in VfrGuid]
-                fStringIO.write(''.join(VfrGuid))                   
-                type (Item[1]) 
+                fStringIO.write(''.join(VfrGuid))
+                type (Item[1])
                 VfrValue = pack ('Q', int (Item[1], 16))
                 fStringIO.write (VfrValue)
-            
+
         #
         # write data into file.
         #
@@ -1122,7 +1122,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
             SaveFileOnChange(UniVfrOffsetFileName, fStringIO.getvalue())
         except:
             EdkLogger.error("GenFds", FILE_WRITE_FAILURE, "Write data to file %s failed, please check whether the file been locked or using by other applications." %UniVfrOffsetFileName, None)
-        
+
         fStringIO.close ()
 
-        
+

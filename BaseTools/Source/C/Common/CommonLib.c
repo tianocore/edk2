@@ -2,13 +2,13 @@
 Common basic Library Functions
 
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -136,7 +136,7 @@ Arguments:
 
 Returns:
   =  0  if Guid1 == Guid2
-  != 0  if Guid1 != Guid2 
+  != 0  if Guid1 != Guid2
 
 --*/
 {
@@ -169,7 +169,7 @@ GetFileImage (
 
 Routine Description:
 
-  This function opens a file and reads it into a memory buffer.  The function 
+  This function opens a file and reads it into a memory buffer.  The function
   will allocate the memory buffer and returns the size of the buffer.
 
 Arguments:
@@ -332,7 +332,7 @@ CalculateChecksum8 (
   IN UINTN        Size
   )
 /*++
-  
+
 Routine Description:
 
   This function calculates the value needed for a valid UINT8 checksum
@@ -357,7 +357,7 @@ CalculateSum8 (
   IN UINTN  Size
   )
 /*++
-  
+
 Routine Description::
 
   This function calculates the UINT8 sum for the requested region.
@@ -394,7 +394,7 @@ CalculateChecksum16 (
   IN UINTN        Size
   )
 /*++
-  
+
 Routine Description::
 
   This function calculates the value needed for a valid UINT16 checksum
@@ -419,7 +419,7 @@ CalculateSum16 (
   IN UINTN        Size
   )
 /*++
-  
+
 Routine Description:
 
   This function calculates the UINT16 sum for the requested region.
@@ -518,7 +518,7 @@ Returns:
   EFI_SUCCESS             The GUID was printed.
   EFI_INVALID_PARAMETER   The input was NULL.
   EFI_BUFFER_TOO_SMALL    The input buffer was not big enough
-  
+
 --*/
 {
   if (Guid == NULL) {
@@ -593,7 +593,7 @@ char *strlwr(char *s)
 #define WINDOWS_UNC_EXTENSION_PATH "\\\\?\\UNC"
 
 //
-// Global data to store full file path. It is not required to be free. 
+// Global data to store full file path. It is not required to be free.
 //
 CHAR8 mCommonLibFullPath[MAX_LONG_FILE_PATH];
 
@@ -604,32 +604,32 @@ LongFilePath (
 /*++
 
 Routine Description:
-  Convert FileName to the long file path, which can support larger than 260 length. 
+  Convert FileName to the long file path, which can support larger than 260 length.
 
 Arguments:
-  FileName         - FileName. 
+  FileName         - FileName.
 
 Returns:
   LongFilePath      A pointer to the converted long file path.
-  
+
 --*/
 {
 #ifdef __GNUC__
   //
-  // __GNUC__ may not be good way to differentiate unix and windows. Need more investigation here. 
-  // unix has no limitation on file path. Just return FileName. 
+  // __GNUC__ may not be good way to differentiate unix and windows. Need more investigation here.
+  // unix has no limitation on file path. Just return FileName.
   //
   return FileName;
 #else
   CHAR8 *RootPath;
   CHAR8 *PathPointer;
   CHAR8 *NextPointer;
-  
+
   PathPointer = (CHAR8 *) FileName;
-  
+
   if (FileName != NULL) {
     //
-    // Add the extension string first to support long file path. 
+    // Add the extension string first to support long file path.
     //
     mCommonLibFullPath[0] = 0;
     strcpy (mCommonLibFullPath, WINDOWS_EXTENSION_PATH);
@@ -642,7 +642,7 @@ Returns:
       FileName ++;
     } else if (strlen (FileName) < 3 || FileName[1] != ':' || (FileName[2] != '\\' && FileName[2] != '/')) {
       //
-      // Relative file path. Convert it to absolute path. 
+      // Relative file path. Convert it to absolute path.
       //
       RootPath = getcwd (NULL, 0);
       if (RootPath != NULL) {
@@ -675,7 +675,7 @@ Returns:
       return NULL;
     }
     strncat (mCommonLibFullPath, FileName, MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
-    
+
     //
     // Convert directory separator '/' to '\\'
     //
@@ -685,7 +685,7 @@ Returns:
         *PathPointer = '\\';
       }
     } while (*PathPointer ++ != '\0');
-    
+
     //
     // Convert ":\\\\" to ":\\", because it doesn't work with WINDOWS_EXTENSION_PATH.
     //
@@ -693,7 +693,7 @@ Returns:
       *(PathPointer + 2) = '\0';
       strncat (mCommonLibFullPath, PathPointer + 3, MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
     }
-    
+
     //
     // Convert ".\\" to "", because it doesn't work with WINDOWS_EXTENSION_PATH.
     //
@@ -701,7 +701,7 @@ Returns:
       *PathPointer = '\0';
       strncat (mCommonLibFullPath, PathPointer + 2, MAX_LONG_FILE_PATH - strlen (mCommonLibFullPath) - 1);
     }
-        
+
     //
     // Convert "\\.\\" to "\\", because it doesn't work with WINDOWS_EXTENSION_PATH.
     //
@@ -732,10 +732,10 @@ Returns:
         break;
       }
     }
-    
+
     PathPointer = mCommonLibFullPath;
   }
-  
+
   return PathPointer;
 #endif
 }

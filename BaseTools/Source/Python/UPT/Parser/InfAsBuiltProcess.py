@@ -3,9 +3,9 @@
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -133,7 +133,7 @@ def GetPackageListInfo(FileNameString, WorkSpace, LineNo):
             continue
 
         #
-        # Found [Packages] section 
+        # Found [Packages] section
         #
         if RePackageHeader.match(Line):
             PackageHederFlag = True
@@ -174,7 +174,7 @@ def GetPackageListInfo(FileNameString, WorkSpace, LineNo):
 
             #
             # Replace with Local section Macro and [Defines] section Macro.
-            #            
+            #
             Line = InfExpandMacro(Line, (FileNameString, Line, LineNo), DefineSectionMacros, PackageSectionMacros, True)
 
             Line = GetSplitValueList(Line, "#", 1)[0]

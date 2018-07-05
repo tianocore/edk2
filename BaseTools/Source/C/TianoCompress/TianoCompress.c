@@ -1,18 +1,18 @@
 /** @file
-Compression routine. The compression algorithm is a mixture of LZ77 and Huffman 
-coding. LZ77 transforms the source data into a sequence of Original Characters 
+Compression routine. The compression algorithm is a mixture of LZ77 and Huffman
+coding. LZ77 transforms the source data into a sequence of Original Characters
 and Pointers to repeated strings.
-This sequence is further divided into Blocks and Huffman codings are applied to 
+This sequence is further divided into Blocks and Huffman codings are applied to
 each Block.
-  
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -100,7 +100,7 @@ Arguments:
   SrcBuffer   - The buffer storing the source data
   SrcSize     - The size of source data
   DstBuffer   - The buffer to store the compressed data
-  
+
   Version     - The version of de/compression algorithm.
                 Version 1 for EFI 1.1 de/compression algorithm.
                 Version 2 for Tiano de/compression algorithm.
@@ -135,12 +135,12 @@ Returns:
   mSrcUpperLimit  = mSrc + SrcSize;
   mDst            = DstBuffer;
   mDstUpperLimit  = mDst +*DstSize;
-    
+
   PutDword (0L);
   PutDword (0L);
-  
+
   MakeCrcTable ();
-  
+
   mOrigSize             = mCompSize = 0;
   mCrc                  = INIT_CRC;
 
@@ -151,7 +151,7 @@ Returns:
   if (EFI_ERROR (Status)) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Null terminate the compressed data
   //
@@ -163,8 +163,8 @@ Returns:
   //
   // Fill in compressed size and original size
   //
-  mDst = DstBuffer; 
- 
+  mDst = DstBuffer;
+
   PutDword (mCompSize + 1);
   PutDword (mOrigSize);
   //
@@ -172,10 +172,10 @@ Returns:
   //
 
   if (mCompSize + 1 + 8 > *DstSize) {
-    *DstSize = mCompSize + 1 + 8;    
+    *DstSize = mCompSize + 1 + 8;
     return EFI_BUFFER_TOO_SMALL;
   } else {
-    *DstSize = mCompSize + 1 + 8;   
+    *DstSize = mCompSize + 1 + 8;
     return EFI_SUCCESS;
   }
 }
@@ -190,13 +190,13 @@ PutDword (
 Routine Description:
 
   Put a dword to output stream
-  
+
 Arguments:
 
   Data    - the dword to put
-  
+
 Returns: (VOID)
-  
+
 --*/
 {
   if (mDst < mDstUpperLimit) {
@@ -226,8 +226,8 @@ AllocateMemory (
 Routine Description:
 
   Allocate memory spaces for data structures used in compression process
-  
-Argements: 
+
+Argements:
   VOID
 
 Returns:
@@ -285,7 +285,7 @@ FreeMemory (
 Routine Description:
 
   Called when compression is completed to free memory previously allocated.
-  
+
 Arguments: (VOID)
 
 Returns: (VOID)
@@ -337,7 +337,7 @@ InitSlide (
 Routine Description:
 
   Initialize String Info Log data structures
-  
+
 Arguments: (VOID)
 
 Returns: (VOID)
@@ -377,16 +377,16 @@ Child (
 Routine Description:
 
   Find child node given the parent node and the edge character
-  
+
 Arguments:
 
   NodeQ       - the parent node
   CharC       - the edge character
-  
+
 Returns:
 
-  The child node (NIL if not found)  
-  
+  The child node (NIL if not found)
+
 --*/
 {
   NODE  NodeR;
@@ -415,13 +415,13 @@ MakeChild (
 Routine Description:
 
   Create a new child for a given parent node.
-  
+
 Arguments:
 
   Parent       - the parent node
   CharC   - the edge character
   Child       - the child node
-  
+
 Returns: (VOID)
 
 --*/
@@ -449,11 +449,11 @@ Split (
 Routine Description:
 
   Split a node.
-  
+
 Arguments:
 
   Old     - the node to split
-  
+
 Returns: (VOID)
 
 --*/
@@ -487,7 +487,7 @@ InsertNode (
 Routine Description:
 
   Insert string info for current position into the String Info Log
-  
+
 Arguments: (VOID)
 
 Returns: (VOID)
@@ -620,7 +620,7 @@ Routine Description:
 
   Delete outdated string info. (The Usage of PERC_FLAG
   ensures a clean deletion)
-  
+
 Arguments: (VOID)
 
 Returns: (VOID)
@@ -751,7 +751,7 @@ Routine Description:
 Arguments: (VOID)
 
 Returns:
-  
+
   EFI_SUCCESS           - The compression is successful
   EFI_OUT_0F_RESOURCES  - Not enough memory for compression process
 
@@ -837,7 +837,7 @@ CountTFreq (
 Routine Description:
 
   Count the frequencies for the Extra Set
-  
+
 Arguments: (VOID)
 
 Returns: (VOID)
@@ -896,13 +896,13 @@ WritePTLen (
 Routine Description:
 
   Outputs the code length array for the Extra Set or the Position Set.
-  
+
 Arguments:
 
   Number       - the number of symbols
   nbit    - the number of bits needed to represent 'n'
   Special - the special symbol that needs to be take care of
-  
+
 Returns: (VOID)
 
 --*/
@@ -944,7 +944,7 @@ WriteCLen (
 Routine Description:
 
   Outputs the code length array for Char&Length Set
-  
+
 Arguments: (VOID)
 
 Returns: (VOID)
@@ -1034,11 +1034,11 @@ SendBlock (
 Routine Description:
 
   Huffman code the block and output it.
-  
-Arguments: 
+
+Arguments:
   (VOID)
 
-Returns: 
+Returns:
   (VOID)
 
 --*/
@@ -1246,7 +1246,7 @@ Routine Description:
 Arguments:
 
   Number   - the rightmost n bits of the data is used
-  x   - the data 
+  x   - the data
 
 Returns: (VOID)
 
@@ -1283,7 +1283,7 @@ FreadCrc (
 Routine Description:
 
   Read in source data
-  
+
 Arguments:
 
   Pointer   - the buffer to hold the data
@@ -1292,7 +1292,7 @@ Arguments:
 Returns:
 
   number of bytes actually read
-  
+
 --*/
 {
   INT32 Index;
@@ -1335,11 +1335,11 @@ CountLen (
 Routine Description:
 
   Count the number of each code length for a Huffman tree.
-  
+
 Arguments:
 
   Index   - the top node
-  
+
 Returns: (VOID)
 
 --*/
@@ -1366,11 +1366,11 @@ MakeLen (
 Routine Description:
 
   Create code length array for a Huffman tree
-  
+
 Arguments:
 
   Root   - the root of the tree
-  
+
 Returns:
 
   VOID
@@ -1462,7 +1462,7 @@ MakeCode (
 Routine Description:
 
   Assign code to each symbol based on the code length array
-  
+
 Arguments:
 
   Number     - number of symbols
@@ -1499,18 +1499,18 @@ MakeTree (
 Routine Description:
 
   Generates Huffman codes given a frequency distribution of symbols
-  
+
 Arguments:
 
   NParm    - number of symbols
   FreqParm - frequency of each symbol
   LenParm  - code length for each symbol
   CodeParm - code for each symbol
-  
+
 Returns:
 
   Root of the Huffman tree.
-  
+
 --*/
 {
   INT32 Index;
@@ -1586,22 +1586,22 @@ GetFileContents (
   OUT UINT32  *BufferLength
   )
 /*++
-        
+
 Routine Description:
-           
+
   Get the contents of file specified in InputFileName
   into FileBuffer.
-            
+
 Arguments:
-               
+
   InputFileName  - Name of the input file.
-                
+
   FileBuffer     - Output buffer to contain data
 
-  BufferLength   - Actual length of the data 
+  BufferLength   - Actual length of the data
 
 Returns:
-                       
+
   EFI_SUCCESS on successful return
   EFI_ABORTED if unable to open input file.
 
@@ -1620,13 +1620,13 @@ Returns:
       Error (NULL, 0, 0001, "Error opening file: %s", InputFileName);
       return EFI_ABORTED;
     }
-  
+
   fseek (InputFile, 0, SEEK_END);
   FileSize = ftell (InputFile);
   fseek (InputFile, 0, SEEK_SET);
     //
     // Now read the contents of the file into the buffer
-    // 
+    //
     if (FileSize > 0 && FileBuffer != NULL) {
       if (fread (FileBuffer, FileSize, 1, InputFile) != 1) {
         Error (NULL, 0, 0004, "Error reading contents of input file: %s", InputFileName);
@@ -1638,7 +1638,7 @@ Returns:
   fclose (InputFile);
   Size += (UINTN) FileSize;
   *BufferLength = Size;
-  
+
   if (FileBuffer != NULL) {
     return EFI_SUCCESS;
   } else {
@@ -1693,11 +1693,11 @@ Returns:
   // Summary usage
   //
   fprintf (stdout, "Usage: %s -e|-d [options] <input_file>\n\n", UTILITY_NAME);
-  
+
   //
   // Copyright declaration
-  // 
-  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  //
+  fprintf (stdout, "Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.\n\n");
 
   //
   // Details Option
@@ -1739,7 +1739,7 @@ Returns:
   EFI_ABORTED    Could not generate the section
   EFI_OUT_OF_RESOURCES  No resource to complete the operation.
 
---*/  
+--*/
 {
   FILE       *OutputFile;
   char       *OutputFileName;
@@ -1755,7 +1755,7 @@ Returns:
   UINT32     OrigSize;
 
   SetUtilityName(UTILITY_NAME);
-  
+
   FileBuffer = NULL;
   Src = NULL;
   OutBuffer = NULL;
@@ -1778,12 +1778,12 @@ Returns:
     Usage();
     return 0;
   }
-  
+
   if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0)) {
     Usage();
     return 0;
   }
-  
+
   if ((strcmp(argv[1], "--version") == 0)) {
     Version();
     return 0;
@@ -1854,7 +1854,7 @@ Returns:
       OutputFileName = argv[1];
       argc -=2;
       argv +=2;
-      continue; 
+      continue;
     }
 
     if (argv[0][0]!='-') {
@@ -1865,7 +1865,7 @@ Returns:
     }
 
     Error (NULL, 0, 1000, "Unknown option", argv[0]);
-    goto ERROR;     
+    goto ERROR;
   }
 
   if (InputFileName == NULL) {
@@ -1883,7 +1883,7 @@ Returns:
   } else if (DebugMode) {
     SetPrintLevel(DebugLevel);
   }
-  
+
   if (VerboseMode) {
     VerboseMsg("%s tool start.\n", UTILITY_NAME);
    }
@@ -1892,13 +1892,13 @@ Returns:
     Error (NULL, 0, 4001, "Resource:", "Memory cannot be allocated!");
     goto ERROR;
   }
-    
+
   InputFile = fopen (LongFilePath (InputFileName), "rb");
   if (InputFile == NULL) {
     Error (NULL, 0, 0001, "Error opening input file", InputFileName);
     goto ERROR;
   }
-        
+
   Status = GetFileContents(
             InputFileName,
             FileBuffer,
@@ -1931,7 +1931,7 @@ Returns:
     Error (NULL, 0, 0001, "Error opening output file for writing", OutputFileName);
     goto ERROR;
   }
-    
+
   if (ENCODE) {
   //
   // First call TianoCompress to get DstSize
@@ -1940,7 +1940,7 @@ Returns:
     DebugMsg(UTILITY_NAME, 0, DebugLevel, "Encoding", NULL);
   }
   Status = TianoCompress ((UINT8 *)FileBuffer, InputLength, OutBuffer, &DstSize);
-  
+
   if (Status == EFI_BUFFER_TOO_SMALL) {
     OutBuffer = (UINT8 *) malloc (DstSize);
     if (OutBuffer == NULL) {
@@ -1973,7 +1973,7 @@ Returns:
   if (VerboseMode) {
     VerboseMsg("Encoding successful\n");
   }
-  return 0;  
+  return 0;
   }
   else if (DECODE) {
   if (DebugMode) {
@@ -1981,10 +1981,10 @@ Returns:
   }
   //
   // Get Compressed file original size
-  // 
-  Src     = (UINT8 *)FileBuffer;                     
-  OrigSize  = Src[4] + (Src[5] << 8) + (Src[6] << 16) + (Src[7] << 24);  
-  
+  //
+  Src     = (UINT8 *)FileBuffer;
+  OrigSize  = Src[4] + (Src[5] << 8) + (Src[6] << 16) + (Src[7] << 24);
+
   //
   // Allocate OutputBuffer
   //
@@ -1992,11 +1992,11 @@ Returns:
   if (OutBuffer == NULL) {
     Error (NULL, 0, 4001, "Resource:", "Memory cannot be allocated!");
     goto ERROR;
-   }  
+   }
 
   Status = Decompress((VOID *)FileBuffer, (VOID *)OutBuffer, (VOID *)Scratch, 2);
   if (Status != EFI_SUCCESS) {
-   goto ERROR; 	
+   goto ERROR;
   }
 
   fwrite(OutBuffer, (size_t)(Scratch->mOrigSize), 1, OutputFile);
@@ -2009,13 +2009,13 @@ Returns:
   if (DebugMode) {
     DebugMsg(UTILITY_NAME, 0, DebugLevel, "Encoding successful!\n", NULL);
   }
-  
+
   if (VerboseMode) {
     VerboseMsg("Decoding successful\n");
   }
   return 0;
   }
-  
+
 ERROR:
   if (DebugMode) {
     if (ENCODE) {
@@ -2039,7 +2039,7 @@ ERROR:
   if (OutBuffer != NULL) {
     free(OutBuffer);
   }
-    
+
   if (VerboseMode) {
     VerboseMsg("%s tool done with return code is 0x%x.\n", UTILITY_NAME, GetUtilityStatus ());
   }
@@ -2104,8 +2104,8 @@ GetBits (
 
 Routine Description:
 
-  Get NumOfBits of bits out from mBitBuf. Fill mBitBuf with subsequent 
-  NumOfBits of bits from source. Returns NumOfBits of bits that are 
+  Get NumOfBits of bits out from mBitBuf. Fill mBitBuf with subsequent
+  NumOfBits of bits from source. Returns NumOfBits of bits that are
   popped out.
 
 Arguments:
@@ -2149,9 +2149,9 @@ Arguments:
   BitLen    - Code length array
   TableBits - The width of the mapping table
   Table     - The table
-  
+
 Returns:
-  
+
   0         - OK.
   BAD_TABLE - The table is corrupted.
 
@@ -2341,7 +2341,7 @@ Arguments:
   Sd        - The global scratch data
   nn        - Number of symbols
   nbit      - Number of bits needed to represent nn
-  Special   - The special symbol that needs to be taken care of 
+  Special   - The special symbol that needs to be taken care of
 
 Returns:
 
@@ -2673,14 +2673,14 @@ Returns:
   assert(Source);
 //  assert(Destination);
   assert(Scratch);
-  
+
   Src     = (UINT8 *)Source;
   Dst     = (UINT8 *)Destination;
 
   Sd      = (SCRATCH_DATA *) Scratch;
   CompSize  = Src[0] + (Src[1] << 8) + (Src[2] << 16) + (Src[3] << 24);
   OrigSize  = Src[4] + (Src[5] << 8) + (Src[6] << 16) + (Src[7] << 24);
-  
+
   //
   // If compressed file size is 0, return
   //
@@ -2721,9 +2721,9 @@ Returns:
   //
   // Decompress it
   //
-  
+
   Decode (Sd);
-  
+
   if (Sd->mBadTableFlag != 0) {
     //
     // Something wrong with the source

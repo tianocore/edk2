@@ -3,9 +3,9 @@
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -52,7 +52,7 @@ from Object.POM.CommonObject import TextObject
 from Core.FileHook import __FileHookOpen__
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 
-## Convert GUID string in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx style to C 
+## Convert GUID string in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx style to C
 # structure style
 #
 # @param      Guid:    The GUID string
@@ -87,7 +87,7 @@ def CheckGuidRegFormat(GuidValue):
         return False
 
 
-## Convert GUID string in C structure style to 
+## Convert GUID string in C structure style to
 # xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 #
 # @param      GuidValue:   The GUID value in C structure format
@@ -151,12 +151,12 @@ def RemoveDirectory(Directory, Recursively=False):
 ## Store content in file
 #
 # This method is used to save file only when its content is changed. This is
-# quite useful for "make" system to decide what will be re-built and what 
+# quite useful for "make" system to decide what will be re-built and what
 # won't.
 #
 # @param      File:            The path of file
 # @param      Content:         The new content of the file
-# @param      IsBinaryFile:    The flag indicating if the file is binary file 
+# @param      IsBinaryFile:    The flag indicating if the file is binary file
 #                              or not
 #
 def SaveFileOnChange(File, Content, IsBinaryFile=True):
@@ -216,7 +216,7 @@ def GetFiles(Root, SkipList=None, FullPath=True):
 # @param FullPath:  True if the returned file should be full path
 # @param PrefixPath: the path that need to be added to the files found
 # @return: the list of files found
-#  
+#
 def GetNonMetaDataFiles(Root, SkipList, FullPath, PrefixPath):
     FileList = GetFiles(Root, SkipList, FullPath)
     NewFileList = []
@@ -602,25 +602,25 @@ def GetWorkspace():
 ## Get relative path
 #
 #  use full path and workspace to get relative path
-#  the destination of this function is mainly to resolve the root path issue(like c: or c:\)  
+#  the destination of this function is mainly to resolve the root path issue(like c: or c:\)
 #
 #  @param Fullpath: a string of fullpath
 #  @param Workspace: a string of workspace
 #
 def GetRelativePath(Fullpath, Workspace):
-    
+
     RelativePath = ''
     if Workspace.endswith(os.sep):
         RelativePath = Fullpath[Fullpath.upper().find(Workspace.upper())+len(Workspace):]
     else:
         RelativePath = Fullpath[Fullpath.upper().find(Workspace.upper())+len(Workspace)+1:]
-        
+
     return RelativePath
-    
+
 ## Check whether all module types are in list
 #
 # check whether all module types (SUP_MODULE_LIST) are in list
-#  
+#
 # @param ModuleList:  a list of ModuleType
 #
 def IsAllModuleList(ModuleList):
@@ -632,9 +632,9 @@ def IsAllModuleList(ModuleList):
         return True
 
 ## Dictionary that use comment(GenericComment, TailComment) as value,
-# if a new comment which key already in the dic is inserted, then the 
+# if a new comment which key already in the dic is inserted, then the
 # comment will be merged.
-# Key is (Statement, SupArch), when TailComment is added, it will ident 
+# Key is (Statement, SupArch), when TailComment is added, it will ident
 # according to Statement
 #
 class MergeCommentDict(dict):
@@ -671,7 +671,7 @@ def GenDummyHelpTextObj():
 # <Major>               ::=  (a-fA-F0-9){4}
 # <Minor>               ::=  (a-fA-F0-9){4}
 # <DecVersion>          ::=  (0-65535) ["." (0-99)]
-# 
+#
 # @param StringIn:  The string contains version defined in INF file.
 #                   It can be Decimal or Hex
 #
@@ -764,7 +764,7 @@ def ConvertPath(Path):
 
 ## ConvertSpec
 #
-# during install, convert the Spec string extract from UPD into INF allowable definition, 
+# during install, convert the Spec string extract from UPD into INF allowable definition,
 # the difference is period is allowed in the former (not the first letter) but not in the latter.
 # return converted Spec string
 #
@@ -787,7 +787,7 @@ def ConvertSpec(SpecStr):
 # The rule is elements in List A are in List B and elements in List B are in List A.
 #
 # @param ListA, ListB  Lists need to be judged.
-# 
+#
 # @return True  ListA and ListB are identical
 # @return False ListA and ListB are different with each other
 #
@@ -808,10 +808,10 @@ def IsEqualList(ListA, ListB):
 ## ConvertArchList
 #
 # Convert item in ArchList if the start character is lower case.
-# In UDP spec, Arch is only allowed as: [A-Z]([a-zA-Z0-9])* 
+# In UDP spec, Arch is only allowed as: [A-Z]([a-zA-Z0-9])*
 #
 # @param ArchList The ArchList need to be converted.
-# 
+#
 # @return NewList  The ArchList been converted.
 #
 def ConvertArchList(ArchList):
@@ -835,7 +835,7 @@ def ConvertArchList(ArchList):
 # If one line ends with a line extender, then it will be combined together with next line.
 #
 # @param LineList The LineList need to be processed.
-# 
+#
 # @return NewList  The ArchList been processed.
 #
 def ProcessLineExtender(LineList):
@@ -854,11 +854,11 @@ def ProcessLineExtender(LineList):
 
 ## ProcessEdkComment
 #
-# Process EDK style comment in LineList: c style /* */ comment or cpp style // comment 
+# Process EDK style comment in LineList: c style /* */ comment or cpp style // comment
 #
 #
 # @param LineList The LineList need to be processed.
-# 
+#
 # @return LineList  The LineList been processed.
 # @return FirstPos  Where Edk comment is first found, -1 if not found
 #
@@ -868,7 +868,7 @@ def ProcessEdkComment(LineList):
     StartPos = -1
     EndPos = -1
     FirstPos = -1
-    
+
     while(Count < len(LineList)):
         Line = LineList[Count].strip()
         if Line.startswith("/*"):
@@ -886,7 +886,7 @@ def ProcessEdkComment(LineList):
                     FindEdkBlockComment = True
                     break
                 Count = Count + 1
-            
+
             if FindEdkBlockComment:
                 if FirstPos == -1:
                     FirstPos = StartPos
@@ -900,9 +900,9 @@ def ProcessEdkComment(LineList):
             LineList[Count] = Line.replace("//", '#')
             if FirstPos == -1:
                 FirstPos = Count
-        
+
         Count = Count + 1
-    
+
     return LineList, FirstPos
 
 ## GetLibInstanceInfo
@@ -994,13 +994,13 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo):
 ## GetLocalValue
 #
 # Generate the local value for INF and DEC file. If Lang attribute not present, then use this value.
-# If present, and there is no element without the Lang attribute, and one of the elements has the rfc1766 code is 
-# "en-x-tianocore", or "en-US" if "en-x-tianocore" was not found, or "en" if "en-US" was not found, or startswith 'en' 
+# If present, and there is no element without the Lang attribute, and one of the elements has the rfc1766 code is
+# "en-x-tianocore", or "en-US" if "en-x-tianocore" was not found, or "en" if "en-US" was not found, or startswith 'en'
 # if 'en' was not found, then use this value.
 # If multiple entries of a tag exist which have the same language code, use the last entry.
 #
 # @param ValueList  A list need to be processed.
-# @param UseFirstValue: True to use the first value, False to use the last value 
+# @param UseFirstValue: True to use the first value, False to use the last value
 #
 # @return LocalValue
 def GetLocalValue(ValueList, UseFirstValue=False):
@@ -1040,7 +1040,7 @@ def GetLocalValue(ValueList, UseFirstValue=False):
                     Value5 = Value
             else:
                 Value5 = Value
-            
+
     if Value1:
         return Value1
     if Value2:
@@ -1051,7 +1051,7 @@ def GetLocalValue(ValueList, UseFirstValue=False):
         return Value4
     if Value5:
         return Value5
-    
+
     return ''
 
 
@@ -1088,29 +1088,29 @@ def GetCharIndexOutStr(CommentCharacter, Line):
 #
 # Check the UNI file path
 #
-# @param FilePath: The UNI file path 
+# @param FilePath: The UNI file path
 #
 def ValidateUNIFilePath(Path):
     Suffix = Path[Path.rfind(TAB_SPLIT):]
-    
+
     #
-    # Check if the suffix is one of the '.uni', '.UNI', '.Uni' 
+    # Check if the suffix is one of the '.uni', '.UNI', '.Uni'
     #
     if Suffix not in TAB_UNI_FILE_SUFFIXS:
-        Logger.Error("Unicode File Parser", 
-                        ToolError.FORMAT_INVALID, 
-                        Message=ST.ERR_UNI_FILE_SUFFIX_WRONG, 
-                        ExtraData=Path)    
-    
+        Logger.Error("Unicode File Parser",
+                        ToolError.FORMAT_INVALID,
+                        Message=ST.ERR_UNI_FILE_SUFFIX_WRONG,
+                        ExtraData=Path)
+
     #
     # Check if '..' in the file name(without suffixe)
     #
     if (TAB_SPLIT + TAB_SPLIT) in Path:
-        Logger.Error("Unicode File Parser", 
-                        ToolError.FORMAT_INVALID, 
-                        Message=ST.ERR_UNI_FILE_NAME_INVALID, 
-                        ExtraData=Path)    
-    
+        Logger.Error("Unicode File Parser",
+                        ToolError.FORMAT_INVALID,
+                        Message=ST.ERR_UNI_FILE_NAME_INVALID,
+                        ExtraData=Path)
+
     #
     # Check if the file name is valid according to the DEC and INF specification
     #
@@ -1118,8 +1118,8 @@ def ValidateUNIFilePath(Path):
     FileName = Path.replace(Suffix, '')
     InvalidCh = re.sub(Pattern, '', FileName)
     if InvalidCh:
-        Logger.Error("Unicode File Parser", 
-                        ToolError.FORMAT_INVALID, 
-                        Message=ST.ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID, 
-                        ExtraData=Path)    
+        Logger.Error("Unicode File Parser",
+                        ToolError.FORMAT_INVALID,
+                        Message=ST.ERR_INF_PARSER_FILE_NOT_EXIST_OR_NAME_INVALID,
+                        ExtraData=Path)
 

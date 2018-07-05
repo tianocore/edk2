@@ -39,7 +39,7 @@ class Ffs(FDClassObject):
         SUP_MODULE_MM_STANDALONE     : 'EFI_FV_FILETYPE_MM_STANDALONE',
         SUP_MODULE_MM_CORE_STANDALONE : 'EFI_FV_FILETYPE_MM_CORE_STANDALONE'
     }
-    
+
     # mapping between section type in FDF and file suffix
     SectionSuffix = {
         BINARY_FILE_TYPE_PE32                 : '.pe32',
@@ -51,14 +51,14 @@ class Ffs(FDClassObject):
         'COMPAT16'             : '.com16',
         'RAW'                  : '.raw',
         'FREEFORM_SUBTYPE_GUID': '.guid',
-        'SUBTYPE_GUID'         : '.guid',        
+        'SUBTYPE_GUID'         : '.guid',
         'FV_IMAGE'             : 'fv.sec',
         'COMPRESS'             : '.com',
         'GUIDED'               : '.guided',
         BINARY_FILE_TYPE_PEI_DEPEX            : '.dpx',
         BINARY_FILE_TYPE_SMM_DEPEX            : '.dpx'
     }
-    
+
     ## The constructor
     #
     #   @param  self        The object pointer

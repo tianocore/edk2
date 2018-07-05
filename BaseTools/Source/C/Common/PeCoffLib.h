@@ -1,14 +1,14 @@
 /** @file
-	Function prototypes and defines on Memory Only PE COFF loader
+  Function prototypes and defines on Memory Only PE COFF loader
 
-	Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-	are licensed and made available under the terms and conditions of the BSD License         
-	which accompanies this distribution.  The full text of the license may be found at        
-	http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-	THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-	WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -20,7 +20,7 @@
 // BUGBUG: Find where used and see if can be replaced by RETURN_STATUS codes
 //
 #define IMAGE_ERROR_SUCCESS                      0
-#define IMAGE_ERROR_IMAGE_READ                   1  
+#define IMAGE_ERROR_IMAGE_READ                   1
 #define IMAGE_ERROR_INVALID_PE_HEADER_SIGNATURE  2
 #define IMAGE_ERROR_INVALID_MACHINE_TYPE         3
 #define IMAGE_ERROR_INVALID_SUBSYSTEM            4
@@ -73,15 +73,15 @@ typedef struct {
 
 
 /**
-	Retrieves information on a PE/COFF image
+  Retrieves information on a PE/COFF image
 
-	@param	ImageContext The context of the image being loaded
+  @param  ImageContext The context of the image being loaded
 
-	@retval	EFI_SUCCESS The information on the PE/COFF image was collected.
-	@retval	EFI_INVALID_PARAMETER ImageContext is NULL.
-	@retval	EFI_UNSUPPORTED The PE/COFF image is not supported.
-	@retval	Otherwise The error status from reading the PE/COFF image using the
-	ImageContext->ImageRead() function
+  @retval  EFI_SUCCESS The information on the PE/COFF image was collected.
+  @retval  EFI_INVALID_PARAMETER ImageContext is NULL.
+  @retval  EFI_UNSUPPORTED The PE/COFF image is not supported.
+  @retval  Otherwise The error status from reading the PE/COFF image using the
+  ImageContext->ImageRead() function
 
 **/
 RETURN_STATUS
@@ -92,13 +92,13 @@ PeCoffLoaderGetImageInfo (
 ;
 
 /**
-	Relocates a PE/COFF image in memory
+  Relocates a PE/COFF image in memory
 
-	@param	ImageContext Contains information on the loaded image to relocate
+  @param  ImageContext Contains information on the loaded image to relocate
 
-	@retval EFI_SUCCESS      if the PE/COFF image was relocated
-	@retval EFI_LOAD_ERROR   if the image is not a valid PE/COFF image
-	@retval EFI_UNSUPPORTED  not support
+  @retval EFI_SUCCESS      if the PE/COFF image was relocated
+  @retval EFI_LOAD_ERROR   if the image is not a valid PE/COFF image
+  @retval EFI_UNSUPPORTED  not support
 
 **/
 RETURN_STATUS
@@ -109,14 +109,14 @@ PeCoffLoaderRelocateImage (
 ;
 
 /**
-	Loads a PE/COFF image into memory
+  Loads a PE/COFF image into memory
 
-	@param	ImageContext Contains information on image to load into memory
+  @param  ImageContext Contains information on image to load into memory
 
-	@retval EFI_SUCCESS            if the PE/COFF image was loaded
-	@retval EFI_BUFFER_TOO_SMALL   if the caller did not provide a large enough buffer
-	@retval EFI_LOAD_ERROR         if the image is a runtime driver with no relocations
-	@retval EFI_INVALID_PARAMETER  if the image address is invalid
+  @retval EFI_SUCCESS            if the PE/COFF image was loaded
+  @retval EFI_BUFFER_TOO_SMALL   if the caller did not provide a large enough buffer
+  @retval EFI_LOAD_ERROR         if the image is a runtime driver with no relocations
+  @retval EFI_INVALID_PARAMETER  if the image address is invalid
 
 **/
 RETURN_STATUS
@@ -148,7 +148,7 @@ PeCoffLoaderGetEntryPoint (
 //
 
 /**
-  Pass in a pointer to an ARM MOVT or MOVW immediate instruciton and 
+  Pass in a pointer to an ARM MOVT or MOVW immediate instruciton and
   return the immediate data encoded in the instruction
 
   @param  Instruction   Pointer to ARM MOVT or MOVW immediate instruction
@@ -178,7 +178,7 @@ ThumbMovtImmediatePatch (
 
 
 /**
-  Pass in a pointer to an ARM MOVW/MOVT instruciton pair and 
+  Pass in a pointer to an ARM MOVW/MOVT instruciton pair and
   return the immediate data encoded in the two` instruction
 
   @param  Instructions  Pointer to ARM MOVW/MOVT insturction pair

@@ -1,15 +1,15 @@
 /** @file
-  
+
   The definition of CFormPkg's member function
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -273,7 +273,7 @@ public:
   virtual ~CIfrObj(VOID);
 
   VOID    _EMIT_PENDING_OBJ (VOID);
-  
+
   inline VOID    SetLineNo (IN UINT32 LineNo) {
     mLineNo = LineNo;
   }
@@ -421,7 +421,7 @@ public:
 
 public:
   CIfrQuestionHeader (
-    IN EFI_IFR_QUESTION_HEADER *StartAddr, 
+    IN EFI_IFR_QUESTION_HEADER *StartAddr,
     IN UINT8 Flags = EFI_IFR_QUESTION_FLAG_DEFAULT
   ) : CIfrStatementHeader (QH2SH(StartAddr)) {
     mHeader                         = StartAddr;
@@ -452,7 +452,7 @@ public:
     if (_FLAG_TEST_AND_CLEAR (Flags, EFI_IFR_FLAG_CALLBACK)) {
       mHeader->Flags |= EFI_IFR_FLAG_CALLBACK;
     }
-    
+
     //
     // ignore NVAccessFlag
     //
@@ -1055,7 +1055,7 @@ private:
 
 public:
   CIfrGet (
-  IN UINT32 LineNo  
+  IN UINT32 LineNo
   ) : CIfrObj (EFI_IFR_GET_OP),
       CIfrOpHeader (EFI_IFR_GET_OP, &(GetObjBinAddr<EFI_IFR_GET>())->Header), mGet(GetObjBinAddr<EFI_IFR_GET>()) {
     SetLineNo (LineNo);
@@ -2071,8 +2071,8 @@ public:
     mEqIdVList->ListLength   = 0;
     mEqIdVList->ValueList[0] = 0;
   }
-  
-  VOID UpdateIfrBuffer ( 
+
+  VOID UpdateIfrBuffer (
   ) {
     _EMIT_PENDING_OBJ();
     mEqIdVList = GetObjBinAddr<EFI_IFR_EQ_ID_VAL_LIST>();
@@ -2607,7 +2607,7 @@ public:
 class CIfrMap : public CIfrObj, public CIfrOpHeader{
 public:
   CIfrMap (
-  IN UINT32 LineNo  
+  IN UINT32 LineNo
   ) : CIfrObj (EFI_IFR_MAP_OP),
       CIfrOpHeader (EFI_IFR_MAP_OP, &(GetObjBinAddr<EFI_IFR_MAP>())->Header) {
     SetLineNo (LineNo);

@@ -1,7 +1,7 @@
 ## @file
 # process VTF generation
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -25,7 +25,7 @@ T_CHAR_LF = '\n'
 #
 #
 class Vtf (VtfClassObject):
-    
+
     ## The constructor
     #
     #   @param  self        The object pointer
@@ -46,7 +46,7 @@ class Vtf (VtfClassObject):
         OutputFile = os.path.join(GenFdsGlobalVariable.FvDir, self.UiName + '.Vtf')
         BaseAddArg = self.GetBaseAddressArg(FdAddressDict)
         OutputArg, VtfRawDict = self.GenOutputArg()
-        
+
         Cmd = (
             'GenVtf',
             ) + OutputArg + (
@@ -55,9 +55,9 @@ class Vtf (VtfClassObject):
 
         GenFdsGlobalVariable.CallExternalTool(Cmd, "GenFv -Vtf Failed!")
         GenFdsGlobalVariable.SharpCounter = 0
-        
+
         return VtfRawDict
-        
+
     ## GenBsfInf() method
     #
     #   Generate inf used to generate VTF
@@ -154,7 +154,7 @@ class Vtf (VtfClassObject):
         for component in self.ComponentStatementList :
             if component.CompLoc.upper() != 'NONE' and not (component.CompLoc.upper() in FvList):
                 FvList.append(component.CompLoc.upper())
-                
+
         return FvList
 
     ## GetBaseAddressArg() method
@@ -173,13 +173,13 @@ class Vtf (VtfClassObject):
                 '-s', '0x%x' % Size,
                 )
         return CmdStr
-    
+
     ## GenOutputArg() method
     #
     #   Get output arguments for GenVtf
     #
     #   @param  self        The object pointer
-    #                 
+    #
     def GenOutputArg(self):
         FvVtfDict = {}
         OutputFileName = ''
@@ -192,6 +192,6 @@ class Vtf (VtfClassObject):
             OutputFileName = os.path.join(GenFdsGlobalVariable.FvDir, OutputFileName)
             Arg += ('-o', OutputFileName)
             FvVtfDict[FvObj.upper()] = OutputFileName
-            
+
         return Arg, FvVtfDict
-                
+

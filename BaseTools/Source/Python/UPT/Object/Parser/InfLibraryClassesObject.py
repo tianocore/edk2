@@ -1,12 +1,12 @@
 ## @file
-# This file is used to define class objects of INF file [LibraryClasses] section. 
-# It will consumed by InfParser. 
+# This file is used to define class objects of INF file [LibraryClasses] section.
+# It will consumed by InfParser.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -37,7 +37,7 @@ def GetArchModuleType(KeyList):
     for (ArchItem, ModuleItem) in KeyList:
         #
         # Validate Arch
-        #            
+        #
         if (ArchItem == '' or ArchItem is None):
             ArchItem = 'COMMON'
 
@@ -118,7 +118,7 @@ class InfLibraryClassObject():
 
     ##SetLibraryClasses
     #
-    # 
+    #
     # @param HelpString:     It can be a common comment or contain a recommend
     #                        instance.
     #
@@ -173,7 +173,7 @@ class InfLibraryClassObject():
                                      Line=LibItemObj.CurrentLine.GetLineNo(),
                                      ExtraData=LibItemObj.CurrentLine.GetLineString())
                     #
-                    # Validate FFE    
+                    # Validate FFE
                     #
                     FeatureFlagRtv = IsValidFeatureFlagExp(LibItem[1].strip())
                     if not FeatureFlagRtv[0]:
@@ -202,15 +202,15 @@ class InfLibraryClassObject():
                 #
                 # Determine Library class duplicate. Follow below rule:
                 #
-                # A library class keyword must not be duplicated within a 
-                # [LibraryClasses] section. Library class keywords may appear in 
-                # multiple architectural and module type [LibraryClasses] sections. 
-                # A library class keyword listed in an architectural or module type 
-                # [LibraryClasses] section must not be listed in the common 
+                # A library class keyword must not be duplicated within a
+                # [LibraryClasses] section. Library class keywords may appear in
+                # multiple architectural and module type [LibraryClasses] sections.
+                # A library class keyword listed in an architectural or module type
+                # [LibraryClasses] section must not be listed in the common
                 # architectural or module type [LibraryClasses] section.
-                # 
+                #
                 # NOTE: This check will not report error now. But keep code for future enhancement.
-                # 
+                #
 #                for Item in self.LibraryClasses:
 #                    if Item.GetLibName() == LibItemObj.GetLibName():
 #                        ItemSupArchList = Item.GetSupArchList()

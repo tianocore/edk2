@@ -1,9 +1,9 @@
 /** @file
 This file contains the relevant declarations required to generate Boot Strap File
-  
-Copyright (c) 1999 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available 
-under the terms and conditions of the BSD License which accompanies this 
+
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available
+under the terms and conditions of the BSD License which accompanies this
 distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
@@ -80,7 +80,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SIZE_IA32_RESET_VECT      0x10        // 16 Bytes
 #define SIZE_SALE_ENTRY_POINT     0x08        // 8 Byte
 #define SIZE_FIT_TABLE_ADD        0x08        // 8 Byte
-#define SIZE_FIT_TABLE_PAL_A      0x10     
+#define SIZE_FIT_TABLE_PAL_A      0x10
 #define SIZE_RESERVED             0x10
 
 
@@ -116,7 +116,7 @@ static BOOLEAN VerboseMode = FALSE;
 //
 // Internal Data Structure
 //
-typedef enum _LOC_TYPE 
+typedef enum _LOC_TYPE
 {
   NONE,                   // In case there is - INF file
   FIRST_VTF,              // First VTF
@@ -174,18 +174,18 @@ UpdateVtfBuffer(
 Routine Description:
 
   Update the Firmware Volume Buffer with requested buffer data
-  
+
 Arguments:
 
   StartAddress   - StartAddress in buffer. This number will automatically
-                  point to right address in buffer where data needed 
+                  point to right address in buffer where data needed
                   to be updated.
   Buffer         - Buffer pointer from data will be copied to memory mapped buffer.
   DataSize       - Size of the data needed to be copied.
   LocType        - The type of the VTF
 
 Returns:
-  
+
   EFI_ABORTED  - The input parameter is error
   EFI_SUCCESS  - The function completed successfully
 
@@ -227,22 +227,22 @@ CalculateFitTableChecksum (
   VOID
   )
 /*++
-  
+
 Routine Description:
 
   This function will perform byte checksum on the FIT table, if the the checksum required
   field is set to CheckSum required. If the checksum is not required then checksum byte
   will have value as 0;.
-  
+
 Arguments:
 
   NONE
-  
+
 Returns:
 
   Status       - Value returned by call to CalculateChecksum8 ()
   EFI_SUCCESS  - The function completed successfully
-    
+
 --*/
 ;
 
@@ -262,22 +262,22 @@ Routine Description:
 
 Arguments:
 
-  StartAddress1  - The start address of the first VTF      
+  StartAddress1  - The start address of the first VTF
   Size1          - The size of the first VTF
-  StartAddress2  - The start address of the second VTF      
+  StartAddress2  - The start address of the second VTF
   Size2          - The size of the second VTF
 
 Returns:
- 
+
   EFI_OUT_OF_RESOURCES - Can not allocate memory
-  The return value can be any of the values 
+  The return value can be any of the values
   returned by the calls to following functions:
       GetVtfRelatedInfoFromInfFile
       ProcessAndCreateVtf
       UpdateIA32ResetVector
       UpdateFfsHeader
       WriteVtfBinary
-  
+
 --*/
 ;
 
@@ -294,11 +294,11 @@ Routine Description:
 Arguments:
 
   StartAddress - StartAddress for PEIM.....
-    
+
 Returns:
- 
+
   EFI_SUCCESS   - The function completed successfully
-  EFI_ABORTED   - Error Opening File 
+  EFI_ABORTED   - Error Opening File
 
 --*/
 ;

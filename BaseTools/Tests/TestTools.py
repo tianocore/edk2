@@ -2,7 +2,7 @@ from __future__ import print_function
 ## @file
 # Utility functions and classes for BaseTools unit tests
 #
-#  Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -78,7 +78,7 @@ class BaseToolsTest(unittest.TestCase):
     def HandleTreeDeleteError(self, function, path, excinfo):
         os.chmod(path, stat.S_IWRITE)
         function(path)
-    
+
     def RemoveDir(self, dir):
         shutil.rmtree(dir, False, self.HandleTreeDeleteError)
 

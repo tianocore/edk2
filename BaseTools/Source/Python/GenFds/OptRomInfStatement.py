@@ -1,7 +1,7 @@
 ## @file
 # process OptionROM generation from INF statement
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -26,7 +26,7 @@ from Common.StringUtils import *
 from FfsInfStatement import FfsInfStatement
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 
-## 
+##
 #
 #
 class OptRomInfStatement (FfsInfStatement):
@@ -45,7 +45,7 @@ class OptRomInfStatement (FfsInfStatement):
     #   @param  self        The object pointer
     #
     def __GetOptRomParams(self):
-        
+
         if self.OverrideAttribs is None:
             self.OverrideAttribs = OptionRom.OverrideAttribs()
 
@@ -59,21 +59,21 @@ class OptRomInfStatement (FfsInfStatement):
 
         if self.OverrideAttribs.PciVendorId is None:
             self.OverrideAttribs.PciVendorId = self.OptRomDefs.get ('PCI_VENDOR_ID')
-        
+
         if self.OverrideAttribs.PciClassCode is None:
             self.OverrideAttribs.PciClassCode = self.OptRomDefs.get ('PCI_CLASS_CODE')
-            
+
         if self.OverrideAttribs.PciDeviceId is None:
             self.OverrideAttribs.PciDeviceId = self.OptRomDefs.get ('PCI_DEVICE_ID')
-            
+
         if self.OverrideAttribs.PciRevision is None:
             self.OverrideAttribs.PciRevision = self.OptRomDefs.get ('PCI_REVISION')
-        
-#        InfObj = GenFdsGlobalVariable.WorkSpace.BuildObject[self.PathClassObj, self.CurrentArch]  
+
+#        InfObj = GenFdsGlobalVariable.WorkSpace.BuildObject[self.PathClassObj, self.CurrentArch]
 #        RecordList = InfObj._RawData[MODEL_META_DATA_HEADER, InfObj._Arch, InfObj._Platform]
 #        for Record in RecordList:
 #            Record = ReplaceMacros(Record, GlobalData.gEdkGlobal, False)
-#            Name = Record[0]  
+#            Name = Record[0]
     ## GenFfs() method
     #
     #   Generate FFS
@@ -147,8 +147,8 @@ class OptRomInfStatement (FfsInfStatement):
                     OutputFileList.append(GenSecInputFile)
                 else:
                     FileList, IsSect = Section.Section.GetFileList(self, '', Sect.FileExtension)
-                    OutputFileList.extend(FileList)    
-        
+                    OutputFileList.extend(FileList)
+
         return OutputFileList
 
-    
+

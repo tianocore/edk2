@@ -1,12 +1,12 @@
 ## @file
-# This file is used to define common parsing related functions used in parsing 
+# This file is used to define common parsing related functions used in parsing
 # INF/DEC/DSC process
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -74,7 +74,7 @@ def GetBuildOption(String, File, LineNo= -1):
 # Get Library of Dsc as <LibraryClassKeyWord>|<LibraryInstance>
 #
 # @param Item:           String as <LibraryClassKeyWord>|<LibraryInstance>
-# @param ContainerFile:  The file which describes the library class, used for 
+# @param ContainerFile:  The file which describes the library class, used for
 #                        error report
 #
 def GetLibraryClass(Item, ContainerFile, WorkspaceDir, LineNo= -1):
@@ -99,7 +99,7 @@ def GetLibraryClass(Item, ContainerFile, WorkspaceDir, LineNo= -1):
 # [|<TokenSpaceGuidCName>.<PcdCName>]
 #
 # @param Item:           String as <LibraryClassKeyWord>|<LibraryInstance>
-# @param ContainerFile:  The file which describes the library class, used for 
+# @param ContainerFile:  The file which describes the library class, used for
 #                        error report
 #
 def GetLibraryClassOfInf(Item, ContainerFile, WorkspaceDir, LineNo= -1):
@@ -148,7 +148,7 @@ def CheckPcdTokenInfo(TokenInfoString, Section, File, LineNo= -1):
 #
 # @param Item:           String as <PcdTokenSpaceGuidCName>.<TokenCName>|
 #                        <Value>[|<Type>|<MaximumDatumSize>]
-# @param ContainerFile:  The file which describes the pcd, used for error 
+# @param ContainerFile:  The file which describes the pcd, used for error
 #                        report
 
 #
@@ -176,7 +176,7 @@ def GetPcd(Item, Type, ContainerFile, LineNo= -1):
 #
 # @param Item:           String as <PcdTokenSpaceGuidCName>
 #                        .<TokenCName>|TRUE/FALSE
-# @param ContainerFile:  The file which describes the pcd, used for error 
+# @param ContainerFile:  The file which describes the pcd, used for error
 #                        report
 #
 def GetFeatureFlagPcd(Item, Type, ContainerFile, LineNo= -1):
@@ -200,7 +200,7 @@ def GetFeatureFlagPcd(Item, Type, ContainerFile, LineNo= -1):
 #
 # @param Item:           String as <PcdTokenSpaceGuidCName>.<TokenCName>|
 #                        TRUE/FALSE
-# @param ContainerFile:  The file which describes the pcd, used for error 
+# @param ContainerFile:  The file which describes the pcd, used for error
 #                        report
 #
 def GetDynamicDefaultPcd(Item, Type, ContainerFile, LineNo= -1):
@@ -226,7 +226,7 @@ def GetDynamicDefaultPcd(Item, Type, ContainerFile, LineNo= -1):
 #
 # @param Item:           String as <PcdTokenSpaceGuidCName>.<TokenCName>|
 #                        TRUE/FALSE
-# @param ContainerFile:  The file which describes the pcd, used for error 
+# @param ContainerFile:  The file which describes the pcd, used for error
 #                        report
 #
 def GetDynamicHiiPcd(Item, Type, ContainerFile, LineNo= -1):
@@ -253,7 +253,7 @@ def GetDynamicHiiPcd(Item, Type, ContainerFile, LineNo= -1):
 #
 # @param Item:           String as <PcdTokenSpaceGuidCName>.<TokenCName>
 #                        |TRUE/FALSE
-# @param ContainerFile:  The file which describes the pcd, used for error 
+# @param ContainerFile:  The file which describes the pcd, used for error
 #                        report
 #
 def GetDynamicVpdPcd(Item, Type, ContainerFile, LineNo= -1):
@@ -273,7 +273,7 @@ def GetDynamicVpdPcd(Item, Type, ContainerFile, LineNo= -1):
 ## GetComponent
 #
 # Parse block of the components defined in dsc file
-# Set KeyValues as [ ['component name', [lib1, lib2, lib3], 
+# Set KeyValues as [ ['component name', [lib1, lib2, lib3],
 # [bo1, bo2, bo3], [pcd1, pcd2, pcd3]], ...]
 #
 # @param Lines:             The content to be parsed
@@ -408,7 +408,7 @@ def GetExec(String):
 ## GetComponents
 #
 # Parse block of the components defined in dsc file
-# Set KeyValues as [ ['component name', [lib1, lib2, lib3], [bo1, bo2, bo3], 
+# Set KeyValues as [ ['component name', [lib1, lib2, lib3], [bo1, bo2, bo3],
 # [pcd1, pcd2, pcd3]], ...]
 #
 # @param Lines:             The content to be parsed
@@ -531,7 +531,7 @@ def GetComponents(Lines, KeyValues, CommentCharacter):
 #
 # @param Item:           String as <Filename>[|<Family>[|<TagName>[|<ToolCode>
 #                        [|<PcdFeatureFlag>]]]]
-# @param ContainerFile:  The file which describes the library class, used 
+# @param ContainerFile:  The file which describes the library class, used
 #                        for error report
 #
 def GetSource(Item, ContainerFile, FileRelativePath, LineNo= -1):
@@ -556,7 +556,7 @@ def GetSource(Item, ContainerFile, FileRelativePath, LineNo= -1):
 #
 # @param Item:           String as <Filename>[|<Family>[|<TagName>
 #                        [|<ToolCode>[|<PcdFeatureFlag>]]]]
-# @param ContainerFile:  The file which describes the library class, 
+# @param ContainerFile:  The file which describes the library class,
 #                        used for error report
 #
 def GetBinary(Item, ContainerFile, LineNo= -1):
@@ -580,7 +580,7 @@ def GetBinary(Item, ContainerFile, LineNo= -1):
 #
 # @param Item:           String as <GuidCName>[|<PcdFeatureFlag>]
 # @param Type:           Type of parsing string
-# @param ContainerFile:  The file which describes the library class, 
+# @param ContainerFile:  The file which describes the library class,
 #                        used for error report
 #
 def GetGuidsProtocolsPpisOfInf(Item):
@@ -594,7 +594,7 @@ def GetGuidsProtocolsPpisOfInf(Item):
 #
 # @param Item:           String as <GuidCName>=<GuidValue>
 # @param Type:           Type of parsing string
-# @param ContainerFile:  The file which describes the library class, 
+# @param ContainerFile:  The file which describes the library class,
 # used for error report
 #
 def GetGuidsProtocolsPpisOfDec(Item, Type, ContainerFile, LineNo= -1):
@@ -625,7 +625,7 @@ def GetGuidsProtocolsPpisOfDec(Item, Type, ContainerFile, LineNo= -1):
 #
 # @param Item:           String as <PackagePath>[|<PcdFeatureFlag>]
 # @param Type:           Type of parsing string
-# @param ContainerFile:  The file which describes the library class, 
+# @param ContainerFile:  The file which describes the library class,
 #                        used for error report
 #
 def GetPackage(Item, ContainerFile, FileRelativePath, LineNo= -1):
@@ -936,7 +936,7 @@ def MacroParser(Line, FileName, SectionType, FileLocalMacros):
     # <Value>           ::=  {<NumVal>} {<Boolean>} {<AsciiString>} {<GUID>}
     #                        {<CString>} {<UnicodeString>} {<CArray>}
     #
-    # The definition of <NumVal>, <PATH>, <Boolean>, <GUID>, <CString>, 
+    # The definition of <NumVal>, <PATH>, <Boolean>, <GUID>, <CString>,
     # <UnicodeString>, <CArray> are subset of <AsciiString>.
     #
     ReIsValidMacroValue = re.compile(r"^[\x20-\x7e]*$", re.DOTALL)
@@ -950,15 +950,15 @@ def MacroParser(Line, FileName, SectionType, FileLocalMacros):
 
     return Name, Value
 
-## GenSection 
+## GenSection
 #
 # generate section contents
 #
-# @param  SectionName:  indicate the name of the section, details refer to 
+# @param  SectionName:  indicate the name of the section, details refer to
 #                       INF, DEC specs
-# @param  SectionDict:  section statement dict, key is SectionAttrs(arch, 
-#                       moduletype or platform may exist as needed) list 
-#                       seperated by space, 
+# @param  SectionDict:  section statement dict, key is SectionAttrs(arch,
+#                       moduletype or platform may exist as needed) list
+#                       seperated by space,
 #                       value is statement
 #
 def GenSection(SectionName, SectionDict, SplitArch=True, NeedBlankLine=False):
@@ -1004,10 +1004,10 @@ def GenSection(SectionName, SectionDict, SplitArch=True, NeedBlankLine=False):
     return Content
 
 ## ConvertArchForInstall
-# if Arch.upper() is in "IA32", "X64", "IPF", and "EBC", it must be upper case.  "common" must be lower case.  
+# if Arch.upper() is in "IA32", "X64", "IPF", and "EBC", it must be upper case.  "common" must be lower case.
 # Anything else, the case must be preserved
 #
-# @param Arch: the arch string that need to be converted, it should be stripped before pass in 
+# @param Arch: the arch string that need to be converted, it should be stripped before pass in
 # @return: the arch string that get converted
 #
 def ConvertArchForInstall(Arch):

@@ -8,10 +8,10 @@
 # If a tool requires additional files, the developer must list those files in the
 # [ExtraFiles.Win32] section.
 # The [CxFreeze.Win32] section is maintained by the owner of the Build Server who
-# must ensure that files that are required by the cx_freeze frozen binaries are 
+# must ensure that files that are required by the cx_freeze frozen binaries are
 # present in the Bin\Win32 directory.
 #
-# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License which accompanies this distribution.

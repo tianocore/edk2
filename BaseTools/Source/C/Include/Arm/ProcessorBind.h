@@ -1,15 +1,15 @@
 /** @file
   Processor or Compiler specific defines and types for ARM.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -28,9 +28,9 @@
 #pragma pack()
 #endif
 
-#if _MSC_EXTENSIONS 
+#if _MSC_EXTENSIONS
   //
-  // use Microsoft* C complier dependent integer width types 
+  // use Microsoft* C complier dependent integer width types
   //
   typedef unsigned __int64    UINT64;
   typedef __int64             INT64;
@@ -45,7 +45,7 @@
   typedef signed char         INT8;
 #else
   //
-  // Assume standard ARM alignment. 
+  // Assume standard ARM alignment.
   //
   typedef unsigned long long  UINT64;
   typedef long long           INT64;
@@ -103,7 +103,7 @@ typedef INT32   INTN;
 // use the correct C calling convention. All protocol member functions and
 // EFI intrinsics are required to modify their member functions with EFIAPI.
 //
-#define EFIAPI    
+#define EFIAPI
 
 #if defined(__GNUC__)
   ///
@@ -122,34 +122,34 @@ typedef INT32   INTN;
 
     #define GCC_ASM_EXPORT(func__)  \
              .global  _CONCATENATE (__USER_LABEL_PREFIX__, func__)    ;\
-             .type ASM_PFX(func__), %function  
+             .type ASM_PFX(func__), %function
 
     #define GCC_ASM_IMPORT(func__)  \
              .extern  _CONCATENATE (__USER_LABEL_PREFIX__, func__)
-             
+
   #else
     //
-    // .type not supported by Apple Xcode tools 
+    // .type not supported by Apple Xcode tools
     //
-    #define INTERWORK_FUNC(func__)  
+    #define INTERWORK_FUNC(func__)
 
     #define GCC_ASM_EXPORT(func__)  \
              .globl  _CONCATENATE (__USER_LABEL_PREFIX__, func__)    \
-  
-    #define GCC_ASM_IMPORT(name)  
+
+    #define GCC_ASM_IMPORT(name)
 
   #endif
 #endif
 
 /**
   Return the pointer to the first instruction of a function given a function pointer.
-  On ARM CPU architectures, these two pointer values are the same, 
+  On ARM CPU architectures, these two pointer values are the same,
   so the implementation of this macro is very simple.
-  
+
   @param  FunctionPointer   A pointer to a function.
 
   @return The pointer to the first instruction of a function given a function pointer.
-  
+
 **/
 #define FUNCTION_ENTRY_POINT(FunctionPointer) (VOID *)(UINTN)(FunctionPointer)
 

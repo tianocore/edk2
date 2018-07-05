@@ -59,7 +59,7 @@ from collections import OrderedDict, defaultdict
 # Version and Copyright
 VersionNumber = "0.60" + ' ' + gBUILD_VERSION
 __version__ = "%prog Version " + VersionNumber
-__copyright__ = "Copyright (c) 2007 - 2017, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007 - 2018, Intel Corporation  All rights reserved."
 
 ## standard targets of build command
 gSupportedTarget = ['all', 'genc', 'genmake', 'modules', 'libraries', 'fds', 'clean', 'cleanall', 'cleanlib', 'run']
@@ -111,7 +111,7 @@ def CheckEnvVariable():
         EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in WORKSPACE path",
                         ExtraData=WorkspaceDir)
     os.environ["WORKSPACE"] = WorkspaceDir
-    
+
     # set multiple workspace
     PackagesPath = os.getenv("PACKAGES_PATH")
     mws.setWs(WorkspaceDir, PackagesPath)
@@ -201,7 +201,7 @@ def CheckEnvVariable():
     GlobalData.gGlobalDefines["EDK_SOURCE"] = EdkSourceDir
     GlobalData.gGlobalDefines["ECP_SOURCE"] = EcpSourceDir
     GlobalData.gGlobalDefines["EDK_TOOLS_PATH"] = os.environ["EDK_TOOLS_PATH"]
-    
+
 ## Get normalized file path
 #
 # Convert the path to be local format, and remove the WORKSPACE path at the
@@ -266,7 +266,7 @@ def LaunchCommand(Command, WorkingDir):
     # if working directory doesn't exist, Popen() will raise an exception
     if not os.path.isdir(WorkingDir):
         EdkLogger.error("build", FILE_NOT_FOUND, ExtraData=WorkingDir)
-    
+
     # Command is used as the first Argument in following Popen().
     # It could be a string or sequence. We find that if command is a string in following Popen(),
     # ubuntu may fail with an error message that the command is not found.
@@ -849,14 +849,14 @@ class Build():
         # print current build environment and configuration
         EdkLogger.quiet("%-16s = %s" % ("WORKSPACE", os.environ["WORKSPACE"]))
         if "PACKAGES_PATH" in os.environ:
-            # WORKSPACE env has been converted before. Print the same path style with WORKSPACE env. 
+            # WORKSPACE env has been converted before. Print the same path style with WORKSPACE env.
             EdkLogger.quiet("%-16s = %s" % ("PACKAGES_PATH", os.path.normcase(os.path.normpath(os.environ["PACKAGES_PATH"]))))
         EdkLogger.quiet("%-16s = %s" % ("ECP_SOURCE", os.environ["ECP_SOURCE"]))
         EdkLogger.quiet("%-16s = %s" % ("EDK_SOURCE", os.environ["EDK_SOURCE"]))
         EdkLogger.quiet("%-16s = %s" % ("EFI_SOURCE", os.environ["EFI_SOURCE"]))
         EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_PATH", os.environ["EDK_TOOLS_PATH"]))
         if "EDK_TOOLS_BIN" in os.environ:
-            # Print the same path style with WORKSPACE env. 
+            # Print the same path style with WORKSPACE env.
             EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_BIN", os.path.normcase(os.path.normpath(os.environ["EDK_TOOLS_BIN"]))))
         EdkLogger.quiet("%-16s = %s" % ("CONF_PATH", GlobalData.gConfDirectory))
         self.InitPreBuild()
@@ -1962,7 +1962,7 @@ class Build():
                     self._SaveMapFile (MapBuffer, Wa)
 
     def _GenFfsCmd(self):
-        # convert dictionary of Cmd:(Inf,Arch) 
+        # convert dictionary of Cmd:(Inf,Arch)
         # to a new dictionary of (Inf,Arch):Cmd,Cmd,Cmd...
         CmdSetDict = defaultdict(set)
         GenFfsDict = GenFds.GenFfsMakefile('', GlobalData.gFdfParser, self, self.ArchList, GlobalData)
@@ -2034,7 +2034,7 @@ class Build():
                     for Module in ModuleList:
                         # Get ModuleAutoGen object to generate C code file and makefile
                         Ma = ModuleAutoGen(Wa, Module, BuildTarget, ToolChain, Arch, self.PlatformFile)
-                        
+
                         if Ma is None:
                             continue
                         if Ma.CanSkipbyHash():

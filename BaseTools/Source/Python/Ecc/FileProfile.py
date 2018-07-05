@@ -1,7 +1,7 @@
 ## @file
 # fragments of source file
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -36,7 +36,7 @@ FunctionCallingList = []
 # May raise Exception when opening file.
 #
 class FileProfile :
-    
+
     ## The constructor
     #
     #   @param  self        The object pointer
@@ -54,5 +54,5 @@ class FileProfile :
 
         except IOError:
             raise Warning("Error when opening file %s" % FileName)
-        
-        
+
+

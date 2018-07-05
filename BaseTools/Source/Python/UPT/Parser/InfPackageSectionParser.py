@@ -1,11 +1,11 @@
 ## @file
-# This file contained the parser for [Packages] sections in INF file 
+# This file contained the parser for [Packages] sections in INF file
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -31,29 +31,29 @@ from Parser.InfParserMisc import InfParserSectionRoot
 class InfPackageSectionParser(InfParserSectionRoot):
     ## InfPackageParser
     #
-    #                       
+    #
     def InfPackageParser(self, SectionString, InfSectionObject, FileName):
         #
-        # Macro defined in this section 
+        # Macro defined in this section
         #
         SectionMacros = {}
         ValueList     = []
         PackageList   = []
         StillCommentFalg  = False
         HeaderComments    = []
-        LineComment       = None                  
+        LineComment       = None
         #
         # Parse section content
         #
         for Line in SectionString:
             PkgLineContent = Line[0]
-            PkgLineNo      = Line[1]  
-            
+            PkgLineNo      = Line[1]
+
             if PkgLineContent.strip() == '':
                 continue
-            
+
             #
-            # Find Header Comments 
+            # Find Header Comments
             #
             if PkgLineContent.strip().startswith(DT.TAB_COMMENT_SPLIT):
                 #
@@ -63,7 +63,7 @@ class InfPackageSectionParser(InfParserSectionRoot):
                     HeaderComments.append(Line)
                     continue
                 #
-                # First time encounter comment 
+                # First time encounter comment
                 #
                 else:
                     #
@@ -75,14 +75,14 @@ class InfPackageSectionParser(InfParserSectionRoot):
                     continue
             else:
                 StillCommentFalg = False
-                          
+
             if len(HeaderComments) >= 1:
                 LineComment = InfLineCommentObject()
                 LineCommentContent = ''
                 for Item in HeaderComments:
                     LineCommentContent += Item[0] + DT.END_OF_LINE
                 LineComment.SetHeaderComments(LineCommentContent)
-            
+
             #
             # Find Tail comment.
             #
@@ -91,7 +91,7 @@ class InfPackageSectionParser(InfParserSectionRoot):
                 PkgLineContent = PkgLineContent[:PkgLineContent.find(DT.TAB_COMMENT_SPLIT)]
                 if LineComment is None:
                     LineComment = InfLineCommentObject()
-                LineComment.SetTailComments(TailComments)                   
+                LineComment.SetTailComments(TailComments)
             #
             # Find Macro
             #
@@ -102,39 +102,39 @@ class InfPackageSectionParser(InfParserSectionRoot):
             if Name is not None:
                 SectionMacros[Name] = Value
                 LineComment = None
-                HeaderComments = []                
+                HeaderComments = []
                 continue
 
             TokenList = GetSplitValueList(PkgLineContent, DT.TAB_VALUE_SPLIT, 1)
             ValueList[0:len(TokenList)] = TokenList
-            
+
             #
             # Replace with Local section Macro and [Defines] section Macro.
-            #            
-            ValueList = [InfExpandMacro(Value, (FileName, PkgLineContent, PkgLineNo), 
+            #
+            ValueList = [InfExpandMacro(Value, (FileName, PkgLineContent, PkgLineNo),
                                         self.FileLocalMacros, SectionMacros, True)
                                         for Value in ValueList]
-            
-            PackageList.append((ValueList, LineComment, 
+
+            PackageList.append((ValueList, LineComment,
                                 (PkgLineContent, PkgLineNo, FileName)))
             ValueList = []
             LineComment = None
             TailComments = ''
-            HeaderComments = []            
+            HeaderComments = []
             continue
 
         #
         # Current section archs
-        #    
+        #
         ArchList = []
         for Item in self.LastSectionHeaderContent:
             if Item[1] not in ArchList:
-                ArchList.append(Item[1])  
-        
+                ArchList.append(Item[1])
+
         if not InfSectionObject.SetPackages(PackageList, Arch = ArchList):
-            Logger.Error('InfParser', 
-                         FORMAT_INVALID, 
+            Logger.Error('InfParser',
+                         FORMAT_INVALID,
                          ST.ERR_INF_PARSER_MODULE_SECTION_TYPE_ERROR\
                          %("[Packages]"),
                          File=FileName,
-                         Line=Item[3])         
+                         Line=Item[3])

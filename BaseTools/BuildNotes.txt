@@ -6,7 +6,7 @@ Root Package 1.00
 Intel is a trademark or registered trademark of Intel Corporation or its
 subsidiaries in the United States and other countries.
 * Other names and brands may be claimed as the property of others.
-Copyright (c) 2007, Intel Corporation. All rights reserved.
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.
 
 -------------------------------------------------------------------------------
 Quick Start
@@ -33,28 +33,28 @@ Tools in Python
 ---------------
 * Convert Python source to exe file
 
-  The tools written in Python can be converted into executable program which can 
+  The tools written in Python can be converted into executable program which can
   be executed without installing a Python interpreter. (Generally it is easier
   to run the scripts from their source on operating systems other than Windows.)
 
   For Windows and Linux, the conversion tool package is called cx_Freeze, its
   home page is:
 
-		http://sourceforge.net/projects/cx-freeze/
+    http://sourceforge.net/projects/cx-freeze/
 
-	If you have installed cx_Freeze at c:\cx_Freeze-3.0.3. Use following command
+  If you have installed cx_Freeze at c:\cx_Freeze-3.0.3. Use following command
   lines to convert MyBuild.py to MyBuild.exe (note this is an example, there is
   no MyBuild Python project in the BaseTools\Python tree.
 
     set PYTHONPATH=<BaseToolsDirPath>\Source\Python
-  	c:\cx_Freeze-3.0.3\FreezePython.exe --include-modules=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_16_le,encodings.utf_8 --install-dir=.\mybuild MyBuild.py
+    c:\cx_Freeze-3.0.3\FreezePython.exe --include-modules=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_16_le,encodings.utf_8 --install-dir=.\mybuild MyBuild.py
 
-	The generated .exe (and .dll) files are put in "mybuild" subdirectory.
+  The generated .exe (and .dll) files are put in "mybuild" subdirectory.
 
-  The following is a real example with the BuildTools/trunk/BaseTools project 
+  The following is a real example with the BuildTools/trunk/BaseTools project
   installed in: C:\Work\BaseTools
 
-  
+
   C:\Work\BaseTools\Source\Python> set PYTHONPATH=C:\Work\BaseTools\Source\Python
   C:\Work\BaseTools\Source\Python> c:\cx_Freeze-3.0.3\FreezePython.exe --include-modules=encodings.cp437,encodings.gbk,encodings.utf_16,encodings.utf_16_le,encodings.utf_8 --install-dir=C:\Work\BaseTools\Bin\Win32 build\build.py
 
@@ -70,7 +70,7 @@ Windows:
 
   The tools written in Python can be executed directly from its source directory
 as long as the Python interpreter (Python 2.5) has been installed. Before the execution,
-please make sure the environment variable PYTHONPATH is set to 
+please make sure the environment variable PYTHONPATH is set to
 
         <buildtools_project>/BaseTools/Source/Python
 

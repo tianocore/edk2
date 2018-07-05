@@ -1,11 +1,11 @@
 ## @file
 # This file is used to define a class object to describe a package
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -30,10 +30,10 @@ class StandardIncludeFileObject(CommonPropertiesObject):
     def __init__(self):
         CommonPropertiesObject.__init__(self)
         self.IncludeFile = ''
-    
+
     def SetIncludeFile(self, IncludeFile):
         self.IncludeFile = IncludeFile
-    
+
     def GetIncludeFile(self):
         return self.IncludeFile
 
@@ -53,19 +53,19 @@ class PackageObject(IdentificationObject, CommonHeaderObject, BinaryHeaderObject
         #
         # LibraryClassObject
         #
-        self.LibraryClassList = [] 
+        self.LibraryClassList = []
         #
         # FileObject
         #
-        self.IncludePathList = [] 
+        self.IncludePathList = []
         #
         # StandardIncludeFileObject
         #
-        self.StandardIncludeFileList = [] 
+        self.StandardIncludeFileList = []
         #
         # PackageIncludeFileObject
         #
-        self.PackageIncludeFileList = [] 
+        self.PackageIncludeFileList = []
         #
         # Include and Arch List, item is (IncludePath, SupArchList-List of Arch), used during install package
         #
@@ -73,126 +73,126 @@ class PackageObject(IdentificationObject, CommonHeaderObject, BinaryHeaderObject
         #
         # ProtocolObject
         #
-        self.ProtocolList = [] 
+        self.ProtocolList = []
         #
         # PpiObject
         #
-        self.PpiList = [] 
+        self.PpiList = []
         #
         # GuidObject
         #
-        self.GuidList = [] 
+        self.GuidList = []
         #
         # (PcdObject, PcdErrorObject)
         #
-        self.PcdList = [] 
+        self.PcdList = []
         #
         # {(PcdTokenSpaceGuidCName, PcdErrroNumber): PcdErrorMessageList}
         #
         self.PcdErrorCommentDict = {}
         #
         # UserExtensionObject
-        #        
-        self.UserExtensionList = [] 
+        #
+        self.UserExtensionList = []
         #
         # MiscFileObject
         #
-        self.MiscFileList = [] 
+        self.MiscFileList = []
         self.ModuleDict = Sdict()
         #
         # ClonedRecordObject
         #
-        self.ClonedFromList = [] 
+        self.ClonedFromList = []
         #
         # string object
         #
-        self.ModuleFileList = [] 
-        
+        self.ModuleFileList = []
+
         self.PcdChecks = []
-        
+
         self.UNIFlag = False
-        
+
     def SetLibraryClassList(self, LibraryClassList):
         self.LibraryClassList = LibraryClassList
-    
+
     def GetLibraryClassList(self):
         return self.LibraryClassList
-    
+
     def SetIncludePathList(self, IncludePathList):
         self.IncludePathList = IncludePathList
-    
+
     def GetIncludePathList(self):
         return self.IncludePathList
 
     def SetIncludeArchList(self, IncludeArchList):
         self.IncludeArchList = IncludeArchList
-    
+
     def GetIncludeArchList(self):
-        return self.IncludeArchList    
-    
+        return self.IncludeArchList
+
     def SetStandardIncludeFileList(self, StandardIncludeFileList):
         self.StandardIncludeFileList = StandardIncludeFileList
-        
+
     def GetStandardIncludeFileList(self):
         return self.StandardIncludeFileList
-    
+
     def SetPackageIncludeFileList(self, PackageIncludeFileList):
         self.PackageIncludeFileList = PackageIncludeFileList
-        
+
     def GetPackageIncludeFileList(self):
         return self.PackageIncludeFileList
-    
+
     def SetProtocolList(self, ProtocolList):
         self.ProtocolList = ProtocolList
-        
+
     def GetProtocolList(self):
         return self.ProtocolList
-    
+
     def SetPpiList(self, PpiList):
         self.PpiList = PpiList
-        
+
     def GetPpiList(self):
         return self.PpiList
-    
+
     def SetGuidList(self, GuidList):
         self.GuidList = GuidList
-        
+
     def GetGuidList(self):
         return self.GuidList
-    
+
     def SetPcdList(self, PcdList):
         self.PcdList = PcdList
-        
+
     def GetPcdList(self):
         return self.PcdList
-    
+
     def SetUserExtensionList(self, UserExtensionList):
         self.UserExtensionList = UserExtensionList
-        
+
     def GetUserExtensionList(self):
         return self.UserExtensionList
-        
+
     def SetMiscFileList(self, MiscFileList):
         self.MiscFileList = MiscFileList
-        
+
     def GetMiscFileList(self):
         return self.MiscFileList
 
     def SetModuleDict(self, ModuleDict):
         self.ModuleDict = ModuleDict
-        
+
     def GetModuleDict(self):
         return self.ModuleDict
 
     def SetClonedFromList(self, ClonedFromList):
         self.ClonedFromList = ClonedFromList
-        
+
     def GetClonedFromList(self):
         return self.ClonedFromList
 
     def SetModuleFileList(self, ModuleFileList):
         self.ModuleFileList = ModuleFileList
-        
+
     def GetModuleFileList(self):
         return self.ModuleFileList
 

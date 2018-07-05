@@ -1,12 +1,12 @@
 ## @file
-# This file is used to define class objects for DEC file. It will consumed by 
+# This file is used to define class objects for DEC file. It will consumed by
 #DecParser
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -49,7 +49,7 @@ class _DecComments:
         return self._HeadComment, self._TailComment
 
     ## GetHeadComment
-    #    
+    #
     def GetHeadComment(self):
         return self._HeadComment
 
@@ -61,7 +61,7 @@ class _DecComments:
         self._HeadComment = Comment
 
     ## GetTailComment
-    #    
+    #
     def GetTailComment(self):
         return self._TailComment
 
@@ -89,22 +89,22 @@ class _DecBaseObject(_DecComments):
         self._SecName = ''
 
     ## GetSectionName
-    #        
+    #
     def GetSectionName(self):
         return self._SecName
 
     ## GetPackagePath
-    #        
+    #
     def GetPackagePath(self):
         return self._PackagePath
 
     ## GetPackageFile
-    #        
+    #
     def GetPackageFile(self):
         return self._FileName
 
     ## GetPackageFullName
-    #        
+    #
     def GetPackageFullName(self):
         return self._PkgFullName
 
@@ -151,7 +151,7 @@ class _DecBaseObject(_DecComments):
 
 ## _DecItemBaseObject
 #
-# Module type and arch the item belongs to 
+# Module type and arch the item belongs to
 #
 class _DecItemBaseObject(_DecComments):
     def __init__(self):
@@ -162,7 +162,7 @@ class _DecItemBaseObject(_DecComments):
         self.ArchAndModuleType = []
 
     ## GetArchList
-    #    
+    #
     def GetArchList(self):
         ArchSet = set()
         for Arch in self.ArchAndModuleType:
@@ -184,7 +184,7 @@ class DecDefineObject(_DecBaseObject):
         self._PkgUniFile = ''
 
     ## GetPackageSpecification
-    #        
+    #
     def GetPackageSpecification(self):
         return self._DecSpec
 
@@ -192,7 +192,7 @@ class DecDefineObject(_DecBaseObject):
         self._DecSpec = DecSpec
 
     ## GetPackageName
-    #        
+    #
     def GetPackageName(self):
         return self._PkgName
 
@@ -200,7 +200,7 @@ class DecDefineObject(_DecBaseObject):
         self._PkgName = PkgName
 
     ## GetPackageGuid
-    #        
+    #
     def GetPackageGuid(self):
         return self._PkgGuid
 
@@ -208,7 +208,7 @@ class DecDefineObject(_DecBaseObject):
         self._PkgGuid = PkgGuid
 
     ## GetPackageVersion
-    #        
+    #
     def GetPackageVersion(self):
         return self._PkgVersion
 
@@ -216,7 +216,7 @@ class DecDefineObject(_DecBaseObject):
         self._PkgVersion = PkgVersion
 
     ## GetPackageUniFile
-    #        
+    #
     def GetPackageUniFile(self):
         return self._PkgUniFile
 
@@ -224,12 +224,12 @@ class DecDefineObject(_DecBaseObject):
         self._PkgUniFile = PkgUniFile
 
     ## GetDefines
-    #        
+    #
     def GetDefines(self):
         return self._GetItemByArch(TAB_ARCH_COMMON)
 
     ## GetAllDefines
-    #        
+    #
     def GetAllDefines(self):
         return self._GetAllItems()
 
@@ -244,7 +244,7 @@ class DecDefineItemObject(_DecItemBaseObject):
         self.Value = ''
 
     ## __hash__
-    #            
+    #
     def __hash__(self):
         return hash(self.Key + self.Value)
 
@@ -254,7 +254,7 @@ class DecDefineItemObject(_DecItemBaseObject):
         return id(self) == id(Other)
 
     ## __str__
-    #            
+    #
     def __str__(self):
         return str(self.ArchAndModuleType) + '\n' + self.Key + \
             ' = ' + self.Value
@@ -269,12 +269,12 @@ class DecIncludeObject(_DecBaseObject):
         self._SecName = TAB_INCLUDES.upper()
 
     ## GetIncludes
-    #          
+    #
     def GetIncludes(self, Arch=TAB_ARCH_COMMON):
         return self._GetItemByArch(Arch)
 
     ## GetAllIncludes
-    #          
+    #
     def GetAllIncludes(self):
         return self._GetAllItems()
 
@@ -289,7 +289,7 @@ class DecIncludeItemObject(_DecItemBaseObject):
         _DecItemBaseObject.__init__(self)
 
     ## __hash__
-    #          
+    #
     def __hash__(self):
         return hash(self.File)
 
@@ -299,7 +299,7 @@ class DecIncludeItemObject(_DecItemBaseObject):
         return id(self) == id(Other)
 
     ## __str__
-    #          
+    #
     def __str__(self):
         return self.File
 
@@ -314,12 +314,12 @@ class DecLibraryclassObject(_DecBaseObject):
         self._SecName = TAB_LIBRARY_CLASSES.upper()
 
     ## GetLibraryclasses
-    #           
+    #
     def GetLibraryclasses(self, Arch=TAB_ARCH_COMMON):
         return self._GetItemByArch(Arch)
 
     ## GetAllLibraryclasses
-    #           
+    #
     def GetAllLibraryclasses(self):
         return self._GetAllItems()
 
@@ -334,7 +334,7 @@ class DecLibraryclassItemObject(_DecItemBaseObject):
         self.Libraryclass = Libraryclass
 
     ## __hash__
-    #        
+    #
     def __hash__(self):
         return hash(self.Libraryclass + self.File)
 
@@ -344,7 +344,7 @@ class DecLibraryclassItemObject(_DecItemBaseObject):
         return id(self) == id(Other)
 
     ## __str__
-    #        
+    #
     def __str__(self):
         return self.Libraryclass + '|' + self.File
 
@@ -381,7 +381,7 @@ class DecPcdObject(_DecBaseObject):
     #
     # @param PcdType: PcdType
     # @param Arch: Arch
-    #    
+    #
     def GetPcds(self, PcdType, Arch=TAB_ARCH_COMMON):
         PcdType = PcdType.upper()
         Arch = Arch.upper()
@@ -392,7 +392,7 @@ class DecPcdObject(_DecBaseObject):
     ## GetPcdsByType
     #
     # @param PcdType: PcdType
-    #        
+    #
     def GetPcdsByType(self, PcdType):
         PcdType = PcdType.upper()
         Retlst = []
@@ -422,7 +422,7 @@ class DecPcdItemObject(_DecItemBaseObject):
         self.MaxDatumSize = MaxDatumSize
 
     ## __hash__
-    #  
+    #
     def __hash__(self):
         return hash(self.TokenSpaceGuidCName + self.TokenCName)
 
@@ -434,7 +434,7 @@ class DecPcdItemObject(_DecItemBaseObject):
     ## GetArchListOfType
     #
     # @param PcdType: PcdType
-    #      
+    #
     def GetArchListOfType(self, PcdType):
         ItemSet = set()
         PcdType = PcdType.upper()
@@ -458,12 +458,12 @@ class DecGuidObjectBase(_DecBaseObject):
     ## GetGuidStyleItems
     #
     # @param Arch: Arch
-    #       
+    #
     def GetGuidStyleItems(self, Arch=TAB_ARCH_COMMON):
         return self._GetItemByArch(Arch)
 
     ## GetGuidStyleAllItems
-    #       
+    #
     def GetGuidStyleAllItems(self):
         return self._GetAllItems()
 
@@ -481,7 +481,7 @@ class DecGuidItemObject(_DecItemBaseObject):
         self.GuidString = GuidString
 
     ## __hash__
-    #      
+    #
     def __hash__(self):
         return hash(self.GuidCName)
 
@@ -491,7 +491,7 @@ class DecGuidItemObject(_DecItemBaseObject):
         return id(self) == id(Other)
 
     ## __str__
-    #      
+    #
     def __str__(self):
         return self.GuidCName + ' = ' + self.GuidCValue
 
@@ -507,14 +507,14 @@ class DecGuidObject(DecGuidObjectBase):
         self._SecName = TAB_GUIDS.upper()
 
     ## GetGuids
-    #          
+    #
     # @param Arch: Arch
     #
     def GetGuids(self, Arch=TAB_ARCH_COMMON):
         return self._GetItemByArch(Arch)
 
     ## GetAllGuids
-    #          
+    #
     def GetAllGuids(self):
         return self._GetAllItems()
 
@@ -530,14 +530,14 @@ class DecPpiObject(DecGuidObjectBase):
         self._SecName = TAB_PPIS.upper()
 
     ## GetPpis
-    #          
+    #
     # @param Arch: Arch
-    #    
+    #
     def GetPpis(self, Arch=TAB_ARCH_COMMON):
         return self._GetItemByArch(Arch)
 
     ## GetAllPpis
-    #           
+    #
     def GetAllPpis(self):
         return self._GetAllItems()
 
@@ -553,14 +553,14 @@ class DecProtocolObject(DecGuidObjectBase):
         self._SecName = TAB_PROTOCOLS.upper()
 
     ## GetProtocols
-    #          
+    #
     # @param Arch: Arch
-    #        
+    #
     def GetProtocols(self, Arch=TAB_ARCH_COMMON):
         return self._GetItemByArch(Arch)
 
     ## GetAllProtocols
-    #        
+    #
     def GetAllProtocols(self):
         return self._GetAllItems()
 
@@ -577,10 +577,10 @@ class DecUserExtensionObject(_DecBaseObject):
         self.ItemList = []
 
     ## GetProtocols
-    #          
+    #
     # @param Item: Item
     # @param Scope: Scope
-    #            
+    #
     def AddItem(self, Item, Scope):
         if not Scope:
             pass
@@ -589,7 +589,7 @@ class DecUserExtensionObject(_DecBaseObject):
         self.ItemList.append(Item)
 
     ## GetAllUserExtensions
-    #       
+    #
     def GetAllUserExtensions(self):
         return self.ItemList
 

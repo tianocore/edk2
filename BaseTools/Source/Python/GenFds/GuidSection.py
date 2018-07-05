@@ -76,7 +76,7 @@ class GuidSection(GuidSectionClassObject) :
             FvAddrIsSet = True
         else:
             FvAddrIsSet = False
-        
+
         if self.ProcessRequired in ("TRUE", "1"):
             if self.FvAddr != []:
                 #no use FvAddr when the image is processed.

@@ -1,11 +1,11 @@
 ## @file
-# This file contained the parser for define sections in INF file 
+# This file contained the parser for define sections in INF file
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -33,32 +33,32 @@ from Logger import StringTable as ST
 from Parser.InfParserMisc import InfParserSectionRoot
 
 ## __GetValidateArchList
-#        
+#
 #
 def GetValidateArchList(LineContent):
-    
+
     TempArch = ''
     ArchList = []
     ValidateAcrhPatten = re.compile(r"^\s*#\s*VALID_ARCHITECTURES\s*=\s*.*$", re.DOTALL)
-    
+
     if ValidateAcrhPatten.match(LineContent):
         TempArch = GetSplitValueList(LineContent, DT.TAB_EQUAL_SPLIT, 1)[1]
-                                
+
         TempArch = GetSplitValueList(TempArch, '(', 1)[0]
-                                
+
         ArchList = re.split('\s+', TempArch)
         NewArchList = []
         for Arch in ArchList:
             if IsValidArch(Arch):
                 NewArchList.append(Arch)
-        
+
         ArchList = NewArchList
-        
-    return ArchList   
+
+    return ArchList
 
 class InfDefinSectionParser(InfParserSectionRoot):
     def InfDefineParser(self, SectionString, InfSectionObject, FileName, SectionComment):
-        
+
         if SectionComment:
             pass
         #
@@ -74,18 +74,18 @@ class InfDefinSectionParser(InfParserSectionRoot):
         # Add WORKSPACE to global Marco dict.
         #
         self.FileLocalMacros['WORKSPACE'] = GlobalData.gWORKSPACE
-        
+
         for Line in SectionString:
             LineContent = Line[0]
             LineNo      = Line[1]
             TailComments   = ''
             LineComment    = None
-            
+
             LineInfo       = ['', -1, '']
             LineInfo[0]    = FileName
             LineInfo[1]    = LineNo
             LineInfo[2]    = LineContent
-            
+
             if LineContent.strip() == '':
                 continue
             #
@@ -106,7 +106,7 @@ class InfDefinSectionParser(InfParserSectionRoot):
                     SectionContent += LineContent + DT.END_OF_LINE
                     continue
                 #
-                # First time encounter comment 
+                # First time encounter comment
                 #
                 else:
                     #
@@ -119,14 +119,14 @@ class InfDefinSectionParser(InfParserSectionRoot):
                     continue
             else:
                 StillCommentFalg = False
-                          
+
             if len(HeaderComments) >= 1:
                 LineComment = InfLineCommentObject()
                 LineCommentContent = ''
                 for Item in HeaderComments:
                     LineCommentContent += Item[0] + DT.END_OF_LINE
                 LineComment.SetHeaderComments(LineCommentContent)
-            
+
             #
             # Find Tail comment.
             #
@@ -136,62 +136,62 @@ class InfDefinSectionParser(InfParserSectionRoot):
                 if LineComment is None:
                     LineComment = InfLineCommentObject()
                 LineComment.SetTailComments(TailComments)
-                              
+
             #
             # Find Macro
             #
-            Name, Value = MacroParser((LineContent, LineNo), 
-                                      FileName, 
-                                      DT.MODEL_META_DATA_HEADER, 
+            Name, Value = MacroParser((LineContent, LineNo),
+                                      FileName,
+                                      DT.MODEL_META_DATA_HEADER,
                                       self.FileLocalMacros)
             if Name is not None:
                 self.FileLocalMacros[Name] = Value
-                continue            
+                continue
 
             #
             # Replace with [Defines] section Macro
             #
-            LineContent = InfExpandMacro(LineContent, 
-                                         (FileName, LineContent, LineNo), 
-                                         self.FileLocalMacros, 
+            LineContent = InfExpandMacro(LineContent,
+                                         (FileName, LineContent, LineNo),
+                                         self.FileLocalMacros,
                                          None, True)
-                       
+
             SectionContent += LineContent + DT.END_OF_LINE
-            
+
             TokenList = GetSplitValueList(LineContent, DT.TAB_EQUAL_SPLIT, 1)
             if len(TokenList) < 2:
                 ErrorInInf(ST.ERR_INF_PARSER_DEFINE_ITEM_NO_VALUE,
-                           LineInfo=LineInfo)                
+                           LineInfo=LineInfo)
             _ValueList[0:len(TokenList)] = TokenList
             if not _ValueList[0]:
                 ErrorInInf(ST.ERR_INF_PARSER_DEFINE_ITEM_NO_NAME,
                            LineInfo=LineInfo)
             if not _ValueList[1]:
                 ErrorInInf(ST.ERR_INF_PARSER_DEFINE_ITEM_NO_VALUE,
-                           LineInfo=LineInfo)   
-   
-            Name, Value = _ValueList[0], _ValueList[1]            
-            
+                           LineInfo=LineInfo)
+
+            Name, Value = _ValueList[0], _ValueList[1]
+
             InfDefMemberObj = InfDefMember(Name, Value)
             if (LineComment is not None):
                 InfDefMemberObj.Comments.SetHeaderComments(LineComment.GetHeaderComments())
                 InfDefMemberObj.Comments.SetTailComments(LineComment.GetTailComments())
-                
+
             InfDefMemberObj.CurrentLine.SetFileName(self.FullPath)
             InfDefMemberObj.CurrentLine.SetLineString(LineContent)
             InfDefMemberObj.CurrentLine.SetLineNo(LineNo)
-                       
+
             _ContentList.append(InfDefMemberObj)
             HeaderComments = []
             TailComments = ''
-        
+
         #
         # Current Define section archs
         #
         if not ArchList:
             ArchList = ['COMMON']
-        
-        InfSectionObject.SetAllContent(SectionContent)                
-        
+
+        InfSectionObject.SetAllContent(SectionContent)
+
         InfSectionObject.SetDefines(_ContentList, Arch=ArchList)
-        
+

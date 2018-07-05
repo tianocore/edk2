@@ -14,7 +14,7 @@
 ## SkuInfoClass
 #
 # This class defined SkuInfo item used in Module/Platform/Package files
-# 
+#
 # @param object:           Inherited from object class
 # @param SkuIdName:        Input value for SkuIdName, default is ''
 # @param SkuId:            Input value for SkuId, default is ''
@@ -35,11 +35,11 @@
 # @var DefaultValue:       To store value for DefaultValue
 #
 class SkuInfoClass(object):
-    def __init__(self, SkuIdName = '', SkuId = '', VariableName = '', VariableGuid = '', VariableOffset = '', 
+    def __init__(self, SkuIdName = '', SkuId = '', VariableName = '', VariableGuid = '', VariableOffset = '',
                  HiiDefaultValue = '', VpdOffset = '', DefaultValue = '', VariableGuidValue = '', VariableAttribute = '', DefaultStore = None):
         self.SkuIdName = SkuIdName
         self.SkuId = SkuId
-        
+
         #
         # Used by Hii
         #
@@ -52,17 +52,17 @@ class SkuInfoClass(object):
         self.HiiDefaultValue = HiiDefaultValue
         self.VariableAttribute = VariableAttribute
         self.DefaultStoreDict = DefaultStore
-        
+
         #
         # Used by Vpd
         #
         self.VpdOffset = VpdOffset
-        
+
         #
         # Used by Default
         #
         self.DefaultValue = DefaultValue
-        
+
     ## Convert the class to a string
     #
     #  Convert each member of the class to string

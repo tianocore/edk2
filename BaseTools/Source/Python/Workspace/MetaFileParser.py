@@ -369,10 +369,10 @@ class MetaFileParser(object):
                     EdkLogger.error("Parser", FORMAT_INVALID, "Global macro %s is not permitted." % (Macro), ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
             else:
                 EdkLogger.error("Parser", FORMAT_INVALID, "%s not defined" % (Macro), ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
-        # Sometimes, we need to make differences between EDK and EDK2 modules 
+        # Sometimes, we need to make differences between EDK and EDK2 modules
         if Name == 'INF_VERSION':
             if hexVersionPattern.match(Value):
-                self._Version = int(Value, 0)   
+                self._Version = int(Value, 0)
             elif decVersionPattern.match(Value):
                 ValueList = Value.split('.')
                 Major = '%04o' % int(ValueList[0], 0)
@@ -418,7 +418,7 @@ class MetaFileParser(object):
         Macros.update(self._GetApplicableSectionMacro())
         return Macros
 
-    ## Construct section Macro dict 
+    ## Construct section Macro dict
     def _ConstructSectionMacroDict(self, Name, Value):
         ScopeKey = [(Scope[0], Scope[1], Scope[2]) for Scope in self._Scope]
         ScopeKey = tuple(ScopeKey)
@@ -433,7 +433,7 @@ class MetaFileParser(object):
 
         self._SectionsMacroDict[SectionDictKey][Name] = Value
 
-    ## Get section Macros that are applicable to current line, which may come from other sections 
+    ## Get section Macros that are applicable to current line, which may come from other sections
     ## that share the same name while scope is wider
     def _GetApplicableSectionMacro(self):
         Macros = {}
@@ -1351,7 +1351,7 @@ class DscParser(MetaFileParser):
             try:
                 Processer[self._ItemType]()
             except EvaluationException as Excpt:
-                # 
+                #
                 # Only catch expression evaluation error here. We need to report
                 # the precise number of line on which the error occurred
                 #
@@ -1478,7 +1478,7 @@ class DscParser(MetaFileParser):
                 EdkLogger.debug(EdkLogger.DEBUG_5, str(Exc), self._ValueList[1])
                 Result = False
             except WrnExpression as Excpt:
-                # 
+                #
                 # Catch expression evaluation warning here. We need to report
                 # the precise number of line and return the evaluation result
                 #
@@ -1535,7 +1535,7 @@ class DscParser(MetaFileParser):
             __IncludeMacros['EFI_SOURCE'] = GlobalData.gGlobalDefines['EFI_SOURCE']
             __IncludeMacros['EDK_SOURCE'] = GlobalData.gGlobalDefines['EDK_SOURCE']
             #
-            # Allow using MACROs comes from [Defines] section to keep compatible. 
+            # Allow using MACROs comes from [Defines] section to keep compatible.
             #
             __IncludeMacros.update(self._Macros)
 

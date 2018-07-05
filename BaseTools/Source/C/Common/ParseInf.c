@@ -1,14 +1,14 @@
 /** @file
 This contains some useful functions for parsing INF files.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -31,11 +31,11 @@ ReadLine (
 Routine Description:
 
   This function reads a line, stripping any comments.
-  The function reads a string from the input stream argument and stores it in 
-  the input string. ReadLine reads characters from the current file position 
-  to and including the first newline character, to the end of the stream, or 
-  until the number of characters read is equal to MaxLength - 1, whichever 
-  comes first.  The newline character, if read, is replaced with a \0. 
+  The function reads a string from the input stream argument and stores it in
+  the input string. ReadLine reads characters from the current file position
+  to and including the first newline character, to the end of the stream, or
+  until the number of characters read is equal to MaxLength - 1, whichever
+  comes first.  The newline character, if read, is replaced with a \0.
 
 Arguments:
 
@@ -372,17 +372,17 @@ StringToGuid (
   )
 /*++
 
-Routine Description: 
+Routine Description:
 
-  Converts a string to an EFI_GUID.  The string must be in the 
+  Converts a string to an EFI_GUID.  The string must be in the
   xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx format.
 
-Arguments:  
+Arguments:
 
   AsciiGuidBuffer - pointer to ascii string
   GuidBuffer      - pointer to destination Guid
 
-Returns:  
+Returns:
 
   EFI_ABORTED             Could not convert the string
   EFI_SUCCESS             The string was successfully converted
@@ -408,7 +408,7 @@ Returns:
         break;
       }
     } else {
-      if (((AsciiGuidBuffer[Index] >= '0') && (AsciiGuidBuffer[Index] <= '9')) || 
+      if (((AsciiGuidBuffer[Index] >= '0') && (AsciiGuidBuffer[Index] <= '9')) ||
          ((AsciiGuidBuffer[Index] >= 'a') && (AsciiGuidBuffer[Index] <= 'f')) ||
          ((AsciiGuidBuffer[Index] >= 'A') && (AsciiGuidBuffer[Index] <= 'F'))) {
         continue;
@@ -417,12 +417,12 @@ Returns:
       }
     }
   }
-  
+
   if (Index < 36 || AsciiGuidBuffer[36] != '\0') {
     Error (NULL, 0, 1003, "Invalid option value", "Incorrect GUID \"%s\"\n  Correct Format \"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx\"", AsciiGuidBuffer);
     return EFI_ABORTED;
   }
-  
+
   //
   // Scan the guid string into the buffer
   //
@@ -477,9 +477,9 @@ AsciiStringToUint64 (
 
 Routine Description:
 
-  Converts a null terminated ascii string that represents a number into a 
-  UINT64 value.  A hex number may be preceeded by a 0x, but may not be 
-  succeeded by an h.  A number without 0x or 0X is considered to be base 10 
+  Converts a null terminated ascii string that represents a number into a
+  UINT64 value.  A hex number may be preceeded by a 0x, but may not be
+  succeeded by an h.  A number without 0x or 0X is considered to be base 10
   unless the IsHex input is true.
 
 Arguments:
@@ -498,13 +498,13 @@ Returns:
   UINT8   Index;
   UINT64  Value;
   CHAR8   CurrentChar;
-  
+
   //
   // Initialize the result
   //
   Value = 0;
   Index = 0;
-  
+
   //
   // Check input parameter
   //
@@ -514,11 +514,11 @@ Returns:
   while (AsciiString[Index] == ' ') {
     Index ++;
   }
-  
+
   //
   // Add each character to the result
   //
-  
+
   //
   // Skip first two chars only if the string starts with '0x' or '0X'
   //

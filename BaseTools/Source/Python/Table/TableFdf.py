@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create/update/query/erase table for fdf datas
 #
-# Copyright (c) 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -22,7 +22,7 @@ from Common.StringUtils import ConvertToSqlString
 ## TableFdf
 #
 # This class defined a table used for data model
-# 
+#
 # @param object:       Inherited from object class
 #
 #
@@ -30,7 +30,7 @@ class TableFdf(Table):
     def __init__(self, Cursor):
         Table.__init__(self, Cursor)
         self.Table = 'Fdf'
-    
+
     ## Create table
     #
     # Create table Fdf
@@ -91,14 +91,14 @@ class TableFdf(Table):
         SqlCommand = """insert into %s values(%s, %s, '%s', '%s', '%s', '%s', '%s', %s, %s, %s, %s, %s, %s, %s)""" \
                      % (self.Table, self.ID, Model, Value1, Value2, Value3, Scope1, Scope2, BelongsToItem, BelongsToFile, StartLine, StartColumn, EndLine, EndColumn, Enabled)
         Table.Insert(self, SqlCommand)
-        
+
         return self.ID
-    
+
     ## Query table
     #
-    # @param Model:  The Model of Record 
+    # @param Model:  The Model of Record
     #
-    # @retval:       A recordSet of all found records 
+    # @retval:       A recordSet of all found records
     #
     def Query(self, Model):
         SqlCommand = """select ID, Value1, Value2, Value3, Scope1, Scope2, BelongsToItem, BelongsToFile, StartLine from %s

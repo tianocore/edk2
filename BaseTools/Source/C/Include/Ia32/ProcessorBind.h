@@ -1,7 +1,7 @@
 /** @file
   Processor or Compiler specific defines and types for x64.
 
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -64,11 +64,11 @@
   //
   // No ANSI C 2000 stdint.h integer width declarations, so define equivalents
   //
- 
-  #if _MSC_EXTENSIONS 
-    
+
+  #if _MSC_EXTENSIONS
+
     //
-    // use Microsoft* C complier dependent integer width types 
+    // use Microsoft* C complier dependent integer width types
     //
     typedef unsigned __int64    UINT64;
     typedef __int64             INT64;
@@ -84,7 +84,7 @@
   #else
 
     //
-    // Assume standard IA-32 alignment. 
+    // Assume standard IA-32 alignment.
     // BugBug: Need to check portability of long long
     //
     typedef unsigned long long  UINT64;
@@ -144,17 +144,17 @@ typedef INT32   INTN;
 #if _MSC_EXTENSIONS
   //
   // Microsoft* compiler requires _EFIAPI useage, __cdecl is Microsoft* specific C.
-  // 
-  #define EFIAPI __cdecl  
+  //
+  #define EFIAPI __cdecl
 #endif
 
 #if __GNUC__
-  #define EFIAPI __attribute__((cdecl))    
+  #define EFIAPI __attribute__((cdecl))
 #endif
 
 //
 // The Microsoft* C compiler can removed references to unreferenced data items
-//  if the /OPT:REF linker option is used. We defined a macro as this is a 
+//  if the /OPT:REF linker option is used. We defined a macro as this is a
 //  a non standard extension
 //
 #if _MSC_EXTENSIONS

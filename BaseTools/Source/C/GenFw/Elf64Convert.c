@@ -800,24 +800,24 @@ WriteSections64 (
             // Absolute relocation.
             //
             VerboseMsg ("R_X86_64_64");
-            VerboseMsg ("Offset: 0x%08X, Addend: 0x%016LX", 
-              (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)), 
+            VerboseMsg ("Offset: 0x%08X, Addend: 0x%016LX",
+              (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)),
               *(UINT64 *)Targ);
             *(UINT64 *)Targ = *(UINT64 *)Targ - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
             VerboseMsg ("Relocation:  0x%016LX", *(UINT64*)Targ);
             break;
           case R_X86_64_32:
             VerboseMsg ("R_X86_64_32");
-            VerboseMsg ("Offset: 0x%08X, Addend: 0x%08X", 
-              (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)), 
+            VerboseMsg ("Offset: 0x%08X, Addend: 0x%08X",
+              (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)),
               *(UINT32 *)Targ);
             *(UINT32 *)Targ = (UINT32)((UINT64)(*(UINT32 *)Targ) - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx]);
             VerboseMsg ("Relocation:  0x%08X", *(UINT32*)Targ);
             break;
           case R_X86_64_32S:
             VerboseMsg ("R_X86_64_32S");
-            VerboseMsg ("Offset: 0x%08X, Addend: 0x%08X", 
-              (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)), 
+            VerboseMsg ("Offset: 0x%08X, Addend: 0x%08X",
+              (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)),
               *(UINT32 *)Targ);
             *(INT32 *)Targ = (INT32)((INT64)(*(INT32 *)Targ) - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx]);
             VerboseMsg ("Relocation:  0x%08X", *(UINT32*)Targ);
@@ -838,8 +838,8 @@ WriteSections64 (
             // Relative relocation: Symbol - Ip + Addend
             //
             VerboseMsg ("R_X86_64_PC32");
-            VerboseMsg ("Offset: 0x%08X, Addend: 0x%08X", 
-              (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)), 
+            VerboseMsg ("Offset: 0x%08X, Addend: 0x%08X",
+              (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)),
               *(UINT32 *)Targ);
             *(UINT32 *)Targ = (UINT32) (*(UINT32 *)Targ
               + (mCoffSectionsOffset[Sym->st_shndx] - SymShdr->sh_addr)
@@ -986,7 +986,7 @@ WriteRelocations64 (
             case R_X86_64_PLT32:
               break;
             case R_X86_64_64:
-              VerboseMsg ("EFI_IMAGE_REL_BASED_DIR64 Offset: 0x%08X", 
+              VerboseMsg ("EFI_IMAGE_REL_BASED_DIR64 Offset: 0x%08X",
                 mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr));
               CoffAddFixup(
                 (UINT32) ((UINT64) mCoffSectionsOffset[RelShdr->sh_info]
@@ -995,7 +995,7 @@ WriteRelocations64 (
               break;
             case R_X86_64_32S:
             case R_X86_64_32:
-              VerboseMsg ("EFI_IMAGE_REL_BASED_HIGHLOW Offset: 0x%08X", 
+              VerboseMsg ("EFI_IMAGE_REL_BASED_HIGHLOW Offset: 0x%08X",
                 mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr));
               CoffAddFixup(
                 (UINT32) ((UINT64) mCoffSectionsOffset[RelShdr->sh_info]

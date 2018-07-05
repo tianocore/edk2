@@ -21,7 +21,7 @@ from __future__ import print_function
 
 import os
 import sys
-import argparse 
+import argparse
 import subprocess
 import uuid
 import struct
@@ -33,7 +33,7 @@ from Common.BuildVersion import gBUILD_VERSION
 #
 __prog__      = 'Rsa2048Sha256Sign'
 __version__   = '%s Version %s' % (__prog__, '0.9 ' + gBUILD_VERSION)
-__copyright__ = 'Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved.'
+__copyright__ = 'Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.'
 __usage__     = '%s -e|-d [options] <input_file>' % (__prog__)
 
 #
@@ -61,7 +61,7 @@ TEST_SIGNING_PRIVATE_KEY_FILENAME = 'TestSigningPrivateKey.pem'
 if __name__ == '__main__':
   #
   # Create command line argument parser object
-  #  
+  #
   parser = argparse.ArgumentParser(prog=__prog__, version=__version__, usage=__usage__, description=__copyright__, conflict_handler='resolve')
   group = parser.add_mutually_exclusive_group(required=True)
   group.add_argument("-e", action="store_true", dest='Encode', help='encode file')
@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
   #
   # Parse command line arguments
-  #  
+  #
   args = parser.parse_args()
 
   #
@@ -96,19 +96,19 @@ if __name__ == '__main__':
   #
   try:
     Process = subprocess.Popen('%s version' % (OpenSslCommand), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-  except:  
+  except:
     print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(1)
-    
+
   Version = Process.communicate()
   if Process.returncode != 0:
     print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
   print(Version[0])
-  
+
   #
   # Read input file into a buffer and save input filename
-  #  
+  #
   args.InputFileName   = args.InputFile.name
   args.InputFileBuffer = args.InputFile.read()
   args.InputFile.close()
@@ -174,17 +174,17 @@ if __name__ == '__main__':
     if args.MonotonicCountStr:
       format = "%dsQ" % len(args.InputFileBuffer)
       FullInputFileBuffer = struct.pack(format, args.InputFileBuffer, args.MonotonicCountValue)
-    # 
+    #
     # Sign the input file using the specified private key and capture signature from STDOUT
     #
     Process = subprocess.Popen('%s dgst -sha256 -sign "%s"' % (OpenSslCommand, args.PrivateKeyFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Signature = Process.communicate(input=FullInputFileBuffer)[0]
     if Process.returncode != 0:
       sys.exit(Process.returncode)
-      
+
     #
     # Write output file that contains hash GUID, Public Key, Signature, and Input data
-    #    
+    #
     args.OutputFile = open(args.OutputFileName, 'wb')
     args.OutputFile.write(EFI_HASH_ALGORITHM_SHA256_GUID.get_bytes_le())
     args.OutputFile.write(PublicKey)
@@ -198,7 +198,7 @@ if __name__ == '__main__':
     #
     Header = EFI_CERT_BLOCK_RSA_2048_SHA256._make(EFI_CERT_BLOCK_RSA_2048_SHA256_STRUCT.unpack_from(args.InputFileBuffer))
     args.InputFileBuffer = args.InputFileBuffer[EFI_CERT_BLOCK_RSA_2048_SHA256_STRUCT.size:]
-    
+
     #
     # Verify that the Hash Type matches the expected SHA256 type
     #
@@ -222,10 +222,10 @@ if __name__ == '__main__':
     # Write Signature to output file
     #
     open(args.OutputFileName, 'wb').write(Header.Signature)
-      
+
     #
     # Verify signature
-    #    
+    #
     Process = subprocess.Popen('%s dgst -sha256 -prverify "%s" -signature %s' % (OpenSslCommand, args.PrivateKeyFileName, args.OutputFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Process.communicate(input=FullInputFileBuffer)
     if Process.returncode != 0:
@@ -234,6 +234,6 @@ if __name__ == '__main__':
       sys.exit(Process.returncode)
 
     #
-    # Save output file contents from input file 
-    #    
+    # Save output file contents from input file
+    #
     open(args.OutputFileName, 'wb').write(args.InputFileBuffer)

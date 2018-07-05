@@ -3,9 +3,9 @@
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -32,7 +32,7 @@ class ParseHeaderCommentSectionTest(unittest.TestCase):
 
     def tearDown(self):
         pass
- 
+
     #
     # Normal case1: have license/copyright/license above @file
     #
@@ -42,36 +42,36 @@ class ParseHeaderCommentSectionTest(unittest.TestCase):
         # License2
         #
         ## @file
-        # example abstract 
-        # 
+        # example abstract
+        #
         # example description
-        # 
-        # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-        # 
-        # License3 
+        #
+        # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+        #
+        # License3
         #'''
-        
+
         CommentList = GetSplitValueList(TestCommentLines1, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-            
+
         Abstract, Description, Copyright, License = \
             ParseHeaderCommentSection(TestCommentLinesList, "PhonyFile")
-        
+
         ExpectedAbstract = 'example abstract'
         self.assertEqual(Abstract, ExpectedAbstract)
-        
+
         ExpectedDescription = 'example description'
         self.assertEqual(Description, ExpectedDescription)
-        
+
         ExpectedCopyright = \
             'Copyright (c) 2007 - 2010,'\
             ' Intel Corporation. All rights reserved.<BR>'
         self.assertEqual(Copyright, ExpectedCopyright)
-        
+
         ExpectedLicense = 'License1\nLicense2\n\nLicense3'
         self.assertEqual(License, ExpectedLicense)
 
@@ -84,41 +84,41 @@ class ParseHeaderCommentSectionTest(unittest.TestCase):
         # License2
         #
         ## @file
-        # example abstract 
-        # 
+        # example abstract
+        #
         # example description
         #
-        #Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+        #Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
         #
         ##'''
-        
+
         CommentList = GetSplitValueList(TestCommentLines2, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-            
+
         Abstract, Description, Copyright, License = \
             ParseHeaderCommentSection(TestCommentLinesList, "PhonyFile")
-        
+
         ExpectedAbstract = 'example abstract'
         self.assertEqual(Abstract, ExpectedAbstract)
-        
+
         ExpectedDescription = 'example description'
         self.assertEqual(Description, ExpectedDescription)
-        
+
         ExpectedCopyright = \
-            'Copyright (c) 2007 - 2010, Intel Corporation.'\
+            'Copyright (c) 2007 - 2018, Intel Corporation.'\
             ' All rights reserved.<BR>'
         self.assertEqual(Copyright, ExpectedCopyright)
-        
+
         ExpectedLicense = 'License1\nLicense2'
         self.assertEqual(License, ExpectedLicense)
-        
+
 
     #
-    # Normal case2: have license/copyright/license above @file, 
+    # Normal case2: have license/copyright/license above @file,
     # but no abstract/description
     #
     def testNormalCase3(self):
@@ -126,41 +126,41 @@ class ParseHeaderCommentSectionTest(unittest.TestCase):
         ''' # License1
         # License2
         #
-        ## @file 
-        # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+        ## @file
+        # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
         #
         # License3 Line1
         # License3 Line2
         ##'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines3, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-            
+
         Abstract, Description, Copyright, License = \
             ParseHeaderCommentSection(TestCommentLinesList, "PhonyFile")
-        
+
         ExpectedAbstract = ''
         self.assertEqual(Abstract, ExpectedAbstract)
-        
+
         ExpectedDescription = ''
         self.assertEqual(Description, ExpectedDescription)
-        
+
         ExpectedCopyright = \
             'Copyright (c) 2007 - 2010,'\
             ' Intel Corporation. All rights reserved.<BR>'
         self.assertEqual(Copyright, ExpectedCopyright)
-        
+
         ExpectedLicense = \
             'License1\n' \
             'License2\n\n' \
             'License3 Line1\n' \
             'License3 Line2'
-        self.assertEqual(License, ExpectedLicense)        
-           
+        self.assertEqual(License, ExpectedLicense)
+
     #
     # Normal case4: format example in spec
     #
@@ -172,33 +172,33 @@ class ParseHeaderCommentSectionTest(unittest.TestCase):
         #
         # Description
         #
-        # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+        # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
         #
         # License
         #
         ##'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-            
+
         Abstract, Description, Copyright, License = \
             ParseHeaderCommentSection(TestCommentLinesList, "PhonyFile")
-        
+
         ExpectedAbstract = 'Abstract'
         self.assertEqual(Abstract, ExpectedAbstract)
-        
+
         ExpectedDescription = 'Description'
         self.assertEqual(Description, ExpectedDescription)
-        
+
         ExpectedCopyright = \
-            'Copyright (c) 2007 - 2010, Intel Corporation.'\
+            'Copyright (c) 2007 - 2018, Intel Corporation.'\
             ' All rights reserved.<BR>'
         self.assertEqual(Copyright, ExpectedCopyright)
-        
+
         ExpectedLicense = \
             'License'
         self.assertEqual(License, ExpectedLicense)
@@ -214,37 +214,37 @@ class ParseHeaderCommentSectionTest(unittest.TestCase):
         #
         # Description
         #
-        # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-        # other line        
-        # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+        # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+        # other line
+        # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
         #
         # License
         #
         ##'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-            
+
         Abstract, Description, Copyright, License = \
             ParseHeaderCommentSection(TestCommentLinesList, "PhonyFile")
-        
+
         ExpectedAbstract = 'Abstract'
         self.assertEqual(Abstract, ExpectedAbstract)
-        
+
         ExpectedDescription = 'Description'
         self.assertEqual(Description, ExpectedDescription)
-        
+
         ExpectedCopyright = \
-            'Copyright (c) 2007 - 2010, Intel Corporation.'\
+            'Copyright (c) 2007 - 2018, Intel Corporation.'\
             ' All rights reserved.<BR>\n'\
-            'Copyright (c) 2007 - 2010, Intel Corporation.'\
+            'Copyright (c) 2007 - 2018, Intel Corporation.'\
             ' All rights reserved.<BR>'
         self.assertEqual(Copyright, ExpectedCopyright)
-        
+
         ExpectedLicense = \
             'License'
         self.assertEqual(License, ExpectedLicense)
@@ -260,39 +260,39 @@ class ParseHeaderCommentSectionTest(unittest.TestCase):
         #
         # Description
         #
-        # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-        # Copyright (c) 2007 - 2010, FOO1 Corporation. All rights reserved.<BR>      
+        # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+        # Copyright (c) 2007 - 2010, FOO1 Corporation. All rights reserved.<BR>
         # Copyright (c) 2007 - 2010, FOO2 Corporation. All rights reserved.<BR>
         #
         # License
         #
         ##'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-            
+
         Abstract, Description, Copyright, License = \
             ParseHeaderCommentSection(TestCommentLinesList, "PhonyFile")
-        
+
         ExpectedAbstract = 'Abstract'
         self.assertEqual(Abstract, ExpectedAbstract)
-        
+
         ExpectedDescription = 'Description'
         self.assertEqual(Description, ExpectedDescription)
-        
+
         ExpectedCopyright = \
-            'Copyright (c) 2007 - 2010, Intel Corporation.'\
+            'Copyright (c) 2007 - 2018, Intel Corporation.'\
             ' All rights reserved.<BR>\n'\
             'Copyright (c) 2007 - 2010, FOO1 Corporation.'\
             ' All rights reserved.<BR>\n'\
             'Copyright (c) 2007 - 2010, FOO2 Corporation.'\
             ' All rights reserved.<BR>'
         self.assertEqual(Copyright, ExpectedCopyright)
-        
+
         ExpectedLicense = \
             'License'
         self.assertEqual(License, ExpectedLicense)
@@ -307,39 +307,39 @@ class ParseHeaderCommentSectionTest(unittest.TestCase):
         #
         # Description
         #
-        # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-        # Copyright (c) 2007 - 2010, FOO1 Corporation. All rights reserved.<BR>      
+        # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+        # Copyright (c) 2007 - 2010, FOO1 Corporation. All rights reserved.<BR>
         # Copyright (c) 2007 - 2010, FOO2 Corporation. All rights reserved.<BR>
         #
         # License
         #
         ##'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-            
+
         Abstract, Description, Copyright, License = \
             ParseHeaderCommentSection(TestCommentLinesList, "PhonyFile")
-        
+
         ExpectedAbstract = ''
         self.assertEqual(Abstract, ExpectedAbstract)
-        
+
         ExpectedDescription = 'Description'
         self.assertEqual(Description, ExpectedDescription)
-        
+
         ExpectedCopyright = \
-            'Copyright (c) 2007 - 2010, Intel Corporation.'\
+            'Copyright (c) 2007 - 2018, Intel Corporation.'\
             ' All rights reserved.<BR>\n'\
             'Copyright (c) 2007 - 2010, FOO1 Corporation.'\
             ' All rights reserved.<BR>\n'\
             'Copyright (c) 2007 - 2010, FOO2 Corporation.'\
             ' All rights reserved.<BR>'
         self.assertEqual(Copyright, ExpectedCopyright)
-        
+
         ExpectedLicense = \
             'License'
         self.assertEqual(License, ExpectedLicense)
@@ -353,37 +353,37 @@ class ParseHeaderCommentSectionTest(unittest.TestCase):
         ## @file
         # Abstact
         #
-        # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+        # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
         #
         # License
         #
         ##'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-            
+
         Abstract, Description, Copyright, License = \
             ParseHeaderCommentSection(TestCommentLinesList, "PhonyFile")
-        
+
         ExpectedAbstract = 'Abstact'
         self.assertEqual(Abstract, ExpectedAbstract)
-        
+
         ExpectedDescription = ''
         self.assertEqual(Description, ExpectedDescription)
-        
+
         ExpectedCopyright = \
-            'Copyright (c) 2007 - 2010, Intel Corporation.'\
+            'Copyright (c) 2007 - 2018, Intel Corporation.'\
             ' All rights reserved.<BR>'
         self.assertEqual(Copyright, ExpectedCopyright)
-        
+
         ExpectedLicense = \
             'License'
         self.assertEqual(License, ExpectedLicense)
-                
+
     #
     # Error case1: No copyright found
     #
@@ -398,18 +398,18 @@ class ParseHeaderCommentSectionTest(unittest.TestCase):
         # License
         #
         ##'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
-        self.assertRaises(Logger.FatalError, 
-                          ParseHeaderCommentSection, 
+
+        self.assertRaises(Logger.FatalError,
+                          ParseHeaderCommentSection,
                           TestCommentLinesList,
-                          "PhonyFile")    
+                          "PhonyFile")
 
     #
     # Error case2: non-empty non-comment lines passed in
@@ -423,22 +423,22 @@ class ParseHeaderCommentSectionTest(unittest.TestCase):
         this is invalid line
         # Description
         #
-        # Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>        
+        # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
         # License
         #
         ##'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
-        self.assertRaises(Logger.FatalError, 
-                          ParseHeaderCommentSection, 
+
+        self.assertRaises(Logger.FatalError,
+                          ParseHeaderCommentSection,
                           TestCommentLinesList,
-                          "PhonyFile")   
+                          "PhonyFile")
 
 #
 # Test ParseGenericComment
@@ -449,14 +449,14 @@ class ParseGenericCommentTest(unittest.TestCase):
 
     def tearDown(self):
         pass
- 
+
     #
     # Normal case1: one line of comment
     #
     def testNormalCase1(self):
         TestCommentLines = \
         '''# hello world'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
@@ -476,17 +476,17 @@ class ParseGenericCommentTest(unittest.TestCase):
         TestCommentLines = \
         '''## hello world
         # second line'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         HelptxtObj = ParseGenericComment(TestCommentLinesList, 'testNormalCase2')
         self.failIf(not HelptxtObj)
-        self.assertEqual(HelptxtObj.GetString(), 
+        self.assertEqual(HelptxtObj.GetString(),
                          'hello world\n' + 'second line')
         self.assertEqual(HelptxtObj.GetLang(), TAB_LANGUAGE_EN_US)
 
@@ -497,17 +497,17 @@ class ParseGenericCommentTest(unittest.TestCase):
         TestCommentLines = \
         '''## hello world
         This is not comment line'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         HelptxtObj = ParseGenericComment(TestCommentLinesList, 'testNormalCase3')
         self.failIf(not HelptxtObj)
-        self.assertEqual(HelptxtObj.GetString(), 
+        self.assertEqual(HelptxtObj.GetString(),
                          'hello world\n\n')
         self.assertEqual(HelptxtObj.GetLang(), TAB_LANGUAGE_EN_US)
 
@@ -520,7 +520,7 @@ class ParseDecPcdGenericCommentTest(unittest.TestCase):
 
     def tearDown(self):
         pass
- 
+
     #
     # Normal case1: comments with no special comment
     #
@@ -528,22 +528,22 @@ class ParseDecPcdGenericCommentTest(unittest.TestCase):
         TestCommentLines = \
         '''## hello world
         # second line'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         (HelpTxt, PcdErr) = \
             ParseDecPcdGenericComment(TestCommentLinesList, 'testNormalCase1')
         self.failIf(not HelpTxt)
         self.failIf(PcdErr)
-        self.assertEqual(HelpTxt, 
+        self.assertEqual(HelpTxt,
                          'hello world\n' + 'second line')
-       
-       
+
+
     #
     # Normal case2: comments with valid list
     #
@@ -553,19 +553,19 @@ class ParseDecPcdGenericCommentTest(unittest.TestCase):
         # second line
         # @ValidList 1, 2, 3
         # other line'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         (HelpTxt, PcdErr) = \
             ParseDecPcdGenericComment(TestCommentLinesList, 'UnitTest')
         self.failIf(not HelpTxt)
         self.failIf(not PcdErr)
-        self.assertEqual(HelpTxt, 
+        self.assertEqual(HelpTxt,
                          'hello world\n' + 'second line\n' + 'other line')
         ExpectedList = GetSplitValueList('1 2 3', TAB_SPACE_SPLIT)
         ActualList = [item for item in \
@@ -583,19 +583,19 @@ class ParseDecPcdGenericCommentTest(unittest.TestCase):
         # second line
         # @ValidRange LT 1 AND GT 2
         # other line'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         (HelpTxt, PcdErr) = \
             ParseDecPcdGenericComment(TestCommentLinesList, 'UnitTest')
         self.failIf(not HelpTxt)
         self.failIf(not PcdErr)
-        self.assertEqual(HelpTxt, 
+        self.assertEqual(HelpTxt,
                          'hello world\n' + 'second line\n' + 'other line')
         self.assertEqual(PcdErr.GetValidValueRange().strip(), 'LT 1 AND GT 2')
         self.failIf(PcdErr.GetExpression())
@@ -610,19 +610,19 @@ class ParseDecPcdGenericCommentTest(unittest.TestCase):
         # second line
         # @Expression LT 1 AND GT 2
         # other line'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         (HelpTxt, PcdErr) = \
             ParseDecPcdGenericComment(TestCommentLinesList, 'UnitTest')
         self.failIf(not HelpTxt)
         self.failIf(not PcdErr)
-        self.assertEqual(HelpTxt, 
+        self.assertEqual(HelpTxt,
                          'hello world\n' + 'second line\n' + 'other line')
         self.assertEqual(PcdErr.GetExpression().strip(), 'LT 1 AND GT 2')
         self.failIf(PcdErr.GetValidValueRange())
@@ -634,14 +634,14 @@ class ParseDecPcdGenericCommentTest(unittest.TestCase):
     def testNormalCase5(self):
         TestCommentLines = \
         '''# @Expression LT 1 AND GT 2'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         (HelpTxt, PcdErr) = \
             ParseDecPcdGenericComment(TestCommentLinesList, 'UnitTest')
         self.failIf(HelpTxt)
@@ -649,28 +649,28 @@ class ParseDecPcdGenericCommentTest(unittest.TestCase):
         self.assertEqual(PcdErr.GetExpression().strip(), 'LT 1 AND GT 2')
         self.failIf(PcdErr.GetValidValueRange())
         self.failIf(PcdErr.GetValidValue())
- 
+
     #
     # Normal case6: comments with only generic help text
     #
     def testNormalCase6(self):
         TestCommentLines = \
         '''#'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         (HelpTxt, PcdErr) = \
             ParseDecPcdGenericComment(TestCommentLinesList, 'UnitTest')
         self.assertEqual(HelpTxt, '\n')
         self.failIf(PcdErr)
 
-        
-        
+
+
     #
     # Error case1: comments with both expression and valid list, use later
     # ignore the former and with a warning message
@@ -679,17 +679,17 @@ class ParseDecPcdGenericCommentTest(unittest.TestCase):
         TestCommentLines = \
         '''## hello world
         # second line
-        # @ValidList 1, 2, 3        
+        # @ValidList 1, 2, 3
         # @Expression LT 1 AND GT 2
         # other line'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         try:
             ParseDecPcdGenericComment(TestCommentLinesList, 'UnitTest')
         except Logger.FatalError:
@@ -704,26 +704,26 @@ class ParseDecPcdTailCommentTest(unittest.TestCase):
 
     def tearDown(self):
         pass
- 
+
     #
     # Normal case1: comments with no SupModeList
     #
     def testNormalCase1(self):
         TestCommentLines = \
         '''## #hello world'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         (SupModeList, HelpStr) = \
             ParseDecPcdTailComment(TestCommentLinesList, 'UnitTest')
         self.failIf(not HelpStr)
         self.failIf(SupModeList)
-        self.assertEqual(HelpStr, 
+        self.assertEqual(HelpStr,
                          'hello world')
 
     #
@@ -732,44 +732,44 @@ class ParseDecPcdTailCommentTest(unittest.TestCase):
     def testNormalCase2(self):
         TestCommentLines = \
         '''## BASE #hello world'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         (SupModeList, HelpStr) = \
             ParseDecPcdTailComment(TestCommentLinesList, 'UnitTest')
         self.failIf(not HelpStr)
         self.failIf(not SupModeList)
-        self.assertEqual(HelpStr, 
+        self.assertEqual(HelpStr,
                          'hello world')
-        self.assertEqual(SupModeList, 
+        self.assertEqual(SupModeList,
                          ['BASE'])
-        
+
     #
     # Normal case3: comments with more than one SupMode
     #
     def testNormalCase3(self):
         TestCommentLines = \
         '''## BASE  UEFI_APPLICATION #hello world'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         (SupModeList, HelpStr) = \
             ParseDecPcdTailComment(TestCommentLinesList, 'UnitTest')
         self.failIf(not HelpStr)
         self.failIf(not SupModeList)
-        self.assertEqual(HelpStr, 
+        self.assertEqual(HelpStr,
                          'hello world')
-        self.assertEqual(SupModeList, 
+        self.assertEqual(SupModeList,
                          ['BASE', 'UEFI_APPLICATION'])
 
     #
@@ -778,58 +778,58 @@ class ParseDecPcdTailCommentTest(unittest.TestCase):
     def testNormalCase4(self):
         TestCommentLines = \
         '''## BASE  UEFI_APPLICATION'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         (SupModeList, HelpStr) = \
             ParseDecPcdTailComment(TestCommentLinesList, 'UnitTest')
         self.failIf(HelpStr)
         self.failIf(not SupModeList)
-        self.assertEqual(SupModeList, 
+        self.assertEqual(SupModeList,
                          ['BASE', 'UEFI_APPLICATION'])
 
     #
-    # Normal case5: general comments with no supModList, extract from real case 
+    # Normal case5: general comments with no supModList, extract from real case
     #
     def testNormalCase5(self):
         TestCommentLines = \
         ''' # 1 = 128MB, 2 = 256MB, 3 = MAX'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         (SupModeList, HelpStr) = \
             ParseDecPcdTailComment(TestCommentLinesList, 'UnitTest')
         self.failIf(not HelpStr)
-        self.assertEqual(HelpStr, 
+        self.assertEqual(HelpStr,
                          '1 = 128MB, 2 = 256MB, 3 = MAX')
         self.failIf(SupModeList)
-        
+
 
     #
-    # Error case2: comments with supModList contains valid and invalid 
+    # Error case2: comments with supModList contains valid and invalid
     # module type
     #
     def testErrorCase2(self):
         TestCommentLines = \
         '''## BASE INVALID_MODULE_TYPE #hello world'''
-     
+
         CommentList = GetSplitValueList(TestCommentLines, "\n")
         LineNum = 0
         TestCommentLinesList = []
         for Comment in CommentList:
             LineNum += 1
             TestCommentLinesList.append((Comment, LineNum))
-        
+
         try:
             ParseDecPcdTailComment(TestCommentLinesList, 'UnitTest')
         except Logger.FatalError:
@@ -869,7 +869,7 @@ class _IsCopyrightLineTest(unittest.TestCase):
         Line = 'this is not aCopyright ( line'
         Result = _IsCopyrightLine(Line)
         self.failIf(Result)
- 
+
     #
     # Normal case
     #
@@ -917,7 +917,7 @@ class _IsCopyrightLineTest(unittest.TestCase):
         Line = 'not a Copyright '
         Result = _IsCopyrightLine(Line)
         self.failIf(Result)
-        
+
 if __name__ == '__main__':
     Logger.Initialize()
     unittest.main()

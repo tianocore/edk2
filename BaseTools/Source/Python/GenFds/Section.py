@@ -160,7 +160,7 @@ class Section (SectionClassObject):
                 SuffixMap = FfsInf.GetFinalTargetSuffixMap()
                 if Suffix in SuffixMap:
                     FileList.extend(SuffixMap[Suffix])
-                
+
         #Process the file lists is alphabetical for a same section type
         if len (FileList) > 1:
             FileList.sort()

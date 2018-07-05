@@ -4,9 +4,9 @@
 #
 # Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -46,8 +46,8 @@ from Library.StringUtils import GetUniFileName
 
 ## Transfer Module Object to Inf files
 #
-# Transfer all contents of a standard Module Object to an Inf file 
-# @param ModuleObject: A Module Object  
+# Transfer all contents of a standard Module Object to an Inf file
+# @param ModuleObject: A Module Object
 #
 def ModuleToInf(ModuleObject, PackageObject=None, DistHeader=None):
     if not GlobalData.gWSPKG_LIST:
@@ -59,9 +59,9 @@ def ModuleToInf(ModuleObject, PackageObject=None, DistHeader=None):
 
     Content = ''
     #
-    # Generate file header, If any Abstract, Description, Copyright or License XML elements are missing, 
-    # should 1) use the Abstract, Description, Copyright or License from the PackageSurfaceArea.Header elements 
-    # that the module belongs to, or 2) if this is a stand-alone module that is not included in a PackageSurfaceArea, 
+    # Generate file header, If any Abstract, Description, Copyright or License XML elements are missing,
+    # should 1) use the Abstract, Description, Copyright or License from the PackageSurfaceArea.Header elements
+    # that the module belongs to, or 2) if this is a stand-alone module that is not included in a PackageSurfaceArea,
     # use the abstract, description, copyright or license from the DistributionPackage.Header elements.
     #
     ModuleAbstract = GetLocalValue(ModuleObject.GetAbstract())
@@ -107,15 +107,15 @@ def ModuleToInf(ModuleObject, PackageObject=None, DistHeader=None):
 
     #
     # Generate header comment section of INF file
-    #        
+    #
     Content += GenHeaderCommentSection(ModuleAbstract,
                                        ModuleDescription,
                                        ModuleCopyright,
                                        ModuleLicense).replace('\r\n', '\n')
 
     #
-    # Generate Binary Header 
-    # 
+    # Generate Binary Header
+    #
     for UserExtension in ModuleObject.GetUserExtensionList():
         if UserExtension.GetUserID() == DT.TAB_BINARY_HEADER_USERID \
         and UserExtension.GetIdentifier() == DT.TAB_BINARY_HEADER_IDENTIFIER:
@@ -152,10 +152,10 @@ def ModuleToInf(ModuleObject, PackageObject=None, DistHeader=None):
     else:
         GlobalData.gIS_BINARY_INF = False
     #
-    # for each section, maintain a dict, sorted arch will be its key, 
+    # for each section, maintain a dict, sorted arch will be its key,
     # statement list will be its data
     # { 'Arch1 Arch2 Arch3': [statement1, statement2],
-    #   'Arch1' : [statement1, statement3] 
+    #   'Arch1' : [statement1, statement3]
     #  }
     #
     # Gen section contents
@@ -197,7 +197,7 @@ def GenModuleUNIEncodeFile(ModuleObject, UniFileHeader='', Encoding=DT.TAB_ENCOD
     BinaryAbstract = []
     BinaryDescription = []
     #
-    # If more than one language code is used for any element that would be present in the MODULE_UNI_FILE, 
+    # If more than one language code is used for any element that would be present in the MODULE_UNI_FILE,
     # then the MODULE_UNI_FILE must be created.
     #
     for (Key, Value) in ModuleObject.GetAbstract() + ModuleObject.GetDescription():
@@ -300,11 +300,11 @@ def GenDefines(ModuleObject):
         BaseName = '_' + BaseName
     Statement = (u'%s ' % DT.TAB_INF_DEFINES_BASE_NAME).ljust(LeftOffset) + u'= %s' % BaseName
     SpecialStatementList.append(Statement)
-    
+
     # TAB_INF_DEFINES_FILE_GUID
     Statement = (u'%s ' % DT.TAB_INF_DEFINES_FILE_GUID).ljust(LeftOffset) + u'= %s' % ModuleObject.GetGuid()
     SpecialStatementList.append(Statement)
-    
+
     # TAB_INF_DEFINES_VERSION_STRING
     Statement = (u'%s ' % DT.TAB_INF_DEFINES_VERSION_STRING).ljust(LeftOffset) + u'= %s' % ModuleObject.GetVersion()
     SpecialStatementList.append(Statement)
@@ -480,7 +480,7 @@ def GenPackages(ModuleObject):
         Path = ''
         #
         # find package path/name
-        # 
+        #
         for PkgInfo in GlobalData.gWSPKG_LIST:
             if Guid == PkgInfo[1]:
                 if (not Version) or (Version == PkgInfo[2]):
@@ -553,7 +553,7 @@ def GenDepex(ModuleObject):
             else:
                 NewSectionDict[Key] = [Statement]
     Content += GenSection('Depex', NewSectionDict, False)
-    
+
     return Content
 ## GenUserExtensions
 #
@@ -673,7 +673,7 @@ def GenBinaryStatement(Key, Value, SubTypeGuidValue=None):
             Statement += '|' + Target
     return Statement
 ## GenGuidSections
-# 
+#
 #  @param GuidObjList: List of GuidObject
 #  @retVal Content: The generated section contents
 #
@@ -736,7 +736,7 @@ def GenGuidSections(GuidObjList):
     return Content
 
 ## GenProtocolPPiSections
-# 
+#
 #  @param ObjList: List of ProtocolObject or Ppi Object
 #  @retVal Content: The generated section contents
 #
@@ -804,7 +804,7 @@ def GenPcdSections(ModuleObject):
     Content = ''
     if not GlobalData.gIS_BINARY_INF:
         #
-        # for each Pcd Itemtype, maintain a dict so the same type will be grouped 
+        # for each Pcd Itemtype, maintain a dict so the same type will be grouped
         # together
         #
         ItemTypeDict = {}
@@ -866,7 +866,7 @@ def GenPcdSections(ModuleObject):
             if NewSectionDict:
                 Content += GenSection(ItemType, NewSectionDict)
     #
-    # For AsBuild INF files   
+    # For AsBuild INF files
     #
     else:
         Content += GenAsBuiltPacthPcdSections(ModuleObject)
@@ -905,7 +905,7 @@ def GenAsBuiltPacthPcdSections(ModuleObject):
             Statement = HelpString + TokenSpaceName + '.' + PcdCName + ' | ' + PcdValue + ' | ' + \
                          PcdOffset + DT.TAB_SPACE_SPLIT
             #
-            # Use binary file's Arch to be Pcd's Arch 
+            # Use binary file's Arch to be Pcd's Arch
             #
             ArchList = []
             FileNameObjList = BinaryFile.GetFileNameList()
@@ -954,7 +954,7 @@ def GenAsBuiltPcdExSections(ModuleObject):
             Statement = HelpString + TokenSpaceName + DT.TAB_SPLIT + PcdCName + DT.TAB_SPACE_SPLIT
 
             #
-            # Use binary file's Arch to be Pcd's Arch 
+            # Use binary file's Arch to be Pcd's Arch
             #
             ArchList = []
             FileNameObjList = BinaryFile.GetFileNameList()
@@ -1033,7 +1033,7 @@ def GenSpecialSections(ObjectList, SectionName, UserExtensionsContent=''):
         Content = Content.lstrip()
     #
     # add a return to differentiate it between other possible sections
-    # 
+    #
     if Content:
         Content += '\n'
     return Content
@@ -1110,7 +1110,7 @@ def GenBinaries(ModuleObject):
                     else:
                         NewSectionDict[SortedArch] = [Statement]
                 #
-                # as we already generated statement for this DictKey here set the Valuelist to be empty 
+                # as we already generated statement for this DictKey here set the Valuelist to be empty
                 # to avoid generate duplicate entries as the DictKey may have multiple entries
                 #
                 BinariesDict[Key] = []

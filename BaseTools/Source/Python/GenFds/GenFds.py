@@ -47,7 +47,7 @@ from struct import unpack
 ## Version and Copyright
 versionNumber = "1.0" + ' ' + gBUILD_VERSION
 __version__ = "%prog Version " + versionNumber
-__copyright__ = "Copyright (c) 2007 - 2017, Intel Corporation  All rights reserved."
+__copyright__ = "Copyright (c) 2007 - 2018, Intel Corporation  All rights reserved."
 
 ## Tool entrance method
 #
@@ -72,10 +72,10 @@ def main():
         if Options.verbose is not None:
             EdkLogger.SetLevel(EdkLogger.VERBOSE)
             GenFdsGlobalVariable.VerboseMode = True
-            
+
         if Options.FixedAddress is not None:
             GenFdsGlobalVariable.FixedLoadAddress = True
-            
+
         if Options.quiet is not None:
             EdkLogger.SetLevel(EdkLogger.QUIET)
         if Options.debug is not None:
@@ -100,7 +100,7 @@ def main():
             if Options.GenfdsMultiThread:
                 GenFdsGlobalVariable.EnableGenfdsMultiThread = True
         os.chdir(GenFdsGlobalVariable.WorkSpaceDir)
-        
+
         # set multiple workspace
         PackagesPath = os.getenv("PACKAGES_PATH")
         mws.setWs(GenFdsGlobalVariable.WorkSpaceDir, PackagesPath)
@@ -228,7 +228,7 @@ def main():
         GlobalData.gDatabasePath = os.path.normpath(os.path.join(ConfDirectoryPath, GlobalData.gDatabasePath))
         BuildWorkSpace = WorkspaceDatabase(GlobalData.gDatabasePath)
         BuildWorkSpace.InitDatabase()
-        
+
         #
         # Get files real name in workspace dir
         #
@@ -244,7 +244,7 @@ def main():
         TargetArchList = set(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, TAB_COMMON, Options.BuildTarget, Options.ToolChain].SupArchList) & set(ArchList)
         if len(TargetArchList) == 0:
             EdkLogger.error("GenFds", GENFDS_ERROR, "Target ARCH %s not in platform supported ARCH %s" % (str(ArchList), str(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, TAB_COMMON].SupArchList)))
-        
+
         for Arch in ArchList:
             GenFdsGlobalVariable.OutputDirFromDscDict[Arch] = NormPath(BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, Options.BuildTarget, Options.ToolChain].OutputDirectory)
             GenFdsGlobalVariable.PlatformName = BuildWorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, Options.BuildTarget, Options.ToolChain].PlatformName
@@ -551,7 +551,7 @@ class GenFds :
                 Buffer = BytesIO('')
                 FvObj.AddToBuffer(Buffer)
                 Buffer.close()
-        
+
         if GenFds.OnlyGenerateThisFv is None and GenFds.OnlyGenerateThisFd is None and GenFds.OnlyGenerateThisCap is None:
             if GenFdsGlobalVariable.FdfParser.Profile.CapsuleDict != {}:
                 GenFdsGlobalVariable.VerboseLogger("\n Generate other Capsule images!")
@@ -617,7 +617,7 @@ class GenFds :
     #   @retval None
     #
     def DisplayFvSpaceInfo(FdfParser):
-        
+
         FvSpaceInfoList = []
         MaxFvNameLength = 0
         for FvName in FdfParser.Profile.FvDict:
@@ -644,10 +644,10 @@ class GenFds :
                         if NameValue[0].strip() == 'EFI_FV_SPACE_SIZE':
                             FreeFound = True
                             Free = NameValue[1].strip()
-                
+
                 if TotalFound and UsedFound and FreeFound:
                     FvSpaceInfoList.append((FvName, Total, Used, Free))
-                
+
         GenFdsGlobalVariable.InfLogger('\nFV Space Information')
         for FvSpaceInfo in FvSpaceInfoList:
             Name = FvSpaceInfo[0]
@@ -675,18 +675,18 @@ class GenFds :
             if PcdObj.TokenCName == 'PcdBsBaseAddress':
                 PcdValue = PcdObj.DefaultValue
                 break
-        
+
         if PcdValue == '':
             return
-        
+
         Int64PcdValue = long(PcdValue, 0)
-        if Int64PcdValue == 0 or Int64PcdValue < -1:    
+        if Int64PcdValue == 0 or Int64PcdValue < -1:
             return
-                
+
         TopAddress = 0
         if Int64PcdValue > 0:
             TopAddress = Int64PcdValue
-            
+
         ModuleDict = BuildDb.BuildObject[DscFile, TAB_COMMON, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag].Modules
         for Key in ModuleDict:
             ModuleObj = BuildDb.BuildObject[Key, TAB_COMMON, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]

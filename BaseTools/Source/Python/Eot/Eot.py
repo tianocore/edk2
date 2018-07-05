@@ -1491,7 +1491,7 @@ class MultipleFv(FirmwareVolume):
             Fv.frombuffer(Buf, 0, len(Buf))
 
             self.BasicInfo.append([Fv.Name, Fv.FileSystemGuid, Fv.Size])
-            self.FfsDict.append(Fv.FfsDict)    
+            self.FfsDict.append(Fv.FfsDict)
 
 ## Class Eot
 #
@@ -1510,7 +1510,7 @@ class Eot(object):
         # Version and Copyright
         self.VersionNumber = ("0.02" + " " + gBUILD_VERSION)
         self.Version = "%prog Version " + self.VersionNumber
-        self.Copyright = "Copyright (c) 2008 - 2010, Intel Corporation  All rights reserved."
+        self.Copyright = "Copyright (c) 2008 - 2018, Intel Corporation  All rights reserved."
         self.Report = Report
 
         self.IsInit = IsInit
@@ -1522,7 +1522,7 @@ class Eot(object):
         self.FvFileList = FvFileList
         self.MapFileList = MapFileList
         self.Dispatch = Dispatch
-        
+
         # Check workspace environment
         if "EFI_SOURCE" not in os.environ:
             if "EDK_SOURCE" not in os.environ:
@@ -1562,13 +1562,13 @@ class Eot(object):
                 if not os.path.isfile(MapFile):
                     EdkLogger.error("Eot", EdkLogger.EOT_ERROR, "Can not find file %s " % MapFile)
                 EotGlobalData.gMAP_FILE.append(MapFile)
-                
+
         # Generate source file list
         self.GenerateSourceFileList(self.SourceFileList, self.IncludeDirList)
 
         # Generate guid list of dec file list
         self.ParseDecFile(self.DecFileList)
-        
+
         # Generate guid list from GUID list file
         self.ParseGuidList(self.GuidList)
 
@@ -1628,7 +1628,7 @@ class Eot(object):
                         if len(list) == 2:
                             EotGlobalData.gGuidDict[list[0].strip()] = GuidStructureStringToGuidString(list[1].strip())
 
-    
+
     ## ParseGuidList() method
     #
     #  Parse Guid list and get all GUID names with GUID values as {GuidName : GuidValue}
@@ -1643,7 +1643,7 @@ class Eot(object):
             for Line in open(Path):
                 (GuidName, GuidValue) = Line.split()
                 EotGlobalData.gGuidDict[GuidName] = GuidValue
-            
+
     ## ConvertLogFile() method
     #
     #  Parse a real running log file to get real dispatch order
@@ -1999,7 +1999,7 @@ class Eot(object):
 
         if Options.FvFileList:
             self.FvFileList = Options.FvFileList
- 
+
         if Options.MapFileList:
             self.MapFileList = Options.FvMapFileList
 
@@ -2011,7 +2011,7 @@ class Eot(object):
 
         if Options.DecFileList:
             self.DecFileList = Options.DecFileList
-        
+
         if Options.GuidList:
             self.GuidList = Options.GuidList
 

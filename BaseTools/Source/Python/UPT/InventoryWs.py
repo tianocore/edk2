@@ -1,11 +1,11 @@
 ## @file
 # Inventory workspace's distribution package information.
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -37,7 +37,7 @@ from Library import GlobalData
 #
 def InventoryDistInstalled(DataBase):
     DistInstalled = DataBase.InventoryDistInstalled()
-    
+
     #
     # find the max length for each item
     #
@@ -47,9 +47,9 @@ def InventoryDistInstalled(DataBase):
     DpOriginalNameStr = "DpOriginalName"
     MaxGuidlen = len(DpGuidStr)
     MaxVerlen = len(DpVerStr)
-    MaxDpAliasFileNameLen = len(DpNameStr) 
+    MaxDpAliasFileNameLen = len(DpNameStr)
     MaxDpOrigFileNamelen = len(DpOriginalNameStr)
-    
+
     for (DpGuid, DpVersion, DpOriginalName, DpAliasFileName) in DistInstalled:
         MaxGuidlen = max(MaxGuidlen, len(DpGuid))
         MaxVerlen = max(MaxVerlen, len(DpVersion))
@@ -57,22 +57,22 @@ def InventoryDistInstalled(DataBase):
         MaxDpOrigFileNamelen = max(MaxDpOrigFileNamelen, len(DpOriginalName))
 
     OutMsgFmt = "%-*s\t%-*s\t%-*s\t%-s"
-    OutMsg = OutMsgFmt % (MaxDpAliasFileNameLen, 
-                          DpNameStr, 
-                          MaxGuidlen, 
-                          DpGuidStr, 
-                          MaxVerlen, 
-                          DpVerStr, 
+    OutMsg = OutMsgFmt % (MaxDpAliasFileNameLen,
+                          DpNameStr,
+                          MaxGuidlen,
+                          DpGuidStr,
+                          MaxVerlen,
+                          DpVerStr,
                           DpOriginalNameStr)
     Logger.Info(OutMsg)
-    
+
     for (DpGuid, DpVersion, DpFileName, DpAliasFileName) in DistInstalled:
-        OutMsg = OutMsgFmt % (MaxDpAliasFileNameLen, 
-                            DpAliasFileName, 
-                            MaxGuidlen, 
-                            DpGuid, 
-                            MaxVerlen, 
-                            DpVersion, 
+        OutMsg = OutMsgFmt % (MaxDpAliasFileNameLen,
+                            DpAliasFileName,
+                            MaxGuidlen,
+                            DpGuid,
+                            MaxVerlen,
+                            DpVersion,
                             DpFileName)
         Logger.Info(OutMsg)
 
@@ -90,13 +90,13 @@ def Main(Options = None):
 
     try:
         DataBase = GlobalData.gDB
-        InventoryDistInstalled(DataBase)     
-        ReturnCode = 0       
+        InventoryDistInstalled(DataBase)
+        ReturnCode = 0
     except FatalError as XExcept:
         ReturnCode = XExcept.args[0]
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())
-    except KeyboardInterrupt: 
+    except KeyboardInterrupt:
         ReturnCode = ABORT_ERROR
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())
@@ -113,5 +113,5 @@ def Main(Options = None):
 
     if ReturnCode == 0:
         Logger.Quiet(ST.MSG_FINISH)
-    
+
     return ReturnCode

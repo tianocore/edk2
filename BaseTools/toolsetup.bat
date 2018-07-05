@@ -1,18 +1,18 @@
 @REM @file
-@REM   This stand-alone program is typically called by the edksetup.bat file, 
+@REM   This stand-alone program is typically called by the edksetup.bat file,
 @REM   however it may be executed directly from the BaseTools project folder
 @REM   if the file is not executed within a WORKSPACE\BaseTools folder.
 @REM
-@REM Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 @REM (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 @REM
 @REM This program and the accompanying materials are licensed and made available
-@REM under the terms and conditions of the BSD License which accompanies this 
+@REM under the terms and conditions of the BSD License which accompanies this
 @REM distribution.  The full text of the license may be found at:
 @REM   http://opensource.org/licenses/bsd-license.php
 @REM
 @REM THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
-@REM WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR 
+@REM WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR
 @REM IMPLIED.
 @REM
 
@@ -124,7 +124,7 @@ if /I "%1"=="/?" goto Usage
       echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
       echo Please check the directory %EDK_TOOLS_PATH%\Bin\Win32
       echo Or configure EDK_TOOLS_BIN env to point Win32 directory.
-      echo. 
+      echo.
     )
   )
   set PATH=%EDK_TOOLS_BIN%;%PATH%
@@ -140,7 +140,7 @@ if /I "%1"=="/?" goto Usage
       echo !!! ERROR !!! Cannot find BaseTools Bin Win32!!!
       echo Please check the directory %EDK_TOOLS_PATH%\Bin\Win32
       echo Or configure EDK_TOOLS_BIN env to point Win32 directory.
-      echo. 
+      echo.
     )
   )
   set PATH=%EDK_TOOLS_BIN%;%PATH%
@@ -182,7 +182,7 @@ if NOT exist %CONF_PATH% (
     )
   )
 )
- 
+
 :CopyConf
 if NOT exist %CONF_PATH% (
   mkdir %CONF_PATH%
@@ -304,7 +304,7 @@ goto end
       set PYTHON_HOME=%PYTHONHOME%
     ) else (
       echo.
-      echo !!! ERROR !!! Binary python tools are missing. PYTHON_HOME environment variable is not set. 
+      echo !!! ERROR !!! Binary python tools are missing. PYTHON_HOME environment variable is not set.
       echo PYTHON_HOME is required to build or execute the python tools.
       echo.
       goto end
@@ -322,7 +322,7 @@ goto end
 
   set BASETOOLS_PYTHON_SOURCE=%BASE_TOOLS_PATH%\Source\Python
   set PYTHONPATH=%BASETOOLS_PYTHON_SOURCE%;%PYTHONPATH%
-  
+
   echo                PATH = %PATH%
   echo         PYTHON_HOME = %PYTHON_HOME%
   echo          PYTHONPATH = %PYTHONPATH%
@@ -385,11 +385,11 @@ goto end
   @echo.
   echo  Usage: "%0 [-h | -help | --help | /h | /help | /?] [ Rebuild | ForceRebuild ] [Reconfig] [base_tools_path [edk_tools_path]]"
   @echo.
-  @echo         base_tools_path   BaseTools project path, BASE_TOOLS_PATH will be set to this path. 
+  @echo         base_tools_path   BaseTools project path, BASE_TOOLS_PATH will be set to this path.
   @echo         edk_tools_path    EDK_TOOLS_PATH will be set to this path.
-  @echo         Rebuild           If sources are available perform an Incremental build, only 
+  @echo         Rebuild           If sources are available perform an Incremental build, only
   @echo                           build those updated tools.
-  @echo         ForceRebuild      If sources are available, rebuild all tools regardless of 
+  @echo         ForceRebuild      If sources are available, rebuild all tools regardless of
   @echo                           whether they have been updated or not.
   @echo         Reconfig          Reinstall target.txt, tools_def.txt and build_rule.txt.
   @echo.

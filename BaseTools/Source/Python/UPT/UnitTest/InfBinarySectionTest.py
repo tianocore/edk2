@@ -1,11 +1,11 @@
 ## @file
-# This file contain unit test for Test [Binary] section part of InfParser 
+# This file contain unit test for Test [Binary] section part of InfParser
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -49,7 +49,7 @@ GUID | Test/Test.guid | DEBUG
 """
 
 #
-# Have 3 elements, Type | FileName | Target 
+# Have 3 elements, Type | FileName | Target
 # Target with MACRO defined in [Define] section
 #
 SectionStringsCommonItem4 = \
@@ -58,7 +58,7 @@ GUID | Test/Test.guid | $(TARGET)
 """
 
 #
-# Have 3 elements, Type | FileName | Target 
+# Have 3 elements, Type | FileName | Target
 # FileName with MACRO defined in [Binary] section
 #
 SectionStringsCommonItem5 = \
@@ -115,7 +115,7 @@ GUID | Test/Test.guid | DEBUG | MSFT | TEST | TRUE | OVERFLOW
 #-------------start of VER type binary item test input------------------------#
 
 #
-# Has 1 element, error format 
+# Has 1 element, error format
 #
 SectionStringsVerItem1 = \
 """
@@ -199,7 +199,7 @@ UI | Test/Test2.ui | * | FALSE
 """
 
 #
-# Has 1 element, error format 
+# Has 1 element, error format
 #
 SectionStringsUiItem4 = \
 """
@@ -253,7 +253,7 @@ def StringToSectionString(String):
             continue
         SectionString.append((Line, LineNo, ''))
         LineNo = LineNo + 1
-        
+
     return SectionString
 
 def PrepareTest(String):
@@ -269,7 +269,7 @@ def PrepareTest(String):
             #
             FileName = os.path.normpath(os.path.realpath(ValueList[1].strip()))
             try:
-                TempFile  = open (FileName, "w")    
+                TempFile  = open (FileName, "w")
                 TempFile.close()
             except:
                 print("File Create Error")
@@ -278,24 +278,24 @@ def PrepareTest(String):
         CurrentLine.SetLineString(Item[0])
         CurrentLine.SetLineNo(Item[1])
         InfLineCommentObject = InfLineCommentObject()
-        
+
         ItemList.append((ValueList, InfLineCommentObject, CurrentLine))
-                
+
     return ItemList
 
 if __name__ == '__main__':
     Logger.Initialize()
-    
+
     InfBinariesInstance = InfBinariesObject()
     ArchList = ['COMMON']
     Global.gINF_MODULE_DIR = os.getcwd()
-    
+
     AllPassedFlag = True
-    
+
     #
     # For All Ui test
     #
-    UiStringList = [ 
+    UiStringList = [
                     SectionStringsUiItem1,
                     SectionStringsUiItem2,
                     SectionStringsUiItem3,
@@ -303,10 +303,10 @@ if __name__ == '__main__':
                     SectionStringsUiItem5,
                     SectionStringsUiItem6,
                     SectionStringsUiItem7,
-                    SectionStringsUiItem8 
+                    SectionStringsUiItem8
                     ]
-    
-    for Item in UiStringList:        
+
+    for Item in UiStringList:
         Ui = PrepareTest(Item)
         if Item == SectionStringsUiItem4 or Item == SectionStringsUiItem5:
             try:
@@ -314,11 +314,11 @@ if __name__ == '__main__':
             except Logger.FatalError:
                 pass
         else:
-            try:		
+            try:
                 InfBinariesInstance.SetBinary(Ui = Ui, ArchList = ArchList)
             except:
-                AllPassedFlag = False   				
- 
+                AllPassedFlag = False
+
     #
     # For All Ver Test
     #
@@ -331,25 +331,25 @@ if __name__ == '__main__':
                      SectionStringsVerItem6,
                      SectionStringsVerItem7
                      ]
-    for Item in VerStringList:        
+    for Item in VerStringList:
         Ver = PrepareTest(Item)
         if Item == SectionStringsVerItem1 or \
            Item == SectionStringsVerItem2:
-            
+
             try:
                 InfBinariesInstance.SetBinary(Ver = Ver, ArchList = ArchList)
             except:
                 pass
-                    
+
         else:
             try:
                 InfBinariesInstance.SetBinary(Ver = Ver, ArchList = ArchList)
             except:
-                AllPassedFlag = False   
-    
+                AllPassedFlag = False
+
     #
     # For All Common Test
-    #    
+    #
     CommonStringList = [
                      SectionStringsCommonItem1,
                      SectionStringsCommonItem2,
@@ -363,23 +363,23 @@ if __name__ == '__main__':
                      SectionStringsCommonItem10
                      ]
 
-    for Item in CommonStringList:        
+    for Item in CommonStringList:
         CommonBin = PrepareTest(Item)
         if Item == SectionStringsCommonItem10 or \
            Item == SectionStringsCommonItem1:
-            
+
             try:
                 InfBinariesInstance.SetBinary(CommonBinary = CommonBin, ArchList = ArchList)
             except:
                 pass
-                    
+
         else:
             try:
                 InfBinariesInstance.SetBinary(Ver = Ver, ArchList = ArchList)
             except:
                 print("Test Failed!")
                 AllPassedFlag = False
-    
+
     if AllPassedFlag :
         print('All tests passed...')
     else:

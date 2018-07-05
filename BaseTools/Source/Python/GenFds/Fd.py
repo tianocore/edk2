@@ -103,7 +103,7 @@ class FD(FDClassObject):
                     pass
                 GenFdsGlobalVariable.VerboseLogger('Call each region\'s AddToBuffer function')
                 RegionObj.AddToBuffer (TempFdBuffer, self.BaseAddress, self.BlockSizeList, self.ErasePolarity, GenFds.ImageBinDict, self.vtfRawDict, self.DefineVarDict)
-        
+
         FdBuffer = BytesIO('')
         PreviousRegionStart = -1
         PreviousRegionSize = 1

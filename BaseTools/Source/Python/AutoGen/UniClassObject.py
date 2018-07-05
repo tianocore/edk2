@@ -284,7 +284,7 @@ class UniFileClassObject(object):
         if not IsLangInDef:
             #
             # The found STRING tokens will be added into new language string list
-            # so that the unique STRING identifier is reserved for all languages in the package list. 
+            # so that the unique STRING identifier is reserved for all languages in the package list.
             #
             FirstLangName = self.LanguageDef[0][0]
             if LangName != FirstLangName:
@@ -411,10 +411,10 @@ class UniFileClassObject(object):
             #
             # Ignore empty line
             #
-            if len(Line) == 0: 
-                continue 
-            
-                             
+            if len(Line) == 0:
+                continue
+
+
             Line = Line.replace(u'/langdef', u'#langdef')
             Line = Line.replace(u'/string', u'#string')
             Line = Line.replace(u'/language', u'#language')
@@ -429,8 +429,8 @@ class UniFileClassObject(object):
             Line = Line.replace(u'\\r', CR)
             Line = Line.replace(u'\\t', u' ')
             Line = Line.replace(u'\t', u' ')
-            Line = Line.replace(u'\\"', u'"') 
-            Line = Line.replace(u"\\'", u"'") 
+            Line = Line.replace(u'\\"', u'"')
+            Line = Line.replace(u"\\'", u"'")
             Line = Line.replace(BACK_SLASH_PLACEHOLDER, u'\\')
 
             StartPos = Line.find(u'\\x')
@@ -570,7 +570,7 @@ class UniFileClassObject(object):
         else:
             EdkLogger.error('Unicode File Parser', FORMAT_NOT_SUPPORTED, "The language '%s' for %s is not defined in Unicode file %s." \
                             % (Language, Name, self.File))
-            
+
         if Language not in self.OrderedStringList:
             self.OrderedStringList[Language] = []
             self.OrderedStringDict[Language] = {}
@@ -592,7 +592,7 @@ class UniFileClassObject(object):
                 for LangName in self.LanguageDef:
                     #
                     # New STRING token will be added into all language string lists.
-                    # so that the unique STRING identifier is reserved for all languages in the package list. 
+                    # so that the unique STRING identifier is reserved for all languages in the package list.
                     #
                     if LangName[0] != Language:
                         if UseOtherLangDef != '':

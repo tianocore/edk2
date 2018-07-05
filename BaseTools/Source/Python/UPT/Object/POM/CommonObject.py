@@ -1,11 +1,11 @@
 ## @file
 # This file is used to define common items of class object
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -23,10 +23,10 @@ from Library.DataType import TAB_LANGUAGE_EN_US
 class HelpTextObject(object):
     def __init__(self):
         self.HelpText = TextObject()
-    
+
     def SetHelpText(self, HelpText):
         self.HelpText = HelpText
-    
+
     def GetHelpText(self):
         return self.HelpText
 
@@ -37,10 +37,10 @@ class HelpTextObject(object):
 class HelpTextListObject(object):
     def __init__(self):
         self.HelpTextList = []
-    
+
     def SetHelpTextList(self, HelpTextList):
         self.HelpTextList = HelpTextList
-    
+
     def GetHelpTextList(self):
         return self.HelpTextList
 
@@ -51,13 +51,13 @@ class HelpTextListObject(object):
 class PromptListObject(object):
     def __init__(self):
         self.PromptList = []
-    
+
     def SetPromptList(self, PromptList):
         self.PromptList = PromptList
-    
+
     def GetPromptList(self):
         return self.PromptList
-    
+
 ## CommonPropertiesObject
 #
 # This class defined common attribution used in Module/Platform/Package files
@@ -77,7 +77,7 @@ class CommonPropertiesObject(HelpTextObject, HelpTextListObject):
         self.GuidValue = ''
         HelpTextObject.__init__(self)
         HelpTextListObject.__init__(self)
-        
+
     def SetUsage(self, Usage):
         self.Usage = Usage
 
@@ -95,10 +95,10 @@ class CommonPropertiesObject(HelpTextObject, HelpTextListObject):
 
     def GetSupArchList(self):
         return self.SupArchList
-    
+
     def SetGuidValue(self, GuidValue):
         self.GuidValue = GuidValue
-        
+
     def GetGuidValue(self):
         return self.GuidValue
 
@@ -199,11 +199,11 @@ class BinaryHeaderObject(object):
 
     def GetBinaryHeaderLicense(self):
         return self.BinaryHeaderLicenseList
-    
+
 ## ClonedRecordObject
 #
 # This class defined ClonedRecord items used in Module/Platform/Package files
-# 
+#
 # @param object:        Inherited from object class
 #
 class ClonedRecordObject(object):
@@ -285,7 +285,7 @@ class FileNameObject(CommonPropertiesObject):
         self.FileType = ''
         self.Filename = ''
         CommonPropertiesObject.__init__(self)
-        
+
     def SetFileType(self, FileType):
         self.FileType = FileType
 
@@ -306,10 +306,10 @@ class FileNameObject(CommonPropertiesObject):
 #
 class FileObject(object):
     def __init__(self):
-        self.Executable = '' 
+        self.Executable = ''
         self.Uri = ''
         self.OsType = ''
-        
+
     def SetExecutable(self, Executable):
         self.Executable = Executable
 
@@ -327,8 +327,8 @@ class FileObject(object):
 
     def GetOS(self):
         return self.OsType
-    
-## 
+
+##
 # MiscFileObject is used for xml
 #
 # @param CommonHeaderObject:   Inherited from CommonHeaderObject class
@@ -336,18 +336,18 @@ class FileObject(object):
 class MiscFileObject(CommonHeaderObject):
     def __init__(self):
         self.Name = ''
-        self.FileList = [] 
+        self.FileList = []
         CommonHeaderObject.__init__(self)
-        
+
     def SetName(self, Name):
         self.Name = Name
-    
+
     def GetName(self):
         return self.Name
-    
+
     def SetFileList(self, FileList):
         self.FileList = FileList
-        
+
     def GetFileList(self):
         return self.FileList
 
@@ -397,7 +397,7 @@ class IdentificationObject(GuidVersionObject):
         self.ModulePath = ''
         self.CombinePath = ''
         GuidVersionObject.__init__(self)
-        
+
     def SetName(self, Name):
         self.Name = Name
 
@@ -448,7 +448,7 @@ class IdentificationObject(GuidVersionObject):
 
 ## GuidProtocolPpiCommonObject
 #
-# This class defined Guid, Protocol and Ppi like items used in 
+# This class defined Guid, Protocol and Ppi like items used in
 # Module/Platform/Package files
 #
 # @param CommonPropertiesObject:    Inherited from CommonPropertiesObject class
@@ -460,7 +460,7 @@ class GuidProtocolPpiCommonObject(CommonPropertiesObject):
         self.Guid = ''
         self.SupModuleList = []
         CommonPropertiesObject.__init__(self)
-        
+
     def SetName(self, Name):
         self.Name = Name
 
@@ -512,7 +512,7 @@ class GuidObject(GuidProtocolPpiCommonObject):
 #
 # This class defined Protocol item used in Module/Platform/Package files
 #
-# @param GuidProtocolPpiCommonObject:  Inherited from 
+# @param GuidProtocolPpiCommonObject:  Inherited from
 #                                      GuidProtocolPpiCommonObject
 #
 class ProtocolObject(GuidProtocolPpiCommonObject):
@@ -529,7 +529,7 @@ class ProtocolObject(GuidProtocolPpiCommonObject):
 #
 # This class defined Ppi item used in Module/Platform/Package files
 #
-# @param GuidProtocolPpiCommonObject:  Inherited from 
+# @param GuidProtocolPpiCommonObject:  Inherited from
 #                                      GuidProtocolPpiCommonObject
 #
 class PpiObject(GuidProtocolPpiCommonObject):
@@ -566,13 +566,13 @@ class UserExtensionObject(object):
         self.BinaryLicenseList = []
         self.UniLangDefsList = []
         #
-        # { Statement : Arch , ... }    
+        # { Statement : Arch , ... }
         #
-        self.DefinesDict = {} 
+        self.DefinesDict = {}
         #
         # { Arch : Statement , ... }
         #
-        self.BuildOptionDict = {} 
+        self.BuildOptionDict = {}
         self.IncludesDict = {}
         self.SourcesDict = {}
         self.BinariesDict = {}
@@ -581,40 +581,40 @@ class UserExtensionObject(object):
         #
         self.Statement = ''
         self.SupArchList = []
-        
+
     def SetStatement(self, Statement):
         self.Statement = Statement
-    
+
     def GetStatement(self):
         return self.Statement
 
     def SetSupArchList(self, ArchList):
         self.SupArchList = ArchList
-    
+
     def GetSupArchList(self):
         return self.SupArchList
-        
+
     def SetUserID(self, UserID):
         self.UserID = UserID
-    
+
     def GetUserID(self):
         return self.UserID
-    
+
     def SetIdentifier(self, Identifier):
         self.Identifier = Identifier
-        
+
     def GetIdentifier(self):
         return self.Identifier
-    
+
     def SetUniLangDefsList(self, UniLangDefsList):
         self.UniLangDefsList = UniLangDefsList
-        
+
     def GetUniLangDefsList(self):
         return self.UniLangDefsList
-    
+
     def SetBinaryAbstract(self, BinaryAbstractList):
         self.BinaryAbstractList = BinaryAbstractList
-    
+
     def GetBinaryAbstract(self, Lang=None):
         if Lang:
             for (Key, Value) in self.BinaryAbstractList:
@@ -623,10 +623,10 @@ class UserExtensionObject(object):
             return None
         else:
             return self.BinaryAbstractList
-    
+
     def SetBinaryDescription(self, BinaryDescriptionList):
         self.BinaryDescriptionList = BinaryDescriptionList
-    
+
     def GetBinaryDescription(self, Lang=None):
         if Lang:
             for (Key, Value) in self.BinaryDescriptionList:
@@ -635,10 +635,10 @@ class UserExtensionObject(object):
             return None
         else:
             return self.BinaryDescriptionList
-    
+
     def SetBinaryCopyright(self, BinaryCopyrightList):
         self.BinaryCopyrightList = BinaryCopyrightList
-    
+
     def GetBinaryCopyright(self, Lang=None):
         if Lang:
             for (Key, Value) in self.BinaryCopyrightList:
@@ -647,10 +647,10 @@ class UserExtensionObject(object):
             return None
         else:
             return self.BinaryCopyrightList
-    
+
     def SetBinaryLicense(self, BinaryLicenseList):
         self.BinaryLicenseList = BinaryLicenseList
-    
+
     def GetBinaryLicense(self, Lang=None):
         if Lang:
             for (Key, Value) in self.BinaryLicenseList:
@@ -659,34 +659,34 @@ class UserExtensionObject(object):
             return None
         else:
             return self.BinaryLicenseList
-    
+
     def SetDefinesDict(self, DefinesDict):
         self.DefinesDict = DefinesDict
-    
+
     def GetDefinesDict(self):
         return self.DefinesDict
-    
+
     def SetBuildOptionDict(self, BuildOptionDict):
         self.BuildOptionDict = BuildOptionDict
-        
+
     def GetBuildOptionDict(self):
         return self.BuildOptionDict
 
     def SetIncludesDict(self, IncludesDict):
         self.IncludesDict = IncludesDict
-        
+
     def GetIncludesDict(self):
         return self.IncludesDict
 
     def SetSourcesDict(self, SourcesDict):
         self.SourcesDict = SourcesDict
-        
+
     def GetSourcesDict(self):
         return self.SourcesDict
 
     def SetBinariesDict(self, BinariesDict):
         self.BinariesDict = BinariesDict
-        
+
     def GetBinariesDict(self):
         return self.BinariesDict
 
@@ -703,28 +703,28 @@ class LibraryClassObject(CommonPropertiesObject):
         self.SupModuleList = []
         self.RecommendedInstance = GuidVersionObject()
         CommonPropertiesObject.__init__(self)
-        
+
     def SetLibraryClass(self, LibraryClass):
         self.LibraryClass = LibraryClass
-    
+
     def GetLibraryClass(self):
         return self.LibraryClass
-    
+
     def SetSupModuleList(self, SupModuleList):
         self.SupModuleList = SupModuleList
-    
+
     def GetSupModuleList(self):
         return self.SupModuleList
-    
+
     def SetIncludeHeader(self, IncludeHeader):
         self.IncludeHeader = IncludeHeader
-        
+
     def GetIncludeHeader(self):
         return self.IncludeHeader
-    
+
     def SetRecommendedInstance(self, RecommendedInstance):
         self.RecommendedInstance = RecommendedInstance
-    
+
     def GetRecommendedInstance(self):
         return self.RecommendedInstance
 
@@ -748,69 +748,69 @@ class PcdErrorObject(object):
 
     def SetValidValue(self, ValidValue):
         self.ValidValue = ValidValue
-    
+
     def GetValidValue(self):
         return self.ValidValue
-    
+
     def SetValidValueLang(self, ValidValueLang):
         self.ValidValueLang = ValidValueLang
-        
+
     def GetValidValueLang(self):
         return self.ValidValueLang
-    
+
     def SetValidValueRange(self, ValidValueRange):
         self.ValidValueRange = ValidValueRange
-        
+
     def GetValidValueRange(self):
         return self.ValidValueRange
-    
+
     def SetExpression(self, Expression):
         self.Expression = Expression
-    
+
     def GetExpression(self):
         return self.Expression
-    
+
     def SetErrorNumber(self, ErrorNumber):
         self.ErrorNumber = ErrorNumber
-        
+
     def GetErrorNumber(self):
         return self.ErrorNumber
-    
+
     def SetErrorMessageList(self, ErrorMessageList):
         self.ErrorMessageList = ErrorMessageList
-        
+
     def GetErrorMessageList(self):
         return self.ErrorMessageList
-    
+
     def SetTokenSpaceGuidCName(self, TokenSpaceGuidCName):
         self.TokenSpaceGuidCName = TokenSpaceGuidCName
-        
+
     def GetTokenSpaceGuidCName(self):
         return self.TokenSpaceGuidCName
-    
+
     def SetCName(self, CName):
         self.CName = CName
-        
+
     def GetCName(self):
         return self.CName
-    
+
     def SetFileLine(self, FileLine):
         self.FileLine = FileLine
-        
+
     def GetFileLine(self):
         return self.FileLine
-    
+
     def SetLineNum(self, LineNum):
         self.LineNum = LineNum
-        
+
     def GetLineNum(self):
         return self.LineNum
-    
-    
+
+
 ## IncludeObject
 #
 # This class defined Include item used in Module/Platform/Package files
-# 
+#
 # @param CommonPropertiesObject:  Inherited from CommonPropertiesObject class
 #
 class IncludeObject(CommonPropertiesObject):
@@ -820,31 +820,31 @@ class IncludeObject(CommonPropertiesObject):
         self.SupModuleList = []
         self.Comment = ''
         CommonPropertiesObject.__init__(self)
-    
+
     def SetFilePath(self, FilePath):
         self.FilePath = FilePath
-    
+
     def GetFilePath(self):
         return self.FilePath
-    
+
     def SetModuleType(self, ModuleType):
         self.ModuleType = ModuleType
-    
+
     def GetModuleType(self):
         return self.ModuleType
-    
+
     def SetSupModuleList(self, SupModuleList):
         self.SupModuleList = SupModuleList
- 
+
     def GetSupModuleList(self):
-        return self.SupModuleList              
-               
+        return self.SupModuleList
+
     def SetComment(self, Comment):
         self.Comment = Comment
- 
+
     def GetComment(self):
-        return self.Comment 
-    
+        return self.Comment
+
 ## PcdObject
 #
 # This class defined Pcd item used in Module/Platform/Package files
@@ -874,86 +874,86 @@ class PcdObject(CommonPropertiesObject, HelpTextListObject, PromptListObject):
         self.Offset = ''
         self.ValidUsage = ''
         self.ItemType = ''
-        self.PcdErrorsList = [] 
-        self.SupModuleList = []        
+        self.PcdErrorsList = []
+        self.SupModuleList = []
         CommonPropertiesObject.__init__(self)
         HelpTextListObject.__init__(self)
         PromptListObject.__init__(self)
-    
+
     def SetPcdCName(self, PcdCName):
         self.PcdCName = PcdCName
-        
+
     def GetPcdCName(self):
         return self.PcdCName
-    
+
     def SetCName(self, CName):
         self.CName = CName
-    
+
     def GetCName(self):
         return self.CName
-    
+
     def SetToken(self, Token):
         self.Token = Token
-    
+
     def GetOffset(self):
         return self.Offset
 
     def SetOffset(self, Offset):
         self.Offset = Offset
-    
+
     def GetToken(self):
         return self.Token
-    
+
     def SetTokenSpaceGuidCName(self, TokenSpaceGuidCName):
         self.TokenSpaceGuidCName = TokenSpaceGuidCName
-    
+
     def GetTokenSpaceGuidCName(self):
         return self.TokenSpaceGuidCName
-    
+
     def SetTokenSpaceGuidValue(self, TokenSpaceGuidValue):
         self.TokenSpaceGuidValue = TokenSpaceGuidValue
-    
+
     def GetTokenSpaceGuidValue(self):
         return self.TokenSpaceGuidValue
-    
+
     def SetDatumType(self, DatumType):
         self.DatumType = DatumType
-        
+
     def GetDatumType(self):
         return self.DatumType
-    
+
     def SetMaxDatumSize(self, MaxDatumSize):
         self.MaxDatumSize = MaxDatumSize
-    
+
     def GetMaxDatumSize(self):
         return self.MaxDatumSize
 
     def SetDefaultValue(self, DefaultValue):
         self.DefaultValue = DefaultValue
-        
+
     def GetDefaultValue(self):
         return self.DefaultValue
 
     def SetValidUsage(self, ValidUsage):
         self.ValidUsage = ValidUsage
-    
+
     def GetValidUsage(self):
         return self.ValidUsage
-    
+
     def SetPcdErrorsList(self, PcdErrorsList):
         self.PcdErrorsList = PcdErrorsList
-    
+
     def GetPcdErrorsList(self):
         return self.PcdErrorsList
 
     def SetItemType(self, ItemType):
         self.ItemType = ItemType
-        
+
     def GetItemType(self):
         return self.ItemType
 
     def SetSupModuleList(self, SupModuleList):
         self.SupModuleList = SupModuleList
-        
+
     def GetSupModuleList(self):
         return self.SupModuleList

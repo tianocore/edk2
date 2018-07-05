@@ -220,7 +220,7 @@ def FindIncludeFiles(Source, IncludePathList, IncludeFiles):
 
 ## Split each lines in file
 #
-#  This method is used to split the lines in file to make the length of each line 
+#  This method is used to split the lines in file to make the length of each line
 #  less than MaxLength.
 #
 #  @param      Content           The content of file
@@ -245,12 +245,12 @@ def FileLinesSplit(Content=None, MaxLength=None):
             NewContentList.append(Line)
     for NewLine in NewContentList:
         NewContent += NewLine + TAB_LINE_BREAK
-    
+
     NewContent = NewContent.replace(TAB_LINE_BREAK, gEndOfLine).replace('\r\r\n', gEndOfLine)
     return NewContent
-    
-    
-    
+
+
+
 ##
 # Parse binary dependency expression section
 #
@@ -280,10 +280,10 @@ class DepexParser(object):
                 for Guid in Package.Guids:
                     GuidValue = GuidStructureStringToGuidString(Package.Guids[Guid])
                     self._GuidDb[GuidValue.upper()] = Guid
-    
+
     ##
     # Parse the binary dependency expression files.
-    # 
+    #
     # This function parses the binary dependency expression file and translate it
     # to the instruction list.
     #
@@ -305,7 +305,7 @@ class DepexParser(object):
             OpCode = DepexFile.read(1)
 
         return DepexStatement
-    
+
 ##
 # Reports library information
 #
@@ -411,7 +411,7 @@ class DepexReport(object):
 
         if ModuleType in [SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_DXE_CORE, SUP_MODULE_SMM_CORE, SUP_MODULE_MM_CORE_STANDALONE, SUP_MODULE_UEFI_APPLICATION]:
             return
-      
+
         for Source in M.SourceFileList:
             if os.path.splitext(Source.Path)[1].lower() == ".dxs":
                 Match = gDxsDependencyPattern.search(open(Source.Path).read())
@@ -457,7 +457,7 @@ class DepexReport(object):
                 FileWrite(File, gSubSectionSep)
             except:
                 EdkLogger.warn(None, "Dependency expression file is corrupted", self._DepexFileName)
-        
+
         FileWrite(File, "Dependency Expression (DEPEX) from %s" % self.Source)
 
         if self.Source == "INF":
@@ -1548,7 +1548,7 @@ class PredictionReport(object):
             EotEndTime = time.time()
             EotDuration = time.strftime("%H:%M:%S", time.gmtime(int(round(EotEndTime - EotStartTime))))
             EdkLogger.quiet("EOT run time: %s\n" % EotDuration)
-            
+
             #
             # Parse the output of EOT tool
             #
@@ -1746,7 +1746,7 @@ class FdRegionReport(object):
         PlatformPcds = {}
         #
         # Collect PCDs declared in DEC files.
-        #        
+        #
         for Pa in Wa.AutoGenObjectList:
             for Package in Pa.PackageList:
                 for (TokenCName, TokenSpaceGuidCName, DecType) in Package.Pcds:
@@ -2026,7 +2026,7 @@ class PlatformReport(object):
         self.DepexParser = None
         if "DEPEX" in ReportType:
             self.DepexParser = DepexParser(Wa)
-            
+
         self.ModuleReportList = []
         if MaList is not None:
             self._IsModuleBuild = True
@@ -2101,7 +2101,7 @@ class PlatformReport(object):
         if not self._IsModuleBuild:
             if "PCD" in ReportType:
                 self.PcdReport.GenerateReport(File, None)
-    
+
             if "FLASH" in ReportType:
                 for FdReportListItem in self.FdReportList:
                     FdReportListItem.GenerateReport(File)
@@ -2135,7 +2135,7 @@ class BuildReport(object):
         if ReportFile:
             self.ReportList = []
             self.ReportType = []
-            if ReportType: 
+            if ReportType:
                 for ReportTypeItem in ReportType:
                     if ReportTypeItem not in self.ReportType:
                         self.ReportType.append(ReportTypeItem)
@@ -2181,7 +2181,7 @@ class BuildReport(object):
                 EdkLogger.error("BuildReport", CODE_ERROR, "Unknown fatal error when generating build report", ExtraData=self.ReportFile, RaiseError=False)
                 EdkLogger.quiet("(Python %s on %s\n%s)" % (platform.python_version(), sys.platform, traceback.format_exc()))
             File.close()
-            
+
 # This acts like the main() function for the script, unless it is 'import'ed into another script.
 if __name__ == '__main__':
     pass

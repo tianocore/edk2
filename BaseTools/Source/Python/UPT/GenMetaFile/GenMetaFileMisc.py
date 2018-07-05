@@ -2,11 +2,11 @@
 #
 # This file contained the miscellaneous routines for GenMetaFile usage.
 #
-# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -26,7 +26,7 @@ from Parser.DecParser import Dec
 #  @param SectionDict: string of source file path/name
 #  @param Arch:     string of source file family field
 #  @param ExternList:  string of source file FeatureFlag field
-#   
+#
 def AddExternToDefineSec(SectionDict, Arch, ExternList):
     LeftOffset = 31
     for ArchList, EntryPoint, UnloadImage, Constructor, Destructor, FFE, HelpStringList in ExternList:
@@ -93,7 +93,7 @@ def ObtainPcdName(Packages, TokenSpaceGuidValue, Token):
         Path = None
         #
         # find package path/name
-        # 
+        #
         for PkgInfo in GlobalData.gWSPKG_LIST:
             if Guid == PkgInfo[1]:
                 if (not Version) or (Version == PkgInfo[2]):
@@ -156,9 +156,9 @@ def ObtainPcdName(Packages, TokenSpaceGuidValue, Token):
     return TokenSpaceGuidName, PcdCName
 
 ## _TransferDict
-#  transfer dict that using (Statement, SortedArch) as key, 
+#  transfer dict that using (Statement, SortedArch) as key,
 #  (GenericComment, UsageComment) as value into a dict that using SortedArch as
-#  key and NewStatement as value 
+#  key and NewStatement as value
 #
 def TransferDict(OrigDict, Type=None):
     NewDict = {}
@@ -171,7 +171,7 @@ def TransferDict(OrigDict, Type=None):
         for Statement, SortedArch in OrigDict:
             if len(Statement) > LeftOffset:
                 LeftOffset = len(Statement)
-        
+
     for Statement, SortedArch in OrigDict:
         Comment = OrigDict[Statement, SortedArch]
         #

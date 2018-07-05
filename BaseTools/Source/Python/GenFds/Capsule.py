@@ -205,7 +205,7 @@ class Capsule (CapsuleClassObject) :
             return GenFds.ImageBinDict[self.UiCapsuleName.upper() + 'cap']
 
         GenFdsGlobalVariable.InfLogger( "\nGenerate %s Capsule" %self.UiCapsuleName)
-        if ('CAPSULE_GUID' in self.TokensDict and 
+        if ('CAPSULE_GUID' in self.TokensDict and
             uuid.UUID(self.TokensDict['CAPSULE_GUID']) == uuid.UUID('6DCBD5ED-E82D-4C44-BDA1-7194199AD92A')):
             return self.GenFmpCapsule()
 

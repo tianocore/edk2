@@ -2,7 +2,7 @@
 # This is an XML API that uses a syntax similar to XPath, but it is written in
 # standard python so that no extra python packages are required to use it.
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -33,7 +33,7 @@ def CreateXmlElement(Name, String, NodeList, AttributeList):
     Element = Doc.createElement(Name)
     if String != '' and String is not None:
         Element.appendChild(Doc.createTextNode(String))
-    
+
     for Item in NodeList:
         if isinstance(Item, type([])):
             Key = Item[0]
@@ -49,7 +49,7 @@ def CreateXmlElement(Name, String, NodeList, AttributeList):
         Value = Item[1]
         if Key != '' and Key is not None and Value != '' and Value is not None:
             Element.setAttribute(Key, Value)
-    
+
     return Element
 
 ## Get a list of XML nodes using XPath style syntax.

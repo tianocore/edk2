@@ -1,15 +1,15 @@
 /** @file
-  
+
   Vfr common library functions.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -229,7 +229,7 @@ public:
 
   VOID                Dump(IN FILE *);
   //
-  // First the declared 
+  // First the declared
   //
   CHAR8               *mFirstNewDataTypeName;
 #ifdef CVFR_VARDATATYPEDB_DEBUG
@@ -270,7 +270,7 @@ struct SVfrVarStorageNode {
     SVfrDataType            *mDataType;
 
     // NameValue Storage
-	struct {
+  struct {
       EFI_STRING_ID         *mNameTable;
       UINT32                mTableSize;
     } mNameSpace;
@@ -333,15 +333,15 @@ private:
   BOOLEAN         ChekVarStoreIdFree (IN EFI_VARSTORE_ID);
   VOID            MarkVarStoreIdUsed (IN EFI_VARSTORE_ID);
   VOID            MarkVarStoreIdUnused (IN EFI_VARSTORE_ID);
-  EFI_VARSTORE_ID CheckGuidField (IN SVfrVarStorageNode *, 
-                                  IN EFI_GUID *, 
-                                  IN BOOLEAN *, 
+  EFI_VARSTORE_ID CheckGuidField (IN SVfrVarStorageNode *,
+                                  IN EFI_GUID *,
+                                  IN BOOLEAN *,
                                   OUT EFI_VFR_RETURN_CODE *);
 
 public:
   CVfrDataStorage ();
   ~CVfrDataStorage ();
-  
+
   SVfrVarStorageNode * GetBufferVarStoreList () {
     return mBufferVarStoreList;
   }
@@ -422,13 +422,13 @@ public:
   VOID                RegisterNewDateQuestion (IN CHAR8 *, IN CHAR8 *, IN OUT EFI_QUESTION_ID &);
   VOID                RegisterOldTimeQuestion (IN CHAR8 *, IN CHAR8 *, IN CHAR8 *, IN OUT EFI_QUESTION_ID &);
   VOID                RegisterNewTimeQuestion (IN CHAR8 *, IN CHAR8 *, IN OUT EFI_QUESTION_ID &);
-  VOID                RegisterRefQuestion (IN CHAR8 *, IN CHAR8 *, IN OUT EFI_QUESTION_ID &);  
+  VOID                RegisterRefQuestion (IN CHAR8 *, IN CHAR8 *, IN OUT EFI_QUESTION_ID &);
   EFI_VFR_RETURN_CODE UpdateQuestionId (IN EFI_QUESTION_ID, IN EFI_QUESTION_ID);
   VOID                GetQuestionId (IN CHAR8 *, IN CHAR8 *, OUT EFI_QUESTION_ID &, OUT UINT32 &, OUT EFI_QUESION_TYPE *QType = NULL);
   EFI_VFR_RETURN_CODE FindQuestion (IN EFI_QUESTION_ID);
   EFI_VFR_RETURN_CODE FindQuestion (IN CHAR8 *);
   VOID                PrintAllQuestion (IN VOID);
-  VOID                ResetInit (IN VOID); 
+  VOID                ResetInit (IN VOID);
 
   VOID SetCompatibleMode (IN BOOLEAN Mode) {
     VfrCompatibleMode = Mode;
@@ -523,7 +523,7 @@ private:
   UINT32 GetUnicodeStringTextSize (
     IN  UINT8            *StringSrc
     );
-    
+
   BOOLEAN GetBestLanguage (
     IN CONST CHAR8  *SupportedLanguages,
     IN CHAR8        *Language

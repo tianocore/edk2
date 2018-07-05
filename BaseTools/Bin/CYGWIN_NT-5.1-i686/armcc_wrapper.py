@@ -14,11 +14,11 @@
 
 #
 # ARMCC tools do not support cygwin paths. Ths script converts cygwin paths to DOS paths
-# in any arguments. 
+# in any arguments.
 #
 # armcc_wrapper.py ToolToExec [command line to convert]
 #
-# anthing with the / will be converted via cygpath cygwin call or manually. 
+# anthing with the / will be converted via cygpath cygwin call or manually.
 # -I/cygpath/c/example is a special case as you can not pass -I to cygpath
 #
 # ExceptionList if a tool takes an argument with a / add it to the exception list
@@ -46,7 +46,7 @@ def ConvertCygPathToDos(CygPath):
     DosPath = CygPath[10] + ':' + CygPath[11:]
   else:
     DosPath = CygPath
-  
+
   # pipes.quote will add the extra \\ for us.
   return DosPath.replace('/', '\\')
 
@@ -59,9 +59,9 @@ def main(argv):
 
   # use 1st argument as name of tool to call
   Command = pipes.quote(sys.argv[1]);
-  
+
   ExceptionList = ["/interwork"]
-  
+
   for arg in argv:
     if arg.find('/') == -1:
       # if we don't need to convert just add to the command line
@@ -77,11 +77,11 @@ def main(argv):
         CygPath = ConvertCygPathToDos(arg)
 
       Command = Command + ' ' + pipes.quote(CygPath)
-    
+
   # call the real tool with the converted paths
   return subprocess.call(Command, shell=True)
 
- 
+
 if __name__ == "__main__":
   try:
      ret = main(sys.argv[2:])

@@ -1,11 +1,11 @@
 ## @file
 # This file is used to parse a xml file of .PKG file
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -89,7 +89,7 @@ class DistributionPackageXml(object):
                     DPLicense = DpHeader.GetLicense()[0][1]
                 else:
                     DPLicense = ''
-                
+
                 CheckDict['Name'] = DpHeader.GetName()
                 CheckDict['GUID'] = DpHeader.GetGuid()
                 CheckDict['Version'] = DpHeader.GetVersion()
@@ -119,7 +119,7 @@ class DistributionPackageXml(object):
                 ValidateMS(self.DistP.ModuleSurfaceArea[Key], ['DistributionPackage', 'ModuleSurfaceArea'])
 
             #
-            # Check Each Tool   
+            # Check Each Tool
             #
             if self.DistP.Tools:
                 XmlTreeLevel = ['DistributionPackage', 'Tools', 'Header']
@@ -195,7 +195,7 @@ class DistributionPackageXml(object):
                 ModuleKey = (Module.GetGuid(), Module.GetVersion(), Module.GetName(), Module.GetModulePath())
                 self.DistP.ModuleSurfaceArea[ModuleKey] = Module
 
-            #    
+            #
             # Parse Tools
             #
             Tmp = MiscellaneousFileXml()
@@ -252,7 +252,7 @@ class DistributionPackageXml(object):
                 Msa = ModuleSurfaceAreaXml()
                 DomModule = Msa.ToXml(Module)
                 Root.appendChild(DomModule)
-            #    
+            #
             # Parse Tools
             #
             Tmp = MiscellaneousFileXml()
@@ -307,7 +307,7 @@ class DistributionPackageXml(object):
 
             #
             # Remove SupModList="COMMON" or "common"
-            #            
+            #
             XmlContent = \
             re.sub(r'[\s\r\n]*SupModList[\s\r\n]*=[\s\r\n]*"[\s\r\n]*COMMON'
             '[\s\r\n]*"', '', XmlContent)
@@ -324,7 +324,7 @@ class DistributionPackageXml(object):
 # Check if any required item is missing in ModuleSurfaceArea
 #
 # @param Module: The ModuleSurfaceArea to be checked
-# @param XmlTreeLevel: The top level of Module 
+# @param XmlTreeLevel: The top level of Module
 #
 def ValidateMS(Module, TopXmlTreeLevel):
     ValidateMS1(Module, TopXmlTreeLevel)
@@ -336,7 +336,7 @@ def ValidateMS(Module, TopXmlTreeLevel):
 # Check if any required item is missing in ModuleSurfaceArea
 #
 # @param Module: The ModuleSurfaceArea to be checked
-# @param XmlTreeLevel: The top level of Module 
+# @param XmlTreeLevel: The top level of Module
 #
 def ValidateMS1(Module, TopXmlTreeLevel):
     #
@@ -421,10 +421,10 @@ def ValidateMS1(Module, TopXmlTreeLevel):
             IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
     #
-    # If SupArchList is used to identify different EntryPoint, UnloadImage, Constructor/Destructor elements and 
+    # If SupArchList is used to identify different EntryPoint, UnloadImage, Constructor/Destructor elements and
     # that SupArchList does not match ModuleSurfaceArea.ModuleProperties:SupArchList, the tool must exit gracefully,
-    # informing the user that the EDK II Build system does not support different EntryPoint, UnloadImage, 
-    # Constructor or Destructor elements based on Architecture type.  Two SupArchList attributes are considered 
+    # informing the user that the EDK II Build system does not support different EntryPoint, UnloadImage,
+    # Constructor or Destructor elements based on Architecture type.  Two SupArchList attributes are considered
     # identical if it lists the same CPU architectures in any order.
     #
     for Item in Module.GetExternList():
@@ -459,7 +459,7 @@ def ValidateMS1(Module, TopXmlTreeLevel):
 # Check if any required item is missing in ModuleSurfaceArea
 #
 # @param Module: The ModuleSurfaceArea to be checked
-# @param XmlTreeLevel: The top level of Module 
+# @param XmlTreeLevel: The top level of Module
 #
 def ValidateMS2(Module, TopXmlTreeLevel):
     #
@@ -485,7 +485,7 @@ def ValidateMS2(Module, TopXmlTreeLevel):
         Logger.Error("UPT", FORMAT_INVALID, ERR_FILE_NAME_INVALIDE % Module.GetModulePath())
 
     #
-    # Check ModuleProperties->BootMode 
+    # Check ModuleProperties->BootMode
     #
     XmlTreeLevel = TopXmlTreeLevel + ['ModuleProperties'] + ['BootMode']
     for Item in Module.GetBootModeList():
@@ -494,7 +494,7 @@ def ValidateMS2(Module, TopXmlTreeLevel):
         IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
     #
-    # Check ModuleProperties->Event 
+    # Check ModuleProperties->Event
     #
     XmlTreeLevel = TopXmlTreeLevel + ['ModuleProperties'] + ['Event']
     for Item in Module.GetEventList():
@@ -503,7 +503,7 @@ def ValidateMS2(Module, TopXmlTreeLevel):
         IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
     #
-    # Check ModuleProperties->Hob 
+    # Check ModuleProperties->Hob
     #
     XmlTreeLevel = TopXmlTreeLevel + ['ModuleProperties'] + ['HOB']
     for Item in Module.GetHobList():
@@ -512,8 +512,8 @@ def ValidateMS2(Module, TopXmlTreeLevel):
         IsRequiredItemListNull(CheckDict, XmlTreeLevel)
 
     #
-    # The UDP Specification supports the module type of UEFI_RUNTIME_DRIVER, which is not present in the EDK II INF 
-    # File Specification v. 1.23, so UPT must perform the following translation that include the generation of a 
+    # The UDP Specification supports the module type of UEFI_RUNTIME_DRIVER, which is not present in the EDK II INF
+    # File Specification v. 1.23, so UPT must perform the following translation that include the generation of a
     # [Depex] section.
     #
     if Module.ModuleType == "UEFI_RUNTIME_DRIVER":
@@ -549,7 +549,7 @@ def ValidateMS2(Module, TopXmlTreeLevel):
                      'Usage':Item.GetUsage()}
         IsRequiredItemListNull(CheckDict, XmlTreeLevel)
         #
-        # If the LibraryClass:SupModList is not "UNDEFINED" the LIBRARY_CLASS entry must have the list 
+        # If the LibraryClass:SupModList is not "UNDEFINED" the LIBRARY_CLASS entry must have the list
         # appended using the format:
         # LIBRARY_CLASS = <ClassName> ["|" <Edk2ModuleTypeList>]
         #
@@ -574,10 +574,10 @@ def ValidateMS2(Module, TopXmlTreeLevel):
 
 
     #
-    # For Library modules (indicated by a LIBRARY_CLASS statement in the [Defines] section)                  
-    # If the SupModList attribute of the CONSTRUCTOR or DESTRUCTOR element does not match the Supported Module 
-    # Types listed after "LIBRARY_CLASS = <Keyword> |", the tool should gracefully exit with an error message 
-    # stating that there is a conflict in the module types the CONSTRUCTOR/DESTRUCTOR is to be used with and 
+    # For Library modules (indicated by a LIBRARY_CLASS statement in the [Defines] section)
+    # If the SupModList attribute of the CONSTRUCTOR or DESTRUCTOR element does not match the Supported Module
+    # Types listed after "LIBRARY_CLASS = <Keyword> |", the tool should gracefully exit with an error message
+    # stating that there is a conflict in the module types the CONSTRUCTOR/DESTRUCTOR is to be used with and
     # the Module types this Library supports.
     #
     if IsLibraryModule:
@@ -591,10 +591,10 @@ def ValidateMS2(Module, TopXmlTreeLevel):
                          RaiseError=True)
 
     #
-    # If the module is not a library module, the MODULE_TYPE listed in the ModuleSurfaceArea.Header must match the 
-    # SupModList attribute.  If these conditions cannot be met, the tool must exit gracefully, informing the user 
+    # If the module is not a library module, the MODULE_TYPE listed in the ModuleSurfaceArea.Header must match the
+    # SupModList attribute.  If these conditions cannot be met, the tool must exit gracefully, informing the user
     # that the EDK II Build system does not currently support the features required by this Module.
-    #                   
+    #
     if not IsLibraryModule:
         for Item in Module.GetExternList():
             if hasattr(Item, 'SupModList') and len(Item.SupModList) > 0 and \
@@ -628,7 +628,7 @@ def ValidateMS2(Module, TopXmlTreeLevel):
 # Check if any required item is missing in ModuleSurfaceArea
 #
 # @param Module: The ModuleSurfaceArea to be checked
-# @param XmlTreeLevel: The top level of Module 
+# @param XmlTreeLevel: The top level of Module
 #
 def ValidateMS3(Module, TopXmlTreeLevel):
     #
@@ -666,12 +666,12 @@ def ValidateMS3(Module, TopXmlTreeLevel):
         for AsBuilt in Item.GetAsBuiltList():
             #
             # Check LibInstance
-            #                        
+            #
             if len(AsBuilt.LibraryInstancesList) == 1 and not AsBuilt.LibraryInstancesList[0]:
                 CheckDict = {'GUID':''}
                 XmlTreeLevel = TopXmlTreeLevel + ['BinaryFiles', 'BinaryFile', 'AsBuilt', 'LibraryInstances']
                 IsRequiredItemListNull(CheckDict, XmlTreeLevel)
-                            
+
             for LibItem in AsBuilt.LibraryInstancesList:
                 CheckDict = {'Guid':LibItem.Guid,
                              'Version':LibItem.Version}
@@ -925,7 +925,7 @@ def ValidatePS2(Package):
 #
 # Check if any required item is missing in  PackageSurfaceArea
 #
-# @param Package: The PackageSurfaceArea to be checked 
+# @param Package: The PackageSurfaceArea to be checked
 #
 def ValidatePackageSurfaceArea(Package):
     ValidatePS1(Package)

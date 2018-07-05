@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define strings used in the BPDG tool
 #
-# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -31,8 +31,8 @@ MAP_FILE_COMMENT_TEMPLATE = \
 #  THIS IS AUTO-GENERATED FILE BY BPDG TOOLS AND PLEASE DO NOT MAKE MODIFICATION.
 #
 #  This file lists all VPD informations for a platform fixed/adjusted by BPDG tool.
-# 
-# Copyright (c) 2010 -2016, Intel Corporation. All rights reserved.<BR>
+#
+# Copyright (c) 2010 -2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -50,18 +50,18 @@ LBL_BPDG_VERSION            = (u"1.0")
 LBL_BPDG_USAGE              = \
 (
 """BPDG options -o Filename.bin -m Filename.map Filename.txt
-Copyright (c) 2010 - 2016, Intel Corporation All Rights Reserved.
+Copyright (c) 2010 - 2018, Intel Corporation All Rights Reserved.
 
   Intel(r) Binary Product Data Generation Tool (Intel(r) BPDG)
-  
+
 Required Flags:
   -o BIN_FILENAME, --vpd-filename=BIN_FILENAME
             Specify the file name for the VPD binary file
   -m FILENAME, --map-filename=FILENAME
-            Generate file name for consumption during the build that contains 
-            the mapping of Pcd name, offset, datum size and value derived 
+            Generate file name for consumption during the build that contains
+            the mapping of Pcd name, offset, datum size and value derived
             from the input file and any automatic calculations.
-""" 
+"""
 )
 
 MSG_OPTION_HELP             = ("Show this help message and exit.")

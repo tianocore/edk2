@@ -1,11 +1,11 @@
 ## @file
-# This file contained the parser for [Sources] sections in INF file 
+# This file contained the parser for [Sources] sections in INF file
 #
-# Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
-# This program and the accompanying materials are licensed and made available 
-# under the terms and conditions of the BSD License which accompanies this 
-# distribution. The full text of the license may be found at 
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution. The full text of the license may be found at
 # http://opensource.org/licenses/bsd-license.php
 #
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
@@ -31,7 +31,7 @@ from Parser.InfParserMisc import InfParserSectionRoot
 class InfSourceSectionParser(InfParserSectionRoot):
     ## InfSourceParser
     #
-    #          
+    #
     def InfSourceParser(self, SectionString, InfSectionObject, FileName):
         SectionMacros = {}
         ValueList     = []
@@ -43,12 +43,12 @@ class InfSourceSectionParser(InfParserSectionRoot):
         for Line in SectionString:
             SrcLineContent = Line[0]
             SrcLineNo      = Line[1]
-            
+
             if SrcLineContent.strip() == '':
                 continue
-            
+
             #
-            # Found Header Comments 
+            # Found Header Comments
             #
             if SrcLineContent.strip().startswith(DT.TAB_COMMENT_SPLIT):
                 #
@@ -59,7 +59,7 @@ class InfSourceSectionParser(InfParserSectionRoot):
                     SectionContent += SrcLineContent + DT.END_OF_LINE
                     continue
                 #
-                # First time encounter comment 
+                # First time encounter comment
                 #
                 else:
                     #
@@ -68,18 +68,18 @@ class InfSourceSectionParser(InfParserSectionRoot):
                     HeaderComments = []
                     HeaderComments.append(Line)
                     StillCommentFalg = True
-                    SectionContent += SrcLineContent + DT.END_OF_LINE 
+                    SectionContent += SrcLineContent + DT.END_OF_LINE
                     continue
             else:
                 StillCommentFalg = False
-                          
+
             if len(HeaderComments) >= 1:
                 LineComment = InfLineCommentObject()
                 LineCommentContent = ''
                 for Item in HeaderComments:
                     LineCommentContent += Item[0] + DT.END_OF_LINE
                 LineComment.SetHeaderComments(LineCommentContent)
-            
+
             #
             # Find Tail comment.
             #
@@ -89,11 +89,11 @@ class InfSourceSectionParser(InfParserSectionRoot):
                 if LineComment is None:
                     LineComment = InfLineCommentObject()
                 LineComment.SetTailComments(TailComments)
-                               
+
             #
             # Find Macro
             #
-            Name, Value = MacroParser((SrcLineContent, SrcLineNo), 
+            Name, Value = MacroParser((SrcLineContent, SrcLineNo),
                                       FileName,
                                       DT.MODEL_EFI_SOURCE_FILE,
                                       self.FileLocalMacros)
@@ -102,44 +102,44 @@ class InfSourceSectionParser(InfParserSectionRoot):
                 LineComment = None
                 HeaderComments = []
                 continue
-            
+
             #
             # Replace with Local section Macro and [Defines] section Macro.
-            #            
-            SrcLineContent = InfExpandMacro(SrcLineContent, 
-                                         (FileName, SrcLineContent, SrcLineNo), 
-                                         self.FileLocalMacros, 
+            #
+            SrcLineContent = InfExpandMacro(SrcLineContent,
+                                         (FileName, SrcLineContent, SrcLineNo),
+                                         self.FileLocalMacros,
                                          SectionMacros)
 
             TokenList = GetSplitValueList(SrcLineContent, DT.TAB_VALUE_SPLIT, 4)
             ValueList[0:len(TokenList)] = TokenList
-          
+
             #
             # Store section content string after MACRO replaced.
             #
-            SectionContent += SrcLineContent + DT.END_OF_LINE 
-            
-            SourceList.append((ValueList, LineComment, 
+            SectionContent += SrcLineContent + DT.END_OF_LINE
+
+            SourceList.append((ValueList, LineComment,
                                (SrcLineContent, SrcLineNo, FileName)))
             ValueList = []
             LineComment = None
             TailComments = ''
             HeaderComments = []
             continue
-        
+
         #
         # Current section archs
         #
         ArchList = []
         for Item in self.LastSectionHeaderContent:
             if Item[1] not in ArchList:
-                ArchList.append(Item[1])  
+                ArchList.append(Item[1])
                 InfSectionObject.SetSupArchList(Item[1])
-                
-        InfSectionObject.SetAllContent(SectionContent)             
+
+        InfSectionObject.SetAllContent(SectionContent)
         if not InfSectionObject.SetSources(SourceList, Arch = ArchList):
-            Logger.Error('InfParser', 
+            Logger.Error('InfParser',
                          FORMAT_INVALID,
                          ST.ERR_INF_PARSER_MODULE_SECTION_TYPE_ERROR % ("[Sources]"),
-                         File=FileName, 
-                         Line=Item[3])            
+                         File=FileName,
+                         Line=Item[3])

@@ -3,7 +3,7 @@
 #
 # This tool depends on DIA2Dump.exe (VS) or nm (gcc) to parse debug entry.
 #
-# Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -21,7 +21,7 @@ import sys
 from optparse import OptionParser
 
 versionNumber = "1.1"
-__copyright__ = "Copyright (c) 2016, Intel Corporation. All rights reserved."
+__copyright__ = "Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved."
 
 class Symbols:
     def __init__(self):
@@ -72,7 +72,7 @@ class Symbols:
         reportLines = linefile.readlines()
         linefile.close()
 
-        # 000113ca T AllocatePool	c:\home\edk-ii\MdePkg\Library\UefiMemoryAllocationLib\MemoryAllocationLib.c:399
+        # 000113ca T AllocatePool  c:\home\edk-ii\MdePkg\Library\UefiMemoryAllocationLib\MemoryAllocationLib.c:399
         patchLineFileMatchString = "([0-9a-fA-F]*)\s+[T|D|t|d]\s+(\w+)\s*((?:[a-zA-Z]:)?[\w+\-./_a-zA-Z0-9\\\\]*):?([0-9]*)"
 
         for reportLine in reportLines:
@@ -127,9 +127,9 @@ class Symbols:
         linefile.close()
 
         #   ** GetDebugPrintErrorLevel
-        #	line 32 at [0000C790][0001:0000B790], len = 0x3	c:\home\edk-ii\mdepkg\library\basedebugprinterrorlevellib\basedebugprinterrorlevellib.c (MD5: 687C0AE564079D35D56ED5D84A6164CC)
-        #	line 36 at [0000C793][0001:0000B793], len = 0x5
-        #	line 37 at [0000C798][0001:0000B798], len = 0x2
+        #  line 32 at [0000C790][0001:0000B790], len = 0x3  c:\home\edk-ii\mdepkg\library\basedebugprinterrorlevellib\basedebugprinterrorlevellib.c (MD5: 687C0AE564079D35D56ED5D84A6164CC)
+        #  line 36 at [0000C793][0001:0000B793], len = 0x5
+        #  line 37 at [0000C798][0001:0000B798], len = 0x2
 
         patchLineFileMatchString = "\s+line ([0-9]+) at \[([0-9a-fA-F]{8})\]\[[0-9a-fA-F]{4}\:[0-9a-fA-F]{8}\], len = 0x[0-9a-fA-F]+\s*([\w+\-\:./_a-zA-Z0-9\\\\]*)\s*"
         patchLineFileMatchStringFunc = "\*\*\s+(\w+)\s*"

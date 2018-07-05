@@ -53,7 +53,7 @@ class FV (FvClassObject):
         self.FvForceRebase = None
         self.FvRegionInFD = None
         self.UsedSizeEnable = False
-        
+
     ## AddToBuffer()
     #
     #   Generate Fv and add it to the Buffer
@@ -72,7 +72,7 @@ class FV (FvClassObject):
 
         if BaseAddress is None and self.UiFvName.upper() + 'fv' in GenFds.ImageBinDict:
             return GenFds.ImageBinDict[self.UiFvName.upper() + 'fv']
-        
+
         #
         # Check whether FV in Capsule is in FD flash region.
         # If yes, return error. Doesn't support FV in Capsule image is also in FD flash region.
@@ -92,7 +92,7 @@ class FV (FvClassObject):
             GenFdsGlobalVariable.InfLogger( "\nGenerating %s FV" %self.UiFvName)
         GenFdsGlobalVariable.LargeFileInFvFlags.append(False)
         FFSGuid = None
-        
+
         if self.FvBaseAddress is not None:
             BaseAddress = self.FvBaseAddress
         if not Flag:
@@ -289,7 +289,7 @@ class FV (FvClassObject):
                 if not self._GetBlockSize():
                     #set default block size is 1
                     self.FvInfFile.writelines("EFI_BLOCK_SIZE  = 0x1" + TAB_LINE_BREAK)
-            
+
             for BlockSize in self.BlockSizeList :
                 if BlockSize[0] is not None:
                     self.FvInfFile.writelines("EFI_BLOCK_SIZE  = "  + \
@@ -331,7 +331,7 @@ class FV (FvClassObject):
                                        self.FvAlignment.strip() + \
                                        " = TRUE"                + \
                                        TAB_LINE_BREAK)
-                                       
+
         #
         # Generate FV extension header file
         #
@@ -387,7 +387,7 @@ class FV (FvClassObject):
                     TotalSize += (Size + 4)
                     FvExtFile.seek(0)
                     Buffer += pack('HH', (Size + 4), int(self.FvExtEntryTypeValue[Index], 16))
-                    Buffer += FvExtFile.read() 
+                    Buffer += FvExtFile.read()
                     FvExtFile.close()
                 if self.FvExtEntryType[Index] == 'DATA':
                     ByteList = self.FvExtEntryData[Index].split(',')
@@ -418,7 +418,7 @@ class FV (FvClassObject):
                                            FvExtHeaderFileName                  + \
                                            TAB_LINE_BREAK)
 
-         
+
         #
         # Add [Files]
         #

@@ -1,10 +1,10 @@
 /** @file
-This file contains functions required to generate a boot strap file (BSF) also 
+This file contains functions required to generate a boot strap file (BSF) also
 known as the Volume Top File (VTF)
 
-Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available 
-under the terms and conditions of the BSD License which accompanies this 
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available
+under the terms and conditions of the BSD License which accompanies this
 distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
@@ -133,7 +133,7 @@ Returns:
     } else {
       memcpy (TemStr, Str + Length - 4, 4);
     }
-  
+
     sscanf (
       TemStr,
       "%02x%02x",
@@ -2362,7 +2362,7 @@ Returns:
       TokenAddress += BaseAddress &~IPF_CACHE_BIT;
 
       fprintf (DestFile, "%s | %016llX | ", Type, (unsigned long long) TokenAddress);
-      fprintf (DestFile, "%s | %s\n    %s\n", Section, Token, BaseToken); 
+      fprintf (DestFile, "%s | %s\n    %s\n", Section, Token, BaseToken);
     }
   }
 
@@ -2479,7 +2479,7 @@ Returns:
   //
   // Copyright declaration
   //
-  fprintf (stdout, "Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.\n\n");
+  fprintf (stdout, "Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.\n\n");
   //
   // Details Option
   //
@@ -2628,7 +2628,7 @@ Returns:
       }
       continue;
     }
-    
+
     if ((stricmp (argv[Index], "-r") == 0) || (stricmp (argv[Index], "--baseaddr") == 0)) {
       if (FirstRoundB) {
         Status      = AsciiStringToUint64 (argv[Index + 1], FALSE, &StartAddress1);
@@ -2639,7 +2639,7 @@ Returns:
       if (Status != EFI_SUCCESS) {
         Error (NULL, 0, 2000, "Invalid option value", "%s is Bad FV start address.", argv[Index + 1]);
         goto ERROR;
-      }  
+      }
       continue;
     }
 
@@ -2649,7 +2649,7 @@ Returns:
         FirstRoundS = FALSE;
       } else {
         Status = AsciiStringToUint64 (argv[Index + 1], FALSE, &FwVolSize2);
-    	  SecondVTF = TRUE;
+        SecondVTF = TRUE;
       }
 
       if (Status != EFI_SUCCESS) {
@@ -2660,8 +2660,8 @@ Returns:
     }
 
     if ((stricmp (argv[Index], "-v") == 0) || (stricmp (argv[Index], "--verbose") == 0)) {
-	    VerboseMode = TRUE;
-	    Index--;
+      VerboseMode = TRUE;
+      Index--;
       continue;
     }
 
@@ -2729,7 +2729,7 @@ Returns:
     if (SecondVTF == TRUE) {
       OutFileName1 = VTF_OUTPUT_FILE1;
       OutFileName2 = VTF_OUTPUT_FILE2;
-	  } else {
+    } else {
       OutFileName1 = VTF_OUTPUT_FILE1;
     }
     SymFileName = VTF_SYM_FILE;

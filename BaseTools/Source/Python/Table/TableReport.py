@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create/update/query/erase table for ECC reports
 #
-# Copyright (c) 2008 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -25,7 +25,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 ## TableReport
 #
 # This class defined a table used for data model
-# 
+#
 # @param object:       Inherited from object class
 #
 #
@@ -33,7 +33,7 @@ class TableReport(Table):
     def __init__(self, Cursor):
         Table.__init__(self, Cursor)
         self.Table = 'Report'
-    
+
     ## Create table
     #
     # Create table report
@@ -78,7 +78,7 @@ class TableReport(Table):
 
     ## Query table
     #
-    # @retval:       A recordSet of all found records 
+    # @retval:       A recordSet of all found records
     #
     def Query(self):
         SqlCommand = """select ID, ErrorID, OtherMsg, BelongsToTable, BelongsToItem, Corrected from %s
