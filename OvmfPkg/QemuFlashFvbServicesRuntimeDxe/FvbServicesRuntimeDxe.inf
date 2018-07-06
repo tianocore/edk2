@@ -53,6 +53,7 @@
   DebugLib
   DevicePathLib
   DxeServicesTableLib
+  MemEncryptSevLib
   MemoryAllocationLib
   PcdLib
   UefiBootServicesTableLib

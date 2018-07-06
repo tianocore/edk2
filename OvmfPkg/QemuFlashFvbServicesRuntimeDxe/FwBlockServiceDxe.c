@@ -18,6 +18,7 @@
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/MemEncryptSevLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
@@ -202,6 +203,22 @@ MarkIoMemoryRangeForRuntimeAccess (
                   GcdDescriptor.Attributes | EFI_MEMORY_RUNTIME
                   );
   ASSERT_EFI_ERROR (Status);
+
+  //
+  // When SEV is active, AmdSevDxe mapped the BaseAddress with C=0 but
+  // SetMemorySpaceAttributes() remaps the range with C=1. Let's restore
+  // the mapping so that both guest and hyervisor can access the flash
+  // memory range.
+  //
+  if (MemEncryptSevIsEnabled ()) {
+    Status = MemEncryptSevClearPageEncMask (
+               0,
+               BaseAddress,
+               EFI_SIZE_TO_PAGES (Length),
+               FALSE
+               );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return Status;
 }
