@@ -1,5 +1,6 @@
 # $ANTLR 3.0.1 C.g 2010-02-23 09:58:53
 
+from __future__ import print_function
 from antlr3 import *
 from antlr3.compat import set, frozenset
          
@@ -98,19 +99,12 @@ class CParser(Parser):
         Parser.__init__(self, input)
         self.ruleMemo = {}
 
-	self.function_definition_stack = []
-	self.postfix_expression_stack = []
+        self.function_definition_stack = []
+        self.postfix_expression_stack = []
 
-
-
-                
-
-
-              
-            
     def printTokenInfo(self, line, offset, tokenText):
-    	print str(line)+ ',' + str(offset) + ':' + str(tokenText)
-        
+        print(str(line)+ ',' + str(offset) + ':' + str(tokenText))
+
     def StorePredicateExpression(self, StartLine, StartOffset, EndLine, EndOffset, Text):
     	PredExp = CodeFragment.PredicateExpression(Text, (StartLine, StartOffset), (EndLine, EndOffset))
     	FileProfile.PredicateExpressionList.append(PredExp)
@@ -180,7 +174,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -539,7 +533,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -790,14 +784,14 @@ class CParser(Parser):
 
                 if self.backtracking == 0:
                           
-                    if d != None:
-                      self.function_definition_stack[-1].ModifierText = self.input.toString(d.start,d.stop)
+                    if d is not None:
+                      self.function_definition_stack[-1].ModifierText = self.input.toString(d.start, d.stop)
                     else:
                       self.function_definition_stack[-1].ModifierText = ''
-                    self.function_definition_stack[-1].DeclText = self.input.toString(declarator1.start,declarator1.stop)
+                    self.function_definition_stack[-1].DeclText = self.input.toString(declarator1.start, declarator1.stop)
                     self.function_definition_stack[-1].DeclLine = declarator1.start.line
                     self.function_definition_stack[-1].DeclOffset = declarator1.start.charPositionInLine
-                    if a != None:
+                    if a is not None:
                       self.function_definition_stack[-1].LBLine = a.start.line
                       self.function_definition_stack[-1].LBOffset = a.start.charPositionInLine
                     else:
@@ -816,7 +810,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -927,10 +921,10 @@ class CParser(Parser):
                         return 
                     if self.backtracking == 0:
                             
-                        if b != None:
-                          self.StoreTypedefDefinition(a.line, a.charPositionInLine, d.line, d.charPositionInLine, self.input.toString(b.start,b.stop), self.input.toString(c.start,c.stop))
+                        if b is not None:
+                          self.StoreTypedefDefinition(a.line, a.charPositionInLine, d.line, d.charPositionInLine, self.input.toString(b.start, b.stop), self.input.toString(c.start, c.stop))
                         else:
-                          self.StoreTypedefDefinition(a.line, a.charPositionInLine, d.line, d.charPositionInLine, '', self.input.toString(c.start,c.stop))
+                          self.StoreTypedefDefinition(a.line, a.charPositionInLine, d.line, d.charPositionInLine, '', self.input.toString(c.start, c.stop))
                         	  
 
 
@@ -964,14 +958,14 @@ class CParser(Parser):
                         return 
                     if self.backtracking == 0:
                           
-                        if t != None:
-                          self.StoreVariableDeclaration(s.start.line, s.start.charPositionInLine, t.start.line, t.start.charPositionInLine, self.input.toString(s.start,s.stop), self.input.toString(t.start,t.stop))
+                        if t is not None:
+                          self.StoreVariableDeclaration(s.start.line, s.start.charPositionInLine, t.start.line, t.start.charPositionInLine, self.input.toString(s.start, s.stop), self.input.toString(t.start, t.stop))
                         	
 
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1099,7 +1093,7 @@ class CParser(Parser):
                 retval.stop = self.input.LT(-1)
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1169,7 +1163,7 @@ class CParser(Parser):
                 retval.stop = self.input.LT(-1)
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1223,7 +1217,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1270,7 +1264,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1408,8 +1402,8 @@ class CParser(Parser):
                         return 
                     if self.backtracking == 0:
                           
-                        if s.stop != None:
-                          self.StoreStructUnionDefinition(s.start.line, s.start.charPositionInLine, s.stop.line, s.stop.charPositionInLine, self.input.toString(s.start,s.stop))
+                        if s.stop is not None:
+                          self.StoreStructUnionDefinition(s.start.line, s.start.charPositionInLine, s.stop.line, s.stop.charPositionInLine, self.input.toString(s.start, s.stop))
                         	
 
 
@@ -1423,8 +1417,8 @@ class CParser(Parser):
                         return 
                     if self.backtracking == 0:
                           
-                        if e.stop != None:
-                          self.StoreEnumerationDefinition(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                        if e.stop is not None:
+                          self.StoreEnumerationDefinition(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
                         	
 
 
@@ -1439,7 +1433,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1472,7 +1466,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1596,7 +1590,7 @@ class CParser(Parser):
                 retval.stop = self.input.LT(-1)
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1643,7 +1637,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1706,7 +1700,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1749,7 +1743,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1868,7 +1862,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -1928,7 +1922,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -2010,7 +2004,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -2165,7 +2159,7 @@ class CParser(Parser):
                 retval.stop = self.input.LT(-1)
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -2230,7 +2224,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -2282,7 +2276,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -2329,7 +2323,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -2471,7 +2465,7 @@ class CParser(Parser):
                 retval.stop = self.input.LT(-1)
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -3063,7 +3057,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -3213,7 +3207,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -3469,7 +3463,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -3535,7 +3529,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -3624,7 +3618,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -3832,7 +3826,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -3888,7 +3882,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -3978,7 +3972,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -4226,7 +4220,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -4577,7 +4571,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -4697,7 +4691,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -4777,7 +4771,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -4842,7 +4836,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -4940,7 +4934,7 @@ class CParser(Parser):
                 retval.stop = self.input.LT(-1)
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -5019,7 +5013,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -5110,7 +5104,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -5210,7 +5204,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -5362,7 +5356,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -5407,7 +5401,7 @@ class CParser(Parser):
                 if self.failed:
                     return 
                 if self.backtracking == 0:
-                    self.postfix_expression_stack[-1].FuncCallText += self.input.toString(p.start,p.stop)
+                    self.postfix_expression_stack[-1].FuncCallText += self.input.toString(p.start, p.stop)
 
                 # C.g:407:9: ( '[' expression ']' | '(' a= ')' | '(' c= argument_expression_list b= ')' | '(' macro_parameter_list ')' | '.' x= IDENTIFIER | '*' y= IDENTIFIER | '->' z= IDENTIFIER | '++' | '--' )*
                 while True: #loop65
@@ -5507,7 +5501,7 @@ class CParser(Parser):
                         if self.failed:
                             return 
                         if self.backtracking == 0:
-                            self.StoreFunctionCalling(p.start.line, p.start.charPositionInLine, b.line, b.charPositionInLine, self.postfix_expression_stack[-1].FuncCallText, self.input.toString(c.start,c.stop))
+                            self.StoreFunctionCalling(p.start.line, p.start.charPositionInLine, b.line, b.charPositionInLine, self.postfix_expression_stack[-1].FuncCallText, self.input.toString(c.start, c.stop))
 
 
 
@@ -5590,7 +5584,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -5651,7 +5645,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -5698,7 +5692,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -5796,7 +5790,7 @@ class CParser(Parser):
                 retval.stop = self.input.LT(-1)
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -6002,7 +5996,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -6072,7 +6066,7 @@ class CParser(Parser):
                 retval.stop = self.input.LT(-1)
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -6107,7 +6101,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8142,7 +8136,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8177,7 +8171,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8224,7 +8218,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8283,7 +8277,7 @@ class CParser(Parser):
                     if self.failed:
                         return 
                     if self.backtracking == 0:
-                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
 
 
 
@@ -8292,7 +8286,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8362,7 +8356,7 @@ class CParser(Parser):
                 retval.stop = self.input.LT(-1)
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8422,7 +8416,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8482,7 +8476,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8542,7 +8536,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8602,7 +8596,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8676,7 +8670,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8750,7 +8744,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -8824,7 +8818,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -9065,7 +9059,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -9162,7 +9156,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -9235,7 +9229,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -9308,7 +9302,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -12474,7 +12468,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -12567,7 +12561,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -14537,7 +14531,7 @@ class CParser(Parser):
                 retval.stop = self.input.LT(-1)
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -16258,7 +16252,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -16329,7 +16323,7 @@ class CParser(Parser):
                 retval.stop = self.input.LT(-1)
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -16390,7 +16384,7 @@ class CParser(Parser):
                     if self.failed:
                         return 
                     if self.backtracking == 0:
-                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
 
                     self.following.append(self.FOLLOW_statement_in_selection_statement2284)
                     self.statement()
@@ -16442,7 +16436,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -16509,7 +16503,7 @@ class CParser(Parser):
                     if self.failed:
                         return 
                     if self.backtracking == 0:
-                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
 
 
 
@@ -16541,7 +16535,7 @@ class CParser(Parser):
                     if self.failed:
                         return 
                     if self.backtracking == 0:
-                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
 
 
 
@@ -16588,12 +16582,12 @@ class CParser(Parser):
                     if self.failed:
                         return 
                     if self.backtracking == 0:
-                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start,e.stop))
+                        self.StorePredicateExpression(e.start.line, e.start.charPositionInLine, e.stop.line, e.stop.charPositionInLine, self.input.toString(e.start, e.stop))
 
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:
@@ -16710,7 +16704,7 @@ class CParser(Parser):
 
 
 
-            except RecognitionException, re:
+            except RecognitionException as re:
                 self.reportError(re)
                 self.recover(self.input, re)
         finally:

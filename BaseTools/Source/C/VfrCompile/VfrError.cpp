@@ -77,7 +77,7 @@ CVfrErrorHandle::~CVfrErrorHandle (
   SVfrFileScopeRecord *pNode = NULL;
 
   if (mInputFileName != NULL) {
-    delete mInputFileName;
+    delete[] mInputFileName;
   }
 
   while (mScopeRecordListHead != NULL) {

@@ -1,7 +1,7 @@
 /** @file
   The generic memory test driver definition
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -139,7 +139,7 @@ typedef struct {
   @retval EFI_SUCCESS          Successful construct the base memory range through GCD service.
   @retval EFI_OUT_OF_RESOURCE  Could not allocate needed resource from base memory.
   @retval Others               Failed to construct base memory range through GCD service.
-                            
+
 **/
 EFI_STATUS
 ConstructBaseMemoryRange (
@@ -154,7 +154,7 @@ ConstructBaseMemoryRange (
   @retval EFI_SUCCESS          Successful construct the non-tested memory range through GCD service.
   @retval EFI_OUT_OF_RESOURCE  Could not allocate needed resource from base memory.
   @retval Others               Failed to construct non-tested memory range through GCD service.
-                            
+
 **/
 EFI_STATUS
 ConstructNonTestedMemoryRange (
@@ -165,9 +165,9 @@ ConstructNonTestedMemoryRange (
   Perform the address line walking ones test.
 
   @param[in] Private  Point to generic memory test driver's private data.
-  
-  @retval EFI_SUCCESS          Successful finished walking ones test. 
-  @retval EFI_OUT_OF_RESOURCE  Could not get resource in base memory. 
+
+  @retval EFI_SUCCESS          Successful finished walking ones test.
+  @retval EFI_OUT_OF_RESOURCE  Could not get resource in base memory.
   @retval EFI_ACCESS_DENIED    Code may can not run here because if walking one test
                                failed, system may be already halt.
 
@@ -181,7 +181,7 @@ PerformAddressDataLineTest (
   Destroy the link list base on the correspond link list type.
 
   @param[in] Private  Point to generic memory test driver's private data.
-                            
+
 **/
 VOID
 DestroyLinkList (
@@ -195,7 +195,7 @@ DestroyLinkList (
 
   @retval EFI_SUCCESS Successful add all the extended memory to system memory map.
   @retval Others      Failed to add the tested extended memory.
-                            
+
 **/
 EFI_STATUS
 UpdateMemoryMap (
@@ -211,7 +211,7 @@ UpdateMemoryMap (
 
   @retval EFI_SUCCESS Successful write the test pattern into the non-tested memory.
   @retval Others      The test pattern may not really write into the physical memory.
-                            
+
 **/
 EFI_STATUS
 WriteMemory (
@@ -232,7 +232,7 @@ WriteMemory (
 
   @retval EFI_SUCCESS Successful verify the range of memory, no errors' location found.
   @retval Others      The range of memory have errors contained.
-                            
+
 **/
 EFI_STATUS
 VerifyMemory (
@@ -251,7 +251,7 @@ VerifyMemory (
 
   @retval EFI_SUCCESS      Successful test the range of memory.
   @retval Others           Failed to test the range of memory.
-                            
+
 **/
 EFI_STATUS
 DirectRangeTest (
@@ -264,12 +264,12 @@ DirectRangeTest (
 /**
   Initialize the generic memory test.
 
-  @param[in]  This                The protocol instance pointer. 
-  @param[in]  Level               The coverage level of the memory test. 
-  @param[out] RequireSoftECCInit  Indicate if the memory need software ECC init. 
+  @param[in]  This                The protocol instance pointer.
+  @param[in]  Level               The coverage level of the memory test.
+  @param[out] RequireSoftECCInit  Indicate if the memory need software ECC init.
 
-  @retval EFI_SUCCESS         The generic memory test is initialized correctly. 
-  @retval EFI_NO_MEDIA        The system had no memory to be tested. 
+  @retval EFI_SUCCESS         The generic memory test is initialized correctly.
+  @retval EFI_NO_MEDIA        The system had no memory to be tested.
 
 **/
 EFI_STATUS
@@ -283,12 +283,12 @@ InitializeMemoryTest (
 /**
   Perform the memory test.
 
-  @param[in]  This              The protocol instance pointer. 
-  @param[out] TestedMemorySize  Return the tested extended memory size. 
-  @param[out] TotalMemorySize   Return the whole system physical memory size. 
-                                The total memory size does not include memory in a slot with a disabled DIMM.  
+  @param[in]  This              The protocol instance pointer.
+  @param[out] TestedMemorySize  Return the tested extended memory size.
+  @param[out] TotalMemorySize   Return the whole system physical memory size.
+                                The total memory size does not include memory in a slot with a disabled DIMM.
   @param[out] ErrorOut          TRUE if the memory error occured.
-  @param[in]  IfTestAbort       Indicates that the user pressed "ESC" to skip the memory test. 
+  @param[in]  IfTestAbort       Indicates that the user pressed "ESC" to skip the memory test.
 
   @retval EFI_SUCCESS         One block of memory passed the test.
   @retval EFI_NOT_FOUND       All memory blocks have already been tested.
@@ -308,7 +308,7 @@ GenPerformMemoryTest (
 /**
   Finish the memory test.
 
-  @param[in] This             The protocol instance pointer. 
+  @param[in] This             The protocol instance pointer.
 
   @retval EFI_SUCCESS         Success. All resources used in the memory test are freed.
 
@@ -322,12 +322,12 @@ GenMemoryTestFinished (
 /**
   Provides the capability to test the compatible range used by some special drivers.
 
-  @param[in]  This              The protocol instance pointer. 
+  @param[in]  This              The protocol instance pointer.
   @param[in]  StartAddress      The start address of the compatible memory range that
                                 must be below 16M.
-  @param[in]  Length            The compatible memory range's length. 
-  
-  @retval EFI_SUCCESS           The compatible memory range pass the memory test. 
+  @param[in]  Length            The compatible memory range's length.
+
+  @retval EFI_SUCCESS           The compatible memory range pass the memory test.
   @retval EFI_INVALID_PARAMETER The compatible memory range are not below Low 16M.
 
 **/

@@ -1,6 +1,6 @@
 /** @file
   Routines to process Wrq (upload).
-  
+
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -124,9 +124,9 @@ Mtftp4WrqSendBlock (
 
 
 /**
-  Function to handle received ACK packet. 
-  
-  If the ACK number matches the expected block number, and there are more 
+  Function to handle received ACK packet.
+
+  If the ACK number matches the expected block number, and there are more
   data pending, send the next block. Otherwise tell the caller that we are done.
 
   @param  Instance              The MTFTP upload session
@@ -150,7 +150,7 @@ Mtftp4WrqHandleAck (
   UINT16                    AckNum;
   INTN                      Expected;
   UINT64                    TotalBlock;
- 
+
   *Completed  = FALSE;
   AckNum      = NTOHS (Packet->Ack.Block[0]);
   Expected    = Mtftp4GetNextBlockNum (&Instance->Blocks);
@@ -175,7 +175,7 @@ Mtftp4WrqHandleAck (
   Expected = Mtftp4GetNextBlockNum (&Instance->Blocks);
 
   if (Expected < 0) {
-  
+
     //
     // The block range is empty. It may either because the the last
     // block has been ACKed, or the sequence number just looped back,
@@ -202,8 +202,8 @@ Mtftp4WrqHandleAck (
 
 
 /**
-  Check whether the received OACK is valid. 
-  
+  Check whether the received OACK is valid.
+
   The OACK is valid only if:
   1. It only include options requested by us
   2. It can only include a smaller block size
@@ -244,8 +244,8 @@ Mtftp4WrqOackValid (
 
 
 /**
-  Function to handle the MTFTP OACK packet. 
-  
+  Function to handle the MTFTP OACK packet.
+
   It parses the packet's options, and update the internal states of the session.
 
   @param  Instance              The MTFTP session
@@ -458,7 +458,7 @@ Mtftp4WrqInput (
   case EFI_MTFTP4_OPCODE_ERROR:
     Status = EFI_TFTP_ERROR;
     break;
-    
+
   default:
     break;
   }
@@ -492,8 +492,8 @@ ON_EXIT:
 
 /**
   Start the MTFTP session for upload.
-  
-  It will first init some states, then send the WRQ request packet, 
+
+  It will first init some states, then send the WRQ request packet,
   and start receiving the packet.
 
   @param  Instance              The MTFTP session

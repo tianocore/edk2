@@ -1,0 +1,21 @@
+// /** @file
+// DXE runtime Debug library instance based on Serial Port library.
+// It takes care not to call into SerialPortLib after ExitBootServices() has
+// been called, to prevent touching hardware that is no longer owned by the
+// firmware.
+//
+// Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+// This program and the accompanying materials
+// are licensed and made available under the terms and conditions of the BSD License
+// which accompanies this distribution. The full text of the license may be found at
+// http://opensource.org/licenses/bsd-license.php.
+// THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+// WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+//
+// **/
+
+
+#string STR_MODULE_ABSTRACT             #language en-US "DXE runtime Debug library instance based on Serial Port library"
+
+#string STR_MODULE_DESCRIPTION          #language en-US "It takes care not to call into SerialPortLib after ExitBootServices() has been called."

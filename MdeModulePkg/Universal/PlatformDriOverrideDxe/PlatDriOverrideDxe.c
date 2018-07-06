@@ -1,6 +1,6 @@
 /** @file
   This file also installs UEFI PLATFORM_DRIVER_OVERRIDE_PROTOCOL.
-  
+
   The main code offers a UI interface in device manager to let user configure
   platform override protocol to override the default algorithm for matching
   drivers to controllers.
@@ -13,7 +13,7 @@
   4. It save all the mapping info in NV variables which will be consumed
      by platform override protocol driver to publish the platform override protocol.
 
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -96,7 +96,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -107,7 +107,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
   Converting a given device to an unicode string.
 
   @param    DevPath     Given device path instance
-  
+
   @return   Converted string from given device path.
   @retval   L"?" Converting failed.
 **/
@@ -131,7 +131,7 @@ DevicePathToStr (
 }
 
 /**
-  Worker function to get the driver name by ComponentName or ComponentName2 protocol 
+  Worker function to get the driver name by ComponentName or ComponentName2 protocol
   according to the driver binding handle.
 
   @param  DriverBindingHandle  The Handle of DriverBinding.
@@ -197,7 +197,7 @@ GetComponentNameWorker (
 
 
 /**
-  Get the driver name by ComponentName or ComponentName2 protocol 
+  Get the driver name by ComponentName or ComponentName2 protocol
   according to the driver binding handle
 
   @param DriverBindingHandle  The Handle of DriverBinding.
@@ -219,7 +219,7 @@ GetComponentName (
   DriverName = GetComponentNameWorker (DriverBindingHandle, &gEfiComponentName2ProtocolGuid, L"PlatformLang");
   if (DriverName == NULL) {
     //
-    // If we can not get driver name from Component Name 2 protocol, we can try ISO 639-2 Component Name protocol. 
+    // If we can not get driver name from Component Name 2 protocol, we can try ISO 639-2 Component Name protocol.
     //
     DriverName = GetComponentNameWorker (DriverBindingHandle, &gEfiComponentNameProtocolGuid, L"Lang");
   }
@@ -266,7 +266,7 @@ GetImageName (
     // Make sure device path node is aligned when accessing it's FV Name Guid field.
     //
     AlignedDevPathNode = AllocateCopyPool (DevicePathNodeLength(DevPathNode), DevPathNode);
-    
+
     //
     // Find the Fv File path
     //
@@ -298,9 +298,9 @@ GetImageName (
         Buffer = NULL;
       }
     }
-    
+
     FreePool (AlignedDevPathNode);
-    
+
     //
     // Next device path node
     //
@@ -344,13 +344,13 @@ UpdateDeviceSelectPage (
   VOID                                      *StartOpCodeHandle;
   VOID                                      *EndOpCodeHandle;
   EFI_IFR_GUID_LABEL                        *StartLabel;
-  EFI_IFR_GUID_LABEL                        *EndLabel;  
+  EFI_IFR_GUID_LABEL                        *EndLabel;
 
   //
   // Set current page form ID.
   //
-  mCurrentPage = FORM_ID_DEVICE;  
-  
+  mCurrentPage = FORM_ID_DEVICE;
+
   //
   // Initial the mapping database in memory
   //
@@ -507,7 +507,7 @@ UpdateDeviceSelectPage (
     // Save the device path string toke for next access use
     //
     mControllerToken[Index] = NewStringToken;
-      
+
     HiiCreateGotoOpCode (
       StartOpCodeHandle,
       FORM_ID_DRIVER,
@@ -575,7 +575,7 @@ GetDriverBindingHandleFromImageHandle (
   if (EFI_ERROR (Status) || (DriverBindingHandleCount == 0)) {
     return NULL;
   }
-  
+
   //
   // Get the first Driver Binding handle which has the specific image handle.
   //
@@ -819,7 +819,7 @@ UpdateBindingDriverSelectPage (
     //
     NewStrSize = StrSize (DriverName);
     NewString = AllocateZeroPool (NewStrSize);
-    ASSERT (NewString != NULL); 
+    ASSERT (NewString != NULL);
     if (EFI_ERROR (CheckMapping (mControllerDevicePathProtocol[mSelectedCtrIndex], LoadedImageDevicePath, &mMappingDataBase, NULL, NULL))) {
       mDriSelection[Index] = FALSE;
     } else {
@@ -842,7 +842,7 @@ UpdateBindingDriverSelectPage (
 
     NewStrSize = StrSize (DriverName);
     NewString = AllocateZeroPool (NewStrSize);
-    ASSERT (NewString != NULL); 
+    ASSERT (NewString != NULL);
     StrCatS (NewString, NewStrSize/sizeof(CHAR16), DriverName);
     NewStringHelpToken = HiiSetString (Private->RegisteredHandle, DriverImageFilePathToken[Index], NewString, NULL);
     ASSERT (NewStringHelpToken != 0);
@@ -1058,7 +1058,7 @@ UpdatePrioritySelectPage (
     FakeNvData->DriOrder[Index] = (UINT8) OrderNO[MinNO];
     TempNO[MinNO] = MAX_CHOICE_NUM + 1;
   }
-  
+
   //
   // Create Order List OpCode
   //
@@ -1289,7 +1289,7 @@ PlatOverMngrRouteConfig (
   if (!HiiIsConfigHdrMatch (Configuration, &gPlatformOverridesManagerGuid, mVariableName)) {
     return EFI_NOT_FOUND;
   }
-  
+
   *Progress = Configuration + StrLen (Configuration);
   Private    = EFI_CALLBACK_INFO_FROM_THIS (This);
   FakeNvData = &Private->FakeNvData;
@@ -1365,7 +1365,7 @@ PlatOverMngrCallback (
     if (Value == NULL) {
       return EFI_INVALID_PARAMETER;
     }
-    
+
     if (KeyValue == KEY_VALUE_DRIVER_GOTO_PREVIOUS) {
       UpdateDeviceSelectPage (Private, KeyValue, FakeNvData);
       //
@@ -1426,7 +1426,7 @@ PlatOverMngrCallback (
           ASSERT (FALSE);
         }
       break;
-      
+
       case KEY_VALUE_ORDER_SAVE_AND_EXIT:
         Status = CommitChanges (Private, KeyValue, FakeNvData);
         *ActionRequest = EFI_BROWSER_ACTION_REQUEST_SUBMIT;
@@ -1526,14 +1526,14 @@ GetDriver (
   This driver doesn't support this API.
 
   @param  This                  A pointer to the EFI_PLATFORM_DRIVER_OVERRIDE_
-                                PROTOCOL instance.                            
+                                PROTOCOL instance.
   @param  ControllerHandle      The device handle of the controller to check if a driver override
-                                exists.                                                          
+                                exists.
   @param  DriverImagePath       On input, a pointer to the previous driver device path returned by
                                 GetDriverPath(). On output, a pointer to the next driver
                                 device path. Passing in a pointer to NULL, will return the first
                                 driver device path for ControllerHandle.
-  
+
   @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
@@ -1550,18 +1550,18 @@ GetDriverPath (
 
 /**
   Used to associate a driver image handle with a device path that was returned on a prior call to the
-  GetDriverPath() service. This driver image handle will then be available through the               
+  GetDriverPath() service. This driver image handle will then be available through the
   GetDriver() service. This driver doesn't support this API.
 
   @param  This                  A pointer to the EFI_PLATFORM_DRIVER_OVERRIDE_
-                                PROTOCOL instance.                            
-  @param  ControllerHandle      The device handle of the controller.                                                             
+                                PROTOCOL instance.
+  @param  ControllerHandle      The device handle of the controller.
   @param  DriverImagePath       A pointer to the driver device path that was returned in a prior
-                                call to GetDriverPath().                                                                        
+                                call to GetDriverPath().
   @param  DriverImageHandle     The driver image handle that was returned by LoadImage()
-                                when the driver specified by DriverImagePath was loaded 
-                                into memory. 
-  
+                                when the driver specified by DriverImagePath was loaded
+                                into memory.
+
   @retval EFI_UNSUPPORTED
 **/
 EFI_STATUS
@@ -1597,7 +1597,7 @@ PlatDriOverrideDxeInit (
   EFI_STATUS                  Status;
   EFI_FORM_BROWSER2_PROTOCOL  *FormBrowser2;
   VOID                        *Instance;
-  
+
   //
   // There should only be one Form Configuration protocol
   //
@@ -1626,7 +1626,7 @@ PlatDriOverrideDxeInit (
   if (!EFI_ERROR (Status)) {
     return EFI_ALREADY_STARTED;
   }
-  
+
   mCallerImageHandle = ImageHandle;
   mCallbackInfo = AllocateZeroPool (sizeof (EFI_CALLBACK_INFO));
   if (mCallbackInfo == NULL) {
@@ -1691,7 +1691,7 @@ PlatDriOverrideDxeInit (
   //
   mDriverImageHandleCount = 0;
   mCurrentPage = 0;
-  
+
   return EFI_SUCCESS;
 
 Finish:

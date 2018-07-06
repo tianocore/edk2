@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2004  - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2018, Intel Corporation. All rights reserved.<BR>
                                                                                    
   This program and the accompanying materials are licensed and made available under
   the terms and conditions of the BSD License that accompanies this distribution.  
@@ -27,7 +27,7 @@ Abstract:
 #include "SetupMode.h"
 #include <Guid/SetupVariable.h>
 #include <Library/TcgPhysicalPresenceLib.h>
-#include <Library/TrEEPhysicalPresenceLib.h>
+#include <Library/Tcg2PhysicalPresenceLib.h>
 #include <Protocol/I2cMasterMcg.h>
 #include <TianoApi.h>
 #include <PlatformBaseAddresses.h>
@@ -1795,7 +1795,7 @@ PlatformBdsPolicyBehavior (
     TcgPhysicalPresenceLibProcessRequest();
     #endif
     #ifdef FTPM_ENABLE
-    TrEEPhysicalPresenceLibProcessRequest(NULL);
+    Tcg2PhysicalPresenceLibProcessRequest(NULL);
     #endif
 
     if (EsrtManagement != NULL) {
@@ -1871,6 +1871,7 @@ PlatformBdsPolicyBehavior (
     //
     PlatformBdsConnectConsole (gPlatformConsole);
     PlatformBdsDiagnostics (EXTENSIVE, FALSE, BaseMemoryTest);
+    EnableQuietBoot (PcdGetPtr(PcdLogoFile));
 
     DEBUG((DEBUG_INFO, "ProcessCapsules Before EndOfDxe......\n"));
     ProcessCapsules ();
@@ -2005,7 +2006,7 @@ FULL_CONFIGURATION:
    TcgPhysicalPresenceLibProcessRequest();
    #endif
    #ifdef FTPM_ENABLE
-   TrEEPhysicalPresenceLibProcessRequest(NULL);
+   Tcg2PhysicalPresenceLibProcessRequest(NULL);
    #endif
 
     if (EsrtManagement != NULL) {
@@ -2642,6 +2643,8 @@ PlatformBdsEnterFrontPageWithHotKey (
 {
   EFI_STATUS                    Status;
 
+  EFI_STATUS                         LogoStatus;
+  EFI_BOOT_LOGO_PROTOCOL             *BootLogo;
   EFI_GRAPHICS_OUTPUT_PROTOCOL       *GraphicsOutput;
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *SimpleTextOut;
   UINTN                              BootTextColumn;
@@ -2721,6 +2724,14 @@ PlatformBdsEnterFrontPageWithHotKey (
     gST->ConOut->EnableCursor (gST->ConOut, TRUE);
     gST->ConOut->ClearScreen (gST->ConOut);
 
+    //
+    // Boot Logo is corrupted, report it using Boot Logo protocol.
+    //
+    LogoStatus = gBS->LocateProtocol (&gEfiBootLogoProtocolGuid, NULL, (VOID **) &BootLogo);
+    if (!EFI_ERROR (LogoStatus) && (BootLogo != NULL)) {
+      BootLogo->SetBootLogo (BootLogo, NULL, 0, 0, 0, 0);
+    }
+
     if (EFI_ERROR (Status)) {
       //
       // Timeout or user press enter to continue
@@ -2728,6 +2739,7 @@ PlatformBdsEnterFrontPageWithHotKey (
       goto Exit;
     }
   }
+
   //
   // Install BM HiiPackages. 
   // Keep BootMaint HiiPackage, so that it can be covered by global setting. 

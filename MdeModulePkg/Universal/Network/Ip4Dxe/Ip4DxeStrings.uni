@@ -1,7 +1,7 @@
 // /** @file
 //   String definitions for Ip4Config2 formset
 
-// Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution.  The full text of the license may be found at
@@ -30,7 +30,7 @@
 #string STR_IP4_MASK_HELP             #language en-US "Enter NetMask in dotted-decimal notation. Example: 255.255.255.0\r\n"
 #string STR_IP4_LOCAL_GATEWAY         #language en-US "Local Gateway"
 #string STR_IP4_GATEWAY_HELP          #language en-US "Enter Gateway in dotted-decimal notation. Example: 192.168.10.1\r\n"
-#string STR_IP4_LOCAL_DNS         	  #language en-US "Local DNS Servers"
+#string STR_IP4_LOCAL_DNS             #language en-US "Local DNS Servers"
 #string STR_IP4_DNS_HELP              #language en-US "Enter DNS Servers in dotted-decimal notation. Example: 192.168.10.8 192.168.10.9\r\n"
 #string STR_SAVE_CHANGES              #language en-US "Save Changes and Exit"
 #string STR_NULL                      #language en-US ""

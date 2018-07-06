@@ -3,7 +3,7 @@
   PS/2 Keyboard driver. Routines that interacts with callers,
   conforming to EFI driver model
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -21,11 +21,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 /**
   Test controller is a keyboard Controller.
-  
+
   @param This                 Pointer of EFI_DRIVER_BINDING_PROTOCOL
   @param Controller           driver's controller
   @param RemainingDevicePath  children device path
-  
+
   @retval EFI_UNSUPPORTED controller is not floppy disk
   @retval EFI_SUCCESS     controller is floppy disk
 **/
@@ -39,11 +39,11 @@ KbdControllerDriverSupported (
 
 /**
   Create KEYBOARD_CONSOLE_IN_DEV instance on controller.
-  
+
   @param This         Pointer of EFI_DRIVER_BINDING_PROTOCOL
   @param Controller   driver controller handle
   @param RemainingDevicePath Children's device path
-  
+
   @retval whether success to create floppy control instance.
 **/
 EFI_STATUS
@@ -79,16 +79,16 @@ KbdControllerDriverStop (
 
 /**
   Free the waiting key notify list.
-  
+
   @param ListHead  Pointer to list head
-  
+
   @retval EFI_INVALID_PARAMETER  ListHead is NULL
   @retval EFI_SUCCESS            Sucess to free NotifyList
 **/
 EFI_STATUS
 KbdFreeNotifyList (
   IN OUT LIST_ENTRY           *ListHead
-  );  
+  );
 
 //
 // DriverBinding Protocol Instance
@@ -104,11 +104,11 @@ EFI_DRIVER_BINDING_PROTOCOL gKeyboardControllerDriver = {
 
 /**
   Test controller is a keyboard Controller.
-  
+
   @param This                 Pointer of EFI_DRIVER_BINDING_PROTOCOL
   @param Controller           driver's controller
   @param RemainingDevicePath  children device path
-  
+
   @retval EFI_UNSUPPORTED controller is not floppy disk
   @retval EFI_SUCCESS     controller is floppy disk
 **/
@@ -158,11 +158,11 @@ KbdControllerDriverSupported (
 
 /**
   Create KEYBOARD_CONSOLE_IN_DEV instance on controller.
-  
+
   @param This         Pointer of EFI_DRIVER_BINDING_PROTOCOL
   @param Controller   driver controller handle
   @param RemainingDevicePath Children's device path
-  
+
   @retval whether success to create floppy control instance.
 **/
 EFI_STATUS
@@ -249,17 +249,17 @@ KbdControllerDriverStart (
   ConsoleIn->ConInEx.ReadKeyStrokeEx     = KeyboardReadKeyStrokeEx;
   ConsoleIn->ConInEx.SetState            = KeyboardSetState;
   ConsoleIn->ConInEx.RegisterKeyNotify   = KeyboardRegisterKeyNotify;
-  ConsoleIn->ConInEx.UnregisterKeyNotify = KeyboardUnregisterKeyNotify;  
-  
+  ConsoleIn->ConInEx.UnregisterKeyNotify = KeyboardUnregisterKeyNotify;
+
   InitializeListHead (&ConsoleIn->NotifyList);
 
   //
   // Fix for random hangs in System waiting for the Key if no KBC is present in BIOS.
-  // When KBC decode (IO port 0x60/0x64 decode) is not enabled, 
+  // When KBC decode (IO port 0x60/0x64 decode) is not enabled,
   // KeyboardRead will read back as 0xFF and return status is EFI_SUCCESS.
   // So instead we read status register to detect after read if KBC decode is enabled.
   //
-  
+
   //
   // Return code is ignored on purpose.
   //
@@ -275,7 +275,7 @@ KbdControllerDriverStart (
       goto ErrorExit;
     }
   }
-  
+
   //
   // Setup the WaitForKey event
   //
@@ -293,7 +293,7 @@ KbdControllerDriverStart (
   }
   //
   // Setup the WaitForKeyEx event
-  //  
+  //
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
@@ -306,7 +306,7 @@ KbdControllerDriverStart (
     StatusCode  = EFI_PERIPHERAL_KEYBOARD | EFI_P_EC_CONTROLLER_ERROR;
     goto ErrorExit;
   }
-  
+
   // Setup a periodic timer, used for reading keystrokes at a fixed interval
   //
   Status = gBS->CreateEvent (
@@ -442,7 +442,7 @@ ErrorExit:
       Status1 = KeyboardRead (ConsoleIn, &Data);;
     }
   }
-  
+
   if (ConsoleIn != NULL) {
     gBS->FreePool (ConsoleIn);
   }
@@ -517,7 +517,7 @@ KbdControllerDriverStop (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   ConsoleIn = KEYBOARD_CONSOLE_IN_DEV_FROM_THIS (ConIn);
 
   //
@@ -595,9 +595,9 @@ KbdControllerDriverStop (
 
 /**
   Free the waiting key notify list.
-  
+
   @param ListHead  Pointer to list head
-  
+
   @retval EFI_INVALID_PARAMETER  ListHead is NULL
   @retval EFI_SUCCESS            Sucess to free NotifyList
 **/
@@ -613,24 +613,24 @@ KbdFreeNotifyList (
   }
   while (!IsListEmpty (ListHead)) {
     NotifyNode = CR (
-                   ListHead->ForwardLink, 
-                   KEYBOARD_CONSOLE_IN_EX_NOTIFY, 
-                   NotifyEntry, 
+                   ListHead->ForwardLink,
+                   KEYBOARD_CONSOLE_IN_EX_NOTIFY,
+                   NotifyEntry,
                    KEYBOARD_CONSOLE_IN_EX_NOTIFY_SIGNATURE
                    );
     RemoveEntryList (ListHead->ForwardLink);
     gBS->FreePool (NotifyNode);
   }
-  
+
   return EFI_SUCCESS;
 }
 
 /**
-  The module Entry Point for module Ps2Keyboard. 
+  The module Entry Point for module Ps2Keyboard.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 

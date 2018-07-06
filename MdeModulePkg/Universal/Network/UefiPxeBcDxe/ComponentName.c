@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -316,7 +316,7 @@ PxeBcComponentNameGetControllerName (
   EFI_PXE_BASE_CODE_PROTOCOL  *PxeBc;
   EFI_HANDLE                  NicHandle;
   EFI_STATUS                  Status;
-  
+
   if (ControllerHandle == NULL || ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
   }

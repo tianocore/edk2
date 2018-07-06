@@ -642,15 +642,15 @@ CoreFreePoolPagesWithGuard (
   NoPagesGuarded = NoPages;
 
   AdjustMemoryF (&Memory, &NoPages);
+  //
+  // It's safe to unset Guard page inside memory lock because there should
+  // be no memory allocation occurred in updating memory page attribute at
+  // this point. And unsetting Guard page before free will prevent Guard
+  // page just freed back to pool from being allocated right away before
+  // marking it usable (from non-present to present).
+  //
+  UnsetGuardForMemory (MemoryGuarded, NoPagesGuarded);
   if (NoPages > 0) {
-    //
-    // It's safe to unset Guard page inside memory lock because there should
-    // be no memory allocation occurred in updating memory page attribute at
-    // this point. And unsetting Guard page before free will prevent Guard
-    // page just freed back to pool from being allocated right away before
-    // marking it usable (from non-present to present).
-    //
-    UnsetGuardForMemory (MemoryGuarded, NoPagesGuarded);
     CoreFreePoolPagesI (PoolType, Memory, NoPages);
   }
 }

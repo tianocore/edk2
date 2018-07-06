@@ -18,12 +18,12 @@ extern "C" {
 
 static void* DefaultAllocFunc(void* opaque, size_t size) {
   BROTLI_UNUSED(opaque);
-  return malloc(size);
+  return BrDummyMalloc(size);
 }
 
 static void DefaultFreeFunc(void* opaque, void* address) {
   BROTLI_UNUSED(opaque);
-  free(address);
+  BrDummyFree(address);
 }
 
 void BrotliDecoderStateInit(BrotliDecoderState* s) {

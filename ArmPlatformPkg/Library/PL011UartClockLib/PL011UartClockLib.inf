@@ -1,0 +1,30 @@
+#/* @file
+#  Copyright 2018 NXP
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#*/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = BasePL011UartClockLib
+  FILE_GUID                      = af8fef24-afbb-472a-b8b7-13101a79703c
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PL011UartClockLib
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
+
+[Sources.common]
+  PL011UartClockLib.c
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PL011UartClkInHz

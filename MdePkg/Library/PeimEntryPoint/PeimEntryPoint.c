@@ -1,7 +1,7 @@
 /** @file
   Entry point to a PEIM.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -22,11 +22,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   The entry point of PE/COFF Image for a PEIM.
 
-  This function is the entry point for a PEIM.  This function must call ProcessLibraryConstructorList() 
+  This function is the entry point for a PEIM.  This function must call ProcessLibraryConstructorList()
   and ProcessModuleEntryPointList().  The return value from ProcessModuleEntryPointList() is returned.
   If _gPeimRevision is not zero and PeiServices->Hdr.Revision is less than _gPeimRevison, then ASSERT().
 
-  @param  FileHandle  Handle of the file being invoked. 
+  @param  FileHandle  Handle of the file being invoked.
   @param  PeiServices Describes the list of possible PEI Services.
 
   @retval  EFI_SUCCESS   The PEIM executed normally.
@@ -60,10 +60,10 @@ _ModuleEntryPoint (
 
 /**
   Required by the EBC compiler and identical in functionality to _ModuleEntryPoint().
-  
+
   This function is required to call _ModuleEntryPoint() passing in FileHandle and PeiServices.
 
-  @param  FileHandle  Handle of the file being invoked. 
+  @param  FileHandle  Handle of the file being invoked.
   @param  PeiServices Describes the list of possible PEI Services.
 
   @retval EFI_SUCCESS  The PEIM executed normally.

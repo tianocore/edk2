@@ -1,7 +1,7 @@
 /** @file
   The XHCI controller driver.
 
-Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -159,7 +159,7 @@ XhcReset (
   EFI_TPL            OldTpl;
 
   Xhc = XHC_FROM_THIS (This);
-  
+
   if (Xhc->DevicePath != NULL) {
     //
     // Report Status Code to indicate reset happens
@@ -169,7 +169,7 @@ XhcReset (
       (EFI_IO_BUS_USB | EFI_IOB_PC_RESET),
       Xhc->DevicePath
       );
-  }  
+  }
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
 
@@ -995,7 +995,7 @@ XhcControlTransfer (
   // Hook Set_Config request from UsbBus as we need configure device endpoint.
   //
   if ((Request->Request     == USB_REQ_GET_DESCRIPTOR) &&
-      ((Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_STANDARD, USB_TARGET_DEVICE)) || 
+      ((Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_STANDARD, USB_TARGET_DEVICE)) ||
       ((Request->RequestType == USB_REQUEST_TYPE (EfiUsbDataIn, USB_REQ_TYPE_CLASS, USB_TARGET_DEVICE))))) {
     DescriptorType = (UINT8)(Request->Value >> 8);
     if ((DescriptorType == USB_DESC_TYPE_DEVICE) && ((*DataLength == sizeof (EFI_USB_DEVICE_DESCRIPTOR)) || ((DeviceSpeed == EFI_USB_SPEED_FULL) && (*DataLength == 8)))) {
@@ -1144,7 +1144,7 @@ XhcControlTransfer (
         ClearPortRequest.Length       = 0;
 
         XhcControlTransfer (
-          This, 
+          This,
           DeviceAddress,
           DeviceSpeed,
           MaximumPacketLength,

@@ -4,7 +4,7 @@
 // It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 // and libraries instances, which are used for those modules.
 //
-// Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials are licensed and made available under
 // the terms and conditions of the BSD License that accompanies this distribution.
@@ -93,6 +93,14 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxAuthVariableSize_HELP  #language en-US "The maximum size of a single authenticated variable."
                                                                                         "The value is 0 as default for compatibility that maximum authenticated variable size is specified by PcdMaxVariableSize."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxVolatileVariableSize_PROMPT  #language en-US "The maximum size of a single non-authenticated volatile variable."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxVolatileVariableSize_HELP  #language en-US "The maximum size of a single non-authenticated volatile variable.<BR><BR>\n"
+                                                                                            "The default value is 0 for compatibility: in that case, the maximum "
+                                                                                            "non-authenticated volatile variable size remains specified by "
+                                                                                            "PcdMaxVariableSize.<BR>\n"
+                                                                                            "Only the MdeModulePkg/Universal/Variable/RuntimeDxe driver supports this PCD.<BR>"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxHardwareErrorVariableSize_PROMPT  #language en-US "Maximum HwErr variable size"
 
@@ -1059,6 +1067,11 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdCapsuleMax_HELP  #language en-US "CapsuleMax value in capsule report variable."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaximumPeiResetNotifies_PROMPT  #language en-US "Maximum Number of PEI Reset Filters, Reset Notifications or Reset Handlers."
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaximumPeiResetNotifies_HELP  #language en-US "Indicates the allowable maximum number of Reset Filters, <BR>\n"
+                                                                                            "Reset Notifications or Reset Handlers in PEI phase."
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdRecoveryFileName_PROMPT  #language en-US "Recover file name in PEI phase"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdRecoveryFileName_HELP  #language en-US "This is recover file name in PEI phase.\n"
@@ -1232,3 +1245,9 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNvStoreDefaultValueBuffer_PROMPT  #language en-US "NV Storage Default Value Buffer"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdNvStoreDefaultValueBuffer_HELP    #language en-US "This dynamic PCD holds the DynamicHii PCD value. Its value is the auto generated.\n"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEdkiiFpdtStringRecordEnableOnly_PROMPT  #language en-US "String FPDT Record Enable Only"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEdkiiFpdtStringRecordEnableOnly_HELP    #language en-US "Control which FPDT record format will be used to store the performance entry.\n"
+                                                                                                      "On TRUE, the string FPDT record will be used to store every performance entry.\n"
+                                                                                                      "On FALSE, the different FPDT record will be used to store the different performance entries."

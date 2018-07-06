@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2011, Apple Inc. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -34,15 +34,15 @@ ASM_GLOBAL ASM_PFX(InternalSwitchStack)
 #------------------------------------------------------------------------------
 ASM_PFX(InternalSwitchStack):
   pushl %ebp
-	movl	%esp, %ebp
+  movl  %esp, %ebp
 
-	movl	20(%ebp), %esp      # switch stack
-	subl	$8, %esp
+  movl  20(%ebp), %esp      # switch stack
+  subl  $8, %esp
 
-	movl	16(%ebp), %eax
-	movl	%eax, 4(%esp)
-	movl	12(%ebp), %eax
-	movl	%eax, (%esp)
-	pushl $0                  # keeps gdb from unwinding stack
-	jmp   *8(%ebp)            # call and never return 
+  movl  16(%ebp), %eax
+  movl  %eax, 4(%esp)
+  movl  12(%ebp), %eax
+  movl  %eax, (%esp)
+  pushl $0                  # keeps gdb from unwinding stack
+  jmp   *8(%ebp)            # call and never return
 

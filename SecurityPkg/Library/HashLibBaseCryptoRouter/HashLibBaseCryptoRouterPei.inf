@@ -2,10 +2,10 @@
 #  Provides hash service by registered hash handler
 #
 #  This library is BaseCrypto router. It will redirect hash request to each individual
-#  hash handler registered, such as SHA1, SHA256. Platform can use PcdTpm2HashMask to 
+#  hash handler registered, such as SHA1, SHA256. Platform can use PcdTpm2HashMask to
 #  mask some hash engines.
 #
-# Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -28,7 +28,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]

@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for MnpDxe driver.
 
-Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -107,10 +107,10 @@ MnpComponentNameGetDriverName (
 
   @param  Mnp[in]                 A pointer to the EFI_MANAGED_NETWORK_PROTOCOL.
 
-  
+
   @retval EFI_SUCCESS             Update the ControllerNameTable of this instance successfully.
   @retval EFI_INVALID_PARAMETER   The input parameter is invalid.
-  
+
 **/
 EFI_STATUS
 UpdateName (
@@ -157,7 +157,7 @@ UpdateName (
     //
     // Remove the last '-'
     //
-    OffSet--;  
+    OffSet--;
     //
     // Print the ProtocolType and VLAN ID for this instance.
     //
@@ -177,12 +177,12 @@ UpdateName (
   } else {
     return Status;
   }
-  
+
   if (gMnpControllerNameTable != NULL) {
     FreeUnicodeStringTable (gMnpControllerNameTable);
     gMnpControllerNameTable = NULL;
   }
-  
+
   Status = AddUnicodeString2 (
              "eng",
              gMnpComponentName.SupportedLanguages,
@@ -193,7 +193,7 @@ UpdateName (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   return AddUnicodeString2 (
            "en",
            gMnpComponentName2.SupportedLanguages,
@@ -290,22 +290,22 @@ MnpComponentNameGetControllerName (
   if (ChildHandle == NULL) {
     return EFI_UNSUPPORTED;
   }
- 
-  // 
-  // Make sure this driver is currently managing ControllerHandle  
-  // 
+
+  //
+  // Make sure this driver is currently managing ControllerHandle
+  //
   Status = EfiTestManagedDevice (
              ControllerHandle,
              gMnpDriverBinding.DriverBindingHandle,
              &gEfiSimpleNetworkProtocolGuid
              );
-  if (EFI_ERROR (Status)) { 
+  if (EFI_ERROR (Status)) {
     return Status;
   }
-  
-  // 
-  // Make sure this driver produced ChildHandle 
-  // 
+
+  //
+  // Make sure this driver produced ChildHandle
+  //
   Status = EfiTestChildHandle (
              ControllerHandle,
              ChildHandle,
@@ -315,9 +315,9 @@ MnpComponentNameGetControllerName (
     return Status;
   }
 
-  // 
-  // Retrieve an instance of a produced protocol from ChildHandle  
-  // 
+  //
+  // Retrieve an instance of a produced protocol from ChildHandle
+  //
   Status = gBS->OpenProtocol (
                   ChildHandle,
                   &gEfiManagedNetworkProtocolGuid,

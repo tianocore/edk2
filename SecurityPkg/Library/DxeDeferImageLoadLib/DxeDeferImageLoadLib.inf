@@ -1,11 +1,11 @@
 ## @file
 #  Provides security service of deferred image load
 #
-#  The platform may need to defer the execution of an image because of security 
-#  considerations. These deferred images will be recorded and then reported by 
+#  The platform may need to defer the execution of an image because of security
+#  considerations. These deferred images will be recorded and then reported by
 #  installing an instance of the EFI_DEFERRED_IMAGE_LOAD_PROTOCOL.
 #
-# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -48,9 +48,9 @@
   DevicePathLib
   BaseMemoryLib
   PrintLib
-  DebugLib 
+  DebugLib
   UefiLib
-  PcdLib 
+  PcdLib
 
 [Protocols]
   gEfiFirmwareVolume2ProtocolGuid                        ## SOMETIMES_CONSUMES
@@ -60,9 +60,9 @@
   ## SOMETIMES_CONSUMES
   ## NOTIFY
   gEfiUserManagerProtocolGuid
-   
+
 [Guids]
   gEfiGlobalVariableGuid                                  ## SOMETIMES_CONSUMES  ## Variable:L"BootOrder"
-  
+
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdDeferImageLoadPolicy   ## SOMETIMES_CONSUMES

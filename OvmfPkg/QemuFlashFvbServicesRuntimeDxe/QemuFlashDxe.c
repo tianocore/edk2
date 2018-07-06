@@ -26,3 +26,15 @@ QemuFlashConvertPointers (
 {
   EfiConvertPointer (0x0, (VOID **) &mFlashBase);
 }
+
+VOID
+QemuFlashBeforeProbe (
+  IN  EFI_PHYSICAL_ADDRESS    BaseAddress,
+  IN  UINTN                   FdBlockSize,
+  IN  UINTN                   FdBlockCount
+  )
+{
+  //
+  // Do nothing
+  //
+}

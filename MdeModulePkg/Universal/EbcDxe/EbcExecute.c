@@ -1,7 +1,7 @@
 /** @file
   Contains code that implements the virtual machine.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1333,11 +1333,11 @@ CONST VM_TABLE_ENTRY           mVmOpcodeTable[] = {
   { ExecuteMOVIn },             // opcode 0x38 - mov immediate natural
   { ExecuteMOVREL },            // opcode 0x39 - move data relative to PC
   { NULL },                     // opcode 0x3a
-  { NULL },                     // opcode 0x3b 
-  { NULL },                     // opcode 0x3c 
-  { NULL },                     // opcode 0x3d 
-  { NULL },                     // opcode 0x3e 
-  { NULL }                      // opcode 0x3f 
+  { NULL },                     // opcode 0x3b
+  { NULL },                     // opcode 0x3c
+  { NULL },                     // opcode 0x3d
+  { NULL },                     // opcode 0x3e
+  { NULL }                      // opcode 0x3f
 };
 
 //

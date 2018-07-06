@@ -1,7 +1,7 @@
 /** @file
   Implement IP4 pesudo interface.
-  
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -68,7 +68,7 @@ Ip4OnArpResolvedDpc (
   @param  Event             The Arp request event.
   @param  Context           The context of the callback, a point to the ARP
                             queue.
-                                
+
 **/
 VOID
 EFIAPI
@@ -139,7 +139,7 @@ Ip4CancelFrameArp (
                                 finished.
   @param[in]  Context           Opaque parameter to the call back.
 
-  @retval   Token               The wrapped token if succeed 
+  @retval   Token               The wrapped token if succeed
   @retval   NULL                The wrapped token if NULL
 
 **/
@@ -587,10 +587,10 @@ Ip4SetAddress (
              Interface->Image,
              Interface->Controller
              );
-      
+
       Interface->Arp = NULL;
     }
-    
+
     NetLibDestroyServiceChild (
       Interface->Controller,
       Interface->Image,
@@ -872,7 +872,7 @@ Ip4OnArpResolvedDpc (
   @param  Event             The Arp request event.
   @param  Context           The context of the callback, a point to the ARP
                             queue.
-                                
+
 **/
 VOID
 EFIAPI

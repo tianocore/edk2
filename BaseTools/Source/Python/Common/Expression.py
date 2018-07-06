@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse and evaluate expression in directive or PCD value.
 #
-# Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.    The full text of the license may be found at
@@ -12,12 +12,14 @@
 
 ## Import Modules
 #
+from __future__ import print_function
 from Common.GlobalData import *
 from CommonDataClass.Exceptions import BadExpression
 from CommonDataClass.Exceptions import WrnExpression
-from Misc import GuidStringToGuidStructureString, ParseFieldValue
+from Misc import GuidStringToGuidStructureString, ParseFieldValue, IsFieldValueAnArray
 import Common.EdkLogger as EdkLogger
 import copy
+from Common.DataType import *
 
 ERR_STRING_EXPR         = 'This operator cannot be used in string expression: [%s].'
 ERR_SNYTAX              = 'Syntax error, the rest of expression cannot be evaluated: [%s].'
@@ -40,20 +42,37 @@ ERR_ARRAY_ELE           = 'This must be HEX value for NList or Array: [%s].'
 ERR_EMPTY_EXPR          = 'Empty expression is not allowed.'
 ERR_IN_OPERAND          = 'Macro after IN operator can only be: $(FAMILY), $(ARCH), $(TOOL_CHAIN_TAG) and $(TARGET).'
 
+__ValidString = re.compile(r'[_a-zA-Z][_0-9a-zA-Z]*$')
+_ReLabel = re.compile('LABEL\((\w+)\)')
+_ReOffset = re.compile('OFFSET_OF\((\w+)\)')
+PcdPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
+
 ## SplitString
 #  Split string to list according double quote
 #  For example: abc"de\"f"ghi"jkl"mn will be: ['abc', '"de\"f"', 'ghi', '"jkl"', 'mn']
 #
 def SplitString(String):
-    # There might be escaped quote: "abc\"def\\\"ghi"
-    Str = String.replace('\\\\', '//').replace('\\\"', '\\\'')
+    # There might be escaped quote: "abc\"def\\\"ghi", 'abc\'def\\\'ghi'
     RetList = []
-    InQuote = False
+    InSingleQuote = False
+    InDoubleQuote = False
     Item = ''
-    for i, ch in enumerate(Str):
-        if ch == '"':
-            InQuote = not InQuote
-            if not InQuote:
+    for i, ch in enumerate(String):
+        if ch == '"' and not InSingleQuote:
+            if String[i - 1] != '\\':
+                InDoubleQuote = not InDoubleQuote
+            if not InDoubleQuote:
+                Item += String[i]
+                RetList.append(Item)
+                Item = ''
+                continue
+            if Item:
+                RetList.append(Item)
+                Item = ''
+        elif ch == "'" and not InDoubleQuote:
+            if String[i - 1] != '\\':
+                InSingleQuote = not InSingleQuote
+            if not InSingleQuote:
                 Item += String[i]
                 RetList.append(Item)
                 Item = ''
@@ -62,11 +81,67 @@ def SplitString(String):
                 RetList.append(Item)
                 Item = ''
         Item += String[i]
-    if InQuote:
+    if InSingleQuote or InDoubleQuote:
         raise BadExpression(ERR_STRING_TOKEN % Item)
     if Item:
         RetList.append(Item)
     return RetList
+
+def SplitPcdValueString(String):
+    # There might be escaped comma in GUID() or DEVICE_PATH() or " "
+    # or ' ' or L' ' or L" "
+    RetList = []
+    InParenthesis = 0
+    InSingleQuote = False
+    InDoubleQuote = False
+    Item = ''
+    for i, ch in enumerate(String):
+        if ch == '(':
+            InParenthesis += 1
+        elif ch == ')':
+            if InParenthesis:
+                InParenthesis -= 1
+            else:
+                raise BadExpression(ERR_STRING_TOKEN % Item)
+        elif ch == '"' and not InSingleQuote:
+            if String[i-1] != '\\':
+                InDoubleQuote = not InDoubleQuote
+        elif ch == "'" and not InDoubleQuote:
+            if String[i-1] != '\\':
+                InSingleQuote = not InSingleQuote
+        elif ch == ',':
+            if InParenthesis or InSingleQuote or InDoubleQuote:
+                Item += String[i]
+                continue
+            elif Item:
+                RetList.append(Item)
+                Item = ''
+            continue
+        Item += String[i]
+    if InSingleQuote or InDoubleQuote or InParenthesis:
+        raise BadExpression(ERR_STRING_TOKEN % Item)
+    if Item:
+        RetList.append(Item)
+    return RetList
+
+def IsValidCName(Str):
+    return True if __ValidString.match(Str) else False
+
+def BuildOptionValue(PcdValue, GuidDict):
+    if PcdValue.startswith('H'):
+        InputValue = PcdValue[1:]
+    elif PcdValue.startswith("L'") or PcdValue.startswith("'"):
+        InputValue = PcdValue
+    elif PcdValue.startswith('L'):
+        InputValue = 'L"' + PcdValue[1:] + '"'
+    else:
+        InputValue = PcdValue
+    if IsFieldValueAnArray(InputValue):
+        try:
+            PcdValue = ValueExpressionEx(InputValue, TAB_VOID, GuidDict)(True)
+        except:
+            pass
+    return PcdValue
 
 ## ReplaceExprMacro
 #
@@ -78,7 +153,7 @@ def ReplaceExprMacro(String, Macros, ExceptionList = None):
             InQuote = True
         MacroStartPos = String.find('$(')
         if MacroStartPos < 0:
-            for Pcd in gPlatformPcds.keys():
+            for Pcd in gPlatformPcds:
                 if Pcd in String:
                     if Pcd not in gConditionalPcds:
                         gConditionalPcds.append(Pcd)
@@ -97,7 +172,7 @@ def ReplaceExprMacro(String, Macros, ExceptionList = None):
                 RetStr += '0'
             elif not InQuote:
                 Tklst = RetStr.split()
-                if Tklst and Tklst[-1] in ['IN', 'in'] and ExceptionList and Macro not in ExceptionList:
+                if Tklst and Tklst[-1] in {'IN', 'in'} and ExceptionList and Macro not in ExceptionList:
                     raise BadExpression(ERR_IN_OPERAND)
                 # Make sure the macro in exception list is encapsulated by double quote
                 # For example: DEFINE ARCH = IA32 X64
@@ -127,7 +202,22 @@ def IntToStr(Value):
 
 SupportedInMacroList = ['TARGET', 'TOOL_CHAIN_TAG', 'ARCH', 'FAMILY']
 
-class ValueExpression(object):
+class BaseExpression(object):
+    def __init__(self, *args, **kwargs):
+        super(BaseExpression, self).__init__()
+
+    # Check if current token matches the operators given from parameter
+    def _IsOperator(self, OpSet):
+        Idx = self._Idx
+        self._GetOperator()
+        if self._Token in OpSet:
+            if self._Token in self.LogicalOperators:
+                self._Token = self.LogicalOperators[self._Token]
+            return True
+        self._Idx = Idx
+        return False
+
+class ValueExpression(BaseExpression):
     # Logical operator mapping
     LogicalOperators = {
         '&&' : 'and', '||' : 'or',
@@ -142,9 +232,6 @@ class ValueExpression(object):
 
     NonLetterOpLst = ['+', '-', '*', '/', '%', '&', '|', '^', '~', '<<', '>>', '!', '=', '>', '<', '?', ':']
 
-    PcdPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
-    HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
-    RegGuidPattern = re.compile(r'[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}')
 
     SymbolPattern = re.compile("("
                                  "\$\([A-Z][A-Z0-9_]*\)|\$\(\w+\.\w+\)|\w+\.\w+|"
@@ -157,23 +244,13 @@ class ValueExpression(object):
     def Eval(Operator, Oprand1, Oprand2 = None):
         WrnExp = None
 
-        if Operator not in ["in", "not in"] and (type(Oprand1) == type('') or type(Oprand2) == type('')):
-            if type(Oprand1) == type(''):
-                if Oprand1[0] in ['"', "'"] or Oprand1.startswith('L"') or Oprand1.startswith("L'")or Oprand1.startswith('UINT'):
-                    Oprand1, Size = ParseFieldValue(Oprand1)
-                else:
-                    Oprand1,Size = ParseFieldValue('"' + Oprand1 + '"')
-            if type(Oprand2) == type(''):
-                if Oprand2[0] in ['"', "'"] or Oprand2.startswith('L"') or Oprand2.startswith("L'") or Oprand2.startswith('UINT'):
-                    Oprand2, Size = ParseFieldValue(Oprand2)
-                else:
-                    Oprand2, Size = ParseFieldValue('"' + Oprand2 + '"')
-            if type(Oprand1) == type('') or type(Oprand2) == type(''):
-                raise BadExpression(ERR_STRING_EXPR % Operator)
-        if Operator in ['in', 'not in']:
-            if type(Oprand1) != type(''):
+        if Operator not in {"==", "!=", ">=", "<=", ">", "<", "in", "not in"} and \
+            (isinstance(Oprand1, type('')) or isinstance(Oprand2, type(''))):
+            raise BadExpression(ERR_STRING_EXPR % Operator)
+        if Operator in {'in', 'not in'}:
+            if not isinstance(Oprand1, type('')):
                 Oprand1 = IntToStr(Oprand1)
-            if type(Oprand2) != type(''):
+            if not isinstance(Oprand2, type('')):
                 Oprand2 = IntToStr(Oprand2)
         TypeDict = {
             type(0)  : 0,
@@ -183,19 +260,19 @@ class ValueExpression(object):
         }
 
         EvalStr = ''
-        if Operator in ["!", "NOT", "not"]:
-            if type(Oprand1) == type(''):
+        if Operator in {"!", "NOT", "not"}:
+            if isinstance(Oprand1, type('')):
                 raise BadExpression(ERR_STRING_EXPR % Operator)
             EvalStr = 'not Oprand1'
-        elif Operator in ["~"]:
-            if type(Oprand1) == type(''):
+        elif Operator in {"~"}:
+            if isinstance(Oprand1, type('')):
                 raise BadExpression(ERR_STRING_EXPR % Operator)
             EvalStr = '~ Oprand1'
         else:
-            if Operator in ["+", "-"] and (type(True) in [type(Oprand1), type(Oprand2)]):
+            if Operator in {"+", "-"} and (type(True) in {type(Oprand1), type(Oprand2)}):
                 # Boolean in '+'/'-' will be evaluated but raise warning
                 WrnExp = WrnExpression(WRN_BOOL_EXPR)
-            elif type('') in [type(Oprand1), type(Oprand2)] and type(Oprand1)!= type(Oprand2):
+            elif type('') in {type(Oprand1), type(Oprand2)} and not isinstance(Oprand1, type(Oprand2)):
                 # == between string and number/boolean will always return False, != return True
                 if Operator == "==":
                     WrnExp = WrnExpression(WRN_EQCMP_STR_OTHERS)
@@ -208,19 +285,19 @@ class ValueExpression(object):
                 else:
                     raise BadExpression(ERR_RELCMP_STR_OTHERS % Operator)
             elif TypeDict[type(Oprand1)] != TypeDict[type(Oprand2)]:
-                if Operator in ["==", "!=", ">=", "<=", ">", "<"] and set((TypeDict[type(Oprand1)], TypeDict[type(Oprand2)])) == set((TypeDict[type(True)], TypeDict[type(0)])):
+                if Operator in {"==", "!=", ">=", "<=", ">", "<"} and set((TypeDict[type(Oprand1)], TypeDict[type(Oprand2)])) == set((TypeDict[type(True)], TypeDict[type(0)])):
                     # comparison between number and boolean is allowed
                     pass
-                elif Operator in ['&', '|', '^', "and", "or"] and set((TypeDict[type(Oprand1)], TypeDict[type(Oprand2)])) == set((TypeDict[type(True)], TypeDict[type(0)])):
+                elif Operator in {'&', '|', '^', "and", "or"} and set((TypeDict[type(Oprand1)], TypeDict[type(Oprand2)])) == set((TypeDict[type(True)], TypeDict[type(0)])):
                     # bitwise and logical operation between number and boolean is allowed
                     pass
                 else:
                     raise BadExpression(ERR_EXPR_TYPE)
-            if type(Oprand1) == type('') and type(Oprand2) == type(''):
+            if isinstance(Oprand1, type('')) and isinstance(Oprand2, type('')):
                 if (Oprand1.startswith('L"') and not Oprand2.startswith('L"')) or \
                     (not Oprand1.startswith('L"') and Oprand2.startswith('L"')):
                     raise BadExpression(ERR_STRING_CMP % (Oprand1, Operator, Oprand2))
-            if 'in' in Operator and type(Oprand2) == type(''):
+            if 'in' in Operator and isinstance(Oprand2, type('')):
                 Oprand2 = Oprand2.split()
             EvalStr = 'Oprand1 ' + Operator + ' Oprand2'
 
@@ -231,10 +308,10 @@ class ValueExpression(object):
         }
         try:
             Val = eval(EvalStr, {}, Dict)
-        except Exception, Excpt:
+        except Exception as Excpt:
             raise BadExpression(str(Excpt))
 
-        if Operator in ['and', 'or']:
+        if Operator in {'and', 'or'}:
             if Val:
                 Val = True
             else:
@@ -246,14 +323,12 @@ class ValueExpression(object):
         return Val
 
     def __init__(self, Expression, SymbolTable={}):
+        super(ValueExpression, self).__init__(self, Expression, SymbolTable)
         self._NoProcess = False
-        if type(Expression) != type(''):
+        if not isinstance(Expression, type('')):
             self._Expr = Expression
             self._NoProcess = True
             return
-        if Expression.strip().startswith('{') and Expression.strip().endswith('}'):
-            self._Expr = Expression
-            self._NoProcess = True
 
         self._Expr = ReplaceExprMacro(Expression.strip(),
                                   SymbolTable,
@@ -293,20 +368,20 @@ class ValueExpression(object):
             self._Token = self._Expr
             if self.__IsNumberToken():
                 return self._Expr
-
+            Token = ''
             try:
                 Token = self._GetToken()
-                if type(Token) == type('') and Token.startswith('{') and Token.endswith('}') and self._Idx >= self._Len:
-                    return self._Expr
             except BadExpression:
                 pass
+            if isinstance(Token, type('')) and Token.startswith('{') and Token.endswith('}') and self._Idx >= self._Len:
+                return self._Expr
 
             self._Idx = 0
             self._Token = ''
 
         Val = self._ConExpr()
         RealVal = Val
-        if type(Val) == type(''):
+        if isinstance(Val, type('')):
             if Val == 'L""':
                 Val = False
             elif not Val:
@@ -336,13 +411,13 @@ class ValueExpression(object):
 
     # Template function to parse binary operators which have same precedence
     # Expr [Operator Expr]*
-    def _ExprFuncTemplate(self, EvalFunc, OpLst):
+    def _ExprFuncTemplate(self, EvalFunc, OpSet):
         Val = EvalFunc()
-        while self._IsOperator(OpLst):
+        while self._IsOperator(OpSet):
             Op = self._Token
             if Op == '?':
                 Val2 = EvalFunc()
-                if self._IsOperator(':'):
+                if self._IsOperator({':'}):
                     Val3 = EvalFunc()
                 if Val:
                     Val = Val2
@@ -351,79 +426,79 @@ class ValueExpression(object):
                 continue
             try:
                 Val = self.Eval(Op, Val, EvalFunc())
-            except WrnExpression, Warn:
+            except WrnExpression as Warn:
                 self._WarnExcept = Warn
                 Val = Warn.result
         return Val
     # A [? B]*
     def _ConExpr(self):
-        return self._ExprFuncTemplate(self._OrExpr, ['?', ':'])
+        return self._ExprFuncTemplate(self._OrExpr, {'?', ':'})
 
     # A [|| B]*
     def _OrExpr(self):
-        return self._ExprFuncTemplate(self._AndExpr, ["OR", "or", "||"])
+        return self._ExprFuncTemplate(self._AndExpr, {"OR", "or", "||"})
 
     # A [&& B]*
     def _AndExpr(self):
-        return self._ExprFuncTemplate(self._BitOr, ["AND", "and", "&&"])
+        return self._ExprFuncTemplate(self._BitOr, {"AND", "and", "&&"})
 
     # A [ | B]*
     def _BitOr(self):
-        return self._ExprFuncTemplate(self._BitXor, ["|"])
+        return self._ExprFuncTemplate(self._BitXor, {"|"})
 
     # A [ ^ B]*
     def _BitXor(self):
-        return self._ExprFuncTemplate(self._BitAnd, ["XOR", "xor", "^"])
+        return self._ExprFuncTemplate(self._BitAnd, {"XOR", "xor", "^"})
 
     # A [ & B]*
     def _BitAnd(self):
-        return self._ExprFuncTemplate(self._EqExpr, ["&"])
+        return self._ExprFuncTemplate(self._EqExpr, {"&"})
 
     # A [ == B]*
     def _EqExpr(self):
         Val = self._RelExpr()
-        while self._IsOperator(["==", "!=", "EQ", "NE", "IN", "in", "!", "NOT", "not"]):
+        while self._IsOperator({"==", "!=", "EQ", "NE", "IN", "in", "!", "NOT", "not"}):
             Op = self._Token
-            if Op in ["!", "NOT", "not"]:
-                if not self._IsOperator(["IN", "in"]):
+            if Op in {"!", "NOT", "not"}:
+                if not self._IsOperator({"IN", "in"}):
                     raise BadExpression(ERR_REL_NOT_IN)
                 Op += ' ' + self._Token
             try:
                 Val = self.Eval(Op, Val, self._RelExpr())
-            except WrnExpression, Warn:
+            except WrnExpression as Warn:
                 self._WarnExcept = Warn
                 Val = Warn.result
         return Val
 
     # A [ > B]*
     def _RelExpr(self):
-        return self._ExprFuncTemplate(self._ShiftExpr, ["<=", ">=", "<", ">", "LE", "GE", "LT", "GT"])
+        return self._ExprFuncTemplate(self._ShiftExpr, {"<=", ">=", "<", ">", "LE", "GE", "LT", "GT"})
 
     def _ShiftExpr(self):
-        return self._ExprFuncTemplate(self._AddExpr, ["<<", ">>"])
+        return self._ExprFuncTemplate(self._AddExpr, {"<<", ">>"})
 
     # A [ + B]*
     def _AddExpr(self):
-        return self._ExprFuncTemplate(self._MulExpr, ["+", "-"])
+        return self._ExprFuncTemplate(self._MulExpr, {"+", "-"})
 
     # A [ * B]*
     def _MulExpr(self):
-        return self._ExprFuncTemplate(self._UnaryExpr, ["*", "/", "%"])
+        return self._ExprFuncTemplate(self._UnaryExpr, {"*", "/", "%"})
 
     # [!]*A
     def _UnaryExpr(self):
-        if self._IsOperator(["!", "NOT", "not"]):
+        if self._IsOperator({"!", "NOT", "not"}):
             Val = self._UnaryExpr()
             try:
                 return self.Eval('not', Val)
-            except WrnExpression, Warn:
+            except WrnExpression as Warn:
                 self._WarnExcept = Warn
                 return Warn.result
-        if self._IsOperator(["~"]):
+        if self._IsOperator({"~"}):
             Val = self._UnaryExpr()
             try:
                 return self.Eval('~', Val)
-            except WrnExpression, Warn:
+            except WrnExpression as Warn:
                 self._WarnExcept = Warn
                 return Warn.result
         return self._IdenExpr()
@@ -454,14 +529,23 @@ class ValueExpression(object):
         Radix = 10
         if self._Token.lower()[0:2] == '0x' and len(self._Token) > 2:
             Radix = 16
-        if self._Token.startswith('"') or self._Token.startswith("'")\
-            or self._Token.startswith("L'") or self._Token.startswith('L"'):
+        if self._Token.startswith('"') or self._Token.startswith('L"'):
             Flag = 0
             for Index in range(len(self._Token)):
-                if self._Token[Index] in ['"', "'"]:
+                if self._Token[Index] in {'"'}:
+                    if self._Token[Index - 1] == '\\':
+                        continue
                     Flag += 1
-            if Flag == 2:
-                self._Token = ParseFieldValue(self._Token)[0]
+            if Flag == 2 and self._Token.endswith('"'):
+                return True
+        if self._Token.startswith("'") or self._Token.startswith("L'"):
+            Flag = 0
+            for Index in range(len(self._Token)):
+                if self._Token[Index] in {"'"}:
+                    if self._Token[Index - 1] == '\\':
+                        continue
+                    Flag += 1
+            if Flag == 2 and self._Token.endswith("'"):
                 return True
         try:
             self._Token = int(self._Token, Radix)
@@ -485,7 +569,7 @@ class ValueExpression(object):
         IsArray = IsGuid = False
         if len(Token.split(',')) == 11 and len(Token.split(',{')) == 2 \
             and len(Token.split('},')) == 1:
-            HexLen = [11,6,6,5,4,4,4,4,4,4,6]
+            HexLen = [11, 6, 6, 5, 4, 4, 4, 4, 4, 4, 6]
             HexList= Token.split(',')
             if HexList[3].startswith('{') and \
                 not [Index for Index, Hex in enumerate(HexList) if len(Hex) > HexLen[Index]]:
@@ -507,16 +591,25 @@ class ValueExpression(object):
         self._Idx += 1
 
         # Replace escape \\\", \"
-        Expr = self._Expr[self._Idx:].replace('\\\\', '//').replace('\\\"', '\\\'')
-        for Ch in Expr:
-            self._Idx += 1
-            if Ch == '"' or Ch == "'":
-                break
-        self._Token = self._LiteralToken = self._Expr[Idx:self._Idx]
-        if self._Token.startswith('"') and not self._Token.endswith('"'):
-            raise BadExpression(ERR_STRING_TOKEN % self._Token)
-        if self._Token.startswith("'") and not self._Token.endswith("'"):
-            raise BadExpression(ERR_STRING_TOKEN % self._Token)
+        if self._Expr[Idx] == '"':
+            Expr = self._Expr[self._Idx:].replace('\\\\', '//').replace('\\\"', '\\\'')
+            for Ch in Expr:
+                self._Idx += 1
+                if Ch == '"':
+                    break
+            self._Token = self._LiteralToken = self._Expr[Idx:self._Idx]
+            if not self._Token.endswith('"'):
+                raise BadExpression(ERR_STRING_TOKEN % self._Token)
+        #Replace escape \\\', \'
+        elif self._Expr[Idx] == "'":
+            Expr = self._Expr[self._Idx:].replace('\\\\', '//').replace("\\\'", "\\\"")
+            for Ch in Expr:
+                self._Idx += 1
+                if Ch == "'":
+                    break
+            self._Token = self._LiteralToken = self._Expr[Idx:self._Idx]
+            if not self._Token.endswith("'"):
+                raise BadExpression(ERR_STRING_TOKEN % self._Token)
         self._Token = self._Token[1:-1]
         return self._Token
 
@@ -541,21 +634,21 @@ class ValueExpression(object):
             raise BadExpression(ERR_EMPTY_TOKEN)
 
         # PCD token
-        if self.PcdPattern.match(self._Token):
+        if PcdPattern.match(self._Token):
             if self._Token not in self._Symb:
                 Ex = BadExpression(ERR_PCD_RESOLVE % self._Token)
                 Ex.Pcd = self._Token
                 raise Ex
             self._Token = ValueExpression(self._Symb[self._Token], self._Symb)(True, self._Depth+1)
-            if type(self._Token) != type(''):
+            if not isinstance(self._Token, type('')):
                 self._LiteralToken = hex(self._Token)
                 return
 
         if self._Token.startswith('"'):
             self._Token = self._Token[1:-1]
-        elif self._Token in ["FALSE", "false", "False"]:
+        elif self._Token in {"FALSE", "false", "False"}:
             self._Token = False
-        elif self._Token in ["TRUE", "true", "True"]:
+        elif self._Token in {"TRUE", "true", "True"}:
             self._Token = True
         else:
             self.__IsNumberToken()
@@ -591,13 +684,12 @@ class ValueExpression(object):
             self._LiteralToken.endswith('}'):
             return True
 
-        if self.HexPattern.match(self._LiteralToken):
+        if gHexPattern.match(self._LiteralToken):
             Token = self._LiteralToken[2:]
-            Token = Token.lstrip('0')
             if not Token:
                 self._LiteralToken = '0x0'
             else:
-                self._LiteralToken = '0x' + Token.lower()
+                self._LiteralToken = '0x' + Token
             return True
         return False
 
@@ -617,24 +709,16 @@ class ValueExpression(object):
             self._Idx += 1
             UStr = self.__GetString()
             self._Token = 'L"' + UStr + '"'
-            self._Token, Size = ParseFieldValue(self._Token)
             return self._Token
         elif Expr.startswith("L'"):
             # Skip L
             self._Idx += 1
             UStr = self.__GetString()
             self._Token = "L'" + UStr + "'"
-            self._Token, Size = ParseFieldValue(self._Token)
-            return self._Token
-        elif Expr.startswith('"'):
-            UStr = self.__GetString()
-            self._Token = '"' + UStr + '"'
-            self._Token, Size = ParseFieldValue(self._Token)
             return self._Token
         elif Expr.startswith("'"):
             UStr = self.__GetString()
             self._Token = "'" + UStr + "'"
-            self._Token, Size = ParseFieldValue(self._Token)
             return self._Token
         elif Expr.startswith('UINT'):
             Re = re.compile('(?:UINT8|UINT16|UINT32|UINT64)\((.+)\)')
@@ -651,7 +735,7 @@ class ValueExpression(object):
                 if Ch == ')':
                     TmpValue = self._Expr[Idx :self._Idx - 1]
                     TmpValue = ValueExpression(TmpValue)(True)
-                    TmpValue = '0x%x' % int(TmpValue) if type(TmpValue) != type('') else TmpValue
+                    TmpValue = '0x%x' % int(TmpValue) if not isinstance(TmpValue, type('')) else TmpValue
                     break
             self._Token, Size = ParseFieldValue(Prefix + '(' + TmpValue + ')')
             return  self._Token
@@ -659,7 +743,7 @@ class ValueExpression(object):
         self._Token = ''
         if Expr:
             Ch = Expr[0]
-            Match = self.RegGuidPattern.match(Expr)
+            Match = gGuidPattern.match(Expr)
             if Match and not Expr[Match.end():Match.end()+1].isalnum() \
                 and Expr[Match.end():Match.end()+1] != '_':
                 self._Idx += Match.end()
@@ -681,7 +765,7 @@ class ValueExpression(object):
     # Parse operator
     def _GetOperator(self):
         self.__SkipWS()
-        LegalOpLst = ['&&', '||', '!=', '==', '>=', '<='] + self.NonLetterOpLst + ['?',':']
+        LegalOpLst = ['&&', '||', '!=', '==', '>=', '<='] + self.NonLetterOpLst + ['?', ':']
 
         self._Token = ''
         Expr = self._Expr[self._Idx:]
@@ -713,17 +797,6 @@ class ValueExpression(object):
         self._Token = OpToken
         return OpToken
 
-    # Check if current token matches the operators given from OpList
-    def _IsOperator(self, OpList):
-        Idx = self._Idx
-        self._GetOperator()
-        if self._Token in OpList:
-            if self._Token in self.LogicalOperators:
-                self._Token = self.LogicalOperators[self._Token]
-            return True
-        self._Idx = Idx
-        return False
-
 class ValueExpressionEx(ValueExpression):
     def __init__(self, PcdValue, PcdType, SymbolTable={}):
         ValueExpression.__init__(self, PcdValue, SymbolTable)
@@ -734,145 +807,218 @@ class ValueExpressionEx(ValueExpression):
         PcdValue = self.PcdValue
         try:
             PcdValue = ValueExpression.__call__(self, RealValue, Depth)
-        except WrnExpression, Value:
+            if self.PcdType == TAB_VOID and (PcdValue.startswith("'") or PcdValue.startswith("L'")):
+                PcdValue, Size = ParseFieldValue(PcdValue)
+                PcdValueList = []
+                for I in range(Size):
+                    PcdValueList.append('0x%02X'%(PcdValue & 0xff))
+                    PcdValue = PcdValue >> 8
+                PcdValue = '{' + ','.join(PcdValueList) + '}'
+            elif self.PcdType in TAB_PCD_NUMERIC_TYPES and (PcdValue.startswith("'") or \
+                      PcdValue.startswith('"') or PcdValue.startswith("L'") or PcdValue.startswith('L"') or PcdValue.startswith('{')):
+                raise BadExpression
+        except WrnExpression as Value:
             PcdValue = Value.result
+        except BadExpression as Value:
+            if self.PcdType in TAB_PCD_NUMERIC_TYPES:
+                PcdValue = PcdValue.strip()
+                if PcdValue.startswith('{') and PcdValue.endswith('}'):
+                    PcdValue = SplitPcdValueString(PcdValue[1:-1])
+                if isinstance(PcdValue, type([])):
+                    TmpValue = 0
+                    Size = 0
+                    ValueType = ''
+                    for Item in PcdValue:
+                        Item = Item.strip()
+                        if Item.startswith(TAB_UINT8):
+                            ItemSize = 1
+                            ValueType = TAB_UINT8
+                        elif Item.startswith(TAB_UINT16):
+                            ItemSize = 2
+                            ValueType = TAB_UINT16
+                        elif Item.startswith(TAB_UINT32):
+                            ItemSize = 4
+                            ValueType = TAB_UINT32
+                        elif Item.startswith(TAB_UINT64):
+                            ItemSize = 8
+                            ValueType = TAB_UINT64
+                        elif Item[0] in {'"', "'", 'L'}:
+                            ItemSize = 0
+                            ValueType = TAB_VOID
+                        else:
+                            ItemSize = 0
+                            ValueType = TAB_UINT8
+                        Item = ValueExpressionEx(Item, ValueType, self._Symb)(True)
+
+                        if ItemSize == 0:
+                            try:
+                                tmpValue = int(Item, 0)
+                                if tmpValue > 255:
+                                    raise BadExpression("Byte  array number %s should less than 0xFF." % Item)
+                            except BadExpression as Value:
+                                raise BadExpression(Value)
+                            except ValueError:
+                                pass
+                            ItemValue, ItemSize = ParseFieldValue(Item)
+                        else:
+                            ItemValue = ParseFieldValue(Item)[0]
+
+                        if isinstance(ItemValue, type('')):
+                            ItemValue = int(ItemValue, 0)
+
+                        TmpValue = (ItemValue << (Size * 8)) | TmpValue
+                        Size = Size + ItemSize
+                else:
+                    try:
+                        TmpValue, Size = ParseFieldValue(PcdValue)
+                    except BadExpression as Value:
+                        raise BadExpression("Type: %s, Value: %s, %s" % (self.PcdType, PcdValue, Value))
+                if isinstance(TmpValue, type('')):
+                    try:
+                        TmpValue = int(TmpValue)
+                    except:
+                        raise  BadExpression(Value)
+                else:
+                    PcdValue = '0x%0{}X'.format(Size) % (TmpValue)
+                if TmpValue < 0:
+                    raise  BadExpression('Type %s PCD Value is negative' % self.PcdType)
+                if self.PcdType == TAB_UINT8 and Size > 1:
+                    raise BadExpression('Type %s PCD Value Size is Larger than 1 byte' % self.PcdType)
+                if self.PcdType == TAB_UINT16 and Size > 2:
+                    raise BadExpression('Type %s PCD Value Size is Larger than 2 byte' % self.PcdType)
+                if self.PcdType == TAB_UINT32 and Size > 4:
+                    raise BadExpression('Type %s PCD Value Size is Larger than 4 byte' % self.PcdType)
+                if self.PcdType == TAB_UINT64 and Size > 8:
+                    raise BadExpression('Type %s PCD Value Size is Larger than 8 byte' % self.PcdType)
+            else:
+                try:
+                    TmpValue = long(PcdValue)
+                    TmpList = []
+                    if TmpValue.bit_length() == 0:
+                        PcdValue = '{0x00}'
+                    else:
+                        for I in range((TmpValue.bit_length() + 7) / 8):
+                            TmpList.append('0x%02x' % ((TmpValue >> I * 8) & 0xff))
+                        PcdValue = '{' + ', '.join(TmpList) + '}'
+                except:
+                    if PcdValue.strip().startswith('{'):
+                        PcdValueList = SplitPcdValueString(PcdValue.strip()[1:-1])
+                        LabelDict = {}
+                        NewPcdValueList = []
+                        LabelOffset = 0
+                        for Item in PcdValueList:
+                            # compute byte offset of every LABEL
+                            LabelList = _ReLabel.findall(Item)
+                            Item = _ReLabel.sub('', Item)
+                            Item = Item.strip()
+                            if LabelList:
+                                for Label in LabelList:
+                                    if not IsValidCName(Label):
+                                        raise BadExpression('%s is not a valid c variable name' % Label)
+                                    if Label not in LabelDict:
+                                        LabelDict[Label] = str(LabelOffset)
+                            if Item.startswith(TAB_UINT8):
+                                LabelOffset = LabelOffset + 1
+                            elif Item.startswith(TAB_UINT16):
+                                LabelOffset = LabelOffset + 2
+                            elif Item.startswith(TAB_UINT32):
+                                LabelOffset = LabelOffset + 4
+                            elif Item.startswith(TAB_UINT64):
+                                LabelOffset = LabelOffset + 8
+                            else:
+                                try:
+                                    ItemValue, ItemSize = ParseFieldValue(Item)
+                                    LabelOffset = LabelOffset + ItemSize
+                                except:
+                                    LabelOffset = LabelOffset + 1
+
+                        for Item in PcdValueList:
+                            # for LABEL parse
+                            Item = Item.strip()
+                            try:
+                                Item = _ReLabel.sub('', Item)
+                            except:
+                                pass
+                            try:
+                                OffsetList = _ReOffset.findall(Item)
+                            except:
+                                pass
+                            # replace each offset, except errors
+                            for Offset in OffsetList:
+                                try:
+                                    Item = Item.replace('OFFSET_OF({})'.format(Offset), LabelDict[Offset])
+                                except:
+                                    raise BadExpression('%s not defined' % Offset)
+
+                            NewPcdValueList.append(Item)
+
+                        AllPcdValueList = []
+                        for Item in NewPcdValueList:
+                            Size = 0
+                            ValueStr = ''
+                            TokenSpaceGuidName = ''
+                            if Item.startswith(TAB_GUID) and Item.endswith(')'):
+                                try:
+                                    TokenSpaceGuidName = re.search('GUID\((\w+)\)', Item).group(1)
+                                except:
+                                    pass
+                                if TokenSpaceGuidName and TokenSpaceGuidName in self._Symb:
+                                    Item = 'GUID(' + self._Symb[TokenSpaceGuidName] + ')'
+                                elif TokenSpaceGuidName:
+                                    raise BadExpression('%s not found in DEC file' % TokenSpaceGuidName)
+                                Item, Size = ParseFieldValue(Item)
+                                for Index in range(0, Size):
+                                    ValueStr = '0x%02X' % (int(Item) & 255)
+                                    Item >>= 8
+                                    AllPcdValueList.append(ValueStr)
+                                continue
+                            elif Item.startswith('DEVICE_PATH') and Item.endswith(')'):
+                                Item, Size = ParseFieldValue(Item)
+                                AllPcdValueList.append(Item[1:-1])
+                                continue
+                            else:
+                                ValueType = ""
+                                if Item.startswith(TAB_UINT8):
+                                    ItemSize = 1
+                                    ValueType = TAB_UINT8
+                                elif Item.startswith(TAB_UINT16):
+                                    ItemSize = 2
+                                    ValueType = TAB_UINT16
+                                elif Item.startswith(TAB_UINT32):
+                                    ItemSize = 4
+                                    ValueType = TAB_UINT32
+                                elif Item.startswith(TAB_UINT64):
+                                    ItemSize = 8
+                                    ValueType = TAB_UINT64
+                                else:
+                                    ItemSize = 0
+                                if ValueType:
+                                    TmpValue = ValueExpressionEx(Item, ValueType, self._Symb)(True)
+                                else:
+                                    TmpValue = ValueExpressionEx(Item, self.PcdType, self._Symb)(True)
+                                Item = '0x%x' % TmpValue if not isinstance(TmpValue, type('')) else TmpValue
+                                if ItemSize == 0:
+                                    ItemValue, ItemSize = ParseFieldValue(Item)
+                                    if Item[0] not in {'"', 'L', '{'} and ItemSize > 1:
+                                        raise BadExpression("Byte  array number %s should less than 0xFF." % Item)
+                                else:
+                                    ItemValue = ParseFieldValue(Item)[0]
+                                for I in range(0, ItemSize):
+                                    ValueStr = '0x%02X' % (int(ItemValue) & 255)
+                                    ItemValue >>= 8
+                                    AllPcdValueList.append(ValueStr)
+                                Size += ItemSize
+
+                        if Size > 0:
+                            PcdValue = '{' + ','.join(AllPcdValueList) + '}'
+                    else:
+                        raise  BadExpression("Type: %s, Value: %s, %s"%(self.PcdType, PcdValue, Value))
 
         if PcdValue == 'True':
             PcdValue = '1'
         if PcdValue == 'False':
             PcdValue = '0'
-        if self.PcdType in ['UINT8', 'UINT16', 'UINT32', 'UINT64', 'BOOLEAN']:
-            PcdValue = PcdValue.strip()
-            if type(PcdValue) == type('') and PcdValue.startswith('{') and PcdValue.endswith('}'):
-                PcdValue = PcdValue[1:-1].split(',')
-            if type(PcdValue) == type([]):
-                TmpValue = 0
-                Size = 0
-                for Item in PcdValue:
-                    if Item.startswith('UINT16'):
-                        ItemSize = 2
-                    elif Item.startswith('UINT32'):
-                        ItemSize = 4
-                    elif Item.startswith('UINT64'):
-                        ItemSize = 8
-                    else:
-                        ItemSize = 0
-                    Item = ValueExpressionEx(Item, self.PcdType, self._Symb)(True)
 
-                    if ItemSize == 0:
-                        ItemValue, ItemSize = ParseFieldValue(Item)
-                    else:
-                        ItemValue = ParseFieldValue(Item)[0]
-
-                    if type(ItemValue) == type(''):
-                        ItemValue = int(ItemValue, 16) if ItemValue.startswith('0x') else int(ItemValue)
-
-                    TmpValue = (ItemValue << (Size * 8)) | TmpValue
-                    Size = Size + ItemSize
-            else:
-                TmpValue, Size = ParseFieldValue(PcdValue)
-            if type(TmpValue) == type(''):
-                TmpValue = int(TmpValue)
-            else:
-                PcdValue = '0x%0{}X'.format(Size) % (TmpValue)
-            if TmpValue < 0:
-                raise  BadExpression('Type %s PCD Value is negative' % self.PcdType)
-            if self.PcdType == 'UINT8' and Size > 1:
-                raise BadExpression('Type %s PCD Value Size is Larger than 1 byte' % self.PcdType)
-            if self.PcdType == 'UINT16' and Size > 2:
-                raise BadExpression('Type %s PCD Value Size is Larger than 2 byte' % self.PcdType)
-            if self.PcdType == 'UINT32' and Size > 4:
-                raise BadExpression('Type %s PCD Value Size is Larger than 4 byte' % self.PcdType)
-            if self.PcdType == 'UINT64' and Size > 8:
-                raise BadExpression('Type %s PCD Value Size is Larger than 8 byte' % self.PcdType)
-        if self.PcdType in ['VOID*']:
-            try:
-                TmpValue = long(PcdValue)
-                TmpList = []
-                if TmpValue.bit_length() == 0:
-                    PcdValue = '{0x00}'
-                else:
-                    for I in range((TmpValue.bit_length() + 7) / 8):
-                        TmpList.append('0x%02x' % ((TmpValue >> I * 8) & 0xff))
-                    PcdValue = '{' + ', '.join(TmpList) + '}'
-            except:
-                if PcdValue.strip().startswith('{'):
-                    PcdValue = PcdValue.strip()[1:-1].strip()
-                    Size = 0
-                    ValueStr = ''
-                    TokenSpaceGuidName = ''
-                    if PcdValue.startswith('GUID') and PcdValue.endswith(')'):
-                        try:
-                            TokenSpaceGuidName = re.search('GUID\((\w+)\)', PcdValue).group(1)
-                        except:
-                            pass
-                        if TokenSpaceGuidName and TokenSpaceGuidName in self._Symb:
-                            PcdValue = 'GUID(' + self._Symb[TokenSpaceGuidName] + ')'
-                        elif TokenSpaceGuidName:
-                            raise BadExpression('%s not found in DEC file' % TokenSpaceGuidName)
-
-                        ListItem, Size = ParseFieldValue(PcdValue)
-                    elif PcdValue.startswith('DEVICE_PATH') and PcdValue.endswith(')'):
-                        ListItem, Size = ParseFieldValue(PcdValue)
-                    else:
-                        ListItem = PcdValue.split(',')
-
-                    if type(ListItem) == type(0) or type(ListItem) == type(0L):
-                        for Index in range(0, Size):
-                            ValueStr += '0x%02X' % (int(ListItem) & 255)
-                            ListItem >>= 8
-                            ValueStr += ', '
-                            PcdValue = '{' + ValueStr[:-2] + '}'
-                    elif type(ListItem) == type(''):
-                        if ListItem.startswith('{') and ListItem.endswith('}'):
-                            PcdValue = ListItem
-                    else:
-                        LabelDict = {}
-                        ReLabel = re.compile('LABEL\((\w+)\)')
-                        ReOffset = re.compile('OFFSET_OF\((\w+)\)')
-                        for Index, Item in enumerate(ListItem):
-                            # for LABEL parse
-                            Item = Item.strip()
-                            try:
-                                LabelList = ReLabel.findall(Item)
-                                for Label in LabelList:
-                                    if Label not in LabelDict.keys():
-                                        LabelDict[Label] = str(Index)
-                                Item = ReLabel.sub('', Item)
-                            except:
-                                pass
-                            try:
-                                OffsetList = ReOffset.findall(Item)
-                            except:
-                                pass
-                            for Offset in OffsetList:
-                                if Offset in LabelDict.keys():
-                                    Re = re.compile('OFFSET_OF\(%s\)'% Offset)
-                                    Item = Re.sub(LabelDict[Offset], Item)
-                                else:
-                                    raise BadExpression('%s not defined before use' % Offset)
-                            if Item.startswith('UINT16'):
-                                ItemSize = 2
-                            elif Item.startswith('UINT32'):
-                                ItemSize = 4
-                            elif Item.startswith('UINT64'):
-                                ItemSize = 8
-                            else:
-                                ItemSize = 0
-                            TmpValue = ValueExpressionEx(Item, self.PcdType, self._Symb)(True)
-                            Item = '0x%x' % TmpValue if type(TmpValue) != type('') else TmpValue
-                            if ItemSize == 0:
-                                ItemValue, ItemSize = ParseFieldValue(Item)
-                            else:
-                                ItemValue = ParseFieldValue(Item)[0]
-                            for I in range(0, ItemSize):
-                                ValueStr += '0x%02X' % (int(ItemValue) & 255)
-                                ItemValue >>= 8
-                                ValueStr += ', '
-                            Size += ItemSize
-
-                        if Size > 0:
-                            PcdValue = '{' + ValueStr[:-2] + '}'
         if RealValue:
             return PcdValue
 
@@ -883,10 +1029,10 @@ if __name__ == '__main__':
         if input in 'qQ':
             break
         try:
-            print ValueExpression(input)(True)
-            print ValueExpression(input)(False)
-        except WrnExpression, Ex:
-            print Ex.result
-            print str(Ex)
-        except Exception, Ex:
-            print str(Ex)
+            print(ValueExpression(input)(True))
+            print(ValueExpression(input)(False))
+        except WrnExpression as Ex:
+            print(Ex.result)
+            print(str(Ex))
+        except Exception as Ex:
+            print(str(Ex))

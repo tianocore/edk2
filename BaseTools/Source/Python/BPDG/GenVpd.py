@@ -2,7 +2,7 @@
 #  This file include GenVpd class for fix the Vpd type PCD offset, and PcdEntry for describe
 #  and process each entry of vpd type PCD.
 #
-#  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -14,7 +14,7 @@
 #
 
 import Common.LongFilePathOs as os
-import StringIO
+from io import BytesIO
 import StringTable as st
 import array
 import re
@@ -35,7 +35,7 @@ _FORMAT_CHAR = {1: 'B',
 #
 class PcdEntry:
     def __init__(self, PcdCName, SkuId,PcdOffset, PcdSize, PcdValue, Lineno=None, FileName=None, PcdUnpackValue=None, 
-                 PcdBinOffset=None, PcdBinSize=None):
+                 PcdBinOffset=None, PcdBinSize=None, Alignment=None):
         self.PcdCName       = PcdCName.strip()
         self.SkuId          = SkuId.strip()
         self.PcdOffset      = PcdOffset.strip()
@@ -46,6 +46,7 @@ class PcdEntry:
         self.PcdUnpackValue = PcdUnpackValue
         self.PcdBinOffset   = PcdBinOffset
         self.PcdBinSize     = PcdBinSize
+        self.Alignment       = Alignment
         
         if self.PcdValue == '' :
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
@@ -61,7 +62,7 @@ class PcdEntry:
 
         self._GenOffsetValue ()
 
-    ## Analyze the string value to judge the PCD's datum type euqal to Boolean or not.
+    ## Analyze the string value to judge the PCD's datum type equal to Boolean or not.
     # 
     #  @param   ValueString      PCD's value
     #  @param   Size             PCD's size
@@ -119,7 +120,7 @@ class PcdEntry:
     # 
     #                                
     def _PackIntValue(self, IntValue, Size):
-        if Size not in _FORMAT_CHAR.keys():
+        if Size not in _FORMAT_CHAR:
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
                             "Invalid size %d for PCD %s in integer datum size(File: %s Line: %s)." % (Size, self.PcdCName, self.FileName, self.Lineno))
 
@@ -164,18 +165,18 @@ class PcdEntry:
     ## Pack VOID* type VPD PCD's value form string to binary type.
     #
     #  The VOID* type of string divided into 3 sub-type:
-    #    1:    L"String", Unicode type string.
-    #    2:    "String",  Ascii type string.
+    #    1:    L"String"/L'String', Unicode type string.
+    #    2:    "String"/'String',  Ascii type string.
     #    3:    {bytearray}, only support byte-array.
     #
     #  @param ValueString     The Integer type string for pack.
     #       
     def _PackPtrValue(self, ValueString, Size):
-        if ValueString.startswith('L"'):
+        if ValueString.startswith('L"') or ValueString.startswith("L'"):
             self._PackUnicode(ValueString, Size)
         elif ValueString.startswith('{') and ValueString.endswith('}'):
             self._PackByteArray(ValueString, Size)
-        elif ValueString.startswith('"') and ValueString.endswith('"'):
+        elif (ValueString.startswith('"') and ValueString.endswith('"')) or (ValueString.startswith("'") and ValueString.endswith("'")):
             self._PackString(ValueString, Size)
         else:
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
@@ -183,7 +184,7 @@ class PcdEntry:
 
     ## Pack an Ascii PCD value.
     #  
-    #  An Ascii string for a PCD should be in format as  "".
+    #  An Ascii string for a PCD should be in format as  ""/''.
     #                   
     def _PackString(self, ValueString, Size):
         if (Size < 0):
@@ -191,11 +192,14 @@ class PcdEntry:
                             "Invalid parameter Size %s of PCD %s!(File: %s Line: %s)" % (self.PcdBinSize, self.PcdCName, self.FileName, self.Lineno))
         if (ValueString == ""):
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "Invalid parameter ValueString %s of PCD %s!(File: %s Line: %s)" % (self.PcdUnpackValue, self.PcdCName, self.FileName, self.Lineno))
-        if (len(ValueString) < 2):
-            EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "For PCD: %s ,ASCII string %s at least contains two!(File: %s Line: %s)" % (self.PcdCName, self.PcdUnpackValue, self.FileName, self.Lineno))
+
+        QuotedFlag = True
+        if ValueString.startswith("'"):
+            QuotedFlag = False
 
         ValueString = ValueString[1:-1]
-        if len(ValueString) + 1 > Size:
+        # No null-terminator in 'string' 
+        if (QuotedFlag and len(ValueString) + 1 > Size) or (not QuotedFlag and len(ValueString) > Size):
             EdkLogger.error("BPDG", BuildToolError.RESOURCE_OVERFLOW,
                             "PCD value string %s is exceed to size %d(File: %s Line: %s)" % (ValueString, Size, self.FileName, self.Lineno))
         try:
@@ -258,19 +262,20 @@ class PcdEntry:
 
     ## Pack a unicode PCD value into byte array.
     #  
-    #  A unicode string for a PCD should be in format as  L"".
+    #  A unicode string for a PCD should be in format as  L""/L''.
     #
     def _PackUnicode(self, UnicodeString, Size):
         if (Size < 0):
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "Invalid parameter Size %s of PCD %s!(File: %s Line: %s)" % \
                              (self.PcdBinSize, self.PcdCName, self.FileName, self.Lineno))
-        if (len(UnicodeString) < 3):
-            EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "For PCD: %s ,ASCII string %s at least contains two!(File: %s Line: %s)" % \
-                            (self.PcdCName, self.PcdUnpackValue, self.FileName, self.Lineno))
 
+        QuotedFlag = True
+        if UnicodeString.startswith("L'"):
+            QuotedFlag = False 
         UnicodeString = UnicodeString[2:-1]
 
-        if (len(UnicodeString) + 1) * 2 > Size:
+        # No null-terminator in L'string'
+        if (QuotedFlag and (len(UnicodeString) + 1) * 2 > Size) or (not QuotedFlag and len(UnicodeString) * 2 > Size):
             EdkLogger.error("BPDG", BuildToolError.RESOURCE_OVERFLOW,
                             "The size of unicode string %s is too larger for size %s(File: %s Line: %s)" % \
                             (UnicodeString, Size, self.FileName, self.Lineno))
@@ -344,7 +349,7 @@ class GenVPD :
                 #
                 # Enhanced for support "|" character in the string.
                 #
-                ValueList = ['', '', '', '','']
+                ValueList = ['', '', '', '', '']
 
                 ValueRe = re.compile(r'\s*L?\".*\|.*\"\s*$')
                 PtrValue = ValueRe.findall(line)
@@ -376,7 +381,7 @@ class GenVPD :
         # Delete useless lines
         while (True) :
             try :
-                if (self.FileLinesList[count] == None) :
+                if (self.FileLinesList[count] is None) :
                     del(self.FileLinesList[count])
                 else :
                     count += 1
@@ -393,8 +398,8 @@ class GenVPD :
         # Process the pcds one by one base on the pcd's value and size
         count = 0
         for line in self.FileLinesList:
-            if line != None :
-                PCD = PcdEntry(line[0], line[1], line[2], line[3], line[4],line[5], self.InputFileName)   
+            if line is not None :
+                PCD = PcdEntry(line[0], line[1], line[2], line[3], line[4], line[5], self.InputFileName)
                 # Strip the space char
                 PCD.PcdCName     = PCD.PcdCName.strip(' ')
                 PCD.SkuId        = PCD.SkuId.strip(' ')
@@ -434,6 +439,7 @@ class GenVPD :
                 else:
                     Alignment = 1
 
+                PCD.Alignment = Alignment
                 if PCD.PcdOffset != '*':
                     if PCD.PcdOccupySize % Alignment != 0:
                         if PCD.PcdUnpackValue.startswith("{"):
@@ -444,6 +450,7 @@ class GenVPD :
                     if PCD.PcdOccupySize % Alignment != 0:
                         PCD.PcdOccupySize = (PCD.PcdOccupySize / Alignment + 1) * Alignment
 
+                PackSize = PCD.PcdOccupySize
                 if PCD._IsBoolean(PCD.PcdValue, PCD.PcdSize):
                     PCD._PackBooleanValue(PCD.PcdValue)
                     self.FileLinesList[count] = PCD
@@ -506,10 +513,10 @@ class GenVPD :
         index =0
         for pcd in self.PcdUnknownOffsetList:
             index += 1
-            if pcd.PcdCName == ".".join(("gEfiMdeModulePkgTokenSpaceGuid","PcdNvStoreDefaultValueBuffer")):
+            if pcd.PcdCName == ".".join(("gEfiMdeModulePkgTokenSpaceGuid", "PcdNvStoreDefaultValueBuffer")):
                 if index != len(self.PcdUnknownOffsetList):
                     for i in range(len(self.PcdUnknownOffsetList) - index):
-                        self.PcdUnknownOffsetList[index+i -1 ] , self.PcdUnknownOffsetList[index+i] = self.PcdUnknownOffsetList[index+i] , self.PcdUnknownOffsetList[index+i -1]
+                        self.PcdUnknownOffsetList[index+i -1 ], self.PcdUnknownOffsetList[index+i] = self.PcdUnknownOffsetList[index+i], self.PcdUnknownOffsetList[index+i -1]
 
         #
         # Process all Offset value are "*"
@@ -518,6 +525,8 @@ class GenVPD :
             # The offset start from 0
             NowOffset = 0
             for Pcd in self.PcdUnknownOffsetList :
+                if NowOffset % Pcd.Alignment != 0:
+                    NowOffset = (NowOffset/ Pcd.Alignment + 1) * Pcd.Alignment
                 Pcd.PcdBinOffset = NowOffset
                 Pcd.PcdOffset    = str(hex(Pcd.PcdBinOffset))
                 NowOffset       += Pcd.PcdOccupySize
@@ -580,13 +589,15 @@ class GenVPD :
                         needFixPcdSize      = eachUnfixedPcd.PcdOccupySize
                         # Not been fixed
                         if eachUnfixedPcd.PcdOffset == '*' :
+                            if LastOffset % eachUnfixedPcd.Alignment != 0:
+                                LastOffset = (LastOffset / eachUnfixedPcd.Alignment + 1) * eachUnfixedPcd.Alignment
                             # The offset un-fixed pcd can write into this free space
                             if needFixPcdSize <= (NowOffset - LastOffset) :
                                 # Change the offset value of un-fixed pcd
                                 eachUnfixedPcd.PcdOffset    = str(hex(LastOffset))
                                 eachUnfixedPcd.PcdBinOffset = LastOffset
                                 # Insert this pcd into fixed offset pcd list.
-                                self.PcdFixedOffsetSizeList.insert(FixOffsetSizeListCount,eachUnfixedPcd)
+                                self.PcdFixedOffsetSizeList.insert(FixOffsetSizeListCount, eachUnfixedPcd)
                                 
                                 # Delete the item's offset that has been fixed and added into fixed offset list
                                 self.PcdUnknownOffsetList.pop(countOfUnfixedList)
@@ -632,6 +643,9 @@ class GenVPD :
             NeedFixPcd = self.PcdUnknownOffsetList[0]
             
             NeedFixPcd.PcdBinOffset = LastPcd.PcdBinOffset + LastPcd.PcdOccupySize
+            if NeedFixPcd.PcdBinOffset % NeedFixPcd.Alignment != 0:
+                NeedFixPcd.PcdBinOffset = (NeedFixPcd.PcdBinOffset / NeedFixPcd.Alignment + 1) * NeedFixPcd.Alignment
+
             NeedFixPcd.PcdOffset    = str(hex(NeedFixPcd.PcdBinOffset))
             
             # Insert this pcd into fixed offset pcd list's tail.
@@ -659,8 +673,8 @@ class GenVPD :
             # Open failed
             EdkLogger.error("BPDG", BuildToolError.FILE_OPEN_FAILURE, "File open failed for %s" % self.MapFileName, None)
 
-        # Use a instance of StringIO to cache data
-        fStringIO = StringIO.StringIO('')
+        # Use a instance of BytesIO to cache data
+        fStringIO = BytesIO('')
 
         # Write the header of map file.
         try :
@@ -671,7 +685,7 @@ class GenVPD :
         for eachPcd in self.PcdFixedOffsetSizeList  :
             # write map file
             try :
-                fMapFile.write("%s | %s | %s | %s | %s  \n" % (eachPcd.PcdCName, eachPcd.SkuId,eachPcd.PcdOffset, eachPcd.PcdSize,eachPcd.PcdUnpackValue))
+                fMapFile.write("%s | %s | %s | %s | %s  \n" % (eachPcd.PcdCName, eachPcd.SkuId, eachPcd.PcdOffset, eachPcd.PcdSize, eachPcd.PcdUnpackValue))
             except:
                 EdkLogger.error("BPDG", BuildToolError.FILE_WRITE_FAILURE, "Write data to file %s failed, please check whether the file been locked or using by other applications." % self.MapFileName, None)
 

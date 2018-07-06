@@ -39,6 +39,7 @@
   SnpStop.c
   SnpTransmit.c
   SnpUnsupported.c
+  VirtioNet.h
 
 [Packages]
   MdePkg/MdePkg.dec

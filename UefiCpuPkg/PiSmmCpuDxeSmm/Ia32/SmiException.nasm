@@ -382,7 +382,7 @@ ASM_PFX(PageFaultIdtHandlerSmmProfile):
 ;; FX_SAVE_STATE_IA32 FxSaveState;
     sub     esp, 512
     mov     edi, esp
-    db      0xf, 0xae, 0x7 ;fxsave [edi]
+    fxsave  [edi]
 
 ; UEFI calling convention for IA32 requires that Direction flag in EFLAGs is clear
     cld
@@ -410,7 +410,7 @@ ASM_PFX(PageFaultIdtHandlerSmmProfile):
 
 ;; FX_SAVE_STATE_IA32 FxSaveState;
     mov     esi, esp
-    db      0xf, 0xae, 0xe ; fxrstor [esi]
+    fxrstor [esi]
     add     esp, 512
 
 ;; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
@@ -582,7 +582,7 @@ PFHandlerEntry:
     clts
     sub     esp, 512
     mov     edi, esp
-    db      0xf, 0xae, 0x7 ;fxsave [edi]
+    fxsave  [edi]
 
 ; UEFI calling convention for IA32 requires that Direction flag in EFLAGs is clear
     cld
@@ -612,7 +612,7 @@ PFHandlerEntry:
 
 ;; FX_SAVE_STATE_IA32 FxSaveState;
     mov     esi, esp
-    db      0xf, 0xae, 0xe ; fxrstor [esi]
+    fxrstor [esi]
     add     esp, 512
 
 ;; UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;

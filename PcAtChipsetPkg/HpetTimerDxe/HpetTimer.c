@@ -1,7 +1,7 @@
 /** @file
   Timer Architectural Protocol module using High Precesion Event Timer (HPET)
 
-  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -52,11 +52,11 @@
   is returned.
 
   @param  This            The EFI_TIMER_ARCH_PROTOCOL instance.
-  @param  NotifyFunction  The function to call when a timer interrupt fires.  
-                          This function executes at TPL_HIGH_LEVEL.  The DXE 
-                          Core will register a handler for the timer interrupt, 
-                          so it can know how much time has passed.  This 
-                          information is used to signal timer based events.  
+  @param  NotifyFunction  The function to call when a timer interrupt fires.
+                          This function executes at TPL_HIGH_LEVEL.  The DXE
+                          Core will register a handler for the timer interrupt,
+                          so it can know how much time has passed.  This
+                          information is used to signal timer based events.
                           NULL will unregister the handler.
 
   @retval  EFI_SUCCESS            The timer handler was registered.
@@ -90,11 +90,11 @@ TimerDriverRegisterHandler (
 
   @param  This         The EFI_TIMER_ARCH_PROTOCOL instance.
   @param  TimerPeriod  The rate to program the timer interrupt in 100 nS units.
-                       If the timer hardware is not programmable, then 
-                       EFI_UNSUPPORTED is returned.  If the timer is programmable, 
-                       then the timer period will be rounded up to the nearest 
-                       timer period that is supported by the timer hardware.  
-                       If TimerPeriod is set to 0, then the timer interrupts 
+                       If the timer hardware is not programmable, then
+                       EFI_UNSUPPORTED is returned.  If the timer is programmable,
+                       then the timer period will be rounded up to the nearest
+                       timer period that is supported by the timer hardware.
+                       If TimerPeriod is set to 0, then the timer interrupts
                        will be disabled.
 
   @retval  EFI_SUCCESS       The timer period was changed.
@@ -151,7 +151,7 @@ EFIAPI
 TimerDriverGenerateSoftInterrupt (
   IN EFI_TIMER_ARCH_PROTOCOL  *This
   );
-  
+
 ///
 /// The handle onto which the Timer Architectural Protocol will be installed.
 ///
@@ -222,7 +222,7 @@ HPET_GENERAL_CAPABILITIES_ID_REGISTER  mHpetGeneralCapabilities;
 HPET_GENERAL_CONFIGURATION_REGISTER  mHpetGeneralConfiguration;
 
 ///
-/// Cached state of the Configuration register for the HPET Timer managed by 
+/// Cached state of the Configuration register for the HPET Timer managed by
 /// this driver.  Caching the state reduces the number of times the configuration
 /// register is read.
 ///
@@ -277,7 +277,7 @@ HpetEnable (
   IN BOOLEAN  Enable
   )
 {
-  mHpetGeneralConfiguration.Bits.MainCounterEnable = Enable ? 1 : 0;  
+  mHpetGeneralConfiguration.Bits.MainCounterEnable = Enable ? 1 : 0;
   HpetWrite (HPET_GENERAL_CONFIGURATION_OFFSET, mHpetGeneralConfiguration.Uint64);
 }
 
@@ -286,7 +286,7 @@ HpetEnable (
   and computes the amount of time that has passed since the last HPET timer interrupt.
   If a notification function is registered, then the amount of time since the last
   HPET interrupt is passed to that notification function in 100 ns units.  The HPET
-  time is updated to generate another interrupt in the required time period. 
+  time is updated to generate another interrupt in the required time period.
 
   @param  InterruptType  The type of interrupt that occurred.
   @param  SystemContext  A pointer to the system context when the interrupt occurred.
@@ -322,7 +322,7 @@ TimerInterruptHandler (
   // Disable HPET timer when adjusting the COMPARATOR value to prevent a missed interrupt
   //
   HpetEnable (FALSE);
-  
+
   //
   // Capture main counter value
   //
@@ -363,13 +363,13 @@ TimerInterruptHandler (
   // Enable the HPET counter once the new COMPARATOR value has been set.
   //
   HpetEnable (TRUE);
-  
+
   //
   // Check to see if there is a registered notification function
   //
   if (mTimerNotifyFunction != NULL) {
     //
-    // Compute time since last notification in 100 ns units (10 ^ -7) 
+    // Compute time since last notification in 100 ns units (10 ^ -7)
     //
     if (MainCounter > mPreviousMainCounter) {
       //
@@ -386,17 +386,17 @@ TimerInterruptHandler (
                     MultU64x32 (
                       Delta & mCounterMask,
                       mHpetGeneralCapabilities.Bits.CounterClockPeriod
-                      ), 
+                      ),
                     100000000
                     );
-                    
+
     //
     // Call registered notification function passing in the time since the last
     // interrupt in 100 ns units.
-    //    
+    //
     mTimerNotifyFunction (TimerPeriod);
   }
-  
+
   //
   // Save main counter value
   //
@@ -417,11 +417,11 @@ TimerInterruptHandler (
   is returned.
 
   @param  This            The EFI_TIMER_ARCH_PROTOCOL instance.
-  @param  NotifyFunction  The function to call when a timer interrupt fires.  
-                          This function executes at TPL_HIGH_LEVEL.  The DXE 
-                          Core will register a handler for the timer interrupt, 
-                          so it can know how much time has passed.  This 
-                          information is used to signal timer based events.  
+  @param  NotifyFunction  The function to call when a timer interrupt fires.
+                          This function executes at TPL_HIGH_LEVEL.  The DXE
+                          Core will register a handler for the timer interrupt,
+                          so it can know how much time has passed.  This
+                          information is used to signal timer based events.
                           NULL will unregister the handler.
 
   @retval  EFI_SUCCESS            The timer handler was registered.
@@ -473,11 +473,11 @@ TimerDriverRegisterHandler (
 
   @param  This         The EFI_TIMER_ARCH_PROTOCOL instance.
   @param  TimerPeriod  The rate to program the timer interrupt in 100 nS units.
-                       If the timer hardware is not programmable, then 
-                       EFI_UNSUPPORTED is returned.  If the timer is programmable, 
-                       then the timer period will be rounded up to the nearest 
-                       timer period that is supported by the timer hardware.  
-                       If TimerPeriod is set to 0, then the timer interrupts 
+                       If the timer hardware is not programmable, then
+                       EFI_UNSUPPORTED is returned.  If the timer is programmable,
+                       then the timer period will be rounded up to the nearest
+                       timer period that is supported by the timer hardware.
+                       If TimerPeriod is set to 0, then the timer interrupts
                        will be disabled.
 
   @retval  EFI_SUCCESS       The timer period was changed.
@@ -507,7 +507,7 @@ TimerDriverSetTimerPeriod (
   // Disable HPET timer when adjusting the timer period
   //
   HpetEnable (FALSE);
-  
+
   if (TimerPeriod == 0) {
     if (mTimerPeriod != 0) {
       //
@@ -516,7 +516,7 @@ TimerDriverSetTimerPeriod (
       MainCounter = HpetRead (HPET_MAIN_COUNTER_OFFSET);
       if (MainCounter < mPreviousMainCounter) {
         Delta = (mCounterMask - mPreviousMainCounter) + MainCounter;
-      } else { 
+      } else {
         Delta = MainCounter - mPreviousMainCounter;
       }
       if ((Delta & mCounterMask) >= mTimerCount) {
@@ -535,7 +535,7 @@ TimerDriverSetTimerPeriod (
     //
     // If TimerPeriod is 0, then mask HPET Timer interrupts
     //
-    
+
     if (mTimerConfiguration.Bits.MsiInterruptCapablity != 0 && FeaturePcdGet (PcdHpetMsiEnable)) {
       //
       // Disable HPET MSI interrupt generation
@@ -547,18 +547,18 @@ TimerDriverSetTimerPeriod (
       //
       IoApicEnableInterrupt (mTimerIrq, FALSE);
     }
-    
+
     //
-    // Disable HPET timer interrupt 
+    // Disable HPET timer interrupt
     //
     mTimerConfiguration.Bits.InterruptEnable = 0;
     HpetWrite (HPET_TIMER_CONFIGURATION_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, mTimerConfiguration.Uint64);
   } else {
     //
-    // Convert TimerPeriod to femtoseconds and divide by the number if femtoseconds 
+    // Convert TimerPeriod to femtoseconds and divide by the number if femtoseconds
     // per tick of the HPET counter to determine the number of HPET counter ticks
     // in TimerPeriod 100 ns units.
-    // 
+    //
     mTimerCount = DivU64x32 (
                     MultU64x32 (TimerPeriod, 100000000),
                     mHpetGeneralCapabilities.Bits.CounterClockPeriod
@@ -570,15 +570,15 @@ TimerDriverSetTimerPeriod (
     MainCounter = HpetRead (HPET_MAIN_COUNTER_OFFSET);
     if (MainCounter > mPreviousMainCounter) {
       Delta = MainCounter - mPreviousMainCounter;
-    } else { 
+    } else {
       Delta = (mCounterMask - mPreviousMainCounter) + MainCounter;
     }
     if ((Delta & mCounterMask) >= mTimerCount) {
       HpetWrite (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, (MainCounter + 1) & mCounterMask);
-    } else {  
+    } else {
       HpetWrite (HPET_TIMER_COMPARATOR_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, (mPreviousMainCounter + mTimerCount) & mCounterMask);
     }
-    
+
     //
     // Enable HPET Timer interrupt generation
     //
@@ -609,7 +609,7 @@ TimerDriverSetTimerPeriod (
     mTimerConfiguration.Bits.InterruptEnable = 1;
     HpetWrite (HPET_TIMER_CONFIGURATION_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, mTimerConfiguration.Uint64);
   }
-    
+
   //
   // Save the new timer period
   //
@@ -690,9 +690,9 @@ TimerDriverGenerateSoftInterrupt (
 
   //
   // Disable interrupts
-  //  
+  //
   Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  
+
   //
   // Capture main counter value
   //
@@ -703,7 +703,7 @@ TimerDriverGenerateSoftInterrupt (
   //
   if (mTimerNotifyFunction != NULL) {
     //
-    // Compute time since last interrupt in 100 ns units (10 ^ -7) 
+    // Compute time since last interrupt in 100 ns units (10 ^ -7)
     //
     if (MainCounter > mPreviousMainCounter) {
       //
@@ -721,14 +721,14 @@ TimerDriverGenerateSoftInterrupt (
                     MultU64x32 (
                       Delta & mCounterMask,
                       mHpetGeneralCapabilities.Bits.CounterClockPeriod
-                      ), 
+                      ),
                     100000000
                     );
-                    
+
     //
     // Call registered notification function passing in the time since the last
     // interrupt in 100 ns units.
-    //    
+    //
     mTimerNotifyFunction (TimerPeriod);
   }
 
@@ -736,12 +736,12 @@ TimerDriverGenerateSoftInterrupt (
   // Save main counter value
   //
   mPreviousMainCounter = MainCounter;
-  
+
   //
   // Restore interrupts
-  //  
+  //
   gBS->RestoreTPL (Tpl);
-  
+
   return EFI_SUCCESS;
 }
 
@@ -783,14 +783,14 @@ TimerDriverInitialize (
 
   //
   // Retrieve HPET Capabilities and Configuration Information
-  //  
+  //
   mHpetGeneralCapabilities.Uint64  = HpetRead (HPET_GENERAL_CAPABILITIES_ID_OFFSET);
   mHpetGeneralConfiguration.Uint64 = HpetRead (HPET_GENERAL_CONFIGURATION_OFFSET);
- 
+
   //
-  // If Revision is not valid, then ASSERT() and unload the driver because the HPET 
+  // If Revision is not valid, then ASSERT() and unload the driver because the HPET
   // device is not present.
-  //  
+  //
   ASSERT (mHpetGeneralCapabilities.Uint64 != 0);
   ASSERT (mHpetGeneralCapabilities.Uint64 != 0xFFFFFFFFFFFFFFFFULL);
   if (mHpetGeneralCapabilities.Uint64 == 0 || mHpetGeneralCapabilities.Uint64 == 0xFFFFFFFFFFFFFFFFULL) {
@@ -805,7 +805,7 @@ TimerDriverInitialize (
 
   //
   // Dump HPET Configuration Information
-  //  
+  //
   DEBUG_CODE (
     DEBUG ((DEBUG_INFO, "HPET Base Address = 0x%08x\n", PcdGet32 (PcdHpetBaseAddress)));
     DEBUG ((DEBUG_INFO, "  HPET_GENERAL_CAPABILITIES_ID  = 0x%016lx\n", mHpetGeneralCapabilities));
@@ -819,16 +819,16 @@ TimerDriverInitialize (
       DEBUG ((DEBUG_INFO, "  HPET_TIMER%d_MSI_ROUTE         = 0x%016lx\n", TimerIndex, HpetRead (HPET_TIMER_MSI_ROUTE_OFFSET     + TimerIndex * HPET_TIMER_STRIDE)));
     }
   );
-  
+
   //
   // Capture the current HPET main counter value.
   //
   mPreviousMainCounter = HpetRead (HPET_MAIN_COUNTER_OFFSET);
-  
+
   //
-  // Determine the interrupt mode to use for the HPET Timer.  
+  // Determine the interrupt mode to use for the HPET Timer.
   // Look for MSI first, then unused PIC mode interrupt, then I/O APIC mode interrupt
-  //  
+  //
   MsiTimerIndex = HPET_INVALID_TIMER_INDEX;
   mTimerIndex   = HPET_INVALID_TIMER_INDEX;
   for (TimerIndex = 0; TimerIndex <= mHpetGeneralCapabilities.Bits.NumberOfTimers; TimerIndex++) {
@@ -836,9 +836,9 @@ TimerDriverInitialize (
     // Read the HPET Timer Capabilities and Configuration register
     //
     mTimerConfiguration.Uint64 = HpetRead (HPET_TIMER_CONFIGURATION_OFFSET + TimerIndex * HPET_TIMER_STRIDE);
-    
+
     //
-    // Check to see if this HPET Timer supports MSI 
+    // Check to see if this HPET Timer supports MSI
     //
     if (mTimerConfiguration.Bits.MsiInterruptCapablity != 0) {
       //
@@ -848,7 +848,7 @@ TimerDriverInitialize (
         MsiTimerIndex = TimerIndex;
       }
     }
-    
+
     //
     // Check to see if this HPET Timer supports I/O APIC interrupts
     //
@@ -891,7 +891,7 @@ TimerDriverInitialize (
       DEBUG ((DEBUG_ERROR, "No HPET timers support MSI or I/O APIC mode.  Unload HPET driver.\n"));
       return EFI_DEVICE_ERROR;
     }
-    
+
     //
     // Initialize I/O APIC entry for HPET Timer Interrupt
     //   Fixed Delivery Mode, Level Triggered, Asserted Low
@@ -911,15 +911,15 @@ TimerDriverInitialize (
 
   //
   // Configure the selected HPET Timer with settings common to both MSI mode and I/O APIC mode
-  //   Clear InterruptEnable to keep interrupts disabled until full init is complete 
-  //   Clear PeriodicInterruptEnable to use one-shot mode 
-  //   Configure as a 32-bit counter  
+  //   Clear InterruptEnable to keep interrupts disabled until full init is complete
+  //   Clear PeriodicInterruptEnable to use one-shot mode
+  //   Configure as a 32-bit counter
   //
   mTimerConfiguration.Bits.InterruptEnable         = 0;
   mTimerConfiguration.Bits.PeriodicInterruptEnable = 0;
   mTimerConfiguration.Bits.CounterSizeEnable       = 1;
   HpetWrite (HPET_TIMER_CONFIGURATION_OFFSET + mTimerIndex * HPET_TIMER_STRIDE, mTimerConfiguration.Uint64);
-  
+
   //
   // Read the HPET Timer Capabilities and Configuration register back again.
   // CounterSizeEnable will be read back as a 0 if it is a 32-bit only timer
@@ -970,7 +970,7 @@ TimerDriverInitialize (
     } else {
       DEBUG ((DEBUG_INFO, "HPET Interrupt Mode I/O APIC\n"));
       DEBUG ((DEBUG_INFO, "HPET I/O APIC IRQ         = 0x%02x\n",  mTimerIrq));
-    }  
+    }
     DEBUG ((DEBUG_INFO, "HPET Interrupt Vector     = 0x%02x\n",    PcdGet8 (PcdHpetLocalApicVector)));
     DEBUG ((DEBUG_INFO, "HPET Counter Mask         = 0x%016lx\n",  mCounterMask));
     DEBUG ((DEBUG_INFO, "HPET Timer Period         = %d\n",        mTimerPeriod));
@@ -981,10 +981,10 @@ TimerDriverInitialize (
 
     //
     // Wait for a few timer interrupts to fire before continuing
-    // 
+    //
     while (mNumTicks < 10);
   );
- 
+
   //
   // Install the Timer Architectural Protocol onto a new handle
   //

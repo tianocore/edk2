@@ -1,7 +1,7 @@
 /** @file
   The platform device manager reference implementation
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -43,7 +43,7 @@ EFI_STRING  mSelectedMacAddrString;
 //
 // Which form Id need to be show.
 //
-EFI_FORM_ID      mNextShowFormId = DEVICE_MANAGER_FORM_ID;  
+EFI_FORM_ID      mNextShowFormId = DEVICE_MANAGER_FORM_ID;
 
 //
 // The Mac Address show in the NETWORK_DEVICE_LIST_FORM_ID
@@ -74,7 +74,7 @@ HII_VENDOR_DEVICE_PATH  mDeviceManagerHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -96,7 +96,7 @@ HII_VENDOR_DEVICE_PATH  mDriverHealthHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
       END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
         (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -240,7 +240,7 @@ ExtractDisplayedHiiFormFromHiiHandle (
   UINT8                        ClassGuidNum;
 
   ASSERT (Handle != NULL);
-  ASSERT (SetupClassGuid != NULL);  
+  ASSERT (SetupClassGuid != NULL);
   ASSERT (FormSetTitle != NULL);
   ASSERT (FormSetHelp != NULL);
 
@@ -263,7 +263,7 @@ ExtractDisplayedHiiFormFromHiiHandle (
   // The return status should always be EFI_BUFFER_TOO_SMALL as input buffer's size is 0.
   //
   ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-  
+
   HiiPackageList = AllocatePool (BufferSize);
   ASSERT (HiiPackageList != NULL);
 
@@ -326,7 +326,7 @@ ExtractDisplayedHiiFormFromHiiHandle (
         }
       }
     }
-    
+
     //
     // Go to next package
     //
@@ -341,12 +341,12 @@ ExtractDisplayedHiiFormFromHiiHandle (
 /**
   Get the mac address string from the device path.
   if the device path has the vlan, get the vanid also.
-  
-  @param MacAddressNode              Device path begin with mac address 
+
+  @param MacAddressNode              Device path begin with mac address
   @param PBuffer                     Output string buffer contain mac address.
 
 **/
-BOOLEAN 
+BOOLEAN
 GetMacAddressString(
   IN  MAC_ADDR_DEVICE_PATH   *MacAddressNode,
   OUT CHAR16                 **PBuffer
@@ -382,7 +382,7 @@ GetMacAddressString(
   *PBuffer = String;
   StrCpyS (String, BufferLen / sizeof (CHAR16), L"MAC:");
   String += 4;
-  
+
   //
   // Convert the MAC address into a unicode string.
   //
@@ -400,7 +400,7 @@ GetMacAddressString(
       *String++ = L':';
     }
   }
-  
+
   //
   // If VLAN is configured, it will need extra 5 characters like "\0005".
   // Plus one unicode character for the null-terminator.
@@ -442,7 +442,7 @@ GetMacAddressString(
   @retval  EFI_SUCCESS               Add the item is successful.
   @return  Other values if failed to Add the item.
 **/
-BOOLEAN 
+BOOLEAN
 AddIdToMacDeviceList (
   IN  EFI_STRING        MacAddrString
   )
@@ -488,13 +488,13 @@ AddIdToMacDeviceList (
     } else {
       TempDeviceList = (MENU_INFO_ITEM *)AllocatePool (sizeof (MENU_INFO_ITEM) * mMacDeviceList.MaxListLen);
     }
-    
+
     if (TempDeviceList == NULL) {
       return FALSE;
     }
-    TempDeviceList[mMacDeviceList.CurListLen].PromptId = PromptId;  
+    TempDeviceList[mMacDeviceList.CurListLen].PromptId = PromptId;
     TempDeviceList[mMacDeviceList.CurListLen].QuestionId = (EFI_QUESTION_ID) (mMacDeviceList.CurListLen + NETWORK_DEVICE_LIST_KEY_OFFSET);
-    
+
     mMacDeviceList.NodeList = TempDeviceList;
   }
   mMacDeviceList.CurListLen ++;
@@ -511,9 +511,9 @@ AddIdToMacDeviceList (
 
   @param    *Node           Input device which need to be check.
   @param    *NeedAddItem    Whether need to add the menu in the network device list.
-  
+
   @retval  TRUE             Has mac address device path.
-  @retval  FALSE            NOT Has mac address device path.  
+  @retval  FALSE            NOT Has mac address device path.
 
 **/
 BOOLEAN
@@ -525,7 +525,7 @@ IsMacAddressDevicePath (
   EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
   CHAR16                     *Buffer;
   BOOLEAN                    ReturnVal;
-  
+
   ASSERT (Node != NULL);
   *NeedAddItem = FALSE;
   ReturnVal    = FALSE;
@@ -540,12 +540,12 @@ IsMacAddressDevicePath (
     if ((DevicePathType (DevicePath) == MESSAGING_DEVICE_PATH) &&
        (DevicePathSubType (DevicePath) == MSG_MAC_ADDR_DP)) {
       ReturnVal = TRUE;
-      
+
       if (DEVICE_MANAGER_FORM_ID == mNextShowFormId) {
         *NeedAddItem = TRUE;
         break;
-      } 
-      
+      }
+
       if (!GetMacAddressString((MAC_ADDR_DEVICE_PATH*)DevicePath, &Buffer)) {
         break;
       }
@@ -559,7 +559,7 @@ IsMacAddressDevicePath (
 
       if (NETWORK_DEVICE_LIST_FORM_ID == mNextShowFormId) {
         //
-        // Same handle may has two network child handle, so the questionid 
+        // Same handle may has two network child handle, so the questionid
         // has the offset of SAME_HANDLE_KEY_OFFSET.
         //
         if (AddIdToMacDeviceList (Buffer)) {
@@ -567,7 +567,7 @@ IsMacAddressDevicePath (
         }
         break;
       }
-    } 
+    }
     DevicePath = NextDevicePathNode (DevicePath);
   }
 
@@ -588,7 +588,7 @@ IsMacAddressDevicePath (
   @return  FALSE         Do not need to add the menu about the network.
 
 **/
-BOOLEAN 
+BOOLEAN
 IsNeedAddNetworkMenu (
   IN      EFI_HII_HANDLE      Handle,
   OUT     UINTN               *ItemCount
@@ -596,7 +596,7 @@ IsNeedAddNetworkMenu (
 {
   EFI_STATUS     Status;
   UINTN          EntryCount;
-  UINTN          Index;  
+  UINTN          Index;
   EFI_HANDLE     DriverHandle;
   EFI_HANDLE     ControllerHandle;
   EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
@@ -625,9 +625,9 @@ IsNeedAddNetworkMenu (
   }
   TmpDevicePath = DevicePath;
 
-  // 
+  //
   // Check whether this device path include mac address device path.
-  // If this path has mac address path, get the value whether need 
+  // If this path has mac address path, get the value whether need
   // add this info to the menu and return.
   // Else check more about the child handle devcie path.
   //
@@ -649,7 +649,7 @@ IsNeedAddNetworkMenu (
   }
 
   if (!IsDevicePathEnd (TmpDevicePath)) {
-    return FALSE;    
+    return FALSE;
   }
 
   //
@@ -688,7 +688,7 @@ IsNeedAddNetworkMenu (
         continue;
       }
 
-      // 
+      //
       // Check whether this device path include mac address device path.
       //
       if (!IsMacAddressDevicePath(ChildDevicePath, &IsNeedAdd)) {
@@ -708,7 +708,7 @@ IsNeedAddNetworkMenu (
         } else {
           //
           // If need to update other form, return whether need to add to the menu.
-          //          
+          //
           goto Done;
         }
       }
@@ -717,9 +717,9 @@ IsNeedAddNetworkMenu (
 
 Done:
   if (OpenInfoBuffer != NULL) {
-    FreePool (OpenInfoBuffer);  
+    FreePool (OpenInfoBuffer);
   }
-  return IsNeedAdd; 
+  return IsNeedAdd;
 }
 
 /**
@@ -749,7 +749,7 @@ GetHiiHandleCount (
   @param   HiiHandles              The input HiiHandle array.
   @param   GuidLists               The input form set guid lists.
   @param   ArrayCount              The input array count, new array will be arraycount + 1 size.
-  @param   Offset                  The current used HiiHandle's Offset. 
+  @param   Offset                  The current used HiiHandle's Offset.
   @param   FormSetGuid             The new found formset guid.
 
 **/
@@ -793,7 +793,7 @@ AdjustArrayData (
 
   This function create the dynamic content for device manager. It includes
   section header for all class of devices, one-of opcode to set VBIOS.
-  
+
   @retval  EFI_SUCCESS             Operation is successful.
   @return  Other values if failed to clean up the dynamic content from HII
            database.
@@ -883,7 +883,7 @@ CallDeviceManager (
     NewStringLen += (StrLen(String) + 2) * 2;
     NewStringTitle = AllocatePool (NewStringLen);
     UnicodeSPrint (NewStringTitle, NewStringLen, L"%s %s", String, mSelectedMacAddrString);
-    HiiSetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE), NewStringTitle, NULL);    
+    HiiSetString (HiiHandle, STRING_TOKEN (STR_FORM_NETWORK_DEVICE_TITLE), NewStringTitle, NULL);
     FreePool (String);
     FreePool (NewStringTitle);
   }
@@ -941,9 +941,9 @@ CallDeviceManager (
     }
 
     //
-    // One HiiHandle has more than one formset can be shown, 
+    // One HiiHandle has more than one formset can be shown,
     // Insert a new pair of HiiHandle + Guid to the HiiHandles and GuidLists list.
-    // 
+    //
     if (SkipCount > 0) {
       AdjustArrayData (&HiiHandles, &GuidLists, HandleNum, Index + 1, FormSetGuid);
       HandleNum ++;
@@ -968,7 +968,7 @@ CallDeviceManager (
 
     //
     // Network device process
-    // 
+    //
     if (IsNeedAddNetworkMenu (HiiHandles[Index], &AddItemCount)) {
       if (mNextShowFormId == DEVICE_MANAGER_FORM_ID) {
         //
@@ -1015,7 +1015,7 @@ CallDeviceManager (
       }
     } else {
       //
-      // 
+      //
       // Not network device process, only need to show at device manger form.
       //
       if (mNextShowFormId == DEVICE_MANAGER_FORM_ID) {
@@ -1128,7 +1128,7 @@ CallDeviceManager (
   }
 
   //
-  // Driver Health item chose. 
+  // Driver Health item chose.
   //
   if (gCallbackKey == DEVICE_MANAGER_KEY_DRIVER_HEALTH) {
     CallDriverHealth ();
@@ -1152,7 +1152,7 @@ CallDeviceManager (
   // In this case, go from the network device list to the specify device.
   //
   if ((gCallbackKey < MAX_KEY_SECTION_LEN + NETWORK_DEVICE_LIST_KEY_OFFSET ) && (gCallbackKey >= NETWORK_DEVICE_LIST_KEY_OFFSET)) {
-	  mNextShowFormId = NETWORK_DEVICE_FORM_ID;
+    mNextShowFormId = NETWORK_DEVICE_FORM_ID;
     gCallbackKey = FRONT_PAGE_KEY_DEVICE_MANAGER;
     goto Done;
   }
@@ -1237,10 +1237,10 @@ DriverHealthCallback (
 }
 
 /**
-  Collect and display the platform's driver health relative information, allow user to do interactive 
+  Collect and display the platform's driver health relative information, allow user to do interactive
   operation while the platform is unhealthy.
 
-  This function display a form which divided into two parts. The one list all modules which has installed 
+  This function display a form which divided into two parts. The one list all modules which has installed
   driver health protocol. The list usually contain driver name, controller name, and it's health info.
   While the driver name can't be retrieved, will use device path as backup. The other part of the form provide
   a choice to the user to repair all platform.
@@ -1251,7 +1251,7 @@ CallDriverHealth (
   VOID
   )
 {
-  EFI_STATUS                  Status; 
+  EFI_STATUS                  Status;
   EFI_HII_HANDLE              HiiHandle;
   EFI_BROWSER_ACTION_REQUEST  ActionRequest;
   EFI_IFR_GUID_LABEL          *StartLabel;
@@ -1278,7 +1278,7 @@ CallDriverHealth (
   UINTN                       StringSize;
 
   Index               = 0;
-  DriverHealthInfo    = NULL;  
+  DriverHealthInfo    = NULL;
   DriverDevicePath    = NULL;
   IsControllerNameEmpty = FALSE;
   InitializeListHead (&DriverHealthList);
@@ -1352,8 +1352,8 @@ CallDriverHealth (
 
   Link = GetFirstNode (&DriverHealthList);
 
-  while (!IsNull (&DriverHealthList, Link)) {   
-    DriverHealthInfo = DEVICE_MANAGER_HEALTH_INFO_FROM_LINK (Link);    
+  while (!IsNull (&DriverHealthList, Link)) {
+    DriverHealthInfo = DEVICE_MANAGER_HEALTH_INFO_FROM_LINK (Link);
 
     Status = DriverHealthGetDriverName (DriverHealthInfo->DriverHandle, &DriverName);
     if (EFI_ERROR (Status)) {
@@ -1366,9 +1366,9 @@ CallDriverHealth (
     StringSize = StrSize (DriverName);
 
     Status = DriverHealthGetControllerName (
-               DriverHealthInfo->DriverHandle, 
-               DriverHealthInfo->ControllerHandle, 
-               DriverHealthInfo->ChildHandle, 
+               DriverHealthInfo->DriverHandle,
+               DriverHealthInfo->ControllerHandle,
+               DriverHealthInfo->ChildHandle,
                &ControllerName
                );
 
@@ -1379,24 +1379,24 @@ CallDriverHealth (
     } else {
       IsControllerNameEmpty = TRUE;
     }
-   
+
     //
     // Add the message of the Module itself provided after the string item.
     //
     if ((DriverHealthInfo->MessageList != NULL) && (DriverHealthInfo->MessageList->StringId != 0)) {
        TmpString = HiiGetString (
-                     DriverHealthInfo->MessageList->HiiHandle, 
-                     DriverHealthInfo->MessageList->StringId, 
+                     DriverHealthInfo->MessageList->HiiHandle,
+                     DriverHealthInfo->MessageList->StringId,
                      NULL
                      );
        ASSERT (TmpString != NULL);
-       
+
        StringSize += StrLen (L"    ") * sizeof(CHAR16);
        StringSize += StrLen (TmpString) * sizeof(CHAR16);
 
        String = (EFI_STRING) AllocateZeroPool (StringSize);
        ASSERT (String != NULL);
-       
+
        StrCpyS (String, StringSize / sizeof(CHAR16), DriverName);
        if (!IsControllerNameEmpty) {
         StrCatS (String, StringSize / sizeof(CHAR16), L"    ");
@@ -1436,7 +1436,7 @@ CallDriverHealth (
 
       String = (EFI_STRING) AllocateZeroPool (StringSize);
       ASSERT (String != NULL);
-      
+
       StrCpyS (String, StringSize / sizeof (CHAR16), DriverName);
       if (!IsControllerNameEmpty) {
         StrCatS (String, StringSize / sizeof (CHAR16), L"    ");
@@ -1464,14 +1464,14 @@ CallDriverHealth (
     Index++;
     Link = GetNextNode (&DriverHealthList, Link);
   }
-   
+
   //
   // Add End Opcode for Subtitle
-  // 
+  //
   HiiCreateEndOpCode (StartOpCodeHandle);
 
   HiiCreateSubTitleOpCode (StartOpCodeHandleRepair, STRING_TOKEN (STR_DRIVER_HEALTH_REPAIR_ALL), 0, 0, 1);
-  TokenHelp = HiiSetString (HiiHandle, 0, GetStringById( STRING_TOKEN (STR_DH_REPAIR_ALL_HELP)), NULL);  
+  TokenHelp = HiiSetString (HiiHandle, 0, GetStringById( STRING_TOKEN (STR_DH_REPAIR_ALL_HELP)), NULL);
 
   if (PlaformHealthStatusCheck ()) {
     //
@@ -1541,7 +1541,7 @@ CallDriverHealth (
   // We will have returned from processing a callback - user either hit ESC to exit, or selected
   // a target to display.
   // Process the diver health status states here.
-  // 
+  //
   if (gCallbackKey >= DRIVER_HEALTH_KEY_OFFSET && gCallbackKey != DRIVER_HEALTH_REPAIR_ALL_KEY) {
     ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
 
@@ -1552,7 +1552,7 @@ CallDriverHealth (
       //
       // Got the item relative node in the List
       //
-      if (Index == (gCallbackKey - DRIVER_HEALTH_KEY_OFFSET)) { 
+      if (Index == (gCallbackKey - DRIVER_HEALTH_KEY_OFFSET)) {
         DriverHealthInfo = DEVICE_MANAGER_HEALTH_INFO_FROM_LINK (Link);
         //
         // Process the driver's healthy status for the specify module
@@ -1560,7 +1560,7 @@ CallDriverHealth (
         RebootRequired = FALSE;
         ProcessSingleControllerHealth (
           DriverHealthInfo->DriverHealth,
-          DriverHealthInfo->ControllerHandle,      
+          DriverHealthInfo->ControllerHandle,
           DriverHealthInfo->ChildHandle,
           DriverHealthInfo->HealthStatus,
           &(DriverHealthInfo->MessageList),
@@ -1579,9 +1579,9 @@ CallDriverHealth (
     if (ActionRequest == EFI_BROWSER_ACTION_REQUEST_RESET) {
       EnableResetRequired ();
     }
-    
+
     //
-    // Force return to the form of Driver Health in Device Manager 
+    // Force return to the form of Driver Health in Device Manager
     //
     gCallbackKey = DRIVER_HEALTH_RETURN_KEY;
   }
@@ -1591,12 +1591,12 @@ CallDriverHealth (
   //
   if (gCallbackKey == DRIVER_HEALTH_REPAIR_ALL_KEY) {
     ActionRequest = EFI_BROWSER_ACTION_REQUEST_NONE;
-    
+
     PlatformRepairAll (&DriverHealthList);
 
     gCallbackKey = DRIVER_HEALTH_RETURN_KEY;
   }
-   
+
   //
   // Remove driver health packagelist from HII database.
   //
@@ -1615,13 +1615,13 @@ CallDriverHealth (
     if (DriverHealthInfo->MessageList != NULL) {
       FreePool(DriverHealthInfo->MessageList);
       FreePool (DriverHealthInfo);
-    }   
+    }
   }
 
   HiiFreeOpCodeHandle (StartOpCodeHandle);
-  HiiFreeOpCodeHandle (EndOpCodeHandle); 
+  HiiFreeOpCodeHandle (EndOpCodeHandle);
   HiiFreeOpCodeHandle (StartOpCodeHandleRepair);
-  HiiFreeOpCodeHandle (EndOpCodeHandleRepair); 
+  HiiFreeOpCodeHandle (EndOpCodeHandleRepair);
 
   if (gCallbackKey == DRIVER_HEALTH_RETURN_KEY) {
     //
@@ -1639,11 +1639,11 @@ CallDriverHealth (
   This function called by CheckAllControllersHealthStatus () function in order to process a specify
   contoller's health state.
 
-  @param DriverHealthList   A Pointer to the list contain all of the platform driver health information. 
+  @param DriverHealthList   A Pointer to the list contain all of the platform driver health information.
   @param DriverHandle       The handle of driver.
   @param ControllerHandle   The class guid specifies which form set will be displayed.
-  @param ChildHandle        The handle of the child controller to retrieve the health 
-                            status on.  This is an optional parameter that may be NULL. 
+  @param ChildHandle        The handle of the child controller to retrieve the health
+                            status on.  This is an optional parameter that may be NULL.
   @param DriverHealth       A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
   @param HealthStatus       The health status of the controller.
 
@@ -1740,7 +1740,7 @@ GetSingleControllerHealthStatus (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  DriverHealthInfo->Signature          = DEVICE_MANAGER_DRIVER_HEALTH_INFO_SIGNATURE; 
+  DriverHealthInfo->Signature          = DEVICE_MANAGER_DRIVER_HEALTH_INFO_SIGNATURE;
   DriverHealthInfo->DriverHandle       = DriverHandle;
   DriverHealthInfo->ControllerHandle   = ControllerHandle;
   DriverHealthInfo->ChildHandle        = ChildHandle;
@@ -1755,12 +1755,12 @@ GetSingleControllerHealthStatus (
 }
 
 /**
-  Collects all the EFI Driver Health Protocols currently present in the EFI Handle Database, 
-  and queries each EFI Driver Health Protocol to determine if one or more of the controllers 
-  managed by each EFI Driver Health Protocol instance are not healthy.  
+  Collects all the EFI Driver Health Protocols currently present in the EFI Handle Database,
+  and queries each EFI Driver Health Protocol to determine if one or more of the controllers
+  managed by each EFI Driver Health Protocol instance are not healthy.
 
   @param DriverHealthList   A Pointer to the list contain all of the platform driver health
-                            information. 
+                            information.
 
   @retval    EFI_NOT_FOUND         No controller in the platform install Driver Health Protocol.
   @retval    EFI_SUCCESS           All the controllers in the platform are healthy.
@@ -1772,7 +1772,7 @@ GetAllControllersHealthStatus (
   IN OUT LIST_ENTRY  *DriverHealthList
   )
 {
-  EFI_STATUS                 Status; 
+  EFI_STATUS                 Status;
   UINTN                      NumHandles;
   EFI_HANDLE                 *DriverHealthHandles;
   EFI_DRIVER_HEALTH_PROTOCOL *DriverHealth;
@@ -1782,7 +1782,7 @@ GetAllControllersHealthStatus (
   UINTN                      HandleCount;
   UINTN                      ControllerIndex;
   UINTN                      ChildIndex;
- 
+
   //
   // Initialize local variables
   //
@@ -1810,7 +1810,7 @@ GetAllControllersHealthStatus (
 
   if (EFI_ERROR (Status) || DriverHealthHandles == NULL) {
     //
-    // If the list of Driver Health Protocol handles can not be retrieved, then 
+    // If the list of Driver Health Protocol handles can not be retrieved, then
     // return EFI_OUT_OF_RESOURCES
     //
     return EFI_OUT_OF_RESOURCES;
@@ -1831,7 +1831,7 @@ GetAllControllersHealthStatus (
     //
     // Retrieve the Driver Health Protocol from DriverHandle
     //
-    Status = gBS->HandleProtocol ( 
+    Status = gBS->HandleProtocol (
                     DriverHealthHandles[DriverHealthIndex],
                     &gEfiDriverHealthProtocolGuid,
                     (VOID **)&DriverHealth
@@ -1858,7 +1858,7 @@ GetAllControllersHealthStatus (
     }
 
     //
-    // If all the controllers managed by this Driver Health Protocol are healthy, then skip to the next 
+    // If all the controllers managed by this Driver Health Protocol are healthy, then skip to the next
     // Driver Health Protocol handle
     //
     if (HealthStatus == EfiDriverHealthStatusHealthy) {
@@ -1882,7 +1882,7 @@ GetAllControllersHealthStatus (
         );
       if (EFI_ERROR (Status) || Handles == NULL) {
         //
-        // If all the handles in the handle database can not be retrieved, then 
+        // If all the handles in the handle database can not be retrieved, then
         // return EFI_OUT_OF_RESOURCES
         //
         Status = EFI_OUT_OF_RESOURCES;
@@ -1959,7 +1959,7 @@ Done:
 
 
 /**
-  Check the healthy status of the platform, this function will return immediately while found one driver 
+  Check the healthy status of the platform, this function will return immediately while found one driver
   in the platform are not healthy.
 
   @retval FALSE      at least one driver in the platform are not healthy.
@@ -2002,13 +2002,13 @@ PlaformHealthStatusCheck (
   }
   //
   // Assume all modules are healthy.
-  // 
+  //
   AllHealthy = TRUE;
 
   //
   // Found one or more Handles.
   //
-  if (!EFI_ERROR (Status)) {    
+  if (!EFI_ERROR (Status)) {
     for (Index = 0; Index < NoHandles; Index++) {
       Status = gBS->HandleProtocol (
                       DriverHealthHandles[Index],
@@ -2033,7 +2033,7 @@ PlaformHealthStatusCheck (
            //
            // Return immediately one driver's status not in healthy.
            //
-           return FALSE;         
+           return FALSE;
          }
       }
     }
@@ -2042,20 +2042,20 @@ PlaformHealthStatusCheck (
 }
 
 /**
-  Processes a single controller using the EFI Driver Health Protocol associated with 
+  Processes a single controller using the EFI Driver Health Protocol associated with
   that controller. This algorithm continues to query the GetHealthStatus() service until
-  one of the legal terminal states of the EFI Driver Health Protocol is reached. This may 
+  one of the legal terminal states of the EFI Driver Health Protocol is reached. This may
   require the processing of HII Messages, HII Form, and invocation of repair operations.
 
   @param DriverHealth       A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
   @param ControllerHandle   The class guid specifies which form set will be displayed.
-  @param ChildHandle        The handle of the child controller to retrieve the health 
-                            status on.  This is an optional parameter that may be NULL. 
+  @param ChildHandle        The handle of the child controller to retrieve the health
+                            status on.  This is an optional parameter that may be NULL.
   @param HealthStatus       The health status of the controller.
-  @param MessageList        An array of warning or error messages associated 
-                            with the controller specified by ControllerHandle and 
+  @param MessageList        An array of warning or error messages associated
+                            with the controller specified by ControllerHandle and
                             ChildHandle.  This is an optional parameter that may be NULL.
-  @param FormHiiHandle      The HII handle for an HII form associated with the 
+  @param FormHiiHandle      The HII handle for an HII form associated with the
                             controller specified by ControllerHandle and ChildHandle.
   @param RebootRequired     Indicate whether a reboot is required to repair the controller.
 **/
@@ -2072,11 +2072,11 @@ ProcessSingleControllerHealth (
 {
   EFI_STATUS                         Status;
   EFI_DRIVER_HEALTH_STATUS           LocalHealthStatus;
-  
+
   LocalHealthStatus = HealthStatus;
   //
   // If the module need to be repaired or reconfiguration,  will process it until
-  // reach a terminal status. The status from EfiDriverHealthStatusRepairRequired after repair 
+  // reach a terminal status. The status from EfiDriverHealthStatusRepairRequired after repair
   // will be in (Health, Failed, Configuration Required).
   //
   while(LocalHealthStatus == EfiDriverHealthStatusConfigurationRequired ||
@@ -2091,9 +2091,9 @@ ProcessSingleControllerHealth (
                                );
     }
     //
-    // Via a form of the driver need to do configuration provided to process of status in 
+    // Via a form of the driver need to do configuration provided to process of status in
     // EfiDriverHealthStatusConfigurationRequired. The status after configuration should be in
-    // (Healthy, Reboot Required, Failed, Reconnect Required, Repair Required).   
+    // (Healthy, Reboot Required, Failed, Reconnect Required, Repair Required).
     //
     if (LocalHealthStatus == EfiDriverHealthStatusConfigurationRequired) {
       if (FormHiiHandle != NULL) {
@@ -2127,9 +2127,9 @@ ProcessSingleControllerHealth (
 
     if (*MessageList != NULL) {
       ProcessMessages (*MessageList);
-    }  
+    }
   }
-  
+
   //
   // Health status in {Healthy, Failed} may also have Messages need to process
   //
@@ -2144,7 +2144,7 @@ ProcessSingleControllerHealth (
   if (LocalHealthStatus == EfiDriverHealthStatusRebootRequired) {
     *RebootRequired = TRUE;
   }
-  
+
   //
   // Do reconnect if need.
   //
@@ -2165,11 +2165,11 @@ ProcessSingleControllerHealth (
 /**
   Reports the progress of a repair operation.
 
-  @param[in]  Value             A value between 0 and Limit that identifies the current 
+  @param[in]  Value             A value between 0 and Limit that identifies the current
                                 progress of the repair operation.
 
   @param[in]  Limit             The maximum value of Value for the current repair operation.
-                                For example, a driver that wants to specify progress in 
+                                For example, a driver that wants to specify progress in
                                 percent would use a Limit value of 100.
 
   @retval EFI_SUCCESS           The progress of a repair operation is reported successfully.
@@ -2197,7 +2197,7 @@ RepairNotify (
   Processes a set of messages returned by the GetHealthStatus ()
   service of the EFI Driver Health Protocol
 
-  @param    MessageList  The MessageList point to messages need to processed.  
+  @param    MessageList  The MessageList point to messages need to processed.
 
 **/
 VOID
@@ -2219,9 +2219,9 @@ ProcessMessages (
                         );
     if (MessageString != NULL) {
       //
-      // User can customize the output. Just simply print out the MessageString like below. 
+      // User can customize the output. Just simply print out the MessageString like below.
       // Also can use the HiiHandle to display message on the front page.
-      // 
+      //
       // Print(L"%s\n",MessageString);
       // gBS->Stall (100000);
     }
@@ -2233,7 +2233,7 @@ ProcessMessages (
   Repair the whole platform.
 
   This function is the main entry for user choose "Repair All" in the front page.
-  It will try to do recovery job till all the driver health protocol installed modules 
+  It will try to do recovery job till all the driver health protocol installed modules
   reach a terminal state.
 
   @param DriverHealthList   A Pointer to the list contain all of the platform driver health
@@ -2244,7 +2244,7 @@ VOID
 PlatformRepairAll (
   IN LIST_ENTRY  *DriverHealthList
   )
-{ 
+{
   DRIVER_HEALTH_INFO          *DriverHealthInfo;
   LIST_ENTRY                  *Link;
   BOOLEAN                     RebootRequired;
@@ -2263,7 +2263,7 @@ PlatformRepairAll (
     //
     ASSERT (DriverHealthInfo != NULL);
 
-    ProcessSingleControllerHealth ( 
+    ProcessSingleControllerHealth (
       DriverHealthInfo->DriverHealth,
       DriverHealthInfo->ControllerHandle,
       DriverHealthInfo->ChildHandle,
@@ -2281,22 +2281,22 @@ PlatformRepairAll (
 
 /**
 
-  Select the best matching language according to front page policy for best user experience. 
-  
-  This function supports both ISO 639-2 and RFC 4646 language codes, but language 
-  code types may not be mixed in a single call to this function. 
+  Select the best matching language according to front page policy for best user experience.
+
+  This function supports both ISO 639-2 and RFC 4646 language codes, but language
+  code types may not be mixed in a single call to this function.
 
   @param  SupportedLanguages   A pointer to a Null-terminated ASCII string that
-                               contains a set of language codes in the format 
+                               contains a set of language codes in the format
                                specified by Iso639Language.
   @param  Iso639Language       If TRUE, then all language codes are assumed to be
                                in ISO 639-2 format.  If FALSE, then all language
                                codes are assumed to be in RFC 4646 language format.
 
   @retval NULL                 The best matching language could not be found in SupportedLanguages.
-  @retval NULL                 There are not enough resources available to return the best matching 
+  @retval NULL                 There are not enough resources available to return the best matching
                                language.
-  @retval Other                A pointer to a Null-terminated ASCII string that is the best matching 
+  @retval Other                A pointer to a Null-terminated ASCII string that is the best matching
                                language in SupportedLanguages.
 **/
 CHAR8 *
@@ -2334,7 +2334,7 @@ DriverHealthSelectBestLanguage (
   @param  ProtocolGuid         A pointer to an EFI_GUID. It points to Component Name (2) protocol GUID.
   @param  DriverBindingHandle  The handle on which the Component Name (2) protocol instance is retrieved.
   @param  ComponentName        A pointer to the Component Name (2) protocol interface.
-  @param  SupportedLanguage    The best suitable language that matches the SupportedLangues interface for the 
+  @param  SupportedLanguage    The best suitable language that matches the SupportedLangues interface for the
                                located Component Name (2) instance.
 
   @retval EFI_SUCCESS          The Component Name (2) protocol instance is successfully located and we find
@@ -2411,8 +2411,8 @@ GetDriverNameWorker (
   EFI_COMPONENT_NAME_PROTOCOL    *ComponentName;
 
   //
-  // Retrieve Component Name (2) protocol instance on the driver binding handle and 
-  // find the best language this instance supports. 
+  // Retrieve Component Name (2) protocol instance on the driver binding handle and
+  // find the best language this instance supports.
   //
   Status = GetComponentNameWorker (
              ProtocolGuid,
@@ -2423,7 +2423,7 @@ GetDriverNameWorker (
   if (EFI_ERROR (Status)) {
     return Status;
   }
- 
+
   //
   // Get the driver name from Component Name (2) protocol instance on the driver binging handle.
   //
@@ -2433,7 +2433,7 @@ GetDriverNameWorker (
                             DriverName
                             );
   FreePool (BestLanguage);
- 
+
   return Status;
 }
 
@@ -2442,7 +2442,7 @@ GetDriverNameWorker (
   This function gets driver name from Component Name 2 protocol interface and Component Name protocol interface
   in turn. It first tries UEFI 2.0 Component Name 2 protocol interface and try to get the driver name.
   If the attempt fails, it then gets the driver name from EFI 1.1 Component Name protocol for backward
-  compatibility support. 
+  compatibility support.
 
   @param  DriverBindingHandle  The handle on which the Component Name (2) protocol instance is retrieved.
   @param  DriverName           A pointer to the Unicode string to return. This Unicode string is the name
@@ -2483,7 +2483,7 @@ DriverHealthGetDriverName (
   This function gets controller name from Component Name 2 protocol interface and Component Name protocol interface
   in turn. It first tries UEFI 2.0 Component Name 2 protocol interface and try to get the controller name.
   If the attempt fails, it then gets the controller name from EFI 1.1 Component Name protocol for backward
-  compatibility support. 
+  compatibility support.
 
   @param  ProtocolGuid         A pointer to an EFI_GUID. It points to Component Name (2) protocol GUID.
   @param  DriverBindingHandle  The handle on which the Component Name (2) protocol instance is retrieved.
@@ -2516,8 +2516,8 @@ GetControllerNameWorker (
   EFI_COMPONENT_NAME_PROTOCOL    *ComponentName;
 
   //
-  // Retrieve Component Name (2) protocol instance on the driver binding handle and 
-  // find the best language this instance supports. 
+  // Retrieve Component Name (2) protocol instance on the driver binding handle and
+  // find the best language this instance supports.
   //
   Status = GetComponentNameWorker (
              ProtocolGuid,
@@ -2547,9 +2547,9 @@ GetControllerNameWorker (
 /**
 
   This function gets controller name from Component Name 2 protocol interface and Component Name protocol interface
-  in turn. It first tries UEFI 2.0 Component Name 2 protocol interface and try to get the controller name. 
+  in turn. It first tries UEFI 2.0 Component Name 2 protocol interface and try to get the controller name.
   If the attempt fails, it then gets the controller name from EFI 1.1 Component Name protocol for backward
-  compatibility support. 
+  compatibility support.
 
   @param  DriverBindingHandle  The handle on which the Component Name (2) protocol instance is retrieved.
   @param  ControllerHandle     The handle of a controller that the driver specified by This is managing.

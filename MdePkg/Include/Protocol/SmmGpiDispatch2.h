@@ -2,14 +2,14 @@
   SMM General Purpose Input (GPI) Dispatch2 Protocol as defined in PI 1.1 Specification
   Volume 4 System Management Mode Core Interface.
 
-  This protocol provides the parent dispatch service for the General Purpose Input 
+  This protocol provides the parent dispatch service for the General Purpose Input
   (GPI) SMI source generator.
 
-  The EFI_SMM_GPI_DISPATCH2_PROTOCOL provides the ability to install child handlers for the 
-  given event types.  Several inputs can be enabled.  This purpose of this interface is to generate an 
+  The EFI_SMM_GPI_DISPATCH2_PROTOCOL provides the ability to install child handlers for the
+  given event types.  Several inputs can be enabled.  This purpose of this interface is to generate an
   SMI in response to any of these inputs having a true value provided.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at

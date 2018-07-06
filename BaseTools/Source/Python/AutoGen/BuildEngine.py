@@ -1,7 +1,7 @@
 ## @file
 # The engine for building files
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os
 import re
 import copy
@@ -23,7 +24,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.GlobalData import *
 from Common.BuildToolError import *
 from Common.Misc import tdict, PathClass
-from Common.String import NormPath
+from Common.StringUtils import NormPath
 from Common.DataType import *
 
 import Common.EdkLogger as EdkLogger
@@ -47,21 +48,10 @@ def ListFileMacro(FileType):
     return "%s_LIST" % FileListMacro(FileType)
 
 class TargetDescBlock(object):
-    _Cache_ = {}    # {TargetFile : TargetDescBlock object}
+    def __init__(self, Inputs, Outputs, Commands, Dependencies):
+        self.InitWorker(Inputs, Outputs, Commands, Dependencies)
 
-    # Factory method
-    def __new__(Class, Inputs, Outputs, Commands, Dependencies):
-        if Outputs[0] in Class._Cache_:
-            Tdb = Class._Cache_[Outputs[0]]
-            for File in Inputs:
-                Tdb.AddInput(File)
-        else:
-            Tdb = super(TargetDescBlock, Class).__new__(Class)
-            Tdb._Init(Inputs, Outputs, Commands, Dependencies)
-            #Class._Cache_[Outputs[0]] = Tdb
-        return Tdb
-
-    def _Init(self, Inputs, Outputs, Commands, Dependencies):
+    def InitWorker(self, Inputs, Outputs, Commands, Dependencies):
         self.Inputs = Inputs
         self.Outputs = Outputs
         self.Commands = Commands
@@ -78,7 +68,7 @@ class TargetDescBlock(object):
         return hash(self.Target.Path)
 
     def __eq__(self, Other):
-        if type(Other) == type(self):
+        if isinstance(Other, type(self)):
             return Other.Target.Path == self.Target.Path
         else:
             return str(Other) == self.Target.Path
@@ -89,10 +79,6 @@ class TargetDescBlock(object):
 
     def IsMultipleInput(self):
         return len(self.Inputs) > 1
-
-    @staticmethod
-    def Renew():
-        TargetDescBlock._Cache_ = {}
 
 ## Class for one build rule
 #
@@ -161,7 +147,7 @@ class FileBuildRule:
 
         # Check input files
         self.IsMultipleInput = False
-        self.SourceFileExtList = []
+        self.SourceFileExtList = set()
         for File in Input:
             Base, Ext = os.path.splitext(File)
             if Base.find("*") >= 0:
@@ -172,8 +158,7 @@ class FileBuildRule:
                 # There's no "*" and "?" in file name
                 self.ExtraSourceFileList.append(File)
                 continue
-            if Ext not in self.SourceFileExtList:
-                self.SourceFileExtList.append(Ext)
+            self.SourceFileExtList.add(Ext)
 
         # Check output files
         self.DestFileList = []
@@ -193,16 +178,6 @@ class FileBuildRule:
         DestString = ", ".join(self.DestFileList)
         CommandString = "\n\t".join(self.CommandList)
         return "%s : %s\n\t%s" % (DestString, SourceString, CommandString)
-
-    ## Check if given file extension is supported by this rule
-    #
-    #   @param  FileExt     The extension of a file
-    #
-    #   @retval True        If the extension is supported
-    #   @retval False       If the extension is not supported
-    #
-    def IsSupported(self, FileExt):
-        return FileExt in self.SourceFileExtList
 
     def Instantiate(self, Macros={}):
         NewRuleObject = copy.copy(self)
@@ -289,7 +264,7 @@ class FileBuildRule:
                         # Command line should be regenerated since some macros are different
                         #
                         CommandList = self._BuildCommand(BuildRulePlaceholderDict)
-                        TargetDesc._Init([SourceFile], DstFile, CommandList, self.ExtraSourceFileList)
+                        TargetDesc.InitWorker([SourceFile], DstFile, CommandList, self.ExtraSourceFileList)
                         break
             else:
                 TargetDesc.AddInput(SourceFile)
@@ -346,12 +321,12 @@ class BuildRule:
     def __init__(self, File=None, Content=None, LineIndex=0, SupportedFamily=["MSFT", "INTEL", "GCC", "RVCT"]):
         self.RuleFile = File
         # Read build rules from file if it's not none
-        if File != None:
+        if File is not None:
             try:
                 self.RuleContent = open(File, 'r').readlines()
             except:
                 EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=File)
-        elif Content != None:
+        elif Content is not None:
             self.RuleContent = Content
         else:
             EdkLogger.error("build", PARAMETER_MISSING, ExtraData="No rule file or string given")
@@ -365,8 +340,8 @@ class BuildRule:
         self._State = ""
         self._RuleInfo = tdict(True, 2)     # {toolchain family : {"InputFile": {}, "OutputFile" : [], "Command" : []}}
         self._FileType = ''
-        self._BuildTypeList = []
-        self._ArchList = []
+        self._BuildTypeList = set()
+        self._ArchList = set()
         self._FamilyList = []
         self._TotalToolChainFamilySet = set()
         self._RuleObjectList = [] # FileBuildRule object list
@@ -375,7 +350,7 @@ class BuildRule:
         self.Parse()
 
         # some intrinsic rules
-        self.RuleDatabase[TAB_DEFAULT_BINARY_FILE, "COMMON", "COMMON", "COMMON"] = self._BinaryFileRule
+        self.RuleDatabase[TAB_DEFAULT_BINARY_FILE, TAB_COMMON, TAB_COMMON, TAB_COMMON] = self._BinaryFileRule
         self.FileTypeList.add(TAB_DEFAULT_BINARY_FILE)
 
     ## Parse the build rule strings
@@ -387,8 +362,8 @@ class BuildRule:
             self.RuleContent[Index] = Line
             
             # find the build_rule_version
-            if Line and Line[0] == "#" and Line.find(TAB_BUILD_RULE_VERSION) <> -1:
-                if Line.find("=") <> -1 and Line.find("=") < (len(Line) - 1) and (Line[(Line.find("=") + 1):]).split():
+            if Line and Line[0] == "#" and Line.find(TAB_BUILD_RULE_VERSION) != -1:
+                if Line.find("=") != -1 and Line.find("=") < (len(Line) - 1) and (Line[(Line.find("=") + 1):]).split():
                     self._FileVersion = (Line[(Line.find("=") + 1):]).split()[0]
             # skip empty or comment line
             if Line == "" or Line[0] == "#":
@@ -435,8 +410,8 @@ class BuildRule:
     def EndOfSection(self):
         Database = self.RuleDatabase
         # if there's specific toochain family, 'COMMON' doesn't make sense any more
-        if len(self._TotalToolChainFamilySet) > 1 and 'COMMON' in self._TotalToolChainFamilySet:
-            self._TotalToolChainFamilySet.remove('COMMON')
+        if len(self._TotalToolChainFamilySet) > 1 and TAB_COMMON in self._TotalToolChainFamilySet:
+            self._TotalToolChainFamilySet.remove(TAB_COMMON)
         for Family in self._TotalToolChainFamilySet:
             Input = self._RuleInfo[Family, self._InputFile]
             Output = self._RuleInfo[Family, self._OutputFile]
@@ -456,15 +431,15 @@ class BuildRule:
     #
     def ParseSectionHeader(self, LineIndex):
         self._RuleInfo = tdict(True, 2)
-        self._BuildTypeList = []
-        self._ArchList = []
+        self._BuildTypeList = set()
+        self._ArchList = set()
         self._FamilyList = []
         self._TotalToolChainFamilySet = set()
         FileType = ''
         RuleNameList = self.RuleContent[LineIndex][1:-1].split(',')
         for RuleName in RuleNameList:
-            Arch = 'COMMON'
-            BuildType = 'COMMON'
+            Arch = TAB_COMMON
+            BuildType = TAB_COMMON
             TokenList = [Token.strip().upper() for Token in RuleName.split('.')]
             # old format: Build.File-Type
             if TokenList[0] == "BUILD":
@@ -478,7 +453,7 @@ class BuildRule:
                     EdkLogger.error("build", FORMAT_INVALID, "No file type given",
                                     File=self.RuleFile, Line=LineIndex + 1,
                                     ExtraData=self.RuleContent[LineIndex])
-                if self._FileTypePattern.match(FileType) == None:
+                if self._FileTypePattern.match(FileType) is None:
                     EdkLogger.error("build", FORMAT_INVALID, File=self.RuleFile, Line=LineIndex + 1,
                                     ExtraData="Only character, number (non-first character), '_' and '-' are allowed in file type")
             # new format: File-Type.Build-Type.Arch
@@ -494,17 +469,15 @@ class BuildRule:
                     BuildType = TokenList[1]
                 if len(TokenList) > 2:
                     Arch = TokenList[2]
-            if BuildType not in self._BuildTypeList:
-                self._BuildTypeList.append(BuildType)
-            if Arch not in self._ArchList:
-                self._ArchList.append(Arch)
+            self._BuildTypeList.add(BuildType)
+            self._ArchList.add(Arch)
 
-        if 'COMMON' in self._BuildTypeList and len(self._BuildTypeList) > 1:
+        if TAB_COMMON in self._BuildTypeList and len(self._BuildTypeList) > 1:
             EdkLogger.error("build", FORMAT_INVALID,
                             "Specific build types must not be mixed with common one",
                             File=self.RuleFile, Line=LineIndex + 1,
                             ExtraData=self.RuleContent[LineIndex])
-        if 'COMMON' in self._ArchList and len(self._ArchList) > 1:
+        if TAB_COMMON in self._ArchList and len(self._ArchList) > 1:
             EdkLogger.error("build", FORMAT_INVALID,
                             "Specific ARCH must not be mixed with common one",
                             File=self.RuleFile, Line=LineIndex + 1,
@@ -537,7 +510,7 @@ class BuildRule:
             if len(TokenList) > 1:
                 Family = TokenList[1].strip().upper()
             else:
-                Family = "COMMON"
+                Family = TAB_COMMON
 
             if Family not in FamilyList:
                 FamilyList.append(Family)
@@ -545,7 +518,7 @@ class BuildRule:
         self._FamilyList = FamilyList
         self._TotalToolChainFamilySet.update(FamilyList)
         self._State = SectionType.upper()
-        if 'COMMON' in FamilyList and len(FamilyList) > 1:
+        if TAB_COMMON in FamilyList and len(FamilyList) > 1:
             EdkLogger.error("build", FORMAT_INVALID,
                             "Specific tool chain family should not be mixed with general one",
                             File=self.RuleFile, Line=LineIndex + 1,
@@ -561,7 +534,7 @@ class BuildRule:
         FileList = [File.strip() for File in self.RuleContent[LineIndex].split(",")]
         for ToolChainFamily in self._FamilyList:
             InputFiles = self._RuleInfo[ToolChainFamily, self._State]
-            if InputFiles == None:
+            if InputFiles is None:
                 InputFiles = []
                 self._RuleInfo[ToolChainFamily, self._State] = InputFiles
             InputFiles.extend(FileList)
@@ -573,7 +546,7 @@ class BuildRule:
     def ParseCommon(self, LineIndex):
         for ToolChainFamily in self._FamilyList:
             Items = self._RuleInfo[ToolChainFamily, self._State]
-            if Items == None:
+            if Items is None:
                 Items = []
                 self._RuleInfo[ToolChainFamily, self._State] = Items
             Items.append(self.RuleContent[LineIndex])
@@ -625,19 +598,19 @@ if __name__ == '__main__':
     EdkLogger.Initialize()
     if len(sys.argv) > 1:
         Br = BuildRule(sys.argv[1])
-        print str(Br[".c", "DXE_DRIVER", "IA32", "MSFT"][1])
-        print
-        print str(Br[".c", "DXE_DRIVER", "IA32", "INTEL"][1])
-        print
-        print str(Br[".c", "DXE_DRIVER", "IA32", "GCC"][1])
-        print
-        print str(Br[".ac", "ACPI_TABLE", "IA32", "MSFT"][1])
-        print
-        print str(Br[".h", "ACPI_TABLE", "IA32", "INTEL"][1])
-        print
-        print str(Br[".ac", "ACPI_TABLE", "IA32", "MSFT"][1])
-        print
-        print str(Br[".s", "SEC", "IPF", "COMMON"][1])
-        print
-        print str(Br[".s", "SEC"][1])
+        print(str(Br[".c", SUP_MODULE_DXE_DRIVER, "IA32", "MSFT"][1]))
+        print()
+        print(str(Br[".c", SUP_MODULE_DXE_DRIVER, "IA32", "INTEL"][1]))
+        print()
+        print(str(Br[".c", SUP_MODULE_DXE_DRIVER, "IA32", "GCC"][1]))
+        print()
+        print(str(Br[".ac", "ACPI_TABLE", "IA32", "MSFT"][1]))
+        print()
+        print(str(Br[".h", "ACPI_TABLE", "IA32", "INTEL"][1]))
+        print()
+        print(str(Br[".ac", "ACPI_TABLE", "IA32", "MSFT"][1]))
+        print()
+        print(str(Br[".s", SUP_MODULE_SEC, "IPF", "COMMON"][1]))
+        print()
+        print(str(Br[".s", SUP_MODULE_SEC][1]))
 

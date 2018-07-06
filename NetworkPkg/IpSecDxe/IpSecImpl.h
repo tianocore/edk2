@@ -1,7 +1,7 @@
 /** @file
   The definitions related to IPsec protocol implementation.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -151,11 +151,11 @@ struct _IPSEC_PRIVATE_DATA {
 /**
   This function processes the inbound traffic with IPsec.
 
-  It checks the received packet security property, trims the ESP/AH header, and then 
+  It checks the received packet security property, trims the ESP/AH header, and then
   returns without an IPsec protected IP Header and FragmentTable.
-  
+
   @param[in]      IpVersion          The version of IP.
-  @param[in, out] IpHead             Points to IP header containing the ESP/AH header 
+  @param[in, out] IpHead             Points to IP header containing the ESP/AH header
                                      to be trimed on input, and without ESP/AH header
                                      on return.
   @param[in, out] LastHead           The Last Header in IP header on return.
@@ -281,7 +281,7 @@ IpSecLookupSpdEntry (
   IN     VOID                    *IpHead,
   IN     UINT8                   *IpPayload,
   IN     UINT8                   Protocol,
-  IN     BOOLEAN                 IsOutbound, 
+  IN     BOOLEAN                 IsOutbound,
      OUT EFI_IPSEC_ACTION        *Action
   );
 

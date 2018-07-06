@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -72,7 +72,7 @@ mIp4SupportedIcmp[23] = {
 /**
   Process the ICMP redirect. Find the instance then update
   its route cache.
-  
+
   All kinds of redirect is treated as host redirect as
   specified by RFC1122 3.3.1.2:
   "Since the subnet mask appropriate to the destination
@@ -80,7 +80,7 @@ mIp4SupportedIcmp[23] = {
   message SHOULD be treated identically to a Host Redirect
   message;"
 
-  @param[in]  IpSb               The IP4 service binding instance that received 
+  @param[in]  IpSb               The IP4 service binding instance that received
                                  the packet.
   @param[in]  Head               The IP head of the received ICMPpacket.
   @param[in]  Packet             The content of the ICMP redirect packet with IP
@@ -166,7 +166,7 @@ Ip4ProcessIcmpRedirect (
   @retval EFI_SUCCESS            The ICMP error is processed successfully.
   @retval EFI_INVALID_PARAMETER  The packet is invalid
   @retval Others                 Failed to process the packet.
-  
+
 **/
 EFI_STATUS
 Ip4ProcessIcmpError (

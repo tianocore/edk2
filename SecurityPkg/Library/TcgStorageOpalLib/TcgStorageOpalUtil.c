@@ -1,7 +1,7 @@
 /** @file
   Public API for Opal Core library.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/TcgStorageOpalLib.h>
+#include "TcgStorageOpalLibInternal.h"
 
+#define OPAL_MSID_LENGHT        128
 
 /**
   Creates a session with OPAL_UID_ADMIN_SP as OPAL_ADMIN_SP_PSID_AUTHORITY, then reverts device using Admin SP Revert method.
@@ -35,9 +37,13 @@ OpalUtilPsidRevert(
 {
   UINT8        MethodStatus;
   TCG_RESULT   Ret;
+  UINT32       RemovalTimeOut;
 
   NULL_CHECK(Session);
   NULL_CHECK(Psid);
+
+  RemovalTimeOut = GetRevertTimeOut (Session);
+  DEBUG ((DEBUG_INFO, "OpalUtilPsidRevert: Timeout value = %d\n", RemovalTimeOut));
 
   Ret = OpalStartSession(
                       Session,
@@ -48,7 +54,7 @@ OpalUtilPsidRevert(
                       OPAL_ADMIN_SP_PSID_AUTHORITY,
                       &MethodStatus);
   if (Ret == TcgResultSuccess && MethodStatus == TCG_METHOD_STATUS_CODE_SUCCESS) {
-    Ret = OpalPsidRevert(Session);
+    Ret = OpalPyrite2PsidRevert(Session, RemovalTimeOut);
     if (Ret != TcgResultSuccess) {
       //
       // If revert was successful, session was already ended by TPer, so only end session on failure
@@ -599,11 +605,15 @@ OpalUtilRevert(
 {
   UINT8        MethodStatus;
   TCG_RESULT   Ret;
+  UINT32       RemovalTimeOut;
 
   NULL_CHECK(Session);
   NULL_CHECK(Msid);
   NULL_CHECK(Password);
   NULL_CHECK(PasswordFailed);
+
+  RemovalTimeOut = GetRevertTimeOut (Session);
+  DEBUG ((DEBUG_INFO, "OpalUtilRevert: Timeout value = %d\n", RemovalTimeOut));
 
   Ret = OpalStartSession(
                    Session,
@@ -625,7 +635,7 @@ OpalUtilRevert(
   //
   // Try to revert with admin1
   //
-  Ret = OpalAdminRevert(Session, KeepUserData, &MethodStatus);
+  Ret = OpalPyrite2AdminRevert(Session, KeepUserData, &MethodStatus, RemovalTimeOut);
   if (Ret != TcgResultSuccess || MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
     //
     // Device ends the session on successful revert, so only call OpalEndSession when fail.
@@ -912,3 +922,201 @@ OpalUtilAdminPasswordExists(
   return (OwnerShip == OpalOwnershipUnknown && LockingFeature->LockingEnabled);
 }
 
+/**
+  Get Active Data Removal Mechanism Value.
+
+  @param[in]      Session                        The session info for one opal device.
+  @param[in]      GeneratedSid                   Generated SID of disk
+  @param[in]      SidLength                      Length of generatedSid in bytes
+  @param[out]     ActiveDataRemovalMechanism     Return the active data removal mechanism.
+
+**/
+TCG_RESULT
+EFIAPI
+OpalUtilGetActiveDataRemovalMechanism (
+  OPAL_SESSION      *Session,
+  const VOID        *GeneratedSid,
+  UINT32            SidLength,
+  UINT8             *ActiveDataRemovalMechanism
+  )
+{
+  TCG_RESULT   Ret;
+  UINT8        MethodStatus;
+
+  NULL_CHECK(Session);
+  NULL_CHECK(GeneratedSid);
+  NULL_CHECK(ActiveDataRemovalMechanism);
+
+  Ret = OpalStartSession(
+                    Session,
+                    OPAL_UID_ADMIN_SP,
+                    TRUE,
+                    SidLength,
+                    GeneratedSid,
+                    OPAL_ADMIN_SP_ANYBODY_AUTHORITY,
+                    &MethodStatus
+                    );
+  if (Ret != TcgResultSuccess || MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
+    DEBUG ((DEBUG_INFO, "Start session with admin SP as SID authority failed: Ret=%d MethodStatus=%u\n", Ret, MethodStatus));
+    if (MethodStatus != TCG_METHOD_STATUS_CODE_SUCCESS) {
+      Ret = TcgResultFailure;
+    }
+    return Ret;
+  }
+
+  Ret = OpalPyrite2GetActiveDataRemovalMechanism (
+                    Session,
+                    ActiveDataRemovalMechanism
+                    );
+
+  if (Ret != TcgResultSuccess) {
+    DEBUG ((DEBUG_INFO, "Pyrite2 Get Active Data Removal Mechanism failed: Ret=%d\n", Ret));
+  }
+
+  OpalEndSession(Session);
+
+  return Ret;
+}
+
+/**
+  Calculate the estimated time.
+
+  @param[in]      IsMinute               Whether the input time value is minute type or second type.
+  @param[in]      Time                   The input time value.
+
+**/
+UINT32
+CalculateDataRemovalTime (
+  IN BOOLEAN               IsMinute,
+  IN UINT16                Time
+  )
+{
+  if (IsMinute) {
+    return Time * 2 * 60;
+  } else {
+    return Time * 2;
+  }
+}
+
+/**
+  Return the estimated time for specific type.
+
+  @param[in]      Index               The input data removal type.
+  @param[in]      Descriptor          DATA_REMOVAL_FEATURE_DESCRIPTOR
+
+**/
+UINT32
+GetDataRemovalTime (
+  IN  UINT8                            Index,
+  IN  DATA_REMOVAL_FEATURE_DESCRIPTOR  *Descriptor
+  )
+{
+  switch (Index) {
+  case OverwriteDataErase:
+    return CalculateDataRemovalTime (Descriptor->FormatBit0, SwapBytes16 (Descriptor->TimeBit0));
+
+  case BlockErase:
+    return CalculateDataRemovalTime (Descriptor->FormatBit1, SwapBytes16 (Descriptor->TimeBit1));
+
+  case CryptoErase:
+    return CalculateDataRemovalTime (Descriptor->FormatBit2, SwapBytes16 (Descriptor->TimeBit2));
+
+  case Unmap:
+    return CalculateDataRemovalTime (Descriptor->FormatBit3, SwapBytes16 (Descriptor->TimeBit3));
+
+  case ResetWritePointers:
+    return CalculateDataRemovalTime (Descriptor->FormatBit4, SwapBytes16 (Descriptor->TimeBit4));
+
+  case VendorSpecificErase:
+    return CalculateDataRemovalTime (Descriptor->FormatBit5, SwapBytes16 (Descriptor->TimeBit5));
+
+  default:
+    return 0;
+  }
+}
+
+/**
+  Get the supported Data Removal Mechanism list.
+
+  @param[in]      Session                        The session info for one opal device.
+  @param[out]     RemovalMechanismLists          Return the supported data removal mechanism lists.
+
+**/
+TCG_RESULT
+EFIAPI
+OpalUtilGetDataRemovalMechanismLists (
+  IN  OPAL_SESSION      *Session,
+  OUT UINT32            *RemovalMechanismLists
+  )
+{
+  TCG_RESULT                       Ret;
+  UINTN                            DataSize;
+  DATA_REMOVAL_FEATURE_DESCRIPTOR  Descriptor;
+  UINT8                            Index;
+  UINT8                            BitValue;
+
+  NULL_CHECK(Session);
+  NULL_CHECK(RemovalMechanismLists);
+
+  DataSize = sizeof (Descriptor);
+  Ret = OpalGetFeatureDescriptor (Session, TCG_FEATURE_DATA_REMOVAL, &DataSize, &Descriptor);
+  if (Ret != TcgResultSuccess) {
+    return TcgResultFailure;
+  }
+
+  ASSERT (Descriptor.RemovalMechanism != 0);
+
+  for (Index = 0; Index < ResearvedMechanism; Index ++) {
+    BitValue = (BOOLEAN) BitFieldRead8 (Descriptor.RemovalMechanism, Index, Index);
+
+    if (BitValue == 0) {
+      RemovalMechanismLists[Index] = 0;
+    } else {
+      RemovalMechanismLists[Index] = GetDataRemovalTime (Index, &Descriptor);
+    }
+  }
+
+  return TcgResultSuccess;
+}
+
+/**
+  Get revert timeout value.
+
+  @param[in]      Session                       The session info for one opal device.
+
+**/
+UINT32
+GetRevertTimeOut (
+  IN OPAL_SESSION                *Session
+  )
+{
+  TCG_RESULT                   TcgResult;
+  OPAL_DISK_SUPPORT_ATTRIBUTE  SupportedAttributes;
+  UINT16                       BaseComId;
+  UINT32                       MsidLength;
+  UINT8                        Msid[OPAL_MSID_LENGHT];
+  UINT32                       RemovalMechanishLists[ResearvedMechanism];
+  UINT8                        ActiveDataRemovalMechanism;
+
+  TcgResult = OpalGetSupportedAttributesInfo (Session, &SupportedAttributes, &BaseComId);
+  if (TcgResult != TcgResultSuccess || SupportedAttributes.DataRemoval == 0) {
+    return 0;
+  }
+
+  TcgResult = OpalUtilGetMsid (Session, Msid, OPAL_MSID_LENGHT, &MsidLength);
+  if (TcgResult != TcgResultSuccess) {
+    return 0;
+  }
+
+  TcgResult = OpalUtilGetDataRemovalMechanismLists (Session, RemovalMechanishLists);
+  if (TcgResult != TcgResultSuccess) {
+    return 0;
+  }
+
+  TcgResult = OpalUtilGetActiveDataRemovalMechanism (Session, Msid, MsidLength, &ActiveDataRemovalMechanism);
+  if (TcgResult != TcgResultSuccess) {
+    return 0;
+  }
+
+  return RemovalMechanishLists[ActiveDataRemovalMechanism];
+}

@@ -2,7 +2,7 @@
   Dhcp and Discover routines for PxeBc.
 
 Copyright (c) 2013, Red Hat, Inc.
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -258,7 +258,7 @@ typedef struct {
   This function initialize the DHCP4 message instance.
 
   This function will pad each item of dhcp4 message packet.
-  
+
   @param  Seed    Pointer to the message instance of the DHCP4 packet.
   @param  Udp4    Pointer to the EFI_UDP4_PROTOCOL instance.
 
@@ -304,7 +304,7 @@ PxeBcCheckSelectedOffer (
 
 /**
   Callback routine.
-  
+
   EFI_DHCP4_CALLBACK is provided by the consumer of the EFI DHCPv4 Protocol driver
   to intercept events that occurred in the configuration process. This structure
   provides advanced control of each state transition of the DHCP process. The
@@ -352,7 +352,7 @@ PxeBcDhcpCallBack (
 
 **/
 EFI_STATUS
-PxeBcSetIp4Policy (   
+PxeBcSetIp4Policy (
   IN PXEBC_PRIVATE_DATA            *Private
   );
 
@@ -363,8 +363,8 @@ PxeBcSetIp4Policy (
   @param  Type                  PxeBc option boot item type
   @param  Layer                 PxeBc option boot item layer
   @param  UseBis                Use BIS or not
-  @param  DestIp                Ip address for server      
-  @param  IpCount               The total count of the server ip address    
+  @param  DestIp                Ip address for server
+  @param  IpCount               The total count of the server ip address
   @param  SrvList               Server list
   @param  IsDiscv               Discover the vendor or not
   @param  Reply                 The dhcp4 packet of Pxe reply
@@ -372,8 +372,8 @@ PxeBcSetIp4Policy (
   @retval EFI_SUCCESS           Operation succeeds.
   @retval EFI_OUT_OF_RESOURCES  Allocate memory pool failed.
   @retval EFI_NOT_FOUND         There is no vendor option exists.
-  @retval EFI_TIMEOUT           Send Pxe Discover time out. 
-  
+  @retval EFI_TIMEOUT           Send Pxe Discover time out.
+
 **/
 EFI_STATUS
 PxeBcDiscvBootService (
@@ -394,8 +394,8 @@ PxeBcDiscvBootService (
 
   @param  Private          Pointer to PxeBc private data.
   @param  OptList          Pointer to a DHCP option list.
-                           
-  @param  IsDhcpDiscover   Discover dhcp option or not.     
+
+  @param  IsDhcpDiscover   Discover dhcp option or not.
 
   @return The index item number of the option list.
 
@@ -413,7 +413,7 @@ PxeBcBuildDhcpOptions (
 
   @param  OptList    Pointer to the list of the options
   @param  Type       the type of option
-  @param  Layer      the layer of the boot options 
+  @param  Layer      the layer of the boot options
   @param  OptLen     length of opotion
 
 **/
@@ -433,7 +433,7 @@ PxeBcCreateBootOptions (
   @param  Length     The length of the dhcp options.
   @param  OptTag     The option OpCode.
 
-  @return NULL if the buffer length is 0 and OpCode is not 
+  @return NULL if the buffer length is 0 and OpCode is not
           DHCP4_TAG_EOP, or the pointer to the buffer.
 
 **/
@@ -467,11 +467,11 @@ PxeBcParseVendorOptions (
   @param  Private              Pointer to PxeBc private data.
 
   @retval EFI_SUCCESS          Select boot prompt done.
-  @retval EFI_TIMEOUT          Select boot prompt time out. 
+  @retval EFI_TIMEOUT          Select boot prompt time out.
   @retval EFI_NOT_FOUND        The proxy offer is not Pxe10.
   @retval EFI_ABORTED          User cancel the operation.
   @retval EFI_NOT_READY        Read the input key from the keybroad has not finish.
-  
+
 **/
 EFI_STATUS
 PxeBcSelectBootPrompt (
@@ -485,10 +485,10 @@ PxeBcSelectBootPrompt (
   @param  Private         Pointer to PxeBc private data.
   @param  Type            The type of the menu.
   @param  UseDefaultItem  Use default item or not.
-  
+
   @retval EFI_ABORTED     User cancel operation.
   @retval EFI_SUCCESS     Select the boot menu success.
-  @retval EFI_NOT_READY   Read the input key from the keybroad has not finish.    
+  @retval EFI_NOT_READY   Read the input key from the keybroad has not finish.
 
 **/
 EFI_STATUS

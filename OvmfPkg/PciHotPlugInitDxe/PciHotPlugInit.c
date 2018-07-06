@@ -14,6 +14,7 @@
 **/
 
 #include <IndustryStandard/Acpi10.h>
+#include <IndustryStandard/Q35MchIch9.h>
 #include <IndustryStandard/QemuPciBridgeCapabilities.h>
 
 #include <Library/BaseLib.h>
@@ -21,11 +22,19 @@
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PciCapLib.h>
+#include <Library/PciCapPciSegmentLib.h>
 #include <Library/PciLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <Protocol/PciHotPlugInit.h>
 #include <Protocol/PciRootBridgeIo.h>
+
+//
+// TRUE if the PCI platform supports extended config space, FALSE otherwise.
+//
+STATIC BOOLEAN mPciExtConfSpaceSupported;
+
 
 //
 // The protocol interface this driver produces.
@@ -249,90 +258,10 @@ HighBitSetRoundUp64 (
 
 
 /**
-  Read a slice from conventional PCI config space at the given offset, then
-  advance the offset.
-
-  @param[in] PciAddress  The address of the PCI Device -- Bus, Device, Function
-                         -- in UEFI (not PciLib) encoding.
-
-  @param[in,out] Offset  On input, the offset in conventional PCI config space
-                         to start reading from. On output, the offset of the
-                         first byte that was not read.
-
-  @param[in] Size        The number of bytes to read.
-
-  @param[out] Buffer     On output, the bytes read from PCI config space are
-                         stored in this object.
-**/
-STATIC
-VOID
-ReadConfigSpace (
-  IN     CONST EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS *PciAddress,
-  IN OUT UINT8                                             *Offset,
-  IN     UINT8                                             Size,
-  OUT    VOID                                              *Buffer
-  )
-{
-  PciReadBuffer (
-    PCI_LIB_ADDRESS (
-      PciAddress->Bus,
-      PciAddress->Device,
-      PciAddress->Function,
-      *Offset
-      ),
-    Size,
-    Buffer
-    );
-  *Offset += Size;
-}
-
-
-/**
-  Convenience wrapper macro for ReadConfigSpace().
-
-  Given the following conditions:
-
-  - HeaderField is the first field in the structure pointed-to by Struct,
-
-  - Struct->HeaderField has been populated from the conventional PCI config
-    space of the PCI device identified by PciAddress,
-
-  - *Offset points one past HeaderField in the conventional PCI config space of
-    the PCI device identified by PciAddress,
-
-  populate the rest of *Struct from conventional PCI config space, starting at
-  *Offset. Finally, increment *Offset so that it point one past *Struct.
-
-  @param[in] PciAddress  The address of the PCI Device -- Bus, Device, Function
-                         -- in UEFI (not PciLib) encoding. Type: pointer to
-                         CONST EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS.
-
-  @param[in,out] Offset  On input, the offset in conventional PCI config space
-                         to start reading from; one past Struct->HeaderField.
-                         On output, the offset of the first byte that was not
-                         read; one past *Struct. Type: pointer to UINT8.
-
-  @param[out] Struct     The structure to complete. Type: pointer to structure
-                         object.
-
-  @param[in] HeaderField The name of the first field in *Struct, after which
-                         *Struct should be populated. Type: structure member
-                         identifier.
-**/
-#define COMPLETE_CONFIG_SPACE_STRUCT(PciAddress, Offset, Struct, HeaderField) \
-          ReadConfigSpace (                                                   \
-            (PciAddress),                                                     \
-            (Offset),                                                         \
-            (UINT8)(sizeof *(Struct) - sizeof ((Struct)->HeaderField)),       \
-            &((Struct)->HeaderField) + 1                                      \
-            )
-
-
-/**
   Look up the QEMU-specific Resource Reservation capability in the conventional
   config space of a Hotplug Controller (that is, PCI Bridge).
 
-  This function performs as few config space reads as possible.
+  On error, the contents of ReservationHint are indeterminate.
 
   @param[in] HpcPciAddress     The address of the PCI Bridge -- Bus, Device,
                                Function -- in UEFI (not PciLib) encoding.
@@ -343,8 +272,9 @@ ReadConfigSpace (
   @retval EFI_SUCCESS    The capability has been found, ReservationHint has
                          been populated.
 
-  @retval EFI_NOT_FOUND  The capability is missing. The contents of
-                         ReservationHint are now indeterminate.
+  @retval EFI_NOT_FOUND  The capability is missing.
+
+  @return                Error codes from PciCapPciSegmentLib and PciCapLib.
 **/
 STATIC
 EFI_STATUS
@@ -353,10 +283,12 @@ QueryReservationHint (
   OUT QEMU_PCI_BRIDGE_CAPABILITY_RESOURCE_RESERVATION   *ReservationHint
 )
 {
-  UINT16 PciVendorId;
-  UINT16 PciStatus;
-  UINT8  PciCapPtr;
-  UINT8  Offset;
+  UINT16       PciVendorId;
+  EFI_STATUS   Status;
+  PCI_CAP_DEV  *PciDevice;
+  PCI_CAP_LIST *CapList;
+  UINT16       VendorInstance;
+  PCI_CAP      *VendorCap;
 
   //
   // Check the vendor identifier.
@@ -374,108 +306,101 @@ QueryReservationHint (
   }
 
   //
-  // Check the Capabilities List bit in the PCI Status Register.
+  // Parse the capabilities lists.
   //
-  PciStatus = PciRead16 (
-                PCI_LIB_ADDRESS (
-                  HpcPciAddress->Bus,
-                  HpcPciAddress->Device,
-                  HpcPciAddress->Function,
-                  PCI_PRIMARY_STATUS_OFFSET
-                  )
-                );
-  if ((PciStatus & EFI_PCI_STATUS_CAPABILITY) == 0) {
-    return EFI_NOT_FOUND;
+  Status = PciCapPciSegmentDeviceInit (
+             mPciExtConfSpaceSupported ? PciCapExtended : PciCapNormal,
+             0, // Segment
+             HpcPciAddress->Bus,
+             HpcPciAddress->Device,
+             HpcPciAddress->Function,
+             &PciDevice
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = PciCapListInit (PciDevice, &CapList);
+  if (EFI_ERROR (Status)) {
+    goto UninitPciDevice;
   }
 
   //
-  // Fetch the start of the Capabilities List.
+  // Scan the vendor capability instances for the Resource Reservation
+  // capability.
   //
-  PciCapPtr = PciRead8 (
-                PCI_LIB_ADDRESS (
-                  HpcPciAddress->Bus,
-                  HpcPciAddress->Device,
-                  HpcPciAddress->Function,
-                  PCI_CAPBILITY_POINTER_OFFSET
-                  )
-                );
+  VendorInstance = 0;
+  for (;;) {
+    UINT8 VendorLength;
+    UINT8 BridgeCapType;
 
-  //
-  // Scan the Capabilities List until we find the terminator element, or the
-  // Resource Reservation capability.
-  //
-  for (Offset = PciCapPtr & 0xFC;
-       Offset > 0;
-       Offset = ReservationHint->BridgeHdr.VendorHdr.Hdr.NextItemPtr & 0xFC) {
-    BOOLEAN EnoughRoom;
-
-    //
-    // Check if the Resource Reservation capability would fit into config space
-    // at this offset.
-    //
-    EnoughRoom = (BOOLEAN)(
-                   Offset <= PCI_MAX_CONFIG_OFFSET - sizeof *ReservationHint
-                   );
+    Status = PciCapListFindCap (
+               CapList,
+               PciCapNormal,
+               EFI_PCI_CAPABILITY_ID_VENDOR,
+               VendorInstance++,
+               &VendorCap
+               );
+    if (EFI_ERROR (Status)) {
+      goto UninitCapList;
+    }
 
     //
-    // Read the standard capability header so we can check the capability ID
-    // (if necessary) and advance to the next capability.
+    // Check the vendor capability length.
     //
-    ReadConfigSpace (
-      HpcPciAddress,
-      &Offset,
-      (UINT8)sizeof ReservationHint->BridgeHdr.VendorHdr.Hdr,
-      &ReservationHint->BridgeHdr.VendorHdr.Hdr
-      );
-    if (!EnoughRoom ||
-        (ReservationHint->BridgeHdr.VendorHdr.Hdr.CapabilityID !=
-         EFI_PCI_CAPABILITY_ID_VENDOR)) {
+    Status = PciCapRead (
+               PciDevice,
+               VendorCap,
+               OFFSET_OF (EFI_PCI_CAPABILITY_VENDOR_HDR, Length),
+               &VendorLength,
+               sizeof VendorLength
+               );
+    if (EFI_ERROR (Status)) {
+      goto UninitCapList;
+    }
+    if (VendorLength != sizeof *ReservationHint) {
       continue;
     }
 
     //
-    // Read the rest of the vendor capability header so we can check the
-    // capability length.
+    // Check the vendor bridge capability type.
     //
-    COMPLETE_CONFIG_SPACE_STRUCT (
-      HpcPciAddress,
-      &Offset,
-      &ReservationHint->BridgeHdr.VendorHdr,
-      Hdr
-      );
-    if (ReservationHint->BridgeHdr.VendorHdr.Length !=
-        sizeof *ReservationHint) {
-      continue;
+    Status = PciCapRead (
+               PciDevice,
+               VendorCap,
+               OFFSET_OF (QEMU_PCI_BRIDGE_CAPABILITY_HDR, Type),
+               &BridgeCapType,
+               sizeof BridgeCapType
+               );
+    if (EFI_ERROR (Status)) {
+      goto UninitCapList;
     }
-
-    //
-    // Read the rest of the QEMU bridge capability header so we can check the
-    // capability type.
-    //
-    COMPLETE_CONFIG_SPACE_STRUCT (
-      HpcPciAddress,
-      &Offset,
-      &ReservationHint->BridgeHdr,
-      VendorHdr
-      );
-    if (ReservationHint->BridgeHdr.Type !=
+    if (BridgeCapType ==
         QEMU_PCI_BRIDGE_CAPABILITY_TYPE_RESOURCE_RESERVATION) {
-      continue;
+      //
+      // We have a match.
+      //
+      break;
     }
-
-    //
-    // Read the body of the reservation hint.
-    //
-    COMPLETE_CONFIG_SPACE_STRUCT (
-      HpcPciAddress,
-      &Offset,
-      ReservationHint,
-      BridgeHdr
-      );
-    return EFI_SUCCESS;
   }
 
-  return EFI_NOT_FOUND;
+  //
+  // Populate ReservationHint.
+  //
+  Status = PciCapRead (
+             PciDevice,
+             VendorCap,
+             0, // SourceOffsetInCap
+             ReservationHint,
+             sizeof *ReservationHint
+             );
+
+UninitCapList:
+  PciCapListUninit (CapList);
+
+UninitPciDevice:
+  PciCapPciSegmentDeviceUninit (PciDevice);
+
+  return Status;
 }
 
 
@@ -870,6 +795,8 @@ DriverInitialize (
 {
   EFI_STATUS Status;
 
+  mPciExtConfSpaceSupported = (PcdGet16 (PcdOvmfHostBridgePciDevId) ==
+                               INTEL_Q35_MCH_DEVICE_ID);
   mPciHotPlugInit.GetRootHpcList = GetRootHpcList;
   mPciHotPlugInit.InitializeRootHpc = InitializeRootHpc;
   mPciHotPlugInit.GetResourcePadding = GetResourcePadding;

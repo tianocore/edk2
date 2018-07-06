@@ -1,7 +1,7 @@
 /** @file
   Language settings
 
-Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -343,7 +343,7 @@ IsLangInSupportedLangCodes(
   IN  CHAR8            *SupportedLang,
   IN  CHAR8            *Lang,
   IN  BOOLEAN          Iso639Language
-  ) 
+  )
 {
   UINTN    Index;
   UINTN    CompareLength;
@@ -375,8 +375,8 @@ IsLangInSupportedLangCodes(
       // Determine the length of the next language code in SupportedLang
       //
       for (CompareLength = 0; SupportedLang[CompareLength] != '\0' && SupportedLang[CompareLength] != ';'; CompareLength++);
-      
-      if ((CompareLength == LanguageLength) && 
+
+      if ((CompareLength == LanguageLength) &&
           (AsciiStrnCmp (Lang, SupportedLang, CompareLength) == 0)) {
         //
         // Successfully find the Lang string in SupportedLang string.
@@ -404,7 +404,7 @@ VOID
 InitializeLangVariable (
   IN CHAR16     *LangName,
   IN CHAR8      *SupportedLang,
-  IN CHAR8      *DefaultLang,     
+  IN CHAR8      *DefaultLang,
   IN BOOLEAN    Iso639Language
   )
 {

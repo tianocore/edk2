@@ -330,6 +330,7 @@ SortApicId (
   CPU_INFO_IN_HOB   CpuInfo;
   UINT32            ApCount;
   CPU_INFO_IN_HOB   *CpuInfoInHob;
+  volatile UINT32   *StartupApSignal;
 
   ApCount = CpuMpData->CpuCount - 1;
   CpuInfoInHob = (CPU_INFO_IN_HOB *) (UINTN) CpuMpData->CpuInfoInHob;
@@ -354,6 +355,14 @@ SortApicId (
           sizeof (CPU_INFO_IN_HOB)
           );
         CopyMem (&CpuInfoInHob[Index1], &CpuInfo, sizeof (CPU_INFO_IN_HOB));
+
+        //
+        // Also exchange the StartupApSignal.
+        //
+        StartupApSignal = CpuMpData->CpuData[Index3].StartupApSignal;
+        CpuMpData->CpuData[Index3].StartupApSignal =
+          CpuMpData->CpuData[Index1].StartupApSignal;
+        CpuMpData->CpuData[Index1].StartupApSignal = StartupApSignal;
       }
     }
 
@@ -630,6 +639,13 @@ ApWakeupFunction (
         // Restore AP's volatile registers saved
         //
         RestoreVolatileRegisters (&CpuMpData->CpuData[ProcessorNumber].VolatileRegisters, TRUE);
+      } else {
+        //
+        // The CPU driver might not flush TLB for APs on spot after updating
+        // page attributes. AP in mwait loop mode needs to take care of it when
+        // woken up.
+        //
+        CpuFlushTlb ();
       }
 
       if (GetApState (&CpuMpData->CpuData[ProcessorNumber]) == CpuStateReady) {
@@ -639,7 +655,7 @@ ApWakeupFunction (
           SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateBusy);
           //
           // Enable source debugging on AP function
-          //         
+          //
           EnableDebugAgent ();
           //
           // Invoke AP function here
@@ -834,14 +850,15 @@ FillExchangeInfoData (
       );
 
     ExchangeInfo->ModeTransitionMemory = (UINT32)CpuMpData->WakeupBufferHigh;
-    ExchangeInfo->ModeHighMemory = (UINT32)CpuMpData->WakeupBufferHigh +
-                                   (UINT32)ExchangeInfo->ModeOffset -
-                                   (UINT32)CpuMpData->AddressMap.ModeTransitionOffset;
-    ExchangeInfo->ModeHighSegment = (UINT16)ExchangeInfo->CodeSegment;
   } else {
     ExchangeInfo->ModeTransitionMemory = (UINT32)
       (ExchangeInfo->BufferStart + CpuMpData->AddressMap.ModeTransitionOffset);
   }
+
+  ExchangeInfo->ModeHighMemory = ExchangeInfo->ModeTransitionMemory +
+                         (UINT32)ExchangeInfo->ModeOffset -
+                         (UINT32)CpuMpData->AddressMap.ModeTransitionOffset;
+  ExchangeInfo->ModeHighSegment = (UINT16)ExchangeInfo->CodeSegment;
 }
 
 /**
@@ -1098,7 +1115,7 @@ CalculateTimeout (
 
   //
   // GetPerformanceCounterProperties () returns the timestamp counter's frequency
-  // in Hz. 
+  // in Hz.
   //
   TimestampCounterFreq = GetPerformanceCounterProperties (NULL, NULL);
 
@@ -1720,7 +1737,7 @@ MpInitLibGetProcessorInfo (
                                enabled AP. Otherwise, it will be disabled.
 
   @retval EFI_SUCCESS          BSP successfully switched.
-  @retval others               Failed to switch BSP. 
+  @retval others               Failed to switch BSP.
 
 **/
 EFI_STATUS

@@ -36,14 +36,14 @@ import Logger.Log as Logger
 def CreateXmlElement(Name, String, NodeList, AttributeList):
     Doc = xml.dom.minidom.Document()
     Element = Doc.createElement(Name)
-    if String != '' and String != None:
+    if String != '' and String is not None:
         Element.appendChild(Doc.createTextNode(String))
 
     for Item in NodeList:
-        if type(Item) == type([]):
+        if isinstance(Item, type([])):
             Key = Item[0]
             Value = Item[1]
-            if Key != '' and Key != None and Value != '' and Value != None:
+            if Key != '' and Key is not None and Value != '' and Value is not None:
                 Node = Doc.createElement(Key)
                 Node.appendChild(Doc.createTextNode(Value))
                 Element.appendChild(Node)
@@ -52,7 +52,7 @@ def CreateXmlElement(Name, String, NodeList, AttributeList):
     for Item in AttributeList:
         Key = Item[0]
         Value = Item[1]
-        if Key != '' and Key != None and Value != '' and Value != None:
+        if Key != '' and Key is not None and Value != '' and Value is not None:
             Element.setAttribute(Key, Value)
 
     return Element
@@ -66,7 +66,7 @@ def CreateXmlElement(Name, String, NodeList, AttributeList):
 # @param  String             A XPath style path.
 #
 def XmlList(Dom, String):
-    if String == None or String == "" or Dom == None or Dom == "":
+    if String is None or String == "" or Dom is None or Dom == "":
         return []
     if Dom.nodeType == Dom.DOCUMENT_NODE:
         Dom = Dom.documentElement
@@ -101,7 +101,7 @@ def XmlList(Dom, String):
 # @param  String             A XPath style path.
 #
 def XmlNode(Dom, String):
-    if String == None or String == ""  or Dom == None or Dom == "":
+    if String is None or String == ""  or Dom is None or Dom == "":
         return None
     if Dom.nodeType == Dom.DOCUMENT_NODE:
         Dom = Dom.documentElement
@@ -224,6 +224,6 @@ def XmlParseFile(FileName):
         Dom = xml.dom.minidom.parse(XmlFile)
         XmlFile.close()
         return Dom
-    except BaseException, XExcept:
+    except BaseException as XExcept:
         XmlFile.close()
         Logger.Error('\nUPT', PARSER_ERROR, XExcept, File=FileName, RaiseError=True)

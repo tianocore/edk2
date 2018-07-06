@@ -1,7 +1,7 @@
 /** @file
   Implementation of driver entry point and driver binding protocol.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -28,7 +28,7 @@ EFI_DRIVER_BINDING_PROTOCOL gMnpDriverBinding = {
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
-  
+
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 
@@ -44,14 +44,14 @@ MnpDestroyServiceDataEntry (
   )
 {
   MNP_SERVICE_DATA              *MnpServiceData;
-  
+
   MnpServiceData = MNP_SERVICE_DATA_FROM_LINK (Entry);
   return MnpDestroyServiceData (MnpServiceData);
 }
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
-  
+
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 

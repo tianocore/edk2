@@ -1,6 +1,6 @@
 /** @file
   SMM CPU misc functions for Ia32 arch specific.
-  
+
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -43,7 +43,7 @@ InitializeIDTSmmStackGuard (
 
 /**
   Initialize Gdt for all processors.
-  
+
   @param[in]   Cr3          CR3 value.
   @param[out]  GdtStepSize  The step size for GDT table.
 
@@ -80,7 +80,7 @@ InitGdt (
     //
     // IA32 Stack Guard need use task switch to switch stack that need
     // write GDT and TSS, so AllocateCodePages() could not be used here
-    // as code pages will be set to RO. 
+    // as code pages will be set to RO.
     //
     GdtTssTables = (UINT8*)AllocatePages (EFI_SIZE_TO_PAGES (mGdtBufferSize));
     ASSERT (GdtTssTables != NULL);

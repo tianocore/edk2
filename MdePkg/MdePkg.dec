@@ -241,6 +241,11 @@
   ##  @libraryclass  provides EFI_FILE_HANDLE services
   FileHandleLib|Include/Library/FileHandleLib.h
 
+  ## @libraryclass provides helper functions to prevent integer overflow during
+  #                type conversion, addition, subtraction, and multiplication.
+  ##
+  SafeIntLib|Include/Library/SafeIntLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Abstracts both S/W SMI generation and detection.
   ##
@@ -1749,7 +1754,7 @@
 
   ## Include/Protocol/Tls.h
   gEfiTlsProtocolGuid                 = { 0xca959f, 0x6cfa, 0x4db1, {0x95, 0xbc, 0xe4, 0x6c, 0x47, 0x51, 0x43, 0x90 }}
-  
+
   ## Include/Protocol/TlsConfig.h
   gEfiTlsConfigurationProtocolGuid    = { 0x1682fe44, 0xbd7a, 0x4407, { 0xb7, 0xc7, 0xdc, 0xa3, 0x7c, 0xa3, 0x92, 0x2d }}
 
@@ -2164,8 +2169,15 @@
 
   ## The mask is used to control PerformanceLib behavior.<BR><BR>
   #  BIT0 - Enable Performance Measurement.<BR>
+  #  BIT1 - Disable Start Image Logging.<BR>
+  #  BIT2 - Disable Load Image logging.<BR>
+  #  BIT3 - Disable Binding Support logging.<BR>
+  #  BIT4 - Disable Binding Start logging.<BR>
+  #  BIT5 - Disable Binding Stop logging.<BR>
+  #  BIT6 - Disable all other general Perfs.<BR>
+  #  BIT1-BIT6 are evaluated when BIT0 is set.<BR>
   # @Prompt Performance Measurement Property.
-  # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask & 0xFE) == 0
+  # @Expression  0x80000002 | (gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask & 0x80) == 0
   gEfiMdePkgTokenSpaceGuid.PcdPerformanceLibraryPropertyMask|0|UINT8|0x00000009
 
   ## The mask is used to control PostCodeLib behavior.<BR><BR>

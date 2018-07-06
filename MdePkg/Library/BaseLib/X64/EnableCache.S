@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,7 @@
 #
 # Abstract:
 #
-#   Flush all caches with a WBINVD instruction, clear the CD bit of CR0 to 0, and clear 
+#   Flush all caches with a WBINVD instruction, clear the CD bit of CR0 to 0, and clear
 #   the NW bit of CR0 to 0
 #
 # Notes:

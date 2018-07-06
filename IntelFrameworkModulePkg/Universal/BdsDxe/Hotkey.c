@@ -2,7 +2,7 @@
   Provides a way for 3rd party applications to register themselves for launch by the
   Boot Manager based on hot key
 
-Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -73,15 +73,15 @@ EFI_STATUS
 HotkeyBoot (
   VOID
   )
-{ 
+{
   EFI_STATUS           Status;
   UINTN                ExitDataSize;
   CHAR16               *ExitData;
 
   if (mHotkeyBootOption == NULL) {
     return EFI_NOT_FOUND;
-  } 
-  
+  }
+
   BdsLibConnectDevicePath (mHotkeyBootOption->DevicePath);
 
   //
@@ -162,7 +162,7 @@ HotkeyCallback (
     HotkeyData = &Hotkey->KeyData[Hotkey->WaitingKey];
     if ((KeyData->Key.ScanCode == HotkeyData->Key.ScanCode) &&
         (KeyData->Key.UnicodeChar == HotkeyData->Key.UnicodeChar) &&
-        (((KeyData->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) ? 
+        (((KeyData->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) ?
           (KeyData->KeyState.KeyShiftState == HotkeyData->KeyState.KeyShiftState) : TRUE
         )
        ) {
@@ -421,7 +421,7 @@ IsKeyOptionVariable (
   )
 {
   UINTN         Index;
-  
+
   if (!CompareGuid (Guid, &gEfiGlobalVariableGuid) ||
       (StrSize (Name) != sizeof (L"Key####")) ||
       (StrnCmp (Name, L"Key", 3) != 0)

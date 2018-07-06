@@ -1,7 +1,7 @@
 /** @file
   Header file for SCSI Disk Driver.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -86,7 +86,7 @@ typedef struct {
   //
   SCSI_UNMAP_PARAM_INFO     UnmapInfo;
   BOOLEAN                   BlockLimitsVpdSupported;
-  
+
   //
   // The flag indicates if 16-byte command can be used
   //
@@ -251,7 +251,7 @@ ScsiDiskDriverBindingStart (
   restrictions for this service. DisconnectController() must follow these
   calling restrictions. If any other agent wishes to call Stop() it must
   also follow these calling restrictions.
-  
+
   @param  This              Protocol instance pointer.
   @param  ControllerHandle  Handle of device to stop driver on
   @param  NumberOfChildren  Number of Handles in ChildHandleBuffer. If number of
@@ -646,7 +646,7 @@ ScsiDiskEraseBlocks (
 
 /**
   Provides inquiry information for the controller type.
-  
+
   This function is used by the IDE bus driver to get inquiry data.  Data format
   of Identify data is defined by the Interface GUID.
 
@@ -655,9 +655,9 @@ ScsiDiskEraseBlocks (
   @param[in, out] InquiryDataSize   Pointer to the value for the inquiry data size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
-  @retval EFI_NOT_FOUND          Device does not support this data class 
-  @retval EFI_DEVICE_ERROR       Error reading InquiryData from device 
-  @retval EFI_BUFFER_TOO_SMALL   InquiryDataSize not big enough 
+  @retval EFI_NOT_FOUND          Device does not support this data class
+  @retval EFI_DEVICE_ERROR       Error reading InquiryData from device
+  @retval EFI_BUFFER_TOO_SMALL   InquiryDataSize not big enough
 
 **/
 EFI_STATUS
@@ -675,16 +675,16 @@ ScsiDiskInfoInquiry (
   This function is used by the IDE bus driver to get identify data.  Data format
   of Identify data is defined by the Interface GUID.
 
-  @param[in]     This               Pointer to the EFI_DISK_INFO_PROTOCOL 
+  @param[in]     This               Pointer to the EFI_DISK_INFO_PROTOCOL
                                     instance.
   @param[in, out] IdentifyData      Pointer to a buffer for the identify data.
   @param[in, out] IdentifyDataSize  Pointer to the value for the identify data
                                     size.
 
   @retval EFI_SUCCESS            The command was accepted without any errors.
-  @retval EFI_NOT_FOUND          Device does not support this data class 
-  @retval EFI_DEVICE_ERROR       Error reading IdentifyData from device 
-  @retval EFI_BUFFER_TOO_SMALL   IdentifyDataSize not big enough 
+  @retval EFI_NOT_FOUND          Device does not support this data class
+  @retval EFI_DEVICE_ERROR       Error reading IdentifyData from device
+  @retval EFI_BUFFER_TOO_SMALL   IdentifyDataSize not big enough
 
 **/
 EFI_STATUS
@@ -698,8 +698,8 @@ ScsiDiskInfoIdentify (
 
 /**
   Provides sense data information for the controller type.
-  
-  This function is used by the IDE bus driver to get sense data. 
+
+  This function is used by the IDE bus driver to get sense data.
   Data format of Sense data is defined by the Interface GUID.
 
   @param[in]      This              Pointer to the EFI_DISK_INFO_PROTOCOL instance.
@@ -725,7 +725,7 @@ ScsiDiskInfoSenseData (
 /**
   This function is used by the IDE bus driver to get controller information.
 
-  @param[in]  This         Pointer to the EFI_DISK_INFO_PROTOCOL instance. 
+  @param[in]  This         Pointer to the EFI_DISK_INFO_PROTOCOL instance.
   @param[out] IdeChannel   Pointer to the Ide Channel number.  Primary or secondary.
   @param[out] IdeDevice    Pointer to the Ide Device number.  Master or slave.
 
@@ -747,7 +747,7 @@ ScsiDiskInfoWhichIde (
 
   @param  ScsiDiskDevice    The pointer of SCSI_DISK_DEV
   @param  MustReadCapacity  The flag about reading device capacity
-  @param  MediaChange       The pointer of flag indicates if media has changed 
+  @param  MediaChange       The pointer of flag indicates if media has changed
 
   @retval EFI_DEVICE_ERROR  Indicates that error occurs
   @retval EFI_SUCCESS       Successfully to detect media
@@ -790,7 +790,7 @@ ScsiDiskTestUnitReady (
 
   @param  ScsiDiskDevice     The pointer of SCSI_DISK_DEV
   @param  SenseData          The pointer of EFI_SCSI_SENSE_DATA
-  @param  NumberOfSenseKeys  The number of sense key  
+  @param  NumberOfSenseKeys  The number of sense key
   @param  Action             The pointer of action which indicates what is need to do next
 
   @retval EFI_DEVICE_ERROR   Indicates that error occurs
@@ -849,7 +849,7 @@ CheckHostAdapterStatus (
   @param  TargetStatus  Target status
 
   @retval EFI_NOT_READY       Device is NOT ready.
-  @retval EFI_DEVICE_ERROR 
+  @retval EFI_DEVICE_ERROR
   @retval EFI_SUCCESS
 
 **/
@@ -1071,7 +1071,7 @@ ScsiDiskRead16 (
   IN     UINT64                StartLba,
   IN     UINT32                SectorCount
   );
-  
+
 /**
   Submit Write(16) Command.
 
@@ -1095,7 +1095,7 @@ ScsiDiskWrite16 (
   IN OUT UINT32                *DataLength,
   IN     UINT64                StartLba,
   IN     UINT32                SectorCount
-  );  
+  );
 
 /**
   Submit Async Read(10) command.
@@ -1326,7 +1326,7 @@ ScsiDiskIsResetBefore (
 
   @param  SenseData    The pointer of EFI_SCSI_SENSE_DATA
   @param  SenseCounts  The number of sense key
-  @param  RetryLater   The flag means if need a retry 
+  @param  RetryLater   The flag means if need a retry
 
   @retval TRUE  Drive is ready.
   @retval FALSE Drive is NOT ready.
@@ -1368,14 +1368,14 @@ ReleaseScsiDiskDeviceResources (
 
 /**
   Determine if Block Io should be produced.
-  
+
 
   @param  ChildHandle  Child Handle to retrieve Parent information.
-  
+
   @retval  TRUE    Should produce Block Io.
   @retval  FALSE   Should not produce Block Io.
 
-**/  
+**/
 BOOLEAN
 DetermineInstallBlockIo (
   IN  EFI_HANDLE      ChildHandle
@@ -1391,26 +1391,26 @@ DetermineInstallBlockIo (
 
   @param  ScsiDiskDevice  The pointer of SCSI_DISK_DEV.
   @param  ChildHandle     Child handle to install DiskInfo protocol.
-  
-**/  
+
+**/
 VOID
 InitializeInstallDiskInfo (
   IN  SCSI_DISK_DEV   *ScsiDiskDevice,
   IN  EFI_HANDLE      ChildHandle
-  ); 
+  );
 
 /**
   Search protocol database and check to see if the protocol
   specified by ProtocolGuid is present on a ControllerHandle and opened by
   ChildHandle with an attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
   If the ControllerHandle is found, then the protocol specified by ProtocolGuid
-  will be opened on it.  
-  
+  will be opened on it.
+
 
   @param  ProtocolGuid   ProtocolGuid pointer.
   @param  ChildHandle    Child Handle to retrieve Parent information.
-  
-**/ 
+
+**/
 VOID *
 EFIAPI
 GetParentProtocol (

@@ -525,12 +525,6 @@ ShellCommandRunMm (
       goto Done;
     }
 
-    if ((AccessType == ShellMmIo) && (Address + Size > MAX_UINT16 + 1)) {
-      ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_IO_ADDRESS_RANGE), gShellDebug1HiiHandle, L"mm");
-      ShellStatus = SHELL_INVALID_PARAMETER;
-      goto Done;
-    }
-
     //
     // locate IO protocol interface
     //
@@ -592,11 +586,6 @@ ShellCommandRunMm (
     //
     Complete = FALSE;
     do {
-      if ((AccessType == ShellMmIo) && (Address + Size > MAX_UINT16 + 1)) {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS_RANGE2), gShellDebug1HiiHandle, L"mm");
-        break;
-      }
-
       ShellMmAccess (AccessType, PciRootBridgeIo, CpuIo, TRUE, Address, Size, &Buffer);
       ShellPrintHiiEx (-1, -1, NULL, mShellMmAccessTypeStr[AccessType], gShellDebug1HiiHandle);
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_MM_ADDRESS), gShellDebug1HiiHandle, Address);

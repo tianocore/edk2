@@ -91,7 +91,7 @@ def InstallNewPackage(WorkspaceDir, Path, CustomPath = False):
 # @param PathList:       The already installed standalone module Path list
 #
 def InstallNewModule(WorkspaceDir, Path, PathList = None):
-    if PathList == None:
+    if PathList is None:
         PathList = []
     Path = ConvertPath(Path)
     Path = os.path.normpath(Path)
@@ -537,7 +537,7 @@ def Main(Options = None):
                       Options, Dep, WorkspaceDir, DataBase)
         ReturnCode = 0
         
-    except FatalError, XExcept:
+    except FatalError as XExcept:
         ReturnCode = XExcept.args[0]
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % (python_version(), platform) + format_exc())

@@ -5,7 +5,7 @@
   After DxeCore finish DXE phase, gEfiBdsArchProtocolGuid->BdsEntry will be invoked
   to enter BDS phase.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 This program and the accompanying materials
@@ -293,9 +293,9 @@ BdsReadKeys (
   }
 
   while (gST->ConIn != NULL) {
-    
+
     Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-    
+
     if (EFI_ERROR (Status)) {
       //
       // No more keys.
@@ -488,10 +488,10 @@ ProcessLoadOptions (
 
 /**
 
-  Validate input console variable data. 
+  Validate input console variable data.
 
   If found the device path is not a valid device path, remove the variable.
-  
+
   @param VariableName             Input console variable name.
 
 **/
@@ -505,7 +505,7 @@ BdsFormalizeConsoleVariable (
   EFI_STATUS                Status;
 
   GetEfiGlobalVariable2 (VariableName, (VOID **) &DevicePath, &VariableSize);
-  if ((DevicePath != NULL) && !IsDevicePathValid (DevicePath, VariableSize)) { 
+  if ((DevicePath != NULL) && !IsDevicePathValid (DevicePath, VariableSize)) {
     Status = gRT->SetVariable (
                     VariableName,
                     &gEfiGlobalVariableGuid,
@@ -525,17 +525,17 @@ BdsFormalizeConsoleVariable (
 }
 
 /**
-  Formalize OsIndication related variables. 
-  
-  For OsIndicationsSupported, Create a BS/RT/UINT64 variable to report caps 
+  Formalize OsIndication related variables.
+
+  For OsIndicationsSupported, Create a BS/RT/UINT64 variable to report caps
   Delete OsIndications variable if it is not NV/BS/RT UINT64.
-  
+
   Item 3 is used to solve case when OS corrupts OsIndications. Here simply delete this NV variable.
 
   Create a boot option for BootManagerMenu if it hasn't been created yet
 
 **/
-VOID 
+VOID
 BdsFormalizeOSIndicationVariable (
   VOID
   )
@@ -613,10 +613,10 @@ BdsFormalizeOSIndicationVariable (
 
 /**
 
-  Validate variables. 
+  Validate variables.
 
 **/
-VOID 
+VOID
 BdsFormalizeEfiGlobalVariable (
   VOID
   )
@@ -632,57 +632,6 @@ BdsFormalizeEfiGlobalVariable (
   // Validate OSIndication related variable.
   //
   BdsFormalizeOSIndicationVariable ();
-}
-
-/**
-
-  Allocate a block of memory that will contain performance data to OS.
-
-**/
-VOID
-BdsAllocateMemoryForPerformanceData (
-  VOID
-  )
-{
-  EFI_STATUS                    Status;
-  EFI_PHYSICAL_ADDRESS          AcpiLowMemoryBase;
-  EDKII_VARIABLE_LOCK_PROTOCOL  *VariableLock;
-
-  AcpiLowMemoryBase = 0x0FFFFFFFFULL;
-
-  //
-  // Allocate a block of memory that will contain performance data to OS.
-  //
-  Status = gBS->AllocatePages (
-                  AllocateMaxAddress,
-                  EfiReservedMemoryType,
-                  EFI_SIZE_TO_PAGES (PERF_DATA_MAX_LENGTH),
-                  &AcpiLowMemoryBase
-                  );
-  if (!EFI_ERROR (Status)) {
-    //
-    // Save the pointer to variable for use in S3 resume.
-    //
-    Status = BdsDxeSetVariableAndReportStatusCodeOnError (
-               L"PerfDataMemAddr",
-               &gPerformanceProtocolGuid,
-               EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
-               sizeof (EFI_PHYSICAL_ADDRESS),
-               &AcpiLowMemoryBase
-               );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "[Bds] PerfDataMemAddr (%08x) cannot be saved to NV storage.\n", AcpiLowMemoryBase));
-    }
-    //
-    // Mark L"PerfDataMemAddr" variable to read-only if the Variable Lock protocol exists
-    // Still lock it even the variable cannot be saved to prevent it's set by 3rd party code.
-    //
-    Status = gBS->LocateProtocol (&gEdkiiVariableLockProtocolGuid, NULL, (VOID **) &VariableLock);
-    if (!EFI_ERROR (Status)) {
-      Status = VariableLock->RequestToLock (VariableLock, L"PerfDataMemAddr", &gPerformanceProtocolGuid);
-      ASSERT_EFI_ERROR (Status);
-    }
-  }
 }
 
 /**
@@ -776,13 +725,9 @@ BdsEntry (
   //
   // Insert the performance probe
   //
-  PERF_END (NULL, "DXE", NULL, 0);
-  PERF_START (NULL, "BDS", NULL, 0);
+  PERF_CROSSMODULE_END("DXE");
+  PERF_CROSSMODULE_BEGIN("BDS");
   DEBUG ((EFI_D_INFO, "[Bds] Entry...\n"));
-
-  PERF_CODE (
-    BdsAllocateMemoryForPerformanceData ();
-  );
 
   //
   // Fill in FirmwareVendor and FirmwareRevision from PCDs
@@ -939,13 +884,13 @@ BdsEntry (
   // Possible things that can be done in PlatformBootManagerBeforeConsole:
   // > Update console variable: 1. include hot-plug devices; 2. Clear ConIn and add SOL for AMT
   // > Register new Driver#### or Boot####
-  // > Register new Key####: e.g.: F12 
+  // > Register new Key####: e.g.: F12
   // > Signal ReadyToLock event
   // > Authentication action: 1. connect Auth devices; 2. Identify auto logon user.
   //
-  PERF_START (NULL, "PlatformBootManagerBeforeConsole", "BDS", 0);
+  PERF_INMODULE_BEGIN("PlatformBootManagerBeforeConsole");
   PlatformBootManagerBeforeConsole ();
-  PERF_END   (NULL, "PlatformBootManagerBeforeConsole", "BDS", 0);
+  PERF_INMODULE_END("PlatformBootManagerBeforeConsole");
 
   //
   // Initialize hotkey service
@@ -962,7 +907,7 @@ BdsEntry (
   //
   // Connect consoles
   //
-  PERF_START (NULL, "EfiBootManagerConnectAllDefaultConsoles", "BDS", 0);
+  PERF_INMODULE_BEGIN("EfiBootManagerConnectAllDefaultConsoles");
   if (PcdGetBool (PcdConInConnectOnDemand)) {
     EfiBootManagerConnectConsoleVariable (ConOut);
     EfiBootManagerConnectConsoleVariable (ErrOut);
@@ -972,7 +917,7 @@ BdsEntry (
   } else {
     EfiBootManagerConnectAllDefaultConsoles ();
   }
-  PERF_END   (NULL, "EfiBootManagerConnectAllDefaultConsoles", "BDS", 0);
+  PERF_INMODULE_END("EfiBootManagerConnectAllDefaultConsoles");
 
   //
   // Do the platform specific action after the console is ready
@@ -984,10 +929,10 @@ BdsEntry (
   // > Connect certain devices
   // > Dispatch aditional option roms
   // > Special boot: e.g.: USB boot, enter UI
-  // 
-  PERF_START (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
+  //
+  PERF_INMODULE_BEGIN("PlatformBootManagerAfterConsole");
   PlatformBootManagerAfterConsole ();
-  PERF_END   (NULL, "PlatformBootManagerAfterConsole", "BDS", 0);
+  PERF_INMODULE_END("PlatformBootManagerAfterConsole");
   //
   // Boot to Boot Manager Menu when EFI_OS_INDICATIONS_BOOT_TO_FW_UI is set. Skip HotkeyBoot
   //
@@ -1036,7 +981,7 @@ BdsEntry (
   PlatformRecovery = (BOOLEAN) ((OsIndication & EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY) != 0);
   //
   // Clear EFI_OS_INDICATIONS_BOOT_TO_FW_UI to acknowledge OS
-  // 
+  //
   if (BootFwUi || PlatformRecovery) {
     OsIndication &= ~((UINT64) (EFI_OS_INDICATIONS_BOOT_TO_FW_UI | EFI_OS_INDICATIONS_START_PLATFORM_RECOVERY));
     Status = gRT->SetVariable (
@@ -1080,10 +1025,9 @@ BdsEntry (
     //
     // Execute Key####
     //
-    PERF_START (NULL, "BdsWait", "BDS", 0);
+    PERF_INMODULE_BEGIN ("BdsWait");
     BdsWait (HotkeyTriggered);
-    PERF_END   (NULL, "BdsWait", "BDS", 0);
-
+    PERF_INMODULE_END ("BdsWait");
     //
     // BdsReadKeys() can be removed after all keyboard drivers invoke callback in timer callback.
     //
@@ -1115,7 +1059,7 @@ BdsEntry (
       if (!EFI_ERROR (Status)) {
         EfiBootManagerBoot (&LoadOption);
         EfiBootManagerFreeLoadOption (&LoadOption);
-        if ((LoadOption.Status == EFI_SUCCESS) && 
+        if ((LoadOption.Status == EFI_SUCCESS) &&
             (BootManagerMenuStatus != EFI_NOT_FOUND) &&
             (LoadOption.OptionNumber != BootManagerMenu.OptionNumber)) {
           //
@@ -1163,14 +1107,14 @@ BdsEntry (
                                  then EFI_INVALID_PARAMETER is returned.
   @param  VendorGuid             A unique identifier for the vendor.
   @param  Attributes             Attributes bitmask to set for the variable.
-  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE, 
+  @param  DataSize               The size in bytes of the Data buffer. Unless the EFI_VARIABLE_APPEND_WRITE,
                                  or EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS attribute is set, a size of zero
-                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is 
-                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to 
-                                 the variable value (the timestamp associated with the variable may be updated however 
-                                 even if no new data value is provided,see the description of the 
-                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not 
-                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated). 
+                                 causes the variable to be deleted. When the EFI_VARIABLE_APPEND_WRITE attribute is
+                                 set, then a SetVariable() call with a DataSize of zero will not cause any change to
+                                 the variable value (the timestamp associated with the variable may be updated however
+                                 even if no new data value is provided,see the description of the
+                                 EFI_VARIABLE_AUTHENTICATION_2 descriptor below. In this case the DataSize will not
+                                 be zero since the EFI_VARIABLE_AUTHENTICATION_2 descriptor will be populated).
   @param  Data                   The contents for the variable.
 
   @retval EFI_SUCCESS            The firmware has successfully stored the variable and its data as

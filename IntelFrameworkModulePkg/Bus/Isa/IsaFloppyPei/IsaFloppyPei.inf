@@ -5,7 +5,7 @@
 # the PEIM will install the BlockIo PPI. This module is only dispatched if it
 # is in the Recovery Boot mode.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -36,7 +36,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is for build only)
 #
 
 [Sources]

@@ -1,10 +1,10 @@
 ## @file
 # Acpi Support Dirver to install Framework Acpi Support Protocol.
 #
-# This driver initializes ACPI support protocol instance data structure and intstall 
+# This driver initializes ACPI support protocol instance data structure and intstall
 # ACPI support protocol to provide Get, Set and Publish Table services.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions
@@ -30,7 +30,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources]

@@ -53,10 +53,11 @@ extern ASM_PFX(gSmiHandlerIdtr)
 extern ASM_PFX(CpuSmmDebugEntry)
 extern ASM_PFX(CpuSmmDebugExit)
 
-global ASM_PFX(gSmbase)
-global ASM_PFX(mXdSupported)
-global ASM_PFX(gSmiStack)
-global ASM_PFX(gSmiCr3)
+global ASM_PFX(gPatchSmbase)
+extern ASM_PFX(mXdSupported)
+global ASM_PFX(gPatchXdSupported)
+global ASM_PFX(gPatchSmiStack)
+global ASM_PFX(gPatchSmiCr3)
 global ASM_PFX(gcSmiHandlerTemplate)
 global ASM_PFX(gcSmiHandlerSize)
 
@@ -75,8 +76,8 @@ _SmiEntryPoint:
 o32 lgdt    [cs:bx]                       ; lgdt fword ptr cs:[bx]
     mov     ax, PROTECT_MODE_CS
     mov     [cs:bx-0x2],ax
-    DB      0x66, 0xbf                   ; mov edi, SMBASE
-ASM_PFX(gSmbase): DD 0
+    mov     edi, strict dword 0           ; source operand will be patched
+ASM_PFX(gPatchSmbase):
     lea     eax, [edi + (@ProtectedMode - _SmiEntryPoint) + 0x8000]
     mov     [cs:bx-0x6],eax
     mov     ebx, cr0
@@ -96,14 +97,14 @@ o16 mov     es, ax
 o16 mov     fs, ax
 o16 mov     gs, ax
 o16 mov     ss, ax
-    DB      0xbc                   ; mov esp, imm32
-ASM_PFX(gSmiStack): DD 0
+    mov esp, strict dword 0               ; source operand will be patched
+ASM_PFX(gPatchSmiStack):
     jmp     ProtFlatMode
 
 BITS 64
 ProtFlatMode:
-    DB      0xb8                        ; mov eax, offset gSmiCr3
-ASM_PFX(gSmiCr3): DD 0
+    mov eax, strict dword 0               ; source operand will be patched
+ASM_PFX(gPatchSmiCr3):
     mov     cr3, rax
     mov     eax, 0x668                   ; as cr4.PGE is not set here, refresh cr3
     mov     cr4, rax                    ; in PreModifyMtrrs() to flush TLB.
@@ -118,8 +119,8 @@ ASM_PFX(gSmiCr3): DD 0
     ltr     ax
 
 ; enable NXE if supported
-    DB      0xb0                        ; mov al, imm8
-ASM_PFX(mXdSupported):     DB      1
+    mov     al, strict byte 1           ; source operand may be patched
+ASM_PFX(gPatchXdSupported):
     cmp     al, 0
     jz      @SkipXd
 ;
@@ -181,8 +182,7 @@ _SmiHandler:
     ; Save FP registers
     ;
     sub     rsp, 0x200
-    DB      0x48                         ; FXSAVE64
-    fxsave  [rsp]
+    fxsave64 [rsp]
 
     add     rsp, -0x20
 
@@ -200,8 +200,7 @@ _SmiHandler:
     ;
     ; Restore FP registers
     ;
-    DB      0x48                         ; FXRSTOR64
-    fxrstor [rsp]
+    fxrstor64 [rsp]
 
     add     rsp, 0x200
 

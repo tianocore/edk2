@@ -2,7 +2,7 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to parse the HTTP message byte stream.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -22,10 +22,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Decode a percent-encoded URI component to the ASCII character.
-  
-  Decode the input component in Buffer according to RFC 3986. The caller is responsible to make 
+
+  Decode the input component in Buffer according to RFC 3986. The caller is responsible to make
   sure ResultBuffer points to a buffer with size equal or greater than ((AsciiStrSize (Buffer))
-  in bytes. 
+  in bytes.
 
   @param[in]    Buffer           The pointer to a percent-encoded URI component.
   @param[in]    BufferLength     Length of Buffer in bytes.
@@ -34,7 +34,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @retval EFI_SUCCESS            Successfully decoded the URI.
   @retval EFI_INVALID_PARAMETER  Buffer is not a valid percent-encoded string.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -61,7 +61,7 @@ UriPercentDecode (
   @retval EFI_SUCCESS              Successfully dereferenced the HTTP URL.
   @retval EFI_INVALID_PARAMETER    UrlParser is NULL or Url is not a valid HTTP URL.
   @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -86,7 +86,7 @@ HttpParseUrl (
   @retval EFI_INVALID_PARAMETER    Uri is NULL or HostName is NULL or UrlParser is invalid.
   @retval EFI_NOT_FOUND            No hostName component in the URL.
   @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -109,7 +109,7 @@ HttpUrlGetHostName (
   @retval EFI_INVALID_PARAMETER    Uri is NULL or Ip4Address is NULL or UrlParser is invalid.
   @retval EFI_NOT_FOUND            No IPv4 address component in the URL.
   @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -132,7 +132,7 @@ HttpUrlGetIp4 (
   @retval EFI_INVALID_PARAMETER    Uri is NULL or Ip6Address is NULL or UrlParser is invalid.
   @retval EFI_NOT_FOUND            No IPv6 address component in the URL.
   @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -155,7 +155,7 @@ HttpUrlGetIp6 (
   @retval EFI_INVALID_PARAMETER    Uri is NULL or Port is NULL or UrlParser is invalid.
   @retval EFI_NOT_FOUND            No port number in the URL.
   @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -179,7 +179,7 @@ HttpUrlGetPort (
   @retval EFI_INVALID_PARAMETER    Uri is NULL or HostName is NULL or UrlParser is invalid.
   @retval EFI_NOT_FOUND            No hostName component in the URL.
   @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -193,7 +193,7 @@ HttpUrlGetPath (
   Release the resource of the URL parser.
 
   @param[in]    UrlParser            Pointer to the parser.
-  
+
 **/
 VOID
 EFIAPI
@@ -231,7 +231,7 @@ typedef enum {
 
   @retval EFI_SUCCESS              Continue to parser the message body.
   @retval Others                   Abort the parse.
- 
+
 **/
 typedef
 EFI_STATUS
@@ -288,7 +288,7 @@ HttpInitMsgParser (
   @retval EFI_INVALID_PARAMETER      MsgParser is NULL or Body is NULL or BodyLength is 0.
   @retval EFI_ABORTED                Operation aborted.
   @retval Other                      Error happened while parsing message body.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -324,7 +324,7 @@ HttpIsMessageComplete (
   @retval EFI_SUCCESS                Successfully to get the entity length.
   @retval EFI_NOT_READY              Entity length is not valid yet.
   @retval EFI_INVALID_PARAMETER      MsgParser is NULL or ContentLength is NULL.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -337,7 +337,7 @@ HttpGetEntityLength (
   Release the resource of the message parser.
 
   @param[in]    MsgParser            Pointer to the message parser.
-  
+
 **/
 VOID
 EFIAPI

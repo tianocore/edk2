@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -235,21 +235,21 @@ NoExtrPush:
 ## insure FXSAVE/FXRSTOR is enabled in CR4...
 ## ... while we're at it, make sure DE is also enabled...
   mov     $1, %eax
-  pushl   %ebx                         # temporarily save value of ebx on stack 
-  cpuid                                # use CPUID to determine if FXSAVE/FXRESTOR 
+  pushl   %ebx                         # temporarily save value of ebx on stack
+  cpuid                                # use CPUID to determine if FXSAVE/FXRESTOR
                                        # and DE are supported
   popl    %ebx                         # retore value of ebx that was overwritten
-                                       # by CPUID 
+                                       # by CPUID
   movl    %cr4, %eax
   pushl   %eax                         # push cr4 firstly
   testl   $BIT24, %edx                 # Test for FXSAVE/FXRESTOR support
   jz      L1
   orl     $BIT9, %eax                  # Set CR4.OSFXSR
-L1:    
+L1:
   testl   $BIT2, %edx                  # Test for Debugging Extensions support
   jz      L2
   orl     $BIT3, %eax                  # Set CR4.DE
-L2:    
+L2:
   movl    %eax, %cr4
   movl    %cr3, %eax
   pushl   %eax
@@ -322,14 +322,14 @@ L2:
                            # edx still contains result from CPUID above
   jz      L3
   .byte 0x0f, 0xae, 0x07   # fxsave [edi]
-L3:  
+L3:
 
 ## save the exception data
   pushl   8(%esp)
 
 ## Clear Direction Flag
   cld
-	
+
 ## Prepare parameter and call C function
   pushl   %esp
   pushl   %ebx
@@ -347,7 +347,7 @@ L3:
   testl   $BIT24, %edx     # Test for FXSAVE/FXRESTOR support
   jz      L4
   .byte 0x0f, 0xae, 0x0e   # fxrstor [esi]
-L4:  
+L4:
   addl    $512,%esp
 
 ## UINT32  Dr0, Dr1, Dr2, Dr3, Dr6, Dr7;
@@ -412,4 +412,4 @@ L4:
   popl    %ebp
   addl    $8,%esp   # skip eax
   iretl
-  
+

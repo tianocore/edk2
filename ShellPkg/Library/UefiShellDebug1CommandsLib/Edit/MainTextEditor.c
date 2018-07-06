@@ -1,7 +1,7 @@
 /** @file
   Implements editor interface functions.
 
-  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -77,7 +77,7 @@ MainCommandGotoLine (
 /**
   Save current file to disk, you can save to current file name or
   save to another file name.
-  
+
   @retval EFI_SUCCESS           The file was saved correctly.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_LOAD_ERROR          A file access error occured.
@@ -1136,7 +1136,7 @@ MainCommandGotoLine (
 /**
   Save current file to disk, you can save to current file name or
   save to another file name.
-  
+
   @retval EFI_SUCCESS           The file was saved correctly.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_LOAD_ERROR          A file access error occured.
@@ -1150,7 +1150,7 @@ MainCommandSaveFile (
   CHAR16            *FileName;
   BOOLEAN           OldFile;
   CHAR16            *Str;
-  SHELL_FILE_HANDLE FileHandle;  
+  SHELL_FILE_HANDLE FileHandle;
   EFI_FILE_INFO     *Info;
 
   //
@@ -1280,15 +1280,15 @@ MainCommandSaveFile (
         StatusBarSetStatusString (L"Open Failed");
         FreePool (FileName);
         return EFI_SUCCESS;
-      } 
+      }
 
       Info = ShellGetFileInfo(FileHandle);
       if (Info == NULL) {
         StatusBarSetStatusString (L"Access Denied");
         FreePool (FileName);
         return (EFI_SUCCESS);
-      } 
-      
+      }
+
       if (Info->Attribute & EFI_FILE_READ_ONLY) {
         StatusBarSetStatusString (L"Access Denied - Read Only");
         FreePool (Info);
@@ -1362,30 +1362,59 @@ MainCommandDisplayHelp (
 {
   INT32           CurrentLine;
   CHAR16          *InfoString;
-  EFI_INPUT_KEY   Key;
-  
+  EFI_KEY_DATA    KeyData;
+  EFI_STATUS      Status;
+  UINTN           EventIndex;
+
   //
-  // print helpInfo      
+  // print helpInfo
   //
   for (CurrentLine = 0; 0 != MainMenuHelpInfo[CurrentLine]; CurrentLine++) {
     InfoString = HiiGetString(gShellDebug1HiiHandle, MainMenuHelpInfo[CurrentLine], NULL);
-    ShellPrintEx (0, CurrentLine+1, L"%E%s%N", InfoString);        
+    ShellPrintEx (0, CurrentLine+1, L"%E%s%N", InfoString);
   }
-  
+
   //
   // scan for ctrl+w
   //
-  do {
-    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-  } while(SCAN_CONTROL_W != Key.UnicodeChar); 
+  while (TRUE) {
+    Status = gBS->WaitForEvent (1, &MainEditor.TextInputEx->WaitForKeyEx, &EventIndex);
+    if (EFI_ERROR (Status) || (EventIndex != 0)) {
+      continue;
+    }
+    Status = MainEditor.TextInputEx->ReadKeyStrokeEx (MainEditor.TextInputEx, &KeyData);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
 
+    if (((KeyData.KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) == 0) ||
+        (KeyData.KeyState.KeyShiftState == EFI_SHIFT_STATE_VALID)) {
+      //
+      // For consoles that don't support/report shift state,
+      // CTRL+W is translated to L'W' - L'A' + 1.
+      //
+      if (KeyData.Key.UnicodeChar == L'W' - L'A' + 1) {
+        break;
+      }
+    } else if (((KeyData.KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) &&
+               ((KeyData.KeyState.KeyShiftState & (EFI_LEFT_CONTROL_PRESSED | EFI_RIGHT_CONTROL_PRESSED)) != 0) &&
+               ((KeyData.KeyState.KeyShiftState & ~(EFI_SHIFT_STATE_VALID | EFI_LEFT_CONTROL_PRESSED | EFI_RIGHT_CONTROL_PRESSED)) == 0)) {
+      //
+      // For consoles that supports/reports shift state,
+      // make sure that only CONTROL shift key is pressed.
+      //
+      if ((KeyData.Key.UnicodeChar == 'w') || (KeyData.Key.UnicodeChar == 'W')) {
+        break;
+      }
+    }
+  }
   //
   // update screen with file buffer's info
   //
   FileBufferRestorePosition ();
   FileBufferNeedRefresh = TRUE;
   FileBufferOnlyLineNeedRefresh = FALSE;
-  FileBufferRefresh ();  
+  FileBufferRefresh ();
 
   return EFI_SUCCESS;
 }
@@ -1406,6 +1435,7 @@ EFI_EDITOR_GLOBAL_EDITOR      MainEditorConst = {
     0,
     0
   },
+  NULL,
   NULL,
   FALSE,
   NULL
@@ -1453,10 +1483,23 @@ MainEditorInit (
         );
 
   //
+  // Find TextInEx in System Table ConsoleInHandle
+  // Per UEFI Spec, TextInEx is required for a console capable platform.
+  //
+  Status = gBS->HandleProtocol (
+              gST->ConsoleInHandle,
+              &gEfiSimpleTextInputExProtocolGuid,
+              (VOID**)&MainEditor.TextInputEx
+              );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
   // Find mouse in System Table ConsoleInHandle
   //
   Status = gBS->HandleProtocol (
-                gST->ConIn,
+                gST->ConsoleInHandle,
                 &gEfiSimplePointerProtocolGuid,
                 (VOID**)&MainEditor.MouseInterface
                 );
@@ -1521,7 +1564,7 @@ MainEditorInit (
     return EFI_LOAD_ERROR;
   }
 
-  InputBarInit ();
+  InputBarInit (MainEditor.TextInputEx);
 
   Status = FileBufferInit ();
   if (EFI_ERROR (Status)) {
@@ -1606,10 +1649,10 @@ MainEditorRefresh (
   //
   // call the components refresh function
   //
-  if (EditorFirst 
-    || StrCmp (FileBufferBackupVar.FileName, FileBuffer.FileName) != 0 
-    || FileBufferBackupVar.FileType != FileBuffer.FileType 
-    || FileBufferBackupVar.FileModified != FileBuffer.FileModified 
+  if (EditorFirst
+    || StrCmp (FileBufferBackupVar.FileName, FileBuffer.FileName) != 0
+    || FileBufferBackupVar.FileType != FileBuffer.FileType
+    || FileBufferBackupVar.FileModified != FileBuffer.FileModified
     || FileBufferBackupVar.ReadOnly != FileBuffer.ReadOnly) {
 
     MainTitleBarRefresh (MainEditor.FileBuffer->FileName, MainEditor.FileBuffer->FileType, MainEditor.FileBuffer->ReadOnly, MainEditor.FileBuffer->FileModified, MainEditor.ScreenSize.Column, MainEditor.ScreenSize.Row, 0, 0);
@@ -1617,8 +1660,8 @@ MainEditorRefresh (
   }
 
   if (EditorFirst
-    || FileBufferBackupVar.FilePosition.Row != FileBuffer.FilePosition.Row 
-    || FileBufferBackupVar.FilePosition.Column != FileBuffer.FilePosition.Column 
+    || FileBufferBackupVar.FilePosition.Row != FileBuffer.FilePosition.Row
+    || FileBufferBackupVar.FilePosition.Column != FileBuffer.FilePosition.Column
     || FileBufferBackupVar.ModeInsert != FileBuffer.ModeInsert
     || StatusBarGetRefresh()) {
 
@@ -1794,9 +1837,10 @@ MainEditorKeyInput (
   VOID
   )
 {
-  EFI_INPUT_KEY             Key;
+  EFI_KEY_DATA              KeyData;
   EFI_STATUS                Status;
   EFI_SIMPLE_POINTER_STATE  MouseState;
+  BOOLEAN                   NoShiftState;
 
   do {
 
@@ -1831,41 +1875,50 @@ MainEditorKeyInput (
       }
     }
 
-    Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    //
+    // CheckEvent() returns Success when non-partial key is pressed.
+    //
+    Status = gBS->CheckEvent (MainEditor.TextInputEx->WaitForKeyEx);
     if (!EFI_ERROR (Status)) {
-      //
-      // dispatch to different components' key handling function
-      // so not everywhere has to set this variable
-      //
-      FileBufferMouseNeedRefresh = TRUE;
-      //
-      // clear previous status string
-      //
-      StatusBarSetRefresh();
-
-      //
-      // dispatch to different components' key handling function
-      //
-      if (EFI_NOT_FOUND != MenuBarDispatchControlHotKey(&Key)) {
-        Status = EFI_SUCCESS;
-      } else if ((Key.ScanCode == SCAN_NULL) || ((Key.ScanCode >= SCAN_UP) && (Key.ScanCode <= SCAN_PAGE_DOWN))) {
-        Status = FileBufferHandleInput (&Key);
-      } else if ((Key.ScanCode >= SCAN_F1) && (Key.ScanCode <= SCAN_F12)) {
-        Status = MenuBarDispatchFunctionKey (&Key);
-      } else {
-        StatusBarSetStatusString (L"Unknown Command");
-        FileBufferMouseNeedRefresh = FALSE;  
-      }
-      
-      if (Status != EFI_SUCCESS && Status != EFI_OUT_OF_RESOURCES) {
+      Status = MainEditor.TextInputEx->ReadKeyStrokeEx (MainEditor.TextInputEx, &KeyData);
+      if (!EFI_ERROR (Status)) {
         //
-        // not already has some error status
+        // dispatch to different components' key handling function
+        // so not everywhere has to set this variable
         //
-        if (StatusBarGetString() != NULL && StrCmp (L"", StatusBarGetString()) == 0) {
-          StatusBarSetStatusString (L"Disk Error. Try Again");
+        FileBufferMouseNeedRefresh = TRUE;
+        //
+        // clear previous status string
+        //
+        StatusBarSetRefresh();
+        //
+        // NoShiftState: TRUE when no shift key is pressed.
+        //
+        NoShiftState = ((KeyData.KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) == 0) || (KeyData.KeyState.KeyShiftState == EFI_SHIFT_STATE_VALID);
+        //
+        // dispatch to different components' key handling function
+        //
+        if (EFI_NOT_FOUND != MenuBarDispatchControlHotKey(&KeyData)) {
+          Status = EFI_SUCCESS;
+        } else if (NoShiftState && ((KeyData.Key.ScanCode == SCAN_NULL) || ((KeyData.Key.ScanCode >= SCAN_UP) && (KeyData.Key.ScanCode <= SCAN_PAGE_DOWN)))) {
+          Status = FileBufferHandleInput (&KeyData.Key);
+        } else if (NoShiftState && (KeyData.Key.ScanCode >= SCAN_F1) && (KeyData.Key.ScanCode <= SCAN_F12)) {
+          Status = MenuBarDispatchFunctionKey (&KeyData.Key);
+        } else {
+          StatusBarSetStatusString (L"Unknown Command");
+          FileBufferMouseNeedRefresh = FALSE;
         }
-      }
 
+        if (Status != EFI_SUCCESS && Status != EFI_OUT_OF_RESOURCES) {
+          //
+          // not already has some error status
+          //
+          if (StatusBarGetString() != NULL && StrCmp (L"", StatusBarGetString()) == 0) {
+            StatusBarSetStatusString (L"Disk Error. Try Again");
+          }
+        }
+
+      }
     }
     //
     // after handling, refresh editor
@@ -1922,6 +1975,6 @@ MainEditorBackup (
   )
 {
   FileBufferBackup ();
-  
+
   return EFI_SUCCESS;
 }

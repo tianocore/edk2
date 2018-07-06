@@ -4,7 +4,7 @@
   Layers on top of Firmware Block protocol to produce a file abstraction
   of FV based files.
 
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -789,7 +789,7 @@ FwVolDriverInit (
       } else {
         FreePool (FvDevice);
       }
-      
+
       DEBUG ((EFI_D_INFO, "Reinstall FV protocol as writable - %r\n", Status));
       ASSERT_EFI_ERROR (Status);
     } else {
@@ -807,7 +807,7 @@ FwVolDriverInit (
       } else {
         FreePool (FvDevice);
       }
-      
+
       DEBUG ((EFI_D_INFO, "Install FV protocol as writable - %r\n", Status));
       ASSERT_EFI_ERROR (Status);
     }
@@ -822,7 +822,7 @@ Done:
   if (InstallFlag) {
     return EFI_SUCCESS;
   }
-  
+
   //
   // No FV protocol install/reinstall successfully.
   // EFI_NOT_FOUND should return to ensure this image will be unloaded.

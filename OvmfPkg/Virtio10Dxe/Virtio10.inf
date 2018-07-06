@@ -22,6 +22,7 @@
 
 [Sources]
   Virtio10.c
+  Virtio10.h
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -31,6 +32,8 @@
   BaseMemoryLib
   DebugLib
   MemoryAllocationLib
+  PciCapLib
+  PciCapPciIoLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib

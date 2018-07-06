@@ -1,7 +1,7 @@
 /** @file
   Declaration of structures and functions of MnpDxe driver.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -366,7 +366,7 @@ MnpBuildTxPacket (
   );
 
 /**
-  Synchronously send out the packet. 
+  Synchronously send out the packet.
 
   This functon places the packet buffer to SNP driver's tansmit queue. The packet
   can be considered successfully sent out once SNP acccetp the packet, while the
@@ -468,7 +468,7 @@ MnpFreeNbuf (
 
 /**
   Allocate a free TX buffer from MnpDeviceData->FreeTxBufList. If there is none
-  in the queue, first try to recycle some from SNP, then try to allocate some and add 
+  in the queue, first try to recycle some from SNP, then try to allocate some and add
   them into the queue, then fetch the NET_BUF from the updated FreeTxBufList.
 
   @param[in, out]  MnpDeviceData        Pointer to the MNP_DEVICE_DATA.

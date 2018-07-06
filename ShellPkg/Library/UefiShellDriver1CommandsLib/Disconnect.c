@@ -3,7 +3,7 @@
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -118,7 +118,7 @@ ShellCommandRunDisconnect (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"disconnect", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"disconnect", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -127,10 +127,10 @@ ShellCommandRunDisconnect (
   } else {
     if (ShellCommandLineGetFlag(Package, L"-r")){
       if (ShellCommandLineGetCount(Package) > 1){
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"disconnect");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"disconnect");
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else if (ShellCommandLineGetCount(Package) < 1) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle, L"disconnect");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle, L"disconnect");
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
          Status = DisconnectAll ();
@@ -151,10 +151,10 @@ ShellCommandRunDisconnect (
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       if (ShellCommandLineGetCount(Package) > 4){
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"disconnect");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"disconnect");
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else if (ShellCommandLineGetCount(Package) < 2) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle, L"disconnect");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDriver1HiiHandle, L"disconnect");
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         //
@@ -171,17 +171,17 @@ ShellCommandRunDisconnect (
         Handle3 = Param3!=NULL?ConvertHandleIndexToHandle((UINTN)Intermediate3):NULL;
 
         if (Param1 != NULL && Handle1 == NULL) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"disconnect", Param1);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"disconnect", Param1);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else if (Param2 != NULL && Handle2 == NULL) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"disconnect", Param2);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"disconnect", Param2);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else if (Param3 != NULL && Handle3 == NULL) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"disconnect", Param3);  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_INV_HANDLE), gShellDriver1HiiHandle, L"disconnect", Param3);
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else if (Handle2 != NULL && EFI_ERROR(gBS->OpenProtocol(Handle2, &gEfiDriverBindingProtocolGuid, NULL, gImageHandle, NULL, EFI_OPEN_PROTOCOL_TEST_PROTOCOL))) {
           ASSERT(Param2 != NULL);
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_HANDLE_NOT), gShellDriver1HiiHandle, L"disconnect", ShellStrToUintn(Param2), L"driver handle");  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_HANDLE_NOT), gShellDriver1HiiHandle, L"disconnect", ShellStrToUintn(Param2), L"driver handle");
           ShellStatus = SHELL_INVALID_PARAMETER;
         } else {
           ASSERT(Param1 != NULL);

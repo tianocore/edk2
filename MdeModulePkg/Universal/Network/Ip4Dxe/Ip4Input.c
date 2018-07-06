@@ -1,7 +1,7 @@
 /** @file
   IP4 input process.
-  
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
 
 This program and the accompanying materials
@@ -441,8 +441,8 @@ DROP:
 }
 
 /**
-  The callback function for the net buffer which wraps the packet processed by 
-  IPsec. It releases the wrap packet and also signals IPsec to free the resources. 
+  The callback function for the net buffer which wraps the packet processed by
+  IPsec. It releases the wrap packet and also signals IPsec to free the resources.
 
   @param[in]  Arg       The wrap context
 
@@ -469,25 +469,25 @@ Ip4IpSecFree (
 }
 
 /**
-  The work function to locate IPsec protocol to process the inbound or 
+  The work function to locate IPsec protocol to process the inbound or
   outbound IP packets. The process routine handls the packet with following
-  actions: bypass the packet, discard the packet, or protect the packet.       
+  actions: bypass the packet, discard the packet, or protect the packet.
 
   @param[in]       IpSb          The IP4 service instance.
   @param[in, out]  Head          The The caller supplied IP4 header.
   @param[in, out]  Netbuf        The IP4 packet to be processed by IPsec.
   @param[in, out]  Options       The caller supplied options.
   @param[in, out]  OptionsLen    The length of the option.
-  @param[in]       Direction     The directionality in an SPD entry, 
+  @param[in]       Direction     The directionality in an SPD entry,
                                  EfiIPsecInBound or EfiIPsecOutBound.
   @param[in]       Context       The token's wrap.
 
   @retval EFI_SUCCESS            The IPsec protocol is not available or disabled.
   @retval EFI_SUCCESS            The packet was bypassed and all buffers remain the same.
   @retval EFI_SUCCESS            The packet was protected.
-  @retval EFI_ACCESS_DENIED      The packet was discarded.  
+  @retval EFI_ACCESS_DENIED      The packet was discarded.
   @retval EFI_OUT_OF_RESOURCES   There is no suffcient resource to complete the operation.
-  @retval EFI_BUFFER_TOO_SMALL   The number of non-empty block is bigger than the 
+  @retval EFI_BUFFER_TOO_SMALL   The number of non-empty block is bigger than the
                                  number of input data blocks when build a fragment table.
 
 **/
@@ -519,12 +519,12 @@ Ip4IpSecProcessPacket (
     goto ON_EXIT;
   }
   ASSERT (mIpSec != NULL);
-  
+
   Packet        = *Netbuf;
   RecycleEvent  = NULL;
   IpSecWrap     = NULL;
   FragmentTable = NULL;
-  TxWrap        = (IP4_TXTOKEN_WRAP *) Context; 
+  TxWrap        = (IP4_TXTOKEN_WRAP *) Context;
   FragmentCount = Packet->BlockOpNum;
 
   ZeroMem (&ZeroHead, sizeof (IP4_HEAD));
@@ -535,14 +535,14 @@ Ip4IpSecProcessPacket (
   if (mIpSec->DisabledFlag) {
     //
     // If IPsec is disabled, restore the original MTU
-    //   
+    //
     IpSb->MaxPacketSize = IpSb->OldMaxPacketSize;
     goto ON_EXIT;
   } else {
     //
-    // If IPsec is enabled, use the MTU which reduce the IPsec header length.  
+    // If IPsec is enabled, use the MTU which reduce the IPsec header length.
     //
-    IpSb->MaxPacketSize = IpSb->OldMaxPacketSize - IP4_MAX_IPSEC_HEADLEN;   
+    IpSb->MaxPacketSize = IpSb->OldMaxPacketSize - IP4_MAX_IPSEC_HEADLEN;
   }
 
   //
@@ -554,9 +554,9 @@ Ip4IpSecProcessPacket (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
- 
+
   Status = NetbufBuildExt (Packet, FragmentTable, &FragmentCount);
-  
+
   //
   // Record the original FragmentTable and count.
   //
@@ -572,7 +572,7 @@ Ip4IpSecProcessPacket (
   // Convert host byte order to network byte order
   //
   Ip4NtohHead (*Head);
-  
+
   Status = mIpSec->ProcessExt (
                      mIpSec,
                      IpSb->Controller,
@@ -590,7 +590,7 @@ Ip4IpSecProcessPacket (
   // Convert back to host byte order
   //
   Ip4NtohHead (*Head);
-  
+
   if (EFI_ERROR (Status)) {
     FreePool (OriginalFragmentTable);
     goto ON_EXIT;
@@ -610,7 +610,7 @@ Ip4IpSecProcessPacket (
   }
 
   if (Direction == EfiIPsecOutBound && TxWrap != NULL) {
-  
+
     TxWrap->IpSecRecycleSignal = RecycleEvent;
     TxWrap->Packet             = NetbufFromExt (
                                    FragmentTable,
@@ -635,28 +635,28 @@ Ip4IpSecProcessPacket (
     //
     NetIpSecNetbufFree (*Netbuf);
     *Netbuf = TxWrap->Packet;
-    
+
   } else {
-  
+
     IpSecWrap = AllocateZeroPool (sizeof (IP4_IPSEC_WRAP));
-  
+
     if (IpSecWrap == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       gBS->SignalEvent (RecycleEvent);
       goto ON_EXIT;
     }
-    
+
     IpSecWrap->IpSecRecycleSignal = RecycleEvent;
     IpSecWrap->Packet             = Packet;
     Packet                        = NetbufFromExt (
-                                      FragmentTable, 
-                                      FragmentCount, 
-                                      IP4_MAX_HEADLEN, 
-                                      0, 
-                                      Ip4IpSecFree, 
+                                      FragmentTable,
+                                      FragmentCount,
+                                      IP4_MAX_HEADLEN,
+                                      0,
+                                      Ip4IpSecFree,
                                       IpSecWrap
                                       );
-  
+
     if (Packet == NULL) {
       Packet = IpSecWrap->Packet;
       gBS->SignalEvent (RecycleEvent);
@@ -686,7 +686,7 @@ ON_EXIT:
 /**
   Pre-process the IPv4 packet. First validates the IPv4 packet, and
   then reassembles packet if it is necessary.
-  
+
   @param[in]       IpSb            Pointer to IP4_SERVICE.
   @param[in, out]  Packet          Pointer to the Packet to be processed.
   @param[in]       Head            Pointer to the IP4_HEAD.
@@ -696,7 +696,7 @@ ON_EXIT:
                                    as multicast.
 
   @retval     EFI_SEUCCESS               The recieved packet is in well form.
-  @retval     EFI_INVAILD_PARAMETER      The recieved packet is malformed.  
+  @retval     EFI_INVAILD_PARAMETER      The recieved packet is malformed.
 
 **/
 EFI_STATUS
@@ -705,9 +705,9 @@ Ip4PreProcessPacket (
   IN OUT NET_BUF        **Packet,
   IN     IP4_HEAD       *Head,
   IN     UINT8          *Option,
-  IN     UINT32         OptionLen, 
+  IN     UINT32         OptionLen,
   IN     UINT32         Flag
-  ) 
+  )
 {
   IP4_CLIP_INFO             *Info;
   UINT32                    HeadLen;
@@ -720,7 +720,7 @@ Ip4PreProcessPacket (
   if ((*Packet)->TotalSize < IP4_MIN_HEADLEN) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   HeadLen  = (Head->HeadLen << 2);
   TotalLen = NTOHS (Head->TotalLen);
 
@@ -769,7 +769,7 @@ Ip4PreProcessPacket (
   // Validate the options. Don't call the Ip4OptionIsValid if
   // there is no option to save some CPU process.
   //
-  
+
   if ((OptionLen > 0) && !Ip4OptionIsValid (Option, OptionLen, TRUE)) {
     return EFI_INVALID_PARAMETER;
   }
@@ -810,7 +810,7 @@ Ip4PreProcessPacket (
       return EFI_INVALID_PARAMETER;
     }
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -842,7 +842,7 @@ Ip4AccpetFrame (
   IP4_HEAD                  ZeroHead;
   UINT8                     *Option;
   UINT32                    OptionLen;
-  
+
   IpSb   = (IP4_SERVICE *) Context;
   Option = NULL;
 
@@ -861,11 +861,11 @@ Ip4AccpetFrame (
   // Validate packet format and reassemble packet if it is necessary.
   //
   Status = Ip4PreProcessPacket (
-             IpSb, 
-             &Packet, 
-             Head, 
+             IpSb,
+             &Packet,
+             Head,
              Option,
-             OptionLen,  
+             OptionLen,
              Flag
              );
 
@@ -890,7 +890,7 @@ Ip4AccpetFrame (
   if (EFI_ERROR (Status)) {
     goto RESTART;
   }
-  
+
   //
   // If the packet is protected by tunnel mode, parse the inner Ip Packet.
   //
@@ -914,7 +914,7 @@ Ip4AccpetFrame (
       goto RESTART;
     }
   }
-  
+
   ASSERT (Packet != NULL);
   Head  = Packet->Ip.Ip4;
   IP4_GET_CLIP_INFO (Packet)->Status = EFI_SUCCESS;
@@ -1298,7 +1298,7 @@ Ip4InstanceDeliverPacket (
         //
         Head = NetbufAllocSpace (Dup, IP4_MAX_HEADLEN, NET_BUF_HEAD);
         ASSERT (Head != NULL);
-        
+
         Dup->Ip.Ip4 = (IP4_HEAD *) Head;
 
         CopyMem (Head, Packet->Ip.Ip4, Packet->Ip.Ip4->HeadLen << 2);
@@ -1345,7 +1345,7 @@ Ip4InstanceDeliverPacket (
   @param[in]  Head               The header of the received packet.
   @param[in]  Packet             The data of the received packet.
   @param[in]  Option             Point to the IP4 packet header options.
-  @param[in]  OptionLen          Length of the IP4 packet header options.  
+  @param[in]  OptionLen          Length of the IP4 packet header options.
   @param[in]  IpIf               The interface to enqueue the packet to.
 
   @return The number of the IP4 children that accepts the packet

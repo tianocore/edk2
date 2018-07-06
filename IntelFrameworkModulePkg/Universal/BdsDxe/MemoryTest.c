@@ -1,7 +1,7 @@
 /** @file
   Perform the platform memory test
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -282,7 +282,7 @@ BdsMemoryTest (
     FreePool (Pos);
     return EFI_SUCCESS;
   }
-  
+
   if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
     TmpStr = GetStringById (STRING_TOKEN (STR_ESC_TO_SKIP_MEM_TEST));
 
@@ -310,7 +310,7 @@ BdsMemoryTest (
 
       ASSERT (0);
     }
-    
+
     if (!FeaturePcdGet(PcdBootlogoOnlyEnable)) {
       TempData = (UINT32) DivU64x32 (TotalMemorySize, 16);
       TestPercent = (UINTN) DivU64x32 (
@@ -326,7 +326,7 @@ BdsMemoryTest (
           //
           StrnCatS (
             StrPercent,
-            sizeof (StrPercent) / sizeof (CHAR16), 
+            sizeof (StrPercent) / sizeof (CHAR16),
             TmpStr,
             sizeof (StrPercent) / sizeof (CHAR16) - StrLen (StrPercent) - 1
             );
@@ -412,11 +412,11 @@ Done:
       100,
       (UINTN) PreviousValue
       );
-    
+
   } else {
     DEBUG ((EFI_D_INFO, "%d bytes of system memory tested OK\r\n", TotalMemorySize));
   }
-  
+
   FreePool (Pos);
 
 

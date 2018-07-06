@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -193,11 +193,11 @@ GetNextProcNumber:
     jz          ProgramStack
     add         edi, 20
     inc         ebx
-    jmp         GetNextProcNumber    
+    jmp         GetNextProcNumber
 
 ProgramStack:
     mov         esp, [edi + 12]
-   
+
 CProcedureInvoke:
     push       ebp               ; push BIST data at top of AP stack
     xor        ebp, ebp          ; clear ebp for call stack trace
@@ -239,6 +239,7 @@ AsmRelocateApLoopStart:
     cmp        cl,  1              ; Check mwait-monitor support
     jnz        HltLoop
 MwaitLoop:
+    cli
     mov        eax, esp
     xor        ecx, ecx
     xor        edx, edx

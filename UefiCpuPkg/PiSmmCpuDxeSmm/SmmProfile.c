@@ -32,6 +32,11 @@ UINTN                     mSmmProfileSize;
 UINTN                     mMsrDsAreaSize   = SMM_PROFILE_DTS_SIZE;
 
 //
+// The flag indicates if execute-disable is supported by processor.
+//
+BOOLEAN                   mXdSupported     = TRUE;
+
+//
 // The flag indicates if execute-disable is enabled on processor.
 //
 BOOLEAN                   mXdEnabled       = FALSE;
@@ -1010,6 +1015,7 @@ CheckFeatureSupported (
       // Extended CPUID functions are not supported on this processor.
       //
       mXdSupported = FALSE;
+      PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
     }
 
     AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx);
@@ -1018,6 +1024,7 @@ CheckFeatureSupported (
       // Execute Disable Bit feature is not supported on this processor.
       //
       mXdSupported = FALSE;
+      PatchInstructionX86 (gPatchXdSupported, mXdSupported, 1);
     }
   }
 
@@ -1302,6 +1309,8 @@ SmmProfilePFHandler (
 {
   UINT64                *PageTable;
   UINT64                PFAddress;
+  UINT64                RestoreAddress;
+  UINTN                 RestorePageNumber;
   UINTN                 CpuIndex;
   UINTN                 Index;
   UINT64                InstructionAddress;
@@ -1331,10 +1340,21 @@ SmmProfilePFHandler (
   PFAddress         = AsmReadCr2 ();
   CpuIndex          = GetCpuIndex ();
 
-  if (PFAddress <= 0xFFFFFFFF) {
-    RestorePageTableBelow4G (PageTable, PFAddress, CpuIndex, ErrorCode);
-  } else {
-    RestorePageTableAbove4G (PageTable, PFAddress, CpuIndex, ErrorCode, &IsValidPFAddress);
+  //
+  // Memory operation cross pages, like "rep mov" instruction, will cause
+  // infinite loop between this and Debug Trap handler. We have to make sure
+  // that current page and the page followed are both in PRESENT state.
+  //
+  RestorePageNumber = 2;
+  RestoreAddress = PFAddress;
+  while (RestorePageNumber > 0) {
+    if (RestoreAddress <= 0xFFFFFFFF) {
+      RestorePageTableBelow4G (PageTable, RestoreAddress, CpuIndex, ErrorCode);
+    } else {
+      RestorePageTableAbove4G (PageTable, RestoreAddress, CpuIndex, ErrorCode, &IsValidPFAddress);
+    }
+    RestoreAddress += EFI_PAGE_SIZE;
+    RestorePageNumber--;
   }
 
   if (!IsValidPFAddress) {

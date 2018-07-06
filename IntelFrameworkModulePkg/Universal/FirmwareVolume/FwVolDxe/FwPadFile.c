@@ -1,7 +1,7 @@
 /** @file
   Implements functions to pad firmware file.
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -219,7 +219,7 @@ FvCreatePadFileInFreeSpace (
 
 /**
   Fill pad file header within firmware cache.
-  
+
   @param PadFileHeader    The start of the Pad File Buffer.
   @param PadFileLength    The length of the pad file including the header.
 
@@ -264,7 +264,7 @@ FvFillPadFile (
 
 /**
   Create entire FFS file.
-  
+
   @param FileHeader      Starting Address of a Buffer that hold the FFS File image.
   @param FfsFileBuffer   The source buffer that contains the File Data.
   @param BufferSize      The length of FfsFileBuffer.
@@ -662,7 +662,7 @@ FreeFfsBuffer (
   @param ActualFileSize  The array of actual file size.
   @param PadSize         The array of leading pad file size for each FFS File
   @param FfsBuffer       The array of Ffs Buffer pointer.
-  @param FileData        The array of EFI_FV_WRITE_FILE_DATA structure, 
+  @param FileData        The array of EFI_FV_WRITE_FILE_DATA structure,
                          used to get name, attributes, type, etc.
 
   @retval EFI_SUCCESS           Add the input multiple files into PAD file area.
@@ -868,7 +868,7 @@ FvCreateMultipleFilesInsidePadFile (
   @param ActualFileSize  The array of actual file size.
   @param PadSize         The array of leading pad file size for each FFS File
   @param FfsBuffer       The array of Ffs Buffer pointer.
-  @param FileData        The array of EFI_FV_WRITE_FILE_DATA structure, 
+  @param FileData        The array of EFI_FV_WRITE_FILE_DATA structure,
                          used to get name, attributes, type, etc.
 
   @retval EFI_SUCCESS           Add the input multiple files into PAD file area.
@@ -993,7 +993,7 @@ FvCreateMultipleFilesInsideFreeSpace (
 
   @param FvDevice        Firmware Volume Device.
   @param NumOfFiles      Total File number to be written.
-  @param FileData        The array of EFI_FV_WRITE_FILE_DATA structure, 
+  @param FileData        The array of EFI_FV_WRITE_FILE_DATA structure,
                          used to get name, attributes, type, etc
   @param FileOperation   The array of operation for each file.
 

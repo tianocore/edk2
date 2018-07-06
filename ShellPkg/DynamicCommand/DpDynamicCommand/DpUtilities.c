@@ -1,7 +1,7 @@
 /** @file
   Utility functions used by the Dp application.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -39,24 +39,24 @@
 #include "Literals.h"
 #include "DpInternal.h"
 
-/** 
+/**
   Calculate an event's duration in timer ticks.
-  
+
   Given the count direction and the event's start and end timer values,
   calculate the duration of the event in timer ticks.  Information for
   the current measurement is pointed to by the parameter.
-  
+
   If the measurement's start time is 1, it indicates that the developer
   is indicating that the measurement began at the release of reset.
   The start time is adjusted to the timer's starting count before performing
   the elapsed time calculation.
-  
+
   The calculated duration, in ticks, is the absolute difference between
   the measurement's ending and starting counts.
-  
+
   @param Measurement   Pointer to a MEASUREMENT_RECORD structure containing
                        data for the current measurement.
-  
+
   @return              The 64-bit duration of the event.
 **/
 UINT64
@@ -71,22 +71,8 @@ GetDuration (
     return 0;
   }
 
-  // PERF_START macros are called with a value of 1 to indicate
-  // the beginning of time.  So, adjust the start ticker value
-  // to the real beginning of time.
-  // Assumes no wraparound.  Even then, there is a very low probability
-  // of having a valid StartTicker value of 1.
-  if (Measurement->StartTimeStamp == 1) {
-    Measurement->StartTimeStamp = TimerInfo.StartCount;
-  }
-  if (TimerInfo.CountUp) {
-    Duration = Measurement->EndTimeStamp - Measurement->StartTimeStamp;
-    Error = (BOOLEAN)(Duration > Measurement->EndTimeStamp);
-  }
-  else {
-    Duration = Measurement->StartTimeStamp - Measurement->EndTimeStamp;
-    Error = (BOOLEAN)(Duration > Measurement->StartTimeStamp);
-  }
+  Duration = Measurement->EndTimeStamp - Measurement->StartTimeStamp;
+  Error = (BOOLEAN)(Duration > Measurement->EndTimeStamp);
 
   if (Error) {
     DEBUG ((EFI_D_ERROR, ALit_TimerLibError));
@@ -95,14 +81,14 @@ GetDuration (
   return Duration;
 }
 
-/** 
+/**
   Determine whether the Measurement record is for an EFI Phase.
-  
+
   The Token and Module members of the measurement record are checked.
   Module must be empty and Token must be one of SEC, PEI, DXE, BDS, or SHELL.
-  
+
   @param[in]  Measurement A pointer to the Measurement record to test.
-  
+
   @retval     TRUE        The measurement record is for an EFI Phase.
   @retval     FALSE       The measurement record is NOT for an EFI Phase.
 **/
@@ -113,26 +99,57 @@ IsPhase(
 {
   BOOLEAN   RetVal;
 
-  RetVal = (BOOLEAN)( ( *Measurement->Module == '\0')                               &&
-            ((AsciiStrnCmp (Measurement->Token, ALit_SEC, PERF_TOKEN_LENGTH) == 0)    ||
-             (AsciiStrnCmp (Measurement->Token, ALit_PEI, PERF_TOKEN_LENGTH) == 0)    ||
-             (AsciiStrnCmp (Measurement->Token, ALit_DXE, PERF_TOKEN_LENGTH) == 0)    ||
-             (AsciiStrnCmp (Measurement->Token, ALit_BDS, PERF_TOKEN_LENGTH) == 0))
+  RetVal = (BOOLEAN)(
+            ((AsciiStrCmp (Measurement->Token, ALit_SEC) == 0)    ||
+             (AsciiStrCmp (Measurement->Token, ALit_PEI) == 0)    ||
+             (AsciiStrCmp (Measurement->Token, ALit_DXE) == 0)    ||
+             (AsciiStrCmp (Measurement->Token, ALit_BDS) == 0))
             );
   return RetVal;
 }
 
-/** 
+/**
+  Determine whether the Measurement record is for core code.
+
+  @param[in] Measurement  A pointer to the Measurement record to test.
+
+  @retval     TRUE        The measurement record is used for core.
+  @retval     FALSE       The measurement record is NOT used for core.
+
+**/
+BOOLEAN
+IsCorePerf(
+  IN MEASUREMENT_RECORD        *Measurement
+  )
+{
+  BOOLEAN   RetVal;
+
+  RetVal = (BOOLEAN)(
+            ((Measurement->Identifier == MODULE_START_ID)            ||
+             (Measurement->Identifier == MODULE_END_ID)              ||
+             (Measurement->Identifier == MODULE_LOADIMAGE_START_ID)  ||
+             (Measurement->Identifier == MODULE_LOADIMAGE_END_ID)    ||
+             (Measurement->Identifier == MODULE_DB_START_ID)         ||
+             (Measurement->Identifier == MODULE_DB_END_ID)           ||
+             (Measurement->Identifier == MODULE_DB_SUPPORT_START_ID) ||
+             (Measurement->Identifier == MODULE_DB_SUPPORT_END_ID)   ||
+             (Measurement->Identifier == MODULE_DB_STOP_START_ID)    ||
+             (Measurement->Identifier == MODULE_DB_STOP_START_ID))
+            );
+  return RetVal;
+}
+
+/**
   Get the file name portion of the Pdb File Name.
-  
+
   The portion of the Pdb File Name between the last backslash and
   either a following period or the end of the string is converted
   to Unicode and copied into UnicodeBuffer.  The name is truncated,
   if necessary, to ensure that UnicodeBuffer is not overrun.
-  
+
   @param[in]  PdbFileName     Pdb file name.
   @param[out] UnicodeBuffer   The resultant Unicode File Name.
-  
+
 **/
 VOID
 DpGetShortPdbFileName (
@@ -175,7 +192,7 @@ DpGetShortPdbFileName (
   }
 }
 
-/** 
+/**
   Get a human readable name for an image handle.
   The following methods will be tried orderly:
     1. Image PDB
@@ -360,17 +377,17 @@ DpGetNameFromHandle (
   FreePool (StringPtr);
 }
 
-/** 
+/**
   Calculate the Duration in microseconds.
-  
+
   Duration is multiplied by 1000, instead of Frequency being divided by 1000 or
   multiplying the result by 1000, in order to maintain precision.  Since Duration is
   a 64-bit value, multiplying it by 1000 is unlikely to produce an overflow.
-  
+
   The time is calculated as (Duration * 1000) / Timer_Frequency.
-  
+
   @param[in]  Duration   The event duration in timer ticks.
-  
+
   @return     A 64-bit value which is the Elapsed time in microseconds.
 **/
 UINT64
@@ -378,22 +395,19 @@ DurationInMicroSeconds (
   IN UINT64 Duration
   )
 {
-  UINT64 Temp;
-
-  Temp = MultU64x32 (Duration, 1000);
-  return DivU64x32 (Temp, TimerInfo.Frequency);
+  return DivU64x32 (Duration, 1000);
 }
 
-/** 
+/**
   Get index of Measurement Record's match in the CumData array.
-  
+
   If the Measurement's Token value matches a Token in one of the CumData
   records, the index of the matching record is returned.  The returned
   index is a signed value so that negative values can indicate that
   the Measurement didn't match any entry in the CumData array.
-  
+
   @param[in]  Measurement A pointer to a Measurement Record to match against the CumData array.
-  
+
   @retval     <0    Token is not in the CumData array.
   @retval     >=0   Return value is the index into CumData where Token is found.
 **/
@@ -405,7 +419,7 @@ GetCumulativeItem(
   INTN    Index;
 
   for( Index = 0; Index < (INTN)NumCum; ++Index) {
-    if (AsciiStrnCmp (Measurement->Token, CumData[Index].Name, PERF_TOKEN_LENGTH) == 0) {
+    if (AsciiStrCmp (Measurement->Token, CumData[Index].Name) == 0) {
       return Index;  // Exit, we found a match
     }
   }

@@ -1,8 +1,8 @@
 /** @file
 Usb Peim definition.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved. <BR>
-  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved. <BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -88,7 +88,7 @@ typedef struct {
 #define USB_WAIT_PORT_STS_CHANGE_STALL  (100)
 
 //
-// Host software return timeout if port status doesn't change 
+// Host software return timeout if port status doesn't change
 // after 500ms(LOOP * STALL = 5000 * 0.1ms), set by experience
 //
 #define USB_WAIT_PORT_STS_CHANGE_LOOP   5000
@@ -112,7 +112,7 @@ typedef struct {
 
 /**
   Submits control transfer to a target USB device.
-  
+
   @param  PeiServices            The pointer of EFI_PEI_SERVICES.
   @param  This                   The pointer of PEI_USB_IO_PPI.
   @param  Request                USB device request to send.
@@ -144,11 +144,11 @@ PeiUsbControlTransfer (
 
 /**
   Submits bulk transfer to a bulk endpoint of a USB device.
-  
+
   @param  PeiServices           The pointer of EFI_PEI_SERVICES.
   @param  This                  The pointer of PEI_USB_IO_PPI.
   @param  DeviceEndpoint        Endpoint number and its direction in bit 7.
-  @param  Data                  A pointer to the buffer of data to transmit 
+  @param  Data                  A pointer to the buffer of data to transmit
                                 from or receive into.
   @param  DataLength            The lenght of the data buffer.
   @param  Timeout               Indicates the maximum time, in millisecond, which the
@@ -233,7 +233,7 @@ PeiUsbPortReset (
 
 /**
   Send reset signal over the given root hub port.
-  
+
   @param  PeiServices       Describes the list of possible PEI Services.
   @param  UsbHcPpi          The pointer of PEI_USB_HOST_CONTROLLER_PPI instance.
   @param  Usb2HcPpi         The pointer of PEI_USB2_HOST_CONTROLLER_PPI instance.

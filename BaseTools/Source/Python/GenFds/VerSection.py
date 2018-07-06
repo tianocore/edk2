@@ -22,6 +22,7 @@ import subprocess
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import VerSectionClassObject
 from Common.LongFilePathSupport import OpenLongFilePath as open
+from Common.DataType import SUP_MODULE_SEC
 
 ## generate version section
 #
@@ -52,21 +53,21 @@ class VerSection (VerSectionClassObject):
         #
         # Prepare the parameter of GenSection
         #
-        if FfsInf != None:
+        if FfsInf is not None:
             self.Alignment = FfsInf.__ExtendMacro__(self.Alignment)
             self.BuildNum = FfsInf.__ExtendMacro__(self.BuildNum)
             self.StringData = FfsInf.__ExtendMacro__(self.StringData)
             self.FileName = FfsInf.__ExtendMacro__(self.FileName)
 
         OutputFile = os.path.join(OutputPath,
-                                  ModuleName + 'SEC' + SecNum + Ffs.SectionSuffix.get('VERSION'))
+                                  ModuleName + SUP_MODULE_SEC + SecNum + Ffs.SectionSuffix.get('VERSION'))
         OutputFile = os.path.normpath(OutputFile)
 
         # Get String Data
         StringData = ''
-        if self.StringData != None:
+        if self.StringData is not None:
             StringData = self.StringData
-        elif self.FileName != None:
+        elif self.FileName is not None:
             FileNameStr = GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.FileName)
             FileNameStr = GenFdsGlobalVariable.MacroExtend(FileNameStr, Dict)
             FileObj = open(FileNameStr, 'r')

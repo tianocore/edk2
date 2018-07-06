@@ -1,6 +1,6 @@
 /** @file
   Handle TPM 2.0 physical presence requests from OS.
-  
+
   This library will handle TPM 2.0 physical presence request from OS.
 
   Caution: This module requires additional review when modified.
@@ -10,13 +10,13 @@
   Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction() and Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction()
   will receive untrusted input and do validation.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -27,12 +27,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <Protocol/SmmVariable.h>
 
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/Tcg2PpVendorLib.h>
 #include <Library/SmmServicesTableLib.h>
 
+#define     PP_INF_VERSION_1_2    "1.2"
+
 EFI_SMM_VARIABLE_PROTOCOL  *mTcg2PpSmmVariable;
+BOOLEAN                    mIsTcg2PPVerLowerThan_1_3 = FALSE;
 
 /**
   The handler for TPM physical presence function:
@@ -147,7 +151,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunctionEx (
                                    DataSize,
                                    &PpData
                                    );
-    if (EFI_ERROR (Status)) { 
+    if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "[TPM2] Set PP variable failure! Status = %r\n", Status));
       ReturnCode = TCG_PP_SUBMIT_REQUEST_TO_PREOS_GENERAL_FAILURE;
       goto EXIT;
@@ -199,7 +203,7 @@ EXIT:
   This API should be invoked in OS runtime phase to interface with ACPI method.
 
   Caution: This function may receive untrusted input.
-  
+
   @param[in]      OperationRequest TPM physical presence operation request.
   @param[in]      RequestParameter TPM physical presence operation request parameter.
 
@@ -229,7 +233,7 @@ Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (
   This API should be invoked in OS runtime phase to interface with ACPI method.
 
   Caution: This function may receive untrusted input.
-  
+
   @param[in]      OperationRequest TPM physical presence operation request.
 
   @return Return Code for Get User Confirmation Status for Operation.
@@ -245,7 +249,7 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
   EFI_TCG2_PHYSICAL_PRESENCE        PpData;
   EFI_TCG2_PHYSICAL_PRESENCE_FLAGS  Flags;
   BOOLEAN                           RequestConfirmed;
-  
+
   DEBUG ((EFI_D_INFO, "[TPM2] GetUserConfirmationStatusFunction, Request = %x\n", OperationRequest));
 
   //
@@ -310,7 +314,7 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
         RequestConfirmed = TRUE;
       }
       break;
-      
+
     case TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS:
       RequestConfirmed = TRUE;
       break;
@@ -337,11 +341,22 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
       break;
 
     default:
-      if (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
-        //
-        // TCG PP spec defined operations that are reserved or un-implemented
-        //
-        return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
+      if (!mIsTcg2PPVerLowerThan_1_3) {
+        if (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+          //
+          // TCG2 PP1.3 spec defined operations that are reserved or un-implemented
+          //
+          return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
+        }
+      } else {
+       //
+       // TCG PP lower than 1.3. (1.0, 1.1, 1.2)
+       //
+       if (OperationRequest <= TCG2_PHYSICAL_PRESENCE_NO_ACTION_MAX) {
+         RequestConfirmed = TRUE;
+       } else if (OperationRequest < TCG2_PHYSICAL_PRESENCE_VENDOR_SPECIFIC_OPERATION) {
+         return TCG_PP_GET_USER_CONFIRMATION_NOT_IMPLEMENTED;
+       }
       }
       break;
   }
@@ -354,17 +369,17 @@ Tcg2PhysicalPresenceLibGetUserConfirmationStatusFunction (
     return TCG_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_NOT_REQUIRED;
   } else {
     return TCG_PP_GET_USER_CONFIRMATION_ALLOWED_AND_PPUSER_REQUIRED;
-  }    
+  }
 }
 
 /**
   The constructor function locates SmmVariable protocol.
-  
-  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS. 
+
+  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor successfully added string package.
   @retval Other value   The constructor can't add string package.
 **/
@@ -376,6 +391,10 @@ Tcg2PhysicalPresenceLibConstructor (
   )
 {
   EFI_STATUS  Status;
+
+  if (AsciiStrnCmp(PP_INF_VERSION_1_2, (CHAR8 *)PcdGetPtr(PcdTcgPhysicalPresenceInterfaceVer), sizeof(PP_INF_VERSION_1_2) - 1) <= 0) {
+    mIsTcg2PPVerLowerThan_1_3 = TRUE;
+  }
 
   //
   // Locate SmmVariableProtocol.

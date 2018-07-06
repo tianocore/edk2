@@ -3,7 +3,7 @@
   and manage the legacy boot option, all legacy boot option is getting from
   the legacy BBS table.
 
-Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -237,7 +237,7 @@ LegacyBmFuzzyMatch (
       );
     if ((StrCmp (Description, BootOption->Description) == 0) && !BbsIndexUsed[BbsData->BbsIndex]) {
       //
-      // If devices with the same description string are connected, 
+      // If devices with the same description string are connected,
       // the BbsIndex of the first device is returned for the other device also.
       // So, check if the BbsIndex is already being used, before assigning the BbsIndex.
       //
@@ -264,7 +264,7 @@ LegacyBmFuzzyMatch (
       );
     if ((StrCmp (Description, BootOption->Description) == 0) && !BbsIndexUsed[Index]) {
       //
-      // If devices with the same description string are connected, 
+      // If devices with the same description string are connected,
       // the BbsIndex of the first device is assigned for the other device also.
       // So, check if the BbsIndex is already being used, before assigning the corrected BbsIndex.
       //
@@ -309,7 +309,7 @@ LegacyBmUpdateBbsIndex (
           ((LegacyDevOrder != NULL) && (*LegacyDevOrderSize != 0))
          );
 
-  for (Entry = LegacyDevOrder; 
+  for (Entry = LegacyDevOrder;
        Entry < (LEGACY_DEV_ORDER_ENTRY *) ((UINT8 *) LegacyDevOrder + *LegacyDevOrderSize);
        Entry = (LEGACY_DEV_ORDER_ENTRY *) ((UINTN) Entry + sizeof (BBS_TYPE) + Entry->Length)
        ) {
@@ -321,8 +321,8 @@ LegacyBmUpdateBbsIndex (
             // Delete the old entry
             //
             CopyMem (
-              &Entry->Data[Index], 
-              &Entry->Data[Index + 1], 
+              &Entry->Data[Index],
+              &Entry->Data[Index + 1],
               (UINT8 *) LegacyDevOrder + *LegacyDevOrderSize - (UINT8 *) &Entry->Data[Index + 1]
               );
             Entry->Length       -= sizeof (UINT16);
@@ -531,7 +531,7 @@ LegacyBmCreateLegacyBootOption (
   if ((BootOption == NULL) || (BbsEntry == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   LegacyBmBuildLegacyDevNameString (BbsEntry, BbsIndex, sizeof (Description), Description);
 
   //
@@ -574,7 +574,7 @@ LegacyBmCreateLegacyBootOption (
              );
   FreePool (DevicePath);
   FreePool (OptionalData);
-  
+
   return Status;
 }
 
@@ -621,7 +621,7 @@ LegacyBmFillDevOrderBuf (
   @param BbsTable        The BBS table.
   @param BbsCount        The BBS Count.
 
-  @retval EFI_SUCCES             The buffer is created and the EFI variable named 
+  @retval EFI_SUCCES             The buffer is created and the EFI variable named
                                  VAR_LEGACY_DEV_ORDER and EfiLegacyDevOrderGuid is
                                  set correctly.
   @retval EFI_OUT_OF_RESOURCES   Memmory or storage is not enough.
@@ -712,11 +712,11 @@ LegacyBmCreateDevOrder (
   DevOrderPtr->BbsType = BBS_HARDDISK;
   DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + HDCount * sizeof (UINT16));
   DevOrderPtr          = (LEGACY_DEV_ORDER_ENTRY *) LegacyBmFillDevOrderBuf (BbsTable, BBS_HARDDISK, BbsCount, DevOrderPtr->Data);
-  
+
   DevOrderPtr->BbsType = BBS_CDROM;
   DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + CDCount * sizeof (UINT16));
   DevOrderPtr          = (LEGACY_DEV_ORDER_ENTRY *) LegacyBmFillDevOrderBuf (BbsTable, BBS_CDROM, BbsCount, DevOrderPtr->Data);
-  
+
   DevOrderPtr->BbsType = BBS_EMBED_NETWORK;
   DevOrderPtr->Length  = (UINT16) (sizeof (UINT16) + NETCount * sizeof (UINT16));
   DevOrderPtr          = (LEGACY_DEV_ORDER_ENTRY *) LegacyBmFillDevOrderBuf (BbsTable, BBS_EMBED_NETWORK, BbsCount, DevOrderPtr->Data);
@@ -743,7 +743,7 @@ LegacyBmCreateDevOrder (
 }
 
 /**
-  Add the legacy boot devices from BBS table into 
+  Add the legacy boot devices from BBS table into
   the legacy device boot order.
 
   @retval EFI_SUCCESS           The boot devices are added successfully.
@@ -944,7 +944,7 @@ LegacyBmUpdateDevOrder (
     NETIndex++;
   }
   NewNETPtr = NewPtr->Data;
-  
+
   //
   // copy BEV
   //
@@ -1164,7 +1164,7 @@ LegacyBmPrintBbsTable (
   Set the boot priority for BBS entries based on boot option entry and boot order.
 
   @param  BootOption            The boot option is to be checked for refresh BBS table.
-  
+
   @retval EFI_SUCCESS           The boot priority for BBS entries is refreshed successfully.
   @retval EFI_NOT_FOUND         BBS entries can't be found.
   @retval EFI_OUT_OF_RESOURCES  Failed to get the legacy device boot order.
@@ -1224,7 +1224,7 @@ LegacyBmRefreshBbsTableForBoot (
   //
   // boot priority always starts at 0
   //
-  Priority = 0;  
+  Priority = 0;
   if ((DevicePathType (BootOption->FilePath) == BBS_DEVICE_PATH) &&
       (DevicePathSubType (BootOption->FilePath) == BBS_BBS_DP)) {
     //
@@ -1255,7 +1255,7 @@ LegacyBmRefreshBbsTableForBoot (
         (DevicePathSubType (Option[Index].FilePath) != BBS_BBS_DP)) {
       continue;
     }
-    
+
     DevType = LegacyBmDeviceType (Option[Index].FilePath);
     for (DeviceTypeIndex = 0; DeviceTypeIndex < DeviceTypeCount; DeviceTypeIndex++) {
       if (DeviceType[DeviceTypeIndex] == DevType) {
@@ -1284,7 +1284,7 @@ LegacyBmRefreshBbsTableForBoot (
   DEBUG_CODE_BEGIN();
     LegacyBmPrintBbsTable (LocalBbsTable, BbsCount);
   DEBUG_CODE_END();
-  
+
   return Status;
 }
 
@@ -1459,7 +1459,7 @@ LegacyBmRefreshAllBootOption (
   PERF_START (NULL, "LegacyBootOptionEnum", "BDS", 0);
 
   //
-  // Before enumerating the legacy boot option, we need to dispatch all the legacy option roms 
+  // Before enumerating the legacy boot option, we need to dispatch all the legacy option roms
   // to ensure the GetBbsInfo() counts all the legacy devices.
   //
   gBS->LocateHandleBuffer (
@@ -1481,7 +1481,7 @@ LegacyBmRefreshAllBootOption (
     for (Index = 0; Index < HandleCount; Index++) {
       //
       // Start the thunk driver so that the legacy option rom gets dispatched.
-      // Note: We don't directly call InstallPciRom because some thunk drivers 
+      // Note: We don't directly call InstallPciRom because some thunk drivers
       // (e.g. BlockIo thunk driver) depend on the immediate result after dispatching
       //
       Status = LegacyBios->CheckPciRom (

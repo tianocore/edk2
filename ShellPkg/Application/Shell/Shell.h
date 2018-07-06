@@ -2,7 +2,7 @@
   function definitions for internal to shell functions.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -294,7 +294,7 @@ RunCommand(
 /**
   Function will process and run a command line.
 
-  This will determine if the command line represents an internal shell 
+  This will determine if the command line represents an internal shell
   command or dispatch an external application.
 
   @param[in] CmdLine      The command line to parse.
@@ -383,8 +383,8 @@ TrimSpaces(
   );
 
 /**
-  
-  Create a new buffer list and stores the old one to OldBufferList  
+
+  Create a new buffer list and stores the old one to OldBufferList
 
   @param OldBufferList   The temporary list head used to store the nodes in BufferToFreeList.
 **/

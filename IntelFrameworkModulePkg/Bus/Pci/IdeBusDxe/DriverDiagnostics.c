@@ -1,15 +1,15 @@
 /** @file
   Implementation of UEFI driver Dialnostics protocol which to perform diagnostic on the IDE
   Bus controller.
-  
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
+
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -42,24 +42,24 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_DRIVER_DIAGNOSTICS2_PROTOCOL gIDEBusDriverDiag
   @param  ChildHandle      The handle of the child controller to run diagnostics on
                            This is an optional parameter that may be NULL.  It will
                            be NULL for device drivers.  It will also be NULL for a
-                           bus drivers that wish to run diagnostics on the bus controller. 
-                           It will not be NULL for a bus driver that wishes to run 
+                           bus drivers that wish to run diagnostics on the bus controller.
+                           It will not be NULL for a bus driver that wishes to run
                            diagnostics on one of its child controllers.
   @param  DiagnosticType   Indicates type of diagnostics to perform on the controller
                            specified by ControllerHandle and ChildHandle.
-  @param  Language         A pointer to a three character ISO 639-2 language identifier. 
-                           This is the language in which the optional error message should 
-                           be returned in Buffer, and it must match one of the languages 
+  @param  Language         A pointer to a three character ISO 639-2 language identifier.
+                           This is the language in which the optional error message should
+                           be returned in Buffer, and it must match one of the languages
                            specified in SupportedLanguages. The number of languages supported by
                            a driver is up to the driver writer.
   @param  ErrorType        A GUID that defines the format of the data returned in Buffer.
   @param  BufferSize       The size, in bytes, of the data returned in Buffer.
   @param  Buffer           A buffer that contains a Null-terminated Unicode string
-                           plus some additional data whose format is defined by ErrorType.  
-                           Buffer is allocated by this function with AllocatePool(), and 
+                           plus some additional data whose format is defined by ErrorType.
+                           Buffer is allocated by this function with AllocatePool(), and
                            it is the caller's responsibility to free it with a call to FreePool().
 
-  @retval  EFI_SUCCESS           The controller specified by ControllerHandle and ChildHandle passed 
+  @retval  EFI_SUCCESS           The controller specified by ControllerHandle and ChildHandle passed
                                  the diagnostic.
   @retval  EFI_INVALID_PARAMETER ControllerHandle is NULL.
   @retval  EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid EFI_HANDLE.
@@ -67,18 +67,18 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_DRIVER_DIAGNOSTICS2_PROTOCOL gIDEBusDriverDiag
   @retval  EFI_INVALID_PARAMETER ErrorType is NULL.
   @retval  EFI_INVALID_PARAMETER BufferType is NULL.
   @retval  EFI_INVALID_PARAMETER Buffer is NULL.
-  @retval  EFI_UNSUPPORTED       The driver specified by This does not support running 
-                                 diagnostics for the controller specified by ControllerHandle 
+  @retval  EFI_UNSUPPORTED       The driver specified by This does not support running
+                                 diagnostics for the controller specified by ControllerHandle
                                  and ChildHandle.
   @retval  EFI_UNSUPPORTED       The driver specified by This does not support the
                                  type of diagnostic specified by DiagnosticType.
-  @retval  EFI_UNSUPPORTED       The driver specified by This does not support the language 
+  @retval  EFI_UNSUPPORTED       The driver specified by This does not support the language
                                  specified by Language.
-  @retval  EFI_OUT_OF_RESOURCES  There are not enough resources available to complete the 
+  @retval  EFI_OUT_OF_RESOURCES  There are not enough resources available to complete the
                                  diagnostics.
-  @retval  EFI_OUT_OF_RESOURCES  There are not enough resources available to return the 
+  @retval  EFI_OUT_OF_RESOURCES  There are not enough resources available to return the
                                  status information in ErrorType, BufferSize,and Buffer.
-  @retval  EFI_DEVICE_ERROR      The controller specified by ControllerHandle and ChildHandle 
+  @retval  EFI_DEVICE_ERROR      The controller specified by ControllerHandle and ChildHandle
                                  did not pass the diagnostic.
 **/
 EFI_STATUS

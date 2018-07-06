@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for Mtftp6 driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -233,10 +233,10 @@ Mtftp6ComponentNameGetDriverName (
 
   @param  Mtftp6[in]                A pointer to the EFI_MTFTP6_PROTOCOL.
 
-  
+
   @retval EFI_SUCCESS               Update the ControllerNameTable of this instance successfully.
   @retval EFI_INVALID_PARAMETER     The input parameter is invalid.
-  
+
 **/
 EFI_STATUS
 UpdateName (
@@ -261,7 +261,7 @@ UpdateName (
     if (EFI_ERROR (Status)) {
       return Status;
     }
-    UnicodeSPrint (HandleName, sizeof (HandleName), 
+    UnicodeSPrint (HandleName, sizeof (HandleName),
       L"MTFTPv6(ServerIp=%s, InitialServerPort=%d)",
       Address,
       Mtftp6ModeData.ConfigData.InitialServerPort
@@ -274,7 +274,7 @@ UpdateName (
     FreeUnicodeStringTable (gMtftp6ControllerNameTable);
     gMtftp6ControllerNameTable = NULL;
   }
-  
+
   Status = AddUnicodeString2 (
              "eng",
              gMtftp6ComponentName.SupportedLanguages,
@@ -285,7 +285,7 @@ UpdateName (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   return AddUnicodeString2 (
            "en",
            gMtftp6ComponentName2.SupportedLanguages,
@@ -383,13 +383,13 @@ Mtftp6ComponentNameGetControllerName (
   if (ChildHandle == NULL) {
     return EFI_UNSUPPORTED;
   }
-  
-  // 
-  // Make sure this driver produced ChildHandle 
-  // 
+
+  //
+  // Make sure this driver produced ChildHandle
+  //
   Status = EfiTestChildHandle (
              ControllerHandle,
-             ChildHandle, 
+             ChildHandle,
              &gEfiUdp6ProtocolGuid
              );
   if (EFI_ERROR (Status)) {
@@ -416,7 +416,7 @@ Mtftp6ComponentNameGetControllerName (
   //
   Status = UpdateName (Mtftp6);
   if (EFI_ERROR (Status)) {
-    return Status; 
+    return Status;
   }
 
   return LookupUnicodeString2 (

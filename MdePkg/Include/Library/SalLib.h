@@ -1,7 +1,7 @@
 /** @file
   Provides library services to make SAL Calls.
 
-Copyright (c) 2007 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,8 +19,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Makes a SAL procedure call.
-  
-  This is a wrapper function to make a SAL procedure call.  
+
+  This is a wrapper function to make a SAL procedure call.
   No parameter checking is performed on the 8 input parameters,
   but there are some common rules that the caller should follow
   when making a SAL call.  Any address passed to SAL as buffers

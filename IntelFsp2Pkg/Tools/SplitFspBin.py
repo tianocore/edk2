@@ -1,6 +1,6 @@
 ## @ FspTool.py
 #
-# Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -234,11 +234,51 @@ class EFI_IMAGE_OPTIONAL_HEADER32(Structure):
         ('DataDirectory',                 ARRAY(EFI_IMAGE_DATA_DIRECTORY, 16))
         ]
 
+class EFI_IMAGE_OPTIONAL_HEADER32_PLUS(Structure):
+    _fields_ = [
+        ('Magic',                         c_uint16),
+        ('MajorLinkerVersion',            c_uint8),
+        ('MinorLinkerVersion',            c_uint8),
+        ('SizeOfCode',                    c_uint32),
+        ('SizeOfInitializedData',         c_uint32),
+        ('SizeOfUninitializedData',       c_uint32),
+        ('AddressOfEntryPoint',           c_uint32),
+        ('BaseOfCode',                    c_uint32),
+        ('ImageBase',                     c_uint64),
+        ('SectionAlignment',              c_uint32),
+        ('FileAlignment',                 c_uint32),
+        ('MajorOperatingSystemVersion',   c_uint16),
+        ('MinorOperatingSystemVersion',   c_uint16),
+        ('MajorImageVersion',             c_uint16),
+        ('MinorImageVersion',             c_uint16),
+        ('MajorSubsystemVersion',         c_uint16),
+        ('MinorSubsystemVersion',         c_uint16),
+        ('Win32VersionValue',             c_uint32),
+        ('SizeOfImage',                   c_uint32),
+        ('SizeOfHeaders',                 c_uint32),
+        ('CheckSum'     ,                 c_uint32),
+        ('Subsystem',                     c_uint16),
+        ('DllCharacteristics',            c_uint16),
+        ('SizeOfStackReserve',            c_uint64),
+        ('SizeOfStackCommit' ,            c_uint64),
+        ('SizeOfHeapReserve',             c_uint64),
+        ('SizeOfHeapCommit' ,             c_uint64),
+        ('LoaderFlags'     ,              c_uint32),
+        ('NumberOfRvaAndSizes',           c_uint32),
+        ('DataDirectory',                 ARRAY(EFI_IMAGE_DATA_DIRECTORY, 16))
+        ]
+
+class EFI_IMAGE_OPTIONAL_HEADER(Union):
+    _fields_ = [
+        ('PeOptHdr',             EFI_IMAGE_OPTIONAL_HEADER32),
+        ('PePlusOptHdr',         EFI_IMAGE_OPTIONAL_HEADER32_PLUS)
+        ]
+
 class EFI_IMAGE_NT_HEADERS32(Structure):
     _fields_ = [
         ('Signature',            c_uint32),
         ('FileHeader',           EFI_IMAGE_FILE_HEADER),
-        ('OptionalHeader',       EFI_IMAGE_OPTIONAL_HEADER32)
+        ('OptionalHeader',       EFI_IMAGE_OPTIONAL_HEADER)
         ]
 
 
@@ -527,16 +567,24 @@ class PeTeImage:
         tehdr          = EFI_TE_IMAGE_HEADER.from_buffer (data, 0)
         if   tehdr.Signature == 'VZ': # TE image
             self.TeHdr   = tehdr
-        elif tehdr.Signature == 'MZ': # PE32 image
+        elif tehdr.Signature == 'MZ': # PE image
             self.TeHdr   = None
             self.DosHdr  = EFI_IMAGE_DOS_HEADER.from_buffer (data, 0)
             self.PeHdr   = EFI_IMAGE_NT_HEADERS32.from_buffer (data, self.DosHdr.e_lfanew)
             if self.PeHdr.Signature != 0x4550:
                 raise Exception("ERROR: Invalid PE32 header !")
-            if self.PeHdr.FileHeader.SizeOfOptionalHeader < EFI_IMAGE_OPTIONAL_HEADER32.DataDirectory.offset:
-                raise Exception("ERROR: Unsupported PE32 image !")
-            if self.PeHdr.OptionalHeader.NumberOfRvaAndSizes <= EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC:
-                raise Exception("ERROR: No relocation information available !")
+            if self.PeHdr.OptionalHeader.PeOptHdr.Magic == 0x10b: # PE32 image
+                if self.PeHdr.FileHeader.SizeOfOptionalHeader < EFI_IMAGE_OPTIONAL_HEADER32.DataDirectory.offset:
+                    raise Exception("ERROR: Unsupported PE32 image !")
+                if self.PeHdr.OptionalHeader.PeOptHdr.NumberOfRvaAndSizes <= EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC:
+                    raise Exception("ERROR: No relocation information available !")
+            elif self.PeHdr.OptionalHeader.PeOptHdr.Magic == 0x20b: # PE32+ image
+                if self.PeHdr.FileHeader.SizeOfOptionalHeader < EFI_IMAGE_OPTIONAL_HEADER32_PLUS.DataDirectory.offset:
+                    raise Exception("ERROR: Unsupported PE32+ image !")
+                if self.PeHdr.OptionalHeader.PePlusOptHdr.NumberOfRvaAndSizes <= EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC:
+                    raise Exception("ERROR: No relocation information available !")
+            else:
+                raise Exception("ERROR: Invalid PE32 optional header !")
         self.Offset    = offset
         self.Data      = data
         self.RelocList = []
@@ -549,8 +597,12 @@ class PeTeImage:
             rsize   = self.TeHdr.DataDirectoryBaseReloc.Size
             roffset = sizeof(self.TeHdr) - self.TeHdr.StrippedSize + self.TeHdr.DataDirectoryBaseReloc.VirtualAddress
         else:
-            rsize   = self.PeHdr.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC].Size
-            roffset = self.PeHdr.OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC].VirtualAddress
+            if self.PeHdr.OptionalHeader.PeOptHdr.Magic == 0x10b: # PE32 image
+                rsize   = self.PeHdr.OptionalHeader.PeOptHdr.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC].Size
+                roffset = self.PeHdr.OptionalHeader.PeOptHdr.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC].VirtualAddress
+            if self.PeHdr.OptionalHeader.PeOptHdr.Magic == 0x20b: # PE32+ image
+                rsize   = self.PeHdr.OptionalHeader.PePlusOptHdr.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC].Size
+                roffset = self.PeHdr.OptionalHeader.PePlusOptHdr.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY.BASERELOC].VirtualAddress
 
         alignment = 4
         offset = roffset
@@ -565,9 +617,9 @@ class PeTeImage:
             for each in rdata:
                 roff  = each & 0xfff
                 rtype = each >> 12
-                if rtype == 0: # IMAGE_REL_BASED.ABSOLUTE:
+                if rtype == 0: # IMAGE_REL_BASED_ABSOLUTE:
                     continue
-                if rtype != 3: # IMAGE_REL_BASED_HIGHLOW
+                if ((rtype != 3) and (rtype != 10)): # IMAGE_REL_BASED_HIGHLOW and IMAGE_REL_BASED_DIR64
                     raise Exception("ERROR: Unsupported relocation type %d!" % rtype)
                 # Calculate the offset of the relocation
                 aoff  = blkhdr.PageRVA + roff
@@ -582,11 +634,17 @@ class PeTeImage:
             return count
 
         for (rtype, roff) in self.RelocList:
-            if rtype == 0x03: # HIGHLOW
+            if rtype == 3: # IMAGE_REL_BASED_HIGHLOW
                 offset = roff + self.Offset
                 value  = Bytes2Val(fdbin[offset:offset+sizeof(c_uint32)])
                 value += delta
                 fdbin[offset:offset+sizeof(c_uint32)] = Val2Bytes(value, sizeof(c_uint32))
+                count += 1
+            elif rtype == 10: # IMAGE_REL_BASED_DIR64
+                offset = roff + self.Offset
+                value  = Bytes2Val(fdbin[offset:offset+sizeof(c_uint64)])
+                value += delta
+                fdbin[offset:offset+sizeof(c_uint64)] = Val2Bytes(value, sizeof(c_uint64))
                 count += 1
             else:
                 raise Exception('ERROR: Unknown relocation type %d !' % rtype)

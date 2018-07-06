@@ -1,7 +1,7 @@
 /** @file
   VFR file used by the HTTP Boot configuration component.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -24,7 +24,7 @@ formset
   varstore HTTP_BOOT_CONFIG_IFR_NVDATA,
     name = HTTP_BOOT_CONFIG_IFR_NVDATA,
     guid = HTTP_BOOT_CONFIG_GUID;
-  
+
   form formid = FORMID_MAIN_FORM,
     title  = STRING_TOKEN(STR_HTTP_BOOT_CONFIG_FORM_TITLE);
 

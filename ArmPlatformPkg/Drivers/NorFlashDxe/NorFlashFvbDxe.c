@@ -25,6 +25,7 @@
 
 #include <Guid/VariableFormat.h>
 #include <Guid/SystemNvDataGuid.h>
+#include <Guid/NvVarStoreFormatted.h>
 
 #include "NorFlashDxe.h"
 
@@ -58,10 +59,6 @@ InitializeFvAndVariableStoreHeaders (
   UINTN                               HeadersLength;
   EFI_FIRMWARE_VOLUME_HEADER          *FirmwareVolumeHeader;
   VARIABLE_STORE_HEADER               *VariableStoreHeader;
-
-  if (!Instance->Initialized && Instance->Initialize) {
-    Instance->Initialize (Instance);
-  }
 
   HeadersLength = sizeof(EFI_FIRMWARE_VOLUME_HEADER) + sizeof(EFI_FV_BLOCK_MAP_ENTRY) + sizeof(VARIABLE_STORE_HEADER);
   Headers = AllocateZeroPool(HeadersLength);
@@ -431,10 +428,6 @@ FvbRead (
 
   DEBUG ((DEBUG_BLKIO, "FvbRead(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Instance->StartLba + Lba, Offset, *NumBytes, Buffer));
 
-  if (!Instance->Initialized && Instance->Initialize) {
-    Instance->Initialize(Instance);
-  }
-
   TempStatus = EFI_SUCCESS;
 
   // Cache the block size to avoid de-referencing pointers all the time
@@ -749,7 +742,6 @@ NorFlashFvbInitialize (
       EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
   ASSERT_EFI_ERROR (Status);
 
-  Instance->Initialized = TRUE;
   mFlashNvStorageVariableBase = FixedPcdGet32 (PcdFlashNvStorageVariableBase);
 
   // Set the index of the first LBA for the FVB
@@ -784,6 +776,18 @@ NorFlashFvbInitialize (
       return Status;
     }
   }
+
+  //
+  // The driver implementing the variable read service can now be dispatched;
+  // the varstore headers are in place.
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &gImageHandle,
+                  &gEdkiiNvVarStoreFormattedGuid,
+                  EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
 
   //
   // Register for the virtual address change event

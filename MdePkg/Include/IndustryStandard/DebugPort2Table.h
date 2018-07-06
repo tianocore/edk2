@@ -1,8 +1,8 @@
-/** @file   
-  ACPI debug port 2 table definition, defined at 
+/** @file
+  ACPI debug port 2 table definition, defined at
   Microsoft DebugPort2Specification.
 
-  Copyright (c) 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2012 - 2016, ARM Limited. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License

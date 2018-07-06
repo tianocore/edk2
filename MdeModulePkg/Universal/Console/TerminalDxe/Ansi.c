@@ -1,7 +1,7 @@
 /** @file
   Implementation of translation upon PC ANSI.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -47,8 +47,8 @@ AnsiRawDataToUnicode (
   or valid text graphics.
 
   @param  TerminalDevice          The terminal device.
-  @param  WString                 The input string.          
- 
+  @param  WString                 The input string.
+
   @retval EFI_UNSUPPORTED         If not all input characters are valid.
   @retval EFI_SUCCESS             If all input characters are valid.
 

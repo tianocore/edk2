@@ -3,14 +3,14 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by Ftw module.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -82,7 +82,7 @@ typedef struct {
   UINTN                                   FtwWorkSpaceSize;   // Size of working space range that stores write record.
   EFI_LBA                                 FtwWorkSpaceLbaInSpare; // Start LBA of working space in spare block.
   UINTN                                   FtwWorkSpaceBaseInSpare;// Offset into the FtwWorkSpaceLbaInSpare block.
-  UINT8                                   *FtwWorkSpace;      // Point to Work Space in memory buffer 
+  UINT8                                   *FtwWorkSpace;      // Point to Work Space in memory buffer
   //
   // Following a buffer of FtwWorkSpace[FTW_WORK_SPACE_SIZE],
   // Allocated with EFI_FTW_DEVICE.
@@ -183,11 +183,11 @@ FtwAllocate (
                          reading, writing, and erasing the target block.
   @param Buffer          The data to write.
 
-  @retval EFI_SUCCESS          The function completed successfully 
-  @retval EFI_ABORTED          The function could not complete successfully. 
-  @retval EFI_BAD_BUFFER_SIZE  The input data can't fit within the spare block. 
+  @retval EFI_SUCCESS          The function completed successfully
+  @retval EFI_ABORTED          The function could not complete successfully.
+  @retval EFI_BAD_BUFFER_SIZE  The input data can't fit within the spare block.
                                Offset + *NumBytes > SpareAreaLength.
-  @retval EFI_ACCESS_DENIED    No writes have been allocated. 
+  @retval EFI_ACCESS_DENIED    No writes have been allocated.
   @retval EFI_OUT_OF_RESOURCES Cannot allocate enough memory resource.
   @retval EFI_NOT_FOUND        Cannot find FVB protocol by handle.
 
@@ -290,7 +290,7 @@ FtwGetLastWrite (
                                 partially erased.
   @retval EFI_INVALID_PARAMETER One or more of the LBAs listed
                                 in the variable argument list do
-                                not exist in the firmware volume.  
+                                not exist in the firmware volume.
 
 
 **/
@@ -654,10 +654,10 @@ EFI_STATUS
 FtwGetSarProtocol (
   OUT VOID                                **SarProtocol
   );
-  
+
 /**
   Function returns an array of handles that support the FVB protocol
-  in a buffer allocated from pool. 
+  in a buffer allocated from pool.
 
   @param[out]  NumberHandles    The number of handles returned in Buffer.
   @param[out]  Buffer           A pointer to the buffer to return the requested
@@ -689,7 +689,7 @@ GetFvbCountAndBuffer (
 **/
 EFI_STATUS
 InitFtwDevice (
-  OUT EFI_FTW_DEVICE               **FtwData 
+  OUT EFI_FTW_DEVICE               **FtwData
   );
 
 
@@ -700,7 +700,7 @@ InitFtwDevice (
 
   @retval EFI_SUCCESS           Initialize the FTW protocol successfully.
   @retval EFI_NOT_FOUND         No proper FVB protocol was found.
-  
+
 **/
 EFI_STATUS
 InitFtwProtocol (

@@ -12,7 +12,7 @@
   from the UEFI shell. It is entirely read-only.
 
 Copyright (c) 2014, ARM Limited. All rights reserved.
-Copyright (c) 2014 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -826,7 +826,7 @@ FvSimpleFileSystemSetPosition (
     // Reset directory position to first entry
     //
     if (File->DirReadNext) {
-      File->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance); 
+      File->DirReadNext = FVFS_GET_FIRST_FILE_INFO (Instance);
     }
   } else if (Position == 0xFFFFFFFFFFFFFFFFull) {
     File->Position = File->FvFileInfo->FileInfo.FileSize;
@@ -942,9 +942,9 @@ FvSimpleFileSystemGetInfo (
     FsInfoOut = (EFI_FILE_SYSTEM_INFO *) Buffer;
 
     CopyMem (FsInfoOut, &mFsInfoTemplate, sizeof (EFI_FILE_SYSTEM_INFO));
-    Status = StrnCpyS ( FsInfoOut->VolumeLabel, 
-                        (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_INFO, VolumeLabel)) / sizeof (CHAR16), 
-                        Instance->VolumeLabel, 
+    Status = StrnCpyS ( FsInfoOut->VolumeLabel,
+                        (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_INFO, VolumeLabel)) / sizeof (CHAR16),
+                        Instance->VolumeLabel,
                         StrLen (Instance->VolumeLabel)
                         );
     ASSERT_EFI_ERROR (Status);
@@ -967,9 +967,9 @@ FvSimpleFileSystemGetInfo (
     }
 
     FsVolumeLabel = (EFI_FILE_SYSTEM_VOLUME_LABEL*) Buffer;
-    Status        = StrnCpyS (FsVolumeLabel->VolumeLabel, 
+    Status        = StrnCpyS (FsVolumeLabel->VolumeLabel,
                               (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_VOLUME_LABEL, VolumeLabel)) / sizeof (CHAR16),
-                              Instance->VolumeLabel, 
+                              Instance->VolumeLabel,
                               StrLen (Instance->VolumeLabel)
                               );
     ASSERT_EFI_ERROR (Status);
@@ -1022,7 +1022,7 @@ FvSimpleFileSystemSetInfo (
   IN VOID                     *Buffer
   )
 {
-  if (CompareGuid (InformationType, &gEfiFileSystemInfoGuid) || 
+  if (CompareGuid (InformationType, &gEfiFileSystemInfoGuid) ||
       CompareGuid (InformationType, &gEfiFileInfoGuid) ||
       CompareGuid (InformationType, &gEfiFileSystemVolumeLabelInfoIdGuid)) {
     return EFI_WRITE_PROTECTED;

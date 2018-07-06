@@ -1,7 +1,7 @@
 ## @file
 # This file contain unit test for CommentParsing
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -28,7 +28,7 @@ from Object.POM.CommonObject import PpiObject
 from Object.POM.CommonObject import PcdObject
 from Object.POM.ModuleObject import HobObject
                                
-from Library.String import GetSplitValueList
+from Library.StringUtils import GetSplitValueList
 from Library.DataType import TAB_SPACE_SPLIT
 from Library.DataType import TAB_LANGUAGE_EN_US
 from Library.DataType import TAB_LANGUAGE_ENG

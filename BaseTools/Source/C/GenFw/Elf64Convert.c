@@ -1,7 +1,7 @@
 /** @file
 Elf64 convert solution
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2013-2014, ARM Ltd. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
@@ -377,6 +377,15 @@ ScanSections64 (
   }
 
   //
+  // Check if mCoffAlignment is larger than MAX_COFF_ALIGNMENT
+  //
+  if (mCoffAlignment > MAX_COFF_ALIGNMENT) {
+    Error (NULL, 0, 3000, "Invalid", "Section alignment is larger than MAX_COFF_ALIGNMENT.");
+    assert (FALSE);
+  }
+
+
+  //
   // Move the PE/COFF header right before the first section. This will help us
   // save space when converting to TE.
   //
@@ -661,6 +670,9 @@ WriteSections64 (
       switch (Shdr->sh_type) {
       case SHT_PROGBITS:
         /* Copy.  */
+        if (Shdr->sh_offset + Shdr->sh_size > mFileBufferSize) {
+          return FALSE;
+        }
         memcpy(mCoffFile + mCoffSectionsOffset[Idx],
               (UINT8*)mEhdr + Shdr->sh_offset,
               (size_t) Shdr->sh_size);

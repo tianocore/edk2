@@ -2,7 +2,7 @@
 # ARM processor package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2017, ARM Limited. All rights reserved.
+# Copyright (c) 2011 - 2018, ARM Limited. All rights reserved.
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -39,6 +39,7 @@
   DefaultExceptionHandlerLib|Include/Library/DefaultExceptionHandlerLib.h
   ArmDisassemblerLib|Include/Library/ArmDisassemblerLib.h
   ArmGicArchLib|Include/Library/ArmGicArchLib.h
+  ArmMtlLib|ArmPlatformPkg/Include/Library/ArmMtlLib.h
   ArmSvcLib|Include/Library/ArmSvcLib.h
 
 [Guids.common]
@@ -47,6 +48,19 @@
   ## ARM MPCore table
   # Include/Guid/ArmMpCoreInfo.h
   gArmMpCoreInfoGuid = { 0xa4ee0728, 0xe5d7, 0x4ac5,  {0xb2, 0x1e, 0x65, 0x8e, 0xd8, 0x57, 0xe8, 0x34} }
+
+[Protocols.common]
+  ## Arm System Control and Management Interface(SCMI) Base protocol
+  ## ArmPkg/Include/Protocol/ArmScmiBaseProtocol.h
+  gArmScmiBaseProtocolGuid = { 0xd7e5abe9, 0x33ab, 0x418e, { 0x9f, 0x91, 0x72, 0xda, 0xe2, 0xba, 0x8e, 0x2f } }
+
+  ## Arm System Control and Management Interface(SCMI) Clock management protocol
+  ## ArmPkg/Include/Protocol/ArmScmiClockProtocol.h
+  gArmScmiClockProtocolGuid = { 0x91ce67a8, 0xe0aa, 0x4012, { 0xb9, 0x9f, 0xb6, 0xfc, 0xf3, 0x4, 0x8e, 0xaa } }
+
+  ## Arm System Control and Management Interface(SCMI) Clock management protocol
+  ## ArmPkg/Include/Protocol/ArmScmiPerformanceProtocol.h
+  gArmScmiPerformanceProtocolGuid = { 0x9b8ba84, 0x3dd3, 0x49a6, { 0xa0, 0x5a, 0x31, 0x34, 0xa5, 0xf0, 0x7b, 0xad } }
 
 [Ppis]
   ## Include/Ppi/ArmMpCoreInfo.h
@@ -70,6 +84,10 @@
 
   # Define if the GICv3 controller should use the GICv2 legacy
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE|BOOLEAN|0x00000042
+
+  # Whether to implement warm reboot for capsule update using a jump back to the
+  # PEI entry point with caches and interrupts disabled.
+  gArmTokenSpaceGuid.PcdArmReenterPeiForCapsuleWarmReboot|FALSE|BOOLEAN|0x0000001F
 
 [PcdsFeatureFlag.ARM]
   # Whether to map normal memory as non-shareable. FALSE is the safe choice, but

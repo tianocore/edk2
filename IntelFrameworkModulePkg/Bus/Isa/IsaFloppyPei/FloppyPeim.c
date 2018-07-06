@@ -1,8 +1,8 @@
 /** @file
 Floppy Peim to support Recovery function from Floppy device.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -152,7 +152,7 @@ PEI_DMA_TABLE      mRegisterTable[] = {
 };
 
 //
-// Table of diskette parameters of various diskette types 
+// Table of diskette parameters of various diskette types
 //
 DISKET_PARA_TABLE  DiskPara[9] = {
   {
@@ -292,7 +292,7 @@ FDC_BLK_IO_DEV mBlockIoDevTemplate = {
                             TRUE means input.
                             FALSE means output.
   @param  TimeoutInMseconds  Timeout value to wait.
-  
+
   @retval EFI_SUCCESS       FDC is ready.
   @retval EFI_NOT_READY     FDC is not ready within the specified time period.
 
@@ -783,7 +783,7 @@ Recalibrate (
 
     if ((Sts0 & 0xf0) == BIT5 && Pcn == 0) {
       //
-      // Recalibration is successful. 
+      // Recalibration is successful.
       //
       Info->Pcn = 0;
       Info->NeedRecalibrate = FALSE;
@@ -1022,7 +1022,7 @@ DiscoverFdcDevice (
     //
     // No diskette in floppy.
     //
-    MediaInfo->MediaPresent = FALSE;    
+    MediaInfo->MediaPresent = FALSE;
   } else if (Status != EFI_MEDIA_CHANGED && Status != EFI_SUCCESS) {
     //
     // EFI_DEVICE_ERROR
@@ -1439,16 +1439,16 @@ ReadDataSector (
 /**
   Gets the count of block I/O devices that one specific block driver detects.
 
-  This function is used for getting the count of block I/O devices that one 
+  This function is used for getting the count of block I/O devices that one
   specific block driver detects.  To the PEI ATAPI driver, it returns the number
-  of all the detected ATAPI devices it detects during the enumeration process. 
-  To the PEI legacy floppy driver, it returns the number of all the legacy 
-  devices it finds during its enumeration process. If no device is detected, 
-  then the function will return zero.  
-  
-  @param[in]  PeiServices          General-purpose services that are available 
+  of all the detected ATAPI devices it detects during the enumeration process.
+  To the PEI legacy floppy driver, it returns the number of all the legacy
+  devices it finds during its enumeration process. If no device is detected,
+  then the function will return zero.
+
+  @param[in]  PeiServices          General-purpose services that are available
                                    to every PEIM.
-  @param[in]  This                 Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI 
+  @param[in]  This                 Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI
                                    instance.
   @param[out] NumberBlockDevices   The number of block I/O devices discovered.
 
@@ -1477,27 +1477,27 @@ FdcGetNumberOfBlockDevices (
 /**
   Gets a block device's media information.
 
-  This function will provide the caller with the specified block device's media 
-  information. If the media changes, calling this function will update the media 
+  This function will provide the caller with the specified block device's media
+  information. If the media changes, calling this function will update the media
   information accordingly.
 
   @param[in]  PeiServices   General-purpose services that are available to every
                             PEIM
   @param[in]  This          Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI instance.
-  @param[in]  DeviceIndex   Specifies the block device to which the function wants 
-                            to talk. Because the driver that implements Block I/O 
-                            PPIs will manage multiple block devices, the PPIs that 
-                            want to talk to a single device must specify the 
+  @param[in]  DeviceIndex   Specifies the block device to which the function wants
+                            to talk. Because the driver that implements Block I/O
+                            PPIs will manage multiple block devices, the PPIs that
+                            want to talk to a single device must specify the
                             device index that was assigned during the enumeration
-                            process. This index is a number from one to 
+                            process. This index is a number from one to
                             NumberBlockDevices.
-  @param[out] MediaInfo     The media information of the specified block media.  
-                            The caller is responsible for the ownership of this 
+  @param[out] MediaInfo     The media information of the specified block media.
+                            The caller is responsible for the ownership of this
                             data structure.
-  
-  @retval EFI_SUCCESS        Media information about the specified block device 
+
+  @retval EFI_SUCCESS        Media information about the specified block device
                              was obtained successfully.
-  @retval EFI_DEVICE_ERROR   Cannot get the media information due to a hardware 
+  @retval EFI_DEVICE_ERROR   Cannot get the media information due to a hardware
                              error.
   @retval Others             Other failure occurs.
 
@@ -1559,31 +1559,31 @@ FdcGetBlockDeviceMediaInfo (
 /**
   Reads the requested number of blocks from the specified block device.
 
-  The function reads the requested number of blocks from the device. All the 
+  The function reads the requested number of blocks from the device. All the
   blocks are read, or an error is returned. If there is no media in the device,
   the function returns EFI_NO_MEDIA.
 
-  @param[in]  PeiServices   General-purpose services that are available to 
+  @param[in]  PeiServices   General-purpose services that are available to
                             every PEIM.
   @param[in]  This          Indicates the EFI_PEI_RECOVERY_BLOCK_IO_PPI instance.
-  @param[in]  DeviceIndex   Specifies the block device to which the function wants 
-                            to talk. Because the driver that implements Block I/O 
-                            PPIs will manage multiple block devices, the PPIs that 
-                            want to talk to a single device must specify the device 
-                            index that was assigned during the enumeration process. 
+  @param[in]  DeviceIndex   Specifies the block device to which the function wants
+                            to talk. Because the driver that implements Block I/O
+                            PPIs will manage multiple block devices, the PPIs that
+                            want to talk to a single device must specify the device
+                            index that was assigned during the enumeration process.
                             This index is a number from one to NumberBlockDevices.
   @param[in]  StartLBA      The starting logical block address (LBA) to read from
                             on the device
   @param[in]  BufferSize    The size of the Buffer in bytes. This number must be
                             a multiple of the intrinsic block size of the device.
   @param[out] Buffer        A pointer to the destination buffer for the data.
-                            The caller is responsible for the ownership of the 
+                            The caller is responsible for the ownership of the
                             buffer.
-                         
+
   @retval EFI_SUCCESS             The data was read correctly from the device.
-  @retval EFI_DEVICE_ERROR        The device reported an error while attempting 
+  @retval EFI_DEVICE_ERROR        The device reported an error while attempting
                                   to perform the read operation.
-  @retval EFI_INVALID_PARAMETER   The read request contains LBAs that are not 
+  @retval EFI_INVALID_PARAMETER   The read request contains LBAs that are not
                                   valid, or the buffer is not properly aligned.
   @retval EFI_NO_MEDIA            There is no media in the device.
   @retval EFI_BAD_BUFFER_SIZE     The BufferSize parameter is not a multiple of
@@ -1729,7 +1729,7 @@ FdcPeimEntry (
 
   //
   // Allocate memory for instance of FDC_BLK_IO_DEV and copy initial value
-  // from template to it. 
+  // from template to it.
   //
   FdcBlkIoDev = AllocatePages (EFI_SIZE_TO_PAGES(sizeof (FDC_BLK_IO_DEV)));
   if (FdcBlkIoDev == NULL) {

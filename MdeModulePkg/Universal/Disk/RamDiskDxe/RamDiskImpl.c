@@ -2,7 +2,7 @@
   HII Config Access protocol implementation of RamDiskDxe driver.
 
   Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
-  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+  (C) Copyright 2016-2018 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -276,6 +276,8 @@ RamDiskRouteConfig (
   if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  *Progress = Configuration;
 
   return EFI_NOT_FOUND;
 }

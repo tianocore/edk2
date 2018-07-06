@@ -1,15 +1,15 @@
 ///** @file
 //  String definitions for Boot Maintenance Utility.
 //
-//  Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+//  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
 //  http://opensource.org/licenses/bsd-license.php
-//  
+//
 //  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-//  
+//
 //**/
 
 /=#
@@ -71,9 +71,9 @@
                                            #language fr-FR "UEFI Optimized Boot"
 #string STR_FORM_UEFI_OPTIMIZED_BOOT_HELP  #language en-US "Modify the UEFI Optimized Boot setting"
                                            #language fr-FR "Modify the UEFI Optimized Boot setting"
-#string UEFI_OPTIMIZED_BOOT_DESCRIPTION	   #language en-US "UEFI Optimized Boot"
+#string UEFI_OPTIMIZED_BOOT_DESCRIPTION     #language en-US "UEFI Optimized Boot"
                                            #language fr-FR "UEFI Optimized Boot"
-#string UEFI_OPTIMIZED_BOOT_HELP	       #language en-US "Check to enable UEFI Optimized Boot"
+#string UEFI_OPTIMIZED_BOOT_HELP         #language en-US "Check to enable UEFI Optimized Boot"
                                            #language fr-FR "Check to enable UEFI Optimized Boot"
 #string STR_FORM_CON_MAIN_TITLE        #language en-US  "Console Options"
                                        #language fr-FR  "Console Options"

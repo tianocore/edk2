@@ -1,7 +1,7 @@
 /** @file
   Intel Processor Trace feature.
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,11 +16,11 @@
 
 ///
 /// This macro define the max entries in the Topa table.
-/// Each entry in the table contains some attribute bits, a pointer to an output region, and the size of the region. 
-/// The last entry in the table may hold a pointer to the next table. This pointer can either point to the top of the 
-/// current table (for circular array) or to the base of another table. 
-/// At least 2 entries are needed because the list of entries must 
-/// be terminated by an entry with the END bit set to 1, so 2 
+/// Each entry in the table contains some attribute bits, a pointer to an output region, and the size of the region.
+/// The last entry in the table may hold a pointer to the next table. This pointer can either point to the top of the
+/// current table (for circular array) or to the base of another table.
+/// At least 2 entries are needed because the list of entries must
+/// be terminated by an entry with the END bit set to 1, so 2
 /// entries are required to use a single valid entry.
 ///
 #define MAX_TOPA_ENTRY_COUNT         2
@@ -43,7 +43,7 @@ typedef struct  {
 typedef struct  {
   UINT32                      NumberOfProcessors;
 
-  UINT8                       ProcTraceOutputScheme;  
+  UINT8                       ProcTraceOutputScheme;
   UINT32                      ProcTraceMemSize;
 
   UINTN                       *ThreadMemRegionTable;
@@ -88,7 +88,7 @@ ProcTraceGetConfigData (
 }
 
 /**
-  Detects if Intel Processor Trace feature supported on current 
+  Detects if Intel Processor Trace feature supported on current
   processor.
 
   @param[in]  ProcessorNumber  The index of the CPU executing this function.
@@ -291,7 +291,7 @@ ProcTraceInitialize (
   //
   //  Single Range output scheme
   //
-  if (ProcTraceData->ProcessorData[ProcessorNumber].SingleRangeSupported && 
+  if (ProcTraceData->ProcessorData[ProcessorNumber].SingleRangeSupported &&
       (ProcTraceData->ProcTraceOutputScheme == RtitOutputSchemeSingleRange)) {
     if (FirstIn) {
       DEBUG ((DEBUG_INFO, "ProcTrace: Enabling Single Range Output scheme \n"));
@@ -337,7 +337,7 @@ ProcTraceInitialize (
   //
   //  ToPA(Table of physical address) scheme
   //
-  if (ProcTraceData->ProcessorData[ProcessorNumber].TopaSupported && 
+  if (ProcTraceData->ProcessorData[ProcessorNumber].TopaSupported &&
       (ProcTraceData->ProcTraceOutputScheme == RtitOutputSchemeToPA)) {
     //
     //  Create ToPA structure aligned at 4KB for each logical thread

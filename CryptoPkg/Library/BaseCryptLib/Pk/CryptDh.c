@@ -1,7 +1,7 @@
 /** @file
   Diffie-Hellman Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -60,7 +60,7 @@ DhFree (
 
   Given generator g, and length of prime number p in bits, this function generates p,
   and sets DH context according to value of g and p.
-  
+
   Before this function can be invoked, pseudorandom number generator must be correctly
   initialized by RandomSeed().
 
@@ -178,7 +178,7 @@ Error:
 /**
   Generates DH public key.
 
-  This function generates random secret exponent, and computes the public key, which is 
+  This function generates random secret exponent, and computes the public key, which is
   returned via parameter PublicKey and PublicKeySize. DH context is updated accordingly.
   If the PublicKey buffer is too small to hold the public key, FALSE is returned and
   PublicKeySize is set to the required buffer size to obtain the public key.
@@ -245,7 +245,7 @@ DhGenerateKey (
   Computes exchanged common key.
 
   Given peer's public key, this function computes the exchanged common key, based on its own
-  context including value of prime modulus and random secret exponent. 
+  context including value of prime modulus and random secret exponent.
 
   If DhContext is NULL, then return FALSE.
   If PeerPublicKey is NULL, then return FALSE.
@@ -288,7 +288,7 @@ DhComputeKey (
   if (PeerPublicKeySize > INT_MAX) {
     return FALSE;
   }
-  
+
   Bn = BN_bin2bn (PeerPublicKey, (UINT32) PeerPublicKeySize, NULL);
   if (Bn == NULL) {
     return FALSE;

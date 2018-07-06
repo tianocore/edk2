@@ -23,6 +23,7 @@
 #
 # ExceptionList if a tool takes an argument with a / add it to the exception list
 #
+from __future__ import print_function
 import sys
 import os
 import subprocess
@@ -47,7 +48,7 @@ def ConvertCygPathToDos(CygPath):
     DosPath = CygPath
   
   # pipes.quote will add the extra \\ for us.
-  return DosPath.replace('/','\\')
+  return DosPath.replace('/', '\\')
 
 
 # we receive our options as a list, but we will be passing them to the shell as a line
@@ -86,7 +87,7 @@ if __name__ == "__main__":
      ret = main(sys.argv[2:])
 
   except:
-    print "exiting: exception from " + sys.argv[0]
+    print("exiting: exception from " + sys.argv[0])
     ret = 2
 
   sys.exit(ret)

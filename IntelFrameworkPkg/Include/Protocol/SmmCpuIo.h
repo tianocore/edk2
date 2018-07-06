@@ -3,13 +3,13 @@
 
   This protocol provides CPU I/O and memory access within SMM.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -29,17 +29,17 @@ typedef struct _EFI_SMM_CPU_IO_INTERFACE EFI_SMM_CPU_IO_INTERFACE;
 /**
   Provides the basic memory and I/O interfaces used to abstract accesses to devices.
 
-  The I/O operations are carried out exactly as requested.  The caller is 
-  responsible for any alignment and I/O width issues that the bus, device, 
+  The I/O operations are carried out exactly as requested.  The caller is
+  responsible for any alignment and I/O width issues that the bus, device,
   platform, or type of I/O might require.
 
   @param[in]      This     The EFI_SMM_CPU_IO_INTERFACE instance.
   @param[in]      Width    Signifies the width of the I/O operations.
-  @param[in]      Address  The base address of the I/O operations.  The caller is 
-                           responsible for aligning the Address, if required. 
+  @param[in]      Address  The base address of the I/O operations.  The caller is
+                           responsible for aligning the Address, if required.
   @param[in]      Count    The number of I/O operations to perform.
-  @param[in,out]  Buffer   For read operations, the destination buffer to store 
-                           the results.  For write operations, the source buffer 
+  @param[in,out]  Buffer   For read operations, the destination buffer to store
+                           the results.  For write operations, the source buffer
                            from which to write data.
 
   @retval EFI_SUCCESS            The data was read from or written to the device.

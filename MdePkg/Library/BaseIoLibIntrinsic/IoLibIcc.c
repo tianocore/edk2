@@ -2,7 +2,7 @@
   I/O Library. This file has compiler specifics for ICC as there
   is no ANSI C standard for doing IO.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -73,7 +73,7 @@ IoWrite8 (
     mov dx, word ptr [Port]
     out dx, al
   }
-  return Value; 
+  return Value;
 }
 
 /**
@@ -119,7 +119,7 @@ IoRead16 (
 
   If 16-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 16-bit boundary, then ASSERT().
-  
+
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
@@ -153,7 +153,7 @@ IoWrite16 (
 
   If 32-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 32-bit boundary, then ASSERT().
-  
+
   @param  Port  The I/O port to read.
 
   @return The value read.
@@ -174,7 +174,7 @@ IoRead32 (
     in  eax, dx
     mov dword ptr [Data], eax
   }
-  
+
   return Data;
 }
 
@@ -187,7 +187,7 @@ IoRead32 (
 
   If 32-bit I/O port operations are not supported, then ASSERT().
   If Port is not aligned on a 32-bit boundary, then ASSERT().
-  
+
   @param  Port  The I/O port to write.
   @param  Value The value to write to the I/O port.
 
@@ -202,7 +202,7 @@ IoWrite32 (
   )
 {
   ASSERT ((Port & 3) == 0);
-  
+
   __asm {
     mov eax, dword ptr [Value]
     mov dx, word ptr [Port]

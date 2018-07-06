@@ -23,9 +23,20 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/MpService.h>
+#include <Protocol/SmmBase2.h>
+#include <Register/Cpuid.h>
+#include <Register/Msr.h>
 
 #include "CpuDxe.h"
 #include "CpuPageTable.h"
+
+///
+/// Paging registers
+///
+#define CR0_WP                      BIT16
+#define CR0_PG                      BIT31
+#define CR4_PSE                     BIT4
+#define CR4_PAE                     BIT5
 
 ///
 /// Page Table Entry
@@ -87,70 +98,45 @@ PAGE_ATTRIBUTE_TABLE mPageAttributeTable[] = {
   {Page1G,  SIZE_1GB, PAGING_1G_ADDRESS_MASK_64},
 };
 
-PAGE_TABLE_POOL   *mPageTablePool = NULL;
+PAGE_TABLE_POOL                   *mPageTablePool = NULL;
+PAGE_TABLE_LIB_PAGING_CONTEXT     mPagingContext;
+EFI_SMM_BASE2_PROTOCOL            *mSmmBase2 = NULL;
 
 /**
-  Enable write protection function for AP.
+ Check if current execution environment is in SMM mode or not, via
+ EFI_SMM_BASE2_PROTOCOL.
 
-  @param[in,out] Buffer  The pointer to private data buffer.
+ This is necessary because of the fact that MdePkg\Library\SmmMemoryAllocationLib
+ supports to free memory outside SMRAM. The library will call gBS->FreePool() or
+ gBS->FreePages() and then SetMemorySpaceAttributes interface in turn to change
+ memory paging attributes during free operation, if some memory related features
+ are enabled (like Heap Guard).
+
+ This means that SetMemorySpaceAttributes() has chance to run in SMM mode. This
+ will cause incorrect result because SMM mode always loads its own page tables,
+ which are usually different from DXE. This function can be used to detect such
+ situation and help to avoid further misoperations.
+
+  @retval TRUE    In SMM mode.
+  @retval FALSE   Not in SMM mode.
 **/
-VOID
-EFIAPI
-SyncCpuEnableWriteProtection (
-  IN OUT VOID *Buffer
+BOOLEAN
+IsInSmm (
+  VOID
   )
 {
-  AsmWriteCr0 (AsmReadCr0 () | BIT16);
-}
+  BOOLEAN                 InSmm;
 
-/**
-  CpuFlushTlb function for AP.
-
-  @param[in,out] Buffer  The pointer to private data buffer.
-**/
-VOID
-EFIAPI
-SyncCpuFlushTlb (
-  IN OUT VOID *Buffer
-  )
-{
-  CpuFlushTlb();
-}
-
-/**
-  Sync memory page attributes for AP.
-
-  @param[in] Procedure            A pointer to the function to be run on enabled APs of
-                                  the system.
-**/
-VOID
-SyncMemoryPageAttributesAp (
-  IN EFI_AP_PROCEDURE            Procedure
-  )
-{
-  EFI_STATUS                Status;
-  EFI_MP_SERVICES_PROTOCOL  *MpService;
-
-  Status = gBS->LocateProtocol (
-                  &gEfiMpServiceProtocolGuid,
-                  NULL,
-                  (VOID **)&MpService
-                  );
-  //
-  // Synchronize the update with all APs
-  //
-  if (!EFI_ERROR (Status)) {
-    Status = MpService->StartupAllAPs (
-                          MpService,          // This
-                          Procedure,          // Procedure
-                          FALSE,              // SingleThread
-                          NULL,               // WaitEvent
-                          0,                  // TimeoutInMicrosecsond
-                          NULL,               // ProcedureArgument
-                          NULL                // FailedCpuList
-                          );
-    ASSERT (Status == EFI_SUCCESS || Status == EFI_NOT_STARTED || Status == EFI_NOT_READY);
+  InSmm = FALSE;
+  if (mSmmBase2 == NULL) {
+    gBS->LocateProtocol (&gEfiSmmBase2ProtocolGuid, NULL, (VOID **)&mSmmBase2);
   }
+
+  if (mSmmBase2 != NULL) {
+    mSmmBase2->InSmm (mSmmBase2, &InSmm);
+  }
+
+  return InSmm;
 }
 
 /**
@@ -163,45 +149,60 @@ GetCurrentPagingContext (
   IN OUT PAGE_TABLE_LIB_PAGING_CONTEXT     *PagingContext
   )
 {
-  UINT32                         RegEax;
-  UINT32                         RegEdx;
+  UINT32                          RegEax;
+  CPUID_EXTENDED_CPU_SIG_EDX      RegEdx;
+  MSR_IA32_EFER_REGISTER          MsrEfer;
 
-  ZeroMem(PagingContext, sizeof(*PagingContext));
-  if (sizeof(UINTN) == sizeof(UINT64)) {
-    PagingContext->MachineType = IMAGE_FILE_MACHINE_X64;
-  } else {
-    PagingContext->MachineType = IMAGE_FILE_MACHINE_I386;
-  }
-  if ((AsmReadCr0 () & BIT31) != 0) {
-    PagingContext->ContextData.X64.PageTableBase = (AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64);
-  } else {
-    PagingContext->ContextData.X64.PageTableBase = 0;
-  }
+  //
+  // Don't retrieve current paging context from processor if in SMM mode.
+  //
+  if (!IsInSmm ()) {
+    ZeroMem (&mPagingContext, sizeof(mPagingContext));
+    if (sizeof(UINTN) == sizeof(UINT64)) {
+      mPagingContext.MachineType = IMAGE_FILE_MACHINE_X64;
+    } else {
+      mPagingContext.MachineType = IMAGE_FILE_MACHINE_I386;
+    }
+    if ((AsmReadCr0 () & CR0_PG) != 0) {
+      mPagingContext.ContextData.X64.PageTableBase = (AsmReadCr3 () & PAGING_4K_ADDRESS_MASK_64);
+    } else {
+      mPagingContext.ContextData.X64.PageTableBase = 0;
+    }
 
-  if ((AsmReadCr4 () & BIT4) != 0) {
-    PagingContext->ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PSE;
-  }
-  if ((AsmReadCr4 () & BIT5) != 0) {
-    PagingContext->ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PAE;
-  }
-  if ((AsmReadCr0 () & BIT16) != 0) {
-    PagingContext->ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_WP_ENABLE;
-  }
+    if ((AsmReadCr4 () & CR4_PSE) != 0) {
+      mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PSE;
+    }
+    if ((AsmReadCr4 () & CR4_PAE) != 0) {
+      mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PAE;
+    }
+    if ((AsmReadCr0 () & CR0_WP) != 0) {
+      mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_WP_ENABLE;
+    }
 
-  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
-  if (RegEax > 0x80000000) {
-    AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
-    if ((RegEdx & BIT20) != 0) {
-      // XD supported
-      if ((AsmReadMsr64 (0xC0000080) & BIT11) != 0) {
-        // XD activated
-        PagingContext->ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_XD_ACTIVATED;
+    AsmCpuid (CPUID_EXTENDED_FUNCTION, &RegEax, NULL, NULL, NULL);
+    if (RegEax >= CPUID_EXTENDED_CPU_SIG) {
+      AsmCpuid (CPUID_EXTENDED_CPU_SIG, NULL, NULL, NULL, &RegEdx.Uint32);
+
+      if (RegEdx.Bits.NX != 0) {
+        // XD supported
+        MsrEfer.Uint64 = AsmReadMsr64(MSR_CORE_IA32_EFER);
+        if (MsrEfer.Bits.NXE != 0) {
+          // XD activated
+          mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_XD_ACTIVATED;
+        }
+      }
+
+      if (RegEdx.Bits.Page1GB != 0) {
+        mPagingContext.ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PAGE_1G_SUPPORT;
       }
     }
-    if ((RegEdx & BIT26) != 0) {
-      PagingContext->ContextData.Ia32.Attributes |= PAGE_TABLE_LIB_PAGING_CONTEXT_IA32_X64_ATTRIBUTES_PAGE_1G_SUPPORT;
-    }
   }
+
+  //
+  // This can avoid getting SMM paging context if in SMM mode. We cannot assume
+  // SMM mode shares the same paging context as DXE.
+  //
+  CopyMem (PagingContext, &mPagingContext, sizeof (mPagingContext));
 }
 
 /**
@@ -571,21 +572,14 @@ IsReadOnlyPageWriteProtected (
   VOID
   )
 {
-  return ((AsmReadCr0 () & BIT16) != 0);
-}
-
-/**
-  Disable write protection function for AP.
-
-  @param[in,out] Buffer  The pointer to private data buffer.
-**/
-VOID
-EFIAPI
-SyncCpuDisableWriteProtection (
-  IN OUT VOID *Buffer
-  )
-{
-  AsmWriteCr0 (AsmReadCr0() & ~BIT16);
+  //
+  // To avoid unforseen consequences, don't touch paging settings in SMM mode
+  // in this driver.
+  //
+  if (!IsInSmm ()) {
+    return ((AsmReadCr0 () & CR0_WP) != 0);
+  }
+  return FALSE;
 }
 
 /**
@@ -596,7 +590,13 @@ DisableReadOnlyPageWriteProtect (
   VOID
   )
 {
-  AsmWriteCr0 (AsmReadCr0() & ~BIT16);
+  //
+  // To avoid unforseen consequences, don't touch paging settings in SMM mode
+  // in this driver.
+  //
+  if (!IsInSmm ()) {
+    AsmWriteCr0 (AsmReadCr0 () & ~CR0_WP);
+  }
 }
 
 /**
@@ -607,7 +607,13 @@ EnableReadOnlyPageWriteProtect (
   VOID
   )
 {
-  AsmWriteCr0 (AsmReadCr0() | BIT16);
+  //
+  // To avoid unforseen consequences, don't touch paging settings in SMM mode
+  // in this driver.
+  //
+  if (!IsInSmm ()) {
+    AsmWriteCr0 (AsmReadCr0 () | CR0_WP);
+  }
 }
 
 /**
@@ -835,10 +841,13 @@ AssignMemoryPageAttributes (
   if (!EFI_ERROR(Status)) {
     if ((PagingContext == NULL) && IsModified) {
       //
-      // Flush TLB as last step
+      // Flush TLB as last step.
+      //
+      // Note: Since APs will always init CR3 register in HLT loop mode or do
+      // TLB flush in MWAIT loop mode, there's no need to flush TLB for them
+      // here.
       //
       CpuFlushTlb();
-      SyncMemoryPageAttributesAp (SyncCpuFlushTlb);
     }
   }
 

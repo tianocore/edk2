@@ -18,7 +18,7 @@
   They will do basic validation for authentication data structure, then call crypto library
   to verify the signature.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1303,7 +1303,7 @@ GetCertsFromDb (
     return EFI_INVALID_PARAMETER;
   }
 
-  
+
   if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
     //
     // Get variable "certdb".
@@ -1355,7 +1355,7 @@ GetCertsFromDb (
 
 /**
   Delete matching signer's certificates when deleting common authenticated
-  variable by corresponding VariableName and VendorGuid from "certdb" or 
+  variable by corresponding VariableName and VendorGuid from "certdb" or
   "certdbv" according to authenticated variable attributes.
 
   @param[in]  VariableName   Name of authenticated Variable.
@@ -1904,13 +1904,13 @@ VerifyTimeBasedPayload (
   //            digestAlgorithms DigestAlgorithmIdentifiers,
   //            contentInfo ContentInfo,
   //            .... }
-  //    The DigestAlgorithmIdentifiers can be used to determine the hash algorithm 
+  //    The DigestAlgorithmIdentifiers can be used to determine the hash algorithm
   //    in VARIABLE_AUTHENTICATION_2 descriptor.
   //    This field has the fixed offset (+13) and be calculated based on two bytes of length encoding.
   //
   if ((Attributes & EFI_VARIABLE_TIME_BASED_AUTHENTICATED_WRITE_ACCESS) != 0) {
     if (SigDataSize >= (13 + sizeof (mSha256OidValue))) {
-      if (((*(SigData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE) || 
+      if (((*(SigData + 1) & TWO_BYTE_ENCODE) != TWO_BYTE_ENCODE) ||
            (CompareMem (SigData + 13, &mSha256OidValue, sizeof (mSha256OidValue)) != 0)) {
           return EFI_SECURITY_VIOLATION;
         }

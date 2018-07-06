@@ -1,8 +1,8 @@
 /** @file
 Usb Hub Request Support In PEI Phase
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -276,9 +276,10 @@ PeiHubClearHubFeature (
 }
 
 /**
-  Get a given hub descriptor.
+  Get a given (SuperSpeed) hub descriptor.
 
   @param  PeiServices    General-purpose services that are available to every PEIM.
+  @param  PeiUsbDevice   Indicates the hub controller device.
   @param  UsbIoPpi       Indicates the PEI_USB_IO_PPI instance.
   @param  DescriptorSize The length of Hub Descriptor buffer.
   @param  HubDescriptor  Caller allocated buffer to store the hub descriptor if
@@ -292,21 +293,28 @@ PeiHubClearHubFeature (
 EFI_STATUS
 PeiGetHubDescriptor (
   IN  EFI_PEI_SERVICES          **PeiServices,
+  IN  PEI_USB_DEVICE            *PeiUsbDevice,
   IN  PEI_USB_IO_PPI            *UsbIoPpi,
   IN  UINTN                     DescriptorSize,
   OUT EFI_USB_HUB_DESCRIPTOR    *HubDescriptor
   )
 {
   EFI_USB_DEVICE_REQUEST      DevReq;
+  UINT8                       DescType;
+
   ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
+
+  DescType = (PeiUsbDevice->DeviceSpeed == EFI_USB_SPEED_SUPER) ?
+             USB_DT_SUPERSPEED_HUB :
+             USB_DT_HUB;
 
   //
   // Fill Device request packet
   //
   DevReq.RequestType = USB_RT_HUB | 0x80;
   DevReq.Request     = USB_HUB_GET_DESCRIPTOR;
-  DevReq.Value       = USB_DT_HUB << 8;
-  DevReq.Length      = (UINT16)DescriptorSize;
+  DevReq.Value       = (UINT16) (DescType << 8);
+  DevReq.Length      = (UINT16) DescriptorSize;
 
   return  UsbIoPpi->UsbControlTransfer (
                       PeiServices,
@@ -316,48 +324,6 @@ PeiGetHubDescriptor (
                       PcdGet32 (PcdUsbTransferTimeoutValue),
                       HubDescriptor,
                       (UINT16)DescriptorSize
-                      );
-}
-
-/**
-  Get a given SuperSpeed hub descriptor.
-
-  @param  PeiServices       General-purpose services that are available to every PEIM.
-  @param  UsbIoPpi          Indicates the PEI_USB_IO_PPI instance.
-  @param  HubDescriptor     Caller allocated buffer to store the hub descriptor if
-                            successfully returned.
-
-  @retval EFI_SUCCESS       Hub descriptor is obtained successfully.
-  @retval EFI_DEVICE_ERROR  Cannot get the hub descriptor due to a hardware error.
-  @retval Others            Other failure occurs.
-
-**/
-EFI_STATUS
-PeiGetSuperSpeedHubDesc (
-  IN  EFI_PEI_SERVICES          **PeiServices,
-  IN  PEI_USB_IO_PPI            *UsbIoPpi,
-  OUT EFI_USB_HUB_DESCRIPTOR    *HubDescriptor
-  )
-{
-  EFI_USB_DEVICE_REQUEST        DevReq;
-  ZeroMem (&DevReq, sizeof (EFI_USB_DEVICE_REQUEST));
-
-  //
-  // Fill Device request packet
-  //
-  DevReq.RequestType = USB_RT_HUB | 0x80;
-  DevReq.Request     = USB_HUB_GET_DESCRIPTOR;
-  DevReq.Value       = USB_DT_SUPERSPEED_HUB << 8;
-  DevReq.Length      = 12;
-
-  return  UsbIoPpi->UsbControlTransfer (
-                      PeiServices,
-                      UsbIoPpi,
-                      &DevReq,
-                      EfiUsbDataIn,
-                      PcdGet32 (PcdUsbTransferTimeoutValue),
-                      HubDescriptor,
-                      12
                       );
 }
 
@@ -387,29 +353,19 @@ PeiUsbHubReadDesc (
 {
   EFI_STATUS Status;
 
-  if (PeiUsbDevice->DeviceSpeed == EFI_USB_SPEED_SUPER) {
-    //
-    // Get the super speed hub descriptor
-    //
-    Status = PeiGetSuperSpeedHubDesc (PeiServices, UsbIoPpi, HubDescriptor);
-  } else {
+  //
+  // First get the hub descriptor length
+  //
+  Status = PeiGetHubDescriptor (PeiServices, PeiUsbDevice, UsbIoPpi, 2, HubDescriptor);
 
-    //
-    // First get the hub descriptor length
-    //
-    Status = PeiGetHubDescriptor (PeiServices, UsbIoPpi, 2, HubDescriptor);
-
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
-
-    //
-    // Get the whole hub descriptor
-    //
-    Status = PeiGetHubDescriptor (PeiServices, UsbIoPpi, HubDescriptor->Length, HubDescriptor);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
-  return Status;
+  //
+  // Get the whole hub descriptor
+  //
+  return PeiGetHubDescriptor (PeiServices, PeiUsbDevice, UsbIoPpi, HubDescriptor->Length, HubDescriptor);
 }
 
 /**
@@ -468,29 +424,35 @@ PeiDoHubConfig (
   IN PEI_USB_DEVICE      *PeiUsbDevice
   )
 {
-  EFI_USB_HUB_DESCRIPTOR  HubDescriptor;
+  UINT8                   HubDescBuffer[256];
+  EFI_USB_HUB_DESCRIPTOR  *HubDescriptor;
   EFI_STATUS              Status;
   EFI_USB_HUB_STATUS      HubStatus;
   UINTN                   Index;
   PEI_USB_IO_PPI          *UsbIoPpi;
 
-  ZeroMem (&HubDescriptor, sizeof (HubDescriptor));
   UsbIoPpi = &PeiUsbDevice->UsbIoPpi;
 
   //
-  // Get the hub descriptor 
+  // The length field of descriptor is UINT8 type, so the buffer
+  // with 256 bytes is enough to hold the descriptor data.
+  //
+  HubDescriptor = (EFI_USB_HUB_DESCRIPTOR *) HubDescBuffer;
+
+  //
+  // Get the hub descriptor
   //
   Status = PeiUsbHubReadDesc (
             PeiServices,
             PeiUsbDevice,
             UsbIoPpi,
-            &HubDescriptor
+            HubDescriptor
             );
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
 
-  PeiUsbDevice->DownStreamPortNo = HubDescriptor.NbrPorts;
+  PeiUsbDevice->DownStreamPortNo = HubDescriptor->NbrPorts;
 
   if (PeiUsbDevice->DeviceSpeed == EFI_USB_SPEED_SUPER) {
     DEBUG ((EFI_D_INFO, "PeiDoHubConfig: Set Hub Depth as 0x%x\n", PeiUsbDevice->Tier));
@@ -516,9 +478,9 @@ PeiDoHubConfig (
       }
     }
 
-    DEBUG (( EFI_D_INFO, "PeiDoHubConfig: HubDescriptor.PwrOn2PwrGood: 0x%x\n", HubDescriptor.PwrOn2PwrGood));
-    if (HubDescriptor.PwrOn2PwrGood > 0) {
-      MicroSecondDelay (HubDescriptor.PwrOn2PwrGood * USB_SET_PORT_POWER_STALL);
+    DEBUG (( EFI_D_INFO, "PeiDoHubConfig: HubDescriptor.PwrOn2PwrGood: 0x%x\n", HubDescriptor->PwrOn2PwrGood));
+    if (HubDescriptor->PwrOn2PwrGood > 0) {
+      MicroSecondDelay (HubDescriptor->PwrOn2PwrGood * USB_SET_PORT_POWER_STALL);
     }
 
     //

@@ -1,7 +1,7 @@
 /** @file
   Supporting functions implementaion for PCI devices management.
 
-Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -211,7 +211,6 @@ RegisterPciDevice (
   EFI_STATUS          Status;
   VOID                *PlatformOpRomBuffer;
   UINTN               PlatformOpRomSize;
-  UINT8               PciExpressCapRegOffset;
   EFI_PCI_IO_PROTOCOL *PciIo;
   UINT8               Data8;
   BOOLEAN             HasEfiImage;
@@ -232,26 +231,12 @@ RegisterPciDevice (
   }
 
   //
-  // Detect if PCI Express Device
-  //
-  PciExpressCapRegOffset = 0;
-  Status = LocateCapabilityRegBlock (
-             PciIoDevice,
-             EFI_PCI_CAPABILITY_ID_PCIEXP,
-             &PciExpressCapRegOffset,
-             NULL
-             );
-  if (!EFI_ERROR (Status)) {
-    PciIoDevice->IsPciExp = TRUE;
-  }
-
-  //
   // Force Interrupt line to "Unknown" or "No Connection"
   //
   PciIo = &(PciIoDevice->PciIo);
   Data8 = PCI_INT_LINE_UNKNOWN;
   PciIo->Pci.Write (PciIo, EfiPciIoWidthUint8, 0x3C, 1, &Data8);
- 
+
   //
   // Process OpRom
   //
@@ -311,7 +296,7 @@ RegisterPciDevice (
           PciIoDevice->PciIo.RomImage,
           PciIoDevice->PciIo.RomSize
           );
-      }   
+      }
     }
   }
 

@@ -1,15 +1,15 @@
 ## @file
 #  Implements ACPI metholds for the TCG feature
 #
-#  This driver implements TPM definition block in ACPI table and registers SMI 
-#  callback functions for physical presence and MemoryClear to handle the requests 
+#  This driver implements TPM definition block in ACPI table and registers SMI
+#  callback functions for physical presence and MemoryClear to handle the requests
 #  from ACPI method.
 #
 #  Caution: This module requires additional review when modified.
 #  This driver will have external input - variable and ACPINvs data in SMM mode.
 #  This external input must be validated carefully to avoid security issue.
 #
-# Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -60,7 +60,7 @@
   ## SOMETIMES_PRODUCES ## Variable:L"MemoryOverwriteRequestControl"
   ## SOMETIMES_CONSUMES ## Variable:L"MemoryOverwriteRequestControl"
   gEfiMemoryOverwriteControlDataGuid
-  
+
   gEfiTpmDeviceInstanceTpm12Guid                        ## PRODUCES           ## GUID       # TPM device identifier
 
 [Protocols]
@@ -77,7 +77,7 @@
   gEfiSmmSwDispatch2ProtocolGuid AND
   gEfiSmmVariableProtocolGuid AND
   gEfiTcgProtocolGuid
-  
+
 [UserExtensions.TianoCore."ExtraFiles"]
   TcgSmmExtra.uni
-  
+

@@ -1,7 +1,7 @@
 /** @file
   Source file for FSP notify phase PEI module
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,11 +16,11 @@
 /**
 
    This function waits for FSP notify.
-    
+
    @param This          Entry point for DXE IPL PPI.
    @param PeiServices   General purpose services available to every PEIM.
    @param HobList       Address to the Pei HOB list.
-   
+
    @return EFI_SUCCESS              This function never returns.
 
 **/
@@ -51,11 +51,11 @@ CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi = {
 /**
 
    This function waits for FSP notify.
-    
+
    @param This          Entry point for DXE IPL PPI.
    @param PeiServices   General purpose services available to every PEIM.
    @param HobList       Address to the Pei HOB list.
-   
+
    @return EFI_SUCCESS              This function never returns.
 
 **/

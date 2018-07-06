@@ -1,7 +1,7 @@
 /** @file
   Reset Architectural and Reset Notification protocols implementation.
 
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -14,6 +14,15 @@
 **/
 
 #include "ResetSystem.h"
+
+GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mResetTypeStr[] = {
+  L"Cold", L"Warm", L"Shutdown", L"PlatformSpecific"
+};
+
+//
+// The current ResetSystem() notification recursion depth
+//
+UINTN  mResetNotifyDepth = 0;
 
 /**
   Register a notification function to be called when ResetSystem() is called.
@@ -130,14 +139,32 @@ RESET_NOTIFICATION_INSTANCE mResetNotification = {
   INITIALIZE_LIST_HEAD_VARIABLE (mResetNotification.ResetNotifies)
 };
 
+RESET_NOTIFICATION_INSTANCE mPlatformSpecificResetFilter = {
+  RESET_NOTIFICATION_INSTANCE_SIGNATURE,
+  {
+    RegisterResetNotify,
+    UnregisterResetNotify
+  },
+  INITIALIZE_LIST_HEAD_VARIABLE (mPlatformSpecificResetFilter.ResetNotifies)
+};
+
+RESET_NOTIFICATION_INSTANCE mPlatformSpecificResetHandler = {
+  RESET_NOTIFICATION_INSTANCE_SIGNATURE,
+  {
+    RegisterResetNotify,
+    UnregisterResetNotify
+  },
+  INITIALIZE_LIST_HEAD_VARIABLE (mPlatformSpecificResetHandler.ResetNotifies)
+};
+
 /**
   The driver's entry point.
 
   It initializes the Reset Architectural Protocol.
 
-  @param[in] ImageHandle  The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
   @param[in] SystemTable  A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS     The entry point is executed successfully.
   @retval other           Cannot install ResetArch protocol.
 
@@ -170,6 +197,8 @@ InitializeResetSystem (
                   &Handle,
                   &gEfiResetArchProtocolGuid,         NULL,
                   &gEfiResetNotificationProtocolGuid, &mResetNotification.ResetNotification,
+                  &gEdkiiPlatformSpecificResetFilterProtocolGuid, &mPlatformSpecificResetFilter.ResetNotification,
+                  &gEdkiiPlatformSpecificResetHandlerProtocolGuid, &mPlatformSpecificResetHandler.ResetNotification,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);
@@ -178,7 +207,7 @@ InitializeResetSystem (
 }
 
 /**
-  Put the system into S3 power state.                            
+  Put the system into S3 power state.
 **/
 VOID
 DoS3 (
@@ -225,20 +254,62 @@ ResetSystem (
   UINTN               CapsuleDataPtr;
   LIST_ENTRY          *Link;
   RESET_NOTIFY_ENTRY  *Entry;
-  
-  //
-  // Indicate reset system runtime service is called.
-  //
-  REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_RESET_SYSTEM));
 
-  if (!EfiAtRuntime ()) {
-    for ( Link = GetFirstNode (&mResetNotification.ResetNotifies)
-        ; !IsNull (&mResetNotification.ResetNotifies, Link)
-        ; Link = GetNextNode (&mResetNotification.ResetNotifies, Link)
-        ) {
-      Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
-      Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
+  //
+  // Only do REPORT_STATUS_CODE() on first call to ResetSystem()
+  //
+  if (mResetNotifyDepth == 0) {
+    //
+    // Indicate reset system runtime service is called.
+    //
+    REPORT_STATUS_CODE (EFI_PROGRESS_CODE, (EFI_SOFTWARE_EFI_RUNTIME_SERVICE | EFI_SW_RS_PC_RESET_SYSTEM));
+  }
+
+  mResetNotifyDepth++;
+  DEBUG ((
+    DEBUG_INFO, "DXE ResetSystem2: ResetType %s, Call Depth = %d.\n",
+    mResetTypeStr[ResetType], mResetNotifyDepth
+    ));
+
+  if (mResetNotifyDepth <= MAX_RESET_NOTIFY_DEPTH) {
+    if (!EfiAtRuntime ()) {
+      //
+      // Call reset notification functions registered through the
+      // EDKII_PLATFORM_SPECIFIC_RESET_FILTER_PROTOCOL.
+      //
+      for ( Link = GetFirstNode (&mPlatformSpecificResetFilter.ResetNotifies)
+          ; !IsNull (&mPlatformSpecificResetFilter.ResetNotifies, Link)
+          ; Link = GetNextNode (&mPlatformSpecificResetFilter.ResetNotifies, Link)
+          ) {
+        Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
+        Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
+      }
+      //
+      // Call reset notification functions registered through the
+      // EFI_RESET_NOTIFICATION_PROTOCOL.
+      //
+      for ( Link = GetFirstNode (&mResetNotification.ResetNotifies)
+          ; !IsNull (&mResetNotification.ResetNotifies, Link)
+          ; Link = GetNextNode (&mResetNotification.ResetNotifies, Link)
+          ) {
+        Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
+        Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
+      }
+      //
+      // call reset notification functions registered through the
+      // EDKII_PLATFORM_SPECIFIC_RESET_HANDLER_PROTOCOL.
+      //
+      for ( Link = GetFirstNode (&mPlatformSpecificResetHandler.ResetNotifies)
+          ; !IsNull (&mPlatformSpecificResetHandler.ResetNotifies, Link)
+          ; Link = GetNextNode (&mPlatformSpecificResetHandler.ResetNotifies, Link)
+          ) {
+        Entry = RESET_NOTIFY_ENTRY_FROM_LINK (Link);
+        Entry->ResetNotify (ResetType, ResetStatus, DataSize, ResetData);
+      }
     }
+  } else {
+    ASSERT (ResetType < ARRAY_SIZE (mResetTypeStr));
+    DEBUG ((DEBUG_ERROR, "DXE ResetSystem2: Maximum reset call depth is met. Use the current reset type: %s!\n", mResetTypeStr[ResetType]));
   }
 
   switch (ResetType) {
@@ -264,7 +335,6 @@ ResetSystem (
     }
 
     ResetWarm ();
-
     break;
 
  case EfiResetCold:

@@ -1,7 +1,7 @@
 /** @file
   PS2 Mouse Communication Interface.
-  
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -21,9 +21,9 @@ UINT8 ResolutionTbl[MaxResolution]  = { 0, 1, 2, 3 };
 
 /**
   Issue self test command via IsaIo interface.
-  
+
   @param IsaIo Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return EFI_SUCCESS  Success to do keyboard self testing.
   @return others       Fail to do keyboard self testing.
 **/
@@ -82,9 +82,9 @@ KbcSelfTest (
 
 /**
   Issue command to enable keyboard AUX functionality.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -100,9 +100,9 @@ KbcEnableAux (
 
 /**
   Issue command to disable keyboard AUX functionality.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -118,9 +118,9 @@ KbcDisableAux (
 
 /**
   Issue command to enable keyboard.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -136,9 +136,9 @@ KbcEnableKb (
 
 /**
   Issue command to disable keyboard.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -154,10 +154,10 @@ KbcDisableKb (
 
 /**
   Issue command to check keyboard status.
-  
+
   @param IsaIo          Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param KeyboardEnable return whether keyboard is enable.
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -195,9 +195,9 @@ CheckKbStatus (
 
 /**
   Issue command to reset keyboard.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -240,10 +240,10 @@ PS2MouseReset (
 
 /**
   Issue command to set mouse's sample rate
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  @param SampleRate value of sample rate 
-  
+  @param SampleRate value of sample rate
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -269,10 +269,10 @@ PS2MouseSetSampleRate (
 
 /**
   Issue command to set mouse's resolution.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Resolution value of resolution
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -298,10 +298,10 @@ PS2MouseSetResolution (
 
 /**
   Issue command to set mouse's scaling.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Scaling value of scaling
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -322,9 +322,9 @@ PS2MouseSetScaling (
 
 /**
   Issue command to enable Ps2 mouse.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -341,7 +341,7 @@ PS2MouseEnable (
 /**
   Get mouse packet . Only care first 3 bytes
 
-  @param MouseDev  Pointer of PS2 Mouse Private Data Structure 
+  @param MouseDev  Pointer of PS2 Mouse Private Data Structure
 
   @retval EFI_NOT_READY  Mouse Device not ready to input data packet, or some error happened during getting the packet
   @retval EFI_SUCCESS    The data packet is gotten successfully.
@@ -432,19 +432,19 @@ PS2MouseGetPacket (
       RelativeMovementX = Packet[1];
       RelativeMovementY = Packet[2];
       //
-      //               Bit 7   |    Bit 6   |    Bit 5   |   Bit 4    |   Bit 3  |   Bit 2    |   Bit 1   |   Bit 0 
-      //  Byte 0  | Y overflow | X overflow | Y sign bit | X sign bit | Always 1 | Middle Btn | Right Btn | Left Btn 
-      //  Byte 1  |                                           8 bit X Movement 
-      //  Byte 2  |                                           8 bit Y Movement 
-      // 
+      //               Bit 7   |    Bit 6   |    Bit 5   |   Bit 4    |   Bit 3  |   Bit 2    |   Bit 1   |   Bit 0
+      //  Byte 0  | Y overflow | X overflow | Y sign bit | X sign bit | Always 1 | Middle Btn | Right Btn | Left Btn
+      //  Byte 1  |                                           8 bit X Movement
+      //  Byte 2  |                                           8 bit Y Movement
+      //
       // X sign bit + 8 bit X Movement : 9-bit signed twos complement integer that presents the relative displacement of the device in the X direction since the last data transmission.
       // Y sign bit + 8 bit Y Movement : Same as X sign bit + 8 bit X Movement.
       //
       //
       // First, Clear X and Y high 8 bits
       //
-      RelativeMovementX = (INT16) (RelativeMovementX & 0xFF); 
-      RelativeMovementY = (INT16) (RelativeMovementY & 0xFF); 
+      RelativeMovementX = (INT16) (RelativeMovementX & 0xFF);
+      RelativeMovementY = (INT16) (RelativeMovementY & 0xFF);
       //
       // Second, if the 9-bit signed twos complement integer is negative, set the high 8 bit 0xff
       //
@@ -455,7 +455,7 @@ PS2MouseGetPacket (
         RelativeMovementY = (INT16) (RelativeMovementY | 0xFF00);
       }
 
-      
+
       RButton           = (UINT8) (Packet[0] & 0x2);
       LButton           = (UINT8) (Packet[0] & 0x1);
 
@@ -475,12 +475,12 @@ PS2MouseGetPacket (
 
 /**
   Read data via IsaIo protocol with given number.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Buffer  Buffer receive data of mouse
   @param BufSize The size of buffer
   @param State   Check input or read data
-  
+
   @return status of reading mouse data.
 **/
 EFI_STATUS
@@ -535,10 +535,10 @@ PS2MouseRead (
 //
 /**
   I/O work flow of outing 8042 command.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Command I/O command.
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -574,10 +574,10 @@ Out8042Command (
 
 /**
   I/O work flow of outing 8042 data.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Data value
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -610,10 +610,10 @@ Out8042Data (
 
 /**
   I/O work flow of in 8042 data.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Data value
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -653,11 +653,11 @@ In8042Data (
 
 /**
   I/O work flow of outing 8042 Aux command.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Command Aux I/O command
   @param Resend  Whether need resend the Aux command.
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -735,10 +735,10 @@ Out8042AuxCommand (
 
 /**
   I/O work flow of outing 8042 Aux data.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Buffer holding return value
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -781,10 +781,10 @@ Out8042AuxData (
 
 /**
   I/O work flow of in 8042 Aux data.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Buffer holding return value.
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -812,9 +812,9 @@ In8042AuxData (
 
 /**
   Check keyboard controller status, if it is output buffer full and for auxiliary device.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @retval EFI_SUCCESS   Keyboard controller is ready
   @retval EFI_NOT_READY Keyboard controller is not ready
 **/
@@ -839,10 +839,10 @@ CheckForInput (
 
 /**
   I/O work flow to wait input buffer empty in given time.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Timeout Wating time.
-  
+
   @retval EFI_TIMEOUT if input is still not empty in given time.
   @retval EFI_SUCCESS input is empty.
 **/
@@ -880,10 +880,10 @@ WaitInputEmpty (
 
 /**
   I/O work flow to wait output buffer full in given time.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Timeout given time
-  
+
   @retval EFI_TIMEOUT  output is not full in given time
   @retval EFI_SUCCESS  output is full in given time.
 **/

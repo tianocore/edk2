@@ -1,7 +1,7 @@
 ## @file
 #  Report Status Code Router Driver which produces SMM Report Stataus Code Handler Protocol and SMM Status Code Protocol.
 #
-#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,7 +20,7 @@
   FILE_GUID                      = A6885402-D022-4b0e-A509-4711B90F2A39
   MODULE_TYPE                    = DXE_SMM_DRIVER
   PI_SPECIFICATION_VERSION       = 0x0001000A
-  VERSION_STRING                 = 1.0  
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = GenericStatusCodeSmmEntry
 
 #

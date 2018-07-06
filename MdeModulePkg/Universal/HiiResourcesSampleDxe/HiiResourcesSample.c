@@ -2,7 +2,7 @@
 This is an example of how a driver retrieve HII data using HII Package List
 Protocol, and how to publish the HII data.
 
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -51,7 +51,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -60,7 +60,7 @@ HII_VENDOR_DEVICE_PATH  mHiiVendorDevicePath = {
 
 /**
   Main entry for this driver.
-  
+
   @param[in] ImageHandle     Image handle this driver.
   @param[in] SystemTable     Pointer to SystemTable.
 

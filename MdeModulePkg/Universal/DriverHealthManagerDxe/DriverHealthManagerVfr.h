@@ -1,7 +1,7 @@
 /** @file
   Definition shared by VFR file and C file.
 
-Copyright (c) 2013 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define _DRIVER_HEALTH_VFR_H_
 #include <Guid/HiiPlatformSetupFormset.h>
 
-#define DRIVER_HEALTH_MANAGER_FORMSET_GUID         { 0xcfb3b000, 0x0b63, 0x444b, { 0xb1, 0xd1, 0x12, 0xd5, 0xd9, 0x5d, 0xc4, 0xfc } } 
-#define DRIVER_HEALTH_CONFIGURE_FORMSET_GUID       { 0x4296d9f4, 0xf6fc, 0x4dde, { 0x86, 0x85, 0x8c, 0xe2, 0xd7, 0x9d, 0x90, 0xf0 } } 
+#define DRIVER_HEALTH_MANAGER_FORMSET_GUID         { 0xcfb3b000, 0x0b63, 0x444b, { 0xb1, 0xd1, 0x12, 0xd5, 0xd9, 0x5d, 0xc4, 0xfc } }
+#define DRIVER_HEALTH_CONFIGURE_FORMSET_GUID       { 0x4296d9f4, 0xf6fc, 0x4dde, { 0x86, 0x85, 0x8c, 0xe2, 0xd7, 0x9d, 0x90, 0xf0 } }
 
 #define LABEL_BEGIN                        0x2000
 #define LABEL_END                          0x2001

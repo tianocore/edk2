@@ -3,7 +3,7 @@
 #
 # This DSC file is used for Package Level build.
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
 #    are licensed and made available under the terms and conditions of the BSD License
@@ -26,7 +26,7 @@
   PLATFORM_VERSION               = 0.96
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/IntelFramework
-  SUPPORTED_ARCHITECTURES        = IA32|IPF|X64|EBC|ARM
+  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|ARM
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 

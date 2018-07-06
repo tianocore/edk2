@@ -1,7 +1,7 @@
 /** @file
   This library implements the Timer Library using the Extended SAL Stall Services Class.
 
-  Copyright (c) 2007 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -42,13 +42,13 @@ MicroSecondDelay (
   EsalCall (
     EFI_EXTENDED_SAL_STALL_SERVICES_PROTOCOL_GUID_LO,
     EFI_EXTENDED_SAL_STALL_SERVICES_PROTOCOL_GUID_HI,
-    StallFunctionId, 
-    MicroSeconds, 
-    0, 
-    0, 
-    0, 
-    0, 
-    0, 
+    StallFunctionId,
+    MicroSeconds,
+    0,
+    0,
+    0,
+    0,
+    0,
     0
     );
   return MicroSeconds;
@@ -82,13 +82,13 @@ NanoSecondDelay (
   EsalCall (
     EFI_EXTENDED_SAL_STALL_SERVICES_PROTOCOL_GUID_LO,
     EFI_EXTENDED_SAL_STALL_SERVICES_PROTOCOL_GUID_HI,
-    StallFunctionId, 
-    MicroSeconds, 
-    0, 
-    0, 
-    0, 
-    0, 
-    0, 
+    StallFunctionId,
+    MicroSeconds,
+    0,
+    0,
+    0,
+    0,
+    0,
     0
     );
   return NanoSeconds;

@@ -3,7 +3,7 @@
 
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   Copyright 2016 Dell Inc.
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -2158,22 +2158,22 @@ InternalCommandLineParse (
       }
       CurrentItemPackage->Value = NewValue;
       if (ValueSize == 0) {
-        StrCpyS( CurrentItemPackage->Value, 
-                  CurrentValueSize/sizeof(CHAR16), 
+        StrCpyS( CurrentItemPackage->Value,
+                  CurrentValueSize/sizeof(CHAR16),
                   Argv[LoopCounter]
                   );
       } else {
-        StrCatS( CurrentItemPackage->Value, 
-                  CurrentValueSize/sizeof(CHAR16), 
+        StrCatS( CurrentItemPackage->Value,
+                  CurrentValueSize/sizeof(CHAR16),
                   L" "
                   );
-        StrCatS( CurrentItemPackage->Value, 
-                  CurrentValueSize/sizeof(CHAR16), 
+        StrCatS( CurrentItemPackage->Value,
+                  CurrentValueSize/sizeof(CHAR16),
                   Argv[LoopCounter]
                   );
       }
       ValueSize += StrSize(Argv[LoopCounter]) + sizeof(CHAR16);
-      
+
       GetItemValue--;
       if (GetItemValue == 0) {
         InsertHeadList(*CheckPackage, &CurrentItemPackage->Link);
@@ -2732,10 +2732,10 @@ InternalPrintTo (
     return (gEfiShellProtocol->WriteFile(gEfiShellParametersProtocol->StdOut, &Size, (VOID*)String));
   }
   if (mEfiShellInterface          != NULL) {
-    if (mEfiShellInterface->RedirArgc == 0) { 
+    if (mEfiShellInterface->RedirArgc == 0) {
     //
     // Divide in half for old shell.  Must be string length not size.
-      // 
+      //
       Size /=2;  // Divide in half only when no redirection.
     }
     return (mEfiShellInterface->StdOut->Write(mEfiShellInterface->StdOut,          &Size, (VOID*)String));
@@ -3173,7 +3173,7 @@ ShellHexStrToUintn(
   if (!EFI_ERROR(ShellConvertStringToUint64(String, &RetVal, TRUE, TRUE))) {
     return ((UINTN)RetVal);
   }
-  
+
   return ((UINTN)(-1));
 }
 
@@ -3312,7 +3312,7 @@ StrnCatGrow (
   if (*Destination == NULL) {
     return (NULL);
   }
-  
+
   StrnCatS(*Destination, NewSize/sizeof(CHAR16), Source, Count);
   return *Destination;
 }
@@ -3636,29 +3636,36 @@ InternalShellIsHexOrDecimalNumber (
   )
 {
   BOOLEAN Hex;
+  BOOLEAN LeadingZero;
+
+  if (String == NULL) {
+    return FALSE;
+  }
 
   //
   // chop off a single negative sign
   //
-  if (String != NULL && *String == L'-') {
+  if (*String == L'-') {
     String++;
   }
 
-  if (String == NULL) {
-    return (FALSE);
+  if (*String == CHAR_NULL) {
+    return FALSE;
   }
 
   //
   // chop leading zeroes
   //
-  while(String != NULL && *String == L'0'){
+  LeadingZero = FALSE;
+  while(*String == L'0'){
     String++;
+    LeadingZero = TRUE;
   }
   //
   // allow '0x' or '0X', but not 'x' or 'X'
   //
-  if (String != NULL && (*String == L'x' || *String == L'X')) {
-    if (*(String-1) != L'0') {
+  if (*String == L'x' || *String == L'X') {
+    if (!LeadingZero) {
       //
       // we got an x without a preceeding 0
       //
@@ -3675,7 +3682,7 @@ InternalShellIsHexOrDecimalNumber (
   //
   // loop through the remaining characters and use the lib function
   //
-  for ( ; String != NULL && *String != CHAR_NULL && !(StopAtSpace && *String == L' ') ; String++){
+  for ( ; *String != CHAR_NULL && !(StopAtSpace && *String == L' ') ; String++){
     if (TimeNumbers && (String[0] == L':')) {
       continue;
     }
@@ -3937,7 +3944,7 @@ InternalShellStrDecimalToUint64 (
   Result = 0;
 
   //
-  // Stop upon space if requested 
+  // Stop upon space if requested
   // (if the whole value was 0)
   //
   if (StopAtSpace && *String == L' ') {
@@ -4248,7 +4255,7 @@ ShellFileHandleReadLine(
 
   @param[in] CommandToGetHelpOn  Pointer to a string containing the command name of help file to be printed.
   @param[in] SectionToGetHelpOn  Pointer to the section specifier(s).
-  @param[in] PrintCommandText    If TRUE, prints the command followed by the help content, otherwise prints 
+  @param[in] PrintCommandText    If TRUE, prints the command followed by the help content, otherwise prints
                                  the help content only.
   @retval EFI_DEVICE_ERROR       The help data format was incorrect.
   @retval EFI_NOT_FOUND          The help data could not be found.
@@ -4262,33 +4269,33 @@ ShellPrintHelp (
   IN BOOLEAN          PrintCommandText
   )
 {
-	EFI_STATUS          Status;
-	CHAR16              *OutText;
-	  
-	OutText = NULL;
-	
+  EFI_STATUS          Status;
+  CHAR16              *OutText;
+
+  OutText = NULL;
+
   //
   // Get the string to print based
   //
-	Status = gEfiShellProtocol->GetHelpText (CommandToGetHelpOn, SectionToGetHelpOn, &OutText);
-  
+  Status = gEfiShellProtocol->GetHelpText (CommandToGetHelpOn, SectionToGetHelpOn, &OutText);
+
   //
   // make sure we got a valid string
   //
   if (EFI_ERROR(Status)){
     return Status;
-	} 
+  }
   if (OutText == NULL || StrLen(OutText) == 0) {
-    return EFI_NOT_FOUND;  
-	}
-  
+    return EFI_NOT_FOUND;
+  }
+
   //
   // Chop off trailing stuff we dont need
   //
   while (OutText[StrLen(OutText)-1] == L'\r' || OutText[StrLen(OutText)-1] == L'\n' || OutText[StrLen(OutText)-1] == L' ') {
     OutText[StrLen(OutText)-1] = CHAR_NULL;
   }
-  
+
   //
   // Print this out to the console
   //
@@ -4297,17 +4304,17 @@ ShellPrintHelp (
   } else {
     ShellPrintEx(-1, -1, L"%N%s\r\n", OutText);
   }
-  
+
   SHELL_FREE_NON_NULL(OutText);
 
-	return EFI_SUCCESS;
+  return EFI_SUCCESS;
 }
 
 /**
   Function to delete a file by name
-  
+
   @param[in]       FileName       Pointer to file name to delete.
-  
+
   @retval EFI_SUCCESS             the file was deleted sucessfully
   @retval EFI_WARN_DELETE_FAILURE the handle was closed, but the file was not
                                   deleted
@@ -4334,26 +4341,26 @@ ShellDeleteFileByName(
 {
   EFI_STATUS                Status;
   SHELL_FILE_HANDLE         FileHandle;
-  
+
   Status = ShellFileExists(FileName);
-  
+
   if (Status == EFI_SUCCESS){
     Status = ShellOpenFileByName(FileName, &FileHandle, EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE, 0x0);
     if (Status == EFI_SUCCESS){
       Status = ShellDeleteFile(&FileHandle);
     }
-  } 
+  }
 
   return(Status);
-  
+
 }
 
 /**
   Cleans off all the quotes in the string.
 
   @param[in]     OriginalString   pointer to the string to be cleaned.
-  @param[out]   CleanString      The new string with all quotes removed. 
-                                                  Memory allocated in the function and free 
+  @param[out]   CleanString      The new string with all quotes removed.
+                                                  Memory allocated in the function and free
                                                   by caller.
 
   @retval EFI_SUCCESS   The operation was successful.
@@ -4365,7 +4372,7 @@ InternalShellStripQuotes (
   )
 {
   CHAR16            *Walker;
-  
+
   if (OriginalString == NULL || CleanString == NULL) {
     return EFI_INVALID_PARAMETER;
   }

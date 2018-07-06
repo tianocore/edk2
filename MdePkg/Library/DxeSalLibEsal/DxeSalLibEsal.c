@@ -1,7 +1,7 @@
 /** @file
   This library implements the SAL Library Class using Extended SAL functions
 
-  Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,8 +21,8 @@
 
 /**
   Makes a SAL procedure call.
-  
-  This is a wrapper function to make a SAL procedure call.  
+
+  This is a wrapper function to make a SAL procedure call.
   No parameter checking is performed on the 8 input parameters,
   but there are some common rules that the caller should follow
   when making a SAL call.  Any address passed to SAL as buffers
@@ -59,7 +59,7 @@ SalCall (
   )
 {
   SAL_RETURN_REGS Regs;
-  
+
   //
   // Initial all members in this structure.
   //
@@ -73,13 +73,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_HI,
-             SalSetVectorsFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             SalSetVectorsFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -88,13 +88,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_MCA_LOG_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_MCA_LOG_SERVICES_PROTOCOL_GUID_HI,
-             SalGetStateInfoFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             SalGetStateInfoFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -103,13 +103,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_MCA_LOG_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_MCA_LOG_SERVICES_PROTOCOL_GUID_HI,
-             SalGetStateInfoSizeFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             SalGetStateInfoSizeFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -118,13 +118,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_MCA_LOG_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_MCA_LOG_SERVICES_PROTOCOL_GUID_HI,
-             SalClearStateInfoFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             SalClearStateInfoFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -133,13 +133,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_HI,
-             SalMcRendezFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             SalMcRendezFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
    break;
@@ -148,13 +148,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_HI,
-             SalMcSetParamsFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             SalMcSetParamsFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -163,13 +163,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_HI,
-             EsalRegisterPhysicalAddrFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             EsalRegisterPhysicalAddrFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -178,13 +178,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_CACHE_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_CACHE_SERVICES_PROTOCOL_GUID_HI,
-             SalCacheFlushFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             SalCacheFlushFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -193,13 +193,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_CACHE_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_CACHE_SERVICES_PROTOCOL_GUID_HI,
-             SalCacheInitFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             SalCacheInitFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -208,13 +208,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_PCI_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_PCI_SERVICES_PROTOCOL_GUID_HI,
-             SalPciConfigReadFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             SalPciConfigReadFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -223,13 +223,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_PCI_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_PCI_SERVICES_PROTOCOL_GUID_HI,
-             SalPciConfigWriteFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             SalPciConfigWriteFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -238,13 +238,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_HI,
-             EsalGetPlatformBaseFreqFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             EsalGetPlatformBaseFreqFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -253,13 +253,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_BASE_SERVICES_PROTOCOL_GUID_HI,
-             EsalPhysicalIdInfoFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             EsalPhysicalIdInfoFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;
@@ -268,13 +268,13 @@ SalCall (
     return EsalCall (
              EFI_EXTENDED_SAL_PAL_SERVICES_PROTOCOL_GUID_LO,
              EFI_EXTENDED_SAL_PAL_SERVICES_PROTOCOL_GUID_HI,
-             EsalUpdatePalFunctionId, 
-             Arg2, 
-             Arg3, 
-             Arg4, 
-             Arg5, 
-             Arg6, 
-             Arg7, 
+             EsalUpdatePalFunctionId,
+             Arg2,
+             Arg3,
+             Arg4,
+             Arg5,
+             Arg6,
+             Arg7,
              Arg8
              );
     break;

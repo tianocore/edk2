@@ -16,7 +16,7 @@
 #
 import Common.EdkLogger as EdkLogger
 from Table import Table
-from Common.String import ConvertToSqlString
+from Common.StringUtils import ConvertToSqlString
 
 ## TableFunction
 #

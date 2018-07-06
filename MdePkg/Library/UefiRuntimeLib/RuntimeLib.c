@@ -3,10 +3,10 @@
 
   This library hides the global variable for the EFI Runtime Services so the
   caller does not need to deal with the possibility of being called from an
-  OS virtual address space. All pointer values are different for a virtual 
+  OS virtual address space. All pointer values are different for a virtual
   mapping than from the normal physical mapping at boot services time.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -125,7 +125,7 @@ RuntimeDriverLibConstruct (
 }
 
 /**
-  If a runtime driver exits with an error, it must call this routine 
+  If a runtime driver exits with an error, it must call this routine
   to free the allocated resource before the exiting.
   It will ASSERT() if gBS is NULL.
   It will ASSERT() if that operation fails.
@@ -180,7 +180,7 @@ EfiAtRuntime (
 }
 
 /**
-  This function allows the caller to determine if UEFI SetVirtualAddressMap() has been called. 
+  This function allows the caller to determine if UEFI SetVirtualAddressMap() has been called.
 
   This function returns TRUE after all the EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE functions have
   executed as a result of the OS calling SetVirtualAddressMap(). Prior to this time FALSE
@@ -466,7 +466,7 @@ EfiGetNextVariableName (
   Variables are stored by the firmware and may maintain their values across power cycles. Each vendor
   may create and manage its own variables without the risk of name conflicts by using a unique VendorGuid.
 
-  @param  VariableName The name of the vendor's variable; it's a Null-Terminated 
+  @param  VariableName The name of the vendor's variable; it's a Null-Terminated
                        Unicode String
   @param  VendorGuid   Unify identifier for vendor.
   @param  Attributes   Points to a memory location to return the attributes of variable. If the point
@@ -530,7 +530,7 @@ EfiGetNextHighMonotonicCount (
 
 
 /**
-  This service is a wrapper for the UEFI Runtime Service ConvertPointer().  
+  This service is a wrapper for the UEFI Runtime Service ConvertPointer().
 
   The ConvertPointer() function is used by an EFI component during the SetVirtualAddressMap() operation.
   ConvertPointer()must be called using physical address pointers during the execution of SetVirtualAddressMap().
@@ -562,7 +562,7 @@ EfiConvertPointer (
   Determines the new virtual address that is to be used on subsequent memory accesses.
 
   For IA32, x64, and EBC, this service is a wrapper for the UEFI Runtime Service
-  ConvertPointer().  See the UEFI Specification for details. 
+  ConvertPointer().  See the UEFI Specification for details.
   For IPF, this function interprets Address as a pointer to an EFI_PLABEL structure
   and both the EntryPoint and GP fields of an EFI_PLABEL are converted from physical
   to virtiual addressing.  Since IPF allows the GP to point to an address outside
@@ -614,7 +614,7 @@ EfiConvertList (
 {
   LIST_ENTRY  *Link;
   LIST_ENTRY  *NextLink;
-  
+
   //
   // For NULL List, return EFI_SUCCESS
   //

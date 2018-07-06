@@ -1,13 +1,13 @@
 /** @file
   The header file for user profile manager driver.
-    
-Copyright (c) 2009 - 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -55,7 +55,7 @@ typedef struct {
   EFI_TIME  UsageDate;
   UINTN     AccessPolicyLen;
   UINTN     IdentityPolicyLen;
-  UINTN     NewIdentityPolicyLen;    
+  UINTN     NewIdentityPolicyLen;
   UINT8     *AccessPolicy;
   UINT8     *IdentityPolicy;
   UINT8     *NewIdentityPolicy;
@@ -197,7 +197,7 @@ DeleteUser (
 /**
   Add a username item in form.
 
-  @param[in]  User             Points to the user profile whose username is added. 
+  @param[in]  User             Points to the user profile whose username is added.
   @param[in]  Index            The index of the user in the user name list.
   @param[in]  OpCodeHandle     Points to container for dynamic created opcodes.
 
@@ -216,7 +216,7 @@ AddUserToForm (
   and access policy are displayed.
 
   @param[in] UserIndex       The index of the user in display list to modify.
-  
+
 **/
 VOID
 ModifyUserInfo (
@@ -224,7 +224,7 @@ ModifyUserInfo (
   );
 
 /**
-  Get the username from user input and update username string in Hii 
+  Get the username from user input and update username string in Hii
   database with it.
 
 **/
@@ -253,11 +253,11 @@ AddIdentityPolicyItem (
 
 /**
   Save the identity policy and update UI with it.
-  
-  This function will verify the new identity policy, in current implementation, 
+
+  This function will verify the new identity policy, in current implementation,
   the identity policy can be:  T, P & P & P & ..., P | P | P | ...
   Here, "T" means "True", "P" means "Credential Provider", "&" means "and", "|" means "or".
-  Other identity policies are not supported.  
+  Other identity policies are not supported.
 
 **/
 VOID
@@ -270,7 +270,7 @@ SaveIdentityPolicy (
 
   In this form, access right, access setu,p and access boot order are dynamically
   added. Load devicepath and connect devicepath are displayed too.
-  
+
 **/
 VOID
 ModidyAccessPolicy (
@@ -278,7 +278,7 @@ ModidyAccessPolicy (
   );
 
 /**
-  Collect all the access policy data to mUserInfo.AccessPolicy, 
+  Collect all the access policy data to mUserInfo.AccessPolicy,
   and save it to user profile.
 
 **/
@@ -338,23 +338,23 @@ DisplayConnectForbid (
   );
 
 /**
-  Delete the specified device path by DriverIndex from the forbid device path 
+  Delete the specified device path by DriverIndex from the forbid device path
   list (mAccessInfo.LoadForbid).
 
   @param[in]  DriverIndex   The index of driver in a forbidden device path list.
-  
+
 **/
 VOID
 DeleteFromForbidLoad (
   IN  UINT16                                    DriverIndex
   );
-  
+
 /**
-  Add the specified device path by DriverIndex to the forbid device path 
+  Add the specified device path by DriverIndex to the forbid device path
   list (mAccessInfo.LoadForbid).
 
   @param[in]  DriverIndex   The index of driver saved in driver options.
-  
+
 **/
 VOID
 AddToForbidLoad (
@@ -363,11 +363,11 @@ AddToForbidLoad (
 
 /**
   Get user name from the popup windows.
-  
+
   @param[in, out]  UserNameLen   On entry, point to the buffer lengh of UserName.
                                  On exit, point to the input user name length.
   @param[out]      UserName      The buffer to hold the input user name.
- 
+
   @retval EFI_ABORTED            It is given up by pressing 'ESC' key.
   @retval EFI_NOT_READY          Not a valid input at all.
   @retval EFI_SUCCESS            Get a user name successfully.
@@ -385,7 +385,7 @@ GetUserNameInput (
   @param[in]  User         Handle of the user whose information will be searched.
   @param[in]  InfoType     The user information type to find.
   @param[out] UserInfo     Points to user information handle found.
-  
+
   @retval EFI_SUCCESS      Find the user information successfully.
   @retval Others           Fail to find the user information.
 
@@ -418,7 +418,7 @@ ResolveIdentityPolicy (
 
   @param[in] ValidLen       The valid access policy length.
   @param[in] ExpandLen      The length that is needed to expand.
-    
+
 **/
 VOID
 ExpandMemory (
@@ -428,7 +428,7 @@ ExpandMemory (
 
 /**
   Delete User's credental from all the providers that exist in User's identity policy.
-  
+
   @param[in]  IdentityPolicy     Point to User's identity policy.
   @param[in]  IdentityPolicyLen  The length of the identity policy.
   @param[in]  User               Points to user profile.
@@ -438,7 +438,7 @@ VOID
 DeleteCredentialFromProviders (
   IN     UINT8                                *IdentityPolicy,
   IN     UINTN                                 IdentityPolicyLen,
-  IN     EFI_USER_PROFILE_HANDLE               User 
+  IN     EFI_USER_PROFILE_HANDLE               User
   );
-  
+
 #endif

@@ -19,10 +19,9 @@ import Common.LongFilePathOs as os, re
 import Common.EdkLogger as EdkLogger
 from Common.DataType import *
 from CommonDataClass.DataClass import *
-from Common.String import CleanString, GetSplitValueList, ReplaceMacro
+from Common.StringUtils import CleanString, GetSplitValueList, ReplaceMacro
 import EotGlobalData
-from Common.Misc import sdict
-from Common.String import GetSplitList
+from Common.StringUtils import GetSplitList
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## PreProcess() method
@@ -623,7 +622,7 @@ def SearchProtocols(SqlCommand, Table, SourceFileID, SourceFileFullPath, ItemMod
 #  @param ItemMode: Mode of item
 #
 def SearchFunctionCalling(Table, SourceFileID, SourceFileFullPath, ItemType, ItemMode):
-    LibraryList = sdict()
+    LibraryList = {}
     Db = EotGlobalData.gDb.TblReport
     Parameters, ItemName, GuidName, GuidMacro, GuidValue, BelongsToFunction = [], '', '', '', '', ''
     if ItemType == 'Protocol' and ItemMode == 'Produced':
@@ -731,7 +730,7 @@ def GetParameter(Parameter, Index = 1):
 #  @return: The name of parameter
 #
 def GetParameterName(Parameter):
-    if type(Parameter) == type('') and Parameter.startswith('&'):
+    if isinstance(Parameter, type('')) and Parameter.startswith('&'):
         return Parameter[1:].replace('{', '').replace('}', '').replace('\r', '').replace('\n', '').strip()
     else:
         return Parameter.strip()

@@ -1,7 +1,7 @@
 /** @file
   Support functions declaration for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -135,7 +135,7 @@ PxeBcIcmp6ErrorUpdate (
   @param[in, out]  SrcPort              The pointer to the source port.
   @param[in]       DoNotFragment        If TRUE, fragment is not enabled.
                                         Otherwise, fragment is enabled.
-  @param[in]       Ttl                  The time to live field of the IP header. 
+  @param[in]       Ttl                  The time to live field of the IP header.
   @param[in]       ToS                  The type of service field of the IP header.
 
   @retval          EFI_SUCCESS          Successfully configured this instance.
@@ -453,7 +453,7 @@ PxeBcUintnToAscDecWithFormat (
   @param[in]  Number         Numeric value to be converted.
   @param[in]  Buffer         Pointer to the buffer for ASCII string.
   @param[in]  BufferSize     The maxsize of the buffer.
-  
+
   @return     Length         The actual length of the ASCII string.
 
 **/

@@ -7,10 +7,10 @@
   buffer overflow, integer overflow.
 
   SupportCapsuleImage(), ProcessCapsuleImage(), IsValidCapsuleHeader(),
-  ValidateFmpCapsule(), DisplayCapsuleImage(), ConvertBmpToGopBlt() will
-  receive untrusted input and do basic validation.
+  ValidateFmpCapsule(), and DisplayCapsuleImage() receives untrusted input and
+  performs basic validation.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -23,7 +23,6 @@
 
 #include <PiDxe.h>
 
-#include <IndustryStandard/Bmp.h>
 #include <IndustryStandard/WindowsUxCapsule.h>
 
 #include <Guid/FmpCapsule.h>
@@ -41,10 +40,12 @@
 #include <Library/DevicePathLib.h>
 #include <Library/UefiLib.h>
 #include <Library/PcdLib.h>
+#include <Library/BmpSupportLib.h>
 
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/EsrtManagement.h>
 #include <Protocol/FirmwareManagement.h>
+#include <Protocol/FirmwareManagementProgress.h>
 #include <Protocol/DevicePath.h>
 
 EFI_SYSTEM_RESOURCE_TABLE *mEsrtTable                  = NULL;
@@ -52,6 +53,8 @@ BOOLEAN                   mIsVirtualAddrConverted      = FALSE;
 
 BOOLEAN                   mDxeCapsuleLibEndOfDxe       = FALSE;
 EFI_EVENT                 mDxeCapsuleLibEndOfDxeEvent  = NULL;
+
+EDKII_FIRMWARE_MANAGEMENT_PROGRESS_PROTOCOL  *mFmpProgress = NULL;
 
 /**
   Initialize capsule related variables.
@@ -101,18 +104,17 @@ RecordFmpCapsuleStatusVariable (
   Function indicate the current completion progress of the firmware
   update. Platform may override with own specific progress function.
 
-  @param[in]  Completion    A value between 1 and 100 indicating the current completion progress of the firmware update
+  @param[in]  Completion  A value between 1 and 100 indicating the current
+                          completion progress of the firmware update
 
-  @retval EFI_SUCESS    Input capsule is a correct FMP capsule.
+  @retval EFI_SUCESS             The capsule update progress was updated.
+  @retval EFI_INVALID_PARAMETER  Completion is greater than 100%.
 **/
 EFI_STATUS
 EFIAPI
-Update_Image_Progress (
+UpdateImageProgress (
   IN UINTN  Completion
-  )
-{
-  return EFI_SUCCESS;
-}
+  );
 
 /**
   Return if this CapsuleGuid is a FMP capsule GUID or not.
@@ -250,7 +252,7 @@ ValidateFmpCapsule (
     //
     if (Index > 0) {
       if (ItemOffsetList[Index] <= ItemOffsetList[Index - 1]) {
-        DEBUG((DEBUG_ERROR, "ItemOffsetList[%d](0x%lx) < ItemOffsetList[%d](0x%x)\n", Index, ItemOffsetList[Index], Index, ItemOffsetList[Index - 1]));
+        DEBUG((DEBUG_ERROR, "ItemOffsetList[%d](0x%lx) < ItemOffsetList[%d](0x%x)\n", Index, ItemOffsetList[Index], Index - 1, ItemOffsetList[Index - 1]));
         return EFI_INVALID_PARAMETER;
       }
     }
@@ -307,262 +309,6 @@ ValidateFmpCapsule (
 }
 
 /**
-  Convert a *.BMP graphics image to a GOP blt buffer. If a NULL Blt buffer
-  is passed in a GopBlt buffer will be allocated by this routine. If a GopBlt
-  buffer is passed in it will be used if it is big enough.
-
-  Caution: This function may receive untrusted input.
-
-  @param[in]       BmpImage      Pointer to BMP file
-  @param[in]       BmpImageSize  Number of bytes in BmpImage
-  @param[in, out]  GopBlt        Buffer containing GOP version of BmpImage.
-  @param[in, out]  GopBltSize    Size of GopBlt in bytes.
-  @param[out]      PixelHeight   Height of GopBlt/BmpImage in pixels
-  @param[out]      PixelWidth    Width of GopBlt/BmpImage in pixels
-
-  @retval EFI_SUCCESS           GopBlt and GopBltSize are returned.
-  @retval EFI_UNSUPPORTED       BmpImage is not a valid *.BMP image
-  @retval EFI_BUFFER_TOO_SMALL  The passed in GopBlt buffer is not big enough.
-                                GopBltSize will contain the required size.
-  @retval EFI_OUT_OF_RESOURCES  No enough buffer to allocate.
-
-**/
-STATIC
-EFI_STATUS
-ConvertBmpToGopBlt (
-  IN     VOID      *BmpImage,
-  IN     UINTN     BmpImageSize,
-  IN OUT VOID      **GopBlt,
-  IN OUT UINTN     *GopBltSize,
-     OUT UINTN     *PixelHeight,
-     OUT UINTN     *PixelWidth
-  )
-{
-  UINT8                         *Image;
-  UINT8                         *ImageHeader;
-  BMP_IMAGE_HEADER              *BmpHeader;
-  BMP_COLOR_MAP                 *BmpColorMap;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *Blt;
-  UINT64                        BltBufferSize;
-  UINTN                         Index;
-  UINTN                         Height;
-  UINTN                         Width;
-  UINTN                         ImageIndex;
-  UINT32                        DataSizePerLine;
-  BOOLEAN                       IsAllocated;
-  UINT32                        ColorMapNum;
-
-  if (sizeof (BMP_IMAGE_HEADER) > BmpImageSize) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  BmpHeader = (BMP_IMAGE_HEADER *) BmpImage;
-
-  if (BmpHeader->CharB != 'B' || BmpHeader->CharM != 'M') {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Doesn't support compress.
-  //
-  if (BmpHeader->CompressionType != 0) {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // Only support BITMAPINFOHEADER format.
-  // BITMAPFILEHEADER + BITMAPINFOHEADER = BMP_IMAGE_HEADER
-  //
-  if (BmpHeader->HeaderSize != sizeof (BMP_IMAGE_HEADER) - OFFSET_OF(BMP_IMAGE_HEADER, HeaderSize)) {
-    return EFI_UNSUPPORTED;
-  }
-
-  //
-  // The data size in each line must be 4 byte alignment.
-  //
-  DataSizePerLine = ((BmpHeader->PixelWidth * BmpHeader->BitPerPixel + 31) >> 3) & (~0x3);
-  BltBufferSize = MultU64x32 (DataSizePerLine, BmpHeader->PixelHeight);
-  if (BltBufferSize > (UINT32) ~0) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if ((BmpHeader->Size != BmpImageSize) ||
-      (BmpHeader->Size < BmpHeader->ImageOffset) ||
-      (BmpHeader->Size - BmpHeader->ImageOffset !=  BmpHeader->PixelHeight * DataSizePerLine)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  //
-  // Calculate Color Map offset in the image.
-  //
-  Image       = BmpImage;
-  BmpColorMap = (BMP_COLOR_MAP *) (Image + sizeof (BMP_IMAGE_HEADER));
-  if (BmpHeader->ImageOffset < sizeof (BMP_IMAGE_HEADER)) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  if (BmpHeader->ImageOffset > sizeof (BMP_IMAGE_HEADER)) {
-    switch (BmpHeader->BitPerPixel) {
-      case 1:
-        ColorMapNum = 2;
-        break;
-      case 4:
-        ColorMapNum = 16;
-        break;
-      case 8:
-        ColorMapNum = 256;
-        break;
-      default:
-        ColorMapNum = 0;
-        break;
-      }
-    //
-    // BMP file may has padding data between the bmp header section and the bmp data section.
-    //
-    if (BmpHeader->ImageOffset - sizeof (BMP_IMAGE_HEADER) < sizeof (BMP_COLOR_MAP) * ColorMapNum) {
-      return EFI_INVALID_PARAMETER;
-    }
-  }
-
-  //
-  // Calculate graphics image data address in the image
-  //
-  Image         = ((UINT8 *) BmpImage) + BmpHeader->ImageOffset;
-  ImageHeader   = Image;
-
-  //
-  // Calculate the BltBuffer needed size.
-  //
-  BltBufferSize = MultU64x32 ((UINT64) BmpHeader->PixelWidth, BmpHeader->PixelHeight);
-  //
-  // Ensure the BltBufferSize * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) doesn't overflow
-  //
-  if (BltBufferSize > DivU64x32 ((UINTN) ~0, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL))) {
-    return EFI_UNSUPPORTED;
-  }
-  BltBufferSize = MultU64x32 (BltBufferSize, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-
-  IsAllocated   = FALSE;
-  if (*GopBlt == NULL) {
-    //
-    // GopBlt is not allocated by caller.
-    //
-    *GopBltSize = (UINTN) BltBufferSize;
-    *GopBlt     = AllocatePool (*GopBltSize);
-    IsAllocated = TRUE;
-    if (*GopBlt == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-  } else {
-    //
-    // GopBlt has been allocated by caller.
-    //
-    if (*GopBltSize < (UINTN) BltBufferSize) {
-      *GopBltSize = (UINTN) BltBufferSize;
-      return EFI_BUFFER_TOO_SMALL;
-    }
-  }
-
-  *PixelWidth   = BmpHeader->PixelWidth;
-  *PixelHeight  = BmpHeader->PixelHeight;
-
-  //
-  // Convert image from BMP to Blt buffer format
-  //
-  BltBuffer = *GopBlt;
-  for (Height = 0; Height < BmpHeader->PixelHeight; Height++) {
-    Blt = &BltBuffer[(BmpHeader->PixelHeight - Height - 1) * BmpHeader->PixelWidth];
-    for (Width = 0; Width < BmpHeader->PixelWidth; Width++, Image++, Blt++) {
-      switch (BmpHeader->BitPerPixel) {
-      case 1:
-        //
-        // Convert 1-bit (2 colors) BMP to 24-bit color
-        //
-        for (Index = 0; Index < 8 && Width < BmpHeader->PixelWidth; Index++) {
-          Blt->Red    = BmpColorMap[((*Image) >> (7 - Index)) & 0x1].Red;
-          Blt->Green  = BmpColorMap[((*Image) >> (7 - Index)) & 0x1].Green;
-          Blt->Blue   = BmpColorMap[((*Image) >> (7 - Index)) & 0x1].Blue;
-          Blt++;
-          Width++;
-        }
-
-        Blt--;
-        Width--;
-        break;
-
-      case 4:
-        //
-        // Convert 4-bit (16 colors) BMP Palette to 24-bit color
-        //
-        Index       = (*Image) >> 4;
-        Blt->Red    = BmpColorMap[Index].Red;
-        Blt->Green  = BmpColorMap[Index].Green;
-        Blt->Blue   = BmpColorMap[Index].Blue;
-        if (Width < (BmpHeader->PixelWidth - 1)) {
-          Blt++;
-          Width++;
-          Index       = (*Image) & 0x0f;
-          Blt->Red    = BmpColorMap[Index].Red;
-          Blt->Green  = BmpColorMap[Index].Green;
-          Blt->Blue   = BmpColorMap[Index].Blue;
-        }
-        break;
-
-      case 8:
-        //
-        // Convert 8-bit (256 colors) BMP Palette to 24-bit color
-        //
-        Blt->Red    = BmpColorMap[*Image].Red;
-        Blt->Green  = BmpColorMap[*Image].Green;
-        Blt->Blue   = BmpColorMap[*Image].Blue;
-        break;
-
-      case 24:
-        //
-        // It is 24-bit BMP.
-        //
-        Blt->Blue   = *Image++;
-        Blt->Green  = *Image++;
-        Blt->Red    = *Image;
-        break;
-
-      case 32:
-        //
-        // it is 32-bit BMP. Skip pixel's highest byte
-        //
-        Blt->Blue  = *Image++;
-        Blt->Green = *Image++;
-        Blt->Red   = *Image++;
-        break;
-
-      default:
-        //
-        // Other bit format BMP is not supported.
-        //
-        if (IsAllocated) {
-          FreePool (*GopBlt);
-          *GopBlt = NULL;
-        }
-        return EFI_UNSUPPORTED;
-      };
-
-    }
-
-    ImageIndex = (UINTN) Image - (UINTN) ImageHeader;
-    if ((ImageIndex % 4) != 0) {
-      //
-      // Bmp Image starts each row on a 32-bit boundary!
-      //
-      Image = Image + (4 - (ImageIndex % 4));
-    }
-  }
-
-  return EFI_SUCCESS;
-}
-
-
-/**
   Those capsules supported by the firmwares.
 
   Caution: This function may receive untrusted input.
@@ -586,8 +332,25 @@ DisplayCapsuleImage (
   UINTN                         Width;
   EFI_GRAPHICS_OUTPUT_PROTOCOL  *GraphicsOutput;
 
-  ImagePayload = (DISPLAY_DISPLAY_PAYLOAD *)(CapsuleHeader + 1);
-  PayloadSize = CapsuleHeader->CapsuleImageSize - sizeof(EFI_CAPSULE_HEADER);
+  //
+  // UX capsule doesn't have extended header entries.
+  //
+  if (CapsuleHeader->HeaderSize != sizeof (EFI_CAPSULE_HEADER)) {
+    return EFI_UNSUPPORTED;
+  }
+  ImagePayload = (DISPLAY_DISPLAY_PAYLOAD *)((UINTN) CapsuleHeader + CapsuleHeader->HeaderSize);
+  //
+  // (CapsuleImageSize > HeaderSize) is guaranteed by IsValidCapsuleHeader().
+  //
+  PayloadSize = CapsuleHeader->CapsuleImageSize - CapsuleHeader->HeaderSize;
+
+  //
+  // Make sure the image payload at least contain the DISPLAY_DISPLAY_PAYLOAD header.
+  // Further size check is performed by the logic translating BMP to GOP BLT.
+  //
+  if (PayloadSize <= sizeof (DISPLAY_DISPLAY_PAYLOAD)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   if (ImagePayload->Version != 1) {
     return EFI_UNSUPPORTED;
@@ -620,10 +383,10 @@ DisplayCapsuleImage (
   Blt = NULL;
   Width = 0;
   Height = 0;
-  Status = ConvertBmpToGopBlt (
+  Status = TranslateBmpToGopBlt (
              ImagePayload + 1,
              PayloadSize - sizeof(DISPLAY_DISPLAY_PAYLOAD),
-             (VOID **)&Blt,
+             &Blt,
              &BltSize,
              &Height,
              &Width
@@ -1078,6 +841,7 @@ SetFmpImageData (
   UINT8                                         *Image;
   VOID                                          *VendorCode;
   CHAR16                                        *AbortReason;
+  EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS ProgressCallback;
 
   Status = gBS->HandleProtocol(
                   Handle,
@@ -1086,6 +850,19 @@ SetFmpImageData (
                   );
   if (EFI_ERROR(Status)) {
     return Status;
+  }
+
+  //
+  // Lookup Firmware Management Progress Protocol before SetImage() is called
+  // This is an optional protocol that may not be present on Handle.
+  //
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gEdkiiFirmwareManagementProgressProtocolGuid,
+                  (VOID **)&mFmpProgress
+                  );
+  if (EFI_ERROR (Status)) {
+    mFmpProgress = NULL;
   }
 
   if (ImageHeader->Version >= EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
@@ -1112,20 +889,42 @@ SetFmpImageData (
     DEBUG((DEBUG_INFO, "(UpdateHardwareInstance - 0x%x)", ImageHeader->UpdateHardwareInstance));
   }
   DEBUG((DEBUG_INFO, "\n"));
+
+  //
+  // Before calling SetImage(), reset the progress bar to 0%
+  //
+  ProgressCallback = UpdateImageProgress;
+  Status = UpdateImageProgress (0);
+  if (EFI_ERROR (Status)) {
+    ProgressCallback = NULL;
+  }
+
   Status = Fmp->SetImage(
                   Fmp,
                   ImageHeader->UpdateImageIndex,          // ImageIndex
                   Image,                                  // Image
                   ImageHeader->UpdateImageSize,           // ImageSize
                   VendorCode,                             // VendorCode
-                  Update_Image_Progress,                  // Progress
+                  ProgressCallback,                       // Progress
                   &AbortReason                            // AbortReason
                   );
+  //
+  // Set the progress bar to 100% after returning from SetImage()
+  //
+  if (ProgressCallback != NULL) {
+    UpdateImageProgress (100);
+  }
+
   DEBUG((DEBUG_INFO, "Fmp->SetImage - %r\n", Status));
   if (AbortReason != NULL) {
     DEBUG ((DEBUG_ERROR, "%s\n", AbortReason));
     FreePool(AbortReason);
   }
+
+  //
+  // Clear mFmpProgress after SetImage() returns
+  //
+  mFmpProgress = NULL;
 
   return Status;
 }
@@ -1446,7 +1245,6 @@ IsNestedFmpCapsule (
   )
 {
   EFI_STATUS                 Status;
-  EFI_SYSTEM_RESOURCE_TABLE  *Esrt;
   EFI_SYSTEM_RESOURCE_ENTRY  *EsrtEntry;
   UINTN                      Index;
   BOOLEAN                    EsrtGuidFound;
@@ -1454,6 +1252,8 @@ IsNestedFmpCapsule (
   UINTN                      NestedCapsuleSize;
   ESRT_MANAGEMENT_PROTOCOL   *EsrtProtocol;
   EFI_SYSTEM_RESOURCE_ENTRY  Entry;
+  EFI_HANDLE                 *HandleBuffer;
+  UINTN                      NumberOfHandles;
 
   EsrtGuidFound = FALSE;
   if (mIsVirtualAddrConverted) {
@@ -1479,19 +1279,21 @@ IsNestedFmpCapsule (
     }
 
     //
-    // Check ESRT configuration table
+    // Check Firmware Management Protocols
     //
     if (!EsrtGuidFound) {
-      Status = EfiGetSystemConfigurationTable(&gEfiSystemResourceTableGuid, (VOID **)&Esrt);
+      HandleBuffer = NULL;
+      Status = GetFmpHandleBufferByType (
+                 &CapsuleHeader->CapsuleGuid,
+                 0,
+                 &NumberOfHandles,
+                 &HandleBuffer
+                 );
       if (!EFI_ERROR(Status)) {
-        ASSERT (Esrt != NULL);
-        EsrtEntry = (VOID *)(Esrt + 1);
-        for (Index = 0; Index < Esrt->FwResourceCount; Index++, EsrtEntry++) {
-          if (CompareGuid(&EsrtEntry->FwClass, &CapsuleHeader->CapsuleGuid)) {
-            EsrtGuidFound = TRUE;
-            break;
-          }
-        }
+        EsrtGuidFound = TRUE;
+      }
+      if (HandleBuffer != NULL) {
+        FreePool (HandleBuffer);
       }
     }
   }

@@ -1,7 +1,7 @@
 /** @file
 Null implementation of SmBusLib class library.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -278,7 +278,7 @@ SmBusWriteDataByte (
   If Status is not NULL, then the status of the executed command is returned in Status.
   If Length in SmBusAddress is not zero, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().
-  
+
   @param  SmBusAddress  Address that encodes the SMBUS Slave Address,
                         SMBUS Command, SMBUS Data Length, and PEC.
   @param  Status        Return status for the executed command.
@@ -453,7 +453,7 @@ SmBusReadBlock (
   The SMBUS slave address, SMBUS command, and SMBUS length fields of SmBusAddress are required.
   Bytes are written to the SMBUS from Buffer.
   The number of bytes written is returned, and will never return a value larger than 32-bytes.
-  If Status is not NULL, then the status of the executed command is returned in Status.  
+  If Status is not NULL, then the status of the executed command is returned in Status.
   If Length in SmBusAddress is zero or greater than 32, then ASSERT().
   If Buffer is NULL, then ASSERT().
   If any reserved bits of SmBusAddress are set, then ASSERT().

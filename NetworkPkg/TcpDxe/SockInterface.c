@@ -1,7 +1,7 @@
 /** @file
   Interface function of the Socket.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -985,7 +985,7 @@ EFI_STATUS
 SockCancel (
   IN OUT SOCKET  *Sock,
   IN     VOID    *Token
-  ) 
+  )
 {
   EFI_STATUS     Status;
 
@@ -1008,7 +1008,7 @@ SockCancel (
     Status = EFI_NOT_STARTED;
     goto Exit;
   }
-  
+
   //
   // 1. Check ConnectionToken.
   //
@@ -1039,7 +1039,7 @@ SockCancel (
   if (Token != NULL && !EFI_ERROR (Status)) {
     goto Exit;
   }
-  
+
   //
   // 4. Check SndTokenList.
   //
@@ -1052,7 +1052,7 @@ SockCancel (
   // 5. Check ProcessingSndTokenList.
   //
   Status = SockCancelToken (Token, &Sock->ProcessingSndTokenList);
-  
+
 Exit:
   EfiReleaseLock (&(Sock->Lock));
   return Status;

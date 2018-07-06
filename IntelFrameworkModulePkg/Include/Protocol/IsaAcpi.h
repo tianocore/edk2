@@ -2,13 +2,13 @@
   EFI ISA ACPI Protocol is used to enumerate and manage all the ISA controllers on
   the platform's ISA Bus.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -71,13 +71,13 @@ typedef struct _EFI_ISA_ACPI_PROTOCOL EFI_ISA_ACPI_PROTOCOL;
 #define EFI_ISA_ACPI_IO_DECODE_16_BITS                   0x02    ///< ISA controllers uses a 16-bit address decoder for I/O cycles.
 
 ///
-/// EFI ISA ACPI resource type 
+/// EFI ISA ACPI resource type
 ///
 typedef enum {
   EfiIsaAcpiResourceEndOfList,    ///< Marks the end if a resource list.
   EfiIsaAcpiResourceIo,           ///< ISA I/O port resource range.
   EfiIsaAcpiResourceMemory,       ///< ISA MMIO resource range.
-  EfiIsaAcpiResourceDma,          ///< ISA DMA resource. 
+  EfiIsaAcpiResourceDma,          ///< ISA DMA resource.
   EfiIsaAcpiResourceInterrupt     ///< ISA interrupt resource.
 } EFI_ISA_ACPI_RESOURCE_TYPE;
 
@@ -112,10 +112,10 @@ typedef struct {
 
   This service allows all the ISA controllers on an ISA bus to be enumerated.  If
   Device is a pointer to a NULL value, then the first ISA controller on the ISA
-  bus is returned in Device and EFI_SUCCESS is returned.  If Device is a pointer 
-  to a value that was returned on a prior call to DeviceEnumerate(), then the next 
+  bus is returned in Device and EFI_SUCCESS is returned.  If Device is a pointer
+  to a value that was returned on a prior call to DeviceEnumerate(), then the next
   ISA controller on the ISA bus is returned in Device and EFI_SUCCESS is returned.
-  If Device is a pointer to the last ISA controller on the ISA bus, then 
+  If Device is a pointer to the last ISA controller on the ISA bus, then
   EFI_NOT_FOUND is returned.
 
   @param[in]  This     The pointer to the EFI_ISA_ACPI_PROTOCOL instance.
@@ -135,8 +135,8 @@ EFI_STATUS
 /**
   Sets the power state of an ISA controller.
 
-  This services sets the power state of the ISA controller specified by Device to 
-  the power state specified by OnOff.  TRUE denotes on, FALSE denotes off. 
+  This services sets the power state of the ISA controller specified by Device to
+  the power state specified by OnOff.  TRUE denotes on, FALSE denotes off.
   If the power state is sucessfully set on the ISA Controller, then
   EFI_SUCCESS is returned.
 
@@ -155,11 +155,11 @@ EFI_STATUS
   IN EFI_ISA_ACPI_DEVICE_ID  *Device,
   IN BOOLEAN                 OnOff
   );
-  
+
 /**
   Retrieves the current set of resources associated with an ISA controller.
 
-  Retrieves the set of I/O, MMIO, DMA, and interrupt resources currently 
+  Retrieves the set of I/O, MMIO, DMA, and interrupt resources currently
   assigned to the ISA controller specified by Device.  These resources
   are returned in ResourceList.
 
@@ -209,7 +209,7 @@ EFI_STATUS
 
   @param[in] This           The pointer to the EFI_ISA_ACPI_PROTOCOL instance.
   @param[in] Device         The pointer to an ISA controller named by ACPI HID/UID.
-  @param[in] ResourceList   The pointer to a resources list that must be one of the 
+  @param[in] ResourceList   The pointer to a resources list that must be one of the
                             resource lists returned by GetPosResource() for the
                             ISA controller specified by Device.
 
@@ -223,7 +223,7 @@ EFI_STATUS
   IN EFI_ISA_ACPI_PROTOCOL       *This,
   IN EFI_ISA_ACPI_DEVICE_ID      *Device,
   IN EFI_ISA_ACPI_RESOURCE_LIST  *ResourceList
-  );    
+  );
 
 /**
   Enables or disables an ISA controller.
@@ -243,7 +243,7 @@ EFI_STATUS
   IN EFI_ISA_ACPI_PROTOCOL   *This,
   IN EFI_ISA_ACPI_DEVICE_ID  *Device,
   IN BOOLEAN                 Enable
-  );    
+  );
 
 /**
   Initializes an ISA controller, so that it can be used.  This service must be called
@@ -261,14 +261,14 @@ EFI_STATUS
 (EFIAPI *EFI_ISA_ACPI_INIT_DEVICE)(
   IN EFI_ISA_ACPI_PROTOCOL   *This,
   IN EFI_ISA_ACPI_DEVICE_ID  *Device
-  );  
+  );
 
 /**
-  Initializes all the HW states required for the ISA controllers on the ISA bus 
+  Initializes all the HW states required for the ISA controllers on the ISA bus
   to be enumerated and managed by the rest of the services in this prorotol.
   This service must be called before any of the other services in this
   protocol will function as expected.
- 
+
   @param[in] This  The pointer to the EFI_ISA_ACPI_PROTOCOL instance.
 
   @retval EFI_SUCCESS   Successfully initialized all required hardware states.
@@ -283,9 +283,9 @@ EFI_STATUS
 
 ///
 /// The EFI_ISA_ACPI_PROTOCOL provides the services to enumerate and manage
-/// ISA controllers on an ISA bus.  These services include the ability to initialize, 
-/// enable, disable, and manage the power state of ISA controllers.  It also 
-/// includes services to query current resources, query possible resources, 
+/// ISA controllers on an ISA bus.  These services include the ability to initialize,
+/// enable, disable, and manage the power state of ISA controllers.  It also
+/// includes services to query current resources, query possible resources,
 /// and assign resources to an ISA controller.
 ///
 struct _EFI_ISA_ACPI_PROTOCOL {
@@ -300,5 +300,5 @@ struct _EFI_ISA_ACPI_PROTOCOL {
 };
 
 extern EFI_GUID gEfiIsaAcpiProtocolGuid;
-  
+
 #endif

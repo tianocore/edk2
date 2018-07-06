@@ -2,7 +2,7 @@
   Support for PxeBc dhcp functions.
 
 Copyright (c) 2013, Red Hat, Inc.
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -171,7 +171,7 @@ PxeBcParseCachedDhcpPacket (
                        );
   }
   //
-  // Second, Check if bootfilename and serverhostname is overloaded to carry DHCP options refers to rfc-2132. 
+  // Second, Check if bootfilename and serverhostname is overloaded to carry DHCP options refers to rfc-2132.
   // If yes, try to parse options from the BootFileName field, then ServerName field.
   //
   Option = Options[PXEBC_DHCP4_TAG_INDEX_OVERLOAD];
@@ -229,7 +229,7 @@ PxeBcParseCachedDhcpPacket (
   //
   if (Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE] != NULL) {
     //
-    // RFC 2132, Section 9.5 does not strictly state Bootfile name (option 67) is null 
+    // RFC 2132, Section 9.5 does not strictly state Bootfile name (option 67) is null
     // terminated string. So force to append null terminated character at the end of string.
     //
     Ptr8 =  (UINT8*)&Options[PXEBC_DHCP4_TAG_INDEX_BOOTFILE]->Data[0];
@@ -685,7 +685,7 @@ PxeBcCacheDhcpOffer (
 
 **/
 EFI_STATUS
-PxeBcSetIp4Policy (   
+PxeBcSetIp4Policy (
   IN PXEBC_PRIVATE_DATA            *Private
   )
 {
@@ -705,7 +705,7 @@ PxeBcSetIp4Policy (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   if (Policy != Ip4Config2PolicyStatic) {
     Policy = Ip4Config2PolicyStatic;
     Status= Ip4Config2->SetData (
@@ -716,7 +716,7 @@ PxeBcSetIp4Policy (
                           );
     if (EFI_ERROR (Status)) {
       return Status;
-    } 
+    }
   }
 
   return  EFI_SUCCESS;
@@ -943,7 +943,7 @@ PxeBcDhcpCallBack (
       Status = EFI_ABORTED;
       break;
     }
-    
+
     if (Mode->SendGUID) {
       //
       // send the system GUID instead of the MAC address as the hardware address
@@ -957,6 +957,7 @@ PxeBcDhcpCallBack (
         // SetMem(DHCPV4_OPTIONS_BUFFER.DhcpPlatformId.Guid, sizeof(EFI_GUID), 0xff);
         // GUID not yet set - send all 0's to show not programable
         //
+        DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
         ZeroMem (DhcpHeader->ClientHwAddr, sizeof (EFI_GUID));
       }
 
@@ -980,7 +981,7 @@ PxeBcDhcpCallBack (
       //
       break;
     }
-    
+
     if (Private->NumOffers < PXEBC_MAX_OFFER_NUM) {
       //
       // Cache the dhcp offers in Private->Dhcp4Offers[]
@@ -1133,6 +1134,7 @@ PxeBcBuildDhcpOptions (
     // SetMem(DHCPV4_OPTIONS_BUFFER.DhcpPlatformId.Guid, sizeof(EFI_GUID), 0xff);
     // GUID not yet set - send all 0's to show not programable
     //
+    DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
     ZeroMem (OptEnt.Uuid->Guid, sizeof (EFI_GUID));
   }
 
@@ -1301,6 +1303,7 @@ PxeBcDiscvBootService (
       //
       // GUID not yet set - send all 0's to show not programable
       //
+      DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
       ZeroMem (DhcpHeader->ClientHwAddr, sizeof (EFI_GUID));
     }
 
@@ -1666,12 +1669,12 @@ PxeBcSelectBootPrompt (
 
   VendorOpt = &Packet->PxeVendorOption;
   //
-  // According to the PXE specification 2.1, Table 2-1 PXE DHCP Options  (Full  
-  // List), we must not consider a boot prompt or boot menu if all of the  
+  // According to the PXE specification 2.1, Table 2-1 PXE DHCP Options  (Full
+  // List), we must not consider a boot prompt or boot menu if all of the
   // following hold:
   // - the PXE_DISCOVERY_CONTROL PXE tag is present inside the Vendor Options
   //   (=43) DHCP tag, and
-  // - the PXE_DISCOVERY_CONTROL PXE tag has bit 3 set, and  
+  // - the PXE_DISCOVERY_CONTROL PXE tag has bit 3 set, and
   // - a boot file name has been presented with DHCP option 67.
   //
   if (IS_DISABLE_PROMPT_MENU (VendorOpt->DiscoverCtrl) &&

@@ -1,7 +1,7 @@
 /** @file
   A shell application that triggers capsule update process.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,7 @@
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/PrintLib.h>
+#include <Library/BmpSupportLib.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Guid/GlobalVariable.h>
 #include <Guid/CapsuleReport.h>
@@ -173,15 +174,21 @@ CreateBmpFmp (
   EFI_DISPLAY_CAPSULE                           *DisplayCapsule;
   EFI_STATUS                                    Status;
   EFI_GRAPHICS_OUTPUT_PROTOCOL                  *Gop;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION          *Info;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL                 *GopBlt;
+  UINTN                                         GopBltSize;
+  UINTN                                         Height;
+  UINTN                                         Width;
 
   Status = gBS->LocateProtocol(&gEfiGraphicsOutputProtocolGuid, NULL, (VOID **)&Gop);
   if (EFI_ERROR(Status)) {
     Print(L"CapsuleApp: NO GOP is found.\n");
     return EFI_UNSUPPORTED;
   }
+  Info = Gop->Mode->Info;
   Print(L"Current GOP: Mode - %d, ", Gop->Mode->Mode);
-  Print(L"HorizontalResolution - %d, ", Gop->Mode->Info->HorizontalResolution);
-  Print(L"VerticalResolution - %d\n", Gop->Mode->Info->VerticalResolution);
+  Print(L"HorizontalResolution - %d, ", Info->HorizontalResolution);
+  Print(L"VerticalResolution - %d\n", Info->VerticalResolution);
   // HorizontalResolution >= BMP_IMAGE_HEADER.PixelWidth
   // VerticalResolution   >= BMP_IMAGE_HEADER.PixelHeight
 
@@ -207,6 +214,35 @@ CreateBmpFmp (
     goto Done;
   }
 
+  GopBlt = NULL;
+  Status = TranslateBmpToGopBlt (
+             BmpBuffer,
+             FileSize,
+             &GopBlt,
+             &GopBltSize,
+             &Height,
+             &Width
+             );
+  if (EFI_ERROR(Status)) {
+    Print(L"CapsuleApp: BMP image (%s) is not valid.\n", BmpName);
+    goto Done;
+  }
+  if (GopBlt != NULL) {
+    FreePool (GopBlt);
+  }
+  Print(L"BMP image (%s), Width - %d, Height - %d\n", BmpName, Width, Height);
+
+  if (Height > Info->VerticalResolution) {
+    Status = EFI_INVALID_PARAMETER;
+    Print(L"CapsuleApp: BMP image (%s) height is larger than current resolution.\n", BmpName);
+    goto Done;
+  }
+  if (Width > Info->HorizontalResolution) {
+    Status = EFI_INVALID_PARAMETER;
+    Print(L"CapsuleApp: BMP image (%s) width is larger than current resolution.\n", BmpName);
+    goto Done;
+  }
+
   FullCapsuleBufferSize = sizeof(EFI_DISPLAY_CAPSULE) + FileSize;
   FullCapsuleBuffer = AllocatePool(FullCapsuleBufferSize);
   if (FullCapsuleBuffer == NULL) {
@@ -226,8 +262,27 @@ CreateBmpFmp (
   DisplayCapsule->ImagePayload.ImageType = 0; // BMP
   DisplayCapsule->ImagePayload.Reserved = 0;
   DisplayCapsule->ImagePayload.Mode = Gop->Mode->Mode;
-  DisplayCapsule->ImagePayload.OffsetX = 0;
-  DisplayCapsule->ImagePayload.OffsetY = 0;
+
+  //
+  // Center the bitmap horizontally
+  //
+  DisplayCapsule->ImagePayload.OffsetX = (UINT32)((Info->HorizontalResolution - Width) / 2);
+
+  //
+  // Put bitmap 3/4 down the display.  If bitmap is too tall, then align bottom
+  // of bitmap at bottom of display.
+  //
+  DisplayCapsule->ImagePayload.OffsetY =
+    MIN (
+      (UINT32)(Info->VerticalResolution - Height),
+      (UINT32)(((3 * Info->VerticalResolution) - (2 * Height)) / 4)
+      );
+
+  Print(L"BMP image (%s), OffsetX - %d, OffsetY - %d\n",
+    BmpName,
+    DisplayCapsule->ImagePayload.OffsetX,
+    DisplayCapsule->ImagePayload.OffsetY
+    );
 
   CopyMem((DisplayCapsule + 1), BmpBuffer, FileSize);
 
@@ -653,7 +708,7 @@ CleanGatherList (
         break;
       }
 
-      TempBlockPtr2 = (VOID *) ((UINTN) TempBlockPtr->Union.ContinuationPointer);
+      TempBlockPtr2 = (VOID *) ((UINTN) TempBlockPtr[Index].Union.ContinuationPointer);
       FreePool(TempBlockPtr1);
       TempBlockPtr1 = TempBlockPtr2;
     }

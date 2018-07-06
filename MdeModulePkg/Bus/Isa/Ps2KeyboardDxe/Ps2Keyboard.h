@@ -1,7 +1,7 @@
 /** @file
   PS/2 keyboard driver header file
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -564,6 +564,18 @@ BOOLEAN
 IsKeyRegistered (
   IN EFI_KEY_DATA  *RegsiteredData,
   IN EFI_KEY_DATA  *InputData
+  );
+
+/**
+  Initialize the key state.
+
+  @param  ConsoleIn     The KEYBOARD_CONSOLE_IN_DEV instance.
+  @param  KeyState      A pointer to receive the key state information.
+**/
+VOID
+InitializeKeyState (
+  IN  KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
+  OUT EFI_KEY_STATE           *KeyState
   );
 
 #endif

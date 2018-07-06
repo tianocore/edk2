@@ -1,14 +1,14 @@
 /** @file
   Generic debug support macros, typedefs and prototypes for IA32/x64.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -90,8 +90,8 @@ Vect2Desc (
   );
 
 /**
-  Initializes driver's handler registration database. 
-  
+  Initializes driver's handler registration database.
+
   This code executes in boot services context
   Must be public because it's referenced from DebugSupport.c
 
@@ -124,14 +124,14 @@ PlUnloadDebugSupportDriver (
 
 /**
   Returns the maximum value that may be used for the ProcessorIndex parameter in
-  RegisterPeriodicCallback() and RegisterExceptionCallback().                   
-    
+  RegisterPeriodicCallback() and RegisterExceptionCallback().
+
   Hard coded to support only 1 processor for now.
 
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  MaxProcessorIndex     Pointer to a caller-allocated UINTN in which the maximum supported
-                                processor index is returned. Always 0 returned.                                     
-                                
+                                processor index is returned. Always 0 returned.
+
   @retval EFI_SUCCESS           Always returned with **MaxProcessorIndex set to 0.
 
 **/
@@ -144,17 +144,17 @@ GetMaximumProcessorIndex (
 
 /**
   Registers a function to be called back periodically in interrupt context.
-    
+
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  ProcessorIndex        Specifies which processor the callback function applies to.
   @param  PeriodicCallback      A pointer to a function of type PERIODIC_CALLBACK that is the main
                                 periodic entry point of the debug agent.
-                                
-  @retval EFI_SUCCESS           The function completed successfully.  
+
+  @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_ALREADY_STARTED   Non-NULL PeriodicCallback parameter when a callback
-                                function was previously registered.                
-  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback                               
-                                function. 
+                                function was previously registered.
+  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback
+                                function.
 **/
 EFI_STATUS
 EFIAPI
@@ -168,17 +168,17 @@ RegisterPeriodicCallback (
   Registers a function to be called when a given processor exception occurs.
 
   This code executes in boot services context.
-    
+
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  ProcessorIndex        Specifies which processor the callback function applies to.
   @param  ExceptionCallback     A pointer to a function of type EXCEPTION_CALLBACK that is called
-                                when the processor exception specified by ExceptionType occurs.  
-  @param  ExceptionType         Specifies which processor exception to hook.                       
-                                
-  @retval EFI_SUCCESS           The function completed successfully.  
+                                when the processor exception specified by ExceptionType occurs.
+  @param  ExceptionType         Specifies which processor exception to hook.
+
+  @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_ALREADY_STARTED   Non-NULL PeriodicCallback parameter when a callback
-                                function was previously registered.                
-  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback                               
+                                function was previously registered.
+  @retval EFI_OUT_OF_RESOURCES  System has insufficient memory resources to register new callback
                                 function.
 **/
 EFI_STATUS
@@ -192,14 +192,14 @@ RegisterExceptionCallback (
 
 /**
   Invalidates processor instruction cache for a memory range. Subsequent execution in this range
-  causes a fresh memory fetch to retrieve code to be executed.                                  
-    
+  causes a fresh memory fetch to retrieve code to be executed.
+
   @param  This                  A pointer to the EFI_DEBUG_SUPPORT_PROTOCOL instance.
   @param  ProcessorIndex        Specifies which processor's instruction cache is to be invalidated.
-  @param  Start                 Specifies the physical base of the memory range to be invalidated.                                
+  @param  Start                 Specifies the physical base of the memory range to be invalidated.
   @param  Length                Specifies the minimum number of bytes in the processor's instruction
-                                cache to invalidate.                                                 
-                                
+                                cache to invalidate.
+
   @retval EFI_SUCCESS           Always returned.
 
 **/

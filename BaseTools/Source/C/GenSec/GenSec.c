@@ -1,7 +1,7 @@
 /** @file
 Creates output file that is a properly formed section per the PI spec.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -11,6 +11,12 @@ THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
 
 **/
+#ifndef __GNUC__
+#include <windows.h>
+#include <io.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +33,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Crc32.h"
 #include "EfiUtilityMsgs.h"
 #include "ParseInf.h"
+#include "FvLib.h"
+#include "PeCoffLib.h"
 
 //
 // GenSec Tool Information
@@ -185,8 +193,9 @@ Returns:
                         used in Ver section.\n");
   fprintf (stdout, "  --sectionalign SectionAlign\n\
                         SectionAlign points to section alignment, which support\n\
-                        the alignment scope 1~16M. It is specified in same\n\
-                        order that the section file is input.\n");
+                        the alignment scope 0~16M. If SectionAlign is specified\n\
+                        as 0, tool get alignment value from SectionFile. It is\n\
+                        specified in same order that the section file is input.\n");
   fprintf (stdout, "  --dummy dummyfile\n\
                         compare dummpyfile with input_file to decide whether\n\
                         need to set PROCESSING_REQUIRED attribute.\n");
@@ -985,6 +994,103 @@ Returns:
   return EFI_SUCCESS;
 }
 
+EFI_STATUS
+FfsRebaseImageRead (
+    IN      VOID    *FileHandle,
+    IN      UINTN   FileOffset,
+    IN OUT  UINT32  *ReadSize,
+    OUT     VOID    *Buffer
+    )
+  /*++
+
+    Routine Description:
+
+    Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file
+
+    Arguments:
+
+   FileHandle - The handle to the PE/COFF file
+
+   FileOffset - The offset, in bytes, into the file to read
+
+   ReadSize   - The number of bytes to read from the file starting at FileOffset
+
+   Buffer     - A pointer to the buffer to read the data into.
+
+   Returns:
+
+   EFI_SUCCESS - ReadSize bytes of data were read into Buffer from the PE/COFF file starting at FileOffset
+
+   --*/
+{
+  CHAR8   *Destination8;
+  CHAR8   *Source8;
+  UINT32  Length;
+
+  Destination8  = Buffer;
+  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
+  Length        = *ReadSize;
+  while (Length--) {
+    *(Destination8++) = *(Source8++);
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+GetAlignmentFromFile(char *InFile, UINT32 *Alignment)
+  /*
+    InFile is input file for getting alignment
+    return the alignment
+    */
+{
+  FILE                           *InFileHandle;
+  UINT8                          *PeFileBuffer;
+  UINTN                          PeFileSize;
+  UINT32                         CurSecHdrSize;
+  PE_COFF_LOADER_IMAGE_CONTEXT   ImageContext;
+  EFI_COMMON_SECTION_HEADER      *CommonHeader;
+  EFI_STATUS                     Status;
+
+  InFileHandle        = NULL;
+  PeFileBuffer        = NULL;
+  *Alignment          = 0;
+
+  memset (&ImageContext, 0, sizeof (ImageContext));
+
+  InFileHandle = fopen(LongFilePath(InFile), "rb");
+  if (InFileHandle == NULL){
+    Error (NULL, 0, 0001, "Error opening file", InFile);
+    return EFI_ABORTED;
+  }
+  PeFileSize = _filelength (fileno(InFileHandle));
+  PeFileBuffer = (UINT8 *) malloc (PeFileSize);
+  if (PeFileBuffer == NULL) {
+    fclose (InFileHandle);
+    Error(NULL, 0, 4001, "Resource", "memory cannot be allocated  of %s", InFileHandle);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  fread (PeFileBuffer, sizeof (UINT8), PeFileSize, InFileHandle);
+  fclose (InFileHandle);
+  CommonHeader = (EFI_COMMON_SECTION_HEADER *) PeFileBuffer;
+  CurSecHdrSize = GetSectionHeaderLength(CommonHeader);
+  ImageContext.Handle = (VOID *) ((UINTN)PeFileBuffer + CurSecHdrSize);
+  ImageContext.ImageRead = (PE_COFF_LOADER_READ_FILE)FfsRebaseImageRead;
+  Status               = PeCoffLoaderGetImageInfo(&ImageContext);
+  if (EFI_ERROR (Status)) {
+    Error (NULL, 0, 3000, "Invalid PeImage", "The input file is %s and return status is %x", InFile, (int) Status);
+    return Status;
+   }
+  *Alignment = ImageContext.SectionAlignment;
+  // Free the allocated memory resource
+  if (PeFileBuffer != NULL) {
+    free (PeFileBuffer);
+    PeFileBuffer = NULL;
+  }
+  return EFI_SUCCESS;
+}
+
 int
 main (
   int  argc,
@@ -1269,11 +1375,14 @@ Returns:
         }
         memset (&(InputFileAlign[InputFileNum]), 1, (MAXIMUM_INPUT_FILE_NUM * sizeof (UINT32)));
       }
-      
-      Status = StringtoAlignment (argv[1], &(InputFileAlign[InputFileAlignNum]));
-      if (EFI_ERROR (Status)) {
-        Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
-        goto Finish;
+      if (stricmp(argv[1], "0") == 0) {
+        InputFileAlign[InputFileAlignNum] = 0;
+      } else {
+        Status = StringtoAlignment (argv[1], &(InputFileAlign[InputFileAlignNum]));
+        if (EFI_ERROR (Status)) {
+          Error (NULL, 0, 1003, "Invalid option value", "%s = %s", argv[0], argv[1]);
+          goto Finish;
+        }
       }
       argc -= 2;
       argv += 2;
@@ -1315,6 +1424,16 @@ Returns:
   if (InputFileAlignNum > 0 && InputFileAlignNum != InputFileNum) {
     Error (NULL, 0, 1003, "Invalid option", "section alignment must be set for each section");
     goto Finish;
+  }
+  for (Index = 0; Index < InputFileAlignNum; Index++)
+  {
+    if (InputFileAlign[Index] == 0) {
+      Status = GetAlignmentFromFile(InputFileName[Index], &(InputFileAlign[Index]));
+      if (EFI_ERROR(Status)) {
+        Error (NULL, 0, 1003, "Fail to get Alignment from %s", InputFileName[InputFileNum]);
+        goto Finish;
+      }
+    }
   }
 
   VerboseMsg ("%s tool start.", UTILITY_NAME);
@@ -1376,6 +1495,7 @@ Returns:
       }
       if (DummyFileBuffer != NULL) {
         free (DummyFileBuffer);
+        DummyFileBuffer = NULL;
       }
       if (InFileBuffer != NULL) {
         free (InFileBuffer);

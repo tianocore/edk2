@@ -10,5 +10,5 @@ full_cmd=${BASH_SOURCE:-$0} # see http://mywiki.wooledge.org/BashFAQ/028 for a d
 dir=$(dirname "$full_cmd")
 cmd=${full_cmd##*/}
 
-export PYTHONPATH="$dir/../../Source/Python"
+export PYTHONPATH="$dir/../../Source/Python${PYTHONPATH:+:"$PYTHONPATH"}"
 exec "${python_exe:-python}" "$dir/../../Source/Python/$cmd/$cmd.py" "$@"

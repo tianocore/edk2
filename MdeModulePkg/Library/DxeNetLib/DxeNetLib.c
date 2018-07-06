@@ -648,10 +648,10 @@ NetGetIpClass (
 
 /**
   Check whether the IP is a valid unicast address according to
-  the netmask. 
+  the netmask.
 
   ASSERT if NetMask is zero.
-  
+
   If all bits of the host address of IP are 0 or 1, IP is also not a valid unicast address,
   except when the originator is one of the endpoints of a point-to-point link with a 31-bit
   mask (RFC3021).
@@ -670,7 +670,7 @@ NetIp4IsUnicast (
   )
 {
   ASSERT (NetMask != 0);
-  
+
   if (Ip == 0 || IP4_IS_LOCAL_BROADCAST (Ip)) {
     return FALSE;
   }
@@ -895,7 +895,7 @@ Ip6Swap128 (
 /**
   Initialize a random seed using current time and monotonic count.
 
-  Get current time and monotonic count first. Then initialize a random seed 
+  Get current time and monotonic count first. Then initialize a random seed
   based on some basic mathematics operation on the hour, day, minute, second,
   nanosecond and year of the current time and the monotonic count value.
 
@@ -1132,7 +1132,7 @@ NetListInsertBefore (
   If it has been removed, then restart the traversal from the head.
   If it hasn't been removed, then continue with the next node directly.
   This function will end the iterate and return the CallBack's last return value if error happens,
-  or retrun EFI_SUCCESS if 2 complete passes are made with no changes in the number of children in the list.  
+  or retrun EFI_SUCCESS if 2 complete passes are made with no changes in the number of children in the list.
 
   @param[in]    List             The head of the list.
   @param[in]    CallBack         Pointer to the callback function to destroy one node in the list.
@@ -1219,7 +1219,7 @@ NetIsInHandleBuffer (
   )
 {
   UINTN     Index;
-  
+
   if (NumberOfChildren == 0 || ChildHandleBuffer == NULL) {
     return FALSE;
   }
@@ -1810,7 +1810,7 @@ NetLibDefaultUnload (
     if (DriverBinding->ImageHandle != ImageHandle) {
       continue;
     }
-    
+
     //
     // Disconnect the driver specified by ImageHandle from all
     // the devices in the handle database.
@@ -1822,16 +1822,16 @@ NetLibDefaultUnload (
                       NULL
                       );
     }
-    
+
     //
     // Uninstall all the protocols installed in the driver entry point
-    //    
+    //
     gBS->UninstallProtocolInterface (
           DriverBinding->DriverBindingHandle,
           &gEfiDriverBindingProtocolGuid,
           DriverBinding
           );
-    
+
     Status = gBS->HandleProtocol (
                     DeviceHandleBuffer[Index],
                     &gEfiComponentNameProtocolGuid,
@@ -2576,13 +2576,13 @@ Exit:
 
 /**
 
-  Detect media state for a network device. This routine will wait for a period of time at 
-  a specified checking interval when a certain network is under connecting until connection 
+  Detect media state for a network device. This routine will wait for a period of time at
+  a specified checking interval when a certain network is under connecting until connection
   process finishs or timeout. If Aip protocol is supported by low layer drivers, three kinds
   of media states can be detected: EFI_SUCCESS, EFI_NOT_READY and EFI_NO_MEDIA, represents
-  connected state, connecting state and no media state respectively. When function detects 
-  the current state is EFI_NOT_READY, it will loop to wait for next time's check until state 
-  turns to be EFI_SUCCESS or EFI_NO_MEDIA. If Aip protocol is not supported, function will 
+  connected state, connecting state and no media state respectively. When function detects
+  the current state is EFI_NOT_READY, it will loop to wait for next time's check until state
+  turns to be EFI_SUCCESS or EFI_NO_MEDIA. If Aip protocol is not supported, function will
   call NetLibDetectMedia() and return state directly.
 
   @param[in]   ServiceHandle    The handle where network service binding protocols are
@@ -2593,7 +2593,7 @@ Exit:
   @param[out]  MediaState       The pointer to the detected media state.
 
   @retval EFI_SUCCESS           Media detection success.
-  @retval EFI_INVALID_PARAMETER ServiceHandle is not a valid network device handle or 
+  @retval EFI_INVALID_PARAMETER ServiceHandle is not a valid network device handle or
                                 MediaState pointer is NULL.
   @retval EFI_DEVICE_ERROR      A device error occurred.
   @retval EFI_TIMEOUT           Network is connecting but timeout.
@@ -2697,7 +2697,7 @@ NetLibDetectMediaWaitTimeout (
   }
 
   //
-  // Loop to check media state 
+  // Loop to check media state
   //
 
   Timer        = NULL;
@@ -2758,10 +2758,10 @@ NetLibDetectMediaWaitTimeout (
   from DHCP).
 
   If the controller handle does not have the EFI_IP4_CONFIG2_PROTOCOL installed, the
-  default address is static. If failed to get the policy from Ip4 Config2 Protocol, 
+  default address is static. If failed to get the policy from Ip4 Config2 Protocol,
   the default address is static. Otherwise, get the result from Ip4 Config2 Protocol.
 
-  @param[in]   Controller     The controller handle which has the EFI_IP4_CONFIG2_PROTOCOL 
+  @param[in]   Controller     The controller handle which has the EFI_IP4_CONFIG2_PROTOCOL
                               relative with the default address to judge.
 
   @retval TRUE           If the default address is static.
@@ -2775,12 +2775,12 @@ NetLibDefaultAddressIsStatic (
 {
   EFI_STATUS                       Status;
   EFI_IP4_CONFIG2_PROTOCOL         *Ip4Config2;
-  UINTN                            DataSize;  
+  UINTN                            DataSize;
   EFI_IP4_CONFIG2_POLICY           Policy;
   BOOLEAN                          IsStatic;
 
   Ip4Config2 = NULL;
-  
+
   DataSize = sizeof (EFI_IP4_CONFIG2_POLICY);
 
   IsStatic   = TRUE;
@@ -2797,11 +2797,11 @@ NetLibDefaultAddressIsStatic (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
-  
+
   IsStatic = (BOOLEAN) (Policy == Ip4Config2PolicyStatic);
 
 ON_EXIT:
-  
+
   return IsStatic;
 }
 
@@ -3132,14 +3132,14 @@ NetLibStrToIp6andPrefix (
 
   Convert one EFI_IPv6_ADDRESS to Null-terminated Unicode string.
   The text representation of address is defined in RFC 4291.
-  
+
   @param[in]       Ip6Address     The pointer to the IPv6 address.
   @param[out]      String         The buffer to return the converted string.
   @param[in]       StringSize     The length in bytes of the input String.
-                                  
+
   @retval EFI_SUCCESS             Convert to string successfully.
   @retval EFI_INVALID_PARAMETER   The input parameter is invalid.
-  @retval EFI_BUFFER_TOO_SMALL    The BufferSize is too small for the result. BufferSize has been 
+  @retval EFI_BUFFER_TOO_SMALL    The BufferSize is too small for the result. BufferSize has been
                                   updated with the size needed to complete the request.
 **/
 EFI_STATUS
@@ -3165,7 +3165,7 @@ NetLibIp6ToStr (
 
   //
   // Convert the UINT8 array to an UINT16 array for easy handling.
-  // 
+  //
   ZeroMem (Ip6Addr, sizeof (Ip6Addr));
   for (Index = 0; Index < 16; Index++) {
     Ip6Addr[Index / 2] |= (Ip6Address->Addr[Index] << ((1 - (Index % 2)) << 3));
@@ -3197,7 +3197,7 @@ NetLibIp6ToStr (
       }
     }
   }
-  
+
   if (CurrentZerosStart != DEFAULT_ZERO_START && CurrentZerosLength > 2) {
     if (LongestZerosStart == DEFAULT_ZERO_START || LongestZerosLength < CurrentZerosLength) {
       LongestZerosStart  = CurrentZerosStart;
@@ -3218,7 +3218,7 @@ NetLibIp6ToStr (
     }
     Ptr += UnicodeSPrint(Ptr, 10, L"%x", Ip6Addr[Index]);
   }
-  
+
   if (LongestZerosStart != DEFAULT_ZERO_START && LongestZerosStart + LongestZerosLength == 8) {
     *Ptr++ = L':';
   }
@@ -3281,7 +3281,7 @@ NetLibGetSystemGuid (
         //
         return EFI_NOT_FOUND;
       }
-      
+
       //
       // SMBIOS tables are byte packed so we need to do a byte copy to
       // prevend alignment faults on Itanium-based platform.
@@ -3295,12 +3295,12 @@ NetLibGetSystemGuid (
     // 1. Formatted section; 2. Unformatted string section. So, 2 steps are needed
     // to skip one SMBIOS structure.
     //
-    
+
     //
     // Step 1: Skip over formatted section.
     //
     String = (CHAR8 *) (Smbios.Raw + Smbios.Hdr->Length);
-  
+
     //
     // Step 2: Skip over unformated string section.
     //
@@ -3318,7 +3318,7 @@ NetLibGetSystemGuid (
         //
         Smbios.Raw = (UINT8 *)++String;
         break;
-      }    
+      }
     } while (TRUE);
   } while (Smbios.Raw < SmbiosEnd.Raw);
   return EFI_NOT_FOUND;
@@ -3328,19 +3328,19 @@ NetLibGetSystemGuid (
   Create Dns QName according the queried domain name.
 
   If DomainName is NULL, then ASSERT().
-  
-  QName is a domain name represented as a sequence of labels, 
-  where each label consists of a length octet followed by that 
-  number of octets. The QName terminates with the zero 
-  length octet for the null label of the root. Caller should 
+
+  QName is a domain name represented as a sequence of labels,
+  where each label consists of a length octet followed by that
+  number of octets. The QName terminates with the zero
+  length octet for the null label of the root. Caller should
   take responsibility to free the buffer in returned pointer.
 
-  @param  DomainName    The pointer to the queried domain name string.  
+  @param  DomainName    The pointer to the queried domain name string.
 
   @retval NULL          Failed to fill QName.
   @return               QName filled successfully.
-  
-**/ 
+
+**/
 CHAR8 *
 EFIAPI
 NetLibCreateDnsQName (
@@ -3362,10 +3362,10 @@ NetLibCreateDnsQName (
   Tail          = NULL;
 
   //
-  // One byte for first label length, one byte for terminated length zero. 
+  // One byte for first label length, one byte for terminated length zero.
   //
   QueryNameSize = StrLen (DomainName) + 2;
-  
+
   if (QueryNameSize > DNS_MAX_NAME_SIZE) {
     return NULL;
   }
@@ -3374,7 +3374,7 @@ NetLibCreateDnsQName (
   if (QueryName == NULL) {
     return NULL;
   }
-  
+
   Header = QueryName;
   Tail = Header + 1;
   Len = 0;

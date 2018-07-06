@@ -969,7 +969,7 @@ vfrExtensionData[UINT8 *DataBuff, UINT32 Size, CHAR8 *TypeName, UINT32 TypeSize,
                  break;
               }
             }
-            if (TFName != NULL) { delete TFName; TFName = NULL; }
+            if (TFName != NULL) { delete[] TFName; TFName = NULL; }
           >>
   )*
 )
@@ -1166,7 +1166,7 @@ vfrStatementVarStoreEfi :
                                                        VSEObj.SetSize ((UINT16) Size);
                                                        VSEObj.SetName (StoreName);
                                                        if (IsUEFI23EfiVarstore == FALSE && StoreName != NULL) {
-                                                         delete StoreName; 
+                                                         delete[] StoreName;
                                                        }
                                                     >>
   ";"
@@ -1324,7 +1324,7 @@ vfrQuestionBaseInfo[EFI_VARSTORE_INFO & Info, EFI_QUESTION_ID & QId, EFI_QUESION
                                                    >>
                                                    <<
                                                       if (VarIdStr != NULL) {
-                                                        delete VarIdStr;
+                                                        delete[] VarIdStr;
                                                       }
                                                       _SAVE_CURRQEST_VARINFO (Info);
                                                    >>
@@ -1511,7 +1511,7 @@ vfrStorageVarId[EFI_VARSTORE_INFO & Info, CHAR8 *&QuestVarIdStr, BOOLEAN CheckFl
                                                        }
 
                                                        QuestVarIdStr = VarIdStr;
-                                                       if (VarStr != NULL) {delete VarStr;}
+                                                       if (VarStr != NULL) {delete[] VarStr;}
                                                     >>
   )
   ;
@@ -4086,7 +4086,15 @@ vfrStatementInvalidSaveRestoreDefaults :
 // Root expression extension function called by other function.
 //
 vfrStatementExpression [UINT32 RootLevel, UINT32 ExpOpCount = 0] :
-  << if ($RootLevel == 0) {mCIfrOpHdrIndex ++; if (mCIfrOpHdrIndex >= MAX_IFR_EXPRESSION_DEPTH) _PCATCH (VFR_RETURN_INVALID_PARAMETER, 0, "The depth of expression exceeds the max supported level 8!"); _CLEAR_SAVED_OPHDR ();} >>
+                                                       <<
+                                                          if ($RootLevel == 0) {
+                                                            mCIfrOpHdrIndex ++;
+                                                            if (mCIfrOpHdrIndex >= MAX_IFR_EXPRESSION_DEPTH) {
+                                                              _PCATCH (VFR_RETURN_INVALID_PARAMETER, 0, "The depth of expression exceeds the max supported level 8!");
+                                                            }
+                                                            _INIT_OPHDR_COND ();
+                                                          }
+                                                       >>
   andTerm[$RootLevel, $ExpOpCount]
   (
     L:OR andTerm[$RootLevel, $ExpOpCount]              << $ExpOpCount++; CIfrOr OObj(L->getLine()); >>
@@ -4105,6 +4113,7 @@ vfrStatementExpression [UINT32 RootLevel, UINT32 ExpOpCount = 0] :
                                                           }
                                                           
                                                           if ($RootLevel == 0) {
+                                                            _CLEAR_SAVED_OPHDR ();
                                                             mCIfrOpHdrIndex --;
                                                           }
                                                        >>
@@ -4389,6 +4398,12 @@ vareqvalExp [UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                        << IdEqValDoSpecial ($ExpOpCount, L->getLine(), QId, VarIdStr, Mask, ConstVal, GREATER_THAN); >>
     )
   )
+  <<
+     if (VarIdStr != NULL) {
+       delete[] VarIdStr;
+       VarIdStr = NULL;
+     }
+  >>
   ;
 
 ideqvalExp [UINT32 & RootLevel, UINT32 & ExpOpCount] :
@@ -4442,6 +4457,12 @@ ideqvalExp [UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                        << IdEqValDoSpecial ($ExpOpCount, L->getLine(), QId, VarIdStr, Mask, ConstVal, GREATER_THAN); >>
     )
   )
+  <<
+     if (VarIdStr != NULL) {
+       delete[] VarIdStr;
+       VarIdStr = NULL;
+     }
+  >>
   ;
 
 ideqidExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
@@ -4494,6 +4515,16 @@ ideqidExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                        << IdEqIdDoSpecial ($ExpOpCount, L->getLine(), QId[0], VarIdStr[0], Mask[0], QId[1], VarIdStr[1], Mask[1], GREATER_THAN); >>
     )
   )
+  <<
+     if (VarIdStr[0] != NULL) {
+       delete[] VarIdStr[0];
+       VarIdStr[0] = NULL;
+     }
+     if (VarIdStr[1] != NULL) {
+       delete[] VarIdStr[1];
+       VarIdStr[1] = NULL;
+     }
+  >>
   ;
 
 ideqvallistExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
@@ -4532,6 +4563,10 @@ ideqvallistExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                               EILObj.SetQuestionId (QId, VarIdStr, LineNo);
                                                             }
                                                             $ExpOpCount++;
+                                                          }
+                                                          if (VarIdStr != NULL) {
+                                                            delete[] VarIdStr;
+                                                            VarIdStr = NULL;
                                                           }
                                                         >>
   ;
@@ -4667,7 +4702,7 @@ getExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                             CIfrGet GObj(L->getLine()); 
                                                             _SAVE_OPHDR_COND (GObj, ($ExpOpCount == 0), L->getLine()); 
                                                             GObj.SetVarInfo (&Info); 
-                                                            delete VarIdStr; 
+                                                            delete[] VarIdStr;
                                                             $ExpOpCount++;
                                                           }
                                                        >>
@@ -4841,7 +4876,7 @@ setExp[UINT32 & RootLevel, UINT32 & ExpOpCount] :
                                                             }
                                                             CIfrSet TSObj(L->getLine()); 
                                                             TSObj.SetVarInfo (&Info); 
-                                                            delete VarIdStr; 
+                                                            delete[] VarIdStr;
                                                             $ExpOpCount++;
                                                           }
                                                        >>
@@ -4963,6 +4998,7 @@ private:
   UINT8               mCIfrOpHdrIndex;
   VOID                _SAVE_OPHDR_COND (IN CIfrOpHeader &, IN BOOLEAN, UINT32 LineNo = 0);
   VOID                _CLEAR_SAVED_OPHDR (VOID);
+  VOID                _INIT_OPHDR_COND (VOID);
   BOOLEAN             _SET_SAVED_OPHDR_SCOPE (VOID);
 
 
@@ -5053,12 +5089,23 @@ EfiVfrParser::_SAVE_OPHDR_COND (
 }
 
 VOID
-EfiVfrParser::_CLEAR_SAVED_OPHDR (
+EfiVfrParser::_INIT_OPHDR_COND (
   VOID
   )
 {
   mCIfrOpHdr[mCIfrOpHdrIndex]       = NULL;
   mCIfrOpHdrLineNo[mCIfrOpHdrIndex] = 0;
+}
+
+VOID
+EfiVfrParser::_CLEAR_SAVED_OPHDR (
+  VOID
+  )
+{
+  if (mCIfrOpHdr[mCIfrOpHdrIndex] != NULL) {
+    delete mCIfrOpHdr[mCIfrOpHdrIndex];
+    mCIfrOpHdr[mCIfrOpHdrIndex] = NULL;
+  }
 }
 
 BOOLEAN
@@ -5474,7 +5521,7 @@ EfiVfrParser::_STRCAT (
   NewStr[0] = '\0';
   if (*Dest != NULL) {
     strcpy (NewStr, *Dest);
-    delete *Dest;
+    delete[] *Dest;
   }
   strcat (NewStr, Src);
 

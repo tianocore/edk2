@@ -2,7 +2,7 @@
 Implementation for handling the User Interface option processing.
 
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -102,8 +102,8 @@ HiiValueToUINT64 (
 
 /**
   Check whether this value type can be transfer to EFI_IFR_TYPE_BUFFER type.
-  
-  EFI_IFR_TYPE_REF, EFI_IFR_TYPE_DATE and EFI_IFR_TYPE_TIME are converted to 
+
+  EFI_IFR_TYPE_REF, EFI_IFR_TYPE_DATE and EFI_IFR_TYPE_TIME are converted to
   EFI_IFR_TYPE_BUFFER when do the value compare.
 
   @param  Value                  Expression value to compare on.
@@ -158,8 +158,8 @@ IsTypeInUINT64 (
 
 /**
   Return the buffer length and buffer pointer for this value.
-  
-  EFI_IFR_TYPE_REF, EFI_IFR_TYPE_DATE and EFI_IFR_TYPE_TIME are converted to 
+
+  EFI_IFR_TYPE_REF, EFI_IFR_TYPE_DATE and EFI_IFR_TYPE_TIME are converted to
   EFI_IFR_TYPE_BUFFER when do the value compare.
 
   @param  Value                  Expression value to compare on.
@@ -285,7 +285,7 @@ CompareHiiValue (
       *Result = Buf1Len > Buf2Len ? 1 : -1;
     }
     return EFI_SUCCESS;
-  }  
+  }
 
   //
   // Take remain types(integer, boolean, date/time) as integer
@@ -333,7 +333,7 @@ ValueToOption (
     ZeroMem (&Value, sizeof (EFI_HII_VALUE));
     Value.Type = Option->OptionOpCode->Type;
     CopyMem (&Value.Value, &Option->OptionOpCode->Value, Option->OptionOpCode->Header.Length - OFFSET_OF (EFI_IFR_ONE_OF_OPTION, Value));
-    
+
     if ((CompareHiiValue (&Value, OptionValue, &Result, NULL) == EFI_SUCCESS) && (Result == 0)) {
       return Option;
     }
@@ -441,12 +441,12 @@ SetArrayData (
   @param  Type                   Type of the data in this array.
   @param  Value                  The value to be find.
   @param  Index                  The index in the array which has same value with Value.
-  
+
   @retval   TRUE Found the value in the array.
   @retval   FALSE Not found the value.
 
 **/
-BOOLEAN 
+BOOLEAN
 FindArrayData (
   IN VOID                     *Array,
   IN UINT8                    Type,
@@ -457,7 +457,7 @@ FindArrayData (
   UINTN  Count;
   UINT64 TmpValue;
   UINT64 ValueComp;
-  
+
   ASSERT (Array != NULL);
 
   Count    = 0;
@@ -804,7 +804,7 @@ PasswordProcess (
 
   StringPtr = AllocateZeroPool ((Maximum + 1) * sizeof (CHAR16));
   ASSERT (StringPtr);
-  
+
   //
   // Use a NULL password to test whether old password is required
   //
@@ -812,7 +812,7 @@ PasswordProcess (
   Status = Question->PasswordCheck (gFormData, Question, StringPtr);
   if (Status == EFI_NOT_AVAILABLE_YET || Status == EFI_UNSUPPORTED) {
     //
-    // Password can't be set now. 
+    // Password can't be set now.
     //
     if (Status == EFI_UNSUPPORTED) {
       do {
@@ -851,7 +851,7 @@ PasswordProcess (
       return Status;
     }
   }
-  
+
   //
   // Ask for new password
   //
@@ -865,7 +865,7 @@ PasswordProcess (
     FreePool (StringPtr);
     return Status;
   }
-  
+
   //
   // Confirm new password
   //
@@ -881,11 +881,11 @@ PasswordProcess (
     FreePool (TempString);
     return Status;
   }
-  
+
   //
   // Compare two typed-in new passwords
   //
-  if (StrCmp (StringPtr, TempString) == 0) {     
+  if (StrCmp (StringPtr, TempString) == 0) {
     gUserInput->InputValue.Buffer = AllocateCopyPool (Question->CurrentValue.BufferLen, StringPtr);
     gUserInput->InputValue.BufferLen = Question->CurrentValue.BufferLen;
     gUserInput->InputValue.Type = Question->CurrentValue.Type;
@@ -897,7 +897,7 @@ PasswordProcess (
     // Reset state machine for password
     //
     Question->PasswordCheck (gFormData, Question, NULL);
-  
+
     //
     // Two password mismatch, prompt error message
     //
@@ -1039,7 +1039,7 @@ ProcessOptions (
           gUserInput->InputValue.Buffer    = ValueArray;
           gUserInput->InputValue.BufferLen = Question->CurrentValue.BufferLen;
           gUserInput->InputValue.Type      = Question->CurrentValue.Type;
-          
+
           Link = GetFirstNode (&Question->OptionListHead);
           Index2 = 0;
           while (!IsNull (&Question->OptionListHead, Link) && Index2 < OrderList->MaxContainers) {
@@ -1125,7 +1125,7 @@ ProcessOptions (
           gUserInput->InputValue.BufferLen = Question->CurrentValue.BufferLen;
           gUserInput->InputValue.Type      = Question->CurrentValue.Type;
         }
-       
+
         SetArrayData (ValueArray, ValueType, Index++, OneOfOption->OptionOpCode->Value.u64);
       }
 
@@ -1159,7 +1159,7 @@ ProcessOptions (
         if (SkipErrorValue) {
           //
           // Not report error, just get the correct option string info.
-          //          
+          //
           Link = GetFirstNode (&Question->OptionListHead);
           OneOfOption = DISPLAY_QUESTION_OPTION_FROM_LINK (Link);
         } else {
@@ -1227,7 +1227,7 @@ ProcessOptions (
       // Perform inconsistent check
       //
       return EFI_SUCCESS;
-    } else {    
+    } else {
       *OptionString = AllocateZeroPool (BufferSize);
       ASSERT (*OptionString);
 
@@ -1364,7 +1364,7 @@ ProcessOptions (
         FreePool (StringPtr);
         return Status;
       }
-      
+
       gUserInput->InputValue.Buffer = AllocateCopyPool (Question->CurrentValue.BufferLen, StringPtr);
       gUserInput->InputValue.BufferLen = Question->CurrentValue.BufferLen;
       gUserInput->InputValue.Type = Question->CurrentValue.Type;
@@ -1466,5 +1466,5 @@ ProcessHelpString (
     FreePool (OutputString);
   }
 
-  return TotalRowNum; 
+  return TotalRowNum;
 }

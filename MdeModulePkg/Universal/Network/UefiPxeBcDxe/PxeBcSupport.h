@@ -1,6 +1,6 @@
 /** @file
   Support routines for PxeBc.
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 
 /**
-  The common notify function associated with various PxeBc events. 
+  The common notify function associated with various PxeBc events.
 
   @param  Event     The event signaled.
   @param  Context   The context.
@@ -38,7 +38,7 @@ PxeBcCommonNotify (
   @param  SubnetMask Pointer to the subnetmask of the station ip address.
   @param  Gateway    Pointer to the gateway ip address.
   @param  SrcPort    Pointer to the srouce port of the station.
-  @param  Ttl        The time to live field of the IP header. 
+  @param  Ttl        The time to live field of the IP header.
   @param  ToS        The type of service field of the IP header.
 
   @retval EFI_SUCCESS           The configuration settings were set, changed, or reset successfully.
@@ -79,7 +79,7 @@ VOID
 PxeBcShowIp4Addr (
   IN EFI_IPv4_ADDRESS   *Ip
   );
-  
+
 
 /**
   Convert number to ASCII value.
@@ -103,7 +103,7 @@ CvtNum (
   @param      Number         The unsigned int number will be converted.
   @param      Buffer         Pointer to the buffer to store the decimal number after transform.
   @param[in]  BufferSize     The maxsize of the buffer.
-  
+
   @return the length of the number after transform.
 
 **/
@@ -112,7 +112,7 @@ UtoA10 (
   IN UINTN Number,
   IN CHAR8 *Buffer,
   IN UINTN BufferSize
-  
+
   );
 
 

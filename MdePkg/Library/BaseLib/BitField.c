@@ -1,7 +1,7 @@
 /** @file
   Bit field functions of BaseLib.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -69,13 +69,13 @@ InternalBaseLibBitFieldOrUint (
   )
 {
   //
-  // Higher bits in OrData those are not used must be zero. 
+  // Higher bits in OrData those are not used must be zero.
   //
   // EndBit - StartBit + 1 might be 32 while the result right shifting 32 on a 32bit integer is undefined,
   // So the logic is updated to right shift (EndBit - StartBit) bits and compare the last bit directly.
   //
   ASSERT ((OrData >> (EndBit - StartBit)) == ((OrData >> (EndBit - StartBit)) & 1));
-  
+
   //
   // ~((UINTN)-2 << EndBit) is a mask in which bit[0] thru bit[EndBit]
   // are 1's while bit[EndBit + 1] thru the most significant bit are 0's.
@@ -111,7 +111,7 @@ InternalBaseLibBitFieldAndUint (
   )
 {
   //
-  // Higher bits in AndData those are not used must be zero. 
+  // Higher bits in AndData those are not used must be zero.
   //
   // EndBit - StartBit + 1 might be 32 while the result right shifting 32 on a 32bit integer is undefined,
   // So the logic is updated to right shift (EndBit - StartBit) bits and compare the last bit directly.
@@ -275,7 +275,7 @@ BitFieldAnd8 (
   bitwise OR, and returns the result.
 
   Performs a bitwise AND between the bit field specified by StartBit and EndBit
-  in Operand and the value specified by AndData, followed by a bitwise 
+  in Operand and the value specified by AndData, followed by a bitwise
   OR with value specified by OrData. All other bits in Operand are
   preserved. The new 8-bit value is returned.
 
@@ -467,7 +467,7 @@ BitFieldAnd16 (
   bitwise OR, and returns the result.
 
   Performs a bitwise AND between the bit field specified by StartBit and EndBit
-  in Operand and the value specified by AndData, followed by a bitwise 
+  in Operand and the value specified by AndData, followed by a bitwise
   OR with value specified by OrData. All other bits in Operand are
   preserved. The new 16-bit value is returned.
 
@@ -659,7 +659,7 @@ BitFieldAnd32 (
   bitwise OR, and returns the result.
 
   Performs a bitwise AND between the bit field specified by StartBit and EndBit
-  in Operand and the value specified by AndData, followed by a bitwise 
+  in Operand and the value specified by AndData, followed by a bitwise
   OR with value specified by OrData. All other bits in Operand are
   preserved. The new 32-bit value is returned.
 
@@ -809,7 +809,7 @@ BitFieldOr64 (
   ASSERT (EndBit < 64);
   ASSERT (StartBit <= EndBit);
   //
-  // Higher bits in OrData those are not used must be zero. 
+  // Higher bits in OrData those are not used must be zero.
   //
   // EndBit - StartBit + 1 might be 64 while the result right shifting 64 on RShiftU64() API is invalid,
   // So the logic is updated to right shift (EndBit - StartBit) bits and compare the last bit directly.
@@ -857,11 +857,11 @@ BitFieldAnd64 (
 {
   UINT64  Value1;
   UINT64  Value2;
-  
+
   ASSERT (EndBit < 64);
   ASSERT (StartBit <= EndBit);
   //
-  // Higher bits in AndData those are not used must be zero. 
+  // Higher bits in AndData those are not used must be zero.
   //
   // EndBit - StartBit + 1 might be 64 while the right shifting 64 on RShiftU64() API is invalid,
   // So the logic is updated to right shift (EndBit - StartBit) bits and compare the last bit directly.
@@ -879,7 +879,7 @@ BitFieldAnd64 (
   bitwise OR, and returns the result.
 
   Performs a bitwise AND between the bit field specified by StartBit and EndBit
-  in Operand and the value specified by AndData, followed by a bitwise 
+  in Operand and the value specified by AndData, followed by a bitwise
   OR with value specified by OrData. All other bits in Operand are
   preserved. The new 64-bit value is returned.
 

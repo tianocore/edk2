@@ -2,7 +2,7 @@
 
     Manage Usb Descriptor List
 
-Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -361,7 +361,7 @@ UsbParseConfigDesc (
   Len     -= Consumed;
 
   //
-  // Make allowances for devices that return extra data at the 
+  // Make allowances for devices that return extra data at the
   // end of their config descriptors
   //
   while (Len >= sizeof (EFI_USB_INTERFACE_DESCRIPTOR)) {
@@ -689,7 +689,7 @@ UsbBuildLangTable (
 
   Max   = (Desc->Length - 2) / 2;
   Max   = MIN(Max, USB_MAX_LANG_ID);
-  
+
   Point = Desc->String;
   for (Index = 0; Index < Max; Index++) {
     UsbDev->LangId[Index] = *Point;

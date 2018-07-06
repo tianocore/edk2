@@ -1,7 +1,7 @@
 /** @file
 Parser for IFR binary encoding.
 
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -37,7 +37,7 @@ CreateStatement (
 {
   FORM_BROWSER_STATEMENT    *Statement;
   EFI_IFR_STATEMENT_HEADER  *StatementHdr;
-  INTN                      ConditionalExprCount; 
+  INTN                      ConditionalExprCount;
 
   if (Form == NULL) {
     //
@@ -70,8 +70,8 @@ CreateStatement (
     //
     // Form is inside of suppressif
     //
-    
-    Statement->Expression = (FORM_EXPRESSION_LIST *) AllocatePool( 
+
+    Statement->Expression = (FORM_EXPRESSION_LIST *) AllocatePool(
                                              (UINTN) (sizeof(FORM_EXPRESSION_LIST) + ((ConditionalExprCount -1) * sizeof(FORM_EXPRESSION *))));
     ASSERT (Statement->Expression != NULL);
     Statement->Expression->Count     = (UINTN) ConditionalExprCount;
@@ -246,7 +246,7 @@ CreateQuestion (
       // Check whether old string node already exist.
       //
       Find = FALSE;
-      if (!IsListEmpty(&Statement->Storage->NameValueListHead)) {  
+      if (!IsListEmpty(&Statement->Storage->NameValueListHead)) {
         Link = GetFirstNode (&Statement->Storage->NameValueListHead);
         while (!IsNull (&Statement->Storage->NameValueListHead, Link)) {
           NameValueNode = NAME_VALUE_NODE_FROM_LINK (Link);
@@ -326,7 +326,7 @@ InitializeConfigHdr (
 {
   CHAR16      *Name;
 
-  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_BUFFER || 
+  if (Storage->BrowserStorage->Type == EFI_HII_VARSTORE_BUFFER ||
       Storage->BrowserStorage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
     Name = Storage->BrowserStorage->Name;
   } else {
@@ -621,7 +621,7 @@ GetFstStgFromVarId (
   @param  Storage              browser storage info.
 
   @return Pointer to a FORMSET_STORAGE data structure.
-  
+
 
 **/
 FORMSET_STORAGE *
@@ -707,7 +707,7 @@ InitializeRequestElement (
   //
   // Prepare <RequestElement>
   //
-  if (Storage->Type == EFI_HII_VARSTORE_BUFFER || 
+  if (Storage->Type == EFI_HII_VARSTORE_BUFFER ||
       Storage->Type == EFI_HII_VARSTORE_EFI_VARIABLE_BUFFER) {
     StrLen = UnicodeSPrint (
                RequestElement,
@@ -1522,7 +1522,7 @@ ParseOpCodes (
         ExpressionOpCode->ValueType = ((EFI_IFR_GET *) OpCodeData)->VarStoreType;
         switch (ExpressionOpCode->ValueType) {
         case EFI_IFR_TYPE_BOOLEAN:
-        case EFI_IFR_TYPE_NUM_SIZE_8: 
+        case EFI_IFR_TYPE_NUM_SIZE_8:
           ExpressionOpCode->ValueWidth = 1;
           break;
 
@@ -1563,8 +1563,8 @@ ParseOpCodes (
         }
         CopyMem (&ExpressionOpCode->VarStoreInfo.VarName,   &((EFI_IFR_GET *) OpCodeData)->VarStoreInfo.VarName,   sizeof (EFI_STRING_ID));
         CopyMem (&ExpressionOpCode->VarStoreInfo.VarOffset, &((EFI_IFR_GET *) OpCodeData)->VarStoreInfo.VarOffset, sizeof (UINT16));
-        if ((ExpressionOpCode->VarStorage != NULL) && 
-            (ExpressionOpCode->VarStorage->Type == EFI_HII_VARSTORE_NAME_VALUE || 
+        if ((ExpressionOpCode->VarStorage != NULL) &&
+            (ExpressionOpCode->VarStorage->Type == EFI_HII_VARSTORE_NAME_VALUE ||
              ExpressionOpCode->VarStorage->Type == EFI_HII_VARSTORE_EFI_VARIABLE)) {
           ExpressionOpCode->ValueName = GetToken (ExpressionOpCode->VarStoreInfo.VarName, FormSet->HiiHandle);
           if (ExpressionOpCode->ValueName == NULL) {
@@ -1754,7 +1754,7 @@ ParseOpCodes (
         //
         // Form is inside of suppressif
         //
-        CurrentForm->SuppressExpression = (FORM_EXPRESSION_LIST *) AllocatePool( 
+        CurrentForm->SuppressExpression = (FORM_EXPRESSION_LIST *) AllocatePool(
                                                  (UINTN) (sizeof(FORM_EXPRESSION_LIST) + ((ConditionalExprCount -1) * sizeof(FORM_EXPRESSION *))));
         ASSERT (CurrentForm->SuppressExpression != NULL);
         CurrentForm->SuppressExpression->Count     = (UINTN) ConditionalExprCount;
@@ -1820,7 +1820,7 @@ ParseOpCodes (
         //
         // Form is inside of suppressif
         //
-        CurrentForm->SuppressExpression = (FORM_EXPRESSION_LIST *) AllocatePool( 
+        CurrentForm->SuppressExpression = (FORM_EXPRESSION_LIST *) AllocatePool(
                                                  (UINTN) (sizeof(FORM_EXPRESSION_LIST) + ((ConditionalExprCount -1) * sizeof(FORM_EXPRESSION *))));
         ASSERT (CurrentForm->SuppressExpression != NULL);
         CurrentForm->SuppressExpression->Count     = (UINTN) ConditionalExprCount;
@@ -1972,7 +1972,7 @@ ParseOpCodes (
           }
         }
       }
-      CurrentStatement->StorageWidth = (UINT16) sizeof (EFI_HII_REF);        
+      CurrentStatement->StorageWidth = (UINT16) sizeof (EFI_HII_REF);
       InitializeRequestElement (FormSet, CurrentStatement, CurrentForm);
       break;
 
@@ -2282,7 +2282,7 @@ ParseOpCodes (
         //
         // Form is inside of suppressif
         //
-        CurrentOption->SuppressExpression = (FORM_EXPRESSION_LIST *) AllocatePool( 
+        CurrentOption->SuppressExpression = (FORM_EXPRESSION_LIST *) AllocatePool(
                                                  (UINTN) (sizeof(FORM_EXPRESSION_LIST) + ((ConditionalExprCount -1) * sizeof(FORM_EXPRESSION *))));
         ASSERT (CurrentOption->SuppressExpression != NULL);
         CurrentOption->SuppressExpression->Count     = (UINTN) ConditionalExprCount;
@@ -2396,11 +2396,11 @@ ParseOpCodes (
       }
 
       if (SuppressForOption) {
-        PushConditionalExpression(CurrentExpression, ExpressOption);       
+        PushConditionalExpression(CurrentExpression, ExpressOption);
       } else if (SuppressForQuestion) {
-        PushConditionalExpression(CurrentExpression, ExpressStatement);  
+        PushConditionalExpression(CurrentExpression, ExpressStatement);
       } else {
-        PushConditionalExpression(CurrentExpression, ExpressForm);  
+        PushConditionalExpression(CurrentExpression, ExpressForm);
       }
 
       //
@@ -2655,7 +2655,7 @@ ParseOpCodes (
       default:
         ASSERT (ParentStatement != NULL);
         ParentStatement->Locked = TRUE;
-      }      
+      }
       break;
 
     //
@@ -2679,7 +2679,7 @@ ParseOpCodes (
         ResetScopeStack ();
         return Status;
       }
-      
+
       //
       // Parent statement end tag found, update ParentStatement info.
       //
@@ -2722,7 +2722,7 @@ ParseOpCodes (
 
       case EFI_IFR_SUPPRESS_IF_OP:
         if (SuppressForOption) {
-          PopConditionalExpression(ExpressOption);      
+          PopConditionalExpression(ExpressOption);
         } else if (SuppressForQuestion) {
           PopConditionalExpression(ExpressStatement);
         } else {

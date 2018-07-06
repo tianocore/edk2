@@ -3,13 +3,13 @@
   used by resources that want to publish IFR/Font/String data and have it
   collected by the Configuration engine.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -473,7 +473,7 @@ EFI_STATUS
   Removes a package from the HII database.
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
-  @param  Handle                The handle that was registered to the data that 
+  @param  Handle                The handle that was registered to the data that
                                 is requested for removal.
 
   @retval EFI_SUCCESS           The data associated with the Handle was removed
@@ -560,14 +560,14 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  StringToTest          A pointer to a Unicode string.
   @param  FirstMissing          A pointer to an index into the string. On input,
-                                the index of the first character in the StringToTest 
-                                to examine. On exit, the index of the first character 
+                                the index of the first character in the StringToTest
+                                to examine. On exit, the index of the first character
                                 encountered for which a glyph is unavailable.
-                                If all glyphs in the string are available, the 
+                                If all glyphs in the string are available, the
                                 index is the index of the terminator of the string.
   @param  GlyphBufferSize       A pointer to a value. On output, if the function
-                                returns EFI_SUCCESS, it contains the amount of 
-                                memory that is required to store the string's 
+                                returns EFI_SUCCESS, it contains the amount of
+                                memory that is required to store the string's
                                 glyph equivalent.
 
   @retval EFI_SUCCESS           All glyphs are available. Note that an empty string
@@ -592,23 +592,23 @@ EFI_STATUS
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Source                A pointer to a Unicode string.
-  @param  Index                 On input, the offset into the string from which to 
-                                fetch the character. On successful completion, the 
-                                index is updated to the first character past the 
+  @param  Index                 On input, the offset into the string from which to
+                                fetch the character. On successful completion, the
+                                index is updated to the first character past the
                                 character(s) making up the just extracted glyph.
   @param  GlyphBuffer           Pointer to an array where the glyphs corresponding
-                                to the characters in the source may be stored. 
-                                GlyphBuffer is assumed to be wide enough to accept 
+                                to the characters in the source may be stored.
+                                GlyphBuffer is assumed to be wide enough to accept
                                 a wide glyph character.
   @param  BitWidth              If EFI_SUCCESS was returned, the UINT16 pointed to by
                                 this value is filled with the length of the glyph in
                                 pixels. It is unchanged if the call was unsuccessful.
   @param  InternalStatus        The cell pointed to by this parameter must be
-                                initialized to zero prior to invoking the call the 
+                                initialized to zero prior to invoking the call the
                                 first time for any string.
 
-  @retval EFI_SUCCESS           Found the corresponding font glyph for a Unicode 
-                                character. 
+  @retval EFI_SUCCESS           Found the corresponding font glyph for a Unicode
+                                character.
   @retval EFI_NOT_FOUND         A glyph for a character was not found.
 
 **/
@@ -639,7 +639,7 @@ EFI_STATUS
   @param  BltBuffer             A pointer to the buffer that contains the data that is
                                 ready to be used by the UGA BLT routines.
 
-  @retval EFI_SUCCESS           Successfully translated a glyph into the required 
+  @retval EFI_SUCCESS           Successfully translated a glyph into the required
                                 format for input to UGA BLT routines.
   @retval EFI_NOT_FOUND         A glyph for a character was not found.
   @note  Inconsistent with specification here:
@@ -666,15 +666,15 @@ EFI_STATUS
   to avoid name confict with EFI_HII_NEW_STRING defined in the UEFI 2.1d specification.
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
-  @param  Pointer               to a NULL-terminated string containing a single 
-                                ISO 639-2 language identifier, indicating the language 
-                                in which the string is translated.  
-  @param  Handle                The handle of the language pack to which the string 
+  @param  Pointer               to a NULL-terminated string containing a single
+                                ISO 639-2 language identifier, indicating the language
+                                in which the string is translated.
+  @param  Handle                The handle of the language pack to which the string
                                 is to be added.
-  @param  Reference             The identifier of the string to be added. If the 
-                                reference value is zero, then the string will be 
+  @param  Reference             The identifier of the string to be added. If the
+                                reference value is zero, then the string will be
                                 assigned a new identifier on that handle for
-                                the language specified. Otherwise, the string will 
+                                the language specified. Otherwise, the string will
                                 be updated with the NewString Value.
   @param  NewString             The string to be added.
 
@@ -699,7 +699,7 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Handle                The handle on which the strings reside.
   @param  LanguageString        A string allocated by GetPrimaryLanguages() that
-                                contains a list of all primary languages registered 
+                                contains a list of all primary languages registered
                                 on the handle.
 
   @retval EFI_SUCCESS           LanguageString was correctly returned.
@@ -720,11 +720,11 @@ EFI_STATUS
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Handle                The handle on which the strings reside.
-  @param  PrimaryLanguage       Pointer to a NULL-terminated string containing a 
-                                single ISO 639-2 language identifier, indicating 
+  @param  PrimaryLanguage       Pointer to a NULL-terminated string containing a
+                                single ISO 639-2 language identifier, indicating
                                 the primary language.
   @param  LanguageString        A string allocated by GetSecondaryLanguages()
-                                containing a list of all secondary languages 
+                                containing a list of all secondary languages
                                 registered on the handle.
 
   @retval EFI_SUCCESS           LanguageString was correctly returned.
@@ -749,14 +749,14 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Handle                The handle on which the string resides.
   @param  Token                 The string token assigned to the string.
-  @param  Raw                   If TRUE, the string is returned unedited in the 
-                                internal storage format. If false, the string 
-                                returned is edited by replacing <cr> with <space> 
+  @param  Raw                   If TRUE, the string is returned unedited in the
+                                internal storage format. If false, the string
+                                returned is edited by replacing <cr> with <space>
                                 and by removing special characters such as the
                                 <wide> prefix.
   @param  LanguageString        Pointer to a NULL-terminated string containing a
-                                single ISO 639-2 language identifier, indicating 
-                                the language to print. If the LanguageString is 
+                                single ISO 639-2 language identifier, indicating
+                                the language to print. If the LanguageString is
                                 empty (starts with a NULL), the default system
                                 language will be used to determine the language.
   @param  BufferLength          Length of the StringBuffer.
@@ -786,19 +786,19 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Handle                The handle on which the string resides.
   @param  Token                 The string token assigned to the string.
-  @param  Index                 On input, the offset into the string where the 
-                                line is to start. On output, the index is updated  
-                                to point beyond the last character returned in 
+  @param  Index                 On input, the offset into the string where the
+                                line is to start. On output, the index is updated
+                                to point beyond the last character returned in
                                 the call.
   @param  LineWidth             The maximum width of the line in units of narrow glyphs.
   @param  LanguageString        The pointer to a NULL-terminated string containing a
-                                single ISO 639-2 language identifier, indicating 
+                                single ISO 639-2 language identifier, indicating
                                 the language to print.
   @param  BufferLength          The pointer to the length of the StringBuffer.
-  @param  StringBuffer          The buffer designed to receive the characters in 
+  @param  StringBuffer          The buffer designed to receive the characters in
                                 the string.
 
-  @retval EFI_SUCCESS           StringBuffer filled with characters that will fit 
+  @retval EFI_SUCCESS           StringBuffer filled with characters that will fit
                                 on the line.
   @retval EFI_NOT_FOUND         The font glyph for at least one of the characters in
                                 the string is not in the font database.
@@ -855,9 +855,9 @@ EFI_STATUS
 
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  Handle                The HII handle from which will have default data retrieved.
-  @param  DefaultMask           The mask used to specify some type of default 
+  @param  DefaultMask           The mask used to specify some type of default
                                 override when extracting the default image data.
-  @param  VariablePackList      An indirect pointer to the first entry of a link 
+  @param  VariablePackList      An indirect pointer to the first entry of a link
                                 list with type EFI_HII_VARIABLE_PACK_LIST.
 
   @retval EFI_SUCCESS           The VariablePackList was populated with the appropriate
@@ -912,8 +912,8 @@ EFI_STATUS
   @param  This                  A pointer to the EFI_HII_PROTOCOL instance.
   @param  DescriptorCount       A pointer to the number of Descriptor entries being
                                 described in the keyboard layout being retrieved.
-  @param  Descriptor            A pointer to a buffer containing an array of 
-                                FRAMEWORK_EFI_KEY_DESCRIPTOR entries. Each entry 
+  @param  Descriptor            A pointer to a buffer containing an array of
+                                FRAMEWORK_EFI_KEY_DESCRIPTOR entries. Each entry
                                 will reflect the definition of a specific physical key.
 
   @retval EFI_SUCCESS           The keyboard layout was retrieved successfully.

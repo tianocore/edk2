@@ -8,7 +8,7 @@
 
   MicrocodeWrite() and VerifyMicrocode() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -368,7 +368,7 @@ GetMatchedProcessor (
                                          On output, the index of target CPU which matches the Microcode.
 
   @retval EFI_SUCCESS               The Microcode image passes verification.
-  @retval EFI_VOLUME_CORRUPTED      The Microcode image is corrupt.
+  @retval EFI_VOLUME_CORRUPTED      The Microcode image is corrupted.
   @retval EFI_INCOMPATIBLE_VERSION  The Microcode image version is incorrect.
   @retval EFI_UNSUPPORTED           The Microcode ProcessorSignature or ProcessorFlags is incorrect.
   @retval EFI_SECURITY_VIOLATION    The Microcode image fails to load.
@@ -421,7 +421,7 @@ VerifyMicrocode (
     return EFI_INCOMPATIBLE_VERSION;
   }
   //
-  // Check Size
+  // Check TotalSize
   //
   if (MicrocodeEntryPoint->DataSize == 0) {
     TotalSize = 2048;
@@ -436,8 +436,16 @@ VerifyMicrocode (
     }
     return EFI_VOLUME_CORRUPTED;
   }
+  if ((TotalSize & (SIZE_1KB - 1)) != 0) {
+    DEBUG((DEBUG_ERROR, "VerifyMicrocode - TotalSize is not multiples of 1024 bytes (1 KBytes)\n"));
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
+    if (AbortReason != NULL) {
+      *AbortReason = AllocateCopyPool(sizeof(L"InvalidTotalSize"), L"InvalidTotalSize");
+    }
+    return EFI_VOLUME_CORRUPTED;
+  }
   if (TotalSize != ImageSize) {
-    DEBUG((DEBUG_ERROR, "VerifyMicrocode - fail on TotalSize\n"));
+    DEBUG((DEBUG_ERROR, "VerifyMicrocode - TotalSize not equal to ImageSize\n"));
     *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
     if (AbortReason != NULL) {
       *AbortReason = AllocateCopyPool(sizeof(L"InvalidTotalSize"), L"InvalidTotalSize");
@@ -445,7 +453,7 @@ VerifyMicrocode (
     return EFI_VOLUME_CORRUPTED;
   }
   //
-  // Check CheckSum32
+  // Check DataSize
   //
   if (MicrocodeEntryPoint->DataSize == 0) {
     DataSize = 2048 - sizeof(CPU_MICROCODE_HEADER);
@@ -461,13 +469,16 @@ VerifyMicrocode (
     return EFI_VOLUME_CORRUPTED;
   }
   if ((DataSize & 0x3) != 0) {
-    DEBUG((DEBUG_ERROR, "VerifyMicrocode - DataSize not aligned\n"));
+    DEBUG((DEBUG_ERROR, "VerifyMicrocode - DataSize is not multiples of DWORDs\n"));
     *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
     if (AbortReason != NULL) {
       *AbortReason = AllocateCopyPool(sizeof(L"InvalidDataSize"), L"InvalidDataSize");
     }
     return EFI_VOLUME_CORRUPTED;
   }
+  //
+  // Check CheckSum32
+  //
   CheckSum32 = CalculateSum32((UINT32 *)MicrocodeEntryPoint, DataSize + sizeof(CPU_MICROCODE_HEADER));
   if (CheckSum32 != 0) {
     DEBUG((DEBUG_ERROR, "VerifyMicrocode - fail on CheckSum32\n"));
@@ -496,16 +507,25 @@ VerifyMicrocode (
       //
       if ((ExtendedTableLength > sizeof(CPU_MICROCODE_EXTENDED_TABLE_HEADER)) && ((ExtendedTableLength & 0x3) == 0)) {
         CheckSum32 = CalculateSum32((UINT32 *)ExtendedTableHeader, ExtendedTableLength);
-        if (CheckSum32 == 0) {
+        if (CheckSum32 != 0) {
+          //
+          // Checksum incorrect
+          //
+          DEBUG((DEBUG_ERROR, "VerifyMicrocode - The checksum for extended table is incorrect\n"));
+        } else {
           //
           // Checksum correct
           //
           ExtendedTableCount = ExtendedTableHeader->ExtendedSignatureCount;
-          if (ExtendedTableCount <= (ExtendedTableLength - sizeof(CPU_MICROCODE_EXTENDED_TABLE_HEADER)) / sizeof(CPU_MICROCODE_EXTENDED_TABLE)) {
+          if (ExtendedTableCount > (ExtendedTableLength - sizeof(CPU_MICROCODE_EXTENDED_TABLE_HEADER)) / sizeof(CPU_MICROCODE_EXTENDED_TABLE)) {
+            DEBUG((DEBUG_ERROR, "VerifyMicrocode - ExtendedTableCount too big\n"));
+          } else {
             ExtendedTable = (CPU_MICROCODE_EXTENDED_TABLE *)(ExtendedTableHeader + 1);
             for (Index = 0; Index < ExtendedTableCount; Index++) {
               CheckSum32 = CalculateSum32((UINT32 *)ExtendedTable, sizeof(CPU_MICROCODE_EXTENDED_TABLE));
-              if (CheckSum32 == 0) {
+              if (CheckSum32 != 0) {
+                DEBUG((DEBUG_ERROR, "VerifyMicrocode - The checksum for ExtendedTable entry with index 0x%x is incorrect\n", Index));
+              } else {
                 //
                 // Verify Header
                 //
@@ -526,11 +546,11 @@ VerifyMicrocode (
     }
     if (!CorrectMicrocode) {
       if (TryLoad) {
-        DEBUG((DEBUG_ERROR, "VerifyMicrocode - fail on CurrentProcessorSignature/ProcessorFlags\n"));
+        DEBUG((DEBUG_ERROR, "VerifyMicrocode - fail on Current ProcessorSignature/ProcessorFlags\n"));
       }
       *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INCORRECT_VERSION;
       if (AbortReason != NULL) {
-        *AbortReason = AllocateCopyPool(sizeof(L"UnsupportedProcessSignature/ProcessorFlags"), L"UnsupportedProcessSignature/ProcessorFlags");
+        *AbortReason = AllocateCopyPool(sizeof(L"UnsupportedProcessorSignature/ProcessorFlags"), L"UnsupportedProcessorSignature/ProcessorFlags");
       }
       return EFI_UNSUPPORTED;
     }
@@ -603,6 +623,124 @@ GetNextMicrocode (
 }
 
 /**
+  Get next FIT Microcode entrypoint.
+
+  @param[in]  MicrocodeFmpPrivate        The Microcode driver private data
+  @param[in]  MicrocodeEntryPoint        Current Microcode entrypoint
+
+  @return next FIT Microcode entrypoint.
+**/
+CPU_MICROCODE_HEADER *
+GetNextFitMicrocode (
+  IN MICROCODE_FMP_PRIVATE_DATA              *MicrocodeFmpPrivate,
+  IN CPU_MICROCODE_HEADER                    *MicrocodeEntryPoint
+  )
+{
+  UINTN                                   Index;
+
+  for (Index = 0; Index < MicrocodeFmpPrivate->FitMicrocodeEntryCount; Index++) {
+    if (MicrocodeEntryPoint == MicrocodeFmpPrivate->FitMicrocodeInfo[Index].MicrocodeEntryPoint) {
+      if (Index == (UINTN) MicrocodeFmpPrivate->FitMicrocodeEntryCount - 1) {
+        // it is last one
+        return NULL;
+      } else {
+        // return next one
+        return MicrocodeFmpPrivate->FitMicrocodeInfo[Index + 1].MicrocodeEntryPoint;
+      }
+    }
+  }
+
+  ASSERT(FALSE);
+  return NULL;
+}
+
+/**
+  Find empty FIT Microcode entrypoint.
+
+  @param[in]  MicrocodeFmpPrivate        The Microcode driver private data
+  @param[in]  ImageSize                  The size of Microcode image buffer in bytes.
+  @param[out] AvailableSize              Available size of the empty FIT Microcode entrypoint.
+
+  @return Empty FIT Microcode entrypoint.
+**/
+CPU_MICROCODE_HEADER *
+FindEmptyFitMicrocode (
+  IN MICROCODE_FMP_PRIVATE_DATA              *MicrocodeFmpPrivate,
+  IN UINTN                                   ImageSize,
+  OUT UINTN                                  *AvailableSize
+  )
+{
+  UINTN                                   Index;
+  CPU_MICROCODE_HEADER                    *MicrocodeEntryPoint;
+  CPU_MICROCODE_HEADER                    *NextMicrocodeEntryPoint;
+  VOID                                    *MicrocodePatchAddress;
+  UINTN                                   MicrocodePatchRegionSize;
+
+  MicrocodePatchAddress = MicrocodeFmpPrivate->MicrocodePatchAddress;
+  MicrocodePatchRegionSize = MicrocodeFmpPrivate->MicrocodePatchRegionSize;
+
+  for (Index = 0; Index < MicrocodeFmpPrivate->FitMicrocodeEntryCount; Index++) {
+    if (MicrocodeFmpPrivate->FitMicrocodeInfo[Index].Empty) {
+      MicrocodeEntryPoint = MicrocodeFmpPrivate->FitMicrocodeInfo[Index].MicrocodeEntryPoint;
+      NextMicrocodeEntryPoint = GetNextFitMicrocode (MicrocodeFmpPrivate, MicrocodeEntryPoint);
+      if (NextMicrocodeEntryPoint != NULL) {
+        *AvailableSize = (UINTN) NextMicrocodeEntryPoint - (UINTN) MicrocodeEntryPoint;
+      } else {
+        *AvailableSize = (UINTN) MicrocodePatchAddress + MicrocodePatchRegionSize - (UINTN) MicrocodeEntryPoint;
+      }
+      if (*AvailableSize >= ImageSize) {
+        return MicrocodeEntryPoint;
+      }
+    }
+  }
+
+  return NULL;
+}
+
+/**
+  Find unused FIT Microcode entrypoint.
+
+  @param[in]  MicrocodeFmpPrivate        The Microcode driver private data
+  @param[in]  ImageSize                  The size of Microcode image buffer in bytes.
+  @param[out] AvailableSize              Available size of the unused FIT Microcode entrypoint.
+
+  @return Unused FIT Microcode entrypoint.
+**/
+CPU_MICROCODE_HEADER *
+FindUnusedFitMicrocode (
+  IN MICROCODE_FMP_PRIVATE_DATA              *MicrocodeFmpPrivate,
+  IN UINTN                                   ImageSize,
+  OUT UINTN                                  *AvailableSize
+  )
+{
+  UINTN                                   Index;
+  CPU_MICROCODE_HEADER                    *MicrocodeEntryPoint;
+  CPU_MICROCODE_HEADER                    *NextMicrocodeEntryPoint;
+  VOID                                    *MicrocodePatchAddress;
+  UINTN                                   MicrocodePatchRegionSize;
+
+  MicrocodePatchAddress = MicrocodeFmpPrivate->MicrocodePatchAddress;
+  MicrocodePatchRegionSize = MicrocodeFmpPrivate->MicrocodePatchRegionSize;
+
+  for (Index = 0; Index < MicrocodeFmpPrivate->FitMicrocodeEntryCount; Index++) {
+    if (!MicrocodeFmpPrivate->FitMicrocodeInfo[Index].InUse) {
+      MicrocodeEntryPoint = MicrocodeFmpPrivate->FitMicrocodeInfo[Index].MicrocodeEntryPoint;
+      NextMicrocodeEntryPoint = GetNextFitMicrocode (MicrocodeFmpPrivate, MicrocodeEntryPoint);
+      if (NextMicrocodeEntryPoint != NULL) {
+        *AvailableSize = (UINTN) NextMicrocodeEntryPoint - (UINTN) MicrocodeEntryPoint;
+      } else {
+        *AvailableSize = (UINTN) MicrocodePatchAddress + MicrocodePatchRegionSize - (UINTN) MicrocodeEntryPoint;
+      }
+      if (*AvailableSize >= ImageSize) {
+        return MicrocodeEntryPoint;
+      }
+    }
+  }
+
+  return NULL;
+}
+
+/**
   Get current Microcode used region size.
 
   @param[in]  MicrocodeFmpPrivate        The Microcode driver private data
@@ -646,7 +784,7 @@ UpdateMicrocode (
 
   DEBUG((DEBUG_INFO, "PlatformUpdate:"));
   DEBUG((DEBUG_INFO, "  Address - 0x%lx,", Address));
-  DEBUG((DEBUG_INFO, "  Legnth - 0x%x\n", ImageSize));
+  DEBUG((DEBUG_INFO, "  Length - 0x%x\n", ImageSize));
 
   Status = MicrocodeFlashWrite (
              Address,
@@ -658,6 +796,201 @@ UpdateMicrocode (
   } else {
     *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_UNSUCCESSFUL;
   }
+  return Status;
+}
+
+/**
+  Update Microcode flash region with FIT.
+
+  @param[in]  MicrocodeFmpPrivate        The Microcode driver private data
+  @param[in]  TargetMicrocodeEntryPoint  Target Microcode entrypoint to be updated
+  @param[in]  Image                      The Microcode image buffer.
+  @param[in]  ImageSize                  The size of Microcode image buffer in bytes.
+  @param[out] LastAttemptStatus          The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+
+  @retval EFI_SUCCESS             The Microcode image is written.
+  @retval EFI_WRITE_PROTECTED     The flash device is read only.
+**/
+EFI_STATUS
+UpdateMicrocodeFlashRegionWithFit (
+  IN  MICROCODE_FMP_PRIVATE_DATA              *MicrocodeFmpPrivate,
+  IN  CPU_MICROCODE_HEADER                    *TargetMicrocodeEntryPoint,
+  IN  VOID                                    *Image,
+  IN  UINTN                                   ImageSize,
+  OUT UINT32                                  *LastAttemptStatus
+  )
+{
+  VOID                                    *MicrocodePatchAddress;
+  UINTN                                   MicrocodePatchRegionSize;
+  UINTN                                   TargetTotalSize;
+  EFI_STATUS                              Status;
+  VOID                                    *MicrocodePatchScratchBuffer;
+  UINT8                                   *ScratchBufferPtr;
+  UINTN                                   ScratchBufferSize;
+  UINTN                                   RestSize;
+  UINTN                                   AvailableSize;
+  VOID                                    *NextMicrocodeEntryPoint;
+  VOID                                    *EmptyFitMicrocodeEntry;
+  VOID                                    *UnusedFitMicrocodeEntry;
+
+  DEBUG((DEBUG_INFO, "UpdateMicrocodeFlashRegionWithFit: Image - 0x%x, size - 0x%x\n", Image, ImageSize));
+
+  MicrocodePatchAddress = MicrocodeFmpPrivate->MicrocodePatchAddress;
+  MicrocodePatchRegionSize = MicrocodeFmpPrivate->MicrocodePatchRegionSize;
+
+  MicrocodePatchScratchBuffer = AllocateZeroPool (MicrocodePatchRegionSize);
+  if (MicrocodePatchScratchBuffer == NULL) {
+    DEBUG((DEBUG_ERROR, "Fail to allocate Microcode Scratch buffer\n"));
+    *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INSUFFICIENT_RESOURCES;
+    return EFI_OUT_OF_RESOURCES;
+  }
+  ScratchBufferPtr = MicrocodePatchScratchBuffer;
+  ScratchBufferSize = 0;
+
+  //
+  // Target data collection
+  //
+  TargetTotalSize = 0;
+  AvailableSize = 0;
+  if (TargetMicrocodeEntryPoint != NULL) {
+    if (TargetMicrocodeEntryPoint->DataSize == 0) {
+      TargetTotalSize = 2048;
+    } else {
+      TargetTotalSize = TargetMicrocodeEntryPoint->TotalSize;
+    }
+    DEBUG((DEBUG_INFO, "  TargetTotalSize - 0x%x\n", TargetTotalSize));
+    NextMicrocodeEntryPoint = GetNextFitMicrocode (MicrocodeFmpPrivate, TargetMicrocodeEntryPoint);
+    DEBUG((DEBUG_INFO, "  NextMicrocodeEntryPoint - 0x%x\n", NextMicrocodeEntryPoint));
+    if (NextMicrocodeEntryPoint != NULL) {
+      ASSERT ((UINTN) NextMicrocodeEntryPoint >= ((UINTN) TargetMicrocodeEntryPoint + TargetTotalSize));
+      AvailableSize = (UINTN) NextMicrocodeEntryPoint - (UINTN) TargetMicrocodeEntryPoint;
+    } else {
+      AvailableSize = (UINTN) MicrocodePatchAddress + MicrocodePatchRegionSize - (UINTN) TargetMicrocodeEntryPoint;
+    }
+    DEBUG((DEBUG_INFO, "  AvailableSize - 0x%x\n", AvailableSize));
+    ASSERT (AvailableSize >= TargetTotalSize);
+  }
+  //
+  // Total Size means the Microcode size.
+  // Available Size means the Microcode size plus the pad till (1) next Microcode or (2) the end.
+  //
+  // (1)
+  // +------+-----------+-----+------+===================+
+  // | MCU1 | Microcode | PAD | MCU2 |      Empty        |
+  // +------+-----------+-----+------+===================+
+  //        | TotalSize |
+  //        |<-AvailableSize->|
+  //
+  // (2)
+  // +------+-----------+===================+
+  // | MCU  | Microcode |      Empty        |
+  // +------+-----------+===================+
+  //        | TotalSize |
+  //        |<-      AvailableSize        ->|
+  //
+
+  //
+  // Update based on policy
+  //
+
+  //
+  // 1. If there is enough space to update old one in situ, replace old microcode in situ.
+  //
+  if (AvailableSize >= ImageSize) {
+    DEBUG((DEBUG_INFO, "Replace old microcode in situ\n"));
+    //
+    // +------+------------+------+===================+
+    // |Other | Old Image  | ...  |      Empty        |
+    // +------+------------+------+===================+
+    //
+    // +------+---------+--+------+===================+
+    // |Other |New Image|FF| ...  |      Empty        |
+    // +------+---------+--+------+===================+
+    //
+    // 1.1. Copy new image
+    CopyMem (ScratchBufferPtr, Image, ImageSize);
+    ScratchBufferSize += ImageSize;
+    ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
+    // 1.2. Pad 0xFF
+    RestSize = AvailableSize - ImageSize;
+    if (RestSize > 0) {
+      SetMem (ScratchBufferPtr, RestSize, 0xFF);
+      ScratchBufferSize += RestSize;
+      ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
+    }
+    Status = UpdateMicrocode((UINTN)TargetMicrocodeEntryPoint, MicrocodePatchScratchBuffer, ScratchBufferSize, LastAttemptStatus);
+    return Status;
+  }
+
+  //
+  // 2. If there is empty FIT microcode entry with enough space, use it.
+  //
+  EmptyFitMicrocodeEntry = FindEmptyFitMicrocode (MicrocodeFmpPrivate, ImageSize, &AvailableSize);
+  if (EmptyFitMicrocodeEntry != NULL) {
+    DEBUG((DEBUG_INFO, "Use empty FIT microcode entry\n"));
+    // 2.1. Copy new image
+    CopyMem (ScratchBufferPtr, Image, ImageSize);
+    ScratchBufferSize += ImageSize;
+    ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
+    // 2.2. Pad 0xFF
+    RestSize = AvailableSize - ImageSize;
+    if (RestSize > 0) {
+      SetMem (ScratchBufferPtr, RestSize, 0xFF);
+      ScratchBufferSize += RestSize;
+      ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
+    }
+    Status = UpdateMicrocode ((UINTN) EmptyFitMicrocodeEntry, MicrocodePatchScratchBuffer, ScratchBufferSize, LastAttemptStatus);
+    if (!EFI_ERROR (Status) && (TargetMicrocodeEntryPoint != NULL)) {
+      //
+      // Empty old microcode.
+      //
+      ScratchBufferPtr = MicrocodePatchScratchBuffer;
+      SetMem (ScratchBufferPtr, TargetTotalSize, 0xFF);
+      ScratchBufferSize = TargetTotalSize;
+      ScratchBufferPtr = (UINT8 *) MicrocodePatchScratchBuffer + ScratchBufferSize;
+      UpdateMicrocode ((UINTN) TargetMicrocodeEntryPoint, MicrocodePatchScratchBuffer, ScratchBufferSize, LastAttemptStatus);
+    }
+    return Status;
+  }
+
+  //
+  // 3. If there is unused microcode entry with enough space, use it.
+  //
+  UnusedFitMicrocodeEntry = FindUnusedFitMicrocode (MicrocodeFmpPrivate, ImageSize, &AvailableSize);
+  if (UnusedFitMicrocodeEntry != NULL) {
+    DEBUG((DEBUG_INFO, "Use unused FIT microcode entry\n"));
+    // 3.1. Copy new image
+    CopyMem (ScratchBufferPtr, Image, ImageSize);
+    ScratchBufferSize += ImageSize;
+    ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
+    // 3.2. Pad 0xFF
+    RestSize = AvailableSize - ImageSize;
+    if (RestSize > 0) {
+      SetMem (ScratchBufferPtr, RestSize, 0xFF);
+      ScratchBufferSize += RestSize;
+      ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
+    }
+    Status = UpdateMicrocode ((UINTN) UnusedFitMicrocodeEntry, MicrocodePatchScratchBuffer, ScratchBufferSize, LastAttemptStatus);
+    if (!EFI_ERROR (Status) && (TargetMicrocodeEntryPoint != NULL)) {
+      //
+      // Empty old microcode.
+      //
+      ScratchBufferPtr = MicrocodePatchScratchBuffer;
+      SetMem (ScratchBufferPtr, TargetTotalSize, 0xFF);
+      ScratchBufferSize = TargetTotalSize;
+      ScratchBufferPtr = (UINT8 *) MicrocodePatchScratchBuffer + ScratchBufferSize;
+      UpdateMicrocode ((UINTN) TargetMicrocodeEntryPoint, MicrocodePatchScratchBuffer, ScratchBufferSize, LastAttemptStatus);
+    }
+    return Status;
+  }
+
+  //
+  // 4. No usable FIT microcode entry.
+  //
+  DEBUG((DEBUG_ERROR, "No usable FIT microcode entry\n"));
+  *LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INSUFFICIENT_RESOURCES;
+  Status = EFI_OUT_OF_RESOURCES;
+
   return Status;
 }
 
@@ -733,8 +1066,8 @@ UpdateMicrocodeFlashRegion (
       AvailableSize = (UINTN)MicrocodePatchAddress + MicrocodePatchRegionSize - (UINTN)TargetMicrocodeEntryPoint;
     }
     DEBUG((DEBUG_INFO, "  AvailableSize - 0x%x\n", AvailableSize));
+    ASSERT (AvailableSize >= TargetTotalSize);
   }
-  ASSERT (AvailableSize >= TargetTotalSize);
   UsedRegionSize = GetCurrentMicrocodeUsedRegionSize(MicrocodeFmpPrivate);
   DEBUG((DEBUG_INFO, "  UsedRegionSize - 0x%x\n", UsedRegionSize));
   ASSERT (UsedRegionSize >= TargetTotalSize);
@@ -742,8 +1075,8 @@ UpdateMicrocodeFlashRegion (
     ASSERT ((UINTN)MicrocodePatchAddress + UsedRegionSize >= ((UINTN)TargetMicrocodeEntryPoint + TargetTotalSize));
   }
   //
-  // Total Size means the Microcode data size.
-  // Available Size means the Microcode data size plus the pad till (1) next Microcode or (2) the end.
+  // Total Size means the Microcode size.
+  // Available Size means the Microcode size plus the pad till (1) next Microcode or (2) the end.
   //
   // (1)
   // +------+-----------+-----+------+===================+
@@ -773,11 +1106,11 @@ UpdateMicrocodeFlashRegion (
     DEBUG((DEBUG_INFO, "Replace old microcode in situ\n"));
     //
     // +------+------------+------+===================+
-    // |Other1| Old Image  |Other2|      Empty        |
+    // |Other | Old Image  | ...  |      Empty        |
     // +------+------------+------+===================+
     //
     // +------+---------+--+------+===================+
-    // |Other1|New Image|FF|Other2|      Empty        |
+    // |Other |New Image|FF| ...  |      Empty        |
     // +------+---------+--+------+===================+
     //
     // 1.1. Copy new image
@@ -815,11 +1148,11 @@ UpdateMicrocodeFlashRegion (
       DEBUG((DEBUG_INFO, "Reorg and replace old microcode\n"));
       //
       // +------+------------+------+===================+
-      // |Other1| Old Image  |Other2|      Empty        |
+      // |Other | Old Image  | ...  |      Empty        |
       // +------+------------+------+===================+
       //
       // +------+---------------+------+================+
-      // |Other1|   New Image   |Other2|      Empty     |
+      // |Other |   New Image   | ...  |      Empty     |
       // +------+---------------+------+================+
       //
       // 2.1. Copy new image
@@ -829,7 +1162,7 @@ UpdateMicrocodeFlashRegion (
       // 2.2. Copy rest images after the old image.
       if (NextMicrocodeEntryPoint != 0) {
         RestSize = (UINTN)MicrocodePatchAddress + UsedRegionSize - ((UINTN)NextMicrocodeEntryPoint);
-        CopyMem (ScratchBufferPtr, (UINT8 *)TargetMicrocodeEntryPoint + TargetTotalSize, RestSize);
+        CopyMem (ScratchBufferPtr, NextMicrocodeEntryPoint, RestSize);
         ScratchBufferSize += RestSize;
         ScratchBufferPtr = (UINT8 *)MicrocodePatchScratchBuffer + ScratchBufferSize;
       }
@@ -912,7 +1245,7 @@ UpdateMicrocodeFlashRegion (
                                    call to FreePool().
 
   @retval EFI_SUCCESS               The Microcode image is written.
-  @retval EFI_VOLUME_CORRUPTED      The Microcode image is corrupt.
+  @retval EFI_VOLUME_CORRUPTED      The Microcode image is corrupted.
   @retval EFI_INCOMPATIBLE_VERSION  The Microcode image version is incorrect.
   @retval EFI_SECURITY_VIOLATION    The Microcode image fails to load.
   @retval EFI_WRITE_PROTECTED       The flash device is read only.
@@ -943,7 +1276,6 @@ MicrocodeWrite (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  *LastAttemptVersion = ((CPU_MICROCODE_HEADER *)Image)->UpdateRevision;
   TargetCpuIndex = (UINTN)-1;
   Status = VerifyMicrocode(MicrocodeFmpPrivate, AlignedImage, ImageSize, TRUE, LastAttemptStatus, AbortReason, &TargetCpuIndex);
   if (EFI_ERROR(Status)) {
@@ -952,6 +1284,7 @@ MicrocodeWrite (
     return Status;
   }
   DEBUG((DEBUG_INFO, "Pass VerifyMicrocode\n"));
+  *LastAttemptVersion = ((CPU_MICROCODE_HEADER *)Image)->UpdateRevision;
 
   DEBUG((DEBUG_INFO, "  TargetCpuIndex - 0x%x\n", TargetCpuIndex));
   ASSERT (TargetCpuIndex < MicrocodeFmpPrivate->ProcessorCount);
@@ -965,13 +1298,23 @@ MicrocodeWrite (
   }
   DEBUG((DEBUG_INFO, "  TargetMicrocodeEntryPoint - 0x%x\n", TargetMicrocodeEntryPoint));
 
-  Status = UpdateMicrocodeFlashRegion(
-             MicrocodeFmpPrivate,
-             TargetMicrocodeEntryPoint,
-             AlignedImage,
-             ImageSize,
-             LastAttemptStatus
-             );
+  if (MicrocodeFmpPrivate->FitMicrocodeInfo != NULL) {
+    Status = UpdateMicrocodeFlashRegionWithFit (
+               MicrocodeFmpPrivate,
+               TargetMicrocodeEntryPoint,
+               AlignedImage,
+               ImageSize,
+               LastAttemptStatus
+               );
+  } else {
+    Status = UpdateMicrocodeFlashRegion (
+               MicrocodeFmpPrivate,
+               TargetMicrocodeEntryPoint,
+               AlignedImage,
+               ImageSize,
+               LastAttemptStatus
+               );
+  }
 
   FreePool(AlignedImage);
 

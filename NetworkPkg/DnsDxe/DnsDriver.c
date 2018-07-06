@@ -1,7 +1,7 @@
 /** @file
 The driver binding and service binding protocol for DnsDxe driver.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -56,9 +56,9 @@ DnsDestroyInstance (
   )
 {
   ZeroMem (&Instance->Dns4CfgData, sizeof (EFI_DNS4_CONFIG_DATA));
-  
+
   ZeroMem (&Instance->Dns6CfgData, sizeof (EFI_DNS6_CONFIG_DATA));
-  
+
   if (!NetMapIsEmpty (&Instance->Dns4TxTokens)) {
     Dns4InstanceCancelToken (Instance, NULL);
   }
@@ -66,11 +66,11 @@ DnsDestroyInstance (
   if (!NetMapIsEmpty (&Instance->Dns6TxTokens)) {
     Dns6InstanceCancelToken (Instance, NULL);
   }
-  
+
   if (Instance->UdpIo!= NULL) {
     UdpIoFreeIo (Instance->UdpIo);
   }
-  
+
   FreePool (Instance);
 }
 
@@ -93,7 +93,7 @@ DnsCreateInstance (
   DNS_INSTANCE            *DnsIns;
 
   *Instance = NULL;
-  
+
   DnsIns = AllocateZeroPool (sizeof (DNS_INSTANCE));
   if (DnsIns == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -104,7 +104,7 @@ DnsCreateInstance (
   DnsIns->State     = DNS_STATE_UNCONFIGED;
   DnsIns->InDestroy = FALSE;
   DnsIns->Service   = Service;
-  
+
   if (Service->IpVersion == IP_VERSION_4) {
     CopyMem (&DnsIns->Dns4, &mDns4Protocol, sizeof (DnsIns->Dns4));
     NetMapInit (&DnsIns->Dns4TxTokens);
@@ -124,7 +124,7 @@ DnsCreateInstance (
     FreePool (DnsIns);
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   *Instance = DnsIns;
 
   return EFI_SUCCESS;
@@ -132,7 +132,7 @@ DnsCreateInstance (
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
-  
+
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 
@@ -202,7 +202,7 @@ DnsDestroyService (
   )
 {
   UdpIoFreeIo (DnsSb->ConnectUdp);
-  
+
   if (DnsSb->TimerToGetMap != NULL){
     gBS->CloseEvent (DnsSb->TimerToGetMap);
   }
@@ -241,7 +241,7 @@ DnsCreateService (
 {
   EFI_STATUS             Status;
   DNS_SERVICE            *DnsSb;
-  
+
   Status    = EFI_SUCCESS;
   DnsSb     = NULL;
 
@@ -259,7 +259,7 @@ DnsCreateService (
   } else {
     DnsSb->ServiceBinding = mDns6ServiceBinding;
   }
-  
+
   DnsSb->Dns4ChildrenNum = 0;
   InitializeListHead (&DnsSb->Dns4ChildrenList);
 
@@ -270,9 +270,9 @@ DnsCreateService (
   DnsSb->ImageHandle      = Image;
 
   DnsSb->TimerToGetMap    = NULL;
-  
+
   DnsSb->Timer            = NULL;
- 
+
   DnsSb->IpVersion        = IpVersion;
 
   //
@@ -290,7 +290,7 @@ DnsCreateService (
     FreePool (DnsSb);
     return Status;
   }
-  
+
   //
   // Create the timer to retransmit packets.
   //
@@ -308,7 +308,7 @@ DnsCreateService (
     FreePool (DnsSb);
     return Status;
   }
-  
+
   DnsSb->ConnectUdp = NULL;
   DnsSb->ConnectUdp = UdpIoCreateIo (
                         Controller,
@@ -339,7 +339,7 @@ DnsCreateService (
   @retval EFI_INVALID_PARAMETER ImageHandle is not a valid image handle.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 EFIAPI
 DnsUnload (
   IN EFI_HANDLE  ImageHandle
@@ -357,7 +357,7 @@ DnsUnload (
   ItemServerIp4 = NULL;
   ItemCache6    = NULL;
   ItemServerIp6 = NULL;
-  
+
   //
   // Disconnect the driver specified by ImageHandle
   //
@@ -373,7 +373,7 @@ DnsUnload (
     if (mDriverData->Timer != NULL) {
       gBS->CloseEvent (mDriverData->Timer);
     }
-    
+
     while (!IsListEmpty (&mDriverData->Dns4CacheList)) {
       Entry = NetListRemoveHead (&mDriverData->Dns4CacheList);
       ItemCache4 = NET_LIST_USER_STRUCT (Entry, DNS4_CACHE, AllCacheLink);
@@ -409,10 +409,10 @@ DnsUnload (
       ItemServerIp6 = NET_LIST_USER_STRUCT (Entry, DNS6_SERVER_IP, AllServerLink);
       FreePool (ItemServerIp6);
     }
-    
+
     FreePool (mDriverData);
   }
- 
+
   return Status;
 }
 
@@ -490,7 +490,7 @@ DnsDriverEntryPoint (
   if (EFI_ERROR (Status)) {
     goto Error3;
   }
-  
+
   Status = gBS->SetTimer (mDriverData->Timer, TimerPeriodic, TICKS_PER_SECOND);
   if (EFI_ERROR (Status)) {
     goto Error4;
@@ -500,7 +500,7 @@ DnsDriverEntryPoint (
   InitializeListHead (&mDriverData->Dns4ServerList);
   InitializeListHead (&mDriverData->Dns6CacheList);
   InitializeListHead (&mDriverData->Dns6ServerList);
-  
+
   return Status;
 
   Error4:
@@ -508,18 +508,18 @@ DnsDriverEntryPoint (
 
   Error3:
     FreePool (mDriverData);
- 
-  Error2: 
+
+  Error2:
      gBS->UninstallMultipleProtocolInterfaces (
            gDns6DriverBinding.DriverBindingHandle,
            &gEfiDriverBindingProtocolGuid,
-           &gDns6DriverBinding,         
+           &gDns6DriverBinding,
            &gEfiComponentName2ProtocolGuid,
            &gDnsComponentName2,
            &gEfiComponentNameProtocolGuid,
            &gDnsComponentName,
            NULL
-           ); 
+           );
 
   Error1:
     gBS->UninstallMultipleProtocolInterfaces (
@@ -532,38 +532,38 @@ DnsDriverEntryPoint (
            &gDnsComponentName,
            NULL
            );
-  
+
   return Status;
 }
 
 /**
-  Tests to see if this driver supports a given controller. If a child device is provided, 
+  Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
 
-  This function checks to see if the driver specified by This supports the device specified by 
-  ControllerHandle. Drivers will typically use the device path attached to 
-  ControllerHandle and/or the services from the bus I/O abstraction attached to 
-  ControllerHandle to determine if the driver supports ControllerHandle. This function 
-  may be called many times during platform initialization. In order to reduce boot times, the tests 
-  performed by this function must be very small, and take as little time as possible to execute. This 
-  function must not change the state of any hardware devices, and this function must be aware that the 
-  device specified by ControllerHandle may already be managed by the same driver or a 
-  different driver. This function must match its calls to AllocatePages() with FreePages(), 
-  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().  
-  Because ControllerHandle may have been previously started by the same driver, if a protocol is 
-  already in the opened state, then it must not be closed with CloseProtocol(). This is required 
+  This function checks to see if the driver specified by This supports the device specified by
+  ControllerHandle. Drivers will typically use the device path attached to
+  ControllerHandle and/or the services from the bus I/O abstraction attached to
+  ControllerHandle to determine if the driver supports ControllerHandle. This function
+  may be called many times during platform initialization. In order to reduce boot times, the tests
+  performed by this function must be very small, and take as little time as possible to execute. This
+  function must not change the state of any hardware devices, and this function must be aware that the
+  device specified by ControllerHandle may already be managed by the same driver or a
+  different driver. This function must match its calls to AllocatePages() with FreePages(),
+  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().
+  Because ControllerHandle may have been previously started by the same driver, if a protocol is
+  already in the opened state, then it must not be closed with CloseProtocol(). This is required
   to guarantee the state of ControllerHandle is not modified by this function.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to test. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to test. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For bus drivers, if this parameter is not NULL, then 
-                                   the bus driver must determine if the bus controller specified 
-                                   by ControllerHandle and the child controller specified 
-                                   by RemainingDevicePath are both supported by this 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For bus drivers, if this parameter is not NULL, then
+                                   the bus driver must determine if the bus controller specified
+                                   by ControllerHandle and the child controller specified
+                                   by RemainingDevicePath are both supported by this
                                    bus driver.
 
   @retval EFI_SUCCESS              The device specified by ControllerHandle and
@@ -622,28 +622,28 @@ Dns4DriverBindingSupported (
   Starts a device controller or a bus controller.
 
   The Start() function is designed to be invoked from the EFI boot service ConnectController().
-  As a result, much of the error checking on the parameters to Start() has been moved into this 
-  common boot service. It is legal to call Start() from other locations, 
+  As a result, much of the error checking on the parameters to Start() has been moved into this
+  common boot service. It is legal to call Start() from other locations,
   but the following calling restrictions must be followed, or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE.
   2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
      EFI_DEVICE_PATH_PROTOCOL.
   3. Prior to calling Start(), the Supported() function for the driver specified by This must
-     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
+     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For a bus driver, if this parameter is NULL, then handles 
-                                   for all the children of Controller are created by this driver.  
-                                   If this parameter is not NULL and the first Device Path Node is 
-                                   not the End of Device Path Node, then only the handle for the 
-                                   child device specified by the first Device Path Node of 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For a bus driver, if this parameter is NULL, then handles
+                                   for all the children of Controller are created by this driver.
+                                   If this parameter is not NULL and the first Device Path Node is
+                                   not the End of Device Path Node, then only the handle for the
+                                   child device specified by the first Device Path Node of
                                    RemainingDevicePath is created by this driver.
-                                   If the first Device Path Node of RemainingDevicePath is 
+                                   If the first Device Path Node of RemainingDevicePath is
                                    the End of Device Path Node, no child handle is created by this
                                    driver.
 
@@ -668,14 +668,14 @@ Dns4DriverBindingStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   ASSERT (DnsSb != NULL);
-  
+
   Status = gBS->SetTimer (DnsSb->Timer, TimerPeriodic, TICKS_PER_SECOND);
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  
+
   //
   // Install the Dns4ServiceBinding Protocol onto ControllerHandle.
   //
@@ -699,10 +699,10 @@ ON_ERROR:
 
 /**
   Stops a device controller or a bus controller.
-  
-  The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
-  As a result, much of the error checking on the parameters to Stop() has been moved 
-  into this common boot service. It is legal to call Stop() from other locations, 
+
+  The Stop() function is designed to be invoked from the EFI boot service DisconnectController().
+  As a result, much of the error checking on the parameters to Stop() has been moved
+  into this common boot service. It is legal to call Stop() from other locations,
   but the following calling restrictions must be followed, or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
      same driver's Start() function.
@@ -710,13 +710,13 @@ ON_ERROR:
      EFI_HANDLE. In addition, all of these handles must have been created in this driver's
      Start() function, and the Start() function must have called OpenProtocol() on
      ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
-  
+
   @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
-                                support a bus specific I/O protocol for the driver 
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must
+                                support a bus specific I/O protocol for the driver
                                 to use to stop the device.
   @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
-  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL
                                 if NumberOfChildren is 0.
 
   @retval EFI_SUCCESS           The device was stopped.
@@ -788,7 +788,7 @@ Dns4DriverBindingStop (
            );
 
     DnsDestroyService (DnsSb);
-    
+
     if (gDnsControllerNameTable != NULL) {
       FreeUnicodeStringTable (gDnsControllerNameTable);
       gDnsControllerNameTable = NULL;
@@ -801,33 +801,33 @@ Dns4DriverBindingStop (
 }
 
 /**
-  Tests to see if this driver supports a given controller. If a child device is provided, 
+  Tests to see if this driver supports a given controller. If a child device is provided,
   it further tests to see if this driver supports creating a handle for the specified child device.
 
-  This function checks to see if the driver specified by This supports the device specified by 
-  ControllerHandle. Drivers will typically use the device path attached to 
-  ControllerHandle and/or the services from the bus I/O abstraction attached to 
-  ControllerHandle to determine if the driver supports ControllerHandle. This function 
-  may be called many times during platform initialization. In order to reduce boot times, the tests 
-  performed by this function must be very small, and take as little time as possible to execute. This 
-  function must not change the state of any hardware devices, and this function must be aware that the 
-  device specified by ControllerHandle may already be managed by the same driver or a 
-  different driver. This function must match its calls to AllocatePages() with FreePages(), 
-  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().  
-  Because ControllerHandle may have been previously started by the same driver, if a protocol is 
-  already in the opened state, then it must not be closed with CloseProtocol(). This is required 
+  This function checks to see if the driver specified by This supports the device specified by
+  ControllerHandle. Drivers will typically use the device path attached to
+  ControllerHandle and/or the services from the bus I/O abstraction attached to
+  ControllerHandle to determine if the driver supports ControllerHandle. This function
+  may be called many times during platform initialization. In order to reduce boot times, the tests
+  performed by this function must be very small, and take as little time as possible to execute. This
+  function must not change the state of any hardware devices, and this function must be aware that the
+  device specified by ControllerHandle may already be managed by the same driver or a
+  different driver. This function must match its calls to AllocatePages() with FreePages(),
+  AllocatePool() with FreePool(), and OpenProtocol() with CloseProtocol().
+  Because ControllerHandle may have been previously started by the same driver, if a protocol is
+  already in the opened state, then it must not be closed with CloseProtocol(). This is required
   to guarantee the state of ControllerHandle is not modified by this function.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to test. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to test. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For bus drivers, if this parameter is not NULL, then 
-                                   the bus driver must determine if the bus controller specified 
-                                   by ControllerHandle and the child controller specified 
-                                   by RemainingDevicePath are both supported by this 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For bus drivers, if this parameter is not NULL, then
+                                   the bus driver must determine if the bus controller specified
+                                   by ControllerHandle and the child controller specified
+                                   by RemainingDevicePath are both supported by this
                                    bus driver.
 
   @retval EFI_SUCCESS              The device specified by ControllerHandle and
@@ -886,28 +886,28 @@ Dns6DriverBindingSupported (
   Starts a device controller or a bus controller.
 
   The Start() function is designed to be invoked from the EFI boot service ConnectController().
-  As a result, much of the error checking on the parameters to Start() has been moved into this 
-  common boot service. It is legal to call Start() from other locations, 
+  As a result, much of the error checking on the parameters to Start() has been moved into this
+  common boot service. It is legal to call Start() from other locations,
   but the following calling restrictions must be followed, or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE.
   2. If RemainingDevicePath is not NULL, then it must be a pointer to a naturally aligned
      EFI_DEVICE_PATH_PROTOCOL.
   3. Prior to calling Start(), the Supported() function for the driver specified by This must
-     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.  
+     have been called with the same calling parameters, and Supported() must have returned EFI_SUCCESS.
 
   @param[in]  This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle     The handle of the controller to start. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in]  ControllerHandle     The handle of the controller to start. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This 
-                                   parameter is ignored by device drivers, and is optional for bus 
-                                   drivers. For a bus driver, if this parameter is NULL, then handles 
-                                   for all the children of Controller are created by this driver.  
-                                   If this parameter is not NULL and the first Device Path Node is 
-                                   not the End of Device Path Node, then only the handle for the 
-                                   child device specified by the first Device Path Node of 
+  @param[in]  RemainingDevicePath  A pointer to the remaining portion of a device path.  This
+                                   parameter is ignored by device drivers, and is optional for bus
+                                   drivers. For a bus driver, if this parameter is NULL, then handles
+                                   for all the children of Controller are created by this driver.
+                                   If this parameter is not NULL and the first Device Path Node is
+                                   not the End of Device Path Node, then only the handle for the
+                                   child device specified by the first Device Path Node of
                                    RemainingDevicePath is created by this driver.
-                                   If the first Device Path Node of RemainingDevicePath is 
+                                   If the first Device Path Node of RemainingDevicePath is
                                    the End of Device Path Node, no child handle is created by this
                                    driver.
 
@@ -932,14 +932,14 @@ Dns6DriverBindingStart (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   ASSERT (DnsSb != NULL);
-  
+
   Status = gBS->SetTimer (DnsSb->Timer, TimerPeriodic, TICKS_PER_SECOND);
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  
+
   //
   // Install the Dns6ServiceBinding Protocol onto ControllerHandle
   //
@@ -964,10 +964,10 @@ ON_ERROR:
 
 /**
   Stops a device controller or a bus controller.
-  
-  The Stop() function is designed to be invoked from the EFI boot service DisconnectController(). 
-  As a result, much of the error checking on the parameters to Stop() has been moved 
-  into this common boot service. It is legal to call Stop() from other locations, 
+
+  The Stop() function is designed to be invoked from the EFI boot service DisconnectController().
+  As a result, much of the error checking on the parameters to Stop() has been moved
+  into this common boot service. It is legal to call Stop() from other locations,
   but the following calling restrictions must be followed, or the system behavior will not be deterministic.
   1. ControllerHandle must be a valid EFI_HANDLE that was used on a previous call to this
      same driver's Start() function.
@@ -975,13 +975,13 @@ ON_ERROR:
      EFI_HANDLE. In addition, all of these handles must have been created in this driver's
      Start() function, and the Start() function must have called OpenProtocol() on
      ControllerHandle with an Attribute of EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER.
-  
+
   @param[in]  This              A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must 
-                                support a bus specific I/O protocol for the driver 
+  @param[in]  ControllerHandle  A handle to the device being stopped. The handle must
+                                support a bus specific I/O protocol for the driver
                                 to use to stop the device.
   @param[in]  NumberOfChildren  The number of child device handles in ChildHandleBuffer.
-  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL 
+  @param[in]  ChildHandleBuffer An array of child handles to be freed. May be NULL
                                 if NumberOfChildren is 0.
 
   @retval EFI_SUCCESS           The device was stopped.
@@ -1053,12 +1053,12 @@ Dns6DriverBindingStop (
            );
 
     DnsDestroyService (DnsSb);
-    
+
     if (gDnsControllerNameTable != NULL) {
       FreeUnicodeStringTable (gDnsControllerNameTable);
       gDnsControllerNameTable = NULL;
     }
-    
+
     Status = EFI_SUCCESS;
   }
 
@@ -1067,14 +1067,14 @@ Dns6DriverBindingStop (
 
 /**
   Creates a child handle and installs a protocol.
-  
-  The CreateChild() function installs a protocol on ChildHandle. 
-  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle. 
+
+  The CreateChild() function installs a protocol on ChildHandle.
+  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle.
   If ChildHandle is not a pointer to NULL, then the protocol installs on the existing ChildHandle.
 
   @param[in] This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param[in] ChildHandle Pointer to the handle of the child to create. If it is NULL,
-                         then a new handle is created. If it is a pointer to an existing UEFI handle, 
+                         then a new handle is created. If it is a pointer to an existing UEFI handle,
                          then the protocol is added to the existing UEFI handle.
 
   @retval EFI_SUCCES            The protocol was added to ChildHandle.
@@ -1142,7 +1142,7 @@ Dns4ServiceBindingCreateChild (
            &Instance->Dns4,
            NULL
            );
-    
+
     goto ON_ERROR;
   }
 
@@ -1167,14 +1167,14 @@ Dns4ServiceBindingCreateChild (
            gDns4DriverBinding.DriverBindingHandle,
            ChildHandle
            );
-    
+
      gBS->UninstallMultipleProtocolInterfaces (
             Instance->ChildHandle,
             &gEfiDns4ProtocolGuid,
             &Instance->Dns4,
             NULL
             );
-    
+
     goto ON_ERROR;
   }
 
@@ -1198,9 +1198,9 @@ ON_ERROR:
 
 /**
   Destroys a child handle with a protocol installed on it.
-  
-  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol 
-  that was installed by CreateChild() from ChildHandle. If the removed protocol is the 
+
+  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol
+  that was installed by CreateChild() from ChildHandle. If the removed protocol is the
   last protocol on ChildHandle, then ChildHandle is destroyed.
 
   @param[in] This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
@@ -1260,7 +1260,7 @@ Dns4ServiceBindingDestroyChild (
   }
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  
+
   Instance->InDestroy = TRUE;
 
   //
@@ -1292,7 +1292,7 @@ Dns4ServiceBindingDestroyChild (
                   );
 
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
-  
+
   if (EFI_ERROR (Status)) {
     Instance->InDestroy = FALSE;
     gBS->RestoreTPL (OldTpl);
@@ -1310,14 +1310,14 @@ Dns4ServiceBindingDestroyChild (
 
 /**
   Creates a child handle and installs a protocol.
-  
-  The CreateChild() function installs a protocol on ChildHandle. 
-  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle. 
+
+  The CreateChild() function installs a protocol on ChildHandle.
+  If ChildHandle is a pointer to NULL, then a new handle is created and returned in ChildHandle.
   If ChildHandle is not a pointer to NULL, then the protocol installs on the existing ChildHandle.
 
   @param[in] This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.
   @param[in] ChildHandle Pointer to the handle of the child to create. If it is NULL,
-                         then a new handle is created. If it is a pointer to an existing UEFI handle, 
+                         then a new handle is created. If it is a pointer to an existing UEFI handle,
                          then the protocol is added to the existing UEFI handle.
 
   @retval EFI_SUCCES            The protocol was added to ChildHandle.
@@ -1385,7 +1385,7 @@ Dns6ServiceBindingCreateChild (
            &Instance->Dns6,
            NULL
            );
-    
+
     goto ON_ERROR;
   }
 
@@ -1410,14 +1410,14 @@ Dns6ServiceBindingCreateChild (
            gDns6DriverBinding.DriverBindingHandle,
            ChildHandle
            );
-    
+
      gBS->UninstallMultipleProtocolInterfaces (
             Instance->ChildHandle,
             &gEfiDns6ProtocolGuid,
             &Instance->Dns6,
             NULL
             );
-    
+
     goto ON_ERROR;
   }
 
@@ -1441,9 +1441,9 @@ ON_ERROR:
 
 /**
   Destroys a child handle with a protocol installed on it.
-  
-  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol 
-  that was installed by CreateChild() from ChildHandle. If the removed protocol is the 
+
+  The DestroyChild() function does the opposite of CreateChild(). It removes a protocol
+  that was installed by CreateChild() from ChildHandle. If the removed protocol is the
   last protocol on ChildHandle, then ChildHandle is destroyed.
 
   @param[in] This        Pointer to the EFI_SERVICE_BINDING_PROTOCOL instance.

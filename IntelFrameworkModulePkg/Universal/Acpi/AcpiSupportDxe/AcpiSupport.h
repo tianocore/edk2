@@ -2,7 +2,7 @@
   This is an implementation of the ACPI Support protocol.
   It is in compliance with the 0.9 definition of the protocol.
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -131,12 +131,12 @@ typedef struct {
       AcpiTableProtocol, \
       EFI_ACPI_SUPPORT_SIGNATURE \
       )
-      
+
 /**
-  Constructor for the ACPI support protocol.  
-  
+  Constructor for the ACPI support protocol.
+
   Constructor for the ACPI support protocol to initializes instance data.
-  
+
   @param AcpiSupportInstance   Instance to construct
 
   @retval EFI_SUCCESS           Instance initialized.
@@ -147,14 +147,14 @@ AcpiSupportAcpiSupportConstructor (
   IN EFI_ACPI_SUPPORT_INSTANCE                 *AcpiSupportInstance
   );
 /**
-  Entry point of the ACPI support driver. This function creates and initializes an instance of the ACPI Support 
+  Entry point of the ACPI support driver. This function creates and initializes an instance of the ACPI Support
   Protocol and installs it on a new handle.
 
   @param ImageHandle   A handle for the image that is initializing this driver
-  @param SystemTable   A pointer to the EFI system table        
+  @param SystemTable   A pointer to the EFI system table
 
   @retval EFI_SUCCESS              Driver initialized successfully
-  @retval EFI_LOAD_ERROR           Failed to Initialize or has been loaded 
+  @retval EFI_LOAD_ERROR           Failed to Initialize or has been loaded
   @retval EFI_OUT_OF_RESOURCES     Could not allocate needed resources
 **/
 EFI_STATUS

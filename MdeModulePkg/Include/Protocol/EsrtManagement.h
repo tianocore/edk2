@@ -1,13 +1,13 @@
 /** @file
   The Esrt Management Protocol used to register/set/update an updatable firmware resource .
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                              
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -31,11 +31,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _ESRT_MANAGEMENT_PROTOCOL  ESRT_MANAGEMENT_PROTOCOL;
 
 /**
-  Get Variable name and data by Esrt Entry FwClass 
+  Get Variable name and data by Esrt Entry FwClass
 
-  @param[in]       FwClass                FwClass of Esrt entry to get  
-  @param[in out]  Entry                   Esrt entry returned 
-  
+  @param[in]       FwClass                FwClass of Esrt entry to get
+  @param[in out]  Entry                   Esrt entry returned
+
   @retval EFI_SUCCESS                  The variable saving this Esrt Entry exists.
   @retval EF_NOT_FOUND                   No correct variable found.
 
@@ -46,13 +46,13 @@ EFI_STATUS
   IN     EFI_GUID                  *FwClass,
   IN OUT EFI_SYSTEM_RESOURCE_ENTRY *Entry
   );
- 
+
 
 /**
   Update one ESRT entry in ESRT Cache.
 
   @param[in]  Entry                         Esrt entry to be updated
-  
+
   @retval EFI_SUCCESS                   Successfully update an ESRT entry in cache.
   @retval EFI_INVALID_PARAMETER  Entry does't exist in ESRT Cache
   @retval EFI_WRITE_PROTECTED     ESRT Cache repositoy is locked
@@ -66,11 +66,11 @@ EFI_STATUS
 
 
 /**
-  Non-FMP instance to unregister Esrt Entry from ESRT Cache. 
+  Non-FMP instance to unregister Esrt Entry from ESRT Cache.
 
-  @param[in]    FwClass                FwClass of Esrt entry to Unregister  
-  
-  @retval EFI_SUCCESS         Insert all entries Successfully 
+  @param[in]    FwClass                FwClass of Esrt entry to Unregister
+
+  @retval EFI_SUCCESS         Insert all entries Successfully
   @retval EFI_NOT_FOUND     FwClass does not exsit
 
 **/
@@ -116,10 +116,10 @@ EFI_STATUS
 
 
 /**
-  This function locks up Esrt repository to be readonly. It should be called 
+  This function locks up Esrt repository to be readonly. It should be called
   before gEfiEndOfDxeEventGroupGuid event signaled
 
-  @retval EFI_SUCCESS              Locks up FMP Non-FMP repository successfully 
+  @retval EFI_SUCCESS              Locks up FMP Non-FMP repository successfully
 
 **/
 typedef

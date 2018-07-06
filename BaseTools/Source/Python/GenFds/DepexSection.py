@@ -1,7 +1,7 @@
 ## @file
 # process depex section generation
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -25,6 +25,7 @@ from AutoGen.GenDepex import DependencyExpression
 from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.Misc import PathClass
+from Common.DataType import *
 
 ## generate data section
 #
@@ -76,49 +77,43 @@ class DepexSection (DepexSectionClassObject):
     #   @param  Dict        dictionary contains macro and its value
     #   @retval tuple       (Generated file name list, section alignment)
     #
-    def GenSection(self, OutputPath, ModuleName, SecNum, keyStringList, FfsFile = None, Dict = {}, IsMakefile = False):
-        
+    def GenSection(self, OutputPath, ModuleName, SecNum, keyStringList, FfsFile = None, Dict = None, IsMakefile = False):
         if self.ExpressionProcessed == False:
             self.Expression = self.Expression.replace("\n", " ").replace("\r", " ")
             ExpList = self.Expression.split()
-            ExpGuidDict = {}
 
             for Exp in ExpList:
                 if Exp.upper() not in ('AND', 'OR', 'NOT', 'TRUE', 'FALSE', 'SOR', 'BEFORE', 'AFTER', 'END'):
                     GuidStr = self.__FindGuidValue(Exp)
-                    if GuidStr == None:
+                    if GuidStr is None:
                         EdkLogger.error("GenFds", RESOURCE_NOT_AVAILABLE,
                                         "Depex GUID %s could not be found in build DB! (ModuleName: %s)" % (Exp, ModuleName))
 
-                    ExpGuidDict[Exp] = GuidStr
-
-            for Item in ExpGuidDict:
-                self.Expression = self.Expression.replace(Item, ExpGuidDict[Item])
+                    self.Expression = self.Expression.replace(Exp, GuidStr)
 
             self.Expression = self.Expression.strip()
             self.ExpressionProcessed = True
 
         if self.DepexType == 'PEI_DEPEX_EXP':
-            ModuleType = 'PEIM'
-            SecType    = 'PEI_DEPEX'
+            ModuleType = SUP_MODULE_PEIM
+            SecType    = BINARY_FILE_TYPE_PEI_DEPEX
         elif self.DepexType == 'DXE_DEPEX_EXP':
-            ModuleType = 'DXE_DRIVER'
-            SecType    = 'DXE_DEPEX'
+            ModuleType = SUP_MODULE_DXE_DRIVER
+            SecType    = BINARY_FILE_TYPE_DXE_DEPEX
         elif self.DepexType == 'SMM_DEPEX_EXP':
-            ModuleType = 'DXE_SMM_DRIVER'
-            SecType    = 'SMM_DEPEX'
+            ModuleType = SUP_MODULE_DXE_SMM_DRIVER
+            SecType    = BINARY_FILE_TYPE_SMM_DEPEX
         else:
             EdkLogger.error("GenFds", FORMAT_INVALID,
                             "Depex type %s is not valid for module %s" % (self.DepexType, ModuleName))
 
-        InputFile = os.path.join (OutputPath, ModuleName + 'SEC' + SecNum + '.depex')
+        InputFile = os.path.join (OutputPath, ModuleName + SUP_MODULE_SEC + SecNum + '.depex')
         InputFile = os.path.normpath(InputFile)
         Depex = DependencyExpression(self.Expression, ModuleType)
         Depex.Generate(InputFile)
 
-        OutputFile = os.path.join (OutputPath, ModuleName + 'SEC' + SecNum + '.dpx')
+        OutputFile = os.path.join (OutputPath, ModuleName + SUP_MODULE_SEC + SecNum + '.dpx')
         OutputFile = os.path.normpath(OutputFile)
 
         GenFdsGlobalVariable.GenerateSection(OutputFile, [InputFile], Section.Section.SectionType.get (SecType), IsMakefile=IsMakefile)
-        FileList = [OutputFile]
-        return FileList, self.Alignment
+        return [OutputFile], self.Alignment

@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for SCSI disk driver.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -183,7 +183,7 @@ ScsiDiskComponentNameGetControllerName (
   if (ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
   }
-  
+
   //
   // Make sure this driver is currently managing ControllerHandle
   //

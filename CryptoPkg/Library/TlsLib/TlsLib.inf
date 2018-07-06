@@ -39,14 +39,13 @@
   CryptoPkg/CryptoPkg.dec
 
 [LibraryClasses]
-  BaseLib
+  BaseCryptLib
   BaseMemoryLib
-  MemoryAllocationLib
-  UefiRuntimeServicesTableLib
   DebugLib
-  OpensslLib
   IntrinsicLib
-  PrintLib
+  MemoryAllocationLib
+  OpensslLib
+  SafeIntLib
 
 [BuildOptions]
   #

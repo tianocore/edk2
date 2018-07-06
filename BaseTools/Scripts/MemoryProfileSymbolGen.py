@@ -14,6 +14,7 @@
 #
 ##
 
+from __future__ import print_function
 import os
 import re
 import sys
@@ -58,10 +59,10 @@ class Symbols:
         try:
             nmCommand = "nm"
             nmLineOption = "-l"
-            print "parsing (debug) - " + pdbName
+            print("parsing (debug) - " + pdbName)
             os.system ('%s %s %s > nmDump.line.log' % (nmCommand, nmLineOption, pdbName))
         except :
-            print 'ERROR: nm command not available.  Please verify PATH'
+            print('ERROR: nm command not available.  Please verify PATH')
             return
 
         #
@@ -111,11 +112,11 @@ class Symbols:
             DIA2DumpCommand = "Dia2Dump.exe"
             #DIA2SymbolOption = "-p"
             DIA2LinesOption = "-l"
-            print "parsing (pdb) - " + pdbName
+            print("parsing (pdb) - " + pdbName)
             #os.system ('%s %s %s > DIA2Dump.symbol.log' % (DIA2DumpCommand, DIA2SymbolOption, pdbName))
             os.system ('%s %s %s > DIA2Dump.line.log' % (DIA2DumpCommand, DIA2LinesOption, pdbName))
         except :
-            print 'ERROR: DIA2Dump command not available.  Please verify PATH'
+            print('ERROR: DIA2Dump command not available.  Please verify PATH')
             return
 
         #
@@ -190,7 +191,7 @@ def processLine(newline):
 
     driverPrefixLen = len("Driver - ")
     # get driver name
-    if cmp(newline[0:driverPrefixLen],"Driver - ") == 0 :
+    if cmp(newline[0:driverPrefixLen], "Driver - ") == 0 :
         driverlineList = newline.split(" ")
         driverName = driverlineList[2]
         #print "Checking : ", driverName
@@ -213,7 +214,7 @@ def processLine(newline):
         else :
             symbolsFile.symbolsTable[driverName].parse_debug_file (driverName, pdbName)
 
-    elif cmp(newline,"") == 0 :
+    elif cmp(newline, "") == 0 :
         driverName = ""
 
     # check entry line
@@ -226,7 +227,7 @@ def processLine(newline):
         rvaName = ""
         symbolName = ""
 
-    if cmp(rvaName,"") == 0 :
+    if cmp(rvaName, "") == 0 :
         return newline
     else :
         return newline + symbolName
@@ -254,16 +255,16 @@ def main():
     try :
         file = open(Options.inputfilename)
     except Exception:
-        print "fail to open " + Options.inputfilename
+        print("fail to open " + Options.inputfilename)
         return 1
     try :
         newfile = open(Options.outputfilename, "w")
     except Exception:
-        print "fail to open " + Options.outputfilename
+        print("fail to open " + Options.outputfilename)
         return 1
 
     try:
-        while 1:
+        while True:
             line = file.readline()
             if not line:
                 break

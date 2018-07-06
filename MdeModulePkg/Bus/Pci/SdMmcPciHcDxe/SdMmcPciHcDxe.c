@@ -17,6 +17,8 @@
 
 #include "SdMmcPciHcDxe.h"
 
+EDKII_SD_MMC_OVERRIDE           *mOverride;
+
 //
 // Driver Global Variables
 //
@@ -281,14 +283,14 @@ SdMmcPciHcEnumerateDevice (
         //
         // Reset the specified slot of the SD/MMC Pci Host Controller
         //
-        Status = SdMmcHcReset (Private->PciIo, Slot);
+        Status = SdMmcHcReset (Private, Slot);
         if (EFI_ERROR (Status)) {
           continue;
         }
         //
         // Reinitialize slot and restart identification process for the new attached device
         //
-        Status = SdMmcHcInitHost (Private->PciIo, Slot, Private->Capability[Slot]);
+        Status = SdMmcHcInitHost (Private, Slot);
         if (EFI_ERROR (Status)) {
           continue;
         }
@@ -601,6 +603,20 @@ SdMmcPciHcDriverBindingStart (
     goto Done;
   }
 
+  //
+  // Attempt to locate the singleton instance of the SD/MMC override protocol,
+  // which implements platform specific workarounds for non-standard SDHCI
+  // implementations.
+  //
+  if (mOverride == NULL) {
+    Status = gBS->LocateProtocol (&gEdkiiSdMmcOverrideProtocolGuid, NULL,
+                    (VOID **)&mOverride);
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "%a: found SD/MMC override protocol\n",
+        __FUNCTION__));
+    }
+  }
+
   Support64BitDma = TRUE;
   for (Slot = FirstBar; Slot < (FirstBar + SlotNum); Slot++) {
     Private->Slot[Slot].Enable = TRUE;
@@ -608,6 +624,17 @@ SdMmcPciHcDriverBindingStart (
     Status = SdMmcHcGetCapability (PciIo, Slot, &Private->Capability[Slot]);
     if (EFI_ERROR (Status)) {
       continue;
+    }
+    if (mOverride != NULL && mOverride->Capability != NULL) {
+      Status = mOverride->Capability (
+                            Controller,
+                            Slot,
+                            &Private->Capability[Slot]);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_WARN, "%a: Failed to override capability - %r\n",
+          __FUNCTION__, Status));
+        continue;
+      }
     }
     DumpCapabilityReg (Slot, &Private->Capability[Slot]);
 
@@ -627,7 +654,7 @@ SdMmcPciHcDriverBindingStart (
     //
     // Reset the specified slot of the SD/MMC Pci Host Controller
     //
-    Status = SdMmcHcReset (PciIo, Slot);
+    Status = SdMmcHcReset (Private, Slot);
     if (EFI_ERROR (Status)) {
       continue;
     }
@@ -642,7 +669,7 @@ SdMmcPciHcDriverBindingStart (
       continue;
     }
 
-    Status = SdMmcHcInitHost (PciIo, Slot, Private->Capability[Slot]);
+    Status = SdMmcHcInitHost (Private, Slot);
     if (EFI_ERROR (Status)) {
       continue;
     }

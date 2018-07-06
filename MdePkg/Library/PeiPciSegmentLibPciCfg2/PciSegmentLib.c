@@ -1,13 +1,13 @@
 /** @file
   PCI Segment Library implementation using PCI CFG2 PPI.
 
-  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of
   the BSD License which accompanies this distribution.  The full
   text of the license may be found at
   http://opensource.org/licenses/bsd-license.php.
-  
+
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -49,7 +49,7 @@
 
   This internal function retrieves PCI CFG2 PPI from PPI database.
 
-  @param  Address       The address that encodes the PCI Segment, Bus, Device, 
+  @param  Address       The address that encodes the PCI Segment, Bus, Device,
                         Function and Register.
 
   @return The pointer to PCI CFG2 PPI.
@@ -163,16 +163,16 @@ PeiPciSegmentLibPciCfg2WriteWorker (
 }
 
 /**
-  Register a PCI device so PCI configuration registers may be accessed after 
+  Register a PCI device so PCI configuration registers may be accessed after
   SetVirtualAddressMap().
-  
+
   If any reserved bits in Address are set, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  
+
   @retval RETURN_SUCCESS           The PCI device was registered for runtime access.
-  @retval RETURN_UNSUPPORTED       An attempt was made to call this function 
+  @retval RETURN_UNSUPPORTED       An attempt was made to call this function
                                    after ExitBootServices().
   @retval RETURN_UNSUPPORTED       The resources required to access the PCI device
                                    at runtime could not be mapped.

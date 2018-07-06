@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse a Package file of .PKG file
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -17,7 +17,7 @@ PackageSurfaceAreaXml
 '''
 from xml.dom import minidom
 
-from Library.String import GetStringOfList
+from Library.StringUtils import GetStringOfList
 from Library.Xml.XmlRoutines import XmlElement
 from Library.Xml.XmlRoutines import XmlNode
 from Library.Xml.XmlRoutines import XmlList

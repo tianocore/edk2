@@ -89,7 +89,7 @@ def debug(Level, Message, ExtraData=None):
         "msg"       : Message,
     }
 
-    if ExtraData != None:
+    if ExtraData is not None:
         LogText = _DebugMessageTemplate % TemplateDict + "\n    %s" % ExtraData
     else:
         LogText = _DebugMessageTemplate % TemplateDict
@@ -119,10 +119,10 @@ def warn(ToolName, Message, File=None, Line=None, ExtraData=None):
         return
 
     # if no tool name given, use caller's source file name as tool name
-    if ToolName == None or ToolName == "":
+    if ToolName is None or ToolName == "":
         ToolName = os.path.basename(traceback.extract_stack()[-2][0])
 
-    if Line == None:
+    if Line is None:
         Line = "..."
     else:
         Line = "%d" % Line
@@ -134,12 +134,12 @@ def warn(ToolName, Message, File=None, Line=None, ExtraData=None):
         "msg"       : Message,
     }
 
-    if File != None:
+    if File is not None:
         LogText = _WarningMessageTemplate % TemplateDict
     else:
         LogText = _WarningMessageTemplateWithoutFile % TemplateDict
 
-    if ExtraData != None:
+    if ExtraData is not None:
         LogText += "\n    %s" % ExtraData
 
     _InfoLogger.log(WARN, LogText)
@@ -168,18 +168,18 @@ info    = _InfoLogger.info
 #                       it's True. This is the default behavior.
 #
 def error(ToolName, ErrorCode, Message=None, File=None, Line=None, ExtraData=None, RaiseError=IsRaiseError):
-    if Line == None:
+    if Line is None:
         Line = "..."
     else:
         Line = "%d" % Line
 
-    if Message == None:
+    if Message is None:
         if ErrorCode in gErrorMessage:
             Message = gErrorMessage[ErrorCode]
         else:
             Message = gErrorMessage[UNKNOWN_ERROR]
 
-    if ExtraData == None:
+    if ExtraData is None:
         ExtraData = ""
 
     TemplateDict = {
@@ -191,7 +191,7 @@ def error(ToolName, ErrorCode, Message=None, File=None, Line=None, ExtraData=Non
         "extra"     : ExtraData
     }
 
-    if File != None:
+    if File is not None:
         LogText =  _ErrorMessageTemplate % TemplateDict
     else:
         LogText = _ErrorMessageTemplateWithoutFile % TemplateDict

@@ -1,7 +1,7 @@
 /** @file
   ACPI Support Protocol implementation
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -19,9 +19,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 #include "AcpiSupport.h"
 //
-// The maximum number of tables that pre-allocated. 
+// The maximum number of tables that pre-allocated.
 //
-UINTN         mEfiAcpiMaxNumTables = EFI_ACPI_MAX_NUM_TABLES; 
+UINTN         mEfiAcpiMaxNumTables = EFI_ACPI_MAX_NUM_TABLES;
 /**
   This function adds an ACPI table to the table list.  It will detect FACS and
   allocate the correct type of memory and properly align the table.
@@ -91,10 +91,10 @@ ChecksumCommonTables (
   );
 
 /**
-  This function returns a table specified by an index if it exists.  
-  
-  The function returns a buffer containing the table that the caller must free.  
-  The function also returns a handle used to identify the table for update or 
+  This function returns a table specified by an index if it exists.
+
+  The function returns a buffer containing the table that the caller must free.
+  The function also returns a handle used to identify the table for update or
   deletion using the SetAcpiTable function.
 
   @param This        Instance of the protocol.
@@ -165,7 +165,7 @@ GetAcpiTable (
 }
 /**
   This function adds, removes, or updates ACPI tables.  If the address is not
-  null and the handle value is null, the table is added.  If both the address and 
+  null and the handle value is null, the table is added.  If both the address and
   handle are not null, the table at handle is updated with the table at address.
   If the address is null and the handle is not, the table at handle is deleted.
 
@@ -371,7 +371,7 @@ PublishTables (
   @param  TableKey             Reurns a key to refer to the ACPI table.
 
   @return EFI_SUCCESS            The table was successfully inserted.
-  @return EFI_INVALID_PARAMETER  Either AcpiTableBuffer is NULL, TableKey is NULL, or AcpiTableBufferSize 
+  @return EFI_INVALID_PARAMETER  Either AcpiTableBuffer is NULL, TableKey is NULL, or AcpiTableBufferSize
                                  and the size field embedded in the ACPI table pointed to by AcpiTableBuffer
                                  are not in sync.
   @return EFI_OUT_OF_RESOURCES   Insufficient resources exist to complete the request.
@@ -427,7 +427,7 @@ InstallAcpiTable (
                             );
   }
   FreePool (AcpiTableBufferConst);
-  
+
   return Status;
 }
 /**
@@ -500,7 +500,7 @@ ReallocateAcpiTableBuffer (
   EFI_STATUS                 Status;
   UINT64                     CurrentData;
 
-  CopyMem (&TempPrivateData, AcpiSupportInstance, sizeof (EFI_ACPI_SUPPORT_INSTANCE)); 
+  CopyMem (&TempPrivateData, AcpiSupportInstance, sizeof (EFI_ACPI_SUPPORT_INSTANCE));
   //
   // Enlarge the max table number from mEfiAcpiMaxNumTables to mEfiAcpiMaxNumTables + EFI_ACPI_MAX_NUM_TABLES
   //
@@ -538,7 +538,7 @@ ReallocateAcpiTableBuffer (
 
   Pointer = (UINT8 *) (UINTN) PageAddress;
   ZeroMem (Pointer, TotalSize);
-  
+
   AcpiSupportInstance->Rsdt1 = (EFI_ACPI_DESCRIPTION_HEADER *) Pointer;
   Pointer += (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + NewMaxTableNumber * sizeof (UINT32));
   AcpiSupportInstance->Rsdt3 = (EFI_ACPI_DESCRIPTION_HEADER *) Pointer;
@@ -554,12 +554,12 @@ ReallocateAcpiTableBuffer (
   CopyMem (&AcpiSupportInstance->Rsdp3->XsdtAddress, &CurrentData, sizeof (UINT64));
 
   //
-  // copy the original Rsdt1, Rsdt3 and Xsdt structure to new buffer 
+  // copy the original Rsdt1, Rsdt3 and Xsdt structure to new buffer
   //
-  CopyMem (AcpiSupportInstance->Rsdt1, TempPrivateData.Rsdt1, (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + mEfiAcpiMaxNumTables * sizeof (UINT32))); 
-  CopyMem (AcpiSupportInstance->Rsdt3, TempPrivateData.Rsdt3, (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + mEfiAcpiMaxNumTables * sizeof (UINT32))); 
+  CopyMem (AcpiSupportInstance->Rsdt1, TempPrivateData.Rsdt1, (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + mEfiAcpiMaxNumTables * sizeof (UINT32)));
+  CopyMem (AcpiSupportInstance->Rsdt3, TempPrivateData.Rsdt3, (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + mEfiAcpiMaxNumTables * sizeof (UINT32)));
   CopyMem (AcpiSupportInstance->Xsdt, TempPrivateData.Xsdt, (sizeof (EFI_ACPI_DESCRIPTION_HEADER) + mEfiAcpiMaxNumTables * sizeof (UINT64)));
-  
+
   //
   // Calculate orignal ACPI table buffer size
   //
@@ -570,10 +570,10 @@ ReallocateAcpiTableBuffer (
               sizeof (EFI_ACPI_DESCRIPTION_HEADER) +         // for ACPI 2.0/3.0 XSDT
               mEfiAcpiMaxNumTables * sizeof (UINT64);
   gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)TempPrivateData.Rsdt1, EFI_SIZE_TO_PAGES (TotalSize));
-  
+
   //
   // Update the Max ACPI table number
-  // 
+  //
   mEfiAcpiMaxNumTables = NewMaxTableNumber;
   return EFI_SUCCESS;
 }
@@ -650,7 +650,7 @@ AddTableToList (
   //
   // Allocation memory type depends on the type of the table
   //
-  if ((CurrentTableSignature == EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) || 
+  if ((CurrentTableSignature == EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_SIGNATURE) ||
       (CurrentTableSignature == EFI_ACPI_4_0_UEFI_ACPI_DATA_TABLE_SIGNATURE)) {
     //
     // Allocate memory for the FACS.  This structure must be aligned
@@ -778,7 +778,7 @@ AddTableToList (
 
       //
       // Update pointers in FADT.  If tables don't exist this will put NULL pointers there.
-      // Note: If the FIRMWARE_CTRL is non-zero, then X_FIRMWARE_CTRL must be zero, and 
+      // Note: If the FIRMWARE_CTRL is non-zero, then X_FIRMWARE_CTRL must be zero, and
       // vice-versa.
       //
       if ((UINT64)(UINTN)AcpiSupportInstance->Facs3 < BASE_4GB) {
@@ -913,7 +913,7 @@ AddTableToList (
       //
       if (AcpiSupportInstance->Fadt3 != NULL) {
         //
-        // Note: If the FIRMWARE_CTRL is non-zero, then X_FIRMWARE_CTRL must be zero, and 
+        // Note: If the FIRMWARE_CTRL is non-zero, then X_FIRMWARE_CTRL must be zero, and
         // vice-versa.
         //
         if ((UINT64)(UINTN)AcpiSupportInstance->Facs3 < BASE_4GB) {
@@ -984,7 +984,7 @@ AddTableToList (
           );
       }
     }
-    
+
      if ((Version & EFI_ACPI_TABLE_VERSION_2_0) != 0 ||
         (Version & EFI_ACPI_TABLE_VERSION_3_0) != 0) {
       //
@@ -1014,7 +1014,7 @@ AddTableToList (
           Checksum)
           );
       }
-    }        
+    }
     //
     // Checksum the table
     //
@@ -1094,7 +1094,7 @@ AddTableToList (
        if (AcpiSupportInstance->NumberOfTableEntries3 >= mEfiAcpiMaxNumTables) {
          Status = ReallocateAcpiTableBuffer (AcpiSupportInstance);
          ASSERT_EFI_ERROR (Status);
-       }      
+       }
       //
       // At this time, it is assumed that RSDT and XSDT maintain parallel lists of tables.
       // If it becomes necessary to maintain separate table lists, changes will be required.
@@ -1159,7 +1159,7 @@ AddTableToList (
 
   @param  Handle      Table to find.
   @param  TableList   Table list to search
-  @param  Table       Pointer to table found. 
+  @param  Table       Pointer to table found.
 
   @return EFI_SUCCESS    The function completed successfully.
   @return EFI_NOT_FOUND  No table found matching the handle specified.
@@ -1207,7 +1207,7 @@ FindTableByHandle (
   For Acpi 1.0 tables, pass in the Rsdt.
   For Acpi 2.0 tables, pass in both Rsdt and Xsdt.
 
-  @param  Table                 Pointer to table found. 
+  @param  Table                 Pointer to table found.
   @param  NumberOfTableEntries  Current number of table entries in the RSDT/XSDT
   @param  Rsdt                  Pointer to the RSDT to remove from
   @param  Xsdt                  Pointer to the Xsdt to remove from
@@ -1417,11 +1417,11 @@ DeleteTable (
       //
       if (Version & EFI_ACPI_TABLE_VERSION_2_0 & Table->Version) {
         Table->Version = Table->Version &~EFI_ACPI_TABLE_VERSION_2_0;
-      }      
+      }
       if (Version & EFI_ACPI_TABLE_VERSION_3_0 & Table->Version) {
         Table->Version = Table->Version &~EFI_ACPI_TABLE_VERSION_3_0;
       }
-      
+
       //
       // Remove from Rsdt and Xsdt.  We don't care about the return value
       // because it is acceptable for the table to not exist in Rsdt/Xsdt.
@@ -1435,7 +1435,7 @@ DeleteTable (
           AcpiSupportInstance->Xsdt
           );
       }
-    }    
+    }
     //
     // Free the table, clean up any dependent tables and our private data pointers.
     //
@@ -1495,7 +1495,7 @@ DeleteTable (
             Checksum)
             );
         }
-      }    
+      }
       break;
 
     case EFI_ACPI_3_0_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE:
@@ -1520,7 +1520,7 @@ DeleteTable (
         }
       }
 
-      
+
       if ((Version & EFI_ACPI_TABLE_VERSION_2_0) != 0 ||
           (Version & EFI_ACPI_TABLE_VERSION_3_0) != 0) {
         AcpiSupportInstance->Dsdt3 = NULL;
@@ -1733,12 +1733,12 @@ ChecksumCommonTables (
     OFFSET_OF (EFI_ACPI_DESCRIPTION_HEADER,
     Checksum)
     );
-  
+
   return EFI_SUCCESS;
 }
-/** 
+/**
   Constructor for the ACPI support protocol to initializes instance data.
-  
+
   @param AcpiSupportInstance   Instance to construct
 
   @retval EFI_SUCCESS             Instance initialized.
@@ -1769,7 +1769,7 @@ AcpiSupportAcpiSupportConstructor (
 
   AcpiSupportInstance->AcpiTableProtocol.InstallAcpiTable   = InstallAcpiTable;
   AcpiSupportInstance->AcpiTableProtocol.UninstallAcpiTable = UninstallAcpiTable;
-  
+
   //
   // Create RSDP table
   //

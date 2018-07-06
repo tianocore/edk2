@@ -1,33 +1,33 @@
 /** @file
   Section Extraction Protocol implementation.
-  
+
   Stream database is implemented as a linked list of section streams,
   where each stream contains a linked list of children, which may be leaves or
-  encapsulations.  
-  
+  encapsulations.
+
   Children that are encapsulations generate new stream entries
-  when they are created.  Streams can also be created by calls to 
+  when they are created.  Streams can also be created by calls to
   SEP->OpenSectionStream().
-  
+
   The database is only created far enough to return the requested data from
   any given stream, or to determine that the requested data is not found.
-  
+
   If a GUIDed encapsulation is encountered, there are three possiblilites.
-  
+
   1) A support protocol is found, in which the stream is simply processed with
      the support protocol.
-     
+
   2) A support protocol is not found, but the data is available to be read
      without processing.  In this case, the database is built up through the
      recursions to return the data, and a RPN event is set that will enable
      the stream in question to be refreshed if and when the required section
-     extraction protocol is published.This insures the AuthenticationStatus 
+     extraction protocol is published.This insures the AuthenticationStatus
      does not become stale in the cache.
-     
+
   3) A support protocol is not found, and the data is not available to be read
      without it.  This results in EFI_PROTOCOL_ERROR.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -77,7 +77,7 @@ typedef struct {
   UINTN                       EncapsulatedStreamHandle;
   EFI_GUID                    *EncapsulationGuid;
   //
-  // If the section REQUIRES an extraction protocol, register for RPN 
+  // If the section REQUIRES an extraction protocol, register for RPN
   // when the required GUIDed extraction protocol becomes available.
   //
   EFI_EVENT                   Event;
@@ -157,22 +157,22 @@ OpenSectionStream (
   @param AuthenticationStatus  Indicates the authentication status of the retrieved
                                section.
 
- 
+
   @retval EFI_SUCCESS           Section was retrieved successfully
-  @retval EFI_PROTOCOL_ERROR    A GUID defined section was encountered in the section 
+  @retval EFI_PROTOCOL_ERROR    A GUID defined section was encountered in the section
                                 stream with its EFI_GUIDED_SECTION_PROCESSING_REQUIRED
-                                bit set, but there was no corresponding GUIDed Section 
-                                Extraction Protocol in the handle database.  *Buffer is 
+                                bit set, but there was no corresponding GUIDed Section
+                                Extraction Protocol in the handle database.  *Buffer is
                                 unmodified.
   @retval EFI_NOT_FOUND         An error was encountered when parsing the SectionStream.
-                                This indicates the SectionStream  is not correctly 
+                                This indicates the SectionStream  is not correctly
                                 formatted.
   @retval EFI_NOT_FOUND         The requested section does not exist.
-  @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to process the 
+  @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to process the
                                 request.
   @retval EFI_INVALID_PARAMETER The SectionStreamHandle does not exist.
-  @retval EFI_WARN_TOO_SMALL    The size of the caller allocated input buffer is 
-                                insufficient to contain the requested section.  The 
+  @retval EFI_WARN_TOO_SMALL    The size of the caller allocated input buffer is
+                                insufficient to contain the requested section.  The
                                 input buffer is filled and contents are section contents
                                 are truncated.
 
@@ -218,18 +218,18 @@ LIST_ENTRY mStreamRoot = INITIALIZE_LIST_HEAD_VARIABLE (mStreamRoot);
 
 EFI_HANDLE mSectionExtractionHandle = NULL;
 
-EFI_SECTION_EXTRACTION_PROTOCOL mSectionExtraction = { 
-  OpenSectionStream, 
-  GetSection, 
+EFI_SECTION_EXTRACTION_PROTOCOL mSectionExtraction = {
+  OpenSectionStream,
+  GetSection,
   CloseSectionStream
 };
 
 /**
-  Entry point of the section extraction code. Initializes an instance of the 
+  Entry point of the section extraction code. Initializes an instance of the
   section extraction interface and installs it on a new handle.
 
   @param ImageHandle             A handle for the image that is initializing this driver
-  @param SystemTable             A pointer to the EFI system table        
+  @param SystemTable             A pointer to the EFI system table
 
   @retval EFI_SUCCESS            Driver initialized successfully
   @retval EFI_OUT_OF_RESOURCES   Could not allocate needed resources
@@ -281,7 +281,7 @@ IsValidSectionStream (
 
   TotalLength = 0;
   SectionHeader = (EFI_COMMON_SECTION_HEADER *)SectionStream;
-  
+
   while (TotalLength < SectionStreamLength) {
     if (IS_SECTION2 (SectionHeader)) {
       SectionLength = SECTION2_SIZE (SectionHeader);
@@ -291,14 +291,14 @@ IsValidSectionStream (
     TotalLength += SectionLength;
 
     if (TotalLength == SectionStreamLength) {
-      return TRUE;    
+      return TRUE;
     }
 
     //
     // Move to the next byte following the section...
     //
     SectionHeader = (EFI_COMMON_SECTION_HEADER *) ((UINT8 *) SectionHeader + SectionLength);
-    
+
     //
     // Figure out where the next section begins
     //
@@ -331,13 +331,13 @@ OpenSectionStreamEx (
   IN     UINTN                                     SectionStreamLength,
   IN     VOID                                      *SectionStream,
   IN     BOOLEAN                                   AllocateBuffer,
-  IN     UINT32                                    AuthenticationStatus,   
+  IN     UINT32                                    AuthenticationStatus,
      OUT UINTN                                     *SectionStreamHandle
   )
 {
   FRAMEWORK_SECTION_STREAM_NODE    *NewStream;
   EFI_TPL                          OldTpl;
-  
+
   //
   // Allocate a new stream
   //
@@ -345,14 +345,14 @@ OpenSectionStreamEx (
   if (NewStream == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
-  if (AllocateBuffer) { 
+
+  if (AllocateBuffer) {
     //
     // if we're here, we're double buffering, allocate the buffer and copy the
     // data in
     //
     if (SectionStreamLength > 0) {
-      NewStream->StreamBuffer = AllocatePool (SectionStreamLength); 
+      NewStream->StreamBuffer = AllocatePool (SectionStreamLength);
       if (NewStream->StreamBuffer == NULL) {
         FreePool (NewStream);
         return EFI_OUT_OF_RESOURCES;
@@ -375,7 +375,7 @@ OpenSectionStreamEx (
     //
     NewStream->StreamBuffer = SectionStream;
   }
-  
+
   //
   // Initialize the rest of the section stream
   //
@@ -384,7 +384,7 @@ OpenSectionStreamEx (
   NewStream->StreamLength = SectionStreamLength;
   InitializeListHead (&NewStream->Children);
   NewStream->AuthenticationStatus = AuthenticationStatus;
-  
+
   //
   // Add new stream to stream list
   //
@@ -393,7 +393,7 @@ OpenSectionStreamEx (
   gBS->RestoreTPL (OldTpl);
 
   *SectionStreamHandle = NewStream->StreamHandle;
-  
+
   return EFI_SUCCESS;
 }
 
@@ -428,9 +428,9 @@ OpenSectionStream (
   if (!IsValidSectionStream (SectionStream, SectionStreamLength)) {
     return EFI_INVALID_PARAMETER;
   }
-  
-  return OpenSectionStreamEx ( 
-          SectionStreamLength, 
+
+  return OpenSectionStreamEx (
+          SectionStreamLength,
           SectionStream,
           TRUE,
           0,
@@ -460,7 +460,7 @@ ChildIsType (
   )
 {
   EFI_GUID_DEFINED_SECTION    *GuidedSection;
-  
+
   if (SearchType == EFI_SECTION_ALL) {
     return TRUE;
   }
@@ -549,7 +549,7 @@ CreateProtocolNotifyEvent (
 
   @return TRUE      The GuidedSectionGuid could be identified, and the pointer to
                     the Guided Section Extraction Protocol will be returned to *GuidedSectionExtraction.
-  @return FALSE     The GuidedSectionGuid could not be identified, or 
+  @return FALSE     The GuidedSectionGuid could not be identified, or
                     the Guided Section Extraction Protocol has not been installed yet.
 
 **/
@@ -588,7 +588,7 @@ VerifyGuidedSectionGuid (
 }
 
 /**
-  RPN callback function.  
+  RPN callback function.
   1. Initialize the section stream when the GUIDED_SECTION_EXTRACTION_PROTOCOL is installed.
   2. Removes a stale section stream and re-initializes it with an updated AuthenticationStatus.
 
@@ -611,7 +611,7 @@ NotifyGuidedExtraction (
   UINTN                                   NewStreamBufferSize;
   UINT32                                  AuthenticationStatus;
   RPN_EVENT_CONTEXT                       *Context;
-  
+
   Context = RpnContext;
   Status = EFI_SUCCESS;
   if (Context->ChildNode->EncapsulatedStreamHandle != NULL_STREAM_HANDLE) {
@@ -619,14 +619,14 @@ NotifyGuidedExtraction (
   }
   if (!EFI_ERROR (Status)) {
     //
-    // The stream is not initialized, open it. 
+    // The stream is not initialized, open it.
     // Or the stream closed successfully, so re-open the stream with correct AuthenticationStatus.
     //
-  
-    GuidedHeader = (EFI_GUID_DEFINED_SECTION *) 
+
+    GuidedHeader = (EFI_GUID_DEFINED_SECTION *)
       (Context->ParentStream->StreamBuffer + Context->ChildNode->OffsetInStream);
     ASSERT (GuidedHeader->CommonHeader.Type == EFI_SECTION_GUID_DEFINED);
-    
+
     if (!VerifyGuidedSectionGuid (Context->ChildNode->EncapsulationGuid, &GuidedExtraction)) {
       return;
     }
@@ -658,11 +658,11 @@ NotifyGuidedExtraction (
   //  already been closed by someone, so just destroy the event and be done with
   //  it.
   //
-  
+
   gBS->CloseEvent (Event);
   Context->ChildNode->Event = NULL;
   FreePool (Context);
-}  
+}
 
 /**
   Worker function.  Constructor for RPN event if needed to keep AuthenticationStatus
@@ -679,16 +679,16 @@ CreateGuidedExtractionRpnEvent (
   )
 {
   RPN_EVENT_CONTEXT *Context;
-  
+
   //
   // Allocate new event structure and context
   //
   Context = AllocatePool (sizeof (RPN_EVENT_CONTEXT));
   ASSERT (Context != NULL);
-  
+
   Context->ChildNode = ChildNode;
   Context->ParentStream = ParentStream;
- 
+
   Context->ChildNode->Event = CreateProtocolNotifyEvent (
                                 Context->ChildNode->EncapsulationGuid,
                                 TPL_NOTIFY,
@@ -740,7 +740,7 @@ CreateChildNode (
   UINT32                                       UncompressedLength;
   UINT8                                        CompressionType;
   UINT16                                       GuidedSectionAttributes;
-    
+
   FRAMEWORK_SECTION_CHILD_NODE                      *Node;
 
   SectionHeader = (EFI_COMMON_SECTION_HEADER *) (Stream->StreamBuffer + ChildOffset);
@@ -753,7 +753,7 @@ CreateChildNode (
   if (Node == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Now initialize it
   //
@@ -767,7 +767,7 @@ CreateChildNode (
   Node->OffsetInStream = ChildOffset;
   Node->EncapsulatedStreamHandle = NULL_STREAM_HANDLE;
   Node->EncapsulationGuid = NULL;
-  
+
   //
   // If it's an encapsulating section, then create the new section stream also
   //
@@ -805,7 +805,7 @@ CreateChildNode (
           FreePool (Node);
           return EFI_OUT_OF_RESOURCES;
         }
-        
+
         if (CompressionType == EFI_NOT_COMPRESSED) {
           //
           // stream is not actually compressed, just encapsulated.  So just copy it.
@@ -814,15 +814,15 @@ CreateChildNode (
         } else if (CompressionType == EFI_STANDARD_COMPRESSION) {
           //
           // Only support the EFI_SATNDARD_COMPRESSION algorithm.
-          // 
+          //
 
           //
           // Decompress the stream
           //
           Status = gBS->LocateProtocol (&gEfiDecompressProtocolGuid, NULL, (VOID **)&Decompress);
-          
+
           ASSERT_EFI_ERROR (Status);
-          
+
           Status = Decompress->GetInfo (
                                  Decompress,
                                  CompressionSource,
@@ -855,7 +855,7 @@ CreateChildNode (
                                  ScratchBuffer,
                                  ScratchSize
                                  );
-          FreePool (ScratchBuffer); 
+          FreePool (ScratchBuffer);
           if (EFI_ERROR (Status)) {
             FreePool (Node);
             FreePool (NewStreamBuffer);
@@ -866,7 +866,7 @@ CreateChildNode (
         NewStreamBuffer = NULL;
         NewStreamBufferSize = 0;
       }
-      
+
       Status = OpenSectionStreamEx (
                  NewStreamBufferSize,
                  NewStreamBuffer,
@@ -906,9 +906,9 @@ CreateChildNode (
           FreePool (*ChildNode);
           return EFI_PROTOCOL_ERROR;
         }
-        
+
         //
-        // Make sure we initialize the new stream with the correct 
+        // Make sure we initialize the new stream with the correct
         // authentication status for both aggregate and local status fields.
         //
         if ((GuidedSectionAttributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
@@ -923,7 +923,7 @@ CreateChildNode (
           //
           AuthenticationStatus = Stream->AuthenticationStatus;
         }
-        
+
         Status = OpenSectionStreamEx (
                    NewStreamBufferSize,
                    NewStreamBuffer,
@@ -942,8 +942,8 @@ CreateChildNode (
         //
         if ((GuidedSectionAttributes & EFI_GUIDED_SECTION_PROCESSING_REQUIRED) == EFI_GUIDED_SECTION_PROCESSING_REQUIRED) {
           //
-          // If the section REQUIRES an extraction protocol, register for RPN 
-          // when the required GUIDed extraction protocol becomes available. 
+          // If the section REQUIRES an extraction protocol, register for RPN
+          // when the required GUIDed extraction protocol becomes available.
           //
           AuthenticationStatus = 0;
           CreateGuidedExtractionRpnEvent (Stream, Node);
@@ -954,11 +954,11 @@ CreateChildNode (
           AuthenticationStatus = Stream->AuthenticationStatus;
           if ((GuidedSectionAttributes & EFI_GUIDED_SECTION_AUTH_STATUS_VALID) == EFI_GUIDED_SECTION_AUTH_STATUS_VALID) {
             //
-            //  The local status of the new stream is contained in 
+            //  The local status of the new stream is contained in
             //  AuthenticaionStatus.  This value needs to be ORed into the
             //  Aggregate bits also...
             //
-            
+
             //
             // Clear out and initialize the local status
             //
@@ -969,7 +969,7 @@ CreateChildNode (
             //
             AuthenticationStatus |= AuthenticationStatus >> 16;
           }
-          
+
           if (IS_SECTION2 (GuidedHeader)) {
             Status = OpenSectionStreamEx (
                        SECTION2_SIZE (GuidedHeader) - ((EFI_GUID_DEFINED_SECTION2 *) GuidedHeader)->DataOffset,
@@ -993,8 +993,8 @@ CreateChildNode (
           }
         }
       }
-      
-      if ((AuthenticationStatus & EFI_LOCAL_AUTH_STATUS_ALL) == 
+
+      if ((AuthenticationStatus & EFI_LOCAL_AUTH_STATUS_ALL) ==
             (EFI_LOCAL_AUTH_STATUS_IMAGE_SIGNED | EFI_LOCAL_AUTH_STATUS_NOT_TESTED)) {
         //
         // Need to register for RPN for when the required GUIDed extraction
@@ -1004,17 +1004,17 @@ CreateChildNode (
         //
         CreateGuidedExtractionRpnEvent (Stream, Node);
       }
-      
+
       break;
 
     default:
-      
+
       //
       // Nothing to do if it's a leaf
       //
       break;
   }
-  
+
   //
   // Last, add the new child node to the stream
   //
@@ -1064,15 +1064,15 @@ FindChildNode (
   UINT32                                        NextChildOffset;
   EFI_STATUS                                    ErrorStatus;
   EFI_STATUS                                    Status;
-  
+
   CurrentChildNode = NULL;
   ErrorStatus = EFI_NOT_FOUND;
-  
+
   if (SourceStream->StreamLength == 0) {
     return EFI_NOT_FOUND;
   }
-  
-  if (IsListEmpty (&SourceStream->Children) && 
+
+  if (IsListEmpty (&SourceStream->Children) &&
                    SourceStream->StreamLength >= sizeof (EFI_COMMON_SECTION_HEADER)) {
     //
     // This occurs when a section stream exists, but no child sections
@@ -1086,7 +1086,7 @@ FindChildNode (
       return Status;
     }
   }
-  
+
   //
   // At least one child has been parsed out of the section stream.  So, walk
   // through the sections that have already been parsed out looking for the
@@ -1113,7 +1113,7 @@ FindChildNode (
         return EFI_SUCCESS;
       }
     }
-    
+
     if (CurrentChildNode->EncapsulatedStreamHandle != NULL_STREAM_HANDLE) {
       //
       // If the current node is an encapsulating node, recurse into it...
@@ -1147,7 +1147,7 @@ FindChildNode (
       //
       ErrorStatus = EFI_PROTOCOL_ERROR;
     }
-    
+
     if (!IsNodeAtEnd (&SourceStream->Children, &CurrentChildNode->Link)) {
       //
       // We haven't found the child node we're interested in yet, but there's
@@ -1199,9 +1199,9 @@ FindStreamNode (
   IN  UINTN                                     SearchHandle,
   OUT FRAMEWORK_SECTION_STREAM_NODE                  **FoundStream
   )
-{  
+{
   FRAMEWORK_SECTION_STREAM_NODE                      *StreamNode;
-  
+
   if (!IsListEmpty (&mStreamRoot)) {
     StreamNode = STREAM_NODE_FROM_LINK (GetFirstNode (&mStreamRoot));
     for (;;) {
@@ -1215,10 +1215,10 @@ FindStreamNode (
       }
     }
   }
-  
+
   return EFI_NOT_FOUND;
 }
-  
+
 /**
   SEP member function.  Retrieves requested section from section stream.
 
@@ -1242,22 +1242,22 @@ FindStreamNode (
   @param AuthenticationStatus  Indicates the authentication status of the retrieved
                                section.
 
- 
+
   @retval EFI_SUCCESS           Section was retrieved successfully
-  @retval EFI_PROTOCOL_ERROR    A GUID defined section was encountered in the section 
+  @retval EFI_PROTOCOL_ERROR    A GUID defined section was encountered in the section
                                 stream with its EFI_GUIDED_SECTION_PROCESSING_REQUIRED
-                                bit set, but there was no corresponding GUIDed Section 
-                                Extraction Protocol in the handle database.  *Buffer is 
+                                bit set, but there was no corresponding GUIDed Section
+                                Extraction Protocol in the handle database.  *Buffer is
                                 unmodified.
   @retval EFI_NOT_FOUND         An error was encountered when parsing the SectionStream.
-                                This indicates the SectionStream  is not correctly 
+                                This indicates the SectionStream  is not correctly
                                 formatted.
   @retval EFI_NOT_FOUND         The requested section does not exist.
-  @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to process the 
+  @retval EFI_OUT_OF_RESOURCES  The system has insufficient resources to process the
                                 request.
   @retval EFI_INVALID_PARAMETER The SectionStreamHandle does not exist.
-  @retval EFI_WARN_TOO_SMALL    The size of the caller allocated input buffer is 
-                                insufficient to contain the requested section.  The 
+  @retval EFI_WARN_TOO_SMALL    The size of the caller allocated input buffer is
+                                insufficient to contain the requested section.  The
                                 input buffer is filled and contents are section contents
                                 are truncated.
 
@@ -1286,12 +1286,12 @@ GetSection (
   UINT8                                                 *CopyBuffer;
   UINTN                                                 SectionSize;
   EFI_COMMON_SECTION_HEADER                             *Section;
-  
+
 
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
   Instance = SectionInstance + 1;
   ChildStreamNode = NULL;
-  
+
   //
   // Locate target stream
   //
@@ -1300,7 +1300,7 @@ GetSection (
     Status = EFI_INVALID_PARAMETER;
     goto GetSection_Done;
   }
-  
+
   //
   // Found the stream, now locate and return the appropriate section
   //
@@ -1316,12 +1316,12 @@ GetSection (
     // There's a requested section type, so go find it and return it...
     //
     Status = FindChildNode (
-                      StreamNode, 
-                      *SectionType, 
-                      &Instance, 
+                      StreamNode,
+                      *SectionType,
+                      &Instance,
                       SectionDefinitionGuid,
                       &ChildNode,
-                      &ChildStreamNode, 
+                      &ChildStreamNode,
                       &ExtractedAuthenticationStatus
                       );
     if (EFI_ERROR (Status)) {
@@ -1339,9 +1339,9 @@ GetSection (
       CopyBuffer = (UINT8 *) Section + sizeof (EFI_COMMON_SECTION_HEADER);
     }
     *AuthenticationStatus = ExtractedAuthenticationStatus;
-  }   
-    
-  SectionSize = CopySize;  
+  }
+
+  SectionSize = CopySize;
   if (*Buffer != NULL) {
     //
     // Caller allocated buffer.  Fill to size and return required size...
@@ -1362,7 +1362,7 @@ GetSection (
   }
   CopyMem (*Buffer, CopyBuffer, CopySize);
   *BufferSize = SectionSize;
-  
+
 GetSection_Done:
   gBS->RestoreTPL (OldTpl);
   return Status;
@@ -1384,7 +1384,7 @@ FreeChildNode (
   // Remove the child from it's list
   //
   RemoveEntryList (&ChildNode->Link);
-  
+
   if (ChildNode->EncapsulatedStreamHandle != NULL_STREAM_HANDLE) {
     //
     // If it's an encapsulating section, we close the resulting section stream.
@@ -1401,7 +1401,7 @@ FreeChildNode (
   // Last, free the child node itself
   //
   FreePool (ChildNode);
-}  
+}
 
 /**
   SEP member function.  Deletes an existing section stream
@@ -1427,9 +1427,9 @@ CloseSectionStream (
   EFI_STATUS                                    Status;
   LIST_ENTRY                                    *Link;
   FRAMEWORK_SECTION_CHILD_NODE                       *ChildNode;
-  
+
   OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
-  
+
   //
   // Locate target stream
   //
@@ -1450,7 +1450,7 @@ CloseSectionStream (
   } else {
     Status = EFI_INVALID_PARAMETER;
   }
-  
+
   gBS->RestoreTPL (OldTpl);
   return Status;
 }

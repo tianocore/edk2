@@ -1203,9 +1203,9 @@ Dhcp4InstanceConfigUdpIo (
   EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN  *Token;
   EFI_UDP4_CONFIG_DATA              UdpConfigData;
   IP4_ADDR                          ClientAddr;
-  IP4_ADDR                          Ip; 
-  INTN                              Class; 
-  IP4_ADDR                          SubnetMask;  
+  IP4_ADDR                          Ip;
+  INTN                              Class;
+  IP4_ADDR                          SubnetMask;
 
   Instance = (DHCP_PROTOCOL *) Context;
   DhcpSb   = Instance->Service;
@@ -1238,7 +1238,7 @@ Dhcp4InstanceConfigUdpIo (
     if (Class >= IP4_ADDR_CLASSE) {
       return EFI_INVALID_PARAMETER;
     }
-    
+
     SubnetMask = gIp4AllMasks[Class << 3];
   } else {
     SubnetMask = DhcpSb->Netmask;
@@ -1548,7 +1548,7 @@ EfiDhcp4TransmitReceive (
   }
 
   ClientAddr = EFI_NTOHL (Token->Packet->Dhcp4.Header.ClientAddr);
-  
+
   if (ClientAddr == 0) {
     return EFI_NO_MAPPING;
   }

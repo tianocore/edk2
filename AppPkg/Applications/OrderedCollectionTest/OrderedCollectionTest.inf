@@ -3,7 +3,7 @@
 #  from the standard input, and writing results to the standard output.
 #
 #  Copyright (C) 2014, Red Hat, Inc.
-#  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials are licensed and made available
 #  under the terms and conditions of the BSD License which accompanies this
@@ -24,7 +24,7 @@
   ENTRY_POINT                    = ShellCEntryLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]

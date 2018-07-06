@@ -1,7 +1,7 @@
 /** @file
   EBC Simple Debugger protocol for debug EBC code.
 
-Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -71,7 +71,7 @@ VOID
 
   @param[in] This           A pointer to the EFI_EBC_SIMPLE_DEBUGGER_PROTOCOL structure.
   @param[in] VmPtr          A pointer to a VM context.
-  @param[in] DasmString     Dump string buffer. 
+  @param[in] DasmString     Dump string buffer.
   @param[in] DasmStringSize Dump string size.
 
   @retval EFI_UNSUPPORTED       No support for it.

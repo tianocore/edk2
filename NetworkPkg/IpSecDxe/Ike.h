@@ -1,7 +1,7 @@
 /** @file
   The common definition of IPsec Key Exchange (IKE).
 
-  Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -55,7 +55,7 @@
 #define IPSEC_ESP_BLOWFISH            7
 #define IPSEC_ESP_3IDEA               8
 #define IPSEC_ESP_DES_IV32            9
-#define IPSEC_ESP_RC4                 10  // It's reserved in IKEv2 
+#define IPSEC_ESP_RC4                 10  // It's reserved in IKEv2
 #define IPSEC_ESP_NULL                11
 #define IPSEC_ESP_AES                 12
 
@@ -150,7 +150,7 @@ typedef struct {
 typedef union {
   UINT16  AttrLength;
   UINT16  AttrValue;
-} IKE_SA_ATTR_UNION; 
+} IKE_SA_ATTR_UNION;
 
 //
 // SA Attribute present in Transform Payload
@@ -163,7 +163,7 @@ typedef struct {
 #pragma pack()
 
 //
-// Contains the IKE packet information. 
+// Contains the IKE packet information.
 //
 typedef struct {
   UINTN               RefCount;
@@ -219,7 +219,7 @@ typedef struct {
 //
 // Each algorithm has its own Id, Guid, BlockSize and KeyLength.
 // This struct contains these information for each algorithm. It is generic structure
-// for both encryption and authentication algorithm. 
+// for both encryption and authentication algorithm.
 // For authentication algorithm, the AlgSize means IcvSize. For encryption algorithm,
 // it means IvSize.
 //

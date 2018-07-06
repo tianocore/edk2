@@ -1,7 +1,7 @@
 /** @file
   Graphics Output Protocol functions for the QEMU video controller.
 
-  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -69,6 +69,9 @@ QemuVideoCompleteModeData (
   Mode->FrameBufferBase = FrameBufDesc->AddrRangeMin;
   Mode->FrameBufferSize = Info->HorizontalResolution * Info->VerticalResolution;
   Mode->FrameBufferSize = Mode->FrameBufferSize * ((ModeData->ColorDepth + 7) / 8);
+  Mode->FrameBufferSize = EFI_PAGES_TO_SIZE (
+                            EFI_SIZE_TO_PAGES (Mode->FrameBufferSize)
+                            );
   DEBUG ((EFI_D_INFO, "FrameBufferBase: 0x%Lx, FrameBufferSize: 0x%Lx\n",
     Mode->FrameBufferBase, (UINT64)Mode->FrameBufferSize));
 
@@ -107,6 +110,9 @@ QemuVideoVmwareSvgaCompleteModeData (
 
   Mode->FrameBufferBase = FrameBufDesc->AddrRangeMin + FbOffset;
   Mode->FrameBufferSize = BytesPerLine * Info->VerticalResolution;
+  Mode->FrameBufferSize = EFI_PAGES_TO_SIZE (
+                            EFI_SIZE_TO_PAGES (Mode->FrameBufferSize)
+                            );
 
   FreePool (FrameBufDesc);
   return Status;
@@ -196,9 +202,10 @@ Routine Description:
 
 --*/
 {
-  QEMU_VIDEO_PRIVATE_DATA    *Private;
-  QEMU_VIDEO_MODE_DATA       *ModeData;
-  RETURN_STATUS              Status;
+  QEMU_VIDEO_PRIVATE_DATA       *Private;
+  QEMU_VIDEO_MODE_DATA          *ModeData;
+  RETURN_STATUS                 Status;
+  EFI_GRAPHICS_OUTPUT_BLT_PIXEL Black;
 
   Private = QEMU_VIDEO_PRIVATE_DATA_FROM_GRAPHICS_OUTPUT_THIS (This);
 
@@ -270,6 +277,21 @@ Routine Description:
                 );
   }
   ASSERT (Status == RETURN_SUCCESS);
+
+  //
+  // Per UEFI Spec, need to clear the visible portions of the output display to black.
+  //
+  ZeroMem (&Black, sizeof (Black));
+  Status = FrameBufferBlt (
+             Private->FrameBufferBltConfigure,
+             &Black,
+             EfiBltVideoFill,
+             0, 0,
+             0, 0,
+             This->Mode->Info->HorizontalResolution, This->Mode->Info->VerticalResolution,
+             0
+             );
+  ASSERT_RETURN_ERROR (Status);
 
   return EFI_SUCCESS;
 }
@@ -350,7 +372,7 @@ Returns:
 
   default:
     Status = EFI_INVALID_PARAMETER;
-    ASSERT (FALSE);
+    break;
   }
 
   gBS->RestoreTPL (OriginalTPL);

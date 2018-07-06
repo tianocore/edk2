@@ -1,6 +1,6 @@
-/** @file  
+/** @file
   This module implements TCG EFI Protocol.
- 
+
 Caution: This module requires additional review when modified.
 This driver will have external input - TcgDxePassThroughToTpm
 This external input must be validated carefully to avoid security issue like
@@ -8,14 +8,14 @@ buffer overflow, integer overflow.
 
 TcgDxePassThroughToTpm() will receive untrusted input and do basic validation.
 
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -86,8 +86,8 @@ EFI_TCG_CLIENT_ACPI_TABLE           mTcgClientAcpiTemplate = {
 //
 // The following EFI_TCG_SERVER_ACPI_TABLE default setting is just one example,
 // the TPM device connectes to LPC, and also defined the ACPI _UID as 0xFF,
-// this _UID can be changed and should match with the _UID setting of the TPM 
-// ACPI device object  
+// this _UID can be changed and should match with the _UID setting of the TPM
+// ACPI device object
 //
 EFI_TCG_SERVER_ACPI_TABLE           mTcgServerAcpiTemplate = {
   {
@@ -209,26 +209,26 @@ GetProcessorsCpuLocation (
 }
 
 /**
-  This service provides EFI protocol capability information, state information 
+  This service provides EFI protocol capability information, state information
   about the TPM, and Event Log state information.
 
   @param[in]  This               Indicates the calling context
-  @param[out] ProtocolCapability The callee allocates memory for a TCG_BOOT_SERVICE_CAPABILITY 
-                                 structure and fills in the fields with the EFI protocol 
+  @param[out] ProtocolCapability The callee allocates memory for a TCG_BOOT_SERVICE_CAPABILITY
+                                 structure and fills in the fields with the EFI protocol
                                  capability information and the current TPM state information.
-  @param[out] TCGFeatureFlags    This is a pointer to the feature flags. No feature 
-                                 flags are currently defined so this parameter 
-                                 MUST be set to 0. However, in the future, 
-                                 feature flags may be defined that, for example, 
+  @param[out] TCGFeatureFlags    This is a pointer to the feature flags. No feature
+                                 flags are currently defined so this parameter
+                                 MUST be set to 0. However, in the future,
+                                 feature flags may be defined that, for example,
                                  enable hash algorithm agility.
   @param[out] EventLogLocation   This is a pointer to the address of the event log in memory.
-  @param[out] EventLogLastEntry  If the Event Log contains more than one entry, 
-                                 this is a pointer to the address of the start of 
-                                 the last entry in the event log in memory. 
+  @param[out] EventLogLastEntry  If the Event Log contains more than one entry,
+                                 this is a pointer to the address of the start of
+                                 the last entry in the event log in memory.
 
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_INVALID_PARAMETER  ProtocolCapability does not match TCG capability.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -307,21 +307,21 @@ TpmCommHashAll (
 
 /**
   This service abstracts the capability to do a hash operation on a data buffer.
-  
+
   @param[in]      This             Indicates the calling context
   @param[in]      HashData         Pointer to the data buffer to be hashed
   @param[in]      HashDataLen      Length of the data buffer to be hashed
   @param[in]      AlgorithmId      Identification of the Algorithm to use for the hashing operation
   @param[in, out] HashedDataLen    Resultant length of the hashed data
-  @param[in, out] HashedDataResult Resultant buffer of the hashed data  
-  
+  @param[in, out] HashedDataResult Resultant buffer of the hashed data
+
   @retval EFI_SUCCESS              Operation completed successfully.
   @retval EFI_INVALID_PARAMETER    HashDataLen is NULL.
   @retval EFI_INVALID_PARAMETER    HashDataLenResult is NULL.
   @retval EFI_OUT_OF_RESOURCES     Cannot allocate buffer of size *HashedDataLen.
   @retval EFI_UNSUPPORTED          AlgorithmId not supported.
   @retval EFI_BUFFER_TOO_SMALL     *HashedDataLen < sizeof (TCG_DIGEST).
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -356,7 +356,7 @@ TcgDxeHashAll (
 
       if (*HashedDataResult == NULL) {
         *HashedDataResult = AllocatePool ((UINTN) *HashedDataLen);
-      } 
+      }
 
       return TpmCommHashAll (
                HashData,
@@ -419,9 +419,9 @@ TpmCommLogEvent (
   Add a new entry to the Event Log.
 
   @param[in] TcgData       TCG_DXE_DATA structure.
-  @param[in] NewEventHdr   Pointer to a TCG_PCR_EVENT_HDR data structure.  
-  @param[in] NewEventData  Pointer to the new event data.  
-  
+  @param[in] NewEventHdr   Pointer to a TCG_PCR_EVENT_HDR data structure.
+  @param[in] NewEventData  Pointer to the new event data.
+
   @retval EFI_SUCCESS           The new event log entry was added.
   @retval EFI_OUT_OF_RESOURCES  No enough memory to log the new event.
 
@@ -459,18 +459,18 @@ TcgDxeLogEventI (
   This service abstracts the capability to add an entry to the Event Log.
 
   @param[in]      This           Indicates the calling context
-  @param[in]      TCGLogData     Pointer to the start of the data buffer containing 
-                                 the TCG_PCR_EVENT data structure. All fields in 
+  @param[in]      TCGLogData     Pointer to the start of the data buffer containing
+                                 the TCG_PCR_EVENT data structure. All fields in
                                  this structure are properly filled by the caller.
   @param[in, out] EventNumber    The event number of the event just logged
-  @param[in]      Flags          Indicate additional flags. Only one flag has been 
-                                 defined at this time, which is 0x01 and means the 
-                                 extend operation should not be performed. All 
-                                 other bits are reserved. 
- 
+  @param[in]      Flags          Indicate additional flags. Only one flag has been
+                                 defined at this time, which is 0x01 and means the
+                                 extend operation should not be performed. All
+                                 other bits are reserved.
+
   @retval EFI_SUCCESS            Operation completed successfully.
   @retval EFI_OUT_OF_RESOURCES   Insufficient memory in the event log to complete this action.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -488,7 +488,7 @@ TcgDxeLogEvent (
   }
 
   TcgData = TCG_DXE_DATA_FROM_THIS (This);
-  
+
   if (TcgData->BsCap.TPMDeactivatedFlag || (!TcgData->BsCap.TPMPresentFlag)) {
     return EFI_DEVICE_ERROR;
   }
@@ -512,7 +512,7 @@ TcgDxeLogEvent (
   @retval     EFI_INVALID_PARAMETER       Invalid ordinal.
   @retval     EFI_UNSUPPORTED             Current Task Priority Level  >= EFI_TPL_CALLBACK.
   @retval     EFI_TIMEOUT                 The TIS timed-out.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -524,8 +524,8 @@ TcgDxePassThroughToTpm (
   IN      UINT8                     *TpmOutputParameterBlock
   )
 {
-  if (TpmInputParameterBlock == NULL || 
-      TpmOutputParameterBlock == NULL || 
+  if (TpmInputParameterBlock == NULL ||
+      TpmOutputParameterBlock == NULL ||
       TpmInputParameterBlockSize == 0 ||
       TpmOutputParameterBlockSize == 0) {
     return EFI_INVALID_PARAMETER;
@@ -544,11 +544,11 @@ TcgDxePassThroughToTpm (
   and add an entry to the Event Log.
 
   @param[in]      TcgData       TCG_DXE_DATA structure.
-  @param[in]      HashData      Physical address of the start of the data buffer 
+  @param[in]      HashData      Physical address of the start of the data buffer
                                 to be hashed, extended, and logged.
   @param[in]      HashDataLen   The length, in bytes, of the buffer referenced by HashData
-  @param[in, out] NewEventHdr   Pointer to a TCG_PCR_EVENT_HDR data structure.  
-  @param[in]      NewEventData  Pointer to the new event data.  
+  @param[in, out] NewEventHdr   Pointer to a TCG_PCR_EVENT_HDR data structure.
+  @param[in]      NewEventData  Pointer to the new event data.
 
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_OUT_OF_RESOURCES  No enough memory to log the new event.
@@ -611,24 +611,24 @@ Done:
   extend a specific TPM PCR with the hash result, and add an entry to the Event Log
 
   @param[in]      This               Indicates the calling context
-  @param[in]      HashData           Physical address of the start of the data buffer 
+  @param[in]      HashData           Physical address of the start of the data buffer
                                      to be hashed, extended, and logged.
   @param[in]      HashDataLen        The length, in bytes, of the buffer referenced by HashData
   @param[in]      AlgorithmId        Identification of the Algorithm to use for the hashing operation
-  @param[in, out] TCGLogData         The physical address of the start of the data 
+  @param[in, out] TCGLogData         The physical address of the start of the data
                                      buffer containing the TCG_PCR_EVENT data structure.
   @param[in, out] EventNumber        The event number of the event just logged.
-  @param[out]     EventLogLastEntry  Physical address of the first byte of the entry 
-                                     just placed in the Event Log. If the Event Log was 
-                                     empty when this function was called then this physical 
-                                     address will be the same as the physical address of 
+  @param[out]     EventLogLastEntry  Physical address of the first byte of the entry
+                                     just placed in the Event Log. If the Event Log was
+                                     empty when this function was called then this physical
+                                     address will be the same as the physical address of
                                      the start of the Event Log.
 
   @retval EFI_SUCCESS                Operation completed successfully.
   @retval EFI_UNSUPPORTED            AlgorithmId != TPM_ALG_SHA.
   @retval EFI_UNSUPPORTED            Current TPL >= EFI_TPL_CALLBACK.
   @retval EFI_DEVICE_ERROR           The command was unsuccessful.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -650,15 +650,15 @@ TcgDxeHashLogExtendEvent (
   }
 
   TcgData = TCG_DXE_DATA_FROM_THIS (This);
-  
+
   if (TcgData->BsCap.TPMDeactivatedFlag || (!TcgData->BsCap.TPMPresentFlag)) {
     return EFI_DEVICE_ERROR;
   }
-    
+
   if (AlgorithmId != TPM_ALG_SHA) {
     return EFI_UNSUPPORTED;
   }
-  
+
   if (HashData == 0 && HashDataLen > 0) {
     return EFI_INVALID_PARAMETER;
   }
@@ -717,10 +717,10 @@ SetupEventLog (
   TCG_PCR_EVENT         *TcgEvent;
   EFI_PEI_HOB_POINTERS  GuidHob;
   EFI_PHYSICAL_ADDRESS  Lasa;
-  
+
   if (PcdGet8 (PcdTpmPlatformClass) == TCG_PLATFORM_TYPE_CLIENT) {
     Lasa = mTcgClientAcpiTemplate.Lasa;
-  
+
     Status = gBS->AllocatePages (
                     AllocateMaxAddress,
                     EfiACPIMemoryNVS,
@@ -732,15 +732,15 @@ SetupEventLog (
     }
     mTcgClientAcpiTemplate.Lasa = Lasa;
     //
-    // To initialize them as 0xFF is recommended 
+    // To initialize them as 0xFF is recommended
     // because the OS can know the last entry for that.
     //
     SetMem ((VOID *)(UINTN)mTcgClientAcpiTemplate.Lasa, PcdGet32 (PcdTcgLogAreaMinLen), 0xFF);
     mTcgClientAcpiTemplate.Laml = PcdGet32 (PcdTcgLogAreaMinLen);
-  
+
   } else {
     Lasa = mTcgServerAcpiTemplate.Lasa;
-  
+
     Status = gBS->AllocatePages (
                     AllocateMaxAddress,
                     EfiACPIMemoryNVS,
@@ -752,7 +752,7 @@ SetupEventLog (
     }
     mTcgServerAcpiTemplate.Lasa = Lasa;
     //
-    // To initialize them as 0xFF is recommended 
+    // To initialize them as 0xFF is recommended
     // because the OS can know the last entry for that.
     //
     SetMem ((VOID *)(UINTN)mTcgServerAcpiTemplate.Lasa, PcdGet32 (PcdTcgLogAreaMinLen), 0xFF);
@@ -760,7 +760,7 @@ SetupEventLog (
   }
 
   GuidHob.Raw = GetHobList ();
-  while (!EFI_ERROR (Status) && 
+  while (!EFI_ERROR (Status) &&
          (GuidHob.Raw = GetNextGuidHob (&gTcgEventEntryHobGuid, GuidHob.Raw)) != NULL) {
     TcgEvent    = GET_GUID_HOB_DATA (GuidHob.Guid);
     GuidHob.Raw = GET_NEXT_HOB (GuidHob);
@@ -777,8 +777,8 @@ SetupEventLog (
 /**
   Measure and log an action string, and extend the measurement result into PCR[5].
 
-  @param[in] String           A specific string that indicates an Action event.  
-  
+  @param[in] String           A specific string that indicates an Action event.
+
   @retval EFI_SUCCESS         Operation completed successfully.
   @retval EFI_DEVICE_ERROR    The operation was unsuccessful.
 
@@ -827,7 +827,7 @@ MeasureHandoffTables (
 
   if (PcdGet8 (PcdTpmPlatformClass) == TCG_PLATFORM_TYPE_SERVER) {
     //
-    // Tcg Server spec. 
+    // Tcg Server spec.
     // Measure each processor EFI_CPU_PHYSICAL_LOCATION with EV_TABLE_OF_DEVICES to PCR[1]
     //
     Status = GetProcessorsCpuLocation(&ProcessorLocBuf, &ProcessorNum);
@@ -859,7 +859,7 @@ MeasureHandoffTables (
 /**
   Measure and log Separator event, and extend the measurement result into a specific PCR.
 
-  @param[in] PCRIndex         PCR index.  
+  @param[in] PCRIndex         PCR index.
 
   @retval EFI_SUCCESS         Operation completed successfully.
   @retval EFI_DEVICE_ERROR    The operation was unsuccessful.
@@ -895,7 +895,7 @@ MeasureSeparatorEvent (
 
   @param[in]  VarName     A Null-terminated string that is the name of the vendor's variable.
   @param[in]  VendorGuid  A unique identifier for the vendor.
-  @param[out] VarSize     The size of the variable data.  
+  @param[out] VarSize     The size of the variable data.
 
   @return A pointer to the buffer to return the contents of the variable.Otherwise NULL.
 
@@ -944,13 +944,13 @@ ReadVariable (
 /**
   Measure and log an EFI variable, and extend the measurement result into a specific PCR.
 
-  @param[in]  PCRIndex          PCR Index.  
-  @param[in]  EventType         Event type.  
+  @param[in]  PCRIndex          PCR Index.
+  @param[in]  EventType         Event type.
   @param[in]  VarName           A Null-terminated string that is the name of the vendor's variable.
   @param[in]  VendorGuid        A unique identifier for the vendor.
-  @param[in]  VarData           The content of the variable data.  
-  @param[in]  VarSize           The size of the variable data.  
- 
+  @param[in]  VarData           The content of the variable data.
+  @param[in]  VarSize           The size of the variable data.
+
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_OUT_OF_RESOURCES  Out of memory.
   @retval EFI_DEVICE_ERROR      The operation was unsuccessful.
@@ -1013,9 +1013,9 @@ MeasureVariable (
 
   @param[in]   VarName          A Null-terminated string that is the name of the vendor's variable.
   @param[in]   VendorGuid       A unique identifier for the vendor.
-  @param[out]  VarSize          The size of the variable data.  
-  @param[out]  VarData          Pointer to the content of the variable.  
- 
+  @param[out]  VarSize          The size of the variable data.
+  @param[out]  VarData          Pointer to the content of the variable.
+
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_OUT_OF_RESOURCES  Out of memory.
   @retval EFI_DEVICE_ERROR      The operation was unsuccessful.
@@ -1197,9 +1197,9 @@ OnReadyToBoot (
 /**
   Install TCG ACPI Table when ACPI Table Protocol is available.
 
-  A system's firmware uses an ACPI table to identify the system's TCG capabilities 
-  to the Post-Boot environment. The information in this ACPI table is not guaranteed 
-  to be valid until the Host Platform transitions from pre-boot state to post-boot state.  
+  A system's firmware uses an ACPI table to identify the system's TCG capabilities
+  to the Post-Boot environment. The information in this ACPI table is not guaranteed
+  to be valid until the Host Platform transitions from pre-boot state to post-boot state.
 
   @param[in]  Event     Event whose notification function is being invoked
   @param[in]  Context   Pointer to the notification function's context
@@ -1230,7 +1230,7 @@ InstallAcpiTable (
     mTcgClientAcpiTemplate.Header.CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
     mTcgClientAcpiTemplate.Header.CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
     //
-    // The ACPI table must be checksumed before calling the InstallAcpiTable() 
+    // The ACPI table must be checksumed before calling the InstallAcpiTable()
     // service of the ACPI table protocol to install it.
     //
     Checksum = CalculateCheckSum8 ((UINT8 *)&mTcgClientAcpiTemplate, sizeof (mTcgClientAcpiTemplate));
@@ -1250,7 +1250,7 @@ InstallAcpiTable (
     mTcgServerAcpiTemplate.Header.CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
     mTcgServerAcpiTemplate.Header.CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
     //
-    // The ACPI table must be checksumed before calling the InstallAcpiTable() 
+    // The ACPI table must be checksumed before calling the InstallAcpiTable()
     // service of the ACPI table protocol to install it.
     //
     Checksum = CalculateCheckSum8 ((UINT8 *)&mTcgServerAcpiTemplate, sizeof (mTcgServerAcpiTemplate));
@@ -1341,7 +1341,7 @@ OnExitBootServicesFailed (
 /**
   Get TPM Deactivated state.
 
-  @param[out] TPMDeactivatedFlag   Returns TPM Deactivated state.  
+  @param[out] TPMDeactivatedFlag   Returns TPM Deactivated state.
 
   @retval EFI_SUCCESS              Operation completed successfully.
   @retval EFI_DEVICE_ERROR         The operation was unsuccessful.
@@ -1368,9 +1368,9 @@ GetTpmStatus (
 
   It publishes EFI TCG Protocol.
 
-  @param[in] ImageHandle  The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
   @param[in] SystemTable  A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS     The entry point is executed successfully.
   @retval other           Some error occurs when executing this entry point.
 
@@ -1444,7 +1444,7 @@ DriverEntry (
                     );
 
     //
-    // Measure Exit Boot Service failed 
+    // Measure Exit Boot Service failed
     //
     Status = gBS->CreateEventEx (
                     EVT_NOTIFY_SIGNAL,
@@ -1460,6 +1460,6 @@ DriverEntry (
   // Install ACPI Table
   //
   EfiCreateProtocolNotifyEvent (&gEfiAcpiTableProtocolGuid, TPL_CALLBACK, InstallAcpiTable, NULL, &Registration);
-  
+
   return Status;
 }

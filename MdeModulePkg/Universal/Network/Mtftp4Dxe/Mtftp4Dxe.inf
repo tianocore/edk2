@@ -4,7 +4,7 @@
 #  This module produces EFI MTFTPv4 Protocol upon EFI UDPv4 Protocol, to provide
 #  basic services for client-side unicast and/or multicase TFTP operations.
 #
-#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -30,7 +30,7 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gMtftp4DriverBinding                        
+#  DRIVER_BINDING                =  gMtftp4DriverBinding
 #  COMPONENT_NAME                =  gMtftp4ComponentName
 #  COMPONENT_NAME2               =  gMtftp4ComponentName2
 #

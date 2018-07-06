@@ -1,7 +1,7 @@
 /** @file
   Functions to deal with Disk buffer.
 
-  Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -39,7 +39,7 @@ HEFI_EDITOR_DISK_IMAGE            HDiskImageConst = {
 
 /**
   Initialization function for HDiskImage.
- 
+
   @retval EFI_SUCCESS     The operation was successful.
   @retval EFI_LOAD_ERROR  A load error occured.
 **/
@@ -59,7 +59,7 @@ HDiskImageInit (
 }
 
 /**
-  Backup function for HDiskImage. Only a few fields need to be backup.   
+  Backup function for HDiskImage. Only a few fields need to be backup.
   This is for making the Disk buffer refresh as few as possible.
 
   @retval EFI_SUCCESS           The operation was successful.
@@ -120,26 +120,22 @@ HDiskImageSetDiskNameOffsetSize (
   IN UINTN    Size
   )
 {
-  UINTN Len;
-  UINTN Index;
+  if (Str == HDiskImage.Name) {
+    //
+    // This function might be called using HDiskImage.FileName as Str.
+    // Directly return without updating HDiskImage.FileName.
+    //
+    return EFI_SUCCESS;
+  }
 
   //
   // free the old file name
   //
   SHELL_FREE_NON_NULL (HDiskImage.Name);
-
-  Len             = StrLen (Str);
-
-  HDiskImage.Name = AllocateZeroPool (2 * (Len + 1));
+  HDiskImage.Name = AllocateCopyPool (StrSize (Str), Str);
   if (HDiskImage.Name == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-
-  for (Index = 0; Index < Len; Index++) {
-    HDiskImage.Name[Index] = Str[Index];
-  }
-
-  HDiskImage.Name[Len]  = L'\0';
 
   HDiskImage.Offset     = Offset;
   HDiskImage.Size       = Size;
@@ -158,7 +154,7 @@ HDiskImageSetDiskNameOffsetSize (
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_LOAD_ERROR        A load error occured.
-  @retval EFI_INVALID_PARAMETER A parameter was invalid.  
+  @retval EFI_INVALID_PARAMETER A parameter was invalid.
 **/
 EFI_STATUS
 HDiskImageRead (
@@ -330,7 +326,7 @@ HDiskImageRead (
   @retval EFI_SUCCESS           The operation was successful.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
   @retval EFI_LOAD_ERROR        A load error occured.
-  @retval EFI_INVALID_PARAMETER A parameter was invalid.  
+  @retval EFI_INVALID_PARAMETER A parameter was invalid.
 **/
 EFI_STATUS
 HDiskImageSave (

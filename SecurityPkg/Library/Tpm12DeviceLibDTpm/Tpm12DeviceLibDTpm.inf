@@ -1,11 +1,11 @@
 ## @file
 #  Provides TPM 1.2 TIS functions
-#  
-#  This library implements TIS (TPM Interface Specification) functions which is 
-#  used for every TPM 1.2 command. Choosing this library means platform uses and 
+#
+#  This library implements TIS (TPM Interface Specification) functions which is
+#  used for every TPM 1.2 command. Choosing this library means platform uses and
 #  only uses TPM 1.2 device.
 #
-# Copyright (c) 2013 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -27,7 +27,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]

@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os
 import EdkLogger
 import DataType
@@ -45,7 +46,7 @@ class TargetTxtClassObject(object):
             DataType.TAB_TAT_DEFINES_BUILD_RULE_CONF                            : '',
         }
         self.ConfDirectoryPath = ""
-        if Filename != None:
+        if Filename is not None:
             self.LoadTargetTxtFile(Filename)
 
     ## LoadTargetTxtFile
@@ -83,7 +84,7 @@ class TargetTxtClassObject(object):
             self.ConfDirectoryPath = os.path.dirname(FileName)
         except:
             EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=FileName)
-            if F != None:
+            if F is not None:
                 F.close()
 
         for Line in F:
@@ -137,33 +138,6 @@ class TargetTxtClassObject(object):
         F.close()
         return 0
 
-    ## Print the dictionary
-    #
-    # Print all items of dictionary one by one
-    #
-    # @param Dict:  The dictionary to be printed
-    #
-    def printDict(Dict):
-        if Dict != None:
-            KeyList = Dict.keys()
-            for Key in KeyList:
-                if Dict[Key] != '':
-                    print Key + ' = ' + str(Dict[Key])
-
-    ## Print the dictionary
-    #
-    # Print the items of dictionary which matched with input key
-    #
-    # @param list:  The dictionary to be printed
-    # @param key:   The key of the item to be printed
-    #
-    def printList(Key, List):
-        if type(List) == type([]):
-            if len(List) > 0:
-                if Key.find(TAB_SPLIT) != -1:
-                    print "\n" + Key
-                    for Item in List:
-                        print Item
 ## TargetTxtDict
 #
 # Load target.txt in input Conf dir
@@ -185,6 +159,6 @@ def TargetTxtDict(ConfDir):
 if __name__ == '__main__':
     pass
     Target = TargetTxtDict(os.getenv("WORKSPACE"))
-    print Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER]
-    print Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TARGET]
-    print Target.TargetTxtDictionary
+    print(Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER])
+    print(Target.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TARGET])
+    print(Target.TargetTxtDictionary)

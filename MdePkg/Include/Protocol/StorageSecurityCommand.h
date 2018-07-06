@@ -5,7 +5,7 @@
   storage devices without specific knowledge of the type of device or controller
   that manages the device.
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -149,7 +149,7 @@ EFI_STATUS
                                        of the security protocol command. A Timeout value of 0
                                        means that this function will wait indefinitely for the
                                        security protocol command to execute. If Timeout is greater
-                                       than zero, then this function will return EFI_TIMEOUT if the 
+                                       than zero, then this function will return EFI_TIMEOUT if the
                                        time required to execute the receive data command is greater than Timeout.
   @param  SecurityProtocolId           The value of the "Security Protocol" parameter of
                                        the security protocol command to be sent.

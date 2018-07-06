@@ -1,18 +1,18 @@
 /** @file
   Definition of Extended SAL Boot Service Protocol
 
-  The Extended SAL Boot Service Protocol provides a mechanisms for platform specific 
+  The Extended SAL Boot Service Protocol provides a mechanisms for platform specific
   drivers to update the SAL System Table and register Extended SAL Procedures that are
   callable in physical or virtual mode using the SAL calling convention.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -36,7 +36,7 @@ typedef struct _EXTENDED_SAL_BOOT_SERVICE_PROTOCOL EXTENDED_SAL_BOOT_SERVICE_PRO
                                 the major revision and the lower byte contains the minor revision.
   @param  OemId                 A pointer to a Null-terminated ASCII string that contains OEM unique string.
                                 The string cannot be longer than 32 bytes in total length
-  @param  ProductId             A pointer to a Null-terminated ASCII string that uniquely identifies a family of 
+  @param  ProductId             A pointer to a Null-terminated ASCII string that uniquely identifies a family of
                                 compatible products. The string cannot be longer than 32 bytes in total length.
 
   @retval EFI_SUCCESS           The SAL System Table header was updated successfully.
@@ -63,7 +63,7 @@ EFI_STATUS
   to the SAL System Table.
 
   @param  This         A pointer to the EXTENDED_SAL_BOOT_SERVICE_PROTOCOL instance.
-  @param  TableEntry   Pointer to a buffer containing a SAL System Table entry that is EntrySize bytes 
+  @param  TableEntry   Pointer to a buffer containing a SAL System Table entry that is EntrySize bytes
                        in length. The first byte of the TableEntry describes the type of entry.
   @param  EntrySize    The size, in bytes, of TableEntry.
 
@@ -97,7 +97,7 @@ EFI_STATUS
   @param  Arg8               Eighth argument to the Extended SAL procedure.
   @param  VirtualMode        TRUE if the Extended SAL Procedure is being invoked in virtual mode.
                              FALSE if the Extended SAL Procedure is being invoked in physical mode.
-  @param  ModuleGlobal       A pointer to the global context associated with this Extended SAL Procedure. 
+  @param  ModuleGlobal       A pointer to the global context associated with this Extended SAL Procedure.
 
   @return The result returned from the specified Extended SAL Procedure
 
@@ -115,7 +115,7 @@ SAL_RETURN_REGS
   IN  UINT64   Arg8,
   IN  BOOLEAN  VirtualMode,
   IN  VOID     *ModuleGlobal  OPTIONAL
-  ); 
+  );
 
 /**
   Registers an Extended SAL Procedure.
@@ -124,16 +124,16 @@ SAL_RETURN_REGS
   ClassGuidHi, and FunctionId is added to the set of available Extended SAL Procedures.
 
   @param  This                   A pointer to the EXTENDED_SAL_BOOT_SERVICE_PROTOCOL instance.
-  @param  ClassGuidLo            The lower 64-bits of  the class GUID for the Extended SAL Procedure being added.  
+  @param  ClassGuidLo            The lower 64-bits of  the class GUID for the Extended SAL Procedure being added.
                                  Each class GUID contains one or more functions specified by a Function ID.
-  @param  ClassGuidHi            The upper 64-bits of  the class GUID for the Extended SAL Procedure being added.  
+  @param  ClassGuidHi            The upper 64-bits of  the class GUID for the Extended SAL Procedure being added.
                                  Each class GUID contains one or more functions specified by a Function ID.
-  @param  FunctionId             The Function ID for the Extended SAL Procedure that is being added.  This Function 
-                                 ID is a member of the Extended SAL Procedure class specified by ClassGuidLo 
+  @param  FunctionId             The Function ID for the Extended SAL Procedure that is being added.  This Function
+                                 ID is a member of the Extended SAL Procedure class specified by ClassGuidLo
                                  and ClassGuidHi.
   @param  InternalSalProc        A pointer to the Extended SAL Procedure being added.
   @param  PhysicalModuleGlobal   Pointer to a  module global structure. This is a physical mode pointer.
-                                 This pointer is passed to the Extended SAL Procedure specified by ClassGuidLo, 
+                                 This pointer is passed to the Extended SAL Procedure specified by ClassGuidLo,
                                  ClassGuidHi, FunctionId, and InternalSalProc.  If the system is in physical mode,
                                  then this pointer is passed unmodified to InternalSalProc.  If the system is in
                                  virtual mode, then the virtual address associated with this pointer is passed to
@@ -157,9 +157,9 @@ EFI_STATUS
 /**
   Calls a previously registered Extended SAL Procedure.
 
-  This function calls the Extended SAL Procedure specified by ClassGuidLo, ClassGuidHi, 
-  and FunctionId.  The set of previously registered Extended SAL Procedures is searched for a 
-  matching ClassGuidLo, ClassGuidHi, and FunctionId.  If a match is not found, then 
+  This function calls the Extended SAL Procedure specified by ClassGuidLo, ClassGuidHi,
+  and FunctionId.  The set of previously registered Extended SAL Procedures is searched for a
+  matching ClassGuidLo, ClassGuidHi, and FunctionId.  If a match is not found, then
   EFI_SAL_NOT_IMPLEMENTED is returned.
 
   @param  ClassGuidLo        The lower 64-bits of the class GUID for the Extended SAL Procedure
@@ -175,9 +175,9 @@ EFI_STATUS
   @param  Arg7               Seventh argument to the Extended SAL procedure.
   @param  Arg8               Eighth argument to the Extended SAL procedure.
 
-  @retval EFI_SAL_NOT_IMPLEMENTED        The Extended SAL Procedure specified by ClassGuidLo, 
+  @retval EFI_SAL_NOT_IMPLEMENTED        The Extended SAL Procedure specified by ClassGuidLo,
                                          ClassGuidHi, and FunctionId has not been registered.
-  @retval EFI_SAL_VIRTUAL_ADDRESS_ERROR  This function was called in virtual mode before virtual mappings 
+  @retval EFI_SAL_VIRTUAL_ADDRESS_ERROR  This function was called in virtual mode before virtual mappings
                                          for the specified Extended SAL Procedure are available.
   @retval Other                          The result returned from the specified Extended SAL Procedure
 
@@ -198,14 +198,14 @@ SAL_RETURN_REGS
   );
 
 ///
-/// The EXTENDED_SAL_BOOT_SERVICE_PROTOCOL provides a mechanisms for platform specific 
+/// The EXTENDED_SAL_BOOT_SERVICE_PROTOCOL provides a mechanisms for platform specific
 /// drivers to update the SAL System Table and register Extended SAL Procedures that are
 /// callable in physical or virtual mode using the SAL calling convention.
 ///
 struct _EXTENDED_SAL_BOOT_SERVICE_PROTOCOL {
   EXTENDED_SAL_ADD_SST_INFO            AddSalSystemTableInfo;
   EXTENDED_SAL_ADD_SST_ENTRY           AddSalSystemTableEntry;
-  EXTENDED_SAL_REGISTER_INTERNAL_PROC  RegisterExtendedSalProc;   
+  EXTENDED_SAL_REGISTER_INTERNAL_PROC  RegisterExtendedSalProc;
   EXTENDED_SAL_PROC                    ExtendedSalProc;
 };
 

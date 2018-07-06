@@ -1,7 +1,7 @@
 /** @file
   The IScsi's EFI_EXT_SCSI_PASS_THRU_PROTOCOL driver.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -15,9 +15,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "IScsiImpl.h"
 
 /**
-  Sends a SCSI Request Packet to a SCSI device that is attached to the SCSI channel. This function   
+  Sends a SCSI Request Packet to a SCSI device that is attached to the SCSI channel. This function
   supports both blocking I/O and nonblocking I/O. The blocking I/O functionality is required, and the
-  nonblocking I/O functionality is optional.                                                             
+  nonblocking I/O functionality is optional.
 
   @param[in]      This    A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
   @param[in]      Target  The Target is an array of size TARGET_MAX_BYTES and it represents
@@ -42,18 +42,18 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   @retval EFI_BAD_BUFFER_SIZE   The SCSI Request Packet was not executed. The number of bytes that
                                 could be transferred is returned in InTransferLength. For write
                                 and bi-directional commands, OutTransferLength bytes were
-                                transferred by OutDataBuffer. Currently not implemeted.                                
+                                transferred by OutDataBuffer. Currently not implemeted.
   @retval EFI_NOT_READY         The SCSI Request Packet could not be sent because there are too many
-                                SCSI Request Packets already queued. The caller may retry again later.                             
+                                SCSI Request Packets already queued. The caller may retry again later.
   @retval EFI_DEVICE_ERROR      A device error occurred while attempting to send the SCSI Request
-                                Packet. 
+                                Packet.
   @retval EFI_INVALID_PARAMETER Target, Lun, or the contents of ScsiRequestPacket are invalid.
   @retval EFI_UNSUPPORTED       The command described by the SCSI Request Packet is not supported
                                 by the host adapter. This includes the case of Bi-directional SCSI
                                 commands not supported by the implementation. The SCSI Request
                                 Packet was not sent, so no additional status information is available.
                                 Currently not implemeted.
-  @retval EFI_TIMEOUT           A timeout occurred while waiting for the SCSI Request Packet to execute.                              
+  @retval EFI_TIMEOUT           A timeout occurred while waiting for the SCSI Request Packet to execute.
 **/
 EFI_STATUS
 EFIAPI
@@ -67,7 +67,7 @@ IScsiExtScsiPassThruFunction (
 {
   ISCSI_DRIVER_DATA           *Private;
   ISCSI_SESSION_CONFIG_NVDATA *ConfigNvData;
-  EFI_STATUS                  Status; 
+  EFI_STATUS                  Status;
 
   Private       = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (This);
   ConfigNvData  = &Private->Session.ConfigData.NvData;
@@ -96,11 +96,11 @@ IScsiExtScsiPassThruFunction (
 }
 
 /**
-  Used to retrieve the list of legal Target IDs and LUNs for SCSI devices on a SCSI channel. These       
+  Used to retrieve the list of legal Target IDs and LUNs for SCSI devices on a SCSI channel. These
   can either be the list SCSI devices that are actually present on the SCSI channel, or the list of legal
-  Target Ids and LUNs for the SCSI channel. Regardless, the caller of this function must probe the       
-  Target ID and LUN returned to see if a SCSI device is actually present at that location on the SCSI    
-  channel.                                                                                               
+  Target Ids and LUNs for the SCSI channel. Regardless, the caller of this function must probe the
+  Target ID and LUN returned to see if a SCSI device is actually present at that location on the SCSI
+  channel.
 
   @param[in]       This    A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
   @param[in, out]  Target  On input, a pointer to the Target ID (an array of size
@@ -310,7 +310,7 @@ IScsiExtScsiPassThruGetTargetLun (
 /**
   Resets a SCSI channel. This operation resets all the SCSI devices connected to the SCSI channel.
   Currently not implemented.
-  
+
   @param[in]  This A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
 
   @retval EFI_SUCCESS      The SCSI channel was reset.
@@ -358,10 +358,10 @@ IScsiExtScsiPassThruResetTargetLun (
 }
 
 /**
-  Used to retrieve the list of legal Target IDs for SCSI devices on a SCSI channel. These can either     
+  Used to retrieve the list of legal Target IDs for SCSI devices on a SCSI channel. These can either
   be the list SCSI devices that are actually present on the SCSI channel, or the list of legal Target IDs
-  for the SCSI channel. Regardless, the caller of this function must probe the Target ID returned to     
-  see if a SCSI device is actually present at that location on the SCSI channel.                         
+  for the SCSI channel. Regardless, the caller of this function must probe the Target ID returned to
+  see if a SCSI device is actually present at that location on the SCSI channel.
 
   @param[in]       This    A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
   @param[in, out]  Target  (TARGET_MAX_BYTES) of a SCSI device present on the SCSI channel.

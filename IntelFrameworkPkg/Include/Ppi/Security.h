@@ -1,17 +1,17 @@
 /** @file
   This file declares the Security Architectural PPI.
-  
+
   This PPI is installed by a platform PEIM that abstracts the security policy to the PEI
   Foundation, namely the case of a PEIM's authentication state being returned during the PEI section
   extraction process.
-  
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -35,12 +35,12 @@ typedef struct _EFI_PEI_SECURITY_PPI  EFI_PEI_SECURITY_PPI;
   to varying file authentication states.
 
   @param  PeiServices             The pointer to the PEI Services Table.
-  @param  This                    Interface pointer that implements the particular 
+  @param  This                    Interface pointer that implements the particular
                                   EFI_PEI_SECURITY_PPI instance.
-  @param  AuthenticationStatus    Status returned by the verification service as 
+  @param  AuthenticationStatus    Status returned by the verification service as
                                   part of section extraction.
   @param  FfsFileHeader           The pointer to the file under review.
-  @param  DeferExecution          The pointer to a variable that alerts the PEI 
+  @param  DeferExecution          The pointer to a variable that alerts the PEI
                                   Foundation to defer execution of a PEIM.
 
   @retval EFI_SUCCESS             The service performed its action successfully.

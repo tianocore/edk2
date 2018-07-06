@@ -1,7 +1,7 @@
 /** @file
   The general interfaces of the IKEv2.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -498,7 +498,7 @@ Ikev2HandleSa (
     if (ChildSaSession == NULL) {
       goto ON_ERROR;
     }
-    
+
     ChildSaCommon  = &ChildSaSession->SessionCommon;
   }
 
@@ -526,7 +526,7 @@ Ikev2HandleSa (
     if (ChildSaSession == NULL) {
       goto ON_ERROR;
     }
-    
+
     ChildSaCommon  = &ChildSaSession->SessionCommon;
 
     //

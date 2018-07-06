@@ -70,7 +70,7 @@
   PrintLib
   BaseCryptLib
 #  TcgPhysicalPresenceLib
-  TrEEPhysicalPresenceLib  
+  Tcg2PhysicalPresenceLib  
   FileHandleLib
   S3BootScriptLib
   SerialPortLib

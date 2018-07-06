@@ -1,7 +1,7 @@
 /** @file
   Functions to deal with Mem buffer
-  
-  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved. <BR>
+
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -67,7 +67,7 @@ HMemImageInit (
 }
 
 /**
-  Backup function for HDiskImage. Only a few fields need to be backup. 
+  Backup function for HDiskImage. Only a few fields need to be backup.
   This is for making the Disk buffer refresh as few as possible.
 
   @retval EFI_SUCCESS       The operation was successful.

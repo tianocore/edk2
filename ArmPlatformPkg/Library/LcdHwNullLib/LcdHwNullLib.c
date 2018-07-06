@@ -19,7 +19,7 @@
 
 /**
   Check for presence of display
-  
+
   @retval EFI_SUCCESS            Platform implements display.
   @retval EFI_NOT_FOUND          Display not found on the platform.
 

@@ -5,7 +5,7 @@
   Availible on http://www.t13.org/#Project drafts
   Currently at ftp://fission.dt.wdc.com/pub/standards/x3t13/project/d1386r4.pdf
 
-Copyright (c) 1999 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -156,14 +156,14 @@ BiosBlockIoDriverBindingSupported (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   gBS->CloseProtocol (
         Controller,
         &gEfiDevicePathProtocolGuid,
         This->DriverBindingHandle,
         Controller
-        );      
-  
+        );
+
   //
   // Open the IO Abstraction(s) needed to perform the supported test
   //
@@ -243,8 +243,8 @@ BiosBlockIoDriverBindingStart (
   //
   PciIo      = NULL;
   PciDevPath = NULL;
-  
-  DeviceEnable = FALSE; 
+
+  DeviceEnable = FALSE;
 
   //
   // See if the Legacy BIOS Protocol is available
@@ -292,9 +292,9 @@ BiosBlockIoDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto Error;
   }
-  
+
   DeviceEnable = TRUE;
-  
+
   //
   // Check to see if there is a legacy option ROM image associated with this PCI device
   //
@@ -635,9 +635,9 @@ SetBiosInitBlockIoDevicePath (
 {
   EFI_STATUS                  Status;
   BLOCKIO_VENDOR_DEVICE_PATH  VendorNode;
-  
+
   Status = EFI_UNSUPPORTED;
-  
+
   //
   // BugBug: Check for memory leaks!
   //
@@ -647,7 +647,7 @@ SetBiosInitBlockIoDevicePath (
     //
     Status = BuildEdd30DevicePath (BaseDevicePath, Drive, DevicePath);
   }
-  
+
   if (EFI_ERROR (Status)) {
     //
     // EDD 1.1 device case or it is unrecognized EDD 3.0 device
@@ -767,14 +767,14 @@ BuildEdd30DevicePath (
         Drive->Number,
         Drive->Parameters.InterfaceType
         )
-        );      
+        );
     }
   }
 
   if (Node.DevPath.Type == 0) {
     return EFI_UNSUPPORTED;
   }
-  
+
   *DevicePath = AppendDevicePathNode (BaseDevicePath, &Node.DevPath);
   return EFI_SUCCESS;
 }

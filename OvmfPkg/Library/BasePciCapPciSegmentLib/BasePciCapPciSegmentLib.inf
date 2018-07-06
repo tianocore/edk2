@@ -1,0 +1,35 @@
+## @file
+# Plug a PciSegmentLib backend into PciCapLib, for config space access.
+#
+# Copyright (C) 2018, Red Hat, Inc.
+#
+# This program and the accompanying materials are licensed and made available
+# under the terms and conditions of the BSD License which accompanies this
+# distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, WITHOUT
+# WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+##
+
+[Defines]
+  INF_VERSION    = 1.27
+  BASE_NAME      = BasePciCapPciSegmentLib
+  FILE_GUID      = ED011855-AA31-43B9-ACC0-BF45A05C5985
+  MODULE_TYPE    = BASE
+  VERSION_STRING = 1.0
+  LIBRARY_CLASS  = PciCapPciSegmentLib
+
+[Sources]
+  BasePciCapPciSegmentLib.h
+  BasePciCapPciSegmentLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  PciSegmentLib

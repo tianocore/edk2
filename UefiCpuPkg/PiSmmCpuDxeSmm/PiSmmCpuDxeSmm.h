@@ -295,23 +295,14 @@ WriteSaveStateRegister (
   IN CONST VOID                   *Buffer
   );
 
-//
-//
-//
-typedef struct {
-  UINT32                            Offset;
-  UINT16                            Segment;
-  UINT16                            Reserved;
-} IA32_FAR_ADDRESS;
-
-extern IA32_FAR_ADDRESS             gSmmJmpAddr;
-
 extern CONST UINT8                  gcSmmInitTemplate[];
 extern CONST UINT16                 gcSmmInitSize;
-extern UINT32                       gSmmCr0;
-extern UINT32                       gSmmCr3;
-extern UINT32                       gSmmCr4;
-extern UINTN                        gSmmInitStack;
+X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr0;
+extern UINT32                       mSmmCr0;
+X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr3;
+extern UINT32                       mSmmCr4;
+X86_ASSEMBLY_PATCH_LABEL            gPatchSmmCr4;
+X86_ASSEMBLY_PATCH_LABEL            gPatchSmmInitStack;
 
 /**
   Semaphore operation for all processor relocate SMMBase.
@@ -1079,7 +1070,7 @@ TransferApToSafeState (
   @retval EFI_UNSUPPORTED       The processor does not support one or more
                                 bytes of the memory resource range specified
                                 by BaseAddress and Length.
-                                The bit mask of attributes is not support for
+                                The bit mask of attributes is not supported for
                                 the memory resource range specified by
                                 BaseAddress and Length.
 
@@ -1101,17 +1092,17 @@ EdkiiSmmSetMemoryAttributes (
   @param  BaseAddress       The physical address that is the start address of
                             a memory region.
   @param  Length            The size in bytes of the memory region.
-  @param  Attributes        The bit mask of attributes to set for the memory
+  @param  Attributes        The bit mask of attributes to clear for the memory
                             region.
 
-  @retval EFI_SUCCESS           The attributes were set for the memory region.
+  @retval EFI_SUCCESS           The attributes were cleared for the memory region.
   @retval EFI_INVALID_PARAMETER Length is zero.
                                 Attributes specified an illegal combination of
-                                attributes that cannot be set together.
+                                attributes that cannot be cleared together.
   @retval EFI_UNSUPPORTED       The processor does not support one or more
                                 bytes of the memory resource range specified
                                 by BaseAddress and Length.
-                                The bit mask of attributes is not support for
+                                The bit mask of attributes is not supported for
                                 the memory resource range specified by
                                 BaseAddress and Length.
 
@@ -1126,7 +1117,7 @@ EdkiiSmmClearMemoryAttributes (
   );
 
 /**
-  This function retrieve the attributes of the memory region specified by
+  This function retrieves the attributes of the memory region specified by
   BaseAddress and Length. If different attributes are got from different part
   of the memory region, EFI_NO_MAPPING will be returned.
 
@@ -1144,9 +1135,6 @@ EdkiiSmmClearMemoryAttributes (
   @retval EFI_UNSUPPORTED       The processor does not support one or more
                                 bytes of the memory resource range specified
                                 by BaseAddress and Length.
-                                The bit mask of attributes is not support for
-                                the memory resource range specified by
-                                BaseAddress and Length.
 
 **/
 EFI_STATUS

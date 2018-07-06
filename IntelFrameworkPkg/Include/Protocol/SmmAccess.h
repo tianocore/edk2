@@ -1,18 +1,18 @@
 /** @file
-  This file declares the SMM SMRAM Access abstraction protocol, which is used to control 
+  This file declares the SMM SMRAM Access abstraction protocol, which is used to control
   the visibility of the SMRAM on the platform. The expectation is
-  that the north bridge or memory controller would publish this protocol. 
-  For example, the Memory Controller Hub (MCH) has the hardware provision for this 
-  type of control. Because of the protected, distinguished class of memory for IA-32 
+  that the north bridge or memory controller would publish this protocol.
+  For example, the Memory Controller Hub (MCH) has the hardware provision for this
+  type of control. Because of the protected, distinguished class of memory for IA-32
   systems, the expectation is that this protocol would be supported only on IA-32 systems.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:

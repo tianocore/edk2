@@ -12,7 +12,7 @@
   may not be modified without authorization. If platform fails to protect these resources,
   the authentication service provided in this driver will be broken, and the behavior is undefined.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -142,7 +142,7 @@ VerifyTimeBasedPayloadAndUpdate (
 
 /**
   Delete matching signer's certificates when deleting common authenticated
-  variable by corresponding VariableName and VendorGuid from "certdb" or 
+  variable by corresponding VariableName and VendorGuid from "certdb" or
   "certdbv" according to authenticated variable attributes.
 
   @param[in]  VariableName   Name of authenticated Variable.
@@ -166,9 +166,9 @@ DeleteCertsFromDb (
   Clean up signer's certificates for common authenticated variable
   by corresponding VariableName and VendorGuid from "certdb".
   Sytem may break down during Timebased Variable update & certdb update,
-  make them inconsistent,  this function is called in AuthVariable Init to ensure 
+  make them inconsistent,  this function is called in AuthVariable Init to ensure
   consistency
-  
+
   @retval  EFI_NOT_FOUND         Fail to find matching certs.
   @retval  EFI_SUCCESS           Find matching certs and output parameters.
 

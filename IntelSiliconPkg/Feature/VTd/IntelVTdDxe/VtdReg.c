@@ -481,7 +481,7 @@ DumpVtdRegs (
       SourceId.Uint16 = (UINT16)FrcdReg.Bits.SID;
       DEBUG((DEBUG_INFO, "    Source - B%02x D%02x F%02x\n", SourceId.Bits.Bus, SourceId.Bits.Device, SourceId.Bits.Function));
       DEBUG((DEBUG_INFO, "    Type - %x (%a)\n", FrcdReg.Bits.T, FrcdReg.Bits.T ? "read" : "write"));
-      DEBUG((DEBUG_INFO, "    Reason - %x\n", FrcdReg.Bits.FR));
+      DEBUG((DEBUG_INFO, "    Reason - %x (Refer to VTd Spec, Appendix A)\n", FrcdReg.Bits.FR));
     }
   }
 
@@ -554,11 +554,13 @@ DumpVtdIfError (
       for (Index = 0; Index < (UINTN)CapReg.Bits.NFR + 1; Index++) {
         FrcdReg.Uint64[1] = MmioRead64 (mVtdUnitInformation[Num].VtdUnitBaseAddress + ((CapReg.Bits.FRO * 16) + (Index * 16) + R_FRCD_REG + sizeof(UINT64)));
         if (FrcdReg.Bits.F != 0) {
-          FrcdReg.Bits.F = 0;
+          //
+          // Software writes the value read from this field (F) to Clear it.
+          //
           MmioWrite64 (mVtdUnitInformation[Num].VtdUnitBaseAddress + ((CapReg.Bits.FRO * 16) + (Index * 16) + R_FRCD_REG + sizeof(UINT64)), FrcdReg.Uint64[1]);
         }
-        MmioWrite32 (mVtdUnitInformation[Num].VtdUnitBaseAddress + R_FSTS_REG, MmioRead32 (mVtdUnitInformation[Num].VtdUnitBaseAddress + R_FSTS_REG));
       }
+      MmioWrite32 (mVtdUnitInformation[Num].VtdUnitBaseAddress + R_FSTS_REG, MmioRead32 (mVtdUnitInformation[Num].VtdUnitBaseAddress + R_FSTS_REG));
     }
   }
 }

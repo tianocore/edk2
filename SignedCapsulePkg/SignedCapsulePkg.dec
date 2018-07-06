@@ -52,6 +52,10 @@
   # @Prompt GUID of the FFS which contains the Pkcs7TestPublicKeyFile.
   gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiPkcs7TestPublicKeyFileGuid|{0xba, 0xf5, 0x93, 0xf0, 0x37, 0x6f, 0x16, 0x48, 0x9e, 0x52, 0x91, 0xbe, 0xa0, 0xf7, 0xe0, 0xb8}|VOID*|0xA0010002
 
+  ## This is the lowest supported version number that can be upgraded to, as exposed via the System Firmware descriptor.
+  # @Prompt Lowest support version number that can be upgraded to via capsule update
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdLowestSupportedFirmwareVersion|0x1|UINT32|0xA0010003
+
 [PcdsDynamicEx]
   ## This dynamic PCD holds the EDKII system firmware image descriptor.
   #  This information can be used for version check in EDKII system FMP capsule.

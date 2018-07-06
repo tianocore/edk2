@@ -19,6 +19,7 @@
 '''
 Pkcs7Sign
 '''
+from __future__ import print_function
 
 import os
 import sys
@@ -87,7 +88,7 @@ if __name__ == '__main__':
   parser.add_argument("--signature-size", dest='SignatureSizeStr', type=str, help="specify the signature size for decode process.")
   parser.add_argument("-v", "--verbose", dest='Verbose', action="store_true", help="increase output messages")
   parser.add_argument("-q", "--quiet", dest='Quiet', action="store_true", help="reduce output messages")
-  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0,10), default=0, help="set debug level")
+  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0, 10), default=0, help="set debug level")
   parser.add_argument(metavar="input_file", dest='InputFile', type=argparse.FileType('rb'), help="specify the input filename")
 
   #
@@ -113,14 +114,14 @@ if __name__ == '__main__':
   try:
     Process = subprocess.Popen('%s version' % (OpenSslCommand), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
   except:
-    print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
+    print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(1)
 
   Version = Process.communicate()
-  if Process.returncode <> 0:
-    print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
+  if Process.returncode != 0:
+    print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
-  print Version[0]
+  print(Version[0])
 
   #
   # Read input file into a buffer and save input filename
@@ -134,7 +135,7 @@ if __name__ == '__main__':
   #
   OutputDir = os.path.dirname(args.OutputFile)
   if not os.path.exists(OutputDir):
-    print 'ERROR: The output path does not exist: %s' % OutputDir
+    print('ERROR: The output path does not exist: %s' % OutputDir)
     sys.exit(1)
   args.OutputFileName = args.OutputFile
 
@@ -170,7 +171,7 @@ if __name__ == '__main__':
         args.SignerPrivateCertFile = open(args.SignerPrivateCertFileName, 'rb')
         args.SignerPrivateCertFile.close()
       except:
-        print 'ERROR: test signer private cert file %s missing' % (args.SignerPrivateCertFileName)
+        print('ERROR: test signer private cert file %s missing' % (args.SignerPrivateCertFileName))
         sys.exit(1)
 
     #
@@ -196,7 +197,7 @@ if __name__ == '__main__':
         args.OtherPublicCertFile = open(args.OtherPublicCertFileName, 'rb')
         args.OtherPublicCertFile.close()
       except:
-        print 'ERROR: test other public cert file %s missing' % (args.OtherPublicCertFileName)
+        print('ERROR: test other public cert file %s missing' % (args.OtherPublicCertFileName))
         sys.exit(1)
 
     format = "%dsQ" % len(args.InputFileBuffer)
@@ -207,7 +208,7 @@ if __name__ == '__main__':
     #
     Process = subprocess.Popen('%s smime -sign -binary -signer "%s" -outform DER -md sha256 -certfile "%s"' % (OpenSslCommand, args.SignerPrivateCertFileName, args.OtherPublicCertFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Signature = Process.communicate(input=FullInputFileBuffer)[0]
-    if Process.returncode <> 0:
+    if Process.returncode != 0:
       sys.exit(Process.returncode)
 
     #
@@ -242,11 +243,11 @@ if __name__ == '__main__':
         args.TrustedPublicCertFile = open(args.TrustedPublicCertFileName, 'rb')
         args.TrustedPublicCertFile.close()
       except:
-        print 'ERROR: test trusted public cert file %s missing' % (args.TrustedPublicCertFileName)
+        print('ERROR: test trusted public cert file %s missing' % (args.TrustedPublicCertFileName))
         sys.exit(1)
 
     if not args.SignatureSizeStr:
-      print "ERROR: please use the option --signature-size to specify the size of the signature data!"
+      print("ERROR: please use the option --signature-size to specify the size of the signature data!")
       sys.exit(1)
     else:
       if args.SignatureSizeStr.upper().startswith('0X'):
@@ -254,10 +255,10 @@ if __name__ == '__main__':
       else:
         SignatureSize = (long)(args.SignatureSizeStr)
     if SignatureSize < 0:
-        print "ERROR: The value of option --signature-size can't be set to negative value!"
+        print("ERROR: The value of option --signature-size can't be set to negative value!")
         sys.exit(1)
     elif SignatureSize > len(args.InputFileBuffer):
-        print "ERROR: The value of option --signature-size is exceed the size of the input file !"
+        print("ERROR: The value of option --signature-size is exceed the size of the input file !")
         sys.exit(1)
 
     args.SignatureBuffer = args.InputFileBuffer[0:SignatureSize]
@@ -276,8 +277,8 @@ if __name__ == '__main__':
     #
     Process = subprocess.Popen('%s smime -verify -inform DER -content %s -CAfile %s' % (OpenSslCommand, args.OutputFileName, args.TrustedPublicCertFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Process.communicate(input=args.SignatureBuffer)[0]
-    if Process.returncode <> 0:
-      print 'ERROR: Verification failed'
+    if Process.returncode != 0:
+      print('ERROR: Verification failed')
       os.remove (args.OutputFileName)
       sys.exit(Process.returncode)
 

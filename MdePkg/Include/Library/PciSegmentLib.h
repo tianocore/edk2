@@ -1,11 +1,11 @@
 /** @file
   Provides services to access PCI Configuration Space on a platform with multiple PCI segments.
-  
+
   The PCI Segment Library function provide services to read, write, and modify the PCI configuration
-  registers on PCI root bridges on any supported PCI segment.  These library services take a single 
-  address parameter that encodes the PCI Segment, PCI Bus, PCI Device, PCI Function, and PCI Register.  
+  registers on PCI root bridges on any supported PCI segment.  These library services take a single
+  address parameter that encodes the PCI Segment, PCI Bus, PCI Device, PCI Function, and PCI Register.
   The layout of this address parameter is as follows:
-  
+
             PCI Register: Bits 0..11
             PCI Function  Bits 12..14
             PCI Device  Bits 15..19
@@ -13,17 +13,17 @@
             Reserved  Bits 28..31.  Must be 0.
             PCI Segment Bits 32..47
             Reserved  Bits 48..63.  Must be 0.
-            
+
   | Reserved (MBZ) | Segment | Reserved (MBZ) |     Bus     | Device | Function | Register |
   63             48  47    32  31           28 27         20 19    15 14      12 11         0
 
-  These functions perform PCI configuration cycles using the default PCI configuration access 
-  method.  This may use I/O ports 0xCF8 and 0xCFC to perform PCI configuration accesses, or it 
-  may use MMIO registers relative to the PcdPciExpressBaseAddress, or it may use some alternate 
-  access method.  Modules will typically use the PCI Segment Library for its PCI configuration 
-  accesses when PCI Segments other than Segment #0 must be accessed.  
+  These functions perform PCI configuration cycles using the default PCI configuration access
+  method.  This may use I/O ports 0xCF8 and 0xCFC to perform PCI configuration accesses, or it
+  may use MMIO registers relative to the PcdPciExpressBaseAddress, or it may use some alternate
+  access method.  Modules will typically use the PCI Segment Library for its PCI configuration
+  accesses when PCI Segments other than Segment #0 must be accessed.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -71,16 +71,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   )
 
 /**
-  Register a PCI device so PCI configuration registers may be accessed after 
+  Register a PCI device so PCI configuration registers may be accessed after
   SetVirtualAddressMap().
-  
+
   If any reserved bits in Address are set, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  
+
   @retval RETURN_SUCCESS           The PCI device was registered for runtime access.
-  @retval RETURN_UNSUPPORTED       An attempt was made to call this function 
+  @retval RETURN_UNSUPPORTED       An attempt was made to call this function
                                    after ExitBootServices().
   @retval RETURN_UNSUPPORTED       The resources required to access the PCI device
                                    at runtime could not be mapped.

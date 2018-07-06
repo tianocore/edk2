@@ -3,7 +3,7 @@
   hash handler registerd, such as SHA1, SHA256.
   Platform can use PcdTpm2HashMask to mask some hash engines.
 
-Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -374,7 +374,7 @@ RegisterHashInterfaceLib (
 
   CopyMem (&HashInterfaceHob->HashInterface[HashInterfaceHob->HashInterfaceCount], HashInterface, sizeof(*HashInterface));
   HashInterfaceHob->HashInterfaceCount ++;
-  
+
   return EFI_SUCCESS;
 }
 
@@ -424,7 +424,9 @@ HashLibBaseCryptoRouterPeiConstructor (
     // This is the second execution of this module, clear the hash interface
     // information registered at its first execution.
     //
-    ZeroMem (&HashInterfaceHob->HashInterface, sizeof (*HashInterfaceHob) - sizeof (EFI_GUID));
+    ZeroMem (&HashInterfaceHob->HashInterface, sizeof (HashInterfaceHob->HashInterface));
+    HashInterfaceHob->HashInterfaceCount = 0;
+    HashInterfaceHob->SupportedHashMask = 0;
   }
 
   //

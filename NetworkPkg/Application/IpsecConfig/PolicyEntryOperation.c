@@ -1,7 +1,7 @@
 /** @file
   The implementation of policy entry operation function in IpSecConfig application.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1875,7 +1875,7 @@ EditOperatePolicyEntry (
                                Selector
                                );
       ASSERT_EFI_ERROR (Status);
-      
+
       if (CreateNew) {
         //
         // Edit the entry to a new one. So, we need delete the old entry.

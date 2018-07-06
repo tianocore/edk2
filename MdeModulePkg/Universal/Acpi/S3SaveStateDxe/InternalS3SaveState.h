@@ -1,7 +1,7 @@
 /** @file
   Internal header file for S3 Boot Script Saver state driver.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -48,25 +48,25 @@ AcpiS3ContextSaveOnEndOfDxe (
   Adds a record into S3 boot script table.
 
   This function is used to store a boot script record into a given boot
-  script table. If the table specified by TableName is nonexistent in the 
-  system, a new table will automatically be created and then the script record 
-  will be added into the new table. This function is responsible for allocating 
+  script table. If the table specified by TableName is nonexistent in the
+  system, a new table will automatically be created and then the script record
+  will be added into the new table. This function is responsible for allocating
   necessary memory for the script.
 
-  This function has a variable parameter list. The exact parameter list depends on 
-  the OpCode that is passed into the function. If an unsupported OpCode or illegal 
+  This function has a variable parameter list. The exact parameter list depends on
+  the OpCode that is passed into the function. If an unsupported OpCode or illegal
   parameter list is passed in, this function returns EFI_INVALID_PARAMETER.
   If there are not enough resources available for storing more scripts, this function returns
   EFI_OUT_OF_RESOURCES.
 
   @param  This                  A pointer to the EFI_S3_SAVE_STATE_PROTOCOL instance.
   @param  OpCode                The operation code (opcode) number.
-  @param  ...                   Argument list that is specific to each opcode. 
+  @param  ...                   Argument list that is specific to each opcode.
 
   @retval EFI_SUCCESS           The operation succeeded. A record was added into the
                                 specified script table.
   @retval EFI_INVALID_PARAMETER The parameter is illegal or the given boot script is not supported.
-                                If the opcode is unknow or not supported because of the PCD 
+                                If the opcode is unknow or not supported because of the PCD
                                 Feature Flags.
   @retval EFI_OUT_OF_RESOURCES  There is insufficient memory to store the boot script.
 
@@ -98,7 +98,7 @@ BootScriptWrite (
                                 inserted, either before or after, depending on BeforeOrAfter. On exit, specifies
                                 the position of the inserted opcode in the boot script table.
   @param  OpCode                The operation code (opcode) number.
-  @param  ...                   Argument list that is specific to each opcode. 
+  @param  ...                   Argument list that is specific to each opcode.
 
   @retval EFI_SUCCESS           The operation succeeded. A record was added into the
                                 specified script table.
@@ -139,7 +139,7 @@ BootScriptInsert (
 
   @retval EFI_SUCCESS           The label already exists or was inserted.
   @retval EFI_INVALID_PARAMETER The Opcode is an invalid opcode value or the Position is not a valid position in the boot script table..
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -152,27 +152,27 @@ BootScriptLabel (
   );
 /**
   Compare two positions in the boot script table and return their relative position.
-  
+
   This function compares two positions in the boot script table and returns their relative positions. If
   Position1 is before Position2, then -1 is returned. If Position1 is equal to Position2,
   then 0 is returned. If Position1 is after Position2, then 1 is returned.
-  
+
   @param  This                  A pointer to the EFI_S3_SAVE_STATE_PROTOCOL instance.
   @param  Position1             The positions in the boot script table to compare
   @param  Position2             The positions in the boot script table to compare
   @param  RelativePosition      On return, points to the result of the comparison
 
-  @retval EFI_SUCCESS           The operation succeeded. 
+  @retval EFI_SUCCESS           The operation succeeded.
   @retval EFI_INVALID_PARAMETER The Position1 or Position2 is not a valid position in the boot script table.
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 BootScriptCompare (
   IN CONST EFI_S3_SAVE_STATE_PROTOCOL      *This,
   IN       EFI_S3_BOOT_SCRIPT_POSITION      Position1,
   IN       EFI_S3_BOOT_SCRIPT_POSITION      Position2,
   OUT      UINTN                           *RelativePosition
   );
-  
+
 #endif //_INTERNAL_S3_SAVE_STATE_H_

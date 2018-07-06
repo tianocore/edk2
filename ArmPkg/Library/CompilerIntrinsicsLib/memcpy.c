@@ -15,20 +15,20 @@
 
 typedef __SIZE_TYPE__ size_t;
 
-static __attribute__((__used__))
-void *__memcpy(void *dest, const void *src, size_t n)
+static void __memcpy(void *dest, const void *src, size_t n)
 {
   unsigned char *d = dest;
   unsigned char const *s = src;
 
   while (n--)
     *d++ = *s++;
-
-  return dest;
 }
 
-__attribute__((__alias__("__memcpy")))
-void *memcpy(void *dest, const void *src, size_t n);
+void *memcpy(void *dest, const void *src, size_t n)
+{
+  __memcpy(dest, src, n);
+  return dest;
+}
 
 #ifdef __arm__
 

@@ -1,7 +1,7 @@
 /** @file
   Supporting functions for X64 architecture.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -62,7 +62,7 @@ InitializeDebugIdt (
   IdtEntry[DEBUG_TIMER_VECTOR].Bits.GateType        = IA32_IDT_GATE_TYPE_INTERRUPT_32;
 
   //
-  // If the CPU supports Debug Extensions(CPUID:01 EDX:BIT2), then 
+  // If the CPU supports Debug Extensions(CPUID:01 EDX:BIT2), then
   // Set DE flag in CR4 to enable IO breakpoint
   //
   AsmCpuid (1, NULL, NULL, NULL, &RegEdx);
@@ -75,7 +75,7 @@ InitializeDebugIdt (
   Retrieve exception handler from IDT table by ExceptionNum.
 
   @param[in]  ExceptionNum    Exception number
- 
+
   @return Exception handler
 
 **/
@@ -93,13 +93,13 @@ GetExceptionHandlerInIdtEntry (
   return (VOID *) (IdtEntry[ExceptionNum].Bits.OffsetLow |
                   (((UINTN)IdtEntry[ExceptionNum].Bits.OffsetHigh) << 16) |
                   (((UINTN)IdtEntry[ExceptionNum].Bits.OffsetUpper) << 32));
-} 
+}
 
 /**
   Set exception handler in IDT table by ExceptionNum.
 
   @param[in]  ExceptionNum      Exception number
-  @param[in]  ExceptionHandler  Exception Handler to be set 
+  @param[in]  ExceptionHandler  Exception Handler to be set
 
 **/
 VOID

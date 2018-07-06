@@ -1,12 +1,12 @@
 /** @file
   EFI SMM Communication PPI definition.
 
-  This Ppi provides a means of communicating between PEIM and SMI 
+  This Ppi provides a means of communicating between PEIM and SMI
   handlers inside of SMM.
   This Ppi is produced and consumed only in S3 resume boot path.
   It is NOT available in normal boot path.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -32,7 +32,7 @@ typedef struct _EFI_PEI_SMM_COMMUNICATION_PPI  EFI_PEI_SMM_COMMUNICATION_PPI;
 
 /**
   Communicates with a registered handler.
-  
+
   This function provides a service to send and receive messages from a registered UEFI service.
 
   @param[in] This                The EFI_PEI_SMM_COMMUNICATION_PPI instance.

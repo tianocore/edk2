@@ -1,7 +1,7 @@
 ## @file
 # This file contained the parser for sections in INF file 
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -21,7 +21,7 @@ InfSectionParser
 from copy import deepcopy
 import re
 
-from Library.String import GetSplitValueList
+from Library.StringUtils import GetSplitValueList
 from Library.CommentParsing import ParseHeaderCommentSection
 from Library.CommentParsing import ParseComment
 

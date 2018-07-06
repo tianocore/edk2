@@ -1,14 +1,14 @@
 /** @file
   Internal include file of the VGA Class Driver.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -132,7 +132,7 @@ VgaClassDriverBindingStart (
 
 /**
   Starts the device controller.
-  
+
   This function implments EFI_DRIVER_BINDING_PROTOCOL.Stop().
   It stops this driver on Controller. Support stopping any child handles
   created by this driver.
@@ -278,7 +278,7 @@ VgaClassComponentNameGetControllerName (
   This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.Reset().
   It resets the text output device hardware. The cursor position is set to (0, 0),
   and the screen is cleared to the default background color for the output device.
-  
+
   @param  This                 Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
   @param  ExtendedVerification Indicates that the driver may perform a more exhaustive
                                verification operation of the device during reset.
@@ -296,7 +296,7 @@ VgaClassReset (
 
 /**
   Writes a Unicode string to the output device.
-  
+
   This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.OutputString().
   It writes a Unicode string to the output device. This is the most basic output mechanism
   on an output device.
@@ -319,7 +319,7 @@ VgaClassOutputString (
 
 /**
   Verifies that all characters in a Unicode string can be output to the target device.
-  
+
   This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.TestString().
   It verifies that all characters in a Unicode string can be output to the target device.
 
@@ -340,13 +340,13 @@ VgaClassTestString (
 
 /**
   Clears the output device(s) display to the currently selected background color.
-  
+
   This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.ClearScreen().
   The ClearScreen() function clears the output device(s) display to the currently
   selected background color. The cursor position is set to (0, 0).
 
   @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
-  
+
   @retval EFI_SUCESS             The operation completed successfully.
   @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request.
   @retval EFI_UNSUPPORTED        The output device is not in a valid text mode.
@@ -360,7 +360,7 @@ VgaClassClearScreen (
 
 /**
   Sets the background and foreground colors for theOutputString() and ClearScreen() functions.
-  
+
   This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.SetAttribute().
   It sets the background and foreground colors for the OutputString() and ClearScreen() functions.
   The color mask can be set even when the device is in an invalid text mode.
@@ -371,7 +371,7 @@ VgaClassClearScreen (
   @param  Attribute              The attribute to set.
                                  Bits 0..3 are the foreground color,
                                  and bits 4..6 are the background color.
-  
+
   @retval EFI_SUCCESS            The requested attributes were set.
   @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request.
 
@@ -385,15 +385,15 @@ VgaClassSetAttribute (
 
 /**
   Sets the current coordinates of the cursor position.
-  
+
   This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.SetCursorPosition().
   It sets the current coordinates of the cursor position.
   The upper left corner of the screen is defined as coordinate (0, 0).
-  
+
   @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
   @param  Column                 Column of position to set the cursor to.
   @param  Row                    Row of position to set the cursor to.
-  
+
   @retval EFI_SUCCESS            The operation completed successfully.
   @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request.
   @retval EFI_UNSUPPORTED        The output device is not in a valid text mode, or the cursor
@@ -410,14 +410,14 @@ VgaClassSetCursorPosition (
 
 /**
   Makes the cursor visible or invisible.
-  
+
   This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.EnableCursor().
   It makes the cursor visible or invisible.
 
   @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
   @param  Visible                If TRUE, the cursor is set to be visible.
                                  If FALSE, the cursor is set to be invisible.
-  
+
   @retval EFI_SUCESS             The operation completed successfully.
   @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request or the
                                  device does not support changing the cursor mode.
@@ -443,7 +443,7 @@ VgaClassEnableCursor (
   @param  ModeNumber             The mode number to return information on.
   @param  Columns                Columen in current mode number
   @param  Rows                   Row in current mode number.
-  
+
   @retval EFI_SUCCESS            The requested mode information was returned.
   @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request.
   @retval EFI_UNSUPPORTED        The mode number was not valid.
@@ -460,7 +460,7 @@ VgaClassQueryMode (
 
 /**
   Sets the output device(s) to a specified mode.
-  
+
   This function implements EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL.QueryMode().
   It sets the output device(s) to the requested mode.
   On success the device is in the geometry for the requested mode,
@@ -468,7 +468,7 @@ VgaClassQueryMode (
 
   @param  This                   Pointer to EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL instance.
   @param  ModeNumber             The text mode to set.
-  
+
   @retval EFI_SUCCESS            The requested text mode was set.
   @retval EFI_DEVICE_ERROR       The device had an error and could not complete the request.
   @retval EFI_UNSUPPORTED        The mode number was not valid.

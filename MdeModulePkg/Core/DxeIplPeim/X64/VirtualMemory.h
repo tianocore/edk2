@@ -1,5 +1,5 @@
 /** @file
-  x64 Long Mode Virtual Memory Management Definitions  
+  x64 Long Mode Virtual Memory Management Definitions
 
   References:
     1) IA-32 Intel(R) Architecture Software Developer's Manual Volume 1:Basic Architecture, Intel
@@ -7,7 +7,7 @@
     3) IA-32 Intel(R) Architecture Software Developer's Manual Volume 3:System Programmer's Guide, Intel
     4) AMD64 Architecture Programmer's Manual Volume 2: System Programming
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -18,7 +18,7 @@ http://opensource.org/licenses/bsd-license.php
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-**/  
+**/
 #ifndef _VIRTUAL_MEMORY_H_
 #define _VIRTUAL_MEMORY_H_
 
@@ -110,7 +110,7 @@ typedef union {
     UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
     UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
     UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
-    UINT64  MustBe1:1;                // Must be 1 
+    UINT64  MustBe1:1;                // Must be 1
     UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
     UINT64  Available:3;              // Available for use by system software
     UINT64  PAT:1;                    //
@@ -134,7 +134,7 @@ typedef union {
     UINT64  CacheDisabled:1;          // 0 = Cached, 1=Non-Cached
     UINT64  Accessed:1;               // 0 = Not accessed, 1 = Accessed (set by CPU)
     UINT64  Dirty:1;                  // 0 = Not Dirty, 1 = written by processor on access to page
-    UINT64  MustBe1:1;                // Must be 1 
+    UINT64  MustBe1:1;                // Must be 1
     UINT64  Global:1;                 // 0 = Not global page, 1 = global page TLB not cleared on CR3 write
     UINT64  Available:3;              // Available for use by system software
     UINT64  PAT:1;                    //
@@ -223,9 +223,9 @@ CreateIdentityMappingPageTables (
 
 
 /**
- 
+
   Fix up the vector number in the vector code.
- 
+
   @param VectorBase   Base address of the vector handler.
   @param VectorNum    Index of vector.
 
@@ -239,11 +239,11 @@ AsmVectorFixup (
 
 
 /**
- 
+
   Get the information of vector template.
-  
+
   @param TemplateBase   Base address of the template code.
- 
+
   @return               Size of the Template code.
 
 **/
@@ -313,4 +313,4 @@ AllocatePageTableMemory (
   IN UINTN           Pages
   );
 
-#endif 
+#endif

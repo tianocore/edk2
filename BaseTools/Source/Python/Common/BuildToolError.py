@@ -89,6 +89,7 @@ PCD_VARIABLE_INFO_ERROR = 0xF016
 PCD_VARIABLE_ATTRIBUTES_CONFLICT_ERROR = 0xF013
 PCD_STRUCTURE_PCD_INVALID_FIELD_ERROR = 0xF014
 PCD_STRUCTURE_PCD_ERROR = 0xF015
+ERROR_STATEMENT = 0xFFFD
 ABORT_ERROR = 0xFFFE
 UNKNOWN_ERROR = 0xFFFF
 
@@ -151,6 +152,7 @@ gErrorMessage = {
     IO_TIMEOUT              :   "Timeout",
     IO_UNKNOWN_ERROR        :   "Unknown error in IO operation",
 
+    ERROR_STATEMENT         :   "!error statement",
     UNKNOWN_ERROR           :   "Unknown error",
 }
 

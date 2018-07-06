@@ -14,6 +14,7 @@
 **/
 
 #include "BdsPlatform.h"
+#include <Guid/QemuRamfb.h>
 
 //
 // Debug Agent UART Device Path structure
@@ -26,6 +27,27 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  End;
 } VENDOR_UART_DEVICE_PATH;
 #pragma pack()
+
+//
+// USB Keyboard Device Path structure
+//
+#pragma pack (1)
+typedef struct {
+  USB_CLASS_DEVICE_PATH    Keyboard;
+  EFI_DEVICE_PATH_PROTOCOL End;
+} USB_KEYBOARD_DEVICE_PATH;
+#pragma pack ()
+
+//
+// QemuRamfb Device Path structure
+//
+#pragma pack (1)
+typedef struct {
+  VENDOR_DEVICE_PATH        Vendor;
+  ACPI_ADR_DEVICE_PATH      AcpiAdr;
+  EFI_DEVICE_PATH_PROTOCOL  End;
+} VENDOR_RAMFB_DEVICE_PATH;
+#pragma pack ()
 
 ACPI_HID_DEVICE_PATH       gPnpPs2KeyboardDeviceNode  = gPnpPs2Keyboard;
 ACPI_HID_DEVICE_PATH       gPnp16550ComPortDeviceNode = gPnp16550ComPort;
@@ -71,6 +93,59 @@ VENDOR_UART_DEVICE_PATH gDebugAgentUartDevicePath = {
   gEndEntire
 };
 
+STATIC USB_KEYBOARD_DEVICE_PATH gUsbKeyboardDevicePath = {
+  {
+    {
+      MESSAGING_DEVICE_PATH,
+      MSG_USB_CLASS_DP,
+      {
+        (UINT8)sizeof (USB_CLASS_DEVICE_PATH),
+        (UINT8)(sizeof (USB_CLASS_DEVICE_PATH) >> 8)
+      }
+    },
+    0xFFFF, // VendorId: any
+    0xFFFF, // ProductId: any
+    3,      // DeviceClass: HID
+    1,      // DeviceSubClass: boot
+    1       // DeviceProtocol: keyboard
+  },
+  gEndEntire
+};
+
+STATIC VENDOR_RAMFB_DEVICE_PATH gQemuRamfbDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8) (sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8) ((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    QEMU_RAMFB_GUID,
+  },
+  {
+    {
+      ACPI_DEVICE_PATH,
+      ACPI_ADR_DP,
+      {
+        (UINT8) (sizeof (ACPI_ADR_DEVICE_PATH)),
+        (UINT8) ((sizeof (ACPI_ADR_DEVICE_PATH)) >> 8)
+      }
+    },
+    ACPI_DISPLAY_ADR (
+      1,                                       // DeviceIdScheme
+      0,                                       // HeadId
+      0,                                       // NonVgaOutput
+      1,                                       // BiosCanDetect
+      0,                                       // VendorInfo
+      ACPI_ADR_DISPLAY_TYPE_EXTERNAL_DIGITAL,  // Type
+      0,                                       // Port
+      0                                        // Index
+      ),
+  },
+  gEndEntire
+};
 
 //
 // Predefined platform default console device path
@@ -79,6 +154,14 @@ PLATFORM_CONSOLE_CONNECT_ENTRY   gPlatformConsole[] = {
   {
     (EFI_DEVICE_PATH_PROTOCOL *) &gDebugAgentUartDevicePath,
     (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
+  },
+  {
+    (EFI_DEVICE_PATH_PROTOCOL *)&gUsbKeyboardDevicePath,
+    CONSOLE_IN
+  },
+  {
+    (EFI_DEVICE_PATH_PROTOCOL *)&gQemuRamfbDevicePath,
+    CONSOLE_OUT
   },
   {
     NULL,

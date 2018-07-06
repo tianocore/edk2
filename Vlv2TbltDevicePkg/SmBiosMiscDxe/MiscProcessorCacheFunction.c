@@ -28,12 +28,6 @@ Abstract:
 #include <Protocol/DataHub.h>
 #include <Guid/DataHubRecords.h>
 
-
-extern  SMBIOS_TABLE_TYPE7            *SmbiosRecordL1;
-extern  SMBIOS_TABLE_TYPE7            *SmbiosRecordL2;
-extern  SMBIOS_TABLE_TYPE7            *SmbiosRecordL3;
-
-
 UINT32
 ConvertBase2ToRaw (
   IN  EFI_EXP_BASE2_DATA             *Data)

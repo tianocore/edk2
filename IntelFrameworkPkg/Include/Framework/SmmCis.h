@@ -2,13 +2,13 @@
   Include file for definitions in the Intel Platform Innovation Framework for EFI
   System Management Mode Core Interface Specification (SMM CIS) version 0.91.
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -33,17 +33,17 @@ typedef struct _EFI_SMM_SYSTEM_TABLE      EFI_SMM_SYSTEM_TABLE;
   Allocates pool memory from SMRAM for IA-32, or runtime memory for
   the Itanium processor family.
 
-  @param  PoolType         The type of pool to allocate. The only supported type 
+  @param  PoolType         The type of pool to allocate. The only supported type
                            is EfiRuntimeServicesData.
   @param  Size             The number of bytes to allocate from the pool.
-  @param  Buffer           A pointer to a pointer to the allocated buffer if the 
+  @param  Buffer           A pointer to a pointer to the allocated buffer if the
                            call succeeds.  Otherwise, undefined.
 
   @retval EFI_SUCCESS           The requested number of bytes was allocated.
   @retval EFI_OUT_OF_RESOURCES  The pool requested could not be allocated.
   @retval EFI_UNSUPPORTED       In runtime.
   @note  Inconsistent with specification here:
-         In Framework Spec, this definition is named EFI_SMM_ALLOCATE_POOL.  
+         In Framework Spec, this definition is named EFI_SMM_ALLOCATE_POOL.
          To avoid a naming conflict, the definition is renamed.
 **/
 typedef
@@ -63,8 +63,8 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER Buffer was invalid.
   @retval EFI_UNSUPPORTED       In runtime.
   @note  Inconsistent with specification here:
-         In Framework Spec, this definition is named EFI_SMM_FREE_POOL.  
-         To avoid a naming conflict, the definition is renamed. 
+         In Framework Spec, this definition is named EFI_SMM_FREE_POOL.
+         To avoid a naming conflict, the definition is renamed.
 **/
 typedef
 EFI_STATUS
@@ -88,7 +88,7 @@ EFI_STATUS
   @retval EFI_INVALID_PARAMETER Type is not AllocateAnyPages or AllocateMaxAddress
                                 or AllocateAddress. Or, MemoryType is in the range EfiMaxMemoryType..0x7FFFFFFF.
   @note  Inconsistent with specification here:
-         In the Framework Spec, this definition is named EFI_SMM_ALLOCATE_PAGES.  
+         In the Framework Spec, this definition is named EFI_SMM_ALLOCATE_PAGES.
          To avoid a naming conflict, the definition here is renamed.
 **/
 typedef
@@ -109,9 +109,9 @@ EFI_STATUS
   @retval EFI_SUCCESS           The requested memory pages were freed.
   @retval EFI_INVALID_PARAMETER Memory is not a page-aligned address or NumberOfPages is invalid.
   @retval EFI_NOT_FOUND         The requested memory pages were not allocated with SmmAllocatePages().
-  
+
   @note  Inconsistent with specification here:
-         In the Framework Spec, this definition is named EFI_SMM_FREE_PAGES.  
+         In the Framework Spec, this definition is named EFI_SMM_FREE_PAGES.
          To avoid a naming conflict, the definition here is renamed.
 **/
 typedef
@@ -155,7 +155,7 @@ typedef struct {
   UINT8                 Reserved2[164];
 
   //
-  // Registers in IA-32 processors. 
+  // Registers in IA-32 processors.
   //
   UINT32                ES;
   UINT32                CS;
@@ -185,7 +185,7 @@ typedef struct {
 /// The processor save-state information for the Itanium processor family. This information is
 /// important in that the SMM drivers may need to ascertain the state of the processor before invoking
 /// the PMI. This structure is mandatory and must be 512 byte aligned.
-/// 
+///
 typedef struct {
   UINT64   reserved;
   UINT64   r1;
@@ -303,7 +303,7 @@ typedef struct {
 ///
 typedef union {
   ///
-  /// The processor save-state information for IA-32 processors. 
+  /// The processor save-state information for IA-32 processors.
   ///
   EFI_SMI_CPU_SAVE_STATE     Ia32SaveState;
   ///
@@ -342,8 +342,8 @@ typedef struct {
 
 ///
 /// The optional floating point save-state information for the Itanium processor family. If the optional
-/// floating point save is indicated for any handler, then this data structure must be preserved. 
-/// 
+/// floating point save is indicated for any handler, then this data structure must be preserved.
+///
 typedef struct {
   UINT64   f2[2];
   UINT64   f3[2];
@@ -382,12 +382,12 @@ typedef struct {
 /// point save is indicated for any handler, then this data structure must be preserved.
 ///
 typedef union {
-  /// 
-  /// The optional floating point save-state information for IA-32 processors. 
+  ///
+  /// The optional floating point save-state information for IA-32 processors.
   ///
   EFI_SMI_OPTIONAL_FPSAVE_STATE             Ia32FpSave;
   ///
-  /// The optional floating point save-state information for Itanium processors. 
+  /// The optional floating point save-state information for Itanium processors.
   ///
   EFI_PMI_OPTIONAL_FLOATING_POINT_CONTEXT   ItaniumFpSave;
 } EFI_SMM_FLOATING_POINT_SAVE_STATE;
@@ -447,7 +447,7 @@ EFI_STATUS
 //
 struct _EFI_SMM_SYSTEM_TABLE {
   ///
-  /// The table header for the System Management System Table (SMST). 
+  /// The table header for the System Management System Table (SMST).
   ///
   EFI_TABLE_HEADER                    Hdr;
 
@@ -462,7 +462,7 @@ struct _EFI_SMM_SYSTEM_TABLE {
   UINT32                              SmmFirmwareRevision;
 
   ///
-  /// Adds, updates, or removes a configuration table entry from the SMST. 
+  /// Adds, updates, or removes a configuration table entry from the SMST.
   ///
   EFI_SMM_INSTALL_CONFIGURATION_TABLE SmmInstallConfigurationTable;
 
@@ -470,7 +470,7 @@ struct _EFI_SMM_SYSTEM_TABLE {
   // I/O Services
   //
   ///
-  /// A GUID that designates the particular CPU I/O services. 
+  /// A GUID that designates the particular CPU I/O services.
   ///
   EFI_GUID                            EfiSmmCpuIoGuid;
   ///
@@ -489,11 +489,11 @@ struct _EFI_SMM_SYSTEM_TABLE {
   ///
   EFI_SMMCORE_ALLOCATE_POOL           SmmAllocatePool;
   ///
-  /// Returns pool memory to the system. 
+  /// Returns pool memory to the system.
   ///
   EFI_SMMCORE_FREE_POOL               SmmFreePool;
   ///
-  /// Allocates memory pages from the system. 
+  /// Allocates memory pages from the system.
   ///
   EFI_SMMCORE_ALLOCATE_PAGES          SmmAllocatePages;
   ///
@@ -504,9 +504,9 @@ struct _EFI_SMM_SYSTEM_TABLE {
   //
   // MP service
   //
-  
+
   /// Inconsistent with specification here:
-  ///  In Framework Spec, this definition does not exist. This method is introduced in PI1.1 specification for 
+  ///  In Framework Spec, this definition does not exist. This method is introduced in PI1.1 specification for
   ///  the implementation needed.
   EFI_SMM_STARTUP_THIS_AP             SmmStartupThisAp;
 

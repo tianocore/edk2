@@ -2,7 +2,7 @@
   Implementation for EFI_SIMPLE_TEXT_INPUT_PROTOCOL protocol.
 
 (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (C) 2016 Silicon Graphics, Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -41,13 +41,12 @@ ReadKeyStrokeWorker (
     return EFI_INVALID_PARAMETER;
   }
 
-  if (!EfiKeyFiFoRemoveOneKey (TerminalDevice, &KeyData->Key)) {
-    return EFI_NOT_READY;
-  }
-
   KeyData->KeyState.KeyShiftState  = 0;
   KeyData->KeyState.KeyToggleState = 0;
 
+  if (!EfiKeyFiFoRemoveOneKey (TerminalDevice, &KeyData->Key)) {
+    return EFI_NOT_READY;
+  }
 
   return EFI_SUCCESS;
 
@@ -633,7 +632,7 @@ KeyNotifyProcessHandler (
   while (TRUE) {
     //
     // Enter critical section
-    //  
+    //
     OldTpl = gBS->RaiseTPL (TPL_NOTIFY);
     HasKey = EfiKeyFiFoForNotifyRemoveOneKey (TerminalDevice->EfiKeyFiFoForNotify, &Key);
     CopyMem (&KeyData.Key, &Key, sizeof (EFI_INPUT_KEY));
@@ -1129,7 +1128,7 @@ UnicodeFiFoInsertOneKey (
 
 /**
   Remove one pre-fetched key out of the Unicode FIFO buffer.
-  The caller should guarantee that Unicode FIFO buffer is not empty 
+  The caller should guarantee that Unicode FIFO buffer is not empty
   by IsUnicodeFiFoEmpty ().
 
   @param  TerminalDevice       Terminal driver private structure.
@@ -1305,10 +1304,10 @@ UnicodeToEfiKeyFlushState (
   There is one special input sequence that will force the system to reset.
   This is ESC R ESC r ESC R.
 
-  Note: current implementation support terminal types include: PC ANSI, VT100+/VTUTF8, VT100. 
+  Note: current implementation support terminal types include: PC ANSI, VT100+/VTUTF8, VT100.
         The table below is not same with UEFI Spec 2.3 Appendix B Table 201(not support ANSI X3.64 /
         DEC VT200-500 and extra support PC ANSI, VT100)since UEFI Table 201 is just an example.
-        
+
   Symbols used in table below
   ===========================
     ESC = 0x1B

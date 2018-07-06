@@ -1,21 +1,21 @@
 /** @file
-  EFI image format for PE32, PE32+ and TE. Please note some data structures are 
-  different for PE32 and PE32+. EFI_IMAGE_NT_HEADERS32 is for PE32 and 
-  EFI_IMAGE_NT_HEADERS64 is for PE32+. 
+  EFI image format for PE32, PE32+ and TE. Please note some data structures are
+  different for PE32 and PE32+. EFI_IMAGE_NT_HEADERS32 is for PE32 and
+  EFI_IMAGE_NT_HEADERS64 is for PE32+.
 
-  This file is coded to the Visual Studio, Microsoft Portable Executable and 
+  This file is coded to the Visual Studio, Microsoft Portable Executable and
   Common Object File Format Specification, Revision 8.3 - February 6, 2013.
   This file also includes some definitions in PI Specification, Revision 1.0.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php.                                           
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -134,12 +134,12 @@ typedef struct {
 
 ///
 /// @attention
-/// EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC means PE32 and 
+/// EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC means PE32 and
 /// EFI_IMAGE_OPTIONAL_HEADER32 must be used. The data structures only vary
 /// after NT additional fields.
 ///
 #define EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC 0x10b
-          
+
 ///
 /// Optional Header Standard Fields for PE32.
 ///
@@ -185,7 +185,7 @@ typedef struct {
 
 ///
 /// @attention
-/// EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC means PE32+ and 
+/// EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC means PE32+ and
 /// EFI_IMAGE_OPTIONAL_HEADER64 must be used. The data structures only vary
 /// after NT additional fields.
 ///
@@ -296,7 +296,7 @@ typedef struct {
 /// Size of EFI_IMAGE_SECTION_HEADER.
 ///
 #define EFI_IMAGE_SIZEOF_SECTION_HEADER       40
-         
+
 //
 // Section Flags Values
 //
@@ -304,12 +304,12 @@ typedef struct {
 #define EFI_IMAGE_SCN_CNT_CODE                     BIT5   ///< 0x00000020
 #define EFI_IMAGE_SCN_CNT_INITIALIZED_DATA         BIT6   ///< 0x00000040
 #define EFI_IMAGE_SCN_CNT_UNINITIALIZED_DATA       BIT7   ///< 0x00000080
-                                                   
+
 #define EFI_IMAGE_SCN_LNK_OTHER                    BIT8   ///< 0x00000100  ///< Reserved.
 #define EFI_IMAGE_SCN_LNK_INFO                     BIT9   ///< 0x00000200  ///< Section contains comments or some other type of information.
 #define EFI_IMAGE_SCN_LNK_REMOVE                   BIT11  ///< 0x00000800  ///< Section contents will not become part of image.
 #define EFI_IMAGE_SCN_LNK_COMDAT                   BIT12  ///< 0x00001000
-                                                   
+
 #define EFI_IMAGE_SCN_ALIGN_1BYTES                 BIT20  ///< 0x00100000
 #define EFI_IMAGE_SCN_ALIGN_2BYTES                 BIT21  ///< 0x00200000
 #define EFI_IMAGE_SCN_ALIGN_4BYTES          (BIT20|BIT21) ///< 0x00300000
@@ -317,7 +317,7 @@ typedef struct {
 #define EFI_IMAGE_SCN_ALIGN_16BYTES         (BIT20|BIT22) ///< 0x00500000
 #define EFI_IMAGE_SCN_ALIGN_32BYTES         (BIT21|BIT22) ///< 0x00600000
 #define EFI_IMAGE_SCN_ALIGN_64BYTES   (BIT20|BIT21|BIT22) ///< 0x00700000
-                                              
+
 #define EFI_IMAGE_SCN_MEM_DISCARDABLE              BIT25  ///< 0x02000000
 #define EFI_IMAGE_SCN_MEM_NOT_CACHED               BIT26  ///< 0x04000000
 #define EFI_IMAGE_SCN_MEM_NOT_PAGED                BIT27  ///< 0x08000000
@@ -415,7 +415,7 @@ typedef struct {
 #define EFI_IMAGE_COMDAT_SELECT_SAME_SIZE       3
 #define EFI_IMAGE_COMDAT_SELECT_EXACT_MATCH     4
 #define EFI_IMAGE_COMDAT_SELECT_ASSOCIATIVE     5
-                                       
+
 //
 // the following values only be referred in PeCoff, not defined in PECOFF.
 //
@@ -450,9 +450,9 @@ typedef struct {
 #define EFI_IMAGE_REL_I386_SECREL   0x000B
 #define EFI_IMAGE_REL_I386_REL32    0x0014  ///< PC-relative 32-bit reference to the symbols virtual address.
 
-// 
+//
 // x64 processor relocation types.
-// 
+//
 #define IMAGE_REL_AMD64_ABSOLUTE  0x0000
 #define IMAGE_REL_AMD64_ADDR64    0x0001
 #define IMAGE_REL_AMD64_ADDR32    0x0002

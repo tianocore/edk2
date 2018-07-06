@@ -1,7 +1,7 @@
 /** @file
   Implementation for S3 SMM Boot Script Saver state driver.
 
-  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -45,7 +45,7 @@ BootScriptWriteIoWrite (
   Address     = VA_ARG (Marker, UINT64);
   Count       = VA_ARG (Marker, UINTN);
   Buffer      = VA_ARG (Marker, UINT8 *);
-  
+
   return S3BootScriptSaveIoWrite (Width, Address, Count, Buffer);
 }
 /**
@@ -67,12 +67,12 @@ BootScriptWriteIoReadWrite (
   UINT64                Address;
   UINT8                 *Data;
   UINT8                 *DataMask;
- 
+
   Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
   Address     = VA_ARG (Marker, UINT64);
   Data        = VA_ARG (Marker, UINT8 *);
   DataMask    = VA_ARG (Marker, UINT8 *);
-  
+
   return S3BootScriptSaveIoReadWrite (Width, Address, Data, DataMask);
 }
 
@@ -95,7 +95,7 @@ BootScriptWriteMemWrite (
   UINT64                Address;
   UINTN                 Count;
   UINT8                 *Buffer;
- 
+
   Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
   Address     = VA_ARG (Marker, UINT64);
   Count       = VA_ARG (Marker, UINTN);
@@ -123,7 +123,7 @@ BootScriptWriteMemReadWrite (
   UINT64                Address;
   UINT8                 *Data;
   UINT8                 *DataMask;
-  
+
   Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
   Address     = VA_ARG (Marker, UINT64);
   Data        = VA_ARG (Marker, UINT8 *);
@@ -237,13 +237,13 @@ BootScriptWritePciCfg2ReadWrite (
   UINT64                Address;
   UINT8                 *Data;
   UINT8                 *DataMask;
- 
+
   Width       = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
   Segment     = VA_ARG (Marker, UINT16);
   Address     = VA_ARG (Marker, UINT64);
   Data        = VA_ARG (Marker, UINT8 *);
   DataMask    = VA_ARG (Marker, UINT8 *);
- 
+
   return S3BootScriptSavePciCfg2ReadWrite (Width, Segment, Address, Data, DataMask);
 }
 /**
@@ -268,15 +268,15 @@ BootScriptWriteSmbusExecute (
   VOID                     *Buffer;
   UINTN                    *DataSize;
   UINTN                     SmBusAddress;
-  
+
   SlaveAddress.SmbusDeviceAddress = VA_ARG (Marker, UINTN);
   Command                         = VA_ARG (Marker, EFI_SMBUS_DEVICE_COMMAND);
   Operation                       = VA_ARG (Marker, EFI_SMBUS_OPERATION);
   PecCheck                        = VA_ARG (Marker, BOOLEAN);
   SmBusAddress                    = SMBUS_LIB_ADDRESS (SlaveAddress.SmbusDeviceAddress,Command,0,PecCheck);
-  DataSize                        = VA_ARG (Marker, UINTN *);    
+  DataSize                        = VA_ARG (Marker, UINTN *);
   Buffer                          = VA_ARG (Marker, VOID *);
- 
+
   return S3BootScriptSaveSmbusExecute (SmBusAddress, Operation, DataSize, Buffer);
 }
 /**
@@ -302,7 +302,7 @@ BootScriptWriteStall (
 }
 
 /**
-  Internal function to add Save jmp address according to DISPATCH_OPCODE. 
+  Internal function to add Save jmp address according to DISPATCH_OPCODE.
   We ignore "Context" parameter
 
   @param  Marker                The variable argument list to get the opcode
@@ -324,8 +324,8 @@ BootScriptWriteDispatch (
 }
 
 /**
-  Internal function to add memory pool operation to the table. 
- 
+  Internal function to add memory pool operation to the table.
+
   @param  Marker                The variable argument list to get the opcode
                                 and associated attributes.
 
@@ -338,18 +338,18 @@ BootScriptWriteMemPoll (
   IN VA_LIST                       Marker
   )
 {
-  S3_BOOT_SCRIPT_LIB_WIDTH   Width;                                   
-  UINT64                     Address;                                    
-  VOID                      *Data;                                       
-  VOID                      *DataMask;                                   
+  S3_BOOT_SCRIPT_LIB_WIDTH   Width;
+  UINT64                     Address;
+  VOID                      *Data;
+  VOID                      *DataMask;
   UINT64                     Delay;
   UINT64                     LoopTimes;
   UINT32                     Remainder;
 
-  Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);                  
-  Address  = VA_ARG (Marker, UINT64);                                    
-  Data     = VA_ARG (Marker, VOID *);                                    
-  DataMask = VA_ARG (Marker, VOID *);                                    
+  Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+  Address  = VA_ARG (Marker, UINT64);
+  Data     = VA_ARG (Marker, VOID *);
+  DataMask = VA_ARG (Marker, VOID *);
   Delay    = VA_ARG (Marker, UINT64);
   //
   // According to the spec, the interval between 2 polls is 100ns,
@@ -369,12 +369,12 @@ BootScriptWriteMemPoll (
     //
     LoopTimes +=1;
   }
-  return S3BootScriptSaveMemPoll (Width, Address, DataMask, Data, 1, LoopTimes); 
+  return S3BootScriptSaveMemPoll (Width, Address, DataMask, Data, 1, LoopTimes);
 
 }
 
 /**
-  Internal function to add Save jmp address according to DISPATCH_OPCODE2. 
+  Internal function to add Save jmp address according to DISPATCH_OPCODE2.
   The "Context" parameter is not ignored.
 
   @param  Marker                The variable argument list to get the opcode
@@ -390,7 +390,7 @@ BootScriptWriteDispatch2 (
   )
 {
   VOID                  *EntryPoint;
-  VOID                  *Context;  
+  VOID                  *Context;
 
   EntryPoint = (VOID*)(UINTN)VA_ARG (Marker, EFI_PHYSICAL_ADDRESS);
   Context    = (VOID*)(UINTN)VA_ARG (Marker, EFI_PHYSICAL_ADDRESS);
@@ -413,7 +413,7 @@ BootScriptWriteInformation (
   )
 {
   UINT32                InformationLength;
-  EFI_PHYSICAL_ADDRESS  Information;  
+  EFI_PHYSICAL_ADDRESS  Information;
 
   InformationLength = VA_ARG (Marker, UINT32);
   Information = VA_ARG (Marker, EFI_PHYSICAL_ADDRESS);
@@ -433,18 +433,18 @@ BootScriptWriteIoPoll (
   IN VA_LIST                       Marker
   )
 {
-   S3_BOOT_SCRIPT_LIB_WIDTH     Width;  
-   UINT64                     Address;    
-   VOID                      *Data;       
-   VOID                      *DataMask;   
-   UINT64                     Delay;       
-   
-   Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);  
-   Address  = VA_ARG (Marker, UINT64);                    
-   Data     = VA_ARG (Marker, VOID *);                   
-   DataMask = VA_ARG (Marker, VOID *);                   
-   Delay    = (UINT64)VA_ARG (Marker, UINT64);             
-   
+   S3_BOOT_SCRIPT_LIB_WIDTH     Width;
+   UINT64                     Address;
+   VOID                      *Data;
+   VOID                      *DataMask;
+   UINT64                     Delay;
+
+   Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+   Address  = VA_ARG (Marker, UINT64);
+   Data     = VA_ARG (Marker, VOID *);
+   DataMask = VA_ARG (Marker, VOID *);
+   Delay    = (UINT64)VA_ARG (Marker, UINT64);
+
    return S3BootScriptSaveIoPoll (Width, Address, Data, DataMask, Delay);
 }
 /**
@@ -468,13 +468,13 @@ BootScriptWritePciConfigPoll (
    VOID                      *DataMask;
    UINT64                     Delay;
 
-   
-   Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);  
-   Address  = VA_ARG (Marker, UINT64);                    
-   Data     = VA_ARG (Marker, VOID *);                   
-   DataMask = VA_ARG (Marker, VOID *);                   
-   Delay    = (UINT64)VA_ARG (Marker, UINT64);             
-   
+
+   Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+   Address  = VA_ARG (Marker, UINT64);
+   Data     = VA_ARG (Marker, VOID *);
+   DataMask = VA_ARG (Marker, VOID *);
+   Delay    = (UINT64)VA_ARG (Marker, UINT64);
+
    return S3BootScriptSavePciPoll (Width, Address, Data, DataMask, Delay);
 }
 /**
@@ -498,14 +498,14 @@ BootScriptWritePciConfig2Poll (
    VOID                         *Data;
    VOID                         *DataMask;
    UINT64                        Delay;
-  
-   Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);  
-   Segment  = VA_ARG (Marker, UINT16);      
-   Address  = VA_ARG (Marker, UINT64);                    
-   Data     = VA_ARG (Marker, VOID *);                   
-   DataMask = VA_ARG (Marker, VOID *);                   
-   Delay    = (UINT64)VA_ARG (Marker, UINT64);             
-   
+
+   Width    = VA_ARG (Marker, S3_BOOT_SCRIPT_LIB_WIDTH);
+   Segment  = VA_ARG (Marker, UINT16);
+   Address  = VA_ARG (Marker, UINT64);
+   Data     = VA_ARG (Marker, VOID *);
+   DataMask = VA_ARG (Marker, VOID *);
+   Delay    = (UINT64)VA_ARG (Marker, UINT64);
+
    return S3BootScriptSavePci2Poll (Width, Segment, Address, Data, DataMask, Delay);
 }
 
@@ -513,25 +513,25 @@ BootScriptWritePciConfig2Poll (
   Adds a record into S3 boot script table.
 
   This function is used to store a boot script record into a given boot
-  script table. If the table specified by TableName is nonexistent in the 
-  system, a new table will automatically be created and then the script record 
-  will be added into the new table. This function is responsible for allocating 
+  script table. If the table specified by TableName is nonexistent in the
+  system, a new table will automatically be created and then the script record
+  will be added into the new table. This function is responsible for allocating
   necessary memory for the script.
 
-  This function has a variable parameter list. The exact parameter list depends on 
-  the OpCode that is passed into the function. If an unsupported OpCode or illegal 
+  This function has a variable parameter list. The exact parameter list depends on
+  the OpCode that is passed into the function. If an unsupported OpCode or illegal
   parameter list is passed in, this function returns EFI_INVALID_PARAMETER.
   If there are not enough resources available for storing more scripts, this function returns
   EFI_OUT_OF_RESOURCES.
 
   @param  This                  A pointer to the EFI_S3_SAVE_STATE_PROTOCOL instance.
   @param  OpCode                The operation code (opcode) number.
-  @param  ...                   Argument list that is specific to each opcode. 
-  
+  @param  ...                   Argument list that is specific to each opcode.
+
   @retval EFI_SUCCESS           The operation succeeded. A record was added into the
                                 specified script table.
   @retval EFI_INVALID_PARAMETER The parameter is illegal or the given boot script is not supported.
-                                If the opcode is unknow or not supported because of the PCD 
+                                If the opcode is unknow or not supported because of the PCD
                                 Feature Flags.
   @retval EFI_OUT_OF_RESOURCES  There is insufficient memory to store the boot script.
 
@@ -545,7 +545,7 @@ BootScriptWrite (
   )
 {
   EFI_STATUS                Status;
-  VA_LIST                   Marker;  
+  VA_LIST                   Marker;
   //
   // Build script according to opcode
   //
@@ -566,7 +566,7 @@ BootScriptWrite (
   case EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE:
     VA_START (Marker, OpCode);
     Status = BootScriptWriteMemWrite (Marker);
-    VA_END (Marker); 
+    VA_END (Marker);
     break;
 
   case EFI_BOOT_SCRIPT_MEM_READ_WRITE_OPCODE:
@@ -597,7 +597,7 @@ BootScriptWrite (
     VA_START (Marker, OpCode);
     Status = BootScriptWriteStall (Marker);
     VA_END (Marker);
-  
+
     break;
 
   case EFI_BOOT_SCRIPT_DISPATCH_OPCODE:
@@ -636,23 +636,23 @@ BootScriptWrite (
     VA_END (Marker);
     break;
 
-  case EFI_BOOT_SCRIPT_IO_POLL_OPCODE:  
+  case EFI_BOOT_SCRIPT_IO_POLL_OPCODE:
     VA_START (Marker, OpCode);
     Status = BootScriptWriteIoPoll (Marker);
     VA_END (Marker);
-    break;    
-  
-  case EFI_BOOT_SCRIPT_PCI_CONFIG_POLL_OPCODE: 
+    break;
+
+  case EFI_BOOT_SCRIPT_PCI_CONFIG_POLL_OPCODE:
     VA_START (Marker, OpCode);
     Status = BootScriptWritePciConfigPoll (Marker);
     VA_END (Marker);
-    break;    
-  
+    break;
+
   case EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL_OPCODE:
     VA_START (Marker, OpCode);
     Status = BootScriptWritePciConfig2Poll (Marker);
     VA_END (Marker);
-    break;    
+    break;
 
   default:
     Status = EFI_INVALID_PARAMETER;
@@ -681,7 +681,7 @@ BootScriptWrite (
                                 inserted, either before or after, depending on BeforeOrAfter. On exit, specifies
                                 the position of the inserted opcode in the boot script table.
   @param  OpCode                The operation code (opcode) number.
-  @param  ...                   Argument list that is specific to each opcode. 
+  @param  ...                   Argument list that is specific to each opcode.
 
   @retval EFI_SUCCESS           The operation succeeded. A record was added into the
                                 specified script table.
@@ -700,7 +700,7 @@ BootScriptInsert (
   )
 {
   EFI_STATUS                Status;
-  VA_LIST                   Marker;  
+  VA_LIST                   Marker;
   //
   // Build script according to opcode
   //
@@ -721,7 +721,7 @@ BootScriptInsert (
   case EFI_BOOT_SCRIPT_MEM_WRITE_OPCODE:
     VA_START (Marker, OpCode);
     Status = BootScriptWriteMemWrite (Marker);
-    VA_END (Marker); 
+    VA_END (Marker);
     break;
 
   case EFI_BOOT_SCRIPT_MEM_READ_WRITE_OPCODE:
@@ -752,7 +752,7 @@ BootScriptInsert (
     VA_START (Marker, OpCode);
     Status = BootScriptWriteStall (Marker);
     VA_END (Marker);
-  
+
     break;
 
   case EFI_BOOT_SCRIPT_DISPATCH_OPCODE:
@@ -790,30 +790,30 @@ BootScriptInsert (
     Status = BootScriptWritePciCfg2ReadWrite (Marker);
     VA_END (Marker);
     break;
-    
-  case EFI_BOOT_SCRIPT_IO_POLL_OPCODE:  
+
+  case EFI_BOOT_SCRIPT_IO_POLL_OPCODE:
     VA_START (Marker, OpCode);
     Status = BootScriptWriteIoPoll (Marker);
     VA_END (Marker);
-    break;    
-  
-  case EFI_BOOT_SCRIPT_PCI_CONFIG_POLL_OPCODE: 
+    break;
+
+  case EFI_BOOT_SCRIPT_PCI_CONFIG_POLL_OPCODE:
     VA_START (Marker, OpCode);
     Status = BootScriptWritePciConfigPoll (Marker);
     VA_END (Marker);
-    break;    
-  
+    break;
+
   case EFI_BOOT_SCRIPT_PCI_CONFIG2_POLL_OPCODE:
     VA_START (Marker, OpCode);
     Status = BootScriptWritePciConfig2Poll (Marker);
     VA_END (Marker);
-    break;    
+    break;
 
   default:
     Status = EFI_INVALID_PARAMETER;
     break;
   }
-  
+
   if (!EFI_ERROR (Status)) {
    Status = S3BootScriptMoveLastOpcode (BeforeOrAfter, Position);
   }
@@ -844,7 +844,7 @@ BootScriptInsert (
   @retval EFI_SUCCESS           The label already exists or was inserted.
   @retval EFI_INVALID_PARAMETER The Label is NULL or points to an empty string.
   @retval EFI_INVALID_PARAMETER The Position is not a valid position in the boot script table.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -856,27 +856,27 @@ BootScriptLabel (
   IN CONST CHAR8                                *Label
   )
 {
-	return S3BootScriptLabel (BeforeOrAfter, CreateIfNotFound, Position, Label);
+  return S3BootScriptLabel (BeforeOrAfter, CreateIfNotFound, Position, Label);
 }
 /**
   Compare two positions in the boot script table and return their relative position.
-  
+
   This function compares two positions in the boot script table and returns their relative positions. If
   Position1 is before Position2, then -1 is returned. If Position1 is equal to Position2,
   then 0 is returned. If Position1 is after Position2, then 1 is returned.
-  
+
   @param  This                  A pointer to the EFI_S3_SAVE_STATE_PROTOCOL instance.
   @param  Position1             The positions in the boot script table to compare
   @param  Position2             The positions in the boot script table to compare
   @param  RelativePosition      On return, points to the result of the comparison
 
-  @retval EFI_SUCCESS           The operation succeeded. 
+  @retval EFI_SUCCESS           The operation succeeded.
   @retval EFI_INVALID_PARAMETER The Position1 or Position2 is not a valid position in the boot script table.
   @retval EFI_INVALID_PARAMETER The RelativePosition is NULL.
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 BootScriptCompare (
   IN CONST EFI_S3_SAVE_STATE_PROTOCOL      *This,
   IN       EFI_S3_BOOT_SCRIPT_POSITION      Position1,
@@ -884,7 +884,7 @@ BootScriptCompare (
   OUT      UINTN                           *RelativePosition
   )
 {
-	return S3BootScriptCompare (Position1, Position2, RelativePosition);
+  return S3BootScriptCompare (Position1, Position2, RelativePosition);
 }
 /**
   This routine is entry point of ScriptSave driver.

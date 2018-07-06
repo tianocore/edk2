@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2013-2017, ARM Limited. All rights reserved.
+*  Copyright (c) 2013-2018, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD
@@ -43,36 +43,36 @@ UINT64 mNumTimerTicks = 0;
 
 EFI_HARDWARE_INTERRUPT2_PROTOCOL *mInterruptProtocol;
 
-EFI_STATUS
+VOID
 WatchdogWriteOffsetRegister (
   UINT32  Value
   )
 {
-  return MmioWrite32 (GENERIC_WDOG_OFFSET_REG, Value);
+  MmioWrite32 (GENERIC_WDOG_OFFSET_REG, Value);
 }
 
-EFI_STATUS
+VOID
 WatchdogWriteCompareRegister (
   UINT64  Value
   )
 {
-  return MmioWrite64 (GENERIC_WDOG_COMPARE_VALUE_REG, Value);
+  MmioWrite64 (GENERIC_WDOG_COMPARE_VALUE_REG, Value);
 }
 
-EFI_STATUS
+VOID
 WatchdogEnable (
   VOID
   )
 {
-  return MmioWrite32 (GENERIC_WDOG_CONTROL_STATUS_REG, GENERIC_WDOG_ENABLED);
+  MmioWrite32 (GENERIC_WDOG_CONTROL_STATUS_REG, GENERIC_WDOG_ENABLED);
 }
 
-EFI_STATUS
+VOID
 WatchdogDisable (
   VOID
   )
 {
-  return MmioWrite32 (GENERIC_WDOG_CONTROL_STATUS_REG, GENERIC_WDOG_DISABLED);
+  MmioWrite32 (GENERIC_WDOG_CONTROL_STATUS_REG, GENERIC_WDOG_DISABLED);
 }
 
 /** On exiting boot services we must make sure the Watchdog Timer
@@ -163,9 +163,7 @@ WatchdogRegisterHandler (
                            then the watchdog timer is disabled.
 
   @retval EFI_SUCCESS           The watchdog timer has been programmed to fire
-                                in Time  100ns units.
-  @retval EFI_DEVICE_ERROR      A watchdog timer could not be programmed due
-                                to a device error.
+                                in TimerPeriod 100ns units.
 
 **/
 EFI_STATUS
@@ -176,12 +174,12 @@ WatchdogSetTimerPeriod (
   )
 {
   UINTN       SystemCount;
-  EFI_STATUS  Status;
 
   // if TimerPeriod is 0, this is a request to stop the watchdog.
   if (TimerPeriod == 0) {
     mNumTimerTicks = 0;
-    return WatchdogDisable ();
+    WatchdogDisable ();
+    return EFI_SUCCESS;
   }
 
   // Work out how many timer ticks will equate to TimerPeriod
@@ -195,19 +193,16 @@ WatchdogSetTimerPeriod (
        because enabling the watchdog causes an "explicit refresh", which
        clobbers the compare register (WCV). In order to make sure this doesn't
        trigger an interrupt, set the offset to max. */
-    Status = WatchdogWriteOffsetRegister (MAX_UINT32);
-    if (EFI_ERROR (Status)) {
-      return Status;
-    }
+    WatchdogWriteOffsetRegister (MAX_UINT32);
     WatchdogEnable ();
     SystemCount = ArmGenericTimerGetSystemCount ();
-    Status      = WatchdogWriteCompareRegister (SystemCount + mNumTimerTicks);
+    WatchdogWriteCompareRegister (SystemCount + mNumTimerTicks);
   } else {
-    Status = WatchdogWriteOffsetRegister ((UINT32)mNumTimerTicks);
+    WatchdogWriteOffsetRegister ((UINT32)mNumTimerTicks);
     WatchdogEnable ();
   }
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**

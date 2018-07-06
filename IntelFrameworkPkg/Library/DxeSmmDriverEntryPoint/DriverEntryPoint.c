@@ -3,7 +3,7 @@
   EfiMain() is common driver entry point for all SMM driver who uses DxeSmmDriverEntryPoint
   library class.
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -136,9 +136,9 @@ _DriverUnloadHandler (
 {
   //
   // Call the unload handlers for all the modules.
-  // 
-  // Note: All libraries were constructed in SMM space, 
-  // therefore we can not destruct them in Unload 
+  //
+  // Note: All libraries were constructed in SMM space,
+  // therefore we can not destruct them in Unload
   // handler.
   //
   return ProcessModuleUnloadList (ImageHandle);

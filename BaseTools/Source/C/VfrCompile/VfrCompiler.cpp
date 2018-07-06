@@ -2,7 +2,7 @@
   
   VfrCompiler main class and main function.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials                          
 are licensed and made available under the terms and conditions of the BSD License         
 which accompanies this distribution.  The full text of the license may be found at        
@@ -284,7 +284,7 @@ CVfrCompiler::AppendIncludePath (
   strcat (IncludePaths, " -I ");
   strcat (IncludePaths, PathStr);
   if (mOptions.IncludePaths != NULL) {
-    delete mOptions.IncludePaths;
+    delete[] mOptions.IncludePaths;
   }
   mOptions.IncludePaths = IncludePaths;
 }
@@ -313,7 +313,7 @@ CVfrCompiler::AppendCPreprocessorOptions (
   strcat (Opt, " ");
   strcat (Opt, Options);
   if (mOptions.CPreprocessorOptions != NULL) {
-    delete mOptions.CPreprocessorOptions;
+    delete[] mOptions.CPreprocessorOptions;
   }
   mOptions.CPreprocessorOptions = Opt;
 }
@@ -531,12 +531,12 @@ CVfrCompiler::~CVfrCompiler (
   }
 
   if (mOptions.IncludePaths != NULL) {
-    delete mOptions.IncludePaths;
+    delete[] mOptions.IncludePaths;
     mOptions.IncludePaths = NULL;
   }
 
   if (mOptions.CPreprocessorOptions != NULL) {
-    delete mOptions.CPreprocessorOptions;
+    delete[] mOptions.CPreprocessorOptions;
     mOptions.CPreprocessorOptions = NULL;
   }
 
@@ -965,11 +965,11 @@ main (
   }
 
   if (gCBuffer.Buffer != NULL) {
-    delete gCBuffer.Buffer;
+    delete[] gCBuffer.Buffer;
   }
   
   if (gRBuffer.Buffer != NULL) {
-    delete gRBuffer.Buffer;
+    delete[] gRBuffer.Buffer;
   }
 
   return GetUtilityStatus ();

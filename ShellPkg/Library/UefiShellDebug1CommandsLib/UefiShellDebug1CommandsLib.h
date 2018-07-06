@@ -1,7 +1,7 @@
 /** @file
   Main file for NULL named library for Profile1 shell command functions.
 
-  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -312,7 +312,7 @@ ShellCommandRunHexEdit (
 
 /**
   Clear the line at the specified Row.
-  
+
   @param[in] Row                The row number to be cleared ( start from 1 )
   @param[in] LastCol            The last printable column.
   @param[in] LastRow            The last printable row.
@@ -326,7 +326,7 @@ EditorClearLine (
 
 /**
   Check if file name has illegal characters.
-  
+
   @param Name       The filename to check.
 
   @retval TRUE      The filename is ok.
@@ -351,18 +351,18 @@ EditGetDefaultFileName (
   );
 
 /**
-  Read a file into an allocated buffer.  The buffer is the responsibility 
+  Read a file into an allocated buffer.  The buffer is the responsibility
   of the caller to free.
 
   @param[in]  FileName          The filename of the file to open.
-  @param[out] Buffer            Upon successful return, the pointer to the 
-                                address of the allocated buffer.                                  
+  @param[out] Buffer            Upon successful return, the pointer to the
+                                address of the allocated buffer.
   @param[out] BufferSize        If not NULL, then the pointer to the size
                                 of the allocated buffer.
   @param[out] ReadOnly          Upon successful return TRUE if the file is
                                 read only.  FALSE otherwise.
 
-  @retval EFI_NOT_FOUND         The filename did not represent a file in the 
+  @retval EFI_NOT_FOUND         The filename did not represent a file in the
                                 file system.  Directories cannot be read with
                                 this method.
   @retval EFI_SUCCESS           The file was read into the buffer.

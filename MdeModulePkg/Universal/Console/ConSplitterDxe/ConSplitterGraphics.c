@@ -1,7 +1,7 @@
 /** @file
   Support for Graphics output spliter.
-  
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -58,7 +58,7 @@ ConSplitterGraphicsOutputQueryMode (
   Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   GraphicsOutput = NULL;
-  
+
   if (Private->CurrentNumberOfGraphicsOutput == 1) {
     //
     // Find the only one GraphicsOutput.
@@ -70,7 +70,7 @@ ConSplitterGraphicsOutputQueryMode (
       }
     }
   }
-  
+
   if (GraphicsOutput != NULL) {
     //
     // If only one physical GOP device exist, return its information.
@@ -79,7 +79,7 @@ ConSplitterGraphicsOutputQueryMode (
     return Status;
   } else {
     //
-    // If 2 more phyiscal GOP device exist or GOP protocol does not exist, 
+    // If 2 more phyiscal GOP device exist or GOP protocol does not exist,
     // return GOP information (PixelFormat is PixelBltOnly) created in ConSplitterAddGraphicsOutputMode ().
     //
     *Info = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION));
@@ -191,7 +191,7 @@ ConSplitterGraphicsOutputSetMode (
     This->Mode->FrameBufferSize = PhysicalGraphicsOutput->Mode->FrameBufferSize;
   } else {
     //
-    // If 2 more phyiscal GOP device exist or GOP protocol does not exist, 
+    // If 2 more phyiscal GOP device exist or GOP protocol does not exist,
     // return GOP information (PixelFormat is PixelBltOnly) created in ConSplitterAddGraphicsOutputMode ().
     //
     CopyMem (This->Mode->Info, &Private->GraphicsOutputModeBuffer[ModeNumber], This->Mode->SizeOfInfo);
@@ -273,7 +273,7 @@ ConSplitterGraphicsOutputBlt (
   if (This == NULL || ((UINTN) BltOperation) >= EfiGraphicsOutputBltOperationMax) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Private = GRAPHICS_OUTPUT_SPLITTER_PRIVATE_DATA_FROM_THIS (This);
 
   ReturnStatus = EFI_SUCCESS;

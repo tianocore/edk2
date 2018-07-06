@@ -1,7 +1,7 @@
 /** @file
   Support routines for RDRAND instruction access.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -63,7 +63,7 @@ RdRandGetBytes (
   This function takes multiple random numbers through RDRAND without intervening
   delays to ensure reseeding and performs AES-CBC-MAC over the data to compute the
   seed value.
-  
+
   @param[out]  SeedBuffer    Pointer to a 128bit buffer to store the random seed.
 
   @retval EFI_SUCCESS        Random seed generation succeeded.

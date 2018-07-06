@@ -18,6 +18,7 @@
 #include <Library/LoadLinuxLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>
+#include <Library/ReportStatusCodeLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 
@@ -148,6 +149,9 @@ TryRunningQemuKernel (
   // Signal the EVT_SIGNAL_READY_TO_BOOT event
   //
   EfiSignalEventReadyToBoot();
+
+  REPORT_STATUS_CODE (EFI_PROGRESS_CODE,
+    (EFI_SOFTWARE_DXE_BS_DRIVER | EFI_SW_DXE_BS_PC_READY_TO_BOOT_EVENT));
 
   Status = LoadLinux (KernelBuf, SetupBuf);
 

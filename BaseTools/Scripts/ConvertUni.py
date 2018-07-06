@@ -23,11 +23,6 @@ import codecs
 import os
 import sys
 
-try:
-    from io import StringIO
-except ImportError:
-    from StringIO import StringIO
-
 class ConvertOneArg:
     """Converts utf-16 to utf-8 for one command line argument.
 

@@ -394,7 +394,7 @@ DisassembleArmInstruction (
   }
 
 
-  if ((OpCode  & 0x0db00000) == 0x03200000) {
+  if ((OpCode  & 0x0db00000) == 0x01200000) {
     // A4.1.38 MSR{<cond>} CPSR_<fields>, #<immediate> MSR{<cond>} CPSR_<fields>, <Rm>
     if (I) {
       // MSR{<cond>} CPSR_<fields>, #<immediate>

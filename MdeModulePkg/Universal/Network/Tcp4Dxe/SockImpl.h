@@ -1,7 +1,7 @@
 /** @file
   Socket implementation header file.
 
-Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,10 +20,10 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 /**
   Signal a event with the given status.
-  
+
   @param Token        The token's event is to be signaled.
   @param TokenStatus  The status to be sent with the event.
-  
+
 **/
 #define SIGNAL_TOKEN(Token, TokenStatus) \
   do { \
@@ -36,7 +36,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Supporting function for both SockImpl and SockInterface.
 
   @param Event  The Event this notify function registered to, ignored.
-  
+
 **/
 VOID
 EFIAPI

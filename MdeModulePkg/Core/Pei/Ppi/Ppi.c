@@ -1,7 +1,7 @@
 /** @file
   EFI PEI Core PPI services
-  
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -19,7 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Initialize PPI services.
 
   @param PrivateData     Pointer to the PEI Core data.
-  @param OldCoreData     Pointer to old PEI Core data. 
+  @param OldCoreData     Pointer to old PEI Core data.
                          NULL if being run in non-permament memory mode.
 
 **/
@@ -38,67 +38,141 @@ InitializePpiServices (
 
 /**
 
-  Migrate Single PPI Pointer from the temporary memory to PEI installed memory.
+  Migrate Pointer from the temporary memory to PEI installed memory.
 
-  @param PpiPointer      Pointer to Ppi
+  @param Pointer         Pointer to the Pointer needs to be converted.
   @param TempBottom      Base of old temporary memory
   @param TempTop         Top of old temporary memory
   @param Offset          Offset of new memory to old temporary memory.
-  @param OffsetPositive  Positive flag of Offset value. 
+  @param OffsetPositive  Positive flag of Offset value.
 
 **/
 VOID
-ConvertSinglePpiPointer (
-  IN PEI_PPI_LIST_POINTERS *PpiPointer,
+ConvertPointer (
+  IN OUT VOID              **Pointer,
   IN UINTN                 TempBottom,
   IN UINTN                 TempTop,
   IN UINTN                 Offset,
   IN BOOLEAN               OffsetPositive
   )
 {
-  if (((UINTN)PpiPointer->Raw < TempTop) &&
-      ((UINTN)PpiPointer->Raw >= TempBottom)) {
-    //
-    // Convert the pointer to the PPI descriptor from the old TempRam
-    // to the relocated physical memory.
-    //
+  if (((UINTN) *Pointer < TempTop) &&
+    ((UINTN) *Pointer >= TempBottom)) {
     if (OffsetPositive) {
-      PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw + Offset);
+      *Pointer = (VOID *) ((UINTN) *Pointer + Offset);
     } else {
-      PpiPointer->Raw = (VOID *) ((UINTN)PpiPointer->Raw - Offset);
-    }
-
-    //
-    // Only when the PEIM descriptor is in the old TempRam should it be necessary
-    // to try to convert the pointers in the PEIM descriptor
-    //
-
-    if (((UINTN)PpiPointer->Ppi->Guid < TempTop) &&
-        ((UINTN)PpiPointer->Ppi->Guid >= TempBottom)) {
-      //
-      // Convert the pointer to the GUID in the PPI or NOTIFY descriptor
-      // from the old TempRam to the relocated physical memory.
-      //
-      if (OffsetPositive) {
-        PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid + Offset);
-      } else {
-        PpiPointer->Ppi->Guid = (VOID *) ((UINTN)PpiPointer->Ppi->Guid - Offset);
-      }
-    }
-
-    //
-    // Convert the pointer to the PPI interface structure in the PPI descriptor
-    // from the old TempRam to the relocated physical memory.
-    //
-    if ((UINTN)PpiPointer->Ppi->Ppi < TempTop &&
-        (UINTN)PpiPointer->Ppi->Ppi >= TempBottom) {
-      if (OffsetPositive) {
-        PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi + Offset);
-      } else {
-        PpiPointer->Ppi->Ppi = (VOID *) ((UINTN)PpiPointer->Ppi->Ppi - Offset);
-      }
+      *Pointer = (VOID *) ((UINTN) *Pointer - Offset);
     }
   }
+}
+
+/**
+
+  Migrate Pointer in ranges of the temporary memory to PEI installed memory.
+
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size
+                         and location of temporary RAM, the stack location and the BFV location.
+  @param PrivateData     Pointer to PeiCore's private data structure.
+  @param Pointer         Pointer to the Pointer needs to be converted.
+
+**/
+VOID
+ConvertPointerInRanges (
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
+  IN PEI_CORE_INSTANCE           *PrivateData,
+  IN OUT VOID                    **Pointer
+  )
+{
+  UINT8                 IndexHole;
+
+  if (PrivateData->MemoryPages.Size != 0) {
+    //
+    // Convert PPI pointer in old memory pages
+    // It needs to be done before Convert PPI pointer in old Heap
+    //
+    ConvertPointer (
+      Pointer,
+      (UINTN)PrivateData->MemoryPages.Base,
+      (UINTN)PrivateData->MemoryPages.Base + PrivateData->MemoryPages.Size,
+      PrivateData->MemoryPages.Offset,
+      PrivateData->MemoryPages.OffsetPositive
+      );
+  }
+
+  //
+  // Convert PPI pointer in old Heap
+  //
+  ConvertPointer (
+    Pointer,
+    (UINTN)SecCoreData->PeiTemporaryRamBase,
+    (UINTN)SecCoreData->PeiTemporaryRamBase + SecCoreData->PeiTemporaryRamSize,
+    PrivateData->HeapOffset,
+    PrivateData->HeapOffsetPositive
+    );
+
+  //
+  // Convert PPI pointer in old Stack
+  //
+  ConvertPointer (
+    Pointer,
+    (UINTN)SecCoreData->StackBase,
+    (UINTN)SecCoreData->StackBase + SecCoreData->StackSize,
+    PrivateData->StackOffset,
+    PrivateData->StackOffsetPositive
+    );
+
+  //
+  // Convert PPI pointer in old TempRam Hole
+  //
+  for (IndexHole = 0; IndexHole < HOLE_MAX_NUMBER; IndexHole ++) {
+    if (PrivateData->HoleData[IndexHole].Size == 0) {
+      continue;
+    }
+
+    ConvertPointer (
+      Pointer,
+      (UINTN)PrivateData->HoleData[IndexHole].Base,
+      (UINTN)PrivateData->HoleData[IndexHole].Base + PrivateData->HoleData[IndexHole].Size,
+      PrivateData->HoleData[IndexHole].Offset,
+      PrivateData->HoleData[IndexHole].OffsetPositive
+      );
+  }
+}
+
+/**
+
+  Migrate Single PPI Pointer from the temporary memory to PEI installed memory.
+
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
+                         and location of temporary RAM, the stack location and the BFV location.
+  @param PrivateData     Pointer to PeiCore's private data structure.
+  @param PpiPointer      Pointer to Ppi
+
+**/
+VOID
+ConvertSinglePpiPointer (
+  IN CONST EFI_SEC_PEI_HAND_OFF  *SecCoreData,
+  IN PEI_CORE_INSTANCE           *PrivateData,
+  IN PEI_PPI_LIST_POINTERS       *PpiPointer
+  )
+{
+  //
+  // 1. Convert the pointer to the PPI descriptor from the old TempRam
+  //    to the relocated physical memory.
+  // It (for the pointer to the PPI descriptor) needs to be done before 2 (for
+  // the pointer to the GUID) and 3 (for the pointer to the PPI interface structure).
+  //
+  ConvertPointerInRanges (SecCoreData, PrivateData, &PpiPointer->Raw);
+  //
+  // 2. Convert the pointer to the GUID in the PPI or NOTIFY descriptor
+  //    from the old TempRam to the relocated physical memory.
+  //
+  ConvertPointerInRanges (SecCoreData, PrivateData, (VOID **) &PpiPointer->Ppi->Guid);
+  //
+  // 3. Convert the pointer to the PPI interface structure in the PPI descriptor
+  //    from the old TempRam to the relocated physical memory.
+  //
+  ConvertPointerInRanges (SecCoreData, PrivateData, (VOID **) &PpiPointer->Ppi->Ppi);
 }
 
 /**
@@ -117,69 +191,21 @@ ConvertPpiPointers (
   )
 {
   UINT8                 Index;
-  UINT8                 IndexHole;
 
   for (Index = 0; Index < PcdGet32 (PcdPeiCoreMaxPpiSupported); Index++) {
     if (Index < PrivateData->PpiData.PpiListEnd || Index > PrivateData->PpiData.NotifyListEnd) {
-      if (PrivateData->MemoryPages.Size != 0) {
-        //
-        // Convert PPI pointer in old memory pages
-        // It needs to be done before Convert PPI pointer in old Heap
-        //
-        ConvertSinglePpiPointer (
-          &PrivateData->PpiData.PpiListPtrs[Index],
-          (UINTN)PrivateData->MemoryPages.Base,
-          (UINTN)PrivateData->MemoryPages.Base + PrivateData->MemoryPages.Size,
-          PrivateData->MemoryPages.Offset,
-          PrivateData->MemoryPages.OffsetPositive
-          );
-      }
-
-      //
-      // Convert PPI pointer in old Heap
-      //
       ConvertSinglePpiPointer (
-        &PrivateData->PpiData.PpiListPtrs[Index],
-        (UINTN)SecCoreData->PeiTemporaryRamBase,
-        (UINTN)SecCoreData->PeiTemporaryRamBase + SecCoreData->PeiTemporaryRamSize,
-        PrivateData->HeapOffset,
-        PrivateData->HeapOffsetPositive
+        SecCoreData,
+        PrivateData,
+        &PrivateData->PpiData.PpiListPtrs[Index]
         );
-        
-      //
-      // Convert PPI pointer in old Stack
-      //
-      ConvertSinglePpiPointer (
-        &PrivateData->PpiData.PpiListPtrs[Index],
-        (UINTN)SecCoreData->StackBase,
-        (UINTN)SecCoreData->StackBase + SecCoreData->StackSize,
-        PrivateData->StackOffset,
-        PrivateData->StackOffsetPositive
-        );
-        
-      //
-      // Convert PPI pointer in old TempRam Hole
-      //
-      for (IndexHole = 0; IndexHole < HOLE_MAX_NUMBER; IndexHole ++) {
-        if (PrivateData->HoleData[IndexHole].Size == 0) {
-          continue;
-        }
-        
-        ConvertSinglePpiPointer (
-          &PrivateData->PpiData.PpiListPtrs[Index],
-          (UINTN)PrivateData->HoleData[IndexHole].Base,
-          (UINTN)PrivateData->HoleData[IndexHole].Base + PrivateData->HoleData[IndexHole].Size,
-          PrivateData->HoleData[IndexHole].Offset,
-          PrivateData->HoleData[IndexHole].OffsetPositive
-          );
-      }
     }
   }
 }
 
 /**
 
-  This function installs an interface in the PEI PPI database by GUID. 
+  This function installs an interface in the PEI PPI database by GUID.
   The purpose of the service is to publish an interface that other parties
   can use to call additional PEIMs.
 
@@ -280,7 +306,7 @@ InternalPeiInstallPpi (
 
 /**
 
-  This function installs an interface in the PEI PPI database by GUID. 
+  This function installs an interface in the PEI PPI database by GUID.
   The purpose of the service is to publish an interface that other parties
   can use to call additional PEIMs.
 
@@ -305,9 +331,9 @@ PeiInstallPpi (
 
 /**
 
-  This function reinstalls an interface in the PEI PPI database by GUID. 
-  The purpose of the service is to publish an interface that other parties can 
-  use to replace an interface of the same name in the protocol database with a 
+  This function reinstalls an interface in the PEI PPI database by GUID.
+  The purpose of the service is to publish an interface that other parties can
+  use to replace an interface of the same name in the protocol database with a
   different interface.
 
   @param PeiServices            An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
@@ -450,8 +476,8 @@ PeiLocatePpi (
 
 /**
 
-  This function installs a notification service to be called back when a given 
-  interface is installed or reinstalled. The purpose of the service is to publish 
+  This function installs a notification service to be called back when a given
+  interface is installed or reinstalled. The purpose of the service is to publish
   an interface that other parties can use to call additional PPIs that may materialize later.
 
   @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.
@@ -579,8 +605,8 @@ InternalPeiNotifyPpi (
 
 /**
 
-  This function installs a notification service to be called back when a given 
-  interface is installed or reinstalled. The purpose of the service is to publish 
+  This function installs a notification service to be called back when a given
+  interface is installed or reinstalled. The purpose of the service is to publish
   an interface that other parties can use to call additional PPIs that may materialize later.
 
   @param PeiServices        An indirect pointer to the EFI_PEI_SERVICES table published by the PEI Foundation.

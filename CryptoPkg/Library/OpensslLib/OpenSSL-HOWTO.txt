@@ -18,7 +18,6 @@ on the cryptography.
                              OpenSSL-Version
 =============================================================================
   EDKII supports building with the latest release of OpenSSL.
-  The latest official release is OpenSSL-1.1.0g (Released at 2017-Nov-02).
   NOTE: Only latest release version was fully validated.
         And no guarantees on build & functionality if using other versions.
 
@@ -40,7 +39,7 @@ or
   And use the following combined commands to pull the remote submodule updates
 (e.g. Updating the new supported OpenSSL release tag):
      $ git pull --recurse-submodules && \
-       git submodule update --recursive --remote
+       git submodule update --recursive
 
 =============================================================================
                       About process_files.pl

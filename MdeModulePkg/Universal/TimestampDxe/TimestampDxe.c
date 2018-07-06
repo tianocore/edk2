@@ -1,7 +1,7 @@
 /** @file
   Implementation of Timestamp Protocol using UEFI APIs.
-  
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -45,9 +45,9 @@ EFI_TIMESTAMP_PROPERTIES mTimestampProperties = {
   will always roll over to zero. The properties of the counter can be retrieved from GetProperties().
   The caller should be prepared for the function to return the same value twice across successive calls.
   The counter value will not go backwards other than when wrapping, as defined by EndValue in GetProperties().
-  The frequency of the returned timestamp counter value must remain constant. Power management operations that 
-  affect clocking must not change the returned counter frequency. The quantization of counter value updates may 
-  vary as long as the value reflecting time passed remains consistent.           
+  The frequency of the returned timestamp counter value must remain constant. Power management operations that
+  affect clocking must not change the returned counter frequency. The quantization of counter value updates may
+  vary as long as the value reflecting time passed remains consistent.
 
   @retval The current value of the free running timestamp counter.
 
@@ -63,7 +63,7 @@ TimestampDriverGetTimestamp (
   //
   UINT64  TimestampValue;
   TimestampValue = 0;
-  
+
   //
   // Get the timestamp
   //
@@ -72,7 +72,7 @@ TimestampDriverGetTimestamp (
   } else {
     TimestampValue = GetPerformanceCounter() - mTimerLibStartValue;
   }
-    
+
   return TimestampValue;
 }
 
@@ -81,9 +81,9 @@ TimestampDriverGetTimestamp (
 
   @param[out]  Properties              The properties of the timestamp counter.
 
-  @retval      EFI_SUCCESS             The properties were successfully retrieved. 
-  @retval      EFI_DEVICE_ERROR        An error occurred trying to retrieve the properties of the timestamp 
-                                       counter subsystem. Properties is not pedated.                                
+  @retval      EFI_SUCCESS             The properties were successfully retrieved.
+  @retval      EFI_DEVICE_ERROR        An error occurred trying to retrieve the properties of the timestamp
+                                       counter subsystem. Properties is not pedated.
   @retval      EFI_INVALID_PARAMETER   Properties is NULL.
 
 **/
@@ -96,12 +96,12 @@ TimestampDriverGetProperties(
   if (Properties == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Get timestamp properties
   //
   CopyMem((VOID *) Properties, (VOID *) &mTimestampProperties, sizeof (mTimestampProperties));
-  
+
   return EFI_SUCCESS;
 }
 
@@ -130,26 +130,26 @@ TimestampDriverInitialize (
   )
 {
   EFI_STATUS  Status;
-  
+
   EFI_HANDLE  TimestampHandle;
   TimestampHandle = NULL;
-  
+
   //
   // Get the start value, end value and frequency in Timerlib
   //
   mTimestampProperties.Frequency = GetPerformanceCounterProperties(&mTimerLibStartValue, &mTimerLibEndValue);
-  
+
   //
-  // Set the EndValue 
+  // Set the EndValue
   //
   if (mTimerLibEndValue > mTimerLibStartValue) {
     mTimestampProperties.EndValue = mTimerLibEndValue - mTimerLibStartValue;
   } else {
     mTimestampProperties.EndValue = mTimerLibStartValue - mTimerLibEndValue;
   }
-  
+
   DEBUG ((EFI_D_INFO, "TimerFrequency:0x%lx, TimerLibStartTime:0x%lx, TimerLibEndtime:0x%lx\n", mTimestampProperties.Frequency, mTimerLibStartValue, mTimerLibEndValue));
-  
+
   //
   // Install the Timestamp Protocol onto a new handle
   //
@@ -159,7 +159,7 @@ TimestampDriverInitialize (
                   &mTimestamp,
                   NULL
                   );
-                  
+
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;

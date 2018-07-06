@@ -1,8 +1,8 @@
 /** @file
 Pei USB ATATPI command implementations.
 
-Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -475,7 +475,7 @@ PeiUsbRead10 (
   return Status;
 }
 
-/**  
+/**
   Check if there is media according to sense data.
 
   @param  SenseData   Pointer to sense data.
@@ -526,7 +526,7 @@ IsNoMedia (
   return NoMedia;
 }
 
-/**  
+/**
   Check if there is media error according to sense data.
 
   @param  SenseData   Pointer to sense data.
@@ -603,7 +603,7 @@ IsMediaError (
   return Error;
 }
 
-/**  
+/**
   Check if media is changed according to sense data.
 
   @param  SenseData   Pointer to sense data.

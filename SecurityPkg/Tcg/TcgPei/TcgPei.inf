@@ -4,7 +4,7 @@
 #  This module will initialize TPM device, measure reported FVs and BIOS version.
 #  This module may also lock TPM physical presence and physicalPresenceLifetimeLock.
 #
-# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -26,7 +26,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 # [BootMode]
 #   S3_RESUME                 ## SOMETIMES_CONSUMES
@@ -73,8 +73,8 @@
   gEfiEndOfPeiSignalPpiGuid                                           ## SOMETIMES_CONSUMES     ## NOTIFY
 
 [Pcd]
-  gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceLifetimeLock       ## SOMETIMES_CONSUMES 
-  gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceCmdEnable          ## SOMETIMES_CONSUMES 
+  gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceLifetimeLock       ## SOMETIMES_CONSUMES
+  gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceCmdEnable          ## SOMETIMES_CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdPhysicalPresenceHwEnable           ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString             ## SOMETIMES_CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                    ## CONSUMES
@@ -85,9 +85,8 @@
 
 [Depex]
   gEfiPeiMasterBootModePpiGuid AND
-  gEfiPeiReadOnlyVariable2PpiGuid AND
   gEfiTpmDeviceSelectedGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   TcgPeiExtra.uni
-  
+

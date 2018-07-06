@@ -298,22 +298,6 @@ SdMmcHcWaitMmioSet (
   );
 
 /**
-  Software reset the specified SD/MMC host controller.
-
-  @param[in] PciIo          The PCI IO protocol instance.
-  @param[in] Slot           The slot number of the SD card to send the command to.
-
-  @retval EFI_SUCCESS       The software reset executes successfully.
-  @retval Others            The software reset fails.
-
-**/
-EFI_STATUS
-SdMmcHcReset (
-  IN EFI_PCI_IO_PROTOCOL    *PciIo,
-  IN UINT8                  Slot
-  );
-
-/**
   Set all interrupt status bits in Normal and Error Interrupt Status Enable
   register.
 
@@ -522,25 +506,6 @@ EFI_STATUS
 SdMmcHcInitTimeoutCtrl (
   IN EFI_PCI_IO_PROTOCOL    *PciIo,
   IN UINT8                  Slot
-  );
-
-/**
-  Initial SD/MMC host controller with lowest clock frequency, max power and max timeout value
-  at initialization.
-
-  @param[in] PciIo          The PCI IO protocol instance.
-  @param[in] Slot           The slot number of the SD card to send the command to.
-  @param[in] Capability     The capability of the slot.
-
-  @retval EFI_SUCCESS       The host controller is initialized successfully.
-  @retval Others            The host controller isn't initialized successfully.
-
-**/
-EFI_STATUS
-SdMmcHcInitHost (
-  IN EFI_PCI_IO_PROTOCOL    *PciIo,
-  IN UINT8                  Slot,
-  IN SD_MMC_HC_SLOT_CAP     Capability
   );
 
 #endif

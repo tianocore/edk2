@@ -1,7 +1,7 @@
 /** @file
   UART Serial Port library functions
 
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -58,11 +58,11 @@ UINT8   gBreakSet = 0;
 
 /**
   Initialize the serial device hardware.
-  
+
   If no initialization is required, then return RETURN_SUCCESS.
   If the serial device was successfully initialized, then return RETURN_SUCCESS.
   If the serial device could not be initialized, then return RETURN_DEVICE_ERROR.
-  
+
   @retval RETURN_SUCCESS        The serial device was initialized.
   @retval RETURN_DEVICE_ERROR   The serail device could not be initialized.
 
@@ -86,7 +86,7 @@ SerialPortInitialize (
   // Calculate divisor for baud generator
   //
   Divisor = 115200 / gBps;
-  
+
   //
   // Set communications format
   //
@@ -109,13 +109,13 @@ SerialPortInitialize (
 }
 
 /**
-  Write data from buffer to serial device. 
- 
-  Writes NumberOfBytes data bytes from Buffer to the serial device.  
+  Write data from buffer to serial device.
+
+  Writes NumberOfBytes data bytes from Buffer to the serial device.
   The number of bytes actually written to the serial device is returned.
   If the return value is less than NumberOfBytes, then the write operation failed.
 
-  If Buffer is NULL, then ASSERT(). 
+  If Buffer is NULL, then ASSERT().
 
   If NumberOfBytes is zero, then return 0.
 
@@ -123,7 +123,7 @@ SerialPortInitialize (
   @param  NumberOfBytes    Number of bytes to written to the serial device.
 
   @retval 0                NumberOfBytes is 0.
-  @retval >0               The number of bytes written to the serial device.  
+  @retval >0               The number of bytes written to the serial device.
                            If this value is less than NumberOfBytes, then the write operation failed.
 
 **/
@@ -164,7 +164,7 @@ SerialPortWrite (
   @param  NumberOfBytes    Number of bytes to read from the serial device.
 
   @retval 0                NumberOfBytes is 0.
-  @retval >0               The number of bytes read from the serial device.  
+  @retval >0               The number of bytes read from the serial device.
                            If this value is less than NumberOfBytes, then the read operation failed.
 
 **/

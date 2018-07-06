@@ -1,7 +1,7 @@
 /** @file
 Header file for boot maintenance module.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -333,7 +333,7 @@ typedef struct {
 } BM_MENU_ENTRY;
 
 typedef struct {
-  
+
   UINTN                          Signature;
 
   EFI_HII_HANDLE                 BmmHiiHandle;
@@ -355,7 +355,7 @@ typedef struct {
   //
   // BMM main formset callback data.
   //
-  
+
   EFI_FORM_ID                    BmmCurrentPageId;
   EFI_FORM_ID                    BmmPreviousPageId;
   BOOLEAN                        BmmAskSaveOrNot;
@@ -403,7 +403,7 @@ BOpt_GetBootOptions (
 
   @return EFI_SUCESS The functin completes successfully.
   @retval EFI_OUT_OF_RESOURCES Not enough memory to compete the operation.
-  
+
 
 **/
 EFI_STATUS
@@ -505,12 +505,12 @@ BOpt_GetMenuEntry (
   );
 
 /**
-  Get option number according to Boot#### and BootOrder variable. 
+  Get option number according to Boot#### and BootOrder variable.
   The value is saved as #### + 1.
 
   @param CallbackData    The BMM context data.
 **/
-VOID  
+VOID
 GetBootOrder (
   IN  BMM_CALLBACK_DATA    *CallbackData
   );
@@ -519,9 +519,9 @@ GetBootOrder (
   Get driver option order from globalc DriverOptionMenu.
 
   @param CallbackData    The BMM context data.
-  
+
 **/
-VOID  
+VOID
 GetDriverOrder (
   IN  BMM_CALLBACK_DATA    *CallbackData
   );
@@ -596,11 +596,11 @@ ChangeVariableDevicePath (
 
 /**
   Update the multi-instance device path of Terminal Device based on
-  the global TerminalMenu. If ChangeTernimal is TRUE, the terminal 
+  the global TerminalMenu. If ChangeTernimal is TRUE, the terminal
   device path in the Terminal Device in TerminalMenu is also updated.
 
   @param DevicePath      The multi-instance device path.
-  @param ChangeTerminal  TRUE, then device path in the Terminal Device 
+  @param ChangeTerminal  TRUE, then device path in the Terminal Device
                          in TerminalMenu is also updated; FALSE, no update.
 
   @return EFI_SUCCESS    The function completes successfully.
@@ -616,8 +616,8 @@ ChangeTerminalDevicePath (
 // Variable operation by menu selection
 //
 /**
-  This function create a currently loaded Boot Option from 
-  the BMM. It then appends this Boot Option to the end of 
+  This function create a currently loaded Boot Option from
+  the BMM. It then appends this Boot Option to the end of
   the "BootOrder" list. It also append this Boot Opotion to the end
   of BootOptionMenu.
 
@@ -635,9 +635,9 @@ Var_UpdateBootOption (
 /**
   Delete Boot Option that represent a Deleted state in BootOptionMenu.
 
-  @retval EFI_SUCCESS   If all boot load option EFI Variables corresponding to  
+  @retval EFI_SUCCESS   If all boot load option EFI Variables corresponding to
                         BM_LOAD_CONTEXT marked for deletion is deleted
-  @return Others        If failed to update the "BootOrder" variable after deletion. 
+  @return Others        If failed to update the "BootOrder" variable after deletion.
 
 **/
 EFI_STATUS
@@ -646,8 +646,8 @@ Var_DelBootOption (
   );
 
 /**
-  This function create a currently loaded Drive Option from 
-  the BMM. It then appends this Driver Option to the end of 
+  This function create a currently loaded Drive Option from
+  the BMM. It then appends this Driver Option to the end of
   the "DriverOrder" list. It append this Driver Opotion to the end
   of DriverOptionMenu.
 
@@ -719,11 +719,11 @@ Var_UpdateErrorOutOption (
 
 /**
   This function delete and build Out of Band console device.
-  
+
   @param   MenuIndex   Menu index which user select in the terminal menu list.
-  
+
   @retval EFI_SUCCESS    The function complete successfully.
-  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.  
+  @return The EFI variable can not be saved. See gRT->SetVariable for detail return information.
 **/
 EFI_STATUS
 Var_UpdateOutOfBandOption (
@@ -731,7 +731,7 @@ Var_UpdateOutOfBandOption (
   );
 
 /**
-  This function update the "BootNext" EFI Variable. If there is no "BootNex" specified in BMM, 
+  This function update the "BootNext" EFI Variable. If there is no "BootNex" specified in BMM,
   this EFI Variable is deleted.
   It also update the BMM context data specified the "BootNext" value.
 
@@ -747,7 +747,7 @@ Var_UpdateBootNext (
   );
 
 /**
-  This function update the "BootOrder" EFI Variable based on BMM Formset's NV map. It then refresh 
+  This function update the "BootOrder" EFI Variable based on BMM Formset's NV map. It then refresh
   BootOptionMenu with the new "BootOrder" list.
 
   @param CallbackData           The BMM context data.
@@ -816,7 +816,7 @@ RefreshUpdateData (
 
 /**
   Clean up the dynamic opcode at label and form specified by
-  both LabelId. 
+  both LabelId.
 
   @param LabelId         It is both the Form ID and Label ID for
                          opcode deletion.
@@ -937,7 +937,7 @@ UpdateOptionPage(
 
   @param VarName            A Null-terminated Unicode string that is
                             the name of the vendor's variable.
-                         
+
   @param VarGuid            A unique identifier for the vendor.
 
   @retval  EFI_SUCCESS           The variable was found and removed
@@ -969,7 +969,7 @@ EfiDevicePathInstanceCount (
   );
 
 /**
-  Get a string from the Data Hub record based on 
+  Get a string from the Data Hub record based on
   a device path.
 
   @param DevPath         The device Path.
@@ -1065,8 +1065,8 @@ InitBootMaintenance(
 
   @param CallbackData    The BMM context data.
 
-**/  
-VOID  
+**/
+VOID
 GetConsoleInCheck (
   IN  BMM_CALLBACK_DATA    *CallbackData
   );
@@ -1091,7 +1091,7 @@ GetConsoleOutCheck (
 
   @param CallbackData    The BMM context data.
 
-**/        
+**/
 VOID
 GetConsoleErrCheck (
   IN  BMM_CALLBACK_DATA    *CallbackData
@@ -1112,9 +1112,9 @@ GetTerminalAttribute (
 
 /**
   This function will change video resolution and text mode
-  according to defined setup mode or defined boot mode  
+  according to defined setup mode or defined boot mode
 
-  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode. 
+  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode.
 
   @retval  EFI_SUCCESS  Mode is changed successfully.
   @retval  Others             Mode failed to be changed.
@@ -1195,7 +1195,7 @@ BootMaintExtractConfig (
 
   @param[in]  This                Points to the EFI_HII_CONFIG_ACCESS_PROTOCOL.
   @param[in]  Configuration       A null-terminated Unicode string in
-                                  <ConfigString> format.   
+                                  <ConfigString> format.
   @param[out] Progress            A pointer to a string filled in with the
                                   offset of the most recent '&' before the
                                   first failing name / value pair (or the
@@ -1205,7 +1205,7 @@ BootMaintExtractConfig (
                                   successful.
 
   @retval EFI_SUCCESS             The results have been distributed or are
-                                  awaiting distribution.  
+                                  awaiting distribution.
   @retval EFI_OUT_OF_RESOURCES    Not enough memory to store the
                                   parts of the results that must be
                                   stored awaiting possible future
@@ -1262,7 +1262,7 @@ BootMaintCallback (
   @retval FALSE  Not exit caller function.
 
 **/
-BOOLEAN 
+BOOLEAN
 EFIAPI
 CreateBootOptionFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
@@ -1276,7 +1276,7 @@ CreateBootOptionFromFile (
   @retval TRUE   Exit caller function.
   @retval FALSE  Not exit caller function.
 **/
-BOOLEAN 
+BOOLEAN
 EFIAPI
 CreateDriverOptionFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath
@@ -1289,9 +1289,9 @@ CreateDriverOptionFromFile (
 
   @retval TRUE   Exit caller function.
   @retval FALSE  Not exit caller function.
-  
+
 **/
-BOOLEAN 
+BOOLEAN
 EFIAPI
 BootFromFile (
   IN EFI_DEVICE_PATH_PROTOCOL    *FilePath

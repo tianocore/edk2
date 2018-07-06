@@ -96,7 +96,7 @@ class InfLibrarySectionParser(InfParserSectionRoot):
                 if LibLineContent.find(DT.TAB_COMMENT_SPLIT) > -1:
                     LibTailComments = LibLineContent[LibLineContent.find(DT.TAB_COMMENT_SPLIT):]
                     LibLineContent = LibLineContent[:LibLineContent.find(DT.TAB_COMMENT_SPLIT)]
-                    if LibLineComment == None:
+                    if LibLineComment is None:
                         LibLineComment = InfLineCommentObject()
                     LibLineComment.SetTailComments(LibTailComments)
 
@@ -107,7 +107,7 @@ class InfLibrarySectionParser(InfParserSectionRoot):
                                           FileName,
                                           DT.MODEL_EFI_LIBRARY_CLASS,
                                           self.FileLocalMacros)
-                if Name != None:
+                if Name is not None:
                     SectionMacros[Name] = Value
                     LibLineComment = None
                     LibHeaderComments = []

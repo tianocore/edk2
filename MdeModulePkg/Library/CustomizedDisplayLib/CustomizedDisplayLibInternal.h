@@ -2,13 +2,13 @@
 
   This library class defines a set of interfaces to customize Display module
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -121,10 +121,10 @@ extern CHAR16            *gInputErrorMessage;
   Print banner info for front page.
 
   @param[in]  FormData             Form Data to be shown in Page
-  
+
 **/
 VOID
-PrintBannerInfo ( 
+PrintBannerInfo (
   IN FORM_DISPLAY_ENGINE_FORM       *FormData
   );
 
@@ -147,7 +147,7 @@ PrintFramework (
   @return EFI_INVALID_PARAMETER  The input screen info is not acceptable.
 
 **/
-EFI_STATUS 
+EFI_STATUS
 ScreenDiemensionInfoValidate (
   IN FORM_DISPLAY_ENGINE_FORM       *FormData
   );
@@ -201,10 +201,10 @@ PrintHotKeyHelpString (
   IN FORM_DISPLAY_ENGINE_FORM      *FormData,
   IN BOOLEAN                       SetState
   );
-  
+
 /**
   Get step info from numeric opcode.
-  
+
   @param[in] OpCode     The input numeric op code.
 
   @return step info for this opcode.
@@ -285,7 +285,7 @@ PrintAt (
 
 /**
   Process some op codes which is out side of current form.
-  
+
   @param FormData                Pointer to the form data.
 
 **/

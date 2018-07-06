@@ -1,13 +1,13 @@
 /** @file
   FormDiplay protocol to show Form
 
-Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -213,22 +213,22 @@ typedef struct {
 typedef struct {
   EFI_HII_HANDLE     HiiHandle;
   UINT16             FormId;
-  
+
   //
   // Info for the highlight question.
   // HLT means highlight
   //
   // If one statement has questionid, save questionid info to find the question.
-  // If one statement not has questionid info, save the opcode info to find the 
+  // If one statement not has questionid info, save the opcode info to find the
   // statement. If more than one statement has same opcode in one form(just like
-  // empty subtitle info may has more than one info one form), also use Index 
+  // empty subtitle info may has more than one info one form), also use Index
   // info to find the statement.
   //
   EFI_QUESTION_ID    HLTQuestionId;
   EFI_IFR_OP_HEADER  *HLTOpCode;
   UINTN              HLTIndex;
   UINTN              HLTSequence;
-  
+
   //
   // Info for the top of screen question.
   // TOS means Top Of Screen
@@ -390,7 +390,7 @@ GetArrayData (
   IN UINT8                    Type,
   IN UINTN                    Index
   );
-  
+
 /**
   Search an Option of a Question by its value.
 
@@ -462,7 +462,7 @@ CreateMultiStringPopUp (
   @param  Index                  Where in InputString to start the copy process
   @param  OutputString           Buffer to copy the string into
 
-  @return Returns the number of CHAR16 characters that were copied into the OutputString 
+  @return Returns the number of CHAR16 characters that were copied into the OutputString
   buffer, include extra glyph info and '\0' info.
 
 **/
@@ -490,7 +490,7 @@ GetToken (
   IN  EFI_STRING_ID                Token,
   IN  EFI_HII_HANDLE               HiiHandle
   );
-  
+
 /**
   Count the storage space of a Unicode string.
 
@@ -559,7 +559,7 @@ CreateSharedPopUp (
   IN  UINTN                       NumberOfLines,
   IN  VA_LIST                     Marker
   );
-  
+
 /**
   Wait for a key to be pressed by user.
 
@@ -642,14 +642,14 @@ SetUnicodeMem (
 
 /**
   Display one form, and return user input.
-  
+
   @param FormData                Form Data to be shown.
   @param UserInputData           User input data.
-  
+
   @retval EFI_SUCCESS            Form Data is shown, and user input is got.
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 FormDisplay (
   IN  FORM_DISPLAY_ENGINE_FORM  *FormData,
   OUT USER_INPUT                *UserInputData
@@ -659,7 +659,7 @@ FormDisplay (
   Clear Screen to the initial state.
 **/
 VOID
-EFIAPI 
+EFIAPI
 DriverClearDisplayPage (
   VOID
   );
@@ -669,7 +669,7 @@ DriverClearDisplayPage (
 
 **/
 VOID
-EFIAPI 
+EFIAPI
 ExitDisplay (
   VOID
   );

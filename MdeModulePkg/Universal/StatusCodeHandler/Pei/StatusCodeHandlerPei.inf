@@ -1,7 +1,7 @@
 ## @file
 #  Report Status Code Handler PEIM which produces general handlers and hook them onto the PEI status code router.
 #
-#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,7 @@
   MODULE_UNI_FILE                = StatusCodeHandlerPei.uni
   FILE_GUID                      = 9D225237-FA01-464C-A949-BAABC02D31D0
   MODULE_TYPE                    = PEIM
-  VERSION_STRING                 = 1.0  
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = StatusCodeHandlerPeiEntry
 
 #
@@ -48,13 +48,13 @@
   PrintLib
   DebugLib
   BaseMemoryLib
-  
+
 [Guids]
   ## SOMETIMES_PRODUCES   ## HOB
   ## SOMETIMES_CONSUMES   ## HOB
   gMemoryStatusCodeRecordGuid
   gEfiStatusCodeDataTypeStringGuid              ## SOMETIMES_CONSUMES   ## UNDEFINED
-  
+
 [Ppis]
   gEfiPeiRscHandlerPpiGuid                      ## CONSUMES
 

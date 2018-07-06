@@ -1,7 +1,7 @@
 /** @file
   This library is TPM2 TCG2 protocol lib.
 
-Copyright (c) 2013 - 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/Tcg2Protocol.h>
 #include <IndustryStandard/Tpm20.h>
 
-EFI_TCG2_PROTOCOL  *mTcg2Protocol = NULL; 
+EFI_TCG2_PROTOCOL  *mTcg2Protocol = NULL;
 
 /**
   This service enables the sending of commands to the TPM2.
@@ -32,7 +32,7 @@ EFI_TCG2_PROTOCOL  *mTcg2Protocol = NULL;
 
   @retval EFI_SUCCESS            The command byte stream was successfully sent to the device and a response was successfully received.
   @retval EFI_DEVICE_ERROR       The command was not successfully sent to the device or a response was not successfully received from the device.
-  @retval EFI_BUFFER_TOO_SMALL   The output parameter block is too small. 
+  @retval EFI_BUFFER_TOO_SMALL   The output parameter block is too small.
 **/
 EFI_STATUS
 EFIAPI

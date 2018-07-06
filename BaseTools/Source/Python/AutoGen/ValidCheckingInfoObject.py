@@ -1,4 +1,4 @@
-# Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -17,8 +17,9 @@
 import os
 from Common.RangeExpression import RangeExpression
 from Common.Misc import *
-from StringIO import StringIO
+from io import BytesIO
 from struct import pack
+from Common.DataType import *
 
 class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
     def __init__(self):
@@ -33,12 +34,6 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
             self.var_check_info.append(var_check_tab)
     
     def dump(self, dest, Phase):
-        
-        FormatMap = {}
-        FormatMap[1] = "=B"
-        FormatMap[2] = "=H"
-        FormatMap[4] = "=L"
-        FormatMap[8] = "=Q"
         
         if not os.path.isabs(dest):
             return
@@ -105,19 +100,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
             realLength += 4
 
             Guid = var_check_tab.Guid
-            b = pack('=LHHBBBBBBBB',
-                Guid[0],
-                Guid[1],
-                Guid[2],
-                Guid[3],
-                Guid[4],
-                Guid[5],
-                Guid[6],
-                Guid[7],
-                Guid[8],
-                Guid[9],
-                Guid[10],
-                )
+            b = PackByteFormatGUID(Guid)
             Buffer += b
             realLength += 16
 
@@ -155,14 +138,14 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
                 realLength += 1
                 for v_data in item.data:
                     if type(v_data) in (int, long):
-                        b = pack(FormatMap[item.StorageWidth], v_data)
+                        b = pack(PACK_CODE_BY_SIZE[item.StorageWidth], v_data)
                         Buffer += b
                         realLength += item.StorageWidth
                     else:
-                        b = pack(FormatMap[item.StorageWidth], v_data[0])
+                        b = pack(PACK_CODE_BY_SIZE[item.StorageWidth], v_data[0])
                         Buffer += b
                         realLength += item.StorageWidth
-                        b = pack(FormatMap[item.StorageWidth], v_data[1])
+                        b = pack(PACK_CODE_BY_SIZE[item.StorageWidth], v_data[1])
                         Buffer += b
                         realLength += item.StorageWidth
 
@@ -179,7 +162,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
                             Buffer += b
                             realLength += 1
         
-        DbFile = StringIO()
+        DbFile = BytesIO()
         if Phase == 'DXE' and os.path.exists(BinFilePath):
             BinFile = open(BinFilePath, "rb")
             BinBuffer = BinFile.read()
@@ -243,40 +226,24 @@ class VAR_CHECK_PCD_VALID_OBJ(object):
         self.Type = 1
         self.Length = 0  # Length include this header
         self.VarOffset = VarOffset
-        self.StorageWidth = 0
         self.PcdDataType = PcdDataType.strip()
         self.rawdata = data
         self.data = set()
-        self.ValidData = True
-        self.updateStorageWidth()
-    def updateStorageWidth(self):
-        if self.PcdDataType == "UINT8" or self.PcdDataType == "BOOLEAN":
-            self.StorageWidth = 1
-        elif self.PcdDataType == "UINT16":
-            self.StorageWidth = 2
-        elif self.PcdDataType == "UINT32":
-            self.StorageWidth = 4
-        elif self.PcdDataType == "UINT64":
-            self.StorageWidth = 8
-        else:
+        try:
+            self.StorageWidth = MAX_SIZE_TYPE[self.PcdDataType]
+            self.ValidData = True
+        except:
             self.StorageWidth = 0
             self.ValidData = False
             
     def __eq__(self, validObj):       
-        if self.VarOffset == validObj.VarOffset:
-            return True
-        else:
-            return False
+        return validObj and self.VarOffset == validObj.VarOffset
          
 class VAR_CHECK_PCD_VALID_LIST(VAR_CHECK_PCD_VALID_OBJ):
     def __init__(self, VarOffset, validlist, PcdDataType):
         super(VAR_CHECK_PCD_VALID_LIST, self).__init__(VarOffset, validlist, PcdDataType)
         self.Type = 1
-        self.update_data()
-        self.update_size()
-    def update_data(self):
         valid_num_list = []
-        data_list = []
         for item in self.rawdata:
             valid_num_list.extend(item.split(','))
         
@@ -284,14 +251,11 @@ class VAR_CHECK_PCD_VALID_LIST(VAR_CHECK_PCD_VALID_OBJ):
             valid_num = valid_num.strip()
 
             if valid_num.startswith('0x') or valid_num.startswith('0X'):
-                data_list.append(int(valid_num, 16))
+                self.data.add(int(valid_num, 16))
             else:
-                data_list.append(int(valid_num))
+                self.data.add(int(valid_num))
 
                 
-        self.data = set(data_list)
-        
-    def update_size(self):
         self.Length = 5 + len(self.data) * self.StorageWidth
         
            
@@ -299,11 +263,7 @@ class VAR_CHECK_PCD_VALID_RANGE(VAR_CHECK_PCD_VALID_OBJ):
     def __init__(self, VarOffset, validrange, PcdDataType):
         super(VAR_CHECK_PCD_VALID_RANGE, self).__init__(VarOffset, validrange, PcdDataType)
         self.Type = 2
-        self.update_data()
-        self.update_size()
-    def update_data(self):
         RangeExpr = ""
-        data_list = []
         i = 0
         for item in self.rawdata:
             if i == 0:
@@ -313,38 +273,14 @@ class VAR_CHECK_PCD_VALID_RANGE(VAR_CHECK_PCD_VALID_OBJ):
         range_result = RangeExpression(RangeExpr, self.PcdDataType)(True)
         for rangelist in range_result:
             for obj in rangelist.pop():
-                data_list.append((obj.start, obj.end))
-        self.data = set(data_list)
-    
-    def update_size(self):
+                self.data.add((obj.start, obj.end))
         self.Length = 5 + len(self.data) * 2 * self.StorageWidth
         
 
-class VAR_VALID_OBJECT_FACTORY(object):
-    def __init__(self):
-        pass
-    @staticmethod
-    def Get_valid_object(PcdClass, VarOffset):
-        if PcdClass.validateranges:
-            return VAR_CHECK_PCD_VALID_RANGE(VarOffset, PcdClass.validateranges, PcdClass.DatumType)
-        if PcdClass.validlists:
-            return VAR_CHECK_PCD_VALID_LIST(VarOffset, PcdClass.validlists, PcdClass.DatumType)
-        else:
-            return None
-
-if __name__ == "__main__":
-    class TestObj(object):
-        def __init__(self, number1):
-            self.number_1 = number1
-        def __eq__(self, testobj):
-            if self.number_1 == testobj.number_1:
-                return True
-            else:
-                return False
-    test1 = TestObj(1)
-    test2 = TestObj(2)
-    
-    testarr = [test1, test2]
-    print TestObj(2) in testarr
-    print TestObj(2) == test2
-    
+def GetValidationObject(PcdClass, VarOffset):
+    if PcdClass.validateranges:
+        return VAR_CHECK_PCD_VALID_RANGE(VarOffset, PcdClass.validateranges, PcdClass.DatumType)
+    if PcdClass.validlists:
+        return VAR_CHECK_PCD_VALID_LIST(VarOffset, PcdClass.validlists, PcdClass.DatumType)
+    else:
+        return None

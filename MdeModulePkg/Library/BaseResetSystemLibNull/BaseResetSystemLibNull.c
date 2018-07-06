@@ -1,7 +1,7 @@
 /** @file
   Null Reset System Library instance that only generates ASSERT() conditions.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,11 +19,11 @@
 
 /**
   This function causes a system-wide reset (cold reset), in which
-  all circuitry within the system returns to its initial state. This type of reset 
+  all circuitry within the system returns to its initial state. This type of reset
   is asynchronous to system operation and operates without regard to
   cycle boundaries.
 
-  If this function returns, it means that the system does not support cold reset. 
+  If this function returns, it means that the system does not support cold reset.
 **/
 VOID
 EFIAPI
@@ -35,7 +35,7 @@ ResetCold (
 }
 
 /**
-  This function causes a system-wide initialization (warm reset), in which all processors 
+  This function causes a system-wide initialization (warm reset), in which all processors
   are set to their initial state. Pending cycles are not corrupted.
 
   If this function returns, it means that the system does not support warm reset.
@@ -50,7 +50,7 @@ ResetWarm (
 }
 
 /**
-  This function causes the system to enter a power state equivalent 
+  This function causes the system to enter a power state equivalent
   to the ACPI G2/S5 or G3 states.
 
   If this function returns, it means that the system does not support shut down reset.

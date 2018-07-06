@@ -1,7 +1,7 @@
 /** @file
   Implementation of synchronization functions.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -16,7 +16,7 @@
 #include "BaseSynchronizationLibInternals.h"
 
 //
-// GCC inline assembly for Read Write Barrier  
+// GCC inline assembly for Read Write Barrier
 //
 #define _ReadWriteBarrier() do { __asm__ __volatile__ ("": : : "memory"); } while(0)
 
@@ -28,7 +28,7 @@
   optimal spin lock performance.
 
   This function retrieves the spin lock alignment requirements for optimal
-  performance on a given CPU architecture. The spin lock alignment is byte alignment. 
+  performance on a given CPU architecture. The spin lock alignment is byte alignment.
   It must be a power of two and is returned by this function. If there are no alignment
   requirements, then 1 must be returned. The spin lock synchronization
   functions must function correctly if the spin lock size and alignment values
@@ -191,7 +191,7 @@ AcquireSpinLockOrFail (
 {
   SPIN_LOCK   LockValue;
   VOID        *Result;
-  
+
   ASSERT (SpinLock != NULL);
 
   LockValue = *SpinLock;

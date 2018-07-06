@@ -1,7 +1,7 @@
 ## @file
 # Parser a Inf file and Get specify section data.
 #
-# Copyright (c) 2007 - 2012, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -26,7 +26,6 @@ class InfSectionParser():
         self._ParserInf()
     
     def _ParserInf(self):
-        Filename = self._FilePath
         FileLinesList = []
         UserExtFind = False
         FindEnd = True
@@ -35,9 +34,9 @@ class InfSectionParser():
         SectionData = []
         
         try:
-            FileLinesList = open(Filename, "r", 0).readlines()
+            FileLinesList = open(self._FilePath, "r", 0).readlines()
         except BaseException:
-            EdkLogger.error("build", AUTOGEN_ERROR, 'File %s is opened failed.' % Filename)
+            EdkLogger.error("build", AUTOGEN_ERROR, 'File %s is opened failed.' % self._FilePath)
         
         for Index in range(0, len(FileLinesList)):
             line = str(FileLinesList[Index]).strip()
@@ -49,7 +48,7 @@ class InfSectionParser():
             if UserExtFind and FindEnd == False:
                 if line:
                     SectionData.append(line)
-            if line.lower().startswith(TAB_SECTION_START) and line.lower().endswith(TAB_SECTION_END):
+            if line.startswith(TAB_SECTION_START) and line.endswith(TAB_SECTION_END):
                 SectionLine = line
                 UserExtFind = True
                 FindEnd = False
@@ -59,7 +58,7 @@ class InfSectionParser():
                 UserExtFind = False
                 FindEnd = True
                 self._FileSectionDataList.append({SectionLine: SectionData[:]})
-                SectionData = []
+                del SectionData[:]
                 SectionLine = ''
     
     # Get user extension TianoCore data
@@ -70,7 +69,7 @@ class InfSectionParser():
         if not self._FileSectionDataList:
             return UserExtensionTianoCore
         for SectionDataDict in self._FileSectionDataList:
-            for key in SectionDataDict.keys():
+            for key in SectionDataDict:
                 if key.lower().startswith("[userextensions") and key.lower().find('.tianocore.') > -1:
                     SectionLine = key.lstrip(TAB_SECTION_START).rstrip(TAB_SECTION_END)
                     SubSectionList = [SectionLine]
@@ -89,7 +88,7 @@ class InfSectionParser():
         if not self._FileSectionDataList:
             return DepexExpresionList
         for SectionDataDict in self._FileSectionDataList:
-            for key in SectionDataDict.keys():
+            for key in SectionDataDict:
                 if key.lower() == "[depex]" or key.lower().startswith("[depex."):
                     SectionLine = key.lstrip(TAB_SECTION_START).rstrip(TAB_SECTION_END)
                     SubSectionList = [SectionLine]

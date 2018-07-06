@@ -1,7 +1,7 @@
 ## @file
 # process APRIORI file data and generate PEI/DXE APRIORI file
 #
-#  Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,14 +17,15 @@
 #
 from struct import *
 import Common.LongFilePathOs as os
-import StringIO
+from io import BytesIO
 import FfsFileStatement
 from GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import AprioriSectionClassObject
-from Common.String import *
-from Common.Misc import SaveFileOnChange,PathClass
+from Common.StringUtils import *
+from Common.Misc import SaveFileOnChange, PathClass
 from Common import EdkLogger
 from Common.BuildToolError import *
+from Common.DataType import TAB_COMMON
 
 ## process APRIORI file data and generate PEI/DXE APRIORI file
 #
@@ -50,7 +51,7 @@ class AprioriSection (AprioriSectionClassObject):
     def GenFfs (self, FvName, Dict = {}, IsMakefile = False):
         DXE_GUID = "FC510EE7-FFDC-11D4-BD41-0080C73C8881"
         PEI_GUID = "1B45CC0A-156A-428A-AF62-49864DA0E6E6"
-        Buffer = StringIO.StringIO('')
+        Buffer = BytesIO('')
         AprioriFileGuid = DXE_GUID
         if self.AprioriType == "PEI":
             AprioriFileGuid = PEI_GUID
@@ -75,16 +76,16 @@ class AprioriSection (AprioriSectionClassObject):
                 InfFileName = NormPath(FfsObj.InfFileName)
                 Arch = FfsObj.GetCurrentArch()
 
-                if Arch != None:
+                if Arch is not None:
                     Dict['$(ARCH)'] = Arch
                 InfFileName = GenFdsGlobalVariable.MacroExtend(InfFileName, Dict, Arch)
 
-                if Arch != None:
+                if Arch is not None:
                     Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(InfFileName, GenFdsGlobalVariable.WorkSpaceDir), Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
                     Guid = Inf.Guid
 
                 else:
-                    Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(InfFileName, GenFdsGlobalVariable.WorkSpaceDir), 'COMMON', GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+                    Inf = GenFdsGlobalVariable.WorkSpace.BuildObject[PathClass(InfFileName, GenFdsGlobalVariable.WorkSpaceDir), TAB_COMMON, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
                     Guid = Inf.Guid
 
                     self.BinFileList = Inf.Module.Binaries

@@ -26,7 +26,7 @@
     unreasonable for now.
 
   Copyright (C) 2012, Red Hat, Inc.
-  Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Inc, All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -454,6 +454,15 @@ VirtioScsiPassThru (
   VOID                      *InDataBuffer;
   UINTN                     InDataNumPages;
   BOOLEAN                   OutDataBufferIsMapped;
+
+  //
+  // Set InDataMapping,OutDataMapping,InDataDeviceAddress and OutDataDeviceAddress to
+  // suppress incorrect compiler/analyzer warnings.
+  //
+  InDataMapping        = NULL;
+  OutDataMapping       = NULL;
+  InDataDeviceAddress  = 0;
+  OutDataDeviceAddress = 0;
 
   ZeroMem ((VOID*) &Request, sizeof (Request));
 

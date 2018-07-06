@@ -16,7 +16,6 @@
 **/
 
 #include "AcpiPlatform.h"
-#include "QemuLoader.h"
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/QemuFwCfgLib.h>

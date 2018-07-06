@@ -1,7 +1,7 @@
 /** @file
   The file ontaining the helper functions implement of the Ide Bus driver
-  
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -24,7 +24,7 @@ UINT8   MasterDeviceType      = INVALID_DEVICE_TYPE;
   read a one-byte data from a IDE port.
 
   @param  PciIo  The PCI IO protocol instance
-  @param  Port   the IDE Port number 
+  @param  Port   the IDE Port number
 
   @return  the one-byte data read from IDE port
 **/
@@ -270,7 +270,7 @@ IDEWritePortWMultiple (
   @param  PciIo Pointer to the EFI_PCI_IO_PROTOCOL instance
   @param  IdeRegsBaseAddr Pointer to IDE_REGISTERS_BASE_ADDR to
            receive IDE IO port registers' base addresses
-           
+
   @retval EFI_UNSUPPORTED return this value when the BARs is not IO type
   @retval EFI_SUCCESS     Get the Base address successfully
   @retval other           read the pci configureation data error
@@ -351,7 +351,7 @@ GetIdeRegistersBaseAddr (
   succeess.
 
   @param  IdeDev The BLK_IO private data which specifies the IDE device
-  
+
   @retval EFI_INVALID_PARAMETER return this value when the channel is invalid
   @retval EFI_SUCCESS           reassign the IDE IO resource successfully
   @retval other                 get the IDE current base address effor
@@ -370,7 +370,7 @@ ReassignIdeResources (
   if (IdeDev->Channel >= IdeMaxChannel) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Requery IDE IO port registers' base addresses in case of the switch of
   // native and legacy modes
@@ -593,7 +593,7 @@ DetectIDEController (
   Detect if there is disk attached to this port
 
   @param  IdeDev The BLK_IO private data which specifies the IDE device.
-  
+
   @retval EFI_NOT_FOUND   The device or channel is not found
   @retval EFI_SUCCESS     The device is found
 
@@ -715,7 +715,7 @@ InitializeIDEChannelData (
   Register. DRQ is cleared when the device is finished transferring data.
   So this function is called after data transfer is finished.
 
-  @param IdeDev                 pointer pointing to IDE_BLK_IO_DEV data structure, used 
+  @param IdeDev                 pointer pointing to IDE_BLK_IO_DEV data structure, used
                                 to record all the information of the IDE device.
   @param TimeoutInMilliSeconds  used to designate the timeout for the DRQ clear.
 
@@ -778,7 +778,7 @@ DRQClear (
   transferring data. So this function is called after data transfer
   is finished.
 
-  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used 
+  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used
                                to record all the information of the IDE device.
 
   @param TimeoutInMilliSeconds used to designate the timeout for the DRQ clear.
@@ -901,10 +901,10 @@ DRQReady (
 }
 /**
   This function is used to poll for the DRQ bit set in the Alternate Status Register.
-  DRQ is set when the device is ready to transfer data. So this function is called after 
+  DRQ is set when the device is ready to transfer data. So this function is called after
   the command is sent to the device and before required data is transferred.
 
-  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used to 
+  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used to
                                record all the information of the IDE device.
 
   @param TimeoutInMilliSeconds used to designate the timeout for the DRQ ready.
@@ -966,7 +966,7 @@ DRQReady2 (
   This function is used to poll for the BSY bit clear in the Status Register. BSY
   is clear when the device is not busy. Every command must be sent after device is not busy.
 
-  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used 
+  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used
                                to record all the information of the IDE device.
   @param TimeoutInMilliSeconds used to designate the timeout for the DRQ ready.
 
@@ -1008,11 +1008,11 @@ WaitForBSYClear (
   return EFI_SUCCESS;
 }
 /**
-  This function is used to poll for the BSY bit clear in the Alternate Status Register. 
-  BSY is clear when the device is not busy. Every command must be sent after device is 
+  This function is used to poll for the BSY bit clear in the Alternate Status Register.
+  BSY is clear when the device is not busy. Every command must be sent after device is
   not busy.
 
-  @param IdeDev               pointer pointing to IDE_BLK_IO_DEV data structure, used to record 
+  @param IdeDev               pointer pointing to IDE_BLK_IO_DEV data structure, used to record
                               all the information of the IDE device.
   @param TimeoutInMilliSeconds used to designate the timeout for the DRQ ready.
 
@@ -1051,7 +1051,7 @@ WaitForBSYClear2 (
 }
 /**
   This function is used to poll for the DRDY bit set in the Status Register. DRDY
-  bit is set when the device is ready to accept command. Most ATA commands must be 
+  bit is set when the device is ready to accept command. Most ATA commands must be
   sent after DRDY set except the ATAPI Packet Command.
 
   @param IdeDev               pointer pointing to IDE_BLK_IO_DEV data structure, used
@@ -1103,8 +1103,8 @@ DRDYReady (
   return EFI_SUCCESS;
 }
 /**
-  This function is used to poll for the DRDY bit set in the Alternate Status Register. 
-  DRDY bit is set when the device is ready to accept command. Most ATA commands must 
+  This function is used to poll for the DRDY bit set in the Alternate Status Register.
+  DRDY bit is set when the device is ready to accept command. Most ATA commands must
   be sent after DRDY set except the ATAPI Packet Command.
 
   @param IdeDev              pointer pointing to IDE_BLK_IO_DEV data structure, used

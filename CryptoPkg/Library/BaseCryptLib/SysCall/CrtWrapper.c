@@ -361,6 +361,19 @@ char *getenv (const char *varname)
   return NULL;
 }
 
+/* Get a value from the current environment */
+char *secure_getenv (const char *varname)
+{
+  //
+  // Null secure_getenv() function implementation to satisfy the linker, since
+  // there is no direct functionality logic dependency in present UEFI cases.
+  //
+  // From the secure_getenv() manual: 'just like getenv() except that it
+  // returns NULL in cases where "secure execution" is required'.
+  //
+  return NULL;
+}
+
 //
 // -- Stream I/O Routines --
 //

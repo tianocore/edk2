@@ -43,7 +43,7 @@ class InfHeaderObject():
     # @param FileName: File Name
     #    
     def SetFileName(self, FileName):
-        if not (FileName == '' or FileName == None):
+        if not (FileName == '' or FileName is None):
             self.FileName = FileName
             return True
         else:
@@ -59,7 +59,7 @@ class InfHeaderObject():
     # @param Abstract: Abstract
     #    
     def SetAbstract(self, Abstract):
-        if not (Abstract == '' or Abstract == None):
+        if not (Abstract == '' or Abstract is None):
             self.Abstract = Abstract
             return True
         else:
@@ -75,7 +75,7 @@ class InfHeaderObject():
     # @param Description: Description content 
     #  
     def SetDescription(self, Description):
-        if not (Description == '' or Description == None):
+        if not (Description == '' or Description is None):
             self.Description = Description
             return True
         else:
@@ -91,7 +91,7 @@ class InfHeaderObject():
     # @param Copyright: Copyright content 
     #      
     def SetCopyright(self, Copyright):
-        if not (Copyright == '' or Copyright == None):
+        if not (Copyright == '' or Copyright is None):
             self.Copyright = Copyright
             return True
         else:
@@ -107,7 +107,7 @@ class InfHeaderObject():
     # @param License: License content 
     #   
     def SetLicense(self, License):
-        if not (License == '' or License == None):
+        if not (License == '' or License is None):
             self.License = License
             return True
         else:

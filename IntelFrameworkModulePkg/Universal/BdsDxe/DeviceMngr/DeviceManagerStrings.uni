@@ -1,16 +1,16 @@
 ///** @file
-//  
+//
 //    String definitions for the Device Manager.
-//  
-//  Copyright (c) 2004 - 2014, Intel Corporation. All rights reserved.<BR>
+//
+//  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 //  This program and the accompanying materials
 //  are licensed and made available under the terms and conditions of the BSD License
 //  which accompanies this distribution.  The full text of the license may be found at
 //  http://opensource.org/licenses/bsd-license.php
-//  
+//
 //  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 //  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
-//  
+//
 //**/
 
 /=#
@@ -49,13 +49,13 @@
 #string STR_DH_STATUS_LIST             #language en-US  "All Driver Health Status List"
                                        #language fr-FR  "All Driver Health Status List"
 #string STR_DRIVER_HEALTH_REPAIR_ALL   #language en-US  "Repair All"
-                                       #language fr-FR  "Repair All"                                       
+                                       #language fr-FR  "Repair All"
 #string STR_DH_REPAIR_ALL_TITLE        #language en-US  "Repair the whole platform"
                                        #language fr-FR  "Repair the whole platform"
 #string STR_DH_REPAIR_ALL_HELP         #language en-US  "Repair the whole platform until all modules reach terminal status"
                                        #language fr-FR  "Repair the whole platform until all modules reach terminal status"
 #string STR_DH_REPAIR_SINGLE_TITLE     #language en-US  "Item cannot get name"
-                                       #language fr-FR  "Item cannot get name"  
+                                       #language fr-FR  "Item cannot get name"
 #string STR_DH_REPAIR_SINGLE_HELP      #language en-US  "Repair single driver with specify controller"
                                        #language fr-FR  "Repair single driver with specify controller"
 

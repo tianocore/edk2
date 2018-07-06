@@ -1,7 +1,7 @@
 /** @file
   Hotkey library functions.
 
-Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -116,7 +116,7 @@ BmIsKeyOptionVariable (
 {
   UINTN         Index;
   UINTN         Uint;
-  
+
   if (!CompareGuid (Guid, &gEfiGlobalVariableGuid) ||
       (StrSize (Name) != sizeof (L"Key####")) ||
       (StrnCmp (Name, L"Key", 3) != 0)
@@ -375,7 +375,7 @@ BmHotkeyCallback (
     HotkeyData = &Hotkey->KeyData[Hotkey->WaitingKey];
     if ((KeyData->Key.ScanCode == HotkeyData->Key.ScanCode) &&
         (KeyData->Key.UnicodeChar == HotkeyData->Key.UnicodeChar) &&
-        (((KeyData->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) ? 
+        (((KeyData->KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) ?
           (KeyData->KeyState.KeyShiftState == HotkeyData->KeyState.KeyShiftState) : TRUE
         )
        ) {
@@ -799,7 +799,7 @@ EfiBootManagerRegisterContinueKeyOption (
   EFI_STATUS                   Status;
   EFI_BOOT_MANAGER_KEY_OPTION  KeyOption;
   VA_LIST                      Args;
-  
+
   if (mBmContinueKeyOption != NULL) {
     return EFI_ALREADY_STARTED;
   }
@@ -822,7 +822,7 @@ EfiBootManagerRegisterContinueKeyOption (
 
 /**
   Stop the hotkey processing.
-  
+
   @param    Event          Event pointer related to hotkey service.
   @param    Context        Context pass to this function.
 **/
@@ -852,7 +852,7 @@ BmStopHotkeyService (
 /**
   Start the hot key service so that the key press can trigger the boot option.
 
-  @param HotkeyTriggered  Return the waitable event and it will be signaled 
+  @param HotkeyTriggered  Return the waitable event and it will be signaled
                           when a valid hot key is pressed.
 
   @retval EFI_SUCCESS     The hot key service is started.

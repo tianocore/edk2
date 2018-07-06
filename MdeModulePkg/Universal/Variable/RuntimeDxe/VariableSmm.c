@@ -955,7 +955,7 @@ VariableServiceInitialize (
                     );
   ASSERT_EFI_ERROR (Status);
 
-  mVariableBufferPayloadSize = GetNonVolatileMaxVariableSize () +
+  mVariableBufferPayloadSize = GetMaxVariableSize () +
                                OFFSET_OF (SMM_VARIABLE_COMMUNICATE_VAR_CHECK_VARIABLE_PROPERTY, Name) - GetVariableHeaderSize ();
 
   Status = gSmst->SmmAllocatePool (

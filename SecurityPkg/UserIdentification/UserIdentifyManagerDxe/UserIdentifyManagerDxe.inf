@@ -2,8 +2,8 @@
 #  Produces user manager protocol
 #
 #  This module manages user information and produces user manager protocol.
-# 
-# Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+#
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -48,7 +48,7 @@
 [Guids]
   gEfiIfrTianoGuid                              ## SOMETIMES_CONSUMES  ## GUID
   gEfiEventUserProfileChangedGuid               ## SOMETIMES_PRODUCES  ## Event
-  
+
   ## SOMETIMES_PRODUCES                         ## Variable:L"Userxxxx"
   ## SOMETIMES_CONSUMES                         ## Variable:L"Userxxxx"
   ## CONSUMES                                   ## HII
@@ -64,16 +64,16 @@
   gEfiSimpleTextInputExProtocolGuid             ## SOMETIMES_CONSUMES
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiDevicePathProtocolGuid                    ## PRODUCES
-  
+
   ## PRODUCES
   ## SOMETIMES_PRODUCES                         ## SystemTable
-  gEfiUserManagerProtocolGuid                   
+  gEfiUserManagerProtocolGuid
 
 [Depex]
-  gEfiHiiDatabaseProtocolGuid   AND 
-  gEfiHiiStringProtocolGuid     AND 
-  gEfiFormBrowser2ProtocolGuid 
+  gEfiHiiDatabaseProtocolGuid   AND
+  gEfiHiiStringProtocolGuid     AND
+  gEfiFormBrowser2ProtocolGuid
 
 [UserExtensions.TianoCore."ExtraFiles"]
   UserIdentifyManagerExtra.uni
-  
+

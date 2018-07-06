@@ -1,7 +1,7 @@
 /** @file
   Guid for Pcd DataBase Signature.
 
-Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -30,10 +30,9 @@ typedef UINT64 SKU_ID;
 #define PCD_TYPE_DATA         (0x0U << PCD_TYPE_SHIFT)
 #define PCD_TYPE_HII          (0x8U << PCD_TYPE_SHIFT)
 #define PCD_TYPE_VPD          (0x4U << PCD_TYPE_SHIFT)
-#define PCD_TYPE_SKU_ENABLED  (0x2U << PCD_TYPE_SHIFT)
 #define PCD_TYPE_STRING       (0x1U << PCD_TYPE_SHIFT)
 
-#define PCD_TYPE_ALL_SET      (PCD_TYPE_DATA | PCD_TYPE_HII | PCD_TYPE_VPD | PCD_TYPE_SKU_ENABLED | PCD_TYPE_STRING)
+#define PCD_TYPE_ALL_SET      (PCD_TYPE_DATA | PCD_TYPE_HII | PCD_TYPE_VPD | PCD_TYPE_STRING)
 
 #define PCD_DATUM_TYPE_SHIFT  24
 

@@ -12,7 +12,7 @@
 # 2. Universal Serial Bus HID Usage Tables, ver 1.12
 # 3. UEFI Specification, v2.1
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -39,7 +39,7 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
 #
-#  DRIVER_BINDING                =  gUsbKeyboardDriverBinding                        
+#  DRIVER_BINDING                =  gUsbKeyboardDriverBinding
 #  COMPONENT_NAME                =  gUsbKeyboardComponentName
 #  COMPONENT_NAME2               =  gUsbKeyboardComponentName2
 #
@@ -87,7 +87,7 @@
   # Otherwise, USB keyboard module tries to use its carried default layout.
   #
   gEfiHiiDatabaseProtocolGuid                   ## SOMETIMES_CONSUMES
-  
+
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdDisableDefaultKeyboardLayoutInUsbKbDriver ## CONSUMES
 

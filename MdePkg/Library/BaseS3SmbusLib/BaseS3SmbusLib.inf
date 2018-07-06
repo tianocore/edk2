@@ -2,9 +2,9 @@
 # Instance of S3 Smbus Library based on SmBus and S3 BootScript Library.
 #
 # S3 Smbus Library Services that do SMBus transactions and also enable the
-# operatation to be replayed during an S3 resume. 
+# operatation to be replayed during an S3 resume.
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -23,7 +23,7 @@
   FILE_GUID                      = 01190654-FED0-40d3-BA7F-2925539E5830
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = S3SmbusLib 
+  LIBRARY_CLASS                  = S3SmbusLib
 
 
 #

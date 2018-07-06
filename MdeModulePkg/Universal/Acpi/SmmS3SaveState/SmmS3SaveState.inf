@@ -3,7 +3,7 @@
 #
 # It will install S3 SMM Save State protocol to store or record various IO operations to be replayed during an S3 resume.
 #
-# Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are
 # licensed and made available under the terms and conditions of the BSD License
@@ -23,7 +23,7 @@
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
   PI_SPECIFICATION_VERSION       = 0x0001000A
-  
+
   ENTRY_POINT                    = InitializeSmmS3SaveState
 
 #

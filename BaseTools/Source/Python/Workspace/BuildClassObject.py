@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define each component of the build database
 #
-# Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -13,7 +13,7 @@
 
 import Common.LongFilePathOs as os
 
-from Common.Misc import sdict
+from collections import OrderedDict
 from Common.Misc import RealPath2
 from Common.BuildToolError import *
 from Common.DataType import *
@@ -55,6 +55,7 @@ class PcdClassObject(object):
         self.DefaultValue = Value
         self.TokenValue = Token
         self.MaxDatumSize = MaxDatumSize
+        self.MaxSizeUserSet = None
         self.SkuInfoList = SkuInfoList
         self.Phase = "DXE"
         self.Pending = False
@@ -65,9 +66,43 @@ class PcdClassObject(object):
         self.validlists = validlists
         self.expressions = expressions
         self.DscDefaultValue = None
+        self.DscRawValue = None
         if IsDsc:
             self.DscDefaultValue = Value
-        
+        self.PcdValueFromComm = ""
+        self.DefinitionPosition = ("", "")
+
+    ## Get the maximum number of bytes
+    def GetPcdMaxSize(self):
+        if self.DatumType in TAB_PCD_NUMERIC_TYPES:
+            return MAX_SIZE_TYPE[self.DatumType]
+
+        MaxSize = int(self.MaxDatumSize, 10) if self.MaxDatumSize else 0
+        if self.PcdValueFromComm:
+            if self.PcdValueFromComm.startswith("{") and self.PcdValueFromComm.endswith("}"):
+                return max([len(self.PcdValueFromComm.split(",")), MaxSize])
+            elif self.PcdValueFromComm.startswith("\"") or self.PcdValueFromComm.startswith("\'"):
+                return max([len(self.PcdValueFromComm)-2+1, MaxSize])
+            elif self.PcdValueFromComm.startswith("L\""):
+                return max([2*(len(self.PcdValueFromComm)-3+1), MaxSize])
+            else:
+                return max([len(self.PcdValueFromComm), MaxSize])
+        return MaxSize
+
+    ## Get the number of bytes
+    def GetPcdSize(self):
+        if self.DatumType in TAB_PCD_NUMERIC_TYPES:
+            return MAX_SIZE_TYPE[self.DatumType]
+        if not self.DefaultValue:
+            return 1
+        elif self.DefaultValue[0] == 'L':
+            return (len(self.DefaultValue) - 2) * 2
+        elif self.DefaultValue[0] == '{':
+            return len(self.DefaultValue.split(','))
+        else:
+            return len(self.DefaultValue) - 1
+
+
     ## Convert the class to a string
     #
     #  Convert each member of the class to string
@@ -109,16 +144,31 @@ class PcdClassObject(object):
         return hash((self.TokenCName, self.TokenSpaceGuidCName))
 
 class StructurePcd(PcdClassObject):
-    def __init__(self, StructuredPcdIncludeFile="", Packages=None, Name=None, Guid=None, Type=None, DatumType=None, Value=None, Token=None, MaxDatumSize=None, SkuInfoList={}, IsOverrided=False, GuidValue=None, validateranges=[], validlists=[], expressions=[],default_store = TAB_DEFAULT_STORES_DEFAULT):
+    def __init__(self, StructuredPcdIncludeFile=None, Packages=None, Name=None, Guid=None, Type=None, DatumType=None, Value=None, Token=None, MaxDatumSize=None, SkuInfoList=None, IsOverrided=False, GuidValue=None, validateranges=None, validlists=None, expressions=None,default_store = TAB_DEFAULT_STORES_DEFAULT):
+        if SkuInfoList is None:
+            SkuInfoList = {}
+        if validateranges is None:
+            validateranges = []
+        if validlists is None:
+            validlists = []
+        if expressions is None:
+            expressions = []
+        if Packages is None:
+            Packages = []
         super(StructurePcd, self).__init__(Name, Guid, Type, DatumType, Value, Token, MaxDatumSize, SkuInfoList, IsOverrided, GuidValue, validateranges, validlists, expressions)
-        self.StructuredPcdIncludeFile = StructuredPcdIncludeFile
+        self.StructuredPcdIncludeFile = [] if StructuredPcdIncludeFile is None else StructuredPcdIncludeFile
         self.PackageDecs = Packages
         self.DefaultStoreName = [default_store]
-        self.DefaultValues = collections.OrderedDict({})
+        self.DefaultValues = collections.OrderedDict()
         self.PcdMode = None
-        self.SkuOverrideValues = collections.OrderedDict({})
+        self.SkuOverrideValues = collections.OrderedDict()
         self.FlexibleFieldName = None
         self.StructName = None
+        self.PcdDefineLineNo = 0
+        self.PkgPath = ""
+        self.DefaultValueFromDec = ""
+        self.ValueChain = set()
+        self.PcdFieldValueFromComm = collections.OrderedDict()
     def __repr__(self):
         return self.TypeName
 
@@ -128,11 +178,13 @@ class StructurePcd(PcdClassObject):
         self.DefaultValues[FieldName] = [Value.strip(), FileName, LineNo]
         return self.DefaultValues[FieldName]
 
+    def SetDecDefaultValue(self, DefaultValue):
+        self.DefaultValueFromDec = DefaultValue
     def AddOverrideValue (self, FieldName, Value, SkuName, DefaultStoreName, FileName="", LineNo=0):
         if SkuName not in self.SkuOverrideValues:
-            self.SkuOverrideValues[SkuName] = collections.OrderedDict({})
+            self.SkuOverrideValues[SkuName] = collections.OrderedDict()
         if DefaultStoreName not in self.SkuOverrideValues[SkuName]:
-            self.SkuOverrideValues[SkuName][DefaultStoreName] = collections.OrderedDict({})
+            self.SkuOverrideValues[SkuName][DefaultStoreName] = collections.OrderedDict()
         if FieldName in self.SkuOverrideValues[SkuName][DefaultStoreName]:
             del self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName]
         self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName] = [Value.strip(), FileName, LineNo]
@@ -162,15 +214,23 @@ class StructurePcd(PcdClassObject):
         self.validateranges = PcdObject.validateranges if PcdObject.validateranges else self.validateranges
         self.validlists = PcdObject.validlists if PcdObject.validlists else self.validlists
         self.expressions = PcdObject.expressions if PcdObject.expressions else self.expressions
-        if type(PcdObject) is StructurePcd:
+        self.DscRawValue = PcdObject.DscRawValue if PcdObject.DscRawValue else self.DscRawValue
+        self.PcdValueFromComm = PcdObject.PcdValueFromComm if PcdObject.PcdValueFromComm else self.PcdValueFromComm
+        self.DefinitionPosition = PcdObject.DefinitionPosition if PcdObject.DefinitionPosition else self.DefinitionPosition
+        if isinstance(PcdObject, StructurePcd):
             self.StructuredPcdIncludeFile = PcdObject.StructuredPcdIncludeFile if PcdObject.StructuredPcdIncludeFile else self.StructuredPcdIncludeFile
             self.PackageDecs = PcdObject.PackageDecs if PcdObject.PackageDecs else self.PackageDecs
             self.DefaultValues = PcdObject.DefaultValues if PcdObject.DefaultValues else self.DefaultValues
             self.PcdMode = PcdObject.PcdMode if PcdObject.PcdMode else self.PcdMode
             self.DefaultFromDSC=None
+            self.DefaultValueFromDec = PcdObject.DefaultValueFromDec if PcdObject.DefaultValueFromDec else self.DefaultValueFromDec
             self.SkuOverrideValues = PcdObject.SkuOverrideValues if PcdObject.SkuOverrideValues else self.SkuOverrideValues
             self.FlexibleFieldName = PcdObject.FlexibleFieldName if PcdObject.FlexibleFieldName else self.FlexibleFieldName
             self.StructName = PcdObject.DatumType if PcdObject.DatumType else self.StructName
+            self.PcdDefineLineNo = PcdObject.PcdDefineLineNo if PcdObject.PcdDefineLineNo else self.PcdDefineLineNo
+            self.PkgPath = PcdObject.PkgPath if PcdObject.PkgPath else self.PkgPath
+            self.ValueChain = PcdObject.ValueChain if PcdObject.ValueChain else self.ValueChain
+            self.PcdFieldValueFromComm = PcdObject.PcdFieldValueFromComm if PcdObject.PcdFieldValueFromComm else self.PcdFieldValueFromComm
 
 ## LibraryClassObject
 #
@@ -189,7 +249,7 @@ class LibraryClassObject(object):
     def __init__(self, Name = None, SupModList = [], Type = None):
         self.LibraryClass = Name
         self.SupModList = SupModList
-        if Type != None:
+        if Type is not None:
             self.SupModList = CleanString(Type).split(DataType.TAB_SPACE_SPLIT)
 
 ## ModuleBuildClassObject
@@ -258,7 +318,7 @@ class ModuleBuildClassObject(object):
 
         self.Binaries                = []
         self.Sources                 = []
-        self.LibraryClasses          = sdict()
+        self.LibraryClasses          = OrderedDict()
         self.Libraries               = []
         self.Protocols               = []
         self.Ppis                    = []
@@ -437,4 +497,3 @@ class PlatformBuildClassObject(object):
     #
     def __hash__(self):
         return hash(self.MetaFile)
-

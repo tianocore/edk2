@@ -256,7 +256,7 @@ PxeBcDestroyIp4Children (
            );
     FreePool (Private->Ip4Nic->DevicePath);
 
-    if (Private->Snp != NULL) { 
+    if (Private->Snp != NULL) {
       //
       // Close SNP from the child virtual handle
       //
@@ -266,7 +266,7 @@ PxeBcDestroyIp4Children (
              This->DriverBindingHandle,
              Private->Ip4Nic->Controller
              );
-             
+
       gBS->UninstallProtocolInterface (
              Private->Ip4Nic->Controller,
              &gEfiSimpleNetworkProtocolGuid,
@@ -416,7 +416,7 @@ PxeBcDestroyIp6Children (
            NULL
            );
     FreePool (Private->Ip6Nic->DevicePath);
-    
+
     if (Private->Snp != NULL) {
       //
       // Close SNP from the child virtual handle
@@ -489,7 +489,7 @@ PxeBcCheckIpv6Support (
 
   //
   // Get the NIC handle by SNP protocol.
-  //  
+  //
   Handle = NetLibGetSnpHandle (ControllerHandle, NULL);
   if (Handle == NULL) {
     return EFI_NOT_FOUND;
@@ -535,7 +535,7 @@ PxeBcCheckIpv6Support (
   if (EFI_ERROR (Status) || InfoBlock == NULL) {
     FreePool (InfoBlock);
     return EFI_NOT_FOUND;
-  }  
+  }
 
   *Ipv6Support = ((EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT *) InfoBlock)->Ipv6Support;
   FreePool (InfoBlock);
@@ -814,7 +814,7 @@ PxeBcCreateIp4Children (
     }
 
     //
-    // Open SNP on the child handle BY_DRIVER. It will prevent any additionally 
+    // Open SNP on the child handle BY_DRIVER. It will prevent any additionally
     // layering to perform the experiment.
     //
     Status = gBS->OpenProtocol (
@@ -951,7 +951,7 @@ PxeBcCreateIp6Children (
   if (Private->Snp != NULL) {
     for (Index = 0; Index < Private->Snp->Mode->HwAddressSize; Index++) {
       Private->IaId |= (Private->Snp->Mode->CurrentAddress.Addr[Index] << ((Index << 3) & 31));
-    }  
+    }
   }
 
   //
@@ -1140,7 +1140,7 @@ PxeBcCreateIp6Children (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  
+
   if (Private->Snp != NULL) {
     //
     // Install SNP protocol on purpose is for some OS loader backward
@@ -1157,7 +1157,7 @@ PxeBcCreateIp6Children (
     }
 
     //
-    // Open SNP on the child handle BY_DRIVER. It will prevent any additionally 
+    // Open SNP on the child handle BY_DRIVER. It will prevent any additionally
     // layering to perform the experiment.
     //
     Status = gBS->OpenProtocol (
@@ -1293,7 +1293,7 @@ PxeBcDriverEntryPoint (
   @param[in]  RemainingDevicePath Optional parameter used to pick a specific child
                                   device to be started.
   @param[in]  IpVersion           IP_VERSION_4 or IP_VERSION_6.
-  
+
   @retval EFI_SUCCESS         This driver supports this device.
   @retval EFI_UNSUPPORTED     This driver does not support this device.
 
@@ -1310,7 +1310,7 @@ PxeBcSupported (
   EFI_STATUS                      Status;
   EFI_GUID                        *DhcpServiceBindingGuid;
   EFI_GUID                        *MtftpServiceBindingGuid;
-  
+
   if (IpVersion == IP_VERSION_4) {
     DhcpServiceBindingGuid  = &gEfiDhcp4ServiceBindingProtocolGuid;
     MtftpServiceBindingGuid = &gEfiMtftp4ServiceBindingProtocolGuid;
@@ -1453,7 +1453,7 @@ PxeBcStart (
 
     //
     // Install PxeBaseCodePrivate protocol onto the real NIC handler.
-    // PxeBaseCodePrivate protocol is only used to keep the relationship between 
+    // PxeBaseCodePrivate protocol is only used to keep the relationship between
     // NIC handle and virtual child handles.
     // gEfiCallerIdGuid will be used as its protocol guid.
     //
@@ -1470,7 +1470,7 @@ PxeBcStart (
     //
     // Try to locate SNP protocol.
     //
-    NetLibGetSnpHandle(ControllerHandle, &Private->Snp);    
+    NetLibGetSnpHandle(ControllerHandle, &Private->Snp);
   }
 
   if (IpVersion == IP_VERSION_4) {

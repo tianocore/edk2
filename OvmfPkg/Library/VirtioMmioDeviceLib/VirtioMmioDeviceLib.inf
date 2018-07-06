@@ -24,6 +24,7 @@
 
 [Sources]
   VirtioMmioDevice.c
+  VirtioMmioDevice.h
   VirtioMmioDeviceFunctions.c
 
 [Packages]

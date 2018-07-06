@@ -1,7 +1,7 @@
 /** @file
   The implementation of EFI IPv4 Configuration II Protocol.
 
-  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
 
   This program and the accompanying materials
@@ -82,7 +82,7 @@ Ip4Config2DestroyDhcp4 (
 
   Instance->Dhcp4Handle = NULL;
 
-  return Status;  
+  return Status;
 }
 
 /**
@@ -112,7 +112,7 @@ Ip4Config2OnPolicyChanged (
   if (IpSb->DefaultInterface != NULL) {
     if (IpSb->DefaultRouteTable != NULL) {
       Ip4FreeRouteTable (IpSb->DefaultRouteTable);
-      IpSb->DefaultRouteTable = NULL;    
+      IpSb->DefaultRouteTable = NULL;
     }
 
     Ip4CancelReceive (IpSb->DefaultInterface);
@@ -125,7 +125,7 @@ Ip4Config2OnPolicyChanged (
 
   //
   // Create new default interface and route table.
-  //    
+  //
   IpIf = Ip4CreateInterface (IpSb->Mnp, IpSb->Controller, IpSb->Image);
   if (IpIf == NULL) {
     return ;
@@ -136,7 +136,7 @@ Ip4Config2OnPolicyChanged (
     Ip4FreeInterface (IpIf, NULL);
     return ;
   }
-  
+
   IpSb->DefaultInterface  = IpIf;
   InsertHeadList (&IpSb->Interfaces, &IpIf->Link);
   IpSb->DefaultRouteTable = RouteTable;
@@ -255,7 +255,7 @@ Ip4Config2ReadConfigData (
       return EFI_NOT_FOUND;
     }
 
- 
+
     for (Index = 0; Index < Variable->DataRecordCount; Index++) {
 
       CopyMem (&DataRecord, &Variable->DataRecord[Index], sizeof (DataRecord));
@@ -375,8 +375,8 @@ Ip4Config2WriteConfigData (
 
 
 /**
-  Build a EFI_IP4_ROUTE_TABLE to be returned to the caller of GetModeData. 
-  The EFI_IP4_ROUTE_TABLE is clumsy to use in the internal operation of the 
+  Build a EFI_IP4_ROUTE_TABLE to be returned to the caller of GetModeData.
+  The EFI_IP4_ROUTE_TABLE is clumsy to use in the internal operation of the
   IP4 driver.
 
   @param[in]   IpSb        The IP4 service binding instance.
@@ -392,7 +392,7 @@ Ip4Config2BuildDefaultRouteTable (
   OUT EFI_IP4_ROUTE_TABLE       *Table
   )
 {
-  LIST_ENTRY                *Entry; 
+  LIST_ENTRY                *Entry;
   IP4_ROUTE_ENTRY           *RtEntry;
   UINT32                    Count;
   INT32                     Index;
@@ -468,8 +468,8 @@ Ip4Config2OnDhcp4SbInstalled (
   @param[in]  StationAddress     Ip address to be set.
   @param[in]  SubnetMask         Subnet to be set.
 
-  @retval EFI_SUCCESS   Set default address successful.     
-  @retval Others        Some errors occur in setting.     
+  @retval EFI_SUCCESS   Set default address successful.
+  @retval Others        Some errors occur in setting.
 
 **/
 EFI_STATUS
@@ -501,7 +501,7 @@ Ip4Config2SetDefaultAddr (
     //
     if (IpSb->DefaultRouteTable != NULL) {
       Ip4FreeRouteTable (IpSb->DefaultRouteTable);
-      IpSb->DefaultRouteTable = NULL;    
+      IpSb->DefaultRouteTable = NULL;
     }
 
     Ip4CancelReceive (IpSb->DefaultInterface);
@@ -509,7 +509,7 @@ Ip4Config2SetDefaultAddr (
     IpSb->DefaultInterface = NULL;
     //
     // Create new default interface and route table.
-    //    
+    //
     IpIf = Ip4CreateInterface (IpSb->Mnp, IpSb->Controller, IpSb->Image);
     if (IpIf == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -520,7 +520,7 @@ Ip4Config2SetDefaultAddr (
       Ip4FreeInterface (IpIf, NULL);
       return EFI_OUT_OF_RESOURCES;
     }
-    
+
     IpSb->DefaultInterface  = IpIf;
     InsertHeadList (&IpSb->Interfaces, &IpIf->Link);
     IpSb->DefaultRouteTable = RouteTable;
@@ -537,8 +537,8 @@ Ip4Config2SetDefaultAddr (
   }
 
   if (IpIf->Arp != NULL) {
-    //   
-    // A non-NULL IpIf->Arp here means a new ARP child is created when setting default address, 
+    //
+    // A non-NULL IpIf->Arp here means a new ARP child is created when setting default address,
     // but some IP children may have referenced the default interface before it is configured,
     // these IP instances also consume this ARP protocol so they need to open it BY_CHILD_CONTROLLER.
     //
@@ -580,20 +580,20 @@ Ip4Config2SetDefaultAddr (
 
   IpSb->State = IP4_SERVICE_CONFIGED;
   IpSb->Reconfig = FALSE;
-  
+
   return EFI_SUCCESS;
 }
 
 /**
   Set the station address, subnetmask and gateway address for the default interface.
 
-  @param[in]  Instance         The pointer to the IP4 config2 instance data.  
+  @param[in]  Instance         The pointer to the IP4 config2 instance data.
   @param[in]  StationAddress   Ip address to be set.
   @param[in]  SubnetMask       Subnet to be set.
   @param[in]  GatewayAddress   Gateway to be set.
 
-  @retval EFI_SUCCESS     Set default If successful.    
-  @retval Others          Errors occur as indicated.  
+  @retval EFI_SUCCESS     Set default If successful.
+  @retval Others          Errors occur as indicated.
 
 **/
 EFI_STATUS
@@ -630,7 +630,7 @@ Ip4Config2SetDefaultIf (
       IP4_ALLZERO_ADDRESS,
       IP4_ALLZERO_ADDRESS,
       GatewayAddress
-      );        
+      );
   }
 
   return EFI_SUCCESS;
@@ -687,7 +687,7 @@ Ip4Config2CleanDhcp4 (
 /**
   This worker function sets the DNS server list for the EFI IPv4 network
   stack running on the communication device that this EFI_IP4_CONFIG2_PROTOCOL
-  manages. The DNS server addresses must be unicast IPv4 addresses. 
+  manages. The DNS server addresses must be unicast IPv4 addresses.
 
   @param[in]     Instance        The pointer to the IP4 config2 instance data.
   @param[in]     DataSize        The size of the buffer pointed to by Data in bytes.
@@ -728,7 +728,7 @@ Ip4Config2SetDnsServerWorker (
   Item        = &Instance->DataItem[Ip4Config2DataTypeDnsServer];
   NewDns      = (EFI_IPv4_ADDRESS *) Data;
   OldDns      = Item->Data.DnsServers;
-  NewDnsCount = DataSize / sizeof (EFI_IPv4_ADDRESS);  
+  NewDnsCount = DataSize / sizeof (EFI_IPv4_ADDRESS);
   OldDnsCount = Item->DataSize / sizeof (EFI_IPv4_ADDRESS);
   OneAdded    = FALSE;
 
@@ -785,7 +785,7 @@ Ip4Config2SetDnsServerWorker (
     if (Tmp != NULL) {
       if (Item->Data.Ptr != NULL) {
         FreePool (Item->Data.Ptr);
-      }      
+      }
       Item->Data.Ptr = Tmp;
     }
 
@@ -846,7 +846,7 @@ Ip4Config2OnDhcp4Complete (
     if (EFI_ERROR (Status)) {
       goto Exit;
     }
-  
+
     //
     // Parse the ACK to get required DNS server information.
     //
@@ -916,7 +916,7 @@ Ip4StartAutoConfig (
   EFI_DHCP4_PACKET_OPTION        *OptionList[1];
   IP4_CONFIG2_DHCP4_OPTION       ParaList;
   EFI_STATUS                     Status;
- 
+
   IpSb = IP4_SERVICE_FROM_IP4_CONFIG2_INSTANCE (Instance);
 
   if (IpSb->State > IP4_SERVICE_UNSTARTED) {
@@ -978,7 +978,7 @@ Ip4StartAutoConfig (
       );
 
     Instance->Dhcp4Handle = NULL;
-    
+
     return Status;
   }
 
@@ -990,7 +990,7 @@ Ip4StartAutoConfig (
   Status = Dhcp4->GetModeData (Dhcp4, &Dhcp4Mode);
   if (Dhcp4Mode.State == Dhcp4Bound) {
     Ip4Config2OnDhcp4Complete (NULL, Instance);
-    
+
     return EFI_SUCCESS;
   }
 
@@ -1023,14 +1023,14 @@ Ip4StartAutoConfig (
       &gEfiDhcp4ServiceBindingProtocolGuid,
       Instance->Dhcp4Handle
       );
-    
+
     Instance->Dhcp4 = NULL;
-    
+
     Instance->Dhcp4Handle = NULL;
-    
+
     return Status;
   }
-  
+
   //
   // Start the DHCP process
   //
@@ -1051,20 +1051,20 @@ Ip4StartAutoConfig (
     Ip4Config2DestroyDhcp4 (Instance);
     gBS->CloseEvent (Instance->Dhcp4Event);
     Instance->Dhcp4Event = NULL;
-    
+
     return Status;
   }
- 
+
   IpSb->State = IP4_SERVICE_STARTED;
   DispatchDpc ();
-  
+
   return EFI_SUCCESS;
 }
 
 
 
 /**
-  The work function is to get the interface information of the communication 
+  The work function is to get the interface information of the communication
   device this IP4_CONFIG2_INSTANCE manages.
 
   @param[in]      Instance Pointer to the IP4 config2 instance data.
@@ -1099,7 +1099,7 @@ Ip4Config2GetIfInfo (
   if (IpSb->DefaultRouteTable != NULL) {
     Length += IpSb->DefaultRouteTable->TotalNum * sizeof (EFI_IP4_ROUTE_TABLE);
   }
-  
+
   if (*DataSize < Length) {
     *DataSize = Length;
     return EFI_BUFFER_TOO_SMALL;
@@ -1126,14 +1126,14 @@ Ip4Config2GetIfInfo (
     IfInfo->RouteTableSize = IpSb->DefaultRouteTable->TotalNum;
     IfInfo->RouteTable   = (EFI_IP4_ROUTE_TABLE *) ((UINT8 *) Data + sizeof (EFI_IP4_CONFIG2_INTERFACE_INFO));
 
-    Ip4Config2BuildDefaultRouteTable (IpSb, IfInfo->RouteTable);  
+    Ip4Config2BuildDefaultRouteTable (IpSb, IfInfo->RouteTable);
   }
-  
+
   return EFI_SUCCESS;
 }
 
 /**
-  The work function is to set the general configuration policy for the EFI IPv4 network 
+  The work function is to set the general configuration policy for the EFI IPv4 network
   stack that is running on the communication device managed by this IP4_CONFIG2_INSTANCE.
   The policy will affect other configuration settings.
 
@@ -1175,7 +1175,7 @@ Ip4Config2SetPolicy (
     }
   } else {
     //
-    // The policy is changed. Clean the ManualAddress, Gateway and DnsServers, 
+    // The policy is changed. Clean the ManualAddress, Gateway and DnsServers,
     // shrink the variable data size, and fire up all the related events.
     //
     DataItem           = &Instance->DataItem[Ip4Config2DataTypeManualAddress];
@@ -1204,7 +1204,7 @@ Ip4Config2SetPolicy (
     DataItem->DataSize = 0;
     DataItem->Status   = EFI_NOT_FOUND;
     NetMapIterate (&DataItem->EventMap, Ip4Config2SignalEvent, NULL);
-    
+
     if (NewPolicy == Ip4Config2PolicyDhcp) {
       SET_DATA_ATTRIB (DataItem->Attribute, DATA_ATTRIB_VOLATILE);
     } else {
@@ -1215,7 +1215,7 @@ Ip4Config2SetPolicy (
       if (Instance->Dhcp4Handle != NULL) {
         Ip4Config2DestroyDhcp4 (Instance);
       }
-      
+
       //
       // Close the event.
       //
@@ -1235,7 +1235,7 @@ Ip4Config2SetPolicy (
 }
 
 /**
-  The work function is to set the station addresses manually for the EFI IPv4 
+  The work function is to set the station addresses manually for the EFI IPv4
   network stack. It is only configurable when the policy is Ip4Config2PolicyStatic.
 
   @param[in]     Instance Pointer to the IP4 config2 instance data.
@@ -1317,7 +1317,7 @@ Ip4Config2SetManualAddress (
     if (DataItem->Data.Ptr != NULL) {
       FreePool (DataItem->Data.Ptr);
     }
-    
+
     DataItem->Data.Ptr = Ptr;
     DataItem->DataSize = DataSize;
     DataItem->Status   = EFI_NOT_READY;
@@ -1331,7 +1331,7 @@ Ip4Config2SetManualAddress (
       if (Ptr != NULL) {
         FreePool (Ptr);
       }
-      DataItem->Data.Ptr = NULL; 
+      DataItem->Data.Ptr = NULL;
     }
   } else {
     //
@@ -1350,7 +1350,7 @@ Ip4Config2SetManualAddress (
     if (IpSb->DefaultInterface != NULL) {
       if (IpSb->DefaultRouteTable != NULL) {
         Ip4FreeRouteTable (IpSb->DefaultRouteTable);
-        IpSb->DefaultRouteTable = NULL;    
+        IpSb->DefaultRouteTable = NULL;
       }
 
       Ip4CancelReceive (IpSb->DefaultInterface);
@@ -1363,7 +1363,7 @@ Ip4Config2SetManualAddress (
 
     //
     // Create new default interface and route table.
-    //    
+    //
     IpIf = Ip4CreateInterface (IpSb->Mnp, IpSb->Controller, IpSb->Image);
     if (IpIf == NULL) {
       return EFI_OUT_OF_RESOURCES;
@@ -1374,14 +1374,14 @@ Ip4Config2SetManualAddress (
       Ip4FreeInterface (IpIf, NULL);
       return EFI_OUT_OF_RESOURCES;
     }
-    
+
     IpSb->DefaultInterface  = IpIf;
     InsertHeadList (&IpSb->Interfaces, &IpIf->Link);
     IpSb->DefaultRouteTable = RouteTable;
     Ip4ReceiveFrame (IpIf, NULL, Ip4AccpetFrame, IpSb);
 
     //
-    // Reset the State to unstarted. 
+    // Reset the State to unstarted.
     //
     if (IpSb->State == IP4_SERVICE_CONFIGED || IpSb->State == IP4_SERVICE_STARTED) {
       IpSb->State = IP4_SERVICE_UNSTARTED;
@@ -1392,8 +1392,8 @@ Ip4Config2SetManualAddress (
 }
 
 /**
-  The work function is to set the gateway addresses manually for the EFI IPv4 
-  network stack that is running on the communication device that this EFI IPv4 
+  The work function is to set the gateway addresses manually for the EFI IPv4
+  network stack that is running on the communication device that this EFI IPv4
   Configuration Protocol manages. It is not configurable when the policy is
   Ip4Config2PolicyDhcp. The gateway addresses must be unicast IPv4 addresses.
 
@@ -1474,7 +1474,7 @@ Ip4Config2SetGateway (
     for (Index1 = 0; Index1 < NewGatewayCount; Index1++) {
       CopyMem (&Gateway, NewGateway + Index1, sizeof (IP4_ADDR));
 
-      if ((IpSb->DefaultInterface->SubnetMask != 0) && 
+      if ((IpSb->DefaultInterface->SubnetMask != 0) &&
           !NetIp4IsUnicast (NTOHL (Gateway), IpSb->DefaultInterface->SubnetMask)) {
         return EFI_INVALID_PARAMETER;
       }
@@ -1505,7 +1505,7 @@ Ip4Config2SetGateway (
         IP4_ALLZERO_ADDRESS,
         IP4_ALLZERO_ADDRESS,
         NTOHL (Gateway)
-        );    
+        );
 
       OneAdded = TRUE;
     }
@@ -1541,9 +1541,9 @@ Ip4Config2SetGateway (
 }
 
 /**
-  The work function is to set the DNS server list for the EFI IPv4 network 
-  stack running on the communication device that this EFI_IP4_CONFIG2_PROTOCOL 
-  manages. It is not configurable when the policy is Ip4Config2PolicyDhcp. 
+  The work function is to set the DNS server list for the EFI IPv4 network
+  stack running on the communication device that this EFI_IP4_CONFIG2_PROTOCOL
+  manages. It is not configurable when the policy is Ip4Config2PolicyDhcp.
   The DNS server addresses must be unicast IPv4 addresses.
 
   @param[in]     Instance The pointer to the IP4 config2 instance data.
@@ -1589,7 +1589,7 @@ Ip4Config2SetDnsServer (
     Status = Ip4Config2SetDnsServerWorker (Instance, DataSize, Data);
   } else {
     //
-    // DataSize is 0 and Data is NULL, clean up the DnsServer address. 
+    // DataSize is 0 and Data is NULL, clean up the DnsServer address.
     //
     if (Item->Data.Ptr != NULL) {
       FreePool (Item->Data.Ptr);
@@ -1598,7 +1598,7 @@ Ip4Config2SetDnsServer (
     Item->DataSize = 0;
     Item->Status   = EFI_NOT_FOUND;
   }
-  
+
   return Status;
 }
 
@@ -1678,7 +1678,7 @@ Ip4Config2OnDhcp4Event (
                                 network stack was set successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following are TRUE:
                                 - This is NULL.
-                                - One or more fields in Data and DataSize do not match the 
+                                - One or more fields in Data and DataSize do not match the
                                   requirement of the data type indicated by DataType.
   @retval EFI_WRITE_PROTECTED   The specified configuration data is read-only or the specified
                                 configuration data cannot be set under the current policy.
@@ -2031,7 +2031,7 @@ Ip4Config2InitInstance (
     NetMapInit (&Instance->DataItem[Index].EventMap);
   }
 
-  
+
   //
   // Initialize each data type: associate storage and set data size for the
   // fixed size data types, hook the SetData function, set the data attribute.
@@ -2066,7 +2066,7 @@ Ip4Config2InitInstance (
 
   //
   // Try to read the config data from NV variable.
-  // If not found, write initialized config data into NV variable 
+  // If not found, write initialized config data into NV variable
   // as a default config data.
   //
   Status = Ip4Config2ReadConfigData (IpSb->MacString, Instance);
@@ -2077,7 +2077,7 @@ Ip4Config2InitInstance (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   Instance->Ip4Config2.SetData              = EfiIp4Config2SetData;
   Instance->Ip4Config2.GetData              = EfiIp4Config2GetData;
   Instance->Ip4Config2.RegisterDataNotify   = EfiIp4Config2RegisterDataNotify;
@@ -2166,7 +2166,7 @@ Ip4AutoReconfigCallBackDpc (
   if (IpSb->State > IP4_SERVICE_UNSTARTED) {
     IpSb->State = IP4_SERVICE_UNSTARTED;
   }
-  
+
   IpSb->Reconfig = TRUE;
 
   Ip4StartAutoConfig (&IpSb->Ip4Config2Instance);

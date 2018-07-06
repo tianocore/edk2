@@ -1,7 +1,7 @@
 /** @file
   UEFI Heap Guard functions.
 
-Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017-2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -70,7 +70,7 @@ SetBits (
   StartBit  = (UINTN)GUARDED_HEAP_MAP_ENTRY_BIT_INDEX (Address);
   EndBit    = (StartBit + BitNumber - 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
 
-  if ((StartBit + BitNumber) > GUARDED_HEAP_MAP_ENTRY_BITS) {
+  if ((StartBit + BitNumber) >= GUARDED_HEAP_MAP_ENTRY_BITS) {
     Msbs    = (GUARDED_HEAP_MAP_ENTRY_BITS - StartBit) %
               GUARDED_HEAP_MAP_ENTRY_BITS;
     Lsbs    = (EndBit + 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
@@ -123,7 +123,7 @@ ClearBits (
   StartBit  = (UINTN)GUARDED_HEAP_MAP_ENTRY_BIT_INDEX (Address);
   EndBit    = (StartBit + BitNumber - 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
 
-  if ((StartBit + BitNumber) > GUARDED_HEAP_MAP_ENTRY_BITS) {
+  if ((StartBit + BitNumber) >= GUARDED_HEAP_MAP_ENTRY_BITS) {
     Msbs    = (GUARDED_HEAP_MAP_ENTRY_BITS - StartBit) %
               GUARDED_HEAP_MAP_ENTRY_BITS;
     Lsbs    = (EndBit + 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
@@ -188,10 +188,14 @@ GetBits (
     Lsbs = 0;
   }
 
-  Result    = RShiftU64 ((*BitMap), StartBit) & (LShiftU64 (1, Msbs) - 1);
-  if (Lsbs > 0) {
-    BitMap  += 1;
-    Result  |= LShiftU64 ((*BitMap) & (LShiftU64 (1, Lsbs) - 1), Msbs);
+  if (StartBit == 0 && BitNumber == GUARDED_HEAP_MAP_ENTRY_BITS) {
+    Result = *BitMap;
+  } else {
+    Result    = RShiftU64((*BitMap), StartBit) & (LShiftU64(1, Msbs) - 1);
+    if (Lsbs > 0) {
+      BitMap  += 1;
+      Result  |= LShiftU64 ((*BitMap) & (LShiftU64 (1, Lsbs) - 1), Msbs);
+    }
   }
 
   return Result;
@@ -225,8 +229,8 @@ FindGuardedMemoryMap (
   //
   // Adjust current map table depth according to the address to access
   //
-  while (mMapLevel < GUARDED_HEAP_MAP_TABLE_DEPTH
-         &&
+  while (AllocMapUnit &&
+         mMapLevel < GUARDED_HEAP_MAP_TABLE_DEPTH &&
          RShiftU64 (
            Address,
            mLevelShift[GUARDED_HEAP_MAP_TABLE_DEPTH - mMapLevel - 1]
@@ -576,6 +580,12 @@ SetGuardPage (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress
   )
 {
+  EFI_STATUS      Status;
+
+  if (gCpu == NULL) {
+    return;
+  }
+
   //
   // Set flag to make sure allocating memory without GUARD for page table
   // operation; otherwise infinite loops could be caused.
@@ -585,7 +595,8 @@ SetGuardPage (
   // Note: This might overwrite other attributes needed by other features,
   // such as NX memory protection.
   //
-  gCpu->SetMemoryAttributes (gCpu, BaseAddress, EFI_PAGE_SIZE, EFI_MEMORY_RP);
+  Status = gCpu->SetMemoryAttributes (gCpu, BaseAddress, EFI_PAGE_SIZE, EFI_MEMORY_RP);
+  ASSERT_EFI_ERROR (Status);
   mOnGuarding = FALSE;
 }
 
@@ -605,6 +616,11 @@ UnsetGuardPage (
   )
 {
   UINT64          Attributes;
+  EFI_STATUS      Status;
+
+  if (gCpu == NULL) {
+    return;
+  }
 
   //
   // Once the Guard page is unset, it will be freed back to memory pool. NX
@@ -626,7 +642,8 @@ UnsetGuardPage (
   // such as memory protection (NX). Please make sure they are not enabled
   // at the same time.
   //
-  gCpu->SetMemoryAttributes (gCpu, BaseAddress, EFI_PAGE_SIZE, Attributes);
+  Status = gCpu->SetMemoryAttributes (gCpu, BaseAddress, EFI_PAGE_SIZE, Attributes);
+  ASSERT_EFI_ERROR (Status);
   mOnGuarding = FALSE;
 }
 
@@ -650,18 +667,8 @@ IsMemoryTypeToGuard (
 {
   UINT64 TestBit;
   UINT64 ConfigBit;
-  BOOLEAN     InSmm;
 
-  if (gCpu == NULL || AllocateType == AllocateAddress) {
-    return FALSE;
-  }
-
-  InSmm = FALSE;
-  if (gSmmBase2 != NULL) {
-    gSmmBase2->InSmm (gSmmBase2, &InSmm);
-  }
-
-  if (InSmm) {
+  if (AllocateType == AllocateAddress) {
     return FALSE;
   }
 
@@ -726,6 +733,20 @@ IsPageTypeToGuard (
   )
 {
   return IsMemoryTypeToGuard (MemoryType, AllocateType, GUARD_HEAP_TYPE_PAGE);
+}
+
+/**
+  Check to see if the heap guard is enabled for page and/or pool allocation.
+
+  @return TRUE/FALSE.
+**/
+BOOLEAN
+IsHeapGuardEnabled (
+  VOID
+  )
+{
+  return IsMemoryTypeToGuard (EfiMaxMemoryType, AllocateAnyPages,
+                              GUARD_HEAP_TYPE_POOL|GUARD_HEAP_TYPE_PAGE);
 }
 
 /**
@@ -890,11 +911,8 @@ AdjustMemoryS (
   }
 
   Target = Start + Size - SizeRequested;
-
-  //
-  // At least one more page needed for Guard page.
-  //
-  if (Size < (SizeRequested + EFI_PAGES_TO_SIZE (1))) {
+  ASSERT (Target >= Start);
+  if (Target == 0) {
     return 0;
   }
 
@@ -1135,10 +1153,6 @@ CoreConvertPagesWithGuard (
     OldPages = NumberOfPages;
 
     AdjustMemoryF (&Start, &NumberOfPages);
-    if (NumberOfPages == 0) {
-      return EFI_SUCCESS;
-    }
-
     //
     // It's safe to unset Guard page inside memory lock because there should
     // be no memory allocation occurred in updating memory page attribute at
@@ -1147,11 +1161,136 @@ CoreConvertPagesWithGuard (
     // marking it usable (from non-present to present).
     //
     UnsetGuardForMemory (OldStart, OldPages);
+    if (NumberOfPages == 0) {
+      return EFI_SUCCESS;
+    }
   } else {
     AdjustMemoryA (&Start, &NumberOfPages);
   }
 
   return CoreConvertPages (Start, NumberOfPages, NewType);
+}
+
+/**
+  Set all Guard pages which cannot be set before CPU Arch Protocol installed.
+**/
+VOID
+SetAllGuardPages (
+  VOID
+  )
+{
+  UINTN     Entries[GUARDED_HEAP_MAP_TABLE_DEPTH];
+  UINTN     Shifts[GUARDED_HEAP_MAP_TABLE_DEPTH];
+  UINTN     Indices[GUARDED_HEAP_MAP_TABLE_DEPTH];
+  UINT64    Tables[GUARDED_HEAP_MAP_TABLE_DEPTH];
+  UINT64    Addresses[GUARDED_HEAP_MAP_TABLE_DEPTH];
+  UINT64    TableEntry;
+  UINT64    Address;
+  UINT64    GuardPage;
+  INTN      Level;
+  UINTN     Index;
+  BOOLEAN   OnGuarding;
+
+  if (mGuardedMemoryMap == 0 ||
+      mMapLevel == 0 ||
+      mMapLevel > GUARDED_HEAP_MAP_TABLE_DEPTH) {
+    return;
+  }
+
+  CopyMem (Entries, mLevelMask, sizeof (Entries));
+  CopyMem (Shifts, mLevelShift, sizeof (Shifts));
+
+  SetMem (Tables, sizeof(Tables), 0);
+  SetMem (Addresses, sizeof(Addresses), 0);
+  SetMem (Indices, sizeof(Indices), 0);
+
+  Level         = GUARDED_HEAP_MAP_TABLE_DEPTH - mMapLevel;
+  Tables[Level] = mGuardedMemoryMap;
+  Address       = 0;
+  OnGuarding    = FALSE;
+
+  DEBUG_CODE (
+    DumpGuardedMemoryBitmap ();
+  );
+
+  while (TRUE) {
+    if (Indices[Level] > Entries[Level]) {
+      Tables[Level] = 0;
+      Level        -= 1;
+    } else {
+
+      TableEntry  = ((UINT64 *)(UINTN)(Tables[Level]))[Indices[Level]];
+      Address     = Addresses[Level];
+
+      if (TableEntry == 0) {
+
+        OnGuarding = FALSE;
+
+      } else if (Level < GUARDED_HEAP_MAP_TABLE_DEPTH - 1) {
+
+        Level            += 1;
+        Tables[Level]     = TableEntry;
+        Addresses[Level]  = Address;
+        Indices[Level]    = 0;
+
+        continue;
+
+      } else {
+
+        Index = 0;
+        while (Index < GUARDED_HEAP_MAP_ENTRY_BITS) {
+          if ((TableEntry & 1) == 1) {
+            if (OnGuarding) {
+              GuardPage = 0;
+            } else {
+              GuardPage = Address - EFI_PAGE_SIZE;
+            }
+            OnGuarding = TRUE;
+          } else {
+            if (OnGuarding) {
+              GuardPage = Address;
+            } else {
+              GuardPage = 0;
+            }
+            OnGuarding = FALSE;
+          }
+
+          if (GuardPage != 0) {
+            SetGuardPage (GuardPage);
+          }
+
+          if (TableEntry == 0) {
+            break;
+          }
+
+          TableEntry = RShiftU64 (TableEntry, 1);
+          Address   += EFI_PAGE_SIZE;
+          Index     += 1;
+        }
+      }
+    }
+
+    if (Level < (GUARDED_HEAP_MAP_TABLE_DEPTH - (INTN)mMapLevel)) {
+      break;
+    }
+
+    Indices[Level] += 1;
+    Address = (Level == 0) ? 0 : Addresses[Level - 1];
+    Addresses[Level] = Address | LShiftU64(Indices[Level], Shifts[Level]);
+
+  }
+}
+
+/**
+  Notify function used to set all Guard pages before CPU Arch Protocol installed.
+**/
+VOID
+HeapGuardCpuArchProtocolNotify (
+  VOID
+  )
+{
+  ASSERT (gCpu != NULL);
+  SetAllGuardPages ();
 }
 
 /**

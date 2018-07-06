@@ -3,7 +3,7 @@
   the Dxe Core. The mArchProtocols[] array represents a list of
   events that represent the Architectural Protocols.
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -206,7 +206,7 @@ GenericProtocolNotify (
 }
 
 /**
-  Creates an event for each entry in a table that is fired everytime a Protocol 
+  Creates an event for each entry in a table that is fired everytime a Protocol
   of a specific type is installed.
 
   @param Entry  Pointer to EFI_CORE_PROTOCOL_NOTIFY_ENTRY.
@@ -245,7 +245,7 @@ CoreNotifyOnProtocolEntryTable (
 }
 
 /**
-  Creates an events for the Architectural Protocols and the optional protocols 
+  Creates an events for the Architectural Protocols and the optional protocols
   that are fired everytime a Protocol of a specific type is installed.
 
 **/

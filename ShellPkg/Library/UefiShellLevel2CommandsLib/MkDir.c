@@ -2,7 +2,7 @@
   Main file for attrib shell level 2 function.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -55,7 +55,7 @@ ShellCommandRunMkDir (
   Status = ShellCommandLineParse (EmptyParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"mkdir", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"mkdir", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -76,7 +76,7 @@ ShellCommandRunMkDir (
       //
       // we didnt get a single parameter
       //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"mkdir");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"mkdir");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       for ( DirCreateCount = 1
@@ -108,7 +108,7 @@ ShellCommandRunMkDir (
           ASSERT(FileHandle == NULL);
           //
           // create the nested directory from parent to child.
-          // if NewDirName = test1\test2\test3, first create "test1\" directory, then "test1\test2\", finally "test1\test2\test3". 
+          // if NewDirName = test1\test2\test3, first create "test1\" directory, then "test1\test2\", finally "test1\test2\test3".
           //
           NewDirNameCopy = AllocateCopyPool (StrSize(NewDirName), NewDirName);
           NewDirNameCopy = PathCleanUpDirectories (NewDirNameCopy);

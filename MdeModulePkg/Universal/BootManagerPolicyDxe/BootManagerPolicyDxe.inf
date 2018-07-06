@@ -1,7 +1,7 @@
 ## @file
 #  This module produces Boot Manager Policy protocol.
-#  
-#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#
+#  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -18,7 +18,7 @@
   MODULE_UNI_FILE                = BootManagerPolicyDxe.uni
   FILE_GUID                      = E622443C-284E-4b47-A984-FD66B482DAC0
   MODULE_TYPE                    = DXE_DRIVER
-  VERSION_STRING                 = 1.0 
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = BootManagerPolicyInitialize
 
 #

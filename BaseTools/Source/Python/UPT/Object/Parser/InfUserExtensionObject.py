@@ -103,7 +103,7 @@ class InfUserExtensionObject():
 #                            Line=LineNo,
 #                            ExtraData=None)
             
-            if self.UserExtension.has_key(IdContentItem):           
+            if IdContentItem in self.UserExtension:
                 #
                 # Each UserExtensions section header must have a unique set 
                 # of UserId, IdString and Arch values.

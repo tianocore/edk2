@@ -65,4 +65,12 @@ EfiTimeToEpoch (
   IN  EFI_TIME  *Time
   );
 
+/**
+  returns Day of the week [0-6] 0=Sunday
+ **/
+UINTN
+EfiTimeToWday (
+  IN  EFI_TIME  *Time
+  );
+
 #endif

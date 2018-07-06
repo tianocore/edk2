@@ -622,7 +622,7 @@ InitializeDmaProtection (
   EFI_EVENT   LegacyBootEvent;
   EFI_EVENT   EventAcpi10;
   EFI_EVENT   EventAcpi20;
-  
+
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   VTD_TPL_LEVEL,

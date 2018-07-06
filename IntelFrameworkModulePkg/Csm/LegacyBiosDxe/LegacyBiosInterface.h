@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -101,9 +101,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define PROTECTED_MODE_BASE_VECTOR_SLAVE   0x70
 
 //
-// When we call CSM16 functions, some CSM16 use es:[offset + 0xabcd] to get data passed from CSM32, 
-// offset + 0xabcd could overflow which exceeds 0xFFFF which is invalid in real mode. 
-// So this will keep offset as small as possible to avoid offset overflow in real mode. 
+// When we call CSM16 functions, some CSM16 use es:[offset + 0xabcd] to get data passed from CSM32,
+// offset + 0xabcd could overflow which exceeds 0xFFFF which is invalid in real mode.
+// So this will keep offset as small as possible to avoid offset overflow in real mode.
 //
 #define NORMALIZE_EFI_SEGMENT(_Adr)      (UINT16) (((UINTN) (_Adr)) >> 4)
 #define NORMALIZE_EFI_OFFSET(_Adr)       (UINT16) (((UINT16) ((UINTN) (_Adr))) & 0xf)
@@ -168,12 +168,6 @@ typedef struct {
 #define NUM_REAL_GDT_ENTRIES  8
 #define CONVENTIONAL_MEMORY_TOP 0xA0000   // 640 KB
 #define INITIAL_VALUE_BELOW_1K  0x0
-
-#elif defined (MDE_CPU_IPF)
-
-#define NUM_REAL_GDT_ENTRIES  3
-#define CONVENTIONAL_MEMORY_TOP 0x80000   // 512 KB
-#define INITIAL_VALUE_BELOW_1K  0xff
 
 #endif
 
@@ -346,79 +340,6 @@ typedef struct {
   BBS_TABLE                         BbsTable[MAX_BBS_ENTRIES];
 } LOW_MEMORY_THUNK;
 
-#elif defined (MDE_CPU_IPF)
-
-typedef struct {
-  //
-  // Space for the code
-  //  The address of Code is also the beginning of the relocated Thunk code
-  //
-  CHAR8                             Code[4096]; // ?
-  //
-  // The address of the Reverse Thunk code
-  //  Note that this member CONTAINS the address of the relocated reverse thunk
-  //  code unlike the member variable 'Code', which IS the address of the Thunk
-  //  code.
-  //
-  UINT32                            LowReverseThunkStart;
-
-  //
-  // Data for the code (cs releative)
-  //
-  DESCRIPTOR32                      GdtDesc;          // Protected mode GDT
-  DESCRIPTOR32                      IdtDesc;          // Protected mode IDT
-  UINT32                            FlatSs;
-  UINT32                            FlatEsp;
-
-  UINT32                            LowCodeSelector;  // Low code selector in GDT
-  UINT32                            LowDataSelector;  // Low data selector in GDT
-  UINT32                            LowStack;
-  DESCRIPTOR32                      RealModeIdtDesc;
-
-  //
-  // real-mode GDT (temporary GDT with two real mode segment descriptors)
-  //
-  GDT32                             RealModeGdt[NUM_REAL_GDT_ENTRIES];
-  DESCRIPTOR32                      RealModeGdtDesc;
-
-  //
-  // Members specifically for the reverse thunk
-  //  The RevReal* members are used to store the current state of real mode
-  //  before performing the reverse thunk.  The RevFlat* members must be set
-  //  before calling the reverse thunk assembly code.
-  //
-  UINT16                            RevRealDs;
-  UINT16                            RevRealSs;
-  UINT32                            RevRealEsp;
-  DESCRIPTOR32                      RevRealIdtDesc;
-  UINT16                            RevFlatDataSelector;  // Flat data selector in GDT
-  UINT32                            RevFlatStack;
-
-  //
-  // A low memory stack
-  //
-  CHAR8                             Stack[LOW_STACK_SIZE];
-
-  //
-  // Stack for flat mode after reverse thunk
-  // @bug - This may no longer be necessary if the reverse thunk interface
-  //           is changed to have the flat stack in a different location.
-  //
-  CHAR8                             RevThunkStack[LOW_STACK_SIZE];
-
-  //
-  // Legacy16 Init memory map info
-  //
-  EFI_TO_COMPATIBILITY16_INIT_TABLE EfiToLegacy16InitTable;
-
-  EFI_TO_COMPATIBILITY16_BOOT_TABLE EfiToLegacy16BootTable;
-
-  CHAR8                             InterruptRedirectionCode[32];
-  EFI_LEGACY_INSTALL_PCI_HANDLER    PciHandler;
-  EFI_DISPATCH_OPROM_TABLE          DispatchOpromTable;
-  BBS_TABLE                         BbsTable[MAX_BBS_ENTRIES];
-} LOW_MEMORY_THUNK;
-
 #endif
 
 //
@@ -544,7 +465,7 @@ extern BOOLEAN mEndOfDxe;
 //
 // Timer 0, Read/Write LSB then MSB, Square wave output, binary count use.
 //
-#define TIMER0_CONTROL_WORD         0x36      
+#define TIMER0_CONTROL_WORD         0x36
 
 #define LEGACY_BIOS_INSTANCE_SIGNATURE  SIGNATURE_32 ('L', 'B', 'I', 'T')
 typedef struct {
@@ -556,16 +477,16 @@ typedef struct {
   EFI_HANDLE                        ImageHandle;
 
   //
-  // CPU Architectural Protocol 
+  // CPU Architectural Protocol
   //
   EFI_CPU_ARCH_PROTOCOL             *Cpu;
 
   //
-  // Timer Architectural Protocol 
+  // Timer Architectural Protocol
   //
   EFI_TIMER_ARCH_PROTOCOL           *Timer;
-  BOOLEAN                           TimerUses8254; 
-  
+  BOOLEAN                           TimerUses8254;
+
   //
   // Protocol to Lock and Unlock 0xc0000 - 0xfffff
   //
@@ -577,7 +498,7 @@ typedef struct {
   // Interrupt control for thunk and PCI IRQ
   //
   EFI_LEGACY_8259_PROTOCOL          *Legacy8259;
-  
+
   //
   // PCI Interrupt PIRQ control
   //
@@ -673,7 +594,7 @@ typedef struct {
   //
   // Indicate that whether GenericLegacyBoot is entered or not
   //
-  BOOLEAN                           LegacyBootEntered;                              
+  BOOLEAN                           LegacyBootEntered;
 
   //
   // CSM16 PCI Interface Version
@@ -1261,10 +1182,10 @@ GenerateSoftInit (
   );
 
 /**
-  Do an AllocatePages () of type AllocateMaxAddress for EfiBootServicesCode
-  memory.
+  Allocate memory for legacy usage.
 
-  @param  AllocateType               Allocated Legacy Memory Type
+  @param  AllocateType               The type of allocation to perform.
+  @param  MemoryType                 The type of memory to allocate.
   @param  StartPageAddress           Start address of range
   @param  Pages                      Number of pages to allocate
   @param  Result                     Result of allocation
@@ -1276,6 +1197,7 @@ GenerateSoftInit (
 EFI_STATUS
 AllocateLegacyMemory (
   IN  EFI_ALLOCATE_TYPE         AllocateType,
+  IN  EFI_MEMORY_TYPE           MemoryType,
   IN  EFI_PHYSICAL_ADDRESS      StartPageAddress,
   IN  UINTN                     Pages,
   OUT EFI_PHYSICAL_ADDRESS      *Result
@@ -1349,7 +1271,7 @@ ShadowAndStartLegacy16 (
 
 /**
   Checks the state of the floppy and if media is inserted.
-  
+
   This routine checks the state of the floppy and if media is inserted.
   There are 3 cases:
   No floppy present         - Set BBS entry to ignore

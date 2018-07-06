@@ -1,7 +1,7 @@
 /** @file
   EFI UDPv4 protocol implementation.
-   
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -158,7 +158,7 @@ Udp4GetModeData (
 /**
   Initializes, changes, or resets the operational parameters for this instance of the EFI UDPv4
   Protocol.
-  
+
   The Configure() function is used to do the following:
   * Initialize and start this instance of the EFI UDPv4 Protocol.
   * Change the filtering rules and operational parameters.
@@ -185,7 +185,7 @@ Udp4GetModeData (
   @retval EFI_OUT_OF_RESOURCES  The EFI UDPv4 Protocol driver cannot allocate memory for this
                                 EFI UDPv4 Protocol instance.
   @retval EFI_DEVICE_ERROR      An unexpected network or system error occurred and this instance
-                                 was not opened. 
+                                 was not opened.
 
 **/
 EFI_STATUS
@@ -197,7 +197,7 @@ Udp4Configure (
 
 /**
   Joins and leaves multicast groups.
-  
+
   The Groups() function is used to enable and disable the multicast group
   filtering. If the JoinFlag is FALSE and the MulticastAddress is NULL, then all
   currently joined groups are left.
@@ -234,7 +234,7 @@ Udp4Groups (
 
 /**
   Adds and deletes routing table entries.
-  
+
   The Routes() function adds a route to or deletes a route from the routing table.
   Routes are determined by comparing the SubnetAddress with the destination IP
   address and arithmetically AND-ing it with the SubnetMask. The gateway address
@@ -282,7 +282,7 @@ Udp4Routes (
 
 /**
   Queues outgoing data packets into the transmit queue.
-  
+
   The Transmit() function places a sending request to this instance of the EFI
   UDPv4 Protocol, alongside the transmit data that was filled by the user. Whenever
   the packet in the token is sent out or some errors occur, the Token.Event will
@@ -319,7 +319,7 @@ Udp4Transmit (
 
 /**
   Places an asynchronous receive request into the receiving queue.
-  
+
   The Receive() function places a completion token into the receive packet queue.
   This function is always asynchronous.
   The caller must fill in the Token.Event field in the completion token, and this
@@ -355,7 +355,7 @@ Udp4Receive (
 
 /**
   Aborts an asynchronous transmit or receive request.
-  
+
   The Cancel() function is used to abort a pending transmit or receive request.
   If the token is in the transmit or receive request queues, after calling this
   function, Token.Status will be set to EFI_ABORTED and then Token.Event will be
@@ -390,7 +390,7 @@ Udp4Cancel (
 
 /**
   Polls for incoming data packets and processes outgoing data packets.
-  
+
   The Poll() function can be used by network drivers and applications to increase
   the rate that data packets are moved between the communications device and the
   transmit and receive queues.
@@ -691,5 +691,5 @@ EFIAPI
 Udp4NetVectorExtFree (
   VOID  *Context
   );
- 
+
 #endif

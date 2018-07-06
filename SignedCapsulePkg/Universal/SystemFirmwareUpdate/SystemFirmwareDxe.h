@@ -1,7 +1,7 @@
 /** @file
   System Firmware update header file.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -203,7 +203,7 @@ FmpGetImageInfo (
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_NOT_FOUND          The current image is not copied to the buffer.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -258,7 +258,7 @@ FmpGetImage (
   @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -290,7 +290,7 @@ FmpSetImage (
   @retval EFI_SUCCESS            The image was successfully checked.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -374,7 +374,7 @@ FmpGetPackageInfo (
   @retval EFI_INVALID_PARAMETER  The PackageVersionName length is longer than the value
                                  returned in PackageVersionNameMaxLen.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS

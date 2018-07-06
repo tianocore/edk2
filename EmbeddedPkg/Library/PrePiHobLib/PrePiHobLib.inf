@@ -1,6 +1,7 @@
 #/** @file
 #  Hob lib that does not contain the APIs as they are already in the PrePiLib
 #
+#  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2008 - 2010, Apple Inc. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -23,7 +24,7 @@
 
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources.common]

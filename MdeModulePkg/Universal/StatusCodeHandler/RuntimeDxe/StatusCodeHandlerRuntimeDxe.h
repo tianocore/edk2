@@ -1,7 +1,7 @@
 /** @file
   Internal include file for Status Code Handler Driver.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -45,7 +45,7 @@ extern RUNTIME_MEMORY_STATUSCODE_HEADER  *mRtMemoryStatusCodeTable;
 
 /**
   Locates Serial I/O Protocol as initialization for serial status code worker.
- 
+
   @retval EFI_SUCCESS  Serial I/O Protocol is successfully located.
 
 **/
@@ -86,7 +86,7 @@ SerialStatusCodeReportWorker (
 
 /**
   Initialize runtime memory status code table as initialization for runtime memory status code worker
- 
+
   @retval EFI_SUCCESS  Runtime memory status code table successfully initialized.
   @retval others       Errors from gBS->InstallConfigurationTable().
 
@@ -97,7 +97,7 @@ RtMemoryStatusCodeInitializeWorker (
   );
 
 /**
-  Report status code into runtime memory. If the runtime pool is full, roll back to the 
+  Report status code into runtime memory. If the runtime pool is full, roll back to the
   first record and overwrite it.
 
   @param  CodeType                Indicates the type of status code being reported.

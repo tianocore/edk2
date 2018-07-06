@@ -2,7 +2,7 @@
 # ARM platform package.
 #
 # Copyright (c) 2009 - 2010, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2011 - 2015, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, ARM Ltd. All rights reserved.<BR>
 # Copyright (c) 2016 - 2017, Linaro Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
@@ -105,6 +105,7 @@
   ArmPlatformPkg/Library/LcdPlatformNullLib/LcdPlatformNullLib.inf
   ArmPlatformPkg/Library/NorFlashPlatformNullLib/NorFlashPlatformNullLib.inf
   ArmPlatformPkg/Library/PL011SerialPortLib/PL011SerialPortLib.inf
+  ArmPlatformPkg/Library/PL011UartClockLib/PL011UartClockLib.inf
   ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
   ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
   ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
@@ -120,3 +121,5 @@
 
   ArmPlatformPkg/PrePi/PeiMPCore.inf
   ArmPlatformPkg/PrePi/PeiUniCore.inf
+
+  ArmPlatformPkg/Library/ArmMaliDp/ArmMaliDp.inf

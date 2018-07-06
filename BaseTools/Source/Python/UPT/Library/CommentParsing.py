@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define comment parsing interface
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -21,8 +21,8 @@ CommentParsing
 #
 import re
 
-from Library.String import GetSplitValueList
-from Library.String import CleanString2
+from Library.StringUtils import GetSplitValueList
+from Library.StringUtils import CleanString2
 from Library.DataType import HEADER_COMMENT_NOT_STARTED
 from Library.DataType import TAB_COMMENT_SPLIT
 from Library.DataType import HEADER_COMMENT_LICENSE
@@ -217,7 +217,7 @@ def ParsePcdErrorCode (Value = None, ContainerFile = None, LineNum = None):
         # To delete the tailing 'L'
         #
         return hex(ErrorCode)[:-1]
-    except ValueError, XStr:
+    except ValueError as XStr:
         if XStr:
             pass
         Logger.Error('Parser', 
@@ -555,15 +555,15 @@ def ParseComment (Comment, UsageTokens, TypeTokens, RemoveTokens, ParseVariable)
     # from HelpText
     #
     for Token in List[0:NumTokens]:
-        if Usage == None and Token in UsageTokens:
+        if Usage is None and Token in UsageTokens:
             Usage = UsageTokens[Token]
             HelpText = HelpText.replace(Token, '')
-    if Usage != None or not ParseVariable:
+    if Usage is not None or not ParseVariable:
         for Token in List[0:NumTokens]:
-            if Type == None and Token in TypeTokens:
+            if Type is None and Token in TypeTokens:
                 Type = TypeTokens[Token]
                 HelpText = HelpText.replace(Token, '')
-            if Usage != None:    
+            if Usage is not None:    
                 for Token in List[0:NumTokens]:
                     if Token in RemoveTokens:
                         HelpText = HelpText.replace(Token, '')
@@ -571,13 +571,13 @@ def ParseComment (Comment, UsageTokens, TypeTokens, RemoveTokens, ParseVariable)
     #
     # If no Usage token is present and set Usage to UNDEFINED
     #  
-    if Usage == None:
+    if Usage is None:
         Usage = 'UNDEFINED'
     
     #
     # If no Type token is present and set Type to UNDEFINED
     #  
-    if Type == None:
+    if Type is None:
         Type = 'UNDEFINED'
     
     #

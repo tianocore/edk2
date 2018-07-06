@@ -1,7 +1,7 @@
 ##  @file
 #  Provides interface to shell functionality for shell commands and applications.
 #
-#  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved. <BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved. <BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -22,7 +22,7 @@
   LIBRARY_CLASS                  = ShellCEntryLib|UEFI_APPLICATION UEFI_DRIVER
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
 
 [Sources.common]
@@ -40,5 +40,5 @@
 [Protocols]
   gEfiShellParametersProtocolGuid                         ## CONSUMES
   gEfiShellInterfaceGuid                                  ## SOMETIMES_CONSUMES
-  
+
 

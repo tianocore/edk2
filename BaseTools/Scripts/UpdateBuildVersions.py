@@ -90,7 +90,8 @@ def ShellCommandResults(CmdLine, Opt):
             sys.stderr.flush()
         returnValue = err_val.returncode
 
-    except IOError as (errno, strerror):
+    except IOError as err_val:
+        (errno, strerror) = err_val.args
         file_list.close()
         if not Opt.silent:
             sys.stderr.write("I/O ERROR : %s : %s\n" % (str(errno), strerror))
@@ -100,7 +101,8 @@ def ShellCommandResults(CmdLine, Opt):
             sys.stderr.flush()
         returnValue = errno
 
-    except OSError as (errno, strerror):
+    except OSError as err_val:
+        (errno, strerror) = err_val.args
         file_list.close()
         if not Opt.silent:
             sys.stderr.write("OS ERROR : %s : %s\n" % (str(errno), strerror))
@@ -210,13 +212,15 @@ def RevertCmd(Filename, Opt):
             sys.stderr.write("Subprocess ERROR : %s\n" % err_val)
             sys.stderr.flush()
 
-    except IOError as (errno, strerror):
+    except IOError as err_val:
+        (errno, strerror) = err_val.args
         if not Opt.silent:
             sys.stderr.write("I/O ERROR : %d : %s\n" % (str(errno), strerror))
             sys.stderr.write("ERROR : this command failed : %s\n" % CmdLine)
             sys.stderr.flush()
 
-    except OSError as (errno, strerror):
+    except OSError as err_val:
+        (errno, strerror) = err_val.args
         if not Opt.silent:
             sys.stderr.write("OS ERROR : %d : %s\n" % (str(errno), strerror))
             sys.stderr.write("ERROR : this command failed : %s\n" % CmdLine)
@@ -249,7 +253,7 @@ def GetSvnRevision(opts):
     StatusCmd = "svn st -v --depth infinity --non-interactive"
     contents = ShellCommandResults(StatusCmd, opts)
     os.chdir(Cwd)
-    if type(contents) is ListType:
+    if isinstance(contents, ListType):
         for line in contents:
             if line.startswith("M "):
                 Modified = True
@@ -259,7 +263,7 @@ def GetSvnRevision(opts):
     InfoCmd = "svn info %s" % SrcPath.replace("\\", "/").strip()
     Revision = 0
     contents = ShellCommandResults(InfoCmd, opts)
-    if type(contents) is IntType:
+    if isinstance(contents, IntType):
         return 0, Modified
     for line in contents:
         line = line.strip()
@@ -280,7 +284,7 @@ def CheckSvn(opts):
     VerCmd = "svn --version"
     contents = ShellCommandResults(VerCmd, opts)
     opts.silent = OriginalSilent
-    if type(contents) is IntType:
+    if isinstance(contents, IntType):
         if opts.verbose:
             sys.stdout.write("SVN does not appear to be available.\n")
             sys.stdout.flush()

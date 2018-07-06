@@ -2,29 +2,29 @@
   Library functions that abstract driver model protocols
   installation.
 
-  Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
   http://opensource.org/licenses/bsd-license.php.
-  
+
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-**/ 
+**/
 
 
 #include "UefiLibInternal.h"
 
 /**
   Installs and completes the initialization of a Driver Binding Protocol instance.
-  
+
   Installs the Driver Binding Protocol specified by DriverBinding onto the handle
   specified by DriverBindingHandle. If DriverBindingHandle is NULL, then DriverBinding
   is installed onto a newly created handle. DriverBindingHandle is typically the same
   as the driver's ImageHandle, but it can be different if the driver produces multiple
-  Driver Binding Protocols. 
-  If DriverBinding is NULL, then ASSERT(). 
+  Driver Binding Protocols.
+  If DriverBinding is NULL, then ASSERT().
   If DriverBinding can not be installed onto a handle, then ASSERT().
 
   @param  ImageHandle          The image handle of the driver.
@@ -80,10 +80,10 @@ EfiLibInstallDriverBinding (
   Protocols onto the driver's DriverBindingHandle. If DriverBindingHandle is NULL,
   then the protocols are  installed onto a newly created handle. DriverBindingHandle
   is typically the same as the driver's ImageHandle, but it can be different if the
-  driver produces multiple Driver Binding Protocols. 
-  If DriverBinding is NULL, then ASSERT(). 
+  driver produces multiple Driver Binding Protocols.
+  If DriverBinding is NULL, then ASSERT().
   If the installation fails, then ASSERT().
-  
+
   @param  ImageHandle          The image handle of the driver.
   @param  SystemTable          The EFI System Table that was passed to the driver's entry point.
   @param  DriverBinding        A Driver Binding Protocol instance that this driver is producing.
@@ -118,7 +118,7 @@ EfiLibInstallAllDriverProtocols (
   //
   DriverBinding->ImageHandle         = ImageHandle;
   DriverBinding->DriverBindingHandle = DriverBindingHandle;
-  
+
   if (DriverDiagnostics == NULL || FeaturePcdGet(PcdDriverDiagnosticsDisable)) {
     if (DriverConfiguration == NULL) {
       if (ComponentName == NULL || FeaturePcdGet(PcdComponentNameDisable)) {
@@ -210,8 +210,8 @@ EfiLibInstallAllDriverProtocols (
   optional Component Name and optional Component Name 2 protocols onto the driver's
   DriverBindingHandle.  If DriverBindingHandle is NULL, then the protocols are installed
   onto a newly created handle.  DriverBindingHandle is typically the same as the driver's
-  ImageHandle, but it can be different if the driver produces multiple Driver Binding Protocols. 
-  If DriverBinding is NULL, then ASSERT(). 
+  ImageHandle, but it can be different if the driver produces multiple Driver Binding Protocols.
+  If DriverBinding is NULL, then ASSERT().
   If the installation fails, then ASSERT().
 
   @param  ImageHandle          The image handle of the driver.
@@ -299,8 +299,8 @@ EfiLibInstallDriverBindingComponentName2 (
   Component Name, optional Component Name 2, optional Driver Configuration, optional Driver Configuration 2,
   optional Driver Diagnostic, and optional Driver Diagnostic 2 Protocols onto the driver's DriverBindingHandle.
   DriverBindingHandle is typically the same as the driver's ImageHandle, but it can be different if the driver
-  produces multiple Driver Binding Protocols. 
-  If DriverBinding is NULL, then ASSERT(). 
+  produces multiple Driver Binding Protocols.
+  If DriverBinding is NULL, then ASSERT().
   If the installation fails, then ASSERT().
 
 
@@ -337,14 +337,14 @@ EfiLibInstallAllDriverProtocols2 (
 {
   EFI_STATUS  Status;
 
-  ASSERT (DriverBinding != NULL); 
+  ASSERT (DriverBinding != NULL);
 
   //
   // Update the ImageHandle and DriverBindingHandle fields of the Driver Binding Protocol
   //
   DriverBinding->ImageHandle         = ImageHandle;
   DriverBinding->DriverBindingHandle = DriverBindingHandle;
-  
+
   if (DriverConfiguration2 == NULL) {
     if (DriverConfiguration == NULL) {
       if (DriverDiagnostics == NULL || FeaturePcdGet(PcdDriverDiagnosticsDisable)) {

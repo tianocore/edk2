@@ -86,7 +86,7 @@ class InfSourceSectionParser(InfParserSectionRoot):
             if SrcLineContent.find(DT.TAB_COMMENT_SPLIT) > -1:
                 TailComments = SrcLineContent[SrcLineContent.find(DT.TAB_COMMENT_SPLIT):]
                 SrcLineContent = SrcLineContent[:SrcLineContent.find(DT.TAB_COMMENT_SPLIT)]
-                if LineComment == None:
+                if LineComment is None:
                     LineComment = InfLineCommentObject()
                 LineComment.SetTailComments(TailComments)
                                
@@ -97,7 +97,7 @@ class InfSourceSectionParser(InfParserSectionRoot):
                                       FileName,
                                       DT.MODEL_EFI_SOURCE_FILE,
                                       self.FileLocalMacros)
-            if Name != None:
+            if Name is not None:
                 SectionMacros[Name] = Value
                 LineComment = None
                 HeaderComments = []

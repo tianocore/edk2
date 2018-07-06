@@ -2,7 +2,7 @@
   Support functions for managing debug image info table when loading and unloading
   images.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -65,9 +65,9 @@ CoreInitializeDebugImageInfoTable (
     Memory = MAX_ADDRESS;
   }
   Status = CoreAllocatePages (
-             AllocateMaxAddress, 
+             AllocateMaxAddress,
              EfiBootServicesData,
-             RealPages, 
+             RealPages,
              &Memory
              );
   if (EFI_ERROR (Status)) {
@@ -80,16 +80,16 @@ CoreInitializeDebugImageInfoTable (
     // as close to the top of memory as feasible.
     //
     Status = CoreAllocatePages (
-               AllocateAnyPages, 
+               AllocateAnyPages,
                EfiBootServicesData,
-               RealPages, 
+               RealPages,
                &Memory
                );
     ASSERT_EFI_ERROR (Status);
     if (EFI_ERROR (Status)) {
       return;
     }
-  }  
+  }
 
   //
   // Free overallocated pages
@@ -121,13 +121,13 @@ CoreInitializeDebugImageInfoTable (
 
   //
   // Initialize EFI_SYSTEM_TABLE_POINTER structure
-  //  
+  //
   mDebugTable->Signature          = EFI_SYSTEM_TABLE_SIGNATURE;
   mDebugTable->EfiSystemTableBase = (EFI_PHYSICAL_ADDRESS) (UINTN) gDxeCoreST;
   mDebugTable->Crc32              = 0;
-  
+
   //
-  // Install the EFI_SYSTEM_TABLE_POINTER structure in the EFI System 
+  // Install the EFI_SYSTEM_TABLE_POINTER structure in the EFI System
   // Configuration Table
   //
   Status = CoreInstallConfigurationTable (&gEfiDebugImageInfoTableGuid, &mDebugInfoTableHeader);
@@ -182,7 +182,7 @@ CoreNewDebugImageInfoEntry (
   mDebugInfoTableHeader.UpdateStatus |= EFI_DEBUG_IMAGE_INFO_UPDATE_IN_PROGRESS;
 
   Table = mDebugInfoTableHeader.EfiDebugImageInfoTable;
-  
+
   if (mDebugInfoTableHeader.TableSize < mMaxTableEntries) {
     //
     // We still have empty entires in the Table, find the first empty entry.

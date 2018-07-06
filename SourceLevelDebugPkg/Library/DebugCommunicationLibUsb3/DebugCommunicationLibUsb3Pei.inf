@@ -1,7 +1,7 @@
 ## @file
 #  Debug Communication Library instance based on usb3 debug port.
 #
-#  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -25,7 +25,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
@@ -41,6 +41,7 @@
 
 [Ppis]
   gEfiPeiMemoryDiscoveredPpiGuid                ## CONSUMES
+  gEdkiiIoMmuPpiGuid                            ## SOMETIMES_CONSUMES
 
 [Pcd]
   # The memory BAR of ehci host controller, in which usb debug feature is enabled.
@@ -51,13 +52,13 @@
   # The format of pci address please refer to SourceLevelDebugPkg.dec
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciPciAddress               ## CONSUMES
 
-  # Per XHCI spec, software shall impose a timeout between the detection of the Debug Host 
+  # Per XHCI spec, software shall impose a timeout between the detection of the Debug Host
   # connection and the DbC Run transition to 1. This PCD specifies the timeout value in microsecond.
   gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdUsbXhciDebugDetectTimeout       ## SOMETIMES_CONSUMES
 
   # The value of data buffer size used for USB debug port handle.
   # It should be equal to sizeof (USB3_DEBUG_PORT_HANDLE).
-  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize|239   ## SOMETIMES_CONSUMES
+  gEfiSourceLevelDebugPkgTokenSpaceGuid.PcdDebugPortHandleBufferSize|249   ## SOMETIMES_CONSUMES
 
 [LibraryClasses]
   BaseLib
@@ -67,6 +68,7 @@
   TimerLib
   BaseMemoryLib
   PeiServicesLib
-  
+  HobLib
+
 [Depex.common.PEIM]
   gEfiPeiMemoryDiscoveredPpiGuid

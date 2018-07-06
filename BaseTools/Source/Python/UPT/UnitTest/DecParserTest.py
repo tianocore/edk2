@@ -11,6 +11,7 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
+from __future__ import print_function
 import os
 import unittest
 
@@ -66,7 +67,7 @@ def TestTemplate(TestString, TestFunc):
         # Close file
         f.close()
     except:
-        print 'Can not create temporary file [%s]!' % Path
+        print('Can not create temporary file [%s]!' % Path)
         exit(-1)
 
     # Call test function to test
@@ -279,6 +280,6 @@ if __name__ == '__main__':
     unittest.FunctionTestCase(TestDecPcd).runTest()
     unittest.FunctionTestCase(TestDecUserExtension).runTest()
 
-    print 'All tests passed...'
+    print('All tests passed...')
 
 

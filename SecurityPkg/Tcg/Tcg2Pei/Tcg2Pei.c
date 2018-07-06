@@ -1,14 +1,14 @@
 /** @file
   Initialize TPM2 device and measure FVs before handing off control to DXE.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -18,7 +18,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <Ppi/FirmwareVolumeInfo.h>
 #include <Ppi/FirmwareVolumeInfo2.h>
-#include <Ppi/LockPhysicalPresence.h>
 #include <Ppi/TpmInitialized.h>
 #include <Ppi/FirmwareVolume.h>
 #include <Ppi/EndOfPeiPhase.h>
@@ -44,7 +43,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/ResetSystemLib.h>
-#include <Library/Tcg2PhysicalPresenceLib.h>
 
 #define PERF_ID_TCG2_PEI  0x3080
 
@@ -121,12 +119,12 @@ EFI_PEI_NOTIFY_DESCRIPTOR           mNotifyList[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     &gEfiPeiFirmwareVolumeInfoPpiGuid,
-    FirmwareVolmeInfoPpiNotifyCallback 
+    FirmwareVolmeInfoPpiNotifyCallback
   },
   {
     EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK,
     &gEfiPeiFirmwareVolumeInfo2PpiGuid,
-    FirmwareVolmeInfoPpiNotifyCallback 
+    FirmwareVolmeInfoPpiNotifyCallback
   },
   {
     (EFI_PEI_PPI_DESCRIPTOR_NOTIFY_CALLBACK | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
@@ -138,7 +136,7 @@ EFI_PEI_NOTIFY_DESCRIPTOR           mNotifyList[] = {
 
 /**
   Record all measured Firmware Volum Information into a Guid Hob
-  Guid Hob payload layout is 
+  Guid Hob payload layout is
 
      UINT32 *************************** FIRMWARE_BLOB number
      EFI_PLATFORM_FIRMWARE_BLOB******** BLOB Array
@@ -158,13 +156,13 @@ EndofPeiSignalNotifyCallBack (
   IN EFI_PEI_NOTIFY_DESCRIPTOR     *NotifyDescriptor,
   IN VOID                          *Ppi
   )
-{  
+{
   MEASURED_HOB_DATA *MeasuredHobData;
 
   MeasuredHobData = NULL;
 
   //
-  // Create a Guid hob to save all measured Fv 
+  // Create a Guid hob to save all measured Fv
   //
   MeasuredHobData = BuildGuidHob(
                       &gMeasuredFvHobGuid,
@@ -360,11 +358,11 @@ LogHashEvent (
   added into the Event Log.
 
   @param[in]      Flags         Bitmap providing additional information.
-  @param[in]      HashData      Physical address of the start of the data buffer 
+  @param[in]      HashData      Physical address of the start of the data buffer
                                 to be hashed, extended, and logged.
   @param[in]      HashDataLen   The length, in bytes, of the buffer referenced by HashData.
-  @param[in]      NewEventHdr   Pointer to a TCG_PCR_EVENT_HDR data structure.  
-  @param[in]      NewEventData  Pointer to the new event data.  
+  @param[in]      NewEventHdr   Pointer to a TCG_PCR_EVENT_HDR data structure.
+  @param[in]      NewEventData  Pointer to the new event data.
 
   @retval EFI_SUCCESS           Operation completed successfully.
   @retval EFI_OUT_OF_RESOURCES  No enough memory to log the new event.
@@ -398,7 +396,7 @@ HashLogExtendEvent (
       Status = LogHashEvent (&DigestList, NewEventHdr, NewEventData);
     }
   }
-  
+
   if (Status == EFI_DEVICE_ERROR) {
     DEBUG ((EFI_D_ERROR, "HashLogExtendEvent - %r. Disable TPM.\n", Status));
     BuildGuidHob (&gTpmErrorHobGuid,0);
@@ -445,13 +443,13 @@ MeasureCRTMVersion (
 }
 
 /**
-  Measure FV image. 
-  Add it into the measured FV list after the FV is measured successfully. 
+  Measure FV image.
+  Add it into the measured FV list after the FV is measured successfully.
 
   @param[in]  FvBase            Base address of FV image.
   @param[in]  FvLength          Length of FV image.
 
-  @retval EFI_SUCCESS           Fv image is measured successfully 
+  @retval EFI_SUCCESS           Fv image is measured successfully
                                 or it has been already measured.
   @retval EFI_OUT_OF_RESOURCES  No enough memory to log the new event.
   @retval EFI_DEVICE_ERROR      The command was unsuccessful.
@@ -707,21 +705,21 @@ FirmwareVolmeInfoPpiNotifyCallback (
   // The PEI Core can not dispatch or load files from memory mapped FVs that do not support FvPpi.
   //
   Status = PeiServicesLocatePpi (
-             &Fv->FvFormat, 
-             0, 
+             &Fv->FvFormat,
+             0,
              NULL,
              (VOID**)&FvPpi
              );
   if (EFI_ERROR (Status)) {
     return EFI_SUCCESS;
   }
-  
+
   //
   // This is an FV from an FFS file, and the parent FV must have already been measured,
   // No need to measure twice, so just record the FV and return
   //
   if (Fv->ParentFvName != NULL || Fv->ParentFileName != NULL ) {
-    
+
     ASSERT (mMeasuredChildFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported));
     if (mMeasuredChildFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported)) {
       //
@@ -763,7 +761,7 @@ PeimEntryMP (
   ASSERT (mMeasuredBaseFvInfo != NULL);
   mMeasuredChildFvInfo = (EFI_PLATFORM_FIRMWARE_BLOB *) AllocateZeroPool (sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * PcdGet32 (PcdPeiCoreMaxFvSupported));
   ASSERT (mMeasuredChildFvInfo != NULL);
-  
+
   if (PcdGet8 (PcdTpm2ScrtmPolicy) == 1) {
     Status = MeasureCRTMVersion ();
   }
@@ -787,7 +785,7 @@ PeimEntryMP (
 /**
   Measure and log Separator event with error, and extend the measurement result into a specific PCR.
 
-  @param[in] PCRIndex         PCR index.  
+  @param[in] PCRIndex         PCR index.
 
   @retval EFI_SUCCESS         Operation completed successfully.
   @retval EFI_DEVICE_ERROR    The operation was unsuccessful.
@@ -887,7 +885,7 @@ PeimEntryMA (
         goto Done;
       }
     }
-    
+
     //
     // Update Tpm2HashMask according to PCR bank.
     //

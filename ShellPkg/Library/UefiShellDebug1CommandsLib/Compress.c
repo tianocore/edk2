@@ -7,7 +7,7 @@
   This sequence is further divided into Blocks and Huffman codings
   are applied to each Block.
 
-  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,8 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/ShellLib.h>
+
+#include "Compress.h"
 
 //
 // Macro Definitions
@@ -179,7 +181,7 @@ PutDword (
 
 /**
   Allocate memory spaces for data structures used in compression process.
-  
+
   @retval EFI_SUCCESS           Memory was allocated successfully.
   @retval EFI_OUT_OF_RESOURCES  A memory allocation failed.
 **/
@@ -738,7 +740,7 @@ MakeLen (
 
 /**
   Assign code to each symbol based on the code length array.
-  
+
   @param[in] LoopVar8      The number of symbols.
   @param[in] Len    The code length array.
   @param[out] Code  The stores codes for each symbol.
@@ -762,7 +764,7 @@ MakeCode (
     Code[LoopVar1] = Start[Len[LoopVar1]]++;
   }
 }
-  
+
 /**
   Generates Huffman codes given a frequency distribution of symbols.
 
@@ -1173,7 +1175,7 @@ HufEncodeStart (
 /**
   Outputs an Original Character or a Pointer.
 
-  @param[in] LoopVar5     The original character or the 'String Length' element of 
+  @param[in] LoopVar5     The original character or the 'String Length' element of
                    a Pointer.
   @param[in] LoopVar7     The 'Position' field of a Pointer.
 **/
@@ -1307,20 +1309,20 @@ Encode (
   The compression routine.
 
   @param[in]       SrcBuffer     The buffer containing the source data.
-  @param[in]       SrcSize       The number of bytes in SrcBuffer.
+  @param[in]       SrcSize       Number of bytes in SrcBuffer.
   @param[in]       DstBuffer     The buffer to put the compressed image in.
   @param[in, out]  DstSize       On input the size (in bytes) of DstBuffer, on
-                                return the number of bytes placed in DstBuffer.
+                                 return the number of bytes placed in DstBuffer.
 
   @retval EFI_SUCCESS           The compression was sucessful.
   @retval EFI_BUFFER_TOO_SMALL  The buffer was too small.  DstSize is required.
 **/
 EFI_STATUS
 Compress (
-  IN       VOID   *SrcBuffer,
-  IN       UINT64 SrcSize,
-  IN       VOID   *DstBuffer,
-  IN OUT   UINT64 *DstSize
+  IN      VOID    *SrcBuffer,
+  IN      UINT64  SrcSize,
+  IN      VOID    *DstBuffer,
+  IN OUT  UINT64  *DstSize
   )
 {
   EFI_STATUS  Status;

@@ -1,15 +1,15 @@
 /** @file
-  This driver produces PEI_LOCK_PHYSICAL_PRESENCE_PPI to indicate 
-  whether TPM need be locked or not. It can be replaced by a platform 
+  This driver produces PEI_LOCK_PHYSICAL_PRESENCE_PPI to indicate
+  whether TPM need be locked or not. It can be replaced by a platform
   specific driver.
 
-Copyright (c) 2005 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -70,18 +70,18 @@ LockTpmPhysicalPresence (
   EFI_PHYSICAL_PRESENCE              TcgPpData;
 
   //
-  // The CRTM has sensed the physical presence assertion of the user. For example, 
-  // the user has pressed the startup button or inserted a USB dongle. The details 
+  // The CRTM has sensed the physical presence assertion of the user. For example,
+  // the user has pressed the startup button or inserted a USB dongle. The details
   // of the implementation are vendor-specific. Here we read a PCD value to indicate
   // whether operator physical presence.
-  // 
+  //
   if (!PcdGetBool (PcdTpmPhysicalPresence)) {
     return TRUE;
   }
 
   //
-  // Check the pending TPM requests. Lock TPM physical presence if there is no TPM 
-  // request.  
+  // Check the pending TPM requests. Lock TPM physical presence if there is no TPM
+  // request.
   //
   Status = PeiServicesLocatePpi (
              &gEfiPeiReadOnlyVariable2PpiGuid,
@@ -91,8 +91,8 @@ LockTpmPhysicalPresence (
              );
   if (!EFI_ERROR (Status)) {
     DataSize = sizeof (EFI_PHYSICAL_PRESENCE);
-    Status = Variable->GetVariable ( 
-                         Variable, 
+    Status = Variable->GetVariable (
+                         Variable,
                          PHYSICAL_PRESENCE_VARIABLE,
                          &gEfiPhysicalPresenceGuid,
                          NULL,
@@ -115,7 +115,7 @@ LockTpmPhysicalPresence (
 /**
   Entry point of this module.
 
-  It installs lock physical presence PPI. 
+  It installs lock physical presence PPI.
 
   @param[in] FileHandle   Handle of the file being invoked.
   @param[in] PeiServices  Describes the list of possible PEI Services.

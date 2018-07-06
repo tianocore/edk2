@@ -2,7 +2,7 @@
   The implementation for Shell command ifconfig based on IP4Config2 protocol.
 
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -45,7 +45,7 @@ typedef struct _IFCONFIG_INTERFACE_CB {
   EFI_HANDLE                                  NicHandle;
   LIST_ENTRY                                  Link;
   EFI_IP4_CONFIG2_PROTOCOL                    *IfCfg;
-  EFI_IP4_CONFIG2_INTERFACE_INFO              *IfInfo; 
+  EFI_IP4_CONFIG2_INTERFACE_INFO              *IfInfo;
   EFI_IP4_CONFIG2_POLICY                      Policy;
   UINT32                                      DnsCnt;
   EFI_IPv4_ADDRESS                            DnsAddr[1];
@@ -399,7 +399,7 @@ IfConfigGetInterfaceInfo (
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
     }
-    
+
     //
     // Get the interface information size.
     //
@@ -420,7 +420,7 @@ IfConfigGetInterfaceInfo (
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_ERROR;
     }
-    
+
     //
     // Get the interface info.
     //
@@ -434,7 +434,7 @@ IfConfigGetInterfaceInfo (
     if (EFI_ERROR (Status)) {
       goto ON_ERROR;
     }
-    
+
     //
     // Check the interface name if required.
     //
@@ -444,7 +444,7 @@ IfConfigGetInterfaceInfo (
     }
 
     DataSize = 0;
-    
+
     //
     // Get the size of dns server list.
     //
@@ -553,7 +553,7 @@ IfConfigShowInterfaceInfo (
   EFI_STATUS                    MediaStatus;
   EFI_IPv4_ADDRESS              Gateway;
   UINT32                        Index;
-  
+
   MediaStatus = EFI_SUCCESS;
 
   if (IsListEmpty (IfList)) {
@@ -571,7 +571,7 @@ IfConfigShowInterfaceInfo (
     //
     // Print interface name.
     //
-    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_IF_NAME), gShellNetwork1HiiHandle, IfCb->IfInfo->Name); 
+    ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_IF_NAME), gShellNetwork1HiiHandle, IfCb->IfInfo->Name);
 
     //
     // Get Media State.
@@ -611,10 +611,10 @@ IfConfigShowInterfaceInfo (
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_IP_ADDR_HEAD), gShellNetwork1HiiHandle);
 
     ShellPrintHiiEx(
-      -1, 
-      -1, 
+      -1,
+      -1,
       NULL,
-      STRING_TOKEN (STR_IFCONFIG_INFO_IP_ADDR_BODY), 
+      STRING_TOKEN (STR_IFCONFIG_INFO_IP_ADDR_BODY),
       gShellNetwork1HiiHandle,
       (UINTN)IfCb->IfInfo->StationAddress.Addr[0],
       (UINTN)IfCb->IfInfo->StationAddress.Addr[1],
@@ -628,10 +628,10 @@ IfConfigShowInterfaceInfo (
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_SUBNET_MASK_HEAD), gShellNetwork1HiiHandle);
 
     ShellPrintHiiEx(
-      -1, 
-      -1, 
+      -1,
+      -1,
       NULL,
-      STRING_TOKEN (STR_IFCONFIG_INFO_IP_ADDR_BODY), 
+      STRING_TOKEN (STR_IFCONFIG_INFO_IP_ADDR_BODY),
       gShellNetwork1HiiHandle,
       (UINTN)IfCb->IfInfo->SubnetMask.Addr[0],
       (UINTN)IfCb->IfInfo->SubnetMask.Addr[1],
@@ -645,26 +645,26 @@ IfConfigShowInterfaceInfo (
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_GATEWAY_HEAD), gShellNetwork1HiiHandle);
 
     ZeroMem (&Gateway, sizeof (EFI_IPv4_ADDRESS));
-    
+
     for (Index = 0; Index < IfCb->IfInfo->RouteTableSize; Index++) {
       if ((CompareMem (&IfCb->IfInfo->RouteTable[Index].SubnetAddress, &mZeroIp4Addr, sizeof (EFI_IPv4_ADDRESS)) == 0) &&
           (CompareMem (&IfCb->IfInfo->RouteTable[Index].SubnetMask   , &mZeroIp4Addr, sizeof (EFI_IPv4_ADDRESS)) == 0) ){
         CopyMem (&Gateway, &IfCb->IfInfo->RouteTable[Index].GatewayAddress, sizeof (EFI_IPv4_ADDRESS));
       }
-    }    
+    }
 
     ShellPrintHiiEx(
-      -1, 
-      -1, 
+      -1,
+      -1,
       NULL,
-      STRING_TOKEN (STR_IFCONFIG_INFO_IP_ADDR_BODY), 
+      STRING_TOKEN (STR_IFCONFIG_INFO_IP_ADDR_BODY),
       gShellNetwork1HiiHandle,
       (UINTN)Gateway.Addr[0],
       (UINTN)Gateway.Addr[1],
       (UINTN)Gateway.Addr[2],
       (UINTN)Gateway.Addr[3]
       );
-      
+
     //
     // Print route table entry.
     //
@@ -674,11 +674,11 @@ IfConfigShowInterfaceInfo (
       ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_ROUTES_ENTRY_INDEX), gShellNetwork1HiiHandle, Index);
 
       ShellPrintHiiEx(
-        -1, 
-        -1, 
+        -1,
+        -1,
         NULL,
-        STRING_TOKEN (STR_IFCONFIG_SHOW_IP_ADDR), 
-        gShellNetwork1HiiHandle, 
+        STRING_TOKEN (STR_IFCONFIG_SHOW_IP_ADDR),
+        gShellNetwork1HiiHandle,
         L"Subnet ",
         (UINTN)IfCb->IfInfo->RouteTable[Index].SubnetAddress.Addr[0],
         (UINTN)IfCb->IfInfo->RouteTable[Index].SubnetAddress.Addr[1],
@@ -687,11 +687,11 @@ IfConfigShowInterfaceInfo (
         );
 
       ShellPrintHiiEx(
-        -1, 
-        -1, 
+        -1,
+        -1,
         NULL,
-        STRING_TOKEN (STR_IFCONFIG_SHOW_IP_ADDR), 
-        gShellNetwork1HiiHandle, 
+        STRING_TOKEN (STR_IFCONFIG_SHOW_IP_ADDR),
+        gShellNetwork1HiiHandle,
         L"Netmask",
         (UINTN)IfCb->IfInfo->RouteTable[Index].SubnetMask.Addr[0],
         (UINTN)IfCb->IfInfo->RouteTable[Index].SubnetMask.Addr[1],
@@ -700,11 +700,11 @@ IfConfigShowInterfaceInfo (
         );
 
       ShellPrintHiiEx(
-        -1, 
-        -1, 
+        -1,
+        -1,
         NULL,
-        STRING_TOKEN (STR_IFCONFIG_SHOW_IP_ADDR), 
-        gShellNetwork1HiiHandle, 
+        STRING_TOKEN (STR_IFCONFIG_SHOW_IP_ADDR),
+        gShellNetwork1HiiHandle,
         L"Gateway",
         (UINTN)IfCb->IfInfo->RouteTable[Index].GatewayAddress.Addr[0],
         (UINTN)IfCb->IfInfo->RouteTable[Index].GatewayAddress.Addr[1],
@@ -720,10 +720,10 @@ IfConfigShowInterfaceInfo (
 
     for (Index = 0; Index < IfCb->DnsCnt; Index++) {
       ShellPrintHiiEx(
-        -1, 
-        -1, 
+        -1,
+        -1,
         NULL,
-        STRING_TOKEN (STR_IFCONFIG_INFO_DNS_ADDR_BODY), 
+        STRING_TOKEN (STR_IFCONFIG_INFO_DNS_ADDR_BODY),
         gShellNetwork1HiiHandle,
         (UINTN) IfCb->DnsAddr[Index].Addr[0],
         (UINTN) IfCb->DnsAddr[Index].Addr[1],
@@ -734,7 +734,7 @@ IfConfigShowInterfaceInfo (
       ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_NEWLINE), gShellNetwork1HiiHandle);
     }
   }
-  
+
   ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INFO_BREAK), gShellNetwork1HiiHandle);
 
   return SHELL_SUCCESS;
@@ -756,13 +756,13 @@ IfConfigClearInterfaceInfo (
   IN CHAR16        *IfName
   )
 {
-  EFI_STATUS                Status;  
+  EFI_STATUS                Status;
   SHELL_STATUS              ShellStatus;
   LIST_ENTRY                *Entry;
   LIST_ENTRY                *Next;
   IFCONFIG_INTERFACE_CB     *IfCb;
   EFI_IP4_CONFIG2_POLICY    Policy;
-  
+
   Status = EFI_SUCCESS;
   ShellStatus = SHELL_SUCCESS;
 
@@ -772,7 +772,7 @@ IfConfigClearInterfaceInfo (
 
   //
   // Go through the interface list.
-  // If the interface name is specified, DHCP DORA process will be 
+  // If the interface name is specified, DHCP DORA process will be
   // triggered by the policy transition (static -> dhcp).
   //
   NET_LIST_FOR_EACH_SAFE (Entry, Next, IfList) {
@@ -780,7 +780,7 @@ IfConfigClearInterfaceInfo (
 
     if ((IfName != NULL) && (StrCmp (IfName, IfCb->IfInfo->Name) == 0)) {
       Policy = Ip4Config2PolicyStatic;
-      
+
       Status = IfCb->IfCfg->SetData (
                               IfCb->IfCfg,
                               Ip4Config2DataTypePolicy,
@@ -791,11 +791,11 @@ IfConfigClearInterfaceInfo (
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_ERR_AD), gShellNetwork1HiiHandle, L"ifconfig");
         ShellStatus = SHELL_ACCESS_DENIED;
         break;
-      }  
+      }
     }
 
     Policy = Ip4Config2PolicyDhcp;
-    
+
     Status = IfCb->IfCfg->SetData (
                             IfCb->IfCfg,
                             Ip4Config2DataTypePolicy,
@@ -854,7 +854,7 @@ IfConfigSetInterfaceInfo (
     ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INVALID_INTERFACE), gShellNetwork1HiiHandle);
     return SHELL_INVALID_PARAMETER;
   }
-  
+
   //
   // Make sure to set only one interface each time.
   //
@@ -944,7 +944,7 @@ IfConfigSetInterfaceInfo (
       }
 
       VarArg = VarArg->Next;
-      continue;   
+      continue;
     }
 
     //
@@ -966,8 +966,8 @@ IfConfigSetInterfaceInfo (
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
-      
-      VarArg= VarArg->Next;    
+
+      VarArg= VarArg->Next;
 
     } else if (StrCmp (VarArg->Arg, L"static") == 0) {
       VarArg= VarArg->Next;
@@ -978,7 +978,7 @@ IfConfigSetInterfaceInfo (
       }
 
       ZeroMem (&ManualAddress, sizeof (ManualAddress));
-    
+
       //
       // Get manual IP address.
       //
@@ -991,14 +991,14 @@ IfConfigSetInterfaceInfo (
 
       //
       // Get subnetmask.
-      //    
+      //
       VarArg = VarArg->Next;
       if (VarArg == NULL) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_LACK_COMMAND), gShellNetwork1HiiHandle);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto ON_EXIT;
       }
-      
+
       Status = NetLibStrToIp4 (VarArg->Arg, &ManualAddress.SubnetMask);
       if (EFI_ERROR(Status)) {
         ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, VarArg->Arg);
@@ -1015,7 +1015,7 @@ IfConfigSetInterfaceInfo (
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto ON_EXIT;
       }
-      
+
       Status = NetLibStrToIp4 (VarArg->Arg, &Gateway);
       if (EFI_ERROR(Status)) {
         ShellPrintHiiEx(-1, -1, NULL,STRING_TOKEN (STR_IFCONFIG_INVALID_IPADDRESS), gShellNetwork1HiiHandle, VarArg->Arg);
@@ -1053,7 +1053,7 @@ IfConfigSetInterfaceInfo (
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
-      
+
       //
       // Set Manual Address.
       //
@@ -1095,7 +1095,7 @@ IfConfigSetInterfaceInfo (
                      Ip4Config2DataTypeManualAddress,
                      MappedEvt
                      );
-      
+
       if (EFI_ERROR (Status)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_SET_ADDR_FAILED), gShellNetwork1HiiHandle, Status);
         ShellStatus = SHELL_ACCESS_DENIED;
@@ -1118,9 +1118,9 @@ IfConfigSetInterfaceInfo (
         ShellStatus = SHELL_ACCESS_DENIED;
         goto ON_EXIT;
       }
-      
+
       VarArg = VarArg->Next;
-      
+
     } else if (StrCmp (VarArg->Arg, L"dns") == 0) {
       //
       // Get DNS addresses.
@@ -1151,7 +1151,7 @@ IfConfigSetInterfaceInfo (
         Index ++;
         Tmp = Tmp->Next;
       }
-      
+
       VarArg = Tmp;
 
       //
@@ -1177,7 +1177,7 @@ ON_EXIT:
   if (Dns != NULL) {
     FreePool (Dns);
   }
-  
+
   return ShellStatus;
 
 }
@@ -1209,7 +1209,7 @@ IfConfig (
              &Private->IfList
              );
   if (EFI_ERROR (Status)) {
-    ShellStatus = SHELL_NOT_FOUND; 
+    ShellStatus = SHELL_NOT_FOUND;
     goto ON_EXIT;
   }
 
@@ -1289,7 +1289,7 @@ IfConfigCleanup (
 
   @retval EFI_SUCCESS    ifconfig command processed successfully.
   @retval others         The ifconfig command process failed.
-  
+
 **/
 SHELL_STATUS
 EFIAPI
@@ -1306,7 +1306,7 @@ ShellCommandRunIfconfig (
   ARG_LIST                  *ArgList;
   CHAR16                    *ProblemParam;
   CHAR16                    *Str;
-  
+
   Status = EFI_INVALID_PARAMETER;
   Private = NULL;
   ShellStatus = SHELL_SUCCESS;
@@ -1320,7 +1320,7 @@ ShellCommandRunIfconfig (
     } else {
       ASSERT(FALSE);
     }
-    
+
     goto ON_EXIT;
   }
 
@@ -1395,7 +1395,7 @@ ShellCommandRunIfconfig (
       Private->IfName = Str;
     }
   }
-  
+
   //
   // To get interface name and corresponding Args for the set option.
   //
@@ -1406,7 +1406,7 @@ ShellCommandRunIfconfig (
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto ON_EXIT;
     }
-    
+
     //
     // To split the configuration into multi-section.
     //
@@ -1428,7 +1428,7 @@ ShellCommandRunIfconfig (
       goto ON_EXIT;
     }
   }
-  
+
   //
   // Main process of ifconfig.
   //
@@ -1437,7 +1437,7 @@ ShellCommandRunIfconfig (
 ON_EXIT:
 
   ShellCommandLineFreeVarList (ParamPackage);
-  
+
   if (Private != NULL) {
     IfConfigCleanup (Private);
   }

@@ -1,7 +1,7 @@
 /** @file
 Elf convert solution
 
-Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
@@ -56,6 +56,11 @@ UINT32 mCoffOffset;
 // Offset in Coff file of headers and sections.
 //
 UINT32 mTableOffset;
+
+//
+//mFileBufferSize
+//
+UINT32 mFileBufferSize;
 
 //
 //*****************************************************************************
@@ -173,6 +178,7 @@ ConvertElf (
   ELF_FUNCTION_TABLE              ElfFunctions;
   UINT8                           EiClass;
 
+  mFileBufferSize = *FileLength;
   //
   // Determine ELF type and set function table pointer correctly.
   //
@@ -201,9 +207,15 @@ ConvertElf (
   // Write and relocate sections.
   //
   VerboseMsg ("Write and relocate sections.");
-  ElfFunctions.WriteSections (SECTION_TEXT);
-  ElfFunctions.WriteSections (SECTION_DATA);
-  ElfFunctions.WriteSections (SECTION_HII);
+  if (!ElfFunctions.WriteSections (SECTION_TEXT)) {
+    return FALSE;
+  }
+  if (!ElfFunctions.WriteSections (SECTION_DATA)) {
+    return FALSE;
+  }
+  if (!ElfFunctions.WriteSections (SECTION_HII)) {
+    return FALSE;
+  }
 
   //
   // Translate and write relocations.

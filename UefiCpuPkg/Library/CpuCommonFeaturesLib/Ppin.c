@@ -1,7 +1,7 @@
 /** @file
   Protected Processor Inventory Number(PPIN) feature.
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -15,7 +15,7 @@
 #include "CpuCommonFeatures.h"
 
 /**
-  Detects if Protected Processor Inventory Number feature supported on current 
+  Detects if Protected Processor Inventory Number feature supported on current
   processor.
 
   @param[in]  ProcessorNumber  The index of the CPU executing this function.
@@ -41,13 +41,13 @@ PpinSupport (
 {
   MSR_IVY_BRIDGE_PLATFORM_INFO_1_REGISTER    PlatformInfo;
 
-  if ((CpuInfo->DisplayFamily == 0x06) && 
+  if ((CpuInfo->DisplayFamily == 0x06) &&
       ((CpuInfo->DisplayModel == 0x3E) ||      // Xeon E5 V2
        (CpuInfo->DisplayModel == 0x56) ||      // Xeon Processor D Product
        (CpuInfo->DisplayModel == 0x4F) ||      // Xeon E5 v4, E7 v4
        (CpuInfo->DisplayModel == 0x55) ||      // Xeon Processor Scalable
        (CpuInfo->DisplayModel == 0x57) ||      // Xeon Phi processor 3200, 5200, 7200 series.
-       (CpuInfo->DisplayModel == 0x85)         // Future Xeon phi processor 
+       (CpuInfo->DisplayModel == 0x85)         // Future Xeon phi processor
      )) {
     //
     // Check whether platform support this feature.
@@ -69,14 +69,14 @@ PpinSupport (
                                by CPU_FEATURE_GET_CONFIG_DATA.  NULL if
                                CPU_FEATURE_GET_CONFIG_DATA was not provided in
                                RegisterCpuFeature().
-  @param[in]  State            If TRUE, then the Protected Processor Inventory 
+  @param[in]  State            If TRUE, then the Protected Processor Inventory
                                Number feature must be enabled.
-                               If FALSE, then the Protected Processor Inventory 
+                               If FALSE, then the Protected Processor Inventory
                                Number feature must be disabled.
 
-  @retval RETURN_SUCCESS       Protected Processor Inventory Number feature is 
+  @retval RETURN_SUCCESS       Protected Processor Inventory Number feature is
                                initialized.
-  @retval RETURN_DEVICE_ERROR  Device can't change state because it has been 
+  @retval RETURN_DEVICE_ERROR  Device can't change state because it has been
                                locked.
 
 **/

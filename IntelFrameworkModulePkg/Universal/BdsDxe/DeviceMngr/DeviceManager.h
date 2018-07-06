@@ -1,7 +1,7 @@
 /** @file
   The platform device manager reference implement
 
-Copyright (c) 2004 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -75,7 +75,7 @@ typedef struct {
 
   EFI_DRIVER_HEALTH_PROTOCOL      *DriverHealth;
   ///
-  /// Driver health messages of the specify Driver 
+  /// Driver health messages of the specify Driver
   ///
   EFI_DRIVER_HEALTH_HII_MESSAGE   *MessageList;
 
@@ -192,7 +192,7 @@ InitializeDeviceManager (
 
   This function create the dynamic content for device manager. It includes
   section header for all class of devices, one-of opcode to set VBIOS.
-  
+
   @retval  EFI_SUCCESS             Operation is successful.
   @retval  Other values if failed to clean up the dynamic content from HII
            database.
@@ -210,11 +210,11 @@ CallDeviceManager (
   This function called by CheckAllControllersHealthStatus () function in order to process a specify
   contoller's health state.
 
-  @param DriverHealthList   A Pointer to the list contain all of the platform driver health information. 
+  @param DriverHealthList   A Pointer to the list contain all of the platform driver health information.
   @param DriverHandle       The handle of driver.
   @param ControllerHandle   The class guid specifies which form set will be displayed.
-  @param ChildHandle        The handle of the child controller to retrieve the health 
-                            status on.  This is an optional parameter that may be NULL. 
+  @param ChildHandle        The handle of the child controller to retrieve the health
+                            status on.  This is an optional parameter that may be NULL.
   @param DriverHealth       A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
   @param HealthStatus       The health status of the controller.
 
@@ -237,9 +237,9 @@ GetSingleControllerHealthStatus (
   );
 
 /**
-  Collects all the EFI Driver Health Protocols currently present in the EFI Handle Database, 
-  and queries each EFI Driver Health Protocol to determine if one or more of the controllers 
-  managed by each EFI Driver Health Protocol instance are not healthy.  
+  Collects all the EFI Driver Health Protocols currently present in the EFI Handle Database,
+  and queries each EFI Driver Health Protocol to determine if one or more of the controllers
+  managed by each EFI Driver Health Protocol instance are not healthy.
 
   @param DriverHealthList   A Pointer to the list contain all of the platform driver health
                             information.
@@ -255,7 +255,7 @@ GetAllControllersHealthStatus (
   );
 
 /**
-  Check the healthy status of the platform, this function will return immediately while found one driver 
+  Check the healthy status of the platform, this function will return immediately while found one driver
   in the platform are not healthy.
 
   @retval FALSE      at least one driver in the platform are not healthy.
@@ -271,7 +271,7 @@ PlaformHealthStatusCheck (
   Repair the whole platform.
 
   This function is the main entry for user choose "Repair All" in the front page.
-  It will try to do recovery job till all the driver health protocol installed modules 
+  It will try to do recovery job till all the driver health protocol installed modules
   reach a terminal state.
 
   @param DriverHealthList   A Pointer to the list contain all of the platform driver health
@@ -284,20 +284,20 @@ PlatformRepairAll (
   );
 
 /**
-  Processes a single controller using the EFI Driver Health Protocol associated with 
+  Processes a single controller using the EFI Driver Health Protocol associated with
   that controller. This algorithm continues to query the GetHealthStatus() service until
-  one of the legal terminal states of the EFI Driver Health Protocol is reached. This may 
+  one of the legal terminal states of the EFI Driver Health Protocol is reached. This may
   require the processing of HII Messages, HII Form, and invocation of repair operations.
 
   @param DriverHealth       A pointer to the EFI_DRIVER_HEALTH_PROTOCOL instance.
   @param ControllerHandle   The class guid specifies which form set will be displayed.
-  @param ChildHandle        The handle of the child controller to retrieve the health 
-                            status on.  This is an optional parameter that may be NULL. 
+  @param ChildHandle        The handle of the child controller to retrieve the health
+                            status on.  This is an optional parameter that may be NULL.
   @param HealthStatus       The health status of the controller.
-  @param MessageList        An array of warning or error messages associated 
-                            with the controller specified by ControllerHandle and 
+  @param MessageList        An array of warning or error messages associated
+                            with the controller specified by ControllerHandle and
                             ChildHandle.  This is an optional parameter that may be NULL.
-  @param FormHiiHandle      The HII handle for an HII form associated with the 
+  @param FormHiiHandle      The HII handle for an HII form associated with the
                             controller specified by ControllerHandle and ChildHandle.
   @param RebootRequired     Indicate whether a reboot is required to repair the controller.
 **/
@@ -315,11 +315,11 @@ ProcessSingleControllerHealth (
 /**
   Reports the progress of a repair operation.
 
-  @param[in]  Value             A value between 0 and Limit that identifies the current 
+  @param[in]  Value             A value between 0 and Limit that identifies the current
                                 progress of the repair operation.
 
   @param[in]  Limit             The maximum value of Value for the current repair operation.
-                                For example, a driver that wants to specify progress in 
+                                For example, a driver that wants to specify progress in
                                 percent would use a Limit value of 100.
 
   @retval EFI_SUCCESS           The progress of a repair operation is reported successfully.
@@ -336,7 +336,7 @@ RepairNotify (
   Processes a set of messages returned by the GetHealthStatus ()
   service of the EFI Driver Health Protocol
 
-  @param    MessageList  The MessageList point to messages need to processed.  
+  @param    MessageList  The MessageList point to messages need to processed.
 
 **/
 VOID
@@ -346,10 +346,10 @@ ProcessMessages (
 
 
 /**
-  Collect and display the platform's driver health relative information, allow user to do interactive 
+  Collect and display the platform's driver health relative information, allow user to do interactive
   operation while the platform is unhealthy.
 
-  This function display a form which divided into two parts. The one list all modules which has installed 
+  This function display a form which divided into two parts. The one list all modules which has installed
   driver health protocol. The list usually contain driver name, controller name, and it's health info.
   While the driver name can't be retrieved, will use device path as backup. The other part of the form provide
   a choice to the user to repair all platform.
@@ -362,22 +362,22 @@ CallDriverHealth (
 
 /**
 
-  Select the best matching language according to front page policy for best user experience. 
-  
-  This function supports both ISO 639-2 and RFC 4646 language codes, but language 
-  code types may not be mixed in a single call to this function. 
+  Select the best matching language according to front page policy for best user experience.
+
+  This function supports both ISO 639-2 and RFC 4646 language codes, but language
+  code types may not be mixed in a single call to this function.
 
   @param  SupportedLanguages   A pointer to a Null-terminated ASCII string that
-                               contains a set of language codes in the format 
+                               contains a set of language codes in the format
                                specified by Iso639Language.
   @param  Iso639Language       If TRUE, then all language codes are assumed to be
                                in ISO 639-2 format.  If FALSE, then all language
                                codes are assumed to be in RFC 4646 language format.
 
   @retval NULL                 The best matching language could not be found in SupportedLanguages.
-  @retval NULL                 There are not enough resources available to return the best matching 
+  @retval NULL                 There are not enough resources available to return the best matching
                                language.
-  @retval Other                A pointer to a Null-terminated ASCII string that is the best matching 
+  @retval Other                A pointer to a Null-terminated ASCII string that is the best matching
                                language in SupportedLanguages.
 **/
 CHAR8 *
@@ -394,7 +394,7 @@ DriverHealthSelectBestLanguage (
   @param  ProtocolGuid         A pointer to an EFI_GUID. It points to Component Name (2) protocol GUID.
   @param  DriverBindingHandle  The handle on which the Component Name (2) protocol instance is retrieved.
   @param  ComponentName        A pointer to the Component Name (2) protocol interface.
-  @param  SupportedLanguage    The best suitable language that matches the SupportedLangues interface for the 
+  @param  SupportedLanguage    The best suitable language that matches the SupportedLangues interface for the
                                located Component Name (2) instance.
 
   @retval EFI_SUCCESS          The Component Name (2) protocol instance is successfully located and we find
@@ -440,7 +440,7 @@ GetDriverNameWorker (
   This function gets driver name from Component Name 2 protocol interface and Component Name protocol interface
   in turn. It first tries UEFI 2.0 Component Name 2 protocol interface and try to get the driver name.
   If the attempt fails, it then gets the driver name from EFI 1.1 Component Name protocol for backward
-  compatibility support. 
+  compatibility support.
 
   @param  DriverBindingHandle  The handle on which the Component Name (2) protocol instance is retrieved.
   @param  DriverName           A pointer to the Unicode string to return. This Unicode string is the name
@@ -462,7 +462,7 @@ DriverHealthGetDriverName (
   This function gets controller name from Component Name 2 protocol interface and Component Name protocol interface
   in turn. It first tries UEFI 2.0 Component Name 2 protocol interface and try to get the controller name.
   If the attempt fails, it then gets the controller name from EFI 1.1 Component Name protocol for backward
-  compatibility support. 
+  compatibility support.
 
   @param  ProtocolGuid         A pointer to an EFI_GUID. It points to Component Name (2) protocol GUID.
   @param  DriverBindingHandle  The handle on which the Component Name (2) protocol instance is retrieved.
@@ -492,9 +492,9 @@ GetControllerNameWorker (
 
 /**
   This function gets controller name from Component Name 2 protocol interface and Component Name protocol interface
-  in turn. It first tries UEFI 2.0 Component Name 2 protocol interface and try to get the controller name. 
+  in turn. It first tries UEFI 2.0 Component Name 2 protocol interface and try to get the controller name.
   If the attempt fails, it then gets the controller name from EFI 1.1 Component Name protocol for backward
-  compatibility support. 
+  compatibility support.
 
   @param  DriverBindingHandle  The handle on which the Component Name (2) protocol instance is retrieved.
   @param  ControllerHandle     The handle of a controller that the driver specified by This is managing.

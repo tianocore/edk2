@@ -2,7 +2,7 @@
   This file implements ATA_PASSTHRU_PROCTOCOL and EXT_SCSI_PASSTHRU_PROTOCOL interfaces
   for managed ATA controllers.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -140,6 +140,15 @@ UINT8 mScsiId[TARGET_MAX_BYTES] = {
   0xFF, 0xFF, 0xFF, 0xFF,
   0xFF, 0xFF, 0xFF, 0xFF,
   0xFF, 0xFF, 0xFF, 0xFF
+};
+
+EDKII_ATA_ATAPI_POLICY_PROTOCOL *mAtaAtapiPolicy;
+EDKII_ATA_ATAPI_POLICY_PROTOCOL mDefaultAtaAtapiPolicy = {
+  EDKII_ATA_ATAPI_POLICY_VERSION,
+  2,  // PuisEnable
+  0,  // DeviceSleepEnable
+  0,  // AggressiveDeviceSleepEnable
+  0   // Reserved
 };
 
 /**
@@ -739,6 +748,14 @@ AtaAtapiPassThruStart (
     goto ErrorExit;
   }
 
+  Status = gBS->LocateProtocol (&gEdkiiAtaAtapiPolicyProtocolGuid, NULL, (VOID **)&mAtaAtapiPolicy);
+  if (EFI_ERROR (Status)) {
+    //
+    // If there is no AtaAtapiPolicy exposed, use the default policy.
+    //
+    mAtaAtapiPolicy = &mDefaultAtaAtapiPolicy;
+  }
+
   //
   // Allocate a buffer to store the ATA_ATAPI_PASS_THRU_INSTANCE data structure
   //
@@ -810,12 +827,11 @@ ErrorExit:
     gBS->CloseEvent (Instance->TimerEvent);
   }
 
-  //
-  // Remove all inserted ATA devices.
-  //
-  DestroyDeviceInfoList(Instance);
-
   if (Instance != NULL) {
+    //
+    // Remove all inserted ATA devices.
+    //
+    DestroyDeviceInfoList (Instance);
     FreePool (Instance);
   }
   return EFI_UNSUPPORTED;

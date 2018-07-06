@@ -4,14 +4,14 @@
   Allow platform to provide EDID information to the producer of the Graphics Output
   protocol.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -55,13 +55,13 @@ EFI_STATUS
   );
 
 ///
-/// This protocol is produced by the platform to allow the platform to provide 
+/// This protocol is produced by the platform to allow the platform to provide
 /// EDID information to the producer of the Graphics Output protocol.
 ///
 struct _EFI_EDID_OVERRIDE_PROTOCOL {
   EFI_EDID_OVERRIDE_PROTOCOL_GET_EDID   GetEdid;
 };
-                                             
+
 extern EFI_GUID gEfiEdidOverrideProtocolGuid;
 
 #endif

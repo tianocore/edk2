@@ -1,13 +1,13 @@
 /** @file
   The header file for User identify Manager driver.
-    
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -239,34 +239,34 @@ UserProfileIdentify (
   Find a user using a user information record.
 
   This function searches all user profiles for the specified user information record.
-  The search starts with the user information record handle following UserInfo and 
+  The search starts with the user information record handle following UserInfo and
   continues until either the information is found or there are no more user profiles.
   A match occurs when the Info.InfoType field matches the user information record
-  type and the user information record data matches the portion of Info passed the 
+  type and the user information record data matches the portion of Info passed the
   EFI_USER_INFO header.
 
   @param[in]      This     Points to this instance of the EFI_USER_MANAGER_PROTOCOL.
-  @param[in, out] User     On entry, points to the previously returned user profile 
+  @param[in, out] User     On entry, points to the previously returned user profile
                            handle, or NULL to start searching with the first user profile.
                            On return, points to the user profile handle, or NULL if not
                            found.
   @param[in, out] UserInfo On entry, points to the previously returned user information
-                           handle, or NULL to start searching with the first. On return, 
+                           handle, or NULL to start searching with the first. On return,
                            points to the user information handle of the user information
-                           record, or NULL if not found. Can be NULL, in which case only 
-                           one user information record per user can be returned. 
-  @param[in]      Info     Points to the buffer containing the user information to be 
-                           compared to the user information record. If NULL, then only 
-                           the user information record type is compared. If InfoSize is 0, 
+                           record, or NULL if not found. Can be NULL, in which case only
+                           one user information record per user can be returned.
+  @param[in]      Info     Points to the buffer containing the user information to be
+                           compared to the user information record. If NULL, then only
+                           the user information record type is compared. If InfoSize is 0,
                            then the user information record must be empty.
 
-  @param[in]      InfoSize The size of Info, in bytes. 
+  @param[in]      InfoSize The size of Info, in bytes.
 
   @retval EFI_SUCCESS      User information was found. User points to the user profile handle,
                            and UserInfo points to the user information handle.
-  @retval EFI_NOT_FOUND    User information was not found. User points to NULL and UserInfo 
+  @retval EFI_NOT_FOUND    User information was not found. User points to NULL and UserInfo
                            points to NULL.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -409,5 +409,5 @@ UserProfileGetNextInfo (
   IN        EFI_USER_PROFILE_HANDLE             User,
   IN OUT    EFI_USER_INFO_HANDLE                *UserInfo
   );
-  
+
 #endif

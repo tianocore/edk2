@@ -19,6 +19,7 @@
 
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
+#include <Library/PL011UartClockLib.h>
 #include <Library/PL011UartLib.h>
 #include <Library/SerialPortLib.h>
 
@@ -48,7 +49,7 @@ SerialPortInitialize (
 
   return PL011UartInitializePort (
            (UINTN)FixedPcdGet64 (PcdSerialRegisterBase),
-           FixedPcdGet32 (PL011UartClkInHz),
+           PL011UartClockGetFreq(),
            &BaudRate,
            &ReceiveFifoDepth,
            &Parity,
@@ -156,7 +157,7 @@ SerialPortSetAttributes (
 {
   return PL011UartInitializePort (
            (UINTN)FixedPcdGet64 (PcdSerialRegisterBase),
-           FixedPcdGet32 (PL011UartClkInHz),
+           PL011UartClockGetFreq(),
            BaudRate,
            ReceiveFifoDepth,
            Parity,

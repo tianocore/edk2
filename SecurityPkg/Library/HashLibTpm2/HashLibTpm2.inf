@@ -1,10 +1,10 @@
 ## @file
 #  Provides hash service using TPM2 device
 #
-#  This library uses TPM2 device to calculate hash. Platform can use PcdTpm2HashMask to 
+#  This library uses TPM2 device to calculate hash. Platform can use PcdTpm2HashMask to
 #  mask some hash calculation.
 #
-# Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -26,7 +26,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]

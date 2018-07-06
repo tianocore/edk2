@@ -3,7 +3,7 @@
   and DXE phases.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -153,7 +153,7 @@ typedef struct _EFI_CERT_BLOCK_RSA_2048_SHA256 {
 typedef struct _WIN_CERTIFICATE_UEFI_GUID {
   WIN_CERTIFICATE   Hdr;
   EFI_GUID          CertType;
-  // UINT8            CertData[ANYSIZE_ARRAY];
+  UINT8             CertData[1];
 } WIN_CERTIFICATE_UEFI_GUID;
 
 

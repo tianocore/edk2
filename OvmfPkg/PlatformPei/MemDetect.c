@@ -358,6 +358,8 @@ GetFirstNonAddress (
   if (!EFI_ERROR (Status) && FwCfgSize == sizeof HotPlugMemoryEnd) {
     QemuFwCfgSelectItem (FwCfgItem);
     QemuFwCfgReadBytes (FwCfgSize, &HotPlugMemoryEnd);
+    DEBUG ((DEBUG_VERBOSE, "%a: HotPlugMemoryEnd=0x%Lx\n", __FUNCTION__,
+      HotPlugMemoryEnd));
 
     ASSERT (HotPlugMemoryEnd >= FirstNonAddress);
     FirstNonAddress = HotPlugMemoryEnd;

@@ -1,6 +1,6 @@
 /** @file
   SMM CPU misc functions for x64 arch specific.
-  
+
 Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -40,7 +40,7 @@ InitializeIDTSmmStackGuard (
 
 /**
   Initialize Gdt for all processors.
-  
+
   @param[in]   Cr3          CR3 value.
   @param[out]  GdtStepSize  The step size for GDT table.
 

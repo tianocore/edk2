@@ -177,7 +177,7 @@ EXIT:
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
-  
+
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 
@@ -296,7 +296,7 @@ Udp6DriverBindingStop (
                &Udp6Service->ServiceBinding,
                NULL
                );
- 
+
     Udp6CleanService (Udp6Service);
     FreePool (Udp6Service);
   }
@@ -405,7 +405,7 @@ Udp6ServiceBindingCreateChild (
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
-  
+
   OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
   //

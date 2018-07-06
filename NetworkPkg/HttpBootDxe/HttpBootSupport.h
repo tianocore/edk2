@@ -1,13 +1,13 @@
 /** @file
   Support functions declaration for UEFI HTTP boot driver.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -107,7 +107,7 @@ typedef struct {
   @param[in]  MaxHeaderCount         The maximun number of HTTP header in this holder.
 
   @return    A pointer of the HTTP header holder or NULL if failed.
-  
+
 **/
 HTTP_IO_HEADER *
 HttpBootCreateHeader (
@@ -115,7 +115,7 @@ HttpBootCreateHeader (
   );
 
 /**
-  Destroy the HTTP_IO_HEADER and release the resouces. 
+  Destroy the HTTP_IO_HEADER and release the resouces.
 
   @param[in]  HttpIoHeader       Point to the HTTP header holder to be destroyed.
 
@@ -129,14 +129,14 @@ HttpBootFreeHeader (
   Set or update a HTTP header with the field name and corresponding value.
 
   @param[in]  HttpIoHeader       Point to the HTTP header holder.
-  @param[in]  FieldName          Null terminated string which describes a field name. 
+  @param[in]  FieldName          Null terminated string which describes a field name.
   @param[in]  FieldValue         Null terminated string which describes the corresponding field value.
 
   @retval  EFI_SUCCESS           The HTTP header has been set or updated.
   @retval  EFI_INVALID_PARAMETER Any input parameter is invalid.
   @retval  EFI_OUT_OF_RESOURCES  Insufficient resource to complete the operation.
   @retval  Other                 Unexpected error happened.
-  
+
 **/
 EFI_STATUS
 HttpBootSetHeader (
@@ -159,7 +159,7 @@ typedef enum {
   @param[in]    EventType      Indicate the Event type that occurs in the current callback.
   @param[in]    Message        HTTP message which will be send to, or just received from HTTP server.
   @param[in]    Context        The Callback Context pointer.
-  
+
   @retval EFI_SUCCESS          Tells the HttpIo to continue the HTTP process.
   @retval Others               Tells the HttpIo to abort the current HTTP process.
 **/
@@ -212,7 +212,7 @@ typedef struct {
   EFI_HANDLE                Image;
   EFI_HANDLE                Controller;
   EFI_HANDLE                Handle;
-  
+
   EFI_HTTP_PROTOCOL         *Http;
 
   HTTP_IO_CALLBACK          Callback;
@@ -250,13 +250,13 @@ typedef struct {
 
   @retval EFI_SUCCESS             Operation succeeded.
   @retval EFI_DEVICE_ERROR        An unexpected network error occurred.
-  @retval Others                  Other errors as indicated.  
+  @retval Others                  Other errors as indicated.
 **/
 EFI_STATUS
 HttpBootDns (
   IN     HTTP_BOOT_PRIVATE_DATA   *Private,
   IN     CHAR16                   *HostName,
-     OUT EFI_IPv6_ADDRESS         *IpAddress 
+     OUT EFI_IPv6_ADDRESS         *IpAddress
   );
 
 /**
@@ -285,7 +285,7 @@ HttpBootCommonNotify (
                              HTTP_IO_CALLBACK_EVENT happened.
   @param[in]  Context        The Context data which will be passed to the Callback function.
   @param[out] HttpIo         The HTTP_IO.
-  
+
   @retval EFI_SUCCESS            The HTTP_IO is created and configured.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_UNSUPPORTED        One or more of the control options are not
@@ -306,7 +306,7 @@ HttpIoCreateIo (
   );
 
 /**
-  Destroy the HTTP_IO and release the resouces. 
+  Destroy the HTTP_IO and release the resouces.
 
   @param[in]  HttpIo          The HTTP_IO which wraps the HTTP service to be destroyed.
 
@@ -318,14 +318,14 @@ HttpIoDestroyIo (
 
 /**
   Synchronously send a HTTP REQUEST message to the server.
-  
+
   @param[in]   HttpIo           The HttpIo wrapping the HTTP service.
   @param[in]   Request          A pointer to storage such data as URL and HTTP method.
-  @param[in]   HeaderCount      Number of HTTP header structures in Headers list. 
+  @param[in]   HeaderCount      Number of HTTP header structures in Headers list.
   @param[in]   Headers          Array containing list of HTTP headers.
   @param[in]   BodyLength       Length in bytes of the HTTP body.
-  @param[in]   Body             Body associated with the HTTP request. 
-  
+  @param[in]   Body             Body associated with the HTTP request.
+
   @retval EFI_SUCCESS            The HTTP request is trasmitted.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
@@ -345,12 +345,12 @@ HttpIoSendRequest (
 
 /**
   Synchronously receive a HTTP RESPONSE message from the server.
-  
+
   @param[in]   HttpIo           The HttpIo wrapping the HTTP service.
   @param[in]   RecvMsgHeader    TRUE to receive a new HTTP response (from message header).
                                 FALSE to continue receive the previous response message.
   @param[out]  ResponseData     Point to a wrapper of the received response data.
-  
+
   @retval EFI_SUCCESS            The HTTP response is received.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
@@ -369,7 +369,7 @@ HttpIoRecvResponse (
   This function checks the HTTP(S) URI scheme.
 
   @param[in]    Uri              The pointer to the URI string.
-  
+
   @retval EFI_SUCCESS            The URI scheme is valid.
   @retval EFI_INVALID_PARAMETER  The URI scheme is not HTTP or HTTPS.
   @retval EFI_ACCESS_DENIED      HTTP is disabled and the URI is HTTP.
@@ -384,10 +384,10 @@ HttpBootCheckUriScheme (
   Get the URI address string from the input device path.
 
   Caller need to free the buffer in the UriAddress pointer.
-  
+
   @param[in]   FilePath         Pointer to the device path which contains a URI device path node.
   @param[out]  UriAddress       The URI address string extract from the device path.
-  
+
   @retval EFI_SUCCESS            The URI string is returned.
   @retval EFI_OUT_OF_RESOURCES   Failed to allocate memory.
 
@@ -403,11 +403,11 @@ HttpBootParseFilePath (
   and also the image's URI info.
 
   @param[in]    Uri              The pointer to the image's URI string.
-  @param[in]    UriParser        URI Parse result returned by NetHttpParseUrl(). 
-  @param[in]    HeaderCount      Number of HTTP header structures in Headers list. 
+  @param[in]    UriParser        URI Parse result returned by NetHttpParseUrl().
+  @param[in]    HeaderCount      Number of HTTP header structures in Headers list.
   @param[in]    Headers          Array containing list of HTTP headers.
   @param[out]   ImageType        The image type of the downloaded file.
-  
+
   @retval EFI_SUCCESS            The image type is returned in ImageType.
   @retval EFI_INVALID_PARAMETER  ImageType, Uri or UriParser is NULL.
   @retval EFI_INVALID_PARAMETER  HeaderCount is not zero, and Headers is NULL.
@@ -426,7 +426,7 @@ HttpBootCheckImageType (
 
 /**
   This function register the RAM disk info to the system.
-  
+
   @param[in]       Private         The pointer to the driver's private data.
   @param[in]       BufferSize      The size of Buffer in bytes.
   @param[in]       Buffer          The base address of the RAM disk.
@@ -448,7 +448,7 @@ HttpBootRegisterRamDisk (
 
 /**
   Indicate if the HTTP status code indicates a redirection.
-  
+
   @param[in]  StatusCode      HTTP status code from server.
 
   @return                     TRUE if it's redirection.

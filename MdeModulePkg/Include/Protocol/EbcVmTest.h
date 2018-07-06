@@ -1,7 +1,7 @@
 /** @file
   EBC VM Test protocol for test purposes.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -144,7 +144,7 @@ EFI_STATUS
   @param[out] BufferLen         Size of buffer that is required to store data.
 
   @retval EFI_UNSUPPORTED       This functionality is unsupported.
-  @retval EFI_SUCCESS           Successfully convert AsmText to the instruction. 
+  @retval EFI_SUCCESS           Successfully convert AsmText to the instruction.
 
 **/
 typedef

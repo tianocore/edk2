@@ -221,6 +221,10 @@ PciHostBridgeGetRootBridges (
     return ScanForRootBridges (Count);
   }
 
+  ZeroMem (&Io, sizeof (Io));
+  ZeroMem (&Mem, sizeof (Mem));
+  ZeroMem (&MemAbove4G, sizeof (MemAbove4G));
+
   Attributes = EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO |
     EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO |
     EFI_PCI_ATTRIBUTE_ISA_IO_16 |

@@ -1,7 +1,7 @@
 /** @file
   Dhcp6 internal data structure and definition declaration.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -132,7 +132,7 @@ struct _DHCP6_INSTANCE {
   BOOLEAN                       MediaPresent;
   //
   // StartTime is used to calculate the 'elapsed-time' option. Refer to RFC3315,
-  // the elapsed-time is amount of time since the client began its current DHCP transaction. 
+  // the elapsed-time is amount of time since the client began its current DHCP transaction.
   //
   UINT64                        StartTime;
 };

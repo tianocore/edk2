@@ -3,7 +3,7 @@
   to be replayed during an S3 resume. This library class maps directly on top
   of the SmbusLib class.
 
-  Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -35,13 +35,13 @@
                              SMBUS Command, SMBUS Data Length, and PEC.
   @param[out] Status         The return status for the executed command.
                              This is an optional parameter and may be NULL.
-                             RETURN_SUCCESS  		 The SMBUS command was executed.
-                             RETURN_TIMEOUT  		 A timeout occurred while executing the SMBUS command.
+                             RETURN_SUCCESS       The SMBUS command was executed.
+                             RETURN_TIMEOUT       A timeout occurred while executing the SMBUS command.
                              RETURN_DEVICE_ERROR The request was not completed because a failure
                               was recorded in the Host Status Register bit.  Device errors are a result
                               of a transaction collision, illegal command field, unclaimed cycle
                               (host initiated), or bus error (collision).
-                             RETURN_UNSUPPORTED  	The SMBus operation is not supported.
+                             RETURN_UNSUPPORTED    The SMBus operation is not supported.
 
 **/
 VOID
@@ -67,13 +67,13 @@ S3SmBusQuickRead (
                              SMBUS Command, SMBUS Data Length, and PEC.
   @param[out] Status         The return status for the executed command.
                              This is an optional parameter and may be NULL.
-                             RETURN_SUCCESS  		The SMBUS command was executed.
-                             RETURN_TIMEOUT  		A timeout occurred while executing the SMBUS command.
+                             RETURN_SUCCESS      The SMBUS command was executed.
+                             RETURN_TIMEOUT      A timeout occurred while executing the SMBUS command.
                              RETURN_DEVICE_ERROR The request was not completed because a failure
                              was recorded in the Host Status Register bit.  Device errors are a result
                              of a transaction collision, illegal command field, unclaimed cycle
                              (host initiated), or bus error (collision).
-                             RETURN_UNSUPPORTED  	The SMBus operation is not supported.
+                             RETURN_UNSUPPORTED    The SMBus operation is not supported.
 
 **/
 VOID
@@ -99,14 +99,14 @@ S3SmBusQuickWrite (
                              SMBUS Command, SMBUS Data Length, and PEC.
   @param[out] Status         The return status for the executed command.
                              This is an optional parameter and may be NULL.
-                             RETURN_SUCCESS  		The SMBUS command was executed.
-                             RETURN_TIMEOUT  		A timeout occurred while executing the SMBUS command.
+                             RETURN_SUCCESS      The SMBUS command was executed.
+                             RETURN_TIMEOUT      A timeout occurred while executing the SMBUS command.
                              RETURN_DEVICE_ERROR The request was not completed because a failure
                              was recorded in the Host Status Register bit.  Device errors are a result
                              of a transaction collision, illegal command field, unclaimed cycle
                              (host initiated), or bus error (collision).
                              RETURN_CRC_ERROR  The checksum is not correct (PEC is incorrect).
-                             RETURN_UNSUPPORTED  	The SMBus operation is not supported.
+                             RETURN_UNSUPPORTED    The SMBus operation is not supported.
 
   @return   The byte received from the SMBUS.
 

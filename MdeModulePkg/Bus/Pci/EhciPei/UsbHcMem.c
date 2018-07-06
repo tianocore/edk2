@@ -2,8 +2,8 @@
 PEIM to produce gPeiUsb2HostControllerPpiGuid based on gPeiUsbControllerPpiGuid
 which is used to enable recovery function from USB Drivers.
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -54,28 +54,28 @@ UsbHcAllocMemBlock (
       return NULL;
   }
   ZeroMem ((VOID   *)(UINTN)TempPtr, PageNumber*EFI_PAGE_SIZE);
-  
+
   //
   // each bit in the bit array represents USBHC_MEM_UNIT
   // bytes of memory in the memory block.
   //
   ASSERT (USBHC_MEM_UNIT * 8 <= EFI_PAGE_SIZE);
-  
+
   Block = (USBHC_MEM_BLOCK*)(UINTN)TempPtr;
   Block->BufLen   = EFI_PAGES_TO_SIZE (Pages);
   Block->BitsLen  = Block->BufLen / (USBHC_MEM_UNIT * 8);
-  
+
   PageNumber =  (Block->BitsLen)/PAGESIZE +1;
   Status = PeiServicesAllocatePages (
              EfiBootServicesCode,
              PageNumber,
              &TempPtr
              );
-  
+
     if (EFI_ERROR (Status)) {
       return NULL;
     }
-  ZeroMem ((VOID   *)(UINTN)TempPtr, PageNumber*EFI_PAGE_SIZE);	
+  ZeroMem ((VOID   *)(UINTN)TempPtr, PageNumber*EFI_PAGE_SIZE);
 
   Block->Bits  = (UINT8 *)(UINTN)TempPtr;
 
@@ -184,7 +184,7 @@ UsbHcAllocMemFromBlock (
   if (Available < Units) {
     return NULL;
   }
-  
+
   //
   // Mark the memory as allocated
   //
@@ -283,7 +283,7 @@ UsbHcIsMemBlockEmpty (
 {
   UINTN                   Index;
 
-  
+
   for (Index = 0; Index < Block->BitsLen; Index++) {
     if (Block->Bits[Index] != 0) {
       return FALSE;
@@ -321,7 +321,7 @@ UsbHcUnlinkMemBlock (
 
 /**
   Initialize the memory management pool for the host controller.
-  
+
   @param  Ehc                   The EHCI device.
   @param  Check4G               Whether the host controller requires allocated memory.
                                 from one 4G address space.
@@ -342,7 +342,7 @@ UsbHcInitMemPool (
   UINTN               PageNumber;
   EFI_STATUS              Status;
   EFI_PHYSICAL_ADDRESS        TempPtr;
-  
+
   PageNumber =  sizeof(USBHC_MEM_POOL)/PAGESIZE +1;
   Status = PeiServicesAllocatePages (
              EfiBootServicesCode,
@@ -353,9 +353,9 @@ UsbHcInitMemPool (
     if (EFI_ERROR (Status)) {
       return NULL;
     }
-  ZeroMem ((VOID   *)(UINTN)TempPtr, PageNumber*EFI_PAGE_SIZE);	
+  ZeroMem ((VOID   *)(UINTN)TempPtr, PageNumber*EFI_PAGE_SIZE);
 
-  Pool = (USBHC_MEM_POOL *) ((UINTN) TempPtr);	
+  Pool = (USBHC_MEM_POOL *) ((UINTN) TempPtr);
 
   Pool->Check4G = Check4G;
   Pool->Which4G = Which4G;
@@ -405,7 +405,7 @@ UsbHcFreeMemPool (
 /**
   Allocate some memory from the host controller's memory pool
   which can be used to communicate with host controller.
-  
+
   @param  Ehc       The EHCI device.
   @param  Pool      The host controller's memory pool.
   @param  Size      Size of the memory to allocate.
@@ -464,7 +464,7 @@ UsbHcAllocateMem (
   if (NewBlock == NULL) {
     return NULL;
   }
-  
+
   //
   // Add the new memory block to the pool, then allocate memory from it
   //

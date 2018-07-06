@@ -16,7 +16,7 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = FlashDeviceLibRuntimeSmm
+  BASE_NAME                      = FlashDeviceLib
   FILE_GUID                      = E38A1C3C-928C-4bf7-B6C1-7F0EF163FAA5
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
@@ -32,7 +32,6 @@
 
 [Sources]
   FlashDeviceLib.c
-  FlashDeviceLibDxeRuntimeSmm.c
 
 
 [Packages]
@@ -43,9 +42,6 @@
 
 [LibraryClasses]
   DebugLib
-
-[Guids]
-  gEfiEventVirtualAddressChangeGuid
 
 [Protocols]
   gEfiSpiProtocolGuid

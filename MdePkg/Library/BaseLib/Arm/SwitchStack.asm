@@ -1,6 +1,6 @@
-;------------------------------------------------------------------------------ 
+;------------------------------------------------------------------------------
 ;
-; Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 ; Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
@@ -11,11 +11,11 @@
 ; WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ;
 ;------------------------------------------------------------------------------
-  
+
     EXPORT InternalSwitchStackAsm
-            
+
     AREA   Switch_Stack, CODE, READONLY
-  
+
 ;/**
 ;  This allows the caller to switch the stack and goes to the new entry point
 ;

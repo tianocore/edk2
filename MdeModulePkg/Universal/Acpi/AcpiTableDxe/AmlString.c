@@ -1,7 +1,7 @@
 /** @file
   ACPI Sdt Protocol Driver
 
-  Copyright (c) 2010 - 2011, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -18,7 +18,7 @@
   Check if it is AML Root name
 
   @param[in]    Buffer AML path.
-  
+
   @retval       TRUE  AML path is root.
   @retval       FALSE AML path is not root.
 **/
@@ -38,7 +38,7 @@ AmlIsRootPath (
   Check if it is AML LeadName.
 
   @param[in]    Ch   Char.
-  
+
   @retval       TRUE  Char is AML LeadName.
   @retval       FALSE Char is not AML LeadName.
 **/
@@ -58,7 +58,7 @@ AmlIsLeadName (
   Check if it is AML Name.
 
   @param[in]    Ch   Char.
-  
+
   @retval       TRUE  Char is AML Name.
   @retval       FALSE Char is not AML Name.
 **/
@@ -78,7 +78,7 @@ AmlIsName (
   Return is buffer is AML NameSeg.
 
   @param[in]    Buffer     AML NameSement.
-  
+
   @retval       TRUE       It is AML NameSegment.
   @retval       FALSE      It is not AML NameSegment.
 **/
@@ -103,8 +103,8 @@ AmlIsNameSeg (
   Get AML NameString size.
 
   @param[in]    Buffer     AML NameString.
-  @param[out]   BufferSize AML NameString size 
-  
+  @param[out]   BufferSize AML NameString size
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER Buffer does not refer to a valid AML NameString.
 **/
@@ -183,7 +183,7 @@ AmlGetNameStringSize (
   Check if it is ASL LeadName.
 
   @param[in]    Ch   Char.
-  
+
   @retval       TRUE  Char is ASL LeadName.
   @retval       FALSE Char is not ASL LeadName.
 **/
@@ -203,7 +203,7 @@ AmlIsAslLeadName (
   Check if it is ASL Name.
 
   @param[in]    Ch   Char.
-  
+
   @retval       TRUE  Char is ASL Name.
   @retval       FALSE Char is not ASL Name.
 **/
@@ -223,7 +223,7 @@ AmlIsAslName (
   Get ASL NameString size.
 
   @param[in]    Buffer   ASL NameString.
-  
+
   @return       ASL NameString size.
 **/
 UINTN
@@ -237,7 +237,7 @@ AmlGetAslNameSegLength (
   if (*Buffer == 0) {
     return 0;
   }
-  
+
   Length = 0;
   //
   // 1st
@@ -275,7 +275,7 @@ AmlGetAslNameSegLength (
   @param[out]   Root     On return, points to Root char number.
   @param[out]   Parent   On return, points to Parent char number.
   @param[out]   SegCount On return, points to Segment count.
-  
+
   @return       ASL NameString size.
 **/
 UINTN
@@ -532,7 +532,7 @@ AmlPrintNameString (
     //
     SegCount = 1;
   }
-  
+
   AmlPrintNameSeg (Buffer);
   Buffer += AML_NAME_SEG_SIZE;
   for (Index = 0; Index < SegCount - 1; Index++) {

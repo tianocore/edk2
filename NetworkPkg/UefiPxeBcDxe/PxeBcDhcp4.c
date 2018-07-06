@@ -320,6 +320,7 @@ PxeBcBuildDhcp4Options (
     //
     // Zero the Guid to indicate NOT programable if failed to get system Guid.
     //
+    DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
     ZeroMem (OptEnt.Uuid->Guid, sizeof (EFI_GUID));
   }
 
@@ -437,7 +438,7 @@ PxeBcCacheDhcp4Packet (
   if (Dst->Size < Src->Length) {
     return EFI_BUFFER_TOO_SMALL;
   }
-  
+
   CopyMem (&Dst->Dhcp4, &Src->Dhcp4, Src->Length);
   Dst->Length = Src->Length;
 
@@ -491,7 +492,7 @@ PxeBcParseDhcp4Packet (
                        );
   }
   //
-  // Second, Check if bootfilename and serverhostname is overloaded to carry DHCP options refers to rfc-2132. 
+  // Second, Check if bootfilename and serverhostname is overloaded to carry DHCP options refers to rfc-2132.
   // If yes, try to parse options from the BootFileName field, then ServerName field.
   //
   Option = Options[PXEBC_DHCP4_TAG_INDEX_OVERLOAD];
@@ -656,7 +657,7 @@ PxeBcCopyDhcp4Ack (
     CopyMem (&Mode->DhcpAck.Dhcpv4, &Ack->Dhcp4, Ack->Length);
     Mode->DhcpAckReceived = TRUE;
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -694,7 +695,7 @@ PxeBcCopyProxyOffer (
   if (EFI_ERROR(Status)) {
     return Status;
   }
-  
+
   PxeBcParseDhcp4Packet (&Private->ProxyOffer.Dhcp4);
 
   //
@@ -870,7 +871,7 @@ PxeBcCacheDhcp4Offer (
         //
         Private->OfferIndex[OfferType][Private->OfferCount[OfferType]] = Private->OfferNum;
         Private->OfferCount[OfferType]++;
-      } else if ((OfferType == PxeOfferTypeProxyPxe10 || OfferType == PxeOfferTypeProxyWfm11a) && 
+      } else if ((OfferType == PxeOfferTypeProxyPxe10 || OfferType == PxeOfferTypeProxyWfm11a) &&
                  Private->OfferCount[OfferType] < 1) {
         //
         // Only cache the first PXE10/WFM11a offer, and discard the others.
@@ -1273,7 +1274,7 @@ PxeBcDhcp4CallBack (
       Status = EFI_ABORTED;
       break;
     }
-    
+
     if (Mode->SendGUID) {
       //
       // Send the system Guid instead of the MAC address as the hardware address if required.
@@ -1282,6 +1283,7 @@ PxeBcDhcp4CallBack (
         //
         // Zero the Guid to indicate NOT programable if failed to get system Guid.
         //
+        DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
         ZeroMem (Packet->Dhcp4.Header.ClientHwAddr, sizeof (EFI_GUID));
       }
       Packet->Dhcp4.Header.HwAddrLen = (UINT8) sizeof (EFI_GUID);
@@ -1308,7 +1310,7 @@ PxeBcDhcp4CallBack (
 
   case Dhcp4SelectOffer:
     ASSERT (NewPacket != NULL);
-    
+
     //
     // Select offer by the default policy or by order, and record the SelectIndex
     // and SelectProxyType.
@@ -1470,6 +1472,7 @@ PxeBcDhcp4Discover (
       //
       // Zero the Guid to indicate NOT programable if failed to get system Guid.
       //
+      DEBUG ((EFI_D_WARN, "PXE: Failed to read system GUID from the smbios table!\n"));
       ZeroMem (Token.Packet->Dhcp4.Header.ClientHwAddr, sizeof (EFI_GUID));
     }
     Token.Packet->Dhcp4.Header.HwAddrLen = (UINT8)  sizeof (EFI_GUID);
@@ -1583,7 +1586,7 @@ PxeBcDhcp4Discover (
     }
   }
 ON_EXIT:
-  
+
   if (Token.ResponseList != NULL) {
     FreePool (Token.ResponseList);
   }
@@ -1603,7 +1606,7 @@ ON_EXIT:
 
 **/
 EFI_STATUS
-PxeBcSetIp4Policy (   
+PxeBcSetIp4Policy (
   IN PXEBC_PRIVATE_DATA            *Private
   )
 {
@@ -1623,7 +1626,7 @@ PxeBcSetIp4Policy (
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   if (Policy != Ip4Config2PolicyStatic) {
     Policy = Ip4Config2PolicyStatic;
     Status= Ip4Config2->SetData (
@@ -1634,7 +1637,7 @@ PxeBcSetIp4Policy (
                           );
     if (EFI_ERROR (Status)) {
       return Status;
-    } 
+    }
   }
 
   return  EFI_SUCCESS;
@@ -1710,7 +1713,7 @@ PxeBcDhcp4Dora (
     if (Status == EFI_TIMEOUT && Private->OfferNum > 0) {
       Status = EFI_NO_RESPONSE;
     }
-    
+
     goto ON_EXIT;
   }
 

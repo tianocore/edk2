@@ -2,7 +2,7 @@
   UfsHcDxe driver produces EFI_UFS_HOST_CONTROLLER_PROTOCOL. The upper layer module
   uses it to query the MMIO base address of the UFS host controller.
 
-  Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -38,7 +38,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mUfsHcDriverNameTable[] =
     "eng;en",
     L"Universal Flash Storage (UFS) Pci Host Controller Driver"
   },
-  { 
+  {
     NULL,
     NULL
   }

@@ -1,7 +1,7 @@
 /** @file
   This is the implementation to save ACPI S3 Context.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -43,7 +43,7 @@ EFI_GUID              mAcpiS3IdtrProfileGuid = {
 
   @param  MemoryType   Memory type of memory to allocate.
   @param  Size         Size of memory to allocate.
-  
+
   @return Allocated address for output.
 
 **/
@@ -101,7 +101,7 @@ ScanTableInRSDT (
   }
 
   EntryCount = (Rsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof(UINT32);
-  
+
   EntryPtr = (UINT32 *)(Rsdt + 1);
   for (Index = 0; Index < EntryCount; Index ++, EntryPtr ++) {
     Table = (EFI_ACPI_DESCRIPTION_HEADER *)((UINTN)(*EntryPtr));
@@ -109,7 +109,7 @@ ScanTableInRSDT (
       return Table;
     }
   }
-  
+
   return NULL;
 }
 
@@ -140,7 +140,7 @@ ScanTableInXSDT (
   }
 
   EntryCount = (Xsdt->Length - sizeof (EFI_ACPI_DESCRIPTION_HEADER)) / sizeof(UINT64);
-  
+
   BasePtr = (UINTN)(Xsdt + 1);
   for (Index = 0; Index < EntryCount; Index ++) {
     CopyMem (&EntryPtr, (VOID *)(BasePtr + Index * sizeof(UINT64)), sizeof(UINT64));
@@ -149,7 +149,7 @@ ScanTableInXSDT (
       return Table;
     }
   }
-  
+
   return NULL;
 }
 
@@ -157,7 +157,7 @@ ScanTableInXSDT (
   To find Facs in FADT.
 
   @param Fadt   FADT table pointer
-  
+
   @return  Facs table pointer.
 **/
 EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *
@@ -187,12 +187,12 @@ FindAcpiFacsFromFadt (
 
 /**
   To find Facs in Acpi tables.
- 
-  To find Firmware ACPI control strutcure in Acpi Tables since the S3 waking vector is stored 
+
+  To find Firmware ACPI control strutcure in Acpi Tables since the S3 waking vector is stored
   in the table.
 
   @param AcpiTableGuid   The guid used to find ACPI table in UEFI ConfigurationTable.
-  
+
   @return  Facs table pointer.
 **/
 EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *
@@ -256,10 +256,10 @@ FindAcpiFacsTableByAcpiGuid (
 
 /**
   To find Facs in Acpi tables.
- 
-  To find Firmware ACPI control strutcure in Acpi Tables since the S3 waking vector is stored 
+
+  To find Firmware ACPI control strutcure in Acpi Tables since the S3 waking vector is stored
   in the table.
-  
+
   @return  Facs table pointer.
 **/
 EFI_ACPI_2_0_FIRMWARE_ACPI_CONTROL_STRUCTURE  *
@@ -315,20 +315,20 @@ IsLongModeWakingVectorSupport (
 
   @param[in] LongModeWakingVectorSupport    Support long mode waking vector or not.
 
-  If BootScriptExector driver will run in 64-bit mode, this function will establish the 1:1 
+  If BootScriptExector driver will run in 64-bit mode, this function will establish the 1:1
   virtual to physical mapping page table when long mode waking vector is supported, otherwise
   create 4G page table when long mode waking vector is not supported and let PF handler to
   handle > 4G request.
-  If BootScriptExector driver will not run in 64-bit mode, this function will do nothing. 
-  
-  @return Page table base address. 
+  If BootScriptExector driver will not run in 64-bit mode, this function will do nothing.
+
+  @return Page table base address.
 
 **/
 EFI_PHYSICAL_ADDRESS
 S3AllocatePageTablesBuffer (
   IN BOOLEAN    LongModeWakingVectorSupport
   )
-{  
+{
   if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
     UINTN                                         ExtraPageTablePages;
     UINT32                                        RegEax;
@@ -419,7 +419,7 @@ S3AllocatePageTablesBuffer (
     //
     // If DXE is running 32-bit mode, no need to establish page table.
     //
-    return  (EFI_PHYSICAL_ADDRESS) 0;  
+    return  (EFI_PHYSICAL_ADDRESS) 0;
   }
 }
 

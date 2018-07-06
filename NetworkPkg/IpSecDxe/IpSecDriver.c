@@ -1,7 +1,7 @@
 /** @file
   Driver Binding Protocol for IPsec Driver.
 
-  Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -28,7 +28,7 @@
   @param[in]  RemainingDevicePath  Optional parameter used to pick a specific child
                                    device to start.
   @param[in]  IpVersion            IP_VERSION_4 or IP_VERSION_6.
-  
+
   @retval EFI_SUCCES           This driver supports this device.
   @retval EFI_ALREADY_STARTED  This driver is already running on this device.
   @retval other                This driver does not support this device.
@@ -45,7 +45,7 @@ IpSecSupported (
 {
   EFI_STATUS  Status;
   EFI_GUID    *UdpServiceBindingGuid;
-  
+
   if (IpVersion == IP_VERSION_4) {
     UdpServiceBindingGuid  = &gEfiUdp4ServiceBindingProtocolGuid;
   } else {
@@ -213,7 +213,7 @@ IpSecStop (
     //
     if (!IsListEmpty (&Private->Ikev2EstablishedList)) {
       NET_LIST_FOR_EACH_SAFE (Entry, Next, &Private->Ikev2EstablishedList) {
-        Ikev2SaSession = IKEV2_SA_SESSION_BY_SESSION (Entry); 
+        Ikev2SaSession = IKEV2_SA_SESSION_BY_SESSION (Entry);
         RemoveEntryList (&Ikev2SaSession->BySessionTable);
         Ikev2SaSessionFree (Ikev2SaSession);
       }

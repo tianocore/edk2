@@ -11,7 +11,7 @@
     synchronous requests and EFI_BLOCK_IO_PROTOCOL for now.
 
   Copyright (C) 2012, Red Hat, Inc.
-  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Inc, All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
@@ -263,6 +263,13 @@ SynchronousRequest (
   EFI_STATUS              UnmapStatus;
 
   BlockSize = Dev->BlockIoMedia.BlockSize;
+
+  //
+  // Set BufferMapping and BufferDeviceAddress to suppress incorrect
+  // compiler/analyzer warnings.
+  //
+  BufferMapping       = NULL;
+  BufferDeviceAddress = 0;
 
   //
   // ensured by VirtioBlkInit()

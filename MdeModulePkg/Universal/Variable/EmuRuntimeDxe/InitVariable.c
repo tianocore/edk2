@@ -1,9 +1,9 @@
 /** @file
 
-  Implment all four UEFI runtime variable services and 
+  Implment all four UEFI runtime variable services and
   install variable architeture protocol.
-  
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -29,7 +29,7 @@ EFI_EVENT   mVirtualAddressChangeEvent = NULL;
                                     data, this value contains the required size.
   @param Data                       The buffer to return the contents of the variable. May be NULL
                                     with a zero DataSize in order to determine the size buffer needed.
-                      
+
   @return EFI_INVALID_PARAMETER     Invalid parameter
   @return EFI_SUCCESS               Find the specified variable
   @return EFI_NOT_FOUND             Not found
@@ -203,13 +203,13 @@ VariableClassAddressChangeEvent (
 
 /**
   EmuVariable Driver main entry point. The Variable driver places the 4 EFI
-  runtime services in the EFI System Table and installs arch protocols 
+  runtime services in the EFI System Table and installs arch protocols
   for variable read and write services being available. It also registers
   notification function for EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       Variable service successfully initialized.
 
 **/

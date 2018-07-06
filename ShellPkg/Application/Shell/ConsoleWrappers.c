@@ -2,7 +2,7 @@
   Function definitions for shell simple text in and out on top of file handles.
 
   (C) Copyright 2013 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -105,7 +105,7 @@ FileBasedSimpleTextInReadKeyStroke(
     CharSize = sizeof(CHAR16);
   } else {
     CharSize = sizeof(CHAR8);
-  } 
+  }
   //
   // Decrement the amount of free space by Size or set to zero (for odd length files)
   //
@@ -123,7 +123,7 @@ FileBasedSimpleTextInReadKeyStroke(
 }
 
 /**
-  Function to create a EFI_SIMPLE_TEXT_INPUT_PROTOCOL on top of a 
+  Function to create a EFI_SIMPLE_TEXT_INPUT_PROTOCOL on top of a
   SHELL_FILE_HANDLE to support redirecting input from a file.
 
   @param[in]  FileHandleToUse The pointer to the SHELL_FILE_HANDLE to use.
@@ -162,7 +162,7 @@ CreateSimpleTextInOnFile(
   ProtocolToReturn->FileHandle                 = FileHandleToUse;
   ProtocolToReturn->SimpleTextIn.Reset         = FileBasedSimpleTextInReset;
   ProtocolToReturn->SimpleTextIn.ReadKeyStroke = FileBasedSimpleTextInReadKeyStroke;
-  
+
   Status = gBS->CreateEvent (
                   EVT_NOTIFY_WAIT,
                   TPL_NOTIFY,
@@ -177,9 +177,9 @@ CreateSimpleTextInOnFile(
   }
   ///@todo possibly also install SimpleTextInputEx on the handle at this point.
   Status = gBS->InstallProtocolInterface(
-    &(ProtocolToReturn->TheHandle), 
-    &gEfiSimpleTextInProtocolGuid, 
-    EFI_NATIVE_INTERFACE, 
+    &(ProtocolToReturn->TheHandle),
+    &gEfiSimpleTextInProtocolGuid,
+    EFI_NATIVE_INTERFACE,
     &(ProtocolToReturn->SimpleTextIn));
   if (!EFI_ERROR(Status)) {
     *HandleLocation = ProtocolToReturn->TheHandle;
@@ -191,7 +191,7 @@ CreateSimpleTextInOnFile(
 }
 
 /**
-  Function to close a EFI_SIMPLE_TEXT_INPUT_PROTOCOL on top of a 
+  Function to close a EFI_SIMPLE_TEXT_INPUT_PROTOCOL on top of a
   SHELL_FILE_HANDLE to support redirecting input from a file.
 
   @param[in]  SimpleTextIn    The pointer to the SimpleTextIn to close.
@@ -213,8 +213,8 @@ CloseSimpleTextInOnFile(
   Status = gBS->CloseEvent(((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL *)SimpleTextIn)->SimpleTextIn.WaitForKey);
 
   Status1 = gBS->UninstallProtocolInterface(
-    ((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL*)SimpleTextIn)->TheHandle, 
-    &gEfiSimpleTextInProtocolGuid, 
+    ((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL*)SimpleTextIn)->TheHandle,
+    &gEfiSimpleTextInProtocolGuid,
     &(((SHELL_EFI_SIMPLE_TEXT_INPUT_PROTOCOL*)SimpleTextIn)->SimpleTextIn));
 
   FreePool(SimpleTextIn);
@@ -283,9 +283,9 @@ FileBasedSimpleTextOutQueryMode (
   )
 {
   EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *PassThruProtocol;
-  
+
   PassThruProtocol = ((SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL *)This)->OriginalSimpleTextOut;
-  
+
   // Pass the QueryMode call thru to the original SimpleTextOutProtocol
   return (PassThruProtocol->QueryMode(
     PassThruProtocol,
@@ -421,7 +421,7 @@ FileBasedSimpleTextOutOutputString (
 }
 
 /**
-  Function to create a EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL on top of a 
+  Function to create a EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL on top of a
   SHELL_FILE_HANDLE to support redirecting output from a file.
 
   @param[in]  FileHandleToUse  The pointer to the SHELL_FILE_HANDLE to use.
@@ -473,9 +473,9 @@ CreateSimpleTextOutOnFile(
   ProtocolToReturn->SimpleTextOut.Mode->CursorVisible = OriginalProtocol->Mode->CursorVisible;
 
   Status = gBS->InstallProtocolInterface(
-    &(ProtocolToReturn->TheHandle), 
-    &gEfiSimpleTextOutProtocolGuid, 
-    EFI_NATIVE_INTERFACE, 
+    &(ProtocolToReturn->TheHandle),
+    &gEfiSimpleTextOutProtocolGuid,
+    EFI_NATIVE_INTERFACE,
     &(ProtocolToReturn->SimpleTextOut));
   if (!EFI_ERROR(Status)) {
     *HandleLocation = ProtocolToReturn->TheHandle;
@@ -488,7 +488,7 @@ CreateSimpleTextOutOnFile(
 }
 
 /**
-  Function to close a EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL on top of a 
+  Function to close a EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL on top of a
   SHELL_FILE_HANDLE to support redirecting output from a file.
 
   @param[in] SimpleTextOut    The pointer to the SimpleTextOUT to close.
@@ -505,8 +505,8 @@ CloseSimpleTextOutOnFile(
     return (EFI_INVALID_PARAMETER);
   }
   Status = gBS->UninstallProtocolInterface(
-    ((SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*)SimpleTextOut)->TheHandle, 
-    &gEfiSimpleTextOutProtocolGuid, 
+    ((SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*)SimpleTextOut)->TheHandle,
+    &gEfiSimpleTextOutProtocolGuid,
     &(((SHELL_EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL*)SimpleTextOut)->SimpleTextOut));
   FreePool(SimpleTextOut->Mode);
   FreePool(SimpleTextOut);

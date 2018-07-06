@@ -1,18 +1,18 @@
 /** @file
-The EFI_SWAP_ADDRESS_RANGE_PROTOCOL is used to abstract the swap operation of boot block 
-and backup block of FV. This swap is especially needed when updating the boot block of FV. If a 
-power failure happens during the boot block update, the swapped backup block (now the boot block) 
-can boot the machine with the old boot block backed up in it. The swap operation is platform dependent, so 
+The EFI_SWAP_ADDRESS_RANGE_PROTOCOL is used to abstract the swap operation of boot block
+and backup block of FV. This swap is especially needed when updating the boot block of FV. If a
+power failure happens during the boot block update, the swapped backup block (now the boot block)
+can boot the machine with the old boot block backed up in it. The swap operation is platform dependent, so
 other protocols such as FTW (Fault Tolerant Write) should use this protocol instead of handling hardware directly.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED. 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -40,17 +40,17 @@ typedef UINT8 EFI_SWAP_LOCK_CAPABILITY;
 //
 
 /**
-  This function gets the address range location of 
-  boot block and backup block. 
+  This function gets the address range location of
+  boot block and backup block.
 
-  @param This             Indicates the calling context.  
+  @param This             Indicates the calling context.
   @param BootBlockBase    The base address of current boot block.
   @param BootBlockSize    The size (in bytes) of current boot block.
   @param BackupBlockBase  The base address of current backup block.
   @param BackupBlockSize  The size (in bytes) of current backup block.
 
   @retval EFI_SUCCESS  The call was successful.
-    
+
 **/
 typedef
 EFI_STATUS
@@ -65,12 +65,12 @@ EFI_STATUS
 /**
   This service checks if the boot block and backup block has been swapped.
 
-  @param This          Indicates the calling context.  
-  @param SwapState     True if the boot block and backup block has been swapped. 
+  @param This          Indicates the calling context.
+  @param SwapState     True if the boot block and backup block has been swapped.
                        False if the boot block and backup block has not been swapped.
 
   @retval EFI_SUCCESS  The call was successful.
-    
+
 **/
 typedef
 EFI_STATUS
@@ -82,15 +82,15 @@ EFI_STATUS
 /**
   This service swaps the boot block and backup block, or swaps them back.
 
-  It also acquires and releases software swap lock during operation. The setting of the new swap state 
+  It also acquires and releases software swap lock during operation. The setting of the new swap state
   is not affected by the old swap state.
 
-  @param This            Indicates the calling context.  
+  @param This            Indicates the calling context.
   @param NewSwapState    True to swap real boot block and backup block, False to swap them back.
 
   @retval EFI_SUCCESS  The call was successful.
   @retval EFI_ABORTED  Set swap state error.
-    
+
 **/
 typedef
 EFI_STATUS
@@ -104,14 +104,14 @@ EFI_STATUS
 /**
   This service checks if a Real Time Clock (RTC) power failure happened.
 
-  If parameter RtcPowerFailed is true after the function returns, RTC power supply failed or was removed. 
+  If parameter RtcPowerFailed is true after the function returns, RTC power supply failed or was removed.
   It is recommended to check RTC power status before calling GetSwapState().
 
-  @param This             Indicates the calling context.  
-  @param RtcPowerFailed   True if the RTC (Real Time Clock) power failed or was removed. 
+  @param This             Indicates the calling context.
+  @param RtcPowerFailed   True if the RTC (Real Time Clock) power failed or was removed.
 
   @retval EFI_SUCCESS The call was successful.
-    
+
 **/
 typedef
 EFI_STATUS
@@ -121,15 +121,15 @@ EFI_STATUS
   );
 
 /**
-  This service returns all lock methods for swap operations that the current platform 
+  This service returns all lock methods for swap operations that the current platform
   supports. Could be software lock, hardware lock, or unsupport lock.
   Note that software and hardware lock methods can be used simultaneously.
 
   @param This             Indicates the calling context.
-  @param LockCapability   The current lock method for swap operations. 
+  @param LockCapability   The current lock method for swap operations.
 
   @retval EFI_SUCCESS The call was successful.
-    
+
 **/
 typedef
 EFI_STATUS
@@ -150,7 +150,7 @@ EFI_STATUS
   @param NewLockState      True to acquire lock; False to release lock.
 
   @retval EFI_SUCCESS The call was successful.
-    
+
 **/
 typedef
 EFI_STATUS

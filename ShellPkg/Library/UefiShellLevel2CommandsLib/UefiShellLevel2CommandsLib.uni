@@ -1,7 +1,7 @@
 // /**
 //
 // (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-// Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -271,7 +271,7 @@
 "     variable %cwd%.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"
-"EXAMPLES:\r\n"     
+"EXAMPLES:\r\n"
 "  * To change the current file system to the mapped fs0 file system:\r\n"
 "    Shell> fs0:\r\n"
 " \r\n"
@@ -294,7 +294,7 @@
 "    fs1:\> cd Tmp\r\n"
 ".SH RETURNVALUES\r\n"
 " \r\n"
-"RETURN VALUES:\r\n"     
+"RETURN VALUES:\r\n"
 "  SHELL_SUCCESS             The action was completed as requested.\r\n"
 "  SHELL_SECURITY_VIOLATION  This function was not performed due to a security\r\n"
 "                            violation.\r\n"
@@ -723,7 +723,7 @@
 "     is specified by sname is deleted.\r\n"
 ".SH EXAMPLES\r\n"
 " \r\n"
-"EXAMPLES:\r\n"  
+"EXAMPLES:\r\n"
 "  * To add an environment variable:\r\n"
 "    Shell> set DiagnosticPath fs0:\efi\diag;fs1:\efi\diag\r\n"
 " \r\n"

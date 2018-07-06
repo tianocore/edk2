@@ -4,7 +4,7 @@
 #   {0xa7717414, 0xc616, 0x4977, {0x94, 0x20, 0x84, 0x47, 0x12, 0xa7, 0x35, 0xbf}}
 # This tool has been tested with OpenSSL 1.0.1e 11 Feb 2013
 #
-# Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,7 @@
 '''
 Rsa2048Sha256Sign
 '''
+from __future__ import print_function
 
 import os
 import sys
@@ -49,7 +50,7 @@ EFI_HASH_ALGORITHM_SHA256_GUID = uuid.UUID('{51aa59de-fdf2-4ea3-bc63-875fb7842ee
 #     UINT8 Signature[256];
 #   } EFI_CERT_BLOCK_RSA_2048_SHA256;
 #
-EFI_CERT_BLOCK_RSA_2048_SHA256        = collections.namedtuple('EFI_CERT_BLOCK_RSA_2048_SHA256', ['HashType','PublicKey','Signature'])
+EFI_CERT_BLOCK_RSA_2048_SHA256        = collections.namedtuple('EFI_CERT_BLOCK_RSA_2048_SHA256', ['HashType', 'PublicKey', 'Signature'])
 EFI_CERT_BLOCK_RSA_2048_SHA256_STRUCT = struct.Struct('16s256s256s')
 
 #
@@ -70,7 +71,7 @@ if __name__ == '__main__':
   parser.add_argument("--private-key", dest='PrivateKeyFile', type=argparse.FileType('rb'), help="specify the private key filename.  If not specified, a test signing key is used.")
   parser.add_argument("-v", "--verbose", dest='Verbose', action="store_true", help="increase output messages")
   parser.add_argument("-q", "--quiet", dest='Quiet', action="store_true", help="reduce output messages")
-  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0,10), default=0, help="set debug level")
+  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0, 10), default=0, help="set debug level")
   parser.add_argument(metavar="input_file", dest='InputFile', type=argparse.FileType('rb'), help="specify the input filename")
 
   #
@@ -96,14 +97,14 @@ if __name__ == '__main__':
   try:
     Process = subprocess.Popen('%s version' % (OpenSslCommand), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
   except:  
-    print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
+    print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(1)
     
   Version = Process.communicate()
-  if Process.returncode <> 0:
-    print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
+  if Process.returncode != 0:
+    print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
-  print Version[0]
+  print(Version[0])
   
   #
   # Read input file into a buffer and save input filename
@@ -117,7 +118,7 @@ if __name__ == '__main__':
   #
   OutputDir = os.path.dirname(args.OutputFile)
   if not os.path.exists(OutputDir):
-    print 'ERROR: The output path does not exist: %s' % OutputDir
+    print('ERROR: The output path does not exist: %s' % OutputDir)
     sys.exit(1)
   args.OutputFileName = args.OutputFile
 
@@ -144,7 +145,7 @@ if __name__ == '__main__':
       args.PrivateKeyFile = open(args.PrivateKeyFileName, 'rb')
       args.PrivateKeyFile.close()
     except:
-      print 'ERROR: test signing private key file %s missing' % (args.PrivateKeyFileName)
+      print('ERROR: test signing private key file %s missing' % (args.PrivateKeyFileName))
       sys.exit(1)
 
   #
@@ -154,9 +155,9 @@ if __name__ == '__main__':
   PublicKeyHexString = Process.communicate()[0].split('=')[1].strip()
   PublicKey = ''
   while len(PublicKeyHexString) > 0:
-    PublicKey = PublicKey + chr(int(PublicKeyHexString[0:2],16))
+    PublicKey = PublicKey + chr(int(PublicKeyHexString[0:2], 16))
     PublicKeyHexString=PublicKeyHexString[2:]
-  if Process.returncode <> 0:
+  if Process.returncode != 0:
     sys.exit(Process.returncode)
 
   if args.MonotonicCountStr:
@@ -176,9 +177,9 @@ if __name__ == '__main__':
     # 
     # Sign the input file using the specified private key and capture signature from STDOUT
     #
-    Process = subprocess.Popen('%s sha256 -sign "%s"' % (OpenSslCommand, args.PrivateKeyFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    Process = subprocess.Popen('%s dgst -sha256 -sign "%s"' % (OpenSslCommand, args.PrivateKeyFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Signature = Process.communicate(input=FullInputFileBuffer)[0]
-    if Process.returncode <> 0:
+    if Process.returncode != 0:
       sys.exit(Process.returncode)
       
     #
@@ -201,15 +202,15 @@ if __name__ == '__main__':
     #
     # Verify that the Hash Type matches the expected SHA256 type
     #
-    if uuid.UUID(bytes_le = Header.HashType) <> EFI_HASH_ALGORITHM_SHA256_GUID:
-      print 'ERROR: unsupport hash GUID'
+    if uuid.UUID(bytes_le = Header.HashType) != EFI_HASH_ALGORITHM_SHA256_GUID:
+      print('ERROR: unsupport hash GUID')
       sys.exit(1)
 
     #
     # Verify the public key
     #
-    if Header.PublicKey <> PublicKey:
-      print 'ERROR: Public key in input file does not match public key from private key file'
+    if Header.PublicKey != PublicKey:
+      print('ERROR: Public key in input file does not match public key from private key file')
       sys.exit(1)
 
     FullInputFileBuffer = args.InputFileBuffer
@@ -225,10 +226,10 @@ if __name__ == '__main__':
     #
     # Verify signature
     #    
-    Process = subprocess.Popen('%s sha256 -prverify "%s" -signature %s' % (OpenSslCommand, args.PrivateKeyFileName, args.OutputFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+    Process = subprocess.Popen('%s dgst -sha256 -prverify "%s" -signature %s' % (OpenSslCommand, args.PrivateKeyFileName, args.OutputFileName), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Process.communicate(input=FullInputFileBuffer)
-    if Process.returncode <> 0:
-      print 'ERROR: Verification failed'
+    if Process.returncode != 0:
+      print('ERROR: Verification failed')
       os.remove (args.OutputFileName)
       sys.exit(Process.returncode)
 

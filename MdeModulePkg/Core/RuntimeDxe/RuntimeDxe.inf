@@ -5,7 +5,7 @@
 #  CalculateCrc32 boot services table, SetVirtualAddressMap & ConvertPointer
 #  runtime services table.
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -38,7 +38,7 @@
   Crc32.c
   Runtime.h
   Runtime.c
- 
+
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -57,7 +57,7 @@
 [Protocols]
   gEfiRuntimeArchProtocolGuid                   ## PRODUCES
   gEfiLoadedImageProtocolGuid                   ## CONSUMES
- 
+
 [depex]
   TRUE
 

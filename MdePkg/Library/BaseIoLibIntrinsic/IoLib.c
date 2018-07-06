@@ -1,7 +1,7 @@
 /** @file
   Common I/O Library routines.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -107,7 +107,7 @@ MmioRead8 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
-  
+
   @return Value.
 
 **/
@@ -169,7 +169,7 @@ MmioRead16 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
-  
+
   @return Value.
 
 **/
@@ -185,7 +185,7 @@ MmioWrite16 (
   MemoryFence ();
   *(volatile UINT16*)Address = Value;
   MemoryFence ();
-  
+
   return Value;
 }
 
@@ -213,11 +213,11 @@ MmioRead32 (
   UINT32                            Value;
 
   ASSERT ((Address & 3) == 0);
-  
+
   MemoryFence ();
   Value = *(volatile UINT32*)Address;
   MemoryFence ();
-  
+
   return Value;
 }
 
@@ -233,7 +233,7 @@ MmioRead32 (
 
   @param  Address The MMIO register to write.
   @param  Value   The value to write to the MMIO register.
-  
+
   @return Value.
 
 **/
@@ -245,11 +245,11 @@ MmioWrite32 (
   )
 {
   ASSERT ((Address & 3) == 0);
-  
+
   MemoryFence ();
   *(volatile UINT32*)Address = Value;
   MemoryFence ();
-  
+
   return Value;
 }
 
@@ -277,7 +277,7 @@ MmioRead64 (
   UINT64                            Value;
 
   ASSERT ((Address & 7) == 0);
-  
+
   MemoryFence ();
   Value = *(volatile UINT64*)Address;
   MemoryFence ();
@@ -307,11 +307,11 @@ MmioWrite64 (
   )
 {
   ASSERT ((Address & 7) == 0);
-  
+
   MemoryFence ();
   *(volatile UINT64*)Address = Value;
   MemoryFence ();
-  
+
   return Value;
 }
 

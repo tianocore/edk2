@@ -1,7 +1,7 @@
 /** @file
   Provides services to access PCI Configuration Space using the MMIO PCI Express window.
-  
-  This library is identical to the PCI Library, except the access method for performing PCI 
+
+  This library is identical to the PCI Library, except the access method for performing PCI
   configuration cycles must be through the 256 MB PCI Express MMIO window whose base address
   is defined by PcdPciExpressBaseAddress.
 
@@ -40,20 +40,20 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define PCI_EXPRESS_LIB_ADDRESS(Bus,Device,Function,Offset) PCI_ECAM_ADDRESS ((Bus), (Device), (Function), (Offset))
 
 /**
-  Registers a PCI device so PCI configuration registers may be accessed after 
+  Registers a PCI device so PCI configuration registers may be accessed after
   SetVirtualAddressMap().
-  
-  Registers the PCI device specified by Address so all the PCI configuration 
-  registers associated with that PCI device may be accessed after SetVirtualAddressMap() 
+
+  Registers the PCI device specified by Address so all the PCI configuration
+  registers associated with that PCI device may be accessed after SetVirtualAddressMap()
   is called.
-  
+
   If Address > 0x0FFFFFFF, then ASSERT().
 
   @param  Address Address that encodes the PCI Bus, Device, Function and
                   Register.
-  
+
   @retval RETURN_SUCCESS           The PCI device was registered for runtime access.
-  @retval RETURN_UNSUPPORTED       An attempt was made to call this function 
+  @retval RETURN_UNSUPPORTED       An attempt was made to call this function
                                    after ExitBootServices().
   @retval RETURN_UNSUPPORTED       The resources required to access the PCI device
                                    at runtime could not be mapped.

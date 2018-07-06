@@ -1,8 +1,8 @@
 /** @file
 Constants definitions for Usb Hub Peim
 
-Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -227,6 +227,7 @@ PeiHubClearHubFeature (
   Get a given hub descriptor.
 
   @param  PeiServices    General-purpose services that are available to every PEIM.
+  @param  PeiUsbDevice   Indicates the hub controller device.
   @param  UsbIoPpi       Indicates the PEI_USB_IO_PPI instance.
   @param  DescriptorSize The length of Hub Descriptor buffer.
   @param  HubDescriptor  Caller allocated buffer to store the hub descriptor if
@@ -240,6 +241,7 @@ PeiHubClearHubFeature (
 EFI_STATUS
 PeiGetHubDescriptor (
   IN EFI_PEI_SERVICES         **PeiServices,
+  IN PEI_USB_DEVICE           *PeiUsbDevice,
   IN PEI_USB_IO_PPI           *UsbIoPpi,
   IN UINTN                    DescriptorSize,
   OUT EFI_USB_HUB_DESCRIPTOR  *HubDescriptor

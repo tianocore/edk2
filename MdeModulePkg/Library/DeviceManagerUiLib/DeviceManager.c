@@ -1,7 +1,7 @@
 /** @file
 The device manager reference implementation
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -58,7 +58,7 @@ HII_VENDOR_DEVICE_PATH  mDeviceManagerHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -101,12 +101,12 @@ DmExtractDevicePathFromHiiHandle (
 /**
   Get the mac address string from the device path.
   if the device path has the vlan, get the vanid also.
-  
-  @param MacAddressNode              Device path begin with mac address 
+
+  @param MacAddressNode              Device path begin with mac address
   @param PBuffer                     Output string buffer contain mac address.
 
 **/
-BOOLEAN 
+BOOLEAN
 GetMacAddressString(
   IN  MAC_ADDR_DEVICE_PATH   *MacAddressNode,
   OUT CHAR16                 **PBuffer
@@ -142,7 +142,7 @@ GetMacAddressString(
   *PBuffer = String;
   StrCpyS(String, BufferLen / sizeof (CHAR16), L"MAC:");
   String += 4;
-  
+
   //
   // Convert the MAC address into a unicode string.
   //
@@ -202,7 +202,7 @@ GetMacAddressString(
   @retval  EFI_SUCCESS               Add the item is successful.
   @return  Other values if failed to Add the item.
 **/
-BOOLEAN 
+BOOLEAN
 AddIdToMacDeviceList (
   IN  EFI_STRING        MacAddrString
   )
@@ -252,7 +252,7 @@ AddIdToMacDeviceList (
     if (TempDeviceList == NULL) {
       return FALSE;
     }
-    TempDeviceList[mMacDeviceList.CurListLen].PromptId = PromptId;  
+    TempDeviceList[mMacDeviceList.CurListLen].PromptId = PromptId;
     TempDeviceList[mMacDeviceList.CurListLen].QuestionId = (EFI_QUESTION_ID) (mMacDeviceList.CurListLen + NETWORK_DEVICE_LIST_KEY_OFFSET);
 
     mMacDeviceList.NodeList = TempDeviceList;
@@ -306,8 +306,8 @@ IsMacAddressDevicePath (
       if (DEVICE_MANAGER_FORM_ID == NextShowFormId) {
         *NeedAddItem = TRUE;
         break;
-      } 
-      
+      }
+
       if (!GetMacAddressString((MAC_ADDR_DEVICE_PATH*)DevicePath, &Buffer)) {
         break;
       }
@@ -321,7 +321,7 @@ IsMacAddressDevicePath (
 
       if (NETWORK_DEVICE_LIST_FORM_ID == NextShowFormId) {
         //
-        // Same handle may has two network child handle, so the questionid 
+        // Same handle may has two network child handle, so the questionid
         // has the offset of SAME_HANDLE_KEY_OFFSET.
         //
         if (AddIdToMacDeviceList (Buffer)) {
@@ -351,7 +351,7 @@ IsMacAddressDevicePath (
   @return  FALSE         Do not need to add the menu about the network.
 
 **/
-BOOLEAN 
+BOOLEAN
 IsNeedAddNetworkMenu (
   IN      EFI_HII_HANDLE      Handle,
   IN      EFI_FORM_ID         NextShowFormId,
@@ -360,7 +360,7 @@ IsNeedAddNetworkMenu (
 {
   EFI_STATUS     Status;
   UINTN          EntryCount;
-  UINTN          Index;  
+  UINTN          Index;
   EFI_HANDLE     DriverHandle;
   EFI_HANDLE     ControllerHandle;
   EFI_DEVICE_PATH_PROTOCOL   *DevicePath;
@@ -389,9 +389,9 @@ IsNeedAddNetworkMenu (
   }
   TmpDevicePath = DevicePath;
 
-  // 
+  //
   // Check whether this device path include mac address device path.
-  // If this path has mac address path, get the value whether need 
+  // If this path has mac address path, get the value whether need
   // add this info to the menu and return.
   // Else check more about the child handle devcie path.
   //
@@ -413,7 +413,7 @@ IsNeedAddNetworkMenu (
   }
 
   if (!IsDevicePathEnd (TmpDevicePath)) {
-    return FALSE;    
+    return FALSE;
   }
 
   //
@@ -452,7 +452,7 @@ IsNeedAddNetworkMenu (
         continue;
       }
 
-      // 
+      //
       // Check whether this device path include mac address device path.
       //
       if (!IsMacAddressDevicePath(ChildDevicePath, NextShowFormId,&IsNeedAdd)) {
@@ -472,7 +472,7 @@ IsNeedAddNetworkMenu (
         } else {
           //
           // If need to update other form, return whether need to add to the menu.
-          //          
+          //
           goto Done;
         }
       }
@@ -481,9 +481,9 @@ IsNeedAddNetworkMenu (
 
 Done:
   if (OpenInfoBuffer != NULL) {
-    FreePool (OpenInfoBuffer);  
+    FreePool (OpenInfoBuffer);
   }
-  return IsNeedAdd; 
+  return IsNeedAdd;
 }
 
 /**
@@ -514,10 +514,10 @@ CreateDeviceManagerForm(
   EFI_STRING                  NewStringTitle;
   CHAR16                      *DevicePathStr;
   EFI_STRING_ID               DevicePathId;
-  EFI_IFR_FORM_SET            *Buffer;      
-  UINTN                       BufferSize;   
-  UINT8                       ClassGuidNum; 
-  EFI_GUID                    *ClassGuid;   
+  EFI_IFR_FORM_SET            *Buffer;
+  UINTN                       BufferSize;
+  UINT8                       ClassGuidNum;
+  EFI_GUID                    *ClassGuid;
   UINTN                       TempSize;
   UINT8                       *Ptr;
   EFI_STATUS                  Status;
@@ -599,7 +599,7 @@ CreateDeviceManagerForm(
       if (((EFI_IFR_OP_HEADER *) Ptr)->Length <= OFFSET_OF (EFI_IFR_FORM_SET, Flags)){
         Ptr += ((EFI_IFR_OP_HEADER *) Ptr)->Length;
         continue;
-      } 
+      }
 
       ClassGuidNum = (UINT8) (((EFI_IFR_FORM_SET *)Ptr)->Flags & 0x3);
       ClassGuid = (EFI_GUID *) (VOID *)(Ptr + sizeof (EFI_IFR_FORM_SET));
@@ -629,7 +629,7 @@ CreateDeviceManagerForm(
 
         //
         // Network device process
-        // 
+        //
         if (IsNeedAddNetworkMenu (HiiHandles[Index], NextShowFormId,&AddItemCount)) {
           if (NextShowFormId == DEVICE_MANAGER_FORM_ID) {
             //
@@ -679,7 +679,7 @@ CreateDeviceManagerForm(
               0,
               (EFI_QUESTION_ID) (Index + DEVICE_KEY_OFFSET),
               0,
-              &FormSetGuid,    
+              &FormSetGuid,
               DevicePathId
             );
           }
@@ -899,7 +899,7 @@ DeviceManagerUiLibConstructor (
   ASSERT (gDeviceManagerPrivate.HiiHandle != NULL);
 
   //
-  // Update boot manager page 
+  // Update boot manager page
   //
   CreateDeviceManagerForm (DEVICE_MANAGER_FORM_ID);
 

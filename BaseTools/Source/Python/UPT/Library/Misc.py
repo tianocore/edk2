@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -45,7 +45,7 @@ from Library.DataType import TAB_LANGUAGE_EN_US
 from Library.DataType import TAB_LANGUAGE_EN
 from Library.DataType import TAB_LANGUAGE_EN_X
 from Library.DataType import TAB_UNI_FILE_SUFFIXS
-from Library.String import GetSplitValueList
+from Library.StringUtils import GetSplitValueList
 from Library.ParserValidate import IsValidHexVersion
 from Library.ParserValidate import IsValidPath
 from Object.POM.CommonObject import TextObject
@@ -120,7 +120,7 @@ def GuidStructureStringToGuidString(GuidValue):
 # @param      Directory:   The directory name
 #
 def CreateDirectory(Directory):
-    if Directory == None or Directory.strip() == "":
+    if Directory is None or Directory.strip() == "":
         return True
     try:
         if not access(Directory, F_OK):
@@ -134,7 +134,7 @@ def CreateDirectory(Directory):
 # @param      Directory:   The directory name
 #
 def RemoveDirectory(Directory, Recursively=False):
-    if Directory == None or Directory.strip() == "" or not \
+    if Directory is None or Directory.strip() == "" or not \
     os.path.exists(Directory):
         return
     if Recursively:
@@ -237,7 +237,7 @@ def GetNonMetaDataFiles(Root, SkipList, FullPath, PrefixPath):
 #
 def ValidFile(File, Ext=None):
     File = File.replace('\\', '/')
-    if Ext != None:
+    if Ext is not None:
         FileExt = os.path.splitext(File)[1]
         if FileExt.lower() != Ext.lower():
             return False
@@ -423,7 +423,7 @@ class Sdict(IterableUserDict):
     ## update method
     #
     def update(self, Dict=None, **Kwargs):
-        if Dict != None:
+        if Dict is not None:
             for Key1, Val1 in Dict.items():
                 self[Key1] = Val1
         if len(Kwargs):
@@ -514,7 +514,7 @@ class PathClass(object):
     # Check whether PathClass are the same
     #
     def __eq__(self, Other):
-        if type(Other) == type(self):
+        if isinstance(Other, type(self)):
             return self.Path == Other.Path
         else:
             return self.Path == str(Other)
@@ -529,7 +529,7 @@ class PathClass(object):
     ## _GetFileKey
     #
     def _GetFileKey(self):
-        if self._Key == None:
+        if self._Key is None:
             self._Key = self.Path.upper()
         return self._Key
     ## Validate
@@ -819,11 +819,11 @@ def ConvertArchList(ArchList):
     if not ArchList:
         return NewArchList
 
-    if type(ArchList) == list:
+    if isinstance(ArchList, list):
         for Arch in ArchList:
             Arch = Arch.upper()
             NewArchList.append(Arch)
-    elif type(ArchList) == str:
+    elif isinstance(ArchList, str):
         ArchList = ArchList.upper()
         NewArchList.append(ArchList)
 

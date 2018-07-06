@@ -2,7 +2,7 @@
   X.509 Certificate Handler Wrapper Implementation which does not provide
   real capabilities.
 
-Copyright (c) 2012 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -50,7 +50,7 @@ X509ConstructCertificate (
   @param           ...        A list of DER-encoded single certificate data followed
                               by certificate size. A NULL terminates the list. The
                               pairs are the arguments to X509ConstructCertificate().
-                                 
+
   @retval FALSE  This interface is not supported.
 
 **/
@@ -58,7 +58,7 @@ BOOLEAN
 EFIAPI
 X509ConstructCertificateStack (
   IN OUT  UINT8  **X509Stack,
-  ...  
+  ...
   )
 {
   ASSERT (FALSE);
@@ -78,7 +78,7 @@ EFIAPI
 X509Free (
   IN  VOID  *X509Cert
   )
-{ 
+{
   ASSERT (FALSE);
 }
 
@@ -135,7 +135,7 @@ X509GetSubjectName (
   @param[in]      Cert             Pointer to the DER-encoded X509 certificate.
   @param[in]      CertSize         Size of the X509 certificate in bytes.
   @param[out]     CommonName       Buffer to contain the retrieved certificate common
-                                   name string. At most CommonNameSize bytes will be
+                                   name string (UTF8). At most CommonNameSize bytes will be
                                    written and the string will be null terminated. May be
                                    NULL in order to determine the size buffer needed.
   @param[in,out]  CommonNameSize   The size in bytes of the CommonName buffer on input,
@@ -196,7 +196,7 @@ RsaGetPublicKeyFromX509 (
   @param[in]      CACertSize   Size of the CA Certificate in bytes.
 
   @retval FALSE  This interface is not supported.
- 
+
 **/
 BOOLEAN
 EFIAPI

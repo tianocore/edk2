@@ -3,7 +3,7 @@
 
   Set a IDT entry for interrupt vector 3 for debug purpose for x64 platform
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
 
@@ -218,7 +218,7 @@ AcquirePage (
 
 /**
   The page fault handler that on-demand read >4G memory/MMIO.
-  
+
   @retval TRUE     The page fault is correctly handled.
   @retval FALSE    The page fault is not handled and is passed through to original handler.
 

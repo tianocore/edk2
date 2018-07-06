@@ -1,14 +1,14 @@
 /** @file
-  The TPM definition block in ACPI table for physical presence  
+  The TPM definition block in ACPI table for physical presence
   and MemoryClear.
 
-Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -49,7 +49,7 @@ DefinitionBlock (
       //
       OperationRegion (SMIP, SystemIO, 0xB2, 1)
       Field (SMIP, ByteAcc, NoLock, Preserve)
-      { 
+      {
           IOB2, 8
       }
 
@@ -79,16 +79,16 @@ DefinitionBlock (
         MCIP,   32, //   Used for save the Mor paramter
         MORD,   32, //   Memory Overwrite Request Data
         MRET,   32, //   Memory Overwrite function return code
-        UCRQ,   32  //   Phyical Presence request operation to Get User Confirmation Status 
+        UCRQ,   32  //   Phyical Presence request operation to Get User Confirmation Status
       }
 
       Method (PTS, 1, Serialized)
-      {  
+      {
         //
         // Detect Sx state for MOR, only S4, S5 need to handle
         //
         If (LAnd (LLess (Arg0, 6), LGreater (Arg0, 3)))
-        {   
+        {
           //
           // Bit4 -- DisableAutoDetect. 0 -- Firmware MAY autodetect.
           //
@@ -98,7 +98,7 @@ DefinitionBlock (
             // Triggle the SMI through ACPI _PTS method.
             //
             Store (0x02, MCIP)
-              
+
             //
             // Triggle the SMI interrupt
             //
@@ -106,7 +106,7 @@ DefinitionBlock (
           }
         }
         Return (0)
-      }   
+      }
 
       Method (_STA, 0)
       {
@@ -156,12 +156,12 @@ DefinitionBlock (
       }
 
       Name(TPM2, Package (0x02){
-        Zero, 
+        Zero,
         Zero
       })
 
       Name(TPM3, Package (0x03){
-        Zero, 
+        Zero,
         Zero,
         Zero
       })
@@ -170,7 +170,7 @@ DefinitionBlock (
       // TCG Physical Presence Interface
       //
       Method (TPPI, 3, Serialized, 0, {BuffObj, PkgObj, IntObj, StrObj}, {UnknownObj, UnknownObj, UnknownObj}) // IntObj, IntObj, PkgObj
-      {        
+      {
         //
         // Switch by function index
         //
@@ -195,10 +195,10 @@ DefinitionBlock (
             //
             // b) Submit TPM Operation Request to Pre-OS Environment
             //
-                  
+
             Store (DerefOf (Index (Arg2, 0x00)), PPRQ)
             Store (0x02, PPIP)
-              
+
             //
             // Triggle the SMI interrupt
             //
@@ -212,7 +212,7 @@ DefinitionBlock (
             //
             // c) Get Pending TPM Operation Requested By the OS
             //
-                  
+
             Store (PPRQ, Index (TPM2, 0x01))
             Return (TPM2)
           }
@@ -229,12 +229,12 @@ DefinitionBlock (
             // e) Return TPM Operation Response to OS Environment
             //
             Store (0x05, PPIP)
-                  
+
             //
             // Triggle the SMI interrupt
             //
             Store (PPIN, IOB2)
-                  
+
             Store (LPPR, Index (TPM3, 0x01))
             Store (PPRP, Index (TPM3, 0x02))
 
@@ -257,11 +257,11 @@ DefinitionBlock (
             //
             Store (7, PPIP)
             Store (DerefOf (Index (Arg2, 0x00)), PPRQ)
-                
+
             //
-            // Triggle the SMI interrupt 
+            // Triggle the SMI interrupt
             //
-            Store (PPIN, IOB2)  
+            Store (PPIN, IOB2)
             Return (FRET)
           }
           Case (8)
@@ -271,12 +271,12 @@ DefinitionBlock (
             //
             Store (8, PPIP)
             Store (DerefOf (Index (Arg2, 0x00)), UCRQ)
-                  
+
             //
             // Triggle the SMI interrupt
             //
             Store (PPIN, IOB2)
-                  
+
             Return (FRET)
           }
 
@@ -305,12 +305,12 @@ DefinitionBlock (
             // Save the Operation Value of the Request to MORD (reserved memory)
             //
             Store (DerefOf (Index (Arg2, 0x00)), MORD)
-                  
+
             //
             // Triggle the SMI through ACPI _DSM method.
             //
             Store (0x01, MCIP)
-                  
+
             //
             // Triggle the SMI interrupt
             //
@@ -319,7 +319,7 @@ DefinitionBlock (
           }
           Default {BreakPoint}
         }
-        Return (1)        
+        Return (1)
       }
 
       Method (_DSM, 4, Serialized, 0, UnknownObj, {BuffObj, IntObj, IntObj, PkgObj})

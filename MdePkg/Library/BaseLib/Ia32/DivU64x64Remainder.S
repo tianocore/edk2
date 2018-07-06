@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -57,22 +57,22 @@ L2:
     shrl    %ecx
     jnz     L2
     divl    %ebx
-    movl    %eax, %ebx                  # ebx <- quotient                     
-    movl    28(%esp), %ecx              # ecx <- high dword of divisor        
+    movl    %eax, %ebx                  # ebx <- quotient
+    movl    28(%esp), %ecx              # ecx <- high dword of divisor
     mull    24(%esp)                    # edx:eax <- quotient * divisor[0..31]
-    imull   %ebx, %ecx                  # ecx <- quotient * divisor[32..63]   
-    addl    %ecx, %edx                  # edx <- (quotient * divisor)[32..63] 
-    mov     32(%esp), %ecx              # ecx <- addr for Remainder           
-    jc      TooLarge                    # product > 2^64                      
-    cmpl    %edx, %edi                  # compare high 32 bits                
-    ja      Correct                                                           
-    jb      TooLarge                    # product > dividend                  
-    cmpl    %eax, %esi                                                        
-    jae     Correct                     # product <= dividend                 
+    imull   %ebx, %ecx                  # ecx <- quotient * divisor[32..63]
+    addl    %ecx, %edx                  # edx <- (quotient * divisor)[32..63]
+    mov     32(%esp), %ecx              # ecx <- addr for Remainder
+    jc      TooLarge                    # product > 2^64
+    cmpl    %edx, %edi                  # compare high 32 bits
+    ja      Correct
+    jb      TooLarge                    # product > dividend
+    cmpl    %eax, %esi
+    jae     Correct                     # product <= dividend
 TooLarge:
-    decl    %ebx                        # adjust quotient by -1              
-    jecxz   Return                      # return if Remainder == NULL        
-    sub     24(%esp), %eax                                                   
+    decl    %ebx                        # adjust quotient by -1
+    jecxz   Return                      # return if Remainder == NULL
+    sub     24(%esp), %eax
     sbb     28(%esp), %edx              # edx:eax <- (quotient - 1) * divisor
 Correct:
     jecxz   Return
@@ -81,7 +81,7 @@ Correct:
     movl    %esi, (%ecx)
     movl    %edi, 4(%ecx)
 Return:
-    movl    %ebx, %eax                  # eax <- quotient         
+    movl    %ebx, %eax                  # eax <- quotient
     xorl    %edx, %edx                  # quotient is 32 bits long
     pop     %edi
     pop     %esi

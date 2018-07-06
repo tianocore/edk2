@@ -1,6 +1,6 @@
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -49,7 +49,7 @@ ASM_GLOBAL ASM_PFX(InternalAsmThunk16)
 .set  IA32_REGS_SIZE, 56
 
     .data
-    
+
 .set Lm16Size, ASM_PFX(InternalAsmThunk16) - ASM_PFX(m16Start)
 ASM_PFX(m16Size):         .word      Lm16Size
 .set  LmThunk16Attr, L_ThunkAttr - ASM_PFX(m16Start)
@@ -85,7 +85,7 @@ ASM_PFX(BackFromUserCode):
     .byte 0xe                           # push cs
     .byte 0x66
     call    L_Base                       # push eip
-L_Base: 
+L_Base:
     .byte 0x66
     pushq   $0                          # reserved high order 32 bits of EFlags
     .byte 0x66, 0x9c                    # pushfd actually
@@ -102,13 +102,13 @@ L_ThunkAttr:  .space  4
     movl    $0x15cd2401,%eax            # mov ax, 2401h & int 15h
     cli                                 # disable interrupts
     jnc     L_2
-L_1: 
+L_1:
     testb   $THUNK_ATTRIBUTE_DISABLE_A20_MASK_KBD_CTRL, %dl
     jz      L_2
     inb     $0x92,%al
     orb     $2,%al
     outb    %al, $0x92                   # deactivate A20M#
-L_2: 
+L_2:
     xorw    %ax, %ax                     # xor eax, eax
     movl    %ss, %eax                    # mov ax, ss
     lea     IA32_REGS_SIZE(%esp), %bp
@@ -180,13 +180,13 @@ ASM_PFX(ToUserCode):
     movw    %bx,%sp                     # set up 16-bit stack pointer
     .byte 0x66                          # make the following call 32-bit
     call    L_Base1                       # push eip
-L_Base1: 
+L_Base1:
     popw    %bp                         # ebp <- address of L_Base1
     pushq   (IA32_REGS_SIZE + 2)(%esp)
     lea     0x0c(%rsi), %eax
     pushq   %rax
     lret                                # execution begins at next instruction
-L_RealMode: 
+L_RealMode:
     .byte 0x66,0x2e                     # CS and operand size override
     lidt    (_16Idtr - L_Base1)(%rsi)
     .byte 0x66,0x61                     # popad
@@ -243,7 +243,7 @@ ASM_PFX(InternalAsmThunk16):
     pushq   %rbx
     pushq   %rsi
     pushq   %rdi
-    
+
     movl    %ds, %ebx
     pushq   %rbx      # Save ds segment register on the stack
     movl    %es, %ebx
@@ -257,7 +257,7 @@ ASM_PFX(InternalAsmThunk16):
     movzwl  _SS(%rsi), %r8d
     movl    _ESP(%rsi), %edi
     lea     -(IA32_REGS_SIZE + 4)(%edi), %rdi
-    imul    $16, %r8d, %eax 
+    imul    $16, %r8d, %eax
     movl    %edi,%ebx                   # ebx <- stack for 16-bit code
     pushq   $(IA32_REGS_SIZE / 4)
     addl    %eax,%edi                   # edi <- linear address of 16-bit stack
@@ -268,26 +268,26 @@ ASM_PFX(InternalAsmThunk16):
     movl    %edx,%eax                   # eax <- transition code address
     andl    $0xf,%edx
     shll    $12,%eax                    # segment address in high order 16 bits
-    .set LBackFromUserCodeDelta, ASM_PFX(BackFromUserCode) - ASM_PFX(m16Start) 
+    .set LBackFromUserCodeDelta, ASM_PFX(BackFromUserCode) - ASM_PFX(m16Start)
     lea     (LBackFromUserCodeDelta)(%rdx), %ax
     stosl                               # [edi] <- return address of user code
     sgdt    0x60(%rsp)                  # save GDT stack in argument space
-    movzwq  0x60(%rsp), %r10            # r10 <- GDT limit 
-    lea     ((ASM_PFX(InternalAsmThunk16) - L_SavedCr4) + 0xf)(%rcx), %r11 
-    andq    $0xfffffffffffffff0, %r11   # r11 <- 16-byte aligned shadowed GDT table in real mode buffer      
-    
+    movzwq  0x60(%rsp), %r10            # r10 <- GDT limit
+    lea     ((ASM_PFX(InternalAsmThunk16) - L_SavedCr4) + 0xf)(%rcx), %r11
+    andq    $0xfffffffffffffff0, %r11   # r11 <- 16-byte aligned shadowed GDT table in real mode buffer
+
     movw    %r10w, (SavedGdt - L_SavedCr4)(%rcx)       # save the limit of shadowed GDT table
     movq    %r11, (SavedGdt - L_SavedCr4 + 0x2)(%rcx)  # save the base address of shadowed GDT table
-    
+
     movq    0x62(%rsp) ,%rsi            # rsi <- the original GDT base address
-    xchg   %r10, %rcx                   # save rcx to r10 and initialize rcx to be the limit of GDT table 
+    xchg   %r10, %rcx                   # save rcx to r10 and initialize rcx to be the limit of GDT table
     incq   %rcx                         # rcx <- the size of memory to copy
     xchg   %r11, %rdi                   # save rdi to r11 and initialize rdi to the base address of shadowed GDT table
     rep
     movsb                               # perform memory copy to shadow GDT table
     movq   %r10, %rcx                   # restore the orignal rcx before memory copy
     movq   %r11, %rdi                   # restore the original rdi before memory copy
-       
+
     sidt    0x50(%rsp)
     movq    %cr0, %rax
     .set LSavedCrDelta, L_SavedCr0 - L_SavedCr4
@@ -311,21 +311,21 @@ ASM_PFX(InternalAsmThunk16):
     .byte   0xff, 0x69                  #  jmp (_EntryPoint - L_SavedCr4)(%rcx)
     .set    Ltemp1, _EntryPoint - L_SavedCr4
     .byte   Ltemp1
-L_RetFromRealMode: 
+L_RetFromRealMode:
     popfq
     lgdt    0x60(%rsp)                  # restore protected mode GDTR
     lidt    0x50(%rsp)                  # restore protected mode IDTR
     lea     -IA32_REGS_SIZE(%rbp), %eax
     .byte 0x0f, 0xa9                    # pop gs
     .byte 0x0f, 0xa1                    # pop fs
-    
+
     popq     %rbx
     movl     %ebx, %ss
     popq     %rbx
     movl     %ebx, %es
     popq     %rbx
     movl     %ebx, %ds
-    
+
     popq    %rdi
     popq    %rsi
     popq    %rbx

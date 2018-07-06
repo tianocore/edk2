@@ -45,11 +45,12 @@
   UefiDriverEntryPoint
   IoLib
   PcdLib
+  UefiLib
 
 [Protocols]
-  gHardwareInterruptProtocolGuid
-  gHardwareInterrupt2ProtocolGuid
-  gEfiCpuArchProtocolGuid
+  gHardwareInterruptProtocolGuid  ## PRODUCES
+  gHardwareInterrupt2ProtocolGuid ## PRODUCES
+  gEfiCpuArchProtocolGuid         ## CONSUMES ## NOTIFY
 
 [Pcd.common]
   gArmTokenSpaceGuid.PcdGicDistributorBase
@@ -58,4 +59,4 @@
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy
 
 [Depex]
-  gEfiCpuArchProtocolGuid
+  TRUE

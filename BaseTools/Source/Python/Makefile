@@ -1,7 +1,7 @@
 ## @file
 # Windows makefile for Python tools build.
 #
-# Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -37,25 +37,16 @@ APPLICATIONS=$(BIN_DIR)\build.exe $(BIN_DIR)\GenFds.exe $(BIN_DIR)\Trim.exe $(BI
 COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Database.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\DataType.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\DecClassObject.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\Dictionary.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\DscClassObject.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\EdkIIWorkspace.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\EdkIIWorkspaceBuild.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\EdkLogger.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Expression.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\FdfClassObject.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\FdfParserLite.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\GlobalData.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Identification.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\InfClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathOs.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathOsPath.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\LongFilePathSupport.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\MigrationUtilities.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Misc.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\Parsing.py \
-              $(BASE_TOOLS_PATH)\Source\Python\Common\String.py \
+              $(BASE_TOOLS_PATH)\Source\Python\Common\StringUtils.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\TargetTxtClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\ToolDefClassObject.py \
               $(BASE_TOOLS_PATH)\Source\Python\Common\VpdInfoFile.py \
@@ -65,9 +56,6 @@ COMMON_PYTHON=$(BASE_TOOLS_PATH)\Source\Python\Common\BuildToolError.py \
               $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\DataClass.py \
               $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\Exceptions.py \
               $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\FdfClass.py \
-              $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\ModuleClass.py \
-              $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\PackageClass.py \
-              $(BASE_TOOLS_PATH)\Source\Python\CommonDataClass\PlatformClass.py \
               $(BASE_TOOLS_PATH)\Source\Python\Table\Table.py \
               $(BASE_TOOLS_PATH)\Source\Python\Table\TableDataModel.py \
               $(BASE_TOOLS_PATH)\Source\Python\Table\TableDec.py \
@@ -119,7 +107,6 @@ CMD_BUILD=$(BASE_TOOLS_PATH)\Source\Python\build\BuildReport.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\EotGlobalData.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\EotToolError.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\FileProfile.py \
-    $(BASE_TOOLS_PATH)\Source\Python\Eot\FvImage.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\InfParserLite.py \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\LzmaCompressor.pyd \
     $(BASE_TOOLS_PATH)\Source\Python\Eot\Parser.py \
@@ -180,7 +167,7 @@ CMD_UPT=$(BASE_TOOLS_PATH)\Source\Python\UPT\Core\DependencyRules.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\Misc.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\ParserValidate.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\Parsing.py \
-    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\String.py \
+    $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\StringUtils.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\UniClassObject.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Library\Xml\XmlRoutines.py \
     $(BASE_TOOLS_PATH)\Source\Python\UPT\Logger\Log.py \

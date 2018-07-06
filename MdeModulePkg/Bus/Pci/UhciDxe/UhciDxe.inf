@@ -1,9 +1,9 @@
 ## @file
-#  The UhciDxe driver is responsible for managing the behavior of UHCI controller. 
+#  The UhciDxe driver is responsible for managing the behavior of UHCI controller.
 #  It implements the interfaces of monitoring the status of all ports and transferring
 #  Control, Bulk, Interrupt and Isochronous requests to Usb1.x device
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -23,7 +23,7 @@
   FILE_GUID                      = 2FB92EFA-2EE0-4bae-9EB6-7464125E1EF7
   MODULE_TYPE                    = UEFI_DRIVER
   VERSION_STRING                 = 1.0
-  
+
   ENTRY_POINT                    = UhciDriverEntryPoint
 
 #
@@ -31,7 +31,7 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC ARM AARCH64
 #
-#  DRIVER_BINDING                =  gUhciDriverBinding                        
+#  DRIVER_BINDING                =  gUhciDriverBinding
 #  COMPONENT_NAME                =  gUhciComponentName
 #  COMPONENT_NAME2               =  gUhciComponentName2
 #

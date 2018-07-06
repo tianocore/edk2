@@ -3,7 +3,7 @@
 #
 #  Capsule library instance for DXE_DRIVER module types.
 #
-#  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution.  The full text of the license may be found at
@@ -51,6 +51,8 @@
   ReportStatusCodeLib
   PrintLib
   HobLib
+  BmpSupportLib
+  DisplayUpdateProgressLib
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleMax                               ## CONSUMES
@@ -65,14 +67,14 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeResettingSystem         ## CONSUMES
 
 [Protocols]
-  gEsrtManagementProtocolGuid             ## CONSUMES
-  gEfiFirmwareManagementProtocolGuid      ## CONSUMES
-  gEdkiiVariableLockProtocolGuid          ## SOMETIMES_CONSUMES
+  gEsrtManagementProtocolGuid                   ## CONSUMES
+  gEfiFirmwareManagementProtocolGuid            ## CONSUMES
+  gEdkiiVariableLockProtocolGuid                ## SOMETIMES_CONSUMES
+  gEdkiiFirmwareManagementProgressProtocolGuid  ## SOMETIMES_CONSUMES
 
 [Guids]
   gEfiFmpCapsuleGuid                      ## SOMETIMES_CONSUMES ## GUID
   gWindowsUxCapsuleGuid                   ## SOMETIMES_CONSUMES ## GUID
-  gEfiSystemResourceTableGuid             ## SOMETIMES_CONSUMES ## GUID
   ## SOMETIMES_CONSUMES ## Variable:L"CapsuleMax"
   ## SOMETIMES_PRODUCES ## Variable:L"CapsuleMax"
   gEfiCapsuleReportGuid

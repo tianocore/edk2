@@ -15,6 +15,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os
 import sys
 import subprocess
@@ -102,7 +103,7 @@ class GenFdsGlobalVariable:
             TargetTxt.LoadTargetTxtFile(BuildConfigurationFile)
             if DataType.TAB_TAT_DEFINES_BUILD_RULE_CONF in TargetTxt.TargetTxtDictionary:
                 BuildRuleFile = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_BUILD_RULE_CONF]
-            if BuildRuleFile in [None, '']:
+            if not BuildRuleFile:
                 BuildRuleFile = 'Conf/build_rule.txt'
             GenFdsGlobalVariable.__BuildRuleDatabase = BuildRule(BuildRuleFile)
             ToolDefinitionFile = TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
@@ -130,7 +131,7 @@ class GenFdsGlobalVariable:
     @staticmethod
     def GetBuildRules(Inf, Arch):
         if not Arch:
-            Arch = 'COMMON'
+            Arch = DataType.TAB_COMMON
 
         if not Arch in GenFdsGlobalVariable.OutputDirDict:
             return {}
@@ -217,7 +218,7 @@ class GenFdsGlobalVariable:
                     FileList.append((File, DataType.TAB_UNKNOWN_FILE))
 
         for File in Inf.Binaries:
-            if File.Target in ['COMMON', '*', GenFdsGlobalVariable.TargetName]:
+            if File.Target in [DataType.TAB_COMMON, '*', GenFdsGlobalVariable.TargetName]:
                 FileList.append((File, File.Type))
 
         for File, FileType in FileList:
@@ -229,7 +230,7 @@ class GenFdsGlobalVariable:
                 Source = SourceList[Index]
                 Index = Index + 1
     
-                if File.IsBinary and File == Source and Inf.Binaries != None and File in Inf.Binaries:
+                if File.IsBinary and File == Source and Inf.Binaries is not None and File in Inf.Binaries:
                     # Skip all files that are not binary libraries
                     if not Inf.LibraryClass:
                         continue            
@@ -288,7 +289,7 @@ class GenFdsGlobalVariable:
 #        GenFdsGlobalVariable.OutputDirDict = OutputDir
         GenFdsGlobalVariable.FdfParser = FdfParser
         GenFdsGlobalVariable.WorkSpace = WorkSpace
-        GenFdsGlobalVariable.FvDir = os.path.join(GenFdsGlobalVariable.OutputDirDict[ArchList[0]], 'FV')
+        GenFdsGlobalVariable.FvDir = os.path.join(GenFdsGlobalVariable.OutputDirDict[ArchList[0]], DataType.TAB_FV_DIRECTORY)
         if not os.path.exists(GenFdsGlobalVariable.FvDir) :
             os.makedirs(GenFdsGlobalVariable.FvDir)
         GenFdsGlobalVariable.FfsDir = os.path.join(GenFdsGlobalVariable.FvDir, 'Ffs')
@@ -340,7 +341,7 @@ class GenFdsGlobalVariable:
         for Arch in ArchList:
             GenFdsGlobalVariable.OutputDirDict[Arch] = os.path.normpath(
                 os.path.join(GlobalData.gWorkspace,
-                             WorkSpace.Db.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch,GlobalData.gGlobalDefines['TARGET'],
+                             WorkSpace.Db.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GlobalData.gGlobalDefines['TARGET'],
                              GlobalData.gGlobalDefines['TOOLCHAIN']].OutputDirectory,
                              GlobalData.gGlobalDefines['TARGET'] +'_' + GlobalData.gGlobalDefines['TOOLCHAIN']))
             GenFdsGlobalVariable.OutputDirFromDscDict[Arch] = os.path.normpath(
@@ -349,7 +350,7 @@ class GenFdsGlobalVariable:
             GenFdsGlobalVariable.PlatformName = WorkSpace.Db.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch,
                                                                       GlobalData.gGlobalDefines['TARGET'],
                                                                       GlobalData.gGlobalDefines['TOOLCHAIN']].PlatformName
-        GenFdsGlobalVariable.FvDir = os.path.join(GenFdsGlobalVariable.OutputDirDict[ArchList[0]], 'FV')
+        GenFdsGlobalVariable.FvDir = os.path.join(GenFdsGlobalVariable.OutputDirDict[ArchList[0]], DataType.TAB_FV_DIRECTORY)
         if not os.path.exists(GenFdsGlobalVariable.FvDir):
             os.makedirs(GenFdsGlobalVariable.FvDir)
         GenFdsGlobalVariable.FfsDir = os.path.join(GenFdsGlobalVariable.FvDir, 'Ffs')
@@ -420,7 +421,7 @@ class GenFdsGlobalVariable:
         if not os.path.exists(Output):
             return True
         # always update "Output" if no "Input" given
-        if Input == None or len(Input) == 0:
+        if Input is None or len(Input) == 0:
             return True
 
         # if fdf file is changed after the 'Output" is generated, update the 'Output'
@@ -439,34 +440,33 @@ class GenFdsGlobalVariable:
 
     @staticmethod
     def GenerateSection(Output, Input, Type=None, CompressionType=None, Guid=None,
-                        GuidHdrLen=None, GuidAttr=[], Ui=None, Ver=None, InputAlign=None, BuildNumber=None, DummyFile=None, IsMakefile=False):
+                        GuidHdrLen=None, GuidAttr=[], Ui=None, Ver=None, InputAlign=[], BuildNumber=None, DummyFile=None, IsMakefile=False):
         Cmd = ["GenSec"]
-        if Type not in [None, '']:
-            Cmd += ["-s", Type]
-        if CompressionType not in [None, '']:
-            Cmd += ["-c", CompressionType]
-        if Guid != None:
-            Cmd += ["-g", Guid]
-        if DummyFile != None:
-            Cmd += ["--dummy", DummyFile]
-        if GuidHdrLen not in [None, '']:
-            Cmd += ["-l", GuidHdrLen]
-        if len(GuidAttr) != 0:
-            #Add each guided attribute
-            for Attr in GuidAttr:
-                Cmd += ["-r", Attr]
-        if InputAlign != None:
-            #Section Align is only for dummy section without section type
-            for SecAlign in InputAlign:
-                Cmd += ["--sectionalign", SecAlign]
+        if Type:
+            Cmd += ("-s", Type)
+        if CompressionType:
+            Cmd += ("-c", CompressionType)
+        if Guid is not None:
+            Cmd += ("-g", Guid)
+        if DummyFile is not None:
+            Cmd += ("--dummy", DummyFile)
+        if GuidHdrLen:
+            Cmd += ("-l", GuidHdrLen)
+        #Add each guided attribute
+        for Attr in GuidAttr:
+            Cmd += ("-r", Attr)
+        #Section Align is only for dummy section without section type
+        for SecAlign in InputAlign:
+            Cmd += ("--sectionalign", SecAlign)
 
         CommandFile = Output + '.txt'
-        if Ui not in [None, '']:
-            #Cmd += ["-n", '"' + Ui + '"']
+        if Ui:
             if IsMakefile:
-                Cmd += ["-n", "$(MODULE_NAME)"]
-                Cmd += ["-o", Output]
-                #SaveFileOnChange(CommandFile, ' '.join(Cmd), False)
+                if Ui == "$(MODULE_NAME)":
+                    Cmd += ('-n', Ui)
+                else:
+                    Cmd += ("-n", '"' + Ui + '"')
+                Cmd += ("-o", Output)
                 if ' '.join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:
                     GenFdsGlobalVariable.SecCmdList.append(' '.join(Cmd).strip())
             else:
@@ -478,11 +478,11 @@ class GenFdsGlobalVariable:
                 GenFdsGlobalVariable.SectionHeader.pack_into(SectionData, 0, Len & 0xff, (Len >> 8) & 0xff, (Len >> 16) & 0xff, 0x15)
                 SaveFileOnChange(Output, SectionData.tostring())
 
-        elif Ver not in [None, '']:
-            Cmd += ["-n", Ver]
+        elif Ver:
+            Cmd += ("-n", Ver)
             if BuildNumber:
-                Cmd += ["-j", BuildNumber]
-            Cmd += ["-o", Output]
+                Cmd += ("-j", BuildNumber)
+            Cmd += ("-o", Output)
 
             SaveFileOnChange(CommandFile, ' '.join(Cmd), False)
             if IsMakefile:
@@ -493,7 +493,7 @@ class GenFdsGlobalVariable:
                     return
                 GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate section")
         else:
-            Cmd += ["-o", Output]
+            Cmd += ("-o", Output)
             Cmd += Input
 
             SaveFileOnChange(CommandFile, ' '.join(Cmd), False)
@@ -509,7 +509,7 @@ class GenFdsGlobalVariable:
 
     @staticmethod
     def GetAlignment (AlignString):
-        if AlignString == None:
+        if AlignString is None:
             return 0
         if AlignString in ("1K", "2K", "4K", "8K", "16K", "32K", "64K", "128K", "256K", "512K"):
             return int (AlignString.rstrip('K')) * 1024
@@ -524,22 +524,22 @@ class GenFdsGlobalVariable:
         Cmd = ["GenFfs", "-t", Type, "-g", Guid]
         mFfsValidAlign = ["0", "8", "16", "128", "512", "1K", "4K", "32K", "64K", "128K", "256K", "512K", "1M", "2M", "4M", "8M", "16M"]
         if Fixed == True:
-            Cmd += ["-x"]
+            Cmd.append("-x")
         if CheckSum:
-            Cmd += ["-s"]
-        if Align not in [None, '']:
+            Cmd.append("-s")
+        if Align:
             if Align not in mFfsValidAlign:
                 Align = GenFdsGlobalVariable.GetAlignment (Align)
                 for index in range(0, len(mFfsValidAlign) - 1):
                     if ((Align > GenFdsGlobalVariable.GetAlignment(mFfsValidAlign[index])) and (Align <= GenFdsGlobalVariable.GetAlignment(mFfsValidAlign[index + 1]))):
                         break
                 Align = mFfsValidAlign[index + 1]
-            Cmd += ["-a", Align]
+            Cmd += ("-a", Align)
 
-        Cmd += ["-o", Output]
+        Cmd += ("-o", Output)
         for I in range(0, len(Input)):
             Cmd += ("-i", Input[I])
-            if SectionAlign not in [None, '', []] and SectionAlign[I] not in [None, '']:
+            if SectionAlign and SectionAlign[I]:
                 Cmd += ("-n", SectionAlign[I])
 
         CommandFile = Output + '.txt'
@@ -547,7 +547,7 @@ class GenFdsGlobalVariable:
 
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
         if MakefilePath:
-            if (tuple(Cmd),tuple(GenFdsGlobalVariable.SecCmdList),tuple(GenFdsGlobalVariable.CopyList)) not in GenFdsGlobalVariable.FfsCmdDict.keys():
+            if (tuple(Cmd), tuple(GenFdsGlobalVariable.SecCmdList), tuple(GenFdsGlobalVariable.CopyList)) not in GenFdsGlobalVariable.FfsCmdDict:
                 GenFdsGlobalVariable.FfsCmdDict[tuple(Cmd), tuple(GenFdsGlobalVariable.SecCmdList), tuple(GenFdsGlobalVariable.CopyList)] = MakefilePath
             GenFdsGlobalVariable.SecCmdList = []
             GenFdsGlobalVariable.CopyList = []
@@ -564,27 +564,27 @@ class GenFdsGlobalVariable:
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
 
         Cmd = ["GenFv"]
-        if BaseAddress not in [None, '']:
-            Cmd += ["-r", BaseAddress]
+        if BaseAddress:
+            Cmd += ("-r", BaseAddress)
 
         if ForceRebase == False:
-            Cmd += ["-F", "FALSE"]
+            Cmd += ("-F", "FALSE")
         elif ForceRebase == True:
-            Cmd += ["-F", "TRUE"]
+            Cmd += ("-F", "TRUE")
 
         if Capsule:
-            Cmd += ["-c"]
+            Cmd.append("-c")
         if Dump:
-            Cmd += ["-p"]
-        if AddressFile not in [None, '']:
-            Cmd += ["-a", AddressFile]
-        if MapFile not in [None, '']:
-            Cmd += ["-m", MapFile]
+            Cmd.append("-p")
+        if AddressFile:
+            Cmd += ("-a", AddressFile)
+        if MapFile:
+            Cmd += ("-m", MapFile)
         if FileSystemGuid:
-            Cmd += ["-g", FileSystemGuid]
-        Cmd += ["-o", Output]
+            Cmd += ("-g", FileSystemGuid)
+        Cmd += ("-o", Output)
         for I in Input:
-            Cmd += ["-i", I]
+            Cmd += ("-i", I)
 
         GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate FV")
 
@@ -595,13 +595,13 @@ class GenFdsGlobalVariable:
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
 
         Cmd = ["GenVtf"]
-        if BaseAddress not in [None, ''] and FvSize not in [None, ''] \
+        if BaseAddress and FvSize \
             and len(BaseAddress) == len(FvSize):
             for I in range(0, len(BaseAddress)):
-                Cmd += ["-r", BaseAddress[I], "-s", FvSize[I]]
-        Cmd += ["-o", Output]
+                Cmd += ("-r", BaseAddress[I], "-s", FvSize[I])
+        Cmd += ("-o", Output)
         for F in Input:
-            Cmd += ["-f", F]
+            Cmd += ("-f", F)
 
         GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate VTF")
 
@@ -615,26 +615,26 @@ class GenFdsGlobalVariable:
 
         Cmd = ["GenFw"]
         if Type.lower() == "te":
-            Cmd += ["-t"]
-        if SubType not in [None, '']:
-            Cmd += ["-e", SubType]
-        if TimeStamp not in [None, '']:
-            Cmd += ["-s", TimeStamp]
-        if Align not in [None, '']:
-            Cmd += ["-a", Align]
-        if Padding not in [None, '']:
-            Cmd += ["-p", Padding]
+            Cmd.append("-t")
+        if SubType:
+            Cmd += ("-e", SubType)
+        if TimeStamp:
+            Cmd += ("-s", TimeStamp)
+        if Align:
+            Cmd += ("-a", Align)
+        if Padding:
+            Cmd += ("-p", Padding)
         if Zero:
-            Cmd += ["-z"]
+            Cmd.append("-z")
         if Strip:
-            Cmd += ["-l"]
+            Cmd.append("-l")
         if Replace:
-            Cmd += ["-r"]
+            Cmd.append("-r")
         if Join:
-            Cmd += ["-j"]
+            Cmd.append("-j")
         if Convert:
-            Cmd += ["-m"]
-        Cmd += ["-o", Output]
+            Cmd.append("-m")
+        Cmd += ("-o", Output)
         Cmd += Input
         if IsMakefile:
             if " ".join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:
@@ -650,18 +650,18 @@ class GenFdsGlobalVariable:
         if len(EfiInput) > 0:
             
             if Compress:
-                Cmd += ["-ec"]
+                Cmd.append("-ec")
             else:
-                Cmd += ["-e"]
+                Cmd.append("-e")
                 
             for EfiFile in EfiInput:
-                Cmd += [EfiFile]
+                Cmd.append(EfiFile)
                 InputList.append (EfiFile)
         
         if len(BinaryInput) > 0:
-            Cmd += ["-b"]
+            Cmd.append("-b")
             for BinFile in BinaryInput:
-                Cmd += [BinFile]
+                Cmd.append(BinFile)
                 InputList.append (BinFile)
 
         # Check List
@@ -669,16 +669,16 @@ class GenFdsGlobalVariable:
             return
         GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, InputList))
                         
-        if ClassCode != None:
-            Cmd += ["-l", ClassCode]
-        if Revision != None:
-            Cmd += ["-r", Revision]
-        if DeviceId != None:
-            Cmd += ["-i", DeviceId]
-        if VendorId != None:
-            Cmd += ["-f", VendorId]
+        if ClassCode is not None:
+            Cmd += ("-l", ClassCode)
+        if Revision is not None:
+            Cmd += ("-r", Revision)
+        if DeviceId is not None:
+            Cmd += ("-i", DeviceId)
+        if VendorId is not None:
+            Cmd += ("-f", VendorId)
 
-        Cmd += ["-o", Output]
+        Cmd += ("-o", Output)
         if IsMakefile:
             if " ".join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:
                 GenFdsGlobalVariable.SecCmdList.append(" ".join(Cmd).strip())
@@ -693,7 +693,7 @@ class GenFdsGlobalVariable:
 
         Cmd = [ToolPath, ]
         Cmd += Options.split(' ')
-        Cmd += ["-o", Output]
+        Cmd += ("-o", Output)
         Cmd += Input
         if IsMakefile:
             if " ".join(Cmd).strip() not in GenFdsGlobalVariable.SecCmdList:
@@ -722,11 +722,11 @@ class GenFdsGlobalVariable:
 
         try:
             PopenObject = subprocess.Popen(' '.join(cmd), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-        except Exception, X:
+        except Exception as X:
             EdkLogger.error("GenFds", COMMAND_FAILURE, ExtraData="%s: %s" % (str(X), cmd[0]))
         (out, error) = PopenObject.communicate()
 
-        while PopenObject.returncode == None :
+        while PopenObject.returncode is None :
             PopenObject.wait()
         if returnValue != [] and returnValue[0] != 0:
             #get command return value
@@ -737,7 +737,7 @@ class GenFdsGlobalVariable:
             GenFdsGlobalVariable.InfLogger (out)
             GenFdsGlobalVariable.InfLogger (error)
             if PopenObject.returncode != 0:
-                print "###", cmd
+                print("###", cmd)
                 EdkLogger.error("GenFds", COMMAND_FAILURE, errorMess)
 
     def VerboseLogger (msg):
@@ -757,8 +757,8 @@ class GenFdsGlobalVariable:
     #   @param  Str           String that may contain macro
     #   @param  MacroDict     Dictionary that contains macro value pair
     #
-    def MacroExtend (Str, MacroDict={}, Arch='COMMON'):
-        if Str == None :
+    def MacroExtend (Str, MacroDict={}, Arch=DataType.TAB_COMMON):
+        if Str is None :
             return None
 
         Dict = {'$(WORKSPACE)'   : GenFdsGlobalVariable.WorkSpaceDir,
@@ -769,15 +769,15 @@ class GenFdsGlobalVariable:
                 '$(SPACE)' : ' '
                }
         OutputDir = GenFdsGlobalVariable.OutputDirFromDscDict[GenFdsGlobalVariable.ArchList[0]]
-        if Arch != 'COMMON' and Arch in GenFdsGlobalVariable.ArchList:
+        if Arch != DataType.TAB_COMMON and Arch in GenFdsGlobalVariable.ArchList:
             OutputDir = GenFdsGlobalVariable.OutputDirFromDscDict[Arch]
 
         Dict['$(OUTPUT_DIRECTORY)'] = OutputDir
 
-        if MacroDict != None  and len (MacroDict) != 0:
+        if MacroDict is not None  and len (MacroDict) != 0:
             Dict.update(MacroDict)
 
-        for key in Dict.keys():
+        for key in Dict:
             if Str.find(key) >= 0 :
                 Str = Str.replace (key, Dict[key])
 
@@ -794,7 +794,7 @@ class GenFdsGlobalVariable:
     #   @param  PcdPattern           pattern that labels a PCD.
     #
     def GetPcdValue (PcdPattern):
-        if PcdPattern == None :
+        if PcdPattern is None :
             return None
         PcdPair = PcdPattern.lstrip('PCD(').rstrip(')').strip().split('.')
         TokenSpace = PcdPair[0]
@@ -807,9 +807,9 @@ class GenFdsGlobalVariable:
             for Key in PcdDict:
                 PcdObj = PcdDict[Key]
                 if (PcdObj.TokenCName == TokenCName) and (PcdObj.TokenSpaceGuidCName == TokenSpace):
-                    if PcdObj.Type != 'FixedAtBuild':
+                    if PcdObj.Type != DataType.TAB_PCDS_FIXED_AT_BUILD:
                         EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not FixedAtBuild type." % PcdPattern)
-                    if PcdObj.DatumType != 'VOID*':
+                    if PcdObj.DatumType != DataType.TAB_VOID:
                         EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not VOID* datum type." % PcdPattern)
                         
                     PcdValue = PcdObj.DefaultValue
@@ -823,9 +823,9 @@ class GenFdsGlobalVariable:
                 for Key in PcdDict:
                     PcdObj = PcdDict[Key]
                     if (PcdObj.TokenCName == TokenCName) and (PcdObj.TokenSpaceGuidCName == TokenSpace):
-                        if PcdObj.Type != 'FixedAtBuild':
+                        if PcdObj.Type != DataType.TAB_PCDS_FIXED_AT_BUILD:
                             EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not FixedAtBuild type." % PcdPattern)
-                        if PcdObj.DatumType != 'VOID*':
+                        if PcdObj.DatumType != DataType.TAB_VOID:
                             EdkLogger.error("GenFds", GENFDS_ERROR, "%s is not VOID* datum type." % PcdPattern)
                             
                         PcdValue = PcdObj.DefaultValue

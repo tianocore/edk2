@@ -1,10 +1,10 @@
 /** @file
   Internal include file of DXE CPU IO Library.
   It includes all necessary protocol/library class's header file
-  for implementation of IoLib library instance. It is included 
+  for implementation of IoLib library instance. It is included
   all source code of this library instance.
-  
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -163,7 +163,7 @@ MmioReadWorker (
                         The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
   @param  Data          The value to write to the I/O port.
-  
+
   @return Data read from registers in the EFI system memory space.
 
 **/

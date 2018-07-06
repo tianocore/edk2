@@ -2,7 +2,7 @@
   DevicePathToText protocol as defined in the UEFI 2.0 specification.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -56,7 +56,7 @@ UefiDevicePathLibCatPrint (
   VA_START (Args, Fmt);
   UnicodeVSPrint (&Str->Str[Str->Count], Str->Capacity - Str->Count * sizeof (CHAR16), Fmt, Args);
   Str->Count += Count;
-  
+
   VA_END (Args);
   return Str->Str;
 }
@@ -435,7 +435,7 @@ DevPathToTextAcpiEx (
 
   //
   // Converts EISA identification to string.
-  // 
+  //
   UnicodeSPrint (
     HIDText,
     sizeof (HIDText),
@@ -1364,7 +1364,7 @@ DevPathToTextIPv6 (
     UefiDevicePathLibCatPrint (Str, L")");
     return ;
   }
-  
+
   UefiDevicePathLibCatPrint (Str, L",");
   CatNetworkProtocol (Str, IPDevPath->Protocol);
 
@@ -1539,18 +1539,20 @@ DevPathToTextiSCSI (
 {
   ISCSI_DEVICE_PATH_WITH_NAME *ISCSIDevPath;
   UINT16                      Options;
+  UINTN                       Index;
 
   ISCSIDevPath = DevPath;
   UefiDevicePathLibCatPrint (
     Str,
-    L"iSCSI(%a,0x%x,0x%lx,",
+    L"iSCSI(%a,0x%x,0x",
     ISCSIDevPath->TargetName,
-    ISCSIDevPath->TargetPortalGroupTag,
-    ISCSIDevPath->Lun
+    ISCSIDevPath->TargetPortalGroupTag
     );
-
+  for (Index = 0; Index < sizeof (ISCSIDevPath->Lun) / sizeof (UINT8); Index++) {
+    UefiDevicePathLibCatPrint (Str, L"%02x", ((UINT8 *)&ISCSIDevPath->Lun)[Index]);
+  }
   Options = ISCSIDevPath->LoginOption;
-  UefiDevicePathLibCatPrint (Str, L"%s,", (((Options >> 1) & 0x0001) != 0) ? L"CRC32C" : L"None");
+  UefiDevicePathLibCatPrint (Str, L",%s,", (((Options >> 1) & 0x0001) != 0) ? L"CRC32C" : L"None");
   UefiDevicePathLibCatPrint (Str, L"%s,", (((Options >> 3) & 0x0001) != 0) ? L"CRC32C" : L"None");
   if (((Options >> 11) & 0x0001) != 0) {
     UefiDevicePathLibCatPrint (Str, L"%s,", L"None");
@@ -1725,7 +1727,7 @@ DevPathToTextDns (
   DnsServerIpCount = (UINT32) (DevicePathNodeLength(DnsDevPath) - sizeof (EFI_DEVICE_PATH_PROTOCOL) - sizeof (DnsDevPath->IsIPv6)) / sizeof (EFI_IP_ADDRESS);
 
   UefiDevicePathLibCatPrint (Str, L"Dns(");
-  
+
   for (DnsServerIpIndex = 0; DnsServerIpIndex < DnsServerIpCount; DnsServerIpIndex++) {
     if (DnsDevPath->IsIPv6 == 0x00) {
       CatIPv4Address (Str, &(DnsDevPath->DnsServerIp[DnsServerIpIndex].v4));
@@ -2407,14 +2409,14 @@ UefiDevicePathLibConvertDevicePathToText (
         UefiDevicePathLibCatPrint (&Str, L"/");
       }
     }
-    
+
     AlignedNode = AllocateCopyPool (DevicePathNodeLength (Node), Node);
     //
     // Print this node of the device path
     //
     ToText (&Str, AlignedNode, DisplayOnly, AllowShortcuts);
     FreePool (AlignedNode);
-    
+
     //
     // Next device path node
     //

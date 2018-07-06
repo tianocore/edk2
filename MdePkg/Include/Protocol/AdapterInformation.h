@@ -3,7 +3,7 @@
   The EFI Adapter Information Protocol is used to dynamically and quickly discover
   or set device information for an adapter.
 
-  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution. The full text of the license may be found at
@@ -59,9 +59,9 @@ typedef struct _EFI_ADAPTER_INFORMATION_PROTOCOL EFI_ADAPTER_INFORMATION_PROTOCO
 ///
 typedef struct {
   ///
-  /// Returns the current media state status. MediaState can have any of the following values: 
-  /// EFI_SUCCESS: There is media attached to the network adapter. EFI_NOT_READY: This detects a bounced state. 
-  /// There was media attached to the network adapter, but it was removed and reattached. EFI_NO_MEDIA: There is 
+  /// Returns the current media state status. MediaState can have any of the following values:
+  /// EFI_SUCCESS: There is media attached to the network adapter. EFI_NOT_READY: This detects a bounced state.
+  /// There was media attached to the network adapter, but it was removed and reattached. EFI_NO_MEDIA: There is
   /// not any media attached to the network.
   ///
   EFI_STATUS                    MediaState;
@@ -140,7 +140,7 @@ typedef struct {
   ///
   /// Returns capability of UNDI to support IPv6 traffic.
   ///
-  BOOLEAN                            Ipv6Support; 
+  BOOLEAN                            Ipv6Support;
 } EFI_ADAPTER_INFO_UNDI_IPV6_SUPPORT;
 
 /**
@@ -148,7 +148,7 @@ typedef struct {
 
   This function returns information of type InformationType from the adapter.
   If an adapter does not support the requested informational type, then
-  EFI_UNSUPPORTED is returned. 
+  EFI_UNSUPPORTED is returned.
 
   @param[in]  This                   A pointer to the EFI_ADAPTER_INFORMATION_PROTOCOL instance.
   @param[in]  InformationType        A pointer to an EFI_GUID that defines the contents of InformationBlock.
@@ -160,8 +160,8 @@ typedef struct {
   @retval EFI_UNSUPPORTED            The InformationType is not known.
   @retval EFI_DEVICE_ERROR           The device reported an error.
   @retval EFI_OUT_OF_RESOURCES       The request could not be completed due to a lack of resources.
-  @retval EFI_INVALID_PARAMETER      This is NULL. 
-  @retval EFI_INVALID_PARAMETER      InformationBlock is NULL. 
+  @retval EFI_INVALID_PARAMETER      This is NULL.
+  @retval EFI_INVALID_PARAMETER      InformationBlock is NULL.
   @retval EFI_INVALID_PARAMETER      InformationBlockSize is NULL.
 
 **/

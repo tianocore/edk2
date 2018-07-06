@@ -2,7 +2,7 @@
   Unicode Collation Support component that hides the trivial difference of Unicode Collation
   and Unicode collation 2 Protocol.
 
-  Copyright (c) 2007 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -83,7 +83,7 @@ InitializeUnicodeCollationSupportWorker (
 
     //
     // Find the best matching matching language from the supported languages
-    // of Unicode Collation (2) protocol. 
+    // of Unicode Collation (2) protocol.
     //
     BestLanguage = GetBestLanguage (
                      Uci->SupportedLanguages,

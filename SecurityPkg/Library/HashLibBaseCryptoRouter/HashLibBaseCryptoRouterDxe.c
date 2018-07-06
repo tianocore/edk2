@@ -3,7 +3,7 @@
   hash handler registerd, such as SHA1, SHA256.
   Platform can use PcdTpm2HashMask to mask some hash engines.
 
-Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -269,16 +269,16 @@ RegisterHashInterfaceLib (
 
   CopyMem (&mHashInterface[mHashInterfaceCount], HashInterface, sizeof(*HashInterface));
   mHashInterfaceCount ++;
-  
+
   return EFI_SUCCESS;
 }
 
 /**
   The constructor function of HashLibBaseCryptoRouterDxe.
-  
+
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor executed correctly.
 
 **/

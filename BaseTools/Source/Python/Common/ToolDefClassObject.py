@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define each component of tools_def.txt file
 #
-# Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -18,15 +18,18 @@ import Common.LongFilePathOs as os
 import re
 import EdkLogger
 
-from Dictionary import *
 from BuildToolError import *
 from TargetTxtClassObject import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.Misc import PathClass
-from Common.String import NormPath
+from Common.StringUtils import NormPath
 import Common.GlobalData as GlobalData
 from Common import GlobalData
 from Common.MultipleWorkspace import MultipleWorkspace as mws
+from DataType import TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG,\
+                     TAB_TOD_DEFINES_TARGET_ARCH, TAB_TOD_DEFINES_COMMAND_TYPE\
+                     , TAB_TOD_DEFINES_FAMILY, TAB_TOD_DEFINES_BUILDRULEFAMILY
+
 
 ##
 # Static variables used for pattern
@@ -53,7 +56,7 @@ class ToolDefClassObject(object):
         for Env in os.environ:
             self.MacroDictionary["ENV(%s)" % Env] = os.environ[Env]
 
-        if FileName != None:
+        if FileName is not None:
             self.LoadToolDefFile(FileName)
 
     ## LoadToolDefFile
@@ -89,7 +92,9 @@ class ToolDefClassObject(object):
 
         KeyList = [TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG, TAB_TOD_DEFINES_TARGET_ARCH, TAB_TOD_DEFINES_COMMAND_TYPE]
         for Index in range(3, -1, -1):
-            for Key in dict(self.ToolsDefTxtDictionary):
+            # make a copy of the keys to enumerate over to prevent issues when
+            # adding/removing items from the original dict.
+            for Key in list(self.ToolsDefTxtDictionary.keys()):
                 List = Key.split('_')
                 if List[Index] == '*':
                     for String in self.ToolsDefTxtDatabase[KeyList[Index]]:
@@ -97,7 +102,6 @@ class ToolDefClassObject(object):
                         NewKey = '%s_%s_%s_%s_%s' % tuple(List)
                         if NewKey not in self.ToolsDefTxtDictionary:
                             self.ToolsDefTxtDictionary[NewKey] = self.ToolsDefTxtDictionary[Key]
-                        continue
                     del self.ToolsDefTxtDictionary[Key]
                 elif List[Index] not in self.ToolsDefTxtDatabase[KeyList[Index]]:
                     del self.ToolsDefTxtDictionary[Key]
@@ -154,7 +158,7 @@ class ToolDefClassObject(object):
                             if ErrorCode != 0:
                                 EdkLogger.error("tools_def.txt parser", FILE_NOT_FOUND, ExtraData=IncFile)
 
-                    if type(IncFileTmp) is PathClass:
+                    if isinstance(IncFileTmp, PathClass):
                         IncFile = IncFileTmp.Path
                     else:
                         IncFile = IncFileTmp

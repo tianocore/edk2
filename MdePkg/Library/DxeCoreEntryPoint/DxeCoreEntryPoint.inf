@@ -1,7 +1,7 @@
 ## @file
 # Module entry point library for DXE core.
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -20,7 +20,7 @@
   FILE_GUID                      = d258d6af-2fc0-4019-9c1f-1101c3dd19b5
   MODULE_TYPE                    = DXE_CORE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DxeCoreEntryPoint|DXE_CORE 
+  LIBRARY_CLASS                  = DxeCoreEntryPoint|DXE_CORE
 
 
 #

@@ -2,14 +2,14 @@
   Main SAL API's defined in Intel Itanium Processor Family System Abstraction
   Layer Specification Revision 3.2 (December 2003)
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -17,16 +17,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define __SAL_API_H__
 
 ///
-/// SAL return status type 
+/// SAL return status type
 ///
 typedef INTN EFI_SAL_STATUS;
 
 ///
-/// Call completed without error. 
+/// Call completed without error.
 ///
 #define EFI_SAL_SUCCESS               ((EFI_SAL_STATUS) 0)
 ///
-/// Call completed without error, but some information was lost due to overflow. 
+/// Call completed without error, but some information was lost due to overflow.
 ///
 #define EFI_SAL_OVERFLOW              ((EFI_SAL_STATUS) 1)
 ///
@@ -34,7 +34,7 @@ typedef INTN EFI_SAL_STATUS;
 ///
 #define EFI_SAL_WARM_BOOT_NEEDED      ((EFI_SAL_STATUS) 2)
 ///
-/// More information is available for retrieval. 
+/// More information is available for retrieval.
 ///
 #define EFI_SAL_MORE_RECORDS          ((EFI_SAL_STATUS) 3)
 ///
@@ -46,15 +46,15 @@ typedef INTN EFI_SAL_STATUS;
 ///
 #define EFI_SAL_INVALID_ARGUMENT      ((EFI_SAL_STATUS) - 2)
 ///
-/// Call completed without error. 
+/// Call completed without error.
 ///
 #define EFI_SAL_ERROR                 ((EFI_SAL_STATUS) - 3)
 ///
-/// Virtual address not registered. 
+/// Virtual address not registered.
 ///
 #define EFI_SAL_VIRTUAL_ADDRESS_ERROR ((EFI_SAL_STATUS) - 4)
 ///
-/// No information available. 
+/// No information available.
 ///
 #define EFI_SAL_NO_INFORMATION        ((EFI_SAL_STATUS) - 5)
 ///
@@ -213,7 +213,7 @@ typedef struct {
 
 //
 // Parameter of EFI_SAL_GET_STATE_INFO, EFI_SAL_GET_STATE_INFO_SIZE, and EFI_SAL_CLEAR_STATE_INFO
-// 
+//
 // Type of information
 //
 #define EFI_SAL_MCA_STATE_INFO  0x0
@@ -345,8 +345,8 @@ typedef struct _SAL_UPDATE_PAL_INFO_BLOCK {
 #pragma pack(1)
 typedef struct {
   ///
-  /// The ASCII string representation of "SST_" that confirms the presence of the table. 
-  /// 
+  /// The ASCII string representation of "SST_" that confirms the presence of the table.
+  ///
   UINT32  Signature;
   ///
   /// The length of the entire table in bytes, starting from offset zero and including the
@@ -470,7 +470,7 @@ typedef struct {
   UINT64  NumberOfProcessors;
   UINT64  LocalIDRegister;
 } SAL_COHERENCE_DOMAIN_INFO;
-           
+
 ///
 /// Format of Purge Translation Cache Coherence Domain Entry.
 ///
@@ -504,7 +504,7 @@ typedef struct {
   UINT8   CheckSum;
 } EFI_SAL_FIT_ENTRY;
 //
-// FIT Types 
+// FIT Types
 //
 #define EFI_SAL_FIT_FIT_HEADER_TYPE                0x00
 #define EFI_SAL_FIT_PAL_B_TYPE                     0x01

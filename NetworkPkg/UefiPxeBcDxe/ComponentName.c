@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for UefiPxeBc driver.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -324,7 +324,7 @@ PxeBcComponentNameGetControllerName (
   if (ControllerHandle == NULL || ChildHandle != NULL) {
     return EFI_UNSUPPORTED;
   }
-  
+
   NicHandle = PxeBcGetNicByIp4Children (ControllerHandle);
   if (NicHandle == NULL) {
     NicHandle = PxeBcGetNicByIp6Children (ControllerHandle);

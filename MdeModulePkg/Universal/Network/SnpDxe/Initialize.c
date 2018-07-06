@@ -1,11 +1,11 @@
 /** @file
- 		Implementation of initializing a network adapter.
+     Implementation of initializing a network adapter.
 
-Copyright (c) 2004 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed 
-and made available under the terms and conditions of the BSD License which 
-accompanies this distribution. The full text of the license may be found at 
-http://opensource.org/licenses/bsd-license.php 
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed
+and made available under the terms and conditions of the BSD License which
+accompanies this distribution. The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
@@ -19,9 +19,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Call UNDI to initialize the interface.
 
   @param  Snp                   Pointer to snp driver structure.
-  @param  CableDetectFlag       Do/don't detect the cable (depending on what 
+  @param  CableDetectFlag       Do/don't detect the cable (depending on what
                                 undi supports).
-  
+
   @retval EFI_SUCCESS           UNDI is initialized successfully.
   @retval EFI_DEVICE_ERROR      UNDI could not be initialized.
   @retval Other                 Other errors as indicated.
@@ -103,17 +103,17 @@ PxeInit (
 
   //
   // There are two fields need to be checked here:
-  // First is the upper two bits (14 & 15) in the CDB.StatFlags field. Until these bits change to report 
+  // First is the upper two bits (14 & 15) in the CDB.StatFlags field. Until these bits change to report
   // PXE_STATFLAGS_COMMAND_COMPLETE or PXE_STATFLAGS_COMMAND_FAILED, the command has not been executed by the UNDI.
-  // Second is the CDB.StatCode field. After command execution completes, either successfully or not, 
+  // Second is the CDB.StatCode field. After command execution completes, either successfully or not,
   // the CDB.StatCode field contains the result of the command execution.
   //
   if ((((Snp->Cdb.StatFlags) & PXE_STATFLAGS_STATUS_MASK) == PXE_STATFLAGS_COMMAND_COMPLETE) &&
       (Snp->Cdb.StatCode == PXE_STATCODE_SUCCESS)) {
     //
-    // If cable detect feature is enabled in CDB.OpFlags, check the CDB.StatFlags to see if there is an 
-    // active connection to this network device. If the no media StatFlag is set, the UNDI and network 
-    // device are still initialized.    
+    // If cable detect feature is enabled in CDB.OpFlags, check the CDB.StatFlags to see if there is an
+    // active connection to this network device. If the no media StatFlag is set, the UNDI and network
+    // device are still initialized.
     //
     if (CableDetectFlag == PXE_OPFLAGS_INITIALIZE_DETECT_CABLE) {
       if(((Snp->Cdb.StatFlags) & PXE_STATFLAGS_INITIALIZED_NO_MEDIA) != PXE_STATFLAGS_INITIALIZED_NO_MEDIA) {
@@ -122,7 +122,7 @@ PxeInit (
         Snp->Mode.MediaPresent = FALSE;
       }
     }
-    
+
     Snp->Mode.State   = EfiSimpleNetworkInitialized;
     Status            = EFI_SUCCESS;
   } else {
@@ -151,8 +151,8 @@ PxeInit (
 
 
 /**
-  Resets a network adapter and allocates the transmit and receive buffers 
-  required by the network interface; optionally, also requests allocation of 
+  Resets a network adapter and allocates the transmit and receive buffers
+  required by the network interface; optionally, also requests allocation of
   additional transmit and receive buffers.
 
   This function allocates the transmit and receive buffers required by the network
@@ -164,8 +164,8 @@ PxeInit (
 
   @param ExtraRxBufferSize  The size, in bytes, of the extra receive buffer space
                             that the driver should allocate for the network interface.
-                            Some network interfaces will not be able to use the 
-                            extra buffer, and the caller will not know if it is 
+                            Some network interfaces will not be able to use the
+                            extra buffer, and the caller will not know if it is
                             actually being used.
   @param ExtraTxBufferSize  The size, in bytes, of the extra transmit buffer space
                             that the driver should allocate for the network interface.

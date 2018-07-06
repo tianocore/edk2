@@ -6,7 +6,7 @@
 # provides debug-agent to periodically gain control during operation of the machine to
 # check for asynchronous commands form the host.
 #
-# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -42,8 +42,6 @@
   Ia32/PlDebugSupport.h
   Ia32/PlDebugSupportIa32.c
   Ia32/AsmFuncs.nasm
-  Ia32/AsmFuncs.S
-  Ia32/AsmFuncs.asm
 
 [Sources.X64]
   Ia32/DebugSupport.h
@@ -51,8 +49,6 @@
   X64/PlDebugSupport.h
   X64/PlDebugSupportX64.c
   X64/AsmFuncs.nasm
-  X64/AsmFuncs.S
-  X64/AsmFuncs.asm
 
 [Sources.IPF]
   Ipf/PlDebugSupport.h

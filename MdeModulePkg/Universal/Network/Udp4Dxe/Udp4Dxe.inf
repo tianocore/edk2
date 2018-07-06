@@ -4,7 +4,7 @@
 #  This module produces EFI UDP(User Datagram Protocol) Protocol upon EFI IPv4
 #  Protocol, to provide basic UDPv4 I/O services.
 #
-#  Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
 #  which accompanies this distribution. The full text of the license may be found at
@@ -30,7 +30,7 @@
 #
 #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
 #
-#  DRIVER_BINDING                =  gUdp4DriverBinding                        
+#  DRIVER_BINDING                =  gUdp4DriverBinding
 #  COMPONENT_NAME                =  gUdp4ComponentName
 #  COMPONENT_NAME2               =  gUdp4ComponentName2
 #

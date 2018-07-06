@@ -23,6 +23,7 @@
 
 [Sources]
   VirtioRng.c
+  VirtioRng.h
 
 [Packages]
   MdePkg/MdePkg.dec

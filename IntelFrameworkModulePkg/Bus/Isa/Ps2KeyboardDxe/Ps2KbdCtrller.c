@@ -1,7 +1,7 @@
 /** @file
   Routines that access 8042 keyboard controller
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -1141,6 +1141,38 @@ UpdateStatusLights (
 }
 
 /**
+  Initialize the key state.
+
+  @param  ConsoleIn     The KEYBOARD_CONSOLE_IN_DEV instance.
+  @param  KeyState      A pointer to receive the key state information.
+**/
+VOID
+InitializeKeyState (
+  IN  KEYBOARD_CONSOLE_IN_DEV *ConsoleIn,
+  OUT EFI_KEY_STATE           *KeyState
+  )
+{
+  KeyState->KeyShiftState  = EFI_SHIFT_STATE_VALID
+                           | (ConsoleIn->LeftCtrl   ? EFI_LEFT_CONTROL_PRESSED  : 0)
+                           | (ConsoleIn->RightCtrl  ? EFI_RIGHT_CONTROL_PRESSED : 0)
+                           | (ConsoleIn->LeftAlt    ? EFI_LEFT_ALT_PRESSED      : 0)
+                           | (ConsoleIn->RightAlt   ? EFI_RIGHT_ALT_PRESSED     : 0)
+                           | (ConsoleIn->LeftShift  ? EFI_LEFT_SHIFT_PRESSED    : 0)
+                           | (ConsoleIn->RightShift ? EFI_RIGHT_SHIFT_PRESSED   : 0)
+                           | (ConsoleIn->LeftLogo   ? EFI_LEFT_LOGO_PRESSED     : 0)
+                           | (ConsoleIn->RightLogo  ? EFI_RIGHT_LOGO_PRESSED    : 0)
+                           | (ConsoleIn->Menu       ? EFI_MENU_KEY_PRESSED      : 0)
+                           | (ConsoleIn->SysReq     ? EFI_SYS_REQ_PRESSED       : 0)
+                           ;
+  KeyState->KeyToggleState = EFI_TOGGLE_STATE_VALID
+                           | (ConsoleIn->CapsLock   ? EFI_CAPS_LOCK_ACTIVE :   0)
+                           | (ConsoleIn->NumLock    ? EFI_NUM_LOCK_ACTIVE :    0)
+                           | (ConsoleIn->ScrollLock ? EFI_SCROLL_LOCK_ACTIVE : 0)
+                           | (ConsoleIn->IsSupportPartialKey ? EFI_KEY_STATE_EXPOSED : 0)
+                           ;
+}
+
+/**
   Get scancode from scancode buffer and translate into EFI-scancode and unicode defined by EFI spec.
 
   The function is always called in TPL_NOTIFY.
@@ -1352,27 +1384,9 @@ KeyGetchar (
   //
   // Save the Shift/Toggle state
   //
-  KeyData.KeyState.KeyShiftState = (UINT32) (EFI_SHIFT_STATE_VALID
-                                 | (ConsoleIn->LeftCtrl   ? EFI_LEFT_CONTROL_PRESSED  : 0)
-                                 | (ConsoleIn->RightCtrl  ? EFI_RIGHT_CONTROL_PRESSED : 0)
-                                 | (ConsoleIn->LeftAlt    ? EFI_LEFT_ALT_PRESSED      : 0)
-                                 | (ConsoleIn->RightAlt   ? EFI_RIGHT_ALT_PRESSED     : 0)
-                                 | (ConsoleIn->LeftShift  ? EFI_LEFT_SHIFT_PRESSED    : 0)
-                                 | (ConsoleIn->RightShift ? EFI_RIGHT_SHIFT_PRESSED   : 0)
-                                 | (ConsoleIn->LeftLogo   ? EFI_LEFT_LOGO_PRESSED     : 0)
-                                 | (ConsoleIn->RightLogo  ? EFI_RIGHT_LOGO_PRESSED    : 0)
-                                 | (ConsoleIn->Menu       ? EFI_MENU_KEY_PRESSED      : 0)
-                                 | (ConsoleIn->SysReq     ? EFI_SYS_REQ_PRESSED       : 0)
-                                 );
-  KeyData.KeyState.KeyToggleState = (EFI_KEY_TOGGLE_STATE) (EFI_TOGGLE_STATE_VALID
-                                  | (ConsoleIn->CapsLock   ? EFI_CAPS_LOCK_ACTIVE :   0)
-                                  | (ConsoleIn->NumLock    ? EFI_NUM_LOCK_ACTIVE :    0)
-                                  | (ConsoleIn->ScrollLock ? EFI_SCROLL_LOCK_ACTIVE : 0)
-                                  | (ConsoleIn->IsSupportPartialKey ? EFI_KEY_STATE_EXPOSED : 0)
-                                  );
-
-  KeyData.Key.ScanCode            = SCAN_NULL;
-  KeyData.Key.UnicodeChar         = CHAR_NULL;
+  InitializeKeyState (ConsoleIn, &KeyData.KeyState);
+  KeyData.Key.ScanCode    = SCAN_NULL;
+  KeyData.Key.UnicodeChar = CHAR_NULL;
 
   //
   // Key Pad "/" shares the same scancode as that of "/" except Key Pad "/" has E0 prefix
@@ -1534,8 +1548,8 @@ InitKeyboard (
     // Exceed the max try times. The device may be error.
     //
     if (TryTime == KEYBOARD_MAX_TRY) {
-    	Status = EFI_DEVICE_ERROR;
-    	goto Done;
+      Status = EFI_DEVICE_ERROR;
+      goto Done;
     }
   }
   //
@@ -1565,7 +1579,7 @@ InitKeyboard (
         KeyboardError (ConsoleIn, L"\n\r");
         goto Done;
       }
-      
+
       Status = KeyboardRead (ConsoleIn, &CommandByte);
       if (EFI_ERROR (Status)) {
         KeyboardError (ConsoleIn, L"\n\r");
@@ -1581,7 +1595,7 @@ InitKeyboard (
       }
     } else {
       mEnableMouseInterface = FALSE;
-    } 
+    }
   } else {
     //
     // 8042 controller is not setup yet:
@@ -1597,13 +1611,13 @@ InitKeyboard (
         KeyboardError (ConsoleIn, L"\n\r");
         goto Done;
       }
-      
+
       Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_DISABLE_MOUSE_INTERFACE);
       if (EFI_ERROR (Status)) {
         KeyboardError (ConsoleIn, L"\n\r");
         goto Done;
       }
-      
+
       REPORT_STATUS_CODE_WITH_DEVICE_PATH (
         EFI_PROGRESS_CODE,
         EFI_PERIPHERAL_KEYBOARD | EFI_P_KEYBOARD_PC_SELF_TEST,
@@ -1617,7 +1631,7 @@ InitKeyboard (
         KeyboardError (ConsoleIn, L"8042 controller command write error!\n\r");
         goto Done;
       }
-      
+
       Status = KeyboardWaitForValue (ConsoleIn, 0x55);
       if (EFI_ERROR (Status)) {
         KeyboardError (ConsoleIn, L"8042 controller self test failed!\n\r");
@@ -1889,7 +1903,7 @@ CheckKeyboardConnect (
                ConsoleIn,
                KEYBOARD_KBEN
                );
-    
+
     if (EFI_ERROR (Status)) {
       return FALSE;
     }
@@ -1903,11 +1917,11 @@ CheckKeyboardConnect (
                KEYBOARD_CMDECHO_ACK
                );
     mWaitForValueTimeOut = WaitForValueTimeOutBcakup;
-    
+
     if (EFI_ERROR (Status)) {
       return FALSE;
     }
-    
+
     return TRUE;
   } else {
     return TRUE;

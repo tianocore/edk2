@@ -1,7 +1,7 @@
 /** @file
   The implementation of construct ENTRY_INDEXER in IpSecConfig application.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -50,7 +50,7 @@ ConstructSpdIndexer (
   if (ValueStr == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Value64 = StrToUInteger (ValueStr, &Status);
   if (!EFI_ERROR (Status)) {
     Indexer->Index = (UINTN) Value64;

@@ -35,12 +35,17 @@
   DebugLib
   DevicePathLib
   MemoryAllocationLib
+  PciCapLib
+  PciCapPciSegmentLib
   PciLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
 [Protocols]
   gEfiPciHotPlugInitProtocolGuid ## ALWAYS_PRODUCES
+
+[Pcd]
+  gUefiOvmfPkgTokenSpaceGuid.PcdOvmfHostBridgePciDevId ## CONSUMES
 
 [Depex]
   TRUE

@@ -1,22 +1,22 @@
 /** @file
   Provides library services to make PAL Calls.
-  
+
   The PAL Library provides a service to make a PAL CALL.  This service is identical
   in functionality to AsmPalCall() in the functions of the Base Library specific to Intel Itanium architecture.
   The only difference is that the PAL Entry Point is not passed in.  Implementations
   of this library class must manage PAL Entry Point on their own.  For example, a PEI
   implementation can use a PPI to lookup the PAL Entry Point, and a DXE implementation
-  can contain a constructor to look up the PAL Entry Point from a HOB.  This library class 
+  can contain a constructor to look up the PAL Entry Point from a HOB.  This library class
   is only available on Intel Itanium-based platforms.
-  
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 

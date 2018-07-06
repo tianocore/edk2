@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -48,12 +48,12 @@ FspGetResourceDescriptorByOwner (
     if (Hob.Header->HobType == EFI_HOB_TYPE_RESOURCE_DESCRIPTOR) {
       if ((Hob.ResourceDescriptor->ResourceType == EFI_RESOURCE_MEMORY_RESERVED) && \
           (CompareGuid (&Hob.ResourceDescriptor->Owner, OwnerGuid))) {
-        return  Hob.ResourceDescriptor;                     
+        return  Hob.ResourceDescriptor;
       }
     }
     Hob.Raw = GET_NEXT_HOB (Hob);
   }
-  
+
   return NULL;
 }
 

@@ -5,13 +5,13 @@
   specific drivers that want to export access to custom hardware storage or
   publish IFR that need to call back the original driver.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -36,14 +36,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 typedef struct _EFI_FORM_CALLBACK_PROTOCOL  EFI_FORM_CALLBACK_PROTOCOL;
 
 ///
-///  Inconsistent with specification here: 
-///  RESET_REQUIRED, EXIT_REQUIRED, SAVE_REQUIRED, NV_CHANGED and NV_NOT_CHANGED are not 
+///  Inconsistent with specification here:
+///  RESET_REQUIRED, EXIT_REQUIRED, SAVE_REQUIRED, NV_CHANGED and NV_NOT_CHANGED are not
 ///  defined in HII specification. These Flags of EFI_IFR_DATA_ENTRY should be defined
 ///  to describe the standard behavior of the browser after the callback.
 ///
 /// If this flag is set, the browser will exit and reset after processing callback results.
 ///
-#define RESET_REQUIRED  1 
+#define RESET_REQUIRED  1
 ///
 /// If this flag is set, the browser will exit after processing callback results.
 ///
@@ -143,12 +143,12 @@ EFI_STATUS
 
   @param  This                  A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
   @param  VariableName          A NULL-terminated Unicode string that is the
-                                name of the vendor's variable. Each VariableName 
-                                is unique for each VendorGuid.  
+                                name of the vendor's variable. Each VariableName
+                                is unique for each VendorGuid.
   @param  VendorGuid            A unique identifier for the vendor.
   @param  Attributes            Attributes bit-mask to set for the variable.
-                                Inconsistent with specification here: 
-                                Attributes data type has been changed from 
+                                Inconsistent with specification here:
+                                Attributes data type has been changed from
                                 UINT32 * to UINT32, because the input parameter is
                                 not necessary to use a pointer date type.
   @param  DataSize              The size in bytes of the Buffer. A size of zero causes
@@ -185,8 +185,8 @@ EFI_STATUS
 
   @param  This                  A pointer to the EFI_FORM_CALLBACK_PROTOCOL instance.
   @param  KeyValue              A unique value which is sent to the original exporting
-                                driver so that it can identify the type of data 
-                                to expect. The format of the data tends to vary based 
+                                driver so that it can identify the type of data
+                                to expect. The format of the data tends to vary based
                                 on the opcode that generated the callback.
   @param  Data                  A pointer to the data being sent to the original exporting driver.
   @param  Packet                A pointer to a packet of information that a driver passes

@@ -1,7 +1,7 @@
 /** @file
   Internal include file of Status Code Runtime DXE Driver.
 
-  Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -87,9 +87,9 @@ ReportDispatcher (
   );
 
 /**
-  Dispatch initialization request to sub status code devices based on 
+  Dispatch initialization request to sub status code devices based on
   customized feature flags.
- 
+
 **/
 VOID
 InitializationDispatcherWorker (
@@ -99,7 +99,7 @@ InitializationDispatcherWorker (
 
 /**
   Locates Serial I/O Protocol as initialization for serial status code worker.
- 
+
   @retval EFI_SUCCESS  Serial I/O Protocol is successfully located.
 
 **/
@@ -111,7 +111,7 @@ EfiSerialStatusCodeInitializeWorker (
 
 /**
   Convert status code value and extended data to readable ASCII string, send string to serial I/O device.
- 
+
   @param  CodeType         Indicates the type of status code being reported.
   @param  Value            Describes the current status of a hardware or software entity.
                            This included information about the class and subclass that is used to
@@ -139,7 +139,7 @@ SerialStatusCodeReportWorker (
 
 /**
   Initialize runtime memory status code table as initialization for runtime memory status code worker
- 
+
   @retval EFI_SUCCESS  Runtime memory status code table successfully initialized.
 
 **/
@@ -149,16 +149,16 @@ RtMemoryStatusCodeInitializeWorker (
   );
 
 /**
-  Report status code into runtime memory. If the runtime pool is full, roll back to the 
+  Report status code into runtime memory. If the runtime pool is full, roll back to the
   first record and overwrite it.
- 
+
   @param  CodeType                Indicates the type of status code being reported.
   @param  Value                   Describes the current status of a hardware or software entity.
                                   This included information about the class and subclass that is used to
                                   classify the entity as well as an operation.
   @param  Instance                The enumeration of a hardware or software entity within
                                   the system. Valid instance numbers start with 1.
- 
+
   @retval EFI_SUCCESS             Status code successfully recorded in runtime memory status code table.
 
 **/

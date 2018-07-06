@@ -2,7 +2,7 @@
   Main file for devices shell Driver1 function.
 
   (C) Copyright 2012-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,19 +19,19 @@
   Get lots of info about a device from its handle.
 
   @param[in] TheHandle       The device handle to get info on.
-  @param[in, out] Type       On successful return R, B, or D (root, bus, or 
+  @param[in, out] Type       On successful return R, B, or D (root, bus, or
                              device) will be placed in this buffer.
-  @param[in, out] Cfg        On successful return this buffer will be 
+  @param[in, out] Cfg        On successful return this buffer will be
                              TRUE if the handle has configuration, FALSE
                              otherwise.
-  @param[in, out] Diag       On successful return this buffer will be 
+  @param[in, out] Diag       On successful return this buffer will be
                              TRUE if the handle has disgnostics, FALSE
                              otherwise.
-  @param[in, out] Parents    On successful return this buffer will be 
+  @param[in, out] Parents    On successful return this buffer will be
                              contain the number of parent handles.
-  @param[in, out] Devices    On successful return this buffer will be 
+  @param[in, out] Devices    On successful return this buffer will be
                              contain the number of devices controlled.
-  @param[in, out] Children   On successful return this buffer will be 
+  @param[in, out] Children   On successful return this buffer will be
                              contain the number of child handles.
   @param[out] Name           The pointer to a buffer that will be allocated
                              and contain the string name of the handle.
@@ -58,7 +58,7 @@ GetDeviceHandleInfo (
   EFI_HANDLE    *HandleBuffer;
   UINTN         Count;
 
-  if (TheHandle == NULL 
+  if (TheHandle == NULL
     || Type == NULL
     || Cfg == NULL
     || Diag == NULL
@@ -168,7 +168,7 @@ ShellCommandRunDevices (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"devices", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDriver1HiiHandle, L"devices", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -182,7 +182,7 @@ ShellCommandRunDevices (
       //
       // error for too many parameters
       //
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devices");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDriver1HiiHandle, L"devices");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
       //
@@ -198,7 +198,7 @@ ShellCommandRunDevices (
 //        AsciiSPrint(Language, 10, "en-us");
       } else {
         ASSERT(Language == NULL);
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devices",  L"-l");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDriver1HiiHandle, L"devices",  L"-l");
         ShellCommandLineFreeVarList (Package);
         return (SHELL_INVALID_PARAMETER);
       }
@@ -253,13 +253,13 @@ ShellCommandRunDevices (
           ShellStatus = SHELL_ABORTED;
           break;
         }
-        
+
       }
 
       if (HandleList != NULL) {
         FreePool(HandleList);
       }
- 
+
     }
     SHELL_FREE_NON_NULL(Language);
     ShellCommandLineFreeVarList (Package);

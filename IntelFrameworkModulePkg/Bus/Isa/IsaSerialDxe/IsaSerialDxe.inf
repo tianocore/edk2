@@ -4,7 +4,7 @@
 # Produces the Serial I/O protocol for standard UARTS using ISA I/O. This driver
 # supports the 8250, 16450, 16550 and 16550A UART types.
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -28,10 +28,10 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
 #
-#  DRIVER_BINDING                =  gSerialControllerDriver                      
-#  COMPONENT_NAME                =  gIsaSerialComponentName                      
+#  DRIVER_BINDING                =  gSerialControllerDriver
+#  COMPONENT_NAME                =  gIsaSerialComponentName
 #  COMPONENT_NAME2               =  gIsaSerialComponentName2
 #
 

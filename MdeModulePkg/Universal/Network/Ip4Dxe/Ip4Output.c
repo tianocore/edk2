@@ -1,7 +1,7 @@
 /** @file
   Transmit the IP4 packet.
-  
-Copyright (c) 2005 - 2015, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -269,16 +269,16 @@ Ip4Output (
     Head->Ver      = 4;
     RawData        = FALSE;
   }
-  
+
   //
   // Call IPsec process.
   //
   Status = Ip4IpSecProcessPacket (
-             IpSb, 
-             &Head, 
-             &Packet, 
-             &Option, 
-             &OptLen, 
+             IpSb,
+             &Head,
+             &Packet,
+             &Option,
+             &OptLen,
              EfiIPsecOutBound,
              Context
              );
@@ -286,7 +286,7 @@ Ip4Output (
   if (EFI_ERROR(Status)) {
     return Status;
   }
-  
+
   Dest = Head->Dst;
   if (IP4_IS_BROADCAST (Ip4GetNetCast (Dest, IpIf)) || (Dest == IP4_ALLONE_ADDRESS)) {
     //
@@ -333,7 +333,7 @@ Ip4Output (
   // OK, selected the source and route, fragment the packet then send
   // them. Tag each fragment other than the first one as spawn from it.
   //
-  Mtu = IpSb->MaxPacketSize + sizeof (IP4_HEAD);  
+  Mtu = IpSb->MaxPacketSize + sizeof (IP4_HEAD);
 
   if (Packet->TotalSize + HeadLen > Mtu) {
     //
@@ -342,7 +342,7 @@ Ip4Output (
     if (RawData) {
       return EFI_BAD_BUFFER_SIZE;
     }
-    
+
     //
     // Packet is fragmented from the tail to the head, that is, the
     // first frame sent is the last fragment of the packet. The first

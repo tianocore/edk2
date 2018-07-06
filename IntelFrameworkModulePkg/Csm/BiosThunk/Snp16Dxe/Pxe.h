@@ -2,12 +2,12 @@
   These are PXE Specification 2.1-compliant data structures and defines.
 
   This file relies upon the existence of a PXE-compliant ROM
-  in memory, as defined by the Preboot Execution Environment 
+  in memory, as defined by the Preboot Execution Environment
   Specification (PXE), Version 2.1, located at
 
   http://developer.intel.com/ial/wfm/wfmspecs.htm
 
-Copyright (c) 1999 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -69,7 +69,7 @@ typedef UINT32  ADDR32;
 
 //
 //    Status codes returned in the status word of PXENV API parameter structures.
-// 
+//
 //    Generic API errors - these do not match up with the M0x or E0x messages
 //    that are reported by the loader.
 //
@@ -92,7 +92,7 @@ typedef enum {
 
 /* Driver errors (0x60 to 0x6F) */
 
-// These errors are for UNDI compatible NIC drivers. 
+// These errors are for UNDI compatible NIC drivers.
 #define PXENV_STATUS_UNDI_INVALID_FUNCTION          0x60
 #define PXENV_STATUS_UNDI_MEDIATEST_FAILED          0x61
 #define PXENV_STATUS_UNDI_CANNOT_INIT_NIC_FOR_MCAST 0x62
@@ -260,7 +260,7 @@ typedef struct {
 
 #define ADDR_LEN                      16
 #define MAXNUM_MCADDR                 8
-#define IPLEN                         4       ///< length of an IP address 
+#define IPLEN                         4       ///< length of an IP address
 #define XMT_DESTADDR                  0x0000  ///< destination address given
 #define XMT_BROADCAST                 0x0001  ///< use broadcast address
 
@@ -288,7 +288,7 @@ typedef struct {
   IN UINT16   Ax;           ///< In: These register fields must be
   IN UINT16   Bx;           ///<     filled in with the same data
   IN UINT16   Dx;           ///<     that was passed to the MLID
-  IN UINT16   Di;           ///<     option ROM boot code by the 
+  IN UINT16   Di;           ///<     option ROM boot code by the
   IN UINT16   Es;           ///<     system BIOS.
 } PXENV_START_UNDI_T;
 
@@ -302,7 +302,7 @@ typedef struct {
 
 typedef struct {
   OUT UINT16  Status;       ///< Out: PXENV_STATUS_xxx
-  
+
   ///
   ///  This is an input parameter and is a 32-bit physical address of
   ///  a memory  copy of the  driver module in  the protocol.ini file
@@ -315,7 +315,7 @@ typedef struct {
   ///  itself.)  This value can be NULL for for any other application
   ///  interfacing to the Universal NIC Driver.
   ///
-  IN UINT32   ProtocolIni; 
+  IN UINT32   ProtocolIni;
   UINT8       Reserved[8];
 } PXENV_UNDI_INITIALIZE_T;
 
@@ -329,23 +329,23 @@ typedef struct {
     Note: The  NIC  driver  does  not  remember  the  multicast
     addresses provided in any  call.    So  the  application  must
     provide the multicast address  list with all  the calls that
-    reset the receive unit of the adapter.  
+    reset the receive unit of the adapter.
   --*/
 typedef struct {
-  OUT UINT16  Status;                     ///< Out: PXENV_STATUS_xxx 
+  OUT UINT16  Status;                     ///< Out: PXENV_STATUS_xxx
 } PXENV_UNDI_SHUTDOWN_T;
 
 typedef struct {
   OUT UINT16                  Status;     ///< Out: PXENV_STATUS_xxx
-  
+
   ///
   ///  This is  an input parameter and is  adapter specific.  This is
   ///  supported  for Universal NDIS 2.0 driver to pass down the Open
   ///  flags  provided  by   the  protocol   driver  (See   NDIS  2.0
-  ///  specifications).  This can be zero.  
-  ///    
-  IN UINT16                   OpenFlag;   ///< In: See description below 
-  IN UINT16                   PktFilter;  ///< In: Filter for receiving 
+  ///  specifications).  This can be zero.
+  ///
+  IN UINT16                   OpenFlag;   ///< In: See description below
+  IN UINT16                   PktFilter;  ///< In: Filter for receiving
 
   /* packet. It takes the following */
 
@@ -355,7 +355,7 @@ typedef struct {
 #define FLTR_DIRECTED 0x0001                ///< directed/multicast
 #define FLTR_BRDCST   0x0002                ///< broadcast packets
 #define FLTR_PRMSCS   0x0004                ///< any packet on LAN
-#define FLTR_SRC_RTG  0x0008                ///< source routing packet 
+#define FLTR_SRC_RTG  0x0008                ///< source routing packet
   IN PXENV_UNDI_MCAST_ADDR_T  McastBuffer;  /* In: */
   /* See t_PXENV_UNDI_MCAST_ADDR. */
 } PXENV_UNDI_OPEN_T;
@@ -370,22 +370,22 @@ typedef struct {
   IN UINT16 ImmedLength;  ///< In: Data buffer length in
 
   /* bytes. */
-  UINT16    XmitOffset;   ///< 16-bit segment & offset of the 
-  UINT16    XmitSegment;  ///< immediate data buffer. 
-  UINT16    DataBlkCount; ///< In: Number of data blocks. 
+  UINT16    XmitOffset;   ///< 16-bit segment & offset of the
+  UINT16    XmitSegment;  ///< immediate data buffer.
+  UINT16    DataBlkCount; ///< In: Number of data blocks.
   struct DataBlk {
-    UINT8   TDPtrType;    ///< 0 => 32 bit Phys pointer in TDDataPtr, not supported in this version of LSA 
+    UINT8   TDPtrType;    ///< 0 => 32 bit Phys pointer in TDDataPtr, not supported in this version of LSA
                           ///< 1 => seg:offser in TDDataPtr which can be a real mode or 16-bit protected mode pointer
-    UINT8   TDRsvdByte;         ///< Reserved, must be zero. 
-    UINT16  TDDataLen;          ///< Data block length in bytes. 
-    UINT16  TDDataPtrOffset;    ///< Far pointer to data buffer. 
-    UINT16  TDDataPtrSegment;   ///< Far pointer to data buffer. 
+    UINT8   TDRsvdByte;         ///< Reserved, must be zero.
+    UINT16  TDDataLen;          ///< Data block length in bytes.
+    UINT16  TDDataPtrOffset;    ///< Far pointer to data buffer.
+    UINT16  TDDataPtrSegment;   ///< Far pointer to data buffer.
   } DataBlock[MAX_DATA_BLKS];
 }
 PXENV_UNDI_TBD_T;
 
 typedef struct {
-  OUT UINT16  Status;           ///< Out: PXENV_STATUS_xxx 
+  OUT UINT16  Status;           ///< Out: PXENV_STATUS_xxx
 
   ///
   ///  This is the protocol  of  the  upper  layer  that  is  calling
@@ -403,9 +403,9 @@ typedef struct {
   ///  destination media  address in the field  DestMediaAddr.  If 1,
   ///  the   NIC  driver   fills  the   broadcast  address   for  the
   ///  destination.
-  ///  
-  IN UINT8    XmitFlag;   
-#define XMT_DESTADDR  0x0000    ///< destination address given 
+  ///
+  IN UINT8    XmitFlag;
+#define XMT_DESTADDR  0x0000    ///< destination address given
 #define XMT_BROADCAST 0x0001    ///< use broadcast address
 
   ///
@@ -415,70 +415,70 @@ typedef struct {
   ///  media address  must be  obtained by  the upper  level protocol
   ///  (with  Address Resolution Protocol) and NIC driver does not do
   ///  any address resolution.
-  ///  
+  ///
   IN UINT16   DestAddrOffset;   ///< 16-bit segment & offset of the
   IN UINT16   DestAddrSegment;  ///< destination media address
 
-  
-  IN UINT16   TBDOffset;  ///< 16-bit segment & offset of the 
-  IN UINT16   TBDSegment; ///< transmit buffer descriptor of type 
 
-  /// XmitBufferDesc  
+  IN UINT16   TBDOffset;  ///< 16-bit segment & offset of the
+  IN UINT16   TBDSegment; ///< transmit buffer descriptor of type
+
+  /// XmitBufferDesc
   IN UINT32   Reserved[2];
 } PXENV_UNDI_TRANSMIT_T;
 
 
 typedef struct {
-  OUT UINT16                  Status;       ///<  Out: PXENV_STATUS_xxx 
-  IN PXENV_UNDI_MCAST_ADDR_T  McastBuffer;  ///<  In: 
+  OUT UINT16                  Status;       ///<  Out: PXENV_STATUS_xxx
+  IN PXENV_UNDI_MCAST_ADDR_T  McastBuffer;  ///<  In:
 } PXENV_UNDI_SET_MCAST_ADDR_T;
 
 typedef struct {
-  OUT UINT16  Status;                   ///< Out: PXENV_STATUS_xxx 
-  IN UINT8    StationAddress[ADDR_LEN]; ///< new address to be set 
+  OUT UINT16  Status;                   ///< Out: PXENV_STATUS_xxx
+  IN UINT8    StationAddress[ADDR_LEN]; ///< new address to be set
 } PXENV_UNDI_SET_STATION_ADDR_T;
 
 typedef struct s_PXENV_UNDI_SET_PACKET_FILTER {
-  OUT UINT16  Status;                   ///< Out: PXENV_STATUS_xxx 
-  IN UINT8    Filter;                   ///< In: Receive filter value. 
+  OUT UINT16  Status;                   ///< Out: PXENV_STATUS_xxx
+  IN UINT8    Filter;                   ///< In: Receive filter value.
 } PXENV_UNDI_SET_PACKET_FILTER_T;
 
 typedef struct {
-  OUT UINT16  Status;       ///< Out: PXENV_STATUS_xxx 
-  OUT UINT16  BaseIo;       ///< Out: Adapter's Base IO 
-  OUT UINT16  IntNumber;    ///< Out: IRQ number 
-  OUT UINT16  MaxTranUnit;  ///< Out: MTU 
-  OUT UINT16  HwType;       ///< Out: type of protocol at hardware level 
+  OUT UINT16  Status;       ///< Out: PXENV_STATUS_xxx
+  OUT UINT16  BaseIo;       ///< Out: Adapter's Base IO
+  OUT UINT16  IntNumber;    ///< Out: IRQ number
+  OUT UINT16  MaxTranUnit;  ///< Out: MTU
+  OUT UINT16  HwType;       ///< Out: type of protocol at hardware level
 
 #define ETHER_TYPE      1
 #define EXP_ETHER_TYPE  2
 #define IEEE_TYPE       6
 #define ARCNET_TYPE     7
-  /*++  
+  /*++
         other numbers can  be obtained from  rfc1010 for "Assigned
         Numbers".  This number may not be validated by the application
         and hence adding new numbers to the list should be fine at any
-        time.  
+        time.
     --*/
-  OUT UINT16  HwAddrLen;                    ///< Out: actual length of hardware address 
+  OUT UINT16  HwAddrLen;                    ///< Out: actual length of hardware address
   OUT UINT8   CurrentNodeAddress[ADDR_LEN]; ///< Out: Current hardware address
   OUT UINT8   PermNodeAddress[ADDR_LEN];    ///< Out: Permanent hardware address
-  OUT UINT16  ROMAddress;                   ///< Out: ROM address 
-  OUT UINT16  RxBufCt;                      ///< Out: receive Queue length    
-  OUT UINT16  TxBufCt;                      ///< Out: Transmit Queue length 
+  OUT UINT16  ROMAddress;                   ///< Out: ROM address
+  OUT UINT16  RxBufCt;                      ///< Out: receive Queue length
+  OUT UINT16  TxBufCt;                      ///< Out: Transmit Queue length
 } PXENV_UNDI_GET_INFORMATION_T;
 
 typedef struct {
-  OUT UINT16  Status;                       ///< Out: PXENV_STATUS_xxx 
-  OUT UINT32  XmtGoodFrames;                ///< Out: No. of good transmissions 
-  OUT UINT32  RcvGoodFrames;                ///< Out: No. of good frames received 
-  OUT UINT32  RcvCRCErrors;                 ///< Out: No. of frames with CRC error 
-  OUT UINT32  RcvResourceErrors;            ///< Out: no. of frames discarded 
+  OUT UINT16  Status;                       ///< Out: PXENV_STATUS_xxx
+  OUT UINT32  XmtGoodFrames;                ///< Out: No. of good transmissions
+  OUT UINT32  RcvGoodFrames;                ///< Out: No. of good frames received
+  OUT UINT32  RcvCRCErrors;                 ///< Out: No. of frames with CRC error
+  OUT UINT32  RcvResourceErrors;            ///< Out: no. of frames discarded
   /* Out: receive Queue full */
 } PXENV_UNDI_GET_STATISTICS_T;
 
 typedef struct {
-  OUT UINT16  Status;               ///< Out: PXENV_STATUS_xxx 
+  OUT UINT16  Status;               ///< Out: PXENV_STATUS_xxx
 } PXENV_UNDI_CLEAR_STATISTICS_T;
 
 typedef struct {
@@ -490,31 +490,31 @@ typedef struct {
 } PXENV_UNDI_FORCE_INTERRUPT_T;
 
 typedef struct {
-  OUT UINT16  Status;               ///< Out: PXENV_STATUS_xxx 
-  IN UINT32   InetAddr;             ///< In: IP Multicast Address 
-  OUT UINT8   MediaAddr[ADDR_LEN];  ///< Out: corresponding hardware 
+  OUT UINT16  Status;               ///< Out: PXENV_STATUS_xxx
+  IN UINT32   InetAddr;             ///< In: IP Multicast Address
+  OUT UINT8   MediaAddr[ADDR_LEN];  ///< Out: corresponding hardware
   /*      multicast address */
 } PXENV_UNDI_GET_MCAST_ADDR_T;
 
 typedef struct {
-    OUT UINT16  Vendor_ID;  ///< OUT: 
-    OUT UINT16  Dev_ID;     ///< OUT: 
-    OUT UINT8   Base_Class; ///< OUT: 
-    OUT UINT8   Sub_Class;  ///< OUT: 
-    OUT UINT8   Prog_Intf;  ///< OUT: program interface 
-    OUT UINT8   Rev;        ///< OUT: Revision number 
-    OUT UINT16  BusDevFunc; ///< OUT: Bus, Device  & Function numbers 
-    OUT UINT16  SubVendor_ID; ///< OUT: 
-    OUT UINT16  SubDevice_ID; ///< OUT: 
+    OUT UINT16  Vendor_ID;  ///< OUT:
+    OUT UINT16  Dev_ID;     ///< OUT:
+    OUT UINT8   Base_Class; ///< OUT:
+    OUT UINT8   Sub_Class;  ///< OUT:
+    OUT UINT8   Prog_Intf;  ///< OUT: program interface
+    OUT UINT8   Rev;        ///< OUT: Revision number
+    OUT UINT16  BusDevFunc; ///< OUT: Bus, Device  & Function numbers
+    OUT UINT16  SubVendor_ID; ///< OUT:
+    OUT UINT16  SubDevice_ID; ///< OUT:
 } PCI_INFO_T;
 
 typedef struct {
-    OUT UINT32  EISA_Dev_ID;  ///< Out: 
-    OUT UINT8   Base_Class;   ///< OUT: 
-    OUT UINT8   Sub_Class;    ///< OUT: 
-    OUT UINT8   Prog_Intf;    ///< OUT: program interface 
-    OUT UINT16  CardSelNum;   ///< OUT: Card Selector Number 
-    OUT UINT8   Reserved;     ///< to make it 10 bytes 
+    OUT UINT32  EISA_Dev_ID;  ///< Out:
+    OUT UINT8   Base_Class;   ///< OUT:
+    OUT UINT8   Sub_Class;    ///< OUT:
+    OUT UINT8   Prog_Intf;    ///< OUT: program interface
+    OUT UINT16  CardSelNum;   ///< OUT: Card Selector Number
+    OUT UINT8   Reserved;     ///< to make it 10 bytes
 } PNP_INFO_T;
 
 
@@ -524,14 +524,14 @@ typedef union {
 } PCI_PNP_INFO_T;
 
 typedef struct {
-  OUT UINT16  Status;         ///< OUT: PXENV_STATUS_xxx 
-  OUT UINT8   NicType;        ///< OUT: 2=PCI, 3=PnP 
+  OUT UINT16  Status;         ///< OUT: PXENV_STATUS_xxx
+  OUT UINT8   NicType;        ///< OUT: 2=PCI, 3=PnP
   PCI_PNP_INFO_T PciPnpInfo;
 } PXENV_UNDI_GET_NIC_TYPE_T;
 
 typedef struct {
-  OUT UINT16  Status;           ///< OUT: PXENV_STATUS_xxx 
-  OUT UINT8   IfaceType[16];    ///< OUT: Type name of MAC, AsciiZ 
+  OUT UINT16  Status;           ///< OUT: PXENV_STATUS_xxx
+  OUT UINT8   IfaceType[16];    ///< OUT: Type name of MAC, AsciiZ
 
   /*      format.  This is used by the */
 
@@ -542,14 +542,14 @@ typedef struct {
   /*      Service specific */
 
   /*      characteristic table */
-  OUT UINT32  LinkSpeed;    ///< OUT: 
-  OUT UINT32  ServiceFlags; ///< OUT: as defined in NDIS Spec 2.0X 
+  OUT UINT32  LinkSpeed;    ///< OUT:
+  OUT UINT32  ServiceFlags; ///< OUT: as defined in NDIS Spec 2.0X
   OUT UINT32  Reserved[4];  ///< OUT: will be filled with 0s till defined
 } PXENV_UNDI_GET_NDIS_INFO_T;
 
 typedef struct {
-  OUT UINT16    Status;   ///< OUT: PXENV_STATUS_xxx 
-  IN OUT UINT16 FuncFlag; ///< In: PXENV_UNDI_ISR_IN_xxx 
+  OUT UINT16    Status;   ///< OUT: PXENV_STATUS_xxx
+  IN OUT UINT16 FuncFlag; ///< In: PXENV_UNDI_ISR_IN_xxx
 
   /* Out: PXENV_UNDI_ISR_OUT_xxx */
   OUT UINT16    BufferLength;
@@ -580,7 +580,7 @@ typedef struct {
      Possible responses from PXENV_UNDI_ISR_IN_START
 
  --*/
-#define PXENV_UNDI_ISR_OUT_OURS 0 ///< This is our interrupt.  Deal  with it. 
+#define PXENV_UNDI_ISR_OUT_OURS 0 ///< This is our interrupt.  Deal  with it.
 #define PXENV_UNDI_ISR_OUT_NOT_OURS 1 ///< This is not our interrupt.
 
 /*++
@@ -589,22 +589,22 @@ typedef struct {
      PXENV_UNDI_ISR_IN_PROCESS
 
 --*/
-#define PXENV_UNDI_ISR_OUT_DONE 0       ///< We are done processing this  interrupt. 
-#define PXENV_UNDI_ISR_OUT_TRANSMIT 2   ///< We completed a transmit interrupt. 
-#define PXENV_UNDI_ISR_OUT_RECEIVE  3   ///< Get data from receive buffer. 
+#define PXENV_UNDI_ISR_OUT_DONE 0       ///< We are done processing this  interrupt.
+#define PXENV_UNDI_ISR_OUT_TRANSMIT 2   ///< We completed a transmit interrupt.
+#define PXENV_UNDI_ISR_OUT_RECEIVE  3   ///< Get data from receive buffer.
 
 #define PXENV_UNDI_ISR_OUT_BUSY     4 /* ? */
 
 typedef struct {
-  UINT16  Status;                     ///< Out: PXENV_STATUS_xxx 
+  UINT16  Status;                     ///< Out: PXENV_STATUS_xxx
 } PXENV_STOP_UNDI_T;
 
-#define PXENV_UNDI_STARTED      1     ///< not even initialized 
-#define PXENV_UNDI_INITIALIZED  2     ///< initialized and closed (not opened) 
-#define PXENV_UNDI_OPENED       3     ///< initialized & opened 
+#define PXENV_UNDI_STARTED      1     ///< not even initialized
+#define PXENV_UNDI_INITIALIZED  2     ///< initialized and closed (not opened)
+#define PXENV_UNDI_OPENED       3     ///< initialized & opened
 
 typedef struct {
-  OUT UINT16  Status;                 ///< Out: PXENV_STATUS_xxx 
+  OUT UINT16  Status;                 ///< Out: PXENV_STATUS_xxx
   UINT16      UNDI_State;
 } PXENV_UNDI_GET_STATE_T;
 

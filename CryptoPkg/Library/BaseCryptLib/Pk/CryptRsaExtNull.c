@@ -7,7 +7,7 @@
   3) RsaCheckKey
   4) RsaPkcs1Sign
 
-Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -55,7 +55,7 @@ RsaGetKey (
   @param[in, out]  RsaContext           Pointer to RSA context being set.
   @param[in]       ModulusLength        Length of RSA modulus N in bits.
   @param[in]       PublicExponent       Pointer to RSA public exponent.
-  @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes. 
+  @param[in]       PublicExponentSize   Size of RSA public exponent buffer in bytes.
 
   @retval FALSE  This interface is not supported.
 

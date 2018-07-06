@@ -1,9 +1,9 @@
 /** @file
-  This driver installs Single Segment Pci Configuration 2 PPI 
-  to provide read, write and modify access to Pci configuration space in PEI phase. 
+  This driver installs Single Segment Pci Configuration 2 PPI
+  to provide read, write and modify access to Pci configuration space in PEI phase.
   To follow PI specification, these services also support access to the unaligned Pci address.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -56,7 +56,7 @@ PciCfgAddressConvert (
 
   @retval EFI_SUCCESS           The function completed successfully.
   @retval EFI_INVALID_PARAMETER The invalid access width.
-  
+
 **/
 EFI_STATUS
 EFIAPI
@@ -157,7 +157,7 @@ PciCfg2Write (
       // Unaligned Pci address access, break up the request into byte by byte.
       //
       PciWrite8 (PciLibAddress, *((UINT8 *) Buffer));
-      PciWrite8 (PciLibAddress + 1, *((UINT8 *) Buffer + 1)); 
+      PciWrite8 (PciLibAddress + 1, *((UINT8 *) Buffer + 1));
     }
   } else if (Width == EfiPeiPciCfgWidthUint32) {
     if ((PciLibAddress & 0x03) == 0) {
@@ -176,9 +176,9 @@ PciCfg2Write (
       // Unaligned Pci address access, break up the request into byte by byte.
       //
       PciWrite8 (PciLibAddress, *((UINT8 *) Buffer));
-      PciWrite8 (PciLibAddress + 1, *((UINT8 *) Buffer + 1)); 
-      PciWrite8 (PciLibAddress + 2, *((UINT8 *) Buffer + 2)); 
-      PciWrite8 (PciLibAddress + 3, *((UINT8 *) Buffer + 3)); 
+      PciWrite8 (PciLibAddress + 1, *((UINT8 *) Buffer + 1));
+      PciWrite8 (PciLibAddress + 2, *((UINT8 *) Buffer + 2));
+      PciWrite8 (PciLibAddress + 3, *((UINT8 *) Buffer + 3));
     }
   } else {
     return EFI_INVALID_PARAMETER;
@@ -292,9 +292,9 @@ EFI_PEI_PPI_DESCRIPTOR gPciCfg2PpiList = {
 };
 
 /**
-  Module's entry function. 
+  Module's entry function.
   This routine will install EFI_PEI_PCI_CFG2_PPI.
-  
+
   @param  FileHandle  Handle of the file being invoked.
   @param  PeiServices Describes the list of possible PEI Services.
 

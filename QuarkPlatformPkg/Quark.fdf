@@ -2,7 +2,7 @@
 # FDF file of Clanton Peak CRB platform with 32-bit DXE
 #
 # This package provides QuarkNcSocId platform specific modules.
-# Copyright (c) 2013 - 2017 Intel Corporation.
+# Copyright (c) 2013 - 2018 Intel Corporation.
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -348,7 +348,7 @@ INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
 INF  UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationPei.inf
 INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
 !if $(MEASURED_BOOT_ENABLE)
-INF  SecurityPkg/Tcg/TrEEConfig/TrEEConfigPei.inf
+INF  SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf
 INF  SecurityPkg/Tcg/TcgPei/TcgPei.inf
 !endif
 
@@ -598,7 +598,7 @@ INF  RuleOverride = DRIVER_ACPITABLE SecurityPkg/Tcg/TcgSmm/TcgSmm.inf
 !endif
 
 !if $(CAPSULE_ENABLE)
-INF  MdeModulePkg/Universal/EsrtDxe/EsrtDxe.inf
+INF  MdeModulePkg/Universal/EsrtFmpDxe/EsrtFmpDxe.inf
 INF  SignedCapsulePkg/Universal/SystemFirmwareUpdate/SystemFirmwareReportDxe.inf
 !endif
 

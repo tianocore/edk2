@@ -1,15 +1,15 @@
 /** @file
   EFI Component Name Protocol as defined in the EFI 1.1 specification.
-  This protocol is used to retrieve user readable names of EFI Drivers 
+  This protocol is used to retrieve user readable names of EFI Drivers
   and controllers managed by EFI Drivers.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -110,7 +110,7 @@ EFI_STATUS
   );
 
 ///
-/// This protocol is used to retrieve user readable names of drivers 
+/// This protocol is used to retrieve user readable names of drivers
 /// and controllers managed by UEFI Drivers.
 ///
 struct _EFI_COMPONENT_NAME_PROTOCOL {
@@ -119,7 +119,7 @@ struct _EFI_COMPONENT_NAME_PROTOCOL {
   ///
   /// A Null-terminated ASCII string that contains one or more
   /// ISO 639-2 language codes. This is the list of language codes
-  /// that this protocol supports.  
+  /// that this protocol supports.
   ///
   CHAR8                                   *SupportedLanguages;
 };

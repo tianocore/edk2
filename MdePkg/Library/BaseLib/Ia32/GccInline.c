@@ -1,7 +1,7 @@
 /** @file
   GCC inline implementation of BaseLib processor specific functions.
-  
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -32,7 +32,7 @@ MemoryFence (
   )
 {
   // This is a little bit of overkill and it is more about the compiler that it is
-  // actually processor synchronization. This is like the _ReadWriteBarrier 
+  // actually processor synchronization. This is like the _ReadWriteBarrier
   // Microsoft specific intrinsic
   __asm__ __volatile__ ("":::"memory");
 }
@@ -65,7 +65,7 @@ EFIAPI
 DisableInterrupts (
   VOID
   )
-{  
+{
   __asm__ __volatile__ ("cli"::: "memory");
 }
 
@@ -128,13 +128,13 @@ AsmReadMsr64 (
   )
 {
   UINT64 Data;
-  
+
   __asm__ __volatile__ (
     "rdmsr"
     : "=A" (Data)   // %0
     : "c"  (Index)  // %1
     );
-    
+
   return Data;
 }
 
@@ -168,7 +168,7 @@ AsmWriteMsr64 (
     : "c" (Index),
       "A" (Value)
     );
-    
+
   return Value;
 }
 
@@ -191,13 +191,13 @@ AsmReadEflags (
   )
 {
   UINTN Eflags;
-  
+
   __asm__ __volatile__ (
     "pushfl     \n\t"
     "popl %0        "
     : "=r" (Eflags)
     );
-    
+
   return Eflags;
 }
 
@@ -220,12 +220,12 @@ AsmReadCr0 (
   )
 {
   UINTN   Data;
-  
+
   __asm__ __volatile__ (
-    "movl %%cr0,%0" 
+    "movl %%cr0,%0"
     : "=a" (Data)
     );
-  
+
   return Data;
 }
 
@@ -247,12 +247,12 @@ AsmReadCr2 (
   )
 {
   UINTN Data;
-  
+
   __asm__ __volatile__ (
-    "movl %%cr2, %0" 
+    "movl %%cr2, %0"
     : "=r" (Data)
     );
-  
+
   return Data;
 }
 
@@ -273,12 +273,12 @@ AsmReadCr3 (
   )
 {
   UINTN Data;
-  
+
   __asm__ __volatile__ (
     "movl %%cr3, %0"
     : "=r" (Data)
     );
-  
+
   return Data;
 }
 
@@ -300,12 +300,12 @@ AsmReadCr4 (
   )
 {
   UINTN Data;
-  
+
   __asm__ __volatile__ (
     "movl %%cr4, %0"
     : "=a" (Data)
     );
-  
+
   return Data;
 }
 
@@ -431,12 +431,12 @@ AsmReadDr0 (
   )
 {
   UINTN Data;
-  
+
   __asm__ __volatile__ (
     "movl %%dr0, %0"
     : "=r" (Data)
     );
-  
+
   return Data;
 }
 
@@ -458,12 +458,12 @@ AsmReadDr1 (
   )
 {
   UINTN Data;
-  
+
   __asm__ __volatile__ (
     "movl %%dr1, %0"
     : "=r" (Data)
     );
-  
+
   return Data;
 }
 
@@ -485,12 +485,12 @@ AsmReadDr2 (
   )
 {
   UINTN Data;
-  
+
   __asm__ __volatile__ (
     "movl %%dr2, %0"
     : "=r" (Data)
     );
-  
+
   return Data;
 }
 
@@ -512,12 +512,12 @@ AsmReadDr3 (
   )
 {
   UINTN Data;
-  
+
   __asm__ __volatile__ (
     "movl %%dr3, %0"
     : "=r" (Data)
     );
-  
+
   return Data;
 }
 
@@ -539,12 +539,12 @@ AsmReadDr4 (
   )
 {
   UINTN Data;
-  
+
   __asm__ __volatile__ (
     "movl %%dr4, %0"
     : "=r" (Data)
     );
-  
+
   return Data;
 }
 
@@ -566,12 +566,12 @@ AsmReadDr5 (
   )
 {
   UINTN Data;
-  
+
   __asm__ __volatile__ (
     "movl %%dr5, %0"
     : "=r" (Data)
     );
-  
+
   return Data;
 }
 
@@ -593,12 +593,12 @@ AsmReadDr6 (
   )
 {
   UINTN Data;
-  
+
   __asm__ __volatile__ (
     "movl %%dr6, %0"
     : "=r" (Data)
     );
-  
+
   return Data;
 }
 
@@ -620,12 +620,12 @@ AsmReadDr7 (
   )
 {
   UINTN Data;
-  
+
   __asm__ __volatile__ (
     "movl %%dr7, %0"
     : "=r" (Data)
     );
-  
+
   return Data;
 }
 
@@ -854,12 +854,12 @@ AsmReadCs (
   )
 {
   UINT16  Data;
-  
+
   __asm__ __volatile__ (
     "mov   %%cs, %0"
     :"=a" (Data)
     );
-    
+
   return Data;
 }
 
@@ -880,12 +880,12 @@ AsmReadDs (
   )
 {
   UINT16  Data;
-  
+
   __asm__ __volatile__ (
     "mov  %%ds, %0"
     :"=a" (Data)
     );
-    
+
   return Data;
 }
 
@@ -906,12 +906,12 @@ AsmReadEs (
   )
 {
   UINT16  Data;
-  
+
   __asm__ __volatile__ (
     "mov  %%es, %0"
     :"=a" (Data)
     );
-    
+
   return Data;
 }
 
@@ -932,12 +932,12 @@ AsmReadFs (
   )
 {
   UINT16  Data;
-  
+
   __asm__ __volatile__ (
     "mov  %%fs, %0"
     :"=a" (Data)
     );
-    
+
   return Data;
 }
 
@@ -958,12 +958,12 @@ AsmReadGs (
   )
 {
   UINT16  Data;
-  
+
   __asm__ __volatile__ (
     "mov  %%gs, %0"
     :"=a" (Data)
     );
-    
+
   return Data;
 }
 
@@ -984,12 +984,12 @@ AsmReadSs (
   )
 {
   UINT16  Data;
-  
+
   __asm__ __volatile__ (
     "mov  %%ds, %0"
     :"=a" (Data)
     );
-    
+
   return Data;
 }
 
@@ -1010,12 +1010,12 @@ AsmReadTr (
   )
 {
   UINT16  Data;
-  
+
   __asm__ __volatile__ (
     "str  %0"
     : "=a" (Data)
     );
-    
+
   return Data;
 }
 
@@ -1062,7 +1062,7 @@ InternalX86WriteGdtr (
     :
     : "m" (*Gdtr)
     );
-    
+
 }
 
 
@@ -1127,12 +1127,12 @@ AsmReadLdtr (
   )
 {
   UINT16  Data;
-  
+
   __asm__ __volatile__ (
     "sldt  %0"
     : "=g" (Data)   // %0
     );
-    
+
   return Data;
 }
 
@@ -1180,7 +1180,7 @@ InternalX86FxSave (
     "fxsave %0"
     :
     : "m" (*Buffer)  // %0
-    );    
+    );
 }
 
 
@@ -1233,7 +1233,7 @@ AsmReadMm0 (
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
     );
-    
+
   return Data;
 }
 
@@ -1263,7 +1263,7 @@ AsmReadMm1 (
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
     );
-    
+
   return Data;
 }
 
@@ -1293,7 +1293,7 @@ AsmReadMm2 (
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
     );
-    
+
   return Data;
 }
 
@@ -1323,7 +1323,7 @@ AsmReadMm3 (
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
     );
-    
+
   return Data;
 }
 
@@ -1353,7 +1353,7 @@ AsmReadMm4 (
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
     );
-    
+
   return Data;
 }
 
@@ -1383,7 +1383,7 @@ AsmReadMm5 (
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
     );
-    
+
   return Data;
 }
 
@@ -1413,7 +1413,7 @@ AsmReadMm6 (
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
     );
-    
+
   return Data;
 }
 
@@ -1443,7 +1443,7 @@ AsmReadMm7 (
     "pop  %%edx          \n\t"
     : "=A"  (Data)       // %0
     );
-    
+
   return Data;
 }
 
@@ -1465,7 +1465,7 @@ AsmWriteMm0 (
 {
   __asm__ __volatile__ (
     "movq %0, %%mm0"  // %0
-    :  
+    :
     : "m" (Value)
     );
 }
@@ -1488,7 +1488,7 @@ AsmWriteMm1 (
 {
   __asm__ __volatile__ (
     "movq %0, %%mm1"  // %0
-    :  
+    :
     : "m" (Value)
     );
 }
@@ -1511,7 +1511,7 @@ AsmWriteMm2 (
 {
   __asm__ __volatile__ (
     "movq %0, %%mm2"  // %0
-    :  
+    :
     : "m" (Value)
     );
 }
@@ -1534,7 +1534,7 @@ AsmWriteMm3 (
 {
   __asm__ __volatile__ (
     "movq %0, %%mm3"  // %0
-    :  
+    :
     : "m" (Value)
     );
 }
@@ -1557,7 +1557,7 @@ AsmWriteMm4 (
 {
   __asm__ __volatile__ (
     "movq %0, %%mm4"  // %0
-    :  
+    :
     : "m" (Value)
     );
 }
@@ -1580,7 +1580,7 @@ AsmWriteMm5 (
 {
   __asm__ __volatile__ (
     "movq %0, %%mm5"  // %0
-    :  
+    :
     : "m" (Value)
     );
 }
@@ -1603,7 +1603,7 @@ AsmWriteMm6 (
 {
   __asm__ __volatile__ (
     "movq %0, %%mm6"  // %0
-    :  
+    :
     : "m" (Value)
     );
 }
@@ -1626,7 +1626,7 @@ AsmWriteMm7 (
 {
   __asm__ __volatile__ (
     "movq %0, %%mm7"  // %0
-    :  
+    :
     : "m" (Value)
     );
 }
@@ -1648,13 +1648,13 @@ AsmReadTsc (
   )
 {
   UINT64  Data;
-  
+
   __asm__ __volatile__ (
     "rdtsc"
     : "=A" (Data)
     );
-  
-  return Data;  
+
+  return Data;
 }
 
 
@@ -1676,14 +1676,14 @@ AsmReadPmc (
   )
 {
   UINT64  Data;
-  
+
   __asm__ __volatile__ (
     "rdpmc"
     : "=A" (Data)
     : "c"  (Index)
     );
-  
-  return Data;  
+
+  return Data;
 }
 
 
@@ -1720,7 +1720,7 @@ AsmInvd (
   )
 {
   __asm__ __volatile__ ("invd":::"memory");
-    
+
 }
 
 
@@ -1748,7 +1748,7 @@ AsmFlushCacheLine (
   UINT32  RegEdx;
 
   //
-  // If the CPU does not support CLFLUSH instruction, 
+  // If the CPU does not support CLFLUSH instruction,
   // then promote flush range to flush entire cache.
   //
   AsmCpuid (0x01, NULL, NULL, NULL, &RegEdx);
@@ -1760,11 +1760,11 @@ AsmFlushCacheLine (
 
   __asm__ __volatile__ (
     "clflush (%0)"
-    : "+a" (LinearAddress) 
-    : 
+    : "+a" (LinearAddress)
+    :
     : "memory"
     );
-    
+
   return LinearAddress;
 }
 

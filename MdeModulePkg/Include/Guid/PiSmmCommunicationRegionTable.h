@@ -1,12 +1,12 @@
 /** @file
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -25,14 +25,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // This table is installed to UEFI configuration table by generic driver
 // or platform driver, at early DXE phase.
-// 
+//
 // The EFI_MEMORY_DESCRIPTOR entry must contain at least one entry.
 // The entries must be normal memory region in EfiReservedMemoryType, EfiACPIMemoryNVS,
 // or EfiRuntimeServicesData.
 // If the Entry.Type is EfiConventionalMemory, it means this entry is free to use.
 // If the Entry.Type is other, it means this entry is occupied.
 //
-// Any non-SMM component may put communication data there, then use 
+// Any non-SMM component may put communication data there, then use
 // UEFI defined SMM Communication ACPI Table, or PI defined EFI_SMM_COMMUNICATION_PROTOCOL
 // to communicate with SMI handler. The process is:
 // 1) Find an entry whose type is EfiConventional.

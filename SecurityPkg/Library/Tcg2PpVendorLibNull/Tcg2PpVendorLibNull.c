@@ -1,13 +1,13 @@
 /** @file
   NULL Tcg2 PP Vendor library instance that does not support any vendor specific PPI.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -19,9 +19,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   Check and execute the requested physical presence command.
 
   This API should be invoked in BIOS boot phase to process pending request.
-  
+
   Caution: This function may receive untrusted input.
-  
+
   If OperationRequest < 128, then ASSERT().
 
   @param[in]      PlatformAuth     platform auth value. NULL means no platform auth change.
@@ -50,7 +50,7 @@ Tcg2PpVendorLibExecutePendingRequest (
   Check if there is a valid physical presence command request.
 
   This API should be invoked in BIOS boot phase to process pending request.
-  
+
   Caution: This function may receive untrusted input.
 
   If OperationRequest < 128, then ASSERT().
@@ -84,7 +84,7 @@ Tcg2PpVendorLibHasValidRequest (
   This API should be invoked in OS runtime phase to interface with ACPI method.
 
   Caution: This function may receive untrusted input.
-  
+
   If OperationRequest < 128, then ASSERT().
 
   @param[in]      OperationRequest TPM physical presence operation request.
@@ -113,7 +113,7 @@ Tcg2PpVendorLibSubmitRequestToPreOSFunction (
   This API should be invoked in OS runtime phase to interface with ACPI method.
 
   Caution: This function may receive untrusted input.
-  
+
   If OperationRequest < 128, then ASSERT().
 
   @param[in]      OperationRequest TPM physical presence operation request.

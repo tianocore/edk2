@@ -1,14 +1,14 @@
 /** @file
   ISA ACPI Protocol Implementation
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials                          
-are licensed and made available under the terms and conditions of the BSD License         
-which accompanies this distribution.  The full text of the license may be found at        
-http://opensource.org/licenses/bsd-license.php                                            
-                                                                                          
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
+http://opensource.org/licenses/bsd-license.php
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "PcatIsaAcpi.h"
@@ -146,7 +146,7 @@ InitializePcatIsaAcpiDeviceList (
 /**
   Enumerate the ISA devices on the ISA bus.
 
-  @param Device             Point to device ID instance 
+  @param Device             Point to device ID instance
   @param IsaAcpiDevice      On return, point to resource data for Isa device
   @param NextIsaAcpiDevice  On return, point to resource data for next Isa device
 **/
@@ -167,7 +167,7 @@ IsaDeviceLookup (
     Index = 0;
   } else {
     for(Index = 0; gPcatIsaAcpiDeviceList[Index].ResourceItem != NULL; Index++) {
-      if (Device->HID == gPcatIsaAcpiDeviceList[Index].Device.HID && 
+      if (Device->HID == gPcatIsaAcpiDeviceList[Index].Device.HID &&
           Device->UID == gPcatIsaAcpiDeviceList[Index].Device.UID    ) {
         break;
       }
@@ -188,7 +188,7 @@ IsaDeviceLookup (
 
 
   @param This            Point to instance of EFI_ISA_ACPI_PROTOCOL
-  @param Device          Point to device ID instance 
+  @param Device          Point to device ID instance
 
   @retval EFI_NOT_FOUND  Can not found the next Isa device.
   @retval EFI_SUCCESS    Success retrieve the next Isa device for enumration.
@@ -217,7 +217,7 @@ IsaDeviceEnumerate (
 
 
   @param This            Point to instance of EFI_ISA_ACPI_PROTOCOL
-  @param Device          Point to device ID instance 
+  @param Device          Point to device ID instance
   @param OnOff           TRUE for setting isa device power on,
                          FALSE for setting isa device power off
 
@@ -232,13 +232,13 @@ IsaDeviceSetPower (
   )
 {
   return EFI_SUCCESS;
-} 
+}
 
 /**
   Get current resource for the specific ISA device.
 
   @param This            Point to instance of EFI_ISA_ACPI_PROTOCOL
-  @param Device          Point to device ID instance 
+  @param Device          Point to device ID instance
   @param ResourceList    On return, point to resources instances for given isa device
 
   @retval EFI_NOT_FOUND Can not found the resource instance for given isa device
@@ -248,7 +248,7 @@ EFI_STATUS
 EFIAPI
 IsaGetCurrentResource (
   IN  EFI_ISA_ACPI_PROTOCOL       *This,
-  IN  EFI_ISA_ACPI_DEVICE_ID      *Device,  
+  IN  EFI_ISA_ACPI_DEVICE_ID      *Device,
   OUT EFI_ISA_ACPI_RESOURCE_LIST  **ResourceList
   )
 {
@@ -261,9 +261,9 @@ IsaGetCurrentResource (
 
 /**
   Get possible resource for the specific ISA device.
-  
+
   @param This            Point to instance of EFI_ISA_ACPI_PROTOCOL
-  @param Device          Point to device ID instance 
+  @param Device          Point to device ID instance
   @param ResourceList    On return, point to resources instances for given isa device
 
   @retval EFI_SUCCESS   Success to get resource instance for given isa device.
@@ -272,7 +272,7 @@ EFI_STATUS
 EFIAPI
 IsaGetPossibleResource (
   IN  EFI_ISA_ACPI_PROTOCOL       *This,
-  IN  EFI_ISA_ACPI_DEVICE_ID      *Device,  
+  IN  EFI_ISA_ACPI_DEVICE_ID      *Device,
   OUT EFI_ISA_ACPI_RESOURCE_LIST  **ResourceList
   )
 {
@@ -283,7 +283,7 @@ IsaGetPossibleResource (
   Set resource for the specific ISA device.
 
   @param This            Point to instance of EFI_ISA_ACPI_PROTOCOL
-  @param Device          Point to device ID instance 
+  @param Device          Point to device ID instance
   @param ResourceList    Point to resources instances for given isa device
 
   @return EFI_SUCCESS  Success to set resource.
@@ -293,18 +293,18 @@ EFI_STATUS
 EFIAPI
 IsaSetResource (
   IN EFI_ISA_ACPI_PROTOCOL       *This,
-  IN EFI_ISA_ACPI_DEVICE_ID      *Device,  
+  IN EFI_ISA_ACPI_DEVICE_ID      *Device,
   IN EFI_ISA_ACPI_RESOURCE_LIST  *ResourceList
   )
 {
   return EFI_SUCCESS;
 }
-        
+
 /**
   Enable/Disable the specific ISA device.
 
   @param This            Point to instance of EFI_ISA_ACPI_PROTOCOL
-  @param Device          Point to device ID instance 
+  @param Device          Point to device ID instance
   @param Enable          Enable/Disable
 
   @return EFI_SUCCESS  Success to enable/disable.
@@ -318,14 +318,14 @@ IsaEnableDevice (
   IN BOOLEAN                 Enable
   )
 {
-  return EFI_SUCCESS;  
+  return EFI_SUCCESS;
 }
 
 /**
   Initialize the specific ISA device.
 
   @param This            Point to instance of EFI_ISA_ACPI_PROTOCOL
-  @param Device          Point to device ID instance 
+  @param Device          Point to device ID instance
 
   @return EFI_SUCCESS  Success to initialize.
 
@@ -353,7 +353,7 @@ EFI_STATUS
 EFIAPI
 IsaInterfaceInit (
   IN EFI_ISA_ACPI_PROTOCOL  *This
-)  
+)
 {
   return EFI_SUCCESS;
-}  
+}

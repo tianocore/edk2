@@ -1,7 +1,7 @@
 /** @file
   PKCS#7 SignedData Sign Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -121,7 +121,7 @@ Pkcs7Sign (
   }
 
   //
-  // Convert the data to be signed to BIO format. 
+  // Convert the data to be signed to BIO format.
   //
   DataBio = BIO_new (BIO_s_mem ());
   if (DataBio == NULL) {

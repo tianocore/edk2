@@ -4,7 +4,7 @@
   This library is for use ONLY by shell commands linked into the shell application.
   This library will not function if it is used for UEFI Shell 2.0 Applications.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
   This program and the accompanying materials
@@ -507,10 +507,10 @@ ShellCommandConsistMappingUnInitialize (
   );
 
 /**
-  Create a consistent mapped name for the device specified by DevicePath 
+  Create a consistent mapped name for the device specified by DevicePath
   based on the Table.
 
-  This must be called after ShellCommandConsistMappingInitialize() and 
+  This must be called after ShellCommandConsistMappingInitialize() and
   before ShellCommandConsistMappingUnInitialize() is called.
 
   @param[in] DevicePath   The pointer to the dev path for the device.

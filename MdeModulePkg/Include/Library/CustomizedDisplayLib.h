@@ -1,13 +1,13 @@
 /** @file
   This library class defines a set of interfaces to customize Display module
 
-Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                            
+http://opensource.org/licenses/bsd-license.php.
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -38,14 +38,14 @@ Statement
 **/
 
 /**
-  This funtion defines Page Frame and Backgroud. 
-  
-  Based on the above layout, it will be responsible for HeaderHeight, FooterHeight, 
-  StatusBarHeight and Backgroud. And, it will reserve Screen for Statement. 
+  This funtion defines Page Frame and Backgroud.
+
+  Based on the above layout, it will be responsible for HeaderHeight, FooterHeight,
+  StatusBarHeight and Backgroud. And, it will reserve Screen for Statement.
 
   @param[in]  FormData             Form Data to be shown in Page.
   @param[out] ScreenForStatement   Screen to be used for Statement. (Prompt, Value and Help)
-  
+
   @return Status
 **/
 EFI_STATUS
@@ -59,7 +59,7 @@ DisplayPageFrame (
   Clear Screen to the initial state.
 **/
 VOID
-EFIAPI 
+EFIAPI
 ClearDisplayPage (
   VOID
   );
@@ -68,8 +68,8 @@ ClearDisplayPage (
   This function updates customized key panel's help information.
   The library will prepare those Strings for the basic key, ESC, Enter, Up/Down/Left/Right, +/-.
   and arrange them in Footer panel.
-  
-  @param[in]  FormData       Form Data to be shown in Page. FormData has the highlighted statement. 
+
+  @param[in]  FormData       Form Data to be shown in Page. FormData has the highlighted statement.
   @param[in]  Statement      The statement current selected.
   @param[in]  Selected       Whether or not a tag be selected. TRUE means Enter has hit this question.
 **/
@@ -84,10 +84,10 @@ RefreshKeyHelp (
 /**
   Update status bar.
 
-  This function updates the status bar on the bottom of menu screen. It just shows StatusBar. 
+  This function updates the status bar on the bottom of menu screen. It just shows StatusBar.
   Original logic in this function should be splitted out.
 
-  @param[in]  MessageType            The type of message to be shown. InputError or Configuration Changed. 
+  @param[in]  MessageType            The type of message to be shown. InputError or Configuration Changed.
   @param[in]  State                  Show or Clear Message.
 **/
 VOID
@@ -98,13 +98,13 @@ UpdateStatusBar (
   );
 
 /**
-  Create popup window. 
+  Create popup window.
 
   This function draws OEM/Vendor specific pop up windows.
 
   @param[out]  Key    User Input Key
   @param       ...    String to be shown in Popup. The variable argument list is terminated by a NULL.
-  
+
 **/
 VOID
 EFIAPI
@@ -114,8 +114,8 @@ CreateDialog (
   );
 
 /**
-  Confirm how to handle the changed data. 
-  
+  Confirm how to handle the changed data.
+
   @return Action BROWSER_ACTION_SUBMIT, BROWSER_ACTION_DISCARD or other values.
 **/
 UINTN
@@ -127,7 +127,7 @@ ConfirmDataChange (
 /**
   OEM specifies whether Setup exits Page by ESC key.
 
-  This function customized the behavior that whether Setup exits Page so that 
+  This function customized the behavior that whether Setup exits Page so that
   system able to boot when configuration is not changed.
 
   @retval  TRUE     Exits FrontPage
@@ -140,14 +140,14 @@ FormExitPolicy (
   );
 
 /**
-  Set Timeout value for a ceratain Form to get user response. 
-  
+  Set Timeout value for a ceratain Form to get user response.
+
   This function allows to set timeout value on a ceratain form if necessary.
-  If timeout is not zero, the form will exit if user has no response in timeout. 
-  
+  If timeout is not zero, the form will exit if user has no response in timeout.
+
   @param[in]  FormData   Form Data to be shown in Page
 
-  @return 0     No timeout for this form. 
+  @return 0     No timeout for this form.
   @return > 0   Timeout value in 100 ns units.
 **/
 UINT64
@@ -186,8 +186,8 @@ PrintStringAt (
   @param  Column     The cursor position to print the string at. When it is -1, use current Position.
   @param  Row        The cursor position to print the string at. When it is -1, use current Position.
   @param  String     String pointer.
-  @param  Width      Width for String to be printed. If the print length of String < Width, 
-                     Space char (L' ') will be used to append String. 
+  @param  Width      Width for String to be printed. If the print length of String < Width,
+                     Space char (L' ') will be used to append String.
 
   @return Length of string printed to the console
 

@@ -1,9 +1,9 @@
 ## @file
 #  This driver produces UEFI PLATFORM_DRIVER_OVERRIDE_PROTOCOL if this protocol doesn't exist.
 #  It doesn't install again if this protocol exists.
-#  It only implements one interface GetDriver of PLATFORM_DRIVER_OVERRIDE_PROTOCOL protocol 
-#  and doesn't support other two interfaces GetDriverPath, DriverLoaded. 
-# 
+#  It only implements one interface GetDriver of PLATFORM_DRIVER_OVERRIDE_PROTOCOL protocol
+#  and doesn't support other two interfaces GetDriverPath, DriverLoaded.
+#
 #  This driver also offers an UI interface in device manager to let user configure
 #  platform override protocol to override the default algorithm for matching
 #  drivers to controllers.
@@ -13,12 +13,12 @@
 #  2. It dynamicly locate all drivers which support binding protocol.
 #  3. It export and dynamicly update two menu to let user select the
 #     mapping between drivers to controllers.
-#  4. It save all the mapping info in NV variables for the following boot, 
+#  4. It save all the mapping info in NV variables for the following boot,
 #     which will be consumed by GetDriver API of the produced the platform override protocol.
 #
 # Caution: This module is a sample implementation for the test purpose.
 #
-# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -70,8 +70,8 @@
   DevicePathLib
   DxeServicesTableLib
   UefiRuntimeServicesTableLib
-  PrintLib 
-   
+  PrintLib
+
 [Guids]
   #
   # This GUID C Name is not required for build since it is from UefiLib and not directly used by this module source.

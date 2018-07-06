@@ -1,7 +1,7 @@
 ## @file
 # Collect all defined strings in multiple uni files.
 #
-# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -14,6 +14,7 @@
 """
 Collect all defined strings in multiple uni files
 """
+from __future__ import print_function
 
 ##
 # Import Modules
@@ -23,7 +24,7 @@ import distutils.util
 from Logger import ToolError
 from Logger import Log as EdkLogger
 from Logger import StringTable as ST
-from Library.String import GetLineNo
+from Library.StringUtils import GetLineNo
 from Library.Misc import PathClass
 from Library.Misc import GetCharIndexOutStr
 from Library import DataType as DT
@@ -46,8 +47,6 @@ LF = u'\u000A'
 NULL = u'\u0000'
 TAB = u'\t'
 BACK_SPLASH = u'\\'
-
-gINCLUDE_PATTERN = re.compile("^!include[\s]+([\S]+)[\s]*$", re.MULTILINE | re.UNICODE)
 
 gLANG_CONV_TABLE = {'eng':'en', 'fra':'fr', \
                  'aar':'aa', 'abk':'ab', 'ave':'ae', 'afr':'af', 'aka':'ak', 'amh':'am', \
@@ -163,7 +162,7 @@ def GetLanguageCode1766(LangName, File=None):
             for Key in gLANG_CONV_TABLE.keys():
                 if gLANG_CONV_TABLE.get(Key) == LangName[0:2].lower():
                     return Key
-        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) == None and LangName[3] == '-':
+        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) is None and LangName[3] == '-':
             for Key in gLANG_CONV_TABLE.keys():
                 if Key == LangName[0:3].lower():
                     return Key
@@ -188,7 +187,7 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
     if IsCompatibleMode:
         if length == 3 and LangName.isalpha():
             TempLangName = gLANG_CONV_TABLE.get(LangName.lower())
-            if TempLangName != None:
+            if TempLangName is not None:
                 return TempLangName
             return LangName
         else:
@@ -202,7 +201,7 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
         if LangName.isalpha():
             return LangName
     elif length == 3:
-        if LangName.isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) == None:
+        if LangName.isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) is None:
             return LangName
     elif length == 5:
         if LangName[0:2].isalpha() and LangName[2] == '-':
@@ -210,7 +209,7 @@ def GetLanguageCode(LangName, IsCompatibleMode, File):
     elif length >= 6:
         if LangName[0:2].isalpha() and LangName[2] == '-':
             return LangName
-        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) == None and LangName[3] == '-':
+        if LangName[0:3].isalpha() and gLANG_CONV_TABLE.get(LangName.lower()) is None and LangName[3] == '-':
             return LangName
 
     EdkLogger.Error("Unicode File Parser", 
@@ -272,14 +271,14 @@ class StringDefClassObject(object):
         self.UseOtherLangDef = UseOtherLangDef
         self.Length = 0
 
-        if Name != None:
+        if Name is not None:
             self.StringName = Name
             self.StringNameByteList = UniToHexList(Name)
-        if Value != None:
+        if Value is not None:
             self.StringValue = Value
             self.StringValueByteList = UniToHexList(self.StringValue)
             self.Length = len(self.StringValueByteList)
-        if Token != None:
+        if Token is not None:
             self.Token = Token
 
     def __str__(self):
@@ -290,7 +289,7 @@ class StringDefClassObject(object):
                repr(self.UseOtherLangDef)
 
     def UpdateValue(self, Value = None):
-        if Value != None:
+        if Value is not None:
             if self.StringValue:
                 self.StringValue = self.StringValue + '\r\n' + Value
             else:
@@ -329,9 +328,9 @@ class UniFileClassObject(object):
         if len(Lang) != 3:
             try:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').readlines()
-            except UnicodeError, Xstr:
+            except UnicodeError as Xstr:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16').readlines()
-            except UnicodeError, Xstr:
+            except UnicodeError as Xstr:
                 FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16_le').readlines()
             except:
                 EdkLogger.Error("Unicode File Parser", 
@@ -395,7 +394,7 @@ class UniFileClassObject(object):
         # Check the string name is the upper character
         if Name != '':
             MatchString = re.match('[A-Z0-9_]+', Name, re.UNICODE)
-            if MatchString == None or MatchString.end(0) != len(Name):
+            if MatchString is None or MatchString.end(0) != len(Name):
                 EdkLogger.Error("Unicode File Parser", 
                              ToolError.FORMAT_INVALID,
                              'The string token name %s in UNI file %s must be upper case character.' %(Name, self.File))
@@ -438,7 +437,7 @@ class UniFileClassObject(object):
 
         try:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_8').readlines()
-        except UnicodeError, Xstr:
+        except UnicodeError as Xstr:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16').readlines()
         except UnicodeError:
             FileIn = codecs.open(File.Path, mode='rb', encoding='utf_16_le').readlines()
@@ -542,22 +541,6 @@ class UniFileClassObject(object):
             Line = Line.replace(u'''\"''', u'''"''')
             Line = Line.replace(u'\t', u' ')
             Line = Line.replace(u'\u0006', u'\\')
-
-            # IncList = gINCLUDE_PATTERN.findall(Line)
-            IncList = []
-            if len(IncList) == 1:
-                for Dir in [File.Dir] + self.IncludePathList:
-                    IncFile = PathClass(str(IncList[0]), Dir)
-                    self.IncFileList.append(IncFile)
-                    if os.path.isfile(IncFile.Path):
-                        Lines.extend(self.PreProcess(IncFile, True))
-                        break
-                else:
-                    EdkLogger.Error("Unicode File Parser", 
-                                    ToolError.FILE_NOT_FOUND, 
-                                    Message="Cannot find include file", 
-                                    ExtraData=str(IncList[0]))
-                continue
 
             #
             # Check if single line has correct '"'
@@ -748,7 +731,7 @@ class UniFileClassObject(object):
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
                 NewLines.append(Line)
             else:
-                print Line
+                print(Line)
                 EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
                     
         if StrName and not StrName.split()[1].startswith(u'STR_'):
@@ -816,7 +799,7 @@ class UniFileClassObject(object):
     # Load a .uni file
     #
     def LoadUniFile(self, File = None):
-        if File == None:
+        if File is None:
             EdkLogger.Error("Unicode File Parser", 
                             ToolError.PARSER_ERROR, 
                             Message='No unicode file is given', 
@@ -919,7 +902,7 @@ class UniFileClassObject(object):
         IsAdded = True
         if Name in self.OrderedStringDict[Language]:
             IsAdded = False
-            if Value != None:
+            if Value is not None:
                 ItemIndexInList = self.OrderedStringDict[Language][Name]
                 Item = self.OrderedStringList[Language][ItemIndexInList]
                 Item.UpdateValue(Value)
@@ -1040,12 +1023,12 @@ class UniFileClassObject(object):
     # Show the instance itself
     #
     def ShowMe(self):
-        print self.LanguageDef
+        print(self.LanguageDef)
         #print self.OrderedStringList
         for Item in self.OrderedStringList:
-            print Item
+            print(Item)
             for Member in self.OrderedStringList[Item]:
-                print str(Member)
+                print(str(Member))
     
     #
     # Read content from '!include' UNI file 
@@ -1060,7 +1043,7 @@ class UniFileClassObject(object):
                              ExtraData=FilaPath)
         try:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_8').readlines()
-        except UnicodeError, Xstr:
+        except UnicodeError as Xstr:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_16').readlines()
         except UnicodeError:
             FileIn = codecs.open(FilaPath, mode='rb', encoding='utf_16_le').readlines()

@@ -1,7 +1,7 @@
 ## @file
 # This file is for converting package information data file to xml file.
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -30,7 +30,7 @@ from Library.DataType import TAB_EQUAL_SPLIT
 from Library.DataType import TAB_SECTION_START
 from Library.DataType import TAB_SECTION_END
 from Logger import StringTable as ST
-from Library.String import ConvertSpecialChar
+from Library.StringUtils import ConvertSpecialChar
 from Library.ParserValidate import IsValidPath
 from Library import GlobalData
 

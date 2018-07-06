@@ -1,13 +1,13 @@
 /** @file
   Functions declaration related with DHCPv4 for HTTP boot driver.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -28,7 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define HTTP_BOOT_DHCP4_OVERLOAD_SERVER_NAME   2
 
 ///
-/// HTTP Tag definition that identifies the processor 
+/// HTTP Tag definition that identifies the processor
 /// and programming environment of the client system.
 /// These identifiers are defined by IETF:
 /// http://www.ietf.org/assignments/dhcpv6-parameters/dhcpv6-parameters.xml
@@ -236,7 +236,7 @@ HttpBootDhcp4Dora (
 
 /**
   This function will register the default DNS addresses to the network device.
-  
+
   @param[in]  Private             The pointer to HTTP_BOOT_PRIVATE_DATA.
   @param[in]  DataLength          Size of the buffer pointed to by DnsServerData in bytes.
   @param[in]  DnsServerData       Point a list of DNS server address in an array

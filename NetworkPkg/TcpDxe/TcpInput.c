@@ -1,7 +1,7 @@
 /** @file
   TCP input process routines.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -436,7 +436,7 @@ TcpDeliverData (
       NetbufFree (Nbuf);
       return -1;
     }
-    
+
     ASSERT (Nbuf->Tcp == NULL);
 
     if (TCP_SEQ_GT (Seg->Seq, Seq)) {
@@ -775,18 +775,18 @@ TcpInput (
 
   Head    = (TCP_HEAD *) NetbufGetByte (Nbuf, 0, NULL);
   ASSERT (Head != NULL);
-  
+
   if (Nbuf->TotalSize < sizeof (TCP_HEAD)) {
     DEBUG ((EFI_D_NET, "TcpInput: received a malformed packet\n"));
     goto DISCARD;
   }
-  
+
   Len     = Nbuf->TotalSize - (Head->HeadLen << 2);
 
   if ((Head->HeadLen < 5) || (Len < 0)) {
 
     DEBUG ((EFI_D_NET, "TcpInput: received a malformed packet\n"));
-    
+
     goto DISCARD;
   }
 
@@ -1322,7 +1322,7 @@ TcpInput (
 
       goto DISCARD;
     }
-    
+
     Tcb->SndUna = Seg->Ack;
 
     if (TCP_FLG_ON (Tcb->CtrlFlag, TCP_CTRL_SND_URG) &&
@@ -1564,7 +1564,7 @@ StepSix:
 
       goto DISCARD;
     }
-    
+
     if (TcpDeliverData (Tcb) == -1) {
       goto RESET_THEN_DROP;
     }
@@ -1664,7 +1664,7 @@ TcpIcmpInput (
   if (Nbuf->TotalSize < sizeof (TCP_HEAD)) {
     goto CLEAN_EXIT;
   }
-  
+
   Head = (TCP_HEAD *) NetbufGetByte (Nbuf, 0, NULL);
   ASSERT (Head != NULL);
 

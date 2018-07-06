@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for iSCSI.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -33,7 +33,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL    gIScsiComponentNam
 };
 
 GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mIScsiDriverNameTable[] = {
-  {"eng;en", L"iSCSI Driver"}, 
+  {"eng;en", L"iSCSI Driver"},
   {NULL, NULL}
 };
 
@@ -48,7 +48,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  *mIScsiControllerNameTab
   returned in DriverName, and EFI_SUCCESS is returned. If the driver specified
   by This does not support the language specified by Language,
   then EFI_UNSUPPORTED is returned.
-  
+
   @param[in]  This        A pointer to the EFI_COMPONENT_NAME_PROTOCOL instance.
   @param[in]  Language    A pointer to a three character ISO 639-2 language identifier.
                           This is the language of the driver name that that the caller
@@ -88,11 +88,11 @@ IScsiComponentNameGetDriverName (
   Update the component name for the iSCSI instance.
 
   @param[in]  IScsiExtScsiPassThru  A pointer to the EFI_EXT_SCSI_PASS_THRU_PROTOCOL instance.
-  
+
   @retval EFI_SUCCESS               Update the ControllerNameTable of this instance successfully.
   @retval EFI_INVALID_PARAMETER     The input parameter is invalid.
   @retval EFI_UNSUPPORTED           Can't get the corresponding NIC info from the Controller handle.
-  
+
 **/
 EFI_STATUS
 UpdateName (
@@ -110,7 +110,7 @@ UpdateName (
   if (IScsiExtScsiPassThru == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   Private  = ISCSI_DRIVER_DATA_FROM_EXT_SCSI_PASS_THRU (IScsiExtScsiPassThru);
 
   //
@@ -122,7 +122,7 @@ UpdateName (
   }
   VlanId = NetLibGetVlanId (Private->Controller);
   IScsiMacAddrToStr (&MacAddress, (UINT32) HwAddressSize, VlanId, MacString);
-    
+
   UnicodeSPrint (
     HandleName,
     sizeof (HandleName),
@@ -183,7 +183,7 @@ UpdateName (
 
   @retval EFI_SUCCESS           The Unicode string for the user readable name in the
                                 language specified by Language for the driver
-                                specified by This was returned in DriverName.                                
+                                specified by This was returned in DriverName.
   @retval EFI_INVALID_PARAMETER ControllerHandle is NULL.
   @retval EFI_INVALID_PARAMETER ChildHandle is not NULL and it is not a valid EFI_HANDLE.
   @retval EFI_INVALID_PARAMETER Language is NULL.
@@ -271,7 +271,7 @@ IScsiComponentNameGetControllerName (
       return Status;
     }
   }
-  
+
   return LookupUnicodeString2 (
            Language,
            This->SupportedLanguages,

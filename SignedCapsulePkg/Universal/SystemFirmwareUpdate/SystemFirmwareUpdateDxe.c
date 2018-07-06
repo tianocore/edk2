@@ -8,7 +8,7 @@
 
   FmpSetImage() will receive untrusted input and do basic validation.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -59,17 +59,23 @@ ParseUpdateDataFile (
   @param[in]  ConfigData              Points to the component configuration structure.
   @param[out] LastAttemptVersion      The last attempt version, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
   @param[out] LastAttemptStatus       The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+  @param[in]  Progress                A function used by the driver to report the progress of the firmware update.
+  @param[in]  StartPercentage         The start completion percentage value that may be used to report progress during the flash write operation.
+  @param[in]  EndPercentage           The end completion percentage value that may be used to report progress during the flash write operation.
 
   @retval EFI_SUCCESS             The System Firmware image is updated.
   @retval EFI_WRITE_PROTECTED     The flash device is read only.
 **/
 EFI_STATUS
 PerformUpdate (
-  IN VOID                         *SystemFirmwareImage,
-  IN UINTN                        SystemFirmwareImageSize,
-  IN UPDATE_CONFIG_DATA           *ConfigData,
-  OUT UINT32                      *LastAttemptVersion,
-  OUT UINT32                      *LastAttemptStatus
+  IN VOID                                           *SystemFirmwareImage,
+  IN UINTN                                          SystemFirmwareImageSize,
+  IN UPDATE_CONFIG_DATA                             *ConfigData,
+  OUT UINT32                                        *LastAttemptVersion,
+  OUT UINT32                                        *LastAttemptStatus,
+  IN EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress,
+  IN UINTN                                          StartPercentage,
+  IN UINTN                                          EndPercentage
   )
 {
   EFI_STATUS                   Status;
@@ -78,13 +84,22 @@ PerformUpdate (
   DEBUG((DEBUG_INFO, "  BaseAddress - 0x%lx,", ConfigData->BaseAddress));
   DEBUG((DEBUG_INFO, "  ImageOffset - 0x%x,", ConfigData->ImageOffset));
   DEBUG((DEBUG_INFO, "  Legnth - 0x%x\n", ConfigData->Length));
-  Status = PerformFlashWrite (
+  if (Progress != NULL) {
+    Progress (StartPercentage);
+  }
+  Status = PerformFlashWriteWithProgress (
              ConfigData->FirmwareType,
              ConfigData->BaseAddress,
              ConfigData->AddressType,
              (VOID *)((UINTN)SystemFirmwareImage + (UINTN)ConfigData->ImageOffset),
-             ConfigData->Length
+             ConfigData->Length,
+             Progress,
+             StartPercentage,
+             EndPercentage
              );
+  if (Progress != NULL) {
+    Progress (EndPercentage);
+  }
   if (!EFI_ERROR(Status)) {
     *LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
     if (ConfigData->FirmwareType == PlatformFirmwareTypeNvRam) {
@@ -105,18 +120,20 @@ PerformUpdate (
   @param[in]  ConfigImageSize         The length of the config file image in bytes.
   @param[out] LastAttemptVersion      The last attempt version, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
   @param[out] LastAttemptStatus       The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+  @param[in]  Progress                A function used by the driver to report the progress of the firmware update.
 
   @retval EFI_SUCCESS             The System Firmware image is updated.
   @retval EFI_WRITE_PROTECTED     The flash device is read only.
 **/
 EFI_STATUS
 UpdateImage (
-  IN VOID                         *SystemFirmwareImage,
-  IN UINTN                        SystemFirmwareImageSize,
-  IN VOID                         *ConfigImage,
-  IN UINTN                        ConfigImageSize,
-  OUT UINT32                      *LastAttemptVersion,
-  OUT UINT32                      *LastAttemptStatus
+  IN VOID                                           *SystemFirmwareImage,
+  IN UINTN                                          SystemFirmwareImageSize,
+  IN VOID                                           *ConfigImage,
+  IN UINTN                                          ConfigImageSize,
+  OUT UINT32                                        *LastAttemptVersion,
+  OUT UINT32                                        *LastAttemptStatus,
+  IN EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress
   )
 {
   EFI_STATUS                            Status;
@@ -124,19 +141,34 @@ UpdateImage (
   UPDATE_CONFIG_DATA                    *UpdateConfigData;
   CONFIG_HEADER                         ConfigHeader;
   UINTN                                 Index;
+  UINTN                                 TotalSize;
+  UINTN                                 BytesWritten;
+  UINTN                                 StartPercentage;
+  UINTN                                 EndPercentage;
 
   if (ConfigImage == NULL) {
     DEBUG((DEBUG_INFO, "PlatformUpdate (NoConfig):"));
     DEBUG((DEBUG_INFO, "  BaseAddress - 0x%x,", 0));
     DEBUG((DEBUG_INFO, "  Length - 0x%x\n", SystemFirmwareImageSize));
     // ASSUME the whole System Firmware include NVRAM region.
-    Status = PerformFlashWrite (
+    StartPercentage = 0;
+    EndPercentage = 100;
+    if (Progress != NULL) {
+      Progress (StartPercentage);
+    }
+    Status = PerformFlashWriteWithProgress (
                PlatformFirmwareTypeNvRam,
                0,
                FlashAddressTypeRelativeAddress,
                SystemFirmwareImage,
-               SystemFirmwareImageSize
+               SystemFirmwareImageSize,
+               Progress,
+               StartPercentage,
+               EndPercentage
                );
+    if (Progress != NULL) {
+      Progress (EndPercentage);
+    }
     if (!EFI_ERROR(Status)) {
       *LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
       mNvRamUpdated = TRUE;
@@ -163,17 +195,30 @@ UpdateImage (
   DEBUG((DEBUG_INFO, "ConfigHeader.NumOfUpdates - 0x%x\n", ConfigHeader.NumOfUpdates));
   DEBUG((DEBUG_INFO, "PcdEdkiiSystemFirmwareFileGuid - %g\n", PcdGetPtr(PcdEdkiiSystemFirmwareFileGuid)));
 
+  TotalSize = 0;
+  for (Index = 0; Index < ConfigHeader.NumOfUpdates; Index++) {
+    if (CompareGuid(&ConfigData[Index].FileGuid, PcdGetPtr(PcdEdkiiSystemFirmwareFileGuid))) {
+      TotalSize = TotalSize + ConfigData[Index].Length;
+    }
+  }
+
+  BytesWritten = 0;
   Index = 0;
   UpdateConfigData = ConfigData;
   while (Index < ConfigHeader.NumOfUpdates) {
     if (CompareGuid(&UpdateConfigData->FileGuid, PcdGetPtr(PcdEdkiiSystemFirmwareFileGuid))) {
       DEBUG((DEBUG_INFO, "FileGuid - %g (processing)\n", &UpdateConfigData->FileGuid));
+      StartPercentage = (BytesWritten * 100) / TotalSize;
+      EndPercentage   = ((BytesWritten + UpdateConfigData->Length) * 100) / TotalSize;
       Status = PerformUpdate (
                  SystemFirmwareImage,
                  SystemFirmwareImageSize,
                  UpdateConfigData,
                  LastAttemptVersion,
-                 LastAttemptStatus
+                 LastAttemptStatus,
+                 Progress,
+                 StartPercentage,
+                 EndPercentage
                  );
       //
       // Shall updates be serialized so that if an update is not successfully completed,
@@ -185,6 +230,8 @@ UpdateImage (
     } else {
       DEBUG((DEBUG_INFO, "FileGuid - %g (ignored)\n", &UpdateConfigData->FileGuid));
     }
+
+    BytesWritten += UpdateConfigData->Length;
 
     Index++;
     UpdateConfigData++;
@@ -202,6 +249,7 @@ UpdateImage (
   @param[in]  ImageSize          The size of the EDKII system FMP capsule image in bytes.
   @param[out] LastAttemptVersion The last attempt version, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
   @param[out] LastAttemptStatus  The last attempt status, which will be recorded in ESRT and FMP EFI_FIRMWARE_IMAGE_DESCRIPTOR.
+  @param[in]  Progress           A function used by the driver to report the progress of the firmware update.
 
   @retval EFI_SUCCESS             EDKII system FMP capsule passes authentication and the System Firmware image is updated.
   @retval EFI_SECURITY_VIOLATION  EDKII system FMP capsule fails authentication and the System Firmware image is not updated.
@@ -209,10 +257,11 @@ UpdateImage (
 **/
 EFI_STATUS
 SystemFirmwareAuthenticatedUpdate (
-  IN VOID                         *Image,
-  IN UINTN                        ImageSize,
-  OUT UINT32                      *LastAttemptVersion,
-  OUT UINT32                      *LastAttemptStatus
+  IN VOID                                           *Image,
+  IN UINTN                                          ImageSize,
+  OUT UINT32                                        *LastAttemptVersion,
+  OUT UINT32                                        *LastAttemptStatus,
+  IN EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress
   )
 {
   EFI_STATUS                  Status;
@@ -240,7 +289,7 @@ SystemFirmwareAuthenticatedUpdate (
   ExtractConfigImage(AuthenticatedImage, AuthenticatedImageSize, &ConfigImage, &ConfigImageSize);
 
   DEBUG((DEBUG_INFO, "UpdateImage ...\n"));
-  Status = UpdateImage(SystemFirmwareImage, SystemFirmwareImageSize, ConfigImage, ConfigImageSize, LastAttemptVersion, LastAttemptStatus);
+  Status = UpdateImage(SystemFirmwareImage, SystemFirmwareImageSize, ConfigImage, ConfigImageSize, LastAttemptVersion, LastAttemptStatus, Progress);
   if (EFI_ERROR(Status)) {
     DEBUG((DEBUG_INFO, "UpdateImage - %r\n", Status));
     return Status;
@@ -412,7 +461,7 @@ QueryVariableInfoHook (
   @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -442,8 +491,8 @@ FmpSetImage (
     return EFI_INVALID_PARAMETER;
   }
 
-  Status = SystemFirmwareAuthenticatedUpdate((VOID *)Image, ImageSize, &SystemFmpPrivate->LastAttempt.LastAttemptVersion, &SystemFmpPrivate->LastAttempt.LastAttemptStatus);
-  DEBUG((DEBUG_INFO, "SetImage - LastAttemp Version - 0x%x, State - 0x%x\n", SystemFmpPrivate->LastAttempt.LastAttemptVersion, SystemFmpPrivate->LastAttempt.LastAttemptStatus));
+  Status = SystemFirmwareAuthenticatedUpdate((VOID *)Image, ImageSize, &SystemFmpPrivate->LastAttempt.LastAttemptVersion, &SystemFmpPrivate->LastAttempt.LastAttemptStatus, Progress);
+  DEBUG((DEBUG_INFO, "SetImage - LastAttempt Version - 0x%x, State - 0x%x\n", SystemFmpPrivate->LastAttempt.LastAttemptVersion, SystemFmpPrivate->LastAttempt.LastAttemptStatus));
 
   //
   // If NVRAM is updated, we should no longer touch variable services, because
@@ -477,52 +526,364 @@ FmpSetImage (
 }
 
 /**
+  Get the set of EFI_FIRMWARE_IMAGE_DESCRIPTOR structures from an FMP Protocol.
+
+  @param[in]  Handle             Handle with an FMP Protocol or a System FMP
+                                 Protocol.
+  @param[in]  ProtocolGuid       Pointer to the FMP Protocol GUID or System FMP
+                                 Protocol GUID.
+  @param[out] FmpImageInfoCount  Pointer to the number of
+                                 EFI_FIRMWARE_IMAGE_DESCRIPTOR structures.
+  @param[out] DescriptorSize     Pointer to the size, in bytes, of each
+                                 EFI_FIRMWARE_IMAGE_DESCRIPTOR structure.
+
+  @return NULL   No EFI_FIRMWARE_IMAGE_DESCRIPTOR structures found.
+  @return !NULL  Pointer to a buffer of EFI_FIRMWARE_IMAGE_DESCRIPTOR structures
+                 allocated using AllocatePool().  Caller must free buffer with
+                 FreePool().
+**/
+EFI_FIRMWARE_IMAGE_DESCRIPTOR *
+GetFmpImageDescriptors (
+  IN  EFI_HANDLE  Handle,
+  IN  EFI_GUID    *ProtocolGuid,
+  OUT UINT8       *FmpImageInfoCount,
+  OUT UINTN       *DescriptorSize
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *Fmp;
+  UINTN                             ImageInfoSize;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR     *FmpImageInfoBuf;
+  UINT32                            FmpImageInfoDescriptorVer;
+  UINT32                            PackageVersion;
+  CHAR16                            *PackageVersionName;
+
+  *FmpImageInfoCount = 0;
+  *DescriptorSize    = 0;
+
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  ProtocolGuid,
+                  (VOID **)&Fmp
+                  );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  //
+  // Determine the size required for the set of EFI_FIRMWARE_IMAGE_DESCRIPTORs.
+  //
+  ImageInfoSize = 0;
+  Status = Fmp->GetImageInfo (
+                  Fmp,                         // FMP Pointer
+                  &ImageInfoSize,              // Buffer Size (in this case 0)
+                  NULL,                        // NULL so we can get size
+                  &FmpImageInfoDescriptorVer,  // DescriptorVersion
+                  FmpImageInfoCount,           // DescriptorCount
+                  DescriptorSize,              // DescriptorSize
+                  &PackageVersion,             // PackageVersion
+                  &PackageVersionName          // PackageVersionName
+                  );
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    DEBUG ((DEBUG_ERROR, "SystemFirmwareUpdateDxe: Unexpected Failure.  Status = %r\n", Status));
+    return NULL;
+  }
+
+  //
+  // Allocate buffer for the set of EFI_FIRMWARE_IMAGE_DESCRIPTORs.
+  //
+  FmpImageInfoBuf = NULL;
+  FmpImageInfoBuf = AllocateZeroPool (ImageInfoSize);
+  if (FmpImageInfoBuf == NULL) {
+    DEBUG ((DEBUG_ERROR, "SystemFirmwareUpdateDxe: Failed to allocate memory for descriptors.\n"));
+    return NULL;
+  }
+
+  //
+  // Retrieve the set of EFI_FIRMWARE_IMAGE_DESCRIPTORs.
+  //
+  PackageVersionName = NULL;
+  Status = Fmp->GetImageInfo (
+                  Fmp,
+                  &ImageInfoSize,              // ImageInfoSize
+                  FmpImageInfoBuf,             // ImageInfo
+                  &FmpImageInfoDescriptorVer,  // DescriptorVersion
+                  FmpImageInfoCount,           // DescriptorCount
+                  DescriptorSize,              // DescriptorSize
+                  &PackageVersion,             // PackageVersion
+                  &PackageVersionName          // PackageVersionName
+                  );
+
+  //
+  // Free unused PackageVersionName return buffer
+  //
+  if (PackageVersionName != NULL) {
+    FreePool (PackageVersionName);
+    PackageVersionName = NULL;
+  }
+
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "SystemFirmwareUpdateDxe: Failure in GetImageInfo.  Status = %r\n", Status));
+    if (FmpImageInfoBuf != NULL) {
+      FreePool (FmpImageInfoBuf);
+    }
+    return NULL;
+  }
+
+  return FmpImageInfoBuf;
+}
+
+/**
+  Search for handles with an FMP protocol whose EFI_FIRMWARE_IMAGE_DESCRIPTOR
+  ImageTypeId matches the ImageTypeId produced by this module.
+
+  @param[in]  ProtocolGuid  Pointer to the GUID of the protocol to search.
+  @param[out] HandleCount   Pointer to the number of returned handles.
+
+  @return NULL   No matching handles found.
+  @return !NULL  Pointer to a buffer of handles allocated using AllocatePool().
+                 Caller must free buffer with FreePool().
+**/
+EFI_HANDLE *
+FindMatchingFmpHandles (
+  IN  EFI_GUID  *ProtocolGuid,
+  OUT UINTN     *HandleCount
+  )
+{
+  EFI_STATUS                     Status;
+  UINTN                          TempHandleCount;
+  EFI_HANDLE                     *HandleBuffer;
+  UINTN                          Index;
+  UINTN                          Index2;
+  UINTN                          Index3;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR  *OriginalFmpImageInfoBuf;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR  *FmpImageInfoBuf;
+  UINT8                          FmpImageInfoCount;
+  UINTN                          DescriptorSize;
+  BOOLEAN                        MatchFound;
+
+  *HandleCount  = 0;
+  TempHandleCount = 0;
+  HandleBuffer = NULL;
+  Status = gBS->LocateHandleBuffer (
+                   ByProtocol,
+                   ProtocolGuid,
+                   NULL,
+                   &TempHandleCount,
+                   &HandleBuffer
+                   );
+  if (EFI_ERROR (Status)) {
+    return NULL;
+  }
+
+  for (Index = 0; Index < TempHandleCount; Index++) {
+    OriginalFmpImageInfoBuf = GetFmpImageDescriptors (
+                                HandleBuffer[Index],
+                                ProtocolGuid,
+                                &FmpImageInfoCount,
+                                &DescriptorSize
+                                );
+
+    //
+    // Loop through the set of EFI_FIRMWARE_IMAGE_DESCRIPTORs.
+    //
+    FmpImageInfoBuf = OriginalFmpImageInfoBuf;
+    MatchFound = FALSE;
+    for (Index2 = 0; Index2 < FmpImageInfoCount; Index2++) {
+      for (Index3 = 0; Index3 < mSystemFmpPrivate->DescriptorCount; Index3++) {
+        MatchFound = CompareGuid (
+                       &FmpImageInfoBuf->ImageTypeId,
+                       &mSystemFmpPrivate->ImageDescriptor[Index3].ImageTypeId
+                       );
+        if (MatchFound) {
+          break;
+        }
+      }
+      if (MatchFound) {
+        break;
+      }
+      //
+      // Increment the buffer pointer ahead by the size of the descriptor
+      //
+      FmpImageInfoBuf = (EFI_FIRMWARE_IMAGE_DESCRIPTOR *)(((UINT8 *)FmpImageInfoBuf) + DescriptorSize);
+    }
+    if (MatchFound) {
+      HandleBuffer[*HandleCount] = HandleBuffer[Index];
+      (*HandleCount)++;
+    }
+
+    FreePool (OriginalFmpImageInfoBuf);
+  }
+
+  if ((*HandleCount) == 0) {
+    //
+    // No any matching handle.
+    //
+    FreePool (HandleBuffer);
+    return NULL;
+  }
+  return HandleBuffer;
+}
+
+/**
+  Uninstall System FMP Protocol instances that may have been installed by
+  SystemFirmwareUpdateDxe drivers dispatches by other capsules.
+
+  @retval EFI_SUCCESS  All System FMP Protocols found were uninstalled.
+  @return Other        One or more System FMP Protocols could not be uninstalled.
+
+**/
+EFI_STATUS
+UninstallMatchingSystemFmpProtocols (
+  VOID
+  )
+{
+  EFI_STATUS                        Status;
+  EFI_HANDLE                        *HandleBuffer;
+  UINTN                             HandleCount;
+  UINTN                             Index;
+  EFI_FIRMWARE_MANAGEMENT_PROTOCOL  *SystemFmp;
+
+  //
+  // Uninstall SystemFmpProtocol instances that may have been produced by
+  // the SystemFirmwareUpdate drivers in FVs dispatched by other capsules.
+  //
+  HandleBuffer = FindMatchingFmpHandles (
+                   &gSystemFmpProtocolGuid,
+                   &HandleCount
+                   );
+  DEBUG ((DEBUG_INFO, "SystemFirmwareUpdateDxe: Found %d matching System FMP instances\n", HandleCount));
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->HandleProtocol(
+                    HandleBuffer[Index],
+                    &gSystemFmpProtocolGuid,
+                    (VOID **)&SystemFmp
+                    );
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+    DEBUG ((DEBUG_INFO, "SystemFirmwareUpdateDxe: Uninstall SystemFmp produced by another capsule\n"));
+    Status = gBS->UninstallProtocolInterface (
+                    HandleBuffer[Index],
+                    &gSystemFmpProtocolGuid,
+                    SystemFmp
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "SystemFirmwareUpdateDxe: Failed to uninstall SystemFmp %r.  Exiting.\n", Status));
+      FreePool (HandleBuffer);
+      return Status;
+    }
+  }
+  if (HandleBuffer != NULL) {
+    FreePool (HandleBuffer);
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   System FMP module entrypoint
 
-  @param  ImageHandle       The firmware allocated handle for the EFI image.
-  @param  SystemTable       A pointer to the EFI System Table.
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
+  @param[in] SystemTable  A pointer to the EFI System Table.
 
-  @return EFI_SUCCESS System FMP module is initialized.
+  @retval EFI_SUCCESS           System FMP module is initialized.
+  @retval EFI_OUT_OF_RESOURCES  There are not enough resources avaulable to
+                                initialize this module.
+  @retval Other                 System FMP Protocols could not be uninstalled.
+  @retval Other                 System FMP Protocol could not be installed.
+  @retval Other                 FMP Protocol could not be installed.
 **/
 EFI_STATUS
 EFIAPI
 SystemFirmwareUpdateMainDxe (
-  IN EFI_HANDLE                         ImageHandle,
-  IN EFI_SYSTEM_TABLE                   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS                                      Status;
+  EFI_STATUS  Status;
+  EFI_HANDLE  *HandleBuffer;
+  UINTN       HandleCount;
 
   //
   // Initialize SystemFmpPrivateData
   //
-  mSystemFmpPrivate = AllocateZeroPool (sizeof(SYSTEM_FMP_PRIVATE_DATA));
+  mSystemFmpPrivate = AllocateZeroPool (sizeof (SYSTEM_FMP_PRIVATE_DATA));
   if (mSystemFmpPrivate == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = InitializePrivateData(mSystemFmpPrivate);
-  if (EFI_ERROR(Status)) {
-    FreePool(mSystemFmpPrivate);
+  Status = InitializePrivateData (mSystemFmpPrivate);
+  if (EFI_ERROR (Status)) {
+    FreePool (mSystemFmpPrivate);
     mSystemFmpPrivate = NULL;
     return Status;
   }
 
   //
-  // Install FMP protocol.
+  // Uninstall SystemFmpProtocol instances that may have been produced by
+  // the SystemFirmwareUpdate drivers in FVs dispatched by other capsules.
   //
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &mSystemFmpPrivate->Handle,
-                  &gEfiFirmwareManagementProtocolGuid,
-                  &mSystemFmpPrivate->Fmp,
-                  &gSystemFmpProtocolGuid,
-                  &mSystemFmpPrivate->Fmp,
-                  NULL
-                  );
+  Status = UninstallMatchingSystemFmpProtocols ();
   if (EFI_ERROR (Status)) {
-    FreePool(mSystemFmpPrivate);
+    FreePool (mSystemFmpPrivate);
     mSystemFmpPrivate = NULL;
     return Status;
+  }
+
+  //
+  // Look for a handle with matching Firmware Management Protocol
+  //
+  HandleCount = 0;
+  HandleBuffer = FindMatchingFmpHandles (
+                   &gEfiFirmwareManagementProtocolGuid,
+                   &HandleCount
+                   );
+  DEBUG ((DEBUG_INFO, "SystemFirmwareUpdateDxe: Found %d matching FMP instances\n", HandleCount));
+
+  switch (HandleCount) {
+  case 0:
+    //
+    // Install FMP protocol onto a new handle.
+    //
+    DEBUG ((DEBUG_INFO, "SystemFirmwareUpdateDxe: Install FMP onto a new handle\n"));
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &mSystemFmpPrivate->Handle,
+                    &gEfiFirmwareManagementProtocolGuid,
+                    &mSystemFmpPrivate->Fmp,
+                    NULL
+                    );
+    break;
+  case 1:
+    //
+    // Install System FMP protocol onto handle with matching FMP Protocol
+    //
+    DEBUG ((DEBUG_INFO, "SystemFirmwareUpdateDxe: Install System FMP onto matching FMP handle\n"));
+    mSystemFmpPrivate->Handle = HandleBuffer[0];
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &HandleBuffer[0],
+                    &gSystemFmpProtocolGuid,
+                    &mSystemFmpPrivate->Fmp,
+                    NULL
+                    );
+    break;
+  default:
+    //
+    // More than one matching handle is not expected.  Unload driver.
+    //
+    DEBUG ((DEBUG_ERROR, "SystemFirmwareUpdateDxe: More than one matching FMP handle.  Unload driver.\n"));
+    Status = EFI_DEVICE_ERROR;
+    break;
+  }
+
+  if (HandleBuffer != NULL) {
+    FreePool (HandleBuffer);
+  }
+
+  if (EFI_ERROR (Status)) {
+    FreePool (mSystemFmpPrivate);
+    mSystemFmpPrivate = NULL;
   }
 
   return Status;

@@ -2,7 +2,7 @@
   This EFI_PXE_BASE_CODE_PROTOCOL and EFI_LOAD_FILE_PROTOCOL.
   interfaces declaration.
 
-  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -107,7 +107,7 @@ struct _PXEBC_PRIVATE_DATA {
   EFI_HANDLE                                Image;
 
   PXEBC_PRIVATE_PROTOCOL                    Id;
-  EFI_SIMPLE_NETWORK_PROTOCOL               *Snp; 
+  EFI_SIMPLE_NETWORK_PROTOCOL               *Snp;
 
   PXEBC_VIRTUAL_NIC                         *Ip4Nic;
   PXEBC_VIRTUAL_NIC                         *Ip6Nic;

@@ -1,10 +1,10 @@
 /** @file
-    Defines the Main Editor data type - 
-     - Global variables 
+    Defines the Main Editor data type -
+     - Global variables
      - Instances of the other objects of the editor
      - Main Interfaces
-  
-  Copyright (c) 2005 - 2012, Intel Corporation. All rights reserved. <BR>
+
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -56,6 +56,7 @@ HEFI_EDITOR_GLOBAL_EDITOR       HMainEditorConst = {
     0,
     0
   },
+  NULL,
   FALSE,
   NULL,
   0,
@@ -105,22 +106,55 @@ HMainCommandDisplayHelp (
   VOID
   )
 {
-  INT32    CurrentLine;
-  CHAR16 * InfoString;
-  EFI_INPUT_KEY  Key;
+  INT32           CurrentLine;
+  CHAR16          *InfoString;
+  EFI_KEY_DATA    KeyData;
+  EFI_STATUS      Status;
+  UINTN           EventIndex;
 
-  CurrentLine = 0;
-  // print helpInfo      
+  //
+  // print helpInfo
+  //
   for (CurrentLine = 0; 0 != HexMainMenuHelpInfo[CurrentLine]; CurrentLine++) {
     InfoString = HiiGetString(gShellDebug1HiiHandle, HexMainMenuHelpInfo[CurrentLine]
 , NULL);
-    ShellPrintEx (0,CurrentLine+1,L"%E%s%N",InfoString);        
+    ShellPrintEx (0,CurrentLine+1,L"%E%s%N",InfoString);
   }
-  
+
+  //
   // scan for ctrl+w
-  do {
-    gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
-  } while(SCAN_CONTROL_W != Key.UnicodeChar); 
+  //
+  while (TRUE) {
+    Status = gBS->WaitForEvent (1, &HMainEditor.TextInputEx->WaitForKeyEx, &EventIndex);
+    if (EFI_ERROR (Status) || (EventIndex != 0)) {
+      continue;
+    }
+    Status = HMainEditor.TextInputEx->ReadKeyStrokeEx (HMainEditor.TextInputEx, &KeyData);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+
+    if (((KeyData.KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) == 0) ||
+        (KeyData.KeyState.KeyShiftState == EFI_SHIFT_STATE_VALID)) {
+      //
+      // For consoles that don't support/report shift state,
+      // CTRL+W is translated to L'W' - L'A' + 1.
+      //
+      if (KeyData.Key.UnicodeChar == L'W' - L'A' + 1) {
+        break;
+      }
+    } else if (((KeyData.KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) != 0) &&
+               ((KeyData.KeyState.KeyShiftState & (EFI_LEFT_CONTROL_PRESSED | EFI_RIGHT_CONTROL_PRESSED)) != 0) &&
+               ((KeyData.KeyState.KeyShiftState & ~(EFI_SHIFT_STATE_VALID | EFI_LEFT_CONTROL_PRESSED | EFI_RIGHT_CONTROL_PRESSED)) == 0)) {
+      //
+      // For consoles that supports/reports shift state,
+      // make sure that only CONTROL shift key is pressed.
+      //
+      if ((KeyData.Key.UnicodeChar == 'w') || (KeyData.Key.UnicodeChar == 'W')) {
+        break;
+      }
+    }
+  }
 
   // update screen with buffer's info
   HBufferImageNeedRefresh = TRUE;
@@ -211,7 +245,7 @@ HMainCommandGoToOffset (
 
 /**
   Save current opened buffer.
-  If is file buffer, you can save to current file name or 
+  If is file buffer, you can save to current file name or
   save to another file name.
 
   @retval EFI_SUCCESS             The operation was successful.
@@ -341,7 +375,7 @@ HMainCommandSaveBuffer (
   // 7. Update File Name field in Title Bar to B
   //       and remove the Modified flag in Title Bar.
   //
-  Str = CatSPrint(NULL, 
+  Str = CatSPrint(NULL,
           L"File to Save: [%s]",
           HMainEditor.BufferImage->FileImage->FileName
           );
@@ -388,7 +422,7 @@ HMainCommandSaveBuffer (
   // if just enter pressed, so think save to current file name
   //
   if (StrLen (InputBarGetString()) == 0) {
-    FileName = CatSPrint(NULL, 
+    FileName = CatSPrint(NULL,
                 L"%s",
                 HMainEditor.BufferImage->FileImage->FileName
                 );
@@ -442,7 +476,7 @@ HMainCommandSaveBuffer (
         StatusBarSetStatusString (L"Access Denied");
         SHELL_FREE_NON_NULL (FileName);
         return EFI_SUCCESS;
-      } 
+      }
 
       SHELL_FREE_NON_NULL(Info);
       //
@@ -486,7 +520,7 @@ HMainCommandSaveBuffer (
       } // while
     } // if opened existing file
   } // if OldFile
-  
+
   //
   // save file back to disk
   //
@@ -1634,10 +1668,23 @@ HMainEditorInit (
         );
 
   //
+  // Find TextInEx in System Table ConsoleInHandle
+  // Per UEFI Spec, TextInEx is required for a console capable platform.
+  //
+  Status = gBS->HandleProtocol (
+              gST->ConsoleInHandle,
+              &gEfiSimpleTextInputExProtocolGuid,
+              (VOID**)&HMainEditor.TextInputEx
+              );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
   // Find mouse in System Table ConsoleInHandle
   //
   Status = gBS->HandleProtocol (
-                gST->ConIn,
+                gST->ConsoleInHandle,
                 &gEfiSimplePointerProtocolGuid,
                 (VOID**)&HMainEditor.MouseInterface
                 );
@@ -1706,7 +1753,7 @@ HMainEditorInit (
     return EFI_LOAD_ERROR;
   }
 
-  InputBarInit ();
+  InputBarInit (HMainEditor.TextInputEx);
 
   Status = HBufferImageInit ();
   if (EFI_ERROR (Status)) {
@@ -1756,9 +1803,9 @@ HMainEditorCleanup (
   MenuBarCleanup ();
 
   StatusBarCleanup ();
-  
+
   InputBarCleanup ();
-  
+
   Status = HBufferImageCleanup ();
   if (EFI_ERROR (Status)) {
     ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_HEXEDIT_LIBEDITOR_BUFFERIMAGE_CLEAN), gShellDebug1HiiHandle);
@@ -1803,28 +1850,28 @@ HMainEditorRefresh (
   if (HMainEditor.BufferImage->BufferType == FileTypeDiskBuffer) {
     if (HMainEditor.BufferImage->DiskImage != NULL &&
         HBufferImageBackupVar.DiskImage != NULL &&
-        (HMainEditor.BufferImage->DiskImage->Offset != HBufferImageBackupVar.DiskImage->Offset || 
+        (HMainEditor.BufferImage->DiskImage->Offset != HBufferImageBackupVar.DiskImage->Offset ||
            HMainEditor.BufferImage->DiskImage->Size != HBufferImageBackupVar.DiskImage->Size) ){
       NameChange = TRUE;
     }
   } else if (HMainEditor.BufferImage->BufferType == FileTypeMemBuffer) {
     if (HMainEditor.BufferImage->MemImage != NULL &&
         HBufferImageBackupVar.MemImage != NULL &&
-        (HMainEditor.BufferImage->MemImage->Offset != HBufferImageBackupVar.MemImage->Offset || 
+        (HMainEditor.BufferImage->MemImage->Offset != HBufferImageBackupVar.MemImage->Offset ||
            HMainEditor.BufferImage->MemImage->Size != HBufferImageBackupVar.MemImage->Size) ){
       NameChange = TRUE;
     }
   } else if (HMainEditor.BufferImage->BufferType == FileTypeFileBuffer) {
-    if ( HMainEditor.BufferImage->FileImage != NULL && 
-         HMainEditor.BufferImage->FileImage->FileName != NULL && 
-         HBufferImageBackupVar.FileImage != NULL && 
-         HBufferImageBackupVar.FileImage->FileName != NULL && 
+    if ( HMainEditor.BufferImage->FileImage != NULL &&
+         HMainEditor.BufferImage->FileImage->FileName != NULL &&
+         HBufferImageBackupVar.FileImage != NULL &&
+         HBufferImageBackupVar.FileImage->FileName != NULL &&
          StrCmp (HMainEditor.BufferImage->FileImage->FileName, HBufferImageBackupVar.FileImage->FileName) != 0 ) {
       NameChange = TRUE;
     }
   }
-  if ( HMainEditor.BufferImage->FileImage != NULL && 
-       HBufferImageBackupVar.FileImage != NULL && 
+  if ( HMainEditor.BufferImage->FileImage != NULL &&
+       HBufferImageBackupVar.FileImage != NULL &&
        HMainEditor.BufferImage->FileImage->ReadOnly != HBufferImageBackupVar.FileImage->ReadOnly ) {
     ReadChange = TRUE;
   }
@@ -1838,10 +1885,10 @@ HMainEditorRefresh (
   //
   // call the components refresh function
   //
-  if (HEditorFirst 
+  if (HEditorFirst
     || NameChange
-    || HMainEditor.BufferImage->BufferType != HBufferImageBackupVar.BufferType 
-    || HBufferImageBackupVar.Modified != HMainEditor.BufferImage->Modified 
+    || HMainEditor.BufferImage->BufferType != HBufferImageBackupVar.BufferType
+    || HBufferImageBackupVar.Modified != HMainEditor.BufferImage->Modified
     || ReadChange ) {
 
     MainTitleBarRefresh (
@@ -1857,8 +1904,8 @@ HMainEditorRefresh (
     HBufferImageRefresh ();
   }
   if (HEditorFirst
-    || HBufferImageBackupVar.DisplayPosition.Row != HMainEditor.BufferImage->DisplayPosition.Row 
-    || HBufferImageBackupVar.DisplayPosition.Column != HMainEditor.BufferImage->DisplayPosition.Column 
+    || HBufferImageBackupVar.DisplayPosition.Row != HMainEditor.BufferImage->DisplayPosition.Row
+    || HBufferImageBackupVar.DisplayPosition.Column != HMainEditor.BufferImage->DisplayPosition.Column
     || StatusBarGetRefresh()) {
 
     StatusBarRefresh (
@@ -2058,9 +2105,10 @@ HMainEditorKeyInput (
   VOID
   )
 {
-  EFI_INPUT_KEY             Key;
+  EFI_KEY_DATA              KeyData;
   EFI_STATUS                Status;
   EFI_SIMPLE_POINTER_STATE  MouseState;
+  BOOLEAN                   NoShiftState;
   BOOLEAN                   LengthChange;
   UINTN                     Size;
   UINTN                     OldSize;
@@ -2219,77 +2267,90 @@ HMainEditorKeyInput (
       }
     }
 
-    Status = gST->ConIn->ReadKeyStroke (gST->ConIn, &Key);
+    //
+    // CheckEvent() returns Success when non-partial key is pressed.
+    //
+    Status = gBS->CheckEvent (HMainEditor.TextInputEx->WaitForKeyEx);
     if (!EFI_ERROR (Status)) {
-      //
-      // dispatch to different components' key handling function
-      // so not everywhere has to set this variable
-      //
-      HBufferImageMouseNeedRefresh = TRUE;
-
-      //
-      // clear previous status string
-      //
-      StatusBarSetRefresh();
-      if (EFI_SUCCESS == MenuBarDispatchControlHotKey(&Key)) {
-        Status = EFI_SUCCESS;
-      } else if (Key.ScanCode == SCAN_NULL) {
-        Status = HBufferImageHandleInput (&Key);
-      } else if (((Key.ScanCode >= SCAN_UP) && (Key.ScanCode <= SCAN_PAGE_DOWN))) {
-        Status = HBufferImageHandleInput (&Key);
-      } else if (((Key.ScanCode >= SCAN_F1) && Key.ScanCode <= (SCAN_F12))) {
-        Status = MenuBarDispatchFunctionKey (&Key);
-      } else {
-        StatusBarSetStatusString (L"Unknown Command");
-
-        HBufferImageMouseNeedRefresh = FALSE;
-      }
-
-      if (Status != EFI_SUCCESS && Status != EFI_OUT_OF_RESOURCES) {
+      Status = HMainEditor.TextInputEx->ReadKeyStrokeEx (HMainEditor.TextInputEx, &KeyData);
+      if (!EFI_ERROR (Status)) {
         //
-        // not already has some error status
+        // dispatch to different components' key handling function
+        // so not everywhere has to set this variable
         //
-        if (StrCmp (L"", StatusBarGetString()) == 0) {
-          StatusBarSetStatusString (L"Disk Error. Try Again");
-        }
-      }
-    }
-    //
-    // decide if has to set length warning
-    //
-    if (HBufferImage.BufferType != HBufferImageBackupVar.BufferType) {
-      LengthChange = FALSE;
-    } else {
-      //
-      // still the old buffer
-      //
-      if (HBufferImage.BufferType != FileTypeFileBuffer) {
-        Size = HBufferImageGetTotalSize ();
+        HBufferImageMouseNeedRefresh = TRUE;
 
-        switch (HBufferImage.BufferType) {
-        case FileTypeDiskBuffer:
-          OldSize = HBufferImage.DiskImage->Size * HBufferImage.DiskImage->BlockSize;
-          break;
+        //
+        // clear previous status string
+        //
+        StatusBarSetRefresh();
+        //
+        // NoShiftState: TRUE when no shift key is pressed.
+        //
+        NoShiftState = ((KeyData.KeyState.KeyShiftState & EFI_SHIFT_STATE_VALID) == 0) || (KeyData.KeyState.KeyShiftState == EFI_SHIFT_STATE_VALID);
+        //
+        // dispatch to different components' key handling function
+        //
+        if (EFI_SUCCESS == MenuBarDispatchControlHotKey(&KeyData)) {
+          Status = EFI_SUCCESS;
+        } else if (NoShiftState && KeyData.Key.ScanCode == SCAN_NULL) {
+          Status = HBufferImageHandleInput (&KeyData.Key);
+        } else if (NoShiftState && ((KeyData.Key.ScanCode >= SCAN_UP) && (KeyData.Key.ScanCode <= SCAN_PAGE_DOWN))) {
+          Status = HBufferImageHandleInput (&KeyData.Key);
+        } else if (NoShiftState && ((KeyData.Key.ScanCode >= SCAN_F1) && KeyData.Key.ScanCode <= SCAN_F12)) {
+          Status = MenuBarDispatchFunctionKey (&KeyData.Key);
+        } else {
+          StatusBarSetStatusString (L"Unknown Command");
 
-        case FileTypeMemBuffer:
-          OldSize = HBufferImage.MemImage->Size;
-          break;
-        
-        default:
-          OldSize = 0;
-          break;
+          HBufferImageMouseNeedRefresh = FALSE;
         }
 
-        if (!LengthChange) {
-          if (OldSize != Size) {
-            StatusBarSetStatusString (L"Disk/Mem Buffer Length should not be changed");
+        if (Status != EFI_SUCCESS && Status != EFI_OUT_OF_RESOURCES) {
+          //
+          // not already has some error status
+          //
+          if (StrCmp (L"", StatusBarGetString()) == 0) {
+            StatusBarSetStatusString (L"Disk Error. Try Again");
           }
         }
+      }
+      //
+      // decide if has to set length warning
+      //
+      if (HBufferImage.BufferType != HBufferImageBackupVar.BufferType) {
+        LengthChange = FALSE;
+      } else {
+        //
+        // still the old buffer
+        //
+        if (HBufferImage.BufferType != FileTypeFileBuffer) {
+          Size = HBufferImageGetTotalSize ();
 
-        if (OldSize != Size) {
-          LengthChange = TRUE;
-        } else {
-          LengthChange = FALSE;
+          switch (HBufferImage.BufferType) {
+          case FileTypeDiskBuffer:
+            OldSize = HBufferImage.DiskImage->Size * HBufferImage.DiskImage->BlockSize;
+            break;
+
+          case FileTypeMemBuffer:
+            OldSize = HBufferImage.MemImage->Size;
+            break;
+
+          default:
+            OldSize = 0;
+            break;
+          }
+
+          if (!LengthChange) {
+            if (OldSize != Size) {
+              StatusBarSetStatusString (L"Disk/Mem Buffer Length should not be changed");
+            }
+          }
+
+          if (OldSize != Size) {
+            LengthChange = TRUE;
+          } else {
+            LengthChange = FALSE;
+          }
         }
       }
     }

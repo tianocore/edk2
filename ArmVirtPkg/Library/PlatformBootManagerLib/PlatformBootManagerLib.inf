@@ -32,6 +32,7 @@
 
 [Sources]
   PlatformBm.c
+  PlatformBm.h
   QemuKernel.c
 
 [Packages]
@@ -52,6 +53,7 @@
   PrintLib
   QemuBootOrderLib
   QemuFwCfgLib
+  ReportStatusCodeLib
   UefiBootManagerLib
   UefiBootServicesTableLib
   UefiLib
@@ -82,3 +84,4 @@
   gEfiLoadedImageProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
+  gVirtioDeviceProtocolGuid

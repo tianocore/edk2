@@ -2,7 +2,7 @@
   Status Code Handler Driver which produces general handlers and hook them
   onto the SMM status code router.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,9 +19,9 @@ EFI_SMM_RSC_HANDLER_PROTOCOL  *mRscHandlerProtocol       = NULL;
 
 
 /**
-  Dispatch initialization request to sub status code devices based on 
+  Dispatch initialization request to sub status code devices based on
   customized feature flags.
- 
+
 **/
 VOID
 InitializationDispatcherWorker (
@@ -54,7 +54,7 @@ InitializationDispatcherWorker (
 
   @param  ImageHandle       The firmware allocated handle for the EFI image.
   @param  SystemTable       A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
 
 **/

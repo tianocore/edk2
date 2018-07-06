@@ -1,14 +1,14 @@
 /** @file
   Support for SCSI-2 standard
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -346,9 +346,9 @@ typedef struct {
   UINT8 BlockSize0;
   UINT8 Protection;
   UINT8 LogicPerPhysical;
-  UINT8 LowestAlignLogic2;  
-  UINT8 LowestAlignLogic1;    
-  UINT8 Reserved[16];  
+  UINT8 LowestAlignLogic2;
+  UINT8 LowestAlignLogic1;
+  UINT8 Reserved[16];
 } EFI_SCSI_DISK_CAPACITY_DATA16;
 
 typedef struct {

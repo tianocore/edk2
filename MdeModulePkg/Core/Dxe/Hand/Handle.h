@@ -1,7 +1,7 @@
 /** @file
   Support functions for managing protocol.
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -26,7 +26,7 @@ typedef struct {
   /// All handles list of IHANDLE
   LIST_ENTRY          AllHandles;
   /// List of PROTOCOL_INTERFACE's for this handle
-  LIST_ENTRY          Protocols;      
+  LIST_ENTRY          Protocols;
   UINTN               LocateRequest;
   /// The Handle Database Key value when this handle was last created or modified
   UINT64              Key;
@@ -44,13 +44,13 @@ typedef struct {
 typedef struct {
   UINTN               Signature;
   /// Link Entry inserted to mProtocolDatabase
-  LIST_ENTRY          AllEntries;  
+  LIST_ENTRY          AllEntries;
   /// ID of the protocol
-  EFI_GUID            ProtocolID;  
+  EFI_GUID            ProtocolID;
   /// All protocol interfaces
-  LIST_ENTRY          Protocols;     
+  LIST_ENTRY          Protocols;
   /// Registerd notification handlers
-  LIST_ENTRY          Notify;                 
+  LIST_ENTRY          Notify;
 } PROTOCOL_ENTRY;
 
 
@@ -63,17 +63,17 @@ typedef struct {
 typedef struct {
   UINTN                       Signature;
   /// Link on IHANDLE.Protocols
-  LIST_ENTRY                  Link;   
+  LIST_ENTRY                  Link;
   /// Back pointer
-  IHANDLE                     *Handle;  
+  IHANDLE                     *Handle;
   /// Link on PROTOCOL_ENTRY.Protocols
-  LIST_ENTRY                  ByProtocol; 
+  LIST_ENTRY                  ByProtocol;
   /// The protocol ID
-  PROTOCOL_ENTRY              *Protocol;  
+  PROTOCOL_ENTRY              *Protocol;
   /// The interface value
-  VOID                        *Interface; 
+  VOID                        *Interface;
   /// OPEN_PROTOCOL_DATA list
-  LIST_ENTRY                  OpenList;       
+  LIST_ENTRY                  OpenList;
   UINTN                       OpenListCount;
 
 } PROTOCOL_INTERFACE;
@@ -83,7 +83,7 @@ typedef struct {
 typedef struct {
   UINTN                       Signature;
   ///Link on PROTOCOL_INTERFACE.OpenList
-  LIST_ENTRY                  Link;      
+  LIST_ENTRY                  Link;
 
   EFI_HANDLE                  AgentHandle;
   EFI_HANDLE                  ControllerHandle;
@@ -101,11 +101,11 @@ typedef struct {
   UINTN               Signature;
   PROTOCOL_ENTRY      *Protocol;
   /// All notifications for this protocol
-  LIST_ENTRY          Link;                   
+  LIST_ENTRY          Link;
   /// Event to notify
-  EFI_EVENT           Event;    
+  EFI_EVENT           Event;
   /// Last position notified
-  LIST_ENTRY          *Position;              
+  LIST_ENTRY          *Position;
 } PROTOCOL_NOTIFY;
 
 

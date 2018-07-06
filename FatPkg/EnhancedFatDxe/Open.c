@@ -1,7 +1,7 @@
 /** @file
   Routines dealing with file open.
 
-Copyright (c) 2005 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
 distribution. The full text of the license may be found at
@@ -234,7 +234,7 @@ FatOpenEx (
   }
 
   //
-  // Check for valid Attributes for file creation case. 
+  // Check for valid Attributes for file creation case.
   //
   if (((OpenMode & EFI_FILE_MODE_CREATE) != 0) && (Attributes & (EFI_FILE_READ_ONLY | (~EFI_FILE_VALID_ATTR))) != 0) {
     return EFI_INVALID_PARAMETER;

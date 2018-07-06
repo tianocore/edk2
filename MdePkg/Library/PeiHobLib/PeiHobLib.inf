@@ -3,7 +3,7 @@
 #
 # HOB Library implementation that uses PEI Services to retrieve the HOB List.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -52,5 +52,5 @@
 #   MEMORY_ALLOCATION     ## SOMETIMES_PRODUCES
 #   RESOURCE_DESCRIPTOR   ## SOMETIMES_PRODUCES
 #   FIRMWARE_VOLUME       ## SOMETIMES_PRODUCES
-#   
+#
 

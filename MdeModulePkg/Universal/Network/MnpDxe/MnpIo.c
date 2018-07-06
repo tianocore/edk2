@@ -1,7 +1,7 @@
 /** @file
   Implementation of Managed Network Protocol I/O functions.
 
-Copyright (c) 2005 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The full
@@ -129,14 +129,14 @@ MnpBuildTxPacket (
   UINT16                  Index;
   MNP_DEVICE_DATA         *MnpDeviceData;
   UINT8                   *TxBuf;
-  
+
   MnpDeviceData = MnpServiceData->MnpDeviceData;
-  
+
   TxBuf = MnpAllocTxBuf (MnpDeviceData);
   if (TxBuf == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Reserve space for vlan tag if needed.
   //
@@ -145,14 +145,14 @@ MnpBuildTxPacket (
   } else {
     *PktBuf = TxBuf;
   }
-  
+
   if ((TxData->DestinationAddress == NULL) && (TxData->FragmentCount == 1)) {
     CopyMem (
         *PktBuf,
         TxData->FragmentTable[0].FragmentBuffer,
         TxData->FragmentTable[0].FragmentLength
         );
-    
+
     *PktLen = TxData->FragmentTable[0].FragmentLength;
   } else {
     //
@@ -160,7 +160,7 @@ MnpBuildTxPacket (
     // one fragment, copy the data into the packet buffer. Reserve the
     // media header space if necessary.
     //
-    SnpMode = MnpDeviceData->Snp->Mode; 
+    SnpMode = MnpDeviceData->Snp->Mode;
     DstPos  = *PktBuf;
     *PktLen = 0;
     if (TxData->DestinationAddress != NULL) {
@@ -195,7 +195,7 @@ MnpBuildTxPacket (
 
 
 /**
-  Synchronously send out the packet. 
+  Synchronously send out the packet.
 
   This functon places the packet buffer to SNP driver's tansmit queue. The packet
   can be considered successfully sent out once SNP acccetp the packet, while the
@@ -245,7 +245,7 @@ MnpSyncSendPacket (
     goto SIGNAL_TOKEN;
   }
 
-  
+
   if (MnpServiceData->VlanId != 0) {
     //
     // Insert VLAN tag
@@ -282,9 +282,9 @@ MnpSyncSendPacket (
                     TxData->SourceAddress,
                     TxData->DestinationAddress,
                     &ProtocolType
-                    ); 
+                    );
   }
-  
+
   if (EFI_ERROR (Status)) {
     Token->Status = EFI_DEVICE_ERROR;
   }

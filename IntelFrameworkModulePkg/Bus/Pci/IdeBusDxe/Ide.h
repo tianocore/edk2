@@ -2,7 +2,7 @@
   Header file for IDE Bus Driver, containing the helper functions'
   prototype.
 
-  Copyright (c) 2006 - 2007, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -28,7 +28,7 @@
   read a one-byte data from a IDE port.
 
   @param  PciIo  The PCI IO protocol instance
-  @param  Port   the IDE Port number 
+  @param  Port   the IDE Port number
 
   return  the one-byte data read from IDE port
 **/
@@ -153,7 +153,7 @@ IDEWritePortWMultiple (
   @param  PciIo Pointer to the EFI_PCI_IO_PROTOCOL instance
   @param  IdeRegsBaseAddr Pointer to IDE_REGISTERS_BASE_ADDR to
           receive IDE IO port registers' base addresses
-  
+
   @retval EFI_UNSUPPORTED return this value when the BARs is not IO type
   @retval EFI_SUCCESS     Get the Base address successfully
   @retval other           read the pci configureation data error
@@ -187,7 +187,7 @@ ReassignIdeResources (
   Detect if there is disk attached to this port.
 
   @param  IdeDev The BLK_IO private data which specifies the IDE device.
-  
+
   @retval EFI_NOT_FOUND   The device or channel is not found
   @retval EFI_SUCCESS     The device is found
 
@@ -212,7 +212,7 @@ InitializeIDEChannelData (
   Register. DRQ is cleared when the device is finished transferring data.
   So this function is called after data transfer is finished.
 
-  @param IdeDev                 pointer pointing to IDE_BLK_IO_DEV data structure, used 
+  @param IdeDev                 pointer pointing to IDE_BLK_IO_DEV data structure, used
                                 to record all the information of the IDE device.
   @param TimeoutInMilliSeconds  used to designate the timeout for the DRQ clear.
 
@@ -236,7 +236,7 @@ DRQClear (
   transferring data. So this function is called after data transfer
   is finished.
 
-  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used 
+  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used
                                to record all the information of the IDE device.
 
   @param TimeoutInMilliSeconds used to designate the timeout for the DRQ clear.
@@ -280,10 +280,10 @@ DRQReady (
 
 /**
   This function is used to poll for the DRQ bit set in the Alternate Status Register.
-  DRQ is set when the device is ready to transfer data. So this function is called after 
+  DRQ is set when the device is ready to transfer data. So this function is called after
   the command is sent to the device and before required data is transferred.
 
-  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used to 
+  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used to
                                record all the information of the IDE device.
 
   @param TimeoutInMilliSeconds used to designate the timeout for the DRQ ready.
@@ -304,7 +304,7 @@ DRQReady2 (
   This function is used to poll for the BSY bit clear in the Status Register. BSY
   is clear when the device is not busy. Every command must be sent after device is not busy.
 
-  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used 
+  @param IdeDev                pointer pointing to IDE_BLK_IO_DEV data structure, used
                                to record all the information of the IDE device.
   @param TimeoutInMilliSeconds used to designate the timeout for the DRQ ready.
 
@@ -320,11 +320,11 @@ WaitForBSYClear (
   );
 
 /**
-  This function is used to poll for the BSY bit clear in the Alternate Status Register. 
-  BSY is clear when the device is not busy. Every command must be sent after device is 
+  This function is used to poll for the BSY bit clear in the Alternate Status Register.
+  BSY is clear when the device is not busy. Every command must be sent after device is
   not busy.
 
-  @param IdeDev               pointer pointing to IDE_BLK_IO_DEV data structure, used to record 
+  @param IdeDev               pointer pointing to IDE_BLK_IO_DEV data structure, used to record
                               all the information of the IDE device.
   @param TimeoutInMilliSeconds used to designate the timeout for the DRQ ready.
 
@@ -341,7 +341,7 @@ WaitForBSYClear2 (
 
 /**
   This function is used to poll for the DRDY bit set in the Status Register. DRDY
-  bit is set when the device is ready to accept command. Most ATA commands must be 
+  bit is set when the device is ready to accept command. Most ATA commands must be
   sent after DRDY set except the ATAPI Packet Command.
 
   @param IdeDev               pointer pointing to IDE_BLK_IO_DEV data structure, used
@@ -360,8 +360,8 @@ DRDYReady (
   );
 
 /**
-  This function is used to poll for the DRDY bit set in the Alternate Status Register. 
-  DRDY bit is set when the device is ready to accept command. Most ATA commands must 
+  This function is used to poll for the DRDY bit set in the Alternate Status Register.
+  DRDY bit is set when the device is ready to accept command. Most ATA commands must
   be sent after DRDY set except the ATAPI Packet Command.
 
   @param IdeDev              pointer pointing to IDE_BLK_IO_DEV data structure, used
@@ -394,7 +394,7 @@ DRDYReady2 (
   information it needs to fill the IDE_BLK_IO_DEV data structure,
   including device type, media block size, media capacity, and etc.
 
-  @param IdeDev  pointer pointing to IDE_BLK_IO_DEV data structure,used to record 
+  @param IdeDev  pointer pointing to IDE_BLK_IO_DEV data structure,used to record
                  all the information of the IDE device.
 
   @retval EFI_SUCCESS      Identify ATA device successfully.
@@ -420,7 +420,7 @@ PrintAtaModuleName (
 /**
   This function is used to send out ATA commands conforms to the PIO Data In Protocol.
 
-  @param IdeDev       pointer pointing to IDE_BLK_IO_DEV data structure, used to record 
+  @param IdeDev       pointer pointing to IDE_BLK_IO_DEV data structure, used to record
                       all the information of the IDE device.
   @param Buffer       buffer contained data transferred from device to host.
   @param ByteCount    data size in byte unit of the buffer.
@@ -430,7 +430,7 @@ PrintAtaModuleName (
   @param SectorNumber value of the Sector Number Register
   @param CylinderLsb  value of the low byte of the Cylinder Register
   @param CylinderMsb  value of the high byte of the Cylinder Register
-  
+
   @retval EFI_SUCCESS      send out the ATA command and device send required data successfully.
   @retval EFI_DEVICE_ERROR command sent failed.
 
@@ -486,7 +486,7 @@ AtaPioDataOut (
   some debug information and if there is ERR bit set in the Status
   Register, the Error Register's value is also be parsed and print out.
 
-  @param IdeDev  pointer pointing to IDE_BLK_IO_DEV data structure, used to 
+  @param IdeDev  pointer pointing to IDE_BLK_IO_DEV data structure, used to
                  record all the information of the IDE device.
 
   @retval EFI_SUCCESS       No err information in the Status Register.
@@ -500,7 +500,7 @@ CheckErrorStatus (
 
 /**
   This function is used to implement the Soft Reset on the specified device. But,
-  the ATA Soft Reset mechanism is so strong a reset method that it will force 
+  the ATA Soft Reset mechanism is so strong a reset method that it will force
   resetting on both devices connected to the same cable.
 
   It is called by IdeBlkIoReset(), a interface function of Block
@@ -568,7 +568,7 @@ AtaBlkIoReadBlocks (
   @param BufferSize      The size of the Buffer in bytes. This must be a multiple
                          of the intrinsic block size of the device.
   @param Buffer          A pointer to the source buffer for the data.The caller
-                         is responsible for either having implicit or explicit 
+                         is responsible for either having implicit or explicit
                          ownership of the memory that data is written from.
 
   @retval EFI_SUCCESS       Write Blocks successfully.
@@ -600,26 +600,26 @@ AtaBlkIoWriteBlocks (
   to fill in the Media data structure of the Block I/O Protocol interface.
 
   There are 5 steps to reach such objective:
-  1. Sends out the ATAPI Identify Command to the specified device. 
+  1. Sends out the ATAPI Identify Command to the specified device.
   Only ATAPI device responses to this command. If the command succeeds,
-  it returns the Identify data structure which filled with information 
-  about the device. Since the ATAPI device contains removable media, 
+  it returns the Identify data structure which filled with information
+  about the device. Since the ATAPI device contains removable media,
   the only meaningful information is the device module name.
   2. Sends out ATAPI Inquiry Packet Command to the specified device.
   This command will return inquiry data of the device, which contains
   the device type information.
   3. Allocate sense data space for future use. We don't detect the media
-  presence here to improvement boot performance, especially when CD 
+  presence here to improvement boot performance, especially when CD
   media is present. The media detection will be performed just before
   each BLK_IO read/write
-  
+
   @param IdeDev pointer pointing to IDE_BLK_IO_DEV data structure, used
                  to record all the information of the IDE device.
 
   @retval EFI_SUCCESS       Identify ATAPI device successfully.
   @retval EFI_DEVICE_ERROR  ATAPI Identify Device Command failed or device type
                             is not supported by this IDE driver.
-  @retval EFI_OUT_OF_RESOURCES Allocate memory for sense data failed 
+  @retval EFI_OUT_OF_RESOURCES Allocate memory for sense data failed
 
   @note   Parameter "IdeDev" will be updated in this function.
 **/
@@ -637,7 +637,7 @@ ATAPIIdentify (
   condition (such as BSY bit is always set ), I think the Soft Reset
   command should be sent without waiting for the BSY clear and DRDY
   set.
-  This function is called by IdeBlkIoReset(), 
+  This function is called by IdeBlkIoReset(),
   a interface function of Block I/O protocol.
 
   @param IdeDev    pointer pointing to IDE_BLK_IO_DEV data structure, used
@@ -662,9 +662,9 @@ AtapiSoftReset (
   @param BufferSize     The size of the Buffer in bytes. This must be a multiple
                         of the intrinsic block size of the device.
   @param Buffer         A pointer to the destination buffer for the data. The caller
-                        is responsible for either having implicit or explicit 
+                        is responsible for either having implicit or explicit
                         ownership of the memory that data is read into.
-  
+
   @retval EFI_SUCCESS           Read Blocks successfully.
   @retval EFI_DEVICE_ERROR      Read Blocks failed.
   @retval EFI_NO_MEDIA          There is no media in the device.
@@ -701,8 +701,8 @@ AtapiBlkIoReadBlocks (
   @retval EFI_NO_MEDIA           There is no media in the device.
   @retval EFI_MEDIA_CHANGE       The MediaId is not for the current media.
   @retval EFI_BAD_BUFFER_SIZE    The BufferSize parameter is not a multiple of the
-                                 intrinsic block size of the device.  
-  @retval EFI_INVALID_PARAMETER  The write request contains LBAs that are not valid, 
+                                 intrinsic block size of the device.
+  @retval EFI_INVALID_PARAMETER  The write request contains LBAs that are not valid,
                                  or the data buffer is not valid.
 
   @retval EFI_WRITE_PROTECTED    The write protected is enabled or the media does not support write

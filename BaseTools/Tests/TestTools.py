@@ -1,3 +1,4 @@
+from __future__ import print_function
 ## @file
 # Utility functions and classes for BaseTools unit tests
 #
@@ -22,7 +23,6 @@ import random
 import shutil
 import subprocess
 import sys
-import types
 import unittest
 
 TestsDir = os.path.realpath(os.path.split(sys.argv[0])[0])
@@ -41,7 +41,7 @@ if PythonSourceDir not in sys.path:
 def MakeTheTestSuite(localItems):
     tests = []
     for name, item in localItems.iteritems():
-        if isinstance(item, types.TypeType):
+        if isinstance(item, type):
             if issubclass(item, unittest.TestCase):
                 tests.append(unittest.TestLoader().loadTestsFromTestCase(item))
             elif issubclass(item, unittest.TestSuite):
@@ -91,9 +91,9 @@ class BaseToolsTest(unittest.TestCase):
             os.remove(path)
 
     def DisplayBinaryData(self, description, data):
-        print description, '(base64 encoded):'
+        print(description, '(base64 encoded):')
         b64data = base64.b64encode(data)
-        print b64data
+        print(b64data)
 
     def DisplayFile(self, fileName):
         sys.stdout.write(self.ReadTmpFile(fileName))
@@ -160,7 +160,7 @@ class BaseToolsTest(unittest.TestCase):
         if minlen is None: minlen = 1024
         if maxlen is None: maxlen = minlen
         return ''.join(
-            [chr(random.randint(0,255))
+            [chr(random.randint(0, 255))
              for x in xrange(random.randint(minlen, maxlen))
             ])
 

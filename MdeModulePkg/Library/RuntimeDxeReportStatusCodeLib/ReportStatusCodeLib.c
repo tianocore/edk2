@@ -1,7 +1,7 @@
 /** @file
   API implementation for instance of Report Status Code Library.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -54,11 +54,11 @@ InternalGetReportStatusCode (
   if (mReportStatusCodeLibStatusCodeProtocol != NULL) {
     return;
   }
-  
+
   if (mHaveExitedBootServices) {
     return;
   }
-  
+
   //
   // Check gBS just in case ReportStatusCode is called before gBS is initialized.
   //
@@ -106,9 +106,9 @@ ReportStatusCodeLibExitBootServices (
 {
   //
   // Locate the report status code service before enter runtime.
-  // 
+  //
   InternalGetReportStatusCode ();
-  
+
   mHaveExitedBootServices = TRUE;
 }
 
@@ -120,7 +120,7 @@ ReportStatusCodeLibExitBootServices (
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/
@@ -135,12 +135,12 @@ ReportStatusCodeLibConstructor (
 
   //
   // Cache the report status code service
-  // 
+  //
   InternalGetReportStatusCode ();
 
   //
   // Register notify function for EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE
-  // 
+  //
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
@@ -153,7 +153,7 @@ ReportStatusCodeLibConstructor (
 
   //
   // Register notify function for EVT_SIGNAL_EXIT_BOOT_SERVICES
-  // 
+  //
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
@@ -169,13 +169,13 @@ ReportStatusCodeLibConstructor (
 
 /**
   The destructor function of Runtime DXE Report Status Code Lib.
-  
+
   The destructor function frees memory allocated by constructor, and closes related events.
-  It will ASSERT() if that related operation fails and it will always return EFI_SUCCESS. 
+  It will ASSERT() if that related operation fails and it will always return EFI_SUCCESS.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/
@@ -246,7 +246,7 @@ InternalReportStatusCode (
     //
     return mReportStatusCodeLibStatusCodeProtocol->ReportStatusCode (Type, Value, Instance, (EFI_GUID *)CallerId, Data);
   }
-  
+
   return EFI_UNSUPPORTED;
 }
 
@@ -641,7 +641,7 @@ ReportStatusCodeEx (
     if (gBS == NULL || gBS->AllocatePool == NULL || gBS->FreePool == NULL) {
       return EFI_UNSUPPORTED;
     }
-  
+
     //
     // Allocate space for the Status Code Header and its buffer
     //

@@ -1,7 +1,7 @@
 /** @file
 Functions implementation related with DHCPv4/v6 for DNS driver.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -48,7 +48,7 @@ DnsInitSeedPacket (
 }
 
 /**
-  The common notify function. 
+  The common notify function.
 
   @param[in]  Event   The event signaled.
   @param[in]  Context The context.
@@ -149,16 +149,16 @@ ParseDhcp4Ack (
   }
 
   gBS->FreePool (OptionList);
-  
+
   return Status;
 }
 
 /**
-  EFI_DHCP6_INFO_CALLBACK is provided by the consumer of the EFI DHCPv6 Protocol 
+  EFI_DHCP6_INFO_CALLBACK is provided by the consumer of the EFI DHCPv6 Protocol
   instance to intercept events that occurs in the DHCPv6 Information Request
   exchange process.
 
-  @param  This                  Pointer to the EFI_DHCP6_PROTOCOL instance that 
+  @param  This                  Pointer to the EFI_DHCP6_PROTOCOL instance that
                                 is used to configure this  callback function.
   @param  Context               Pointer to the context that is initialized in
                                 the EFI_DHCP6_PROTOCOL.InfoRequest().
@@ -186,11 +186,11 @@ ParseDhcp6Ack (
   EFI_IPv6_ADDRESS            *ServerList;
   UINT32                      Index;
   UINT32                      Count;
- 
+
   OptionCount = 0;
   ServerCount = 0;
   ServerList  = NULL;
-  
+
   Status      = This->Parse (This, Packet, &OptionCount, NULL);
   if (Status != EFI_BUFFER_TOO_SMALL) {
     return EFI_DEVICE_ERROR;
@@ -206,7 +206,7 @@ ParseDhcp6Ack (
     gBS->FreePool (OptionList);
     return EFI_DEVICE_ERROR;
   }
-  
+
   DnsServerInfor = (DNS6_SERVER_INFOR *) Context;
 
   for (Index = 0; Index < OptionCount; Index++) {
@@ -223,7 +223,7 @@ ParseDhcp6Ack (
         gBS->FreePool (OptionList);
         return Status;
       }
-      
+
       ServerCount = OptionList[Index]->OpLen/16;
       ServerList = AllocatePool (ServerCount * sizeof (EFI_IPv6_ADDRESS));
       if (ServerList == NULL) {
@@ -241,7 +241,7 @@ ParseDhcp6Ack (
   }
 
   gBS->FreePool (OptionList);
-  
+
   return Status;
 
 }
@@ -270,10 +270,10 @@ GetDns4ServerFromDhcp4 (
   EFI_HANDLE                          Image;
   EFI_HANDLE                          Controller;
   EFI_STATUS                          MediaStatus;
-  EFI_HANDLE                          MnpChildHandle;  
+  EFI_HANDLE                          MnpChildHandle;
   EFI_MANAGED_NETWORK_PROTOCOL        *Mnp;
   EFI_MANAGED_NETWORK_CONFIG_DATA     MnpConfigData;
-  EFI_HANDLE                          Dhcp4Handle;  
+  EFI_HANDLE                          Dhcp4Handle;
   EFI_DHCP4_PROTOCOL                  *Dhcp4;
   EFI_IP4_CONFIG2_PROTOCOL            *Ip4Config2;
   UINTN                               DataSize;
@@ -286,13 +286,13 @@ GetDns4ServerFromDhcp4 (
   EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN    Token;
   BOOLEAN                             IsDone;
   UINTN                               Index;
-  
+
   Image                      = Instance->Service->ImageHandle;
   Controller                 = Instance->Service->ControllerHandle;
 
   MnpChildHandle             = NULL;
   Mnp                        = NULL;
-  
+
   Dhcp4Handle                = NULL;
   Dhcp4                      = NULL;
 
@@ -304,11 +304,11 @@ GetDns4ServerFromDhcp4 (
   ZeroMem ((UINT8 *) ParaList, sizeof (ParaList));
 
   ZeroMem (&MnpConfigData, sizeof (EFI_MANAGED_NETWORK_CONFIG_DATA));
-  
+
   ZeroMem (&DnsServerInfor, sizeof (DNS4_SERVER_INFOR));
-  
+
   ZeroMem (&Token, sizeof (EFI_DHCP4_TRANSMIT_RECEIVE_TOKEN));
-  
+
   DnsServerInfor.ServerCount = DnsServerCount;
 
   IsDone = FALSE;
@@ -346,7 +346,7 @@ GetDns4ServerFromDhcp4 (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
-  
+
   MnpConfigData.ReceivedQueueTimeoutValue = 0;
   MnpConfigData.TransmitQueueTimeoutValue = 0;
   MnpConfigData.ProtocolTypeFilter        = IP4_ETHER_PROTO;
@@ -362,7 +362,7 @@ GetDns4ServerFromDhcp4 (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
-  
+
   //
   // Create a DHCP4 child instance and get the protocol.
   //
@@ -395,7 +395,7 @@ GetDns4ServerFromDhcp4 (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
-  
+
   Status = Ip4Config2->GetData (Ip4Config2, Ip4Config2DataTypeInterfaceInfo, &DataSize, Data);
   if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
     goto ON_EXIT;
@@ -413,7 +413,7 @@ GetDns4ServerFromDhcp4 (
   }
 
   InterfaceInfo = (EFI_IP4_CONFIG2_INTERFACE_INFO *)Data;
-  
+
   //
   // Build required Token.
   //
@@ -427,13 +427,13 @@ GetDns4ServerFromDhcp4 (
   if (EFI_ERROR (Status)) {
     goto ON_EXIT;
   }
-  
+
   SetMem (&Token.RemoteAddress, sizeof (EFI_IPv4_ADDRESS), 0xff);
-  
+
   Token.RemotePort = 67;
 
   Token.ListenPointCount = 1;
-  
+
   Token.ListenPoints = AllocateZeroPool (Token.ListenPointCount * sizeof (EFI_DHCP4_LISTEN_POINT));
   if (Token.ListenPoints == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -447,9 +447,9 @@ GetDns4ServerFromDhcp4 (
     CopyMem (&(Token.ListenPoints[0].ListenAddress), &(Instance->Dns4CfgData.StationIp), sizeof (EFI_IPv4_ADDRESS));
     CopyMem (&(Token.ListenPoints[0].SubnetMask), &(Instance->Dns4CfgData.SubnetMask), sizeof (EFI_IPv4_ADDRESS));
   }
-  
+
   Token.ListenPoints[0].ListenPort = 68;
-  
+
   Token.TimeoutValue = DNS_TIME_TO_GETMAP;
 
   DnsInitSeedPacket (&SeedPacket, InterfaceInfo);
@@ -459,35 +459,35 @@ GetDns4ServerFromDhcp4 (
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-  
+
   ParaList[0]->OpCode  = DHCP4_TAG_TYPE;
   ParaList[0]->Length  = 1;
   ParaList[0]->Data[0] = DHCP4_MSG_REQUEST;
-  
+
   ParaList[1] = AllocateZeroPool (sizeof (EFI_DHCP4_PACKET_OPTION));
   if (ParaList[1] == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
-  
+
   ParaList[1]->OpCode  = DHCP4_TAG_PARA_LIST;
   ParaList[1]->Length  = 1;
   ParaList[1]->Data[0] = DHCP4_TAG_DNS_SERVER;
 
-  Status = Dhcp4->Build (Dhcp4, &SeedPacket, 0, NULL, 2, ParaList, &Token.Packet); 
+  Status = Dhcp4->Build (Dhcp4, &SeedPacket, 0, NULL, 2, ParaList, &Token.Packet);
 
   Token.Packet->Dhcp4.Header.Xid      = HTONL(NET_RANDOM (NetRandomInitSeed ()));
-  
+
   Token.Packet->Dhcp4.Header.Reserved = HTONS ((UINT16)0x8000);
-  
+
   if (Instance->Dns4CfgData.UseDefaultSetting) {
     CopyMem (&(Token.Packet->Dhcp4.Header.ClientAddr), &(InterfaceInfo->StationAddress), sizeof (EFI_IPv4_ADDRESS));
   } else {
     CopyMem (&(Token.Packet->Dhcp4.Header.ClientAddr), &(Instance->Dns4CfgData.StationIp), sizeof (EFI_IPv4_ADDRESS));
   }
-  
-  CopyMem (Token.Packet->Dhcp4.Header.ClientHwAddr, &(InterfaceInfo->HwAddress), InterfaceInfo->HwAddressSize); 
-  
+
+  CopyMem (Token.Packet->Dhcp4.Header.ClientHwAddr, &(InterfaceInfo->HwAddress), InterfaceInfo->HwAddressSize);
+
   Token.Packet->Dhcp4.Header.HwAddrLen = (UINT8)(InterfaceInfo->HwAddressSize);
 
   //
@@ -504,7 +504,7 @@ GetDns4ServerFromDhcp4 (
   do {
     Status = Mnp->Poll (Mnp);
   } while (!IsDone);
-  
+
   //
   // Parse the ACK to get required information if received done.
   //
@@ -520,7 +520,7 @@ GetDns4ServerFromDhcp4 (
   } else {
     Status = Token.Status;
   }
-  
+
 ON_EXIT:
 
   if (Data != NULL) {
@@ -540,15 +540,15 @@ ON_EXIT:
   if (Token.Packet) {
     FreePool (Token.Packet);
   }
-  
+
   if (Token.ResponseList != NULL) {
     FreePool (Token.ResponseList);
   }
-  
+
   if (Token.CompletionEvent != NULL) {
     gBS->CloseEvent (Token.CompletionEvent);
   }
-  
+
   if (Dhcp4 != NULL) {
     Dhcp4->Stop (Dhcp4);
     Dhcp4->Configure (Dhcp4, NULL);
@@ -560,7 +560,7 @@ ON_EXIT:
            Controller
            );
   }
-  
+
   if (Dhcp4Handle != NULL) {
     NetLibDestroyServiceChild (
       Controller,
@@ -580,14 +580,14 @@ ON_EXIT:
            Controller
            );
   }
-  
+
   NetLibDestroyServiceChild (
     Controller,
     Image,
     &gEfiManagedNetworkServiceBindingProtocolGuid,
     MnpChildHandle
     );
-  
+
   return Status;
 }
 
@@ -729,14 +729,14 @@ GetDns6ServerFromDhcp6 (
       }
     } while (TimerStatus == EFI_NOT_READY);
   }
-  
+
   *DnsServerList  = DnsServerInfor.ServerList;
 
 ON_EXIT:
 
   if (Oro != NULL) {
     FreePool (Oro);
-  }  
+  }
 
   if (Timer != NULL) {
     gBS->CloseEvent (Timer);
@@ -759,6 +759,6 @@ ON_EXIT:
     );
 
   return Status;
-  
+
 }
 

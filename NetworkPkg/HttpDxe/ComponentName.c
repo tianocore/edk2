@@ -2,7 +2,7 @@
   Implementation of EFI_COMPONENT_NAME_PROTOCOL and
   EFI_COMPONENT_NAME2_PROTOCOL protocol.
 
-  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,7 @@
 ///
 /// Component Name Protocol instance
 ///
-GLOBAL_REMOVE_IF_UNREFERENCED 
+GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_COMPONENT_NAME_PROTOCOL  gHttpDxeComponentName = {
   (EFI_COMPONENT_NAME_GET_DRIVER_NAME)     HttpDxeComponentNameGetDriverName,
   (EFI_COMPONENT_NAME_GET_CONTROLLER_NAME) HttpDxeComponentNameGetControllerName,
@@ -29,7 +29,7 @@ EFI_COMPONENT_NAME_PROTOCOL  gHttpDxeComponentName = {
 ///
 /// Component Name 2 Protocol instance
 ///
-GLOBAL_REMOVE_IF_UNREFERENCED 
+GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_COMPONENT_NAME2_PROTOCOL  gHttpDxeComponentName2 = {
   HttpDxeComponentNameGetDriverName,
   HttpDxeComponentNameGetControllerName,
@@ -39,7 +39,7 @@ EFI_COMPONENT_NAME2_PROTOCOL  gHttpDxeComponentName2 = {
 ///
 /// Table of driver names
 ///
-GLOBAL_REMOVE_IF_UNREFERENCED 
+GLOBAL_REMOVE_IF_UNREFERENCED
 EFI_UNICODE_STRING_TABLE mHttpDxeDriverNameTable[] = {
   { "eng;en", (CHAR16 *) L"HttpDxe" },
   { NULL, NULL }

@@ -1,7 +1,7 @@
 /** @file
   Null PE/Coff Extra Action library instances with empty functions.
 
-  Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -32,14 +32,14 @@ PeCoffLoaderRelocateImageExtraAction (
   )
 {
   ASSERT (ImageContext != NULL);
-}  
+}
 
 /**
   Performs additional actions just before a PE/COFF image is unloaded.  Any resources
   that were allocated by PeCoffLoaderRelocateImageExtraAction() must be freed.
-  
+
   If ImageContext is NULL, then ASSERT().
-  
+
   @param  ImageContext  The pointer to the image context structure that describes the
                         PE/COFF image that is being unloaded.
 

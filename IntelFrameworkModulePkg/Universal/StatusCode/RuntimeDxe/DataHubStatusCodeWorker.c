@@ -1,7 +1,7 @@
 /** @file
   Data Hub status code worker.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -62,7 +62,7 @@ AcquireRecordBuffer (
     if (CurrentTpl > TPL_NOTIFY) {
       //
       // Memory management should work at <=TPL_NOTIFY
-      // 
+      //
       gBS->RestoreTPL (CurrentTpl);
       return NULL;
     }
@@ -132,7 +132,7 @@ RetrieveRecord (
 
 /**
   Release given record and return it to free record buffer.
-  
+
   @param RecordData  Pointer to the record to release.
 
 **/
@@ -212,7 +212,7 @@ DataHubStatusCodeReportWorker (
       return Status;
     }
   }
-  
+
   Record = AcquireRecordBuffer ();
   if (Record == NULL) {
     //
@@ -362,8 +362,8 @@ DataHubStatusCodeInitializeWorker (
   EFI_STATUS  Status;
 
   Status = gBS->LocateProtocol (
-                  &gEfiDataHubProtocolGuid, 
-                  NULL, 
+                  &gEfiDataHubProtocolGuid,
+                  NULL,
                   (VOID **) &mDataHubProtocol
                   );
   if (EFI_ERROR (Status)) {

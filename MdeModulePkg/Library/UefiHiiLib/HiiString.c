@@ -1,7 +1,7 @@
 /** @file
   HII Library implementation that uses DXE protocols and services.
 
-  Copyright (c) 2006 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,37 +16,37 @@
 #include "InternalHiiLib.h"
 
 /**
-  This function create a new string in String Package or updates an existing 
+  This function create a new string in String Package or updates an existing
   string in a String Package.  If StringId is 0, then a new string is added to
   a String Package.  If StringId is not zero, then a string in String Package is
   updated.  If SupportedLanguages is NULL, then the string is added or updated
   for all the languages that the String Package supports.  If SupportedLanguages
-  is not NULL, then the string is added or updated for the set of languages 
+  is not NULL, then the string is added or updated for the set of languages
   specified by SupportedLanguages.
-    
+
   If HiiHandle is NULL, then ASSERT().
   If String is NULL, then ASSERT().
 
-  @param[in]  HiiHandle           A handle that was previously registered in the 
+  @param[in]  HiiHandle           A handle that was previously registered in the
                                   HII Database.
-  @param[in]  StringId            If zero, then a new string is created in the 
-                                  String Package associated with HiiHandle.  If 
-                                  non-zero, then the string specified by StringId 
-                                  is updated in the String Package  associated 
-                                  with HiiHandle. 
-  @param[in]  String              A pointer to the Null-terminated Unicode string 
-                                  to add or update in the String Package associated 
+  @param[in]  StringId            If zero, then a new string is created in the
+                                  String Package associated with HiiHandle.  If
+                                  non-zero, then the string specified by StringId
+                                  is updated in the String Package  associated
                                   with HiiHandle.
-  @param[in]  SupportedLanguages  A pointer to a Null-terminated ASCII string of 
-                                  language codes.  If this parameter is NULL, then 
-                                  String is added or updated in the String Package 
-                                  associated with HiiHandle for all the languages 
-                                  that the String Package supports.  If this 
-                                  parameter is not NULL, then then String is added 
-                                  or updated in the String Package associated with 
-                                  HiiHandle for the set oflanguages specified by 
-                                  SupportedLanguages.  The format of 
-                                  SupportedLanguages must follow the language 
+  @param[in]  String              A pointer to the Null-terminated Unicode string
+                                  to add or update in the String Package associated
+                                  with HiiHandle.
+  @param[in]  SupportedLanguages  A pointer to a Null-terminated ASCII string of
+                                  language codes.  If this parameter is NULL, then
+                                  String is added or updated in the String Package
+                                  associated with HiiHandle for all the languages
+                                  that the String Package supports.  If this
+                                  parameter is not NULL, then then String is added
+                                  or updated in the String Package associated with
+                                  HiiHandle for the set oflanguages specified by
+                                  SupportedLanguages.  The format of
+                                  SupportedLanguages must follow the language
                                   format assumed the HII Database.
 
   @retval 0      The string could not be added or updated in the String Package.
@@ -106,7 +106,7 @@ HiiSetString (
     if (*Supported != 0) {
       *(Supported++) = '\0';
     }
-    
+
     if ((SupportedLanguages == NULL) && AsciiStrnCmp (Language, UEFI_CONFIG_LANG, AsciiStrLen (UEFI_CONFIG_LANG)) == 0) {
       //
       // Skip string package used for keyword protocol.
@@ -145,24 +145,24 @@ HiiSetString (
 
 
 /**
-  Retrieves a string from a string package names by GUID in a specific language.  
-  If the language is not specified, then a string from a string package in the 
-  current platform  language is retrieved.  If the string can not be retrieved 
-  using the specified language or the current platform language, then the string 
-  is retrieved from the string package in the first language the string package 
-  supports.  The returned string is allocated using AllocatePool().  The caller 
+  Retrieves a string from a string package names by GUID in a specific language.
+  If the language is not specified, then a string from a string package in the
+  current platform  language is retrieved.  If the string can not be retrieved
+  using the specified language or the current platform language, then the string
+  is retrieved from the string package in the first language the string package
+  supports.  The returned string is allocated using AllocatePool().  The caller
   is responsible for freeing the allocated buffer using FreePool().
-  
+
   If PackageListGuid is NULL, then ASSERT().
   If StringId is 0, then ASSERT.
 
-  @param[in]  PackageListGuid  The GUID of a package list that was previously 
+  @param[in]  PackageListGuid  The GUID of a package list that was previously
                                registered in the HII Database.
-  @param[in]  StringId         The identifier of the string to retrieved from the 
+  @param[in]  StringId         The identifier of the string to retrieved from the
                                string package associated with PackageListGuid.
-  @param[in]  Language         The language of the string to retrieve.  If this 
-                               parameter is NULL, then the current platform 
-                               language is used.  The format of Language must 
+  @param[in]  Language         The language of the string to retrieve.  If this
+                               parameter is NULL, then the current platform
+                               language is used.  The format of Language must
                                follow the language format assumed the HII Database.
 
   @retval NULL   The package list specified by PackageListGuid is not present in the
@@ -197,22 +197,22 @@ HiiGetPackageString (
 
 /**
   Retrieves a string from a string package in a specific language.  If the language
-  is not specified, then a string from a string package in the current platform 
-  language is retrieved.  If the string can not be retrieved using the specified 
-  language or the current platform language, then the string is retrieved from 
-  the string package in the first language the string package supports.  The 
-  returned string is allocated using AllocatePool().  The caller is responsible 
+  is not specified, then a string from a string package in the current platform
+  language is retrieved.  If the string can not be retrieved using the specified
+  language or the current platform language, then the string is retrieved from
+  the string package in the first language the string package supports.  The
+  returned string is allocated using AllocatePool().  The caller is responsible
   for freeing the allocated buffer using FreePool().
-  
+
   If HiiHandle is NULL, then ASSERT().
   If StringId is 0, then ASSET.
 
   @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
-  @param[in]  StringId   The identifier of the string to retrieved from the string 
+  @param[in]  StringId   The identifier of the string to retrieved from the string
                          package associated with HiiHandle.
-  @param[in]  Language   The language of the string to retrieve.  If this parameter 
-                         is NULL, then the current platform language is used.  The 
-                         format of Language must follow the language format assumed 
+  @param[in]  Language   The language of the string to retrieve.  If this parameter
+                         is NULL, then the current platform language is used.  The
+                         format of Language must follow the language format assumed
                          the HII Database.
 
   @retval NULL   The string specified by StringId is not present in the string package.
@@ -240,7 +240,7 @@ HiiGetString (
 
   //
   // Initialize all allocated buffers to NULL
-  // 
+  //
   SupportedLanguages = NULL;
   PlatformLanguage   = NULL;
   BestLanguage       = NULL;
@@ -260,7 +260,7 @@ HiiGetString (
   GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&PlatformLanguage, NULL);
 
   //
-  // If Languag is NULL, then set it to an empty string, so it will be 
+  // If Languag is NULL, then set it to an empty string, so it will be
   // skipped by GetBestLanguage()
   //
   if (Language == NULL) {
@@ -271,11 +271,11 @@ HiiGetString (
   // Get the best matching language from SupportedLanguages
   //
   BestLanguage = GetBestLanguage (
-                   SupportedLanguages, 
+                   SupportedLanguages,
                    FALSE,                                             // RFC 4646 mode
-                   Language,                                          // Highest priority 
+                   Language,                                          // Highest priority
                    PlatformLanguage != NULL ? PlatformLanguage : "",  // Next highest priority
-                   SupportedLanguages,                                // Lowest priority 
+                   SupportedLanguages,                                // Lowest priority
                    NULL
                    );
   if (BestLanguage == NULL) {
@@ -296,8 +296,8 @@ HiiGetString (
                          NULL
                          );
   //
-  // If GetString() returns EFI_SUCCESS for a zero size, 
-  // then there are no supported languages registered for HiiHandle.  If GetString() 
+  // If GetString() returns EFI_SUCCESS for a zero size,
+  // then there are no supported languages registered for HiiHandle.  If GetString()
   // returns an error other than EFI_BUFFER_TOO_SMALL, then HiiHandle is not present
   // in the HII Database
   //

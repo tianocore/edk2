@@ -3,14 +3,14 @@
   Framework IFR is primarily consumed by the EFI presentation engine, and produced by EFI
   internal application and drivers as well as all add-in card option-ROM drivers
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
   These definitions are from the Framework Specification HII 0.92.
@@ -222,8 +222,8 @@ typedef struct {
 
 //
 // There is an interesting twist with regards to Time and Date.  This is one of the few items which can accept input
-// from a user, and may or may not need to use storage in the NVRAM space.  The decided method for determining 
-// if NVRAM space will be used (only for a TimeOp or DateOp) is:  If .QuestionId == 0 && .Width == 0 (normally an 
+// from a user, and may or may not need to use storage in the NVRAM space.  The decided method for determining
+// if NVRAM space will be used (only for a TimeOp or DateOp) is:  If .QuestionId == 0 && .Width == 0 (normally an
 // impossibility) then use system resources to store the data away and not NV resources.  In other words, the setup
 // engine will call gRT->SetTime, and gRT->SetDate for the saving of data, and the values displayed will be from the
 // gRT->GetXXXX series of calls.
@@ -256,7 +256,7 @@ typedef struct {
 typedef struct {
   FRAMEWORK_EFI_IFR_OP_HEADER       Header;
   UINT16                            QuestionId; ///< The ID designating what the question is about...
-  UINT8                             Width;      ///< The Size of the Data being saved. 
+  UINT8                             Width;      ///< The Size of the Data being saved.
   STRING_REF                        Prompt;     ///< The String Token for the Prompt.
   STRING_REF                        Help;       ///< The string Token for the context-help.
   UINT8                             Flags;      ///< This is included solely for purposes of interactive/dynamic support.
@@ -277,7 +277,7 @@ typedef struct {
 
 ///
 /// Inconsistent with specification here:
-/// The following defintion may not comply with Framework Specification HII 0.92. To 
+/// The following defintion may not comply with Framework Specification HII 0.92. To
 /// keep the inconsistant is for implementation needed.
 ///@{
 typedef struct {

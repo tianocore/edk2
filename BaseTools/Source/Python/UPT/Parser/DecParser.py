@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse DEC file. It will consumed by DecParser
 #
-# Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -57,10 +57,10 @@ from Object.Parser.DecObject import DecPcdObject
 from Object.Parser.DecObject import DecPcdItemObject
 from Library.Misc import GuidStructureStringToGuidString
 from Library.Misc import CheckGuidRegFormat
-from Library.String import ReplaceMacro
-from Library.String import GetSplitValueList
-from Library.String import gMACRO_PATTERN
-from Library.String import ConvertSpecialChar
+from Library.StringUtils import ReplaceMacro
+from Library.StringUtils import GetSplitValueList
+from Library.StringUtils import gMACRO_PATTERN
+from Library.StringUtils import ConvertSpecialChar
 from Library.CommentParsing import ParsePcdErrorCode
 
 ##

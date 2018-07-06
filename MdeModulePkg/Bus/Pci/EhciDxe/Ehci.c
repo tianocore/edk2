@@ -1,14 +1,14 @@
-/** @file  
+/** @file
   The Ehci controller driver.
 
-  EhciDxe driver is responsible for managing the behavior of EHCI controller. 
-  It implements the interfaces of monitoring the status of all ports and transferring 
+  EhciDxe driver is responsible for managing the behavior of EHCI controller.
+  It implements the interfaces of monitoring the status of all ports and transferring
   Control, Bulk, Interrupt and Isochronous requests to Usb2.0 device.
 
   Note that EhciDxe driver is enhanced to guarantee that the EHCI controller get attached
-  to the EHCI controller before a UHCI or OHCI driver attaches to the companion UHCI or 
-  OHCI controller.  This way avoids the control transfer on a shared port between EHCI 
-  and companion host controller when UHCI or OHCI gets attached earlier than EHCI and a 
+  to the EHCI controller before a UHCI or OHCI driver attaches to the companion UHCI or
+  OHCI controller.  This way avoids the control transfer on a shared port between EHCI
+  and companion host controller when UHCI or OHCI gets attached earlier than EHCI and a
   USB 2.0 device inserts.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -1608,7 +1608,7 @@ EhcCreateUsb2Hc (
     gBS->FreePool (Ehc);
     return NULL;
   }
-  
+
   EhcGetUsbDebugPortInfo (Ehc);
 
   //
@@ -1781,12 +1781,12 @@ EhcDriverBindingStart (
     goto CLOSE_PCIIO;
   }
   //
-  // Determine if the device is UHCI or OHCI host controller or not. If yes, then find out the 
+  // Determine if the device is UHCI or OHCI host controller or not. If yes, then find out the
   // companion usb ehci host controller and force EHCI driver get attached to it before
   // UHCI or OHCI driver attaches to UHCI or OHCI host controller.
   //
   if ((UsbClassCReg.ProgInterface == PCI_IF_UHCI || UsbClassCReg.ProgInterface == PCI_IF_OHCI) &&
-       (UsbClassCReg.BaseCode == PCI_CLASS_SERIAL) && 
+       (UsbClassCReg.BaseCode == PCI_CLASS_SERIAL) &&
        (UsbClassCReg.SubClassCode == PCI_CLASS_SERIAL_USB)) {
     Status = PciIo->GetLocation (
                     PciIo,
@@ -1835,7 +1835,7 @@ EhcDriverBindingStart (
       }
 
       if ((UsbClassCReg.ProgInterface == PCI_IF_EHCI) &&
-           (UsbClassCReg.BaseCode == PCI_CLASS_SERIAL) && 
+           (UsbClassCReg.BaseCode == PCI_CLASS_SERIAL) &&
            (UsbClassCReg.SubClassCode == PCI_CLASS_SERIAL_USB)) {
         Status = Instance->GetLocation (
                     Instance,
@@ -2098,7 +2098,7 @@ EhcDriverBindingStop (
   }
 
   //
-  // Disable routing of all ports to EHCI controller, so all ports are 
+  // Disable routing of all ports to EHCI controller, so all ports are
   // routed back to the UHCI or OHCI controller.
   //
   EhcClearOpRegBit (Ehc, EHC_CONFIG_FLAG_OFFSET, CONFIGFLAG_ROUTE_EHC);

@@ -2,7 +2,7 @@
 
   The definition for UHCI driver model and HC protocol routines.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -145,7 +145,7 @@ struct _USB_HC_DEV {
   VOID                      *FrameMapping;
 
   //
-  // ExitBootServicesEvent is used to stop the EHC DMA operation 
+  // ExitBootServicesEvent is used to stop the EHC DMA operation
   // after exit boot service.
   //
   EFI_EVENT                 ExitBootServiceEvent;

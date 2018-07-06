@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -43,12 +43,12 @@ ASM_PFX(InternalMemSetMem):
     movq    %rcx, %r8
     movq    %r8, %rdi                     # rdi <- Buffer
     movq    %rdx, %rcx
-    andq    $7, %rdx 
+    andq    $7, %rdx
     shrq    $3, %rcx
     jz      L_SetBytes
     .byte   0x0f, 0x70, 0x0C0, 0x00
 L0:
-    movntq  %mm0, (%rdi) 
+    movntq  %mm0, (%rdi)
     addq    $8, %rdi
     loop    L0
     mfence

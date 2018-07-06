@@ -104,12 +104,12 @@ class DependencyRules(object):
             # check whether satisfied by current distribution 
             #
             if not Exist:
-                if DpObj == None:
+                if DpObj is None:
                     Result = False
                     break
                 for GuidVerPair in DpObj.PackageSurfaceArea.keys():
                     if Dep.GetGuid() == GuidVerPair[0]:
-                        if Dep.GetVersion() == None or \
+                        if Dep.GetVersion() is None or \
                         len(Dep.GetVersion()) == 0:
                             Result = True
                             break
@@ -285,8 +285,8 @@ class DependencyRules(object):
                 pass
             DecPath = dirname(DecFile)
             if DecPath.find(WorkSP) > -1:
-                InstallPath = GetRelativePath(DecPath,WorkSP)
-                DecFileRelaPath = GetRelativePath(DecFile,WorkSP)
+                InstallPath = GetRelativePath(DecPath, WorkSP)
+                DecFileRelaPath = GetRelativePath(DecFile, WorkSP)
             else:
                 InstallPath = DecPath
                 DecFileRelaPath = DecFile
@@ -348,8 +348,8 @@ class DependencyRules(object):
                 pass
             DecPath = dirname(DecFile)
             if DecPath.find(WorkSP) > -1:
-                InstallPath = GetRelativePath(DecPath,WorkSP)
-                DecFileRelaPath = GetRelativePath(DecFile,WorkSP)
+                InstallPath = GetRelativePath(DecPath, WorkSP)
+                DecFileRelaPath = GetRelativePath(DecFile, WorkSP)
             else:
                 InstallPath = DecPath
                 DecFileRelaPath = DecFile
@@ -394,7 +394,7 @@ def VerifyRemoveModuleDep(Path, DpPackagePathList):
                 return False
         else:
             return True
-    except FatalError, ErrCode:
+    except FatalError as ErrCode:
         if ErrCode.message == EDK1_INF_ERROR:
             Logger.Warn("UPT",
                         ST.WRN_EDK1_INF_FOUND%Path)
@@ -446,7 +446,7 @@ def VerifyReplaceModuleDep(Path, DpPackagePathList, OtherPkgList):
                     return False
         else:
             return True
-    except FatalError, ErrCode:
+    except FatalError as ErrCode:
         if ErrCode.message == EDK1_INF_ERROR:
             Logger.Warn("UPT",
                         ST.WRN_EDK1_INF_FOUND%Path)

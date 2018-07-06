@@ -1,7 +1,7 @@
 /** @file
 Implementation of interfaces function for EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -109,7 +109,7 @@ ExtractDevicePath (
   if (((Length + 1) / 2) < sizeof (EFI_DEVICE_PATH_PROTOCOL)) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // The data in <PathHdr> is encoded as hex UNICODE %02x bytes in the same order
   // as the device path resides in RAM memory.
@@ -119,7 +119,7 @@ ExtractDevicePath (
   if (DevicePathBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   //
   // Convert DevicePath
   //
@@ -133,7 +133,7 @@ ExtractDevicePath (
       DevicePathBuffer [Index/2] = (UINT8) ((DevicePathBuffer [Index/2] << 4) + DigitUint8);
     }
   }
-  
+
   //
   // Validate DevicePath
   //
@@ -209,7 +209,7 @@ ExtractNameSpace (
 
   TmpPtr = StrStr (String, L"&");
   if (TmpPtr != NULL) {
-    *TmpPtr = 0; 
+    *TmpPtr = 0;
   }
   if (NextString != NULL) {
     *NextString = String + StrLen (String);
@@ -227,7 +227,7 @@ ExtractNameSpace (
   UnicodeStrToAsciiStrS (String, *NameSpace, NameSpaceSize);
 
   if (TmpPtr != NULL) {
-    *TmpPtr = L'&'; 
+    *TmpPtr = L'&';
   }
 
   return EFI_SUCCESS;
@@ -256,7 +256,7 @@ ExtractKeyword (
   EFI_STRING  TmpPtr;
 
   ASSERT ((Keyword != NULL) && (NextString != NULL));
-  
+
   TmpPtr = NULL;
 
   //
@@ -280,10 +280,10 @@ ExtractKeyword (
   }
 
   String += StrLen (L"KEYWORD=");
-  
+
   TmpPtr = StrStr (String, L"&");
   if (TmpPtr != NULL) {
-    *TmpPtr = 0; 
+    *TmpPtr = 0;
   }
   *NextString = String + StrLen (String);
 
@@ -295,7 +295,7 @@ ExtractKeyword (
   if (TmpPtr != NULL) {
     *TmpPtr = L'&';
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -335,10 +335,10 @@ ExtractValue (
   }
 
   String += StrLen (L"VALUE=");
-  
+
   TmpPtr = StrStr (String, L"&");
   if (TmpPtr != NULL) {
-    *TmpPtr = 0; 
+    *TmpPtr = 0;
   }
   *NextString = String + StrLen (String);
 
@@ -350,7 +350,7 @@ ExtractValue (
   if (TmpPtr != NULL) {
     *TmpPtr = L'&';
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -376,7 +376,7 @@ ExtractFilter (
 {
   CHAR16      *PathPtr;
   CHAR16      *KeywordPtr;
-  BOOLEAN     RetVal; 
+  BOOLEAN     RetVal;
 
   ASSERT ((FilterFlags != NULL) && (NextString != NULL));
 
@@ -387,7 +387,7 @@ ExtractFilter (
     *NextString = NULL;
     return FALSE;
   }
-  
+
   *FilterFlags = 0;
   RetVal = TRUE;
 
@@ -558,7 +558,7 @@ ValidateFilter (
 
   //
   // Get ReadOnly flag from Question.
-  // 
+  //
   *ReadOnly = ExtractReadOnlyFromOpCode(OpCodeData);
 
   while (ExtractFilter (StringPtr, &FilterFlags, &NextFilter)) {
@@ -653,7 +653,7 @@ ValidateFilter (
     //
     StringPtr = NextFilter;
   }
-  
+
 Done:
   //
   // The current filter which is processing.
@@ -702,14 +702,14 @@ GetRecordFromDevicePath (
 }
 
 /**
-  Calculate the size of StringSrc and output it. Also copy string text from src 
+  Calculate the size of StringSrc and output it. Also copy string text from src
   to dest.
 
   This is a internal function.
 
   @param  StringSrc              Points to current null-terminated string.
   @param  BufferSize             Length of the buffer.
-  @param  StringDest             Buffer to store the string text. 
+  @param  StringDest             Buffer to store the string text.
 
   @retval EFI_SUCCESS            The string text was outputted successfully.
   @retval EFI_OUT_OF_RESOURCES   Out of resource.
@@ -738,7 +738,7 @@ GetUnicodeStringTextAndSize (
   if (*StringDest == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   CopyMem (*StringDest, StringSrc, StringSize);
 
   *BufferSize = StringSize;
@@ -1067,7 +1067,7 @@ GetNextStringId (
     case EFI_HII_SIBT_STRING_SCSU:
       Offset = sizeof (EFI_HII_STRING_BLOCK);
       StringTextPtr = BlockHdr + Offset;
-      
+
       if (FindString) {
         StringSize = AsciiStrSize ((CHAR8 *) StringTextPtr);
         *KeywordValue = AllocatePool (StringSize * sizeof (CHAR16));
@@ -1087,7 +1087,7 @@ GetNextStringId (
     case EFI_HII_SIBT_STRING_SCSU_FONT:
       Offset = sizeof (EFI_HII_SIBT_STRING_SCSU_FONT_BLOCK) - sizeof (UINT8);
       StringTextPtr = BlockHdr + Offset;
-      
+
       if (FindString) {
         StringSize = AsciiStrSize ((CHAR8 *) StringTextPtr);
         *KeywordValue = AllocatePool (StringSize * sizeof (CHAR16));
@@ -1205,7 +1205,7 @@ GetNextStringId (
       BlockSize += Offset;
       CopyMem (&StringCount, BlockHdr + sizeof (EFI_HII_STRING_BLOCK), sizeof (UINT16));
       for (Index = 0; Index < StringCount; Index++) {
-        GetUnicodeStringTextAndSize (StringTextPtr, &StringSize, &String);        
+        GetUnicodeStringTextAndSize (StringTextPtr, &StringSize, &String);
 
         if (FindString) {
           *KeywordValue = String;
@@ -1346,7 +1346,7 @@ GetStringIdFromRecord (
     StringPackage = CR (Link, HII_STRING_PACKAGE_INSTANCE, StringEntry, HII_STRING_PACKAGE_SIGNATURE);
 
     if (AsciiStrnCmp(Name, StringPackage->StringPkgHdr->Language, AsciiStrLen (Name)) == 0) {
-      Status = GetStringIdFromString (StringPackage, KeywordValue, StringId); 
+      Status = GetStringIdFromString (StringPackage, KeywordValue, StringId);
       if (EFI_ERROR (Status)) {
         return KEYWORD_HANDLER_KEYWORD_NOT_FOUND;
       } else {
@@ -1430,10 +1430,10 @@ IsStorageOpCode (
   @retval  the opcode for the question.
 
 **/
-UINT8 * 
+UINT8 *
 FindQuestionFromStringId (
   IN HII_IFR_PACKAGE_INSTANCE      *FormPackage,
-  IN EFI_STRING_ID                 KeywordStrId 
+  IN EFI_STRING_ID                 KeywordStrId
   )
 {
   UINT8                        *OpCodeData;
@@ -1530,7 +1530,7 @@ FindStorageFromVarId (
   @retval  the width info for one question.
 
 **/
-UINT16 
+UINT16
 GetWidth (
   IN UINT8        *OpCodeData
   )
@@ -1548,16 +1548,16 @@ GetWidth (
     switch (((EFI_IFR_ONE_OF *) OpCodeData)->Flags & EFI_IFR_NUMERIC_SIZE) {
     case EFI_IFR_NUMERIC_SIZE_1:
       return (UINT16) sizeof (UINT8);
-    
+
     case EFI_IFR_NUMERIC_SIZE_2:
       return  (UINT16) sizeof (UINT16);
-    
+
     case EFI_IFR_NUMERIC_SIZE_4:
       return (UINT16) sizeof (UINT32);
-    
+
     case EFI_IFR_NUMERIC_SIZE_8:
       return (UINT16) sizeof (UINT64);
-    
+
     default:
       ASSERT (FALSE);
       return 0;
@@ -1572,16 +1572,16 @@ GetWidth (
     switch (((EFI_IFR_ONE_OF_OPTION *) NextOpCodeData)->Type) {
     case EFI_IFR_TYPE_NUM_SIZE_8:
       return (UINT16) sizeof (UINT8) * ((EFI_IFR_ORDERED_LIST *) OpCodeData)->MaxContainers;
-    
+
     case EFI_IFR_TYPE_NUM_SIZE_16:
       return (UINT16) sizeof (UINT16) * ((EFI_IFR_ORDERED_LIST *) OpCodeData)->MaxContainers ;
-    
+
     case EFI_IFR_TYPE_NUM_SIZE_32:
       return (UINT16) sizeof (UINT32) * ((EFI_IFR_ORDERED_LIST *) OpCodeData)->MaxContainers;
-    
+
     case EFI_IFR_TYPE_NUM_SIZE_64:
       return (UINT16) sizeof (UINT64) * ((EFI_IFR_ORDERED_LIST *) OpCodeData)->MaxContainers;
-    
+
     default:
       ASSERT (FALSE);
       return 0;
@@ -1589,7 +1589,7 @@ GetWidth (
 
   case EFI_IFR_CHECKBOX_OP:
     return (UINT16) sizeof (BOOLEAN);
-    
+
   case EFI_IFR_PASSWORD_OP:
     return (UINT16)((UINTN) ((EFI_IFR_PASSWORD *) OpCodeData)->MaxSize * sizeof (CHAR16));
 
@@ -1648,12 +1648,12 @@ InternalLowerConfigString (
 
 /**
   Allocates and returns a Null-terminated Unicode <ConfigHdr> string.
-  
+
   The format of a <ConfigHdr> is as follows:
 
     GUID=<HexCh>32&NAME=<Char>NameLength&PATH=<HexChar>DevicePathSize<Null>
 
-  @param[in]  OpCodeData    The opcode for the storage.                  
+  @param[in]  OpCodeData    The opcode for the storage.
   @param[in]  DriverHandle  The driver handle which supports a Device Path Protocol
                             that is the routing information PATH.  Each byte of
                             the Device Path associated with DriverHandle is converted
@@ -1689,17 +1689,17 @@ ConstructConfigHdr (
     Guid      = (EFI_GUID *)(UINTN *)&((EFI_IFR_VARSTORE *) OpCodeData)->Guid;
     AsciiName = (CHAR8 *) ((EFI_IFR_VARSTORE *) OpCodeData)->Name;
     break;
-  
+
   case EFI_IFR_VARSTORE_NAME_VALUE_OP:
     Guid      = (EFI_GUID *)(UINTN *)&((EFI_IFR_VARSTORE_NAME_VALUE *) OpCodeData)->Guid;
     AsciiName = NULL;
     break;
-  
+
   case EFI_IFR_VARSTORE_EFI_OP:
     Guid      = (EFI_GUID *)(UINTN *)&((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Guid;
     AsciiName = (CHAR8 *) ((EFI_IFR_VARSTORE_EFI *) OpCodeData)->Name;
     break;
-  
+
   default:
     ASSERT (FALSE);
     Guid      = NULL;
@@ -1717,7 +1717,7 @@ ConstructConfigHdr (
   }
 
   //
-  // Compute the length of Name in Unicode characters.  
+  // Compute the length of Name in Unicode characters.
   // If Name is NULL, then the length is 0.
   //
   NameLength = 0;
@@ -1773,7 +1773,7 @@ ConstructConfigHdr (
       String += StrnLenS (String, MaxLen - ((UINTN)String - (UINTN)ReturnString) / sizeof (CHAR16));
     }
   }
-  
+
   //
   // Append L"&NAME="
   //
@@ -1841,12 +1841,12 @@ EFI_STRING
 ConstructRequestElement (
   IN CHAR16      *Name,
   IN UINT16      Offset,
-  IN UINT16      Width  
+  IN UINT16      Width
   )
 {
   CHAR16    *StringPtr;
   UINTN     Length;
-  
+
   if (Name != NULL) {
     //
     // Add <BlockName> length for each Name
@@ -1886,10 +1886,10 @@ ConstructRequestElement (
     // Append OFFSET=XXXX&WIDTH=YYYY\0
     //
     UnicodeSPrint (
-      StringPtr, 
-      (7 + 4 + 7 + 4 + 1) * sizeof (CHAR16), 
-      L"OFFSET=%04X&WIDTH=%04X", 
-      Offset, 
+      StringPtr,
+      (7 + 4 + 7 + 4 + 1) * sizeof (CHAR16),
+      L"OFFSET=%04X&WIDTH=%04X",
+      Offset,
       Width
     );
   }
@@ -1922,7 +1922,7 @@ GetNameFromId (
 
   Name = NULL;
   BestLanguage = NULL;
-  PlatformLanguage = NULL; 
+  PlatformLanguage = NULL;
   SupportedLanguages = NULL;
 
   GetEfiGlobalVariable2 (L"PlatformLang", (VOID**)&PlatformLanguage, NULL);
@@ -1932,10 +1932,10 @@ GetNameFromId (
   // Get the best matching language from SupportedLanguages
   //
   BestLanguage = GetBestLanguage (
-                   SupportedLanguages, 
+                   SupportedLanguages,
                    FALSE,                                             // RFC 4646 mode
                    PlatformLanguage != NULL ? PlatformLanguage : "",  // Highest priority
-                   SupportedLanguages,                                // Lowest priority 
+                   SupportedLanguages,                                // Lowest priority
                    NULL
                    );
   if (BestLanguage == NULL) {
@@ -2013,7 +2013,7 @@ ExtractConfigRequest (
   IN  EFI_STRING_ID         KeywordStrId,
   OUT UINT8                 **OpCodeData,
   OUT EFI_STRING            *ConfigRequest
-  ) 
+  )
 {
   LIST_ENTRY                          *Link;
   HII_DATABASE_PACKAGE_LIST_INSTANCE  *PackageListNode;
@@ -2053,7 +2053,7 @@ ExtractConfigRequest (
       //
       ASSERT (Header->VarStoreId != 0);
       DEBUG ((EFI_D_INFO, "Varstore Id: 0x%x\n", Header->VarStoreId));
-      
+
       Storage = FindStorageFromVarId (FormPackage, Header->VarStoreId);
       ASSERT (Storage != NULL);
 
@@ -2116,7 +2116,7 @@ ExtractConfigResp (
   IN  EFI_STRING            ValueElement,
   OUT UINT8                 **OpCodeData,
   OUT EFI_STRING            *ConfigResp
-  ) 
+  )
 {
   LIST_ENTRY                          *Link;
   HII_DATABASE_PACKAGE_LIST_INSTANCE  *PackageListNode;
@@ -2156,7 +2156,7 @@ ExtractConfigResp (
       //
       ASSERT (Header->VarStoreId != 0);
       DEBUG ((EFI_D_INFO, "Varstore Id: 0x%x\n", Header->VarStoreId));
-      
+
       Storage = FindStorageFromVarId (FormPackage, Header->VarStoreId);
       ASSERT (Storage != NULL);
 
@@ -2341,7 +2341,7 @@ GetStringIdFromDatabase (
       *ProgressErr = GetStringIdFromRecord (Record, NameSpace, KeywordData, KeywordStringId);
       if (*ProgressErr == KEYWORD_HANDLER_NO_ERROR) {
         *DataBaseRecord = Record;
-        
+
         if ((DevicePathPkg = Record->PackageList->DevicePathPkg) != NULL) {
           DestDevicePath = (EFI_DEVICE_PATH_PROTOCOL *) (DevicePathPkg + sizeof (EFI_HII_PACKAGE_HEADER));
           DevicePathSize = GetDevicePathSize ((EFI_DEVICE_PATH_PROTOCOL *) DestDevicePath);
@@ -2361,7 +2361,7 @@ GetStringIdFromDatabase (
         return EFI_OUT_OF_RESOURCES;
       } else if (*ProgressErr == KEYWORD_HANDLER_KEYWORD_NOT_FOUND) {
         FindNameSpace = TRUE;
-      }  
+      }
     }
 
     //
@@ -2394,7 +2394,7 @@ GetStringIdFromDatabase (
 **/
 EFI_STATUS
 GenerateKeywordResp (
-  IN  CHAR8                          *NameSpace, 
+  IN  CHAR8                          *NameSpace,
   IN  EFI_DEVICE_PATH_PROTOCOL       *DevicePath,
   IN  EFI_STRING                     KeywordData,
   IN  EFI_STRING                     ValueStr,
@@ -2510,7 +2510,7 @@ GenerateKeywordResp (
   if (PathHdr != NULL) {
     FreePool (PathHdr);
   }
-  
+
   return EFI_SUCCESS;
 }
 
@@ -2562,9 +2562,9 @@ MergeToMultiKeywordResp (
 }
 
 /**
-  Enumerate all keyword in the system. 
-  
-  If error occur when parse one keyword, just skip it and parse the next one. 
+  Enumerate all keyword in the system.
+
+  If error occur when parse one keyword, just skip it and parse the next one.
 
   This is a internal function.
 
@@ -2649,7 +2649,7 @@ EnumerateAllKeywords (
         // Any valid string start from 2. so here initial it to 1.
         //
         NextStringId = 1;
-        
+
         //
         // Enumerate all valid stringid in the package.
         //
@@ -2664,7 +2664,7 @@ EnumerateAllKeywords (
             //
             goto Error;
           }
-          
+
           //
           // 3.4 Extract Value for the input keyword.
           //
@@ -2698,7 +2698,7 @@ EnumerateAllKeywords (
             //
             goto Done;
           }
-          
+
           //
           // 6. Merge to the MultiKeywordResp string.
           //
@@ -2721,7 +2721,7 @@ Error:
           if (KeywordResp != NULL) {
             FreePool (KeywordResp);
             KeywordResp = NULL;
-          } 
+          }
         }
 
         if (LocalNameSpace != NULL) {
@@ -2729,7 +2729,7 @@ Error:
           LocalNameSpace = NULL;
         }
       }
-    } 
+    }
   }
 
   //
@@ -2746,7 +2746,7 @@ Error:
     Status = EFI_SUCCESS;
   }
   *MultiResp = MultiKeywordResp;
-  
+
 Done:
   if (LocalNameSpace != NULL) {
     FreePool (LocalNameSpace);
@@ -2766,18 +2766,18 @@ Done:
   This function accepts a <MultiKeywordResp> formatted string, finds the associated
   keyword owners, creates a <MultiConfigResp> string from it and forwards it to the
   EFI_HII_ROUTING_PROTOCOL.RouteConfig function.
-  
-  If there is an issue in resolving the contents of the KeywordString, then the 
-  function returns an error and also sets the Progress and ProgressErr with the 
+
+  If there is an issue in resolving the contents of the KeywordString, then the
+  function returns an error and also sets the Progress and ProgressErr with the
   appropriate information about where the issue occurred and additional data about
-  the nature of the issue. 
-  
+  the nature of the issue.
+
   In the case when KeywordString containing multiple keywords, when an EFI_NOT_FOUND
   error is generated during processing the second or later keyword element, the system
-  storage associated with earlier keywords is not modified. All elements of the 
+  storage associated with earlier keywords is not modified. All elements of the
   KeywordString must successfully pass all tests for format and access prior to making
   any modifications to storage.
-  
+
   In the case when EFI_DEVICE_ERROR is returned from the processing of a KeywordString
   containing multiple keywords, the state of storage associated with earlier keywords
   is undefined.
@@ -2785,18 +2785,18 @@ Done:
 
   @param This             Pointer to the EFI_KEYWORD_HANDLER _PROTOCOL instance.
 
-  @param KeywordString    A null-terminated string in <MultiKeywordResp> format. 
+  @param KeywordString    A null-terminated string in <MultiKeywordResp> format.
 
-  @param Progress         On return, points to a character in the KeywordString. 
-                          Points to the string's NULL terminator if the request 
-                          was successful. Points to the most recent '&' before 
+  @param Progress         On return, points to a character in the KeywordString.
+                          Points to the string's NULL terminator if the request
+                          was successful. Points to the most recent '&' before
                           the first failing name / value pair (or the beginning
                           of the string if the failure is in the first name / value
                           pair) if the request was not successful.
 
   @param ProgressErr      If during the processing of the KeywordString there was
-                          a failure, this parameter gives additional information 
-                          about the possible source of the problem. The various 
+                          a failure, this parameter gives additional information
+                          about the possible source of the problem. The various
                           errors are defined in "Related Definitions" below.
 
 
@@ -2804,16 +2804,16 @@ Done:
 
   @retval EFI_INVALID_PARAMETER   One or more of the following are TRUE:
                                   1. KeywordString is NULL.
-                                  2. Parsing of the KeywordString resulted in an 
+                                  2. Parsing of the KeywordString resulted in an
                                      error. See Progress and ProgressErr for more data.
 
-  @retval EFI_NOT_FOUND           An element of the KeywordString was not found. 
+  @retval EFI_NOT_FOUND           An element of the KeywordString was not found.
                                   See ProgressErr for more data.
 
-  @retval EFI_OUT_OF_RESOURCES    Required system resources could not be allocated.  
+  @retval EFI_OUT_OF_RESOURCES    Required system resources could not be allocated.
                                   See ProgressErr for more data.
-                                  
-  @retval EFI_ACCESS_DENIED       The action violated system policy. See ProgressErr 
+
+  @retval EFI_ACCESS_DENIED       The action violated system policy. See ProgressErr
                                   for more data.
 
   @retval EFI_DEVICE_ERROR        An unexpected system error occurred. See ProgressErr
@@ -2821,7 +2821,7 @@ Done:
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 EfiConfigKeywordHandlerSetData (
   IN EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL *This,
   IN CONST EFI_STRING                    KeywordString,
@@ -2974,7 +2974,7 @@ EfiConfigKeywordHandlerSetData (
       Status = EFI_ACCESS_DENIED;
       goto Done;
     }
-    
+
     //
     // 9. Merge to the MultiKeywordResp string.
     //
@@ -2991,7 +2991,7 @@ EfiConfigKeywordHandlerSetData (
     FreePool (KeywordData);
     FreePool (ValueElement);
     NameSpace = NULL;
-    DevicePath = NULL; 
+    DevicePath = NULL;
     KeywordData = NULL;
     ValueElement = NULL;
     if (ConfigResp != NULL) {
@@ -3013,7 +3013,7 @@ EfiConfigKeywordHandlerSetData (
     Status = EFI_DEVICE_ERROR;
     goto Done;
   }
-  
+
   *ProgressErr = KEYWORD_HANDLER_NO_ERROR;
 
 Done:
@@ -3049,56 +3049,56 @@ Done:
 
 /**
 
-  This function accepts a <MultiKeywordRequest> formatted string, finds the underlying 
+  This function accepts a <MultiKeywordRequest> formatted string, finds the underlying
   keyword owners, creates a <MultiConfigRequest> string from it and forwards it to the
   EFI_HII_ROUTING_PROTOCOL.ExtractConfig function.
-  
+
   If there is an issue in resolving the contents of the KeywordString, then the function
   returns an EFI_INVALID_PARAMETER and also set the Progress and ProgressErr with the
   appropriate information about where the issue occurred and additional data about the
   nature of the issue.
-  
+
   In the case when KeywordString is NULL, or contains multiple keywords, or when
   EFI_NOT_FOUND is generated while processing the keyword elements, the Results string
-  contains values returned for all keywords processed prior to the keyword generating the 
+  contains values returned for all keywords processed prior to the keyword generating the
   error but no values for the keyword with error or any following keywords.
 
-  
+
   @param This           Pointer to the EFI_KEYWORD_HANDLER _PROTOCOL instance.
-  
+
   @param NameSpaceId    A null-terminated string containing the platform configuration
                         language to search through in the system. If a NULL is passed
                         in, then it is assumed that any platform configuration language
                         with the prefix of "x-UEFI-" are searched.
-                        
+
   @param KeywordString  A null-terminated string in <MultiKeywordRequest> format. If a
-                        NULL is passed in the KeywordString field, all of the known 
-                        keywords in the system for the NameSpaceId specified are 
+                        NULL is passed in the KeywordString field, all of the known
+                        keywords in the system for the NameSpaceId specified are
                         returned in the Results field.
-  
+
   @param Progress       On return, points to a character in the KeywordString. Points
-                        to the string's NULL terminator if the request was successful. 
+                        to the string's NULL terminator if the request was successful.
                         Points to the most recent '&' before the first failing name / value
                         pair (or the beginning of the string if the failure is in the first
                         name / value pair) if the request was not successful.
-                        
+
   @param ProgressErr    If during the processing of the KeywordString there was a
-                        failure, this parameter gives additional information about the 
+                        failure, this parameter gives additional information about the
                         possible source of the problem. See the definitions in SetData()
                         for valid value definitions.
-  
+
   @param Results        A null-terminated string in <MultiKeywordResp> format is returned
-                        which has all the values filled in for the keywords in the 
+                        which has all the values filled in for the keywords in the
                         KeywordString. This is a callee-allocated field, and must be freed
-                        by the caller after being used. 
+                        by the caller after being used.
 
   @retval EFI_SUCCESS             The specified action was completed successfully.
-  
+
   @retval EFI_INVALID_PARAMETER   One or more of the following are TRUE:
                                   1.Progress, ProgressErr, or Results is NULL.
                                   2.Parsing of the KeywordString resulted in an error. See
                                     Progress and ProgressErr for more data.
-  
+
 
   @retval EFI_NOT_FOUND           An element of the KeywordString was not found. See
                                   ProgressErr for more data.
@@ -3108,7 +3108,7 @@ Done:
 
   @retval EFI_OUT_OF_RESOURCES    Required system resources could not be allocated.  See
                                   ProgressErr for more data.
-                                  
+
   @retval EFI_ACCESS_DENIED       The action violated system policy.  See ProgressErr for
                                   more data.
 
@@ -3117,12 +3117,12 @@ Done:
 
 **/
 EFI_STATUS
-EFIAPI 
+EFIAPI
 EfiConfigKeywordHandlerGetData (
   IN EFI_CONFIG_KEYWORD_HANDLER_PROTOCOL  *This,
   IN CONST EFI_STRING                     NameSpaceId, OPTIONAL
   IN CONST EFI_STRING                     KeywordString, OPTIONAL
-  OUT EFI_STRING                          *Progress, 
+  OUT EFI_STRING                          *Progress,
   OUT UINT32                              *ProgressErr,
   OUT EFI_STRING                          *Results
   )
@@ -3132,7 +3132,7 @@ EfiConfigKeywordHandlerGetData (
   EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
   HII_DATABASE_RECORD                 *DataBaseRecord;
   CHAR16                              *StringPtr;
-  CHAR16                              *NextStringPtr;  
+  CHAR16                              *NextStringPtr;
   CHAR16                              *KeywordData;
   EFI_STRING_ID                       KeywordStringId;
   UINT8                               *OpCode;
@@ -3188,7 +3188,7 @@ EfiConfigKeywordHandlerGetData (
       return EFI_INVALID_PARAMETER;
     }
   }
-  
+
   if (KeywordString != NULL) {
     //
     // Use temp string to avoid changing input string buffer.
@@ -3208,7 +3208,7 @@ EfiConfigKeywordHandlerGetData (
       }
       StringPtr = NextStringPtr;
 
-     
+
       //
       // 3. Process Keyword section from the input keywordRequest string.
       //
@@ -3240,7 +3240,7 @@ EfiConfigKeywordHandlerGetData (
       if (EFI_ERROR (Status)) {
         goto Done;
       }
-      
+
       //
       // 3.4 Extract Value for the input keyword.
       //
@@ -3293,7 +3293,7 @@ EfiConfigKeywordHandlerGetData (
       FreePool (KeywordData);
       FreePool (ValueElement);
       FreePool (ConfigRequest);
-      DevicePath = NULL; 
+      DevicePath = NULL;
       KeywordData = NULL;
       ValueElement = NULL;
       ConfigRequest = NULL;

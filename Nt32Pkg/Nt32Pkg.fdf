@@ -28,10 +28,10 @@
 ################################################################################
 [FD.Nt32]
 BaseAddress   = 0x0|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFdBaseAddress          #The base address of the FLASH Device.
-Size          = 0x00380000|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize  #The size in bytes of the FLASH Device
+Size          = 0x00480000|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFirmwareFdSize  #The size in bytes of the FLASH Device
 ErasePolarity = 1
 BlockSize     = 0x10000
-NumBlocks     = 0x38
+NumBlocks     = 0x48
 
 ################################################################################
 #
@@ -48,11 +48,11 @@ NumBlocks     = 0x38
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-0x00000000|0x00360000
+0x00000000|0x00460000
 gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoveryBase|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashFvRecoverySize
 FV = FvRecovery
 
-0x00360000|0x0000c000
+0x00460000|0x0000c000
 gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 #NV_VARIABLE_STORE
 DATA = {
@@ -93,11 +93,11 @@ DATA = {
   0x5A, 0xFE, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x0036c000|0x00002000
+0x0046c000|0x00002000
 #NV_EVENT_LOG
 gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogBase|gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageEventLogSize
 
-0x0036e000|0x00002000
+0x0046e000|0x00002000
 gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 #NV_FTW_WORKING
 DATA = {
@@ -111,7 +111,7 @@ DATA = {
   0xE0, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 }
 
-0x00370000|0x00010000
+0x00470000|0x00010000
 #NV_FTW_SPARE
 gEfiNt32PkgTokenSpaceGuid.PcdWinNtFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 

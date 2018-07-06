@@ -1,7 +1,7 @@
 ## @file
 # process FFS generation
 #
-#  Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007-2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -16,35 +16,18 @@
 # Import Modules
 #
 from CommonDataClass.FdfClass import FDClassObject
+from Common.DataType import *
 
 ## generate FFS
 #
 #
 class Ffs(FDClassObject):
-    
-    # mapping between MODULE type in FDF (from INF) and file type for GenFfs
-    ModuleTypeToFileType = {
-        'SEC'               : 'EFI_FV_FILETYPE_SECURITY_CORE',
-        'PEI_CORE'          : 'EFI_FV_FILETYPE_PEI_CORE',
-        'PEIM'              : 'EFI_FV_FILETYPE_PEIM',
-        'DXE_CORE'          : 'EFI_FV_FILETYPE_DXE_CORE',
-        'DXE_DRIVER'        : 'EFI_FV_FILETYPE_DRIVER',
-        'DXE_SAL_DRIVER'    : 'EFI_FV_FILETYPE_DRIVER',
-        'DXE_SMM_DRIVER'    : 'EFI_FV_FILETYPE_DRIVER',
-        'DXE_RUNTIME_DRIVER': 'EFI_FV_FILETYPE_DRIVER',
-        'UEFI_DRIVER'       : 'EFI_FV_FILETYPE_DRIVER',
-        'UEFI_APPLICATION'  : 'EFI_FV_FILETYPE_APPLICATION',
-        'SMM_CORE'          : 'EFI_FV_FILETYPE_SMM_CORE',
-        'MM_STANDALONE'     : 'EFI_FV_FILETYPE_MM_STANDALONE',
-        'MM_CORE_STANDALONE' : 'EFI_FV_FILETYPE_MM_CORE_STANDALONE'
-    }
-    
     # mapping between FILE type in FDF and file type for GenFfs
     FdfFvFileTypeToFileType = {
-        'SEC'               : 'EFI_FV_FILETYPE_SECURITY_CORE',
-        'PEI_CORE'          : 'EFI_FV_FILETYPE_PEI_CORE',
-        'PEIM'              : 'EFI_FV_FILETYPE_PEIM',
-        'DXE_CORE'          : 'EFI_FV_FILETYPE_DXE_CORE',
+        SUP_MODULE_SEC               : 'EFI_FV_FILETYPE_SECURITY_CORE',
+        SUP_MODULE_PEI_CORE          : 'EFI_FV_FILETYPE_PEI_CORE',
+        SUP_MODULE_PEIM              : 'EFI_FV_FILETYPE_PEIM',
+        SUP_MODULE_DXE_CORE          : 'EFI_FV_FILETYPE_DXE_CORE',
         'FREEFORM'          : 'EFI_FV_FILETYPE_FREEFORM',
         'DRIVER'            : 'EFI_FV_FILETYPE_DRIVER',
         'APPLICATION'       : 'EFI_FV_FILETYPE_APPLICATION',
@@ -52,19 +35,19 @@ class Ffs(FDClassObject):
         'RAW'               : 'EFI_FV_FILETYPE_RAW',
         'PEI_DXE_COMBO'     : 'EFI_FV_FILETYPE_COMBINED_PEIM_DRIVER',
         'SMM'               : 'EFI_FV_FILETYPE_SMM',
-        'SMM_CORE'          : 'EFI_FV_FILETYPE_SMM_CORE',
-        'MM_STANDALONE'     : 'EFI_FV_FILETYPE_MM_STANDALONE',
-        'MM_CORE_STANDALONE' : 'EFI_FV_FILETYPE_MM_CORE_STANDALONE'
+        SUP_MODULE_SMM_CORE          : 'EFI_FV_FILETYPE_SMM_CORE',
+        SUP_MODULE_MM_STANDALONE     : 'EFI_FV_FILETYPE_MM_STANDALONE',
+        SUP_MODULE_MM_CORE_STANDALONE : 'EFI_FV_FILETYPE_MM_CORE_STANDALONE'
     }
     
     # mapping between section type in FDF and file suffix
     SectionSuffix = {
-        'PE32'                 : '.pe32',
-        'PIC'                  : '.pic',
-        'TE'                   : '.te',
-        'DXE_DEPEX'            : '.dpx',
+        BINARY_FILE_TYPE_PE32                 : '.pe32',
+        BINARY_FILE_TYPE_PIC                  : '.pic',
+        BINARY_FILE_TYPE_TE                   : '.te',
+        BINARY_FILE_TYPE_DXE_DEPEX            : '.dpx',
         'VERSION'              : '.ver',
-        'UI'                   : '.ui',
+        BINARY_FILE_TYPE_UI                   : '.ui',
         'COMPAT16'             : '.com16',
         'RAW'                  : '.raw',
         'FREEFORM_SUBTYPE_GUID': '.guid',
@@ -72,8 +55,8 @@ class Ffs(FDClassObject):
         'FV_IMAGE'             : 'fv.sec',
         'COMPRESS'             : '.com',
         'GUIDED'               : '.guided',
-        'PEI_DEPEX'            : '.dpx',
-        'SMM_DEPEX'            : '.dpx'
+        BINARY_FILE_TYPE_PEI_DEPEX            : '.dpx',
+        BINARY_FILE_TYPE_SMM_DEPEX            : '.dpx'
     }
     
     ## The constructor

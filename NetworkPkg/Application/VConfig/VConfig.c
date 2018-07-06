@@ -1,7 +1,7 @@
 /** @file
   Shell application for VLAN configuration.
 
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -618,7 +618,7 @@ VlanConfigMain (
   EFI_STATUS    Status;
 
   mImageHandle = ImageHandle;
-  
+
   //
   // Retrieve HII package list from ImageHandle
   //

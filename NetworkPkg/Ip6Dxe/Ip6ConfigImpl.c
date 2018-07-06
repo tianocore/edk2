@@ -1,7 +1,7 @@
 /** @file
   The implementation of EFI IPv6 Configuration Protocol.
 
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -58,7 +58,7 @@ Ip6ConfigOnPolicyChanged (
   BOOLEAN             Recovery;
 
   Recovery = FALSE;
-  
+
   //
   // Currently there are only two policies: Manual and Automatic. Regardless of
   // what transition is going on, i.e., Manual -> Automatic and Automatic ->
@@ -86,14 +86,14 @@ Ip6ConfigOnPolicyChanged (
   }
 
   if (!IsListEmpty (&IpSb->DefaultInterface->AddressList) && IpSb->DefaultInterface->AddressCount > 0) {
-    //  
-    // If any IPv6 children (Instance) in configured state and use global unicast address, it will be 
-    // destroyed in Ip6RemoveAddr() function later. Then, the upper layer driver's Stop() function will be 
-    // called, which may break the upper layer network stacks. So, the driver should take the responsibility 
-    // for the recovery by using ConnectController() after Ip6RemoveAddr(). 
+    //
+    // If any IPv6 children (Instance) in configured state and use global unicast address, it will be
+    // destroyed in Ip6RemoveAddr() function later. Then, the upper layer driver's Stop() function will be
+    // called, which may break the upper layer network stacks. So, the driver should take the responsibility
+    // for the recovery by using ConnectController() after Ip6RemoveAddr().
     // Here, just check whether need to recover the upper layer network stacks later.
     //
-    NET_LIST_FOR_EACH (Entry, &IpSb->DefaultInterface->AddressList) { 
+    NET_LIST_FOR_EACH (Entry, &IpSb->DefaultInterface->AddressList) {
       AddrInfo = NET_LIST_USER_STRUCT_S (Entry, IP6_ADDRESS_INFO, Link, IP6_ADDR_INFO_SIGNATURE);
       if (!IsListEmpty (&IpSb->Children)) {
         NET_LIST_FOR_EACH (Entry2, &IpSb->Children) {
@@ -105,7 +105,7 @@ Ip6ConfigOnPolicyChanged (
         }
       }
     }
-    
+
     //
     // All IPv6 children that use global unicast address as it's source address
     // should be destroyed now. The survivers are those use the link-local address
@@ -118,7 +118,7 @@ Ip6ConfigOnPolicyChanged (
       NULL,
       0
       );
-    
+
     if (IpSb->Controller != NULL && Recovery) {
       //
       // ConnectController() to recover the upper layer network stacks.
@@ -726,7 +726,7 @@ Ip6ConfigSetPolicy (
     DataItem->DataSize = 0;
     DataItem->Status   = EFI_NOT_FOUND;
     NetMapIterate (&DataItem->EventMap, Ip6ConfigSignalEvent, NULL);
-    
+
     if (NewPolicy == Ip6ConfigPolicyManual) {
       //
       // The policy is changed from automatic to manual. Stop the DHCPv6 process
@@ -1546,7 +1546,7 @@ Ip6ConfigSetDnsServer (
     }
   } else  {
     //
-    // DataSize is 0 and Data is NULL, clean up the DnsServer address. 
+    // DataSize is 0 and Data is NULL, clean up the DnsServer address.
     //
     if (Item->Data.Ptr != NULL) {
       FreePool (Item->Data.Ptr);
@@ -1965,7 +1965,7 @@ Ip6ConfigOnDhcp6SbInstalled (
                                 network stack was set successfully.
   @retval EFI_INVALID_PARAMETER One or more of the following are TRUE:
                                 - This is NULL.
-                                - One or more fields in Data and DataSizedo not match the 
+                                - One or more fields in Data and DataSizedo not match the
                                   requirement of the data type indicated by DataType.
   @retval EFI_WRITE_PROTECTED   The specified configuration data is read-only or the specified
                                 configuration data cannot be set under the current policy.

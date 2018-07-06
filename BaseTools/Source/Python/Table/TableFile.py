@@ -16,7 +16,7 @@
 #
 import Common.EdkLogger as EdkLogger
 from Table import Table
-from Common.String import ConvertToSqlString
+from Common.StringUtils import ConvertToSqlString
 import Common.LongFilePathOs as os
 from CommonDataClass.DataClass import FileClass
 

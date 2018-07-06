@@ -1,0 +1,63 @@
+## @file
+# This driver implements Reset2, ResetFilter and ResetHandler PPIs.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are
+# licensed and made available under the terms and conditions of the BSD License
+# which accompanies this distribution.  The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ResetSystemPei
+  MODULE_UNI_FILE                = ResetSystemPei.uni
+  FILE_GUID                      = 6141E486-7543-4F1A-A579-FF532ED78E75
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeResetSystem
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  ResetSystem.h
+  ResetSystem.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PeiServicesLib
+  HobLib
+  PeimEntryPoint
+  ResetSystemLib
+  ReportStatusCodeLib
+
+[Ppis]
+  gEfiPeiReset2PpiGuid                           ## PRODUCES
+  gEdkiiPlatformSpecificResetFilterPpiGuid       ## PRODUCES
+  gEdkiiPlatformSpecificResetHandlerPpiGuid      ## PRODUCES
+  gEdkiiPlatformSpecificResetNotificationPpiGuid ## PRODUCES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaximumPeiResetNotifies
+
+[Depex]
+  TRUE
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  ResetSystemPeiExtra.uni

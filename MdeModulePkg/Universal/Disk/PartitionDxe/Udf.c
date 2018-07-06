@@ -1,6 +1,7 @@
 /** @file
   Scan for an UDF file system on a formatted media.
 
+  Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
   Copyright (C) 2014-2017 Paulo Alcantara <pcacjr@zytor.com>
 
   This program and the accompanying materials are licensed and made available
@@ -753,7 +754,8 @@ PartitionInstallUdfChildHandles (
     &PartitionInfo,
     StartingLBA,
     EndingLBA,
-    Media->BlockSize
+    Media->BlockSize,
+    NULL
     );
   if (EFI_ERROR (Status)) {
     return (ChildCreated ? EFI_SUCCESS : Status);

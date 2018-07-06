@@ -1,7 +1,7 @@
 // /** @file
 // CustomizedDisplayLib Module Localized Abstract and Description Content
 //
-// Copyright (c) 2014, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
@@ -13,11 +13,11 @@
 // **/
 
 
-#string STR_MODULE_ABSTRACT             
-#language en-US 
+#string STR_MODULE_ABSTRACT
+#language en-US
 "Customize display library used by display engine."
 
-#string STR_MODULE_DESCRIPTION          
-#language en-US 
+#string STR_MODULE_DESCRIPTION
+#language en-US
 "Customize display library used by display engine."
 

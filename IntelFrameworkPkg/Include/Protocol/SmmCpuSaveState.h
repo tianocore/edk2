@@ -2,13 +2,13 @@
   This file declares the SMM CPU Save State protocol, which provides the processor
   save-state information for IA-32 and Itanium processors.
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -30,19 +30,19 @@ typedef struct _EFI_SMM_CPU_SAVE_STATE_PROTOCOL  EFI_SMM_CPU_SAVE_STATE_PROTOCOL
 
 #pragma pack (1)
 
-/// 
+///
 /// CPU save-state strcuture for IA32 and X64.
 ///
 /// This struct declaration does not exctly match the Framework SMM CIS 0.91 because the
 /// union in the Framework SMM CIS 0.91 contains an unnamed union member that causes build
-/// breaks on many compilers with high warning levels.  Instead, the UINT8 Reserved[0x200] 
+/// breaks on many compilers with high warning levels.  Instead, the UINT8 Reserved[0x200]
 /// field has been moved into EFI_SMM_CPU_STATE32.  This maintains binary compatibility for
 /// the layout and also maintains source comaptibility for access of all fields in this
 /// union.
 ///
-/// This struct declaration does not exctly match the Framework SMM CIS 0.91 because 
+/// This struct declaration does not exctly match the Framework SMM CIS 0.91 because
 /// the Framework SMM CIS 0.91 uses ASM_XXX for base types in this structure.  These
-/// have been changed to use the base types defined in the UEFI Specification. 
+/// have been changed to use the base types defined in the UEFI Specification.
 ///
 typedef struct {
   UINT8   Reserved[0x200];
@@ -80,9 +80,9 @@ typedef struct {
 } EFI_SMM_CPU_STATE32;
 
 ///
-/// This struct declaration does not exctly match the Framework SMM CIS 0.91 because 
+/// This struct declaration does not exctly match the Framework SMM CIS 0.91 because
 /// the Framework SMM CIS 0.91 uses ASM_XXX for base types in this structure.  These
-/// have been changed to use the base types defined in the UEFI Specification. 
+/// have been changed to use the base types defined in the UEFI Specification.
 ///
 typedef struct {
   UINT8   Reserved1[0x1d0];  // fc00h
@@ -148,7 +148,7 @@ typedef struct {
 ///
 /// This union declaration does not exctly match the Framework SMM CIS 0.91 because the
 /// union in the Framework SMM CIS 0.91 contains an unnamed union member that causes build
-/// breaks on many compilers with high warning levels.  Instead, the UINT8 Reserved[0x200] 
+/// breaks on many compilers with high warning levels.  Instead, the UINT8 Reserved[0x200]
 /// field has been moved into EFI_SMM_CPU_STATE32.  This maintains binary compatibility for
 /// the layout and also maintains source comaptibility for access of all fields in this
 /// union.

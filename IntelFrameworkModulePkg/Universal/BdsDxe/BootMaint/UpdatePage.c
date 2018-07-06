@@ -1,7 +1,7 @@
 /** @file
 Dynamically update the pages.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -25,7 +25,7 @@ RefreshUpdateData (
 {
   //
   // Free current updated date
-  //  
+  //
   if (mStartOpCodeHandle != NULL) {
     HiiFreeOpCodeHandle (mStartOpCodeHandle);
   }
@@ -46,7 +46,7 @@ RefreshUpdateData (
 /**
   Add a "Go back to main page" tag in front of the form when there are no
   "Apply changes" and "Discard changes" tags in the end of the form.
- 
+
   @param CallbackData    The BMM context data.
 
 **/
@@ -131,7 +131,7 @@ UpdatePageEnd (
 }
 
 /**
-  Clean up the dynamic opcode at label and form specified by both LabelId. 
+  Clean up the dynamic opcode at label and form specified by both LabelId.
 
   @param LabelId         It is both the Form ID and Label ID for opcode deletion.
   @param CallbackData    The BMM context data.
@@ -345,7 +345,7 @@ UpdateDrvDelPage (
   UpdatePageStart (CallbackData);
 
   CreateMenuStringToken (CallbackData, CallbackData->BmmHiiHandle, &DriverOptionMenu);
-  
+
   ASSERT (DriverOptionMenu.MenuNumber <= (sizeof (CallbackData->BmmFakeNvData.DriverOptionDel) / sizeof (CallbackData->BmmFakeNvData.DriverOptionDel[0])));
   for (Index = 0; Index < DriverOptionMenu.MenuNumber; Index++) {
     NewMenuEntry            = BOpt_GetMenuEntry (&DriverOptionMenu, Index);
@@ -380,7 +380,7 @@ UpdateDrvDelPage (
 }
 
 /**
-  Prepare the page to allow user to add description for 
+  Prepare the page to allow user to add description for
   a Driver Option.
 
   @param CallbackData    The BMM context data.
@@ -552,11 +552,11 @@ UpdateOrderPage (
   UpdatePageStart (CallbackData);
 
   CreateMenuStringToken (CallbackData, CallbackData->BmmHiiHandle, OptionMenu);
-  
+
   OptionOrder = NULL;
   QuestionId = 0;
   VarOffset = 0;
-  switch (UpdatePageId) { 
+  switch (UpdatePageId) {
 
   case FORM_BOOT_CHG_ID:
     //
@@ -587,12 +587,12 @@ UpdateOrderPage (
     QuestionId = DRIVER_OPTION_ORDER_QUESTION_ID;
     VarOffset = DRIVER_OPTION_ORDER_VAR_OFFSET;
     break;
-  }  
+  }
   ASSERT (OptionOrder != NULL);
 
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);
-  
+
   NewMenuEntry = NULL;
   for (OptionIndex = 0; (OptionIndex < MAX_MENU_NUMBER && OptionOrder[OptionIndex] != 0); OptionIndex++) {
     BootOptionFound = FALSE;
@@ -613,21 +613,21 @@ UpdateOrderPage (
         );
     }
   }
-  
+
   if (OptionMenu->MenuNumber > 0) {
-    HiiCreateOrderedListOpCode (                   
-      mStartOpCodeHandle,                          // Container for dynamic created opcodes     
-      QuestionId,                                  // Question ID                               
-      VARSTORE_ID_BOOT_MAINT,                      // VarStore ID                               
-      VarOffset,                                   // Offset in Buffer Storage                  
-      STRING_TOKEN (STR_CHANGE_ORDER),             // Question prompt text                      
-      STRING_TOKEN (STR_CHANGE_ORDER),             // Question help text                        
-      0,                                           // Question flag                             
+    HiiCreateOrderedListOpCode (
+      mStartOpCodeHandle,                          // Container for dynamic created opcodes
+      QuestionId,                                  // Question ID
+      VARSTORE_ID_BOOT_MAINT,                      // VarStore ID
+      VarOffset,                                   // Offset in Buffer Storage
+      STRING_TOKEN (STR_CHANGE_ORDER),             // Question prompt text
+      STRING_TOKEN (STR_CHANGE_ORDER),             // Question help text
+      0,                                           // Question flag
       0,                                           // Ordered list flag, e.g. EFI_IFR_UNIQUE_SET
-      EFI_IFR_TYPE_NUM_SIZE_32,                    // Data type of Question value               
-      100,                                         // Maximum container                         
-      OptionsOpCodeHandle,                         // Option Opcode list                        
-      NULL                                         // Default Opcode is NULL                    
+      EFI_IFR_TYPE_NUM_SIZE_32,                    // Data type of Question value
+      100,                                         // Maximum container
+      OptionsOpCodeHandle,                         // Option Opcode list
+      NULL                                         // Default Opcode is NULL
       );
   }
 
@@ -706,7 +706,7 @@ UpdateBootNextPage (
         EFI_IFR_TYPE_NUM_SIZE_16,
         Index
         );
-    }      
+    }
 
     HiiCreateOneOfOpCode (
       mStartOpCodeHandle,
@@ -765,7 +765,7 @@ UpdateTimeOutPage (
     0,
     DefaultOpCodeHandle
     );
-  
+
   HiiFreeOpCodeHandle (DefaultOpCodeHandle);
 
   //CallbackData->BmmFakeNvData.BootTimeOut = BootTimeOut;
@@ -840,7 +840,7 @@ UpdateConModePage (
     if (EFI_ERROR (Status)) {
       continue;
     }
-    
+
     //
     // Build mode string Column x Row
     //
@@ -956,7 +956,7 @@ UpdateTerminalPage (
     OptionsOpCodeHandle,
     NULL
     );
-  
+
   HiiFreeOpCodeHandle (OptionsOpCodeHandle);
   OptionsOpCodeHandle = HiiAllocateOpCodeHandle ();
   ASSERT (OptionsOpCodeHandle != NULL);

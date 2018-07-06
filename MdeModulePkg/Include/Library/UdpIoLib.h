@@ -49,7 +49,7 @@ typedef struct {
 
   This prototype is used by both receive and sending when calling
   UdpIoRecvDatagram() or UdpIoSendDatagram(). When receiving, Netbuf is allocated by the
-  UDP access point and released by the user. When sending, the user allocates the the NetBuf, 
+  UDP access point and released by the user. When sending, the user allocates the the NetBuf,
   which is then provided to the callback as a reference.
 
   @param[in] Packet       The packet received or sent.
@@ -97,7 +97,7 @@ typedef struct {
 /// This structure is used internally by UdpIo Library.
 ///
 /// Each transmit request is wrapped in an UDP_TX_TOKEN. Upon completion,
-/// the CallBack will be called. There can be several transmit requests. All transmit 
+/// the CallBack will be called. There can be several transmit requests. All transmit
 /// requests are linked in a list.
 ///
 

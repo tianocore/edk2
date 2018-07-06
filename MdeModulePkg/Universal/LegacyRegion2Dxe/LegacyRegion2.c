@@ -1,13 +1,13 @@
 /** @file
   Dummy implementation of Legacy Region 2 Protocol.
 
-  This generic implementation of the Legacy Region 2 Protocol does not actually 
-  perform any lock/unlock operations.  This module may be used on platforms 
-  that do not provide HW locking of the legacy memory regions.  It can also 
+  This generic implementation of the Legacy Region 2 Protocol does not actually
+  perform any lock/unlock operations.  This module may be used on platforms
+  that do not provide HW locking of the legacy memory regions.  It can also
   be used as a template driver for implementing the Legacy Region 2 Protocol on
   a platform that does support HW locking of the legacy memory regions.
 
-Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -33,9 +33,9 @@ EFI_LEGACY_REGION2_PROTOCOL  mLegacyRegion2 = {
 /**
   Modify the hardware to allow (decode) or disallow (not decode) memory reads in a region.
 
-  If the On parameter evaluates to TRUE, this function enables memory reads in the address range 
+  If the On parameter evaluates to TRUE, this function enables memory reads in the address range
   Start to (Start + Length - 1).
-  If the On parameter evaluates to FALSE, this function disables memory reads in the address range 
+  If the On parameter evaluates to FALSE, this function disables memory reads in the address range
   Start to (Start + Length - 1).
 
   @param  This[in]              Indicates the EFI_LEGACY_REGION_PROTOCOL instance.
@@ -114,7 +114,7 @@ LegacyRegion2Lock (
 /**
   Modify the hardware to disallow memory attribute changes in a region.
 
-  This function makes the attributes of a region read only. Once a region is boot-locked with this 
+  This function makes the attributes of a region read only. Once a region is boot-locked with this
   function, the read and write attributes of that region cannot be changed until a power cycle has
   reset the boot-lock attribute. Calls to Decode(), Lock() and Unlock() will have no effect.
 
@@ -155,7 +155,7 @@ LegacyRegion2BootLock (
 /**
   Modify the hardware to allow memory writes in a region.
 
-  This function changes the attributes of a memory range to allow writes.  
+  This function changes the attributes of a memory range to allow writes.
 
   @param  This[in]              Indicates the EFI_LEGACY_REGION_PROTOCOL instance.
   @param  Start[in]             The beginning of the physical address of the region whose
@@ -193,9 +193,9 @@ LegacyRegion2Unlock (
 /**
   Get region information for the attributes of the Legacy Region.
 
-  This function is used to discover the granularity of the attributes for the memory in the legacy 
+  This function is used to discover the granularity of the attributes for the memory in the legacy
   region. Each attribute may have a different granularity and the granularity may not be the same
-  for all memory ranges in the legacy region.  
+  for all memory ranges in the legacy region.
 
   @param  This[in]              Indicates the EFI_LEGACY_REGION2_PROTOCOL instance.
   @param  DescriptorCount[out]  The number of region descriptor entries returned in the Descriptor
@@ -223,9 +223,9 @@ LegacyRegionGetInfo (
 /**
   The user Entry Point for module LegacyRegionDxe.  The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
 
 **/
@@ -237,12 +237,12 @@ LegacyRegion2Install (
   )
 {
   EFI_STATUS  Status;
-  
+
   //
   // Make sure the Legacy Region 2 Protocol is not already installed in the system
   //
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiLegacyRegion2ProtocolGuid);
-  
+
   //
   // Install the protocol on a new handle.
   //

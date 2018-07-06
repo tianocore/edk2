@@ -3,7 +3,7 @@
   and manage the legacy boot option, all legacy boot option is getting from
   the legacy BBS table.
 
-Copyright (c) 2004 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -53,9 +53,9 @@ OrderLegacyBootOption4SameType (
   UINTN                    BootOrderSize;
   UINTN                    Index;
   UINTN                    StartPosition;
-  
+
   BDS_COMMON_OPTION        *BootOption;
-  
+
   CHAR16                   OptionName[sizeof ("Boot####")];
   UINT16                   *BbsIndexArray;
   UINT16                   *DeviceTypeArray;
@@ -82,12 +82,12 @@ OrderLegacyBootOption4SameType (
   ASSERT (*DisBootOption != NULL);
 
   for (Index = 0; Index < BootOrderSize / sizeof (UINT16); Index++) {
-  
+
     UnicodeSPrint (OptionName, sizeof (OptionName), L"Boot%04x", BootOrder[Index]);
     InitializeListHead (&List);
     BootOption = BdsLibVariableToOption (&List, OptionName);
     ASSERT (BootOption != NULL);
-    
+
     if ((DevicePathType (BootOption->DevicePath) == BBS_DEVICE_PATH) &&
         (DevicePathSubType (BootOption->DevicePath) == BBS_BBS_DP)) {
       //
@@ -119,7 +119,7 @@ OrderLegacyBootOption4SameType (
       if (BbsIndexArray[Index] == (DevOrder[DevOrderCount] & 0xFF)) {
         StartPosition = MIN (StartPosition, Index);
         NewBootOption[DevOrderCount] = BootOrder[Index];
-        
+
         if ((DevOrder[DevOrderCount] & 0xFF00) == 0xFF00) {
           (*DisBootOption)[*DisBootOptionCount] = BootOrder[Index];
           (*DisBootOptionCount)++;
@@ -157,7 +157,7 @@ OrderLegacyBootOption4SameType (
 /**
   Group the legacy boot options in the BootOption.
 
-  The routine assumes the boot options in the beginning that covers all the device 
+  The routine assumes the boot options in the beginning that covers all the device
   types are ordered properly and re-position the following boot options just after
   the corresponding boot options with the same device type.
   For example:

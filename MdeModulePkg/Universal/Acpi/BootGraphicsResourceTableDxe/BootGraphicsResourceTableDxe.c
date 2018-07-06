@@ -1,7 +1,8 @@
 /** @file
   This module install ACPI Boot Graphics Resource Table (BGRT).
 
-  Copyright (c) 2011 - 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016, Microsoft Corporation<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -14,11 +15,11 @@
 #include <Uefi.h>
 
 #include <IndustryStandard/Acpi.h>
-#include <IndustryStandard/Bmp.h>
 
 #include <Protocol/AcpiTable.h>
 #include <Protocol/GraphicsOutput.h>
 #include <Protocol/BootLogo.h>
+#include <Protocol/BootLogo2.h>
 
 #include <Guid/EventGroup.h>
 
@@ -28,44 +29,135 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
+#include <Library/SafeIntLib.h>
+#include <Library/BmpSupportLib.h>
+
+/**
+  Update information of logo image drawn on screen.
+
+  @param[in] This          The pointer to the Boot Logo protocol 2 instance.
+  @param[in] BltBuffer     The BLT buffer for logo drawn on screen. If BltBuffer
+                           is set to NULL, it indicates that logo image is no
+                           longer on the screen.
+  @param[in] DestinationX  X coordinate of destination for the BltBuffer.
+  @param[in] DestinationY  Y coordinate of destination for the BltBuffer.
+  @param[in] Width         Width of rectangle in BltBuffer in pixels.
+  @param[in] Height        Hight of rectangle in BltBuffer in pixels.
+
+  @retval EFI_SUCCESS            The boot logo information was updated.
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+  @retval EFI_OUT_OF_RESOURCES   The logo information was not updated due to
+                                 insufficient memory resources.
+**/
+EFI_STATUS
+EFIAPI
+SetBootLogo (
+  IN EFI_BOOT_LOGO_PROTOCOL         *This,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer       OPTIONAL,
+  IN UINTN                          DestinationX,
+  IN UINTN                          DestinationY,
+  IN UINTN                          Width,
+  IN UINTN                          Height
+  );
+
+/**
+  Update information of logo image drawn on screen.
+
+  @param[in] This          The pointer to the Boot Logo protocol 2 instance.
+  @param[in] BltBuffer     The BLT buffer for logo drawn on screen. If BltBuffer
+                           is set to NULL, it indicates that logo image is no
+                           longer on the screen.
+  @param[in] DestinationX  X coordinate of destination for the BltBuffer.
+  @param[in] DestinationY  Y coordinate of destination for the BltBuffer.
+  @param[in] Width         Width of rectangle in BltBuffer in pixels.
+  @param[in] Height        Hight of rectangle in BltBuffer in pixels.
+
+  @retval EFI_SUCCESS            The boot logo information was updated.
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+  @retval EFI_OUT_OF_RESOURCES   The logo information was not updated due to
+                                 insufficient memory resources.
+**/
+EFI_STATUS
+EFIAPI
+SetBootLogo2 (
+  IN EDKII_BOOT_LOGO2_PROTOCOL      *This,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer       OPTIONAL,
+  IN UINTN                          DestinationX,
+  IN UINTN                          DestinationY,
+  IN UINTN                          Width,
+  IN UINTN                          Height
+  );
+
+/**
+  Get the location of the boot logo on the screen.
+
+  @param[in]  This          The pointer to the Boot Logo Protocol 2 instance
+  @param[out] BltBuffer     Returns pointer to the GOP BLT buffer that was
+                            previously registered with SetBootLogo2(). The
+                            buffer returned must not be modified or freed.
+  @param[out] DestinationX  Returns the X start position of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] DestinationY  Returns the Y start position of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] Width         Returns the width of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] Height        Returns the height of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+
+  @retval EFI_SUCCESS            The location of the boot logo was returned.
+  @retval EFI_NOT_READY          The boot logo has not been set.
+  @retval EFI_INVALID_PARAMETER  BltBuffer is NULL.
+  @retval EFI_INVALID_PARAMETER  DestinationX is NULL.
+  @retval EFI_INVALID_PARAMETER  DestinationY is NULL.
+  @retval EFI_INVALID_PARAMETER  Width is NULL.
+  @retval EFI_INVALID_PARAMETER  Height is NULL.
+**/
+EFI_STATUS
+EFIAPI
+GetBootLogo2 (
+  IN  EDKII_BOOT_LOGO2_PROTOCOL      *This,
+  OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  **BltBuffer,
+  OUT UINTN                          *DestinationX,
+  OUT UINTN                          *DestinationY,
+  OUT UINTN                          *Width,
+  OUT UINTN                          *Height
+  );
 
 //
-// Module globals.
+// Boot Logo Protocol Handle
 //
-EFI_EVENT  mBootGraphicsReadyToBootEvent;
-UINTN      mBootGraphicsResourceTableKey = 0;
+EFI_HANDLE  mBootLogoHandle = NULL;
 
-EFI_HANDLE                     mBootLogoHandle = NULL;
-BOOLEAN                        mIsLogoValid = FALSE;
-EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *mLogoBltBuffer = NULL;
-UINTN                          mLogoDestX = 0;
-UINTN                          mLogoDestY = 0;
-UINTN                          mLogoWidth = 0;
-UINTN                          mLogoHeight = 0;
-
-BMP_IMAGE_HEADER  mBmpImageHeaderTemplate = {
-  'B',    // CharB
-  'M',    // CharM
-  0,      // Size will be updated at runtime
-  {0, 0}, // Reserved
-  sizeof (BMP_IMAGE_HEADER), // ImageOffset
-  sizeof (BMP_IMAGE_HEADER) - OFFSET_OF (BMP_IMAGE_HEADER, HeaderSize), // HeaderSize
-  0,      // PixelWidth will be updated at runtime
-  0,      // PixelHeight will be updated at runtime
-  1,      // Planes
-  24,     // BitPerPixel
-  0,      // CompressionType
-  0,      // ImageSize will be updated at runtime
-  0,      // XPixelsPerMeter
-  0,      // YPixelsPerMeter
-  0,      // NumberOfColors
-  0       // ImportantColors
+//
+// Boot Logo Protocol Instance
+//
+EFI_BOOT_LOGO_PROTOCOL  mBootLogoProtocolTemplate = {
+  SetBootLogo
 };
 
-BOOLEAN  mAcpiBgrtInstalled = FALSE;
-BOOLEAN  mAcpiBgrtStatusChanged = FALSE;
-BOOLEAN  mAcpiBgrtBufferChanged = FALSE;
+///
+/// Boot Logo 2 Protocol instance
+///
+EDKII_BOOT_LOGO2_PROTOCOL mBootLogo2ProtocolTemplate = {
+  SetBootLogo2,
+  GetBootLogo2
+};
 
+EFI_EVENT                      mBootGraphicsReadyToBootEvent;
+UINTN                          mBootGraphicsResourceTableKey = 0;
+BOOLEAN                        mIsLogoValid = FALSE;
+EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *mLogoBltBuffer = NULL;
+UINTN                          mLogoDestX  = 0;
+UINTN                          mLogoDestY  = 0;
+UINTN                          mLogoWidth  = 0;
+UINTN                          mLogoHeight = 0;
+BOOLEAN                        mAcpiBgrtInstalled     = FALSE;
+BOOLEAN                        mAcpiBgrtStatusChanged = FALSE;
+BOOLEAN                        mAcpiBgrtBufferChanged = FALSE;
+
+//
+// ACPI Boot Graphics Resource Table template
+//
 EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE mBootGraphicsResourceTableTemplate = {
   {
     EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE_SIGNATURE,
@@ -116,40 +208,52 @@ SetBootLogo (
   IN UINTN                             DestinationY,
   IN UINTN                             Width,
   IN UINTN                             Height
-  );
-
-EFI_BOOT_LOGO_PROTOCOL  mBootLogoProtocolTemplate = { SetBootLogo };
+  )
+{
+  //
+  // Call same service in Boot Logo 2 Protocol
+  //
+  return SetBootLogo2 (
+           &mBootLogo2ProtocolTemplate,
+           BltBuffer,
+           DestinationX,
+           DestinationY,
+           Width,
+           Height
+           );
+}
 
 /**
   Update information of logo image drawn on screen.
 
-  @param  This           The pointer to the Boot Logo protocol instance.
-  @param  BltBuffer      The BLT buffer for logo drawn on screen. If BltBuffer
-                         is set to NULL, it indicates that logo image is no
-                         longer on the screen.
-  @param  DestinationX   X coordinate of destination for the BltBuffer.
-  @param  DestinationY   Y coordinate of destination for the BltBuffer.
-  @param  Width          Width of rectangle in BltBuffer in pixels.
-  @param  Height         Hight of rectangle in BltBuffer in pixels.
+  @param[in] This          The pointer to the Boot Logo protocol 2 instance.
+  @param[in] BltBuffer     The BLT buffer for logo drawn on screen. If BltBuffer
+                           is set to NULL, it indicates that logo image is no
+                           longer on the screen.
+  @param[in] DestinationX  X coordinate of destination for the BltBuffer.
+  @param[in] DestinationY  Y coordinate of destination for the BltBuffer.
+  @param[in] Width         Width of rectangle in BltBuffer in pixels.
+  @param[in] Height        Hight of rectangle in BltBuffer in pixels.
 
-  @retval EFI_SUCCESS             The boot logo information was updated.
-  @retval EFI_INVALID_PARAMETER   One of the parameters has an invalid value.
-  @retval EFI_OUT_OF_RESOURCES    The logo information was not updated due to
-                                  insufficient memory resources.
-
+  @retval EFI_SUCCESS            The boot logo information was updated.
+  @retval EFI_INVALID_PARAMETER  One of the parameters has an invalid value.
+  @retval EFI_OUT_OF_RESOURCES   The logo information was not updated due to
+                                 insufficient memory resources.
 **/
 EFI_STATUS
 EFIAPI
-SetBootLogo (
-  IN EFI_BOOT_LOGO_PROTOCOL            *This,
-  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL     *BltBuffer       OPTIONAL,
-  IN UINTN                             DestinationX,
-  IN UINTN                             DestinationY,
-  IN UINTN                             Width,
-  IN UINTN                             Height
+SetBootLogo2 (
+  IN EDKII_BOOT_LOGO2_PROTOCOL      *This,
+  IN EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer       OPTIONAL,
+  IN UINTN                          DestinationX,
+  IN UINTN                          DestinationY,
+  IN UINTN                          Width,
+  IN UINTN                          Height
   )
 {
-  UINT64                        BufferSize;
+  EFI_STATUS  Status;
+  UINTN       BufferSize;
+  UINT32      Result32;
 
   if (BltBuffer == NULL) {
     mIsLogoValid = FALSE;
@@ -157,235 +261,148 @@ SetBootLogo (
     return EFI_SUCCESS;
   }
 
+  //
+  // Width and height are not allowed to be zero.
+  //
   if (Width == 0 || Height == 0) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
+  //
+  // Verify destination, width, and height do not overflow 32-bit values.
+  // The Boot Graphics Resource Table only has 32-bit fields for these values.
+  //
+  Status = SafeUintnToUint32 (DestinationX, &Result32);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  Status = SafeUintnToUint32 (DestinationY, &Result32);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  Status = SafeUintnToUint32 (Width, &Result32);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+  Status = SafeUintnToUint32 (Height, &Result32);
+  if (EFI_ERROR (Status)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Ensure the Height * Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) does
+  // not overflow UINTN
+  //
+  Status = SafeUintnMult (
+             Width,
+             Height,
+             &BufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
+  Status = SafeUintnMult (
+             BufferSize,
+             sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL),
+             &BufferSize
+             );
+  if (EFI_ERROR (Status)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Update state
+  //
   mAcpiBgrtBufferChanged = TRUE;
+
+  //
+  // Free old logo buffer
+  //
   if (mLogoBltBuffer != NULL) {
     FreePool (mLogoBltBuffer);
     mLogoBltBuffer = NULL;
   }
-  
-  //
-  // Ensure the Height * Width doesn't overflow
-  //
-  if (Height > DivU64x64Remainder ((UINTN) ~0, Width, NULL)) {
-    return EFI_UNSUPPORTED;
-  }
-  BufferSize = MultU64x64 (Width, Height);
-  
-  //
-  // Ensure the BufferSize * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) doesn't overflow
-  //
-  if (BufferSize > DivU64x32 ((UINTN) ~0, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL))) {
-    return EFI_UNSUPPORTED;
-  }
 
-  mLogoBltBuffer = AllocateCopyPool (
-                     (UINTN)BufferSize * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL),
-                     BltBuffer
-                     );
+  //
+  // Allocate new logo buffer
+  //
+  mLogoBltBuffer = AllocateCopyPool (BufferSize, BltBuffer);
   if (mLogoBltBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
-  mLogoDestX = DestinationX;
-  mLogoDestY = DestinationY;
-  mLogoWidth = Width;
-  mLogoHeight = Height;
+
+  mLogoDestX   = DestinationX;
+  mLogoDestY   = DestinationY;
+  mLogoWidth   = Width;
+  mLogoHeight  = Height;
   mIsLogoValid = TRUE;
 
   return EFI_SUCCESS;
 }
 
 /**
-  This function calculates and updates an UINT8 checksum.
+  Get the location of the boot logo on the screen.
 
-  @param[in]  Buffer          Pointer to buffer to checksum.
-  @param[in]  Size            Number of bytes to checksum.
+  @param[in]  This          The pointer to the Boot Logo Protocol 2 instance
+  @param[out] BltBuffer     Returns pointer to the GOP BLT buffer that was
+                            previously registered with SetBootLogo2(). The
+                            buffer returned must not be modified or freed.
+  @param[out] DestinationX  Returns the X start position of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] DestinationY  Returns the Y start position of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] Width         Returns the width of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
+  @param[out] Height        Returns the height of the GOP BLT buffer
+                            that was previously registered with SetBootLogo2().
 
-**/
-VOID
-BgrtAcpiTableChecksum (
-  IN UINT8      *Buffer,
-  IN UINTN      Size
-  )
-{
-  UINTN ChecksumOffset;
-
-  ChecksumOffset = OFFSET_OF (EFI_ACPI_DESCRIPTION_HEADER, Checksum);
-
-  //
-  // Set checksum to 0 first.
-  //
-  Buffer[ChecksumOffset] = 0;
-
-  //
-  // Update checksum value.
-  //
-  Buffer[ChecksumOffset] = CalculateCheckSum8 (Buffer, Size);
-}
-
-/**
-  Install Boot Graphics Resource Table to ACPI table.
-
-  @return Status code.
-
+  @retval EFI_SUCCESS            The location of the boot logo was returned.
+  @retval EFI_NOT_READY          The boot logo has not been set.
+  @retval EFI_INVALID_PARAMETER  BltBuffer is NULL.
+  @retval EFI_INVALID_PARAMETER  DestinationX is NULL.
+  @retval EFI_INVALID_PARAMETER  DestinationY is NULL.
+  @retval EFI_INVALID_PARAMETER  Width is NULL.
+  @retval EFI_INVALID_PARAMETER  Height is NULL.
 **/
 EFI_STATUS
-InstallBootGraphicsResourceTable (
-  VOID
+EFIAPI
+GetBootLogo2 (
+  IN  EDKII_BOOT_LOGO2_PROTOCOL      *This,
+  OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  **BltBuffer,
+  OUT UINTN                          *DestinationX,
+  OUT UINTN                          *DestinationY,
+  OUT UINTN                          *Width,
+  OUT UINTN                          *Height
   )
 {
-  EFI_STATUS                    Status;
-  EFI_ACPI_TABLE_PROTOCOL       *AcpiTableProtocol;
-  UINT8                         *ImageBuffer;
-  UINTN                         PaddingSize;
-  UINTN                         BmpSize;
-  UINTN                         OrigBmpSize;
-  UINT8                         *Image;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltPixel;
-  UINTN                         Col;
-  UINTN                         Row;
-
   //
-  // Get ACPI Table protocol.
+  // If the boot logo has not been set with SetBootLogo() or SetBootLogo() was
+  // called with a NULL BltBuffer then the boot logo is not valid and
+  // EFI_NOT_READY is returned.
   //
-  Status = gBS->LocateProtocol (&gEfiAcpiTableProtocolGuid, NULL, (VOID **) &AcpiTableProtocol);
-  if (EFI_ERROR (Status)) {
-    return Status;
+  if (mLogoBltBuffer == NULL) {
+    DEBUG ((DEBUG_ERROR, "Request to get boot logo location before boot logo has been set.\n"));
+    return EFI_NOT_READY;
   }
 
   //
-  // Check whether Boot Graphics Resource Table is already installed.
+  // Make sure none of the boot logo location parameters are NULL.
   //
-  if (mAcpiBgrtInstalled) {
-    if (!mAcpiBgrtStatusChanged && !mAcpiBgrtBufferChanged) {
-      //
-      // Nothing has changed
-      //
-      return EFI_SUCCESS;
-    } else {
-      //
-      // If BGRT data change happens. Uninstall Orignal AcpiTable first
-      //
-      Status = AcpiTableProtocol->UninstallAcpiTable (
-                                    AcpiTableProtocol,
-                                    mBootGraphicsResourceTableKey
-                                    );
-      if (EFI_ERROR (Status)) {
-        return Status;
-      } 
-    }
-  } else {
-    //
-    // Check whether Logo exist.
-    //
-    if ( mLogoBltBuffer == NULL) {
-      return EFI_NOT_FOUND;
-    }
+  if (BltBuffer == NULL || DestinationX == NULL || DestinationY == NULL ||
+      Width == NULL || Height == NULL) {
+    return EFI_INVALID_PARAMETER;
   }
 
-  if (mAcpiBgrtBufferChanged) {
-    //
-    // reserve original BGRT buffer size
-    //
-    OrigBmpSize = mBmpImageHeaderTemplate.ImageSize + sizeof (BMP_IMAGE_HEADER);
-    //
-    // Free orignal BMP memory 
-    // 
-    if (mBootGraphicsResourceTableTemplate.ImageAddress) {
-      gBS->FreePages(mBootGraphicsResourceTableTemplate.ImageAddress, EFI_SIZE_TO_PAGES(OrigBmpSize));
-    }
-
-    //
-    // Allocate memory for BMP file.
-    //
-    PaddingSize = mLogoWidth & 0x3;
-
-    //
-    // First check mLogoWidth * 3 + PaddingSize doesn't overflow
-    //
-    if (mLogoWidth > (((UINT32) ~0) - PaddingSize) / 3 ) {
-      return EFI_UNSUPPORTED;
-    }
-
-    //
-    // Second check (mLogoWidth * 3 + PaddingSize) * mLogoHeight + sizeof (BMP_IMAGE_HEADER) doesn't overflow
-    //
-    if (mLogoHeight > (((UINT32) ~0) - sizeof (BMP_IMAGE_HEADER)) / (mLogoWidth * 3 + PaddingSize)) {
-      return EFI_UNSUPPORTED;
-    }
-
-    //
-    // The image should be stored in EfiBootServicesData, allowing the system to reclaim the memory
-    //
-    BmpSize = (mLogoWidth * 3 + PaddingSize) * mLogoHeight + sizeof (BMP_IMAGE_HEADER);
-    ImageBuffer = AllocatePages (EFI_SIZE_TO_PAGES (BmpSize));
-    if (ImageBuffer == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    ZeroMem (ImageBuffer, BmpSize);
-
-    mBmpImageHeaderTemplate.Size = (UINT32) BmpSize;
-    mBmpImageHeaderTemplate.ImageSize = (UINT32) BmpSize - sizeof (BMP_IMAGE_HEADER);
-    mBmpImageHeaderTemplate.PixelWidth = (UINT32) mLogoWidth;
-    mBmpImageHeaderTemplate.PixelHeight = (UINT32) mLogoHeight;
-    CopyMem (ImageBuffer, &mBmpImageHeaderTemplate, sizeof (BMP_IMAGE_HEADER));
-    
-    //
-    // Convert BLT buffer to BMP file.
-    //
-    Image = ImageBuffer + sizeof (BMP_IMAGE_HEADER);
-    for (Row = 0; Row < mLogoHeight; Row++) {
-    BltPixel = &mLogoBltBuffer[(mLogoHeight - Row - 1) * mLogoWidth];
-
-    for (Col = 0; Col < mLogoWidth; Col++) {
-      *Image++ = BltPixel->Blue;
-      *Image++ = BltPixel->Green;
-      *Image++ = BltPixel->Red;
-      BltPixel++;
-    }
-
-      //
-      // Padding for 4 byte alignment.
-      //
-      Image += PaddingSize;
-    }
-    FreePool (mLogoBltBuffer);
-    mLogoBltBuffer = NULL;
-
-    mBootGraphicsResourceTableTemplate.ImageAddress = (UINT64) (UINTN) ImageBuffer;
-    mBootGraphicsResourceTableTemplate.ImageOffsetX = (UINT32) mLogoDestX;
-    mBootGraphicsResourceTableTemplate.ImageOffsetY = (UINT32) mLogoDestY;
-  }
-
-  mBootGraphicsResourceTableTemplate.Status = (UINT8) (mIsLogoValid ? EFI_ACPI_5_0_BGRT_STATUS_VALID : EFI_ACPI_5_0_BGRT_STATUS_INVALID);
-
   //
-  // Update Checksum.
+  // Boot logo is valid.  Return values from module globals.
   //
-  BgrtAcpiTableChecksum ((UINT8 *) &mBootGraphicsResourceTableTemplate, sizeof (EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE));
+  *BltBuffer    = mLogoBltBuffer;
+  *DestinationX = mLogoDestX;
+  *DestinationY = mLogoDestY;
+  *Width        = mLogoWidth;
+  *Height       = mLogoHeight;
 
-  //
-  // Publish Boot Graphics Resource Table.
-  //
-  Status = AcpiTableProtocol->InstallAcpiTable (
-                                AcpiTableProtocol,
-                                &mBootGraphicsResourceTableTemplate,
-                                sizeof (EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE),
-                                &mBootGraphicsResourceTableKey
-                                );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  mAcpiBgrtInstalled = TRUE;
-  mAcpiBgrtStatusChanged = FALSE;
-  mAcpiBgrtBufferChanged = FALSE;
-  
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -399,11 +416,131 @@ InstallBootGraphicsResourceTable (
 VOID
 EFIAPI
 BgrtReadyToBootEventNotify (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  InstallBootGraphicsResourceTable ();
+  EFI_STATUS               Status;
+  EFI_ACPI_TABLE_PROTOCOL  *AcpiTableProtocol;
+  VOID                     *ImageBuffer;
+  UINT32                   BmpSize;
+
+  //
+  // Get ACPI Table protocol.
+  //
+  Status = gBS->LocateProtocol (
+                  &gEfiAcpiTableProtocolGuid,
+                  NULL,
+                  (VOID **) &AcpiTableProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // Check whether Boot Graphics Resource Table is already installed.
+  //
+  if (mAcpiBgrtInstalled) {
+    if (!mAcpiBgrtStatusChanged && !mAcpiBgrtBufferChanged) {
+      //
+      // Nothing has changed
+      //
+      return;
+    } else {
+      //
+      // If BGRT data change happens, then uninstall orignal AcpiTable first
+      //
+      Status = AcpiTableProtocol->UninstallAcpiTable (
+                                    AcpiTableProtocol,
+                                    mBootGraphicsResourceTableKey
+                                    );
+      if (EFI_ERROR (Status)) {
+        return;
+      }
+    }
+  } else {
+    //
+    // Check whether Logo exists
+    //
+    if (mLogoBltBuffer == NULL) {
+      return;
+    }
+  }
+
+  if (mAcpiBgrtBufferChanged) {
+    //
+    // Free the old BMP image buffer
+    //
+    ImageBuffer = (UINT8 *)(UINTN)mBootGraphicsResourceTableTemplate.ImageAddress;
+    if (ImageBuffer != NULL) {
+      FreePool (ImageBuffer);
+    }
+
+    //
+    // Convert GOP Blt buffer to BMP image.  Pass in ImageBuffer set to NULL
+    // so the BMP image is allocated by TranslateGopBltToBmp().
+    //
+    ImageBuffer = NULL;
+    Status = TranslateGopBltToBmp (
+               mLogoBltBuffer,
+               (UINT32)mLogoHeight,
+               (UINT32)mLogoWidth,
+               &ImageBuffer,
+               &BmpSize
+               );
+    if (EFI_ERROR (Status)) {
+      return;
+    }
+
+    //
+    // Free the logo buffer
+    //
+    FreePool (mLogoBltBuffer);
+    mLogoBltBuffer = NULL;
+
+    //
+    // Update BMP image fields of the Boot Graphics Resource Table
+    //
+    mBootGraphicsResourceTableTemplate.ImageAddress = (UINT64)(UINTN)ImageBuffer;
+    mBootGraphicsResourceTableTemplate.ImageOffsetX = (UINT32)mLogoDestX;
+    mBootGraphicsResourceTableTemplate.ImageOffsetY = (UINT32)mLogoDestY;
+  }
+
+  //
+  // Update Status field of Boot Graphics Resource Table
+  //
+  if (mIsLogoValid) {
+    mBootGraphicsResourceTableTemplate.Status = EFI_ACPI_5_0_BGRT_STATUS_VALID;
+  } else {
+    mBootGraphicsResourceTableTemplate.Status = EFI_ACPI_5_0_BGRT_STATUS_INVALID;
+  }
+
+  //
+  // Update Checksum of Boot Graphics Resource Table
+  //
+  mBootGraphicsResourceTableTemplate.Header.Checksum = 0;
+  mBootGraphicsResourceTableTemplate.Header.Checksum =
+    CalculateCheckSum8 (
+      (UINT8 *)&mBootGraphicsResourceTableTemplate,
+      sizeof (EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE)
+      );
+
+  //
+  // Publish Boot Graphics Resource Table.
+  //
+  Status = AcpiTableProtocol->InstallAcpiTable (
+                                AcpiTableProtocol,
+                                &mBootGraphicsResourceTableTemplate,
+                                sizeof (EFI_ACPI_5_0_BOOT_GRAPHICS_RESOURCE_TABLE),
+                                &mBootGraphicsResourceTableKey
+                                );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  mAcpiBgrtInstalled     = TRUE;
+  mAcpiBgrtStatusChanged = FALSE;
+  mAcpiBgrtBufferChanged = FALSE;
 }
 
 /**
@@ -419,31 +556,37 @@ BgrtReadyToBootEventNotify (
 EFI_STATUS
 EFIAPI
 BootGraphicsDxeEntryPoint (
-  IN EFI_HANDLE          ImageHandle,
-  IN EFI_SYSTEM_TABLE    *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS  Status;
-  UINT64      OemTableId;
-
-  CopyMem (
-    mBootGraphicsResourceTableTemplate.Header.OemId,
-    PcdGetPtr (PcdAcpiDefaultOemId),
-    sizeof (mBootGraphicsResourceTableTemplate.Header.OemId)
-    );
-  OemTableId = PcdGet64 (PcdAcpiDefaultOemTableId);
-  CopyMem (&mBootGraphicsResourceTableTemplate.Header.OemTableId, &OemTableId, sizeof (UINT64));
-  mBootGraphicsResourceTableTemplate.Header.OemRevision      = PcdGet32 (PcdAcpiDefaultOemRevision);
-  mBootGraphicsResourceTableTemplate.Header.CreatorId        = PcdGet32 (PcdAcpiDefaultCreatorId);
-  mBootGraphicsResourceTableTemplate.Header.CreatorRevision  = PcdGet32 (PcdAcpiDefaultCreatorRevision);
+  EFI_STATUS                   Status;
+  EFI_ACPI_DESCRIPTION_HEADER  *Header;
 
   //
-  // Install Boot Logo protocol.
+  // Update Header fields of Boot Graphics Resource Table from PCDs
+  //
+  Header = &mBootGraphicsResourceTableTemplate.Header;
+  ZeroMem (Header->OemId, sizeof (Header->OemId));
+  CopyMem (
+    Header->OemId,
+    PcdGetPtr (PcdAcpiDefaultOemId),
+    MIN (PcdGetSize (PcdAcpiDefaultOemId), sizeof (Header->OemId))
+    );
+  WriteUnaligned64 (&Header->OemTableId, PcdGet64 (PcdAcpiDefaultOemTableId));
+  Header->OemRevision     = PcdGet32 (PcdAcpiDefaultOemRevision);
+  Header->CreatorId       = PcdGet32 (PcdAcpiDefaultCreatorId);
+  Header->CreatorRevision = PcdGet32 (PcdAcpiDefaultCreatorRevision);
+
+  //
+  // Install Boot Logo and Boot Logo 2 Protocols.
   //
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &mBootLogoHandle,
                   &gEfiBootLogoProtocolGuid,
                   &mBootLogoProtocolTemplate,
+                  &gEdkiiBootLogo2ProtocolGuid,
+                  &mBootLogo2ProtocolTemplate,
                   NULL
                   );
   ASSERT_EFI_ERROR (Status);

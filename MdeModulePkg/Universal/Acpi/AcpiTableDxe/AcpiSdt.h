@@ -1,7 +1,7 @@
 /** @file
   ACPI Sdt Protocol Driver
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -130,7 +130,7 @@ typedef UINT32 AML_OP_ATTRIBUTE;
 #define AML_HAS_CHILD_OBJ        0x4     // it is ACPI attribute - if OpCode has Child Object.
 #define AML_IN_NAMESPACE         0x10000 // It is UEFI SDT attribute - if OpCode will be in NameSpace
                                          // NOTE; Not all OBJECT will be in NameSpace
-                                         // For example, BankField | CreateBitField | CreateByteField | CreateDWordField | 
+                                         // For example, BankField | CreateBitField | CreateByteField | CreateDWordField |
                                          //   CreateField | CreateQWordField | CreateWordField | Field | IndexField.
 
 struct _AML_BYTE_ENCODING {
@@ -147,7 +147,7 @@ struct _AML_BYTE_ENCODING {
 
 /**
   Returns a requested ACPI table.
-  
+
   The GetAcpiTable() function returns a pointer to a buffer containing the ACPI table associated
   with the Index that was input. The following structures are not considered elements in the list of
   ACPI tables:
@@ -157,20 +157,20 @@ struct _AML_BYTE_ENCODING {
   Version is updated with a bit map containing all the versions of ACPI of which the table is a
   member. For tables installed via the EFI_ACPI_TABLE_PROTOCOL.InstallAcpiTable() interface,
   the function returns the value of EFI_ACPI_STD_PROTOCOL.AcpiVersion.
-  
+
   @param[in]    Index       The zero-based index of the table to retrieve.
   @param[out]   Table       Pointer for returning the table buffer.
   @param[out]   Version     On return, updated with the ACPI versions to which this table belongs. Type
                             EFI_ACPI_TABLE_VERSION is defined in "Related Definitions" in the
-                            EFI_ACPI_SDT_PROTOCOL.    
+                            EFI_ACPI_SDT_PROTOCOL.
   @param[out]   TableKey    On return, points to the table key for the specified ACPI system definition table.
                             This is identical to the table key used in the EFI_ACPI_TABLE_PROTOCOL.
                             The TableKey can be passed to EFI_ACPI_TABLE_PROTOCOL.UninstallAcpiTable()
                             to uninstall the table.
-                            
+
   @retval EFI_SUCCESS       The function completed successfully.
-  @retval EFI_NOT_FOUND     The requested index is too large and a table was not found.                                  
-**/  
+  @retval EFI_NOT_FOUND     The requested index is too large and a table was not found.
+**/
 EFI_STATUS
 EFIAPI
 GetAcpiTable2 (
@@ -182,17 +182,17 @@ GetAcpiTable2 (
 
 /**
   Register or unregister a callback when an ACPI table is installed.
-  
+
   This function registers or unregisters a function which will be called whenever a new ACPI table is
   installed.
-  
+
   @param[in]    Register        If TRUE, then the specified function will be registered. If FALSE, then the specified
                                 function will be unregistered.
   @param[in]    Notification    Points to the callback function to be registered or unregistered.
-  
+
   @retval EFI_SUCCESS           Callback successfully registered or unregistered.
   @retval EFI_INVALID_PARAMETER Notification is NULL
-  @retval EFI_INVALID_PARAMETER Register is FALSE and Notification does not match a known registration function.                        
+  @retval EFI_INVALID_PARAMETER Register is FALSE and Notification does not match a known registration function.
 **/
 EFI_STATUS
 EFIAPI
@@ -203,12 +203,12 @@ RegisterNotify (
 
 /**
   Create a handle for the first ACPI opcode in an ACPI system description table.
-  
+
   @param[in]    TableKey    The table key for the ACPI table, as returned by GetTable().
   @param[out]   Handle      On return, points to the newly created ACPI handle.
 
   @retval EFI_SUCCESS       Handle created successfully.
-  @retval EFI_NOT_FOUND     TableKey does not refer to a valid ACPI table.  
+  @retval EFI_NOT_FOUND     TableKey does not refer to a valid ACPI table.
 **/
 EFI_STATUS
 EFIAPI
@@ -219,29 +219,29 @@ OpenSdt (
 
 /**
   Create a handle from an ACPI opcode
-  
+
   @param[in]  Buffer                 Points to the ACPI opcode.
   @param[out] Handle                 Upon return, holds the handle.
-  
+
   @retval   EFI_SUCCESS             Success
   @retval   EFI_INVALID_PARAMETER   Buffer is NULL or Handle is NULL or Buffer points to an
                                     invalid opcode.
-  
+
 **/
 EFI_STATUS
 EFIAPI
 Open (
   IN    VOID            *Buffer,
-  OUT   EFI_ACPI_HANDLE *Handle 
+  OUT   EFI_ACPI_HANDLE *Handle
   );
 
 /**
   Close an ACPI handle.
-  
+
   @param[in] Handle Returns the handle.
-  
+
   @retval EFI_SUCCESS           Success
-  @retval EFI_INVALID_PARAMETER Handle is NULL or does not refer to a valid ACPI object.  
+  @retval EFI_INVALID_PARAMETER Handle is NULL or does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 EFIAPI
@@ -251,7 +251,7 @@ Close (
 
 /**
   Retrieve information about an ACPI object.
-  
+
   @param[in]    Handle      ACPI object handle.
   @param[in]    Index       Index of the data to retrieve from the object. In general, indexes read from left-to-right
                             in the ACPI encoding, with index 0 always being the ACPI opcode.
@@ -259,7 +259,7 @@ Close (
                             for the specified index.
   @param[out]   Data        Upon return, points to the pointer to the data.
   @param[out]   DataSize    Upon return, points to the size of Data.
-  
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER Handle is NULL or does not refer to a valid ACPI object.
 **/
@@ -275,7 +275,7 @@ GetOption (
 
 /**
   Change information about an ACPI object.
-  
+
   @param[in]  Handle    ACPI object handle.
   @param[in]  Index     Index of the data to retrieve from the object. In general, indexes read from left-to-right
                         in the ACPI encoding, with index 0 always being the ACPI opcode.
@@ -299,14 +299,14 @@ SetOption (
 
 /**
   Return the child ACPI objects.
-  
+
   @param[in]        ParentHandle    Parent handle.
   @param[in, out]   Handle          On entry, points to the previously returned handle or NULL to start with the first
                                     handle. On return, points to the next returned ACPI handle or NULL if there are no
                                     child objects.
 
   @retval EFI_SUCCESS               Success
-  @retval EFI_INVALID_PARAMETER     ParentHandle is NULL or does not refer to a valid ACPI object.                                
+  @retval EFI_INVALID_PARAMETER     ParentHandle is NULL or does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 EFIAPI
@@ -317,14 +317,14 @@ GetChild (
 
 /**
   Returns the handle of the ACPI object representing the specified ACPI path
-  
+
   @param[in]    HandleIn    Points to the handle of the object representing the starting point for the path search.
   @param[in]    AcpiPath    Points to the ACPI path, which conforms to the ACPI encoded path format.
   @param[out]   HandleOut   On return, points to the ACPI object which represents AcpiPath, relative to
                             HandleIn.
-                            
+
   @retval EFI_SUCCESS           Success
-  @retval EFI_INVALID_PARAMETER HandleIn is NULL or does not refer to a valid ACPI object.                            
+  @retval EFI_INVALID_PARAMETER HandleIn is NULL or does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 EFIAPI
@@ -340,21 +340,21 @@ FindPath (
 
 /**
   Create a handle from an ACPI opcode
-  
+
   @param[in]  Buffer                 Points to the ACPI opcode.
   @param[in]  BufferSize             Max buffer size.
   @param[out] Handle                 Upon return, holds the handle.
-  
+
   @retval   EFI_SUCCESS             Success
   @retval   EFI_INVALID_PARAMETER   Buffer is NULL or Handle is NULL or Buffer points to an
                                     invalid opcode.
-  
+
 **/
 EFI_STATUS
 SdtOpenEx (
   IN    VOID            *Buffer,
   IN    UINTN           BufferSize,
-  OUT   EFI_ACPI_HANDLE *Handle 
+  OUT   EFI_ACPI_HANDLE *Handle
   );
 
 //
@@ -365,8 +365,8 @@ SdtOpenEx (
   Get AML NameString size.
 
   @param[in]    Buffer     AML NameString.
-  @param[out]   BufferSize AML NameString size 
-  
+  @param[out]   BufferSize AML NameString size
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER Buffer does not refer to a valid AML NameString.
 **/
@@ -416,11 +416,11 @@ AmlSearchByOpByte (
 
 /**
   Return object size.
-  
+
   @param[in]    AmlByteEncoding      AML Byte Encoding.
   @param[in]    Buffer               AML object buffer.
   @param[in]    MaxBufferSize        AML object buffer MAX size. The parser can not parse any data exceed this region.
-  
+
   @return       Size of the object.
 **/
 UINTN
@@ -432,9 +432,9 @@ AmlGetObjectSize (
 
 /**
   Return object name.
-  
+
   @param[in]    AmlHandle            AML handle.
-  
+
   @return       Name of the object.
 **/
 CHAR8 *
@@ -444,7 +444,7 @@ AmlGetObjectName (
 
 /**
   Retrieve information according to AmlHandle
-  
+
   @param[in]    AmlHandle            AML handle.
   @param[in]    Index                Index of the data to retrieve from the object. In general, indexes read from left-to-right
                                      in the ACPI encoding, with index 0 always being the ACPI opcode.
@@ -452,7 +452,7 @@ AmlGetObjectName (
                                      for the specified index.
   @param[out]   Data                 Upon return, points to the pointer to the data.
   @param[out]   DataSize             Upon return, points to the size of Data.
-  
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER AmlHandle does not refer to a valid ACPI object.
 **/
@@ -467,10 +467,10 @@ AmlParseOptionHandleCommon (
 
 /**
   Return offset of last option.
-  
+
   @param[in]    AmlHandle            AML Handle.
   @param[out]   Buffer               Upon return, points to the offset after last option.
-  
+
   @retval       EFI_SUCCESS           Success.
   @retval       EFI_INVALID_PARAMETER AmlHandle does not refer to a valid ACPI object.
 **/
@@ -482,14 +482,14 @@ AmlGetOffsetAfterLastOption (
 
 /**
   Return the child ACPI objects from Root Handle.
-  
+
   @param[in]        AmlParentHandle Parent handle. It is Root Handle.
   @param[in]        AmlHandle       The previously returned handle or NULL to start with the first handle.
   @param[out]       Buffer          On return, points to the next returned ACPI handle or NULL if there are no
                                     child objects.
 
   @retval EFI_SUCCESS               Success
-  @retval EFI_INVALID_PARAMETER     ParentHandle is NULL or does not refer to a valid ACPI object.                                
+  @retval EFI_INVALID_PARAMETER     ParentHandle is NULL or does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 AmlGetChildFromRoot (
@@ -500,14 +500,14 @@ AmlGetChildFromRoot (
 
 /**
   Return the child ACPI objects from Non-Root Handle.
-  
+
   @param[in]        AmlParentHandle Parent handle. It is Non-Root Handle.
   @param[in]        AmlHandle       The previously returned handle or NULL to start with the first handle.
   @param[out]       Buffer          On return, points to the next returned ACPI handle or NULL if there are no
                                     child objects.
 
   @retval EFI_SUCCESS               Success
-  @retval EFI_INVALID_PARAMETER     ParentHandle is NULL or does not refer to a valid ACPI object.                                
+  @retval EFI_INVALID_PARAMETER     ParentHandle is NULL or does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 AmlGetChildFromNonRoot (
@@ -531,16 +531,16 @@ AmlNameFromAslName (
 
 /**
   Returns the handle of the ACPI object representing the specified ACPI AML path
-  
+
   @param[in]    AmlHandle   Points to the handle of the object representing the starting point for the path search.
   @param[in]    AmlPath     Points to the ACPI AML path.
   @param[out]   Buffer      On return, points to the ACPI object which represents AcpiPath, relative to
                             HandleIn.
   @param[in]    FromRoot    TRUE means to find AML path from \ (Root) Node.
                             FALSE means to find AML path from this Node (The HandleIn).
-                            
+
   @retval EFI_SUCCESS           Success
-  @retval EFI_INVALID_PARAMETER HandleIn does not refer to a valid ACPI object.                            
+  @retval EFI_INVALID_PARAMETER HandleIn does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 AmlFindPath (
@@ -574,7 +574,7 @@ AmlPrintNameSeg (
   Check if it is AML Root name
 
   @param[in]    Buffer AML path.
-  
+
   @retval       TRUE  AML path is root.
   @retval       FALSE AML path is not root.
 **/

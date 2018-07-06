@@ -73,7 +73,7 @@ def CheckForExistingDp(Path):
 #
 #
 def Main(Options = None):
-    if Options == None:
+    if Options is None:
         Logger.Error("\nMkPkg", OPTION_UNKNOWN_ERROR, ST.ERR_OPTION_NOT_FOUND)
     try:
         DataBase = GlobalData.gDB        
@@ -213,7 +213,7 @@ def Main(Options = None):
         Logger.Quiet(ST.MSG_FINISH)
         ReturnCode = 0
 
-    except FatalError, XExcept:
+    except FatalError as XExcept:
         ReturnCode = XExcept.args[0]        
         if Logger.GetLevel() <= Logger.DEBUG_9:
             Logger.Quiet(ST.MSG_PYTHON_ON % \

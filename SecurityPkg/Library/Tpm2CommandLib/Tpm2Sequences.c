@@ -1,7 +1,7 @@
 /** @file
   Implement TPM2 Sequences related command.
 
-Copyright (c) 2013, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved. <BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -90,7 +90,7 @@ typedef struct {
   @param[in]  HashAlg           The hash algorithm to use for the hash sequence
                                 An Event sequence starts if this is TPM_ALG_NULL.
   @param[out] SequenceHandle    A handle to reference the sequence
- 
+
   @retval EFI_SUCCESS      Operation completed successfully.
   @retval EFI_DEVICE_ERROR Unexpected device behavior.
 **/
@@ -178,7 +178,7 @@ Tpm2HashSequenceStart (
 
   @param[in] SequenceHandle    Handle for the sequence object
   @param[in] Buffer            Data to be added to hash
- 
+
   @retval EFI_SUCCESS      Operation completed successfully.
   @retval EFI_DEVICE_ERROR Unexpected device behavior.
 **/
@@ -277,7 +277,7 @@ Tpm2SequenceUpdate (
   @param[in]  SequenceHandle    Authorization for the sequence
   @param[in]  Buffer            Data to be added to the Event
   @param[out] Results           List of digests computed for the PCR
- 
+
   @retval EFI_SUCCESS      Operation completed successfully.
   @retval EFI_DEVICE_ERROR Unexpected device behavior.
 **/
@@ -375,6 +375,11 @@ Tpm2EventSequenceComplete (
 
   // count
   Results->count = SwapBytes32(ReadUnaligned32 ((UINT32 *)BufferPtr));
+  if (Results->count > HASH_COUNT) {
+    DEBUG ((DEBUG_ERROR, "Tpm2EventSequenceComplete - Results->count error %x\n", Results->count));
+    return EFI_DEVICE_ERROR;
+  }
+
   BufferPtr += sizeof(UINT32);
 
   for (Index = 0; Index < Results->count; Index++) {
@@ -403,7 +408,7 @@ Tpm2EventSequenceComplete (
   @param[in]  SequenceHandle    Authorization for the sequence
   @param[in]  Buffer            Data to be added to the hash/HMAC
   @param[out] Result            The returned HMAC or digest in a sized buffer
- 
+
   @retval EFI_SUCCESS      Operation completed successfully.
   @retval EFI_DEVICE_ERROR Unexpected device behavior.
 **/
@@ -496,6 +501,11 @@ Tpm2SequenceComplete (
 
   // digestSize
   Result->size = SwapBytes16(ReadUnaligned16 ((UINT16 *)BufferPtr));
+  if (Result->size > sizeof(TPMU_HA)){
+    DEBUG ((DEBUG_ERROR, "Tpm2SequenceComplete - Result->size error %x\n", Result->size));
+    return EFI_DEVICE_ERROR;
+  }
+
   BufferPtr += sizeof(UINT16);
 
   CopyMem(

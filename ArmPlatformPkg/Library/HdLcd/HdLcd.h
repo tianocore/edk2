@@ -1,6 +1,6 @@
-/** @file  HDLcd.h
+/** @file
 
- Copyright (c) 2011-2012, ARM Ltd. All rights reserved.<BR>
+ Copyright (c) 2011-2018, ARM Ltd. All rights reserved.<BR>
 
  This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
@@ -12,13 +12,10 @@
 
  **/
 
-#ifndef _HDLCD_H_
-#define _HDLCD_H_
+#ifndef HDLCD_H_
+#define HDLCD_H_
 
-//
 // HDLCD Controller Register Offsets
-//
-
 #define HDLCD_REG_VERSION                 ((UINTN)PcdGet32 (PcdArmHdLcdBase) + 0x000)
 #define HDLCD_REG_INT_RAWSTAT             ((UINTN)PcdGet32 (PcdArmHdLcdBase) + 0x010)
 #define HDLCD_REG_INT_CLEAR               ((UINTN)PcdGet32 (PcdArmHdLcdBase) + 0x014)
@@ -44,10 +41,7 @@
 #define HDLCD_REG_GREEN_SELECT            ((UINTN)PcdGet32 (PcdArmHdLcdBase) + 0x248)
 #define HDLCD_REG_BLUE_SELECT             ((UINTN)PcdGet32 (PcdArmHdLcdBase) + 0x24C)
 
-
-//
 // HDLCD Values of registers
-//
 
 // HDLCD Interrupt mask, clear and status register
 #define HDLCD_DMA_END                     BIT0    /* DMA has finished reading a frame */
@@ -79,6 +73,11 @@
 #define HDLCD_DATA_LOW                    0
 #define HDLCD_PXCLK_LOW                   0
 
+// Default polarities
+#define HDLCD_DEFAULT_POLARITIES   (HDLCD_PXCLK_LOW | HDLCD_DATA_HIGH |       \
+                                    HDLCD_DATEN_HIGH | HDLCD_HSYNC_LOW |      \
+                                    HDLCD_VSYNC_HIGH)
+
 // Pixel Format
 #define HDLCD_LITTLE_ENDIAN              (0 << 31)
 #define HDLCD_BIG_ENDIAN                 (1 << 31)
@@ -86,4 +85,6 @@
 // Number of bytes per pixel
 #define HDLCD_4BYTES_PER_PIXEL           ((4 - 1) << 3)
 
-#endif /* _HDLCD_H_ */
+#define HDLCD_PRODUCT_ID                 0x1CDC
+
+#endif /* HDLCD_H_ */

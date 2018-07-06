@@ -30,6 +30,7 @@ Abstract:
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/SmBios.h>
 #include <IndustryStandard/PeImage.h>
+#include <IndustryStandard/Virtio095.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>

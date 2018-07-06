@@ -2,7 +2,7 @@
 # This file is used to define class objects of INF file [Pcds] section. 
 # It will consumed by InfParser. 
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -31,8 +31,8 @@ from Library.ParserValidate import IsValidCVariableName
 from Library.ParserValidate import IsValidPcdValue
 from Library.ParserValidate import IsValidArch
 from Library.CommentParsing import ParseComment
-from Library.String import GetSplitValueList
-from Library.String import IsHexDigitUINT32
+from Library.StringUtils import GetSplitValueList
+from Library.StringUtils import IsHexDigitUINT32
 from Library.ExpressionValidate import IsValidFeatureFlagExp
 from Parser.InfAsBuiltProcess import GetPackageListInfo
 from Parser.DecParser import Dec
@@ -43,7 +43,7 @@ def ValidateArch(ArchItem, PcdTypeItem1, LineNo, SupArchDict, SupArchList):
     #
     # Validate Arch
     #            
-    if (ArchItem == '' or ArchItem == None):
+    if (ArchItem == '' or ArchItem is None):
         ArchItem = 'COMMON'
 
     if PcdTypeItem1.upper != DT.TAB_INF_FEATURE_PCD.upper():
@@ -82,7 +82,7 @@ def ParsePcdComment(CommentList, PcdTypeItem, PcdItemObj):
 
         if PcdTypeItem == 'FeaturePcd':
             CommentItemUsage = DT.USAGE_ITEM_CONSUMES
-            if CommentItemHelpText == None:
+            if CommentItemHelpText is None:
                 CommentItemHelpText = ''
 
             if Count == 1:
@@ -96,7 +96,7 @@ def ParsePcdComment(CommentList, PcdTypeItem, PcdItemObj):
             else:
                 continue
 
-        if CommentItemHelpText == None:
+        if CommentItemHelpText is None:
             CommentItemHelpText = ''
             if Count == len(CommentList) and CommentItemUsage == DT.ITEM_UNDEFINED:
                 CommentItemHelpText = DT.END_OF_LINE
@@ -326,7 +326,7 @@ class InfPcdObject():
             #
             # Validate PcdType
             #
-            if (PcdTypeItem1 == '' or PcdTypeItem1 == None):
+            if (PcdTypeItem1 == '' or PcdTypeItem1 is None):
                 return False
             else:
                 if not IsValidPcdType(PcdTypeItem1):
@@ -346,7 +346,7 @@ class InfPcdObject():
                 CurrentLineOfPcdItem = PcdItem[2]
                 PcdItem = PcdItem[0]
 
-                if CommentList != None and len(CommentList) != 0:
+                if CommentList is not None and len(CommentList) != 0:
                     PcdItemObj = ParsePcdComment(CommentList, PcdTypeItem, PcdItemObj)
                 else:
                     CommentItemIns = InfPcdItemCommentContent()
@@ -411,7 +411,7 @@ class InfPcdObject():
                 else:
                     PcdItemObj.SetSupportArchList(SupArchList)
 
-                if self.Pcds.has_key((PcdTypeItem, PcdItemObj)):
+                if (PcdTypeItem, PcdItemObj) in self.Pcds:
                     PcdsList = self.Pcds[PcdTypeItem, PcdItemObj]
                     PcdsList.append(PcdItemObj)
                     self.Pcds[PcdTypeItem, PcdItemObj] = PcdsList
@@ -456,7 +456,7 @@ class InfPcdObject():
                                                       PackageInfo)
 
             PcdTypeItem = KeysList[0][0]
-            if self.Pcds.has_key((PcdTypeItem, PcdItemObj)):
+            if (PcdTypeItem, PcdItemObj) in self.Pcds:
                 PcdsList = self.Pcds[PcdTypeItem, PcdItemObj]
                 PcdsList.append(PcdItemObj)
                 self.Pcds[PcdTypeItem, PcdItemObj] = PcdsList

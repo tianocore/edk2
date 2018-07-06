@@ -1,14 +1,14 @@
 /** @file
   Main PAL API's defined in Intel Itanium Architecture Software Developer's Manual.
 
-  Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
@@ -1152,7 +1152,7 @@ typedef struct {
                                                 ///< be enabled or disabled by
                                                 ///< PAL_PROC_SET_FEATURES. The
                                                 ///< corresponding argument is ignored.
-                                                
+
   UINT64  NoPresentPmi:1;                       ///< Bit37, No INIT, PMI, and LINT pins
                                                 ///< present. Denotes the absence of INIT,
                                                 ///< PMI, LINT0 and LINT1 pins on the
@@ -1163,7 +1163,7 @@ typedef struct {
                                                 ///< enabled or disabled by
                                                 ///< PAL_PROC_SET_FEATURES. The corresponding
                                                 ///< argument is ignored.
-                                                
+
   UINT64  NoSimpleImpInUndefinedIns:1;          ///< Bit38, No Simple
                                                 ///< implementation of
                                                 ///< unimplemented instruction
@@ -1432,7 +1432,7 @@ typedef struct {
                                                 ///<   bit has no effect if BERR
                                                 ///<   signalling is disabled. (See
                                                 ///<   PAL_BUS_GET/SET_FEATURES)
-                                                
+
   UINT64  EnableBerrPromotion:1;                ///< Bit63. Enable BERR promotion. When
                                                 ///<   1, the Bus Error (BERR) signal is
                                                 ///<   promoted to the Bus Initialization
@@ -1757,15 +1757,15 @@ typedef struct {
 
   UINT64  FailedInInsCache:1;           ///< Bit11, Failure located in the
                                         ///< instruction cache.
-                                        
+
   UINT64  Mesi:3;                       ///< Bit14:12,  0 - cache line is invalid. 1 - cache
                                         ///< line is held shared. 2 - cache line is held
                                         ///< exclusive. 3 - cache line is modified. All other
                                         ///< values are reserved.
-                                        
+
   UINT64  MesiIsValid:1;                ///< Bit15, The mesi field in the cache_check
                                         ///< parameter is valid.
-                                        
+
   UINT64  FailedWay:5;                  ///< Bit20:16, Failure located in the way of
                                         ///< the cache indicated by this value.
 
@@ -2288,7 +2288,7 @@ typedef struct {
                                 ///<   ignored or generate an illegal argument in
                                 ///<   procedure calls if the caller sets these
                                 ///<   bits.
-                                
+
   UINT64  ControlSupport:1;     ///< This bit defines if an implementation
                                 ///<  supports control of the PAL self-tests
                                 ///<  via the self-test control word. If

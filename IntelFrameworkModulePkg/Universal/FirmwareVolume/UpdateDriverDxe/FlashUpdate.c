@@ -1,7 +1,7 @@
 /** @file
   Functions in this file will program the image into flash area.
 
-  Copyright (c) 2002 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2002 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -450,9 +450,9 @@ FaultTolerantUpdateOnWholeFv (
   Offset                = 0;
   UpdateBuffer          = ImageBuffer;
   CopyMem (
-  	(VOID *) &PrivateData.FileGuid,
-  	(VOID *) &ConfigData->FileGuid,
-   	sizeof (EFI_GUID)
+    (VOID *) &PrivateData.FileGuid,
+    (VOID *) &ConfigData->FileGuid,
+     sizeof (EFI_GUID)
   );
 
   while (TRUE) {
@@ -1006,9 +1006,9 @@ FaultTolerantUpdateOnPartFv (
   PtrMap                = BlockMap;
   Image                 = ImageBuffer;
   CopyMem (
-  	(VOID *) &PrivateData.FileGuid,
-  	(VOID *) &ConfigData->FileGuid,
-   	sizeof (EFI_GUID)
+    (VOID *) &PrivateData.FileGuid,
+    (VOID *) &ConfigData->FileGuid,
+     sizeof (EFI_GUID)
   );
 
   while (TotalSize > 0) {

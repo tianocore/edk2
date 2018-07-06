@@ -28,6 +28,29 @@ EFI_GUID mBmHardDriveBootVariableGuid = { 0xfab7e9e1, 0x39dd, 0x4f2b, { 0x84, 0x
 EFI_GUID mBmAutoCreateBootOptionGuid  = { 0x8108ac4e, 0x9f11, 0x4d59, { 0x85, 0x0e, 0xe2, 0x1a, 0x52, 0x2c, 0x59, 0xb2 } };
 
 /**
+
+  End Perf entry of BDS
+
+  @param  Event                 The triggered event.
+  @param  Context               Context for this event.
+
+**/
+VOID
+EFIAPI
+BmEndOfBdsPerfCode (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  //
+  // Record the performance data for End of BDS
+  //
+  PERF_CROSSMODULE_END("BDS");
+
+  return ;
+}
+
+/**
   The function registers the legacy boot support capabilities.
 
   @param RefreshLegacyBootOption The function pointer to create all the legacy boot options.
@@ -86,7 +109,7 @@ BmFindBootOptionInVariable (
   EFI_BOOT_MANAGER_LOAD_OPTION *BootOptions;
   UINTN                        BootOptionCount;
   UINTN                        Index;
-  
+
   OptionNumber = LoadOptionNumberUnassigned;
 
   //
@@ -210,7 +233,7 @@ BmAdjustFvFilePath (
       break;
     }
   }
-  
+
   if (FvHandles != NULL) {
     FreePool (FvHandles);
   }
@@ -219,7 +242,7 @@ BmAdjustFvFilePath (
 
 /**
   Check if it's a Device Path pointing to FV file.
-  
+
   The function doesn't garentee the device path points to existing FV file.
 
   @param  DevicePath     Input device path.
@@ -448,13 +471,13 @@ BmMatchUsbWwid (
 }
 
 /**
-  Find a USB device which match the specified short-form device path start with 
+  Find a USB device which match the specified short-form device path start with
   USB Class or USB WWID device path. If ParentDevicePath is NULL, this function
   will search in all USB devices of the platform. If ParentDevicePath is not NULL,
   this function will only search in its child devices.
 
   @param DevicePath           The device path that contains USB Class or USB WWID device path.
-  @param ParentDevicePathSize The length of the device path before the USB Class or 
+  @param ParentDevicePathSize The length of the device path before the USB Class or
                               USB WWID device path.
   @param UsbIoHandleCount     A pointer to the count of the returned USB IO handles.
 
@@ -476,7 +499,7 @@ BmFindUsbDevice (
   UINTN                     Index;
   BOOLEAN                   Matched;
 
-  ASSERT (UsbIoHandleCount != NULL);  
+  ASSERT (UsbIoHandleCount != NULL);
 
   //
   // Get all UsbIo Handles.
@@ -632,7 +655,7 @@ BmExpandFileDevicePath (
   UINTN                           MediaType;
   EFI_DEVICE_PATH_PROTOCOL        *NextFullPath;
   BOOLEAN                         GetNext;
-  
+
   EfiBootManagerConnectAll ();
   Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiSimpleFileSystemProtocolGuid, NULL, &HandleCount, &Handles);
   if (EFI_ERROR (Status)) {
@@ -757,7 +780,7 @@ BmCachePartitionDevicePath (
 {
   EFI_DEVICE_PATH_PROTOCOL        *TempDevicePath;
   UINTN                           Count;
-  
+
   if (BmMatchDevicePaths (*CachedDevicePath, DevicePath)) {
     TempDevicePath = *CachedDevicePath;
     *CachedDevicePath = BmDelPartMatchInstance (*CachedDevicePath, DevicePath);
@@ -1647,12 +1670,12 @@ BmIsBootManagerMenuFilePath (
 /**
   Attempt to boot the EFI boot option. This routine sets L"BootCurent" and
   also signals the EFI ready to boot event. If the device path for the option
-  starts with a BBS device path a legacy boot is attempted via the registered 
-  gLegacyBoot function. Short form device paths are also supported via this 
+  starts with a BBS device path a legacy boot is attempted via the registered
+  gLegacyBoot function. Short form device paths are also supported via this
   rountine. A device path starting with MEDIA_HARDDRIVE_DP, MSG_USB_WWID_DP,
   MSG_USB_CLASS_DP gets expaned out to find the first device that matches.
-  If the BootOption Device Path fails the removable media boot algorithm 
-  is attempted (\EFI\BOOTIA32.EFI, \EFI\BOOTX64.EFI,... only one file type 
+  If the BootOption Device Path fails the removable media boot algorithm
+  is attempted (\EFI\BOOTIA32.EFI, \EFI\BOOTX64.EFI,... only one file type
   is tried per processor type)
 
   @param  BootOption    Boot Option to try and boot.
@@ -1744,7 +1767,7 @@ EfiBootManagerBoot (
     //
     // 4. Repair system through DriverHealth protocol
     //
-    BmRepairAllControllers ();
+    BmRepairAllControllers (0);
   }
 
   PERF_START_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32) OptionNumber);
@@ -1830,8 +1853,8 @@ EfiBootManagerBoot (
         //
         Status = EfiCreateEventLegacyBootEx(
                    TPL_NOTIFY,
-                   BmWriteBootToOsPerformanceData,
-                   NULL, 
+                   BmEndOfBdsPerfCode,
+                   NULL,
                    &LegacyBootEvent
                    );
         ASSERT_EFI_ERROR (Status);
@@ -1845,7 +1868,7 @@ EfiBootManagerBoot (
     PERF_END_EX (gImageHandle, "BdsAttempt", NULL, 0, (UINT32) OptionNumber);
     return;
   }
- 
+
   //
   // Provide the image with its load options
   //
@@ -1871,7 +1894,7 @@ EfiBootManagerBoot (
   // Write boot to OS performance data for UEFI boot
   //
   PERF_CODE (
-    BmWriteBootToOsPerformanceData (NULL, NULL);
+    BmEndOfBdsPerfCode (NULL, NULL);
   );
 
   REPORT_STATUS_CODE (EFI_PROGRESS_CODE, PcdGet32 (PcdProgressCodeOsLoaderStart));
@@ -1998,7 +2021,7 @@ BmMatchPartitionDevicePathNode (
   3. Non-BlockIo SimpleFileSystem - The boot option points to a device supporting
                                     SimpleFileSystem Protocol, but not supporting BlockIo
                                     protocol.
-  4. LoadFile                     - The boot option points to the media supporting 
+  4. LoadFile                     - The boot option points to the media supporting
                                     LoadFile protocol.
   Reference: UEFI Spec chapter 3.3 Boot Option Variables Default Boot Behavior
 
@@ -2223,7 +2246,7 @@ EfiBootManagerRefreshAllBootOption (
   // Remove invalid EFI boot options from NV
   //
   for (Index = 0; Index < NvBootOptionCount; Index++) {
-    if (((DevicePathType (NvBootOptions[Index].FilePath) != BBS_DEVICE_PATH) || 
+    if (((DevicePathType (NvBootOptions[Index].FilePath) != BBS_DEVICE_PATH) ||
          (DevicePathSubType (NvBootOptions[Index].FilePath) != BBS_BBS_DP)
         ) && BmIsAutoCreateBootOption (&NvBootOptions[Index])
        ) {
@@ -2406,7 +2429,7 @@ EfiBootManagerGetBootManagerMenu (
   UINTN                        BootOptionCount;
   EFI_BOOT_MANAGER_LOAD_OPTION *BootOptions;
   UINTN                        Index;
-  
+
   BootOptions = EfiBootManagerGetLoadOptions (&BootOptionCount, LoadOptionTypeBoot);
 
   for (Index = 0; Index < BootOptionCount; Index++) {

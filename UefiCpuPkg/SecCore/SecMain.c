@@ -1,7 +1,7 @@
 /** @file
   C functions in SEC
 
-  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -113,6 +113,7 @@ SecPerformancePpiCallBack (
   @param BootFirmwareVolume  Base address of the Boot Firmware Volume.
 **/
 VOID
+NORETURN
 EFIAPI
 SecStartup (
   IN UINT32                   SizeOfRam,
@@ -201,6 +202,11 @@ SecStartup (
   // Initialize Debug Agent to support source level debug in SEC/PEI phases before memory ready.
   //
   InitializeDebugAgent (DEBUG_AGENT_INIT_PREMEM_SEC, &SecCoreData, SecStartupPhase2);
+
+  //
+  // Should not come here.
+  //
+  UNREACHABLE ();
 }
 
 /**

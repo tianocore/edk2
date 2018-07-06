@@ -32,9 +32,6 @@ NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
   NOR_FLASH_SIGNATURE, // Signature
   NULL, // Handle ... NEED TO BE FILLED
 
-  FALSE, // Initialized
-  NULL, // Initialize
-
   0, // DeviceBaseAddress ... NEED TO BE FILLED
   0, // RegionBaseAddress ... NEED TO BE FILLED
   0, // Size ... NEED TO BE FILLED
@@ -69,7 +66,6 @@ NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
     NorFlashDiskIoWriteDisk        // WriteDisk
   },
 
-  FALSE, // SupportFvb ... NEED TO BE FILLED
   {
     FvbGetAttributes, // GetAttributes
     FvbSetAttributes, // SetAttributes
@@ -137,8 +133,7 @@ NorFlashCreateInstance (
   }
 
   if (SupportFvb) {
-    Instance->SupportFvb = TRUE;
-    Instance->Initialize = NorFlashFvbInitialize;
+    NorFlashFvbInitialize (Instance);
 
     Status = gBS->InstallMultipleProtocolInterfaces (
                   &Instance->Handle,
@@ -152,8 +147,6 @@ NorFlashCreateInstance (
       return Status;
     }
   } else {
-    Instance->Initialized = TRUE;
-
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &Instance->Handle,
                     &gEfiDevicePathProtocolGuid, &Instance->DevicePath,
@@ -923,10 +916,6 @@ NorFlashWriteSingleBlock (
   UINTN       PrevBlockAddress;
 
   PrevBlockAddress = 0;
-
-  if (!Instance->Initialized && Instance->Initialize) {
-    Instance->Initialize(Instance);
-  }
 
   DEBUG ((DEBUG_BLKIO, "NorFlashWriteSingleBlock(Parameters: Lba=%ld, Offset=0x%x, *NumBytes=0x%x, Buffer @ 0x%08x)\n", Lba, Offset, *NumBytes, Buffer));
 

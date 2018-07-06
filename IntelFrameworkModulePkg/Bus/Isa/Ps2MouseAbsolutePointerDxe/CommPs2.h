@@ -1,7 +1,7 @@
 /** @file
   Using PS2 Mouse to simulation Absolution Pointer Device.
-  
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -78,23 +78,23 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///
 /// Parity Error
 ///
-#define KBC_PARE  0x80  
+#define KBC_PARE  0x80
 ///
 /// General Time Out
 ///
-#define KBC_TIM   0x40  
+#define KBC_TIM   0x40
 ///
 /// Output buffer for auxiliary device (PS/2):
 ///    0 - Holds keyboard data
 ///    1 - Holds data for auxiliary device
 ///
-#define KBC_AUXB  0x20  
+#define KBC_AUXB  0x20
 ///
 /// Keyboard lock status:
 ///    0 - keyboard locked
 ///    1 - keyboard free
 ///
-#define KBC_KEYL  0x10 
+#define KBC_KEYL  0x10
 ///
 /// Command/Data:
 ///    0 - data byte written via port 60h
@@ -106,25 +106,25 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 ///    0 - power-on reset
 ///    1 - self-test successful
 ///
-#define KBC_SYSF  0x04  
+#define KBC_SYSF  0x04
 ///
 /// Input Buffer Status :
 ///    0 - input buffer empty
 ///    1 - CPU data in input buffer
 ///
-#define KBC_INPB  0x02  
+#define KBC_INPB  0x02
 ///
 /// Output Buffer Status :
 ///    0 - output buffer empty
 ///    1 - keyboard controller data in output buffer
 ///
-#define KBC_OUTB  0x01  
+#define KBC_OUTB  0x01
 
 /**
   Issue self test command via IsaIo interface.
-  
+
   @param IsaIo Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return EFI_SUCCESS  Success to do keyboard self testing.
   @return others       Fail to do keyboard self testing.
 **/
@@ -135,9 +135,9 @@ KbcSelfTest (
 
 /**
   Issue command to enable keyboard AUX functionality.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -147,9 +147,9 @@ KbcEnableAux (
 
 /**
   Issue command to disable keyboard AUX functionality.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -159,9 +159,9 @@ KbcDisableAux (
 
 /**
   Issue command to enable keyboard.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -171,9 +171,9 @@ KbcEnableKb (
 
 /**
   Issue command to disable keyboard.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -183,10 +183,10 @@ KbcDisableKb (
 
 /**
   Issue command to check keyboard status.
-  
+
   @param IsaIo          Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param KeyboardEnable return whether keyboard is enable.
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -197,9 +197,9 @@ CheckKbStatus (
 
 /**
   Issue command to reset keyboard.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -209,10 +209,10 @@ PS2MouseReset (
 
 /**
   Issue command to set mouse's sample rate
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  @param SampleRate value of sample rate 
-  
+  @param SampleRate value of sample rate
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -223,10 +223,10 @@ PS2MouseSetSampleRate (
 
 /**
   Issue command to set mouse's resolution.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Resolution value of resolution
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -237,10 +237,10 @@ PS2MouseSetResolution (
 
 /**
   Issue command to set mouse's scaling.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Scaling value of scaling
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -251,9 +251,9 @@ PS2MouseSetScaling (
 
 /**
   Issue command to enable Ps2 mouse.
-  
+
   @param IsaIo  Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @return Status of command issuing.
 **/
 EFI_STATUS
@@ -277,12 +277,12 @@ PS2MouseGetPacket (
 
 /**
   Read data via IsaIo protocol with given number.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Buffer  Buffer receive data of mouse
   @param BufSize The size of buffer
   @param State   Check input or read data
-  
+
   @return status of reading mouse data.
 **/
 EFI_STATUS
@@ -298,10 +298,10 @@ PS2MouseRead (
 //
 /**
   I/O work flow of outing 8042 command.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Command I/O command.
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -313,10 +313,10 @@ Out8042Command (
 
 /**
   I/O work flow of in 8042 data.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Data value
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -328,10 +328,10 @@ In8042Data (
 
 /**
   I/O work flow of outing 8042 data.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Data value
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -343,11 +343,11 @@ Out8042Data (
 
 /**
   I/O work flow of outing 8042 Aux command.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Command Aux I/O command
   @param Resend  Whether need resend the Aux command.
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -360,10 +360,10 @@ Out8042AuxCommand (
 
 /**
   I/O work flow of in 8042 Aux data.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Buffer holding return value.
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -375,10 +375,10 @@ In8042AuxData (
 
 /**
   I/O work flow of outing 8042 Aux data.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Data    Buffer holding return value.
-  
+
   @retval EFI_SUCCESS Success to execute I/O work flow
   @retval EFI_TIMEOUT Keyboard controller time out.
 **/
@@ -390,9 +390,9 @@ Out8042AuxData (
 
 /**
   Check keyboard controller status, if it is output buffer full and for auxiliary device.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
-  
+
   @retval EFI_SUCCESS   Keyboard controller is ready
   @retval EFI_NOT_READY Keyboard controller is not ready
 **/
@@ -403,10 +403,10 @@ CheckForInput (
 
 /**
   I/O work flow to wait input buffer empty in given time.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Timeout Wating time.
-  
+
   @retval EFI_TIMEOUT if input is still not empty in given time.
   @retval EFI_SUCCESS input is empty.
 **/
@@ -418,10 +418,10 @@ WaitInputEmpty (
 
 /**
   I/O work flow to wait output buffer full in given time.
-  
+
   @param IsaIo   Pointer to instance of EFI_ISA_IO_PROTOCOL
   @param Timeout given time
-  
+
   @retval EFI_TIMEOUT  output is not full in given time
   @retval EFI_SUCCESS  output is full in given time.
 **/

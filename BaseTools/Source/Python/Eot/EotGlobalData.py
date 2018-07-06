@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-from Common.Misc import sdict
+from collections import OrderedDict
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
 gEFI_SOURCE = ''
@@ -36,11 +36,6 @@ gMACRO['EDK_SOURCE'] = gEDK_SOURCE
 gMACRO['SHELL_INF'] = gSHELL_INF
 gMACRO['CAPSULE_INF'] = ''
 
-gNOT_FOUND_FILES = []
-gSOURCE_FILES = []
-gINF_FILES = {}
-gDEC_FILES = []
-
 # Log file for unmatched variables
 gUN_MATCHED_LOG = 'Log_UnMatched.log'
 gOP_UN_MATCHED = open(gUN_MATCHED_LOG, 'w+')
@@ -61,34 +56,26 @@ gOP_UN_MATCHED_IN_LIBRARY_CALLING = open(gUN_MATCHED_IN_LIBRARY_CALLING_LOG, 'w+
 gDISPATCH_ORDER_LOG = 'Log_DispatchOrder.log'
 gOP_DISPATCH_ORDER = open(gDISPATCH_ORDER_LOG, 'w+')
 
-# Log file for source files not found
-gUN_FOUND_FILES = 'Log_UnFoundSourceFiles.log'
-gOP_UN_FOUND_FILES = open(gUN_FOUND_FILES, 'w+')
-
 # Log file for found source files
 gSOURCE_FILES = 'Log_SourceFiles.log'
 gOP_SOURCE_FILES = open(gSOURCE_FILES, 'w+')
 
 # Dict for GUID found in DEC files
-gGuidDict = sdict()
-
-# Dict for hard coded GUID Macros
-# {GuidName : [GuidMacro : GuidValue]}
-gGuidMacroDict = sdict()
-
-# Dict for PPI
-gPpiList = {}
+gGuidDict = dict()
 
 # Dict for PROTOCOL
 gProtocolList = {}
+# Dict for PPI
+gPpiList = {}
+
 
 # Dict for consumed PPI function calling
-gConsumedPpiLibrary = sdict()
+gConsumedPpiLibrary = OrderedDict()
 gConsumedPpiLibrary['EfiCommonLocateInterface'] = 0
 gConsumedPpiLibrary['PeiServicesLocatePpi'] = 0
 
 # Dict for produced PROTOCOL function calling
-gProducedProtocolLibrary = sdict()
+gProducedProtocolLibrary = OrderedDict()
 gProducedProtocolLibrary['RegisterEsalClass'] = 0
 gProducedProtocolLibrary['CoreInstallProtocolInterface'] = 1
 gProducedProtocolLibrary['CoreInstallMultipleProtocolInterfaces'] = -1
@@ -99,32 +86,17 @@ gProducedProtocolLibrary['LibInstallProtocolInterfaces'] = 1
 gProducedProtocolLibrary['LibReinstallProtocolInterfaces'] = 1
 
 # Dict for consumed PROTOCOL function calling
-gConsumedProtocolLibrary = sdict()
+gConsumedProtocolLibrary = OrderedDict()
 gConsumedProtocolLibrary['EfiHandleProtocol'] = 0
 gConsumedProtocolLibrary['EfiLocateProtocolHandleBuffers'] = 0
 gConsumedProtocolLibrary['EfiLocateProtocolInterface'] = 0
 gConsumedProtocolLibrary['EfiHandleProtocol'] = 1
 
 # Dict for callback PROTOCOL function callling
-gCallbackProtocolLibrary = sdict()
+gCallbackProtocolLibrary = OrderedDict()
 gCallbackProtocolLibrary['EfiRegisterProtocolCallback'] = 2
 
-# Dict for ARCH PROTOCOL
-gArchProtocols = ['gEfiBdsArchProtocolGuid',
-                  'gEfiCapsuleArchProtocolGuid',
-                  'gEfiCpuArchProtocolGuid',  #5053697e-2cbc-4819-90d9-0580deee5754
-                  'gEfiMetronomeArchProtocolGuid',
-                  'gEfiMonotonicCounterArchProtocolGuid',
-                  'gEfiRealTimeClockArchProtocolGuid',
-                  'gEfiResetArchProtocolGuid',
-                  'gEfiRuntimeArchProtocolGuid',
-                  'gEfiSecurityArchProtocolGuid',
-                  'gEfiStatusCodeRuntimeProtocolGuid',
-                  'gEfiTimerArchProtocolGuid',
-                  'gEfiVariableArchProtocolGuid',
-                  'gEfiVariableWriteArchProtocolGuid',
-                  'gEfiWatchdogTimerArchProtocolGuid']
-gArchProtocolGuids = ['665e3ff6-46cc-11d4-9a38-0090273fc14d',
+gArchProtocolGuids = {'665e3ff6-46cc-11d4-9a38-0090273fc14d',
                       '26baccb1-6f42-11d4-bce7-0080c73c8881',
                       '26baccb2-6f42-11d4-bce7-0080c73c8881',
                       '1da97072-bddc-4b30-99f1-72a0b56fff2a',
@@ -136,4 +108,4 @@ gArchProtocolGuids = ['665e3ff6-46cc-11d4-9a38-0090273fc14d',
                       '26baccb3-6f42-11d4-bce7-0080c73c8881',
                       '1e5668e2-8481-11d4-bcf1-0080c73c8881',
                       '6441f818-6362-4e44-b570-7dba31dd2453',
-                      '665e3ff5-46cc-11d4-9a38-0090273fc14d']
+                      '665e3ff5-46cc-11d4-9a38-0090273fc14d'}

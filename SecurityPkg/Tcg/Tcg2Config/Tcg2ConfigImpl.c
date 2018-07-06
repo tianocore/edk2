@@ -2,13 +2,14 @@
   HII Config Access protocol implementation of TCG2 configuration module.
   NOTE: This module is only for reference only, each platform should have its own setup page.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -16,7 +17,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Tcg2ConfigImpl.h"
 #include <Library/PcdLib.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tpm2DeviceLib.h>
 #include <Library/IoLib.h>
+
 #include <Guid/TpmInstance.h>
 
 #include <IndustryStandard/TpmPtp.h>
@@ -50,7 +53,7 @@ HII_VENDOR_DEVICE_PATH          mTcg2HiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -60,45 +63,10 @@ HII_VENDOR_DEVICE_PATH          mTcg2HiiVendorDevicePath = {
 UINT8  mCurrentPpRequest;
 
 /**
-  Return PTP interface type.
-
-  @param[in] Register                Pointer to PTP register.
-
-  @return PTP interface type.
-**/
-UINT8
-GetPtpInterface (
-  IN VOID *Register
-  )
-{
-  PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
-  PTP_FIFO_INTERFACE_CAPABILITY InterfaceCapability;
-
-  //
-  // Check interface id
-  //
-  InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
-  InterfaceCapability.Uint32 = MmioRead32 ((UINTN)&((PTP_FIFO_REGISTERS *)Register)->InterfaceCapability);
-
-  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_CRB) &&
-      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_CRB) &&
-      (InterfaceId.Bits.CapCRB != 0)) {
-    return TPM_DEVICE_INTERFACE_PTP_CRB;
-  }
-  if ((InterfaceId.Bits.InterfaceType == PTP_INTERFACE_IDENTIFIER_INTERFACE_TYPE_FIFO) &&
-      (InterfaceId.Bits.InterfaceVersion == PTP_INTERFACE_IDENTIFIER_INTERFACE_VERSION_FIFO) &&
-      (InterfaceId.Bits.CapFIFO != 0) &&
-      (InterfaceCapability.Bits.InterfaceVersion == INTERFACE_CAPABILITY_INTERFACE_VERSION_PTP)) {
-    return TPM_DEVICE_INTERFACE_PTP_FIFO;
-  }
-  return TPM_DEVICE_INTERFACE_TIS;
-}
-
-/**
   Return if PTP CRB is supported.
 
   @param[in] Register                Pointer to PTP register.
-  
+
   @retval TRUE  PTP CRB is supported.
   @retval FALSE PTP CRB is unsupported.
 **/
@@ -126,7 +94,7 @@ IsPtpCrbSupported (
   Return if PTP FIFO is supported.
 
   @param[in] Register                Pointer to PTP register.
-  
+
   @retval TRUE  PTP FIFO is supported.
   @retval FALSE PTP FIFO is unsupported.
 **/
@@ -152,10 +120,11 @@ IsPtpFifoSupported (
 
 /**
   Set PTP interface type.
+  Do not update PcdActiveTpmInterfaceType here because interface change only happens on next _TPM_INIT
 
   @param[in] Register                Pointer to PTP register.
   @param[in] PtpInterface            PTP interface type.
-  
+
   @retval EFI_SUCCESS                PTP interface type is set.
   @retval EFI_INVALID_PARAMETER      PTP interface type is invalid.
   @retval EFI_UNSUPPORTED            PTP interface type is unsupported.
@@ -167,12 +136,12 @@ SetPtpInterface (
   IN UINT8                PtpInterface
   )
 {
-  UINT8                         PtpInterfaceCurrent;
+  TPM2_PTP_INTERFACE_TYPE       PtpInterfaceCurrent;
   PTP_CRB_INTERFACE_IDENTIFIER  InterfaceId;
 
-  PtpInterfaceCurrent = GetPtpInterface (Register);
-  if ((PtpInterfaceCurrent != TPM_DEVICE_INTERFACE_PTP_FIFO) && 
-      (PtpInterfaceCurrent != TPM_DEVICE_INTERFACE_PTP_CRB)) {
+  PtpInterfaceCurrent = PcdGet8(PcdActiveTpmInterfaceType);
+  if ((PtpInterfaceCurrent != Tpm2PtpInterfaceFifo) &&
+      (PtpInterfaceCurrent != Tpm2PtpInterfaceCrb)) {
     return EFI_UNSUPPORTED;
   }
   InterfaceId.Uint32 = MmioRead32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId);
@@ -181,14 +150,14 @@ SetPtpInterface (
   }
 
   switch (PtpInterface) {
-  case TPM_DEVICE_INTERFACE_PTP_FIFO:
+  case Tpm2PtpInterfaceFifo:
     if (InterfaceId.Bits.CapFIFO == 0) {
       return EFI_UNSUPPORTED;
     }
     InterfaceId.Bits.InterfaceSelector = PTP_INTERFACE_IDENTIFIER_INTERFACE_SELECTOR_FIFO;
     MmioWrite32 ((UINTN)&((PTP_CRB_REGISTERS *)Register)->InterfaceId, InterfaceId.Uint32);
     return EFI_SUCCESS;
-  case TPM_DEVICE_INTERFACE_PTP_CRB:
+  case Tpm2PtpInterfaceCrb:
     if (InterfaceId.Bits.CapCRB == 0) {
       return EFI_UNSUPPORTED;
     }
@@ -330,7 +299,7 @@ SaveTcg2PCRBanksRequest (
   } else {
     mTcg2ConfigPrivateDate->PCRBanksDesired &= ~(0x1 << PCRBankIndex);
   }
-  
+
   ReturnCode = Tcg2PhysicalPresenceLibSubmitRequestToPreOSFunction (TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS, mTcg2ConfigPrivateDate->PCRBanksDesired);
   if (ReturnCode == TCG_PP_SUBMIT_REQUEST_TO_PREOS_SUCCESS) {
     Status = EFI_SUCCESS;
@@ -374,6 +343,8 @@ Tcg2RouteConfig (
   if (Configuration == NULL || Progress == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
+  *Progress = Configuration;
 
   return EFI_NOT_FOUND;
 }
@@ -609,7 +580,7 @@ Tcg2Callback (
       }
     }
   }
-  
+
   if (Action == EFI_BROWSER_ACTION_CHANGED) {
     if (QuestionId == KEY_TPM_DEVICE) {
       return EFI_SUCCESS;
@@ -822,7 +793,7 @@ InstallTcg2ConfigForm (
   TPML_PCR_SELECTION              Pcrs;
   CHAR16                          TempBuffer[1024];
   TCG2_CONFIGURATION_INFO         Tcg2ConfigInfo;
-  UINT8                           TpmDeviceInterfaceDetected;
+  TPM2_PTP_INTERFACE_TYPE         TpmDeviceInterfaceDetected;
 
   DriverHandle = NULL;
   ConfigAccess = &PrivateData->ConfigAccess;
@@ -858,11 +829,11 @@ InstallTcg2ConfigForm (
            &gEfiHiiConfigAccessProtocolGuid,
            ConfigAccess,
            NULL
-           );  
+           );
 
     return EFI_OUT_OF_RESOURCES;
   }
-  
+
   PrivateData->HiiHandle = HiiHandle;
 
   //
@@ -927,15 +898,15 @@ InstallTcg2ConfigForm (
   // Update TPM device interface type
   //
   if (PrivateData->TpmDeviceDetected == TPM_DEVICE_2_0_DTPM) {
-    TpmDeviceInterfaceDetected = GetPtpInterface ((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
+    TpmDeviceInterfaceDetected = PcdGet8(PcdActiveTpmInterfaceType);
     switch (TpmDeviceInterfaceDetected) {
-    case TPM_DEVICE_INTERFACE_TIS:
+    case Tpm2PtpInterfaceTis:
       HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT), L"TIS", NULL);
       break;
-    case TPM_DEVICE_INTERFACE_PTP_FIFO:
+    case Tpm2PtpInterfaceFifo:
       HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT), L"PTP FIFO", NULL);
       break;
-    case TPM_DEVICE_INTERFACE_PTP_CRB:
+    case Tpm2PtpInterfaceCrb:
       HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_STATE_CONTENT), L"PTP CRB", NULL);
       break;
      default:
@@ -945,13 +916,13 @@ InstallTcg2ConfigForm (
 
     Tcg2ConfigInfo.TpmDeviceInterfaceAttempt = TpmDeviceInterfaceDetected;
     switch (TpmDeviceInterfaceDetected) {
-    case TPM_DEVICE_INTERFACE_TIS:
+    case Tpm2PtpInterfaceTis:
       Tcg2ConfigInfo.TpmDeviceInterfacePtpFifoSupported = FALSE;
       Tcg2ConfigInfo.TpmDeviceInterfacePtpCrbSupported  = FALSE;
       HiiSetString (PrivateData->HiiHandle, STRING_TOKEN (STR_TCG2_DEVICE_INTERFACE_CAPABILITY_CONTENT), L"TIS", NULL);
       break;
-    case TPM_DEVICE_INTERFACE_PTP_FIFO:
-    case TPM_DEVICE_INTERFACE_PTP_CRB:
+    case Tpm2PtpInterfaceFifo:
+    case Tpm2PtpInterfaceCrb:
       Tcg2ConfigInfo.TpmDeviceInterfacePtpFifoSupported = IsPtpFifoSupported((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
       Tcg2ConfigInfo.TpmDeviceInterfacePtpCrbSupported  = IsPtpCrbSupported((VOID *) (UINTN) PcdGet64 (PcdTpmBaseAddress));
       TempBuffer[0] = 0;
@@ -991,7 +962,7 @@ InstallTcg2ConfigForm (
     DEBUG ((EFI_D_ERROR, "Tcg2ConfigDriver: Fail to set TCG2_STORAGE_INFO_NAME\n"));
   }
 
-  return EFI_SUCCESS;  
+  return EFI_SUCCESS;
 }
 
 /**
@@ -1027,6 +998,6 @@ UninstallTcg2ConfigForm (
            );
     PrivateData->DriverHandle = NULL;
   }
-  
+
   FreePool (PrivateData);
 }

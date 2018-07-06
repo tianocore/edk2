@@ -2,7 +2,7 @@
 #  Produces TCG protocol and measures boot environment
 #  This module will produce TCG protocol and measure boot environment.
 #
-# Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution. The full text of the license may be found at
@@ -24,7 +24,7 @@
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
@@ -65,7 +65,7 @@
   gEfiTcgProtocolGuid                                ## PRODUCES
   gEfiAcpiTableProtocolGuid                          ## NOTIFY
   gEfiMpServiceProtocolGuid                          ## SOMETIMES_CONSUMES
-  
+
 [Pcd]
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmPlatformClass              ## SOMETIMES_CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid               ## CONSUMES
@@ -83,4 +83,4 @@
 
 [UserExtensions.TianoCore."ExtraFiles"]
   TcgDxeExtra.uni
-  
+

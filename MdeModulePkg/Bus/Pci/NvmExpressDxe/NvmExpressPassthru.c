@@ -656,6 +656,7 @@ NvmExpressPassThru (
     PhyAddr = (Sq->Prp[0] + EFI_PAGE_SIZE) & ~(EFI_PAGE_SIZE - 1);
     Prp = NvmeCreatePrpList (PciIo, PhyAddr, EFI_SIZE_TO_PAGES(Offset + Bytes) - 1, &PrpListHost, &PrpListNo, &MapPrpList);
     if (Prp == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
       goto EXIT;
     }
 
@@ -780,7 +781,7 @@ NvmExpressPassThru (
       // Copy the Respose Queue entry for this command to the callers response buffer
       //
       CopyMem(Packet->NvmeCompletion, Cq, sizeof(EFI_NVM_EXPRESS_COMPLETION));
-    
+
       //
       // Dump every completion entry status for debugging.
       //

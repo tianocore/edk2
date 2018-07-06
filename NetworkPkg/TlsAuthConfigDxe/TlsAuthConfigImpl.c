@@ -1,7 +1,7 @@
 /** @file
   The Miscellaneous Routines for TlsAuthConfigDxe driver.
 
-Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -813,6 +813,7 @@ EnrollX509toVariable (
   CACert        = NULL;
   CACertData    = NULL;
   Data          = NULL;
+  Attr          = 0;
 
   Status = ReadFileContent (
              Private->FileContext->FHandle,
@@ -847,22 +848,22 @@ EnrollX509toVariable (
   CopyMem ((UINT8* ) (CACertData->SignatureData), X509Data, X509DataSize);
 
   //
-  // Check if signature database entry has been already existed.
-  // If true, use EFI_VARIABLE_APPEND_WRITE attribute to append the
-  // new signature data to original variable
+  // Check if the signature database entry already exists. If it does, use the
+  // EFI_VARIABLE_APPEND_WRITE attribute to append the new signature data to
+  // the original variable, plus preserve the original variable attributes.
   //
-  Attr = TLS_AUTH_CONFIG_VAR_BASE_ATTR;
-
   Status = gRT->GetVariable(
                   VariableName,
                   &gEfiTlsCaCertificateGuid,
-                  NULL,
+                  &Attr,
                   &DataSize,
                   NULL
                   );
   if (Status == EFI_BUFFER_TOO_SMALL) {
     Attr |= EFI_VARIABLE_APPEND_WRITE;
-  } else if (Status != EFI_NOT_FOUND) {
+  } else if (Status == EFI_NOT_FOUND) {
+    Attr = TLS_AUTH_CONFIG_VAR_BASE_ATTR;
+  } else {
     goto ON_EXIT;
   }
 
@@ -1559,7 +1560,7 @@ TlsAuthConfigAccessCallback (
   HiiGetBrowserData (&gTlsAuthConfigGuid, mTlsAuthConfigStorageName, BufferSize, (UINT8 *) IfrNvData);
 
   if ((Action != EFI_BROWSER_ACTION_CHANGED) &&
-      (Action != EFI_BROWSER_ACTION_CHANGING) && 
+      (Action != EFI_BROWSER_ACTION_CHANGING) &&
       (Action != EFI_BROWSER_ACTION_FORM_CLOSE)) {
     Status = EFI_UNSUPPORTED;
     goto EXIT;
@@ -1592,10 +1593,10 @@ TlsAuthConfigAccessCallback (
       break;
     case KEY_TLS_AUTH_CONFIG_ENROLL_CERT_FROM_FILE:
       //
-      // If the file is already opened, clean the file related resource first. 
+      // If the file is already opened, clean the file related resource first.
       //
       CleanFileContext (Private);
-      
+
       ChooseFile( NULL, NULL, UpdateCAFromFile, &File);
       break;
 

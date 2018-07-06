@@ -89,7 +89,7 @@ class InfPackageSectionParser(InfParserSectionRoot):
             if PkgLineContent.find(DT.TAB_COMMENT_SPLIT) > -1:
                 TailComments = PkgLineContent[PkgLineContent.find(DT.TAB_COMMENT_SPLIT):]
                 PkgLineContent = PkgLineContent[:PkgLineContent.find(DT.TAB_COMMENT_SPLIT)]
-                if LineComment == None:
+                if LineComment is None:
                     LineComment = InfLineCommentObject()
                 LineComment.SetTailComments(TailComments)                   
             #
@@ -99,7 +99,7 @@ class InfPackageSectionParser(InfParserSectionRoot):
                                       FileName,
                                       DT.MODEL_META_DATA_PACKAGE,
                                       self.FileLocalMacros)
-            if Name != None:
+            if Name is not None:
                 SectionMacros[Name] = Value
                 LineComment = None
                 HeaderComments = []                

@@ -285,7 +285,7 @@ class GitDiffCheck:
         if self.state == START:
             if line.startswith('diff --git'):
                 self.state = PRE_PATCH
-                self.filename = line[13:].split(' ',1)[0]
+                self.filename = line[13:].split(' ', 1)[0]
                 self.is_newfile = False
                 self.force_crlf = not self.filename.endswith('.sh')
             elif len(line.rstrip()) != 0:

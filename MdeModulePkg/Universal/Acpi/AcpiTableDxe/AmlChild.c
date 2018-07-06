@@ -1,7 +1,7 @@
 /** @file
   ACPI Sdt Protocol Driver
 
-  Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,14 +16,14 @@
 
 /**
   Return the child objects buffer from AML Handle's buffer.
-  
+
   @param[in]        AmlParentHandle Parent handle.
   @param[in]        CurrentBuffer   The current child buffer.
   @param[out]       Buffer          On return, points to the next returned child buffer or NULL if there are no
                                     child buffer.
 
   @retval EFI_SUCCESS               Success
-  @retval EFI_INVALID_PARAMETER     AmlParentHandle does not refer to a valid ACPI object.                                
+  @retval EFI_INVALID_PARAMETER     AmlParentHandle does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 AmlGetChildFromObjectBuffer (
@@ -72,14 +72,14 @@ AmlGetChildFromObjectBuffer (
 
 /**
   Return the child ACPI objects from Root Handle.
-  
+
   @param[in]        AmlParentHandle Parent handle. It is Root Handle.
   @param[in]        AmlHandle       The previously returned handle or NULL to start with the first handle.
   @param[out]       Buffer          On return, points to the next returned ACPI handle or NULL if there are no
                                     child objects.
 
   @retval EFI_SUCCESS               Success
-  @retval EFI_INVALID_PARAMETER     ParentHandle is NULL or does not refer to a valid ACPI object.                                
+  @retval EFI_INVALID_PARAMETER     ParentHandle is NULL or does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 AmlGetChildFromRoot (
@@ -104,14 +104,14 @@ AmlGetChildFromRoot (
 
 /**
   Return the child objects buffer from AML Handle's option list.
-  
+
   @param[in]        AmlParentHandle Parent handle.
   @param[in]        AmlHandle       The current child handle.
   @param[out]       Buffer          On return, points to the next returned child buffer or NULL if there are no
                                     child buffer.
 
   @retval EFI_SUCCESS               Success
-  @retval EFI_INVALID_PARAMETER     AmlParentHandle does not refer to a valid ACPI object.                                
+  @retval EFI_INVALID_PARAMETER     AmlParentHandle does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 AmlGetChildFromOptionList (
@@ -170,14 +170,14 @@ AmlGetChildFromOptionList (
 
 /**
   Return the child objects buffer from AML Handle's object child list.
-  
+
   @param[in]        AmlParentHandle Parent handle.
   @param[in]        AmlHandle       The current child handle.
   @param[out]       Buffer          On return, points to the next returned child buffer or NULL if there are no
                                     child buffer.
 
   @retval EFI_SUCCESS               Success
-  @retval EFI_INVALID_PARAMETER     AmlParentHandle does not refer to a valid ACPI object.                                
+  @retval EFI_INVALID_PARAMETER     AmlParentHandle does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 AmlGetChildFromObjectChildList (
@@ -237,14 +237,14 @@ AmlGetChildFromObjectChildList (
 
 /**
   Return the child ACPI objects from Non-Root Handle.
-  
+
   @param[in]        AmlParentHandle Parent handle. It is Non-Root Handle.
   @param[in]        AmlHandle       The previously returned handle or NULL to start with the first handle.
   @param[out]       Buffer          On return, points to the next returned ACPI handle or NULL if there are no
                                     child objects.
 
   @retval EFI_SUCCESS               Success
-  @retval EFI_INVALID_PARAMETER     ParentHandle is NULL or does not refer to a valid ACPI object.                                
+  @retval EFI_INVALID_PARAMETER     ParentHandle is NULL or does not refer to a valid ACPI object.
 **/
 EFI_STATUS
 AmlGetChildFromNonRoot (

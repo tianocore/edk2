@@ -1,7 +1,7 @@
 ## @file
 # Provides driver and definitions to build fsp in EDKII bios.
 #
-# Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -20,7 +20,7 @@
 
 [Includes]
   Include
-  
+
 [LibraryClasses]
   ##  @libraryclass  Provides cache-as-ram support.
   CacheAsRamLib|Include/Library/CacheAsRamLib.h
@@ -39,7 +39,7 @@
 
   ##  @libraryclass  Provides FSP switch stack function.
   FspSwitchStackLib|Include/Library/FspSwitchStackLib.h
-  
+
   ##  @libraryclass  Provides FSP platform sec related actions.
   FspSecPlatformLib|Include/Library/FspSecPlatformLib.h
 
@@ -74,7 +74,7 @@
   # x % of FSP temporary memory will be used for heap
   # (100 - x) % of FSP temporary memory will be used for stack
   gIntelFsp2PkgTokenSpaceGuid.PcdFspHeapSizePercentage    |        50| UINT8|0x10000004
-  
+
 [PcdsFixedAtBuild,PcdsDynamic,PcdsDynamicEx]
   gIntelFsp2PkgTokenSpaceGuid.PcdFspReservedMemoryLength |0x00100000|UINT32|0x46530000
   gIntelFsp2PkgTokenSpaceGuid.PcdBootLoaderEntry         |0xFFFFFFE4|UINT32|0x46530100

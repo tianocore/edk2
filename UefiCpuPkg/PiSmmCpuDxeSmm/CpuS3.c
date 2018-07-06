@@ -744,9 +744,9 @@ InitSmmS3ResumeState (
       SmmS3ResumeState->SmmS3StackSize = 0;
     }
 
-    SmmS3ResumeState->SmmS3Cr0 = gSmmCr0;
+    SmmS3ResumeState->SmmS3Cr0 = mSmmCr0;
     SmmS3ResumeState->SmmS3Cr3 = Cr3;
-    SmmS3ResumeState->SmmS3Cr4 = gSmmCr4;
+    SmmS3ResumeState->SmmS3Cr4 = mSmmCr4;
 
     if (sizeof (UINTN) == sizeof (UINT64)) {
       SmmS3ResumeState->Signature = SMM_S3_RESUME_SMM_64;

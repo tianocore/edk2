@@ -1,16 +1,16 @@
-/** @file   
+/** @file
   ACPI 5.1 definitions from the ACPI Specification Revision 5.1 Errata B January, 2016.
 
   Copyright (c) 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
-  This program and the accompanying materials                          
-  are licensed and made available under the terms and conditions of the BSD License         
-  which accompanies this distribution.  The full text of the license may be found at        
-  http://opensource.org/licenses/bsd-license.php                                            
+  This program and the accompanying materials
+  are licensed and made available under the terms and conditions of the BSD License
+  which accompanies this distribution.  The full text of the license may be found at
+  http://opensource.org/licenses/bsd-license.php
 
-  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
-  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.             
+  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #ifndef _ACPI_5_1_H_
@@ -89,7 +89,7 @@ typedef struct {
 
 //
 // Root System Description Table
-// No definition needed as it is a common description table header, the same with 
+// No definition needed as it is a common description table header, the same with
 // EFI_ACPI_DESCRIPTION_HEADER, followed by a variable number of UINT32 table pointers.
 //
 
@@ -100,7 +100,7 @@ typedef struct {
 
 //
 // Extended System Description Table
-// No definition needed as it is a common description table header, the same with 
+// No definition needed as it is a common description table header, the same with
 // EFI_ACPI_DESCRIPTION_HEADER, followed by a variable number of UINT64 table pointers.
 //
 
@@ -1874,7 +1874,7 @@ typedef struct {
   UINT8                                    CommandComplete:1;
   UINT8                                    SciDoorbell:1;
   UINT8                                    Error:1;
-  UINT8                                    PlatformNotification:1;  
+  UINT8                                    PlatformNotification:1;
   UINT8                                    Reserved:4;
   UINT8                                    Reserved1;
 } EFI_ACPI_5_1_PCCT_GENERIC_SHARED_MEMORY_REGION_STATUS;
@@ -1892,7 +1892,7 @@ typedef struct {
 ///
 /// "RSD PTR " Root System Description Pointer
 ///
-#define EFI_ACPI_5_1_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE  SIGNATURE_64('R', 'S', 'D', ' ', 'P', 'T', 'R', ' ') 
+#define EFI_ACPI_5_1_ROOT_SYSTEM_DESCRIPTION_POINTER_SIGNATURE  SIGNATURE_64('R', 'S', 'D', ' ', 'P', 'T', 'R', ' ')
 
 ///
 /// "APIC" Multiple APIC Description Table

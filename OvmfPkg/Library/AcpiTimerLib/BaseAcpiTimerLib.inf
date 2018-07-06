@@ -25,6 +25,7 @@
 
 [Sources]
   AcpiTimerLib.c
+  AcpiTimerLib.h
   BaseAcpiTimerLib.c
 
 [Packages]

@@ -1,7 +1,7 @@
 /** @file
   ARC4 Wrapper Implementation over OpenSSL.
 
-Copyright (c) 2010 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -66,7 +66,7 @@ Arc4Init (
 
   //
   // Check input parameters.
-  //  
+  //
   if (Arc4Context == NULL || Key == NULL || (KeySize < 5 || KeySize > 256)) {
     return FALSE;
   }
@@ -202,7 +202,7 @@ Arc4Reset (
   if (Arc4Context == NULL) {
     return FALSE;
   }
-  
+
   Rc4Key = (RC4_KEY *) Arc4Context;
 
   CopyMem (Rc4Key, Rc4Key + 1, sizeof (RC4_KEY));

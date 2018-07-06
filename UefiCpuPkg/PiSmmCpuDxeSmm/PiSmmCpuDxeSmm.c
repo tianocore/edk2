@@ -125,6 +125,12 @@ UINTN                    mSmmCpuSmramRangeCount;
 
 UINT8                    mPhysicalAddressBits;
 
+//
+// Control register contents saved for SMM S3 resume state initialization.
+//
+UINT32                   mSmmCr0;
+UINT32                   mSmmCr4;
+
 /**
   Initialize IDT to setup exception handlers for SMM.
 
@@ -405,9 +411,11 @@ SmmRelocateBases (
   //
   // Patch ASM code template with current CR0, CR3, and CR4 values
   //
-  gSmmCr0 = (UINT32)AsmReadCr0 ();
-  gSmmCr3 = (UINT32)AsmReadCr3 ();
-  gSmmCr4 = (UINT32)AsmReadCr4 ();
+  mSmmCr0 = (UINT32)AsmReadCr0 ();
+  PatchInstructionX86 (gPatchSmmCr0, mSmmCr0, 4);
+  PatchInstructionX86 (gPatchSmmCr3, AsmReadCr3 (), 4);
+  mSmmCr4 = (UINT32)AsmReadCr4 ();
+  PatchInstructionX86 (gPatchSmmCr4, mSmmCr4, 4);
 
   //
   // Patch GDTR for SMM base relocation
@@ -560,13 +568,6 @@ PiCpuSmmEntry (
     EFI_PROGRESS_CODE,
     EFI_COMPUTING_UNIT_HOST_PROCESSOR | EFI_CU_HP_PC_SMM_INIT
     );
-
-  //
-  // Fix segment address of the long-mode-switch jump
-  //
-  if (sizeof (UINTN) == sizeof (UINT64)) {
-    gSmmJmpAddr.Segment = LONG_MODE_CODE_SEGMENT;
-  }
 
   //
   // Find out SMRR Base and SMRR Size
@@ -847,7 +848,11 @@ PiCpuSmmEntry (
   //
   // Set SMI stack for SMM base relocation
   //
-  gSmmInitStack = (UINTN) (Stacks + mSmmStackSize - sizeof (UINTN));
+  PatchInstructionX86 (
+    gPatchSmmInitStack,
+    (UINTN) (Stacks + mSmmStackSize - sizeof (UINTN)),
+    sizeof (UINTN)
+    );
 
   //
   // Initialize IDT

@@ -1,7 +1,7 @@
 /** @file
   Declaration of internal functions in BaseSynchronizationLib.
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -143,7 +143,7 @@ InternalSyncCompareExchange64 (
   requirements for optimal spin lock performance.
 
   @return The architecture specific spin lock alignment.
-  
+
 **/
 UINTN
 InternalGetSpinLockProperties (

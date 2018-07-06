@@ -1,7 +1,7 @@
 /** @file
   Implement TPM1.2 NV storage related command.
 
-Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved. <BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved. <BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -58,7 +58,7 @@ typedef struct {
 
 /**
   Send NV DefineSpace command to TPM1.2.
-  
+
   @param PubInfo           The public parameters of the NV area.
   @param EncAuth           The encrypted AuthData, only valid if the attributes require subsequent authorization.
 
@@ -180,7 +180,7 @@ Tpm12NvReadValue (
 
 /**
   Send NV WriteValue command to TPM1.2.
-  
+
   @param NvIndex           The index of the area to set.
   @param Offset            The offset into the NV Area.
   @param DataSize          The size of the data parameter.

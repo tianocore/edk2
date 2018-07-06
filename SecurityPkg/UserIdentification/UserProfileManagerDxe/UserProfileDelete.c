@@ -1,13 +1,13 @@
 /** @file
   The functions to delete a user profile.
-    
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -17,12 +17,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 /**
   Get the username from the specified user.
 
-  @param[in]   User              Handle of a user profile. 
+  @param[in]   User              Handle of a user profile.
 
   @retval EFI_STRING_ID          The String Id of the user's username.
 
 **/
-EFI_STRING_ID 
+EFI_STRING_ID
 GetUserName (
   IN  EFI_USER_PROFILE_HANDLE                   User
   )
@@ -35,14 +35,14 @@ GetUserName (
   UINTN                 NameLen;
   CHAR16                UserName[USER_NAME_LENGTH];
   EFI_STRING_ID         UserId;
-  
+
   //
   // Allocate user information memory.
   //
   MemSize = sizeof (EFI_USER_INFO) + 63;
   Info    = AllocateZeroPool (MemSize);
   ASSERT (Info != NULL);
-  
+
   //
   // Get user name information.
   //
@@ -116,7 +116,7 @@ GetUserName (
 /**
   Add a username item in form.
 
-  @param[in]  User          Points to the user profile whose username is added. 
+  @param[in]  User          Points to the user profile whose username is added.
   @param[in]  Index         The index of the user in the user name list
   @param[in]  OpCodeHandle  Points to container for dynamic created opcodes.
 
@@ -137,7 +137,7 @@ AddUserToForm (
   if (NameId == 0) {
     return ;
   }
-  
+
   //
   // Create user name option.
   //
@@ -173,7 +173,7 @@ AddUserToForm (
 /**
   Delete the user specified by UserIndex in user profile database.
 
-  @param[in]  UserIndex       The index of user in the user name list 
+  @param[in]  UserIndex       The index of user in the user name list
                               to be deleted.
 
 **/
@@ -197,7 +197,7 @@ DeleteUser (
   if (EFI_ERROR (Status)) {
     goto Done;
   }
-  
+
   while (UserIndex > 1) {
     Status = mUserManager->GetNext (mUserManager, &User);
     if (EFI_ERROR (Status)) {
@@ -232,7 +232,7 @@ DeleteUser (
     ASSERT (Info != NULL);
     DeleteCredentialFromProviders ((UINT8 *)(Info + 1), Info->InfoSize - sizeof (EFI_USER_INFO), User);
     FreePool (Info);
-    
+
     Status = mUserManager->Delete (mUserManager, User);
     if (EFI_ERROR (Status)) {
       goto Done;
@@ -245,7 +245,7 @@ DeleteUser (
       L"Please Press Any Key to Continue ...",
       NULL
       );
-    return ;  
+    return ;
   }
 
 Done:

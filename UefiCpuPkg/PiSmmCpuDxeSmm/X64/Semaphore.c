@@ -15,8 +15,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "PiSmmCpuDxeSmm.h"
 
-extern  UINT32    mSmmRelocationOriginalAddressPtr32;
-extern  UINT32    mRebasedFlagAddr32;
+X86_ASSEMBLY_PATCH_LABEL gPatchSmmRelocationOriginalAddressPtr32;
+X86_ASSEMBLY_PATCH_LABEL gPatchRebasedFlagAddr32;
 
 UINTN             mSmmRelocationOriginalAddress;
 volatile BOOLEAN  *mRebasedFlag;
@@ -49,7 +49,11 @@ SemaphoreHook (
   UINTN                 TempValue;
 
   mRebasedFlag       = RebasedFlag;
-  mRebasedFlagAddr32 = (UINT32)(UINTN)mRebasedFlag;
+  PatchInstructionX86 (
+    gPatchRebasedFlagAddr32,
+    (UINT32)(UINTN)mRebasedFlag,
+    4
+    );
 
   CpuState = (SMRAM_SAVE_STATE_MAP *)(UINTN)(SMM_DEFAULT_SMBASE + SMRAM_SAVE_STATE_MAP_OFFSET);
   mSmmRelocationOriginalAddress = HookReturnFromSmm (
@@ -63,5 +67,9 @@ SemaphoreHook (
   // Use temp value to fix ICC complier warning
   //
   TempValue = (UINTN)&mSmmRelocationOriginalAddress;
-  mSmmRelocationOriginalAddressPtr32 = (UINT32)TempValue;
+  PatchInstructionX86 (
+    gPatchSmmRelocationOriginalAddressPtr32,
+    (UINT32)TempValue,
+    4
+    );
 }

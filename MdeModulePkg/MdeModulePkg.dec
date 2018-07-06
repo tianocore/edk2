@@ -7,7 +7,7 @@
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
-#
+# Copyright (c) 2016, Microsoft Corporation<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -53,6 +53,9 @@
 
   ##  @libraryclass  Defines a set of methods to reset whole system.
   ResetSystemLib|Include/Library/ResetSystemLib.h
+
+  ##  @libraryclass  Defines a set of helper functions for resetting the system.
+  ResetUtilityLib|Include/Library/ResetUtilityLib.h
 
   ##  @libraryclass  Defines a set of methods related do S3 mode.
   #   This library class is no longer used and modules using this library should
@@ -167,6 +170,18 @@
   ##
   NonDiscoverableDeviceRegistrationLib|Include/Library/NonDiscoverableDeviceRegistrationLib.h
 
+  ## @libraryclass  Provides services to convert a BMP graphics image to a GOP BLT buffer
+  #  and to convert a GOP BLT buffer to a BMP graphics image.
+  #
+  BmpSupportLib|Include/Library/BmpSupportLib.h
+
+  ## @libraryclass  Provides services to display completion progress when
+  #  processing a firmware update that updates the firmware image in a firmware
+  #  device.  A platform may provide its own instance of this library class to
+  #  customize how a user is informed of completion progress.
+  #
+  DisplayUpdateProgressLib|Include/Library/DisplayUpdateProgressLib.h
+
 [Guids]
   ## MdeModule package token space guid
   # Include/Guid/MdeModulePkgTokenSpace.h
@@ -245,6 +260,9 @@
   gSmmPerformanceProtocolGuid    = { 0xf866226a, 0xeaa5, 0x4f5a, { 0xa9, 0xa,  0x6c, 0xfb, 0xa5, 0x7c, 0x58, 0x8e } }
   gPerformanceExProtocolGuid     = { 0x1ea81bec, 0xf01a, 0x4d98, { 0xa2, 0x1,  0x4a, 0x61, 0xce, 0x2f, 0xc0, 0x22 } }
   gSmmPerformanceExProtocolGuid  = { 0x931fc048, 0xc71d, 0x4455, { 0x89, 0x30, 0x47, 0x6,  0x30, 0xe3, 0xe,  0xe5 } }
+  #  Include/Guid/PerformanceMeasurement.h
+  gEdkiiPerformanceMeasurementProtocolGuid      = { 0xc85d06be, 0x5f75, 0x48ce, { 0xa8, 0x0f, 0x12, 0x36, 0xba, 0x3b, 0x87, 0xb1 } }
+  gEdkiiSmmPerformanceMeasurementProtocolGuid   = { 0xd56b6d73, 0x1a7b, 0x4015, { 0x9b, 0xb4, 0x7b, 0x07, 0x17, 0x29, 0xed, 0x24 } }
 
   ## Guid is defined for CRC32 encapsulation scheme.
   #  Include/Guid/Crc32GuidedSectionExtraction.h
@@ -284,6 +302,9 @@
 
   ## Include/Guid/RecoveryDevice.h
   gRecoveryOnDataCdGuid              = { 0x5CAC0099, 0x0DC9, 0x48E5, { 0x80, 0x68, 0xBB, 0x95, 0xF5, 0x40, 0x0A, 0x9F }}
+
+  ## Include/Guid/RecoveryDevice.h
+  gRecoveryOnFatNvmeDiskGuid         = { 0xC770A27F, 0x956A, 0x497A, { 0x85, 0x48, 0xE0, 0x61, 0x97, 0x58, 0x8B, 0xF6 }}
 
   ## Include/Guid/SmmLockBox.h
   gEfiSmmLockBoxCommunicationGuid    = { 0x2a3cfebd, 0x27e8, 0x4d0a, { 0x8b, 0x79, 0xd6, 0x88, 0xc2, 0xa3, 0xe1, 0xc0 }}
@@ -392,8 +413,14 @@
   ## Include/Guid/PlatformHasAcpi.h
   gEdkiiPlatformHasAcpiGuid = { 0xf0966b41, 0xc23f, 0x41b9, { 0x96, 0x04, 0x0f, 0xf7, 0xe1, 0x11, 0x96, 0x5a } }
 
+  ## Include/Guid/ExtendedFirmwarePerformance.h
+  gEdkiiFpdtExtendedFirmwarePerformanceGuid = { 0x3b387bfd, 0x7abc, 0x4cf2, { 0xa0, 0xca, 0xb6, 0xa1, 0x6c, 0x1b, 0x1b, 0x25 } }
+
   ## Include/Guid/EndofS3Resume.h
   gEdkiiEndOfS3ResumeGuid = { 0x96f5296d, 0x05f7, 0x4f3c, {0x84, 0x67, 0xe4, 0x56, 0x89, 0x0e, 0x0c, 0xb5 } }
+
+  ## Include/Guid/S3SmmInitDone.h
+  gEdkiiS3SmmInitDoneGuid = { 0x8f9d4825, 0x797d, 0x48fc, { 0x84, 0x71, 0x84, 0x50, 0x25, 0x79, 0x2e, 0xf6 } }
 
 [Ppis]
   ## Include/Ppi/AtaController.h
@@ -440,6 +467,18 @@
 
   ## Include/Ppi/IoMmu.h
   gEdkiiIoMmuPpiGuid = { 0x70b0af26, 0xf847, 0x4bb6, { 0xaa, 0xb9, 0xcd, 0xe8, 0x4f, 0xc6, 0x14, 0x31 } }
+
+  ## Include/Ppi/PlatformSpecificResetFilter.h
+  gEdkiiPlatformSpecificResetFilterPpiGuid = { 0x8c9f4de3, 0x7b90, 0x47ef, { 0x93, 0x8, 0x28, 0x7c, 0xec, 0xd6, 0x6d, 0xe8 } }
+
+  ## Include/Ppi/PlatformSpecificResetNotification.h
+  gEdkiiPlatformSpecificResetNotificationPpiGuid = { 0xe09f355d, 0xdae8, 0x4910, { 0xb1, 0x4a, 0x92, 0x78, 0xf, 0xdc, 0xf7, 0xcb } }
+
+  ## Include/Ppi/PlatformSpecificResetHandler.h
+  gEdkiiPlatformSpecificResetHandlerPpiGuid = { 0x75cf14ae, 0x3441, 0x49dc, { 0xaa, 0x10, 0xbb, 0x35, 0xa7, 0xba, 0x8b, 0xab } }
+
+  ## Include/Ppi/NvmExpressHostController.h
+  gEdkiiPeiNvmExpressHostControllerPpiGuid  = { 0xcae3aa63, 0x676f, 0x4da3, { 0xbd, 0x50, 0x6c, 0xc5, 0xed, 0xde, 0x9a, 0xad } }
 
 [Protocols]
   ## Load File protocol provides capability to load and unload EFI image into memory and execute it.
@@ -518,6 +557,9 @@
   ## Include/Protocol/BootLogo.h
   gEfiBootLogoProtocolGuid = { 0xcdea2bd3, 0xfc25, 0x4c1c, { 0xb9, 0x7c, 0xb3, 0x11, 0x86, 0x6, 0x49, 0x90 } }
 
+  # Include/Protocol/BootLogo2.h
+  gEdkiiBootLogo2ProtocolGuid = { 0x4b5dc1df, 0x1eaa, 0x48b2, { 0xa7, 0xe9, 0xea, 0xc4, 0x89, 0xa0, 0xb, 0x5c } }
+
   ## Include/Protocol/DisplayProtocol.h
   gEdkiiFormDisplayEngineProtocolGuid = { 0x9bbe29e9, 0xfda1, 0x41ec, { 0xad, 0x52, 0x45, 0x22, 0x13, 0x74, 0x2d, 0x2e } }
 
@@ -562,6 +604,19 @@
   ## Include/Protocol/SmmMemoryAttribute.h
   gEdkiiSmmMemoryAttributeProtocolGuid = { 0x69b792ea, 0x39ce, 0x402d, { 0xa2, 0xa6, 0xf7, 0x21, 0xde, 0x35, 0x1d, 0xfe } }
 
+  ## Include/Protocol/SdMmcOverride.h
+  gEdkiiSdMmcOverrideProtocolGuid = { 0xeaf9e3c1, 0xc9cd, 0x46db, { 0xa5, 0xe5, 0x5a, 0x12, 0x4c, 0x83, 0x23, 0x23 } }
+
+  ## Include/Protocol/PlatformSpecificResetFilter.h
+  gEdkiiPlatformSpecificResetFilterProtocolGuid  = { 0x695d7835, 0x8d47, 0x4c11, { 0xab, 0x22, 0xfa, 0x8a, 0xcc, 0xe7, 0xae, 0x7a } }
+  ## Include/Protocol/PlatformSpecificResetHandler.h
+  gEdkiiPlatformSpecificResetHandlerProtocolGuid = { 0x2df6ba0b, 0x7092, 0x440d, { 0xbd, 0x4, 0xfb, 0x9, 0x1e, 0xc3, 0xf3, 0xc1 } }
+
+  ## Include/Protocol/FirmwareManagementProgress.h
+  gEdkiiFirmwareManagementProgressProtocolGuid = { 0x1849bda2, 0x6952, 0x4e86, { 0xa1, 0xdb, 0x55, 0x9a, 0x3c, 0x47, 0x9d, 0xf1 } }
+
+  ## Include/Protocol/AtaAtapiPolicy.h
+  gEdkiiAtaAtapiPolicyProtocolGuid = { 0xe59cd769, 0x5083, 0x4f26,{ 0x90, 0x94, 0x6c, 0x91, 0x9f, 0x91, 0x6c, 0x4e } }
 #
 # [Error.gEfiMdeModulePkgTokenSpaceGuid]
 #   0x80000001 | Invalid value provided.
@@ -1010,6 +1065,14 @@
   # @Prompt Maximum authenticated variable size.
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxAuthVariableSize|0x00|UINT32|0x30000009
 
+  ## The maximum size of a single non-authenticated volatile variable.
+  # The default value is 0 for compatibility: in that case, the maximum
+  # non-authenticated volatile variable size remains specified by
+  # PcdMaxVariableSize. Only the MdeModulePkg/Universal/Variable/RuntimeDxe
+  # driver supports this PCD.
+  # @Prompt Maximum non-authenticated volatile variable size.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVolatileVariableSize|0x00|UINT32|0x3000000a
+
   ## The maximum size of single hardware error record variable.<BR><BR>
   # In IA32/X64 platforms, this value should be larger than 1KB.<BR>
   # In IA64 platforms, this value should be larger than 128KB.<BR>
@@ -1406,6 +1469,16 @@
   # @Prompt CapsuleMax value in capsule report variable.
   gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleMax|0xFFFF|UINT16|0x00000107
 
+  ## Control which FPDT record format will be used to store the performance entry.
+  # On TRUE, the string FPDT record will be used to store every performance entry.
+  # On FALSE, the different FPDT record will be used to store the different performance entries.
+  # @Prompt String FPDT Record Enable Only
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEdkiiFpdtStringRecordEnableOnly|FALSE|BOOLEAN|0x00000109
+
+  ## Indicates the allowable maximum number of Reset Filters, Reset Notifications or Reset Handlers in PEI phase.
+  # @Prompt Maximum Number of PEI Reset Filters, Reset Notifications or Reset Handlers.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaximumPeiResetNotifies|0x10|UINT32|0x0000010A
+
 [PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This PCD defines the Console output row. The default value is 25 according to UEFI spec.
   #  This PCD could be set to 0 then console output would be at max column and max row.
@@ -1705,7 +1778,7 @@
   ## This PCD specifies the additional pad size in FPDT Basic Boot Performance Table for
   #  the extension FPDT boot records received after ReadyToBoot and before ExitBootService.
   # @Prompt Pad size for extension FPDT boot records.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x0|UINT32|0x0001005F
+  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize|0x20000|UINT32|0x0001005F
 
   ## Indicates if ConIn device are connected on demand.<BR><BR>
   #   TRUE  - ConIn device are not connected during BDS and ReadKeyStroke/ReadKeyStrokeEx produced
@@ -1833,7 +1906,7 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiS3Enable|TRUE|BOOLEAN|0x01100000
 
   ## Specify memory size for boot script executor stack usage in S3 phase.
-  #  The default size 32K. When changing the value make sure the memory size is large enough 
+  #  The default size 32K. When changing the value make sure the memory size is large enough
   #  to meet boot script executor requirement in the S3 phase.
   # @Prompt Reserved S3 Boot Script Stack ACPI Memory Size
   gEfiMdeModulePkgTokenSpaceGuid.PcdS3BootScriptStackSize|0x8000|UINT32|0x02000000

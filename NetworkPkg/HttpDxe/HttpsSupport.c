@@ -1,7 +1,7 @@
 /** @file
   Miscellaneous routines specific to Https for HttpDxe driver.
 
-Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -384,6 +384,7 @@ TlsConfigCertificate (
   UINT32              Index;
   EFI_SIGNATURE_LIST  *CertList;
   EFI_SIGNATURE_DATA  *Cert;
+  UINTN               CertArraySizeInBytes;
   UINTN               CertCount;
   UINT32              ItemDataSize;
 
@@ -423,14 +424,75 @@ TlsConfigCertificate (
   if (EFI_ERROR (Status)) {
     //
     // GetVariable still error or the variable is corrupted.
-    // Fall back to the default value.
     //
-    FreePool (CACert);
-
-    return EFI_NOT_FOUND;
+    goto FreeCACert;
   }
 
   ASSERT (CACert != NULL);
+
+  //
+  // Sanity check
+  //
+  Status = EFI_INVALID_PARAMETER;
+  CertCount = 0;
+  ItemDataSize = (UINT32) CACertSize;
+  while (ItemDataSize > 0) {
+    if (ItemDataSize < sizeof (EFI_SIGNATURE_LIST)) {
+      DEBUG ((DEBUG_ERROR, "%a: truncated EFI_SIGNATURE_LIST header\n",
+        __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    CertList = (EFI_SIGNATURE_LIST *) (CACert + (CACertSize - ItemDataSize));
+
+    if (CertList->SignatureListSize < sizeof (EFI_SIGNATURE_LIST)) {
+      DEBUG ((DEBUG_ERROR,
+        "%a: SignatureListSize too small for EFI_SIGNATURE_LIST\n",
+        __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    if (CertList->SignatureListSize > ItemDataSize) {
+      DEBUG ((DEBUG_ERROR, "%a: truncated EFI_SIGNATURE_LIST body\n",
+        __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    if (!CompareGuid (&CertList->SignatureType, &gEfiCertX509Guid)) {
+      DEBUG ((DEBUG_ERROR, "%a: only X509 certificates are supported\n",
+        __FUNCTION__));
+      Status = EFI_UNSUPPORTED;
+      goto FreeCACert;
+    }
+
+    if (CertList->SignatureHeaderSize != 0) {
+      DEBUG ((DEBUG_ERROR, "%a: SignatureHeaderSize must be 0 for X509\n",
+        __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    if (CertList->SignatureSize < sizeof (EFI_SIGNATURE_DATA)) {
+      DEBUG ((DEBUG_ERROR,
+        "%a: SignatureSize too small for EFI_SIGNATURE_DATA\n", __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    CertArraySizeInBytes = (CertList->SignatureListSize -
+                            sizeof (EFI_SIGNATURE_LIST));
+    if (CertArraySizeInBytes % CertList->SignatureSize != 0) {
+      DEBUG ((DEBUG_ERROR,
+        "%a: EFI_SIGNATURE_DATA array not a multiple of SignatureSize\n",
+        __FUNCTION__));
+      goto FreeCACert;
+    }
+
+    CertCount += CertArraySizeInBytes / CertList->SignatureSize;
+    ItemDataSize -= CertList->SignatureListSize;
+  }
+  if (CertCount == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: no X509 certificates provided\n", __FUNCTION__));
+    goto FreeCACert;
+  }
 
   //
   // Enumerate all data and erasing the target item.
@@ -451,8 +513,7 @@ TlsConfigCertificate (
                                                  CertList->SignatureSize - sizeof (Cert->SignatureOwner)
                                                  );
       if (EFI_ERROR (Status)) {
-        FreePool (CACert);
-        return Status;
+        goto FreeCACert;
       }
 
       Cert = (EFI_SIGNATURE_DATA *) ((UINT8 *) Cert + CertList->SignatureSize);
@@ -462,7 +523,89 @@ TlsConfigCertificate (
     CertList = (EFI_SIGNATURE_LIST *) ((UINT8 *) CertList + CertList->SignatureListSize);
   }
 
+FreeCACert:
   FreePool (CACert);
+  return Status;
+}
+
+/**
+  Read the HttpTlsCipherList variable and configure it for HTTPS session.
+
+  @param[in, out]  HttpInstance  The HTTP instance private data.
+
+  @retval EFI_SUCCESS            The prefered HTTP TLS CipherList is configured.
+  @retval EFI_NOT_FOUND          Fail to get 'HttpTlsCipherList' variable.
+  @retval EFI_INVALID_PARAMETER  The contents of variable are invalid.
+  @retval EFI_OUT_OF_RESOURCES   Can't allocate memory resources.
+
+  @retval Others                 Other error as indicated.
+
+**/
+EFI_STATUS
+TlsConfigCipherList (
+  IN OUT HTTP_PROTOCOL      *HttpInstance
+  )
+{
+  EFI_STATUS          Status;
+  UINT8               *CipherList;
+  UINTN               CipherListSize;
+
+  CipherList     = NULL;
+  CipherListSize = 0;
+
+  //
+  // Try to read the HttpTlsCipherList variable.
+  //
+  Status  = gRT->GetVariable (
+                   EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE,
+                   &gEdkiiHttpTlsCipherListGuid,
+                   NULL,
+                   &CipherListSize,
+                   NULL
+                   );
+  ASSERT (EFI_ERROR (Status));
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    return Status;
+  }
+
+  if (CipherListSize % sizeof (EFI_TLS_CIPHER) != 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Allocate buffer and read the config variable.
+  //
+  CipherList = AllocatePool (CipherListSize);
+  if (CipherList == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = gRT->GetVariable (
+                  EDKII_HTTP_TLS_CIPHER_LIST_VARIABLE,
+                  &gEdkiiHttpTlsCipherListGuid,
+                  NULL,
+                  &CipherListSize,
+                  CipherList
+                  );
+  if (EFI_ERROR (Status)) {
+    //
+    // GetVariable still error or the variable is corrupted.
+    //
+    goto ON_EXIT;
+  }
+
+  ASSERT (CipherList != NULL);
+
+  Status = HttpInstance->Tls->SetSessionData (
+                                HttpInstance->Tls,
+                                EfiTlsCipherList,
+                                CipherList,
+                                CipherListSize
+                                );
+
+ON_EXIT:
+  FreePool (CipherList);
+
   return Status;
 }
 
@@ -522,6 +665,15 @@ TlsConfigureSession (
                                 sizeof (EFI_TLS_SESSION_STATE)
                                 );
   if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Tls Cipher List
+  //
+  Status = TlsConfigCipherList (HttpInstance);
+  if (EFI_ERROR (Status) && Status != EFI_NOT_FOUND) {
+    DEBUG ((EFI_D_ERROR, "TlsConfigCipherList: return %r error.\n", Status));
     return Status;
   }
 
@@ -861,7 +1013,7 @@ TlsReceiveOnePdu (
   //
   // Allocate buffer to receive one TLS header.
   //
-  Len     = sizeof (TLS_RECORD_HEADER);
+  Len     = TLS_RECORD_HEADER_LENGTH;
   PduHdr  = NetbufAlloc (Len);
   if (PduHdr == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -1302,10 +1454,18 @@ TlsCloseSession (
 
   @param[in]           HttpInstance    Pointer to HTTP_PROTOCOL structure.
   @param[in]           Message         Pointer to the message buffer needed to processed.
+                                       If ProcessMode is EfiTlsEncrypt, the message contain the TLS
+                                       header and plain text TLS APP payload.
+                                       If ProcessMode is EfiTlsDecrypt, the message contain the TLS
+                                       header and cipher text TLS APP payload.
   @param[in]           MessageSize     Pointer to the message buffer size.
   @param[in]           ProcessMode     Process mode.
   @param[in, out]      Fragment        Only one Fragment returned after the Message is
                                        processed successfully.
+                                       If ProcessMode is EfiTlsEncrypt, the fragment contain the TLS
+                                       header and cipher text TLS APP payload.
+                                       If ProcessMode is EfiTlsDecrypt, the fragment contain the TLS
+                                       header and plain text TLS APP payload.
 
   @retval EFI_SUCCESS          Message is processed successfully.
   @retval EFI_OUT_OF_RESOURCES   Can't allocate memory resources.
@@ -1408,6 +1568,9 @@ TlsProcessMessage (
 ON_EXIT:
 
   if (OriginalFragmentTable != NULL) {
+    if( FragmentTable == OriginalFragmentTable) {
+      FragmentTable = NULL;
+    }
     FreePool (OriginalFragmentTable);
     OriginalFragmentTable = NULL;
   }
@@ -1592,7 +1755,7 @@ HttpsReceive (
       return Status;
     }
 
-    CopyMem (BufferIn, TempFragment.Bulk + sizeof (TLS_RECORD_HEADER), BufferInSize);
+    CopyMem (BufferIn, TempFragment.Bulk + TLS_RECORD_HEADER_LENGTH, BufferInSize);
 
     //
     // Free the buffer in TempFragment.

@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -45,12 +45,12 @@
 ASM_GLOBAL ASM_PFX(InternalMemScanMem16)
 ASM_PFX(InternalMemScanMem16):
     pushq   %rdi
-    movq    %rcx, %rdi 
-    movq    %r8, %rax 
-    movq    %rdx, %rcx 
+    movq    %rcx, %rdi
+    movq    %r8, %rax
+    movq    %rdx, %rcx
     repne   scasw
     leaq    -2(%rdi), %rax
-    cmovnz  %rcx, %rax 
+    cmovnz  %rcx, %rax
     popq    %rdi
     ret
 

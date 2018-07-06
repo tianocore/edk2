@@ -2,7 +2,7 @@
   This library is used to share code between UEFI network stack modules.
   It provides the helper routines to access TCP service.
 
-Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at<BR>
@@ -85,7 +85,7 @@ typedef struct {
   EFI_HANDLE                Image;
   EFI_HANDLE                Controller;
   EFI_HANDLE                Handle;
-  
+
   TCP_IO_PROTOCOL           Tcp;
   TCP_IO_PROTOCOL           NewTcp;
   TCP_IO_CONNECTION_TOKEN   ConnToken;
@@ -93,7 +93,7 @@ typedef struct {
   TCP_IO_IO_TOKEN           RxToken;
   TCP_IO_CLOSE_TOKEN        CloseToken;
   TCP_IO_LISTEN_TOKEN       ListenToken;
-  
+
   BOOLEAN                   IsConnDone;
   BOOLEAN                   IsTxDone;
   BOOLEAN                   IsRxDone;
@@ -102,14 +102,14 @@ typedef struct {
 } TCP_IO;
 
 /**
-  Create a TCP socket with the specified configuration data. 
+  Create a TCP socket with the specified configuration data.
 
   @param[in]  Image      The handle of the driver image.
   @param[in]  Controller The handle of the controller.
   @param[in]  TcpVersion The version of Tcp, TCP_VERSION_4 or TCP_VERSION_6.
   @param[in]  ConfigData The Tcp configuration data.
   @param[out] TcpIo      The TcpIo.
-  
+
   @retval EFI_SUCCESS            The TCP socket is created and configured.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_UNSUPPORTED        One or more of the control options are not
@@ -129,7 +129,7 @@ TcpIoCreateSocket (
   );
 
 /**
-  Destroy the socket. 
+  Destroy the socket.
 
   @param[in]  TcpIo The TcpIo which wraps the socket to be destroyed.
 
@@ -145,7 +145,7 @@ TcpIoDestroySocket (
 
   @param[in, out]  TcpIo     The TcpIo wrapping the TCP socket.
   @param[in]       Timeout   The time to wait for connection done. Set to NULL for infinite wait.
-  
+
   @retval EFI_SUCCESS            Connect to the other endpoint of the TCP socket
                                  successfully.
   @retval EFI_TIMEOUT            Failed to connect to the other endpoint of the
@@ -169,7 +169,7 @@ TcpIoConnect (
   @param[in, out]  TcpIo     The TcpIo wrapping the TCP socket.
   @param[in]       Timeout   The time to wait for connection done. Set to NULL for infinite wait.
 
-  
+
   @retval EFI_SUCCESS            Connect to the other endpoint of the TCP socket
                                  successfully.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
@@ -187,7 +187,7 @@ TcpIoAccept (
   IN OUT TCP_IO             *TcpIo,
   IN     EFI_EVENT          Timeout        OPTIONAL
   );
-  
+
 /**
   Reset the socket.
 
@@ -205,7 +205,7 @@ TcpIoReset (
 
   @param[in]   TcpIo           The TcpIo wrapping the TCP socket.
   @param[in]   Packet          The packet to transmit.
-  
+
   @retval EFI_SUCCESS            The packet is trasmitted.
   @retval EFI_INVALID_PARAMETER  One or more parameters are invalid.
   @retval EFI_UNSUPPORTED        One or more of the control options are not

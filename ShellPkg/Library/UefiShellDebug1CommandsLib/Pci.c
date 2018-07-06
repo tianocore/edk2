@@ -1,9 +1,9 @@
 /** @file
   Main file for Pci shell Debug1 function.
 
-  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2015 Hewlett-Packard Development Company, L.P.<BR>
-  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>  
+  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -2487,7 +2487,7 @@ ShellCommandRunPci (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"pci", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"pci", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -2496,23 +2496,23 @@ ShellCommandRunPci (
   } else {
 
     if (ShellCommandLineGetCount(Package) == 2) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"pci");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellDebug1HiiHandle, L"pci");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
 
     if (ShellCommandLineGetCount(Package) > 4) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"pci");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"pci");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
     if (ShellCommandLineGetFlag(Package, L"-ec") && ShellCommandLineGetValue(Package, L"-ec") == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle,  L"pci", L"-ec");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle,  L"pci", L"-ec");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
     if (ShellCommandLineGetFlag(Package, L"-s") && ShellCommandLineGetValue(Package, L"-s") == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle,  L"pci", L"-s");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle,  L"pci", L"-s");
       ShellStatus = SHELL_INVALID_PARAMETER;
       goto Done;
     }
@@ -2524,7 +2524,7 @@ ShellCommandRunPci (
     HandleBufSize = sizeof (EFI_HANDLE);
     HandleBuf     = (EFI_HANDLE *) AllocateZeroPool (HandleBufSize);
     if (HandleBuf == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"pci");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"pci");
       ShellStatus = SHELL_OUT_OF_RESOURCES;
       goto Done;
     }
@@ -2540,7 +2540,7 @@ ShellCommandRunPci (
     if (Status == EFI_BUFFER_TOO_SMALL) {
       HandleBuf = ReallocatePool (sizeof (EFI_HANDLE), HandleBufSize, HandleBuf);
       if (HandleBuf == NULL) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"pci");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_OUT_MEM), gShellDebug1HiiHandle, L"pci");
         ShellStatus = SHELL_OUT_OF_RESOURCES;
         goto Done;
       }
@@ -2555,7 +2555,7 @@ ShellCommandRunPci (
     }
 
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"pci");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PCIRBIO_NF), gShellDebug1HiiHandle, L"pci");
       ShellStatus = SHELL_NOT_FOUND;
       goto Done;
     }
@@ -2591,7 +2591,7 @@ ShellCommandRunPci (
                   &Descriptors
                  );
         if (EFI_ERROR (Status)) {
-          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_HANDLE_CFG_ERR), gShellDebug1HiiHandle, L"pci");  
+          ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_HANDLE_CFG_ERR), gShellDebug1HiiHandle, L"pci");
           ShellStatus = SHELL_NOT_FOUND;
           goto Done;
         }
@@ -2604,7 +2604,7 @@ ShellCommandRunPci (
           Status = PciGetNextBusRange (&Descriptors, &MinBus, &MaxBus, &IsEnd);
 
           if (EFI_ERROR (Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_BUS_RANGE_ERR), gShellDebug1HiiHandle, L"pci");  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_BUS_RANGE_ERR), gShellDebug1HiiHandle, L"pci");
             ShellStatus = SHELL_NOT_FOUND;
             goto Done;
           }
@@ -2729,7 +2729,7 @@ ShellCommandRunPci (
       if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
         Segment = (UINT16) RetVal;
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);  
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -2747,13 +2747,13 @@ ShellCommandRunPci (
       if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
         Bus = (UINT16) RetVal;
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);  
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
 
       if (Bus > PCI_MAX_BUS) {
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -2766,13 +2766,13 @@ ShellCommandRunPci (
       if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
         Device = (UINT16) RetVal;
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);  
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
 
       if (Device > PCI_MAX_DEVICE){
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -2786,13 +2786,13 @@ ShellCommandRunPci (
       if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
         Func = (UINT16) RetVal;
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);  
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
 
       if (Func > PCI_MAX_FUNC){
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"pci", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -2806,7 +2806,7 @@ ShellCommandRunPci (
       if (!EFI_ERROR (ShellConvertStringToUint64 (Temp, &RetVal, TRUE, TRUE))) {
         ExtendedCapability = (UINT16) RetVal;
       } else {
-        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);  
+        ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV_HEX), gShellDebug1HiiHandle, L"pci", Temp);
         ShellStatus = SHELL_INVALID_PARAMETER;
         goto Done;
       }
@@ -2826,7 +2826,7 @@ ShellCommandRunPci (
 
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx(
-        -1, -1, NULL, STRING_TOKEN (STR_PCI_NO_FIND), gShellDebug1HiiHandle, L"pci",  
+        -1, -1, NULL, STRING_TOKEN (STR_PCI_NO_FIND), gShellDebug1HiiHandle, L"pci",
         Segment,
         Bus
        );
@@ -2844,7 +2844,7 @@ ShellCommandRunPci (
                          );
 
     if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_NO_CFG), gShellDebug1HiiHandle, L"pci");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_PCI_NO_CFG), gShellDebug1HiiHandle, L"pci");
       ShellStatus = SHELL_ACCESS_DENIED;
       goto Done;
     }
@@ -4999,13 +4999,13 @@ PrintInterpretedExtendedCompatibilityLinkControl (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_INTERNAL_LINK_CONTROL*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_LINK_CONTROL), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_LINK_CONTROL),
+    gShellDebug1HiiHandle,
     Header->RootComplexLinkCapabilities,
     Header->RootComplexLinkControl,
     Header->RootComplexLinkStatus
-    ); 
+    );
   DumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
@@ -5031,13 +5031,13 @@ PrintInterpretedExtendedCompatibilityPowerBudgeting (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_POWER_BUDGETING*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_POWER), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_POWER),
+    gShellDebug1HiiHandle,
     Header->DataSelect,
     Header->Data,
     Header->PowerBudgetCapability
-    ); 
+    );
   DumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
@@ -5067,12 +5067,12 @@ PrintInterpretedExtendedCompatibilityAcs (
   VectorSize  = 0;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_ACS), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_ACS),
+    gShellDebug1HiiHandle,
     Header->AcsCapability,
     Header->AcsControl
-    ); 
+    );
   if (PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRES_CONTROL(Header)) {
     VectorSize = PCI_EXPRESS_EXTENDED_CAPABILITY_ACS_EXTENDED_GET_EGRES_VECTOR_SIZE(Header);
     if (VectorSize == 0) {
@@ -5080,12 +5080,12 @@ PrintInterpretedExtendedCompatibilityAcs (
     }
     for (LoopCounter = 0 ; LoopCounter * 8 < VectorSize ; LoopCounter++) {
       ShellPrintHiiEx(
-        -1, -1, NULL, 
-        STRING_TOKEN (STR_PCI_EXT_CAP_ACS2), 
-        gShellDebug1HiiHandle, 
+        -1, -1, NULL,
+        STRING_TOKEN (STR_PCI_EXT_CAP_ACS2),
+        gShellDebug1HiiHandle,
         LoopCounter + 1,
         Header->EgressControlVectorArray[LoopCounter]
-        ); 
+        );
     }
   }
   DumpHex (
@@ -5113,12 +5113,12 @@ PrintInterpretedExtendedCompatibilityLatencyToleranceReporting (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_LATENCE_TOLERANCE_REPORTING*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_LAT), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_LAT),
+    gShellDebug1HiiHandle,
     Header->MaxSnoopLatency,
     Header->MaxNoSnoopLatency
-    ); 
+    );
   DumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
@@ -5144,11 +5144,11 @@ PrintInterpretedExtendedCompatibilitySerialNumber (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_SERIAL_NUMBER*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_SN), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_SN),
+    gShellDebug1HiiHandle,
     Header->SerialNumber
-    ); 
+    );
   DumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
@@ -5174,14 +5174,14 @@ PrintInterpretedExtendedCompatibilityRcrb (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_RCRB_HEADER*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_RCRB), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_RCRB),
+    gShellDebug1HiiHandle,
     Header->VendorId,
     Header->DeviceId,
     Header->RcrbCapabilities,
     Header->RcrbControl
-    ); 
+    );
   DumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
@@ -5207,11 +5207,11 @@ PrintInterpretedExtendedCompatibilityVendorSpecific (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_VENDOR_SPECIFIC*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_VEN), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_VEN),
+    gShellDebug1HiiHandle,
     Header->VendorSpecificHeader
-    ); 
+    );
   DumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
@@ -5237,11 +5237,11 @@ PrintInterpretedExtendedCompatibilityECEA (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_EVENT_COLLECTOR_ENDPOINT_ASSOCIATION*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_ECEA), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_ECEA),
+    gShellDebug1HiiHandle,
     Header->AssociationBitmap
-    ); 
+    );
   DumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
@@ -5267,12 +5267,12 @@ PrintInterpretedExtendedCompatibilityAri (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_ARI_CAPABILITY*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_ARI), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_ARI),
+    gShellDebug1HiiHandle,
     Header->AriCapability,
     Header->AriControl
-    ); 
+    );
   DumpHex (
     4,
     EFI_PCIE_CAPABILITY_BASE_OFFSET + ((UINT8*)HeaderAddress - (UINT8*)HeadersBaseAddress),
@@ -5299,19 +5299,19 @@ PrintInterpretedExtendedCompatibilityDynamicPowerAllocation (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_DYNAMIC_POWER_ALLOCATION*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_DPA), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_DPA),
+    gShellDebug1HiiHandle,
     Header->DpaCapability,
     Header->DpaLatencyIndicator,
     Header->DpaStatus,
     Header->DpaControl
-    ); 
+    );
   for (LinkCount = 0 ; LinkCount < PCI_EXPRESS_EXTENDED_CAPABILITY_DYNAMIC_POWER_ALLOCATION_GET_SUBSTATE_MAX(Header) + 1 ; LinkCount++) {
     ShellPrintHiiEx(
-      -1, -1, NULL, 
-      STRING_TOKEN (STR_PCI_EXT_CAP_DPA2), 
-      gShellDebug1HiiHandle, 
+      -1, -1, NULL,
+      STRING_TOKEN (STR_PCI_EXT_CAP_DPA2),
+      gShellDebug1HiiHandle,
       LinkCount+1,
       Header->DpaPowerAllocationArray[LinkCount]
       );
@@ -5342,17 +5342,17 @@ PrintInterpretedExtendedCompatibilityLinkDeclaration (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_LINK_DECLARATION*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_LINK_DECLAR), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_LINK_DECLAR),
+    gShellDebug1HiiHandle,
     Header->ElementSelfDescription
     );
 
   for (LinkCount = 0 ; LinkCount < PCI_EXPRESS_EXTENDED_CAPABILITY_LINK_DECLARATION_GET_LINK_COUNT(Header) ; LinkCount++) {
     ShellPrintHiiEx(
-      -1, -1, NULL, 
-      STRING_TOKEN (STR_PCI_EXT_CAP_LINK_DECLAR2), 
-      gShellDebug1HiiHandle, 
+      -1, -1, NULL,
+      STRING_TOKEN (STR_PCI_EXT_CAP_LINK_DECLAR2),
+      gShellDebug1HiiHandle,
       LinkCount+1,
       Header->LinkEntry[LinkCount]
       );
@@ -5382,9 +5382,9 @@ PrintInterpretedExtendedCompatibilityAer (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_ADVANCED_ERROR_REPORTING*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_AER), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_AER),
+    gShellDebug1HiiHandle,
     Header->UncorrectableErrorStatus,
     Header->UncorrectableErrorMask,
     Header->UncorrectableErrorSeverity,
@@ -5431,9 +5431,9 @@ PrintInterpretedExtendedCompatibilityMulticast (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_MULTICAST*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_MULTICAST), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_MULTICAST),
+    gShellDebug1HiiHandle,
     Header->MultiCastCapability,
     Header->MulticastControl,
     Header->McBaseAddress,
@@ -5471,9 +5471,9 @@ PrintInterpretedExtendedCompatibilityVirtualChannel (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_VIRTUAL_CHANNEL_CAPABILITY*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_VC_BASE), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_VC_BASE),
+    gShellDebug1HiiHandle,
     Header->ExtendedVcCount,
     Header->PortVcCapability1,
     Header->PortVcCapability2,
@@ -5484,9 +5484,9 @@ PrintInterpretedExtendedCompatibilityVirtualChannel (
   for (ItemCount = 0 ; ItemCount < Header->ExtendedVcCount ; ItemCount++) {
     CapabilityItem = &Header->Capability[ItemCount];
     ShellPrintHiiEx(
-      -1, -1, NULL, 
-      STRING_TOKEN (STR_PCI_EXT_CAP_VC_ITEM), 
-      gShellDebug1HiiHandle, 
+      -1, -1, NULL,
+      STRING_TOKEN (STR_PCI_EXT_CAP_VC_ITEM),
+      gShellDebug1HiiHandle,
       ItemCount+1,
       CapabilityItem->VcResourceCapability,
       CapabilityItem->PortArbTableOffset,
@@ -5524,9 +5524,9 @@ PrintInterpretedExtendedCompatibilityResizeableBar (
 
   for (ItemCount = 0 ; ItemCount < (UINT32)GET_NUMBER_RESIZABLE_BARS(Header) ; ItemCount++) {
     ShellPrintHiiEx(
-      -1, -1, NULL, 
-      STRING_TOKEN (STR_PCI_EXT_CAP_RESIZE_BAR), 
-      gShellDebug1HiiHandle, 
+      -1, -1, NULL,
+      STRING_TOKEN (STR_PCI_EXT_CAP_RESIZE_BAR),
+      gShellDebug1HiiHandle,
       ItemCount+1,
       Header->Capability[ItemCount].ResizableBarCapability,
       Header->Capability[ItemCount].ResizableBarControl
@@ -5559,9 +5559,9 @@ PrintInterpretedExtendedCompatibilityTph (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_TPH*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_TPH), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_TPH),
+    gShellDebug1HiiHandle,
     Header->TphRequesterCapability,
     Header->TphRequesterControl
     );
@@ -5600,9 +5600,9 @@ PrintInterpretedExtendedCompatibilitySecondary (
   Header = (PCI_EXPRESS_EXTENDED_CAPABILITIES_SECONDARY_PCIE*)HeaderAddress;
 
   ShellPrintHiiEx(
-    -1, -1, NULL, 
-    STRING_TOKEN (STR_PCI_EXT_CAP_SECONDARY), 
-    gShellDebug1HiiHandle, 
+    -1, -1, NULL,
+    STRING_TOKEN (STR_PCI_EXT_CAP_SECONDARY),
+    gShellDebug1HiiHandle,
     Header->LinkControl3.Uint32,
     Header->LaneErrorStatus
     );
@@ -5633,7 +5633,7 @@ PrintInterpretedExtendedCompatibilitySecondary (
 **/
 EFI_STATUS
 PrintPciExtendedCapabilityDetails(
-  IN CONST PCI_EXP_EXT_HDR    *HeadersBaseAddress, 
+  IN CONST PCI_EXP_EXT_HDR    *HeadersBaseAddress,
   IN CONST PCI_EXP_EXT_HDR    *HeaderAddress,
   IN CONST PCI_CAPABILITY_PCIEXP *PciExpressCapPtr
   )
@@ -5666,7 +5666,7 @@ PrintPciExtendedCapabilityDetails(
     case PCI_EXPRESS_EXTENDED_CAPABILITY_VIRTUAL_CHANNEL_ID:
     case PCI_EXPRESS_EXTENDED_CAPABILITY_MULTI_FUNCTION_VIRTUAL_CHANNEL_ID:
       return PrintInterpretedExtendedCompatibilityVirtualChannel(HeaderAddress, HeadersBaseAddress);
-    case PCI_EXPRESS_EXTENDED_CAPABILITY_MULTICAST_ID: 
+    case PCI_EXPRESS_EXTENDED_CAPABILITY_MULTICAST_ID:
       //
       // should only be present if PCIE_CAP_DEVICEPORT_TYPE(PciExpressCapPtr->PcieCapReg) == 0100b, 0101b, or 0110b
       //

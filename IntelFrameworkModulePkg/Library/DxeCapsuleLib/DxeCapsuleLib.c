@@ -1,7 +1,7 @@
 /** @file
   Capsule Library instance to process capsule images.
 
-  Copyright (c) 2007 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -82,7 +82,7 @@ ValidateFmpCapsule (
 
   if (ItemNum == FmpCapsuleHeader->EmbeddedDriverCount) {
     //
-    // No payload element 
+    // No payload element
     //
     if (((UINT8 *)FmpCapsuleHeader + ItemOffsetList[ItemNum - 1]) < EndOfCapsule) {
       return EFI_SUCCESS;
@@ -123,7 +123,7 @@ ValidateFmpCapsule (
 }
 
 /**
-  Process Firmware management protocol data capsule.  
+  Process Firmware management protocol data capsule.
 
   @param  CapsuleHeader         Points to a capsule header.
 
@@ -185,15 +185,15 @@ ProcessFmpCapsuleImage (
   }
 
   //
-  // 1. ConnectAll to ensure 
-  //    All the communication protocol required by driver in capsule installed 
+  // 1. ConnectAll to ensure
+  //    All the communication protocol required by driver in capsule installed
   //    All FMP protocols are installed
   //
   BdsLibConnectAll();
 
 
   //
-  // 2. Try to load & start all the drivers within capsule 
+  // 2. Try to load & start all the drivers within capsule
   //
   SetDevicePathNodeLength (&MemMapNode.Header, sizeof (MemMapNode));
   MemMapNode.Header.Type     = HARDWARE_DEVICE_PATH;
@@ -230,8 +230,8 @@ ProcessFmpCapsuleImage (
     }
 
     Status = gBS->StartImage(
-                    ImageHandle, 
-                    &ExitDataSize, 
+                    ImageHandle,
+                    &ExitDataSize,
                     NULL
                     );
     if (EFI_ERROR(Status)) {
@@ -241,7 +241,7 @@ ProcessFmpCapsuleImage (
   }
 
   //
-  // Connnect all again to connect drivers within capsule 
+  // Connnect all again to connect drivers within capsule
   //
   if (FmpCapsuleHeader->EmbeddedDriverCount > 0) {
     BdsLibConnectAll();
@@ -318,7 +318,7 @@ ProcessFmpCapsuleImage (
       TempFmpImageInfo = FmpImageInfoBuf;
       for (Index2 = 0; Index2 < FmpImageInfoCount; Index2++) {
         //
-        // Check all the payload entry in capsule payload list 
+        // Check all the payload entry in capsule payload list
         //
         for (Index = FmpCapsuleHeader->EmbeddedDriverCount; Index < ItemNum; Index++) {
           ImageHeader  = (EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER *)((UINT8 *)FmpCapsuleHeader + ItemOffsetList[Index]);

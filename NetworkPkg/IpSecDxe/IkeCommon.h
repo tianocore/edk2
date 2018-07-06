@@ -1,7 +1,7 @@
 /** @file
   Common operation of the IKE.
 
-  Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -19,7 +19,7 @@
 #include <Protocol/Udp4.h>
 #include <Protocol/Udp6.h>
 #include <Protocol/Ip4Config2.h>
- 
+
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -62,7 +62,7 @@
 
 /**
   Call Crypto Lib to generate a random value with eight-octet length.
-  
+
   @return the 64 byte vaule.
 
 **/
@@ -75,8 +75,8 @@ IkeGenerateCookie (
   Generate the random data for Nonce payload.
 
   @param[in]  NonceSize      Size of the data in bytes.
-  
-  @return Buffer which contains the random data of the spcified size. 
+
+  @return Buffer which contains the random data of the spcified size.
 
 **/
 UINT8 *
@@ -131,11 +131,11 @@ IkePayloadFree (
 
 /**
   Generate an new SPI.
-  
-  @param[in]       IkeSaSession   Pointer to IKEV2_SA_SESSION related to this Child SA 
+
+  @param[in]       IkeSaSession   Pointer to IKEV2_SA_SESSION related to this Child SA
                                   Session.
-  @param[in, out]  SpiValue       Pointer to the new generated SPI value. 
-                              
+  @param[in, out]  SpiValue       Pointer to the new generated SPI value.
+
   @retval EFI_SUCCESS         The operation performs successfully.
   @retval Otherwise           The operation is failed.
 

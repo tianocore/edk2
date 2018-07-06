@@ -4,7 +4,7 @@
   Local APIC library assumes local APIC is enabled. It does not
   handles cases where local APIC is disabled.
 
-  Copyright (c) 2010 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -82,7 +82,7 @@ SetApicMode (
   Get the initial local APIC ID of the executing processor assigned by hardware upon power on or reset.
 
   In xAPIC mode, the initial local APIC ID may be different from current APIC ID.
-  In x2APIC mode, the local APIC ID can't be changed and there is no concept of initial APIC ID. In this case, 
+  In x2APIC mode, the local APIC ID can't be changed and there is no concept of initial APIC ID. In this case,
   the 32-bit local APIC ID is returned as initial APIC ID.
 
   @return  32-bit initial local APIC ID of the executing processor.
@@ -118,7 +118,7 @@ GetApicVersion (
 /**
   Send a Fixed IPI to a specified target processor.
 
-  This function returns after the IPI has been accepted by the target processor. 
+  This function returns after the IPI has been accepted by the target processor.
 
   @param  ApicId   The local APIC ID of the target processor.
   @param  Vector   The vector number of the interrupt being sent.
@@ -133,7 +133,7 @@ SendFixedIpi (
 /**
   Send a Fixed IPI to all processors excluding self.
 
-  This function returns after the IPI has been accepted by the target processors. 
+  This function returns after the IPI has been accepted by the target processors.
 
   @param  Vector   The vector number of the interrupt being sent.
 **/
@@ -146,7 +146,7 @@ SendFixedIpiAllExcludingSelf (
 /**
   Send a SMI IPI to a specified target processor.
 
-  This function returns after the IPI has been accepted by the target processor. 
+  This function returns after the IPI has been accepted by the target processor.
 
   @param  ApicId   Specify the local APIC ID of the target processor.
 **/
@@ -159,7 +159,7 @@ SendSmiIpi (
 /**
   Send a SMI IPI to all processors excluding self.
 
-  This function returns after the IPI has been accepted by the target processors. 
+  This function returns after the IPI has been accepted by the target processors.
 **/
 VOID
 EFIAPI
@@ -170,7 +170,7 @@ SendSmiIpiAllExcludingSelf (
 /**
   Send an INIT IPI to a specified target processor.
 
-  This function returns after the IPI has been accepted by the target processor. 
+  This function returns after the IPI has been accepted by the target processor.
 
   @param  ApicId   Specify the local APIC ID of the target processor.
 **/
@@ -183,7 +183,7 @@ SendInitIpi (
 /**
   Send an INIT IPI to all processors excluding self.
 
-  This function returns after the IPI has been accepted by the target processors. 
+  This function returns after the IPI has been accepted by the target processors.
 **/
 VOID
 EFIAPI
@@ -194,7 +194,7 @@ SendInitIpiAllExcludingSelf (
 /**
   Send an INIT-Start-up-Start-up IPI sequence to a specified target processor.
 
-  This function returns after the IPI has been accepted by the target processor. 
+  This function returns after the IPI has been accepted by the target processor.
 
   if StartupRoutine >= 1M, then ASSERT.
   if StartupRoutine is not multiple of 4K, then ASSERT.
@@ -213,7 +213,7 @@ SendInitSipiSipi (
 /**
   Send an INIT-Start-up-Start-up IPI sequence to all processors excluding self.
 
-  This function returns after the IPI has been accepted by the target processors. 
+  This function returns after the IPI has been accepted by the target processors.
 
   if StartupRoutine >= 1M, then ASSERT.
   if StartupRoutine is not multiple of 4K, then ASSERT.
@@ -363,27 +363,27 @@ SendApicEoi (
   );
 
 /**
-  Get the 32-bit address that a device should use to send a Message Signaled 
+  Get the 32-bit address that a device should use to send a Message Signaled
   Interrupt (MSI) to the Local APIC of the currently executing processor.
 
   @return 32-bit address used to send an MSI to the Local APIC.
 **/
 UINT32
-EFIAPI    
+EFIAPI
 GetApicMsiAddress (
   VOID
   );
-    
+
 /**
-  Get the 64-bit data value that a device should use to send a Message Signaled 
+  Get the 64-bit data value that a device should use to send a Message Signaled
   Interrupt (MSI) to the Local APIC of the currently executing processor.
 
   If Vector is not in range 0x10..0xFE, then ASSERT().
   If DeliveryMode is not supported, then ASSERT().
-  
-  @param  Vector          The 8-bit interrupt vector associated with the MSI.  
+
+  @param  Vector          The 8-bit interrupt vector associated with the MSI.
                           Must be in the range 0x10..0xFE
-  @param  DeliveryMode    A 3-bit value that specifies how the recept of the MSI 
+  @param  DeliveryMode    A 3-bit value that specifies how the recept of the MSI
                           is handled.  The only supported values are:
                             0: LOCAL_APIC_DELIVERY_MODE_FIXED
                             1: LOCAL_APIC_DELIVERY_MODE_LOWEST_PRIORITY
@@ -391,19 +391,19 @@ GetApicMsiAddress (
                             4: LOCAL_APIC_DELIVERY_MODE_NMI
                             5: LOCAL_APIC_DELIVERY_MODE_INIT
                             7: LOCAL_APIC_DELIVERY_MODE_EXTINT
-                          
-  @param  LevelTriggered  TRUE specifies a level triggered interrupt.  
+
+  @param  LevelTriggered  TRUE specifies a level triggered interrupt.
                           FALSE specifies an edge triggered interrupt.
   @param  AssertionLevel  Ignored if LevelTriggered is FALSE.
-                          TRUE specifies a level triggered interrupt that active 
+                          TRUE specifies a level triggered interrupt that active
                           when the interrupt line is asserted.
-                          FALSE specifies a level triggered interrupt that active 
+                          FALSE specifies a level triggered interrupt that active
                           when the interrupt line is deasserted.
 
   @return 64-bit data value used to send an MSI to the Local APIC.
 **/
 UINT64
-EFIAPI    
+EFIAPI
 GetApicMsiValue (
   IN UINT8    Vector,
   IN UINTN    DeliveryMode,
@@ -431,6 +431,6 @@ GetProcessorLocationByApicId (
   OUT UINT32  *Core    OPTIONAL,
   OUT UINT32  *Thread  OPTIONAL
   );
-  
+
 #endif
 

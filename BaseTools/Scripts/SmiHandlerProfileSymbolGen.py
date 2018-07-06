@@ -14,6 +14,7 @@
 #
 ##
 
+from __future__ import print_function
 import os
 import re
 import sys
@@ -61,10 +62,10 @@ class Symbols:
         try:
             nmCommand = "nm"
             nmLineOption = "-l"
-            print "parsing (debug) - " + pdbName
+            print("parsing (debug) - " + pdbName)
             os.system ('%s %s %s > nmDump.line.log' % (nmCommand, nmLineOption, pdbName))
         except :
-            print 'ERROR: nm command not available.  Please verify PATH'
+            print('ERROR: nm command not available.  Please verify PATH')
             return
 
         #
@@ -103,11 +104,11 @@ class Symbols:
             DIA2DumpCommand = "Dia2Dump.exe"
             #DIA2SymbolOption = "-p"
             DIA2LinesOption = "-l"
-            print "parsing (pdb) - " + pdbName
+            print("parsing (pdb) - " + pdbName)
             #os.system ('%s %s %s > DIA2Dump.symbol.log' % (DIA2DumpCommand, DIA2SymbolOption, pdbName))
             os.system ('%s %s %s > DIA2Dump.line.log' % (DIA2DumpCommand, DIA2LinesOption, pdbName))
         except :
-            print 'ERROR: DIA2Dump command not available.  Please verify PATH'
+            print('ERROR: DIA2Dump command not available.  Please verify PATH')
             return
 
         #
@@ -204,7 +205,7 @@ def genGuidString(guidreffile):
         if len(guidLineList) == 2:
             guid = guidLineList[0]
             guidName = guidLineList[1]
-            if guid not in dictGuid.keys() :
+            if guid not in dictGuid :
                 dictGuid[guid] = guidName
 
 def createSym(symbolName):
@@ -235,14 +236,14 @@ def main():
     try :
         DOMTree = xml.dom.minidom.parse(Options.inputfilename)
     except Exception:
-        print "fail to open input " + Options.inputfilename
+        print("fail to open input " + Options.inputfilename)
         return 1
 
     if Options.guidreffilename is not None:
         try :
             guidreffile = open(Options.guidreffilename)
         except Exception:
-            print "fail to open guidref" + Options.guidreffilename
+            print("fail to open guidref" + Options.guidreffilename)
             return 1
         genGuidString(guidreffile)
         guidreffile.close()
@@ -256,7 +257,7 @@ def main():
         for smiEntry in SmiEntry:
             if smiEntry.hasAttribute("HandlerType"):
                 guidValue = smiEntry.getAttribute("HandlerType")
-                if guidValue in dictGuid.keys() :
+                if guidValue in dictGuid:
                     smiEntry.setAttribute("HandlerType", dictGuid[guidValue])
             SmiHandler = smiEntry.getElementsByTagName("SmiHandler")
             for smiHandler in SmiHandler:
@@ -277,7 +278,7 @@ def main():
 
                     Handler = smiHandler.getElementsByTagName("Handler")
                     RVA = Handler[0].getElementsByTagName("RVA")
-                    print "    Handler RVA: %s" % RVA[0].childNodes[0].data
+                    print("    Handler RVA: %s" % RVA[0].childNodes[0].data)
 
                     if (len(RVA)) >= 1:
                         rvaName = RVA[0].childNodes[0].data
@@ -289,7 +290,7 @@ def main():
 
                     Caller = smiHandler.getElementsByTagName("Caller")
                     RVA = Caller[0].getElementsByTagName("RVA")
-                    print "    Caller RVA: %s" % RVA[0].childNodes[0].data
+                    print("    Caller RVA: %s" % RVA[0].childNodes[0].data)
 
                     if (len(RVA)) >= 1:
                         rvaName = RVA[0].childNodes[0].data
@@ -302,7 +303,7 @@ def main():
     try :
         newfile = open(Options.outputfilename, "w")
     except Exception:
-        print "fail to open output" + Options.outputfilename
+        print("fail to open output" + Options.outputfilename)
         return 1
 
     newfile.write(DOMTree.toprettyxml(indent = "\t", newl = "\n", encoding = "utf-8"))

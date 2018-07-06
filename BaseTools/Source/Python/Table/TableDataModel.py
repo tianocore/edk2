@@ -17,7 +17,7 @@
 import Common.EdkLogger as EdkLogger
 import CommonDataClass.DataClass as DataClass
 from Table import Table
-from Common.String import ConvertToSqlString
+from Common.StringUtils import ConvertToSqlString
 
 ## TableDataModel
 #

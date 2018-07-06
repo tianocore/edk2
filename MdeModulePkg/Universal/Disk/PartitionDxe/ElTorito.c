@@ -1,6 +1,7 @@
 /** @file
   Decode an El Torito formatted CD-ROM
 
+Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
 Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -265,7 +266,8 @@ PartitionInstallElToritoChildHandles (
                 &PartitionInfo,
                 Catalog->Boot.Lba * (SIZE_2KB / Media->BlockSize),
                 Catalog->Boot.Lba * (SIZE_2KB / Media->BlockSize) + CdDev.PartitionSize - 1,
-                SubBlockSize
+                SubBlockSize,
+                NULL
                 );
       if (!EFI_ERROR (Status)) {
         Found = EFI_SUCCESS;

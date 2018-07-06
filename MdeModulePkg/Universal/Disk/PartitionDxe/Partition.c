@@ -4,7 +4,8 @@
   of the raw block devices media. Currently "El Torito CD-ROM", UDF, Legacy
   MBR, and GPT partition schemes are supported.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -26,8 +27,8 @@ EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding = {
   PartitionDriverBindingStart,
   PartitionDriverBindingStop,
   //
-  // Grub4Dos copies the BPB of the first partition to the MBR. If the 
-  // DriverBindingStart() of the Fat driver gets run before that of Partition 
+  // Grub4Dos copies the BPB of the first partition to the MBR. If the
+  // DriverBindingStart() of the Fat driver gets run before that of Partition
   // driver only the first partition can be recognized.
   // Let the driver binding version of Partition driver be higher than that of
   // Fat driver to make sure the DriverBindingStart() of the Partition driver
@@ -39,7 +40,7 @@ EFI_DRIVER_BINDING_PROTOCOL gPartitionDriverBinding = {
 };
 
 //
-// Prioritized function list to detect partition table. 
+// Prioritized function list to detect partition table.
 //
 PARTITION_DETECT_ROUTINE mPartitionDetectRoutineTable[] = {
   PartitionInstallGptChildHandles,
@@ -81,7 +82,7 @@ PartitionDriverBindingSupported (
   //
   if (RemainingDevicePath != NULL) {
     //
-    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // Check if RemainingDevicePath is the End of Device Path Node,
     // if yes, go on checking other conditions
     //
     if (!IsDevicePathEnd (RemainingDevicePath)) {
@@ -204,13 +205,13 @@ PartitionDriverBindingStart (
   EFI_TPL                   OldTpl;
 
   BlockIo2 = NULL;
-  OldTpl = gBS->RaiseTPL (TPL_CALLBACK); 
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
   //
   // Check RemainingDevicePath validation
   //
   if (RemainingDevicePath != NULL) {
     //
-    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // Check if RemainingDevicePath is the End of Device Path Node,
     // if yes, return EFI_SUCCESS
     //
     if (IsDevicePathEnd (RemainingDevicePath)) {
@@ -332,12 +333,12 @@ PartitionDriverBindingStart (
   // driver. So don't try to close them. Otherwise, we will break the dependency
   // between the controller and the driver set up before.
   //
-  // In the case that when the media changes on a device it will Reinstall the 
+  // In the case that when the media changes on a device it will Reinstall the
   // BlockIo interaface. This will cause a call to our Stop(), and a subsequent
   // reentrant call to our Start() successfully. We should leave the device open
   // when this happen. The "media change" case includes either the status is
-  // EFI_MEDIA_CHANGED or it is a "media" to "no media" change. 
-  //  
+  // EFI_MEDIA_CHANGED or it is a "media" to "no media" change.
+  //
   if (EFI_ERROR (Status)          &&
       !EFI_ERROR (OpenStatus)     &&
       Status != EFI_MEDIA_CHANGED &&
@@ -350,7 +351,7 @@ PartitionDriverBindingStart (
           );
     //
     // Close Parent DiskIo2 if has.
-    //    
+    //
     gBS->CloseProtocol (
            ControllerHandle,
            &gEfiDiskIo2ProtocolGuid,
@@ -401,6 +402,7 @@ PartitionDriverBindingStop (
   BOOLEAN                 AllChildrenStopped;
   PARTITION_PRIVATE_DATA  *Private;
   EFI_DISK_IO_PROTOCOL    *DiskIo;
+  EFI_GUID                *TypeGuid;
 
   BlockIo  = NULL;
   BlockIo2 = NULL;
@@ -428,7 +430,7 @@ PartitionDriverBindingStop (
           );
     //
     // Close Parent BlockIO2 if has.
-    //    
+    //
     gBS->CloseProtocol (
            ControllerHandle,
            &gEfiDiskIo2ProtocolGuid,
@@ -465,7 +467,7 @@ PartitionDriverBindingStop (
            This->DriverBindingHandle,
            ControllerHandle,
            EFI_OPEN_PROTOCOL_GET_PROTOCOL
-           ); 
+           );
 
 
     Private = PARTITION_DEVICE_FROM_BLOCK_IO_THIS (BlockIo);
@@ -493,6 +495,13 @@ PartitionDriverBindingStop (
            This->DriverBindingHandle,
            ChildHandleBuffer[Index]
            );
+
+    if (IsZeroGuid (&Private->TypeGuid)) {
+      TypeGuid = NULL;
+    } else {
+      TypeGuid = &Private->TypeGuid;
+    }
+
     //
     // All Software protocols have be freed from the handle so remove it.
     // Remove the BlockIo Protocol if has.
@@ -516,7 +525,7 @@ PartitionDriverBindingStop (
                          &Private->BlockIo2,
                          &gEfiPartitionInfoProtocolGuid,
                          &Private->PartitionInfo,
-                         Private->EspGuid,
+                         TypeGuid,
                          NULL,
                          NULL
                          );
@@ -530,7 +539,7 @@ PartitionDriverBindingStop (
                        &Private->BlockIo,
                        &gEfiPartitionInfoProtocolGuid,
                        &Private->PartitionInfo,
-                       Private->EspGuid,
+                       TypeGuid,
                        NULL,
                        NULL
                        );
@@ -777,11 +786,15 @@ ProbeMediaStatusEx (
   )
 {
   EFI_STATUS                 Status;
+  UINT8                      Buffer[1];
 
   //
-  // Read 1 byte from offset 0 but passing NULL as buffer pointer
+  // Read 1 byte from offset 0 to check if the MediaId is still valid.
+  // The reading operation is synchronious thus it is not worth it to
+  // allocate a buffer from the pool. The destination buffer for the
+  // data is in the stack.
   //
-  Status = DiskIo2->ReadDiskEx (DiskIo2, MediaId, 0, NULL, 1, NULL);
+  Status = DiskIo2->ReadDiskEx (DiskIo2, MediaId, 0, NULL, 1, (VOID*)Buffer);
   if ((Status == EFI_NO_MEDIA) || (Status == EFI_MEDIA_CHANGED)) {
     return Status;
   }
@@ -880,7 +893,7 @@ PartitionCreateAccessTask (
 
 /**
   Read BufferSize bytes from Lba into Buffer.
-  
+
   This function reads the requested number of blocks from the device. All the
   blocks are read, or an error is returned.
   If EFI_DEVICE_ERROR, EFI_NO_MEDIA,_or EFI_MEDIA_CHANGED is returned and
@@ -888,13 +901,13 @@ PartitionCreateAccessTask (
   not be signaled.
 
   @param[in]       This       Indicates a pointer to the calling context.
-  @param[in]       MediaId    Id of the media, changes every time the media is 
+  @param[in]       MediaId    Id of the media, changes every time the media is
                               replaced.
   @param[in]       Lba        The starting Logical Block Address to read from.
-  @param[in, out]  Token	    A pointer to the token associated with the transaction.
-  @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.  
-  @param[out]      Buffer     A pointer to the destination buffer for the data. The 
-                              caller is responsible for either having implicit or 
+  @param[in, out]  Token      A pointer to the token associated with the transaction.
+  @param[in]       BufferSize Size of Buffer, must be a multiple of device block size.
+  @param[out]      Buffer     A pointer to the destination buffer for the data. The
+                              caller is responsible for either having implicit or
                               explicit ownership of the buffer.
 
   @retval EFI_SUCCESS           The read request was queued if Token->Event is
@@ -906,7 +919,7 @@ PartitionCreateAccessTask (
   @retval EFI_MEDIA_CHANGED     The MediaId is not for the current media.
   @retval EFI_BAD_BUFFER_SIZE   The BufferSize parameter is not a multiple of the
                                 intrinsic block size of the device.
-  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The read request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack
                                 of resources.
@@ -981,7 +994,7 @@ PartitionReadBlocksEx (
   @retval EFI_MEDIA_CHNAGED     The MediaId does not matched the current device.
   @retval EFI_DEVICE_ERROR      The device reported an error while performing the write.
   @retval EFI_BAD_BUFFER_SIZE   The Buffer was not a multiple of the block size of the device.
-  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid, 
+  @retval EFI_INVALID_PARAMETER The write request contains LBAs that are not valid,
                                 or the buffer is not on proper alignment.
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack
                                 of resources.
@@ -1013,7 +1026,7 @@ PartitionWriteBlocksEx (
   if (Offset + BufferSize > Private->End) {
     return ProbeMediaStatusEx (Private->DiskIo2, MediaId, EFI_INVALID_PARAMETER);
   }
-  
+
   if ((Token != NULL) && (Token->Event != NULL)) {
     Task = PartitionCreateAccessTask (Token);
     if (Task == NULL) {
@@ -1033,10 +1046,10 @@ PartitionWriteBlocksEx (
 
 /**
   Flush the Block Device.
- 
+
   If EFI_DEVICE_ERROR, EFI_NO_MEDIA,_EFI_WRITE_PROTECTED or EFI_MEDIA_CHANGED
   is returned and non-blocking I/O is being used, the Event associated with
-  this request will not be signaled.  
+  this request will not be signaled.
 
   @param[in]      This     Indicates a pointer to the calling context.
   @param[in, out] Token    A pointer to the token associated with the transaction
@@ -1100,6 +1113,7 @@ PartitionFlushBlocksEx (
   @param[in]  Start             Start Block.
   @param[in]  End               End Block.
   @param[in]  BlockSize         Child block size.
+  @param[in]  TypeGuid          Partition GUID Type.
 
   @retval EFI_SUCCESS       A child handle was added.
   @retval other             A child handle was not added.
@@ -1118,7 +1132,8 @@ PartitionInstallChildHandle (
   IN  EFI_PARTITION_INFO_PROTOCOL  *PartitionInfo,
   IN  EFI_LBA                      Start,
   IN  EFI_LBA                      End,
-  IN  UINT32                       BlockSize
+  IN  UINT32                       BlockSize,
+  IN  EFI_GUID                     *TypeGuid
   )
 {
   EFI_STATUS              Status;
@@ -1145,7 +1160,7 @@ PartitionInstallChildHandle (
   // Set the BlockIO into Private Data.
   //
   Private->BlockIo.Revision = ParentBlockIo->Revision;
-  
+
   Private->BlockIo.Media    = &Private->Media;
   CopyMem (Private->BlockIo.Media, ParentBlockIo->Media, sizeof (EFI_BLOCK_IO_MEDIA));
 
@@ -1165,7 +1180,7 @@ PartitionInstallChildHandle (
     Private->BlockIo2.Reset          = PartitionResetEx;
     Private->BlockIo2.ReadBlocksEx   = PartitionReadBlocksEx;
     Private->BlockIo2.WriteBlocksEx  = PartitionWriteBlocksEx;
-    Private->BlockIo2.FlushBlocksEx  = PartitionFlushBlocksEx; 
+    Private->BlockIo2.FlushBlocksEx  = PartitionFlushBlocksEx;
   }
 
   Private->Media.IoAlign   = 0;
@@ -1212,17 +1227,14 @@ PartitionInstallChildHandle (
   //
   CopyMem (&Private->PartitionInfo, PartitionInfo, sizeof (EFI_PARTITION_INFO_PROTOCOL));
 
-  if (PartitionInfo->System == 1) {
-    Private->EspGuid = &gEfiPartTypeSystemPartGuid;
+  if (TypeGuid != NULL) {
+    CopyGuid(&(Private->TypeGuid), TypeGuid);
   } else {
-    //
-    // If NULL InstallMultipleProtocolInterfaces will ignore it.
-    //
-    Private->EspGuid = NULL;
+    ZeroMem ((VOID *)&(Private->TypeGuid), sizeof (EFI_GUID));
   }
 
   //
-  // Create the new handle. 
+  // Create the new handle.
   //
   Private->Handle = NULL;
   if (Private->DiskIo2 != NULL) {
@@ -1236,11 +1248,11 @@ PartitionInstallChildHandle (
                     &Private->BlockIo2,
                     &gEfiPartitionInfoProtocolGuid,
                     &Private->PartitionInfo,
-                    Private->EspGuid,
+                    TypeGuid,
                     NULL,
                     NULL
                     );
-  } else {    
+  } else {
     Status = gBS->InstallMultipleProtocolInterfaces (
                     &Private->Handle,
                     &gEfiDevicePathProtocolGuid,
@@ -1249,7 +1261,7 @@ PartitionInstallChildHandle (
                     &Private->BlockIo,
                     &gEfiPartitionInfoProtocolGuid,
                     &Private->PartitionInfo,
-                    Private->EspGuid,
+                    TypeGuid,
                     NULL,
                     NULL
                     );
@@ -1279,9 +1291,9 @@ PartitionInstallChildHandle (
 /**
   The user Entry Point for module Partition. The user code starts with this function.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
   @param[in] SystemTable    A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS       The entry point is executed successfully.
   @retval other             Some error occurs when executing this entry point.
 

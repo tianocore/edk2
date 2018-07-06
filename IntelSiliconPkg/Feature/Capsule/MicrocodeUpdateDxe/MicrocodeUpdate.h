@@ -1,7 +1,7 @@
 /** @file
   Microcode update header file.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -19,6 +19,8 @@
 
 #include <Guid/SystemResourceTable.h>
 #include <Guid/MicrocodeFmp.h>
+
+#include <IndustryStandard/FirmwareInterfaceTable.h>
 
 #include <Protocol/FirmwareManagement.h>
 #include <Protocol/MpService.h>
@@ -58,6 +60,13 @@ typedef struct {
 } MICROCODE_INFO;
 
 typedef struct {
+  CPU_MICROCODE_HEADER   *MicrocodeEntryPoint;
+  UINTN                  TotalSize;
+  BOOLEAN                InUse;
+  BOOLEAN                Empty;
+} FIT_MICROCODE_INFO;
+
+typedef struct {
   UINTN                  CpuIndex;
   UINT32                 ProcessorSignature;
   UINT8                  PlatformId;
@@ -86,11 +95,13 @@ struct _MICROCODE_FMP_PRIVATE_DATA {
   UINTN                                BspIndex;
   UINTN                                ProcessorCount;
   PROCESSOR_INFO                       *ProcessorInfo;
+  UINT32                               FitMicrocodeEntryCount;
+  FIT_MICROCODE_INFO                   *FitMicrocodeInfo;
 };
 
 typedef struct _MICROCODE_FMP_PRIVATE_DATA  MICROCODE_FMP_PRIVATE_DATA;
 
-#define MICROCODE_FMP_LAST_ATTEMPT_VARIABLE_NAME  L"MicrocodeLastAttempVar"
+#define MICROCODE_FMP_LAST_ATTEMPT_VARIABLE_NAME  L"MicrocodeLastAttemptVar"
 
 /**
   Returns a pointer to the MICROCODE_FMP_PRIVATE_DATA structure from the input a as Fmp.
@@ -305,7 +316,7 @@ FmpGetImageInfo (
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_NOT_FOUND          The current image is not copied to the buffer.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -360,7 +371,7 @@ FmpGetImage (
   @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -392,7 +403,7 @@ FmpSetImage (
   @retval EFI_SUCCESS            The image was successfully checked.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -476,7 +487,7 @@ FmpGetPackageInfo (
   @retval EFI_INVALID_PARAMETER  The PackageVersionName length is longer than the value
                                  returned in PackageVersionNameMaxLen.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS

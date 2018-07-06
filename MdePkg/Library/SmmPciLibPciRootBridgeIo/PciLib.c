@@ -1,13 +1,13 @@
 /** @file
   PCI Library using SMM PCI Root Bridge I/O Protocol.
 
-  Copyright (c) 2009 - 2012, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials are
   licensed and made available under the terms and conditions of
   the BSD License which accompanies this distribution.  The full
   text of the license may be found at
   http://opensource.org/licenses/bsd-license.php.
-  
+
   THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
@@ -44,17 +44,17 @@
 //
 // Global varible to cache pointer to PCI Root Bridge I/O protocol.
 //
-EFI_SMM_PCI_ROOT_BRIDGE_IO_PROTOCOL      *mSmmPciRootBridgeIo = NULL; 
+EFI_SMM_PCI_ROOT_BRIDGE_IO_PROTOCOL      *mSmmPciRootBridgeIo = NULL;
 
 /**
   The constructor function caches the pointer to PCI Root Bridge I/O protocol.
-  
+
   The constructor function locates PCI Root Bridge I/O protocol from protocol database.
-  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS. 
+  It will ASSERT() if that operation fails and it will always return EFI_SUCCESS.
 
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor always returns EFI_SUCCESS.
 
 **/
@@ -66,7 +66,7 @@ PciLibConstructor (
   )
 {
   EFI_STATUS  Status;
-  
+
   Status = gSmst->SmmLocateProtocol (&gEfiSmmPciRootBridgeIoProtocolGuid, NULL, (VOID**) &mSmmPciRootBridgeIo);
   ASSERT_EFI_ERROR (Status);
   ASSERT (mSmmPciRootBridgeIo != NULL);
@@ -141,19 +141,19 @@ SmmPciLibPciRootBridgeIoWriteWorker (
 }
 
 /**
-  Registers a PCI device so PCI configuration registers may be accessed after 
+  Registers a PCI device so PCI configuration registers may be accessed after
   SetVirtualAddressMap().
-  
-  Registers the PCI device specified by Address so all the PCI configuration registers 
+
+  Registers the PCI device specified by Address so all the PCI configuration registers
   associated with that PCI device may be accessed after SetVirtualAddressMap() is called.
-  
+
   If Address > 0x0FFFFFFF, then ASSERT().
 
   @param  Address The address that encodes the PCI Bus, Device, Function and
                   Register.
-  
+
   @retval RETURN_SUCCESS           The PCI device was registered for runtime access.
-  @retval RETURN_UNSUPPORTED       An attempt was made to call this function 
+  @retval RETURN_UNSUPPORTED       An attempt was made to call this function
                                    after ExitBootServices().
   @retval RETURN_UNSUPPORTED       The resources required to access the PCI device
                                    at runtime could not be mapped.

@@ -1,7 +1,7 @@
 /** @file
   PE/Coff Extra Action library instances, it will report image debug info.
 
-  Copyright (c) 2013, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -43,14 +43,14 @@ extern UINTN  AsmInterruptHandle;
   @retval  FALSE    IDT entries were not setuo by Debug Agent.
 
 **/
-BOOLEAN 
+BOOLEAN
 CheckDebugAgentHandler (
   IN  IA32_DESCRIPTOR            *IdtDescriptor,
   IN  UINTN                      InterruptType
   );
 
 /**
-  Save IDT entry for INT1 and update it. 
+  Save IDT entry for INT1 and update it.
 
   @param[in]  IdtDescriptor      Pointer to IDT Descriptor.
   @param[out] SavedIdtEntry      Original IDT entry returned.
@@ -63,7 +63,7 @@ SaveAndUpdateIdtEntry1 (
   );
 
 /**
-  Restore IDT entry for INT1. 
+  Restore IDT entry for INT1.
 
   @param[in]  IdtDescriptor      Pointer to IDT Descriptor.
   @param[in]  RestoredIdtEntry   IDT entry to be restored.

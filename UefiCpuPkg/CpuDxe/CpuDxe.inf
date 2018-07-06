@@ -1,7 +1,7 @@
 ## @file
 #  CPU driver installs CPU Architecture Protocol and CPU MP protocol.
 #
-#  Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 #  Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
@@ -58,18 +58,15 @@
   CpuPageTable.c
 
 [Sources.IA32]
-  Ia32/CpuAsm.asm
   Ia32/CpuAsm.nasm
-  Ia32/CpuAsm.S
 
 [Sources.X64]
-  X64/CpuAsm.asm
   X64/CpuAsm.nasm
-  X64/CpuAsm.S
 
 [Protocols]
   gEfiCpuArchProtocolGuid                       ## PRODUCES
   gEfiMpServiceProtocolGuid                     ## PRODUCES
+  gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
 
 [Guids]
   gIdleLoopEventGuid                            ## CONSUMES           ## Event

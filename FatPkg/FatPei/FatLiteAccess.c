@@ -1,7 +1,7 @@
 /** @file
   FAT file system access routines for FAT recovery PEIM
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available
 under the terms and conditions of the BSD License which accompanies this
@@ -22,16 +22,16 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   volume structure. Note there should be a valid Block device number
   already set.
 
-  @param  PrivateData            Global memory map for accessing global 
-                                 variables. 
-  @param  Volume                 On input, the BlockDeviceNumber field of the 
-                                 Volume  should be a valid value. On successful 
-                                 output, all  fields except the VolumeNumber 
-                                 field is initialized. 
+  @param  PrivateData            Global memory map for accessing global
+                                 variables.
+  @param  Volume                 On input, the BlockDeviceNumber field of the
+                                 Volume  should be a valid value. On successful
+                                 output, all  fields except the VolumeNumber
+                                 field is initialized.
 
-  @retval EFI_SUCCESS            A FAT is found and the volume structure is 
-                                 initialized. 
-  @retval EFI_NOT_FOUND          There is no FAT on the corresponding device. 
+  @retval EFI_SUCCESS            A FAT is found and the volume structure is
+                                 initialized.
+  @retval EFI_NOT_FOUND          There is no FAT on the corresponding device.
   @retval EFI_DEVICE_ERROR       There is something error while accessing device.
 
 **/
@@ -177,13 +177,13 @@ FatGetBpbInfo (
 /**
   Gets the next cluster in the cluster chain
 
-  @param  PrivateData            Global memory map for accessing global variables 
-  @param  Volume                 The volume 
-  @param  Cluster                The cluster 
-  @param  NextCluster            The cluster number of the next cluster 
+  @param  PrivateData            Global memory map for accessing global variables
+  @param  Volume                 The volume
+  @param  Cluster                The cluster
+  @param  NextCluster            The cluster number of the next cluster
 
-  @retval EFI_SUCCESS            The address is got 
-  @retval EFI_INVALID_PARAMETER  ClusterNo exceeds the MaxCluster of the volume. 
+  @retval EFI_SUCCESS            The address is got
+  @retval EFI_INVALID_PARAMETER  ClusterNo exceeds the MaxCluster of the volume.
   @retval EFI_DEVICE_ERROR       Read disk error
 
 **/
@@ -256,13 +256,13 @@ FatGetNextCluster (
 /**
   Set a file's CurrentPos and CurrentCluster, then compute StraightReadAmount.
 
-  @param  PrivateData            the global memory map 
-  @param  File                   the file 
-  @param  Pos                    the Position which is offset from the file's 
-                                 CurrentPos 
+  @param  PrivateData            the global memory map
+  @param  File                   the file
+  @param  Pos                    the Position which is offset from the file's
+                                 CurrentPos
 
-  @retval EFI_SUCCESS            Success. 
-  @retval EFI_INVALID_PARAMETER  Pos is beyond file's size. 
+  @retval EFI_SUCCESS            Success.
+  @retval EFI_INVALID_PARAMETER  Pos is beyond file's size.
   @retval EFI_DEVICE_ERROR       Something error while accessing media.
 
 **/
@@ -346,13 +346,13 @@ FatSetFilePos (
 /**
   Reads file data. Updates the file's CurrentPos.
 
-  @param  PrivateData            Global memory map for accessing global variables 
-  @param  File                   The file. 
-  @param  Size                   The amount of data to read. 
-  @param  Buffer                 The buffer storing the data. 
+  @param  PrivateData            Global memory map for accessing global variables
+  @param  File                   The file.
+  @param  Size                   The amount of data to read.
+  @param  Buffer                 The buffer storing the data.
 
-  @retval EFI_SUCCESS            The data is read. 
-  @retval EFI_INVALID_PARAMETER  File is invalid. 
+  @retval EFI_SUCCESS            The data is read.
+  @retval EFI_INVALID_PARAMETER  File is invalid.
   @retval EFI_DEVICE_ERROR       Something error while accessing media.
 
 **/
@@ -434,14 +434,14 @@ FatReadFile (
   The function updates the CurrentPos of the parent dir to after the item read.
   If no more items were found, the function returns EFI_NOT_FOUND.
 
-  @param  PrivateData            Global memory map for accessing global variables 
-  @param  ParentDir              The parent directory. 
-  @param  SubFile                The File structure containing the sub file that 
-                                 is caught. 
+  @param  PrivateData            Global memory map for accessing global variables
+  @param  ParentDir              The parent directory.
+  @param  SubFile                The File structure containing the sub file that
+                                 is caught.
 
-  @retval EFI_SUCCESS            The next sub file is obtained. 
-  @retval EFI_INVALID_PARAMETER  The ParentDir is not a directory. 
-  @retval EFI_NOT_FOUND          No more sub file exists. 
+  @retval EFI_SUCCESS            The next sub file is obtained.
+  @retval EFI_INVALID_PARAMETER  The ParentDir is not a directory.
+  @retval EFI_NOT_FOUND          No more sub file exists.
   @retval EFI_DEVICE_ERROR       Something error while accessing media.
 
 **/

@@ -3,7 +3,7 @@
 #
 #------------------------------------------------------------------------------
 #
-# Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -39,7 +39,7 @@ ASM_PFX(InternalMemCopyMem):
     pushq   %rdi
     movq    %rdx, %rsi                  # rsi <- Source
     movq    %rcx, %rdi                  # rdi <- Destination
-    leaq    -1(%rsi,%r8,), %r9          # r9 <- Last byte of Source      
+    leaq    -1(%rsi,%r8,), %r9          # r9 <- Last byte of Source
     cmpq    %rdi, %rsi
     movq    %rdi, %rax                  # rax <- Destination as return value
     jae     L0                          # Copy forward if Source > Destination

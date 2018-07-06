@@ -68,7 +68,7 @@ class Vtf (VtfClassObject):
         FvList = self.GetFvList()
         self.BsfInfName = os.path.join(GenFdsGlobalVariable.FvDir, self.UiName + '.inf')
         BsfInf = open(self.BsfInfName, 'w+')
-        if self.ResetBin != None:
+        if self.ResetBin is not None:
             BsfInf.writelines ("[OPTIONS]" + T_CHAR_LF)
             BsfInf.writelines ("IA32_RST_BIN" + \
                                " = " + \
@@ -89,7 +89,7 @@ class Vtf (VtfClassObject):
                                    'N' + \
                                    T_CHAR_LF)
 
-            elif ComponentObj.FilePos != None:
+            elif ComponentObj.FilePos is not None:
                 BsfInf.writelines ("COMP_LOC" + \
                                    " = " + \
                                    ComponentObj.FilePos + \

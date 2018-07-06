@@ -1,7 +1,7 @@
 /** @file
   SerialIo implementation for PCI or SIO UARTs.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -92,7 +92,7 @@ VerifyUartParameters (
       ((DataBits >= 6) && (DataBits <= 8) && (StopBits == OneFiveStopBits))
       ) {
     return FALSE;
-  } 
+  }
 
   //
   // Do not verify the baud rate if clock rate is unknown (0).
@@ -169,8 +169,8 @@ VerifyUartParameters (
   }
 
   //
-  // ActualBaudRate is higher than requested baud rate and more than 4% 
-  // higher than the requested value.  Increment Divisor if it is less 
+  // ActualBaudRate is higher than requested baud rate and more than 4%
+  // higher than the requested value.  Increment Divisor if it is less
   // than MAX_UINT16 and computed baud rate with new divisor.
   //
   if (ComputedDivisor == MAX_UINT16) {
@@ -212,7 +212,7 @@ SerialFifoFull (
 
 /**
   Detect whether specific FIFO is empty or not.
- 
+
   @param  Fifo    A pointer to the Data Structure SERIAL_DEV_FIFO
 
   @return whether specific FIFO is empty or not
@@ -363,7 +363,7 @@ SerialReceiveTransmit (
           Data = READ_RBR (SerialDevice);
 
           SerialFifoAdd (&SerialDevice->Receive, Data);
-          
+
           //
           // For full handshake flow control, if receive buffer full
           // tell the peer to stop sending data.
@@ -1065,7 +1065,7 @@ SerialWrite (
                 NULL
                 )
               );
-  
+
   for (Index = 0; Index < *BufferSize; Index++) {
     SerialFifoAdd (&SerialDevice->Transmit, CharBuffer[Index]);
 

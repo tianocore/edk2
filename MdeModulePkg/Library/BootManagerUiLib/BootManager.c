@@ -1,7 +1,7 @@
 /** @file
   The boot manager reference implementation
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
@@ -62,7 +62,7 @@ HII_VENDOR_DEVICE_PATH  mBootManagerHiiVendorDevicePath = {
   {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    { 
+    {
       (UINT8) (END_DEVICE_PATH_LENGTH),
       (UINT8) ((END_DEVICE_PATH_LENGTH) >> 8)
     }
@@ -82,9 +82,9 @@ BOOT_MANAGER_CALLBACK_DATA  gBootManagerPrivate = {
 
 /**
   This function will change video resolution and text mode
-  according to defined setup mode or defined boot mode  
+  according to defined setup mode or defined boot mode
 
-  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode. 
+  @param  IsSetupMode   Indicate mode is changed to setup mode or boot mode.
 
   @retval  EFI_SUCCESS  Mode is changed successfully.
   @retval  Others             Mode failed to be changed.
@@ -111,13 +111,13 @@ BmSetConsoleMode (
   EFI_STATUS                            Status;
   UINTN                                 Index;
   UINTN                                 CurrentColumn;
-  UINTN                                 CurrentRow;  
+  UINTN                                 CurrentRow;
 
   MaxGopMode  = 0;
   MaxTextMode = 0;
 
   //
-  // Get current video resolution and text mode 
+  // Get current video resolution and text mode
   //
   Status = gBS->HandleProtocol (
                   gST->ConsoleOutHandle,
@@ -156,7 +156,7 @@ BmSetConsoleMode (
     NewHorizontalResolution = mBmBootHorizontalResolution;
     NewVerticalResolution   = mBmBootVerticalResolution;
     NewColumns              = mBmBootTextModeColumn;
-    NewRows                 = mBmBootTextModeRow;   
+    NewRows                 = mBmBootTextModeRow;
   }
 
   if (GraphicsOutput != NULL) {
@@ -340,7 +340,7 @@ BmSetupResetReminder (
 /**
   Group the legacy boot options in the BootOption.
 
-  The routine assumes the boot options in the beginning that covers all the device 
+  The routine assumes the boot options in the beginning that covers all the device
   types are ordered properly and re-position the following boot options just after
   the corresponding boot options with the same device type.
   For example:
@@ -466,7 +466,7 @@ BmDevicePathToStr (
   This function invokes Boot Manager. It then enumerate all boot options. If
   a boot option from the Boot Manager page is selected, Boot Manager will boot
   from this boot option.
-  
+
 **/
 VOID
 UpdateBootManager (
@@ -559,7 +559,7 @@ UpdateBootManager (
       NeedEndOp = FALSE;
       HiiCreateEndOpCode (StartOpCodeHandle);
     }
-    
+
     if (IsLegacyOption && DeviceType != ((BBS_BBS_DEVICE_PATH *) BootOption[Index].FilePath)->DeviceType) {
       if (NeedEndOp) {
         HiiCreateEndOpCode (StartOpCodeHandle);

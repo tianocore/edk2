@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -35,7 +35,7 @@
 #define UFS_PASS_THRU_SIG           SIGNATURE_32 ('U', 'F', 'S', 'P')
 
 //
-// Lun 0~7 is for 8 common luns. 
+// Lun 0~7 is for 8 common luns.
 // Lun 8~11 is for those 4 well known luns (Refer to UFS 2.0 spec Table 10.58 for details):
 //  Lun 8:  REPORT LUNS
 //  Lun 9:  UFS DEVICE
@@ -59,7 +59,7 @@ typedef struct {
   for(Entry = (ListHead)->ForwardLink, NextEntry = Entry->ForwardLink;\
       Entry != (ListHead); Entry = NextEntry, NextEntry = Entry->ForwardLink)
 
-typedef struct _UFS_PASS_THRU_PRIVATE_DATA {  
+typedef struct _UFS_PASS_THRU_PRIVATE_DATA {
   UINT32                              Signature;
   EFI_HANDLE                          Handle;
   EFI_EXT_SCSI_PASS_THRU_MODE         ExtScsiPassThruMode;

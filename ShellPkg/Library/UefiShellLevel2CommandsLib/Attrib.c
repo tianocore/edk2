@@ -2,7 +2,7 @@
   Main file for attrib shell level 2 function.
 
   (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -70,7 +70,7 @@ ShellCommandRunAttrib (
   Status = ShellCommandLineParse (AttribParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"attrib", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellLevel2HiiHandle, L"attrib", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -133,7 +133,7 @@ ShellCommandRunAttrib (
           ASSERT(ListOfFiles == NULL);
           Status = ShellOpenFileMetaArg((CHAR16*)FileName, EFI_FILE_MODE_READ, &ListOfFiles);
           if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));
             ShellStatus = SHELL_NOT_FOUND;
           } else {
             for (FileNode = (EFI_SHELL_FILE_INFO*)GetFirstNode(&ListOfFiles->Link)
@@ -153,7 +153,7 @@ ShellCommandRunAttrib (
                 FileNode->Info->Attribute&EFI_FILE_READ_ONLY? L'R':L' ',
                 FileNode->FileName
                );
-               
+
               if (ShellGetExecutionBreakFlag()) {
                   ShellStatus = SHELL_ABORTED;
                   break;
@@ -162,7 +162,7 @@ ShellCommandRunAttrib (
             Status = ShellCloseFileMetaArg(&ListOfFiles);
             ListOfFiles = NULL;
             if (EFI_ERROR(Status)) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_CLOSE_FAIL), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));  
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_CLOSE_FAIL), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));
               ShellStatus = SHELL_NOT_FOUND;
             }
           } // for loop for handling wildcard filenames
@@ -171,7 +171,7 @@ ShellCommandRunAttrib (
         //
         // fail as we have conflcting params.
         //
-        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel2HiiHandle, L"attrib");  
+        ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_CON), gShellLevel2HiiHandle, L"attrib");
         ShellStatus = SHELL_INVALID_PARAMETER;
       } else {
         //
@@ -188,7 +188,7 @@ ShellCommandRunAttrib (
             // make sure we are not failing on the first one we do... if yes that's an error...
             //
             if (ParamNumberCount == 1) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"attrib");  
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_FEW), gShellLevel2HiiHandle, L"attrib");
               ShellStatus = SHELL_INVALID_PARAMETER;
             }
             break;
@@ -205,7 +205,7 @@ ShellCommandRunAttrib (
           ASSERT(ListOfFiles == NULL);
           Status = ShellOpenFileMetaArg((CHAR16*)FileName, EFI_FILE_MODE_READ, &ListOfFiles);
           if (EFI_ERROR(Status)) {
-            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));  
+            ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));
             ShellStatus = SHELL_NOT_FOUND;
           } else {
             for (FileNode = (EFI_SHELL_FILE_INFO*)GetFirstNode(&ListOfFiles->Link)
@@ -231,7 +231,7 @@ ShellCommandRunAttrib (
                 //
                 Status = ShellSetFileInfo(FileNode->Handle, FileInfo);
                 if (EFI_ERROR(Status)) {
-                  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_AD), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));  
+                  ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_AD), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));
                   ShellStatus = SHELL_ACCESS_DENIED;
                 }
               }
@@ -247,7 +247,7 @@ ShellCommandRunAttrib (
               //
               Status = ShellSetFileInfo(FileNode->Handle, FileInfo);
               if (EFI_ERROR(Status)) {;
-                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_AD), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));  
+                ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_AD), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));
                 ShellStatus = SHELL_ACCESS_DENIED;
               }
 
@@ -256,7 +256,7 @@ ShellCommandRunAttrib (
             Status = ShellCloseFileMetaArg(&ListOfFiles);
             ListOfFiles = NULL;
             if (EFI_ERROR(Status)) {
-              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_CLOSE_FAIL), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));  
+              ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_CLOSE_FAIL), gShellLevel2HiiHandle, L"attrib", ShellCommandLineGetRawValue(Package, ParamNumberCount));
               ShellStatus = SHELL_NOT_FOUND;
             }
           } // for loop for handling wildcard filenames

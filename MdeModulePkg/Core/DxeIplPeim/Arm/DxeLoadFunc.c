@@ -1,7 +1,7 @@
 /** @file
-  ARM specifc functionality for DxeLoad. 
-  
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  ARM specifc functionality for DxeLoad.
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -65,7 +65,7 @@ HandOffToDxeCore (
 
   //
   // Update the contents of BSP stack HOB to reflect the real stack info passed to DxeCore.
-  //    
+  //
   UpdateStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN) BaseOfStack, STACK_SIZE);
 
   SwitchStack (

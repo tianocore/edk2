@@ -1,13 +1,13 @@
 /** @file
   The form data for user profile manager driver.
-    
-Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -47,7 +47,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define  LABEL_END                  0x00F0
 
 //
-// First form key (Add/modify/del user profile). 
+// First form key (Add/modify/del user profile).
 // First 2 bits (bit 16~15).
 //
 #define  KEY_MODIFY_USER            0x4000
@@ -77,7 +77,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Specified key, used in VFR (KEY_MODIFY_USER | KEY_SELECT_USER | KEY_MODIFY_NAME).
 //
-#define  KEY_MODIFY_USER_NAME       0x5200 
+#define  KEY_MODIFY_USER_NAME       0x5200
 
 //
 // Modify identity policy form key.
@@ -134,7 +134,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Device path modify key.
 // 2 bits (bit 12~11).
-// 
+//
 #define KEY_LOAD_PERMIT_MODIFY      0x0000
 #define KEY_LOAD_FORBID_MODIFY      0x0400
 #define KEY_CONNECT_PERMIT_MODIFY   0x0800

@@ -100,8 +100,6 @@ ASM_FUNC(ArmGetTTBR0BaseAddress)
 //  IN VOID  *MVA                    // R1
 //  );
 ASM_FUNC(ArmUpdateTranslationTableEntry)
-  mcr     p15,0,R0,c7,c14,1     @ DCCIMVAC Clean data cache by MVA
-  dsb
   mcr     p15,0,R1,c8,c7,1      @ TLBIMVA TLB Invalidate MVA
   mcr     p15,0,R9,c7,c5,6      @ BPIALL Invalidate Branch predictor array. R9 == NoOp
   dsb

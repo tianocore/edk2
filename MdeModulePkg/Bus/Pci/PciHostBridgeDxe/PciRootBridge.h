@@ -2,7 +2,7 @@
 
   The PCI Root Bridge header file.
 
-Copyright (c) 1999 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 1999 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -23,7 +23,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 //
 // Driver Consumed Protocol Prototypes
 //
-#include <Protocol/Metronome.h>
 #include <Protocol/CpuIo2.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/PciRootBridgeIo.h>
@@ -36,6 +35,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/BaseLib.h>
 #include <Library/PciSegmentLib.h>
 #include <Library/UefiLib.h>
+#include <Library/TimerLib.h>
 #include "PciHostResource.h"
 
 
@@ -574,7 +574,5 @@ RootBridgeIoConfiguration (
   )
 ;
 
-
-extern EFI_METRONOME_ARCH_PROTOCOL *mMetronome;
 extern EFI_CPU_IO2_PROTOCOL         *mCpuIo;
 #endif

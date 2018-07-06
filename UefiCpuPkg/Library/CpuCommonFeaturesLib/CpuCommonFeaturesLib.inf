@@ -4,7 +4,7 @@
 #  This library registers CPU features defined in Intel(R) 64 and IA-32
 #  Architectures Software Developer's Manual.
 #
-# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

@@ -4,7 +4,7 @@
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
-  Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1422,7 +1422,7 @@ EfiShellEnablePageBreak (
                                 variables with the format 'x=y', where x is the
                                 environment variable name and y is the value. If this
                                 is NULL, then the current shell environment is used.
-                            
+
   @param[out] StartImageStatus  Returned status from gBS->StartImage.
 
   @retval EFI_SUCCESS       The command executed successfully. The  status code
@@ -1460,7 +1460,7 @@ InternalShellExecuteDevicePath(
   ZeroMem(&ShellParamsProtocol, sizeof(EFI_SHELL_PARAMETERS_PROTOCOL));
 
   NewHandle = NULL;
-  
+
   NewCmdLine = AllocateCopyPool (StrSize (CommandLine), CommandLine);
   if (NewCmdLine == NULL) {
     return EFI_OUT_OF_RESOURCES;
@@ -1505,8 +1505,8 @@ InternalShellExecuteDevicePath(
     //
     if (LoadedImage->ImageCodeType != EfiLoaderCode){
       ShellPrintHiiEx(
-        -1, 
-        -1, 
+        -1,
+        -1,
         NULL,
         STRING_TOKEN (STR_SHELL_IMAGE_NOT_APP),
         ShellInfoObject.HiiHandle
@@ -1630,7 +1630,7 @@ FreeAlloc:
                                 variables with the format 'x=y', where x is the
                                 environment variable name and y is the value. If this
                                 is NULL, then the current shell environment is used.
-                
+
   @param[out] StartImageStatus  Returned status from the command line.
 
   @retval EFI_SUCCESS       The command executed successfully. The  status code
@@ -2210,7 +2210,7 @@ EfiShellGetGuidFromName(
   if (Guid == NULL || GuidName == NULL) {
     return (EFI_INVALID_PARAMETER);
   }
- 
+
   Status = GetGuidFromStringName(GuidName, NULL, &NewGuid);
 
   if (!EFI_ERROR(Status)) {
@@ -2762,8 +2762,8 @@ EfiShellGetEnvEx(
       ; Node = (ENV_VAR_LIST*)GetNextNode(&gShellEnvVarList.Link, &Node->Link)
      ){
       ASSERT(Node->Key != NULL);
-      StrCpyS( CurrentWriteLocation, 
-                (Size)/sizeof(CHAR16) - (CurrentWriteLocation - ((CHAR16*)Buffer)), 
+      StrCpyS( CurrentWriteLocation,
+                (Size)/sizeof(CHAR16) - (CurrentWriteLocation - ((CHAR16*)Buffer)),
                 Node->Key
                 );
       CurrentWriteLocation += StrLen(CurrentWriteLocation) + 1;
@@ -3233,9 +3233,9 @@ EfiShellGetHelpText(
         return EFI_OUT_OF_RESOURCES;
       }
 
-      StrnCpyS( FixCommand, 
-                (StrSize(Command) - 4 * sizeof (CHAR16))/sizeof(CHAR16), 
-                Command, 
+      StrnCpyS( FixCommand,
+                (StrSize(Command) - 4 * sizeof (CHAR16))/sizeof(CHAR16),
+                Command,
                 StrLen(Command)-4
                 );
       Status = ProcessManFile(FixCommand, FixCommand, Sections, NULL, HelpText);
@@ -3295,7 +3295,7 @@ InternalEfiShellGetListAlias(
   VOID
   )
 {
-  
+
   EFI_STATUS        Status;
   EFI_GUID          Guid;
   CHAR16            *VariableName;
@@ -3330,17 +3330,17 @@ InternalEfiShellGetListAlias(
         RetVal = NULL;
         break;
       }
-      
+
       NameSize = NameBufferSize;
       Status = gRT->GetNextVariableName(&NameSize, VariableName, &Guid);
     }
-    
+
     if (EFI_ERROR (Status)) {
       SHELL_FREE_NON_NULL(RetVal);
       RetVal = NULL;
       break;
     }
-    
+
     if (CompareGuid(&Guid, &gShellAliasGuid)){
       ASSERT((RetVal == NULL && RetSize == 0) || (RetVal != NULL));
       RetVal = StrnCatGrow(&RetVal, &RetSize, VariableName, 0);
@@ -3355,10 +3355,10 @@ InternalEfiShellGetListAlias(
 /**
   Convert a null-terminated unicode string, in-place, to all lowercase.
   Then return it.
-  
+
   @param  Str    The null-terminated string to be converted to all lowercase.
-  
-  @return        The null-terminated string converted into all lowercase.  
+
+  @return        The null-terminated string converted into all lowercase.
 **/
 CHAR16 *
 ToLower (
@@ -3385,7 +3385,7 @@ ToLower (
   @param[out] Volatile          upon return of a single command if TRUE indicates
                                 this is stored in a volatile fashion.  FALSE otherwise.
 
-  @return                      	If Alias is not NULL, it will return a pointer to
+  @return                        If Alias is not NULL, it will return a pointer to
                                 the NULL-terminated command for that alias.
                                 If Alias is NULL, ReturnedData points to a ';'
                                 delimited list of alias (e.g.
@@ -3801,7 +3801,7 @@ CleanUpShellEnvironment (
 {
   EFI_STATUS                        Status;
   EFI_SIMPLE_TEXT_INPUT_EX_PROTOCOL *SimpleEx;
-  
+
   CleanUpShellProtocol (NewShell);
 
   Status = gBS->CloseEvent(NewShell->ExecutionBreak);
@@ -3844,21 +3844,21 @@ NotificationFunction(
   if ( ((KeyData->Key.UnicodeChar == L'c') &&
         (KeyData->KeyState.KeyShiftState == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))) ||
       (KeyData->Key.UnicodeChar == 3)
-      ){ 
+      ){
     if (ShellInfoObject.NewEfiShellProtocol->ExecutionBreak == NULL) {
       return (EFI_UNSUPPORTED);
     }
     return (gBS->SignalEvent(ShellInfoObject.NewEfiShellProtocol->ExecutionBreak));
   } else if  ((KeyData->Key.UnicodeChar == L's') &&
               (KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_LEFT_CONTROL_PRESSED) || KeyData->KeyState.KeyShiftState  == (EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED))
-              ){ 
+              ){
     ShellInfoObject.HaltOutput = TRUE;
   }
   return (EFI_SUCCESS);
 }
 
 /**
-  Function to start monitoring for CTRL-C using SimpleTextInputEx.  This 
+  Function to start monitoring for CTRL-C using SimpleTextInputEx.  This
   feature's enabled state was not known when the shell initially launched.
 
   @retval EFI_SUCCESS           The feature is enabled.
@@ -3882,8 +3882,8 @@ InernalEfiShellStartMonitor(
     EFI_OPEN_PROTOCOL_GET_PROTOCOL);
   if (EFI_ERROR(Status)) {
     ShellPrintHiiEx(
-      -1, 
-      -1, 
+      -1,
+      -1,
       NULL,
       STRING_TOKEN (STR_SHELL_NO_IN_EX),
       ShellInfoObject.HiiHandle);
@@ -3904,7 +3904,7 @@ InernalEfiShellStartMonitor(
     &KeyData,
     NotificationFunction,
     &ShellInfoObject.CtrlCNotifyHandle1);
-  
+
   KeyData.KeyState.KeyShiftState  = EFI_SHIFT_STATE_VALID|EFI_RIGHT_CONTROL_PRESSED;
   if (!EFI_ERROR(Status)) {
     Status = SimpleEx->RegisterKeyNotify(

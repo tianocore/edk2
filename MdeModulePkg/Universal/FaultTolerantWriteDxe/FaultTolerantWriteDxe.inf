@@ -1,11 +1,11 @@
 ## @file
 # Fault Tolerant Write Dxe Driver.
 #
-# This driver installs Fault Tolerant Write (FTW) protocol, 
+# This driver installs Fault Tolerant Write (FTW) protocol,
 # which provides fault tolerant write capability for block devices.
 # Its implementation depends on the full functionality FVB protocol that support read, write/erase flash access.
 #
-# Copyright (c) 2006 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License

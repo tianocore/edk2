@@ -2,7 +2,7 @@
   Provides a service to retrieve a pointer to the SMM Services Table.
   Only available to SMM module types.
 
-Copyright (c) 2009, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -24,14 +24,14 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 extern EFI_SMM_SYSTEM_TABLE2   *gSmst;
 
 /**
-  This function allows the caller to determine if the driver is executing in 
+  This function allows the caller to determine if the driver is executing in
   System Management Mode(SMM).
 
-  This function returns TRUE if the driver is executing in SMM and FALSE if the 
+  This function returns TRUE if the driver is executing in SMM and FALSE if the
   driver is not executing in SMM.
 
   @retval  TRUE  The driver is executing in System Management Mode (SMM).
-  @retval  FALSE The driver is not executing in System Management Mode (SMM). 
+  @retval  FALSE The driver is not executing in System Management Mode (SMM).
 
 **/
 BOOLEAN

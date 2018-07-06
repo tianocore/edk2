@@ -1,6 +1,7 @@
 /**@file
 
 Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+(C) Copyright 2018 Hewlett Packard Enterprise Development LP<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -453,7 +454,7 @@ Returns:
     ASSERT (PcdTempStr != NULL);
 
     TempStrSize = StrLen (PcdTempStr);
-    TempStr = AllocateMemory ((TempStrSize * sizeof (CHAR16)) + 1);
+    TempStr = AllocateMemory (((TempStrSize + 1) * sizeof (CHAR16)));
     StrCpy (TempStr, PcdTempStr);
 
     StartString = TempStr;

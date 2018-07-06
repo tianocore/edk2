@@ -2,7 +2,7 @@
 
   Implements get/set firmware volume attributes.
 
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -65,7 +65,7 @@ FvGetVolumeAttributes (
                         unsuccessful return, FvAttributes is not
                         modified and the firmware volume
                         settings are not changed.
-  
+
   @retval EFI_SUCCESS             The requested firmware volume attributes
                                   were set and the resulting
                                   EFI_FV_ATTRIBUTES is returned in

@@ -419,7 +419,7 @@ SdMmcHcWaitMmioSet (
 /**
   Software reset the specified SD/MMC host controller and enable all interrupts.
 
-  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
   @param[in] Slot           The slot number of the SD card to send the command to.
 
   @retval EFI_SUCCESS       The software reset executes successfully.
@@ -428,13 +428,32 @@ SdMmcHcWaitMmioSet (
 **/
 EFI_STATUS
 SdMmcHcReset (
-  IN EFI_PCI_IO_PROTOCOL    *PciIo,
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
   IN UINT8                  Slot
   )
 {
   EFI_STATUS                Status;
   UINT8                     SwReset;
+  EFI_PCI_IO_PROTOCOL       *PciIo;
 
+  //
+  // Notify the SD/MMC override protocol that we are about to reset
+  // the SD/MMC host controller.
+  //
+  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
+    Status = mOverride->NotifyPhase (
+                          Private->ControllerHandle,
+                          Slot,
+                          EdkiiSdMmcResetPre);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN,
+        "%a: SD/MMC pre reset notifier callback failed - %r\n",
+        __FUNCTION__, Status));
+      return Status;
+    }
+  }
+
+  PciIo   = Private->PciIo;
   SwReset = 0xFF;
   Status  = SdMmcHcRwMmio (PciIo, Slot, SD_MMC_HC_SW_RST, FALSE, sizeof (SwReset), &SwReset);
 
@@ -456,10 +475,32 @@ SdMmcHcReset (
     DEBUG ((DEBUG_INFO, "SdMmcHcReset: reset done with %r\n", Status));
     return Status;
   }
+
   //
   // Enable all interrupt after reset all.
   //
   Status = SdMmcHcEnableInterrupt (PciIo, Slot);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "SdMmcHcReset: SdMmcHcEnableInterrupt done with %r\n",
+      Status));
+    return Status;
+  }
+
+  //
+  // Notify the SD/MMC override protocol that we have just reset
+  // the SD/MMC host controller.
+  //
+  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
+    Status = mOverride->NotifyPhase (
+                          Private->ControllerHandle,
+                          Slot,
+                          EdkiiSdMmcResetPost);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN,
+        "%a: SD/MMC post reset notifier callback failed - %r\n",
+        __FUNCTION__, Status));
+    }
+  }
 
   return Status;
 }
@@ -1021,9 +1062,8 @@ SdMmcHcInitTimeoutCtrl (
   Initial SD/MMC host controller with lowest clock frequency, max power and max timeout value
   at initialization.
 
-  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Private        A pointer to the SD_MMC_HC_PRIVATE_DATA instance.
   @param[in] Slot           The slot number of the SD card to send the command to.
-  @param[in] Capability     The capability of the slot.
 
   @retval EFI_SUCCESS       The host controller is initialized successfully.
   @retval Others            The host controller isn't initialized successfully.
@@ -1031,12 +1071,33 @@ SdMmcHcInitTimeoutCtrl (
 **/
 EFI_STATUS
 SdMmcHcInitHost (
-  IN EFI_PCI_IO_PROTOCOL    *PciIo,
-  IN UINT8                  Slot,
-  IN SD_MMC_HC_SLOT_CAP     Capability
+  IN SD_MMC_HC_PRIVATE_DATA *Private,
+  IN UINT8                  Slot
   )
 {
-  EFI_STATUS       Status;
+  EFI_STATUS                Status;
+  EFI_PCI_IO_PROTOCOL       *PciIo;
+  SD_MMC_HC_SLOT_CAP        Capability;
+
+  //
+  // Notify the SD/MMC override protocol that we are about to initialize
+  // the SD/MMC host controller.
+  //
+  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
+    Status = mOverride->NotifyPhase (
+                          Private->ControllerHandle,
+                          Slot,
+                          EdkiiSdMmcInitHostPre);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN,
+        "%a: SD/MMC pre init notifier callback failed - %r\n",
+        __FUNCTION__, Status));
+      return Status;
+    }
+  }
+
+  PciIo = Private->PciIo;
+  Capability = Private->Capability[Slot];
 
   Status = SdMmcHcInitClockFreq (PciIo, Slot, Capability);
   if (EFI_ERROR (Status)) {
@@ -1049,6 +1110,25 @@ SdMmcHcInitHost (
   }
 
   Status = SdMmcHcInitTimeoutCtrl (PciIo, Slot);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Notify the SD/MMC override protocol that we are have just initialized
+  // the SD/MMC host controller.
+  //
+  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
+    Status = mOverride->NotifyPhase (
+                          Private->ControllerHandle,
+                          Slot,
+                          EdkiiSdMmcInitHostPost);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN,
+        "%a: SD/MMC post init notifier callback failed - %r\n",
+        __FUNCTION__, Status));
+    }
+  }
   return Status;
 }
 

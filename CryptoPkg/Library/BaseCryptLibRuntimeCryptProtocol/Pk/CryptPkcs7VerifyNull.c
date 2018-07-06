@@ -2,7 +2,7 @@
   PKCS#7 SignedData Verification Wrapper Implementation which does not provide
   real capabilities.
 
-Copyright (c) 2012 - 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -53,7 +53,7 @@ Pkcs7GetSigners (
   Wrap function to use free() to free allocated memory for certificates.
 
   If the interface is not supported, then ASSERT().
-  
+
   @param[in]  Certs        Pointer to the certificates to be freed.
 
 **/

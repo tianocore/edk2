@@ -1,13 +1,13 @@
 /** @file
   VFR file used by the TCG2 configuration component.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -19,7 +19,7 @@ formset
   title     = STRING_TOKEN(STR_TCG2_TITLE),
   help      = STRING_TOKEN(STR_TCG2_HELP),
   classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
-  
+
   efivarstore TCG2_CONFIGURATION_INFO,
     varid = TCG2_CONFIGURATION_INFO_VARSTORE_ID,
     attribute = 0x02,  // EFI variable attribures  EFI_VARIABLE_BOOTSERVICE_ACCESS
@@ -154,7 +154,7 @@ formset
             option text = STRING_TOKEN(STR_TCG2_LOG_ALL_DIGESTS), value = TCG2_PHYSICAL_PRESENCE_LOG_ALL_DIGESTS, flags = RESET_REQUIRED;
             option text = STRING_TOKEN(STR_TCG2_DISABLE_ENDORSEMENT_ENABLE_STORAGE_HIERARCHY), value = TCG2_PHYSICAL_PRESENCE_DISABLE_ENDORSEMENT_ENABLE_STORAGE_HIERARCHY, flags = RESET_REQUIRED;
     endoneof;
-    
+
     suppressif NOT questionref(Tpm2Operation) == TCG2_PHYSICAL_PRESENCE_SET_PCR_BANKS;
     numeric name = Tpm2OperationParameter,
             questionid = KEY_TPM2_OPERATION_PARAMETER,

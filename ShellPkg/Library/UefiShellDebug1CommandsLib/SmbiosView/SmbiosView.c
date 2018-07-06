@@ -2,7 +2,7 @@
   Tools of clarify the content of the smbios table.
 
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -69,7 +69,7 @@ ShellCommandRunSmbiosView (
   Status = ShellCommandLineParse (ParamList, &Package, &ProblemParam, TRUE);
   if (EFI_ERROR(Status)) {
     if (Status == EFI_VOLUME_CORRUPTED && ProblemParam != NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"smbiosview", ProblemParam);  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PROBLEM), gShellDebug1HiiHandle, L"smbiosview", ProblemParam);
       FreePool(ProblemParam);
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
@@ -77,13 +77,13 @@ ShellCommandRunSmbiosView (
     }
   } else {
     if (ShellCommandLineGetCount(Package) > 1) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"smbiosview");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"smbiosview");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetFlag(Package, L"-t") && ShellCommandLineGetValue(Package, L"-t") == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"smbiosview", L"-t");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle, L"smbiosview", L"-t");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (ShellCommandLineGetFlag(Package, L"-h") && ShellCommandLineGetValue(Package, L"-h") == NULL) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle,  L"smbiosview", L"-h");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_NO_VALUE), gShellDebug1HiiHandle,  L"smbiosview", L"-h");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else if (
         (ShellCommandLineGetFlag(Package, L"-t") && ShellCommandLineGetFlag(Package, L"-h")) ||
@@ -93,7 +93,7 @@ ShellCommandRunSmbiosView (
         (ShellCommandLineGetFlag(Package, L"-h") && ShellCommandLineGetFlag(Package, L"-a")) ||
         (ShellCommandLineGetFlag(Package, L"-s") && ShellCommandLineGetFlag(Package, L"-a"))
       ) {
-      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"smbiosview");  
+      ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_TOO_MANY), gShellDebug1HiiHandle, L"smbiosview");
       ShellStatus = SHELL_INVALID_PARAMETER;
     } else {
 
@@ -103,30 +103,30 @@ ShellCommandRunSmbiosView (
       Status1 = LibSmbiosInit ();
       Status2 = LibSmbios64BitInit ();
       if (EFI_ERROR (Status1) && EFI_ERROR (Status2)) {
-      	ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_CANNOT_GET_TABLE), gShellDebug1HiiHandle);
+        ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_LIBSMBIOSVIEW_CANNOT_GET_TABLE), gShellDebug1HiiHandle);
         ShellStatus = SHELL_NOT_FOUND;
         goto Done;
       }
-      
+
       StructType    = STRUCTURE_TYPE_RANDOM;
       RandomView    = TRUE;
-      
+
       Temp          = ShellCommandLineGetValue(Package, L"-t");
       if (Temp != NULL) {
         StructType = (UINT8) ShellStrToUintn (Temp);
       }
-      
+
       if (ShellCommandLineGetFlag(Package, L"-a")) {
         gShowType = SHOW_ALL;
       }
-      
+
       if (!EFI_ERROR (Status1)) {
         //
         // Initialize the StructHandle to be the first handle
         //
         StructHandle  = INVALID_HANDLE;
         LibGetSmbiosStructure (&StructHandle, NULL, NULL);
-        
+
         Temp = ShellCommandLineGetValue(Package, L"-h");
         if (Temp != NULL) {
           RandomView   = FALSE;
@@ -140,7 +140,7 @@ ShellCommandRunSmbiosView (
           ShellStatus = SHELL_NOT_FOUND;
           goto Done;
         }
-        
+
         if (ShellCommandLineGetFlag(Package, L"-s")) {
           Status = DisplayStatisticsTable (SHOW_DETAIL);
           if (EFI_ERROR(Status)) {
@@ -148,7 +148,7 @@ ShellCommandRunSmbiosView (
           }
           goto Show64Bit;
         }
-        
+
         //
         // Show SMBIOS structure information
         //
@@ -174,13 +174,13 @@ Show64Bit:
         //
         StructHandle  = INVALID_HANDLE;
         LibGetSmbios64BitStructure (&StructHandle, NULL, NULL);
-        
+
         Temp = ShellCommandLineGetValue(Package, L"-h");
         if (Temp != NULL) {
           RandomView   = FALSE;
           StructHandle = (UINT16) ShellStrToUintn(Temp);
         }
-        
+
         if (ShellCommandLineGetFlag(Package, L"-s")) {
           Status = DisplaySmbios64BitStatisticsTable (SHOW_DETAIL);
           if (EFI_ERROR(Status)) {
@@ -188,7 +188,7 @@ Show64Bit:
           }
           goto Done;
         }
-        
+
         //
         // Show SMBIOS structure information
         //
@@ -666,7 +666,7 @@ InitSmbiosTableStatistics (
   @param[out] NumberOfSmbios64Structures  The number of structures in 64-bit SMBIOS table.
   @param[out] Smbios64TableLength         The total length of 64-bit SMBIOS table.
 
-  @retval EFI_SUCCESS           					Calculation was successful.
+  @retval EFI_SUCCESS                     Calculation was successful.
 **/
 EFI_STATUS
 CalculateSmbios64BitStructureCountAndLength (
@@ -677,10 +677,10 @@ CalculateSmbios64BitStructureCountAndLength (
 {
   SMBIOS_STRUCTURE_POINTER        Smbios;
   UINT8                           *Raw;
-  
+
   *Smbios64TableLength = 0;
   *NumberOfSmbios64Structures = 0;
-  
+
   Smbios.Raw = (UINT8 *)(UINTN)(Smbios64EntryPoint->TableAddress);
   while (TRUE) {
     if (Smbios.Hdr->Type == 127) {
@@ -702,11 +702,11 @@ CalculateSmbios64BitStructureCountAndLength (
     //
     (*Smbios64TableLength) += ((UINTN) Smbios.Raw - (UINTN) Raw);
     if ((*Smbios64TableLength) > Smbios64EntryPoint->TableMaximumSize) {
-    	//
-    	// The actual table length exceeds maximum table size,
-    	// There should be something wrong with SMBIOS table.
-    	//
-    	return EFI_INVALID_PARAMETER;
+      //
+      // The actual table length exceeds maximum table size,
+      // There should be something wrong with SMBIOS table.
+      //
+      return EFI_INVALID_PARAMETER;
     }
     (*NumberOfSmbios64Structures)++;
   }
@@ -727,7 +727,7 @@ InitSmbios64BitTableStatistics (
   UINT16                    Length;
   UINT16                    Offset;
   UINT16                    Index;
-	EFI_STATUS								Status;
+  EFI_STATUS                Status;
   SMBIOS_STRUCTURE_POINTER      SmbiosStruct;
   SMBIOS_TABLE_3_0_ENTRY_POINT  *SMBiosTable;
   STRUCTURE_STATISTICS          *StatisticsPointer;
@@ -755,9 +755,9 @@ InitSmbios64BitTableStatistics (
   //
   Status = CalculateSmbios64BitStructureCountAndLength (SMBiosTable, &mNumberOfSmbios64BitStructures, &mSmbios64BitTableLength);
   if ((EFI_ERROR (Status)) || (mSmbios64BitTableLength > SMBiosTable->TableMaximumSize)) {
-  	return EFI_INVALID_PARAMETER;
+    return EFI_INVALID_PARAMETER;
   }
-  
+
   mSmbios64BitStatisticsTable = (STRUCTURE_STATISTICS *) AllocateZeroPool (mNumberOfSmbios64BitStructures * sizeof (STRUCTURE_STATISTICS));
 
   if (mSmbios64BitStatisticsTable == NULL) {

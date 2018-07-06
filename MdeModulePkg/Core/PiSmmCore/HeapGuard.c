@@ -1,7 +1,7 @@
 /** @file
   UEFI Heap Guard functions.
 
-Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2017-2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -73,7 +73,7 @@ SetBits (
   StartBit  = (UINTN)GUARDED_HEAP_MAP_ENTRY_BIT_INDEX (Address);
   EndBit    = (StartBit + BitNumber - 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
 
-  if ((StartBit + BitNumber) > GUARDED_HEAP_MAP_ENTRY_BITS) {
+  if ((StartBit + BitNumber) >= GUARDED_HEAP_MAP_ENTRY_BITS) {
     Msbs    = (GUARDED_HEAP_MAP_ENTRY_BITS - StartBit) %
               GUARDED_HEAP_MAP_ENTRY_BITS;
     Lsbs    = (EndBit + 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
@@ -126,7 +126,7 @@ ClearBits (
   StartBit  = (UINTN)GUARDED_HEAP_MAP_ENTRY_BIT_INDEX (Address);
   EndBit    = (StartBit + BitNumber - 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
 
-  if ((StartBit + BitNumber) > GUARDED_HEAP_MAP_ENTRY_BITS) {
+  if ((StartBit + BitNumber) >= GUARDED_HEAP_MAP_ENTRY_BITS) {
     Msbs    = (GUARDED_HEAP_MAP_ENTRY_BITS - StartBit) %
               GUARDED_HEAP_MAP_ENTRY_BITS;
     Lsbs    = (EndBit + 1) % GUARDED_HEAP_MAP_ENTRY_BITS;
@@ -191,10 +191,14 @@ GetBits (
     Lsbs = 0;
   }
 
-  Result    = RShiftU64 ((*BitMap), StartBit) & (LShiftU64 (1, Msbs) - 1);
-  if (Lsbs > 0) {
-    BitMap  += 1;
-    Result  |= LShiftU64 ((*BitMap) & (LShiftU64 (1, Lsbs) - 1), Msbs);
+  if (StartBit == 0 && BitNumber == GUARDED_HEAP_MAP_ENTRY_BITS) {
+    Result = *BitMap;
+  } else {
+    Result    = RShiftU64((*BitMap), StartBit) & (LShiftU64(1, Msbs) - 1);
+    if (Lsbs > 0) {
+      BitMap  += 1;
+      Result  |= LShiftU64 ((*BitMap) & (LShiftU64 (1, Lsbs) - 1), Msbs);
+    }
   }
 
   return Result;
@@ -251,8 +255,8 @@ FindGuardedMemoryMap (
   //
   // Adjust current map table depth according to the address to access
   //
-  while (mMapLevel < GUARDED_HEAP_MAP_TABLE_DEPTH
-         &&
+  while (AllocMapUnit &&
+         mMapLevel < GUARDED_HEAP_MAP_TABLE_DEPTH &&
          RShiftU64 (
            Address,
            mLevelShift[GUARDED_HEAP_MAP_TABLE_DEPTH - mMapLevel - 1]
@@ -588,14 +592,17 @@ SetGuardPage (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress
   )
 {
+  EFI_STATUS      Status;
+
   if (mSmmMemoryAttribute != NULL) {
     mOnGuarding = TRUE;
-    mSmmMemoryAttribute->SetMemoryAttributes (
-                           mSmmMemoryAttribute,
-                           BaseAddress,
-                           EFI_PAGE_SIZE,
-                           EFI_MEMORY_RP
-                           );
+    Status = mSmmMemoryAttribute->SetMemoryAttributes (
+                                    mSmmMemoryAttribute,
+                                    BaseAddress,
+                                    EFI_PAGE_SIZE,
+                                    EFI_MEMORY_RP
+                                    );
+    ASSERT_EFI_ERROR (Status);
     mOnGuarding = FALSE;
   }
 }
@@ -615,14 +622,17 @@ UnsetGuardPage (
   IN  EFI_PHYSICAL_ADDRESS      BaseAddress
   )
 {
+  EFI_STATUS      Status;
+
   if (mSmmMemoryAttribute != NULL) {
     mOnGuarding = TRUE;
-    mSmmMemoryAttribute->ClearMemoryAttributes (
-                           mSmmMemoryAttribute,
-                           BaseAddress,
-                           EFI_PAGE_SIZE,
-                           EFI_MEMORY_RP
-                           );
+    Status = mSmmMemoryAttribute->ClearMemoryAttributes (
+                                    mSmmMemoryAttribute,
+                                    BaseAddress,
+                                    EFI_PAGE_SIZE,
+                                    EFI_MEMORY_RP
+                                    );
+    ASSERT_EFI_ERROR (Status);
     mOnGuarding = FALSE;
   }
 }
@@ -887,11 +897,8 @@ AdjustMemoryS (
   }
 
   Target = Start + Size - SizeRequested;
-
-  //
-  // At least one more page needed for Guard page.
-  //
-  if (Size < (SizeRequested + EFI_PAGES_TO_SIZE (1))) {
+  ASSERT (Target >= Start);
+  if (Target == 0) {
     return 0;
   }
 
@@ -940,6 +947,7 @@ AdjustMemoryF (
   EFI_PHYSICAL_ADDRESS  MemoryToTest;
   UINTN                 PagesToFree;
   UINT64                GuardBitmap;
+  UINT64                Attributes;
 
   if (Memory == NULL || NumberOfPages == NULL || *NumberOfPages == 0) {
     return;
@@ -947,6 +955,27 @@ AdjustMemoryF (
 
   Start = *Memory;
   PagesToFree = *NumberOfPages;
+
+  //
+  // In case the memory to free is marked as read-only (e.g. EfiRuntimeServicesCode).
+  //
+  if (mSmmMemoryAttribute != NULL) {
+    Attributes = 0;
+    mSmmMemoryAttribute->GetMemoryAttributes (
+                           mSmmMemoryAttribute,
+                           Start,
+                           EFI_PAGES_TO_SIZE (PagesToFree),
+                           &Attributes
+                           );
+    if ((Attributes & EFI_MEMORY_RO) != 0) {
+      mSmmMemoryAttribute->ClearMemoryAttributes (
+                             mSmmMemoryAttribute,
+                             Start,
+                             EFI_PAGES_TO_SIZE (PagesToFree),
+                             EFI_MEMORY_RO
+                             );
+    }
+  }
 
   //
   // Head Guard must be one page before, if any.
@@ -1204,6 +1233,10 @@ SmmInternalFreePagesExWithGuard (
 {
   EFI_PHYSICAL_ADDRESS    MemoryToFree;
   UINTN                   PagesToFree;
+
+  if (((Memory & EFI_PAGE_MASK) != 0) || (Memory == 0) || (NumberOfPages == 0)) {
+    return EFI_INVALID_PARAMETER;
+  }
 
   MemoryToFree  = Memory;
   PagesToFree   = NumberOfPages;

@@ -5,13 +5,13 @@
   It abstracts the location and characteristics of SMRAM.  The expectation is
   that the north bridge or memory controller would publish this PPI.
 
-  The principal functionality found in the memory controller includes the following: 
+  The principal functionality found in the memory controller includes the following:
   - Exposing the SMRAM to all non-SMM agents, or the "open" state
   - Shrouding the SMRAM to all but the SMM agents, or the "closed" state
-  - Preserving the system integrity, or "locking" the SMRAM, such that the settings cannot be 
-    perturbed by either boot service or runtime agents 
+  - Preserving the system integrity, or "locking" the SMRAM, such that the settings cannot be
+    perturbed by either boot service or runtime agents
 
-Copyright (c) 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -35,18 +35,18 @@ typedef struct _PEI_SMM_ACCESS_PPI  PEI_SMM_ACCESS_PPI;
 /**
   Opens the SMRAM area to be accessible by a PEIM driver.
 
-  This function "opens" SMRAM so that it is visible while not inside of SMM. The function should 
-  return EFI_UNSUPPORTED if the hardware does not support hiding of SMRAM. The function 
+  This function "opens" SMRAM so that it is visible while not inside of SMM. The function should
+  return EFI_UNSUPPORTED if the hardware does not support hiding of SMRAM. The function
   should return EFI_DEVICE_ERROR if the SMRAM configuration is locked.
 
   @param  PeiServices            General purpose services available to every PEIM.
   @param  This                   The pointer to the SMM Access Interface.
   @param  DescriptorIndex        The region of SMRAM to Open.
-  
+
   @retval EFI_SUCCESS            The region was successfully opened.
   @retval EFI_DEVICE_ERROR       The region could not be opened because locked by chipset.
   @retval EFI_INVALID_PARAMETER  The descriptor index was out of bounds.
-  
+
 **/
 typedef
 EFI_STATUS
@@ -59,15 +59,15 @@ EFI_STATUS
 /**
   Inhibits access to the SMRAM.
 
-  This function "closes" SMRAM so that it is not visible while outside of SMM. The function should 
+  This function "closes" SMRAM so that it is not visible while outside of SMM. The function should
   return EFI_UNSUPPORTED if the hardware does not support hiding of SMRAM.
 
   @param  PeiServices              General purpose services available to every PEIM.
   @param  This                     The pointer to the SMM Access Interface.
   @param  DescriptorIndex          The region of SMRAM to Close.
-  
+
   @retval EFI_SUCCESS              The region was successfully closed.
-  @retval EFI_DEVICE_ERROR         The region could not be closed because locked by chipset.                           
+  @retval EFI_DEVICE_ERROR         The region could not be closed because locked by chipset.
   @retval EFI_INVALID_PARAMETER    The descriptor index was out of bounds.
 
 **/
@@ -82,13 +82,13 @@ EFI_STATUS
 /**
   Inhibits access to the SMRAM.
 
-  This function prohibits access to the SMRAM region.  This function is usually implemented such 
-  that it is a write-once operation. 
+  This function prohibits access to the SMRAM region.  This function is usually implemented such
+  that it is a write-once operation.
 
   @param  PeiServices              General purpose services available to every PEIM.
   @param  This                     The pointer to the SMM Access Interface.
   @param  DescriptorIndex          The region of SMRAM to Close.
-  
+
   @retval EFI_SUCCESS            The region was successfully locked.
   @retval EFI_DEVICE_ERROR       The region could not be locked because at least
                                  one range is still open.
@@ -112,7 +112,7 @@ EFI_STATUS
                                 buffer to contain the description information.
   @param SmramMap               The buffer containing the data describing the Smram
                                 region descriptors.
-  
+
   @retval EFI_BUFFER_TOO_SMALL  The user did not provide a sufficient buffer.
   @retval EFI_SUCCESS           The user provided a sufficiently-sized buffer.
 
@@ -128,10 +128,10 @@ EFI_STATUS
 
 ///
 ///  EFI SMM Access PPI is used to control the visibility of the SMRAM on the platform.
-///  It abstracts the location and characteristics of SMRAM. The platform should report 
-///  all MMRAM via PEI_SMM_ACCESS_PPI. The expectation is that the north bridge or 
+///  It abstracts the location and characteristics of SMRAM. The platform should report
+///  all MMRAM via PEI_SMM_ACCESS_PPI. The expectation is that the north bridge or
 ///  memory controller would publish this PPI.
-/// 
+///
 struct _PEI_SMM_ACCESS_PPI {
   PEI_SMM_OPEN          Open;
   PEI_SMM_CLOSE         Close;

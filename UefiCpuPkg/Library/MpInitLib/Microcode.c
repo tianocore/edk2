@@ -1,7 +1,7 @@
 /** @file
   Implementation of loading microcode on processors.
 
-  Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -77,7 +77,7 @@ MicrocodeDetect (
   ExtendedTableLength = 0;
   //
   // Here data of CPUID leafs have not been collected into context buffer, so
-  // GetProcessorCpuid() cannot be used here to retrieve sCPUID data.
+  // GetProcessorCpuid() cannot be used here to retrieve CPUID data.
   //
   AsmCpuid (CPUID_VERSION_INFO, &Eax.Uint32, NULL, NULL, NULL);
 

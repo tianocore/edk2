@@ -1,9 +1,9 @@
 /** @file
   I/O Library.
-  The implementation of I/O operation for this library instance 
+  The implementation of I/O operation for this library instance
   are based on EFI_CPU_IO_PROTOCOL.
-  
-  Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -217,7 +217,7 @@ MmioReadWorker (
                         The caller is responsible for aligning the Address if required.
   @param  Width         The width of the I/O operation.
   @param  Data          The value to write to the I/O port.
-  
+
   @return Data read from registers in the EFI system memory space.
 
 **/
@@ -293,7 +293,7 @@ IoWrite8 (
   serialized.
 
   If Port is not aligned on a 16-bit boundary, then ASSERT().
- 
+
   If 16-bit I/O port operations are not supported, then ASSERT().
 
   @param  Port  The I/O port to read.
@@ -351,7 +351,7 @@ IoWrite16 (
   Reads the 32-bit I/O port specified by Port. The 32-bit read value is returned.
   This function must guarantee that all I/O read and write operations are
   serialized.
- 
+
   If Port is not aligned on a 32-bit boundary, then ASSERT().
 
   If 32-bit I/O port operations are not supported, then ASSERT().
@@ -442,7 +442,7 @@ IoRead64 (
   operations are serialized.
 
   If Port is not aligned on a 64-bit boundary, then ASSERT().
- 
+
   If 64-bit I/O port operations are not supported, then ASSERT().
 
   @param  Port  The I/O port to write.
@@ -703,7 +703,7 @@ MmioWrite8 (
   operations are serialized.
 
   If Address is not aligned on a 16-bit boundary, then ASSERT().
- 
+
   If 16-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to read.
@@ -732,7 +732,7 @@ MmioRead16 (
   and write operations are serialized.
 
   If Address is not aligned on a 16-bit boundary, then ASSERT().
- 
+
   If 16-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to write.
@@ -761,7 +761,7 @@ MmioWrite16 (
   operations are serialized.
 
   If Address is not aligned on a 32-bit boundary, then ASSERT().
-  
+
   If 32-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to read.
@@ -790,7 +790,7 @@ MmioRead32 (
   and write operations are serialized.
 
   If Address is not aligned on a 32-bit boundary, then ASSERT().
- 
+
   If 32-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to write.
@@ -819,7 +819,7 @@ MmioWrite32 (
   operations are serialized.
 
   If Address is not aligned on a 64-bit boundary, then ASSERT().
- 
+
   If 64-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to read.
@@ -848,7 +848,7 @@ MmioRead64 (
   and write operations are serialized.
 
   If Address is not aligned on a 64-bit boundary, then ASSERT().
- 
+
   If 64-bit MMIO register operations are not supported, then ASSERT().
 
   @param  Address The MMIO register to write.

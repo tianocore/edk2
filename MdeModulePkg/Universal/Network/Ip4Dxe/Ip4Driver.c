@@ -258,7 +258,7 @@ Ip4CreateService (
   IpSb->ReconfigEvent = NULL;
 
   IpSb->Reconfig = FALSE;
-  
+
   IpSb->MediaPresent = TRUE;
 
   //
@@ -352,7 +352,7 @@ Ip4CreateService (
 
   IpSb->MacString = NULL;
   Status = NetLibGetMacString (IpSb->Controller, IpSb->Image, &IpSb->MacString);
-  
+
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;
   }
@@ -367,7 +367,7 @@ Ip4CreateService (
   InsertHeadList (&IpSb->Interfaces, &IpSb->DefaultInterface->Link);
 
   ZeroMem (&IpSb->Ip4Config2Instance, sizeof (IP4_CONFIG2_INSTANCE));
-  
+
   Status = Ip4Config2InitInstance (&IpSb->Ip4Config2Instance);
 
   if (EFI_ERROR (Status)) {
@@ -488,7 +488,7 @@ Ip4CleanService (
 
 /**
   Callback function which provided by user to remove one node in NetDestroyLinkList process.
-  
+
   @param[in]    Entry           The entry to be removed.
   @param[in]    Context         Pointer to the callback context corresponds to the Context in NetDestroyLinkList.
 
@@ -549,7 +549,7 @@ Ip4DriverBindingStart (
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
   )
-{ 
+{
   EFI_STATUS                    Status;
   IP4_SERVICE                   *IpSb;
   EFI_IP4_CONFIG2_PROTOCOL      *Ip4Cfg2;
@@ -575,13 +575,13 @@ Ip4DriverBindingStart (
   if (Status == EFI_SUCCESS) {
     return EFI_ALREADY_STARTED;
   }
-  
+
   Status = Ip4CreateService (ControllerHandle, This->DriverBindingHandle, &IpSb);
-  
+
   if (EFI_ERROR (Status)) {
     return Status;
   }
-  
+
   ASSERT (IpSb != NULL);
 
   Ip4Cfg2  = &IpSb->Ip4Config2Instance.Ip4Config2;
@@ -603,16 +603,16 @@ Ip4DriverBindingStart (
   }
 
   //
-  // Read the config data from NV variable again. 
+  // Read the config data from NV variable again.
   // The default data can be changed by other drivers.
   //
   Status = Ip4Config2ReadConfigData (IpSb->MacString, &IpSb->Ip4Config2Instance);
   if (EFI_ERROR (Status)) {
     goto UNINSTALL_PROTOCOL;
   }
-  
+
   //
-  // Consume the installed EFI_IP4_CONFIG2_PROTOCOL to set the default data items. 
+  // Consume the installed EFI_IP4_CONFIG2_PROTOCOL to set the default data items.
   //
   for (Index = Ip4Config2DataTypePolicy; Index < Ip4Config2DataTypeMaximum; Index++) {
     DataItem = &IpSb->Ip4Config2Instance.DataItem[Index];
@@ -626,13 +626,13 @@ Ip4DriverBindingStart (
       if (EFI_ERROR(Status)) {
         goto UNINSTALL_PROTOCOL;
       }
-      
+
       if (Index == Ip4Config2DataTypePolicy && (*(DataItem->Data.Policy) == Ip4Config2PolicyDhcp)) {
         break;
-      } 
+      }
     }
   }
- 
+
   //
   // Ready to go: start the receiving and timer.
   // Ip4Config2SetPolicy maybe call Ip4ReceiveFrame() to set the default interface's RecvRequest first after
@@ -705,9 +705,9 @@ Ip4DriverBindingStop (
   )
 {
   EFI_SERVICE_BINDING_PROTOCOL             *ServiceBinding;
-  IP4_SERVICE                              *IpSb; 
+  IP4_SERVICE                              *IpSb;
   EFI_HANDLE                               NicHandle;
-  EFI_STATUS                               Status; 
+  EFI_STATUS                               Status;
   INTN                                     State;
   LIST_ENTRY                               *List;
   IP4_DESTROY_CHILD_IN_HANDLE_BUF_CONTEXT  Context;
@@ -717,20 +717,20 @@ Ip4DriverBindingStop (
   BOOLEAN                                  IsDhcp4;
 
   IsDhcp4   = FALSE;
-   
+
   NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiManagedNetworkProtocolGuid);
   if (NicHandle == NULL) {
     NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiArpProtocolGuid);
     if (NicHandle == NULL) {
       NicHandle = NetLibGetNicHandle (ControllerHandle, &gEfiDhcp4ProtocolGuid);
       if (NicHandle != NULL) {
-        IsDhcp4 = TRUE;  
+        IsDhcp4 = TRUE;
       } else {
         return EFI_SUCCESS;
       }
     }
   }
-   
+
   Status = gBS->OpenProtocol (
                   NicHandle,
                   &gEfiIp4ServiceBindingProtocolGuid,
@@ -742,7 +742,7 @@ Ip4DriverBindingStop (
   if (EFI_ERROR (Status)) {
     return EFI_DEVICE_ERROR;
   }
-  
+
   IpSb = IP4_SERVICE_FROM_PROTOCOL (ServiceBinding);
 
   if (IsDhcp4) {
@@ -761,7 +761,7 @@ Ip4DriverBindingStop (
                NULL
                );
   } else if (IpSb->DefaultInterface->ArpHandle == ControllerHandle) {
-  
+
     //
     // The ARP protocol for the default interface is being uninstalled and all
     // its IP child handles should have been destroyed before. So, release the
@@ -770,7 +770,7 @@ Ip4DriverBindingStop (
     Ip4CancelReceive (IpSb->DefaultInterface);
     Ip4FreeInterface (IpSb->DefaultInterface, NULL);
     Ip4FreeRouteTable (IpSb->DefaultRouteTable);
-    
+
     IpIf = Ip4CreateInterface (IpSb->Mnp, IpSb->Controller, IpSb->Image);
     if (IpIf == NULL) {
       goto ON_ERROR;
@@ -780,7 +780,7 @@ Ip4DriverBindingStop (
       Ip4FreeInterface (IpIf, NULL);
       goto ON_ERROR;;
     }
-    
+
     IpSb->DefaultInterface  = IpIf;
     InsertHeadList (&IpSb->Interfaces, &IpIf->Link);
     IpSb->DefaultRouteTable = RouteTable;
@@ -807,7 +807,7 @@ Ip4DriverBindingStop (
            &IpSb->Ip4Config2Instance.Ip4Config2,
            NULL
            );
-    
+
     if (gIp4ControllerNameTable != NULL) {
       FreeUnicodeStringTable (gIp4ControllerNameTable);
       gIp4ControllerNameTable = NULL;

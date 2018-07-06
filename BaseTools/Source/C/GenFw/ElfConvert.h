@@ -1,7 +1,7 @@
 /** @file
 Header file for Elf convert solution
 
-Copyright (c) 2010 - 2014, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials are licensed and made available 
 under the terms and conditions of the BSD License which accompanies this 
@@ -29,6 +29,7 @@ extern UINT32 mImageTimeStamp;
 extern UINT8  *mCoffFile;
 extern UINT32 mTableOffset;
 extern UINT32 mOutImageType;
+extern UINT32 mFileBufferSize;
 
 //
 // Common EFI specific data.

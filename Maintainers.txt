@@ -41,6 +41,7 @@ T: svn (read-only, deprecated) - https://svn.code.sf.net/p/edk2/code/trunk/edk2
 Tianocore Stewards
 ------------------
 M: Andrew Fish <afish@apple.com>
+M: Laszlo Ersek <lersek@redhat.com>
 M: Leif Lindholm <leif.lindholm@linaro.org>
 M: Michael D Kinney <michael.d.kinney@intel.com>
 
@@ -217,6 +218,7 @@ M: Kelly Steele <kelly.steele@intel.com>
 SecurityPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SecurityPkg
 M: Chao Zhang <chao.b.zhang@intel.com>
+M: Jiewen Yao <jiewen.yao@intel.com>
 
 ShellBinPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
@@ -259,3 +261,8 @@ M: Mang Guo <mang.guo@intel.com>
 Vlv2TbltDevicePkg
 M: David Wei <david.wei@intel.com>
 M: Mang Guo <mang.guo@intel.com>
+
+StandaloneMmPkg
+M: Achin Gupta <achin.gupta@arm.com>
+M: Jiewen Yao <jiewen.yao@intel.com>
+R: Supreeth Venkatesh <supreeth.venkatesh@arm.com>

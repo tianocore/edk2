@@ -1,7 +1,7 @@
 ## @file
 #  Status Code Handler Driver which produces general handlers and hook them onto the SMM status code router.
 #
-#  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 #  (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 #
 #  This program and the accompanying materials
@@ -21,7 +21,7 @@
   FILE_GUID                      = 79CD78D8-6EDC-4978-BD02-3299C387AB17
   MODULE_TYPE                    = DXE_SMM_DRIVER
   PI_SPECIFICATION_VERSION       = 0x0001000A
-  VERSION_STRING                 = 1.0  
+  VERSION_STRING                 = 1.0
   ENTRY_POINT                    = StatusCodeHandlerSmmEntry
 
 #

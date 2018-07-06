@@ -13,7 +13,8 @@
   PartitionValidGptTable(), PartitionCheckGptEntry() routine will accept disk
   partition content and validate the GPT table and GPT entry.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2018 Qualcomm Datacenter Technologies, Inc.
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -100,7 +101,7 @@ PartitionRestoreGptTable (
 
   @param[in]    PartHeader    Partition table header structure
   @param[in]    PartEntry     The partition entry array
-  @param[out]   PEntryStatus  the partition entry status array 
+  @param[out]   PEntryStatus  the partition entry status array
                               recording the status of each partition
 
 **/
@@ -419,7 +420,8 @@ PartitionInstallGptChildHandles (
                &PartitionInfo,
                Entry->StartingLBA,
                Entry->EndingLBA,
-               BlockSize
+               BlockSize,
+               &Entry->PartitionTypeGUID
                );
   }
 
@@ -696,7 +698,7 @@ Done:
 
   @param[in]    PartHeader    Partition table header structure
   @param[in]    PartEntry     The partition entry array
-  @param[out]   PEntryStatus  the partition entry status array 
+  @param[out]   PEntryStatus  the partition entry status array
                               recording the status of each partition
 
 **/
@@ -734,7 +736,7 @@ PartitionCheckGptEntry (
 
     if ((Entry->Attributes & BIT1) != 0) {
       //
-      // If Bit 1 is set, this indicate that this is an OS specific GUID partition. 
+      // If Bit 1 is set, this indicate that this is an OS specific GUID partition.
       //
       PEntryStatus[Index1].OsSpecific = TRUE;
     }

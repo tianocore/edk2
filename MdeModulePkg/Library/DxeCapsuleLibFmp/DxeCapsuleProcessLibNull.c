@@ -3,7 +3,7 @@
   Dummy function for runtime module, because CapsuleDxeRuntime
   does not need call ProcessCapsules().
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,25 @@
 
 #include <PiDxe.h>
 #include <Library/CapsuleLib.h>
+
+/**
+  Function indicate the current completion progress of the firmware
+  update. Platform may override with own specific progress function.
+
+  @param[in]  Completion  A value between 1 and 100 indicating the current
+                          completion progress of the firmware update
+
+  @retval EFI_SUCESS             The capsule update progress was updated.
+  @retval EFI_INVALID_PARAMETER  Completion is greater than 100%.
+**/
+EFI_STATUS
+EFIAPI
+UpdateImageProgress (
+  IN UINTN  Completion
+  )
+{
+  return EFI_SUCCESS;
+}
 
 /**
 

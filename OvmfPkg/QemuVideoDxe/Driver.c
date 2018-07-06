@@ -30,36 +30,49 @@ EFI_DRIVER_BINDING_PROTOCOL gQemuVideoDriverBinding = {
 
 QEMU_VIDEO_CARD gQemuVideoCardList[] = {
     {
+        PCI_CLASS_DISPLAY_VGA,
         CIRRUS_LOGIC_VENDOR_ID,
         CIRRUS_LOGIC_5430_DEVICE_ID,
         QEMU_VIDEO_CIRRUS_5430,
         L"Cirrus 5430"
     },{
+        PCI_CLASS_DISPLAY_VGA,
         CIRRUS_LOGIC_VENDOR_ID,
         CIRRUS_LOGIC_5430_ALTERNATE_DEVICE_ID,
         QEMU_VIDEO_CIRRUS_5430,
         L"Cirrus 5430"
     },{
+        PCI_CLASS_DISPLAY_VGA,
         CIRRUS_LOGIC_VENDOR_ID,
         CIRRUS_LOGIC_5446_DEVICE_ID,
         QEMU_VIDEO_CIRRUS_5446,
         L"Cirrus 5446"
     },{
+        PCI_CLASS_DISPLAY_VGA,
         0x1234,
         0x1111,
         QEMU_VIDEO_BOCHS_MMIO,
         L"QEMU Standard VGA"
     },{
+        PCI_CLASS_DISPLAY_OTHER,
+        0x1234,
+        0x1111,
+        QEMU_VIDEO_BOCHS_MMIO,
+        L"QEMU Standard VGA (secondary)"
+    },{
+        PCI_CLASS_DISPLAY_VGA,
         0x1b36,
         0x0100,
         QEMU_VIDEO_BOCHS,
         L"QEMU QXL VGA"
     },{
+        PCI_CLASS_DISPLAY_VGA,
         0x1af4,
         0x1050,
         QEMU_VIDEO_BOCHS_MMIO,
         L"QEMU VirtIO VGA"
     },{
+        PCI_CLASS_DISPLAY_VGA,
         VMWARE_PCI_VENDOR_ID_VMWARE,
         VMWARE_PCI_DEVICE_ID_VMWARE_SVGA2,
         QEMU_VIDEO_VMWARE_SVGA,
@@ -71,6 +84,7 @@ QEMU_VIDEO_CARD gQemuVideoCardList[] = {
 
 static QEMU_VIDEO_CARD*
 QemuVideoDetect(
+  IN UINT8 SubClass,
   IN UINT16 VendorId,
   IN UINT16 DeviceId
   )
@@ -78,7 +92,8 @@ QemuVideoDetect(
   UINTN Index = 0;
 
   while (gQemuVideoCardList[Index].VendorId != 0) {
-    if (gQemuVideoCardList[Index].VendorId == VendorId &&
+    if (gQemuVideoCardList[Index].SubClass == SubClass &&
+        gQemuVideoCardList[Index].VendorId == VendorId &&
         gQemuVideoCardList[Index].DeviceId == DeviceId) {
       return gQemuVideoCardList + Index;
     }
@@ -141,10 +156,10 @@ QemuVideoControllerDriverSupported (
   }
 
   Status = EFI_UNSUPPORTED;
-  if (!IS_PCI_VGA (&Pci)) {
+  if (!IS_PCI_DISPLAY (&Pci)) {
     goto Done;
   }
-  Card = QemuVideoDetect(Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
+  Card = QemuVideoDetect(Pci.Hdr.ClassCode[1], Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
   if (Card != NULL) {
     DEBUG ((EFI_D_INFO, "QemuVideo: %s detected\n", Card->Name));
     Status = EFI_SUCCESS;
@@ -243,7 +258,7 @@ QemuVideoControllerDriverStart (
   //
   // Determine card variant.
   //
-  Card = QemuVideoDetect(Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
+  Card = QemuVideoDetect(Pci.Hdr.ClassCode[1], Pci.Hdr.VendorId, Pci.Hdr.DeviceId);
   if (Card == NULL) {
     Status = EFI_DEVICE_ERROR;
     goto ClosePciIo;

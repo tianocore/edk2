@@ -1,18 +1,18 @@
 /** @file
   This module implements measuring PeCoff image for Tcg2 Protocol.
-  
+
   Caution: This file requires additional review when modified.
   This driver will have external input - PE/COFF image.
   This external input must be validated carefully to avoid security issue like
   buffer overflow, integer overflow.
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -183,8 +183,8 @@ MeasurePeImageAndExtend (
   //
   if (Hdr.Pe32->FileHeader.Machine == IMAGE_FILE_MACHINE_IA64 && Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     //
-    // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value 
-    //       in the PE/COFF Header. If the MachineType is Itanium(IA64) and the 
+    // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value
+    //       in the PE/COFF Header. If the MachineType is Itanium(IA64) and the
     //       Magic value in the OptionalHeader is EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
     //       then override the magic value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
     //
@@ -195,7 +195,7 @@ MeasurePeImageAndExtend (
     //
     Magic = Hdr.Pe32->OptionalHeader.Magic;
   }
-  
+
   //
   // 3.  Calculate the distance from the base of the image header to the image checksum address.
   // 4.  Hash the image header from its base to beginning of the image checksum.
@@ -218,7 +218,7 @@ MeasurePeImageAndExtend (
   Status = HashUpdate (HashHandle, HashBase, HashSize);
   if (EFI_ERROR (Status)) {
     goto Finish;
-  }  
+  }
 
   //
   // 5.  Skip over the image checksum (it occupies a single ULONG).
@@ -247,7 +247,7 @@ MeasurePeImageAndExtend (
       if (EFI_ERROR (Status)) {
         goto Finish;
       }
-    }    
+    }
   } else {
     //
     // 7.  Hash everything from the end of the checksum to the start of the Cert Directory.
@@ -261,7 +261,7 @@ MeasurePeImageAndExtend (
     } else {
       //
       // Use PE32+ offset
-      //    
+      //
       HashBase = (UINT8 *) &Hdr.Pe32Plus->OptionalHeader.CheckSum + sizeof (UINT32);
       HashSize = (UINTN) (&Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY]) - (UINTN) HashBase;
     }
@@ -290,7 +290,7 @@ MeasurePeImageAndExtend (
       HashBase = (UINT8 *) &Hdr.Pe32Plus->OptionalHeader.DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_SECURITY + 1];
       HashSize = Hdr.Pe32Plus->OptionalHeader.SizeOfHeaders - (UINTN) (HashBase - ImageAddress);
     }
-    
+
     if (HashSize != 0) {
       Status  = HashUpdate (HashHandle, HashBase, HashSize);
       if (EFI_ERROR (Status)) {

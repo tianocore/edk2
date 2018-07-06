@@ -1,10 +1,10 @@
 /** @file
-  Debug Print Error Level library instance that provide compatibility with the 
+  Debug Print Error Level library instance that provide compatibility with the
   "err" shell command.  This includes support for the Debug Mask Protocol
   supports for global debug print error level mask stored in an EFI Variable.
   This library instance only support DXE Phase modules.
 
-  Copyright (c) 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -32,7 +32,7 @@
   it in CurrentDebugMask.
 
   @param  This              The protocol instance pointer.
-  @param  CurrentDebugMask  Pointer to the debug print error level mask that 
+  @param  CurrentDebugMask  Pointer to the debug print error level mask that
                             is returned.
 
   @retval EFI_SUCCESS            The current debug print error level mask was
@@ -45,8 +45,8 @@
 EFI_STATUS
 EFIAPI
 GetDebugMask (
-  IN EFI_DEBUG_MASK_PROTOCOL  *This,             
-  IN OUT UINTN                *CurrentDebugMask  
+  IN EFI_DEBUG_MASK_PROTOCOL  *This,
+  IN OUT UINTN                *CurrentDebugMask
   );
 
 /**
@@ -79,7 +79,7 @@ EFI_DEBUG_MASK_PROTOCOL  mDebugMaskProtocol = {
 };
 
 ///
-/// Global variable that is set to TRUE after the first attempt is made to 
+/// Global variable that is set to TRUE after the first attempt is made to
 /// retrieve the global error level mask through the EFI Varibale Services.
 /// This variable prevents the EFI Variable Services from being called fort
 /// every DEBUG() macro.
@@ -91,9 +91,9 @@ BOOLEAN           mGlobalErrorLevelInitialized = FALSE;
 /// module that is using this library instance.  This variable is initially
 /// set to the PcdDebugPrintErrorLevel value.  If the EFI Variable exists that
 /// contains the global debug print error level mask, then that overrides the
-/// PcdDebugPrintErrorLevel value. The EFI Variable can optionally be 
+/// PcdDebugPrintErrorLevel value. The EFI Variable can optionally be
 /// discovered via a HOB so early DXE drivers can access the variable. If the
-/// Debug Mask Protocol SetDebugMask() service is called, then that overrides 
+/// Debug Mask Protocol SetDebugMask() service is called, then that overrides
 /// the PcdDebugPrintErrorLevel and the EFI Variable setting.
 ///
 UINT32            mDebugPrintErrorLevel        = 0;
@@ -107,12 +107,12 @@ UINT32            mDebugPrintErrorLevel        = 0;
 EFI_SYSTEM_TABLE  *mSystemTable                         = NULL;
 
 /**
-  The constructor function caches the PCI Express Base Address and creates a 
+  The constructor function caches the PCI Express Base Address and creates a
   Set Virtual Address Map event to convert physical address to virtual addresses.
-  
+
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The constructor completed successfully.
   @retval Other value   The constructor did not complete successfully.
 
@@ -125,15 +125,15 @@ DxeDebugPrintErrorLevelLibConstructor (
   )
 {
   EFI_STATUS                  Status;
-  
+
   //
   // Initialize the error level mask from PCD setting.
   //
   mDebugPrintErrorLevel = PcdGet32 (PcdDebugPrintErrorLevel);
-    
+
   //
   // Install Debug Mask Protocol onto ImageHandle
-  //  
+  //
   mSystemTable = SystemTable;
   Status = SystemTable->BootServices->InstallMultipleProtocolInterfaces (
                                         &ImageHandle,
@@ -144,22 +144,22 @@ DxeDebugPrintErrorLevelLibConstructor (
   //
   // Attempt to retrieve the global debug print error level mask from the EFI Variable
   // If the EFI Variable can not be accessed when this module's library constructors are
-  // executed a HOB can be used to set the global debug print error level. If no value 
+  // executed a HOB can be used to set the global debug print error level. If no value
   // was found then the EFI Variable access will be reattempted on every DEBUG() print
   // from this module until the EFI Variable services are available.
   //
   GetDebugPrintErrorLevel ();
-  
+
   return Status;
 }
 
 /**
-  The destructor function frees any allocated buffers and closes the Set Virtual 
+  The destructor function frees any allocated buffers and closes the Set Virtual
   Address Map event.
-  
+
   @param  ImageHandle   The firmware allocated handle for the EFI image.
   @param  SystemTable   A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS   The destructor completed successfully.
   @retval Other value   The destructor did not complete successfully.
 
@@ -173,7 +173,7 @@ DxeDebugPrintErrorLevelLibDestructor (
 {
   //
   // Uninstall the Debug Mask Protocol from ImageHandle
-  //  
+  //
   return SystemTable->BootServices->UninstallMultipleProtocolInterfaces (
                                       ImageHandle,
                                       &gEfiDebugMaskProtocolGuid, &mDebugMaskProtocol,
@@ -207,13 +207,13 @@ GetDebugPrintErrorLevel (
   if (mSystemTable == NULL) {
     return PcdGet32 (PcdDebugPrintErrorLevel);
   }
-  
+
   //
-  // Check to see if an attempt has been made to retrieve the global debug print 
+  // Check to see if an attempt has been made to retrieve the global debug print
   // error level mask.  Since this library instance stores the global debug print
   // error level mask in an EFI Variable, the EFI Variable should only be accessed
   // once to reduce the overhead of reading the EFI Variable on every debug print
-  //  
+  //
   if (!mGlobalErrorLevelInitialized) {
     //
     // Make sure the TPL Level is low enough for EFI Variable Services to be called
@@ -222,15 +222,15 @@ GetDebugPrintErrorLevel (
     mSystemTable->BootServices->RestoreTPL (CurrentTpl);
     if (CurrentTpl <= TPL_CALLBACK) {
       //
-      // Attempt to retrieve the global debug print error level mask from the 
+      // Attempt to retrieve the global debug print error level mask from the
       // EFI Variable
       //
       Size = sizeof (GlobalErrorLevel);
       Status = mSystemTable->RuntimeServices->GetVariable (
-                                       DEBUG_MASK_VARIABLE_NAME, 
-                                       &gEfiGenericVariableGuid, 
-                                       NULL, 
-                                       &Size, 
+                                       DEBUG_MASK_VARIABLE_NAME,
+                                       &gEfiGenericVariableGuid,
+                                       NULL,
+                                       &Size,
                                        &GlobalErrorLevel
                                        );
       if (Status != EFI_NOT_AVAILABLE_YET) {
@@ -270,9 +270,9 @@ GetDebugPrintErrorLevel (
 
 /**
   Sets the global debug print error level mask fpr the entire platform.
-  
+
   @param   ErrorLevel     Global debug print error level
-  
+
   @retval  TRUE           The debug print error level mask was sucessfully set.
   @retval  FALSE          The debug print error level mask could not be set.
 
@@ -304,18 +304,18 @@ SetDebugPrintErrorLevel (
       GlobalErrorLevel = (UINTN)ErrorLevel;
       Size = sizeof (GlobalErrorLevel);
       Status = mSystemTable->RuntimeServices->SetVariable (
-                                       DEBUG_MASK_VARIABLE_NAME, 
-                                       &gEfiGenericVariableGuid, 
+                                       DEBUG_MASK_VARIABLE_NAME,
+                                       &gEfiGenericVariableGuid,
                                        (EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS),
                                        Size,
                                        &GlobalErrorLevel
                                        );
       if (!EFI_ERROR (Status)) {
         //
-        // If the EFI Variable was updated, then update the mask value for this 
+        // If the EFI Variable was updated, then update the mask value for this
         // module and return TRUE.
         //
-        mGlobalErrorLevelInitialized = TRUE;    
+        mGlobalErrorLevelInitialized = TRUE;
         mDebugPrintErrorLevel = ErrorLevel;
         return TRUE;
       }
@@ -332,7 +332,7 @@ SetDebugPrintErrorLevel (
   it in CurrentDebugMask.
 
   @param  This              The protocol instance pointer.
-  @param  CurrentDebugMask  Pointer to the debug print error level mask that 
+  @param  CurrentDebugMask  Pointer to the debug print error level mask that
                             is returned.
 
   @retval EFI_SUCCESS            The current debug print error level mask was
@@ -345,14 +345,14 @@ SetDebugPrintErrorLevel (
 EFI_STATUS
 EFIAPI
 GetDebugMask (
-  IN EFI_DEBUG_MASK_PROTOCOL  *This,             
-  IN OUT UINTN                *CurrentDebugMask  
+  IN EFI_DEBUG_MASK_PROTOCOL  *This,
+  IN OUT UINTN                *CurrentDebugMask
   )
 {
   if (CurrentDebugMask == NULL) {
     return EFI_INVALID_PARAMETER;
   }
-  
+
   //
   // Retrieve the current debug mask from mDebugPrintErrorLevel
   //

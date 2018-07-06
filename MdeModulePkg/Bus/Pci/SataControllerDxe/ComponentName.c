@@ -1,7 +1,7 @@
 /** @file
   UEFI Component Name(2) protocol implementation for Sata Controller driver.
 
-  Copyright (c) 2011 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -72,7 +72,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mSataControllerController
   @param DriverName             A pointer to the Unicode string to return.  This Unicode string
                                 is the name of the driver specified by This in the language
                                 specified by Language.
-  
+
   @retval EFI_SUCCESS           The Unicode string for the Driver specified by This
                                 and the language specified by Language was returned
                                 in DriverName.
@@ -100,7 +100,7 @@ SataControllerComponentNameGetDriverName (
 
 /**
   Retrieves a Unicode string that is the user readable name of the controller
-  that is being managed by an UEFI Driver.  
+  that is being managed by an UEFI Driver.
 
   @param This                   A pointer to the EFI_COMPONENT_NAME_PROTOCOL instance.
   @param ControllerHandle       The handle of a controller that the driver specified by
@@ -123,7 +123,7 @@ SataControllerComponentNameGetDriverName (
                                 ControllerHandle and ChildHandle in the language
                                 specified by Language from the point of view of the
                                 driver specified by This.
-  
+
   @retval EFI_SUCCESS           The Unicode string for the user readable name in the
                                 language specified by Language for the driver
                                 specified by This was returned in DriverName.

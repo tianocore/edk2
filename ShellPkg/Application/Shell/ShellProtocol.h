@@ -3,7 +3,7 @@
   manipulation, and initialization of EFI_SHELL_PROTOCOL.
 
   (C) Copyright 2014 Hewlett-Packard Development Company, L.P.<BR>
-  Copyright (c) 2009 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -36,7 +36,7 @@ typedef struct {
 
   This must be removed via calling CleanUpShellProtocol().
 
-  @param[in, out] NewShell   The pointer to the pointer to the structure 
+  @param[in, out] NewShell   The pointer to the pointer to the structure
   to install.
 
   @retval EFI_SUCCESS     The operation was successful.
@@ -819,7 +819,7 @@ EfiShellIsRootShell(
                                 aliases will be returned in ReturnedData.
   @param[out] Volatile          upon return of a single command if TRUE indicates
                                 this is stored in a volatile fashion.  FALSE otherwise.
-  @return                      	If Alias is not NULL, it will return a pointer to
+  @return                        If Alias is not NULL, it will return a pointer to
                                 the NULL-terminated command for that alias.
                                 If Alias is NULL, ReturnedData points to a ';'
                                 delimited list of alias (e.g.
@@ -917,7 +917,7 @@ InternalEfiShellSetEnv(
   );
 
 /**
-  Function to start monitoring for CTRL-C using SimpleTextInputEx.  This 
+  Function to start monitoring for CTRL-C using SimpleTextInputEx.  This
   feature's enabled state was not known when the shell initially launched.
 
   @retval EFI_SUCCESS           The feature is enabled.

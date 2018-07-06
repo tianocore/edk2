@@ -3,18 +3,18 @@
   services handle many of the more mundane tasks that are required to publish a set of tables. The
   services will:
         - Generate common tables.
-	- Update the table links.
-	- Ensure that tables are properly aligned and use correct types of memory.
-	- Update checksum values and IDs.
-	- Complete the final installation of the tables.
- 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials are licensed and made available under 
-the terms and conditions of the BSD License that accompanies this distribution.  
+  - Update the table links.
+  - Ensure that tables are properly aligned and use correct types of memory.
+  - Update checksum values and IDs.
+  - Complete the final installation of the tables.
+
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials are licensed and made available under
+the terms and conditions of the BSD License that accompanies this distribution.
 The full text of the license may be found at
-http://opensource.org/licenses/bsd-license.php.                                          
-    
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,                     
+http://opensource.org/licenses/bsd-license.php.
+
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Revision Reference:
@@ -95,10 +95,10 @@ EFI_STATUS
   Causes one or more versions of the ACPI tables to be published in
   the EFI system configuration tables.
 
-  The PublishTables() function installs the ACPI tables for the versions that are specified in 
-  Version. No tables are published for Version equal to EFI_ACPI_VERSION_NONE. Once 
-  published, tables will continue to be updated as tables are modified with 
-  EFI_ACPI_SUPPORT_PROTOCOL.SetAcpiTable(). 
+  The PublishTables() function installs the ACPI tables for the versions that are specified in
+  Version. No tables are published for Version equal to EFI_ACPI_VERSION_NONE. Once
+  published, tables will continue to be updated as tables are modified with
+  EFI_ACPI_SUPPORT_PROTOCOL.SetAcpiTable().
 
   @param  This                  A pointer to the EFI_ACPI_SUPPORT_PROTOCOL instance.
   @param  Version               Indicates to which version(s) of ACPI the table should be published.

@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 from Xml.XmlRoutines import *
 import Common.LongFilePathOs as os
 
@@ -84,4 +85,4 @@ class ExceptionCheck(object):
 #
 if __name__ == '__main__':
     El = ExceptionCheck('C:\\Hess\\Project\\BuildTool\\src\\Ecc\\exception.xml')
-    print El.ExceptionList
+    print(El.ExceptionList)

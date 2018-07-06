@@ -1,7 +1,7 @@
 /** @file
   Esrt management module.
 
-Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 ESRT_PRIVATE_DATA mPrivate;
 
-ESRT_MANAGEMENT_PROTOCOL  mEsrtManagementProtocolTemplate = { 
+ESRT_MANAGEMENT_PROTOCOL  mEsrtManagementProtocolTemplate = {
                             EsrtDxeGetEsrtEntry,
                             EsrtDxeUpdateEsrtEntry,
                             EsrtDxeRegisterEsrtEntry,
@@ -30,11 +30,11 @@ ESRT_MANAGEMENT_PROTOCOL  mEsrtManagementProtocolTemplate = {
                             };
 
 /**
-  Get ESRT entry from ESRT Cache by FwClass Guid 
+  Get ESRT entry from ESRT Cache by FwClass Guid
 
-  @param[in]       FwClass                FwClass of Esrt entry to get  
-  @param[in, out]  Entry                  Esrt entry returned 
-  
+  @param[in]       FwClass                FwClass of Esrt entry to get
+  @param[in, out]  Entry                  Esrt entry returned
+
   @retval EFI_SUCCESS                   The variable saving this Esrt Entry exists.
   @retval EF_NOT_FOUND                  No correct variable found.
   @retval EFI_WRITE_PROTECTED           ESRT Cache repository is locked
@@ -94,7 +94,7 @@ EsrtDxeGetEsrtEntry(
   Update one ESRT entry in ESRT Cache.
 
   @param[in]  Entry                         Esrt entry to be updated
-  
+
   @retval EFI_SUCCESS                   Successfully update an ESRT entry in cache.
   @retval EFI_INVALID_PARAMETER         Entry does't exist in ESRT Cache
   @retval EFI_WRITE_PROTECTED           ESRT Cache repositoy is locked
@@ -107,7 +107,7 @@ EsrtDxeUpdateEsrtEntry(
   )
 {
   EFI_STATUS                Status;
-  
+
   if (Entry == NULL) {
     return EFI_INVALID_PARAMETER;
   }
@@ -139,11 +139,11 @@ EsrtDxeUpdateEsrtEntry(
 }
 
 /**
-  Non-FMP instance to unregister Esrt Entry from ESRT Cache. 
+  Non-FMP instance to unregister Esrt Entry from ESRT Cache.
 
-  @param[in]    FwClass                FwClass of Esrt entry to Unregister  
-  
-  @retval EFI_SUCCESS             Insert all entries Successfully 
+  @param[in]    FwClass                FwClass of Esrt entry to Unregister
+
+  @retval EFI_SUCCESS             Insert all entries Successfully
   @retval EFI_NOT_FOUND           Entry of FwClass does not exsit
 
 **/
@@ -153,7 +153,7 @@ EsrtDxeUnRegisterEsrtEntry(
   IN  EFI_GUID        *FwClass
   )
 {
-  EFI_STATUS Status; 
+  EFI_STATUS Status;
 
   if (FwClass == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -228,7 +228,7 @@ EFI_STATUS
 EFIAPI
 EsrtDxeSyncFmp(
   VOID
-  ) 
+  )
 {
   EFI_STATUS                                Status;
   UINTN                                     Index1;
@@ -238,8 +238,8 @@ EsrtDxeSyncFmp(
   EFI_FIRMWARE_MANAGEMENT_PROTOCOL          **FmpBuf;
   UINTN                                     NumberOfHandles;
   UINTN                                     *DescriptorSizeBuf;
-  EFI_FIRMWARE_IMAGE_DESCRIPTOR             **FmpImageInfoBuf;  
-  EFI_FIRMWARE_IMAGE_DESCRIPTOR             *TempFmpImageInfo;  
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR             **FmpImageInfoBuf;
+  EFI_FIRMWARE_IMAGE_DESCRIPTOR             *TempFmpImageInfo;
   UINT8                                     *FmpImageInfoCountBuf;
   UINT32                                    *FmpImageInfoDescriptorVerBuf;
   UINTN                                     ImageInfoSize;
@@ -270,11 +270,11 @@ EsrtDxeSyncFmp(
                   &HandleBuffer
                   );
 
- 
-  if (Status == EFI_NOT_FOUND) { 
+
+  if (Status == EFI_NOT_FOUND) {
     EntryNumNew = 0;
     goto UPDATE_REPOSITORY;
-  } else if (EFI_ERROR(Status)){ 
+  } else if (EFI_ERROR(Status)){
     goto END;
   }
 
@@ -295,7 +295,7 @@ EsrtDxeSyncFmp(
 
   FmpImageInfoBuf = AllocateZeroPool(sizeof(EFI_FIRMWARE_IMAGE_DESCRIPTOR *) * NumberOfHandles);
   if (FmpImageInfoBuf == NULL) {
-    Status = EFI_OUT_OF_RESOURCES;    
+    Status = EFI_OUT_OF_RESOURCES;
     goto END;
   }
 
@@ -380,14 +380,14 @@ EsrtDxeSyncFmp(
 
   //
   // Create new FMP cache repository based on FmpImageInfoBuf
-  // 
+  //
   for (Index2 = 0; Index2 < NumberOfHandles; Index2++){
     TempFmpImageInfo = FmpImageInfoBuf[Index2];
     for (Index3 = 0; Index3 < FmpImageInfoCountBuf[Index2]; Index3++){
-      if ((TempFmpImageInfo->AttributesSupported & IMAGE_ATTRIBUTE_IN_USE) != 0 
+      if ((TempFmpImageInfo->AttributesSupported & IMAGE_ATTRIBUTE_IN_USE) != 0
       && (TempFmpImageInfo->AttributesSetting & IMAGE_ATTRIBUTE_IN_USE) != 0){
         //
-        // Always put the first smallest version of Image info into ESRT cache 
+        // Always put the first smallest version of Image info into ESRT cache
         //
         for(Index1 = 0; Index1 < EntryNumNew; Index1++) {
           if (CompareGuid(&EsrtRepositoryNew[Index1].FwClass, &TempFmpImageInfo->ImageTypeId)) {
@@ -402,7 +402,7 @@ EsrtDxeSyncFmp(
         //
         if (Index1 == EntryNumNew){
           SetEsrtEntryFromFmpInfo(&EsrtRepositoryNew[EntryNumNew], TempFmpImageInfo, FmpImageInfoDescriptorVerBuf[Index2]);
-          EntryNumNew++; 
+          EntryNumNew++;
           if (EntryNumNew >= PcdGet32(PcdMaxFmpEsrtCacheNum)) {
             break;
           }
@@ -471,10 +471,10 @@ END:
 }
 
 /**
-  This function locks up Esrt repository to be readonly. It should be called 
+  This function locks up Esrt repository to be readonly. It should be called
   before gEfiEndOfDxeEventGroupGuid event signaled
 
-  @retval EFI_SUCCESS              Locks up FMP Non-FMP repository successfully 
+  @retval EFI_SUCCESS              Locks up FMP Non-FMP repository successfully
 
 **/
 EFI_STATUS
@@ -514,14 +514,14 @@ EsrtReadyToBootEventNotify (
   IN EFI_EVENT        Event,
   IN VOID             *Context
   )
-{  
+{
   EFI_STATUS                 Status;
   EFI_SYSTEM_RESOURCE_TABLE  *EsrtTable;
   EFI_SYSTEM_RESOURCE_ENTRY  *FmpEsrtRepository;
   EFI_SYSTEM_RESOURCE_ENTRY  *NonFmpEsrtRepository;
   UINTN                      FmpRepositorySize;
   UINTN                      NonFmpRepositorySize;
-  
+
 
   FmpEsrtRepository    = NULL;
   NonFmpEsrtRepository = NULL;
@@ -583,8 +583,8 @@ EsrtReadyToBootEventNotify (
     goto EXIT;
   }
 
-  EsrtTable->FwResourceVersion  = EFI_SYSTEM_RESOURCE_TABLE_FIRMWARE_RESOURCE_VERSION;                                            
-  EsrtTable->FwResourceCount    = (UINT32)((NonFmpRepositorySize + FmpRepositorySize) / sizeof(EFI_SYSTEM_RESOURCE_ENTRY));  
+  EsrtTable->FwResourceVersion  = EFI_SYSTEM_RESOURCE_TABLE_FIRMWARE_RESOURCE_VERSION;
+  EsrtTable->FwResourceCount    = (UINT32)((NonFmpRepositorySize + FmpRepositorySize) / sizeof(EFI_SYSTEM_RESOURCE_ENTRY));
   EsrtTable->FwResourceCountMax = PcdGet32(PcdMaxNonFmpEsrtCacheNum) + PcdGet32(PcdMaxFmpEsrtCacheNum);
 
   if (NonFmpRepositorySize != 0 && NonFmpEsrtRepository != NULL) {
@@ -617,7 +617,7 @@ EXIT:
 }
 
 /**
-  The module Entry Point of the Esrt DXE driver that manages cached ESRT repository 
+  The module Entry Point of the Esrt DXE driver that manages cached ESRT repository
   & publishes ESRT table
 
   @param[in]  ImageHandle    The firmware allocated handle for the EFI image.
@@ -633,7 +633,7 @@ EsrtDxeEntryPoint (
   IN EFI_HANDLE         ImageHandle,
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
-{  
+{
   EFI_STATUS                    Status;
 
   EfiInitializeLock (&mPrivate.FmpLock,    TPL_CALLBACK);

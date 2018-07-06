@@ -1,7 +1,7 @@
 ## @file
 # This file is used to be the c coding style checking of ECC tool
 #
-# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -11,6 +11,7 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
+from __future__ import print_function
 import sys
 import Common.LongFilePathOs as os
 import re
@@ -550,7 +551,7 @@ def CollectSourceCodeDataIntoDB(RootDir):
     Db.UpdateIdentifierBelongsToFunction()
 
 def GetTableID(FullFileName, ErrorMsgList=None):
-    if ErrorMsgList == None:
+    if ErrorMsgList is None:
         ErrorMsgList = []
 
     Db = GetDB()
@@ -575,7 +576,7 @@ def GetIncludeFileList(FullFileName):
     if os.path.splitext(FullFileName)[1].upper() not in ('.H'):
         return []
     IFList = IncludeFileListDict.get(FullFileName)
-    if IFList != None:
+    if IFList is not None:
         return IFList
 
     FileID = GetTableID(FullFileName)
@@ -601,12 +602,12 @@ def GetFullPathOfIncludeFile(Str, IncludePathList):
     return None
 
 def GetAllIncludeFiles(FullFileName):
-    if AllIncludeFileListDict.get(FullFileName) != None:
+    if AllIncludeFileListDict.get(FullFileName) is not None:
         return AllIncludeFileListDict.get(FullFileName)
 
     FileDirName = os.path.dirname(FullFileName)
     IncludePathList = IncludePathListDict.get(FileDirName)
-    if IncludePathList == None:
+    if IncludePathList is None:
         IncludePathList = MetaDataParser.GetIncludeListOfFile(EccGlobalData.gWorkspace, FullFileName, GetDB())
         if FileDirName not in IncludePathList:
             IncludePathList.insert(0, FileDirName)
@@ -618,7 +619,7 @@ def GetAllIncludeFiles(FullFileName):
         FileName = FileName.strip('\"')
         FileName = FileName.lstrip('<').rstrip('>').strip()
         FullPath = GetFullPathOfIncludeFile(FileName, IncludePathList)
-        if FullPath != None:
+        if FullPath is not None:
             IncludeFileQueue.append(FullPath)
 
     i = 0
@@ -629,7 +630,7 @@ def GetAllIncludeFiles(FullFileName):
             FileName = FileName.strip('\"')
             FileName = FileName.lstrip('<').rstrip('>').strip()
             FullPath = GetFullPathOfIncludeFile(FileName, IncludePathList)
-            if FullPath != None and FullPath not in IncludeFileQueue:
+            if FullPath is not None and FullPath not in IncludeFileQueue:
                 IncludeFileQueue.insert(i + 1, FullPath)
         i += 1
 
@@ -830,7 +831,7 @@ def GetDataTypeFromModifier(ModifierStr):
     MList = ModifierStr.split()
     ReturnType = ''
     for M in MList:
-        if M in EccGlobalData.gConfig.ModifierList:
+        if M in EccGlobalData.gConfig.ModifierSet:
             continue
         # remove array sufix
         if M.startswith('[') or M.endswith(']'):
@@ -853,7 +854,7 @@ def DiffModifier(Str1, Str2):
 def GetTypedefDict(FullFileName):
 
     Dict = ComplexTypeDict.get(FullFileName)
-    if Dict != None:
+    if Dict is not None:
         return Dict
 
     FileID = GetTableID(FullFileName)
@@ -898,7 +899,7 @@ def GetTypedefDict(FullFileName):
 def GetSUDict(FullFileName):
 
     Dict = SUDict.get(FullFileName)
-    if Dict != None:
+    if Dict is not None:
         return Dict
 
     FileID = GetTableID(FullFileName)
@@ -983,9 +984,9 @@ def StripComments(Str):
 
 def GetFinalTypeValue(Type, FieldName, TypedefDict, SUDict):
     Value = TypedefDict.get(Type)
-    if Value == None:
+    if Value is None:
         Value = SUDict.get(Type)
-    if Value == None:
+    if Value is None:
         return None
 
     LBPos = Value.find('{')
@@ -994,11 +995,11 @@ def GetFinalTypeValue(Type, FieldName, TypedefDict, SUDict):
         for FT in FTList:
             if FT not in ('struct', 'union'):
                 Value = TypedefDict.get(FT)
-                if Value == None:
+                if Value is None:
                     Value = SUDict.get(FT)
                 break
 
-        if Value == None:
+        if Value is None:
             return None
 
         LBPos = Value.find('{')
@@ -1025,11 +1026,11 @@ def GetFinalTypeValue(Type, FieldName, TypedefDict, SUDict):
     return None
 
 def GetRealType(Type, TypedefDict, TargetType=None):
-    if TargetType != None and Type == TargetType:
+    if TargetType is not None and Type == TargetType:
             return Type
     while TypedefDict.get(Type):
         Type = TypedefDict.get(Type)
-        if TargetType != None and Type == TargetType:
+        if TargetType is not None and Type == TargetType:
             return Type
     return Type
 
@@ -1043,10 +1044,10 @@ def GetTypeInfo(RefList, Modifier, FullFileName, TargetType=None):
     while Index < len(RefList):
         FieldName = RefList[Index]
         FromType = GetFinalTypeValue(Type, FieldName, TypedefDict, SUDict)
-        if FromType == None:
+        if FromType is None:
             return None
         # we want to determine the exact type.
-        if TargetType != None:
+        if TargetType is not None:
             Type = FromType.split()[0]
         # we only want to check if it is a pointer
         else:
@@ -1151,7 +1152,7 @@ def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall=False, TargetTy
 #            Type = GetDataTypeFromModifier(Result[0]).split()[-1]
             TypeList = GetDataTypeFromModifier(Result[0]).split()
             Type = TypeList[-1]
-            if len(TypeList) > 1 and StarList != None:
+            if len(TypeList) > 1 and StarList is not None:
                 for Star in StarList:
                     Type = Type.strip()
                     Type = Type.rstrip(Star)
@@ -1174,7 +1175,7 @@ def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall=False, TargetTy
                 Type = TypeList[-1]
                 if Type == '*' and len(TypeList) >= 2:
                     Type = TypeList[-2]
-                if len(TypeList) > 1 and StarList != None:
+                if len(TypeList) > 1 and StarList is not None:
                     for Star in StarList:
                         Type = Type.strip()
                         Type = Type.rstrip(Star)
@@ -1199,7 +1200,7 @@ def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall=False, TargetTy
         else:
             TypeList = GetDataTypeFromModifier(Result[0]).split()
             Type = TypeList[-1]
-            if len(TypeList) > 1 and StarList != None:
+            if len(TypeList) > 1 and StarList is not None:
                 for Star in StarList:
                     Type = Type.strip()
                     Type = Type.rstrip(Star)
@@ -1230,7 +1231,7 @@ def GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall=False, TargetTy
             else:
                 TypeList = GetDataTypeFromModifier(Result[0]).split()
                 Type = TypeList[-1]
-                if len(TypeList) > 1 and StarList != None:
+                if len(TypeList) > 1 and StarList is not None:
                     for Star in StarList:
                         Type = Type.strip()
                         Type = Type.rstrip(Star)
@@ -1858,7 +1859,13 @@ def CheckDeclNoUseCType(FullFileName):
     for Result in ResultSet:
         for Type in CTypeTuple:
             if PatternInModifier(Result[0], Type):
-                PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE, 'Variable type %s' % Type, FileTable, Result[2])
+                if EccGlobalData.gException.IsException(ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE,
+                                                        Result[0] + ' ' + Result[1]):
+                    continue
+                PrintErrorMsg(ERROR_DECLARATION_DATA_TYPE_CHECK_NO_USE_C_TYPE,
+                              'Invalid variable type (%s) in definition [%s]' % (Type, Result[0] + ' ' + Result[1]),
+                              FileTable,
+                              Result[2])
                 break
 
     SqlStatement = """ select Modifier, Name, ID, Value
@@ -1933,12 +1940,12 @@ def CheckPointerNullComparison(FullFileName):
     p = GetFuncDeclPattern()
     for Str in PSL:
         FuncRecord = GetFuncContainsPE(Str[1], FL)
-        if FuncRecord == None:
+        if FuncRecord is None:
             continue
 
         for Exp in GetPredicateListFromPredicateExpStr(Str[0]):
             PredInfo = SplitPredicateStr(Exp)
-            if PredInfo[1] == None:
+            if PredInfo[1] is None:
                 PredVarStr = PredInfo[0][0].strip()
                 IsFuncCall = False
                 SearchInCache = False
@@ -1960,7 +1967,7 @@ def CheckPointerNullComparison(FullFileName):
                     continue
                 if SearchInCache:
                     Type = FuncReturnTypeDict.get(PredVarStr)
-                    if Type != None:
+                    if Type is not None:
                         if Type.find('*') != -1 and Type != 'BOOLEAN*':
                             PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_COMPARISON_NULL_TYPE, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
                         continue
@@ -1971,7 +1978,7 @@ def CheckPointerNullComparison(FullFileName):
                 Type = GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall, None, StarList)
                 if SearchInCache:
                     FuncReturnTypeDict[PredVarStr] = Type
-                if Type == None:
+                if Type is None:
                     continue
                 Type = GetTypeFromArray(Type, PredVarStr)
                 if Type.find('*') != -1 and Type != 'BOOLEAN*':
@@ -2012,12 +2019,12 @@ def CheckNonBooleanValueComparison(FullFileName):
     p = GetFuncDeclPattern()
     for Str in PSL:
         FuncRecord = GetFuncContainsPE(Str[1], FL)
-        if FuncRecord == None:
+        if FuncRecord is None:
             continue
 
         for Exp in GetPredicateListFromPredicateExpStr(Str[0]):
             PredInfo = SplitPredicateStr(Exp)
-            if PredInfo[1] == None:
+            if PredInfo[1] is None:
                 PredVarStr = PredInfo[0][0].strip()
                 IsFuncCall = False
                 SearchInCache = False
@@ -2040,7 +2047,7 @@ def CheckNonBooleanValueComparison(FullFileName):
 
                 if SearchInCache:
                     Type = FuncReturnTypeDict.get(PredVarStr)
-                    if Type != None:
+                    if Type is not None:
                         if Type.find('BOOLEAN') == -1:
                             PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_NO_BOOLEAN_OPERATOR, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
                         continue
@@ -2050,7 +2057,7 @@ def CheckNonBooleanValueComparison(FullFileName):
                 Type = GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall, 'BOOLEAN', StarList)
                 if SearchInCache:
                     FuncReturnTypeDict[PredVarStr] = Type
-                if Type == None:
+                if Type is None:
                     continue
                 if Type.find('BOOLEAN') == -1:
                     PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_NO_BOOLEAN_OPERATOR, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
@@ -2091,7 +2098,7 @@ def CheckBooleanValueComparison(FullFileName):
     p = GetFuncDeclPattern()
     for Str in PSL:
         FuncRecord = GetFuncContainsPE(Str[1], FL)
-        if FuncRecord == None:
+        if FuncRecord is None:
             continue
 
         for Exp in GetPredicateListFromPredicateExpStr(Str[0]):
@@ -2119,7 +2126,7 @@ def CheckBooleanValueComparison(FullFileName):
 
                 if SearchInCache:
                     Type = FuncReturnTypeDict.get(PredVarStr)
-                    if Type != None:
+                    if Type is not None:
                         if Type.find('BOOLEAN') != -1:
                             PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_BOOLEAN_VALUE, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
                         continue
@@ -2130,7 +2137,7 @@ def CheckBooleanValueComparison(FullFileName):
                 Type = GetVarInfo(PredVarList, FuncRecord, FullFileName, IsFuncCall, 'BOOLEAN', StarList)
                 if SearchInCache:
                     FuncReturnTypeDict[PredVarStr] = Type
-                if Type == None:
+                if Type is None:
                     continue
                 if Type.find('BOOLEAN') != -1:
                     PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_BOOLEAN_VALUE, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
@@ -2279,7 +2286,7 @@ def CheckDoxygenTripleForwardSlash(FullFileName):
         for Result in ResultSet:
             CommentSet.append(Result)
     except:
-        print 'Unrecognized chars in comment of file %s', FullFileName
+        print('Unrecognized chars in comment of file %s', FullFileName)
 
 
     for Result in CommentSet:
@@ -2432,7 +2439,7 @@ def CheckFuncHeaderDoxygenComments(FullFileName):
         for Result in ResultSet:
             CommentSet.append(Result)
     except:
-        print 'Unrecognized chars in comment of file %s', FullFileName
+        print('Unrecognized chars in comment of file %s', FullFileName)
 
     # Func Decl check
     SqlStatement = """ select Modifier, Name, StartLine, ID, Value
@@ -2463,7 +2470,7 @@ def CheckFuncHeaderDoxygenComments(FullFileName):
         for Result in ResultSet:
             CommentSet.append(Result)
     except:
-        print 'Unrecognized chars in comment of file %s', FullFileName
+        print('Unrecognized chars in comment of file %s', FullFileName)
 
     SqlStatement = """ select Modifier, Header, StartLine, ID, Name
                        from Function
@@ -2627,10 +2634,10 @@ if __name__ == '__main__':
 #    CollectSourceCodeDataIntoDB(sys.argv[1])
     try:
         test_file = sys.argv[1]
-    except IndexError, v:
-        print "Usage: %s filename" % sys.argv[0]
+    except IndexError as v:
+        print("Usage: %s filename" % sys.argv[0])
         sys.exit(1)
     MsgList = CheckFuncHeaderDoxygenComments(test_file)
     for Msg in MsgList:
-        print Msg
-    print 'Done!'
+        print(Msg)
+    print('Done!')

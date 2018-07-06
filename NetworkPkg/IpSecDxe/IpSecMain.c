@@ -1,7 +1,7 @@
 /** @file
   The mian interface of IPsec Protocol.
 
-  Copyright (c) 2009 - 2011, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -70,9 +70,9 @@ IpSecProcess (
   UINT8                  OldLastHead;
   BOOLEAN                IsOutbound;
 
-  if (OptionsBuffer == NULL || 
-      OptionsLength == NULL || 
-      FragmentTable == NULL || 
+  if (OptionsBuffer == NULL ||
+      OptionsLength == NULL ||
+      FragmentTable == NULL ||
       FragmentCount == NULL
       ) {
     return EFI_INVALID_PARAMETER;
@@ -83,7 +83,7 @@ IpSecProcess (
   OldLastHead     = *LastHead;
   *RecycleSignal  = NULL;
   SpdList         = &mConfigData[IPsecConfigDataTypeSpd];
-  
+
   if (!IsOutbound) {
     //
     // For inbound traffic, process the ipsec header of the packet.
@@ -108,7 +108,7 @@ IpSecProcess (
     }
 
     if (Status == EFI_SUCCESS) {
-      
+
       //
       // Check the spd entry if the packet is accessible.
       //
@@ -120,18 +120,18 @@ IpSecProcess (
       Status =  EFI_ACCESS_DENIED;
       NET_LIST_FOR_EACH (Entry, SpdList) {
         SpdEntry = IPSEC_SPD_ENTRY_FROM_LIST (Entry);
-        if (IsSubSpdSelector (               
+        if (IsSubSpdSelector (
               (EFI_IPSEC_CONFIG_SELECTOR *) SpdSelector,
               (EFI_IPSEC_CONFIG_SELECTOR *) SpdEntry->Selector
               )) {
           Status = EFI_SUCCESS;
         }
-      }      
+      }
       goto ON_EXIT;
-    }       
+    }
   }
 
-  Status  = EFI_ACCESS_DENIED;  
+  Status  = EFI_ACCESS_DENIED;
 
   NET_LIST_FOR_EACH (Entry, SpdList) {
     //
@@ -145,7 +145,7 @@ IpSecProcess (
                      IpHead,
                      IpPayload,
                      OldLastHead,
-                     IsOutbound, 
+                     IsOutbound,
                      &Action
                      ))) {
       //
@@ -222,20 +222,20 @@ IpSecProcess (
       goto ON_EXIT;
 
     case EfiIPsecActionDiscard:
-      goto ON_EXIT;   
+      goto ON_EXIT;
     }
   }
-   
+
   //
   // If don't find the related SPD entry, return the EFI_ACCESS_DENIED and discard it.
   // But it the packet is NS/NA, it should be by passed even not find the related SPD entry.
   //
-  if (OldLastHead == IP6_ICMP && 
+  if (OldLastHead == IP6_ICMP &&
       (*IpPayload == ICMP_V6_NEIGHBOR_SOLICIT || *IpPayload == ICMP_V6_NEIGHBOR_ADVERTISE)
       ){
     Status = EFI_SUCCESS;
   }
-  
+
 ON_EXIT:
   return Status;
 }

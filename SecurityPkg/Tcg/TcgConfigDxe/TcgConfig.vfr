@@ -1,13 +1,13 @@
 /** @file
   VFR file used by the TCG configuration component.
 
-Copyright (c) 2011 - 2015, Intel Corporation. All rights reserved.<BR>
-This program and the accompanying materials 
-are licensed and made available under the terms and conditions of the BSD License 
-which accompanies this distribution.  The full text of the license may be found at 
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
+This program and the accompanying materials
+are licensed and made available under the terms and conditions of the BSD License
+which accompanies this distribution.  The full text of the license may be found at
 http://opensource.org/licenses/bsd-license.php
 
-THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS, 
+THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
@@ -53,7 +53,7 @@ formset
             option text = STRING_TOKEN(STR_TPM_DEACTIVATE_DISABLE), value = PHYSICAL_PRESENCE_DEACTIVATE_DISABLE, flags = 0;
           endif
           //
-          // Clear (TPM_ORD_ForceClear) command is not available when disabled or deactivated. 
+          // Clear (TPM_ORD_ForceClear) command is not available when disabled or deactivated.
           //
           suppressif ideqval TCG_CONFIGURATION.TpmEnable == 0 OR
                      ideqval TCG_CONFIGURATION.TpmActivate == 0;
@@ -62,7 +62,7 @@ formset
           endif
 
           option text = STRING_TOKEN(STR_ENABLE), value = PHYSICAL_PRESENCE_ENABLE, flags = DEFAULT;
-          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE, flags = 0;          
+          option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE, flags = 0;
           option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR, flags = 0;
           option text = STRING_TOKEN(STR_TPM_ENABLE_ACTIVATE_CLEAR_E_A), value = PHYSICAL_PRESENCE_ENABLE_ACTIVATE_CLEAR_ENABLE_ACTIVATE, flags = 0;
     endoneof;

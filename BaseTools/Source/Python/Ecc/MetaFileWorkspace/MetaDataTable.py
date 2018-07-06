@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create/update/query/erase table for files
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os
 
 import Common.EdkLogger as EdkLogger
@@ -73,7 +74,7 @@ class Table(object):
         self.ID = self.ID + self._ID_STEP_
         if self.ID >= (self.IdBase + self._ID_MAX_):
             self.ID = self.IdBase + self._ID_STEP_
-        Values = ", ".join([str(Arg) for Arg in Args])
+        Values = ", ".join(str(Arg) for Arg in Args)
         SqlCommand = "insert into %s values(%s, %s)" % (self.Table, self.ID, Values)
         EdkLogger.debug(EdkLogger.DEBUG_5, SqlCommand)
         self.Cur.execute(SqlCommand)
@@ -98,8 +99,8 @@ class Table(object):
         SqlCommand = """drop table IF EXISTS %s""" % self.Table
         try:
             self.Cur.execute(SqlCommand)
-        except Exception, e:
-            print "An error occurred when Drop a table:", e.args[0]
+        except Exception as e:
+            print("An error occurred when Drop a table:", e.args[0])
 
     ## Get count
     #
@@ -116,7 +117,7 @@ class Table(object):
         SqlCommand = """select max(ID) from %s""" % self.Table
         Record = self.Cur.execute(SqlCommand).fetchall()
         Id = Record[0][0]
-        if Id == None:
+        if Id is None:
             Id = self.IdBase
         return Id
 
@@ -191,7 +192,7 @@ class TableDataModel(Table):
     def InitTable(self):
         EdkLogger.verbose("\nInitialize table DataModel started ...")
         Count = self.GetCount()
-        if Count != None and Count != 0:
+        if Count is not None and Count != 0:
             return
         for Item in DataClass.MODEL_LIST:
             CrossIndex = Item[1]

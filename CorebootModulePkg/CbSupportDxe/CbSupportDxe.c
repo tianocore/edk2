@@ -14,7 +14,6 @@
 **/
 #include "CbSupportDxe.h"
 
-UINTN mPmCtrlReg = 0;
 /**
   Reserve MMIO/IO resource in GCD
 
@@ -86,31 +85,6 @@ CbReserveResourceInGcd (
   return Status;
 }
 
-/**
-  Notification function of EVT_GROUP_READY_TO_BOOT event group.
-
-  This is a notification function registered on EVT_GROUP_READY_TO_BOOT event group.
-  When the Boot Manager is about to load and execute a boot option, it reclaims variable
-  storage if free size is below the threshold.
-
-  @param  Event        Event whose notification function is being invoked.
-  @param  Context      Pointer to the notification function's context.
-
-**/
-VOID
-EFIAPI
-OnReadyToBoot (
-  IN  EFI_EVENT  Event,
-  IN  VOID       *Context
-  )
-{
-  //
-  // Enable SCI
-  //
-  IoOr16 (mPmCtrlReg, BIT0);
-
-  DEBUG ((EFI_D_ERROR, "Enable SCI bit at 0x%lx before boot\n", (UINT64)mPmCtrlReg));
-}
 
 /**
   Main entry for the Coreboot Support DXE module.
@@ -130,10 +104,8 @@ CbDxeEntryPoint (
   )
 {
   EFI_STATUS Status;
-  EFI_EVENT  ReadyToBootEvent;
   EFI_HOB_GUID_TYPE  *GuidHob;
   SYSTEM_TABLE_INFO  *pSystemTableInfo;
-  ACPI_BOARD_INFO    *pAcpiBoardInfo;
   FRAME_BUFFER_INFO  *FbInfo;
 
   Status = EFI_SUCCESS;
@@ -172,16 +144,6 @@ CbDxeEntryPoint (
   }
 
   //
-  // Find the acpi board information guid hob
-  //
-  GuidHob = GetFirstGuidHob (&gUefiAcpiBoardInfoGuid);
-  ASSERT (GuidHob != NULL);
-  pAcpiBoardInfo = (ACPI_BOARD_INFO *)GET_GUID_HOB_DATA (GuidHob);
-
-  mPmCtrlReg = (UINTN)pAcpiBoardInfo->PmCtrlRegBase;
-  DEBUG ((EFI_D_ERROR, "PmCtrlReg at 0x%lx\n", (UINT64)mPmCtrlReg));
-
-  //
   // Find the frame buffer information and update PCDs
   //
   GuidHob = GetFirstGuidHob (&gUefiFrameBufferInfoGuid);
@@ -196,19 +158,6 @@ CbDxeEntryPoint (
     Status = PcdSet32S (PcdSetupVideoVerticalResolution, FbInfo->VerticalResolution);
     ASSERT_EFI_ERROR (Status);
   }
-
-  //
-  // Register callback on the ready to boot event
-  // in order to enable SCI
-  //
-  ReadyToBootEvent = NULL;
-  Status = EfiCreateEventReadyToBootEx (
-                    TPL_CALLBACK,
-                    OnReadyToBoot,
-                    NULL,
-                    &ReadyToBootEvent
-                    );
-  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }

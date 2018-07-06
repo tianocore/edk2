@@ -1,14 +1,14 @@
 /** @file
   ISA Floppy Disk UEFI Driver conforming to the UEFI driver model
 
-  1. Support two types diskette drive  
+  1. Support two types diskette drive
      1.44M drive and 2.88M drive (and now only support 1.44M)
   2. Support two diskette drives per floppy disk controller
   3. Use DMA channel 2 to transfer data
   4. Do not use interrupt
   5. Support diskette change line signal and write protect
-  
-Copyright (c) 2006 - 2009, Intel Corporation. All rights reserved.<BR>
+
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -39,9 +39,9 @@ EFI_DRIVER_BINDING_PROTOCOL gFdcControllerDriver = {
 /**
   The main Entry Point for this driver.
 
-  @param[in] ImageHandle  The firmware allocated handle for the EFI image.  
+  @param[in] ImageHandle  The firmware allocated handle for the EFI image.
   @param[in] SystemTable  A pointer to the EFI System Table.
-  
+
   @retval EFI_SUCCESS     The entry point is executed successfully.
   @retval other           Some error occurs when executing this entry point.
 **/
@@ -72,14 +72,14 @@ InitializeIsaFloppy(
 
 /**
   Test if the controller is a floppy disk drive device
-  
-  @param[in] This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.  
+
+  @param[in] This                 A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
   @param[in] Controller           The handle of the controller to test.
   @param[in] RemainingDevicePath  A pointer to the remaining portion of a device path.
-  
+
   @retval EFI_SUCCESS             The device is supported by this driver.
   @retval EFI_ALREADY_STARTED     The device is already being managed by this driver.
-  @retval EFI_ACCESS_DENIED       The device is already being managed by a different driver 
+  @retval EFI_ACCESS_DENIED       The device is already being managed by a different driver
                                   or an application that requires exclusive access.
   @retval EFI_UNSUPPORTED         The device is is not supported by this driver.
 **/
@@ -159,10 +159,10 @@ FdcControllerDriverSupported (
   Start this driver on Controller.
 
   @param[in] This                  A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in] ControllerHandle      The handle of the controller to start. This handle 
-                                   must support a protocol interface that supplies 
+  @param[in] ControllerHandle      The handle of the controller to start. This handle
+                                   must support a protocol interface that supplies
                                    an I/O abstraction to the driver.
-  @param[in] RemainingDevicePath   A pointer to the remaining portion of a device path. 
+  @param[in] RemainingDevicePath   A pointer to the remaining portion of a device path.
                                    This parameter is ignored by device drivers, and is optional for bus drivers.
 
   @retval EFI_SUCCESS              The device was started.
@@ -248,7 +248,7 @@ FdcControllerDriverStart (
 
   FdcDev->ControllerNameTable = NULL;
   AddName (FdcDev);
-  
+
   //
   // Look up the base address of the Floppy Disk Controller which controls this floppy device
   //
@@ -397,11 +397,11 @@ Done:
   Stop this driver on ControllerHandle.
 
   @param[in] This               A pointer to the EFI_DRIVER_BINDING_PROTOCOL instance.
-  @param[in] ControllerHandle   A handle to the device being stopped. The handle must 
-                                support a bus specific I/O protocol for the driver 
+  @param[in] ControllerHandle   A handle to the device being stopped. The handle must
+                                support a bus specific I/O protocol for the driver
                                 to use to stop the device.
   @param[in] NumberOfChildren   The number of child device handles in ChildHandleBuffer.
-  @param[in] ChildHandleBuffer  An array of child handles to be freed. May be NULL 
+  @param[in] ChildHandleBuffer  An array of child handles to be freed. May be NULL
                                 if NumberOfChildren is 0.
 
   @retval EFI_SUCCESS           The device was stopped.

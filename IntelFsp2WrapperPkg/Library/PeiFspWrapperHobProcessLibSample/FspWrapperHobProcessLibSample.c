@@ -1,7 +1,7 @@
 /** @file
   Sample to provide FSP wrapper hob process related function.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -359,7 +359,7 @@ ProcessFspHobList (
       //
       // Skip FSP binary creates PcdDataBaseHobGuid
       //
-      if (!CompareGuid(&FspHob.Guid->Name, &gPcdDataBaseHobGuid)) { 
+      if (!CompareGuid(&FspHob.Guid->Name, &gPcdDataBaseHobGuid)) {
         BuildGuidDataHob (
           &FspHob.Guid->Name,
           GET_GUID_HOB_DATA(FspHob),

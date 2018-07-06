@@ -1,7 +1,7 @@
 ## @file InfPomAlignment.py
 # This file contained the adapter for convert INF parser object to POM Object
 #
-# Copyright (c) 2011 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available 
 # under the terms and conditions of the BSD License which accompanies this 
@@ -20,10 +20,10 @@ InfPomAlignment
 import os.path
 from Logger import StringTable as ST
 import Logger.Log as Logger
-from Library.String import FORMAT_INVALID
-from Library.String import PARSER_ERROR
-from Library.String import NormPath
-from Library.String import GetSplitValueList
+from Library.StringUtils import FORMAT_INVALID
+from Library.StringUtils import PARSER_ERROR
+from Library.StringUtils import NormPath
+from Library.StringUtils import GetSplitValueList
 from Library.Misc import ConvertVersionToDecimal
 from Library.Misc import GetHelpStringByRemoveHashKey
 from Library.Misc import ConvertArchList
@@ -167,11 +167,11 @@ class InfPomAlignment(ModuleObject):
         #
         # Convert UEFI/PI version to decimal number
         #
-        if DefineObj.GetUefiSpecificationVersion() != None:
+        if DefineObj.GetUefiSpecificationVersion() is not None:
             __UefiVersion = DefineObj.GetUefiSpecificationVersion().GetValue()
             __UefiVersion = ConvertVersionToDecimal(__UefiVersion)
             self.SetUefiSpecificationVersion(str(__UefiVersion))
-        if DefineObj.GetPiSpecificationVersion() != None:
+        if DefineObj.GetPiSpecificationVersion() is not None:
             __PiVersion = DefineObj.GetPiSpecificationVersion().GetValue()
             __PiVersion = ConvertVersionToDecimal(__PiVersion)
 
@@ -186,7 +186,7 @@ class InfPomAlignment(ModuleObject):
         # must exist items in INF define section
         # MODULE_TYPE/BASE_NAME/INF_VERSION/FILE_GUID/VERSION_STRING 
         #
-        if DefineObj.GetModuleType() == None:
+        if DefineObj.GetModuleType() is None:
             Logger.Error("InfParser", FORMAT_INVALID,
                          ST.ERR_INF_PARSER_DEFINE_SECTION_MUST_ITEM_NOT_EXIST % ("MODULE_TYPE"), File=self.FullPath)
         else:
@@ -205,7 +205,7 @@ class InfPomAlignment(ModuleObject):
                                  Line=DefineObj.ModuleType.CurrentLine.LineNo,
                                  ExtraData=DefineObj.ModuleType.CurrentLine.LineString)
                 self.LibModuleTypeList.append(ModuleType)
-        if DefineObj.GetBaseName() == None:
+        if DefineObj.GetBaseName() is None:
             Logger.Error("InfParser", FORMAT_INVALID,
                          ST.ERR_INF_PARSER_DEFINE_SECTION_MUST_ITEM_NOT_EXIST % ("BASE_NAME"), File=self.FullPath)
         else:
@@ -214,17 +214,17 @@ class InfPomAlignment(ModuleObject):
             self.UniFileClassObject = UniFileClassObject([PathClass(DefineObj.GetModuleUniFileName())])
         else:
             self.UniFileClassObject = None
-        if DefineObj.GetInfVersion() == None:
+        if DefineObj.GetInfVersion() is None:
             Logger.Error("InfParser", FORMAT_INVALID,
                          ST.ERR_INF_PARSER_DEFINE_SECTION_MUST_ITEM_NOT_EXIST % ("INF_VERSION"), File=self.FullPath)
         else:
             self.SetVersion(DefineObj.GetInfVersion().GetValue())
-        if DefineObj.GetFileGuid() == None:
+        if DefineObj.GetFileGuid() is None:
             Logger.Error("InfParser", FORMAT_INVALID,
                          ST.ERR_INF_PARSER_DEFINE_SECTION_MUST_ITEM_NOT_EXIST % ("FILE_GUID"), File=self.FullPath)
         else:
             self.SetGuid(DefineObj.GetFileGuid().GetValue())
-        if DefineObj.GetVersionString() == None:
+        if DefineObj.GetVersionString() is None:
             #
             # VERSION_STRING is missing from the [Defines] section, tools must assume that the module's version is 0.
             #
@@ -256,7 +256,7 @@ class InfPomAlignment(ModuleObject):
             if not (ModuleTypeValue == 'SEC' or ModuleTypeValue == 'PEI_CORE' or ModuleTypeValue == 'PEIM'):
                 Logger.Error("InfParser", FORMAT_INVALID, ST.ERR_INF_PARSER_DEFINE_SHADOW_INVALID, File=self.FullPath)
 
-        if DefineObj.GetPcdIsDriver() != None:
+        if DefineObj.GetPcdIsDriver() is not None:
             self.SetPcdIsDriver(DefineObj.GetPcdIsDriver().GetValue())
         #
         # LIBRARY_CLASS
@@ -486,10 +486,7 @@ class InfPomAlignment(ModuleObject):
             #
             # Get all LibraryClasses
             #
-            LibClassObj = self.Parser.InfLibraryClassSection.LibraryClasses
-            Keys = LibClassObj.keys()
-            for Key in Keys:
-                LibraryClassData = LibClassObj[Key]
+            for LibraryClassData in self.Parser.InfLibraryClassSection.LibraryClasses.values():
                 for Item in LibraryClassData:
                     LibraryClass = CommonObject.LibraryClassObject()
                     LibraryClass.SetUsage(DT.USAGE_ITEM_CONSUMES)
@@ -499,7 +496,7 @@ class InfPomAlignment(ModuleObject):
                     LibraryClass.SetSupArchList(ConvertArchList(Item.GetSupArchList()))
                     LibraryClass.SetSupModuleList(Item.GetSupModuleList())
                     HelpStringObj = Item.GetHelpString()
-                    if HelpStringObj != None:
+                    if HelpStringObj is not None:
                         CommentString = GetHelpStringByRemoveHashKey(HelpStringObj.HeaderComments +
                                                                      HelpStringObj.TailComments)
                         HelpTextHeaderObj = CommonObject.TextObject()
@@ -614,8 +611,7 @@ class InfPomAlignment(ModuleObject):
                 SourceFile = Item.GetSourceFileName()
                 Family = Item.GetFamily()
                 FeatureFlag = Item.GetFeatureFlagExp()
-                SupArchList = ConvertArchList(Item.GetSupArchList())
-                SupArchList.sort()
+                SupArchList = sorted(ConvertArchList(Item.GetSupArchList()))
                 Source = SourceFileObject()
                 Source.SetSourceFile(SourceFile)
                 Source.SetFamily(Family)

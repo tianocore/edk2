@@ -86,6 +86,7 @@
   MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
   MdePkg/Library/BaseUefiDecompressLib/BaseUefiDecompressLib.inf
   MdePkg/Library/BaseSmbusLibNull/BaseSmbusLibNull.inf
+  MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
 
   MdePkg/Library/DxeCoreEntryPoint/DxeCoreEntryPoint.inf
   MdePkg/Library/DxeCoreHobLib/DxeCoreHobLib.inf
@@ -178,13 +179,14 @@
   MdePkg/Library/DxePciSegmentLibEsal/DxePciSegmentLibEsal.inf
   MdePkg/Library/DxeRuntimeExtendedSalLib/DxeRuntimeExtendedSalLib.inf
   MdePkg/Library/DxeSalLibEsal/DxeSalLibEsal.inf
-  MdePkg/Library/DxeTimerLibEsal/DxeTimerLibEsal.inf  
-  
+  MdePkg/Library/DxeTimerLibEsal/DxeTimerLibEsal.inf
+
 [Components.EBC]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
   MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
 
 [Components.ARM, Components.AARCH64]
+  MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsicArmVirt.inf
   MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
 [BuildOptions]

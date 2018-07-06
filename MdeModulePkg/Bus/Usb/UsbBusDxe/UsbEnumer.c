@@ -2,7 +2,7 @@
 
     Usb bus enumeration support.
 
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -33,9 +33,9 @@ UsbGetEndpointDesc (
   USB_ENDPOINT_DESC       *EpDesc;
   UINT8                   Index;
   UINT8                   NumEndpoints;
-  
+
   NumEndpoints = UsbIf->IfSetting->Desc.NumEndpoints;
-  
+
   for (Index = 0; Index < NumEndpoints; Index++) {
     EpDesc = UsbIf->IfSetting->Endpoints[Index];
 
@@ -279,7 +279,7 @@ UsbConnectDriver (
     // twisted TPL used. It should be no problem for us to connect
     // or disconnect at CALLBACK.
     //
-    
+
     //
     // Only recursively wanted usb child device
     //
@@ -493,13 +493,13 @@ UsbDisconnectDriver (
     if (!EFI_ERROR (Status)) {
       UsbIf->IsManaged = FALSE;
     }
-    
+
     DEBUG (( EFI_D_INFO, "UsbDisconnectDriver: TPL after disconnect is %d, %d\n", (UINT32)UsbGetCurrentTpl(), Status));
     ASSERT (UsbGetCurrentTpl () == TPL_CALLBACK);
 
     gBS->RaiseTPL (OldTpl);
   }
-  
+
   return Status;
 }
 
@@ -524,7 +524,7 @@ UsbRemoveConfig (
   // Remove each interface of the device
   //
   ReturnStatus = EFI_SUCCESS;
-  for (Index = 0; Index < Device->NumOfInterface; Index++) {    
+  for (Index = 0; Index < Device->NumOfInterface; Index++) {
     ASSERT (Index < USB_MAX_INTERFACE);
     UsbIf = Device->Interfaces[Index];
 
@@ -683,11 +683,11 @@ UsbEnumerateNewDev (
 
   Parent  = HubIf->Device;
   Bus     = Parent->Bus;
-  HubApi  = HubIf->HubApi;  
+  HubApi  = HubIf->HubApi;
   Address = Bus->MaxDevices;
 
   gBS->Stall (USB_WAIT_PORT_STABLE_STALL);
-  
+
   //
   // Hub resets the device for at least 10 milliseconds.
   // Host learns device speed. If device is of low/full speed
@@ -698,7 +698,7 @@ UsbEnumerateNewDev (
     Status = HubApi->ResetPort (HubIf, Port);
     if (EFI_ERROR (Status)) {
       DEBUG ((EFI_D_ERROR, "UsbEnumerateNewDev: failed to reset port %d - %r\n", Port, Status));
-  
+
       return Status;
     }
     DEBUG (( EFI_D_INFO, "UsbEnumerateNewDev: hub port %d is reset\n", Port));
@@ -927,60 +927,60 @@ UsbEnumeratePort (
   // connect/disconnect. Other three events are: ENABLE, SUSPEND, RESET.
   // ENABLE/RESET is used to reset port. SUSPEND isn't supported.
   //
-  
-  if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_OVERCURRENT)) {     
+
+  if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_OVERCURRENT)) {
 
     if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_OVERCURRENT)) {
       //
       // Case1:
-      //   Both OverCurrent and OverCurrentChange set, means over current occurs, 
+      //   Both OverCurrent and OverCurrentChange set, means over current occurs,
       //   which probably is caused by short circuit. It has to wait system hardware
       //   to perform recovery.
       //
       DEBUG (( EFI_D_ERROR, "UsbEnumeratePort: Critical Over Current\n", Port));
       return EFI_DEVICE_ERROR;
-      
-    } 
+
+    }
     //
     // Case2:
-    //   Only OverCurrentChange set, means system has been recoveried from 
+    //   Only OverCurrentChange set, means system has been recoveried from
     //   over current. As a result, all ports are nearly power-off, so
-    //   it's necessary to detach and enumerate all ports again. 
+    //   it's necessary to detach and enumerate all ports again.
     //
-    DEBUG (( EFI_D_ERROR, "UsbEnumeratePort: 2.0 device Recovery Over Current\n", Port)); 
+    DEBUG (( EFI_D_ERROR, "UsbEnumeratePort: 2.0 device Recovery Over Current\n", Port));
   }
 
-  if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_ENABLE)) {  
+  if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_ENABLE)) {
     //
     // Case3:
     //   1.1 roothub port reg doesn't reflect over-current state, while its counterpart
-    //   on 2.0 roothub does. When over-current has influence on 1.1 device, the port 
+    //   on 2.0 roothub does. When over-current has influence on 1.1 device, the port
     //   would be disabled, so it's also necessary to detach and enumerate again.
     //
     DEBUG (( EFI_D_ERROR, "UsbEnumeratePort: 1.1 device Recovery Over Current\n", Port));
   }
-  
+
   if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_CONNECTION)) {
     //
     // Case4:
-    //   Device connected or disconnected normally. 
+    //   Device connected or disconnected normally.
     //
     DEBUG ((EFI_D_INFO, "UsbEnumeratePort: Device Connect/Disconnect Normally\n", Port));
   }
 
-  // 
+  //
   // Following as the above cases, it's safety to remove and create again.
   //
   Child = UsbFindChild (HubIf, Port);
-  
+
   if (Child != NULL) {
     DEBUG (( EFI_D_INFO, "UsbEnumeratePort: device at port %d removed from root hub %p\n", Port, HubIf));
     UsbRemoveDevice (Child);
   }
-  
+
   if (USB_BIT_IS_SET (PortState.PortStatus, USB_PORT_STAT_CONNECTION)) {
     //
-    // Now, new device connected, enumerate and configure the device 
+    // Now, new device connected, enumerate and configure the device
     //
     DEBUG (( EFI_D_INFO, "UsbEnumeratePort: new device connected at port %d\n", Port));
     if (USB_BIT_IS_SET (PortState.PortChangeStatus, USB_PORT_STAT_C_RESET)) {
@@ -988,11 +988,11 @@ UsbEnumeratePort (
     } else {
       Status = UsbEnumerateNewDev (HubIf, Port, TRUE);
     }
-  
+
   } else {
     DEBUG (( EFI_D_INFO, "UsbEnumeratePort: device disconnected event on port %d\n", Port));
   }
-  
+
   HubApi->ClearPortChange (HubIf, Port);
   return Status;
 }
@@ -1017,7 +1017,7 @@ UsbHubEnumeration (
   UINT8                   Bit;
   UINT8                   Index;
   USB_DEVICE              *Child;
-  
+
   ASSERT (Context != NULL);
 
   HubIf = (USB_INTERFACE *) Context;
@@ -1082,7 +1082,7 @@ UsbRootHubEnumeration (
       DEBUG (( EFI_D_INFO, "UsbEnumeratePort: The device disconnect fails at port %d from root hub %p, try again\n", Index, RootHub));
       UsbRemoveDevice (Child);
     }
-    
+
     UsbEnumeratePort (RootHub, Index);
   }
 }

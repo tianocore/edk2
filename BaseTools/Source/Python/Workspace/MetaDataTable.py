@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create/update/query/erase table for files
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -73,7 +73,7 @@ class Table(object):
         self.ID = self.ID + self._ID_STEP_
         if self.ID >= (self.IdBase + self._ID_MAX_):
             self.ID = self.IdBase + self._ID_STEP_
-        Values = ", ".join([str(Arg) for Arg in Args])
+        Values = ", ".join(str(Arg) for Arg in Args)
         SqlCommand = "insert into %s values(%s, %s)" % (self.Table, self.ID, Values)
         EdkLogger.debug(EdkLogger.DEBUG_5, SqlCommand)
         self.Cur.execute(SqlCommand)
@@ -113,7 +113,7 @@ class Table(object):
         SqlCommand = """select max(ID) from %s""" % self.Table
         Record = self.Cur.execute(SqlCommand).fetchall()
         Id = Record[0][0]
-        if Id == None:
+        if Id is None:
             Id = self.IdBase
         return Id
 
@@ -168,7 +168,8 @@ class TableFile(Table):
         Path VARCHAR,
         FullPath VARCHAR NOT NULL,
         Model INTEGER DEFAULT 0,
-        TimeStamp SINGLE NOT NULL
+        TimeStamp SINGLE NOT NULL,
+        FromItem REAL NOT NULL
         '''
     def __init__(self, Cursor):
         Table.__init__(self, Cursor, 'File')
@@ -184,7 +185,7 @@ class TableFile(Table):
     # @param Model:     Model of a File
     # @param TimeStamp: TimeStamp of a File
     #
-    def Insert(self, Name, ExtName, Path, FullPath, Model, TimeStamp):
+    def Insert(self, Name, ExtName, Path, FullPath, Model, TimeStamp, FromItem=0):
         (Name, ExtName, Path, FullPath) = ConvertToSqlString((Name, ExtName, Path, FullPath))
         return Table.Insert(
             self,
@@ -193,7 +194,8 @@ class TableFile(Table):
             Path,
             FullPath,
             Model,
-            TimeStamp
+            TimeStamp,
+            FromItem
             )
 
     ## InsertFile
@@ -205,7 +207,17 @@ class TableFile(Table):
     #
     # @retval FileID:       The ID after record is inserted
     #
-    def InsertFile(self, File, Model):
+    def InsertFile(self, File, Model, FromItem=''):
+        if FromItem:
+            return self.Insert(
+                        File.Name,
+                        File.Ext,
+                        File.Dir,
+                        File.Path,
+                        Model,
+                        File.TimeStamp,
+                        FromItem
+                        )
         return self.Insert(
                         File.Name,
                         File.Ext,
@@ -221,8 +233,11 @@ class TableFile(Table):
     #
     #   @retval ID          ID value of given file in the table
     #
-    def GetFileId(self, File):
-        QueryScript = "select ID from %s where FullPath = '%s'" % (self.Table, str(File))
+    def GetFileId(self, File, FromItem=None):
+        if FromItem:
+            QueryScript = "select ID from %s where FullPath = '%s' and FromItem = %s" % (self.Table, str(File), str(FromItem))
+        else:
+            QueryScript = "select ID from %s where FullPath = '%s'" % (self.Table, str(File))
         RecordList = self.Exec(QueryScript)
         if len(RecordList) == 0:
             return None
@@ -311,7 +326,7 @@ class TableDataModel(Table):
     def InitTable(self):
         EdkLogger.verbose("\nInitialize table DataModel started ...")
         Count = self.GetCount()
-        if Count != None and Count != 0:
+        if Count is not None and Count != 0:
             return
         for Item in DataClass.MODEL_LIST:
             CrossIndex = Item[1]

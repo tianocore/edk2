@@ -1,7 +1,7 @@
 /** @file
   UEFI Memory page management functions.
 
-Copyright (c) 2007 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -93,7 +93,7 @@ EFI_MEMORY_TYPE_INFORMATION gMemoryTypeInformation[EfiMaxMemoryType + 1] = {
 };
 //
 // Only used when load module at fixed address feature is enabled. True means the memory is alreay successfully allocated
-// and ready to load the module in to specified address.or else, the memory is not ready and module will be loaded at a 
+// and ready to load the module in to specified address.or else, the memory is not ready and module will be loaded at a
 //  address assigned by DXE core.
 //
 GLOBAL_REMOVE_IF_UNREFERENCED   BOOLEAN       gLoadFixedAddressCodeMemoryReady = FALSE;
@@ -178,22 +178,22 @@ CoreAddRange (
   ASSERT_LOCKED (&gMemoryLock);
 
   DEBUG ((DEBUG_PAGE, "AddRange: %lx-%lx to %d\n", Start, End, Type));
-  
+
   //
-  // If memory of type EfiConventionalMemory is being added that includes the page 
-  // starting at address 0, then zero the page starting at address 0.  This has 
-  // two benifits.  It helps find NULL pointer bugs and it also maximizes 
-  // compatibility with operating systems that may evaluate memory in this page 
-  // for legacy data structures.  If memory of any other type is added starting 
-  // at address 0, then do not zero the page at address 0 because the page is being 
+  // If memory of type EfiConventionalMemory is being added that includes the page
+  // starting at address 0, then zero the page starting at address 0.  This has
+  // two benifits.  It helps find NULL pointer bugs and it also maximizes
+  // compatibility with operating systems that may evaluate memory in this page
+  // for legacy data structures.  If memory of any other type is added starting
+  // at address 0, then do not zero the page at address 0 because the page is being
   // used for other purposes.
-  //  
+  //
   if (Type == EfiConventionalMemory && Start == 0 && (End >= EFI_PAGE_SIZE - 1)) {
     if ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & BIT0) == 0) {
       SetMem ((VOID *)(UINTN)Start, EFI_PAGE_SIZE, 0);
     }
   }
-  
+
   //
   // Memory map being altered so updated key
   //
@@ -454,8 +454,8 @@ PromoteMemoryResource (
   return Promoted;
 }
 /**
-  This function try to allocate Runtime code & Boot time code memory range. If LMFA enabled, 2 patchable PCD 
-  PcdLoadFixAddressRuntimeCodePageNumber & PcdLoadFixAddressBootTimeCodePageNumber which are set by tools will record the 
+  This function try to allocate Runtime code & Boot time code memory range. If LMFA enabled, 2 patchable PCD
+  PcdLoadFixAddressRuntimeCodePageNumber & PcdLoadFixAddressBootTimeCodePageNumber which are set by tools will record the
   size of boot time and runtime code.
 
 **/
@@ -473,7 +473,7 @@ CoreLoadingFixedAddressHook (
    //
    // Make sure these 2 areas are not initialzied.
    //
-   if (!gLoadFixedAddressCodeMemoryReady) {   
+   if (!gLoadFixedAddressCodeMemoryReady) {
      RuntimeCodePageNumber = PcdGet32(PcdLoadFixAddressRuntimeCodePageNumber);
      BootTimeCodePageNumber= PcdGet32(PcdLoadFixAddressBootTimeCodePageNumber);
      RuntimeCodeBase       = (EFI_PHYSICAL_ADDRESS)(gLoadModuleAtFixAddressConfigurationTable.DxeCodeTopAddress - EFI_PAGES_TO_SIZE (RuntimeCodePageNumber));
@@ -489,7 +489,7 @@ CoreLoadingFixedAddressHook (
                        );
      if (EFI_ERROR(Status)) {
        //
-       // Runtime memory allocation failed 
+       // Runtime memory allocation failed
        //
        return;
      }
@@ -504,19 +504,19 @@ CoreLoadingFixedAddressHook (
                        );
      if (EFI_ERROR(Status)) {
        //
-     	 // boot memory allocation failed. Free Runtime code range and will try the allocation again when 
-     	 // new memory range is installed.
-     	 //
-     	 CoreFreePages (
+        // boot memory allocation failed. Free Runtime code range and will try the allocation again when
+        // new memory range is installed.
+        //
+        CoreFreePages (
               RuntimeCodeBase,
               RuntimeCodePageNumber
               );
        return;
      }
      gLoadFixedAddressCodeMemoryReady = TRUE;
-   } 
+   }
    return;
-}  
+}
 
 /**
   Called to initialize the memory map and add descriptors to
@@ -545,7 +545,7 @@ CoreAddMemoryDescriptor (
   EFI_STATUS                  Status;
   UINTN                       Index;
   UINTN                       FreeIndex;
-  
+
   if ((Start & EFI_PAGE_MASK) != 0) {
     return;
   }
@@ -568,7 +568,7 @@ CoreAddMemoryDescriptor (
   if (PcdGet64(PcdLoadModuleAtFixAddressEnable) != 0) {
     CoreLoadingFixedAddressHook();
   }
-  
+
   //
   // Check to see if the statistics for the different memory types have already been established
   //
@@ -576,7 +576,7 @@ CoreAddMemoryDescriptor (
     return;
   }
 
-  
+
   //
   // Loop through each memory type in the order specified by the gMemoryTypeInformation[] array
   //
@@ -1163,10 +1163,10 @@ FindFreePages (
   //
   if ((UINT32)NewType < EfiMaxMemoryType && MaxAddress >= mMemoryTypeStatistics[NewType].MaximumAddress) {
     Start = CoreFindFreePagesI (
-              mMemoryTypeStatistics[NewType].MaximumAddress, 
-              mMemoryTypeStatistics[NewType].BaseAddress, 
-              NoPages, 
-              NewType, 
+              mMemoryTypeStatistics[NewType].MaximumAddress,
+              mMemoryTypeStatistics[NewType].BaseAddress,
+              NoPages,
+              NewType,
               Alignment,
               NeedGuard
               );
@@ -1190,9 +1190,9 @@ FindFreePages (
   }
 
   //
-  // The allocation did not succeed in any of the prefered bins even after 
-  // promoting resources. Attempt to find free pages anywhere is the requested 
-  // address range.  If this allocation fails, then there are not enough 
+  // The allocation did not succeed in any of the prefered bins even after
+  // promoting resources. Attempt to find free pages anywhere is the requested
+  // address range.  If this allocation fails, then there are not enough
   // resources anywhere to satisfy the request.
   //
   Start = CoreFindFreePagesI (MaxAddress, 0, NoPages, NewType, Alignment,
@@ -1311,7 +1311,7 @@ CoreInternalAllocatePages (
     End = Start + NumberOfBytes - 1;
 
     if ((Start >= End) ||
-        (Start > MaxAddress) || 
+        (Start > MaxAddress) ||
         (End > MaxAddress)) {
       return EFI_NOT_FOUND;
     }
@@ -1571,7 +1571,7 @@ MergeMemoryMapDescriptor (
     //
     // Check to see if MemoryMapDescriptor is immediately above MemoryMap
     //
-    if (MemoryMap->PhysicalStart + EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages) == MemoryMapDescriptor->PhysicalStart) { 
+    if (MemoryMap->PhysicalStart + EFI_PAGES_TO_SIZE ((UINTN)MemoryMap->NumberOfPages) == MemoryMapDescriptor->PhysicalStart) {
       //
       // Merge MemoryMapDescriptor into MemoryMap
       //
@@ -1604,7 +1604,7 @@ MergeMemoryMapDescriptor (
   //
   // MemoryMapDescrtiptor could not be merged with any descriptors in MemoryMap.
   //
-  // Return the slot immediately after MemoryMapDescriptor as the next available 
+  // Return the slot immediately after MemoryMapDescriptor as the next available
   // slot in the MemoryMap array
   //
   return NEXT_MEMORY_DESCRIPTOR (MemoryMapDescriptor, DescriptorSize);
@@ -1678,7 +1678,7 @@ CoreGetMemoryMap (
   NumberOfEntries = 0;
   for (Link = mGcdMemorySpaceMap.ForwardLink; Link != &mGcdMemorySpaceMap; Link = Link->ForwardLink) {
     GcdMapEntry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
-    if ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypePersistent) || 
+    if ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypePersistent) ||
         (GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeReserved) ||
         ((GcdMapEntry->GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
         ((GcdMapEntry->Attributes & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME))) {
@@ -1764,13 +1764,13 @@ CoreGetMemoryMap (
     }
 
     //
-    // Check to see if the new Memory Map Descriptor can be merged with an 
+    // Check to see if the new Memory Map Descriptor can be merged with an
     // existing descriptor if they are adjacent and have the same attributes
     //
     MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);
   }
 
- 
+
   ZeroMem (&MergeGcdMapEntry, sizeof (MergeGcdMapEntry));
   GcdMapEntry = NULL;
   for (Link = mGcdMemorySpaceMap.ForwardLink; ; Link = Link->ForwardLink) {
@@ -1779,8 +1779,8 @@ CoreGetMemoryMap (
       // Merge adjacent same type and attribute GCD memory range
       //
       GcdMapEntry = CR (Link, EFI_GCD_MAP_ENTRY, Link, EFI_GCD_MAP_SIGNATURE);
-  
-      if ((MergeGcdMapEntry.Capabilities == GcdMapEntry->Capabilities) && 
+
+      if ((MergeGcdMapEntry.Capabilities == GcdMapEntry->Capabilities) &&
           (MergeGcdMapEntry.Attributes == GcdMapEntry->Attributes) &&
           (MergeGcdMapEntry.GcdMemoryType == GcdMapEntry->GcdMemoryType) &&
           (MergeGcdMapEntry.GcdIoType == GcdMapEntry->GcdIoType)) {
@@ -1793,19 +1793,19 @@ CoreGetMemoryMap (
         ((MergeGcdMapEntry.GcdMemoryType == EfiGcdMemoryTypeMemoryMappedIo) &&
         ((MergeGcdMapEntry.Attributes & EFI_MEMORY_RUNTIME) == EFI_MEMORY_RUNTIME))) {
       //
-      // Page Align GCD range is required. When it is converted to EFI_MEMORY_DESCRIPTOR, 
-      // it will be recorded as page PhysicalStart and NumberOfPages. 
+      // Page Align GCD range is required. When it is converted to EFI_MEMORY_DESCRIPTOR,
+      // it will be recorded as page PhysicalStart and NumberOfPages.
       //
       ASSERT ((MergeGcdMapEntry.BaseAddress & EFI_PAGE_MASK) == 0);
       ASSERT (((MergeGcdMapEntry.EndAddress - MergeGcdMapEntry.BaseAddress + 1) & EFI_PAGE_MASK) == 0);
-      
-      // 
+
+      //
       // Create EFI_MEMORY_DESCRIPTOR for every Reserved and runtime MMIO GCD entries
       //
       MemoryMap->PhysicalStart = MergeGcdMapEntry.BaseAddress;
       MemoryMap->VirtualStart  = 0;
       MemoryMap->NumberOfPages = RShiftU64 ((MergeGcdMapEntry.EndAddress - MergeGcdMapEntry.BaseAddress + 1), EFI_PAGE_SHIFT);
-      MemoryMap->Attribute     = (MergeGcdMapEntry.Attributes & ~EFI_MEMORY_PORT_IO) | 
+      MemoryMap->Attribute     = (MergeGcdMapEntry.Attributes & ~EFI_MEMORY_PORT_IO) |
                                 (MergeGcdMapEntry.Capabilities & (EFI_MEMORY_RP | EFI_MEMORY_WP | EFI_MEMORY_XP | EFI_MEMORY_RO |
                                 EFI_MEMORY_UC | EFI_MEMORY_UCE | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB));
 
@@ -1820,33 +1820,33 @@ CoreGetMemoryMap (
       }
 
       //
-      // Check to see if the new Memory Map Descriptor can be merged with an 
+      // Check to see if the new Memory Map Descriptor can be merged with an
       // existing descriptor if they are adjacent and have the same attributes
       //
       MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);
     }
-    
+
     if (MergeGcdMapEntry.GcdMemoryType == EfiGcdMemoryTypePersistent) {
       //
-      // Page Align GCD range is required. When it is converted to EFI_MEMORY_DESCRIPTOR, 
-      // it will be recorded as page PhysicalStart and NumberOfPages. 
+      // Page Align GCD range is required. When it is converted to EFI_MEMORY_DESCRIPTOR,
+      // it will be recorded as page PhysicalStart and NumberOfPages.
       //
       ASSERT ((MergeGcdMapEntry.BaseAddress & EFI_PAGE_MASK) == 0);
       ASSERT (((MergeGcdMapEntry.EndAddress - MergeGcdMapEntry.BaseAddress + 1) & EFI_PAGE_MASK) == 0);
 
-      // 
+      //
       // Create EFI_MEMORY_DESCRIPTOR for every Persistent GCD entries
       //
       MemoryMap->PhysicalStart = MergeGcdMapEntry.BaseAddress;
       MemoryMap->VirtualStart  = 0;
       MemoryMap->NumberOfPages = RShiftU64 ((MergeGcdMapEntry.EndAddress - MergeGcdMapEntry.BaseAddress + 1), EFI_PAGE_SHIFT);
-      MemoryMap->Attribute     = MergeGcdMapEntry.Attributes | EFI_MEMORY_NV | 
+      MemoryMap->Attribute     = MergeGcdMapEntry.Attributes | EFI_MEMORY_NV |
                                 (MergeGcdMapEntry.Capabilities & (EFI_MEMORY_RP | EFI_MEMORY_WP | EFI_MEMORY_XP | EFI_MEMORY_RO |
                                 EFI_MEMORY_UC | EFI_MEMORY_UCE | EFI_MEMORY_WC | EFI_MEMORY_WT | EFI_MEMORY_WB));
       MemoryMap->Type          = EfiPersistentMemory;
-      
+
       //
-      // Check to see if the new Memory Map Descriptor can be merged with an 
+      // Check to see if the new Memory Map Descriptor can be merged with an
       // existing descriptor if they are adjacent and have the same attributes
       //
       MemoryMap = MergeMemoryMapDescriptor (MemoryMapStart, MemoryMap, Size);

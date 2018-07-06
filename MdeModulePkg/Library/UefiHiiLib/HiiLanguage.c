@@ -1,7 +1,7 @@
 /** @file
   Language related HII Library implementation.
 
-  Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,12 +16,12 @@
 #include "InternalHiiLib.h"
 
 /**
-  Retrieves a pointer to the a Null-terminated ASCII string containing the list 
-  of languages that an HII handle in the HII Database supports.  The returned 
+  Retrieves a pointer to the a Null-terminated ASCII string containing the list
+  of languages that an HII handle in the HII Database supports.  The returned
   string is allocated using AllocatePool().  The caller is responsible for freeing
   the returned string using FreePool().  The format of the returned string follows
   the language format assumed the HII Database.
-  
+
   If HiiHandle is NULL, then ASSERT().
 
   @param[in]  HiiHandle  A handle that was previously registered in the HII Database.
@@ -53,8 +53,8 @@ HiiGetSupportedLanguages (
   Status = gHiiString->GetLanguages (gHiiString, HiiHandle, &TempSupportedLanguages, &LanguageSize);
 
   //
-  // If GetLanguages() returns EFI_SUCCESS for a zero size, 
-  // then there are no supported languages registered for HiiHandle.  If GetLanguages() 
+  // If GetLanguages() returns EFI_SUCCESS for a zero size,
+  // then there are no supported languages registered for HiiHandle.  If GetLanguages()
   // returns an error other than EFI_BUFFER_TOO_SMALL, then HiiHandle is not present
   // in the HII Database
   //

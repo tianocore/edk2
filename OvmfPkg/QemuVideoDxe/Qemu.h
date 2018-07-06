@@ -96,6 +96,7 @@ typedef enum {
 } QEMU_VIDEO_VARIANT;
 
 typedef struct {
+  UINT8                                 SubClass;
   UINT16                                VendorId;
   UINT16                                DeviceId;
   QEMU_VIDEO_VARIANT                    Variant;

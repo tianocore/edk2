@@ -27,11 +27,13 @@
 #
 
 [Sources]
-  QemuFwCfgAcpiPlatform.c
-  QemuFwCfgAcpi.c
+  AcpiPlatform.h
+  BootScript.c
   EntryPoint.c
   PciDecoding.c
-  BootScript.c
+  QemuFwCfgAcpi.c
+  QemuFwCfgAcpiPlatform.c
+  QemuLoader.h
 
 [Packages]
   MdePkg/MdePkg.dec

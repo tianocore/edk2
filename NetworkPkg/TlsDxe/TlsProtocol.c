@@ -38,6 +38,7 @@ EFI_TLS_PROTOCOL  mTlsProtocol = {
                                   This is NULL.
                                   Data is NULL.
                                   DataSize is 0.
+                                  DataSize is invalid for DataType.
   @retval EFI_UNSUPPORTED         The DataType is unsupported.
   @retval EFI_ACCESS_DENIED       If the DataType is one of below:
                                   EfiTlsClientRandom
@@ -59,6 +60,8 @@ TlsSetSessionData (
   EFI_STATUS                Status;
   TLS_INSTANCE              *Instance;
   UINT16                    *CipherId;
+  CONST EFI_TLS_CIPHER      *TlsCipherList;
+  UINTN                     CipherCount;
   UINTN                     Index;
 
   EFI_TPL                   OldTpl;
@@ -100,17 +103,25 @@ TlsSetSessionData (
     Status = TlsSetConnectionEnd (Instance->TlsConn, *((EFI_TLS_CONNECTION_END *) Data));
     break;
   case EfiTlsCipherList:
+    if (DataSize % sizeof (EFI_TLS_CIPHER) != 0) {
+      Status = EFI_INVALID_PARAMETER;
+      goto ON_EXIT;
+    }
+
     CipherId = AllocatePool (DataSize);
     if (CipherId == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       goto ON_EXIT;
     }
 
-    for (Index = 0; Index < DataSize / sizeof (EFI_TLS_CIPHER); Index++) {
-      *(CipherId +Index) = HTONS (*(((UINT16 *) Data) + Index));
+    TlsCipherList = (CONST EFI_TLS_CIPHER *) Data;
+    CipherCount = DataSize / sizeof (EFI_TLS_CIPHER);
+    for (Index = 0; Index < CipherCount; Index++) {
+      CipherId[Index] = ((TlsCipherList[Index].Data1 << 8) |
+                         TlsCipherList[Index].Data2);
     }
 
-    Status = TlsSetCipherList (Instance->TlsConn, CipherId, DataSize / sizeof (EFI_TLS_CIPHER));
+    Status = TlsSetCipherList (Instance->TlsConn, CipherId, CipherCount);
 
     FreePool (CipherId);
     break;

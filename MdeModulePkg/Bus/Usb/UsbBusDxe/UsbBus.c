@@ -2,7 +2,7 @@
 
     Usb Bus Driver Binding and Bus IO Protocol.
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -862,7 +862,7 @@ UsbIoPortReset (
   Dev->Address = DevAddress;
 
   gBS->Stall (USB_SET_DEVICE_ADDRESS_STALL);
-  
+
   if (EFI_ERROR (Status)) {
     //
     // It may fail due to device disconnection or other reasons.
@@ -1036,7 +1036,7 @@ UsbBusBuildProtocol (
   RootIf->Signature       = USB_INTERFACE_SIGNATURE;
   RootIf->Device          = RootHub;
   RootIf->DevicePath      = UsbBus->DevicePath;
-  
+
   //
   // Report Status Code here since we will enumerate the USB devices
   //
@@ -1045,7 +1045,7 @@ UsbBusBuildProtocol (
     (EFI_IO_BUS_USB | EFI_IOB_PC_DETECT),
     UsbBus->DevicePath
     );
-  
+
   Status                  = mUsbRootHubApi.Init (RootIf);
 
   if (EFI_ERROR (Status)) {
@@ -1157,7 +1157,7 @@ UsbBusControllerDriverSupported (
   //
   if (RemainingDevicePath != NULL) {
     //
-    // Check if RemainingDevicePath is the End of Device Path Node, 
+    // Check if RemainingDevicePath is the End of Device Path Node,
     // if yes, go on checking other conditions
     //
     if (!IsDevicePathEnd (RemainingDevicePath)) {
@@ -1166,13 +1166,13 @@ UsbBusControllerDriverSupported (
       // check its validation
       //
       DevicePathNode.DevPath = RemainingDevicePath;
-      
+
       if ((DevicePathNode.DevPath->Type    != MESSAGING_DEVICE_PATH) ||
           (DevicePathNode.DevPath->SubType != MSG_USB_DP &&
            DevicePathNode.DevPath->SubType != MSG_USB_CLASS_DP
            && DevicePathNode.DevPath->SubType != MSG_USB_WWID_DP
            )) {
-      
+
         return EFI_UNSUPPORTED;
       }
     }
@@ -1208,7 +1208,7 @@ UsbBusControllerDriverSupported (
     if (Status == EFI_ALREADY_STARTED) {
       return EFI_SUCCESS;
     }
-  
+
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -1235,7 +1235,7 @@ UsbBusControllerDriverSupported (
            Controller
            );
   }
- 
+
   //
   // Open the EFI Device Path protocol needed to perform the supported test
   //
@@ -1362,7 +1362,7 @@ UsbBusControllerDriverStart (
         //
         // If RemainingDevicePath is the End of Device Path Node,
         // skip enumerate any device and return EFI_SUCESSS
-        // 
+        //
         return EFI_SUCCESS;
       }
     }

@@ -15,7 +15,7 @@
 # Import Modules
 #
 import Common.EdkLogger as EdkLogger
-from Common.String import ConvertToSqlString
+from Common.StringUtils import ConvertToSqlString
 from Table import Table
 
 ## TableQuery

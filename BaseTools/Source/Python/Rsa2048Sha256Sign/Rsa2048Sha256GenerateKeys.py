@@ -9,7 +9,7 @@
 # on STDOUT.
 # This tool has been tested with OpenSSL 1.0.1e 11 Feb 2013
 #
-# Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,7 @@
 '''
 Rsa2048Sha256GenerateKeys
 '''
+from __future__ import print_function
 
 import os
 import sys
@@ -50,7 +51,7 @@ if __name__ == '__main__':
   parser.add_argument("--public-key-hash-c", dest='PublicKeyHashCFile', type=argparse.FileType('wb'), help="specify the public key hash filename that is SHA 256 hash of 2048 bit RSA public key in C structure format")
   parser.add_argument("-v", "--verbose", dest='Verbose', action="store_true", help="increase output messages")
   parser.add_argument("-q", "--quiet", dest='Quiet', action="store_true", help="reduce output messages")
-  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0,10), default=0, help="set debug level")
+  parser.add_argument("--debug", dest='Debug', type=int, metavar='[0-9]', choices=range(0, 10), default=0, help="set debug level")
 
   #
   # Parse command line arguments
@@ -75,21 +76,21 @@ if __name__ == '__main__':
   try:
     Process = subprocess.Popen('%s version' % (OpenSslCommand), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
   except:  
-    print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
+    print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(1)
     
   Version = Process.communicate()
-  if Process.returncode <> 0:
-    print 'ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH'
+  if Process.returncode != 0:
+    print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
-  print Version[0]
+  print(Version[0])
   
   args.PemFileName = []
   
   #
   # Check for output file argument
   #
-  if args.OutputFile <> None:
+  if args.OutputFile is not None:
     for Item in args.OutputFile:
       #
       # Save PEM filename and close output file
@@ -102,14 +103,14 @@ if __name__ == '__main__':
       #
       Process = subprocess.Popen('%s genrsa -out %s 2048' % (OpenSslCommand, Item.name), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
       Process.communicate()
-      if Process.returncode <> 0:
-        print 'ERROR: RSA 2048 key generation failed'
+      if Process.returncode != 0:
+        print('ERROR: RSA 2048 key generation failed')
         sys.exit(Process.returncode)
       
   #
   # Check for input file argument
   #
-  if args.InputFile <> None:
+  if args.InputFile is not None:
     for Item in args.InputFile:
       #
       # Save PEM filename and close input file
@@ -124,8 +125,8 @@ if __name__ == '__main__':
     #
     Process = subprocess.Popen('%s rsa -in %s -modulus -noout' % (OpenSslCommand, Item), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     PublicKeyHexString = Process.communicate()[0].split('=')[1].strip()
-    if Process.returncode <> 0:
-      print 'ERROR: Unable to extract public key from private key'
+    if Process.returncode != 0:
+      print('ERROR: Unable to extract public key from private key')
       sys.exit(Process.returncode)
     PublicKey = ''
     for Index in range (0, len(PublicKeyHexString), 2):
@@ -137,8 +138,8 @@ if __name__ == '__main__':
     Process = subprocess.Popen('%s dgst -sha256 -binary' % (OpenSslCommand), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     Process.stdin.write (PublicKey)
     PublicKeyHash = PublicKeyHash + Process.communicate()[0]
-    if Process.returncode <> 0:
-      print 'ERROR: Unable to extract SHA 256 hash of public key'
+    if Process.returncode != 0:
+      print('ERROR: Unable to extract SHA 256 hash of public key')
       sys.exit(Process.returncode)
 
   #
@@ -171,4 +172,4 @@ if __name__ == '__main__':
   # If verbose is enabled display the public key in C structure format
   #
   if args.Verbose:
-    print 'PublicKeySha256 = ' + PublicKeyHashC    
+    print('PublicKeySha256 = ' + PublicKeyHashC)

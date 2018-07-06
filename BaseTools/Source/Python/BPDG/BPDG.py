@@ -20,6 +20,7 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
 import Common.LongFilePathOs as os
 import sys
 import encodings.ascii
@@ -57,21 +58,21 @@ def main():
         EdkLogger.SetLevel(EdkLogger.VERBOSE)
     elif Options.opt_quiet:
         EdkLogger.SetLevel(EdkLogger.QUIET)
-    elif Options.debug_level != None:
+    elif Options.debug_level is not None:
         EdkLogger.SetLevel(Options.debug_level + 1) 
     else:
         EdkLogger.SetLevel(EdkLogger.INFO)
                   
-    if Options.bin_filename == None:
+    if Options.bin_filename is None:
         EdkLogger.error("BPDG", ATTRIBUTE_NOT_AVAILABLE, "Please use the -o option to specify the file name for the VPD binary file")  
-    if Options.filename == None:
+    if Options.filename is None:
         EdkLogger.error("BPDG", ATTRIBUTE_NOT_AVAILABLE, "Please use the -m option to specify the file name for the mapping file")  
 
     Force = False
-    if Options.opt_force != None:
+    if Options.opt_force is not None:
         Force = True
 
-    if (Args[0] != None) :
+    if (Args[0] is not None) :
         StartBpdg(Args[0], Options.filename, Options.bin_filename, Force)
     else :
         EdkLogger.error("BPDG", ATTRIBUTE_NOT_AVAILABLE, "Please specify the file which contain the VPD pcd info.",
@@ -132,7 +133,7 @@ def MyOptionParser():
 #
 def StartBpdg(InputFileName, MapFileName, VpdFileName, Force):
     if os.path.exists(VpdFileName) and not Force:
-        print "\nFile %s already exist, Overwrite(Yes/No)?[Y]: " % VpdFileName
+        print("\nFile %s already exist, Overwrite(Yes/No)?[Y]: " % VpdFileName)
         choice = sys.stdin.readline()
         if choice.strip().lower() not in ['y', 'yes', '']:
             return

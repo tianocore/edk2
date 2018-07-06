@@ -6,7 +6,7 @@
   CapsuleAuthenticateSystemFirmware(), ExtractAuthenticatedImage() will receive
   untrusted input and do basic validation.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -188,7 +188,7 @@ GetFfsByName (
       FvHeader = (EFI_FIRMWARE_VOLUME_HEADER *)((UINTN)FvHeader + SIZE_4KB);
       continue;
     }
-    DEBUG((DEBUG_ERROR, "checking FV....0x%08x - 0x%x\n", FvHeader, FvHeader->FvLength));
+    DEBUG((DEBUG_INFO, "checking FV....0x%08x - 0x%x\n", FvHeader, FvHeader->FvLength));
     FvFound = TRUE;
     if (FvHeader->FvLength > FvSize) {
       DEBUG((DEBUG_ERROR, "GetFfsByName - FvSize: 0x%08x, MaxSize - 0x%08x\n", (UINTN)FvHeader->FvLength, (UINTN)FvSize));
@@ -225,9 +225,6 @@ GetFfsByName (
 
       if (CompareGuid(FileName, &FfsHeader->Name) &&
           ((Type == EFI_FV_FILETYPE_ALL) || (FfsHeader->Type == Type))) {
-        //
-        // Check section
-        //
         *OutFfsBuffer = FfsHeader;
         *OutFfsBufferSize = FfsSize;
         return TRUE;
@@ -248,7 +245,6 @@ GetFfsByName (
     // Next FV
     //
     FvHeader = (VOID *)(UINTN)((UINTN)FvHeader + FvHeader->FvLength);
-    DEBUG((DEBUG_ERROR, "Next FV....0x%08x - 0x%x\n", FvHeader, FvHeader->FvLength));
   }
 
   if (!FvFound) {

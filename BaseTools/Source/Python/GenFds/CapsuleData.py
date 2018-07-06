@@ -1,7 +1,7 @@
 ## @file
 # generate capsule
 #
-#  Copyright (c) 2007-2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2007-2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -17,7 +17,7 @@
 #
 import Ffs
 from GenFdsGlobalVariable import GenFdsGlobalVariable
-import StringIO
+from io import BytesIO
 from struct import pack
 import os
 from Common.Misc import SaveFileOnChange
@@ -80,9 +80,9 @@ class CapsuleFv (CapsuleData):
     #
     def GenCapsuleSubItem(self):
         if self.FvName.find('.fv') == -1:
-            if self.FvName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict.keys():
-                FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName.upper())
-                FdBuffer = StringIO.StringIO('')
+            if self.FvName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FvDict:
+                FvObj = GenFdsGlobalVariable.FdfParser.Profile.FvDict[self.FvName.upper()]
+                FdBuffer = BytesIO('')
                 FvObj.CapsuleName = self.CapsuleName
                 FvFile = FvObj.AddToBuffer(FdBuffer)
                 FvObj.CapsuleName = None
@@ -112,8 +112,8 @@ class CapsuleFd (CapsuleData):
     #
     def GenCapsuleSubItem(self):
         if self.FdName.find('.fd') == -1:
-            if self.FdName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict.keys():
-                FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict.get(self.FdName.upper())
+            if self.FdName.upper() in GenFdsGlobalVariable.FdfParser.Profile.FdDict:
+                FdObj = GenFdsGlobalVariable.FdfParser.Profile.FdDict[self.FdName.upper()]
                 FdFile = FdObj.GenFd()
                 return FdFile
         else:
@@ -207,7 +207,7 @@ class CapsulePayload(CapsuleData):
         #
         Guid = self.ImageTypeId.split('-')
         Buffer = pack('=ILHHBBBBBBBBBBBBIIQ',
-                       int(self.Version,16),
+                       int(self.Version, 16),
                        int(Guid[0], 16), 
                        int(Guid[1], 16), 
                        int(Guid[2], 16), 

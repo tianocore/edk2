@@ -38,6 +38,9 @@ typedef enum {
 
 typedef struct {
   PCI_RESOURCE_TYPE Type;
+  //
+  // Base is a host address
+  //
   UINT64            Base;
   UINT64            Length;
   UINT64            Alignment;

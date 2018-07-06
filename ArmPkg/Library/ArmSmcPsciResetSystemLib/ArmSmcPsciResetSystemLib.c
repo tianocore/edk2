@@ -15,10 +15,13 @@
 
 #include <PiDxe.h>
 
+#include <Library/ArmMmuLib.h>
+#include <Library/ArmSmcLib.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/ResetSystemLib.h>
-#include <Library/ArmSmcLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeLib.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
 
@@ -89,7 +92,21 @@ EnterS3WithImmediateWake (
   VOID
   )
 {
-  // Not implemented
+  VOID (*Reset)(VOID);
+
+  if (FeaturePcdGet (PcdArmReenterPeiForCapsuleWarmReboot) &&
+      !EfiAtRuntime ()) {
+    //
+    // At boot time, we are the only core running, so we can implement the
+    // immediate wake (which is used by capsule update) by disabling the MMU
+    // and interrupts, and jumping to the PEI entry point.
+    //
+    Reset = (VOID (*)(VOID))(UINTN)FixedPcdGet64 (PcdFvBaseAddress);
+
+    gBS->RaiseTPL (TPL_HIGH_LEVEL);
+    ArmDisableMmu ();
+    Reset ();
+  }
 }
 
 /**

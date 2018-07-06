@@ -1,7 +1,7 @@
 /** @file
 
-Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
-  
+Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
 of the BSD License which accompanies this distribution.  The
@@ -25,7 +25,7 @@ typedef struct _UFS_PEIM_MEM_BLOCK UFS_PEIM_MEM_BLOCK;
 
 struct _UFS_PEIM_MEM_BLOCK {
   UINT8                   *Bits;    // Bit array to record which unit is allocated
-  UINTN                   BitsLen; 
+  UINTN                   BitsLen;
   UINT8                   *Buf;
   UINT8                   *BufHost;
   UINTN                   BufLen;   // Memory size in bytes
