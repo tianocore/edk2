@@ -189,4 +189,11 @@ VOID
 InstallVirtualAddressChangeHandler (
   VOID
   );
+
+EFI_STATUS
+MarkIoMemoryRangeForRuntimeAccess (
+  IN EFI_PHYSICAL_ADDRESS   BaseAddress,
+  IN UINTN                  Length
+  );
+
 #endif

@@ -17,6 +17,7 @@
 #include <Guid/EventGroup.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>
@@ -154,4 +155,53 @@ InstallVirtualAddressChangeHandler (
                   &VirtualAddressChangeEvent
                   );
   ASSERT_EFI_ERROR (Status);
+}
+
+EFI_STATUS
+MarkIoMemoryRangeForRuntimeAccess (
+  IN EFI_PHYSICAL_ADDRESS                BaseAddress,
+  IN UINTN                               Length
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR     GcdDescriptor;
+
+  //
+  // Mark flash region as runtime memory
+  //
+  Status = gDS->RemoveMemorySpace (
+                  BaseAddress,
+                  Length
+                  );
+
+  Status = gDS->AddMemorySpace (
+                  EfiGcdMemoryTypeMemoryMappedIo,
+                  BaseAddress,
+                  Length,
+                  EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gDS->AllocateMemorySpace (
+                  EfiGcdAllocateAddress,
+                  EfiGcdMemoryTypeMemoryMappedIo,
+                  0,
+                  Length,
+                  &BaseAddress,
+                  gImageHandle,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gDS->GetMemorySpaceDescriptor (BaseAddress, &GcdDescriptor);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gDS->SetMemorySpaceAttributes (
+                  BaseAddress,
+                  Length,
+                  GcdDescriptor.Attributes | EFI_MEMORY_RUNTIME
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
 }
