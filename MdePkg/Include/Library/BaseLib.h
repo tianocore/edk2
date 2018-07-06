@@ -4609,6 +4609,62 @@ BitFieldAndThenOr64 (
   IN      UINT64                    OrData
   );
 
+/**
+  Reads a bit field from a 32-bit value, counts and returns
+  the number of set bits.
+
+  Counts the number of set bits in the  bit field specified by
+  StartBit and EndBit in Operand. The count is returned.
+
+  If StartBit is greater than 31, then ASSERT().
+  If EndBit is greater than 31, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
+
+  @param  Operand   Operand on which to perform the bitfield operation.
+  @param  StartBit  The ordinal of the least significant bit in the bit field.
+                    Range 0..31.
+  @param  EndBit    The ordinal of the most significant bit in the bit field.
+                    Range 0..31.
+
+  @return The number of bits set between StartBit and EndBit.
+
+**/
+UINT8
+EFIAPI
+BitFieldCountOnes32 (
+  IN       UINT32                   Operand,
+  IN       UINTN                    StartBit,
+  IN       UINTN                    EndBit
+  );
+
+/**
+   Reads a bit field from a 64-bit value, counts and returns
+   the number of set bits.
+
+   Counts the number of set bits in the  bit field specified by
+   StartBit and EndBit in Operand. The count is returned.
+
+   If StartBit is greater than 63, then ASSERT().
+   If EndBit is greater than 63, then ASSERT().
+   If EndBit is less than StartBit, then ASSERT().
+
+   @param  Operand   Operand on which to perform the bitfield operation.
+   @param  StartBit  The ordinal of the least significant bit in the bit field.
+   Range 0..63.
+   @param  EndBit    The ordinal of the most significant bit in the bit field.
+   Range 0..63.
+
+   @return The number of bits set between StartBit and EndBit.
+
+**/
+UINT8
+EFIAPI
+BitFieldCountOnes64 (
+  IN       UINT64                   Operand,
+  IN       UINTN                    StartBit,
+  IN       UINTN                    EndBit
+  );
+
 //
 // Base Library Checksum Functions
 //

@@ -920,3 +920,89 @@ BitFieldAndThenOr64 (
            OrData
            );
 }
+
+/**
+  Reads a bit field from a 32-bit value, counts and returns
+  the number of set bits.
+
+  Counts the number of set bits in the  bit field specified by
+  StartBit and EndBit in Operand. The count is returned.
+
+  If StartBit is greater than 31, then ASSERT().
+  If EndBit is greater than 31, then ASSERT().
+  If EndBit is less than StartBit, then ASSERT().
+
+  @param  Operand   Operand on which to perform the bitfield operation.
+  @param  StartBit  The ordinal of the least significant bit in the bit field.
+                    Range 0..31.
+  @param  EndBit    The ordinal of the most significant bit in the bit field.
+                    Range 0..31.
+
+  @return The number of bits set between StartBit and EndBit.
+
+**/
+UINT8
+EFIAPI
+BitFieldCountOnes32 (
+  IN       UINT32                   Operand,
+  IN       UINTN                    StartBit,
+  IN       UINTN                    EndBit
+  )
+{
+  UINT32 Count;
+
+  ASSERT (EndBit < 32);
+  ASSERT (StartBit <= EndBit);
+
+  Count = BitFieldRead32 (Operand, StartBit, EndBit);
+  Count -= ((Count >> 1) & 0x55555555);
+  Count = (Count & 0x33333333) + ((Count >> 2) & 0x33333333);
+  Count += Count >> 4;
+  Count &= 0x0F0F0F0F;
+  Count += Count >> 8;
+  Count += Count >> 16;
+
+  return (UINT8) Count & 0x3F;
+}
+
+/**
+   Reads a bit field from a 64-bit value, counts and returns
+   the number of set bits.
+
+   Counts the number of set bits in the  bit field specified by
+   StartBit and EndBit in Operand. The count is returned.
+
+   If StartBit is greater than 63, then ASSERT().
+   If EndBit is greater than 63, then ASSERT().
+   If EndBit is less than StartBit, then ASSERT().
+
+   @param  Operand   Operand on which to perform the bitfield operation.
+   @param  StartBit  The ordinal of the least significant bit in the bit field.
+   Range 0..63.
+   @param  EndBit    The ordinal of the most significant bit in the bit field.
+   Range 0..63.
+
+   @return The number of bits set between StartBit and EndBit.
+
+**/
+UINT8
+EFIAPI
+BitFieldCountOnes64 (
+  IN       UINT64                   Operand,
+  IN       UINTN                    StartBit,
+  IN       UINTN                    EndBit
+  )
+{
+  UINT64 BitField;
+  UINT8 Count;
+
+  ASSERT (EndBit < 64);
+  ASSERT (StartBit <= EndBit);
+
+  BitField = BitFieldRead64 (Operand, StartBit, EndBit);
+  Count = BitFieldCountOnes32 ((UINT32) BitField, 0, 31);
+  Count += BitFieldCountOnes32 ((UINT32) RShiftU64(BitField, 32), 0, 31);
+
+  return Count;
+}
+
