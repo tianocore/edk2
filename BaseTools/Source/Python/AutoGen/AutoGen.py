@@ -1293,12 +1293,17 @@ class PlatformAutoGen(AutoGen):
             ShareFixedAtBuildPcdsSameValue = {}
             for Module in LibAuto._ReferenceModules:
                 for Pcd in Module.FixedAtBuildPcds + LibAuto.FixedAtBuildPcds:
+                    DefaultValue = Pcd.DefaultValue
+                    # Cover the case: DSC component override the Pcd value and the Pcd only used in one Lib
+                    if Pcd in Module.LibraryPcdList:
+                        Index = Module.LibraryPcdList.index(Pcd)
+                        DefaultValue = Module.LibraryPcdList[Index].DefaultValue
                     key = ".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
                     if key not in FixedAtBuildPcds:
                         ShareFixedAtBuildPcdsSameValue[key] = True
-                        FixedAtBuildPcds[key] = Pcd.DefaultValue
+                        FixedAtBuildPcds[key] = DefaultValue
                     else:
-                        if FixedAtBuildPcds[key] != Pcd.DefaultValue:
+                        if FixedAtBuildPcds[key] != DefaultValue:
                             ShareFixedAtBuildPcdsSameValue[key] = False
             for Pcd in LibAuto.FixedAtBuildPcds:
                 key = ".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName))
