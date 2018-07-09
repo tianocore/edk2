@@ -1052,6 +1052,23 @@ typedef struct {
 #define  R_X86_64_DTPOFF32  21  /* Offset in TLS block */
 #define  R_X86_64_GOTTPOFF  22  /* PC relative offset to IE GOT entry */
 #define  R_X86_64_TPOFF32  23  /* Offset in static TLS block */
+#define  R_X86_64_PC64  24  /* PC relative 64 bit */
+#define  R_X86_64_GOTOFF64  25  /* 64 bit offset to GOT */
+#define  R_X86_64_GOTPC3  26  /* 32 bit signed pc relative offset to GOT */
+#define  R_X86_64_GOT64  27  /* 64-bit GOT entry offset */
+#define  R_X86_64_GOTPCREL64  28  /* 64-bit PC relative offset to GOT entry */
+#define  R_X86_64_GOTPC64  29  /* 64-bit PC relative offset to GOT */
+#define  R_X86_64_GOTPLT64  30  /* like GOT64, says PLT entry needed */
+#define  R_X86_64_PLTOFF64  31  /* 64-bit GOT relative offset to PLT entry */
+#define  R_X86_64_SIZE32  32  /* Size of symbol plus 32-bit addend */
+#define  R_X86_64_SIZE64  33  /* Size of symbol plus 64-bit addend */
+#define  R_X86_64_GOTPC32_TLSDESC  34  /* GOT offset for TLS descriptor. */
+#define  R_X86_64_TLSDESC_CALL  35  /* Marker for call through TLS descriptor. */
+#define  R_X86_64_TLSDESC  36  /* TLS descriptor. */
+#define  R_X86_64_IRELATIVE  37  /* Adjust indirectly by program base */
+#define  R_X86_64_RELATIVE64  38  /* 64-bit adjust by program base */
+#define  R_X86_64_GOTPCRELX  41  /* Load from 32 bit signed pc relative offset to GOT entry without REX prefix, relaxable. */
+#define  R_X86_64_REX_GOTPCRELX  42  /* Load from 32 bit signed pc relative offset to GOT entry with REX prefix, relaxable. */
 
 
 #endif /* !_SYS_ELF_COMMON_H_ */

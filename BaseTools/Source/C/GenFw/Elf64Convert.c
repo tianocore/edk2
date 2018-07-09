@@ -95,6 +95,15 @@ STATIC Elf_Shdr *mShdrBase;
 STATIC Elf_Phdr *mPhdrBase;
 
 //
+// GOT information
+//
+STATIC Elf_Shdr *mGOTShdr = NULL;
+STATIC UINT32   mGOTShindex = 0;
+STATIC UINT32   *mGOTCoffEntries = NULL;
+STATIC UINT32   mGOTMaxCoffEntries = 0;
+STATIC UINT32   mGOTNumCoffEntries = 0;
+
+//
 // Coff information
 //
 STATIC UINT32 mCoffAlignment = 0x20;
@@ -320,6 +329,134 @@ GetSymName (
   assert(foundEnd);
 
   return StrtabContents + Sym->st_name;
+}
+
+//
+// Find the ELF section hosting the GOT from an ELF Rva
+//   of a single GOT entry.  Normally, GOT is placed in
+//   ELF .text section, so assume once we find in which
+//   section the GOT is, all GOT entries are there, and
+//   just verify this.
+//
+STATIC
+VOID
+FindElfGOTSectionFromGOTEntryElfRva (
+  Elf64_Addr GOTEntryElfRva
+  )
+{
+  UINT32 i;
+  if (mGOTShdr != NULL) {
+    if (GOTEntryElfRva >= mGOTShdr->sh_addr &&
+        GOTEntryElfRva <  mGOTShdr->sh_addr + mGOTShdr->sh_size) {
+      return;
+    }
+    Error (NULL, 0, 3000, "Unsupported", "FindElfGOTSectionFromGOTEntryElfRva: GOT entries found in multiple sections.");
+    exit(EXIT_FAILURE);
+  }
+  for (i = 0; i < mEhdr->e_shnum; i++) {
+    Elf_Shdr *shdr = GetShdrByIndex(i);
+    if (GOTEntryElfRva >= shdr->sh_addr &&
+        GOTEntryElfRva <  shdr->sh_addr + shdr->sh_size) {
+      mGOTShdr = shdr;
+      mGOTShindex = i;
+      return;
+    }
+  }
+  Error (NULL, 0, 3000, "Invalid", "FindElfGOTSectionFromGOTEntryElfRva: ElfRva 0x%016LX for GOT entry not found in any section.", GOTEntryElfRva);
+  exit(EXIT_FAILURE);
+}
+
+//
+// Stores locations of GOT entries in COFF image.
+//   Returns TRUE if GOT entry is new.
+//   Simple implementation as number of GOT
+//   entries is expected to be low.
+//
+
+STATIC
+BOOLEAN
+AccumulateCoffGOTEntries (
+  UINT32 GOTCoffEntry
+  )
+{
+  UINT32 i;
+  if (mGOTCoffEntries != NULL) {
+    for (i = 0; i < mGOTNumCoffEntries; i++) {
+      if (mGOTCoffEntries[i] == GOTCoffEntry) {
+        return FALSE;
+      }
+    }
+  }
+  if (mGOTCoffEntries == NULL) {
+    mGOTCoffEntries = (UINT32*)malloc(5 * sizeof *mGOTCoffEntries);
+    if (mGOTCoffEntries == NULL) {
+      Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    }
+    assert (mGOTCoffEntries != NULL);
+    mGOTMaxCoffEntries = 5;
+    mGOTNumCoffEntries = 0;
+  } else if (mGOTNumCoffEntries == mGOTMaxCoffEntries) {
+    mGOTCoffEntries = (UINT32*)realloc(mGOTCoffEntries, 2 * mGOTMaxCoffEntries * sizeof *mGOTCoffEntries);
+    if (mGOTCoffEntries == NULL) {
+      Error (NULL, 0, 4001, "Resource", "memory cannot be allocated!");
+    }
+    assert (mGOTCoffEntries != NULL);
+    mGOTMaxCoffEntries += mGOTMaxCoffEntries;
+  }
+  mGOTCoffEntries[mGOTNumCoffEntries++] = GOTCoffEntry;
+  return TRUE;
+}
+
+//
+// 32-bit Unsigned integer comparator for qsort.
+//
+STATIC
+int
+UINT32Comparator (
+  const void* lhs,
+  const void* rhs
+  )
+{
+  if (*(const UINT32*)lhs < *(const UINT32*)rhs) {
+    return -1;
+  }
+  return *(const UINT32*)lhs > *(const UINT32*)rhs;
+}
+
+//
+// Emit accumulated Coff GOT entry relocations into
+//   Coff image.  This function performs its job
+//   once and then releases the entry list, so
+//   it can safely be called multiple times.
+//
+STATIC
+VOID
+EmitGOTRelocations (
+  VOID
+  )
+{
+  UINT32 i;
+  if (mGOTCoffEntries == NULL) {
+    return;
+  }
+  //
+  // Emit Coff relocations with Rvas ordered.
+  //
+  qsort(
+    mGOTCoffEntries,
+    mGOTNumCoffEntries,
+    sizeof *mGOTCoffEntries,
+    UINT32Comparator);
+  for (i = 0; i < mGOTNumCoffEntries; i++) {
+    VerboseMsg ("EFI_IMAGE_REL_BASED_DIR64 Offset: 0x%08X", mGOTCoffEntries[i]);
+    CoffAddFixup(
+      mGOTCoffEntries[i],
+      EFI_IMAGE_REL_BASED_DIR64);
+  }
+  free(mGOTCoffEntries);
+  mGOTCoffEntries = NULL;
+  mGOTMaxCoffEntries = 0;
+  mGOTNumCoffEntries = 0;
 }
 
 //
@@ -643,6 +780,7 @@ WriteSections64 (
   Elf_Shdr    *SecShdr;
   UINT32      SecOffset;
   BOOLEAN     (*Filter)(Elf_Shdr *);
+  Elf64_Addr  GOTEntryRva;
 
   //
   // Initialize filter pointer
@@ -710,7 +848,7 @@ WriteSections64 (
     // section that applies to the entire binary, and which will have its section
     // index set to #0 (which is a NULL section with the SHF_ALLOC bit cleared).
     //
-    // In the absence of GOT based relocations (which we currently don't support),
+    // In the absence of GOT based relocations,
     // this RELA section will contain redundant R_xxx_RELATIVE relocations, one
     // for every R_xxx_xx64 relocation appearing in the per-section RELA sections.
     // (i.e., .rela.text and .rela.data)
@@ -845,6 +983,44 @@ WriteSections64 (
               + (mCoffSectionsOffset[Sym->st_shndx] - SymShdr->sh_addr)
               - (SecOffset - SecShdr->sh_addr));
             VerboseMsg ("Relocation:  0x%08X", *(UINT32 *)Targ);
+            break;
+          case R_X86_64_GOTPCREL:
+          case R_X86_64_GOTPCRELX:
+          case R_X86_64_REX_GOTPCRELX:
+            VerboseMsg ("R_X86_64_GOTPCREL family");
+            VerboseMsg ("Offset: 0x%08X, Addend: 0x%08X",
+              (UINT32)(SecOffset + (Rel->r_offset - SecShdr->sh_addr)),
+              *(UINT32 *)Targ);
+            GOTEntryRva = Rel->r_offset - Rel->r_addend + *(INT32 *)Targ;
+            FindElfGOTSectionFromGOTEntryElfRva(GOTEntryRva);
+            *(UINT32 *)Targ = (UINT32) (*(UINT32 *)Targ
+              + (mCoffSectionsOffset[mGOTShindex] - mGOTShdr->sh_addr)
+              - (SecOffset - SecShdr->sh_addr));
+            VerboseMsg ("Relocation:  0x%08X", *(UINT32 *)Targ);
+            GOTEntryRva += (mCoffSectionsOffset[mGOTShindex] - mGOTShdr->sh_addr);  // ELF Rva -> COFF Rva
+            if (AccumulateCoffGOTEntries((UINT32)GOTEntryRva)) {
+              //
+              // Relocate GOT entry if it's the first time we run into it
+              //
+              Targ = mCoffFile + GOTEntryRva;
+              //
+              // Limitation: The following three statements assume memory
+              //   at *Targ is valid because the section containing the GOT
+              //   has already been copied from the ELF image to the Coff image.
+              //   This pre-condition presently holds because the GOT is placed
+              //   in section .text, and the ELF text sections are all copied
+              //   prior to reaching this point.
+              //   If the pre-condition is violated in the future, this fixup
+              //   either needs to be deferred after the GOT section is copied
+              //   to the Coff image, or the fixup should be performed on the
+              //   source Elf image instead of the destination Coff image.
+              //
+              VerboseMsg ("Offset: 0x%08X, Addend: 0x%016LX",
+                (UINT32)GOTEntryRva,
+                *(UINT64 *)Targ);
+              *(UINT64 *)Targ = *(UINT64 *)Targ - SymShdr->sh_addr + mCoffSectionsOffset[Sym->st_shndx];
+              VerboseMsg ("Relocation:  0x%016LX", *(UINT64*)Targ);
+            }
             break;
           default:
             Error (NULL, 0, 3000, "Invalid", "%s unsupported ELF EM_X86_64 relocation 0x%x.", mInImageName, (unsigned) ELF_R_TYPE(Rel->r_info));
@@ -984,6 +1160,9 @@ WriteRelocations64 (
             case R_X86_64_NONE:
             case R_X86_64_PC32:
             case R_X86_64_PLT32:
+            case R_X86_64_GOTPCREL:
+            case R_X86_64_GOTPCRELX:
+            case R_X86_64_REX_GOTPCRELX:
               break;
             case R_X86_64_64:
               VerboseMsg ("EFI_IMAGE_REL_BASED_DIR64 Offset: 0x%08X",
@@ -1052,10 +1231,32 @@ WriteRelocations64 (
             Error (NULL, 0, 3000, "Not Supported", "This tool does not support relocations for ELF with e_machine %u (processor type).", (unsigned) mEhdr->e_machine);
           }
         }
+        if (mEhdr->e_machine == EM_X86_64 && RelShdr->sh_info == mGOTShindex) {
+          //
+          // Tack relocations for GOT entries after other relocations for
+          //   the section the GOT is in, as it's usually found at the end
+          //   of the section.  This is done in order to maintain Rva order
+          //   of Coff relocations.
+          //
+          EmitGOTRelocations();
+        }
       }
     }
   }
 
+  if (mEhdr->e_machine == EM_X86_64) {
+    //
+    // This is a safety net just in case the GOT is in a section
+    //   with no other relocations and the first invocation of
+    //   EmitGOTRelocations() above was skipped.  This invocation
+    //   does not maintain Rva order of Coff relocations.
+    //   At present, with a single text section, all references to
+    //   the GOT and the GOT itself reside in section .text, so
+    //   if there's a GOT at all, the first invocation above
+    //   is executed.
+    //
+    EmitGOTRelocations();
+  }
   //
   // Pad by adding empty entries.
   //
