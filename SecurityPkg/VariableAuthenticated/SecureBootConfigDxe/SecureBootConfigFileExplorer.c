@@ -123,6 +123,8 @@ OpenFileByDevicePath(
   EFI_FILE_PROTOCOL               *Handle1;
   EFI_FILE_PROTOCOL               *Handle2;
   EFI_HANDLE                      DeviceHandle;
+  CHAR16                          *PathName;
+  UINTN                           PathLength;
 
   if ((FilePath == NULL || FileHandle == NULL)) {
     return EFI_INVALID_PARAMETER;
@@ -173,6 +175,11 @@ OpenFileByDevicePath(
     //
     Handle2  = Handle1;
     Handle1 = NULL;
+    PathLength = DevicePathNodeLength (*FilePath) - sizeof (EFI_DEVICE_PATH_PROTOCOL);
+    PathName = AllocateCopyPool (PathLength, ((FILEPATH_DEVICE_PATH*)*FilePath)->PathName);
+    if (PathName == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     //
     // Try to test opening an existing file
@@ -180,7 +187,7 @@ OpenFileByDevicePath(
     Status = Handle2->Open (
                           Handle2,
                           &Handle1,
-                          ((FILEPATH_DEVICE_PATH*)*FilePath)->PathName,
+                          PathName,
                           OpenMode &~EFI_FILE_MODE_CREATE,
                           0
                          );
@@ -192,7 +199,7 @@ OpenFileByDevicePath(
       Status = Handle2->Open (
                             Handle2,
                             &Handle1,
-                            ((FILEPATH_DEVICE_PATH*)*FilePath)->PathName,
+                            PathName,
                             OpenMode,
                             Attributes
                            );
@@ -201,6 +208,8 @@ OpenFileByDevicePath(
     // Close the last node
     //
     Handle2->Close (Handle2);
+
+    FreePool (PathName);
 
     if (EFI_ERROR(Status)) {
       return (Status);
