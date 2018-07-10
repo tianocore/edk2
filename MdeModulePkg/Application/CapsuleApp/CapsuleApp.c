@@ -431,7 +431,7 @@ CreateNestedFmp (
   ZeroMem(NestedCapsuleHeader, NESTED_CAPSULE_HEADER_SIZE);
   CopyGuid(&NestedCapsuleHeader->CapsuleGuid, ImageTypeId);
   NestedCapsuleHeader->HeaderSize = NESTED_CAPSULE_HEADER_SIZE;
-  NestedCapsuleHeader->Flags = (FwType == ESRT_FW_TYPE_DEVICEFIRMWARE) ? SYSTEM_FIRMWARE_FLAG : DEVICE_FIRMWARE_FLAG;
+  NestedCapsuleHeader->Flags = (FwType == ESRT_FW_TYPE_SYSTEMFIRMWARE) ? SYSTEM_FIRMWARE_FLAG : DEVICE_FIRMWARE_FLAG;
   NestedCapsuleHeader->CapsuleImageSize = (UINT32)FullCapsuleBufferSize;
 
   CopyMem((UINT8 *)NestedCapsuleHeader + NestedCapsuleHeader->HeaderSize, CapsuleBuffer, FileSize);
