@@ -1172,7 +1172,28 @@ WriteRelocations64 (
                 + (Rel->r_offset - SecShdr->sh_addr)),
                 EFI_IMAGE_REL_BASED_DIR64);
               break;
-            case R_X86_64_32S:
+            //
+            // R_X86_64_32 and R_X86_64_32S are ELF64 relocations emitted when using
+            //   the SYSV X64 ABI small non-position-independent code model.
+            //   R_X86_64_32 is used for unsigned 32-bit immediates with a 32-bit operand
+            //   size.  The value is either not extended, or zero-extended to 64 bits.
+            //   R_X86_64_32S is used for either signed 32-bit non-rip-relative displacements
+            //   or signed 32-bit immediates with a 64-bit operand size.  The value is
+            //   sign-extended to 64 bits.
+            //   EFI_IMAGE_REL_BASED_HIGHLOW is a PE relocation that uses 32-bit arithmetic
+            //   for rebasing an image.
+            //   EFI PE binaries declare themselves EFI_IMAGE_FILE_LARGE_ADDRESS_AWARE and
+            //   may load above 2GB.  If an EFI PE binary with a converted R_X86_64_32S
+            //   relocation is loaded above 2GB, the value will get sign-extended to the
+            //   negative part of the 64-bit address space.  The negative part of the 64-bit
+            //   address space is unmapped, so accessing such an address page-faults.
+            //   In order to support R_X86_64_32S, it is necessary to unset
+            //   EFI_IMAGE_FILE_LARGE_ADDRESS_AWARE, and the EFI PE loader must implement
+            //   this flag and abstain from loading such a PE binary above 2GB.
+            //   Since this feature is not supported, support for R_X86_64_32S (and hence
+            //   the small non-position-independent code model) is disabled.
+            //
+            // case R_X86_64_32S:
             case R_X86_64_32:
               VerboseMsg ("EFI_IMAGE_REL_BASED_HIGHLOW Offset: 0x%08X",
                 mCoffSectionsOffset[RelShdr->sh_info] + (Rel->r_offset - SecShdr->sh_addr));
