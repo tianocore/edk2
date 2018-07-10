@@ -1425,7 +1425,7 @@ ProcessCapsuleImage (
     }
 
     //
-    // Press EFI FMP Capsule
+    // Process EFI FMP Capsule
     //
     DEBUG((DEBUG_INFO, "ProcessFmpCapsuleImage ...\n"));
     Status = ProcessFmpCapsuleImage(CapsuleHeader);
