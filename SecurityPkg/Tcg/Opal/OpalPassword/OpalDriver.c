@@ -1076,6 +1076,15 @@ OpalDriverRequestPassword (
         break;
       }
 
+      //
+      // Check whether opal device's Tries value has reach the TryLimit value, if yes, force a shutdown
+      // before accept new password.
+      //
+      if (Ret == TcgResultFailureInvalidType) {
+        Count = MAX_PASSWORD_TRY_COUNT;
+        break;
+      }
+
       Count++;
 
       do {
