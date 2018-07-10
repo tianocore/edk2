@@ -4320,7 +4320,7 @@ class ModuleAutoGen(AutoGen):
     #  If any source file is newer than the module than we cannot skip
     #
     def CanSkip(self):
-        if self.MetaFile in GlobalData.gSikpAutoGenCache:
+        if self.MakeFileDir in GlobalData.gSikpAutoGenCache:
             return True
         if not os.path.exists(self.GetTimeStampPath()):
             return False
@@ -4340,7 +4340,7 @@ class ModuleAutoGen(AutoGen):
                     ModuleAutoGen.TimeDict[source] = os.stat(source)[8]
                 if ModuleAutoGen.TimeDict[source] > DstTimeStamp:
                     return False
-        GlobalData.gSikpAutoGenCache.add(self.MetaFile)
+        GlobalData.gSikpAutoGenCache.add(self.MakeFileDir)
         return True
 
     def GetTimeStampPath(self):
