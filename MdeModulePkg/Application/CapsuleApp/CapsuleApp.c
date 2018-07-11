@@ -742,13 +742,13 @@ PrintUsage (
   Print(L"       which is defined in UEFI specification.\n");
   Print(L"  -P:  Dump UEFI FMP protocol info.\n");
   Print(L"  -E:  Dump UEFI ESRT table info.\n");
-  Print(L"  -G:  Convert a BMP file to be a UX capsule,\n");
+  Print(L"  -G:  Convert a BMP file to be an UX capsule,\n");
   Print(L"       according to Windows Firmware Update document\n");
   Print(L"  -N:  Append a Capsule Header to an existing capsule image,\n");
   Print(L"       according to Windows Firmware Update document\n");
   Print(L"  -O:  Output new Capsule file name\n");
-  Print(L"  -D:  Dump Capsule image header information and FMP header information,\n");
-  Print(L"       if it is an FMP capsule.\n");
+  Print(L"  -D:  Dump Capsule image header information, image payload information if it is an UX capsule\n");
+  Print(L"       and FMP header information if it is a FMP capsule.\n");
 }
 
 /**
