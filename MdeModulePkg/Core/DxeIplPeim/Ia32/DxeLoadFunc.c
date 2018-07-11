@@ -320,7 +320,9 @@ HandOffToDxeCore (
     //
     // End of PEI phase signal
     //
+    PERF_EVENT_SIGNAL_BEGIN (gEndOfPeiSignalPpi.Guid);
     Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
+    PERF_EVENT_SIGNAL_END (gEndOfPeiSignalPpi.Guid);
     ASSERT_EFI_ERROR (Status);
 
     AsmWriteCr3 (PageTables);
@@ -437,7 +439,9 @@ HandOffToDxeCore (
     //
     // End of PEI phase signal
     //
+    PERF_EVENT_SIGNAL_BEGIN (gEndOfPeiSignalPpi.Guid);
     Status = PeiServicesInstallPpi (&gEndOfPeiSignalPpi);
+    PERF_EVENT_SIGNAL_END (gEndOfPeiSignalPpi.Guid);
     ASSERT_EFI_ERROR (Status);
 
     if (BuildPageTablesIa32Pae) {
