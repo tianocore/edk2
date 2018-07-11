@@ -410,7 +410,7 @@ ApInitializeSync (
   //
   // Load microcode on AP
   //
-  MicrocodeDetect (CpuMpData);
+  MicrocodeDetect (CpuMpData, FALSE);
   //
   // Sync BSP's MTRR table to AP
   //
@@ -1658,7 +1658,7 @@ MpInitLibInitialize (
   //
   // Load Microcode on BSP
   //
-  MicrocodeDetect (CpuMpData);
+  MicrocodeDetect (CpuMpData, TRUE);
   //
   // Store BSP's MTRR setting
   //

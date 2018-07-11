@@ -245,6 +245,11 @@ struct _CPU_MP_DATA {
   BOOLEAN                        TimerInterruptState;
   UINT64                         MicrocodePatchAddress;
   UINT64                         MicrocodePatchRegionSize;
+
+  UINT32                         ProcessorSignature;
+  UINT32                         ProcessorFlags;
+  UINT64                         MicrocodeDataAddress;
+  UINT32                         MicrocodeRevision;
 };
 
 extern EFI_GUID mCpuInitMpLibHobGuid;
@@ -546,11 +551,13 @@ CheckAndUpdateApsStatus (
 /**
   Detect whether specified processor can find matching microcode patch and load it.
 
-  @param[in]  CpuMpData  The pointer to CPU MP Data structure.
+  @param[in]  CpuMpData    The pointer to CPU MP Data structure.
+  @param[in]  IsBspCallIn  Indicate whether the caller is BSP or not.
 **/
 VOID
 MicrocodeDetect (
-  IN CPU_MP_DATA             *CpuMpData
+  IN CPU_MP_DATA             *CpuMpData,
+  IN BOOLEAN                 IsBspCallIn
   );
 
 /**
