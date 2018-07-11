@@ -792,6 +792,10 @@ UefiMain (
     return EFI_INVALID_PARAMETER;
   }
   if (StrCmp(Argv[1], L"-D") == 0) {
+    if (Argc < 3) {
+      Print(L"CapsuleApp: NO input capsule name.\n");
+      return EFI_INVALID_PARAMETER;
+    }
     Status = DumpCapsule(Argv[2]);
     return Status;
   }
