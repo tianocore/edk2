@@ -740,7 +740,8 @@ PrintUsage (
   Print(L"       which is defined in UEFI specification.\n");
   Print(L"  -C:  Clear capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
-  Print(L"  -P:  Dump UEFI FMP protocol info.\n");
+  Print(L"  -P:  Dump UEFI FMP protocol info, or get image with specified\n");
+  Print(L"       ImageTypeId and index to a file if 'GET' option is used.\n");
   Print(L"  -E:  Dump UEFI ESRT table info.\n");
   Print(L"  -G:  Convert a BMP file to be an UX capsule,\n");
   Print(L"       according to Windows Firmware Update document\n");
@@ -820,7 +821,15 @@ UefiMain (
       DumpFmpData();
     }
     if (Argc >= 3) {
-      if (StrCmp(Argv[2], L"GET") == 0) {
+      if (StrCmp(Argv[2], L"GET") != 0) {
+        Print(L"CapsuleApp: Unrecognized option(%s).\n", Argv[2]);
+        return EFI_UNSUPPORTED;
+      } else {
+        if (Argc != 7) {
+          Print(L"CapsuleApp: Incorrect parameter count.\n");
+          return EFI_UNSUPPORTED;
+        }
+
         EFI_GUID  ImageTypeId;
         UINTN     ImageIndex;
         //
@@ -832,9 +841,11 @@ UefiMain (
           return EFI_INVALID_PARAMETER;
         }
         ImageIndex = StrDecimalToUintn(Argv[4]);
-        if (StrCmp(Argv[5], L"-O") == 0) {
-          DumpFmpImage(&ImageTypeId, ImageIndex, Argv[6]);
+        if (StrCmp(Argv[5], L"-O") != 0) {
+          Print(L"CapsuleApp: NO output file name.\n");
+          return EFI_UNSUPPORTED;
         }
+        DumpFmpImage(&ImageTypeId, ImageIndex, Argv[6]);
       }
     }
     return EFI_SUCCESS;
