@@ -738,7 +738,7 @@ PrintUsage (
   Print(L"       with CAPSULE_FLAGS_PERSIST_ACROSS_RESET and without CAPSULE_FLAGS_INITIATE_RESET.\n");
   Print(L"  -S:  Dump capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
-  Print(L"  -C:  Clear capsule report variable (EFI_CAPSULE_RPORT_GUID),\n");
+  Print(L"  -C:  Clear capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
   Print(L"  -P:  Dump UEFI FMP protocol info.\n");
   Print(L"  -E:  Dump UEFI ESRT table info.\n");
