@@ -125,10 +125,20 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Network/MnpDxe/MnpDxe.inf
   INF MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
   INF MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
-  INF MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
   INF MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
+!if $(NETWORK_IP6_ENABLE) == TRUE
+  INF NetworkPkg/Ip6Dxe/Ip6Dxe.inf
+  INF NetworkPkg/TcpDxe/TcpDxe.inf
+  INF NetworkPkg/Udp6Dxe/Udp6Dxe.inf
+  INF NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
+  INF NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
+  INF NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
+  INF NetworkPkg/IScsiDxe/IScsiDxe.inf
+!else
+  INF MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
   INF MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
   INF MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
+!endif
 !if $(HTTP_BOOT_ENABLE) == TRUE
   INF NetworkPkg/DnsDxe/DnsDxe.inf
   INF NetworkPkg/HttpUtilitiesDxe/HttpUtilitiesDxe.inf
