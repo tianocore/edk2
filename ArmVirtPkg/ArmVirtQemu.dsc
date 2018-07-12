@@ -64,10 +64,6 @@
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
   PciHostBridgeLib|ArmVirtPkg/Library/FdtPciHostBridgeLib/FdtPciHostBridgeLib.inf
 
-!if $(HTTP_BOOT_ENABLE) == TRUE
-  HttpLib|MdeModulePkg/Library/DxeHttpLib/DxeHttpLib.inf
-!endif
-
 [LibraryClasses.common.PEIM]
   ArmVirtMemInfoLib|ArmVirtPkg/Library/QemuVirtMemInfoLib/QemuVirtMemInfoPeiLib.inf
 

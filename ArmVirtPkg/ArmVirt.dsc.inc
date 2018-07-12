@@ -80,6 +80,9 @@
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
+!if $(HTTP_BOOT_ENABLE) == TRUE
+  HttpLib|MdeModulePkg/Library/DxeHttpLib/DxeHttpLib.inf
+!endif
 
   #
   # It is not possible to prevent the ARM compiler from inserting calls to intrinsic functions.
