@@ -61,6 +61,7 @@ MicrocodeDetect (
   VOID                                    *MicrocodeData;
   MSR_IA32_PLATFORM_ID_REGISTER           PlatformIdMsr;
   UINT32                                  ProcessorFlags;
+  UINT32                                  ThreadId;
 
   if (CpuMpData->MicrocodePatchRegionSize == 0) {
     //
@@ -73,6 +74,14 @@ MicrocodeDetect (
   if (CurrentRevision != 0 && !IsBspCallIn) {
     //
     // Skip loading microcode if it has been loaded successfully
+    //
+    return;
+  }
+
+  GetProcessorLocationByApicId (GetInitialApicId (), NULL, NULL, &ThreadId);
+  if (ThreadId != 0) {
+    //
+    // Skip loading microcode if it is not the first thread in one core.
     //
     return;
   }
