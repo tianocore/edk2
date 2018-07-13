@@ -193,7 +193,7 @@ CreateBmpFmp (
   // VerticalResolution   >= BMP_IMAGE_HEADER.PixelHeight
 
   if (Argc != 5) {
-    Print(L"CapsuleApp: Invalid Parameter.\n");
+    Print(L"CapsuleApp: Incorrect parameter count.\n");
     return EFI_UNSUPPORTED;
   }
 
@@ -387,7 +387,7 @@ CreateNestedFmp (
   EFI_STATUS                                    Status;
 
   if (Argc != 5) {
-    Print(L"CapsuleApp: Invalid Parameter.\n");
+    Print(L"CapsuleApp: Incorrect parameter count.\n");
     return EFI_UNSUPPORTED;
   }
 
@@ -793,7 +793,8 @@ PrintUsage (
   @param[in]  SystemTable     The system table.
 
   @retval EFI_SUCCESS            Command completed successfully.
-  @retval EFI_INVALID_PARAMETER  Command usage error.
+  @retval EFI_UNSUPPORTED        Command usage unsupported.
+  @retval EFI_INVALID_PARAMETER  Command usage invalid.
   @retval EFI_NOT_FOUND          The input file can't be found.
 **/
 EFI_STATUS
@@ -824,12 +825,12 @@ UefiMain (
   }
   if (Argc < 2) {
     PrintUsage();
-    return EFI_INVALID_PARAMETER;
+    return EFI_UNSUPPORTED;
   }
   if (StrCmp(Argv[1], L"-D") == 0) {
-    if (Argc < 3) {
-      Print(L"CapsuleApp: NO input capsule name.\n");
-      return EFI_INVALID_PARAMETER;
+    if (Argc != 3) {
+      Print(L"CapsuleApp: Incorrect parameter count.\n");
+      return EFI_UNSUPPORTED;
     }
     Status = DumpCapsule(Argv[2]);
     return Status;
