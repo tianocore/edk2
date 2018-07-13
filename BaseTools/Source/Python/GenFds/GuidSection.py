@@ -22,6 +22,7 @@ import subprocess
 from .Ffs import Ffs
 import Common.LongFilePathOs as os
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
+from .GenFdsGlobalVariable import FindExtendTool
 from CommonDataClass.FdfClass import GuidSectionClassObject
 from Common import ToolDefClassObject
 import sys
@@ -131,7 +132,6 @@ class GuidSection(GuidSectionClassObject) :
         ExternalTool = None
         ExternalOption = None
         if self.NameGuid is not None:
-            from .GenFds import FindExtendTool
             ExternalTool, ExternalOption = FindExtendTool(self.KeyStringList, self.CurrentArchList, self.NameGuid)
 
         #

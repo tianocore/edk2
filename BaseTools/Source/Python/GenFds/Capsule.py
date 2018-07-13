@@ -17,6 +17,7 @@
 #
 from __future__ import absolute_import
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
+from .GenFdsGlobalVariable import FindExtendTool
 from CommonDataClass.FdfClass import CapsuleClassObject
 import Common.LongFilePathOs as os
 import subprocess
@@ -65,7 +66,6 @@ class Capsule (CapsuleClassObject) :
         #     UINT32            CapsuleImageSize;
         # } EFI_CAPSULE_HEADER;
         #
-        from .GenFds import FindExtendTool
         Header = BytesIO()
         #
         # Use FMP capsule GUID: 6DCBD5ED-E82D-4C44-BDA1-7194199AD92A

@@ -27,7 +27,7 @@ from Common import EdkLogger
 from Common.Misc import SaveFileOnChange
 
 from Common.TargetTxtClassObject import TargetTxtClassObject
-from Common.ToolDefClassObject import ToolDefClassObject
+from Common.ToolDefClassObject import ToolDefClassObject, ToolDefDict
 from AutoGen.BuildEngine import BuildRule
 import Common.DataType as DataType
 from Common.Misc import PathClass
@@ -843,3 +843,95 @@ class GenFdsGlobalVariable:
     DebugLogger = staticmethod(DebugLogger)
     MacroExtend = staticmethod (MacroExtend)
     GetPcdValue = staticmethod(GetPcdValue)
+
+## FindExtendTool()
+#
+#  Find location of tools to process data
+#
+#  @param  KeyStringList    Filter for inputs of section generation
+#  @param  CurrentArchList  Arch list
+#  @param  NameGuid         The Guid name
+#
+def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
+    ToolDb = ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDatabase
+    # if user not specify filter, try to deduce it from global data.
+    if KeyStringList is None or KeyStringList == []:
+        Target = GenFdsGlobalVariable.TargetName
+        ToolChain = GenFdsGlobalVariable.ToolChainTag
+        if ToolChain not in ToolDb['TOOL_CHAIN_TAG']:
+            EdkLogger.error("GenFds", GENFDS_ERROR, "Can not find external tool because tool tag %s is not defined in tools_def.txt!" % ToolChain)
+        KeyStringList = [Target + '_' + ToolChain + '_' + CurrentArchList[0]]
+        for Arch in CurrentArchList:
+            if Target + '_' + ToolChain + '_' + Arch not in KeyStringList:
+                KeyStringList.append(Target + '_' + ToolChain + '_' + Arch)
+
+    if GenFdsGlobalVariable.GuidToolDefinition:
+        if NameGuid in GenFdsGlobalVariable.GuidToolDefinition:
+            return GenFdsGlobalVariable.GuidToolDefinition[NameGuid]
+
+    ToolDefinition = ToolDefDict(GenFdsGlobalVariable.ConfDir).ToolsDefTxtDictionary
+    ToolPathTmp = None
+    ToolOption = None
+    ToolPathKey = None
+    ToolOptionKey = None
+    KeyList = None
+    for ToolDef in ToolDefinition.items():
+        if NameGuid.lower() == ToolDef[1].lower() :
+            KeyList = ToolDef[0].split('_')
+            Key = KeyList[0] + \
+                  '_' + \
+                  KeyList[1] + \
+                  '_' + \
+                  KeyList[2]
+            if Key in KeyStringList and KeyList[4] == DataType.TAB_GUID:
+                ToolPathKey   = Key + '_' + KeyList[3] + '_PATH'
+                ToolOptionKey = Key + '_' + KeyList[3] + '_FLAGS'
+                ToolPath = ToolDefinition.get(ToolPathKey)
+                ToolOption = ToolDefinition.get(ToolOptionKey)
+                if ToolPathTmp is None:
+                    ToolPathTmp = ToolPath
+                else:
+                    if ToolPathTmp != ToolPath:
+                        EdkLogger.error("GenFds", GENFDS_ERROR, "Don't know which tool to use, %s or %s ?" % (ToolPathTmp, ToolPath))
+
+    BuildOption = {}
+    for Arch in CurrentArchList:
+        Platform = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+        # key is (ToolChainFamily, ToolChain, CodeBase)
+        for item in Platform.BuildOptions:
+            if '_PATH' in item[1] or '_FLAGS' in item[1] or '_GUID' in item[1]:
+                if not item[0] or (item[0] and GenFdsGlobalVariable.ToolChainFamily== item[0]):
+                    if item[1] not in BuildOption:
+                        BuildOption[item[1]] = Platform.BuildOptions[item]
+        if BuildOption:
+            ToolList = [DataType.TAB_TOD_DEFINES_TARGET, DataType.TAB_TOD_DEFINES_TOOL_CHAIN_TAG, DataType.TAB_TOD_DEFINES_TARGET_ARCH]
+            for Index in range(2, -1, -1):
+                for Key in list(BuildOption.keys()):
+                    List = Key.split('_')
+                    if List[Index] == '*':
+                        for String in ToolDb[ToolList[Index]]:
+                            if String in [Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]:
+                                List[Index] = String
+                                NewKey = '%s_%s_%s_%s_%s' % tuple(List)
+                                if NewKey not in BuildOption:
+                                    BuildOption[NewKey] = BuildOption[Key]
+                                    continue
+                                del BuildOption[Key]
+                    elif List[Index] not in ToolDb[ToolList[Index]]:
+                        del BuildOption[Key]
+    if BuildOption:
+        if not KeyList:
+            for Op in BuildOption:
+                if NameGuid == BuildOption[Op]:
+                    KeyList = Op.split('_')
+                    Key = KeyList[0] + '_' + KeyList[1] +'_' + KeyList[2]
+                    if Key in KeyStringList and KeyList[4] == DataType.TAB_GUID:
+                        ToolPathKey   = Key + '_' + KeyList[3] + '_PATH'
+                        ToolOptionKey = Key + '_' + KeyList[3] + '_FLAGS'
+        if ToolPathKey in BuildOption:
+            ToolPathTmp = BuildOption[ToolPathKey]
+        if ToolOptionKey in BuildOption:
+            ToolOption = BuildOption[ToolOptionKey]
+
+    GenFdsGlobalVariable.GuidToolDefinition[NameGuid] = (ToolPathTmp, ToolOption)
+    return ToolPathTmp, ToolOption
