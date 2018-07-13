@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-from message import *
+from __future__ import absolute_import
+from .message import *
 import re
 import os
 

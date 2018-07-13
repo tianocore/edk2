@@ -12,9 +12,10 @@
 #
 
 from __future__ import print_function
+from __future__ import absolute_import
 import os
 
-from message import *
+from .message import *
 
 class BaseDoxygeItem:
     def __init__(self, name, tag=''):
