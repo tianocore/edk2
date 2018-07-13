@@ -15,15 +15,16 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import sqlite3
 from Common.StringUtils import *
 from Common.DataType import *
 from Common.Misc import *
 from types import *
 
-from MetaDataTable import *
-from MetaFileTable import *
-from MetaFileParser import *
+from .MetaDataTable import *
+from .MetaFileTable import *
+from .MetaFileParser import *
 
 from Workspace.DecBuildData import DecBuildData
 from Workspace.DscBuildData import DscBuildData

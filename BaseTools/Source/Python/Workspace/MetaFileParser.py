@@ -16,6 +16,7 @@
 # Import Modules
 #
 from __future__ import print_function
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import re
 import time
@@ -33,8 +34,8 @@ from Common.Expression import *
 from CommonDataClass.Exceptions import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from collections import defaultdict
-from MetaFileTable import MetaFileStorage
-from MetaFileCommentParser import CheckInfComment
+from .MetaFileTable import MetaFileStorage
+from .MetaFileCommentParser import CheckInfComment
 
 ## RegEx for finding file versions
 hexVersionPattern = re.compile(r'0[xX][\da-f-A-F]{5,8}')

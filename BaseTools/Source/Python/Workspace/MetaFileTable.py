@@ -14,13 +14,14 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import uuid
 
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import FORMAT_INVALID
 
-from MetaDataTable import Table, TableFile
-from MetaDataTable import ConvertToSqlString
+from .MetaDataTable import Table, TableFile
+from .MetaDataTable import ConvertToSqlString
 from CommonDataClass.DataClass import MODEL_FILE_DSC, MODEL_FILE_DEC, MODEL_FILE_INF, \
                                       MODEL_FILE_OTHERS
 from Common.DataType import *
