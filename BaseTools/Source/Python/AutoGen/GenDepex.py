@@ -22,6 +22,8 @@ from struct import pack
 from Common.BuildToolError import *
 from Common.Misc import SaveFileOnChange
 from Common.Misc import GuidStructureStringToGuidString
+from Common.Misc import GuidStructureByteArrayToGuidString
+from Common.Misc import GuidStringToGuidStructureString
 from Common import EdkLogger as EdkLogger
 from Common.BuildVersion import gBUILD_VERSION
 from Common.DataType import *
@@ -333,6 +335,10 @@ class DependencyExpression:
     def GetGuidValue(self, Guid):
         GuidValueString = Guid.replace("{", "").replace("}", "").replace(" ", "")
         GuidValueList = GuidValueString.split(",")
+        if len(GuidValueList) != 11 and len(GuidValueList) == 16:
+            GuidValueString = GuidStringToGuidStructureString(GuidStructureByteArrayToGuidString(Guid))
+            GuidValueString = GuidValueString.replace("{", "").replace("}", "").replace(" ", "")
+            GuidValueList = GuidValueString.split(",")
         if len(GuidValueList) != 11:
             EdkLogger.error("GenDepex", PARSER_ERROR, "Invalid GUID value string or opcode: %s" % Guid)
         return pack("1I2H8B", *(int(value, 16) for value in GuidValueList))

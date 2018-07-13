@@ -280,7 +280,12 @@ class DepexParser(object):
                 for Guid in Package.Guids:
                     GuidValue = GuidStructureStringToGuidString(Package.Guids[Guid])
                     self._GuidDb[GuidValue.upper()] = Guid
-
+            for Ma in Pa.ModuleAutoGenList:
+                for Pcd in Ma.FixedVoidTypePcds:
+                    PcdValue = Ma.FixedVoidTypePcds[Pcd]
+                    if len(PcdValue.split(',')) == 16:
+                        GuidValue = GuidStructureByteArrayToGuidString(PcdValue)
+                        self._GuidDb[GuidValue.upper()] = Pcd
     ##
     # Parse the binary dependency expression files.
     #

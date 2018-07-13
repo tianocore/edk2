@@ -2752,6 +2752,10 @@ class ModuleAutoGen(AutoGen):
         self._FixedAtBuildPcds         = []
         self.ConstPcd                  = {}
 
+        ##Store the VOID* type FixedAtBuild Pcds
+        #
+        self._FixedPcdVoidTypeDict = {}
+
     def __repr__(self):
         return "%s [%s]" % (self.MetaFile, self.Arch)
 
@@ -2766,6 +2770,15 @@ class ModuleAutoGen(AutoGen):
                 self._FixedAtBuildPcds.append(Pcd)
 
         return self._FixedAtBuildPcds
+
+    def _GetFixedAtBuildVoidTypePcds(self):
+        if self._FixedPcdVoidTypeDict:
+            return self._FixedPcdVoidTypeDict
+        for Pcd in self.ModulePcdList:
+            if Pcd.Type == TAB_PCDS_FIXED_AT_BUILD and Pcd.DatumType == TAB_VOID:
+                if '{}.{}'.format(Pcd.TokenSpaceGuidCName, Pcd.TokenCName) not in self._FixedPcdVoidTypeDict:
+                    self._FixedPcdVoidTypeDict['{}.{}'.format(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)] = Pcd.DefaultValue
+        return self._FixedPcdVoidTypeDict
 
     def _GetUniqueBaseName(self):
         BaseName = self.Name
@@ -3036,7 +3049,7 @@ class ModuleAutoGen(AutoGen):
                 return self._DepexDict
 
             self._DepexDict[self.ModuleType] = []
-
+            self._GetFixedAtBuildVoidTypePcds()
             for ModuleType in self._DepexDict:
                 DepexList = self._DepexDict[ModuleType]
                 #
@@ -3048,7 +3061,21 @@ class ModuleAutoGen(AutoGen):
                         if DepexList != []:
                             DepexList.append('AND')
                         DepexList.append('(')
-                        DepexList.extend(D)
+                        #replace D with value if D is FixedAtBuild PCD
+                        NewList = []
+                        for item in D:
+                            if '.' not in item:
+                                NewList.append(item)
+                            else:
+                                if item not in self._FixedPcdVoidTypeDict:
+                                    EdkLogger.error("build", FORMAT_INVALID, "{} used in [Depex] section should be used as FixedAtBuild type and VOID* datum type in the module.".format(item))
+                                else:
+                                    Value = self._FixedPcdVoidTypeDict[item]
+                                    if len(Value.split(',')) != 16:
+                                        EdkLogger.error("build", FORMAT_INVALID,
+                                                        "{} used in [Depex] section should be used as FixedAtBuild type and VOID* datum type and 16 bytes in the module.".format(item))
+                                    NewList.append(Value)
+                        DepexList.extend(NewList)
                         if DepexList[-1] == 'END':  # no need of a END at this time
                             DepexList.pop()
                         DepexList.append(')')
@@ -4420,6 +4447,7 @@ class ModuleAutoGen(AutoGen):
 
     FixedAtBuildPcds         = property(_GetFixedAtBuildPcds)
     UniqueBaseName          = property(_GetUniqueBaseName)
+    FixedVoidTypePcds       = property(_GetFixedAtBuildVoidTypePcds)
 
 # This acts like the main() function for the script, unless it is 'import'ed into another script.
 if __name__ == '__main__':
