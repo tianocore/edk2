@@ -1,5 +1,5 @@
 /** @file
-  Industry Standard Definitions of SMBIOS Table Specification v3.1.1.
+  Industry Standard Definitions of SMBIOS Table Specification v3.2.0.
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
@@ -685,6 +685,7 @@ typedef enum {
   ProcessorFamilyzArchitecture          = 0xCC,
   ProcessorFamilyIntelCoreI5            = 0xCD,
   ProcessorFamilyIntelCoreI3            = 0xCE,
+  ProcessorFamilyIntelCoreI9            = 0xCF,
   ProcessorFamilyViaC7M                 = 0xD2,
   ProcessorFamilyViaC7D                 = 0xD3,
   ProcessorFamilyViaC7                  = 0xD4,
@@ -806,7 +807,11 @@ typedef enum {
   ProcessorUpgradeSocketBGA1515   = 0x35,
   ProcessorUpgradeSocketLGA3647_1 = 0x36,
   ProcessorUpgradeSocketSP3       = 0x37,
-  ProcessorUpgradeSocketSP3r2     = 0x38
+  ProcessorUpgradeSocketSP3r2     = 0x38,
+  ProcessorUpgradeSocketLGA2066   = 0x39,
+  ProcessorUpgradeSocketBGA1392   = 0x3A,
+  ProcessorUpgradeSocketBGA1510   = 0x3B,
+  ProcessorUpgradeSocketBGA1528   = 0x3C
 } PROCESSOR_UPGRADE;
 
 ///
@@ -1159,6 +1164,7 @@ typedef enum {
   PortConnectorTypeBNC                    = 0x20,
   PortConnectorType1394                   = 0x21,
   PortConnectorTypeSasSata                = 0x22,
+  PortConnectorTypeUsbTypeC               = 0x23,
   PortConnectorTypePC98                   = 0xA0,
   PortConnectorTypePC98Hireso             = 0xA1,
   PortConnectorTypePCH98                  = 0xA2,
@@ -1205,6 +1211,8 @@ typedef enum {
   PortTypeNetworkPort               = 0x1F,
   PortTypeSata                      = 0x20,
   PortTypeSas                       = 0x21,
+  PortTypeMfdp                      = 0x22, ///< Multi-Function Display Port
+  PortTypeThunderbolt               = 0x23,
   PortType8251Compatible            = 0xA0,
   PortType8251FifoCompatible        = 0xA1,
   PortTypeOther                     = 0xFF
@@ -1314,10 +1322,11 @@ typedef enum {
 /// System Slots - Current Usage.
 ///
 typedef enum {
-  SlotUsageOther     = 0x01,
-  SlotUsageUnknown   = 0x02,
-  SlotUsageAvailable = 0x03,
-  SlotUsageInUse     = 0x04
+  SlotUsageOther        = 0x01,
+  SlotUsageUnknown      = 0x02,
+  SlotUsageAvailable    = 0x03,
+  SlotUsageInUse        = 0x04,
+  SlotUsageUnavailable  = 0x05
 } MISC_SLOT_USAGE;
 
 ///
@@ -1350,8 +1359,19 @@ typedef struct {
   UINT8  PmeSignalSupported      :1;
   UINT8  HotPlugDevicesSupported :1;
   UINT8  SmbusSignalSupported    :1;
-  UINT8  Reserved                :5;  ///< Set to 0.
+  UINT8  BifurcationSupported    :1;
+  UINT8  Reserved                :4;  ///< Set to 0.
 } MISC_SLOT_CHARACTERISTICS2;
+
+///
+/// System Slots - Peer Segment/Bus/Device/Function/Width Groups
+///
+typedef struct {
+  UINT16                      SegmentGroupNum;
+  UINT8                       BusNum;
+  UINT8                       DevFuncNum;
+  UINT8                       DataBusWidth;
+} MISC_SLOT_PEER_GROUP;
 
 ///
 /// System Slots (Type 9)
@@ -1376,6 +1396,12 @@ typedef struct {
   UINT16                      SegmentGroupNum;
   UINT8                       BusNum;
   UINT8                       DevFuncNum;
+  //
+  // Add for smbios 3.2
+  //
+  UINT8                       DataBusWidth;
+  UINT8                       PeerGroupingCount;
+  MISC_SLOT_PEER_GROUP        PeerGroups[1];
 } SMBIOS_TABLE_TYPE9;
 
 ///
@@ -1668,9 +1694,13 @@ typedef enum {
   MemoryTypeLpddr                          = 0x1B,
   MemoryTypeLpddr2                         = 0x1C,
   MemoryTypeLpddr3                         = 0x1D,
-  MemoryTypeLpddr4                         = 0x1E
+  MemoryTypeLpddr4                         = 0x1E,
+  MemoryTypeLogicalNonVolatileDevice       = 0x1F
 } MEMORY_DEVICE_TYPE;
 
+///
+/// Memory Device - Type Detail
+///
 typedef struct {
   UINT16    Reserved        :1;
   UINT16    Other           :1;
@@ -1691,6 +1721,41 @@ typedef struct {
 } MEMORY_DEVICE_TYPE_DETAIL;
 
 ///
+/// Memory Device - Memory Technology
+///
+typedef enum {
+  MemoryTechnologyOther                     = 0x01,
+  MemoryTechnologyUnknown                   = 0x02,
+  MemoryTechnologyDram                      = 0x03,
+  MemoryTechnologyNvdimmN                   = 0x04,
+  MemoryTechnologyNvdimmF                   = 0x05,
+  MemoryTechnologyNvdimmP                   = 0x06,
+  MemoryTechnologyIntelPersistentMemory     = 0x07
+} MEMORY_DEVICE_TECHNOLOGY;
+
+///
+/// Memory Device - Memory Operating Mode Capability
+///
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    UINT16 Reserved                         :1;   ///< Set to 0.
+    UINT16 Other                            :1;
+    UINT16 Unknown                          :1;
+    UINT16 VolatileMemory                   :1;
+    UINT16 ByteAccessiblePersistentMemory   :1;
+    UINT16 BlockAccessiblePersistentMemory  :1;
+    UINT16 Reserved2                        :10;  ///< Set to 0.
+  } Bits;
+  ///
+  /// All bit fields as a 16-bit value
+  ///
+  UINT16 Uint16;
+} MEMORY_DEVICE_OPERATING_MODE_CAPABILITY;
+
+///
 /// Memory Device (Type 17).
 ///
 /// This structure describes a single memory device that is part of
@@ -1700,38 +1765,57 @@ typedef struct {
 /// socket is currently populated.
 ///
 typedef struct {
-  SMBIOS_STRUCTURE          Hdr;
-  UINT16                    MemoryArrayHandle;
-  UINT16                    MemoryErrorInformationHandle;
-  UINT16                    TotalWidth;
-  UINT16                    DataWidth;
-  UINT16                    Size;
-  UINT8                     FormFactor;                     ///< The enumeration value from MEMORY_FORM_FACTOR.
-  UINT8                     DeviceSet;
-  SMBIOS_TABLE_STRING       DeviceLocator;
-  SMBIOS_TABLE_STRING       BankLocator;
-  UINT8                     MemoryType;                     ///< The enumeration value from MEMORY_DEVICE_TYPE.
-  MEMORY_DEVICE_TYPE_DETAIL TypeDetail;
-  UINT16                    Speed;
-  SMBIOS_TABLE_STRING       Manufacturer;
-  SMBIOS_TABLE_STRING       SerialNumber;
-  SMBIOS_TABLE_STRING       AssetTag;
-  SMBIOS_TABLE_STRING       PartNumber;
+  SMBIOS_STRUCTURE                          Hdr;
+  UINT16                                    MemoryArrayHandle;
+  UINT16                                    MemoryErrorInformationHandle;
+  UINT16                                    TotalWidth;
+  UINT16                                    DataWidth;
+  UINT16                                    Size;
+  UINT8                                     FormFactor;         ///< The enumeration value from MEMORY_FORM_FACTOR.
+  UINT8                                     DeviceSet;
+  SMBIOS_TABLE_STRING                       DeviceLocator;
+  SMBIOS_TABLE_STRING                       BankLocator;
+  UINT8                                     MemoryType;         ///< The enumeration value from MEMORY_DEVICE_TYPE.
+  MEMORY_DEVICE_TYPE_DETAIL                 TypeDetail;
+  UINT16                                    Speed;
+  SMBIOS_TABLE_STRING                       Manufacturer;
+  SMBIOS_TABLE_STRING                       SerialNumber;
+  SMBIOS_TABLE_STRING                       AssetTag;
+  SMBIOS_TABLE_STRING                       PartNumber;
   //
   // Add for smbios 2.6
   //
-  UINT8                     Attributes;
+  UINT8                                     Attributes;
   //
   // Add for smbios 2.7
   //
-  UINT32                    ExtendedSize;
-  UINT16                    ConfiguredMemoryClockSpeed;
+  UINT32                                    ExtendedSize;
+  //
+  // Keep using name "ConfiguredMemoryClockSpeed" for compatibility
+  // although this field is renamed from "Configured Memory Clock Speed"
+  // to "Configured Memory Speed" in smbios 3.2.0.
+  //
+  UINT16                                    ConfiguredMemoryClockSpeed;
   //
   // Add for smbios 2.8.0
   //
-  UINT16                    MinimumVoltage;
-  UINT16                    MaximumVoltage;
-  UINT16                    ConfiguredVoltage;
+  UINT16                                    MinimumVoltage;
+  UINT16                                    MaximumVoltage;
+  UINT16                                    ConfiguredVoltage;
+  //
+  // Add for smbios 3.2.0
+  //
+  UINT8                                     MemoryTechnology;   ///< The enumeration value from MEMORY_DEVICE_TECHNOLOGY
+  MEMORY_DEVICE_OPERATING_MODE_CAPABILITY   MemoryOperatingModeCapability;
+  SMBIOS_TABLE_STRING                       FirwareVersion;
+  UINT16                                    ModuleManufacturerID;
+  UINT16                                    ModuleProductID;
+  UINT16                                    MemorySubsystemControllerManufacturerID;
+  UINT16                                    MemorySubsystemControllerProductID;
+  UINT64                                    NonVolatileSize;
+  UINT64                                    VolatileSize;
+  UINT64                                    CacheSize;
+  UINT64                                    LogicalSize;
 } SMBIOS_TABLE_TYPE17;
 
 ///
@@ -2269,7 +2353,7 @@ typedef enum {
   IPMIDeviceInfoInterfaceTypeKCS           = 0x01, ///< The Keyboard Controller Style.
   IPMIDeviceInfoInterfaceTypeSMIC          = 0x02, ///< The Server Management Interface Chip.
   IPMIDeviceInfoInterfaceTypeBT            = 0x03, ///< The Block Transfer
-  IPMIDeviceInfoInterfaceTypeReserved      = 0x04
+  IPMIDeviceInfoInterfaceTypeSSIF          = 0x04  ///< SMBus System Interface
 } BMC_INTERFACE_TYPE;
 
 ///
@@ -2339,7 +2423,7 @@ typedef struct {
   UINT8                   ReferencedOffset;
   SMBIOS_TABLE_STRING     EntryString;
   UINT8                   Value[1];
-}ADDITIONAL_INFORMATION_ENTRY;
+} ADDITIONAL_INFORMATION_ENTRY;
 
 ///
 /// Additional Information (Type 40).
@@ -2425,8 +2509,9 @@ typedef enum{
 ///
 typedef struct {
   SMBIOS_STRUCTURE                  Hdr;
-  UINT8                             InterfaceType;          ///< The enumeration value from MC_HOST_INTERFACE_TYPE
-  UINT8                             MCHostInterfaceData[1]; ///< This field has a minimum of four bytes
+  UINT8                             InterfaceType;                  ///< The enumeration value from MC_HOST_INTERFACE_TYPE
+  UINT8                             InterfaceTypeSpecificDataLength;
+  UINT8                             InterfaceTypeSpecificData[4];   ///< This field has a minimum of four bytes
 } SMBIOS_TABLE_TYPE42;
 
 ///
