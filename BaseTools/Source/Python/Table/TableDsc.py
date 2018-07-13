@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 ## @file
 # This file is used to create/update/query/erase table for dsc datas
 #
@@ -16,7 +17,7 @@
 #
 import Common.EdkLogger as EdkLogger
 import CommonDataClass.DataClass as DataClass
-from Table import Table
+from .Table import Table
 from Common.StringUtils import ConvertToSqlString
 
 ## TableDsc

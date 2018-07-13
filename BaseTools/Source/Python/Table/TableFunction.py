@@ -14,8 +14,9 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.EdkLogger as EdkLogger
-from Table import Table
+from .Table import Table
 from Common.StringUtils import ConvertToSqlString
 
 ## TableFunction
