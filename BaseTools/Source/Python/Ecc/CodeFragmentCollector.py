@@ -17,18 +17,19 @@
 #
 
 from __future__ import print_function
+from __future__ import absolute_import
 import re
 import Common.LongFilePathOs as os
 import sys
 
 import antlr3
-from CLexer import CLexer
-from CParser import CParser
+from .CLexer import CLexer
+from .CParser import CParser
 
-import FileProfile
-from CodeFragment import Comment
-from CodeFragment import PP_Directive
-from ParserWarning import Warning
+from . import FileProfile
+from .CodeFragment import Comment
+from .CodeFragment import PP_Directive
+from .ParserWarning import Warning
 
 
 ##define T_CHAR_SPACE                ' '

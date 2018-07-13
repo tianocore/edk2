@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import sqlite3
 import Common.LongFilePathOs as os, time
 
@@ -26,9 +27,9 @@ from Table.TableFunction import TableFunction
 from Table.TablePcd import TablePcd
 from Table.TableIdentifier import TableIdentifier
 from Table.TableReport import TableReport
-from MetaFileWorkspace.MetaFileTable import ModuleTable
-from MetaFileWorkspace.MetaFileTable import PackageTable
-from MetaFileWorkspace.MetaFileTable import PlatformTable
+from .MetaFileWorkspace.MetaFileTable import ModuleTable
+from .MetaFileWorkspace.MetaFileTable import PackageTable
+from .MetaFileWorkspace.MetaFileTable import PlatformTable
 from Table.TableFdf import TableFdf
 
 ##

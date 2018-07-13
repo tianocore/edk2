@@ -12,18 +12,19 @@
 #
 
 from __future__ import print_function
+from __future__ import absolute_import
 import sys
 import Common.LongFilePathOs as os
 import re
 import string
-import CodeFragmentCollector
-import FileProfile
+from . import CodeFragmentCollector
+from . import FileProfile
 from CommonDataClass import DataClass
-import Database
+from . import Database
 from Common import EdkLogger
-from EccToolError import *
-import EccGlobalData
-import MetaDataParser
+from .EccToolError import *
+from . import EccGlobalData
+from . import MetaDataParser
 
 IncludeFileListDict = {}
 AllIncludeFileListDict = {}

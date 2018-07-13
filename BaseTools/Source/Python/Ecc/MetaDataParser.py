@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 from CommonDataClass.DataClass import *
-from EccToolError import *
+from .EccToolError import *
 from Common.MultipleWorkspace import MultipleWorkspace as mws
-import EccGlobalData
+from . import EccGlobalData
 import re
 ## Get the inlcude path list for a source file
 #

@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import re
 import time
@@ -31,7 +32,7 @@ from Common.Misc import GuidStructureStringToGuidString, CheckPcdDatum, PathClas
 from Common.Expression import *
 from CommonDataClass.Exceptions import *
 
-from MetaFileTable import MetaFileStorage
+from .MetaFileTable import MetaFileStorage
 from GenFds.FdfParser import FdfParser
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.LongFilePathSupport import CodecOpenLongFilePath
