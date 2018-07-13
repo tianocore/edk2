@@ -14,13 +14,14 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import sqlite3
 import Common.LongFilePathOs as os
 
-import EdkLogger as EdkLogger
+from . import EdkLogger as EdkLogger
 from CommonDataClass.DataClass import *
-from StringUtils import *
-from DataType import *
+from .StringUtils import *
+from .DataType import *
 
 from Table.TableDataModel import TableDataModel
 from Table.TableFile import TableFile
@@ -117,4 +118,3 @@ if __name__ == '__main__':
     Db.QueryTable(Db.TblFile)
     Db.QueryTable(Db.TblDsc)
     Db.Close()
-

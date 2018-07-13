@@ -14,14 +14,15 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import re
-import DataType
+from . import DataType
 import Common.LongFilePathOs as os
 import string
-import EdkLogger as EdkLogger
+from . import EdkLogger as EdkLogger
 
-import GlobalData
-from BuildToolError import *
+from . import GlobalData
+from .BuildToolError import *
 from CommonDataClass.Exceptions import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws

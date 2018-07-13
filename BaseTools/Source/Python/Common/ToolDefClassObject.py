@@ -14,19 +14,20 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import re
-import EdkLogger
+from . import EdkLogger
 
-from BuildToolError import *
-from TargetTxtClassObject import *
+from .BuildToolError import *
+from .TargetTxtClassObject import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.Misc import PathClass
 from Common.StringUtils import NormPath
 import Common.GlobalData as GlobalData
 from Common import GlobalData
 from Common.MultipleWorkspace import MultipleWorkspace as mws
-from DataType import TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG,\
+from .DataType import TAB_TOD_DEFINES_TARGET, TAB_TOD_DEFINES_TOOL_CHAIN_TAG,\
                      TAB_TOD_DEFINES_TARGET_ARCH, TAB_TOD_DEFINES_COMMAND_TYPE\
                      , TAB_TOD_DEFINES_FAMILY, TAB_TOD_DEFINES_BUILDRULEFAMILY
 

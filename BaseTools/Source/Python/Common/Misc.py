@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import sys
 import string
@@ -30,10 +31,10 @@ from UserList import UserList
 
 from Common import EdkLogger as EdkLogger
 from Common import GlobalData as GlobalData
-from DataType import *
-from BuildToolError import *
+from .DataType import *
+from .BuildToolError import *
 from CommonDataClass.DataClass import *
-from Parsing import GetSplitValueList
+from .Parsing import GetSplitValueList
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 import uuid
@@ -474,7 +475,7 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
     try:
         if GlobalData.gIsWindows:
             try:
-                from PyUtility import SaveFileToDisk
+                from .PyUtility import SaveFileToDisk
                 if not SaveFileToDisk(File, Content):
                     EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData=File)
             except:
