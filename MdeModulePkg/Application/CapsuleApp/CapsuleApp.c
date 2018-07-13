@@ -716,6 +716,40 @@ CleanGatherList (
 }
 
 /**
+  Validate if it is valid capsule header
+
+  This function assumes the caller provided correct CapsuleHeader pointer
+  and CapsuleSize.
+
+  This function validates the fields in EFI_CAPSULE_HEADER.
+
+  @param[in] CapsuleHeader  Points to a capsule header.
+  @param[in] CapsuleSize    Size of the whole capsule image.
+
+**/
+BOOLEAN
+IsValidCapsuleHeader (
+  IN EFI_CAPSULE_HEADER     *CapsuleHeader,
+  IN UINT64                 CapsuleSize
+  )
+{
+  if (CapsuleSize < sizeof (EFI_CAPSULE_HEADER)) {
+    return FALSE;
+  }
+  if (CapsuleHeader->CapsuleImageSize != CapsuleSize) {
+    return FALSE;
+  }
+  if (CapsuleHeader->HeaderSize > CapsuleHeader->CapsuleImageSize) {
+    return FALSE;
+  }
+  if (CapsuleHeader->HeaderSize < sizeof (EFI_CAPSULE_HEADER)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
   Print APP usage.
 **/
 VOID
@@ -890,6 +924,10 @@ UefiMain (
     if (EFI_ERROR(Status)) {
       Print(L"CapsuleApp: capsule image (%s) is not found.\n", CapsuleName);
       goto Done;
+    }
+    if (!IsValidCapsuleHeader (CapsuleBuffer[Index], FileSize[Index])) {
+      Print(L"CapsuleApp: Capsule image (%s) is not a valid capsule.\n", CapsuleName);
+      return EFI_INVALID_PARAMETER;
     }
   }
 
