@@ -824,7 +824,7 @@ WriteSections64 (
         //
         //  Ignore for unkown section type.
         //
-        VerboseMsg ("%s unknown section type %x. We directly copy this section into Coff file", mInImageName, (unsigned)Shdr->sh_type);
+        VerboseMsg ("%s unknown section type %x. We ignore this unknown section type.", mInImageName, (unsigned)Shdr->sh_type);
         break;
       }
     }
