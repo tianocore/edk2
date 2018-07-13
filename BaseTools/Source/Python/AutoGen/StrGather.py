@@ -14,10 +14,11 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import re
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import *
-from UniClassObject import *
+from .UniClassObject import *
 from io import BytesIO
 from struct import pack, unpack
 from Common.LongFilePathSupport import OpenLongFilePath as open

@@ -10,13 +10,14 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
+from __future__ import absolute_import
 from io import BytesIO
 from Common.Misc import *
 from Common.StringUtils import StringToArray
 from struct import pack
-from ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER
-from ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB
-from ValidCheckingInfoObject import GetValidationObject
+from .ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER
+from .ValidCheckingInfoObject import VAR_CHECK_PCD_VARIABLE_TAB
+from .ValidCheckingInfoObject import GetValidationObject
 from Common.VariableAttributes import VariableAttributes
 import copy
 from struct import unpack

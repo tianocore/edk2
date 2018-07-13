@@ -13,6 +13,7 @@
 
 ## Import Modules
 #
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import sys
 import string
@@ -23,7 +24,7 @@ from Common.MultipleWorkspace import MultipleWorkspace as mws
 from Common.BuildToolError import *
 from Common.Misc import *
 from Common.StringUtils import *
-from BuildEngine import *
+from .BuildEngine import *
 import Common.GlobalData as GlobalData
 from collections import OrderedDict
 

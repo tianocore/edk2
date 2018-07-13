@@ -16,19 +16,20 @@
 ## Import Modules
 #
 from __future__ import print_function
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import re
 import os.path as path
 import copy
 import uuid
 
-import GenC
-import GenMake
-import GenDepex
+from . import GenC
+from . import GenMake
+from . import GenDepex
 from io import BytesIO
 
-from StrGather import *
-from BuildEngine import BuildRule
+from .StrGather import *
+from .BuildEngine import BuildRule
 
 from Common.LongFilePathSupport import CopyLongFilePath
 from Common.BuildToolError import *
@@ -41,14 +42,14 @@ from CommonDataClass.CommonClass import SkuInfoClass
 from Workspace.BuildClassObject import *
 from GenPatchPcdTable.GenPatchPcdTable import parsePcdInfoFromMapFile
 import Common.VpdInfoFile as VpdInfoFile
-from GenPcdDb import CreatePcdDatabaseCode
+from .GenPcdDb import CreatePcdDatabaseCode
 from Workspace.MetaFileCommentParser import UsageList
 from Workspace.WorkspaceCommon import GetModuleLibInstances
 from Common.MultipleWorkspace import MultipleWorkspace as mws
-import InfSectionParser
+from . import InfSectionParser
 import datetime
 import hashlib
-from GenVar import VariableMgr, var_info
+from .GenVar import VariableMgr, var_info
 from collections import OrderedDict
 from collections import defaultdict
 from Workspace.WorkspaceCommon import OrderedListDict

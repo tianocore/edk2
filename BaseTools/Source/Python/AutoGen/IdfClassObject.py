@@ -13,6 +13,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import *
 from Common.StringUtils import GetLineNo
@@ -21,7 +22,7 @@ from Common.LongFilePathSupport import LongFilePath
 import re
 import os
 from Common.GlobalData import gIdentifierPattern
-from UniClassObject import StripComments
+from .UniClassObject import StripComments
 
 IMAGE_TOKEN = re.compile('IMAGE_TOKEN *\(([A-Z0-9_]+) *\)', re.MULTILINE | re.UNICODE)
 

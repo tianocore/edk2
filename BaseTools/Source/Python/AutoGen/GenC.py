@@ -13,6 +13,7 @@
 
 ## Import Modules
 #
+from __future__ import absolute_import
 import string
 import collections
 import struct
@@ -22,9 +23,9 @@ from Common.BuildToolError import *
 from Common.DataType import *
 from Common.Misc import *
 from Common.StringUtils import StringToArray
-from StrGather import *
-from GenPcdDb import CreatePcdDatabaseCode
-from IdfClassObject import *
+from .StrGather import *
+from .GenPcdDb import CreatePcdDatabaseCode
+from .IdfClassObject import *
 
 ## PCD type string
 gItemTypeStringDatabase  = {
