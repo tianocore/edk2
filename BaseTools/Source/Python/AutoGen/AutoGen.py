@@ -1292,7 +1292,7 @@ class PlatformAutoGen(AutoGen):
             FixedAtBuildPcds = {}
             ShareFixedAtBuildPcdsSameValue = {}
             for Module in LibAuto._ReferenceModules:
-                for Pcd in Module.FixedAtBuildPcds + LibAuto.FixedAtBuildPcds:
+                for Pcd in set(Module.FixedAtBuildPcds + LibAuto.FixedAtBuildPcds):
                     DefaultValue = Pcd.DefaultValue
                     # Cover the case: DSC component override the Pcd value and the Pcd only used in one Lib
                     if Pcd in Module.LibraryPcdList:
