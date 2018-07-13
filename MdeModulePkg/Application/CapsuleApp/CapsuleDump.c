@@ -454,9 +454,6 @@ DumpEsrtEntry (
   Print(L"  FwVersion                - 0x%x\n", EsrtEntry->FwVersion);
   Print(L"  LowestSupportedFwVersion - 0x%x\n", EsrtEntry->LowestSupportedFwVersion);
   Print(L"  CapsuleFlags             - 0x%x\n", EsrtEntry->CapsuleFlags);
-  Print(L"    PERSIST_ACROSS_RESET   - 0x%x\n", EsrtEntry->CapsuleFlags & CAPSULE_FLAGS_PERSIST_ACROSS_RESET);
-  Print(L"    POPULATE_SYSTEM_TABLE  - 0x%x\n", EsrtEntry->CapsuleFlags & CAPSULE_FLAGS_POPULATE_SYSTEM_TABLE);
-  Print(L"    INITIATE_RESET         - 0x%x\n", EsrtEntry->CapsuleFlags & CAPSULE_FLAGS_INITIATE_RESET);
   Print(L"  LastAttemptVersion       - 0x%x\n", EsrtEntry->LastAttemptVersion);
   Print(L"  LastAttemptStatus        - 0x%x (%a)\n", EsrtEntry->LastAttemptStatus, LastAttemptStatusToString(EsrtEntry->LastAttemptStatus));
 }
