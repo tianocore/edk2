@@ -161,12 +161,12 @@ STATIC
 VOID
 DumpGTBlock (
   IN UINT8* Ptr,
-  IN UINT16 Length
+  IN UINT32 Length
   )
 {
   UINT32 Index;
   UINT32 Offset;
-  UINT16 GTBlockTimerLength;
+  UINT32 GTBlockTimerLength;
 
   Offset = ParseAcpi (
              TRUE,

@@ -96,7 +96,7 @@ ParseAcpiXsdt (
       CONST UINT8*  Revision;
 
       if ((UINT64*)(UINTN)(*TablePointer) != NULL) {
-        UINT8*      Ptr;
+        UINT8*      SignaturePtr;
 
         ParseAcpiHeader (
           (UINT8*)(UINTN)(*TablePointer),
@@ -105,17 +105,17 @@ ParseAcpiXsdt (
           &Revision
           );
 
-        Ptr = (UINT8*)Signature;
+        SignaturePtr = (UINT8*)Signature;
 
         UnicodeSPrint (
           Buffer,
           sizeof (Buffer),
           L"Entry[%d] - %c%c%c%c",
           EntryIndex++,
-          Ptr[0],
-          Ptr[1],
-          Ptr[2],
-          Ptr[3]
+          SignaturePtr[0],
+          SignaturePtr[1],
+          SignaturePtr[2],
+          SignaturePtr[3]
           );
       } else {
         UnicodeSPrint (
