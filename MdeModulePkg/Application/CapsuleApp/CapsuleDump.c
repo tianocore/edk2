@@ -953,5 +953,7 @@ DumpFmpImage (
   Status = WriteFileFromBuffer(ImageName, ImageSize, Image);
   Print(L"CapsuleApp: Dump %g ImageIndex (0x%x) to %s %r\n", ImageTypeId, ImageIndex, ImageName, Status);
 
+  FreePool (Image);
+
   return ;
 }
