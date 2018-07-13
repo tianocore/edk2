@@ -16,6 +16,7 @@
 '''
 Parsing
 '''
+from __future__ import absolute_import
 
 ##
 # Import Modules
@@ -42,7 +43,7 @@ from Logger import StringTable as ST
 import Logger.Log as Logger
 
 from Parser.DecParser import Dec
-import GlobalData
+from . import GlobalData
 
 gPKG_INFO_DICT = {}
 
