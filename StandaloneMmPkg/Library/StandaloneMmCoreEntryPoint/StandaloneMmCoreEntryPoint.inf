@@ -1,0 +1,55 @@
+## @file
+# Module entry point library for DXE core.
+#
+# Copyright (c) 2017 - 2018, ARM Ltd. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution. The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php.
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = StandaloneMmCoreEntryPoint
+  FILE_GUID                      = C97AC593-109A-4C63-905C-675FDE2689E8
+  MODULE_TYPE                    = MM_CORE_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = StandaloneMmCoreEntryPoint|MM_CORE_STANDALONE
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
+#
+
+[Sources.AARCH64]
+  AArch64/StandaloneMmCoreEntryPoint.c
+  AArch64/SetPermissions.c
+  AArch64/CreateHobList.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[Packages.AARCH64]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+
+[LibraryClasses.AARCH64]
+  ArmMmuLib
+  ArmSvcLib
+
+[Guids]
+  gMpInformationHobGuid
+  gEfiMmPeiMmramMemoryReserveGuid
+  gEfiStandaloneMmNonSecureBufferGuid
+  gEfiArmTfCpuDriverEpDescriptorGuid
