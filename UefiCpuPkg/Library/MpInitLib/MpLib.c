@@ -1520,6 +1520,7 @@ MpInitLibInitialize (
   UINTN                    ApResetVectorSize;
   UINTN                    BackupBufferAddr;
   UINTN                    ApIdtBase;
+  VOID                     *MicrocodePatchInRam;
 
   OldCpuMpData = GetCpuMpDataFromGuidedHob ();
   if (OldCpuMpData == NULL) {
@@ -1587,8 +1588,38 @@ MpInitLibInitialize (
   CpuMpData->SwitchBspFlag    = FALSE;
   CpuMpData->CpuData          = (CPU_AP_DATA *) (CpuMpData + 1);
   CpuMpData->CpuInfoInHob     = (UINT64) (UINTN) (CpuMpData->CpuData + MaxLogicalProcessorNumber);
-  CpuMpData->MicrocodePatchAddress    = PcdGet64 (PcdCpuMicrocodePatchAddress);
   CpuMpData->MicrocodePatchRegionSize = PcdGet64 (PcdCpuMicrocodePatchRegionSize);
+  //
+  // If platform has more than one CPU, relocate microcode to memory to reduce
+  // loading microcode time.
+  //
+  MicrocodePatchInRam = NULL;
+  if (MaxLogicalProcessorNumber > 1) {
+    MicrocodePatchInRam = AllocatePages (
+                            EFI_SIZE_TO_PAGES (
+                              (UINTN)CpuMpData->MicrocodePatchRegionSize
+                              )
+                            );
+  }
+  if (MicrocodePatchInRam == NULL) {
+    //
+    // there is only one processor, or no microcode patch is available, or
+    // memory allocation failed
+    //
+    CpuMpData->MicrocodePatchAddress = PcdGet64 (PcdCpuMicrocodePatchAddress);
+  } else {
+    //
+    // there are multiple processors, and a microcode patch is available, and
+    // memory allocation succeeded
+    //
+    CopyMem (
+      MicrocodePatchInRam,
+      (VOID *)(UINTN)PcdGet64 (PcdCpuMicrocodePatchAddress),
+      (UINTN)CpuMpData->MicrocodePatchRegionSize
+      );
+    CpuMpData->MicrocodePatchAddress = (UINTN)MicrocodePatchInRam;
+  }
+
   InitializeSpinLock(&CpuMpData->MpLock);
 
   //
