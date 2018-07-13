@@ -70,9 +70,8 @@ class FV (FvClassObject):
     #
     def AddToBuffer (self, Buffer, BaseAddress=None, BlockSize= None, BlockNum=None, ErasePloarity='1', VtfDict=None, MacroDict = {}, Flag=False) :
 
-        from .GenFds import GenFds
-        if BaseAddress is None and self.UiFvName.upper() + 'fv' in GenFds.ImageBinDict:
-            return GenFds.ImageBinDict[self.UiFvName.upper() + 'fv']
+        if BaseAddress is None and self.UiFvName.upper() + 'fv' in GenFdsGlobalVariable.ImageBinDict:
+            return GenFdsGlobalVariable.ImageBinDict[self.UiFvName.upper() + 'fv']
 
         #
         # Check whether FV in Capsule is in FD flash region.
@@ -85,7 +84,7 @@ class FV (FvClassObject):
                         for RegionData in RegionObj.RegionDataList:
                             if RegionData.endswith(".fv"):
                                 continue
-                            elif RegionData.upper() + 'fv' in GenFds.ImageBinDict:
+                            elif RegionData.upper() + 'fv' in GenFdsGlobalVariable.ImageBinDict:
                                 continue
                             elif self.UiFvName.upper() == RegionData.upper():
                                 GenFdsGlobalVariable.ErrorLogger("Capsule %s in FD region can't contain a FV %s in FD region." % (self.CapsuleName, self.UiFvName.upper()))
@@ -140,7 +139,7 @@ class FV (FvClassObject):
             FvOutputFile = self.CreateFileName
 
         if Flag:
-            GenFds.ImageBinDict[self.UiFvName.upper() + 'fv'] = FvOutputFile
+            GenFdsGlobalVariable.ImageBinDict[self.UiFvName.upper() + 'fv'] = FvOutputFile
             return FvOutputFile
 
         FvInfoFileName = os.path.join(GenFdsGlobalVariable.FfsDir, self.UiFvName + '.inf')
@@ -220,7 +219,7 @@ class FV (FvClassObject):
                     # FvAlignmentValue is less than 1K
                     self.FvAlignment = str (FvAlignmentValue)
                 FvFileObj.close()
-                GenFds.ImageBinDict[self.UiFvName.upper() + 'fv'] = FvOutputFile
+                GenFdsGlobalVariable.ImageBinDict[self.UiFvName.upper() + 'fv'] = FvOutputFile
                 GenFdsGlobalVariable.LargeFileInFvFlags.pop()
             else:
                 GenFdsGlobalVariable.ErrorLogger("Failed to generate %s FV file." %self.UiFvName)
