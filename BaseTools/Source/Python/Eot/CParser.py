@@ -1,6 +1,7 @@
 # $ANTLR 3.0.1 C.g 2010-02-23 09:58:53
 
 from __future__ import print_function
+from __future__ import absolute_import
 from antlr3 import *
 from antlr3.compat import set, frozenset
 
@@ -23,8 +24,8 @@ from antlr3.compat import set, frozenset
 #
 ##
 
-import CodeFragment
-import FileProfile
+from . import CodeFragment
+from . import FileProfile
 
 
 

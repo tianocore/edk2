@@ -14,8 +14,9 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
-import EotGlobalData
+from . import EotGlobalData
 from Common.LongFilePathSupport import OpenLongFilePath as open
 
 ## Report() class
