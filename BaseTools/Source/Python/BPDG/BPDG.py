@@ -21,6 +21,7 @@
 # Import Modules
 #
 from __future__ import print_function
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import sys
 import encodings.ascii
@@ -30,8 +31,8 @@ from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.BuildVersion import gBUILD_VERSION
 
-import StringTable as st
-import GenVpd
+from . import StringTable as st
+from . import GenVpd
 
 PROJECT_NAME       = st.LBL_BPDG_LONG_UNI
 VERSION            = (st.LBL_BPDG_VERSION + " Build " + gBUILD_VERSION)
