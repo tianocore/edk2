@@ -850,10 +850,17 @@ UefiMain (
     }
     return EFI_SUCCESS;
   }
+
   if (StrCmp(Argv[1], L"-E") == 0) {
     DumpEsrtData();
     return EFI_SUCCESS;
   }
+
+  if (Argv[1][0] == L'-') {
+    Print(L"CapsuleApp: Unrecognized option(%s).\n", Argv[1]);
+    return EFI_UNSUPPORTED;
+  }
+
   CapsuleFirstIndex = 1;
   NoReset = FALSE;
   if ((Argc > 1) && (StrCmp(Argv[Argc - 1], L"-NR") == 0)) {
