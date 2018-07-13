@@ -11,4 +11,4 @@ dir=$(dirname "$full_cmd")
 cmd=${full_cmd##*/}
 
 export PYTHONPATH="$dir/../../Source/Python${PYTHONPATH:+:"$PYTHONPATH"}"
-exec "${python_exe:-python}" "$dir/../../Source/Python/$cmd/$cmd.py" "$@"
+exec "${python_exe:-python}" -m $cmd.$cmd "$@"
