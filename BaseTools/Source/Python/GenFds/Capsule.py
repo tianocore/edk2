@@ -15,17 +15,16 @@
 ##
 # Import Modules
 #
-from GenFdsGlobalVariable import GenFdsGlobalVariable
+from __future__ import absolute_import
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import CapsuleClassObject
 import Common.LongFilePathOs as os
 import subprocess
 from io import BytesIO
 from Common.Misc import SaveFileOnChange
-from GenFds import GenFds
 from Common.Misc import PackRegistryFormatGuid
 import uuid
 from struct import pack
-from GenFds import FindExtendTool
 from Common import EdkLogger
 from Common.BuildToolError import *
 
@@ -66,6 +65,7 @@ class Capsule (CapsuleClassObject) :
         #     UINT32            CapsuleImageSize;
         # } EFI_CAPSULE_HEADER;
         #
+        from .GenFds import FindExtendTool
         Header = BytesIO()
         #
         # Use FMP capsule GUID: 6DCBD5ED-E82D-4C44-BDA1-7194199AD92A
@@ -201,6 +201,7 @@ class Capsule (CapsuleClassObject) :
     #   @retval string      Generated Capsule file path
     #
     def GenCapsule(self):
+        from .GenFds import GenFds
         if self.UiCapsuleName.upper() + 'cap' in GenFds.ImageBinDict:
             return GenFds.ImageBinDict[self.UiCapsuleName.upper() + 'cap']
 

@@ -15,18 +15,18 @@
 ##
 # Import Modules
 #
-import Region
-import Fv
+from __future__ import absolute_import
+from . import Region
+from . import Fv
 import Common.LongFilePathOs as os
 from io import BytesIO
 import sys
 from struct import *
-from GenFdsGlobalVariable import GenFdsGlobalVariable
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import FDClassObject
 from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.Misc import SaveFileOnChange
-from GenFds import GenFds
 from Common.DataType import BINARY_FILE_TYPE_FV
 
 ## generate FD
@@ -47,6 +47,7 @@ class FD(FDClassObject):
     #   @retval string      Generated FD file name
     #
     def GenFd (self, Flag = False):
+        from .GenFds import GenFds
         if self.FdUiName.upper() + 'fd' in GenFds.ImageBinDict:
             return GenFds.ImageBinDict[self.FdUiName.upper() + 'fd']
 

@@ -15,11 +15,12 @@
 ##
 # Import Modules
 #
-import Section
+from __future__ import absolute_import
+from . import Section
 from io import BytesIO
-from Ffs import Ffs
+from .Ffs import Ffs
 import subprocess
-from GenFdsGlobalVariable import GenFdsGlobalVariable
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
 import Common.LongFilePathOs as os
 from CommonDataClass.FdfClass import FvImageSectionClassObject
 from Common import EdkLogger

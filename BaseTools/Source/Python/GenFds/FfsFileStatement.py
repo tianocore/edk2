@@ -15,19 +15,20 @@
 ##
 # Import Modules
 #
-import Ffs
-import Rule
+from __future__ import absolute_import
+from . import Ffs
+from . import Rule
 import Common.LongFilePathOs as os
 from io import BytesIO
 import subprocess
 
-from GenFdsGlobalVariable import GenFdsGlobalVariable
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import FileStatementClassObject
 from Common import EdkLogger
 from Common.BuildToolError import *
 from Common.Misc import GuidStructureByteArrayToGuidString
-from GuidSection import GuidSection
-from FvImageSection import FvImageSection
+from .GuidSection import GuidSection
+from .FvImageSection import FvImageSection
 from Common.Misc import SaveFileOnChange
 from struct import *
 

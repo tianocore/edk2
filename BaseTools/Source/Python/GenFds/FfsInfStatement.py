@@ -16,17 +16,18 @@
 ##
 # Import Modules
 #
-import Rule
+from __future__ import absolute_import
+from . import Rule
 import Common.LongFilePathOs as os
 from io import BytesIO
 from struct import *
-from GenFdsGlobalVariable import GenFdsGlobalVariable
-import Ffs
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
+from . import Ffs
 import subprocess
 import sys
-import Section
-import RuleSimpleFile
-import RuleComplexFile
+from . import Section
+from . import RuleSimpleFile
+from . import RuleComplexFile
 from CommonDataClass.FdfClass import FfsInfStatementClassObject
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 from Common.StringUtils import *
@@ -36,15 +37,15 @@ from Common.Misc import ProcessDuplicatedInf
 from Common.Misc import GetVariableOffset
 from Common import EdkLogger
 from Common.BuildToolError import *
-from GuidSection import GuidSection
-from FvImageSection import FvImageSection
+from .GuidSection import GuidSection
+from .FvImageSection import FvImageSection
 from Common.Misc import PeImageClass
 from AutoGen.GenDepex import DependencyExpression
 from PatchPcdValue.PatchPcdValue import PatchBinaryFile
 from Common.LongFilePathSupport import CopyLongFilePath
 from Common.LongFilePathSupport import OpenLongFilePath as open
 import Common.GlobalData as GlobalData
-from DepexSection import DepexSection
+from .DepexSection import DepexSection
 from Common.Misc import SaveFileOnChange
 from Common.Expression import *
 from Common.DataType import *

@@ -15,11 +15,12 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 from struct import *
-import Section
-from GenFdsGlobalVariable import GenFdsGlobalVariable
+from . import Section
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
 import subprocess
-from Ffs import Ffs
+from .Ffs import Ffs
 import Common.LongFilePathOs as os
 from CommonDataClass.FdfClass import EfiSectionClassObject
 from Common import EdkLogger

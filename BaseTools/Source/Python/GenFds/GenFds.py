@@ -16,17 +16,18 @@
 # Import Modules
 #
 from __future__ import print_function
+from __future__ import absolute_import
 from optparse import OptionParser
 import sys
 import Common.LongFilePathOs as os
 import linecache
-import FdfParser
+from . import FdfParser
 import Common.BuildToolError as BuildToolError
-from GenFdsGlobalVariable import GenFdsGlobalVariable
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from Workspace.WorkspaceDatabase import WorkspaceDatabase
 from Workspace.BuildClassObject import PcdClassObject
-import RuleComplexFile
-from EfiSection import EfiSection
+from . import RuleComplexFile
+from .EfiSection import EfiSection
 from io import BytesIO
 import Common.TargetTxtClassObject as TargetTxtClassObject
 import Common.ToolDefClassObject as ToolDefClassObject
@@ -40,7 +41,7 @@ from Common.Misc import ClearDuplicatedInf
 from Common.Misc import GuidStructureStringToGuidString
 from Common.BuildVersion import gBUILD_VERSION
 from Common.MultipleWorkspace import MultipleWorkspace as mws
-import FfsFileStatement
+from . import FfsFileStatement
 import glob
 from struct import unpack
 

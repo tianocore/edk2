@@ -15,16 +15,16 @@
 ##
 # Import Modules
 #
-import RuleSimpleFile
-import RuleComplexFile
-import Section
-import OptionRom
+from __future__ import absolute_import
+from . import RuleSimpleFile
+from . import RuleComplexFile
+from . import Section
 import Common.GlobalData as GlobalData
 
 from Common.DataType import *
 from Common.StringUtils import *
-from FfsInfStatement import FfsInfStatement
-from GenFdsGlobalVariable import GenFdsGlobalVariable
+from .FfsInfStatement import FfsInfStatement
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
 
 ##
 #
@@ -45,7 +45,7 @@ class OptRomInfStatement (FfsInfStatement):
     #   @param  self        The object pointer
     #
     def __GetOptRomParams(self):
-
+        from . import OptionRom
         if self.OverrideAttribs is None:
             self.OverrideAttribs = OptionRom.OverrideAttribs()
 
@@ -150,5 +150,3 @@ class OptRomInfStatement (FfsInfStatement):
                     OutputFileList.extend(FileList)
 
         return OutputFileList
-
-

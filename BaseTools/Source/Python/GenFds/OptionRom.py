@@ -15,12 +15,12 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import subprocess
 
-import OptRomInfStatement
-from GenFdsGlobalVariable import GenFdsGlobalVariable
-from GenFds import GenFds
+from . import OptRomInfStatement
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import OptionRomClassObject
 from Common.Misc import SaveFileOnChange
 from Common import EdkLogger

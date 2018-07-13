@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 ## @file
 # process FV generation
 #
@@ -20,11 +21,10 @@ import subprocess
 from io import BytesIO
 from struct import *
 
-import Ffs
-import AprioriSection
-import FfsFileStatement
-from GenFdsGlobalVariable import GenFdsGlobalVariable
-from GenFds import GenFds
+from . import Ffs
+from . import AprioriSection
+from . import FfsFileStatement
+from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from CommonDataClass.FdfClass import FvClassObject
 from Common.Misc import SaveFileOnChange, PackGUID
 from Common.LongFilePathSupport import CopyLongFilePath
@@ -70,6 +70,7 @@ class FV (FvClassObject):
     #
     def AddToBuffer (self, Buffer, BaseAddress=None, BlockSize= None, BlockNum=None, ErasePloarity='1', VtfDict=None, MacroDict = {}, Flag=False) :
 
+        from .GenFds import GenFds
         if BaseAddress is None and self.UiFvName.upper() + 'fv' in GenFds.ImageBinDict:
             return GenFds.ImageBinDict[self.UiFvName.upper() + 'fv']
 
