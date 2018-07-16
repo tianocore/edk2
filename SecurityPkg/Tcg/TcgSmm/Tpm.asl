@@ -95,12 +95,12 @@ DefinitionBlock (
           If (LNot (And (MORD, 0x10)))
           {
             //
-            // Triggle the SMI through ACPI _PTS method.
+            // Trigger the SMI through ACPI _PTS method.
             //
             Store (0x02, MCIP)
 
             //
-            // Triggle the SMI interrupt
+            // Trigger the SMI interrupt
             //
             Store (MCIN, IOB2)
           }
@@ -200,7 +200,7 @@ DefinitionBlock (
             Store (0x02, PPIP)
 
             //
-            // Triggle the SMI interrupt
+            // Trigger the SMI interrupt
             //
             Store (PPIN, IOB2)
             Return (FRET)
@@ -231,7 +231,7 @@ DefinitionBlock (
             Store (0x05, PPIP)
 
             //
-            // Triggle the SMI interrupt
+            // Trigger the SMI interrupt
             //
             Store (PPIN, IOB2)
 
@@ -259,7 +259,7 @@ DefinitionBlock (
             Store (DerefOf (Index (Arg2, 0x00)), PPRQ)
 
             //
-            // Triggle the SMI interrupt
+            // Trigger the SMI interrupt
             //
             Store (PPIN, IOB2)
             Return (FRET)
@@ -273,7 +273,7 @@ DefinitionBlock (
             Store (DerefOf (Index (Arg2, 0x00)), UCRQ)
 
             //
-            // Triggle the SMI interrupt
+            // Trigger the SMI interrupt
             //
             Store (PPIN, IOB2)
 
@@ -307,12 +307,12 @@ DefinitionBlock (
             Store (DerefOf (Index (Arg2, 0x00)), MORD)
 
             //
-            // Triggle the SMI through ACPI _DSM method.
+            // Trigger the SMI through ACPI _DSM method.
             //
             Store (0x01, MCIP)
 
             //
-            // Triggle the SMI interrupt
+            // Trigger the SMI interrupt
             //
             Store (MCIN, IOB2)
             Return (MRET)
