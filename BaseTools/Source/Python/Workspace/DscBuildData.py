@@ -1295,10 +1295,10 @@ class DscBuildData(PlatformBuildClassObject):
         if GlobalData.gFdfParser is None:
             return AllPcds
         NoFiledValues = GlobalData.gFdfParser.Profile.PcdDict
-        for Guid,Name,Field in NoFiledValues:
+        for Name,Guid,Field in NoFiledValues:
             if len(Field):
                 continue
-            Value = NoFiledValues[(Guid,Name,Field)]
+            Value = NoFiledValues[(Name,Guid,Field)]
             if (Name,Guid) in AllPcds:
                 Pcd = AllPcds.get((Name,Guid))
                 if isinstance(self._DecPcds.get((Pcd.TokenCName,Pcd.TokenSpaceGuidCName), None),StructurePcd):
@@ -1325,7 +1325,7 @@ class DscBuildData(PlatformBuildClassObject):
             else:
                 PcdInDec = self.DecPcds.get((Name,Guid))
                 if PcdInDec:
-                    PcdInDec.PcdValueFromComm = Value
+                    PcdInDec.PcdValueFromFdf = Value
                     if PcdInDec.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_FEATURE_FLAG]]:
