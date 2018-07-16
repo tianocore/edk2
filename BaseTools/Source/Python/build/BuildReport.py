@@ -963,6 +963,11 @@ class PcdReport(object):
                 DecDefaultValue = self.DecPcdDefault.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, DecType))
                 DscDefaultValue = self.DscPcdDefault.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName))
                 DscDefaultValBak = DscDefaultValue
+                Field = ''
+                for (CName, Guid, Field) in self.FdfPcdSet:
+                    if CName == PcdTokenCName and Guid == Key:
+                        DscDefaultValue = self.FdfPcdSet[(CName, Guid, Field)]
+                        break
                 DscDefaultValue = self.FdfPcdSet.get((Pcd.TokenCName, Key), DscDefaultValue)
                 if DscDefaultValue != DscDefaultValBak:
                     try:
@@ -975,13 +980,14 @@ class PcdReport(object):
                 PcdValue = DecDefaultValue
                 if DscDefaultValue:
                     PcdValue = DscDefaultValue
+                Pcd.DefaultValue = PcdValue
                 if ModulePcdSet is not None:
                     if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type) not in ModulePcdSet:
                         continue
-                    InfDefault, PcdValue = ModulePcdSet[Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type]
+                    InfDefaultValue, PcdValue = ModulePcdSet[Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type]
                     Pcd.DefaultValue = PcdValue
-                    if InfDefault == "":
-                        InfDefault = None
+                    if InfDefaultValue == "":
+                        InfDefaultValue = None
 
                 BuildOptionMatch = False
                 if GlobalData.BuildOptionPcd:
@@ -1084,13 +1090,15 @@ class PcdReport(object):
                 #
                 # Report PCD item according to their override relationship
                 #
-                if DecMatch and InfMatch:
+                if DecMatch:
                     self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '  ')
+                elif InfDefaultValue and InfMatch:
+                    self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*M')
                 elif BuildOptionMatch:
                     self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*B')
                 else:
-                    if DscMatch:
-                        if (Pcd.TokenCName, Key) in self.FdfPcdSet:
+                    if DscDefaultValue and DscMatch:
+                        if (Pcd.TokenCName, Key, Field) in self.FdfPcdSet:
                             self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*F')
                         else:
                             self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '*P')
