@@ -161,6 +161,8 @@ EndofPeiSignalNotifyCallBack (
 
   MeasuredHobData = NULL;
 
+  PERF_CALLBACK_BEGIN (&gEfiEndOfPeiSignalPpiGuid);
+
   //
   // Create a Guid hob to save all measured Fv
   //
@@ -185,6 +187,8 @@ EndofPeiSignalNotifyCallBack (
     //
     CopyMem (&MeasuredHobData->MeasuredFvBuf[mMeasuredBaseFvIndex] , mMeasuredChildFvInfo, sizeof(EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredChildFvIndex));
   }
+
+  PERF_CALLBACK_END (&gEfiEndOfPeiSignalPpiGuid);
 
   return EFI_SUCCESS;
 }
