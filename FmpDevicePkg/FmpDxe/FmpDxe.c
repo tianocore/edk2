@@ -898,6 +898,9 @@ SetTheImage (
   UINT32      AllHeaderSize;
   UINT32      IncommingFwVersion;
   UINT32      LastAttemptStatus;
+  EFI_STATUS  GetAttributesStatus;
+  UINT64      AttributesSupported;
+  UINT64      AttributesSetting;
 
   Status             = EFI_SUCCESS;
   Updateable         = 0;
@@ -1110,10 +1113,14 @@ SetTheImage (
 
   //
   // Set flag so the descriptor is repopulated
-  // This only applied to devices that do not require system reboot
+  // This is only applied to devices that do not require reset
   //
-  if (!PcdGetBool (PcdFmpDeviceSystemResetRequired)) {
-    mDescriptorPopulated = FALSE;
+  GetAttributesStatus = FmpDeviceGetAttributes (&AttributesSupported, &AttributesSetting);
+  if (!EFI_ERROR (GetAttributesStatus)) {
+    if (((AttributesSupported & IMAGE_ATTRIBUTE_RESET_REQUIRED) == 0) ||
+        ((AttributesSetting & IMAGE_ATTRIBUTE_RESET_REQUIRED) == 0)) {
+      mDescriptorPopulated = FALSE;
+    }
   }
 
 cleanup:
