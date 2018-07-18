@@ -1719,3 +1719,230 @@ EfiLocateProtocolBuffer (
 
   return EFI_SUCCESS;
 }
+
+/**
+  Open or create a file or directory, possibly creating the chain of
+  directories leading up to the directory.
+
+  EfiOpenFileByDevicePath() first locates EFI_SIMPLE_FILE_SYSTEM_PROTOCOL on
+  FilePath, and opens the root directory of that filesystem with
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL.OpenVolume().
+
+  On the remaining device path, the longest initial sequence of
+  FILEPATH_DEVICE_PATH nodes is node-wise traversed with
+  EFI_FILE_PROTOCOL.Open(). For the pathname fragment specified by each
+  traversed FILEPATH_DEVICE_PATH node, EfiOpenFileByDevicePath() first masks
+  EFI_FILE_MODE_CREATE out of OpenMode, and passes 0 for Attributes. If
+  EFI_FILE_PROTOCOL.Open() fails, and OpenMode includes EFI_FILE_MODE_CREATE,
+  then the operation is retried with the caller's OpenMode and Attributes
+  unmodified.
+
+  (As a consequence, if OpenMode includes EFI_FILE_MODE_CREATE, and Attributes
+  includes EFI_FILE_DIRECTORY, and each FILEPATH_DEVICE_PATH specifies a single
+  pathname component, then EfiOpenFileByDevicePath() ensures that the specified
+  series of subdirectories exist on return.)
+
+  The EFI_FILE_PROTOCOL identified by the last FILEPATH_DEVICE_PATH node is
+  output to the caller; intermediate EFI_FILE_PROTOCOL instances are closed. If
+  there are no FILEPATH_DEVICE_PATH nodes past the node that identifies the
+  filesystem, then the EFI_FILE_PROTOCOL of the root directory of the
+  filesystem is output to the caller. If a device path node that is different
+  from FILEPATH_DEVICE_PATH is encountered relative to the filesystem, the
+  traversal is stopped with an error, and a NULL EFI_FILE_PROTOCOL is output.
+
+  @param[in,out] FilePath  On input, the device path to the file or directory
+                           to open or create. The caller is responsible for
+                           ensuring that the device path pointed-to by FilePath
+                           is well-formed. On output, FilePath points one past
+                           the last node in the original device path that has
+                           been successfully processed. FilePath is set on
+                           output even if EfiOpenFileByDevicePath() returns an
+                           error.
+
+  @param[out] File         On error, File is set to NULL. On success, File is
+                           set to the EFI_FILE_PROTOCOL of the root directory
+                           of the filesystem, if there are no
+                           FILEPATH_DEVICE_PATH nodes in FilePath; otherwise,
+                           File is set to the EFI_FILE_PROTOCOL identified by
+                           the last node in FilePath.
+
+  @param[in] OpenMode      The OpenMode parameter to pass to
+                           EFI_FILE_PROTOCOL.Open(). For each
+                           FILEPATH_DEVICE_PATH node in FilePath,
+                           EfiOpenFileByDevicePath() first opens the specified
+                           pathname fragment with EFI_FILE_MODE_CREATE masked
+                           out of OpenMode and with Attributes set to 0, and
+                           only retries the operation with EFI_FILE_MODE_CREATE
+                           unmasked and Attributes propagated if the first open
+                           attempt fails.
+
+  @param[in] Attributes    The Attributes parameter to pass to
+                           EFI_FILE_PROTOCOL.Open(), when EFI_FILE_MODE_CREATE
+                           is propagated unmasked in OpenMode.
+
+  @retval EFI_SUCCESS            The file or directory has been opened or
+                                 created.
+
+  @retval EFI_INVALID_PARAMETER  FilePath is NULL; or File is NULL; or FilePath
+                                 contains a device path node, past the node
+                                 that identifies
+                                 EFI_SIMPLE_FILE_SYSTEM_PROTOCOL, that is not a
+                                 FILEPATH_DEVICE_PATH node.
+
+  @retval EFI_OUT_OF_RESOURCES   Memory allocation failed.
+
+  @return                        Error codes propagated from the
+                                 LocateDevicePath() and OpenProtocol() boot
+                                 services, and from the
+                                 EFI_SIMPLE_FILE_SYSTEM_PROTOCOL.OpenVolume()
+                                 and EFI_FILE_PROTOCOL.Open() member functions.
+**/
+EFI_STATUS
+EFIAPI
+EfiOpenFileByDevicePath (
+  IN OUT EFI_DEVICE_PATH_PROTOCOL  **FilePath,
+  OUT    EFI_FILE_PROTOCOL         **File,
+  IN     UINT64                    OpenMode,
+  IN     UINT64                    Attributes
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_HANDLE                      FileSystemHandle;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *FileSystem;
+  EFI_FILE_PROTOCOL               *LastFile;
+  FILEPATH_DEVICE_PATH            *FilePathNode;
+  CHAR16                          *AlignedPathName;
+  CHAR16                          *PathName;
+  EFI_FILE_PROTOCOL               *NextFile;
+
+  if (File == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+  *File = NULL;
+
+  if (FilePath == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
+  // Look up the filesystem.
+  //
+  Status = gBS->LocateDevicePath (
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  FilePath,
+                  &FileSystemHandle
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  Status = gBS->OpenProtocol (
+                  FileSystemHandle,
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  (VOID **)&FileSystem,
+                  gImageHandle,
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Open the root directory of the filesystem. After this operation succeeds,
+  // we have to release LastFile on error.
+  //
+  Status = FileSystem->OpenVolume (FileSystem, &LastFile);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Traverse the device path nodes relative to the filesystem.
+  //
+  while (!IsDevicePathEnd (*FilePath)) {
+    if (DevicePathType (*FilePath) != MEDIA_DEVICE_PATH ||
+        DevicePathSubType (*FilePath) != MEDIA_FILEPATH_DP) {
+      Status = EFI_INVALID_PARAMETER;
+      goto CloseLastFile;
+    }
+    FilePathNode = (FILEPATH_DEVICE_PATH *)*FilePath;
+
+    //
+    // FilePathNode->PathName may be unaligned, and the UEFI specification
+    // requires pointers that are passed to protocol member functions to be
+    // aligned. Create an aligned copy of the pathname if necessary.
+    //
+    if ((UINTN)FilePathNode->PathName % sizeof *FilePathNode->PathName == 0) {
+      AlignedPathName = NULL;
+      PathName = FilePathNode->PathName;
+    } else {
+      AlignedPathName = AllocateCopyPool (
+                          (DevicePathNodeLength (FilePathNode) -
+                           SIZE_OF_FILEPATH_DEVICE_PATH),
+                          FilePathNode->PathName
+                          );
+      if (AlignedPathName == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto CloseLastFile;
+      }
+      PathName = AlignedPathName;
+    }
+
+    //
+    // Open the next pathname fragment with EFI_FILE_MODE_CREATE masked out and
+    // with Attributes set to 0.
+    //
+    Status = LastFile->Open (
+                         LastFile,
+                         &NextFile,
+                         PathName,
+                         OpenMode & ~(UINT64)EFI_FILE_MODE_CREATE,
+                         0
+                         );
+
+    //
+    // Retry with EFI_FILE_MODE_CREATE and the original Attributes if the first
+    // attempt failed, and the caller specified EFI_FILE_MODE_CREATE.
+    //
+    if (EFI_ERROR (Status) && (OpenMode & EFI_FILE_MODE_CREATE) != 0) {
+      Status = LastFile->Open (
+                           LastFile,
+                           &NextFile,
+                           PathName,
+                           OpenMode,
+                           Attributes
+                           );
+    }
+
+    //
+    // Release any AlignedPathName on both error and success paths; PathName is
+    // no longer needed.
+    //
+    if (AlignedPathName != NULL) {
+      FreePool (AlignedPathName);
+    }
+    if (EFI_ERROR (Status)) {
+      goto CloseLastFile;
+    }
+
+    //
+    // Advance to the next device path node.
+    //
+    LastFile->Close (LastFile);
+    LastFile = NextFile;
+    *FilePath = NextDevicePathNode (FilePathNode);
+  }
+
+  *File = LastFile;
+  return EFI_SUCCESS;
+
+CloseLastFile:
+  LastFile->Close (LastFile);
+
+  //
+  // We are on the error path; we must have set an error Status for returning
+  // to the caller.
+  //
+  ASSERT (EFI_ERROR (Status));
+  return Status;
+}

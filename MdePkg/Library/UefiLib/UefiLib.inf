@@ -68,6 +68,7 @@
   gEfiSimpleTextOutProtocolGuid                   ## SOMETIMES_CONSUMES
   gEfiGraphicsOutputProtocolGuid                  ## SOMETIMES_CONSUMES
   gEfiHiiFontProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiSimpleFileSystemProtocolGuid                ## SOMETIMES_CONSUMES
   gEfiUgaDrawProtocolGuid | gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport                 ## SOMETIMES_CONSUMES # Consumes if gEfiGraphicsOutputProtocolGuid uninstalled
   gEfiComponentNameProtocolGuid  | NOT gEfiMdePkgTokenSpaceGuid.PcdComponentNameDisable   ## SOMETIMES_PRODUCES # User chooses to produce it
   gEfiComponentName2ProtocolGuid | NOT gEfiMdePkgTokenSpaceGuid.PcdComponentName2Disable  ## SOMETIMES_PRODUCES # User chooses to produce it
