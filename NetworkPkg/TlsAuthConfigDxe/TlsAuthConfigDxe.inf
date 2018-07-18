@@ -57,7 +57,6 @@
 [Protocols]
   gEfiDevicePathProtocolGuid                    ## PRODUCES
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
-  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
 
 [Guids]
   gTlsAuthConfigGuid                            ## PRODUCES  ## GUID
