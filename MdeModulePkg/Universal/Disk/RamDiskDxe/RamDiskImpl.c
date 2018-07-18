@@ -656,7 +656,7 @@ RamDiskCallback (
         //
         // Open the file.
         //
-        Status = OpenFileByDevicePath (
+        Status = EfiOpenFileByDevicePath (
                    &FileDevPath,
                    &FileHandle,
                    EFI_FILE_MODE_READ,

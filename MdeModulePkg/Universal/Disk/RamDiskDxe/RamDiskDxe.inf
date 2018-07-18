@@ -75,7 +75,6 @@
   gEfiDevicePathProtocolGuid                     ## PRODUCES
   gEfiBlockIoProtocolGuid                        ## PRODUCES
   gEfiBlockIo2ProtocolGuid                       ## PRODUCES
-  gEfiSimpleFileSystemProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiAcpiTableProtocolGuid                      ## SOMETIMES_CONSUMES
   gEfiAcpiSdtProtocolGuid                        ## SOMETIMES_CONSUMES
 

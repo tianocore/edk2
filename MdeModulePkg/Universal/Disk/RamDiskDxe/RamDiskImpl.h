@@ -606,45 +606,6 @@ FileInfo (
 
 
 /**
-  This function will open a file or directory referenced by DevicePath.
-
-  This function opens a file with the open mode according to the file path. The
-  Attributes is valid only for EFI_FILE_MODE_CREATE.
-
-  @param[in, out] FilePath   On input, the device path to the file.
-                             On output, the remaining device path.
-  @param[out]     FileHandle Pointer to the file handle.
-  @param[in]      OpenMode   The mode to open the file with.
-  @param[in]      Attributes The file's file attributes.
-
-  @retval EFI_SUCCESS             The information was set.
-  @retval EFI_INVALID_PARAMETER   One of the parameters has an invalid value.
-  @retval EFI_UNSUPPORTED         Could not open the file path.
-  @retval EFI_NOT_FOUND           The specified file could not be found on the
-                                  device or the file system could not be found
-                                  on the device.
-  @retval EFI_NO_MEDIA            The device has no medium.
-  @retval EFI_MEDIA_CHANGED       The device has a different medium in it or
-                                  the medium is no longer supported.
-  @retval EFI_DEVICE_ERROR        The device reported an error.
-  @retval EFI_VOLUME_CORRUPTED    The file system structures are corrupted.
-  @retval EFI_WRITE_PROTECTED     The file or medium is write protected.
-  @retval EFI_ACCESS_DENIED       The file was opened read only.
-  @retval EFI_OUT_OF_RESOURCES    Not enough resources were available to open
-                                  the file.
-  @retval EFI_VOLUME_FULL         The volume is full.
-**/
-EFI_STATUS
-EFIAPI
-OpenFileByDevicePath(
-  IN OUT EFI_DEVICE_PATH_PROTOCOL           **FilePath,
-  OUT EFI_FILE_HANDLE                       *FileHandle,
-  IN UINT64                                 OpenMode,
-  IN UINT64                                 Attributes
-  );
-
-
-/**
   Publish the RAM disk NVDIMM Firmware Interface Table (NFIT) to the ACPI
   table.
 
