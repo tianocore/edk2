@@ -22,11 +22,6 @@
 
 #string STR_PACKAGE_DESCRIPTION  #language en-US  "This package provides libraries that support the implementation of a module that produces the Firmware Management Protocol to support the update of a system firmware component."
 
-#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceSystemResetRequired_PROMPT  #language en-US "FMP Device System Reset Required."
-#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceSystemResetRequired_HELP    #language en-US "Indicates if a full system reset is required before a firmware update to a firmware device takes effect.<BR><BR>\n"
-                                                                                                "TRUE  - System reset is required.<BR>\n"
-                                                                                                "FALSE - System reset is not required.<BR>"
-
 #string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceTestKeySha256Digest_PROMPT  #language en-US "SHA-256 hash of PKCS7 test key."
 #string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceTestKeySha256Digest_HELP    #language en-US "The SHA-256 hash of a PKCS7 test key that is used to detect if a test key"
                                                                                                 "is being used to authenticate capsules.  Test key detection can be disabled"

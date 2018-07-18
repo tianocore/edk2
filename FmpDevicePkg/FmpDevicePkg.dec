@@ -62,13 +62,6 @@
   gFmpDevicePkgTokenSpaceGuid = { 0x40b2d964, 0xfe11, 0x40dc, { 0x82, 0x83, 0x2e, 0xfb, 0xda, 0x29, 0x53, 0x56 } }
 
 [PcdsFixedAtBuild]
-  ## Indicates if a full system reset is required before a firmware update to a
-  #  firmware devices takes effect.<BR><BR>
-  #   TRUE  - System reset is required.<BR>
-  #   FALSE - System reset is not required.<BR>
-  # @Prompt FMP Device System Reset Required.
-  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceSystemResetRequired|TRUE|BOOLEAN|0x40000008
-
   ## The SHA-256 hash of a PKCS7 test key that is used to detect if a test key
   #  is being used to authenticate capsules.  Test key detection is disabled by
   #  setting the value to {0}.

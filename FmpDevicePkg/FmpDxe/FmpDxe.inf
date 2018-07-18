@@ -76,7 +76,6 @@
   gEdkiiFirmwareManagementProgressProtocolGuid  ## PRODUCES
 
 [Pcd]
-  gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceSystemResetRequired              ## CONSUMES
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceImageIdName                      ## CONSUMES
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceBuildTimeLowestSupportedVersion  ## CONSUMES
   gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceLockEventGuid                    ## CONSUMES
