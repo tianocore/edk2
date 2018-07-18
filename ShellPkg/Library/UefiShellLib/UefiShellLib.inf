@@ -51,7 +51,6 @@
   SortLib
 
 [Protocols]
-  gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
   gEfiUnicodeCollation2ProtocolGuid             ## CONSUMES
 
   # shell 2.0

@@ -504,12 +504,7 @@ ShellOpenFileByDevicePath(
 {
   CHAR16                          *FileName;
   EFI_STATUS                      Status;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL *EfiSimpleFileSystemProtocol;
-  EFI_FILE_PROTOCOL               *Handle1;
-  EFI_FILE_PROTOCOL               *Handle2;
-  CHAR16                          *FnafPathName;
-  UINTN                           PathLen;
-  EFI_HANDLE                      DeviceHandle;
+  EFI_FILE_PROTOCOL               *File;
 
   if (FilePath == NULL || FileHandle == NULL) {
     return (EFI_INVALID_PARAMETER);
@@ -535,117 +530,15 @@ ShellOpenFileByDevicePath(
   //
   // use old shell method.
   //
-  Status = gBS->LocateDevicePath (&gEfiSimpleFileSystemProtocolGuid,
-                                  FilePath,
-                                  &DeviceHandle);
+  Status = EfiOpenFileByDevicePath (FilePath, &File, OpenMode, Attributes);
   if (EFI_ERROR (Status)) {
     return Status;
-  }
-  Status = gBS->OpenProtocol(DeviceHandle,
-                             &gEfiSimpleFileSystemProtocolGuid,
-                             (VOID**)&EfiSimpleFileSystemProtocol,
-                             gImageHandle,
-                             NULL,
-                             EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  Status = EfiSimpleFileSystemProtocol->OpenVolume(EfiSimpleFileSystemProtocol, &Handle1);
-  if (EFI_ERROR (Status)) {
-    FileHandle = NULL;
-    return Status;
-  }
-
-  //
-  // go down directories one node at a time.
-  //
-  while (!IsDevicePathEnd (*FilePath)) {
-    //
-    // For file system access each node should be a file path component
-    //
-    if (DevicePathType    (*FilePath) != MEDIA_DEVICE_PATH ||
-        DevicePathSubType (*FilePath) != MEDIA_FILEPATH_DP
-       ) {
-      FileHandle = NULL;
-      return (EFI_INVALID_PARAMETER);
-    }
-    //
-    // Open this file path node
-    //
-    Handle2  = Handle1;
-    Handle1 = NULL;
-
-    //
-    // File Name Alignment Fix (FNAF)
-    // Handle2->Open may be incapable of handling a unaligned CHAR16 data.
-    // The structure pointed to by FilePath may be not CHAR16 aligned.
-    // This code copies the potentially unaligned PathName data from the
-    // FilePath structure to the aligned FnafPathName for use in the
-    // calls to Handl2->Open.
-    //
-
-    //
-    // Determine length of PathName, in bytes.
-    //
-    PathLen = DevicePathNodeLength (*FilePath) - SIZE_OF_FILEPATH_DEVICE_PATH;
-
-    //
-    // Allocate memory for the aligned copy of the string Extra allocation is to allow for forced alignment
-    // Copy bytes from possibly unaligned location to aligned location
-    //
-    FnafPathName = AllocateCopyPool(PathLen, (UINT8 *)((FILEPATH_DEVICE_PATH*)*FilePath)->PathName);
-    if (FnafPathName == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-
-    //
-    // Try to test opening an existing file
-    //
-    Status = Handle2->Open (
-                          Handle2,
-                          &Handle1,
-                          FnafPathName,
-                          OpenMode &~EFI_FILE_MODE_CREATE,
-                          0
-                         );
-
-    //
-    // see if the error was that it needs to be created
-    //
-    if ((EFI_ERROR (Status)) && (OpenMode != (OpenMode &~EFI_FILE_MODE_CREATE))) {
-      Status = Handle2->Open (
-                            Handle2,
-                            &Handle1,
-                            FnafPathName,
-                            OpenMode,
-                            Attributes
-                           );
-    }
-
-    //
-    // Free the alignment buffer
-    //
-    FreePool(FnafPathName);
-
-    //
-    // Close the last node
-    //
-    Handle2->Close (Handle2);
-
-    if (EFI_ERROR(Status)) {
-      return (Status);
-    }
-
-    //
-    // Get the next node
-    //
-    *FilePath = NextDevicePathNode (*FilePath);
   }
 
   //
   // This is a weak spot since if the undefined SHELL_FILE_HANDLE format changes this must change also!
   //
-  *FileHandle = (VOID*)Handle1;
+  *FileHandle = (VOID*)File;
   return (EFI_SUCCESS);
 }
 
