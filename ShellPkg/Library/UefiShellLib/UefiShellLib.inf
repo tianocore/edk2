@@ -19,7 +19,7 @@
   BASE_NAME                      = UefiShellLib
   FILE_GUID                      = 449D0F00-2148-4a43-9836-F10B3980ECF5
   MODULE_TYPE                    = UEFI_DRIVER
-  VERSION_STRING                 = 1.1
+  VERSION_STRING                 = 1.2
   LIBRARY_CLASS                  = ShellLib|UEFI_APPLICATION UEFI_DRIVER DXE_RUNTIME_DRIVER DXE_DRIVER
   CONSTRUCTOR                    = ShellLibConstructor
   DESTRUCTOR                     = ShellLibDestructor

@@ -89,7 +89,6 @@ ShellSetFileInfo (
 
   @param[in, out]  FilePath      On input, the device path to the file.  On output,
                                  the remaining device path.
-  @param[out]   DeviceHandle     Pointer to the system device handle.
   @param[out]   FileHandle       Pointer to the file handle.
   @param[in]    OpenMode         The mode to open the file with.
   @param[in]    Attributes       The file's file attributes.
@@ -115,7 +114,6 @@ EFI_STATUS
 EFIAPI
 ShellOpenFileByDevicePath(
   IN OUT EFI_DEVICE_PATH_PROTOCOL     **FilePath,
-  OUT EFI_HANDLE                      *DeviceHandle,
   OUT SHELL_FILE_HANDLE               *FileHandle,
   IN UINT64                           OpenMode,
   IN UINT64                           Attributes
