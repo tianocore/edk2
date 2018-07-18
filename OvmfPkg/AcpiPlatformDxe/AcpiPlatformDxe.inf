@@ -46,7 +46,6 @@
 
 [LibraryClasses]
   UefiLib
-  DxeServicesLib
   PcdLib
   BaseMemoryLib
   DebugLib
@@ -62,6 +61,7 @@
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+  gEfiFirmwareVolume2ProtocolGuid               # PROTOCOL SOMETIMES_CONSUMED
   gEfiPciIoProtocolGuid                         # PROTOCOL SOMETIMES_CONSUMED
 
 [Guids]
