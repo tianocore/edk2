@@ -436,7 +436,6 @@ cleanlib:
         self.ListFileMacros = {}
 
         self.FileCache = {}
-        self.FileDependency = []
         self.LibraryBuildCommandList = []
         self.LibraryFileList = []
         self.LibraryMakefileList = []
@@ -891,26 +890,26 @@ cleanlib:
                 if Item in SourceFileList:
                     SourceFileList.remove(Item)
 
-        self.FileDependency = self.GetFileDependency(
+        FileDependencyDict = self.GetFileDependency(
                                     SourceFileList,
                                     ForceIncludedFile,
                                     self._AutoGenObject.IncludePathList + self._AutoGenObject.BuildOptionIncPathList
                                     )
         DepSet = None
-        for File in self.FileDependency:
-            if not self.FileDependency[File]:
-                self.FileDependency[File] = ['$(FORCE_REBUILD)']
+        for File,Dependency in FileDependencyDict.items():
+            if not Dependency:
+                FileDependencyDict[File] = ['$(FORCE_REBUILD)']
                 continue
 
-            self._AutoGenObject.AutoGenDepSet |= set(self.FileDependency[File])
+            self._AutoGenObject.AutoGenDepSet |= set(Dependency)
 
             # skip non-C files
             if File.Ext not in [".c", ".C"] or File.Name == "AutoGen.c":
                 continue
             elif DepSet is None:
-                DepSet = set(self.FileDependency[File])
+                DepSet = set(Dependency)
             else:
-                DepSet &= set(self.FileDependency[File])
+                DepSet &= set(Dependency)
         # in case nothing in SourceFileList
         if DepSet is None:
             DepSet = set()
@@ -920,13 +919,13 @@ cleanlib:
         for File in DepSet:
             self.CommonFileDependency.append(self.PlaceMacro(File.Path, self.Macros))
 
-        for File in self.FileDependency:
+        for File in FileDependencyDict:
             # skip non-C files
             if File.Ext not in [".c", ".C"] or File.Name == "AutoGen.c":
                 continue
-            NewDepSet = set(self.FileDependency[File])
+            NewDepSet = set(FileDependencyDict[File])
             NewDepSet -= DepSet
-            self.FileDependency[File] = ["$(COMMON_DEPS)"] + list(NewDepSet)
+            FileDependencyDict[File] = ["$(COMMON_DEPS)"] + list(NewDepSet)
 
         # Convert target description object to target string in makefile
         for Type in self._AutoGenObject.Targets:
@@ -944,8 +943,8 @@ cleanlib:
                 for Dep in T.Dependencies:
                     Deps.append(self.PlaceMacro(str(Dep), self.Macros))
                 # Add inclusion-dependencies
-                if len(T.Inputs) == 1 and T.Inputs[0] in self.FileDependency:
-                    for F in self.FileDependency[T.Inputs[0]]:
+                if len(T.Inputs) == 1 and T.Inputs[0] in FileDependencyDict:
+                    for F in FileDependencyDict[T.Inputs[0]]:
                         Deps.append(self.PlaceMacro(str(F), self.Macros))
                 # Add source-dependencies
                 for F in T.Inputs:
