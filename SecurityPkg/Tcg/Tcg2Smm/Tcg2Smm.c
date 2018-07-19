@@ -153,6 +153,10 @@ MemoryClearCallback (
       return EFI_SUCCESS;
     }
     MorControl &= ~MOR_CLEAR_MEMORY_BIT_MASK;
+  } else {
+    mTcgNvs->MemoryClear.ReturnCode = MOR_REQUEST_GENERAL_FAILURE;
+    DEBUG ((EFI_D_ERROR, "[TPM] MOR Parameter error! Parameter = %x\n", mTcgNvs->MemoryClear.Parameter));
+    return EFI_SUCCESS;
   }
 
   DataSize = sizeof (UINT8);
