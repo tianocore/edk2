@@ -1360,7 +1360,7 @@ cleanup:
 }
 
 /**
-  Main entry for this library.
+  Main entry for this driver/library.
 
   @param[in] ImageHandle  Image handle this driver.
   @param[in] SystemTable  Pointer to SystemTable.
