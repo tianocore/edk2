@@ -45,21 +45,6 @@ EFI_PEI_NOTIFY_DESCRIPTOR        mS3SmmInitDoneNotifyDesc = {
 };
 
 /**
-  The function prototype for invoking a function on an Application Processor.
-
-  This definition is used by the UEFI MP Serices Protocol, and the
-  PI SMM System Table.
-
-  @param[in,out] Buffer  The pointer to private data buffer.
-**/
-VOID
-EmptyApProcedure (
-  IN OUT VOID * Buffer
-  )
-{
-}
-
-/**
   S3 SMM Init Done notification function.
 
   @param  PeiServices      Indirect reference to the PEI Services Table.
