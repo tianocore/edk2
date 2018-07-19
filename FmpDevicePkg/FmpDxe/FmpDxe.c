@@ -210,11 +210,14 @@ GetLowestSupportedVersion (
   // Get the LowestSupportedVersion.
   //
 
-  DeviceLibLowestSupportedVersion = DEFAULT_LOWESTSUPPORTEDVERSION;
-  ReturnLsv = PcdGet32 (PcdFmpDeviceBuildTimeLowestSupportedVersion);
   if (!IsLowestSupportedVersionCheckRequired ()) {
-    return 1;
+    //
+    // Any Version can pass the 0 LowestSupportedVersion check.
+    //
+    return 0;
   }
+
+  ReturnLsv = PcdGet32 (PcdFmpDeviceBuildTimeLowestSupportedVersion);
 
   //
   // Check the FmpDeviceLib
