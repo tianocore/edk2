@@ -937,7 +937,7 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
         if Info.IsLibrary:
             PcdList = Info.LibraryPcdList
         else:
-            PcdList = Info.ModulePcdList
+            PcdList = Info.ModulePcdList + Info.LibraryPcdList
         PcdExCNameTest = 0
         for PcdModule in PcdList:
             if PcdModule.Type in PCD_DYNAMIC_EX_TYPE_SET and Pcd.TokenCName == PcdModule.TokenCName:
