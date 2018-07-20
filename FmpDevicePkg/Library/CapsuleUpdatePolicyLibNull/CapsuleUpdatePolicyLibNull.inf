@@ -34,7 +34,7 @@
   LIBRARY_CLASS   = CapsuleUpdatePolicyLib
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
 #
 
 [Sources]

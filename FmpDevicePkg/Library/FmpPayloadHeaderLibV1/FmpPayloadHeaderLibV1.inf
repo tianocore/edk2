@@ -37,7 +37,7 @@
   LIBRARY_CLASS                  = FmpPayloadHeaderLib|DXE_DRIVER UEFI_APPLICATION
 
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF ARM AARCH64
+#  VALID_ARCHITECTURES           = IA32 X64 ARM AARCH64
 #
 
 [Sources]
