@@ -405,10 +405,22 @@ EfiHttpRequest (
       goto Error1;
     }
 
-    HostName   = NULL;
-    Status     = HttpUrlGetHostName (Url, UrlParser, &HostName);
+    Status = HttpUrlGetHostName (Url, UrlParser, &HostName);
     if (EFI_ERROR (Status)) {
-     goto Error1;
+      goto Error1;
+    }
+
+    if (HttpInstance->LocalAddressIsIPv6) {
+      HostNameSize = AsciiStrSize (HostName);
+
+      if (HostNameSize > 2 && HostName[0] == '[' && HostName[HostNameSize - 2] == ']') {
+        //
+        // HostName format is expressed as IPv6, so, remove '[' and ']'.
+        //
+        HostNameSize -= 2;
+        CopyMem (HostName, HostName + 1, HostNameSize - 1);
+        HostName[HostNameSize - 1] = '\0';
+      }
     }
 
     Status = HttpUrlGetPort (Url, UrlParser, &RemotePort);
