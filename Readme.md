@@ -74,9 +74,6 @@ edk2/master.  The target date for integration into edk2/master is early August
   new information.
 
 ## PCDs set per module
-* PcdFmpDeviceSystemResetRequired - Indicates if a full
-  system reset is required before a firmware update to a
-  firmware devices takes effect
 * PcdFmpDeviceTestKeySha256Digest - The SHA-256 hash of a
   PKCS7 test key that is used to detect if a test key is
   being used to authenticate capsules.  Test key detection

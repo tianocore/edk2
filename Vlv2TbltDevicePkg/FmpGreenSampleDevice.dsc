@@ -44,12 +44,6 @@
       #
       !include Vlv2TbltDevicePkg/FmpCertificate.dsc
 
-      #
-      # TRUE if system reset is required after sucessful capsule update
-      # FALSE if system reset is not required after sucessful capsule update
-      #
-      gFmpDevicePkgTokenSpaceGuid.PcdFmpDeviceSystemResetRequired|TRUE
-
     <LibraryClasses>
       #
       # Generic libraries that are used "as is" by all FMP modules
