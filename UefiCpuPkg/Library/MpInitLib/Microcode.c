@@ -63,6 +63,11 @@ MicrocodeDetect (
   UINT32                                  ProcessorFlags;
   UINT32                                  ThreadId;
 
+  //
+  // set ProcessorFlags to suppress incorrect compiler/analyzer warnings
+  //
+  ProcessorFlags = 0;
+
   if (CpuMpData->MicrocodePatchRegionSize == 0) {
     //
     // There is no microcode patches
