@@ -4,7 +4,7 @@
   This module initilizes MemoryOverwriteRequestControlLock variable.
   This module adds Variable Hook and check MemoryOverwriteRequestControlLock.
 
-Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -459,14 +459,14 @@ MorLockInitAtEndOfDxe (
     // MOR implementation depends on (one of) those protocols.
     //
     TcgStatus = gBS->LocateProtocol (
-                       &gEfiTcgProtocolGuid,
-                       NULL,                 // Registration
+                       &gEfiTcg2ProtocolGuid,
+                       NULL,                     // Registration
                        &TcgInterface
                        );
     if (EFI_ERROR (TcgStatus)) {
       TcgStatus = gBS->LocateProtocol (
-                         &gEfiTcg2ProtocolGuid,
-                         NULL,                  // Registration
+                         &gEfiTcgProtocolGuid,
+                         NULL,                   // Registration
                          &TcgInterface
                          );
     }
