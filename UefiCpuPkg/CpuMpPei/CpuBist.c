@@ -275,18 +275,20 @@ CollectBistDataFromPpi (
     (UINTN) BistInformationSize
     );
 
-  if (SecPlatformInformation2 != NULL && NumberOfData < NumberOfProcessors) {
-    //
-    // Reinstall SecPlatformInformation2 PPI to include new BIST information
-    //
-    Status = PeiServicesReInstallPpi (
-               SecInformationDescriptor,
-               &mPeiSecPlatformInformation2Ppi
-               );
-    ASSERT_EFI_ERROR (Status);
+  if (SecPlatformInformation2 != NULL) {
+    if (NumberOfData < NumberOfProcessors) {
+      //
+      // Reinstall SecPlatformInformation2 PPI to include new BIST information
+      //
+      Status = PeiServicesReInstallPpi (
+                 SecInformationDescriptor,
+                 &mPeiSecPlatformInformation2Ppi
+                 );
+      ASSERT_EFI_ERROR (Status);
+    }
   } else {
     //
-    // Install SecPlatformInformation2 PPI to include new BIST information
+    // Install SecPlatformInformation2 PPI
     //
     Status = PeiServicesInstallPpi (&mPeiSecPlatformInformation2Ppi);
     ASSERT_EFI_ERROR(Status);
