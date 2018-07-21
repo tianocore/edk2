@@ -184,21 +184,22 @@ TpmMeasureAndLogData (
   EFI_STATUS  Status;
 
   //
-  // Try to measure using Tpm1.2 protocol
+  // Try to measure using Tpm20 protocol
   //
-  Status = Tpm12MeasureAndLogData(
-               PcrIndex,
-               EventType,
-               EventLog,
-               LogLen,
-               HashData,
-               HashDataLen
-               );
+  Status = Tpm20MeasureAndLogData(
+             PcrIndex,
+             EventType,
+             EventLog,
+             LogLen,
+             HashData,
+             HashDataLen
+             );
+
   if (EFI_ERROR (Status)) {
     //
-    // Try to measure using Tpm20 protocol
+    // Try to measure using Tpm1.2 protocol
     //
-    Status = Tpm20MeasureAndLogData(
+    Status = Tpm12MeasureAndLogData(
                PcrIndex,
                EventType,
                EventLog,
