@@ -188,6 +188,60 @@ class Check(object):
     def GeneralCheck(self):
         self.GeneralCheckNonAcsii()
         self.UniCheck()
+        self.GeneralCheckNoTab()
+        self.GeneralCheckLineEnding()
+        self.GeneralCheckTrailingWhiteSpaceLine()
+
+    # Check whether NO Tab is used, replaced with spaces
+    def GeneralCheckNoTab(self):
+        if EccGlobalData.gConfig.GeneralCheckNoTab == '1' or EccGlobalData.gConfig.GeneralCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+            EdkLogger.quiet("Checking No TAB used in file ...")
+            SqlCommand = """select ID, FullPath, ExtName from File where ExtName in ('.dec', '.inf', '.dsc', 'c', 'h')"""
+            RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
+            for Record in RecordSet:
+                if Record[2].upper() not in EccGlobalData.gConfig.BinaryExtList:
+                    op = open(Record[1]).readlines()
+                    IndexOfLine = 0
+                    for Line in op:
+                        IndexOfLine += 1
+                        IndexOfChar = 0
+                        for Char in Line:
+                            IndexOfChar += 1
+                            if Char == '\t':
+                                OtherMsg = "File %s has TAB char at line %s column %s" % (Record[1], IndexOfLine, IndexOfChar)
+                                EccGlobalData.gDb.TblReport.Insert(ERROR_GENERAL_CHECK_NO_TAB, OtherMsg=OtherMsg, BelongsToTable='File', BelongsToItem=Record[0])
+
+    # Check Only use CRLF (Carriage Return Line Feed) line endings.
+    def GeneralCheckLineEnding(self):
+        if EccGlobalData.gConfig.GeneralCheckLineEnding == '1' or EccGlobalData.gConfig.GeneralCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+            EdkLogger.quiet("Checking line ending in file ...")
+            SqlCommand = """select ID, FullPath, ExtName from File where ExtName in ('.dec', '.inf', '.dsc', 'c', 'h')"""
+            RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
+            for Record in RecordSet:
+                if Record[2].upper() not in EccGlobalData.gConfig.BinaryExtList:
+                    op = open(Record[1], 'rb').readlines()
+                    IndexOfLine = 0
+                    for Line in op:
+                        IndexOfLine += 1
+                        if not Line.endswith('\r\n'):
+                            OtherMsg = "File %s has invalid line ending at line %s" % (Record[1], IndexOfLine)
+                            EccGlobalData.gDb.TblReport.Insert(ERROR_GENERAL_CHECK_INVALID_LINE_ENDING, OtherMsg=OtherMsg, BelongsToTable='File', BelongsToItem=Record[0])
+
+    # Check if there is no trailing white space in one line.
+    def GeneralCheckTrailingWhiteSpaceLine(self):
+        if EccGlobalData.gConfig.GeneralCheckTrailingWhiteSpaceLine == '1' or EccGlobalData.gConfig.GeneralCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+            EdkLogger.quiet("Checking trailing white space line in file ...")
+            SqlCommand = """select ID, FullPath, ExtName from File where ExtName in ('.dec', '.inf', '.dsc', 'c', 'h')"""
+            RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
+            for Record in RecordSet:
+                if Record[2].upper() not in EccGlobalData.gConfig.BinaryExtList:
+                    op = open(Record[1], 'rb').readlines()
+                    IndexOfLine = 0
+                    for Line in op:
+                        IndexOfLine += 1
+                        if Line.replace('\r', '').replace('\n', '').endswith(' '):
+                            OtherMsg = "File %s has trailing white spaces at line %s" % (Record[1], IndexOfLine)
+                            EccGlobalData.gDb.TblReport.Insert(ERROR_GENERAL_CHECK_TRAILING_WHITE_SPACE_LINE, OtherMsg=OtherMsg, BelongsToTable='File', BelongsToItem=Record[0])
 
     # Check whether file has non ACSII char
     def GeneralCheckNonAcsii(self):

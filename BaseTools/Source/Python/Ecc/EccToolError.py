@@ -1,7 +1,7 @@
 ## @file
 # Standardized Error Hanlding infrastructures.
 #
-# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -22,6 +22,8 @@ ERROR_GENERAL_CHECK_FILE_EXISTENCE = 1007
 ERROR_GENERAL_CHECK_NON_ACSII = 1008
 ERROR_GENERAL_CHECK_UNI = 1009
 ERROR_GENERAL_CHECK_UNI_HELP_INFO = 1010
+ERROR_GENERAL_CHECK_INVALID_LINE_ENDING = 1011
+ERROR_GENERAL_CHECK_TRAILING_WHITE_SPACE_LINE = 1012
 
 ERROR_SPACE_CHECK_ALL = 2000
 
@@ -109,7 +111,7 @@ ERROR_SMM_COMM_PARA_CHECK_BUFFER_TYPE = 12001
 
 gEccErrorMessage = {
     ERROR_GENERAL_CHECK_ALL : "",
-    ERROR_GENERAL_CHECK_NO_TAB : "'TAB' character is not allowed in source code, please replace each 'TAB' with two spaces",
+    ERROR_GENERAL_CHECK_NO_TAB : "'TAB' character is not allowed in source code, please replace each 'TAB' with two spaces.",
     ERROR_GENERAL_CHECK_INDENTATION : "Indentation does not follow coding style",
     ERROR_GENERAL_CHECK_LINE : "The width of each line does not follow coding style",
     ERROR_GENERAL_CHECK_NO_ASM : "There should be no use of _asm in the source file",
@@ -119,6 +121,8 @@ gEccErrorMessage = {
     ERROR_GENERAL_CHECK_NON_ACSII : "File has invalid Non-ACSII char",
     ERROR_GENERAL_CHECK_UNI : "File is not a valid UTF-16 UNI file",
     ERROR_GENERAL_CHECK_UNI_HELP_INFO : "UNI file that is associated by INF or DEC file need define the prompt and help information.",
+    ERROR_GENERAL_CHECK_INVALID_LINE_ENDING : "Only CRLF (Carriage Return Line Feed) is allowed to line ending.",
+    ERROR_GENERAL_CHECK_TRAILING_WHITE_SPACE_LINE : "There should be no trailing white space in one line.",
 
     ERROR_SPACE_CHECK_ALL : "",
 

@@ -186,6 +186,10 @@ class Configuration(object):
         self.GeneralCheckNonAcsii = 1
         # Check whether UNI file is valid
         self.GeneralCheckUni = 1
+        # Check Only use CRLF (Carriage Return Line Feed) line endings.
+        self.GeneralCheckLineEnding = 1
+        # Check if there is no trailing white space in one line.
+        self.GeneralCheckTrailingWhiteSpaceLine = 1
 
         ## Space Checking
         self.SpaceCheckAll = 1
