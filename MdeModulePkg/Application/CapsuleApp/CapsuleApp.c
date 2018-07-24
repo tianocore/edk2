@@ -809,14 +809,16 @@ UefiMain (
   UINTN                         FileSize[MAX_CAPSULE_NUM];
   VOID                          *CapsuleBuffer[MAX_CAPSULE_NUM];
   EFI_CAPSULE_BLOCK_DESCRIPTOR  *BlockDescriptors;
-  EFI_CAPSULE_HEADER             *CapsuleHeaderArray[MAX_CAPSULE_NUM + 1];
-  UINT64                         MaxCapsuleSize;
-  EFI_RESET_TYPE                 ResetType;
-  BOOLEAN                        NeedReset;
-  BOOLEAN                        NoReset;
-  CHAR16                         *CapsuleName;
-  UINTN                          CapsuleNum;
-  UINTN                          Index;
+  EFI_CAPSULE_HEADER            *CapsuleHeaderArray[MAX_CAPSULE_NUM + 1];
+  UINT64                        MaxCapsuleSize;
+  EFI_RESET_TYPE                ResetType;
+  BOOLEAN                       NeedReset;
+  BOOLEAN                       NoReset;
+  CHAR16                        *CapsuleName;
+  UINTN                         CapsuleNum;
+  UINTN                         Index;
+  EFI_GUID                      ImageTypeId;
+  UINTN                         ImageIndex;
 
   Status = GetArg();
   if (EFI_ERROR(Status)) {
@@ -865,8 +867,6 @@ UefiMain (
           return EFI_UNSUPPORTED;
         }
 
-        EFI_GUID  ImageTypeId;
-        UINTN     ImageIndex;
         //
         // FMP->GetImage()
         //
