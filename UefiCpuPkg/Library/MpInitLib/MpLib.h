@@ -215,9 +215,8 @@ struct _CPU_MP_DATA {
   UINTN                          BackupBuffer;
   UINTN                          BackupBufferSize;
 
-  volatile UINT32                StartCount;
   volatile UINT32                FinishedCount;
-  volatile UINT32                RunningCount;
+  UINT32                         RunningCount;
   BOOLEAN                        SingleThread;
   EFI_AP_PROCEDURE               Procedure;
   VOID                           *ProcArguments;

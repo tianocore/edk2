@@ -1424,7 +1424,7 @@ CheckAllAPs (
     // value of state after setting the it to CpuStateIdle, so BSP can safely make use of its value.
     //
     if (GetApState(CpuData) == CpuStateIdle) {
-      CpuMpData->RunningCount ++;
+      CpuMpData->RunningCount --;
       CpuMpData->CpuData[ProcessorNumber].Waiting = FALSE;
 
       //
@@ -1449,7 +1449,7 @@ CheckAllAPs (
   //
   // If all APs finish, return EFI_SUCCESS.
   //
-  if (CpuMpData->RunningCount == CpuMpData->StartCount) {
+  if (CpuMpData->RunningCount == 0) {
     return EFI_SUCCESS;
   }
 
@@ -1466,7 +1466,7 @@ CheckAllAPs (
     //
     if (CpuMpData->FailedCpuList != NULL) {
       *CpuMpData->FailedCpuList =
-         AllocatePool ((CpuMpData->StartCount - CpuMpData->FinishedCount + 1) * sizeof (UINTN));
+         AllocatePool ((CpuMpData->RunningCount + 1) * sizeof (UINTN));
       ASSERT (*CpuMpData->FailedCpuList != NULL);
     }
     ListIndex = 0;
@@ -2212,7 +2212,7 @@ StartupAllAPsWorker (
     return EFI_NOT_STARTED;
   }
 
-  CpuMpData->StartCount = 0;
+  CpuMpData->RunningCount = 0;
   for (ProcessorNumber = 0; ProcessorNumber < ProcessorCount; ProcessorNumber++) {
     CpuData = &CpuMpData->CpuData[ProcessorNumber];
     CpuData->Waiting = FALSE;
@@ -2222,7 +2222,7 @@ StartupAllAPsWorker (
         // Mark this processor as responsible for current calling.
         //
         CpuData->Waiting = TRUE;
-        CpuMpData->StartCount++;
+        CpuMpData->RunningCount++;
       }
     }
   }
@@ -2231,7 +2231,6 @@ StartupAllAPsWorker (
   CpuMpData->ProcArguments = ProcedureArgument;
   CpuMpData->SingleThread  = SingleThread;
   CpuMpData->FinishedCount = 0;
-  CpuMpData->RunningCount  = 0;
   CpuMpData->FailedCpuList = FailedCpuList;
   CpuMpData->ExpectedTime  = CalculateTimeout (
                                TimeoutInMicroseconds,
