@@ -58,7 +58,7 @@
   HobLib
   IoLib
   PciLib
-  PeiResourcePublicationLib
+  ResourcePublicationLib
   PeiServicesLib
   PeiServicesTablePointerLib
   PeimEntryPoint
