@@ -1127,7 +1127,13 @@ class PcdReport(object):
                                 for Array in ArrayList:
                                     FileWrite(File, Array)
                             else:
-                                FileWrite(File, ' *M     %-*s = %s' % (self.MaxLen + 15, ModulePath, ModuleDefault.strip()))
+                                Value =  ModuleDefault.strip()
+                                if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+                                    if Value.startswith(('0x', '0X')):
+                                        Value = '{} ({:d})'.format(Value, int(Value, 0))
+                                    else:
+                                        Value = "0x{:X} ({})".format(int(Value, 0), Value)
+                                FileWrite(File, ' *M     %-*s = %s' % (self.MaxLen + 15, ModulePath, Value))
 
         if ModulePcdSet is None:
             FileWrite(File, gSectionEnd)
