@@ -696,7 +696,7 @@ ApWakeupFunction (
             }
           }
         }
-        SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateFinished);
+        SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
       }
     }
 
@@ -1352,18 +1352,17 @@ CheckThisAP (
   CpuData   = &CpuMpData->CpuData[ProcessorNumber];
 
   //
-  //  Check the CPU state of AP. If it is CpuStateFinished, then the AP has finished its task.
+  //  Check the CPU state of AP. If it is CpuStateIdle, then the AP has finished its task.
   //  Only BSP and corresponding AP access this unit of CPU Data. This means the AP will not modify the
-  //  value of state after setting the it to CpuStateFinished, so BSP can safely make use of its value.
+  //  value of state after setting the it to CpuStateIdle, so BSP can safely make use of its value.
   //
   //
   // If the AP finishes for StartupThisAP(), return EFI_SUCCESS.
   //
-  if (GetApState(CpuData) == CpuStateFinished) {
+  if (GetApState(CpuData) == CpuStateIdle) {
     if (CpuData->Finished != NULL) {
       *(CpuData->Finished) = TRUE;
     }
-    SetApState (CpuData, CpuStateIdle);
     return EFI_SUCCESS;
   } else {
     //
@@ -1420,14 +1419,13 @@ CheckAllAPs (
 
     CpuData = &CpuMpData->CpuData[ProcessorNumber];
     //
-    // Check the CPU state of AP. If it is CpuStateFinished, then the AP has finished its task.
+    // Check the CPU state of AP. If it is CpuStateIdle, then the AP has finished its task.
     // Only BSP and corresponding AP access this unit of CPU Data. This means the AP will not modify the
-    // value of state after setting the it to CpuStateFinished, so BSP can safely make use of its value.
+    // value of state after setting the it to CpuStateIdle, so BSP can safely make use of its value.
     //
-    if (GetApState(CpuData) == CpuStateFinished) {
+    if (GetApState(CpuData) == CpuStateIdle) {
       CpuMpData->RunningCount ++;
       CpuMpData->CpuData[ProcessorNumber].Waiting = FALSE;
-      SetApState(CpuData, CpuStateIdle);
 
       //
       // If in Single Thread mode, then search for the next waiting AP for execution.
@@ -1923,7 +1921,7 @@ SwitchBSPWorker (
   //
   // Wait for old BSP finished AP task
   //
-  while (GetApState (&CpuMpData->CpuData[CallerNumber]) != CpuStateFinished) {
+  while (GetApState (&CpuMpData->CpuData[CallerNumber]) != CpuStateIdle) {
     CpuPause ();
   }
 

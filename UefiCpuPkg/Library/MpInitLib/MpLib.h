@@ -81,11 +81,14 @@ typedef enum {
 //
 // AP state
 //
+// The state transitions for an AP when it process a procedure are:
+//  Idle ----> Ready ----> Busy ----> Idle
+//       [BSP]       [AP]       [AP]
+//
 typedef enum {
   CpuStateIdle,
   CpuStateReady,
   CpuStateBusy,
-  CpuStateFinished,
   CpuStateDisabled
 } CPU_STATE;
 
