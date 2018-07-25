@@ -24,7 +24,7 @@ $(LIBRARY): $(OBJECTS)
 	$(BUILD_AR) crs $@ $^
 
 %.o : %.c 
-	$(BUILD_CC)  -c $(BUILD_CFLAGS) $(BUILD_CPPFLAGS) $< -o $@
+	$(BUILD_CC)  -c $(BUILD_CPPFLAGS) $(BUILD_CFLAGS) $< -o $@
 
 %.o : %.cpp
 	$(BUILD_CXX) -c $(BUILD_CPPFLAGS) $(BUILD_CXXFLAGS) $< -o $@
