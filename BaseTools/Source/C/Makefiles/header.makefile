@@ -69,7 +69,10 @@ endif
 
 INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE) 
 BUILD_CPPFLAGS = $(INCLUDE)
-BUILD_OPTFLAGS = -O2
+
+# keep EXTRA_OPTFLAGS last
+BUILD_OPTFLAGS = -O2 $(EXTRA_OPTFLAGS)
+
 ifeq ($(DARWIN),Darwin)
 # assume clang or clang compatible flags on OS X
 BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -g
