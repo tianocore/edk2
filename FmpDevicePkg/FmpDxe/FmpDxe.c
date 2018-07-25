@@ -626,6 +626,7 @@ GetAllHeaderSize (
                                  if available, additional information if the image is invalid.
 
   @retval EFI_SUCCESS            The image was successfully checked.
+  @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
   @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
