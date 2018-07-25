@@ -968,7 +968,6 @@ class PcdReport(object):
                     if CName == PcdTokenCName and Guid == Key:
                         DscDefaultValue = self.FdfPcdSet[(CName, Guid, Field)]
                         break
-                DscDefaultValue = self.FdfPcdSet.get((Pcd.TokenCName, Key), DscDefaultValue)
                 if DscDefaultValue != DscDefaultValBak:
                     try:
                         DscDefaultValue = ValueExpressionEx(DscDefaultValue, Pcd.DatumType, self._GuidDict)(True)
@@ -1084,8 +1083,13 @@ class PcdReport(object):
                                 if DscOverride:
                                     break
                         if DscOverride:
+                            DscDefaultValue = True
                             DscMatch = True
                             DecMatch = False
+                    else:
+                        DscDefaultValue = True
+                        DscMatch = True
+                        DecMatch = False
 
                 #
                 # Report PCD item according to their override relationship
@@ -1352,16 +1356,22 @@ class PcdReport(object):
                     OverrideFieldStruct[Key] = Values
         if Pcd.PcdFieldValueFromFdf:
             for Key, Values in Pcd.PcdFieldValueFromFdf.items():
+                if Key in OverrideFieldStruct and Values[0] == OverrideFieldStruct[Key][0]:
+                    continue
                 OverrideFieldStruct[Key] = Values
         if Pcd.PcdFieldValueFromComm:
             for Key, Values in Pcd.PcdFieldValueFromComm.items():
+                if Key in OverrideFieldStruct and Values[0] == OverrideFieldStruct[Key][0]:
+                    continue
                 OverrideFieldStruct[Key] = Values
         return OverrideFieldStruct
 
     def PrintStructureInfo(self, File, Struct):
-        for Key, Value in Struct.items():
+        for Key, Value in sorted(Struct.items(), key=lambda x: x[0]):
             if Value[1] and 'build command options' in Value[1]:
                 FileWrite(File, '    *B  %-*s = %s' % (self.MaxLen + 4, '.' + Key, Value[0]))
+            elif Value[1] and Value[1].endswith('.fdf'):
+                FileWrite(File, '    *F  %-*s = %s' % (self.MaxLen + 4, '.' + Key, Value[0]))
             else:
                 FileWrite(File, '        %-*s = %s' % (self.MaxLen + 4, '.' + Key, Value[0]))
 
