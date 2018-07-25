@@ -376,9 +376,12 @@ class MetaFileParser(object):
                 self._Version = int(Value, 0)
             elif decVersionPattern.match(Value):
                 ValueList = Value.split('.')
-                Major = '%04o' % int(ValueList[0], 0)
-                Minor = '%04o' % int(ValueList[1], 0)
-                self._Version = int('0x' + Major + Minor, 0)
+                Major = int(ValueList[0], 0)
+                Minor = int(ValueList[1], 0)
+                if Major > 0xffff or Minor > 0xffff:
+                    EdkLogger.error('Parser', FORMAT_INVALID, "Invalid version number",
+                                    ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
+                self._Version = int('0x{0:04x}{1:04x}'.format(Major, Minor), 0)
             else:
                 EdkLogger.error('Parser', FORMAT_INVALID, "Invalid version number",
                                 ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
