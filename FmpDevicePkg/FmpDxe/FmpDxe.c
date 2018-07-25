@@ -1121,10 +1121,12 @@ cleanup:
   mProgressSupported = FALSE;
   SetLastAttemptStatusInVariable (LastAttemptStatus);
 
-  //
-  // Set progress to 100 after everything is done including recording Status.
-  //
-  Progress (100);
+  if (Progress != NULL) {
+    //
+    // Set progress to 100 after everything is done including recording Status.
+    //
+    Progress (100);
+  }
 
   return Status;
 }
