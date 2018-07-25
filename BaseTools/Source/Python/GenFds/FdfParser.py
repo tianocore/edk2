@@ -423,6 +423,8 @@ class FdfParser:
 
     def __StringToList(self):
         self.Profile.FileLinesList = [list(s) for s in self.Profile.FileLinesList]
+        if not self.Profile.FileLinesList:
+            EdkLogger.error('FdfParser', FILE_READ_FAILURE, 'The file is empty!', File=self.FileName)
         self.Profile.FileLinesList[-1].append(' ')
 
     def __ReplaceFragment(self, StartPos, EndPos, Value = ' '):
