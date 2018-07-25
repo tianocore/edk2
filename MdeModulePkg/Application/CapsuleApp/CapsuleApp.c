@@ -779,7 +779,8 @@ PrintUsage (
   Print(L"  -E:  Dump UEFI ESRT table info.\n");
   Print(L"  -G:  Convert a BMP file to be an UX capsule,\n");
   Print(L"       according to Windows Firmware Update document\n");
-  Print(L"  -N:  Append a Capsule Header to an existing capsule image,\n");
+  Print(L"  -N:  Append a Capsule Header to an existing FMP capsule image\n");
+  Print(L"       with its ImageTypeId supported by the system,\n");
   Print(L"       according to Windows Firmware Update document\n");
   Print(L"  -O:  Output new Capsule file name\n");
   Print(L"  -D:  Dump Capsule image header information, image payload information if it is an UX capsule\n");
