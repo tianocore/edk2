@@ -68,7 +68,8 @@ $(error Bad HOST_ARCH)
 endif
 
 INCLUDE = $(TOOL_INCLUDE) -I $(MAKEROOT) -I $(MAKEROOT)/Include/Common -I $(MAKEROOT)/Include/ -I $(MAKEROOT)/Include/IndustryStandard -I $(MAKEROOT)/Common/ -I .. -I . $(ARCH_INCLUDE) 
-BUILD_CPPFLAGS = $(INCLUDE) -O2
+BUILD_CPPFLAGS = $(INCLUDE)
+BUILD_OPTFLAGS = -O2
 ifeq ($(DARWIN),Darwin)
 # assume clang or clang compatible flags on OS X
 BUILD_CFLAGS = -MD -fshort-wchar -fno-strict-aliasing -Wall -Werror -Wno-deprecated-declarations -Wno-self-assign -Wno-unused-result -nostdlib -g
@@ -91,6 +92,9 @@ ifeq ($(DARWIN),Darwin)
 endif
 endif
 
+# keep BUILD_OPTFLAGS last
+BUILD_CFLAGS   += $(BUILD_OPTFLAGS)
+BUILD_CXXFLAGS += $(BUILD_OPTFLAGS)
   
 .PHONY: all
 .PHONY: install
