@@ -62,6 +62,24 @@ WriteFileFromBuffer (
   );
 
 /**
+  Validate if it is valid capsule header
+
+  This function assumes the caller provided correct CapsuleHeader pointer
+  and CapsuleSize.
+
+  This function validates the fields in EFI_CAPSULE_HEADER.
+
+  @param[in] CapsuleHeader  Points to a capsule header.
+  @param[in] CapsuleSize    Size of the whole capsule image.
+
+**/
+BOOLEAN
+IsValidCapsuleHeader (
+  IN EFI_CAPSULE_HEADER     *CapsuleHeader,
+  IN UINT64                 CapsuleSize
+  );
+
+/**
   Dump UX capsule information.
 
   @param[in] CapsuleHeader      The UX capsule header
@@ -246,6 +264,11 @@ DumpCapsule (
   Status = ReadFileToBuffer(CapsuleName, &FileSize, &Buffer);
   if (EFI_ERROR(Status)) {
     Print(L"CapsuleApp: Capsule (%s) is not found.\n", CapsuleName);
+    goto Done;
+  }
+  if (!IsValidCapsuleHeader (Buffer, FileSize)) {
+    Print(L"CapsuleApp: Capsule image (%s) is not a valid capsule.\n", CapsuleName);
+    Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
 

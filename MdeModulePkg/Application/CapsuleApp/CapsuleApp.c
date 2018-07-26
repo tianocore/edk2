@@ -363,6 +363,60 @@ GetEsrtFwType (
 }
 
 /**
+  Validate if it is valid capsule header
+
+  This function assumes the caller provided correct CapsuleHeader pointer
+  and CapsuleSize.
+
+  This function validates the fields in EFI_CAPSULE_HEADER.
+
+  @param[in] CapsuleHeader  Points to a capsule header.
+  @param[in] CapsuleSize    Size of the whole capsule image.
+
+**/
+BOOLEAN
+IsValidCapsuleHeader (
+  IN EFI_CAPSULE_HEADER     *CapsuleHeader,
+  IN UINT64                 CapsuleSize
+  )
+{
+  if (CapsuleSize < sizeof (EFI_CAPSULE_HEADER)) {
+    return FALSE;
+  }
+  if (CapsuleHeader->CapsuleImageSize != CapsuleSize) {
+    return FALSE;
+  }
+  if (CapsuleHeader->HeaderSize > CapsuleHeader->CapsuleImageSize) {
+    return FALSE;
+  }
+  if (CapsuleHeader->HeaderSize < sizeof (EFI_CAPSULE_HEADER)) {
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+/**
+  Return if this CapsuleGuid is a FMP capsule GUID or not.
+
+  @param[in] CapsuleGuid A pointer to EFI_GUID
+
+  @retval TRUE  It is a FMP capsule GUID.
+  @retval FALSE It is not a FMP capsule GUID.
+**/
+BOOLEAN
+IsFmpCapsuleGuid (
+  IN EFI_GUID  *CapsuleGuid
+  )
+{
+  if (CompareGuid(&gEfiFmpCapsuleGuid, CapsuleGuid)) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
   Append a capsule header on top of current image.
   This function follows Windows UEFI Firmware Update Platform document.
 
@@ -407,15 +461,28 @@ CreateNestedFmp (
     Print(L"CapsuleApp: Capsule image (%s) is not found.\n", CapsuleName);
     goto Done;
   }
+  if (!IsValidCapsuleHeader (CapsuleBuffer, FileSize)) {
+    Print(L"CapsuleApp: Capsule image (%s) is not a valid capsule.\n", CapsuleName);
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
+
+  if (!IsFmpCapsuleGuid (&((EFI_CAPSULE_HEADER *) CapsuleBuffer)->CapsuleGuid)) {
+    Print(L"CapsuleApp: Capsule image (%s) is not a FMP capsule.\n", CapsuleName);
+    Status = EFI_INVALID_PARAMETER;
+    goto Done;
+  }
 
   ImageTypeId = GetCapsuleImageTypeId(CapsuleBuffer);
   if (ImageTypeId == NULL) {
     Print(L"CapsuleApp: Capsule ImageTypeId is not found.\n");
+    Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
   FwType = GetEsrtFwType(ImageTypeId);
   if ((FwType != ESRT_FW_TYPE_SYSTEMFIRMWARE) && (FwType != ESRT_FW_TYPE_DEVICEFIRMWARE)) {
     Print(L"CapsuleApp: Capsule FwType is invalid.\n");
+    Status = EFI_INVALID_PARAMETER;
     goto Done;
   }
 
@@ -722,40 +789,6 @@ CleanGatherList (
       TempBlockPtr1 = TempBlockPtr2;
     }
   }
-}
-
-/**
-  Validate if it is valid capsule header
-
-  This function assumes the caller provided correct CapsuleHeader pointer
-  and CapsuleSize.
-
-  This function validates the fields in EFI_CAPSULE_HEADER.
-
-  @param[in] CapsuleHeader  Points to a capsule header.
-  @param[in] CapsuleSize    Size of the whole capsule image.
-
-**/
-BOOLEAN
-IsValidCapsuleHeader (
-  IN EFI_CAPSULE_HEADER     *CapsuleHeader,
-  IN UINT64                 CapsuleSize
-  )
-{
-  if (CapsuleSize < sizeof (EFI_CAPSULE_HEADER)) {
-    return FALSE;
-  }
-  if (CapsuleHeader->CapsuleImageSize != CapsuleSize) {
-    return FALSE;
-  }
-  if (CapsuleHeader->HeaderSize > CapsuleHeader->CapsuleImageSize) {
-    return FALSE;
-  }
-  if (CapsuleHeader->HeaderSize < sizeof (EFI_CAPSULE_HEADER)) {
-    return FALSE;
-  }
-
-  return TRUE;
 }
 
 /**
