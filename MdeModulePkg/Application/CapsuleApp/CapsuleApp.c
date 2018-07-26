@@ -768,14 +768,16 @@ PrintUsage (
   Print(L"  CapsuleApp -D <Capsule>\n");
   Print(L"  CapsuleApp -P GET <ImageTypeId> <Index> -O <FileName>\n");
   Print(L"Parameter:\n");
-  Print(L"  -NR: No reset will be triggered for the capsule\n");
-  Print(L"       with CAPSULE_FLAGS_PERSIST_ACROSS_RESET and without CAPSULE_FLAGS_INITIATE_RESET.\n");
+  Print(L"  -NR: No reset will be triggered for the capsule with\n");
+  Print(L"       CAPSULE_FLAGS_PERSIST_ACROSS_RESET and without\n");
+  Print(L"       CAPSULE_FLAGS_INITIATE_RESET.\n");
   Print(L"  -S:  Dump capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
   Print(L"  -C:  Clear capsule report variable (EFI_CAPSULE_REPORT_GUID),\n");
   Print(L"       which is defined in UEFI specification.\n");
   Print(L"  -P:  Dump UEFI FMP protocol info, or get image with specified\n");
-  Print(L"       ImageTypeId and index to a file if 'GET' option is used.\n");
+  Print(L"       ImageTypeId and Index (decimal format) to a file if 'GET'\n");
+  Print(L"       option is used.\n");
   Print(L"  -E:  Dump UEFI ESRT table info.\n");
   Print(L"  -G:  Convert a BMP file to be an UX capsule,\n");
   Print(L"       according to Windows Firmware Update document\n");
@@ -783,8 +785,9 @@ PrintUsage (
   Print(L"       with its ImageTypeId supported by the system,\n");
   Print(L"       according to Windows Firmware Update document\n");
   Print(L"  -O:  Output new Capsule file name\n");
-  Print(L"  -D:  Dump Capsule image header information, image payload information if it is an UX capsule\n");
-  Print(L"       and FMP header information if it is a FMP capsule.\n");
+  Print(L"  -D:  Dump Capsule image header information, image payload\n");
+  Print(L"       information if it is an UX capsule and FMP header\n");
+  Print(L"       information if it is a FMP capsule.\n");
 }
 
 /**
