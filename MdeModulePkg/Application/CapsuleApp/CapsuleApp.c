@@ -69,7 +69,7 @@ DumpCapsule (
   @retval EFI_UNSUPPORTED        Input parameter is not valid.
 **/
 EFI_STATUS
-DmpCapsuleStatusVariable (
+DumpCapsuleStatusVariable (
   VOID
   );
 
@@ -411,11 +411,13 @@ ClearCapsuleStatusVariable (
   UINT32                              Index;
   CHAR16                              CapsuleVarName[20];
   CHAR16                              *TempVarName;
+  BOOLEAN                             Found;
 
   StrCpyS (CapsuleVarName, sizeof(CapsuleVarName)/sizeof(CapsuleVarName[0]), L"Capsule");
   TempVarName = CapsuleVarName + StrLen (CapsuleVarName);
   Index = 0;
 
+  Found = FALSE;
   while (TRUE) {
     UnicodeSPrint (TempVarName, 5 * sizeof(CHAR16), L"%04x", Index);
 
@@ -426,17 +428,24 @@ ClearCapsuleStatusVariable (
                     0,
                     (VOID *)NULL
                     );
-    if (EFI_ERROR(Status)) {
+    if (Status == EFI_NOT_FOUND) {
       //
-      // There is no capsule variables, quit
+      // There is no more capsule variables, quit
       //
       break;
     }
+    Found = TRUE;
+
+    Print (L"Clear %s %r\n", CapsuleVarName, Status);
 
     Index++;
     if (Index > 0xFFFF) {
       break;
     }
+  }
+
+  if (!Found) {
+    Print (L"No any Capsule#### variable found\n");
   }
 
   return EFI_SUCCESS;
@@ -795,7 +804,7 @@ UefiMain (
     return Status;
   }
   if (StrCmp(Argv[1], L"-S") == 0) {
-    Status = DmpCapsuleStatusVariable();
+    Status = DumpCapsuleStatusVariable();
     return EFI_SUCCESS;
   }
   if (StrCmp(Argv[1], L"-C") == 0) {

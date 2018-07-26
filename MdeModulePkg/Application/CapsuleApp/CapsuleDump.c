@@ -283,7 +283,7 @@ Done:
   @retval EFI_UNSUPPORTED        Input parameter is not valid.
 **/
 EFI_STATUS
-DmpCapsuleStatusVariable (
+DumpCapsuleStatusVariable (
   VOID
   )
 {
