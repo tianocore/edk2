@@ -268,10 +268,6 @@ ValidateFmpCapsule (
     }
     FmpImageSize = (UINTN)EndOfPayload - ItemOffsetList[Index];
 
-    if (FmpImageSize < OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance)) {
-      DEBUG((DEBUG_ERROR, "FmpImageSize(0x%lx) < EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER\n", FmpImageSize));
-      return EFI_INVALID_PARAMETER;
-    }
     FmpImageHeaderSize = sizeof(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER);
     if ((ImageHeader->Version > EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) ||
         (ImageHeader->Version < 1)) {
@@ -280,6 +276,10 @@ ValidateFmpCapsule (
     }
     if (ImageHeader->Version < EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER_INIT_VERSION) {
       FmpImageHeaderSize = OFFSET_OF(EFI_FIRMWARE_MANAGEMENT_CAPSULE_IMAGE_HEADER, UpdateHardwareInstance);
+    }
+    if (FmpImageSize < FmpImageHeaderSize) {
+      DEBUG((DEBUG_ERROR, "FmpImageSize(0x%lx) < FmpImageHeaderSize(0x%x)\n", FmpImageSize, FmpImageHeaderSize));
+      return EFI_INVALID_PARAMETER;
     }
 
     // No overflow
