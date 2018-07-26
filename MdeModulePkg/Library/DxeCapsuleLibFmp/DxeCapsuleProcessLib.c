@@ -99,11 +99,31 @@ IsValidCapsuleHeader (
   );
 
 extern BOOLEAN                   mDxeCapsuleLibEndOfDxe;
-BOOLEAN                          mNeedReset;
+BOOLEAN                          mNeedReset = FALSE;
 
 VOID                        **mCapsulePtr;
 EFI_STATUS                  *mCapsuleStatusArray;
 UINT32                      mCapsuleTotalNumber;
+
+/**
+  The firmware implements to process the capsule image.
+
+  Caution: This function may receive untrusted input.
+
+  @param[in]  CapsuleHeader         Points to a capsule header.
+  @param[out] ResetRequired         Indicates whether reset is required or not.
+
+  @retval EFI_SUCESS            Process Capsule Image successfully.
+  @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
+  @retval EFI_VOLUME_CORRUPTED  FV volume in the capsule is corrupted.
+  @retval EFI_OUT_OF_RESOURCES  Not enough memory.
+**/
+EFI_STATUS
+EFIAPI
+ProcessThisCapsuleImage (
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader,
+  OUT BOOLEAN            *ResetRequired OPTIONAL
+  );
 
 /**
   Function indicate the current completion progress of the firmware
@@ -381,6 +401,7 @@ ProcessTheseCapsules (
   UINT32                      Index;
   ESRT_MANAGEMENT_PROTOCOL    *EsrtManagement;
   UINT16                      EmbeddedDriverCount;
+  BOOLEAN                     ResetRequired;
 
   REPORT_STATUS_CODE(EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeProcessCapsulesBegin)));
 
@@ -416,11 +437,11 @@ ProcessTheseCapsules (
   for (Index = 0; Index < mCapsuleTotalNumber; Index++) {
     CapsuleHeader = (EFI_CAPSULE_HEADER*) mCapsulePtr [Index];
     if (CompareGuid (&CapsuleHeader->CapsuleGuid, &gWindowsUxCapsuleGuid)) {
-      DEBUG ((DEBUG_INFO, "ProcessCapsuleImage (Ux) - 0x%x\n", CapsuleHeader));
+      DEBUG ((DEBUG_INFO, "ProcessThisCapsuleImage (Ux) - 0x%x\n", CapsuleHeader));
       DEBUG ((DEBUG_INFO, "Display logo capsule is found.\n"));
-      Status = ProcessCapsuleImage (CapsuleHeader);
+      Status = ProcessThisCapsuleImage (CapsuleHeader, NULL);
       mCapsuleStatusArray [Index] = EFI_SUCCESS;
-      DEBUG((DEBUG_INFO, "ProcessCapsuleImage (Ux) - %r\n", Status));
+      DEBUG((DEBUG_INFO, "ProcessThisCapsuleImage (Ux) - %r\n", Status));
       break;
     }
   }
@@ -454,10 +475,11 @@ ProcessTheseCapsules (
       }
 
       if ((!FirstRound) || (EmbeddedDriverCount == 0)) {
-        DEBUG((DEBUG_INFO, "ProcessCapsuleImage - 0x%x\n", CapsuleHeader));
-        Status = ProcessCapsuleImage (CapsuleHeader);
+        DEBUG((DEBUG_INFO, "ProcessThisCapsuleImage - 0x%x\n", CapsuleHeader));
+        ResetRequired = FALSE;
+        Status = ProcessThisCapsuleImage (CapsuleHeader, &ResetRequired);
         mCapsuleStatusArray [Index] = Status;
-        DEBUG((DEBUG_INFO, "ProcessCapsuleImage - %r\n", Status));
+        DEBUG((DEBUG_INFO, "ProcessThisCapsuleImage - %r\n", Status));
 
         if (Status != EFI_NOT_READY) {
           if (EFI_ERROR(Status)) {
@@ -467,8 +489,8 @@ ProcessTheseCapsules (
             REPORT_STATUS_CODE(EFI_PROGRESS_CODE, (EFI_SOFTWARE | PcdGet32(PcdStatusCodeSubClassCapsule) | PcdGet32(PcdCapsuleStatusCodeUpdateFirmwareSuccess)));
           }
 
-          if ((CapsuleHeader->Flags & PcdGet16(PcdSystemRebootAfterCapsuleProcessFlag)) != 0 ||
-              IsFmpCapsule(CapsuleHeader)) {
+          mNeedReset |= ResetRequired;
+          if ((CapsuleHeader->Flags & PcdGet16(PcdSystemRebootAfterCapsuleProcessFlag)) != 0) {
             mNeedReset = TRUE;
           }
         }
