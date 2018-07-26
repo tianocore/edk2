@@ -93,7 +93,7 @@ class VariableMgr(object):
             value_list,itemPcdname,itemPcdDscLine = newvalue[offset]
             if offset > len(BaseValue) or (offset + len(value_list) > len(BaseValue)):
                 EdkLogger.error("build", AUTOGEN_ERROR, "The EFI Variable referred by PCD %s in line %s exceeds variable size: %s\n" % (itemPcdname,itemPcdDscLine,hex(len(BaseValue))))
-            for i in xrange(len(value_list)):
+            for i in range(len(value_list)):
                 BaseValue[offset + i] = value_list[i]
         newvaluestr =  "{" + ",".join(BaseValue) +"}"
         return newvaluestr
@@ -129,7 +129,7 @@ class VariableMgr(object):
         for current_valuedict_key in ordered_valuedict_keys:
             if current_valuedict_key < len(var_value):
                 raise
-            for _ in xrange(current_valuedict_key - len(var_value)):
+            for _ in range(current_valuedict_key - len(var_value)):
                 var_value.append('0x00')
             var_value += valuedict[current_valuedict_key]
         return var_value

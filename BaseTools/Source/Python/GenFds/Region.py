@@ -57,7 +57,7 @@ class Region(RegionClassObject):
                 PadByte = pack('B', 0xFF)
             else:
                 PadByte = pack('B', 0)
-            PadData = ''.join(PadByte for i in xrange(0, Size))
+            PadData = ''.join(PadByte for i in range(0, Size))
             Buffer.write(PadData)
 
     ## AddToBuffer()
