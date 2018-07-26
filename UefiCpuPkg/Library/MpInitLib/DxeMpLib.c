@@ -306,7 +306,7 @@ MpInitChangeApLoopCallback (
   CpuMpData->PmCodeSegment = GetProtectedModeCS ();
   CpuMpData->ApLoopMode = PcdGet8 (PcdCpuApLoopMode);
   mNumberToFinish = CpuMpData->CpuCount - 1;
-  WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, NULL);
+  WakeUpAP (CpuMpData, TRUE, 0, RelocateApLoop, NULL, TRUE);
   while (mNumberToFinish > 0) {
     CpuPause ();
   }

@@ -377,6 +377,7 @@ GetModeTransitionBuffer (
   @param[in] ProcessorNumber    The handle number of specified processor
   @param[in] Procedure          The function to be invoked by AP
   @param[in] ProcedureArgument  The argument to be passed into AP function
+  @param[in] WakeUpDisabledAps  Whether need to wake up disabled APs in broadcast mode.
 **/
 VOID
 WakeUpAP (
@@ -384,7 +385,8 @@ WakeUpAP (
   IN BOOLEAN                   Broadcast,
   IN UINTN                     ProcessorNumber,
   IN EFI_AP_PROCEDURE          Procedure,              OPTIONAL
-  IN VOID                      *ProcedureArgument      OPTIONAL
+  IN VOID                      *ProcedureArgument,     OPTIONAL
+  IN BOOLEAN                   WakeUpDisabledAps       OPTIONAL
   );
 
 /**
