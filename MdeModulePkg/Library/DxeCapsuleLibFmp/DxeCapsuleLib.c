@@ -1047,7 +1047,7 @@ RecordFmpCapsuleStatus (
 
   //
   // Update EsrtEntry For V1, V2 FMP instance.
-  // V3 FMP ESRT cache will be synced up through EsrtSyncFmp interface
+  // V3 FMP ESRT cache will be synced up through SyncEsrtFmp interface
   //
   FmpImageInfoDescriptorVer = GetFmpImageInfoDescriptorVer (Handle);
   if (FmpImageInfoDescriptorVer < EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION) {
