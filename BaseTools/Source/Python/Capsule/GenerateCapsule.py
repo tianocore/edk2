@@ -298,6 +298,12 @@ if __name__ == '__main__':
                 parser.error ('--capflag PopulateSystemTable also requires --capflag PersistAcrossReset')
             if 'InitiateReset' in args.CapsuleFlag:
                 parser.error ('--capflag InitiateReset also requires --capflag PersistAcrossReset')
+        if args.CapsuleOemFlag > 0xFFFF:
+            parser.error ('--capoemflag must be an integer between 0x0000 and 0xffff')
+        if args.HardwareInstance > 0xFFFFFFFFFFFFFFFF:
+            parser.error ('--hardware-instance must be an integer in range 0x0..0xffffffffffffffff')
+        if args.MonotonicCount > 0xFFFFFFFFFFFFFFFF:
+            parser.error ('--monotonic-count must be an integer in range 0x0..0xffffffffffffffff')
 
     UseSignTool = args.SignToolPfxFile is not None
     UseOpenSsl  = (args.OpenSslSignerPrivateCertFile is not None and
@@ -319,6 +325,10 @@ if __name__ == '__main__':
         if args.Encode and (UseSignTool or UseOpenSsl):
             if args.FwVersion is None or args.LowestSupportedVersion is None:
                 parser.error ('the following options are required: --fw-version, --lsv')
+            if args.FwVersion > 0xFFFFFFFF:
+                parser.error ('--fw-version must be an integer in range 0x0..0xffffffff')
+            if args.LowestSupportedVersion > 0xFFFFFFFF:
+                parser.error ('--lsv must be an integer in range 0x0..0xffffffff')
 
         if UseSignTool:
             args.SignToolPfxFile.close()
