@@ -239,8 +239,8 @@ if __name__ == '__main__':
     # Add optional arguments for this command
     #
     parser.add_argument ("--capflag", dest = 'CapsuleFlag', action='append', default = [],
-                         choices=['PersistAcrossReset', 'PopulateSystemTable', 'InitiateReset'],
-                         help = "Capsule flag can be PersistAcrossReset, or PopulateSystemTable or InitiateReset or not set")
+                         choices=['PersistAcrossReset', 'InitiateReset'],
+                         help = "Capsule flag can be PersistAcrossReset or InitiateReset or not set")
     parser.add_argument ("--capoemflag", dest = 'CapsuleOemFlag', type = ValidateUnsignedInteger, default = 0x0000,
                          help = "Capsule OEM Flag is an integer between 0x0000 and 0xffff.")
 
@@ -294,8 +294,6 @@ if __name__ == '__main__':
         if args.Guid is None:
             parser.error ('the following option is required: --guid')
         if 'PersistAcrossReset' not in args.CapsuleFlag:
-            if 'PopulateSystemTable' in args.CapsuleFlag:
-                parser.error ('--capflag PopulateSystemTable also requires --capflag PersistAcrossReset')
             if 'InitiateReset' in args.CapsuleFlag:
                 parser.error ('--capflag InitiateReset also requires --capflag PersistAcrossReset')
         if args.CapsuleOemFlag > 0xFFFF:
@@ -421,7 +419,7 @@ if __name__ == '__main__':
         try:
             UefiCapsuleHeader.OemFlags            = args.CapsuleOemFlag
             UefiCapsuleHeader.PersistAcrossReset  = 'PersistAcrossReset'  in args.CapsuleFlag
-            UefiCapsuleHeader.PopulateSystemTable = 'PopulateSystemTable' in args.CapsuleFlag
+            UefiCapsuleHeader.PopulateSystemTable = False
             UefiCapsuleHeader.InitiateReset       = 'InitiateReset'       in args.CapsuleFlag
             UefiCapsuleHeader.Payload             = Result
             Result = UefiCapsuleHeader.Encode ()
