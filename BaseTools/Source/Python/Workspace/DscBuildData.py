@@ -1551,7 +1551,7 @@ class DscBuildData(PlatformBuildClassObject):
                 elif TAB_DEFAULT in pcd.SkuInfoList and TAB_COMMON in pcd.SkuInfoList:
                     del pcd.SkuInfoList[TAB_COMMON]
 
-        map(self.FilterSkuSettings, [Pcds[pcdkey] for pcdkey in Pcds if Pcds[pcdkey].Type in DynamicPcdType])
+        list(map(self.FilterSkuSettings, [Pcds[pcdkey] for pcdkey in Pcds if Pcds[pcdkey].Type in DynamicPcdType]))
         return Pcds
 
     ## Retrieve non-dynamic PCD settings
@@ -2505,7 +2505,7 @@ class DscBuildData(PlatformBuildClassObject):
             elif TAB_DEFAULT in pcd.SkuInfoList and TAB_COMMON in pcd.SkuInfoList:
                 del pcd.SkuInfoList[TAB_COMMON]
 
-        map(self.FilterSkuSettings, Pcds.values())
+        list(map(self.FilterSkuSettings, Pcds.values()))
 
         return Pcds
 
@@ -2570,7 +2570,7 @@ class DscBuildData(PlatformBuildClassObject):
                     PcdObj.SkuInfoList[skuname].SkuId = skuid
                     PcdObj.SkuInfoList[skuname].SkuIdName = skuname
             if PcdType in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
-                PcdObj.DefaultValue = PcdObj.SkuInfoList.values()[0].HiiDefaultValue if self.SkuIdMgr.SkuUsageType == self.SkuIdMgr.SINGLE else PcdObj.SkuInfoList[TAB_DEFAULT].HiiDefaultValue
+                PcdObj.DefaultValue = list(PcdObj.SkuInfoList.values())[0].HiiDefaultValue if self.SkuIdMgr.SkuUsageType == self.SkuIdMgr.SINGLE else PcdObj.SkuInfoList[TAB_DEFAULT].HiiDefaultValue
             Pcds[PcdCName, TokenSpaceGuid]= PcdObj
         return Pcds
     ## Retrieve dynamic HII PCD settings
@@ -2731,7 +2731,7 @@ class DscBuildData(PlatformBuildClassObject):
             invalidpcd = ",".join(invalidhii)
             EdkLogger.error('build', PCD_VARIABLE_INFO_ERROR, Message='The same HII PCD must map to the same EFI variable for all SKUs', File=self.MetaFile, ExtraData=invalidpcd)
 
-        map(self.FilterSkuSettings, Pcds.values())
+        list(map(self.FilterSkuSettings, Pcds.values()))
 
         return Pcds
 
@@ -2829,7 +2829,7 @@ class DscBuildData(PlatformBuildClassObject):
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}
             Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName][TAB_DEFAULT_STORES_DEFAULT] = InitialValue
         for pcd in Pcds.values():
-            SkuInfoObj = pcd.SkuInfoList.values()[0]
+            SkuInfoObj = list(pcd.SkuInfoList.values())[0]
             pcdDecObject = self._DecPcds[pcd.TokenCName, pcd.TokenSpaceGuidCName]
             pcd.DatumType = pcdDecObject.DatumType
             # Only fix the value while no value provided in DSC file.
@@ -2847,7 +2847,7 @@ class DscBuildData(PlatformBuildClassObject):
                 del pcd.SkuInfoList[TAB_COMMON]
 
 
-        map(self.FilterSkuSettings, Pcds.values())
+        list(map(self.FilterSkuSettings, Pcds.values()))
         return Pcds
 
     ## Add external modules

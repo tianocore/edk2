@@ -611,7 +611,7 @@ def BuildExDataBase(Dict):
     DbVardefValueUint32 = DbItemList(4, RawDataList = VardefValueUint32)
     VpdHeadValue = Dict['VPD_DB_VALUE']
     DbVpdHeadValue = DbComItemList(4, RawDataList = VpdHeadValue)
-    ExMapTable = zip(Dict['EXMAPPING_TABLE_EXTOKEN'], Dict['EXMAPPING_TABLE_LOCAL_TOKEN'], Dict['EXMAPPING_TABLE_GUID_INDEX'])
+    ExMapTable = list(zip(Dict['EXMAPPING_TABLE_EXTOKEN'], Dict['EXMAPPING_TABLE_LOCAL_TOKEN'], Dict['EXMAPPING_TABLE_GUID_INDEX']))
     DbExMapTable = DbExMapTblItemList(8, RawDataList = ExMapTable)
     LocalTokenNumberTable = Dict['LOCAL_TOKEN_NUMBER_DB_VALUE']
     DbLocalTokenNumberTable = DbItemList(4, RawDataList = LocalTokenNumberTable)
@@ -645,7 +645,7 @@ def BuildExDataBase(Dict):
     PcdNameOffsetTable = Dict['PCD_NAME_OFFSET']
     DbPcdNameOffsetTable = DbItemList(4, RawDataList = PcdNameOffsetTable)
 
-    SizeTableValue = zip(Dict['SIZE_TABLE_MAXIMUM_LENGTH'], Dict['SIZE_TABLE_CURRENT_LENGTH'])
+    SizeTableValue = list(zip(Dict['SIZE_TABLE_MAXIMUM_LENGTH'], Dict['SIZE_TABLE_CURRENT_LENGTH']))
     DbSizeTableValue = DbSizeTableItemList(2, RawDataList = SizeTableValue)
     InitValueUint16 = Dict['INIT_DB_VALUE_UINT16']
     DbInitValueUint16 = DbComItemList(2, RawDataList = InitValueUint16)

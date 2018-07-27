@@ -936,7 +936,7 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
         if Info.IsLibrary:
             PcdList = Info.LibraryPcdList
         else:
-            PcdList = Info.ModulePcdList + Info.LibraryPcdList
+            PcdList = list(Info.ModulePcdList) + list(Info.LibraryPcdList)
         PcdExCNameTest = 0
         for PcdModule in PcdList:
             if PcdModule.Type in PCD_DYNAMIC_EX_TYPE_SET and Pcd.TokenCName == PcdModule.TokenCName:
@@ -970,7 +970,7 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                 AutoGenH.Append('#define %s(Value)  LibPcdSetEx%sS(&%s, %s, (Value))\n' % (SetModeStatusName, DatumSizeLib, Pcd.TokenSpaceGuidCName, PcdTokenName))
     elif Pcd.Type in PCD_DYNAMIC_TYPE_SET:
         PcdCNameTest = 0
-        for PcdModule in Info.LibraryPcdList + Info.ModulePcdList:
+        for PcdModule in list(Info.LibraryPcdList) + list(Info.ModulePcdList):
             if PcdModule.Type in PCD_DYNAMIC_TYPE_SET and Pcd.TokenCName == PcdModule.TokenCName:
                 PcdCNameTest += 1
             # get out early once we found > 1...
@@ -2065,7 +2065,7 @@ def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer, 
             if Guid in Info.Module.GetGuidsUsedByPcd():
                 continue
             GuidMacros.append('#define %s %s' % (Guid, Info.Module.Guids[Guid]))
-        for Guid, Value in Info.Module.Protocols.items() + Info.Module.Ppis.items():
+        for Guid, Value in list(Info.Module.Protocols.items()) + list(Info.Module.Ppis.items()):
             GuidMacros.append('#define %s %s' % (Guid, Value))
         # supports FixedAtBuild and FeaturePcd usage in VFR file
         if Info.VfrFileList and Info.ModulePcdList:

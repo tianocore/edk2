@@ -668,8 +668,8 @@ cleanlib:
             "separator"                 : Separator,
             "module_tool_definitions"   : ToolsDef,
 
-            "shell_command_code"        : self._SHELL_CMD_[self._FileType].keys(),
-            "shell_command"             : self._SHELL_CMD_[self._FileType].values(),
+            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
+            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
 
             "module_entry_point"        : ModuleEntryPoint,
             "image_entry_point"         : ImageEntryPoint,
@@ -1274,8 +1274,8 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
             "separator"                 : Separator,
             "module_tool_definitions"   : ToolsDef,
 
-            "shell_command_code"        : self._SHELL_CMD_[self._FileType].keys(),
-            "shell_command"             : self._SHELL_CMD_[self._FileType].values(),
+            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
+            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
 
             "create_directory_command"  : self.GetCreateDirectoryCommand(self.IntermediateDirectoryList),
             "custom_makefile_content"   : CustomMakefile
@@ -1448,8 +1448,8 @@ cleanlib:
 
             "toolchain_tag"             : MyAgo.ToolChain,
             "build_target"              : MyAgo.BuildTarget,
-            "shell_command_code"        : self._SHELL_CMD_[self._FileType].keys(),
-            "shell_command"             : self._SHELL_CMD_[self._FileType].values(),
+            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
+            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
             "build_architecture_list"   : MyAgo.Arch,
             "architecture"              : MyAgo.Arch,
             "separator"                 : Separator,
@@ -1584,8 +1584,8 @@ class TopLevelMakefile(BuildFile):
 
             "toolchain_tag"             : MyAgo.ToolChain,
             "build_target"              : MyAgo.BuildTarget,
-            "shell_command_code"        : self._SHELL_CMD_[self._FileType].keys(),
-            "shell_command"             : self._SHELL_CMD_[self._FileType].values(),
+            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
+            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
             'arch'                      : list(MyAgo.ArchList),
             "build_architecture_list"   : ','.join(MyAgo.ArchList),
             "separator"                 : Separator,

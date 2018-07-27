@@ -24,8 +24,8 @@ import pickle
 import array
 import shutil
 from struct import pack
-from UserDict import IterableUserDict
-from UserList import UserList
+from collections import UserDict as IterableUserDict
+from collections import OrderedDict
 
 from Common import EdkLogger as EdkLogger
 from Common import GlobalData as GlobalData
@@ -654,7 +654,7 @@ def RealPath2(File, Dir='', OverrideDir=''):
 #
 def GuidValue(CName, PackageList, Inffile = None):
     for P in PackageList:
-        GuidKeys = P.Guids.keys()
+        GuidKeys = list(P.Guids.keys())
         if Inffile and P._PrivateGuids:
             if not Inffile.startswith(P.MetaFile.Dir):
                 GuidKeys = [x for x in P.Guids if x not in P._PrivateGuids]
@@ -673,7 +673,7 @@ def GuidValue(CName, PackageList, Inffile = None):
 #
 def ProtocolValue(CName, PackageList, Inffile = None):
     for P in PackageList:
-        ProtocolKeys = P.Protocols.keys()
+        ProtocolKeys = list(P.Protocols.keys())
         if Inffile and P._PrivateProtocols:
             if not Inffile.startswith(P.MetaFile.Dir):
                 ProtocolKeys = [x for x in P.Protocols if x not in P._PrivateProtocols]
@@ -692,7 +692,7 @@ def ProtocolValue(CName, PackageList, Inffile = None):
 #
 def PpiValue(CName, PackageList, Inffile = None):
     for P in PackageList:
-        PpiKeys = P.Ppis.keys()
+        PpiKeys = list(P.Ppis.keys())
         if Inffile and P._PrivatePpis:
             if not Inffile.startswith(P.MetaFile.Dir):
                 PpiKeys = [x for x in P.Ppis if x not in P._PrivatePpis]
@@ -1960,7 +1960,7 @@ class SkuClass():
                             ExtraData = "SKU-ID [%s] value %s exceeds the max value of UINT64"
                                       % (SkuName, SkuId))
 
-        self.AvailableSkuIds = sdict()
+        self.AvailableSkuIds = OrderedDict()
         self.SkuIdSet = []
         self.SkuIdNumberSet = []
         self.SkuData = SkuIds
@@ -1970,7 +1970,7 @@ class SkuClass():
             self.SkuIdSet = ['DEFAULT']
             self.SkuIdNumberSet = ['0U']
         elif SkuIdentifier == 'ALL':
-            self.SkuIdSet = SkuIds.keys()
+            self.SkuIdSet = list(SkuIds.keys())
             self.SkuIdNumberSet = [num[0].strip() + 'U' for num in SkuIds.values()]
         else:
             r = SkuIdentifier.split('|')

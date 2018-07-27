@@ -503,7 +503,7 @@ class BuildTask:
 
                 # get all pending tasks
                 BuildTask._PendingQueueLock.acquire()
-                BuildObjectList = BuildTask._PendingQueue.keys()
+                BuildObjectList = list(BuildTask._PendingQueue.keys())
                 #
                 # check if their dependency is resolved, and if true, move them
                 # into ready queue

@@ -600,7 +600,7 @@ class ModuleReport(object):
             # Collect all module used PCD set: module INF referenced directly or indirectly.
             # It also saves module INF default values of them in case they exist.
             #
-            for Pcd in M.ModulePcdList + M.LibraryPcdList:
+            for Pcd in list(M.ModulePcdList) + list(M.LibraryPcdList):
                 self.ModulePcdSet.setdefault((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Type), (Pcd.InfDefaultValue, Pcd.DefaultValue))
 
         self.LibraryReport = None
@@ -853,7 +853,7 @@ class PcdReport(object):
                 #
                 # Collect module override PCDs
                 #
-                for ModulePcd in Module.M.ModulePcdList + Module.M.LibraryPcdList:
+                for ModulePcd in list(Module.M.ModulePcdList) + list(Module.M.LibraryPcdList):
                     TokenCName = ModulePcd.TokenCName
                     TokenSpaceGuid = ModulePcd.TokenSpaceGuidCName
                     ModuleDefault = ModulePcd.DefaultValue
@@ -1082,9 +1082,9 @@ class PcdReport(object):
                         if not Pcd.SkuInfoList:
                             OverrideValues = Pcd.SkuOverrideValues
                             if OverrideValues:
-                                Keys = OverrideValues.keys()
+                                Keys = list(OverrideValues.keys())
                                 Data = OverrideValues[Keys[0]]
-                                Struct = Data.values()[0]
+                                Struct = list(Data.values())[0]
                                 DscOverride = self.ParseStruct(Struct)
                         else:
                             SkuList = sorted(Pcd.SkuInfoList.keys())
@@ -1101,7 +1101,7 @@ class PcdReport(object):
                                 else:
                                     OverrideValues = Pcd.SkuOverrideValues[Sku]
                                     if OverrideValues:
-                                        Keys = OverrideValues.keys()
+                                        Keys = list(OverrideValues.keys())
                                         OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[Keys[0]])
                                         DscOverride = self.ParseStruct(OverrideFieldStruct)
                                 if DscOverride:
@@ -1256,9 +1256,9 @@ class PcdReport(object):
             if IsStructure:
                 OverrideValues = Pcd.SkuOverrideValues
                 if OverrideValues:
-                    Keys = OverrideValues.keys()
+                    Keys = list(OverrideValues.keys())
                     Data = OverrideValues[Keys[0]]
-                    Struct = Data.values()[0]
+                    Struct = list(Data.values())[0]
                     OverrideFieldStruct = self.OverrideFieldValue(Pcd, Struct)
                     self.PrintStructureInfo(File, OverrideFieldStruct)
             self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
@@ -1382,7 +1382,7 @@ class PcdReport(object):
                     if IsStructure:
                         OverrideValues = Pcd.SkuOverrideValues[Sku]
                         if OverrideValues:
-                            Keys = OverrideValues.keys()
+                            Keys = list(OverrideValues.keys())
                             OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[Keys[0]])
                             self.PrintStructureInfo(File, OverrideFieldStruct)
                     self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
