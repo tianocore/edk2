@@ -480,7 +480,7 @@ cleanup:
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_NOT_FOUND          The current image is not copied to the buffer.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -629,7 +629,7 @@ GetAllHeaderSize (
   @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -875,7 +875,7 @@ cleanup:
   @retval EFI_ABORTED            The operation is aborted.
   @retval EFI_INVALID_PARAMETER  The Image was NULL.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
@@ -1206,7 +1206,7 @@ GetPackageInfo (
   @retval EFI_INVALID_PARAMETER  The PackageVersionName length is longer than the value
                                  returned in PackageVersionNameMaxLen.
   @retval EFI_UNSUPPORTED        The operation is not supported.
-  @retval EFI_SECURITY_VIOLATIO  The operation could not be performed due to an authentication failure.
+  @retval EFI_SECURITY_VIOLATION The operation could not be performed due to an authentication failure.
 
 **/
 EFI_STATUS
