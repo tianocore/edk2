@@ -459,8 +459,14 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
 
     if os.path.exists(File):
         try:
-            if Content == open(File, "rb").read():
-                return False
+            if isinstance(Content, bytes):
+                with open(File, "rb") as f:
+                    if Content == f.read():
+                        return False
+            else:
+                with open(File, "r") as f:
+                    if Content == f.read():
+                        return False
         except:
             EdkLogger.error(None, FILE_OPEN_FAILURE, ExtraData=File)
 
@@ -480,13 +486,19 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
                 if not SaveFileToDisk(File, Content):
                     EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData=File)
             except:
-                Fd = open(File, "wb")
-                Fd.write(Content)
-                Fd.close()
+                if isinstance(Content, bytes):
+                    with open(File, "wb") as Fd:
+                        Fd.write(Content)
+                else:
+                    with open(File, "w") as Fd:
+                        Fd.write(Content)
         else:
-            Fd = open(File, "wb")
-            Fd.write(Content)
-            Fd.close()
+            if isinstance(Content, bytes):
+                with open(File, "wb") as Fd:
+                    Fd.write(Content)
+            else:
+                with open(File, "w") as Fd:
+                    Fd.write(Content)
     except IOError as X:
         EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s' % X)
 

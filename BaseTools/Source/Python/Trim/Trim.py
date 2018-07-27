@@ -245,7 +245,7 @@ def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
 
     # save to file
     try:
-        f = open (Target, 'wb')
+        f = open (Target, 'w')
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Target)
     f.writelines(NewLines)
@@ -562,7 +562,7 @@ def TrimEdkSourceCode(Source, Target):
     CreateDirectory(os.path.dirname(Target))
 
     try:
-        f = open (Source, 'rb')
+        f = open (Source, 'r')
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Source)
     # read whole file
@@ -581,7 +581,7 @@ def TrimEdkSourceCode(Source, Target):
         return
 
     try:
-        f = open (Target, 'wb')
+        f = open (Target, 'w')
     except:
         EdkLogger.error("Trim", FILE_OPEN_FAILURE, ExtraData=Target)
     f.write(NewLines)

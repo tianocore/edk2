@@ -305,7 +305,7 @@ class GenVPD :
         self.PcdFixedOffsetSizeList  = []
         self.PcdUnknownOffsetList    = []
         try:
-            fInputfile = open(InputFileName, "r", 0)
+            fInputfile = open(InputFileName, "r")
             try:
                 self.FileLinesList = fInputfile.readlines()
             except:
@@ -650,7 +650,7 @@ class GenVPD :
             EdkLogger.error("BPDG", BuildToolError.FILE_OPEN_FAILURE, "File open failed for %s" % self.VpdFileName, None)
 
         try :
-            fMapFile = open(MapFileName, "w", 0)
+            fMapFile = open(MapFileName, "w")
         except:
             # Open failed
             EdkLogger.error("BPDG", BuildToolError.FILE_OPEN_FAILURE, "File open failed for %s" % self.MapFileName, None)

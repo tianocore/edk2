@@ -634,7 +634,7 @@ class ModuleReport(object):
         FwReportFileName = os.path.join(self._BuildDir, "DEBUG", self.ModuleName + ".txt")
         if os.path.isfile(FwReportFileName):
             try:
-                FileContents = open(FwReportFileName).read()
+                FileContents = open(FwReportFileName, 'r').read()
                 Match = gModuleSizePattern.search(FileContents)
                 if Match:
                     self.Size = int(Match.group(1))

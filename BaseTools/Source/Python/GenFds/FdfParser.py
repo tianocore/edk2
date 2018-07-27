@@ -155,7 +155,7 @@ class IncludeFileProfile :
         self.FileName = FileName
         self.FileLinesList = []
         try:
-            fsock = open(FileName, "rb", 0)
+            fsock = open(FileName, "r")
             try:
                 self.FileLinesList = fsock.readlines()
                 for index, line in enumerate(self.FileLinesList):
@@ -216,7 +216,7 @@ class FileProfile :
     def __init__(self, FileName):
         self.FileLinesList = []
         try:
-            fsock = open(FileName, "rb", 0)
+            fsock = open(FileName, "r")
             try:
                 self.FileLinesList = fsock.readlines()
             finally:
