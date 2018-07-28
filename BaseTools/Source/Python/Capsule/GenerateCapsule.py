@@ -339,6 +339,10 @@ if __name__ == '__main__':
             args.OpenSslOtherPublicCertFile   = args.OpenSslOtherPublicCertFile.name
             args.OpenSslTrustedPublicCertFile = args.OpenSslTrustedPublicCertFile.name
 
+    if args.DumpInfo:
+        if args.OutputFile is not None:
+            parser.error ('the following option is not supported for dumpinfo operations: --output')
+
     #
     # Read binary input file
     #
