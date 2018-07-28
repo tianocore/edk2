@@ -1,6 +1,17 @@
 ## @file
 # Generate a capsule.
 #
+# This tool generates a UEFI Capsule around an FMP Capsule.  The capsule payload
+# be signed using signtool or OpenSSL and if it is signed the signed content
+# includes an FMP Payload Header.
+#
+# This tool is intended to be used to generate UEFI Capsules to update the
+# system firmware or device firmware for integrated devices.  In order to
+# keep the tool as simple as possible, it has the following limitations:
+#   * Do not support multiple payloads in a capsule.
+#   * Do not support optional drivers in a capsule.
+#   * Do not support vendor code bytes in a capsule.
+#
 # Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
