@@ -928,7 +928,7 @@ SetTheImage (
   //
   if (mFmpDeviceLocked) {
     DEBUG ((DEBUG_ERROR, "FmpDxe: SetTheImage() - Device is already locked.  Can't update.\n"));
-    Status = EFI_ACCESS_DENIED;
+    Status = EFI_UNSUPPORTED;
     goto cleanup;
   }
 
