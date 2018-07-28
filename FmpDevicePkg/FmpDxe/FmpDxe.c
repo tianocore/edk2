@@ -89,6 +89,13 @@ UINT64  mImageId      = 0x1;
 CHAR16  *mVersionName = NULL;
 
 EFI_EVENT  mFmpDeviceLockEvent;
+//
+// Indicates if an attempt has been made to lock a 
+// FLASH storage device by calling FmpDeviceLock().
+// A FLASH storage device may not support being locked,
+// so this variable is set to TRUE even if FmpDeviceLock()
+// returns an error.
+//
 BOOLEAN    mFmpDeviceLocked = FALSE;
 
 /**
