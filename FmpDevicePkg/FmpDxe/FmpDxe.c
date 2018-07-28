@@ -497,6 +497,15 @@ GetTheImage (
 
   Status = EFI_SUCCESS;
 
+  //
+  // Check to make sure index is 1 (only 1 image for this device)
+  //
+  if (ImageIndex != 1) {
+    DEBUG ((DEBUG_ERROR, "FmpDxe: GetImage() - Image Index Invalid.\n"));
+    Status = EFI_INVALID_PARAMETER;
+    goto cleanup;
+  }
+
   if ((ImageSize == NULL)) {
     DEBUG ((DEBUG_ERROR, "FmpDxe: GetImage() - ImageSize Pointer Parameter is NULL.\n"));
     Status = EFI_INVALID_PARAMETER;
@@ -522,16 +531,6 @@ GetTheImage (
     Status = EFI_INVALID_PARAMETER;
     goto cleanup;
   }
-
-  //
-  // Check to make sure index is 1 (only 1 image for this device)
-  //
-  if (ImageIndex != 1) {
-    DEBUG ((DEBUG_ERROR, "FmpDxe: GetImage() - Image Index Invalid.\n"));
-    Status = EFI_INVALID_PARAMETER;
-    goto cleanup;
-  }
-
 
   Status = FmpDeviceGetImage (Image, ImageSize);
 cleanup:
