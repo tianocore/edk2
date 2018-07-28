@@ -166,7 +166,7 @@ class FmpAuthHeaderClass (object):
         self.dwLength         = dwLength
         self.wRevision        = wRevision
         self.wCertificateType = wCertificateType
-        self.CertType         = uuid.UUID (bytes = CertType)
+        self.CertType         = uuid.UUID (bytes_le = CertType)
         self.CertData         = Buffer[self._StructSize:self._MonotonicCountSize + self.dwLength]
         self.Payload          = Buffer[self._MonotonicCountSize + self.dwLength:]
         self._Valid           = True
