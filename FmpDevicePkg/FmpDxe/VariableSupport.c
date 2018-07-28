@@ -72,7 +72,7 @@ GetVersionFromVariable (
   Version = DEFAULT_VERSION;
 
   Status = GetVariable2 (VARNAME_VERSION, &gEfiCallerIdGuid, (VOID **)&Value, &Size);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (Value == NULL)) {
     DEBUG ((DEBUG_ERROR, "Failed to get the Version from variable.  Status = %r\n", Status));
     return Version;
   }
@@ -125,7 +125,7 @@ GetLowestSupportedVersionFromVariable (
   Version = DEFAULT_LOWESTSUPPORTEDVERSION;
 
   Status = GetVariable2 (VARNAME_LSV, &gEfiCallerIdGuid, (VOID **)&Value, &Size);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (Value == NULL)) {
     DEBUG ((DEBUG_WARN, "Warning: Failed to get the Lowest Supported Version from variable.  Status = %r\n", Status));
     return Version;
   }
@@ -177,7 +177,7 @@ GetLastAttemptStatusFromVariable (
   LastAttemptStatus     = DEFAULT_LASTATTEMPT;
 
   Status = GetVariable2 (VARNAME_LASTATTEMPTSTATUS, &gEfiCallerIdGuid, (VOID **)&Value, &Size);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (Value == NULL)) {
     DEBUG ((DEBUG_WARN, "Warning: Failed to get the Last Attempt Status from variable.  Status = %r\n", Status));
     return LastAttemptStatus;
   }
@@ -233,7 +233,7 @@ GetLastAttemptVersionFromVariable (
   Version = DEFAULT_LASTATTEMPT;
 
   Status = GetVariable2 (VARNAME_LASTATTEMPTVERSION, &gEfiCallerIdGuid, (VOID **)&Value, &Size);
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || (Value == NULL)) {
     DEBUG ((DEBUG_WARN, "Warning: Failed to get the Last Attempt Version from variable.  Status = %r\n", Status));
     return Version;
   }
