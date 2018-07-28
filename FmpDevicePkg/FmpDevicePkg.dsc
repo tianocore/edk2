@@ -43,8 +43,8 @@
   #
   # Define ESRT GUIDs for Firmware Management Protocol instances
   #
-  DEFINE FMP_GRAPHICS_ESRT_GUID  = B461B3BD-E62A-4A71-841C-50BA4E500267
-  DEFINE FMP_TEXT_ESRT_GUID      = 226034C4-8B67-4536-8653-D6EE7CE5A316
+  DEFINE SYSTEM_FMP_ESRT_GUID   = B461B3BD-E62A-4A71-841C-50BA4E500267
+  DEFINE DEVICE_FMP_ESRT_GUID   = 226034C4-8B67-4536-8653-D6EE7CE5A316
 
 [LibraryClasses]
   UefiDriverEntryPoint|MdePkg/Library/UefiDriverEntryPoint/UefiDriverEntryPoint.inf
@@ -116,11 +116,9 @@
   FmpDevicePkg/FmpDxe/FmpDxe.inf {
     <Defines>
       #
-      # FILE_GUID is FMP ESRT GUID
+      # FILE_GUID is used as ESRT GUID
       #
-      FILE_GUID = $(FMP_GRAPHICS_ESRT_GUID)
-    <LibraryClasses>
-      DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibGraphics/DisplayUpdateProgressLibGraphics.inf
+      FILE_GUID = $(SYSTEM_FMP_ESRT_GUID)
   }
 
   FmpDevicePkg/FmpDxe/FmpDxe.inf {
@@ -128,9 +126,7 @@
       #
       # FILE_GUID is used as ESRT GUID
       #
-      FILE_GUID = $(FMP_TEXT_ESRT_GUID)
-    <LibraryClasses>
-      DisplayUpdateProgressLib|MdeModulePkg/Library/DisplayUpdateProgressLibText/DisplayUpdateProgressLibText.inf
+      FILE_GUID = $(DEVICE_FMP_ESRT_GUID)
   }
 
 [BuildOptions]
