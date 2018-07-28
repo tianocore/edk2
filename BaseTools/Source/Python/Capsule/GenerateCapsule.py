@@ -254,9 +254,9 @@ if __name__ == '__main__':
                          help = "64-bit monotonic count value in header.  Default is 0x0000000000000000.")
 
     parser.add_argument ("--fw-version", dest = 'FwVersion', type = ValidateUnsignedInteger,
-                         help = "The 32-bit version of the binary payload (e.g. 0x11223344 or 5678).")
+                         help = "The 32-bit version of the binary payload (e.g. 0x11223344 or 5678).  Required for encode operations that sign a payload.")
     parser.add_argument ("--lsv", dest = 'LowestSupportedVersion', type = ValidateUnsignedInteger,
-                         help = "The 32-bit lowest supported version of the binary payload (e.g. 0x11223344 or 5678).")
+                         help = "The 32-bit lowest supported version of the binary payload (e.g. 0x11223344 or 5678).  Required for encode operations that sign a payload.")
 
     parser.add_argument ("--pfx-file", dest='SignToolPfxFile', type=argparse.FileType('rb'),
                          help="signtool PFX certificate filename.")
