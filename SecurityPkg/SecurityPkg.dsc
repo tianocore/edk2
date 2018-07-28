@@ -219,8 +219,8 @@
   #
   SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha1.inf
   SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha256.inf
-  SecurityPkg/Library/HashInstanceLibSha1/HashInstanceLibSha384.inf
-  SecurityPkg/Library/HashInstanceLibSha256/HashInstanceLibSha512.inf
+  SecurityPkg/Library/HashInstanceLibSha384/HashInstanceLibSha384.inf
+  SecurityPkg/Library/HashInstanceLibSha512/HashInstanceLibSha512.inf
 
   SecurityPkg/Tcg/Tcg2Config/Tcg2ConfigPei.inf {
     <LibraryClasses>
