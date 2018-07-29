@@ -455,6 +455,9 @@ if __name__ == '__main__':
                 FmpCapsuleHeader.DumpInfo ()
             if UseSignTool or UseOpenSsl:
                 Result = FmpAuthHeader.Decode (Result)
+                if args.Verbose:
+                    print ('--------')
+                    FmpAuthHeader.DumpInfo ()
 
                 #
                 # Verify Image with 64-bit MonotonicCount appended to end of image
@@ -479,20 +482,25 @@ if __name__ == '__main__':
                 except ValueError:
                     print ('GenerateCapsule: warning: can not verify payload.')
 
-                Result = FmpPayloadHeader.Decode (Result)
-                if args.Verbose:
-                    print ('--------')
-                    FmpAuthHeader.DumpInfo ()
-                    print ('--------')
-                    FmpPayloadHeader.DumpInfo ()
+                try:
+                    Result = FmpPayloadHeader.Decode (Result)
+                    if args.Verbose:
+                        print ('--------')
+                        FmpPayloadHeader.DumpInfo ()
+                        print ('========')
+                except:
+                    if args.Verbose:
+                        print ('--------')
+                        print ('No FMP_PAYLOAD_HEADER')
+                        print ('========')
+                    raise
             else:
                 if args.Verbose:
                     print ('--------')
                     print ('No EFI_FIRMWARE_IMAGE_AUTHENTICATION')
                     print ('--------')
                     print ('No FMP_PAYLOAD_HEADER')
-            if args.Verbose:
-                print ('========')
+                    print ('========')
         except:
             print ('GenerateCapsule: error: can not decode capsule')
             sys.exit (1)
@@ -508,11 +516,15 @@ if __name__ == '__main__':
             FmpCapsuleHeader.DumpInfo ()
             try:
                 Result = FmpAuthHeader.Decode (Result)
-                Result = FmpPayloadHeader.Decode (Result)
                 print ('--------')
                 FmpAuthHeader.DumpInfo ()
-                print ('--------')
-                FmpPayloadHeader.DumpInfo ()
+                try:
+                    Result = FmpPayloadHeader.Decode (Result)
+                    print ('--------')
+                    FmpPayloadHeader.DumpInfo ()
+                except:
+                    print ('--------')
+                    print ('No FMP_PAYLOAD_HEADER')
             except:
                 print ('--------')
                 print ('No EFI_FIRMWARE_IMAGE_AUTHENTICATION')
