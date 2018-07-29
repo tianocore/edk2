@@ -408,7 +408,6 @@ if __name__ == '__main__':
                                  )
             except:
                 print ('GenerateCapsule: error: can not sign payload')
-                raise
                 sys.exit (1)
 
             try:
@@ -496,7 +495,6 @@ if __name__ == '__main__':
                 print ('========')
         except:
             print ('GenerateCapsule: error: can not decode capsule')
-            raise
             sys.exit (1)
 
     elif args.DumpInfo:
