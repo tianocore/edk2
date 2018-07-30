@@ -1,4 +1,4 @@
-/**  @file
+/** @file
   Detects if PcdFmpDevicePkcs7CertBufferXdr contains a test key.
 
   Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>

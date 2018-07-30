@@ -59,17 +59,17 @@
                                                                                                           "value of 0 disables the watchdog timer.  The default value is 0 (watchdog"
                                                                                                           "disabled)."
 
-#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdFmpDevicePkcs7CertBufferXdr_PROMPT  #language en-US "One or more XDR encoded PKCS7 certificates used to verify firmware device capsule update images"
-#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdFmpDevicePkcs7CertBufferXdr_HELP    #language en-US "Provides one or more PKCS7 certificates used to verify a firmware device"
-                                                                                                 "capsule update image.  This PCD is encoded using the Variable-Length Opaque"
-                                                                                                 "Data format of RFC 4506 External Data Representation Standard (XDR)."
-                                                                                                 "The default value is empty with 0 certificates."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDevicePkcs7CertBufferXdr_PROMPT  #language en-US "One or more XDR encoded PKCS7 certificates used to verify firmware device capsule update images"
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDevicePkcs7CertBufferXdr_HELP    #language en-US "Provides one or more PKCS7 certificates used to verify a firmware device"
+                                                                                               "capsule update image.  This PCD is encoded using the Variable-Length Opaque"
+                                                                                               "Data format of RFC 4506 External Data Representation Standard (XDR)."
+                                                                                               "The default value is empty with 0 certificates."
 
-#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdFmpDeviceLockEventGuid_PROMPT  #language en-US "Firmware Device Lock Event GUID."
-#string STR_gEfiSecurityPkgTokenSpaceGuid_PcdFmpDeviceLockEventGuid_HELP    #language en-US "An event GUID that locks the firmware device when the event is signaled."
-                                                                                            "If this PCD is not a valid GUID value, then the firmware device is locked"
-                                                                                            "when gEfiEndOfDxeEventGroupGuid (End of DXE Phase) is signaled.  The"
-                                                                                            "default value is empty, so by default the firmware device is locked at the"
-                                                                                            "end of the DXE phase."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceLockEventGuid_PROMPT  #language en-US "Firmware Device Lock Event GUID."
+#string STR_gFmpDevicePkgTokenSpaceGuid_PcdFmpDeviceLockEventGuid_HELP    #language en-US "An event GUID that locks the firmware device when the event is signaled."
+                                                                                          "If this PCD is not a valid GUID value, then the firmware device is locked"
+                                                                                          "when gEfiEndOfDxeEventGroupGuid (End of DXE Phase) is signaled.  The"
+                                                                                          "default value is empty, so by default the firmware device is locked at the"
+                                                                                          "end of the DXE phase."
 
 
