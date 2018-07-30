@@ -229,6 +229,7 @@ GetLowestSupportedVersion (
   //
   // Check the FmpDeviceLib
   //
+  DeviceLibLowestSupportedVersion = DEFAULT_LOWESTSUPPORTEDVERSION;
   Status = FmpDeviceGetLowestSupportedVersion (&DeviceLibLowestSupportedVersion);
   if (EFI_ERROR (Status)) {
     DeviceLibLowestSupportedVersion = DEFAULT_LOWESTSUPPORTEDVERSION;
