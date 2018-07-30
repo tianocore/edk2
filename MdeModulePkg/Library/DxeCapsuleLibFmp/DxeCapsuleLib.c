@@ -610,6 +610,8 @@ DumpAllFmpInfo (
     FreePool(FmpImageInfoBuf);
   }
 
+  FreePool (HandleBuffer);
+
   return ;
 }
 
@@ -776,6 +778,8 @@ GetFmpHandleBufferByType (
     }
     FreePool(FmpImageInfoBuf);
   }
+
+  FreePool (HandleBuffer);
 
   if (MatchedNumberOfHandles == 0) {
     return EFI_NOT_FOUND;
