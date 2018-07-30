@@ -516,7 +516,7 @@ ParseAcpi (
       IncrementErrorCount ();
       Print (
         L"\nERROR: %a: Offset Mismatch for %s\n"
-          "CurrentOffset = %d FieldOffset = %d\n",
+          L"CurrentOffset = %d FieldOffset = %d\n",
         AsciiName,
         Parser[Index].NameStr,
         Offset,

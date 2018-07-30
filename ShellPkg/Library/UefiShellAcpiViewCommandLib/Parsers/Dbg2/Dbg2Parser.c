@@ -120,7 +120,7 @@ ValidateNameSpaceStrLen (
     IncrementErrorCount ();
     Print (
       L"\nERROR: NamespaceString Length = %d. If no Namespace device exists,\n"
-       "    then NamespaceString[] must contain a period '.'",
+       L"    then NamespaceString[] must contain a period '.'",
       NameSpaceStrLen
       );
   }

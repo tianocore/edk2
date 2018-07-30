@@ -119,7 +119,7 @@ ParseAcpiSlit (
         IncrementErrorCount ();
         Print (
           L"ERROR: Diagonal Element[0x%lx][0x%lx] (%3d)."
-            " Normalized Value is not 10\n",
+            L" Normalized Value is not 10\n",
           Count,
           Index,
           SLIT_ELEMENT (LocalityPtr, Count, Index)
@@ -131,7 +131,7 @@ ParseAcpiSlit (
         IncrementErrorCount ();
         Print (
           L"ERROR: Relative distances for Element[0x%lx][0x%lx] (%3d) and \n"
-           "Element[0x%lx][0x%lx] (%3d) do not match.\n",
+           L"Element[0x%lx][0x%lx] (%3d) do not match.\n",
           Count,
           Index,
           SLIT_ELEMENT (LocalityPtr, Count, Index),
