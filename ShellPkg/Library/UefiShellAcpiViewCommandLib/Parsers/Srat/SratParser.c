@@ -48,6 +48,7 @@ ValidateSratReserved (
 **/
 STATIC
 VOID
+EFIAPI
 DumpSratApicProximity (
   IN  CONST CHAR16*  Format,
   IN  UINT8*         Ptr
@@ -172,6 +173,7 @@ ValidateSratReserved (
 **/
 STATIC
 VOID
+EFIAPI
 DumpSratApicProximity (
  IN CONST CHAR16* Format,
  IN UINT8*        Ptr
