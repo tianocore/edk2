@@ -1,4 +1,4 @@
-/**  @file
+/** @file
   Provides platform policy services used during a capsule update.
 
   Copyright (c) 2016, Microsoft Corporation. All rights reserved.<BR>
@@ -63,7 +63,7 @@ CheckSystemPower (
 EFI_STATUS
 EFIAPI
 CheckSystemThermal (
-  IN OUT BOOLEAN  *Good
+  OUT BOOLEAN   *Good
   );
 
 /**
@@ -82,7 +82,7 @@ CheckSystemThermal (
 EFI_STATUS
 EFIAPI
 CheckSystemEnvironment (
-  IN OUT BOOLEAN  *Good
+  OUT BOOLEAN   *Good
   );
 
 /**

@@ -1,4 +1,4 @@
-/**  @file
+/** @file
   Produces a Firmware Management Protocol that supports updates to a firmware
   image stored in a firmware device with platform and firmware device specific
   information provided through PCDs and libraries.
@@ -90,7 +90,7 @@ CHAR16  *mVersionName = NULL;
 
 EFI_EVENT  mFmpDeviceLockEvent;
 //
-// Indicates if an attempt has been made to lock a 
+// Indicates if an attempt has been made to lock a
 // FLASH storage device by calling FmpDeviceLock().
 // A FLASH storage device may not support being locked,
 // so this variable is set to TRUE even if FmpDeviceLock()
@@ -474,11 +474,11 @@ cleanup:
   This function allows a copy of the current firmware image to be created and saved.
   The saved copy could later been used, for example, in firmware image recovery or rollback.
 
-  @param[in]  This               A pointer to the EFI_FIRMWARE_MANAGEMENT_PROTOCOL instance.
-  @param[in]  ImageIndex         A unique number identifying the firmware image(s) within the device.
+  @param[in]      This           A pointer to the EFI_FIRMWARE_MANAGEMENT_PROTOCOL instance.
+  @param[in]      ImageIndex     A unique number identifying the firmware image(s) within the device.
                                  The number is between 1 and DescriptorCount.
-  @param[out] Image              Points to the buffer where the current image is copied to.
-  @param[out] ImageSize          On entry, points to the size of the buffer pointed to by Image, in bytes.
+  @param[in, out] Image          Points to the buffer where the current image is copied to.
+  @param[in, out] ImageSize      On entry, points to the size of the buffer pointed to by Image, in bytes.
                                  On return, points to the length of the image, in bytes.
 
   @retval EFI_SUCCESS            The device was successfully updated with the new image.
@@ -646,7 +646,7 @@ CheckTheImage (
   IN  UINT8                             ImageIndex,
   IN  CONST VOID                        *Image,
   IN  UINTN                             ImageSize,
-  OUT UINT32                            *ImageUpdateable
+  OUT UINT32                            *ImageUpdatable
   )
 {
   EFI_STATUS  Status;
@@ -677,8 +677,8 @@ CheckTheImage (
     PopulateDescriptor();
   }
 
-  if (ImageUpdateable == NULL) {
-    DEBUG ((DEBUG_ERROR, "FmpDxe: CheckImage() - ImageUpdateable Pointer Parameter is NULL.\n"));
+  if (ImageUpdatable == NULL) {
+    DEBUG ((DEBUG_ERROR, "FmpDxe: CheckImage() - ImageUpdatable Pointer Parameter is NULL.\n"));
     Status = EFI_INVALID_PARAMETER;
     goto cleanup;
   }
@@ -686,14 +686,14 @@ CheckTheImage (
   //
   //Set to valid and then if any tests fail it will update this flag.
   //
-  *ImageUpdateable = IMAGE_UPDATABLE_VALID;
+  *ImageUpdatable = IMAGE_UPDATABLE_VALID;
 
   if (Image == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpDxe: CheckImage() - Image Pointer Parameter is NULL.\n"));
     //
     // not sure if this is needed
     //
-    *ImageUpdateable = IMAGE_UPDATABLE_INVALID;
+    *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
     return EFI_INVALID_PARAMETER;
   }
 
@@ -767,7 +767,7 @@ CheckTheImage (
   //
   if (ImageIndex != 1) {
     DEBUG ((DEBUG_ERROR, "FmpDxe: CheckImage() - Image Index Invalid.\n"));
-    *ImageUpdateable = IMAGE_UPDATABLE_INVALID_TYPE;
+    *ImageUpdatable = IMAGE_UPDATABLE_INVALID_TYPE;
     Status = EFI_SUCCESS;
     goto cleanup;
   }
@@ -785,7 +785,7 @@ CheckTheImage (
   Status = GetFmpPayloadHeaderVersion (FmpPayloadHeader, FmpPayloadSize, &Version);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "FmpDxe: CheckTheImage() - GetFmpPayloadHeaderVersion failed %r.\n", Status));
-    *ImageUpdateable = IMAGE_UPDATABLE_INVALID;
+    *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
     Status = EFI_SUCCESS;
     goto cleanup;
   }
@@ -799,7 +799,7 @@ CheckTheImage (
       "FmpDxe: CheckTheImage() - Version Lower than lowest supported version. 0x%08X < 0x%08X\n",
       Version, mDesc.LowestSupportedImageVersion)
       );
-    *ImageUpdateable = IMAGE_UPDATABLE_INVALID_OLD;
+    *ImageUpdatable = IMAGE_UPDATABLE_INVALID_OLD;
     Status = EFI_SUCCESS;
     goto cleanup;
   }
@@ -810,7 +810,7 @@ CheckTheImage (
   Status = GetFmpPayloadHeaderSize (FmpPayloadHeader, FmpPayloadSize, &FmpHeaderSize);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "FmpDxe: CheckTheImage() - GetFmpPayloadHeaderSize failed %r.\n", Status));
-    *ImageUpdateable = IMAGE_UPDATABLE_INVALID;
+    *ImageUpdatable = IMAGE_UPDATABLE_INVALID;
     Status = EFI_SUCCESS;
     goto cleanup;
   }
@@ -830,7 +830,7 @@ CheckTheImage (
   //
   // FmpDeviceLib CheckImage function to do any specific checks
   //
-  Status = FmpDeviceCheckImage ((((UINT8 *)Image) + AllHeaderSize), RawSize, ImageUpdateable);
+  Status = FmpDeviceCheckImage ((((UINT8 *)Image) + AllHeaderSize), RawSize, ImageUpdatable);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "FmpDxe: CheckTheImage() - FmpDeviceLib CheckImage failed. Status = %r\n", Status));
   }
@@ -909,6 +909,8 @@ SetTheImage (
   EFI_STATUS  GetAttributesStatus;
   UINT64      AttributesSupported;
   UINT64      AttributesSetting;
+  UINT32      Version;
+  UINT32      LowestSupportedVersion;
 
   Status             = EFI_SUCCESS;
   Updateable         = 0;
@@ -1103,7 +1105,7 @@ SetTheImage (
   // Update the version stored in variable
   //
   if (!mRuntimeVersionSupported) {
-    UINT32 Version = DEFAULT_VERSION;
+    Version = DEFAULT_VERSION;
     GetFmpPayloadHeaderVersion (FmpHeader, FmpPayloadSize, &Version);
     SetVersionInVariable (Version);
   }
@@ -1112,9 +1114,9 @@ SetTheImage (
   // Update lowest supported variable
   //
   {
-    UINT32 Version = DEFAULT_LOWESTSUPPORTEDVERSION;
-    GetFmpPayloadHeaderLowestSupportedVersion (FmpHeader, FmpPayloadSize, &Version);
-    SetLowestSupportedVersionInVariable (Version);
+    LowestSupportedVersion = DEFAULT_LOWESTSUPPORTEDVERSION;
+    GetFmpPayloadHeaderLowestSupportedVersion (FmpHeader, FmpPayloadSize, &LowestSupportedVersion);
+    SetLowestSupportedVersionInVariable (LowestSupportedVersion);
   }
 
   LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
