@@ -202,17 +202,24 @@ FmpSetImage (
                   (VOID **)&SystemFmp
                   );
   if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_INFO, "(Agent)SetImage - SystemFmpProtocol - %r\n", Status));
-    SystemFmpPrivate->LastAttempt.LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
-    VarStatus = gRT->SetVariable(
-                       SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_NAME,
-                       &gSystemFmpLastAttemptVariableGuid,
-                       EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                       sizeof(SystemFmpPrivate->LastAttempt),
-                       &SystemFmpPrivate->LastAttempt
-                       );
-    DEBUG((DEBUG_INFO, "(Agent)SetLastAttemp - %r\n", VarStatus));
-    return Status;
+    Status = gBS->LocateProtocol (
+                    &gSystemFmpProtocolGuid,
+                    NULL,
+                    (VOID **)&SystemFmp
+                    );
+    if (EFI_ERROR(Status)) {
+      DEBUG((DEBUG_INFO, "(Agent)SetImage - SystemFmpProtocol - %r\n", Status));
+      SystemFmpPrivate->LastAttempt.LastAttemptStatus = LAST_ATTEMPT_STATUS_ERROR_INVALID_FORMAT;
+      VarStatus = gRT->SetVariable(
+                         SYSTEM_FMP_LAST_ATTEMPT_VARIABLE_NAME,
+                         &gSystemFmpLastAttemptVariableGuid,
+                         EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                         sizeof(SystemFmpPrivate->LastAttempt),
+                         &SystemFmpPrivate->LastAttempt
+                         );
+      DEBUG((DEBUG_INFO, "(Agent)SetLastAttemp - %r\n", VarStatus));
+      return Status;
+    }
   }
 
   return SystemFmp->SetImage(SystemFmp, ImageIndex, Image, ImageSize, VendorCode, Progress, AbortReason);
