@@ -317,11 +317,11 @@ EFI_STATUS
   This function allows a copy of the current firmware image to be created and saved.
   The saved copy could later been used, for example, in firmware image recovery or rollback.
 
-  @param[in]  This               A pointer to the EFI_FIRMWARE_MANAGEMENT_PROTOCOL instance.
-  @param[in]  ImageIndex         A unique number identifying the firmware image(s) within the device.
+  @param[in]      This           A pointer to the EFI_FIRMWARE_MANAGEMENT_PROTOCOL instance.
+  @param[in]      ImageIndex     A unique number identifying the firmware image(s) within the device.
                                  The number is between 1 and DescriptorCount.
-  @param[out] Image              Points to the buffer where the current image is copied to.
-  @param[out] ImageSize          On entry, points to the size of the buffer pointed to by Image, in bytes.
+  @param[in, out] Image          Points to the buffer where the current image is copied to.
+  @param[in, out] ImageSize      On entry, points to the size of the buffer pointed to by Image, in bytes.
                                  On return, points to the length of the image, in bytes.
 
   @retval EFI_SUCCESS            The device was successfully updated with the new image.
