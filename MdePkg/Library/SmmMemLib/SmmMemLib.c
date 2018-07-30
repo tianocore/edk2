@@ -439,7 +439,7 @@ SmmMemLibInternalGetUefiMemoryAttributesTable (
   UINTN                        MemoryAttributesTableSize;
 
   Status = EfiGetSystemConfigurationTable (&gEfiMemoryAttributesTableGuid, (VOID **)&MemoryAttributesTable);
-  if (!EFI_ERROR (Status)) {
+  if (!EFI_ERROR (Status) && (MemoryAttributesTable != NULL)) {
     MemoryAttributesTableSize = sizeof(EFI_MEMORY_ATTRIBUTES_TABLE) + MemoryAttributesTable->DescriptorSize * MemoryAttributesTable->NumberOfEntries;
     mSmmMemLibMemoryAttributesTable = AllocateCopyPool (MemoryAttributesTableSize, MemoryAttributesTable);
     ASSERT (mSmmMemLibMemoryAttributesTable != NULL);
