@@ -1,4 +1,4 @@
-/**  @file
+/** @file
   Provides firmware device specific services to support updates of a firmware
   image stored in a firmware device.
 
@@ -79,7 +79,7 @@ RegisterFmpInstaller (
 EFI_STATUS
 EFIAPI
 FmpDeviceGetSize (
-  IN UINTN  *Size
+  OUT UINTN  *Size
   )
 {
   if (Size == NULL) {
@@ -138,8 +138,8 @@ FmpDeviceGetImageTypeIdGuidPtr (
 EFI_STATUS
 EFIAPI
 FmpDeviceGetAttributes (
-  IN OUT UINT64  *Supported,
-  IN OUT UINT64  *Setting
+  OUT UINT64    *Supported,
+  OUT UINT64    *Setting
   )
 {
   if (Supported == NULL || Setting == NULL) {
@@ -268,9 +268,9 @@ FmpDeviceGetVersion (
         a copy currently stored firmware image.  This can be used to support
         features such as recovery and rollback.
 
-  @param[out]    Image      Pointer to a caller allocated buffer where the
+  @param[out]     Image     Pointer to a caller allocated buffer where the
                             currently stored firmware image is copied to.
-  @param[in out] ImageSize  Pointer the size, in bytes, of the Image buffer.
+  @param[in, out] ImageSize Pointer the size, in bytes, of the Image buffer.
                             On return, points to the size, in bytes, of firmware
                             image currently stored in the firmware device.
 
@@ -294,8 +294,8 @@ FmpDeviceGetVersion (
 EFI_STATUS
 EFIAPI
 FmpDeviceGetImage (
-  IN OUT    VOID   *Image,
-  IN IN OUT UINTN  *ImageSize
+  OUT    VOID   *Image,
+  IN OUT UINTN  *ImageSize
   )
 {
   return EFI_UNSUPPORTED;
@@ -320,9 +320,9 @@ FmpDeviceGetImage (
 
   @retval EFI_SUCCESS            The image was successfully checked.  Additional
                                  status information is returned in
-                                 ImageUpdateable.
+                                 ImageUpdatable.
   @retval EFI_INVALID_PARAMETER  Image is NULL.
-  @retval EFI_INVALID_PARAMETER  ImageUpdateable is NULL.
+  @retval EFI_INVALID_PARAMETER  ImageUpdatable is NULL.
 
 **/
 EFI_STATUS
@@ -330,7 +330,7 @@ EFIAPI
 FmpDeviceCheckImage (
   IN  CONST VOID  *Image,
   IN  UINTN       ImageSize,
-  OUT UINT32      *ImageUpdateable
+  OUT UINT32      *ImageUpdatable
   )
 {
   return EFI_SUCCESS;

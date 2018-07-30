@@ -1,4 +1,4 @@
-/**  @file
+/** @file
   Provides services to retrieve values from a capsule's FMP Payload Header.
   The structure is not included in the library class.  Instead, services are
   provided to retrieve information from the FMP Payload Header.  If information
@@ -92,9 +92,9 @@ GetFmpPayloadHeaderVersion (
 EFI_STATUS
 EFIAPI
 GetFmpPayloadHeaderLowestSupportedVersion (
-  IN     CONST VOID   *Header,
-  IN     CONST UINTN  FmpPayloadSize,
-  IN OUT UINT32       *LowestSupportedVersion
+  IN  CONST VOID    *Header,
+  IN  CONST UINTN   FmpPayloadSize,
+  OUT UINT32        *LowestSupportedVersion
   );
 
 #endif

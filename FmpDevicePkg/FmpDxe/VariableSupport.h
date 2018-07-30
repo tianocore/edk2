@@ -1,4 +1,4 @@
-/**  @file
+/** @file
   UEFI variable support functions for Firmware Management Protocol based
   firmware updates.
 
@@ -128,8 +128,8 @@ SetVersionInVariable (
 
   UEFI Variable accessed: GUID = gEfiCallerIdGuid, Name = L"FmpLsv"
 
-  @param[in] LowestSupported  The lowest supported version of the firmware image
-                              in the firmware device.
+  @param[in] LowestSupportedVersion The lowest supported version of the firmware image
+                                    in the firmware device.
 
 **/
 VOID
