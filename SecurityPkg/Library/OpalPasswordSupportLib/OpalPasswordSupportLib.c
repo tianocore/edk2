@@ -14,8 +14,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "OpalPasswordSupportNotify.h"
 
-#define OPAL_PASSWORD_MAX_LENGTH         32
-
 LIST_ENTRY           mDeviceList = INITIALIZE_LIST_HEAD_VARIABLE (mDeviceList);
 BOOLEAN              gInSmm = FALSE;
 EFI_GUID             gOpalPasswordNotifyProtocolGuid = OPAL_PASSWORD_NOTIFY_PROTOCOL_GUID;
@@ -663,34 +661,53 @@ SmmOpalPasswordHandler (
   EFI_STATUS                        Status;
   OPAL_SMM_COMMUNICATE_HEADER       *SmmFunctionHeader;
   UINTN                             TempCommBufferSize;
-  UINT8                             *NewPassword;
-  UINT8                             PasswordLength;
-  EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
+  UINTN                             RemainedDevicePathSize;
+  OPAL_COMM_DEVICE_LIST             *DeviceBuffer;
 
   if (CommBuffer == NULL || CommBufferSize == NULL) {
     return EFI_SUCCESS;
   }
 
+  Status = EFI_SUCCESS;
+  DeviceBuffer = NULL;
+
   TempCommBufferSize = *CommBufferSize;
   if (TempCommBufferSize < OFFSET_OF (OPAL_SMM_COMMUNICATE_HEADER, Data)) {
     return EFI_SUCCESS;
   }
-
-  Status   = EFI_SUCCESS;
-  SmmFunctionHeader     = (OPAL_SMM_COMMUNICATE_HEADER *)CommBuffer;
-
-  DevicePath = &((OPAL_COMM_DEVICE_LIST*)(SmmFunctionHeader->Data))->OpalDevicePath;
-  PasswordLength = ((OPAL_COMM_DEVICE_LIST*)(SmmFunctionHeader->Data))->PasswordLength;
-  NewPassword = ((OPAL_COMM_DEVICE_LIST*)(SmmFunctionHeader->Data))->Password;
+  SmmFunctionHeader = (OPAL_SMM_COMMUNICATE_HEADER *)CommBuffer;
 
   switch (SmmFunctionHeader->Function) {
     case SMM_FUNCTION_SET_OPAL_PASSWORD:
-        if (OpalPasswordIsFullZero (NewPassword) || PasswordLength == 0) {
-          Status = EFI_INVALID_PARAMETER;
-          goto EXIT;
-        }
+      if (TempCommBufferSize <= OFFSET_OF (OPAL_SMM_COMMUNICATE_HEADER, Data) + OFFSET_OF (OPAL_COMM_DEVICE_LIST, OpalDevicePath)) {
+        return EFI_SUCCESS;
+      }
 
-        Status = OpalSavePasswordToSmm (DevicePath, NewPassword, PasswordLength);
+      DeviceBuffer = AllocateCopyPool (TempCommBufferSize - OFFSET_OF (OPAL_SMM_COMMUNICATE_HEADER, Data), SmmFunctionHeader->Data);
+      if (DeviceBuffer == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto EXIT;
+      }
+
+      //
+      // Validate the DevicePath.
+      //
+      RemainedDevicePathSize = TempCommBufferSize - OFFSET_OF (OPAL_SMM_COMMUNICATE_HEADER, Data)
+                                    - OFFSET_OF (OPAL_COMM_DEVICE_LIST, OpalDevicePath);
+      if (!IsDevicePathValid(&DeviceBuffer->OpalDevicePath, RemainedDevicePathSize) ||
+          (RemainedDevicePathSize != GetDevicePathSize (&DeviceBuffer->OpalDevicePath))) {
+        Status = EFI_SUCCESS;
+        goto EXIT;
+      }
+
+      if (OpalPasswordIsFullZero (DeviceBuffer->Password) ||
+          DeviceBuffer->PasswordLength == 0 ||
+          DeviceBuffer->PasswordLength > OPAL_PASSWORD_MAX_LENGTH) {
+        Status = EFI_INVALID_PARAMETER;
+        goto EXIT;
+      }
+
+      Status = OpalSavePasswordToSmm (&DeviceBuffer->OpalDevicePath, DeviceBuffer->Password, DeviceBuffer->PasswordLength);
       break;
 
     default:
@@ -700,6 +717,10 @@ SmmOpalPasswordHandler (
 
 EXIT:
   SmmFunctionHeader->ReturnStatus = Status;
+
+  if (DeviceBuffer != NULL) {
+    FreePool (DeviceBuffer);
+  }
 
   //
   // Return EFI_SUCCESS cause only one handler can be trigged.

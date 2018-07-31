@@ -41,7 +41,7 @@ typedef struct {
 } OPAL_SMM_COMMUNICATE_HEADER;
 
 typedef struct {
-  UINT8                      Password[32];
+  UINT8                      Password[OPAL_PASSWORD_MAX_LENGTH];
   UINT8                      PasswordLength;
 
   EFI_DEVICE_PATH_PROTOCOL   OpalDevicePath;
