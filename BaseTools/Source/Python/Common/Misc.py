@@ -18,7 +18,6 @@ from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import sys
 import string
-import thread
 import threading
 import time
 import re
