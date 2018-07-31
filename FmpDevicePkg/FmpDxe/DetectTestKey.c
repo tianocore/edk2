@@ -53,12 +53,14 @@ DetectTestKey (
   UINT8    *PublicKeyDataXdrEnd;
   VOID     *HashContext;
   UINT8    Digest[SHA256_DIGEST_SIZE];
+  UINTN    TestKeyDigestSize;
 
   //
   // If PcdFmpDeviceTestKeySha256Digest is not exacty SHA256_DIGEST_SIZE bytes,
   // then skip the test key detection.
   //
-  if (PcdGetSize (PcdFmpDeviceTestKeySha256Digest) != SHA256_DIGEST_SIZE) {
+  TestKeyDigestSize = PcdGetSize (PcdFmpDeviceTestKeySha256Digest);
+  if (TestKeyDigestSize != SHA256_DIGEST_SIZE) {
     return;
   }
 
