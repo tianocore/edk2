@@ -21,7 +21,7 @@ import string
 import threading
 import time
 import re
-import cPickle
+import pickle
 import array
 import shutil
 from struct import pack
@@ -499,7 +499,7 @@ def DataDump(Data, File):
     Fd = None
     try:
         Fd = open(File, 'wb')
-        cPickle.dump(Data, Fd, cPickle.HIGHEST_PROTOCOL)
+        pickle.dump(Data, Fd, pickle.HIGHEST_PROTOCOL)
     except:
         EdkLogger.error("", FILE_OPEN_FAILURE, ExtraData=File, RaiseError=False)
     finally:
@@ -518,7 +518,7 @@ def DataRestore(File):
     Fd = None
     try:
         Fd = open(File, 'rb')
-        Data = cPickle.load(Fd)
+        Data = pickle.load(Fd)
     except Exception as e:
         EdkLogger.verbose("Failed to load [%s]\n\t%s" % (File, str(e)))
         Data = None
