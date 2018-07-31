@@ -66,7 +66,7 @@ if __name__ == '__main__':
             #
             # If Xdr flag is not set, then concatenate all the data
             #
-            Buffer = b''.join (Buffer)
+            Buffer = bytearray (b''.join (Buffer))
         #
         # Return a PCD value of the form '{0x01, 0x02, ...}' along with the PCD length in bytes
         #
