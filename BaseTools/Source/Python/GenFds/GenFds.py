@@ -605,6 +605,11 @@ class GenFds :
         GuidDict = {}
         ModuleList = []
         FileGuidList = []
+        GuidPattern = re.compile("\s*([0-9a-fA-F]){8}-"
+                                       "([0-9a-fA-F]){4}-"
+                                       "([0-9a-fA-F]){4}-"
+                                       "([0-9a-fA-F]){4}-"
+                                       "([0-9a-fA-F]){12}\s*")
         for Arch in ArchList:
             PlatformDataBase = BuildDb.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             for ModuleFile in PlatformDataBase.Modules:
@@ -613,7 +618,11 @@ class GenFds :
                     continue
                 else:
                     ModuleList.append(Module)
-                GuidXRefFile.write("%s %s\n" % (Module.Guid, Module.BaseName))
+                GuidMatch = GuidPattern.match(ModuleFile.BaseName)
+                if GuidMatch is not None:
+                    GuidXRefFile.write("%s %s\n" % (ModuleFile.BaseName, Module.BaseName))
+                else:
+                    GuidXRefFile.write("%s %s\n" % (Module.Guid, Module.BaseName))
                 for key, item in Module.Protocols.items():
                     GuidDict[key] = item
                 for key, item in Module.Guids.items():
