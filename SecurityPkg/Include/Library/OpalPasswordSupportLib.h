@@ -19,6 +19,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/DevicePath.h>
 #include <Library/TcgStorageOpalLib.h>
 
+#define OPAL_PASSWORD_MAX_LENGTH         32
 
 #pragma pack(1)
 
@@ -76,7 +77,7 @@ typedef struct {
 typedef struct {
   LIST_ENTRY                 Link;
 
-  UINT8                      Password[32];
+  UINT8                      Password[OPAL_PASSWORD_MAX_LENGTH];
   UINT8                      PasswordLength;
 
   EFI_DEVICE_PATH_PROTOCOL   OpalDevicePath;

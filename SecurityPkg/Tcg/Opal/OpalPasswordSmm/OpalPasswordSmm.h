@@ -63,10 +63,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 // The payload Length of HDD related ATA commands
 //
 #define HDD_PAYLOAD                      512
-//
-// According to ATA spec, the max Length of hdd password is 32 bytes
-//
-#define OPAL_PASSWORD_MAX_LENGTH         32
 
 extern VOID                              *mBuffer;
 
@@ -125,7 +121,7 @@ typedef struct {
 
   UINT32                                   NvmeNamespaceId;
 
-  UINT8                                    Password[32];
+  UINT8                                    Password[OPAL_PASSWORD_MAX_LENGTH];
   UINT8                                    PasswordLength;
 
   UINT32                                   Length;
