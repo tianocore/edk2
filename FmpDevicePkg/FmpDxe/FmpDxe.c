@@ -514,7 +514,7 @@ GetTheImage (
     goto cleanup;
   }
 
-  if ((ImageSize == NULL)) {
+  if (ImageSize == NULL) {
     DEBUG ((DEBUG_ERROR, "FmpDxe: GetImage() - ImageSize Pointer Parameter is NULL.\n"));
     Status = EFI_INVALID_PARAMETER;
     goto cleanup;
