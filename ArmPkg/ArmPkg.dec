@@ -41,6 +41,7 @@
   ArmGicArchLib|Include/Library/ArmGicArchLib.h
   ArmMtlLib|ArmPlatformPkg/Include/Library/ArmMtlLib.h
   ArmSvcLib|Include/Library/ArmSvcLib.h
+  OpteeLib|Include/Library/OpteeLib.h
 
 [Guids.common]
   gArmTokenSpaceGuid       = { 0xBB11ECFE, 0x820F, 0x4968, { 0xBB, 0xA6, 0xF7, 0x6A, 0xFE, 0x30, 0x25, 0x96 } }

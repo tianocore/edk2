@@ -111,4 +111,12 @@
 #define ARM_SMC_ID_PSCI_AFFINITY_INFO_OFF         1
 #define ARM_SMC_ID_PSCI_AFFINITY_INFO_ON_PENDING  2
 
+/*
+ * SMC function IDs for Trusted OS Service queries
+ */
+#define ARM_SMC_ID_TOS_CALL_COUNT     0xbf00ff00
+#define ARM_SMC_ID_TOS_UID            0xbf00ff01
+/*                                    0xbf00ff02 is reserved */
+#define ARM_SMC_ID_TOS_REVISION       0xbf00ff03
+
 #endif
