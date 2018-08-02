@@ -70,7 +70,8 @@ if __name__ == '__main__':
         #
         # Return a PCD value of the form '{0x01, 0x02, ...}' along with the PCD length in bytes
         #
-        return '{' + (', '.join (['0x{Byte:02X}'.format (Byte = Item) for Item in Buffer])) + '}', len (Buffer)
+        PcdValue = '{' + ', '.join (['0x{Byte:02X}'.format (Byte = Item) for Item in Buffer]) + '}'
+        return PcdValue.encode (), len (Buffer)
 
     #
     # Create command line argument parser object
