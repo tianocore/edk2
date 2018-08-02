@@ -1225,7 +1225,9 @@ ProcessFmpCapsuleImage (
                &HandleBuffer,
                &ResetRequiredBuffer
                );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR(Status) ||
+        (HandleBuffer == NULL) ||
+        (ResetRequiredBuffer == NULL)) {
       NotReady = TRUE;
       RecordFmpCapsuleStatus (
         NULL,
