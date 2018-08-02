@@ -556,6 +556,13 @@ XhcDataTransfer (
 
   XhcExecTransfer (Handle, Urb, Timeout);
 
+  //
+  // Make sure the data received from HW can fit in the received buffer.
+  //
+  if (Urb->Completed > *DataLength) {
+    return EFI_DEVICE_ERROR;
+  }
+
   *DataLength     = Urb->Completed;
 
   Status = EFI_TIMEOUT;
