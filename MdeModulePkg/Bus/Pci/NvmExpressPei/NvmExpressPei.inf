@@ -50,7 +50,6 @@
   MemoryAllocationLib
   BaseMemoryLib
   IoLib
-  PciLib
   TimerLib
   PeimEntryPoint
 

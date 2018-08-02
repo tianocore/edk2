@@ -23,7 +23,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
-#include <Library/DxeServicesLib.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/SmmAccess2.h>
 #include <Protocol/SmmReadyToLock.h>

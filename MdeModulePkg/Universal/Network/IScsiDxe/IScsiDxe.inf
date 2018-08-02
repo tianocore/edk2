@@ -108,7 +108,6 @@
   gEfiIfrTianoGuid                              ## SOMETIMES_PRODUCES ## UNDEFINED
   gEfiAcpiTableGuid                             ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
-  gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
   ## SOMETIMES_PRODUCES ## Variable:L"iSCSIDeviceList"
   ## SOMETIMES_CONSUMES ## Variable:L"iSCSIDeviceList"
   ## SOMETIMES_CONSUMES ## UNDEFINED # HiiIsConfigHdrMatch   mVendorStorageName

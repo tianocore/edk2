@@ -42,7 +42,6 @@
 
 [LibraryClasses]
   UefiBootServicesTableLib
-  MemoryAllocationLib
   UefiDriverEntryPoint
   BaseMemoryLib
   BaseLib

@@ -25,8 +25,6 @@
 
 #include <Guid/Acpi.h>
 #include <Guid/FirmwarePerformance.h>
-#include <Guid/EventGroup.h>
-#include <Guid/EventLegacyBios.h>
 
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>

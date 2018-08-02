@@ -27,7 +27,6 @@
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
-#include <Library/IoLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeLib.h>

@@ -22,7 +22,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PrintLib.h>
 #include <Library/UefiLib.h>
 #include <Library/DevicePathLib.h>
-#include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/DxeServicesLib.h>
 #include <Protocol/SmmCommunication.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>

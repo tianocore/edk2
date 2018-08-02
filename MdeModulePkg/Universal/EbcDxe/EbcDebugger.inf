@@ -106,8 +106,6 @@
 
 [Guids]
   gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## GUID
-  gEfiFileSystemInfoGuid                        ## SOMETIMES_CONSUMES ## GUID
-  gEfiFileSystemVolumeLabelInfoIdGuid           ## SOMETIMES_CONSUMES ## GUID
   gEfiDebugImageInfoTableGuid                   ## SOMETIMES_CONSUMES ## GUID
 
 [Depex]

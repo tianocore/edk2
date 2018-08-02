@@ -40,7 +40,6 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [Guids]
-  gEfiGlobalVariableGuid                 ## CONSUMES   ## GUID
   gEfiCapsuleReportGuid                  ## CONSUMES   ## GUID
   gEfiFmpCapsuleGuid                     ## CONSUMES   ## GUID
   gWindowsUxCapsuleGuid                  ## CONSUMES   ## GUID

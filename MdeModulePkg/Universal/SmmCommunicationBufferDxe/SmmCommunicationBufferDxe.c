@@ -26,7 +26,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiLib.h>
-#include <Library/PcdLib.h>
 #include <Guid/PiSmmCommunicationRegionTable.h>
 
 #define DEFAULT_COMMON_PI_SMM_COMMUNIATION_REGION_PAGES  4

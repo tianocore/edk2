@@ -50,7 +50,6 @@
   MemoryAllocationLib
   HobLib
   DebugLib
-  PcdLib
 
 [Guids]
   gEdkiiPiSmmCommunicationRegionTableGuid     ## PRODUCES   ## SystemTable

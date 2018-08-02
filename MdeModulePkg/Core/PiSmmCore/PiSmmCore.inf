@@ -63,10 +63,8 @@
   PcdLib
   SmmCorePlatformHookLib
   PerformanceLib
-  TimerLib
   HobLib
   SmmMemLib
-  DxeServicesLib
 
 [Protocols]
   gEfiDxeSmmReadyToLockProtocolGuid             ## UNDEFINED # SmiHandlerRegister
@@ -90,7 +88,6 @@
   gEfiSmmGpiDispatch2ProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiSmmIoTrapDispatch2ProtocolGuid            ## SOMETIMES_CONSUMES
   gEfiSmmUsbDispatch2ProtocolGuid               ## SOMETIMES_CONSUMES
-  gEfiSmmCpuProtocolGuid                        ## SOMETIMES_CONSUMES
   gEdkiiSmmMemoryAttributeProtocolGuid          ## CONSUMES
   gEfiSmmSxDispatch2ProtocolGuid                ## SOMETIMES_CONSUMES
 

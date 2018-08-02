@@ -28,7 +28,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/CapsuleLib.h>
-#include <Library/PrintLib.h>
 
 #include <Protocol/FirmwareManagement.h>
 #include <Protocol/EsrtManagement.h>

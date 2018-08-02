@@ -29,8 +29,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/SimpleFileSystem.h>
 #include <Protocol/DebuggerConfiguration.h>
 #include <Guid/FileInfo.h>
-#include <Guid/FileSystemInfo.h>
-#include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Guid/DebugImageInfoTable.h>
 
 typedef UINTN EFI_DEBUG_STATUS;

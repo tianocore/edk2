@@ -42,7 +42,6 @@
 [LibraryClasses]
   BaseLib
   DebugLib
-  DevicePathLib
   UefiDriverEntryPoint
   UefiBootServicesTableLib
   UefiLib

@@ -60,7 +60,6 @@
   ReportStatusCodeLib
 
 [Guids]
-  gEfiDiskInfoIdeInterfaceGuid                  ## SOMETIMES_PRODUCES ## UNDEFINED
   gEfiDiskInfoAhciInterfaceGuid                 ## SOMETIMES_PRODUCES ## UNDEFINED
 
 [Protocols]

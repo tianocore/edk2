@@ -42,7 +42,6 @@
   UefiLib
   PrintLib
   DevicePathLib
-  PeCoffGetEntryPointLib
   DxeServicesLib
 
 [Protocols]

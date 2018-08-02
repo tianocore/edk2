@@ -97,7 +97,6 @@
   UefiBootServicesTableLib
   DevicePathLib
   ReportStatusCodeLib
-  TimerLib
   DxeServicesLib
   DebugAgentLib
   CpuExceptionHandlerLib
@@ -163,7 +162,6 @@
   gEfiHiiPackageListProtocolGuid                ## SOMETIMES_PRODUCES
   gEfiEbcProtocolGuid                           ## SOMETIMES_CONSUMES
   gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
-  gEfiBlockIoProtocolGuid                       ## SOMETIMES_CONSUMES
 
   # Arch Protocols
   gEfiBdsArchProtocolGuid                       ## CONSUMES

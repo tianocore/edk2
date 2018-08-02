@@ -44,7 +44,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/PropertiesTable.h>
 
 #include <Protocol/FirmwareVolume2.h>
-#include <Protocol/BlockIo.h>
 #include <Protocol/SimpleFileSystem.h>
 
 #include "DxeMain.h"

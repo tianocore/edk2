@@ -43,7 +43,6 @@
   UefiRuntimeLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
-  IoLib
   UefiLib
   DebugLib
   BaseLib

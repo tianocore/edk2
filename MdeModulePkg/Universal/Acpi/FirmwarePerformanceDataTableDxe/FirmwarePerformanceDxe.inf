@@ -61,8 +61,6 @@
 
 [Guids]
   gEfiEventExitBootServicesGuid                 ## CONSUMES             ## Event
-  gEfiEventReadyToBootGuid                      ## CONSUMES             ## Event
-  gEfiEventLegacyBootGuid                       ## SOMETIMES_CONSUMES   ## Event
   ## SOMETIMES_CONSUMES   ## HOB
   ## SOMETIMES_CONSUMES   ## Variable:L"FirmwarePerformance"
   ## PRODUCES             ## Variable:L"FirmwarePerformance"

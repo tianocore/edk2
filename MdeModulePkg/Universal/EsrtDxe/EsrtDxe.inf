@@ -49,7 +49,6 @@
   DxeServicesTableLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
-  PrintLib
 
 [Guids]
   gEfiSystemResourceTableGuid             ## PRODUCES             ## SystemTable

@@ -23,7 +23,6 @@
 #include <Library/PrintLib.h>
 #include <Library/BmpSupportLib.h>
 #include <Protocol/GraphicsOutput.h>
-#include <Guid/GlobalVariable.h>
 #include <Guid/CapsuleReport.h>
 #include <Guid/SystemResourceTable.h>
 #include <Guid/FmpCapsule.h>

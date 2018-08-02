@@ -44,7 +44,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PcdLib.h>
-#include <Library/PeCoffLib.h>
 
 #include <IndustryStandard/Pci.h>
 #include <IndustryStandard/PeImage.h>

@@ -36,15 +36,14 @@
 
 [LibraryClasses]
   UefiLib
-  DxeServicesLib
   PcdLib
-  BaseMemoryLib
   DebugLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
 [Protocols]
   gEfiAcpiTableProtocolGuid                     ## CONSUMES
+  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiTableStorageFile    ## CONSUMES
