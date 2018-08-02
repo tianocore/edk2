@@ -1009,9 +1009,12 @@ EhcMonitorAsyncRequests (
     ProcBuf = NULL;
 
     if (Urb->Result == EFI_USB_NOERROR) {
-      ASSERT (Urb->Completed <= Urb->DataLen);
-
-      ProcBuf = AllocatePool (Urb->Completed);
+      //
+      // Make sure the data received from HW is no more than expected.
+      //
+      if (Urb->Completed <= Urb->DataLen) {
+        ProcBuf = AllocatePool (Urb->Completed);
+      }
 
       if (ProcBuf == NULL) {
         EhcUpdateAsyncRequest (Ehc, Urb);
