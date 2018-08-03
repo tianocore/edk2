@@ -54,7 +54,7 @@ from collections import OrderedDict
 from collections import defaultdict
 from Workspace.WorkspaceCommon import OrderedListDict
 
-from Common.caching import cached_property
+from Common.caching import cached_property, cached_class_function
 
 ## Regular expression for splitting Dependency Expression string into tokens
 gDepexTokenPattern = re.compile("(\(|\)|\w+| \S+\.inf)")
@@ -2549,7 +2549,6 @@ class ModuleAutoGen(AutoGen):
         self.ToolChainFamily = self.PlatformInfo.ToolChainFamily
         self.BuildRuleFamily = self.PlatformInfo.BuildRuleFamily
 
-        self.IsMakeFileCreated = False
         self.IsCodeFileCreated = False
         self.IsAsBuiltInfCreated = False
         self.DepexGenerated = False
@@ -3956,13 +3955,31 @@ class ModuleAutoGen(AutoGen):
     #   @param      CreateLibraryMakeFile   Flag indicating if or not the makefiles of
     #                                       dependent libraries will be created
     #
+    @cached_class_function
     def CreateMakeFile(self, CreateLibraryMakeFile=True, GenFfsList = []):
+        # nest this function inside it's only caller.
+        def CreateTimeStamp():
+            FileSet = {self.MetaFile.Path}
+
+            for SourceFile in self.Module.Sources:
+                FileSet.add (SourceFile.Path)
+
+            for Lib in self.DependentLibraryList:
+                FileSet.add (Lib.MetaFile.Path)
+
+            for f in self.AutoGenDepSet:
+                FileSet.add (f.Path)
+
+            if os.path.exists (self.TimeStampPath):
+                os.remove (self.TimeStampPath)
+            with open(self.TimeStampPath, 'w+') as file:
+                for f in FileSet:
+                    print(f, file=file)
+
         # Ignore generating makefile when it is a binary module
         if self.IsBinaryModule:
             return
 
-        if self.IsMakeFileCreated:
-            return
         self.GenFfsList = GenFfsList
         if not self.IsLibrary and CreateLibraryMakeFile:
             for LibraryAutoGen in self.LibraryAutoGenList:
@@ -3982,8 +3999,7 @@ class ModuleAutoGen(AutoGen):
             EdkLogger.debug(EdkLogger.DEBUG_9, "Skipped the generation of makefile for module %s [%s]" %
                             (self.Name, self.Arch))
 
-        self.CreateTimeStamp()
-        self.IsMakeFileCreated = True
+        CreateTimeStamp()
 
     def CopyBinaryFiles(self):
         for File in self.Module.Binaries:
@@ -4156,21 +4172,3 @@ class ModuleAutoGen(AutoGen):
     @cached_property
     def TimeStampPath(self):
         return os.path.join(self.MakeFileDir, 'AutoGenTimeStamp')
-
-    def CreateTimeStamp(self):
-        FileSet = {self.MetaFile.Path}
-
-        for SourceFile in self.Module.Sources:
-            FileSet.add (SourceFile.Path)
-
-        for Lib in self.DependentLibraryList:
-            FileSet.add (Lib.MetaFile.Path)
-
-        for f in self.AutoGenDepSet:
-            FileSet.add (f.Path)
-
-        if os.path.exists (self.TimeStampPath):
-            os.remove (self.TimeStampPath)
-        with open(self.TimeStampPath, 'w+') as file:
-            for f in FileSet:
-                print(f, file=file)
