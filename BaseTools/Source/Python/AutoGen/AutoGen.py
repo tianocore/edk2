@@ -2855,45 +2855,42 @@ class ModuleAutoGen(AutoGen):
         if self.DxsFile or self.IsLibrary or TAB_DEPENDENCY_EXPRESSION_FILE in self.FileTypes:
             return {}
 
-        RetVal = {self.ModuleType:[]}
-
-        for ModuleType in RetVal:
-            DepexList = RetVal[ModuleType]
-            #
-            # Append depex from dependent libraries, if not "BEFORE", "AFTER" expresion
-            #
-            for M in [self.Module] + self.DependentLibraryList:
-                Inherited = False
-                for D in M.Depex[self.Arch, ModuleType]:
-                    if DepexList != []:
-                        DepexList.append('AND')
-                    DepexList.append('(')
-                    #replace D with value if D is FixedAtBuild PCD
-                    NewList = []
-                    for item in D:
-                        if '.' not in item:
-                            NewList.append(item)
+        DepexList = []
+        #
+        # Append depex from dependent libraries, if not "BEFORE", "AFTER" expresion
+        #
+        for M in [self.Module] + self.DependentLibraryList:
+            Inherited = False
+            for D in M.Depex[self.Arch, self.ModuleType]:
+                if DepexList != []:
+                    DepexList.append('AND')
+                DepexList.append('(')
+                #replace D with value if D is FixedAtBuild PCD
+                NewList = []
+                for item in D:
+                    if '.' not in item:
+                        NewList.append(item)
+                    else:
+                        if item not in self._FixedPcdVoidTypeDict:
+                            EdkLogger.error("build", FORMAT_INVALID, "{} used in [Depex] section should be used as FixedAtBuild type and VOID* datum type in the module.".format(item))
                         else:
-                            if item not in self._FixedPcdVoidTypeDict:
-                                EdkLogger.error("build", FORMAT_INVALID, "{} used in [Depex] section should be used as FixedAtBuild type and VOID* datum type in the module.".format(item))
-                            else:
-                                Value = self._FixedPcdVoidTypeDict[item]
-                                if len(Value.split(',')) != 16:
-                                    EdkLogger.error("build", FORMAT_INVALID,
-                                                    "{} used in [Depex] section should be used as FixedAtBuild type and VOID* datum type and 16 bytes in the module.".format(item))
-                                NewList.append(Value)
-                    DepexList.extend(NewList)
-                    if DepexList[-1] == 'END':  # no need of a END at this time
-                        DepexList.pop()
-                    DepexList.append(')')
-                    Inherited = True
-                if Inherited:
-                    EdkLogger.verbose("DEPEX[%s] (+%s) = %s" % (self.Name, M.BaseName, DepexList))
-                if 'BEFORE' in DepexList or 'AFTER' in DepexList:
-                    break
-                if len(DepexList) > 0:
-                    EdkLogger.verbose('')
-        return RetVal
+                            Value = self._FixedPcdVoidTypeDict[item]
+                            if len(Value.split(',')) != 16:
+                                EdkLogger.error("build", FORMAT_INVALID,
+                                                "{} used in [Depex] section should be used as FixedAtBuild type and VOID* datum type and 16 bytes in the module.".format(item))
+                            NewList.append(Value)
+                DepexList.extend(NewList)
+                if DepexList[-1] == 'END':  # no need of a END at this time
+                    DepexList.pop()
+                DepexList.append(')')
+                Inherited = True
+            if Inherited:
+                EdkLogger.verbose("DEPEX[%s] (+%s) = %s" % (self.Name, M.BaseName, DepexList))
+            if 'BEFORE' in DepexList or 'AFTER' in DepexList:
+                break
+            if len(DepexList) > 0:
+                EdkLogger.verbose('')
+        return {self.ModuleType:DepexList}
 
     ## Merge dependency expression
     #
@@ -2904,31 +2901,28 @@ class ModuleAutoGen(AutoGen):
         if self.DxsFile or self.IsLibrary or TAB_DEPENDENCY_EXPRESSION_FILE in self.FileTypes:
             return {}
 
-        RetVal = {self.ModuleType:''}
+        DepexExpressionString = ''
+        #
+        # Append depex from dependent libraries, if not "BEFORE", "AFTER" expresion
+        #
+        for M in [self.Module] + self.DependentLibraryList:
+            Inherited = False
+            for D in M.DepexExpression[self.Arch, self.ModuleType]:
+                if DepexExpressionString != '':
+                    DepexExpressionString += ' AND '
+                DepexExpressionString += '('
+                DepexExpressionString += D
+                DepexExpressionString = DepexExpressionString.rstrip('END').strip()
+                DepexExpressionString += ')'
+                Inherited = True
+            if Inherited:
+                EdkLogger.verbose("DEPEX[%s] (+%s) = %s" % (self.Name, M.BaseName, DepexExpressionString))
+            if 'BEFORE' in DepexExpressionString or 'AFTER' in DepexExpressionString:
+                break
+        if len(DepexExpressionString) > 0:
+            EdkLogger.verbose('')
 
-        for ModuleType in RetVal:
-            DepexExpressionString = RetVal[ModuleType]
-            #
-            # Append depex from dependent libraries, if not "BEFORE", "AFTER" expresion
-            #
-            for M in [self.Module] + self.DependentLibraryList:
-                Inherited = False
-                for D in M.DepexExpression[self.Arch, ModuleType]:
-                    if DepexExpressionString != '':
-                        DepexExpressionString += ' AND '
-                    DepexExpressionString += '('
-                    DepexExpressionString += D
-                    DepexExpressionString = DepexExpressionString.rstrip('END').strip()
-                    DepexExpressionString += ')'
-                    Inherited = True
-                if Inherited:
-                    EdkLogger.verbose("DEPEX[%s] (+%s) = %s" % (self.Name, M.BaseName, DepexExpressionString))
-                if 'BEFORE' in DepexExpressionString or 'AFTER' in DepexExpressionString:
-                    break
-            if len(DepexExpressionString) > 0:
-                EdkLogger.verbose('')
-            RetVal[ModuleType] = DepexExpressionString
-        return RetVal
+        return {self.ModuleType:DepexExpressionString}
 
     # Get the tiano core user extension, it is contain dependent library.
     # @retval: a list contain tiano core userextension.
