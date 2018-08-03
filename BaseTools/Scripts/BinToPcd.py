@@ -70,8 +70,7 @@ if __name__ == '__main__':
         #
         # Return a PCD value of the form '{0x01, 0x02, ...}' along with the PCD length in bytes
         #
-        PcdValue = '{' + ', '.join (['0x{Byte:02X}'.format (Byte = Item) for Item in Buffer]) + '}'
-        return PcdValue.encode (), len (Buffer)
+        return '{' + (', '.join (['0x{Byte:02X}'.format (Byte = Item) for Item in Buffer])) + '}', len (Buffer)
 
     #
     # Create command line argument parser object
@@ -81,7 +80,7 @@ if __name__ == '__main__':
                                       conflict_handler = 'resolve')
     parser.add_argument ("-i", "--input", dest = 'InputFile', type = argparse.FileType ('rb'), action='append', required = True,
                          help = "Input binary filename.  Multiple input files are combined into a single PCD.")
-    parser.add_argument ("-o", "--output", dest = 'OutputFile', type = argparse.FileType ('wb'),
+    parser.add_argument ("-o", "--output", dest = 'OutputFile', type = argparse.FileType ('w'),
                          help = "Output filename for PCD value or PCD statement")
     parser.add_argument ("-p", "--pcd", dest = 'PcdName', type = ValidatePcdName,
                          help = "Name of the PCD in the form <PcdTokenSpaceGuidCName>.<PcdCName>")
