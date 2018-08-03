@@ -297,7 +297,7 @@ DumpUint64 (
   Val = *(UINT32*)(Ptr + sizeof (UINT32));
 
   Val <<= 32;
-  Val |= *(UINT32*)Ptr;
+  Val |= (UINT64)*(UINT32*)Ptr;
 
   Print (Format, Val);
 }
