@@ -1329,7 +1329,7 @@ def CreateLibraryPcdCode(Info, AutoGenC, AutoGenH, Pcd):
         AutoGenH.Append('//#define %s  ASSERT(FALSE)  // It is not allowed to set value for a FIXED_AT_BUILD PCD\n' % SetModeName)
 
         ConstFixedPcd = False
-        if PcdItemType == TAB_PCDS_FIXED_AT_BUILD and (key in Info.ConstPcd or (Info.IsLibrary and not Info._ReferenceModules)):
+        if PcdItemType == TAB_PCDS_FIXED_AT_BUILD and (key in Info.ConstPcd or (Info.IsLibrary and not Info.ReferenceModules)):
             ConstFixedPcd = True
             if key in Info.ConstPcd:
                 Pcd.DefaultValue = Info.ConstPcd[key]

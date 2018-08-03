@@ -798,14 +798,14 @@ cleanlib:
                                     Tool = Flag
                                     break
                         if Tool:
-                            if 'PATH' not in self._AutoGenObject._BuildOption[Tool]:
+                            if 'PATH' not in self._AutoGenObject.BuildOption[Tool]:
                                 EdkLogger.error("build", AUTOGEN_ERROR, "%s_PATH doesn't exist in %s ToolChain and %s Arch." %(Tool, self._AutoGenObject.ToolChain, self._AutoGenObject.Arch), ExtraData="[%s]" % str(self._AutoGenObject))
-                            SingleCommandLength += len(self._AutoGenObject._BuildOption[Tool]['PATH'])
+                            SingleCommandLength += len(self._AutoGenObject.BuildOption[Tool]['PATH'])
                             for item in SingleCommandList[1:]:
                                 if FlagDict[Tool]['Macro'] in item:
-                                    if 'FLAGS' not in self._AutoGenObject._BuildOption[Tool]:
+                                    if 'FLAGS' not in self._AutoGenObject.BuildOption[Tool]:
                                         EdkLogger.error("build", AUTOGEN_ERROR, "%s_FLAGS doesn't exist in %s ToolChain and %s Arch." %(Tool, self._AutoGenObject.ToolChain, self._AutoGenObject.Arch), ExtraData="[%s]" % str(self._AutoGenObject))
-                                    Str = self._AutoGenObject._BuildOption[Tool]['FLAGS']
+                                    Str = self._AutoGenObject.BuildOption[Tool]['FLAGS']
                                     for Option in self._AutoGenObject.BuildOption:
                                         for Attr in self._AutoGenObject.BuildOption[Option]:
                                             if Str.find(Option + '_' + Attr) != -1:
@@ -820,7 +820,7 @@ cleanlib:
                                             break
                                     SingleCommandLength += len(Str)
                                 elif '$(INC)' in item:
-                                    SingleCommandLength += self._AutoGenObject.IncludePathLength + len(IncPrefix) * len(self._AutoGenObject._IncludePathList)
+                                    SingleCommandLength += self._AutoGenObject.IncludePathLength + len(IncPrefix) * len(self._AutoGenObject.IncludePathList)
                                 elif item.find('$(') != -1:
                                     Str = item
                                     for Option in self._AutoGenObject.BuildOption:
@@ -846,7 +846,7 @@ cleanlib:
                         Key = Flag + '_RESP'
                         RespMacro = FlagDict[Flag]['Macro'].replace('FLAGS', 'RESP')
                         Value = self._AutoGenObject.BuildOption[Flag]['FLAGS']
-                        for inc in self._AutoGenObject._IncludePathList:
+                        for inc in self._AutoGenObject.IncludePathList:
                             Value += ' ' + IncPrefix + inc
                         for Option in self._AutoGenObject.BuildOption:
                             for Attr in self._AutoGenObject.BuildOption[Option]:
