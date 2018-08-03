@@ -1536,6 +1536,13 @@ class DscBuildData(PlatformBuildClassObject):
             if Setting is None:
                 continue
             PcdValue, DatumType, MaxDatumSize = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
+            if MaxDatumSize:
+                if int(MaxDatumSize, 0) > 0xFFFF:
+                    EdkLogger.error('build', FORMAT_INVALID, "The size value must not exceed the maximum value of 0xFFFF (UINT16) for %s." % ".".join((TokenSpaceGuid, PcdCName)),
+                                    File=self.MetaFile, Line=Dummy4)
+                if int(MaxDatumSize, 0) < 0:
+                    EdkLogger.error('build', FORMAT_INVALID, "The size value can't be set to negative value for %s." % ".".join((TokenSpaceGuid, PcdCName)),
+                                    File=self.MetaFile, Line=Dummy4)
             if (PcdCName, TokenSpaceGuid) in PcdValueDict:
                 PcdValueDict[PcdCName, TokenSpaceGuid][SkuName] = (PcdValue, DatumType, MaxDatumSize)
             else:
@@ -2381,6 +2388,13 @@ class DscBuildData(PlatformBuildClassObject):
                 continue
 
             PcdValue, DatumType, MaxDatumSize = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
+            if MaxDatumSize:
+                if int(MaxDatumSize, 0) > 0xFFFF:
+                    EdkLogger.error('build', FORMAT_INVALID, "The size value must not exceed the maximum value of 0xFFFF (UINT16) for %s." % ".".join((TokenSpaceGuid, PcdCName)),
+                                    File=self.MetaFile, Line=Dummy4)
+                if int(MaxDatumSize, 0) < 0:
+                    EdkLogger.error('build', FORMAT_INVALID, "The size value can't be set to negative value for %s." % ".".join((TokenSpaceGuid, PcdCName)),
+                                    File=self.MetaFile, Line=Dummy4)
             SkuInfo = SkuInfoClass(SkuName, self.SkuIds[SkuName][0], '', '', '', '', '', PcdValue)
             if (PcdCName, TokenSpaceGuid) in Pcds:
                 pcdObject = Pcds[PcdCName, TokenSpaceGuid]
@@ -2714,6 +2728,13 @@ class DscBuildData(PlatformBuildClassObject):
             # until the DEC parser has been called.
             #
             VpdOffset, MaxDatumSize, InitialValue = self._ValidatePcd(PcdCName, TokenSpaceGuid, Setting, Type, Dummy4)
+            if MaxDatumSize:
+                if int(MaxDatumSize, 0) > 0xFFFF:
+                    EdkLogger.error('build', FORMAT_INVALID, "The size value must not exceed the maximum value of 0xFFFF (UINT16) for %s." % ".".join((TokenSpaceGuid, PcdCName)),
+                                    File=self.MetaFile, Line=Dummy4)
+                if int(MaxDatumSize, 0) < 0:
+                    EdkLogger.error('build', FORMAT_INVALID, "The size value can't be set to negative value for %s." % ".".join((TokenSpaceGuid, PcdCName)),
+                                    File=self.MetaFile, Line=Dummy4)
             SkuInfo = SkuInfoClass(SkuName, self.SkuIds[SkuName][0], '', '', '', '', VpdOffset, InitialValue)
             if (PcdCName, TokenSpaceGuid) in Pcds:
                 pcdObject = Pcds[PcdCName, TokenSpaceGuid]
