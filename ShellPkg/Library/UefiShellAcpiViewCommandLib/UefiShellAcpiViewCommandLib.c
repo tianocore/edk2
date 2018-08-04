@@ -66,6 +66,7 @@ RegisterAllParsers (
   EFI_STATUS Status;
   UINTN Count;
 
+  Status = EFI_SUCCESS;
   Count = sizeof (ParserList) / sizeof (ParserList[0]);
 
   while (Count-- != 0) {

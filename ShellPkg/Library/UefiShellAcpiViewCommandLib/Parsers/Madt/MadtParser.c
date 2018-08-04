@@ -231,7 +231,7 @@ ParseAcpiMadt (
       IncrementErrorCount ();
       Print (
          L"ERROR: Invalid Interrupt Controller Length,"
-          " Type = %d, Length = %d\n",
+          L" Type = %d, Length = %d\n",
          *MadtInterruptControllerType,
          *MadtInterruptControllerLength
          );
@@ -256,7 +256,7 @@ ParseAcpiMadt (
           IncrementErrorCount ();
           Print (
             L"ERROR: Only one GICD must be present,"
-              " GICDCount = %d\n",
+              L" GICDCount = %d\n",
             GICDCount
             );
         }
@@ -311,7 +311,7 @@ ParseAcpiMadt (
         IncrementErrorCount ();
         Print (
           L"ERROR: Unknown Interrupt Controller Structure,"
-            " Type = %d, Length = %d\n",
+            L" Type = %d, Length = %d\n",
           *MadtInterruptControllerType,
           *MadtInterruptControllerLength
           );

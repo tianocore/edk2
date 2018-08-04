@@ -889,7 +889,7 @@ BdsEntry (
   // If any component set PcdTestKeyUsed to TRUE because use of a test key
   // was detected, then display a warning message on the debug log and the console
   //
-  if (PcdGetBool (PcdTestKeyUsed) == TRUE) {
+  if (PcdGetBool (PcdTestKeyUsed)) {
     DEBUG ((DEBUG_ERROR, "**********************************\n"));
     DEBUG ((DEBUG_ERROR, "**  WARNING: Test Key is used.  **\n"));
     DEBUG ((DEBUG_ERROR, "**********************************\n"));

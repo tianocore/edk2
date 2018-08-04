@@ -476,6 +476,7 @@ ParseAcpi (
   UINT32  Index;
   UINT32  Offset;
   BOOLEAN HighLight;
+  UINTN   OriginalAttribute;
 
   Offset = 0;
 
@@ -484,7 +485,6 @@ ParseAcpi (
 
   if (Trace && (AsciiName != NULL)){
     HighLight = GetColourHighlighting ();
-    UINTN   OriginalAttribute;
 
     if (HighLight) {
       OriginalAttribute = gST->ConOut->Mode->Attribute;
@@ -516,7 +516,7 @@ ParseAcpi (
       IncrementErrorCount ();
       Print (
         L"\nERROR: %a: Offset Mismatch for %s\n"
-          "CurrentOffset = %d FieldOffset = %d\n",
+          L"CurrentOffset = %d FieldOffset = %d\n",
         AsciiName,
         Parser[Index].NameStr,
         Offset,

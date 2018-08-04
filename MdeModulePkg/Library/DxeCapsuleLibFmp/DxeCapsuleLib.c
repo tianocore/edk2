@@ -610,6 +610,8 @@ DumpAllFmpInfo (
     FreePool(FmpImageInfoBuf);
   }
 
+  FreePool (HandleBuffer);
+
   return ;
 }
 
@@ -618,11 +620,14 @@ DumpAllFmpInfo (
 
   @param[in]     UpdateImageTypeId       Used to identify device firmware targeted by this update.
   @param[in]     UpdateHardwareInstance  The HardwareInstance to target with this update.
-  @param[in,out] NoHandles               The number of handles returned in Buffer.
-  @param[out]    Buffer[out]             A pointer to the buffer to return the requested array of handles.
+  @param[out]    NoHandles               The number of handles returned in HandleBuf.
+  @param[out]    HandleBuf               A pointer to the buffer to return the requested array of handles.
+  @param[out]    ResetRequiredBuf        A pointer to the buffer to return reset required flag for
+                                         the requested array of handles.
 
-  @retval EFI_SUCCESS            The array of handles was returned in Buffer, and the number of
-                                 handles in Buffer was returned in NoHandles.
+  @retval EFI_SUCCESS            The array of handles and their reset required flag were returned in
+                                 HandleBuf and ResetRequiredBuf, and the number of handles in HandleBuf
+                                 was returned in NoHandles.
   @retval EFI_NOT_FOUND          No handles match the search.
   @retval EFI_OUT_OF_RESOURCES   There is not enough pool memory to store the matching results.
 **/
@@ -630,14 +635,16 @@ EFI_STATUS
 GetFmpHandleBufferByType (
   IN     EFI_GUID                     *UpdateImageTypeId,
   IN     UINT64                       UpdateHardwareInstance,
-  IN OUT UINTN                        *NoHandles,
-  OUT    EFI_HANDLE                   **Buffer
+  OUT    UINTN                        *NoHandles, OPTIONAL
+  OUT    EFI_HANDLE                   **HandleBuf, OPTIONAL
+  OUT    BOOLEAN                      **ResetRequiredBuf OPTIONAL
   )
 {
   EFI_STATUS                                    Status;
   EFI_HANDLE                                    *HandleBuffer;
   UINTN                                         NumberOfHandles;
   EFI_HANDLE                                    *MatchedHandleBuffer;
+  BOOLEAN                                       *MatchedResetRequiredBuffer;
   UINTN                                         MatchedNumberOfHandles;
   EFI_FIRMWARE_MANAGEMENT_PROTOCOL              *Fmp;
   UINTN                                         Index;
@@ -651,8 +658,15 @@ GetFmpHandleBufferByType (
   UINTN                                         Index2;
   EFI_FIRMWARE_IMAGE_DESCRIPTOR                 *TempFmpImageInfo;
 
-  *NoHandles = 0;
-  *Buffer = NULL;
+  if (NoHandles != NULL) {
+    *NoHandles = 0;
+  }
+  if (HandleBuf != NULL) {
+    *HandleBuf = NULL;
+  }
+  if (ResetRequiredBuf != NULL) {
+    *ResetRequiredBuf = NULL;
+  }
 
   Status = gBS->LocateHandleBuffer (
                   ByProtocol,
@@ -666,10 +680,26 @@ GetFmpHandleBufferByType (
   }
 
   MatchedNumberOfHandles = 0;
-  MatchedHandleBuffer = AllocateZeroPool (sizeof(EFI_HANDLE) * NumberOfHandles);
-  if (MatchedHandleBuffer == NULL) {
-    FreePool (HandleBuffer);
-    return EFI_OUT_OF_RESOURCES;
+
+  MatchedHandleBuffer = NULL;
+  if (HandleBuf != NULL) {
+    MatchedHandleBuffer = AllocateZeroPool (sizeof(EFI_HANDLE) * NumberOfHandles);
+    if (MatchedHandleBuffer == NULL) {
+      FreePool (HandleBuffer);
+      return EFI_OUT_OF_RESOURCES;
+    }
+  }
+
+  MatchedResetRequiredBuffer = NULL;
+  if (ResetRequiredBuf != NULL) {
+    MatchedResetRequiredBuffer = AllocateZeroPool (sizeof(BOOLEAN) * NumberOfHandles);
+    if (MatchedResetRequiredBuffer == NULL) {
+      if (MatchedHandleBuffer != NULL) {
+        FreePool (MatchedHandleBuffer);
+      }
+      FreePool (HandleBuffer);
+      return EFI_OUT_OF_RESOURCES;
+    }
   }
 
   for (Index = 0; Index < NumberOfHandles; Index++) {
@@ -731,7 +761,15 @@ GetFmpHandleBufferByType (
         if ((UpdateHardwareInstance == 0) ||
             ((FmpImageInfoDescriptorVer >= EFI_FIRMWARE_IMAGE_DESCRIPTOR_VERSION) &&
              (UpdateHardwareInstance == TempFmpImageInfo->HardwareInstance))) {
-          MatchedHandleBuffer[MatchedNumberOfHandles] = HandleBuffer[Index];
+          if (MatchedHandleBuffer != NULL) {
+            MatchedHandleBuffer[MatchedNumberOfHandles] = HandleBuffer[Index];
+          }
+          if (MatchedResetRequiredBuffer != NULL) {
+            MatchedResetRequiredBuffer[MatchedNumberOfHandles] = (((TempFmpImageInfo->AttributesSupported & 
+                                                                 IMAGE_ATTRIBUTE_RESET_REQUIRED) != 0) &&
+                                                                 ((TempFmpImageInfo->AttributesSetting &
+                                                                 IMAGE_ATTRIBUTE_RESET_REQUIRED) != 0));
+          }
           MatchedNumberOfHandles++;
           break;
         }
@@ -741,12 +779,21 @@ GetFmpHandleBufferByType (
     FreePool(FmpImageInfoBuf);
   }
 
+  FreePool (HandleBuffer);
+
   if (MatchedNumberOfHandles == 0) {
     return EFI_NOT_FOUND;
   }
 
-  *NoHandles = MatchedNumberOfHandles;
-  *Buffer = MatchedHandleBuffer;
+  if (NoHandles != NULL) {
+    *NoHandles = MatchedNumberOfHandles;
+  }
+  if (HandleBuf != NULL) {
+    *HandleBuf = MatchedHandleBuffer;
+  }
+  if (ResetRequiredBuf != NULL) {
+    *ResetRequiredBuf = MatchedResetRequiredBuffer;
+  }
 
   return EFI_SUCCESS;
 }
@@ -1074,7 +1121,8 @@ RecordFmpCapsuleStatus (
 
   This function need support nested FMP capsule.
 
-  @param[in]   CapsuleHeader         Points to a capsule header.
+  @param[in]  CapsuleHeader         Points to a capsule header.
+  @param[out] ResetRequired         Indicates whether reset is required or not.
 
   @retval EFI_SUCESS            Process Capsule Image successfully.
   @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
@@ -1084,7 +1132,8 @@ RecordFmpCapsuleStatus (
 **/
 EFI_STATUS
 ProcessFmpCapsuleImage (
-  IN EFI_CAPSULE_HEADER  *CapsuleHeader
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader,
+  OUT BOOLEAN            *ResetRequired OPTIONAL
   )
 {
   EFI_STATUS                                    Status;
@@ -1094,6 +1143,7 @@ ProcessFmpCapsuleImage (
   UINT32                                        ItemNum;
   UINTN                                         Index;
   EFI_HANDLE                                    *HandleBuffer;
+  BOOLEAN                                       *ResetRequiredBuffer;
   UINTN                                         NumberOfHandles;
   UINTN                                         DriverLen;
   UINT64                                        UpdateHardwareInstance;
@@ -1102,7 +1152,7 @@ ProcessFmpCapsuleImage (
   BOOLEAN                                       Abort;
 
   if (!IsFmpCapsuleGuid(&CapsuleHeader->CapsuleGuid)) {
-    return ProcessFmpCapsuleImage ((EFI_CAPSULE_HEADER *)((UINTN)CapsuleHeader + CapsuleHeader->HeaderSize));
+    return ProcessFmpCapsuleImage ((EFI_CAPSULE_HEADER *)((UINTN)CapsuleHeader + CapsuleHeader->HeaderSize), ResetRequired);
   }
 
   NotReady = FALSE;
@@ -1172,9 +1222,12 @@ ProcessFmpCapsuleImage (
                &ImageHeader->UpdateImageTypeId,
                UpdateHardwareInstance,
                &NumberOfHandles,
-               &HandleBuffer
+               &HandleBuffer,
+               &ResetRequiredBuffer
                );
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR(Status) ||
+        (HandleBuffer == NULL) ||
+        (ResetRequiredBuffer == NULL)) {
       NotReady = TRUE;
       RecordFmpCapsuleStatus (
         NULL,
@@ -1205,6 +1258,10 @@ ProcessFmpCapsuleImage (
                  );
       if (Status != EFI_SUCCESS) {
         Abort = TRUE;
+      } else {
+        if (ResetRequired != NULL) {
+          *ResetRequired |= ResetRequiredBuffer[Index2];
+        }
       }
 
       RecordFmpCapsuleStatus (
@@ -1217,6 +1274,9 @@ ProcessFmpCapsuleImage (
     }
     if (HandleBuffer != NULL) {
       FreePool(HandleBuffer);
+    }
+    if (ResetRequiredBuffer != NULL) {
+      FreePool(ResetRequiredBuffer);
     }
   }
 
@@ -1252,8 +1312,6 @@ IsNestedFmpCapsule (
   UINTN                      NestedCapsuleSize;
   ESRT_MANAGEMENT_PROTOCOL   *EsrtProtocol;
   EFI_SYSTEM_RESOURCE_ENTRY  Entry;
-  EFI_HANDLE                 *HandleBuffer;
-  UINTN                      NumberOfHandles;
 
   EsrtGuidFound = FALSE;
   if (mIsVirtualAddrConverted) {
@@ -1282,18 +1340,15 @@ IsNestedFmpCapsule (
     // Check Firmware Management Protocols
     //
     if (!EsrtGuidFound) {
-      HandleBuffer = NULL;
       Status = GetFmpHandleBufferByType (
                  &CapsuleHeader->CapsuleGuid,
                  0,
-                 &NumberOfHandles,
-                 &HandleBuffer
+                 NULL,
+                 NULL,
+                 NULL
                  );
       if (!EFI_ERROR(Status)) {
         EsrtGuidFound = TRUE;
-      }
-      if (HandleBuffer != NULL) {
-        FreePool (HandleBuffer);
       }
     }
   }
@@ -1382,6 +1437,7 @@ SupportCapsuleImage (
   Caution: This function may receive untrusted input.
 
   @param[in]  CapsuleHeader         Points to a capsule header.
+  @param[out] ResetRequired         Indicates whether reset is required or not.
 
   @retval EFI_SUCESS            Process Capsule Image successfully.
   @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
@@ -1390,8 +1446,9 @@ SupportCapsuleImage (
 **/
 EFI_STATUS
 EFIAPI
-ProcessCapsuleImage (
-  IN EFI_CAPSULE_HEADER  *CapsuleHeader
+ProcessThisCapsuleImage (
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader,
+  OUT BOOLEAN            *ResetRequired OPTIONAL
   )
 {
   EFI_STATUS                   Status;
@@ -1428,13 +1485,34 @@ ProcessCapsuleImage (
     // Process EFI FMP Capsule
     //
     DEBUG((DEBUG_INFO, "ProcessFmpCapsuleImage ...\n"));
-    Status = ProcessFmpCapsuleImage(CapsuleHeader);
+    Status = ProcessFmpCapsuleImage(CapsuleHeader, ResetRequired);
     DEBUG((DEBUG_INFO, "ProcessFmpCapsuleImage - %r\n", Status));
 
     return Status;
   }
 
   return EFI_UNSUPPORTED;
+}
+
+/**
+  The firmware implements to process the capsule image.
+
+  Caution: This function may receive untrusted input.
+
+  @param[in]  CapsuleHeader         Points to a capsule header.
+
+  @retval EFI_SUCESS            Process Capsule Image successfully.
+  @retval EFI_UNSUPPORTED       Capsule image is not supported by the firmware.
+  @retval EFI_VOLUME_CORRUPTED  FV volume in the capsule is corrupted.
+  @retval EFI_OUT_OF_RESOURCES  Not enough memory.
+**/
+EFI_STATUS
+EFIAPI
+ProcessCapsuleImage (
+  IN EFI_CAPSULE_HEADER  *CapsuleHeader
+  )
+{
+  return ProcessThisCapsuleImage (CapsuleHeader, NULL);
 }
 
 /**
