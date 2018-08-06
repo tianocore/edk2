@@ -43,7 +43,7 @@ UINTN                 mStructureTablePages     = 0;
 BOOLEAN               mEndOfDxe                = FALSE;
 
 /**
-  Allocate memory for legacy usage.
+  Allocate memory for legacy usage. The memory is executable.
 
   @param  AllocateType               The type of allocation to perform.
   @param  MemoryType                 The type of memory to allocate.
@@ -51,8 +51,8 @@ BOOLEAN               mEndOfDxe                = FALSE;
   @param  Pages                      Number of pages to allocate
   @param  Result                     Result of allocation
 
-  @retval EFI_SUCCESS                Legacy16 code loaded
-  @retval Other                      No protocol installed, unload driver.
+  @retval EFI_SUCCESS                Legacy memory is allocated successfully.
+  @retval Other                      Legacy memory is not allocated.
 
 **/
 EFI_STATUS
@@ -64,8 +64,9 @@ AllocateLegacyMemory (
   OUT EFI_PHYSICAL_ADDRESS      *Result
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  MemPage;
+  EFI_STATUS                      Status;
+  EFI_PHYSICAL_ADDRESS            MemPage;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR MemDesc;
 
   //
   // Allocate Pages of memory less <= StartPageAddress
@@ -82,11 +83,28 @@ AllocateLegacyMemory (
   // memory is already taken but that is ok.
   //
   if (!EFI_ERROR (Status)) {
+    if (MemoryType != EfiBootServicesCode) {
+      //
+      // Make sure that the buffer can be used to store code.
+      //
+      Status = gDS->GetMemorySpaceDescriptor (MemPage, &MemDesc);
+      if (!EFI_ERROR (Status) && (MemDesc.Attributes & EFI_MEMORY_XP) != 0) {
+        Status = gDS->SetMemorySpaceAttributes (
+                        MemPage,
+                        EFI_PAGES_TO_SIZE (Pages),
+                        MemDesc.Attributes & (~EFI_MEMORY_XP)
+                        );
+      }
+      if (EFI_ERROR (Status)) {
+        gBS->FreePages (MemPage, Pages);
+      }
+    }
+  }
+
+  if (!EFI_ERROR (Status)) {
     *Result = (EFI_PHYSICAL_ADDRESS) (UINTN) MemPage;
   }
-  //
-  // If reach here the status = EFI_SUCCESS
-  //
+
   return Status;
 }
 
