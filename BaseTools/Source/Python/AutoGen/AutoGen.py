@@ -3240,7 +3240,7 @@ class ModuleAutoGen(AutoGen):
                 # match tool chain
                 if F.TagName not in ToolChainTagSet:
                     EdkLogger.debug(EdkLogger.DEBUG_9, "The toolchain [%s] for processing file [%s] is found, "
-                                    "but [%s] is needed" % (F.TagName, str(F), self.ToolChain))
+                                    "but [%s] is currently used" % (F.TagName, str(F), self.ToolChain))
                     continue
                 # match tool chain family or build rule family
                 if F.ToolChainFamily not in ToolChainFamilySet:
