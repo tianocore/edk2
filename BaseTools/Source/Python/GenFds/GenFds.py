@@ -44,6 +44,7 @@ from Common.MultipleWorkspace import MultipleWorkspace as mws
 from . import FfsFileStatement
 import glob
 from struct import unpack
+from Common.GlobalData import gGuidPattern
 
 ## Version and Copyright
 versionNumber = "1.0" + ' ' + gBUILD_VERSION
@@ -605,11 +606,7 @@ class GenFds :
         GuidDict = {}
         ModuleList = []
         FileGuidList = []
-        GuidPattern = re.compile("\s*([0-9a-fA-F]){8}-"
-                                       "([0-9a-fA-F]){4}-"
-                                       "([0-9a-fA-F]){4}-"
-                                       "([0-9a-fA-F]){4}-"
-                                       "([0-9a-fA-F]){12}\s*")
+        GuidPattern = gGuidPattern
         for Arch in ArchList:
             PlatformDataBase = BuildDb.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             for ModuleFile in PlatformDataBase.Modules:
