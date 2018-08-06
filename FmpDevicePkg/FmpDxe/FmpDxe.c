@@ -906,9 +906,6 @@ SetTheImage (
   UINT32      AllHeaderSize;
   UINT32      IncommingFwVersion;
   UINT32      LastAttemptStatus;
-  EFI_STATUS  GetAttributesStatus;
-  UINT64      AttributesSupported;
-  UINT64      AttributesSetting;
   UINT32      Version;
   UINT32      LowestSupportedVersion;
 
@@ -1121,18 +1118,6 @@ SetTheImage (
 
   LastAttemptStatus = LAST_ATTEMPT_STATUS_SUCCESS;
 
-  //
-  // Set flag so the descriptor is repopulated
-  // This is only applied to devices that do not require reset
-  //
-  GetAttributesStatus = FmpDeviceGetAttributes (&AttributesSupported, &AttributesSetting);
-  if (!EFI_ERROR (GetAttributesStatus)) {
-    if (((AttributesSupported & IMAGE_ATTRIBUTE_RESET_REQUIRED) == 0) ||
-        ((AttributesSetting & IMAGE_ATTRIBUTE_RESET_REQUIRED) == 0)) {
-      mDescriptorPopulated = FALSE;
-    }
-  }
-
 cleanup:
   mProgressFunc = NULL;
   mProgressSupported = FALSE;
@@ -1144,6 +1129,12 @@ cleanup:
     //
     Progress (100);
   }
+
+  //
+  // Need repopulate after SetImage is called to
+  // update LastAttemptVersion and LastAttemptStatus.
+  //
+  mDescriptorPopulated = FALSE;
 
   return Status;
 }
