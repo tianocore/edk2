@@ -530,26 +530,24 @@ class BuildRule:
     #
     #   @param  LineIndex   The line index of build rule text
     #
-    def ParseInputFile(self, LineIndex):
+    def ParseInputFileSubSection(self, LineIndex):
         FileList = [File.strip() for File in self.RuleContent[LineIndex].split(",")]
         for ToolChainFamily in self._FamilyList:
-            InputFiles = self._RuleInfo[ToolChainFamily, self._State]
-            if InputFiles is None:
-                InputFiles = []
-                self._RuleInfo[ToolChainFamily, self._State] = InputFiles
-            InputFiles.extend(FileList)
+            if self._RuleInfo[ToolChainFamily, self._State] is None:
+                self._RuleInfo[ToolChainFamily, self._State] = []
+            self._RuleInfo[ToolChainFamily, self._State].extend(FileList)
 
     ## Parse <ExtraDependency> sub-section
+    ## Parse <OutputFile> sub-section
+    ## Parse <Command> sub-section
     #
     #   @param  LineIndex   The line index of build rule text
     #
-    def ParseCommon(self, LineIndex):
+    def ParseCommonSubSection(self, LineIndex):
         for ToolChainFamily in self._FamilyList:
-            Items = self._RuleInfo[ToolChainFamily, self._State]
-            if Items is None:
-                Items = []
-                self._RuleInfo[ToolChainFamily, self._State] = Items
-            Items.append(self.RuleContent[LineIndex])
+            if self._RuleInfo[ToolChainFamily, self._State] is None:
+                self._RuleInfo[ToolChainFamily, self._State] = []
+            self._RuleInfo[ToolChainFamily, self._State].append(self.RuleContent[LineIndex])
 
     ## Get a build rule via [] operator
     #
@@ -584,10 +582,10 @@ class BuildRule:
         _Section           : ParseSection,
         _SubSectionHeader  : ParseSubSectionHeader,
         _SubSection        : ParseSubSection,
-        _InputFile         : ParseInputFile,
-        _OutputFile        : ParseCommon,
-        _ExtraDependency   : ParseCommon,
-        _Command           : ParseCommon,
+        _InputFile         : ParseInputFileSubSection,
+        _OutputFile        : ParseCommonSubSection,
+        _ExtraDependency   : ParseCommonSubSection,
+        _Command           : ParseCommonSubSection,
         _UnknownSection    : SkipSection,
     }
 
