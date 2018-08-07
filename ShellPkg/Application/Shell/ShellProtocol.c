@@ -2924,36 +2924,15 @@ EfiShellSetEnv(
   //
   // Make sure we dont 'set' a predefined read only variable
   //
-  if (gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"cwd") == 0
-    ||gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"Lasterror") == 0
-    ||gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"profiles") == 0
-    ||gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"uefishellsupport") == 0
-    ||gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"uefishellversion") == 0
-    ||gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        L"uefiversion") == 0
-    ||(!ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoNest &&
-      gUnicodeCollation->StriColl(
-        gUnicodeCollation,
-        (CHAR16*)Name,
-        (CHAR16*)mNoNestingEnvVarName) == 0)
-       ){
+  if ((StrCmp (Name, L"cwd") == 0) ||
+      (StrCmp (Name, L"lasterror") == 0) ||
+      (StrCmp (Name, L"profiles") == 0) ||
+      (StrCmp (Name, L"uefishellsupport") == 0) ||
+      (StrCmp (Name, L"uefishellversion") == 0) ||
+      (StrCmp (Name, L"uefiversion") == 0) ||
+      (!ShellInfoObject.ShellInitSettings.BitUnion.Bits.NoNest &&
+       StrCmp (Name, mNoNestingEnvVarName) == 0)
+     ) {
     return (EFI_INVALID_PARAMETER);
   }
   return (InternalEfiShellSetEnv(Name, Value, Volatile));
