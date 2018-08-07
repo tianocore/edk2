@@ -985,6 +985,11 @@ class PcdReport(object):
                         continue
                     InfDefaultValue, PcdValue = ModulePcdSet[Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type]
                     Pcd.DefaultValue = PcdValue
+                    if InfDefaultValue:
+                        try:
+                            InfDefaultValue = ValueExpressionEx(InfDefaultValue, Pcd.DatumType, self._GuidDict)(True)
+                        except BadExpression as InfDefaultValue:
+                            EdkLogger.error('BuildReport', FORMAT_INVALID, "PCD Value: %s, Type: %s" % (InfDefaultValue, Pcd.DatumType))
                     if InfDefaultValue == "":
                         InfDefaultValue = None
 
