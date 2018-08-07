@@ -1248,32 +1248,18 @@ FmpDxeLockEventNotify (
   EFI_STATUS  Status;
 
   if (!mFmpDeviceLocked) {
-    if (IsLockFmpDeviceAtLockEventGuidRequired ()) {
-      //
-      // Lock all UEFI Variables used by this module.
-      //
-      Status = LockAllFmpVariables ();
-      if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_ERROR, "FmpDxe: Failed to lock variables.  Status = %r.\n"));
+    //
+    // Lock the firmware device
+    //
+    Status = FmpDeviceLock();
+    if (EFI_ERROR (Status)) {
+      if (Status != EFI_UNSUPPORTED) {
+        DEBUG ((DEBUG_ERROR, "FmpDxe: FmpDeviceLock() returned error.  Status = %r\n", Status));
       } else {
-        DEBUG ((DEBUG_INFO, "FmpDxe: All variables locked\n"));
+        DEBUG ((DEBUG_WARN, "FmpDxe: FmpDeviceLock() returned error.  Status = %r\n", Status));
       }
-
-      //
-      // Lock the firmware device
-      //
-      Status = FmpDeviceLock();
-      if (EFI_ERROR (Status)) {
-        if (Status != EFI_UNSUPPORTED) {
-          DEBUG ((DEBUG_ERROR, "FmpDxe: FmpDeviceLock() returned error.  Status = %r\n", Status));
-        } else {
-          DEBUG ((DEBUG_WARN, "FmpDxe: FmpDeviceLock() returned error.  Status = %r\n", Status));
-        }
-      }
-      mFmpDeviceLocked = TRUE;
-    } else {
-      DEBUG ((DEBUG_VERBOSE, "FmpDxe: Not calling FmpDeviceLock() because mfg mode\n"));
     }
+    mFmpDeviceLocked = TRUE;
   }
 }
 
@@ -1417,6 +1403,45 @@ FmpDxeEntryPoint (
   //
   DetectTestKey ();
 
+  if (IsLockFmpDeviceAtLockEventGuidRequired ()) {
+    //
+    // Lock all UEFI Variables used by this module.
+    //
+    Status = LockAllFmpVariables ();
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "FmpDxe: Failed to lock variables.  Status = %r.\n", Status));
+    } else {
+      DEBUG ((DEBUG_INFO, "FmpDxe: All variables locked\n"));
+    }
+
+    //
+    // Register notify function to lock the FMP device.
+    // The lock event GUID is retrieved from PcdFmpDeviceLockEventGuid.
+    // If PcdFmpDeviceLockEventGuid is not the size of an EFI_GUID, then
+    // gEfiEndOfDxeEventGroupGuid is used.
+    //
+    LockGuid = &gEfiEndOfDxeEventGroupGuid;
+    if (PcdGetSize (PcdFmpDeviceLockEventGuid) == sizeof (EFI_GUID)) {
+      LockGuid = (EFI_GUID *)PcdGetPtr (PcdFmpDeviceLockEventGuid);
+    }
+    DEBUG ((DEBUG_INFO, "FmpDxe: Lock GUID: %g\n", LockGuid));
+
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    FmpDxeLockEventNotify,
+                    NULL,
+                    LockGuid,
+                    &mFmpDeviceLockEvent
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "FmpDxe: Failed to register notification.  Status = %r\n", Status));
+    }
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    DEBUG ((DEBUG_VERBOSE, "FmpDxe: Not registering notification to call FmpDeviceLock() because mfg mode\n"));
+  }
+
   //
   // Register with library the install function so if the library uses
   // UEFI driver model/driver binding protocol it can install FMP on its device handle
@@ -1435,31 +1460,6 @@ FmpDxeEntryPoint (
       "FmpDxe: FmpDeviceLib registration returned EFI_SUCCESS.  Expect FMP to be installed during the BDS/Device connection phase.\n"
       ));
   }
-
-  //
-  // Register notify function to lock the FMP device.
-  // The lock event GUID is retrieved from PcdFmpDeviceLockEventGuid.
-  // If PcdFmpDeviceLockEventGuid is not the size of an EFI_GUID, then
-  // gEfiEndOfDxeEventGroupGuid is used.
-  //
-  LockGuid = &gEfiEndOfDxeEventGroupGuid;
-  if (PcdGetSize (PcdFmpDeviceLockEventGuid) == sizeof (EFI_GUID)) {
-    LockGuid = (EFI_GUID *)PcdGetPtr (PcdFmpDeviceLockEventGuid);
-  }
-  DEBUG ((DEBUG_INFO, "FmpDxe: Lock GUID: %g\n", LockGuid));
-
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  FmpDxeLockEventNotify,
-                  NULL,
-                  LockGuid,
-                  &mFmpDeviceLockEvent
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "FmpDxe: Failed to register for ready to boot.  Status = %r\n", Status));
-  }
-  ASSERT_EFI_ERROR (Status);
 
   return Status;
 }
