@@ -24,7 +24,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/IsaIo.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/DriverBinding.h>
-#include <Protocol/GenericMemoryTest.h>
 #include <Guid/StatusCodeDataTypeId.h>
 
 #include <Library/DebugLib.h>

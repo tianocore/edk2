@@ -62,7 +62,6 @@
   gEfiSioProtocolGuid                           ## TO_START
   gEfiPciIoProtocolGuid                         ## TO_START
   gEfiDevicePathProtocolGuid                    ## TO_START
-  gEfiGenericMemTestProtocolGuid                ## TO_START
 
 [Pcd]
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdIsaBusSupportedFeatures  ## CONSUMES
