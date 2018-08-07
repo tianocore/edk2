@@ -59,22 +59,33 @@ if /I "%1"=="/help" goto Usage
 
 if /I "%1"=="NewBuild" shift
 if not defined EDK_TOOLS_PATH (
-  if exist %WORKSPACE%\BaseTools (
-    set EDK_TOOLS_PATH=%WORKSPACE%\BaseTools
-  ) else (
-    if defined PACKAGES_PATH (
-      for %%i IN (%PACKAGES_PATH%) DO (
-        if exist %%~fi\BaseTools (
-          set EDK_TOOLS_PATH=%%~fi\BaseTools
-          goto checkNt32Flag
-        )
+  goto SetEdkToolsPath
+) else (
+  goto checkNt32Flag
+)
+
+:SetEdkToolsPath
+if %WORKSPACE:~-1% EQU \ (
+  @set EDK_BASETOOLS=%WORKSPACE%BaseTools
+) else (
+  @set EDK_BASETOOLS=%WORKSPACE%\BaseTools
+)
+if exist %EDK_BASETOOLS% (
+  set EDK_TOOLS_PATH=%EDK_BASETOOLS%
+  set EDK_BASETOOLS=
+) else (
+  if defined PACKAGES_PATH (
+    for %%i IN (%PACKAGES_PATH%) DO (
+      if exist %%~fi\BaseTools (
+        set EDK_TOOLS_PATH=%%~fi\BaseTools
+        goto checkNt32Flag
       )
-    ) else (
-      echo.
-      echo !!! ERROR !!! Cannot find BaseTools !!!
-      echo.
-      goto BadBaseTools
     )
+  ) else (
+    echo.
+    echo !!! ERROR !!! Cannot find BaseTools !!!
+    echo.
+    goto BadBaseTools
   )
 )
 
