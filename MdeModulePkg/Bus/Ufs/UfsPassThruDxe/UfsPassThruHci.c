@@ -753,31 +753,6 @@ UfsFindAvailableSlotInTrl (
   return EFI_NOT_READY;
 }
 
-/**
-  Find out available slot in task management transfer list of a UFS device.
-
-  @param[in]  Private       The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
-  @param[out] Slot          The available slot.
-
-  @retval EFI_SUCCESS       The available slot was found successfully.
-
-**/
-EFI_STATUS
-UfsFindAvailableSlotInTmrl (
-  IN     UFS_PASS_THRU_PRIVATE_DATA   *Private,
-     OUT UINT8                        *Slot
-  )
-{
-  ASSERT ((Private != NULL) && (Slot != NULL));
-
-  //
-  // The simplest algo to always use slot 0.
-  // TODO: enhance it to support async transfer with multiple slot.
-  //
-  *Slot = 0;
-
-  return EFI_SUCCESS;
-}
 
 /**
   Start specified slot in transfer list of a UFS device.
@@ -1229,31 +1204,7 @@ UfsSetFlag (
   return Status;
 }
 
-/**
-  Clear specified flag to 0 on a UFS device.
 
-  @param[in]  Private           The pointer to the UFS_PASS_THRU_PRIVATE_DATA data structure.
-  @param[in]  FlagId            The ID of flag to be cleared.
-
-  @retval EFI_SUCCESS           The flag was cleared successfully.
-  @retval EFI_DEVICE_ERROR      A device error occurred while attempting to clear the flag.
-  @retval EFI_TIMEOUT           A timeout occurred while waiting for the completion of clearing the flag.
-
-**/
-EFI_STATUS
-UfsClearFlag (
-  IN  UFS_PASS_THRU_PRIVATE_DATA   *Private,
-  IN  UINT8                        FlagId
-  )
-{
-  EFI_STATUS             Status;
-  UINT8                  Value;
-
-  Value  = 0;
-  Status = UfsRwFlags (Private, FALSE, FlagId, &Value);
-
-  return Status;
-}
 
 /**
   Read specified flag from a UFS device.
