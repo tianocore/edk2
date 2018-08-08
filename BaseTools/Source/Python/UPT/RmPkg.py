@@ -23,7 +23,7 @@ import os.path
 from stat import S_IWUSR
 from traceback import format_exc
 from platform import python_version
-import md5
+from hashlib import md5
 from sys import stdin
 from sys import platform
 
@@ -242,7 +242,7 @@ def RemoveDist(Guid, Version, StoredDistFile, DataBase, WorkspaceDir, ForceRemov
                 #
                 # check whether modified by users
                 #
-                Md5Sigature = md5.new(open(str(Path), 'rb').read())
+                Md5Sigature = md5(open(str(Path), 'rb').read())
                 if Md5Sum != Md5Sigature.hexdigest():
                     Logger.Info(ST.MSG_CONFIRM_REMOVE2 % Path)
                     Input = stdin.readline()

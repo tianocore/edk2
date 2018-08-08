@@ -27,7 +27,7 @@ from sys import stdin
 from sys import platform
 from traceback import format_exc
 from platform import python_version
-import md5
+from hashlib import md5
 from time import strftime
 from time import localtime
 from uuid import uuid4
@@ -196,7 +196,7 @@ def Main(Options = None):
         #
         # Add Md5Sigature
         #
-        DistPkg.Header.Signature = md5.new(open(str(ContentFile), 'rb').read()).hexdigest()
+        DistPkg.Header.Signature = md5(open(str(ContentFile), 'rb').read()).hexdigest()
         #
         # Add current Date
         #

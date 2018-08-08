@@ -19,7 +19,7 @@ GenDEC
 import os
 import stat
 import codecs
-import md5
+from hashlib import md5
 from Core.FileHook import __FileHookOpen__
 from Library.Parsing import GenSection
 from Library.CommentGenerating import GenHeaderCommentSection
@@ -646,7 +646,7 @@ def GenPackageUNIEncodeFile(PackageObject, UniFileHeader = '', Encoding=TAB_ENCO
     File = codecs.open(ContainerFile, 'w', Encoding)
     File.write(u'\uFEFF' + Content)
     File.stream.close()
-    Md5Sigature = md5.new(__FileHookOpen__(str(ContainerFile), 'rb').read())
+    Md5Sigature = md5(__FileHookOpen__(str(ContainerFile), 'rb').read())
     Md5Sum = Md5Sigature.hexdigest()
     if (ContainerFile, Md5Sum) not in PackageObject.FileList:
         PackageObject.FileList.append((ContainerFile, Md5Sum))

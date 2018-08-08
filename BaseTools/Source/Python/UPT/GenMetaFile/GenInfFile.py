@@ -18,7 +18,7 @@ GenInf
 import os
 import stat
 import codecs
-import md5
+from hashlib import md5
 from Core.FileHook import __FileHookOpen__
 from Library.StringUtils import GetSplitValueList
 from Library.Parsing import GenSection
@@ -255,7 +255,7 @@ def GenModuleUNIEncodeFile(ModuleObject, UniFileHeader='', Encoding=DT.TAB_ENCOD
         File = codecs.open(ContainerFile, 'wb', Encoding)
         File.write(u'\uFEFF' + Content)
         File.stream.close()
-    Md5Sigature = md5.new(__FileHookOpen__(str(ContainerFile), 'rb').read())
+    Md5Sigature = md5(__FileHookOpen__(str(ContainerFile), 'rb').read())
     Md5Sum = Md5Sigature.hexdigest()
     if (ContainerFile, Md5Sum) not in ModuleObject.FileList:
         ModuleObject.FileList.append((ContainerFile, Md5Sum))
