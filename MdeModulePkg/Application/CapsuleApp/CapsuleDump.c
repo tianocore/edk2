@@ -106,37 +106,6 @@ DumpUxCapsule (
   Print(L"  OffsetY          - 0x%x\n", DisplayCapsule->ImagePayload.OffsetY);
 }
 
-/**
-  Dump FMP image authentication information.
-
-  @param[in] Image      The FMP capsule image
-  @param[in] ImageSize  The size of the FMP capsule image in bytes.
-
-  @return the size of FMP authentication.
-**/
-UINTN
-DumpImageAuthentication (
-  IN VOID   *Image,
-  IN UINTN  ImageSize
-  )
-{
-  EFI_FIRMWARE_IMAGE_AUTHENTICATION             *ImageAuthentication;
-
-  ImageAuthentication = Image;
-  if (CompareGuid(&ImageAuthentication->AuthInfo.CertType, &gEfiCertPkcs7Guid) ||
-      CompareGuid(&ImageAuthentication->AuthInfo.CertType, &gEfiCertTypeRsa2048Sha256Guid)) {
-    Print(L"[ImageAuthentication]\n");
-    Print(L"  MonotonicCount   - 0x%lx\n", ImageAuthentication->MonotonicCount);
-    Print(L"WIN_CERTIFICATE:\n");
-    Print(L"  dwLength         - 0x%x\n", ImageAuthentication->AuthInfo.Hdr.dwLength);
-    Print(L"  wRevision        - 0x%x\n", ImageAuthentication->AuthInfo.Hdr.wRevision);
-    Print(L"  wCertificateType - 0x%x\n", ImageAuthentication->AuthInfo.Hdr.wCertificateType);
-    Print(L"  CertType         - %g\n", &ImageAuthentication->AuthInfo.CertType);
-    return sizeof(ImageAuthentication->MonotonicCount) + ImageAuthentication->AuthInfo.Hdr.dwLength;
-  } else {
-    return 0;
-  }
-}
 
 /**
   Dump a non-nested FMP capsule.
