@@ -443,51 +443,6 @@ GetGuardMapBit (
   return 0;
 }
 
-/**
-  Set the bit in bitmap table for the given address.
-
-  @param[in]  Address     The address to set for.
-
-  @return VOID.
-**/
-VOID
-EFIAPI
-SetGuardMapBit (
-  IN EFI_PHYSICAL_ADDRESS    Address
-  )
-{
-  UINT64        *GuardMap;
-  UINT64        BitMask;
-
-  FindGuardedMemoryMap (Address, TRUE, &GuardMap);
-  if (GuardMap != NULL) {
-    BitMask = LShiftU64 (1, GUARDED_HEAP_MAP_ENTRY_BIT_INDEX (Address));
-    *GuardMap |= BitMask;
-  }
-}
-
-/**
-  Clear the bit in bitmap table for the given address.
-
-  @param[in]  Address     The address to clear for.
-
-  @return VOID.
-**/
-VOID
-EFIAPI
-ClearGuardMapBit (
-  IN EFI_PHYSICAL_ADDRESS    Address
-  )
-{
-  UINT64        *GuardMap;
-  UINT64        BitMask;
-
-  FindGuardedMemoryMap (Address, TRUE, &GuardMap);
-  if (GuardMap != NULL) {
-    BitMask = LShiftU64 (1, GUARDED_HEAP_MAP_ENTRY_BIT_INDEX (Address));
-    *GuardMap &= ~BitMask;
-  }
-}
 
 /**
   Check to see if the page at the given address is a Guard page or not.
@@ -514,39 +469,6 @@ IsGuardPage (
   return ((BitMap == BIT0) || (BitMap == BIT2) || (BitMap == (BIT2 | BIT0)));
 }
 
-/**
-  Check to see if the page at the given address is a head Guard page or not.
-
-  @param[in]  Address     The address to check for
-
-  @return TRUE  The page at Address is a head Guard page
-  @return FALSE The page at Address is not a head Guard page
-**/
-BOOLEAN
-EFIAPI
-IsHeadGuard (
-  IN EFI_PHYSICAL_ADDRESS    Address
-  )
-{
-  return (GetGuardedMemoryBits (Address, 2) == BIT1);
-}
-
-/**
-  Check to see if the page at the given address is a tail Guard page or not.
-
-  @param[in]  Address     The address to check for.
-
-  @return TRUE  The page at Address is a tail Guard page.
-  @return FALSE The page at Address is not a tail Guard page.
-**/
-BOOLEAN
-EFIAPI
-IsTailGuard (
-  IN EFI_PHYSICAL_ADDRESS    Address
-  )
-{
-  return (GetGuardedMemoryBits (Address - EFI_PAGE_SIZE, 2) == BIT0);
-}
 
 /**
   Check to see if the page at the given address is guarded or not.

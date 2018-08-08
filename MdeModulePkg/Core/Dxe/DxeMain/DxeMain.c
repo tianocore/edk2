@@ -560,28 +560,6 @@ DxeMain (
 
 
 
-/**
-  Place holder function until all the Boot Services and Runtime Services are
-  available.
-
-  @return EFI_NOT_AVAILABLE_YET
-
-**/
-EFI_STATUS
-EFIAPI
-CoreEfiNotAvailableYetArg0 (
-  VOID
-  )
-{
-  //
-  // This function should never be executed.  If it does, then the architectural protocols
-  // have not been designed correctly.  The CpuBreakpoint () is commented out for now until the
-  // DXE Core and all the Architectural Protocols are complete.
-  //
-
-  return EFI_NOT_AVAILABLE_YET;
-}
-
 
 /**
   Place holder function until all the Boot Services and Runtime Services are

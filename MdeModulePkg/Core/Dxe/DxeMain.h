@@ -2177,19 +2177,6 @@ CoreDisplayDiscoveredNotDispatched (
   );
 
 
-/**
-  Place holder function until all the Boot Services and Runtime Services are
-  available.
-
-  @return EFI_NOT_AVAILABLE_YET
-
-**/
-EFI_STATUS
-EFIAPI
-CoreEfiNotAvailableYetArg0 (
-  VOID
-  );
-
 
 /**
   Place holder function until all the Boot Services and Runtime Services are
