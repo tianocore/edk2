@@ -360,6 +360,8 @@ def GuidStructureByteArrayToGuidString(GuidValue):
 #   @retval     string      The GUID value in xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx format
 #
 def GuidStructureStringToGuidString(GuidValue):
+    if not GlobalData.gGuidCFormatPattern.match(GuidValue):
+        return ''
     guidValueString = GuidValue.lower().replace("{", "").replace("}", "").replace(" ", "").replace(";", "")
     guidValueList = guidValueString.split(",")
     if len(guidValueList) != 11:
@@ -1327,7 +1329,7 @@ def ParseFieldValue (Value):
         Value = Value.split('(', 1)[1][:-1].strip()
         if Value[0] == '{' and Value[-1] == '}':
             TmpValue = GuidStructureStringToGuidString(Value)
-            if len(TmpValue) == 0:
+            if not TmpValue:
                 raise BadExpression("Invalid GUID value string %s" % Value)
             Value = TmpValue
         if Value[0] == '"' and Value[-1] == '"':
