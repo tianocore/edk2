@@ -1131,18 +1131,6 @@ IsUnicodeFiFoFull (
   TERMINAL_DEV  *TerminalDevice
   );
 
-/**
-  Count Unicode FIFO buffer.
-
-  @param  TerminalDevice       Terminal driver private structure
-
-  @return The count in bytes of Unicode FIFO.
-
-**/
-UINT8
-UnicodeFiFoGetKeyCount (
-  TERMINAL_DEV    *TerminalDevice
-  );
 
 /**
   Translate raw data into Unicode (according to different encode), and
