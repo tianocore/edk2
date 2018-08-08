@@ -504,12 +504,12 @@ class GenVPD :
         # Sort fixed offset list in order to find out where has free spaces for the pcd's offset
         # value is "*" to insert into.
 
-        self.PcdFixedOffsetSizeList.sort(lambda x, y: cmp(x.PcdBinOffset, y.PcdBinOffset))
+        self.PcdFixedOffsetSizeList.sort(key=lambda x: x.PcdBinOffset)
 
         #
         # Sort the un-fixed pcd's offset by it's size.
         #
-        self.PcdUnknownOffsetList.sort(lambda x, y: cmp(x.PcdBinSize, y.PcdBinSize))
+        self.PcdUnknownOffsetList.sort(key=lambda x: x.PcdBinSize)
 
         index =0
         for pcd in self.PcdUnknownOffsetList:

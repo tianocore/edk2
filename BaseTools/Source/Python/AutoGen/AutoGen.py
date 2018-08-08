@@ -870,7 +870,7 @@ class WorkspaceAutoGen(AutoGen):
         for Pa in self.AutoGenObjectList:
             for Package in Pa.PackageList:
                 PcdList = Package.Pcds.values()
-                PcdList.sort(lambda x, y: cmp(int(x.TokenValue, 0), int(y.TokenValue, 0)))
+                PcdList.sort(key=lambda x: int(x.TokenValue, 0))
                 Count = 0
                 while (Count < len(PcdList) - 1) :
                     Item = PcdList[Count]
@@ -891,7 +891,7 @@ class WorkspaceAutoGen(AutoGen):
                         #
                         # Sort same token value PCD list with TokenGuid and TokenCName
                         #
-                        SameTokenValuePcdList.sort(lambda x, y: cmp("%s.%s" % (x.TokenSpaceGuidCName, x.TokenCName), "%s.%s" % (y.TokenSpaceGuidCName, y.TokenCName)))
+                        SameTokenValuePcdList.sort(key=lambda x: "%s.%s" % (x.TokenSpaceGuidCName, x.TokenCName))
                         SameTokenValuePcdListCount = 0
                         while (SameTokenValuePcdListCount < len(SameTokenValuePcdList) - 1):
                             Flag = False
@@ -916,7 +916,7 @@ class WorkspaceAutoGen(AutoGen):
                     Count += 1
 
                 PcdList = Package.Pcds.values()
-                PcdList.sort(lambda x, y: cmp("%s.%s" % (x.TokenSpaceGuidCName, x.TokenCName), "%s.%s" % (y.TokenSpaceGuidCName, y.TokenCName)))
+                PcdList.sort(key=lambda x: "%s.%s" % (x.TokenSpaceGuidCName, x.TokenCName))
                 Count = 0
                 while (Count < len(PcdList) - 1) :
                     Item = PcdList[Count]
