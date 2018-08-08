@@ -1252,26 +1252,7 @@ IsStatusOK (
   }
 }
 
-/**
-  Get Current Frame Number.
 
-  @param  UhcDev          The UHCI device.
-  @param  FrameNumberAddr The address of frame list register.
-
-  @retval The content of the frame list register.
-
-**/
-UINT16
-GetCurrentFrameNumber (
-  IN USB_UHC_DEV   *UhcDev,
-  IN UINT32        FrameNumberAddr
-  )
-{
-  //
-  // Gets value in the USB frame number register.
-  //
-  return (UINT16) (USBReadPortW (UhcDev, FrameNumberAddr) & 0x03FF);
-}
 
 /**
   Set Frame List Base Address.
@@ -1349,25 +1330,7 @@ SetQHHorizontalLinkPtr (
   PtrQH->QueueHead.QHHorizontalPtr = (UINT32) (UINTN) PtrNext >> 4;
 }
 
-/**
-  Get the horizontal link pointer in QH.
 
-  @param  PtrQH     Place to store QH_STRUCT pointer.
-
-  @retval The horizontal link pointer in QH.
-
-**/
-VOID *
-GetQHHorizontalLinkPtr (
-  IN QH_STRUCT  *PtrQH
-  )
-{
-  //
-  // Restore the 28bit address to 32bit address
-  // (take 32bit address as an example)
-  //
-  return (VOID *) (UINTN) ((PtrQH->QueueHead.QHHorizontalPtr) << 4);
-}
 
 /**
   Set a QH or TD horizontally to be connected with a specific QH.
@@ -1470,25 +1433,7 @@ SetQHVerticalValidorInvalid (
   PtrQH->QueueHead.QHVerticalTerminate = IsValid ? 0 : 1;
 }
 
-/**
-  Get the vertical validor bit in QH.
 
-  @param  PtrQH      Place to store QH_STRUCT pointer.
-
-  @retval The vertical linker is valid or not.
-
-**/
-BOOLEAN
-GetQHHorizontalValidorInvalid (
-  IN QH_STRUCT  *PtrQH
-  )
-{
-  //
-  // If TRUE, meaning the Horizontal Link Pointer field is valid,
-  // else, the field is invalid.
-  //
-  return (BOOLEAN) (!(PtrQH->QueueHead.QHHorizontalTerminate));
-}
 
 /**
   Allocate TD or QH Struct.
@@ -2000,26 +1945,7 @@ GetTDLinkPtr (
   return (VOID *) (UINTN) ((PtrTDStruct->TDData.TDLinkPtr) << 4);
 }
 
-/**
-  Get the information about whether the Link Pointer field pointing to
-  a QH or a TD.
 
-  @param  PtrTDStruct     Place to store TD_STRUCT pointer.
-
-  @retval whether the Link Pointer field pointing to a QH or a TD.
-
-**/
-BOOLEAN
-IsTDLinkPtrQHOrTD (
-  IN  TD_STRUCT *PtrTDStruct
-  )
-{
-  //
-  // Get the information about whether the Link Pointer field pointing to
-  // a QH or a TD.
-  //
-  return (BOOLEAN) (PtrTDStruct->TDData.TDLinkPtrQSelect);
-}
 
 /**
   Enable/Disable short packet detection mechanism.
@@ -3239,60 +3165,9 @@ InsertMemoryHeaderToList (
   }
 }
 
-/**
-  Judge the memory block in the memory header is empty or not.
 
-  @param  MemoryHeaderPtr   A pointer to the memory header list.
 
-  @retval Whether the memory block in the memory header is empty or not.
 
-**/
-BOOLEAN
-IsMemoryBlockEmptied (
-  IN MEMORY_MANAGE_HEADER  *MemoryHeaderPtr
-  )
-{
-  UINTN Index;
-
-  for (Index = 0; Index < MemoryHeaderPtr->BitArraySizeInBytes; Index++) {
-    if (MemoryHeaderPtr->BitArrayPtr[Index] != 0) {
-      return FALSE;
-    }
-  }
-
-  return TRUE;
-}
-
-/**
-  remove a memory header from list.
-
-  @param  FirstMemoryHeader   A pointer to the memory header list.
-  @param  FreeMemoryHeader    A memory header to be removed into the list.
-
-**/
-VOID
-DelinkMemoryBlock (
-  IN MEMORY_MANAGE_HEADER    *FirstMemoryHeader,
-  IN MEMORY_MANAGE_HEADER    *FreeMemoryHeader
-  )
-{
-  MEMORY_MANAGE_HEADER  *TempHeaderPtr;
-
-  if ((FirstMemoryHeader == NULL) || (FreeMemoryHeader == NULL)) {
-    return ;
-  }
-
-  for (TempHeaderPtr = FirstMemoryHeader; TempHeaderPtr != NULL; TempHeaderPtr = TempHeaderPtr->Next) {
-
-    if (TempHeaderPtr->Next == FreeMemoryHeader) {
-      //
-      // Link the before and after
-      //
-      TempHeaderPtr->Next = FreeMemoryHeader->Next;
-      break;
-    }
-  }
-}
 
 /**
   Map address of request structure buffer.

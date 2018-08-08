@@ -205,29 +205,7 @@ IoMmuAllocateBuffer (
   return Status;
 }
 
-/**
-  Frees memory that was allocated with AllocateBuffer().
 
-  @param IoMmu              Pointer to IOMMU PPI.
-  @param Pages              The number of pages to free.
-  @param HostAddress        The base system memory address of the allocated range.
-  @param Mapping            The mapping value returned from Map().
-
-**/
-VOID
-IoMmuFreeBuffer (
-  IN EDKII_IOMMU_PPI        *IoMmu,
-  IN UINTN                  Pages,
-  IN VOID                   *HostAddress,
-  IN VOID                   *Mapping
-  )
-{
-  if (IoMmu != NULL) {
-    IoMmu->SetAttribute (IoMmu, Mapping, 0);
-    IoMmu->Unmap (IoMmu, Mapping);
-    IoMmu->FreeBuffer (IoMmu, Pages, HostAddress);
-  }
-}
 
 /**
   Initialize IOMMU.

@@ -473,21 +473,6 @@ IsStatusOK (
   );
 
 /**
-  Get Current Frame Number.
-
-  @param  UhcDev          The UHCI device.
-  @param  FrameNumberAddr The address of frame list register.
-
-  @retval The content of the frame list register.
-
-**/
-UINT16
-GetCurrentFrameNumber (
-  IN USB_UHC_DEV   *UhcDev,
-  IN UINT32        FrameNumberAddr
-  );
-
-/**
   Set Frame List Base Address.
 
   @param  UhcDev           The UHCI device.
@@ -529,19 +514,6 @@ VOID
 SetQHHorizontalLinkPtr (
   IN QH_STRUCT  *PtrQH,
   IN VOID       *PtrNext
-  );
-
-/**
-  Get the horizontal link pointer in QH.
-
-  @param  PtrQH     Place to store QH_STRUCT pointer.
-
-  @retval The horizontal link pointer in QH.
-
-**/
-VOID  *
-GetQHHorizontalLinkPtr (
-  IN QH_STRUCT  *PtrQH
   );
 
 /**
@@ -609,18 +581,6 @@ SetQHVerticalValidorInvalid (
   IN BOOLEAN    IsValid
   );
 
-/**
-  Get the vertical validor bit in QH.
-
-  @param  PtrQH      Place to store QH_STRUCT pointer.
-
-  @retval The vertical linker is valid or not.
-
-**/
-BOOLEAN
-GetQHHorizontalValidorInvalid (
-  IN QH_STRUCT  *PtrQH
-  );
 
 /**
   Allocate TD or QH Struct.
@@ -805,19 +765,6 @@ GetTDLinkPtr (
   IN  TD_STRUCT *PtrTDStruct
   );
 
-/**
-  Get the information about whether the Link Pointer field pointing to
-  a QH or a TD.
-
-  @param  PtrTDStruct     Place to store TD_STRUCT pointer.
-
-  @retval whether the Link Pointer field pointing to a QH or a TD.
-
-**/
-BOOLEAN
-IsTDLinkPtrQHOrTD (
-  IN  TD_STRUCT *PtrTDStruct
-  );
 
 /**
   Enable/Disable short packet detection mechanism.
@@ -1317,31 +1264,6 @@ InsertMemoryHeaderToList (
   IN MEMORY_MANAGE_HEADER  *NewMemoryHeader
   );
 
-/**
-  Judge the memory block in the memory header is empty or not.
-
-  @param  MemoryHeaderPtr   A pointer to the memory header list.
-
-  @retval Whether the memory block in the memory header is empty or not.
-
-**/
-BOOLEAN
-IsMemoryBlockEmptied (
-  IN MEMORY_MANAGE_HEADER  *MemoryHeaderPtr
-  );
-
-/**
-  remove a memory header from list.
-
-  @param  FirstMemoryHeader   A pointer to the memory header list.
-  @param  FreeMemoryHeader    A memory header to be removed into the list.
-
-**/
-VOID
-DelinkMemoryBlock (
-  IN MEMORY_MANAGE_HEADER    *FirstMemoryHeader,
-  IN MEMORY_MANAGE_HEADER    *FreeMemoryHeader
-  );
 
 /**
   Map address of request structure buffer.
@@ -1460,22 +1382,6 @@ IoMmuAllocateBuffer (
   OUT VOID                  **Mapping
   );
 
-/**
-  Frees memory that was allocated with AllocateBuffer().
-
-  @param IoMmu              Pointer to IOMMU PPI.
-  @param Pages              The number of pages to free.
-  @param HostAddress        The base system memory address of the allocated range.
-  @param Mapping            The mapping value returned from Map().
-
-**/
-VOID
-IoMmuFreeBuffer (
-  IN EDKII_IOMMU_PPI        *IoMmu,
-  IN UINTN                  Pages,
-  IN VOID                   *HostAddress,
-  IN VOID                   *Mapping
-  );
 
 /**
   Initialize IOMMU.
