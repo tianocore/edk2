@@ -769,30 +769,6 @@ AtaNonDataCommandIn (
   );
 
 /**
-  Send ATA Ext command into device with NON_DATA protocol.
-
-  @param  IdeDev Standard IDE device private data structure
-  @param  AtaCommand The ATA command to be sent
-  @param  Device The value in Device register
-  @param  Feature The value in Feature register
-  @param  SectorCount The value in SectorCount register
-  @param  LbaAddress The Lba address in 48-bit mode
-
-  @retval  EFI_SUCCESS Reading succeed
-  @retval  EFI_ABORTED Command failed
-  @retval  EFI_DEVICE_ERROR Device status error.
-
-**/
-EFI_STATUS
-AtaNonDataCommandInExt (
-  IN  IDE_BLK_IO_DEV  *IdeDev,
-  IN  UINT8           AtaCommand,
-  IN  UINT8           Device,
-  IN  UINT16          Feature,
-  IN  UINT16          SectorCount,
-  IN  EFI_LBA         LbaAddress
-  );
-/**
   Enable Long Physical Sector Feature for ATA device.
 
   @param   IdeDev  The IDE device data
