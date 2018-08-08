@@ -312,70 +312,7 @@ Var_ChangeDriverOrder (
   return EFI_SUCCESS;
 }
 
-/**
-  Update the device path of "ConOut", "ConIn" and "ErrOut"
-  based on the new BaudRate, Data Bits, parity and Stop Bits
-  set.
 
-**/
-VOID
-Var_UpdateAllConsoleOption (
-  VOID
-  )
-{
-  EFI_DEVICE_PATH_PROTOCOL  *OutDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *InpDevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *ErrDevicePath;
-  EFI_STATUS                Status;
-
-  OutDevicePath = EfiLibGetVariable (L"ConOut", &gEfiGlobalVariableGuid);
-  InpDevicePath = EfiLibGetVariable (L"ConIn", &gEfiGlobalVariableGuid);
-  ErrDevicePath = EfiLibGetVariable (L"ErrOut", &gEfiGlobalVariableGuid);
-  if (OutDevicePath != NULL) {
-    ChangeVariableDevicePath (OutDevicePath);
-    Status = gRT->SetVariable (
-                    L"ConOut",
-                    &gEfiGlobalVariableGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                    GetDevicePathSize (OutDevicePath),
-                    OutDevicePath
-                    );
-    //
-    // Changing variable without increasing its size with current variable implementation shouldn't fail.
-    //
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  if (InpDevicePath != NULL) {
-    ChangeVariableDevicePath (InpDevicePath);
-    Status = gRT->SetVariable (
-                    L"ConIn",
-                    &gEfiGlobalVariableGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                    GetDevicePathSize (InpDevicePath),
-                    InpDevicePath
-                    );
-    //
-    // Changing variable without increasing its size with current variable implementation shouldn't fail.
-    //
-    ASSERT_EFI_ERROR (Status);
-  }
-
-  if (ErrDevicePath != NULL) {
-    ChangeVariableDevicePath (ErrDevicePath);
-    Status = gRT->SetVariable (
-                    L"ErrOut",
-                    &gEfiGlobalVariableGuid,
-                    EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
-                    GetDevicePathSize (ErrDevicePath),
-                    ErrDevicePath
-                    );
-    //
-    // Changing variable without increasing its size with current variable implementation shouldn't fail.
-    //
-    ASSERT_EFI_ERROR (Status);
-  }
-}
 
 /**
   This function delete and build multi-instance device path for

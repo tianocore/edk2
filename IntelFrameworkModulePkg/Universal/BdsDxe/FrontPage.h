@@ -198,23 +198,6 @@ InitializeFrontPage (
   IN BOOLEAN    InitializeHiiData
   );
 
-/**
-  Acquire the string associated with the ProducerGuid and return it.
-
-
-  @param ProducerGuid    - The Guid to search the HII database for
-  @param Token           - The token value of the string to extract
-  @param String          - The string that is extracted
-
-  @retval  EFI_SUCCESS  The function returns EFI_SUCCESS always.
-
-**/
-EFI_STATUS
-GetProducerString (
-  IN      EFI_GUID                  *ProducerGuid,
-  IN      EFI_STRING_ID             Token,
-  OUT     CHAR16                    **String
-  );
 
 /**
   This function is the main entry of the platform setup entry.

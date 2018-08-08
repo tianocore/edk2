@@ -548,22 +548,6 @@ BOpt_IsEfiImageName (
   IN UINT16  *FileName
   );
 
-/**
-
-  Check whether current FileName point to a valid Efi Application
-
-  @param Dir       Pointer to current Directory
-  @param FileName  Pointer to current File name.
-
-  @retval TRUE      Is a valid Efi Application
-  @retval FALSE     not a valid Efi Application
-
-**/
-BOOLEAN
-BOpt_IsEfiApp (
-  IN EFI_FILE_HANDLE Dir,
-  IN UINT16          *FileName
-  );
 
 /**
 
@@ -702,18 +686,6 @@ FreeAllConsoles (
   VOID
   );
 
-/**
-  Update the device path that describing a terminal device
-  based on the new BaudRate, Data Bits, parity and Stop Bits
-  set.
-
-  @param DevicePath     The devicepath protocol instance wanted to be updated.
-
-**/
-VOID
-ChangeVariableDevicePath (
-  IN OUT EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-  );
 
 /**
   Update the multi-instance device path of Terminal Device based on
@@ -875,15 +847,6 @@ Var_UpdateErrorOutOption (
   VOID
   );
 
-/**
-  Update the device path of "ConOut", "ConIn" and "ErrOut" based on the new BaudRate, Data Bits,
-  parity and stop Bits set.
-
-**/
-VOID
-Var_UpdateAllConsoleOption (
-  VOID
-  );
 
 /**
   This function update the "BootNext" EFI Variable. If there is no "BootNex" specified in BMM,
@@ -1154,22 +1117,6 @@ EfiLibFileInfo (
   IN EFI_FILE_HANDLE      FHand
   );
 
-/**
-  Adjusts the size of a previously allocated buffer.
-
-  @param OldPool         A pointer to the buffer whose size is being adjusted.
-  @param OldSize         The size of the current buffer.
-  @param NewSize         The size of the new buffer.
-
-  @return   The newly allocated buffer. if NULL, allocation failed.
-
-**/
-VOID*
-EfiReallocatePool (
-  IN VOID                 *OldPool,
-  IN UINTN                OldSize,
-  IN UINTN                NewSize
-  );
 
 /**
   Function deletes the variable specified by VarName and VarGuid.

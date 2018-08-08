@@ -1192,69 +1192,7 @@ BOpt_IsEfiImageName (
   return FALSE;
 }
 
-/**
 
-  Check whether current FileName point to a valid Efi Application
-
-  @param Dir       Pointer to current Directory
-  @param FileName  Pointer to current File name.
-
-  @retval TRUE      Is a valid Efi Application
-  @retval FALSE     not a valid Efi Application
-
-**/
-BOOLEAN
-BOpt_IsEfiApp (
-  IN EFI_FILE_HANDLE Dir,
-  IN UINT16          *FileName
-  )
-{
-  UINTN                       BufferSize;
-  EFI_IMAGE_DOS_HEADER        DosHdr;
-  UINT16                      Subsystem;
-  EFI_FILE_HANDLE             File;
-  EFI_STATUS                  Status;
-  EFI_IMAGE_OPTIONAL_HEADER_UNION PeHdr;
-
-  Status = Dir->Open (Dir, &File, FileName, EFI_FILE_MODE_READ, 0);
-
-  if (EFI_ERROR (Status)) {
-    return FALSE;
-  }
-
-  BufferSize = sizeof (EFI_IMAGE_DOS_HEADER);
-  File->Read (File, &BufferSize, &DosHdr);
-  if (DosHdr.e_magic != EFI_IMAGE_DOS_SIGNATURE) {
-    File->Close (File);
-    return FALSE;
-  }
-
-  File->SetPosition (File, DosHdr.e_lfanew);
-  BufferSize = sizeof (EFI_IMAGE_OPTIONAL_HEADER_UNION);
-  File->Read (File, &BufferSize, &PeHdr);
-  if (PeHdr.Pe32.Signature != EFI_IMAGE_NT_SIGNATURE) {
-    File->Close (File);
-    return FALSE;
-  }
-  //
-  // Determine PE type and read subsytem
-  //
-  if (PeHdr.Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-    Subsystem = PeHdr.Pe32.OptionalHeader.Subsystem;
-  } else if (PeHdr.Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
-    Subsystem = PeHdr.Pe32Plus.OptionalHeader.Subsystem;
-  } else {
-    return FALSE;
-  }
-
-  if (Subsystem == EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION) {
-    File->Close (File);
-    return TRUE;
-  } else {
-    File->Close (File);
-    return FALSE;
-  }
-}
 
 /**
 

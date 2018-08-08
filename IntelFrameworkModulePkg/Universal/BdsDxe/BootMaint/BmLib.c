@@ -323,42 +323,6 @@ EfiDevicePathInstanceCount (
   return Count;
 }
 
-/**
-  Adjusts the size of a previously allocated buffer.
-
-
-  @param OldPool         - A pointer to the buffer whose size is being adjusted.
-  @param OldSize         - The size of the current buffer.
-  @param NewSize         - The size of the new buffer.
-
-  @return   The newly allocated buffer.
-  @retval   NULL  Allocation failed.
-
-**/
-VOID *
-EfiReallocatePool (
-  IN VOID                 *OldPool,
-  IN UINTN                OldSize,
-  IN UINTN                NewSize
-  )
-{
-  VOID  *NewPool;
-
-  NewPool = NULL;
-  if (NewSize != 0) {
-    NewPool = AllocateZeroPool (NewSize);
-  }
-
-  if (OldPool != NULL) {
-    if (NewPool != NULL) {
-      CopyMem (NewPool, OldPool, OldSize < NewSize ? OldSize : NewSize);
-    }
-
-    FreePool (OldPool);
-  }
-
-  return NewPool;
-}
 
 /**
   Get a string from the Data Hub record based on

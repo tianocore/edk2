@@ -569,35 +569,6 @@ CallFrontPage (
   return Status;
 }
 
-/**
-  Acquire the string associated with the ProducerGuid and return it.
-
-
-  @param ProducerGuid    The Guid to search the HII database for
-  @param Token           The token value of the string to extract
-  @param String          The string that is extracted
-
-  @retval  EFI_SUCCESS  The function returns EFI_SUCCESS always.
-
-**/
-EFI_STATUS
-GetProducerString (
-  IN      EFI_GUID                  *ProducerGuid,
-  IN      EFI_STRING_ID             Token,
-  OUT     CHAR16                    **String
-  )
-{
-  EFI_STRING      TmpString;
-
-  TmpString = HiiGetPackageString (ProducerGuid, Token, NULL);
-  if (TmpString == NULL) {
-    *String = GetStringById (STRING_TOKEN (STR_MISSING_STRING));
-  } else {
-    *String = TmpString;
-  }
-
-  return EFI_SUCCESS;
-}
 
 /**
   Convert Processor Frequency Data to a string.

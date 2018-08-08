@@ -218,71 +218,7 @@ ChangeTerminalDevicePath (
 
 }
 
-/**
-  Update the device path that describing a terminal device
-  based on the new BaudRate, Data Bits, parity and Stop Bits
-  set.
 
-  @param DevicePath terminal device's path
-
-**/
-VOID
-ChangeVariableDevicePath (
-  IN OUT EFI_DEVICE_PATH_PROTOCOL  *DevicePath
-  )
-{
-  EFI_DEVICE_PATH_PROTOCOL  *Node;
-  ACPI_HID_DEVICE_PATH      *Acpi;
-  UART_DEVICE_PATH          *Uart;
-  UINTN                     Com;
-  BM_TERMINAL_CONTEXT       *NewTerminalContext;
-  BM_MENU_ENTRY             *NewMenuEntry;
-
-  Node  = DevicePath;
-  Node  = NextDevicePathNode (Node);
-  Com   = 0;
-  while (!IsDevicePathEnd (Node)) {
-    Acpi = (ACPI_HID_DEVICE_PATH *) Node;
-    if (IsIsaSerialNode (Acpi)) {
-      CopyMem (&Com, &Acpi->UID, sizeof (UINT32));
-    }
-
-    if ((DevicePathType (Node) == MESSAGING_DEVICE_PATH) && (DevicePathSubType (Node) == MSG_UART_DP)) {
-      NewMenuEntry = BOpt_GetMenuEntry (
-                      &TerminalMenu,
-                      Com
-                      );
-      ASSERT (NewMenuEntry != NULL);
-      NewTerminalContext  = (BM_TERMINAL_CONTEXT *) NewMenuEntry->VariableContext;
-      Uart                = (UART_DEVICE_PATH *) Node;
-      CopyMem (
-        &Uart->BaudRate,
-        &NewTerminalContext->BaudRate,
-        sizeof (UINT64)
-        );
-
-      CopyMem (
-        &Uart->DataBits,
-        &NewTerminalContext->DataBits,
-        sizeof (UINT8)
-        );
-
-      CopyMem (
-        &Uart->Parity,
-        &NewTerminalContext->Parity,
-        sizeof (UINT8)
-        );
-
-      CopyMem (
-        &Uart->StopBits,
-        &NewTerminalContext->StopBits,
-        sizeof (UINT8)
-        );
-    }
-
-    Node = NextDevicePathNode (Node);
-  }
-}
 
 /**
   Retrieve ACPI UID of UART from device path
