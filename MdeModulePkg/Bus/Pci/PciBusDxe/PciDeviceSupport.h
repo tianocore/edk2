@@ -255,23 +255,6 @@ ActiveVGADeviceOnTheRootBridge (
   IN PCI_IO_DEVICE        *RootBridge
   );
 
-/**
-  Get HPC PCI address according to its device path.
-
-  @param RootBridge           Root bridege Io instance.
-  @param RemainingDevicePath  Given searching device path.
-  @param PciAddress           Buffer holding searched result.
-
-  @retval EFI_SUCCESS         PCI address was stored in PciAddress.
-  @retval EFI_NOT_FOUND       Can not find the specific device path.
-
-**/
-EFI_STATUS
-GetHpcPciAddressFromRootBridge (
-  IN  PCI_IO_DEVICE                    *RootBridge,
-  IN  EFI_DEVICE_PATH_PROTOCOL         *RemainingDevicePath,
-  OUT UINT64                           *PciAddress
-  );
 
 /**
   Destroy a pci device node.
