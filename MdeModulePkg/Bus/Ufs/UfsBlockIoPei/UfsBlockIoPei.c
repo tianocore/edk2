@@ -137,53 +137,7 @@ UFS_PEIM_HC_PRIVATE_DATA   gUfsHcPeimTemplate = {
   }
 };
 
-/**
-  Execute Request Sense SCSI command on a specific UFS device.
 
-  @param[in]  Private              A pointer to UFS_PEIM_HC_PRIVATE_DATA data structure.
-  @param[in]  Lun                  The lun on which the SCSI cmd executed.
-  @param[out] DataBuffer           A pointer to output sense data.
-  @param[out] DataBufferLength     The length of output sense data.
-
-  @retval EFI_SUCCESS              The command executed successfully.
-  @retval EFI_DEVICE_ERROR         A device error occurred while attempting to send SCSI Request Packet.
-  @retval EFI_TIMEOUT              A timeout occurred while waiting for the SCSI Request Packet to execute.
-
-**/
-EFI_STATUS
-UfsPeimRequestSense (
-  IN     UFS_PEIM_HC_PRIVATE_DATA        *Private,
-  IN     UINTN                           Lun,
-     OUT VOID                            *DataBuffer,
-     OUT UINT32                          *DataBufferLength
-  )
-{
-  UFS_SCSI_REQUEST_PACKET                Packet;
-  UINT8                                  Cdb[UFS_SCSI_OP_LENGTH_SIX];
-  EFI_STATUS                             Status;
-
-  ZeroMem (&Packet, sizeof (UFS_SCSI_REQUEST_PACKET));
-  ZeroMem (Cdb, sizeof (Cdb));
-
-  Cdb[0]  = EFI_SCSI_OP_REQUEST_SENSE;
-
-  Packet.Timeout          = UFS_TIMEOUT;
-  Packet.Cdb              = Cdb;
-  Packet.CdbLength        = sizeof (Cdb);
-  Packet.DataDirection    = UfsDataIn;
-  Packet.InDataBuffer     = DataBuffer;
-  Packet.InTransferLength = *DataBufferLength;
-  Packet.SenseData        = NULL;
-  Packet.SenseDataLength  = 0;
-
-  Status = UfsExecScsiCmds (Private,(UINT8)Lun, &Packet);
-
-  if (!EFI_ERROR (Status)) {
-    *DataBufferLength = Packet.InTransferLength;
-  }
-
-  return Status;
-}
 
 /**
   Execute TEST UNITY READY SCSI command on a specific UFS device.
@@ -231,62 +185,7 @@ UfsPeimTestUnitReady (
   return Status;
 }
 
-/**
-  Execute INQUIRY SCSI command on a specific UFS device.
 
-  @param[in]  Private              A pointer to UFS_PEIM_HC_PRIVATE_DATA data structure.
-  @param[in]  Lun                  The lun on which the SCSI cmd executed.
-  @param[out] Inquiry              A pointer to Inquiry data buffer.
-  @param[out] InquiryLengths       The length of output Inquiry data.
-  @param[out] SenseData            A pointer to output sense data.
-  @param[out] SenseDataLength      The length of output sense data.
-
-  @retval EFI_SUCCESS              The command executed successfully.
-  @retval EFI_DEVICE_ERROR         A device error occurred while attempting to send SCSI Request Packet.
-  @retval EFI_TIMEOUT              A timeout occurred while waiting for the SCSI Request Packet to execute.
-
-**/
-EFI_STATUS
-UfsPeimInquiry (
-  IN     UFS_PEIM_HC_PRIVATE_DATA     *Private,
-  IN     UINTN                        Lun,
-     OUT VOID                         *Inquiry,
-     OUT UINT32                       *InquiryLength,
-     OUT VOID                         *SenseData,  OPTIONAL
-     OUT UINT8                        *SenseDataLength
-  )
-{
-  UFS_SCSI_REQUEST_PACKET             Packet;
-  UINT8                               Cdb[UFS_SCSI_OP_LENGTH_SIX];
-  EFI_STATUS                          Status;
-
-  ZeroMem (&Packet, sizeof (UFS_SCSI_REQUEST_PACKET));
-  ZeroMem (Cdb, sizeof (Cdb));
-
-  Cdb[0]  = EFI_SCSI_OP_INQUIRY;
-  Cdb[4]  = sizeof (EFI_SCSI_INQUIRY_DATA);
-
-  Packet.Timeout          = UFS_TIMEOUT;
-  Packet.Cdb              = Cdb;
-  Packet.CdbLength        = sizeof (Cdb);
-  Packet.InDataBuffer     = Inquiry;
-  Packet.InTransferLength = *InquiryLength;
-  Packet.DataDirection    = UfsDataIn;
-  Packet.SenseData        = SenseData;
-  Packet.SenseDataLength  = *SenseDataLength;
-
-  Status = UfsExecScsiCmds (Private, (UINT8)Lun, &Packet);
-
-  if (*SenseDataLength != 0) {
-    *SenseDataLength = Packet.SenseDataLength;
-  }
-
-  if (!EFI_ERROR (Status)) {
-    *InquiryLength = Packet.InTransferLength;
-  }
-
-  return Status;
-}
 
 /**
   Execute READ CAPACITY(10) SCSI command on a specific UFS device.
