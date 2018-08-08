@@ -104,62 +104,7 @@ PeiUsbSetDeviceAddress (
                      );
 }
 
-/**
-  Clear a given usb feature.
 
-  @param  PeiServices       General-purpose services that are available to every PEIM.
-  @param  UsbIoPpi          Indicates the PEI_USB_IO_PPI instance.
-  @param  Recipient         The recipient of ClearFeature Request, should be one of Device/Interface/Endpoint.
-  @param  Value             Request Value.
-  @param  Target            Request Index.
-
-  @retval EFI_SUCCESS       Usb feature is cleared successfully.
-  @retval EFI_DEVICE_ERROR  Cannot clear the usb feature due to a hardware error.
-  @retval Others            Other failure occurs.
-
-**/
-EFI_STATUS
-PeiUsbClearDeviceFeature (
-  IN EFI_PEI_SERVICES         **PeiServices,
-  IN PEI_USB_IO_PPI           *UsbIoPpi,
-  IN EFI_USB_RECIPIENT        Recipient,
-  IN UINT16                   Value,
-  IN UINT16                   Target
-  )
-{
-  EFI_USB_DEVICE_REQUEST  DevReq;
-
-  ASSERT (UsbIoPpi != NULL);
-
-  switch (Recipient) {
-  case EfiUsbDevice:
-    DevReq.RequestType = USB_DEV_CLEAR_FEATURE_REQ_TYPE_D;
-    break;
-
-  case EfiUsbInterface:
-    DevReq.RequestType = USB_DEV_CLEAR_FEATURE_REQ_TYPE_I;
-    break;
-
-  case EfiUsbEndpoint:
-    DevReq.RequestType = USB_DEV_CLEAR_FEATURE_REQ_TYPE_E;
-    break;
-  }
-
-  DevReq.Request      = USB_DEV_CLEAR_FEATURE;
-  DevReq.Value        = Value;
-  DevReq.Index        = Target;
-  DevReq.Length       = 0;
-
-  return UsbIoPpi->UsbControlTransfer (
-                     PeiServices,
-                     UsbIoPpi,
-                     &DevReq,
-                     EfiUsbNoData,
-                     PcdGet32 (PcdUsbTransferTimeoutValue),
-                     NULL,
-                     0
-                     );
-}
 
 /**
   Configure a usb device to Configuration 1.
@@ -244,26 +189,4 @@ PeiUsbGetDeviceSpeed (
   }
 }
 
-/**
-  Judge if the port is in "connection change" status or not.
 
-  @param  PortChangeStatus  The usb port change status gotten.
-
-  @retval TRUE              The port is in "connection change" status.
-  @retval FALSE             The port is NOT in "connection change" status.
-
-**/
-BOOLEAN
-IsPortConnectChange (
-  IN UINT16  PortChangeStatus
-  )
-{
-  //
-  // return the bit 0 value of PortChangeStatus
-  //
-  if ((PortChangeStatus & USB_PORT_STAT_C_CONNECTION) != 0) {
-    return TRUE;
-  } else {
-    return FALSE;
-  }
-}

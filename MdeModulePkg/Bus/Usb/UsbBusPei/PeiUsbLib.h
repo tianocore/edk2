@@ -148,28 +148,6 @@ PeiUsbSetDeviceAddress (
   IN UINT16                   AddressValue
   );
 
-/**
-  Clear a given usb feature.
-
-  @param  PeiServices       General-purpose services that are available to every PEIM.
-  @param  UsbIoPpi          Indicates the PEI_USB_IO_PPI instance.
-  @param  Recipient         The recipient of ClearFeature Request, should be one of Device/Interface/Endpoint.
-  @param  Value             Request Value.
-  @param  Target            Request Index.
-
-  @retval EFI_SUCCESS       Usb feature is cleared successfully.
-  @retval EFI_DEVICE_ERROR  Cannot clear the usb feature due to a hardware error.
-  @retval Others            Other failure occurs.
-
-**/
-EFI_STATUS
-PeiUsbClearDeviceFeature (
-  IN EFI_PEI_SERVICES         **PeiServices,
-  IN PEI_USB_IO_PPI           *UsbIoPpi,
-  IN EFI_USB_RECIPIENT        Recipient,
-  IN UINT16                   Value,
-  IN UINT16                   Target
-  );
 
 /**
   Configure a usb device to Configuration 1.
@@ -215,17 +193,4 @@ PeiUsbGetDeviceSpeed (
   IN UINT16 PortStatus
   );
 
-/**
-  Judge if the port is in "connection change" status or not.
-
-  @param  PortChangeStatus  The usb port change status gotten.
-
-  @retval TRUE              The port is in "connection change" status.
-  @retval FALSE             The port is NOT in "connection change" status.
-
-**/
-BOOLEAN
-IsPortConnectChange (
-  IN UINT16  PortChangeStatus
-  );
 #endif
