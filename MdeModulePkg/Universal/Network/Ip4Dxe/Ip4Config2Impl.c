@@ -1628,22 +1628,6 @@ Ip4Config2InitIfInfo (
   CopyMem (&IfInfo->HwAddress, &IpSb->SnpMode.CurrentAddress, IfInfo->HwAddressSize);
 }
 
-/**
-  The event handle routine when DHCPv4 process is finished or is updated.
-
-  @param[in]     Event         Not used.
-  @param[in]     Context       The pointer to the IP4 configuration instance data.
-
-**/
-VOID
-EFIAPI
-Ip4Config2OnDhcp4Event (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-{
-  return ;
-}
 
 
 /**
