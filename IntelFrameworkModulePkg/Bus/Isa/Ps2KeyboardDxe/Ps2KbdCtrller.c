@@ -1848,32 +1848,7 @@ Done:
 
 }
 
-/**
-  Disable the keyboard interface of the 8042 controller.
 
-  @param ConsoleIn   The device instance
-
-  @return status of issuing disable command
-
-**/
-EFI_STATUS
-DisableKeyboard (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
-  )
-{
-  EFI_STATUS  Status;
-
-  //
-  // Disable keyboard interface
-  //
-  Status = KeyboardCommand (ConsoleIn, KEYBOARD_8042_COMMAND_DISABLE_KEYBOARD_INTERFACE);
-  if (EFI_ERROR (Status)) {
-    KeyboardError (ConsoleIn, L"\n\r");
-    return EFI_DEVICE_ERROR;
-  }
-
-  return Status;
-}
 
 /**
   Check whether there is Ps/2 Keyboard device in system by 0xF4 Keyboard Command
