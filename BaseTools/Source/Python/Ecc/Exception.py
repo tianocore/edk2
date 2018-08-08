@@ -16,7 +16,7 @@
 #
 from __future__ import print_function
 from __future__ import absolute_import
-from .Xml.XmlRoutines import *
+from Ecc.Xml.XmlRoutines import *
 import Common.LongFilePathOs as os
 
 # ExceptionXml to parse Exception Node of XML file

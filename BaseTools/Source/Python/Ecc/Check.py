@@ -15,10 +15,10 @@ import Common.LongFilePathOs as os
 import re
 from CommonDataClass.DataClass import *
 import Common.DataType as DT
-from .EccToolError import *
-from .MetaDataParser import ParseHeaderCommentSection
-from . import EccGlobalData
-from . import c
+from Ecc.EccToolError import *
+from Ecc.MetaDataParser import ParseHeaderCommentSection
+from Ecc import EccGlobalData
+from Ecc import c
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 

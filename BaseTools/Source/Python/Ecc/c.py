@@ -17,14 +17,14 @@ import sys
 import Common.LongFilePathOs as os
 import re
 import string
-from . import CodeFragmentCollector
-from . import FileProfile
+from Ecc import CodeFragmentCollector
+from Ecc import FileProfile
 from CommonDataClass import DataClass
-from . import Database
+from Ecc import Database
 from Common import EdkLogger
-from .EccToolError import *
-from . import EccGlobalData
-from . import MetaDataParser
+from Ecc.EccToolError import *
+from Ecc import EccGlobalData
+from Ecc import MetaDataParser
 
 IncludeFileListDict = {}
 AllIncludeFileListDict = {}

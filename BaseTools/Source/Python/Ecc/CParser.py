@@ -24,8 +24,8 @@ from antlr3.compat import set, frozenset
 #
 ##
 
-from . import CodeFragment
-from . import FileProfile
+from Ecc import CodeFragment
+from Ecc import FileProfile
 
 
 

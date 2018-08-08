@@ -22,8 +22,8 @@ import copy
 
 import Common.EdkLogger as EdkLogger
 import Common.GlobalData as GlobalData
-import EccGlobalData
-import EccToolError
+import Ecc.EccGlobalData as EccGlobalData
+import Ecc.EccToolError as EccToolError
 
 from CommonDataClass.DataClass import *
 from Common.DataType import *
@@ -32,7 +32,7 @@ from Common.Misc import GuidStructureStringToGuidString, CheckPcdDatum, PathClas
 from Common.Expression import *
 from CommonDataClass.Exceptions import *
 
-from .MetaFileTable import MetaFileStorage
+from Ecc.MetaFileWorkspace.MetaFileTable import MetaFileStorage
 from GenFds.FdfParser import FdfParser
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.LongFilePathSupport import CodecOpenLongFilePath

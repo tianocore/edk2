@@ -17,12 +17,12 @@
 from __future__ import absolute_import
 import Common.LongFilePathOs as os, time, glob, sys
 import Common.EdkLogger as EdkLogger
-from . import Database
-from . import EccGlobalData
-from .MetaDataParser import *
+from Ecc import Database
+from Ecc import EccGlobalData
+from Ecc.MetaDataParser import *
 from optparse import OptionParser
-from .Configuration import Configuration
-from .Check import Check
+from Ecc.Configuration import Configuration
+from Ecc.Check import Check
 import Common.GlobalData as GlobalData
 
 from Common.StringUtils import NormPath
@@ -30,14 +30,14 @@ from Common.BuildVersion import gBUILD_VERSION
 from Common import BuildToolError
 from Common.Misc import PathClass
 from Common.Misc import DirCache
-from .MetaFileWorkspace.MetaFileParser import DscParser
-from .MetaFileWorkspace.MetaFileParser import DecParser
-from .MetaFileWorkspace.MetaFileParser import InfParser
-from .MetaFileWorkspace.MetaFileParser import Fdf
-from .MetaFileWorkspace.MetaFileTable import MetaFileStorage
-from . import c
+from Ecc.MetaFileWorkspace.MetaFileParser import DscParser
+from Ecc.MetaFileWorkspace.MetaFileParser import DecParser
+from Ecc.MetaFileWorkspace.MetaFileParser import InfParser
+from Ecc.MetaFileWorkspace.MetaFileParser import Fdf
+from Ecc.MetaFileWorkspace.MetaFileTable import MetaFileStorage
+from Ecc import c
 import re, string
-from .Exception import *
+from Ecc.Exception import *
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 

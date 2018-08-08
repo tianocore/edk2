@@ -1,7 +1,7 @@
 ## @file
 # This file implements the log mechanism for Python tools.
 #
-# Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -198,6 +198,7 @@ def error(ToolName, ErrorCode, Message=None, File=None, Line=None, ExtraData=Non
         LogText = _ErrorMessageTemplateWithoutFile % TemplateDict
 
     _ErrorLogger.log(ERROR, LogText)
+    RaiseError = IsRaiseError
     if RaiseError:
         raise FatalError(ErrorCode)
 

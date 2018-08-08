@@ -14,9 +14,9 @@
 from __future__ import absolute_import
 import Common.LongFilePathOs as os
 from CommonDataClass.DataClass import *
-from .EccToolError import *
+from Ecc.EccToolError import *
 from Common.MultipleWorkspace import MultipleWorkspace as mws
-from . import EccGlobalData
+from Ecc import EccGlobalData
 import re
 ## Get the inlcude path list for a source file
 #

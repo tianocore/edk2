@@ -18,10 +18,10 @@ from __future__ import absolute_import
 import uuid
 
 import Common.EdkLogger as EdkLogger
-import EccGlobalData
+import Ecc.EccGlobalData as EccGlobalData
 
-from .MetaDataTable import Table
-from .MetaDataTable import ConvertToSqlString
+from Ecc.MetaFileWorkspace.MetaDataTable import Table
+from Ecc.MetaFileWorkspace.MetaDataTable import ConvertToSqlString
 from CommonDataClass.DataClass import MODEL_FILE_DSC, MODEL_FILE_DEC, MODEL_FILE_INF, \
                                       MODEL_FILE_OTHERS
 
