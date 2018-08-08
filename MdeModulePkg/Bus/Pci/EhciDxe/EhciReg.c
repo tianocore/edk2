@@ -372,29 +372,7 @@ EhcEnablePeriodSchd (
 }
 
 
-/**
-  Disable periodic schedule.
 
-  @param  Ehc               The EHCI device.
-  @param  Timeout           Time to wait before abort (in millisecond, ms).
-
-  @retval EFI_SUCCESS       Periodic schedule is disabled.
-  @retval EFI_DEVICE_ERROR  Fail to disable periodic schedule.
-
-**/
-EFI_STATUS
-EhcDisablePeriodSchd (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Timeout
-  )
-{
-  EFI_STATUS              Status;
-
-  EhcClearOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_ENABLE_PERIOD);
-
-  Status = EhcWaitOpRegBit (Ehc, EHC_USBSTS_OFFSET, USBSTS_PERIOD_ENABLED, FALSE, Timeout);
-  return Status;
-}
 
 
 
@@ -424,29 +402,7 @@ EhcEnableAsyncSchd (
 
 
 
-/**
-  Disable asynchrounous schedule.
 
-  @param  Ehc          The EHCI device.
-  @param  Timeout      Time to wait before abort (in millisecond, ms).
-
-  @retval EFI_SUCCESS  The asynchronous schedule is disabled.
-  @return Others       Failed to disable the asynchronous schedule.
-
-**/
-EFI_STATUS
-EhcDisableAsyncSchd (
-  IN USB2_HC_DEV          *Ehc,
-  IN UINT32               Timeout
-  )
-{
-  EFI_STATUS  Status;
-
-  EhcClearOpRegBit (Ehc, EHC_USBCMD_OFFSET, USBCMD_ENABLE_ASYNC);
-
-  Status = EhcWaitOpRegBit (Ehc, EHC_USBSTS_OFFSET, USBSTS_ASYNC_ENABLED, FALSE, Timeout);
-  return Status;
-}
 
 
 
