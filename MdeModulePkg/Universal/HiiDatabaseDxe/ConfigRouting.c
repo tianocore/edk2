@@ -3590,53 +3590,6 @@ Done:
   return Status;
 }
 
-/**
-  Get Data buffer size based on data type.
-
-  @param      ValueType             The input data type.
-
-  @retval     The data buffer size for the input type.
-**/
-UINT16
-GetStorageWidth (
-  IN UINT8       ValueType
-  )
-{
-  UINT16         StorageWidth;
-
-  switch (ValueType) {
-  case EFI_IFR_NUMERIC_SIZE_1:
-  case EFI_IFR_TYPE_BOOLEAN:
-    StorageWidth = (UINT16) sizeof (UINT8);
-    break;
-
-  case EFI_IFR_NUMERIC_SIZE_2:
-    StorageWidth = (UINT16) sizeof (UINT16);
-    break;
-
-  case EFI_IFR_NUMERIC_SIZE_4:
-    StorageWidth = (UINT16) sizeof (UINT32);
-    break;
-
-  case EFI_IFR_NUMERIC_SIZE_8:
-    StorageWidth = (UINT16) sizeof (UINT64);
-    break;
-
-  case EFI_IFR_TYPE_TIME:
-    StorageWidth = (UINT16) sizeof (EFI_IFR_TIME);
-    break;
-
-  case EFI_IFR_TYPE_DATE:
-    StorageWidth = (UINT16) sizeof (EFI_IFR_DATE);
-    break;
-
-  default:
-    StorageWidth = 0;
-    break;
-  }
-
-  return StorageWidth;
-}
 
 /**
   Update the default value in the block data which is used as bit var store.
