@@ -564,46 +564,7 @@ PxeUndiTransmit (
   }
 }
 
-/**
-  PXE
-  UNDI SET MULTICAST ADDRESS
-  Op-Code: PXENV_UNDI_SET_MCAST_ADDRESS (0009h)
-  Input: Far pointer to a PXENV_TFTP_SET_MCAST_ADDRESS_t parameter structure that has been
-  initialized by the caller.
-  Output: PXENV_EXIT_SUCCESS or PXENV_EXIT_FAILURE must be returned in AX. The status field in
-  the parameter structure must be set to one of the values represented by the PXENV_STATUS_xxx
-  constants.
-  Description: This call changes the current list of multicast addresses to the input list and resets the network
-  adapter to accept it. If the number of multicast addresses is zero, multicast is disabled.
-  typedef struct {
-    PXENV_STATUS Status;
-    PXENV_UNDI_MCAST_ADDRESS_t R_Mcast_Buf;
-  } PXENV_UNDI_SET_MCAST_ADDR_T;
-  Set before calling API service
-  R_Mcast_Buf: See description in the UNDI RESET ADAPTER
-  (0004h) API.
-  Returned from API service
-  Status: See the PXENV_STATUS_xxx constants
 
-  @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value
-                                for option ROM call.
-
-  @return Return value of PXE option ROM far call.
-**/
-EFI_STATUS
-PxeUndiSetMcastAddr (
-  IN     EFI_SIMPLE_NETWORK_DEV       *SimpleNetworkDevice,
-  IN OUT PXENV_UNDI_SET_MCAST_ADDR_T  *PxeUndiTable
-  )
-{
-  return MakePxeCall (
-          SimpleNetworkDevice,
-          PxeUndiTable,
-          sizeof (PXENV_UNDI_SET_MCAST_ADDR_T),
-          PXENV_UNDI_SET_MCAST_ADDR
-          );
-}
 
 /**
   PXE
@@ -674,19 +635,6 @@ PxeUndiSetStationAddr (
 
   @return Return value of PXE option ROM far call.
 **/
-EFI_STATUS
-PxeUndiSetPacketFilter (
-  IN     EFI_SIMPLE_NETWORK_DEV          *SimpleNetworkDevice,
-  IN OUT PXENV_UNDI_SET_PACKET_FILTER_T  *PxeUndiTable
-  )
-{
-  return MakePxeCall (
-          SimpleNetworkDevice,
-          PxeUndiTable,
-          sizeof (PXENV_UNDI_SET_PACKET_FILTER_T),
-          PXENV_UNDI_SET_PACKET_FILTER
-          );
-}
 
 /**
   PXE
@@ -863,19 +811,6 @@ PxeUndiClearStatistics (
 
   @return Return value of PXE option ROM far call.
 **/
-EFI_STATUS
-PxeUndiInitiateDiags (
-  IN     EFI_SIMPLE_NETWORK_DEV       *SimpleNetworkDevice,
-  IN OUT PXENV_UNDI_INITIATE_DIAGS_T  *PxeUndiTable
-  )
-{
-  return MakePxeCall (
-          SimpleNetworkDevice,
-          PxeUndiTable,
-          sizeof (PXENV_UNDI_INITIATE_DIAGS_T),
-          PXENV_UNDI_INITIATE_DIAGS
-          );
-}
 
 /**
   PXE
@@ -907,19 +842,6 @@ PxeUndiInitiateDiags (
 
   @return Return value of PXE option ROM far call.
 **/
-EFI_STATUS
-PxeUndiForceInterrupt (
-  IN     EFI_SIMPLE_NETWORK_DEV        *SimpleNetworkDevice,
-  IN OUT PXENV_UNDI_FORCE_INTERRUPT_T  *PxeUndiTable
-  )
-{
-  return MakePxeCall (
-          SimpleNetworkDevice,
-          PxeUndiTable,
-          sizeof (PXENV_UNDI_FORCE_INTERRUPT_T),
-          PXENV_UNDI_FORCE_INTERRUPT
-          );
-}
 
 /**
   PXE
@@ -1239,16 +1161,3 @@ PxeUndiStop (
 
   @return Return value of PXE option ROM far call.
 **/
-EFI_STATUS
-PxeUndiGetState (
-  IN     EFI_SIMPLE_NETWORK_DEV  *SimpleNetworkDevice,
-  IN OUT PXENV_UNDI_GET_STATE_T  *PxeUndiTable
-  )
-{
-  return MakePxeCall (
-          SimpleNetworkDevice,
-          PxeUndiTable,
-          sizeof (PXENV_UNDI_GET_STATE_T),
-          PXENV_UNDI_GET_STATE
-          );
-}

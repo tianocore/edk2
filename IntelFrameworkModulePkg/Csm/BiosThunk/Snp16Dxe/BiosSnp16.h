@@ -1019,39 +1019,6 @@ PxeUndiTransmit (
   )
 ;
 
-/**
-  PXE
-  UNDI SET MULTICAST ADDRESS
-  Op-Code: PXENV_UNDI_SET_MCAST_ADDRESS (0009h)
-  Input: Far pointer to a PXENV_TFTP_SET_MCAST_ADDRESS_t parameter structure that has been
-  initialized by the caller.
-  Output: PXENV_EXIT_SUCCESS or PXENV_EXIT_FAILURE must be returned in AX. The status field in
-  the parameter structure must be set to one of the values represented by the PXENV_STATUS_xxx
-  constants.
-  Description: This call changes the current list of multicast addresses to the input list and resets the network
-  adapter to accept it. If the number of multicast addresses is zero, multicast is disabled.
-  typedef struct {
-    PXENV_STATUS Status;
-    PXENV_UNDI_MCAST_ADDRESS_t R_Mcast_Buf;
-  } PXENV_UNDI_SET_MCAST_ADDR_T;
-  Set before calling API service
-  R_Mcast_Buf: See description in the UNDI RESET ADAPTER
-  (0004h) API.
-  Returned from API service
-  Status: See the PXENV_STATUS_xxx constants
-
-  @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value
-                                for option ROM call.
-
-  @return Return value of PXE option ROM far call.
-**/
-EFI_STATUS
-PxeUndiSetMcastAddr (
-  IN EFI_SIMPLE_NETWORK_DEV               *SimpleNetworkDevice,
-  IN OUT PXENV_UNDI_SET_MCAST_ADDR_T      *PxeUndiTable
-  )
-;
 
 /**
   PXE
@@ -1088,39 +1055,6 @@ PxeUndiSetStationAddr (
   )
 ;
 
-/**
-  PXE
-  UNDI SET PACKET FILTER
-  Op-Code: PXENV_UNDI_SET_PACKET_FILTER (000Bh)
-  Input: Far pointer to a PXENV_UNDI_SET_PACKET_FILTER_T parameter structure that has been
-  initialized by the caller.
-  Output: PXENV_EXIT_SUCCESS or PXENV_EXIT_FAILURE must be returned in AX. The status field in
-  the parameter structure must be set to one of the values represented by the PXENV_STATUS_xxx
-  constants.
-  Description: This call resets the adapter's receive unit to accept a new filter, different from the one provided with
-  the open call.
-  typedef struct {
-    PXENV_STATUS Status;
-    UINT8 filter;
-  } PXENV_UNDI_SET_PACKET_FILTER_T;
-  Set before calling API service
-  Filter: See the receive filter values in the UNDI OPEN
-  (0006h) API description.
-  Returned from API service
-  Status: See the PXENV_STATUS_xxx constants.
-
-  @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value
-                                for option ROM call.
-
-  @return Return value of PXE option ROM far call.
-**/
-EFI_STATUS
-PxeUndiSetPacketFilter (
-  IN EFI_SIMPLE_NETWORK_DEV               *SimpleNetworkDevice,
-  IN OUT PXENV_UNDI_SET_PACKET_FILTER_T   *PxeUndiTable
-  )
-;
 
 /**
   PXE
@@ -1252,73 +1186,6 @@ PxeUndiClearStatistics (
   )
 ;
 
-/**
-  PXE
-  UNDI INITIATE DIAGS
-  Op-Code: PXENV_UNDI_INITIATE_DIAGS (000Fh)
-  Input: Far pointer to a PXENV_UNDI_INITIATE_DIAGS_T parameter.
-  Output: PXENV_EXIT_SUCCESS or PXENV_EXIT_FAILURE must be returned in AX. The status field in
-  the parameter structure must be set to one of the values represented by the
-  PXENV_STATUS_xxx constants.
-  Description: This call can be used to initiate the run-time diagnostics. It causes the network adapter to run
-  hardware diagnostics and to update its status information.
-  typedef struct {
-    PXENV_STATUS Status;
-  } PXENV_UNDI_INITIATE_DIAGS_T;
-  Set before calling API service
-  N/A
-  Returned from API service
-  Status: See the PXENV_STATUS_xxx constants.
-
-  @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value
-                                for option ROM call.
-
-  @return Return value of PXE option ROM far call.
-**/
-EFI_STATUS
-PxeUndiInitiateDiags (
-  IN EFI_SIMPLE_NETWORK_DEV               *SimpleNetworkDevice,
-  IN OUT PXENV_UNDI_INITIATE_DIAGS_T      *PxeUndiTable
-  )
-;
-
-/**
-  PXE
-  UNDI FORCE INTERRUPT
-  Op-Code: PXENV_UNDI_FORCE_INTERRUPT (0010h)
-  Input: Far pointer to a PXENV_UNDI_FORCE_INTERRUPT_T parameter structure that has been
-  initialized by the caller.
-  Output: PXENV_EXIT_SUCCESS or PXENV_EXIT_FAILURE must be returned in AX. The status field in
-  the parameter structure must be set to one of the values represented by the PXENV_STATUS_xxx
-  constants.
-  Description: This call forces the network adapter to generate an interrupt. When a receive interrupt occurs, the
-  network adapter driver usually queues the packet and calls the application's callback receive
-  routine with a pointer to the packet received. Then, the callback routine either can copy the packet
-  to its buffer or can decide to delay the copy to a later time. If the packet is not immediately copied,
-  the network adapter driver does not remove it from the input queue. When the application wants to
-  copy the packet, it can call the PXENV_UNDI_FORCE_INTERRUPT routine to simulate the receive
-  interrupt.
-  typedef struct {
-    PXENV_STATUS Status;
-  } PXENV_UNDI_FORCE_INTERRUPT_T;
-  Set before calling API service
-  N/A
-  Returned from API service
-  Status: See the PXENV_STATUS_xxx constants.
-
-  @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value
-                                for option ROM call.
-
-  @return Return value of PXE option ROM far call.
-**/
-EFI_STATUS
-PxeUndiForceInterrupt (
-  IN EFI_SIMPLE_NETWORK_DEV               *SimpleNetworkDevice,
-  IN OUT PXENV_UNDI_FORCE_INTERRUPT_T     *PxeUndiTable
-  )
-;
 
 /**
   PXE
@@ -1562,53 +1429,6 @@ PxeUndiStop (
   )
 ;
 
-/**
-  PXE
-  UNDI GET STATE
-  Op-Code: PXENV_UNDI_GET_STATE (0015h)
-  Input: Far pointer to a PXENV_UNDI_GET_STATE_T parameter.
-  Output: PXENV_EXIT_SUCCESS or PXENV_EXIT_FAILURE must be returned in AX. The status field in
-  the parameter structure must be set to one of the values represented by the PXENV_STATUS_xxx
-  constants. The UNDI_STATE field in the parameter structure must be set to one of the valid state
-  constants
-  Description: This call can be used to obtain state of the UNDI engine in order to avoid issuing adverse call
-  sequences
-  typedef struct {
-    #define PXE_UNDI_GET_STATE_STARTED 1
-    #define PXE_UNDI_GET_STATE_INITIALIZED 2
-    #define PXE_UNDI_GET_STATE_OPENED 3
-    PXENV_STATUS Status;
-    UINT8 UNDIstate;
-  } PXENV_UNDI_GET_STATE_T;
-  Set before calling API service
-  N/A
-  Returned from API service
-  Status: See the PXENV_STATUS_xxx constants.
-  State: See definitions of the state constants.
-  Note. UNDI implementation is responsible for maintaining
-  internal state machine.
-  UNDI ISR
-  Op-Code: PXENV_UNDI_ISR (0014h)
-  Input: Far pointer to a t_PXENV_UNDI_ISR parameter structure that has been initialized by the caller.
-  Output: PXENV_EXIT_SUCCESS or PXENV_EXIT_FAILURE must be returned in AX. The status field in
-  the parameter structure must be set to one of the values represented by the PXENV_STATUS_xxx
-  constants.
-  Description: This API function will be called at different levels of processing the interrupt. The FuncFlag field in
-  the parameter block indicates the operation to be performed for the call. This field is filled with the
-  status of that operation on return.
-
-  @param  SimpleNetworkDevice   Device instance
-  @param  PxeUndiTable          Point to structure which hold parameter and return value
-                                for option ROM call.
-
-  @return Return value of PXE option ROM far call.
-**/
-EFI_STATUS
-PxeUndiGetState (
-  IN EFI_SIMPLE_NETWORK_DEV               *SimpleNetworkDevice,
-  IN OUT PXENV_UNDI_GET_STATE_T           *PxeUndiTable
-  )
-;
 
 /**
   Effect the Far Call into the PXE Layer
