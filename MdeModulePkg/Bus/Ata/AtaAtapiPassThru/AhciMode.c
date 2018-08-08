@@ -294,41 +294,6 @@ AhciCheckMemSet (
   }
 }
 
-/**
-  Check if the device is still on port. It also checks if the AHCI controller
-  supports the address and data count will be transferred.
-
-  @param  PciIo            The PCI IO protocol instance.
-  @param  Port             The number of port.
-
-  @retval EFI_SUCCESS      The device is attached to port and the transfer data is
-                           supported by AHCI controller.
-  @retval EFI_UNSUPPORTED  The transfer address and count is not supported by AHCI
-                           controller.
-  @retval EFI_NOT_READY    The physical communication between AHCI controller and device
-                           is not ready.
-
-**/
-EFI_STATUS
-EFIAPI
-AhciCheckDeviceStatus (
-  IN  EFI_PCI_IO_PROTOCOL    *PciIo,
-  IN  UINT8                  Port
-  )
-{
-  UINT32      Data;
-  UINT32      Offset;
-
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SSTS;
-
-  Data   = AhciReadReg (PciIo, Offset) & EFI_AHCI_PORT_SSTS_DET_MASK;
-
-  if (Data == EFI_AHCI_PORT_SSTS_DET_PCE) {
-    return EFI_SUCCESS;
-  }
-
-  return EFI_NOT_READY;
-}
 
 /**
 
@@ -1361,75 +1326,6 @@ AhciStartCommand (
   return EFI_SUCCESS;
 }
 
-/**
-  Do AHCI port reset.
-
-  @param  PciIo              The PCI IO protocol instance.
-  @param  Port               The number of port.
-  @param  Timeout            The timeout value of reset, uses 100ns as a unit.
-
-  @retval EFI_DEVICE_ERROR   The port reset unsuccessfully
-  @retval EFI_TIMEOUT        The reset operation is time out.
-  @retval EFI_SUCCESS        The port reset successfully.
-
-**/
-EFI_STATUS
-EFIAPI
-AhciPortReset (
-  IN  EFI_PCI_IO_PROTOCOL       *PciIo,
-  IN  UINT8                     Port,
-  IN  UINT64                    Timeout
-  )
-{
-  EFI_STATUS      Status;
-  UINT32          Offset;
-
-  AhciClearPortStatus (PciIo, Port);
-
-  AhciStopCommand (PciIo, Port, Timeout);
-
-  AhciDisableFisReceive (PciIo, Port, Timeout);
-
-  AhciEnableFisReceive (PciIo, Port, Timeout);
-
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SCTL;
-
-  AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_SCTL_DET_INIT);
-
-  //
-  // wait 5 millisecond before de-assert DET
-  //
-  MicroSecondDelay (5000);
-
-  AhciAndReg (PciIo, Offset, (UINT32)EFI_AHCI_PORT_SCTL_MASK);
-
-  //
-  // wait 5 millisecond before de-assert DET
-  //
-  MicroSecondDelay (5000);
-
-  //
-  // Wait for communication to be re-established
-  //
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SSTS;
-  Status = AhciWaitMmioSet (
-             PciIo,
-             Offset,
-             EFI_AHCI_PORT_SSTS_DET_MASK,
-             EFI_AHCI_PORT_SSTS_DET_PCE,
-             Timeout
-             );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "Port %d COMRESET failed: %r\n", Port, Status));
-    return Status;
-  }
-
-  Offset = EFI_AHCI_PORT_START + Port * EFI_AHCI_PORT_REG_WIDTH + EFI_AHCI_PORT_SERR;
-  AhciOrReg (PciIo, Offset, EFI_AHCI_PORT_ERR_CLEAR);
-
-  return EFI_SUCCESS;
-}
 
 /**
   Do AHCI HBA reset.
