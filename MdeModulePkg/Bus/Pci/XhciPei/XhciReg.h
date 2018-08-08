@@ -302,20 +302,6 @@ XhcPeiWaitOpRegBit (
   IN UINT32             Timeout
   );
 
-/**
-  Read XHCI door bell register.
-
-  @param  Xhc           The XHCI device.
-  @param  Offset        The offset of the door bell register.
-
-  @return The register content read
-
-**/
-UINT32
-XhcPeiReadDoorBellReg (
-  IN  PEI_XHC_DEV       *Xhc,
-  IN  UINT32            Offset
-  );
 
 /**
   Write the data to the XHCI door bell register.
