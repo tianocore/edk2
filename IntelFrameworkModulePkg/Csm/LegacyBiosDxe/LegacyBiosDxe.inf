@@ -72,8 +72,6 @@
   DxeServicesTableLib
   PcdLib
   ReportStatusCodeLib
-  PeCoffLib
-  CacheMaintenanceLib
   DebugAgentLib
 
 [LibraryClasses.IA32]

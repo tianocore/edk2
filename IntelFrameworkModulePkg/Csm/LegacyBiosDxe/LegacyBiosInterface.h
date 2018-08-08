@@ -63,8 +63,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/PcdLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/DxeServicesTableLib.h>
-#include <Library/PeCoffLib.h>
-#include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugAgentLib.h>
 
 //
