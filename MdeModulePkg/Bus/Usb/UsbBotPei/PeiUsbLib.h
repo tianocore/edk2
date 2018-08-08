@@ -100,50 +100,6 @@ typedef enum {
   EfiUsbEndpoint
 } EFI_USB_RECIPIENT;
 
-/**
-  Get a given usb descriptor.
-
-  @param  PeiServices        General-purpose services that are available to every PEIM.
-  @param  UsbIoPpi           Indicates the PEI_USB_IO_PPI instance.
-  @param  Value              Request Value.
-  @param  Index              Request Index.
-  @param  DescriptorLength   Request descriptor Length.
-  @param  Descriptor         Request descriptor.
-
-
-  @retval EFI_SUCCESS       Usb descriptor is obtained successfully.
-  @retval EFI_DEVICE_ERROR  Cannot get the usb descriptor due to a hardware error.
-  @retval Others            Other failure occurs.
-
-**/
-EFI_STATUS
-PeiUsbGetDescriptor (
-  IN  EFI_PEI_SERVICES         **PeiServices,
-  IN  PEI_USB_IO_PPI           *UsbIoPpi,
-  IN  UINT16                   Value,
-  IN  UINT16                   Index,
-  IN  UINT16                   DescriptorLength,
-  OUT VOID                     *Descriptor
-  );
-
-/**
-  Set a usb device with a specified address.
-
-  @param  PeiServices        General-purpose services that are available to every PEIM.
-  @param  UsbIoPpi           Indicates the PEI_USB_IO_PPI instance.
-  @param  AddressValue       The address to assign.
-
-  @retval EFI_SUCCESS        Usb device address is set successfully.
-  @retval EFI_DEVICE_ERROR   Cannot set the usb address due to a hardware error.
-  @retval Others             Other failure occurs.
-
-**/
-EFI_STATUS
-PeiUsbSetDeviceAddress (
-  IN EFI_PEI_SERVICES         **PeiServices,
-  IN PEI_USB_IO_PPI           *UsbIoPpi,
-  IN UINT16                   AddressValue
-  );
 
 /**
   Clear a given usb feature.
@@ -168,22 +124,6 @@ PeiUsbClearDeviceFeature (
   IN UINT16                   Target
   );
 
-/**
-  Configure a usb device to Configuration 1.
-
-  @param  PeiServices        General-purpose services that are available to every PEIM.
-  @param  UsbIoPpi           Indicates the PEI_USB_IO_PPI instance.
-
-  @retval EFI_SUCCESS        Usb device is set to use Configuration 1 successfully.
-  @retval EFI_DEVICE_ERROR   Cannot set the usb device due to a hardware error.
-  @retval Others             Other failure occurs.
-
-**/
-EFI_STATUS
-PeiUsbSetConfiguration (
-  IN EFI_PEI_SERVICES         **PeiServices,
-  IN PEI_USB_IO_PPI           *UsbIoPpi
-  );
 
 /**
   Clear Endpoint Halt.
@@ -204,45 +144,7 @@ PeiUsbClearEndpointHalt (
   IN UINT8                    EndpointAddress
   );
 
-/**
-  Judge if the port is connected with a usb device or not.
 
-  @param  PortStatus  The usb port status gotten.
 
-  @retval TRUE        A usb device is connected with the port.
-  @retval FALSE       No usb device is connected with the port.
 
-**/
-BOOLEAN
-IsPortConnect (
-  IN UINT16  PortStatus
-  );
-
-/**
-  Judge if the port is connected with a low-speed usb device or not.
-
-  @param  PortStatus  The usb port status gotten.
-
-  @retval TRUE        A low-speed usb device is connected with the port.
-  @retval FALSE       No low-speed usb device is connected with the port.
-
-**/
-BOOLEAN
-IsPortLowSpeedDeviceAttached (
-  IN UINT16  PortStatus
-  );
-
-/**
-  Judge if the port is in "connection change" status or not.
-
-  @param  PortChangeStatus  The usb port change status gotten.
-
-  @retval TRUE              The port is in "connection change" status.
-  @retval FALSE             The port is NOT in "connection change" status.
-
-**/
-BOOLEAN
-IsPortConnectChange (
-  IN UINT16  PortChangeStatus
-  );
 #endif
