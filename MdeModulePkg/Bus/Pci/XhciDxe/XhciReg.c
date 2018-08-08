@@ -158,75 +158,9 @@ XhcWriteOpReg (
   }
 }
 
-/**
-  Write the data to the 2-bytes width XHCI operational register.
 
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the 2-bytes width operational register.
-  @param  Data         The data to write.
 
-**/
-VOID
-XhcWriteOpReg16 (
-  IN USB_XHCI_INSTANCE    *Xhc,
-  IN UINT32               Offset,
-  IN UINT16               Data
-  )
-{
-  EFI_STATUS              Status;
 
-  ASSERT (Xhc->CapLength != 0);
-
-  Status = Xhc->PciIo->Mem.Write (
-                             Xhc->PciIo,
-                             EfiPciIoWidthUint16,
-                             XHC_BAR_INDEX,
-                             Xhc->CapLength + Offset,
-                             1,
-                             &Data
-                             );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcWriteOpReg16: Pci Io Write error: %r at %d\n", Status, Offset));
-  }
-}
-
-/**
-  Read XHCI door bell register.
-
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the door bell register.
-
-  @return The register content read
-
-**/
-UINT32
-XhcReadDoorBellReg (
-  IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  UINT32              Offset
-  )
-{
-  UINT32                  Data;
-  EFI_STATUS              Status;
-
-  ASSERT (Xhc->DBOff != 0);
-
-  Status = Xhc->PciIo->Mem.Read (
-                             Xhc->PciIo,
-                             EfiPciIoWidthUint32,
-                             XHC_BAR_INDEX,
-                             Xhc->DBOff + Offset,
-                             1,
-                             &Data
-                             );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((EFI_D_ERROR, "XhcReadDoorBellReg: Pci Io Read error - %r at %d\n", Status, Offset));
-    Data = 0xFFFFFFFF;
-  }
-
-  return Data;
-}
 
 /**
   Write the data to the XHCI door bell register.

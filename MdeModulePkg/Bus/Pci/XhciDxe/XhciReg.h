@@ -286,20 +286,6 @@ XhcWriteOpReg (
   IN UINT32               Data
   );
 
-/**
-  Write the data to the 2-bytes width XHCI operational register.
-
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the 2-bytes width operational register.
-  @param  Data         The data to write.
-
-**/
-VOID
-XhcWriteOpReg16 (
-  IN USB_XHCI_INSTANCE    *Xhc,
-  IN UINT32               Offset,
-  IN UINT16               Data
-  );
 
 /**
   Read XHCI runtime register.
@@ -331,20 +317,6 @@ XhcWriteRuntimeReg (
   IN UINT32               Data
   );
 
-/**
-  Read XHCI door bell register.
-
-  @param  Xhc          The XHCI Instance.
-  @param  Offset       The offset of the door bell register.
-
-  @return The register content read
-
-**/
-UINT32
-XhcReadDoorBellReg (
-  IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  UINT32              Offset
-  );
 
 /**
   Write the data to the XHCI door bell register.
