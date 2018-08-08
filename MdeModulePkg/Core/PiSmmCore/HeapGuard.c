@@ -455,51 +455,6 @@ GetGuardMapBit (
   return 0;
 }
 
-/**
-  Set the bit in bitmap table for the given address.
-
-  @param[in]  Address     The address to set for.
-
-  @return VOID.
-**/
-VOID
-EFIAPI
-SetGuardMapBit (
-  IN EFI_PHYSICAL_ADDRESS    Address
-  )
-{
-  UINT64        *GuardMap;
-  UINT64        BitMask;
-
-  FindGuardedMemoryMap (Address, TRUE, &GuardMap);
-  if (GuardMap != NULL) {
-    BitMask = LShiftU64 (1, GUARDED_HEAP_MAP_ENTRY_BIT_INDEX (Address));
-    *GuardMap |= BitMask;
-  }
-}
-
-/**
-  Clear the bit in bitmap table for the given address.
-
-  @param[in]  Address     The address to clear for.
-
-  @return VOID.
-**/
-VOID
-EFIAPI
-ClearGuardMapBit (
-  IN EFI_PHYSICAL_ADDRESS    Address
-  )
-{
-  UINT64        *GuardMap;
-  UINT64        BitMask;
-
-  FindGuardedMemoryMap (Address, TRUE, &GuardMap);
-  if (GuardMap != NULL) {
-    BitMask = LShiftU64 (1, GUARDED_HEAP_MAP_ENTRY_BIT_INDEX (Address));
-    *GuardMap &= ~BitMask;
-  }
-}
 
 /**
   Check to see if the page at the given address is a Guard page or not.
@@ -526,39 +481,7 @@ IsGuardPage (
   return ((BitMap == BIT0) || (BitMap == BIT2) || (BitMap == (BIT2 | BIT0)));
 }
 
-/**
-  Check to see if the page at the given address is a head Guard page or not.
 
-  @param[in]  Address     The address to check for.
-
-  @return TRUE  The page at Address is a head Guard page.
-  @return FALSE The page at Address is not a head Guard page.
-**/
-BOOLEAN
-EFIAPI
-IsHeadGuard (
-  IN EFI_PHYSICAL_ADDRESS    Address
-  )
-{
-  return (GetGuardedMemoryBits (Address, 2) == BIT1);
-}
-
-/**
-  Check to see if the page at the given address is a tail Guard page or not.
-
-  @param[in]  Address     The address to check for.
-
-  @return TRUE  The page at Address is a tail Guard page.
-  @return FALSE The page at Address is not a tail Guard page.
-**/
-BOOLEAN
-EFIAPI
-IsTailGuard (
-  IN EFI_PHYSICAL_ADDRESS    Address
-  )
-{
-  return (GetGuardedMemoryBits (Address - EFI_PAGE_SIZE, 2) == BIT0);
-}
 
 /**
   Check to see if the page at the given address is guarded or not.
@@ -864,66 +787,7 @@ UnsetGuardForMemory (
   ClearGuardedMemoryBits(Memory, NumberOfPages);
 }
 
-/**
-  Adjust address of free memory according to existing and/or required Guard.
 
-  This function will check if there're existing Guard pages of adjacent
-  memory blocks, and try to use it as the Guard page of the memory to be
-  allocated.
-
-  @param[in]  Start           Start address of free memory block.
-  @param[in]  Size            Size of free memory block.
-  @param[in]  SizeRequested   Size of memory to allocate.
-
-  @return The end address of memory block found.
-  @return 0 if no enough space for the required size of memory and its Guard.
-**/
-UINT64
-AdjustMemoryS (
-  IN UINT64                  Start,
-  IN UINT64                  Size,
-  IN UINT64                  SizeRequested
-  )
-{
-  UINT64  Target;
-
-  //
-  // UEFI spec requires that allocated pool must be 8-byte aligned. If it's
-  // indicated to put the pool near the Tail Guard, we need extra bytes to
-  // make sure alignment of the returned pool address.
-  //
-  if ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0) {
-    SizeRequested = ALIGN_VALUE(SizeRequested, 8);
-  }
-
-  Target = Start + Size - SizeRequested;
-  ASSERT (Target >= Start);
-  if (Target == 0) {
-    return 0;
-  }
-
-  if (!IsGuardPage (Start + Size)) {
-    // No Guard at tail to share. One more page is needed.
-    Target -= EFI_PAGES_TO_SIZE (1);
-  }
-
-  // Out of range?
-  if (Target < Start) {
-    return 0;
-  }
-
-  // At the edge?
-  if (Target == Start) {
-    if (!IsGuardPage (Target - EFI_PAGES_TO_SIZE (1))) {
-      // No enough space for a new head Guard if no Guard at head to share.
-      return 0;
-    }
-  }
-
-  // OK, we have enough pages for memory and its Guards. Return the End of the
-  // free space.
-  return Target + SizeRequested - 1;
-}
 
 /**
   Adjust the start address and number of pages to free according to Guard.
@@ -1049,36 +913,6 @@ AdjustMemoryF (
   *NumberOfPages  = PagesToFree;
 }
 
-/**
-  Adjust the base and number of pages to really allocate according to Guard.
-
-  @param[in,out]  Memory          Base address of free memory.
-  @param[in,out]  NumberOfPages   Size of memory to allocate.
-
-  @return VOID.
-**/
-VOID
-AdjustMemoryA (
-  IN OUT EFI_PHYSICAL_ADDRESS    *Memory,
-  IN OUT UINTN                   *NumberOfPages
-  )
-{
-  //
-  // FindFreePages() has already taken the Guard into account. It's safe to
-  // adjust the start address and/or number of pages here, to make sure that
-  // the Guards are also "allocated".
-  //
-  if (!IsGuardPage (*Memory + EFI_PAGES_TO_SIZE (*NumberOfPages))) {
-    // No tail Guard, add one.
-    *NumberOfPages += 1;
-  }
-
-  if (!IsGuardPage (*Memory - EFI_PAGE_SIZE)) {
-    // No head Guard, add one.
-    *Memory        -= EFI_PAGE_SIZE;
-    *NumberOfPages += 1;
-  }
-}
 
 /**
   Adjust the pool head position to make sure the Guard page is adjavent to

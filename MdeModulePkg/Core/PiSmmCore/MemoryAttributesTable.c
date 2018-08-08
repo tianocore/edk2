@@ -114,34 +114,6 @@ EfiSizeToPages (
   return RShiftU64 (Size, EFI_PAGE_SHIFT) + ((((UINTN)Size) & EFI_PAGE_MASK) ? 1 : 0);
 }
 
-/**
-  Check the consistency of Smm memory attributes table.
-
-  @param[in] MemoryAttributesTable  PI SMM memory attributes table
-**/
-VOID
-SmmMemoryAttributesTableConsistencyCheck (
-  IN EDKII_PI_SMM_MEMORY_ATTRIBUTES_TABLE *MemoryAttributesTable
-  )
-{
-  EFI_MEMORY_DESCRIPTOR                     *MemoryMap;
-  UINTN                                     MemoryMapEntryCount;
-  UINTN                                     DescriptorSize;
-  UINTN                                     Index;
-  UINT64                                    Address;
-
-  Address = 0;
-  MemoryMapEntryCount = MemoryAttributesTable->NumberOfEntries;
-  DescriptorSize = MemoryAttributesTable->DescriptorSize;
-  MemoryMap = (EFI_MEMORY_DESCRIPTOR *)(MemoryAttributesTable + 1);
-  for (Index = 0; Index < MemoryMapEntryCount; Index++) {
-    if (Address != 0) {
-      ASSERT (Address == MemoryMap->PhysicalStart);
-    }
-    Address = MemoryMap->PhysicalStart + EfiPagesToSize(MemoryMap->NumberOfPages);
-    MemoryMap = NEXT_MEMORY_DESCRIPTOR(MemoryMap, DescriptorSize);
-  }
-}
 
 /**
   Sort memory map entries based upon PhysicalStart, from low to high.
@@ -1224,85 +1196,6 @@ Finish:
   return ;
 }
 
-/**
-  Find image record according to image base and size.
-
-  @param[in]  ImageBase    Base of PE image
-  @param[in]  ImageSize    Size of PE image
-
-  @return image record
-**/
-STATIC
-IMAGE_PROPERTIES_RECORD *
-FindImageRecord (
-  IN EFI_PHYSICAL_ADDRESS  ImageBase,
-  IN UINT64                ImageSize
-  )
-{
-  IMAGE_PROPERTIES_RECORD    *ImageRecord;
-  LIST_ENTRY                 *ImageRecordLink;
-  LIST_ENTRY                 *ImageRecordList;
-
-  ImageRecordList = &mImagePropertiesPrivateData.ImageRecordList;
-
-  for (ImageRecordLink = ImageRecordList->ForwardLink;
-       ImageRecordLink != ImageRecordList;
-       ImageRecordLink = ImageRecordLink->ForwardLink) {
-    ImageRecord = CR (
-                    ImageRecordLink,
-                    IMAGE_PROPERTIES_RECORD,
-                    Link,
-                    IMAGE_PROPERTIES_RECORD_SIGNATURE
-                    );
-
-    if ((ImageBase == ImageRecord->ImageBase) &&
-        (ImageSize == ImageRecord->ImageSize)) {
-      return ImageRecord;
-    }
-  }
-
-  return NULL;
-}
-
-/**
-  Remove Image record.
-
-  @param[in]  DriverEntry    Driver information
-**/
-VOID
-SmmRemoveImageRecord (
-  IN EFI_SMM_DRIVER_ENTRY  *DriverEntry
-  )
-{
-  IMAGE_PROPERTIES_RECORD              *ImageRecord;
-  LIST_ENTRY                           *CodeSegmentListHead;
-  IMAGE_PROPERTIES_RECORD_CODE_SECTION *ImageRecordCodeSection;
-
-  DEBUG ((DEBUG_VERBOSE, "SMM RemoveImageRecord - 0x%x\n", DriverEntry));
-  DEBUG ((DEBUG_VERBOSE, "SMM RemoveImageRecord - 0x%016lx - 0x%016lx\n", DriverEntry->ImageBuffer, DriverEntry->NumberOfPage));
-
-  ImageRecord = FindImageRecord (DriverEntry->ImageBuffer, EfiPagesToSize(DriverEntry->NumberOfPage));
-  if (ImageRecord == NULL) {
-    DEBUG ((DEBUG_ERROR, "SMM !!!!!!!! ImageRecord not found !!!!!!!!\n"));
-    return ;
-  }
-
-  CodeSegmentListHead = &ImageRecord->CodeSegmentList;
-  while (!IsListEmpty (CodeSegmentListHead)) {
-    ImageRecordCodeSection = CR (
-                               CodeSegmentListHead->ForwardLink,
-                               IMAGE_PROPERTIES_RECORD_CODE_SECTION,
-                               Link,
-                               IMAGE_PROPERTIES_RECORD_CODE_SECTION_SIGNATURE
-                               );
-    RemoveEntryList (&ImageRecordCodeSection->Link);
-    FreePool (ImageRecordCodeSection);
-  }
-
-  RemoveEntryList (&ImageRecord->Link);
-  FreePool (ImageRecord);
-  mImagePropertiesPrivateData.ImageRecordCount--;
-}
 
 /**
   Publish MemoryAttributesTable to SMM configuration table.
@@ -1386,30 +1279,6 @@ PublishMemoryAttributesTable (
   ASSERT_EFI_ERROR (Status);
 }
 
-/**
-  This function returns if image is inside SMRAM.
-
-  @param[in] LoadedImage LoadedImage protocol instance for an image.
-
-  @retval TRUE  the image is inside SMRAM.
-  @retval FALSE the image is outside SMRAM.
-**/
-BOOLEAN
-IsImageInsideSmram (
-  IN EFI_LOADED_IMAGE_PROTOCOL   *LoadedImage
-  )
-{
-  UINTN  Index;
-
-  for (Index = 0; Index < mFullSmramRangeCount; Index++) {
-    if ((mFullSmramRanges[Index].PhysicalStart <= (UINTN)LoadedImage->ImageBase)&&
-        (mFullSmramRanges[Index].PhysicalStart + mFullSmramRanges[Index].PhysicalSize >= (UINTN)LoadedImage->ImageBase + LoadedImage->ImageSize)) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
 
 /**
   This function installs all SMM image record information.
