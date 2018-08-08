@@ -380,13 +380,6 @@ CreateDeviceNode (
    UINT16                          NodeLength
   );
 
- EFI_DEVICE_PATH_PROTOCOL *
-CreateDeviceNode (
-   UINT8                           NodeType,
-   UINT8                           NodeSubType,
-   UINT16                          NodeLength
-  );
-
 BOOLEAN
 IsDevicePathMultiInstance (
    CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
