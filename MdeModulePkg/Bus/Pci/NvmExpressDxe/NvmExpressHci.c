@@ -183,43 +183,7 @@ ReadNvmeControllerStatus (
   return EFI_SUCCESS;
 }
 
-/**
-  Read Nvm Express admin queue attributes register.
 
-  @param  Private          The pointer to the NVME_CONTROLLER_PRIVATE_DATA data structure.
-  @param  Aqa              The buffer used to store admin queue attributes register content.
-
-  @return EFI_SUCCESS      Successfully read the admin queue attributes register content.
-  @return EFI_DEVICE_ERROR Fail to read the admin queue attributes register.
-
-**/
-EFI_STATUS
-ReadNvmeAdminQueueAttributes (
-  IN NVME_CONTROLLER_PRIVATE_DATA     *Private,
-  IN NVME_AQA                         *Aqa
-  )
-{
-  EFI_PCI_IO_PROTOCOL   *PciIo;
-  EFI_STATUS            Status;
-  UINT32                Data;
-
-  PciIo  = Private->PciIo;
-  Status = PciIo->Mem.Read (
-                        PciIo,
-                        EfiPciIoWidthUint32,
-                        NVME_BAR,
-                        NVME_AQA_OFFSET,
-                        1,
-                        &Data
-                        );
-
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
-  WriteUnaligned32 ((UINT32*)Aqa, Data);
-  return EFI_SUCCESS;
-}
 
 /**
   Write Nvm Express admin queue attributes register.
@@ -262,43 +226,6 @@ WriteNvmeAdminQueueAttributes (
   return EFI_SUCCESS;
 }
 
-/**
-  Read Nvm Express admin submission queue base address register.
-
-  @param  Private          The pointer to the NVME_CONTROLLER_PRIVATE_DATA data structure.
-  @param  Asq              The buffer used to store admin submission queue base address register content.
-
-  @return EFI_SUCCESS      Successfully read the admin submission queue base address register content.
-  @return EFI_DEVICE_ERROR Fail to read the admin submission queue base address register.
-
-**/
-EFI_STATUS
-ReadNvmeAdminSubmissionQueueBaseAddress (
-  IN NVME_CONTROLLER_PRIVATE_DATA     *Private,
-  IN NVME_ASQ                         *Asq
-  )
-{
-  EFI_PCI_IO_PROTOCOL   *PciIo;
-  EFI_STATUS            Status;
-  UINT64                Data;
-
-  PciIo  = Private->PciIo;
-  Status = PciIo->Mem.Read (
-                        PciIo,
-                        EfiPciIoWidthUint32,
-                        NVME_BAR,
-                        NVME_ASQ_OFFSET,
-                        2,
-                        &Data
-                        );
-
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
-  WriteUnaligned64 ((UINT64*)Asq, Data);
-  return EFI_SUCCESS;
-}
 
 /**
   Write Nvm Express admin submission queue base address register.
@@ -341,44 +268,7 @@ WriteNvmeAdminSubmissionQueueBaseAddress (
   return EFI_SUCCESS;
 }
 
-/**
-  Read Nvm Express admin completion queue base address register.
 
-  @param  Private          The pointer to the NVME_CONTROLLER_PRIVATE_DATA data structure.
-  @param  Acq              The buffer used to store admin completion queue base address register content.
-
-  @return EFI_SUCCESS      Successfully read the admin completion queue base address register content.
-  @return EFI_DEVICE_ERROR Fail to read the admin completion queue base address register.
-
-**/
-EFI_STATUS
-ReadNvmeAdminCompletionQueueBaseAddress (
-  IN NVME_CONTROLLER_PRIVATE_DATA     *Private,
-  IN NVME_ACQ                         *Acq
-  )
-{
-  EFI_PCI_IO_PROTOCOL   *PciIo;
-  EFI_STATUS            Status;
-  UINT64                Data;
-
-  PciIo  = Private->PciIo;
-
-  Status = PciIo->Mem.Read (
-                        PciIo,
-                        EfiPciIoWidthUint32,
-                        NVME_BAR,
-                        NVME_ACQ_OFFSET,
-                        2,
-                        &Data
-                        );
-
-  if (EFI_ERROR(Status)) {
-    return Status;
-  }
-
-  WriteUnaligned64 ((UINT64*)Acq, Data);
-  return EFI_SUCCESS;
-}
 
 /**
   Write Nvm Express admin completion queue base address register.
