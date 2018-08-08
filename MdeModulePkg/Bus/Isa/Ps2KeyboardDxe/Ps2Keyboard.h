@@ -300,18 +300,6 @@ InitKeyboard (
   IN BOOLEAN                     ExtendedVerification
   );
 
-/**
-  Disable the keyboard interface of the 8042 controller.
-
-  @param ConsoleIn   - the device instance
-
-  @return status of issuing disable command
-
-**/
-EFI_STATUS
-DisableKeyboard (
-  IN KEYBOARD_CONSOLE_IN_DEV *ConsoleIn
-  );
 
 /**
   Timer event handler: read a series of scancodes from 8042
