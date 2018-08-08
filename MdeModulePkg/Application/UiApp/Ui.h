@@ -53,27 +53,7 @@ typedef struct {
 //
 //The interface functions related to the Setup Browser Reset Reminder feature
 //
-/**
-  Enable the setup browser reset reminder feature.
-  This routine is used in a platform tip. If the platform policy needs the feature, use the routine to enable it.
 
-**/
-VOID
-EFIAPI
-EnableResetReminderFeature (
-  VOID
-  );
-
-/**
-  Disable the setup browser reset reminder feature.
-  This routine is used in a platform tip. If the platform policy does not want the feature, use the routine to disable it.
-
-**/
-VOID
-EFIAPI
-DisableResetReminderFeature (
-  VOID
-  );
 
 /**
   Record the info that a reset is required.
@@ -87,16 +67,6 @@ EnableResetRequired (
   );
 
 
-/**
-  Record the info that no reset is required.
-  A module boolean variable is used to record whether a reset is required.
-
-**/
-VOID
-EFIAPI
-DisableResetRequired (
-  VOID
-  );
 
 /**
   Check whether platform policy enables the reset reminder feature. The default is enabled.

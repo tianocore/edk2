@@ -1042,34 +1042,7 @@ UiEntry (
 //
 
 
-/**
-  Enable the setup browser reset reminder feature.
-  This routine is used in platform tip. If the platform policy need the feature, use the routine to enable it.
 
-**/
-VOID
-EFIAPI
-EnableResetReminderFeature (
-  VOID
-  )
-{
-  mFeaturerSwitch = TRUE;
-}
-
-
-/**
-  Disable the setup browser reset reminder feature.
-  This routine is used in platform tip. If the platform policy do not want the feature, use the routine to disable it.
-
-**/
-VOID
-EFIAPI
-DisableResetReminderFeature (
-  VOID
-  )
-{
-  mFeaturerSwitch = FALSE;
-}
 
 
 /**
@@ -1087,19 +1060,6 @@ EnableResetRequired (
 }
 
 
-/**
-  Record the info that  no reset is required.
-  A  module boolean variable is used to record whether a reset is required.
-
-**/
-VOID
-EFIAPI
-DisableResetRequired (
-  VOID
-  )
-{
-  mResetRequired = FALSE;
-}
 
 
 /**
