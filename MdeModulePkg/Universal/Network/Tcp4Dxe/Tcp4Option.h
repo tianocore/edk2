@@ -126,20 +126,5 @@ TcpParseOption (
   IN OUT TCP_OPTION *Option
   );
 
-/**
-  Check the segment against PAWS.
-
-  @param  Tcb     Pointer to the TCP_CB of this TCP instance.
-  @param  TSVal   The timestamp value.
-
-  @retval 1       The segment passed the PAWS check.
-  @retval 0       The segment failed to pass the PAWS check.
-
-**/
-UINT32
-TcpPawsOK (
-  IN TCP_CB *Tcb,
-  IN UINT32 TSVal
-  );
 
 #endif

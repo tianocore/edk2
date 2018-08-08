@@ -550,19 +550,6 @@ SockClone (
   IN SOCKET *Sock
   );
 
-/**
-  Signal the receive token with the specific error or
-  set socket error code after error is received.
-
-  @param  Sock                  Pointer to the socket.
-  @param  Error                 The error code received.
-
-**/
-VOID
-SockRcvdErr (
-  IN OUT SOCKET       *Sock,
-  IN     EFI_STATUS   Error
-  );
 
 ///
 /// Proto type of the create callback
@@ -907,25 +894,6 @@ EFI_STATUS
 SockGetMode (
   IN     SOCKET *Sock,
   IN OUT VOID   *Mode
-  );
-
-/**
-  Configure the low level protocol to join a multicast group for
-  this socket's connection.
-
-  @param  Sock                 Pointer to the socket of the connection to join the
-                               specific multicast group.
-  @param  GroupInfo            Pointer to the multicast group info.
-
-  @retval EFI_SUCCESS          The configuration is done successfully.
-  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket.
-  @retval EFI_NOT_STARTED      The socket is not configured.
-
-**/
-EFI_STATUS
-SockGroup (
-  IN SOCKET *Sock,
-  IN VOID   *GroupInfo
   );
 
 /**

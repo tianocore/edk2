@@ -350,31 +350,3 @@ TcpParseOption (
 }
 
 
-/**
-  Check the segment against PAWS.
-
-  @param  Tcb     Pointer to the TCP_CB of this TCP instance.
-  @param  TSVal   The timestamp value.
-
-  @retval 1       The segment passed the PAWS check.
-  @retval 0       The segment failed to pass the PAWS check.
-
-**/
-UINT32
-TcpPawsOK (
-  IN TCP_CB *Tcb,
-  IN UINT32 TSVal
-  )
-{
-  //
-  // PAWS as defined in RFC1323, buggy...
-  //
-  if (TCP_TIME_LT (TSVal, Tcb->TsRecent) &&
-      TCP_TIME_LT (Tcb->TsRecentAge + TCP_PAWS_24DAY, mTcpTick)) {
-
-    return 0;
-
-  }
-
-  return 1;
-}

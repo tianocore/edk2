@@ -938,48 +938,7 @@ SockGetMode (
 }
 
 
-/**
-  Configure the low level protocol to join a multicast group for
-  this socket's connection.
 
-  @param  Sock                 Pointer to the socket of the connection to join the
-                               specific multicast group.
-  @param  GroupInfo            Pointer to the multicast group info.
-
-  @retval EFI_SUCCESS          The configuration is done successfully.
-  @retval EFI_ACCESS_DENIED    Failed to get the lock to access the socket.
-  @retval EFI_NOT_STARTED      The socket is not configured.
-
-**/
-EFI_STATUS
-SockGroup (
-  IN SOCKET *Sock,
-  IN VOID   *GroupInfo
-  )
-{
-  EFI_STATUS  Status;
-
-  Status = EfiAcquireLockOrFail (&(Sock->Lock));
-
-  if (EFI_ERROR (Status)) {
-
-    DEBUG ((EFI_D_ERROR, "SockGroup: Get the access for socket"
-      " failed with %r", Status));
-
-    return EFI_ACCESS_DENIED;
-  }
-
-  if (SOCK_IS_UNCONFIGURED (Sock)) {
-    Status = EFI_NOT_STARTED;
-    goto Exit;
-  }
-
-  Status = Sock->ProtoHandler (Sock, SOCK_GROUP, GroupInfo);
-
-Exit:
-  EfiReleaseLock (&(Sock->Lock));
-  return Status;
-}
 
 
 /**

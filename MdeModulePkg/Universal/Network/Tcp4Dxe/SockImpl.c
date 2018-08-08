@@ -1107,41 +1107,6 @@ SockGetFreeSpace (
 }
 
 
-/**
-  Signal the receive token with the specific error or
-  set socket error code after error is received.
-
-  @param  Sock                  Pointer to the socket.
-  @param  Error                 The error code received.
-
-**/
-VOID
-SockRcvdErr (
-  IN OUT SOCKET       *Sock,
-  IN     EFI_STATUS   Error
-  )
-{
-  SOCK_TOKEN  *SockToken;
-
-  if (!IsListEmpty (&Sock->RcvTokenList)) {
-
-    SockToken = NET_LIST_HEAD (
-                  &Sock->RcvTokenList,
-                  SOCK_TOKEN,
-                  TokenList
-                  );
-
-    RemoveEntryList (&SockToken->TokenList);
-
-    SIGNAL_TOKEN (SockToken->Token, Error);
-
-    FreePool (SockToken);
-  } else {
-
-    SOCK_ERROR (Sock, Error);
-  }
-}
-
 
 /**
   Called by the low layer protocol to indicate that there will be no more data
