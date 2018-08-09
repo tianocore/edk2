@@ -2097,39 +2097,6 @@ IScsiDelTcb (
 
 
 /**
-  Find the task control block by the initator task tag.
-
-  @param[in]  TcbList         The tcb list.
-  @param[in]  InitiatorTaskTag The initiator task tag.
-
-  @return The task control block found.
-  @retval NULL The task control block cannot be found.
-
-**/
-ISCSI_TCB *
-IScsiFindTcbByITT (
-  IN LIST_ENTRY      *TcbList,
-  IN UINT32          InitiatorTaskTag
-  )
-{
-  ISCSI_TCB       *Tcb;
-  LIST_ENTRY      *Entry;
-
-  Tcb = NULL;
-
-  NET_LIST_FOR_EACH (Entry, TcbList) {
-    Tcb = NET_LIST_USER_STRUCT (Entry, ISCSI_TCB, Link);
-
-    if (Tcb->InitiatorTaskTag == InitiatorTaskTag) {
-      break;
-    }
-  }
-
-  return Tcb;
-}
-
-
-/**
   Create a data segment, pad it, and calculate the CRC if needed.
 
   @param[in]  Data       The data to fill into the data segment.

@@ -124,7 +124,6 @@
   gEfiIfrTianoGuid                              ## SOMETIMES_PRODUCES ## UNDEFINED
   gEfiAcpiTableGuid                             ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi10TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
-  gEfiAcpi20TableGuid                           ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAdapterInfoNetworkBootGuid                ## SOMETIMES_CONSUMES ## UNDEFINED
   gEfiAdapterInfoUndiIpv6SupportGuid            ## SOMETIMES_CONSUMES ## GUID
 
