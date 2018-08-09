@@ -355,10 +355,8 @@ o16 mov     [ecx + IA32_TSS._SS], ax
     movzx  ebx, word [ecx + IA32_TSS._CS]
     mov    [eax - 0x8], ebx                      ; create CS in old stack
     mov    ebx, dword [ecx + IA32_TSS.EFLAGS]
-    bts    ebx, 8
+    bts    ebx, 8                                ; Set TF
     mov    [eax - 0x4], ebx                      ; create eflags in old stack
-    mov    dword [ecx + IA32_TSS.EFLAGS], ebx    ; update eflags in old TSS
-    mov    eax, dword [ecx + IA32_TSS._ESP]      ; Get old stack pointer
     sub    eax, 0xc                              ; minus 12 byte
     mov    dword [ecx + IA32_TSS._ESP], eax      ; Set new stack pointer
 

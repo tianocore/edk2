@@ -336,6 +336,10 @@ HasErrorCode:
     pop     r15
 
     mov     rsp, rbp
+    cmp     qword [rbp + 8], 14 ; #PF?
+    jne     .1
+    bts     qword [rsp + 40], 8 ; RFLAGS.TF
+.1:
     pop     rbp
     add     rsp, 16
     cmp     qword [rsp - 32], 0  ; check EXCEPTION_HANDLER_CONTEXT.OldIdtHandler
