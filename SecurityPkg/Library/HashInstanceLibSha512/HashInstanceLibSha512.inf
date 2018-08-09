@@ -17,7 +17,7 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = HashInstanceLibSha512
   MODULE_UNI_FILE                = HashInstanceLibSha512.uni
-  FILE_GUID                      = 5810798A-ED30-4080-8DD7-B9667A748C02
+  FILE_GUID                      = 959C3685-AC3F-4F3E-AC5B-7E2A64BADD36
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = NULL
