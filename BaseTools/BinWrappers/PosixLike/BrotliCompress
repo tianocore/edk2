@@ -2,7 +2,7 @@
 #
 # This script will exec Brotli tool with -e/-d options.
 #
-# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -11,18 +11,15 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-QLT="-q 9"
-INPUTFLAG=0
+QLT="-q 9 -w 22"
 ARGS=
 
 while test $# -gt 0
 do
   case $1 in
     -e)
-      INPUTFLAG=1
       ;;
     -d)
-      INPUTFLAG=1
       ARGS+="$1 "
       ;;
     -o|-g)
@@ -34,16 +31,10 @@ do
       shift
       ;;
     *)
-      if [ $INPUTFLAG -eq 1 ]
-        then
-          ARGS+="-i $1 "
-          INPUTFLAG=0
-        else
-          ARGS+="$1 "
-      fi
+      ARGS+="$1 "
       ;;
   esac
   shift
 done
 
-exec Brotli $ARGS $QLT
+exec Brotli $QLT $ARGS

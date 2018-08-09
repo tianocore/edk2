@@ -1,7 +1,7 @@
 @REM @file
 @REM This script will exec Brotli tool with -e/-d options.
 @REM
-@REM Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+@REM Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
 @REM This program and the accompanying materials
 @REM are licensed and made available under the terms and conditions of the BSD License
 @REM which accompanies this distribution.  The full text of the license may be found at
@@ -14,22 +14,19 @@
 @echo off
 @setlocal
 
-set QLT=-q 9
-set INPUTFLAG=0
+set QLT=-q 9 -w 22
 set ARGS=
 
 :Begin
 if "%1"=="" goto End
 
 if "%1"=="-d" (
-  set INPUTFLAG=1
   set ARGS=%ARGS% %1
   shift
   goto Begin
 )
 
 if "%1"=="-e" (
-  set INPUTFLAG=1
   shift
   goto Begin
 )
@@ -55,15 +52,10 @@ if "%1"=="-q" (
   goto Begin
 )
 
-if %INPUTFLAG% == 1 (
-  set ARGS=%ARGS% -i %1
-  set INPUTFLAG=0
-) else (
-  set ARGS=%ARGS% %1
-)
+set ARGS=%ARGS% %1
 shift
 goto Begin
 
 :End
-Brotli %ARGS% %QLT%
+Brotli %QLT% %ARGS%
 @echo on

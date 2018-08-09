@@ -13,7 +13,7 @@ static void FN(InitialEntropyCodes)(const DataType* data, size_t length,
                                     size_t stride,
                                     size_t num_histograms,
                                     HistogramType* histograms) {
-  unsigned int seed = 7;
+  uint32_t seed = 7;
   size_t block_length = length / num_histograms;
   size_t i;
   FN(ClearHistograms)(histograms, num_histograms);
@@ -29,14 +29,13 @@ static void FN(InitialEntropyCodes)(const DataType* data, size_t length,
   }
 }
 
-static void FN(RandomSample)(unsigned int* seed,
+static void FN(RandomSample)(uint32_t* seed,
                              const DataType* data,
                              size_t length,
                              size_t stride,
                              HistogramType* sample) {
   size_t pos = 0;
   if (stride >= length) {
-    pos = 0;
     stride = length;
   } else {
     pos = MyRand(seed) % (length - stride + 1);
@@ -50,7 +49,7 @@ static void FN(RefineEntropyCodes)(const DataType* data, size_t length,
                                    HistogramType* histograms) {
   size_t iters =
       kIterMulForRefining * length / stride + kMinItersForRefining;
-  unsigned int seed = 7;
+  uint32_t seed = 7;
   size_t iter;
   iters = ((iters + num_histograms - 1) / num_histograms) * num_histograms;
   for (iter = 0; iter < iters; ++iter) {
@@ -61,7 +60,7 @@ static void FN(RefineEntropyCodes)(const DataType* data, size_t length,
   }
 }
 
-/* Assigns a block id from the range [0, vec.size()) to each data element
+/* Assigns a block id from the range [0, num_histograms) to each data element
    in data[0..length) and fills in block_id[0..length) with the assigned values.
    Returns the number of blocks, i.e. one plus the number of block switches. */
 static size_t FN(FindBlocks)(const DataType* data, const size_t length,
@@ -71,13 +70,13 @@ static size_t FN(FindBlocks)(const DataType* data, const size_t length,
                              double* insert_cost,
                              double* cost,
                              uint8_t* switch_signal,
-                             uint8_t *block_id) {
+                             uint8_t* block_id) {
   const size_t data_size = FN(HistogramDataSize)();
   const size_t bitmaplen = (num_histograms + 7) >> 3;
   size_t num_blocks = 1;
   size_t i;
   size_t j;
-  assert(num_histograms <= 256);
+  BROTLI_DCHECK(num_histograms <= 256);
   if (num_histograms <= 1) {
     for (i = 0; i < length; ++i) {
       block_id[i] = 0;
@@ -127,7 +126,7 @@ static size_t FN(FindBlocks)(const DataType* data, const size_t length,
       if (cost[k] >= block_switch_cost) {
         const uint8_t mask = (uint8_t)(1u << (k & 7));
         cost[k] = block_switch_cost;
-        assert((k >> 3) < bitmaplen);
+        BROTLI_DCHECK((k >> 3) < bitmaplen);
         switch_signal[ix + (k >> 3)] |= mask;
       }
     }
@@ -138,7 +137,7 @@ static size_t FN(FindBlocks)(const DataType* data, const size_t length,
     uint8_t cur_id = block_id[byte_ix];
     while (byte_ix > 0) {
       const uint8_t mask = (uint8_t)(1u << (cur_id & 7));
-      assert(((size_t)cur_id >> 3) < bitmaplen);
+      BROTLI_DCHECK(((size_t)cur_id >> 3) < bitmaplen);
       --byte_ix;
       ix -= bitmaplen;
       if (switch_signal[ix + (cur_id >> 3)] & mask) {
@@ -162,16 +161,16 @@ static size_t FN(RemapBlockIds)(uint8_t* block_ids, const size_t length,
     new_id[i] = kInvalidId;
   }
   for (i = 0; i < length; ++i) {
-    assert(block_ids[i] < num_histograms);
+    BROTLI_DCHECK(block_ids[i] < num_histograms);
     if (new_id[block_ids[i]] == kInvalidId) {
       new_id[block_ids[i]] = next_id++;
     }
   }
   for (i = 0; i < length; ++i) {
     block_ids[i] = (uint8_t)new_id[block_ids[i]];
-    assert(block_ids[i] < num_histograms);
+    BROTLI_DCHECK(block_ids[i] < num_histograms);
   }
-  assert(next_id <= num_histograms);
+  BROTLI_DCHECK(next_id <= num_histograms);
   return next_id;
 }
 
@@ -214,7 +213,6 @@ static void FN(ClusterBlocks)(MemoryManager* m,
   size_t num_final_clusters;
   static const uint32_t kInvalidIndex = BROTLI_UINT32_MAX;
   uint32_t* new_index;
-  uint8_t max_type = 0;
   size_t i;
   uint32_t sizes[HISTOGRAMS_PER_BATCH] = { 0 };
   uint32_t new_clusters[HISTOGRAMS_PER_BATCH] = { 0 };
@@ -228,13 +226,13 @@ static void FN(ClusterBlocks)(MemoryManager* m,
   {
     size_t block_idx = 0;
     for (i = 0; i < length; ++i) {
-      assert(block_idx < num_blocks);
+      BROTLI_DCHECK(block_idx < num_blocks);
       ++block_lengths[block_idx];
       if (i + 1 == length || block_ids[i] != block_ids[i + 1]) {
         ++block_idx;
       }
     }
-    assert(block_idx == num_blocks);
+    BROTLI_DCHECK(block_idx == num_blocks);
   }
 
   for (i = 0; i < num_blocks; i += HISTOGRAMS_PER_BATCH) {
@@ -270,8 +268,8 @@ static void FN(ClusterBlocks)(MemoryManager* m,
       histogram_symbols[i + j] = (uint32_t)num_clusters + remap[symbols[j]];
     }
     num_clusters += num_new_clusters;
-    assert(num_clusters == cluster_size_size);
-    assert(num_clusters == all_histograms_size);
+    BROTLI_DCHECK(num_clusters == cluster_size_size);
+    BROTLI_DCHECK(num_clusters == all_histograms_size);
   }
   BROTLI_FREE(m, histograms);
 
@@ -337,6 +335,7 @@ static void FN(ClusterBlocks)(MemoryManager* m,
   {
     uint32_t cur_length = 0;
     size_t block_idx = 0;
+    uint8_t max_type = 0;
     for (i = 0; i < num_blocks; ++i) {
       cur_length += block_lengths[i];
       if (i + 1 == num_blocks ||
@@ -398,7 +397,7 @@ static void FN(SplitByteVector)(MemoryManager* m,
   {
     /* Find a good path through literals with the good entropy codes. */
     uint8_t* block_ids = BROTLI_ALLOC(m, uint8_t, length);
-    size_t num_blocks;
+    size_t num_blocks = 0;
     const size_t bitmaplen = (num_histograms + 7) >> 3;
     double* insert_cost = BROTLI_ALLOC(m, double, data_size * num_histograms);
     double* cost = BROTLI_ALLOC(m, double, num_histograms);

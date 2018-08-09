@@ -7,21 +7,17 @@
 #include "./static_dict.h"
 
 #include "../common/dictionary.h"
+#include "../common/platform.h"
+#include "../common/transform.h"
+#include "./encoder_dict.h"
 #include "./find_match_length.h"
-#include "./port.h"
-#include "./static_dict_lut.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
 #endif
 
-static const uint8_t kUppercaseFirst = 10;
-static const uint8_t kOmitLastNTransforms[10] = {
-  0, 12, 27, 23, 42, 63, 56, 48, 59, 64,
-};
-
-static BROTLI_INLINE uint32_t Hash(const uint8_t *data) {
-  uint32_t h = BROTLI_UNALIGNED_LOAD32(data) * kDictHashMul32;
+static BROTLI_INLINE uint32_t Hash(const uint8_t* data) {
+  uint32_t h = BROTLI_UNALIGNED_LOAD32LE(data) * kDictHashMul32;
   /* The higher bits contain more mixture from the multiplication,
      so we take our results from there. */
   return h >> (32 - kDictNumBits);
@@ -33,23 +29,24 @@ static BROTLI_INLINE void AddMatch(size_t distance, size_t len, size_t len_code,
   matches[len] = BROTLI_MIN(uint32_t, matches[len], match);
 }
 
-static BROTLI_INLINE size_t DictMatchLength(const uint8_t* data,
+static BROTLI_INLINE size_t DictMatchLength(const BrotliDictionary* dictionary,
+                                            const uint8_t* data,
                                             size_t id,
                                             size_t len,
                                             size_t maxlen) {
-  const size_t offset = kBrotliDictionaryOffsetsByLength[len] + len * id;
-  return FindMatchLengthWithLimit(&kBrotliDictionary[offset], data,
+  const size_t offset = dictionary->offsets_by_length[len] + len * id;
+  return FindMatchLengthWithLimit(&dictionary->data[offset], data,
                                   BROTLI_MIN(size_t, len, maxlen));
 }
 
-static BROTLI_INLINE BROTLI_BOOL IsMatch(
+static BROTLI_INLINE BROTLI_BOOL IsMatch(const BrotliDictionary* dictionary,
     DictWord w, const uint8_t* data, size_t max_length) {
   if (w.len > max_length) {
     return BROTLI_FALSE;
   } else {
-    const size_t offset = kBrotliDictionaryOffsetsByLength[w.len] +
+    const size_t offset = dictionary->offsets_by_length[w.len] +
         (size_t)w.len * (size_t)w.idx;
-    const uint8_t* dict = &kBrotliDictionary[offset];
+    const uint8_t* dict = &dictionary->data[offset];
     if (w.transform == 0) {
       /* Match against base dictionary word. */
       return
@@ -78,31 +75,33 @@ static BROTLI_INLINE BROTLI_BOOL IsMatch(
 }
 
 BROTLI_BOOL BrotliFindAllStaticDictionaryMatches(
-    const uint8_t* data, size_t min_length, size_t max_length,
-    uint32_t* matches) {
+    const BrotliEncoderDictionary* dictionary, const uint8_t* data,
+    size_t min_length, size_t max_length, uint32_t* matches) {
   BROTLI_BOOL has_found_match = BROTLI_FALSE;
   {
-    size_t offset = kStaticDictionaryBuckets[Hash(data)];
+    size_t offset = dictionary->buckets[Hash(data)];
     BROTLI_BOOL end = !offset;
     while (!end) {
-      DictWord w = kStaticDictionaryWords[offset++];
-      const size_t l = w.len & 0x7F;
-      const size_t n = (size_t)1 << kBrotliDictionarySizeBitsByLength[l];
+      DictWord w = dictionary->dict_words[offset++];
+      const size_t l = w.len & 0x1F;
+      const size_t n = (size_t)1 << dictionary->words->size_bits_by_length[l];
       const size_t id = w.idx;
       end = !!(w.len & 0x80);
       w.len = (uint8_t)l;
       if (w.transform == 0) {
-        const size_t matchlen = DictMatchLength(data, id, l, max_length);
+        const size_t matchlen =
+            DictMatchLength(dictionary->words, data, id, l, max_length);
         const uint8_t* s;
         size_t minlen;
         size_t maxlen;
         size_t len;
-        /* Transform "" + kIdentity + "" */
+        /* Transform "" + BROTLI_TRANSFORM_IDENTITY + "" */
         if (matchlen == l) {
           AddMatch(id, l, l, matches);
           has_found_match = BROTLI_TRUE;
         }
-        /* Transforms "" + kOmitLast1 + "" and "" + kOmitLast1 + "ing " */
+        /* Transforms "" + BROTLI_TRANSFORM_OMIT_LAST_1 + "" and
+                      "" + BROTLI_TRANSFORM_OMIT_LAST_1 + "ing " */
         if (matchlen >= l - 1) {
           AddMatch(id + 12 * n, l - 1, l, matches);
           if (l + 2 < max_length &&
@@ -112,19 +111,22 @@ BROTLI_BOOL BrotliFindAllStaticDictionaryMatches(
           }
           has_found_match = BROTLI_TRUE;
         }
-        /* Transform "" + kOmitLastN + "" (N = 2 .. 9) */
+        /* Transform "" + BROTLI_TRANSFORM_OMIT_LAST_# + "" (# = 2 .. 9) */
         minlen = min_length;
         if (l > 9) minlen = BROTLI_MAX(size_t, minlen, l - 9);
         maxlen = BROTLI_MIN(size_t, matchlen, l - 2);
         for (len = minlen; len <= maxlen; ++len) {
-          AddMatch(id + kOmitLastNTransforms[l - len] * n, len, l, matches);
+          size_t cut = l - len;
+          size_t transform_id = (cut << 2) +
+              (size_t)((dictionary->cutoffTransforms >> (cut * 6)) & 0x3F);
+          AddMatch(id + transform_id * n, len, l, matches);
           has_found_match = BROTLI_TRUE;
         }
         if (matchlen < l || l + 6 >= max_length) {
           continue;
         }
         s = &data[l];
-        /* Transforms "" + kIdentity + <suffix> */
+        /* Transforms "" + BROTLI_TRANSFORM_IDENTITY + <suffix> */
         if (s[0] == ' ') {
           AddMatch(id + n, l + 1, l, matches);
           if (s[1] == 'a') {
@@ -271,12 +273,13 @@ BROTLI_BOOL BrotliFindAllStaticDictionaryMatches(
           }
         }
       } else {
-        /* Set is_all_caps=0 for kUppercaseFirst and
-               is_all_caps=1 otherwise (kUppercaseAll) transform. */
+        /* Set is_all_caps=0 for BROTLI_TRANSFORM_UPPERCASE_FIRST and
+               is_all_caps=1 otherwise (BROTLI_TRANSFORM_UPPERCASE_ALL)
+           transform. */
         const BROTLI_BOOL is_all_caps =
-            TO_BROTLI_BOOL(w.transform != kUppercaseFirst);
+            TO_BROTLI_BOOL(w.transform != BROTLI_TRANSFORM_UPPERCASE_FIRST);
         const uint8_t* s;
-        if (!IsMatch(w, data, max_length)) {
+        if (!IsMatch(dictionary->words, w, data, max_length)) {
           continue;
         }
         /* Transform "" + kUppercase{First,All} + "" */
@@ -321,27 +324,29 @@ BROTLI_BOOL BrotliFindAllStaticDictionaryMatches(
   /* Transforms with prefixes " " and "." */
   if (max_length >= 5 && (data[0] == ' ' || data[0] == '.')) {
     BROTLI_BOOL is_space = TO_BROTLI_BOOL(data[0] == ' ');
-    size_t offset = kStaticDictionaryBuckets[Hash(&data[1])];
+    size_t offset = dictionary->buckets[Hash(&data[1])];
     BROTLI_BOOL end = !offset;
     while (!end) {
-      DictWord w = kStaticDictionaryWords[offset++];
-      const size_t l = w.len & 0x7F;
-      const size_t n = (size_t)1 << kBrotliDictionarySizeBitsByLength[l];
+      DictWord w = dictionary->dict_words[offset++];
+      const size_t l = w.len & 0x1F;
+      const size_t n = (size_t)1 << dictionary->words->size_bits_by_length[l];
       const size_t id = w.idx;
       end = !!(w.len & 0x80);
       w.len = (uint8_t)l;
       if (w.transform == 0) {
         const uint8_t* s;
-        if (!IsMatch(w, &data[1], max_length - 1)) {
+        if (!IsMatch(dictionary->words, w, &data[1], max_length - 1)) {
           continue;
         }
-        /* Transforms " " + kIdentity + "" and "." + kIdentity + "" */
+        /* Transforms " " + BROTLI_TRANSFORM_IDENTITY + "" and
+                      "." + BROTLI_TRANSFORM_IDENTITY + "" */
         AddMatch(id + (is_space ? 6 : 32) * n, l + 1, l, matches);
         has_found_match = BROTLI_TRUE;
         if (l + 2 >= max_length) {
           continue;
         }
-        /* Transforms " " + kIdentity + <suffix> and "." + kIdentity + <suffix>
+        /* Transforms " " + BROTLI_TRANSFORM_IDENTITY + <suffix> and
+                      "." + BROTLI_TRANSFORM_IDENTITY + <suffix>
         */
         s = &data[l + 1];
         if (s[0] == ' ') {
@@ -368,12 +373,13 @@ BROTLI_BOOL BrotliFindAllStaticDictionaryMatches(
           }
         }
       } else if (is_space) {
-        /* Set is_all_caps=0 for kUppercaseFirst and
-               is_all_caps=1 otherwise (kUppercaseAll) transform. */
+        /* Set is_all_caps=0 for BROTLI_TRANSFORM_UPPERCASE_FIRST and
+               is_all_caps=1 otherwise (BROTLI_TRANSFORM_UPPERCASE_ALL)
+           transform. */
         const BROTLI_BOOL is_all_caps =
-            TO_BROTLI_BOOL(w.transform != kUppercaseFirst);
+            TO_BROTLI_BOOL(w.transform != BROTLI_TRANSFORM_UPPERCASE_FIRST);
         const uint8_t* s;
-        if (!IsMatch(w, &data[1], max_length - 1)) {
+        if (!IsMatch(dictionary->words, w, &data[1], max_length - 1)) {
           continue;
         }
         /* Transforms " " + kUppercase{First,All} + "" */
@@ -409,21 +415,22 @@ BROTLI_BOOL BrotliFindAllStaticDictionaryMatches(
     }
   }
   if (max_length >= 6) {
-    /* Transforms with prefixes "e ", "s ", ", " and "\xc2\xa0" */
+    /* Transforms with prefixes "e ", "s ", ", " and "\xC2\xA0" */
     if ((data[1] == ' ' &&
          (data[0] == 'e' || data[0] == 's' || data[0] == ',')) ||
-        (data[0] == 0xc2 && data[1] == 0xa0)) {
-      size_t offset = kStaticDictionaryBuckets[Hash(&data[2])];
+        (data[0] == 0xC2 && data[1] == 0xA0)) {
+      size_t offset = dictionary->buckets[Hash(&data[2])];
       BROTLI_BOOL end = !offset;
       while (!end) {
-        DictWord w = kStaticDictionaryWords[offset++];
-        const size_t l = w.len & 0x7F;
-        const size_t n = (size_t)1 << kBrotliDictionarySizeBitsByLength[l];
+        DictWord w = dictionary->dict_words[offset++];
+        const size_t l = w.len & 0x1F;
+        const size_t n = (size_t)1 << dictionary->words->size_bits_by_length[l];
         const size_t id = w.idx;
         end = !!(w.len & 0x80);
         w.len = (uint8_t)l;
-        if (w.transform == 0 && IsMatch(w, &data[2], max_length - 2)) {
-          if (data[0] == 0xc2) {
+        if (w.transform == 0 &&
+            IsMatch(dictionary->words, w, &data[2], max_length - 2)) {
+          if (data[0] == 0xC2) {
             AddMatch(id + 102 * n, l + 2, l, matches);
             has_found_match = BROTLI_TRUE;
           } else if (l + 2 < max_length && data[l + 2] == ' ') {
@@ -441,16 +448,17 @@ BROTLI_BOOL BrotliFindAllStaticDictionaryMatches(
          data[3] == 'e' && data[4] == ' ') ||
         (data[0] == '.' && data[1] == 'c' && data[2] == 'o' &&
          data[3] == 'm' && data[4] == '/')) {
-      size_t offset = kStaticDictionaryBuckets[Hash(&data[5])];
+      size_t offset = dictionary->buckets[Hash(&data[5])];
       BROTLI_BOOL end = !offset;
       while (!end) {
-        DictWord w = kStaticDictionaryWords[offset++];
-        const size_t l = w.len & 0x7F;
-        const size_t n = (size_t)1 << kBrotliDictionarySizeBitsByLength[l];
+        DictWord w = dictionary->dict_words[offset++];
+        const size_t l = w.len & 0x1F;
+        const size_t n = (size_t)1 << dictionary->words->size_bits_by_length[l];
         const size_t id = w.idx;
         end = !!(w.len & 0x80);
         w.len = (uint8_t)l;
-        if (w.transform == 0 && IsMatch(w, &data[5], max_length - 5)) {
+        if (w.transform == 0 &&
+            IsMatch(dictionary->words, w, &data[5], max_length - 5)) {
           AddMatch(id + (data[0] == ' ' ? 41 : 72) * n, l + 5, l, matches);
           has_found_match = BROTLI_TRUE;
           if (l + 5 < max_length) {

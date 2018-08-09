@@ -13,9 +13,9 @@
 #ifndef BROTLI_ENC_COMPRESS_FRAGMENT_TWO_PASS_H_
 #define BROTLI_ENC_COMPRESS_FRAGMENT_TWO_PASS_H_
 
-#include "../common/types.h"
+#include "../common/platform.h"
+#include <brotli/types.h>
 #include "./memory.h"
-#include "./port.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
@@ -29,10 +29,13 @@ static const size_t kCompressFragmentTwoPassBlockSize = 1 << 17;
    If "is_last" is 1, emits an additional empty last meta-block.
 
    REQUIRES: "input_size" is greater than zero, or "is_last" is 1.
+   REQUIRES: "input_size" is less or equal to maximal metablock size (1 << 24).
    REQUIRES: "command_buf" and "literal_buf" point to at least
               kCompressFragmentTwoPassBlockSize long arrays.
    REQUIRES: All elements in "table[0..table_size-1]" are initialized to zero.
-   REQUIRES: "table_size" is a power of two */
+   REQUIRES: "table_size" is a power of two
+   OUTPUT: maximal copy distance <= |input_size|
+   OUTPUT: maximal copy distance <= BROTLI_MAX_BACKWARD_LIMIT(18) */
 BROTLI_INTERNAL void BrotliCompressFragmentTwoPass(MemoryManager* m,
                                                    const uint8_t* input,
                                                    size_t input_size,

@@ -11,8 +11,8 @@
 #include <string.h>  /* memset */
 
 #include "../common/constants.h"
-#include "../common/types.h"
-#include "./port.h"
+#include "../common/platform.h"
+#include <brotli/types.h>
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
@@ -23,7 +23,7 @@ BROTLI_BOOL BrotliSetDepth(
   int stack[16];
   int level = 0;
   int p = p0;
-  assert(max_depth <= 15);
+  BROTLI_DCHECK(max_depth <= 15);
   stack[0] = -1;
   while (BROTLI_TRUE) {
     if (pool[p].index_left_ >= 0) {
@@ -66,11 +66,11 @@ static BROTLI_INLINE BROTLI_BOOL SortHuffmanTree(
    we are not planning to use this with extremely long blocks.
 
    See http://en.wikipedia.org/wiki/Huffman_coding */
-void BrotliCreateHuffmanTree(const uint32_t *data,
+void BrotliCreateHuffmanTree(const uint32_t* data,
                              const size_t length,
                              const int tree_limit,
                              HuffmanTree* tree,
-                             uint8_t *depth) {
+                             uint8_t* depth) {
   uint32_t count_limit;
   HuffmanTree sentinel;
   InitHuffmanTree(&sentinel, BROTLI_UINT32_MAX, -1, -1);
@@ -165,7 +165,7 @@ static void BrotliWriteHuffmanTreeRepetitions(
     size_t* tree_size,
     uint8_t* tree,
     uint8_t* extra_bits_data) {
-  assert(repetitions > 0);
+  BROTLI_DCHECK(repetitions > 0);
   if (previous_value != value) {
     tree[*tree_size] = value;
     extra_bits_data[*tree_size] = 0;
@@ -246,7 +246,7 @@ void BrotliOptimizeHuffmanCountsForRle(size_t length, uint32_t* counts,
   size_t limit;
   size_t sum;
   const size_t streak_limit = 1240;
-  /* Let's make the Huffman code more compatible with rle encoding. */
+  /* Let's make the Huffman code more compatible with RLE encoding. */
   size_t i;
   for (i = 0; i < length; i++) {
     if (counts[i]) {
@@ -293,10 +293,10 @@ void BrotliOptimizeHuffmanCountsForRle(size_t length, uint32_t* counts,
     }
   }
   /* 2) Let's mark all population counts that already can be encoded
-     with an rle code. */
+     with an RLE code. */
   memset(good_for_rle, 0, length);
   {
-    /* Let's not spoil any of the existing good rle codes.
+    /* Let's not spoil any of the existing good RLE codes.
        Mark any seq of 0's that is longer as 5 as a good_for_rle.
        Mark any seq of non-0's that is longer as 7 as a good_for_rle. */
     uint32_t symbol = counts[0];
@@ -319,7 +319,7 @@ void BrotliOptimizeHuffmanCountsForRle(size_t length, uint32_t* counts,
       }
     }
   }
-  /* 3) Let's replace those population counts that lead to more rle codes.
+  /* 3) Let's replace those population counts that lead to more RLE codes.
      Math here is in 24.8 fixed point representation. */
   stride = 0;
   limit = 256 * (counts[0] + counts[1] + counts[2]) / 3 + 420;
@@ -371,8 +371,8 @@ void BrotliOptimizeHuffmanCountsForRle(size_t length, uint32_t* counts,
 }
 
 static void DecideOverRleUse(const uint8_t* depth, const size_t length,
-                             BROTLI_BOOL *use_rle_for_non_zero,
-                             BROTLI_BOOL *use_rle_for_zero) {
+                             BROTLI_BOOL* use_rle_for_non_zero,
+                             BROTLI_BOOL* use_rle_for_zero) {
   size_t total_reps_zero = 0;
   size_t total_reps_non_zero = 0;
   size_t count_reps_zero = 1;
@@ -420,15 +420,15 @@ void BrotliWriteHuffmanTree(const uint8_t* depth,
     }
   }
 
-  /* First gather statistics on if it is a good idea to do rle. */
+  /* First gather statistics on if it is a good idea to do RLE. */
   if (length > 50) {
-    /* Find rle coding for longer codes.
-       Shorter codes seem not to benefit from rle. */
+    /* Find RLE coding for longer codes.
+       Shorter codes seem not to benefit from RLE. */
     DecideOverRleUse(depth, new_length,
                      &use_rle_for_non_zero, &use_rle_for_zero);
   }
 
-  /* Actual rle coding. */
+  /* Actual RLE coding. */
   for (i = 0; i < new_length;) {
     const uint8_t value = depth[i];
     size_t reps = 1;
@@ -454,26 +454,26 @@ void BrotliWriteHuffmanTree(const uint8_t* depth,
 
 static uint16_t BrotliReverseBits(size_t num_bits, uint16_t bits) {
   static const size_t kLut[16] = {  /* Pre-reversed 4-bit values. */
-    0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe,
-    0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf
+    0x00, 0x08, 0x04, 0x0C, 0x02, 0x0A, 0x06, 0x0E,
+    0x01, 0x09, 0x05, 0x0D, 0x03, 0x0B, 0x07, 0x0F
   };
-  size_t retval = kLut[bits & 0xf];
+  size_t retval = kLut[bits & 0x0F];
   size_t i;
   for (i = 4; i < num_bits; i += 4) {
     retval <<= 4;
     bits = (uint16_t)(bits >> 4);
-    retval |= kLut[bits & 0xf];
+    retval |= kLut[bits & 0x0F];
   }
-  retval >>= ((0 - num_bits) & 0x3);
+  retval >>= ((0 - num_bits) & 0x03);
   return (uint16_t)retval;
 }
 
 /* 0..15 are values for bits */
 #define MAX_HUFFMAN_BITS 16
 
-void BrotliConvertBitDepthsToSymbols(const uint8_t *depth,
+void BrotliConvertBitDepthsToSymbols(const uint8_t* depth,
                                      size_t len,
-                                     uint16_t *bits) {
+                                     uint16_t* bits) {
   /* In Brotli, all bit depths are [1..15]
      0 bit depth means that the symbol does not exist. */
   uint16_t bl_count[MAX_HUFFMAN_BITS] = { 0 };

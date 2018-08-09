@@ -28,8 +28,8 @@ static BROTLI_INLINE size_t FN(HashTypeLength)(void) { return 4; }
 static BROTLI_INLINE size_t FN(StoreLookahead)(void) { return 4; }
 
 /* HashBytes is the function that chooses the bucket to place the address in.*/
-static BROTLI_INLINE size_t FN(HashBytes)(const uint8_t *data) {
-  const uint32_t h = BROTLI_UNALIGNED_LOAD32(data) * kHashMul32;
+static BROTLI_INLINE size_t FN(HashBytes)(const uint8_t* data) {
+  const uint32_t h = BROTLI_UNALIGNED_LOAD32LE(data) * kHashMul32;
   /* The higher bits contain more mixture from the multiplication,
      so we take our results from there. */
   return h >> (32 - BUCKET_BITS);
@@ -51,65 +51,57 @@ typedef struct HashForgetfulChain {
   uint8_t tiny_hash[65536];
   FN(Bank) banks[NUM_BANKS];
   uint16_t free_slot_idx[NUM_BANKS];
-  BROTLI_BOOL is_dirty_;
-  DictionarySearchStatictics dict_search_stats_;
   size_t max_hops;
 } HashForgetfulChain;
 
-static void FN(Reset)(HashForgetfulChain* self) {
-  self->is_dirty_ = BROTLI_TRUE;
-  DictionarySearchStaticticsReset(&self->dict_search_stats_);
+static BROTLI_INLINE HashForgetfulChain* FN(Self)(HasherHandle handle) {
+  return (HashForgetfulChain*)&(GetHasherCommon(handle)[1]);
 }
 
-static void FN(InitEmpty)(HashForgetfulChain* self) {
-  if (self->is_dirty_) {
+static void FN(Initialize)(
+    HasherHandle handle, const BrotliEncoderParams* params) {
+  FN(Self)(handle)->max_hops =
+      (params->quality > 6 ? 7u : 8u) << (params->quality - 4);
+}
+
+static void FN(Prepare)(HasherHandle handle, BROTLI_BOOL one_shot,
+    size_t input_size, const uint8_t* data) {
+  HashForgetfulChain* self = FN(Self)(handle);
+  /* Partial preparation is 100 times slower (per socket). */
+  size_t partial_prepare_threshold = BUCKET_SIZE >> 6;
+  if (one_shot && input_size <= partial_prepare_threshold) {
+    size_t i;
+    for (i = 0; i < input_size; ++i) {
+      size_t bucket = FN(HashBytes)(&data[i]);
+      /* See InitEmpty comment. */
+      self->addr[bucket] = 0xCCCCCCCC;
+      self->head[bucket] = 0xCCCC;
+    }
+  } else {
     /* Fill |addr| array with 0xCCCCCCCC value. Because of wrapping, position
        processed by hasher never reaches 3GB + 64M; this makes all new chains
        to be terminated after the first node. */
     memset(self->addr, 0xCC, sizeof(self->addr));
     memset(self->head, 0, sizeof(self->head));
-    memset(self->tiny_hash, 0, sizeof(self->tiny_hash));
-    memset(self->free_slot_idx, 0, sizeof(self->free_slot_idx));
-    self->is_dirty_ = BROTLI_FALSE;
-  }
-}
-
-static void FN(InitForData)(HashForgetfulChain* self, const uint8_t* data,
-    size_t num) {
-  size_t i;
-  for (i = 0; i < num; ++i) {
-    size_t bucket = FN(HashBytes)(&data[i]);
-    /* See InitEmpty comment. */
-    self->addr[bucket] = 0xCCCCCCCC;
-    self->head[bucket] = 0xCCCC;
   }
   memset(self->tiny_hash, 0, sizeof(self->tiny_hash));
   memset(self->free_slot_idx, 0, sizeof(self->free_slot_idx));
-  if (num != 0) {
-    self->is_dirty_ = BROTLI_FALSE;
-  }
 }
 
-static void FN(Init)(
-    MemoryManager* m, HashForgetfulChain* self, const uint8_t* data,
-    const BrotliEncoderParams* params, size_t position, size_t bytes,
-    BROTLI_BOOL is_last) {
-  /* Choose which init method is faster.
-     Init() is about 100 times faster than InitForData(). */
-  const size_t kMaxBytesForPartialHashInit = BUCKET_SIZE >> 6;
-  BROTLI_UNUSED(m);
-  self->max_hops = (params->quality > 6 ? 7u : 8u) << (params->quality - 4);
-  if (position == 0 && is_last && bytes <= kMaxBytesForPartialHashInit) {
-    FN(InitForData)(self, data, bytes);
-  } else {
-    FN(InitEmpty)(self);
-  }
+static BROTLI_INLINE size_t FN(HashMemAllocInBytes)(
+    const BrotliEncoderParams* params, BROTLI_BOOL one_shot,
+    size_t input_size) {
+  BROTLI_UNUSED(params);
+  BROTLI_UNUSED(one_shot);
+  BROTLI_UNUSED(input_size);
+  return sizeof(HashForgetfulChain);
 }
 
 /* Look at 4 bytes at &data[ix & mask]. Compute a hash from these, and prepend
    node to corresponding chain; also update tiny_hash for current position. */
-static BROTLI_INLINE void FN(Store)(HashForgetfulChain* BROTLI_RESTRICT self,
+static BROTLI_INLINE void FN(Store)(HasherHandle BROTLI_RESTRICT handle,
     const uint8_t* BROTLI_RESTRICT data, const size_t mask, const size_t ix) {
+  HashForgetfulChain* self = FN(Self)(handle);
   const size_t key = FN(HashBytes)(&data[ix & mask]);
   const size_t bank = key & (NUM_BANKS - 1);
   const size_t idx = self->free_slot_idx[bank]++ & (BANK_SIZE - 1);
@@ -122,56 +114,68 @@ static BROTLI_INLINE void FN(Store)(HashForgetfulChain* BROTLI_RESTRICT self,
   self->head[key] = (uint16_t)idx;
 }
 
-static BROTLI_INLINE void FN(StoreRange)(HashForgetfulChain* self,
-    const uint8_t *data, const size_t mask, const size_t ix_start,
+static BROTLI_INLINE void FN(StoreRange)(HasherHandle handle,
+    const uint8_t* data, const size_t mask, const size_t ix_start,
     const size_t ix_end) {
   size_t i;
   for (i = ix_start; i < ix_end; ++i) {
-    FN(Store)(self, data, mask, i);
+    FN(Store)(handle, data, mask, i);
   }
 }
 
-static BROTLI_INLINE void FN(StitchToPreviousBlock)(HashForgetfulChain* self,
+static BROTLI_INLINE void FN(StitchToPreviousBlock)(HasherHandle handle,
     size_t num_bytes, size_t position, const uint8_t* ringbuffer,
     size_t ring_buffer_mask) {
   if (num_bytes >= FN(HashTypeLength)() - 1 && position >= 3) {
     /* Prepare the hashes for three last bytes of the last write.
        These could not be calculated before, since they require knowledge
        of both the previous and the current block. */
-    FN(Store)(self, ringbuffer, ring_buffer_mask, position - 3);
-    FN(Store)(self, ringbuffer, ring_buffer_mask, position - 2);
-    FN(Store)(self, ringbuffer, ring_buffer_mask, position - 1);
+    FN(Store)(handle, ringbuffer, ring_buffer_mask, position - 3);
+    FN(Store)(handle, ringbuffer, ring_buffer_mask, position - 2);
+    FN(Store)(handle, ringbuffer, ring_buffer_mask, position - 1);
   }
+}
+
+static BROTLI_INLINE void FN(PrepareDistanceCache)(
+    HasherHandle handle, int* BROTLI_RESTRICT distance_cache) {
+  BROTLI_UNUSED(handle);
+  PrepareDistanceCache(distance_cache, NUM_LAST_DISTANCES_TO_CHECK);
 }
 
 /* Find a longest backward match of &data[cur_ix] up to the length of
    max_length and stores the position cur_ix in the hash table.
 
+   REQUIRES: FN(PrepareDistanceCache) must be invoked for current distance cache
+             values; if this method is invoked repeatedly with the same distance
+             cache values, it is enough to invoke FN(PrepareDistanceCache) once.
+
    Does not look for matches longer than max_length.
    Does not look for matches further away than max_backward.
    Writes the best match into |out|.
-   Returns 1 when match is found, otherwise 0. */
-static BROTLI_INLINE BROTLI_BOOL FN(FindLongestMatch)(
-    HashForgetfulChain* self, const uint8_t* BROTLI_RESTRICT data,
-    const size_t ring_buffer_mask, const int* BROTLI_RESTRICT distance_cache,
+   |out|->score is updated only if a better match is found. */
+static BROTLI_INLINE void FN(FindLongestMatch)(HasherHandle handle,
+    const BrotliEncoderDictionary* dictionary,
+    const uint8_t* BROTLI_RESTRICT data, const size_t ring_buffer_mask,
+    const int* BROTLI_RESTRICT distance_cache,
     const size_t cur_ix, const size_t max_length, const size_t max_backward,
+    const size_t gap, const size_t max_distance,
     HasherSearchResult* BROTLI_RESTRICT out) {
+  HashForgetfulChain* self = FN(Self)(handle);
   const size_t cur_ix_masked = cur_ix & ring_buffer_mask;
-  BROTLI_BOOL is_match_found = BROTLI_FALSE;
   /* Don't accept a short copy from far away. */
+  score_t min_score = out->score;
   score_t best_score = out->score;
   size_t best_len = out->len;
   size_t i;
   const size_t key = FN(HashBytes)(&data[cur_ix_masked]);
   const uint8_t tiny_hash = (uint8_t)(key);
   out->len = 0;
-  out->len_x_code = 0;
+  out->len_code_delta = 0;
   /* Try last distance first. */
   for (i = 0; i < NUM_LAST_DISTANCES_TO_CHECK; ++i) {
-    const size_t idx = kDistanceCacheIndex[i];
-    const size_t backward =
-        (size_t)(distance_cache[idx] + kDistanceCacheOffset[i]);
+    const size_t backward = (size_t)distance_cache[i];
     size_t prev_ix = (cur_ix - backward);
+    /* For distance code 0 we want to consider 2-byte matches. */
     if (i > 0 && self->tiny_hash[(uint16_t)prev_ix] != tiny_hash) continue;
     if (prev_ix >= cur_ix || backward > max_backward) {
       continue;
@@ -182,14 +186,16 @@ static BROTLI_INLINE BROTLI_BOOL FN(FindLongestMatch)(
                                                   &data[cur_ix_masked],
                                                   max_length);
       if (len >= 2) {
-        score_t score = BackwardReferenceScoreUsingLastDistance(len, i);
+        score_t score = BackwardReferenceScoreUsingLastDistance(len);
         if (best_score < score) {
-          best_score = score;
-          best_len = len;
-          out->len = best_len;
-          out->distance = backward;
-          out->score = best_score;
-          is_match_found = BROTLI_TRUE;
+          if (i != 0) score -= BackwardReferencePenaltyUsingLastDistance(i);
+          if (best_score < score) {
+            best_score = score;
+            best_len = len;
+            out->len = best_len;
+            out->distance = backward;
+            out->score = best_score;
+          }
         }
       }
     }
@@ -228,18 +234,17 @@ static BROTLI_INLINE BROTLI_BOOL FN(FindLongestMatch)(
             out->len = best_len;
             out->distance = backward;
             out->score = best_score;
-            is_match_found = BROTLI_TRUE;
           }
         }
       }
     }
-    FN(Store)(self, data, ring_buffer_mask, cur_ix);
+    FN(Store)(handle, data, ring_buffer_mask, cur_ix);
   }
-  if (!is_match_found) {
-    is_match_found = SearchInStaticDictionary(&self->dict_search_stats_,
-        &data[cur_ix_masked], max_length, max_backward, out, BROTLI_FALSE);
+  if (out->score == min_score) {
+    SearchInStaticDictionary(dictionary,
+        handle, &data[cur_ix_masked], max_length, max_backward + gap,
+        max_distance, out, BROTLI_FALSE);
   }
-  return is_match_found;
 }
 
 #undef BANK_SIZE

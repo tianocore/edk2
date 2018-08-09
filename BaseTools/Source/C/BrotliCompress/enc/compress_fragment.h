@@ -12,9 +12,9 @@
 #ifndef BROTLI_ENC_COMPRESS_FRAGMENT_H_
 #define BROTLI_ENC_COMPRESS_FRAGMENT_H_
 
-#include "../common/types.h"
+#include "../common/platform.h"
+#include <brotli/types.h>
 #include "./memory.h"
-#include "./port.h"
 
 #if defined(__cplusplus) || defined(c_plusplus)
 extern "C" {
@@ -37,8 +37,11 @@ extern "C" {
    updated to represent the updated "cmd_depth" and "cmd_bits".
 
    REQUIRES: "input_size" is greater than zero, or "is_last" is 1.
+   REQUIRES: "input_size" is less or equal to maximal metablock size (1 << 24).
    REQUIRES: All elements in "table[0..table_size-1]" are initialized to zero.
-   REQUIRES: "table_size" is a power of two */
+   REQUIRES: "table_size" is an odd (9, 11, 13, 15) power of two
+   OUTPUT: maximal copy distance <= |input_size|
+   OUTPUT: maximal copy distance <= BROTLI_MAX_BACKWARD_LIMIT(18) */
 BROTLI_INTERNAL void BrotliCompressFragmentFast(MemoryManager* m,
                                                 const uint8_t* input,
                                                 size_t input_size,
