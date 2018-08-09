@@ -26,21 +26,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   {                                                                              \
     TCG_RESULT ret = (arg);                                                      \
     if (ret != TcgResultSuccess) {                                               \
-      DEBUG ((DEBUG_INFO, "ERROR_CHECK failed at %s:%u\n", __FILE__, __LINE__)); \
+      DEBUG ((DEBUG_INFO, "ERROR_CHECK failed at %a:%u\n", __FILE__, __LINE__)); \
       return ret;                                                                \
     }                                                                            \
   }
 
 #define METHOD_STATUS_ERROR_CHECK(arg, failRet)                                                  \
   if ((arg) != TCG_METHOD_STATUS_CODE_SUCCESS) {                                                 \
-    DEBUG ((DEBUG_INFO, "Method Status error: 0x%02X (%s)\n", arg, TcgMethodStatusString(arg))); \
+    DEBUG ((DEBUG_INFO, "Method Status error: 0x%02X (%a)\n", arg, TcgMethodStatusString(arg))); \
     return (failRet);                                                                            \
   }
 
 #define NULL_CHECK(arg)                                                                   \
   do {                                                                                    \
     if ((arg) == NULL) {                                                                  \
-      DEBUG ((DEBUG_INFO, "NULL_CHECK(%s) failed at %s:%u\n", #arg, __FILE__, __LINE__)); \
+      DEBUG ((DEBUG_INFO, "NULL_CHECK(%a) failed at %a:%u\n", #arg, __FILE__, __LINE__)); \
       return TcgResultFailureNullPointer;                                                 \
     }                                                                                     \
   } while (0)
