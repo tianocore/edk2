@@ -1148,15 +1148,35 @@ FileInterfaceEnvDelete(
 EFI_STATUS
 EFIAPI
 FileInterfaceEnvRead(
-  IN EFI_FILE_PROTOCOL *This,
-  IN OUT UINTN *BufferSize,
-  OUT VOID *Buffer
+  IN     EFI_FILE_PROTOCOL *This,
+  IN OUT UINTN             *BufferSize,
+  OUT    VOID              *Buffer
   )
 {
-  return (SHELL_GET_ENVIRONMENT_VARIABLE(
-    ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
-    BufferSize,
-    Buffer));
+  EFI_STATUS     Status;
+
+  *BufferSize = *BufferSize / sizeof (CHAR16) * sizeof (CHAR16);
+  if (*BufferSize != 0) {
+    //
+    // Make sure the first unicode character is \xFEFF
+    //
+    *(CHAR16 *)Buffer = gUnicodeFileTag;
+    Buffer            = (CHAR16 *)Buffer + 1;
+    *BufferSize      -= sizeof (gUnicodeFileTag);
+  }
+
+  Status = SHELL_GET_ENVIRONMENT_VARIABLE (
+             ((EFI_FILE_PROTOCOL_ENVIRONMENT*)This)->Name,
+             BufferSize,
+             Buffer
+             );
+  if (!EFI_ERROR (Status) || (Status == EFI_BUFFER_TOO_SMALL)) {
+    //
+    // BufferSize is valid and needs update when Status is Success or BufferTooSmall.
+    //
+    *BufferSize += sizeof (gUnicodeFileTag);
+  }
+  return Status;
 }
 
 /**
