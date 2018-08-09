@@ -309,19 +309,6 @@ RunShellCommand(
   OUT EFI_STATUS    *CommandStatus
   );
 
-/**
-  Function determines if the CommandName COULD be a valid command.  It does not determine whether
-  this is a valid command.  It only checks for invalid characters.
-
-  @param[in] CommandName    The name to check
-
-  @retval TRUE              CommandName could be a command name
-  @retval FALSE             CommandName could not be a valid command name
-**/
-BOOLEAN
-IsValidCommandName(
-  IN CONST CHAR16     *CommandName
-  );
 
 /**
   Function to process a NSH script file via SHELL_FILE_HANDLE.
