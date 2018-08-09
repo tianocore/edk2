@@ -132,6 +132,11 @@ M: Ruiyu Ni <ruiyu.ni@intel.com>
 T: svn - https://svn.code.sf.net/p/edk2-fatdriver2/code/trunk/EnhancedFat
 T: git - https://github.com/tianocore/edk2-FatPkg.git
 
+FmpDevicePkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/FmpDevicePkg
+M: Star Zeng <star.zeng@intel.com>
+M: Michael D Kinney <michael.d.kinney@intel.com>
+
 IntelFrameworkModulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelFrameworkModulePkg
 M: Liming Gao <liming.gao@intel.com>
