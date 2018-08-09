@@ -22,8 +22,8 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/ExtractGuidedSectionLib.h>
-#include <common/types.h>
-#include <dec/decode.h>
+#include <brotli/types.h>
+#include <brotli/decode.h>
 
 typedef struct
 {

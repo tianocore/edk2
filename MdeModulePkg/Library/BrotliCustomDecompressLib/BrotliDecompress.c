@@ -122,14 +122,14 @@ BrotliDecompress (
   size_t         TotalOut;
   size_t         AvailableIn;
   size_t         AvailableOut;
-  BrotliResult   Result;
-  BrotliState *  BroState;
   VOID *         Temp;
+  BrotliDecoderResult   Result;
+  BrotliDecoderState *  BroState;
 
   TotalOut = 0;
   AvailableOut = FILE_BUFFER_SIZE;
-  Result = BROTLI_RESULT_ERROR;
-  BroState = BrotliCreateState(BrAlloc, BrFree, BuffInfo);
+  Result = BROTLI_DECODER_RESULT_ERROR;
+  BroState = BrotliDecoderCreateInstance(BrAlloc, BrFree, BuffInfo);
   Temp = Destination;
 
   if (BroState == NULL) {
@@ -140,13 +140,13 @@ BrotliDecompress (
   if ((Input==NULL) || (Output==NULL)) {
     BrFree(BuffInfo, Input);
     BrFree(BuffInfo, Output);
-    BrotliDestroyState(BroState);
+    BrotliDecoderDestroyInstance(BroState);
     return EFI_INVALID_PARAMETER;
   }
   NextOut = Output;
-  Result = BROTLI_RESULT_NEEDS_MORE_INPUT;
+  Result = BROTLI_DECODER_RESULT_NEEDS_MORE_INPUT;
   while (1) {
-    if (Result == BROTLI_RESULT_NEEDS_MORE_INPUT) {
+    if (Result == BROTLI_DECODER_RESULT_NEEDS_MORE_INPUT) {
       if (SourceSize == 0) {
         break;
       }
@@ -159,7 +159,7 @@ BrotliDecompress (
       Source = (VOID *)((UINT8 *)Source + AvailableIn);
       SourceSize -= AvailableIn;
       NextIn = Input;
-    } else if (Result == BROTLI_RESULT_NEEDS_MORE_OUTPUT) {
+    } else if (Result == BROTLI_DECODER_RESULT_NEEDS_MORE_OUTPUT) {
       CopyMem(Temp, Output, FILE_BUFFER_SIZE);
       AvailableOut = FILE_BUFFER_SIZE;
       Temp = (VOID *)((UINT8 *)Temp +FILE_BUFFER_SIZE);
@@ -167,13 +167,13 @@ BrotliDecompress (
     } else {
       break; /* Error or success. */
     }
-    Result = BrotliDecompressStream(
+    Result = BrotliDecoderDecompressStream(
+                          BroState,
                           &AvailableIn,
                           &NextIn,
                           &AvailableOut,
                           &NextOut,
-                          &TotalOut,
-                          BroState
+                          &TotalOut
                           );
   }
   if (NextOut != Output) {
@@ -184,8 +184,8 @@ BrotliDecompress (
 
   BrFree(BuffInfo, Input);
   BrFree(BuffInfo, Output);
-  BrotliDestroyState(BroState);
-  return (Result == BROTLI_RESULT_SUCCESS) ? EFI_SUCCESS : EFI_INVALID_PARAMETER;
+  BrotliDecoderDestroyInstance(BroState);
+  return (Result == BROTLI_DECODER_RESULT_SUCCESS) ? EFI_SUCCESS : EFI_INVALID_PARAMETER;
 }
 
 /**
