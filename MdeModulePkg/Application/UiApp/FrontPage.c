@@ -20,7 +20,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 EFI_GUID   mFrontPageGuid      = FRONT_PAGE_FORMSET_GUID;
 
-BOOLEAN   mFeaturerSwitch = TRUE;
 BOOLEAN   mResetRequired  = FALSE;
 
 EFI_FORM_BROWSER2_PROTOCOL      *gFormBrowser2;
@@ -1062,19 +1061,6 @@ EnableResetRequired (
 
 
 
-/**
-  Check whether platform policy enable the reset reminder feature. The default is enabled.
-
-**/
-BOOLEAN
-EFIAPI
-IsResetReminderFeatureEnable (
-  VOID
-  )
-{
-  return mFeaturerSwitch;
-}
-
 
 /**
   Check if  user changed any option setting which needs a system reset to be effective.
@@ -1106,31 +1092,28 @@ SetupResetReminder (
   CHAR16                        *StringBuffer1;
   CHAR16                        *StringBuffer2;
 
-
   //
   //check any reset required change is applied? if yes, reset system
   //
-  if (IsResetReminderFeatureEnable ()) {
-    if (IsResetRequired ()) {
+  if (IsResetRequired ()) {
 
-      StringBuffer1 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
-      ASSERT (StringBuffer1 != NULL);
-      StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
-      ASSERT (StringBuffer2 != NULL);
-      StrCpyS (StringBuffer1, MAX_STRING_LEN, L"Configuration changed. Reset to apply it Now.");
-      StrCpyS (StringBuffer2, MAX_STRING_LEN, L"Press ENTER to reset");
-      //
-      // Popup a menu to notice user
-      //
-      do {
-        CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, StringBuffer1, StringBuffer2, NULL);
-      } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
+    StringBuffer1 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
+    ASSERT (StringBuffer1 != NULL);
+    StringBuffer2 = AllocateZeroPool (MAX_STRING_LEN * sizeof (CHAR16));
+    ASSERT (StringBuffer2 != NULL);
+    StrCpyS (StringBuffer1, MAX_STRING_LEN, L"Configuration changed. Reset to apply it Now.");
+    StrCpyS (StringBuffer2, MAX_STRING_LEN, L"Press ENTER to reset");
+    //
+    // Popup a menu to notice user
+    //
+    do {
+      CreatePopUp (EFI_LIGHTGRAY | EFI_BACKGROUND_BLUE, &Key, StringBuffer1, StringBuffer2, NULL);
+    } while (Key.UnicodeChar != CHAR_CARRIAGE_RETURN);
 
-      FreePool (StringBuffer1);
-      FreePool (StringBuffer2);
+    FreePool (StringBuffer1);
+    FreePool (StringBuffer2);
 
-      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
-    }
+    gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
   }
 }
 
