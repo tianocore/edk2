@@ -31,6 +31,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/MtrrLib.h>
+#include <Library/MemoryAllocationLib.h>
 
 #include <Protocol/MpService.h>
 #include <Guid/EventGroup.h>
@@ -81,6 +82,28 @@ AllocateAcpiNvsMemoryBelow4G (
   return Buffer;
 }
 
+/**
+  Allocate memory and clean it with zero.
+
+  @param[in] Size   Size of memory to allocate.
+
+  @return       Allocated address for output.
+
+**/
+VOID *
+AllocateZeroPages (
+  IN UINTN  Size
+  )
+{
+  VOID                  *Buffer;
+
+  Buffer = AllocatePages (EFI_SIZE_TO_PAGES (Size));
+  if (Buffer != NULL) {
+    ZeroMem (Buffer, Size);
+  }
+
+  return Buffer;
+}
 /**
   Callback function executed when the EndOfDxe event group is signaled.
 
@@ -171,10 +194,7 @@ CpuS3DataInitialize (
   //
   OldAcpiCpuData = (ACPI_CPU_DATA *) (UINTN) PcdGet64 (PcdCpuS3DataAddress);
 
-  //
-  // Allocate ACPI NVS memory below 4G memory for use on ACPI S3 resume.
-  //
-  AcpiCpuDataEx = AllocateAcpiNvsMemoryBelow4G (sizeof (ACPI_CPU_DATA_EX));
+  AcpiCpuDataEx = AllocateZeroPages (sizeof (ACPI_CPU_DATA_EX));
   ASSERT (AcpiCpuDataEx != NULL);
   AcpiCpuData = &AcpiCpuDataEx->AcpiCpuData;
 
@@ -223,11 +243,11 @@ CpuS3DataInitialize (
   AsmReadIdtr (&AcpiCpuDataEx->IdtrProfile);
 
   //
-  // Allocate GDT and IDT in ACPI NVS and copy current GDT and IDT contents
+  // Allocate GDT and IDT and copy current GDT and IDT contents
   //
   GdtSize = AcpiCpuDataEx->GdtrProfile.Limit + 1;
   IdtSize = AcpiCpuDataEx->IdtrProfile.Limit + 1;
-  Gdt = AllocateAcpiNvsMemoryBelow4G (GdtSize + IdtSize);
+  Gdt = AllocateZeroPages (GdtSize + IdtSize);
   ASSERT (Gdt != NULL);
   Idt = (VOID *)((UINTN)Gdt + GdtSize);
   CopyMem (Gdt, (VOID *)AcpiCpuDataEx->GdtrProfile.Base, GdtSize);
@@ -243,7 +263,7 @@ CpuS3DataInitialize (
     // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
     //
     TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
-    RegisterTable = (CPU_REGISTER_TABLE *)AllocateAcpiNvsMemoryBelow4G (TableSize);
+    RegisterTable = (CPU_REGISTER_TABLE *)AllocateZeroPages (TableSize);
     ASSERT (RegisterTable != NULL);
 
     for (Index = 0; Index < NumberOfCpus; Index++) {

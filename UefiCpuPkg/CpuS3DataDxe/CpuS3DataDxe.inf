@@ -51,6 +51,7 @@
   DebugLib
   BaseLib
   MtrrLib
+  MemoryAllocationLib
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid         ## CONSUMES   ## Event
