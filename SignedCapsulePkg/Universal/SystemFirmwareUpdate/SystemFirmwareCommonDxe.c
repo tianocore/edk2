@@ -343,31 +343,4 @@ InitializePrivateData (
   return EFI_SUCCESS;
 }
 
-/**
-  Return if this FMP is a system FMP or a device FMP, based upon FmpImageInfo.
 
-  @param[in] FmpImageInfo A pointer to EFI_FIRMWARE_IMAGE_DESCRIPTOR
-
-  @retval TRUE  It is a system FMP.
-  @retval FALSE It is a device FMP.
-**/
-BOOLEAN
-IsSystemFmp (
-  IN EFI_FIRMWARE_IMAGE_DESCRIPTOR   *FmpImageInfo
-  )
-{
-  GUID      *Guid;
-  UINTN     Count;
-  UINTN     Index;
-
-  Guid = PcdGetPtr(PcdSystemFmpCapsuleImageTypeIdGuid);
-  Count = PcdGetSize(PcdSystemFmpCapsuleImageTypeIdGuid) / sizeof(GUID);
-
-  for (Index = 0; Index < Count; Index++, Guid++) {
-    if (CompareGuid(&FmpImageInfo->ImageTypeId, Guid)) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}

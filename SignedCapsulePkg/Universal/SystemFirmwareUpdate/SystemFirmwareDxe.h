@@ -36,7 +36,6 @@
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/DevicePathLib.h>
 #include <Library/HobLib.h>
-#include <Library/DxeServicesLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/PlatformFlashAccessLib.h>
 #include <Library/EdkiiSystemCapsuleLib.h>

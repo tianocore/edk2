@@ -50,9 +50,7 @@
   HobLib
   UefiRuntimeServicesTableLib
   UefiDriverEntryPoint
-  DxeServicesLib
   DxeServicesTableLib
-  PrintLib
   EdkiiSystemCapsuleLib
 
 [Pcd]
