@@ -296,7 +296,7 @@ class VariableMgr(object):
                     Buffer += pack("=B", int(value_char, 16))
                 data_len += len(tail.split(","))
         elif data_type == "BOOLEAN":
-            Buffer += pack("=B", True) if var_value.upper() == "TRUE" else pack("=B", False)
+            Buffer += pack("=B", True) if var_value.upper() in ["TRUE","1"] else pack("=B", False)
             data_len += 1
         elif data_type  == DataType.TAB_UINT8:
             Buffer += pack("=B", GetIntegerValue(var_value))
