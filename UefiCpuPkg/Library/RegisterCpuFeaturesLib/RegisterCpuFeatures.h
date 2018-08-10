@@ -88,26 +88,6 @@ GetCpuFeaturesData (
   );
 
 /**
-  Enlarges CPU register table for each processor.
-
-  @param[in, out]  RegisterTable   Pointer processor's CPU register table
-**/
-VOID
-EnlargeRegisterTable (
-  IN OUT CPU_REGISTER_TABLE            *RegisterTable
-  );
-
-/**
-  Allocates ACPI NVS memory to save ACPI_CPU_DATA.
-
-  @return  Pointer to allocated ACPI_CPU_DATA.
-**/
-ACPI_CPU_DATA *
-AllocateAcpiCpuData (
-  VOID
-  );
-
-/**
   Worker function to return processor index.
 
   @return  The processor index.

@@ -489,6 +489,98 @@ RegisterCpuFeature (
 }
 
 /**
+  Allocates boot service data to save ACPI_CPU_DATA.
+
+  @return  Pointer to allocated ACPI_CPU_DATA.
+**/
+STATIC
+ACPI_CPU_DATA *
+AllocateAcpiCpuData (
+  VOID
+  )
+{
+  EFI_STATUS                           Status;
+  UINTN                                NumberOfCpus;
+  UINTN                                NumberOfEnabledProcessors;
+  ACPI_CPU_DATA                        *AcpiCpuData;
+  UINTN                                TableSize;
+  CPU_REGISTER_TABLE                   *RegisterTable;
+  UINTN                                Index;
+  EFI_PROCESSOR_INFORMATION            ProcessorInfoBuffer;
+
+  AcpiCpuData  = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (ACPI_CPU_DATA)));
+  ASSERT (AcpiCpuData != NULL);
+
+  GetNumberOfProcessor (&NumberOfCpus, &NumberOfEnabledProcessors);
+  AcpiCpuData->NumberOfCpus = (UINT32)NumberOfCpus;
+
+  //
+  // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
+  //  
+  TableSize = 2 * NumberOfCpus * sizeof (CPU_REGISTER_TABLE);
+  RegisterTable  = AllocatePages (EFI_SIZE_TO_PAGES (TableSize));
+  ASSERT (RegisterTable != NULL);
+
+  for (Index = 0; Index < NumberOfCpus; Index++) {
+    Status = GetProcessorInformation (Index, &ProcessorInfoBuffer);
+    ASSERT_EFI_ERROR (Status);
+
+    RegisterTable[Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
+    RegisterTable[Index].TableLength        = 0;
+    RegisterTable[Index].AllocatedSize      = 0;
+    RegisterTable[Index].RegisterTableEntry = 0;
+
+    RegisterTable[NumberOfCpus + Index].InitialApicId      = (UINT32)ProcessorInfoBuffer.ProcessorId;
+    RegisterTable[NumberOfCpus + Index].TableLength        = 0;
+    RegisterTable[NumberOfCpus + Index].AllocatedSize      = 0;
+    RegisterTable[NumberOfCpus + Index].RegisterTableEntry = 0;
+  }
+  AcpiCpuData->RegisterTable           = (EFI_PHYSICAL_ADDRESS)(UINTN)RegisterTable;
+  AcpiCpuData->PreSmmInitRegisterTable = (EFI_PHYSICAL_ADDRESS)(UINTN)(RegisterTable + NumberOfCpus);
+
+  return AcpiCpuData;
+}
+
+/**
+  Enlarges CPU register table for each processor.
+
+  @param[in, out]  RegisterTable   Pointer processor's CPU register table
+**/
+STATIC
+VOID
+EnlargeRegisterTable (
+  IN OUT CPU_REGISTER_TABLE            *RegisterTable
+  )
+{
+  EFI_PHYSICAL_ADDRESS  Address;
+  UINTN                 UsedPages;
+
+  UsedPages = RegisterTable->AllocatedSize / EFI_PAGE_SIZE;
+  Address  = (UINTN)AllocatePages (UsedPages + 1);
+  ASSERT (Address != 0);
+
+  //
+  // If there are records existing in the register table, then copy its contents
+  // to new region and free the old one.
+  //
+  if (RegisterTable->AllocatedSize > 0) {
+    CopyMem (
+      (VOID *) (UINTN) Address,
+      (VOID *) (UINTN) RegisterTable->RegisterTableEntry,
+      RegisterTable->AllocatedSize
+      );
+
+    FreePages ((VOID *)(UINTN)RegisterTable->RegisterTableEntry, UsedPages);
+  }
+
+  //
+  // Adjust the allocated size and register table base address.
+  //
+  RegisterTable->AllocatedSize     += EFI_PAGE_SIZE;
+  RegisterTable->RegisterTableEntry = Address;
+}
+
+/**
   Add an entry in specified register table.
 
   This function adds an entry in specified register table, with given register type,
