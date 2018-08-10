@@ -17,7 +17,7 @@ from __future__ import absolute_import
 from Common.GlobalData import *
 from CommonDataClass.Exceptions import BadExpression
 from CommonDataClass.Exceptions import WrnExpression
-from .Misc import GuidStringToGuidStructureString, ParseFieldValue, IsFieldValueAnArray
+from .Misc import GuidStringToGuidStructureString, ParseFieldValue
 import Common.EdkLogger as EdkLogger
 import copy
 from Common.DataType import *
@@ -138,11 +138,11 @@ def BuildOptionValue(PcdValue, GuidDict):
         InputValue = 'L"' + PcdValue[1:] + '"'
     else:
         InputValue = PcdValue
-    if IsFieldValueAnArray(InputValue):
-        try:
-            PcdValue = ValueExpressionEx(InputValue, TAB_VOID, GuidDict)(True)
-        except:
-            pass
+    try:
+        PcdValue = ValueExpressionEx(InputValue, TAB_VOID, GuidDict)(True)
+    except:
+        pass
+
     return PcdValue
 
 ## ReplaceExprMacro
