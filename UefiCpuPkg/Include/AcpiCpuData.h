@@ -1,7 +1,7 @@
 /** @file
 Definitions for CPU S3 data.
 
-Copyright (c) 2013 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -57,15 +57,13 @@ typedef struct {
   //
   UINT32                    InitialApicId;
   //
-  // Physical address of CPU_REGISTER_TABLE_ENTRY structures.  This buffer must be
-  // allocated below 4GB from memory of type EfiACPIMemoryNVS.
+  // Physical address of CPU_REGISTER_TABLE_ENTRY structures.
   //
   EFI_PHYSICAL_ADDRESS      RegisterTableEntry;
 } CPU_REGISTER_TABLE;
 
 //
-// Data structure that is required for ACPI S3 resume.  This structure must be
-// allocated below 4GB from memory of type EfiACPIMemoryNVS.  The PCD
+// Data structure that is required for ACPI S3 resume. The PCD
 // PcdCpuS3DataAddress must be set to the physical address where this structure
 // is allocated
 //
@@ -78,21 +76,17 @@ typedef struct {
   //
   EFI_PHYSICAL_ADDRESS  StartupVector;
   //
-  // Physical address of structure of type IA32_DESCRIPTOR.  This structure must
-  // be allocated below 4GB from memory of type EfiACPIMemoryNVS.  The
+  // Physical address of structure of type IA32_DESCRIPTOR. The
   // IA32_DESCRIPTOR structure provides the base address and length of a GDT
-  // The buffer for GDT must also be allocated below 4GB from memory of type
-  // EfiACPIMemoryNVS.  The GDT must be filled in with the GDT contents that are
+  // The GDT must be filled in with the GDT contents that are
   // used during an ACPI S3 resume.  This is typically the contents of the GDT
   // used by the boot processor when the platform is booted.
   //
   EFI_PHYSICAL_ADDRESS  GdtrProfile;
   //
-  // Physical address of structure of type IA32_DESCRIPTOR.  This structure must
-  // be allocated below 4GB from memory of type EfiACPIMemoryNVS.  The
+  // Physical address of structure of type IA32_DESCRIPTOR.  The
   // IA32_DESCRIPTOR structure provides the base address and length of an IDT.
-  // The buffer for IDT must also be allocated below 4GB from memory of type
-  // EfiACPIMemoryNVS.  The IDT must be filled in with the IDT contents that are
+  // The IDT must be filled in with the IDT contents that are
   // used during an ACPI S3 resume.  This is typically the contents of the IDT
   // used by the boot processor when the platform is booted.
   //
@@ -100,7 +94,7 @@ typedef struct {
   //
   // Physical address of a buffer that is used as stacks during ACPI S3 resume.
   // The total size of this buffer, in bytes, is NumberOfCpus * StackSize.  This
-  // structure must be allocated below 4GB from memory of type EfiACPIMemoryNVS.
+  // structure must be allocated from memory of type EfiACPIMemoryNVS.
   //
   EFI_PHYSICAL_ADDRESS  StackAddress;
   //
@@ -118,14 +112,12 @@ typedef struct {
   // Physical address of structure of type MTRR_SETTINGS that contains a copy
   // of the MTRR settings that are compatible with the MTRR settings used by
   // the boot processor when the platform was booted.  These MTRR settings are
-  // used during an ACPI S3 resume.  This structure must be allocated below 4GB
-  // from memory of type EfiACPIMemoryNVS.
+  // used during an ACPI S3 resume.
   //
   EFI_PHYSICAL_ADDRESS  MtrrTable;
   //
   // Physical address of an array of CPU_REGISTER_TABLE structures, with
-  // NumberOfCpus entries.  This array must be allocated below 4GB from memory
-  // of type EfiACPIMemoryNVS.  If a register table is not required, then the
+  // NumberOfCpus entries.  If a register table is not required, then the
   // TableLength and AllocatedSize fields of CPU_REGISTER_TABLE are set to 0.
   // If TableLength is > 0, then elements of RegisterTableEntry are used to
   // initialize the CPU that matches InitialApicId, during an ACPI S3 resume,
@@ -134,8 +126,7 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS  PreSmmInitRegisterTable;
   //
   // Physical address of an array of CPU_REGISTER_TABLE structures, with
-  // NumberOfCpus entries.  This array must be allocated below 4GB from memory
-  // of type EfiACPIMemoryNVS.  If a register table is not required, then the
+  // NumberOfCpus entries.  If a register table is not required, then the
   // TableLength and AllocatedSize fields of CPU_REGISTER_TABLE are set to 0.
   // If TableLength is > 0, then elements of RegisterTableEntry are used to
   // initialize the CPU that matches InitialApicId, during an ACPI S3 resume,
@@ -144,8 +135,7 @@ typedef struct {
   EFI_PHYSICAL_ADDRESS  RegisterTable;
   //
   // Physical address of a buffer that contains the machine check handler that
-  // is used during an ACPI S3 Resume.  This buffer must be allocated below 4GB
-  // from memory of type EfiACPIMemoryNVS.  In order for this machine check
+  // is used during an ACPI S3 Resume.  In order for this machine check
   // handler to be active on an AP during an ACPI S3 resume, the machine check
   // vector in the IDT provided by IdtrProfile must be initialized to transfer
   // control to this physical address.
