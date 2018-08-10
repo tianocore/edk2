@@ -47,9 +47,7 @@ typedef struct {
 } ACPI_CPU_DATA_EX;
 
 /**
-  Allocate EfiACPIMemoryNVS below 4G memory address.
-
-  This function allocates EfiACPIMemoryNVS below 4G memory address.
+  Allocate EfiACPIMemoryNVS memory.
 
   @param[in] Size   Size of memory to allocate.
 
@@ -57,7 +55,7 @@ typedef struct {
 
 **/
 VOID *
-AllocateAcpiNvsMemoryBelow4G (
+AllocateAcpiNvsMemory (
   IN UINTN  Size
   )
 {
@@ -65,9 +63,8 @@ AllocateAcpiNvsMemoryBelow4G (
   EFI_STATUS            Status;
   VOID                  *Buffer;
 
-  Address = BASE_4GB - 1;
   Status  = gBS->AllocatePages (
-                   AllocateMaxAddress,
+                   AllocateAnyPages,
                    EfiACPIMemoryNVS,
                    EFI_SIZE_TO_PAGES (Size),
                    &Address
@@ -230,9 +227,13 @@ CpuS3DataInitialize (
   AcpiCpuData->MtrrTable    = (EFI_PHYSICAL_ADDRESS)(UINTN)&AcpiCpuDataEx->MtrrTable;
 
   //
-  // Allocate stack space for all CPUs
+  // Allocate stack space for all CPUs.
+  // Use ACPI NVS memory type because this data will be directly used by APs
+  // in S3 resume phase in long mode. Also during S3 resume, the stack buffer
+  // will only be used as scratch space. i.e. we won't read anything from it
+  // before we write to it, in PiSmmCpuDxeSmm.
   //
-  Stack = AllocateAcpiNvsMemoryBelow4G (NumberOfCpus * AcpiCpuData->StackSize);
+  Stack = AllocateAcpiNvsMemory (NumberOfCpus * AcpiCpuData->StackSize);
   ASSERT (Stack != NULL);
   AcpiCpuData->StackAddress = (EFI_PHYSICAL_ADDRESS)(UINTN)Stack;
 
