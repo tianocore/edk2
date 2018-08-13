@@ -217,7 +217,10 @@ SmmLockBoxRestore (
                (VOID *)(UINTN)TempLockBoxParameterRestore.Buffer,
                (UINTN *)&TempLockBoxParameterRestore.Length
                );
-    if (Status == EFI_BUFFER_TOO_SMALL) {
+    if ((Status == EFI_BUFFER_TOO_SMALL) || (Status == EFI_SUCCESS)) {
+      //
+      // Return the actual Length value.
+      //
       LockBoxParameterRestore->Length = TempLockBoxParameterRestore.Length;
     }
   }
