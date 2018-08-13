@@ -11,11 +11,6 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-import Common.LongFilePathOs as os
-
-from collections import OrderedDict
-from Common.Misc import RealPath2
-from Common.BuildToolError import *
 from Common.DataType import *
 import collections
 
@@ -253,18 +248,14 @@ class StructurePcd(PcdClassObject):
 # @param object:      Inherited from object class
 # @param Name:        Input value for LibraryClassName, default is None
 # @param SupModList:  Input value for SupModList, default is []
-# @param Type:        Input value for Type, default is None
 #
 # @var LibraryClass:  To store value for LibraryClass
 # @var SupModList:    To store value for SupModList
-# @var Type:          To store value for Type
 #
 class LibraryClassObject(object):
-    def __init__(self, Name = None, SupModList = [], Type = None):
+    def __init__(self, Name = None, SupModList = []):
         self.LibraryClass = Name
         self.SupModList = SupModList
-        if Type is not None:
-            self.SupModList = CleanString(Type).split(DataType.TAB_SPACE_SPLIT)
 
 ## ModuleBuildClassObject
 #
@@ -332,7 +323,7 @@ class ModuleBuildClassObject(object):
 
         self.Binaries                = []
         self.Sources                 = []
-        self.LibraryClasses          = OrderedDict()
+        self.LibraryClasses          = collections.OrderedDict()
         self.Libraries               = []
         self.Protocols               = []
         self.Ppis                    = []
