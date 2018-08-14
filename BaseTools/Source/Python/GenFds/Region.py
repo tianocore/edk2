@@ -296,7 +296,7 @@ class Region(RegionClassObject):
             else:
                 # region ended within current blocks
                 if self.Offset + self.Size <= End:
-                    ExpectedList.append((BlockSize, (RemindingSize + BlockSize - 1) / BlockSize))
+                    ExpectedList.append((BlockSize, (RemindingSize + BlockSize - 1) // BlockSize))
                     break
                 # region not ended yet
                 else:
@@ -305,7 +305,7 @@ class Region(RegionClassObject):
                         UsedBlockNum = BlockNum
                     # region started in middle of current blocks
                     else:
-                        UsedBlockNum = (End - self.Offset) / BlockSize
+                        UsedBlockNum = (End - self.Offset) // BlockSize
                     Start = End
                     ExpectedList.append((BlockSize, UsedBlockNum))
                     RemindingSize -= BlockSize * UsedBlockNum

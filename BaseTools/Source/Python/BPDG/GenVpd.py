@@ -430,7 +430,7 @@ class GenVPD :
                             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 'The offset value of PCD %s should be %s-byte aligned.' % (PCD.PcdCName, Alignment))
                 else:
                     if PCD.PcdOccupySize % Alignment != 0:
-                        PCD.PcdOccupySize = (PCD.PcdOccupySize / Alignment + 1) * Alignment
+                        PCD.PcdOccupySize = (PCD.PcdOccupySize // Alignment + 1) * Alignment
 
                 PackSize = PCD.PcdOccupySize
                 if PCD._IsBoolean(PCD.PcdValue, PCD.PcdSize):
@@ -508,7 +508,7 @@ class GenVPD :
             NowOffset = 0
             for Pcd in self.PcdUnknownOffsetList :
                 if NowOffset % Pcd.Alignment != 0:
-                    NowOffset = (NowOffset/ Pcd.Alignment + 1) * Pcd.Alignment
+                    NowOffset = (NowOffset // Pcd.Alignment + 1) * Pcd.Alignment
                 Pcd.PcdBinOffset = NowOffset
                 Pcd.PcdOffset    = str(hex(Pcd.PcdBinOffset))
                 NowOffset       += Pcd.PcdOccupySize
@@ -572,7 +572,7 @@ class GenVPD :
                         # Not been fixed
                         if eachUnfixedPcd.PcdOffset == '*' :
                             if LastOffset % eachUnfixedPcd.Alignment != 0:
-                                LastOffset = (LastOffset / eachUnfixedPcd.Alignment + 1) * eachUnfixedPcd.Alignment
+                                LastOffset = (LastOffset // eachUnfixedPcd.Alignment + 1) * eachUnfixedPcd.Alignment
                             # The offset un-fixed pcd can write into this free space
                             if needFixPcdSize <= (NowOffset - LastOffset) :
                                 # Change the offset value of un-fixed pcd
@@ -626,7 +626,7 @@ class GenVPD :
 
             NeedFixPcd.PcdBinOffset = LastPcd.PcdBinOffset + LastPcd.PcdOccupySize
             if NeedFixPcd.PcdBinOffset % NeedFixPcd.Alignment != 0:
-                NeedFixPcd.PcdBinOffset = (NeedFixPcd.PcdBinOffset / NeedFixPcd.Alignment + 1) * NeedFixPcd.Alignment
+                NeedFixPcd.PcdBinOffset = (NeedFixPcd.PcdBinOffset // NeedFixPcd.Alignment + 1) * NeedFixPcd.Alignment
 
             NeedFixPcd.PcdOffset    = str(hex(NeedFixPcd.PcdBinOffset))
 

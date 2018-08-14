@@ -1310,7 +1310,7 @@ def ParseDevPathValue (Value):
 
 def ParseFieldValue (Value):
     if isinstance(Value, type(0)):
-        return Value, (Value.bit_length() + 7) / 8
+        return Value, (Value.bit_length() + 7) // 8
     if not isinstance(Value, type('')):
         raise BadExpression('Type %s is %s' %(Value, type(Value)))
     Value = Value.strip()
@@ -1431,12 +1431,12 @@ def ParseFieldValue (Value):
             raise BadExpression("invalid hex value: %s" % Value)
         if Value == 0:
             return 0, 1
-        return Value, (Value.bit_length() + 7) / 8
+        return Value, (Value.bit_length() + 7) // 8
     if Value[0].isdigit():
         Value = int(Value, 10)
         if Value == 0:
             return 0, 1
-        return Value, (Value.bit_length() + 7) / 8
+        return Value, (Value.bit_length() + 7) // 8
     if Value.lower() == 'true':
         return 1, 1
     if Value.lower() == 'false':

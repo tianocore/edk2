@@ -212,9 +212,9 @@ class FV (FvClassObject):
                         #The max alignment supported by FFS is 16M.
                             self.FvAlignment = "16M"
                         else:
-                            self.FvAlignment = str(FvAlignmentValue / 0x100000) + "M"
+                            self.FvAlignment = str(FvAlignmentValue // 0x100000) + "M"
                     else:
-                        self.FvAlignment = str(FvAlignmentValue / 0x400) + "K"
+                        self.FvAlignment = str(FvAlignmentValue // 0x400) + "K"
                 else:
                     # FvAlignmentValue is less than 1K
                     self.FvAlignment = str (FvAlignmentValue)
