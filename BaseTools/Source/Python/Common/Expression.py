@@ -1026,7 +1026,7 @@ class ValueExpressionEx(ValueExpression):
 if __name__ == '__main__':
     pass
     while True:
-        input = raw_input('Input expr: ')
+        input = input('Input expr: ')
         if input in 'qQ':
             break
         try:
