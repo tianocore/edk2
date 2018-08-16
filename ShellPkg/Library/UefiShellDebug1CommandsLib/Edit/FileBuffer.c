@@ -500,7 +500,7 @@ FileBufferPrintLine (
   PrintLine = AllocatePool (BufLen);
   if (PrintLine != NULL) {
     StrnCpyS (PrintLine, BufLen/sizeof(CHAR16), Buffer, MIN(Limit, MainEditor.ScreenSize.Column));
-    for (; Limit < MainEditor.ScreenSize.Column; Limit++) {
+    for (Limit = StrLen (PrintLine); Limit < MainEditor.ScreenSize.Column; Limit++) {
       PrintLine[Limit] = L' ';
     }
 
