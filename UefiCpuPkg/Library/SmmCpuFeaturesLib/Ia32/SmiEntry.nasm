@@ -18,6 +18,8 @@
 ;
 ;-------------------------------------------------------------------------------
 
+%include "StuffRsb.inc"
+
 %define MSR_IA32_MISC_ENABLE 0x1A0
 %define MSR_EFER      0xc0000080
 %define MSR_EFER_XD   0x800
@@ -206,6 +208,7 @@ CommonHandler:
     wrmsr
 
 .7:
+    StuffRsb32
     rsm
 
 

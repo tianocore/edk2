@@ -18,6 +18,8 @@
 ;
 ;-------------------------------------------------------------------------------
 
+%include "StuffRsb.inc"
+
 global  ASM_PFX(gcStmPsd)
 
 extern  ASM_PFX(SmmStmExceptionHandler)
@@ -131,7 +133,8 @@ ASM_PFX(OnStmSetup):
     wrmsr
 
 .11:
-  rsm
+    StuffRsb64
+    rsm
 
 global ASM_PFX(OnStmTeardown)
 ASM_PFX(OnStmTeardown):
@@ -175,4 +178,5 @@ ASM_PFX(OnStmTeardown):
     wrmsr
 
 .12:
-  rsm
+    StuffRsb64
+    rsm
