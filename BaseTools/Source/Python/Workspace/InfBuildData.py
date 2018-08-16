@@ -370,11 +370,7 @@ class InfBuildData(ModuleBuildClassObject):
                     self._Sources.append(File)
                 else:
                     ToolList = self._NMAKE_FLAG_PATTERN_.findall(Name)
-                    if len(ToolList) == 0 or len(ToolList) != 1:
-                        pass
-#                        EdkLogger.warn("build", "Don't know how to do with macro [%s]" % Name,
-#                                       File=self.MetaFile, Line=LineNo)
-                    else:
+                    if len(ToolList) == 1:
                         if self._BuildOptions is None:
                             self._BuildOptions = OrderedDict()
 
