@@ -105,19 +105,6 @@ Ikev2SaSessionRemove (
 
 
 /**
-  Marking a SA session as on deleting.
-
-  @param[in]  IkeSaSession  Pointer to IKEV2_SA_SESSION.
-
-  @retval     EFI_SUCCESS   Find the related SA session and marked it.
-
-**/
-EFI_STATUS
-Ikev2SaSessionOnDeleting (
-  IN IKEV2_SA_SESSION          *IkeSaSession
-  );
-
-/**
   After IKE/Child SA is estiblished, close the time event and free sent packet.
 
   @param[in]   SessionCommon   Pointer to a Session Common.
@@ -211,20 +198,6 @@ Ikev2ChildSaSessionLookupBySpi (
   IN UINT32               Spi
   );
 
-/**
-  Find the ChildSaSession by it's MessagId.
-
-  @param[in] SaSessionList  Pointer to a ChildSaSession List.
-  @param[in] Mid            The messageId used to search ChildSaSession.
-
-  @return Pointer to IKEV2_CHILD_SA_SESSION.
-
-**/
-IKEV2_CHILD_SA_SESSION *
-Ikev2ChildSaSessionLookupByMid (
-  IN LIST_ENTRY           *SaSessionList,
-  IN UINT32               Mid
-  );
 
 /**
   Insert a Child SA Session into the specified ChildSa list..
@@ -257,18 +230,6 @@ Ikev2ChildSaSessionRemove (
   IN UINT8                ListType
   );
 
-/**
-  Mark a specified Child SA Session as on deleting.
-
-  @param[in]  ChildSaSession   Pointer to IKEV2_CHILD_SA_SESSION.
-
-  @retval     EFI_SUCCESS      Operation is successful.
-
-**/
-EFI_STATUS
-Ikev2ChildSaSessionOnDeleting (
-  IN IKEV2_CHILD_SA_SESSION   *ChildSaSession
-  );
 
 /**
   Free the memory located for the specified IKEV2_CHILD_SA_SESSION.
@@ -325,19 +286,6 @@ Ikev2ChildSaSilentDelete (
 **/
 IKEV2_CREATE_CHILD_REQUEST_TYPE
 Ikev2ChildExchangeRequestType(
-  IN IKE_PACKET               *IkePacket
-  );
-
-/**
-  This function finds the SPI from Create Child Sa Exchange Packet.
-
-  @param[in] IkePacket       Pointer to IKE_PACKET to be searched.
-
-  @retval SPI number.
-
-**/
-UINT32
-Ikev2ChildExchangeRekeySpi(
   IN IKE_PACKET               *IkePacket
   );
 
@@ -882,21 +830,6 @@ Ikev2DecodePacket (
   IN     UINTN                 IkeType
   );
 
-/**
-  Save some useful payloads after accepting the Packet.
-
-  @param[in] SessionCommon   Pointer to IKEV2_SESSION_COMMON related to the operation.
-  @param[in] IkePacket       Pointer to received IkePacet.
-  @param[in] IkeType         The type used to indicate it is in IkeSa or ChildSa or Info
-                             exchange.
-
-**/
-VOID
-Ikev2OnPacketAccepted (
-  IN IKEV2_SESSION_COMMON *SessionCommon,
-  IN IKE_PACKET           *IkePacket,
-  IN UINT8                IkeType
-  );
 
 /**
   Send out IKEV2 packet.

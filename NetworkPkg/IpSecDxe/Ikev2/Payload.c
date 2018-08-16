@@ -3104,24 +3104,6 @@ ON_EXIT:
   return Status;
 }
 
-/**
-  Save some useful payloads after accepting the Packet.
-
-  @param[in] SessionCommon   Pointer to IKEV2_SESSION_COMMON related to the operation.
-  @param[in] IkePacket       Pointer to received IkePacet.
-  @param[in] IkeType         The type used to indicate it is in IkeSa or ChildSa or Info
-                             exchange.
-
-**/
-VOID
-Ikev2OnPacketAccepted (
-  IN IKEV2_SESSION_COMMON *SessionCommon,
-  IN IKE_PACKET           *IkePacket,
-  IN UINT8                IkeType
-  )
-{
-  return;
-}
 
 /**
 

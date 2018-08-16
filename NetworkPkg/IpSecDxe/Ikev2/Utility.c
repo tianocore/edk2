@@ -290,21 +290,6 @@ Ikev2SaSessionRemove (
   return NULL;
 }
 
-/**
-  Marking a SA session as on deleting.
-
-  @param[in]  IkeSaSession  Pointer to IKEV2_SA_SESSION.
-
-  @retval     EFI_SUCCESS   Find the related SA session and marked it.
-
-**/
-EFI_STATUS
-Ikev2SaSessionOnDeleting (
-  IN IKEV2_SA_SESSION          *IkeSaSession
-  )
-{
-  return EFI_SUCCESS;
-}
 
 /**
   Free specified Seession Common. The session common would belong to a IKE SA or
@@ -659,33 +644,6 @@ Ikev2ChildSaSessionReg (
   return ;
 }
 
-/**
-  Find the ChildSaSession by it's MessagId.
-
-  @param[in] SaSessionList  Pointer to a ChildSaSession List.
-  @param[in] Mid            The messageId used to search ChildSaSession.
-
-  @return Pointer to IKEV2_CHILD_SA_SESSION or NULL.
-
-**/
-IKEV2_CHILD_SA_SESSION *
-Ikev2ChildSaSessionLookupByMid (
-  IN LIST_ENTRY           *SaSessionList,
-  IN UINT32               Mid
-  )
-{
-  LIST_ENTRY              *Entry;
-  IKEV2_CHILD_SA_SESSION  *ChildSaSession;
-
-  NET_LIST_FOR_EACH (Entry, SaSessionList) {
-    ChildSaSession  = IKEV2_CHILD_SA_SESSION_BY_IKE_SA (Entry);
-
-    if (ChildSaSession->MessageId == Mid) {
-      return ChildSaSession;
-    }
-  }
-  return NULL;
-}
 
 /**
   This function find the Child SA by the specified SPI.
@@ -774,22 +732,6 @@ Ikev2ChildSaSessionRemove (
   }
 
   return NULL;
-}
-
-/**
-  Mark a specified Child SA Session as on deleting.
-
-  @param[in]  ChildSaSession   Pointer to IKEV2_CHILD_SA_SESSION.
-
-  @retval     EFI_SUCCESS      Operation is successful.
-
-**/
-EFI_STATUS
-Ikev2ChildSaSessionOnDeleting (
-  IN IKEV2_CHILD_SA_SESSION   *ChildSaSession
-  )
-{
-  return EFI_SUCCESS;
 }
 
 /**
@@ -1137,24 +1079,6 @@ Ikev2ChildSaAssociateSpdEntry (
 }
 
 
-/**
-  This function finds the SPI from Create Child SA Exchange Packet.
-
-  @param[in] IkePacket       Pointer to IKE_PACKET to be searched.
-
-  @retval SPI number or 0 if it is not supported.
-
-**/
-UINT32
-Ikev2ChildExchangeRekeySpi (
-  IN IKE_PACKET               *IkePacket
-  )
-{
-  //
-  // Not support yet.
-  //
-  return 0;
-}
 
 /**
   Validate the IKE header of received IKE packet.
