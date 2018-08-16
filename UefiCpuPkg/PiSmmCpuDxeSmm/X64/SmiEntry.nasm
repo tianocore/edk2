@@ -18,6 +18,8 @@
 ;
 ;-------------------------------------------------------------------------------
 
+%include "StuffRsb.inc"
+
 ;
 ; Variables referrenced by C code
 ;
@@ -217,6 +219,7 @@ _SmiHandler:
     wrmsr
 
 .1:
+    StuffRsb64
     rsm
 
 ASM_PFX(gcSmiHandlerSize)    DW      $ - _SmiEntryPoint

@@ -18,6 +18,8 @@
 ;
 ;-------------------------------------------------------------------------------
 
+%include "StuffRsb.inc"
+
 extern ASM_PFX(SmmInitHandler)
 extern ASM_PFX(mRebasedFlag)
 extern ASM_PFX(mSmmRelocationOriginalAddress)
@@ -75,6 +77,7 @@ BITS 32
     mov     esp, strict dword 0         ; source operand will be patched
 ASM_PFX(gPatchSmmInitStack):
     call    ASM_PFX(SmmInitHandler)
+    StuffRsb32
     rsm
 
 BITS 16

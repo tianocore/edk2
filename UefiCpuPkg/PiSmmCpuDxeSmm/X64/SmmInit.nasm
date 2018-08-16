@@ -18,6 +18,8 @@
 ;
 ;-------------------------------------------------------------------------------
 
+%include "StuffRsb.inc"
+
 extern ASM_PFX(SmmInitHandler)
 extern ASM_PFX(mRebasedFlag)
 extern ASM_PFX(mSmmRelocationOriginalAddress)
@@ -101,6 +103,7 @@ ASM_PFX(gPatchSmmInitStack):
     movdqa  xmm4, [rsp + 0x40]
     movdqa  xmm5, [rsp + 0x50]
 
+    StuffRsb64
     rsm
 
 BITS 16
