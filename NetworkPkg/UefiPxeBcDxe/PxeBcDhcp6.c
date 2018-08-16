@@ -202,29 +202,6 @@ PxeBcCacheDhcp6Packet (
   return EFI_SUCCESS;
 }
 
-
-/**
-  Free all the nodes in the list for boot file.
-
-  @param[in]  Head            The pointer to the head of list.
-
-**/
-VOID
-PxeBcFreeBootFileOption (
-  IN LIST_ENTRY               *Head
-  )
-{
-  LIST_ENTRY                  *Entry;
-  LIST_ENTRY                  *NextEntry;
-  PXEBC_DHCP6_OPTION_NODE     *Node;
-
-  NET_LIST_FOR_EACH_SAFE (Entry, NextEntry, Head) {
-    Node = NET_LIST_USER_STRUCT (Entry, PXEBC_DHCP6_OPTION_NODE, Link);
-    RemoveEntryList (Entry);
-    FreePool (Node);
-  }
-}
-
 /**
   Retrieve the boot server address using the EFI_DNS6_PROTOCOL.
 

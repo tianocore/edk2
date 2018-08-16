@@ -116,16 +116,6 @@ typedef struct {
 } PXEBC_DHCP6_PACKET_CACHE;
 
 
-/**
-  Free all the nodes in the boot file list.
-
-  @param[in]  Head            The pointer to the head of the list.
-
-**/
-VOID
-PxeBcFreeBootFileOption (
-  IN LIST_ENTRY               *Head
-  );
 
 
 /**
