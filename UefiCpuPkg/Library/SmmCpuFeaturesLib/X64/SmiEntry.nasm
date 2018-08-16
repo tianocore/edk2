@@ -18,6 +18,8 @@
 ;
 ;-------------------------------------------------------------------------------
 
+%include "StuffRsb.inc"
+
 ;
 ; Variables referrenced by C code
 ;
@@ -218,6 +220,7 @@ CommonHandler:
     wrmsr
 
 .1:
+    StuffRsb64
     rsm
 
 _StmSmiHandler:
