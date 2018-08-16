@@ -18,6 +18,8 @@
 ;
 ;-------------------------------------------------------------------------------
 
+%include "StuffRsb.inc"
+
 extern ASM_PFX(SmmInitHandler)
 extern ASM_PFX(mRebasedFlag)
 extern ASM_PFX(mSmmRelocationOriginalAddress)
@@ -79,6 +81,7 @@ BITS 32
     DB      0xbc                        ; mov esp, imm32
 ASM_PFX(gSmmInitStack): DD 0
     call    ASM_PFX(SmmInitHandler)
+    StuffRsb32
     rsm
 
 BITS 16
