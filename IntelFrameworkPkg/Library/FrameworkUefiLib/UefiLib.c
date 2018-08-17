@@ -1702,12 +1702,7 @@ EfiLocateProtocolBuffer (
 
   On the remaining device path, the longest initial sequence of
   FILEPATH_DEVICE_PATH nodes is node-wise traversed with
-  EFI_FILE_PROTOCOL.Open(). For the pathname fragment specified by each
-  traversed FILEPATH_DEVICE_PATH node, EfiOpenFileByDevicePath() first masks
-  EFI_FILE_MODE_CREATE out of OpenMode, and passes 0 for Attributes. If
-  EFI_FILE_PROTOCOL.Open() fails, and OpenMode includes EFI_FILE_MODE_CREATE,
-  then the operation is retried with the caller's OpenMode and Attributes
-  unmodified.
+  EFI_FILE_PROTOCOL.Open().
 
   (As a consequence, if OpenMode includes EFI_FILE_MODE_CREATE, and Attributes
   includes EFI_FILE_DIRECTORY, and each FILEPATH_DEVICE_PATH specifies a single
@@ -1739,18 +1734,10 @@ EfiLocateProtocolBuffer (
                            the last node in FilePath.
 
   @param[in] OpenMode      The OpenMode parameter to pass to
-                           EFI_FILE_PROTOCOL.Open(). For each
-                           FILEPATH_DEVICE_PATH node in FilePath,
-                           EfiOpenFileByDevicePath() first opens the specified
-                           pathname fragment with EFI_FILE_MODE_CREATE masked
-                           out of OpenMode and with Attributes set to 0, and
-                           only retries the operation with EFI_FILE_MODE_CREATE
-                           unmasked and Attributes propagated if the first open
-                           attempt fails.
+                           EFI_FILE_PROTOCOL.Open().
 
   @param[in] Attributes    The Attributes parameter to pass to
-                           EFI_FILE_PROTOCOL.Open(), when EFI_FILE_MODE_CREATE
-                           is propagated unmasked in OpenMode.
+                           EFI_FILE_PROTOCOL.Open().
 
   @retval EFI_SUCCESS            The file or directory has been opened or
                                  created.
@@ -1861,30 +1848,15 @@ EfiOpenFileByDevicePath (
     }
 
     //
-    // Open the next pathname fragment with EFI_FILE_MODE_CREATE masked out and
-    // with Attributes set to 0.
+    // Open or create the file corresponding to the next pathname fragment.
     //
     Status = LastFile->Open (
                          LastFile,
                          &NextFile,
                          PathName,
-                         OpenMode & ~(UINT64)EFI_FILE_MODE_CREATE,
-                         0
+                         OpenMode,
+                         Attributes
                          );
-
-    //
-    // Retry with EFI_FILE_MODE_CREATE and the original Attributes if the first
-    // attempt failed, and the caller specified EFI_FILE_MODE_CREATE.
-    //
-    if (EFI_ERROR (Status) && (OpenMode & EFI_FILE_MODE_CREATE) != 0) {
-      Status = LastFile->Open (
-                           LastFile,
-                           &NextFile,
-                           PathName,
-                           OpenMode,
-                           Attributes
-                           );
-    }
 
     //
     // Release any AlignedPathName on both error and success paths; PathName is
