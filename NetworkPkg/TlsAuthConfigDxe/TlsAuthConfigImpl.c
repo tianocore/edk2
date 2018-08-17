@@ -663,6 +663,7 @@ EnrollX509toVariable (
   EFI_SIGNATURE_LIST                *CACert;
   EFI_SIGNATURE_DATA                *CACertData;
   VOID                              *Data;
+  VOID                              *CurrentData;
   UINTN                             DataSize;
   UINTN                             SigDataSize;
   UINT32                            Attr;
@@ -674,6 +675,7 @@ EnrollX509toVariable (
   CACert        = NULL;
   CACertData    = NULL;
   Data          = NULL;
+  CurrentData   = NULL;
   Attr          = 0;
 
   Status = ReadFileContent (
@@ -716,11 +718,30 @@ EnrollX509toVariable (
   Status = gRT->GetVariable(
                   VariableName,
                   &gEfiTlsCaCertificateGuid,
-                  &Attr,
+                  NULL,
                   &DataSize,
                   NULL
                   );
   if (Status == EFI_BUFFER_TOO_SMALL) {
+    //
+    // Per spec, we have to fetch the variable's contents, even though we're
+    // only interested in the variable's attributes.
+    //
+    CurrentData = AllocatePool (DataSize);
+    if (CurrentData == NULL) {
+      Status = EFI_OUT_OF_RESOURCES;
+      goto ON_EXIT;
+    }
+    Status = gRT->GetVariable(
+                    VariableName,
+                    &gEfiTlsCaCertificateGuid,
+                    &Attr,
+                    &DataSize,
+                    CurrentData
+                    );
+    if (EFI_ERROR (Status)) {
+      goto ON_EXIT;
+    }
     Attr |= EFI_VARIABLE_APPEND_WRITE;
   } else if (Status == EFI_NOT_FOUND) {
     Attr = TLS_AUTH_CONFIG_VAR_BASE_ATTR;
@@ -749,6 +770,10 @@ ON_EXIT:
 
   if (Data != NULL) {
     FreePool (Data);
+  }
+
+  if (CurrentData != NULL) {
+    FreePool (CurrentData);
   }
 
   if (X509Data != NULL) {
