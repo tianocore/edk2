@@ -116,21 +116,6 @@ class DecBuildData(PackageBuildClassObject):
     def _GetArch(self):
         return self._Arch
 
-    ## Set architecture
-    #
-    #   Changing the default ARCH to another may affect all other information
-    # because all information in a platform may be ARCH-related. That's
-    # why we need to clear all internal used members, in order to cause all
-    # information to be re-retrieved.
-    #
-    #   @param  Value   The value of ARCH
-    #
-    def _SetArch(self, Value):
-        if self._Arch == Value:
-            return
-        self._Arch = Value
-        self._Clear()
-
     ## Retrieve all information in [Defines] section
     #
     #   (Retriving all [Defines] information in one-shot is just to save time.)
@@ -469,7 +454,7 @@ class DecBuildData(PackageBuildClassObject):
 
 
     _Macros = property(_GetMacros)
-    Arch = property(_GetArch, _SetArch)
+    Arch = property(_GetArch)
     PackageName = property(_GetPackageName)
     Guid = property(_GetFileGuid)
     Version = property(_GetVersion)
