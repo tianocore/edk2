@@ -673,10 +673,6 @@ InitializeMpExceptionStackSwitchHandlers (
   UINT8                           *GdtBuffer;
   UINT8                           *StackTop;
 
-  if (!PcdGetBool (PcdCpuStackGuard)) {
-    return;
-  }
-
   ExceptionNumber = FixedPcdGetSize (PcdCpuStackSwitchExceptionList);
   NewStackSize = FixedPcdGet32 (PcdCpuKnownGoodStackSize) * ExceptionNumber;
 
@@ -791,6 +787,32 @@ InitializeMpExceptionStackSwitchHandlers (
 }
 
 /**
+  Initializes MP exceptions handlers for special features, such as Heap Guard
+  and Stack Guard.
+**/
+VOID
+InitializeMpExceptionHandlers (
+  VOID
+  )
+{
+  //
+  // Enable non-stop mode for #PF triggered by Heap Guard or NULL Pointer
+  // Detection.
+  //
+  if (HEAP_GUARD_NONSTOP_MODE || NULL_DETECTION_NONSTOP_MODE) {
+    RegisterCpuInterruptHandler (EXCEPT_IA32_DEBUG, DebugExceptionHandler);
+    RegisterCpuInterruptHandler (EXCEPT_IA32_PAGE_FAULT, PageFaultExceptionHandler);
+  }
+
+  //
+  // Setup stack switch for Stack Guard feature.
+  //
+  if (PcdGetBool (PcdCpuStackGuard)) {
+    InitializeMpExceptionStackSwitchHandlers ();
+  }
+}
+
+/**
   Initialize Multi-processor support.
 
 **/
@@ -814,9 +836,9 @@ InitializeMpSupport (
   DEBUG ((DEBUG_INFO, "Detect CPU count: %d\n", mNumberOfProcessors));
 
   //
-  // Initialize exception stack switch handlers for each logic processor.
+  // Initialize special exception handlers for each logic processor.
   //
-  InitializeMpExceptionStackSwitchHandlers ();
+  InitializeMpExceptionHandlers ();
 
   //
   // Update CPU healthy information from Guided HOB

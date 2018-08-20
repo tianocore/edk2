@@ -57,6 +57,12 @@
                                        EFI_MEMORY_RO    \
                                        )
 
+#define HEAP_GUARD_NONSTOP_MODE       \
+        ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT6|BIT1|BIT0)) > BIT6)
+
+#define NULL_DETECTION_NONSTOP_MODE   \
+        ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT6|BIT0)) > BIT6)
+
 /**
   Flush CPU data cache. If the instruction cache is fully coherent
   with all DMA operations then function can just return EFI_SUCCESS.
@@ -273,7 +279,40 @@ RefreshGcdMemoryAttributesFromPaging (
   VOID
   );
 
+/**
+  Special handler for #DB exception, which will restore the page attributes
+  (not-present). It should work with #PF handler which will set pages to
+  'present'.
+
+  @param ExceptionType  Exception type.
+  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+
+**/
+VOID
+EFIAPI
+DebugExceptionHandler (
+  IN EFI_EXCEPTION_TYPE   InterruptType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
+  );
+
+/**
+  Special handler for #PF exception, which will set the pages which caused
+  #PF to be 'present'. The attribute of those pages should be restored in
+  the subsequent #DB handler.
+
+  @param ExceptionType  Exception type.
+  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+
+**/
+VOID
+EFIAPI
+PageFaultExceptionHandler (
+  IN EFI_EXCEPTION_TYPE   InterruptType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
+  );
+
 extern BOOLEAN mIsAllocatingPageTable;
+extern UINTN   mNumberOfProcessors;
 
 #endif
 

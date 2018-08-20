@@ -22,6 +22,10 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/SerialPortLib.h>
+#include <Library/SynchronizationLib.h>
+#include <Library/PrintLib.h>
 #include <Protocol/MpService.h>
 #include <Protocol/SmmBase2.h>
 #include <Register/Cpuid.h>
@@ -73,6 +77,10 @@
 #define PAGING_2M_ADDRESS_MASK_64 0x000FFFFFFFE00000ull
 #define PAGING_1G_ADDRESS_MASK_64 0x000FFFFFC0000000ull
 
+#define MAX_PF_ENTRY_COUNT        10
+#define MAX_DEBUG_MESSAGE_LENGTH  0x100
+#define IA32_PF_EC_ID             BIT4
+
 typedef enum {
   PageNone,
   Page4K,
@@ -101,6 +109,12 @@ PAGE_ATTRIBUTE_TABLE mPageAttributeTable[] = {
 PAGE_TABLE_POOL                   *mPageTablePool = NULL;
 PAGE_TABLE_LIB_PAGING_CONTEXT     mPagingContext;
 EFI_SMM_BASE2_PROTOCOL            *mSmmBase2 = NULL;
+
+//
+// Record the page fault exception count for one instruction execution.
+//
+UINTN                     *mPFEntryCount;
+UINT64                    *(*mLastPFEntryPointer)[MAX_PF_ENTRY_COUNT];
 
 /**
  Check if current execution environment is in SMM mode or not, via
@@ -1136,6 +1150,150 @@ AllocatePageTableMemory (
 }
 
 /**
+  Special handler for #DB exception, which will restore the page attributes
+  (not-present). It should work with #PF handler which will set pages to
+  'present'.
+
+  @param ExceptionType  Exception type.
+  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+
+**/
+VOID
+EFIAPI
+DebugExceptionHandler (
+  IN EFI_EXCEPTION_TYPE   ExceptionType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
+  )
+{
+  UINTN     CpuIndex;
+  UINTN     PFEntry;
+  BOOLEAN   IsWpEnabled;
+
+  MpInitLibWhoAmI (&CpuIndex);
+
+  //
+  // Clear last PF entries
+  //
+  IsWpEnabled = IsReadOnlyPageWriteProtected ();
+  if (IsWpEnabled) {
+    DisableReadOnlyPageWriteProtect ();
+  }
+
+  for (PFEntry = 0; PFEntry < mPFEntryCount[CpuIndex]; PFEntry++) {
+    if (mLastPFEntryPointer[CpuIndex][PFEntry] != NULL) {
+      *mLastPFEntryPointer[CpuIndex][PFEntry] &= ~IA32_PG_P;
+    }
+  }
+
+  if (IsWpEnabled) {
+    EnableReadOnlyPageWriteProtect ();
+  }
+
+  //
+  // Reset page fault exception count for next page fault.
+  //
+  mPFEntryCount[CpuIndex] = 0;
+
+  //
+  // Flush TLB
+  //
+  CpuFlushTlb ();
+
+  //
+  // Clear TF in EFLAGS
+  //
+  if (mPagingContext.MachineType == IMAGE_FILE_MACHINE_I386) {
+    SystemContext.SystemContextIa32->Eflags &= (UINT32)~BIT8;
+  } else {
+    SystemContext.SystemContextX64->Rflags &= (UINT64)~BIT8;
+  }
+}
+
+/**
+  Special handler for #PF exception, which will set the pages which caused
+  #PF to be 'present'. The attribute of those pages should be restored in
+  the subsequent #DB handler.
+
+  @param ExceptionType  Exception type.
+  @param SystemContext  Pointer to EFI_SYSTEM_CONTEXT.
+
+**/
+VOID
+EFIAPI
+PageFaultExceptionHandler (
+  IN EFI_EXCEPTION_TYPE   ExceptionType,
+  IN EFI_SYSTEM_CONTEXT   SystemContext
+  )
+{
+  EFI_STATUS                      Status;
+  UINT64                          PFAddress;
+  PAGE_TABLE_LIB_PAGING_CONTEXT   PagingContext;
+  PAGE_ATTRIBUTE                  PageAttribute;
+  UINT64                          Attributes;
+  UINT64                          *PageEntry;
+  UINTN                           Index;
+  UINTN                           CpuIndex;
+  UINTN                           PageNumber;
+  BOOLEAN                         NonStopMode;
+
+  PFAddress = AsmReadCr2 () & ~EFI_PAGE_MASK;
+  if (PFAddress < BASE_4KB) {
+    NonStopMode = NULL_DETECTION_NONSTOP_MODE ? TRUE : FALSE;
+  } else {
+    NonStopMode = HEAP_GUARD_NONSTOP_MODE ? TRUE : FALSE;
+  }
+
+  if (NonStopMode) {
+    MpInitLibWhoAmI (&CpuIndex);
+    GetCurrentPagingContext (&PagingContext);
+    //
+    // Memory operation cross page boundary, like "rep mov" instruction, will
+    // cause infinite loop between this and Debug Trap handler. We have to make
+    // sure that current page and the page followed are both in PRESENT state.
+    //
+    PageNumber = 2;
+    while (PageNumber > 0) {
+      PageEntry = GetPageTableEntry (&PagingContext, PFAddress, &PageAttribute);
+      ASSERT(PageEntry != NULL);
+
+      if (PageEntry != NULL) {
+        Attributes = GetAttributesFromPageEntry (PageEntry);
+        if ((Attributes & EFI_MEMORY_RP) != 0) {
+          Attributes &= ~EFI_MEMORY_RP;
+          Status = AssignMemoryPageAttributes (&PagingContext, PFAddress,
+                                               EFI_PAGE_SIZE, Attributes, NULL);
+          if (!EFI_ERROR(Status)) {
+            Index = mPFEntryCount[CpuIndex];
+            //
+            // Re-retrieve page entry because above calling might update page
+            // table due to table split.
+            //
+            PageEntry = GetPageTableEntry (&PagingContext, PFAddress, &PageAttribute);
+            mLastPFEntryPointer[CpuIndex][Index++] = PageEntry;
+            mPFEntryCount[CpuIndex] = Index;
+          }
+        }
+      }
+
+      PFAddress += EFI_PAGE_SIZE;
+      --PageNumber;
+    }
+  }
+
+  //
+  // Initialize the serial port before dumping.
+  //
+  SerialPortInitialize ();
+  //
+  // Display ExceptionType, CPU information and Image information
+  //
+  DumpCpuContext (ExceptionType, SystemContext);
+  if (!NonStopMode) {
+    CpuDeadLoop ();
+  }
+}
+
+/**
   Initialize the Page Table lib.
 **/
 VOID
@@ -1156,6 +1314,15 @@ InitializePageTableLib (
     DisableReadOnlyPageWriteProtect ();
     InitializePageTablePool (1);
     EnableReadOnlyPageWriteProtect ();
+  }
+
+  if (HEAP_GUARD_NONSTOP_MODE || NULL_DETECTION_NONSTOP_MODE) {
+    mPFEntryCount = (UINTN *)AllocateZeroPool (sizeof (UINTN) * mNumberOfProcessors);
+    ASSERT (mPFEntryCount != NULL);
+
+    mLastPFEntryPointer = (UINT64 *(*)[MAX_PF_ENTRY_COUNT])
+                          AllocateZeroPool (sizeof (mLastPFEntryPointer[0]) * mNumberOfProcessors);
+    ASSERT (mLastPFEntryPointer != NULL);
   }
 
   DEBUG ((DEBUG_INFO, "CurrentPagingContext:\n", CurrentPagingContext.MachineType));
