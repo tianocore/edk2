@@ -20,6 +20,7 @@
 
 extern  ASM_PFX(FeaturePcdGet (PcdCpuSmmProfileEnable))
 extern  ASM_PFX(SmiPFHandler)
+extern  ASM_PFX(mSetupDebugTrap)
 
 global  ASM_PFX(gcSmiIdtr)
 global  ASM_PFX(gcSmiGdtr)
@@ -673,7 +674,7 @@ o16 mov     [ecx + IA32_TSS._SS], ax
     mov     esp, ebp
 
 ; Set single step DB# if SMM profile is enabled and page fault exception happens
-    cmp     byte [dword ASM_PFX(FeaturePcdGet (PcdCpuSmmProfileEnable))], 0
+    cmp     byte [dword ASM_PFX(mSetupDebugTrap)], 0
     jz      @Done2
 
 ; Create return context for iretd in stub function

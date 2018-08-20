@@ -52,6 +52,11 @@ BOOLEAN                   mBtsSupported     = TRUE;
 BOOLEAN                   mSmmProfileStart = FALSE;
 
 //
+// The flag indicates if #DB will be setup in #PF handler.
+//
+BOOLEAN                   mSetupDebugTrap = FALSE;
+
+//
 // Record the page fault exception count for one instruction execution.
 //
 UINTN                     *mPFEntryCount;
@@ -229,7 +234,9 @@ DebugExceptionHandler (
   UINTN  CpuIndex;
   UINTN  PFEntry;
 
-  if (!mSmmProfileStart) {
+  if (!mSmmProfileStart &&
+      !HEAP_GUARD_NONSTOP_MODE &&
+      !NULL_DETECTION_NONSTOP_MODE) {
     return;
   }
   CpuIndex = GetCpuIndex ();
@@ -1174,7 +1181,9 @@ InitSmmProfile (
   //
   // Skip SMM profile initialization if feature is disabled
   //
-  if (!FeaturePcdGet (PcdCpuSmmProfileEnable)) {
+  if (!FeaturePcdGet (PcdCpuSmmProfileEnable) &&
+      !HEAP_GUARD_NONSTOP_MODE &&
+      !NULL_DETECTION_NONSTOP_MODE) {
     return;
   }
 
@@ -1187,6 +1196,11 @@ InitSmmProfile (
   // Initialize profile IDT.
   //
   InitIdtr ();
+
+  //
+  // Tell #PF handler to prepare a #DB subsequently.
+  //
+  mSetupDebugTrap = TRUE;
 }
 
 /**
@@ -1292,6 +1306,46 @@ RestorePageTableBelow4G (
       PageTable[PTIndex] &= ~IA32_PG_NX;
     }
   }
+}
+
+/**
+  Handler for Page Fault triggered by Guard page.
+
+  @param  ErrorCode  The Error code of exception.
+
+**/
+VOID
+GuardPagePFHandler (
+  UINTN ErrorCode
+  )
+{
+  UINT64                *PageTable;
+  UINT64                PFAddress;
+  UINT64                RestoreAddress;
+  UINTN                 RestorePageNumber;
+  UINTN                 CpuIndex;
+
+  PageTable         = (UINT64 *)AsmReadCr3 ();
+  PFAddress         = AsmReadCr2 ();
+  CpuIndex          = GetCpuIndex ();
+
+  //
+  // Memory operation cross pages, like "rep mov" instruction, will cause
+  // infinite loop between this and Debug Trap handler. We have to make sure
+  // that current page and the page followed are both in PRESENT state.
+  //
+  RestorePageNumber = 2;
+  RestoreAddress = PFAddress;
+  while (RestorePageNumber > 0) {
+    RestorePageTableBelow4G (PageTable, RestoreAddress, CpuIndex, ErrorCode);
+    RestoreAddress += EFI_PAGE_SIZE;
+    RestorePageNumber--;
+  }
+
+  //
+  // Flush TLB
+  //
+  CpuFlushTlb ();
 }
 
 /**

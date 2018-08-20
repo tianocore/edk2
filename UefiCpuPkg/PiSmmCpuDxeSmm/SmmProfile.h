@@ -114,6 +114,17 @@ GetCpuIndex (
   VOID
   );
 
+/**
+  Handler for Page Fault triggered by Guard page.
+
+  @param  ErrorCode  The Error code of exception.
+
+**/
+VOID
+GuardPagePFHandler (
+  UINTN ErrorCode
+  );
+
 //
 // The flag indicates if execute-disable is supported by processor.
 //
@@ -122,5 +133,9 @@ extern BOOLEAN    mXdSupported;
 // The flag indicates if execute-disable is enabled on processor.
 //
 extern BOOLEAN    mXdEnabled;
+//
+// The flag indicates if #DB will be setup in #PF handler.
+//
+extern BOOLEAN    mSetupDebugTrap;
 
 #endif // _SMM_PROFILE_H_
