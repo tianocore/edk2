@@ -932,7 +932,8 @@
   #  If enabled, accessing NULL address in UEFI or SMM code can be caught.<BR><BR>
   #    BIT0    - Enable NULL pointer detection for UEFI.<BR>
   #    BIT1    - Enable NULL pointer detection for SMM.<BR>
-  #    BIT2..6 - Reserved for future uses.<BR>
+  #    BIT2..5 - Reserved for future uses.<BR>
+  #    BIT6    - Enable non-stop mode.<BR>
   #    BIT7    - Disable NULL pointer detection just after EndOfDxe. <BR>
   #              This is a workaround for those unsolvable NULL access issues in
   #              OptionROM, boot loader, etc. It can also help to avoid unnecessary
@@ -1014,6 +1015,7 @@
   #   BIT1 - Enable UEFI pool guard.<BR>
   #   BIT2 - Enable SMM page guard.<BR>
   #   BIT3 - Enable SMM pool guard.<BR>
+  #   BIT6 - Enable non-stop mode.<BR>
   #   BIT7 - The direction of Guard Page for Pool Guard.
   #          0 - The returned pool is near the tail guard page.<BR>
   #          1 - The returned pool is near the head guard page.<BR>
