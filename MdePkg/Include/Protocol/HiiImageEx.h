@@ -1,7 +1,7 @@
 /** @file
   Protocol which allows access to the images in the images database.
 
-(C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
+(C) Copyright 2016-2018 Hewlett Packard Enterprise Development LP<BR>
 
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
@@ -10,6 +10,9 @@ http://opensource.org/licenses/bsd-license.php.
 
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+
+  @par Revision Reference:
+  This Protocol was introduced in UEFI Specification 2.6.
 
 **/
 

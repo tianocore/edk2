@@ -15,6 +15,9 @@ http://opensource.org/licenses/bsd-license.php.
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
+  @par Revision Reference:
+  This Protocol was introduced in PI Specification 1.2.
+
 **/
 
 #ifndef __PCD_H__

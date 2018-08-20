@@ -14,6 +14,10 @@ http://opensource.org/licenses/bsd-license.php.
 THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
+  @par Revision Reference:
+  This Protocol was introduced in UEFI Specification 2.1.
+
+
 **/
 
 #ifndef __HII_CONFIG_ROUTING_H__
