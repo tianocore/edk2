@@ -2897,7 +2897,7 @@ class ModuleAutoGen(AutoGen):
     #   @retval     list    The token list of the dependency expression after parsed
     #
     @cached_property
-    def DepexExpressionTokenList(self):
+    def DepexExpressionDict(self):
         if self.DxsFile or self.IsLibrary or TAB_DEPENDENCY_EXPRESSION_FILE in self.FileTypes:
             return {}
 
