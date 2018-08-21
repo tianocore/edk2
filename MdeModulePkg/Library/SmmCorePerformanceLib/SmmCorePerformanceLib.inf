@@ -60,6 +60,7 @@
   UefiLib
   ReportStatusCodeLib
   PeCoffGetEntryPointLib
+  DxeServicesLib
 
 [Protocols]
   gEfiSmmBase2ProtocolGuid                  ## CONSUMES
