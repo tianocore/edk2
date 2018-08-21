@@ -863,6 +863,41 @@ SmmInternalFreePages (
 }
 
 /**
+  Check whether the input range is in memory map.
+
+  @param  Memory                 Base address of memory being inputed.
+  @param  NumberOfPages          The number of pages.
+
+  @retval TRUE   In memory map.
+  @retval FALSE  Not in memory map.
+
+**/
+BOOLEAN
+InMemMap (
+  IN EFI_PHYSICAL_ADDRESS  Memory,
+  IN UINTN                 NumberOfPages
+  )
+{
+  LIST_ENTRY               *Link;
+  MEMORY_MAP               *Entry;
+  EFI_PHYSICAL_ADDRESS     Last;
+
+  Last = Memory + EFI_PAGES_TO_SIZE (NumberOfPages) - 1;
+
+  Link = gMemoryMap.ForwardLink;
+  while (Link != &gMemoryMap) {
+    Entry = CR (Link, MEMORY_MAP, Link, MEMORY_MAP_SIGNATURE);
+    Link  = Link->ForwardLink;
+
+    if ((Entry->Start <= Memory) && (Entry->End >= Last)) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Frees previous allocated pages.
 
   @param  Memory                 Base address of memory being freed.
@@ -882,6 +917,10 @@ SmmFreePages (
 {
   EFI_STATUS  Status;
   BOOLEAN     IsGuarded;
+
+  if (!InMemMap(Memory, NumberOfPages)) {
+    return EFI_NOT_FOUND;
+  }
 
   IsGuarded = IsHeapGuardEnabled () && IsMemoryGuarded (Memory);
   Status = SmmInternalFreePages (Memory, NumberOfPages, IsGuarded);
