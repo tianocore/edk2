@@ -3,7 +3,7 @@
   Provide a thunk function to transition from long mode to compatibility mode to execute 32-bit code and then transit
   back to long mode.
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -67,6 +67,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED IA32_DESCRIPTOR mGdt = {
   @return status.
 **/
 UINT32
+EFIAPI
 AsmExecute32BitCode (
   IN UINT64           Function,
   IN UINT64           Param1,
