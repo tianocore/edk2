@@ -788,7 +788,7 @@ class ValueExpression(BaseExpression):
         OpToken = ''
         for Ch in Expr:
             if Ch in self.NonLetterOpLst:
-                if '!' == Ch and OpToken:
+                if Ch in ['!', '~'] and OpToken:
                     break
                 self._Idx += 1
                 OpToken += Ch
