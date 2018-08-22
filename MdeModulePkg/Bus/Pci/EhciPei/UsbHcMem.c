@@ -293,31 +293,6 @@ UsbHcIsMemBlockEmpty (
   return TRUE;
 }
 
-/**
-  Unlink the memory block from the pool's list.
-
-  @param  Head           The block list head of the memory's pool.
-  @param  BlockToUnlink  The memory block to unlink.
-
-**/
-VOID
-UsbHcUnlinkMemBlock (
-  IN USBHC_MEM_BLOCK      *Head,
-  IN USBHC_MEM_BLOCK      *BlockToUnlink
-  )
-{
-  USBHC_MEM_BLOCK         *Block;
-
-  ASSERT ((Head != NULL) && (BlockToUnlink != NULL));
-
-  for (Block = Head; Block != NULL; Block = Block->Next) {
-    if (Block->Next == BlockToUnlink) {
-      Block->Next         = BlockToUnlink->Next;
-      BlockToUnlink->Next = NULL;
-      break;
-    }
-  }
-}
 
 /**
   Initialize the memory management pool for the host controller.
@@ -390,8 +365,6 @@ UsbHcFreeMemPool (
 
   //
   // Unlink all the memory blocks from the pool, then free them.
-  // UsbHcUnlinkMemBlock can't be used to unlink and free the
-  // first block.
   //
   for (Block = Pool->Head->Next; Block != NULL; Block = Block->Next) {
     UsbHcFreeMemBlock (Ehc, Pool, Block);
