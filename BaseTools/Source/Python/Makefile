@@ -236,7 +236,7 @@ CMD_ECC=$(BASE_TOOLS_PATH)\Source\Python\Ecc\c.py \
     $(BASE_TOOLS_PATH)\Source\Python\Ecc\Configuration.py \
     $(BASE_TOOLS_PATH)\Source\Python\Ecc\CParser.py \
     $(BASE_TOOLS_PATH)\Source\Python\Ecc\Database.py \
-    $(BASE_TOOLS_PATH)\Source\Python\Ecc\Ecc.py \
+    $(BASE_TOOLS_PATH)\Source\Python\Ecc\EccMain.py \
     $(BASE_TOOLS_PATH)\Source\Python\Ecc\EccGlobalData.py \
     $(BASE_TOOLS_PATH)\Source\Python\Ecc\EccToolError.py \
     $(BASE_TOOLS_PATH)\Source\Python\Ecc\Exception.py \
@@ -296,8 +296,8 @@ $(BIN_DIR)\TestSigningPrivateKey.pem: $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sh
 $(BIN_DIR)\Rsa2048Sha256GenerateKeys.exe: $(BASE_TOOLS_PATH)\Source\Python\Rsa2048Sha256Sign\Rsa2048Sha256GenerateKeys.py
   @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Rsa2048Sha256Sign\Rsa2048Sha256GenerateKeys.py
 
-$(BIN_DIR)\Ecc.exe: $(BASE_TOOLS_PATH)\Source\Python\Ecc\Ecc.py $(CMD_ECC) $(BIN_DIR)\config.ini $(BIN_DIR)\exception.xml
-  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Ecc\Ecc.py
+$(BIN_DIR)\Ecc.exe: $(BASE_TOOLS_PATH)\Source\Python\Ecc\EccMain.py $(CMD_ECC) $(BIN_DIR)\config.ini $(BIN_DIR)\exception.xml
+  @$(FREEZE) --include-modules=$(MODULES) --install-dir=$(BIN_DIR) Ecc\EccMain.py --target-name=Ecc.exe
 
 $(BIN_DIR)\config.ini: $(BASE_TOOLS_PATH)\Source\Python\Ecc\config.ini
   @copy /Y /B $(BASE_TOOLS_PATH)\Source\Python\Ecc\config.ini $(BIN_DIR)\config.ini
