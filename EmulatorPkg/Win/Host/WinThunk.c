@@ -482,14 +482,68 @@ SecGetTime (
   OUT EFI_TIME_CAPABILITIES   *Capabilities OPTIONAL
   )
 {
+  SYSTEMTIME            SystemTime;
+  TIME_ZONE_INFORMATION TimeZone;
+
+  GetLocalTime (&SystemTime);
+  GetTimeZoneInformation (&TimeZone);
+
+  Time->Year = (UINT16)SystemTime.wYear;
+  Time->Month = (UINT8)SystemTime.wMonth;
+  Time->Day = (UINT8)SystemTime.wDay;
+  Time->Hour = (UINT8)SystemTime.wHour;
+  Time->Minute = (UINT8)SystemTime.wMinute;
+  Time->Second = (UINT8)SystemTime.wSecond;
+  Time->Nanosecond = (UINT32)(SystemTime.wMilliseconds * 1000000);
+  Time->TimeZone = (INT16)TimeZone.Bias;
+
+  if (Capabilities != NULL) {
+    Capabilities->Resolution = 1;
+    Capabilities->Accuracy = 50000000;
+    Capabilities->SetsToZero = FALSE;
+  }
+
+  Time->Daylight = 0;
+  if (TimeZone.StandardDate.wMonth) {
+    Time->Daylight = (UINT8)TimeZone.StandardDate.wMonth;
+  }
 }
 
 EFI_STATUS
 SecSetTime (
   IN  EFI_TIME               *Time
-)
+  )
 {
-  return EFI_SUCCESS;
+  TIME_ZONE_INFORMATION TimeZone;
+  SYSTEMTIME            SystemTime;
+  BOOL                  Flag;
+
+  //
+  // Set Daylight savings time information and Time Zone
+  //
+  GetTimeZoneInformation (&TimeZone);
+  TimeZone.StandardDate.wMonth = Time->Daylight;
+  TimeZone.Bias = Time->TimeZone;
+  Flag = SetTimeZoneInformation (&TimeZone);
+  if (!Flag) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  SystemTime.wYear = Time->Year;
+  SystemTime.wMonth = Time->Month;
+  SystemTime.wDay = Time->Day;
+  SystemTime.wHour = Time->Hour;
+  SystemTime.wMinute = Time->Minute;
+  SystemTime.wSecond = Time->Second;
+  SystemTime.wMilliseconds = (INT16)(Time->Nanosecond / 1000000);
+
+  Flag = SetLocalTime (&SystemTime);
+
+  if (!Flag) {
+    return EFI_DEVICE_ERROR;
+  } else {
+    return EFI_SUCCESS;
+  }
 }
 
 EMU_THUNK_PROTOCOL gEmuThunkProtocol = {
