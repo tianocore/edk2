@@ -425,6 +425,11 @@ Returns:
   AddThunkPpi (EFI_PEI_PPI_DESCRIPTOR_PPI, &gEmuThunkPpiGuid, &mSecEmuThunkPpi);
 
   //
+  // Emulator Bus Driver Thunks
+  //
+  AddThunkProtocol (&mWinNtWndThunkIo, (CHAR16 *)PcdGetPtr (PcdEmuGop), TRUE);
+
+  //
   // Allocate space for gSystemMemory Array
   //
   gSystemMemoryCount  = CountSeparatorsInString (MemorySizeStr, '!') + 1;

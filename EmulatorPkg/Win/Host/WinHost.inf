@@ -30,6 +30,9 @@
 
 [Sources]
   WinMemoryAllocationLib.c
+  WinGopInput.c
+  WinGopScreen.c
+  WinGop.h
   WinThunk.c
   WinHost.h
   WinHost.c
@@ -55,6 +58,9 @@
 [Ppis]
   gEmuThunkPpiGuid
 
+[Protocols]
+  gEmuIoThunkProtocolGuid
+  gEmuGraphicsWindowProtocolGuid
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdInitValueInTempStack
 
@@ -62,6 +68,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareVolume
   gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySize
   gEmulatorPkgTokenSpaceGuid.PcdEmuFdBaseAddress
+  gEmulatorPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"
   gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage
 
 [BuildOptions]
