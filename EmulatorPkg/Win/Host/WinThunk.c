@@ -205,12 +205,193 @@ SecFree (
   return TRUE;
 }
 
+
+
+//
+// Define a global that we can use to shut down the NT timer thread when
+// the timer is canceled.
+//
+BOOLEAN                 mCancelTimerThread = FALSE;
+
+//
+// The notification function to call on every timer interrupt
+//
+EMU_SET_TIMER_CALLBACK  *mTimerNotifyFunction = NULL;
+
+//
+// The thread handle for this driver
+//
+HANDLE                  mNtMainThreadHandle;
+
+//
+// The timer value from the last timer interrupt
+//
+UINT32                  mNtLastTick;
+
+//
+// Critical section used to update varibles shared between the main thread and
+// the timer interrupt thread.
+//
+CRITICAL_SECTION        mNtCriticalSection;
+
+//
+// Worker Functions
+//
+UINT                    mMMTimerThreadID = 0;
+
+volatile BOOLEAN        mInterruptEnabled = FALSE;
+
+VOID
+CALLBACK
+MMTimerThread (
+  UINT  wTimerID,
+  UINT  msg,
+  DWORD dwUser,
+  DWORD dw1,
+  DWORD dw2
+)
+{
+  UINT32            CurrentTick;
+  UINT32            Delta;
+
+  if (!mCancelTimerThread) {
+
+    //
+    // Suspend the main thread until we are done.
+    // Enter the critical section before suspending
+    // and leave the critical section after resuming
+    // to avoid deadlock between main and timer thread.
+    //
+    EnterCriticalSection (&mNtCriticalSection);
+    SuspendThread (mNtMainThreadHandle);
+
+    //
+    // If the timer thread is being canceled, then bail immediately.
+    // We check again here because there's a small window of time from when
+    // this thread was kicked off and when we suspended the main thread above.
+    //
+    if (mCancelTimerThread) {
+      ResumeThread (mNtMainThreadHandle);
+      LeaveCriticalSection (&mNtCriticalSection);
+      timeKillEvent (wTimerID);
+      mMMTimerThreadID = 0;
+      return;
+    }
+
+    while (!mInterruptEnabled) {
+      //
+      //  Resume the main thread
+      //
+      ResumeThread (mNtMainThreadHandle);
+      LeaveCriticalSection (&mNtCriticalSection);
+
+      //
+      //  Wait for interrupts to be enabled.
+      //
+      while (!mInterruptEnabled) {
+        Sleep (1);
+      }
+
+      //
+      //  Suspend the main thread until we are done
+      //
+      EnterCriticalSection (&mNtCriticalSection);
+      SuspendThread (mNtMainThreadHandle);
+    }
+
+    //
+    //  Get the current system tick
+    //
+    CurrentTick = GetTickCount ();
+    Delta = CurrentTick - mNtLastTick;
+    mNtLastTick = CurrentTick;
+
+    //
+    //  If delay was more then 1 second, ignore it (probably debugging case)
+    //
+    if (Delta < 1000) {
+
+      //
+      // Only invoke the callback function if a Non-NULL handler has been
+      // registered. Assume all other handlers are legal.
+      //
+      if (mTimerNotifyFunction != NULL) {
+        mTimerNotifyFunction (Delta);
+      }
+    }
+
+    //
+    //  Resume the main thread
+    //
+    ResumeThread (mNtMainThreadHandle);
+    LeaveCriticalSection (&mNtCriticalSection);
+  } else {
+    timeKillEvent (wTimerID);
+    mMMTimerThreadID = 0;
+  }
+
+}
+
 VOID
 SecSetTimer (
   IN  UINT64                  TimerPeriod,
   IN  EMU_SET_TIMER_CALLBACK  Callback
 )
 {
+  //
+// If TimerPeriod is 0, then the timer thread should be canceled
+//
+  if (TimerPeriod == 0) {
+    //
+    // Cancel the timer thread
+    //
+    EnterCriticalSection (&mNtCriticalSection);
+
+    mCancelTimerThread = TRUE;
+
+    LeaveCriticalSection (&mNtCriticalSection);
+
+    //
+    // Wait for the timer thread to exit
+    //
+
+    if (mMMTimerThreadID != 0) {
+      timeKillEvent (mMMTimerThreadID);
+      mMMTimerThreadID = 0;
+    }
+  } else {
+    //
+    // If the TimerPeriod is valid, then create and/or adjust the period of the timer thread
+    //
+    EnterCriticalSection (&mNtCriticalSection);
+
+    mCancelTimerThread = FALSE;
+
+    LeaveCriticalSection (&mNtCriticalSection);
+
+    //
+    //  Get the starting tick location if we are just starting the timer thread
+    //
+    mNtLastTick = GetTickCount ();
+
+    if (mMMTimerThreadID) {
+      timeKillEvent (mMMTimerThreadID);
+    }
+
+    SetThreadPriority (
+      GetCurrentThread (),
+      THREAD_PRIORITY_HIGHEST
+    );
+
+    mMMTimerThreadID = timeSetEvent (
+      (UINT)TimerPeriod,
+      0,
+      MMTimerThread,
+      (DWORD_PTR)NULL,
+      TIME_PERIODIC | TIME_KILL_SYNCHRONOUS | TIME_CALLBACK_FUNCTION
+    );
+  }
+  mTimerNotifyFunction = Callback;
 }
 
 VOID
@@ -218,6 +399,17 @@ SecInitializeThunk (
   VOID
 )
 {
+  InitializeCriticalSection (&mNtCriticalSection);
+
+  DuplicateHandle (
+    GetCurrentProcess (),
+    GetCurrentThread (),
+    GetCurrentProcess (),
+    &mNtMainThreadHandle,
+    0,
+    FALSE,
+    DUPLICATE_SAME_ACCESS
+  );
 }
 
 VOID
@@ -225,6 +417,7 @@ SecEnableInterrupt (
   VOID
   )
 {
+  mInterruptEnabled = TRUE;
 }
 
 
@@ -233,6 +426,7 @@ SecDisableInterrupt (
   VOID
   )
 {
+  mInterruptEnabled = FALSE;
 }
 
 
