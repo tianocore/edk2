@@ -325,6 +325,11 @@ HandOffToDxeCore (
     PERF_EVENT_SIGNAL_END (gEndOfPeiSignalPpi.Guid);
     ASSERT_EFI_ERROR (Status);
 
+    //
+    // Paging might be already enabled. To avoid conflict configuration,
+    // disable paging first anyway.
+    //
+    AsmWriteCr0 (AsmReadCr0 () & (~BIT31));
     AsmWriteCr3 (PageTables);
 
     //
@@ -445,6 +450,11 @@ HandOffToDxeCore (
     ASSERT_EFI_ERROR (Status);
 
     if (BuildPageTablesIa32Pae) {
+      //
+      // Paging might be already enabled. To avoid conflict configuration,
+      // disable paging first anyway.
+      //
+      AsmWriteCr0 (AsmReadCr0 () & (~BIT31));
       AsmWriteCr3 (PageTables);
       //
       // Set Physical Address Extension (bit 5 of CR4).
