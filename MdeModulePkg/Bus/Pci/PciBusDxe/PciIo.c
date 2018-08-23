@@ -1413,9 +1413,9 @@ SupportPaletteSnoopAttributes (
   }
 
   //
-  // Get the boot VGA on the same segement
+  // Get the boot VGA on the same Host Bridge
   //
-  Temp = ActiveVGADeviceOnTheSameSegment (PciIoDevice);
+  Temp = LocateVgaDeviceOnHostBridge (PciIoDevice->PciRootBridgeIo->ParentHandle);
 
   if (Temp == NULL) {
     //
@@ -1668,9 +1668,9 @@ PciIoAttributes (
       //
       if (Operation == EfiPciIoAttributeOperationEnable) {
         //
-        // Check if there have been an active VGA device on the same segment
+        // Check if there have been an active VGA device on the same Host Bridge
         //
-        Temp = ActiveVGADeviceOnTheSameSegment (PciIoDevice);
+        Temp = LocateVgaDeviceOnHostBridge (PciIoDevice->PciRootBridgeIo->ParentHandle);
         if (Temp != NULL && Temp != PciIoDevice) {
           //
           // An active VGA has been detected, so can not enable another
