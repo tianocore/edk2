@@ -1,6 +1,6 @@
 /*++ @file
 
-Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -18,6 +18,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiDxe.h>
 
 #include <Guid/EmuSystemConfig.h>
+#include <Guid/EventGroup.h>
 #include <Protocol/EmuThunk.h>
 #include <Protocol/EmuIoThunk.h>
 #include <Protocol/EmuGraphicsWindow.h>
@@ -32,6 +33,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/GenericBdsLib.h>
 #include <Library/PlatformBdsLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/UefiLib.h>
 
 
 extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
