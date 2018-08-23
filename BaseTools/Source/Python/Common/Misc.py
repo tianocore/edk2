@@ -1432,9 +1432,9 @@ def ParseFieldValue (Value):
 ## AnalyzeDscPcd
 #
 #  Analyze DSC PCD value, since there is no data type info in DSC
-#  This fuction is used to match functions (AnalyzePcdData) used for retrieving PCD value from database
+#  This function is used to match functions (AnalyzePcdData) used for retrieving PCD value from database
 #  1. Feature flag: TokenSpace.PcdCName|PcdValue
-#  2. Fix and Patch:TokenSpace.PcdCName|PcdValue[|MaxSize]
+#  2. Fix and Patch:TokenSpace.PcdCName|PcdValue[|VOID*[|MaxSize]]
 #  3. Dynamic default:
 #     TokenSpace.PcdCName|PcdValue[|VOID*[|MaxSize]]
 #     TokenSpace.PcdCName|PcdValue
@@ -1442,7 +1442,7 @@ def ParseFieldValue (Value):
 #     TokenSpace.PcdCName|VpdOffset[|VpdValue]
 #     TokenSpace.PcdCName|VpdOffset[|MaxSize[|VpdValue]]
 #  5. Dynamic HII:
-#     TokenSpace.PcdCName|HiiString|VaiableGuid|VariableOffset[|HiiValue]
+#     TokenSpace.PcdCName|HiiString|VariableGuid|VariableOffset[|HiiValue]
 #  PCD value needs to be located in such kind of string, and the PCD value might be an expression in which
 #    there might have "|" operator, also in string value.
 #
@@ -1458,50 +1458,33 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
     FieldList = AnalyzePcdExpression(Setting)
 
     IsValid = True
-    if PcdType in (MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_FEATURE_FLAG):
+    if PcdType in (MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT):
         Value = FieldList[0]
         Size = ''
-        if len(FieldList) > 1:
-            if FieldList[1].upper().startswith("0X") or FieldList[1].isdigit():
-                Size = FieldList[1]
+        if len(FieldList) > 1 and FieldList[1]:
+            DataType = FieldList[1]
+            if FieldList[1] != TAB_VOID:
+                IsValid = False
+        if len(FieldList) > 2:
+            Size = FieldList[2]
+        if IsValid:
+            if DataType == "":
+                IsValid = (len(FieldList) <= 1)
             else:
-                DataType = FieldList[1]
+                IsValid = (len(FieldList) <= 3)
 
-        if len(FieldList) > 2:
-            Size = FieldList[2]
-        if DataType == "":
-            IsValid = (len(FieldList) <= 1)
-        else:
-            IsValid = (len(FieldList) <= 3)
-#         Value, Size = ParseFieldValue(Value)
         if Size:
             try:
                 int(Size, 16) if Size.upper().startswith("0X") else int(Size)
             except:
                 IsValid = False
                 Size = -1
-        return [str(Value), '', str(Size)], IsValid, 0
-    elif PcdType in (MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT):
+        return [str(Value), DataType, str(Size)], IsValid, 0
+    elif PcdType == MODEL_PCD_FEATURE_FLAG:
         Value = FieldList[0]
-        Size = Type = ''
-        if len(FieldList) > 1:
-            Type = FieldList[1]
-        else:
-            Type = DataType
-        if len(FieldList) > 2:
-            Size = FieldList[2]
-        if DataType == "":
-            IsValid = (len(FieldList) <= 1)
-        else:
-            IsValid = (len(FieldList) <= 3)
-
-        if Size:
-            try:
-                int(Size, 16) if Size.upper().startswith("0X") else int(Size)
-            except:
-                IsValid = False
-                Size = -1
-        return [Value, Type, str(Size)], IsValid, 0
+        Size = ''
+        IsValid = (len(FieldList) <= 1)
+        return [Value, DataType, str(Size)], IsValid, 0
     elif PcdType in (MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_VPD):
         VpdOffset = FieldList[0]
         Value = Size = ''
