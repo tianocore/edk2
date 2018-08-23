@@ -251,6 +251,13 @@
   EmulatorPkg/Unix/Host/Host.inf
 !endif
 
+!ifdef $(WIN_SEC_BUILD)
+  ##
+  #  Emulator, OS WIN application
+  ##
+  EmulatorPkg/Win/Host/WinHost.inf
+!endif
+
 !ifndef $(SKIP_MAIN_BUILD)
   #
   # Generic SEC
