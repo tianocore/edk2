@@ -33,6 +33,8 @@ Abstract:
 #include <Protocol/EmuThunk.h>
 #include <Protocol/SimpleFileSystem.h>
 
+#include <Protocol/EmuBlockIo.h>
+#include <Protocol/BlockIo.h>
 
 #include <Library/BaseLib.h>
 #include <Library/PeCoffLib.h>
@@ -203,4 +205,5 @@ SecInitializeThunk (
 extern EMU_THUNK_PROTOCOL    gEmuThunkProtocol;
 extern EMU_IO_THUNK_PROTOCOL mWinNtWndThunkIo;
 extern EMU_IO_THUNK_PROTOCOL mWinNtFileSystemThunkIo;
+extern EMU_IO_THUNK_PROTOCOL mWinNtBlockIoThunkIo;
 #endif

@@ -34,6 +34,7 @@
   WinGopScreen.c
   WinGop.h
   WinFileSystem.c
+  WinBlockIo.c
   WinThunk.c
   WinHost.h
   WinHost.c
@@ -62,6 +63,7 @@
 [Protocols]
   gEmuIoThunkProtocolGuid
   gEmuGraphicsWindowProtocolGuid
+  gEmuBlockIoProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
 
 [Guids]
@@ -76,6 +78,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuFirmwareVolume
   gEmulatorPkgTokenSpaceGuid.PcdEmuMemorySize
   gEmulatorPkgTokenSpaceGuid.PcdEmuFdBaseAddress
+  gEmulatorPkgTokenSpaceGuid.PcdEmuVirtualDisk
   gEmulatorPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"
   gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem
   gEmulatorPkgTokenSpaceGuid.PcdPeiServicesTablePage
