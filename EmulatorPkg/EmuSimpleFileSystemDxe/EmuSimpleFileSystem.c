@@ -4,7 +4,7 @@
   environment variables. The variables must be visible to the Microsoft*
   Developer Studio for them to work.
 
-Copyright (c) 2006 - 2011, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -51,7 +51,10 @@ EmuSimpleFileSystemOpen (
   IN  UINT64              Attributes
   )
 {
+  EFI_STATUS                        Status;
+  EFI_TPL                           OldTpl;
   EMU_EFI_FILE_PRIVATE              *PrivateFile;
+  EMU_EFI_FILE_PRIVATE              *NewPrivateFile;
 
   //
   // Check for obvious invalid parameters.
@@ -81,9 +84,29 @@ EmuSimpleFileSystemOpen (
     return EFI_INVALID_PARAMETER;
   }
 
-  PrivateFile     = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
+  OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
-  return PrivateFile->Io->Open (PrivateFile->Io, NewHandle, FileName, OpenMode, Attributes);
+  PrivateFile = EMU_EFI_FILE_PRIVATE_DATA_FROM_THIS (This);
+
+  NewPrivateFile = AllocateCopyPool (sizeof (EMU_EFI_FILE_PRIVATE), PrivateFile);
+  if (NewPrivateFile == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto Done;
+  }
+
+
+  Status = PrivateFile->Io->Open (PrivateFile->Io, &NewPrivateFile->Io, FileName, OpenMode, Attributes);
+  if (!EFI_ERROR (Status)) {
+    *NewHandle = &NewPrivateFile->EfiFile;
+  } else {
+    *NewHandle = NULL;
+    FreePool (NewPrivateFile);
+  }
+
+Done:
+  gBS->RestoreTPL (OldTpl);
+
+  return Status;
 }
 
 
@@ -508,7 +531,9 @@ EmuSimpleFileSystemOpenVolume (
   PrivateFile->Signature            = EMU_EFI_FILE_PRIVATE_SIGNATURE;
   PrivateFile->IoThunk              = Private->IoThunk;
   PrivateFile->SimpleFileSystem     = This;
-  PrivateFile->EfiFile.Revision     = EFI_SIMPLE_FILE_SYSTEM_PROTOCOL_REVISION;
+
+  ZeroMem (&PrivateFile->EfiFile, sizeof (PrivateFile->EfiFile));
+  PrivateFile->EfiFile.Revision     = EFI_FILE_PROTOCOL_REVISION;
   PrivateFile->EfiFile.Open         = EmuSimpleFileSystemOpen;
   PrivateFile->EfiFile.Close        = EmuSimpleFileSystemClose;
   PrivateFile->EfiFile.Delete       = EmuSimpleFileSystemDelete;
