@@ -42,7 +42,19 @@ SecWriteStdErr (
   IN UINTN     NumberOfBytes
   )
 {
-  return 0;
+  BOOL  Success;
+  DWORD CharCount;
+
+  CharCount = (DWORD)NumberOfBytes;
+  Success = WriteFile (
+    GetStdHandle (STD_ERROR_HANDLE),
+    Buffer,
+    CharCount,
+    &CharCount,
+    NULL
+    );
+
+  return Success ? CharCount : 0;
 }
 
 
@@ -51,7 +63,32 @@ SecConfigStdIn (
   VOID
   )
 {
-  return EFI_SUCCESS;
+  BOOL     Success;
+  DWORD    Mode;
+
+  Success = GetConsoleMode (GetStdHandle (STD_INPUT_HANDLE), &Mode);
+  if (Success) {
+    //
+    // Disable buffer (line input), echo, mouse, window
+    //
+    Success = SetConsoleMode (
+                GetStdHandle (STD_INPUT_HANDLE),
+                Mode | ENABLE_VIRTUAL_TERMINAL_INPUT & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT)
+                );
+  }
+  if (Success) {
+    //
+    // Enable terminal mode
+    //
+    Success = GetConsoleMode (GetStdHandle (STD_OUTPUT_HANDLE), &Mode);
+    if (Success) {
+      Success = SetConsoleMode (
+        GetStdHandle (STD_OUTPUT_HANDLE),
+        Mode | ENABLE_VIRTUAL_TERMINAL_PROCESSING | DISABLE_NEWLINE_AUTO_RETURN
+      );
+    }
+  }
+  return Success ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 }
 
 UINTN
@@ -60,7 +97,19 @@ SecWriteStdOut (
   IN UINTN     NumberOfBytes
   )
 {
-  return 0;
+  BOOL  Success;
+  DWORD CharCount;
+
+  CharCount = (DWORD)NumberOfBytes;
+  Success = WriteFile (
+    GetStdHandle (STD_OUTPUT_HANDLE),
+    Buffer,
+    CharCount,
+    &CharCount,
+    NULL
+    );
+
+  return Success ? CharCount : 0;
 }
 
 BOOLEAN
@@ -68,6 +117,38 @@ SecPollStdIn (
   VOID
   )
 {
+  BOOL           Success;
+  INPUT_RECORD   Record;
+  DWORD          RecordNum;
+
+  do {
+    Success = GetNumberOfConsoleInputEvents (GetStdHandle (STD_INPUT_HANDLE), &RecordNum);
+    if (!Success || (RecordNum == 0)) {
+      break;
+    }
+    Success = PeekConsoleInput (
+      GetStdHandle (STD_INPUT_HANDLE),
+      &Record,
+      1,
+      &RecordNum
+    );
+    if (Success && (RecordNum == 1)) {
+      if (Record.EventType == KEY_EVENT && Record.Event.KeyEvent.bKeyDown) {
+        return TRUE;
+      } else {
+        //
+        // Consume the non-key event.
+        //
+        Success = ReadConsoleInput (
+          GetStdHandle (STD_INPUT_HANDLE),
+          &Record,
+          1,
+          &RecordNum
+        );
+      }
+    }
+  } while (Success);
+
   return FALSE;
 }
 
@@ -77,7 +158,27 @@ SecReadStdIn (
   IN UINTN     NumberOfBytes
   )
 {
-  return 0;
+  BOOL           Success;
+  INPUT_RECORD   Record;
+  DWORD          RecordNum;
+  UINTN          BytesReturn;
+
+  if (!SecPollStdIn ()) {
+    return 0;
+  }
+  Success = ReadConsoleInput (
+    GetStdHandle (STD_INPUT_HANDLE),
+    &Record,
+    1,
+    &RecordNum
+  );
+  ASSERT (Success && (RecordNum == 1) && (Record.EventType == KEY_EVENT) && (Record.Event.KeyEvent.bKeyDown));
+  NumberOfBytes = MIN (Record.Event.KeyEvent.wRepeatCount, NumberOfBytes);
+  BytesReturn   = NumberOfBytes;
+  while (NumberOfBytes-- != 0) {
+    Buffer[NumberOfBytes] = Record.Event.KeyEvent.uChar.AsciiChar;
+  }
+  return BytesReturn;
 }
 
 
