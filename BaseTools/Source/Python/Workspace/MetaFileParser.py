@@ -139,7 +139,7 @@ class MetaFileParser(object):
         if FilePath in Class.MetaFiles:
             return Class.MetaFiles[FilePath]
         else:
-            ParserObject = super(MetaFileParser, Class).__new__(Class)
+            ParserObject = super().__new__(Class)
             Class.MetaFiles[FilePath] = ParserObject
             return ParserObject
 

@@ -241,7 +241,7 @@ class VAR_CHECK_PCD_VALID_OBJ(object):
 
 class VAR_CHECK_PCD_VALID_LIST(VAR_CHECK_PCD_VALID_OBJ):
     def __init__(self, VarOffset, validlist, PcdDataType):
-        super(VAR_CHECK_PCD_VALID_LIST, self).__init__(VarOffset, validlist, PcdDataType)
+        super().__init__(VarOffset, validlist, PcdDataType)
         self.Type = 1
         valid_num_list = []
         for item in self.rawdata:
@@ -261,7 +261,7 @@ class VAR_CHECK_PCD_VALID_LIST(VAR_CHECK_PCD_VALID_OBJ):
 
 class VAR_CHECK_PCD_VALID_RANGE(VAR_CHECK_PCD_VALID_OBJ):
     def __init__(self, VarOffset, validrange, PcdDataType):
-        super(VAR_CHECK_PCD_VALID_RANGE, self).__init__(VarOffset, validrange, PcdDataType)
+        super().__init__(VarOffset, validrange, PcdDataType)
         self.Type = 2
         RangeExpr = ""
         i = 0

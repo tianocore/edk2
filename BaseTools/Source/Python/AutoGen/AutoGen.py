@@ -198,11 +198,11 @@ class AutoGen(object):
             # if it exists, just return it directly
             return cls.__ObjectCache[Key]
             # it didnt exist. create it, cache it, then return it
-        RetVal = cls.__ObjectCache[Key] = super(AutoGen, cls).__new__(cls)
+        RetVal = cls.__ObjectCache[Key] = super().__new__(cls)
         return RetVal
 
     def __init__ (self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
-        super(AutoGen, self).__init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+        super().__init__()
 
     ## hash() operator
     #
@@ -235,7 +235,7 @@ class WorkspaceAutoGen(AutoGen):
     # call super().__init__ then call the worker function with different parameter count
     def __init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
         if not hasattr(self, "_Init"):
-            super(WorkspaceAutoGen, self).__init__(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+            super().__init__(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
             self._InitWorker(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
             self._Init = True
 
@@ -973,7 +973,7 @@ class PlatformAutoGen(AutoGen):
     # call super().__init__ then call the worker function with different parameter count
     def __init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
         if not hasattr(self, "_Init"):
-            super(PlatformAutoGen, self).__init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+            super().__init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
             self._InitWorker(Workspace, MetaFile, Target, Toolchain, Arch)
             self._Init = True
     #
@@ -2425,7 +2425,7 @@ class ModuleAutoGen(AutoGen):
     # call super().__init__ then call the worker function with different parameter count
     def __init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
         if not hasattr(self, "_Init"):
-            super(ModuleAutoGen, self).__init__(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+            super().__init__(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
             self._InitWorker(Workspace, MetaFile, Target, Toolchain, Arch, *args)
             self._Init = True
 
@@ -2439,7 +2439,7 @@ class ModuleAutoGen(AutoGen):
             EdkLogger.verbose("Module [%s] for [%s] is not employed by active platform\n" \
                               % (MetaFile, Arch))
             return None
-        return super(ModuleAutoGen, cls).__new__(cls, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+        return super().__new__(cls, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
 
     ## Initialize ModuleAutoGen
     #

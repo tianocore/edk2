@@ -347,7 +347,7 @@ class RangeExpression(BaseExpression):
 
 
     def __init__(self, Expression, PcdDataType, SymbolTable = {}):
-        super(RangeExpression, self).__init__(self, Expression, PcdDataType, SymbolTable)
+        super().__init__(self, Expression, PcdDataType, SymbolTable)
         self._NoProcess = False
         if not isinstance(Expression, type('')):
             self._Expr = Expression

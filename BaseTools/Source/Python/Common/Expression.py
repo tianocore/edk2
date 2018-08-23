@@ -204,7 +204,7 @@ SupportedInMacroList = ['TARGET', 'TOOL_CHAIN_TAG', 'ARCH', 'FAMILY']
 
 class BaseExpression(object):
     def __init__(self, *args, **kwargs):
-        super(BaseExpression, self).__init__()
+        super().__init__()
 
     # Check if current token matches the operators given from parameter
     def _IsOperator(self, OpSet):
@@ -324,7 +324,7 @@ class ValueExpression(BaseExpression):
         return Val
 
     def __init__(self, Expression, SymbolTable={}):
-        super(ValueExpression, self).__init__(self, Expression, SymbolTable)
+        super().__init__(self, Expression, SymbolTable)
         self._NoProcess = False
         if not isinstance(Expression, type('')):
             self._Expr = Expression
