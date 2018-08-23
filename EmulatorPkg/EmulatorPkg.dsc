@@ -223,7 +223,7 @@
   # For a CD-ROM/DVD use L"diag.dmg:RO:2048"
   gEmulatorPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"disk.dmg:FW"
   gEmulatorPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"
-  gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem|L".!../../../../EdkShellBinPkg/Bin"
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem|L"."
   gEmulatorPkgTokenSpaceGuid.PcdEmuSerialPort|L"/dev/ttyS0"
   gEmulatorPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"en0"
 
