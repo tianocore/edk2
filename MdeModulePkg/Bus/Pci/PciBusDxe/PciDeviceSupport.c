@@ -979,33 +979,33 @@ PciDeviceExisted (
 }
 
 /**
-  Get the active VGA device on the same segment.
+  Get the active VGA device on the specified Host Bridge.
 
-  @param VgaDevice    PCI IO instance for the VGA device.
+  @param HostBridgeHandle    Host Bridge handle.
 
-  @return The active VGA device on the same segment.
+  @return The active VGA device on the specified Host Bridge.
 
 **/
 PCI_IO_DEVICE *
-ActiveVGADeviceOnTheSameSegment (
-  IN PCI_IO_DEVICE        *VgaDevice
+LocateVgaDeviceOnHostBridge (
+  IN EFI_HANDLE           HostBridgeHandle
   )
 {
   LIST_ENTRY      *CurrentLink;
-  PCI_IO_DEVICE   *Temp;
+  PCI_IO_DEVICE   *PciIoDevice;
 
   CurrentLink = mPciDevicePool.ForwardLink;
 
   while (CurrentLink != NULL && CurrentLink != &mPciDevicePool) {
 
-    Temp = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
+    PciIoDevice = PCI_IO_DEVICE_FROM_LINK (CurrentLink);
 
-    if (Temp->PciRootBridgeIo->SegmentNumber == VgaDevice->PciRootBridgeIo->SegmentNumber) {
+    if (PciIoDevice->PciRootBridgeIo->ParentHandle== HostBridgeHandle) {
 
-      Temp = LocateVgaDevice (Temp);
+      PciIoDevice = LocateVgaDevice (PciIoDevice);
 
-      if (Temp != NULL) {
-        return Temp;
+      if (PciIoDevice != NULL) {
+        return PciIoDevice;
       }
     }
 
