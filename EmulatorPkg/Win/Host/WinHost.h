@@ -26,8 +26,12 @@ Abstract:
 
 #include <PiPei.h>
 #include <IndustryStandard/PeImage.h>
+#include <Guid/FileInfo.h>
+#include <Guid/FileSystemInfo.h>
+#include <Guid/FileSystemVolumeLabelInfo.h>
 #include <Ppi/EmuThunk.h>
 #include <Protocol/EmuThunk.h>
+#include <Protocol/SimpleFileSystem.h>
 
 
 #include <Library/BaseLib.h>
@@ -198,4 +202,5 @@ SecInitializeThunk (
 );
 extern EMU_THUNK_PROTOCOL    gEmuThunkProtocol;
 extern EMU_IO_THUNK_PROTOCOL mWinNtWndThunkIo;
+extern EMU_IO_THUNK_PROTOCOL mWinNtFileSystemThunkIo;
 #endif
