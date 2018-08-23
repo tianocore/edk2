@@ -479,7 +479,7 @@ GetPlatformOptions (
                NULL,
                BootOptionNumber,
                0,
-               BootKeys[Index],
+               &BootKeys[Index],
                NULL
                );
     if (EFI_ERROR (Status)) {
