@@ -3,6 +3,7 @@
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+Copyright (c) 2019 - 2020, ARM Limited. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -371,4 +372,5 @@ PcRtcAcpiTableChangeCallback (
   IN EFI_EVENT        Event,
   IN VOID             *Context
   );
+
 #endif
