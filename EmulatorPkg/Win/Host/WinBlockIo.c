@@ -24,7 +24,7 @@ typedef struct {
   BOOLEAN                     Readonly;
 
   HANDLE                      NtHandle;
-  UINTN                       BlockSize;
+  UINT32                      BlockSize;
 
   EFI_BLOCK_IO_MEDIA          *Media;
   EMU_BLOCK_IO_PROTOCOL       EmuBlockIo;

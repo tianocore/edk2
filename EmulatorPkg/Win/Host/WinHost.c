@@ -466,7 +466,7 @@ Returns:
     SecPrint ("ERROR : Can not allocate enough space for SecStack\n");
     exit (1);
   }
-  SetMemN (TemporaryRam, TemporaryRamSize, PcdGet32 (PcdInitValueInTempStack));
+  SetMem32 (TemporaryRam, TemporaryRamSize, PcdGet32 (PcdInitValueInTempStack));
 
   SecPrint ("  OS Emulator passing in %u KB of temp RAM at 0x%08lx to SEC\n",
     TemporaryRamSize / SIZE_1KB,
