@@ -1,6 +1,6 @@
 /*++ @file
 
-Copyright (c) 2006 - 2012, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2010 - 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -146,9 +146,9 @@ EmuGopSetMode (
                             );
 
 
-  Fill.Red                      = 0x7f;
-  Fill.Green                    = 0x7F;
-  Fill.Blue                     = 0x7f;
+  Fill.Red   = 0;
+  Fill.Green = 0;
+  Fill.Blue  = 0;
   This->Blt (
           This,
           &Fill,
