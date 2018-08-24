@@ -128,7 +128,7 @@ def GetDependencyList(FileStack, SearchPathList):
 
             if len(FileContent) == 0:
                 continue
-
+            IncludedFileList = []
             if FileContent[0] == 0xff or FileContent[0] == 0xfe:
                 FileContent = str(FileContent, "utf-16")
                 IncludedFileList = gIncludePattern.findall(FileContent)

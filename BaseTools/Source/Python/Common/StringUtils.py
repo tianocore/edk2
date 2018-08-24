@@ -612,7 +612,7 @@ def PreCheck(FileName, FileContent, SupSectionTag):
         #
         # Regenerate FileContent
         #
-        NewFileContent = NewFileContent + Line + '\r\n'
+        NewFileContent = NewFileContent + Line + '\n'
 
     if IsFailed:
        EdkLogger.error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError=EdkLogger.IsRaiseError)

@@ -917,7 +917,7 @@ cleanlib:
         #
         # Extract common files list in the dependency files
         #
-        for File in DepSet:
+        for File in sorted(DepSet, key=lambda x: str(x)):
             self.CommonFileDependency.append(self.PlaceMacro(File.Path, self.Macros))
 
         for File in FileDependencyDict:
@@ -926,11 +926,11 @@ cleanlib:
                 continue
             NewDepSet = set(FileDependencyDict[File])
             NewDepSet -= DepSet
-            FileDependencyDict[File] = ["$(COMMON_DEPS)"] + list(NewDepSet)
+            FileDependencyDict[File] = ["$(COMMON_DEPS)"] + sorted(NewDepSet, key=lambda x: str(x))
 
         # Convert target description object to target string in makefile
         for Type in self._AutoGenObject.Targets:
-            for T in self._AutoGenObject.Targets[Type]:
+            for T in sorted(self._AutoGenObject.Targets[Type], key=lambda x: str(x)):
                 # Generate related macros if needed
                 if T.GenFileListMacro and T.FileListMacro not in self.FileListMacros:
                     self.FileListMacros[T.FileListMacro] = []
@@ -1097,7 +1097,7 @@ cleanlib:
         DependencySet.update(ForceList)
         if File in DependencySet:
             DependencySet.remove(File)
-        DependencyList = list(DependencySet)  # remove duplicate ones
+        DependencyList = sorted(DependencySet, key=lambda x: str(x))  # remove duplicate ones
 
         return DependencyList
 

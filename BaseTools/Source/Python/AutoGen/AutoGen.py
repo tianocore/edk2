@@ -295,7 +295,7 @@ class WorkspaceAutoGen(AutoGen):
             SkippedArchList = set(self.ArchList).symmetric_difference(set(self.Platform.SupArchList))
             EdkLogger.verbose("\nArch [%s] is ignored because the platform supports [%s] only!"
                               % (" ".join(SkippedArchList), " ".join(self.Platform.SupArchList)))
-        self.ArchList = tuple(ArchList)
+        self.ArchList = tuple(sorted(ArchList))
 
         # Validate build target
         if self.BuildTarget not in self.Platform.BuildTargets:
@@ -616,17 +616,17 @@ class WorkspaceAutoGen(AutoGen):
         #
         content = 'gCommandLineDefines: '
         content += str(GlobalData.gCommandLineDefines)
-        content += os.linesep
+        content += "\n"
         content += 'BuildOptionPcd: '
         content += str(GlobalData.BuildOptionPcd)
-        content += os.linesep
+        content += "\n"
         content += 'Active Platform: '
         content += str(self.Platform)
-        content += os.linesep
+        content += "\n"
         if self.FdfFile:
             content += 'Flash Image Definition: '
             content += str(self.FdfFile)
-            content += os.linesep
+            content += "\n"
         SaveFileOnChange(os.path.join(self.BuildDir, 'BuildOptions'), content, False)
 
         #
@@ -636,7 +636,7 @@ class WorkspaceAutoGen(AutoGen):
         if Pa.PcdTokenNumber:
             if Pa.DynamicPcdList:
                 for Pcd in Pa.DynamicPcdList:
-                    PcdTokenNumber += os.linesep
+                    PcdTokenNumber += "\n"
                     PcdTokenNumber += str((Pcd.TokenCName, Pcd.TokenSpaceGuidCName))
                     PcdTokenNumber += ' : '
                     PcdTokenNumber += str(Pa.PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName])
@@ -677,7 +677,7 @@ class WorkspaceAutoGen(AutoGen):
         if not os.path.exists(self.BuildDir):
             os.makedirs(self.BuildDir)
         with open(os.path.join(self.BuildDir, 'AutoGen'), 'w+') as file:
-            for f in AllWorkSpaceMetaFiles:
+            for f in sorted(AllWorkSpaceMetaFiles):
                 print(f, file=file)
         return True
 
@@ -1598,6 +1598,9 @@ class PlatformAutoGen(AutoGen):
         self._DynamicPcdList.extend(list(UnicodePcdArray))
         self._DynamicPcdList.extend(list(HiiPcdArray))
         self._DynamicPcdList.extend(list(OtherPcdArray))
+        #python3.6 set is not ordered at all
+        self._DynamicPcdList = sorted(self._DynamicPcdList, key=lambda x:(x.TokenSpaceGuidCName, x.TokenCName))
+        self._NonDynamicPcdList = sorted(self._NonDynamicPcdList, key=lambda x: (x.TokenSpaceGuidCName, x.TokenCName))
         allskuset = [(SkuName, Sku.SkuId) for pcd in self._DynamicPcdList for (SkuName, Sku) in pcd.SkuInfoList.items()]
         for pcd in self._DynamicPcdList:
             if len(pcd.SkuInfoList) == 1:
@@ -2374,7 +2377,7 @@ class PlatformAutoGen(AutoGen):
                        list(PlatformModuleOptions.keys()) + list(ModuleTypeOptions.keys()) +
                        list(self.ToolDefinition.keys()))
         BuildOptions = defaultdict(lambda: defaultdict(str))
-        for Tool in AllTools:
+        for Tool in sorted(AllTools):
             for Options in [self.ToolDefinition, ModuleOptions, PlatformOptions, ModuleTypeOptions, PlatformModuleOptions]:
                 if Tool not in Options:
                     continue
@@ -3156,12 +3159,12 @@ class ModuleAutoGen(AutoGen):
     @cached_property
     def IntroTargetList(self):
         self.Targets
-        return self._IntroBuildTargetList
+        return sorted(self._IntroBuildTargetList, key=lambda x: str(x.Target))
 
     @cached_property
     def CodaTargetList(self):
         self.Targets
-        return self._FinalBuildTargetList
+        return sorted(self._FinalBuildTargetList, key=lambda x: str(x.Target))
 
     @cached_property
     def FileTypes(self):
@@ -3889,7 +3892,7 @@ class ModuleAutoGen(AutoGen):
             if os.path.exists (self.TimeStampPath):
                 os.remove (self.TimeStampPath)
             with open(self.TimeStampPath, 'w+') as file:
-                for f in FileSet:
+                for f in sorted(FileSet):
                     print(f, file=file)
 
         # Ignore generating makefile when it is a binary module

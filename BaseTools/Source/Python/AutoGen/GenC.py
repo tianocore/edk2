@@ -1011,7 +1011,10 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                     Value = Value[:-1]
                 ValueNumber = int (Value, 0)
             except:
-                EdkLogger.error("build", AUTOGEN_ERROR,
+                try:
+                    ValueNumber = int(Value.lstrip('0'))
+                except:
+                    EdkLogger.error("build", AUTOGEN_ERROR,
                                 "PCD value is not valid dec or hex number for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
                                 ExtraData="[%s]" % str(Info))
             if ValueNumber < 0:

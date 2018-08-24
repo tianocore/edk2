@@ -79,7 +79,7 @@ gGlueLibEntryPoint = re.compile(r"__EDKII_GLUE_MODULE_ENTRY_POINT__\s*=\s*(\w+)"
 gLineMaxLength = 120
 
 ## Tags for end of line in report
-gEndOfLine = "\r\n"
+gEndOfLine = "\n"
 
 ## Tags for section start, end and separator
 gSectionStart = ">" + "=" * (gLineMaxLength - 2) + "<"
@@ -1031,7 +1031,10 @@ class PcdReport(object):
 
 
                 if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
-                    PcdValueNumber = int(PcdValue.strip(), 0)
+                    try:
+                        PcdValueNumber = int(PcdValue.strip(), 0)
+                    except:
+                        PcdValueNumber = int(PcdValue.lstrip('0'))
                     if DecDefaultValue is None:
                         DecMatch = True
                     else:
@@ -1047,7 +1050,10 @@ class PcdReport(object):
                     if DscDefaultValue is None:
                         DscMatch = True
                     else:
-                        DscDefaultValueNumber = int(DscDefaultValue.strip(), 0)
+                        try:
+                            DscDefaultValueNumber = int(DscDefaultValue.strip(), 0)
+                        except:
+                            DscDefaultValueNumber = int(DscDefaultValue.lstrip('0'))
                         DscMatch = (DscDefaultValueNumber == PcdValueNumber)
                 else:
                     if DecDefaultValue is None:
@@ -1152,7 +1158,10 @@ class PcdReport(object):
                         for ModulePath in ModuleOverride:
                             ModuleDefault = ModuleOverride[ModulePath]
                             if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
-                                ModulePcdDefaultValueNumber = int(ModuleDefault.strip(), 0)
+                                try:
+                                    ModulePcdDefaultValueNumber = int(ModuleDefault.strip(), 0)
+                                except:
+                                    ModulePcdDefaultValueNumber = int(ModuleDefault.lstrip('0'))
                                 Match = (ModulePcdDefaultValueNumber == PcdValueNumber)
                                 if Pcd.DatumType == 'BOOLEAN':
                                     ModuleDefault = str(ModulePcdDefaultValueNumber)
@@ -1231,7 +1240,10 @@ class PcdReport(object):
                     if Value.startswith(('0x', '0X')):
                         Value = '{} ({:d})'.format(Value, int(Value, 0))
                     else:
-                        Value = "0x{:X} ({})".format(int(Value, 0), Value)
+                        try:
+                            Value = "0x{:X} ({})".format(int(Value, 0), Value)
+                        except:
+                            Value = "0x{:X} ({})".format(int(Value.lstrip('0')), Value)
                 FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DEC DEFAULT', Value))
             if IsStructure:
                 self.PrintStructureInfo(File, Pcd.DefaultValues)

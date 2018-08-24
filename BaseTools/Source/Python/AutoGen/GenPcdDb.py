@@ -1348,7 +1348,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
 
                 DbValueList.append(Sku.DefaultValue)
 
-        Pcd.TokenTypeList = list(set(Pcd.TokenTypeList))
+        Pcd.TokenTypeList = sorted(set(Pcd.TokenTypeList))
         if Pcd.DatumType == TAB_VOID:
             Dict['SIZE_TABLE_CNAME'].append(CName)
             Dict['SIZE_TABLE_GUID'].append(TokenSpaceGuid)
@@ -1449,7 +1449,7 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
             Dict['PCD_CNAME_LENGTH'][GeneratedTokenNumber] = len(CNameBinArray.split(","))
 
 
-        Pcd.TokenTypeList = list(set(Pcd.TokenTypeList))
+        Pcd.TokenTypeList = sorted(set(Pcd.TokenTypeList))
 
         # search the Offset and Table, used by LocalTokenNumberTableOffset
         if 'PCD_TYPE_HII' in Pcd.TokenTypeList:
