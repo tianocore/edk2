@@ -1,6 +1,6 @@
 /*++ @file
 
-Copyright (c) 2006 - 2008, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2011, Apple Inc. All rights reserved.
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -101,9 +101,9 @@ Returns:
   } while (!EFI_ERROR (Status));
 
   //
-  // Build the CPU hob with 36-bit addressing and 16-bits of IO space.
+  // Build the CPU hob with 57-bit addressing and 16-bits of IO space.
   //
-  BuildCpuHob (36, 16);
+  BuildCpuHob (57, 16);
 
   return Status;
 }
