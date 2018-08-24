@@ -66,8 +66,8 @@ class GenFdsGlobalVariable:
     FixedLoadAddress = False
     PlatformName = ''
 
-    BuildRuleFamily = "MSFT"
-    ToolChainFamily = "MSFT"
+    BuildRuleFamily = DataType.TAB_COMPILER_MSFT
+    ToolChainFamily = DataType.TAB_COMPILER_MSFT
     __BuildRuleDatabase = None
     GuidToolDefinition = {}
     FfsCmdDict = {}

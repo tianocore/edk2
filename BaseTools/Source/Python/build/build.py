@@ -933,7 +933,7 @@ class Build():
             if TAB_TOD_DEFINES_FAMILY not in ToolDefinition or Tool not in ToolDefinition[TAB_TOD_DEFINES_FAMILY] \
                or not ToolDefinition[TAB_TOD_DEFINES_FAMILY][Tool]:
                 EdkLogger.warn("build", "No tool chain family found in configuration for %s. Default to MSFT." % Tool)
-                ToolChainFamily.append("MSFT")
+                ToolChainFamily.append(TAB_COMPILER_MSFT)
             else:
                 ToolChainFamily.append(ToolDefinition[TAB_TOD_DEFINES_FAMILY][Tool])
         self.ToolChainFamily = ToolChainFamily

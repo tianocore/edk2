@@ -318,7 +318,7 @@ class BuildRule:
     #   @param  LineIndex           The line number from which the parsing will begin
     #   @param  SupportedFamily     The list of supported tool chain families
     #
-    def __init__(self, File=None, Content=None, LineIndex=0, SupportedFamily=["MSFT", "INTEL", "GCC", "RVCT"]):
+    def __init__(self, File=None, Content=None, LineIndex=0, SupportedFamily=[TAB_COMPILER_MSFT, "INTEL", "GCC", "RVCT"]):
         self.RuleFile = File
         # Read build rules from file if it's not none
         if File is not None:
@@ -596,17 +596,17 @@ if __name__ == '__main__':
     EdkLogger.Initialize()
     if len(sys.argv) > 1:
         Br = BuildRule(sys.argv[1])
-        print(str(Br[".c", SUP_MODULE_DXE_DRIVER, "IA32", "MSFT"][1]))
+        print(str(Br[".c", SUP_MODULE_DXE_DRIVER, "IA32", TAB_COMPILER_MSFT][1]))
         print()
         print(str(Br[".c", SUP_MODULE_DXE_DRIVER, "IA32", "INTEL"][1]))
         print()
         print(str(Br[".c", SUP_MODULE_DXE_DRIVER, "IA32", "GCC"][1]))
         print()
-        print(str(Br[".ac", "ACPI_TABLE", "IA32", "MSFT"][1]))
+        print(str(Br[".ac", "ACPI_TABLE", "IA32", TAB_COMPILER_MSFT][1]))
         print()
         print(str(Br[".h", "ACPI_TABLE", "IA32", "INTEL"][1]))
         print()
-        print(str(Br[".ac", "ACPI_TABLE", "IA32", "MSFT"][1]))
+        print(str(Br[".ac", "ACPI_TABLE", "IA32", TAB_COMPILER_MSFT][1]))
         print()
         print(str(Br[".s", SUP_MODULE_SEC, "IPF", "COMMON"][1]))
         print()

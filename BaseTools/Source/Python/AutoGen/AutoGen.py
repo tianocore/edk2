@@ -79,7 +79,7 @@ gEfiVarStoreNamePattern = re.compile("\s*name\s*=\s*(\w+)")
 gEfiVarStoreGuidPattern = re.compile("\s*guid\s*=\s*({.*?{.*?}\s*})")
 
 ## Mapping Makefile type
-gMakeTypeMap = {"MSFT":"nmake", "GCC":"gmake"}
+gMakeTypeMap = {TAB_COMPILER_MSFT:"nmake", "GCC":"gmake"}
 
 
 ## Build rule configuration file
@@ -1842,7 +1842,7 @@ class PlatformAutoGen(AutoGen):
                or not ToolDefinition[TAB_TOD_DEFINES_FAMILY][self.ToolChain]:
                 EdkLogger.verbose("No tool chain family found in configuration for %s. Default to MSFT." \
                                    % self.ToolChain)
-                self._ToolChainFamily = "MSFT"
+                self._ToolChainFamily = TAB_COMPILER_MSFT
             else:
                 self._ToolChainFamily = ToolDefinition[TAB_TOD_DEFINES_FAMILY][self.ToolChain]
         return self._ToolChainFamily
@@ -1855,7 +1855,7 @@ class PlatformAutoGen(AutoGen):
                or not ToolDefinition[TAB_TOD_DEFINES_BUILDRULEFAMILY][self.ToolChain]:
                 EdkLogger.verbose("No tool chain family found in configuration for %s. Default to MSFT." \
                                    % self.ToolChain)
-                self._BuildRuleFamily = "MSFT"
+                self._BuildRuleFamily = TAB_COMPILER_MSFT
             else:
                 self._BuildRuleFamily = ToolDefinition[TAB_TOD_DEFINES_BUILDRULEFAMILY][self.ToolChain]
         return self._BuildRuleFamily
@@ -2977,7 +2977,7 @@ class ModuleAutoGen(AutoGen):
         # Regular expression for finding Include Directories, the difference between MSFT and INTEL/GCC/RVCT
         # is the former use /I , the Latter used -I to specify include directories
         #
-        if self.PlatformInfo.ToolChainFamily in ('MSFT'):
+        if self.PlatformInfo.ToolChainFamily in (TAB_COMPILER_MSFT):
             BuildOptIncludeRegEx = gBuildOptIncludePatternMsft
         elif self.PlatformInfo.ToolChainFamily in ('INTEL', 'GCC', 'RVCT'):
             BuildOptIncludeRegEx = gBuildOptIncludePatternOther

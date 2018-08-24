@@ -252,10 +252,10 @@ class InfBuildData(ModuleBuildClassObject):
                 if self._CustomMakefile is None:
                     self._CustomMakefile = {}
                 if len(TokenList) < 2:
-                    self._CustomMakefile['MSFT'] = TokenList[0]
+                    self._CustomMakefile[TAB_COMPILER_MSFT] = TokenList[0]
                     self._CustomMakefile['GCC'] = TokenList[0]
                 else:
-                    if TokenList[0] not in ['MSFT', 'GCC']:
+                    if TokenList[0] not in [TAB_COMPILER_MSFT, 'GCC']:
                         EdkLogger.error("build", FORMAT_NOT_SUPPORTED,
                                         "No supported family [%s]" % TokenList[0],
                                         File=self.MetaFile, Line=Record[-1])
@@ -353,7 +353,7 @@ class InfBuildData(ModuleBuildClassObject):
                         else:
                             Tool = ToolList[0]
                         ToolChain = "*_*_*_%s_FLAGS" % Tool
-                        ToolChainFamily = 'MSFT'  # Edk.x only support MSFT tool chain
+                        # Edk.x only support MSFT tool chain
                         # ignore not replaced macros in value
                         ValueList = GetSplitList(' ' + Value, '/D')
                         Dummy = ValueList[0]
@@ -362,11 +362,11 @@ class InfBuildData(ModuleBuildClassObject):
                                 continue
                             Dummy = Dummy + ' /D ' + ValueList[Index]
                         Value = Dummy.strip()
-                        if (ToolChainFamily, ToolChain) not in self._BuildOptions:
-                            self._BuildOptions[ToolChainFamily, ToolChain] = Value
+                        if (TAB_COMPILER_MSFT, ToolChain) not in self._BuildOptions:
+                            self._BuildOptions[TAB_COMPILER_MSFT, ToolChain] = Value
                         else:
-                            OptionString = self._BuildOptions[ToolChainFamily, ToolChain]
-                            self._BuildOptions[ToolChainFamily, ToolChain] = OptionString + " " + Value
+                            OptionString = self._BuildOptions[TAB_COMPILER_MSFT, ToolChain]
+                            self._BuildOptions[TAB_COMPILER_MSFT, ToolChain] = OptionString + " " + Value
         # set _Header to non-None in order to avoid database re-querying
         self._Header_ = 'DUMMY'
 

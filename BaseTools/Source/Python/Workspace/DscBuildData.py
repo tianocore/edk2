@@ -2784,7 +2784,7 @@ class DscBuildData(PlatformBuildClassObject):
             self.Modules.append(Module)
 
     def _GetToolChainFamily(self):
-        self._ToolChainFamily = "MSFT"
+        self._ToolChainFamily = TAB_COMPILER_MSFT
         BuildConfigurationFile = os.path.normpath(os.path.join(GlobalData.gConfDirectory, "target.txt"))
         if os.path.isfile(BuildConfigurationFile) == True:
             TargetTxt      = TargetTxtClassObject()
@@ -2800,7 +2800,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if TAB_TOD_DEFINES_FAMILY not in ToolDefinition \
                    or self._Toolchain not in ToolDefinition[TAB_TOD_DEFINES_FAMILY] \
                    or not ToolDefinition[TAB_TOD_DEFINES_FAMILY][self._Toolchain]:
-                    self._ToolChainFamily = "MSFT"
+                    self._ToolChainFamily = TAB_COMPILER_MSFT
                 else:
                     self._ToolChainFamily = ToolDefinition[TAB_TOD_DEFINES_FAMILY][self._Toolchain]
         return self._ToolChainFamily

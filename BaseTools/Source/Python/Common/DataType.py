@@ -554,3 +554,5 @@ PACK_CODE_BY_SIZE = {8:'=Q',
                      1:'=B',
                      0:'=B',
                     16:""}
+
+TAB_COMPILER_MSFT = 'MSFT'
