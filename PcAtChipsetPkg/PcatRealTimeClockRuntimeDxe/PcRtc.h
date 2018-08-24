@@ -3,6 +3,7 @@
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2017, AMD Inc. All rights reserved.<BR>
+Copyright (c) 2019 - 2020, ARM Limited. All rights reserved.<BR>
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -371,4 +372,34 @@ PcRtcAcpiTableChangeCallback (
   IN EFI_EVENT        Event,
   IN VOID             *Context
   );
+
+/**
+  Function pointer to Read RTC content through its registers.
+
+  @param  Address   Address offset of RTC. It is recommended to use
+                    macros such as RTC_ADDRESS_SECONDS.
+
+  @return The data of UINT8 type read from RTC.
+**/
+typedef
+UINT8
+(EFIAPI *RTC_READ) (
+  IN  UINTN Address
+  );
+
+/**
+  Function pointer to Write RTC through its registers.
+
+  @param  Address   Address offset of RTC. It is recommended to use
+                    macros such as RTC_ADDRESS_SECONDS.
+  @param  Data      The content you want to write into RTC.
+
+**/
+typedef
+VOID
+(EFIAPI *RTC_WRITE) (
+  IN  UINTN   Address,
+  IN  UINT8   Data
+  );
+
 #endif
