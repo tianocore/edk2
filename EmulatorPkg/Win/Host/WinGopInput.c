@@ -363,6 +363,23 @@ WinNtWndKeySetState (
   GRAPHICS_PRIVATE_DATA           *Private;
 
   Private = GRAPHICS_PRIVATE_DATA_FROM_THIS (GraphicsIo);
+  Private->ScrollLock = FALSE;
+  Private->NumLock = FALSE;
+  Private->CapsLock = FALSE;
+  Private->IsPartialKeySupport = FALSE;
+
+  if ((*KeyToggleState & EFI_SCROLL_LOCK_ACTIVE) == EFI_SCROLL_LOCK_ACTIVE) {
+    Private->ScrollLock = TRUE;
+  }
+  if ((*KeyToggleState & EFI_NUM_LOCK_ACTIVE) == EFI_NUM_LOCK_ACTIVE) {
+    Private->NumLock = TRUE;
+  }
+  if ((*KeyToggleState & EFI_CAPS_LOCK_ACTIVE) == EFI_CAPS_LOCK_ACTIVE) {
+    Private->CapsLock = TRUE;
+  }
+  if ((*KeyToggleState & EFI_KEY_STATE_EXPOSED) == EFI_KEY_STATE_EXPOSED) {
+    Private->IsPartialKeySupport = TRUE;
+  }
   Private->KeyState.KeyToggleState = *KeyToggleState;
   return EFI_SUCCESS;
 }
