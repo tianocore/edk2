@@ -31,6 +31,7 @@ Abstract:
 #include <Protocol/SimpleTextIn.h>
 #include <Protocol/SimpleTextInEx.h>
 #include <Protocol/GraphicsOutput.h>
+#include <Library/FrameBufferBltLib.h>
 
 //
 // WM_SYSKEYDOWN/WM_SYSKEYUP Notification
@@ -86,9 +87,8 @@ typedef struct {
   // updated in the main thread and displayed in the windows thread.
   //
   BITMAPV4HEADER                *VirtualScreenInfo;
-  RGBQUAD                       *VirtualScreen;
 
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *FillLine;
+  FRAME_BUFFER_CONFIGURE        *FrameBufferConfigure;
 
   //
   // Keyboard Queue used by Simple Text In.

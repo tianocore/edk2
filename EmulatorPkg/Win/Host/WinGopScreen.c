@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2006 - 2013, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -193,15 +193,63 @@ WinNtWndSize (
   IN  UINT32                        Height
 )
 {
-  UINT32                            Size;
-  GRAPHICS_PRIVATE_DATA             *Private;
-  RECT                              Rect;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL     *NewFillLine;
+  RETURN_STATUS                        RStatus;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION Info;
+  GRAPHICS_PRIVATE_DATA                *Private;
+  RECT                                 Rect;
+  BITMAPV4HEADER                       *VirtualScreenInfo;
+  FRAME_BUFFER_CONFIGURE               *FrameBufferConfigure;
+  UINTN                                FrameBufferConfigureSize;
 
   Private = GRAPHICS_PRIVATE_DATA_FROM_THIS (GraphicsIo);
-  Private->Width  = Width;
-  Private->Height = Height;
 
+  //
+  // Allocate DIB frame buffer directly from NT for performance enhancement
+  // This buffer is the virtual screen/frame buffer.
+  //
+  VirtualScreenInfo = HeapAlloc (
+    GetProcessHeap (),
+    HEAP_ZERO_MEMORY,
+    Width * Height * sizeof (RGBQUAD) + sizeof (BITMAPV4HEADER)
+  );
+  if (VirtualScreenInfo == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Update the virtual screen info data structure
+  // Use negative Height to make sure screen/buffer are using the same coordinate.
+  //
+  VirtualScreenInfo->bV4Size = sizeof (BITMAPV4HEADER);
+  VirtualScreenInfo->bV4Width = Width;
+  VirtualScreenInfo->bV4Height = -(LONG)Height;
+  VirtualScreenInfo->bV4Planes = 1;
+  VirtualScreenInfo->bV4BitCount = 32;
+  //
+  // uncompressed
+  //
+  VirtualScreenInfo->bV4V4Compression = BI_RGB;
+
+  Info.HorizontalResolution = Width;
+  Info.VerticalResolution   = Height;
+  Info.PixelFormat          = PixelBlueGreenRedReserved8BitPerColor;
+  Info.PixelsPerScanLine    = Width;
+  FrameBufferConfigureSize  = 0;
+  RStatus = FrameBufferBltConfigure (VirtualScreenInfo + 1, &Info, NULL, &FrameBufferConfigureSize);
+  ASSERT (RStatus == EFI_BUFFER_TOO_SMALL);
+  FrameBufferConfigure = AllocatePool (FrameBufferConfigureSize);
+  if (FrameBufferConfigure == NULL) {
+    HeapFree (GetProcessHeap (), 0, VirtualScreenInfo);
+    return EFI_OUT_OF_RESOURCES;
+  }
+  RStatus = FrameBufferBltConfigure (VirtualScreenInfo + 1, &Info, FrameBufferConfigure, &FrameBufferConfigureSize);
+  ASSERT_RETURN_ERROR (RStatus);
+
+
+  if (Private->FrameBufferConfigure != NULL) {
+    FreePool (Private->FrameBufferConfigure);
+  }
+  Private->FrameBufferConfigure = FrameBufferConfigure;
 
   //
   // Free the old buffer. We do not save the content of the old buffer since the
@@ -211,46 +259,19 @@ WinNtWndSize (
   if (Private->VirtualScreenInfo != NULL) {
     HeapFree (GetProcessHeap (), 0, Private->VirtualScreenInfo);
   }
+  Private->VirtualScreenInfo = VirtualScreenInfo;
 
-  //
-  // Allocate DIB frame buffer directly from NT for performance enhancement
-  // This buffer is the virtual screen/frame buffer. This buffer is not the
-  // same a a frame buffer. The first row of this buffer will be the bottom
-  // line of the image. This is an artifact of the way we draw to the screen.
-  //
-  Size = Private->Width * Private->Height * sizeof (RGBQUAD) + sizeof (BITMAPV4HEADER);
-  Private->VirtualScreenInfo = HeapAlloc (
-    GetProcessHeap (),
-    HEAP_ZERO_MEMORY,
-    Size
-  );
-
-  //
-  // Update the virtual screen info data structure
-  //
-  Private->VirtualScreenInfo->bV4Size = sizeof (BITMAPV4HEADER);
-  Private->VirtualScreenInfo->bV4Width = Private->Width;
-  Private->VirtualScreenInfo->bV4Height = Private->Height;
-  Private->VirtualScreenInfo->bV4Planes = 1;
-  Private->VirtualScreenInfo->bV4BitCount = 32;
-  //
-  // uncompressed
-  //
-  Private->VirtualScreenInfo->bV4V4Compression = BI_RGB;
-
-  //
-  // The rest of the allocated memory block is the virtual screen buffer
-  //
-  Private->VirtualScreen = (RGBQUAD *)(Private->VirtualScreenInfo + 1);
+  Private->Width  = Width;
+  Private->Height = Height;
 
   //
   // Use the AdjuctWindowRect fuction to calculate the real width and height
   // of the new window including the border and caption
   //
-  Rect.left = 0;
-  Rect.top = 0;
-  Rect.right = Private->Width;
-  Rect.bottom = Private->Height;
+  Rect.left   = 0;
+  Rect.top    = 0;
+  Rect.right  = Width;
+  Rect.bottom = Height;
 
   AdjustWindowRect (&Rect, WS_OVERLAPPEDWINDOW, 0);
 
@@ -267,16 +288,6 @@ WinNtWndSize (
   //
   MoveWindow (Private->WindowHandle, Rect.left, Rect.top, (INT32)Width, (INT32)Height, TRUE);
 
-  NewFillLine = AllocatePool (sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * Private->Width);
-  if (NewFillLine == NULL) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  if (Private->FillLine != NULL) {
-    FreePool (Private->FillLine);
-  }
-
-  Private->FillLine = NewFillLine;
   return EFI_SUCCESS;
 }
 
@@ -322,68 +333,22 @@ WinNtWndBlt (
   IN  EMU_GRAPHICS_WINDOWS__BLT_ARGS          *Args
 )
 {
+  RETURN_STATUS                 RStatus;
   GRAPHICS_PRIVATE_DATA         *Private;
-  UINTN                         DstY;
-  UINTN                         SrcY;
-  RGBQUAD                       *VScreen;
-  RGBQUAD                       *VScreenSrc;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *Blt;
-  UINTN                         Index;
   RECT                          Rect;
-  EFI_GRAPHICS_OUTPUT_BLT_PIXEL *FillPixel;
-  UINT32                        VerticalResolution;
-  UINT32                        HorizontalResolution;
 
   Private = GRAPHICS_PRIVATE_DATA_FROM_THIS (GraphicsIo);
-
-  //
-  // We need to fill the Virtual Screen buffer with the blt data.
-  // The virtual screen is upside down, as the first row is the bootom row of
-  // the image.
-  //
-  VerticalResolution = Private->VirtualScreenInfo->bV4Height;
-  HorizontalResolution = Private->VirtualScreenInfo->bV4Width;
-  if (BltOperation == EfiBltVideoToBltBuffer) {
-
-    for (SrcY = Args->SourceY, DstY = Args->DestinationY; DstY < (Args->Height + Args->DestinationY); SrcY++, DstY++) {
-      Blt = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) ((UINT8 *) BltBuffer + (DstY * Args->Delta) + Args->DestinationX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-      VScreen = &Private->VirtualScreen[(VerticalResolution - SrcY - 1) * HorizontalResolution + Args->SourceX];
-      CopyMem (Blt, VScreen, sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL) * Args->Width);
-    }
-  } else {
-    if (BltOperation == EfiBltVideoFill) {
-      FillPixel = BltBuffer;
-      for (Index = 0; Index < Args->Width; Index++) {
-        Private->FillLine[Index] = *FillPixel;
-      }
-    }
-
-    for (Index = 0; Index < Args->Height; Index++) {
-      if (Args->DestinationY <= Args->SourceY) {
-        SrcY  = Args->SourceY + Index;
-        DstY  = Args->DestinationY + Index;
-      } else {
-        SrcY  = Args->SourceY + Args->Height - Index - 1;
-        DstY  = Args->DestinationY + Args->Height - Index - 1;
-      }
-
-      VScreen = &Private->VirtualScreen[(VerticalResolution - DstY - 1) * HorizontalResolution + Args->DestinationX];
-      switch (BltOperation) {
-      case EfiBltBufferToVideo:
-        Blt = (EFI_GRAPHICS_OUTPUT_BLT_PIXEL *) ((UINT8 *) BltBuffer + (SrcY * Args->Delta) + Args->SourceX * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-        CopyMem (VScreen, Blt, Args->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-        break;
-
-      case EfiBltVideoToVideo:
-        VScreenSrc = &Private->VirtualScreen[(VerticalResolution - SrcY - 1) * HorizontalResolution + Args->SourceX];
-        CopyMem (VScreen, VScreenSrc, Args->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-        break;
-
-      case EfiBltVideoFill:
-        CopyMem (VScreen, Private->FillLine, Args->Width * sizeof (EFI_GRAPHICS_OUTPUT_BLT_PIXEL));
-        break;
-      }
-    }
+  RStatus = FrameBufferBlt (
+              Private->FrameBufferConfigure,
+              BltBuffer,
+              BltOperation,
+              Args->SourceX, Args->SourceY,
+              Args->DestinationX, Args->DestinationY,
+              Args->Width, Args->Height,
+              Args->Delta
+              );
+  if (RETURN_ERROR (RStatus)) {
+    return (EFI_STATUS)RStatus;
   }
 
   if (BltOperation != EfiBltVideoToBltBuffer) {
@@ -435,20 +400,11 @@ WinNtGopThreadWindowProc (
   )
 {
   GRAPHICS_PRIVATE_DATA *Private;
-  UINTN                 Size;
   HDC                   Handle;
   PAINTSTRUCT           PaintStruct;
   LPARAM                Index;
   EFI_INPUT_KEY         Key;
   BOOLEAN               AltIsPress;
-
-  //
-  // BugBug - if there are two instances of this DLL in memory (such as is
-  // the case for ERM), the correct instance of this function may not be called.
-  // This also means that the address of the mTlsIndex value will be wrong, and
-  // the value may be wrong too.
-  //
-
 
   //
   // Use mTlsIndex global to get a Thread Local Storage version of Private.
@@ -460,39 +416,7 @@ WinNtGopThreadWindowProc (
   ASSERT (NULL != Private);
 
   switch (iMsg) {
-  case WM_CREATE:
-    Size = Private->Width * Private->Height * sizeof (RGBQUAD);
-
-    //
-    // Allocate DIB frame buffer directly from NT for performance enhancement
-    // This buffer is the virtual screen/frame buffer. This buffer is not the
-    // same a a frame buffer. The first fow of this buffer will be the bottom
-    // line of the image. This is an artifact of the way we draw to the screen.
-    //
-    Private->VirtualScreenInfo = HeapAlloc (
-                                   GetProcessHeap (),
-                                   HEAP_ZERO_MEMORY,
-                                   Size
-                                   );
-
-    Private->VirtualScreenInfo->bV4Size           = sizeof (BITMAPV4HEADER);
-    Private->VirtualScreenInfo->bV4Width          = Private->Width;
-    Private->VirtualScreenInfo->bV4Height         = Private->Height;
-    Private->VirtualScreenInfo->bV4Planes         = 1;
-    Private->VirtualScreenInfo->bV4BitCount       = 32;
-    //
-    // uncompressed
-    //
-    Private->VirtualScreenInfo->bV4V4Compression  = BI_RGB;
-    Private->VirtualScreen = (RGBQUAD *) (Private->VirtualScreenInfo + 1);
-    return 0;
-
   case WM_PAINT:
-    //
-    // I have not found a way to convert hwnd into a Private context. So for
-    // now we use this API to convert hwnd to Private data.
-    //
-
     Handle = BeginPaint (hwnd, &PaintStruct);
 
     SetDIBitsToDevice (
@@ -505,7 +429,7 @@ WinNtGopThreadWindowProc (
       0,                                          // Source Y
       0,                                          // DIB Start Scan Line
       Private->Height,                            // Number of scan lines
-      Private->VirtualScreen,                     // Address of array of DIB bits
+      Private->VirtualScreenInfo + 1,             // Address of array of DIB bits
       (BITMAPINFO *) Private->VirtualScreenInfo,  // Address of structure with bitmap info
       DIB_RGB_COLORS                              // RGB or palette indexes
       );
@@ -690,10 +614,6 @@ WinNtGopThreadWinMain (
   //
   // This call will fail after the first time, but thats O.K. since we only need
   // WIN_NT_GOP_CLASS_NAME to exist to create the window.
-  //
-  // Note: Multiple instances of this DLL will use the same instance of this
-  // Class, including the callback function, unless the Class is unregistered and
-  // successfully registered again.
   //
   RegisterClassEx (&Private->WindowsClass);
 
