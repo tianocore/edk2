@@ -2,7 +2,7 @@
   The NvmExpressPei driver is used to manage non-volatile memory subsystem
   which follows NVM Express specification at PEI phase.
 
-  Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions
@@ -215,13 +215,6 @@ NvmExpressPeimEntry (
   EFI_PHYSICAL_ADDRESS                     DeviceAddress;
 
   //
-  // Shadow this PEIM to run from memory
-  //
-  if (!EFI_ERROR (PeiServicesRegisterForShadow (FileHandle))) {
-    return EFI_SUCCESS;
-  }
-
-  //
   // Locate the NVME host controller PPI
   //
   Status = PeiServicesLocatePpi (
@@ -234,8 +227,6 @@ NvmExpressPeimEntry (
     DEBUG ((DEBUG_ERROR, "%a: Fail to locate NvmeHostControllerPpi.\n", __FUNCTION__));
     return EFI_UNSUPPORTED;
   }
-
-  IoMmuInit ();
 
   Controller = 0;
   MmioBase   = 0;
