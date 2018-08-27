@@ -870,6 +870,7 @@ EmuSnpDriverBindingStop (
   EFI_STATUS                  Status;
   EMU_SNP_PRIVATE_DATA        *Private = NULL;
   EFI_SIMPLE_NETWORK_PROTOCOL *Snp;
+  VOID                        *EmuIoThunk;
 
   //
   // Complete all outstanding transactions to Controller.
@@ -914,27 +915,42 @@ EmuSnpDriverBindingStop (
   }
 
   Private = EMU_SNP_PRIVATE_DATA_FROM_SNP_THIS (Snp);
-  Status = Private->IoThunk->Close (Private->IoThunk);
+  ASSERT (Private->DeviceHandle == ChildHandleBuffer[0]);
+  ASSERT (Private->EfiHandle    == ControllerHandle);
 
   Status = gBS->CloseProtocol(
-                  ChildHandleBuffer[0],
+                  ControllerHandle,
                   &gEmuIoThunkProtocolGuid,
                   This->DriverBindingHandle,
                   Private->DeviceHandle
                   );
+  ASSERT_EFI_ERROR (Status);
 
   Status = gBS->UninstallMultipleProtocolInterfaces(
-                  ChildHandleBuffer[0],
+                  Private->DeviceHandle,
                   &gEfiSimpleNetworkProtocolGuid,   &Private->Snp,
                   &gEfiDevicePathProtocolGuid,      Private->DevicePath,
                   NULL
                   );
+  if (EFI_ERROR (Status)) {
+    gBS->OpenProtocol (
+           ControllerHandle,
+           &gEmuIoThunkProtocolGuid,
+           &EmuIoThunk,
+           This->DriverBindingHandle,
+           Private->DeviceHandle,
+           EFI_OPEN_PROTOCOL_BY_CHILD_CONTROLLER
+           );
+  } else {
+    Status = Private->IoThunk->Close (Private->IoThunk);
+    ASSERT_EFI_ERROR (Status);
 
-  FreePool (Private->DevicePath);
-  FreeUnicodeStringTable (Private->ControllerNameTable);
-  FreePool (Private);
+    FreePool (Private->DevicePath);
+    FreeUnicodeStringTable (Private->ControllerNameTable);
+    FreePool (Private);
+  }
 
-  return EFI_SUCCESS;
+  return Status;
 }
 
 

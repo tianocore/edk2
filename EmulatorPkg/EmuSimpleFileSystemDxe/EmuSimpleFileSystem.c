@@ -866,7 +866,6 @@ EmuSimpleFileSystemDriverBindingStop (
   }
 
   Private = EMU_SIMPLE_FILE_SYSTEM_PRIVATE_DATA_FROM_THIS (SimpleFileSystem);
-  Status = Private->IoThunk->Close (Private->IoThunk);
 
   //
   // Uninstall the Simple File System Protocol from ControllerHandle
@@ -883,9 +882,12 @@ EmuSimpleFileSystemDriverBindingStop (
                     This->DriverBindingHandle,
                     ControllerHandle
                     );
-  }
-
-  if (!EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    //
+    // Destroy the IO interface.
+    //
+    Status = Private->IoThunk->Close (Private->IoThunk);
+    ASSERT_EFI_ERROR (Status);
     //
     // Free our instance data
     //
