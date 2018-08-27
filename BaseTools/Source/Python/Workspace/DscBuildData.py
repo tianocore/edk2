@@ -92,7 +92,7 @@ LIBS = -lCommon
 '''
 
 variablePattern = re.compile(r'[\t\s]*0[xX][a-fA-F0-9]+$')
-
+SkuIdPattern = re.compile(r'^[a-zA-Z_][a-zA-Z0-9_]*$')
 ## regular expressions for finding decimal and hex numbers
 Pattern = re.compile('^[1-9]\d*|0$')
 HexPattern = re.compile(r'0[xX][0-9a-fA-F]+$')
@@ -631,8 +631,8 @@ class DscBuildData(PlatformBuildClassObject):
                 if not Pattern.match(Record[0]) and not HexPattern.match(Record[0]):
                     EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID number is invalid. It only support Integer and HexNumber",
                                     File=self.MetaFile, Line=Record[-1])
-                if not IsValidWord(Record[1]):
-                    EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID name is invalid. The correct format is '(a-zA-Z0-9_)(a-zA-Z0-9_-.)*'",
+                if not SkuIdPattern.match(Record[1]) or (Record[2] and not SkuIdPattern.match(Record[2])):
+                    EdkLogger.error('build', FORMAT_INVALID, "The format of the Sku ID name is invalid. The correct format is '(a-zA-Z_)(a-zA-Z0-9_)*'",
                                     File=self.MetaFile, Line=Record[-1])
                 self._SkuIds[Record[1].upper()] = (str(DscBuildData.ToInt(Record[0])), Record[1].upper(), Record[2].upper())
             if TAB_DEFAULT not in self._SkuIds:

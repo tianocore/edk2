@@ -1508,6 +1508,7 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
                 Size = -1
         return [VpdOffset, str(Size), Value], IsValid, 2
     elif PcdType in (MODEL_PCD_DYNAMIC_HII, MODEL_PCD_DYNAMIC_EX_HII):
+        IsValid = (3 <= len(FieldList) <= 5)
         HiiString = FieldList[0]
         Guid = Offset = Value = Attribute = ''
         if len(FieldList) > 1:
@@ -1516,9 +1517,10 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
             Offset = FieldList[2]
         if len(FieldList) > 3:
             Value = FieldList[3]
+            if not Value:
+                IsValid = False
         if len(FieldList) > 4:
             Attribute = FieldList[4]
-        IsValid = (3 <= len(FieldList) <= 5)
         return [HiiString, Guid, Offset, Value, Attribute], IsValid, 3
     return [], False, 0
 
