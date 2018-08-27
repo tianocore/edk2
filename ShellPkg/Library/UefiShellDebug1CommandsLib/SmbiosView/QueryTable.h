@@ -2,7 +2,7 @@
   Build a table, each item is (key, info) pair.
   and give a interface of query a string out of a table.
 
-  Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -559,6 +559,30 @@ DisplayMemoryDeviceType (
 **/
 VOID
 DisplayMemoryDeviceTypeDetail (
+  IN UINT16  Para,
+  IN UINT8   Option
+  );
+
+/**
+  Display Memory Device (Type 17) memory technology.
+
+  @param[in] Para     The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMemoryDeviceMemoryTechnology (
+  IN UINT8  Para,
+  IN UINT8  Option
+  );
+
+/**
+  Display Memory Device (Type 17) memory operating mode capability.
+
+  @param[in] Para     The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMemoryDeviceMemoryOperatingModeCapability (
   IN UINT16  Para,
   IN UINT8   Option
   );

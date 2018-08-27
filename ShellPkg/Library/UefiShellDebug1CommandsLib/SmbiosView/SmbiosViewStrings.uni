@@ -1,6 +1,6 @@
 // /**
 //
-// Copyright (c) 2005 - 2017, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2005 - 2018, Intel Corporation. All rights reserved.<BR>
 // (C) Copyright 2014-2015 Hewlett-Packard Development Company, L.P.<BR>
 // (C) Copyright 2015-2017 Hewlett Packard Enterprise Development LP<BR>
 // This program and the accompanying materials
@@ -104,6 +104,11 @@
 #string STR_SMBIOSVIEW_PRINTINFO_INSTALLED                      #language en-US "Installed "
 #string STR_SMBIOSVIEW_PRINTINFO_ENABLED                        #language en-US "Enabled "
 #string STR_SMBIOSVIEW_PRINTINFO_EXTERNAL                       #language en-US "External "
+#string STR_SMBIOSVIEW_PRINTINFO_SLOT_PEER_GROUPS               #language en-US "Peer Groups %d:\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_SEGMENT_GROUP_NUM              #language en-US "  SegmentGroup Num: 0x%04x\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_BUS_NUM                        #language en-US "  Bus Num:          0x%02x\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_DEV_FUNC_NUM                   #language en-US "  DevFunc Num:      0x%02x\r\n"
+#string STR_SMBIOSVIEW_PRINTINFO_DATA_BUS_WIDTH                 #language en-US "  DataBus Width:    %d\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_DESC_STRING                    #language en-US "Description String: "
 #string STR_SMBIOSVIEW_PRINTINFO_SUPOPRTED_EVENT                #language en-US "Supported Event Log Type Descriptors %d:\r\n"
 #string STR_SMBIOSVIEW_PRINTINFO_ACCESS_METHOD_NOT_SUPOPRTED    #language en-US "Access Method %d has not supported\r\n"
@@ -427,6 +432,8 @@
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_FORM_FACTOR        #language en-US "Memory Device - Form Factor: "
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_TYPE               #language en-US "Memory Device - Type: "
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_TYPE_DETAIL        #language en-US "Memory Device - Type Detail: "
+#string STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_MEMORY_TECHNOLOGY  #language en-US "Memory Device - Memory Technology: "
+#string STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_MEM_OPER_MODE_CAPA #language en-US "Memory Device - Memory Operating Mode Capability: "
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_ERROR_INFO                #language en-US "32-bit Memory Error Information - Type: "
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_ERROR_GRANULARITY         #language en-US "Memory Error - Error granularity: "
 #string STR_SMBIOSVIEW_QUERYTABLE_MEM_ERROR_OP                  #language en-US "Memory Error - Error Operation: "

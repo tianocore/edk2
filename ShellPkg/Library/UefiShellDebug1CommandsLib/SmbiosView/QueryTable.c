@@ -579,6 +579,22 @@ TABLE_ITEM  ProcessorUpgradeTable[] = {
   {
     0x38,
     L"Socket SP3r2"
+  },
+  {
+    0x39,
+    L"Socket LGA2066"
+  },
+  {
+    0x3A,
+    L"Socket BGA1392"
+  },
+  {
+    0x3B,
+    L"Socket BGA1510"
+  },
+  {
+    0x3C,
+    L"Socket BGA1528"
   }
 };
 
@@ -1089,6 +1105,10 @@ TABLE_ITEM  PortConnectorTypeTable[] = {
     L"SAS/SATA Plug Receptacle"
   },
   {
+    0x23,
+    L"USB Type-C Receptacle"
+  },
+  {
     0xA0,
     L"PC-98"
   },
@@ -1250,6 +1270,14 @@ TABLE_ITEM  PortTypeTable[] = {
   {
     0x21,
     L"SAS Port"
+  },
+  {
+    0x22,
+    L"Multi-Function Display Port (MFDP)"
+  },
+  {
+    0x23,
+    L"Thunderbolt"
   },
   {
     0xA0,
@@ -1576,6 +1604,10 @@ TABLE_ITEM  SystemSlotCurrentUsageTable[] = {
     0x04,
     L" In use"
   },
+  {
+    0x05,
+    L" Unavailable"
+  }
 };
 
 TABLE_ITEM  SystemSlotLengthTable[] = {
@@ -1645,6 +1677,10 @@ TABLE_ITEM  SlotCharacteristics2Table[] = {
   {
     2,
     L" PCI slot supports SMBus signal"
+  },
+  {
+    3,
+    L" PCIe slot supports bifurcation"
   }
 };
 
@@ -2468,6 +2504,10 @@ TABLE_ITEM  MemoryDeviceTypeTable[] = {
   {
     0x1E,
     L"  LPDDR4"
+  },
+  {
+    0x1F,
+    L"  Logical non-volatile device"
   }
 };
 
@@ -2529,6 +2569,61 @@ TABLE_ITEM  MemoryDeviceTypeDetailTable[] = {
     L" Unbuffered(Unregistered)"
   }
 };
+
+TABLE_ITEM  MemoryDeviceMemoryTechnologyTable[] = {
+  {
+    0x01,
+    L" Other"
+  },
+  {
+    0x02,
+    L" Unknown"
+  },
+  {
+    0x03,
+    L" DRAM"
+  },
+  {
+    0x04,
+    L" NVDIMM-N"
+  },
+  {
+    0x05,
+    L" NVDIMM-F"
+  },
+  {
+    0x06,
+    L" NVDIMM-P"
+  },
+  {
+    0x07,
+    L" Intel persistent memory"
+  }
+};
+
+TABLE_ITEM  MemoryDeviceMemoryOperatingModeCapabilityTable[] = {
+  {
+    1,
+    L" Other"
+  },
+  {
+    2,
+    L" Unknown"
+  },
+  {
+    3,
+    L" Volatile memory"
+  },
+  {
+    4,
+    L" Byte-accessible persistent memory"
+  },
+  {
+    5,
+    L" Block-accessible persistent memory"
+  }
+};
+
 
 TABLE_ITEM  MemoryErrorTypeTable[] = {
   {
@@ -3155,7 +3250,11 @@ TABLE_ITEM  IPMIDIBMCInterfaceTypeTable[] = {
     L" BT: Block Transfer "
   },
   {
-    0xFF04,
+    0x04,
+    L" SSIF: SMBus System Interface "
+  },
+  {
+    0xFF05,
     L" Reserved for future assignment by this specification "
   },
 };
@@ -4220,6 +4319,40 @@ DisplayMemoryDeviceTypeDetail (
   ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_TYPE_DETAIL), gShellDebug1HiiHandle);
   PRINT_INFO_OPTION (Para, Option);
   PRINT_BITS_INFO (MemoryDeviceTypeDetailTable, Para);
+}
+
+/**
+  Display Memory Device (Type 17) memory technology.
+
+  @param[in] Para     The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMemoryDeviceMemoryTechnology (
+  IN UINT8  Para,
+  IN UINT8  Option
+  )
+{
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_MEMORY_TECHNOLOGY), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Para, Option);
+  PRINT_TABLE_ITEM (MemoryDeviceMemoryTechnologyTable, Para);
+}
+
+/**
+  Display Memory Device (Type 17) memory operating mode capability.
+
+  @param[in] Para     The key of the structure.
+  @param[in] Option   The optional information.
+**/
+VOID
+DisplayMemoryDeviceMemoryOperatingModeCapability (
+  IN UINT16  Para,
+  IN UINT8   Option
+  )
+{
+  ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_QUERYTABLE_MEM_DEVICE_MEM_OPER_MODE_CAPA), gShellDebug1HiiHandle);
+  PRINT_INFO_OPTION (Para, Option);
+  PRINT_BITS_INFO (MemoryDeviceMemoryOperatingModeCapabilityTable, Para);
 }
 
 /**

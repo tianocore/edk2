@@ -543,22 +543,45 @@ SmbiosPrintStructure (
   // System Slots (Type 9)
   //
   case 9:
-    PRINT_PENDING_STRING (Struct, Type9, SlotDesignation);
-    DisplaySystemSlotType (Struct->Type9->SlotType, Option);
-    DisplaySystemSlotDataBusWidth (Struct->Type9->SlotDataBusWidth, Option);
-    DisplaySystemSlotCurrentUsage (Struct->Type9->CurrentUsage, Option);
-    DisplaySystemSlotLength (Struct->Type9->SlotLength, Option);
-    DisplaySystemSlotId (
-      Struct->Type9->SlotID,
-      Struct->Type9->SlotType,
-      Option
-     );
-    DisplaySlotCharacteristics1 (*(UINT8 *) &(Struct->Type9->SlotCharacteristics1), Option);
-    DisplaySlotCharacteristics2 (*(UINT8 *) &(Struct->Type9->SlotCharacteristics2), Option);
-    if (AE_SMBIOS_VERSION (0x2, 0x6) && (Struct->Hdr->Length > 0xD)) {
-      PRINT_STRUCT_VALUE_H (Struct, Type9, SegmentGroupNum);
-      PRINT_STRUCT_VALUE_H (Struct, Type9, BusNum);
-      PRINT_STRUCT_VALUE_H (Struct, Type9, DevFuncNum);
+    {
+      MISC_SLOT_PEER_GROUP  *PeerGroupPtr;
+      UINT8                 PeerGroupCount;
+
+      PRINT_PENDING_STRING (Struct, Type9, SlotDesignation);
+      DisplaySystemSlotType (Struct->Type9->SlotType, Option);
+      DisplaySystemSlotDataBusWidth (Struct->Type9->SlotDataBusWidth, Option);
+      DisplaySystemSlotCurrentUsage (Struct->Type9->CurrentUsage, Option);
+      DisplaySystemSlotLength (Struct->Type9->SlotLength, Option);
+      DisplaySystemSlotId (
+        Struct->Type9->SlotID,
+        Struct->Type9->SlotType,
+        Option
+       );
+      DisplaySlotCharacteristics1 (*(UINT8 *) &(Struct->Type9->SlotCharacteristics1), Option);
+      DisplaySlotCharacteristics2 (*(UINT8 *) &(Struct->Type9->SlotCharacteristics2), Option);
+      if (AE_SMBIOS_VERSION (0x2, 0x6) && (Struct->Hdr->Length > 0xD)) {
+        PRINT_STRUCT_VALUE_H (Struct, Type9, SegmentGroupNum);
+        PRINT_STRUCT_VALUE_H (Struct, Type9, BusNum);
+        PRINT_STRUCT_VALUE_H (Struct, Type9, DevFuncNum);
+      }
+      if (AE_SMBIOS_VERSION (0x3, 0x2)) {
+        if (Struct->Hdr->Length > 0x11) {
+          PRINT_STRUCT_VALUE (Struct, Type9, DataBusWidth);
+        }
+        if (Struct->Hdr->Length > 0x12) {
+          PRINT_STRUCT_VALUE (Struct, Type9, PeerGroupingCount);
+
+          PeerGroupCount = Struct->Type9->PeerGroupingCount;
+          PeerGroupPtr   = Struct->Type9->PeerGroups;
+          for (Index = 0; Index < PeerGroupCount; Index++) {
+            ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_SLOT_PEER_GROUPS), gShellDebug1HiiHandle, Index + 1);
+            ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_SEGMENT_GROUP_NUM), gShellDebug1HiiHandle, PeerGroupPtr[Index].SegmentGroupNum);
+            ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_BUS_NUM), gShellDebug1HiiHandle, PeerGroupPtr[Index].BusNum);
+            ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DEV_FUNC_NUM), gShellDebug1HiiHandle, PeerGroupPtr[Index].DevFuncNum);
+            ShellPrintHiiEx(-1,-1,NULL,STRING_TOKEN (STR_SMBIOSVIEW_PRINTINFO_DATA_BUS_WIDTH), gShellDebug1HiiHandle, PeerGroupPtr[Index].DataBusWidth);
+          }
+        }
+      }
     }
     break;
 
@@ -754,6 +777,29 @@ SmbiosPrintStructure (
       PRINT_STRUCT_VALUE (Struct, Type17, MinimumVoltage);
       PRINT_STRUCT_VALUE (Struct, Type17, MaximumVoltage);
       PRINT_STRUCT_VALUE (Struct, Type17, ConfiguredVoltage);
+    }
+    if (AE_SMBIOS_VERSION (0x3, 0x2)) {
+      if (Struct->Hdr->Length > 0x28) {
+        DisplayMemoryDeviceMemoryTechnology (Struct->Type17->MemoryTechnology, Option);
+        DisplayMemoryDeviceMemoryOperatingModeCapability (Struct->Type17->MemoryOperatingModeCapability.Uint16, Option);
+        PRINT_PENDING_STRING (Struct, Type17, FirwareVersion);
+        PRINT_STRUCT_VALUE_H (Struct, Type17, ModuleManufacturerID);
+        PRINT_STRUCT_VALUE_H (Struct, Type17, ModuleProductID);
+        PRINT_STRUCT_VALUE_H (Struct, Type17, MemorySubsystemControllerManufacturerID);
+        PRINT_STRUCT_VALUE_H (Struct, Type17, MemorySubsystemControllerProductID);
+      }
+      if (Struct->Hdr->Length > 0x34) {
+        PRINT_STRUCT_VALUE_H (Struct, Type17, NonVolatileSize);
+      }
+      if (Struct->Hdr->Length > 0x3C) {
+        PRINT_STRUCT_VALUE_H (Struct, Type17, VolatileSize);
+      }
+      if (Struct->Hdr->Length > 0x44) {
+        PRINT_STRUCT_VALUE_H (Struct, Type17, CacheSize);
+      }
+      if (Struct->Hdr->Length > 0x4C) {
+        PRINT_STRUCT_VALUE_H (Struct, Type17, LogicalSize);
+      }
     }
     break;
 
@@ -1108,6 +1154,10 @@ SmbiosPrintStructure (
   //
   case 42:
     DisplayMCHostInterfaceType (Struct->Type42->InterfaceType, Option);
+    if (AE_SMBIOS_VERSION (0x3, 0x2)) {
+      PRINT_STRUCT_VALUE_H (Struct, Type42, InterfaceTypeSpecificDataLength);
+      PRINT_BIT_FIELD (Struct, Type42, InterfaceTypeSpecificData, Struct->Type42->InterfaceTypeSpecificDataLength);
+    }
     break;
 
   //
@@ -2109,6 +2159,10 @@ DisplayProcessorFamily (
 
   case 0xCE:
     Print (L"Intel Core i3 processor\n");
+    break;
+
+  case 0xCF:
+    Print (L"Intel Core i9 processor\n");
     break;
 
   case 0xD2:
