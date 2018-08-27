@@ -21,39 +21,12 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "OpalDriver.h"
 #include "OpalHii.h"
 
-EFI_GUID mOpalDeviceAtaGuid = OPAL_DEVICE_ATA_GUID;
-EFI_GUID mOpalDeviceNvmeGuid = OPAL_DEVICE_NVME_GUID;
+EFI_GUID mOpalDeviceLockBoxGuid = OPAL_DEVICE_LOCKBOX_GUID;
 
 BOOLEAN                 mOpalEndOfDxe = FALSE;
 OPAL_REQUEST_VARIABLE   *mOpalRequestVariable = NULL;
 UINTN                   mOpalRequestVariableSize = 0;
 CHAR16                  mPopUpString[100];
-
-typedef struct {
-  UINT32                   Address;
-  S3_BOOT_SCRIPT_LIB_WIDTH Width;
-} OPAL_HC_PCI_REGISTER_SAVE;
-
-//
-// To unlock the Intel SATA controller at S3 Resume, restored the following registers.
-//
-const OPAL_HC_PCI_REGISTER_SAVE mSataHcRegisterSaveTemplate[] = {
-  {0x9,  S3BootScriptWidthUint8},
-  {0x10, S3BootScriptWidthUint32},
-  {0x14, S3BootScriptWidthUint32},
-  {0x18, S3BootScriptWidthUint32},
-  {0x1C, S3BootScriptWidthUint32},
-  {0x20, S3BootScriptWidthUint32},
-  {0x24, S3BootScriptWidthUint32},
-  {0x3c, S3BootScriptWidthUint8},
-  {0x3d, S3BootScriptWidthUint8},
-  {0x40, S3BootScriptWidthUint16},
-  {0x42, S3BootScriptWidthUint16},
-  {0x92, S3BootScriptWidthUint16},
-  {0x94, S3BootScriptWidthUint32},
-  {0x9C, S3BootScriptWidthUint32},
-  {0x4,  S3BootScriptWidthUint16},
-};
 
 OPAL_DRIVER mOpalDriver;
 
@@ -233,14 +206,12 @@ OpalSupportUpdatePassword (
   @param[out] DevInfoLength     Device information length needed.
   @param[out] DevInfo           Device information extracted.
 
-  @return Device type.
-
 **/
-UINT8
+VOID
 ExtractDeviceInfoFromDevicePath (
   IN  EFI_DEVICE_PATH_PROTOCOL  *DevicePath,
-  OUT UINT16                    *DevInfoLength,
-  OUT OPAL_DEVICE_COMMON        *DevInfo OPTIONAL
+  OUT UINT32                    *DevInfoLength,
+  OUT OPAL_DEVICE_LOCKBOX_DATA  *DevInfo OPTIONAL
   )
 {
   EFI_DEVICE_PATH_PROTOCOL      *TmpDevPath;
@@ -249,10 +220,6 @@ ExtractDeviceInfoFromDevicePath (
   UINT8                         DeviceType;
   UINT8                         BusNum;
   OPAL_PCI_DEVICE               *PciDevice;
-  OPAL_DEVICE_ATA               *DevInfoAta;
-  OPAL_DEVICE_NVME              *DevInfoNvme;
-  SATA_DEVICE_PATH              *SataDevPath;
-  NVME_NAMESPACE_DEVICE_PATH    *NvmeDevPath;
 
   ASSERT (DevicePath != NULL);
   ASSERT (DevInfoLength != NULL);
@@ -266,30 +233,15 @@ ExtractDeviceInfoFromDevicePath (
   // Get device type.
   //
   while (!IsDevicePathEnd (TmpDevPath)) {
-    if (TmpDevPath->Type == MESSAGING_DEVICE_PATH && TmpDevPath->SubType == MSG_SATA_DP) {
-      //
-      // SATA
-      //
+    if ((TmpDevPath->Type == MESSAGING_DEVICE_PATH) &&
+        (TmpDevPath->SubType == MSG_SATA_DP || TmpDevPath->SubType == MSG_NVME_NAMESPACE_DP)) {
       if (DevInfo != NULL) {
-        SataDevPath = (SATA_DEVICE_PATH *) TmpDevPath;
-        DevInfoAta = (OPAL_DEVICE_ATA *) DevInfo;
-        DevInfoAta->Port = SataDevPath->HBAPortNumber;
-        DevInfoAta->PortMultiplierPort = SataDevPath->PortMultiplierPortNumber;
+        DevInfo->DevicePathLength = (UINT32) GetDevicePathSize (DevicePath);
+        CopyMem (DevInfo->DevicePath, DevicePath, DevInfo->DevicePathLength);
       }
-      DeviceType = OPAL_DEVICE_TYPE_ATA;
-      *DevInfoLength = sizeof (OPAL_DEVICE_ATA);
-      break;
-    } else if (TmpDevPath->Type == MESSAGING_DEVICE_PATH && TmpDevPath->SubType == MSG_NVME_NAMESPACE_DP) {
-      //
-      // NVMe
-      //
-      if (DevInfo != NULL) {
-        NvmeDevPath = (NVME_NAMESPACE_DEVICE_PATH *) TmpDevPath;
-        DevInfoNvme = (OPAL_DEVICE_NVME *) DevInfo;
-        DevInfoNvme->NvmeNamespaceId = NvmeDevPath->NamespaceId;
-      }
-      DeviceType = OPAL_DEVICE_TYPE_NVME;
-      *DevInfoLength = sizeof (OPAL_DEVICE_NVME);
+
+      DeviceType = (TmpDevPath->SubType == MSG_SATA_DP) ? OPAL_DEVICE_TYPE_ATA : OPAL_DEVICE_TYPE_NVME;
+      *DevInfoLength = sizeof (OPAL_DEVICE_LOCKBOX_DATA) + (UINT32) GetDevicePathSize (DevicePath);
       break;
     }
     TmpDevPath = NextDevicePathNode (TmpDevPath);
@@ -304,8 +256,8 @@ ExtractDeviceInfoFromDevicePath (
   while (!IsDevicePathEnd (TmpDevPath2)) {
     if (TmpDevPath->Type == HARDWARE_DEVICE_PATH && TmpDevPath->SubType == HW_PCI_DP) {
       PciDevPath = (PCI_DEVICE_PATH *) TmpDevPath;
-      if ((TmpDevPath2->Type == MESSAGING_DEVICE_PATH && TmpDevPath2->SubType == MSG_NVME_NAMESPACE_DP)||
-          (TmpDevPath2->Type == MESSAGING_DEVICE_PATH && TmpDevPath2->SubType == MSG_SATA_DP)) {
+      if ((TmpDevPath2->Type == MESSAGING_DEVICE_PATH) &&
+          (TmpDevPath2->SubType == MSG_SATA_DP || TmpDevPath2->SubType == MSG_NVME_NAMESPACE_DP)) {
         if (DevInfo != NULL) {
           PciDevice = &DevInfo->Device;
           PciDevice->Segment = 0;
@@ -314,14 +266,6 @@ ExtractDeviceInfoFromDevicePath (
           PciDevice->Function = PciDevPath->Function;
         }
       } else {
-        if (DevInfo != NULL) {
-          PciDevice = (OPAL_PCI_DEVICE *) ((UINTN) DevInfo + *DevInfoLength);
-          PciDevice->Segment = 0;
-          PciDevice->Bus = BusNum;
-          PciDevice->Device = PciDevPath->Device;
-          PciDevice->Function = PciDevPath->Function;
-        }
-        *DevInfoLength += sizeof (OPAL_PCI_DEVICE);
         if (TmpDevPath2->Type == HARDWARE_DEVICE_PATH && TmpDevPath2->SubType == HW_PCI_DP) {
           BusNum = PciRead8 (PCI_LIB_ADDRESS (BusNum, PciDevPath->Device, PciDevPath->Function, PCI_BRIDGE_SECONDARY_BUS_REGISTER_OFFSET));
         }
@@ -333,251 +277,157 @@ ExtractDeviceInfoFromDevicePath (
   }
 
   ASSERT (DeviceType != OPAL_DEVICE_TYPE_UNKNOWN);
-  return DeviceType;
+  return;
 }
 
 /**
-  Save boot script for ATA OPAL device.
-
-  @param[in] DevInfo    Pointer to ATA Opal device information.
+  Build OPAL device info and save them to LockBox.
 
  **/
 VOID
-OpalDeviceAtaSaveBootScript (
-  IN OPAL_DEVICE_ATA    *DevInfo
+BuildOpalDeviceInfo (
+  VOID
   )
 {
-  UINTN                         Bus;
-  UINTN                         Device;
-  UINTN                         Function;
-  UINTN                         Index;
-  EFI_STATUS                    Status;
-  UINTN                         Offset;
-  UINT64                        Address;
-  S3_BOOT_SCRIPT_LIB_WIDTH      Width;
-  UINT32                        Data;
-  OPAL_HC_PCI_REGISTER_SAVE     *HcRegisterSaveListPtr;
-  UINTN                         Count;
+  EFI_STATUS                  Status;
+  OPAL_DEVICE_LOCKBOX_DATA    *DevInfo;
+  OPAL_DEVICE_LOCKBOX_DATA    *TempDevInfo;
+  UINTN                       TotalDevInfoLength;
+  UINT32                      DevInfoLength;
+  OPAL_DRIVER_DEVICE          *TmpDev;
+  UINT8                       DummyData;
+  BOOLEAN                     S3InitDevicesExist;
+  UINTN                       S3InitDevicesLength;
+  EFI_DEVICE_PATH_PROTOCOL    *S3InitDevices;
+  EFI_DEVICE_PATH_PROTOCOL    *S3InitDevicesBak;
 
-  Data = 0;
+  //
+  // Build OPAL device info and save them to LockBox.
+  //
+  TotalDevInfoLength = 0;
+  TmpDev = mOpalDriver.DeviceList;
+  while (TmpDev != NULL) {
+    ExtractDeviceInfoFromDevicePath (
+      TmpDev->OpalDisk.OpalDevicePath,
+      &DevInfoLength,
+      NULL
+      );
+    TotalDevInfoLength += DevInfoLength;
+    TmpDev = TmpDev->Next;
+  }
 
-  Bus        = DevInfo->Device.Bus;
-  Device     = DevInfo->Device.Device;
-  Function   = DevInfo->Device.Function;
+  if (TotalDevInfoLength == 0) {
+    return;
+  }
 
-  HcRegisterSaveListPtr = (OPAL_HC_PCI_REGISTER_SAVE *) mSataHcRegisterSaveTemplate;
-  Count = sizeof (mSataHcRegisterSaveTemplate) / sizeof (OPAL_HC_PCI_REGISTER_SAVE);
-
-  for (Index = 0; Index < Count; Index++) {
-    Offset  = HcRegisterSaveListPtr[Index].Address;
-    Width   = HcRegisterSaveListPtr[Index].Width;
-
-    switch (Width) {
-      case S3BootScriptWidthUint8:
-        Data = (UINT32)PciRead8 (PCI_LIB_ADDRESS(Bus,Device,Function,Offset));
-        break;
-      case S3BootScriptWidthUint16:
-        Data = (UINT32)PciRead16 (PCI_LIB_ADDRESS(Bus,Device,Function,Offset));
-        break;
-      case S3BootScriptWidthUint32:
-        Data = PciRead32 (PCI_LIB_ADDRESS(Bus,Device,Function,Offset));
-        break;
-      default:
-        ASSERT (FALSE);
-        break;
+  S3InitDevicesLength = sizeof (DummyData);
+  Status = RestoreLockBox (
+             &gS3StorageDeviceInitListGuid,
+             &DummyData,
+             &S3InitDevicesLength
+             );
+  ASSERT ((Status == EFI_NOT_FOUND) || (Status == EFI_BUFFER_TOO_SMALL));
+  if (Status == EFI_NOT_FOUND) {
+    S3InitDevices      = NULL;
+    S3InitDevicesExist = FALSE;
+  } else if (Status == EFI_BUFFER_TOO_SMALL) {
+    S3InitDevices = AllocatePool (S3InitDevicesLength);
+    ASSERT (S3InitDevices != NULL);
+    if (S3InitDevices == NULL) {
+      return;
     }
 
-    Address = S3_BOOT_SCRIPT_LIB_PCI_ADDRESS (Bus, Device, Function, Offset);
-    Status  = S3BootScriptSavePciCfgWrite (Width, Address, 1, &Data);
+    Status = RestoreLockBox (
+               &gS3StorageDeviceInitListGuid,
+               S3InitDevices,
+               &S3InitDevicesLength
+               );
+    ASSERT_EFI_ERROR (Status);
+    S3InitDevicesExist = TRUE;
+  } else {
+    return;
+  }
+
+  DevInfo = AllocateZeroPool (TotalDevInfoLength);
+  ASSERT (DevInfo != NULL);
+  if (DevInfo == NULL) {
+    return;
+  }
+
+  TempDevInfo = DevInfo;
+  TmpDev      = mOpalDriver.DeviceList;
+  while (TmpDev != NULL) {
+    ExtractDeviceInfoFromDevicePath (
+      TmpDev->OpalDisk.OpalDevicePath,
+      &DevInfoLength,
+      TempDevInfo
+      );
+    TempDevInfo->Length = DevInfoLength;
+    TempDevInfo->OpalBaseComId = TmpDev->OpalDisk.OpalBaseComId;
+    CopyMem (
+      TempDevInfo->Password,
+      TmpDev->OpalDisk.Password,
+      TmpDev->OpalDisk.PasswordLength
+      );
+    TempDevInfo->PasswordLength = TmpDev->OpalDisk.PasswordLength;
+
+    S3InitDevicesBak = S3InitDevices;
+    S3InitDevices    = AppendDevicePathInstance (
+                         S3InitDevicesBak,
+                         TmpDev->OpalDisk.OpalDevicePath
+                         );
+    if (S3InitDevicesBak != NULL) {
+      FreePool (S3InitDevicesBak);
+    }
+    ASSERT (S3InitDevices != NULL);
+    if (S3InitDevices == NULL) {
+      return;
+    }
+
+    TempDevInfo = (OPAL_DEVICE_LOCKBOX_DATA *) ((UINTN) TempDevInfo + DevInfoLength);
+    TmpDev = TmpDev->Next;
+  }
+
+  Status = SaveLockBox (
+             &mOpalDeviceLockBoxGuid,
+             DevInfo,
+             TotalDevInfoLength
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = SetLockBoxAttributes (
+             &mOpalDeviceLockBoxGuid,
+             LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  S3InitDevicesLength = GetDevicePathSize (S3InitDevices);
+  if (S3InitDevicesExist) {
+    Status = UpdateLockBox (
+               &gS3StorageDeviceInitListGuid,
+               0,
+               S3InitDevices,
+               S3InitDevicesLength
+               );
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    Status = SaveLockBox (
+               &gS3StorageDeviceInitListGuid,
+               S3InitDevices,
+               S3InitDevicesLength
+               );
+    ASSERT_EFI_ERROR (Status);
+
+    Status = SetLockBoxAttributes (
+               &gS3StorageDeviceInitListGuid,
+               LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY
+               );
     ASSERT_EFI_ERROR (Status);
   }
-}
 
-/**
-  Build ATA OPAL device info and save them to LockBox.
-
-  @param[in] BarAddr    Bar address allocated.
-
- **/
-VOID
-BuildOpalDeviceInfoAta (
-  IN UINT32     BarAddr
-  )
-{
-  EFI_STATUS            Status;
-  UINT8                 DeviceType;
-  OPAL_DEVICE_ATA       *DevInfoAta;
-  OPAL_DEVICE_ATA       *TempDevInfoAta;
-  UINTN                 DevInfoLengthAta;
-  UINT16                DevInfoLength;
-  OPAL_DRIVER_DEVICE    *TmpDev;
-
-  //
-  // Build ATA OPAL device info and save them to LockBox.
-  //
-  DevInfoLengthAta = 0;
-  TmpDev = mOpalDriver.DeviceList;
-  while (TmpDev != NULL) {
-    DeviceType = ExtractDeviceInfoFromDevicePath (
-                   TmpDev->OpalDisk.OpalDevicePath,
-                   &DevInfoLength,
-                   NULL
-                   );
-    if (DeviceType == OPAL_DEVICE_TYPE_ATA) {
-      DevInfoLengthAta += DevInfoLength;
-    }
-
-    TmpDev = TmpDev->Next;
-  }
-
-  if (DevInfoLengthAta == 0) {
-    return;
-  }
-
-  DevInfoAta = AllocateZeroPool (DevInfoLengthAta);
-  ASSERT (DevInfoAta != NULL);
-  if (DevInfoAta == NULL) {
-    return;
-  }
-
-  TempDevInfoAta = DevInfoAta;
-  TmpDev = mOpalDriver.DeviceList;
-  while (TmpDev != NULL) {
-    DeviceType = ExtractDeviceInfoFromDevicePath (
-                   TmpDev->OpalDisk.OpalDevicePath,
-                   &DevInfoLength,
-                   NULL
-                   );
-    if (DeviceType == OPAL_DEVICE_TYPE_ATA) {
-      ExtractDeviceInfoFromDevicePath (
-        TmpDev->OpalDisk.OpalDevicePath,
-        &DevInfoLength,
-        (OPAL_DEVICE_COMMON *) TempDevInfoAta
-        );
-      TempDevInfoAta->Length = DevInfoLength;
-      TempDevInfoAta->OpalBaseComId = TmpDev->OpalDisk.OpalBaseComId;
-      TempDevInfoAta->BarAddr = BarAddr;
-      CopyMem (
-        TempDevInfoAta->Password,
-        TmpDev->OpalDisk.Password,
-        TmpDev->OpalDisk.PasswordLength
-        );
-      TempDevInfoAta->PasswordLength = TmpDev->OpalDisk.PasswordLength;
-      OpalDeviceAtaSaveBootScript (TempDevInfoAta);
-      TempDevInfoAta = (OPAL_DEVICE_ATA *) ((UINTN) TempDevInfoAta + DevInfoLength);
-    }
-
-    TmpDev = TmpDev->Next;
-  }
-
-  Status = SaveLockBox (
-             &mOpalDeviceAtaGuid,
-             DevInfoAta,
-             DevInfoLengthAta
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = SetLockBoxAttributes (
-             &mOpalDeviceAtaGuid,
-             LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  ZeroMem (DevInfoAta, DevInfoLengthAta);
-  FreePool (DevInfoAta);
-}
-
-/**
-  Build NVMe OPAL device info and save them to LockBox.
-
-  @param[in] BarAddr    Bar address allocated.
-
- **/
-VOID
-BuildOpalDeviceInfoNvme (
-  IN UINT32     BarAddr
-  )
-{
-  EFI_STATUS            Status;
-  UINT8                 DeviceType;
-  OPAL_DEVICE_NVME      *DevInfoNvme;
-  OPAL_DEVICE_NVME      *TempDevInfoNvme;
-  UINTN                 DevInfoLengthNvme;
-  UINT16                DevInfoLength;
-  OPAL_DRIVER_DEVICE    *TmpDev;
-
-  //
-  // Build NVMe OPAL device info and save them to LockBox.
-  //
-  DevInfoLengthNvme = 0;
-  TmpDev = mOpalDriver.DeviceList;
-  while (TmpDev != NULL) {
-    DeviceType = ExtractDeviceInfoFromDevicePath (
-                   TmpDev->OpalDisk.OpalDevicePath,
-                   &DevInfoLength,
-                   NULL
-                   );
-    if (DeviceType == OPAL_DEVICE_TYPE_NVME) {
-      DevInfoLengthNvme += DevInfoLength;
-    }
-
-    TmpDev = TmpDev->Next;
-  }
-
-  if (DevInfoLengthNvme == 0) {
-    return;
-  }
-
-  DevInfoNvme = AllocateZeroPool (DevInfoLengthNvme);
-  ASSERT (DevInfoNvme != NULL);
-  if (DevInfoNvme == NULL) {
-    return;
-  }
-
-  TempDevInfoNvme = DevInfoNvme;
-  TmpDev = mOpalDriver.DeviceList;
-  while (TmpDev != NULL) {
-    DeviceType = ExtractDeviceInfoFromDevicePath (
-                   TmpDev->OpalDisk.OpalDevicePath,
-                   &DevInfoLength,
-                   NULL
-                   );
-    if (DeviceType == OPAL_DEVICE_TYPE_NVME) {
-      ExtractDeviceInfoFromDevicePath (
-        TmpDev->OpalDisk.OpalDevicePath,
-        &DevInfoLength,
-        (OPAL_DEVICE_COMMON *) TempDevInfoNvme
-        );
-      TempDevInfoNvme->Length = DevInfoLength;
-      TempDevInfoNvme->OpalBaseComId = TmpDev->OpalDisk.OpalBaseComId;
-      TempDevInfoNvme->BarAddr = BarAddr;
-      CopyMem (
-        TempDevInfoNvme->Password,
-        TmpDev->OpalDisk.Password,
-        TmpDev->OpalDisk.PasswordLength
-        );
-      TempDevInfoNvme->PasswordLength = TmpDev->OpalDisk.PasswordLength;
-      TempDevInfoNvme = (OPAL_DEVICE_NVME *) ((UINTN) TempDevInfoNvme + DevInfoLength);
-    }
-
-    TmpDev = TmpDev->Next;
-  }
-
-  Status = SaveLockBox (
-             &mOpalDeviceNvmeGuid,
-             DevInfoNvme,
-             DevInfoLengthNvme
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  Status = SetLockBoxAttributes (
-             &mOpalDeviceNvmeGuid,
-             LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  ZeroMem (DevInfoNvme, DevInfoLengthNvme);
-  FreePool (DevInfoNvme);
+  ZeroMem (DevInfo, TotalDevInfoLength);
+  FreePool (DevInfo);
+  FreePool (S3InitDevices);
 }
 
 /**
@@ -596,9 +446,6 @@ OpalEndOfDxeEventNotify (
   VOID                                    *Context
   )
 {
-  EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  Address;
-  UINT64                Length;
   OPAL_DRIVER_DEVICE    *TmpDev;
 
   DEBUG ((DEBUG_INFO, "%a() - enter\n", __FUNCTION__));
@@ -623,24 +470,7 @@ OpalEndOfDxeEventNotify (
     return;
   }
 
-  //
-  // Assume 64K size and alignment are enough.
-  //
-  Length = 0x10000;
-  Address = 0xFFFFFFFF;
-  Status = gDS->AllocateMemorySpace (
-                  EfiGcdAllocateMaxAddressSearchBottomUp,
-                  EfiGcdMemoryTypeMemoryMappedIo,
-                  16,                             // 2^16: 64K Alignment
-                  Length,
-                  &Address,
-                  gImageHandle,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
-
-  BuildOpalDeviceInfoAta ((UINT32) Address);
-  BuildOpalDeviceInfoNvme ((UINT32) Address);
+  BuildOpalDeviceInfo ();
 
   //
   // Zero passsword.

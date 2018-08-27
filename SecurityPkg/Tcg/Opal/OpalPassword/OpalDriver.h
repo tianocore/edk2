@@ -1,7 +1,7 @@
 /** @file
   Values defined and used by the Opal UEFI Driver.
 
-Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -28,6 +28,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/StorageSecurityCommand.h>
 
 #include <Guid/EventGroup.h>
+#include <Guid/S3StorageDeviceInitList.h>
 
 #include <Library/UefiLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -42,7 +43,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/HiiLib.h>
 #include <Library/UefiHiiServicesLib.h>
 #include <Library/PciLib.h>
-#include <Library/S3BootScriptLib.h>
 #include <Library/LockBoxLib.h>
 #include <Library/TcgStorageOpalLib.h>
 #include <Library/Tcg2PhysicalPresenceLib.h>
