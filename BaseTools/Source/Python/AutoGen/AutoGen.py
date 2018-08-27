@@ -39,7 +39,6 @@ from Common.StringUtils import *
 import Common.GlobalData as GlobalData
 from GenFds.FdfParser import *
 from CommonDataClass.CommonClass import SkuInfoClass
-from Workspace.BuildClassObject import *
 from GenPatchPcdTable.GenPatchPcdTable import parsePcdInfoFromMapFile
 import Common.VpdInfoFile as VpdInfoFile
 from .GenPcdDb import CreatePcdDatabaseCode
