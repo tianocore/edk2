@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Specification Reference:
-  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.4.
+  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 4,
+  May 2018, Volume 4: Model-Specific-Registers (MSR)
 
 **/
 
@@ -81,7 +81,7 @@ typedef union {
     UINT32  Reserved2:19;
     UINT32  Reserved3:18;
     ///
-    /// [Bits 52:50] See Table 35-2.
+    /// [Bits 52:50] See Table 2-2.
     ///
     UINT32  PlatformId:3;
     UINT32  Reserved4:11;
@@ -181,7 +181,7 @@ typedef union {
 
 
 /**
-  Core. Control Features in Intel 64 Processor (R/W). See Table 35-2.
+  Core. Control Features in Intel 64 Processor (R/W). See Table 2-2.
 
   @param  ECX  MSR_IA32_SILVERMONT_FEATURE_CONTROL (0x0000003A)
   @param  EAX  Lower 32-bits of MSR value.
@@ -643,54 +643,54 @@ typedef union {
   ///
   struct {
     ///
-    /// [Bit 0] Core. Fast-Strings Enable See Table 35-2.
+    /// [Bit 0] Core. Fast-Strings Enable See Table 2-2.
     ///
     UINT32  FastStrings:1;
     UINT32  Reserved1:2;
     ///
     /// [Bit 3] Module. Automatic Thermal Control Circuit Enable (R/W) See
-    /// Table 35-2. Default value is 0.
+    /// Table 2-2. Default value is 0.
     ///
     UINT32  AutomaticThermalControlCircuit:1;
     UINT32  Reserved2:3;
     ///
-    /// [Bit 7] Core. Performance Monitoring Available (R) See Table 35-2.
+    /// [Bit 7] Core. Performance Monitoring Available (R) See Table 2-2.
     ///
     UINT32  PerformanceMonitoring:1;
     UINT32  Reserved3:3;
     ///
-    /// [Bit 11] Core. Branch Trace Storage Unavailable (RO) See Table 35-2.
+    /// [Bit 11] Core. Branch Trace Storage Unavailable (RO) See Table 2-2.
     ///
     UINT32  BTS:1;
     ///
     /// [Bit 12] Core. Processor Event Based Sampling Unavailable (RO) See
-    /// Table 35-2.
+    /// Table 2-2.
     ///
     UINT32  PEBS:1;
     UINT32  Reserved4:3;
     ///
     /// [Bit 16] Module. Enhanced Intel SpeedStep Technology Enable (R/W) See
-    /// Table 35-2.
+    /// Table 2-2.
     ///
     UINT32  EIST:1;
     UINT32  Reserved5:1;
     ///
-    /// [Bit 18] Core. ENABLE MONITOR FSM (R/W) See Table 35-2.
+    /// [Bit 18] Core. ENABLE MONITOR FSM (R/W) See Table 2-2.
     ///
     UINT32  MONITOR:1;
     UINT32  Reserved6:3;
     ///
-    /// [Bit 22] Core. Limit CPUID Maxval (R/W) See Table 35-2.
+    /// [Bit 22] Core. Limit CPUID Maxval (R/W) See Table 2-2.
     ///
     UINT32  LimitCpuidMaxval:1;
     ///
-    /// [Bit 23] Module. xTPR Message Disable (R/W) See Table 35-2.
+    /// [Bit 23] Module. xTPR Message Disable (R/W) See Table 2-2.
     ///
     UINT32  xTPR_Message_Disable:1;
     UINT32  Reserved7:8;
     UINT32  Reserved8:2;
     ///
-    /// [Bit 34] Core. XD Bit Disable (R/W) See Table 35-2.
+    /// [Bit 34] Core. XD Bit Disable (R/W) See Table 2-2.
     ///
     UINT32  XD:1;
     UINT32  Reserved9:3;
@@ -941,8 +941,8 @@ typedef union {
 
 
 /**
-  Core. Last Branch Record Filtering Select Register (R/W)  See Section
-  17.7.2, "Filtering of Last Branch Records.".
+  Core. Last Branch Record Filtering Select Register (R/W) See Section 17.9.2,
+  "Filtering of Last Branch Records.".
 
   @param  ECX  MSR_SILVERMONT_LBR_SELECT (0x000001C8)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1082,7 +1082,7 @@ typedef union {
 
 
 /**
-  Core. See Table 35-2. See Section 18.4.4, "Processor Event Based Sampling
+  Core. See Table 2-2. See Section 18.6.2.4, "Processor Event Based Sampling
   (PEBS).".
 
   @param  ECX  MSR_SILVERMONT_PEBS_ENABLE (0x000003F1)
@@ -1173,7 +1173,7 @@ typedef union {
 
 
 /**
-  Core. Capability Reporting Register of EPT and VPID (R/O)  See Table 35-2.
+  Core. Capability Reporting Register of EPT and VPID (R/O) See Table 2-2.
 
   @param  ECX  MSR_SILVERMONT_IA32_VMX_EPT_VPID_ENUM (0x0000048C)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1191,8 +1191,8 @@ typedef union {
 
 
 /**
-  Core. Capability Reporting Register of VM-function Controls (R/O) See Table
-  35-2.
+  Core. Capability Reporting Register of VM-Function Controls (R/O) See Table
+  2-2.
 
   @param  ECX  MSR_SILVERMONT_IA32_VMX_FMFUNC (0x00000491)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1323,8 +1323,8 @@ typedef union {
   ///
   struct {
     ///
-    /// [Bits 14:0] Package Power Limit #1. (R/W) See Section 14.9.3, "Package
-    /// RAPL Domain." and MSR_RAPL_POWER_UNIT in Table 35-8.
+    /// [Bits 14:0] Package Power Limit #1 (R/W) See Section 14.9.3, "Package
+    /// RAPL Domain." and MSR_RAPL_POWER_UNIT in Table 2-8.
     ///
     UINT32  Limit:15;
     ///
@@ -1358,7 +1358,7 @@ typedef union {
 
 /**
   Package. PKG Energy Status (R/O) See Section 14.9.3, "Package RAPL Domain."
-  and MSR_RAPL_POWER_UNIT in Table 35-8.
+  and MSR_RAPL_POWER_UNIT in Table 2-8.
 
   @param  ECX  MSR_SILVERMONT_PKG_ENERGY_STATUS (0x00000611)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1376,8 +1376,8 @@ typedef union {
 
 
 /**
-  Package. PP0 Energy Status (R/O)  See Section 14.9.4, "PP0/PP1 RAPL
-  Domains." and MSR_RAPL_POWER_UNIT in Table 35-8.
+  Package. PP0 Energy Status (R/O) See Section 14.9.4, "PP0/PP1 RAPL Domains."
+  and MSR_RAPL_POWER_UNIT in Table 2-8.
 
   @param  ECX  MSR_SILVERMONT_PP0_ENERGY_STATUS (0x00000639)
   @param  EAX  Lower 32-bits of MSR value.

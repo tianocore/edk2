@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Specification Reference:
-  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.9.
+  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 4,
+  May 2018, Volume 4: Model-Specific-Registers (MSR)
 
 **/
 
@@ -88,7 +88,8 @@ typedef union {
 
 
 /**
-  Package. See http://biosbits.org.
+  Package. Platform Information Contains power management and other model
+  specific features enumeration. See http://biosbits.org.
 
   @param  ECX  MSR_SANDY_BRIDGE_PLATFORM_INFO (0x000000CE)
   @param  EAX  Lower 32-bits of MSR value.
@@ -359,7 +360,7 @@ typedef union {
 
 
 /**
-  Core. See Table 35-2; If CPUID.0AH:EAX[15:8] = 8.
+  Core. See Table 2-2. If CPUID.0AH:EAX[15:8] = 8.
 
   @param  ECX  MSR_SANDY_BRIDGE_IA32_PERFEVTSELn
   @param  EAX  Lower 32-bits of MSR value.
@@ -429,7 +430,7 @@ typedef union {
 
 
 /**
-  Thread. Clock Modulation (R/W)  See Table 35-2 IA32_CLOCK_MODULATION MSR was
+  Thread. Clock Modulation (R/W) See Table 2-2. IA32_CLOCK_MODULATION MSR was
   originally named IA32_THERM_CONTROL MSR.
 
   @param  ECX  MSR_SANDY_BRIDGE_IA32_CLOCK_MODULATION (0x0000019A)
@@ -511,48 +512,48 @@ typedef union {
   ///
   struct {
     ///
-    /// [Bit 0] Thread. Fast-Strings Enable  See Table 35-2.
+    /// [Bit 0] Thread. Fast-Strings Enable See Table 2-2.
     ///
     UINT32  FastStrings:1;
     UINT32  Reserved1:6;
     ///
-    /// [Bit 7] Thread. Performance Monitoring Available (R) See Table 35-2.
+    /// [Bit 7] Thread. Performance Monitoring Available (R) See Table 2-2.
     ///
     UINT32  PerformanceMonitoring:1;
     UINT32  Reserved2:3;
     ///
-    /// [Bit 11] Thread. Branch Trace Storage Unavailable (RO) See Table 35-2.
+    /// [Bit 11] Thread. Branch Trace Storage Unavailable (RO) See Table 2-2.
     ///
     UINT32  BTS:1;
     ///
     /// [Bit 12] Thread. Processor Event Based Sampling Unavailable (RO) See
-    /// Table 35-2.
+    /// Table 2-2.
     ///
     UINT32  PEBS:1;
     UINT32  Reserved3:3;
     ///
     /// [Bit 16] Package. Enhanced Intel SpeedStep Technology Enable (R/W) See
-    /// Table 35-2.
+    /// Table 2-2.
     ///
     UINT32  EIST:1;
     UINT32  Reserved4:1;
     ///
-    /// [Bit 18] Thread. ENABLE MONITOR FSM. (R/W) See Table 35-2.
+    /// [Bit 18] Thread. ENABLE MONITOR FSM (R/W) See Table 2-2.
     ///
     UINT32  MONITOR:1;
     UINT32  Reserved5:3;
     ///
-    /// [Bit 22] Thread. Limit CPUID Maxval (R/W) See Table 35-2.
+    /// [Bit 22] Thread. Limit CPUID Maxval (R/W) See Table 2-2.
     ///
     UINT32  LimitCpuidMaxval:1;
     ///
-    /// [Bit 23] Thread. xTPR Message Disable (R/W) See Table 35-2.
+    /// [Bit 23] Thread. xTPR Message Disable (R/W) See Table 2-2.
     ///
     UINT32  xTPR_Message_Disable:1;
     UINT32  Reserved6:8;
     UINT32  Reserved7:2;
     ///
-    /// [Bit 34] Thread. XD Bit Disable (R/W) See Table 35-2.
+    /// [Bit 34] Thread. XD Bit Disable (R/W) See Table 2-2.
     ///
     UINT32  XD:1;
     UINT32  Reserved8:3;
@@ -750,8 +751,8 @@ typedef union {
 
 
 /**
-  Thread. Last Branch Record Filtering Select Register (R/W)  See Section
-  17.7.2, "Filtering of Last Branch Records.".
+  Thread. Last Branch Record Filtering Select Register (R/W) See Section
+  17.9.2, "Filtering of Last Branch Records.".
 
   @param  ECX  MSR_SANDY_BRIDGE_LBR_SELECT (0x000001C8)
   @param  EAX  Lower 32-bits of MSR value.
@@ -929,7 +930,7 @@ typedef union {
 
 
 /**
-  See Table 35-2. See Section 18.4.2, "Global Counter Control Facilities.".
+  See Table 2-2. See Section 18.6.2.2, "Global Counter Control Facilities.".
 
   @param  ECX  MSR_SANDY_BRIDGE_IA32_PERF_GLOBAL_STATUS (0x0000038E)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1024,7 +1025,7 @@ typedef union {
 
 
 /**
-  Thread. See Table 35-2. See Section 18.4.2, "Global Counter Control
+  Thread. See Table 2-2. See Section 18.6.2.2, "Global Counter Control
   Facilities.".
 
   @param  ECX  MSR_SANDY_BRIDGE_IA32_PERF_GLOBAL_CTRL (0x0000038F)
@@ -1112,7 +1113,7 @@ typedef union {
 
 
 /**
-  See Table 35-2. See Section 18.4.2, "Global Counter Control Facilities.".
+  See Table 2-2. See Section 18.6.2.2, "Global Counter Control Facilities.".
 
   @param  ECX  MSR_SANDY_BRIDGE_IA32_PERF_GLOBAL_OVF_CTRL (0x00000390)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1207,7 +1208,7 @@ typedef union {
 
 
 /**
-  Thread. See Section 18.8.1.1, "Processor Event Based Sampling (PEBS).".
+  Thread. See Section 18.3.1.1.1, "Processor Event Based Sampling (PEBS).".
 
   @param  ECX  MSR_SANDY_BRIDGE_PEBS_ENABLE (0x000003F1)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1281,7 +1282,7 @@ typedef union {
 
 
 /**
-  Thread. see See Section 18.8.1.2, "Load Latency Performance Monitoring
+  Thread. See Section 18.3.1.1.2, "Load Latency Performance Monitoring
   Facility.".
 
   @param  ECX  MSR_SANDY_BRIDGE_PEBS_LD_LAT (0x000003F6)
@@ -1518,7 +1519,7 @@ typedef union {
 
 
 /**
-  Thread. Capability Reporting Register of EPT and VPID (R/O)  See Table 35-2.
+  Thread. Capability Reporting Register of EPT and VPID (R/O) See Table 2-2.
 
   @param  ECX  MSR_SANDY_BRIDGE_IA32_VMX_EPT_VPID_ENUM (0x0000048C)
   @param  EAX  Lower 32-bits of MSR value.
@@ -2859,7 +2860,7 @@ typedef union {
     ///
     /// [Bit 0] ENABLE_PEBS_NUM_ALT (RW) Write 1 to enable alternate PEBS
     /// counting logic for specific events requiring additional configuration,
-    /// see Table 19-15.
+    /// see Table 19-17.
     ///
     UINT32  ENABLE_PEBS_NUM_ALT:1;
     UINT32  Reserved1:31;

@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Specification Reference:
-  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.11.
+  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 4,
+  May 2018, Volume 4: Model-Specific-Registers (MSR)
 
 **/
 
@@ -129,8 +129,8 @@ typedef union {
 
 
 /**
-  THREAD. Performance Event Select for Counter n (R/W) Supports all fields
-  described inTable 35-2 and the fields below.
+  Thread. Performance Event Select for Counter n (R/W) Supports all fields
+  described inTable 2-2 and the fields below.
 
   @param  ECX  MSR_HASWELL_IA32_PERFEVTSELn
   @param  EAX  Lower 32-bits of MSR value.
@@ -218,7 +218,7 @@ typedef union {
     UINT32  CMASK:8;
     UINT32  Reserved:32;
     ///
-    /// [Bit 32] IN_TX: see Section 18.11.5.1 When IN_TX (bit 32) is set,
+    /// [Bit 32] IN_TX: see Section 18.3.6.5.1 When IN_TX (bit 32) is set,
     /// AnyThread (bit 21) should be cleared to prevent incorrect results.
     ///
     UINT32  IN_TX:1;
@@ -232,8 +232,8 @@ typedef union {
 
 
 /**
-  THREAD. Performance Event Select for Counter 2 (R/W) Supports all fields
-  described inTable 35-2 and the fields below.
+  Thread. Performance Event Select for Counter 2 (R/W) Supports all fields
+  described inTable 2-2 and the fields below.
 
   @param  ECX  MSR_HASWELL_IA32_PERFEVTSEL2 (0x00000188)
   @param  EAX  Lower 32-bits of MSR value.
@@ -314,12 +314,12 @@ typedef union {
     UINT32  CMASK:8;
     UINT32  Reserved:32;
     ///
-    /// [Bit 32] IN_TX: see Section 18.11.5.1 When IN_TX (bit 32) is set,
+    /// [Bit 32] IN_TX: see Section 18.3.6.5.1 When IN_TX (bit 32) is set,
     /// AnyThread (bit 21) should be cleared to prevent incorrect results.
     ///
     UINT32  IN_TX:1;
     ///
-    /// [Bit 33] IN_TXCP: see Section 18.11.5.1 When IN_TXCP=1 & IN_TX=1 and
+    /// [Bit 33] IN_TXCP: see Section 18.3.6.5.1 When IN_TXCP=1 & IN_TX=1 and
     /// in sampling, spurious PMI may occur and transactions may continuously
     /// abort near overflow conditions. Software should favor using IN_TXCP
     /// for counting over sampling. If sampling, software should use large
@@ -459,9 +459,9 @@ typedef union {
     ///
     UINT32  InterruptResponseTimeLimit:10;
     ///
-    /// [Bits 12:10] Time Unit (R/W)  Specifies the encoding value of time
-    /// unit of the interrupt response time limit. See Table 35-18 for
-    /// supported time unit encodings.
+    /// [Bits 12:10] Time Unit (R/W) Specifies the encoding value of time unit
+    /// of the interrupt response time limit. See Table 2-19 for supported
+    /// time unit encodings.
     ///
     UINT32  TimeUnit:3;
     UINT32  Reserved1:2;
@@ -518,15 +518,15 @@ typedef union {
   ///
   struct {
     ///
-    /// [Bits 9:0] Interrupt response time limit (R/W)  Specifies the limit
+    /// [Bits 9:0] Interrupt response time limit (R/W) Specifies the limit
     /// that should be used to decide if the package should be put into a
     /// package C6 or C7 state.
     ///
     UINT32  InterruptResponseTimeLimit:10;
     ///
-    /// [Bits 12:10] Time Unit (R/W)  Specifies the encoding value of time
-    /// unit of the interrupt response time limit. See Table 35-18 for
-    /// supported time unit encodings.
+    /// [Bits 12:10] Time Unit (R/W) Specifies the encoding value of time unit
+    /// of the interrupt response time limit. See Table 2-19 for supported
+    /// time unit encodings.
     ///
     UINT32  TimeUnit:3;
     UINT32  Reserved1:2;

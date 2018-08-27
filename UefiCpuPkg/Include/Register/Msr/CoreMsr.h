@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Specification Reference:
-  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.19.
+  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 4,
+  May 2018, Volume 4: Model-Specific-Registers (MSR)
 
 **/
 
@@ -43,7 +43,7 @@
    )
 
 /**
-  Unique. See Section 35.22, "MSRs in Pentium Processors," and see Table 35-2.
+  Unique. See Section 2.22, "MSRs in Pentium Processors," and see Table 2-2.
 
   @param  ECX  MSR_CORE_P5_MC_ADDR (0x00000000)
   @param  EAX  Lower 32-bits of MSR value.
@@ -62,7 +62,7 @@
 
 
 /**
-  Unique. See Section 35.22, "MSRs in Pentium Processors," and see Table 35-2.
+  Unique. See Section 2.22, "MSRs in Pentium Processors," and see Table 2-2.
 
   @param  ECX  MSR_CORE_P5_MC_TYPE (0x00000001)
   @param  EAX  Lower 32-bits of MSR value.
@@ -194,7 +194,7 @@ typedef union {
   Unique. Last Branch Record n (R/W) One of 8 last branch record registers on
   the last branch record stack: bits 31-0 hold the 'from' address and bits
   63-32 hold the 'to' address. See also: -  Last Branch Record Stack TOS at
-  1C9H -  Section 17.13, "Last Branch, Interrupt, and Exception Recording
+  1C9H -  Section 17.15, "Last Branch, Interrupt, and Exception Recording
   (Pentium M Processors).".
 
   @param  ECX  MSR_CORE_LASTBRANCH_n
@@ -424,12 +424,12 @@ typedef union {
     UINT32  Reserved1:3;
     ///
     /// [Bit 3] Unique. Automatic Thermal Control Circuit Enable (R/W) See
-    /// Table 35-2.
+    /// Table 2-2.
     ///
     UINT32  AutomaticThermalControlCircuit:1;
     UINT32  Reserved2:3;
     ///
-    /// [Bit 7] Shared. Performance Monitoring Available (R) See Table 35-2.
+    /// [Bit 7] Shared. Performance Monitoring Available (R) See Table 2-2.
     ///
     UINT32  PerformanceMonitoring:1;
     UINT32  Reserved3:2;
@@ -441,7 +441,7 @@ typedef union {
     ///
     UINT32  FERR:1;
     ///
-    /// [Bit 11] Shared. Branch Trace Storage Unavailable (RO) See Table 35-2.
+    /// [Bit 11] Shared. Branch Trace Storage Unavailable (RO) See Table 2-2.
     ///
     UINT32  BTS:1;
     UINT32  Reserved4:1;
@@ -468,13 +468,13 @@ typedef union {
     UINT32  EIST:1;
     UINT32  Reserved6:1;
     ///
-    /// [Bit 18] Shared. ENABLE MONITOR FSM (R/W) See Table 35-2.
+    /// [Bit 18] Shared. ENABLE MONITOR FSM (R/W) See Table 2-2.
     ///
     UINT32  MONITOR:1;
     UINT32  Reserved7:1;
     UINT32  Reserved8:2;
     ///
-    /// [Bit 22] Shared. Limit CPUID Maxval (R/W) See Table 35-2. Setting this
+    /// [Bit 22] Shared. Limit CPUID Maxval (R/W) See Table 2-2. Setting this
     /// bit may cause behavior in software that depends on the availability of
     /// CPUID leaves greater than 2.
     ///
@@ -482,7 +482,7 @@ typedef union {
     UINT32  Reserved9:9;
     UINT32  Reserved10:2;
     ///
-    /// [Bit 34] Shared. XD Bit Disable (R/W) See Table 35-2.
+    /// [Bit 34] Shared. XD Bit Disable (R/W) See Table 2-2.
     ///
     UINT32  XD:1;
     UINT32  Reserved11:29;
@@ -1062,7 +1062,7 @@ typedef union {
 
 
 /**
-  Unique. See Table 35-2.
+  Unique. See Table 2-2.
 
   @param  ECX  MSR_CORE_IA32_EFER (0xC0000080)
   @param  EAX  Lower 32-bits of MSR value.

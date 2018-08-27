@@ -1,12 +1,12 @@
 /** @file
-  MSR Definitions for Intel processors based on the Skylake microarchitecture.
+  MSR Defintions for Intel processors based on the Skylake/Kabylake/Coffeelake/Cannonlake microarchitecture.
 
   Provides defines for Machine Specific Registers(MSR) indexes. Data structures
   are provided for MSRs that contain one or more bit fields.  If the MSR value
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Specification Reference:
-  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.15.
+  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 4,
+  May 2018, Volume 4: Model-Specific-Registers (MSR)
 
 **/
 
@@ -163,7 +163,7 @@ typedef union {
 
 
 /**
-  See Table 35-2. See Section 18.2.4, "Architectural Performance Monitoring
+  See Table 2-2. See Section 18.2.4, "Architectural Performance Monitoring
   Version 4.".
 
   @param  ECX  MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS (0x0000038E)
@@ -275,7 +275,7 @@ typedef union {
 
 
 /**
-  See Table 35-2. See Section 18.2.4, "Architectural Performance Monitoring
+  See Table 2-2. See Section 18.2.4, "Architectural Performance Monitoring
   Version 4.".
 
   @param  ECX  MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_RESET (0x00000390)
@@ -388,7 +388,7 @@ typedef union {
 
 
 /**
-  See Table 35-2. See Section 18.2.4, "Architectural Performance Monitoring
+  See Table 2-2. See Section 18.2.4, "Architectural Performance Monitoring
   Version 4.".
 
   @param  ECX  MSR_SKYLAKE_IA32_PERF_GLOBAL_STATUS_SET (0x00000391)

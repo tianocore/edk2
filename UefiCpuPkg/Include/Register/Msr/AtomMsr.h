@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Specification Reference:
-  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.3.
+  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 4,
+  May 2018, Volume 4: Model-Specific-Registers (MSR)
 
 **/
 
@@ -518,18 +518,18 @@ typedef union {
   ///
   struct {
     ///
-    /// [Bit 0] Fast-Strings Enable See Table 35-2.
+    /// [Bit 0] Fast-Strings Enable See Table 2-2.
     ///
     UINT32  FastStrings:1;
     UINT32  Reserved1:2;
     ///
     /// [Bit 3] Unique. Automatic Thermal Control Circuit Enable (R/W) See
-    /// Table 35-2. Default value is 0.
+    /// Table 2-2. Default value is 0.
     ///
     UINT32  AutomaticThermalControlCircuit:1;
     UINT32  Reserved2:3;
     ///
-    /// [Bit 7] Shared. Performance Monitoring Available (R) See Table 35-2.
+    /// [Bit 7] Shared. Performance Monitoring Available (R) See Table 2-2.
     ///
     UINT32  PerformanceMonitoring:1;
     UINT32  Reserved3:1;
@@ -542,12 +542,12 @@ typedef union {
     ///
     UINT32  FERR:1;
     ///
-    /// [Bit 11] Shared. Branch Trace Storage Unavailable (RO) See Table 35-2.
+    /// [Bit 11] Shared. Branch Trace Storage Unavailable (RO) See Table 2-2.
     ///
     UINT32  BTS:1;
     ///
     /// [Bit 12] Shared. Processor Event Based Sampling Unavailable (RO) See
-    /// Table 35-2.
+    /// Table 2-2.
     ///
     UINT32  PEBS:1;
     ///
@@ -568,12 +568,12 @@ typedef union {
     UINT32  Reserved5:2;
     ///
     /// [Bit 16] Shared. Enhanced Intel SpeedStep Technology Enable (R/W) See
-    /// Table 35-2.
+    /// Table 2-2.
     ///
     UINT32  EIST:1;
     UINT32  Reserved6:1;
     ///
-    /// [Bit 18] Shared. ENABLE MONITOR FSM (R/W) See Table 35-2.
+    /// [Bit 18] Shared. ENABLE MONITOR FSM (R/W) See Table 2-2.
     ///
     UINT32  MONITOR:1;
     UINT32  Reserved7:1;
@@ -588,17 +588,17 @@ typedef union {
     UINT32  EISTLock:1;
     UINT32  Reserved8:1;
     ///
-    /// [Bit 22] Unique. Limit CPUID Maxval (R/W) See Table 35-2.
+    /// [Bit 22] Unique. Limit CPUID Maxval (R/W) See Table 2-2.
     ///
     UINT32  LimitCpuidMaxval:1;
     ///
-    /// [Bit 23] Shared. xTPR Message Disable (R/W) See Table 35-2.
+    /// [Bit 23] Shared. xTPR Message Disable (R/W) See Table 2-2.
     ///
     UINT32  xTPR_Message_Disable:1;
     UINT32  Reserved9:8;
     UINT32  Reserved10:2;
     ///
-    /// [Bit 34] Unique. XD Bit Disable (R/W) See Table 35-2.
+    /// [Bit 34] Unique. XD Bit Disable (R/W) See Table 2-2.
     ///
     UINT32  XD:1;
     UINT32  Reserved11:29;
@@ -673,7 +673,7 @@ typedef union {
 
 
 /**
-  Unique. See Table 35-2. See Section 18.4.4, "Processor Event Based Sampling
+  Unique. See Table 2-2. See Section 18.6.2.4, "Processor Event Based Sampling
   (PEBS).".
 
   @param  ECX  MSR_ATOM_PEBS_ENABLE (0x000003F1)

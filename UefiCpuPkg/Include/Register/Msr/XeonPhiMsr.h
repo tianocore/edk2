@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Specification Reference:
-  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.17.
+  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 4,
+  May 2018, Volume 4: Model-Specific-Registers (MSR)
 
 **/
 
@@ -804,7 +804,7 @@ typedef union {
 
 
 /**
-  Thread. See Table 35-2.
+  Thread. See Table 2-2.
 
   @param  ECX  MSR_XEON_PHI_PEBS_ENABLE (0x000003F1)
   @param  EAX  Lower 32-bits of MSR value.
@@ -943,7 +943,7 @@ typedef union {
 
 
 /**
-  Core. Capability Reporting Register of EPT and VPID (R/O)  See Table 35-2.
+  Core. Capability Reporting Register of EPT and VPID (R/O)  See Table 2-2.
 
   @param  ECX  MSR_XEON_PHI_IA32_VMX_EPT_VPID_ENUM (0x0000048C)
   @param  EAX  Lower 32-bits of MSR value.
@@ -961,8 +961,8 @@ typedef union {
 
 
 /**
-  Core. Capability Reporting Register of VM-function Controls (R/O) See Table
-  35-2.
+  Core. Capability Reporting Register of VM-Function Controls (R/O) See Table
+  2-2.
 
   @param  ECX  MSR_XEON_PHI_IA32_VMX_FMFUNC (0x00000491)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1251,7 +1251,7 @@ typedef union {
 
 
 /**
-  Package. Base TDP Ratio (R/O) See Table 35-23.
+  Package. Base TDP Ratio (R/O) See Table 2-24.
 
   @param  ECX  MSR_XEON_PHI_CONFIG_TDP_NOMINAL (0x00000648)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1269,7 +1269,7 @@ typedef union {
 
 
 /**
-  Package. ConfigTDP Level 1 ratio and power level (R/O). See Table 35-23.
+  Package. ConfigTDP Level 1 ratio and power level (R/O) See Table 2-24.
 
   @param  ECX  MSR_XEON_PHI_CONFIG_TDP_LEVEL1 (0x00000649)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1287,7 +1287,7 @@ typedef union {
 
 
 /**
-  Package. ConfigTDP Level 2 ratio and power level (R/O). See Table 35-23.
+  Package. ConfigTDP Level 2 ratio and power level (R/O) See Table 2-24.
 
   @param  ECX  MSR_XEON_PHI_CONFIG_TDP_LEVEL2 (0x0000064A)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1305,7 +1305,7 @@ typedef union {
 
 
 /**
-  Package. ConfigTDP Control (R/W) See Table 35-23.
+  Package. ConfigTDP Control (R/W) See Table 2-24.
 
   @param  ECX  MSR_XEON_PHI_CONFIG_TDP_CONTROL (0x0000064B)
   @param  EAX  Lower 32-bits of MSR value.
@@ -1324,7 +1324,7 @@ typedef union {
 
 
 /**
-  Package. ConfigTDP Control (R/W) See Table 35-23.
+  Package. ConfigTDP Control (R/W) See Table 2-24.
 
   @param  ECX  MSR_XEON_PHI_TURBO_ACTIVATION_RATIO (0x0000064C)
   @param  EAX  Lower 32-bits of MSR value.

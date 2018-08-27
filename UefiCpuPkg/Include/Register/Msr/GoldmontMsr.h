@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Specification Reference:
-  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.5.
+  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 4,
+  May 2018, Volume 4: Model-Specific-Registers (MSR)
 
 **/
 
@@ -333,54 +333,54 @@ typedef union {
   ///
   struct {
     ///
-    /// [Bit 0] Core. Fast-Strings Enable See Table 35-2.
+    /// [Bit 0] Core. Fast-Strings Enable See Table 2-2.
     ///
     UINT32  FastStrings:1;
     UINT32  Reserved1:2;
     ///
     /// [Bit 3] Package. Automatic Thermal Control Circuit Enable (R/W) See
-    /// Table 35-2. Default value is 1.
+    /// Table 2-2. Default value is 1.
     ///
     UINT32  AutomaticThermalControlCircuit:1;
     UINT32  Reserved2:3;
     ///
-    /// [Bit 7] Core. Performance Monitoring Available (R) See Table 35-2.
+    /// [Bit 7] Core. Performance Monitoring Available (R) See Table 2-2.
     ///
     UINT32  PerformanceMonitoring:1;
     UINT32  Reserved3:3;
     ///
-    /// [Bit 11] Core. Branch Trace Storage Unavailable (RO) See Table 35-2.
+    /// [Bit 11] Core. Branch Trace Storage Unavailable (RO) See Table 2-2.
     ///
     UINT32  BTS:1;
     ///
     /// [Bit 12] Core. Processor Event Based Sampling Unavailable (RO) See
-    /// Table 35-2.
+    /// Table 2-2.
     ///
     UINT32  PEBS:1;
     UINT32  Reserved4:3;
     ///
     /// [Bit 16] Package. Enhanced Intel SpeedStep Technology Enable (R/W) See
-    /// Table 35-2.
+    /// Table 2-2.
     ///
     UINT32  EIST:1;
     UINT32  Reserved5:1;
     ///
-    /// [Bit 18] Core. ENABLE MONITOR FSM (R/W) See Table 35-2.
+    /// [Bit 18] Core. ENABLE MONITOR FSM (R/W) See Table 2-2.
     ///
     UINT32  MONITOR:1;
     UINT32  Reserved6:3;
     ///
-    /// [Bit 22] Core. Limit CPUID Maxval (R/W) See Table 35-2.
+    /// [Bit 22] Core. Limit CPUID Maxval (R/W) See Table 2-2.
     ///
     UINT32  LimitCpuidMaxval:1;
     ///
-    /// [Bit 23] Package. xTPR Message Disable (R/W) See Table 35-2.
+    /// [Bit 23] Package. xTPR Message Disable (R/W) See Table 2-2.
     ///
     UINT32  xTPR_Message_Disable:1;
     UINT32  Reserved7:8;
     UINT32  Reserved8:2;
     ///
-    /// [Bit 34] Core. XD Bit Disable (R/W) See Table 35-2.
+    /// [Bit 34] Core. XD Bit Disable (R/W) See Table 2-2.
     ///
     UINT32  XD:1;
     UINT32  Reserved9:3;
@@ -690,8 +690,8 @@ typedef union {
 
 
 /**
-  Core. Last Branch Record Filtering Select Register (R/W)  See Section
-  17.7.2, "Filtering of Last Branch Records.".
+  Core. Last Branch Record Filtering Select Register (R/W) See Section 17.9.2,
+  "Filtering of Last Branch Records.".
 
   @param  ECX  MSR_GOLDMONT_LBR_SELECT (0x000001C8)
   @param  EAX  Lower 32-bits of MSR value.
@@ -881,7 +881,7 @@ typedef union {
 
 
 /**
-  Core. See Table 35-2. See Section 18.2.4, "Architectural Performance
+  Core. See Table 2-2. See Section 18.2.4, "Architectural Performance
   Monitoring Version 4.".
 
   @param  ECX  MSR_GOLDMONT_IA32_PERF_GLOBAL_STATUS_RESET (0x00000390)
@@ -978,7 +978,7 @@ typedef union {
 
 
 /**
-  Core. See Table 35-2. See Section 18.2.4, "Architectural Performance
+  Core. See Table 2-2. See Section 18.2.4, "Architectural Performance
   Monitoring Version 4.".
 
   @param  ECX  MSR_GOLDMONT_IA32_PERF_GLOBAL_STATUS_SET (0x00000391)
@@ -1072,7 +1072,7 @@ typedef union {
 
 
 /**
-  Core. See Table 35-2. See Section 18.4.4, "Processor Event Based Sampling
+  Core. See Table 2-2. See Section 18.6.2.4, "Processor Event Based Sampling
   (PEBS).".
 
   @param  ECX  MSR_GOLDMONT_PEBS_ENABLE (0x000003F1)
@@ -1492,9 +1492,9 @@ typedef union {
     ///
     UINT32  InterruptResponseTimeLimit:10;
     ///
-    /// [Bits 12:10] Time Unit (R/W)  Specifies the encoding value of time
-    /// unit of the interrupt response time limit. See Table 35-18 for
-    /// supported time unit encodings.
+    /// [Bits 12:10] Time Unit (R/W) Specifies the encoding value of time unit
+    /// of the interrupt response time limit. See Table 2-19 for supported
+    /// time unit encodings.
     ///
     UINT32  TimeUnit:3;
     UINT32  Reserved1:2;
@@ -1556,9 +1556,9 @@ typedef union {
     ///
     UINT32  InterruptResponseTimeLimit:10;
     ///
-    /// [Bits 12:10] Time Unit (R/W)  Specifies the encoding value of time
-    /// unit of the interrupt response time limit. See Table 35-18 for
-    /// supported time unit encodings.
+    /// [Bits 12:10] Time Unit (R/W) Specifies the encoding value of time unit
+    /// of the interrupt response time limit. See Table 2-19 for supported
+    /// time unit encodings.
     ///
     UINT32  TimeUnit:3;
     UINT32  Reserved1:2;
@@ -1619,9 +1619,9 @@ typedef union {
     ///
     UINT32  InterruptResponseTimeLimit:10;
     ///
-    /// [Bits 12:10] Time Unit (R/W)  Specifies the encoding value of time
-    /// unit of the interrupt response time limit. See Table 35-18 for
-    /// supported time unit encodings.
+    /// [Bits 12:10] Time Unit (R/W) Specifies the encoding value of time unit
+    /// of the interrupt response time limit. See Table 2-19 for supported
+    /// time unit encodings.
     ///
     UINT32  TimeUnit:3;
     UINT32  Reserved1:2;

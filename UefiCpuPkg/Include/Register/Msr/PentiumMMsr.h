@@ -6,7 +6,7 @@
   returned is a single 32-bit or 64-bit value, then a data structure is not
   provided for that MSR.
 
-  Copyright (c) 2016 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -16,8 +16,8 @@
   WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
   @par Specification Reference:
-  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 3,
-  September 2016, Chapter 35 Model-Specific-Registers (MSR), Section 35.20.
+  Intel(R) 64 and IA-32 Architectures Software Developer's Manual, Volume 4,
+  May 2018, Volume 4: Model-Specific-Registers (MSR)
 
 **/
 
@@ -43,7 +43,7 @@
    )
 
 /**
-  See Section 35.22, "MSRs in Pentium Processors.".
+  See Section 2.22, "MSRs in Pentium Processors.".
 
   @param  ECX  MSR_PENTIUM_M_P5_MC_ADDR (0x00000000)
   @param  EAX  Lower 32-bits of MSR value.
@@ -62,7 +62,7 @@
 
 
 /**
-  See Section 35.22, "MSRs in Pentium Processors.".
+  See Section 2.22, "MSRs in Pentium Processors.".
 
   @param  ECX  MSR_PENTIUM_M_P5_MC_TYPE (0x00000001)
   @param  EAX  Lower 32-bits of MSR value.
@@ -200,7 +200,7 @@ typedef union {
   Last Branch Record n (R/W) One of 8 last branch record registers on the last
   branch record stack: bits 31-0 hold the 'from' address and bits 63-32 hold
   the to address. See also: -  Last Branch Record Stack TOS at 1C9H -  Section
-  17.13, "Last Branch, Interrupt, and Exception Recording (Pentium M
+  17.15, "Last Branch, Interrupt, and Exception Recording (Pentium M
   Processors)".
 
   @param  ECX  MSR_PENTIUM_M_LASTBRANCH_n
@@ -498,7 +498,7 @@ typedef union {
 
 /**
   Debug Control (R/W)  Controls how several debug features are used. Bit
-  definitions are discussed in the referenced section. See Section 17.13,
+  definitions are discussed in the referenced section. See Section 17.15,
   "Last Branch, Interrupt, and Exception Recording (Pentium M Processors).".
 
   @param  ECX  MSR_PENTIUM_M_DEBUGCTLB (0x000001D9)
@@ -521,8 +521,8 @@ typedef union {
   Last Exception Record To Linear IP (R)  This area contains a pointer to the
   target of the last branch instruction that the processor executed prior to
   the last exception that was generated or the last interrupt that was
-  handled. See Section 17.13, "Last Branch, Interrupt, and Exception Recording
-  (Pentium M Processors)" and Section 17.14.2, "Last Branch and Last Exception
+  handled. See Section 17.15, "Last Branch, Interrupt, and Exception Recording
+  (Pentium M Processors)" and Section 17.16.2, "Last Branch and Last Exception
   MSRs.".
 
   @param  ECX  MSR_PENTIUM_M_LER_TO_LIP (0x000001DD)
@@ -544,8 +544,8 @@ typedef union {
   Last Exception Record From Linear IP (R)  Contains a pointer to the last
   branch instruction that the processor executed prior to the last exception
   that was generated or the last interrupt that was handled. See Section
-  17.13, "Last Branch, Interrupt, and Exception Recording (Pentium M
-  Processors)" and Section 17.14.2, "Last Branch and Last Exception MSRs.".
+  17.15, "Last Branch, Interrupt, and Exception Recording (Pentium M
+  Processors)" and Section 17.16.2, "Last Branch and Last Exception MSRs.".
 
   @param  ECX  MSR_PENTIUM_M_LER_FROM_LIP (0x000001DE)
   @param  EAX  Lower 32-bits of MSR value.
