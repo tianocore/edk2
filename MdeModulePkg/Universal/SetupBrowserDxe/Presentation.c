@@ -2004,7 +2004,7 @@ ProcessCallBackFunction (
     //
     if (Action == EFI_BROWSER_ACTION_CHANGING) {
       if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
-        BackUpBuffer = AllocateCopyPool(Statement->StorageWidth + sizeof(CHAR16), Statement->BufferValue);
+        BackUpBuffer = AllocateCopyPool(Statement->StorageWidth, Statement->BufferValue);
         ASSERT (BackUpBuffer != NULL);
       } else {
         CopyMem (&BackUpValue, &HiiValue->Value, sizeof (EFI_IFR_TYPE_VALUE));
@@ -2130,7 +2130,7 @@ ProcessCallBackFunction (
       //
       if (Action  == EFI_BROWSER_ACTION_CHANGING && Status == EFI_UNSUPPORTED) {
         if (HiiValue->Type == EFI_IFR_TYPE_BUFFER) {
-          CopyMem (Statement->BufferValue, BackUpBuffer, Statement->StorageWidth + sizeof(CHAR16));
+          CopyMem (Statement->BufferValue, BackUpBuffer, Statement->StorageWidth);
         } else {
           CopyMem (&HiiValue->Value, &BackUpValue, sizeof (EFI_IFR_TYPE_VALUE));
         }
