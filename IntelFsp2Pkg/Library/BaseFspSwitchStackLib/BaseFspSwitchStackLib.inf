@@ -34,9 +34,5 @@
   BaseLib
   IoLib
 
-[FixedPcd]
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPatchEntry      ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPerfEntry       ## CONSUMES
-
 
 
