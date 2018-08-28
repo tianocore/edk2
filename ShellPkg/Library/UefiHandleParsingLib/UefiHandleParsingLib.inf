@@ -353,5 +353,4 @@
   gEfiAdapterInfoUndiIpv6SupportGuid                      ## SOMETIMES_CONSUMES ## GUID
 
 [Pcd.common]
-  gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize      ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellIncludeNtGuids       ## CONSUMES
