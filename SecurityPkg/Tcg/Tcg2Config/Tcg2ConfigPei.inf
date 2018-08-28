@@ -67,7 +67,6 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                 ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy         ## PRODUCES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmAutoDetection                ## CONSUMES
-  gEfiSecurityPkgTokenSpaceGuid.PcdTpmBaseAddress                  ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiPeiMasterBootModePpiGuid AND
