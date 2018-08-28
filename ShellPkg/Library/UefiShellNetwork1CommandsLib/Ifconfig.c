@@ -1032,6 +1032,7 @@ IfConfigSetInterfaceInfo (
       SubnetMask  = NTOHL (SubnetMask);
       TempGateway = NTOHL (TempGateway);
       if ((SubnetMask != 0) &&
+          (SubnetMask != 0xFFFFFFFFu) && 
           !NetIp4IsUnicast (TempGateway, SubnetMask)) {
         ShellPrintHiiEx (-1, -1, NULL, STRING_TOKEN (STR_IFCONFIG_INVALID_GATEWAY), gShellNetwork1HiiHandle, VarArg->Arg);
         ShellStatus = SHELL_INVALID_PARAMETER;
