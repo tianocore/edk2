@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-import plugins.EdkPlugins.basemodel.ini as ini
+from ...basemodel import ini
 import re, os
-from plugins.EdkPlugins.basemodel.message import *
+from ...basemodel.message import *
 
 class INFFile(ini.BaseINIFile):
     _libobjs = {}

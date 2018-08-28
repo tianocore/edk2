@@ -10,12 +10,12 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-import plugins.EdkPlugins.basemodel.ini as ini
-import plugins.EdkPlugins.edk2.model.dsc as dsc
-import plugins.EdkPlugins.edk2.model.inf as inf
-import plugins.EdkPlugins.edk2.model.dec as dec
+from ...basemodel import ini as ini
+from ..model import dsc as dsc
+from ..model import inf as inf
+from ..model import dec as dec
 import os
-from plugins.EdkPlugins.basemodel.message import *
+from ...basemodel.message import *
 
 class SurfaceObject(object):
     _objs = {}
@@ -25,7 +25,7 @@ class SurfaceObject(object):
         @return: instance of this class
 
         """
-        obj = object.__new__(cls, *args, **kwargs)
+        obj = object.__new__(cls)
         if "None" not in cls._objs:
             cls._objs["None"] = []
         cls._objs["None"].append(obj)
@@ -846,7 +846,7 @@ class SurfaceItem(object):
                 ErrorMsg("%s item is duplicated defined in packages: %s and %s" %
                          (name, parent.GetFilename(), cls._objs[name].GetParent().GetFilename()))
                 return None
-            obj = object.__new__(cls, *args, **kwargs)
+            obj = object.__new__(cls)
             cls._objs[name] = obj
             return obj
         elif issubclass(parent.__class__, Module):

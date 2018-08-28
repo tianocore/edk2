@@ -18,8 +18,8 @@ import os, sys, wx, logging
 import wx.stc
 import wx.lib.newevent
 import wx.lib.agw.genericmessagedialog as GMD
-import plugins.EdkPlugins.edk2.model.baseobject as baseobject
-import plugins.EdkPlugins.edk2.model.doxygengen as doxygengen
+from plugins.EdkPlugins.edk2.model import baseobject
+from plugins.EdkPlugins.edk2.model import doxygengen
 
 if hasattr(sys, "frozen"):
     appPath = os.path.abspath(os.path.dirname(sys.executable))
@@ -42,7 +42,7 @@ class PackageDocApp(wx.App):
 
         frame.Show(True)
 
-        EVT_APP_CALLBACK( self, self.OnAppCallBack)
+        self.Bind(EVT_APP_CALLBACK, self.OnAppCallBack)
         return True
 
     def GetLogger(self):
@@ -60,13 +60,13 @@ class PackageDocApp(wx.App):
 
 class PackageDocMainFrame(wx.Frame):
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, -1, title, size=(550, 290), style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX )
+        wx.Frame.__init__(self, parent, -1, title, size=(550, 350), style=wx.MINIMIZE_BOX|wx.SYSTEM_MENU|wx.CAPTION|wx.CLOSE_BOX )
 
         panel = wx.Panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
 
         subsizer = wx.GridBagSizer(5, 10)
-        subsizer.AddGrowableCol(1)
+        subsizer.AddGrowableCol(0)
         subsizer.Add(wx.StaticText(panel, -1, "Workspace Location : "), (0, 0), flag=wx.ALIGN_CENTER_VERTICAL)
         self._workspacePathCtrl = wx.ComboBox(panel, -1)
         list = self.GetConfigure("WorkspacePath")
@@ -76,9 +76,9 @@ class PackageDocMainFrame(wx.Frame):
             self._workspacePathCtrl.SetValue(list[len(list) - 1])
 
         subsizer.Add(self._workspacePathCtrl, (0, 1), flag=wx.ALIGN_CENTER_VERTICAL|wx.EXPAND)
-        self._workspacePathBt = wx.BitmapButton(panel, -1, bitmap=wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
+        self._workspacePathBt = wx.BitmapButton(panel, -1, bitmap=wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN))
         subsizer.Add(self._workspacePathBt, (0, 2), flag=wx.ALIGN_CENTER_VERTICAL)
-        wx.EVT_BUTTON(self._workspacePathBt, self._workspacePathBt.GetId(), self.OnBrowsePath)
+        self.Bind(wx.EVT_BUTTON, self.OnBrowsePath, self._workspacePathBt)
 
         subsizer.Add(wx.StaticText(panel, -1, "Package DEC Location : "), (1, 0), flag=wx.ALIGN_CENTER_VERTICAL|wx.EXPAND)
         self._packagePathCtrl = wx.ComboBox(panel, -1)
@@ -88,9 +88,9 @@ class PackageDocMainFrame(wx.Frame):
                 self._packagePathCtrl.Append(item)
             self._packagePathCtrl.SetValue(list[len(list) - 1])
         subsizer.Add(self._packagePathCtrl, (1, 1), flag=wx.ALIGN_CENTER_VERTICAL|wx.EXPAND)
-        self._packagePathBt = wx.BitmapButton(panel, -1, bitmap=wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
+        self._packagePathBt = wx.BitmapButton(panel, -1, bitmap=wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN))
         subsizer.Add(self._packagePathBt, (1, 2), flag=wx.ALIGN_CENTER_VERTICAL)
-        wx.EVT_BUTTON(self._packagePathBt, self._packagePathBt.GetId(), self.OnBrowsePath)
+        self.Bind(wx.EVT_BUTTON, self.OnBrowsePath, self._packagePathBt)
 
         subsizer.Add(wx.StaticText(panel, -1, "Doxygen Tool Location : "), (2, 0), flag=wx.ALIGN_CENTER_VERTICAL)
         self._doxygenPathCtrl = wx.TextCtrl(panel, -1)
@@ -103,10 +103,10 @@ class PackageDocMainFrame(wx.Frame):
             else:
                 self._doxygenPathCtrl.SetValue('/usr/bin/doxygen')
 
-        self._doxygenPathBt = wx.BitmapButton(panel, -1, bitmap=wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
+        self._doxygenPathBt = wx.BitmapButton(panel, -1, bitmap=wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN))
         subsizer.Add(self._doxygenPathCtrl, (2, 1), flag=wx.ALIGN_CENTER_VERTICAL|wx.EXPAND)
         subsizer.Add(self._doxygenPathBt, (2, 2), flag=wx.ALIGN_CENTER_VERTICAL)
-        wx.EVT_BUTTON(self._doxygenPathBt, self._doxygenPathBt.GetId(), self.OnBrowsePath)
+        self.Bind(wx.EVT_BUTTON, self.OnBrowsePath, self._doxygenPathBt)
 
         subsizer.Add(wx.StaticText(panel, -1, "CHM Tool Location : "), (3, 0), flag=wx.ALIGN_CENTER_VERTICAL)
         self._chmPathCtrl = wx.TextCtrl(panel, -1)
@@ -116,10 +116,10 @@ class PackageDocMainFrame(wx.Frame):
         else:
             self._chmPathCtrl.SetValue('C:\\Program Files\\HTML Help Workshop\\hhc.exe')
 
-        self._chmPathBt = wx.BitmapButton(panel, -1, bitmap=wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
+        self._chmPathBt = wx.BitmapButton(panel, -1, bitmap=wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN))
         subsizer.Add(self._chmPathCtrl, (3, 1), flag=wx.ALIGN_CENTER_VERTICAL|wx.EXPAND)
         subsizer.Add(self._chmPathBt, (3, 2), flag=wx.ALIGN_CENTER_VERTICAL)
-        wx.EVT_BUTTON(self._chmPathBt, self._chmPathBt.GetId(), self.OnBrowsePath)
+        self.Bind(wx.EVT_BUTTON, self.OnBrowsePath, self._chmPathBt)
 
         subsizer.Add(wx.StaticText(panel, -1, "Output Location : "), (4, 0), flag=wx.ALIGN_CENTER_VERTICAL)
         self._outputPathCtrl = wx.ComboBox(panel, -1)
@@ -130,9 +130,9 @@ class PackageDocMainFrame(wx.Frame):
             self._outputPathCtrl.SetValue(list[len(list) - 1])
 
         subsizer.Add(self._outputPathCtrl, (4, 1), flag=wx.ALIGN_CENTER_VERTICAL|wx.EXPAND)
-        self._outputPathBt = wx.BitmapButton(panel, -1, bitmap=wx.ArtProvider_GetBitmap(wx.ART_FILE_OPEN))
+        self._outputPathBt = wx.BitmapButton(panel, -1, bitmap=wx.ArtProvider.GetBitmap(wx.ART_FILE_OPEN))
         subsizer.Add(self._outputPathBt, (4, 2), flag=wx.ALIGN_CENTER_VERTICAL|wx.EXPAND)
-        wx.EVT_BUTTON(self._outputPathBt, self._outputPathBt.GetId(), self.OnBrowsePath)
+        self.Bind(wx.EVT_BUTTON, self.OnBrowsePath, self._outputPathBt)
 
         subsizer.Add(wx.StaticText(panel, -1, "Architecture Specified : "), (5, 0), flag=wx.ALIGN_CENTER_VERTICAL)
         self._archCtrl = wx.ComboBox(panel, -1, value='ALL', choices=['ALL', 'IA32/MSFT', 'IA32/GNU', 'X64/INTEL', 'X64/GNU', 'IPF/MSFT', 'IPF/GNU', 'EBC/INTEL'],
@@ -164,7 +164,7 @@ class PackageDocMainFrame(wx.Frame):
     def SaveConfigure(self, name, value):
         if value ==None or len(value) == 0:
             return
-        config = wx.ConfigBase_Get()
+        config = wx.ConfigBase.Get()
         oldvalues = config.Read(name, '').split(';')
         if len(oldvalues) >= 10:
             oldvalues.remove(oldvalues[0])
@@ -177,7 +177,7 @@ class PackageDocMainFrame(wx.Frame):
         config.Write(name, ';'.join(oldvalues))
 
     def GetConfigure(self, name):
-        config = wx.ConfigBase_Get()
+        config = wx.ConfigBase.Get()
         values = config.Read(name, '').split(';')
         list = []
         for item in values:
@@ -416,10 +416,10 @@ class ProgressDialog(wx.Dialog):
         logging.getLogger('').addHandler(self._loghandle)
         logging.getLogger('app').addHandler(self._loghandle)
 
-        wx.EVT_BUTTON(self._closeBt, self._closeBt.GetId(), self.OnButtonClose)
-        wx.EVT_UPDATE_UI(self, self._closeBt.GetId(), self.OnUpdateCloseButton)
-        wx.EVT_BUTTON(self._gotoOuputBt, self._gotoOuputBt.GetId(), self.OnGotoOutput)
-        EVT_LOG(self, self.OnPostLog)
+        self.Bind(wx.EVT_BUTTON, self.OnButtonClose, self._closeBt)
+        self.Bind(wx.EVT_UPDATE_UI, self.OnUpdateCloseButton)
+        self.Bind(wx.EVT_BUTTON, self.OnGotoOutput, self._gotoOuputBt)
+        self.Bind(EVT_LOG, self.OnPostLog)
 
         self._process     = None
         self._pid         = None
@@ -720,7 +720,7 @@ class ProgressDialog(wx.Dialog):
             lines = f.readlines()
             f.close()
             bfound = False
-            for index in xrange(len(lines)):
+            for index in range(len(lines)):
                 if lines[index].find('<a class="el" href="files.html" target="basefrm">File List</a>') != -1:
                     lines[index] = "<!-- %s" % lines[index]
                     bfound = True
@@ -745,7 +745,7 @@ class ProgressDialog(wx.Dialog):
             lines = f.readlines()
             f.close()
             bfound = False
-            for index in xrange(len(lines)):
+            for index in range(len(lines)):
                 if not bfound:
                     if lines[index].find('<param name="Local" value="files.html">') != -1:
                         lines[index] = '<!-- %s' % lines[index]
@@ -969,7 +969,7 @@ class ProgressDialog(wx.Dialog):
             fd = open(path, 'r')
             text = fd.read()
             fd.close()
-        except Exception, e:
+        except Exception as e:
             self.LogMessage ("   <<<Fail to open file %s" % path)
             return
         text = text.replace ('.s.dox', '.s')
@@ -982,7 +982,7 @@ class ProgressDialog(wx.Dialog):
             fd = open(path, 'w')
             fd.write(text)
             fd.close()
-        except Exception, e:
+        except Exception as e:
             self.LogMessage ("    <<<Fail to fixup file %s" % path)
             return
         self.LogMessage('    >>> Finish to fixup .dox postfix for file %s \n' % path)
@@ -993,7 +993,7 @@ class ProgressDialog(wx.Dialog):
             fd = open(path, 'r')
             lines = fd.readlines()
             fd.close()
-        except Exception, e:
+        except Exception as e:
             self.LogMessage ("   <<<Fail to open file %s" % path)
             return
         for line in lines:
@@ -1004,7 +1004,7 @@ class ProgressDialog(wx.Dialog):
             fd = open(path, 'w')
             fd.write("".join(lines))
             fd.close()
-        except Exception, e:
+        except Exception as e:
             self.LogMessage ("    <<<Fail to fixup file %s" % path)
             return
         self.LogMessage('    >>> Finish to fixup .decdoxygen postfix for file %s \n' % path)

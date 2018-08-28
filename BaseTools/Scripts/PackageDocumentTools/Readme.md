@@ -1,6 +1,6 @@
 Prerequisite Tools:
-1. Install Python 2.7.3 from https://www.python.org/download/releases/2.7.3/
-2. Install wxPython 2.8.12.1 from https://sourceforge.net/projects/wxpython/files/wxPython/2.8.12.1/
+1. Install Python 3.6.6 from https://www.python.org/downloads/release/python-366/
+2. Install wxPython 4.0.3 from https://pypi.org/project/wxPython/#files
    generally the libraries will be installed at python's subfolder, for example in windows: c:\python27\Lib\site-packages\
 3. Install DoxyGen 1.8.6 from https://sourceforge.net/projects/doxygen/files/rel-1.8.6/
 4. (Windows only) Install Htmlhelp tool from https://msdn.microsoft.com/en-us/library/windows/desktop/ms669985(v=vs.85).aspx

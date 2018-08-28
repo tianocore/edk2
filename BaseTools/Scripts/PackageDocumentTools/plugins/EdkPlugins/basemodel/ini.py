@@ -11,7 +11,6 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-from __future__ import absolute_import
 from .message import *
 import re
 import os
@@ -25,7 +24,7 @@ class BaseINIFile(object):
         @return: instance of this class
 
         """
-        if len(args) == 0: return object.__new__(cls, *args, **kwargs)
+        if len(args) == 0: return object.__new__(cls)
         filename = args[0]
         parent   = None
         if len(args) > 1:
@@ -33,7 +32,7 @@ class BaseINIFile(object):
 
         key = os.path.normpath(filename)
         if key not in cls._objs.keys():
-            cls._objs[key] = object.__new__(cls, *args, **kwargs)
+            cls._objs[key] = object.__new__(cls)
 
         if parent is not None:
             cls._objs[key].AddParent(parent)
