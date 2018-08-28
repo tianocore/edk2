@@ -69,8 +69,5 @@
   gEfiHiiPackageListProtocolGuid                          ## CONSUMES
   gEfiShellDynamicCommandProtocolGuid                     ## PRODUCES
 
-[Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize   ## CONSUMES
-
 [DEPEX]
   TRUE

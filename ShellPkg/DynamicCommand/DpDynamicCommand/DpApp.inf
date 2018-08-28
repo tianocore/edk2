@@ -67,5 +67,3 @@
   gEfiLoadedImageDevicePathProtocolGuid                   ## SOMETIMES_CONSUMES
   gEfiHiiPackageListProtocolGuid                          ## CONSUMES
 
-[Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize   ## CONSUMES
