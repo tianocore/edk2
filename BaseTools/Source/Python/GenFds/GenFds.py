@@ -603,12 +603,23 @@ class GenFds :
     def GenerateGuidXRefFile(BuildDb, ArchList, FdfParserObj):
         GuidXRefFileName = os.path.join(GenFdsGlobalVariable.FvDir, "Guid.xref")
         GuidXRefFile = BytesIO('')
+        PkgGuidDict = {}
         GuidDict = {}
         ModuleList = []
         FileGuidList = []
         GuidPattern = gGuidPattern
         for Arch in ArchList:
             PlatformDataBase = BuildDb.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
+            PkgList = GenFdsGlobalVariable.WorkSpace.GetPackageList(GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag)
+            for P in PkgList:
+                PkgGuidDict.update(P.Guids)
+            for Name, Guid in PlatformDataBase.Pcds:
+                Pcd = PlatformDataBase.Pcds[Name, Guid]
+                if Pcd.Type in [TAB_PCDS_DYNAMIC_HII, TAB_PCDS_DYNAMIC_EX_HII]:
+                    for SkuId in Pcd.SkuInfoList:
+                        Sku = Pcd.SkuInfoList[SkuId]
+                        if Sku.VariableGuid and Sku.VariableGuid in PkgGuidDict.keys():
+                            GuidDict[Sku.VariableGuid] = PkgGuidDict[Sku.VariableGuid]
             for ModuleFile in PlatformDataBase.Modules:
                 Module = BuildDb.BuildObject[ModuleFile, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
                 if Module in ModuleList:
