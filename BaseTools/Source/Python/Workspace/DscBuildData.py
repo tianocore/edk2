@@ -1534,15 +1534,16 @@ class DscBuildData(PlatformBuildClassObject):
                 PcdValueDict[PcdCName, TokenSpaceGuid] = {SkuName:(PcdValue, DatumType, MaxDatumSize)}
 
         for ((PcdCName, TokenSpaceGuid), PcdSetting) in PcdValueDict.iteritems():
-            PcdValue = None
-            DatumType = None
-            MaxDatumSize = None
-            if TAB_COMMON in PcdSetting:
-                PcdValue, DatumType, MaxDatumSize = PcdSetting[TAB_COMMON]
-            if TAB_DEFAULT in PcdSetting:
-                PcdValue, DatumType, MaxDatumSize = PcdSetting[TAB_DEFAULT]
             if self.SkuIdMgr.SystemSkuId in PcdSetting:
                 PcdValue, DatumType, MaxDatumSize = PcdSetting[self.SkuIdMgr.SystemSkuId]
+            elif TAB_DEFAULT in PcdSetting:
+                PcdValue, DatumType, MaxDatumSize = PcdSetting[TAB_DEFAULT]
+            elif TAB_COMMON in PcdSetting:
+                PcdValue, DatumType, MaxDatumSize = PcdSetting[TAB_COMMON]
+            else:
+                PcdValue = None
+                DatumType = None
+                MaxDatumSize = None
 
             Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
                                                 PcdCName,
