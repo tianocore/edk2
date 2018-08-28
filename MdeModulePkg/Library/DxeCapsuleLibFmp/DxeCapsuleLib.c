@@ -39,7 +39,6 @@
 #include <Library/CapsuleLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/UefiLib.h>
-#include <Library/PcdLib.h>
 #include <Library/BmpSupportLib.h>
 
 #include <Protocol/GraphicsOutput.h>

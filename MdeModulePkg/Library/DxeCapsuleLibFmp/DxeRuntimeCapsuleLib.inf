@@ -56,17 +56,6 @@
   HobLib
   BmpSupportLib
 
-[Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleMax                               ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSystemRebootAfterCapsuleProcessFlag      ## CONSUMES
-
-  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeSubClassCapsule                ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeProcessCapsulesBegin    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeProcessCapsulesEnd      ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdatingFirmware        ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdateFirmwareSuccess   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeUpdateFirmwareFailed    ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdCapsuleStatusCodeResettingSystem         ## CONSUMES
 
 [Protocols]
   gEsrtManagementProtocolGuid                   ## CONSUMES
