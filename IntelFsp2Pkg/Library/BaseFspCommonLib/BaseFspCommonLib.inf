@@ -33,8 +33,3 @@
 [Pcd]
   gIntelFsp2PkgTokenSpaceGuid.PcdGlobalDataPointerAddress      ## CONSUMES
 
-[FixedPcd]
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPatchEntry              ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPerfEntry               ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase              ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize              ## CONSUMES
