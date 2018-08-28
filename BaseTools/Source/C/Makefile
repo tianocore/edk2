@@ -1,7 +1,7 @@
 ## @file
 # Windows makefile for C tools build.
 #
-# Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -16,7 +16,7 @@ HOST_ARCH = IA32
 
 LIBRARIES = Common
 APPLICATIONS = \
-  BootSectImage \
+  VfrCompile \
   BrotliCompress \
   EfiLdrImage \
   EfiRom \
@@ -32,7 +32,7 @@ APPLICATIONS = \
   Split \
   TianoCompress \
   VolInfo \
-  VfrCompile \
+  BootSectImage \
   DevicePath
 
 all: libs apps install
@@ -43,7 +43,7 @@ libs: $(LIBRARIES)
 	@echo # Build libraries
 	@echo ######################
 	@if not exist $(LIB_PATH) mkdir $(LIB_PATH)
-	@Makefiles\NmakeSubdirs.bat all $**
+	@$(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py all $**
 
 apps: $(APPLICATIONS)
 	@echo.
@@ -51,7 +51,7 @@ apps: $(APPLICATIONS)
 	@echo # Build executables
 	@echo ######################
 	@if not exist $(BIN_PATH) mkdir $(BIN_PATH)
-	@Makefiles\NmakeSubdirs.bat all $**
+	@$(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py all $**
 
 install: $(LIB_PATH) $(BIN_PATH)
 	@echo.
@@ -65,11 +65,11 @@ install: $(LIB_PATH) $(BIN_PATH)
 
 .PHONY: clean
 clean:
-  @Makefiles\NmakeSubdirs.bat clean $(LIBRARIES) $(APPLICATIONS)
+  @$(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py clean $(LIBRARIES) $(APPLICATIONS)
 
 .PHONY: cleanall
 cleanall:
-  @Makefiles\NmakeSubdirs.bat cleanall $(LIBRARIES) $(APPLICATIONS)
+  @$(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
 
 !INCLUDE Makefiles\ms.rule
 
