@@ -73,7 +73,6 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart   ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdExtFpdtBootRecordPadSize    ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId            ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId       ## CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision      ## CONSUMES
