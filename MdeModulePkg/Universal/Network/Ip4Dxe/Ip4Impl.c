@@ -1259,7 +1259,7 @@ EfiIp4Routes (
   // the gateway address must be a unicast on the connected network if not zero.
   //
   if ((Nexthop != IP4_ALLZERO_ADDRESS) &&
-      (!IP4_NET_EQUAL (Nexthop, IpIf->Ip, IpIf->SubnetMask) ||
+      ((IpIf->SubnetMask != IP4_ALLONE_ADDRESS && !IP4_NET_EQUAL (Nexthop, IpIf->Ip, IpIf->SubnetMask)) ||
         IP4_IS_BROADCAST (Ip4GetNetCast (Nexthop, IpIf)))) {
 
     Status = EFI_INVALID_PARAMETER;

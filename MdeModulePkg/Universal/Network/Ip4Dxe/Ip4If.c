@@ -138,6 +138,7 @@ Ip4CancelFrameArp (
   @param[in]  CallBack          Call back function to execute if transmission
                                 finished.
   @param[in]  Context           Opaque parameter to the call back.
+  @param[in]  IpSb              The pointer to the IP4 service binding instance.
 
   @retval   Token               The wrapped token if succeed
   @retval   NULL                The wrapped token if NULL
@@ -149,7 +150,8 @@ Ip4WrapLinkTxToken (
   IN IP4_PROTOCOL           *IpInstance     OPTIONAL,
   IN NET_BUF                *Packet,
   IN IP4_FRAME_CALLBACK     CallBack,
-  IN VOID                   *Context
+  IN VOID                   *Context,
+  IN IP4_SERVICE            *IpSb
   )
 {
   EFI_MANAGED_NETWORK_COMPLETION_TOKEN  *MnpToken;
@@ -170,6 +172,7 @@ Ip4WrapLinkTxToken (
 
   Token->Interface  = Interface;
   Token->IpInstance = IpInstance;
+  Token->IpSb       = IpSb;
   Token->CallBack   = CallBack;
   Token->Packet     = Packet;
   Token->Context    = Context;
@@ -792,9 +795,89 @@ Ip4FreeInterface (
   return EFI_SUCCESS;
 }
 
+/**
+  This function tries to send all the queued frames in ArpQue to the default gateway if 
+  the ARP resolve for direct destination address is failed when using /32 subnet mask.
+
+  @param[in]   ArpQue           The ARP queue of a failed request.
+  
+  @retval EFI_SUCCESS           All the queued frames have been send to the default route.
+  @retval Others                Failed to send the queued frames.
+  
+**/
+EFI_STATUS
+Ip4SendFrameToDefaultRoute (
+  IN  IP4_ARP_QUE               *ArpQue
+  )
+{
+  LIST_ENTRY                *Entry;
+  LIST_ENTRY                *Next;
+  IP4_ROUTE_CACHE_ENTRY     *RtCacheEntry;
+  IP4_LINK_TX_TOKEN         *Token;
+  IP4_ADDR                  Gateway;
+  EFI_STATUS                Status;
+  IP4_ROUTE_ENTRY           *DefaultRoute;
+  
+  //
+  // ARP resolve failed when using /32 subnet mask.
+  //
+  NET_LIST_FOR_EACH_SAFE (Entry, Next, &ArpQue->Frames) {
+    RemoveEntryList (Entry);
+    Token = NET_LIST_USER_STRUCT (Entry, IP4_LINK_TX_TOKEN, Link);
+    ASSERT (Token->Interface->SubnetMask == IP4_ALLONE_ADDRESS);
+    //
+    // Find the default gateway IP address. The default route was saved to the RtCacheEntry->Tag in Ip4Route().
+    //
+    RtCacheEntry = NULL;
+    if (Token->IpInstance != NULL) {
+      RtCacheEntry = Ip4FindRouteCache (Token->IpInstance->RouteTable, NTOHL (ArpQue->Ip), Token->Interface->Ip);
+    }
+    if (RtCacheEntry == NULL) {
+      RtCacheEntry = Ip4FindRouteCache (Token->IpSb->DefaultRouteTable, NTOHL (ArpQue->Ip), Token->Interface->Ip);
+    }
+    if (RtCacheEntry == NULL) {
+      Status= EFI_NO_MAPPING;
+      goto ON_ERROR;
+    }
+    DefaultRoute = (IP4_ROUTE_ENTRY*)RtCacheEntry->Tag;
+    if (DefaultRoute == NULL) {
+      Status= EFI_NO_MAPPING;
+      goto ON_ERROR;
+    }
+    //
+    // Try to send the frame to the default route.
+    //
+    Gateway = DefaultRoute->NextHop;
+    if (ArpQue->Ip == Gateway) {
+      //
+      // ARP resolve for the default route is failed, return error to caller. 
+      //
+      Status= EFI_NO_MAPPING;
+      goto ON_ERROR;
+    }
+    RtCacheEntry->NextHop = Gateway;
+    Status = Ip4SendFrame (Token->Interface,Token->IpInstance,Token->Packet,Gateway,Token->CallBack,Token->Context,Token->IpSb);
+    if (EFI_ERROR (Status)) {
+      Status= EFI_NO_MAPPING;
+      goto ON_ERROR;
+    }
+    Ip4FreeRouteCacheEntry (RtCacheEntry);
+  }
+
+  return EFI_SUCCESS;
+  
+ON_ERROR:
+  if (RtCacheEntry != NULL) {
+    Ip4FreeRouteCacheEntry (RtCacheEntry);
+  }
+  Token->CallBack (Token->IpInstance, Token->Packet, Status, 0, Token->Context);
+  Ip4FreeLinkTxToken (Token);
+  return Status;
+}
+
 
 /**
-  Callback function when ARP request are finished. It will cancelled
+  Callback function when ARP request are finished. It will cancel
   all the queued frame if the ARP requests failed. Or transmit them
   if the request succeed.
 
@@ -814,6 +897,7 @@ Ip4OnArpResolvedDpc (
   IP4_INTERFACE             *Interface;
   IP4_LINK_TX_TOKEN         *Token;
   EFI_STATUS                Status;
+  EFI_STATUS                IoStatus;
 
   ArpQue = (IP4_ARP_QUE *) Context;
   NET_CHECK_SIGNATURE (ArpQue, IP4_FRAME_ARP_SIGNATURE);
@@ -821,14 +905,23 @@ Ip4OnArpResolvedDpc (
   RemoveEntryList (&ArpQue->Link);
 
   //
-  // ARP resolve failed for some reason. Release all the frame
-  // and ARP queue itself. Ip4FreeArpQue will call the frame's
-  // owner back.
+  // ARP resolve failed for some reason. 
   //
   if (NET_MAC_EQUAL (&ArpQue->Mac, &mZeroMacAddress, ArpQue->Interface->HwaddrLen)) {
-    Ip4FreeArpQue (ArpQue, EFI_NO_MAPPING);
-
-    return ;
+    if (ArpQue->Interface->SubnetMask != IP4_ALLONE_ADDRESS) {
+      //
+      // Release all the frame and ARP queue itself. Ip4FreeArpQue will call the frame's
+      // owner back.
+      //
+      IoStatus = EFI_NO_MAPPING;
+    } else {
+      //
+      // ARP resolve failed when using 32bit subnet mask, try to send the packets to the
+      // default route.
+      //
+      IoStatus = Ip4SendFrameToDefaultRoute (ArpQue);
+    }
+    goto ON_EXIT;
   }
 
   //
@@ -836,6 +929,7 @@ Ip4OnArpResolvedDpc (
   // queue. It isn't necessary for us to cache the ARP binding because
   // we always check the ARP cache first before transmit.
   //
+  IoStatus = EFI_SUCCESS;
   Interface = ArpQue->Interface;
 
   NET_LIST_FOR_EACH_SAFE (Entry, Next, &ArpQue->Frames) {
@@ -863,7 +957,8 @@ Ip4OnArpResolvedDpc (
     }
   }
 
-  Ip4FreeArpQue (ArpQue, EFI_SUCCESS);
+ON_EXIT:
+  Ip4FreeArpQue (ArpQue, IoStatus);
 }
 
 /**
@@ -957,6 +1052,7 @@ Ip4OnFrameSent (
                                 to.
   @param[in]  CallBack          Function to call back when transmit finished.
   @param[in]  Context           Opaque parameter to the call back.
+  @param[in]  IpSb              The pointer to the IP4 service binding instance.
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to send the frame
   @retval EFI_NO_MAPPING        Can't resolve the MAC for the nexthop
@@ -971,7 +1067,8 @@ Ip4SendFrame (
   IN  NET_BUF               *Packet,
   IN  IP4_ADDR              NextHop,
   IN  IP4_FRAME_CALLBACK    CallBack,
-  IN  VOID                  *Context
+  IN  VOID                  *Context,
+  IN IP4_SERVICE            *IpSb
   )
 {
   IP4_LINK_TX_TOKEN         *Token;
@@ -982,7 +1079,7 @@ Ip4SendFrame (
 
   ASSERT (Interface->Configured);
 
-  Token = Ip4WrapLinkTxToken (Interface, IpInstance, Packet, CallBack, Context);
+  Token = Ip4WrapLinkTxToken (Interface, IpInstance, Packet, CallBack, Context, IpSb);
 
   if (Token == NULL) {
     return EFI_OUT_OF_RESOURCES;

@@ -309,15 +309,15 @@ Ip4Output (
     // Route the packet unless overrided, that is, GateWay isn't zero.
     //
     if (IpInstance == NULL) {
-      CacheEntry = Ip4Route (IpSb->DefaultRouteTable, Head->Dst, Head->Src);
+      CacheEntry = Ip4Route (IpSb->DefaultRouteTable, Head->Dst, Head->Src, IpIf->SubnetMask, TRUE);
     } else {
-      CacheEntry = Ip4Route (IpInstance->RouteTable, Head->Dst, Head->Src);
+      CacheEntry = Ip4Route (IpInstance->RouteTable, Head->Dst, Head->Src, IpIf->SubnetMask, FALSE);
       //
       // If failed to route the packet by using the instance's route table,
       // try to use the default route table.
       //
       if (CacheEntry == NULL) {
-        CacheEntry = Ip4Route (IpSb->DefaultRouteTable, Head->Dst, Head->Src);
+        CacheEntry = Ip4Route (IpSb->DefaultRouteTable, Head->Dst, Head->Src, IpIf->SubnetMask, TRUE);
       }
     }
 
@@ -386,7 +386,8 @@ Ip4Output (
                  Fragment,
                  GateWay,
                  Ip4SysPacketSent,
-                 Packet
+                 Packet,
+                 IpSb
                  );
 
       if (EFI_ERROR (Status)) {
@@ -429,7 +430,7 @@ Ip4Output (
   //    upper layer's packets.
   //
   Ip4PrependHead (Packet, Head, Option, OptLen);
-  Status = Ip4SendFrame (IpIf, IpInstance, Packet, GateWay, Callback, Context);
+  Status = Ip4SendFrame (IpIf, IpInstance, Packet, GateWay, Callback, Context, IpSb);
 
   if (EFI_ERROR (Status)) {
     goto ON_ERROR;

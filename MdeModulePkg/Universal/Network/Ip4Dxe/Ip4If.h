@@ -79,6 +79,7 @@ typedef struct {
   LIST_ENTRY                            Link;
 
   IP4_INTERFACE                         *Interface;
+  IP4_SERVICE                           *IpSb;
 
   IP4_PROTOCOL                          *IpInstance;
   IP4_FRAME_CALLBACK                    CallBack;
@@ -262,6 +263,7 @@ Ip4FreeInterface (
                                 to.
   @param[in]  CallBack          Function to call back when transmit finished.
   @param[in]  Context           Opaque parameter to the call back.
+  @param[in]  IpSb              The pointer to the IP4 service binding instance.
 
   @retval EFI_OUT_OF_RESOURCES  Failed to allocate resource to send the frame
   @retval EFI_NO_MAPPING        Can't resolve the MAC for the nexthop
@@ -276,7 +278,8 @@ Ip4SendFrame (
   IN  NET_BUF               *Packet,
   IN  IP4_ADDR              NextHop,
   IN  IP4_FRAME_CALLBACK    CallBack,
-  IN  VOID                  *Context
+  IN  VOID                  *Context,
+  IN IP4_SERVICE            *IpSb
   );
 
 /**

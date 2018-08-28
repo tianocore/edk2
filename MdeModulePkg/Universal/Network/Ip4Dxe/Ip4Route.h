@@ -194,6 +194,11 @@ Ip4FreeRouteCacheEntry (
   @param[in]  RtTable               The route table to search from
   @param[in]  Dest                  The destination address to search for
   @param[in]  Src                   The source address to search for
+  @param[in]  SubnetMask            The subnet mask of the Src address, this field is
+                                    used to check if the station is using /32 subnet.
+  @param[in]  AlwaysTryDestAddr     Always try to use the dest address as next hop even
+                                    though we can't find a matching route entry. This
+                                    field is only valid when using /32 subnet.
 
   @return NULL if failed to route packet, otherwise a route cache
           entry that can be used to route packet.
@@ -203,7 +208,9 @@ IP4_ROUTE_CACHE_ENTRY *
 Ip4Route (
   IN IP4_ROUTE_TABLE        *RtTable,
   IN IP4_ADDR               Dest,
-  IN IP4_ADDR               Src
+  IN IP4_ADDR               Src,
+  IN IP4_ADDR               SubnetMask,
+  IN BOOLEAN                AlwaysTryDestAddr
   );
 
 /**

@@ -509,8 +509,9 @@ Mtftp4Start (
     goto ON_ERROR;
   }
 
+  gBS->RestoreTPL(OldTpl);
+
   if (Token->Event != NULL) {
-    gBS->RestoreTPL (OldTpl);
     return EFI_SUCCESS;
   }
 
@@ -522,7 +523,6 @@ Mtftp4Start (
     This->Poll (This);
   }
 
-  gBS->RestoreTPL (OldTpl);
   return Token->Status;
 
 ON_ERROR:
@@ -682,7 +682,7 @@ EfiMtftp4Configure (
     }
 
     if ((Gateway != 0) &&
-        (!IP4_NET_EQUAL (Gateway, Ip, Netmask) || (Netmask != 0 && !NetIp4IsUnicast (Gateway, Netmask)))) {
+        ((Netmask != 0xFFFFFFFF && !IP4_NET_EQUAL (Gateway, Ip, Netmask)) || (Netmask != 0 && !NetIp4IsUnicast (Gateway, Netmask)))) {
 
       return EFI_INVALID_PARAMETER;
     }

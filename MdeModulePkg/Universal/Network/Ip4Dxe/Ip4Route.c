@@ -494,6 +494,11 @@ Ip4FindRouteEntry (
   @param[in]  RtTable               The route table to search from
   @param[in]  Dest                  The destination address to search for
   @param[in]  Src                   The source address to search for
+  @param[in]  SubnetMask            The subnet mask of the Src address, this field is
+                                    used to check if the station is using /32 subnet.
+  @param[in]  AlwaysTryDestAddr     Always try to use the dest address as next hop even
+                                    though we can't find a matching route entry. This
+                                    field is only valid when using /32 subnet.
 
   @return NULL if failed to route packet, otherwise a route cache
           entry that can be used to route packet.
@@ -503,7 +508,9 @@ IP4_ROUTE_CACHE_ENTRY *
 Ip4Route (
   IN IP4_ROUTE_TABLE        *RtTable,
   IN IP4_ADDR               Dest,
-  IN IP4_ADDR               Src
+  IN IP4_ADDR               Src,
+  IN IP4_ADDR               SubnetMask,
+  IN BOOLEAN                AlwaysTryDestAddr
   )
 {
   LIST_ENTRY                *Head;
@@ -535,7 +542,11 @@ Ip4Route (
   RtEntry = Ip4FindRouteEntry (RtTable, Dest);
 
   if (RtEntry == NULL) {
-    return NULL;
+    if (SubnetMask != IP4_ALLONE_ADDRESS) {
+      return NULL;
+    } else if (!AlwaysTryDestAddr) {
+      return NULL;
+    }
   }
 
   //
@@ -544,16 +555,23 @@ Ip4Route (
   // network. Otherwise, it is an indirect route, the packet will be
   // sent to the next hop router.
   //
-  if ((RtEntry->Flag & IP4_DIRECT_ROUTE) != 0) {
+  // When using /32 subnet mask, the packet will always be sent to the direct
+  // destination first, if we can't find a matching route cache.
+  //
+  if (SubnetMask == IP4_ALLONE_ADDRESS || ((RtEntry->Flag & IP4_DIRECT_ROUTE) != 0)) {
     NextHop = Dest;
   } else {
     NextHop = RtEntry->NextHop;
   }
 
-  Ip4FreeRouteEntry (RtEntry);
+  if (RtEntry != NULL) {
+    Ip4FreeRouteEntry (RtEntry);
+  }
 
   //
   // Create a route cache entry, and tag it as spawned from this route entry
+  // For /32 subnet mask, the default route in RtEntry will be used if failed
+  // to send the packet to driect destination address.
   //
   RtCacheEntry = Ip4CreateRouteCacheEntry (Dest, Src, NextHop, (UINTN) RtEntry);
 

@@ -55,7 +55,7 @@ typedef struct _IP4_SERVICE    IP4_SERVICE;
 /// Compose the fragment field to be used in the IP4 header.
 ///
 #define IP4_HEAD_FRAGMENT_FIELD(Df, Mf, Offset) \
-    ((UINT16)(((Df) ? 0x4000 : 0) | ((Mf) ? 0x2000 : 0) | (((Offset) >> 3) & 0x1fff)))
+    ((UINT16)(((Df) ? IP4_HEAD_DF_MASK : 0) | ((Mf) ? IP4_HEAD_MF_MASK : 0) | (((Offset) >> 3) & IP4_HEAD_OFFSET_MASK)))
 
 #define IP4_LAST_FRAGMENT(FragmentField)  \
           (((FragmentField) & IP4_HEAD_MF_MASK) == 0)
