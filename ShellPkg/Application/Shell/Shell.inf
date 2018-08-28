@@ -102,10 +102,8 @@
   gEfiShellPkgTokenSpaceGuid.PcdShellRequireHiiPlatform     ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellSupportFrameworkHii    ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellPageBreakDefault       ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize      ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellInsertModeDefault      ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellScreenLogCount         ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellMapNameLength          ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellPrintBufferSize        ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellForceConsole           ## CONSUMES
   gEfiShellPkgTokenSpaceGuid.PcdShellSupplier               ## CONSUMES
