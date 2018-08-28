@@ -52,17 +52,6 @@
   FspCommonLib
   FspSecPlatformLib
 
-[Pcd]
-  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress           ## UNDEFINED
-  gIntelFsp2PkgTokenSpaceGuid.PcdGlobalDataPointerAddress      ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase              ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize              ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspTemporaryRamSize           ## CONSUMES
-
-[FixedPcd]
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPatchEntry              ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPerfEntry               ## CONSUMES
-
 [Ppis]
   gEfiTemporaryRamSupportPpiGuid                              ## PRODUCES
 
