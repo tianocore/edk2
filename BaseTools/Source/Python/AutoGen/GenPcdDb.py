@@ -1184,6 +1184,12 @@ def CreatePcdDatabasePhaseSpecificAutoGen (Platform, DynamicPcdList, Phase):
                 # and calculate the VariableHeadStringIndex
 
                 VariableNameStructure = StringToArray(Sku.VariableName)
+
+                #  Make pointer of VaraibleName(HII PCD) 2 bytes aligned
+                VariableNameStructureBytes = VariableNameStructure.lstrip("{").rstrip("}").split(",")
+                if len(VariableNameStructureBytes) % 2:
+                    VariableNameStructure = "{%s,0x00}" % ",".join(VariableNameStructureBytes)
+
                 if VariableNameStructure not in Dict['STRING_TABLE_VALUE']:
                     Dict['STRING_TABLE_CNAME'].append(CName)
                     Dict['STRING_TABLE_GUID'].append(TokenSpaceGuid)
