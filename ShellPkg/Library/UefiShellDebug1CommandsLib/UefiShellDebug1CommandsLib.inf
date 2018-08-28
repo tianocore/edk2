@@ -119,8 +119,6 @@
 
 [Pcd]
   gEfiShellPkgTokenSpaceGuid.PcdShellProfileMask              ## CONSUMES
-  gEfiShellPkgTokenSpaceGuid.PcdShellFileOperationSize        ## CONSUMES
-  gEfiMdePkgTokenSpaceGuid.PcdMaximumUnicodeStringLength      ## CONSUMES
 
 [Protocols]
   gEfiPciRootBridgeIoProtocolGuid             ## SOMETIMES_CONSUMES
