@@ -559,13 +559,6 @@ Ip4Config2SetDefaultAddr (
     }
   }
 
-  Ip4AddRoute (
-    IpSb->DefaultRouteTable,
-    StationAddress,
-    SubnetMask,
-    IP4_ALLZERO_ADDRESS
-    );
-
   //
   // Add a route for the connected network.
   //
