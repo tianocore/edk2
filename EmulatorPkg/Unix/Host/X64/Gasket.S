@@ -1542,7 +1542,7 @@ ASM_GLOBAL ASM_PFX(GasketSnpTransmit)
 ASM_PFX(GasketSnpTransmit):
   pushq   %rbp            // stack frame is for the debugger
   movq    %rsp, %rbp
-	subq    $16, %rsp       // Allocate space for args on the stack
+  subq    $16, %rsp       // Allocate space for args on the stack
 
   pushq   %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
   pushq   %rdi
@@ -1557,7 +1557,7 @@ ASM_PFX(GasketSnpTransmit):
   movq    %rax,     (%rsp)
 
   call    ASM_PFX(EmuSnpTransmit)
-	addq    $16, %rsp
+  addq    $16, %rsp
 
   popq    %rdi          // restore state
   popq    %rsi
@@ -1570,7 +1570,7 @@ ASM_GLOBAL ASM_PFX(GasketSnpReceive)
 ASM_PFX(GasketSnpReceive):
   pushq   %rbp            // stack frame is for the debugger
   movq    %rsp, %rbp
-	subq    $16, %rsp       // Allocate space for args on the stack
+  subq    $16, %rsp       // Allocate space for args on the stack
 
   pushq   %rsi          // %rsi & %rdi are volatile in Unix and callee-save in EFI ABI
   pushq   %rdi
@@ -1585,7 +1585,7 @@ ASM_PFX(GasketSnpReceive):
   movq    %rax,     (%rsp)
 
   call    ASM_PFX(EmuSnpReceive)
-	addq    $16, %rsp
+  addq    $16, %rsp
 
   popq    %rdi          // restore state
   popq    %rsi

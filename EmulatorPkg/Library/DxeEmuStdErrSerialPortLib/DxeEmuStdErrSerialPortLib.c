@@ -69,7 +69,7 @@ SerialPortWrite (
   if (gEmuThunk == NULL) {
     return NumberOfBytes;
   }
-  
+
   return gEmuThunk->WriteStdErr (Buffer, NumberOfBytes);
 }
 

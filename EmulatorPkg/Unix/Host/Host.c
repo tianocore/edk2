@@ -1148,7 +1148,7 @@ GdbScriptAddImage (
 
   if (ImageContext->PdbPointer != NULL && !IsPdbFile (ImageContext->PdbPointer)) {
     FILE  *GdbTempFile;
-    if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {    
+    if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {
       GdbTempFile = fopen (gGdbWorkingFileName, "a");
       if (GdbTempFile != NULL) {
         long unsigned int SymbolsAddr = (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders);
@@ -1170,13 +1170,13 @@ GdbScriptAddImage (
       GdbTempFile = fopen (gGdbWorkingFileName, "w");
       if (GdbTempFile != NULL) {
         fprintf (
-          GdbTempFile, 
-          "add-symbol-file %s 0x%08lx\n", 
-          ImageContext->PdbPointer, 
+          GdbTempFile,
+          "add-symbol-file %s 0x%08lx\n",
+          ImageContext->PdbPointer,
           (long unsigned int)(ImageContext->ImageAddress + ImageContext->SizeOfHeaders)
           );
         fclose (GdbTempFile);
-  
+
         //
         // Target for gdb breakpoint in a script that uses gGdbWorkingFileName to set a breakpoint.
         // Hey what can you say scripting in gdb is not that great....
@@ -1225,7 +1225,7 @@ GdbScriptRemoveImage (
     return;
   }
 
-  if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {    
+  if (FeaturePcdGet (PcdEmulatorLazyLoadSymbols)) {
     //
     // Write the file we need for the gdb script
     //
@@ -1256,7 +1256,7 @@ GdbScriptRemoveImage (
       SecGdbScriptBreak (ImageContext->PdbPointer, strlen (ImageContext->PdbPointer) + 1, 0, 0);
     } else {
       ASSERT (FALSE);
-    }  
+    }
   }
 }
 

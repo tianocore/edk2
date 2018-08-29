@@ -1,7 +1,7 @@
 ## @file
 # Platform SMBIOS driver that fills in SMBIOS table entries.
 #
-# Copyright (c) 2012, Apple Inc. All rights reserved. 
+# Copyright (c) 2012, Apple Inc. All rights reserved.
 # Portions copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials

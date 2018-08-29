@@ -46,7 +46,7 @@ def EFI_GUID_TypeSummary (valobj,internal_dict):
         if i == 2:
             str +='-'
         str += "%02x" % data4_val.GetChildAtIndex(i).data.GetUnsignedInt8(SBError, 0)
-    
+
     return guid_dict.get (str.upper(), '')
 
 
@@ -119,7 +119,7 @@ def EFI_STATUS_TypeSummary (valobj,internal_dict):
 
 def EFI_TPL_TypeSummary (valobj,internal_dict):
   #
-  # Return TPL values 
+  # Return TPL values
   #
 
   if valobj.TypeIsPointerType():
@@ -146,10 +146,10 @@ def EFI_TPL_TypeSummary (valobj,internal_dict):
     Str = "TPL_HIGH_LEVEL"
   else:
     Str = "Invalid TPL"
-  
+
   return Str
 
- 
+
 def CHAR16_TypeSummary (valobj,internal_dict):
   #
   # Display EFI CHAR16 'unsigned short' as string
@@ -159,7 +159,7 @@ def CHAR16_TypeSummary (valobj,internal_dict):
   if valobj.TypeIsPointerType():
     if valobj.GetValueAsUnsigned () == 0:
       return "NULL"
-      
+
     # CHAR16 *   max string size 1024
     for i in range (1024):
       Char = valobj.GetPointeeData(i,1).GetUnsignedInt16(SBError, 0)
@@ -168,7 +168,7 @@ def CHAR16_TypeSummary (valobj,internal_dict):
       Str += unichr (Char)
     Str = 'L"' + Str + '"'
     return Str.encode ('utf-8', 'replace')
-  
+
   if valobj.num_children == 0:
     # CHAR16
     if chr (valobj.unsigned) in string.printable:
@@ -183,7 +183,7 @@ def CHAR16_TypeSummary (valobj,internal_dict):
       Str += unichr (Char)
     Str = 'L"' + Str + '"'
     return Str.encode ('utf-8', 'replace')
-  
+
   return Str
 
 def CHAR8_TypeSummary (valobj,internal_dict):
@@ -197,16 +197,16 @@ def CHAR8_TypeSummary (valobj,internal_dict):
   if valobj.TypeIsPointerType():
     if valobj.GetValueAsUnsigned () == 0:
       return "NULL"
-      
+
     # CHAR8 *   max string size 1024
     for i in range (1024):
       Char = valobj.GetPointeeData(i,1).GetUnsignedInt8(SBError, 0)
       if SBError.fail or Char == 0:
         break
       Str += unichr (Char)
-    Str = '"' + Str + '"'  
+    Str = '"' + Str + '"'
     return Str.encode ('utf-8', 'replace')
-  
+
   if valobj.num_children == 0:
     # CHAR8
     if chr (valobj.unsigned) in string.printable:
@@ -219,9 +219,9 @@ def CHAR8_TypeSummary (valobj,internal_dict):
       if Char == 0:
         break
       Str += unichr (Char)
-    Str = '"' + Str + '"'  
+    Str = '"' + Str + '"'
     return Str.encode ('utf-8', 'replace')
-  
+
   return Str
 
 device_path_dict = {
@@ -248,7 +248,7 @@ device_path_dict = {
   (0x03, 0x09): "INFINIBAND_DEVICE_PATH",
   (0x03, 0x0e): "UART_DEVICE_PATH",
   (0x03, 0x0a): "VENDOR_DEVICE_PATH",
-  (0x03, 0x13): "ISCSI_DEVICE_PATH", 
+  (0x03, 0x13): "ISCSI_DEVICE_PATH",
   (0x04, 0x01): "HARDDRIVE_DEVICE_PATH",
   (0x04, 0x02): "CDROM_DEVICE_PATH",
   (0x04, 0x03): "VENDOR_DEVICE_PATH",
@@ -276,11 +276,11 @@ def EFI_DEVICE_PATH_PROTOCOL_TypeSummary (valobj,internal_dict):
       TypeStr = device_path_dict[Type, SubType]
     else:
       TypeStr = ""
-    
+
     LenLow  = valobj.GetChildMemberWithName('Length').GetChildAtIndex(0).unsigned
     LenHigh = valobj.GetChildMemberWithName('Length').GetChildAtIndex(1).unsigned
     Len = LenLow + (LenHigh >> 8)
-    
+
     Address = long ("%d" % valobj.addr)
     if (Address == lldb.LLDB_INVALID_ADDRESS):
       # Need to reserach this, it seems to be the nested struct case
@@ -288,8 +288,8 @@ def EFI_DEVICE_PATH_PROTOCOL_TypeSummary (valobj,internal_dict):
     elif (Type & 0x7f == 0x7f):
       ExprStr = "End Device Path" if SubType == 0xff else "End This Instance"
     else:
-      ExprStr = "expr *(%s *)0x%08x" % (TypeStr, Address) 
-    
+      ExprStr = "expr *(%s *)0x%08x" % (TypeStr, Address)
+
     Str =  " {\n"
     Str += "   (UINT8) Type    = 0x%02x // %s\n" % (Type, "END" if (Type & 0x7f == 0x7f) else "")
     Str += "   (UINT8) SubType = 0x%02x // %s\n" % (SubType, ExprStr)
@@ -395,7 +395,7 @@ def LoadEmulatorEfiSymbols(frame, bp_loc , internal_dict):
     debugger = frame.thread.process.target.debugger
     if frame.FindVariable ("AddSymbolFlag").GetValueAsUnsigned() == 1:
         LoadAddress = frame.FindVariable ("LoadAddress").GetValueAsUnsigned()
-        
+
         debugger.HandleCommand ("target modules add  %s" % FileName)
         print "target modules load --slid 0x%x %s" % (LoadAddress, FileName)
         debugger.HandleCommand ("target modules load --slide 0x%x --file %s" % (LoadAddress, FileName))
@@ -464,7 +464,7 @@ def create_guid_options():
     return parser
 
 def efi_guid_command(debugger, command, result, dict):
-    # Use the Shell Lexer to properly parse up command options just like a 
+    # Use the Shell Lexer to properly parse up command options just like a
     # shell would
     command_args = shlex.split(command)
     parser = create_guid_options()
@@ -475,7 +475,7 @@ def efi_guid_command(debugger, command, result, dict):
               # caller forgot to quote the string"
               # mark arg[0] a string containing all args[n]
               args[0] = ' '.join(args)
-          GuidStr = ParseGuidString (args[0]) 
+          GuidStr = ParseGuidString (args[0])
           if GuidStr == "":
               # return Key of GuidNameDict for value args[0]
               GuidStr = [Key for Key, Value in guid_dict.iteritems() if Value == args[0]][0]
@@ -486,7 +486,7 @@ def efi_guid_command(debugger, command, result, dict):
         result.SetError ("option parsing failed")
         return
 
-    
+
     if len(args) >= 1:
         if GuidStr in guid_dict:
             print "%s = %s" % (guid_dict[GuidStr], GuidStr)
@@ -509,7 +509,7 @@ def __lldb_init_module (debugger, internal_dict):
     # This initializer is being run from LLDB in the embedded command interpreter
     # Make the options so we can generate the help text for the new LLDB
     # command line command prior to registering it with LLDB below
-    
+
     global guid_dict
 
     # Source Guid.xref file if we can find it

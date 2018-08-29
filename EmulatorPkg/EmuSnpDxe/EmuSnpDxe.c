@@ -42,7 +42,7 @@ EFI_SIMPLE_NETWORK_PROTOCOL gEmuSnpTemplate = {
   NULL                      // Mode
  };
 
-EFI_SIMPLE_NETWORK_MODE gEmuSnpModeTemplate = {                 
+EFI_SIMPLE_NETWORK_MODE gEmuSnpModeTemplate = {
   EfiSimpleNetworkStopped,      //  State
   NET_ETHER_ADDR_LEN,           //  HwAddressSize
   NET_ETHER_HEADER_SIZE,        //  MediaHeaderSize

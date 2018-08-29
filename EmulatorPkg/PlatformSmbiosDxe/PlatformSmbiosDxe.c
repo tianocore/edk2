@@ -66,10 +66,10 @@ CreatePlatformSmbiosMemoryRecords (
   while ((HobPtr.Raw = GetNextHob (EFI_HOB_TYPE_RESOURCE_DESCRIPTOR, HobPtr.Raw)) != NULL) {
     if (HobPtr.ResourceDescriptor->ResourceType == EFI_RESOURCE_SYSTEM_MEMORY) {
       gSmbiosType19Template.ExtendedStartingAddress = HobPtr.ResourceDescriptor->PhysicalStart;
-      gSmbiosType19Template.ExtendedEndingAddress = 
-        HobPtr.ResourceDescriptor->PhysicalStart + 
+      gSmbiosType19Template.ExtendedEndingAddress =
+        HobPtr.ResourceDescriptor->PhysicalStart +
         HobPtr.ResourceDescriptor->ResourceLength - 1;
-      
+
       SmbiosLibCreateEntry ((SMBIOS_STRUCTURE *)&gSmbiosType19Template, NULL);
     }
     HobPtr.Raw = GET_NEXT_HOB (HobPtr);
@@ -97,7 +97,7 @@ PlatfomrSmbiosDriverEntryPoint (
   EFI_SMBIOS_HANDLE           SmbiosHandle;
   SMBIOS_STRUCTURE_POINTER    Smbios;
 
-  // Phase 0 - Patch table to make SMBIOS 2.7 structures smaller to conform 
+  // Phase 0 - Patch table to make SMBIOS 2.7 structures smaller to conform
   //           to an early version of the specification.
 
   // Phase 1 - Initialize SMBIOS tables from template
@@ -112,18 +112,18 @@ PlatfomrSmbiosDriverEntryPoint (
     Smbios.Type0->BiosSize = (UINT8)DivU64x32 (FixedPcdGet64 (PcdEmuFirmwareFdSize), 64*1024) - 1;
 
     SmbiosLibUpdateUnicodeString (
-      SmbiosHandle, 
-      Smbios.Type0->BiosVersion, 
+      SmbiosHandle,
+      Smbios.Type0->BiosVersion,
       (CHAR16 *) PcdGetPtr (PcdFirmwareVersionString)
       );
     SmbiosLibUpdateUnicodeString (
-      SmbiosHandle, 
-      Smbios.Type0->BiosReleaseDate, 
+      SmbiosHandle,
+      Smbios.Type0->BiosReleaseDate,
       (CHAR16 *) PcdGetPtr (PcdFirmwareReleaseDateString)
       );
   }
 
-  // Phase 3 - Create tables from scratch 
+  // Phase 3 - Create tables from scratch
 
   // Create Type 13 record from EFI Variables
   // Do we need this record for EFI as the info is available from EFI varaibles
