@@ -1091,7 +1091,7 @@ class PlatformAutoGen(AutoGen):
             for Inf in self._AsBuildInfList:
                 InfClass = PathClass(NormPath(Inf), GlobalData.gWorkspace, self.Arch)
                 M = self.BuildDatabase[InfClass, self.Arch, self.BuildTarget, self.ToolChain]
-                if not M.IsSupportedArch:
+                if not M.IsBinaryModule:
                     continue
                 self._AsBuildModuleList.append(InfClass)
         # get library/modules for build
@@ -1346,7 +1346,7 @@ class PlatformAutoGen(AutoGen):
                 # If a module INF in FDF but not in current arch's DSC module list, it must be module (either binary or source)
                 # for different Arch. PCDs in source module for different Arch is already added before, so skip the source module here.
                 # For binary module, if in current arch, we need to list the PCDs into database.
-                if not M.IsSupportedArch:
+                if not M.IsBinaryModule:
                     continue
                 # Override the module PCD setting by platform setting
                 ModulePcdList = self.ApplyPcdSetting(M, M.Pcds)

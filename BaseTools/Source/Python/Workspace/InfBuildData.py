@@ -578,12 +578,7 @@ class InfBuildData(ModuleBuildClassObject):
             EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, ExtraData=ErrorInfo, File=self.MetaFile)
 
         return Binaries
-    ## Check whether it exists the binaries with current ARCH in AsBuild INF
-    def _IsSupportedArch(self):
-        if self._GetBinaries() and not self._GetSourceFiles():
-            return True
-        else:
-            return False
+
     ## Retrieve source files
     def _GetSourceFiles(self):
         # Ignore all source files in a binary build mode
@@ -1170,4 +1165,3 @@ class InfBuildData(ModuleBuildClassObject):
     Depex                   = property(_GetDepex)
     DepexExpression         = property(_GetDepexExpression)
     IsBinaryModule          = property(_IsBinaryModule)
-    IsSupportedArch         = property(_IsSupportedArch)
