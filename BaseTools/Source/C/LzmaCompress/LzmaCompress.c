@@ -1,9 +1,9 @@
 /** @file
   LZMA Compress/Decompress tool (LzmaCompress)
 
-  Based on LZMA SDK 16.04:
+  Based on LZMA SDK 18.05:
     LzmaUtil.c -- Test application for LZMA compression
-    2016-10-04 : Igor Pavlov : Public domain
+    2018-04-30 : Igor Pavlov : Public domain
 
   Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
@@ -341,14 +341,14 @@ int main2(int numArgs, const char *args[], char *rs)
     if (!mQuietMode) {
       printf("Encoding\n");
     }
-    res = Encode(&outStream.s, &inStream.s, fileSize);
+    res = Encode(&outStream.vt, &inStream.vt, fileSize);
   }
   else
   {
     if (!mQuietMode) {
       printf("Decoding\n");
     }
-    res = Decode(&outStream.s, &inStream.s, fileSize);
+    res = Decode(&outStream.vt, &inStream.vt, fileSize);
   }
 
   File_Close(&outStream.file);
