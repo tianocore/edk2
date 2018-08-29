@@ -36,7 +36,7 @@ typedef struct
 **/
 VOID *
 SzAlloc (
-  VOID *P,
+  CONST ISzAlloc *P,
   size_t Size
   )
 {
@@ -64,7 +64,7 @@ SzAlloc (
 **/
 VOID
 SzFree (
-  VOID *P,
+  CONST ISzAlloc *P,
   VOID *Address
   )
 {
