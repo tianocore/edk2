@@ -859,7 +859,7 @@ class DscBuildData(PlatformBuildClassObject):
 
         if (PcdCName, TokenSpaceGuid) not in self._DecPcds:
             EdkLogger.error('build', PARSER_ERROR,
-                            "Pcd (%s.%s) defined in DSC is not declared in DEC files. Arch: ['%s']" % (TokenSpaceGuid, PcdCName, self._Arch),
+                            "Pcd (%s.%s) defined in DSC is not declared in DEC files referenced in INF files in FDF. Arch: ['%s']" % (TokenSpaceGuid, PcdCName, self._Arch),
                             File=self.MetaFile, Line=LineNo)
         ValueList, IsValid, Index = AnalyzeDscPcd(Setting, PcdType, self._DecPcds[PcdCName, TokenSpaceGuid].DatumType)
         if not IsValid:
