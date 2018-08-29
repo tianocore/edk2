@@ -1358,7 +1358,7 @@ GetFvUsedSize (
 }
 
 /**
-  Get Fv image from the FV type file, then install FV INFO(2) ppi, Build FV hob.
+  Get Fv image(s) from the FV type file, then install FV INFO(2) ppi, Build FV(2, 3) hob.
 
   @param PrivateData          PeiCore's private data structure
   @param ParentFvCoreHandle   Pointer of EFI_CORE_FV_HANDLE to parent Fv image that contain this Fv image.
@@ -1391,6 +1391,7 @@ ProcessFvFile (
   UINT32                        AuthenticationStatus;
   UINT32                        FvUsedSize;
   UINT8                         EraseByte;
+  UINTN                         Index;
 
   //
   // Check if this EFI_FV_FILETYPE_FIRMWARE_VOLUME_IMAGE file has already
@@ -1412,144 +1413,164 @@ ProcessFvFile (
   ParentFvPpi    = ParentFvCoreHandle->FvPpi;
 
   //
-  // Find FvImage in FvFile
+  // Find FvImage(s) in FvFile
   //
-  AuthenticationStatus = 0;
-  if ((ParentFvPpi->Signature == EFI_PEI_FIRMWARE_VOLUME_PPI_SIGNATURE) &&
-      (ParentFvPpi->Revision == EFI_PEI_FIRMWARE_VOLUME_PPI_REVISION)) {
-    Status = ParentFvPpi->FindSectionByType2 (
-                            ParentFvPpi,
-                            EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
-                            0,
-                            ParentFvFileHandle,
-                            (VOID **)&FvHeader,
-                            &AuthenticationStatus
-                            );
+  Index = 0;
+  do {
+    AuthenticationStatus = 0;
+    if ((ParentFvPpi->Signature == EFI_PEI_FIRMWARE_VOLUME_PPI_SIGNATURE) &&
+        (ParentFvPpi->Revision == EFI_PEI_FIRMWARE_VOLUME_PPI_REVISION)) {
+      Status = ParentFvPpi->FindSectionByType2 (
+                              ParentFvPpi,
+                              EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
+                              Index,
+                              ParentFvFileHandle,
+                              (VOID **)&FvHeader,
+                              &AuthenticationStatus
+                              );
+    } else {
+      //
+      // Old FvPpi has no parameter to input SearchInstance,
+      // only one instance is supported.
+      //
+      if (Index > 0) {
+        break;
+      }
+      Status = ParentFvPpi->FindSectionByType (
+                              ParentFvPpi,
+                              EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
+                              ParentFvFileHandle,
+                              (VOID **)&FvHeader
+                              );
+    }
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    Status = VerifyPeim (PrivateData, ParentFvHandle, ParentFvFileHandle, AuthenticationStatus);
+    if (Status == EFI_SECURITY_VIOLATION) {
+      break;
+    }
+
+    //
+    // If EFI_FVB2_WEAK_ALIGNMENT is set in the volume header then the first byte of the volume
+    // can be aligned on any power-of-two boundary. A weakly aligned volume can not be moved from
+    // its initial linked location and maintain its alignment.
+    //
+    if ((ReadUnaligned32 (&FvHeader->Attributes) & EFI_FVB2_WEAK_ALIGNMENT) != EFI_FVB2_WEAK_ALIGNMENT) {
+      //
+      // FvAlignment must be greater than or equal to 8 bytes of the minimum FFS alignment value.
+      //
+      FvAlignment = 1 << ((ReadUnaligned32 (&FvHeader->Attributes) & EFI_FVB2_ALIGNMENT) >> 16);
+      if (FvAlignment < 8) {
+        FvAlignment = 8;
+      }
+
+      DEBUG ((
+        DEBUG_INFO,
+        "%a() FV at 0x%x, FvAlignment required is 0x%x\n",
+        __FUNCTION__,
+        FvHeader,
+        FvAlignment
+        ));
+
+      //
+      // Check FvImage alignment.
+      //
+      if ((UINTN) FvHeader % FvAlignment != 0) {
+        FvLength    = ReadUnaligned64 (&FvHeader->FvLength);
+        NewFvBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINT32) FvLength), FvAlignment);
+        if (NewFvBuffer == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+          break;
+        }
+        if (GetFvUsedSize (FvHeader, &FvUsedSize, &EraseByte)) {
+          //
+          // Copy the used bytes and fill the rest with the erase value.
+          //
+          CopyMem (NewFvBuffer, FvHeader, (UINTN) FvUsedSize);
+          SetMem (
+            (UINT8 *) NewFvBuffer + FvUsedSize,
+            (UINTN) (FvLength - FvUsedSize),
+            EraseByte
+            );
+        } else {
+          CopyMem (NewFvBuffer, FvHeader, (UINTN) FvLength);
+        }
+        FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) NewFvBuffer;
+      }
+    }
+
+    Status = ParentFvPpi->GetVolumeInfo (ParentFvPpi, ParentFvHandle, &ParentFvImageInfo);
+    ASSERT_EFI_ERROR (Status);
+
+    Status = ParentFvPpi->GetFileInfo (ParentFvPpi, ParentFvFileHandle, &FileInfo);
+    ASSERT_EFI_ERROR (Status);
+
+    //
+    // Install FvInfo(2) Ppi
+    // NOTE: FvInfo2 must be installed before FvInfo so that recursive processing of encapsulated
+    // FVs inherit the proper AuthenticationStatus.
+    //
+    PeiServicesInstallFvInfo2Ppi(
+      &FvHeader->FileSystemGuid,
+      (VOID**)FvHeader,
+      (UINT32)FvHeader->FvLength,
+      &ParentFvImageInfo.FvName,
+      &FileInfo.FileName,
+      AuthenticationStatus
+      );
+
+    PeiServicesInstallFvInfoPpi (
+      &FvHeader->FileSystemGuid,
+      (VOID**) FvHeader,
+      (UINT32) FvHeader->FvLength,
+      &ParentFvImageInfo.FvName,
+      &FileInfo.FileName
+      );
+
+    //
+    // Inform the extracted FvImage to Fv HOB consumer phase, i.e. DXE phase
+    //
+    BuildFvHob (
+      (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
+      FvHeader->FvLength
+      );
+
+    //
+    // Makes the encapsulated volume show up in DXE phase to skip processing of
+    // encapsulated file again.
+    //
+    BuildFv2Hob (
+      (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
+      FvHeader->FvLength,
+      &ParentFvImageInfo.FvName,
+      &FileInfo.FileName
+      );
+
+    //
+    // Build FV3 HOB with authentication status to be propagated to DXE.
+    //
+    BuildFv3Hob (
+      (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
+      FvHeader->FvLength,
+      AuthenticationStatus,
+      TRUE,
+      &ParentFvImageInfo.FvName,
+      &FileInfo.FileName
+      );
+
+    Index++;
+  } while (TRUE);
+
+  if (Index > 0) {
+    //
+    // At least one FvImage has been processed successfully.
+    //
+    return EFI_SUCCESS;
   } else {
-    Status = ParentFvPpi->FindSectionByType (
-                            ParentFvPpi,
-                            EFI_SECTION_FIRMWARE_VOLUME_IMAGE,
-                            ParentFvFileHandle,
-                            (VOID **)&FvHeader
-                            );
-  }
-  if (EFI_ERROR (Status)) {
     return Status;
   }
-
-  Status = VerifyPeim (PrivateData, ParentFvHandle, ParentFvFileHandle, AuthenticationStatus);
-  if (Status == EFI_SECURITY_VIOLATION) {
-    return Status;
-  }
-
-  //
-  // If EFI_FVB2_WEAK_ALIGNMENT is set in the volume header then the first byte of the volume
-  // can be aligned on any power-of-two boundary. A weakly aligned volume can not be moved from
-  // its initial linked location and maintain its alignment.
-  //
-  if ((ReadUnaligned32 (&FvHeader->Attributes) & EFI_FVB2_WEAK_ALIGNMENT) != EFI_FVB2_WEAK_ALIGNMENT) {
-    //
-    // FvAlignment must be greater than or equal to 8 bytes of the minimum FFS alignment value.
-    //
-    FvAlignment = 1 << ((ReadUnaligned32 (&FvHeader->Attributes) & EFI_FVB2_ALIGNMENT) >> 16);
-    if (FvAlignment < 8) {
-      FvAlignment = 8;
-    }
-
-    DEBUG ((
-      DEBUG_INFO,
-      "%a() FV at 0x%x, FvAlignment required is 0x%x\n",
-      __FUNCTION__,
-      FvHeader,
-      FvAlignment
-      ));
-
-    //
-    // Check FvImage alignment.
-    //
-    if ((UINTN) FvHeader % FvAlignment != 0) {
-      FvLength    = ReadUnaligned64 (&FvHeader->FvLength);
-      NewFvBuffer = AllocateAlignedPages (EFI_SIZE_TO_PAGES ((UINT32) FvLength), FvAlignment);
-      if (NewFvBuffer == NULL) {
-        return EFI_OUT_OF_RESOURCES;
-      }
-      if (GetFvUsedSize (FvHeader, &FvUsedSize, &EraseByte)) {
-        //
-        // Copy the used bytes and fill the rest with the erase value.
-        //
-        CopyMem (NewFvBuffer, FvHeader, (UINTN) FvUsedSize);
-        SetMem (
-          (UINT8 *) NewFvBuffer + FvUsedSize,
-          (UINTN) (FvLength - FvUsedSize),
-          EraseByte
-          );
-      } else {
-        CopyMem (NewFvBuffer, FvHeader, (UINTN) FvLength);
-      }
-      FvHeader = (EFI_FIRMWARE_VOLUME_HEADER*) NewFvBuffer;
-    }
-  }
-
-  Status = ParentFvPpi->GetVolumeInfo (ParentFvPpi, ParentFvHandle, &ParentFvImageInfo);
-  ASSERT_EFI_ERROR (Status);
-
-  Status = ParentFvPpi->GetFileInfo (ParentFvPpi, ParentFvFileHandle, &FileInfo);
-  ASSERT_EFI_ERROR (Status);
-
-  //
-  // Install FvInfo(2) Ppi
-  // NOTE: FvInfo2 must be installed before FvInfo so that recursive processing of encapsulated
-  // FVs inherit the proper AuthenticationStatus.
-  //
-  PeiServicesInstallFvInfo2Ppi(
-    &FvHeader->FileSystemGuid,
-    (VOID**)FvHeader,
-    (UINT32)FvHeader->FvLength,
-    &ParentFvImageInfo.FvName,
-    &FileInfo.FileName,
-    AuthenticationStatus
-    );
-
-  PeiServicesInstallFvInfoPpi (
-    &FvHeader->FileSystemGuid,
-    (VOID**) FvHeader,
-    (UINT32) FvHeader->FvLength,
-    &ParentFvImageInfo.FvName,
-    &FileInfo.FileName
-    );
-
-  //
-  // Inform the extracted FvImage to Fv HOB consumer phase, i.e. DXE phase
-  //
-  BuildFvHob (
-    (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
-    FvHeader->FvLength
-    );
-
-  //
-  // Makes the encapsulated volume show up in DXE phase to skip processing of
-  // encapsulated file again.
-  //
-  BuildFv2Hob (
-    (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
-    FvHeader->FvLength,
-    &ParentFvImageInfo.FvName,
-    &FileInfo.FileName
-    );
-
-  //
-  // Build FV3 HOB with authentication status to be propagated to DXE.
-  //
-  BuildFv3Hob (
-    (EFI_PHYSICAL_ADDRESS) (UINTN) FvHeader,
-    FvHeader->FvLength,
-    AuthenticationStatus,
-    TRUE,
-    &ParentFvImageInfo.FvName,
-    &FileInfo.FileName
-    );
-
-  return EFI_SUCCESS;
 }
 
 /**

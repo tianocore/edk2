@@ -1258,7 +1258,7 @@ SecurityPpiNotifyCallback (
   );
 
 /**
-  Get Fv image from the FV type file, then install FV INFO(2) ppi, Build FV hob.
+  Get Fv image(s) from the FV type file, then install FV INFO(2) ppi, Build FV(2, 3) hob.
 
   @param PrivateData          PeiCore's private data structure
   @param ParentFvCoreHandle   Pointer of EFI_CORE_FV_HANDLE to parent Fv image that contain this Fv image.
