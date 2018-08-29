@@ -1,11 +1,11 @@
 ## @file
 #  LzmaArchCustomDecompressLib produces LZMA custom decompression algorithm with the converter for the different arch code.
 #
-#  It is based on the LZMA SDK 16.04
-#  LZMA SDK 16.04 was placed in the public domain on 2016-10-04.
+#  It is based on the LZMA SDK 18.05
+#  LZMA SDK 18.05 was placed in the public domain on 2018-04-30.
 #  It was released on the http://www.7-zip.org/sdk.html website.
 #
-#  Copyright (c) 2012 - 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
