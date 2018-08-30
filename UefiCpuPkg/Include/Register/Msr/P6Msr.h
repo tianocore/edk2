@@ -1153,54 +1153,6 @@ typedef union {
 **/
 #define MSR_P6_LASTINTTOIP                       0x000001DE
 
-
-/**
-
-
-  @param  ECX  MSR_P6_ROB_CR_BKUPTMPDR6 (0x000001E0)
-  @param  EAX  Lower 32-bits of MSR value.
-               Described by the type MSR_P6_ROB_CR_BKUPTMPDR6_REGISTER.
-  @param  EDX  Upper 32-bits of MSR value.
-               Described by the type MSR_P6_ROB_CR_BKUPTMPDR6_REGISTER.
-
-  <b>Example usage</b>
-  @code
-  MSR_P6_ROB_CR_BKUPTMPDR6_REGISTER  Msr;
-
-  Msr.Uint64 = AsmReadMsr64 (MSR_P6_ROB_CR_BKUPTMPDR6);
-  AsmWriteMsr64 (MSR_P6_ROB_CR_BKUPTMPDR6, Msr.Uint64);
-  @endcode
-  @note MSR_P6_ROB_CR_BKUPTMPDR6 is defined as ROB_CR_BKUPTMPDR6 in SDM.
-**/
-#define MSR_P6_ROB_CR_BKUPTMPDR6                 0x000001E0
-
-/**
-  MSR information returned for MSR index #MSR_P6_ROB_CR_BKUPTMPDR6
-**/
-typedef union {
-  ///
-  /// Individual bit fields
-  ///
-  struct {
-    UINT32  Reserved1:2;
-    ///
-    /// [Bit 2] Fast Strings Enable bit. Default is enabled.
-    ///
-    UINT32  FastStrings:1;
-    UINT32  Reserved2:29;
-    UINT32  Reserved3:32;
-  } Bits;
-  ///
-  /// All bit fields as a 32-bit value
-  ///
-  UINT32  Uint32;
-  ///
-  /// All bit fields as a 64-bit value
-  ///
-  UINT64  Uint64;
-} MSR_P6_ROB_CR_BKUPTMPDR6_REGISTER;
-
-
 /**
 
 
