@@ -1,7 +1,7 @@
 ## @file
 # This is Emulator FDF file with UEFI HII features enabled
 #
-# Copyright (c) 2008 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # Portions copyright (c) 2009 - 2011, Apple Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials
@@ -183,9 +183,12 @@ INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
 INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
 INF  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
-INF  IntelFrameworkModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+INF  MdeModulePkg/Logo/LogoDxe.inf
+INF  MdeModulePkg/Universal/LoadFileOnFv2/LoadFileOnFv2.inf
+INF  RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
+INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 INF  MdeModulePkg/Universal/DriverSampleDxe/DriverSampleDxe.inf
-INF  MdeModulePkg/Application/HelloWorld/HelloWorld.inf
 
 #
 # Network stack drivers
@@ -211,11 +214,6 @@ INF  ShellPkg/Application/Shell/Shell.inf
 !else
 INF  RuleOverride = BINARY EdkShellBinPkg/FullShell/FullShell.inf
 !endif
-
-FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
-  SECTION RAW = MdeModulePkg/Logo/Logo.bmp
-}
-
 
 [Rule.Common.SEC]
   FILE SEC = $(NAMED_GUID)  {
@@ -294,6 +292,13 @@ FILE FREEFORM = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile) {
         VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
       }
     }
+  }
+
+[Rule.Common.UEFI_APPLICATION.UI]
+  FILE APPLICATION = $(NAMED_GUID) {
+    PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI        STRING="Enter Setup"
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
 [Rule.Common.UEFI_DRIVER.BINARY]

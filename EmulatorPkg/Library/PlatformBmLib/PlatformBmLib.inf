@@ -1,5 +1,5 @@
 ## @file
-# Platfrom BDS driver
+# Platfrom Boot Manager library
 #
 # Do platform action customized by IBV/OEM.
 # Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -17,29 +17,29 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = EmuBdsLib
-  FILE_GUID                      =  59569181-CBF8-2E44-9C3E-C2AB2F5608E1
+  BASE_NAME                      = PlatformBmLib
+  FILE_GUID                      = 59569181-CBF8-2E44-9C3E-C2AB2F5608E1
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PlatformBdsLib|DXE_DRIVER
+  LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
 
 
 #
 # The following information is for reference only and not required by the build tools.
 #
-#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#  VALID_ARCHITECTURES           = IA32 X64
 #
 
 [Sources]
-  BdsPlatform.c
-  PlatformData.c
-  BdsPlatform.h
+  PlatformBm.c
+  PlatformBm.h
+  PlatformBmData.c
+  PlatformBmMemoryTest.c
 
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   EmulatorPkg/EmulatorPkg.dec
-  IntelFrameworkModulePkg/IntelFrameworkModulePkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -49,19 +49,25 @@
   BaseMemoryLib
   DebugLib
   PcdLib
-  GenericBdsLib
+  UefiBootManagerLib
   DevicePathLib
   UefiLib
+  BootLogoLib
+  HobLib
+  HiiLib
 
 [Guids]
   gEmuSystemConfigGuid
   gEfiEndOfDxeEventGroupGuid
 
+[Protocols]
+  gEfiGenericMemTestProtocolGuid
+
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdLogoFile
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand
 
 [Depex]
   gEfiVariableArchProtocolGuid AND gEfiVariableWriteArchProtocolGuid

@@ -12,8 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#ifndef _BDS_PLATFORM_H
-#define _BDS_PLATFORM_H
+#ifndef _PLATFORM_BM_H
+#define _PLATFORM_BM_H
 
 #include <PiDxe.h>
 
@@ -22,6 +22,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Protocol/EmuThunk.h>
 #include <Protocol/EmuIoThunk.h>
 #include <Protocol/EmuGraphicsWindow.h>
+#include <Protocol/GenericMemoryTest.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/FirmwareVolume2.h>
 
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -30,15 +33,24 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/BaseLib.h>
 #include <Library/PcdLib.h>
-#include <Library/GenericBdsLib.h>
-#include <Library/PlatformBdsLib.h>
+#include <Library/UefiBootManagerLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/UefiLib.h>
+#include <Library/BootLogoLib.h>
+#include <Library/HobLib.h>
+#include <Library/HiiLib.h>
 
+#define CONSOLE_OUT 0x00000001
+#define STD_ERROR   0x00000002
+#define CONSOLE_IN  0x00000004
+#define CONSOLE_ALL (CONSOLE_OUT | CONSOLE_IN | STD_ERROR)
+
+typedef struct {
+  EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
+  UINTN                     ConnectType;
+} BDS_CONSOLE_CONNECT_ENTRY;
 
 extern BDS_CONSOLE_CONNECT_ENTRY  gPlatformConsole[];
-extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformConnectSequence[];
-extern EFI_DEVICE_PATH_PROTOCOL   *gPlatformDriverOption[];
 
 #define gEndEntire \
   { \
@@ -61,14 +73,20 @@ typedef struct {
 //
 // Platform BDS Functions
 //
-VOID
-PlatformBdsGetDriverOption (
-  IN LIST_ENTRY               *BdsDriverLists
-  );
 
+/**
+  Perform the memory test base on the memory test intensive level,
+  and update the memory resource.
+
+  @param  Level         The memory test intensive level.
+
+  @retval EFI_STATUS    Success test all the system memory and update
+                        the memory resource
+
+**/
 EFI_STATUS
-BdsMemoryTest (
-  EXTENDMEM_COVERAGE_LEVEL Level
+PlatformBootManagerMemoryTest (
+  IN EXTENDMEM_COVERAGE_LEVEL Level
   );
 
 
@@ -77,25 +95,4 @@ PlatformBdsConnectSequence (
   VOID
   );
 
-EFI_STATUS
-ProcessCapsules (
-  EFI_BOOT_MODE BootMode
-  );
-
-EFI_STATUS
-PlatformBdsConnectConsole (
-  IN BDS_CONSOLE_CONNECT_ENTRY   *PlatformConsole
-  );
-
-EFI_STATUS
-PlatformBdsNoConsoleAction (
-  VOID
-  );
-
-VOID
-PlatformBdsEnterFrontPage (
-  IN UINT16                 TimeoutDefault,
-  IN BOOLEAN                ConnectAllHappened
-  );
-
-#endif // _BDS_PLATFORM_H
+#endif // _PLATFORM_BM_H
