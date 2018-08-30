@@ -5908,6 +5908,51 @@ typedef union {
   UINT64  Uint64;
 } MSR_IA32_L3_QOS_CFG_REGISTER;
 
+/**
+  L2 QOS Configuration (R/W). If ( CPUID.(EAX=10H, ECX=2):ECX.[2] = 1 ).
+
+  @param  ECX  MSR_IA32_L2_QOS_CFG (0x00000C82)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_IA32_L2_QOS_CFG_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_IA32_L2_QOS_CFG_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_IA32_L2_QOS_CFG_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_IA32_L2_QOS_CFG);
+  AsmWriteMsr64 (MSR_IA32_L2_QOS_CFG, Msr.Uint64);
+  @endcode
+  @note MSR_IA32_L2_QOS_CFG is defined as IA32_L2_QOS_CFG in SDM.
+**/
+#define MSR_IA32_L2_QOS_CFG                      0x00000C82
+
+/**
+  MSR information returned for MSR index #MSR_IA32_L2_QOS_CFG
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bit 0] Enable (R/W) Set 1 to enable L2 CAT masks and COS to operate
+    /// in Code and Data Prioritization (CDP) mode.
+    ///
+    UINT32  Enable:1;
+    UINT32  Reserved1:31;
+    UINT32  Reserved2:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_IA32_L2_QOS_CFG_REGISTER;
 
 /**
   Monitoring Event Select Register (R/W). If ( CPUID.(EAX=07H, ECX=0):EBX.[12]
@@ -6380,6 +6425,25 @@ typedef union {
 **/
 #define MSR_IA32_LSTAR                           0xC0000082
 
+/**
+  IA-32e Mode System Call Target Address (R/W) Not used, as the SYSCALL
+  instruction is not recognized in compatibility mode. If
+  CPUID.80000001:EDX.[29] = 1.
+
+  @param  ECX  MSR_IA32_CSTAR (0xC0000083)
+  @param  EAX  Lower 32-bits of MSR value.
+  @param  EDX  Upper 32-bits of MSR value.
+
+  <b>Example usage</b>
+  @code
+  UINT64  Msr;
+
+  Msr = AsmReadMsr64 (MSR_IA32_CSTAR);
+  AsmWriteMsr64 (MSR_IA32_CSTAR, Msr);
+  @endcode
+  @note MSR_IA32_CSTAR is defined as IA32_CSTAR in SDM.
+**/
+#define MSR_IA32_CSTAR                           0xC0000083
 
 /**
   System Call Flag Mask (R/W). If CPUID.80000001:EDX.[29] = 1.
