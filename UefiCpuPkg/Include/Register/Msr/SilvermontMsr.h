@@ -376,6 +376,54 @@ typedef union {
 
 
 /**
+  Package. Platform Information: Contains power management and other model
+  specific features enumeration. See http://biosbits.org.
+
+  @param  ECX  MSR_SILVERMONT_PLATFORM_INFO (0x000000CE)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_SILVERMONT_PLATFORM_INFO_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_SILVERMONT_PLATFORM_INFO_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_SILVERMONT_PLATFORM_INFO_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_SILVERMONT_PLATFORM_INFO);
+  AsmWriteMsr64 (MSR_SILVERMONT_PLATFORM_INFO, Msr.Uint64);
+  @endcode
+**/
+#define MSR_SILVERMONT_PLATFORM_INFO             0x000000CE
+
+/**
+  MSR information returned for MSR index #MSR_SILVERMONT_PLATFORM_INFO
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    UINT32  Reserved1:8;
+    ///
+    /// [Bits 15:8] Package. Maximum Non-Turbo Ratio (R/O) This is the ratio
+    /// of the maximum frequency that does not require turbo. Frequency =
+    /// ratio * Scalable Bus Frequency.
+    ///
+    UINT32  MaximumNon_TurboRatio:8;
+    UINT32  Reserved2:16;
+    UINT32  Reserved3:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_SILVERMONT_PLATFORM_INFO_REGISTER;
+
+/**
   Module. C-State Configuration Control (R/W)  Note: C-state values are
   processor specific C-state code names, unrelated to MWAIT extension C-state
   parameters or ACPI CStates. See http://biosbits.org.
