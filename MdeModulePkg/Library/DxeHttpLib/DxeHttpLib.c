@@ -1597,6 +1597,18 @@ HttpGetFieldNameAndValue (
 
   //
   // Each header field consists of a name followed by a colon (":") and the field value.
+  // The field value MAY be preceded by any amount of LWS, though a single SP is preferred.
+  //
+  // message-header = field-name ":" [ field-value ]
+  // field-name = token
+  // field-value = *( field-content | LWS )
+  //
+  // Note: "*(element)" allows any number element, including zero; "1*(element)" requires at least one element.
+  //       [element] means element is optional.
+  //       LWS  = [CRLF] 1*(SP|HT), it can be ' ' or '\t' or '\r\n ' or '\r\n\t'.
+  //       CRLF = '\r\n'.
+  //       SP   = ' '.
+  //       HT   = '\t' (Tab).
   //
   FieldNameStr = String;
   FieldValueStr = AsciiStrGetNextToken (FieldNameStr, ':');
@@ -1605,16 +1617,12 @@ HttpGetFieldNameAndValue (
   }
 
   //
-  // Replace ':' with 0
+  // Replace ':' with 0, then FieldName has been retrived from String.
   //
   *(FieldValueStr - 1) = 0;
 
   //
-  // The field value MAY be preceded by any amount of LWS, though a single SP is preferred.
-  // Note: LWS  = [CRLF] 1*(SP|HT), it can be '\r\n ' or '\r\n\t' or ' ' or '\t'.
-  //       CRLF = '\r\n'.
-  //       SP   = ' '.
-  //       HT   = '\t' (Tab).
+  // Handle FieldValueStr, skip all the preceded LWS.
   //
   while (TRUE) {
     if (*FieldValueStr == ' ' || *FieldValueStr == '\t') {
@@ -1622,6 +1630,9 @@ HttpGetFieldNameAndValue (
       // Boundary condition check.
       //
       if ((UINTN) EndofHeader - (UINTN) FieldValueStr < 1) {
+        //
+        // Wrong String format!
+        //
         return NULL;
       }
 
@@ -1631,25 +1642,45 @@ HttpGetFieldNameAndValue (
       // Boundary condition check.
       //
       if ((UINTN) EndofHeader - (UINTN) FieldValueStr < 3) {
-        return NULL;
+        //
+        // No more preceded LWS, so break here.
+        //
+        break;
       }
 
-      if (*(FieldValueStr + 1) == '\n' && (*(FieldValueStr + 2) == ' ' || *(FieldValueStr + 2) == '\t')) {
-        FieldValueStr = FieldValueStr + 3;
+      if (*(FieldValueStr + 1) == '\n' ) {
+        if (*(FieldValueStr + 2) == ' ' || *(FieldValueStr + 2) == '\t') {
+          FieldValueStr = FieldValueStr + 3;
+        } else {
+          //
+          // No more preceded LWS, so break here.
+          //
+          break;
+        }
+      } else {
+        //
+        // Wrong String format!
+        //
+        return NULL;
       }
     } else {
+      //
+      // No more preceded LWS, so break here.
+      //
       break;
     }
   }
 
-  //
-  // Header fields can be extended over multiple lines by preceding each extra
-  // line with at least one SP or HT.
-  //
   StrPtr = FieldValueStr;
   do {
+    //
+    // Handle the LWS within the field value.
+    //
     StrPtr = AsciiStrGetNextToken (StrPtr, '\r');
     if (StrPtr == NULL || *StrPtr != '\n') {
+      //
+      // Wrong String format!
+      //
       return NULL;
     }
 
