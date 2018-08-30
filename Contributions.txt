@@ -201,7 +201,7 @@ title, and interest in and to Your Contributions.
   license. If your employer(s) has rights to intellectual property
   that You create that includes Your Contributions, You represent
   that You have received permission to make Contributions on behalf
-  of that employer, that Your employer has waived such rights for
+  of that employer or that Your employer has waived such rights for
   Your Contributions.
 * You represent that each of Your Contributions is Your original
   creation (see Section 4 for submissions on behalf of others).
