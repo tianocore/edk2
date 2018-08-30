@@ -471,66 +471,6 @@ typedef union {
   UINT64  Uint64;
 } MSR_CORE2_FSB_FREQ_REGISTER;
 
-
-/**
-  Shared.
-
-  @param  ECX  MSR_CORE2_BBL_CR_CTL3 (0x0000011E)
-  @param  EAX  Lower 32-bits of MSR value.
-               Described by the type MSR_CORE2_BBL_CR_CTL3_REGISTER.
-  @param  EDX  Upper 32-bits of MSR value.
-               Described by the type MSR_CORE2_BBL_CR_CTL3_REGISTER.
-
-  <b>Example usage</b>
-  @code
-  MSR_CORE2_BBL_CR_CTL3_REGISTER  Msr;
-
-  Msr.Uint64 = AsmReadMsr64 (MSR_CORE2_BBL_CR_CTL3);
-  AsmWriteMsr64 (MSR_CORE2_BBL_CR_CTL3, Msr.Uint64);
-  @endcode
-  @note MSR_CORE2_BBL_CR_CTL3 is defined as MSR_BBL_CR_CTL3 in SDM.
-**/
-#define MSR_CORE2_BBL_CR_CTL3                    0x0000011E
-
-/**
-  MSR information returned for MSR index #MSR_CORE2_BBL_CR_CTL3
-**/
-typedef union {
-  ///
-  /// Individual bit fields
-  ///
-  struct {
-    ///
-    /// [Bit 0] L2 Hardware Enabled (RO) 1 = If the L2 is hardware-enabled 0 =
-    /// Indicates if the L2 is hardware-disabled.
-    ///
-    UINT32  L2HardwareEnabled:1;
-    UINT32  Reserved1:7;
-    ///
-    /// [Bit 8] L2 Enabled (R/W)  1 = L2 cache has been initialized 0 =
-    /// Disabled (default) Until this bit is set the processor will not
-    /// respond to the WBINVD instruction or the assertion of the FLUSH# input.
-    ///
-    UINT32  L2Enabled:1;
-    UINT32  Reserved2:14;
-    ///
-    /// [Bit 23] L2 Not Present (RO)  1. = L2 Present 2. = L2 Not Present.
-    ///
-    UINT32  L2NotPresent:1;
-    UINT32  Reserved3:8;
-    UINT32  Reserved4:32;
-  } Bits;
-  ///
-  /// All bit fields as a 32-bit value
-  ///
-  UINT32  Uint32;
-  ///
-  /// All bit fields as a 64-bit value
-  ///
-  UINT64  Uint64;
-} MSR_CORE2_BBL_CR_CTL3_REGISTER;
-
-
 /**
   Shared.
 
