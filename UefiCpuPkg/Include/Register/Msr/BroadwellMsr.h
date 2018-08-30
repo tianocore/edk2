@@ -286,6 +286,60 @@ typedef union {
 
 
 /**
+  Package. Uncore Ratio Limit (R/W) Out of reset, the min_ratio and max_ratio
+  fields represent the widest possible range of uncore frequencies. Writing to
+  these fields allows software to control the minimum and the maximum
+  frequency that hardware will select.
+
+  @param  ECX  MSR_BROADWELL_MSRUNCORE_RATIO_LIMIT (0x00000620)
+  @param  EAX  Lower 32-bits of MSR value.
+               Described by the type MSR_BROADWELL_MSRUNCORE_RATIO_LIMIT_REGISTER.
+  @param  EDX  Upper 32-bits of MSR value.
+               Described by the type MSR_BROADWELL_MSRUNCORE_RATIO_LIMIT_REGISTER.
+
+  <b>Example usage</b>
+  @code
+  MSR_BROADWELL_MSRUNCORE_RATIO_LIMIT_REGISTER  Msr;
+
+  Msr.Uint64 = AsmReadMsr64 (MSR_BROADWELL_MSRUNCORE_RATIO_LIMIT);
+  AsmWriteMsr64 (MSR_BROADWELL_MSRUNCORE_RATIO_LIMIT, Msr.Uint64);
+  @endcode
+**/
+#define MSR_BROADWELL_MSRUNCORE_RATIO_LIMIT      0x00000620
+
+/**
+  MSR information returned for MSR index #MSR_BROADWELL_MSRUNCORE_RATIO_LIMIT
+**/
+typedef union {
+  ///
+  /// Individual bit fields
+  ///
+  struct {
+    ///
+    /// [Bits 6:0] MAX_RATIO This field is used to limit the max ratio of the
+    /// LLC/Ring.
+    ///
+    UINT32  MAX_RATIO:7;
+    UINT32  Reserved2:1;
+    ///
+    /// [Bits 14:8] MIN_RATIO Writing to this field controls the minimum
+    /// possible ratio of the LLC/Ring.
+    ///
+    UINT32  MIN_RATIO:7;
+    UINT32  Reserved3:17;
+    UINT32  Reserved4:32;
+  } Bits;
+  ///
+  /// All bit fields as a 32-bit value
+  ///
+  UINT32  Uint32;
+  ///
+  /// All bit fields as a 64-bit value
+  ///
+  UINT64  Uint64;
+} MSR_BROADWELL_MSRUNCORE_RATIO_LIMIT_REGISTER;
+
+/**
   Package. PP0 Energy Status (R/O)  See Section 14.9.4, "PP0/PP1 RAPL
   Domains.".
 
