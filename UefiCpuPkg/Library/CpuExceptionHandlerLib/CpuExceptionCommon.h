@@ -1,7 +1,7 @@
 /** @file
   Common header file for CPU Exception Handler Library.
 
-  Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -42,11 +42,6 @@
 #define IA32_PF_EC_SGX              BIT15
 
 #include "ArchInterruptDefs.h"
-
-#define CPU_EXCEPTION_HANDLER_LIB_HOB_GUID \
-  { \
-    0xb21d9148, 0x9211, 0x4d8f, { 0xad, 0xd3, 0x66, 0xb1, 0x89, 0xc9, 0x2c, 0x83 } \
-  }
 
 #define CPU_STACK_SWITCH_EXCEPTION_NUMBER \
   FixedPcdGetSize (PcdCpuStackSwitchExceptionList)
