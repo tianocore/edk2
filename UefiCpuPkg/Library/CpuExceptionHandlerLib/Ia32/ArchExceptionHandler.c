@@ -1,7 +1,7 @@
 /** @file
   IA32 CPU Exception Handler functons.
 
-  Copyright (c) 2012 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2012 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -66,7 +66,9 @@ ArchSaveExceptionContext (
 
   ReservedVectors = ExceptionHandlerData->ReservedVectors;
   //
-  // Save Exception context in global variable
+  // Save Exception context in global variable in first entry of the exception handler.
+  // So when original exception handler returns to the new exception handler (second entry),
+  // the Eflags/Cs/Eip/ExceptionData can be used.
   //
   ReservedVectors[ExceptionType].OldFlags      = SystemContext.SystemContextIa32->Eflags;
   ReservedVectors[ExceptionType].OldCs         = SystemContext.SystemContextIa32->Cs;
@@ -79,7 +81,7 @@ ArchSaveExceptionContext (
   Eflags.Bits.IF = 0;
   SystemContext.SystemContextIa32->Eflags = Eflags.UintN;
   //
-  // Modify the EIP in stack, then old IDT handler will return to the stub code
+  // Modify the EIP in stack, then old IDT handler will return to HookAfterStubBegin.
   //
   SystemContext.SystemContextIa32->Eip    = (UINTN) ReservedVectors[ExceptionType].HookAfterStubHeaderCode;
 }
