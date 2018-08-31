@@ -1,0 +1,234 @@
+#
+#  Copyright (c) 2018 - 2020, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+
+################################################################################
+#
+# FD Section
+# The [FD] Section is made up of the definition statements and a
+# description of what goes into  the Flash Device Image.  Each FD section
+# defines one flash "device" image.  A flash device image may be one of
+# the following: Removable media bootable image (like a boot floppy
+# image,) an Option ROM image (that would be "flashed" into an add-in
+# card,) a System "Flash"  image (that would be burned into a system's
+# flash) or an Update ("Capsule") image that will be used to update and
+# existing system flash.
+#
+################################################################################
+
+[FD.KVMTOOL_EFI]
+BaseAddress   = 0x00000000|gArmTokenSpaceGuid.PcdFdBaseAddress
+# The size in bytes of the FLASH Device
+Size          = 0x00200000|gArmTokenSpaceGuid.PcdFdSize
+ErasePolarity = 1
+
+# This one is tricky, it must be: BlockSize * NumBlocks = Size
+BlockSize     = 0x00001000
+NumBlocks     = 0x200
+
+################################################################################
+#
+# Following are lists of FD Region layout which correspond to the locations of different
+# images within the flash device.
+#
+# Regions must be defined in ascending order and may not overlap.
+#
+# A Layout Region start with a eight digit hex offset (leading "0x" required) followed by
+# the pipe "|" character, followed by the size of the region, also in hex with the leading
+# "0x" characters. Like:
+# Offset|Size
+# PcdOffsetCName|PcdSizeCName
+# RegionType <FV, DATA, or FILE>
+#
+################################################################################
+
+#
+# Implement the Linux kernel header layout so that the loader will identify
+# it as something bootable, and execute it with a FDT pointer in x0 or r2.
+# This area will be reused to store a copy of the FDT so round it up to 32 KB.
+#
+0x00000000|0x00008000
+DATA = {
+!if $(ARCH) == AARCH64
+  0x01, 0x00, 0x00, 0x10,                         # code0: adr x1, .
+  0xff, 0x1f, 0x00, 0x14,                         # code1: b 0x8000
+  0x00, 0x00, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, # text_offset: 512 KB
+  0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, # image_size: 2 MB
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # flags
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # res2
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # res3
+  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, # res4
+  0x41, 0x52, 0x4d, 0x64,                         # magic: "ARM\x64"
+  0x00, 0x00, 0x00, 0x00                          # res5
+!else
+  0x08, 0x10, 0x4f, 0xe2, # adr r1, .
+  0x02, 0x00, 0xa0, 0xe1, # mov r0, r2 (DTB)
+  0x00, 0x00, 0xa0, 0xe1, # nop
+  0x00, 0x00, 0xa0, 0xe1, # nop
+  0x00, 0x00, 0xa0, 0xe1, # nop
+  0x00, 0x00, 0xa0, 0xe1, # nop
+  0x00, 0x00, 0xa0, 0xe1, # nop
+  0x00, 0x00, 0xa0, 0xe1, # nop
+
+  0xf6, 0x1f, 0x00, 0xea, # b 0x8000
+  0x18, 0x28, 0x6f, 0x01, # magic
+  0x00, 0x00, 0x00, 0x00, # start
+  0x00, 0x00, 0x20, 0x00, # image size: 2 MB
+  0x01, 0x02, 0x03, 0x04  # endiannness flag
+!endif
+}
+
+0x00008000|0x001f8000
+gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
+FV = FVMAIN_COMPACT
+
+################################################################################
+#
+# FV Section
+#
+# [FV] section is used to define what components or modules are placed within a flash
+# device file.  This section also defines order the components and modules are positioned
+# within the image.  The [FV] section consists of define statements, set statements and
+# module statements.
+#
+################################################################################
+
+[FV.FvMain]
+FvNameGuid         = 8A91C08E-7D9D-4933-84D6-901D26D0766E
+BlockSize          = 0x40
+NumBlocks          = 0         # This FV gets compressed so make it just big enough
+FvAlignment        = 16        # FV alignment and FV attributes setting.
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+  INF MdeModulePkg/Core/Dxe/DxeMain.inf
+  INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  INF ArmVirtPkg/VirtioFdtDxe/VirtioFdtDxe.inf
+  INF ArmVirtPkg/FdtClientDxe/FdtClientDxe.inf
+  INF ArmVirtPkg/KvmtoolPlatformDxe/KvmtoolPlatformDxe.inf
+  INF ArmVirtPkg/HighMemDxe/HighMemDxe.inf
+
+  #
+  # PI DXE Drivers producing Architectural Protocols (EFI Services)
+  #
+  INF ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  INF MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+  INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+  INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+  INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+
+  INF MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+  INF MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+
+  INF  MdeModulePkg/Universal/Metronome/Metronome.inf
+  INF  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+
+  INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+
+  #
+  # Multiple Console IO support
+  #
+  INF MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  INF MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  INF MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+  INF MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+  INF MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
+
+  INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  INF ArmPkg/Drivers/TimerDxe/TimerDxe.inf
+  INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  INF ArmPlatformPkg/Drivers/NorFlashDxe/NorFlashDxe.inf
+
+  #
+  # FAT filesystem + GPT/MBR partitioning + UDF filesystem
+  #
+  INF MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  INF MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  INF FatPkg/EnhancedFatDxe/Fat.inf
+  INF MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  INF MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
+
+  #
+  # Platform Driver
+  #
+  INF OvmfPkg/VirtioBlkDxe/VirtioBlk.inf
+  INF OvmfPkg/VirtioNetDxe/VirtioNet.inf
+  INF OvmfPkg/VirtioScsiDxe/VirtioScsi.inf
+  INF OvmfPkg/VirtioRngDxe/VirtioRng.inf
+
+  #
+  # UEFI application (Shell Embedded Boot Loader)
+  #
+  INF ShellPkg/Application/Shell/Shell.inf
+  INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
+
+  #
+  # Bds
+  #
+  INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+  INF MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  INF MdeModulePkg/Universal/DriverHealthManagerDxe/DriverHealthManagerDxe.inf
+  INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  INF MdeModulePkg/Application/UiApp/UiApp.inf
+
+  #
+  # SCSI Bus and Disk Driver
+  #
+  INF MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+  INF MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+
+  #
+  # TianoCore logo (splash screen)
+  #
+  INF MdeModulePkg/Logo/LogoDxe.inf
+
+  #
+  # Ramdisk support
+  #
+  INF MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+
+[FV.FVMAIN_COMPACT]
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+  INF RuleOverride = SELF_RELOC ArmVirtPkg/PrePi/ArmVirtPrePiUniCoreRelocatable.inf
+
+  FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
+    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+      SECTION FV_IMAGE = FVMAIN
+    }
+  }
+
+!include ArmVirtRules.fdf.inc
