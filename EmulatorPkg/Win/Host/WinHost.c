@@ -673,7 +673,7 @@ Returns:
   // Transfer control to the SEC Core
   //
   SwitchStack (
-    (SWITCH_STACK_ENTRY_POINT)SecCoreEntryPoint,
+    (SWITCH_STACK_ENTRY_POINT)(UINTN)SecCoreEntryPoint,
     SecCoreData,
     GetThunkPpiList (),
     TopOfStack

@@ -71,15 +71,23 @@ SecConfigStdIn (
     //
     // Disable buffer (line input), echo, mouse, window
     //
-    Success = SetConsoleMode (
-                GetStdHandle (STD_INPUT_HANDLE),
-                Mode | ENABLE_VIRTUAL_TERMINAL_INPUT & ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT)
-                );
+    Mode &= ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT | ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT);
+
+#if defined(NTDDI_VERSION) && defined (NTDDI_WIN10_TH2) && (NTDDI_VERSION > NTDDI_WIN10_TH2)
+    //
+    // Enable virtual terminal input for Win10 above TH2
+    //
+    Mode |= ENABLE_VIRTUAL_TERMINAL_INPUT;
+#endif
+
+    Success = SetConsoleMode (GetStdHandle (STD_INPUT_HANDLE), Mode);
   }
+
+#if defined(NTDDI_VERSION) && defined (NTDDI_WIN10_TH2) && (NTDDI_VERSION > NTDDI_WIN10_TH2)
+  //
+  // Enable terminal mode for Win10 above TH2
+  //
   if (Success) {
-    //
-    // Enable terminal mode
-    //
     Success = GetConsoleMode (GetStdHandle (STD_OUTPUT_HANDLE), &Mode);
     if (Success) {
       Success = SetConsoleMode (
@@ -88,6 +96,7 @@ SecConfigStdIn (
       );
     }
   }
+#endif
   return Success ? EFI_SUCCESS : EFI_DEVICE_ERROR;
 }
 
