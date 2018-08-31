@@ -1918,7 +1918,9 @@ EhcDriverBindingStart (
     EhcClearLegacySupport (Ehc);
   }
 
-  if (Ehc->DebugPortNum != 0) {
+  if (Ehc->DebugPortNum == 0) {
+    EhcResetHC (Ehc, EHC_RESET_TIMEOUT);
+  } else {
     State = EhcReadDbgRegister(Ehc, 0);
     if ((State & (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) != (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) {
       EhcResetHC (Ehc, EHC_RESET_TIMEOUT);
