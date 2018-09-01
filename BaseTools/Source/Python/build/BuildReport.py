@@ -819,6 +819,9 @@ class PcdReport(object):
                             break
 
                 PcdList = self.AllPcds.setdefault(Pcd.TokenSpaceGuidCName, {}).setdefault(Pcd.Type, [])
+                UnusedPcdList = self.UnusedPcds.setdefault(Pcd.TokenSpaceGuidCName, {}).setdefault(Pcd.Type, [])
+                if Pcd in UnusedPcdList:
+                    UnusedPcdList.remove(Pcd)
                 if Pcd not in PcdList and Pcd not in UnusedPcdFullList:
                     UnusedPcdFullList.append(Pcd)
                 if len(Pcd.TokenCName) > self.MaxLen:
