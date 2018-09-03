@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/PcdLib.h>
 
 CONST UINTN    mDoFarReturnFlag  = 0;
 
@@ -239,5 +240,29 @@ InitializeCpuExceptionHandlersEx (
   IN CPU_EXCEPTION_INIT_DATA            *InitData OPTIONAL
   )
 {
-  return InitializeCpuExceptionHandlers (VectorInfo);
+  EFI_STATUS                        Status;
+
+  //
+  // To avoid repeat initialization of default handlers, the caller should pass
+  // an extended init data with InitDefaultHandlers set to FALSE. There's no
+  // need to call this method to just initialize default handlers. Call non-ex
+  // version instead; or this method must be implemented as a simple wrapper of
+  // non-ex version of it, if this version has to be called.
+  //
+  if (InitData == NULL || InitData->Ia32.InitDefaultHandlers) {
+    Status = InitializeCpuExceptionHandlers (VectorInfo);
+  } else {
+    Status = EFI_SUCCESS;
+  }
+
+  if (!EFI_ERROR (Status)) {
+    //
+    // Initializing stack switch is only necessary for Stack Guard functionality.
+    //
+    if (PcdGetBool (PcdCpuStackGuard) && InitData != NULL) {
+      Status = ArchSetupExcpetionStack (InitData);
+    }
+  }
+
+  return  Status;
 }
