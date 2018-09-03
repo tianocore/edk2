@@ -767,7 +767,7 @@
   #
   # GUID defined in PI1.6
   #
-  ## Include/Guid/DiskInfo.h
+  ## Include/Protocol/DiskInfo.h
   gEfiDiskInfoSdMmcInterfaceGuid  = { 0x8deec992, 0xd39c, 0x4a5c, { 0xab, 0x6b, 0x98, 0x6e, 0x14, 0x24, 0x2b, 0x9d }}
 
   #
