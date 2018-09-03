@@ -41,26 +41,15 @@ PlatformBootManagerMemoryTest (
   EFI_GENERIC_MEMORY_TEST_PROTOCOL  *GenMemoryTest;
   UINT64                            TestedMemorySize;
   UINT64                            TotalMemorySize;
-  UINT64                            PreviousValue;
   BOOLEAN                           ErrorOut;
   BOOLEAN                           TestAbort;
   EFI_INPUT_KEY                     Key;
-  CHAR16                            *StrTotalMemory;
-  CHAR16                            *Pos;
-  UINTN                             StrTotalMemorySize;
 
   ReturnStatus = EFI_SUCCESS;
   ZeroMem (&Key, sizeof (EFI_INPUT_KEY));
 
-  StrTotalMemorySize = 128;
-  Pos = AllocateZeroPool (StrTotalMemorySize);
-  ASSERT (Pos != NULL);
-
-  StrTotalMemory    = Pos;
-
   TestedMemorySize  = 0;
   TotalMemorySize   = 0;
-  PreviousValue     = 0;
   ErrorOut          = FALSE;
   TestAbort         = FALSE;
 
@@ -72,7 +61,6 @@ PlatformBootManagerMemoryTest (
                   (VOID **) &GenMemoryTest
                   );
   if (EFI_ERROR (Status)) {
-    FreePool (Pos);
     return EFI_SUCCESS;
   }
 
@@ -89,7 +77,6 @@ PlatformBootManagerMemoryTest (
     // do the test, and then the status of EFI_NO_MEDIA will be returned by
     // "MemoryTestInit". So it does not need to test memory again, just return.
     //
-    FreePool (Pos);
     return EFI_SUCCESS;
   }
 
@@ -128,6 +115,5 @@ PlatformBootManagerMemoryTest (
 Done:
   DEBUG ((DEBUG_INFO, "%d bytes of system memory tested OK\r\n", TotalMemorySize));
 
-  FreePool (Pos);
   return ReturnStatus;
 }
