@@ -68,6 +68,19 @@ class PcdClassObject(object):
         self.PcdValueFromFdf = ""
         self.DefinitionPosition = ("","")
 
+    @staticmethod
+    def GetPcdMaxSizeWorker(PcdString, MaxSize):
+        if PcdString.startswith("{") and PcdString.endswith("}"):
+            return  max([len(PcdString.split(",")),MaxSize])
+
+        if PcdString.startswith("\"") or PcdString.startswith("\'"):
+            return  max([len(PcdString)-2+1,MaxSize])
+
+        if PcdString.startswith("L\""):
+            return  max([2*(len(PcdString)-3+1),MaxSize])
+
+        return max([len(PcdString),MaxSize])
+
     ## Get the maximum number of bytes
     def GetPcdMaxSize(self):
         if self.DatumType in TAB_PCD_NUMERIC_TYPES:
@@ -75,24 +88,11 @@ class PcdClassObject(object):
 
         MaxSize = int(self.MaxDatumSize, 10) if self.MaxDatumSize else 0
         if self.PcdValueFromFdf:
-            if self.PcdValueFromFdf.startswith("{") and self.PcdValueFromFdf.endswith("}"):
-                MaxSize =  max([len(self.PcdValueFromFdf.split(",")),MaxSize])
-            elif self.PcdValueFromFdf.startswith("\"") or self.PcdValueFromFdf.startswith("\'"):
-                MaxSize =  max([len(self.PcdValueFromFdf)-2+1,MaxSize])
-            elif self.PcdValueFromFdf.startswith("L\""):
-                MaxSize =  max([2*(len(self.PcdValueFromFdf)-3+1),MaxSize])
-            else:
-                MaxSize = max([len(self.PcdValueFromFdf),MaxSize])
-
+            MaxSize = self.GetPcdMaxSizeWorker(self.PcdValueFromFdf,MaxSize)
         if self.PcdValueFromComm:
-            if self.PcdValueFromComm.startswith("{") and self.PcdValueFromComm.endswith("}"):
-                return max([len(self.PcdValueFromComm.split(",")), MaxSize])
-            elif self.PcdValueFromComm.startswith("\"") or self.PcdValueFromComm.startswith("\'"):
-                return max([len(self.PcdValueFromComm)-2+1, MaxSize])
-            elif self.PcdValueFromComm.startswith("L\""):
-                return max([2*(len(self.PcdValueFromComm)-3+1), MaxSize])
-            else:
-                return max([len(self.PcdValueFromComm), MaxSize])
+            MaxSize = self.GetPcdMaxSizeWorker(self.PcdValueFromComm,MaxSize)
+        if hasattr(self, "DefaultValueFromDec"):
+            MaxSize = self.GetPcdMaxSizeWorker(self.DefaultValueFromDec,MaxSize)
         return MaxSize
 
     ## Get the number of bytes
