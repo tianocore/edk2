@@ -1019,11 +1019,11 @@ class sdict(IterableUserDict):
 
     ## Keys interation support
     def iterkeys(self):
-        return iter(self.keys())
+        return self.keys()
 
     ## Values interation support
     def itervalues(self):
-        return iter(self.values())
+        return self.values()
 
     ## Return value related to a key, and remove the (key, value) from the dict
     def pop(self, key, *dv):
@@ -1032,7 +1032,7 @@ class sdict(IterableUserDict):
             value = self[key]
             self.__delitem__(key)
         elif len(dv) != 0 :
-            value = kv[0]
+            value = dv[0]
         return value
 
     ## Return (key, value) pair, and remove the (key, value) from the dict

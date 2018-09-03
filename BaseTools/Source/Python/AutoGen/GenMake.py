@@ -491,7 +491,7 @@ cleanlib:
             # EdkII modules always use "_ModuleEntryPoint" as entry point
             ImageEntryPoint = "_ModuleEntryPoint"
 
-        for k, v in MyAgo.Module.Defines.iteritems():
+        for k, v in MyAgo.Module.Defines.items():
             if k not in MyAgo.Macros:
                 MyAgo.Macros[k] = v
 
@@ -503,7 +503,7 @@ cleanlib:
             MyAgo.Macros['IMAGE_ENTRY_POINT'] = ImageEntryPoint
 
         PCI_COMPRESS_Flag = False
-        for k, v in MyAgo.Module.Defines.iteritems():
+        for k, v in MyAgo.Module.Defines.items():
             if 'PCI_COMPRESS' == k and 'TRUE' == v:
                 PCI_COMPRESS_Flag = True
 
@@ -654,7 +654,7 @@ cleanlib:
             "module_relative_directory" : MyAgo.SourceDir,
             "module_dir"                : mws.join (self.Macros["WORKSPACE"], MyAgo.SourceDir),
             "package_relative_directory": package_rel_dir,
-            "module_extra_defines"      : ["%s = %s" % (k, v) for k, v in MyAgo.Module.Defines.iteritems()],
+            "module_extra_defines"      : ["%s = %s" % (k, v) for k, v in MyAgo.Module.Defines.items()],
 
             "architecture"              : MyAgo.Arch,
             "toolchain_tag"             : MyAgo.ToolChain,
