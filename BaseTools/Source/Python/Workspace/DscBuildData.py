@@ -1334,8 +1334,7 @@ class DscBuildData(PlatformBuildClassObject):
 
         Pcds = AllPcds
         DefaultStoreMgr = DefaultStore(self.DefaultStores)
-        SkuIds = self.SkuIdMgr.AvailableSkuIdSet
-        SkuIds.update({TAB_DEFAULT:0})
+        SkuIds = self.SkuIds
         DefaultStores = {storename for pcdobj in AllPcds.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict}
 
         S_PcdSet = []
@@ -2145,7 +2144,7 @@ class DscBuildData(PlatformBuildClassObject):
                 CApp = CApp + '  Initialize_%s_%s_%s_%s();\n' % (self.SkuIdMgr.SystemSkuId, TAB_DEFAULT_STORES_DEFAULT, Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
             else:
                 for SkuName in self.SkuIdMgr.SkuOverrideOrder():
-                    if SkuName not in Pcd.SkuOverrideValues:
+                    if SkuName not in self.SkuIdMgr.AvailableSkuIdSet:
                         continue
                     for DefaultStoreName in Pcd.SkuOverrideValues[SkuName]:
                         CApp = CApp + '  Initialize_%s_%s_%s_%s();\n' % (SkuName, DefaultStoreName, Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
