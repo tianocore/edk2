@@ -2521,6 +2521,7 @@ class DscBuildData(PlatformBuildClassObject):
         VariableAttrs = {}
 
         Pcds = OrderedDict()
+        UserDefinedDefaultStores = []
         #
         # tdict is a special dict kind of type, used for selecting correct
         # PCD settings for certain ARCH and SKU
@@ -2538,6 +2539,9 @@ class DscBuildData(PlatformBuildClassObject):
             DefaultStore = DefaultStore.upper()
             if DefaultStore == TAB_COMMON:
                 DefaultStore = TAB_DEFAULT_STORES_DEFAULT
+            else:
+                #The end user define [DefaultStores] and [SKUID_IDENTIFIER.Menufacturing] in DSC
+                UserDefinedDefaultStores.append((PcdCName, TokenSpaceGuid))
             if SkuName not in AvailableSkuIdSet:
                 EdkLogger.error('build', PARAMETER_INVALID, 'Sku %s is not defined in [SkuIds] section' % SkuName,
                                             File=self.MetaFile, Line=Dummy5)
@@ -2600,7 +2604,7 @@ class DscBuildData(PlatformBuildClassObject):
                     pcdObject.SkuInfoList[SkuName] = SkuInfo
             else:
                 SkuInfo = SkuInfoClass(SkuName, self.SkuIds[SkuName][0], VariableName, VariableGuid, VariableOffset, DefaultValue, VariableAttribute=VarAttribute, DefaultStore={DefaultStore:DefaultValue})
-                Pcds[PcdCName, TokenSpaceGuid] = PcdClassObject(
+                PcdClassObj = PcdClassObject(
                                                 PcdCName,
                                                 TokenSpaceGuid,
                                                 self._PCD_TYPE_STRING_[Type],
@@ -2615,6 +2619,9 @@ class DscBuildData(PlatformBuildClassObject):
                                                 pcdDecObject.validlists,
                                                 pcdDecObject.expressions,
                                                 IsDsc=True)
+                if (PcdCName, TokenSpaceGuid) in UserDefinedDefaultStores:
+                    PcdClassObj.UserDefinedDefaultStoresFlag = True
+                Pcds[PcdCName, TokenSpaceGuid] = PcdClassObj
 
             if SkuName not in Pcds[PcdCName, TokenSpaceGuid].DscRawValue:
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}

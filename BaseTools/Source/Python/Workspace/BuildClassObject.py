@@ -41,7 +41,7 @@ import collections
 # @var Phase:                To store value for Phase, default is "DXE"
 #
 class PcdClassObject(object):
-    def __init__(self, Name = None, Guid = None, Type = None, DatumType = None, Value = None, Token = None, MaxDatumSize = None, SkuInfoList = {}, IsOverrided = False, GuidValue = None, validateranges = [], validlists = [], expressions = [], IsDsc = False):
+    def __init__(self, Name = None, Guid = None, Type = None, DatumType = None, Value = None, Token = None, MaxDatumSize = None, SkuInfoList = {}, IsOverrided = False, GuidValue = None, validateranges = [], validlists = [], expressions = [], IsDsc = False, UserDefinedDefaultStoresFlag = False):
         self.TokenCName = Name
         self.TokenSpaceGuidCName = Guid
         self.TokenSpaceGuidValue = GuidValue
@@ -67,6 +67,7 @@ class PcdClassObject(object):
         self.PcdValueFromComm = ""
         self.PcdValueFromFdf = ""
         self.DefinitionPosition = ("","")
+        self.UserDefinedDefaultStoresFlag = UserDefinedDefaultStoresFlag
 
     @staticmethod
     def GetPcdMaxSizeWorker(PcdString, MaxSize):
@@ -225,6 +226,7 @@ class StructurePcd(PcdClassObject):
         self.PcdValueFromComm = PcdObject.PcdValueFromComm if PcdObject.PcdValueFromComm else self.PcdValueFromComm
         self.PcdValueFromFdf = PcdObject.PcdValueFromFdf if PcdObject.PcdValueFromFdf else self.PcdValueFromFdf
         self.DefinitionPosition = PcdObject.DefinitionPosition if PcdObject.DefinitionPosition else self.DefinitionPosition
+        self.UserDefinedDefaultStoresFlag = PcdObject.UserDefinedDefaultStoresFlag if PcdObject.UserDefinedDefaultStoresFlag else self.UserDefinedDefaultStoresFlag
         if isinstance(PcdObject, StructurePcd):
             self.StructuredPcdIncludeFile = PcdObject.StructuredPcdIncludeFile if PcdObject.StructuredPcdIncludeFile else self.StructuredPcdIncludeFile
             self.PackageDecs = PcdObject.PackageDecs if PcdObject.PackageDecs else self.PackageDecs
