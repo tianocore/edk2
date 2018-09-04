@@ -1113,6 +1113,8 @@ class FdfParser:
         if self.CurrentLineNumber != StartLine:
             EndPos = len(self.Profile.FileLinesList[StartLine-1])
         self.__Token = self.Profile.FileLinesList[StartLine-1][StartPos : EndPos]
+        if self.__Token.lower() in [TAB_IF, TAB_END_IF, TAB_ELSE_IF, TAB_ELSE, TAB_IF_DEF, TAB_IF_N_DEF, TAB_ERROR, TAB_INCLUDE]:
+            self.__Token = self.__Token.lower()
         if StartPos != self.CurrentOffsetWithinLine:
             return True
         else:
