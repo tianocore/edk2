@@ -91,7 +91,7 @@ class VariableMgr(object):
                 data_type = item.data_type
                 value_list = item.default_value.strip("{").strip("}").split(",")
                 if data_type in ["BOOLEAN","UINT8","UINT16","UINT32","UINT64"]:
-                    if data_type == ["BOOLEAN","UINT8"]:
+                    if data_type in ["BOOLEAN","UINT8"]:
                         data_flag = "=B"
                     elif data_type == "UINT16":
                         data_flag = "=H"
