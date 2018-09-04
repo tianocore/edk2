@@ -1412,6 +1412,8 @@ ProcessFvFile (
   ParentFvHandle = ParentFvCoreHandle->FvHandle;
   ParentFvPpi    = ParentFvCoreHandle->FvPpi;
 
+  Status = EFI_SUCCESS;
+
   //
   // Find FvImage(s) in FvFile
   //
