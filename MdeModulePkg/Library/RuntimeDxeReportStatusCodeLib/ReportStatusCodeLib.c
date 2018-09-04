@@ -632,12 +632,16 @@ ReportStatusCodeEx (
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
-  if (mHaveExitedBootServices) {
-    if (sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize > MAX_EXTENDED_DATA_SIZE) {
+  if (ExtendedDataSize <= (MAX_EXTENDED_DATA_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
+    //
+    // Use Buffer instead of allocating if possible.
+    //
+    StatusCodeData = (EFI_STATUS_CODE_DATA *) StatusCodeBuffer;
+  } else {
+    if (mHaveExitedBootServices) {
       return EFI_OUT_OF_RESOURCES;
     }
-    StatusCodeData = (EFI_STATUS_CODE_DATA *) StatusCodeBuffer;
-  } else  {
+
     if (gBS == NULL || gBS->AllocatePool == NULL || gBS->FreePool == NULL) {
       return EFI_UNSUPPORTED;
     }
@@ -680,7 +684,7 @@ ReportStatusCodeEx (
   //
   // Free the allocated buffer
   //
-  if (!mHaveExitedBootServices) {
+  if (StatusCodeData != (EFI_STATUS_CODE_DATA *) StatusCodeBuffer) {
     gBS->FreePool (StatusCodeData);
   }
 

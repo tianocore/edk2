@@ -496,37 +496,34 @@ ReportStatusCodeEx (
   ASSERT (!((ExtendedData == NULL) && (ExtendedDataSize != 0)));
   ASSERT (!((ExtendedData != NULL) && (ExtendedDataSize == 0)));
 
-  if (gBS == NULL || gBS->AllocatePool == NULL || gBS->FreePool == NULL) {
-    return EFI_UNSUPPORTED;
-  }
+  if (ExtendedDataSize <= (MAX_EXTENDED_DATA_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
+    //
+    // Use Buffer instead of allocating if possible.
+    //
+    StatusCodeData = (EFI_STATUS_CODE_DATA *)Buffer;
+  } else {
+    if (gBS == NULL || gBS->AllocatePool == NULL || gBS->FreePool == NULL) {
+      return EFI_UNSUPPORTED;
+    }
 
-  //
-  // Retrieve the current TPL
-  //
-  Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
-  gBS->RestoreTPL (Tpl);
+    //
+    // Retrieve the current TPL
+    //
+    Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+    gBS->RestoreTPL (Tpl);
 
-  StatusCodeData = NULL;
-  if (Tpl <= TPL_NOTIFY) {
+    if (Tpl > TPL_NOTIFY) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     //
     // Allocate space for the Status Code Header and its buffer
     //
+    StatusCodeData = NULL;
     gBS->AllocatePool (EfiBootServicesData, sizeof (EFI_STATUS_CODE_DATA) + ExtendedDataSize, (VOID **)&StatusCodeData);
-  }
-
-  if (StatusCodeData == NULL) {
-    //
-    // If a buffer could not be allocated, then see if the local variable Buffer can be used
-    //
-    if (ExtendedDataSize > (MAX_EXTENDED_DATA_SIZE - sizeof (EFI_STATUS_CODE_DATA))) {
-      //
-      // The local variable Buffer not large enough to hold the extended data associated
-      // with the status code being reported.
-      //
-      DEBUG ((EFI_D_ERROR, "Status code extended data is too large to be reported!\n"));
+    if (StatusCodeData == NULL) {
       return EFI_OUT_OF_RESOURCES;
     }
-    StatusCodeData = (EFI_STATUS_CODE_DATA  *)Buffer;
   }
 
   //
