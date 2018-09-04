@@ -21,10 +21,6 @@ UPT
 #
 import locale
 import sys
-encoding = locale.getdefaultlocale()[1]
-if encoding:
-    reload(sys)
-    sys.setdefaultencoding(encoding)
 from Core import FileHook
 import os.path
 from sys import platform

@@ -205,7 +205,7 @@ def GetFileLineContent(FileName, WorkSpace, LineNo, OriginalString):
 
     try:
         FullFileName = FullFileName.replace('\\', '/')
-        Inputfile = open(FullFileName, "rb", 0)
+        Inputfile = open(FullFileName, "r")
         try:
             FileLinesList = Inputfile.readlines()
         except BaseException:

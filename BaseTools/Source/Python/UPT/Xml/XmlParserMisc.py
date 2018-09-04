@@ -53,7 +53,7 @@ def ConvertVariableName(VariableName):
         if SecondByte != 0:
             return None
 
-        if FirstByte not in xrange(0x20, 0x7F):
+        if FirstByte not in range(0x20, 0x7F):
             return None
         TransferedStr += ('%c')%FirstByte
         Index = Index + 2

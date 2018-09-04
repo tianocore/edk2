@@ -136,7 +136,7 @@ def Main(Options = None):
                 # strings in your desired encoding before passing them to
                 # write().
                 #
-                FromFile = os.path.normpath(FileObject.GetURI()).encode('utf_8')
+                FromFile = os.path.normpath(FileObject.GetURI())
                 FileFullPath = mws.join(WorkspaceDir, FromFile)
                 if FileFullPath in RePkgDict:
                     (DpGuid, DpVersion, DpName, Repackage) = RePkgDict[FileFullPath]

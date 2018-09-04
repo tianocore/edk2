@@ -20,7 +20,6 @@ StringUtils
 #
 import re
 import os.path
-from string import strip
 import Logger.Log as Logger
 import Library.DataType as DataType
 from Logger.ToolError import FORMAT_INVALID
@@ -44,7 +43,7 @@ gMACRO_PATTERN = re.compile("\$\(([_A-Z][_A-Z0-9]*)\)", re.UNICODE)
 #
 #
 def GetSplitValueList(String, SplitTag=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
-    return map(lambda l: l.strip(), String.split(SplitTag, MaxSplit))
+    return list(map(lambda l: l.strip(), String.split(SplitTag, MaxSplit)))
 
 ## MergeArches
 #
@@ -435,7 +434,7 @@ def GetSingleValueOfKeyFromLines(Lines, Dictionary, CommentCharacter, KeySplitCh
                 #
                 LineList[1] = CleanString(LineList[1], CommentCharacter)
                 if ValueSplitFlag:
-                    Value = map(strip, LineList[1].split(ValueSplitCharacter))
+                    Value = map(lambda x: x.strip(), LineList[1].split(ValueSplitCharacter))
                 else:
                     Value = CleanString(LineList[1], CommentCharacter).splitlines()
 
@@ -502,7 +501,7 @@ def PreCheck(FileName, FileContent, SupSectionTag):
         #
         # Regenerate FileContent
         #
-        NewFileContent = NewFileContent + Line + '\r\n'
+        NewFileContent = NewFileContent + Line + '\n'
 
     if IsFailed:
         Logger.Error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError=Logger.IS_RAISE_ERROR)
@@ -938,14 +937,14 @@ def SplitPcdEntry(String):
 def IsMatchArch(Arch1, Arch2):
     if 'COMMON' in Arch1 or 'COMMON' in Arch2:
         return True
-    if isinstance(Arch1, basestring) and isinstance(Arch2, basestring):
+    if isinstance(Arch1, str) and isinstance(Arch2, str):
         if Arch1 == Arch2:
             return True
 
-    if isinstance(Arch1, basestring) and isinstance(Arch2, list):
+    if isinstance(Arch1, str) and isinstance(Arch2, list):
         return Arch1 in Arch2
 
-    if isinstance(Arch2, basestring) and isinstance(Arch1, list):
+    if isinstance(Arch2, str) and isinstance(Arch1, list):
         return Arch2 in Arch1
 
     if isinstance(Arch1, list) and isinstance(Arch2, list):

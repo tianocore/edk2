@@ -326,7 +326,7 @@ def IniToXml(IniFile):
     CurrentKey = ''
     PreMap = None
     Map = None
-    FileContent = ConvertSpecialChar(open(IniFile, 'rb').readlines())
+    FileContent = ConvertSpecialChar(open(IniFile, 'r').readlines())
     LastIndex = 0
     for Index in range(0, len(FileContent)):
         LastIndex = Index

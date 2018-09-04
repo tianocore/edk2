@@ -14,7 +14,6 @@
 '''
 ExpressionValidate
 '''
-from __future__ import print_function
 
 ##
 # Import Modules
