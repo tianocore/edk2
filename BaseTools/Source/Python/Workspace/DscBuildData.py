@@ -1832,8 +1832,12 @@ class DscBuildData(PlatformBuildClassObject):
                     #
                     CApp = CApp + '  FieldSize = __FIELD_SIZE(%s, %s);\n' % (Pcd.DatumType, FieldName)
                     CApp = CApp + '  Value     = %s; // From %s Line %d Value %s\n' % (DscBuildData.IntToCString(Value, ValueSize), FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
+                    CApp = CApp + '  __STATIC_ASSERT((__FIELD_SIZE(%s, %s) >= %d) || (__FIELD_SIZE(%s, %s) == 0), "Input buffer exceeds the buffer array"); // From %s Line %d Value %s\n' % (Pcd.DatumType, FieldName, ValueSize, Pcd.DatumType, FieldName, FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
                     CApp = CApp + '  memcpy (&Pcd->%s, Value, (FieldSize > 0 && FieldSize < %d) ? FieldSize : %d);\n' % (FieldName, ValueSize, ValueSize)
                 else:
+                    if '[' in FieldName and ']' in FieldName:
+                        Index = int(FieldName.split('[')[1].split(']')[0])
+                        CApp = CApp + '  __STATIC_ASSERT((%d < __ARRAY_SIZE(Pcd->%s)) || (__ARRAY_SIZE(Pcd->%s) == 0), "array index exceeds the array number"); // From %s Line %d Index of %s\n' % (Index, FieldName.split('[')[0], FieldName.split('[')[0], FieldList[FieldName][1], FieldList[FieldName][2], FieldName)
                     if ValueSize > 4:
                         CApp = CApp + '  Pcd->%s = %dULL; // From %s Line %d Value %s\n' % (FieldName, Value, FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
                     else:
@@ -1911,8 +1915,12 @@ class DscBuildData(PlatformBuildClassObject):
                     #
                         CApp = CApp + '  FieldSize = __FIELD_SIZE(%s, %s);\n' % (Pcd.DatumType, FieldName)
                         CApp = CApp + '  Value     = %s; // From %s Line %d Value %s\n' % (DscBuildData.IntToCString(Value, ValueSize), FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
+                        CApp = CApp + '  __STATIC_ASSERT((__FIELD_SIZE(%s, %s) >= %d) || (__FIELD_SIZE(%s, %s) == 0), "Input buffer exceeds the buffer array"); // From %s Line %d Value %s\n' % (Pcd.DatumType, FieldName, ValueSize, Pcd.DatumType, FieldName, FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
                         CApp = CApp + '  memcpy (&Pcd->%s, Value, (FieldSize > 0 && FieldSize < %d) ? FieldSize : %d);\n' % (FieldName, ValueSize, ValueSize)
                     else:
+                        if '[' in FieldName and ']' in FieldName:
+                            Index = int(FieldName.split('[')[1].split(']')[0])
+                            CApp = CApp + '  __STATIC_ASSERT((%d < __ARRAY_SIZE(Pcd->%s)) || (__ARRAY_SIZE(Pcd->%s) == 0), "array index exceeds the array number"); // From %s Line %d Index of %s\n' % (Index, FieldName.split('[')[0], FieldName.split('[')[0], FieldList[FieldName][1], FieldList[FieldName][2], FieldName)
                         if ValueSize > 4:
                             CApp = CApp + '  Pcd->%s = %dULL; // From %s Line %d Value %s\n' % (FieldName, Value, FieldList[FieldName][1], FieldList[FieldName][2], FieldList[FieldName][0])
                         else:
