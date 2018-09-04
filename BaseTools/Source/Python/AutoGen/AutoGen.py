@@ -1655,6 +1655,7 @@ class PlatformAutoGen(AutoGen):
                         continue
                     pcd.SkuInfoList[SkuName] = copy.deepcopy(pcd.SkuInfoList[TAB_DEFAULT])
                     pcd.SkuInfoList[SkuName].SkuId = SkuId
+                    pcd.SkuInfoList[SkuName].SkuIdName = SkuName
         self.AllPcdList = self._NonDynamicPcdList + self._DynamicPcdList
 
     def FixVpdOffset(self, VpdFile ):

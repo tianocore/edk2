@@ -61,7 +61,7 @@ class PcdClassObject(object):
         self.validlists = validlists
         self.expressions = expressions
         self.DscDefaultValue = None
-        self.DscRawValue = None
+        self.DscRawValue = {}
         if IsDsc:
             self.DscDefaultValue = Value
         self.PcdValueFromComm = ""
