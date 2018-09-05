@@ -593,23 +593,6 @@ class GenFdsGlobalVariable:
         GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate FV")
 
     @staticmethod
-    def GenerateVtf(Output, Input, BaseAddress=None, FvSize=None):
-        if not GenFdsGlobalVariable.NeedsUpdate(Output, Input):
-            return
-        GenFdsGlobalVariable.DebugLogger(EdkLogger.DEBUG_5, "%s needs update because of newer %s" % (Output, Input))
-
-        Cmd = ["GenVtf"]
-        if BaseAddress and FvSize \
-            and len(BaseAddress) == len(FvSize):
-            for I in range(0, len(BaseAddress)):
-                Cmd += ("-r", BaseAddress[I], "-s", FvSize[I])
-        Cmd += ("-o", Output)
-        for F in Input:
-            Cmd += ("-f", F)
-
-        GenFdsGlobalVariable.CallExternalTool(Cmd, "Failed to generate VTF")
-
-    @staticmethod
     def GenerateFirmwareImage(Output, Input, Type="efi", SubType=None, Zero=False,
                               Strip=False, Replace=False, TimeStamp=None, Join=False,
                               Align=None, Padding=None, Convert=False, IsMakefile=False):
