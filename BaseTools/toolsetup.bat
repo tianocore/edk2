@@ -299,18 +299,32 @@ goto end
      )
   )
 
-  if not defined PYTHON_HOME (
-    if defined PYTHONHOME (
-      set PYTHON_HOME=%PYTHONHOME%
-    ) else (
-      echo.
-      echo !!! ERROR !!! Binary python tools are missing. PYTHON_HOME environment variable is not set.
-      echo PYTHON_HOME is required to build or execute the python tools.
-      echo.
-      goto end
+set PYTHON3=py -3
+:check_python_version
+  %PYTHON3% --version >NUL 2>&1
+  if %ERRORLEVEL% NEQ 0 (
+    if defined PYTHON_HOME (
+      if EXIST "%PYTHON_HOME%" (
+        set PYTHON3=%PYTHON_HOME%\python.exe
+      )
     )
   )
+  %PYTHON3% --version >NUL 2>&1
+  if %ERRORLEVEL% NEQ 0 (
+     echo.
+     echo !!! ERROR !!!  %PYTHON3% not install.
+     echo.
+     goto end
+   )
+  FOR /F "TOKENS=1,2" %%i IN ('%PYTHON3% --version') DO set VERSION=%%j
+  if /I "%VERSION%" LSS "3.6" (
+     echo.
+     echo !!! ERROR !!!  python version should greater than or equal to version 3.6.
+     echo.
+     goto end
+  )
 
+:check_freezer_path
   @REM We have Python, now test for FreezePython application
   if not defined PYTHON_FREEZER_PATH (
     echo.
