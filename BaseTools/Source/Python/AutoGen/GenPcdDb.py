@@ -938,7 +938,7 @@ def NewCreatePcdDatabasePhaseSpecificAutoGen(Platform, Phase):
         new_pcd = copy.deepcopy(pcd)
         new_pcd.SkuInfoList = {skuname:pcd.SkuInfoList[skuname]}
         new_pcd.isinit = 'INIT'
-        if new_pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+        if new_pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
             for skuobj in pcd.SkuInfoList.values():
                 if skuobj.DefaultValue:
                     defaultvalue = int(skuobj.DefaultValue, 16) if skuobj.DefaultValue.upper().startswith("0X") else int(skuobj.DefaultValue, 10)
