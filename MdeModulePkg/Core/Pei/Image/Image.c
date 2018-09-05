@@ -61,87 +61,6 @@ PeiImageRead (
 }
 
 /**
-
-  Support routine for the PE/COFF Loader that reads a buffer from a PE/COFF file.
-  The function is implemented as PIC so as to support shadowing.
-
-  @param FileHandle      - The handle to the PE/COFF file
-  @param FileOffset      - The offset, in bytes, into the file to read
-  @param ReadSize        - The number of bytes to read from the file starting at FileOffset
-  @param Buffer          - A pointer to the buffer to read the data into.
-
-  @return EFI_SUCCESS - ReadSize bytes of data were read into Buffer from the PE/COFF file starting at FileOffset
-
-**/
-EFI_STATUS
-EFIAPI
-PeiImageReadForShadow (
-  IN     VOID    *FileHandle,
-  IN     UINTN   FileOffset,
-  IN     UINTN   *ReadSize,
-  OUT    VOID    *Buffer
-  )
-{
-  volatile CHAR8  *Destination8;
-  CHAR8           *Source8;
-  UINTN           Length;
-
-  Destination8  = Buffer;
-  Source8       = (CHAR8 *) ((UINTN) FileHandle + FileOffset);
-  if (Destination8 != Source8) {
-    Length        = *ReadSize;
-    while ((Length--) > 0) {
-      *(Destination8++) = *(Source8++);
-    }
-  }
-
-  return EFI_SUCCESS;
-}
-
-/**
-
-  Support routine to get the Image read file function.
-
-  @param ImageContext    - The context of the image being loaded
-
-  @retval EFI_SUCCESS - If Image function location is found
-
-**/
-EFI_STATUS
-GetImageReadFunction (
-  IN      PE_COFF_LOADER_IMAGE_CONTEXT  *ImageContext
-  )
-{
-#if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
-  PEI_CORE_INSTANCE     *Private;
-  EFI_PHYSICAL_ADDRESS  MemoryBuffer;
-
-  Private = PEI_CORE_INSTANCE_FROM_PS_THIS (GetPeiServicesTablePointer ());
-  MemoryBuffer = 0;
-
-  if (Private->PeiMemoryInstalled  && (((Private->HobList.HandoffInformationTable->BootMode != BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnBoot)) ||
-      ((Private->HobList.HandoffInformationTable->BootMode == BOOT_ON_S3_RESUME) && PcdGetBool (PcdShadowPeimOnS3Boot)))) {
-    //
-    // Shadow algorithm makes lots of non ANSI C assumptions and only works for IA32 and X64
-    //  compilers that have been tested
-    //
-    if (Private->ShadowedImageRead == NULL) {
-      PeiServicesAllocatePages (EfiBootServicesCode, 0x400 / EFI_PAGE_SIZE + 1, &MemoryBuffer);
-      ASSERT (MemoryBuffer != 0);
-      CopyMem ((VOID *)(UINTN)MemoryBuffer, (CONST VOID *) (UINTN) PeiImageReadForShadow, 0x400);
-      Private->ShadowedImageRead = (PE_COFF_LOADER_READ_FILE) (UINTN) MemoryBuffer;
-    }
-
-    ImageContext->ImageRead = Private->ShadowedImageRead;
-  } else {
-    ImageContext->ImageRead = PeiImageRead;
-  }
-#else
-  ImageContext->ImageRead = PeiImageRead;
-#endif
-  return EFI_SUCCESS;
-}
-/**
   To check memory usage bit map array to figure out if the memory range the image will be loaded in is available or not. If
   memory range is available, the function will mark the corresponding bits to 1 which indicates the memory range is used.
   The function is only invoked when load modules at fixed address feature is enabled.
@@ -369,9 +288,7 @@ LoadAndRelocatePeCoffImage (
   IsXipImage   = FALSE;
   ZeroMem (&ImageContext, sizeof (ImageContext));
   ImageContext.Handle = Pe32Data;
-  Status              = GetImageReadFunction (&ImageContext);
-
-  ASSERT_EFI_ERROR (Status);
+  ImageContext.ImageRead = PeiImageRead;
 
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
