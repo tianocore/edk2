@@ -121,7 +121,6 @@ EhcReset (
   USB2_HC_DEV             *Ehc;
   EFI_TPL                 OldTpl;
   EFI_STATUS              Status;
-  UINT32                  DbgCtrlStatus;
 
   Ehc = EHC_FROM_THIS (This);
 
@@ -147,12 +146,9 @@ EhcReset (
     //
     // Host Controller must be Halt when Reset it
     //
-    if (Ehc->DebugPortNum != 0) {
-      DbgCtrlStatus = EhcReadDbgRegister(Ehc, 0);
-      if ((DbgCtrlStatus & (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) == (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) {
-        Status = EFI_SUCCESS;
-        goto ON_EXIT;
-      }
+    if (EhcIsDebugPortInUse (Ehc, NULL)) {
+      Status = EFI_SUCCESS;
+      goto ON_EXIT;
     }
 
     if (!EhcIsHalt (Ehc)) {
@@ -345,7 +341,6 @@ EhcGetRootHubPortStatus (
   UINTN                   Index;
   UINTN                   MapSize;
   EFI_STATUS              Status;
-  UINT32                  DbgCtrlStatus;
 
   if (PortStatus == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -367,11 +362,8 @@ EhcGetRootHubPortStatus (
   PortStatus->PortStatus        = 0;
   PortStatus->PortChangeStatus  = 0;
 
-  if ((Ehc->DebugPortNum != 0) && (PortNumber == (Ehc->DebugPortNum - 1))) {
-    DbgCtrlStatus = EhcReadDbgRegister(Ehc, 0);
-    if ((DbgCtrlStatus & (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) == (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) {
-      goto ON_EXIT;
-    }
+  if (EhcIsDebugPortInUse (Ehc, &PortNumber)) {
+    goto ON_EXIT;
   }
 
   State                         = EhcReadOpReg (Ehc, Offset);
@@ -1696,7 +1688,6 @@ EhcDriverBindingStart (
   UINTN                   EhciBusNumber;
   UINTN                   EhciDeviceNumber;
   UINTN                   EhciFunctionNumber;
-  UINT32                  State;
   EFI_DEVICE_PATH_PROTOCOL  *HcDevicePath;
 
   //
@@ -1918,13 +1909,8 @@ EhcDriverBindingStart (
     EhcClearLegacySupport (Ehc);
   }
 
-  if (Ehc->DebugPortNum == 0) {
+  if (!EhcIsDebugPortInUse (Ehc, NULL)) {
     EhcResetHC (Ehc, EHC_RESET_TIMEOUT);
-  } else {
-    State = EhcReadDbgRegister(Ehc, 0);
-    if ((State & (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) != (USB_DEBUG_PORT_IN_USE | USB_DEBUG_PORT_OWNER)) {
-      EhcResetHC (Ehc, EHC_RESET_TIMEOUT);
-    }
   }
 
   Status = EhcInitHC (Ehc);

@@ -77,6 +77,8 @@ typedef struct _USB2_HC_DEV  USB2_HC_DEV;
 #define USB_DEBUG_PORT_IN_USE        BIT10
 #define USB_DEBUG_PORT_ENABLE        BIT28
 #define USB_DEBUG_PORT_OWNER         BIT30
+#define USB_DEBUG_PORT_IN_USE_MASK   (USB_DEBUG_PORT_IN_USE | \
+                                      USB_DEBUG_PORT_OWNER)
 
 //
 // EHC raises TPL to TPL_NOTIFY to serialize all its operations

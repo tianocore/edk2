@@ -137,19 +137,28 @@ EhcReadCapRegister (
   );
 
 /**
-  Read EHCI debug port register.
+  Check whether the host controller has an in-use debug port.
 
-  @param  Ehc          The EHCI device.
-  @param  Offset       Debug port register address.
+  @param[in] Ehc         The Enhanced Host Controller to query.
 
-  @return The register content read.
-  @retval If err, return 0xffff.
+  @param[in] PortNumber  If PortNumber is not NULL, then query whether
+                         PortNumber is an in-use debug port on Ehc. (PortNumber
+                         is taken in UEFI notation, i.e., zero-based.)
+                         Otherwise, query whether Ehc has any in-use debug
+                         port.
 
+  @retval TRUE   PortNumber is an in-use debug port on Ehc (if PortNumber is
+                 not NULL), or some port on Ehc is an in-use debug port
+                 (otherwise).
+
+  @retval FALSE  PortNumber is not an in-use debug port on Ehc (if PortNumber
+                 is not NULL), or no port on Ehc is an in-use debug port
+                 (otherwise).
 **/
-UINT32
-EhcReadDbgRegister (
-  IN  USB2_HC_DEV         *Ehc,
-  IN  UINT32              Offset
+BOOLEAN
+EhcIsDebugPortInUse (
+  IN CONST USB2_HC_DEV *Ehc,
+  IN CONST UINT8       *PortNumber OPTIONAL
   );
 
 /**
