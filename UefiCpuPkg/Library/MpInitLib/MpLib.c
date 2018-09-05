@@ -1014,7 +1014,7 @@ WakeUpAP (
         CpuData = &CpuMpData->CpuData[Index];
         //
         // All AP(include disabled AP) will be woke up by INIT-SIPI-SIPI, but
-        // the AP procedure will be skipped for disabled AP because AP state 
+        // the AP procedure will be skipped for disabled AP because AP state
         // is not CpuStateReady.
         //
         if (GetApState (CpuData) == CpuStateDisabled && !WakeUpDisabledAps) {
