@@ -124,7 +124,7 @@ class Region(RegionClassObject):
                         #
                         self.BlockInfoOfRegion(BlockSizeList, FvObj)
                         self.FvAddress = self.FvAddress + FvOffset
-                        FvAlignValue = self.GetFvAlignValue(FvObj.FvAlignment)
+                        FvAlignValue = GenFdsGlobalVariable.GetAlignment(FvObj.FvAlignment)
                         if self.FvAddress % FvAlignValue != 0:
                             EdkLogger.error("GenFds", GENFDS_ERROR,
                                             "FV (%s) is NOT %s Aligned!" % (FvObj.UiFvName, FvObj.FvAlignment))
@@ -276,25 +276,6 @@ class Region(RegionClassObject):
         if self.RegionType is None:
             GenFdsGlobalVariable.InfLogger('   Region Name = None')
             self.PadBuffer(Buffer, ErasePolarity, Size)
-
-    def GetFvAlignValue(self, Str):
-        AlignValue = 1
-        Granu = 1
-        Str = Str.strip().upper()
-        if Str.endswith('K'):
-            Granu = 1024
-            Str = Str[:-1]
-        elif Str.endswith('M'):
-            Granu = 1024 * 1024
-            Str = Str[:-1]
-        elif Str.endswith('G'):
-            Granu = 1024 * 1024 * 1024
-            Str = Str[:-1]
-        else:
-            pass
-
-        AlignValue = int(Str) * Granu
-        return AlignValue
 
     ## BlockSizeOfRegion()
     #

@@ -512,14 +512,15 @@ class GenFdsGlobalVariable:
 
     @staticmethod
     def GetAlignment (AlignString):
-        if AlignString is None:
+        if not AlignString:
             return 0
-        if AlignString in ("1K", "2K", "4K", "8K", "16K", "32K", "64K", "128K", "256K", "512K"):
+        if AlignString.endswith('K'):
             return int (AlignString.rstrip('K')) * 1024
-        elif AlignString in ("1M", "2M", "4M", "8M", "16M"):
+        if AlignString.endswith('M'):
             return int (AlignString.rstrip('M')) * 1024 * 1024
-        else:
-            return int (AlignString)
+        if AlignString.endswith('G'):
+            return int (AlignString.rstrip('G')) * 1024 * 1024 * 1024
+        return int (AlignString)
 
     @staticmethod
     def GenerateFfs(Output, Input, Type, Guid, Fixed=False, CheckSum=False, Align=None,
