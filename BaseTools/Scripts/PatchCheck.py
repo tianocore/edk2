@@ -551,7 +551,7 @@ class CheckGitCommits:
                      stdout=subprocess.PIPE,
                      stderr=subprocess.STDOUT)
         Result = p.communicate()
-        return Result[0].decode('utf-8', 'ignore') if Result[0] and Result[0].find("fatal")!=0 else None
+        return Result[0].decode('utf-8', 'ignore') if Result[0] and Result[0].find(b"fatal")!=0 else None
 
 class CheckOnePatchFile:
     """Performs a patch check for a single file.
