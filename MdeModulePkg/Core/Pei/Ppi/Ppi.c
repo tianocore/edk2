@@ -143,7 +143,7 @@ ConvertPointerInRanges (
 
   Migrate Single PPI Pointer from the temporary memory to PEI installed memory.
 
-  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size
                          and location of temporary RAM, the stack location and the BFV location.
   @param PrivateData     Pointer to PeiCore's private data structure.
   @param PpiPointer      Pointer to Ppi
@@ -179,7 +179,7 @@ ConvertSinglePpiPointer (
 
   Migrate PPI Pointers from the temporary memory to PEI installed memory.
 
-  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size 
+  @param SecCoreData     Points to a data structure containing SEC to PEI handoff data, such as the size
                          and location of temporary RAM, the stack location and the BFV location.
   @param PrivateData     Pointer to PeiCore's private data structure.
 

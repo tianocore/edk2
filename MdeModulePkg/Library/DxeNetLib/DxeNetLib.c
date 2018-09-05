@@ -656,7 +656,7 @@ NetGetIpClass (
   except when the originator is one of the endpoints of a point-to-point link with a 31-bit
   mask (RFC3021), or a 32bit NetMask (all 0xFF) is used for special network environment (e.g.
   PPP link).
-  
+
   @param[in]  Ip                    The IP to check against.
   @param[in]  NetMask               The mask of the IP.
 
@@ -671,7 +671,7 @@ NetIp4IsUnicast (
   )
 {
   INTN   MaskLength;
-  
+
   ASSERT (NetMask != 0);
 
   if (Ip == 0 || IP4_IS_LOCAL_BROADCAST (Ip)) {

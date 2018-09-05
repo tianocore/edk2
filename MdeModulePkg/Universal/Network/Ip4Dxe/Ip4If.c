@@ -796,14 +796,14 @@ Ip4FreeInterface (
 }
 
 /**
-  This function tries to send all the queued frames in ArpQue to the default gateway if 
+  This function tries to send all the queued frames in ArpQue to the default gateway if
   the ARP resolve for direct destination address is failed when using /32 subnet mask.
 
   @param[in]   ArpQue           The ARP queue of a failed request.
-  
+
   @retval EFI_SUCCESS           All the queued frames have been send to the default route.
   @retval Others                Failed to send the queued frames.
-  
+
 **/
 EFI_STATUS
 Ip4SendFrameToDefaultRoute (
@@ -817,7 +817,7 @@ Ip4SendFrameToDefaultRoute (
   IP4_ADDR                  Gateway;
   EFI_STATUS                Status;
   IP4_ROUTE_ENTRY           *DefaultRoute;
-  
+
   //
   // ARP resolve failed when using /32 subnet mask.
   //
@@ -850,7 +850,7 @@ Ip4SendFrameToDefaultRoute (
     Gateway = DefaultRoute->NextHop;
     if (ArpQue->Ip == Gateway) {
       //
-      // ARP resolve for the default route is failed, return error to caller. 
+      // ARP resolve for the default route is failed, return error to caller.
       //
       Status= EFI_NO_MAPPING;
       goto ON_ERROR;
@@ -865,7 +865,7 @@ Ip4SendFrameToDefaultRoute (
   }
 
   return EFI_SUCCESS;
-  
+
 ON_ERROR:
   if (RtCacheEntry != NULL) {
     Ip4FreeRouteCacheEntry (RtCacheEntry);
@@ -905,7 +905,7 @@ Ip4OnArpResolvedDpc (
   RemoveEntryList (&ArpQue->Link);
 
   //
-  // ARP resolve failed for some reason. 
+  // ARP resolve failed for some reason.
   //
   if (NET_MAC_EQUAL (&ArpQue->Mac, &mZeroMacAddress, ArpQue->Interface->HwaddrLen)) {
     if (ArpQue->Interface->SubnetMask != IP4_ALLONE_ADDRESS) {

@@ -296,7 +296,7 @@ CreateFmpBasedEsrt (
 
   Table->FwResourceCount    = 0;
   Table->FwResourceCountMax = GROWTH_STEP;
-  Table->FwResourceVersion  = EFI_SYSTEM_RESOURCE_TABLE_FIRMWARE_RESOURCE_VERSION; 
+  Table->FwResourceVersion  = EFI_SYSTEM_RESOURCE_TABLE_FIRMWARE_RESOURCE_VERSION;
 
   for (Index = 0; Index < NoProtocols; Index++) {
     Fmp = (EFI_FIRMWARE_MANAGEMENT_PROTOCOL *) Buffer[Index];
