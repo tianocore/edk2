@@ -587,6 +587,39 @@ XhcIsSysError (
 }
 
 /**
+  Set USBCMD Host System Error Enable(HSEE) Bit if PCICMD SERR# Enable Bit is set.
+
+  The USBCMD HSEE Bit will be reset to default 0 by USBCMD Host Controller Reset(HCRST).
+  This function is to set USBCMD HSEE Bit if PCICMD SERR# Enable Bit is set.
+
+  @param Xhc            The XHCI Instance.
+
+**/
+VOID
+XhcSetHsee (
+  IN USB_XHCI_INSTANCE  *Xhc
+  )
+{
+  EFI_STATUS            Status;
+  EFI_PCI_IO_PROTOCOL   *PciIo;
+  UINT16                XhciCmd;
+
+  PciIo = Xhc->PciIo;
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint16,
+                        PCI_COMMAND_OFFSET,
+                        sizeof (XhciCmd),
+                        &XhciCmd
+                        );
+  if (!EFI_ERROR (Status)) {
+    if ((XhciCmd & EFI_PCI_COMMAND_SERR) != 0) {
+      XhcSetOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_HSEE);
+    }
+  }
+}
+
+/**
   Reset the XHCI host controller.
 
   @param  Xhc          The XHCI Instance.
@@ -628,6 +661,14 @@ XhcResetHC (
     //
     gBS->Stall (XHC_1_MILLISECOND);
     Status = XhcWaitOpRegBit (Xhc, XHC_USBCMD_OFFSET, XHC_USBCMD_RESET, FALSE, Timeout);
+
+    if (!EFI_ERROR (Status)) {
+      //
+      // The USBCMD HSEE Bit will be reset to default 0 by USBCMD HCRST.
+      // Set USBCMD HSEE Bit if PCICMD SERR# Enable Bit is set.
+      //
+      XhcSetHsee (Xhc);
+    }
   }
 
   return Status;
