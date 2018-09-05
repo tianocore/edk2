@@ -198,8 +198,8 @@ def error(ToolName, ErrorCode, Message=None, File=None, Line=None, ExtraData=Non
         LogText = _ErrorMessageTemplateWithoutFile % TemplateDict
 
     _ErrorLogger.log(ERROR, LogText)
-    RaiseError = IsRaiseError
-    if RaiseError:
+
+    if RaiseError and IsRaiseError:
         raise FatalError(ErrorCode)
 
 # Log information which should be always put out
