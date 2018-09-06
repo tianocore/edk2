@@ -154,7 +154,7 @@ DmaAllocateAlignedBuffer (
   //
   if (MemoryType == EfiBootServicesData) {
     *HostAddress = AllocateAlignedPages (Pages, Alignment);
-  } else if (MemoryType != EfiRuntimeServicesData) {
+  } else if (MemoryType == EfiRuntimeServicesData) {
     *HostAddress = AllocateAlignedRuntimePages (Pages, Alignment);
   } else {
     return EFI_INVALID_PARAMETER;
