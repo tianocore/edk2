@@ -29,6 +29,7 @@
   Oniguruma/OnigurumaIntrinsics.c | MSFT
 
 # Upstream Oniguruma code
+  Oniguruma/onig_init.c
   Oniguruma/oniguruma.h
   Oniguruma/regcomp.c
   Oniguruma/regenc.c
@@ -50,9 +51,13 @@
   Oniguruma/st.h
 
 # Supported Character Encodings
-  Oniguruma/enc/ascii.c
-  Oniguruma/enc/unicode.c
-  Oniguruma/enc/utf16_le.c
+  Oniguruma/ascii.c
+  Oniguruma/unicode.c
+  Oniguruma/unicode_fold1_key.c
+  Oniguruma/unicode_fold2_key.c
+  Oniguruma/unicode_fold3_key.c
+  Oniguruma/unicode_unfold_key.c
+  Oniguruma/utf16_le.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -75,11 +80,8 @@
 
 [BuildOptions]
   # Override MSFT build option to remove /Oi and /GL
-  MSFT:DEBUG_*_IA32_CC_FLAGS   == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2  /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm
-  MSFT:RELEASE_*_IA32_CC_FLAGS == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2  /FIAutoGen.h /EHs-c- /GR- /GF
-  MSFT:DEBUG_*_X64_CC_FLAGS    == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /X
-  MSFT:RELEASE_*_X64_CC_FLAGS  == /nologo /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2s /FIAutoGen.h /EHs-c- /GR- /GF /Gy /X
-  INTEL:*_*_*_CC_FLAGS         =  /Oi-
+  MSFT:*_*_*_CC_FLAGS          = /GL-
+  INTEL:*_*_*_CC_FLAGS         = /Oi-
 
   # Oniguruma: potentially uninitialized local variable used
   MSFT:*_*_*_CC_FLAGS = /wd4701
@@ -93,3 +95,17 @@
   # Oniguruma: 'type cast' : truncation from 'OnigUChar *' to 'unsigned int'
   MSFT:*_*_*_CC_FLAGS = /wd4305 /wd4306
 
+  # Oniguruma: nameless union declared in regparse.h
+  MSFT:*_*_*_CC_FLAGS = /wd4201
+
+  # Oniguruma: 'type cast' : "int" to "OnigUChar", function pointer to "void *"
+  MSFT:*_*_*_CC_FLAGS = /wd4244 /wd4054
+
+  # Oniguruma: previous local declaration
+  MSFT:*_*_*_CC_FLAGS = /wd4456
+
+  # Oniguruma: signed and unsigned mismatch/cast
+  MSFT:*_*_*_CC_FLAGS = /wd4018 /wd4245 /wd4389
+
+  # Oniguruma: error: variable 'fp' set but not used
+  GCC:*_*_*_CC_FLAGS = -Wno-error=unused-but-set-variable

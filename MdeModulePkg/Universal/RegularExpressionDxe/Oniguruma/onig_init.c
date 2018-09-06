@@ -1,8 +1,8 @@
 /**********************************************************************
-  ascii.c -  Oniguruma (regular expression library)
+  onig_init.c -  Oniguruma (regular expression library)
 **********************************************************************/
 /*-
- * Copyright (c) 2002-2006  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2016-2018  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -27,32 +27,19 @@
  * SUCH DAMAGE.
  */
 
-#include "regenc.h"
+#include "regint.h"
 
-static int
-ascii_is_code_ctype(OnigCodePoint code, unsigned int ctype)
+/* onig_init(): deprecated function */
+extern int
+onig_init(void)
 {
-  if (code < 128)
-    return ONIGENC_IS_ASCII_CODE_CTYPE(code, ctype);
-  else
-    return FALSE;
-}
+#if 0
+  OnigEncoding encs[] = {
+    ONIG_ENCODING_UTF8
+  };
 
-OnigEncodingType OnigEncodingASCII = {
-  onigenc_single_byte_mbc_enc_len,
-  "US-ASCII",  /* name */
-  1,           /* max byte length */
-  1,           /* min byte length */
-  onigenc_is_mbc_newline_0x0a,
-  onigenc_single_byte_mbc_to_code,
-  onigenc_single_byte_code_to_mbclen,
-  onigenc_single_byte_code_to_mbc,
-  onigenc_ascii_mbc_case_fold,
-  onigenc_ascii_apply_all_case_fold,
-  onigenc_ascii_get_case_fold_codes_by_str,
-  onigenc_minimum_property_name_to_ctype,
-  ascii_is_code_ctype,
-  onigenc_not_support_get_ctype_code_range,
-  onigenc_single_byte_left_adjust_char_head,
-  onigenc_always_true_is_allowed_reverse_match
-};
+  return onig_initialize(encs, sizeof(encs)/sizeof(encs[0]));
+#else
+  return onig_initialize(0, 0);
+#endif
+}

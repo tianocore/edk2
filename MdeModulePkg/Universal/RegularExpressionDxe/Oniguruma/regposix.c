@@ -2,10 +2,8 @@
   regposix.c - Oniguruma (regular expression library)
 **********************************************************************/
 /*-
- * Copyright (c) 2002-2008  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2002-2018  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
  * All rights reserved.
- *
- * (C) Copyright 2015 Hewlett Packard Enterprise Development LP<BR>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,7 +40,7 @@
   if (ONIGENC_MBC_MINLEN(enc) == 1) { \
     UChar* tmps = (UChar* )(s); \
     while (*tmps != 0) tmps++; \
-    len = (int)(tmps - (UChar* )(s)); \
+    len = (int )(tmps - (UChar* )(s));\
   } \
   else { \
     len = onigenc_str_bytelen_null(enc, (UChar* )s); \
@@ -60,8 +58,10 @@ onig2posix_error_code(int code)
   static const O2PERR o2p[] = {
     { ONIG_MISMATCH,                                      REG_NOMATCH },
     { ONIG_NO_SUPPORT_CONFIG,                             REG_EONIG_INTERNAL },
+    { ONIG_ABORT,                                         REG_EONIG_INTERNAL },
     { ONIGERR_MEMORY,                                     REG_ESPACE  },
     { ONIGERR_MATCH_STACK_LIMIT_OVER,                     REG_EONIG_INTERNAL },
+    { ONIGERR_RETRY_LIMIT_IN_MATCH_OVER,                  REG_EONIG_INTERNAL },
     { ONIGERR_TYPE_BUG,                                   REG_EONIG_INTERNAL },
     { ONIGERR_PARSER_BUG,                                 REG_EONIG_INTERNAL },
     { ONIGERR_STACK_BUG,                                  REG_EONIG_INTERNAL },
@@ -69,6 +69,7 @@ onig2posix_error_code(int code)
     { ONIGERR_UNEXPECTED_BYTECODE,                        REG_EONIG_INTERNAL },
     { ONIGERR_DEFAULT_ENCODING_IS_NOT_SETTED,             REG_EONIG_BADARG },
     { ONIGERR_SPECIFIED_ENCODING_CANT_CONVERT_TO_WIDE_CHAR, REG_EONIG_BADARG },
+    { ONIGERR_FAIL_TO_INITIALIZE,                         REG_EONIG_INTERNAL },
     { ONIGERR_INVALID_ARGUMENT,                           REG_EONIG_BADARG },
     { ONIGERR_END_PATTERN_AT_LEFT_BRACE,                  REG_EBRACE  },
     { ONIGERR_END_PATTERN_AT_LEFT_BRACKET,                REG_EBRACK  },
@@ -115,9 +116,17 @@ onig2posix_error_code(int code)
     { ONIGERR_NEVER_ENDING_RECURSION,                     REG_BADPAT },
     { ONIGERR_GROUP_NUMBER_OVER_FOR_CAPTURE_HISTORY,      REG_BADPAT },
     { ONIGERR_INVALID_CHAR_PROPERTY_NAME,                 REG_BADPAT },
+    { ONIGERR_INVALID_IF_ELSE_SYNTAX,                     REG_BADPAT },
+    { ONIGERR_INVALID_ABSENT_GROUP_PATTERN,               REG_BADPAT },
+    { ONIGERR_INVALID_ABSENT_GROUP_GENERATOR_PATTERN,     REG_BADPAT },
+    { ONIGERR_INVALID_CALLOUT_PATTERN,                    REG_BADPAT },
+    { ONIGERR_INVALID_CALLOUT_NAME,                       REG_BADPAT },
+    { ONIGERR_UNDEFINED_CALLOUT_NAME,                     REG_BADPAT },
+    { ONIGERR_INVALID_CALLOUT_BODY,                       REG_BADPAT },
+    { ONIGERR_INVALID_CALLOUT_TAG_NAME,                   REG_BADPAT },
+    { ONIGERR_INVALID_CALLOUT_ARG,                        REG_BADPAT },
     { ONIGERR_NOT_SUPPORTED_ENCODING_COMBINATION,         REG_EONIG_BADARG },
-    { ONIGERR_OVER_THREAD_PASS_LIMIT_COUNT,               REG_EONIG_THREAD }
-
+    { ONIGERR_LIBRARY_IS_NOT_INITIALIZED,                 REG_EONIG_INTERNAL }
   };
 
   int i;
@@ -241,10 +250,9 @@ reg_set_encoding(int mb_code)
   case REG_POSIX_ENCODING_UTF16_LE:
     enc = ONIG_ENCODING_UTF16_LE;
     break;
-
-  default:
-    return;
   }
+
+  onig_initialize(&enc, 1);
 
   onigenc_set_default_encoding(enc);
 }
