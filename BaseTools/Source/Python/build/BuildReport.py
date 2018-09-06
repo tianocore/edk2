@@ -1014,7 +1014,7 @@ class PcdReport(object):
                     First = False
 
 
-                if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+                if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
                     PcdValueNumber = int(PcdValue.strip(), 0)
                     if DecDefaultValue is None:
                         DecMatch = True
@@ -1102,6 +1102,15 @@ class PcdReport(object):
                 #
                 # Report PCD item according to their override relationship
                 #
+                if Pcd.DatumType == 'BOOLEAN':
+                    if DscDefaultValue:
+                        DscDefaultValue = str(int(DscDefaultValue, 0))
+                    if DecDefaultValue:
+                        DecDefaultValue = str(int(DecDefaultValue, 0))
+                    if InfDefaultValue:
+                        InfDefaultValue = str(int(InfDefaultValue, 0))
+                    if Pcd.DefaultValue:
+                        Pcd.DefaultValue = str(int(Pcd.DefaultValue, 0))
                 if DecMatch:
                     self.PrintPcdValue(File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValBak, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, '  ')
                 elif InfDefaultValue and InfMatch:
@@ -1126,9 +1135,11 @@ class PcdReport(object):
                         ModuleOverride = self.ModulePcdOverride.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName), {})
                         for ModulePath in ModuleOverride:
                             ModuleDefault = ModuleOverride[ModulePath]
-                            if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
+                            if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
                                 ModulePcdDefaultValueNumber = int(ModuleDefault.strip(), 0)
                                 Match = (ModulePcdDefaultValueNumber == PcdValueNumber)
+                                if Pcd.DatumType == 'BOOLEAN':
+                                    ModuleDefault = str(ModulePcdDefaultValueNumber)
                             else:
                                 Match = (ModuleDefault.strip() == PcdValue.strip())
                             if Match:
@@ -1247,6 +1258,8 @@ class PcdReport(object):
                         for DefaultStore in DefaultStoreList:
                             Value = SkuInfo.DefaultStoreDict[DefaultStore]
                             IsByteArray, ArrayList = ByteArrayForamt(Value)
+                            if Pcd.DatumType == 'BOOLEAN':
+                                Value = str(int(Value, 0))
                             if FirstPrint:
                                 FirstPrint = False
                                 if IsByteArray:
@@ -1309,6 +1322,8 @@ class PcdReport(object):
                 else:
                     Value = SkuInfo.DefaultValue
                     IsByteArray, ArrayList = ByteArrayForamt(Value)
+                    if Pcd.DatumType == 'BOOLEAN':
+                        Value = str(int(Value, 0))
                     if FirstPrint:
                         FirstPrint = False
                         if IsByteArray:
