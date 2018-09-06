@@ -124,6 +124,7 @@ EmulatorPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
 M: Jordan Justen <jordan.l.justen@intel.com>
 M: Andrew Fish <afish@apple.com>
+M: Ruiyu Ni <ruiyu.ni@intel.com>
 S: Maintained
 
 FatPkg, FatBinPkg
