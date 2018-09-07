@@ -46,7 +46,7 @@ GetExceptionHandlerData (
 
   AsmReadIdtr (&IdtDescriptor);
   IdtTable = (IA32_IDT_GATE_DESCRIPTOR *)IdtDescriptor.Base;
-  
+
   Exception0StubHeader = (EXCEPTION0_STUB_HEADER *)ArchGetIdtHandler (&IdtTable[0]);
   return Exception0StubHeader->ExceptionHandlerData;
 }
@@ -58,7 +58,7 @@ GetExceptionHandlerData (
   exception handler data. The new allocated memory layout follows structure EXCEPTION0_STUB_HEADER.
   The code assumes that all processors uses the same exception handler for #0 exception.
 
-  @param  pointer to exception handler data.
+  @param ExceptionHandlerData  pointer to exception handler data.
 **/
 VOID
 SetExceptionHandlerData (
@@ -74,7 +74,7 @@ SetExceptionHandlerData (
   //
   AsmReadIdtr (&IdtDescriptor);
   IdtTable = (IA32_IDT_GATE_DESCRIPTOR *)IdtDescriptor.Base;
-  
+
   Exception0StubHeader = AllocatePool (sizeof (*Exception0StubHeader));
   ASSERT (Exception0StubHeader != NULL);
   CopyMem (
