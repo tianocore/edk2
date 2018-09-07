@@ -2750,9 +2750,6 @@ RunCommand(
   return (RunShellCommand(CmdLine, NULL));
 }
 
-
-STATIC CONST UINT16 InvalidChars[] = {L'*', L'?', L'<', L'>', L'\\', L'/', L'\"', 0x0001, 0x0002};
-
 /**
   Function to process a NSH script file via SHELL_FILE_HANDLE.
 
