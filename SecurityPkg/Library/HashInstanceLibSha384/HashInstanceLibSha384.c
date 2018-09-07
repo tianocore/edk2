@@ -118,7 +118,7 @@ Sha384HashFinal (
   Sha384Final (Sha384Ctx, Digest);
 
   FreePool (Sha384Ctx);
-  
+
   Tpm2SetSha384ToDigestList (DigestList, Digest);
 
   return EFI_SUCCESS;
@@ -133,7 +133,7 @@ HASH_INTERFACE  mSha384InternalHashInstance = {
 
 /**
   The function register SHA384 instance.
-  
+
   @retval EFI_SUCCESS   SHA384 instance is registered, or system dose not surpport registr SHA384 instance
 **/
 EFI_STATUS

@@ -117,7 +117,7 @@ Sha512HashFinal (
   Sha512Final (Sha512Ctx, Digest);
 
   FreePool (Sha512Ctx);
-  
+
   Tpm2SetSha512ToDigestList (DigestList, Digest);
 
   return EFI_SUCCESS;
@@ -132,7 +132,7 @@ HASH_INTERFACE  mSha512InternalHashInstance = {
 
 /**
   The function register SHA512 instance.
-  
+
   @retval EFI_SUCCESS   SHA512 instance is registered, or system dose not surpport registr SHA512 instance
 **/
 EFI_STATUS
