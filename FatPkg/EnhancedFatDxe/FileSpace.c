@@ -467,7 +467,7 @@ FatGrowEof (
       ClusterCount  = 0;
 
       while (!FAT_END_OF_FAT_CHAIN (Cluster)) {
-        if (Cluster == FAT_CLUSTER_FREE || Cluster >= FAT_CLUSTER_SPECIAL) {
+        if (Cluster < FAT_MIN_CLUSTER || Cluster > Volume->MaxCluster + 1) {
 
           DEBUG (
             (EFI_D_INIT | EFI_D_ERROR,
@@ -509,6 +509,11 @@ FatGrowEof (
         goto Done;
       }
 
+      if (NewCluster < FAT_MIN_CLUSTER || NewCluster > Volume->MaxCluster + 1) {
+        Status = EFI_VOLUME_CORRUPTED;
+        goto Done;
+      }
+
       if (LastCluster != 0) {
         FatSetFatEntry (Volume, LastCluster, NewCluster);
       } else {
@@ -518,12 +523,21 @@ FatGrowEof (
 
       LastCluster = NewCluster;
       CurSize += 1;
+
+      //
+      // Terminate the cluster list
+      //
+      // Note that we must do this EVERY time we allocate a cluster, because
+      // FatAllocateCluster scans the FAT looking for a free cluster and
+      // "LastCluster" is no longer free!  Usually, FatAllocateCluster will
+      // start looking with the cluster after "LastCluster"; however, when
+      // there is only one free cluster left, it will find "LastCluster"
+      // a second time.  There are other, less predictable scenarios
+      // where this could happen, as well.
+      //
+      FatSetFatEntry (Volume, LastCluster, (UINTN) FAT_CLUSTER_LAST);
+      OFile->FileLastCluster = LastCluster;
     }
-    //
-    // Terminate the cluster list
-    //
-    FatSetFatEntry (Volume, LastCluster, (UINTN) FAT_CLUSTER_LAST);
-    OFile->FileLastCluster = LastCluster;
   }
 
   OFile->FileSize = (UINTN) NewSizeInBytes;
@@ -603,7 +617,7 @@ FatOFilePosition (
       Cluster = FatGetFatEntry (Volume, Cluster);
     }
 
-    if (Cluster < FAT_MIN_CLUSTER) {
+    if (Cluster < FAT_MIN_CLUSTER || Cluster > Volume->MaxCluster + 1) {
       return EFI_VOLUME_CORRUPTED;
     }
 
