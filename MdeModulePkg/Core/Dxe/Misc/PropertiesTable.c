@@ -1076,7 +1076,6 @@ InsertImageRecord (
   IMAGE_PROPERTIES_RECORD              *ImageRecord;
   CHAR8                                *PdbPointer;
   IMAGE_PROPERTIES_RECORD_CODE_SECTION *ImageRecordCodeSection;
-  UINT16                               Magic;
 
   DEBUG ((EFI_D_VERBOSE, "InsertImageRecord - 0x%x\n", RuntimeImage));
   DEBUG ((EFI_D_VERBOSE, "InsertImageRecord - 0x%016lx - 0x%016lx\n", (EFI_PHYSICAL_ADDRESS)(UINTN)RuntimeImage->ImageBase, RuntimeImage->ImageSize));
@@ -1126,21 +1125,7 @@ InsertImageRecord (
   //
   // Get SectionAlignment
   //
-  if (Hdr.Pe32->FileHeader.Machine == IMAGE_FILE_MACHINE_IA64 && Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-    //
-    // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value
-    //       in the PE/COFF Header. If the MachineType is Itanium(IA64) and the
-    //       Magic value in the OptionalHeader is EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
-    //       then override the magic value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
-    //
-    Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
-  } else {
-    //
-    // Get the magic value from the PE/COFF Optional Header
-    //
-    Magic = Hdr.Pe32->OptionalHeader.Magic;
-  }
-  if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+  if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     SectionAlignment  = Hdr.Pe32->OptionalHeader.SectionAlignment;
   } else {
     SectionAlignment  = Hdr.Pe32Plus->OptionalHeader.SectionAlignment;

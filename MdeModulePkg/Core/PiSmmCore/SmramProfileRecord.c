@@ -256,35 +256,6 @@ GetSmramProfileContext (
 }
 
 /**
-  Retrieves the magic value from the PE/COFF header.
-
-  @param Hdr    The buffer in which to return the PE32, PE32+, or TE header.
-
-  @return EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC - Image is PE32
-  @return EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC - Image is PE32+
-
-**/
-UINT16
-InternalPeCoffGetPeHeaderMagicValue (
-  IN  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr
-  )
-{
-  //
-  // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value
-  //       in the PE/COFF Header.  If the MachineType is Itanium(IA64) and the
-  //       Magic value in the OptionalHeader is  EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
-  //       then override the returned value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
-  //
-  if (Hdr.Pe32->FileHeader.Machine == IMAGE_FILE_MACHINE_IA64 && Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-    return EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
-  }
-  //
-  // Return the magic value from the PC/COFF Optional Header
-  //
-  return Hdr.Pe32->OptionalHeader.Magic;
-}
-
-/**
   Retrieves and returns the Subsystem of a PE/COFF image that has been loaded into system memory.
   If Pe32Data is NULL, then ASSERT().
 
@@ -320,7 +291,7 @@ InternalPeCoffGetSubsystem (
   if (Hdr.Te->Signature == EFI_TE_IMAGE_HEADER_SIGNATURE) {
     return Hdr.Te->Subsystem;
   } else if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE)  {
-    Magic = InternalPeCoffGetPeHeaderMagicValue (Hdr);
+    Magic = Hdr.Pe32->OptionalHeader.Magic;
     if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       return Hdr.Pe32->OptionalHeader.Subsystem;
     } else if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
