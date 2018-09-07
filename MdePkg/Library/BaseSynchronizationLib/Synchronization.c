@@ -231,8 +231,7 @@ ReleaseSpinLock (
 
   Performs an atomic increment of the 32-bit unsigned integer specified by
   Value and returns the incremented value. The increment operation must be
-  performed using MP safe mechanisms. The state of the return value is not
-  guaranteed to be MP safe.
+  performed using MP safe mechanisms.
 
   If Value is NULL, then ASSERT().
 
@@ -256,8 +255,7 @@ InterlockedIncrement (
 
   Performs an atomic decrement of the 32-bit unsigned integer specified by
   Value and returns the decremented value. The decrement operation must be
-  performed using MP safe mechanisms. The state of the return value is not
-  guaranteed to be MP safe.
+  performed using MP safe mechanisms.
 
   If Value is NULL, then ASSERT().
 

@@ -34,9 +34,9 @@
   Ia32/InterlockedCompareExchange64.c | MSFT
   Ia32/InterlockedCompareExchange32.c | MSFT
   Ia32/InterlockedCompareExchange16.c | MSFT
-  Ia32/InterlockedDecrement.c | MSFT
-  Ia32/InterlockedIncrement.c | MSFT
-  SynchronizationMsc.c  | MSFT
+  InterlockedIncrementMsc.c | MSFT
+  InterlockedDecrementMsc.c | MSFT
+  SynchronizationMsc.c | MSFT
 
   Ia32/InterlockedCompareExchange64.nasm| INTEL
   Ia32/InterlockedCompareExchange32.nasm| INTEL
@@ -54,17 +54,15 @@
   X64/InterlockedCompareExchange64.c | MSFT
   X64/InterlockedCompareExchange32.c | MSFT
   X64/InterlockedCompareExchange16.c | MSFT
+  InterlockedIncrementMsc.c | MSFT
+  InterlockedDecrementMsc.c | MSFT
+  SynchronizationMsc.c | MSFT
 
   X64/InterlockedCompareExchange64.nasm| INTEL
   X64/InterlockedCompareExchange32.nasm| INTEL
   X64/InterlockedCompareExchange16.nasm| INTEL
-
-  X64/InterlockedDecrement.c | MSFT
-  X64/InterlockedIncrement.c | MSFT
-  SynchronizationMsc.c | MSFT
-
-  X64/InterlockedDecrement.nasm| INTEL
-  X64/InterlockedIncrement.nasm| INTEL
+  X64/InterlockedDecrement.nasm | INTEL
+  X64/InterlockedIncrement.nasm | INTEL
   Synchronization.c | INTEL
 
   Ia32/InternalGetSpinLockProperties.c | GCC

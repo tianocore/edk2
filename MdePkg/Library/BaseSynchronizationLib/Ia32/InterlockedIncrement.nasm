@@ -32,8 +32,9 @@
 ;------------------------------------------------------------------------------
 global ASM_PFX(InternalSyncIncrement)
 ASM_PFX(InternalSyncIncrement):
-    mov     eax, [esp + 4]
-    lock    inc     dword [eax]
-    mov     eax, [eax]
+    mov       ecx, [esp + 4]
+    mov       eax, 1
+    lock xadd dword [ecx], eax
+    inc       eax
     ret
 

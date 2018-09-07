@@ -20,8 +20,7 @@
 
   Performs an atomic increment of the 32-bit unsigned integer specified by
   Value and returns the incremented value. The increment operation must be
-  performed using MP safe mechanisms. The state of the return value is not
-  guaranteed to be MP safe.
+  performed using MP safe mechanisms.
 
   @param  Value A pointer to the 32-bit value to increment.
 
@@ -37,9 +36,10 @@ InternalSyncIncrement (
   UINT32  Result;
 
   __asm__ __volatile__ (
+    "movl    $1, %%eax  \n\t"
     "lock               \n\t"
-    "incl    %2         \n\t"
-    "movl    %2, %%eax      "
+    "xadd    %%eax, %2  \n\t"
+    "inc     %%eax          "
     : "=a" (Result),          // %0
       "=m" (*Value)           // %1
     : "m"  (*Value)           // %2
@@ -57,8 +57,7 @@ InternalSyncIncrement (
 
   Performs an atomic decrement of the 32-bit unsigned integer specified by
   Value and returns the decremented value. The decrement operation must be
-  performed using MP safe mechanisms. The state of the return value is not
-  guaranteed to be MP safe.
+  performed using MP safe mechanisms.
 
   @param  Value A pointer to the 32-bit value to decrement.
 
@@ -74,9 +73,10 @@ InternalSyncDecrement (
    UINT32  Result;
 
   __asm__ __volatile__ (
-    "lock               \n\t"
-    "decl    %2         \n\t"
-    "movl    %2, %%eax      "
+    "movl    $-1, %%eax  \n\t"
+    "lock                \n\t"
+    "xadd    %%eax, %2   \n\t"
+    "dec     %%eax                  "
     : "=a" (Result),          // %0
       "=m" (*Value)           // %1
     : "m"  (*Value)           // %2

@@ -1,7 +1,7 @@
 /** @file
   InterlockedDecrement function
 
-  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -12,8 +12,15 @@
 
 **/
 
+/**
+  Microsoft Visual Studio 7.1 Function Prototypes for I/O Intrinsics.
+**/
 
+long _InterlockedDecrement(
+   long * lpAddend
+);
 
+#pragma intrinsic(_InterlockedDecrement)
 
 /**
   Performs an atomic decrement of an 32-bit unsigned integer.
@@ -34,9 +41,6 @@ InternalSyncDecrement (
   IN      volatile UINT32           *Value
   )
 {
-  _asm {
-    mov     eax, Value
-    lock    dec     dword ptr [eax]
-    mov     eax, [eax]
-  }
+  return _InterlockedDecrement ((long *)(Value));
 }
+
