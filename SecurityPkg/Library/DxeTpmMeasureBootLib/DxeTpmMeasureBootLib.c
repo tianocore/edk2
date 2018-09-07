@@ -320,7 +320,6 @@ TcgMeasurePeImage (
   EFI_IMAGE_SECTION_HEADER             *SectionHeader;
   UINTN                                Index;
   UINTN                                Pos;
-  UINT16                               Magic;
   UINT32                               EventSize;
   UINT32                               EventNumber;
   EFI_PHYSICAL_ADDRESS                 EventLogLastEntry;
@@ -418,27 +417,13 @@ TcgMeasurePeImage (
   // Measuring PE/COFF Image Header;
   // But CheckSum field and SECURITY data directory (certificate) are excluded
   //
-  if (Hdr.Pe32->FileHeader.Machine == IMAGE_FILE_MACHINE_IA64 && Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
-    //
-    // NOTE: Some versions of Linux ELILO for Itanium have an incorrect magic value
-    //       in the PE/COFF Header. If the MachineType is Itanium(IA64) and the
-    //       Magic value in the OptionalHeader is EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC
-    //       then override the magic value to EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC
-    //
-    Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
-  } else {
-    //
-    // Get the magic value from the PE/COFF Optional Header
-    //
-    Magic = Hdr.Pe32->OptionalHeader.Magic;
-  }
 
   //
   // 3.  Calculate the distance from the base of the image header to the image checksum address.
   // 4.  Hash the image header from its base to beginning of the image checksum.
   //
   HashBase = (UINT8 *) (UINTN) ImageAddress;
-  if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+  if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     //
     // Use PE32 offset
     //
@@ -465,7 +450,7 @@ TcgMeasurePeImage (
     // 6.  Since there is no Cert Directory in optional header, hash everything
     //     from the end of the checksum to the end of image header.
     //
-    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
       // Use PE32 offset.
       //
@@ -489,7 +474,7 @@ TcgMeasurePeImage (
     //
     // 7.  Hash everything from the end of the checksum to the start of the Cert Directory.
     //
-    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
       // Use PE32 offset
       //
@@ -514,7 +499,7 @@ TcgMeasurePeImage (
     // 8.  Skip over the Cert Directory. (It is sizeof(IMAGE_DATA_DIRECTORY) bytes.)
     // 9.  Hash everything from the end of the Cert Directory to the end of image header.
     //
-    if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+    if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
       //
       // Use PE32 offset
       //
@@ -539,7 +524,7 @@ TcgMeasurePeImage (
   //
   // 10. Set the SUM_OF_BYTES_HASHED to the size of the header
   //
-  if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+  if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
     //
     // Use PE32 offset
     //
@@ -621,7 +606,7 @@ TcgMeasurePeImage (
     if (NumberOfRvaAndSizes <= EFI_IMAGE_DIRECTORY_ENTRY_SECURITY) {
       CertSize = 0;
     } else {
-      if (Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
+      if (Hdr.Pe32->OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) {
         //
         // Use PE32 offset.
         //
