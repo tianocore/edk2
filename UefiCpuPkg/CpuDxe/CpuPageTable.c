@@ -1181,7 +1181,7 @@ DebugExceptionHandler (
 
   for (PFEntry = 0; PFEntry < mPFEntryCount[CpuIndex]; PFEntry++) {
     if (mLastPFEntryPointer[CpuIndex][PFEntry] != NULL) {
-      *mLastPFEntryPointer[CpuIndex][PFEntry] &= ~IA32_PG_P;
+      *mLastPFEntryPointer[CpuIndex][PFEntry] &= ~(UINT64)IA32_PG_P;
     }
   }
 
