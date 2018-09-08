@@ -291,7 +291,7 @@ RefreshGcdMemoryAttributesFromPaging (
 VOID
 EFIAPI
 DebugExceptionHandler (
-  IN EFI_EXCEPTION_TYPE   InterruptType,
+  IN EFI_EXCEPTION_TYPE   ExceptionType,
   IN EFI_SYSTEM_CONTEXT   SystemContext
   );
 
@@ -307,7 +307,7 @@ DebugExceptionHandler (
 VOID
 EFIAPI
 PageFaultExceptionHandler (
-  IN EFI_EXCEPTION_TYPE   InterruptType,
+  IN EFI_EXCEPTION_TYPE   ExceptionType,
   IN EFI_SYSTEM_CONTEXT   SystemContext
   );
 
