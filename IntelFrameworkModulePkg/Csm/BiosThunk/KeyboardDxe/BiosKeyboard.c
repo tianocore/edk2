@@ -1986,6 +1986,7 @@ BiosKeyboardTimerHandler (
       //
       Enqueue (&BiosKeyboardPrivate->QueueForNotify, &KeyData);
       gBS->SignalEvent (BiosKeyboardPrivate->KeyNotifyProcessEvent);
+      break;
     }
   }
 
