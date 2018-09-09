@@ -1451,6 +1451,7 @@ KeyGetchar (
       //
       PushEfikeyBufTail (&ConsoleIn->EfiKeyQueueForNotify, &KeyData);
       gBS->SignalEvent (ConsoleIn->KeyNotifyProcessEvent);
+      break;
     }
   }
 

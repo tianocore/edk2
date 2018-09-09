@@ -1695,6 +1695,7 @@ UsbKeyCodeToEfiInputKey (
       //
       Enqueue (&UsbKeyboardDevice->EfiKeyQueueForNotify, KeyData, sizeof (*KeyData));
       gBS->SignalEvent (UsbKeyboardDevice->KeyNotifyProcessEvent);
+      break;
     }
   }
 

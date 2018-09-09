@@ -987,6 +987,7 @@ EfiKeyFiFoInsertOneKey (
       //
       EfiKeyFiFoForNotifyInsertOneKey (TerminalDevice->EfiKeyFiFoForNotify, Key);
       gBS->SignalEvent (TerminalDevice->KeyNotifyProcessEvent);
+      break;
     }
   }
   if (IsEfiKeyFiFoFull (TerminalDevice)) {
