@@ -1,7 +1,7 @@
 /** @file
   VirtualKeyboard driver
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2018, Linaro Ltd. All rights reserved.<BR>
 
 This program and the accompanying materials
@@ -1045,6 +1045,7 @@ VirtualKeyboardTimerHandler (
       //
       Enqueue (&VirtualKeyboardPrivate->QueueForNotify, &KeyData);
       gBS->SignalEvent (VirtualKeyboardPrivate->KeyNotifyProcessEvent);
+      break;
     }
   }
 
