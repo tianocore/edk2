@@ -714,7 +714,15 @@ InitSmmS3ResumeState (
   }
 
   GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
-  if (GuidHob != NULL) {
+  if (GuidHob == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "ERROR:%a(): HOB(gEfiAcpiVariableGuid=%g) needed by S3 resume doesn't exist!\n",
+      __FUNCTION__,
+      &gEfiAcpiVariableGuid
+    ));
+    CpuDeadLoop ();
+  } else {
     SmramDescriptor = (EFI_SMRAM_DESCRIPTOR *) GET_GUID_HOB_DATA (GuidHob);
 
     DEBUG ((EFI_D_INFO, "SMM S3 SMRAM Structure = %x\n", SmramDescriptor));
