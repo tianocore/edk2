@@ -1085,21 +1085,19 @@ class PlatformAutoGen(AutoGen):
     def GenFdsCommand(self):
         return self.Workspace.GenFdsCommand
 
-    ## Create makefile for the platform and mdoules in it
+    ## Create makefile for the platform and modules in it
     #
     #   @param      CreateModuleMakeFile    Flag indicating if the makefile for
     #                                       modules will be created as well
     #
     def CreateMakeFile(self, CreateModuleMakeFile=False, FfsCommand = {}):
         if CreateModuleMakeFile:
-            for ModuleFile in self.Platform.Modules:
-                Ma = ModuleAutoGen(self.Workspace, ModuleFile, self.BuildTarget,
-                                   self.ToolChain, self.Arch, self.MetaFile)
-                if (ModuleFile.File, self.Arch) in FfsCommand:
-                    Ma.CreateMakeFile(True, FfsCommand[ModuleFile.File, self.Arch])
+            for Ma in self._MaList:
+                key = (Ma.MetaFile.File, self.Arch)
+                if key in FfsCommand:
+                    Ma.CreateMakeFile(True, FfsCommand[key])
                 else:
                     Ma.CreateMakeFile(True)
-                #Ma.CreateAsBuiltInf()
 
         # no need to create makefile for the platform more than once
         if self.IsMakeFileCreated:
@@ -1231,16 +1229,12 @@ class PlatformAutoGen(AutoGen):
         for InfName in self._AsBuildInfList:
             InfName = mws.join(self.WorkspaceDir, InfName)
             FdfModuleList.append(os.path.normpath(InfName))
-        for F in self.Platform.Modules.keys():
-            M = ModuleAutoGen(self.Workspace, F, self.BuildTarget, self.ToolChain, self.Arch, self.MetaFile)
-            #GuidValue.update(M.Guids)
-
-            self.Platform.Modules[F].M = M
-
+        for M in self._MaList:
+#            F is the Module for which M is the module autogen
             for PcdFromModule in M.ModulePcdList + M.LibraryPcdList:
                 # make sure that the "VOID*" kind of datum has MaxDatumSize set
                 if PcdFromModule.DatumType == TAB_VOID and not PcdFromModule.MaxDatumSize:
-                    NoDatumTypePcdList.add("%s.%s [%s]" % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, F))
+                    NoDatumTypePcdList.add("%s.%s [%s]" % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, M.MetaFile))
 
                 # Check the PCD from Binary INF or Source INF
                 if M.IsBinaryModule == True:
@@ -1250,7 +1244,7 @@ class PlatformAutoGen(AutoGen):
                 PcdFromModule.IsFromDsc = (PcdFromModule.TokenCName, PcdFromModule.TokenSpaceGuidCName) in self.Platform.Pcds
 
                 if PcdFromModule.Type in PCD_DYNAMIC_TYPE_SET or PcdFromModule.Type in PCD_DYNAMIC_EX_TYPE_SET:
-                    if F.Path not in FdfModuleList:
+                    if M.MetaFile.Path not in FdfModuleList:
                         # If one of the Source built modules listed in the DSC is not listed
                         # in FDF modules, and the INF lists a PCD can only use the PcdsDynamic
                         # access method (it is only listed in the DEC file that declares the
@@ -1934,19 +1928,25 @@ class PlatformAutoGen(AutoGen):
             TokenNumber += 1
         return RetVal
 
+    @cached_property
+    def _MaList(self):
+        for ModuleFile in self.Platform.Modules:
+            Ma = ModuleAutoGen(
+                  self.Workspace,
+                  ModuleFile,
+                  self.BuildTarget,
+                  self.ToolChain,
+                  self.Arch,
+                  self.MetaFile
+                  )
+            self.Platform.Modules[ModuleFile].M = Ma
+        return [x.M for x in self.Platform.Modules.values()]
+
     ## Summarize ModuleAutoGen objects of all modules to be built for this platform
     @cached_property
     def ModuleAutoGenList(self):
         RetVal = []
-        for ModuleFile in self.Platform.Modules:
-            Ma = ModuleAutoGen(
-                    self.Workspace,
-                    ModuleFile,
-                    self.BuildTarget,
-                    self.ToolChain,
-                    self.Arch,
-                    self.MetaFile
-                    )
+        for Ma in self._MaList:
             if Ma not in RetVal:
                 RetVal.append(Ma)
         return RetVal
@@ -1955,15 +1955,7 @@ class PlatformAutoGen(AutoGen):
     @cached_property
     def LibraryAutoGenList(self):
         RetVal = []
-        for ModuleFile in self.Platform.Modules:
-            Ma = ModuleAutoGen(
-                    self.Workspace,
-                    ModuleFile,
-                    self.BuildTarget,
-                    self.ToolChain,
-                    self.Arch,
-                    self.MetaFile
-                    )
+        for Ma in self._MaList:
             for La in Ma.LibraryAutoGenList:
                 if La not in RetVal:
                     RetVal.append(La)
