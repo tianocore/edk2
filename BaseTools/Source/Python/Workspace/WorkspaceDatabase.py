@@ -302,24 +302,20 @@ determine whether database file is out of date!\n")
         return PackageList
 
     ## Summarize all platforms in the database
-    def _GetPlatformList(self):
-        PlatformList = []
+    def PlatformList(self):
+        RetVal = []
         for PlatformFile in self.TblFile.GetFileList(MODEL_FILE_DSC):
             try:
-                Platform = self.BuildObject[PathClass(PlatformFile), TAB_COMMON]
+                RetVal.append(self.BuildObject[PathClass(PlatformFile), TAB_COMMON])
             except:
-                Platform = None
-            if Platform is not None:
-                PlatformList.append(Platform)
-        return PlatformList
+                pass
+        return RetVal
 
-    def _MapPlatform(self, Dscfile):
+    def MapPlatform(self, Dscfile):
         Platform = self.BuildObject[PathClass(Dscfile), TAB_COMMON]
         if Platform is None:
             EdkLogger.error('build', PARSER_ERROR, "Failed to parser DSC file: %s" % Dscfile)
         return Platform
-
-    PlatformList = property(_GetPlatformList)
 
 ##
 #

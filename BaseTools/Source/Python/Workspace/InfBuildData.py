@@ -157,40 +157,42 @@ class InfBuildData(ModuleBuildClassObject):
         self._BuildOptions          = None
         self._Depex                 = None
         self._DepexExpression       = None
-        self.__Macros               = None
+        self._MacroDict             = None
 
     ## Get current effective macros
-    def _GetMacros(self):
-        if self.__Macros is None:
-            self.__Macros = {}
+    @property
+    def _Macros(self):
+        if self._MacroDict is None:
+            self._MacroDict = {}
             # EDK_GLOBAL defined macros can be applied to EDK module
             if self.AutoGenVersion < 0x00010005:
-                self.__Macros.update(GlobalData.gEdkGlobal)
-                self.__Macros.update(GlobalData.gGlobalDefines)
-        return self.__Macros
+                self._MacroDict.update(GlobalData.gEdkGlobal)
+                self._MacroDict.update(GlobalData.gGlobalDefines)
+        return self._MacroDict
 
     ## Get architecture
-    def _GetArch(self):
+    @property
+    def Arch(self):
         return self._Arch
 
     ## Return the name of platform employing this module
-    def _GetPlatform(self):
+    @property
+    def Platform(self):
         return self._Platform
 
-    def _GetHeaderComments(self):
+
+    @property
+    def HeaderComments(self):
         if not self._HeaderComments:
-            self._HeaderComments = []
-            RecordList = self._RawData[MODEL_META_DATA_HEADER_COMMENT]
-            for Record in RecordList:
-                self._HeaderComments.append(Record[0])
+            self._HeaderComments = [a[0] for a in self._RawData[MODEL_META_DATA_HEADER_COMMENT]]
         return self._HeaderComments
-    def _GetTailComments(self):
+
+    @property
+    def TailComments(self):
         if not self._TailComments:
-            self._TailComments = []
-            RecordList = self._RawData[MODEL_META_DATA_TAIL_COMMENT]
-            for Record in RecordList:
-                self._TailComments.append(Record[0])
+            self._TailComments = [a[0] for a in self._RawData[MODEL_META_DATA_TAIL_COMMENT]]
         return self._TailComments
+
     ## Retrieve all information in [Defines] section
     #
     #   (Retriving all [Defines] information in one-shot is just to save time.)
@@ -371,7 +373,8 @@ class InfBuildData(ModuleBuildClassObject):
         self._Header_ = 'DUMMY'
 
     ## Retrieve file version
-    def _GetInfVersion(self):
+    @property
+    def AutoGenVersion(self):
         if self._AutoGenVersion is None:
             RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch, self._Platform]
             for Record in RecordList:
@@ -389,7 +392,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._AutoGenVersion
 
     ## Retrieve BASE_NAME
-    def _GetBaseName(self):
+    @property
+    def BaseName(self):
         if self._BaseName is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -398,7 +402,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._BaseName
 
     ## Retrieve DxsFile
-    def _GetDxsFile(self):
+    @property
+    def DxsFile(self):
         if self._DxsFile is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -407,7 +412,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._DxsFile
 
     ## Retrieve MODULE_TYPE
-    def _GetModuleType(self):
+    @property
+    def ModuleType(self):
         if self._ModuleType is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -418,7 +424,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._ModuleType
 
     ## Retrieve COMPONENT_TYPE
-    def _GetComponentType(self):
+    @property
+    def ComponentType(self):
         if self._ComponentType is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -427,7 +434,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._ComponentType
 
     ## Retrieve "BUILD_TYPE"
-    def _GetBuildType(self):
+    @property
+    def BuildType(self):
         if self._BuildType is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -436,7 +444,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._BuildType
 
     ## Retrieve file guid
-    def _GetFileGuid(self):
+    @property
+    def Guid(self):
         if self._Guid is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -445,7 +454,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Guid
 
     ## Retrieve module version
-    def _GetVersion(self):
+    @property
+    def Version(self):
         if self._Version is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -454,7 +464,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Version
 
     ## Retrieve PCD_IS_DRIVER
-    def _GetPcdIsDriver(self):
+    @property
+    def PcdIsDriver(self):
         if self._PcdIsDriver is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -463,7 +474,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._PcdIsDriver
 
     ## Retrieve SHADOW
-    def _GetShadow(self):
+    @property
+    def Shadow(self):
         if self._Shadow is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -474,7 +486,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Shadow
 
     ## Retrieve CUSTOM_MAKEFILE
-    def _GetMakefile(self):
+    @property
+    def CustomMakefile(self):
         if self._CustomMakefile is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -483,7 +496,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._CustomMakefile
 
     ## Retrieve EFI_SPECIFICATION_VERSION
-    def _GetSpec(self):
+    @property
+    def Specification(self):
         if self._Specification is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -492,7 +506,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Specification
 
     ## Retrieve LIBRARY_CLASS
-    def _GetLibraryClass(self):
+    @property
+    def LibraryClass(self):
         if self._LibraryClass is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -501,7 +516,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._LibraryClass
 
     ## Retrieve ENTRY_POINT
-    def _GetEntryPoint(self):
+    @property
+    def ModuleEntryPointList(self):
         if self._ModuleEntryPointList is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -510,7 +526,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._ModuleEntryPointList
 
     ## Retrieve UNLOAD_IMAGE
-    def _GetUnloadImage(self):
+    @property
+    def ModuleUnloadImageList(self):
         if self._ModuleUnloadImageList is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -519,7 +536,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._ModuleUnloadImageList
 
     ## Retrieve CONSTRUCTOR
-    def _GetConstructor(self):
+    @property
+    def ConstructorList(self):
         if self._ConstructorList is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -528,7 +546,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._ConstructorList
 
     ## Retrieve DESTRUCTOR
-    def _GetDestructor(self):
+    @property
+    def DestructorList(self):
         if self._DestructorList is None:
             if self._Header_ is None:
                 self._GetHeaderInfo()
@@ -537,7 +556,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._DestructorList
 
     ## Retrieve definies other than above ones
-    def _GetDefines(self):
+    @property
+    def Defines(self):
         if len(self._Defs) == 0 and self._Header_ is None:
             self._GetHeaderInfo()
         return self._Defs
@@ -571,7 +591,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Binaries
 
     ## Retrieve binary files with error check.
-    def _GetBinaryFiles(self):
+    @property
+    def Binaries(self):
         Binaries = self._GetBinaries()
         if GlobalData.gIgnoreSource and Binaries == []:
             ErrorInfo = "The INF file does not contain any Binaries to use in creating the image\n"
@@ -580,7 +601,8 @@ class InfBuildData(ModuleBuildClassObject):
         return Binaries
 
     ## Retrieve source files
-    def _GetSourceFiles(self):
+    @property
+    def Sources(self):
         # Ignore all source files in a binary build mode
         if GlobalData.gIgnoreSource:
             self._Sources = []
@@ -626,7 +648,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Sources
 
     ## Retrieve library classes employed by this module
-    def _GetLibraryClassUses(self):
+    @property
+    def LibraryClasses(self):
         if self._LibraryClasses is None:
             self._LibraryClasses = OrderedDict()
             RecordList = self._RawData[MODEL_EFI_LIBRARY_CLASS, self._Arch, self._Platform]
@@ -639,7 +662,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._LibraryClasses
 
     ## Retrieve library names (for Edk.x style of modules)
-    def _GetLibraryNames(self):
+    @property
+    def Libraries(self):
         if self._Libraries is None:
             self._Libraries = []
             RecordList = self._RawData[MODEL_EFI_LIBRARY_INSTANCE, self._Arch, self._Platform]
@@ -651,11 +675,14 @@ class InfBuildData(ModuleBuildClassObject):
                     self._Libraries.append(LibraryName)
         return self._Libraries
 
-    def _GetProtocolComments(self):
-        self._GetProtocols()
+    @property
+    def ProtocolComments(self):
+        self.Protocols
         return self._ProtocolComments
+
     ## Retrieve protocols consumed/produced by this module
-    def _GetProtocols(self):
+    @property
+    def Protocols(self):
         if self._Protocols is None:
             self._Protocols = OrderedDict()
             self._ProtocolComments = OrderedDict()
@@ -676,11 +703,14 @@ class InfBuildData(ModuleBuildClassObject):
                 self._ProtocolComments[CName] = Comments
         return self._Protocols
 
-    def _GetPpiComments(self):
-        self._GetPpis()
+    @property
+    def PpiComments(self):
+        self.Ppis
         return self._PpiComments
+
     ## Retrieve PPIs consumed/produced by this module
-    def _GetPpis(self):
+    @property
+    def Ppis(self):
         if self._Ppis is None:
             self._Ppis = OrderedDict()
             self._PpiComments = OrderedDict()
@@ -701,11 +731,14 @@ class InfBuildData(ModuleBuildClassObject):
                 self._PpiComments[CName] = Comments
         return self._Ppis
 
-    def _GetGuidComments(self):
-        self._GetGuids()
+    @property
+    def GuidComments(self):
+        self.Guids
         return self._GuidComments
+
     ## Retrieve GUIDs consumed/produced by this module
-    def _GetGuids(self):
+    @property
+    def Guids(self):
         if self._Guids is None:
             self._Guids = OrderedDict()
             self._GuidComments = OrderedDict()
@@ -727,7 +760,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Guids
 
     ## Retrieve include paths necessary for this module (for Edk.x style of modules)
-    def _GetIncludes(self):
+    @property
+    def Includes(self):
         if self._Includes is None:
             self._Includes = []
             if self._SourceOverridePath:
@@ -781,7 +815,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Includes
 
     ## Retrieve packages this module depends on
-    def _GetPackages(self):
+    @property
+    def Packages(self):
         if self._Packages is None:
             self._Packages = []
             RecordList = self._RawData[MODEL_META_DATA_PACKAGE, self._Arch, self._Platform]
@@ -800,11 +835,14 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Packages
 
     ## Retrieve PCD comments
-    def _GetPcdComments(self):
-        self._GetPcds()
+    @property
+    def PcdComments(self):
+        self.Pcds
         return self._PcdComments
+
     ## Retrieve PCDs used in this module
-    def _GetPcds(self):
+    @property
+    def Pcds(self):
         if self._Pcds is None:
             self._Pcds = OrderedDict()
             self._PcdComments = OrderedDict()
@@ -816,7 +854,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Pcds
 
     ## Retrieve build options specific to this module
-    def _GetBuildOptions(self):
+    @property
+    def BuildOptions(self):
         if self._BuildOptions is None:
             self._BuildOptions = OrderedDict()
             RecordList = self._RawData[MODEL_META_DATA_BUILD_OPTION, self._Arch, self._Platform]
@@ -833,7 +872,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._BuildOptions
 
     ## Retrieve dependency expression
-    def _GetDepex(self):
+    @property
+    def Depex(self):
         if self._Depex is None:
             self._Depex = tdict(False, 2)
             RecordList = self._RawData[MODEL_EFI_DEPEX, self._Arch]
@@ -904,7 +944,8 @@ class InfBuildData(ModuleBuildClassObject):
         return self._Depex
 
     ## Retrieve depedency expression
-    def _GetDepexExpression(self):
+    @property
+    def DepexExpression(self):
         if self._DepexExpression is None:
             self._DepexExpression = tdict(False, 2)
             RecordList = self._RawData[MODEL_EFI_DEPEX, self._Arch]
@@ -924,6 +965,7 @@ class InfBuildData(ModuleBuildClassObject):
 
     def GetGuidsUsedByPcd(self):
         return self._GuidsUsedByPcd
+
     ## Retrieve PCD for given type
     def _GetPcd(self, Type):
         Pcds = OrderedDict()
@@ -1114,54 +1156,8 @@ class InfBuildData(ModuleBuildClassObject):
         return Pcds
 
     ## check whether current module is binary module
-    def _IsBinaryModule(self):
-        if self.Binaries and not self.Sources:
+    @property
+    def IsBinaryModule(self):
+        if (self.Binaries and not self.Sources) or GlobalData.gIgnoreSource:
             return True
-        elif GlobalData.gIgnoreSource:
-            return True
-        else:
-            return False
-
-    _Macros = property(_GetMacros)
-    Arch = property(_GetArch)
-    Platform = property(_GetPlatform)
-
-    HeaderComments = property(_GetHeaderComments)
-    TailComments = property(_GetTailComments)
-    AutoGenVersion          = property(_GetInfVersion)
-    BaseName                = property(_GetBaseName)
-    ModuleType              = property(_GetModuleType)
-    ComponentType           = property(_GetComponentType)
-    BuildType               = property(_GetBuildType)
-    Guid                    = property(_GetFileGuid)
-    Version                 = property(_GetVersion)
-    PcdIsDriver             = property(_GetPcdIsDriver)
-    Shadow                  = property(_GetShadow)
-    CustomMakefile          = property(_GetMakefile)
-    Specification           = property(_GetSpec)
-    LibraryClass            = property(_GetLibraryClass)
-    ModuleEntryPointList    = property(_GetEntryPoint)
-    ModuleUnloadImageList   = property(_GetUnloadImage)
-    ConstructorList         = property(_GetConstructor)
-    DestructorList          = property(_GetDestructor)
-    Defines                 = property(_GetDefines)
-    DxsFile                 = property(_GetDxsFile)
-
-    Binaries                = property(_GetBinaryFiles)
-    Sources                 = property(_GetSourceFiles)
-    LibraryClasses          = property(_GetLibraryClassUses)
-    Libraries               = property(_GetLibraryNames)
-    Protocols               = property(_GetProtocols)
-    ProtocolComments        = property(_GetProtocolComments)
-    Ppis                    = property(_GetPpis)
-    PpiComments             = property(_GetPpiComments)
-    Guids                   = property(_GetGuids)
-    GuidComments            = property(_GetGuidComments)
-    Includes                = property(_GetIncludes)
-    Packages                = property(_GetPackages)
-    Pcds                    = property(_GetPcds)
-    PcdComments             = property(_GetPcdComments)
-    BuildOptions            = property(_GetBuildOptions)
-    Depex                   = property(_GetDepex)
-    DepexExpression         = property(_GetDepexExpression)
-    IsBinaryModule          = property(_IsBinaryModule)
+        return False

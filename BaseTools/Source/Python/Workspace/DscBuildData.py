@@ -222,6 +222,7 @@ class DscBuildData(PlatformBuildClassObject):
         self.WorkspaceDir = os.getenv("WORKSPACE") if os.getenv("WORKSPACE") else ""
         self.DefaultStores = None
         self.SkuIdMgr = SkuClass(self.SkuName, self.SkuIds)
+
     @property
     def OutputPath(self):
         if os.getenv("WORKSPACE"):
@@ -273,9 +274,8 @@ class DscBuildData(PlatformBuildClassObject):
         self._RFCLanguages      = None
         self._ISOLanguages      = None
         self._VpdToolGuid       = None
-        self.__Macros           = None
+        self._MacroDict         = None
         self.DefaultStores      = None
-
 
     ## handle Override Path of Module
     def _HandleOverridePath(self):
@@ -296,16 +296,18 @@ class DscBuildData(PlatformBuildClassObject):
                 GlobalData.gOverrideDir[ModuleFile.Key] = SourceOverridePath
 
     ## Get current effective macros
-    def _GetMacros(self):
-        if self.__Macros is None:
-            self.__Macros = {}
-            self.__Macros.update(GlobalData.gPlatformDefines)
-            self.__Macros.update(GlobalData.gGlobalDefines)
-            self.__Macros.update(GlobalData.gCommandLineDefines)
-        return self.__Macros
+    @property
+    def _Macros(self):
+        if self._MacroDict is None:
+            self._MacroDict = {}
+            self._MacroDict.update(GlobalData.gPlatformDefines)
+            self._MacroDict.update(GlobalData.gGlobalDefines)
+            self._MacroDict.update(GlobalData.gCommandLineDefines)
+        return self._MacroDict
 
     ## Get architecture
-    def _GetArch(self):
+    @property
+    def Arch(self):
         return self._Arch
 
     ## Retrieve all information in [Defines] section
@@ -410,7 +412,8 @@ class DscBuildData(PlatformBuildClassObject):
         self._Header = 'DUMMY'
 
     ## Retrieve platform name
-    def _GetPlatformName(self):
+    @property
+    def PlatformName(self):
         if self._PlatformName is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -418,8 +421,13 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No PLATFORM_NAME", File=self.MetaFile)
         return self._PlatformName
 
+    @property
+    def Platform(self):
+        return self.PlatformName
+
     ## Retrieve file guid
-    def _GetFileGuid(self):
+    @property
+    def Guid(self):
         if self._Guid is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -428,7 +436,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._Guid
 
     ## Retrieve platform version
-    def _GetVersion(self):
+    @property
+    def Version(self):
         if self._Version is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -437,7 +446,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._Version
 
     ## Retrieve platform description file version
-    def _GetDscSpec(self):
+    @property
+    def DscSpecification(self):
         if self._DscSpecification is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -446,7 +456,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._DscSpecification
 
     ## Retrieve OUTPUT_DIRECTORY
-    def _GetOutpuDir(self):
+    @property
+    def OutputDirectory(self):
         if self._OutputDirectory is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -455,7 +466,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._OutputDirectory
 
     ## Retrieve SUPPORTED_ARCHITECTURES
-    def _GetSupArch(self):
+    @property
+    def SupArchList(self):
         if self._SupArchList is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -464,7 +476,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._SupArchList
 
     ## Retrieve BUILD_TARGETS
-    def _GetBuildTarget(self):
+    @property
+    def BuildTargets(self):
         if self._BuildTargets is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -472,14 +485,17 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('build', ATTRIBUTE_NOT_AVAILABLE, "No BUILD_TARGETS", File=self.MetaFile)
         return self._BuildTargets
 
-    def _GetPcdInfoFlag(self):
+    @property
+    def PcdInfoFlag(self):
         if self._PcdInfoFlag is None or self._PcdInfoFlag.upper() == 'FALSE':
             return False
         elif self._PcdInfoFlag.upper() == 'TRUE':
             return True
         else:
             return False
-    def _GetVarCheckFlag(self):
+
+    @property
+    def VarCheckFlag(self):
         if self._VarCheckFlag is None or self._VarCheckFlag.upper() == 'FALSE':
             return False
         elif self._VarCheckFlag.upper() == 'TRUE':
@@ -488,7 +504,8 @@ class DscBuildData(PlatformBuildClassObject):
             return False
 
     # # Retrieve SKUID_IDENTIFIER
-    def _GetSkuName(self):
+    @property
+    def SkuName(self):
         if self._SkuName is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -497,10 +514,12 @@ class DscBuildData(PlatformBuildClassObject):
         return self._SkuName
 
     ## Override SKUID_IDENTIFIER
-    def _SetSkuName(self, Value):
+    @SkuName.setter
+    def SkuName(self, Value):
         self._SkuName = Value
 
-    def _GetFdfFile(self):
+    @property
+    def FlashDefinition(self):
         if self._FlashDefinition is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -508,7 +527,8 @@ class DscBuildData(PlatformBuildClassObject):
                 self._FlashDefinition = ''
         return self._FlashDefinition
 
-    def _GetPrebuild(self):
+    @property
+    def Prebuild(self):
         if self._Prebuild is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -516,7 +536,8 @@ class DscBuildData(PlatformBuildClassObject):
                 self._Prebuild = ''
         return self._Prebuild
 
-    def _GetPostbuild(self):
+    @property
+    def Postbuild(self):
         if self._Postbuild is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -525,7 +546,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._Postbuild
 
     ## Retrieve FLASH_DEFINITION
-    def _GetBuildNumber(self):
+    @property
+    def BuildNumber(self):
         if self._BuildNumber is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -534,7 +556,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._BuildNumber
 
     ## Retrieve MAKEFILE_NAME
-    def _GetMakefileName(self):
+    @property
+    def MakefileName(self):
         if self._MakefileName is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -543,7 +566,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._MakefileName
 
     ## Retrieve BsBaseAddress
-    def _GetBsBaseAddress(self):
+    @property
+    def BsBaseAddress(self):
         if self._BsBaseAddress is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -552,7 +576,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._BsBaseAddress
 
     ## Retrieve RtBaseAddress
-    def _GetRtBaseAddress(self):
+    @property
+    def RtBaseAddress(self):
         if self._RtBaseAddress is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -561,7 +586,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._RtBaseAddress
 
     ## Retrieve the top address for the load fix address
-    def _GetLoadFixAddress(self):
+    @property
+    def LoadFixAddress(self):
         if self._LoadFixAddress is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -591,7 +617,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._LoadFixAddress
 
     ## Retrieve RFCLanguage filter
-    def _GetRFCLanguages(self):
+    @property
+    def RFCLanguages(self):
         if self._RFCLanguages is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -600,15 +627,18 @@ class DscBuildData(PlatformBuildClassObject):
         return self._RFCLanguages
 
     ## Retrieve ISOLanguage filter
-    def _GetISOLanguages(self):
+    @property
+    def ISOLanguages(self):
         if self._ISOLanguages is None:
             if self._Header is None:
                 self._GetHeaderInfo()
             if self._ISOLanguages is None:
                 self._ISOLanguages = []
         return self._ISOLanguages
+
     ## Retrieve the GUID string for VPD tool
-    def _GetVpdToolGuid(self):
+    @property
+    def VpdToolGuid(self):
         if self._VpdToolGuid is None:
             if self._Header is None:
                 self._GetHeaderInfo()
@@ -617,7 +647,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._VpdToolGuid
 
     ## Retrieve [SkuIds] section information
-    def _GetSkuIds(self):
+    @property
+    def SkuIds(self):
         if self._SkuIds is None:
             self._SkuIds = OrderedDict()
             RecordList = self._RawData[MODEL_EFI_SKU_ID, self._Arch]
@@ -669,7 +700,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self.DefaultStores
 
     ## Retrieve [Components] section information
-    def _GetModules(self):
+    @property
+    def Modules(self):
         if self._Modules is not None:
             return self._Modules
 
@@ -768,13 +800,15 @@ class DscBuildData(PlatformBuildClassObject):
         return self._Modules
 
     ## Retrieve all possible library instances used in this platform
-    def _GetLibraryInstances(self):
+    @property
+    def LibraryInstances(self):
         if self._LibraryInstances is None:
-            self._GetLibraryClasses()
+            self.LibraryClasses
         return self._LibraryInstances
 
     ## Retrieve [LibraryClasses] information
-    def _GetLibraryClasses(self):
+    @property
+    def LibraryClasses(self):
         if self._LibraryClasses is None:
             self._LibraryInstances = []
             #
@@ -922,6 +956,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if isinstance(pcd, StructurePcd) and pcd.SkuOverrideValues:
                     Pcds[pcdname].SkuOverrideValues = {skuid:pcd.SkuOverrideValues[skuid] for skuid in pcd.SkuOverrideValues if skuid in available_sku}
         return Pcds
+
     def CompleteHiiPcdsDefaultStores(self, Pcds):
         HiiPcd = [Pcds[pcd] for pcd in Pcds if Pcds[pcd].Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]]
         DefaultStoreMgr = DefaultStore(self.DefaultStores)
@@ -1102,7 +1137,8 @@ class DscBuildData(PlatformBuildClassObject):
         return PcdValue
 
     ## Retrieve all PCD settings in platform
-    def _GetPcds(self):
+    @property
+    def Pcds(self):
         if self._Pcds is None:
             self._Pcds = OrderedDict()
             self.__ParsePcdFromCommandLine()
@@ -1127,7 +1163,8 @@ class DscBuildData(PlatformBuildClassObject):
         return self._Pcds
 
     ## Retrieve [BuildOptions]
-    def _GetBuildOptions(self):
+    @property
+    def BuildOptions(self):
         if self._BuildOptions is None:
             self._BuildOptions = OrderedDict()
             #
@@ -1225,7 +1262,6 @@ class DscBuildData(PlatformBuildClassObject):
                 Pcd.PcdFieldValueFromComm[field][1] = FieldValues[field][1][0]
                 Pcd.PcdFieldValueFromComm[field][2] = FieldValues[field][1][1]
         return StruPcds
-
 
     def OverrideByCommOverAll(self,AllPcds):
         def CheckStructureInComm(commpcds):
@@ -2799,7 +2835,8 @@ class DscBuildData(PlatformBuildClassObject):
             Module.MetaFile = FilePath
             self.Modules.append(Module)
 
-    def _GetToolChainFamily(self):
+    @property
+    def ToolChainFamily(self):
         self._ToolChainFamily = TAB_COMPILER_MSFT
         BuildConfigurationFile = os.path.normpath(os.path.join(GlobalData.gConfDirectory, "target.txt"))
         if os.path.isfile(BuildConfigurationFile) == True:
@@ -2834,6 +2871,7 @@ class DscBuildData(PlatformBuildClassObject):
         if (Name, Guid) not in self.Pcds:
             self.Pcds[Name, Guid] = PcdClassObject(Name, Guid, '', '', '', '', '', {}, False, None)
         self.Pcds[Name, Guid].DefaultValue = Value
+
     @property
     def DecPcds(self):
         if self._DecPcds is None:
@@ -2849,34 +2887,3 @@ class DscBuildData(PlatformBuildClassObject):
                 PkgSet.update(ModuleData.Packages)
             self._DecPcds, self._GuidDict = GetDeclaredPcd(self, self._Bdb, self._Arch, self._Target, self._Toolchain, PkgSet)
         return self._DecPcds
-    _Macros             = property(_GetMacros)
-    Arch                = property(_GetArch)
-    Platform            = property(_GetPlatformName)
-    PlatformName        = property(_GetPlatformName)
-    Guid                = property(_GetFileGuid)
-    Version             = property(_GetVersion)
-    DscSpecification    = property(_GetDscSpec)
-    OutputDirectory     = property(_GetOutpuDir)
-    SupArchList         = property(_GetSupArch)
-    BuildTargets        = property(_GetBuildTarget)
-    SkuName             = property(_GetSkuName, _SetSkuName)
-    PcdInfoFlag         = property(_GetPcdInfoFlag)
-    VarCheckFlag        = property(_GetVarCheckFlag)
-    FlashDefinition     = property(_GetFdfFile)
-    Prebuild            = property(_GetPrebuild)
-    Postbuild           = property(_GetPostbuild)
-    BuildNumber         = property(_GetBuildNumber)
-    MakefileName        = property(_GetMakefileName)
-    BsBaseAddress       = property(_GetBsBaseAddress)
-    RtBaseAddress       = property(_GetRtBaseAddress)
-    LoadFixAddress      = property(_GetLoadFixAddress)
-    RFCLanguages        = property(_GetRFCLanguages)
-    ISOLanguages        = property(_GetISOLanguages)
-    VpdToolGuid         = property(_GetVpdToolGuid)
-    SkuIds              = property(_GetSkuIds)
-    Modules             = property(_GetModules)
-    LibraryInstances    = property(_GetLibraryInstances)
-    LibraryClasses      = property(_GetLibraryClasses)
-    Pcds                = property(_GetPcds)
-    BuildOptions        = property(_GetBuildOptions)
-    ToolChainFamily     = property(_GetToolChainFamily)

@@ -213,11 +213,13 @@ class MetaFileParser(object):
         self._PostProcessed = True
 
     ## Get the parse complete flag
-    def _GetFinished(self):
+    @property
+    def Finished(self):
         return self._Finished
 
     ## Set the complete flag
-    def _SetFinished(self, Value):
+    @Finished.setter
+    def Finished(self, Value):
         self._Finished = Value
 
     ## Remove records that do not match given Filter Arch
@@ -416,7 +418,9 @@ class MetaFileParser(object):
                 )
     def GetValidExpression(self, TokenSpaceGuid, PcdCName):
         return self._Table.GetValidExpression(TokenSpaceGuid, PcdCName)
-    def _GetMacros(self):
+
+    @property
+    def _Macros(self):
         Macros = {}
         Macros.update(self._FileLocalMacros)
         Macros.update(self._GetApplicableSectionMacro())
@@ -478,9 +482,6 @@ class MetaFileParser(object):
         return Macros
 
     _SectionParser = {}
-    Finished = property(_GetFinished, _SetFinished)
-    _Macros = property(_GetMacros)
-
 
 ## INF file parser class
 #
@@ -1252,7 +1253,8 @@ class DscParser(MetaFileParser):
                 )
 
     ## Override parent's method since we'll do all macro replacements in parser
-    def _GetMacros(self):
+    @property
+    def _Macros(self):
         Macros = {}
         Macros.update(self._FileLocalMacros)
         Macros.update(self._GetApplicableSectionMacro())
@@ -1672,8 +1674,6 @@ class DscParser(MetaFileParser):
         MODEL_META_DATA_SECTION_HEADER                  :   MetaFileParser._SectionHeaderParser,
         MODEL_META_DATA_SUBSECTION_HEADER               :   _SubsectionHeaderParser,
     }
-
-    _Macros = property(_GetMacros)
 
 ## DEC file parser class
 #

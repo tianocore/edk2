@@ -341,9 +341,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
         self.InfModule = Inf
         self.PcdIsDriver = Inf.PcdIsDriver
         self.IsBinaryModule = Inf.IsBinaryModule
-        Inf._GetDepex()
-        Inf._GetDepexExpression()
-        if len(Inf._Depex.data) > 0 and len(Inf._DepexExpression.data) > 0:
+        if len(Inf.Depex.data) > 0 and len(Inf.DepexExpression.data) > 0:
             self.Depex = True
 
         GenFdsGlobalVariable.VerboseLogger("BaseName : %s" % self.BaseName)
