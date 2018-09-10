@@ -1046,41 +1046,13 @@ class PlatformAutoGen(AutoGen):
         # get the original module/package/platform objects
         self.BuildDatabase = Workspace.BuildDatabase
         self.DscBuildDataObj = Workspace.Platform
-        self._GuidDict = Workspace._GuidDict
 
         # flag indicating if the makefile/C-code file has been created or not
         self.IsMakeFileCreated  = False
-        self.IsCodeFileCreated  = False
 
-        self._Platform   = None
-        self._Name       = None
-        self._Guid       = None
-        self._Version    = None
-
-        self._BuildRule = None
-        self._SourceDir = None
-        self._BuildDir = None
-        self._OutputDir = None
-        self._FvDir = None
-        self._MakeFileDir = None
-        self._FdfFile = None
-
-        self._PcdTokenNumber = None    # (TokenCName, TokenSpaceGuidCName) : GeneratedTokenNumber
         self._DynamicPcdList = None    # [(TokenCName1, TokenSpaceGuidCName1), (TokenCName2, TokenSpaceGuidCName2), ...]
         self._NonDynamicPcdList = None # [(TokenCName1, TokenSpaceGuidCName1), (TokenCName2, TokenSpaceGuidCName2), ...]
-        self._NonDynamicPcdDict = {}
 
-        self._ToolDefinitions = None
-        self._ToolDefFile = None          # toolcode : tool path
-        self._ToolChainFamily = None
-        self._BuildRuleFamily = None
-        self._BuildOption = None          # toolcode : option
-        self._EdkBuildOption = None       # edktoolcode : option
-        self._EdkIIBuildOption = None     # edkiitoolcode : option
-        self._PackageList = None
-        self._ModuleAutoGenList  = None
-        self._LibraryAutoGenList = None
-        self._BuildCommand = None
         self._AsBuildInfList = []
         self._AsBuildModuleList = []
 
@@ -1100,6 +1072,7 @@ class PlatformAutoGen(AutoGen):
 
         return True
 
+    @cached_class_function
     def __repr__(self):
         return "%s [%s]" % (self.MetaFile, self.Arch)
 
@@ -1111,19 +1084,18 @@ class PlatformAutoGen(AutoGen):
     #   @param      CreateModuleCodeFile    Flag indicating if creating module's
     #                                       autogen code file or not
     #
+    @cached_class_function
     def CreateCodeFile(self, CreateModuleCodeFile=False):
         # only module has code to be greated, so do nothing if CreateModuleCodeFile is False
-        if self.IsCodeFileCreated or not CreateModuleCodeFile:
+        if not CreateModuleCodeFile:
             return
 
         for Ma in self.ModuleAutoGenList:
             Ma.CreateCodeFile(True)
 
-        # don't do this twice
-        self.IsCodeFileCreated = True
-
     ## Generate Fds Command
-    def _GenFdsCommand(self):
+    @cached_property
+    def GenFdsCommand(self):
         return self.Workspace.GenFdsCommand
 
     ## Create makefile for the platform and mdoules in it
@@ -1185,7 +1157,6 @@ class PlatformAutoGen(AutoGen):
                     LibAuto.ConstPcd[key] = FixedAtBuildPcds[key]
 
     def CollectVariables(self, DynamicPcdSet):
-
         VpdRegionSize = 0
         VpdRegionBase = 0
         if self.Workspace.FdfFile:
@@ -1196,7 +1167,6 @@ class PlatformAutoGen(AutoGen):
                         VpdRegionSize = FdRegion.Size
                         VpdRegionBase = FdRegion.Offset
                         break
-
 
         VariableInfo = VariableMgr(self.DscBuildDataObj._GetDefaultStores(), self.DscBuildDataObj._GetSkuIds())
         VariableInfo.SetVpdRegionMaxSize(VpdRegionSize)
@@ -1250,7 +1220,6 @@ class PlatformAutoGen(AutoGen):
     #  This interface should be invoked explicitly when platform action is created.
     #
     def CollectPlatformDynamicPcds(self):
-
         for key in self.Platform.Pcds:
             for SinglePcd in GlobalData.MixedPcd:
                 if (self.Platform.Pcds[key].TokenCName, self.Platform.Pcds[key].TokenSpaceGuidCName) == SinglePcd:
@@ -1687,308 +1656,301 @@ class PlatformAutoGen(AutoGen):
                 EdkLogger.error("Build", FILE_NOT_FOUND, "Fail to find third-party BPDG tool to process VPD PCDs. BPDG Guid tool need to be defined in tools_def.txt and VPD_TOOL_GUID need to be provided in DSC file.")
 
     ## Return the platform build data object
-    def _GetPlatform(self):
-        if self._Platform is None:
-            self._Platform = self.BuildDatabase[self.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
-        return self._Platform
+    @cached_property
+    def Platform(self):
+        return self.BuildDatabase[self.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
 
     ## Return platform name
-    def _GetName(self):
+    @cached_property
+    def Name(self):
         return self.Platform.PlatformName
 
     ## Return the meta file GUID
-    def _GetGuid(self):
+    @cached_property
+    def Guid(self):
         return self.Platform.Guid
 
     ## Return the platform version
-    def _GetVersion(self):
+    @cached_property
+    def Version(self):
         return self.Platform.Version
 
     ## Return the FDF file name
-    def _GetFdfFile(self):
-        if self._FdfFile is None:
-            if self.Workspace.FdfFile != "":
-                self._FdfFile= mws.join(self.WorkspaceDir, self.Workspace.FdfFile)
-            else:
-                self._FdfFile = ''
-        return self._FdfFile
+    @cached_property
+    def FdfFile(self):
+        if self.Workspace.FdfFile:
+            RetVal= mws.join(self.WorkspaceDir, self.Workspace.FdfFile)
+        else:
+            RetVal = ''
+        return RetVal
 
     ## Return the build output directory platform specifies
-    def _GetOutputDir(self):
+    @cached_property
+    def OutputDir(self):
         return self.Platform.OutputDirectory
 
     ## Return the directory to store all intermediate and final files built
-    def _GetBuildDir(self):
-        if self._BuildDir is None:
-            if os.path.isabs(self.OutputDir):
-                self._BuildDir = path.join(
-                                            path.abspath(self.OutputDir),
-                                            self.BuildTarget + "_" + self.ToolChain,
-                                            )
-            else:
-                self._BuildDir = path.join(
-                                            self.WorkspaceDir,
-                                            self.OutputDir,
-                                            self.BuildTarget + "_" + self.ToolChain,
-                                            )
-            GlobalData.gBuildDirectory = self._BuildDir
-        return self._BuildDir
+    @cached_property
+    def BuildDir(self):
+        if os.path.isabs(self.OutputDir):
+            GlobalData.gBuildDirectory = RetVal = path.join(
+                                        path.abspath(self.OutputDir),
+                                        self.BuildTarget + "_" + self.ToolChain,
+                                        )
+        else:
+            GlobalData.gBuildDirectory = RetVal = path.join(
+                                        self.WorkspaceDir,
+                                        self.OutputDir,
+                                        self.BuildTarget + "_" + self.ToolChain,
+                                        )
+        return RetVal
 
     ## Return directory of platform makefile
     #
     #   @retval     string  Makefile directory
     #
-    def _GetMakeFileDir(self):
-        if self._MakeFileDir is None:
-            self._MakeFileDir = path.join(self.BuildDir, self.Arch)
-        return self._MakeFileDir
+    @cached_property
+    def MakeFileDir(self):
+        return path.join(self.BuildDir, self.Arch)
 
     ## Return build command string
     #
     #   @retval     string  Build command string
     #
-    def _GetBuildCommand(self):
-        if self._BuildCommand is None:
-            self._BuildCommand = []
-            if "MAKE" in self.ToolDefinition and "PATH" in self.ToolDefinition["MAKE"]:
-                self._BuildCommand += SplitOption(self.ToolDefinition["MAKE"]["PATH"])
-                if "FLAGS" in self.ToolDefinition["MAKE"]:
-                    NewOption = self.ToolDefinition["MAKE"]["FLAGS"].strip()
-                    if NewOption != '':
-                        self._BuildCommand += SplitOption(NewOption)
-                if "MAKE" in self.EdkIIBuildOption:
-                    if "FLAGS" in self.EdkIIBuildOption["MAKE"]:
-                        Flags = self.EdkIIBuildOption["MAKE"]["FLAGS"]
-                        if Flags.startswith('='):
-                            self._BuildCommand = [self._BuildCommand[0]] + [Flags[1:]]
-                        else:
-                            self._BuildCommand.append(Flags)
-        return self._BuildCommand
+    @cached_property
+    def BuildCommand(self):
+        RetVal = []
+        if "MAKE" in self.ToolDefinition and "PATH" in self.ToolDefinition["MAKE"]:
+            RetVal += SplitOption(self.ToolDefinition["MAKE"]["PATH"])
+            if "FLAGS" in self.ToolDefinition["MAKE"]:
+                NewOption = self.ToolDefinition["MAKE"]["FLAGS"].strip()
+                if NewOption != '':
+                    RetVal += SplitOption(NewOption)
+            if "MAKE" in self.EdkIIBuildOption:
+                if "FLAGS" in self.EdkIIBuildOption["MAKE"]:
+                    Flags = self.EdkIIBuildOption["MAKE"]["FLAGS"]
+                    if Flags.startswith('='):
+                        RetVal = [RetVal[0]] + [Flags[1:]]
+                    else:
+                        RetVal.append(Flags)
+        return RetVal
 
     ## Get tool chain definition
     #
     #  Get each tool defition for given tool chain from tools_def.txt and platform
     #
-    def _GetToolDefinition(self):
-        if self._ToolDefinitions is None:
-            ToolDefinition = self.Workspace.ToolDef.ToolsDefTxtDictionary
-            if TAB_TOD_DEFINES_COMMAND_TYPE not in self.Workspace.ToolDef.ToolsDefTxtDatabase:
-                EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, "No tools found in configuration",
-                                ExtraData="[%s]" % self.MetaFile)
-            self._ToolDefinitions = {}
-            DllPathList = set()
-            for Def in ToolDefinition:
-                Target, Tag, Arch, Tool, Attr = Def.split("_")
-                if Target != self.BuildTarget or Tag != self.ToolChain or Arch != self.Arch:
-                    continue
+    @cached_property
+    def ToolDefinition(self):
+        ToolDefinition = self.Workspace.ToolDef.ToolsDefTxtDictionary
+        if TAB_TOD_DEFINES_COMMAND_TYPE not in self.Workspace.ToolDef.ToolsDefTxtDatabase:
+            EdkLogger.error('build', RESOURCE_NOT_AVAILABLE, "No tools found in configuration",
+                            ExtraData="[%s]" % self.MetaFile)
+        RetVal = {}
+        DllPathList = set()
+        for Def in ToolDefinition:
+            Target, Tag, Arch, Tool, Attr = Def.split("_")
+            if Target != self.BuildTarget or Tag != self.ToolChain or Arch != self.Arch:
+                continue
 
-                Value = ToolDefinition[Def]
-                # don't record the DLL
-                if Attr == "DLL":
-                    DllPathList.add(Value)
-                    continue
+            Value = ToolDefinition[Def]
+            # don't record the DLL
+            if Attr == "DLL":
+                DllPathList.add(Value)
+                continue
 
-                if Tool not in self._ToolDefinitions:
-                    self._ToolDefinitions[Tool] = {}
-                self._ToolDefinitions[Tool][Attr] = Value
+            if Tool not in RetVal:
+                RetVal[Tool] = {}
+            RetVal[Tool][Attr] = Value
 
-            ToolsDef = ''
-            if GlobalData.gOptions.SilentMode and "MAKE" in self._ToolDefinitions:
-                if "FLAGS" not in self._ToolDefinitions["MAKE"]:
-                    self._ToolDefinitions["MAKE"]["FLAGS"] = ""
-                self._ToolDefinitions["MAKE"]["FLAGS"] += " -s"
-            MakeFlags = ''
-            for Tool in self._ToolDefinitions:
-                for Attr in self._ToolDefinitions[Tool]:
-                    Value = self._ToolDefinitions[Tool][Attr]
-                    if Tool in self.BuildOption and Attr in self.BuildOption[Tool]:
-                        # check if override is indicated
-                        if self.BuildOption[Tool][Attr].startswith('='):
-                            Value = self.BuildOption[Tool][Attr][1:]
+        ToolsDef = ''
+        if GlobalData.gOptions.SilentMode and "MAKE" in RetVal:
+            if "FLAGS" not in RetVal["MAKE"]:
+                RetVal["MAKE"]["FLAGS"] = ""
+            RetVal["MAKE"]["FLAGS"] += " -s"
+        MakeFlags = ''
+        for Tool in RetVal:
+            for Attr in RetVal[Tool]:
+                Value = RetVal[Tool][Attr]
+                if Tool in self._BuildOptionWithToolDef(RetVal) and Attr in self._BuildOptionWithToolDef(RetVal)[Tool]:
+                    # check if override is indicated
+                    if self._BuildOptionWithToolDef(RetVal)[Tool][Attr].startswith('='):
+                        Value = self._BuildOptionWithToolDef(RetVal)[Tool][Attr][1:]
+                    else:
+                        if Attr != 'PATH':
+                            Value += " " + self._BuildOptionWithToolDef(RetVal)[Tool][Attr]
                         else:
-                            if Attr != 'PATH':
-                                Value += " " + self.BuildOption[Tool][Attr]
-                            else:
-                                Value = self.BuildOption[Tool][Attr]
+                            Value = self._BuildOptionWithToolDef(RetVal)[Tool][Attr]
 
-                    if Attr == "PATH":
-                        # Don't put MAKE definition in the file
-                        if Tool != "MAKE":
-                            ToolsDef += "%s = %s\n" % (Tool, Value)
-                    elif Attr != "DLL":
-                        # Don't put MAKE definition in the file
-                        if Tool == "MAKE":
-                            if Attr == "FLAGS":
-                                MakeFlags = Value
-                        else:
-                            ToolsDef += "%s_%s = %s\n" % (Tool, Attr, Value)
-                ToolsDef += "\n"
+                if Attr == "PATH":
+                    # Don't put MAKE definition in the file
+                    if Tool != "MAKE":
+                        ToolsDef += "%s = %s\n" % (Tool, Value)
+                elif Attr != "DLL":
+                    # Don't put MAKE definition in the file
+                    if Tool == "MAKE":
+                        if Attr == "FLAGS":
+                            MakeFlags = Value
+                    else:
+                        ToolsDef += "%s_%s = %s\n" % (Tool, Attr, Value)
+            ToolsDef += "\n"
 
-            SaveFileOnChange(self.ToolDefinitionFile, ToolsDef)
-            for DllPath in DllPathList:
-                os.environ["PATH"] = DllPath + os.pathsep + os.environ["PATH"]
-            os.environ["MAKE_FLAGS"] = MakeFlags
+        SaveFileOnChange(self.ToolDefinitionFile, ToolsDef)
+        for DllPath in DllPathList:
+            os.environ["PATH"] = DllPath + os.pathsep + os.environ["PATH"]
+        os.environ["MAKE_FLAGS"] = MakeFlags
 
-        return self._ToolDefinitions
+        return RetVal
 
     ## Return the paths of tools
-    def _GetToolDefFile(self):
-        if self._ToolDefFile is None:
-            self._ToolDefFile = os.path.join(self.MakeFileDir, "TOOLS_DEF." + self.Arch)
-        return self._ToolDefFile
+    @cached_property
+    def ToolDefinitionFile(self):
+        return os.path.join(self.MakeFileDir, "TOOLS_DEF." + self.Arch)
 
     ## Retrieve the toolchain family of given toolchain tag. Default to 'MSFT'.
-    def _GetToolChainFamily(self):
-        if self._ToolChainFamily is None:
-            ToolDefinition = self.Workspace.ToolDef.ToolsDefTxtDatabase
-            if TAB_TOD_DEFINES_FAMILY not in ToolDefinition \
-               or self.ToolChain not in ToolDefinition[TAB_TOD_DEFINES_FAMILY] \
-               or not ToolDefinition[TAB_TOD_DEFINES_FAMILY][self.ToolChain]:
-                EdkLogger.verbose("No tool chain family found in configuration for %s. Default to MSFT." \
-                                   % self.ToolChain)
-                self._ToolChainFamily = TAB_COMPILER_MSFT
-            else:
-                self._ToolChainFamily = ToolDefinition[TAB_TOD_DEFINES_FAMILY][self.ToolChain]
-        return self._ToolChainFamily
+    @cached_property
+    def ToolChainFamily(self):
+        ToolDefinition = self.Workspace.ToolDef.ToolsDefTxtDatabase
+        if TAB_TOD_DEFINES_FAMILY not in ToolDefinition \
+           or self.ToolChain not in ToolDefinition[TAB_TOD_DEFINES_FAMILY] \
+           or not ToolDefinition[TAB_TOD_DEFINES_FAMILY][self.ToolChain]:
+            EdkLogger.verbose("No tool chain family found in configuration for %s. Default to MSFT." \
+                               % self.ToolChain)
+            RetVal = TAB_COMPILER_MSFT
+        else:
+            RetVal = ToolDefinition[TAB_TOD_DEFINES_FAMILY][self.ToolChain]
+        return RetVal
 
-    def _GetBuildRuleFamily(self):
-        if self._BuildRuleFamily is None:
-            ToolDefinition = self.Workspace.ToolDef.ToolsDefTxtDatabase
-            if TAB_TOD_DEFINES_BUILDRULEFAMILY not in ToolDefinition \
-               or self.ToolChain not in ToolDefinition[TAB_TOD_DEFINES_BUILDRULEFAMILY] \
-               or not ToolDefinition[TAB_TOD_DEFINES_BUILDRULEFAMILY][self.ToolChain]:
-                EdkLogger.verbose("No tool chain family found in configuration for %s. Default to MSFT." \
-                                   % self.ToolChain)
-                self._BuildRuleFamily = TAB_COMPILER_MSFT
-            else:
-                self._BuildRuleFamily = ToolDefinition[TAB_TOD_DEFINES_BUILDRULEFAMILY][self.ToolChain]
-        return self._BuildRuleFamily
+    @cached_property
+    def BuildRuleFamily(self):
+        ToolDefinition = self.Workspace.ToolDef.ToolsDefTxtDatabase
+        if TAB_TOD_DEFINES_BUILDRULEFAMILY not in ToolDefinition \
+           or self.ToolChain not in ToolDefinition[TAB_TOD_DEFINES_BUILDRULEFAMILY] \
+           or not ToolDefinition[TAB_TOD_DEFINES_BUILDRULEFAMILY][self.ToolChain]:
+            EdkLogger.verbose("No tool chain family found in configuration for %s. Default to MSFT." \
+                               % self.ToolChain)
+            return TAB_COMPILER_MSFT
+
+        return ToolDefinition[TAB_TOD_DEFINES_BUILDRULEFAMILY][self.ToolChain]
 
     ## Return the build options specific for all modules in this platform
-    def _GetBuildOptions(self):
-        if self._BuildOption is None:
-            self._BuildOption = self._ExpandBuildOption(self.Platform.BuildOptions)
-        return self._BuildOption
+    @cached_property
+    def BuildOption(self):
+        return self._ExpandBuildOption(self.Platform.BuildOptions)
+
+    def _BuildOptionWithToolDef(self, ToolDef):
+        return self._ExpandBuildOption(self.Platform.BuildOptions, ToolDef=ToolDef)
 
     ## Return the build options specific for EDK modules in this platform
-    def _GetEdkBuildOptions(self):
-        if self._EdkBuildOption is None:
-            self._EdkBuildOption = self._ExpandBuildOption(self.Platform.BuildOptions, EDK_NAME)
-        return self._EdkBuildOption
+    @cached_property
+    def EdkBuildOption(self):
+        return self._ExpandBuildOption(self.Platform.BuildOptions, EDK_NAME)
 
     ## Return the build options specific for EDKII modules in this platform
-    def _GetEdkIIBuildOptions(self):
-        if self._EdkIIBuildOption is None:
-            self._EdkIIBuildOption = self._ExpandBuildOption(self.Platform.BuildOptions, EDKII_NAME)
-        return self._EdkIIBuildOption
+    @cached_property
+    def EdkIIBuildOption(self):
+        return self._ExpandBuildOption(self.Platform.BuildOptions, EDKII_NAME)
 
     ## Parse build_rule.txt in Conf Directory.
     #
     #   @retval     BuildRule object
     #
-    def _GetBuildRule(self):
-        if self._BuildRule is None:
-            BuildRuleFile = None
-            if TAB_TAT_DEFINES_BUILD_RULE_CONF in self.Workspace.TargetTxt.TargetTxtDictionary:
-                BuildRuleFile = self.Workspace.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_BUILD_RULE_CONF]
-            if not BuildRuleFile:
-                BuildRuleFile = gDefaultBuildRuleFile
-            self._BuildRule = BuildRule(BuildRuleFile)
-            if self._BuildRule._FileVersion == "":
-                self._BuildRule._FileVersion = AutoGenReqBuildRuleVerNum
-            else:
-                if self._BuildRule._FileVersion < AutoGenReqBuildRuleVerNum :
-                    # If Build Rule's version is less than the version number required by the tools, halting the build.
-                    EdkLogger.error("build", AUTOGEN_ERROR,
-                                    ExtraData="The version number [%s] of build_rule.txt is less than the version number required by the AutoGen.(the minimum required version number is [%s])"\
-                                     % (self._BuildRule._FileVersion, AutoGenReqBuildRuleVerNum))
-
-        return self._BuildRule
+    @cached_property
+    def BuildRule(self):
+        BuildRuleFile = None
+        if TAB_TAT_DEFINES_BUILD_RULE_CONF in self.Workspace.TargetTxt.TargetTxtDictionary:
+            BuildRuleFile = self.Workspace.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_BUILD_RULE_CONF]
+        if not BuildRuleFile:
+            BuildRuleFile = gDefaultBuildRuleFile
+        RetVal = BuildRule(BuildRuleFile)
+        if RetVal._FileVersion == "":
+            RetVal._FileVersion = AutoGenReqBuildRuleVerNum
+        else:
+            if RetVal._FileVersion < AutoGenReqBuildRuleVerNum :
+                # If Build Rule's version is less than the version number required by the tools, halting the build.
+                EdkLogger.error("build", AUTOGEN_ERROR,
+                                ExtraData="The version number [%s] of build_rule.txt is less than the version number required by the AutoGen.(the minimum required version number is [%s])"\
+                                 % (RetVal._FileVersion, AutoGenReqBuildRuleVerNum))
+        return RetVal
 
     ## Summarize the packages used by modules in this platform
-    def _GetPackageList(self):
-        if self._PackageList is None:
-            self._PackageList = set()
-            for La in self.LibraryAutoGenList:
-                self._PackageList.update(La.DependentPackageList)
-            for Ma in self.ModuleAutoGenList:
-                self._PackageList.update(Ma.DependentPackageList)
-            #Collect package set information from INF of FDF
-            PkgSet = set()
-            for ModuleFile in self._AsBuildModuleList:
-                if ModuleFile in self.Platform.Modules:
-                    continue
-                ModuleData = self.BuildDatabase[ModuleFile, self.Arch, self.BuildTarget, self.ToolChain]
-                PkgSet.update(ModuleData.Packages)
-            self._PackageList = list(self._PackageList) + list (PkgSet)
-        return self._PackageList
+    @cached_property
+    def PackageList(self):
+        RetVal = set()
+        for La in self.LibraryAutoGenList:
+            RetVal.update(La.DependentPackageList)
+        for Ma in self.ModuleAutoGenList:
+            RetVal.update(Ma.DependentPackageList)
+        #Collect package set information from INF of FDF
+        for ModuleFile in self._AsBuildModuleList:
+            if ModuleFile in self.Platform.Modules:
+                continue
+            ModuleData = self.BuildDatabase[ModuleFile, self.Arch, self.BuildTarget, self.ToolChain]
+            RetVal.update(ModuleData.Packages)
+        return list(RetVal)
 
-    def _GetNonDynamicPcdDict(self):
-        if self._NonDynamicPcdDict:
-            return self._NonDynamicPcdDict
-        for Pcd in self.NonDynamicPcdList:
-            self._NonDynamicPcdDict[(Pcd.TokenCName, Pcd.TokenSpaceGuidCName)] = Pcd
-        return self._NonDynamicPcdDict
+    @cached_property
+    def NonDynamicPcdDict(self):
+        return {(Pcd.TokenCName, Pcd.TokenSpaceGuidCName):Pcd for Pcd in self.NonDynamicPcdList}
 
     ## Get list of non-dynamic PCDs
-    def _GetNonDynamicPcdList(self):
-        if self._NonDynamicPcdList is None:
-            self.CollectPlatformDynamicPcds()
+    @cached_property
+    def NonDynamicPcdList(self):
+        self.CollectPlatformDynamicPcds()
         return self._NonDynamicPcdList
 
     ## Get list of dynamic PCDs
-    def _GetDynamicPcdList(self):
-        if self._DynamicPcdList is None:
-            self.CollectPlatformDynamicPcds()
+    @cached_property
+    def DynamicPcdList(self):
+        self.CollectPlatformDynamicPcds()
         return self._DynamicPcdList
 
     ## Generate Token Number for all PCD
-    def _GetPcdTokenNumbers(self):
-        if self._PcdTokenNumber is None:
-            self._PcdTokenNumber = OrderedDict()
-            TokenNumber = 1
-            #
-            # Make the Dynamic and DynamicEx PCD use within different TokenNumber area.
-            # Such as:
-            #
-            # Dynamic PCD:
-            # TokenNumber 0 ~ 10
-            # DynamicEx PCD:
-            # TokeNumber 11 ~ 20
-            #
-            for Pcd in self.DynamicPcdList:
-                if Pcd.Phase == "PEI" and Pcd.Type in PCD_DYNAMIC_TYPE_SET:
-                    EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
-                    self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
-                    TokenNumber += 1
-
-            for Pcd in self.DynamicPcdList:
-                if Pcd.Phase == "PEI" and Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
-                    EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
-                    self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
-                    TokenNumber += 1
-
-            for Pcd in self.DynamicPcdList:
-                if Pcd.Phase == "DXE" and Pcd.Type in PCD_DYNAMIC_TYPE_SET:
-                    EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
-                    self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
-                    TokenNumber += 1
-
-            for Pcd in self.DynamicPcdList:
-                if Pcd.Phase == "DXE" and Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
-                    EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
-                    self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
-                    TokenNumber += 1
-
-            for Pcd in self.NonDynamicPcdList:
-                self._PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
+    @cached_property
+    def PcdTokenNumber(self):
+        RetVal = OrderedDict()
+        TokenNumber = 1
+        #
+        # Make the Dynamic and DynamicEx PCD use within different TokenNumber area.
+        # Such as:
+        #
+        # Dynamic PCD:
+        # TokenNumber 0 ~ 10
+        # DynamicEx PCD:
+        # TokeNumber 11 ~ 20
+        #
+        for Pcd in self.DynamicPcdList:
+            if Pcd.Phase == "PEI" and Pcd.Type in PCD_DYNAMIC_TYPE_SET:
+                EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
+                RetVal[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
                 TokenNumber += 1
-        return self._PcdTokenNumber
 
-    ## Summarize ModuleAutoGen objects of all modules/libraries to be built for this platform
-    def _GetAutoGenObjectList(self):
-        self._ModuleAutoGenList = []
-        self._LibraryAutoGenList = []
+        for Pcd in self.DynamicPcdList:
+            if Pcd.Phase == "PEI" and Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
+                EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
+                RetVal[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
+                TokenNumber += 1
+
+        for Pcd in self.DynamicPcdList:
+            if Pcd.Phase == "DXE" and Pcd.Type in PCD_DYNAMIC_TYPE_SET:
+                EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
+                RetVal[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
+                TokenNumber += 1
+
+        for Pcd in self.DynamicPcdList:
+            if Pcd.Phase == "DXE" and Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
+                EdkLogger.debug(EdkLogger.DEBUG_5, "%s %s (%s) -> %d" % (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Pcd.Phase, TokenNumber))
+                RetVal[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
+                TokenNumber += 1
+
+        for Pcd in self.NonDynamicPcdList:
+            RetVal[Pcd.TokenCName, Pcd.TokenSpaceGuidCName] = TokenNumber
+            TokenNumber += 1
+        return RetVal
+
+    ## Summarize ModuleAutoGen objects of all modules to be built for this platform
+    @cached_property
+    def ModuleAutoGenList(self):
+        RetVal = []
         for ModuleFile in self.Platform.Modules:
             Ma = ModuleAutoGen(
                     self.Workspace,
@@ -1998,25 +1960,29 @@ class PlatformAutoGen(AutoGen):
                     self.Arch,
                     self.MetaFile
                     )
-            if Ma not in self._ModuleAutoGenList:
-                self._ModuleAutoGenList.append(Ma)
-            for La in Ma.LibraryAutoGenList:
-                if La not in self._LibraryAutoGenList:
-                    self._LibraryAutoGenList.append(La)
-                if Ma not in La.ReferenceModules:
-                    La.ReferenceModules.append(Ma)
-
-    ## Summarize ModuleAutoGen objects of all modules to be built for this platform
-    def _GetModuleAutoGenList(self):
-        if self._ModuleAutoGenList is None:
-            self._GetAutoGenObjectList()
-        return self._ModuleAutoGenList
+            if Ma not in RetVal:
+                RetVal.append(Ma)
+        return RetVal
 
     ## Summarize ModuleAutoGen objects of all libraries to be built for this platform
-    def _GetLibraryAutoGenList(self):
-        if self._LibraryAutoGenList is None:
-            self._GetAutoGenObjectList()
-        return self._LibraryAutoGenList
+    @cached_property
+    def LibraryAutoGenList(self):
+        RetVal = []
+        for ModuleFile in self.Platform.Modules:
+            Ma = ModuleAutoGen(
+                    self.Workspace,
+                    ModuleFile,
+                    self.BuildTarget,
+                    self.ToolChain,
+                    self.Arch,
+                    self.MetaFile
+                    )
+            for La in Ma.LibraryAutoGenList:
+                if La not in RetVal:
+                    RetVal.append(La)
+                if Ma not in La.ReferenceModules:
+                    La.ReferenceModules.append(Ma)
+        return RetVal
 
     ## Test if a module is supported by the platform
     #
@@ -2099,7 +2065,7 @@ class PlatformAutoGen(AutoGen):
             # Add Flexible PCD format parse
             if ToPcd.DefaultValue:
                 try:
-                    ToPcd.DefaultValue = ValueExpressionEx(ToPcd.DefaultValue, ToPcd.DatumType, self._GuidDict)(True)
+                    ToPcd.DefaultValue = ValueExpressionEx(ToPcd.DefaultValue, ToPcd.DatumType, self.Workspace._GuidDict)(True)
                 except BadExpression as Value:
                     EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s", %s' %(ToPcd.TokenSpaceGuidCName, ToPcd.TokenCName, ToPcd.DefaultValue, Value),
                                         File=self.MetaFile)
@@ -2265,10 +2231,16 @@ class PlatformAutoGen(AutoGen):
     ## Expand * in build option key
     #
     #   @param  Options     Options to be expanded
+    #   @param  ToolDef     Use specified ToolDef instead of full version.
+    #                       This is needed during initialization to prevent
+    #                       infinite recursion betweeh BuildOptions,
+    #                       ToolDefinition, and this function.
     #
     #   @retval options     Options expanded
     #
-    def _ExpandBuildOption(self, Options, ModuleStyle=None):
+    def _ExpandBuildOption(self, Options, ModuleStyle=None, ToolDef=None):
+        if not ToolDef:
+            ToolDef = self.ToolDefinition
         BuildOptions = {}
         FamilyMatch  = False
         FamilyIsNull = True
@@ -2332,12 +2304,12 @@ class PlatformAutoGen(AutoGen):
             Family = Key[0]
             Target, Tag, Arch, Tool, Attr = Key[1].split("_")
             # if tool chain family doesn't match, skip it
-            if Tool in self.ToolDefinition and Family != "":
+            if Tool in ToolDef and Family != "":
                 FamilyIsNull = False
-                if self.ToolDefinition[Tool].get(TAB_TOD_DEFINES_BUILDRULEFAMILY, "") != "":
-                    if Family != self.ToolDefinition[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
+                if ToolDef[Tool].get(TAB_TOD_DEFINES_BUILDRULEFAMILY, "") != "":
+                    if Family != ToolDef[Tool][TAB_TOD_DEFINES_BUILDRULEFAMILY]:
                         continue
-                elif Family != self.ToolDefinition[Tool][TAB_TOD_DEFINES_FAMILY]:
+                elif Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
                     continue
                 FamilyMatch = True
             # expand any wildcard
@@ -2369,10 +2341,10 @@ class PlatformAutoGen(AutoGen):
             Family = Key[0]
             Target, Tag, Arch, Tool, Attr = Key[1].split("_")
             # if tool chain family doesn't match, skip it
-            if Tool not in self.ToolDefinition or Family == "":
+            if Tool not in ToolDef or Family == "":
                 continue
             # option has been added before
-            if Family != self.ToolDefinition[Tool][TAB_TOD_DEFINES_FAMILY]:
+            if Family != ToolDef[Tool][TAB_TOD_DEFINES_FAMILY]:
                 continue
 
             # expand any wildcard
@@ -2451,36 +2423,6 @@ class PlatformAutoGen(AutoGen):
             BuildOptions['BUILD']['FLAGS'] = self.Workspace.UniFlag
         return BuildOptions, BuildRuleOrder
 
-    Platform            = property(_GetPlatform)
-    Name                = property(_GetName)
-    Guid                = property(_GetGuid)
-    Version             = property(_GetVersion)
-
-    OutputDir           = property(_GetOutputDir)
-    BuildDir            = property(_GetBuildDir)
-    MakeFileDir         = property(_GetMakeFileDir)
-    FdfFile             = property(_GetFdfFile)
-
-    PcdTokenNumber      = property(_GetPcdTokenNumbers)    # (TokenCName, TokenSpaceGuidCName) : GeneratedTokenNumber
-    DynamicPcdList      = property(_GetDynamicPcdList)    # [(TokenCName1, TokenSpaceGuidCName1), (TokenCName2, TokenSpaceGuidCName2), ...]
-    NonDynamicPcdList   = property(_GetNonDynamicPcdList)    # [(TokenCName1, TokenSpaceGuidCName1), (TokenCName2, TokenSpaceGuidCName2), ...]
-    NonDynamicPcdDict   = property(_GetNonDynamicPcdDict)
-    PackageList         = property(_GetPackageList)
-
-    ToolDefinition      = property(_GetToolDefinition)    # toolcode : tool path
-    ToolDefinitionFile  = property(_GetToolDefFile)    # toolcode : lib path
-    ToolChainFamily     = property(_GetToolChainFamily)
-    BuildRuleFamily     = property(_GetBuildRuleFamily)
-    BuildOption         = property(_GetBuildOptions)    # toolcode : option
-    EdkBuildOption      = property(_GetEdkBuildOptions)   # edktoolcode : option
-    EdkIIBuildOption    = property(_GetEdkIIBuildOptions) # edkiitoolcode : option
-
-    BuildCommand        = property(_GetBuildCommand)
-    BuildRule           = property(_GetBuildRule)
-    ModuleAutoGenList   = property(_GetModuleAutoGenList)
-    LibraryAutoGenList  = property(_GetLibraryAutoGenList)
-    GenFdsCommand       = property(_GenFdsCommand)
-
 #
 # extend lists contained in a dictionary with lists stored in another dictionary
 # if CopyToDict is not derived from DefaultDict(list) then this may raise exception
@@ -2536,7 +2478,6 @@ class ModuleAutoGen(AutoGen):
 
         self.Workspace = Workspace
         self.WorkspaceDir = Workspace.WorkspaceDir
-        self._GuidDict = Workspace._GuidDict
         self.MetaFile = ModuleFile
         self.PlatformInfo = PlatformAutoGen(Workspace, PlatformFile, Target, Toolchain, Arch)
 
