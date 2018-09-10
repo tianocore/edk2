@@ -11,8 +11,8 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
+from collections import OrderedDict, namedtuple
 from Common.DataType import *
-import collections
 
 ## PcdClassObject
 #
@@ -166,17 +166,17 @@ class StructurePcd(PcdClassObject):
         self.StructuredPcdIncludeFile = [] if StructuredPcdIncludeFile is None else StructuredPcdIncludeFile
         self.PackageDecs = Packages
         self.DefaultStoreName = [default_store]
-        self.DefaultValues = collections.OrderedDict()
+        self.DefaultValues = OrderedDict()
         self.PcdMode = None
-        self.SkuOverrideValues = collections.OrderedDict()
+        self.SkuOverrideValues = OrderedDict()
         self.FlexibleFieldName = None
         self.StructName = None
         self.PcdDefineLineNo = 0
         self.PkgPath = ""
         self.DefaultValueFromDec = ""
         self.ValueChain = set()
-        self.PcdFieldValueFromComm = collections.OrderedDict()
-        self.PcdFieldValueFromFdf = collections.OrderedDict()
+        self.PcdFieldValueFromComm = OrderedDict()
+        self.PcdFieldValueFromFdf = OrderedDict()
     def __repr__(self):
         return self.TypeName
 
@@ -190,9 +190,9 @@ class StructurePcd(PcdClassObject):
         self.DefaultValueFromDec = DefaultValue
     def AddOverrideValue (self, FieldName, Value, SkuName, DefaultStoreName, FileName="", LineNo=0):
         if SkuName not in self.SkuOverrideValues:
-            self.SkuOverrideValues[SkuName] = collections.OrderedDict()
+            self.SkuOverrideValues[SkuName] = OrderedDict()
         if DefaultStoreName not in self.SkuOverrideValues[SkuName]:
-            self.SkuOverrideValues[SkuName][DefaultStoreName] = collections.OrderedDict()
+            self.SkuOverrideValues[SkuName][DefaultStoreName] = OrderedDict()
         if FieldName in self.SkuOverrideValues[SkuName][DefaultStoreName]:
             del self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName]
         self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName] = [Value.strip(), FileName, LineNo]
@@ -243,21 +243,7 @@ class StructurePcd(PcdClassObject):
             self.PcdFieldValueFromComm = PcdObject.PcdFieldValueFromComm if PcdObject.PcdFieldValueFromComm else self.PcdFieldValueFromComm
             self.PcdFieldValueFromFdf = PcdObject.PcdFieldValueFromFdf if PcdObject.PcdFieldValueFromFdf else self.PcdFieldValueFromFdf
 
-## LibraryClassObject
-#
-# This Class defines LibraryClassObject used in BuildDatabase
-#
-# @param object:      Inherited from object class
-# @param Name:        Input value for LibraryClassName, default is None
-# @param SupModList:  Input value for SupModList, default is []
-#
-# @var LibraryClass:  To store value for LibraryClass
-# @var SupModList:    To store value for SupModList
-#
-class LibraryClassObject(object):
-    def __init__(self, Name = None, SupModList = []):
-        self.LibraryClass = Name
-        self.SupModList = SupModList
+LibraryClassObject = namedtuple('LibraryClassObject', ['LibraryClass','SupModList'], verbose=False)
 
 ## ModuleBuildClassObject
 #
@@ -325,7 +311,7 @@ class ModuleBuildClassObject(object):
 
         self.Binaries                = []
         self.Sources                 = []
-        self.LibraryClasses          = collections.OrderedDict()
+        self.LibraryClasses          = OrderedDict()
         self.Libraries               = []
         self.Protocols               = []
         self.Ppis                    = []
