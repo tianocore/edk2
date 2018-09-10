@@ -1120,28 +1120,6 @@ class FdfParser:
         else:
             return False
 
-    def __GetNextOp(self):
-        # Skip leading spaces, if exist.
-        self.__SkipWhiteSpace()
-        if self.__EndOfFile():
-            return False
-        # Record the token start position, the position of the first non-space char.
-        StartPos = self.CurrentOffsetWithinLine
-        while not self.__EndOfLine():
-            TempChar = self.__CurrentChar()
-            # Try to find the end char that is not a space
-            if not str(TempChar).isspace():
-                self.__GetOneChar()
-            else:
-                break
-        else:
-            return False
-
-        if StartPos != self.CurrentOffsetWithinLine:
-            self.__Token = self.__CurrentLine()[StartPos : self.CurrentOffsetWithinLine]
-            return True
-        else:
-            return False
     ## __GetNextGuid() method
     #
     #   Get next token unit before a seperator
@@ -1246,28 +1224,6 @@ class FdfParser:
         else:
             self.__UndoToken()
             return False
-
-    ## __GetNextPcdName() method
-    #
-    #   Get next PCD token space C name and PCD C name pair before a seperator
-    #   If found, the decimal data is put into self.__Token
-    #
-    #   @param  self        The object pointer
-    #   @retval Tuple       PCD C name and PCD token space C name pair
-    #
-    def __GetNextPcdName(self):
-        if not self.__GetNextWord():
-            raise Warning("expected format of <PcdTokenSpaceCName>.<PcdCName>", self.FileName, self.CurrentLineNumber)
-        pcdTokenSpaceCName = self.__Token
-
-        if not self.__IsToken( "."):
-            raise Warning("expected format of <PcdTokenSpaceCName>.<PcdCName>", self.FileName, self.CurrentLineNumber)
-
-        if not self.__GetNextWord():
-            raise Warning("expected format of <PcdTokenSpaceCName>.<PcdCName>", self.FileName, self.CurrentLineNumber)
-        pcdCName = self.__Token
-
-        return (pcdCName, pcdTokenSpaceCName)
 
     def __GetNextPcdSettings(self):
         if not self.__GetNextWord():
@@ -3681,7 +3637,6 @@ class FdfParser:
                               ModuleType.upper()     + \
                               '.'                    + \
                               TemplateName.upper() ] = RuleObj
-#        self.Profile.RuleList.append(rule)
         return True
 
     ## __GetModuleType() method
@@ -4139,7 +4094,6 @@ class FdfParser:
     #   @retval False       Not able to find section statement
     #
     def __GetRuleEncapsulationSection(self, Rule):
-
         if self.__IsKeyword( "COMPRESS"):
             Type = "PI_STD"
             if self.__IsKeyword("PI_STD") or self.__IsKeyword("PI_NONE"):
@@ -4207,7 +4161,6 @@ class FdfParser:
     #   @retval False       Not able to find a VTF
     #
     def __GetVtf(self):
-
         if not self.__GetNextToken():
             return False
 
@@ -4279,7 +4232,6 @@ class FdfParser:
     #   @retval False       Not able to find a component
     #
     def __GetComponentStatement(self, VtfObj):
-
         if not self.__IsKeyword("COMP_NAME"):
             return False
 
@@ -4413,7 +4365,6 @@ class FdfParser:
     #   @retval False       Not able to find a OptionROM
     #
     def __GetOptionRom(self):
-
         if not self.__GetNextToken():
             return False
 
@@ -4454,7 +4405,6 @@ class FdfParser:
     #   @retval False       Not able to find inf statement
     #
     def __GetOptRomInfStatement(self, Obj):
-
         if not self.__IsKeyword( "INF"):
             return False
 
@@ -4557,7 +4507,6 @@ class FdfParser:
     #   @retval False       Not able to find FILE statement
     #
     def __GetOptRomFileStatement(self, Obj):
-
         if not self.__IsKeyword( "FILE"):
             return False
 
@@ -4592,7 +4541,6 @@ class FdfParser:
     #   @retval CapList     List of Capsule in FD
     #
     def __GetCapInFd (self, FdName):
-
         CapList = []
         if FdName.upper() in self.Profile.FdDict:
             FdObj = self.Profile.FdDict[FdName.upper()]
@@ -4615,7 +4563,6 @@ class FdfParser:
     #   @param  RefFvList   referenced FV by section
     #
     def __GetReferencedFdCapTuple(self, CapObj, RefFdList = [], RefFvList = []):
-
         for CapsuleDataObj in CapObj.CapsuleDataList :
             if hasattr(CapsuleDataObj, 'FvName') and CapsuleDataObj.FvName is not None and CapsuleDataObj.FvName.upper() not in RefFvList:
                 RefFvList.append (CapsuleDataObj.FvName.upper())
@@ -4639,7 +4586,6 @@ class FdfParser:
     #   @retval FvList      list of FV in FD
     #
     def __GetFvInFd (self, FdName):
-
         FvList = []
         if FdName.upper() in self.Profile.FdDict:
             FdObj = self.Profile.FdDict[FdName.upper()]
@@ -4662,7 +4608,6 @@ class FdfParser:
     #   @param  RefFvList   referenced FV by section
     #
     def __GetReferencedFdFvTuple(self, FvObj, RefFdList = [], RefFvList = []):
-
         for FfsObj in FvObj.FfsList:
             if isinstance(FfsObj, FfsFileStatement.FileStatement):
                 if FfsObj.FvName is not None and FfsObj.FvName.upper() not in RefFvList:
@@ -4682,7 +4627,6 @@ class FdfParser:
     #   @param  FvList      referenced FV by section
     #
     def __GetReferencedFdFvTupleFromSection(self, FfsFile, FdList = [], FvList = []):
-
         SectionStack = []
         SectionStack.extend(FfsFile.SectionList)
         while SectionStack != []:
