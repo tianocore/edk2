@@ -410,6 +410,7 @@ class DecBuildData(PackageBuildClassObject):
             if not (PcdCName, TokenSpaceGuid) in PcdSet:
                 PcdSet.append((PcdCName, TokenSpaceGuid))
 
+        DefinitionPosition = {}
         for PcdCName, TokenSpaceGuid in PcdSet:
             #
             # limit the ARCH to self._Arch, if no self._Arch found, tdict
@@ -436,7 +437,7 @@ class DecBuildData(PackageBuildClassObject):
                                         list(validlists),
                                         list(expressions)
                                         )
-            PcdObj.DefinitionPosition = (self.MetaFile.File, LineNo)
+            DefinitionPosition[PcdObj] = (self.MetaFile.File, LineNo)
             if "." in TokenSpaceGuid:
                 StrPcdSet.append((PcdObj, LineNo))
             else:
@@ -449,10 +450,10 @@ class DecBuildData(PackageBuildClassObject):
         for pcd in Pcds.values():
             if pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
                 if StructPattern.match(pcd.DatumType) is None:
-                    EdkLogger.error('build', FORMAT_INVALID, "DatumType only support BOOLEAN, UINT8, UINT16, UINT32, UINT64, VOID* or a valid struct name.", pcd.DefinitionPosition[0], pcd.DefinitionPosition[1])
+                    EdkLogger.error('build', FORMAT_INVALID, "DatumType only support BOOLEAN, UINT8, UINT16, UINT32, UINT64, VOID* or a valid struct name.", DefinitionPosition[pcd][0], DefinitionPosition[pcd][1])
         for struct_pcd in Pcds.values():
             if isinstance(struct_pcd, StructurePcd) and not struct_pcd.StructuredPcdIncludeFile:
-                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "The structure Pcd %s.%s header file is not found in %s line %s \n" % (struct_pcd.TokenSpaceGuidCName, struct_pcd.TokenCName, struct_pcd.DefinitionPosition[0], struct_pcd.DefinitionPosition[1] ))
+                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "The structure Pcd %s.%s header file is not found in %s line %s \n" % (struct_pcd.TokenSpaceGuidCName, struct_pcd.TokenCName, DefinitionPosition[struct_pcd][0], DefinitionPosition[struct_pcd][1] ))
 
         return Pcds
 

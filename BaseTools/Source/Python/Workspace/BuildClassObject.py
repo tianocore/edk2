@@ -66,7 +66,6 @@ class PcdClassObject(object):
             self.DscDefaultValue = Value
         self.PcdValueFromComm = ""
         self.PcdValueFromFdf = ""
-        self.DefinitionPosition = ("","")
         self.UserDefinedDefaultStoresFlag = UserDefinedDefaultStoresFlag
 
     @staticmethod
@@ -169,7 +168,6 @@ class StructurePcd(PcdClassObject):
         self.DefaultValues = OrderedDict()
         self.PcdMode = None
         self.SkuOverrideValues = OrderedDict()
-        self.FlexibleFieldName = None
         self.StructName = None
         self.PcdDefineLineNo = 0
         self.PkgPath = ""
@@ -201,9 +199,6 @@ class StructurePcd(PcdClassObject):
     def SetPcdMode (self, PcdMode):
         self.PcdMode = PcdMode
 
-    def SetFlexibleFieldName (self, FlexibleFieldName):
-        self.FlexibleFieldName = FlexibleFieldName
-
     def copy(self, PcdObject):
         self.TokenCName = PcdObject.TokenCName if PcdObject.TokenCName else self.TokenCName
         self.TokenSpaceGuidCName = PcdObject.TokenSpaceGuidCName if PcdObject.TokenSpaceGuidCName else PcdObject.TokenSpaceGuidCName
@@ -225,7 +220,6 @@ class StructurePcd(PcdClassObject):
         self.DscRawValue = PcdObject.DscRawValue if PcdObject.DscRawValue else self.DscRawValue
         self.PcdValueFromComm = PcdObject.PcdValueFromComm if PcdObject.PcdValueFromComm else self.PcdValueFromComm
         self.PcdValueFromFdf = PcdObject.PcdValueFromFdf if PcdObject.PcdValueFromFdf else self.PcdValueFromFdf
-        self.DefinitionPosition = PcdObject.DefinitionPosition if PcdObject.DefinitionPosition else self.DefinitionPosition
         self.UserDefinedDefaultStoresFlag = PcdObject.UserDefinedDefaultStoresFlag if PcdObject.UserDefinedDefaultStoresFlag else self.UserDefinedDefaultStoresFlag
         if isinstance(PcdObject, StructurePcd):
             self.StructuredPcdIncludeFile = PcdObject.StructuredPcdIncludeFile if PcdObject.StructuredPcdIncludeFile else self.StructuredPcdIncludeFile
@@ -235,7 +229,6 @@ class StructurePcd(PcdClassObject):
             self.DefaultFromDSC=None
             self.DefaultValueFromDec = PcdObject.DefaultValueFromDec if PcdObject.DefaultValueFromDec else self.DefaultValueFromDec
             self.SkuOverrideValues = PcdObject.SkuOverrideValues if PcdObject.SkuOverrideValues else self.SkuOverrideValues
-            self.FlexibleFieldName = PcdObject.FlexibleFieldName if PcdObject.FlexibleFieldName else self.FlexibleFieldName
             self.StructName = PcdObject.DatumType if PcdObject.DatumType else self.StructName
             self.PcdDefineLineNo = PcdObject.PcdDefineLineNo if PcdObject.PcdDefineLineNo else self.PcdDefineLineNo
             self.PkgPath = PcdObject.PkgPath if PcdObject.PkgPath else self.PkgPath
