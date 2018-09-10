@@ -278,10 +278,6 @@ class WorkspaceAutoGen(AutoGen):
         self.FvTargetList   = Fvs if Fvs else []
         self.CapTargetList  = Caps if Caps else []
         self.AutoGenObjectList = []
-        self._BuildDir      = None
-        self._FvDir         = None
-        self._MakeFileDir   = None
-        self._BuildCommand  = None
         self._GuidDict = {}
 
         # there's many relative directory operations, so ...
@@ -810,54 +806,56 @@ class WorkspaceAutoGen(AutoGen):
         return "%s [%s]" % (self.MetaFile, ", ".join(self.ArchList))
 
     ## Return the directory to store FV files
-    def _GetFvDir(self):
-        if self._FvDir is None:
-            self._FvDir = path.join(self.BuildDir, TAB_FV_DIRECTORY)
-        return self._FvDir
+    @cached_property
+    def FvDir(self):
+        return path.join(self.BuildDir, TAB_FV_DIRECTORY)
 
     ## Return the directory to store all intermediate and final files built
-    def _GetBuildDir(self):
-        if self._BuildDir is None:
-            return self.AutoGenObjectList[0].BuildDir
+    @cached_property
+    def BuildDir(self):
+        return self.AutoGenObjectList[0].BuildDir
 
     ## Return the build output directory platform specifies
-    def _GetOutputDir(self):
+    @cached_property
+    def OutputDir(self):
         return self.Platform.OutputDirectory
 
     ## Return platform name
-    def _GetName(self):
+    @cached_property
+    def Name(self):
         return self.Platform.PlatformName
 
     ## Return meta-file GUID
-    def _GetGuid(self):
+    @cached_property
+    def Guid(self):
         return self.Platform.Guid
 
     ## Return platform version
-    def _GetVersion(self):
+    @cached_property
+    def Version(self):
         return self.Platform.Version
 
     ## Return paths of tools
-    def _GetToolDefinition(self):
+    @cached_property
+    def ToolDefinition(self):
         return self.AutoGenObjectList[0].ToolDefinition
 
     ## Return directory of platform makefile
     #
     #   @retval     string  Makefile directory
     #
-    def _GetMakeFileDir(self):
-        if self._MakeFileDir is None:
-            self._MakeFileDir = self.BuildDir
-        return self._MakeFileDir
+    @cached_property
+    def MakeFileDir(self):
+        return self.BuildDir
 
     ## Return build command string
     #
     #   @retval     string  Build command string
     #
-    def _GetBuildCommand(self):
-        if self._BuildCommand is None:
-            # BuildCommand should be all the same. So just get one from platform AutoGen
-            self._BuildCommand = self.AutoGenObjectList[0].BuildCommand
-        return self._BuildCommand
+    @cached_property
+    def BuildCommand(self):
+        # BuildCommand should be all the same. So just get one from platform AutoGen
+        return self.AutoGenObjectList[0].BuildCommand
 
     ## Check the PCDs token value conflict in each DEC file.
     #
@@ -933,7 +931,8 @@ class WorkspaceAutoGen(AutoGen):
                                     )
                     Count += 1
     ## Generate fds command
-    def _GenFdsCommand(self):
+    @property
+    def GenFdsCommand(self):
         return (GenMake.TopLevelMakefile(self)._TEMPLATE_.Replace(GenMake.TopLevelMakefile(self)._TemplateDict)).strip()
 
     ## Create makefile for the platform and modules in it
@@ -966,18 +965,6 @@ class WorkspaceAutoGen(AutoGen):
     def CreateAsBuiltInf(self):
         return
 
-    Name                = property(_GetName)
-    Guid                = property(_GetGuid)
-    Version             = property(_GetVersion)
-    OutputDir           = property(_GetOutputDir)
-
-    ToolDefinition      = property(_GetToolDefinition)       # toolcode : tool path
-
-    BuildDir            = property(_GetBuildDir)
-    FvDir               = property(_GetFvDir)
-    MakeFileDir         = property(_GetMakeFileDir)
-    BuildCommand        = property(_GetBuildCommand)
-    GenFdsCommand       = property(_GenFdsCommand)
 
 ## AutoGen class for platform
 #
@@ -2593,7 +2580,7 @@ class ModuleAutoGen(AutoGen):
     ## Return the module build data object
     @cached_property
     def Module(self):
-        return self.Workspace.BuildDatabase[self.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
+        return self.BuildDatabase[self.MetaFile, self.Arch, self.BuildTarget, self.ToolChain]
 
     ## Return the module name
     @cached_property
@@ -2941,7 +2928,7 @@ class ModuleAutoGen(AutoGen):
             except KeyError:
                 FlagOption = ''
 
-            if self.PlatformInfo.ToolChainFamily != 'RVCT':
+            if self.ToolChainFamily != 'RVCT':
                 IncPathList = [NormPath(Path, self.Macros) for Path in BuildOptIncludeRegEx.findall(FlagOption)]
             else:
                 #
@@ -3857,7 +3844,7 @@ class ModuleAutoGen(AutoGen):
         if os.path.exists(ModuleFile):
             shutil.copy2(ModuleFile, FileDir)
         if not self.OutputFile:
-            Ma = self.Workspace.BuildDatabase[PathClass(ModuleFile), self.Arch, self.BuildTarget, self.ToolChain]
+            Ma = self.BuildDatabase[PathClass(ModuleFile), self.Arch, self.BuildTarget, self.ToolChain]
             self.OutputFile = Ma.Binaries
         if self.OutputFile:
             for File in self.OutputFile:
