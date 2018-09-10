@@ -455,7 +455,8 @@ cleanlib:
         self.FfsOutputFileList = []
 
     # Compose a dict object containing information used to do replacement in template
-    def _CreateTemplateDict(self):
+    @property
+    def _TemplateDict(self):
         if self._FileType not in self._SEP_:
             EdkLogger.error("build", PARAMETER_INVALID, "Invalid Makefile type [%s]" % self._FileType,
                             ExtraData="[%s]" % str(self._AutoGenObject))
@@ -1095,8 +1096,6 @@ cleanlib:
 
         return DependencyList
 
-    _TemplateDict = property(_CreateTemplateDict)
-
 ## CustomMakefile class
 #
 #  This class encapsules makefie and its generation for module. It uses template to generate
@@ -1205,7 +1204,8 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
         self.IntermediateDirectoryList = ["$(DEBUG_DIR)", "$(OUTPUT_DIR)"]
 
     # Compose a dict object containing information used to do replacement in template
-    def _CreateTemplateDict(self):
+    @property
+    def _TemplateDict(self):
         Separator = self._SEP_[self._FileType]
         MyAgo = self._AutoGenObject
         if self._FileType not in MyAgo.CustomMakefile:
@@ -1277,8 +1277,6 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
         }
 
         return MakefileTemplateDict
-
-    _TemplateDict = property(_CreateTemplateDict)
 
 ## PlatformMakefile class
 #
@@ -1396,7 +1394,8 @@ cleanlib:
         self.LibraryMakeCommandList = []
 
     # Compose a dict object containing information used to do replacement in template
-    def _CreateTemplateDict(self):
+    @property
+    def _TemplateDict(self):
         Separator = self._SEP_[self._FileType]
 
         MyAgo = self._AutoGenObject
@@ -1481,8 +1480,6 @@ cleanlib:
                 DirList.append(os.path.join(self._AutoGenObject.BuildDir, LibraryAutoGen.BuildDir))
         return DirList
 
-    _TemplateDict = property(_CreateTemplateDict)
-
 ## TopLevelMakefile class
 #
 #  This class encapsules makefie and its generation for entrance makefile. It
@@ -1502,7 +1499,8 @@ class TopLevelMakefile(BuildFile):
         self.IntermediateDirectoryList = []
 
     # Compose a dict object containing information used to do replacement in template
-    def _CreateTemplateDict(self):
+    @property
+    def _TemplateDict(self):
         Separator = self._SEP_[self._FileType]
 
         # any platform autogen object is ok because we just need common information
@@ -1621,8 +1619,6 @@ class TopLevelMakefile(BuildFile):
             if not LibraryAutoGen.IsBinaryModule:
                 DirList.append(os.path.join(self._AutoGenObject.BuildDir, LibraryAutoGen.BuildDir))
         return DirList
-
-    _TemplateDict = property(_CreateTemplateDict)
 
 # This acts like the main() function for the script, unless it is 'import'ed into another script.
 if __name__ == '__main__':
