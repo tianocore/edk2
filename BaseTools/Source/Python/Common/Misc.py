@@ -38,6 +38,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.MultipleWorkspace import MultipleWorkspace as mws
 import uuid
 from CommonDataClass.Exceptions import BadExpression
+from Common.caching import cached_property
 import subprocess
 ## Regular expression used to find out place holders in string template
 gPlaceholderPattern = re.compile("\$\{([^$()\s]+)\}", re.MULTILINE | re.UNICODE)
@@ -1724,8 +1725,6 @@ class PathClass(object):
         self.ToolCode = ToolCode
         self.ToolChainFamily = ToolChainFamily
 
-        self._Key = None
-
     ## Convert the object of this class to a string
     #
     #  Convert member Path of the class to a string
@@ -1778,12 +1777,12 @@ class PathClass(object):
     def __hash__(self):
         return hash(self.Path)
 
-    def _GetFileKey(self):
-        if self._Key is None:
-            self._Key = self.Path.upper()   # + self.ToolChainFamily + self.TagName + self.ToolCode + self.Target
-        return self._Key
+    @cached_property
+    def Key(self):
+        return self.Path.upper()
 
-    def _GetTimeStamp(self):
+    @property
+    def TimeStamp(self):
         return os.stat(self.Path)[8]
 
     def Validate(self, Type='', CaseSensitive=True):
@@ -1821,9 +1820,6 @@ class PathClass(object):
             self.Root = RealRoot
             self.Path = os.path.join(RealRoot, RealFile)
         return ErrorCode, ErrorInfo
-
-    Key = property(_GetFileKey)
-    TimeStamp = property(_GetTimeStamp)
 
 ## Parse PE image to get the required PE informaion.
 #
@@ -1934,8 +1930,8 @@ class DefaultStore():
         for sid, name in self.DefaultStores.values():
             if sid == minid:
                 return name
-class SkuClass():
 
+class SkuClass():
     DEFAULT = 0
     SINGLE = 1
     MULTIPLE =2
@@ -1956,8 +1952,8 @@ class SkuClass():
         self.SkuIdSet = []
         self.SkuIdNumberSet = []
         self.SkuData = SkuIds
-        self.__SkuInherit = {}
-        self.__SkuIdentifier = SkuIdentifier
+        self._SkuInherit = {}
+        self._SkuIdentifier = SkuIdentifier
         if SkuIdentifier == '' or SkuIdentifier is None:
             self.SkuIdSet = ['DEFAULT']
             self.SkuIdNumberSet = ['0U']
@@ -1981,7 +1977,7 @@ class SkuClass():
                 EdkLogger.error("build", PARAMETER_INVALID,
                             ExtraData="SKU-ID [%s] is not supported by the platform. [Valid SKU-ID: %s]"
                                       % (each, " | ".join(SkuIds.keys())))
-        if self.SkuUsageType != self.SINGLE:
+        if self.SkuUsageType != SkuClass.SINGLE:
             self.AvailableSkuIds.update({'DEFAULT':0, 'COMMON':0})
         if self.SkuIdSet:
             GlobalData.gSkuids = (self.SkuIdSet)
@@ -1995,11 +1991,11 @@ class SkuClass():
                 GlobalData.gSkuids.sort()
 
     def GetNextSkuId(self, skuname):
-        if not self.__SkuInherit:
-            self.__SkuInherit = {}
+        if not self._SkuInherit:
+            self._SkuInherit = {}
             for item in self.SkuData.values():
-                self.__SkuInherit[item[1]]=item[2] if item[2] else "DEFAULT"
-        return self.__SkuInherit.get(skuname, "DEFAULT")
+                self._SkuInherit[item[1]]=item[2] if item[2] else "DEFAULT"
+        return self._SkuInherit.get(skuname, "DEFAULT")
 
     def GetSkuChain(self, sku):
         if sku == "DEFAULT":
@@ -2029,55 +2025,45 @@ class SkuClass():
 
         return skuorder
 
-    def __SkuUsageType(self):
-
-        if self.__SkuIdentifier.upper() == "ALL":
+    @property
+    def SkuUsageType(self):
+        if self._SkuIdentifier.upper() == "ALL":
             return SkuClass.MULTIPLE
 
         if len(self.SkuIdSet) == 1:
             if self.SkuIdSet[0] == 'DEFAULT':
                 return SkuClass.DEFAULT
-            else:
-                return SkuClass.SINGLE
-        elif len(self.SkuIdSet) == 2:
-            if 'DEFAULT' in self.SkuIdSet:
-                return SkuClass.SINGLE
-            else:
-                return SkuClass.MULTIPLE
-        else:
-            return SkuClass.MULTIPLE
-    def DumpSkuIdArrary(self):
+            return SkuClass.SINGLE
+        if len(self.SkuIdSet) == 2 and 'DEFAULT' in self.SkuIdSet:
+            return SkuClass.SINGLE
+        return SkuClass.MULTIPLE
 
-        ArrayStrList = []
+    def DumpSkuIdArrary(self):
         if self.SkuUsageType == SkuClass.SINGLE:
-            ArrayStr = "{0x0}"
-        else:
-            for skuname in self.AvailableSkuIds:
-                if skuname == "COMMON":
-                    continue
-                while skuname != "DEFAULT":
-                    ArrayStrList.append(hex(int(self.AvailableSkuIds[skuname])))
-                    skuname = self.GetNextSkuId(skuname)
-                ArrayStrList.append("0x0")
-            ArrayStr = "{" + ",".join(ArrayStrList) +  "}"
-        return ArrayStr
-    def __GetAvailableSkuIds(self):
+            return "{0x0}"
+        ArrayStrList = []
+        for skuname in self.AvailableSkuIds:
+            if skuname == "COMMON":
+                continue
+            while skuname != "DEFAULT":
+                ArrayStrList.append(hex(int(self.AvailableSkuIds[skuname])))
+                skuname = self.GetNextSkuId(skuname)
+            ArrayStrList.append("0x0")
+        return "{{{myList}}}".format(myList=",".join(ArrayStrList))
+
+    @property
+    def AvailableSkuIdSet(self):
         return self.AvailableSkuIds
 
-    def __GetSystemSkuID(self):
-        if self.__SkuUsageType() == SkuClass.SINGLE:
+    @property
+    def SystemSkuId(self):
+        if self.SkuUsageType == SkuClass.SINGLE:
             if len(self.SkuIdSet) == 1:
                 return self.SkuIdSet[0]
             else:
                 return self.SkuIdSet[0] if self.SkuIdSet[0] != 'DEFAULT' else self.SkuIdSet[1]
         else:
             return 'DEFAULT'
-    def __GetAvailableSkuIdNumber(self):
-        return self.SkuIdNumberSet
-    SystemSkuId = property(__GetSystemSkuID)
-    AvailableSkuIdSet = property(__GetAvailableSkuIds)
-    SkuUsageType = property(__SkuUsageType)
-    AvailableSkuIdNumSet = property(__GetAvailableSkuIdNumber)
 
 #
 # Pack a registry format GUID
