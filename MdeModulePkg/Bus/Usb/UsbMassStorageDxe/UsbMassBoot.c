@@ -815,14 +815,14 @@ UsbBootReadWriteBlocks (
 {
   USB_BOOT_READ_WRITE_10_CMD Cmd;
   EFI_STATUS                 Status;
-  UINT16                     Count;
-  UINT16                     CountMax;
+  UINT32                     Count;
+  UINT32                     CountMax;
   UINT32                     BlockSize;
   UINT32                     ByteSize;
   UINT32                     Timeout;
 
   BlockSize = UsbMass->BlockIoMedia.BlockSize;
-  CountMax = (UINT16)(USB_BOOT_MAX_CARRY_SIZE / BlockSize);
+  CountMax  = USB_BOOT_MAX_CARRY_SIZE / BlockSize;
   Status    = EFI_SUCCESS;
 
   while (TotalBlock > 0) {
@@ -831,8 +831,9 @@ UsbBootReadWriteBlocks (
     // on the device. We must split the total block because the READ10
     // command only has 16 bit transfer length (in the unit of block).
     //
-    Count     = (UINT16)((TotalBlock < CountMax) ? TotalBlock : CountMax);
-    ByteSize  = (UINT32)Count * BlockSize;
+    Count    = (UINT32)MIN (TotalBlock, CountMax);
+    Count    = MIN (MAX_UINT16, Count);
+    ByteSize = Count * BlockSize;
 
     //
     // USB command's upper limit timeout is 5s. [USB2.0-9.2.6.1]
@@ -847,7 +848,7 @@ UsbBootReadWriteBlocks (
     Cmd.OpCode  = Write ? USB_BOOT_WRITE10_OPCODE : USB_BOOT_READ10_OPCODE;
     Cmd.Lun     = (UINT8) (USB_BOOT_LUN (UsbMass->Lun));
     WriteUnaligned32 ((UINT32 *) Cmd.Lba, SwapBytes32 (Lba));
-    WriteUnaligned16 ((UINT16 *) Cmd.TransferLen, SwapBytes16 (Count));
+    WriteUnaligned16 ((UINT16 *) Cmd.TransferLen, SwapBytes16 ((UINT16)Count));
 
     Status = UsbBootExecCmdWithRetry (
                UsbMass,
@@ -867,7 +868,7 @@ UsbBootReadWriteBlocks (
       Lba, Count
       ));
     Lba        += Count;
-    Buffer     += Count * BlockSize;
+    Buffer     += ByteSize;
     TotalBlock -= Count;
   }
 
@@ -897,22 +898,22 @@ UsbBootReadWriteBlocks16 (
 {
   UINT8                     Cmd[16];
   EFI_STATUS                Status;
-  UINT16                    Count;
-  UINT16                    CountMax;
+  UINT32                    Count;
+  UINT32                    CountMax;
   UINT32                    BlockSize;
   UINT32                    ByteSize;
   UINT32                    Timeout;
 
   BlockSize = UsbMass->BlockIoMedia.BlockSize;
-  CountMax = (UINT16)(USB_BOOT_MAX_CARRY_SIZE / BlockSize);
+  CountMax  = USB_BOOT_MAX_CARRY_SIZE / BlockSize;
   Status    = EFI_SUCCESS;
 
   while (TotalBlock > 0) {
     //
     // Split the total blocks into smaller pieces.
     //
-    Count     = (UINT16)((TotalBlock < CountMax) ? TotalBlock : CountMax);
-    ByteSize  = (UINT32)Count * BlockSize;
+    Count    = (UINT32)MIN (TotalBlock, CountMax);
+    ByteSize = Count * BlockSize;
 
     //
     // USB command's upper limit timeout is 5s. [USB2.0-9.2.6.1]
@@ -947,7 +948,7 @@ UsbBootReadWriteBlocks16 (
       Lba, Count
       ));
     Lba        += Count;
-    Buffer     += Count * BlockSize;
+    Buffer     += ByteSize;
     TotalBlock -= Count;
   }
 
