@@ -1414,7 +1414,10 @@ def ParseFieldValue (Value):
         Value = Value.strip().strip('"')
         return ParseDevPathValue(Value)
     if Value.lower().startswith('0x'):
-        Value = int(Value, 16)
+        try:
+            Value = int(Value, 16)
+        except:
+            raise BadExpression("invalid hex value: %s" % Value)
         if Value == 0:
             return 0, 1
         return Value, (Value.bit_length() + 7) / 8
