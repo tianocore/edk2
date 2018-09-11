@@ -172,9 +172,9 @@ UsbMassReadBlocks (
   }
 
   if (UsbMass->Cdb16Byte) {
-    Status = UsbBootReadBlocks16 (UsbMass, Lba, TotalBlock, Buffer);
+    Status = UsbBootReadWriteBlocks16 (UsbMass, FALSE, Lba, TotalBlock, Buffer);
   } else {
-    Status = UsbBootReadBlocks (UsbMass, (UINT32) Lba, TotalBlock, Buffer);
+    Status = UsbBootReadWriteBlocks (UsbMass, FALSE, (UINT32) Lba, TotalBlock, Buffer);
   }
 
   if (EFI_ERROR (Status)) {
@@ -292,9 +292,9 @@ UsbMassWriteBlocks (
   // and clear the status should the write succeed.
   //
   if (UsbMass->Cdb16Byte) {
-    Status = UsbBootWriteBlocks16 (UsbMass, Lba, TotalBlock, Buffer);
+    Status = UsbBootReadWriteBlocks16 (UsbMass, TRUE, Lba, TotalBlock, Buffer);
   } else {
-    Status = UsbBootWriteBlocks (UsbMass, (UINT32) Lba, TotalBlock, Buffer);
+    Status = UsbBootReadWriteBlocks (UsbMass, TRUE, (UINT32) Lba, TotalBlock, Buffer);
   }
 
   if (EFI_ERROR (Status)) {

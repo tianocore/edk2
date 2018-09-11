@@ -161,17 +161,7 @@ typedef struct {
   UINT8             TransferLen[2]; ///< Transfer length
   UINT8             Reserverd1;
   UINT8             Pad[2];
-} USB_BOOT_READ10_CMD;
-
-typedef struct {
-  UINT8             OpCode;
-  UINT8             Lun;
-  UINT8             Lba[4];
-  UINT8             Reserved0;
-  UINT8             TransferLen[2];
-  UINT8             Reserverd1;
-  UINT8             Pad[2];
-} USB_BOOT_WRITE10_CMD;
+} USB_BOOT_READ_WRITE_10_CMD;
 
 typedef struct {
   UINT8             OpCode;
@@ -292,65 +282,47 @@ UsbBootReadBlocks (
   );
 
 /**
-  Write some blocks to the device.
+  Read or write some blocks from the device.
 
-  @param  UsbMass                The USB mass storage device to write to
+  @param  UsbMass                The USB mass storage device to access
+  @param  Write                  TRUE for write operation.
   @param  Lba                    The start block number
-  @param  TotalBlock             Total block number to write
-  @param  Buffer                 Pointer to the source buffer for the data.
+  @param  TotalBlock             Total block number to read or write
+  @param  Buffer                 The buffer to read to or write from
 
-  @retval EFI_SUCCESS            Data are written into the buffer
-  @retval Others                 Failed to write all the data
+  @retval EFI_SUCCESS            Data are read into the buffer or writen into the device.
+  @retval Others                 Failed to read or write all the data
 
 **/
 EFI_STATUS
-UsbBootWriteBlocks (
-  IN  USB_MASS_DEVICE         *UsbMass,
-  IN  UINT32                  Lba,
-  IN  UINTN                   TotalBlock,
-  IN  UINT8                   *Buffer
+UsbBootReadWriteBlocks (
+  IN  USB_MASS_DEVICE       *UsbMass,
+  IN  BOOLEAN               Write,
+  IN  UINT32                Lba,
+  IN  UINTN                 TotalBlock,
+  IN OUT UINT8              *Buffer
   );
 
 /**
-  Read some blocks from the device by SCSI 16 byte cmd.
+  Read or write some blocks from the device by SCSI 16 byte cmd.
 
-  @param  UsbMass                The USB mass storage device to read from
+  @param  UsbMass                The USB mass storage device to access
+  @param  Write                  TRUE for write operation.
   @param  Lba                    The start block number
-  @param  TotalBlock             Total block number to read
-  @param  Buffer                 The buffer to read to
+  @param  TotalBlock             Total block number to read or write
+  @param  Buffer                 The buffer to read to or write from
 
-  @retval EFI_SUCCESS            Data are read into the buffer
-  @retval Others                 Failed to read all the data
-
+  @retval EFI_SUCCESS            Data are read into the buffer or writen into the device.
+  @retval Others                 Failed to read or write all the data
 **/
 EFI_STATUS
-UsbBootReadBlocks16 (
+UsbBootReadWriteBlocks16 (
   IN  USB_MASS_DEVICE       *UsbMass,
+  IN  BOOLEAN               Write,
   IN  UINT64                Lba,
   IN  UINTN                 TotalBlock,
-  OUT UINT8                 *Buffer
+  IN OUT UINT8              *Buffer
   );
-
-/**
-  Write some blocks to the device by SCSI 16 byte cmd.
-
-  @param  UsbMass                The USB mass storage device to write to
-  @param  Lba                    The start block number
-  @param  TotalBlock             Total block number to write
-  @param  Buffer                 Pointer to the source buffer for the data.
-
-  @retval EFI_SUCCESS            Data are written into the buffer
-  @retval Others                 Failed to write all the data
-
-**/
-EFI_STATUS
-UsbBootWriteBlocks16 (
-  IN  USB_MASS_DEVICE         *UsbMass,
-  IN  UINT64                  Lba,
-  IN  UINTN                   TotalBlock,
-  IN  UINT8                   *Buffer
-  );
-
 
 /**
   Use the USB clear feature control transfer to clear the endpoint stall condition.
