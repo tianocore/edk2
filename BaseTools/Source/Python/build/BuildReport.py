@@ -992,12 +992,16 @@ class PcdReport(object):
                 PcdValue = DecDefaultValue
                 if DscDefaultValue:
                     PcdValue = DscDefaultValue
-                Pcd.DefaultValue = PcdValue
+                #The DefaultValue of StructurePcd already be the latest, no need to update.
+                if not self.IsStructurePcd(Pcd.TokenCName, Pcd.TokenSpaceGuidCName):
+                    Pcd.DefaultValue = PcdValue
                 if ModulePcdSet is not None:
                     if (Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type) not in ModulePcdSet:
                         continue
                     InfDefaultValue, PcdValue = ModulePcdSet[Pcd.TokenCName, Pcd.TokenSpaceGuidCName, Type]
-                    Pcd.DefaultValue = PcdValue
+                    #The DefaultValue of StructurePcd already be the latest, no need to update.
+                    if not self.IsStructurePcd(Pcd.TokenCName, Pcd.TokenSpaceGuidCName):
+                        Pcd.DefaultValue = PcdValue
                     if InfDefaultValue:
                         try:
                             InfDefaultValue = ValueExpressionEx(InfDefaultValue, Pcd.DatumType, self._GuidDict)(True)
@@ -1013,7 +1017,9 @@ class PcdReport(object):
                             if pcd[2]:
                                 continue
                             PcdValue = pcd[3]
-                            Pcd.DefaultValue = PcdValue
+                            #The DefaultValue of StructurePcd already be the latest, no need to update.
+                            if not self.IsStructurePcd(Pcd.TokenCName, Pcd.TokenSpaceGuidCName):
+                                Pcd.DefaultValue = PcdValue
                             BuildOptionMatch = True
                             break
 
@@ -1060,7 +1066,7 @@ class PcdReport(object):
                         DscMatch = (DscDefaultValue.strip() == PcdValue.strip())
 
                 IsStructure = False
-                if GlobalData.gStructurePcd and (self.Arch in GlobalData.gStructurePcd) and ((Pcd.TokenCName, Pcd.TokenSpaceGuidCName) in GlobalData.gStructurePcd[self.Arch]):
+                if self.IsStructurePcd(Pcd.TokenCName, Pcd.TokenSpaceGuidCName):
                     IsStructure = True
                     if TypeName in ('DYNVPD', 'DEXVPD'):
                         SkuInfoList = Pcd.SkuInfoList
@@ -1437,6 +1443,12 @@ class PcdReport(object):
                 return valuelist
             else:
                 return value
+
+    def IsStructurePcd(self, PcdToken, PcdTokenSpaceGuid):
+        if GlobalData.gStructurePcd and (self.Arch in GlobalData.gStructurePcd) and ((PcdToken, PcdTokenSpaceGuid) in GlobalData.gStructurePcd[self.Arch]):
+            return True
+        else:
+            return False
 
 ##
 # Reports platform and module Prediction information

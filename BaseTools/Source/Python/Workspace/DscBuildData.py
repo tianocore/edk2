@@ -1067,6 +1067,23 @@ class DscBuildData(PlatformBuildClassObject):
                         PcdItem = BuildData.Pcds[key]
                         if (TokenSpaceGuidCName, TokenCName) == (PcdItem.TokenSpaceGuidCName, PcdItem.TokenCName) and FieldName =="":
                             PcdItem.DefaultValue = pcdvalue
+        #In command line, the latter full assign value in commandLine should override the former field assign value.
+        #For example, --pcd Token.pcd.field="" --pcd Token.pcd=H"{}"
+        delete_assign = []
+        field_assign = {}
+        if GlobalData.BuildOptionPcd:
+            for pcdTuple in GlobalData.BuildOptionPcd:
+                TokenSpaceGuid, Token, Field = pcdTuple[0], pcdTuple[1], pcdTuple[2]
+                if Field:
+                    if (TokenSpaceGuid, Token) not in field_assign:
+                        field_assign[TokenSpaceGuid, Token] = []
+                    field_assign[TokenSpaceGuid, Token].append(pcdTuple)
+                else:
+                    if (TokenSpaceGuid, Token) in field_assign:
+                        delete_assign.extend(field_assign[TokenSpaceGuid, Token])
+                        field_assign[TokenSpaceGuid, Token] = []
+            for item in delete_assign:
+                GlobalData.BuildOptionPcd.remove(item)
 
     @staticmethod
     def HandleFlexiblePcd(TokenSpaceGuidCName, TokenCName, PcdValue, PcdDatumType, GuidDict, FieldName=''):
