@@ -888,7 +888,17 @@ class PcdReport(object):
             if self.ConditionalPcds:
                 self.GenerateReportDetail(File, ModulePcdSet, 1)
             if self.UnusedPcds:
-                self.GenerateReportDetail(File, ModulePcdSet, 2)
+                IsEmpty = True
+                for Token in self.UnusedPcds:
+                    TokenDict = self.UnusedPcds[Token]
+                    for Type in TokenDict:
+                        if TokenDict[Type]:
+                            IsEmpty = False
+                            break
+                    if not IsEmpty:
+                        break
+                if not IsEmpty:
+                    self.GenerateReportDetail(File, ModulePcdSet, 2)
         self.GenerateReportDetail(File, ModulePcdSet)
 
     ##
