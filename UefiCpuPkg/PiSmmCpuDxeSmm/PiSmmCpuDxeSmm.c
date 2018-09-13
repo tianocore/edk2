@@ -237,6 +237,11 @@ SmmReadSaveState (
   if ((CpuIndex >= gSmst->NumberOfCpus) || (Buffer == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
+  //
+  // The AsmLfence() call here is to ensure the above check for the CpuIndex
+  // has been completed before the execution of subsequent codes.
+  //
+  AsmLfence ();
 
   //
   // Check for special EFI_SMM_SAVE_STATE_REGISTER_PROCESSOR_ID
