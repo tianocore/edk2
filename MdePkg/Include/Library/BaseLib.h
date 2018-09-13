@@ -2,7 +2,7 @@
   Provides string functions, linked list functions, math functions, synchronization
   functions, file path functions, and CPU architecture-specific functions.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -9065,6 +9065,19 @@ VOID
 EFIAPI
 AsmWriteTr (
   IN UINT16 Selector
+  );
+
+/**
+  Performs a serializing operation on all load-from-memory instructions that
+  were issued prior the AsmLfence function.
+
+  Executes a LFENCE instruction. This function is only available on IA-32 and x64.
+
+**/
+VOID
+EFIAPI
+AsmLfence (
+  VOID
   );
 
 #endif

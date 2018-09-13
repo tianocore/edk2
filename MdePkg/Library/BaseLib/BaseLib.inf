@@ -68,6 +68,7 @@
 
 [Sources.Ia32]
   Ia32/WriteTr.nasm
+  Ia32/Lfence.nasm
 
   Ia32/Wbinvd.c | MSFT 
   Ia32/WriteMm7.c | MSFT 
@@ -450,6 +451,7 @@
   X64/DisableCache.nasm
   X64/DisableCache.asm
   X64/WriteTr.nasm
+  X64/Lfence.nasm
 
   X64/CpuBreakpoint.c | MSFT 
   X64/WriteMsr64.c | MSFT 
