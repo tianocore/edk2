@@ -477,25 +477,12 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
             EdkLogger.error(None, PERMISSION_FAILURE, "Do not have write permission on directory %s" % DirName)
 
     try:
-        if GlobalData.gIsWindows:
-            try:
-                from .PyUtility import SaveFileToDisk
-                if not SaveFileToDisk(File, Content):
-                    EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData=File)
-            except:
-                if isinstance(Content, bytes):
-                    with open(File, "wb") as Fd:
-                        Fd.write(Content)
-                else:
-                    with open(File, "w") as Fd:
-                        Fd.write(Content)
+        if isinstance(Content, bytes):
+            with open(File, "wb") as Fd:
+                Fd.write(Content)
         else:
-            if isinstance(Content, bytes):
-                with open(File, "wb") as Fd:
-                    Fd.write(Content)
-            else:
-                with open(File, "w") as Fd:
-                    Fd.write(Content)
+            with open(File, "w") as Fd:
+                Fd.write(Content)
     except IOError as X:
         EdkLogger.error(None, FILE_CREATE_FAILURE, ExtraData='IOError %s' % X)
 
