@@ -231,19 +231,13 @@ ScanPciBus (
   UINT8                   HeaderType;
   UINT8                   BaseClass;
   UINT8                   SubClass;
-  UINT32                  MaxFunction;
   UINT16                  VendorID;
   UINT16                  DeviceID;
   EFI_STATUS              Status;
 
   // Scan the PCI bus for devices
-  for (Device = 0; Device < PCI_MAX_DEVICE + 1; Device++) {
-    HeaderType = PciSegmentRead8 (PCI_SEGMENT_LIB_ADDRESS(Segment, Bus, Device, 0, PCI_HEADER_TYPE_OFFSET));
-    MaxFunction = PCI_MAX_FUNC + 1;
-    if ((HeaderType & HEADER_TYPE_MULTI_FUNCTION) == 0x00) {
-      MaxFunction = 1;
-    }
-    for (Function = 0; Function < MaxFunction; Function++) {
+  for (Device = 0; Device <= PCI_MAX_DEVICE; Device++) {
+    for (Function = 0; Function <= PCI_MAX_FUNC; Function++) {
       VendorID  = PciSegmentRead16 (PCI_SEGMENT_LIB_ADDRESS(Segment, Bus, Device, Function, PCI_VENDOR_ID_OFFSET));
       DeviceID  = PciSegmentRead16 (PCI_SEGMENT_LIB_ADDRESS(Segment, Bus, Device, Function, PCI_DEVICE_ID_OFFSET));
       if (VendorID == 0xFFFF && DeviceID == 0xFFFF) {
@@ -273,6 +267,16 @@ ScanPciBus (
               return Status;
             }
           }
+        }
+      }
+
+      if (Function == 0) {
+        HeaderType = PciSegmentRead8 (PCI_SEGMENT_LIB_ADDRESS(Segment, Bus, Device, 0, PCI_HEADER_TYPE_OFFSET));
+        if ((HeaderType & HEADER_TYPE_MULTI_FUNCTION) == 0x00) {
+          //
+          // It is not a multi-function device, do not scan other functions.
+          //
+          break;
         }
       }
     }
