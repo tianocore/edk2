@@ -67,6 +67,8 @@
   BaseLibInternals.h
 
 [Sources.Ia32]
+  Ia32/Lfence.nasm
+
   Ia32/Wbinvd.c | MSFT 
   Ia32/WriteMm7.c | MSFT 
   Ia32/WriteMm6.c | MSFT 
@@ -382,6 +384,7 @@
   X64/SwitchStack.asm
   X64/EnableCache.asm
   X64/DisableCache.asm
+  X64/Lfence.nasm
 
   X64/CpuBreakpoint.c | MSFT 
   X64/WriteMsr64.c | MSFT 
