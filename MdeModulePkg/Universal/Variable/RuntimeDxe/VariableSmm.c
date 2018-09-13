@@ -529,6 +529,12 @@ SmmVariableHandler (
         goto EXIT;
       }
 
+      //
+      // The MemoryLoadFence() call here is to ensure the previous range/content
+      // checks for the CommBuffer have been completed before the subsequent
+      // consumption of the CommBuffer content.
+      //
+      MemoryLoadFence ();
       if (SmmVariableHeader->NameSize < sizeof (CHAR16) || SmmVariableHeader->Name[SmmVariableHeader->NameSize/sizeof (CHAR16) - 1] != L'\0') {
         //
         // Make sure VariableName is A Null-terminated string.
@@ -623,6 +629,12 @@ SmmVariableHandler (
         goto EXIT;
       }
 
+      //
+      // The MemoryLoadFence() call here is to ensure the previous range/content
+      // checks for the CommBuffer have been completed before the subsequent
+      // consumption of the CommBuffer content.
+      //
+      MemoryLoadFence ();
       if (SmmVariableHeader->NameSize < sizeof (CHAR16) || SmmVariableHeader->Name[SmmVariableHeader->NameSize/sizeof (CHAR16) - 1] != L'\0') {
         //
         // Make sure VariableName is A Null-terminated string.
@@ -757,6 +769,12 @@ SmmVariableHandler (
         goto EXIT;
       }
 
+      //
+      // The MemoryLoadFence() call here is to ensure the previous range/content
+      // checks for the CommBuffer have been completed before the subsequent
+      // consumption of the CommBuffer content.
+      //
+      MemoryLoadFence ();
       if (CommVariableProperty->NameSize < sizeof (CHAR16) || CommVariableProperty->Name[CommVariableProperty->NameSize/sizeof (CHAR16) - 1] != L'\0') {
         //
         // Make sure VariableName is A Null-terminated string.

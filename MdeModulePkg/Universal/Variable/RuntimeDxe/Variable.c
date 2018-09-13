@@ -3183,6 +3183,12 @@ VariableServiceSetVariable (
       ((EFI_VARIABLE_AUTHENTICATION_2 *) Data)->AuthInfo.Hdr.dwLength < OFFSET_OF (WIN_CERTIFICATE_UEFI_GUID, CertData)) {
       return EFI_SECURITY_VIOLATION;
     }
+    //
+    // The MemoryLoadFence() call here is to ensure the above sanity check
+    // for the EFI_VARIABLE_AUTHENTICATION_2 descriptor has been completed
+    // before the execution of subsequent codes.
+    //
+    MemoryLoadFence ();
     PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
   } else {
     PayloadSize = DataSize;

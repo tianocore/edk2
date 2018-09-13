@@ -53,6 +53,7 @@
   Variable.h
   VariableExLib.c
   TcgMorLockSmm.c
+  LoadFenceSmm.c
 
 [Packages]
   MdePkg/MdePkg.dec
