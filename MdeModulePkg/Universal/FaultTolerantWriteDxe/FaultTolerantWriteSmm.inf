@@ -55,6 +55,7 @@
   PcdLib
   ReportStatusCodeLib
   SmmMemLib
+  BaseLib
 
 [Guids]
   #

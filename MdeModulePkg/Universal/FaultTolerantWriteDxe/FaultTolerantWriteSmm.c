@@ -57,6 +57,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <PiSmm.h>
 #include <Library/SmmServicesTableLib.h>
 #include <Library/SmmMemLib.h>
+#include <Library/BaseLib.h>
 #include <Protocol/SmmSwapAddressRange.h>
 #include "FaultTolerantWrite.h"
 #include "FaultTolerantWriteSmmCommon.h"
@@ -417,6 +418,12 @@ SmmFaultTolerantWriteHandler (
                  &SmmFvbHandle
                  );
       if (!EFI_ERROR (Status)) {
+        //
+        // The AsmLfence() call here is to ensure the previous range/content
+        // checks for the CommBuffer have been completed before calling into
+        // FtwWrite().
+        //
+        AsmLfence ();
         Status = FtwWrite(
                    &mFtwDevice->FtwInstance,
                    SmmFtwWriteHeader->Lba,
