@@ -8904,6 +8904,19 @@ AsmRdRand64  (
   OUT     UINT64                    *Rand
   );
 
+/**
+  Performs a serializing operation on all load-from-memory instructions that
+  were issued prior the AsmLfence function.
+
+  Executes a LFENCE instruction. This function is only available on IA-32 and x64.
+
+**/
+VOID
+EFIAPI
+AsmLfence (
+  VOID
+  );
+
 #endif
 #endif
 
