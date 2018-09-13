@@ -1059,6 +1059,10 @@ KeyboardHandler (
   // Byte 1 is reserved.
   // Bytes 2 to 7 are keycodes.
   //
+  if (DataLength < 8) {
+    return EFI_DEVICE_ERROR;
+  }
+
   CurKeyCodeBuffer  = (UINT8 *) Data;
   OldKeyCodeBuffer  = UsbKeyboardDevice->LastKeyCodeArray;
 
