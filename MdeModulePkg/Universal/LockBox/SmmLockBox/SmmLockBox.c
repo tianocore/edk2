@@ -76,6 +76,11 @@ SmmLockBoxSave (
     LockBoxParameterSave->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return ;
   }
+  //
+  // The AsmLfence() call here is to ensure the above range check for the
+  // CommBuffer have been completed before calling into SaveLockBox().
+  //
+  AsmLfence ();
 
   //
   // Save data
@@ -160,6 +165,11 @@ SmmLockBoxUpdate (
     LockBoxParameterUpdate->Header.ReturnStatus = (UINT64)EFI_ACCESS_DENIED;
     return ;
   }
+  //
+  // The AsmLfence() call here is to ensure the above range check for the
+  // CommBuffer have been completed before calling into UpdateLockBox().
+  //
+  AsmLfence ();
 
   //
   // Update data
