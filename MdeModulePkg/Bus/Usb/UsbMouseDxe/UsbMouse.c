@@ -811,8 +811,6 @@ OnMouseInterruptComplete (
     return EFI_SUCCESS;
   }
 
-  UsbMouseDevice->StateChanged = TRUE;
-
   //
   // Check mouse Data
   // USB HID Specification specifies following data format:
@@ -825,6 +823,12 @@ OnMouseInterruptComplete (
   // 2       0 to 7  Y displacement
   // 3 to n  0 to 7  Device specific (optional)
   //
+  if (DataLength < 3) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  UsbMouseDevice->StateChanged = TRUE;
+
   UsbMouseDevice->State.LeftButton  = (BOOLEAN) ((*(UINT8 *) Data & BIT0) != 0);
   UsbMouseDevice->State.RightButton = (BOOLEAN) ((*(UINT8 *) Data & BIT1) != 0);
   UsbMouseDevice->State.RelativeMovementX += *((INT8 *) Data + 1);
