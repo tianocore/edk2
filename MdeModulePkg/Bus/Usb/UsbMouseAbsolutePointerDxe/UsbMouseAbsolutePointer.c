@@ -813,8 +813,6 @@ OnMouseInterruptComplete (
     return EFI_SUCCESS;
   }
 
-  UsbMouseAbsolutePointerDevice->StateChanged = TRUE;
-
   //
   // Check mouse Data
   // USB HID Specification specifies following data format:
@@ -827,6 +825,12 @@ OnMouseInterruptComplete (
   // 2       0 to 7  Y displacement
   // 3 to n  0 to 7  Device specific (optional)
   //
+  if (DataLength < 3) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  UsbMouseAbsolutePointerDevice->StateChanged = TRUE;
+
   UsbMouseAbsolutePointerDevice->State.ActiveButtons = *(UINT8 *) Data & (BIT0 | BIT1 | BIT2);
 
   UsbMouseAbsolutePointerDevice->State.CurrentX =
