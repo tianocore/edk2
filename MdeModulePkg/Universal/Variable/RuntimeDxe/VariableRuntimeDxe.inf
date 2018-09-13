@@ -46,6 +46,7 @@
   TcgMorLockDxe.c
   VarCheck.c
   VariableExLib.c
+  LoadFenceDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec

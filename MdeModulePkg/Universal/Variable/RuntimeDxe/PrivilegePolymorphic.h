@@ -7,7 +7,7 @@
   vs. non-privileged driver code.
 
   Copyright (c) 2017, Red Hat, Inc.<BR>
-  Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials are licensed and made available
   under the terms and conditions of the BSD License which accompanies this
@@ -82,6 +82,17 @@ SetVariableCheckHandlerMor (
   IN UINT32     Attributes,
   IN UINTN      DataSize,
   IN VOID       *Data
+  );
+
+/**
+  This service is consumed by the variable modules to perform a serializing
+  operation on all load-from-memory instructions that were issued prior to the
+  call of this function.
+
+**/
+VOID
+MemoryLoadFence (
+  VOID
   );
 
 #endif
