@@ -979,6 +979,10 @@ Mtftp6OperationClean (
   Instance->ServerDataPort = 0;
   Instance->McastPort      = 0;
   Instance->BlkSize        = 0;
+  Instance->Operation      = 0;
+  Instance->WindowSize     = 1;
+  Instance->TotalBlock     = 0;
+  Instance->AckedBlock     = 0;
   Instance->LastBlk        = 0;
   Instance->PacketToLive   = 0;
   Instance->MaxRetry       = 0;
@@ -1051,6 +1055,8 @@ Mtftp6OperationStart (
   Status           = EFI_SUCCESS;
   Instance->OldTpl = gBS->RaiseTPL (TPL_CALLBACK);
 
+  Instance->Operation = OpCode;
+
   //
   // Parse the extension options in the request packet.
   //
@@ -1060,6 +1066,7 @@ Mtftp6OperationStart (
                Token->OptionList,
                Token->OptionCount,
                TRUE,
+               Instance->Operation,
                &Instance->ExtInfo
                );
 
@@ -1104,6 +1111,9 @@ Mtftp6OperationStart (
   }
   if (Instance->BlkSize == 0) {
     Instance->BlkSize = MTFTP6_DEFAULT_BLK_SIZE;
+  }
+  if (Instance->WindowSize == 0) {
+    Instance->WindowSize = MTFTP6_DEFAULT_WINDOWSIZE;
   }
   if (Instance->MaxRetry == 0) {
     Instance->MaxRetry = MTFTP6_DEFAULT_MAX_RETRY;

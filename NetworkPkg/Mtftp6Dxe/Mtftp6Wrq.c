@@ -318,7 +318,7 @@ Mtftp6WrqHandleOack (
   }
   ASSERT (Options != NULL);
 
-  Status = Mtftp6ParseExtensionOption (Options, Count, FALSE, &ExtInfo);
+  Status = Mtftp6ParseExtensionOption (Options, Count, FALSE, Instance->Operation, &ExtInfo);
 
   if (EFI_ERROR(Status) || !Mtftp6WrqOackValid (&ExtInfo, &Instance->ExtInfo)) {
     //
