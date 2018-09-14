@@ -1,7 +1,7 @@
 // /**
 //
 // (C) Copyright 2015-2016 Hewlett Packard Enterprise Development LP<BR>
-// Copyright (c) 2010 - 2017, Intel Corporation. All rights reserved. <BR>
+// Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved. <BR>
 // This program and the accompanying materials
 // are licensed and made available under the terms and conditions of the BSD License
 // which accompanies this distribution. The full text of the license may be found at
@@ -50,7 +50,7 @@
 ".SH SYNOPSIS\r\n"
 " \r\n"
 "TFTP [-i interface] [-l <port>] [-r <port>] [-c <retry count>] [-t <timeout>]\r\n"
-"     [-s <block size>] host remotefilepath [localfilepath]\r\n"
+"     [-s <block size>] [-w <window size>] host remotefilepath [localfilepath]\r\n"
 ".SH OPTIONS\r\n"
 " \r\n"
 "  -i interface     - Specifies an adapter name, i.e., eth0.\r\n"
@@ -63,6 +63,8 @@
 "                     sending a request packet. Default value is 4s.\r\n"
 "  -s <block size>  - Specifies the TFTP blksize option as defined in RFC 2348.\r\n"
 "                     Valid range is between 8 and 65464, default value is 512.\r\n"
+"  -w <window size> - Specifies the TFTP windowsize option as defined in RFC 7440.\r\n"
+"                     Valid range is between 1 and 64, default value is 1.\r\n"
 "  host             - Specify TFTP Server IPv4 address.\r\n"
 "  remotefilepath   - TFTP server file path to download the file.\r\n"
 "  localfilepath    - Local destination file path.\r\n"
