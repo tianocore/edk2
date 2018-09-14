@@ -20,7 +20,8 @@
 #define PXE_MTFTP_OPTION_TIMEOUT_INDEX     1
 #define PXE_MTFTP_OPTION_TSIZE_INDEX       2
 #define PXE_MTFTP_OPTION_MULTICAST_INDEX   3
-#define PXE_MTFTP_OPTION_MAXIMUM_INDEX     4
+#define PXE_MTFTP_OPTION_WINDOWSIZE_INDEX  4
+#define PXE_MTFTP_OPTION_MAXIMUM_INDEX     5
 #define PXE_MTFTP_OPTBUF_MAXNUM_INDEX      128
 
 #define PXE_MTFTP_ERROR_STRING_LENGTH      127   // refer to definition of struct EFI_PXE_BASE_CODE_TFTP_ERROR.
@@ -48,6 +49,7 @@ PxeBcTftpGetFileSize (
   IN     VOID                       *Config,
   IN     UINT8                      *Filename,
   IN     UINTN                      *BlockSize,
+  IN     UINTN                      *WindowSize,
   IN OUT UINT64                     *BufferSize
   );
 
@@ -74,6 +76,7 @@ PxeBcTftpReadFile (
   IN     VOID                       *Config,
   IN     UINT8                      *Filename,
   IN     UINTN                      *BlockSize,
+  IN     UINTN                      *WindowSize,
   IN     UINT8                      *BufferPtr,
   IN OUT UINT64                     *BufferSize,
   IN     BOOLEAN                    DontUseBuffer
@@ -130,6 +133,7 @@ PxeBcTftpReadDirectory (
   IN     VOID                          *Config,
   IN     UINT8                         *Filename,
   IN     UINTN                         *BlockSize,
+  IN     UINTN                         *WindowSize,
   IN     UINT8                         *BufferPtr,
   IN OUT UINT64                        *BufferSize,
   IN     BOOLEAN                       DontUseBuffer

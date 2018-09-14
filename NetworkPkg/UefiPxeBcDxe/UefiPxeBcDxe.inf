@@ -55,6 +55,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
 
 
 [LibraryClasses]
@@ -107,5 +108,7 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdTftpBlockSize      ## SOMETIMES_CONSUMES
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeTftpWindowSize    ## SOMETIMES_CONSUMES
+
 [UserExtensions.TianoCore."ExtraFiles"]
   UefiPxeBcDxeExtra.uni

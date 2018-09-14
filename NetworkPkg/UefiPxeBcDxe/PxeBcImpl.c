@@ -849,7 +849,7 @@ EfiPxeBcMtftp (
   VOID                            *Config;
   EFI_STATUS                      Status;
   EFI_PXE_BASE_CODE_IP_FILTER     IpFilter;
-
+  UINTN                           WindowSize;
 
   if ((This == NULL) ||
       (Filename == NULL) ||
@@ -872,6 +872,11 @@ EfiPxeBcMtftp (
   Status    = EFI_DEVICE_ERROR;
   Private   = PXEBC_PRIVATE_DATA_FROM_PXEBC (This);
   Mode      = Private->PxeBc.Mode;
+
+  //
+  // Get PcdPxeTftpWindowSize.
+  //
+  WindowSize = (UINTN) PcdGet64 (PcdPxeTftpWindowSize);
 
   if (Mode->UsingIpv6) {
     if (!NetIp6IsValidUnicast (&ServerIp->v6)) {
@@ -930,6 +935,7 @@ EfiPxeBcMtftp (
                Config,
                Filename,
                BlockSize,
+               (WindowSize > 1) ? &WindowSize : NULL,
                BufferSize
                );
 
@@ -944,6 +950,7 @@ EfiPxeBcMtftp (
                Config,
                Filename,
                BlockSize,
+               (WindowSize > 1) ? &WindowSize : NULL,
                BufferPtr,
                BufferSize,
                DontUseBuffer
@@ -976,6 +983,7 @@ EfiPxeBcMtftp (
                Config,
                Filename,
                BlockSize,
+               (WindowSize > 1) ? &WindowSize : NULL,
                BufferPtr,
                BufferSize,
                DontUseBuffer

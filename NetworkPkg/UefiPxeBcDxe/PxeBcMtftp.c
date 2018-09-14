@@ -19,7 +19,8 @@ CHAR8 *mMtftpOptions[PXE_MTFTP_OPTION_MAXIMUM_INDEX] = {
   "blksize",
   "timeout",
   "tsize",
-  "multicast"
+  "multicast",
+  "windowsize"
 };
 
 
@@ -122,15 +123,17 @@ PxeBcMtftp6GetFileSize (
   IN     EFI_MTFTP6_CONFIG_DATA       *Config,
   IN     UINT8                        *Filename,
   IN     UINTN                        *BlockSize,
+  IN     UINTN                        *WindowSize,
   IN OUT UINT64                       *BufferSize
   )
 {
   EFI_MTFTP6_PROTOCOL                 *Mtftp6;
-  EFI_MTFTP6_OPTION                   ReqOpt[2];
+  EFI_MTFTP6_OPTION                   ReqOpt[3];
   EFI_MTFTP6_PACKET                   *Packet;
   EFI_MTFTP6_OPTION                   *Option;
   UINT32                              PktLen;
-  UINT8                               OptBuf[128];
+  UINT8                               OptBuf[PXE_MTFTP_OPTBUF_MAXNUM_INDEX];
+  UINTN                               OptBufSize;
   UINT32                              OptCnt;
   EFI_STATUS                          Status;
 
@@ -140,6 +143,7 @@ PxeBcMtftp6GetFileSize (
   Packet                    = NULL;
   Option                    = NULL;
   PktLen                    = 0;
+  OptBufSize                = PXE_MTFTP_OPTBUF_MAXNUM_INDEX;
   OptCnt                    = 1;
   Config->InitialServerPort = PXEBC_BS_DOWNLOAD_PORT;
 
@@ -152,13 +156,22 @@ PxeBcMtftp6GetFileSize (
   // Build the required options for get info.
   //
   ReqOpt[0].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_TSIZE_INDEX];
-  PxeBcUintnToAscDec (0, OptBuf, PXE_MTFTP_OPTBUF_MAXNUM_INDEX);
+  PxeBcUintnToAscDec (0, OptBuf, OptBufSize);
   ReqOpt[0].ValueStr  = OptBuf;
 
   if (BlockSize != NULL) {
-    ReqOpt[1].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
-    ReqOpt[1].ValueStr  = (UINT8 *) (ReqOpt[0].ValueStr + AsciiStrLen ((CHAR8 *) ReqOpt[0].ValueStr) + 1);
-    PxeBcUintnToAscDec (*BlockSize, ReqOpt[1].ValueStr, PXE_MTFTP_OPTBUF_MAXNUM_INDEX - (AsciiStrLen ((CHAR8 *) ReqOpt[0].ValueStr) + 1));
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = (UINT8 *) (ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    OptBufSize -= (AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, OptBufSize);
+    OptCnt++;
+  }
+
+  if (WindowSize != NULL) {
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = (UINT8 *) (ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    OptBufSize -= (AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, OptBufSize);
     OptCnt++;
   }
 
@@ -250,6 +263,7 @@ PxeBcMtftp6ReadFile (
   IN     EFI_MTFTP6_CONFIG_DATA       *Config,
   IN     UINT8                        *Filename,
   IN     UINTN                        *BlockSize,
+  IN     UINTN                        *WindowSize,
   IN     UINT8                        *BufferPtr,
   IN OUT UINT64                       *BufferSize,
   IN     BOOLEAN                      DontUseBuffer
@@ -257,9 +271,10 @@ PxeBcMtftp6ReadFile (
 {
   EFI_MTFTP6_PROTOCOL                 *Mtftp6;
   EFI_MTFTP6_TOKEN                    Token;
-  EFI_MTFTP6_OPTION                   ReqOpt[1];
+  EFI_MTFTP6_OPTION                   ReqOpt[2];
   UINT32                              OptCnt;
-  UINT8                               OptBuf[128];
+  UINT8                               BlksizeBuf[10];
+  UINT8                               WindowsizeBuf[10];
   EFI_STATUS                          Status;
 
   Status                    = EFI_DEVICE_ERROR;
@@ -273,11 +288,19 @@ PxeBcMtftp6ReadFile (
   }
 
   if (BlockSize != NULL) {
-    ReqOpt[0].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
-    ReqOpt[0].ValueStr  = OptBuf;
-    PxeBcUintnToAscDec (*BlockSize, ReqOpt[0].ValueStr, PXE_MTFTP_OPTBUF_MAXNUM_INDEX);
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = BlksizeBuf;
+    PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, sizeof (BlksizeBuf));
     OptCnt++;
   }
+
+  if (WindowSize != NULL) {
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = WindowsizeBuf;
+    PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, sizeof (WindowsizeBuf));
+    OptCnt++;
+  }
+
 
   Token.Event         = NULL;
   Token.OverrideData  = NULL;
@@ -408,6 +431,7 @@ PxeBcMtftp6ReadDirectory (
   IN     EFI_MTFTP6_CONFIG_DATA        *Config,
   IN     UINT8                         *Filename,
   IN     UINTN                         *BlockSize,
+  IN     UINTN                         *WindowSize,
   IN     UINT8                         *BufferPtr,
   IN OUT UINT64                        *BufferSize,
   IN     BOOLEAN                       DontUseBuffer
@@ -415,9 +439,10 @@ PxeBcMtftp6ReadDirectory (
 {
   EFI_MTFTP6_PROTOCOL                  *Mtftp6;
   EFI_MTFTP6_TOKEN                     Token;
-  EFI_MTFTP6_OPTION                    ReqOpt[1];
+  EFI_MTFTP6_OPTION                    ReqOpt[2];
   UINT32                               OptCnt;
-  UINT8                                OptBuf[128];
+  UINT8                                BlksizeBuf[10];
+  UINT8                                WindowsizeBuf[10];
   EFI_STATUS                           Status;
 
   Status                    = EFI_DEVICE_ERROR;
@@ -431,9 +456,16 @@ PxeBcMtftp6ReadDirectory (
   }
 
   if (BlockSize != NULL) {
-    ReqOpt[0].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
-    ReqOpt[0].ValueStr  = OptBuf;
-    PxeBcUintnToAscDec (*BlockSize, ReqOpt[0].ValueStr, PXE_MTFTP_OPTBUF_MAXNUM_INDEX);
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = BlksizeBuf;
+    PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, sizeof (BlksizeBuf));
+    OptCnt++;
+  }
+
+  if (WindowSize != NULL) {
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = WindowsizeBuf;
+    PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, sizeof (WindowsizeBuf));
     OptCnt++;
   }
 
@@ -568,15 +600,17 @@ PxeBcMtftp4GetFileSize (
   IN     EFI_MTFTP4_CONFIG_DATA     *Config,
   IN     UINT8                      *Filename,
   IN     UINTN                      *BlockSize,
+  IN     UINTN                      *WindowSize,
   IN OUT UINT64                     *BufferSize
   )
 {
   EFI_MTFTP4_PROTOCOL *Mtftp4;
-  EFI_MTFTP4_OPTION   ReqOpt[2];
+  EFI_MTFTP4_OPTION   ReqOpt[3];
   EFI_MTFTP4_PACKET   *Packet;
   EFI_MTFTP4_OPTION   *Option;
   UINT32              PktLen;
-  UINT8               OptBuf[128];
+  UINT8               OptBuf[PXE_MTFTP_OPTBUF_MAXNUM_INDEX];
+  UINTN               OptBufSize;
   UINT32              OptCnt;
   EFI_STATUS          Status;
 
@@ -586,6 +620,7 @@ PxeBcMtftp4GetFileSize (
   Packet                    = NULL;
   Option                    = NULL;
   PktLen                    = 0;
+  OptBufSize                = PXE_MTFTP_OPTBUF_MAXNUM_INDEX;
   OptCnt                    = 1;
   Config->InitialServerPort = PXEBC_BS_DOWNLOAD_PORT;
 
@@ -598,13 +633,22 @@ PxeBcMtftp4GetFileSize (
   // Build the required options for get info.
   //
   ReqOpt[0].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_TSIZE_INDEX];
-  PxeBcUintnToAscDec (0, OptBuf, PXE_MTFTP_OPTBUF_MAXNUM_INDEX);
+  PxeBcUintnToAscDec (0, OptBuf, OptBufSize);
   ReqOpt[0].ValueStr  = OptBuf;
 
   if (BlockSize != NULL) {
-    ReqOpt[1].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
-    ReqOpt[1].ValueStr  = (UINT8 *) (ReqOpt[0].ValueStr + AsciiStrLen ((CHAR8 *) ReqOpt[0].ValueStr) + 1);
-    PxeBcUintnToAscDec (*BlockSize, ReqOpt[1].ValueStr, PXE_MTFTP_OPTBUF_MAXNUM_INDEX - (AsciiStrLen ((CHAR8 *) ReqOpt[0].ValueStr) + 1));
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = (UINT8 *) (ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    OptBufSize -= (AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, OptBufSize);
+    OptCnt++;
+  }
+
+  if (WindowSize != NULL) {
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = (UINT8 *) (ReqOpt[OptCnt-1].ValueStr + AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    OptBufSize -= (AsciiStrLen ((CHAR8 *) ReqOpt[OptCnt-1].ValueStr) + 1);
+    PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, OptBufSize);
     OptCnt++;
   }
 
@@ -696,6 +740,7 @@ PxeBcMtftp4ReadFile (
   IN     EFI_MTFTP4_CONFIG_DATA     *Config,
   IN     UINT8                      *Filename,
   IN     UINTN                      *BlockSize,
+  IN     UINTN                      *WindowSize,
   IN     UINT8                      *BufferPtr,
   IN OUT UINT64                     *BufferSize,
   IN     BOOLEAN                    DontUseBuffer
@@ -703,9 +748,10 @@ PxeBcMtftp4ReadFile (
 {
   EFI_MTFTP4_PROTOCOL *Mtftp4;
   EFI_MTFTP4_TOKEN    Token;
-  EFI_MTFTP4_OPTION   ReqOpt[1];
+  EFI_MTFTP4_OPTION   ReqOpt[2];
   UINT32              OptCnt;
-  UINT8               OptBuf[128];
+  UINT8               BlksizeBuf[10];
+  UINT8               WindowsizeBuf[10];
   EFI_STATUS          Status;
 
   Status                    = EFI_DEVICE_ERROR;
@@ -719,9 +765,16 @@ PxeBcMtftp4ReadFile (
   }
 
   if (BlockSize != NULL) {
-    ReqOpt[0].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
-    ReqOpt[0].ValueStr  = OptBuf;
-    PxeBcUintnToAscDec (*BlockSize, ReqOpt[0].ValueStr, PXE_MTFTP_OPTBUF_MAXNUM_INDEX);
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = BlksizeBuf;
+    PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, sizeof (BlksizeBuf));
+    OptCnt++;
+  }
+
+  if (WindowSize != NULL) {
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = WindowsizeBuf;
+    PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, sizeof (WindowsizeBuf));
     OptCnt++;
   }
 
@@ -854,6 +907,7 @@ PxeBcMtftp4ReadDirectory (
   IN     EFI_MTFTP4_CONFIG_DATA        *Config,
   IN     UINT8                         *Filename,
   IN     UINTN                         *BlockSize,
+  IN     UINTN                         *WindowSize,
   IN     UINT8                         *BufferPtr,
   IN OUT UINT64                        *BufferSize,
   IN     BOOLEAN                       DontUseBuffer
@@ -861,9 +915,10 @@ PxeBcMtftp4ReadDirectory (
 {
   EFI_MTFTP4_PROTOCOL *Mtftp4;
   EFI_MTFTP4_TOKEN    Token;
-  EFI_MTFTP4_OPTION   ReqOpt[1];
+  EFI_MTFTP4_OPTION   ReqOpt[2];
   UINT32              OptCnt;
-  UINT8               OptBuf[128];
+  UINT8               BlksizeBuf[10];
+  UINT8               WindowsizeBuf[10];
   EFI_STATUS          Status;
 
   Status                    = EFI_DEVICE_ERROR;
@@ -877,9 +932,16 @@ PxeBcMtftp4ReadDirectory (
   }
 
   if (BlockSize != NULL) {
-    ReqOpt[0].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
-    ReqOpt[0].ValueStr  = OptBuf;
-    PxeBcUintnToAscDec (*BlockSize, ReqOpt[0].ValueStr, PXE_MTFTP_OPTBUF_MAXNUM_INDEX);
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_BLKSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = BlksizeBuf;
+    PxeBcUintnToAscDec (*BlockSize, ReqOpt[OptCnt].ValueStr, sizeof (BlksizeBuf));
+    OptCnt++;
+  }
+
+  if (WindowSize != NULL) {
+    ReqOpt[OptCnt].OptionStr = (UINT8 *) mMtftpOptions[PXE_MTFTP_OPTION_WINDOWSIZE_INDEX];
+    ReqOpt[OptCnt].ValueStr  = WindowsizeBuf;
+    PxeBcUintnToAscDec (*WindowSize, ReqOpt[OptCnt].ValueStr, sizeof (WindowsizeBuf));
     OptCnt++;
   }
 
@@ -936,6 +998,7 @@ PxeBcTftpGetFileSize (
   IN     VOID                       *Config,
   IN     UINT8                      *Filename,
   IN     UINTN                      *BlockSize,
+  IN     UINTN                      *WindowSize,
   IN OUT UINT64                     *BufferSize
   )
 {
@@ -945,6 +1008,7 @@ PxeBcTftpGetFileSize (
              (EFI_MTFTP6_CONFIG_DATA *) Config,
              Filename,
              BlockSize,
+             WindowSize,
              BufferSize
              );
   } else {
@@ -953,6 +1017,7 @@ PxeBcTftpGetFileSize (
              (EFI_MTFTP4_CONFIG_DATA *) Config,
              Filename,
              BlockSize,
+             WindowSize,
              BufferSize
              );
   }
@@ -981,6 +1046,7 @@ PxeBcTftpReadFile (
   IN     VOID                       *Config,
   IN     UINT8                      *Filename,
   IN     UINTN                      *BlockSize,
+  IN     UINTN                      *WindowSize,
   IN     UINT8                      *BufferPtr,
   IN OUT UINT64                     *BufferSize,
   IN     BOOLEAN                    DontUseBuffer
@@ -992,6 +1058,7 @@ PxeBcTftpReadFile (
              (EFI_MTFTP6_CONFIG_DATA *) Config,
              Filename,
              BlockSize,
+             WindowSize,
              BufferPtr,
              BufferSize,
              DontUseBuffer
@@ -1002,6 +1069,7 @@ PxeBcTftpReadFile (
              (EFI_MTFTP4_CONFIG_DATA *) Config,
              Filename,
              BlockSize,
+             WindowSize,
              BufferPtr,
              BufferSize,
              DontUseBuffer
@@ -1083,6 +1151,7 @@ PxeBcTftpReadDirectory (
   IN     VOID                          *Config,
   IN     UINT8                         *Filename,
   IN     UINTN                         *BlockSize,
+  IN     UINTN                         *WindowSize,
   IN     UINT8                         *BufferPtr,
   IN OUT UINT64                        *BufferSize,
   IN     BOOLEAN                       DontUseBuffer
@@ -1094,6 +1163,7 @@ PxeBcTftpReadDirectory (
              (EFI_MTFTP6_CONFIG_DATA *) Config,
              Filename,
              BlockSize,
+             WindowSize,
              BufferPtr,
              BufferSize,
              DontUseBuffer
@@ -1104,6 +1174,7 @@ PxeBcTftpReadDirectory (
              (EFI_MTFTP4_CONFIG_DATA *) Config,
              Filename,
              BlockSize,
+             WindowSize,
              BufferPtr,
              BufferSize,
              DontUseBuffer
