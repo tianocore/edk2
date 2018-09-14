@@ -8,6 +8,7 @@
   RFC2347 - TFTP Option Extension
   RFC2348 - TFTP Blocksize Option
   RFC2349 - TFTP Timeout Interval and Transfer Size Options
+  RFC7440 - TFTP Windowsize Option
 
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
@@ -56,6 +57,7 @@ typedef struct _MTFTP4_PROTOCOL MTFTP4_PROTOCOL;
 #define MTFTP4_DEFAULT_TIMEOUT      3
 #define MTFTP4_DEFAULT_RETRY        5
 #define MTFTP4_DEFAULT_BLKSIZE      512
+#define MTFTP4_DEFAULT_WINDOWSIZE   1
 #define MTFTP4_TIME_TO_GETMAP       5
 
 #define MTFTP4_STATE_UNCONFIGED     0
@@ -120,6 +122,14 @@ struct _MTFTP4_PROTOCOL {
   UINT16                        BlkSize;
   UINT16                        LastBlock;
   LIST_ENTRY                    Blocks;
+
+  UINT16                        WindowSize;
+
+  //
+  // Record the total received block number and the already acked block number.
+  //
+  UINT64                        TotalBlock;
+  UINT64                        AckedBlock;
 
   //
   // The server's communication end point: IP and two ports. one for

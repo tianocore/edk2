@@ -80,6 +80,9 @@ Mtftp4CleanOperation (
   Instance->Operation     = 0;
 
   Instance->BlkSize       = MTFTP4_DEFAULT_BLKSIZE;
+  Instance->WindowSize    = 1;
+  Instance->TotalBlock    = 0;
+  Instance->AckedBlock    = 0;
   Instance->LastBlock     = 0;
   Instance->ServerIp      = 0;
   Instance->ListeningPort = 0;
@@ -428,6 +431,7 @@ Mtftp4Start (
                Token->OptionList,
                Token->OptionCount,
                TRUE,
+               Instance->Operation,
                &Instance->RequestOption
                );
 
@@ -443,6 +447,7 @@ Mtftp4Start (
   Config                  = &Instance->Config;
   Instance->Token         = Token;
   Instance->BlkSize       = MTFTP4_DEFAULT_BLKSIZE;
+  Instance->WindowSize    = MTFTP4_DEFAULT_WINDOWSIZE;
 
   CopyMem (&Instance->ServerIp, &Config->ServerIp, sizeof (IP4_ADDR));
   Instance->ServerIp      = NTOHL (Instance->ServerIp);

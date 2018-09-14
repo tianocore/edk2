@@ -1,7 +1,7 @@
 /** @file
   Routines to process MTFTP4 options.
 
-Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -16,6 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 CHAR8 *mMtftp4SupportedOptions[MTFTP4_SUPPORTED_OPTIONS] = {
   "blksize",
+  "windowsize",
   "timeout",
   "tsize",
   "multicast"
@@ -400,6 +401,7 @@ Mtftp4ExtractMcast (
   @param  Count                  The number of options in the Options
   @param  Request                Whether this is a request or OACK. The format of
                                  multicast is different according to this setting.
+  @param  Operation              The current performed operation.
   @param  MtftpOption            The MTFTP4_OPTION for easy access.
 
   @retval EFI_INVALID_PARAMETER  The option is mal-formated
@@ -412,6 +414,7 @@ Mtftp4ParseOption (
   IN     EFI_MTFTP4_OPTION     *Options,
   IN     UINT32                Count,
   IN     BOOLEAN               Request,
+  IN     UINT16                Operation,
      OUT MTFTP4_OPTION         *MtftpOption
   )
 {
@@ -481,6 +484,22 @@ Mtftp4ParseOption (
 
       MtftpOption->Exist |= MTFTP4_MCAST_EXIST;
 
+    } else if (NetStringEqualNoCase (This->OptionStr, (UINT8 *) "windowsize")) {
+      if (Operation == EFI_MTFTP4_OPCODE_WRQ) {
+        //
+        // Currently, windowsize is not supported in the write operation.
+        //
+        return EFI_UNSUPPORTED;
+      }
+
+      Value = NetStringToU32 (This->ValueStr);
+
+      if (Value < 1) {
+        return EFI_INVALID_PARAMETER;
+      }
+
+      MtftpOption->WindowSize = (UINT16) Value;
+      MtftpOption->Exist |= MTFTP4_WINDOWSIZE_EXIST;
     } else if (Request) {
       //
       // Ignore the unsupported option if it is a reply, and return
@@ -500,6 +519,7 @@ Mtftp4ParseOption (
 
   @param  Packet                 The OACK packet to parse
   @param  PacketLen              The length of the packet
+  @param  Operation              The current performed operation.
   @param  MtftpOption            The MTFTP_OPTION for easy access.
 
   @retval EFI_INVALID_PARAMETER  The packet option is mal-formated
@@ -511,6 +531,7 @@ EFI_STATUS
 Mtftp4ParseOptionOack (
   IN     EFI_MTFTP4_PACKET     *Packet,
   IN     UINT32                PacketLen,
+  IN     UINT16                Operation,
      OUT MTFTP4_OPTION         *MtftpOption
   )
 {
@@ -527,7 +548,7 @@ Mtftp4ParseOptionOack (
   }
   ASSERT (OptionList != NULL);
 
-  Status = Mtftp4ParseOption (OptionList, Count, FALSE, MtftpOption);
+  Status = Mtftp4ParseOption (OptionList, Count, FALSE, Operation, MtftpOption);
 
   FreePool (OptionList);
   return Status;

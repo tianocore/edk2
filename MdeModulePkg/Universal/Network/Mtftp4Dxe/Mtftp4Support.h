@@ -173,19 +173,6 @@ Mtftp4SendError (
   IN UINT8                  *ErrInfo
   );
 
-/**
-  Retransmit the last packet for the instance.
-
-  @param  Instance              The Mtftp instance
-
-  @retval EFI_SUCCESS           The last packet is retransmitted.
-  @retval Others                Failed to retransmit.
-
-**/
-EFI_STATUS
-Mtftp4Retransmit (
-  IN MTFTP4_PROTOCOL        *Instance
-  );
 
 /**
   The timer ticking function in TPL_NOTIFY level for the Mtftp service instance.

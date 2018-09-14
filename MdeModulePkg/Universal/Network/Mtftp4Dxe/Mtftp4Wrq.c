@@ -286,7 +286,7 @@ Mtftp4WrqHandleOack (
   // Parse and validate the options from server
   //
   ZeroMem (&Reply, sizeof (MTFTP4_OPTION));
-  Status = Mtftp4ParseOptionOack (Packet, Len, &Reply);
+  Status = Mtftp4ParseOptionOack (Packet, Len, Instance->Operation, &Reply);
 
   if (EFI_ERROR (Status) || !Mtftp4WrqOackValid (&Reply, &Instance->RequestOption)) {
     //

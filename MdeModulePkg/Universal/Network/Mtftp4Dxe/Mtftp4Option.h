@@ -16,7 +16,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef __EFI_MTFTP4_OPTION_H__
 #define __EFI_MTFTP4_OPTION_H__
 
-#define MTFTP4_SUPPORTED_OPTIONS  4
+#define MTFTP4_SUPPORTED_OPTIONS  5
 #define MTFTP4_OPCODE_LEN         2
 #define MTFTP4_ERRCODE_LEN        2
 #define MTFTP4_BLKNO_LEN          2
@@ -26,9 +26,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define MTFTP4_TIMEOUT_EXIST      0x02
 #define MTFTP4_TSIZE_EXIST        0x04
 #define MTFTP4_MCAST_EXIST        0x08
+#define MTFTP4_WINDOWSIZE_EXIST   0x10
 
 typedef struct {
   UINT16                    BlkSize;
+  UINT16                    WindowSize;
   UINT8                     Timeout;
   UINT32                    Tsize;
   IP4_ADDR                  McastIp;
@@ -71,6 +73,7 @@ Mtftp4ExtractOptions (
   @param  Count                  The number of options in the Options
   @param  Request                Whether this is a request or OACK. The format of
                                  multicast is different according to this setting.
+  @param  Operation              The current performed operation.
   @param  MtftpOption            The MTFTP4_OPTION for easy access.
 
   @retval EFI_INVALID_PARAMETER  The option is mal-formated
@@ -83,6 +86,7 @@ Mtftp4ParseOption (
   IN     EFI_MTFTP4_OPTION     *Options,
   IN     UINT32                Count,
   IN     BOOLEAN               Request,
+  IN     UINT16                Operation,
      OUT MTFTP4_OPTION         *MtftpOption
   );
 
@@ -92,6 +96,7 @@ Mtftp4ParseOption (
 
   @param  Packet                 The OACK packet to parse
   @param  PacketLen              The length of the packet
+  @param  Operation              The current performed operation.
   @param  MtftpOption            The MTFTP_OPTION for easy access.
 
   @retval EFI_INVALID_PARAMETER  The packet option is mal-formated
@@ -103,6 +108,7 @@ EFI_STATUS
 Mtftp4ParseOptionOack (
   IN     EFI_MTFTP4_PACKET     *Packet,
   IN     UINT32                PacketLen,
+  IN     UINT16                Operation,
      OUT MTFTP4_OPTION         *MtftpOption
   );
 
