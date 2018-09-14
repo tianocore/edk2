@@ -17,9 +17,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Ebc.h>
 #include <Protocol/EbcVmTest.h>
 #include <Protocol/EbcSimpleDebugger.h>
+#include <Protocol/PeCoffImageEmulator.h>
 
 #include <Library/BaseLib.h>
+#include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PeCoffLib.h>
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiBootServicesTableLib.h>

@@ -51,7 +51,9 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
+  CacheMaintenanceLib
   MemoryAllocationLib
+  PeCoffLib
   UefiBootServicesTableLib
   BaseMemoryLib
   UefiDriverEntryPoint
@@ -62,6 +64,7 @@
 [Protocols]
   gEfiDebugSupportProtocolGuid                  ## PRODUCES
   gEfiEbcProtocolGuid                           ## PRODUCES
+  gEdkiiPeCoffImageEmulatorProtocolGuid         ## PRODUCES
   gEfiEbcVmTestProtocolGuid                     ## SOMETIMES_PRODUCES
   gEfiEbcSimpleDebuggerProtocolGuid             ## SOMETIMES_CONSUMES
 

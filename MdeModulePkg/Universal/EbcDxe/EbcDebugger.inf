@@ -84,6 +84,8 @@
   BaseMemoryLib
   DebugLib
   BaseLib
+  CacheMaintenanceLib
+  PeCoffLib
 
 [Protocols]
   gEfiDebugSupportProtocolGuid                  ## PRODUCES
@@ -93,6 +95,7 @@
   gEfiEbcSimpleDebuggerProtocolGuid             ## SOMETIMES_CONSUMES
   gEfiPciRootBridgeIoProtocolGuid               ## SOMETIMES_CONSUMES
   gEfiSimpleFileSystemProtocolGuid              ## SOMETIMES_CONSUMES
+  gEdkiiPeCoffImageEmulatorProtocolGuid         ## PRODUCES
 
 [Guids]
   gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## GUID
