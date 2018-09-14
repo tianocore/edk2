@@ -98,8 +98,8 @@
   MdePkg/Library/DxeSmbusLib/DxeSmbusLib.inf
   MdePkg/Library/DxeIoLibCpuIo2/DxeIoLibCpuIo2.inf
   MdePkg/Library/DxeHstiLib/DxeHstiLib.inf
-
   MdePkg/Library/DxeRuntimePciExpressLib/DxeRuntimePciExpressLib.inf
+  MdePkg/Library/DxeRuntimeDebugLibSerialPort/DxeRuntimeDebugLibSerialPort.inf
 
   MdePkg/Library/PeiCoreEntryPoint/PeiCoreEntryPoint.inf
   MdePkg/Library/PeiDxePostCodeLibReportStatusCode/PeiDxePostCodeLibReportStatusCode.inf
