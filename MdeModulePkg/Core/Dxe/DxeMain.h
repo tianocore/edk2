@@ -36,7 +36,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/LoadPe32Image.h>
 #include <Protocol/Security.h>
 #include <Protocol/Security2.h>
-#include <Protocol/Ebc.h>
 #include <Protocol/Reset.h>
 #include <Protocol/Cpu.h>
 #include <Protocol/Metronome.h>
@@ -221,8 +220,6 @@ typedef struct {
   BASE_LIBRARY_JUMP_BUFFER    *JumpContext;
   /// Machine type from PE image
   UINT16                      Machine;
-  /// EBC Protocol pointer
-  EFI_EBC_PROTOCOL            *Ebc;
   /// PE/COFF Image Emulator Protocol pointer
   EDKII_PECOFF_IMAGE_EMULATOR_PROTOCOL  *PeCoffEmu;
   /// Runtime image list

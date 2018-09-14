@@ -154,7 +154,6 @@
   gEfiLoadedImageProtocolGuid                   ## PRODUCES
   gEfiLoadedImageDevicePathProtocolGuid         ## PRODUCES
   gEfiHiiPackageListProtocolGuid                ## SOMETIMES_PRODUCES
-  gEfiEbcProtocolGuid                           ## SOMETIMES_CONSUMES
   gEfiSmmBase2ProtocolGuid                      ## SOMETIMES_CONSUMES
   gEdkiiPeCoffImageEmulatorProtocolGuid         ## SOMETIMES_CONSUMES
 

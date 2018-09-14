@@ -69,7 +69,6 @@ LOADED_IMAGE_PRIVATE_DATA mCorePrivateImage  = {
   NULL,                       // JumpBuffer
   NULL,                       // JumpContext
   0,                          // Machine
-  NULL,                       // Ebc
   NULL,                       // PeCoffEmu
   NULL,                       // RuntimeData
   NULL                        // LoadedImageDevicePath
@@ -86,9 +85,6 @@ typedef struct {
   CHAR16  *MachineTypeName;
 } MACHINE_TYPE_INFO;
 
-//
-// EBC machine is not listed in this table, because EBC is in the default supported scopes of other machine type.
-//
 GLOBAL_REMOVE_IF_UNREFERENCED MACHINE_TYPE_INFO  mMachineTypeInfo[] = {
   {EFI_IMAGE_MACHINE_IA32,           L"IA32"},
   {EFI_IMAGE_MACHINE_IA64,           L"IA64"},
@@ -768,51 +764,15 @@ CoreLoadPeImage (
   InvalidateInstructionCacheRange ((VOID *)(UINTN)Image->ImageContext.ImageAddress, (UINTN)Image->ImageContext.ImageSize);
 
   //
-  // Copy the machine type from the context to the image private data. This
-  // is needed during image unload to know if we should call an EBC protocol
-  // to unload the image.
+  // Copy the machine type from the context to the image private data.
   //
   Image->Machine = Image->ImageContext.Machine;
 
   //
-  // Get the image entry point. If it's an EBC image, then call into the
-  // interpreter to create a thunk for the entry point and use the returned
-  // value for the entry point.
+  // Get the image entry point.
   //
   Image->EntryPoint   = (EFI_IMAGE_ENTRY_POINT)(UINTN)Image->ImageContext.EntryPoint;
-  if (Image->ImageContext.Machine == EFI_IMAGE_MACHINE_EBC) {
-    //
-    // Locate the EBC interpreter protocol
-    //
-    Status = CoreLocateProtocol (&gEfiEbcProtocolGuid, NULL, (VOID **)&Image->Ebc);
-    if (EFI_ERROR(Status) || Image->Ebc == NULL) {
-      DEBUG ((DEBUG_LOAD | DEBUG_ERROR, "CoreLoadPeImage: There is no EBC interpreter for an EBC image.\n"));
-      goto Done;
-    }
-
-    //
-    // Register a callback for flushing the instruction cache so that created
-    // thunks can be flushed.
-    //
-    Status = Image->Ebc->RegisterICacheFlush (Image->Ebc, (EBC_ICACHE_FLUSH)InvalidateInstructionCacheRange);
-    if (EFI_ERROR(Status)) {
-      goto Done;
-    }
-
-    //
-    // Create a thunk for the image's entry point. This will be the new
-    // entry point for the image.
-    //
-    Status = Image->Ebc->CreateThunk (
-                           Image->Ebc,
-                           Image->Handle,
-                           (VOID *)(UINTN) Image->ImageContext.EntryPoint,
-                           (VOID **) &Image->EntryPoint
-                           );
-    if (EFI_ERROR(Status)) {
-      goto Done;
-    }
-  } else if (Image->PeCoffEmu != NULL) {
+  if (Image->PeCoffEmu != NULL) {
     Status = Image->PeCoffEmu->RegisterImage (Image->PeCoffEmu,
                                  Image->ImageBasePage,
                                  EFI_PAGES_TO_SIZE (Image->NumberOfPages),
@@ -1001,13 +961,6 @@ CoreUnloadAndCloseImage (
   }
 
   UnprotectUefiImage (&Image->Info, Image->LoadedImageDevicePath);
-
-  if (Image->Ebc != NULL) {
-    //
-    // If EBC protocol exists we must perform cleanups for this image.
-    //
-    Image->Ebc->UnloadImage (Image->Ebc, Image->Handle);
-  }
 
   if (Image->PeCoffEmu != NULL) {
     //
