@@ -197,10 +197,12 @@ typedef union {
 
 
 /**
-  Package. Lower 64 Bit OwnerEpoch Component of SGX Key (RO). Low 64 bits of
-  an 128-bit external entropy value for key derivation of an enclave.
+  Package. Lower 64 Bit CR_SGXOWNEREPOCH (W) Writes do not update
+  CR_SGXOWNEREPOCH if CPUID.(EAX=12H, ECX=0):EAX.SGX1 is 1 on any thread in
+  the package. Lower 64 bits of an 128-bit external entropy value for key
+  derivation of an enclave.
 
-  @param  ECX  MSR_SKYLAKE_SGXOWNER0 (0x00000300)
+  @param  ECX  MSR_SKYLAKE_SGXOWNEREPOCH0 (0x00000300)
   @param  EAX  Lower 32-bits of MSR value.
   @param  EDX  Upper 32-bits of MSR value.
 
@@ -208,18 +210,24 @@ typedef union {
   @code
   UINT64  Msr;
 
-  Msr = AsmReadMsr64 (MSR_SKYLAKE_SGXOWNER0);
+  Msr = 0;
+  AsmWriteMsr64 (MSR_SKYLAKE_SGXOWNEREPOCH0, Msr);
   @endcode
-  @note MSR_SKYLAKE_SGXOWNER0 is defined as MSR_SGXOWNER0 in SDM.
+  @note MSR_SKYLAKE_SGXOWNEREPOCH0 is defined as MSR_SGXOWNER0 in SDM.
 **/
-#define MSR_SKYLAKE_SGXOWNER0                    0x00000300
+#define MSR_SKYLAKE_SGXOWNEREPOCH0                    0x00000300
 
-
+//
+// Define MSR_SKYLAKE_SGXOWNER0 for compatibility due to name change in the SDM.
+//
+#define MSR_SKYLAKE_SGXOWNER0                         MSR_SKYLAKE_SGXOWNEREPOCH0
 /**
-  Package. Upper 64 Bit OwnerEpoch Component of SGX Key (RO). Upper 64 bits of
-  an 128-bit external entropy value for key derivation of an enclave.
+  Package. Upper 64 Bit CR_SGXOWNEREPOCH (W) Writes do not update
+  CR_SGXOWNEREPOCH if CPUID.(EAX=12H, ECX=0):EAX.SGX1 is 1 on any thread in
+  the package. Upper 64 bits of an 128-bit external entropy value for key
+  derivation of an enclave.
 
-  @param  ECX  MSR_SKYLAKE_SGXOWNER1 (0x00000301)
+  @param  ECX  MSR_SKYLAKE_SGXOWNEREPOCH1 (0x00000301)
   @param  EAX  Lower 32-bits of MSR value.
   @param  EDX  Upper 32-bits of MSR value.
 
@@ -227,11 +235,17 @@ typedef union {
   @code
   UINT64  Msr;
 
-  Msr = AsmReadMsr64 (MSR_SKYLAKE_SGXOWNER1);
+  Msr = 0;
+  AsmWriteMsr64 (MSR_SKYLAKE_SGXOWNEREPOCH1, Msr);
   @endcode
-  @note MSR_SKYLAKE_SGXOWNER1 is defined as MSR_SGXOWNER1 in SDM.
+  @note MSR_SKYLAKE_SGXOWNEREPOCH1 is defined as MSR_SGXOWNER1 in SDM.
 **/
-#define MSR_SKYLAKE_SGXOWNER1                    0x00000301
+#define MSR_SKYLAKE_SGXOWNEREPOCH1                0x00000301
+
+//
+// Define MSR_SKYLAKE_SGXOWNER1 for compatibility due to name change in the SDM.
+//
+#define MSR_SKYLAKE_SGXOWNER1                     MSR_SKYLAKE_SGXOWNEREPOCH1
 
 
 /**
