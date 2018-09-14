@@ -1288,17 +1288,23 @@
   ## Set image protection policy. The policy is bitwise.
   #  If a bit is set, the image will be protected by DxeCore if it is aligned.
   #   The code section becomes read-only, and the data section becomes non-executable.
-  #  If a bit is clear, the image will not be protected.<BR><BR>
+  #  If a bit is clear, nothing will be done to image code/data sections.<BR><BR>
   #    BIT0       - Image from unknown device. <BR>
   #    BIT1       - Image from firmware volume.<BR>
+  #  <BR>
+  #  Note: If a bit is cleared, the data section could be still non-executable if
+  #  PcdDxeNxMemoryProtectionPolicy is enabled for EfiLoaderData, EfiBootServicesData
+  #  and/or EfiRuntimeServicesData.<BR>
+  #  <BR>
   # @Prompt Set image protection policy.
   # @ValidRange 0x80000002 | 0x00000000 - 0x0000001F
   gEfiMdeModulePkgTokenSpaceGuid.PcdImageProtectionPolicy|0x00000002|UINT32|0x00001047
 
   ## Set DXE memory protection policy. The policy is bitwise.
   #  If a bit is set, memory regions of the associated type will be mapped
-  #  non-executable.<BR><BR>
-  #
+  #  non-executable.<BR>
+  #  If a bit is cleared, nothing will be done to associated type of memory.<BR>
+  #  <BR>
   # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
   #  EfiReservedMemoryType          0x0001<BR>
   #  EfiLoaderCode                  0x0002<BR>
@@ -1890,8 +1896,13 @@
   #  For the DxeIpl and the DxeCore are both X64, set NX for stack feature also require PcdDxeIplBuildPageTables be TRUE.<BR>
   #  For the DxeIpl and the DxeCore are both IA32 (PcdDxeIplSwitchToLongMode is FALSE), set NX for stack feature also require
   #  IA32 PAE is supported and Execute Disable Bit is available.<BR>
-  #   TRUE  - to set NX for stack.<BR>
-  #   FALSE - Not to set NX for stack.<BR>
+  #  <BR>
+  #   TRUE  - Set NX for stack.<BR>
+  #   FALSE - Do nothing for stack.<BR>
+  #  <BR>
+  #  Note: If this PCD is set to FALSE, NX could be still applied to stack due to PcdDxeNxMemoryProtectionPolicy enabled for
+  #  EfiBootServicesData.<BR>
+  #  <BR>
   # @Prompt Set NX for stack.
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|FALSE|BOOLEAN|0x0001006f
 

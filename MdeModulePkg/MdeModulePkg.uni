@@ -345,8 +345,9 @@
                                                                                   "For the DxeIpl and the DxeCore are both X64, set NX for stack feature also require PcdDxeIplBuildPageTables be TRUE.<BR>"
                                                                                   "For the DxeIpl and the DxeCore are both IA32 (PcdDxeIplSwitchToLongMode is FALSE), set NX for stack feature also require"
                                                                                   "IA32 PAE is supported and Execute Disable Bit is available.<BR>"
-                                                                                  "TRUE  - to set NX for stack.<BR>"
-                                                                                  "FALSE - Not to set NX for stack.<BR>"
+                                                                                  "TRUE  - Set NX for stack.<BR>"
+                                                                                  "FALSE - Do nothing for stack.<BR>"
+                                                                                  "Note: If this PCD is set to FALSE, NX could be still applied to stack due to PcdDxeNxMemoryProtectionPolicy enabled for EfiBootServicesData.<BR>"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdAcpiS3Enable_PROMPT  #language en-US "ACPI S3 Enable"
 
@@ -1098,15 +1099,19 @@
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdImageProtectionPolicy_HELP  #language en-US "Set image protection policy. The policy is bitwise.\n"
                                                                                           "If a bit is set, the image will be protected by DxeCore if it is aligned.\n"
                                                                                           "The code section becomes read-only, and the data section becomes non-executable.\n"
-                                                                                          "If a bit is clear, the image will not be protected.<BR><BR>\n"
+                                                                                          "If a bit is clear, nothing will be done to image code/data sections.<BR><BR>\n"
                                                                                           "BIT0       - Image from unknown device. <BR>\n"
                                                                                           "BIT1       - Image from firmware volume.<BR>"
+                                                                                          "Note: If a bit is cleared, the data section could be still non-executable if\n"
+                                                                                          "PcdDxeNxMemoryProtectionPolicy is enabled for EfiLoaderData, EfiBootServicesData\n"
+                                                                                          "and/or EfiRuntimeServicesData.<BR>"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdDxeNxMemoryProtectionPolicy_PROMPT  #language en-US "Set DXE memory protection policy."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdDxeNxMemoryProtectionPolicy_HELP  #language en-US "Set DXE memory protection policy. The policy is bitwise.\n"
                                                                                                 "If a bit is set, memory regions of the associated type will be mapped\n"
-                                                                                                "non-executable.<BR><BR>\n"
+                                                                                                "non-executable.<BR>\n"
+                                                                                                "If a bit is cleared, nothing will be done to associated type of memory.<BR><BR>\n"
                                                                                                 "\n"
                                                                                                 "Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>\n"
                                                                                                 "EfiReservedMemoryType          0x0001<BR>\n"
