@@ -752,12 +752,12 @@ InitSmmS3ResumeState (
     if (sizeof (UINTN) == sizeof (UINT32)) {
       SmmS3ResumeState->Signature = SMM_S3_RESUME_SMM_32;
     }
-  }
 
-  //
-  // Patch SmmS3ResumeState->SmmS3Cr3
-  //
-  InitSmmS3Cr3 ();
+    //
+    // Patch SmmS3ResumeState->SmmS3Cr3
+    //
+    InitSmmS3Cr3 ();
+  }
 
   //
   // Allocate safe memory in ACPI NVS for AP to execute hlt loop in
