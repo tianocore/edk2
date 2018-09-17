@@ -763,7 +763,6 @@ OpalUtilUpdateGlobalLockingRange(
 
   if (MethodStatus == TCG_METHOD_STATUS_CODE_AUTHORITY_LOCKED_OUT) {
     DEBUG ((DEBUG_INFO, "unlock as admin failed with AUTHORITY_LOCKED_OUT\n"));
-    goto done;
   }
 
   //
