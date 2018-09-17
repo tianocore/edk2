@@ -675,9 +675,9 @@ Ip4ConfigProtocol (
     // Add a route to this connected network in the instance route table.
     //
     Ip4AddRoute (
-      IpInstance->RouteTable, 
-      Ip & Netmask, 
-      Netmask, 
+      IpInstance->RouteTable,
+      Ip & Netmask,
+      Netmask,
       IP4_ALLZERO_ADDRESS
       );
   } else {
