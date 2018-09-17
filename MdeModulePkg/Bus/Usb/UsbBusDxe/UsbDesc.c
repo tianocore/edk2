@@ -655,7 +655,13 @@ UsbGetOneString (
   //
   Status = UsbCtrlGetDesc (UsbDev, USB_DESC_TYPE_STRING, Index, LangId, &Desc, 2);
 
-  if (EFI_ERROR (Status)) {
+  //
+  // Reject if Length even cannot cover itself, or odd because Unicode string byte length should be even.
+  //
+  if (EFI_ERROR (Status) || 
+      (Desc.Length < OFFSET_OF (EFI_USB_STRING_DESCRIPTOR, Length) + sizeof (Desc.Length)) ||
+      (Desc.Length % 2 != 0)
+    ) {
     return NULL;
   }
 
