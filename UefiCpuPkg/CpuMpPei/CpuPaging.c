@@ -554,6 +554,8 @@ SetupStackGuardPage (
   MpInitLibGetNumberOfProcessors(&NumberOfProcessors, NULL);
   MpInitLibWhoAmI (&Bsp);
   for (Index = 0; Index < NumberOfProcessors; ++Index) {
+    StackBase = 0;
+
     if (Index == Bsp) {
       Hob.Raw = GetHobList ();
       while ((Hob.Raw = GetNextHob (EFI_HOB_TYPE_MEMORY_ALLOCATION, Hob.Raw)) != NULL) {
@@ -570,6 +572,7 @@ SetupStackGuardPage (
       //
       MpInitLibStartupThisAP(GetStackBase, Index, NULL, 0, (VOID *)&StackBase, NULL);
     }
+    ASSERT (StackBase != 0);
     //
     // Set Guard page at stack base address.
     //
