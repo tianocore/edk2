@@ -77,7 +77,6 @@
 [LibraryClasses]
   UefiDriverEntryPoint
   UefiRuntimeServicesTableLib
-  CacheMaintenanceLib
   PcdLib
   DebugLib
   BaseLib
@@ -113,7 +112,6 @@
 
 [Guids]
   gEfiAcpiVariableGuid                     ## SOMETIMES_CONSUMES ## HOB # it is used for S3 boot.
-  gEfiGlobalVariableGuid                   ## SOMETIMES_PRODUCES ## Variable:L"SmmProfileData"
   gEfiAcpi20TableGuid                      ## SOMETIMES_CONSUMES ## SystemTable
   gEfiAcpi10TableGuid                      ## SOMETIMES_CONSUMES ## SystemTable
   gEdkiiPiSmmMemoryAttributesTableGuid     ## CONSUMES ## SystemTable

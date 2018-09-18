@@ -13,8 +13,6 @@
 **/
 
 #include <PiPei.h>
-#include <Library/BaseLib.h>
-#include <Library/PeCoffGetEntryPointLib.h>
 
 #include "SecMain.h"
 

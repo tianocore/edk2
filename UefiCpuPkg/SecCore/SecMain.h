@@ -17,14 +17,12 @@
 
 #include <PiPei.h>
 
-#include <Ppi/SecPlatformInformation.h>
 #include <Ppi/SecPlatformInformation2.h>
 #include <Ppi/TemporaryRamDone.h>
 #include <Ppi/SecPerformance.h>
 
 #include <Guid/FirmwarePerformance.h>
 
-#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/PcdLib.h>
 #include <Library/BaseMemoryLib.h>

@@ -50,7 +50,6 @@
 [LibraryClasses]
   BaseMemoryLib
   DebugLib
-  BaseLib
   PlatformSecLib
   PcdLib
   DebugAgentLib
@@ -71,9 +70,6 @@
   ## SOMETIMES_PRODUCES
   gEfiSecPlatformInformation2PpiGuid
   gEfiTemporaryRamDonePpiGuid                          ## PRODUCES
-  ## NOTIFY
-  ## SOMETIMES_CONSUMES
-  gPeiSecPerformancePpiGuid
 
 [Guids]
   ## SOMETIMES_PRODUCES   ## HOB

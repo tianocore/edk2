@@ -16,17 +16,10 @@
 
 #include <Base.h>
 #include <Uefi.h>
-#include <Library/BaseLib.h>
-#include <Library/CpuLib.h>
-#include <Library/BaseMemoryLib.h>
-#include <Library/MemoryAllocationLib.h>
-#include <Library/DebugLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Library/PrintLib.h>
-#include <Protocol/MpService.h>
 #include <Protocol/SmmBase2.h>
 #include <Register/Cpuid.h>
 #include <Register/Msr.h>

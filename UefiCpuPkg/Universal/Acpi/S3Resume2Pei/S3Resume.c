@@ -25,7 +25,6 @@
 #include <Guid/ExtendedFirmwarePerformance.h>
 #include <Guid/EndOfS3Resume.h>
 #include <Guid/S3SmmInitDone.h>
-#include <Ppi/ReadOnlyVariable2.h>
 #include <Ppi/S3Resume2.h>
 #include <Ppi/SmmAccess.h>
 #include <Ppi/PostBootScriptTable.h>
@@ -34,7 +33,6 @@
 
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
-#include <Library/TimerLib.h>
 #include <Library/PeimEntryPoint.h>
 #include <Library/PeiServicesLib.h>
 #include <Library/HobLib.h>
@@ -47,7 +45,7 @@
 #include <Library/DebugAgentLib.h>
 #include <Library/LocalApicLib.h>
 #include <Library/ReportStatusCodeLib.h>
-#include <Library/PrintLib.h>
+
 #include <Library/HobLib.h>
 #include <Library/LockBoxLib.h>
 #include <IndustryStandard/Acpi.h>

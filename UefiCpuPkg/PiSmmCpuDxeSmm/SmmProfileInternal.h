@@ -15,7 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #ifndef _SMM_PROFILE_INTERNAL_H_
 #define _SMM_PROFILE_INTERNAL_H_
 
-#include <Guid/GlobalVariable.h>
 #include <Guid/Acpi.h>
 #include <Protocol/SmmReadyToLock.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
