@@ -16,7 +16,6 @@
 #ifndef __DXE_PCI_SEGMENT_LIB__
 #define __DXE_PCI_SEGMENT_LIB__
 
-#include <PiDxe.h>
 
 #include <Protocol/PciRootBridgeIo.h>
 
