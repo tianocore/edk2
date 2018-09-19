@@ -37,6 +37,7 @@
   Console.c
   UefiLib.c
   UefiLibInternal.h
+  Acpi.c
 
 [Packages]
   MdePkg/MdePkg.dec
