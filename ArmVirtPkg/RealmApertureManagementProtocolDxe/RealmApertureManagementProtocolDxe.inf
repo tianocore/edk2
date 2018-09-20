@@ -1,0 +1,48 @@
+## @file
+#  Module to manage the sharing of buffers in a Realm with the Host.
+#
+#  Copyright (c) 2022 - 2023, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = RealmApertureManagementProtocolDxe
+  FILE_GUID                      = CEC2F7D5-2564-46D4-A23F-501623F7F56A
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = RealmApertureManagementProtocolDxeInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  RealmApertureManagementProtocolDxe.c
+
+[Packages]
+  ArmVirtPkg/ArmVirtPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmCcaLib
+  ArmCcaRsiLib
+  BaseLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiRealmApertureManagementProtocolGuid         ## SOMETIME_PRODUCES
+  gEfiResetNotificationProtocolGuid               ## CONSUMES
+
+[Depex]
+  TRUE
