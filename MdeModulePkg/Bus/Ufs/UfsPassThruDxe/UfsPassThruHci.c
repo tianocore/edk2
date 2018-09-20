@@ -833,6 +833,7 @@ UfsStopExecCmd (
   @param[in] QueryResp  Pointer to the query response.
 
   @retval EFI_INVALID_PARAMETER Packet or QueryResp are empty or opcode is invalid.
+  @retval EFI_DEVICE_ERROR      Data returned from device is invalid.
   @retval EFI_SUCCESS           Data extracted.
 
 **/
@@ -853,6 +854,13 @@ UfsGetReturnDataFromQueryResponse (
     case UtpQueryFuncOpcodeRdDesc:
       ReturnDataSize = QueryResp->Tsf.Length;
       SwapLittleEndianToBigEndian ((UINT8*)&ReturnDataSize, sizeof (UINT16));
+      //
+      // Make sure the hardware device does not return more data than expected.
+      //
+      if (ReturnDataSize > Packet->TransferLength) {
+        return EFI_DEVICE_ERROR;
+      }
+
       CopyMem (Packet->DataBuffer, (QueryResp + 1), ReturnDataSize);
       Packet->TransferLength = ReturnDataSize;
       break;
@@ -1469,8 +1477,15 @@ UfsExecScsiCmds (
   SwapLittleEndianToBigEndian ((UINT8*)&SenseDataLen, sizeof (UINT16));
 
   if ((Packet->SenseDataLength != 0) && (Packet->SenseData != NULL)) {
-    CopyMem (Packet->SenseData, Response->SenseData, SenseDataLen);
-    Packet->SenseDataLength = (UINT8)SenseDataLen;
+    //
+    // Make sure the hardware device does not return more data than expected.
+    //
+    if (SenseDataLen <= Packet->SenseDataLength) {
+      CopyMem (Packet->SenseData, Response->SenseData, SenseDataLen);
+      Packet->SenseDataLength = (UINT8)SenseDataLen;
+    } else {
+      Packet->SenseDataLength = 0;
+    }
   }
 
   //
@@ -2226,8 +2241,15 @@ ProcessAsyncTaskList (
         SwapLittleEndianToBigEndian ((UINT8*)&SenseDataLen, sizeof (UINT16));
 
         if ((Packet->SenseDataLength != 0) && (Packet->SenseData != NULL)) {
-          CopyMem (Packet->SenseData, Response->SenseData, SenseDataLen);
-          Packet->SenseDataLength = (UINT8)SenseDataLen;
+          //
+          // Make sure the hardware device does not return more data than expected.
+          //
+          if (SenseDataLen <= Packet->SenseDataLength) {
+            CopyMem (Packet->SenseData, Response->SenseData, SenseDataLen);
+            Packet->SenseDataLength = (UINT8)SenseDataLen;
+          } else {
+            Packet->SenseDataLength = 0;
+          }
         }
 
         //

@@ -857,6 +857,14 @@ UfsRwDeviceDesc (
     SwapLittleEndianToBigEndian ((UINT8*)&ReturnDataSize, sizeof (UINT16));
 
     if (Read) {
+      //
+      // Make sure the hardware device does not return more data than expected.
+      //
+      if (ReturnDataSize > Packet.InTransferLength) {
+        Status = EFI_DEVICE_ERROR;
+        goto Exit;
+      }
+
       CopyMem (Packet.InDataBuffer, (QueryResp + 1), ReturnDataSize);
       Packet.InTransferLength = ReturnDataSize;
     } else {
@@ -1170,8 +1178,15 @@ UfsExecScsiCmds (
   SwapLittleEndianToBigEndian ((UINT8*)&SenseDataLen, sizeof (UINT16));
 
   if ((Packet->SenseDataLength != 0) && (Packet->SenseData != NULL)) {
-    CopyMem (Packet->SenseData, Response->SenseData, SenseDataLen);
-    Packet->SenseDataLength = (UINT8)SenseDataLen;
+    //
+    // Make sure the hardware device does not return more data than expected.
+    //
+    if (SenseDataLen <= Packet->SenseDataLength) {
+      CopyMem (Packet->SenseData, Response->SenseData, SenseDataLen);
+      Packet->SenseDataLength = (UINT8)SenseDataLen;
+    } else {
+      Packet->SenseDataLength = 0;
+    }
   }
 
   //
