@@ -44,6 +44,9 @@
   #
   gArmVirtTokenSpaceGuid.PcdTpm2SupportEnabled|FALSE|BOOLEAN|0x00000004
 
+[Protocols]
+  gEfiRealmApertureManagementProtocolGuid = { 0x585c00be, 0xcf7c, 0x4db8, { 0x8a, 0xa2, 0x49, 0xd, 0x67, 0xf5, 0xf6, 0xe6 } }
+
 [PcdsFixedAtBuild, PcdsPatchableInModule]
   ##
   # This is the physical address of Rsdp which is the core struct of Acpi.
