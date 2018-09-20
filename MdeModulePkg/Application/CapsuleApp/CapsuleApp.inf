@@ -43,8 +43,6 @@
   gEfiCapsuleReportGuid                  ## CONSUMES   ## GUID
   gEfiFmpCapsuleGuid                     ## CONSUMES   ## GUID
   gWindowsUxCapsuleGuid                  ## CONSUMES   ## GUID
-  gEfiCertTypeRsa2048Sha256Guid          ## CONSUMES   ## GUID
-  gEfiCertPkcs7Guid                      ## CONSUMES   ## GUID
   gEfiSystemResourceTableGuid            ## CONSUMES   ## GUID
 
 [Protocols]
