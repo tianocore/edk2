@@ -725,7 +725,7 @@ def SplitFspBin (fspfile, outdir, nametemplate):
         fspname, ext = os.path.splitext(os.path.basename(nametemplate))
         filename = os.path.join(outdir, fspname + '_' + fsp.Type + ext)
         hfsp = open(filename, 'wb')
-        print ("Ceate FSP component file '%s'" % filename)
+        print ("Create FSP component file '%s'" % filename)
         for fvidx in fsp.FvIdxList:
             fv = fd.FvList[fvidx]
             hfsp.write(fv.FvData)
