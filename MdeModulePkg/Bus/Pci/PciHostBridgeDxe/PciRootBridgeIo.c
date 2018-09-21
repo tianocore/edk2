@@ -301,6 +301,8 @@ CreateRootBridge (
 
   @retval EFI_INVALID_PARAMETER  Buffer is NULL.
 
+  @retval EFI_INVALID_PARAMETER  Address or Count is invalid.
+
   @retval EFI_UNSUPPORTED        The Buffer is not aligned for the given Width.
 
   @retval EFI_UNSUPPORTED        The address range specified by Address, Width,
@@ -321,6 +323,7 @@ RootBridgeIoCheckParameter (
   UINT64                                       Base;
   UINT64                                       Limit;
   UINT32                                       Size;
+  UINT64                                       Length;
 
   //
   // Check to see if Buffer is NULL
@@ -337,7 +340,7 @@ RootBridgeIoCheckParameter (
   }
 
   //
-  // For FIFO type, the target address won't increase during the access,
+  // For FIFO type, the device address won't increase during the access,
   // so treat Count as 1
   //
   if (Width >= EfiPciWidthFifoUint8 && Width <= EfiPciWidthFifoUint64) {
@@ -348,10 +351,25 @@ RootBridgeIoCheckParameter (
   Size  = 1 << Width;
 
   //
+  // Make sure (Count * Size) doesn't exceed MAX_UINT64
+  //
+  if (Count > DivU64x32 (MAX_UINT64, Size)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  //
   // Check to see if Address is aligned
   //
   if ((Address & (Size - 1)) != 0) {
     return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Make sure (Address + Count * Size) doesn't exceed MAX_UINT64
+  //
+  Length = MultU64x32 (Count, Size);
+  if (Address > MAX_UINT64 - Length) {
+    return EFI_INVALID_PARAMETER;
   }
 
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
@@ -372,7 +390,7 @@ RootBridgeIoCheckParameter (
     //
     // Allow Legacy IO access
     //
-    if (Address + MultU64x32 (Count, Size) <= 0x1000) {
+    if (Address + Length <= 0x1000) {
       if ((RootBridge->Attributes & (
            EFI_PCI_ATTRIBUTE_ISA_IO | EFI_PCI_ATTRIBUTE_VGA_PALETTE_IO | EFI_PCI_ATTRIBUTE_VGA_IO |
            EFI_PCI_ATTRIBUTE_IDE_PRIMARY_IO | EFI_PCI_ATTRIBUTE_IDE_SECONDARY_IO |
@@ -386,7 +404,7 @@ RootBridgeIoCheckParameter (
     //
     // Allow Legacy MMIO access
     //
-    if ((Address >= 0xA0000) && (Address + MultU64x32 (Count, Size)) <= 0xC0000) {
+    if ((Address >= 0xA0000) && (Address + Length) <= 0xC0000) {
       if ((RootBridge->Attributes & EFI_PCI_ATTRIBUTE_VGA_MEMORY) != 0) {
         return EFI_SUCCESS;
       }
@@ -395,7 +413,7 @@ RootBridgeIoCheckParameter (
     // By comparing the Address against Limit we know which range to be used
     // for checking
     //
-    if (Address + MultU64x32 (Count, Size) <= RootBridge->Mem.Limit + 1) {
+    if (Address + Length <= RootBridge->Mem.Limit + 1) {
       Base = RootBridge->Mem.Base;
       Limit = RootBridge->Mem.Limit;
     } else {
@@ -427,7 +445,7 @@ RootBridgeIoCheckParameter (
       return EFI_INVALID_PARAMETER;
   }
 
-  if (Address + MultU64x32 (Count, Size) > Limit + 1) {
+  if (Address + Length > Limit + 1) {
     return EFI_INVALID_PARAMETER;
   }
 
