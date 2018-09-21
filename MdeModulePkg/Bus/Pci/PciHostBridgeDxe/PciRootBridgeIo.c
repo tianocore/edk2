@@ -413,12 +413,18 @@ RootBridgeIoCheckParameter (
     // By comparing the Address against Limit we know which range to be used
     // for checking
     //
-    if (Address + Length <= RootBridge->Mem.Limit + 1) {
-      Base = RootBridge->Mem.Base;
+    if ((Address >= RootBridge->Mem.Base) && (Address + Length <= RootBridge->Mem.Limit + 1)) {
+      Base  = RootBridge->Mem.Base;
       Limit = RootBridge->Mem.Limit;
-    } else {
-      Base = RootBridge->MemAbove4G.Base;
+    } else if ((Address >= RootBridge->PMem.Base) && (Address + Length <= RootBridge->PMem.Limit + 1)) {
+      Base  = RootBridge->PMem.Base;
+      Limit = RootBridge->PMem.Limit;
+    } else if ((Address >= RootBridge->MemAbove4G.Base) && (Address + Length <= RootBridge->MemAbove4G.Limit + 1)) {
+      Base  = RootBridge->MemAbove4G.Base;
       Limit = RootBridge->MemAbove4G.Limit;
+    } else {
+      Base  = RootBridge->PMemAbove4G.Base;
+      Limit = RootBridge->PMemAbove4G.Limit;
     }
   } else {
     PciRbAddr = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_PCI_ADDRESS*) &Address;
