@@ -173,9 +173,6 @@ SmiHandlerIdtrAbsAddr:
     mov     gs, eax
     mov     ax, [rbx + DSC_SS]
     mov     ss, eax
-    mov     rax, strict qword 0         ;   mov     rax, _SmiHandler
-_SmiHandlerAbsAddr:
-    jmp     rax
 
 _SmiHandler:
     mov     rbx, [rsp + 0x8]             ; rcx <- CpuIndex
@@ -189,13 +186,19 @@ _SmiHandler:
     add     rsp, -0x20
 
     mov     rcx, rbx
-    call    ASM_PFX(CpuSmmDebugEntry)
+    mov     rax, strict qword 0         ;   call    ASM_PFX(CpuSmmDebugEntry)
+CpuSmmDebugEntryAbsAddr:
+    call    rax
 
     mov     rcx, rbx
-    call    ASM_PFX(SmiRendezvous)
+    mov     rax, strict qword 0         ;   call    ASM_PFX(SmiRendezvous)
+SmiRendezvousAbsAddr:
+    call    rax
 
     mov     rcx, rbx
-    call    ASM_PFX(CpuSmmDebugExit)
+    mov     rax, strict qword 0         ;   call    ASM_PFX(CpuSmmDebugExit)
+CpuSmmDebugExitAbsAddr:
+    call    rax
 
     add     rsp, 0x20
 
@@ -206,7 +209,8 @@ _SmiHandler:
 
     add     rsp, 0x200
 
-    lea     rax, [ASM_PFX(mXdSupported)]
+    mov     rax, strict qword 0         ;       lea     rax, [ASM_PFX(mXdSupported)]
+mXdSupportedAbsAddr:
     mov     al, [rax]
     cmp     al, 0
     jz      .1
@@ -224,13 +228,33 @@ _SmiHandler:
 
 ASM_PFX(gcSmiHandlerSize)    DW      $ - _SmiEntryPoint
 
+;
+; Retrieve the address and fill it into mov opcode.
+;
+; It is called in the driver entry point first.
+; It is used to fix up the real address in mov opcode.
+; Then, after the code logic is copied to the different location,
+; the code can also run.
+;
 global ASM_PFX(PiSmmCpuSmiEntryFixupAddress)
 ASM_PFX(PiSmmCpuSmiEntryFixupAddress):
     lea    rax, [ASM_PFX(gSmiHandlerIdtr)]
     lea    rcx, [SmiHandlerIdtrAbsAddr]
     mov    qword [rcx - 8], rax
 
-    lea    rax, [_SmiHandler]
-    lea    rcx, [_SmiHandlerAbsAddr]
+    lea    rax, [ASM_PFX(CpuSmmDebugEntry)]
+    lea    rcx, [CpuSmmDebugEntryAbsAddr]
+    mov    qword [rcx - 8], rax
+
+    lea    rax, [ASM_PFX(SmiRendezvous)]
+    lea    rcx, [SmiRendezvousAbsAddr]
+    mov    qword [rcx - 8], rax
+
+    lea    rax, [ASM_PFX(CpuSmmDebugExit)]
+    lea    rcx, [CpuSmmDebugExitAbsAddr]
+    mov    qword [rcx - 8], rax
+
+    lea    rax, [ASM_PFX(mXdSupported)]
+    lea    rcx, [mXdSupportedAbsAddr]
     mov    qword [rcx - 8], rax
     ret
