@@ -15,7 +15,6 @@
 ##
 # Import Modules
 #
-from __future__ import absolute_import
 from struct import *
 from . import Section
 from .GenFdsGlobalVariable import GenFdsGlobalVariable

@@ -15,8 +15,6 @@
 ##
 # Import Modules
 #
-from __future__ import print_function
-from __future__ import absolute_import
 from optparse import OptionParser
 import sys
 import Common.LongFilePathOs as os

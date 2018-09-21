@@ -1,4 +1,3 @@
-from __future__ import absolute_import
 ## @file
 # process FV generation
 #

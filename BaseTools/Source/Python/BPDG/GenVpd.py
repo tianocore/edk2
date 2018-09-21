@@ -13,7 +13,6 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-from __future__ import absolute_import
 import Common.LongFilePathOs as os
 from io import BytesIO
 from . import StringTable as st

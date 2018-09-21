@@ -16,7 +16,6 @@
 ##
 # Import Modules
 #
-from __future__ import absolute_import
 from . import Rule
 import Common.LongFilePathOs as os
 from io import BytesIO

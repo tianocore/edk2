@@ -15,7 +15,6 @@
 ##
 # Import Modules
 #
-from __future__ import absolute_import
 from .Ffs import Ffs
 from . import Section
 import Common.LongFilePathOs as os

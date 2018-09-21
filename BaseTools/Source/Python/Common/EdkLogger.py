@@ -12,7 +12,6 @@
 #
 
 ## Import modules
-from __future__ import absolute_import
 import Common.LongFilePathOs as os, sys, logging
 import traceback
 from  .BuildToolError import *

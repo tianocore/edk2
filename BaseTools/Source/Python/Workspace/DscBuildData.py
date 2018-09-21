@@ -17,8 +17,6 @@
 #  This class is used to retrieve information stored in database and convert them
 # into PlatformBuildClassObject form for easier use for AutoGen.
 #
-from __future__ import print_function
-from __future__ import absolute_import
 from Common.StringUtils import *
 from Common.DataType import *
 from Common.Misc import *

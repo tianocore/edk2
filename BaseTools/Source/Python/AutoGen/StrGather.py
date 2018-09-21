@@ -14,7 +14,6 @@
 ##
 # Import Modules
 #
-from __future__ import absolute_import
 import re
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import *

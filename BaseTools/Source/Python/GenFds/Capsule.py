@@ -15,7 +15,6 @@
 ##
 # Import Modules
 #
-from __future__ import absolute_import
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from .GenFdsGlobalVariable import FindExtendTool
 from CommonDataClass.FdfClass import CapsuleClassObject

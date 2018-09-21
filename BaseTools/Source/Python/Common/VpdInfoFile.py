@@ -15,7 +15,6 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
-from __future__ import print_function
 import Common.LongFilePathOs as os
 import re
 import Common.EdkLogger as EdkLogger

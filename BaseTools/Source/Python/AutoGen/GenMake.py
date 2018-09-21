@@ -13,7 +13,6 @@
 
 ## Import Modules
 #
-from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import sys
 import string

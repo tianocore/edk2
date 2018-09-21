@@ -15,7 +15,6 @@
 ##
 # Import Modules
 #
-from __future__ import absolute_import
 from CommonDataClass.FdfClass import SectionClassObject
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
 import Common.LongFilePathOs as os, glob

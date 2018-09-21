@@ -17,7 +17,6 @@
 #
 
 #======================================  External Libraries ========================================
-from __future__ import print_function
 import optparse
 import Common.LongFilePathOs as os
 import re

@@ -12,7 +12,6 @@
 
 # # Import Modules
 #
-from __future__ import print_function
 from Common.GlobalData import *
 from CommonDataClass.Exceptions import BadExpression
 from CommonDataClass.Exceptions import WrnExpression

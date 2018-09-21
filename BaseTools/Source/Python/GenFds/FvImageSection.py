@@ -15,7 +15,6 @@
 ##
 # Import Modules
 #
-from __future__ import absolute_import
 from . import Section
 from io import BytesIO
 from .Ffs import Ffs

@@ -15,7 +15,6 @@
 ##
 # Import Modules
 #
-from __future__ import absolute_import
 import sqlite3
 from Common.StringUtils import *
 from Common.DataType import *

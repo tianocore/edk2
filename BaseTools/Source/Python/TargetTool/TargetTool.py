@@ -12,7 +12,6 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
-from __future__ import print_function
 import Common.LongFilePathOs as os
 import sys
 import traceback
