@@ -55,6 +55,12 @@
                                                                                        "TRUE  - HTTP connections are allowed.\n"
                                                                                        "FALSE - HTTP connections are denied."
 
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdPxeTftpWindowSize_PROMPT  #language en-US "This setting is to specify the MTFTP windowsize used by UEFI PXE driver."
+
+#string STR_gEfiNetworkPkgTokenSpaceGuid_PcdPxeTftpWindowSize_HELP  #language en-US "Specify MTFTP windowsize used by UEFI PXE driver.\n"
+                                                                                    "A value of 0 indicates the default value of windowsize(1).\n"
+                                                                                    "A non-zero value will be used as windowsize."
+
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecCertificateEnabled_PROMPT  #language en-US "Enable IPsec IKEv2 Certificate Authentication."
 
 #string STR_gEfiNetworkPkgTokenSpaceGuid_PcdIpsecCertificateEnabled_HELP  #language en-US "Indicates if the IPsec IKEv2 Certificate Authentication feature is enabled or not.<BR><BR>\n"

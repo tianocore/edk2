@@ -92,6 +92,12 @@
   # @Prompt Indicates whether HTTP connections are permitted or not.
   gEfiNetworkPkgTokenSpaceGuid.PcdAllowHttpConnections|FALSE|BOOLEAN|0x00000008
 
+  ## This setting is to specify the MTFTP windowsize used by UEFI PXE driver.
+  # A value of 0 indicates the default value of windowsize(1).
+  # A non-zero value will be used as windowsize.
+  # @Prompt PXE TFTP windowsize.
+  gEfiNetworkPkgTokenSpaceGuid.PcdPxeTftpWindowSize|0x4|UINT64|0x10000008
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## IPv6 DHCP Unique Identifier (DUID) Type configuration (From RFCs 3315 and 6355).
   # 01 = DUID Based on Link-layer Address Plus Time [DUID-LLT]
