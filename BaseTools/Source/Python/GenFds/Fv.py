@@ -195,32 +195,36 @@ class FV (FvClassObject):
             #
             # Write the Fv contents to Buffer
             #
-            if os.path.isfile(FvOutputFile):
+            if os.path.isfile(FvOutputFile) and os.path.getsize(FvOutputFile) >= 0x48:
                 FvFileObj = open(FvOutputFile, 'rb')
-                GenFdsGlobalVariable.VerboseLogger("\nGenerate %s FV Successfully" % self.UiFvName)
-                GenFdsGlobalVariable.SharpCounter = 0
-
-                Buffer.write(FvFileObj.read())
-                FvFileObj.seek(0)
                 # PI FvHeader is 0x48 byte
                 FvHeaderBuffer = FvFileObj.read(0x48)
-                # FV alignment position.
-                FvAlignmentValue = 1 << (ord(FvHeaderBuffer[0x2E]) & 0x1F)
-                if FvAlignmentValue >= 0x400:
-                    if FvAlignmentValue >= 0x100000:
-                        if FvAlignmentValue >= 0x1000000:
-                        #The max alignment supported by FFS is 16M.
-                            self.FvAlignment = "16M"
+                Signature = FvHeaderBuffer[0x28:0x32]
+                if Signature and Signature.startswith('_FVH'):
+                    GenFdsGlobalVariable.VerboseLogger("\nGenerate %s FV Successfully" % self.UiFvName)
+                    GenFdsGlobalVariable.SharpCounter = 0
+
+                    Buffer.write(FvFileObj.read())
+                    FvFileObj.seek(0)
+                    # FV alignment position.
+                    FvAlignmentValue = 1 << (ord(FvHeaderBuffer[0x2E]) & 0x1F)
+                    if FvAlignmentValue >= 0x400:
+                        if FvAlignmentValue >= 0x100000:
+                            if FvAlignmentValue >= 0x1000000:
+                            #The max alignment supported by FFS is 16M.
+                                self.FvAlignment = "16M"
+                            else:
+                                self.FvAlignment = str(FvAlignmentValue / 0x100000) + "M"
                         else:
-                            self.FvAlignment = str(FvAlignmentValue / 0x100000) + "M"
+                            self.FvAlignment = str(FvAlignmentValue / 0x400) + "K"
                     else:
-                        self.FvAlignment = str(FvAlignmentValue / 0x400) + "K"
+                        # FvAlignmentValue is less than 1K
+                        self.FvAlignment = str (FvAlignmentValue)
+                    FvFileObj.close()
+                    GenFdsGlobalVariable.ImageBinDict[self.UiFvName.upper() + 'fv'] = FvOutputFile
+                    GenFdsGlobalVariable.LargeFileInFvFlags.pop()
                 else:
-                    # FvAlignmentValue is less than 1K
-                    self.FvAlignment = str (FvAlignmentValue)
-                FvFileObj.close()
-                GenFdsGlobalVariable.ImageBinDict[self.UiFvName.upper() + 'fv'] = FvOutputFile
-                GenFdsGlobalVariable.LargeFileInFvFlags.pop()
+                    GenFdsGlobalVariable.ErrorLogger("Invalid FV file %s." % self.UiFvName)
             else:
                 GenFdsGlobalVariable.ErrorLogger("Failed to generate %s FV file." %self.UiFvName)
         return FvOutputFile
