@@ -70,6 +70,7 @@ class PcdClassObject(object):
             self.DscDefaultValue = Value
         self.PcdValueFromComm = ""
         self.PcdValueFromFdf = ""
+        self.CustomAttribute = {}
         self.UserDefinedDefaultStoresFlag = UserDefinedDefaultStoresFlag
 
     @staticmethod
@@ -224,6 +225,7 @@ class StructurePcd(PcdClassObject):
         self.DscRawValue = PcdObject.DscRawValue if PcdObject.DscRawValue else self.DscRawValue
         self.PcdValueFromComm = PcdObject.PcdValueFromComm if PcdObject.PcdValueFromComm else self.PcdValueFromComm
         self.PcdValueFromFdf = PcdObject.PcdValueFromFdf if PcdObject.PcdValueFromFdf else self.PcdValueFromFdf
+        self.CustomAttribute = PcdObject.CustomAttribute if PcdObject.CustomAttribute else self.CustomAttribute
         self.UserDefinedDefaultStoresFlag = PcdObject.UserDefinedDefaultStoresFlag if PcdObject.UserDefinedDefaultStoresFlag else self.UserDefinedDefaultStoresFlag
         if isinstance(PcdObject, StructurePcd):
             self.StructuredPcdIncludeFile = PcdObject.StructuredPcdIncludeFile if PcdObject.StructuredPcdIncludeFile else self.StructuredPcdIncludeFile

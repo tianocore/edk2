@@ -1168,7 +1168,7 @@ class PlatformAutoGen(AutoGen):
                     VariableGuidStructure = Sku.VariableGuidValue
                     VariableGuid = GuidStructureStringToGuidString(VariableGuidStructure)
                     for StorageName in Sku.DefaultStoreDict:
-                        VariableInfo.append_variable(var_info(Index, pcdname, StorageName, SkuName, StringToArray(Sku.VariableName), VariableGuid, Sku.VariableOffset, Sku.VariableAttribute, Sku.HiiDefaultValue, Sku.DefaultStoreDict[StorageName], Pcd.DatumType))
+                        VariableInfo.append_variable(var_info(Index, pcdname, StorageName, SkuName, StringToArray(Sku.VariableName), VariableGuid, Sku.VariableOffset, Sku.VariableAttribute, Sku.HiiDefaultValue, Sku.DefaultStoreDict[StorageName], Pcd.DatumType, Pcd.CustomAttribute['DscPosition'], Pcd.CustomAttribute.get('IsStru',False)))
             Index += 1
         return VariableInfo
 
@@ -2057,6 +2057,7 @@ class PlatformAutoGen(AutoGen):
             ToPcd.validateranges = FromPcd.validateranges
             ToPcd.validlists = FromPcd.validlists
             ToPcd.expressions = FromPcd.expressions
+            ToPcd.CustomAttribute = FromPcd.CustomAttribute
 
         if FromPcd is not None and ToPcd.DatumType == TAB_VOID and not ToPcd.MaxDatumSize:
             EdkLogger.debug(EdkLogger.DEBUG_9, "No MaxDatumSize specified for PCD %s.%s" \

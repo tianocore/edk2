@@ -1536,6 +1536,7 @@ class DscBuildData(PlatformBuildClassObject):
 
                 str_pcd_obj.MaxDatumSize = self.GetStructurePcdMaxSize(str_pcd_obj)
                 Pcds[str_pcd_obj.TokenCName, str_pcd_obj.TokenSpaceGuidCName] = str_pcd_obj
+                Pcds[str_pcd_obj.TokenCName, str_pcd_obj.TokenSpaceGuidCName].CustomAttribute['IsStru']=True
 
             for pcdkey in Pcds:
                 pcd = Pcds[pcdkey]
@@ -2680,6 +2681,7 @@ class DscBuildData(PlatformBuildClassObject):
                     PcdClassObj.UserDefinedDefaultStoresFlag = True
                 Pcds[PcdCName, TokenSpaceGuid] = PcdClassObj
 
+                Pcds[PcdCName, TokenSpaceGuid].CustomAttribute['DscPosition'] = int(Dummy4)
             if SkuName not in Pcds[PcdCName, TokenSpaceGuid].DscRawValue:
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}
             Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName][DefaultStore] = DefaultValue
