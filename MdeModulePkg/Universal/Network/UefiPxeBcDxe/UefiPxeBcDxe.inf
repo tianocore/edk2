@@ -4,7 +4,16 @@
 #  This module produces EFI PXE Base Code Protocol upon EFI MMP Protocl and IPv4
 #  network stack, used to control PXE-compatible devices. It produces EFI Load File
 #  Protocol to provide one clean way to otain control from the boot manager if the
-#  boot patch is from the remote device.
+#  boot patch is from the remote device. This driver only supports IPv4 network stack.
+#
+#  Notes:
+#  1) This driver can't co-work with the UefiPxeBcDxe driver in NetworkPkg.
+#  2) This driver might have some issues that have been fixed in the UefiPxeBcDxe
+#     driver in NetworkPkg.
+#  3) This driver supports fewer features than the UefiPxeBcDxe driver in NetworkPkg
+#     (e.g. IPv6, MTFTP windowsize).
+#  4) UefiPxeBcDxe driver in NetworkPkg is recommended for use instead of this one even
+#     though both of them can be used.
 #
 #  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
