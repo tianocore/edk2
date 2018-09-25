@@ -242,7 +242,7 @@ class StructurePcd(PcdClassObject):
             self.PcdFieldValueFromComm = PcdObject.PcdFieldValueFromComm if PcdObject.PcdFieldValueFromComm else self.PcdFieldValueFromComm
             self.PcdFieldValueFromFdf = PcdObject.PcdFieldValueFromFdf if PcdObject.PcdFieldValueFromFdf else self.PcdFieldValueFromFdf
 
-LibraryClassObject = namedtuple('LibraryClassObject', ['LibraryClass','SupModList'], verbose=False)
+LibraryClassObject = namedtuple('LibraryClassObject', ['LibraryClass','SupModList'])
 
 ## ModuleBuildClassObject
 #
