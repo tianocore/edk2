@@ -107,6 +107,62 @@ IsNullDetectionEnabled (
 }
 
 /**
+  The function will check if Execute Disable Bit is available.
+
+  @retval TRUE      Execute Disable Bit is available.
+  @retval FALSE     Execute Disable Bit is not available.
+
+**/
+BOOLEAN
+IsExecuteDisableBitAvailable (
+  VOID
+  )
+{
+  UINT32            RegEax;
+  UINT32            RegEdx;
+  BOOLEAN           Available;
+
+  Available = FALSE;
+  AsmCpuid (0x80000000, &RegEax, NULL, NULL, NULL);
+  if (RegEax >= 0x80000001) {
+    AsmCpuid (0x80000001, NULL, NULL, NULL, &RegEdx);
+    if ((RegEdx & BIT20) != 0) {
+      //
+      // Bit 20: Execute Disable Bit available.
+      //
+      Available = TRUE;
+    }
+  }
+
+  return Available;
+}
+
+/**
+  Check if Execute Disable Bit (IA32_EFER.NXE) should be enabled or not.
+
+  @retval TRUE    IA32_EFER.NXE should be enabled.
+  @retval FALSE   IA32_EFER.NXE should not be enabled.
+
+**/
+BOOLEAN
+IsEnableNonExecNeeded (
+  VOID
+  )
+{
+  if (!IsExecuteDisableBitAvailable ()) {
+    return FALSE;
+  }
+
+  //
+  // XD flag (BIT63) in page table entry is only valid if IA32_EFER.NXE is set.
+  // Features controlled by Following PCDs need this feature to be enabled.
+  //
+  return (PcdGetBool (PcdSetNxForStack) ||
+          PcdGet64 (PcdDxeNxMemoryProtectionPolicy) != 0 ||
+          PcdGet32 (PcdImageProtectionPolicy) != 0);
+}
+
+/**
   Enable Execute Disable Bit.
 
 **/
@@ -755,7 +811,10 @@ CreateIdentityMappingPageTables (
   //
   EnablePageTableProtection ((UINTN)PageMap, TRUE);
 
-  if (PcdGetBool (PcdSetNxForStack)) {
+  //
+  // Set IA32_EFER.NXE if necessary.
+  //
+  if (IsEnableNonExecNeeded ()) {
     EnableExecuteDisableBit ();
   }
 

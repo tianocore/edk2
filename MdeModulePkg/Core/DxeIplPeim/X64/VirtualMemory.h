@@ -180,6 +180,18 @@ typedef struct {
 } PAGE_TABLE_POOL;
 
 /**
+  Check if Execute Disable Bit (IA32_EFER.NXE) should be enabled or not.
+
+  @retval TRUE    IA32_EFER.NXE should be enabled.
+  @retval FALSE   IA32_EFER.NXE should not be enabled.
+
+**/
+BOOLEAN
+IsEnableNonExecNeeded (
+  VOID
+  );
+
+/**
   Enable Execute Disable Bit.
 
 **/
