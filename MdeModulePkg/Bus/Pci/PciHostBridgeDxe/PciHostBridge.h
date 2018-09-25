@@ -23,6 +23,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PciHostBridgeLib.h>
 #include <Protocol/PciHostBridgeResourceAllocation.h>
+#include <Protocol/IoMmu.h>
 
 #include "PciRootBridge.h"
 
@@ -269,4 +270,6 @@ GetTranslationByResourceType (
   );
 
 extern EFI_CPU_IO2_PROTOCOL        *mCpuIo;
+extern EDKII_IOMMU_PROTOCOL        *mIoMmu;
+
 #endif

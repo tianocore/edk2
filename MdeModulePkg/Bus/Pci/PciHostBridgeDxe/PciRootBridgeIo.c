@@ -17,8 +17,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "PciRootBridge.h"
 #include "PciHostResource.h"
 
-extern EDKII_IOMMU_PROTOCOL        *mIoMmuProtocol;
-
 #define NO_MAPPING  (VOID *) (UINTN) -1
 
 #define RESOURCE_VALID(Resource) ((Resource)->Base <= (Resource)->Limit)
@@ -1269,7 +1267,7 @@ RootBridgeIoMap (
 
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
 
-  if (mIoMmuProtocol != NULL) {
+  if (mIoMmu != NULL) {
     if (!RootBridge->DmaAbove4G) {
       //
       // Clear 64bit support
@@ -1278,14 +1276,14 @@ RootBridgeIoMap (
         Operation = (EFI_PCI_ROOT_BRIDGE_IO_PROTOCOL_OPERATION) (Operation - EfiPciOperationBusMasterRead64);
       }
     }
-    Status = mIoMmuProtocol->Map (
-                               mIoMmuProtocol,
-                               (EDKII_IOMMU_OPERATION) Operation,
-                               HostAddress,
-                               NumberOfBytes,
-                               DeviceAddress,
-                               Mapping
-                               );
+    Status = mIoMmu->Map (
+                       mIoMmu,
+                       (EDKII_IOMMU_OPERATION) Operation,
+                       HostAddress,
+                       NumberOfBytes,
+                       DeviceAddress,
+                       Mapping
+                       );
     return Status;
   }
 
@@ -1413,11 +1411,11 @@ RootBridgeIoUnmap (
   PCI_ROOT_BRIDGE_INSTANCE *RootBridge;
   EFI_STATUS                Status;
 
-  if (mIoMmuProtocol != NULL) {
-    Status = mIoMmuProtocol->Unmap (
-                               mIoMmuProtocol,
-                               Mapping
-                               );
+  if (mIoMmu != NULL) {
+    Status = mIoMmu->Unmap (
+                       mIoMmu,
+                       Mapping
+                       );
     return Status;
   }
 
@@ -1539,21 +1537,21 @@ RootBridgeIoAllocateBuffer (
 
   RootBridge = ROOT_BRIDGE_FROM_THIS (This);
 
-  if (mIoMmuProtocol != NULL) {
+  if (mIoMmu != NULL) {
     if (!RootBridge->DmaAbove4G) {
       //
       // Clear DUAL_ADDRESS_CYCLE
       //
       Attributes &= ~((UINT64) EFI_PCI_ATTRIBUTE_DUAL_ADDRESS_CYCLE);
     }
-    Status = mIoMmuProtocol->AllocateBuffer (
-                               mIoMmuProtocol,
-                               Type,
-                               MemoryType,
-                               Pages,
-                               HostAddress,
-                               Attributes
-                               );
+    Status = mIoMmu->AllocateBuffer (
+                       mIoMmu,
+                       Type,
+                       MemoryType,
+                       Pages,
+                       HostAddress,
+                       Attributes
+                       );
     return Status;
   }
 
@@ -1603,12 +1601,12 @@ RootBridgeIoFreeBuffer (
 {
   EFI_STATUS                Status;
 
-  if (mIoMmuProtocol != NULL) {
-    Status = mIoMmuProtocol->FreeBuffer (
-                               mIoMmuProtocol,
-                               Pages,
-                               HostAddress
-                               );
+  if (mIoMmu != NULL) {
+    Status = mIoMmu->FreeBuffer (
+                       mIoMmu,
+                       Pages,
+                       HostAddress
+                       );
     return Status;
   }
 

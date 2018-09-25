@@ -26,7 +26,7 @@ GLOBAL_REMOVE_IF_UNREFERENCED CHAR16 *mPciResourceTypeStr[] = {
   L"I/O", L"Mem", L"PMem", L"Mem64", L"PMem64", L"Bus"
 };
 
-EDKII_IOMMU_PROTOCOL        *mIoMmuProtocol;
+EDKII_IOMMU_PROTOCOL        *mIoMmu;
 EFI_EVENT                   mIoMmuEvent;
 VOID                        *mIoMmuRegistration;
 
@@ -363,7 +363,7 @@ IoMmuProtocolCallback (
 {
   EFI_STATUS   Status;
 
-  Status = gBS->LocateProtocol (&gEdkiiIoMmuProtocolGuid, NULL, (VOID **)&mIoMmuProtocol);
+  Status = gBS->LocateProtocol (&gEdkiiIoMmuProtocolGuid, NULL, (VOID **)&mIoMmu);
   if (!EFI_ERROR(Status)) {
     gBS->CloseEvent (mIoMmuEvent);
   }
