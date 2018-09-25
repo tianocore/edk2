@@ -4647,7 +4647,14 @@ typedef union {
     /// [Bit 3] User.
     ///
     UINT32  User:1;
-    UINT32  Reserved1:2;
+    ///
+    /// [Bit 4] PwrEvtEn.
+    ///
+    UINT32  PwrEvtEn:1;
+    ///
+    /// [Bit 5] FUPonPTW.
+    ///
+    UINT32  FUPonPTW:1;
     ///
     /// [Bit 6] FabricEn. If (CPUID.(EAX=07H, ECX=0):ECX[3] = 1).
     ///
@@ -4672,7 +4679,10 @@ typedef union {
     /// [Bit 11] DisRETC.
     ///
     UINT32  DisRETC:1;
-    UINT32  Reserved2:1;
+    ///
+    /// [Bit 12] PTWEn.
+    ///
+    UINT32  PTWEn:1;
     ///
     /// [Bit 13] BranchEn.
     ///
