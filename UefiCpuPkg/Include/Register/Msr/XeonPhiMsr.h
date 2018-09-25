@@ -278,7 +278,25 @@ typedef union {
     /// [Bit 15] CFG Lock (R/WO).
     ///
     UINT32  CFGLock:1;
-    UINT32  Reserved3:16;
+    UINT32  Reserved5:10;
+    ///
+    /// [Bit 26] C1 State Auto Demotion Enable (R/W) When set, the processor
+    /// will conditionally demote C3/C6/C7 requests to C1 based on uncore
+    /// auto-demote information.
+    ///
+    UINT32  C1StateAutoDemotionEnable:1;
+    UINT32  Reserved6:1;
+    ///
+    /// [Bit 28] C1 State Auto Undemotion Enable (R/W) When set, enables
+    /// Undemotion from Demoted C1.
+    ///
+    UINT32  C1StateAutoUndemotionEnable:1;
+    ///
+    /// [Bit 29] PKG C-State Auto Demotion Enable (R/W) When set, enables
+    /// Package C state demotion.
+    ///
+    UINT32  PKGC_StateAutoDemotionEnable:1;
+    UINT32  Reserved7:2;
     UINT32  Reserved4:32;
   } Bits;
   ///
@@ -325,13 +343,12 @@ typedef union {
     ///
     UINT32  Lvl2Base:16;
     ///
-    /// [Bits 18:16] C-state Range (R/W)  Specifies the encoding value of the
-    /// maximum C-State code name to be included when IO read to MWAIT
-    /// redirection is enabled by MSR_PKG_CST_CONFIG_CONTROL[bit10]: 100b - C4
-    /// is the max C-State to include 110b - C6 is the max C-State to include.
+    /// [Bits 22:16] C-State Range (R/W) The IO-port block size in which
+    /// IO-redirection will be executed (0-127). Should be programmed based on
+    /// the number of LVLx registers existing in the chipset.
     ///
-    UINT32  CStateRange:3;
-    UINT32  Reserved1:13;
+    UINT32  CStateRange:7;
+    UINT32  Reserved3:9;
     UINT32  Reserved2:32;
   } Bits;
   ///
@@ -477,8 +494,22 @@ typedef union {
   /// Individual bit fields
   ///
   struct {
-    UINT32  Reserved1:32;
-    UINT32  Reserved2:26;
+    ///
+    /// [Bits 31:0] Bank Support (SMM-RO) One bit per MCA bank. If the bit is
+    /// set, that bank supports Enhanced MCA (Default all 0; does not support
+    /// EMCA).
+    ///
+    UINT32  BankSupport:32;
+    UINT32  Reserved4:24;
+    ///
+    /// [Bit 56] Targeted SMI (SMM-RO) Set if targeted SMI is supported.
+    ///
+    UINT32  TargetedSMI:1;
+    ///
+    /// [Bit 57] SMM_CPU_SVRSTR (SMM-RO) Set if SMM SRAM save/restore feature
+    /// is supported.
+    ///
+    UINT32  SMM_CPU_SVRSTR:1;
     ///
     /// [Bit 58] SMM_Code_Access_Chk (SMM-RO) If set to 1 indicates that the
     /// SMM code access restriction is supported and a host-space interface
