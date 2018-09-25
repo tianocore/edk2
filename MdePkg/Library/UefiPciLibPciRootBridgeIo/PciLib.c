@@ -13,8 +13,6 @@
 
 **/
 
-#include <PiDxe.h>
-
 #include <Protocol/PciRootBridgeIo.h>
 
 #include <Library/PciLib.h>
