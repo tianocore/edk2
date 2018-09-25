@@ -609,7 +609,7 @@ XhcSetHsee (
                         PciIo,
                         EfiPciIoWidthUint16,
                         PCI_COMMAND_OFFSET,
-                        sizeof (XhciCmd),
+                        sizeof (XhciCmd) / sizeof (UINT16),
                         &XhciCmd
                         );
   if (!EFI_ERROR (Status)) {
