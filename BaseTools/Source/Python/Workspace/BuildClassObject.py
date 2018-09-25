@@ -13,7 +13,11 @@
 
 from collections import OrderedDict, namedtuple
 from Common.DataType import *
-
+import collections
+import re
+from collections import OrderedDict
+StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_\[\]]*$')
+ArrayIndex = re.compile("\[\s*\d{0,1}\s*\]")
 ## PcdClassObject
 #
 # This Class is used for PcdObject
@@ -41,7 +45,7 @@ from Common.DataType import *
 # @var Phase:                To store value for Phase, default is "DXE"
 #
 class PcdClassObject(object):
-    def __init__(self, Name = None, Guid = None, Type = None, DatumType = None, Value = None, Token = None, MaxDatumSize = None, SkuInfoList = {}, IsOverrided = False, GuidValue = None, validateranges = [], validlists = [], expressions = [], IsDsc = False, UserDefinedDefaultStoresFlag = False):
+    def __init__(self, Name = None, Guid = None, Type = None, DatumType = None, Value = None, Token = None, MaxDatumSize = None, SkuInfoList = None, IsOverrided = False, GuidValue = None, validateranges = None, validlists = None, expressions = None, IsDsc = False, UserDefinedDefaultStoresFlag = False):
         self.TokenCName = Name
         self.TokenSpaceGuidCName = Guid
         self.TokenSpaceGuidValue = GuidValue
@@ -51,15 +55,15 @@ class PcdClassObject(object):
         self.TokenValue = Token
         self.MaxDatumSize = MaxDatumSize
         self.MaxSizeUserSet = None
-        self.SkuInfoList = SkuInfoList
+        self.SkuInfoList = SkuInfoList if SkuInfoList is not None else OrderedDict()
         self.Phase = "DXE"
         self.Pending = False
         self.IsOverrided = IsOverrided
         self.IsFromBinaryInf = False
         self.IsFromDsc = False
-        self.validateranges = validateranges
-        self.validlists = validlists
-        self.expressions = expressions
+        self.validateranges = validateranges if validateranges is not None else []
+        self.validlists = validlists if validlists is not None else []
+        self.expressions = expressions if expressions is not None else []
         self.DscDefaultValue = None
         self.DscRawValue = {}
         if IsDsc:

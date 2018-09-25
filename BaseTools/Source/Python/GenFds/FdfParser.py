@@ -64,6 +64,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from .Capsule import EFI_CERT_TYPE_PKCS7_GUID
 from .Capsule import EFI_CERT_TYPE_RSA2048_SHA256_GUID
 from Common.RangeExpression import RangeExpression
+from collections import OrderedDict
 
 ##define T_CHAR_SPACE                ' '
 ##define T_CHAR_NULL                 '\0'
@@ -227,8 +228,8 @@ class FileProfile :
             EdkLogger.error("FdfParser", FILE_OPEN_FAILURE, ExtraData=FileName)
 
         self.FileName = FileName
-        self.PcdDict = {}
-        self.PcdLocalDict = {}
+        self.PcdDict = OrderedDict()
+        self.PcdLocalDict = OrderedDict()
         self.InfList = []
         self.InfDict = {'ArchTBD':[]}
         # ECC will use this Dict and List information
@@ -274,7 +275,7 @@ class FdfParser:
         # Key: [section name, UI name, arch]
         # Value: {MACRO_NAME : MACRO_VALUE}
         self.__MacroDict = tdict(True, 3)
-        self.__PcdDict = {}
+        self.__PcdDict = OrderedDict()
 
         self.__WipeOffArea = []
         if GenFdsGlobalVariable.WorkSpaceDir == '':

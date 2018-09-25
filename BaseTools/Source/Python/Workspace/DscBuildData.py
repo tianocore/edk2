@@ -1287,12 +1287,17 @@ class DscBuildData(PlatformBuildClassObject):
             if len(commpcds[0]) == 5:
                 return True
             return False
-
+        NoFiledValues = OrderedDict()
         if CheckStructureInComm(GlobalData.BuildOptionPcd):
-            StructurePcdInCom = {(item[0], item[1], item[2] ):(item[3], item[4]) for item in GlobalData.BuildOptionPcd } if GlobalData.BuildOptionPcd else {}
-            NoFiledValues = {(item[0], item[1]):StructurePcdInCom[item] for item in StructurePcdInCom if not item[2]}
+            StructurePcdInCom = OrderedDict()
+            for item in GlobalData.BuildOptionPcd:
+                StructurePcdInCom[(item[0], item[1], item[2] )] = (item[3], item[4])
+            for item in StructurePcdInCom:
+                if not item[2]:
+                    NoFiledValues[(item[0], item[1])] = StructurePcdInCom[item]
         else:
-            NoFiledValues = {(item[0], item[1]):[item[2]] for item in GlobalData.BuildOptionPcd}
+            for item in GlobalData.BuildOptionPcd:
+                NoFiledValues[(item[0], item[1])] = [item[2]]
         for Guid, Name in NoFiledValues:
             if (Name, Guid) in AllPcds:
                 Pcd = AllPcds.get((Name, Guid))
@@ -2219,7 +2224,7 @@ class DscBuildData(PlatformBuildClassObject):
                       'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'INCLUDE +='
 
         IncSearchList = []
-        PlatformInc = {}
+        PlatformInc = OrderedDict()
         for Cache in self._Bdb._CACHE_.values():
             if Cache.MetaFile.Ext.lower() != '.dec':
                 continue
@@ -2249,7 +2254,7 @@ class DscBuildData(PlatformBuildClassObject):
         CC_FLAGS = LinuxCFLAGS
         if sys.platform == "win32":
             CC_FLAGS = WindowsCFLAGS
-        BuildOptions = {}
+        BuildOptions = OrderedDict()
         for Options in self.BuildOptions:
             if Options[2] != EDKII_NAME:
                 continue
@@ -2264,7 +2269,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if Tag == "*" or Tag == self._Toolchain:
                     if Arch == "*" or Arch == self.Arch:
                         if Tool not in BuildOptions:
-                            BuildOptions[Tool] = {}
+                            BuildOptions[Tool] = OrderedDict()
                         if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or self.BuildOptions[Options].startswith('='):
                             BuildOptions[Tool][Attr] = self.BuildOptions[Options]
                         else:
@@ -2469,7 +2474,7 @@ class DscBuildData(PlatformBuildClassObject):
                                                     PcdValue,
                                                     '',
                                                     MaxDatumSize,
-                                                    {SkuName : SkuInfo},
+                                                    OrderedDict({SkuName : SkuInfo}),
                                                     False,
                                                     None,
                                                     IsDsc=True)
@@ -2526,7 +2531,7 @@ class DscBuildData(PlatformBuildClassObject):
             return False
 
     def CompletePcdValues(self, PcdSet):
-        Pcds = {}
+        Pcds = OrderedDict()
         DefaultStoreObj = DefaultStore(self._GetDefaultStores())
         SkuIds = {skuname:skuid for skuname, skuid in self.SkuIdMgr.AvailableSkuIdSet.items() if skuname != TAB_COMMON}
         DefaultStores = set(storename for pcdobj in PcdSet.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict)
@@ -2664,7 +2669,7 @@ class DscBuildData(PlatformBuildClassObject):
                                                 DefaultValue,
                                                 '',
                                                 '',
-                                                {SkuName : SkuInfo},
+                                                OrderedDict({SkuName : SkuInfo}),
                                                 False,
                                                 None,
                                                 pcdDecObject.validateranges,
@@ -2808,7 +2813,7 @@ class DscBuildData(PlatformBuildClassObject):
                                                 InitialValue,
                                                 '',
                                                 MaxDatumSize,
-                                                {SkuName : SkuInfo},
+                                                OrderedDict({SkuName : SkuInfo}),
                                                 False,
                                                 None,
                                                 IsDsc=True)
