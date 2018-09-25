@@ -38,11 +38,11 @@ InternalSyncIncrement (
   __asm__ __volatile__ (
     "movl    $1, %%eax  \n\t"
     "lock               \n\t"
-    "xadd    %%eax, %2  \n\t"
+    "xadd    %%eax, %1  \n\t"
     "inc     %%eax          "
     : "=a" (Result),          // %0
-      "=m" (*Value)           // %1
-    : "m"  (*Value)           // %2
+      "+m" (*Value)           // %1
+    :                         // no inputs that aren't also outputs
     : "memory",
       "cc"
     );
@@ -74,11 +74,11 @@ InternalSyncDecrement (
   __asm__ __volatile__ (
     "movl    $-1, %%eax  \n\t"
     "lock                \n\t"
-    "xadd    %%eax, %2   \n\t"
+    "xadd    %%eax, %1   \n\t"
     "dec     %%eax                  "
     : "=a" (Result),          // %0
-      "=m" (*Value)           // %1
-    : "m"  (*Value)           // %2
+      "+m" (*Value)           // %1
+    :                         // no inputs that aren't also outputs
     : "memory",
       "cc"
     );
