@@ -4,7 +4,17 @@
 #  This module produces EFI iSCSI Initiator Name Protocol upon EFI TCPv4 Protocol
 #  and EFI DHCPv4 Protocol, to provide the capability to do the transport for SCSI
 #  data over TCP/IP. It installs EFI HII Configuration Access Protocol to provide
-#  one way to configurate the iSCSI setting.
+#  one way to configurate the iSCSI setting. This driver only supports IPv4 network
+#  stack.
+#
+#  Notes:
+#  1) This driver can't co-work with the IScsiDxe driver in NetworkPkg.
+#  2) This driver might have some issues that have been fixed in the IScsiDxe driver
+#     in NetworkPkg.
+#  3) This driver supports fewer features than the IScsiDxe driver in NetworkPkg
+#     (e.g. IPv6, Dns support for target URL configuration, iSCSI keyword support).
+#  4) IScsiDxe driver in NetworkPkg is recommended for use instead of this one even
+#     though both of them can be used.
 #
 #  Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 #  This program and the accompanying materials
