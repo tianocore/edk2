@@ -187,7 +187,7 @@ if __name__ == '__main__':
     # Write output file that contains hash GUID, Public Key, Signature, and Input data
     #
     args.OutputFile = open(args.OutputFileName, 'wb')
-    args.OutputFile.write(EFI_HASH_ALGORITHM_SHA256_GUID.get_bytes_le())
+    args.OutputFile.write(EFI_HASH_ALGORITHM_SHA256_GUID.bytes_le)
     args.OutputFile.write(bytearray.fromhex(PublicKey))
     args.OutputFile.write(Signature)
     args.OutputFile.write(args.InputFileBuffer)
