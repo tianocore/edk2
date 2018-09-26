@@ -15,24 +15,24 @@
 !ERROR "BASE_TOOLS_PATH is not set! Please run toolsetup.bat first!"
 !ENDIF
 
-SUBDIRS = $(BASE_TOOLS_PATH)\Source\C $(BASE_TOOLS_PATH)\Source\Python
+SUBDIRS = $(BASE_TOOLS_PATH)\Source\C
 
-all: c python
+all: c
 
 c :
-  @$(PYTHON_HOME)\python.exe $(BASE_TOOLS_PATH)\Source\C\Makefiles\NmakeSubdirs.py  all $(BASE_TOOLS_PATH)\Source\C
+  @$(PYTHON3) $(BASE_TOOLS_PATH)\Source\C\Makefiles\NmakeSubdirs.py  all $(BASE_TOOLS_PATH)\Source\C
 
 python:
-  @$(PYTHON_HOME)\python.exe $(BASE_TOOLS_PATH)\Source\C\Makefiles\NmakeSubdirs.py  all $(BASE_TOOLS_PATH)\Source\Python
+  @$(PYTHON3) $(BASE_TOOLS_PATH)\Source\C\Makefiles\NmakeSubdirs.py  all $(BASE_TOOLS_PATH)\Source\Python
 
 subdirs: $(SUBDIRS)
-  @$(PYTHON_HOME)\python.exe $(BASE_TOOLS_PATH)\Source\C\Makefiles\NmakeSubdirs.py  all $**
+  @$(PYTHON3) $(BASE_TOOLS_PATH)\Source\C\Makefiles\NmakeSubdirs.py  all $**
 
 .PHONY: clean
 clean:
-  $(PYTHON_HOME)\python.exe $(BASE_TOOLS_PATH)\Source\C\Makefiles\NmakeSubdirs.py clean $(SUBDIRS)
+  $(PYTHON3) $(BASE_TOOLS_PATH)\Source\C\Makefiles\NmakeSubdirs.py clean $(SUBDIRS)
 
 .PHONY: cleanall
 cleanall:
-  $(PYTHON_HOME)\python.exe $(BASE_TOOLS_PATH)\Source\C\Makefiles\NmakeSubdirs.py  cleanall $(SUBDIRS)
+  $(PYTHON3) $(BASE_TOOLS_PATH)\Source\C\Makefiles\NmakeSubdirs.py  cleanall $(SUBDIRS)
 
