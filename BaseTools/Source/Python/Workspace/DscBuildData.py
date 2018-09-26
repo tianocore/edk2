@@ -1304,16 +1304,29 @@ class DscBuildData(PlatformBuildClassObject):
                 if isinstance(self._DecPcds.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName), None), StructurePcd):
                     self._DecPcds.get((Pcd.TokenCName, Pcd.TokenSpaceGuidCName)).PcdValueFromComm = NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0]
                 else:
-                    Pcd.PcdValueFromComm = NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0]
-                    Pcd.DefaultValue = NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0]
+                    if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
+                        Pcd.PcdValueFromComm = NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0]
+                        Pcd.DefaultValue = NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0]
+                    else:
+                        Pcd.PcdValueFromComm = StringToArray(NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0])
+                        Pcd.DefaultValue = StringToArray(NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0])
                     for sku in Pcd.SkuInfoList:
                         SkuInfo = Pcd.SkuInfoList[sku]
                         if SkuInfo.DefaultValue:
-                            SkuInfo.DefaultValue = NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0]
+                            if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
+                                SkuInfo.DefaultValue = NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0]
+                            else:
+                                SkuInfo.DefaultValue = StringToArray(NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0])
                         else:
-                            SkuInfo.HiiDefaultValue = NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0]
+                            if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
+                                SkuInfo.HiiDefaultValue = NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0]
+                            else:
+                                SkuInfo.HiiDefaultValue = StringToArray(NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0])
                             for defaultstore in SkuInfo.DefaultStoreDict:
-                                SkuInfo.DefaultStoreDict[defaultstore] = NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0]
+                                if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
+                                    SkuInfo.DefaultStoreDict[defaultstore] = NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0]
+                                else:
+                                    SkuInfo.DefaultStoreDict[defaultstore] = StringToArray(NoFiledValues[(Pcd.TokenSpaceGuidCName, Pcd.TokenCName)][0])
                     if Pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII]]:
                         if Pcd.DatumType == TAB_VOID:
                             if not Pcd.MaxDatumSize:
@@ -1325,17 +1338,26 @@ class DscBuildData(PlatformBuildClassObject):
             else:
                 PcdInDec = self.DecPcds.get((Name, Guid))
                 if PcdInDec:
-                    PcdInDec.PcdValueFromComm = NoFiledValues[(Guid, Name)][0]
+                    if PcdInDec.DatumType in TAB_PCD_NUMERIC_TYPES:
+                        PcdInDec.PcdValueFromComm = NoFiledValues[(Guid, Name)][0]
+                    else:
+                        PcdInDec.PcdValueFromComm = StringToArray(NoFiledValues[(Guid, Name)][0])
                     if PcdInDec.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_FIXED_AT_BUILD],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_PATCHABLE_IN_MODULE],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_FEATURE_FLAG],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX]]:
                         self.Pcds[Name, Guid] = copy.deepcopy(PcdInDec)
-                        self.Pcds[Name, Guid].DefaultValue = NoFiledValues[( Guid, Name)][0]
+                        if PcdInDec.DatumType in TAB_PCD_NUMERIC_TYPES:
+                            self.Pcds[Name, Guid].DefaultValue = NoFiledValues[( Guid, Name)][0]
+                        else:
+                            self.Pcds[Name, Guid].DefaultValue = StringToArray(NoFiledValues[( Guid, Name)][0])
                     if PcdInDec.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC],
                                         self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX]]:
-                        self.Pcds[Name, Guid].SkuInfoList = {TAB_DEFAULT:SkuInfoClass(TAB_DEFAULT, self.SkuIds[TAB_DEFAULT][0], '', '', '', '', '', NoFiledValues[( Guid, Name)][0])}
+                        if PcdInDec.DatumType in TAB_PCD_NUMERIC_TYPES:
+                            self.Pcds[Name, Guid].SkuInfoList = {TAB_DEFAULT:SkuInfoClass(TAB_DEFAULT, self.SkuIds[TAB_DEFAULT][0], '', '', '', '', '', NoFiledValues[( Guid, Name)][0])}
+                        else:
+                            self.Pcds[Name, Guid].SkuInfoList = {TAB_DEFAULT:SkuInfoClass(TAB_DEFAULT, self.SkuIds[TAB_DEFAULT][0], '', '', '', '', '',  StringToArray(NoFiledValues[( Guid, Name)][0]))}
         return AllPcds
 
     def OverrideByFdfOverAll(self,AllPcds):
