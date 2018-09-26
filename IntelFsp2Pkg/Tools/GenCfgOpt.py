@@ -1,6 +1,6 @@
 ## @ GenCfgOpt.py
 #
-# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -449,7 +449,7 @@ EndList
                 IsUpdSect = False
                 if  Match.group(1).lower() == "Defines".lower():
                     IsDefSect = True
-                if  Match.group(1).lower() == "PcdsFeatureFlag".lower():
+                if  (Match.group(1).lower() == "PcdsFeatureFlag".lower() or Match.group(1).lower() == "PcdsFixedAtBuild".lower()):
                     IsPcdSect = True
                 elif Match.group(1).lower() == "PcdsDynamicVpd.Upd".lower():
                     ConfigDict = {}
@@ -491,7 +491,7 @@ EndList
                             IfStack.append(Result)
                             ElifStack.append(0)
                         else:
-                            Match  = re.match("!(if|elseif)\s+(.+)", DscLine)
+                            Match  = re.match("!(if|elseif)\s+(.+)", DscLine.split("#")[0])
                             if Match:
                                 Result = self.EvaluateExpress(Match.group(2))
                                 if Match.group(1) == "if":
