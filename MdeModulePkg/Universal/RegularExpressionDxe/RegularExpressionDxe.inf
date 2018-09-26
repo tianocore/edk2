@@ -84,7 +84,7 @@
   INTEL:*_*_*_CC_FLAGS         = /Oi-
 
   # Oniguruma: potentially uninitialized local variable used
-  MSFT:*_*_*_CC_FLAGS = /wd4701
+  MSFT:*_*_*_CC_FLAGS = /wd4701 /wd4703
 
   # Oniguruma: intrinsic function not declared
   MSFT:*_*_*_CC_FLAGS = /wd4164
