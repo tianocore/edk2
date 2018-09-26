@@ -1415,6 +1415,7 @@ class DscBuildData(PlatformBuildClassObject):
         Pcds = AllPcds
         DefaultStoreMgr = DefaultStore(self.DefaultStores)
         SkuIds = self.SkuIds
+        self.SkuIdMgr.AvailableSkuIdSet.update({TAB_DEFAULT:0})
         DefaultStores = {storename for pcdobj in AllPcds.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict}
 
         S_PcdSet = []
