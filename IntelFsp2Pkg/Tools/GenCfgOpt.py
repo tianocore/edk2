@@ -1038,6 +1038,13 @@ EndList
         NewTextBody.extend(OldTextBody)
         return NewTextBody
 
+    def WriteLinesWithoutTailingSpace (self, HeaderFd, Line):
+        TxtBody2 = Line.splitlines(True)
+        for Line2 in TxtBody2:
+            Line2 = Line2.rstrip()
+            Line2 += '\n'
+            HeaderFd.write (Line2)
+        return 0
     def CreateHeaderFile (self, InputHeaderFile):
         FvDir = self._FvDir
 
@@ -1237,7 +1244,7 @@ EndList
                 Index += 1
                 for Item in range(len(StructStart)):
                     if Index >= StructStartWithComment[Item] and Index <= StructEnd[Item]:
-                        HeaderFd.write (Line)
+                        self.WriteLinesWithoutTailingSpace(HeaderFd, Line)
             HeaderFd.write("#pragma pack()\n\n")
             HeaderFd.write("#endif\n")
             HeaderFd.close()
@@ -1282,7 +1289,7 @@ EndList
                 Index += 1
                 for Item in range(len(StructStart)):
                     if Index >= StructStartWithComment[Item] and Index <= StructEnd[Item]:
-                        HeaderFd.write (Line)
+                        self.WriteLinesWithoutTailingSpace(HeaderFd, Line)
         HeaderFd.write("#pragma pack()\n\n")
         HeaderFd.write("#endif\n")
         HeaderFd.close()
