@@ -418,6 +418,8 @@ EndList
         return ""
 
     def ParseDscFile (self, DscFile, FvDir):
+        Hardcode = False
+        AutoAlign = False
         self._CfgItemList = []
         self._CfgPageDict = {}
         self._CfgBlkDict  = {}
@@ -438,6 +440,8 @@ EndList
         DscLines     = DscFd.readlines()
         DscFd.close()
 
+        MaxAlign = 32   #Default align to 32, but if there are 64 bit unit, align to 64
+        SizeAlign = 0   #record the struct max align
         while len(DscLines):
             DscLine  = DscLines.pop(0).strip()
             Handle   = False
@@ -464,6 +468,7 @@ EndList
                     ConfigDict['comment'] = ''
                     ConfigDict['subreg']  = []
                     IsUpdSect = True
+                    Offset    = 0
             else:
                 if IsDefSect or IsPcdSect or IsUpdSect or IsVpdSect:
                     if re.match("^!else($|\s+#.+)", DscLine):
@@ -530,6 +535,7 @@ EndList
                                         NewDscLines = IncludeDsc.readlines()
                                         IncludeDsc.close()
                                         DscLines = NewDscLines + DscLines
+                                        Offset = 0
                                     else:
                                         if DscLine.startswith('!'):
                                             print("ERROR: Unrecoginized directive for line '%s'" % DscLine)
@@ -620,13 +626,22 @@ EndList
 
                 # Check VPD/UPD
                 if IsUpdSect:
-                    Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
+                    Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+|\*)\s*\|\s*(\d+|0x[0-9a-fA-F]+)\s*\|\s*(.+)",DscLine)
                 else:
                     Match = re.match("^([_a-zA-Z0-9]+).([_a-zA-Z0-9]+)\s*\|\s*(0x[0-9A-F]+)(?:\s*\|\s*(.+))?",  DscLine)
                 if Match:
                     ConfigDict['space']  = Match.group(1)
                     ConfigDict['cname']  = Match.group(2)
-                    ConfigDict['offset'] = int (Match.group(3), 16)
+                    if Match.group(3) != '*':
+                        Hardcode = True
+                        Offset =  int (Match.group(3), 16)
+                    else:
+                        AutoAlign = True
+
+                    if Hardcode and AutoAlign:
+                        print("Hardcode and auto-align mixed mode is not supported by GenCfgOpt")
+                        raise SystemExit
+                    ConfigDict['offset'] = Offset
                     if ConfigDict['order'] == -1:
                         ConfigDict['order'] = ConfigDict['offset'] << 8
                     else:
@@ -638,6 +653,7 @@ EndList
                             Length  = int (Match.group(4), 16)
                         else :
                             Length  = int (Match.group(4))
+                        Offset += Length
                     else:
                         Value = Match.group(4)
                         if Value is None:
@@ -665,6 +681,52 @@ EndList
                         ConfigDict['help']   = ''
                         ConfigDict['type']   = ''
                         ConfigDict['option'] = ''
+                    if IsUpdSect and AutoAlign:
+                        ItemLength = int(ConfigDict['length'])
+                        ItemOffset = int(ConfigDict['offset'])
+                        ItemStruct = ConfigDict['struct']
+                        Unit = 1
+                        if ItemLength in [1, 2, 4, 8] and not ConfigDict['value'].startswith('{'):
+                            Unit = ItemLength
+                            # If there are 64 bit unit, align to 64
+                            if Unit == 8:
+                                MaxAlign = 64
+                                SizeAlign = 8
+                        if ItemStruct != '':
+                            UnitDict = {'UINT8':1, 'UINT16':2, 'UINT32':4, 'UINT64':8}
+                            if ItemStruct in ['UINT8', 'UINT16', 'UINT32', 'UINT64']:
+                                Unit = UnitDict[ItemStruct]
+                                # If there are 64 bit unit, align to 64
+                                if Unit == 8:
+                                    MaxAlign = 64
+                                SizeAlign = max(SizeAlign, Unit)
+                        if (ConfigDict['embed'].find(':START') != -1):
+                            Base = ItemOffset
+                        SubOffset = ItemOffset - Base
+                        SubRemainder = SubOffset % Unit
+                        if SubRemainder:
+                            Diff = Unit - SubRemainder
+                            Offset = Offset + Diff
+                            ItemOffset = ItemOffset + Diff
+
+                        if (ConfigDict['embed'].find(':END') != -1):
+                            Remainder = Offset % (MaxAlign/8)   # MaxAlign is either 32 or 64
+                            if Remainder:
+                                Diff = (MaxAlign/8) - Remainder
+                                Offset = Offset + Diff
+                                ItemOffset = ItemOffset + Diff
+                            MaxAlign = 32                       # Reset to default 32 align when struct end
+                        if (ConfigDict['cname'] == 'UpdTerminator'):
+                            # ItemLength is the size of UpdTerminator
+                            # Itemlength might be 16, 32, or 64
+                            # Struct align to 64 if UpdTerminator
+                            # or struct size is 64 bit, else align to 32
+                            Remainder = Offset % max(ItemLength/8, 4, SizeAlign)
+                            Offset = Offset + ItemLength
+                            if Remainder:
+                                Diff = max(ItemLength/8, 4, SizeAlign) - Remainder
+                                ItemOffset = ItemOffset + Diff
+                        ConfigDict['offset'] = ItemOffset
 
                     self._CfgItemList.append(ConfigDict.copy())
                     ConfigDict['name']   = ''
