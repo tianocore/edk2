@@ -936,6 +936,8 @@ DownloadFile (
   UINT8                 BlksizeBuf[10];
   UINT8                 WindowsizeBuf[10];
 
+  ZeroMem (&Mtftp4Token, sizeof (EFI_MTFTP4_TOKEN));
+
   // Downloaded file can be large. BS.AllocatePages() is more faster
   // than AllocatePool() and avoid fragmentation.
   // The downloaded file could be an EFI application. Marking the
@@ -961,7 +963,6 @@ DownloadFile (
   TftpContext->DownloadedNbOfBytes   = 0;
   TftpContext->LastReportedNbOfBytes = 0;
 
-  ZeroMem (&Mtftp4Token, sizeof (EFI_MTFTP4_TOKEN));
   Mtftp4Token.Filename    = (UINT8*)AsciiFilePath;
   Mtftp4Token.BufferSize  = FileSize;
   Mtftp4Token.Buffer      = Buffer;
