@@ -177,6 +177,18 @@ UsbCreateDesc (
     DescLen = sizeof (EFI_USB_ENDPOINT_DESCRIPTOR);
     CtrlLen = sizeof (USB_ENDPOINT_DESC);
     break;
+
+  default:
+    ASSERT (FALSE);
+    return NULL;
+  }
+
+  //
+  // Total length is too small that cannot hold the single descriptor header plus data. 
+  //
+  if (Len <= sizeof (USB_DESC_HEAD)) {
+    DEBUG ((DEBUG_ERROR, "UsbCreateDesc: met mal-format descriptor, total length = %d!\n", Len));
+    return NULL;
   }
 
   //
@@ -184,24 +196,43 @@ UsbCreateDesc (
   // format. Skip the descriptor that isn't of this Type
   //
   Offset = 0;
-  Head   = (USB_DESC_HEAD*)DescBuf;
+  Head   = (USB_DESC_HEAD *)DescBuf;
+  while (Offset < Len - sizeof (USB_DESC_HEAD)) {
+    //
+    // Above condition make sure Head->Len and Head->Type are safe to access
+    //
+    Head = (USB_DESC_HEAD *)&DescBuf[Offset];
 
-  while ((Offset < Len) && (Head->Type != Type)) {
-    Offset += Head->Len;
-    if (Len <= Offset) {
-      DEBUG (( EFI_D_ERROR, "UsbCreateDesc: met mal-format descriptor, Beyond boundary!\n"));
+    if (Head->Len == 0) {
+      DEBUG ((DEBUG_ERROR, "UsbCreateDesc: met mal-format descriptor, Head->Len = 0!\n"));
       return NULL;
     }
-    Head    = (USB_DESC_HEAD*)(DescBuf + Offset);
-    if (Head->Len == 0) {
-      DEBUG (( EFI_D_ERROR, "UsbCreateDesc: met mal-format descriptor, Head->Len = 0!\n"));
+
+    //
+    // Make sure no overflow when adding Head->Len to Offset.
+    //
+    if (Head->Len > MAX_UINTN - Offset) {
+      DEBUG ((DEBUG_ERROR, "UsbCreateDesc: met mal-format descriptor, Head->Len = %d!\n", Head->Len));
       return NULL;
+    }
+
+    Offset += Head->Len;
+
+    if (Head->Type == Type) {
+      break;
     }
   }
 
-  if ((Len <= Offset)      || (Len < Offset + Head->Len) ||
-      (Head->Type != Type) || (Head->Len < DescLen)) {
-    DEBUG (( EFI_D_ERROR, "UsbCreateDesc: met mal-format descriptor\n"));
+  //
+  // Head->Len is invalid resulting data beyond boundary, or
+  // Descriptor cannot be found: No such type.
+  //
+  if (Len < Offset) {
+    DEBUG ((DEBUG_ERROR, "UsbCreateDesc: met mal-format descriptor, Offset/Len = %d/%d!\n", Offset, Len));
+  }
+
+  if ((Head->Type != Type) || (Head->Len < DescLen)) {
+    DEBUG ((DEBUG_ERROR, "UsbCreateDesc: descriptor cannot be found, Header(T/L) = %d/%d!\n", Head->Type, Head->Len));
     return NULL;
   }
 
@@ -212,7 +243,7 @@ UsbCreateDesc (
 
   CopyMem (Desc, Head, (UINTN) DescLen);
 
-  *Consumed = Offset + Head->Len;
+  *Consumed = Offset;
 
   return Desc;
 }
