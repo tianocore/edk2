@@ -772,6 +772,13 @@ UsbGetOneConfig (
 
   DEBUG (( EFI_D_INFO, "UsbGetOneConfig: total length is %d\n", Desc.TotalLength));
 
+  //
+  // Reject if TotalLength even cannot cover itself.
+  //
+  if (Desc.TotalLength < OFFSET_OF (EFI_USB_CONFIG_DESCRIPTOR, TotalLength) + sizeof (Desc.TotalLength)) {
+    return NULL;
+  }
+
   Buf = AllocateZeroPool (Desc.TotalLength);
 
   if (Buf == NULL) {
