@@ -35,12 +35,6 @@
   PerformanceLib
   ReportStatusCodeLib
 
-[Pcd]
-  gIntelFsp2PkgTokenSpaceGuid.PcdGlobalDataPointerAddress    ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase            ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize            ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspTemporaryRamSize         ## CONSUMES
-
 [Guids]
   gFspPerformanceDataGuid                                   ## CONSUMES ## GUID
   gFspEventEndOfFirmwareGuid                                ## PRODUCES ## GUID
@@ -49,6 +43,3 @@
 [Protocols]
   gEfiPciEnumerationCompleteProtocolGuid                    ## CONSUMES
 
-[FixedPcd]
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPatchEntry        ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxPerfEntry         ## CONSUMES
