@@ -57,7 +57,7 @@ PeimInitializeVariableServices (
 
   @param VarStoreHeader  Pointer to the Variable Store Header.
 
-  @return Pointer to the first variable header
+  @return Pointer to the first variable header.
 
 **/
 VARIABLE_HEADER *
@@ -66,18 +66,22 @@ GetStartPointer (
   )
 {
   //
-  // The end of variable store
+  // The start of variable store
   //
   return (VARIABLE_HEADER *) HEADER_ALIGN (VarStoreHeader + 1);
 }
 
 
 /**
-  This code gets the pointer to the last variable memory pointer byte.
 
-  @param  VarStoreHeader  Pointer to the Variable Store Header.
+  Gets the pointer to the end of the variable storage area.
 
-  @return VARIABLE_HEADER* pointer to last unavailable Variable Header.
+  This function gets pointer to the end of the variable storage
+  area, according to the input variable store header.
+
+  @param VarStoreHeader  Pointer to the Variable Store Header.
+
+  @return Pointer to the end of the variable storage area.
 
 **/
 VARIABLE_HEADER *

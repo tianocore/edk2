@@ -681,7 +681,7 @@ GetStartPointer (
   )
 {
   //
-  // The end of variable store.
+  // The start of variable store.
   //
   return (VARIABLE_HEADER *) HEADER_ALIGN (VarStoreHeader + 1);
 }
