@@ -1589,8 +1589,12 @@ def CheckPcdDatum(Type, Value):
             return False, "Invalid value [%s] of type [%s]; must be one of TRUE, True, true, 0x1, 0x01, 1"\
                           ", FALSE, False, false, 0x0, 0x00, 0" % (Value, Type)
     elif Type in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64]:
+        if Value and int(Value, 0) < 0:
+            return False, "PCD can't be set to negative value[%s] for datum type [%s]" % (Value, Type)
         try:
             Value = long(Value, 0)
+            if Value > MAX_VAL_TYPE[Type]:
+                return False, "Too large PCD value[%s] for datum type [%s]" % (Value, Type)
         except:
             return False, "Invalid value [%s] of type [%s];"\
                           " must be a hexadecimal, decimal or octal in C language format." % (Value, Type)

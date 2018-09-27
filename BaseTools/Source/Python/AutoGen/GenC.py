@@ -1015,50 +1015,19 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
                 EdkLogger.error("build", AUTOGEN_ERROR,
                                 "PCD value is not valid dec or hex number for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
                                 ExtraData="[%s]" % str(Info))
-            if Pcd.DatumType == TAB_UINT64:
-                if ValueNumber < 0:
-                    EdkLogger.error("build", AUTOGEN_ERROR,
-                                    "PCD can't be set to negative value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
-                                    ExtraData="[%s]" % str(Info))
-                elif ValueNumber >= 0x10000000000000000:
-                    EdkLogger.error("build", AUTOGEN_ERROR,
-                                    "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
-                                    ExtraData="[%s]" % str(Info))
-                if not Value.endswith('ULL'):
-                    Value += 'ULL'
-            elif Pcd.DatumType == TAB_UINT32:
-                if ValueNumber < 0:
-                    EdkLogger.error("build", AUTOGEN_ERROR,
-                                    "PCD can't be set to negative value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
-                                    ExtraData="[%s]" % str(Info))
-                elif ValueNumber >= 0x100000000:
-                    EdkLogger.error("build", AUTOGEN_ERROR,
-                                    "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
-                                    ExtraData="[%s]" % str(Info))
-                if not Value.endswith('U'):
-                    Value += 'U'
-            elif Pcd.DatumType == TAB_UINT16:
-                if ValueNumber < 0:
-                    EdkLogger.error("build", AUTOGEN_ERROR,
-                                    "PCD can't be set to negative value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
-                                    ExtraData="[%s]" % str(Info))
-                elif ValueNumber >= 0x10000:
-                    EdkLogger.error("build", AUTOGEN_ERROR,
-                                    "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
-                                    ExtraData="[%s]" % str(Info))
-                if not Value.endswith('U'):
-                    Value += 'U'
-            elif Pcd.DatumType == TAB_UINT8:
-                if ValueNumber < 0:
-                    EdkLogger.error("build", AUTOGEN_ERROR,
-                                    "PCD can't be set to negative value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
-                                    ExtraData="[%s]" % str(Info))
-                elif ValueNumber >= 0x100:
-                    EdkLogger.error("build", AUTOGEN_ERROR,
-                                    "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
-                                    ExtraData="[%s]" % str(Info))
-                if not Value.endswith('U'):
-                    Value += 'U'
+            if ValueNumber < 0:
+                EdkLogger.error("build", AUTOGEN_ERROR,
+                                "PCD can't be set to negative value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
+                                ExtraData="[%s]" % str(Info))
+            elif ValueNumber > MAX_VAL_TYPE[Pcd.DatumType]:
+                EdkLogger.error("build", AUTOGEN_ERROR,
+                                "Too large PCD value for datum type [%s] of PCD %s.%s" % (Pcd.DatumType, Pcd.TokenSpaceGuidCName, TokenCName),
+                                ExtraData="[%s]" % str(Info))
+            if Pcd.DatumType == TAB_UINT64 and not Value.endswith('ULL'):
+                Value += 'ULL'
+            elif Pcd.DatumType != TAB_UINT64 and not Value.endswith('U'):
+                Value += 'U'
+
         if Pcd.DatumType not in TAB_PCD_NUMERIC_TYPES:
             if not Pcd.MaxDatumSize:
                 EdkLogger.error("build", AUTOGEN_ERROR,

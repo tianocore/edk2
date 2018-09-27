@@ -21,6 +21,7 @@ import array
 import re
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from struct import *
+from Common.DataType import MAX_SIZE_TYPE, MAX_VAL_TYPE
 import Common.EdkLogger as EdkLogger
 import Common.BuildToolError as BuildToolError
 
@@ -125,37 +126,18 @@ class PcdEntry:
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
                             "Invalid size %d for PCD %s in integer datum size(File: %s Line: %s)." % (Size, self.PcdCName, self.FileName, self.Lineno))
 
-        if Size == 1:
-            if IntValue < 0:
-                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
-                                "PCD can't be set to negative value %d for PCD %s in UINT8 datum type(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
-            elif IntValue >= 0x100:
-                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
-                                "Too large PCD value %d for datum type UINT8 for PCD %s(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
-        elif Size == 2:
-            if IntValue < 0:
-                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
-                                "PCD can't be set to negative value %d for PCD %s in UINT16 datum type(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
-            elif IntValue >= 0x10000:
-                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
-                                "Too large PCD value %d for datum type UINT16 for PCD %s(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
-        elif Size == 4:
-            if IntValue < 0:
-                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
-                                "PCD can't be set to negative value %d for PCD %s in UINT32 datum type(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
-            elif IntValue >= 0x100000000:
-                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
-                                "Too large PCD value %d for datum type UINT32 for PCD %s(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
-        elif Size == 8:
-            if IntValue < 0:
-                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
-                                "PCD can't be set to negative value %d for PCD %s in UINT32 datum type(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
-            elif IntValue >= 0x10000000000000000:
-                EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
-                                "Too large PCD value %d for datum type UINT32 for PCD %s(File: %s Line: %s)." % (IntValue, self.PcdCName, self.FileName, self.Lineno))
-        else:
-            EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
-                            "Invalid size %d for PCD %s in integer datum size(File: %s Line: %s)." % (Size, self.PcdCName, self.FileName, self.Lineno))
+        for Type, MaxSize in MAX_SIZE_TYPE.items():
+            if Type == 'BOOLEAN':
+                continue
+            if Size == MaxSize:
+                if IntValue < 0:
+                    EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
+                                    "PCD can't be set to negative value %d for PCD %s in %s datum type(File: %s Line: %s)." % (
+                                    IntValue, self.PcdCName, Type, self.FileName, self.Lineno))
+                elif IntValue > MAX_VAL_TYPE[Type]:
+                    EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
+                                    "Too large PCD value %d for datum type %s for PCD %s(File: %s Line: %s)." % (
+                                    IntValue, Type, self.PcdCName, self.FileName, self.Lineno))
 
         try:
             self.PcdValue = pack(_FORMAT_CHAR[Size], IntValue)
