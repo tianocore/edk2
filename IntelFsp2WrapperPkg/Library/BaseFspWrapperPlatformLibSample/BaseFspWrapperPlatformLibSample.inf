@@ -55,6 +55,3 @@
 
 [LibraryClasses]
 
-[Pcd]
-  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase  ## CONSUMES
-  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize  ## CONSUMES
