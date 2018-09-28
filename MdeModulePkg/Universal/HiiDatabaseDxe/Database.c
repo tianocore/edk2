@@ -898,7 +898,7 @@ UpdateDefaultSettingInFormPackage (
       IfrScope         = IfrOpHdr->Scope;
       IfrQuestionType  = IfrOpHdr->OpCode;
       IfrQuestionHdr   = (EFI_IFR_QUESTION_HEADER *) (IfrOpHdr + 1);
-      IfrCheckBox      = (EFI_IFR_CHECKBOX *) (IfrOpHdr + 1);
+      IfrCheckBox      = (EFI_IFR_CHECKBOX *) IfrOpHdr;
       EfiVarStoreIndex = IsEfiVarStoreQuestion (IfrQuestionHdr, EfiVarStoreList, EfiVarStoreNumber);
       Width            = sizeof (BOOLEAN);
       if (EfiVarStoreIndex < EfiVarStoreNumber) {
