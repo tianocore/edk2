@@ -1914,10 +1914,10 @@ HttpTcpReceiveHeader (
       }
 
       //
-      // Append the response string.
+      // Append the response string along with a Null-terminator.
       //
       *BufferSize = *SizeofHeaders + Fragment.Len;
-      Buffer      = AllocateZeroPool (*BufferSize);
+      Buffer      = AllocatePool (*BufferSize + 1);
       if (Buffer == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         return Status;
@@ -1933,6 +1933,7 @@ HttpTcpReceiveHeader (
         Fragment.Bulk,
         Fragment.Len
         );
+      *(Buffer + *BufferSize) = '\0';
       *HttpHeaders   = Buffer;
       *SizeofHeaders = *BufferSize;
 
@@ -2013,10 +2014,10 @@ HttpTcpReceiveHeader (
       }
 
       //
-      // Append the response string.
+      // Append the response string along with a Null-terminator.
       //
       *BufferSize = *SizeofHeaders + Fragment.Len;
-      Buffer      = AllocateZeroPool (*BufferSize);
+      Buffer      = AllocatePool (*BufferSize + 1);
       if (Buffer == NULL) {
         Status = EFI_OUT_OF_RESOURCES;
         return Status;
@@ -2032,6 +2033,7 @@ HttpTcpReceiveHeader (
         Fragment.Bulk,
         Fragment.Len
         );
+      *(Buffer + *BufferSize) = '\0';
       *HttpHeaders   = Buffer;
       *SizeofHeaders = *BufferSize;
 
