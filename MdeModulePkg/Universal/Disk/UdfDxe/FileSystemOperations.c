@@ -468,8 +468,6 @@ DuplicateFid (
   *NewFileIdentifierDesc =
     (UDF_FILE_IDENTIFIER_DESCRIPTOR *)AllocateCopyPool (
       (UINTN) GetFidDescriptorLength (FileIdentifierDesc), FileIdentifierDesc);
-
-  ASSERT (*NewFileIdentifierDesc != NULL);
 }
 
 /**
@@ -490,8 +488,6 @@ DuplicateFe (
   )
 {
   *NewFileEntry = AllocateCopyPool (Volume->FileEntrySize, FileEntry);
-
-  ASSERT (*NewFileEntry != NULL);
 }
 
 /**
@@ -1370,7 +1366,15 @@ InternalFindFile (
     }
 
     DuplicateFe (BlockIo, Volume, Parent->FileEntry, &File->FileEntry);
+    if (File->FileEntry == NULL) {
+      return EFI_OUT_OF_RESOURCES;
+    }
+
     DuplicateFid (Parent->FileIdentifierDesc, &File->FileIdentifierDesc);
+    if (File->FileIdentifierDesc == NULL) {
+      FreePool (File->FileEntry);
+      return EFI_OUT_OF_RESOURCES;
+    }
 
     return EFI_SUCCESS;
   }
@@ -1732,9 +1736,20 @@ FindFile (
         // We've already a file pointer (Root) for the root directory. Duplicate
         // its FE/EFE and FID descriptors.
         //
-        DuplicateFe (BlockIo, Volume, Root->FileEntry, &File->FileEntry);
-        DuplicateFid (Root->FileIdentifierDesc, &File->FileIdentifierDesc);
         Status = EFI_SUCCESS;
+        DuplicateFe (BlockIo, Volume, Root->FileEntry, &File->FileEntry);
+        if (File->FileEntry == NULL) {
+          Status = EFI_OUT_OF_RESOURCES;
+        } else {
+          //
+          // File->FileEntry is not NULL.
+          //
+          DuplicateFid (Root->FileIdentifierDesc, &File->FileIdentifierDesc);
+          if (File->FileIdentifierDesc == NULL) {
+            FreePool (File->FileEntry);
+            Status = EFI_OUT_OF_RESOURCES;
+          }
+        }
       }
     } else {
       //
@@ -1874,6 +1889,9 @@ ReadDirectoryEntry (
   } while (FileIdentifierDesc->FileCharacteristics & DELETED_FILE);
 
   DuplicateFid (FileIdentifierDesc, FoundFid);
+  if (*FoundFid == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
 
   return EFI_SUCCESS;
 }
@@ -2031,8 +2049,18 @@ ResolveSymlink (
       // "." (current file). Duplicate both FE/EFE and FID of this file.
       //
       DuplicateFe (BlockIo, Volume, PreviousFile.FileEntry, &File->FileEntry);
+      if (File->FileEntry == NULL) {
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Error_Find_File;
+      }
+
       DuplicateFid (PreviousFile.FileIdentifierDesc,
                     &File->FileIdentifierDesc);
+      if (File->FileIdentifierDesc == NULL) {
+        FreePool (File->FileEntry);
+        Status = EFI_OUT_OF_RESOURCES;
+        goto Error_Find_File;
+      }
       goto Next_Path_Component;
     case 5:
       //
