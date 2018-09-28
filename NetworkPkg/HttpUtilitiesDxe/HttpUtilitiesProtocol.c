@@ -298,6 +298,7 @@ HttpUtilitiesParse (
   CHAR8                     *FieldName;
   CHAR8                     *FieldValue;
   UINTN                     Index;
+  UINTN                     HttpBufferSize;
 
   Status          = EFI_SUCCESS;
   TempHttpMessage = NULL;
@@ -311,12 +312,17 @@ HttpUtilitiesParse (
     return EFI_INVALID_PARAMETER;
   }
 
-  TempHttpMessage = AllocateZeroPool (HttpMessageSize);
+  //
+  // Append the http response string along with a Null-terminator.
+  //
+  HttpBufferSize = HttpMessageSize + 1;
+  TempHttpMessage = AllocatePool (HttpBufferSize);
   if (TempHttpMessage == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
   CopyMem (TempHttpMessage, HttpMessage, HttpMessageSize);
+  *(TempHttpMessage + HttpMessageSize) = '\0';
 
   //
   // Get header number
