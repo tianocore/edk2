@@ -193,14 +193,11 @@ InternalSyncCompareExchange64 (
   )
 {
   __asm__ __volatile__ (
-    "push        %%ebx      \n\t"
-    "movl        %2,%%ebx   \n\t"
     "lock                   \n\t"
     "cmpxchg8b   (%1)       \n\t"
-    "pop         %%ebx      \n\t"
     : "+A"  (CompareValue)                    // %0
     : "S"   (Value),                          // %1
-      "r"   ((UINT32) ExchangeValue),         // %2
+      "b"   ((UINT32) ExchangeValue),         // %2
       "c"   ((UINT32) (ExchangeValue >> 32))  // %3
     : "memory",
       "cc"
