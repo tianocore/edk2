@@ -39,7 +39,7 @@ InternalSyncIncrement (
     "movl    $1, %%eax  \n\t"
     "lock               \n\t"
     "xadd    %%eax, %1  \n\t"
-    "inc     %%eax          "
+    "inc     %%eax      \n\t"
     : "=a" (Result),          // %0
       "+m" (*Value)           // %1
     :                         // no inputs that aren't also outputs
@@ -48,7 +48,6 @@ InternalSyncIncrement (
     );
 
   return Result;
-
 }
 
 
@@ -76,16 +75,17 @@ InternalSyncDecrement (
     "movl    $-1, %%eax  \n\t"
     "lock                \n\t"
     "xadd    %%eax, %1   \n\t"
-    "dec     %%eax                  "
-    : "=a" (Result),          // %0
-      "+m" (*Value)           // %1
-    :                         // no inputs that aren't also outputs
+    "dec     %%eax       \n\t"
+    : "=a" (Result),           // %0
+      "+m" (*Value)            // %1
+    :                          // no inputs that aren't also outputs
     : "memory",
       "cc"
     );
 
   return Result;
 }
+
 
 /**
   Performs an atomic compare exchange operation on a 16-bit unsigned integer.
@@ -113,21 +113,20 @@ InternalSyncCompareExchange16 (
   IN      UINT16                    ExchangeValue
   )
 {
-
   __asm__ __volatile__ (
-    "                     \n\t"
     "lock                 \n\t"
     "cmpxchgw    %1, %2   \n\t"
-    : "=a" (CompareValue)
-    : "q"  (ExchangeValue),
-      "m"  (*Value),
-      "0"  (CompareValue)
+    : "=a" (CompareValue)       // %0
+    : "q"  (ExchangeValue),     // %1
+      "m"  (*Value),            // %2
+      "0"  (CompareValue)       // %3
     : "memory",
       "cc"
     );
 
   return CompareValue;
 }
+
 
 /**
   Performs an atomic compare exchange operation on a 32-bit unsigned integer.
@@ -155,21 +154,20 @@ InternalSyncCompareExchange32 (
   IN      UINT32                    ExchangeValue
   )
 {
-
   __asm__ __volatile__ (
-    "                     \n\t"
     "lock                 \n\t"
     "cmpxchgl    %1, %2   \n\t"
-    : "=a" (CompareValue)     // %0
-    : "q"  (ExchangeValue),   // %1
-      "m"  (*Value),          // %2
-      "0"  (CompareValue)     // %4
+    : "=a" (CompareValue)       // %0
+    : "q"  (ExchangeValue),     // %1
+      "m"  (*Value),            // %2
+      "0"  (CompareValue)       // %3
     : "memory",
       "cc"
     );
 
   return CompareValue;
 }
+
 
 /**
   Performs an atomic compare exchange operation on a 64-bit unsigned integer.
@@ -197,7 +195,6 @@ InternalSyncCompareExchange64 (
   )
 {
   __asm__ __volatile__ (
-    "                       \n\t"
     "push        %%ebx      \n\t"
     "movl        %2,%%ebx   \n\t"
     "lock                   \n\t"

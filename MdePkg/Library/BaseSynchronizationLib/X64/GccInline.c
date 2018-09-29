@@ -39,7 +39,7 @@ InternalSyncIncrement (
     "movl    $1, %%eax  \n\t"
     "lock               \n\t"
     "xadd    %%eax, %1  \n\t"
-    "inc     %%eax          "
+    "inc     %%eax      \n\t"
     : "=a" (Result),          // %0
       "+m" (*Value)           // %1
     :                         // no inputs that aren't also outputs
@@ -75,10 +75,10 @@ InternalSyncDecrement (
     "movl    $-1, %%eax  \n\t"
     "lock                \n\t"
     "xadd    %%eax, %1   \n\t"
-    "dec     %%eax                  "
-    : "=a" (Result),          // %0
-      "+m" (*Value)           // %1
-    :                         // no inputs that aren't also outputs
+    "dec     %%eax       \n\t"
+    : "=a" (Result),           // %0
+      "+m" (*Value)            // %1
+    :                          // no inputs that aren't also outputs
     : "memory",
       "cc"
     );
@@ -113,16 +113,14 @@ InternalSyncCompareExchange16 (
   IN      UINT16                    ExchangeValue
   )
 {
-
-
   __asm__ __volatile__ (
     "lock                 \n\t"
-    "cmpxchgw    %3, %1       "
-    : "=a" (CompareValue),
-      "=m" (*Value)
-    : "a"  (CompareValue),
-      "r"  (ExchangeValue),
-      "m"  (*Value)
+    "cmpxchgw    %3, %1   \n\t"
+    : "=a" (CompareValue),      // %0
+      "=m" (*Value)             // %1
+    : "a"  (CompareValue),      // %2
+      "r"  (ExchangeValue),     // %3
+      "m"  (*Value)             // %4
     : "memory",
       "cc"
     );
@@ -157,16 +155,14 @@ InternalSyncCompareExchange32 (
   IN      UINT32                    ExchangeValue
   )
 {
-
-
   __asm__ __volatile__ (
     "lock                 \n\t"
-    "cmpxchgl    %3, %1       "
-    : "=a" (CompareValue),    // %0
-      "=m" (*Value)           // %1
-    : "a"  (CompareValue),    // %2
-      "r"  (ExchangeValue),   // %3
-      "m"  (*Value)
+    "cmpxchgl    %3, %1   \n\t"
+    : "=a" (CompareValue),      // %0
+      "=m" (*Value)             // %1
+    : "a"  (CompareValue),      // %2
+      "r"  (ExchangeValue),     // %3
+      "m"  (*Value)             // %4
     : "memory",
       "cc"
     );
@@ -200,20 +196,17 @@ InternalSyncCompareExchange64 (
   IN      UINT64                    ExchangeValue
   )
 {
-
   __asm__ __volatile__ (
     "lock                 \n\t"
-    "cmpxchgq    %3, %1       "
-    : "=a" (CompareValue),    // %0
-      "=m" (*Value)           // %1
-    : "a"  (CompareValue),    // %2
-      "r"  (ExchangeValue),   // %3
-      "m"  (*Value)
+    "cmpxchgq    %3, %1   \n\t"
+    : "=a" (CompareValue),      // %0
+      "=m" (*Value)             // %1
+    : "a"  (CompareValue),      // %2
+      "r"  (ExchangeValue),     // %3
+      "m"  (*Value)             // %4
     : "memory",
       "cc"
     );
 
   return CompareValue;
 }
-
-
