@@ -155,11 +155,10 @@ InternalSyncCompareExchange32 (
 {
   __asm__ __volatile__ (
     "lock                 \n\t"
-    "cmpxchgl    %1, %2   \n\t"
-    : "=a" (CompareValue)       // %0
-    : "q"  (ExchangeValue),     // %1
-      "m"  (*Value),            // %2
-      "0"  (CompareValue)       // %3
+    "cmpxchgl    %2, %1   \n\t"
+    : "+a" (CompareValue),      // %0
+      "+m" (*Value)             // %1
+    : "q"  (ExchangeValue)      // %2
     : "memory",
       "cc"
     );
