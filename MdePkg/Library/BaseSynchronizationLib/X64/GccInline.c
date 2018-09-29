@@ -194,12 +194,10 @@ InternalSyncCompareExchange64 (
 {
   __asm__ __volatile__ (
     "lock                 \n\t"
-    "cmpxchgq    %3, %1   \n\t"
-    : "=a" (CompareValue),      // %0
-      "=m" (*Value)             // %1
-    : "a"  (CompareValue),      // %2
-      "r"  (ExchangeValue),     // %3
-      "m"  (*Value)             // %4
+    "cmpxchgq    %2, %1   \n\t"
+    : "+a" (CompareValue),      // %0
+      "+m" (*Value)             // %1
+    : "r"  (ExchangeValue)      // %2
     : "memory",
       "cc"
     );
