@@ -271,26 +271,39 @@ GetPdFromLongAd (
 /**
   Return logical sector number of a given Long Allocation Descriptor.
 
-  @param[in]  Volume              Volume information pointer.
-  @param[in]  LongAd              Long Allocation Descriptor pointer.
+  @param[in]   Volume             Volume information pointer.
+  @param[in]   LongAd             Long Allocation Descriptor pointer.
+  @param[out]  Lsn                Logical sector number pointer.
 
-  @return The logical sector number of a given Long Allocation Descriptor.
+  @retval EFI_SUCCESS             Logical sector number successfully returned.
+  @retval EFI_UNSUPPORTED         Logical sector number is not returned due to
+                                  unrecognized format.
 
 **/
-UINT64
+EFI_STATUS
 GetLongAdLsn (
-  IN UDF_VOLUME_INFO                 *Volume,
-  IN UDF_LONG_ALLOCATION_DESCRIPTOR  *LongAd
+  IN  UDF_VOLUME_INFO                 *Volume,
+  IN  UDF_LONG_ALLOCATION_DESCRIPTOR  *LongAd,
+  OUT UINT64                          *Lsn
   )
 {
   UDF_PARTITION_DESCRIPTOR *PartitionDesc;
 
   PartitionDesc = GetPdFromLongAd (Volume, LongAd);
-  ASSERT (PartitionDesc != NULL);
+  if (PartitionDesc == NULL) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Fail to get the Partition Descriptor from the given Long Allocation Descriptor.\n",
+      __FUNCTION__
+      ));
+    return EFI_UNSUPPORTED;
+  }
 
-  return (UINT64)PartitionDesc->PartitionStartingLocation -
-    Volume->MainVdsStartLocation +
-    LongAd->ExtentLocation.LogicalBlockNumber;
+  *Lsn = (UINT64)PartitionDesc->PartitionStartingLocation -
+         Volume->MainVdsStartLocation +
+         LongAd->ExtentLocation.LogicalBlockNumber;
+
+  return EFI_SUCCESS;
 }
 
 /**
@@ -342,7 +355,10 @@ FindFileSetDescriptor (
   UDF_DESCRIPTOR_TAG             *DescriptorTag;
 
   LogicalVolDesc = &Volume->LogicalVolDesc;
-  Lsn = GetLongAdLsn (Volume, &LogicalVolDesc->LogicalVolumeContentsUse);
+  Status = GetLongAdLsn (Volume, &LogicalVolDesc->LogicalVolumeContentsUse, &Lsn);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   //
   // As per UDF 2.60 specification:
@@ -732,34 +748,43 @@ GetAllocationDescriptor (
   @param[in]  Volume              Volume information pointer.
   @param[in]  ParentIcb           Long Allocation Descriptor pointer.
   @param[in]  Ad                  Allocation Descriptor pointer.
+  @param[out] Lsn                 Logical sector number pointer.
 
-  @return The logical sector number of the given Allocation Descriptor.
+  @retval EFI_SUCCESS             Logical sector number of the given Allocation
+                                  Descriptor successfully returned.
+  @retval EFI_UNSUPPORTED         Logical sector number of the given Allocation
+                                  Descriptor is not returned due to unrecognized
+                                  format.
 
 **/
-UINT64
+EFI_STATUS
 GetAllocationDescriptorLsn (
-  IN UDF_FE_RECORDING_FLAGS          RecordingFlags,
-  IN UDF_VOLUME_INFO                 *Volume,
-  IN UDF_LONG_ALLOCATION_DESCRIPTOR  *ParentIcb,
-  IN VOID                            *Ad
+  IN  UDF_FE_RECORDING_FLAGS          RecordingFlags,
+  IN  UDF_VOLUME_INFO                 *Volume,
+  IN  UDF_LONG_ALLOCATION_DESCRIPTOR  *ParentIcb,
+  IN  VOID                            *Ad,
+  OUT UINT64                          *Lsn
   )
 {
   UDF_PARTITION_DESCRIPTOR *PartitionDesc;
 
   if (RecordingFlags == LongAdsSequence) {
-    return GetLongAdLsn (Volume, (UDF_LONG_ALLOCATION_DESCRIPTOR *)Ad);
+    return GetLongAdLsn (Volume, (UDF_LONG_ALLOCATION_DESCRIPTOR *)Ad, Lsn);
   } else if (RecordingFlags == ShortAdsSequence) {
     PartitionDesc = GetPdFromLongAd (Volume, ParentIcb);
-    ASSERT (PartitionDesc != NULL);
+    if (PartitionDesc == NULL) {
+      return EFI_UNSUPPORTED;
+    }
 
-    return GetShortAdLsn (
-      Volume,
-      PartitionDesc,
-      (UDF_SHORT_ALLOCATION_DESCRIPTOR *)Ad
-      );
+    *Lsn = GetShortAdLsn (
+             Volume,
+             PartitionDesc,
+             (UDF_SHORT_ALLOCATION_DESCRIPTOR *)Ad
+             );
+    return EFI_SUCCESS;
   }
 
-  return 0;
+  return EFI_UNSUPPORTED;
 }
 
 /**
@@ -804,10 +829,14 @@ GetAedAdsOffset (
   UDF_DESCRIPTOR_TAG                *DescriptorTag;
 
   ExtentLength  = GET_EXTENT_LENGTH (RecordingFlags, Ad);
-  Lsn           = GetAllocationDescriptorLsn (RecordingFlags,
+  Status        = GetAllocationDescriptorLsn (RecordingFlags,
                                               Volume,
                                               ParentIcb,
-                                              Ad);
+                                              Ad,
+                                              &Lsn);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
 
   Data = AllocatePool (ExtentLength);
   if (Data == NULL) {
@@ -1156,10 +1185,14 @@ ReadFile (
 
       ExtentLength = GET_EXTENT_LENGTH (RecordingFlags, Ad);
 
-      Lsn = GetAllocationDescriptorLsn (RecordingFlags,
-                                        Volume,
-                                        ParentIcb,
-                                        Ad);
+      Status = GetAllocationDescriptorLsn (RecordingFlags,
+                                           Volume,
+                                           ParentIcb,
+                                           Ad,
+                                           &Lsn);
+      if (EFI_ERROR (Status)) {
+        goto Done;
+      }
 
       switch (ReadFileInfo->Flags) {
       case ReadFileGetFileSize:
@@ -1630,7 +1663,11 @@ FindFileEntry (
   UDF_DESCRIPTOR_TAG  *DescriptorTag;
   VOID                *ReadBuffer;
 
-  Lsn               = GetLongAdLsn (Volume, Icb);
+  Status = GetLongAdLsn (Volume, Icb, &Lsn);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
   LogicalBlockSize  = Volume->LogicalVolDesc.LogicalBlockSize;
 
   ReadBuffer = AllocateZeroPool (Volume->FileEntrySize);
