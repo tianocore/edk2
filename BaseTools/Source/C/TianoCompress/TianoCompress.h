@@ -427,7 +427,7 @@ Decode (
 
 RETURN_STATUS
 EFIAPI
-Decompress (
+TDecompress (
   IN VOID  *Source,
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch,
