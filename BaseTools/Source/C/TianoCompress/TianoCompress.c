@@ -17,6 +17,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 **/
 
 #include "Compress.h"
+#include "Decompress.h"
 #include "TianoCompress.h"
 #include "EfiUtilityMsgs.h"
 #include "ParseInf.h"
@@ -65,6 +66,7 @@ static BOOLEAN QuietMode = FALSE;
 //
 STATIC BOOLEAN ENCODE = FALSE;
 STATIC BOOLEAN DECODE = FALSE;
+STATIC BOOLEAN UEFIMODE = FALSE;
 STATIC UINT8  *mSrc, *mDst, *mSrcUpperLimit, *mDstUpperLimit;
 STATIC UINT8  *mLevel, *mText, *mChildCount, *mBuf, mCLen[NC], mPTLen[NPT], *mLen;
 STATIC INT16  mHeap[NC + 1];
@@ -1703,6 +1705,8 @@ Returns:
   // Details Option
   //
   fprintf (stdout, "Options:\n");
+  fprintf (stdout, "  --uefi\n\
+            Enable UefiCompress, use TianoCompress when without this option\n");
   fprintf (stdout, "  -o FileName, --output FileName\n\
             File will be created to store the ouput content.\n");
   fprintf (stdout, "  -v, --verbose\n\
@@ -1817,6 +1821,13 @@ Returns:
   while (argc > 0) {
     if ((strcmp(argv[0], "-v") == 0) || (stricmp(argv[0], "--verbose") == 0)) {
       VerboseMode = TRUE;
+      argc--;
+      argv++;
+      continue;
+    }
+
+    if (stricmp(argv[0], "--uefi") == 0) {
+      UEFIMODE = TRUE;
       argc--;
       argv++;
       continue;
@@ -1939,7 +1950,11 @@ Returns:
   if (DebugMode) {
     DebugMsg(UTILITY_NAME, 0, DebugLevel, "Encoding", NULL);
   }
-  Status = TianoCompress ((UINT8 *)FileBuffer, InputLength, OutBuffer, &DstSize);
+  if (UEFIMODE) {
+    Status = EfiCompress ((UINT8 *)FileBuffer, InputLength, OutBuffer, &DstSize);
+  } else {
+    Status = TianoCompress ((UINT8 *)FileBuffer, InputLength, OutBuffer, &DstSize);
+  }
 
   if (Status == EFI_BUFFER_TOO_SMALL) {
     OutBuffer = (UINT8 *) malloc (DstSize);
@@ -1949,7 +1964,11 @@ Returns:
     }
   }
 
-  Status = TianoCompress ((UINT8 *)FileBuffer, InputLength, OutBuffer, &DstSize);
+  if (UEFIMODE) {
+    Status = EfiCompress ((UINT8 *)FileBuffer, InputLength, OutBuffer, &DstSize);
+  } else {
+    Status = TianoCompress ((UINT8 *)FileBuffer, InputLength, OutBuffer, &DstSize);
+  }
   if (Status != EFI_SUCCESS) {
     Error (NULL, 0, 0007, "Error compressing file", NULL);
     goto ERROR;
@@ -1979,32 +1998,46 @@ Returns:
   if (DebugMode) {
     DebugMsg(UTILITY_NAME, 0, DebugLevel, "Decoding\n", NULL);
   }
-  //
-  // Get Compressed file original size
-  //
-  Src     = (UINT8 *)FileBuffer;
-  OrigSize  = Src[4] + (Src[5] << 8) + (Src[6] << 16) + (Src[7] << 24);
 
-  //
-  // Allocate OutputBuffer
-  //
-  OutBuffer = (UINT8 *)malloc(OrigSize);
-  if (OutBuffer == NULL) {
-    Error (NULL, 0, 4001, "Resource:", "Memory cannot be allocated!");
-    goto ERROR;
-   }
+  if (UEFIMODE) {
+    Status = Extract((VOID *)FileBuffer, InputLength, (VOID *)&OutBuffer, &DstSize, 1);
+    if (Status != EFI_SUCCESS) {
+      goto ERROR;
+    }
+    fwrite(OutBuffer, (size_t)(DstSize), 1, OutputFile);
+  } else {
+    //
+    // Get Compressed file original size
+    //
+    Src     = (UINT8 *)FileBuffer;
+    OrigSize  = Src[4] + (Src[5] << 8) + (Src[6] << 16) + (Src[7] << 24);
 
-  Status = Decompress((VOID *)FileBuffer, (VOID *)OutBuffer, (VOID *)Scratch, 2);
-  if (Status != EFI_SUCCESS) {
-   goto ERROR;
+    //
+    // Allocate OutputBuffer
+    //
+    OutBuffer = (UINT8 *)malloc(OrigSize);
+    if (OutBuffer == NULL) {
+      Error (NULL, 0, 4001, "Resource:", "Memory cannot be allocated!");
+      goto ERROR;
+     }
+
+    Status = TDecompress((VOID *)FileBuffer, (VOID *)OutBuffer, (VOID *)Scratch, 2);
+    if (Status != EFI_SUCCESS) {
+      goto ERROR;
+    }
+    fwrite(OutBuffer, (size_t)(Scratch->mOrigSize), 1, OutputFile);
   }
-
-  fwrite(OutBuffer, (size_t)(Scratch->mOrigSize), 1, OutputFile);
   fclose(OutputFile);
   fclose(InputFile);
-  free(Scratch);
-  free(FileBuffer);
-  free(OutBuffer);
+  if (Scratch != NULL) {
+    free(Scratch);
+  }
+  if (FileBuffer != NULL) {
+    free(FileBuffer);
+  }
+  if (OutBuffer != NULL) {
+    free(OutBuffer);
+  }
 
   if (DebugMode) {
     DebugMsg(UTILITY_NAME, 0, DebugLevel, "Encoding successful!\n", NULL);
@@ -2634,7 +2667,7 @@ Done:
 
 RETURN_STATUS
 EFIAPI
-Decompress (
+TDecompress (
   IN VOID  *Source,
   IN OUT VOID    *Destination,
   IN OUT VOID    *Scratch,
