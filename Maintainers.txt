@@ -105,6 +105,11 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/DuetPkg
 M: Ruiyu Ni <ruiyu.ni@intel.com>
 M: Hao Wu <hao.a.wu@intel.com>
 
+DynamicTablesPkg
+W: https://github.com/tianocore/tianocore.github.io/wiki/DynamicTablesPkg
+M: Evan Lloyd <Evan.Lloyd@arm.com>
+M: Sami Mujawar <Sami.Mujawar@arm.com>
+
 EdkCompatibilityPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/EdkCompatibilityPkg
 M: Liming Gao <liming.gao@intel.com>
