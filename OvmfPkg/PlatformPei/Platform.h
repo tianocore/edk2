@@ -83,6 +83,11 @@ InstallFeatureControlCallback (
   VOID
   );
 
+VOID
+InstallClearCacheCallback (
+  VOID
+  );
+
 EFI_STATUS
 InitializeXen (
   VOID

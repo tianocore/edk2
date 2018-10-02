@@ -672,6 +672,7 @@ InitializePlatform (
     NoexecDxeInitialization ();
   }
 
+  InstallClearCacheCallback ();
   AmdSevInitialize ();
   MiscInitialization ();
   InstallFeatureControlCallback ();
