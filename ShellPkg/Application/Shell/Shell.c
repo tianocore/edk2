@@ -1169,6 +1169,8 @@ LocateStartupScript (
       *TempSpot = CHAR_NULL;
     }
 
+    InternalEfiShellSetEnv(L"homefilesystem", StartupScriptPath, TRUE);
+
     StartupScriptPath = StrnCatGrow (&StartupScriptPath, &Size, ((FILEPATH_DEVICE_PATH *)FileDevicePath)->PathName, 0);
     PathRemoveLastItem (StartupScriptPath);
     StartupScriptPath = StrnCatGrow (&StartupScriptPath, &Size, mStartupScript, 0);
