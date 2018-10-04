@@ -2,6 +2,7 @@
   Defines file-path manipulation functions.
 
   Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018, Dell Technologies. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -103,7 +104,9 @@ PathCleanUpDirectories(
         ) {
     *(TempString + 1) = CHAR_NULL;
     PathRemoveLastItem(Path);
-    CopyMem (Path + StrLen (Path), TempString + 3, StrSize (TempString + 3));
+    if (*(TempString + 3) != CHAR_NULL) {
+      CopyMem (Path + StrLen (Path), TempString + 4, StrSize (TempString + 4));
+    }
   }
 
   //
