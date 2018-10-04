@@ -4,6 +4,7 @@
   (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
   (C) Copyright 2015 Hewlett-Packard Development Company, L.P.<BR>
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2018, Dell Technologies. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -261,9 +262,6 @@ ShellCommandRunCd (
 
         if (Param1Copy != NULL && IsCurrentFileSystem (Param1Copy, Cwd)) {
           Status = ReplaceDriveWithCwd (&Param1Copy,Cwd);
-          if (!EFI_ERROR (Status)) {
-            Param1Copy = PathCleanUpDirectories (Param1Copy);
-          }
         } else {
           //
           // Can't use cd command to change filesystem.
@@ -302,13 +300,15 @@ ShellCommandRunCd (
                 StrCatS (TempBuffer, TotalSize / sizeof (CHAR16), Param1Copy);
 
                 FreePool (Param1Copy);
-                Param1Copy = PathCleanUpDirectories (TempBuffer);
+                Param1Copy = TempBuffer;
+                TempBuffer = NULL;
               }
             }
           }
         }
 
         if (!EFI_ERROR(Status)) {
+          Param1Copy = PathCleanUpDirectories (Param1Copy);
           Status = ExtractDriveAndPath (Param1Copy, &Drive, &Path);
         }
 
