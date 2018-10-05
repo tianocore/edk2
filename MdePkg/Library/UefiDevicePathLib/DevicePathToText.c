@@ -477,16 +477,16 @@ DevPathToTextAcpiEx (
         UefiDevicePathLibCatPrint (Str, L"AcpiEx(%s,", HIDText);
       }
 
-      if (AcpiEx->UID == 0) {
-        UefiDevicePathLibCatPrint (Str, L"%a,", UIDStr);
+      if (AcpiEx->CID == 0) {
+        UefiDevicePathLibCatPrint (Str, L"%a,", CIDStr);
       } else {
-        UefiDevicePathLibCatPrint (Str, L"0x%x,", AcpiEx->UID);
+        UefiDevicePathLibCatPrint (Str, L"%s,", CIDText);
       }
 
-      if (AcpiEx->CID == 0) {
-        UefiDevicePathLibCatPrint (Str, L"%a)", CIDStr);
+      if (AcpiEx->UID == 0) {
+        UefiDevicePathLibCatPrint (Str, L"%a)", UIDStr);
       } else {
-        UefiDevicePathLibCatPrint (Str, L"%s)", CIDText);
+        UefiDevicePathLibCatPrint (Str, L"0x%x)", AcpiEx->UID);
       }
     } else {
       UefiDevicePathLibCatPrint (
