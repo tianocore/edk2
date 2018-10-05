@@ -433,6 +433,27 @@ DevPathToTextAcpiEx (
   UIDStr = HIDStr + AsciiStrLen (HIDStr) + 1;
   CIDStr = UIDStr + AsciiStrLen (UIDStr) + 1;
 
+  if (DisplayOnly) {
+    if ((EISA_ID_TO_NUM (AcpiEx->HID) == 0x0A03) ||
+        (EISA_ID_TO_NUM (AcpiEx->CID) == 0x0A03 && EISA_ID_TO_NUM (AcpiEx->HID) != 0x0A08)) {
+      if (AcpiEx->UID == 0) {
+        UefiDevicePathLibCatPrint (Str, L"PciRoot(%a)", UIDStr);
+      } else {
+        UefiDevicePathLibCatPrint (Str, L"PciRoot(0x%x)", AcpiEx->UID);
+      }
+      return;
+    }
+
+    if (EISA_ID_TO_NUM (AcpiEx->HID) == 0x0A08 || EISA_ID_TO_NUM (AcpiEx->CID) == 0x0A08) {
+      if (AcpiEx->UID == 0) {
+        UefiDevicePathLibCatPrint (Str, L"PcieRoot(%a)", UIDStr);
+      } else {
+        UefiDevicePathLibCatPrint (Str, L"PcieRoot(0x%x)", AcpiEx->UID);
+      }
+      return;
+    }
+  }
+
   //
   // Converts EISA identification to string.
   //
