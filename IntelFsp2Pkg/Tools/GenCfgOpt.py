@@ -88,6 +88,8 @@ are permitted provided that the following conditions are met:
 **/
 """
 
+BuildOptionPcd = []
+
 class CLogicalExpression:
     def __init__(self):
         self.index    = 0
@@ -561,6 +563,12 @@ EndList
                     self._PcdsDict[Match.group(1)] = Match.group(2)
                     if self.Debug:
                         print "INFO : PCD %s = [ %s ]" % (Match.group(1), Match.group(2))
+                    i = 0
+                    while i < len(BuildOptionPcd):
+                        Match = re.match("\s*([\w\.]+)\s*\=\s*(\w+)", BuildOptionPcd[i])
+                        if Match:
+                            self._PcdsDict[Match.group(1)] = Match.group(2)
+                        i += 1
             else:
                 Match = re.match("^\s*#\s+(!BSF|@Bsf|!HDR)\s+(.+)", DscLine)
                 if Match:
@@ -1462,7 +1470,7 @@ EndList
 
 
 def Usage():
-    print "GenCfgOpt Version 0.52"
+    print "GenCfgOpt Version 0.53"
     print "Usage:"
     print "    GenCfgOpt  UPDTXT  PlatformDscFile BuildFvDir                 [-D Macros]"
     print "    GenCfgOpt  HEADER  PlatformDscFile BuildFvDir  InputHFile     [-D Macros]"
@@ -1472,7 +1480,14 @@ def Main():
     #
     # Parse the options and args
     #
+    i = 1
+
     GenCfgOpt = CGenCfgOpt()
+    while i < len(sys.argv):
+        if sys.argv[i].strip().lower() == "--pcd":
+            BuildOptionPcd.append(sys.argv[i+1])
+            i += 1
+        i += 1
     argc = len(sys.argv)
     if argc < 4:
         Usage()
