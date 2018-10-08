@@ -1,7 +1,7 @@
 /** @file
   Functions declaration related with Mtftp for UefiPxeBc Driver.
 
-  Copyright (c) 2007 - 2015, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -35,6 +35,7 @@
   @param[in]      Config         Pointer to configure data.
   @param[in]      Filename       Pointer to boot file name.
   @param[in]      BlockSize      Pointer to required block size.
+  @param[in]      WindowSize     Pointer to required window size.
   @param[in, out] BufferSize     Pointer to buffer size.
 
   @retval EFI_SUCCESS        Successfully obtained the size of file.
@@ -61,6 +62,7 @@ PxeBcTftpGetFileSize (
   @param[in]      Config         Pointer to config data.
   @param[in]      Filename       Pointer to boot file name.
   @param[in]      BlockSize      Pointer to required block size.
+  @param[in]      WindowSize     Pointer to required window size.
   @param[in]      BufferPtr      Pointer to buffer.
   @param[in, out] BufferSize     Pointer to buffer size.
   @param[in]      DontUseBuffer  Indicates whether to use a receive buffer.
@@ -118,6 +120,7 @@ PxeBcTftpWriteFile (
   @param[in]       Config         Pointer to config data.
   @param[in]       Filename       Pointer to boot file name.
   @param[in]       BlockSize      Pointer to required block size.
+  @param[in]       WindowSize     Pointer to required window size.
   @param[in]       BufferPtr      Pointer to buffer.
   @param[in, out]  BufferSize     Pointer to buffer size.
   @param[in]       DontUseBuffer  Indicates whether with a receive buffer.
