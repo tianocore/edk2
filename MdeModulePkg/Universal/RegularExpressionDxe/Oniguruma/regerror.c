@@ -28,7 +28,6 @@
  */
 
 #include "regint.h"
-#define HAVE_STDARG_PROTOTYPES
 #if 0
 #include <stdio.h> /* for vsnprintf() */
 

@@ -79,6 +79,9 @@
   gEfiRegularExpressionProtocolGuid       ## PRODUCES
 
 [BuildOptions]
+  # Enable STDARG for variable arguments
+  *_*_*_CC_FLAGS = -DHAVE_STDARG_H
+
   # Override MSFT build option to remove /Oi and /GL
   MSFT:*_*_*_CC_FLAGS          = /GL-
   INTEL:*_*_*_CC_FLAGS         = /Oi-
