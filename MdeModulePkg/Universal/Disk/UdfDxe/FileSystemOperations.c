@@ -2453,7 +2453,7 @@ SetFileInfo (
     FileInfo->CreateTime.Month       = FileEntry->AccessTime.Month;
     FileInfo->CreateTime.Day         = FileEntry->AccessTime.Day;
     FileInfo->CreateTime.Hour        = FileEntry->AccessTime.Hour;
-    FileInfo->CreateTime.Minute      = FileEntry->AccessTime.Second;
+    FileInfo->CreateTime.Minute      = FileEntry->AccessTime.Minute;
     FileInfo->CreateTime.Second      = FileEntry->AccessTime.Second;
     FileInfo->CreateTime.Nanosecond  =
                                    FileEntry->AccessTime.HundredsOfMicroseconds;
