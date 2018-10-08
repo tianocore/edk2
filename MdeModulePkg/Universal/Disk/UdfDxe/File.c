@@ -722,7 +722,7 @@ UdfSetPosition (
     // set to the EOF.
     //
     if (Position == 0xFFFFFFFFFFFFFFFF) {
-      PrivFileData->FilePosition = PrivFileData->FileSize - 1;
+      PrivFileData->FilePosition = PrivFileData->FileSize;
     } else {
       PrivFileData->FilePosition = Position;
     }
