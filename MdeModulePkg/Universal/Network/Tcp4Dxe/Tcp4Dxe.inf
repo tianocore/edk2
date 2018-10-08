@@ -2,14 +2,14 @@
 #  This module produces EFI TCPv4 Protocol and EFI TCPv4 Service Binding Protocol.
 #
 #  This module produces EFI TCPv4(Transmission Control Protocol version 4) Protocol
-#  upon EFI IPv4 Protocol, to provide basic TCPv4 I/O services. This driver only 
+#  upon EFI IPv4 Protocol, to provide basic TCPv4 I/O services. This driver only
 #  supports IPv4 network stack.
 #
 #  Notes:
 #  1) This driver can't co-work with the TcpDxe driver in NetworkPkg.
-#  2) This driver might have some issues that have been fixed in the TcpDxe driver 
+#  2) This driver might have some issues that have been fixed in the TcpDxe driver
 #     in NetworkPkg.
-#  3) This driver supports fewer features than the TcpDxe driver in NetworkPkg (e.g. IPv6, 
+#  3) This driver supports fewer features than the TcpDxe driver in NetworkPkg (e.g. IPv6,
 #     TCP Cancel function).
 #  4) TcpDxe driver in NetworkPkg is recommended for use instead of this one even though
 #     both of them can be used.
