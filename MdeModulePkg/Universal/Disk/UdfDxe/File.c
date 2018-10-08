@@ -257,8 +257,12 @@ UdfOpen (
     &NewPrivFileData->File,
     &NewPrivFileData->FileSize
     );
-  ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: GetFileSize() fails with status - %r.\n",
+      __FUNCTION__, Status
+      ));
     goto Error_Get_File_Size;
   }
 
