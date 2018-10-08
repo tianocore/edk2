@@ -165,6 +165,7 @@ GetFileSize (
   @param[in]   AsciiFilePath  Path of the file, ASCII encoded
   @param[in]   FileSize       Size of the file in number of bytes
   @param[in]   BlockSize      Value of the TFTP blksize option
+  @param[in]   WindowSize     Value of the TFTP window size option
   @param[out]  Data           Address where to store the address of the buffer
                               where the data of the file were downloaded in
                               case of success.
@@ -906,6 +907,7 @@ Error :
   @param[in]   AsciiFilePath  Path of the file, ASCII encoded
   @param[in]   FileSize       Size of the file in number of bytes
   @param[in]   BlockSize      Value of the TFTP blksize option
+  @param[in]   WindowSize     Value of the TFTP window size option
   @param[out]  Data           Address where to store the address of the buffer
                               where the data of the file were downloaded in
                               case of success.
