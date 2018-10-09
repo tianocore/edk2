@@ -782,7 +782,8 @@ SdMmcHcClockSupply (
   //
   // Set SDCLK Frequency Select and Internal Clock Enable fields in Clock Control register.
   //
-  if ((ControllerVer & 0xFF) == SD_MMC_HC_CTRL_VER_300) {
+  if (((ControllerVer & 0xFF) >= SD_MMC_HC_CTRL_VER_300) &&
+      ((ControllerVer & 0xFF) <= SD_MMC_HC_CTRL_VER_420)) {
     ASSERT (Divisor <= 0x3FF);
     ClockCtrl = ((Divisor & 0xFF) << 8) | ((Divisor & 0x300) >> 2);
   } else if (((ControllerVer & 0xFF) == 0) || ((ControllerVer & 0xFF) == 1)) {
