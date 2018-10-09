@@ -1,6 +1,6 @@
 /** @file
 *
-*  Copyright (c) 2011-2017, ARM Limited. All rights reserved.
+*  Copyright (c) 2011-2018, ARM Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -19,6 +19,16 @@
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
 
+// In GICv3, there are 2 x 64KB frames:
+// Redistributor control frame + SGI Control & Generation frame
+#define GIC_V3_REDISTRIBUTOR_GRANULARITY  (ARM_GICR_CTLR_FRAME_SIZE           \
+                                           + ARM_GICR_SGI_PPI_FRAME_SIZE)
+
+// In GICv4, there are 2 additional 64KB frames:
+// VLPI frame + Reserved page frame
+#define GIC_V4_REDISTRIBUTOR_GRANULARITY  (GIC_V3_REDISTRIBUTOR_GRANULARITY   \
+                                           + ARM_GICR_SGI_VLPI_FRAME_SIZE     \
+                                           + ARM_GICR_SGI_RESERVED_FRAME_SIZE)
 
 #define ISENABLER_ADDRESS(base,offset) ((base) + \
           ARM_GICR_CTLR_FRAME_SIZE +  ARM_GICR_ISENABLER + (4 * offset))
@@ -54,12 +64,11 @@ GicGetCpuRedistributorBase (
   IN ARM_GIC_ARCH_REVISION Revision
   )
 {
-  UINTN Index;
   UINTN MpId;
   UINTN CpuAffinity;
   UINTN Affinity;
-  UINTN GicRedistributorGranularity;
   UINTN GicCpuRedistributorBase;
+  UINT64 TypeRegister;
 
   MpId = ArmReadMpidr ();
   // Define CPU affinity as:
@@ -68,27 +77,30 @@ GicGetCpuRedistributorBase (
   CpuAffinity = (MpId & (ARM_CORE_AFF0 | ARM_CORE_AFF1 | ARM_CORE_AFF2)) |
                 ((MpId & ARM_CORE_AFF3) >> 8);
 
-  if (Revision == ARM_GIC_ARCH_REVISION_3) {
-    // 2 x 64KB frame:
-    //   Redistributor control frame + SGI Control & Generation frame
-    GicRedistributorGranularity = ARM_GICR_CTLR_FRAME_SIZE
-                                  + ARM_GICR_SGI_PPI_FRAME_SIZE;
-  } else {
+  if (Revision < ARM_GIC_ARCH_REVISION_3) {
     ASSERT_EFI_ERROR (EFI_UNSUPPORTED);
     return 0;
   }
 
   GicCpuRedistributorBase = GicRedistributorBase;
 
-  for (Index = 0; Index < PcdGet32 (PcdCoreCount); Index++) {
-    Affinity = MmioRead64 (GicCpuRedistributorBase + ARM_GICR_TYPER) >> 32;
+  do {
+    TypeRegister = MmioRead64 (GicCpuRedistributorBase + ARM_GICR_TYPER);
+    Affinity = ARM_GICR_TYPER_GET_AFFINITY (TypeRegister);
     if (Affinity == CpuAffinity) {
       return GicCpuRedistributorBase;
     }
 
-    // Move to the next GIC Redistributor frame
-    GicCpuRedistributorBase += GicRedistributorGranularity;
-  }
+    // Move to the next GIC Redistributor frame.
+    // The GIC specification does not forbid a mixture of redistributors
+    // with or without support for virtual LPIs, so we test Virtual LPIs
+    // Support (VLPIS) bit for each frame to decide the granularity.
+    // Note: The assumption here is that the redistributors are adjacent
+    // for all CPUs. However this may not be the case for NUMA systems.
+    GicCpuRedistributorBase += (((ARM_GICR_TYPER_VLPIS & TypeRegister) != 0)
+                                ? GIC_V4_REDISTRIBUTOR_GRANULARITY
+                                : GIC_V3_REDISTRIBUTOR_GRANULARITY);
+  } while ((TypeRegister & ARM_GICR_TYPER_LAST) == 0);
 
   // The Redistributor has not been found for the current CPU
   ASSERT_EFI_ERROR (EFI_NOT_FOUND);
