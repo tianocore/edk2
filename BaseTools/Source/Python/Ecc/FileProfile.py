@@ -47,7 +47,7 @@ class FileProfile :
         self.FileLinesList = []
         self.FileLinesListFromFile = []
         try:
-            fsock = open(FileName, "rb", 0)
+            fsock = open(FileName, "r")
             try:
                 self.FileLinesListFromFile = fsock.readlines()
             finally:

@@ -988,7 +988,7 @@ class sdict(IterableUserDict):
 
     ## append support
     def append(self, sdict):
-        for key in sdict:
+        for key in sdict.keys():
             if key not in self._key_list:
                 self._key_list.append(key)
             IterableUserDict.__setitem__(self, key, sdict[key])

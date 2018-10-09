@@ -205,7 +205,7 @@ class Ecc(object):
         Op = open(EccGlobalData.gConfig.MetaDataFileCheckPathOfGenerateFileList, 'w+')
         #SkipDirs = Read from config file
         SkipDirs = EccGlobalData.gConfig.SkipDirList
-        SkipDirString = string.join(SkipDirs, '|')
+        SkipDirString = '|'.join(SkipDirs)
 #         p = re.compile(r'.*[\\/](?:%s)[\\/]?.*' % SkipDirString)
         p = re.compile(r'.*[\\/](?:%s^\S)[\\/]?.*' % SkipDirString)
         for scanFolder in ScanFolders:
