@@ -408,6 +408,15 @@ UdfRead (
 
         goto Done;
       }
+      //
+      // After calling function ReadDirectoryEntry(), if 'NewFileIdentifierDesc'
+      // is NULL, then the 'Status' must be EFI_OUT_OF_RESOURCES. Hence, if the
+      // code reaches here, 'NewFileIdentifierDesc' must be not NULL.
+      //
+      // The ASSERT here is for addressing a false positive NULL pointer
+      // dereference issue raised from static analysis.
+      //
+      ASSERT (NewFileIdentifierDesc != NULL);
 
       if (!IS_FID_PARENT_FILE (NewFileIdentifierDesc)) {
         break;

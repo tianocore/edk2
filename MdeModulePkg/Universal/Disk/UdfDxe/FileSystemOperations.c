@@ -1404,6 +1404,15 @@ InternalFindFile (
 
       break;
     }
+    //
+    // After calling function ReadDirectoryEntry(), if 'FileIdentifierDesc' is
+    // NULL, then the 'Status' must be EFI_OUT_OF_RESOURCES. Hence, if the code
+    // reaches here, 'FileIdentifierDesc' must be not NULL.
+    //
+    // The ASSERT here is for addressing a false positive NULL pointer
+    // dereference issue raised from static analysis.
+    //
+    ASSERT (FileIdentifierDesc != NULL);
 
     if (FileIdentifierDesc->FileCharacteristics & PARENT_FILE) {
       //
