@@ -978,9 +978,9 @@ SdCardIdentification (
     return Status;
   }
 
-  if ((ControllerVer & 0xFF) == 2) {
+  if ((ControllerVer & 0xFF) == SD_MMC_HC_CTRL_VER_300) {
     S18r = TRUE;
-  } else if (((ControllerVer & 0xFF) == 0) || ((ControllerVer & 0xFF) == 1)) {
+  } else if (((ControllerVer & 0xFF) == SD_MMC_HC_CTRL_VER_100) || ((ControllerVer & 0xFF) == SD_MMC_HC_CTRL_VER_200)) {
     S18r = FALSE;
   } else {
     ASSERT (FALSE);

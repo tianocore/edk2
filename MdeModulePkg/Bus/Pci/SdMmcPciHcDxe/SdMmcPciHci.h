@@ -135,6 +135,16 @@ typedef struct {
   UINT32   Hs400:1;           // bit 63
 } SD_MMC_HC_SLOT_CAP;
 
+//
+// SD Host controller version
+//
+#define SD_MMC_HC_CTRL_VER_100      0x00
+#define SD_MMC_HC_CTRL_VER_200      0x01
+#define SD_MMC_HC_CTRL_VER_300      0x02
+#define SD_MMC_HC_CTRL_VER_400      0x03
+#define SD_MMC_HC_CTRL_VER_410      0x04
+#define SD_MMC_HC_CTRL_VER_420      0x05
+
 /**
   Dump the content of SD/MMC host controller's Capability Register.
 
