@@ -1464,7 +1464,9 @@ static unsigned GetOptimum(CLzmaEnc *p, UInt32 position)
         unsigned limit = p->numFastBytes + 1;
         if (limit > numAvailFull)
           limit = numAvailFull;
-        for (len = 3; len < limit && data[len] == data2[len]; len++);
+        for (len = 3; len < limit && data[len] == data2[len]; len++)
+        {
+        }
         
         {
           unsigned state2 = kLiteralNextStates[state];
