@@ -100,6 +100,12 @@ typedef struct {
   // on behalf of this device
   //
   LIST_ENTRY                UncachedAllocationList;
+  //
+  // Unique ID for this device instance: needed so that we can report unique
+  // segment/bus/device number for each device instance. Note that this number
+  // may change when disconnecting/reconnecting the driver.
+  //
+  UINTN                     UniqueId;
 } NON_DISCOVERABLE_PCI_DEVICE;
 
 /**

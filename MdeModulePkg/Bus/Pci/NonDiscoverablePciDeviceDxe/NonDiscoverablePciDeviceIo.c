@@ -1181,6 +1181,8 @@ PciIoGetLocation (
   OUT  UINTN                *FunctionNumber
   )
 {
+  NON_DISCOVERABLE_PCI_DEVICE         *Dev;
+
   if (SegmentNumber == NULL ||
       BusNumber == NULL ||
       DeviceNumber == NULL ||
@@ -1188,9 +1190,11 @@ PciIoGetLocation (
     return EFI_INVALID_PARAMETER;
   }
 
-  *SegmentNumber  = 0;
-  *BusNumber      = 0xff;
-  *DeviceNumber   = 0;
+  Dev = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO(This);
+
+  *SegmentNumber  = 0xff;
+  *BusNumber      = Dev->UniqueId >> 5;
+  *DeviceNumber   = Dev->UniqueId & 0x1f;
   *FunctionNumber = 0;
 
   return EFI_SUCCESS;
