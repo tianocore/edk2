@@ -140,11 +140,11 @@ if __name__ == '__main__':
 
   try:
     if args.MonotonicCountStr.upper().startswith('0X'):
-      args.MonotonicCountValue = (long)(args.MonotonicCountStr, 16)
+      args.MonotonicCountValue = (int)(args.MonotonicCountStr, 16)
     else:
-      args.MonotonicCountValue = (long)(args.MonotonicCountStr)
+      args.MonotonicCountValue = (int)(args.MonotonicCountStr)
   except:
-    args.MonotonicCountValue = (long)(0)
+    args.MonotonicCountValue = (int)(0)
 
   if args.Encode:
     #
@@ -250,9 +250,9 @@ if __name__ == '__main__':
       sys.exit(1)
     else:
       if args.SignatureSizeStr.upper().startswith('0X'):
-        SignatureSize = (long)(args.SignatureSizeStr, 16)
+        SignatureSize = (int)(args.SignatureSizeStr, 16)
       else:
-        SignatureSize = (long)(args.SignatureSizeStr)
+        SignatureSize = (int)(args.SignatureSizeStr)
     if SignatureSize < 0:
         print("ERROR: The value of option --signature-size can't be set to negative value!")
         sys.exit(1)

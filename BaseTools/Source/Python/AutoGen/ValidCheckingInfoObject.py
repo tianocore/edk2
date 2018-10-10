@@ -57,7 +57,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
                 itemIndex += 1
                 realLength += 5
                 for v_data in item.data:
-                    if type(v_data) in (int, long):
+                    if isinstance(v_data, int):
                         realLength += item.StorageWidth
                     else:
                         realLength += item.StorageWidth
@@ -137,7 +137,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
                 Buffer += b
                 realLength += 1
                 for v_data in item.data:
-                    if type(v_data) in (int, long):
+                    if isinstance(v_data, int):
                         b = pack(PACK_CODE_BY_SIZE[item.StorageWidth], v_data)
                         Buffer += b
                         realLength += item.StorageWidth

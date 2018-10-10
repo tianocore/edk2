@@ -557,9 +557,9 @@ class GenFds :
         GenFdsGlobalVariable.InfLogger('\nFV Space Information')
         for FvSpaceInfo in FvSpaceInfoList:
             Name = FvSpaceInfo[0]
-            TotalSizeValue = long(FvSpaceInfo[1], 0)
-            UsedSizeValue = long(FvSpaceInfo[2], 0)
-            FreeSizeValue = long(FvSpaceInfo[3], 0)
+            TotalSizeValue = int(FvSpaceInfo[1], 0)
+            UsedSizeValue = int(FvSpaceInfo[2], 0)
+            FreeSizeValue = int(FvSpaceInfo[3], 0)
             if UsedSizeValue == TotalSizeValue:
                 Percentage = '100'
             else:
@@ -585,7 +585,7 @@ class GenFds :
         if PcdValue == '':
             return
 
-        Int64PcdValue = long(PcdValue, 0)
+        Int64PcdValue = int(PcdValue, 0)
         if Int64PcdValue == 0 or Int64PcdValue < -1:
             return
 

@@ -96,7 +96,7 @@ class AprioriSection (AprioriSectionClassObject):
 
 
             GuidPart = Guid.split('-')
-            Buffer.write(pack('I', long(GuidPart[0], 16)))
+            Buffer.write(pack('I', int(GuidPart[0], 16)))
             Buffer.write(pack('H', int(GuidPart[1], 16)))
             Buffer.write(pack('H', int(GuidPart[2], 16)))
 
