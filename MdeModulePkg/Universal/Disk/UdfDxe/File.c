@@ -500,6 +500,10 @@ UdfRead (
     PrivFileData->FilePosition++;
     Status = EFI_SUCCESS;
   } else if (IS_FID_DELETED_FILE (Parent->FileIdentifierDesc)) {
+    //
+    // Code should never reach here.
+    //
+    ASSERT (FALSE);
     Status = EFI_DEVICE_ERROR;
   }
 
