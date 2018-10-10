@@ -109,3 +109,6 @@
 
   # Oniguruma: error: variable 'fp' set but not used
   GCC:*_*_*_CC_FLAGS = -Wno-error=unused-but-set-variable
+
+  # Oniguruma: tag_end in parse_callout_of_name
+  GCC:*_*_*_CC_FLAGS = -Wno-error=maybe-uninitialized
