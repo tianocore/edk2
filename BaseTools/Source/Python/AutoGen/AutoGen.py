@@ -3637,6 +3637,10 @@ class ModuleAutoGen(AutoGen):
                 AsBuiltInfDict['binary_item'].append('PE32|' + self.Name + '.efi')
             else:
                 AsBuiltInfDict['binary_item'].append('BIN|' + File)
+        if not self.DepexGenerated:
+            DepexFile = os.path.join(self.OutputDir, self.Name + '.depex')
+            if os.path.exists(DepexFile):
+                self.DepexGenerated = True
         if self.DepexGenerated:
             self.OutputFile.add(self.Name + '.depex')
             if self.ModuleType in [SUP_MODULE_PEIM]:
