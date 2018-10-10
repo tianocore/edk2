@@ -56,51 +56,7 @@ class VariableMgr(object):
         value_str += ",".join(default_var_bin_strip)
         value_str += "}"
         return value_str
-    def Do_combine(self,sku_var_info_offset_list):
-        newvalue = {}
-        for item in sku_var_info_offset_list:
-            data_type = item.data_type
-            value_list = item.default_value.strip("{").strip("}").split(",")
-            if data_type in DataType.TAB_PCD_NUMERIC_TYPES:
-                data_flag = DataType.PACK_CODE_BY_SIZE[MAX_SIZE_TYPE[data_type]]
-                data = value_list[0]
-                value_list = []
-                for data_byte in pack(data_flag, int(data, 16) if data.upper().startswith('0X') else int(data)):
-                    value_list.append(hex(unpack("B", data_byte)[0]))
-            newvalue[int(item.var_offset, 16) if item.var_offset.upper().startswith("0X") else int(item.var_offset)] = value_list
-        try:
-            newvaluestr = "{" + ",".join(VariableMgr.assemble_variable(newvalue)) +"}"
-        except:
-            EdkLogger.error("build", AUTOGEN_ERROR, "Variable offset conflict in PCDs: %s \n" % (" and ".join(item.pcdname for item in sku_var_info_offset_list)))
-        return newvaluestr
-    def Do_Merge(self,sku_var_info_offset_list):
-        StructrurePcds = sorted([item for item in sku_var_info_offset_list if item.StructurePcd], key = lambda x: x.PcdDscLine, reverse =True )
-        Base = StructrurePcds[0]
-        BaseValue = Base.default_value.strip("{").strip("}").split(",")
-        Override = [item for item in sku_var_info_offset_list if not item.StructurePcd and item.PcdDscLine > Base.PcdDscLine]
-        newvalue = {}
-        for item in Override:
-            data_type = item.data_type
-            value_list = item.default_value.strip("{").strip("}").split(",")
-            if data_type in DataType.TAB_PCD_NUMERIC_TYPES:
-                data_flag = DataType.PACK_CODE_BY_SIZE[MAX_SIZE_TYPE[data_type]]
-                data = value_list[0]
-                value_list = []
-                for data_byte in pack(data_flag, int(data, 16) if data.upper().startswith('0X') else int(data)):
-                    value_list.append(hex(unpack("B", data_byte)[0]))
-            newvalue[int(item.var_offset, 16) if item.var_offset.upper().startswith("0X") else int(item.var_offset)] = (value_list,item.pcdname,item.PcdDscLine)
-        for offset in newvalue:
-            value_list,itemPcdname,itemPcdDscLine = newvalue[offset]
-            if offset > len(BaseValue) or (offset + len(value_list) > len(BaseValue)):
-                EdkLogger.error("build", AUTOGEN_ERROR, "The EFI Variable referred by PCD %s in line %s exceeds variable size: %s\n" % (itemPcdname,itemPcdDscLine,hex(len(BaseValue))))
-            for i in xrange(len(value_list)):
-                BaseValue[offset + i] = value_list[i]
-        newvaluestr =  "{" + ",".join(BaseValue) +"}"
-        return newvaluestr
-    def NeedMerge(self,sku_var_info_offset_list):
-        if [item for item in sku_var_info_offset_list if item.StructurePcd]:
-            return True
-        return False
+
     def combine_variable(self):
         indexedvarinfo = collections.OrderedDict()
         for item in self.VarInfo:
@@ -109,30 +65,37 @@ class VariableMgr(object):
             indexedvarinfo[(item.skuname, item.defaultstoragename, item.var_name, item.var_guid)].append(item)
         for key in indexedvarinfo:
             sku_var_info_offset_list = indexedvarinfo[key]
-            if len(sku_var_info_offset_list) == 1:
-                continue
+            sku_var_info_offset_list.sort(key=lambda x:x.PcdDscLine)
+            FirstOffset = int(sku_var_info_offset_list[0].var_offset, 16) if sku_var_info_offset_list[0].var_offset.upper().startswith("0X") else int(sku_var_info_offset_list[0].var_offset)
+            fisrtvalue_list = sku_var_info_offset_list[0].default_value.strip("{").strip("}").split(",")
+            firstdata_type = sku_var_info_offset_list[0].data_type
+            if firstdata_type in DataType.TAB_PCD_NUMERIC_TYPES:
+                fisrtdata_flag = DataType.PACK_CODE_BY_SIZE[MAX_SIZE_TYPE[firstdata_type]]
+                fisrtdata = fisrtvalue_list[0]
+                fisrtvalue_list = []
+                for data_byte in pack(fisrtdata_flag, int(fisrtdata, 16) if fisrtdata.upper().startswith('0X') else int(fisrtdata)):
+                    fisrtvalue_list.append(hex(unpack("B", data_byte)[0]))
+            newvalue_list = ["0x00"] * FirstOffset + fisrtvalue_list
 
+            for var_item in sku_var_info_offset_list[1:]:
+                CurOffset = int(var_item.var_offset, 16) if var_item.var_offset.upper().startswith("0X") else int(var_item.var_offset)
+                CurvalueList = var_item.default_value.strip("{").strip("}").split(",")
+                Curdata_type = var_item.data_type
+                if Curdata_type in DataType.TAB_PCD_NUMERIC_TYPES:
+                    data_flag = DataType.PACK_CODE_BY_SIZE[MAX_SIZE_TYPE[Curdata_type]]
+                    data = CurvalueList[0]
+                    CurvalueList = []
+                    for data_byte in pack(data_flag, int(data, 16) if data.upper().startswith('0X') else int(data)):
+                        CurvalueList.append(hex(unpack("B", data_byte)[0]))
+                if CurOffset > len(newvalue_list):
+                    newvalue_list = newvalue_list + ["0x00"] * (CurOffset - len(newvalue_list)) + CurvalueList
+                else:
+                    newvalue_list[CurOffset : CurOffset + len(CurvalueList)] = CurvalueList
+
+            newvaluestr =  "{" + ",".join(newvalue_list) +"}"
             n = sku_var_info_offset_list[0]
-
-            if self.NeedMerge(sku_var_info_offset_list):
-                newvaluestr = self.Do_Merge(sku_var_info_offset_list)
-            else:
-                newvaluestr = self.Do_combine(sku_var_info_offset_list)
-
             indexedvarinfo[key] =  [var_info(n.pcdindex, n.pcdname, n.defaultstoragename, n.skuname, n.var_name, n.var_guid, "0x00", n.var_attribute, newvaluestr, newvaluestr, DataType.TAB_VOID,n.PcdDscLine,n.StructurePcd)]
-        self.VarInfo = [item[0] for item in indexedvarinfo.values()]
-
-    @staticmethod
-    def assemble_variable(valuedict):
-        ordered_valuedict_keys = sorted(valuedict.keys())
-        var_value = []
-        for current_valuedict_key in ordered_valuedict_keys:
-            if current_valuedict_key < len(var_value):
-                raise
-            for _ in xrange(current_valuedict_key - len(var_value)):
-                var_value.append('0x00')
-            var_value += valuedict[current_valuedict_key]
-        return var_value
+        self.VarInfo = [item[0] for item in list(indexedvarinfo.values())]
 
     def process_variable_data(self):
 
