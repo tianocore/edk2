@@ -7725,8 +7725,9 @@ parse_exp(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
   case TK_ALT:
   case TK_EOT:
   end_of_token:
-  *np = node_new_empty();
-  return tok->type;
+    *np = node_new_empty();
+    CHECK_NULL_RETURN_MEMERR(*np);
+    return tok->type;
   break;
 
   case TK_SUBEXP_OPEN:
@@ -7977,8 +7978,10 @@ parse_exp(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
     if (IS_SYNTAX_BV(env->syntax, ONIG_SYN_CONTEXT_INDEP_REPEAT_OPS)) {
       if (IS_SYNTAX_BV(env->syntax, ONIG_SYN_CONTEXT_INVALID_REPEAT_OPS))
         return ONIGERR_TARGET_OF_REPEAT_OPERATOR_NOT_SPECIFIED;
-      else
+      else {
         *np = node_new_empty();
+        CHECK_NULL_RETURN_MEMERR(*np);
+      }
     }
     else {
       goto tk_byte;
