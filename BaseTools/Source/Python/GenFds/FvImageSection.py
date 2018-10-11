@@ -98,7 +98,7 @@ class FvImageSection(FvImageSectionClassObject):
         # Generate Fv
         #
         if self.FvName is not None:
-            Buffer = BytesIO('')
+            Buffer = BytesIO()
             Fv = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName)
             if Fv is not None:
                 self.Fv = Fv
@@ -118,7 +118,7 @@ class FvImageSection(FvImageSectionClassObject):
                         # PI FvHeader is 0x48 byte
                         FvHeaderBuffer = FvFileObj.read(0x48)
                         # FV alignment position.
-                        FvAlignmentValue = 1 << (ord (FvHeaderBuffer[0x2E]) & 0x1F)
+                        FvAlignmentValue = 1 << (FvHeaderBuffer[0x2E] & 0x1F)
                         # FvAlignmentValue is larger than or equal to 1K
                         if FvAlignmentValue >= 0x400:
                             if FvAlignmentValue >= 0x100000:

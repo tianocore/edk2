@@ -130,7 +130,14 @@ def GetDependencyList(FileStack, SearchPathList):
                 continue
 
             if FileContent[0] == 0xff or FileContent[0] == 0xfe:
-                FileContent = unicode(FileContent, "utf-16")
+                FileContent = str(FileContent, "utf-16")
+                IncludedFileList = gIncludePattern.findall(FileContent)
+            else:
+                try:
+                    FileContent = str(FileContent, "utf-8")
+                    IncludedFileList = gIncludePattern.findall(FileContent)
+                except:
+                    pass
             IncludedFileList = gIncludePattern.findall(FileContent)
 
             for Inc in IncludedFileList:
@@ -1655,7 +1662,7 @@ class DscBuildData(PlatformBuildClassObject):
         except:
             EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s' % Command)
         Result = Process.communicate()
-        return Process.returncode, Result[0], Result[1]
+        return Process.returncode, Result[0].decode(encoding='utf-8', errors='ignore'), Result[1].decode(encoding='utf-8', errors='ignore')
 
     @staticmethod
     def IntToCString(Value, ValueSize):
@@ -2684,7 +2691,7 @@ class DscBuildData(PlatformBuildClassObject):
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}
             Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName][DefaultStore] = DefaultValue
         for pcd in Pcds.values():
-            SkuInfoObj = pcd.SkuInfoList.values()[0]
+            SkuInfoObj = list(pcd.SkuInfoList.values())[0]
             pcdDecObject = self._DecPcds[pcd.TokenCName, pcd.TokenSpaceGuidCName]
             pcd.DatumType = pcdDecObject.DatumType
             # Only fix the value while no value provided in DSC file.

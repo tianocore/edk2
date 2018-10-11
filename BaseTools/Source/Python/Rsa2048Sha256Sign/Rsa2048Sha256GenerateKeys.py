@@ -82,7 +82,7 @@ if __name__ == '__main__':
   if Process.returncode != 0:
     print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
-  print(Version[0])
+  print(Version[0].decode())
 
   args.PemFileName = []
 
@@ -117,19 +117,19 @@ if __name__ == '__main__':
       args.PemFileName.append(Item.name)
       Item.close()
 
-  PublicKeyHash = ''
+  PublicKeyHash = bytearray()
   for Item in args.PemFileName:
     #
     # Extract public key from private key into STDOUT
     #
     Process = subprocess.Popen('%s rsa -in %s -modulus -noout' % (OpenSslCommand, Item), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-    PublicKeyHexString = Process.communicate()[0].split('=')[1].strip()
+    PublicKeyHexString = Process.communicate()[0].split(b'=')[1].strip()
     if Process.returncode != 0:
       print('ERROR: Unable to extract public key from private key')
       sys.exit(Process.returncode)
-    PublicKey = ''
+    PublicKey = bytearray()
     for Index in range (0, len(PublicKeyHexString), 2):
-      PublicKey = PublicKey + chr(int(PublicKeyHexString[Index:Index + 2], 16))
+      PublicKey = PublicKey + PublicKeyHexString[Index:Index + 2]
 
     #
     # Generate SHA 256 hash of RSA 2048 bit public key into STDOUT
@@ -155,14 +155,14 @@ if __name__ == '__main__':
   #
   PublicKeyHashC = '{'
   for Item in PublicKeyHash:
-    PublicKeyHashC = PublicKeyHashC + '0x%02x, ' % (ord(Item))
+    PublicKeyHashC = PublicKeyHashC + '0x%02x, ' % (Item)
   PublicKeyHashC = PublicKeyHashC[:-2] + '}'
 
   #
   # Write SHA 256 of 2048 bit binary public key to public key hash C structure file
   #
   try:
-    args.PublicKeyHashCFile.write (PublicKeyHashC)
+    args.PublicKeyHashCFile.write (bytes(PublicKeyHashC))
     args.PublicKeyHashCFile.close ()
   except:
     pass

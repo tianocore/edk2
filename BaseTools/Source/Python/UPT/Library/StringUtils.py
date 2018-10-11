@@ -680,9 +680,7 @@ def GetHelpTextList(HelpTextClassList):
 # @param String: the source string
 #
 def StringArrayLength(String):
-    if isinstance(String, unicode):
-        return (len(String) + 1) * 2 + 1
-    elif String.startswith('L"'):
+    if String.startswith('L"'):
         return (len(String) - 3 + 1) * 2
     elif String.startswith('"'):
         return (len(String) - 2 + 1)

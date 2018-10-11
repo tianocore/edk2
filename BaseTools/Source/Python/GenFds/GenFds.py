@@ -27,6 +27,7 @@ from Workspace.BuildClassObject import PcdClassObject
 from . import RuleComplexFile
 from .EfiSection import EfiSection
 from io import BytesIO
+from io import StringIO
 import Common.TargetTxtClassObject as TargetTxtClassObject
 import Common.ToolDefClassObject as ToolDefClassObject
 from Common.DataType import *
@@ -454,7 +455,7 @@ class GenFds :
                 return
         elif GenFds.OnlyGenerateThisFv is None:
             for FvObj in GenFdsGlobalVariable.FdfParser.Profile.FvDict.values():
-                Buffer = BytesIO('')
+                Buffer = BytesIO()
                 FvObj.AddToBuffer(Buffer)
                 Buffer.close()
 
@@ -600,7 +601,7 @@ class GenFds :
 
     def GenerateGuidXRefFile(BuildDb, ArchList, FdfParserObj):
         GuidXRefFileName = os.path.join(GenFdsGlobalVariable.FvDir, "Guid.xref")
-        GuidXRefFile = BytesIO('')
+        GuidXRefFile = StringIO('')
         PkgGuidDict = {}
         GuidDict = {}
         ModuleList = []

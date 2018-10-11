@@ -18,6 +18,7 @@
 import Common.LongFilePathOs as os
 import subprocess
 from io import BytesIO
+from io import StringIO
 from struct import *
 
 from . import Ffs
@@ -204,7 +205,7 @@ class FV (FvClassObject):
                 # PI FvHeader is 0x48 byte
                 FvHeaderBuffer = FvFileObj.read(0x48)
                 # FV alignment position.
-                FvAlignmentValue = 1 << (ord(FvHeaderBuffer[0x2E]) & 0x1F)
+                FvAlignmentValue = 1 << (FvHeaderBuffer[0x2E] & 0x1F)
                 if FvAlignmentValue >= 0x400:
                     if FvAlignmentValue >= 0x100000:
                         if FvAlignmentValue >= 0x1000000:
@@ -264,7 +265,7 @@ class FV (FvClassObject):
         #
         self.InfFileName = os.path.join(GenFdsGlobalVariable.FvDir,
                                    self.UiFvName + '.inf')
-        self.FvInfFile = BytesIO()
+        self.FvInfFile = StringIO()
 
         #
         # Add [Options]
@@ -339,7 +340,7 @@ class FV (FvClassObject):
                 GenFdsGlobalVariable.ErrorLogger("FV Extension Header Entries declared for %s with no FvNameGuid declaration." % (self.UiFvName))
         else:
             TotalSize = 16 + 4
-            Buffer = ''
+            Buffer = bytearray()
             if self.UsedSizeEnable:
                 TotalSize += (4 + 4)
                 ## define EFI_FV_EXT_TYPE_USED_SIZE_TYPE 0x03
@@ -366,7 +367,7 @@ class FV (FvClassObject):
                 #
                 Buffer += (pack('HH', (FvUiLen + 16 + 4), 0x0002)
                            + PackGUID(Guid)
-                           + self.UiFvName)
+                           + bytes(self.UiFvName, 'utf-8'))
 
             for Index in range (0, len(self.FvExtEntryType)):
                 if self.FvExtEntryType[Index] == 'FILE':

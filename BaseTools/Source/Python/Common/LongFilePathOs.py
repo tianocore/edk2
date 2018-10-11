@@ -14,7 +14,6 @@
 import os
 from . import LongFilePathOsPath
 from Common.LongFilePathSupport import LongFilePath
-from Common.LongFilePathSupport import UniToStr
 import time
 
 path = LongFilePathOsPath
@@ -63,7 +62,7 @@ def listdir(path):
     List = []
     uList = os.listdir(u"%s" % LongFilePath(path))
     for Item in uList:
-        List.append(UniToStr(Item))
+        List.append(Item)
     return List
 
 environ = os.environ

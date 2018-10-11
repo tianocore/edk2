@@ -18,7 +18,7 @@
 #
 import Common.LongFilePathOs as os
 import re
-from io import BytesIO
+from io import StringIO
 import sys
 import glob
 import time
@@ -242,8 +242,8 @@ def ReadMessage(From, To, ExitFlag):
         # read one line a time
         Line = From.readline()
         # empty string means "end"
-        if Line is not None and Line != "":
-            To(Line.rstrip())
+        if Line is not None and Line != b"":
+            To(Line.rstrip().decode(encoding='utf-8', errors='ignore'))
         else:
             break
         if ExitFlag.isSet():
@@ -1780,7 +1780,7 @@ class Build():
                             if not Ma.IsLibrary:
                                 ModuleList[Ma.Guid.upper()] = Ma
 
-                    MapBuffer = BytesIO('')
+                    MapBuffer = StringIO('')
                     if self.LoadFixAddress != 0:
                         #
                         # Rebase module to the preferred memory address before GenFds
@@ -1938,7 +1938,7 @@ class Build():
                             if not Ma.IsLibrary:
                                 ModuleList[Ma.Guid.upper()] = Ma
 
-                    MapBuffer = BytesIO('')
+                    MapBuffer = StringIO('')
                     if self.LoadFixAddress != 0:
                         #
                         # Rebase module to the preferred memory address before GenFds
@@ -2125,7 +2125,7 @@ class Build():
                     #
                     # Rebase module to the preferred memory address before GenFds
                     #
-                    MapBuffer = BytesIO('')
+                    MapBuffer = StringIO('')
                     if self.LoadFixAddress != 0:
                         self._CollectModuleMapBuffer(MapBuffer, ModuleList)
 

@@ -41,7 +41,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
             os.mkdir(dest)
         BinFileName = "PcdVarCheck.bin"
         BinFilePath = os.path.join(dest, BinFileName)
-        Buffer = ''
+        Buffer = bytearray()
         index = 0
         for var_check_tab in self.var_check_info:
             index += 1

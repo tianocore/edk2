@@ -454,9 +454,6 @@ def RemoveDirectory(Directory, Recursively=False):
 #   @retval     False           If the file content is the same
 #
 def SaveFileOnChange(File, Content, IsBinaryFile=True):
-    if not IsBinaryFile:
-        Content = Content.replace("\n", os.linesep)
-
     if os.path.exists(File):
         try:
             if isinstance(Content, bytes):
@@ -1308,7 +1305,7 @@ def ParseDevPathValue (Value):
     if err:
         raise BadExpression("DevicePath: %s" % str(err))
     Size = len(out.split())
-    out = ','.join(out.split())
+    out = ','.join(out.decode(encoding='utf-8', errors='ignore').split())
     return '{' + out + '}', Size
 
 def ParseFieldValue (Value):
@@ -1347,7 +1344,7 @@ def ParseFieldValue (Value):
         if Value[0] == '"' and Value[-1] == '"':
             Value = Value[1:-1]
         try:
-            Value = "'" + uuid.UUID(Value).get_bytes_le() + "'"
+            Value = "{" + ','.join([str(i) for i in uuid.UUID(Value).bytes_le]) + "}"
         except ValueError as Message:
             raise BadExpression(Message)
         Value, Size = ParseFieldValue(Value)
@@ -1871,7 +1868,7 @@ class PeImageClass():
         ByteArray = array.array('B')
         ByteArray.fromfile(PeObject, 4)
         # PE signature should be 'PE\0\0'
-        if ByteArray.tostring() != 'PE\0\0':
+        if ByteArray.tostring() != b'PE\0\0':
             self.ErrorInfo = self.FileName + ' has no valid PE signature PE00'
             return
 

@@ -82,7 +82,7 @@ class FileStatement (FileStatementClassObject) :
         Dict.update(self.DefineVarDict)
         SectionAlignments = None
         if self.FvName is not None :
-            Buffer = BytesIO('')
+            Buffer = BytesIO()
             if self.FvName.upper() not in GenFdsGlobalVariable.FdfParser.Profile.FvDict:
                 EdkLogger.error("GenFds", GENFDS_ERROR, "FV (%s) is NOT described in FDF file!" % (self.FvName))
             Fv = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName.upper())
@@ -99,7 +99,7 @@ class FileStatement (FileStatementClassObject) :
         elif self.FileName is not None:
             if hasattr(self, 'FvFileType') and self.FvFileType == 'RAW':
                 if isinstance(self.FileName, list) and isinstance(self.SubAlignment, list) and len(self.FileName) == len(self.SubAlignment):
-                    FileContent = ''
+                    FileContent = BytesIO()
                     MaxAlignIndex = 0
                     MaxAlignValue = 1
                     for Index, File in enumerate(self.FileName):
@@ -115,15 +115,15 @@ class FileStatement (FileStatementClassObject) :
                         if AlignValue > MaxAlignValue:
                             MaxAlignIndex = Index
                             MaxAlignValue = AlignValue
-                        FileContent += Content
-                        if len(FileContent) % AlignValue != 0:
+                        FileContent.write(Content)
+                        if len(FileContent.getvalue()) % AlignValue != 0:
                             Size = AlignValue - len(FileContent) % AlignValue
                             for i in range(0, Size):
-                                FileContent += pack('B', 0xFF)
+                                FileContent.write(pack('B', 0xFF))
 
-                    if FileContent:
+                    if FileContent.getvalue() != b'':
                         OutputRAWFile = os.path.join(GenFdsGlobalVariable.FfsDir, self.NameGuid, self.NameGuid + '.raw')
-                        SaveFileOnChange(OutputRAWFile, FileContent, True)
+                        SaveFileOnChange(OutputRAWFile, FileContent.getvalue(), True)
                         self.FileName = OutputRAWFile
                         self.SubAlignment = self.SubAlignment[MaxAlignIndex]
 
