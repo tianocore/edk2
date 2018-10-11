@@ -20,6 +20,11 @@ EFI_PEI_TEMPORARY_RAM_SUPPORT_PPI gSecTemporaryRamSupportPpi = {
 
 EFI_PEI_PPI_DESCRIPTOR            mPeiSecPlatformInformationPpi[] = {
   {
+    EFI_PEI_PPI_DESCRIPTOR_PPI,
+    &gFspInApiModePpiGuid,
+    NULL
+  },
+  {
     (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
     &gEfiTemporaryRamSupportPpiGuid,
     &gSecTemporaryRamSupportPpi

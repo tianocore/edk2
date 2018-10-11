@@ -48,6 +48,12 @@ CONST EFI_PEI_PPI_DESCRIPTOR gEndOfPeiSignalPpi = {
   NULL
 };
 
+CONST EFI_PEI_PPI_DESCRIPTOR gFspReadyForNotifyPhasePpi = {
+  (EFI_PEI_PPI_DESCRIPTOR_PPI | EFI_PEI_PPI_DESCRIPTOR_TERMINATE_LIST),
+  &gFspReadyForNotifyPhasePpiGuid,
+  NULL
+};
+
 /**
 
    This function waits for FSP notify.
@@ -88,13 +94,15 @@ WaitForNotify (
   //
   FspWaitForNotify ();
 
-  //
-  // Should not come here
-  //
-  while (TRUE) {
-    DEBUG ((DEBUG_ERROR, "No FSP API should be called after FSP is DONE!\n"));
-    SetFspApiReturnStatus (EFI_UNSUPPORTED);
-    Pei2LoaderSwitchStack ();
+  if (GetFspGlobalDataPointer ()->FspMode == FSP_IN_API_MODE) {
+    //
+    // Should not come here
+    //
+    while (TRUE) {
+      DEBUG ((DEBUG_ERROR, "No FSP API should be called after FSP is DONE!\n"));
+      SetFspApiReturnStatus (EFI_UNSUPPORTED);
+      Pei2LoaderSwitchStack ();
+    }
   }
 
   return EFI_SUCCESS;
@@ -121,22 +129,27 @@ FspNotifyPhasePeimEntryPoint (
 
   DEBUG ((DEBUG_INFO | DEBUG_INIT, "The entry of FspNotificationPeim\n"));
 
-  //
-  // Locate old DXE IPL PPI
-  //
-  Status = PeiServicesLocatePpi (
-            &gEfiDxeIplPpiGuid,
-            0,
-            &OldDescriptor,
-            &OldDxeIplPpi
-            );
-  ASSERT_EFI_ERROR (Status);
+  if (GetFspGlobalDataPointer ()->FspMode == FSP_IN_API_MODE) {
+    //
+    // Locate old DXE IPL PPI
+    //
+    Status = PeiServicesLocatePpi (
+              &gEfiDxeIplPpiGuid,
+              0,
+              &OldDescriptor,
+              &OldDxeIplPpi
+              );
+    ASSERT_EFI_ERROR (Status);
 
-  //
-  // Re-install the DXE IPL PPI to wait for notify
-  //
-  Status = PeiServicesReInstallPpi (OldDescriptor, &mInstallDxeIplPpi);
-  ASSERT_EFI_ERROR (Status);
+    //
+    // Re-install the DXE IPL PPI to wait for notify
+    //
+    Status = PeiServicesReInstallPpi (OldDescriptor, &mInstallDxeIplPpi);
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    Status = PeiServicesInstallPpi (&gFspReadyForNotifyPhasePpi);
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return EFI_SUCCESS;
 }

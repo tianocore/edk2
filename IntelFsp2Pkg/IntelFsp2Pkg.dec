@@ -43,6 +43,18 @@
   ##  @libraryclass  Provides FSP platform sec related actions.
   FspSecPlatformLib|Include/Library/FspSecPlatformLib.h
 
+[Ppis]
+  #
+  # PPI to indicate FSP is ready to enter notify phase
+  # This provides flexibility for any late initialization that must be done right before entering notify phase.
+  #
+  gFspReadyForNotifyPhasePpiGuid        = { 0xcd167c1e, 0x6e0b, 0x42b3, { 0x82, 0xf6, 0xe3, 0xe9, 0x6, 0x19, 0x98, 0x10}}
+
+  #
+  # PPI as dependency on some modules which only required for API mode
+  #
+  gFspInApiModePpiGuid                  = { 0xa1eeab87, 0xc859, 0x479d, {0x89, 0xb5, 0x14, 0x61, 0xf4, 0x06, 0x1a, 0x3e}}
+
 [Guids]
   #
   # GUID defined in package
