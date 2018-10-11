@@ -149,7 +149,7 @@ ShellCommandRunDmem (
       Temp1 = ShellCommandLineGetRawValue(Package, 1);
       if (Temp1 == NULL) {
         Address = gST;
-        Size = 512;
+        Size    = sizeof (*gST);
       } else {
         if (!ShellIsHexOrDecimalNumber(Temp1, TRUE, FALSE) || EFI_ERROR(ShellConvertStringToUint64(Temp1, (UINT64*)&Address, TRUE, FALSE))) {
           ShellPrintHiiEx(-1, -1, NULL, STRING_TOKEN (STR_GEN_PARAM_INV), gShellDebug1HiiHandle, L"dmem", Temp1);
