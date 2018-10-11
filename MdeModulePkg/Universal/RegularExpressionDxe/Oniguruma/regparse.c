@@ -1906,6 +1906,7 @@ callout_tag_entry(regex_t* reg, UChar* name, UChar* name_end,
   if (r != ONIG_NORMAL) return r;
 
   ext = onig_get_regex_ext(reg);
+  CHECK_NULL_RETURN_MEMERR(ext);
   r = callout_tag_entry_raw(ext->tag_table, name, name_end, entry_val);
 
   e = onig_reg_callout_list_at(reg, (int )entry_val);
@@ -2088,6 +2089,7 @@ node_new(void)
   Node* node;
 
   node = (Node* )xmalloc(sizeof(Node));
+  CHECK_NULL_RETURN(node);
   xmemset(node, 0, sizeof(*node));
 
 #ifdef DEBUG_NODE_FREE
@@ -6616,6 +6618,7 @@ parse_callout_of_contents(Node** np, int cterm, UChar** src, UChar* end, ScanEnv
   if (r != 0) return r;
 
   ext = onig_get_regex_ext(env->reg);
+  CHECK_NULL_RETURN_MEMERR(ext);
   if (IS_NULL(ext->pattern)) {
     r = onig_ext_set_pattern(env->reg, env->pattern, env->pattern_end);
     if (r != ONIG_NORMAL) return r;
@@ -6936,6 +6939,7 @@ parse_callout_of_name(Node** np, int cterm, UChar** src, UChar* end, ScanEnv* en
   if (r != 0) return r;
 
   ext = onig_get_regex_ext(env->reg);
+  CHECK_NULL_RETURN_MEMERR(ext);
   if (IS_NULL(ext->pattern)) {
     r = onig_ext_set_pattern(env->reg, env->pattern, env->pattern_end);
     if (r != ONIG_NORMAL) return r;
@@ -7987,6 +7991,7 @@ parse_exp(Node** np, OnigToken* tok, int term, UChar** src, UChar* end,
       int ascii_mode =
         IS_WORD_ASCII(env->options) && IS_WORD_ANCHOR_TYPE(tok->u.anchor) ? 1 : 0;
       *np = onig_node_new_anchor(tok->u.anchor, ascii_mode);
+	  CHECK_NULL_RETURN_MEMERR(*np);
     }
     break;
 
