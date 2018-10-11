@@ -3546,8 +3546,12 @@ expand_case_fold_string_alt(int item_num, OnigCaseFoldCodeItem items[], UChar *p
     if (IS_NULL(an)) {
       goto mem_err2;
     }
-
-    if (items[i].byte_len != slen) {
+    //The NULL pointer check is not necessary. It is added just for pass static
+    //analysis. When condition "items[i].byte_len != slen" is true, "varlen = 1"
+    //in line 3503 will be reached ,so that "if (IS_NULL(var_anode)) return ONIGERR_MEMORY"
+    //in line 3510 will be executed, so the null pointer has been checked before
+    //deferenced in line 3584.
+    if (items[i].byte_len != slen && IS_NOT_NULL(var_anode)) {
       Node *rem;
       UChar *q = p + items[i].byte_len;
 

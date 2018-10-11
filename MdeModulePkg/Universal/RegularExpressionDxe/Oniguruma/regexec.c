@@ -4088,6 +4088,11 @@ slow_search_backward(OnigEncoding enc, UChar* target, UChar* target_end,
     s = ONIGENC_LEFT_ADJUST_CHAR_HEAD(enc, adjust_text, s);
 
   while (s >= text) {
+    //if text is not null,the logic is correct.
+    //this function is only invoked by backward_search_range,parameter text come
+    //from range, which is checked by "if (range == 0) goto fail" in line 4512
+    //so the check is just for passing static analysis.
+    if(IS_NULL(s))break;
     if (*s == *target) {
       p = s + 1;
       t = target + 1;
@@ -4298,6 +4303,11 @@ map_search_backward(OnigEncoding enc, UChar map[],
   const UChar *s = text_start;
 
   while (s >= text) {
+    //if text is not null,the logic is correct.
+    //this function is only invoked by backward_search_range,parameter text come
+    //from range, which is checked by "if (range == 0) goto fail" in line 4512
+    //so the check is just for passing static analysis.
+    if(IS_NULL(s))break;
     if (map[*s]) return (UChar* )s;
 
     s = onigenc_get_prev_char_head(enc, adjust_text, s);
@@ -4499,7 +4509,7 @@ backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
                       UChar** low, UChar** high)
 {
   UChar *p;
-
+  if (range == 0) goto fail;
   range += reg->dmin;
   p = s;
 
@@ -4550,7 +4560,7 @@ backward_search_range(regex_t* reg, const UChar* str, const UChar* end,
       case ANCHOR_BEGIN_LINE:
         if (!ON_STR_BEGIN(p)) {
           prev = onigenc_get_prev_char_head(reg->enc, str, p);
-          if (!ONIGENC_IS_MBC_NEWLINE(reg->enc, prev, end)) {
+          if (IS_NOT_NULL(prev) && !ONIGENC_IS_MBC_NEWLINE(reg->enc, prev, end)) {
             p = prev;
             goto retry;
           }
@@ -4739,10 +4749,15 @@ onig_search_with_param(regex_t* reg, const UChar* str, const UChar* end,
       }
     }
     else if (reg->anchor & ANCHOR_SEMI_END_BUF) {
+
       UChar* pre_end = ONIGENC_STEP_BACK(reg->enc, str, end, 1);
 
       max_semi_end = (UChar* )end;
-      if (ONIGENC_IS_MBC_NEWLINE(reg->enc, pre_end, end)) {
+      // only when str > end, pre_end will be null
+      // line 4659 "if (start > end || start < str) goto mismatch_no_msa"
+      // will guarantee str alwayls less than end
+      // so pre_end won't be null,this check is just for passing staic analysis
+      if (IS_NOT_NULL(pre_end) && ONIGENC_IS_MBC_NEWLINE(reg->enc, pre_end, end)) {
         min_semi_end = pre_end;
 
 #ifdef USE_CRNL_AS_LINE_TERMINATOR
@@ -4891,6 +4906,16 @@ onig_search_with_param(regex_t* reg, const UChar* str, const UChar* end,
             MATCH_AND_RETURN_CHECK(orig_start);
             s = prev;
           }
+          // if range is not null,the check is not necessary.
+          // the range is actually the pointer of the end of the matched string
+          // or assigned by "range = str" in line 4708. In RegularExpressionMatch
+          // protocol, the matched string is the parameter String. And str in
+          // line 4708 is the String,too. and the range is calculated from
+          // "Start + onigenc_str_bytelen_null (CHAR16_ENCODING, Start)" in
+          // line 146 in RegularExpressionDxe.c. RegularExpressionMatch ensure
+          // the String is not null,So in both situation, the range can not be NULL.
+          // This check is just for passing static analysis.
+          if(IS_NULL(s))break;
         } while (s >= range);
         goto mismatch;
       }
