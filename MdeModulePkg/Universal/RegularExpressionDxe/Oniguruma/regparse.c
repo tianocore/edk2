@@ -966,6 +966,7 @@ name_add(regex_t* reg, UChar* name, UChar* name_end, int backref, ScanEnv* env)
 #ifdef USE_ST_LIBRARY
     if (IS_NULL(t)) {
       t = onig_st_init_strend_table_with_size(INIT_NAMES_ALLOC_NUM);
+      CHECK_NULL_RETURN_MEMERR(t);
       reg->name_table = (void* )t;
     }
     e = (NameEntry* )xmalloc(sizeof(NameEntry));
@@ -1372,6 +1373,7 @@ callout_name_entry(CalloutNameEntry** rentry, OnigEncoding enc,
 #ifdef USE_ST_LIBRARY
     if (IS_NULL(t)) {
       t = onig_st_init_callout_name_table_with_size(INIT_NAMES_ALLOC_NUM);
+      CHECK_NULL_RETURN_MEMERR(t);
       GlobalCalloutNameTable = t;
     }
     e = (CalloutNameEntry* )xmalloc(sizeof(CalloutNameEntry));
@@ -1616,6 +1618,7 @@ onig_get_callout_start_func(regex_t* reg, int callout_num)
   CalloutListEntry* e;
 
   e = onig_reg_callout_list_at(reg, callout_num);
+  CHECK_NULL_RETURN(e);
   return e->start_func;
 }
 
@@ -1623,6 +1626,7 @@ extern const UChar*
 onig_get_callout_tag_start(regex_t* reg, int callout_num)
 {
   CalloutListEntry* e = onig_reg_callout_list_at(reg, callout_num);
+  CHECK_NULL_RETURN(e);
   return e->tag_start;
 }
 
@@ -1630,6 +1634,7 @@ extern const UChar*
 onig_get_callout_tag_end(regex_t* reg, int callout_num)
 {
   CalloutListEntry* e = onig_reg_callout_list_at(reg, callout_num);
+  CHECK_NULL_RETURN(e);
   return e->tag_end;
 }
 
@@ -1904,6 +1909,7 @@ callout_tag_entry(regex_t* reg, UChar* name, UChar* name_end,
   r = callout_tag_entry_raw(ext->tag_table, name, name_end, entry_val);
 
   e = onig_reg_callout_list_at(reg, (int )entry_val);
+  CHECK_NULL_RETURN_MEMERR(e);
   e->tag_start = name;
   e->tag_end   = name_end;
 
@@ -2138,6 +2144,8 @@ node_new_anychar_with_fixed_option(OnigOptionType option)
   Node* node;
 
   node = node_new_anychar();
+  CHECK_NULL_RETURN(node);
+
   ct = CTYPE_(node);
   ct->options = option;
   NODE_STATUS_ADD(node, FIXED_OPTION);
@@ -3174,6 +3182,7 @@ static Node*
 node_new_str_raw(UChar* s, UChar* end)
 {
   Node* node = node_new_str(s, end);
+  CHECK_NULL_RETURN(node);
   NODE_STRING_SET_RAW(node);
   return node;
 }
@@ -3206,6 +3215,7 @@ str_node_split_last_char(Node* node, OnigEncoding enc)
     p = onigenc_get_prev_char_head(enc, sn->s, sn->end);
     if (p && p > sn->s) { /* can be split. */
       rn = node_new_str(p, sn->end);
+      CHECK_NULL_RETURN(rn);
       if (NODE_STRING_IS_RAW(node))
         NODE_STRING_SET_RAW(rn);
 
@@ -6626,6 +6636,11 @@ parse_callout_of_contents(Node** np, int cterm, UChar** src, UChar* end, ScanEnv
   }
 
   e = onig_reg_callout_list_at(env->reg, num);
+  if (IS_NULL(e)) {
+    xfree(contents);
+    return ONIGERR_MEMORY;
+  }
+
   e->of      = ONIG_CALLOUT_OF_CONTENTS;
   e->in      = in;
   e->name_id = ONIG_NON_NAME_ID;
@@ -6935,6 +6950,8 @@ parse_callout_of_name(Node** np, int cterm, UChar** src, UChar* end, ScanEnv* en
   if (r != ONIG_NORMAL) return r;
 
   e = onig_reg_callout_list_at(env->reg, num);
+  CHECK_NULL_RETURN_MEMERR(e);
+
   e->of         = ONIG_CALLOUT_OF_NAME;
   e->in         = in;
   e->name_id    = name_id;
@@ -8098,6 +8115,11 @@ parse_branch(Node** top, OnigToken* tok, int term, UChar** src, UChar* end,
   }
   else {
     *top  = node_new_list(node, NULL);
+    if (IS_NULL(*top)) {
+      onig_node_free(node);
+      return ONIGERR_MEMORY;
+    }
+
     headp = &(NODE_CDR(*top));
     while (r != TK_EOT && r != term && r != TK_ALT) {
       r = parse_exp(&node, tok, term, src, end, env);
@@ -8133,6 +8155,7 @@ parse_subexp(Node** top, OnigToken* tok, int term, UChar** src, UChar* end,
   env->parse_depth++;
   if (env->parse_depth > ParseDepthLimit)
     return ONIGERR_PARSE_DEPTH_LIMIT_OVER;
+
   r = parse_branch(&node, tok, term, src, end, env);
   if (r < 0) {
     onig_node_free(node);
@@ -8144,6 +8167,11 @@ parse_subexp(Node** top, OnigToken* tok, int term, UChar** src, UChar* end,
   }
   else if (r == TK_ALT) {
     *top  = onig_node_new_alt(node, NULL);
+    if (IS_NULL(*top)) {
+      onig_node_free(node);
+      return ONIGERR_MEMORY;
+    }
+
     headp = &(NODE_CDR(*top));
     while (r == TK_ALT) {
       r = fetch_token(tok, src, end, env);
@@ -8154,6 +8182,12 @@ parse_subexp(Node** top, OnigToken* tok, int term, UChar** src, UChar* end,
         return r;
       }
       *headp = onig_node_new_alt(node, NULL);
+      if (IS_NULL(*headp)) {
+        onig_node_free(node);
+        onig_node_free(*top);
+        return ONIGERR_MEMORY;
+      }
+
       headp = &(NODE_CDR(*headp));
     }
 

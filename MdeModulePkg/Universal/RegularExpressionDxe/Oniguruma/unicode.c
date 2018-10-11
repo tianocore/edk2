@@ -758,6 +758,10 @@ onig_unicode_define_user_property(const char* name, OnigCodePoint* ranges)
 
   if (UserDefinedPropertyTable == 0) {
     UserDefinedPropertyTable = onig_st_init_strend_table_with_size(10);
+    if (IS_NULL(UserDefinedPropertyTable)) {
+      xfree(s);
+      return ONIGERR_MEMORY;
+    }
   }
 
   e = UserDefinedPropertyRanges + UserDefinedPropertyNum;

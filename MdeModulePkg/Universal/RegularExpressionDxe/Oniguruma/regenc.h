@@ -197,7 +197,7 @@ extern int onigenc_egcb_is_break_position P_((OnigEncoding enc, UChar* p, UChar*
   else if ((buk)->fold_len == 3)\
     addr = OnigUnicodeFolds3 + (buk)->index;\
   else\
-    addr = 0;\
+    return ONIGERR_INVALID_CODE_POINT_VALUE;\
 } while (0)
 
 extern OnigCodePoint OnigUnicodeFolds1[];
