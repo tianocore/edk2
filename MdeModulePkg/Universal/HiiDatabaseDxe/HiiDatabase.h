@@ -2329,12 +2329,12 @@ This function mainly use to get HiiDatabase information.
 
 **/
 EFI_STATUS
-HiiGetDatabaseInfo(
+HiiGetDatabaseInfo (
   IN CONST EFI_HII_DATABASE_PROTOCOL        *This
   );
 
 /**
-This is an internal function,mainly use to get and update configuration settings information.
+This function mainly use to get and update ConfigResp string.
 
 @param  This                   A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
 
@@ -2343,7 +2343,7 @@ This is an internal function,mainly use to get and update configuration settings
 
 **/
 EFI_STATUS
-HiiGetConfigurationSetting(
+HiiGetConfigRespInfo (
   IN CONST EFI_HII_DATABASE_PROTOCOL        *This
   );
 

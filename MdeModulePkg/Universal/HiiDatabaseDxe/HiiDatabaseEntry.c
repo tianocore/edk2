@@ -144,7 +144,8 @@ OnReadyToBoot (
   // When ready to boot, we begin to export the HiiDatabase date.
   // And hook all the possible HiiDatabase change actions to export data.
   //
-  HiiGetConfigurationSetting(&mPrivate.HiiDatabase);
+  HiiGetDatabaseInfo (&mPrivate.HiiDatabase);
+  HiiGetConfigRespInfo (&mPrivate.HiiDatabase);
   gExportAfterReadyToBoot = TRUE;
 
   gBS->CloseEvent (Event);

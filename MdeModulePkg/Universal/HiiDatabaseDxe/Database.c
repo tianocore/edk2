@@ -21,7 +21,7 @@ EFI_HII_PACKAGE_LIST_HEADER    *gRTDatabaseInfoBuffer = NULL;
 EFI_STRING                     gRTConfigRespBuffer    = NULL;
 UINTN                          gDatabaseInfoSize = 0;
 UINTN                          gConfigRespSize = 0;
-BOOLEAN                        gExportConfigResp = TRUE;
+BOOLEAN                        gExportConfigResp = FALSE;
 UINTN                          gNvDefaultStoreSize = 0;
 SKU_ID                         gSkuId              = 0xFFFFFFFFFFFFFFFF;
 LIST_ENTRY                     gVarStorageList     = INITIALIZE_LIST_HEAD_VARIABLE (gVarStorageList);
@@ -3436,39 +3436,6 @@ HiiGetDatabaseInfo(
 }
 
 /**
-This  function mainly use to get and update configuration settings information.
-
-@param  This                   A pointer to the EFI_HII_DATABASE_PROTOCOL instance.
-
-@retval EFI_SUCCESS            Get the information successfully.
-@retval EFI_OUT_OF_RESOURCES   Not enough memory to store the Configuration Setting data.
-
-**/
-EFI_STATUS
-HiiGetConfigurationSetting(
-  IN CONST EFI_HII_DATABASE_PROTOCOL        *This
-  )
-{
-  EFI_STATUS                          Status;
-
-  //
-  // Get the HiiDatabase info.
-  //
-  Status = HiiGetDatabaseInfo(This);
-
-  //
-  // Get ConfigResp string
-  //
-  if (gExportConfigResp) {
-    Status = HiiGetConfigRespInfo (This);
-    gExportConfigResp = FALSE;
-  }
-  return Status;
-
-}
-
-
-/**
   This function adds the packages in the package list to the database and returns a handle. If there is a
   EFI_DEVICE_PATH_PROTOCOL associated with the DriverHandle, then this function will
   create a package of type EFI_PACKAGE_TYPE_DEVICE_PATH and add it to the package list.
@@ -3561,11 +3528,19 @@ HiiNewPackageList (
   *Handle = DatabaseRecord->Handle;
 
   //
-  // Check whether need to get the Database and configuration setting info.
+  // Check whether need to get the Database info.
   // Only after ReadyToBoot, need to do the export.
   //
   if (gExportAfterReadyToBoot) {
-    HiiGetConfigurationSetting(This);
+    HiiGetDatabaseInfo (This);
+  }
+
+  //
+  // Check whether need to get the configuration setting info from HII drivers.
+  // When after ReadyToBoot and need to do the export for form package add.
+  //
+  if (gExportAfterReadyToBoot && gExportConfigResp) {
+    HiiGetConfigRespInfo (This);
   }
 
   return EFI_SUCCESS;
@@ -3674,11 +3649,19 @@ HiiRemovePackageList (
       FreePool (Node);
 
       //
-      // Check whether need to get the Database and configuration setting info.
+      // Check whether need to get the Database info.
       // Only after ReadyToBoot, need to do the export.
       //
       if (gExportAfterReadyToBoot) {
-        HiiGetConfigurationSetting(This);
+        HiiGetDatabaseInfo (This);
+      }
+
+      //
+      // Check whether need to get the configuration setting info from HII drivers.
+      // When after ReadyToBoot and need to do the export for form package remove.
+      //
+      if (gExportAfterReadyToBoot && gExportConfigResp) {
+        HiiGetConfigRespInfo (This);
       }
       return EFI_SUCCESS;
     }
@@ -3790,13 +3773,19 @@ HiiUpdatePackageList (
       Status = AddPackages (Private, EFI_HII_DATABASE_NOTIFY_ADD_PACK, PackageList, Node);
 
       //
-      // Check whether need to get the Database and configuration setting info.
+      // Check whether need to get the Database info.
       // Only after ReadyToBoot, need to do the export.
       //
-      if (gExportAfterReadyToBoot) {
-        if (Status == EFI_SUCCESS){
-          HiiGetConfigurationSetting(This);
-        }
+      if (gExportAfterReadyToBoot && Status == EFI_SUCCESS) {
+        HiiGetDatabaseInfo (This);
+      }
+
+      //
+      // Check whether need to get the configuration setting info from HII drivers.
+      // When after ReadyToBoot and need to do the export for form package update.
+      //
+      if (gExportAfterReadyToBoot && gExportConfigResp && Status == EFI_SUCCESS) {
+        HiiGetConfigRespInfo (This);
       }
 
       return Status;
