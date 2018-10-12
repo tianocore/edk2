@@ -480,13 +480,22 @@ DevPathToTextAcpiEx (
     //
     // use AcpiExp()
     //
-    UefiDevicePathLibCatPrint (
-      Str,
-      L"AcpiExp(%s,%s,%a)",
-      HIDText,
-      CIDText,
-      UIDStr
-      );
+    if (AcpiEx->CID == 0) {
+      UefiDevicePathLibCatPrint (
+        Str,
+        L"AcpiExp(%s,0,%a)",
+        HIDText,
+        UIDStr
+       );
+    } else {
+      UefiDevicePathLibCatPrint (
+        Str,
+        L"AcpiExp(%s,%s,%a)",
+        HIDText,
+        CIDText,
+        UIDStr
+       );
+    }
   } else {
     if (AllowShortcuts) {
       //
