@@ -3416,7 +3416,15 @@ DevPathFromTextSata (
                                 (UINT16) sizeof (SATA_DEVICE_PATH)
                                 );
   Sata->HBAPortNumber            = (UINT16) Strtoi (Param1);
-  Sata->PortMultiplierPortNumber = (UINT16) Strtoi (Param2);
+
+  //
+  // According to UEFI spec, if PMPN is not provided, the default is 0xFFFF
+  //
+  if (*Param2 == L'\0' ) {
+    Sata->PortMultiplierPortNumber = 0xFFFF;
+  } else {
+    Sata->PortMultiplierPortNumber = (UINT16) Strtoi (Param2);
+  }
   Sata->Lun                      = (UINT16) Strtoi (Param3);
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Sata;
