@@ -26,6 +26,11 @@ UINTN                          gNvDefaultStoreSize = 0;
 SKU_ID                         gSkuId              = 0xFFFFFFFFFFFFFFFF;
 LIST_ENTRY                     gVarStorageList     = INITIALIZE_LIST_HEAD_VARIABLE (gVarStorageList);
 
+//
+// HII database lock.
+//
+EFI_LOCK mHiiDatabaseLock = EFI_INITIALIZE_LOCK_VARIABLE(TPL_NOTIFY);
+
 /**
   This function generates a HII_DATABASE_RECORD node and adds into hii database.
   This is a internal function.
@@ -3493,11 +3498,14 @@ HiiNewPackageList (
     }
   }
 
+  EfiAcquireLock (&mHiiDatabaseLock);
+
   //
   // Build a PackageList node
   //
   Status = GenerateHiiDatabaseRecord (Private, &DatabaseRecord);
   if (EFI_ERROR (Status)) {
+    EfiReleaseLock (&mHiiDatabaseLock);
     return Status;
   }
 
@@ -3507,6 +3515,7 @@ HiiNewPackageList (
   //
   Status = AddPackages (Private, EFI_HII_DATABASE_NOTIFY_NEW_PACK, PackageList, DatabaseRecord);
   if (EFI_ERROR (Status)) {
+    EfiReleaseLock (&mHiiDatabaseLock);
     return Status;
   }
 
@@ -3534,8 +3543,17 @@ HiiNewPackageList (
   if (gExportAfterReadyToBoot) {
     HiiGetDatabaseInfo (This);
   }
+  EfiReleaseLock (&mHiiDatabaseLock);
 
   //
+  // Notes:
+  // HiiGetDatabaseInfo () will get the contents of HII data base,
+  // belong to the atomic behavior of Hii Database update.
+  // And since HiiGetConfigRespInfo () will get the configuration setting info from HII drivers
+  // we can not think it belong to the atomic behavior of Hii Database update.
+  // That's why EfiReleaseLock (&mHiiDatabaseLock) is callled before HiiGetConfigRespInfo ().
+  //
+
   // Check whether need to get the configuration setting info from HII drivers.
   // When after ReadyToBoot and need to do the export for form package add.
   //
@@ -3585,6 +3603,8 @@ HiiRemovePackageList (
     return EFI_NOT_FOUND;
   }
 
+  EfiAcquireLock (&mHiiDatabaseLock);
+
   Private = HII_DATABASE_DATABASE_PRIVATE_DATA_FROM_THIS (This);
 
   //
@@ -3602,34 +3622,42 @@ HiiRemovePackageList (
       //
       Status = RemoveGuidPackages (Private, Handle, PackageList);
       if (EFI_ERROR (Status)) {
+        EfiReleaseLock (&mHiiDatabaseLock);
         return Status;
       }
       Status = RemoveFormPackages (Private, Handle, PackageList);
       if (EFI_ERROR (Status)) {
+        EfiReleaseLock (&mHiiDatabaseLock);
         return Status;
       }
       Status = RemoveKeyboardLayoutPackages (Private, Handle, PackageList);
       if (EFI_ERROR (Status)) {
+        EfiReleaseLock (&mHiiDatabaseLock);
         return Status;
       }
       Status = RemoveStringPackages (Private, Handle, PackageList);
       if (EFI_ERROR (Status)) {
+        EfiReleaseLock (&mHiiDatabaseLock);
         return Status;
       }
       Status = RemoveFontPackages (Private, Handle, PackageList);
       if (EFI_ERROR (Status)) {
+        EfiReleaseLock (&mHiiDatabaseLock);
         return Status;
       }
       Status = RemoveImagePackages (Private, Handle, PackageList);
       if (EFI_ERROR (Status)) {
+        EfiReleaseLock (&mHiiDatabaseLock);
         return Status;
       }
       Status = RemoveSimpleFontPackages (Private, Handle, PackageList);
       if (EFI_ERROR (Status)) {
+        EfiReleaseLock (&mHiiDatabaseLock);
         return Status;
       }
       Status = RemoveDevicePathPackage (Private, Handle, PackageList);
       if (EFI_ERROR (Status)) {
+        EfiReleaseLock (&mHiiDatabaseLock);
         return Status;
       }
 
@@ -3655,6 +3683,16 @@ HiiRemovePackageList (
       if (gExportAfterReadyToBoot) {
         HiiGetDatabaseInfo (This);
       }
+      EfiReleaseLock (&mHiiDatabaseLock);
+
+      //
+      // Notes:
+      // HiiGetDatabaseInfo () will get the contents of HII data base,
+      // belong to the atomic behavior of Hii Database update.
+      // And since HiiGetConfigRespInfo () will get the configuration setting info from HII drivers
+      // we can not think it belong to the atomic behavior of Hii Database update.
+      // That's why EfiReleaseLock (&mHiiDatabaseLock) is callled before HiiGetConfigRespInfo ().
+      //
 
       //
       // Check whether need to get the configuration setting info from HII drivers.
@@ -3667,6 +3705,7 @@ HiiRemovePackageList (
     }
   }
 
+  EfiReleaseLock (&mHiiDatabaseLock);
   return EFI_NOT_FOUND;
 }
 
@@ -3719,6 +3758,7 @@ HiiUpdatePackageList (
 
   Status = EFI_SUCCESS;
 
+  EfiAcquireLock (&mHiiDatabaseLock);
   //
   // Get original packagelist to be updated
   //
@@ -3760,6 +3800,7 @@ HiiUpdatePackageList (
         }
 
         if (EFI_ERROR (Status)) {
+          EfiReleaseLock (&mHiiDatabaseLock);
           return Status;
         }
 
@@ -3779,6 +3820,16 @@ HiiUpdatePackageList (
       if (gExportAfterReadyToBoot && Status == EFI_SUCCESS) {
         HiiGetDatabaseInfo (This);
       }
+      EfiReleaseLock (&mHiiDatabaseLock);
+
+      //
+      // Notes:
+      // HiiGetDatabaseInfo () will get the contents of HII data base,
+      // belong to the atomic behavior of Hii Database update.
+      // And since HiiGetConfigRespInfo () will get the configuration setting info from HII drivers
+      // we can not think it belong to the atomic behavior of Hii Database update.
+      // That's why EfiReleaseLock (&mHiiDatabaseLock) is callled before HiiGetConfigRespInfo ().
+      //
 
       //
       // Check whether need to get the configuration setting info from HII drivers.
@@ -3791,7 +3842,7 @@ HiiUpdatePackageList (
       return Status;
     }
   }
-
+  EfiReleaseLock (&mHiiDatabaseLock);
   return EFI_NOT_FOUND;
 }
 

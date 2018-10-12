@@ -1210,6 +1210,8 @@ HiiNewString (
     return EFI_NOT_FOUND;
   }
 
+  EfiAcquireLock (&mHiiDatabaseLock);
+
   Status = EFI_SUCCESS;
   NewStringPackageCreated = FALSE;
   NewStringId   = 0;
@@ -1573,6 +1575,8 @@ Done:
     }
   }
 
+  EfiReleaseLock (&mHiiDatabaseLock);
+
   return Status;
 }
 
@@ -1738,6 +1742,8 @@ HiiSetString (
     return EFI_NOT_FOUND;
   }
 
+  EfiAcquireLock (&mHiiDatabaseLock);
+
   Private = HII_STRING_DATABASE_PRIVATE_DATA_FROM_THIS (This);
   PackageListNode = NULL;
 
@@ -1764,6 +1770,7 @@ HiiSetString (
                    (EFI_FONT_INFO *) StringFontInfo
                    );
         if (EFI_ERROR (Status)) {
+          EfiReleaseLock (&mHiiDatabaseLock);
           return Status;
         }
         PackageListNode->PackageListHdr.PackageLength += StringPackage->StringPkgHdr->Header.Length - OldPackageLen;
@@ -1774,11 +1781,13 @@ HiiSetString (
         if (gExportAfterReadyToBoot) {
           HiiGetDatabaseInfo(&Private->HiiDatabase);
         }
+        EfiReleaseLock (&mHiiDatabaseLock);
         return EFI_SUCCESS;
       }
     }
   }
 
+  EfiReleaseLock (&mHiiDatabaseLock);
   return EFI_NOT_FOUND;
 }
 

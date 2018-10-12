@@ -61,6 +61,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define BITMAP_LEN_8_BIT(Width, Height)  ((Width) * (Height))
 #define BITMAP_LEN_24_BIT(Width, Height) ((Width) * (Height) * 3)
 
+extern EFI_LOCK mHiiDatabaseLock;
+
 //
 // IFR data structure
 //
