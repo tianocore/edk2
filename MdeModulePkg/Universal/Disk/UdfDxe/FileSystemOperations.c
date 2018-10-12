@@ -2531,6 +2531,90 @@ SetFileInfo (
 }
 
 /**
+  Get volume label of an UDF volume.
+
+  @attention This is boundary function that may receive untrusted input.
+  @attention The input is from FileSystem.
+
+  The File Set Descriptor is external input, so this routine will do basic
+  validation for File Set Descriptor and report status.
+
+  @param[in]   Volume   Volume information pointer.
+  @param[in]   CharMax  The maximum number of Unicode char in String,
+                        including terminating null char.
+  @param[out]  String   String buffer pointer to store the volume label.
+
+  @retval EFI_SUCCESS           Volume label is returned.
+  @retval EFI_VOLUME_CORRUPTED  The file system structures are corrupted.
+  @retval EFI_BUFFER_TOO_SMALL  The string buffer String cannot hold the
+                                volume label.
+
+**/
+EFI_STATUS
+GetVolumeLabel (
+  IN   UDF_VOLUME_INFO  *Volume,
+  IN   UINTN            CharMax,
+  OUT  CHAR16           *String
+  )
+{
+  UDF_FILE_SET_DESCRIPTOR  *FileSetDesc;
+  UINTN                    Index;
+  UINT8                    *OstaCompressed;
+  UINT8                    CompressionId;
+  CHAR16                   *StringBak;
+
+  FileSetDesc = &Volume->FileSetDesc;
+
+  OstaCompressed = &FileSetDesc->LogicalVolumeIdentifier[0];
+
+  CompressionId = OstaCompressed[0];
+  if (!IS_VALID_COMPRESSION_ID (CompressionId)) {
+    return EFI_VOLUME_CORRUPTED;
+  }
+
+  StringBak = String;
+  for (Index = 1; Index < 128; Index++) {
+    if (CompressionId == 16) {
+      if ((Index >> 1) > CharMax) {
+        return EFI_BUFFER_TOO_SMALL;
+      }
+
+      *String = *(UINT8 *)(OstaCompressed + Index) << 8;
+      Index++;
+    } else {
+      if (Index > CharMax) {
+        return EFI_BUFFER_TOO_SMALL;
+      }
+
+      *String = 0;
+    }
+
+    if (Index < 128) {
+      *String |= (CHAR16)(*(UINT8 *)(OstaCompressed + Index));
+    }
+
+    //
+    // Unlike FID Identifiers, Logical Volume Identifier is stored in a
+    // NULL-terminated OSTA compressed format, so we must check for the NULL
+    // character.
+    //
+    if (*String == L'\0') {
+      break;
+    }
+
+    String++;
+  }
+
+  Index = ((UINTN)String - (UINTN)StringBak) / sizeof (CHAR16);
+  if (Index > CharMax - 1) {
+    Index = CharMax - 1;
+  }
+  StringBak[Index] = L'\0';
+
+  return EFI_SUCCESS;
+}
+
+/**
   Get volume and free space size information of an UDF volume.
 
   @attention This is boundary function that may receive untrusted input.

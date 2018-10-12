@@ -736,12 +736,6 @@ UdfSetPosition (
 /**
   Get information about a file.
 
-  @attention This is boundary function that may receive untrusted input.
-  @attention The input is from FileSystem.
-
-  The File Set Descriptor is external input, so this routine will do basic
-  validation for File Set Descriptor and report status.
-
   @param  This            Protocol instance pointer.
   @param  InformationType Type of information to return in Buffer.
   @param  BufferSize      On input size of buffer, on output amount of data in
@@ -768,19 +762,16 @@ UdfGetInfo (
   OUT     VOID               *Buffer
   )
 {
-  EFI_STATUS                  Status;
-  PRIVATE_UDF_FILE_DATA       *PrivFileData;
-  PRIVATE_UDF_SIMPLE_FS_DATA  *PrivFsData;
-  EFI_FILE_SYSTEM_INFO        *FileSystemInfo;
-  UINTN                       FileSystemInfoLength;
-  CHAR16                      *String;
-  UDF_FILE_SET_DESCRIPTOR     *FileSetDesc;
-  UINTN                       Index;
-  UINT8                       *OstaCompressed;
-  UINT8                       CompressionId;
-  UINT64                      VolumeSize;
-  UINT64                      FreeSpaceSize;
-  CHAR16                      VolumeLabel[64];
+  EFI_STATUS                    Status;
+  PRIVATE_UDF_FILE_DATA         *PrivFileData;
+  PRIVATE_UDF_SIMPLE_FS_DATA    *PrivFsData;
+  EFI_FILE_SYSTEM_INFO          *FileSystemInfo;
+  UINTN                         FileSystemInfoLength;
+  UINT64                        VolumeSize;
+  UINT64                        FreeSpaceSize;
+  EFI_FILE_SYSTEM_VOLUME_LABEL  *FileSystemVolumeLabel;
+  UINTN                         FileSystemVolumeLabelLength;
+  CHAR16                        VolumeLabel[64];
 
   if (This == NULL || InformationType == NULL || BufferSize == NULL ||
       (*BufferSize != 0 && Buffer == NULL)) {
@@ -802,50 +793,10 @@ UdfGetInfo (
       Buffer
       );
   } else if (CompareGuid (InformationType, &gEfiFileSystemInfoGuid)) {
-    String = VolumeLabel;
-
-    FileSetDesc = &PrivFsData->Volume.FileSetDesc;
-
-    OstaCompressed = &FileSetDesc->LogicalVolumeIdentifier[0];
-
-    CompressionId = OstaCompressed[0];
-    if (!IS_VALID_COMPRESSION_ID (CompressionId)) {
-      return EFI_VOLUME_CORRUPTED;
+    Status = GetVolumeLabel (&PrivFsData->Volume, ARRAY_SIZE (VolumeLabel), VolumeLabel);
+    if (EFI_ERROR (Status)) {
+      return Status;
     }
-
-    for (Index = 1; Index < 128; Index++) {
-      if (CompressionId == 16) {
-        *String = *(UINT8 *)(OstaCompressed + Index) << 8;
-        Index++;
-      } else {
-        if (Index > ARRAY_SIZE (VolumeLabel)) {
-          return EFI_VOLUME_CORRUPTED;
-        }
-
-        *String = 0;
-      }
-
-      if (Index < 128) {
-        *String |= (CHAR16)(*(UINT8 *)(OstaCompressed + Index));
-      }
-
-      //
-      // Unlike FID Identifiers, Logical Volume Identifier is stored in a
-      // NULL-terminated OSTA compressed format, so we must check for the NULL
-      // character.
-      //
-      if (*String == L'\0') {
-        break;
-      }
-
-      String++;
-    }
-
-    Index = ((UINTN)String - (UINTN)VolumeLabel) / sizeof (CHAR16);
-    if (Index > ARRAY_SIZE (VolumeLabel) - 1) {
-      Index = ARRAY_SIZE (VolumeLabel) - 1;
-    }
-    VolumeLabel[Index] = L'\0';
 
     FileSystemInfoLength = StrSize (VolumeLabel) +
                            sizeof (EFI_FILE_SYSTEM_INFO);
@@ -857,7 +808,7 @@ UdfGetInfo (
     FileSystemInfo = (EFI_FILE_SYSTEM_INFO *)Buffer;
     StrCpyS (
       FileSystemInfo->VolumeLabel,
-      (*BufferSize - OFFSET_OF (EFI_FILE_SYSTEM_INFO, VolumeLabel)) / sizeof (CHAR16),
+      (*BufferSize - SIZE_OF_EFI_FILE_SYSTEM_INFO) / sizeof (CHAR16),
       VolumeLabel
       );
     Status = GetVolumeSize (
@@ -879,6 +830,26 @@ UdfGetInfo (
     FileSystemInfo->FreeSpace   = FreeSpaceSize;
 
     *BufferSize = FileSystemInfoLength;
+    Status = EFI_SUCCESS;
+  } else if (CompareGuid (InformationType, &gEfiFileSystemVolumeLabelInfoIdGuid)) {
+    Status = GetVolumeLabel (&PrivFsData->Volume, ARRAY_SIZE (VolumeLabel), VolumeLabel);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    FileSystemVolumeLabelLength = StrSize (VolumeLabel) +
+                                  sizeof (EFI_FILE_SYSTEM_VOLUME_LABEL);
+    if (*BufferSize < FileSystemVolumeLabelLength) {
+      *BufferSize = FileSystemVolumeLabelLength;
+      return EFI_BUFFER_TOO_SMALL;
+    }
+
+    FileSystemVolumeLabel = (EFI_FILE_SYSTEM_VOLUME_LABEL *)Buffer;
+    StrCpyS (
+      FileSystemVolumeLabel->VolumeLabel,
+      (*BufferSize - SIZE_OF_EFI_FILE_SYSTEM_VOLUME_LABEL) / sizeof (CHAR16),
+      VolumeLabel
+      );
     Status = EFI_SUCCESS;
   }
 

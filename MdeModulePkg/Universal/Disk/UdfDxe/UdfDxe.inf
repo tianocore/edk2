@@ -58,6 +58,7 @@
 [Guids]
   gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES ## Protocol
   gEfiFileSystemInfoGuid                        ## SOMETIMES_CONSUMES ## Protocol
+  gEfiFileSystemVolumeLabelInfoIdGuid           ## SOMETIMES_CONSUMES ## Protocol
 
 
 [Protocols]
