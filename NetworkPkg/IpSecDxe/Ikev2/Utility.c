@@ -1995,28 +1995,45 @@ Ikev2IsSupportAlg (
 /**
   Get the preferred algorithm types from ProposalData.
 
-  @param[in]  ProposalData              Pointer to related IKEV2_PROPOSAL_DATA.
-  @param[out] PreferEncryptAlgorithm    Output of preferred encrypt algorithm.
-  @param[out] PreferIntegrityAlgorithm  Output of preferred integrity algorithm.
-  @param[out] PreferPrfAlgorithm        Output of preferred PRF algorithm. Only
-                                        for IKE SA.
-  @param[out] PreferDhGroup             Output of preferred DH group. Only for
-                                        IKE SA.
-  @param[out] PreferEncryptKeylength    Output of preferred encrypt key length
-                                        in bytes.
-  @param[out] IsSupportEsn              Output of value about the Extented Sequence
-                                        Number is support or not. Only for Child SA.
-  @param[in]  IsChildSa                 If it is ture, the ProposalData is for IKE
-                                        SA. Otherwise the proposalData is for Child SA.
+  @param[in]      ProposalData              Pointer to related IKEV2_PROPOSAL_DATA.
+  @param[in, out] PreferEncryptAlgorithm    Pointer to buffer which is used to store the
+                                            preferred encrypt algorithm.
+                                            Input value shall be initialized to zero that
+                                            indicates to be parsed from ProposalData.
+                                            Output of preferred encrypt algorithm.
+  @param[in, out] PreferIntegrityAlgorithm  Pointer to buffer which is used to store the
+                                            preferred integrity algorithm.
+                                            Input value shall be initialized to zero that
+                                            indicates to be parsed from ProposalData.
+                                            Output of preferred integrity algorithm.
+  @param[in, out] PreferPrfAlgorithm        Pointer to buffer which is used to store the
+                                            preferred PRF algorithm.
+                                            Input value shall be initialized to zero that
+                                            indicates to be parsed from ProposalData.
+                                            Output of preferred PRF algorithm. Only
+                                            for IKE SA.
+  @param[in, out] PreferDhGroup             Pointer to buffer which is used to store the
+                                            preferred DH group.
+                                            Input value shall be initialized to zero that
+                                            indicates to be parsed from ProposalData.
+                                            Output of preferred DH group. Only for
+                                            IKE SA.
+  @param[out]     PreferEncryptKeylength    Pointer to buffer which is used to store the
+                                            preferred encrypt key length in bytes.
+  @param[out]     IsSupportEsn              Pointer to buffer which is used to store the
+                                            value about the Extented Sequence Number is
+                                            support or not. Only for Child SA.
+  @param[in]      IsChildSa                 If it is ture, the ProposalData is for IKE
+                                            SA. Otherwise the proposalData is for Child SA.
 
 **/
 VOID
 Ikev2ParseProposalData (
   IN     IKEV2_PROPOSAL_DATA  *ProposalData,
-     OUT UINT16               *PreferEncryptAlgorithm,
-     OUT UINT16               *PreferIntegrityAlgorithm,
-     OUT UINT16               *PreferPrfAlgorithm,
-     OUT UINT16               *PreferDhGroup,
+  IN OUT UINT16               *PreferEncryptAlgorithm,
+  IN OUT UINT16               *PreferIntegrityAlgorithm,
+  IN OUT UINT16               *PreferPrfAlgorithm,
+  IN OUT UINT16               *PreferDhGroup,
      OUT UINTN                *PreferEncryptKeylength,
      OUT BOOLEAN              *IsSupportEsn,
   IN     BOOLEAN              IsChildSa
@@ -2504,11 +2521,12 @@ Ikev2ChildSaParseSaPayload (
           ) {
         IsMatch = TRUE;
       } else {
-        PreferEncryptAlgorithm   = 0;
-        PreferIntegrityAlgorithm = 0;
-        IsSupportEsn             = TRUE;
+        IntegrityAlgorithm = 0;
+        EncryptAlgorithm   = 0;
+        EncryptKeylength   = 0;
+        IsSupportEsn       = FALSE;
       }
-       ProposalData = (IKEV2_PROPOSAL_DATA*)((UINT8*)(ProposalData + 1) +
+      ProposalData = (IKEV2_PROPOSAL_DATA*)((UINT8*)(ProposalData + 1) +
                      ProposalData->NumTransforms * sizeof (IKEV2_TRANSFORM_DATA));
     }
 
