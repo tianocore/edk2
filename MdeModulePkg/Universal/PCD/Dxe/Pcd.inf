@@ -331,6 +331,7 @@
 [Guids]
   gPcdDataBaseHobGuid                           ## SOMETIMES_CONSUMES  ## HOB
   gPcdDataBaseSignatureGuid                     ## CONSUMES  ## GUID  # PCD database signature GUID.
+  gEfiMdeModulePkgTokenSpaceGuid                ## SOMETIMES_CONSUMES  ## GUID
 
 [Protocols]
   gPcdProtocolGuid                              ## PRODUCES
@@ -342,7 +343,8 @@
   gEdkiiVariableLockProtocolGuid
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress  ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNvStoreDefaultId ## SOMETIMES_CONSUMES
 
 [Depex]
   TRUE

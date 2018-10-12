@@ -890,6 +890,11 @@ DxePcdSet16Ex (
   IN UINT16            Value
   )
 {
+  //
+  // PcdSetNvStoreDefaultId should be set in PEI phase to take effect.
+  //
+  ASSERT (!(CompareGuid (Guid, &gEfiMdeModulePkgTokenSpaceGuid) &&
+            (ExTokenNumber == PcdToken(PcdSetNvStoreDefaultId))));
   return  ExSetValueWorker (ExTokenNumber, Guid, &Value, sizeof (Value));
 }
 
