@@ -204,8 +204,8 @@ class FV (FvClassObject):
                     GenFdsGlobalVariable.VerboseLogger("\nGenerate %s FV Successfully" % self.UiFvName)
                     GenFdsGlobalVariable.SharpCounter = 0
 
-                    Buffer.write(FvFileObj.read())
                     FvFileObj.seek(0)
+                    Buffer.write(FvFileObj.read())
                     # FV alignment position.
                     FvAlignmentValue = 1 << (ord(FvHeaderBuffer[0x2E]) & 0x1F)
                     if FvAlignmentValue >= 0x400:
