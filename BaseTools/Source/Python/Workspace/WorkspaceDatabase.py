@@ -15,6 +15,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import sqlite3
 from Common.StringUtils import *
 from Common.DataType import *
@@ -164,7 +165,7 @@ class WorkspaceDatabase(object):
                 os.remove(DbPath)
 
         # create db with optimized parameters
-        self.Conn = sqlite3.connect(DbPath, isolation_level=None)
+        self.Conn = sqlite3.connect(DbPath, isolation_level='DEFERRED')
         self.Conn.execute("PRAGMA synchronous=OFF")
         self.Conn.execute("PRAGMA temp_store=MEMORY")
         self.Conn.execute("PRAGMA count_changes=OFF")

@@ -234,22 +234,22 @@ def GenModuleUNIEncodeFile(ModuleObject, UniFileHeader='', Encoding=DT.TAB_ENCOD
     if not os.path.exists(os.path.dirname(ModuleObject.GetFullPath())):
         os.makedirs(os.path.dirname(ModuleObject.GetFullPath()))
 
-    Content = UniFileHeader + '\n'
-    Content += '\n'
+    Content = UniFileHeader + '\r\n'
+    Content += '\r\n'
 
-    Content += FormatUniEntry('#string ' + DT.TAB_INF_ABSTRACT, ModuleObject.GetAbstract(), ContainerFile) + '\n'
+    Content += FormatUniEntry('#string ' + DT.TAB_INF_ABSTRACT, ModuleObject.GetAbstract(), ContainerFile) + '\r\n'
 
     Content += FormatUniEntry('#string ' + DT.TAB_INF_DESCRIPTION, ModuleObject.GetDescription(), ContainerFile) \
-            + '\n'
+            + '\r\n'
 
     BinaryAbstractString = FormatUniEntry('#string ' + DT.TAB_INF_BINARY_ABSTRACT, BinaryAbstract, ContainerFile)
     if BinaryAbstractString:
-        Content += BinaryAbstractString + '\n'
+        Content += BinaryAbstractString + '\r\n'
 
     BinaryDescriptionString = FormatUniEntry('#string ' + DT.TAB_INF_BINARY_DESCRIPTION, BinaryDescription, \
                                              ContainerFile)
     if BinaryDescriptionString:
-        Content += BinaryDescriptionString + '\n'
+        Content += BinaryDescriptionString + '\r\n'
 
     if not os.path.exists(ContainerFile):
         File = codecs.open(ContainerFile, 'wb', Encoding)
@@ -274,7 +274,7 @@ def GenDefines(ModuleObject):
         if not DefinesDict:
             continue
         for Statement in DefinesDict:
-            if len(Statement.split(DT.TAB_EQUAL_SPLIT)) > 1:
+            if Statement.split(DT.TAB_EQUAL_SPLIT) > 1:
                 Statement = (u'%s ' % Statement.split(DT.TAB_EQUAL_SPLIT, 1)[0]).ljust(LeftOffset) \
                              + u'= %s' % Statement.split(DT.TAB_EQUAL_SPLIT, 1)[1].lstrip()
             SortedArch = DT.TAB_ARCH_COMMON
@@ -409,7 +409,7 @@ def GenLibraryClasses(ModuleObject):
                 Statement += '|' + FFE
             ModuleList = LibraryClass.GetSupModuleList()
             ArchList = LibraryClass.GetSupArchList()
-            for Index in range(0, len(ArchList)):
+            for Index in xrange(0, len(ArchList)):
                 ArchList[Index] = ConvertArchForInstall(ArchList[Index])
             ArchList.sort()
             SortedArch = ' '.join(ArchList)
@@ -572,7 +572,7 @@ def GenUserExtensions(ModuleObject):
 #         if not Statement:
 #             continue
         ArchList = UserExtension.GetSupArchList()
-        for Index in range(0, len(ArchList)):
+        for Index in xrange(0, len(ArchList)):
             ArchList[Index] = ConvertArchForInstall(ArchList[Index])
         ArchList.sort()
         KeyList = []

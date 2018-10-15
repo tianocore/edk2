@@ -15,6 +15,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 from . import RuleSimpleFile
 from . import RuleComplexFile
 from . import Section

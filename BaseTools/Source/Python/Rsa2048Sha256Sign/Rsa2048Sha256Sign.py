@@ -17,6 +17,7 @@
 '''
 Rsa2048Sha256Sign
 '''
+from __future__ import print_function
 
 import os
 import sys
@@ -61,9 +62,8 @@ if __name__ == '__main__':
   #
   # Create command line argument parser object
   #
-  parser = argparse.ArgumentParser(prog=__prog__, usage=__usage__, description=__copyright__, conflict_handler='resolve')
+  parser = argparse.ArgumentParser(prog=__prog__, version=__version__, usage=__usage__, description=__copyright__, conflict_handler='resolve')
   group = parser.add_mutually_exclusive_group(required=True)
-  group.add_argument("--version", action='version', version=__version__)
   group.add_argument("-e", action="store_true", dest='Encode', help='encode file')
   group.add_argument("-d", action="store_true", dest='Decode', help='decode file')
   parser.add_argument("-o", "--output", dest='OutputFile', type=str, metavar='filename', help="specify the output filename", required=True)
@@ -104,7 +104,7 @@ if __name__ == '__main__':
   if Process.returncode != 0:
     print('ERROR: Open SSL command not available.  Please verify PATH or set OPENSSL_PATH')
     sys.exit(Process.returncode)
-  print(Version[0].decode())
+  print(Version[0])
 
   #
   # Read input file into a buffer and save input filename
@@ -152,11 +152,10 @@ if __name__ == '__main__':
   # Extract public key from private key into STDOUT
   #
   Process = subprocess.Popen('%s rsa -in "%s" -modulus -noout' % (OpenSslCommand, args.PrivateKeyFileName), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-  PublicKeyHexString = Process.communicate()[0].split(b'=')[1].strip()
-  PublicKeyHexString = PublicKeyHexString.decode(encoding='utf-8')
+  PublicKeyHexString = Process.communicate()[0].split('=')[1].strip()
   PublicKey = ''
   while len(PublicKeyHexString) > 0:
-    PublicKey = PublicKey + PublicKeyHexString[0:2]
+    PublicKey = PublicKey + chr(int(PublicKeyHexString[0:2], 16))
     PublicKeyHexString=PublicKeyHexString[2:]
   if Process.returncode != 0:
     sys.exit(Process.returncode)
@@ -164,9 +163,9 @@ if __name__ == '__main__':
   if args.MonotonicCountStr:
     try:
       if args.MonotonicCountStr.upper().startswith('0X'):
-        args.MonotonicCountValue = (int)(args.MonotonicCountStr, 16)
+        args.MonotonicCountValue = (long)(args.MonotonicCountStr, 16)
       else:
-        args.MonotonicCountValue = (int)(args.MonotonicCountStr)
+        args.MonotonicCountValue = (long)(args.MonotonicCountStr)
     except:
         pass
 
@@ -187,8 +186,8 @@ if __name__ == '__main__':
     # Write output file that contains hash GUID, Public Key, Signature, and Input data
     #
     args.OutputFile = open(args.OutputFileName, 'wb')
-    args.OutputFile.write(EFI_HASH_ALGORITHM_SHA256_GUID.bytes_le)
-    args.OutputFile.write(bytearray.fromhex(PublicKey))
+    args.OutputFile.write(EFI_HASH_ALGORITHM_SHA256_GUID.get_bytes_le())
+    args.OutputFile.write(PublicKey)
     args.OutputFile.write(Signature)
     args.OutputFile.write(args.InputFileBuffer)
     args.OutputFile.close()
@@ -210,7 +209,7 @@ if __name__ == '__main__':
     #
     # Verify the public key
     #
-    if Header.PublicKey != bytearray.fromhex(PublicKey):
+    if Header.PublicKey != PublicKey:
       print('ERROR: Public key in input file does not match public key from private key file')
       sys.exit(1)
 

@@ -15,13 +15,13 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from .GenFdsGlobalVariable import FindExtendTool
 from CommonDataClass.FdfClass import CapsuleClassObject
 import Common.LongFilePathOs as os
 import subprocess
 from io import BytesIO
-from io import StringIO
 from Common.Misc import SaveFileOnChange
 from Common.Misc import PackRegistryFormatGuid
 import uuid
@@ -185,7 +185,7 @@ class Capsule (CapsuleClassObject) :
         #
         # The real capsule header structure is 28 bytes
         #
-        Header.write(b'\x00'*(HdrSize-28))
+        Header.write('\x00'*(HdrSize-28))
         Header.write(FwMgrHdr.getvalue())
         Header.write(Content.getvalue())
         #
@@ -247,7 +247,7 @@ class Capsule (CapsuleClassObject) :
     def GenCapInf(self):
         self.CapInfFileName = os.path.join(GenFdsGlobalVariable.FvDir,
                                    self.UiCapsuleName +  "_Cap" + '.inf')
-        CapInfFile = StringIO() #open (self.CapInfFileName , 'w+')
+        CapInfFile = BytesIO() #open (self.CapInfFileName , 'w+')
 
         CapInfFile.writelines("[options]" + T_CHAR_LF)
 

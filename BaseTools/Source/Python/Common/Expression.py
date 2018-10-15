@@ -12,6 +12,8 @@
 
 ## Import Modules
 #
+from __future__ import print_function
+from __future__ import absolute_import
 from Common.GlobalData import *
 from CommonDataClass.Exceptions import BadExpression
 from CommonDataClass.Exceptions import WrnExpression
@@ -204,7 +206,7 @@ SupportedInMacroList = ['TARGET', 'TOOL_CHAIN_TAG', 'ARCH', 'FAMILY']
 
 class BaseExpression(object):
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super(BaseExpression, self).__init__()
 
     # Check if current token matches the operators given from parameter
     def _IsOperator(self, OpSet):
@@ -324,7 +326,7 @@ class ValueExpression(BaseExpression):
         return Val
 
     def __init__(self, Expression, SymbolTable={}):
-        super().__init__(self, Expression, SymbolTable)
+        super(ValueExpression, self).__init__(self, Expression, SymbolTable)
         self._NoProcess = False
         if not isinstance(Expression, type('')):
             self._Expr = Expression
@@ -425,13 +427,6 @@ class ValueExpression(BaseExpression):
                 else:
                     Val = Val3
                 continue
-            #
-            # PEP 238 -- Changing the Division Operator
-            # x/y to return a reasonable approximation of the mathematical result of the division ("true division")
-            # x//y to return the floor ("floor division")
-            #
-            if Op == '/':
-                Op = '//'
             try:
                 Val = self.Eval(Op, Val, EvalFunc())
             except WrnExpression as Warn:
@@ -905,7 +900,7 @@ class ValueExpressionEx(ValueExpression):
                     if TmpValue.bit_length() == 0:
                         PcdValue = '{0x00}'
                     else:
-                        for I in range((TmpValue.bit_length() + 7) // 8):
+                        for I in range((TmpValue.bit_length() + 7) / 8):
                             TmpList.append('0x%02x' % ((TmpValue >> I * 8) & 0xff))
                         PcdValue = '{' + ', '.join(TmpList) + '}'
                 except:
@@ -1033,7 +1028,7 @@ class ValueExpressionEx(ValueExpression):
 if __name__ == '__main__':
     pass
     while True:
-        input = input('Input expr: ')
+        input = raw_input('Input expr: ')
         if input in 'qQ':
             break
         try:

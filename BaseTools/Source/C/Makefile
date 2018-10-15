@@ -43,7 +43,7 @@ libs: $(LIBRARIES)
 	@echo # Build libraries
 	@echo ######################
 	@if not exist $(LIB_PATH) mkdir $(LIB_PATH)
-	@$(PYTHON3) Makefiles\NmakeSubdirs.py all $**
+	@$(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py all $**
 
 apps: $(APPLICATIONS)
 	@echo.
@@ -51,7 +51,7 @@ apps: $(APPLICATIONS)
 	@echo # Build executables
 	@echo ######################
 	@if not exist $(BIN_PATH) mkdir $(BIN_PATH)
-	@$(PYTHON3) Makefiles\NmakeSubdirs.py all $**
+	@$(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py all $**
 
 install: $(LIB_PATH) $(BIN_PATH)
 	@echo.
@@ -65,11 +65,11 @@ install: $(LIB_PATH) $(BIN_PATH)
 
 .PHONY: clean
 clean:
-  @$(PYTHON3) Makefiles\NmakeSubdirs.py clean $(LIBRARIES) $(APPLICATIONS)
+  @$(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py clean $(LIBRARIES) $(APPLICATIONS)
 
 .PHONY: cleanall
 cleanall:
-  @$(PYTHON3) Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
+  @$(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
 
 !INCLUDE Makefiles\ms.rule
 

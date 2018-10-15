@@ -2,7 +2,7 @@
 # This file is used to define common parsing related functions used in parsing
 # Inf/Dsc/Makefile process
 #
-# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -24,32 +24,6 @@ from Common.StringUtils import CleanString, GetSplitValueList, ReplaceMacro
 from . import EotGlobalData
 from Common.StringUtils import GetSplitList
 from Common.LongFilePathSupport import OpenLongFilePath as open
-
-import subprocess
-
-## DeCompress
-#
-# Call external decompress tool to decompress the fv section
-#
-def DeCompress(Method, Input):
-    # Write the input to a temp file
-    open('_Temp.bin', 'wb').write(Input)
-    cmd = ''
-    if Method == 'Lzma':
-        cmd = r'LzmaCompress -o _New.bin -d _Temp.bin'
-    if Method == 'Efi':
-        cmd = r'TianoCompress -d --uefi -o _New.bin _Temp.bin'
-    if Method == 'Framework':
-        cmd = r'TianoCompress -d -o _New.bin _Temp.bin'
-
-    # Call tool to create the decompressed output file
-    Process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    Process.communicate()[0]
-
-    # Return the beffer of New.bin
-    if os.path.exists('New.bin'):
-        return open('New.bin', 'rb').read()
-
 
 ## PreProcess() method
 #

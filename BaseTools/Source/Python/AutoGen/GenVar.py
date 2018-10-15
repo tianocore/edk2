@@ -66,7 +66,7 @@ class VariableMgr(object):
                 data = value_list[0]
                 value_list = []
                 for data_byte in pack(data_flag, int(data, 16) if data.upper().startswith('0X') else int(data)):
-                    value_list.append(hex(unpack("B", bytes([data_byte]))[0]))
+                    value_list.append(hex(unpack("B", data_byte)[0]))
             newvalue[int(item.var_offset, 16) if item.var_offset.upper().startswith("0X") else int(item.var_offset)] = value_list
         try:
             newvaluestr = "{" + ",".join(VariableMgr.assemble_variable(newvalue)) +"}"
@@ -87,13 +87,13 @@ class VariableMgr(object):
                 data = value_list[0]
                 value_list = []
                 for data_byte in pack(data_flag, int(data, 16) if data.upper().startswith('0X') else int(data)):
-                    value_list.append(hex(unpack("B", bytes([data_byte]))[0]))
+                    value_list.append(hex(unpack("B", data_byte)[0]))
             newvalue[int(item.var_offset, 16) if item.var_offset.upper().startswith("0X") else int(item.var_offset)] = (value_list,item.pcdname,item.PcdDscLine)
         for offset in newvalue:
             value_list,itemPcdname,itemPcdDscLine = newvalue[offset]
             if offset > len(BaseValue) or (offset + len(value_list) > len(BaseValue)):
                 EdkLogger.error("build", AUTOGEN_ERROR, "The EFI Variable referred by PCD %s in line %s exceeds variable size: %s\n" % (itemPcdname,itemPcdDscLine,hex(len(BaseValue))))
-            for i in range(len(value_list)):
+            for i in xrange(len(value_list)):
                 BaseValue[offset + i] = value_list[i]
         newvaluestr =  "{" + ",".join(BaseValue) +"}"
         return newvaluestr
@@ -129,7 +129,7 @@ class VariableMgr(object):
         for current_valuedict_key in ordered_valuedict_keys:
             if current_valuedict_key < len(var_value):
                 raise
-            for _ in range(current_valuedict_key - len(var_value)):
+            for _ in xrange(current_valuedict_key - len(var_value)):
                 var_value.append('0x00')
             var_value += valuedict[current_valuedict_key]
         return var_value
@@ -161,7 +161,7 @@ class VariableMgr(object):
 
             default_data_array = ()
             for item in default_data_buffer:
-                default_data_array += unpack("B", bytes([item]))
+                default_data_array += unpack("B", item)
 
             var_data[(DataType.TAB_DEFAULT, DataType.TAB_DEFAULT_STORES_DEFAULT)][index] = (default_data_buffer, sku_var_info[(DataType.TAB_DEFAULT, DataType.TAB_DEFAULT_STORES_DEFAULT)])
 
@@ -179,7 +179,7 @@ class VariableMgr(object):
 
                 others_data_array = ()
                 for item in others_data_buffer:
-                    others_data_array += unpack("B", bytes([item]))
+                    others_data_array += unpack("B", item)
 
                 data_delta = VariableMgr.calculate_delta(default_data_array, others_data_array)
 
@@ -195,7 +195,7 @@ class VariableMgr(object):
             return []
 
         pcds_default_data = var_data.get((DataType.TAB_DEFAULT, DataType.TAB_DEFAULT_STORES_DEFAULT), {})
-        NvStoreDataBuffer = bytearray()
+        NvStoreDataBuffer = ""
         var_data_offset = collections.OrderedDict()
         offset = NvStorageHeaderSize
         for default_data, default_info in pcds_default_data.values():
@@ -222,7 +222,7 @@ class VariableMgr(object):
 
         nv_default_part = VariableMgr.AlignData(VariableMgr.PACK_DEFAULT_DATA(0, 0, VariableMgr.unpack_data(variable_storage_header_buffer+NvStoreDataBuffer)), 8)
 
-        data_delta_structure_buffer = bytearray()
+        data_delta_structure_buffer = ""
         for skuname, defaultstore in var_data:
             if (skuname, defaultstore) == (DataType.TAB_DEFAULT, DataType.TAB_DEFAULT_STORES_DEFAULT):
                 continue
@@ -254,7 +254,7 @@ class VariableMgr(object):
     def unpack_data(data):
         final_data = ()
         for item in data:
-            final_data += unpack("B", bytes([item]))
+            final_data += unpack("B", item)
         return final_data
 
     @staticmethod
@@ -322,7 +322,7 @@ class VariableMgr(object):
 
     @staticmethod
     def PACK_VARIABLES_DATA(var_value,data_type, tail = None):
-        Buffer = bytearray()
+        Buffer = ""
         data_len = 0
         if data_type == DataType.TAB_VOID:
             for value_char in var_value.strip("{").strip("}").split(","):
@@ -352,7 +352,7 @@ class VariableMgr(object):
 
     @staticmethod
     def PACK_DEFAULT_DATA(defaultstoragename, skuid, var_value):
-        Buffer = bytearray()
+        Buffer = ""
         Buffer += pack("=L", 4+8+8)
         Buffer += pack("=Q", int(skuid))
         Buffer += pack("=Q", int(defaultstoragename))
@@ -377,7 +377,7 @@ class VariableMgr(object):
     def PACK_DELTA_DATA(self, skuname, defaultstoragename, delta_list):
         skuid = self.GetSkuId(skuname)
         defaultstorageid = self.GetDefaultStoreId(defaultstoragename)
-        Buffer = bytearray()
+        Buffer = ""
         Buffer += pack("=L", 4+8+8)
         Buffer += pack("=Q", int(skuid))
         Buffer += pack("=Q", int(defaultstorageid))
@@ -400,7 +400,7 @@ class VariableMgr(object):
 
     @staticmethod
     def PACK_VARIABLE_NAME(var_name):
-        Buffer = bytearray()
+        Buffer = ""
         for name_char in var_name.strip("{").strip("}").split(","):
             Buffer += pack("=B", int(name_char, 16))
 

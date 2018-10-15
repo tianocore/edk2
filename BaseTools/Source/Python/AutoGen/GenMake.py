@@ -13,6 +13,7 @@
 
 ## Import Modules
 #
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import sys
 import string
@@ -491,7 +492,7 @@ cleanlib:
             # EdkII modules always use "_ModuleEntryPoint" as entry point
             ImageEntryPoint = "_ModuleEntryPoint"
 
-        for k, v in MyAgo.Module.Defines.items():
+        for k, v in MyAgo.Module.Defines.iteritems():
             if k not in MyAgo.Macros:
                 MyAgo.Macros[k] = v
 
@@ -503,7 +504,7 @@ cleanlib:
             MyAgo.Macros['IMAGE_ENTRY_POINT'] = ImageEntryPoint
 
         PCI_COMPRESS_Flag = False
-        for k, v in MyAgo.Module.Defines.items():
+        for k, v in MyAgo.Module.Defines.iteritems():
             if 'PCI_COMPRESS' == k and 'TRUE' == v:
                 PCI_COMPRESS_Flag = True
 
@@ -654,7 +655,7 @@ cleanlib:
             "module_relative_directory" : MyAgo.SourceDir,
             "module_dir"                : mws.join (self.Macros["WORKSPACE"], MyAgo.SourceDir),
             "package_relative_directory": package_rel_dir,
-            "module_extra_defines"      : ["%s = %s" % (k, v) for k, v in MyAgo.Module.Defines.items()],
+            "module_extra_defines"      : ["%s = %s" % (k, v) for k, v in MyAgo.Module.Defines.iteritems()],
 
             "architecture"              : MyAgo.Arch,
             "toolchain_tag"             : MyAgo.ToolChain,
@@ -668,8 +669,8 @@ cleanlib:
             "separator"                 : Separator,
             "module_tool_definitions"   : ToolsDef,
 
-            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
-            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
+            "shell_command_code"        : self._SHELL_CMD_[self._FileType].keys(),
+            "shell_command"             : self._SHELL_CMD_[self._FileType].values(),
 
             "module_entry_point"        : ModuleEntryPoint,
             "image_entry_point"         : ImageEntryPoint,
@@ -917,7 +918,7 @@ cleanlib:
         #
         # Extract common files list in the dependency files
         #
-        for File in sorted(DepSet, key=lambda x: str(x)):
+        for File in DepSet:
             self.CommonFileDependency.append(self.PlaceMacro(File.Path, self.Macros))
 
         for File in FileDependencyDict:
@@ -926,11 +927,11 @@ cleanlib:
                 continue
             NewDepSet = set(FileDependencyDict[File])
             NewDepSet -= DepSet
-            FileDependencyDict[File] = ["$(COMMON_DEPS)"] + sorted(NewDepSet, key=lambda x: str(x))
+            FileDependencyDict[File] = ["$(COMMON_DEPS)"] + list(NewDepSet)
 
         # Convert target description object to target string in makefile
         for Type in self._AutoGenObject.Targets:
-            for T in sorted(self._AutoGenObject.Targets[Type], key=lambda x: str(x)):
+            for T in self._AutoGenObject.Targets[Type]:
                 # Generate related macros if needed
                 if T.GenFileListMacro and T.FileListMacro not in self.FileListMacros:
                     self.FileListMacros[T.FileListMacro] = []
@@ -1031,7 +1032,7 @@ cleanlib:
                 CurrentFileDependencyList = DepDb[F]
             else:
                 try:
-                    Fd = open(F.Path, 'rb')
+                    Fd = open(F.Path, 'r')
                 except BaseException as X:
                     EdkLogger.error("build", FILE_OPEN_FAILURE, ExtraData=F.Path + "\n\t" + str(X))
 
@@ -1041,14 +1042,8 @@ cleanlib:
                     continue
 
                 if FileContent[0] == 0xff or FileContent[0] == 0xfe:
-                    FileContent = str(FileContent, encoding="utf-16")
-                    IncludedFileList = gIncludePattern.findall(FileContent)
-                else:
-                    try:
-                        FileContent = str(FileContent, encoding="utf-8")
-                        IncludedFileList = gIncludePattern.findall(FileContent)
-                    except:
-                        continue
+                    FileContent = unicode(FileContent, "utf-16")
+                IncludedFileList = gIncludePattern.findall(FileContent)
 
                 for Inc in IncludedFileList:
                     Inc = Inc.strip()
@@ -1097,7 +1092,7 @@ cleanlib:
         DependencySet.update(ForceList)
         if File in DependencySet:
             DependencySet.remove(File)
-        DependencyList = sorted(DependencySet, key=lambda x: str(x))  # remove duplicate ones
+        DependencyList = list(DependencySet)  # remove duplicate ones
 
         return DependencyList
 
@@ -1274,8 +1269,8 @@ ${BEGIN}\t-@${create_directory_command}\n${END}\
             "separator"                 : Separator,
             "module_tool_definitions"   : ToolsDef,
 
-            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
-            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
+            "shell_command_code"        : self._SHELL_CMD_[self._FileType].keys(),
+            "shell_command"             : self._SHELL_CMD_[self._FileType].values(),
 
             "create_directory_command"  : self.GetCreateDirectoryCommand(self.IntermediateDirectoryList),
             "custom_makefile_content"   : CustomMakefile
@@ -1448,8 +1443,8 @@ cleanlib:
 
             "toolchain_tag"             : MyAgo.ToolChain,
             "build_target"              : MyAgo.BuildTarget,
-            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
-            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
+            "shell_command_code"        : self._SHELL_CMD_[self._FileType].keys(),
+            "shell_command"             : self._SHELL_CMD_[self._FileType].values(),
             "build_architecture_list"   : MyAgo.Arch,
             "architecture"              : MyAgo.Arch,
             "separator"                 : Separator,
@@ -1584,8 +1579,8 @@ class TopLevelMakefile(BuildFile):
 
             "toolchain_tag"             : MyAgo.ToolChain,
             "build_target"              : MyAgo.BuildTarget,
-            "shell_command_code"        : list(self._SHELL_CMD_[self._FileType].keys()),
-            "shell_command"             : list(self._SHELL_CMD_[self._FileType].values()),
+            "shell_command_code"        : self._SHELL_CMD_[self._FileType].keys(),
+            "shell_command"             : self._SHELL_CMD_[self._FileType].values(),
             'arch'                      : list(MyAgo.ArchList),
             "build_architecture_list"   : ','.join(MyAgo.ArchList),
             "separator"                 : Separator,

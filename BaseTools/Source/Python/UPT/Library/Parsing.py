@@ -16,6 +16,7 @@
 '''
 Parsing
 '''
+from __future__ import absolute_import
 
 ##
 # Import Modules
@@ -973,7 +974,7 @@ def GenSection(SectionName, SectionDict, SplitArch=True, NeedBlankLine=False):
                     ArchList = GetSplitValueList(SectionAttrs, DataType.TAB_COMMENT_SPLIT)
                 else:
                     ArchList = [SectionAttrs]
-            for Index in range(0, len(ArchList)):
+            for Index in xrange(0, len(ArchList)):
                 ArchList[Index] = ConvertArchForInstall(ArchList[Index])
             Section = '[' + SectionName + '.' + (', ' + SectionName + '.').join(ArchList) + ']'
         else:

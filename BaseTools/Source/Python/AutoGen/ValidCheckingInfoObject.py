@@ -41,7 +41,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
             os.mkdir(dest)
         BinFileName = "PcdVarCheck.bin"
         BinFilePath = os.path.join(dest, BinFileName)
-        Buffer = bytearray()
+        Buffer = ''
         index = 0
         for var_check_tab in self.var_check_info:
             index += 1
@@ -57,7 +57,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
                 itemIndex += 1
                 realLength += 5
                 for v_data in item.data:
-                    if isinstance(v_data, int):
+                    if type(v_data) in (int, long):
                         realLength += item.StorageWidth
                     else:
                         realLength += item.StorageWidth
@@ -137,7 +137,7 @@ class VAR_CHECK_PCD_VARIABLE_TAB_CONTAINER(object):
                 Buffer += b
                 realLength += 1
                 for v_data in item.data:
-                    if isinstance(v_data, int):
+                    if type(v_data) in (int, long):
                         b = pack(PACK_CODE_BY_SIZE[item.StorageWidth], v_data)
                         Buffer += b
                         realLength += item.StorageWidth
@@ -241,7 +241,7 @@ class VAR_CHECK_PCD_VALID_OBJ(object):
 
 class VAR_CHECK_PCD_VALID_LIST(VAR_CHECK_PCD_VALID_OBJ):
     def __init__(self, VarOffset, validlist, PcdDataType):
-        super().__init__(VarOffset, validlist, PcdDataType)
+        super(VAR_CHECK_PCD_VALID_LIST, self).__init__(VarOffset, validlist, PcdDataType)
         self.Type = 1
         valid_num_list = []
         for item in self.rawdata:
@@ -261,7 +261,7 @@ class VAR_CHECK_PCD_VALID_LIST(VAR_CHECK_PCD_VALID_OBJ):
 
 class VAR_CHECK_PCD_VALID_RANGE(VAR_CHECK_PCD_VALID_OBJ):
     def __init__(self, VarOffset, validrange, PcdDataType):
-        super().__init__(VarOffset, validrange, PcdDataType)
+        super(VAR_CHECK_PCD_VALID_RANGE, self).__init__(VarOffset, validrange, PcdDataType)
         self.Type = 2
         RangeExpr = ""
         i = 0

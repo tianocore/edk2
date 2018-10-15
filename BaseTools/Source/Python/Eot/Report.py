@@ -77,7 +77,7 @@ class Report(object):
     def GenerateUnDispatchedList(self):
         FvObj = self.FvObj
         EotGlobalData.gOP_UN_DISPATCHED.write('%s\n' % FvObj.Name)
-        for Item in FvObj.UnDispatchedFfsDict.keys():
+        for Item in FvObj.UnDispatchedFfsDict:
             EotGlobalData.gOP_UN_DISPATCHED.write('%s\n' % FvObj.UnDispatchedFfsDict[Item])
 
     ## GenerateFv() method
@@ -112,7 +112,7 @@ class Report(object):
         self.WriteLn(Content)
 
         EotGlobalData.gOP_DISPATCH_ORDER.write('Dispatched:\n')
-        for FfsId in FvObj.OrderedFfsDict.keys():
+        for FfsId in FvObj.OrderedFfsDict:
             self.GenerateFfs(FvObj.OrderedFfsDict[FfsId])
         Content = """     </table></td>
   </tr>"""
@@ -125,7 +125,7 @@ class Report(object):
         self.WriteLn(Content)
 
         EotGlobalData.gOP_DISPATCH_ORDER.write('\nUnDispatched:\n')
-        for FfsId in FvObj.UnDispatchedFfsDict.keys():
+        for FfsId in FvObj.UnDispatchedFfsDict:
             self.GenerateFfs(FvObj.UnDispatchedFfsDict[FfsId])
         Content = """     </table></td>
   </tr>"""

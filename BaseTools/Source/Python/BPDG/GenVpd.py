@@ -13,6 +13,7 @@
 #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 from io import BytesIO
 from . import StringTable as st
@@ -185,7 +186,7 @@ class PcdEntry:
             EdkLogger.error("BPDG", BuildToolError.RESOURCE_OVERFLOW,
                             "PCD value string %s is exceed to size %d(File: %s Line: %s)" % (ValueString, Size, self.FileName, self.Lineno))
         try:
-            self.PcdValue = pack('%ds' % Size, bytes(ValueString, 'utf-8'))
+            self.PcdValue = pack('%ds' % Size, ValueString)
         except:
             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID,
                             "Invalid size or value for PCD %s to pack(File: %s Line: %s)." % (self.PcdCName, self.FileName, self.Lineno))
@@ -211,7 +212,7 @@ class PcdEntry:
 
         ReturnArray = array.array('B')
 
-        for Index in range(len(ValueList)):
+        for Index in xrange(len(ValueList)):
             Value = None
             if ValueList[Index].lower().startswith('0x'):
                 # translate hex value
@@ -237,7 +238,7 @@ class PcdEntry:
 
             ReturnArray.append(Value)
 
-        for Index in range(len(ValueList), Size):
+        for Index in xrange(len(ValueList), Size):
             ReturnArray.append(0)
 
         self.PcdValue = ReturnArray.tolist()
@@ -272,7 +273,7 @@ class PcdEntry:
                                 "Invalid unicode character %s in unicode string %s(File: %s Line: %s)" % \
                                 (Value, UnicodeString, self.FileName, self.Lineno))
 
-        for Index in range(len(UnicodeString) * 2, Size):
+        for Index in xrange(len(UnicodeString) * 2, Size):
             ReturnArray.append(0)
 
         self.PcdValue = ReturnArray.tolist()
@@ -305,7 +306,7 @@ class GenVPD :
         self.PcdFixedOffsetSizeList  = []
         self.PcdUnknownOffsetList    = []
         try:
-            fInputfile = open(InputFileName, "r")
+            fInputfile = open(InputFileName, "r", 0)
             try:
                 self.FileLinesList = fInputfile.readlines()
             except:
@@ -430,7 +431,7 @@ class GenVPD :
                             EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, 'The offset value of PCD %s should be %s-byte aligned.' % (PCD.PcdCName, Alignment))
                 else:
                     if PCD.PcdOccupySize % Alignment != 0:
-                        PCD.PcdOccupySize = (PCD.PcdOccupySize // Alignment + 1) * Alignment
+                        PCD.PcdOccupySize = (PCD.PcdOccupySize / Alignment + 1) * Alignment
 
                 PackSize = PCD.PcdOccupySize
                 if PCD._IsBoolean(PCD.PcdValue, PCD.PcdSize):
@@ -508,7 +509,7 @@ class GenVPD :
             NowOffset = 0
             for Pcd in self.PcdUnknownOffsetList :
                 if NowOffset % Pcd.Alignment != 0:
-                    NowOffset = (NowOffset // Pcd.Alignment + 1) * Pcd.Alignment
+                    NowOffset = (NowOffset/ Pcd.Alignment + 1) * Pcd.Alignment
                 Pcd.PcdBinOffset = NowOffset
                 Pcd.PcdOffset    = str(hex(Pcd.PcdBinOffset))
                 NowOffset       += Pcd.PcdOccupySize
@@ -572,7 +573,7 @@ class GenVPD :
                         # Not been fixed
                         if eachUnfixedPcd.PcdOffset == '*' :
                             if LastOffset % eachUnfixedPcd.Alignment != 0:
-                                LastOffset = (LastOffset // eachUnfixedPcd.Alignment + 1) * eachUnfixedPcd.Alignment
+                                LastOffset = (LastOffset / eachUnfixedPcd.Alignment + 1) * eachUnfixedPcd.Alignment
                             # The offset un-fixed pcd can write into this free space
                             if needFixPcdSize <= (NowOffset - LastOffset) :
                                 # Change the offset value of un-fixed pcd
@@ -626,7 +627,7 @@ class GenVPD :
 
             NeedFixPcd.PcdBinOffset = LastPcd.PcdBinOffset + LastPcd.PcdOccupySize
             if NeedFixPcd.PcdBinOffset % NeedFixPcd.Alignment != 0:
-                NeedFixPcd.PcdBinOffset = (NeedFixPcd.PcdBinOffset // NeedFixPcd.Alignment + 1) * NeedFixPcd.Alignment
+                NeedFixPcd.PcdBinOffset = (NeedFixPcd.PcdBinOffset / NeedFixPcd.Alignment + 1) * NeedFixPcd.Alignment
 
             NeedFixPcd.PcdOffset    = str(hex(NeedFixPcd.PcdBinOffset))
 
@@ -650,13 +651,13 @@ class GenVPD :
             EdkLogger.error("BPDG", BuildToolError.FILE_OPEN_FAILURE, "File open failed for %s" % self.VpdFileName, None)
 
         try :
-            fMapFile = open(MapFileName, "w")
+            fMapFile = open(MapFileName, "w", 0)
         except:
             # Open failed
             EdkLogger.error("BPDG", BuildToolError.FILE_OPEN_FAILURE, "File open failed for %s" % self.MapFileName, None)
 
         # Use a instance of BytesIO to cache data
-        fStringIO = BytesIO()
+        fStringIO = BytesIO('')
 
         # Write the header of map file.
         try :
@@ -674,7 +675,8 @@ class GenVPD :
             # Write Vpd binary file
             fStringIO.seek (eachPcd.PcdBinOffset)
             if isinstance(eachPcd.PcdValue, list):
-                fStringIO.write(bytes(eachPcd.PcdValue))
+                ValueList = [chr(Item) for Item in eachPcd.PcdValue]
+                fStringIO.write(''.join(ValueList))
             else:
                 fStringIO.write (eachPcd.PcdValue)
 

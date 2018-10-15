@@ -12,6 +12,7 @@
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #
 
+from __future__ import absolute_import
 from Common.DataType import *
 from Common.Misc import *
 from Common.caching import cached_property, cached_class_function

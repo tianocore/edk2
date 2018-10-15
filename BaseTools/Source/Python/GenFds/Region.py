@@ -15,6 +15,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 from struct import *
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from io import BytesIO
@@ -57,8 +58,8 @@ class Region(RegionClassObject):
                 PadByte = pack('B', 0xFF)
             else:
                 PadByte = pack('B', 0)
-            for i in range(0, Size):
-                Buffer.write(PadByte)
+            PadData = ''.join(PadByte for i in xrange(0, Size))
+            Buffer.write(PadData)
 
     ## AddToBuffer()
     #
@@ -127,7 +128,7 @@ class Region(RegionClassObject):
                         if self.FvAddress % FvAlignValue != 0:
                             EdkLogger.error("GenFds", GENFDS_ERROR,
                                             "FV (%s) is NOT %s Aligned!" % (FvObj.UiFvName, FvObj.FvAlignment))
-                        FvBuffer = BytesIO()
+                        FvBuffer = BytesIO('')
                         FvBaseAddress = '0x%X' % self.FvAddress
                         BlockSize = None
                         BlockNum = None
@@ -296,7 +297,7 @@ class Region(RegionClassObject):
             else:
                 # region ended within current blocks
                 if self.Offset + self.Size <= End:
-                    ExpectedList.append((BlockSize, (RemindingSize + BlockSize - 1) // BlockSize))
+                    ExpectedList.append((BlockSize, (RemindingSize + BlockSize - 1) / BlockSize))
                     break
                 # region not ended yet
                 else:
@@ -305,7 +306,7 @@ class Region(RegionClassObject):
                         UsedBlockNum = BlockNum
                     # region started in middle of current blocks
                     else:
-                        UsedBlockNum = (End - self.Offset) // BlockSize
+                        UsedBlockNum = (End - self.Offset) / BlockSize
                     Start = End
                     ExpectedList.append((BlockSize, UsedBlockNum))
                     RemindingSize -= BlockSize * UsedBlockNum

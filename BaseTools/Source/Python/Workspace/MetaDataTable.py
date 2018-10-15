@@ -22,7 +22,7 @@ from CommonDataClass.DataClass import FileClass
 
 ## Convert to SQL required string format
 def ConvertToSqlString(StringList):
-    return list(map(lambda s: "'" + s.replace("'", "''") + "'", StringList))
+    return map(lambda s: "'" + s.replace("'", "''") + "'", StringList)
 
 ## TableFile
 #

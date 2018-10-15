@@ -17,6 +17,8 @@
 #  This class is used to retrieve information stored in database and convert them
 # into PlatformBuildClassObject form for easier use for AutoGen.
 #
+from __future__ import print_function
+from __future__ import absolute_import
 from Common.StringUtils import *
 from Common.DataType import *
 from Common.Misc import *
@@ -128,16 +130,9 @@ def GetDependencyList(FileStack, SearchPathList):
 
             if len(FileContent) == 0:
                 continue
-            IncludedFileList = []
+
             if FileContent[0] == 0xff or FileContent[0] == 0xfe:
-                FileContent = str(FileContent, "utf-16")
-                IncludedFileList = gIncludePattern.findall(FileContent)
-            else:
-                try:
-                    FileContent = str(FileContent, "utf-8")
-                    IncludedFileList = gIncludePattern.findall(FileContent)
-                except:
-                    pass
+                FileContent = unicode(FileContent, "utf-16")
             IncludedFileList = gIncludePattern.findall(FileContent)
 
             for Inc in IncludedFileList:
@@ -937,8 +932,7 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('build', FORMAT_INVALID, ErrStr, File=self.MetaFile, Line=LineNo,
                                 ExtraData="%s.%s" % (TokenSpaceGuid, PcdCName))
             if PcdType in (MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_EX_DEFAULT, MODEL_PCD_FIXED_AT_BUILD, MODEL_PCD_PATCHABLE_IN_MODULE):
-                if self._DecPcds[PcdCName, TokenSpaceGuid].DatumType.strip() in TAB_PCD_NUMERIC_TYPES_VOID \
-                 and self._DecPcds[PcdCName, TokenSpaceGuid].DatumType.strip() != ValueList[1].strip():
+                if self._DecPcds[PcdCName, TokenSpaceGuid].DatumType.strip() != ValueList[1].strip():
                     EdkLogger.error('build', FORMAT_INVALID, "Pcd datumtype used in DSC file is not the same as its declaration in DEC file.", File=self.MetaFile, Line=LineNo,
                                 ExtraData="%s.%s|%s" % (TokenSpaceGuid, PcdCName, Setting))
         if (TokenSpaceGuid + '.' + PcdCName) in GlobalData.gPlatformPcds:
@@ -1552,7 +1546,7 @@ class DscBuildData(PlatformBuildClassObject):
                 elif TAB_DEFAULT in pcd.SkuInfoList and TAB_COMMON in pcd.SkuInfoList:
                     del pcd.SkuInfoList[TAB_COMMON]
 
-        list(map(self.FilterSkuSettings, [Pcds[pcdkey] for pcdkey in Pcds if Pcds[pcdkey].Type in DynamicPcdType]))
+        map(self.FilterSkuSettings, [Pcds[pcdkey] for pcdkey in Pcds if Pcds[pcdkey].Type in DynamicPcdType])
         return Pcds
 
     ## Retrieve non-dynamic PCD settings
@@ -1602,7 +1596,7 @@ class DscBuildData(PlatformBuildClassObject):
             else:
                 PcdValueDict[PcdCName, TokenSpaceGuid] = {SkuName:(PcdValue, DatumType, MaxDatumSize)}
 
-        for ((PcdCName, TokenSpaceGuid), PcdSetting) in PcdValueDict.items():
+        for ((PcdCName, TokenSpaceGuid), PcdSetting) in PcdValueDict.iteritems():
             if self.SkuIdMgr.SystemSkuId in PcdSetting:
                 PcdValue, DatumType, MaxDatumSize = PcdSetting[self.SkuIdMgr.SystemSkuId]
             elif TAB_DEFAULT in PcdSetting:
@@ -1663,7 +1657,7 @@ class DscBuildData(PlatformBuildClassObject):
         except:
             EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s' % Command)
         Result = Process.communicate()
-        return Process.returncode, Result[0].decode(encoding='utf-8', errors='ignore'), Result[1].decode(encoding='utf-8', errors='ignore')
+        return Process.returncode, Result[0], Result[1]
 
     @staticmethod
     def IntToCString(Value, ValueSize):
@@ -2506,7 +2500,7 @@ class DscBuildData(PlatformBuildClassObject):
             elif TAB_DEFAULT in pcd.SkuInfoList and TAB_COMMON in pcd.SkuInfoList:
                 del pcd.SkuInfoList[TAB_COMMON]
 
-        list(map(self.FilterSkuSettings, Pcds.values()))
+        map(self.FilterSkuSettings, Pcds.values())
 
         return Pcds
 
@@ -2571,7 +2565,7 @@ class DscBuildData(PlatformBuildClassObject):
                     PcdObj.SkuInfoList[skuname].SkuId = skuid
                     PcdObj.SkuInfoList[skuname].SkuIdName = skuname
             if PcdType in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]]:
-                PcdObj.DefaultValue = list(PcdObj.SkuInfoList.values())[0].HiiDefaultValue if self.SkuIdMgr.SkuUsageType == self.SkuIdMgr.SINGLE else PcdObj.SkuInfoList[TAB_DEFAULT].HiiDefaultValue
+                PcdObj.DefaultValue = PcdObj.SkuInfoList.values()[0].HiiDefaultValue if self.SkuIdMgr.SkuUsageType == self.SkuIdMgr.SINGLE else PcdObj.SkuInfoList[TAB_DEFAULT].HiiDefaultValue
             Pcds[PcdCName, TokenSpaceGuid]= PcdObj
         return Pcds
     ## Retrieve dynamic HII PCD settings
@@ -2692,7 +2686,7 @@ class DscBuildData(PlatformBuildClassObject):
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}
             Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName][DefaultStore] = DefaultValue
         for pcd in Pcds.values():
-            SkuInfoObj = list(pcd.SkuInfoList.values())[0]
+            SkuInfoObj = pcd.SkuInfoList.values()[0]
             pcdDecObject = self._DecPcds[pcd.TokenCName, pcd.TokenSpaceGuidCName]
             pcd.DatumType = pcdDecObject.DatumType
             # Only fix the value while no value provided in DSC file.
@@ -2732,7 +2726,7 @@ class DscBuildData(PlatformBuildClassObject):
             invalidpcd = ",".join(invalidhii)
             EdkLogger.error('build', PCD_VARIABLE_INFO_ERROR, Message='The same HII PCD must map to the same EFI variable for all SKUs', File=self.MetaFile, ExtraData=invalidpcd)
 
-        list(map(self.FilterSkuSettings, Pcds.values()))
+        map(self.FilterSkuSettings, Pcds.values())
 
         return Pcds
 
@@ -2830,7 +2824,7 @@ class DscBuildData(PlatformBuildClassObject):
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}
             Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName][TAB_DEFAULT_STORES_DEFAULT] = InitialValue
         for pcd in Pcds.values():
-            SkuInfoObj = list(pcd.SkuInfoList.values())[0]
+            SkuInfoObj = pcd.SkuInfoList.values()[0]
             pcdDecObject = self._DecPcds[pcd.TokenCName, pcd.TokenSpaceGuidCName]
             pcd.DatumType = pcdDecObject.DatumType
             # Only fix the value while no value provided in DSC file.
@@ -2848,7 +2842,7 @@ class DscBuildData(PlatformBuildClassObject):
                 del pcd.SkuInfoList[TAB_COMMON]
 
 
-        list(map(self.FilterSkuSettings, Pcds.values()))
+        map(self.FilterSkuSettings, Pcds.values())
         return Pcds
 
     ## Add external modules

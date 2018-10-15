@@ -15,6 +15,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 from struct import *
 import Common.LongFilePathOs as os
 from io import BytesIO
@@ -51,7 +52,7 @@ class AprioriSection (AprioriSectionClassObject):
     def GenFfs (self, FvName, Dict = {}, IsMakefile = False):
         DXE_GUID = "FC510EE7-FFDC-11D4-BD41-0080C73C8881"
         PEI_GUID = "1B45CC0A-156A-428A-AF62-49864DA0E6E6"
-        Buffer = BytesIO()
+        Buffer = BytesIO('')
         AprioriFileGuid = DXE_GUID
         if self.AprioriType == "PEI":
             AprioriFileGuid = PEI_GUID
@@ -96,7 +97,7 @@ class AprioriSection (AprioriSectionClassObject):
 
 
             GuidPart = Guid.split('-')
-            Buffer.write(pack('I', int(GuidPart[0], 16)))
+            Buffer.write(pack('I', long(GuidPart[0], 16)))
             Buffer.write(pack('H', int(GuidPart[1], 16)))
             Buffer.write(pack('H', int(GuidPart[2], 16)))
 

@@ -15,6 +15,8 @@
 
 ## Import Modules
 #
+from __future__ import print_function
+from __future__ import absolute_import
 import Common.LongFilePathOs as os
 import re
 import os.path as path
@@ -198,11 +200,11 @@ class AutoGen(object):
             # if it exists, just return it directly
             return cls.__ObjectCache[Key]
             # it didnt exist. create it, cache it, then return it
-        RetVal = cls.__ObjectCache[Key] = super().__new__(cls)
+        RetVal = cls.__ObjectCache[Key] = super(AutoGen, cls).__new__(cls)
         return RetVal
 
     def __init__ (self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
-        super().__init__()
+        super(AutoGen, self).__init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
 
     ## hash() operator
     #
@@ -235,7 +237,7 @@ class WorkspaceAutoGen(AutoGen):
     # call super().__init__ then call the worker function with different parameter count
     def __init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
         if not hasattr(self, "_Init"):
-            super().__init__(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+            super(WorkspaceAutoGen, self).__init__(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
             self._InitWorker(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
             self._Init = True
 
@@ -295,7 +297,7 @@ class WorkspaceAutoGen(AutoGen):
             SkippedArchList = set(self.ArchList).symmetric_difference(set(self.Platform.SupArchList))
             EdkLogger.verbose("\nArch [%s] is ignored because the platform supports [%s] only!"
                               % (" ".join(SkippedArchList), " ".join(self.Platform.SupArchList)))
-        self.ArchList = tuple(sorted(ArchList))
+        self.ArchList = tuple(ArchList)
 
         # Validate build target
         if self.BuildTarget not in self.Platform.BuildTargets:
@@ -518,7 +520,7 @@ class WorkspaceAutoGen(AutoGen):
             for BuildData in PGen.BuildDatabase._CACHE_.values():
                 if BuildData.Arch != Arch:
                     continue
-                for key in list(BuildData.Pcds.keys()):
+                for key in BuildData.Pcds:
                     for SinglePcd in GlobalData.MixedPcd:
                         if (BuildData.Pcds[key].TokenCName, BuildData.Pcds[key].TokenSpaceGuidCName) == SinglePcd:
                             for item in GlobalData.MixedPcd[SinglePcd]:
@@ -616,17 +618,17 @@ class WorkspaceAutoGen(AutoGen):
         #
         content = 'gCommandLineDefines: '
         content += str(GlobalData.gCommandLineDefines)
-        content += "\n"
+        content += os.linesep
         content += 'BuildOptionPcd: '
         content += str(GlobalData.BuildOptionPcd)
-        content += "\n"
+        content += os.linesep
         content += 'Active Platform: '
         content += str(self.Platform)
-        content += "\n"
+        content += os.linesep
         if self.FdfFile:
             content += 'Flash Image Definition: '
             content += str(self.FdfFile)
-            content += "\n"
+            content += os.linesep
         SaveFileOnChange(os.path.join(self.BuildDir, 'BuildOptions'), content, False)
 
         #
@@ -636,7 +638,7 @@ class WorkspaceAutoGen(AutoGen):
         if Pa.PcdTokenNumber:
             if Pa.DynamicPcdList:
                 for Pcd in Pa.DynamicPcdList:
-                    PcdTokenNumber += "\n"
+                    PcdTokenNumber += os.linesep
                     PcdTokenNumber += str((Pcd.TokenCName, Pcd.TokenSpaceGuidCName))
                     PcdTokenNumber += ' : '
                     PcdTokenNumber += str(Pa.PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName])
@@ -661,7 +663,7 @@ class WorkspaceAutoGen(AutoGen):
             for files in AllWorkSpaceMetaFiles:
                 if files.endswith('.dec'):
                     continue
-                f = open(files, 'rb')
+                f = open(files, 'r')
                 Content = f.read()
                 f.close()
                 m.update(Content)
@@ -677,7 +679,7 @@ class WorkspaceAutoGen(AutoGen):
         if not os.path.exists(self.BuildDir):
             os.makedirs(self.BuildDir)
         with open(os.path.join(self.BuildDir, 'AutoGen'), 'w+') as file:
-            for f in sorted(AllWorkSpaceMetaFiles):
+            for f in AllWorkSpaceMetaFiles:
                 print(f, file=file)
         return True
 
@@ -690,7 +692,7 @@ class WorkspaceAutoGen(AutoGen):
         HashFile = os.path.join(PkgDir, Pkg.PackageName + '.hash')
         m = hashlib.md5()
         # Get .dec file's hash value
-        f = open(Pkg.MetaFile.Path, 'rb')
+        f = open(Pkg.MetaFile.Path, 'r')
         Content = f.read()
         f.close()
         m.update(Content)
@@ -700,7 +702,7 @@ class WorkspaceAutoGen(AutoGen):
                 for Root, Dirs, Files in os.walk(str(inc)):
                     for File in sorted(Files):
                         File_Path = os.path.join(Root, File)
-                        f = open(File_Path, 'rb')
+                        f = open(File_Path, 'r')
                         Content = f.read()
                         f.close()
                         m.update(Content)
@@ -864,7 +866,7 @@ class WorkspaceAutoGen(AutoGen):
     def _CheckAllPcdsTokenValueConflict(self):
         for Pa in self.AutoGenObjectList:
             for Package in Pa.PackageList:
-                PcdList = list(Package.Pcds.values())
+                PcdList = Package.Pcds.values()
                 PcdList.sort(key=lambda x: int(x.TokenValue, 0))
                 Count = 0
                 while (Count < len(PcdList) - 1) :
@@ -910,7 +912,7 @@ class WorkspaceAutoGen(AutoGen):
                         Count += SameTokenValuePcdListCount
                     Count += 1
 
-                PcdList = list(Package.Pcds.values())
+                PcdList = Package.Pcds.values()
                 PcdList.sort(key=lambda x: "%s.%s" % (x.TokenSpaceGuidCName, x.TokenCName))
                 Count = 0
                 while (Count < len(PcdList) - 1) :
@@ -973,7 +975,7 @@ class PlatformAutoGen(AutoGen):
     # call super().__init__ then call the worker function with different parameter count
     def __init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
         if not hasattr(self, "_Init"):
-            super().__init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+            super(PlatformAutoGen, self).__init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
             self._InitWorker(Workspace, MetaFile, Target, Toolchain, Arch)
             self._Init = True
     #
@@ -1179,7 +1181,7 @@ class PlatformAutoGen(AutoGen):
                 if os.path.exists(VpdMapFilePath):
                     OrgVpdFile.Read(VpdMapFilePath)
                     PcdItems = OrgVpdFile.GetOffset(PcdNvStoreDfBuffer[0])
-                    NvStoreOffset = list(PcdItems.values())[0].strip() if PcdItems else '0'
+                    NvStoreOffset = PcdItems.values()[0].strip() if PcdItems else '0'
                 else:
                     EdkLogger.error("build", FILE_READ_FAILURE, "Can not find VPD map file %s to fix up VPD offset." % VpdMapFilePath)
 
@@ -1229,7 +1231,7 @@ class PlatformAutoGen(AutoGen):
             FdfModuleList.append(os.path.normpath(InfName))
         for M in self._MaList:
 #            F is the Module for which M is the module autogen
-            for PcdFromModule in list(M.ModulePcdList) + list(M.LibraryPcdList):
+            for PcdFromModule in M.ModulePcdList + M.LibraryPcdList:
                 # make sure that the "VOID*" kind of datum has MaxDatumSize set
                 if PcdFromModule.DatumType == TAB_VOID and not PcdFromModule.MaxDatumSize:
                     NoDatumTypePcdList.add("%s.%s [%s]" % (PcdFromModule.TokenSpaceGuidCName, PcdFromModule.TokenCName, M.MetaFile))
@@ -1378,7 +1380,7 @@ class PlatformAutoGen(AutoGen):
         if (self.Workspace.ArchList[-1] == self.Arch):
             for Pcd in self._DynamicPcdList:
                 # just pick the a value to determine whether is unicode string type
-                Sku = list(Pcd.SkuInfoList.values())[0]
+                Sku = Pcd.SkuInfoList.values()[0]
                 Sku.VpdOffset = Sku.VpdOffset.strip()
 
                 if Pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
@@ -1477,7 +1479,7 @@ class PlatformAutoGen(AutoGen):
                         if not FoundFlag :
                             # just pick the a value to determine whether is unicode string type
                             SkuValueMap = {}
-                            SkuObjList = list(DscPcdEntry.SkuInfoList.items())
+                            SkuObjList = DscPcdEntry.SkuInfoList.items()
                             DefaultSku = DscPcdEntry.SkuInfoList.get(TAB_DEFAULT)
                             if DefaultSku:
                                 defaultindex = SkuObjList.index((TAB_DEFAULT, DefaultSku))
@@ -1503,7 +1505,7 @@ class PlatformAutoGen(AutoGen):
                                             DscPcdEntry.TokenSpaceGuidValue = eachDec.Guids[DecPcdEntry.TokenSpaceGuidCName]
                                             # Only fix the value while no value provided in DSC file.
                                             if not Sku.DefaultValue:
-                                                DscPcdEntry.SkuInfoList[list(DscPcdEntry.SkuInfoList.keys())[0]].DefaultValue = DecPcdEntry.DefaultValue
+                                                DscPcdEntry.SkuInfoList[DscPcdEntry.SkuInfoList.keys()[0]].DefaultValue = DecPcdEntry.DefaultValue
 
                                 if DscPcdEntry not in self._DynamicPcdList:
                                     self._DynamicPcdList.append(DscPcdEntry)
@@ -1579,7 +1581,7 @@ class PlatformAutoGen(AutoGen):
             # Delete the DynamicPcdList At the last time enter into this function
             for Pcd in self._DynamicPcdList:
                 # just pick the a value to determine whether is unicode string type
-                Sku = list(Pcd.SkuInfoList.values())[0]
+                Sku = Pcd.SkuInfoList.values()[0]
                 Sku.VpdOffset = Sku.VpdOffset.strip()
 
                 if Pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
@@ -1598,14 +1600,11 @@ class PlatformAutoGen(AutoGen):
         self._DynamicPcdList.extend(list(UnicodePcdArray))
         self._DynamicPcdList.extend(list(HiiPcdArray))
         self._DynamicPcdList.extend(list(OtherPcdArray))
-        #python3.6 set is not ordered at all
-        self._DynamicPcdList = sorted(self._DynamicPcdList, key=lambda x:(x.TokenSpaceGuidCName, x.TokenCName))
-        self._NonDynamicPcdList = sorted(self._NonDynamicPcdList, key=lambda x: (x.TokenSpaceGuidCName, x.TokenCName))
         allskuset = [(SkuName, Sku.SkuId) for pcd in self._DynamicPcdList for (SkuName, Sku) in pcd.SkuInfoList.items()]
         for pcd in self._DynamicPcdList:
             if len(pcd.SkuInfoList) == 1:
                 for (SkuName, SkuId) in allskuset:
-                    if isinstance(SkuId, str) and eval(SkuId) == 0 or SkuId == 0:
+                    if type(SkuId) in (str, unicode) and eval(SkuId) == 0 or SkuId == 0:
                         continue
                     pcd.SkuInfoList[SkuName] = copy.deepcopy(pcd.SkuInfoList[TAB_DEFAULT])
                     pcd.SkuInfoList[SkuName].SkuId = SkuId
@@ -2147,7 +2146,7 @@ class PlatformAutoGen(AutoGen):
                     Pcd.MaxDatumSize = str(len(Value.split(',')))
                 else:
                     Pcd.MaxDatumSize = str(len(Value) - 1)
-        return list(Pcds.values())
+        return Pcds.values()
 
     ## Resolve library names to library modules
     #
@@ -2251,7 +2250,7 @@ class PlatformAutoGen(AutoGen):
         # Use the highest priority value.
         #
         if (len(OverrideList) >= 2):
-            KeyList = list(OverrideList.keys())
+            KeyList = OverrideList.keys()
             for Index in range(len(KeyList)):
                 NowKey = KeyList[Index]
                 Target1, ToolChain1, Arch1, CommandType1, Attr1 = NowKey.split("_")
@@ -2373,11 +2372,11 @@ class PlatformAutoGen(AutoGen):
                     if Attr == TAB_TOD_DEFINES_BUILDRULEORDER:
                         BuildRuleOrder = Options[Tool][Attr]
 
-        AllTools = set(list(ModuleOptions.keys()) + list(PlatformOptions.keys()) +
-                       list(PlatformModuleOptions.keys()) + list(ModuleTypeOptions.keys()) +
-                       list(self.ToolDefinition.keys()))
+        AllTools = set(ModuleOptions.keys() + PlatformOptions.keys() +
+                       PlatformModuleOptions.keys() + ModuleTypeOptions.keys() +
+                       self.ToolDefinition.keys())
         BuildOptions = defaultdict(lambda: defaultdict(str))
-        for Tool in sorted(AllTools):
+        for Tool in AllTools:
             for Options in [self.ToolDefinition, ModuleOptions, PlatformOptions, ModuleTypeOptions, PlatformModuleOptions]:
                 if Tool not in Options:
                     continue
@@ -2428,7 +2427,7 @@ class ModuleAutoGen(AutoGen):
     # call super().__init__ then call the worker function with different parameter count
     def __init__(self, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs):
         if not hasattr(self, "_Init"):
-            super().__init__(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+            super(ModuleAutoGen, self).__init__(Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
             self._InitWorker(Workspace, MetaFile, Target, Toolchain, Arch, *args)
             self._Init = True
 
@@ -2442,7 +2441,7 @@ class ModuleAutoGen(AutoGen):
             EdkLogger.verbose("Module [%s] for [%s] is not employed by active platform\n" \
                               % (MetaFile, Arch))
             return None
-        return super().__new__(cls, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
+        return super(ModuleAutoGen, cls).__new__(cls, Workspace, MetaFile, Target, Toolchain, Arch, *args, **kwargs)
 
     ## Initialize ModuleAutoGen
     #
@@ -3159,12 +3158,12 @@ class ModuleAutoGen(AutoGen):
     @cached_property
     def IntroTargetList(self):
         self.Targets
-        return sorted(self._IntroBuildTargetList, key=lambda x: str(x.Target))
+        return self._IntroBuildTargetList
 
     @cached_property
     def CodaTargetList(self):
         self.Targets
-        return sorted(self._FinalBuildTargetList, key=lambda x: str(x.Target))
+        return self._FinalBuildTargetList
 
     @cached_property
     def FileTypes(self):
@@ -3210,7 +3209,7 @@ class ModuleAutoGen(AutoGen):
             AutoFile = PathClass(gAutoGenStringFileName % {"module_name":self.Name}, self.DebugDir)
             RetVal[AutoFile] = str(StringH)
             self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
-        if UniStringBinBuffer is not None and UniStringBinBuffer.getvalue() != b"":
+        if UniStringBinBuffer is not None and UniStringBinBuffer.getvalue() != "":
             AutoFile = PathClass(gAutoGenStringFormFileName % {"module_name":self.Name}, self.OutputDir)
             RetVal[AutoFile] = UniStringBinBuffer.getvalue()
             AutoFile.IsBinary = True
@@ -3221,7 +3220,7 @@ class ModuleAutoGen(AutoGen):
             AutoFile = PathClass(gAutoGenImageDefFileName % {"module_name":self.Name}, self.DebugDir)
             RetVal[AutoFile] = str(StringIdf)
             self._ApplyBuildRule(AutoFile, TAB_UNKNOWN_FILE)
-        if IdfGenBinBuffer is not None and IdfGenBinBuffer.getvalue() != b"":
+        if IdfGenBinBuffer is not None and IdfGenBinBuffer.getvalue() != "":
             AutoFile = PathClass(gAutoGenIdfFileName % {"module_name":self.Name}, self.OutputDir)
             RetVal[AutoFile] = IdfGenBinBuffer.getvalue()
             AutoFile.IsBinary = True
@@ -3439,7 +3438,7 @@ class ModuleAutoGen(AutoGen):
             return None
         MapFileName = os.path.join(self.OutputDir, self.Name + ".map")
         EfiFileName = os.path.join(self.OutputDir, self.Name + ".efi")
-        VfrUniOffsetList = GetVariableOffset(MapFileName, EfiFileName, list(VfrUniBaseName.values()))
+        VfrUniOffsetList = GetVariableOffset(MapFileName, EfiFileName, VfrUniBaseName.values())
         if not VfrUniOffsetList:
             return None
 
@@ -3452,7 +3451,7 @@ class ModuleAutoGen(AutoGen):
             EdkLogger.error("build", FILE_OPEN_FAILURE, "File open failed for %s" % UniVfrOffsetFileName, None)
 
         # Use a instance of BytesIO to cache data
-        fStringIO = BytesIO()
+        fStringIO = BytesIO('')
 
         for Item in VfrUniOffsetList:
             if (Item[0].find("Strings") != -1):
@@ -3462,7 +3461,8 @@ class ModuleAutoGen(AutoGen):
                 # { 0x8913c5e0, 0x33f6, 0x4d86, { 0x9b, 0xf1, 0x43, 0xef, 0x89, 0xfc, 0x6, 0x66 } }
                 #
                 UniGuid = [0xe0, 0xc5, 0x13, 0x89, 0xf6, 0x33, 0x86, 0x4d, 0x9b, 0xf1, 0x43, 0xef, 0x89, 0xfc, 0x6, 0x66]
-                fStringIO.write(bytes(UniGuid))
+                UniGuid = [chr(ItemGuid) for ItemGuid in UniGuid]
+                fStringIO.write(''.join(UniGuid))
                 UniValue = pack ('Q', int (Item[1], 16))
                 fStringIO.write (UniValue)
             else:
@@ -3472,7 +3472,8 @@ class ModuleAutoGen(AutoGen):
                 # { 0xd0bc7cb4, 0x6a47, 0x495f, { 0xaa, 0x11, 0x71, 0x7, 0x46, 0xda, 0x6, 0xa2 } };
                 #
                 VfrGuid = [0xb4, 0x7c, 0xbc, 0xd0, 0x47, 0x6a, 0x5f, 0x49, 0xaa, 0x11, 0x71, 0x7, 0x46, 0xda, 0x6, 0xa2]
-                fStringIO.write(bytes(VfrGuid))
+                VfrGuid = [chr(ItemGuid) for ItemGuid in VfrGuid]
+                fStringIO.write(''.join(VfrGuid))
                 VfrValue = pack ('Q', int (Item[1], 16))
                 fStringIO.write (VfrValue)
         #
@@ -3524,7 +3525,7 @@ class ModuleAutoGen(AutoGen):
         Packages = []
         PcdCheckList = []
         PcdTokenSpaceList = []
-        for Pcd in list(self.ModulePcdList) + list(self.LibraryPcdList):
+        for Pcd in self.ModulePcdList + self.LibraryPcdList:
             if Pcd.Type == TAB_PCDS_PATCHABLE_IN_MODULE:
                 PatchablePcds.append(Pcd)
                 PcdCheckList.append((Pcd.TokenCName, Pcd.TokenSpaceGuidCName, TAB_PCDS_PATCHABLE_IN_MODULE))
@@ -3636,10 +3637,6 @@ class ModuleAutoGen(AutoGen):
                 AsBuiltInfDict['binary_item'].append('PE32|' + self.Name + '.efi')
             else:
                 AsBuiltInfDict['binary_item'].append('BIN|' + File)
-        if not self.DepexGenerated:
-            DepexFile = os.path.join(self.OutputDir, self.Name + '.depex')
-            if os.path.exists(DepexFile):
-                self.DepexGenerated = True
         if self.DepexGenerated:
             self.OutputFile.add(self.Name + '.depex')
             if self.ModuleType in [SUP_MODULE_PEIM]:
@@ -3736,7 +3733,7 @@ class ModuleAutoGen(AutoGen):
                         Padding = '0x00, '
                         if Unicode:
                             Padding = Padding * 2
-                            ArraySize = ArraySize // 2
+                            ArraySize = ArraySize / 2
                         if ArraySize < (len(PcdValue) + 1):
                             if Pcd.MaxSizeUserSet:
                                 EdkLogger.error("build", AUTOGEN_ERROR,
@@ -3896,7 +3893,7 @@ class ModuleAutoGen(AutoGen):
             if os.path.exists (self.TimeStampPath):
                 os.remove (self.TimeStampPath)
             with open(self.TimeStampPath, 'w+') as file:
-                for f in sorted(FileSet):
+                for f in FileSet:
                     print(f, file=file)
 
         # Ignore generating makefile when it is a binary module
@@ -4024,29 +4021,29 @@ class ModuleAutoGen(AutoGen):
             GlobalData.gModuleHash[self.Arch] = {}
         m = hashlib.md5()
         # Add Platform level hash
-        m.update(GlobalData.gPlatformHash.encode('utf-8'))
+        m.update(GlobalData.gPlatformHash)
         # Add Package level hash
         if self.DependentPackageList:
             for Pkg in sorted(self.DependentPackageList, key=lambda x: x.PackageName):
                 if Pkg.PackageName in GlobalData.gPackageHash[self.Arch]:
-                    m.update(GlobalData.gPackageHash[self.Arch][Pkg.PackageName].encode('utf-8'))
+                    m.update(GlobalData.gPackageHash[self.Arch][Pkg.PackageName])
 
         # Add Library hash
         if self.LibraryAutoGenList:
             for Lib in sorted(self.LibraryAutoGenList, key=lambda x: x.Name):
                 if Lib.Name not in GlobalData.gModuleHash[self.Arch]:
                     Lib.GenModuleHash()
-                m.update(GlobalData.gModuleHash[self.Arch][Lib.Name].encode('utf-8'))
+                m.update(GlobalData.gModuleHash[self.Arch][Lib.Name])
 
         # Add Module self
-        f = open(str(self.MetaFile), 'rb')
+        f = open(str(self.MetaFile), 'r')
         Content = f.read()
         f.close()
         m.update(Content)
         # Add Module's source files
         if self.SourceFileList:
             for File in sorted(self.SourceFileList, key=lambda x: str(x)):
-                f = open(str(File), 'rb')
+                f = open(str(File), 'r')
                 Content = f.read()
                 f.close()
                 m.update(Content)

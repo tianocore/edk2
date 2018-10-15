@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import re
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import *
@@ -122,8 +123,6 @@ def DecToHexList(Dec, Digit = 8):
 # @retval:       A list for formatted hex string
 #
 def AscToHexList(Ascii):
-    if isinstance(Ascii, bytes):
-        return ['0x{0:02X}'.format(Item) for Item in Ascii]
     return ['0x{0:02X}'.format(ord(Item)) for Item in Ascii]
 
 ## Create content of .h file
@@ -552,9 +551,9 @@ def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, Ski
             #
             # support ISO 639-2 codes in .UNI files of EDK Shell
             #
-            Uni = UniFileClassObject(sorted (UniFilList, key=lambda x: x.File), True, IncludePathList)
+            Uni = UniFileClassObject(sorted (UniFilList), True, IncludePathList)
         else:
-            Uni = UniFileClassObject(sorted (UniFilList, key=lambda x: x.File), IsCompatibleMode, IncludePathList)
+            Uni = UniFileClassObject(sorted (UniFilList), IsCompatibleMode, IncludePathList)
     else:
         EdkLogger.error("UnicodeStringGather", AUTOGEN_ERROR, 'No unicode files given')
 

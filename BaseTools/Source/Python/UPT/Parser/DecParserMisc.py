@@ -151,7 +151,7 @@ def IsValidNumValUint8(Token):
     else:
         Base = 10
     try:
-        TokenValue = int(Token, Base)
+        TokenValue = long(Token, Base)
     except BaseException:
         Valid, Cause = IsValidLogicalExpr(Token, True)
         if Cause:
@@ -262,7 +262,7 @@ def IsValidPcdDatum(Type, Value):
                 Value = Value.lstrip('0')
                 if not Value:
                     return True, ""
-            Value = int(Value, 0)
+            Value = long(Value, 0)
             TypeLenMap = {
                 #
                 # 0x00 - 0xff

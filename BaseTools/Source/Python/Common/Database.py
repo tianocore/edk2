@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import sqlite3
 import Common.LongFilePathOs as os
 

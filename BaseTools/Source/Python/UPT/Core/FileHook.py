@@ -66,7 +66,7 @@ class RecoverMgr:
         arc = self._tryhook(path)
         if arc and os.path.isfile(path):
             self._createzip()
-            self.zip.write(path, arc)
+            self.zip.write(path, arc.encode('utf_8'))
             sta = os.stat(path)
             oldmode = stat.S_IMODE(sta.st_mode)
             self.rlist.append(_PathInfo(_CHMOD, path, oldmode))

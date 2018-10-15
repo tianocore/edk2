@@ -51,7 +51,7 @@ def OpenInfFile(Filename):
     FileLinesList = []
 
     try:
-        FInputfile = open(Filename, "r")
+        FInputfile = open(Filename, "rb", 0)
         try:
             FileLinesList = FInputfile.readlines()
         except BaseException:
@@ -86,7 +86,7 @@ class InfParser(InfSectionParser):
         #
         # Call parent class construct function
         #
-        super().__init__()
+        super(InfParser, self).__init__()
 
         self.WorkspaceDir    = WorkspaceDir
         self.SupArchList     = DT.ARCH_LIST

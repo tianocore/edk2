@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 ## @file
 # This file is used to create/update/query/erase table for dsc datas
 #

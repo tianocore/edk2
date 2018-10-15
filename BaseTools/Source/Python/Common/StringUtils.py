@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 import re
 from . import DataType
 import Common.LongFilePathOs as os
@@ -98,7 +99,7 @@ def GetSplitValueList(String, SplitTag=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
 # @retval list() A list for splitted string
 #
 def GetSplitList(String, SplitStr=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
-    return list(map(lambda l: l.strip(), String.split(SplitStr, MaxSplit)))
+    return map(lambda l: l.strip(), String.split(SplitStr, MaxSplit))
 
 ## MergeArches
 #
@@ -544,7 +545,7 @@ def GetSingleValueOfKeyFromLines(Lines, Dictionary, CommentCharacter, KeySplitCh
                 #
                 LineList[1] = CleanString(LineList[1], CommentCharacter)
                 if ValueSplitFlag:
-                    Value = list(map(string.strip, LineList[1].split(ValueSplitCharacter)))
+                    Value = map(string.strip, LineList[1].split(ValueSplitCharacter))
                 else:
                     Value = CleanString(LineList[1], CommentCharacter).splitlines()
 
@@ -612,7 +613,7 @@ def PreCheck(FileName, FileContent, SupSectionTag):
         #
         # Regenerate FileContent
         #
-        NewFileContent = NewFileContent + Line + '\n'
+        NewFileContent = NewFileContent + Line + '\r\n'
 
     if IsFailed:
        EdkLogger.error("Parser", FORMAT_INVALID, Line=LineNo, File=FileName, RaiseError=EdkLogger.IsRaiseError)
@@ -750,7 +751,7 @@ def SplitString(String):
 # @param StringList:  A list for strings to be converted
 #
 def ConvertToSqlString(StringList):
-    return list(map(lambda s: s.replace("'", "''"), StringList))
+    return map(lambda s: s.replace("'", "''"), StringList)
 
 ## Convert To Sql String
 #
@@ -815,7 +816,11 @@ def GetHelpTextList(HelpTextClassList):
     return List
 
 def StringToArray(String):
-    if String.startswith('L"'):
+    if isinstance(String, unicode):
+        if len(unicode) == 0:
+            return "{0x00,0x00}"
+        return "{%s,0x00,0x00}" % ",".join("0x%02x,0x00" % ord(C) for C in String)
+    elif String.startswith('L"'):
         if String == "L\"\"":
             return "{0x00,0x00}"
         else:
@@ -838,7 +843,9 @@ def StringToArray(String):
             return '{%s,0,0}' % ','.join(String.split())
 
 def StringArrayLength(String):
-    if String.startswith('L"'):
+    if isinstance(String, unicode):
+        return (len(String) + 1) * 2 + 1;
+    elif String.startswith('L"'):
         return (len(String) - 3 + 1) * 2
     elif String.startswith('"'):
         return (len(String) - 2 + 1)

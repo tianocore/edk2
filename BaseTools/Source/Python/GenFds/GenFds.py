@@ -15,6 +15,8 @@
 ##
 # Import Modules
 #
+from __future__ import print_function
+from __future__ import absolute_import
 from optparse import OptionParser
 import sys
 import Common.LongFilePathOs as os
@@ -27,7 +29,6 @@ from Workspace.BuildClassObject import PcdClassObject
 from . import RuleComplexFile
 from .EfiSection import EfiSection
 from io import BytesIO
-from io import StringIO
 import Common.TargetTxtClassObject as TargetTxtClassObject
 import Common.ToolDefClassObject as ToolDefClassObject
 from Common.DataType import *
@@ -321,8 +322,6 @@ def main():
                             continue
                         for RegionData in RegionObj.RegionDataList:
                             if FvObj.UiFvName.upper() == RegionData.upper():
-                                if not FvObj.BaseAddress:
-                                    FvObj.BaseAddress = '0x%x' % (int(FdObj.BaseAddress, 0) + RegionObj.Offset)
                                 if FvObj.FvRegionInFD:
                                     if FvObj.FvRegionInFD != RegionObj.Size:
                                         EdkLogger.error("GenFds", FORMAT_INVALID, "The FV %s's region is specified in multiple FD with different value." %FvObj.UiFvName)
@@ -457,7 +456,7 @@ class GenFds :
                 return
         elif GenFds.OnlyGenerateThisFv is None:
             for FvObj in GenFdsGlobalVariable.FdfParser.Profile.FvDict.values():
-                Buffer = BytesIO()
+                Buffer = BytesIO('')
                 FvObj.AddToBuffer(Buffer)
                 Buffer.close()
 
@@ -560,9 +559,9 @@ class GenFds :
         GenFdsGlobalVariable.InfLogger('\nFV Space Information')
         for FvSpaceInfo in FvSpaceInfoList:
             Name = FvSpaceInfo[0]
-            TotalSizeValue = int(FvSpaceInfo[1], 0)
-            UsedSizeValue = int(FvSpaceInfo[2], 0)
-            FreeSizeValue = int(FvSpaceInfo[3], 0)
+            TotalSizeValue = long(FvSpaceInfo[1], 0)
+            UsedSizeValue = long(FvSpaceInfo[2], 0)
+            FreeSizeValue = long(FvSpaceInfo[3], 0)
             if UsedSizeValue == TotalSizeValue:
                 Percentage = '100'
             else:
@@ -588,7 +587,7 @@ class GenFds :
         if PcdValue == '':
             return
 
-        Int64PcdValue = int(PcdValue, 0)
+        Int64PcdValue = long(PcdValue, 0)
         if Int64PcdValue == 0 or Int64PcdValue < -1:
             return
 
@@ -603,27 +602,22 @@ class GenFds :
 
     def GenerateGuidXRefFile(BuildDb, ArchList, FdfParserObj):
         GuidXRefFileName = os.path.join(GenFdsGlobalVariable.FvDir, "Guid.xref")
-        GuidXRefFile = StringIO('')
+        GuidXRefFile = BytesIO('')
         PkgGuidDict = {}
         GuidDict = {}
         ModuleList = []
         FileGuidList = []
         GuidPattern = gGuidPattern
-        VariableGuidSet = set()
         for Arch in ArchList:
             PlatformDataBase = BuildDb.BuildObject[GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
             PkgList = GenFdsGlobalVariable.WorkSpace.GetPackageList(GenFdsGlobalVariable.ActivePlatform, Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag)
             for P in PkgList:
                 PkgGuidDict.update(P.Guids)
-            for Name, Guid in sorted(PlatformDataBase.Pcds):
+            for Name, Guid in PlatformDataBase.Pcds:
                 Pcd = PlatformDataBase.Pcds[Name, Guid]
                 if Pcd.Type in [TAB_PCDS_DYNAMIC_HII, TAB_PCDS_DYNAMIC_EX_HII]:
                     for SkuId in Pcd.SkuInfoList:
                         Sku = Pcd.SkuInfoList[SkuId]
-                        if Sku.VariableGuid in VariableGuidSet:
-                            continue
-                        else:
-                            VariableGuidSet.add(Sku.VariableGuid)
                         if Sku.VariableGuid and Sku.VariableGuid in PkgGuidDict.keys():
                             GuidDict[Sku.VariableGuid] = PkgGuidDict[Sku.VariableGuid]
             for ModuleFile in PlatformDataBase.Modules:
@@ -691,7 +685,7 @@ class GenFds :
                                     F.read()
                                     length = F.tell()
                                     F.seek(4)
-                                    TmpStr = unpack('%dh' % ((length - 4) // 2), F.read())
+                                    TmpStr = unpack('%dh' % ((length - 4) / 2), F.read())
                                     Name = ''.join(chr(c) for c in TmpStr[:-1])
                         else:
                             FileList = []

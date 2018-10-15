@@ -40,7 +40,7 @@ if PythonSourceDir not in sys.path:
 
 def MakeTheTestSuite(localItems):
     tests = []
-    for name, item in localItems.items():
+    for name, item in localItems.iteritems():
         if isinstance(item, type):
             if issubclass(item, unittest.TestCase):
                 tests.append(unittest.TestLoader().loadTestsFromTestCase(item))
@@ -146,12 +146,9 @@ class BaseToolsTest(unittest.TestCase):
         return data
 
     def WriteTmpFile(self, fileName, data):
-        if isinstance(data, bytes):
-            with open(self.GetTmpFilePath(fileName), 'wb') as f:
-                f.write(data)
-        else:
-            with open(self.GetTmpFilePath(fileName), 'w') as f:
-                f.write(data)
+        f = open(self.GetTmpFilePath(fileName), 'w')
+        f.write(data)
+        f.close()
 
     def GenRandomFileData(self, fileName, minlen = None, maxlen = None):
         if maxlen is None: maxlen = minlen
@@ -164,7 +161,7 @@ class BaseToolsTest(unittest.TestCase):
         if maxlen is None: maxlen = minlen
         return ''.join(
             [chr(random.randint(0, 255))
-             for x in range(random.randint(minlen, maxlen))
+             for x in xrange(random.randint(minlen, maxlen))
             ])
 
     def setUp(self):
@@ -186,3 +183,4 @@ class BaseToolsTest(unittest.TestCase):
 
         os.environ['PATH'] = self.savedEnvPath
         sys.path = self.savedSysPath
+

@@ -223,7 +223,7 @@ class Check(object):
                     IndexOfLine = 0
                     for Line in op:
                         IndexOfLine += 1
-                        if not bytes.decode(Line).endswith('\r\n'):
+                        if not Line.endswith('\r\n'):
                             OtherMsg = "File %s has invalid line ending at line %s" % (Record[1], IndexOfLine)
                             EccGlobalData.gDb.TblReport.Insert(ERROR_GENERAL_CHECK_INVALID_LINE_ENDING, OtherMsg=OtherMsg, BelongsToTable='File', BelongsToItem=Record[0])
 
@@ -235,7 +235,7 @@ class Check(object):
             RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
             for Record in RecordSet:
                 if Record[2].upper() not in EccGlobalData.gConfig.BinaryExtList:
-                    op = open(Record[1], 'r').readlines()
+                    op = open(Record[1], 'rb').readlines()
                     IndexOfLine = 0
                     for Line in op:
                         IndexOfLine += 1

@@ -21,7 +21,7 @@ import re
 import Common.LongFilePathOs as os
 import sys
 
-import antlr4
+import antlr3
 from .CLexer import CLexer
 from .CParser import CParser
 

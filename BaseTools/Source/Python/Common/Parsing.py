@@ -14,6 +14,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 from .StringUtils import *
 from CommonDataClass.DataClass import *
 from .DataType import *

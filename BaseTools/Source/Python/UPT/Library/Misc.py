@@ -32,7 +32,7 @@ from os import linesep
 from os import walk
 from os import environ
 import re
-from collections import UserDict as IterableUserDict
+from UserDict import IterableUserDict
 
 import Logger.Log as Logger
 from Logger import StringTable as ST
@@ -160,23 +160,19 @@ def RemoveDirectory(Directory, Recursively=False):
 #                              or not
 #
 def SaveFileOnChange(File, Content, IsBinaryFile=True):
+    if not IsBinaryFile:
+        Content = Content.replace("\n", linesep)
+
     if os.path.exists(File):
         try:
-            if isinstance(Content, bytes):
-                if Content == __FileHookOpen__(File, "rb").read():
-                    return False
-            else:
-                if Content == __FileHookOpen__(File, "r").read():
-                    return False
+            if Content == __FileHookOpen__(File, "rb").read():
+                return False
         except BaseException:
             Logger.Error(None, ToolError.FILE_OPEN_FAILURE, ExtraData=File)
 
     CreateDirectory(os.path.dirname(File))
     try:
-        if isinstance(Content, bytes):
-            FileFd = __FileHookOpen__(File, "wb")
-        else:
-            FileFd = __FileHookOpen__(File, "w")
+        FileFd = __FileHookOpen__(File, "wb")
         FileFd.write(Content)
         FileFd.close()
     except BaseException:
@@ -441,7 +437,7 @@ class Sdict(IterableUserDict):
 def CommonPath(PathList):
     Path1 = min(PathList).split(os.path.sep)
     Path2 = max(PathList).split(os.path.sep)
-    for Index in range(min(len(Path1), len(Path2))):
+    for Index in xrange(min(len(Path1), len(Path2))):
         if Path1[Index] != Path2[Index]:
             return os.path.sep.join(Path1[:Index])
     return os.path.sep.join(Path1)
@@ -894,7 +890,7 @@ def ProcessEdkComment(LineList):
             if FindEdkBlockComment:
                 if FirstPos == -1:
                     FirstPos = StartPos
-                for Index in range(StartPos, EndPos+1):
+                for Index in xrange(StartPos, EndPos+1):
                     LineList[Index] = ''
                 FindEdkBlockComment = False
         elif Line.find("//") != -1 and not Line.startswith("#"):
@@ -961,7 +957,7 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo):
         FileLinesList = []
 
         try:
-            FInputfile = open(FullFileName, "r")
+            FInputfile = open(FullFileName, "rb", 0)
             try:
                 FileLinesList = FInputfile.readlines()
             except BaseException:

@@ -16,6 +16,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 from . import Section
 import subprocess
 from .Ffs import Ffs

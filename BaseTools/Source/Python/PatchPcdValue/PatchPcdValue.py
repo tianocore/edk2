@@ -133,7 +133,7 @@ def PatchBinaryFile(FileName, ValueOffset, TypeName, ValueString, MaxSize=0):
         #
         for Index in range(ValueLength):
             ByteList[ValueOffset + Index] = ValueNumber % 0x100
-            ValueNumber = ValueNumber // 0x100
+            ValueNumber = ValueNumber / 0x100
     elif TypeName == TAB_VOID:
         ValueString = SavedStr
         if ValueString.startswith('L"'):

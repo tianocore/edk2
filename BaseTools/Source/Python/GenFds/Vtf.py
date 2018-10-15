@@ -15,6 +15,7 @@
 ##
 # Import Modules
 #
+from __future__ import absolute_import
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
 import Common.LongFilePathOs as os
 from CommonDataClass.FdfClass import VtfClassObject

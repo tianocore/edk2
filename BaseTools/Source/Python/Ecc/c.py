@@ -35,7 +35,7 @@ IgnoredKeywordList = ['EFI_ERROR']
 
 def GetIgnoredDirListPattern():
     skipList = list(EccGlobalData.gConfig.SkipDirList) + ['.svn']
-    DirString = '|'.join(skipList)
+    DirString = string.join(skipList, '|')
     p = re.compile(r'.*[\\/](?:%s)[\\/]?.*' % DirString)
     return p
 
@@ -963,7 +963,7 @@ def StripComments(Str):
             ListFromStr[Index] = ' '
             Index += 1
         # check for // comment
-        elif ListFromStr[Index] == '/' and ListFromStr[Index + 1] == '/':
+        elif ListFromStr[Index] == '/' and ListFromStr[Index + 1] == '/' and ListFromStr[Index + 2] != '\n':
             InComment = True
             DoubleSlashComment = True
 
@@ -1297,7 +1297,7 @@ def CheckFuncLayoutReturnType(FullFileName):
         Result0 = Result[0]
         if Result0.upper().startswith('STATIC'):
             Result0 = Result0[6:].strip()
-        Index = Result0.find(TypeStart)
+        Index = Result0.find(ReturnType)
         if Index != 0 or Result[3] != 0:
             PrintErrorMsg(ERROR_C_FUNCTION_LAYOUT_CHECK_RETURN_TYPE, '[%s] Return Type should appear at the start of line' % FuncName, 'Function', Result[1])
 
