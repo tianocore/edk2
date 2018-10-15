@@ -22,8 +22,59 @@ typedef enum {
   Msr,
   ControlRegister,
   MemoryMapped,
-  CacheControl
+  CacheControl,
+
+  //
+  // Semaphore type used to control the execute sequence of the Msr.
+  // It will be insert between two Msr which has execute dependence.
+  //
+  Semaphore,
+  InvalidReg
 } REGISTER_TYPE;
+
+//
+// Describe the dependency type for different features.
+// The value set to CPU_REGISTER_TABLE_ENTRY.Value when the REGISTER_TYPE is Semaphore.
+//
+typedef enum {
+  NoneDepType,
+  ThreadDepType,
+  CoreDepType,
+  PackageDepType,
+  InvalidDepType
+} CPU_FEATURE_DEPENDENCE_TYPE;
+
+//
+// CPU information.
+//
+typedef struct {
+  //
+  // Record the package count in this CPU.
+  //
+  UINT32                      PackageCount;
+  //
+  // Record the max core count in this CPU.
+  // Different packages may have different core count, this value
+  // save the max core count in all the packages.
+  //
+  UINT32                      MaxCoreCount;
+  //
+  // Record the max thread count in this CPU.
+  // Different cores may have different thread count, this value
+  // save the max thread count in all the cores.
+  //
+  UINT32                      MaxThreadCount;
+  //
+  // This field points to an array.
+  // This array saves valid core count (type UINT32) of each package.
+  // The array has PackageCount elements.
+  //
+  // If the platform does not support MSR setting at S3 resume, and
+  // therefore it doesn't need the dependency semaphores, it should set
+  // this field to 0.
+  //
+  EFI_PHYSICAL_ADDRESS        ValidCoreCountPerPackage;
+} CPU_STATUS_INFORMATION;
 
 //
 // Element of register table entry
@@ -147,6 +198,20 @@ typedef struct {
   // provided.
   //
   UINT32                ApMachineCheckHandlerSize;
+  //
+  // CPU information which is required when set the register table.
+  //
+  CPU_STATUS_INFORMATION     CpuStatus;
+  //
+  // Location info for each AP.
+  // It points to an array which saves all APs location info.
+  // The array count is the AP count in this CPU.
+  //
+  // If the platform does not support MSR setting at S3 resume, and
+  // therefore it doesn't need the dependency semaphores, it should set
+  // this field to 0.
+  //
+  EFI_PHYSICAL_ADDRESS  ApLocation;
 } ACPI_CPU_DATA;
 
 #endif
