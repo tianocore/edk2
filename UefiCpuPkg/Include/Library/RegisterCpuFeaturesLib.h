@@ -73,10 +73,23 @@
 #define CPU_FEATURE_PPIN                            (32+11)
 #define CPU_FEATURE_PROC_TRACE                      (32+12)
 
-#define CPU_FEATURE_BEFORE_ALL                      BIT27
-#define CPU_FEATURE_AFTER_ALL                       BIT28
-#define CPU_FEATURE_BEFORE                          BIT29
-#define CPU_FEATURE_AFTER                           BIT30
+#define CPU_FEATURE_BEFORE_ALL                      BIT23
+#define CPU_FEATURE_AFTER_ALL                       BIT24
+//
+// CPU_FEATURE_BEFORE and CPU_FEATURE_AFTER only mean Thread scope
+// before and Thread scope after.
+// It will be replace with CPU_FEATURE_THREAD_BEFORE and
+// CPU_FEATURE_THREAD_AFTER, and should not be used anymore.
+//
+#define CPU_FEATURE_BEFORE                          BIT25
+#define CPU_FEATURE_AFTER                           BIT26
+
+#define CPU_FEATURE_THREAD_BEFORE                   CPU_FEATURE_BEFORE
+#define CPU_FEATURE_THREAD_AFTER                    CPU_FEATURE_AFTER
+#define CPU_FEATURE_CORE_BEFORE                     BIT27
+#define CPU_FEATURE_CORE_AFTER                      BIT28
+#define CPU_FEATURE_PACKAGE_BEFORE                  BIT29
+#define CPU_FEATURE_PACKAGE_AFTER                   BIT30
 #define CPU_FEATURE_END                             MAX_UINT32
 /// @}
 
