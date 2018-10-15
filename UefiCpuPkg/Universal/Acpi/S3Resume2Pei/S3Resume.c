@@ -964,6 +964,7 @@ S3RestoreConfig2 (
   VOID                                          *GuidHob;
   BOOLEAN                                       Build4GPageTableOnly;
   BOOLEAN                                       InterruptStatus;
+  IA32_CR0                                      Cr0;
 
   TempAcpiS3Context = 0;
   TempEfiBootScriptExecutorVariable = 0;
@@ -1045,6 +1046,13 @@ S3RestoreConfig2 (
   //
   GuidHob = GetFirstGuidHob (&gEfiAcpiVariableGuid);
   if (GuidHob != NULL) {
+    //
+    // Below SwitchStack/AsmEnablePaging64 function has
+    // assumption that it's in 32 bits mode now.
+    // Add ASSERT code to indicate this assumption.
+    //
+    ASSERT(sizeof (UINTN) == sizeof (UINT32));
+
     Status = PeiServicesLocatePpi (
                               &gPeiSmmAccessPpiGuid,
                               0,
@@ -1105,6 +1113,15 @@ S3RestoreConfig2 (
       //
       SetInterruptState (InterruptStatus);
 
+      Cr0.UintN = AsmReadCr0 ();
+      if (Cr0.Bits.PG != 0) {
+        //
+        // We're in 32-bit mode, with paging enabled. We can't set CR3 to
+        // the 64-bit page tables without first disabling paging.
+        //
+        Cr0.Bits.PG = 0;
+        AsmWriteCr0 (Cr0.UintN);
+      }
       AsmWriteCr3 ((UINTN)SmmS3ResumeState->SmmS3Cr3);
 
       //

@@ -33,6 +33,16 @@
 #  VALID_ARCHITECTURES           = IA32 X64
 #
 
+#
+# This module is not always workable in IA32 and X64 mode. It has below result:
+# when it works with SMM mode:
+# ===============================
+#           SMM:used  SMM:unused
+# PEI:IA32   works      works
+# PEI:X64    fails      works
+# ===============================
+#
+
 [Sources]
   S3Resume.c
 
