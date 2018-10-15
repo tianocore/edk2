@@ -1079,37 +1079,48 @@ class PcdReport(object):
                         DecMatch = False
                     elif Pcd.SkuOverrideValues:
                         DscOverride = False
-                        if not Pcd.SkuInfoList:
-                            OverrideValues = Pcd.SkuOverrideValues
-                            if OverrideValues:
-                                Keys = OverrideValues.keys()
-                                Data = OverrideValues[Keys[0]]
-                                Struct = Data.values()[0]
-                                DscOverride = self.ParseStruct(Struct)
+                        if Pcd.DefaultFromDSC:
+                            DscOverride = True
                         else:
-                            SkuList = sorted(Pcd.SkuInfoList.keys())
-                            for Sku in SkuList:
-                                SkuInfo = Pcd.SkuInfoList[Sku]
-                                if TypeName in ('DYNHII', 'DEXHII'):
-                                    if SkuInfo.DefaultStoreDict:
-                                        DefaultStoreList = sorted(SkuInfo.DefaultStoreDict.keys())
-                                        for DefaultStore in DefaultStoreList:
-                                            OverrideValues = Pcd.SkuOverrideValues[Sku]
-                                            DscOverride = self.ParseStruct(OverrideValues[DefaultStore])
-                                            if DscOverride:
-                                                break
-                                else:
-                                    OverrideValues = Pcd.SkuOverrideValues[Sku]
+                            DictLen = 0
+                            for item in Pcd.SkuOverrideValues:
+                                DictLen += len(Pcd.SkuOverrideValues[item])
+                            if not DictLen:
+                                DscOverride = False
+                            else:
+                                if not Pcd.SkuInfoList:
+                                    OverrideValues = Pcd.SkuOverrideValues
                                     if OverrideValues:
-                                        Keys = OverrideValues.keys()
-                                        OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[Keys[0]])
-                                        DscOverride = self.ParseStruct(OverrideFieldStruct)
-                                if DscOverride:
-                                    break
+                                        Keys = list(OverrideValues.keys())
+                                        Data = OverrideValues[Keys[0]]
+                                        Struct = list(Data.values())
+                                        DscOverride = self.ParseStruct(Struct[0])
+                                else:
+                                    SkuList = sorted(Pcd.SkuInfoList.keys())
+                                    for Sku in SkuList:
+                                        SkuInfo = Pcd.SkuInfoList[Sku]
+                                        if TypeName in ('DYNHII', 'DEXHII'):
+                                            if SkuInfo.DefaultStoreDict:
+                                                DefaultStoreList = sorted(SkuInfo.DefaultStoreDict.keys())
+                                                for DefaultStore in DefaultStoreList:
+                                                    OverrideValues = Pcd.SkuOverrideValues[Sku]
+                                                    DscOverride = self.ParseStruct(OverrideValues[DefaultStore])
+                                                    if DscOverride:
+                                                        break
+                                        else:
+                                            OverrideValues = Pcd.SkuOverrideValues[Sku]
+                                            if OverrideValues:
+                                                Keys = list(OverrideValues.keys())
+                                                OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[Keys[0]])
+                                                DscOverride = self.ParseStruct(OverrideFieldStruct)
+                                        if DscOverride:
+                                            break
                         if DscOverride:
                             DscDefaultValue = True
                             DscMatch = True
                             DecMatch = False
+                        else:
+                            DecMatch = True
                     else:
                         DscDefaultValue = True
                         DscMatch = True
@@ -1256,11 +1267,12 @@ class PcdReport(object):
             if IsStructure:
                 OverrideValues = Pcd.SkuOverrideValues
                 if OverrideValues:
-                    Keys = OverrideValues.keys()
+                    Keys = list(OverrideValues.keys())
                     Data = OverrideValues[Keys[0]]
-                    Struct = Data.values()[0]
-                    OverrideFieldStruct = self.OverrideFieldValue(Pcd, Struct)
-                    self.PrintStructureInfo(File, OverrideFieldStruct)
+                    Struct = list(Data.values())
+                    if Struct:
+                        OverrideFieldStruct = self.OverrideFieldValue(Pcd, Struct[0])
+                        self.PrintStructureInfo(File, OverrideFieldStruct)
             self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
         else:
             FirstPrint = True
