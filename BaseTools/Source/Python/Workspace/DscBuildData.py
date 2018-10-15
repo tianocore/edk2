@@ -1132,6 +1132,8 @@ class DscBuildData(PlatformBuildClassObject):
             if not FieldName:
                 if PcdDatumType not in TAB_PCD_NUMERIC_TYPES:
                     PcdValue = '"' + PcdValue + '"'
+                elif not PcdValue.isdigit() and not PcdValue.upper().startswith('0X'):
+                    PcdValue = '"' + PcdValue + '"'
             else:
                 IsArray = False
                 Base = 10
