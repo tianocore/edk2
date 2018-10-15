@@ -50,6 +50,8 @@ valuePatternGcc = re.compile('^([\w_\.]+) +([\da-fA-Fx]+) +([\da-fA-Fx]+)$')
 pcdPatternGcc = re.compile('^([\da-fA-Fx]+) +([\da-fA-Fx]+)')
 secReGeneral = re.compile('^([\da-fA-F]+):([\da-fA-F]+) +([\da-fA-F]+)[Hh]? +([.\w\$]+) +(\w+)', re.UNICODE)
 
+StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*$')
+
 ## Dictionary used to store file time stamp for quick re-access
 gFileTimeStampCache = {}    # {file path : file time stamp}
 
@@ -1459,7 +1461,7 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
         Size = ''
         if len(FieldList) > 1 and FieldList[1]:
             DataType = FieldList[1]
-            if FieldList[1] != TAB_VOID:
+            if FieldList[1] != TAB_VOID and StructPattern.match(FieldList[1]) is None:
                 IsValid = False
         if len(FieldList) > 2:
             Size = FieldList[2]
