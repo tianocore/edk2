@@ -738,6 +738,10 @@ GetAllocationDescriptor (
       );
   }
 
+  //
+  // Code should never reach here.
+  //
+  ASSERT (FALSE);
   return EFI_DEVICE_ERROR;
 }
 
@@ -784,6 +788,10 @@ GetAllocationDescriptorLsn (
     return EFI_SUCCESS;
   }
 
+  //
+  // Code should never reach here.
+  //
+  ASSERT (FALSE);
   return EFI_UNSUPPORTED;
 }
 
