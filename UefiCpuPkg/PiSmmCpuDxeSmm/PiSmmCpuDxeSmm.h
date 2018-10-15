@@ -53,6 +53,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/ReportStatusCodeLib.h>
 #include <Library/SmmCpuFeaturesLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
+#include <Library/RegisterCpuFeaturesLib.h>
 
 #include <AcpiCpuData.h>
 #include <CpuHotPlugData.h>
@@ -364,7 +365,6 @@ typedef struct {
   volatile BOOLEAN     *AllCpusInSync;
   SPIN_LOCK            *PFLock;
   SPIN_LOCK            *CodeAccessCheckLock;
-  SPIN_LOCK            *MemoryMappedLock;
 } SMM_CPU_SEMAPHORE_GLOBAL;
 
 ///
@@ -409,7 +409,6 @@ extern SMM_CPU_SEMAPHORES                  mSmmCpuSemaphores;
 extern UINTN                               mSemaphoreSize;
 extern SPIN_LOCK                           *mPFLock;
 extern SPIN_LOCK                           *mConfigSmmCodeAccessCheckLock;
-extern SPIN_LOCK                           *mMemoryMappedLock;
 extern EFI_SMRAM_DESCRIPTOR                *mSmmCpuSmramRanges;
 extern UINTN                               mSmmCpuSmramRangeCount;
 extern UINT8                               mPhysicalAddressBits;

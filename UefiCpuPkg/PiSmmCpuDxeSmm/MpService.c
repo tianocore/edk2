@@ -1303,8 +1303,6 @@ InitializeSmmCpuSemaphores (
   mSmmCpuSemaphores.SemaphoreGlobal.CodeAccessCheckLock
                                                   = (SPIN_LOCK *)SemaphoreAddr;
   SemaphoreAddr += SemaphoreSize;
-  mSmmCpuSemaphores.SemaphoreGlobal.MemoryMappedLock
-                                                  = (SPIN_LOCK *)SemaphoreAddr;
 
   SemaphoreAddr = (UINTN)SemaphoreBlock + GlobalSemaphoresSize;
   mSmmCpuSemaphores.SemaphoreCpu.Busy    = (SPIN_LOCK *)SemaphoreAddr;
@@ -1321,7 +1319,6 @@ InitializeSmmCpuSemaphores (
 
   mPFLock                       = mSmmCpuSemaphores.SemaphoreGlobal.PFLock;
   mConfigSmmCodeAccessCheckLock = mSmmCpuSemaphores.SemaphoreGlobal.CodeAccessCheckLock;
-  mMemoryMappedLock             = mSmmCpuSemaphores.SemaphoreGlobal.MemoryMappedLock;
 
   mSemaphoreSize = SemaphoreSize;
 }
