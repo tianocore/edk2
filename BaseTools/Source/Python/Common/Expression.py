@@ -297,8 +297,8 @@ class ValueExpression(BaseExpression):
                 else:
                     raise BadExpression(ERR_EXPR_TYPE)
             if isinstance(Oprand1, type('')) and isinstance(Oprand2, type('')):
-                if (Oprand1.startswith('L"') and not Oprand2.startswith('L"')) or \
-                    (not Oprand1.startswith('L"') and Oprand2.startswith('L"')):
+                if ((Oprand1.startswith('L"') or Oprand1.startswith('L')) and (not Oprand2.startswith('L"')) and (not Oprand2.startswith("L'"))) or \
+                        (((not Oprand1.startswith('L"')) and (not Oprand1.startswith("L'"))) and (Oprand2.startswith('L"') or Oprand2.startswith('L'))):
                     raise BadExpression(ERR_STRING_CMP % (Oprand1, Operator, Oprand2))
             if 'in' in Operator and isinstance(Oprand2, type('')):
                 Oprand2 = Oprand2.split()
@@ -827,6 +827,8 @@ class ValueExpressionEx(ValueExpression):
                 PcdValue = PcdValue.strip()
                 if PcdValue.startswith('{') and PcdValue.endswith('}'):
                     PcdValue = SplitPcdValueString(PcdValue[1:-1])
+                if ERR_STRING_CMP.split(':')[0] in Value.message:
+                    raise BadExpression("Type: %s, Value: %s, %s" % (self.PcdType, PcdValue, Value))
                 if isinstance(PcdValue, type([])):
                     TmpValue = 0
                     Size = 0
