@@ -1,7 +1,7 @@
 ## @file
 # This file is used to parse INF file of EDK project
 #
-# Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -22,8 +22,9 @@ from Common.DataType import *
 from CommonDataClass.DataClass import *
 from Common.Identification import *
 from Common.StringUtils import *
-from .Parser import *
-from . import Database
+from Eot.Parser import *
+from Eot import Database
+from Eot import EotGlobalData
 
 ## EdkInfParser() class
 #
@@ -153,21 +154,4 @@ class EdkInfParser(object):
         self.ParserSource(CurrentSection, SectionItemList, ArchList, ThirdList)
         #End of For
 
-##
-#
-# This acts like the main() function for the script, unless it is 'import'ed into another
-# script.
-#
-if __name__ == '__main__':
-    EdkLogger.Initialize()
-    EdkLogger.SetLevel(EdkLogger.QUIET)
 
-    Db = Database.Database('Inf.db')
-    Db.InitDatabase()
-    P = EdkInfParser(os.path.normpath("C:\Framework\Edk\Sample\Platform\Nt32\Dxe\PlatformBds\PlatformBds.inf"), Db, '', '')
-    for Inf in P.Sources:
-        print(Inf)
-    for Item in P.Macros:
-        print(Item, P.Macros[Item])
-
-    Db.Close()
