@@ -2144,7 +2144,7 @@ def CheckBooleanValueComparison(FullFileName):
                     PrintErrorMsg(ERROR_PREDICATE_EXPRESSION_CHECK_BOOLEAN_VALUE, 'Predicate Expression: %s' % Exp, FileTable, Str[2])
 
 
-def CheckHeaderFileData(FullFileName):
+def CheckHeaderFileData(FullFileName, AllTypedefFun=[]):
     ErrorMsgList = []
 
     FileID = GetTableID(FullFileName, ErrorMsgList)
@@ -2160,7 +2160,11 @@ def CheckHeaderFileData(FullFileName):
     ResultSet = Db.TblFile.Exec(SqlStatement)
     for Result in ResultSet:
         if not Result[1].startswith('extern'):
-            PrintErrorMsg(ERROR_INCLUDE_FILE_CHECK_DATA, 'Variable definition appears in header file', FileTable, Result[0])
+            for Item in AllTypedefFun:
+                if '(%s)' % Result[1] in Item:
+                    break
+            else:
+                PrintErrorMsg(ERROR_INCLUDE_FILE_CHECK_DATA, 'Variable definition appears in header file', FileTable, Result[0])
 
     SqlStatement = """ select ID
                        from Function

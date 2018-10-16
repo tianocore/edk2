@@ -646,13 +646,23 @@ class Check(object):
         if EccGlobalData.gConfig.IncludeFileCheckData == '1' or EccGlobalData.gConfig.IncludeFileCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
             EdkLogger.quiet("Checking header file data ...")
 
+            # Get all typedef functions
+            gAllTypedefFun = []
+            for IdentifierTable in EccGlobalData.gIdentifierTableList:
+                SqlCommand = """select Name from %s
+                                where Model = %s """ % (IdentifierTable, MODEL_IDENTIFIER_TYPEDEF)
+                RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
+                for Record in RecordSet:
+                    if Record[0].startswith('('):
+                        gAllTypedefFun.append(Record[0])
+
 #            for Dirpath, Dirnames, Filenames in self.WalkTree():
 #                for F in Filenames:
 #                    if os.path.splitext(F)[1] in ('.h'):
 #                        FullName = os.path.join(Dirpath, F)
 #                        MsgList = c.CheckHeaderFileData(FullName)
             for FullName in EccGlobalData.gHFileList:
-                MsgList = c.CheckHeaderFileData(FullName)
+                MsgList = c.CheckHeaderFileData(FullName, gAllTypedefFun)
 
     # Doxygen document checking
     def DoxygenCheck(self):
