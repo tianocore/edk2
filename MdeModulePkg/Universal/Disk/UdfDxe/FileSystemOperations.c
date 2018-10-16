@@ -1078,6 +1078,7 @@ ReadFile (
   EFI_STATUS              Status;
   UINT32                  LogicalBlockSize;
   VOID                    *Data;
+  VOID                    *DataBak;
   UINT64                  Length;
   VOID                    *Ad;
   UINT64                  AdOffset;
@@ -1218,12 +1219,7 @@ ReadFile (
       // Descriptor and its extents (ADs).
       //
       if (GET_EXTENT_FLAGS (RecordingFlags, Ad) == ExtentIsNextExtent) {
-        if (!DoFreeAed) {
-          DoFreeAed = TRUE;
-        } else {
-          FreePool (Data);
-        }
-
+        DataBak = Data;
         Status = GetAedAdsData (
           BlockIo,
           DiskIo,
@@ -1234,6 +1230,13 @@ ReadFile (
           &Data,
           &Length
           );
+
+        if (!DoFreeAed) {
+          DoFreeAed = TRUE;
+        } else {
+          FreePool (DataBak);
+        }
+
         if (EFI_ERROR (Status)) {
           goto Error_Get_Aed;
         }
