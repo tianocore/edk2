@@ -127,7 +127,7 @@ M: Andrew Fish <afish@apple.com>
 M: Ruiyu Ni <ruiyu.ni@intel.com>
 S: Maintained
 
-FatPkg, FatBinPkg
+FatPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/Edk2-fat-driver
 M: Ruiyu Ni <ruiyu.ni@intel.com>
 T: svn - https://svn.code.sf.net/p/edk2-fatdriver2/code/trunk/EnhancedFat
