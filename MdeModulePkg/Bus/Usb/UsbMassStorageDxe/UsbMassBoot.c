@@ -737,6 +737,13 @@ UsbBootDetectMedia (
   }
 
   //
+  // Simply reject device whose block size is unacceptable small (==0) or large (>64K).
+  //
+  if ((Media->BlockSize == 0) || (Media->BlockSize > USB_BOOT_MAX_CARRY_SIZE)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
   // Detect whether it is necessary to reinstall the Block I/O Protocol.
   //
   // MediaId may change in RequestSense for MediaChanged
