@@ -123,7 +123,7 @@ Dhcp6GenerateClientId (
     gRT->GetTime (&Time, NULL);
     Stamp = (UINT32)
       (
-        (((((Time.Year - 2000) * 360 + (Time.Month - 1)) * 30 + (Time.Day - 1)) * 24 + Time.Hour) * 60 + Time.Minute) *
+        ((((UINT32)(Time.Year - 2000) * 360 + (Time.Month - 1) * 30 + (Time.Day - 1)) * 24 + Time.Hour) * 60 + Time.Minute) *
         60 +
         Time.Second
       );
@@ -881,14 +881,14 @@ SetElapsedTime (
   // Generate a time stamp of the centiseconds from 2000/1/1, assume 30day/month.
   //
   gRT->GetTime (&Time, NULL);
-  CurrentStamp = (UINT64)
-    (
-      ((((((Time.Year - 2000) * 360 +
-       (Time.Month - 1)) * 30 +
-       (Time.Day - 1)) * 24 + Time.Hour) * 60 +
-       Time.Minute) * 60 + Time.Second) * 100
-       + DivU64x32(Time.Nanosecond, 10000000)
-    );
+  CurrentStamp = MultU64x32 (
+                   ((((UINT32)(Time.Year - 2000) * 360 + (Time.Month - 1) * 30 + (Time.Day - 1)) * 24 + Time.Hour) * 60 + Time.Minute) * 60 + Time.Second,
+                   100
+                   ) +
+                 DivU64x32(
+                   Time.Nanosecond,
+                   10000000
+                   );
 
   //
   // Sentinel value of 0 means that this is the first DHCP packet that we are

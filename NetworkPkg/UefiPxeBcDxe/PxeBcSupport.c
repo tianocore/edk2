@@ -1510,14 +1510,14 @@ CalcElapsedTime (
   //
   ZeroMem (&Time, sizeof (EFI_TIME));
   gRT->GetTime (&Time, NULL);
-  CurrentStamp = (UINT64)
-    (
-      ((((((Time.Year - 1900) * 360 +
-       (Time.Month - 1)) * 30 +
-       (Time.Day - 1)) * 24 + Time.Hour) * 60 +
-       Time.Minute) * 60 + Time.Second) * 100
-       + DivU64x32(Time.Nanosecond, 10000000)
-    );
+  CurrentStamp = MultU64x32 (
+                   ((((UINT32)(Time.Year - 1900) * 360 + (Time.Month - 1) * 30 + (Time.Day - 1)) * 24 + Time.Hour) * 60 + Time.Minute) * 60 + Time.Second,
+                   100
+                   ) +
+                 DivU64x32 (
+                   Time.Nanosecond,
+                   10000000
+                   );
 
   //
   // Sentinel value of 0 means that this is the first DHCP packet that we are
