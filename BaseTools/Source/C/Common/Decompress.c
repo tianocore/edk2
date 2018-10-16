@@ -194,12 +194,16 @@ Returns:
   UINT16  Avail;
   UINT16  NextCode;
   UINT16  Mask;
+  UINT16  MaxTableLength;
 
   for (Index = 1; Index <= 16; Index++) {
     Count[Index] = 0;
   }
 
   for (Index = 0; Index < NumOfChar; Index++) {
+    if (BitLen[Index] > 16) {
+      return (UINT16) BAD_TABLE;
+    }
     Count[BitLen[Index]]++;
   }
 
@@ -237,6 +241,7 @@ Returns:
 
   Avail = NumOfChar;
   Mask  = (UINT16) (1U << (15 - TableBits));
+  MaxTableLength = (UINT16) (1U << TableBits);
 
   for (Char = 0; Char < NumOfChar; Char++) {
 
@@ -250,6 +255,9 @@ Returns:
     if (Len <= TableBits) {
 
       for (Index = Start[Len]; Index < NextCode; Index++) {
+        if (Index >= MaxTableLength) {
+          return (UINT16) BAD_TABLE;
+        }
         Table[Index] = Char;
       }
 
@@ -643,10 +651,14 @@ Returns: (VOID)
 
       BytesRemain--;
       while ((INT16) (BytesRemain) >= 0) {
-        Sd->mDstBase[Sd->mOutBuf++] = Sd->mDstBase[DataIdx++];
         if (Sd->mOutBuf >= Sd->mOrigSize) {
           return ;
         }
+        if (DataIdx >= Sd->mOrigSize) {
+          Sd->mBadTableFlag = (UINT16) BAD_TABLE;
+          return ;
+        }
+        Sd->mDstBase[Sd->mOutBuf++] = Sd->mDstBase[DataIdx++];
 
         BytesRemain--;
       }
@@ -684,6 +696,7 @@ Returns:
 --*/
 {
   UINT8 *Src;
+  UINT32 CompSize;
 
   *ScratchSize  = sizeof (SCRATCH_DATA);
 
@@ -692,7 +705,13 @@ Returns:
     return EFI_INVALID_PARAMETER;
   }
 
+  CompSize = Src[0] + (Src[1] << 8) + (Src[2] << 16) + (Src[3] << 24);
   *DstSize = Src[4] + (Src[5] << 8) + (Src[6] << 16) + (Src[7] << 24);
+
+  if (SrcSize < CompSize + 8 || (CompSize + 8) < 8) {
+    return EFI_INVALID_PARAMETER;
+  }
+
   return EFI_SUCCESS;
 }
 
@@ -752,7 +771,7 @@ Returns:
   CompSize  = Src[0] + (Src[1] << 8) + (Src[2] << 16) + (Src[3] << 24);
   OrigSize  = Src[4] + (Src[5] << 8) + (Src[6] << 16) + (Src[7] << 24);
 
-  if (SrcSize < CompSize + 8) {
+  if (SrcSize < CompSize + 8 || (CompSize + 8) < 8) {
     return EFI_INVALID_PARAMETER;
   }
 
