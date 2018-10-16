@@ -858,6 +858,7 @@ static BROTLI_INLINE uint32_t ReadBlockLength(const HuffmanCode* table,
   uint32_t code;
   uint32_t nbits;
   code = ReadSymbol(table, br);
+  ASSERT (code < BROTLI_NUM_BLOCK_LEN_SYMBOLS);
   nbits = kBlockLengthPrefixCode[code].nbits;  /* nbits == 2..24 */
   return kBlockLengthPrefixCode[code].offset + BrotliReadBits(br, nbits);
 }
@@ -910,6 +911,7 @@ static BROTLI_NOINLINE void InverseMoveToFrontTransform(
   uint32_t upper_bound = state->mtf_upper_bound;
   uint32_t* mtf = &state->mtf[1];  /* Make mtf[-1] addressable. */
   uint8_t* mtf_u8 = (uint8_t*)mtf;
+  uint8_t* mtf_u8t = mtf_u8 - 1;
   /* Load endian-aware constant. */
   const uint8_t b0123[4] = {0, 1, 2, 3};
   uint32_t pattern;
@@ -928,13 +930,13 @@ static BROTLI_NOINLINE void InverseMoveToFrontTransform(
   for (i = 0; i < v_len; ++i) {
     int index = v[i];
     uint8_t value = mtf_u8[index];
-    upper_bound |= v[i];
+    upper_bound |= (uint32_t) v[i];
     v[i] = value;
-    mtf_u8[-1] = value;
-    do {
+    mtf_u8t[0] = value;
+    while (index >= 0) {
+      mtf_u8t[index + 1] = mtf_u8t[index];
       index--;
-      mtf_u8[index + 1] = mtf_u8[index];
-    } while (index >= 0);
+    }
   }
   /* Remember amount of elements to be reinitialized. */
   state->mtf_upper_bound = upper_bound >> 2;
@@ -1566,6 +1568,7 @@ static BROTLI_INLINE BROTLI_BOOL ReadCommandInternal(
   BrotliBitReaderState memento;
   if (!safe) {
     cmd_code = ReadSymbol(s->htree_command, br);
+    ASSERT (cmd_code < BROTLI_NUM_COMMAND_SYMBOLS);
   } else {
     BrotliBitReaderSaveState(br, &memento);
     if (!SafeReadSymbol(s->htree_command, br, &cmd_code)) {
