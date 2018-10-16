@@ -143,6 +143,7 @@ MakeTable (
   UINT16  Mask;
   UINT16  WordOfStart;
   UINT16  WordOfCount;
+  UINT16  MaxTableLength;
 
   //
   // The maximum mapping table width supported by this internal
@@ -155,6 +156,9 @@ MakeTable (
   }
 
   for (Index = 0; Index < NumOfChar; Index++) {
+    if (BitLen[Index] > 16) {
+      return (UINT16) BAD_TABLE;
+    }
     Count[BitLen[Index]]++;
   }
 
@@ -196,6 +200,7 @@ MakeTable (
 
   Avail = NumOfChar;
   Mask  = (UINT16) (1U << (15 - TableBits));
+  MaxTableLength = (UINT16) (1U << TableBits);
 
   for (Char = 0; Char < NumOfChar; Char++) {
 
@@ -209,6 +214,9 @@ MakeTable (
     if (Len <= TableBits) {
 
       for (Index = Start[Len]; Index < NextCode; Index++) {
+        if (Index >= MaxTableLength) {
+          return (UINT16) BAD_TABLE;
+        }
         Table[Index] = Char;
       }
 
@@ -615,10 +623,14 @@ Decode (
       //
       BytesRemain--;
       while ((INT16) (BytesRemain) >= 0) {
-        Sd->mDstBase[Sd->mOutBuf++] = Sd->mDstBase[DataIdx++];
         if (Sd->mOutBuf >= Sd->mOrigSize) {
           goto Done ;
         }
+        if (DataIdx >= Sd->mOrigSize) {
+          Sd->mBadTableFlag = (UINT16) BAD_TABLE;
+          goto Done ;
+        }
+        Sd->mDstBase[Sd->mOutBuf++] = Sd->mDstBase[DataIdx++];
 
         BytesRemain--;
       }
@@ -688,7 +700,7 @@ UefiDecompressGetInfo (
   }
 
   CompressedSize   = ReadUnaligned32 ((UINT32 *)Source);
-  if (SourceSize < (CompressedSize + 8)) {
+  if (SourceSize < (CompressedSize + 8) || (CompressedSize + 8) < 8) {
     return RETURN_INVALID_PARAMETER;
   }
 
