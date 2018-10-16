@@ -567,6 +567,22 @@ class UniFileClassObject(object):
                 MultiLineFeedExits = True
 
             #
+            # Check the situation that there only has one '"' for the language entry
+            #
+            if Line.startswith(u'#string') and Line.find(u'#language') > 0 and Line.count(u'"') == 1:
+                EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
+                                ExtraData='''The line %s misses '"' at the end of it in file %s'''
+                                % (LineCount, File.Path))
+
+            #
+            # Check the situation that there has more than 2 '"' for the language entry
+            #
+            if Line.startswith(u'#string') and Line.find(u'#language') > 0 and Line.replace(u'\\"', '').count(u'"') > 2:
+                EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
+                                ExtraData='''The line %s has more than 2 '"' for language entry in file %s'''
+                                % (LineCount, File.Path))
+
+            #
             # Between two String entry, can not contain line feed
             #
             if Line.startswith(u'"'):
@@ -727,6 +743,13 @@ class UniFileClassObject(object):
                 else:
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
             elif Line.startswith(u'"'):
+                #
+                # Check the situation that there has more than 2 '"' for the language entry
+                #
+                if Line.replace(u'\\"', '').count(u'"') > 2:
+                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
+                                    ExtraData='''The line %s has more than 2 '"' for language entry in file %s'''
+                                    % (LineCount, File.Path))
                 if u'#string' in Line  or u'#language' in Line:
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
                 NewLines.append(Line)
