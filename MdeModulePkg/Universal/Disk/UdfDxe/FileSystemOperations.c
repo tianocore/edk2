@@ -242,11 +242,16 @@ GetPdFromLongAd (
     //
     // NOTE: Only one Type 1 (Physical) Partition is supported. It has been
     // checked already in Partition driver for existence of a single Type 1
-    // Partition map, so we don't have to double check here.
+    // Partition map. Hence, the 'PartitionReferenceNumber' field (the index
+    // used to access Partition Maps data within the Logical Volume Descriptor)
+    // in the Long Allocation Descriptor should be 0 to indicate there is only
+    // one partition.
     //
-    // Partition reference number can also be retrieved from
-    // LongAd->ExtentLocation.PartitionReferenceNumber, however the spec says
-    // it may be 0, so let's not rely on it.
+    if (LongAd->ExtentLocation.PartitionReferenceNumber != 0) {
+      return NULL;
+    }
+    //
+    // Since only one partition, get the first one directly.
     //
     PartitionNum = *(UINT16 *)((UINTN)&LogicalVolDesc->PartitionMaps[4]);
     break;
