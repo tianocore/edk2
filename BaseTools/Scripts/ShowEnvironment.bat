@@ -52,7 +52,6 @@ if defined SRC_CONF @goto SetEnv
 @if not defined EDK_TOOLS_PATH @echo     EDK_TOOLS_PATH       = Not Set
 @if defined BASE_TOOLS_PATH @echo     BASE_TOOLS_PATH      = %BASE_TOOLS_PATH%
 @if defined EDK_TOOLS_BIN @echo     EDK_TOOLS_BIN        = %EDK_TOOLS_BIN%
-@if defined PYTHON_FREEZER_PATH @echo     PYTHON_FREEZER_PATH  = %PYTHON_FREEZER_PATH%
 @if "%NT32PKG%"=="TRUE" (
     @echo.
     @echo NOTE: Please configure your build to use the following TOOL_CHAIN_TAG

@@ -16,7 +16,6 @@ In addition to this, you should set the following environment variables:
  * EDK_TOOLS_PATH - Path to the BaseTools sub directory under the edk2 tree
  * BASE_TOOLS_PATH - The directory where the BaseTools source is located.
    (It is the same directory where this README.txt is located.)
- * PYTHON_FREEZER_PATH - Path to where the python freezer tool is installed
 
 After this, you can run the toolsetup.bat file, which is in the same
 directory as this file.  It should setup the remainder of the environment,

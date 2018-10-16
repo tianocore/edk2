@@ -13,8 +13,7 @@ Quick Start
 -----------
 
 Windows:
-  a) Set the PYTHON_FREEZER_PATH to the cx_Freeze installation directory
-  b) Go to the <buildtools_project>/BaseTools and run "toolsetup" script
+  a) Go to the <buildtools_project>/BaseTools and run "toolsetup" script
 
 Unix-like:
   a) make -C <buildtools_project>/BaseTools

@@ -271,21 +271,12 @@ IF NOT EXIST "%EDK_TOOLS_BIN%\TianoCompress.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\VfrCompile.exe" goto check_c_tools
 IF NOT EXIST "%EDK_TOOLS_BIN%\VolInfo.exe" goto check_c_tools
 
-goto check_python_tools
+goto check_build_environment
 
 :check_c_tools
   echo.
   echo !!! ERROR !!! Binary C tools are missing. They are requried to be built from BaseTools Source.
   echo.
-  goto check_build_environment
-
-:check_python_tools
-IF NOT EXIST "%EDK_TOOLS_BIN%\build.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\GenFds.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\TargetTool.exe" goto check_build_environment
-IF NOT EXIST "%EDK_TOOLS_BIN%\Trim.exe" goto check_build_environment
-
-goto end
 
 :check_build_environment
   if defined BASETOOLS_PYTHON_SOURCE goto VisualStudioAvailable
@@ -311,24 +302,13 @@ goto end
     )
   )
 
-  @REM We have Python, now test for FreezePython application
-  if not defined PYTHON_FREEZER_PATH (
-    echo.
-    echo !!! WARNING !!! PYTHON_FREEZER_PATH environment variable is not set.
-    echo Setup environment to run Python scripts directly.
-    echo.
-    set "PATH=%BASE_TOOLS_PATH%\BinWrappers\WindowsLike;%PATH%"
-  )
-
+  set "PATH=%BASE_TOOLS_PATH%\BinWrappers\WindowsLike;%PATH%"
   set BASETOOLS_PYTHON_SOURCE=%BASE_TOOLS_PATH%\Source\Python
   set PYTHONPATH=%BASETOOLS_PYTHON_SOURCE%;%PYTHONPATH%
 
   echo                PATH = %PATH%
   echo         PYTHON_HOME = %PYTHON_HOME%
   echo          PYTHONPATH = %PYTHONPATH%
-  if defined PYTHON_FREEZER_PATH (
-    echo PYTHON_FREEZER_PATH = %PYTHON_FREEZER_PATH%
-  )
   echo.
 
 :VisualStudioAvailable
@@ -360,18 +340,6 @@ goto end
   cd %BASE_TOOLS_PATH%
   call nmake c
   popd
-
-  if defined PYTHON_FREEZER_PATH (
-    echo BUILDING PYTHON TOOLS
-    pushd .
-    cd %BASE_TOOLS_PATH%
-    call nmake python
-    popd
-  ) else (
-    echo.
-    echo !!! WARNING !!! Cannot make executable from Python code, executing python scripts instead !!!
-    echo.
-  )
   goto end
 
 
