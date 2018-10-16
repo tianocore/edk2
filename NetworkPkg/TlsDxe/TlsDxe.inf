@@ -5,7 +5,7 @@
 #  This module produces EFI TLS (Transport Layer Security) Protocol and EFI TLS
 #  Service Binding Protocol, to provide TLS services.
 #
-#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -52,7 +52,6 @@
   BaseLib
   UefiLib
   DebugLib
-  NetLib
   BaseCryptLib
   TlsLib
 
