@@ -515,7 +515,13 @@ SetupVtd (
 
   ParseDmarAcpiTableRmrr ();
 
-  ProcessRequestedAccessAttribute ();
+  if ((PcdGet8 (PcdVTdPolicyPropertyMask) & BIT2) == 0) {
+    //
+    // Support IOMMU access attribute request recording before DMAR table is installed.
+    // Here is to process the requests.
+    //
+    ProcessRequestedAccessAttribute ();
+  }
 
   for (Index = 0; Index < mVtdUnitNumber; Index++) {
     DEBUG ((DEBUG_INFO,"VTD Unit %d (Segment: %04x)\n", Index, mVtdUnitInformation[Index].Segment));

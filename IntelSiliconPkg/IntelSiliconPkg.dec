@@ -58,6 +58,7 @@
   ## The mask is used to control VTd behavior.<BR><BR>
   #  BIT0: Enable IOMMU during boot (If DMAR table is installed in DXE. If VTD_INFO_PPI is installed in PEI.)
   #  BIT1: Enable IOMMU when transfer control to OS (ExitBootService in normal boot. EndOfPEI in S3)
+  #  BIT2: Force no IOMMU access attribute request recording before DMAR table is installed.
   # @Prompt The policy for VTd driver behavior.
   gIntelSiliconPkgTokenSpaceGuid.PcdVTdPolicyPropertyMask|1|UINT8|0x00000002
 
