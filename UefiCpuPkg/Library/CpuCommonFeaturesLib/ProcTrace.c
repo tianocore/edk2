@@ -191,6 +191,17 @@ ProcTraceInitialize (
   MSR_IA32_RTIT_OUTPUT_MASK_PTRS_REGISTER  OutputMaskPtrsReg;
   RTIT_TOPA_TABLE_ENTRY                *TopaEntryPtr;
 
+  //
+  // The scope of the MSR_IA32_RTIT_* is core for below processor type, only program
+  // MSR_IA32_RTIT_* for thread 0 in each core.
+  //
+  if (IS_GOLDMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_GOLDMONT_PLUS_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+    if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
+      return RETURN_SUCCESS;
+    }
+  }
+
   ProcTraceData = (PROC_TRACE_DATA *) ConfigData;
   ASSERT (ProcTraceData != NULL);
 

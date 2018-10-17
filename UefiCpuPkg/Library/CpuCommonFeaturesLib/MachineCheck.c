@@ -140,6 +140,32 @@ McaInitialize (
   MSR_IA32_MCG_CAP_REGISTER  McgCap;
   UINT32                     BankIndex;
 
+  //
+  // The scope of MSR_IA32_MC*_CTL/MSR_IA32_MC*_STATUS is core for below processor type, only program
+  // MSR_IA32_MC*_CTL/MSR_IA32_MC*_STATUS for thread 0 in each core.
+  //
+  if (IS_ATOM_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_SANDY_BRIDGE_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_SKYLAKE_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_XEON_PHI_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_PENTIUM_4_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_CORE_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+    if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
+      return RETURN_SUCCESS;
+    }
+  }
+
+  //
+  // The scope of MSR_IA32_MC*_CTL/MSR_IA32_MC*_STATUS is package for below processor type, only program
+  // MSR_IA32_MC*_CTL/MSR_IA32_MC*_STATUS for thread 0 core 0 in each package.
+  //
+  if (IS_NEHALEM_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+    if ((CpuInfo->ProcessorInfo.Location.Thread != 0) || (CpuInfo->ProcessorInfo.Location.Core != 0)) {
+      return RETURN_SUCCESS;
+    }
+  }
+
   if (State) {
     McgCap.Uint64 = AsmReadMsr64 (MSR_IA32_MCG_CAP);
     for (BankIndex = 0; BankIndex < (UINT32) McgCap.Bits.Count; BankIndex++) {
@@ -300,6 +326,18 @@ LmceInitialize (
   )
 {
   MSR_IA32_FEATURE_CONTROL_REGISTER    *MsrRegister;
+
+  //
+  // The scope of FastStrings bit in the MSR_IA32_MISC_ENABLE is core for below processor type, only program 
+  // MSR_IA32_MISC_ENABLE for thread 0 in each core.
+  //
+  if (IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_GOLDMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_PENTIUM_4_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+    if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
+      return RETURN_SUCCESS;
+    }
+  }
 
   ASSERT (ConfigData != NULL);
   MsrRegister = (MSR_IA32_FEATURE_CONTROL_REGISTER *) ConfigData;

@@ -96,6 +96,19 @@ VmxInitialize (
 {
   MSR_IA32_FEATURE_CONTROL_REGISTER    *MsrRegister;
 
+  //
+  // The scope of EnableVmxOutsideSmx bit in the MSR_IA32_FEATURE_CONTROL is core for
+  // below processor type, only program MSR_IA32_FEATURE_CONTROL for thread 0 in each
+  // core.
+  //
+  if (IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_GOLDMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_GOLDMONT_PLUS_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+    if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
+      return RETURN_SUCCESS;
+    }
+  }
+
   ASSERT (ConfigData != NULL);
   MsrRegister = (MSR_IA32_FEATURE_CONTROL_REGISTER *) ConfigData;
   if (MsrRegister[ProcessorNumber].Bits.Lock == 0) {
@@ -170,6 +183,19 @@ LockFeatureControlRegisterInitialize (
   )
 {
   MSR_IA32_FEATURE_CONTROL_REGISTER    *MsrRegister;
+
+  //
+  // The scope of Lock bit in the MSR_IA32_FEATURE_CONTROL is core for
+  // below processor type, only program MSR_IA32_FEATURE_CONTROL for thread 0 in each
+  // core.
+  //
+  if (IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_GOLDMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_GOLDMONT_PLUS_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+    if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
+      return RETURN_SUCCESS;
+    }
+  }
 
   ASSERT (ConfigData != NULL);
   MsrRegister = (MSR_IA32_FEATURE_CONTROL_REGISTER *) ConfigData;
@@ -247,6 +273,18 @@ SmxInitialize (
 {
   MSR_IA32_FEATURE_CONTROL_REGISTER    *MsrRegister;
   RETURN_STATUS                        Status;
+
+  //
+  // The scope of Lock bit in the MSR_IA32_FEATURE_CONTROL is core for
+  // below processor type, only program MSR_IA32_FEATURE_CONTROL for thread 0 in each
+  // core.
+  //
+  if (IS_GOLDMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_GOLDMONT_PLUS_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+    if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
+      return RETURN_SUCCESS;
+    }
+  }
 
   Status = RETURN_SUCCESS;
 

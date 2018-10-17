@@ -75,6 +75,17 @@ PendingBreakInitialize (
   )
 {
   //
+  // The scope of the MSR_ATOM_IA32_MISC_ENABLE is core for below processor type, only program
+  // MSR_ATOM_IA32_MISC_ENABLE for thread 0 in each core.
+  //
+  // Support function has check the processer type for this feature, no need to check again
+  // here.
+  //
+  if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
+    return RETURN_SUCCESS;
+  }
+
+  //
   // ATOM, CORE2, CORE, PENTIUM_4 and IS_PENTIUM_M_PROCESSOR have the same MSR index,
   // Simply use MSR_ATOM_IA32_MISC_ENABLE here
   //

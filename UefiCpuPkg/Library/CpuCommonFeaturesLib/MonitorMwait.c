@@ -67,6 +67,21 @@ MonitorMwaitInitialize (
   IN BOOLEAN                           State
   )
 {
+  //
+  // The scope of the MSR_IA32_MISC_ENABLE is core for below processor type, only program
+  // MSR_IA32_MISC_ENABLE for thread 0 in each core.
+  //
+  if (IS_CORE2_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_ATOM_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_GOLDMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_PENTIUM_4_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
+      IS_CORE_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+    if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
+      return RETURN_SUCCESS;
+    }
+  }
+
   CPU_REGISTER_TABLE_WRITE_FIELD (
     ProcessorNumber,
     Msr,

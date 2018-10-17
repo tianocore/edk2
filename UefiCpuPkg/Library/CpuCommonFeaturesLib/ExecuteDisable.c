@@ -79,6 +79,16 @@ ExecuteDisableInitialize (
   IN BOOLEAN                           State
   )
 {
+  //
+  // The scope of the MSR_IA32_EFER is core for below processor type, only program
+  // MSR_IA32_EFER for thread 0 in each core.
+  //
+  if (IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+    if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
+      return RETURN_SUCCESS;
+    }
+  }
+
   CPU_REGISTER_TABLE_WRITE_FIELD (
     ProcessorNumber,
     Msr,

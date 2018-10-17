@@ -67,6 +67,14 @@ C1eInitialize (
   IN BOOLEAN                           State
   )
 {
+  //
+  // The scope of C1EEnable bit in the MSR_NEHALEM_POWER_CTL is Package, only program
+  // MSR_FEATURE_CONFIG for thread 0 core 0 in each package.
+  //
+  if ((CpuInfo->ProcessorInfo.Location.Thread != 0) || (CpuInfo->ProcessorInfo.Location.Core != 0)) {
+  return RETURN_SUCCESS;
+  }
+
   CPU_REGISTER_TABLE_WRITE_FIELD (
     ProcessorNumber,
     Msr,

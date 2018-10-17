@@ -102,6 +102,16 @@ X2ApicInitialize (
 {
   BOOLEAN                            *X2ApicEnabled;
 
+  //
+  // The scope of the MSR_IA32_APIC_BASE is core for below processor type, only program
+  // MSR_IA32_APIC_BASE for thread 0 in each core.
+  //
+  if (IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel)) {
+    if (CpuInfo->ProcessorInfo.Location.Thread != 0) {
+      return RETURN_SUCCESS;
+    }
+  }
+
   ASSERT (ConfigData != NULL);
   X2ApicEnabled = (BOOLEAN *) ConfigData;
   if (X2ApicEnabled[ProcessorNumber]) {
