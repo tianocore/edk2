@@ -297,8 +297,8 @@ class ValueExpression(BaseExpression):
                 else:
                     raise BadExpression(ERR_EXPR_TYPE)
             if isinstance(Oprand1, type('')) and isinstance(Oprand2, type('')):
-                if ((Oprand1.startswith('L"') or Oprand1.startswith('L')) and (not Oprand2.startswith('L"')) and (not Oprand2.startswith("L'"))) or \
-                        (((not Oprand1.startswith('L"')) and (not Oprand1.startswith("L'"))) and (Oprand2.startswith('L"') or Oprand2.startswith('L'))):
+                if ((Oprand1.startswith('L"') or Oprand1.startswith("L'")) and (not Oprand2.startswith('L"')) and (not Oprand2.startswith("L'"))) or \
+                        (((not Oprand1.startswith('L"')) and (not Oprand1.startswith("L'"))) and (Oprand2.startswith('L"') or Oprand2.startswith("L'"))):
                     raise BadExpression(ERR_STRING_CMP % (Oprand1, Operator, Oprand2))
             if 'in' in Operator and isinstance(Oprand2, type('')):
                 Oprand2 = Oprand2.split()
