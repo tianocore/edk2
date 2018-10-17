@@ -24,6 +24,7 @@ import re
 import pickle
 import array
 import shutil
+from random import sample
 from struct import pack
 from UserDict import IterableUserDict
 from UserList import UserList
@@ -1236,7 +1237,8 @@ def IsFieldValueAnArray (Value):
     return False
 
 def AnalyzePcdExpression(Setting):
-    Setting = Setting.strip()
+    RanStr = ''.join(sample(string.ascii_letters + string.digits, 8))
+    Setting = Setting.replace('\\\\', RanStr).strip()
     # There might be escaped quote in a string: \", \\\" , \', \\\'
     Data = Setting
     # There might be '|' in string and in ( ... | ... ), replace it with '-'
@@ -1269,7 +1271,9 @@ def AnalyzePcdExpression(Setting):
             break
         FieldList.append(Setting[StartPos:Pos].strip())
         StartPos = Pos + 1
-
+    for i, ch in enumerate(FieldList):
+        if RanStr in ch:
+            FieldList[i] = ch.replace(RanStr,'\\\\')
     return FieldList
 
 def ParseDevPathValue (Value):

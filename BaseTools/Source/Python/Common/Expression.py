@@ -22,6 +22,8 @@ import Common.EdkLogger as EdkLogger
 import copy
 from Common.DataType import *
 import sys
+from random import sample
+import string
 
 ERR_STRING_EXPR         = 'This operator cannot be used in string expression: [%s].'
 ERR_SNYTAX              = 'Syntax error, the rest of expression cannot be evaluated: [%s].'
@@ -55,6 +57,8 @@ PcdPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*\.[_a-zA-Z][0-9A-Za-z_]*$')
 #
 def SplitString(String):
     # There might be escaped quote: "abc\"def\\\"ghi", 'abc\'def\\\'ghi'
+    RanStr = ''.join(sample(string.ascii_letters + string.digits, 8))
+    String = String.replace('\\\\', RanStr).strip()
     RetList = []
     InSingleQuote = False
     InDoubleQuote = False
@@ -87,11 +91,16 @@ def SplitString(String):
         raise BadExpression(ERR_STRING_TOKEN % Item)
     if Item:
         RetList.append(Item)
+    for i, ch in enumerate(RetList):
+        if RanStr in ch:
+            RetList[i] = ch.replace(RanStr,'\\\\')
     return RetList
 
 def SplitPcdValueString(String):
     # There might be escaped comma in GUID() or DEVICE_PATH() or " "
     # or ' ' or L' ' or L" "
+    RanStr = ''.join(sample(string.ascii_letters + string.digits, 8))
+    String = String.replace('\\\\', RanStr).strip()
     RetList = []
     InParenthesis = 0
     InSingleQuote = False
@@ -124,6 +133,9 @@ def SplitPcdValueString(String):
         raise BadExpression(ERR_STRING_TOKEN % Item)
     if Item:
         RetList.append(Item)
+    for i, ch in enumerate(RetList):
+        if RanStr in ch:
+            RetList[i] = ch.replace(RanStr,'\\\\')
     return RetList
 
 def IsValidCName(Str):
@@ -390,7 +402,7 @@ class ValueExpression(BaseExpression):
             elif not Val:
                 Val = False
                 RealVal = '""'
-            elif not Val.startswith('L"') and not Val.startswith('{') and not Val.startswith("L'"):
+            elif not Val.startswith('L"') and not Val.startswith('{') and not Val.startswith("L'") and not Val.startswith("'"):
                 Val = True
                 RealVal = '"' + RealVal + '"'
 
