@@ -214,6 +214,7 @@ ArchSetupExcpetionStack (
   //
   TssBase = (UINTN)Tss;
 
+  TssDesc->Uint64          = 0;
   TssDesc->Bits.LimitLow   = sizeof(IA32_TASK_STATE_SEGMENT) - 1;
   TssDesc->Bits.BaseLow    = (UINT16)TssBase;
   TssDesc->Bits.BaseMid    = (UINT8)(TssBase >> 16);
@@ -238,6 +239,7 @@ ArchSetupExcpetionStack (
     //
     TssBase = (UINTN)Tss;
 
+    TssDesc->Uint64         = 0;
     TssDesc->Bits.LimitLow  = sizeof(IA32_TASK_STATE_SEGMENT) - 1;
     TssDesc->Bits.BaseLow   = (UINT16)TssBase;
     TssDesc->Bits.BaseMid   = (UINT8)(TssBase >> 16);
@@ -255,6 +257,7 @@ ArchSetupExcpetionStack (
       continue;
     }
 
+    ZeroMem (Tss, sizeof (*Tss));
     Tss->EIP    = (UINT32)(TemplateMap.ExceptionStart
                            + Vector * TemplateMap.ExceptionStubHeaderSize);
     Tss->EFLAGS = 0x2;

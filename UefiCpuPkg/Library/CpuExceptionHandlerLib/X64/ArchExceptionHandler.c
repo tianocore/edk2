@@ -219,6 +219,8 @@ ArchSetupExcpetionStack (
   //
   TssBase = (UINTN)Tss;
 
+  TssDesc->Uint128.Uint64  = 0;
+  TssDesc->Uint128.Uint64_1= 0;
   TssDesc->Bits.LimitLow   = sizeof(IA32_TASK_STATE_SEGMENT) - 1;
   TssDesc->Bits.BaseLow    = (UINT16)TssBase;
   TssDesc->Bits.BaseMidl   = (UINT8)(TssBase >> 16);
@@ -231,6 +233,7 @@ ArchSetupExcpetionStack (
   //
   // Fixup exception task descriptor and task-state segment
   //
+  ZeroMem (Tss, sizeof (*Tss));
   StackTop = StackSwitchData->X64.KnownGoodStackTop - CPU_STACK_ALIGNMENT;
   StackTop = (UINTN)ALIGN_POINTER (StackTop, CPU_STACK_ALIGNMENT);
   IdtTable = StackSwitchData->X64.IdtTable;
