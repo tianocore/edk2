@@ -113,6 +113,302 @@ IsBitMaskMatchCheck (
 }
 
 /**
+  Return feature dependence result.
+
+  @param[in]  CpuFeature        Pointer to CPU feature.
+  @param[in]  Before            Check before dependence or after.
+
+  @retval     return the dependence result.
+**/
+CPU_FEATURE_DEPENDENCE_TYPE
+DetectFeatureScope (
+  IN CPU_FEATURES_ENTRY         *CpuFeature,
+  IN BOOLEAN                    Before
+  )
+{
+  if (Before) {
+    if (CpuFeature->PackageBeforeFeatureBitMask != NULL) {
+      return PackageDepType;
+    }
+
+    if (CpuFeature->CoreBeforeFeatureBitMask != NULL) {
+      return CoreDepType;
+    }
+
+    if (CpuFeature->BeforeFeatureBitMask != NULL) {
+      return ThreadDepType;
+    }
+
+    return NoneDepType;
+  }
+
+  if (CpuFeature->PackageAfterFeatureBitMask != NULL) {
+    return PackageDepType;
+  }
+
+  if (CpuFeature->CoreAfterFeatureBitMask != NULL) {
+    return CoreDepType;
+  }
+
+  if (CpuFeature->AfterFeatureBitMask != NULL) {
+    return ThreadDepType;
+  }
+
+  return NoneDepType;
+}
+
+/**
+  Clear dependence for the specified type.
+
+  @param[in]  CurrentFeature     Cpu feature need to clear.
+  @param[in]  Before             Before or after dependence relationship.
+
+**/
+VOID
+ClearFeatureScope (
+  IN CPU_FEATURES_ENTRY           *CpuFeature,
+  IN BOOLEAN                      Before
+  )
+{
+  if (Before) {
+    if (CpuFeature->BeforeFeatureBitMask != NULL) {
+      FreePool (CpuFeature->BeforeFeatureBitMask);
+      CpuFeature->BeforeFeatureBitMask = NULL;
+    }
+    if (CpuFeature->CoreBeforeFeatureBitMask != NULL) {
+      FreePool (CpuFeature->CoreBeforeFeatureBitMask);
+      CpuFeature->CoreBeforeFeatureBitMask = NULL;
+    }
+    if (CpuFeature->PackageBeforeFeatureBitMask != NULL) {
+      FreePool (CpuFeature->PackageBeforeFeatureBitMask);
+      CpuFeature->PackageBeforeFeatureBitMask = NULL;
+    }
+  } else {
+    if (CpuFeature->PackageAfterFeatureBitMask != NULL) {
+      FreePool (CpuFeature->PackageAfterFeatureBitMask);
+      CpuFeature->PackageAfterFeatureBitMask = NULL;
+    }
+    if (CpuFeature->CoreAfterFeatureBitMask != NULL) {
+      FreePool (CpuFeature->CoreAfterFeatureBitMask);
+      CpuFeature->CoreAfterFeatureBitMask = NULL;
+    }
+    if (CpuFeature->AfterFeatureBitMask != NULL) {
+      FreePool (CpuFeature->AfterFeatureBitMask);
+      CpuFeature->AfterFeatureBitMask = NULL;
+    }
+  }
+}
+
+/**
+  Base on dependence relationship to asjust feature dependence.
+
+  ONLY when the feature before(or after) the find feature also has 
+  dependence with the find feature. In this case, driver need to base
+  on dependce relationship to decide how to insert current feature and
+  adjust the feature dependence.
+
+  @param[in]  PreviousFeature    CPU feature current before the find one.
+  @param[in]  CurrentFeature     Cpu feature need to adjust.
+  @param[in]  Before             Before or after dependence relationship.
+
+  @retval   TRUE   means the current feature dependence has been adjusted.
+
+  @retval   FALSE  means the previous feature dependence has been adjusted.
+                   or previous feature has no dependence with the find one.
+
+**/
+BOOLEAN
+AdjustFeaturesDependence (
+  IN OUT CPU_FEATURES_ENTRY         *PreviousFeature,
+  IN OUT CPU_FEATURES_ENTRY         *CurrentFeature,
+  IN     BOOLEAN                    Before
+  )
+{
+  CPU_FEATURE_DEPENDENCE_TYPE            PreDependType;
+  CPU_FEATURE_DEPENDENCE_TYPE            CurrentDependType;
+
+  PreDependType     = DetectFeatureScope(PreviousFeature, Before);
+  CurrentDependType = DetectFeatureScope(CurrentFeature, Before);
+
+  //
+  // If previous feature has no dependence with the find featue.
+  // return FALSE.
+  //
+  if (PreDependType == NoneDepType) {
+    return FALSE;
+  }
+
+  //
+  // If both feature have dependence, keep the one which needs use more 
+  // processors and clear the dependence for the other one.
+  //
+  if (PreDependType >= CurrentDependType) {
+    ClearFeatureScope (CurrentFeature, Before);
+    return TRUE;
+  } else {
+    ClearFeatureScope (PreviousFeature, Before);
+    return FALSE;
+  }
+}
+
+/**
+  Base on dependence relationship to asjust feature order.
+
+  @param[in]  FeatureList        Pointer to CPU feature list
+  @param[in]  FindEntry          The entry this feature depend on.
+  @param[in]  CurrentEntry       The entry for this feature.
+  @param[in]  Before             Before or after dependence relationship.
+
+**/
+VOID
+AdjustEntry (
+  IN      LIST_ENTRY                *FeatureList,
+  IN OUT  LIST_ENTRY                *FindEntry,
+  IN OUT  LIST_ENTRY                *CurrentEntry,
+  IN      BOOLEAN                   Before
+  )
+{
+  LIST_ENTRY                *PreviousEntry;
+  CPU_FEATURES_ENTRY        *PreviousFeature;
+  CPU_FEATURES_ENTRY        *CurrentFeature;
+
+  //
+  // For CPU feature which has core or package type dependence, later code need to insert
+  // AcquireSpinLock/ReleaseSpinLock logic to sequency the execute order.
+  // So if driver finds both feature A and B need to execute before feature C, driver will
+  // base on dependence type of feature A and B to update the logic here.
+  // For example, feature A has package type dependence and feature B has core type dependence,
+  // because package type dependence need to wait for more processors which has strong dependence
+  // than core type dependence. So driver will adjust the feature order to B -> A -> C. and driver 
+  // will remove the feature dependence in feature B. 
+  // Driver just needs to make sure before feature C been executed, feature A has finished its task
+  // in all all thread. Feature A finished in all threads also means feature B have finshed in all
+  // threads.
+  //
+  if (Before) {
+    PreviousEntry = GetPreviousNode (FeatureList, FindEntry);
+  } else {
+    PreviousEntry = GetNextNode (FeatureList, FindEntry);
+  }
+
+  CurrentFeature  = CPU_FEATURE_ENTRY_FROM_LINK (CurrentEntry);
+  RemoveEntryList (CurrentEntry);
+
+  if (IsNull (FeatureList, PreviousEntry)) {
+    //
+    // If not exist the previous or next entry, just insert the current entry.
+    //
+    if (Before) {
+      InsertTailList (FindEntry, CurrentEntry);
+    } else {
+      InsertHeadList (FindEntry, CurrentEntry);
+    }
+  } else {
+    //
+    // If exist the previous or next entry, need to check it before insert curent entry.
+    //
+    PreviousFeature = CPU_FEATURE_ENTRY_FROM_LINK (PreviousEntry);
+
+    if (AdjustFeaturesDependence (PreviousFeature, CurrentFeature, Before)) {
+      //
+      // Return TRUE means current feature dependence has been cleared and the previous
+      // feature dependence has been kept and used. So insert current feature before (or after)
+      // the previous feature.
+      //
+      if (Before) {
+        InsertTailList (PreviousEntry, CurrentEntry);
+      } else {
+        InsertHeadList (PreviousEntry, CurrentEntry);
+      }
+    } else {
+      if (Before) {
+        InsertTailList (FindEntry, CurrentEntry);
+      } else {
+        InsertHeadList (FindEntry, CurrentEntry);
+      }
+    }
+  }
+}
+
+/**
+  Checks and adjusts current CPU features per dependency relationship.
+
+  @param[in]  FeatureList        Pointer to CPU feature list
+  @param[in]  CurrentEntry       Pointer to current checked CPU feature
+  @param[in]  FeatureMask        The feature bit mask.
+
+  @retval     return Swapped info.
+**/
+BOOLEAN
+InsertToBeforeEntry (
+  IN LIST_ENTRY              *FeatureList,
+  IN LIST_ENTRY              *CurrentEntry,
+  IN UINT8                   *FeatureMask
+  )
+{
+  LIST_ENTRY                 *CheckEntry;
+  CPU_FEATURES_ENTRY         *CheckFeature;
+  BOOLEAN                    Swapped;
+
+  Swapped = FALSE;
+
+  //
+  // Check all features dispatched before this entry
+  //
+  CheckEntry = GetFirstNode (FeatureList);
+  while (CheckEntry != CurrentEntry) {
+    CheckFeature = CPU_FEATURE_ENTRY_FROM_LINK (CheckEntry);
+    if (IsBitMaskMatchCheck (CheckFeature->FeatureMask, FeatureMask)) {
+      AdjustEntry (FeatureList, CheckEntry, CurrentEntry, TRUE);
+      Swapped = TRUE;
+      break;
+    }
+    CheckEntry = CheckEntry->ForwardLink;
+  }
+
+  return Swapped;
+}
+
+/**
+  Checks and adjusts current CPU features per dependency relationship.
+
+  @param[in]  FeatureList        Pointer to CPU feature list
+  @param[in]  CurrentEntry       Pointer to current checked CPU feature
+  @param[in]  FeatureMask        The feature bit mask.
+
+  @retval     return Swapped info.
+**/
+BOOLEAN
+InsertToAfterEntry (
+  IN LIST_ENTRY              *FeatureList,
+  IN LIST_ENTRY              *CurrentEntry,
+  IN UINT8                   *FeatureMask
+  )
+{
+  LIST_ENTRY                 *CheckEntry;
+  CPU_FEATURES_ENTRY         *CheckFeature;
+  BOOLEAN                    Swapped;
+
+  Swapped = FALSE;
+
+  //
+  // Check all features dispatched after this entry
+  //
+  CheckEntry = GetNextNode (FeatureList, CurrentEntry);
+  while (!IsNull (FeatureList, CheckEntry)) {
+    CheckFeature = CPU_FEATURE_ENTRY_FROM_LINK (CheckEntry);
+    if (IsBitMaskMatchCheck (CheckFeature->FeatureMask, FeatureMask)) {
+      AdjustEntry (FeatureList, CheckEntry, CurrentEntry, FALSE);
+      Swapped = TRUE;
+      break;
+    }
+    CheckEntry = CheckEntry->ForwardLink;
+  }
+
+  return Swapped;
+}
+
+/**
   Checks and adjusts CPU features order per dependency relationship.
 
   @param[in]  FeatureList        Pointer to CPU feature list
@@ -128,11 +424,13 @@ CheckCpuFeaturesDependency (
   CPU_FEATURES_ENTRY         *CheckFeature;
   BOOLEAN                    Swapped;
   LIST_ENTRY                 *TempEntry;
+  LIST_ENTRY                 *NextEntry;
 
   CurrentEntry = GetFirstNode (FeatureList);
   while (!IsNull (FeatureList, CurrentEntry)) {
     Swapped = FALSE;
     CpuFeature = CPU_FEATURE_ENTRY_FROM_LINK (CurrentEntry);
+    NextEntry = CurrentEntry->ForwardLink;
     if (CpuFeature->BeforeAll) {
       //
       // Check all features dispatched before this entry
@@ -153,6 +451,7 @@ CheckCpuFeaturesDependency (
         CheckEntry = CheckEntry->ForwardLink;
       }
       if (Swapped) {
+        CurrentEntry = NextEntry;
         continue;
       }
     }
@@ -179,60 +478,59 @@ CheckCpuFeaturesDependency (
         CheckEntry = CheckEntry->ForwardLink;
       }
       if (Swapped) {
+        CurrentEntry = NextEntry;
         continue;
       }
     }
 
     if (CpuFeature->BeforeFeatureBitMask != NULL) {
-      //
-      // Check all features dispatched before this entry
-      //
-      CheckEntry = GetFirstNode (FeatureList);
-      while (CheckEntry != CurrentEntry) {
-        CheckFeature = CPU_FEATURE_ENTRY_FROM_LINK (CheckEntry);
-        if (IsBitMaskMatchCheck (CheckFeature->FeatureMask, CpuFeature->BeforeFeatureBitMask)) {
-          //
-          // If there is dependency, swap them
-          //
-          RemoveEntryList (CurrentEntry);
-          InsertTailList (CheckEntry, CurrentEntry);
-          Swapped = TRUE;
-          break;
-        }
-        CheckEntry = CheckEntry->ForwardLink;
-      }
+      Swapped = InsertToBeforeEntry (FeatureList, CurrentEntry, CpuFeature->BeforeFeatureBitMask);
       if (Swapped) {
+        CurrentEntry = NextEntry;
         continue;
       }
     }
 
     if (CpuFeature->AfterFeatureBitMask != NULL) {
-      //
-      // Check all features dispatched after this entry
-      //
-      CheckEntry = GetNextNode (FeatureList, CurrentEntry);
-      while (!IsNull (FeatureList, CheckEntry)) {
-        CheckFeature = CPU_FEATURE_ENTRY_FROM_LINK (CheckEntry);
-        if (IsBitMaskMatchCheck (CheckFeature->FeatureMask, CpuFeature->AfterFeatureBitMask)) {
-          //
-          // If there is dependency, swap them
-          //
-          TempEntry = GetNextNode (FeatureList, CurrentEntry);
-          RemoveEntryList (CurrentEntry);
-          InsertHeadList (CheckEntry, CurrentEntry);
-          CurrentEntry = TempEntry;
-          Swapped = TRUE;
-          break;
-        }
-        CheckEntry = CheckEntry->ForwardLink;
-      }
+      Swapped = InsertToAfterEntry (FeatureList, CurrentEntry, CpuFeature->AfterFeatureBitMask);
       if (Swapped) {
+        CurrentEntry = NextEntry;
         continue;
       }
     }
-    //
-    // No swap happened, check the next feature
-    //
+
+    if (CpuFeature->CoreBeforeFeatureBitMask != NULL) {
+      Swapped = InsertToBeforeEntry (FeatureList, CurrentEntry, CpuFeature->CoreBeforeFeatureBitMask);
+      if (Swapped) {
+        CurrentEntry = NextEntry;
+        continue;
+      }
+    }
+
+    if (CpuFeature->CoreAfterFeatureBitMask != NULL) {
+      Swapped = InsertToAfterEntry (FeatureList, CurrentEntry, CpuFeature->CoreAfterFeatureBitMask);
+      if (Swapped) {
+        CurrentEntry = NextEntry;
+        continue;
+      }
+    }
+
+    if (CpuFeature->PackageBeforeFeatureBitMask != NULL) {
+      Swapped = InsertToBeforeEntry (FeatureList, CurrentEntry, CpuFeature->PackageBeforeFeatureBitMask);
+      if (Swapped) {
+        CurrentEntry = NextEntry;
+        continue;
+      }
+    }
+
+    if (CpuFeature->PackageAfterFeatureBitMask != NULL) {
+      Swapped = InsertToAfterEntry (FeatureList, CurrentEntry, CpuFeature->PackageAfterFeatureBitMask);
+      if (Swapped) {
+        CurrentEntry = NextEntry;
+        continue;
+      }
+    }
+
     CurrentEntry = CurrentEntry->ForwardLink;
   }
 }
@@ -265,8 +563,8 @@ RegisterCpuFeatureWorker (
   CpuFeaturesData = GetCpuFeaturesData ();
   if (CpuFeaturesData->FeaturesCount == 0) {
     InitializeListHead (&CpuFeaturesData->FeatureList);
-    InitializeSpinLock (&CpuFeaturesData->MsrLock);
-    InitializeSpinLock (&CpuFeaturesData->MemoryMappedLock);
+    InitializeSpinLock (&CpuFeaturesData->CpuFlags.MemoryMappedLock);
+    InitializeSpinLock (&CpuFeaturesData->CpuFlags.ConsoleLogLock);
     CpuFeaturesData->BitMaskSize = (UINT32) BitMaskSize;
   }
   ASSERT (CpuFeaturesData->BitMaskSize == BitMaskSize);
@@ -328,6 +626,31 @@ RegisterCpuFeatureWorker (
       }
       CpuFeatureEntry->AfterFeatureBitMask = CpuFeature->AfterFeatureBitMask;
     }
+    if (CpuFeature->CoreBeforeFeatureBitMask != NULL) {
+      if (CpuFeatureEntry->CoreBeforeFeatureBitMask != NULL) {
+        FreePool (CpuFeatureEntry->CoreBeforeFeatureBitMask);
+      }
+      CpuFeatureEntry->CoreBeforeFeatureBitMask = CpuFeature->CoreBeforeFeatureBitMask;
+    }
+    if (CpuFeature->CoreAfterFeatureBitMask != NULL) {
+      if (CpuFeatureEntry->CoreAfterFeatureBitMask != NULL) {
+        FreePool (CpuFeatureEntry->CoreAfterFeatureBitMask);
+      }
+      CpuFeatureEntry->CoreAfterFeatureBitMask = CpuFeature->CoreAfterFeatureBitMask;
+    }
+    if (CpuFeature->PackageBeforeFeatureBitMask != NULL) {
+      if (CpuFeatureEntry->PackageBeforeFeatureBitMask != NULL) {
+        FreePool (CpuFeatureEntry->PackageBeforeFeatureBitMask);
+      }
+      CpuFeatureEntry->PackageBeforeFeatureBitMask = CpuFeature->PackageBeforeFeatureBitMask;
+    }
+    if (CpuFeature->PackageAfterFeatureBitMask != NULL) {
+      if (CpuFeatureEntry->PackageAfterFeatureBitMask != NULL) {
+        FreePool (CpuFeatureEntry->PackageAfterFeatureBitMask);
+      }
+      CpuFeatureEntry->PackageAfterFeatureBitMask = CpuFeature->PackageAfterFeatureBitMask;
+    }
+
     CpuFeatureEntry->BeforeAll = CpuFeature->BeforeAll;
     CpuFeatureEntry->AfterAll  = CpuFeature->AfterAll;
 
@@ -410,6 +733,8 @@ SetCpuFeaturesBitMask (
   @retval  RETURN_UNSUPPORTED       Registration of the CPU feature is not
                                     supported due to a circular dependency between
                                     BEFORE and AFTER features.
+  @retval  RETURN_NOT_READY         CPU feature PCD PcdCpuFeaturesUserConfiguration
+                                    not updated by Platform driver yet.
 
   @note This service could be called by BSP only.
 **/
@@ -431,12 +756,20 @@ RegisterCpuFeature (
   UINT8                      *FeatureMask;
   UINT8                      *BeforeFeatureBitMask;
   UINT8                      *AfterFeatureBitMask;
+  UINT8                      *CoreBeforeFeatureBitMask;
+  UINT8                      *CoreAfterFeatureBitMask;
+  UINT8                      *PackageBeforeFeatureBitMask;
+  UINT8                      *PackageAfterFeatureBitMask;
   BOOLEAN                    BeforeAll;
   BOOLEAN                    AfterAll;
 
-  FeatureMask          = NULL;
-  BeforeFeatureBitMask = NULL;
-  AfterFeatureBitMask  = NULL;
+  FeatureMask                 = NULL;
+  BeforeFeatureBitMask        = NULL;
+  AfterFeatureBitMask         = NULL;
+  CoreBeforeFeatureBitMask    = NULL;
+  CoreAfterFeatureBitMask     = NULL;
+  PackageBeforeFeatureBitMask = NULL;
+  PackageAfterFeatureBitMask  = NULL;
   BeforeAll            = FALSE;
   AfterAll             = FALSE;
 
@@ -449,6 +782,10 @@ RegisterCpuFeature (
                     != (CPU_FEATURE_BEFORE | CPU_FEATURE_AFTER));
     ASSERT ((Feature & (CPU_FEATURE_BEFORE_ALL | CPU_FEATURE_AFTER_ALL))
                     != (CPU_FEATURE_BEFORE_ALL | CPU_FEATURE_AFTER_ALL));
+    ASSERT ((Feature & (CPU_FEATURE_CORE_BEFORE | CPU_FEATURE_CORE_AFTER))
+                    != (CPU_FEATURE_CORE_BEFORE | CPU_FEATURE_CORE_AFTER));
+    ASSERT ((Feature & (CPU_FEATURE_PACKAGE_BEFORE | CPU_FEATURE_PACKAGE_AFTER))
+                    != (CPU_FEATURE_PACKAGE_BEFORE | CPU_FEATURE_PACKAGE_AFTER));
     if (Feature < CPU_FEATURE_BEFORE) {
       BeforeAll = ((Feature & CPU_FEATURE_BEFORE_ALL) != 0) ? TRUE : FALSE;
       AfterAll  = ((Feature & CPU_FEATURE_AFTER_ALL) != 0) ? TRUE : FALSE;
@@ -459,6 +796,14 @@ RegisterCpuFeature (
       SetCpuFeaturesBitMask (&BeforeFeatureBitMask, Feature & ~CPU_FEATURE_BEFORE, BitMaskSize);
     } else if ((Feature & CPU_FEATURE_AFTER) != 0) {
       SetCpuFeaturesBitMask (&AfterFeatureBitMask, Feature & ~CPU_FEATURE_AFTER, BitMaskSize);
+    } else if ((Feature & CPU_FEATURE_CORE_BEFORE) != 0) {
+      SetCpuFeaturesBitMask (&CoreBeforeFeatureBitMask, Feature & ~CPU_FEATURE_CORE_BEFORE, BitMaskSize);
+    } else if ((Feature & CPU_FEATURE_CORE_AFTER) != 0) {
+      SetCpuFeaturesBitMask (&CoreAfterFeatureBitMask, Feature & ~CPU_FEATURE_CORE_AFTER, BitMaskSize);
+    } else if ((Feature & CPU_FEATURE_PACKAGE_BEFORE) != 0) {
+      SetCpuFeaturesBitMask (&PackageBeforeFeatureBitMask, Feature & ~CPU_FEATURE_PACKAGE_BEFORE, BitMaskSize);
+    } else if ((Feature & CPU_FEATURE_PACKAGE_AFTER) != 0) {
+      SetCpuFeaturesBitMask (&PackageAfterFeatureBitMask, Feature & ~CPU_FEATURE_PACKAGE_AFTER, BitMaskSize);
     }
     Feature = VA_ARG (Marker, UINT32);
   }
@@ -466,15 +811,19 @@ RegisterCpuFeature (
 
   CpuFeature = AllocateZeroPool (sizeof (CPU_FEATURES_ENTRY));
   ASSERT (CpuFeature != NULL);
-  CpuFeature->Signature            = CPU_FEATURE_ENTRY_SIGNATURE;
-  CpuFeature->FeatureMask          = FeatureMask;
-  CpuFeature->BeforeFeatureBitMask = BeforeFeatureBitMask;
-  CpuFeature->AfterFeatureBitMask  = AfterFeatureBitMask;
-  CpuFeature->BeforeAll            = BeforeAll;
-  CpuFeature->AfterAll             = AfterAll;
-  CpuFeature->GetConfigDataFunc    = GetConfigDataFunc;
-  CpuFeature->SupportFunc          = SupportFunc;
-  CpuFeature->InitializeFunc       = InitializeFunc;
+  CpuFeature->Signature                   = CPU_FEATURE_ENTRY_SIGNATURE;
+  CpuFeature->FeatureMask                 = FeatureMask;
+  CpuFeature->BeforeFeatureBitMask        = BeforeFeatureBitMask;
+  CpuFeature->AfterFeatureBitMask         = AfterFeatureBitMask;
+  CpuFeature->CoreBeforeFeatureBitMask    = CoreBeforeFeatureBitMask;
+  CpuFeature->CoreAfterFeatureBitMask     = CoreAfterFeatureBitMask;
+  CpuFeature->PackageBeforeFeatureBitMask = PackageBeforeFeatureBitMask;
+  CpuFeature->PackageAfterFeatureBitMask  = PackageAfterFeatureBitMask;
+  CpuFeature->BeforeAll                   = BeforeAll;
+  CpuFeature->AfterAll                    = AfterAll;
+  CpuFeature->GetConfigDataFunc           = GetConfigDataFunc;
+  CpuFeature->SupportFunc                 = SupportFunc;
+  CpuFeature->InitializeFunc              = InitializeFunc;
   if (FeatureName != NULL) {
     CpuFeature->FeatureName          = AllocatePool (CPU_FEATURE_NAME_SIZE);
     ASSERT (CpuFeature->FeatureName != NULL);
@@ -489,13 +838,12 @@ RegisterCpuFeature (
 }
 
 /**
-  Allocates boot service data to save ACPI_CPU_DATA.
+  Return ACPI_CPU_DATA data.
 
-  @return  Pointer to allocated ACPI_CPU_DATA.
+  @return  Pointer to ACPI_CPU_DATA data.
 **/
-STATIC
 ACPI_CPU_DATA *
-AllocateAcpiCpuData (
+GetAcpiCpuData (
   VOID
   )
 {
@@ -508,8 +856,19 @@ AllocateAcpiCpuData (
   UINTN                                Index;
   EFI_PROCESSOR_INFORMATION            ProcessorInfoBuffer;
 
+  AcpiCpuData = (ACPI_CPU_DATA *) (UINTN) PcdGet64 (PcdCpuS3DataAddress);
+  if (AcpiCpuData != NULL) {
+    return AcpiCpuData;
+  }
+
   AcpiCpuData  = AllocatePages (EFI_SIZE_TO_PAGES (sizeof (ACPI_CPU_DATA)));
   ASSERT (AcpiCpuData != NULL);
+
+  //
+  // Set PcdCpuS3DataAddress to the base address of the ACPI_CPU_DATA structure
+  //
+  Status = PcdSet64S (PcdCpuS3DataAddress, (UINT64)(UINTN)AcpiCpuData);
+  ASSERT_EFI_ERROR (Status);
 
   GetNumberOfProcessor (&NumberOfCpus, &NumberOfEnabledProcessors);
   AcpiCpuData->NumberOfCpus = (UINT32)NumberOfCpus;
@@ -606,7 +965,6 @@ CpuRegisterTableWriteWorker (
   IN UINT64                  Value
   )
 {
-  EFI_STATUS               Status;
   CPU_FEATURES_DATA        *CpuFeaturesData;
   ACPI_CPU_DATA            *AcpiCpuData;
   CPU_REGISTER_TABLE       *RegisterTable;
@@ -614,17 +972,8 @@ CpuRegisterTableWriteWorker (
 
   CpuFeaturesData = GetCpuFeaturesData ();
   if (CpuFeaturesData->RegisterTable == NULL) {
-    AcpiCpuData = (ACPI_CPU_DATA *) (UINTN) PcdGet64 (PcdCpuS3DataAddress);
-    if (AcpiCpuData == NULL) {
-      AcpiCpuData = AllocateAcpiCpuData ();
-      ASSERT (AcpiCpuData != NULL);
-      //
-      // Set PcdCpuS3DataAddress to the base address of the ACPI_CPU_DATA structure
-      //
-      Status = PcdSet64S (PcdCpuS3DataAddress, (UINT64)(UINTN)AcpiCpuData);
-      ASSERT_EFI_ERROR (Status);
-    }
-    ASSERT (AcpiCpuData->RegisterTable != 0);
+    AcpiCpuData = GetAcpiCpuData ();
+    ASSERT ((AcpiCpuData != NULL) && (AcpiCpuData->RegisterTable != 0));
     CpuFeaturesData->RegisterTable = (CPU_REGISTER_TABLE *) (UINTN) AcpiCpuData->RegisterTable;
     CpuFeaturesData->PreSmmRegisterTable = (CPU_REGISTER_TABLE *) (UINTN) AcpiCpuData->PreSmmInitRegisterTable;
   }

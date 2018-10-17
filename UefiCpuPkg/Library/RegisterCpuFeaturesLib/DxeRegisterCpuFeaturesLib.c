@@ -15,6 +15,7 @@
 #include <PiDxe.h>
 
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 
 #include "RegisterCpuFeatures.h"
 
@@ -115,14 +116,20 @@ GetProcessorInformation (
 
   @param[in]  Procedure               A pointer to the function to be run on
                                       enabled APs of the system.
+  @param[in]  MpEvent                 A pointer to the event to be used later
+                                      to check whether procedure has done.
 **/
 VOID
 StartupAPsWorker (
-  IN  EFI_AP_PROCEDURE                 Procedure
+  IN  EFI_AP_PROCEDURE                 Procedure,
+  IN  EFI_EVENT                        MpEvent
   )
 {
   EFI_STATUS                           Status;
   EFI_MP_SERVICES_PROTOCOL             *MpServices;
+  CPU_FEATURES_DATA                    *CpuFeaturesData;
+
+  CpuFeaturesData = GetCpuFeaturesData ();
 
   MpServices = GetMpProtocol ();
   //
@@ -132,9 +139,9 @@ StartupAPsWorker (
                  MpServices,
                  Procedure,
                  FALSE,
-                 NULL,
+                 MpEvent,
                  0,
-                 NULL,
+                 CpuFeaturesData,
                  NULL
                  );
   ASSERT_EFI_ERROR (Status);
@@ -195,5 +202,63 @@ GetNumberOfProcessor (
                          NumberOfEnabledProcessors
                          );
   ASSERT_EFI_ERROR (Status);
+}
+
+/**
+  Performs CPU features Initialization.
+
+  This service will invoke MP service to perform CPU features
+  initialization on BSP/APs per user configuration.
+
+  @note This service could be called by BSP only.
+**/
+VOID
+EFIAPI
+CpuFeaturesInitialize (
+  VOID
+  )
+{
+  CPU_FEATURES_DATA          *CpuFeaturesData;
+  UINTN                      OldBspNumber;
+  EFI_EVENT                  MpEvent;
+  EFI_STATUS                 Status;
+
+  CpuFeaturesData = GetCpuFeaturesData ();
+
+  OldBspNumber = GetProcessorIndex();
+  CpuFeaturesData->BspNumber = OldBspNumber;
+
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_WAIT,
+                  TPL_CALLBACK,
+                  EfiEventEmptyFunction,
+                  NULL,
+                  &MpEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Wakeup all APs for programming.
+  //
+  StartupAPsWorker (SetProcessorRegister, MpEvent);
+  //
+  // Programming BSP
+  //
+  SetProcessorRegister (CpuFeaturesData);
+
+  //
+  // Wait all processors to finish the task.
+  //
+  do {
+    Status = gBS->CheckEvent (MpEvent);
+  } while (Status == EFI_NOT_READY);
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Switch to new BSP if required
+  //
+  if (CpuFeaturesData->BspNumber != OldBspNumber) {
+    SwitchNewBsp (CpuFeaturesData->BspNumber);
+  }
 }
 

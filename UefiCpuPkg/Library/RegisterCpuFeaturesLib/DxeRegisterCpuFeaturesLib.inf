@@ -47,6 +47,8 @@
   SynchronizationLib
   UefiBootServicesTableLib
   IoLib
+  UefiBootServicesTableLib
+  UefiLib
 
 [Protocols]
   gEfiMpServiceProtocolGuid                                            ## CONSUMES

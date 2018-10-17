@@ -149,11 +149,15 @@ GetProcessorInformation (
 **/
 VOID
 StartupAPsWorker (
-  IN  EFI_AP_PROCEDURE                 Procedure
+  IN  EFI_AP_PROCEDURE                 Procedure,
+  IN  EFI_EVENT                        MpEvent
   )
 {
   EFI_STATUS                           Status;
   EFI_PEI_MP_SERVICES_PPI              *CpuMpPpi;
+  CPU_FEATURES_DATA                    *CpuFeaturesData;
+
+  CpuFeaturesData = GetCpuFeaturesData ();
 
   //
   // Get MP Services Protocol
@@ -175,7 +179,7 @@ StartupAPsWorker (
                  Procedure,
                  FALSE,
                  0,
-                 NULL
+                 CpuFeaturesData
                  );
   ASSERT_EFI_ERROR (Status);
 }
@@ -257,3 +261,50 @@ GetNumberOfProcessor (
                          );
   ASSERT_EFI_ERROR (Status);
 }
+
+/**
+  Performs CPU features Initialization.
+
+  This service will invoke MP service to perform CPU features
+  initialization on BSP/APs per user configuration.
+
+  @note This service could be called by BSP only.
+**/
+VOID
+EFIAPI
+CpuFeaturesInitialize (
+  VOID
+  )
+{
+  CPU_FEATURES_DATA          *CpuFeaturesData;
+  UINTN                      OldBspNumber;
+
+  CpuFeaturesData = GetCpuFeaturesData ();
+
+  OldBspNumber = GetProcessorIndex();
+  CpuFeaturesData->BspNumber = OldBspNumber;
+
+  //
+  // Known limitation: In PEI phase, CpuFeatures driver not
+  // support async mode execute tasks. So semaphore type
+  // register can't been used for this instance, must use
+  // DXE type instance.
+  //
+
+  //
+  // Wakeup all APs for programming.
+  //
+  StartupAPsWorker (SetProcessorRegister, NULL);
+  //
+  // Programming BSP
+  //
+  SetProcessorRegister (CpuFeaturesData);
+
+  //
+  // Switch to new BSP if required
+  //
+  if (CpuFeaturesData->BspNumber != OldBspNumber) {
+    SwitchNewBsp (CpuFeaturesData->BspNumber);
+  }
+}
+

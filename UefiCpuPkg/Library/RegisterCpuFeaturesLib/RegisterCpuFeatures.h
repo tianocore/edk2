@@ -23,6 +23,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/SynchronizationLib.h>
 #include <Library/IoLib.h>
+#include <Library/LocalApicLib.h>
 
 #include <AcpiCpuData.h>
 
@@ -46,16 +47,27 @@ typedef struct {
   CPU_FEATURE_INITIALIZE       InitializeFunc;
   UINT8                        *BeforeFeatureBitMask;
   UINT8                        *AfterFeatureBitMask;
+  UINT8                        *CoreBeforeFeatureBitMask;
+  UINT8                        *CoreAfterFeatureBitMask;
+  UINT8                        *PackageBeforeFeatureBitMask;
+  UINT8                        *PackageAfterFeatureBitMask;
   VOID                         *ConfigData;
   BOOLEAN                      BeforeAll;
   BOOLEAN                      AfterAll;
 } CPU_FEATURES_ENTRY;
 
+//
+// Flags used when program the register.
+//
+typedef struct {
+  volatile UINTN           ConsoleLogLock;       // Spinlock used to control console.
+  volatile UINTN           MemoryMappedLock;     // Spinlock used to program mmio
+  volatile UINT32          *SemaphoreCount;      // Semaphore used to program semaphore.
+} PROGRAM_CPU_REGISTER_FLAGS;
+
 typedef struct {
   UINTN                    FeaturesCount;
   UINT32                   BitMaskSize;
-  SPIN_LOCK                MsrLock;
-  SPIN_LOCK                MemoryMappedLock;
   LIST_ENTRY               FeatureList;
 
   CPU_FEATURES_INIT_ORDER  *InitOrder;
@@ -64,9 +76,14 @@ typedef struct {
   UINT8                    *ConfigurationPcd;
   UINT8                    *SettingPcd;
 
+  UINT32                   NumberOfCpus;
+  ACPI_CPU_DATA            *AcpiCpuData;
+
   CPU_REGISTER_TABLE       *RegisterTable;
   CPU_REGISTER_TABLE       *PreSmmRegisterTable;
   UINTN                    BspNumber;
+
+  PROGRAM_CPU_REGISTER_FLAGS  CpuFlags;
 } CPU_FEATURES_DATA;
 
 #define CPU_FEATURE_ENTRY_FROM_LINK(a) \
@@ -118,10 +135,13 @@ GetProcessorInformation (
 
   @param[in]  Procedure               A pointer to the function to be run on
                                       enabled APs of the system.
+  @param[in]  MpEvent                 A pointer to the event to be used later
+                                      to check whether procedure has done.
 **/
 VOID
 StartupAPsWorker (
-  IN  EFI_AP_PROCEDURE                 Procedure
+  IN  EFI_AP_PROCEDURE                 Procedure,
+  IN  EFI_EVENT                        MpEvent
   );
 
 /**
@@ -168,6 +188,42 @@ DumpCpuFeatureMask (
 VOID
 DumpCpuFeature (
   IN CPU_FEATURES_ENTRY  *CpuFeature
+  );
+
+/**
+  Return feature dependence result.
+
+  @param[in]  CpuFeature        Pointer to CPU feature.
+  @param[in]  Before            Check before dependence or after.
+
+  @retval     return the dependence result.
+**/
+CPU_FEATURE_DEPENDENCE_TYPE
+DetectFeatureScope (
+  IN CPU_FEATURES_ENTRY         *CpuFeature,
+  IN BOOLEAN                    Before
+  );
+
+/**
+  Programs registers for the calling processor.
+
+  @param[in,out] Buffer  The pointer to private data buffer.
+
+**/
+VOID
+EFIAPI
+SetProcessorRegister (
+  IN OUT VOID            *Buffer
+  );
+
+/**
+  Return ACPI_CPU_DATA data.
+
+  @return  Pointer to ACPI_CPU_DATA data.
+**/
+ACPI_CPU_DATA *
+GetAcpiCpuData (
+  VOID
   );
 
 #endif
