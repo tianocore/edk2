@@ -270,6 +270,66 @@ class Check(object):
         self.FunctionLayoutCheckPrototype()
         self.FunctionLayoutCheckBody()
         self.FunctionLayoutCheckLocalVariable()
+        self.FunctionLayoutCheckDeprecated()
+    
+    # To check if the deprecated functions are used
+    def FunctionLayoutCheckDeprecated(self):
+        if EccGlobalData.gConfig.CFunctionLayoutCheckNoDeprecated == '1' or EccGlobalData.gConfig.CFunctionLayoutCheckAll == '1' or EccGlobalData.gConfig.CheckAll == '1':
+            EdkLogger.quiet("Checking function no deprecated one being used ...")
+
+            DeprecatedFunctionSet = ('UnicodeValueToString',
+                                     'AsciiValueToString',
+                                     'StrCpy',
+                                     'StrnCpy',
+                                     'StrCat',
+                                     'StrnCat',
+                                     'UnicodeStrToAsciiStr',
+                                     'AsciiStrCpy',
+                                     'AsciiStrnCpy',
+                                     'AsciiStrCat',
+                                     'AsciiStrnCat',
+                                     'AsciiStrToUnicodeStr',
+                                     'PcdSet8',
+                                     'PcdSet16',
+                                     'PcdSet32',
+                                     'PcdSet64',
+                                     'PcdSetPtr',
+                                     'PcdSetBool',
+                                     'PcdSetEx8',
+                                     'PcdSetEx16',
+                                     'PcdSetEx32',
+                                     'PcdSetEx64',
+                                     'PcdSetExPtr',
+                                     'PcdSetExBool',
+                                     'LibPcdSet8',
+                                     'LibPcdSet16',
+                                     'LibPcdSet32',
+                                     'LibPcdSet64',
+                                     'LibPcdSetPtr',
+                                     'LibPcdSetBool',
+                                     'LibPcdSetEx8',
+                                     'LibPcdSetEx16',
+                                     'LibPcdSetEx32',
+                                     'LibPcdSetEx64',
+                                     'LibPcdSetExPtr',
+                                     'LibPcdSetExBool',
+                                     'GetVariable',
+                                     'GetEfiGlobalVariable',
+                                     )
+
+            for IdentifierTable in EccGlobalData.gIdentifierTableList:
+                SqlCommand = """select ID, Name, BelongsToFile from %s
+                                where Model = %s """ % (IdentifierTable, MODEL_IDENTIFIER_FUNCTION_CALLING)
+                RecordSet = EccGlobalData.gDb.TblFile.Exec(SqlCommand)
+                for Record in RecordSet:
+                    for Key in DeprecatedFunctionSet:
+                        if Key == Record[1]:
+                            if not EccGlobalData.gException.IsException(ERROR_C_FUNCTION_LAYOUT_CHECK_NO_DEPRECATE, Key):
+                                OtherMsg = 'The function [%s] is deprecated which should NOT be used' % Key
+                                EccGlobalData.gDb.TblReport.Insert(ERROR_C_FUNCTION_LAYOUT_CHECK_NO_DEPRECATE,
+                                                                   OtherMsg=OtherMsg,
+                                                                   BelongsToTable=IdentifierTable,
+                                                                   BelongsToItem=Record[0])
 
     def WalkTree(self):
         IgnoredPattern = c.GetIgnoredDirListPattern()
