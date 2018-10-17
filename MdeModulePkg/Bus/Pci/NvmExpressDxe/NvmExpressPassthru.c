@@ -595,7 +595,8 @@ NvmExpressPassThru (
   //
   if (((Sq->Opc & (BIT0 | BIT1)) != 0) &&
       !((Packet->QueueType == NVME_ADMIN_QUEUE) && ((Sq->Opc == NVME_ADMIN_CRIOCQ_CMD) || (Sq->Opc == NVME_ADMIN_CRIOSQ_CMD)))) {
-    if ((Packet->TransferLength == 0) || (Packet->TransferBuffer == NULL)) {
+    if (((Packet->TransferLength != 0) && (Packet->TransferBuffer == NULL)) ||
+        ((Packet->TransferLength == 0) && (Packet->TransferBuffer != NULL))) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -605,21 +606,23 @@ NvmExpressPassThru (
       Flag = EfiPciIoOperationBusMasterWrite;
     }
 
-    MapLength = Packet->TransferLength;
-    Status = PciIo->Map (
-                      PciIo,
-                      Flag,
-                      Packet->TransferBuffer,
-                      &MapLength,
-                      &PhyAddr,
-                      &MapData
-                      );
-    if (EFI_ERROR (Status) || (Packet->TransferLength != MapLength)) {
-      return EFI_OUT_OF_RESOURCES;
-    }
+    if ((Packet->TransferLength != 0) && (Packet->TransferBuffer != NULL)) {
+      MapLength = Packet->TransferLength;
+      Status = PciIo->Map (
+                        PciIo,
+                        Flag,
+                        Packet->TransferBuffer,
+                        &MapLength,
+                        &PhyAddr,
+                        &MapData
+                        );
+      if (EFI_ERROR (Status) || (Packet->TransferLength != MapLength)) {
+        return EFI_OUT_OF_RESOURCES;
+      }
 
-    Sq->Prp[0] = PhyAddr;
-    Sq->Prp[1] = 0;
+      Sq->Prp[0] = PhyAddr;
+      Sq->Prp[1] = 0;
+    }
 
     if((Packet->MetadataLength != 0) && (Packet->MetadataBuffer != NULL)) {
       MapLength = Packet->MetadataLength;
