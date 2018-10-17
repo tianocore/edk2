@@ -259,6 +259,8 @@ CpuS3DataInitialize (
   if (OldAcpiCpuData != NULL) {
     AcpiCpuData->RegisterTable           = OldAcpiCpuData->RegisterTable;
     AcpiCpuData->PreSmmInitRegisterTable = OldAcpiCpuData->PreSmmInitRegisterTable;
+    AcpiCpuData->ApLocation              = OldAcpiCpuData->ApLocation;
+    CopyMem (&AcpiCpuData->CpuStatus, &OldAcpiCpuData->CpuStatus, sizeof (CPU_STATUS_INFORMATION));
   } else {
     //
     // Allocate buffer for empty RegisterTable and PreSmmInitRegisterTable for all CPUs
