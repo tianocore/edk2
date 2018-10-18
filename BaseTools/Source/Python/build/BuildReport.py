@@ -1091,10 +1091,11 @@ class PcdReport(object):
                                 if not Pcd.SkuInfoList:
                                     OverrideValues = Pcd.SkuOverrideValues
                                     if OverrideValues:
-                                        Keys = list(OverrideValues.keys())
-                                        Data = OverrideValues[Keys[0]]
-                                        Struct = list(Data.values())
-                                        DscOverride = self.ParseStruct(Struct[0])
+                                        for Data in OverrideValues.values():
+                                            Struct = list(Data.values())
+                                            if Struct:
+                                                DscOverride = self.ParseStruct(Struct[0])
+                                                break
                                 else:
                                     SkuList = sorted(Pcd.SkuInfoList.keys())
                                     for Sku in SkuList:
@@ -1267,12 +1268,12 @@ class PcdReport(object):
             if IsStructure:
                 OverrideValues = Pcd.SkuOverrideValues
                 if OverrideValues:
-                    Keys = list(OverrideValues.keys())
-                    Data = OverrideValues[Keys[0]]
-                    Struct = list(Data.values())
-                    if Struct:
-                        OverrideFieldStruct = self.OverrideFieldValue(Pcd, Struct[0])
-                        self.PrintStructureInfo(File, OverrideFieldStruct)
+                    for Data in OverrideValues.values():
+                        Struct = list(Data.values())
+                        if Struct:
+                            OverrideFieldStruct = self.OverrideFieldValue(Pcd, Struct[0])
+                            self.PrintStructureInfo(File, OverrideFieldStruct)
+                            break
             self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
         else:
             FirstPrint = True
