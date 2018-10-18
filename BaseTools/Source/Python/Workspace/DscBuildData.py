@@ -2878,6 +2878,15 @@ class DscBuildData(PlatformBuildClassObject):
             elif TAB_DEFAULT in pcd.SkuInfoList and TAB_COMMON in pcd.SkuInfoList:
                 del pcd.SkuInfoList[TAB_COMMON]
 
+        #For the same one VOID* pcd, if the default value type of one SKU is "Unicode string",
+        #the other SKUs are "OtherVOID*"(ASCII string or byte array),Then convert "Unicode string" to "byte array".
+        for pcd in Pcds.values():
+            PcdValueTypeSet = set()
+            for sku in pcd.SkuInfoList.values():
+                PcdValueTypeSet.add("UnicodeString" if sku.DefaultValue.startswith(('L"',"L'")) else "OtherVOID*")
+            if len(PcdValueTypeSet) > 1:
+                for sku in pcd.SkuInfoList.values():
+                    sku.DefaultValue = StringToArray(sku.DefaultValue) if sku.DefaultValue.startswith(('L"',"L'")) else sku.DefaultValue
 
         map(self.FilterSkuSettings, Pcds.values())
         return Pcds
