@@ -2288,7 +2288,7 @@ class DscBuildData(PlatformBuildClassObject):
 
             if Target == "*" or Target == self._Target:
                 if Tag == "*" or Tag == self._Toolchain:
-                    if Arch == "*" or Arch == self.Arch:
+                    if Arch == "*":
                         if Tool not in BuildOptions:
                             BuildOptions[Tool] = OrderedDict()
                         if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or self.BuildOptions[Options].startswith('='):
