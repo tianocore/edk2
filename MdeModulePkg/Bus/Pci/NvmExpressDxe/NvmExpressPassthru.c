@@ -781,17 +781,16 @@ NvmExpressPassThru (
     } else {
       Status = EFI_DEVICE_ERROR;
       //
-      // Copy the Respose Queue entry for this command to the callers response buffer
-      //
-      CopyMem(Packet->NvmeCompletion, Cq, sizeof(EFI_NVM_EXPRESS_COMPLETION));
-
-      //
       // Dump every completion entry status for debugging.
       //
       DEBUG_CODE_BEGIN();
         NvmeDumpStatus(Cq);
       DEBUG_CODE_END();
     }
+    //
+    // Copy the Respose Queue entry for this command to the callers response buffer
+    //
+    CopyMem(Packet->NvmeCompletion, Cq, sizeof(EFI_NVM_EXPRESS_COMPLETION));
   } else {
     //
     // Timeout occurs for an NVMe command. Reset the controller to abort the
