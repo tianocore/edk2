@@ -1903,15 +1903,12 @@ class DscBuildData(PlatformBuildClassObject):
                     IsArray = IsFieldValueAnArray(FieldList[FieldName][0])
                     if IsArray:
                         try:
-                            FieldValue = ValueExpressionEx(FieldList[FieldName][0], TAB_VOID, self._GuidDict)(True)
+                            FieldList[FieldName][0] = ValueExpressionEx(FieldList[FieldName][0], TAB_VOID, self._GuidDict)(True)
                         except BadExpression:
                             EdkLogger.error('Build', FORMAT_INVALID, "Invalid value format for %s. From %s Line %d " %
                                             (".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName, FieldName)), FieldList[FieldName][1], FieldList[FieldName][2]))
                     try:
-                        if IsArray:
-                            Value, ValueSize = ParseFieldValue (FieldValue)
-                        else:
-                            Value, ValueSize = ParseFieldValue (FieldList[FieldName][0])
+                        Value, ValueSize = ParseFieldValue (FieldList[FieldName][0])
                     except Exception:
                         EdkLogger.error('Build', FORMAT_INVALID, "Invalid value format for %s. From %s Line %d " % (".".join((Pcd.TokenSpaceGuidCName, Pcd.TokenCName, FieldName)), FieldList[FieldName][1], FieldList[FieldName][2]))
                     if isinstance(Value, str):
