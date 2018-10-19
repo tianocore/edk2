@@ -86,6 +86,10 @@
   # x % of FSP temporary memory will be used for heap
   # (100 - x) % of FSP temporary memory will be used for stack
   gIntelFsp2PkgTokenSpaceGuid.PcdFspHeapSizePercentage    |        50| UINT8|0x10000004
+  #
+  # Maximal Interrupt supported in IDT table.
+  #
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspMaxInterruptSupported |        34| UINT8|0x10000005
 
 [PcdsFixedAtBuild,PcdsDynamic,PcdsDynamicEx]
   gIntelFsp2PkgTokenSpaceGuid.PcdFspReservedMemoryLength |0x00100000|UINT32|0x46530000

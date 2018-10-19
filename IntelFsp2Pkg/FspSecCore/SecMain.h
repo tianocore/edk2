@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2014 - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -29,8 +29,6 @@
 #include <Library/FspCommonLib.h>
 #include <FspEas.h>
 
-#define SEC_IDT_ENTRY_COUNT    34
-
 typedef VOID (*PEI_CORE_ENTRY) ( \
   IN CONST  EFI_SEC_PEI_HAND_OFF    *SecCoreData, \
   IN CONST  EFI_PEI_PPI_DESCRIPTOR  *PpiList \
@@ -38,7 +36,7 @@ typedef VOID (*PEI_CORE_ENTRY) ( \
 
 typedef struct _SEC_IDT_TABLE {
   EFI_PEI_SERVICES  *PeiService;
-  UINT64            IdtTable[SEC_IDT_ENTRY_COUNT];
+  UINT64            IdtTable[FixedPcdGet8 (PcdFspMaxInterruptSupported)];
 } SEC_IDT_TABLE;
 
 /**

@@ -70,6 +70,7 @@ SecStartup (
   UINT32                      Index;
   FSP_GLOBAL_DATA             PeiFspData;
   UINT64                      ExceptionHandler;
+  UINTN                       IdtSize;
 
   //
   // Process all libraries constructor function linked to SecCore.
@@ -98,13 +99,26 @@ SecStartup (
   // |                   |
   // |-------------------|---->  TempRamBase
   IdtTableInStack.PeiService  = NULL;
-  ExceptionHandler = FspGetExceptionHandler(mIdtEntryTemplate);
-  for (Index = 0; Index < SEC_IDT_ENTRY_COUNT; Index ++) {
-    CopyMem ((VOID*)&IdtTableInStack.IdtTable[Index], (VOID*)&ExceptionHandler, sizeof (UINT64));
+  AsmReadIdtr (&IdtDescriptor);
+  if ((IdtDescriptor.Base == 0) && (IdtDescriptor.Limit == 0xFFFF)) {
+    ExceptionHandler = FspGetExceptionHandler(mIdtEntryTemplate);
+    for (Index = 0; Index < FixedPcdGet8(PcdFspMaxInterruptSupported); Index ++) {
+      CopyMem ((VOID*)&IdtTableInStack.IdtTable[Index], (VOID*)&ExceptionHandler, sizeof (UINT64));
+    }
+    IdtSize = sizeof (IdtTableInStack.IdtTable);
+  } else {
+    if (IdtDescriptor.Limit + 1 > sizeof (IdtTableInStack.IdtTable)) {
+      //
+      // ERROR: IDT table size from boot loader is larger than FSP can support, DeadLoop here!
+      //
+      CpuDeadLoop();
+    } else {
+      IdtSize = IdtDescriptor.Limit + 1;
+    }
+    CopyMem ((VOID *) (UINTN) &IdtTableInStack.IdtTable, (VOID *) IdtDescriptor.Base, IdtSize);
   }
-
   IdtDescriptor.Base  = (UINTN) &IdtTableInStack.IdtTable;
-  IdtDescriptor.Limit = (UINT16)(sizeof (IdtTableInStack.IdtTable) - 1);
+  IdtDescriptor.Limit = (UINT16)(IdtSize - 1);
 
   AsmWriteIdtr (&IdtDescriptor);
 
