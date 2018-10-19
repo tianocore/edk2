@@ -2932,7 +2932,7 @@ AsciiStrToUnicodeStrS (
   // Convert string
   //
   while (*Source != '\0') {
-    *(Destination++) = (CHAR16)*(Source++);
+    *(Destination++) = (CHAR16)(UINT8)*(Source++);
   }
   *Destination = '\0';
 
@@ -3045,7 +3045,7 @@ AsciiStrnToUnicodeStrS (
   // Convert string
   //
   while ((*Source != 0) && (SourceLen > 0)) {
-    *(Destination++) = (CHAR16)*(Source++);
+    *(Destination++) = (CHAR16)(UINT8)*(Source++);
     SourceLen--;
     (*DestinationLength)++;
   }
