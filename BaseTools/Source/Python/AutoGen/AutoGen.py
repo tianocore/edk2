@@ -569,8 +569,8 @@ class WorkspaceAutoGen(AutoGen):
                         'build',
                         PARSER_ERROR,
                         "PCD (%s.%s) used in FDF is not declared in DEC files." % (Guid, Name),
-                        File = self.FdfProfile.PcdFileLineDict[Name, Guid][0],
-                        Line = self.FdfProfile.PcdFileLineDict[Name, Guid][1]
+                        File = self.FdfProfile.PcdFileLineDict[Name, Guid, Fileds][0],
+                        Line = self.FdfProfile.PcdFileLineDict[Name, Guid, Fileds][1]
                     )
                 else:
                     # Check whether Dynamic or DynamicEx PCD used in FDF file. If used, build break and give a error message.
@@ -583,8 +583,8 @@ class WorkspaceAutoGen(AutoGen):
                                 'build',
                                 PARSER_ERROR,
                                 "Using Dynamic or DynamicEx type of PCD [%s.%s] in FDF file is not allowed." % (Guid, Name),
-                                File = self.FdfProfile.PcdFileLineDict[Name, Guid][0],
-                                Line = self.FdfProfile.PcdFileLineDict[Name, Guid][1]
+                                File = self.FdfProfile.PcdFileLineDict[Name, Guid, Fileds][0],
+                                Line = self.FdfProfile.PcdFileLineDict[Name, Guid, Fileds][1]
                         )
 
             Pa = PlatformAutoGen(self, self.MetaFile, Target, Toolchain, Arch)
