@@ -276,6 +276,7 @@ class DscBuildData(PlatformBuildClassObject):
         self._VpdToolGuid       = None
         self._MacroDict         = None
         self.DefaultStores      = None
+        self.UsedStructurePcd   = None
 
     ## handle Override Path of Module
     def _HandleOverridePath(self):
@@ -1457,6 +1458,7 @@ class DscBuildData(PlatformBuildClassObject):
                         else:
                             str_pcd_obj_str.DefaultFromDSC = {skuname:{defaultstore: str_pcd_obj.SkuInfoList[skuname].DefaultStoreDict.get(defaultstore, str_pcd_obj.SkuInfoList[skuname].DefaultValue) for defaultstore in DefaultStores} for skuname in str_pcd_obj.SkuInfoList}
                     S_pcd_set[Pcd] = str_pcd_obj_str
+        self.FilterStrcturePcd(S_pcd_set)
         if S_pcd_set:
             GlobalData.gStructurePcd[self.Arch] = S_pcd_set
         for stru_pcd in S_pcd_set.values():
@@ -1552,6 +1554,23 @@ class DscBuildData(PlatformBuildClassObject):
 
         map(self.FilterSkuSettings, [Pcds[pcdkey] for pcdkey in Pcds if Pcds[pcdkey].Type in DynamicPcdType])
         return Pcds
+    #Filter the StrucutrePcd that is not used by any module in dsc file and fdf file.
+    def FilterStrcturePcd(self, S_pcd_set):
+        if not self.UsedStructurePcd:
+            FdfInfList = []
+            if GlobalData.gFdfParser:
+                FdfInfList = GlobalData.gFdfParser.Profile.InfList
+            FdfModuleList = [PathClass(NormPath(Inf), GlobalData.gWorkspace, Arch=self._Arch) for Inf in FdfInfList]
+            AllModulePcds = set()
+            ModuleSet = set(self._Modules.keys() + self.LibraryInstances + FdfModuleList)
+            for ModuleFile in ModuleSet:
+                ModuleData = self._Bdb[ModuleFile, self._Arch, self._Target, self._Toolchain]
+                AllModulePcds = AllModulePcds | set(ModuleData.Pcds.keys())
+
+            self.UsedStructurePcd = AllModulePcds
+        UnusedStruPcds = set(S_pcd_set.keys()) - self.UsedStructurePcd
+        for (Token, TokenSpaceGuid) in UnusedStruPcds:
+            del S_pcd_set[(Token, TokenSpaceGuid)]
 
     ## Retrieve non-dynamic PCD settings
     #
