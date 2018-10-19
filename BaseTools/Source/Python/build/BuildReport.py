@@ -1074,8 +1074,12 @@ class PcdReport(object):
                     Pcd.DatumType = Pcd.StructName
                     if TypeName in ('DYNVPD', 'DEXVPD'):
                         Pcd.SkuInfoList = SkuInfoList
-                    if Pcd.PcdFieldValueFromComm:
+                    if Pcd.PcdValueFromComm or Pcd.PcdFieldValueFromComm:
                         BuildOptionMatch = True
+                        DecMatch = False
+                    elif Pcd.PcdValueFromFdf or Pcd.PcdFieldValueFromFdf:
+                        DscDefaultValue = True
+                        DscMatch = True
                         DecMatch = False
                     elif Pcd.SkuOverrideValues:
                         DscOverride = False
@@ -1266,6 +1270,7 @@ class PcdReport(object):
                         Value = "0x{:X} ({})".format(int(Value, 0), Value)
                 FileWrite(File, ' %-*s   : %6s %10s = %s' % (self.MaxLen, Flag + ' ' + PcdTokenCName, TypeName, '(' + Pcd.DatumType + ')', Value))
             if IsStructure:
+                FiledOverrideFlag = False
                 OverrideValues = Pcd.SkuOverrideValues
                 if OverrideValues:
                     for Data in OverrideValues.values():
@@ -1273,7 +1278,11 @@ class PcdReport(object):
                         if Struct:
                             OverrideFieldStruct = self.OverrideFieldValue(Pcd, Struct[0])
                             self.PrintStructureInfo(File, OverrideFieldStruct)
+                            FiledOverrideFlag = True
                             break
+                if not FiledOverrideFlag and (Pcd.PcdFieldValueFromComm or Pcd.PcdFieldValueFromFdf):
+                    OverrideFieldStruct = self.OverrideFieldValue(Pcd, {})
+                    self.PrintStructureInfo(File, OverrideFieldStruct)
             self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
         else:
             FirstPrint = True
@@ -1393,10 +1402,15 @@ class PcdReport(object):
                     if TypeName in ('DYNVPD', 'DEXVPD'):
                         FileWrite(File, '%*s' % (self.MaxLen + 4, SkuInfo.VpdOffset))
                     if IsStructure:
+                        FiledOverrideFlag = False
                         OverrideValues = Pcd.SkuOverrideValues[Sku]
                         if OverrideValues:
                             Keys = OverrideValues.keys()
                             OverrideFieldStruct = self.OverrideFieldValue(Pcd, OverrideValues[Keys[0]])
+                            self.PrintStructureInfo(File, OverrideFieldStruct)
+                            FiledOverrideFlag = True
+                        if not FiledOverrideFlag and (Pcd.PcdFieldValueFromComm or Pcd.PcdFieldValueFromFdf):
+                            OverrideFieldStruct = self.OverrideFieldValue(Pcd, {})
                             self.PrintStructureInfo(File, OverrideFieldStruct)
                     self.PrintPcdDefault(File, Pcd, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue)
 
