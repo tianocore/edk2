@@ -1067,6 +1067,7 @@ class DscBuildData(PlatformBuildClassObject):
                         PcdItem = BuildData.Pcds[key]
                         if (TokenSpaceGuidCName, TokenCName) == (PcdItem.TokenSpaceGuidCName, PcdItem.TokenCName) and FieldName =="":
                             PcdItem.DefaultValue = pcdvalue
+                            PcdItem.PcdValueFromComm = pcdvalue
         #In command line, the latter full assign value in commandLine should override the former field assign value.
         #For example, --pcd Token.pcd.field="" --pcd Token.pcd=H"{}"
         delete_assign = []
