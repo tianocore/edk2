@@ -67,7 +67,7 @@ ScanTableInSDT (
     EntryPtr = 0;
     CopyMem (&EntryPtr, (VOID *)(BasePtr + Index * TablePointerSize), TablePointerSize);
     Table = (EFI_ACPI_COMMON_HEADER *)((UINTN)(EntryPtr));
-    if (Table->Signature == Signature) {
+    if ((Table != NULL) && (Table->Signature == Signature)) {
       if (PreviousTable != NULL) {
         if (Table == PreviousTable) {
           *PreviousTableLocated = TRUE;
