@@ -26,6 +26,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define XHC_PCI_BAR_OFFSET          0x10       // Memory Bar Register Offset
 #define XHC_PCI_BAR_MASK            0xFFFF     // Memory Base Address Mask
 
+#define XHC_PCI_SBRN_OFFSET         0x60       // Serial Bus Release Number Register Offset
+
 #define USB_HUB_CLASS_CODE          0x09
 #define USB_HUB_SUBCLASS_CODE       0x00
 

@@ -1770,6 +1770,7 @@ XhcCreateUsbHc (
   EFI_STATUS              Status;
   UINT32                  PageSize;
   UINT16                  ExtCapReg;
+  UINT8                   ReleaseNumber;
 
   Xhc = AllocateZeroPool (sizeof (USB_XHCI_INSTANCE));
 
@@ -1785,6 +1786,19 @@ XhcCreateUsbHc (
   Xhc->DevicePath            = DevicePath;
   Xhc->OriginalPciAttributes = OriginalPciAttributes;
   CopyMem (&Xhc->Usb2Hc, &gXhciUsb2HcTemplate, sizeof (EFI_USB2_HC_PROTOCOL));
+
+  Status = PciIo->Pci.Read (
+                        PciIo,
+                        EfiPciIoWidthUint8,
+                        XHC_PCI_SBRN_OFFSET,
+                        1,
+                        &ReleaseNumber
+                        );
+
+  if (!EFI_ERROR (Status)) {
+    Xhc->Usb2Hc.MajorRevision = (ReleaseNumber & 0xF0) >> 4;
+    Xhc->Usb2Hc.MinorRevision = (ReleaseNumber & 0x0F);
+  }
 
   InitializeListHead (&Xhc->AsyncIntTransfers);
 
