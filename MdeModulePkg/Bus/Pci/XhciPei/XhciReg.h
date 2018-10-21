@@ -1,7 +1,7 @@
 /** @file
 Private Header file for Usb Host Controller PEIM
 
-Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -82,9 +82,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define XHC_PORTSC_PED                  BIT1    // Port Enabled/Disabled
 #define XHC_PORTSC_OCA                  BIT3    // Over-current Active
 #define XHC_PORTSC_RESET                BIT4    // Port Reset
-#define XHC_PORTSC_PLS                  (BIT5|BIT6|BIT7|BIT8)   // Port Link State
+#define XHC_PORTSC_PLS                  (BIT5|BIT6|BIT7|BIT8)     // Port Link State
 #define XHC_PORTSC_PP                   BIT9    // Port Power
-#define XHC_PORTSC_PS                   (BIT10|BIT11|BIT12)     // Port Speed
+#define XHC_PORTSC_PS                   (BIT10|BIT11|BIT12|BIT13) // Port Speed
 #define XHC_PORTSC_LWS                  BIT16   // Port Link State Write Strobe
 #define XHC_PORTSC_CSC                  BIT17   // Connect Status Change
 #define XHC_PORTSC_PEC                  BIT18   // Port Enabled/Disabled Change

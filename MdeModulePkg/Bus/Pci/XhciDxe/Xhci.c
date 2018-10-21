@@ -403,7 +403,8 @@ XhcGetRootHubPortStatus (
   State = XhcReadOpReg (Xhc, Offset);
 
   //
-  // According to XHCI 1.0 spec, bit 10~13 of the root port status register identifies the speed of the attached device.
+  // According to XHCI 1.1 spec November 2017,
+  // bit 10~13 of the root port status register identifies the speed of the attached device.
   //
   switch ((State & XHC_PORTSC_PS) >> 10) {
   case 2:
@@ -415,6 +416,7 @@ XhcGetRootHubPortStatus (
     break;
 
   case 4:
+  case 5:
     PortStatus->PortStatus |= USB_PORT_STAT_SUPER_SPEED;
     break;
 
