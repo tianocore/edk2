@@ -853,6 +853,34 @@ XhciDelAllAsyncIntTransfers (
   );
 
 /**
+  Insert a single asynchronous interrupt transfer for
+  the device and endpoint.
+
+  @param Xhc            The XHCI Instance
+  @param BusAddr        The logical device address assigned by UsbBus driver
+  @param EpAddr         Endpoint addrress
+  @param DevSpeed       The device speed
+  @param MaxPacket      The max packet length of the endpoint
+  @param DataLen        The length of data buffer
+  @param Callback       The function to call when data is transferred
+  @param Context        The context to the callback
+
+  @return Created URB or NULL
+
+**/
+URB *
+XhciInsertAsyncIntTransfer (
+  IN USB_XHCI_INSTANCE                  *Xhc,
+  IN UINT8                              BusAddr,
+  IN UINT8                              EpAddr,
+  IN UINT8                              DevSpeed,
+  IN UINTN                              MaxPacket,
+  IN UINTN                              DataLen,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
+  IN VOID                               *Context
+  );
+
+/**
   Set Bios Ownership
 
   @param  Xhc          The XHCI Instance.

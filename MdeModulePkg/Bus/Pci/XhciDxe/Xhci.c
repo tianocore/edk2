@@ -1346,7 +1346,6 @@ XhcAsyncInterruptTransfer (
   EFI_STATUS              Status;
   UINT8                   SlotId;
   UINT8                   Index;
-  UINT8                   *Data;
   EFI_TPL                 OldTpl;
 
   //
@@ -1413,36 +1412,21 @@ XhcAsyncInterruptTransfer (
     goto ON_EXIT;
   }
 
-  Data = AllocateZeroPool (DataLength);
-
-  if (Data == NULL) {
-    DEBUG ((EFI_D_ERROR, "XhcAsyncInterruptTransfer: failed to allocate buffer\n"));
-    Status = EFI_OUT_OF_RESOURCES;
-    goto ON_EXIT;
-  }
-
-  Urb = XhcCreateUrb (
+  Urb = XhciInsertAsyncIntTransfer (
           Xhc,
           DeviceAddress,
           EndPointAddress,
           DeviceSpeed,
           MaximumPacketLength,
-          XHC_INT_TRANSFER_ASYNC,
-          NULL,
-          Data,
           DataLength,
           CallBackFunction,
           Context
           );
-
   if (Urb == NULL) {
-    DEBUG ((EFI_D_ERROR, "XhcAsyncInterruptTransfer: failed to create URB\n"));
-    FreePool (Data);
     Status = EFI_OUT_OF_RESOURCES;
     goto ON_EXIT;
   }
 
-  InsertHeadList (&Xhc->AsyncIntTransfers, &Urb->UrbList);
   //
   // Ring the doorbell
   //

@@ -1411,6 +1411,71 @@ XhciDelAllAsyncIntTransfers (
 }
 
 /**
+  Insert a single asynchronous interrupt transfer for
+  the device and endpoint.
+
+  @param Xhc            The XHCI Instance
+  @param BusAddr        The logical device address assigned by UsbBus driver
+  @param EpAddr         Endpoint addrress
+  @param DevSpeed       The device speed
+  @param MaxPacket      The max packet length of the endpoint
+  @param DataLen        The length of data buffer
+  @param Callback       The function to call when data is transferred
+  @param Context        The context to the callback
+
+  @return Created URB or NULL
+
+**/
+URB *
+XhciInsertAsyncIntTransfer (
+  IN USB_XHCI_INSTANCE                  *Xhc,
+  IN UINT8                              BusAddr,
+  IN UINT8                              EpAddr,
+  IN UINT8                              DevSpeed,
+  IN UINTN                              MaxPacket,
+  IN UINTN                              DataLen,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
+  IN VOID                               *Context
+  )
+{
+  VOID      *Data;
+  URB       *Urb;
+
+  Data = AllocateZeroPool (DataLen);
+  if (Data == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: failed to allocate buffer\n", __FUNCTION__));
+    return NULL;
+  }
+
+  Urb = XhcCreateUrb (
+          Xhc,
+          BusAddr,
+          EpAddr,
+          DevSpeed,
+          MaxPacket,
+          XHC_INT_TRANSFER_ASYNC,
+          NULL,
+          Data,
+          DataLen,
+          Callback,
+          Context
+          );
+  if (Urb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: failed to create URB\n", __FUNCTION__));
+    FreePool (Data);
+    return NULL;
+  }
+
+  //
+  // New asynchronous transfer must inserted to the head.
+  // Check the comments in XhcMoniteAsyncRequests
+  //
+  InsertHeadList (&Xhc->AsyncIntTransfers, &Urb->UrbList);
+
+  return Urb;
+}
+
+/**
   Update the queue head for next round of asynchronous transfer
 
   @param  Xhc     The XHCI Instance.
