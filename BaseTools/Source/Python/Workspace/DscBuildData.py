@@ -86,6 +86,12 @@ LIBS = $(LIB_PATH)\Common.lib
 !INCLUDE $(BASE_TOOLS_PATH)\Source\C\Makefiles\ms.app
 '''
 
+AppTarget = '''
+all: $(APPFILE)
+$(APPFILE): $(OBJECTS)
+%s
+'''
+
 PcdGccMakefile = '''
 MAKEROOT ?= $(EDK_TOOLS_PATH)/Source/C
 LIBS = -lCommon
@@ -2257,10 +2263,10 @@ class DscBuildData(PlatformBuildClassObject):
 
         MakeApp = PcdMakefileHeader
         if sys.platform == "win32":
-            MakeApp = MakeApp + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\%s.obj\n' % (self.OutputPath, PcdValueInitName) + 'INC = '
+            MakeApp = MakeApp + 'APPFILE = %s\%s.exe\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s\%s.obj\n' % (self.OutputPath, PcdValueInitName) + 'INC = '
         else:
             MakeApp = MakeApp + PcdGccMakefile
-            MakeApp = MakeApp + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o\n' % (self.OutputPath, PcdValueInitName) + \
+            MakeApp = MakeApp + 'APPFILE = %s/%s\n' % (self.OutputPath, PcdValueInitName) + 'APPNAME = %s\n' % (PcdValueInitName) + 'OBJECTS = %s/%s.o\n' % (self.OutputPath, PcdValueInitName) + \
                       'include $(MAKEROOT)/Makefiles/app.makefile\n' + 'INCLUDE +='
 
         IncSearchList = []
@@ -2336,6 +2342,9 @@ class DscBuildData(PlatformBuildClassObject):
 
         if sys.platform == "win32":
             MakeApp = MakeApp + PcdMakefileEnd
+            MakeApp = MakeApp + AppTarget % ("""\tcopy $(APPLICATION) $(APPFILE) /y """)
+        else:
+            MakeApp = MakeApp + AppTarget % ("""\tcp $(APPLICATION) $(APPFILE) """)
         MakeApp = MakeApp + '\n'
         IncludeFileFullPaths = []
         for includefile in IncludeFiles:
@@ -2359,12 +2368,11 @@ class DscBuildData(PlatformBuildClassObject):
         OutputValueFile = os.path.join(self.OutputPath, 'Output.txt')
         SaveFileOnChange(InputValueFile, InitByteValue, False)
 
-        PcdValueInitExe = PcdValueInitName
+        Dest_PcdValueInitExe = PcdValueInitName
         if not sys.platform == "win32":
-            PcdValueInitExe = os.path.join(os.getenv("EDK_TOOLS_PATH"), 'Source', 'C', 'bin', PcdValueInitName)
+            Dest_PcdValueInitExe = os.path.join(self.OutputPath, PcdValueInitName)
         else:
-            PcdValueInitExe = os.path.join(os.getenv("EDK_TOOLS_PATH"), 'Bin', 'Win32', PcdValueInitName) +".exe"
-
+            Dest_PcdValueInitExe = os.path.join(self.OutputPath, PcdValueInitName) +".exe"
         Messages = ''
         if sys.platform == "win32":
             MakeCommand = 'nmake -f %s' % (MakeFileName)
@@ -2374,6 +2382,7 @@ class DscBuildData(PlatformBuildClassObject):
             MakeCommand = 'make -f %s' % (MakeFileName)
             returncode, StdOut, StdErr = DscBuildData.ExecuteCommand (MakeCommand)
             Messages = StdErr
+
         Messages = Messages.split('\n')
         MessageGroup = []
         if returncode != 0:
@@ -2418,8 +2427,8 @@ class DscBuildData(PlatformBuildClassObject):
             else:
                 EdkLogger.error('Build', COMMAND_FAILURE, 'Can not execute command: %s' % MakeCommand)
 
-        if DscBuildData.NeedUpdateOutput(OutputValueFile, PcdValueInitExe, InputValueFile):
-            Command = PcdValueInitExe + ' -i %s -o %s' % (InputValueFile, OutputValueFile)
+        if DscBuildData.NeedUpdateOutput(OutputValueFile, Dest_PcdValueInitExe, InputValueFile):
+            Command = Dest_PcdValueInitExe + ' -i %s -o %s' % (InputValueFile, OutputValueFile)
             returncode, StdOut, StdErr = DscBuildData.ExecuteCommand (Command)
             if returncode != 0:
                 EdkLogger.warn('Build', COMMAND_FAILURE, 'Can not collect output from command: %s' % Command)
