@@ -673,20 +673,9 @@ SmmIplDxeDispatchEventNotify (
     }
 
     //
-    // Attempt to reset SMRAM cacheability to UC
-    // Assume CPU AP is available at this time
-    //
-    Status = gDS->SetMemorySpaceAttributes(
-                    mSmramCacheBase,
-                    mSmramCacheSize,
-                    EFI_MEMORY_UC
-                    );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "SMM IPL failed to reset SMRAM window to EFI_MEMORY_UC\n"));
-    }
-
-    //
     // Close all SMRAM ranges to protect SMRAM
+    // NOTE: SMRR is enabled by CPU SMM driver by calling SmmCpuFeaturesInitializeProcessor() from SmmCpuFeaturesLib
+    //       so no need to reset the SMRAM to UC in MTRR.
     //
     Status = mSmmAccess->Close (mSmmAccess);
     ASSERT_EFI_ERROR (Status);
