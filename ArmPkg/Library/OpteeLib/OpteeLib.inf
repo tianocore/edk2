@@ -23,11 +23,13 @@
 
 [Sources]
   Optee.c
+  OpteeSmc.h
 
 [Packages]
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  ArmMmuLib
   ArmSmcLib
   BaseLib
