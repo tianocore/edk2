@@ -65,8 +65,9 @@ T_CHAR_TAB = '\t'
 T_CHAR_DOUBLE_QUOTE = '\"'
 T_CHAR_SINGLE_QUOTE = '\''
 T_CHAR_STAR = '*'
+T_CHAR_BRACE_R = '}'
 
-SEPARATORS = {TAB_EQUAL_SPLIT, TAB_VALUE_SPLIT, TAB_COMMA_SPLIT, '{', '}'}
+SEPARATORS = {TAB_EQUAL_SPLIT, TAB_VALUE_SPLIT, TAB_COMMA_SPLIT, '{', T_CHAR_BRACE_R}
 ALIGNMENTS = {"Auto", "8", "16", "32", "64", "128", "512", "1K", "4K", "32K", "64K", "128K",
                                     "256K", "512K", "1M", "2M", "4M", "8M", "16M"}
 ALIGNMENT_NOAUTO = ALIGNMENTS - {"Auto"}
@@ -2021,7 +2022,7 @@ class FdfParser:
                 DataString += self._Token
                 DataString += TAB_COMMA_SPLIT
 
-        if not self._IsToken("}"):
+        if not self._IsToken(T_CHAR_BRACE_R):
             raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
 
         DataString = DataString.rstrip(TAB_COMMA_SPLIT)
@@ -2061,7 +2062,7 @@ class FdfParser:
                     DataString += self._Token
                     DataString += TAB_COMMA_SPLIT
 
-            if not self._IsToken("}"):
+            if not self._IsToken(T_CHAR_BRACE_R):
                 raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
 
             DataString = DataString.rstrip(TAB_COMMA_SPLIT)
@@ -2330,10 +2331,10 @@ class FdfParser:
                 DataString += self._Token
                 DataString += TAB_COMMA_SPLIT
 
-            if not self._IsToken("}"):
+            if not self._IsToken(T_CHAR_BRACE_R):
                 raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
 
-            if not self._IsToken("}"):
+            if not self._IsToken(T_CHAR_BRACE_R):
                 raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
 
             DataString = DataString.rstrip(TAB_COMMA_SPLIT)
@@ -2348,7 +2349,7 @@ class FdfParser:
 
             FvObj.FvExtEntryData.append(self._Token)
 
-            if not self._IsToken("}"):
+            if not self._IsToken(T_CHAR_BRACE_R):
                 raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
 
         return True
@@ -2384,7 +2385,7 @@ class FdfParser:
             if not IsInf and not IsFile:
                 break
 
-        if not self._IsToken("}"):
+        if not self._IsToken(T_CHAR_BRACE_R):
             raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
 
         FvObj.AprioriSectionList.append(AprSectionObj)
@@ -2659,7 +2660,7 @@ class FdfParser:
             FfsFileObj.FileName = self._Token.replace('$(SPACE)', ' ')
             self._VerifyFile(FfsFileObj.FileName)
 
-        if not self._IsToken("}"):
+        if not self._IsToken(T_CHAR_BRACE_R):
             raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
 
     ## _GetRAWData() method
@@ -2684,7 +2685,7 @@ class FdfParser:
                 raise Warning.Expected("Filename value", self.FileName, self.CurrentLineNumber)
 
             FileName = self._Token.replace('$(SPACE)', ' ')
-            if FileName == '}':
+            if FileName == T_CHAR_BRACE_R:
                 self._UndoToken()
                 raise Warning.Expected("Filename value", self.FileName, self.CurrentLineNumber)
 
@@ -2693,7 +2694,7 @@ class FdfParser:
             FfsFileObj.FileName.append(File.Path)
             FfsFileObj.SubAlignment.append(AlignValue)
 
-            if self._IsToken("}"):
+            if self._IsToken(T_CHAR_BRACE_R):
                 self._UndoToken()
                 break
 
@@ -2865,7 +2866,7 @@ class FdfParser:
                     if not IsInf and not IsFile:
                         break
 
-                if not self._IsToken("}"):
+                if not self._IsToken(T_CHAR_BRACE_R):
                     raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
 
             FvImageSectionObj = FvImageSection()
@@ -2890,10 +2891,10 @@ class FdfParser:
                 raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
             if not self._IsToken("{"):
                 raise Warning.ExpectedCurlyOpen(self.FileName, self.CurrentLineNumber)
-            if not self._SkipToToken("}"):
+            if not self._SkipToToken(T_CHAR_BRACE_R):
                 raise Warning.Expected("Depex expression ending '}'", self.FileName, self.CurrentLineNumber)
 
-            DepexSectionObj.Expression = self._SkippedChars.rstrip('}')
+            DepexSectionObj.Expression = self._SkippedChars.rstrip(T_CHAR_BRACE_R)
             Obj.SectionList.append(DepexSectionObj)
 
         else:
@@ -2984,7 +2985,7 @@ class FdfParser:
                     break
 
 
-            if not self._IsToken("}"):
+            if not self._IsToken(T_CHAR_BRACE_R):
                 raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
             Obj.SectionList.append(CompressSectionObj)
             return True
@@ -3011,7 +3012,7 @@ class FdfParser:
                 if not IsLeafSection and not IsEncapSection:
                     break
 
-            if not self._IsToken("}"):
+            if not self._IsToken(T_CHAR_BRACE_R):
                 raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
             Obj.SectionList.append(GuidSectionObj)
 
@@ -3689,7 +3690,7 @@ class FdfParser:
                 if not IsEncapsulate and not IsLeaf:
                     break
 
-            if not self._IsToken("}"):
+            if not self._IsToken(T_CHAR_BRACE_R):
                 raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
 
             return NewRule
@@ -3789,7 +3790,7 @@ class FdfParser:
                     if not IsInf and not IsFile:
                         break
 
-                if not self._IsToken("}"):
+                if not self._IsToken(T_CHAR_BRACE_R):
                     raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
                 FvImageSectionObj.Fv = FvObj
                 FvImageSectionObj.FvName = None
@@ -3808,7 +3809,7 @@ class FdfParser:
                     FvImageSectionObj.FvFileExtension = self._GetFileExtension()
                 elif self._GetNextToken():
                     if self._Token not in {
-                            "}", "COMPAT16", BINARY_FILE_TYPE_PE32,
+                            T_CHAR_BRACE_R, "COMPAT16", BINARY_FILE_TYPE_PE32,
                             BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE,
                             "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,
                             BINARY_FILE_TYPE_UI, "VERSION",
@@ -3894,7 +3895,7 @@ class FdfParser:
             EfiSectionObj.FileExtension = self._GetFileExtension()
         elif self._GetNextToken():
             if self._Token not in {
-                    "}", "COMPAT16", BINARY_FILE_TYPE_PE32,
+                    T_CHAR_BRACE_R, "COMPAT16", BINARY_FILE_TYPE_PE32,
                     BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE,
                     "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,
                     BINARY_FILE_TYPE_UI, "VERSION",
@@ -4037,7 +4038,7 @@ class FdfParser:
                 if not IsEncapsulate and not IsLeaf:
                     break
 
-            if not self._IsToken("}"):
+            if not self._IsToken(T_CHAR_BRACE_R):
                 raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
             theRule.SectionList.append(CompressSectionObj)
 
@@ -4069,7 +4070,7 @@ class FdfParser:
                 if not IsEncapsulate and not IsLeaf:
                     break
 
-            if not self._IsToken("}"):
+            if not self._IsToken(T_CHAR_BRACE_R):
                 raise Warning.ExpectedCurlyClose(self.FileName, self.CurrentLineNumber)
             theRule.SectionList.append(GuidSectionObj)
 
@@ -4415,7 +4416,7 @@ class FdfParser:
                     Overrides.NeedCompress = self._Token.upper() == 'TRUE'
                     continue
 
-                if self._IsToken("}"):
+                if self._IsToken(T_CHAR_BRACE_R):
                     break
                 else:
                     EdkLogger.error("FdfParser", FORMAT_INVALID, File=self.FileName, Line=self.CurrentLineNumber)
