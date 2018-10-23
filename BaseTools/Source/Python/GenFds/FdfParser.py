@@ -2113,12 +2113,12 @@ class FdfParser:
         if FvObj.FvNameString == 'TRUE' and not FvObj.FvNameGuid:
             raise Warning("FvNameString found but FvNameGuid was not found", self.FileName, self.CurrentLineNumber)
 
-        self._GetAprioriSection(FvObj, FvObj.DefineVarDict.copy())
-        self._GetAprioriSection(FvObj, FvObj.DefineVarDict.copy())
+        self._GetAprioriSection(FvObj)
+        self._GetAprioriSection(FvObj)
 
         while True:
             isInf = self._GetInfStatement(FvObj)
-            isFile = self._GetFileStatement(FvObj, MacroDict = FvObj.DefineVarDict.copy())
+            isFile = self._GetFileStatement(FvObj)
             if not isInf and not isFile:
                 break
 
@@ -2353,11 +2353,10 @@ class FdfParser:
     #
     #   @param  self        The object pointer
     #   @param  FvObj       for whom apriori is got
-    #   @param  MacroDict   dictionary used to replace macro
     #   @retval True        Successfully find apriori statement
     #   @retval False       Not able to find apriori statement
     #
-    def _GetAprioriSection(self, FvObj, MacroDict = {}):
+    def _GetAprioriSection(self, FvObj):
         if not self._IsKeyword("APRIORI"):
             return False
 
@@ -2372,7 +2371,6 @@ class FdfParser:
         AprSectionObj.AprioriType = AprType
 
         self._GetDefineStatements(AprSectionObj)
-        MacroDict.update(AprSectionObj.DefineVarDict)
 
         while True:
             IsInf = self._GetInfStatement(AprSectionObj)
@@ -2526,11 +2524,10 @@ class FdfParser:
     #
     #   @param  self        The object pointer
     #   @param  Obj         for whom FILE statement is got
-    #   @param  MacroDict   dictionary used to replace macro
     #   @retval True        Successfully find FILE statement
     #   @retval False       Not able to find FILE statement
     #
-    def _GetFileStatement(self, Obj, ForCapsule = False, MacroDict = {}):
+    def _GetFileStatement(self, Obj, ForCapsule = False):
         if not self._IsKeyword("FILE"):
             return False
 
@@ -2561,7 +2558,7 @@ class FdfParser:
 
         FfsFileObj.NameGuid = self._Token
 
-        self._GetFilePart(FfsFileObj, MacroDict.copy())
+        self._GetFilePart(FfsFileObj)
 
         if ForCapsule:
             capsuleFfs = CapsuleFfs()
@@ -2608,9 +2605,8 @@ class FdfParser:
     #
     #   @param  self        The object pointer
     #   @param  FfsFileObj   for whom component is got
-    #   @param  MacroDict   dictionary used to replace macro
     #
-    def _GetFilePart(self, FfsFileObj, MacroDict = {}):
+    def _GetFilePart(self, FfsFileObj):
         self._GetFileOpts(FfsFileObj)
 
         if not self._IsToken("{"):
@@ -2645,11 +2641,11 @@ class FdfParser:
 
         elif self._Token in {TAB_DEFINE, "APRIORI", "SECTION"}:
             self._UndoToken()
-            self._GetSectionData(FfsFileObj, MacroDict)
+            self._GetSectionData(FfsFileObj)
 
         elif hasattr(FfsFileObj, 'FvFileType') and FfsFileObj.FvFileType == 'RAW':
             self._UndoToken()
-            self._GetRAWData(FfsFileObj, MacroDict)
+            self._GetRAWData(FfsFileObj)
 
         else:
             FfsFileObj.CurrentLineNum = self.CurrentLineNumber
@@ -2666,9 +2662,8 @@ class FdfParser:
     #
     #   @param  self         The object pointer
     #   @param  FfsFileObj   for whom section is got
-    #   @param  MacroDict    dictionary used to replace macro
     #
-    def _GetRAWData(self, FfsFileObj, MacroDict = {}):
+    def _GetRAWData(self, FfsFileObj):
         FfsFileObj.FileName = []
         FfsFileObj.SubAlignment = []
         while True:
@@ -2756,26 +2751,18 @@ class FdfParser:
 
         return False
 
-    ## _GetFilePart() method
+    ## _GetSectionData() method
     #
     #   Get section data for FILE statement
     #
     #   @param  self        The object pointer
     #   @param  FfsFileObj   for whom section is got
-    #   @param  MacroDict   dictionary used to replace macro
     #
-    def _GetSectionData(self, FfsFileObj, MacroDict = {}):
-        Dict = {}
-        Dict.update(MacroDict)
-
+    def _GetSectionData(self, FfsFileObj):
         self._GetDefineStatements(FfsFileObj)
 
-        Dict.update(FfsFileObj.DefineVarDict)
-        self._GetAprioriSection(FfsFileObj, Dict.copy())
-        self._GetAprioriSection(FfsFileObj, Dict.copy())
-
         while True:
-            IsLeafSection = self._GetLeafSection(FfsFileObj, Dict)
+            IsLeafSection = self._GetLeafSection(FfsFileObj)
             IsEncapSection = self._GetEncapsulationSec(FfsFileObj)
             if not IsLeafSection and not IsEncapSection:
                 break
@@ -2786,11 +2773,10 @@ class FdfParser:
     #
     #   @param  self        The object pointer
     #   @param  Obj         for whom leaf section is got
-    #   @param  MacroDict   dictionary used to replace macro
     #   @retval True        Successfully find section statement
     #   @retval False       Not able to find section statement
     #
-    def _GetLeafSection(self, Obj, MacroDict = {}):
+    def _GetLeafSection(self, Obj):
         OldPos = self.GetFileBufferPos()
 
         if not self._IsKeyword("SECTION"):
@@ -2861,17 +2847,15 @@ class FdfParser:
                 FvObj = FV()
                 FvObj.UiFvName = FvName.upper()
                 self._GetDefineStatements(FvObj)
-                MacroDict.update(FvObj.DefineVarDict)
+
                 self._GetBlockStatement(FvObj)
                 self._GetSetStatements(FvObj)
                 self._GetFvAlignment(FvObj)
                 self._GetFvAttributes(FvObj)
-                self._GetAprioriSection(FvObj, MacroDict.copy())
-                self._GetAprioriSection(FvObj, MacroDict.copy())
 
                 while True:
                     IsInf = self._GetInfStatement(FvObj)
-                    IsFile = self._GetFileStatement(FvObj, MacroDict.copy())
+                    IsFile = self._GetFileStatement(FvObj)
                     if not IsInf and not IsFile:
                         break
 
