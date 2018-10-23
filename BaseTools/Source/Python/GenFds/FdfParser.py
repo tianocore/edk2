@@ -2090,8 +2090,7 @@ class FdfParser:
         if not self._IsToken(TAB_SECTION_END):
             raise Warning("expected ']'", self.FileName, self.CurrentLineNumber)
 
-        FvObj = FV()
-        FvObj.UiFvName = self.CurrentFvName
+        FvObj = FV(Name=self.CurrentFvName)
         self.Profile.FvDict[self.CurrentFvName] = FvObj
 
         Status = self._GetCreateFile(FvObj)
@@ -2102,9 +2101,6 @@ class FdfParser:
 
         self._GetAddressStatements(FvObj)
 
-        FvObj.FvExtEntryTypeValue = []
-        FvObj.FvExtEntryType = []
-        FvObj.FvExtEntryData = []
         while True:
             self._GetSetStatements(FvObj)
 

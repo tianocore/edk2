@@ -37,8 +37,8 @@ class FV (object):
     #
     #   @param  self        The object pointer
     #
-    def __init__(self):
-        self.UiFvName = None
+    def __init__(self, Name=None):
+        self.UiFvName = Name
         self.CreateFileName = None
         self.BlockSizeList = []
         self.DefineVarDict = {}
@@ -61,7 +61,9 @@ class FV (object):
         self.FvForceRebase = None
         self.FvRegionInFD = None
         self.UsedSizeEnable = False
-
+        self.FvExtEntryTypeValue = []
+        self.FvExtEntryType = []
+        self.FvExtEntryData = []
     ## AddToBuffer()
     #
     #   Generate Fv and add it to the Buffer
@@ -77,7 +79,6 @@ class FV (object):
     #   @retval string      Generated FV file path
     #
     def AddToBuffer (self, Buffer, BaseAddress=None, BlockSize= None, BlockNum=None, ErasePloarity='1', VtfDict=None, MacroDict = {}, Flag=False):
-
         if BaseAddress is None and self.UiFvName.upper() + 'fv' in GenFdsGlobalVariable.ImageBinDict:
             return GenFdsGlobalVariable.ImageBinDict[self.UiFvName.upper() + 'fv']
 
