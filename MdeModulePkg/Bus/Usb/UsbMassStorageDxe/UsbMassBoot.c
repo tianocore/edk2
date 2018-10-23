@@ -861,7 +861,7 @@ UsbBootReadWriteBlocks (
                UsbMass,
                &Cmd,
                (UINT8) sizeof (USB_BOOT_READ_WRITE_10_CMD),
-               EfiUsbDataIn,
+               Write ? EfiUsbDataOut : EfiUsbDataIn,
                Buffer,
                ByteSize,
                Timeout
@@ -941,7 +941,7 @@ UsbBootReadWriteBlocks16 (
                UsbMass,
                Cmd,
                (UINT8) sizeof (Cmd),
-               EfiUsbDataIn,
+               Write ? EfiUsbDataOut : EfiUsbDataIn,
                Buffer,
                ByteSize,
                Timeout
