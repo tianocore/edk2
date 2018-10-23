@@ -18,21 +18,24 @@
 from __future__ import absolute_import
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
 import Common.LongFilePathOs as os
-from CommonDataClass.FdfClass import VtfClassObject
 from Common.LongFilePathSupport import OpenLongFilePath as open
-T_CHAR_LF = '\n'
+from Common.DataType import TAB_LINE_BREAK
 
 ## generate VTF
 #
 #
-class Vtf (VtfClassObject):
+class Vtf (object):
 
     ## The constructor
     #
     #   @param  self        The object pointer
     #
     def __init__(self):
-        VtfClassObject.__init__(self)
+        self.KeyArch = None
+        self.ArchList = None
+        self.UiName = None
+        self.ResetBin = None
+        self.ComponentStatementList = []
 
     ## GenVtf() method
     #
@@ -44,7 +47,6 @@ class Vtf (VtfClassObject):
     #
     def GenVtf(self, FdAddressDict) :
         self.GenBsfInf()
-        OutputFile = os.path.join(GenFdsGlobalVariable.FvDir, self.UiName + '.Vtf')
         BaseAddArg = self.GetBaseAddressArg(FdAddressDict)
         OutputArg, VtfRawDict = self.GenOutputArg()
 
@@ -69,57 +71,57 @@ class Vtf (VtfClassObject):
         FvList = self.GetFvList()
         self.BsfInfName = os.path.join(GenFdsGlobalVariable.FvDir, self.UiName + '.inf')
         BsfInf = open(self.BsfInfName, 'w+')
-        if self.ResetBin is not None:
-            BsfInf.writelines ("[OPTIONS]" + T_CHAR_LF)
+        if self.ResetBin:
+            BsfInf.writelines ("[OPTIONS]" + TAB_LINE_BREAK)
             BsfInf.writelines ("IA32_RST_BIN" + \
                                " = " + \
                                GenFdsGlobalVariable.MacroExtend(GenFdsGlobalVariable.ReplaceWorkspaceMacro(self.ResetBin)) + \
-                               T_CHAR_LF)
-            BsfInf.writelines (T_CHAR_LF)
+                               TAB_LINE_BREAK)
+            BsfInf.writelines (TAB_LINE_BREAK)
 
-        BsfInf.writelines ("[COMPONENTS]" + T_CHAR_LF)
+        BsfInf.writelines ("[COMPONENTS]" + TAB_LINE_BREAK)
 
         for ComponentObj in self.ComponentStatementList :
             BsfInf.writelines ("COMP_NAME" + \
                                " = " + \
                                ComponentObj.CompName + \
-                               T_CHAR_LF)
+                               TAB_LINE_BREAK)
             if ComponentObj.CompLoc.upper() == 'NONE':
                 BsfInf.writelines ("COMP_LOC" + \
                                    " = " + \
                                    'N' + \
-                                   T_CHAR_LF)
+                                   TAB_LINE_BREAK)
 
-            elif ComponentObj.FilePos is not None:
+            elif ComponentObj.FilePos:
                 BsfInf.writelines ("COMP_LOC" + \
                                    " = " + \
                                    ComponentObj.FilePos + \
-                                   T_CHAR_LF)
+                                   TAB_LINE_BREAK)
             else:
                 Index = FvList.index(ComponentObj.CompLoc.upper())
                 if Index == 0:
                     BsfInf.writelines ("COMP_LOC" + \
                                        " = " + \
                                        'F' + \
-                                       T_CHAR_LF)
+                                       TAB_LINE_BREAK)
                 elif Index == 1:
                     BsfInf.writelines ("COMP_LOC" + \
                                        " = " + \
                                        'S' + \
-                                       T_CHAR_LF)
+                                       TAB_LINE_BREAK)
 
             BsfInf.writelines ("COMP_TYPE" + \
                                " = " + \
                                ComponentObj.CompType + \
-                               T_CHAR_LF)
+                               TAB_LINE_BREAK)
             BsfInf.writelines ("COMP_VER" + \
                                " = " + \
                                ComponentObj.CompVer + \
-                               T_CHAR_LF)
+                               TAB_LINE_BREAK)
             BsfInf.writelines ("COMP_CS" + \
                                " = " + \
                                ComponentObj.CompCs + \
-                               T_CHAR_LF)
+                               TAB_LINE_BREAK)
 
             BinPath = ComponentObj.CompBin
             if BinPath != '-':
@@ -127,7 +129,7 @@ class Vtf (VtfClassObject):
             BsfInf.writelines ("COMP_BIN" + \
                                " = " + \
                                BinPath + \
-                               T_CHAR_LF)
+                               TAB_LINE_BREAK)
 
             SymPath = ComponentObj.CompSym
             if SymPath != '-':
@@ -135,12 +137,12 @@ class Vtf (VtfClassObject):
             BsfInf.writelines ("COMP_SYM" + \
                                " = " + \
                                SymPath + \
-                               T_CHAR_LF)
+                               TAB_LINE_BREAK)
             BsfInf.writelines ("COMP_SIZE" + \
                                " = " + \
                                ComponentObj.CompSize + \
-                               T_CHAR_LF)
-            BsfInf.writelines (T_CHAR_LF)
+                               TAB_LINE_BREAK)
+            BsfInf.writelines (TAB_LINE_BREAK)
 
         BsfInf.close()
 

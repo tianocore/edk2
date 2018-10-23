@@ -19,7 +19,7 @@ from __future__ import absolute_import
 from . import Section
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
 import subprocess
-from .Ffs import Ffs
+from .Ffs import SectionSuffix
 import Common.LongFilePathOs as os
 from CommonDataClass.FdfClass import DataSectionClassObject
 from Common.Misc import PeImageClass
@@ -121,7 +121,7 @@ class DataSection (DataSectionClassObject):
                 )
             self.SectFileName = TeFile
 
-        OutputFile = os.path.join (OutputPath, ModuleName + SUP_MODULE_SEC + SecNum + Ffs.SectionSuffix.get(self.SecType))
+        OutputFile = os.path.join (OutputPath, ModuleName + SUP_MODULE_SEC + SecNum + SectionSuffix.get(self.SecType))
         OutputFile = os.path.normpath(OutputFile)
         GenFdsGlobalVariable.GenerateSection(OutputFile, [self.SectFileName], Section.Section.SectionType.get(self.SecType), IsMakefile = IsMakefile)
         FileList = [OutputFile]

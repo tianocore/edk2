@@ -37,50 +37,6 @@ class FDClassObject:
         self.RegionList = []
         self.vtfRawDict = {}
 
-## FV data in FDF
-#
-#
-class FvClassObject:
-    ## The constructor
-    #
-    #   @param  self        The object pointer
-    #
-    def __init__(self):
-        self.UiFvName = None
-        self.CreateFileName = None
-        # 3-tuple list (blockSize, numBlocks, pcd)
-        self.BlockSizeList = []
-        # DefineVarDict[var] = value
-        self.DefineVarDict = {}
-        # SetVarDict[var] = value
-        self.SetVarDict = {}
-        self.FvAlignment = None
-        # FvAttributeDict[attribute] = TRUE/FALSE (1/0)
-        self.FvAttributeDict = {}
-        self.FvNameGuid = None
-        self.FvNameString = None
-        self.AprioriSectionList = []
-        self.FfsList = []
-        self.BsBaseAddress = None
-        self.RtBaseAddress = None
-
-## Region data in FDF
-#
-#
-class RegionClassObject:
-    ## The constructor
-    #
-    #   @param  self        The object pointer
-    #
-    def __init__(self):
-        self.Offset = None       # The begin position of the Region
-        self.Size = None         # The Size of the Region
-        self.PcdOffset = None
-        self.PcdSize = None
-        self.SetVarDict = {}
-        self.RegionType = None
-        self.RegionDataList = []
-
 ## FFS data in FDF
 #
 #
@@ -112,7 +68,6 @@ class FileStatementClassObject (FfsClassObject) :
         self.FvName = None
         self.FdName = None
         self.DefineVarDict = {}
-        self.AprioriSection = None
         self.KeepReloc = None
 
 ## INF statement data in FDF
@@ -133,19 +88,6 @@ class FfsInfStatementClassObject(FfsClassObject):
         self.KeyStringList = []
         self.KeepReloc = None
         self.UseArch = None
-
-## APRIORI section data in FDF
-#
-#
-class AprioriSectionClassObject:
-    ## The constructor
-    #
-    #   @param  self        The object pointer
-    #
-    def __init__(self):
-        # DefineVarDict[var] = value
-        self.DefineVarDict = {}
-        self.FfsList = []
 
 ## section data in FDF
 #
@@ -362,21 +304,6 @@ class CapsuleClassObject :
         self.TokensDict = {}
         self.CapsuleDataList = []
         self.FmpPayloadList = []
-
-## VTF data in FDF
-#
-#
-class VtfClassObject :
-    ## The constructor
-    #
-    #   @param  self        The object pointer
-    #
-    def __init__(self):
-        self.KeyArch = None
-        self.ArchList = None
-        self.UiName = None
-        self.ResetBin = None
-        self.ComponentStatementList = []
 
 ## VTF component data in FDF
 #

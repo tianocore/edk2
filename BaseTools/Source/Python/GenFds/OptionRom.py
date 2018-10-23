@@ -26,8 +26,6 @@ from Common.Misc import SaveFileOnChange
 from Common import EdkLogger
 from Common.BuildToolError import *
 
-T_CHAR_LF = '\n'
-
 ##
 #
 #
@@ -36,9 +34,9 @@ class OPTIONROM (OptionRomClassObject):
     #
     #   @param  self        The object pointer
     #
-    def __init__(self):
+    def __init__(self, Name = ""):
         OptionRomClassObject.__init__(self)
-
+        self.DriverName = Name
 
     ## AddToBuffer()
     #

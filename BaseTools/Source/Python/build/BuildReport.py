@@ -46,6 +46,7 @@ from Common.StringUtils import NormPath
 from Common.DataType import *
 import collections
 from Common.Expression import *
+from GenFds.AprioriSection import DXE_APRIORI_GUID, PEI_APRIORI_GUID
 
 ## Pattern to extract contents in EDK DXS files
 gDxsDependencyPattern = re.compile(r"DEPENDENCY_START(.+)DEPENDENCY_END", re.DOTALL)
@@ -1873,8 +1874,8 @@ class FdRegionReport(object):
         #
         # Add PEI and DXE a priori files GUIDs defined in PI specification.
         #
-        self._GuidsDb["1B45CC0A-156A-428A-AF62-49864DA0E6E6"] = "PEI Apriori"
-        self._GuidsDb["FC510EE7-FFDC-11D4-BD41-0080C73C8881"] = "DXE Apriori"
+        self._GuidsDb[PEI_APRIORI_GUID] = "PEI Apriori"
+        self._GuidsDb[DXE_APRIORI_GUID] = "DXE Apriori"
         #
         # Add ACPI table storage file
         #

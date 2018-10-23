@@ -16,7 +16,6 @@
 # Import Modules
 #
 from __future__ import absolute_import
-from . import Ffs
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from io import BytesIO
 from struct import pack
