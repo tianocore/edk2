@@ -584,6 +584,7 @@ NvmeCreateIoCompletionQueue (
   UINT16                                   QueueSize;
 
   Status = EFI_SUCCESS;
+  Private->CreateIoQueue = TRUE;
 
   for (Index = 1; Index < NVME_MAX_QUEUES; Index++) {
     ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
@@ -627,6 +628,8 @@ NvmeCreateIoCompletionQueue (
     }
   }
 
+  Private->CreateIoQueue = FALSE;
+
   return Status;
 }
 
@@ -653,6 +656,7 @@ NvmeCreateIoSubmissionQueue (
   UINT16                                   QueueSize;
 
   Status = EFI_SUCCESS;
+  Private->CreateIoQueue = TRUE;
 
   for (Index = 1; Index < NVME_MAX_QUEUES; Index++) {
     ZeroMem (&CommandPacket, sizeof(EFI_NVM_EXPRESS_PASS_THRU_COMMAND_PACKET));
@@ -697,6 +701,8 @@ NvmeCreateIoSubmissionQueue (
       break;
     }
   }
+
+  Private->CreateIoQueue = FALSE;
 
   return Status;
 }

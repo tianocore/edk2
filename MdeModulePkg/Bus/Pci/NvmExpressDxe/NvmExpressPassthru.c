@@ -587,14 +587,23 @@ NvmExpressPassThru (
   }
 
   Sq->Prp[0] = (UINT64)(UINTN)Packet->TransferBuffer;
-  //
-  // If the NVMe cmd has data in or out, then mapping the user buffer to the PCI controller specific addresses.
-  // Note here we don't handle data buffer for CreateIOSubmitionQueue and CreateIOCompletionQueue cmds because
-  // these two cmds are special which requires their data buffer must support simultaneous access by both the
-  // processor and a PCI Bus Master. It's caller's responsbility to ensure this.
-  //
-  if (((Sq->Opc & (BIT0 | BIT1)) != 0) &&
-      !((Packet->QueueType == NVME_ADMIN_QUEUE) && ((Sq->Opc == NVME_ADMIN_CRIOCQ_CMD) || (Sq->Opc == NVME_ADMIN_CRIOSQ_CMD)))) {
+  if ((Packet->QueueType == NVME_ADMIN_QUEUE) &&
+      ((Sq->Opc == NVME_ADMIN_CRIOCQ_CMD) || (Sq->Opc == NVME_ADMIN_CRIOSQ_CMD))) {
+    //
+    // Currently, we only use the IO Completion/Submission queues created internally
+    // by this driver during controller initialization. Any other IO queues created
+    // will not be consumed here. The value is little to accept external IO queue
+    // creation requests, so here we will return EFI_UNSUPPORTED for external IO
+    // queue creation request.
+    //
+    if (!Private->CreateIoQueue) {
+      DEBUG ((DEBUG_ERROR, "NvmExpressPassThru: Does not support external IO queues creation request.\n"));
+      return EFI_UNSUPPORTED;
+    }
+  } else if ((Sq->Opc & (BIT0 | BIT1)) != 0) {
+    //
+    // If the NVMe cmd has data in or out, then mapping the user buffer to the PCI controller specific addresses.
+    //
     if (((Packet->TransferLength != 0) && (Packet->TransferBuffer == NULL)) ||
         ((Packet->TransferLength == 0) && (Packet->TransferBuffer != NULL))) {
       return EFI_INVALID_PARAMETER;
