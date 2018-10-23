@@ -70,6 +70,7 @@ SEPARATORS = {TAB_EQUAL_SPLIT, TAB_VALUE_SPLIT, TAB_COMMA_SPLIT, '{', '}'}
 ALIGNMENTS = {"Auto", "8", "16", "32", "64", "128", "512", "1K", "4K", "32K", "64K", "128K",
                                     "256K", "512K", "1M", "2M", "4M", "8M", "16M"}
 ALIGNMENT_NOAUTO = ALIGNMENTS - {"Auto"}
+CR_LB_SET = {T_CHAR_CR, TAB_LINE_BREAK}
 
 RegionSizePattern = compile("\s*(?P<base>(?:0x|0X)?[a-fA-F0-9]+)\s*\|\s*(?P<size>(?:0x|0X)?[a-fA-F0-9]+)\s*")
 RegionSizeGuidPattern = compile("\s*(?P<base>\w+\.\w+[\.\w\[\]]*)\s*\|\s*(?P<size>\w+\.\w+[\.\w\[\]]*)\s*")
@@ -266,7 +267,7 @@ class FdfParser:
     #
     def _SkipWhiteSpace(self):
         while not self._EndOfFile():
-            if self._CurrentChar() in (TAB_PRINTCHAR_NUL, T_CHAR_CR, TAB_LINE_BREAK, TAB_SPACE_SPLIT, T_CHAR_TAB):
+            if self._CurrentChar() in {TAB_PRINTCHAR_NUL, T_CHAR_CR, TAB_LINE_BREAK, TAB_SPACE_SPLIT, T_CHAR_TAB}:
                 self._SkippedChars += str(self._CurrentChar())
                 self._GetOneChar()
             else:
@@ -406,14 +407,14 @@ class FdfParser:
             return
 
         Offset = StartPos[1]
-        while self.Profile.FileLinesList[StartPos[0]][Offset] not in (T_CHAR_CR, TAB_LINE_BREAK):
+        while self.Profile.FileLinesList[StartPos[0]][Offset] not in CR_LB_SET:
             self.Profile.FileLinesList[StartPos[0]][Offset] = Value
             Offset += 1
 
         Line = StartPos[0]
         while Line < EndPos[0]:
             Offset = 0
-            while self.Profile.FileLinesList[Line][Offset] not in (T_CHAR_CR, TAB_LINE_BREAK):
+            while self.Profile.FileLinesList[Line][Offset] not in CR_LB_SET:
                 self.Profile.FileLinesList[Line][Offset] = Value
                 Offset += 1
             Line += 1
@@ -707,7 +708,7 @@ class FdfParser:
                     PreIndex = 0
                     StartPos = CurLine.find('$(', PreIndex)
                     EndPos = CurLine.find(')', StartPos+2)
-                    while StartPos != -1 and EndPos != -1 and self._Token not in [TAB_IF_DEF, TAB_IF_N_DEF, TAB_IF, TAB_ELSE_IF]:
+                    while StartPos != -1 and EndPos != -1 and self._Token not in {TAB_IF_DEF, TAB_IF_N_DEF, TAB_IF, TAB_ELSE_IF}:
                         MacroName = CurLine[StartPos+2: EndPos]
                         MacorValue = self._GetMacroValue(MacroName)
                         if MacorValue is not None:
@@ -759,7 +760,7 @@ class FdfParser:
                 self.Profile.PcdFileLineDict[PcdPair] = FileLineTuple
 
                 self._WipeOffArea.append(((SetLine, SetOffset), (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
-            elif self._Token in (TAB_IF_DEF, TAB_IF_N_DEF, TAB_IF):
+            elif self._Token in {TAB_IF_DEF, TAB_IF_N_DEF, TAB_IF}:
                 IfStartPos = (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - len(self._Token))
                 IfList.append([IfStartPos, None, None])
 
@@ -777,7 +778,7 @@ class FdfParser:
                 IfList[-1] = [IfList[-1][0], ConditionSatisfied, BranchDetermined]
                 if ConditionSatisfied:
                     self._WipeOffArea.append((IfList[-1][0], (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - 1)))
-            elif self._Token in (TAB_ELSE_IF, '!else'):
+            elif self._Token in {TAB_ELSE_IF, TAB_ELSE}:
                 ElseStartPos = (self.CurrentLineNumber - 1, self.CurrentOffsetWithinLine - len(self._Token))
                 if len(IfList) <= 0:
                     raise Warning("Missing !if statement", self.FileName, self.CurrentLineNumber)
@@ -860,13 +861,12 @@ class FdfParser:
 
         MacroDict.update(GlobalData.gGlobalDefines)
         MacroDict.update(GlobalData.gCommandLineDefines)
-        if GlobalData.BuildOptionPcd:
-            for Item in GlobalData.BuildOptionPcd:
-                if isinstance(Item, tuple):
-                    continue
-                PcdName, TmpValue = Item.split(TAB_EQUAL_SPLIT)
-                TmpValue = BuildOptionValue(TmpValue, {})
-                MacroDict[PcdName.strip()] = TmpValue
+        for Item in GlobalData.BuildOptionPcd:
+            if isinstance(Item, tuple):
+                continue
+            PcdName, TmpValue = Item.split(TAB_EQUAL_SPLIT)
+            TmpValue = BuildOptionValue(TmpValue, {})
+            MacroDict[PcdName.strip()] = TmpValue
         # Highest priority
 
         return MacroDict
@@ -967,7 +967,7 @@ class FdfParser:
     def _GetExpression(self):
         Line = self.Profile.FileLinesList[self.CurrentLineNumber - 1]
         Index = len(Line) - 1
-        while Line[Index] in [T_CHAR_CR, TAB_LINE_BREAK]:
+        while Line[Index] in CR_LB_SET:
             Index -= 1
         ExpressionString = self.Profile.FileLinesList[self.CurrentLineNumber - 1][self.CurrentOffsetWithinLine:Index+1]
         self.CurrentOffsetWithinLine += len(ExpressionString)
@@ -1066,7 +1066,7 @@ class FdfParser:
         if self.CurrentLineNumber != StartLine:
             EndPos = len(self.Profile.FileLinesList[StartLine-1])
         self._Token = self.Profile.FileLinesList[StartLine-1][StartPos: EndPos]
-        if self._Token.lower() in [TAB_IF, TAB_END_IF, TAB_ELSE_IF, TAB_ELSE, TAB_IF_DEF, TAB_IF_N_DEF, TAB_ERROR, TAB_INCLUDE]:
+        if self._Token.lower() in {TAB_IF, TAB_END_IF, TAB_ELSE_IF, TAB_ELSE, TAB_IF_DEF, TAB_IF_N_DEF, TAB_ERROR, TAB_INCLUDE}:
             self._Token = self._Token.lower()
         if StartPos != self.CurrentOffsetWithinLine:
             return True
@@ -1813,7 +1813,7 @@ class FdfParser:
         if not self._GetNextWord():
             return True
 
-        if not self._Token in ("SET", BINARY_FILE_TYPE_FV, "FILE", "DATA", "CAPSULE", "INF"):
+        if not self._Token in {"SET", BINARY_FILE_TYPE_FV, "FILE", "DATA", "CAPSULE", "INF"}:
             #
             # If next token is a word which is not a valid FV type, it might be part of [PcdOffset[|PcdSize]]
             # Or it might be next region's offset described by an expression which starts with a PCD.
@@ -2147,10 +2147,10 @@ class FdfParser:
         if not self._GetNextToken():
             raise Warning("expected alignment value", self.FileName, self.CurrentLineNumber)
 
-        if self._Token.upper() not in ("1", "2", "4", "8", "16", "32", "64", "128", "256", "512", \
+        if self._Token.upper() not in {"1", "2", "4", "8", "16", "32", "64", "128", "256", "512", \
                                         "1K", "2K", "4K", "8K", "16K", "32K", "64K", "128K", "256K", "512K", \
                                         "1M", "2M", "4M", "8M", "16M", "32M", "64M", "128M", "256M", "512M", \
-                                        "1G", "2G"):
+                                        "1G", "2G"}:
             raise Warning("Unknown alignment value '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
         Obj.FvAlignment = self._Token
         return True
@@ -2198,12 +2198,12 @@ class FdfParser:
         if not self._GetNextToken():
             raise Warning("expected FvForceRebase value", self.FileName, self.CurrentLineNumber)
 
-        if self._Token.upper() not in ["TRUE", "FALSE", "0", "0X0", "0X00", "1", "0X1", "0X01"]:
+        if self._Token.upper() not in {"TRUE", "FALSE", "0", "0X0", "0X00", "1", "0X1", "0X01"}:
             raise Warning("Unknown FvForceRebase value '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
 
-        if self._Token.upper() in ["TRUE", "1", "0X1", "0X01"]:
+        if self._Token.upper() in {"TRUE", "1", "0X1", "0X01"}:
             Obj.FvForceRebase = True
-        elif self._Token.upper() in ["FALSE", "0", "0X0", "0X00"]:
+        elif self._Token.upper() in {"FALSE", "0", "0X0", "0X00"}:
             Obj.FvForceRebase = False
         else:
             Obj.FvForceRebase = None
@@ -2224,19 +2224,19 @@ class FdfParser:
         while self._GetNextWord():
             IsWordToken = True
             name = self._Token
-            if name not in ("ERASE_POLARITY", "MEMORY_MAPPED", \
+            if name not in {"ERASE_POLARITY", "MEMORY_MAPPED", \
                            "STICKY_WRITE", "LOCK_CAP", "LOCK_STATUS", "WRITE_ENABLED_CAP", \
                            "WRITE_DISABLED_CAP", "WRITE_STATUS", "READ_ENABLED_CAP", \
                            "READ_DISABLED_CAP", "READ_STATUS", "READ_LOCK_CAP", \
                            "READ_LOCK_STATUS", "WRITE_LOCK_CAP", "WRITE_LOCK_STATUS", \
-                           "WRITE_POLICY_RELIABLE", "WEAK_ALIGNMENT", "FvUsedSizeEnable"):
+                           "WRITE_POLICY_RELIABLE", "WEAK_ALIGNMENT", "FvUsedSizeEnable"}:
                 self._UndoToken()
                 return False
 
             if not self._IsToken(TAB_EQUAL_SPLIT):
                 raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
 
-            if not self._GetNextToken() or self._Token.upper() not in ("TRUE", "FALSE", "1", "0"):
+            if not self._GetNextToken() or self._Token.upper() not in {"TRUE", "FALSE", "1", "0"}:
                 raise Warning("expected TRUE/FALSE (1/0)", self.FileName, self.CurrentLineNumber)
 
             FvObj.FvAttributeDict[name] = self._Token
@@ -2272,7 +2272,7 @@ class FdfParser:
         if not self._IsToken(TAB_EQUAL_SPLIT):
             raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
 
-        if not self._GetNextToken() or self._Token not in ('TRUE', 'FALSE'):
+        if not self._GetNextToken() or self._Token not in {'TRUE', 'FALSE'}:
             raise Warning("expected TRUE or FALSE for FvNameString", self.FileName, self.CurrentLineNumber)
 
         FvObj.FvNameString = self._Token
@@ -2586,7 +2586,7 @@ class FdfParser:
     #
     @staticmethod
     def _FileCouldHaveRelocFlag (FileType):
-        if FileType in (SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM, 'PEI_DXE_COMBO'):
+        if FileType in {SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM, 'PEI_DXE_COMBO'}:
             return True
         else:
             return False
@@ -2601,7 +2601,7 @@ class FdfParser:
     #
     @staticmethod
     def _SectionCouldHaveRelocFlag (SectionType):
-        if SectionType in (BINARY_FILE_TYPE_TE, BINARY_FILE_TYPE_PE32):
+        if SectionType in {BINARY_FILE_TYPE_TE, BINARY_FILE_TYPE_PE32}:
             return True
         else:
             return False
@@ -2647,7 +2647,7 @@ class FdfParser:
                 raise Warning("expected FD name", self.FileName, self.CurrentLineNumber)
             FfsFileObj.FdName = self._Token
 
-        elif self._Token in (TAB_DEFINE, "APRIORI", "SECTION"):
+        elif self._Token in {TAB_DEFINE, "APRIORI", "SECTION"}:
             self._UndoToken()
             self._GetSectionData(FfsFileObj, MacroDict)
 
@@ -2919,8 +2919,8 @@ class FdfParser:
                 self.SetFileBufferPos(OldPos)
                 return False
 
-            if self._Token not in ("COMPAT16", BINARY_FILE_TYPE_PE32, BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,\
-                               BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, "SUBTYPE_GUID", BINARY_FILE_TYPE_SMM_DEPEX):
+            if self._Token not in {"COMPAT16", BINARY_FILE_TYPE_PE32, BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,\
+                               BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, "SUBTYPE_GUID", BINARY_FILE_TYPE_SMM_DEPEX}:
                 raise Warning("Unknown section type '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
             if AlignValue == 'Auto'and (not self._Token == BINARY_FILE_TYPE_PE32) and (not self._Token == BINARY_FILE_TYPE_TE):
                 raise Warning("Auto alignment can only be used in PE32 or TE section ", self.FileName, self.CurrentLineNumber)
@@ -3067,7 +3067,7 @@ class FdfParser:
                     continue
                 except ValueError:
                     raise Warning("expected Number", self.FileName, self.CurrentLineNumber)
-            elif self._Token.upper() not in ("TRUE", "FALSE", "1", "0"):
+            elif self._Token.upper() not in {"TRUE", "FALSE", "1", "0"}:
                 raise Warning("expected TRUE/FALSE (1/0)", self.FileName, self.CurrentLineNumber)
             AttribDict[AttribKey] = self._Token
 
@@ -3254,21 +3254,21 @@ class FdfParser:
     def _GetCapsuleTokens(self, Obj):
         if not self._GetNextToken():
             return False
-        while self._Token in ("CAPSULE_GUID", "CAPSULE_HEADER_SIZE", "CAPSULE_FLAGS", "OEM_CAPSULE_FLAGS", "CAPSULE_HEADER_INIT_VERSION"):
+        while self._Token in {"CAPSULE_GUID", "CAPSULE_HEADER_SIZE", "CAPSULE_FLAGS", "OEM_CAPSULE_FLAGS", "CAPSULE_HEADER_INIT_VERSION"}:
             Name = self._Token.strip()
             if not self._IsToken(TAB_EQUAL_SPLIT):
                 raise Warning("expected '='", self.FileName, self.CurrentLineNumber)
             if not self._GetNextToken():
                 raise Warning("expected value", self.FileName, self.CurrentLineNumber)
             if Name == 'CAPSULE_FLAGS':
-                if not self._Token in ("PersistAcrossReset", "PopulateSystemTable", "InitiateReset"):
+                if not self._Token in {"PersistAcrossReset", "PopulateSystemTable", "InitiateReset"}:
                     raise Warning("expected PersistAcrossReset, PopulateSystemTable, or InitiateReset", self.FileName, self.CurrentLineNumber)
                 Value = self._Token.strip()
                 while self._IsToken(TAB_COMMA_SPLIT):
                     Value += TAB_COMMA_SPLIT
                     if not self._GetNextToken():
                         raise Warning("expected value", self.FileName, self.CurrentLineNumber)
-                    if not self._Token in ("PersistAcrossReset", "PopulateSystemTable", "InitiateReset"):
+                    if not self._Token in {"PersistAcrossReset", "PopulateSystemTable", "InitiateReset"}:
                         raise Warning("expected PersistAcrossReset, PopulateSystemTable, or InitiateReset", self.FileName, self.CurrentLineNumber)
                     Value += self._Token.strip()
             elif Name == 'OEM_CAPSULE_FLAGS':
@@ -3478,7 +3478,7 @@ class FdfParser:
         AfileName = self._Token
         AfileBaseName = os.path.basename(AfileName)
 
-        if os.path.splitext(AfileBaseName)[1]  not in [".bin", ".BIN", ".Bin", ".dat", ".DAT", ".Dat", ".data", ".DATA", ".Data"]:
+        if os.path.splitext(AfileBaseName)[1]  not in {".bin", ".BIN", ".Bin", ".dat", ".DAT", ".Dat", ".data", ".DATA", ".Data"}:
             raise Warning('invalid binary file type, should be one of "bin",BINARY_FILE_TYPE_BIN,"Bin","dat","DAT","Dat","data","DATA","Data"', \
                           self.FileName, self.CurrentLineNumber)
 
@@ -3568,12 +3568,22 @@ class FdfParser:
     def _GetModuleType(self):
         if not self._GetNextWord():
             raise Warning("expected Module type", self.FileName, self.CurrentLineNumber)
-        if self._Token.upper() not in (SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM, SUP_MODULE_DXE_CORE, \
-                             SUP_MODULE_DXE_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, \
-                             SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_DXE_RUNTIME_DRIVER, \
-                             SUP_MODULE_UEFI_DRIVER, SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_USER_DEFINED, TAB_DEFAULT, SUP_MODULE_BASE, \
-                             EDK_COMPONENT_TYPE_SECURITY_CORE, EDK_COMPONENT_TYPE_COMBINED_PEIM_DRIVER, EDK_COMPONENT_TYPE_PIC_PEIM, EDK_COMPONENT_TYPE_RELOCATABLE_PEIM, \
-                                        "PE32_PEIM", EDK_COMPONENT_TYPE_BS_DRIVER, EDK_COMPONENT_TYPE_RT_DRIVER, EDK_COMPONENT_TYPE_SAL_RT_DRIVER, EDK_COMPONENT_TYPE_APPLICATION, "ACPITABLE", SUP_MODULE_SMM_CORE, SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE):
+        if self._Token.upper() not in {
+                SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM,
+                SUP_MODULE_DXE_CORE, SUP_MODULE_DXE_DRIVER,
+                SUP_MODULE_DXE_SAL_DRIVER, SUP_MODULE_DXE_SMM_DRIVER,
+                SUP_MODULE_DXE_RUNTIME_DRIVER, SUP_MODULE_UEFI_DRIVER,
+                SUP_MODULE_UEFI_APPLICATION, SUP_MODULE_USER_DEFINED,
+                TAB_DEFAULT, SUP_MODULE_BASE,
+                EDK_COMPONENT_TYPE_SECURITY_CORE,
+                EDK_COMPONENT_TYPE_COMBINED_PEIM_DRIVER,
+                EDK_COMPONENT_TYPE_PIC_PEIM,
+                EDK_COMPONENT_TYPE_RELOCATABLE_PEIM, "PE32_PEIM",
+                EDK_COMPONENT_TYPE_BS_DRIVER, EDK_COMPONENT_TYPE_RT_DRIVER,
+                EDK_COMPONENT_TYPE_SAL_RT_DRIVER,
+                EDK_COMPONENT_TYPE_APPLICATION, "ACPITABLE",
+                SUP_MODULE_SMM_CORE, SUP_MODULE_MM_STANDALONE,
+                SUP_MODULE_MM_CORE_STANDALONE}:
             raise Warning("Unknown Module type '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
         return self._Token
 
@@ -3614,8 +3624,10 @@ class FdfParser:
             raise Warning("expected FFS type", self.FileName, self.CurrentLineNumber)
 
         Type = self._Token.strip().upper()
-        if Type not in ("RAW", "FREEFORM", SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM,\
-                             "PEI_DXE_COMBO", "DRIVER", SUP_MODULE_DXE_CORE, EDK_COMPONENT_TYPE_APPLICATION, "FV_IMAGE", "SMM", SUP_MODULE_SMM_CORE, SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE):
+        if Type not in {"RAW", "FREEFORM", SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM,
+                        "PEI_DXE_COMBO", "DRIVER", SUP_MODULE_DXE_CORE, EDK_COMPONENT_TYPE_APPLICATION,
+                        "FV_IMAGE", "SMM", SUP_MODULE_SMM_CORE, SUP_MODULE_MM_STANDALONE,
+                        SUP_MODULE_MM_CORE_STANDALONE}:
             raise Warning("Unknown FV type '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
 
         if not self._IsToken(TAB_EQUAL_SPLIT):
@@ -3707,8 +3719,12 @@ class FdfParser:
 
             SectionName = self._Token
 
-            if SectionName not in ("COMPAT16", BINARY_FILE_TYPE_PE32, BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,\
-                                    BINARY_FILE_TYPE_UI, BINARY_FILE_TYPE_PEI_DEPEX, "VERSION", "SUBTYPE_GUID", BINARY_FILE_TYPE_SMM_DEPEX):
+            if SectionName not in {
+                    "COMPAT16", BINARY_FILE_TYPE_PE32,
+                    BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE",
+                    "RAW",BINARY_FILE_TYPE_DXE_DEPEX, BINARY_FILE_TYPE_UI,
+                    BINARY_FILE_TYPE_PEI_DEPEX, "VERSION", "SUBTYPE_GUID",
+                    BINARY_FILE_TYPE_SMM_DEPEX}:
                 raise Warning("Unknown leaf section name '%s'" % SectionName, self.FileName, self.CurrentLineNumber)
 
 
@@ -3762,8 +3778,12 @@ class FdfParser:
             return False
         SectionName = self._Token
 
-        if SectionName not in ("COMPAT16", BINARY_FILE_TYPE_PE32, BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,\
-                               BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, BINARY_FILE_TYPE_GUID, BINARY_FILE_TYPE_SMM_DEPEX):
+        if SectionName not in {
+                    "COMPAT16", BINARY_FILE_TYPE_PE32,
+                    BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE",
+                    "RAW",BINARY_FILE_TYPE_DXE_DEPEX, BINARY_FILE_TYPE_UI,
+                    BINARY_FILE_TYPE_PEI_DEPEX, "VERSION", "SUBTYPE_GUID",
+                    BINARY_FILE_TYPE_SMM_DEPEX, BINARY_FILE_TYPE_GUID}:
             self._UndoToken()
             return False
 
@@ -3805,8 +3825,13 @@ class FdfParser:
                 if self._IsToken(TAB_VALUE_SPLIT):
                     FvImageSectionObj.FvFileExtension = self._GetFileExtension()
                 elif self._GetNextToken():
-                    if self._Token not in ("}", "COMPAT16", BINARY_FILE_TYPE_PE32, BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,\
-                               BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, BINARY_FILE_TYPE_GUID, BINARY_FILE_TYPE_SMM_DEPEX):
+                    if self._Token not in {
+                            "}", "COMPAT16", BINARY_FILE_TYPE_PE32,
+                            BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE,
+                            "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,
+                            BINARY_FILE_TYPE_UI, "VERSION",
+                            BINARY_FILE_TYPE_PEI_DEPEX, BINARY_FILE_TYPE_GUID,
+                            BINARY_FILE_TYPE_SMM_DEPEX}:
                         FvImageSectionObj.FvFileName = self._Token
                     else:
                         self._UndoToken()
@@ -3886,8 +3911,13 @@ class FdfParser:
         if self._IsToken(TAB_VALUE_SPLIT):
             EfiSectionObj.FileExtension = self._GetFileExtension()
         elif self._GetNextToken():
-            if self._Token not in ("}", "COMPAT16", BINARY_FILE_TYPE_PE32, BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE, "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,\
-                       BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, BINARY_FILE_TYPE_GUID, BINARY_FILE_TYPE_SMM_DEPEX):
+            if self._Token not in {
+                    "}", "COMPAT16", BINARY_FILE_TYPE_PE32,
+                    BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_TE,
+                    "FV_IMAGE", "RAW", BINARY_FILE_TYPE_DXE_DEPEX,
+                    BINARY_FILE_TYPE_UI, "VERSION",
+                    BINARY_FILE_TYPE_PEI_DEPEX, BINARY_FILE_TYPE_GUID,
+                    BINARY_FILE_TYPE_SMM_DEPEX}:
 
                 if self._Token.startswith('PCD'):
                     self._UndoToken()
@@ -3921,7 +3951,7 @@ class FdfParser:
     #
     @staticmethod
     def _RuleSectionCouldBeOptional(SectionType):
-        if SectionType in (BINARY_FILE_TYPE_DXE_DEPEX, BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, "RAW", BINARY_FILE_TYPE_SMM_DEPEX):
+        if SectionType in {BINARY_FILE_TYPE_DXE_DEPEX, BINARY_FILE_TYPE_UI, "VERSION", BINARY_FILE_TYPE_PEI_DEPEX, "RAW", BINARY_FILE_TYPE_SMM_DEPEX}:
             return True
         else:
             return False
@@ -3936,7 +3966,7 @@ class FdfParser:
     #
     @staticmethod
     def _RuleSectionCouldHaveBuildNum(SectionType):
-        if SectionType in ("VERSION"):
+        if SectionType == "VERSION":
             return True
         else:
             return False
@@ -3951,7 +3981,7 @@ class FdfParser:
     #
     @staticmethod
     def _RuleSectionCouldHaveString(SectionType):
-        if SectionType in (BINARY_FILE_TYPE_UI, "VERSION"):
+        if SectionType in {BINARY_FILE_TYPE_UI, "VERSION"}:
             return True
         else:
             return False
@@ -3966,34 +3996,34 @@ class FdfParser:
     #
     def _CheckRuleSectionFileType(self, SectionType, FileType):
         if SectionType == "COMPAT16":
-            if FileType not in ("COMPAT16", "SEC_COMPAT16"):
+            if FileType not in {"COMPAT16", "SEC_COMPAT16"}:
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == BINARY_FILE_TYPE_PE32:
-            if FileType not in (BINARY_FILE_TYPE_PE32, "SEC_PE32"):
+            if FileType not in {BINARY_FILE_TYPE_PE32, "SEC_PE32"}:
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == BINARY_FILE_TYPE_PIC:
-            if FileType not in (BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_PIC):
+            if FileType not in {BINARY_FILE_TYPE_PIC, BINARY_FILE_TYPE_PIC}:
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == BINARY_FILE_TYPE_TE:
-            if FileType not in (BINARY_FILE_TYPE_TE, "SEC_TE"):
+            if FileType not in {BINARY_FILE_TYPE_TE, "SEC_TE"}:
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == "RAW":
-            if FileType not in (BINARY_FILE_TYPE_BIN, "SEC_BIN", "RAW", "ASL", "ACPI"):
+            if FileType not in {BINARY_FILE_TYPE_BIN, "SEC_BIN", "RAW", "ASL", "ACPI"}:
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == BINARY_FILE_TYPE_DXE_DEPEX or SectionType == BINARY_FILE_TYPE_SMM_DEPEX:
-            if FileType not in (BINARY_FILE_TYPE_DXE_DEPEX, "SEC_DXE_DEPEX", BINARY_FILE_TYPE_SMM_DEPEX):
+            if FileType not in {BINARY_FILE_TYPE_DXE_DEPEX, "SEC_DXE_DEPEX", BINARY_FILE_TYPE_SMM_DEPEX}:
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == BINARY_FILE_TYPE_UI:
-            if FileType not in (BINARY_FILE_TYPE_UI, "SEC_UI"):
+            if FileType not in {BINARY_FILE_TYPE_UI, "SEC_UI"}:
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == "VERSION":
-            if FileType not in ("VERSION", "SEC_VERSION"):
+            if FileType not in {"VERSION", "SEC_VERSION"}:
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == BINARY_FILE_TYPE_PEI_DEPEX:
-            if FileType not in (BINARY_FILE_TYPE_PEI_DEPEX, "SEC_PEI_DEPEX"):
+            if FileType not in {BINARY_FILE_TYPE_PEI_DEPEX, "SEC_PEI_DEPEX"}:
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
         elif SectionType == BINARY_FILE_TYPE_GUID:
-            if FileType not in (BINARY_FILE_TYPE_PE32, "SEC_GUID"):
+            if FileType not in {BINARY_FILE_TYPE_PE32, "SEC_GUID"}:
                 raise Warning("Incorrect section file type '%s'" % FileType, self.FileName, self.CurrentLineNumber)
 
     ## _GetRuleEncapsulationSection() method
@@ -4073,6 +4103,7 @@ class FdfParser:
     #   @retval False       Not able to find a VTF
     #
     def _GetVtf(self):
+        HW_ARCH_SET = {TAB_ARCH_IA32, TAB_ARCH_X64, TAB_ARCH_IPF, TAB_ARCH_ARM, TAB_ARCH_AARCH64}
         if not self._GetNextToken():
             return False
 
@@ -4093,7 +4124,7 @@ class FdfParser:
             raise Warning("expected '.'", self.FileName, self.CurrentLineNumber)
 
         Arch = self._SkippedChars.rstrip(TAB_SPLIT).upper()
-        if Arch not in {TAB_ARCH_IA32, TAB_ARCH_X64, TAB_ARCH_IPF, TAB_ARCH_ARM, TAB_ARCH_AARCH64}:
+        if Arch not in HW_ARCH_SET:
             raise Warning("Unknown Arch '%s'" % Arch, self.FileName, self.CurrentLineNumber)
 
         if not self._GetNextWord():
@@ -4107,7 +4138,7 @@ class FdfParser:
         if self._IsToken(TAB_COMMA_SPLIT):
             if not self._GetNextWord():
                 raise Warning("expected Arch list", self.FileName, self.CurrentLineNumber)
-            if self._Token.upper() not in (TAB_ARCH_IA32, TAB_ARCH_X64, TAB_ARCH_IPF, TAB_ARCH_ARM, TAB_ARCH_AARCH64):
+            if self._Token.upper() not in HW_ARCH_SET:
                 raise Warning("Unknown Arch '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
             VtfObj.ArchList = self._Token.upper()
 
@@ -4169,7 +4200,7 @@ class FdfParser:
                 if not self._GetNextWord():
                     raise Warning("Expected Region Name", self.FileName, self.CurrentLineNumber)
 
-                if self._Token not in ("F", "N", "S"):    #, "H", "L", "PH", "PL"): not support
+                if self._Token not in {"F", "N", "S"}:    #, "H", "L", "PH", "PL"): not support
                     raise Warning("Unknown location type '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
 
                 CompStatementObj.FilePos = self._Token
@@ -4185,7 +4216,7 @@ class FdfParser:
 
         if not self._GetNextToken():
             raise Warning("expected Component type", self.FileName, self.CurrentLineNumber)
-        if self._Token not in ("FIT", "PAL_B", "PAL_A", "OEM"):
+        if self._Token not in {"FIT", "PAL_B", "PAL_A", "OEM"}:
             if not self._Token.startswith("0x") or len(self._Token) < 3 or len(self._Token) > 4 or \
                 not self._Token[2] in hexdigits or not self._Token[-1] in hexdigits:
                 raise Warning("Unknown location type '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
@@ -4213,7 +4244,7 @@ class FdfParser:
 
         if not self._GetNextToken():
             raise Warning("expected Component CS", self.FileName, self.CurrentLineNumber)
-        if self._Token not in ("1", "0"):
+        if self._Token not in {"1", "0"}:
             raise Warning("Unknown  Component CS '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
         CompStatementObj.CompCs = self._Token
 
@@ -4538,8 +4569,7 @@ class FdfParser:
     #   @param  FvList      referenced FV by section
     #
     def _GetReferencedFdFvTupleFromSection(self, FfsFile, FdList = [], FvList = []):
-        SectionStack = []
-        SectionStack.extend(FfsFile.SectionList)
+        SectionStack = list(FfsFile.SectionList)
         while SectionStack != []:
             SectionObj = SectionStack.pop()
             if isinstance(SectionObj, FvImageSection):
@@ -4567,9 +4597,8 @@ class FdfParser:
         MaxLength = len (self.Profile.FvDict)
         for FvName in self.Profile.FvDict:
             LogStr = "\nCycle Reference Checking for FV: %s\n" % FvName
-            RefFvStack = []
-            RefFvStack.append(FvName)
-            FdAnalyzedList = []
+            RefFvStack = set(FvName)
+            FdAnalyzedList = set()
 
             Index = 0
             while RefFvStack and Index < MaxLength:
@@ -4594,17 +4623,17 @@ class FdfParser:
                         for FvNameInFd in FvInFdList:
                             LogStr += "FD %s contains FV %s\n" % (RefFdName, FvNameInFd)
                             if FvNameInFd not in RefFvStack:
-                                RefFvStack.append(FvNameInFd)
+                                RefFvStack.add(FvNameInFd)
 
                             if FvName in RefFvStack or FvNameFromStack in RefFvStack:
                                 EdkLogger.info(LogStr)
                                 return True
-                    FdAnalyzedList.append(RefFdName)
+                    FdAnalyzedList.add(RefFdName)
 
                 for RefFvName in RefFvList:
                     LogStr += "FV %s contains FV %s\n" % (FvNameFromStack, RefFvName)
                     if RefFvName not in RefFvStack:
-                        RefFvStack.append(RefFvName)
+                        RefFvStack.add(RefFvName)
 
                     if FvName in RefFvStack or FvNameFromStack in RefFvStack:
                         EdkLogger.info(LogStr)
@@ -4619,13 +4648,12 @@ class FdfParser:
             # Capsule image to be checked.
             #
             LogStr = "\n\n\nCycle Reference Checking for Capsule: %s\n" % CapName
-            RefCapStack = []
-            RefCapStack.append(CapName)
-            FdAnalyzedList = []
-            FvAnalyzedList = []
+            RefCapStack = {CapName}
+            FdAnalyzedList = set()
+            FvAnalyzedList = set()
 
             Index = 0
-            while RefCapStack != [] and Index < MaxLength:
+            while RefCapStack and Index < MaxLength:
                 Index = Index + 1
                 CapNameFromStack = RefCapStack.pop()
                 if CapNameFromStack.upper() in self.Profile.CapsuleDict:
@@ -4645,25 +4673,21 @@ class FdfParser:
                             continue
 
                         LogStr += "Capsule %s contains FD %s\n" % (CapNameFromStack, RefFdName)
-                        CapInFdList = self._GetCapInFd(RefFdName)
-                        if CapInFdList != []:
-                            for CapNameInFd in CapInFdList:
-                                LogStr += "FD %s contains Capsule %s\n" % (RefFdName, CapNameInFd)
-                                if CapNameInFd not in RefCapStack:
-                                    RefCapStack.append(CapNameInFd)
+                        for CapNameInFd in self._GetCapInFd(RefFdName):
+                            LogStr += "FD %s contains Capsule %s\n" % (RefFdName, CapNameInFd)
+                            if CapNameInFd not in RefCapStack:
+                                RefCapStack.append(CapNameInFd)
 
-                                if CapName in RefCapStack or CapNameFromStack in RefCapStack:
-                                    EdkLogger.info(LogStr)
-                                    return True
+                            if CapName in RefCapStack or CapNameFromStack in RefCapStack:
+                                EdkLogger.info(LogStr)
+                                return True
 
-                        FvInFdList = self._GetFvInFd(RefFdName)
-                        if FvInFdList != []:
-                            for FvNameInFd in FvInFdList:
-                                LogStr += "FD %s contains FV %s\n" % (RefFdName, FvNameInFd)
-                                if FvNameInFd not in RefFvList:
-                                    RefFvList.append(FvNameInFd)
+                        for FvNameInFd in self._GetFvInFd(RefFdName):
+                            LogStr += "FD %s contains FV %s\n" % (RefFdName, FvNameInFd)
+                            if FvNameInFd not in RefFvList:
+                                RefFvList.append(FvNameInFd)
 
-                        FdAnalyzedList.append(RefFdName)
+                        FdAnalyzedList.add(RefFdName)
                     #
                     # the number of the parsed FV and FD image
                     #
@@ -4678,7 +4702,7 @@ class FdfParser:
                         else:
                             continue
                         self._GetReferencedFdFvTuple(FvObj, RefFdList, RefFvList)
-                        FvAnalyzedList.append(RefFvName)
+                        FvAnalyzedList.add(RefFvName)
 
         return False
 
