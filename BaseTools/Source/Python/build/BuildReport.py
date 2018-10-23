@@ -126,6 +126,9 @@ gDriverTypeMap = {
 ## The look up table of the supported opcode in the dependency expression binaries
 gOpCodeList = ["BEFORE", "AFTER", "PUSH", "AND", "OR", "NOT", "TRUE", "FALSE", "END", "SOR"]
 
+## Save VPD Pcd
+VPDPcdList = []
+
 ##
 # Writes a string to the file object.
 #
@@ -1401,6 +1404,9 @@ class PcdReport(object):
                                 FileWrite(File, ' %-*s   : %6s %10s %10s = %s' % (self.MaxLen, ' ', TypeName, '(' + Pcd.DatumType + ')', '(' + SkuIdName + ')', Value))
                     if TypeName in ('DYNVPD', 'DEXVPD'):
                         FileWrite(File, '%*s' % (self.MaxLen + 4, SkuInfo.VpdOffset))
+                        VPDPcdItem = (Pcd.TokenSpaceGuidCName + '.' + PcdTokenCName, SkuIdName, SkuInfo.VpdOffset, Pcd.MaxDatumSize, SkuInfo.DefaultValue)
+                        if VPDPcdItem not in VPDPcdList:
+                            VPDPcdList.append(VPDPcdItem)
                     if IsStructure:
                         FiledOverrideFlag = False
                         OverrideValues = Pcd.SkuOverrideValues[Sku]
@@ -2017,34 +2023,13 @@ class FdReport(object):
         self.Size = Fd.Size
         self.FdRegionList = [FdRegionReport(FdRegion, Wa) for FdRegion in Fd.RegionList]
         self.FvPath = os.path.join(Wa.BuildDir, TAB_FV_DIRECTORY)
-        self.VpdFilePath = os.path.join(self.FvPath, "%s.map" % Wa.Platform.VpdToolGuid)
         self.VPDBaseAddress = 0
         self.VPDSize = 0
-        self.VPDInfoList = []
         for index, FdRegion in enumerate(Fd.RegionList):
             if str(FdRegion.RegionType) is 'FILE' and Wa.Platform.VpdToolGuid in str(FdRegion.RegionDataList):
                 self.VPDBaseAddress = self.FdRegionList[index].BaseAddress
                 self.VPDSize = self.FdRegionList[index].Size
                 break
-
-        if os.path.isfile(self.VpdFilePath):
-            fd = open(self.VpdFilePath, "r")
-            Lines = fd.readlines()
-            for Line in Lines:
-                Line = Line.strip()
-                if len(Line) == 0 or Line.startswith("#"):
-                    continue
-                try:
-                    PcdName, SkuId, Offset, Size, Value = Line.split("#")[0].split("|")
-                    PcdName, SkuId, Offset, Size, Value = PcdName.strip(), SkuId.strip(), Offset.strip(), Size.strip(), Value.strip()
-                    if Offset.lower().startswith('0x'):
-                        Offset = '0x%08X' % (int(Offset, 16) + self.VPDBaseAddress)
-                    else:
-                        Offset = '0x%08X' % (int(Offset, 10) + self.VPDBaseAddress)
-                    self.VPDInfoList.append("%s | %s | %s | %s | %s" % (PcdName, SkuId, Offset, Size, Value))
-                except:
-                    EdkLogger.error("BuildReport", CODE_ERROR, "Fail to parse VPD information file %s" % self.VpdFilePath)
-            fd.close()
 
     ##
     # Generate report for the firmware device.
@@ -2065,23 +2050,26 @@ class FdReport(object):
             for FdRegionItem in self.FdRegionList:
                 FdRegionItem.GenerateReport(File)
 
-        if len(self.VPDInfoList) > 0:
+        if VPDPcdList:
+            VPDPcdList.sort(key=lambda x: int(x[2], 0))
             FileWrite(File, gSubSectionStart)
             FileWrite(File, "FD VPD Region")
             FileWrite(File, "Base Address:       0x%X" % self.VPDBaseAddress)
             FileWrite(File, "Size:               0x%X (%.0fK)" % (self.VPDSize, self.VPDSize / 1024.0))
             FileWrite(File, gSubSectionSep)
-            for item in self.VPDInfoList:
-                ValueList = item.split('|')
-                Value = ValueList[-1].strip()
-                IsByteArray, ArrayList = ByteArrayForamt(Value)
+            for item in VPDPcdList:
+                # Add BaseAddress for offset
+                Offset = '0x%08X' % (int(item[2], 16) + self.VPDBaseAddress)
+                IsByteArray, ArrayList = ByteArrayForamt(item[-1])
+                Skuinfo = item[1]
+                if len(GlobalData.gSkuids) == 1 :
+                    Skuinfo = GlobalData.gSkuids[0]
                 if IsByteArray:
-                    ValueList[-1] = ' {'
-                    FileWrite(File, '|'.join(ValueList))
+                    FileWrite(File, "%s | %s | %s | %s | %s" % (item[0], Skuinfo, Offset, item[3], '{'))
                     for Array in ArrayList:
                         FileWrite(File, Array)
                 else:
-                    FileWrite(File, item)
+                    FileWrite(File, "%s | %s | %s | %s | %s" % (item[0], Skuinfo, Offset, item[3], item[-1]))
             FileWrite(File, gSubSectionEnd)
         FileWrite(File, gSectionEnd)
 
