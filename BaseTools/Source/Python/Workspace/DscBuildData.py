@@ -1410,6 +1410,7 @@ class DscBuildData(PlatformBuildClassObject):
         SkuIds = self.SkuIds
         self.SkuIdMgr.AvailableSkuIdSet.update({TAB_DEFAULT:0})
         DefaultStores = {storename for pcdobj in AllPcds.values() for skuobj in pcdobj.SkuInfoList.values() for storename in skuobj.DefaultStoreDict}
+        DefaultStores.add(TAB_DEFAULT_STORES_DEFAULT)
 
         S_PcdSet = []
         # Find out all possible PCD candidates for self._Arch
@@ -1597,7 +1598,7 @@ class DscBuildData(PlatformBuildClassObject):
         #
         AvailableSkuIdSet = copy.copy(self.SkuIds)
 
-        PcdDict = tdict(True, 3)
+        PcdDict = tdict(True, 4)
         PcdSet = set()
         # Find out all possible PCD candidates for self._Arch
         RecordList = self._RawData[Type, self._Arch]
@@ -1608,10 +1609,9 @@ class DscBuildData(PlatformBuildClassObject):
             if SkuName not in AvailableSkuIdSet:
                 EdkLogger.error('build ', PARAMETER_INVALID, 'Sku %s is not defined in [SkuIds] section' % SkuName,
                                             File=self.MetaFile, Line=Dummy5)
-            if SkuName in (self.SkuIdMgr.SystemSkuId, TAB_DEFAULT, TAB_COMMON):
-                if "." not in TokenSpaceGuid:
-                    PcdSet.add((PcdCName, TokenSpaceGuid, SkuName, Dummy5))
-                PcdDict[Arch, PcdCName, TokenSpaceGuid, SkuName] = Setting
+            if "." not in TokenSpaceGuid:
+                PcdSet.add((PcdCName, TokenSpaceGuid, SkuName, Dummy5))
+            PcdDict[Arch, PcdCName, TokenSpaceGuid, SkuName] = Setting
 
         for PcdCName, TokenSpaceGuid, SkuName, Dummy4 in PcdSet:
             Setting = PcdDict[self._Arch, PcdCName, TokenSpaceGuid, SkuName]
@@ -1654,10 +1654,11 @@ class DscBuildData(PlatformBuildClassObject):
                                                 False,
                                                 None,
                                                 IsDsc=True)
-
-            if self.SkuIdMgr.SystemSkuId not in Pcds[PcdCName, TokenSpaceGuid].DscRawValue:
-                Pcds[PcdCName, TokenSpaceGuid].DscRawValue[self.SkuIdMgr.SystemSkuId] = {}
-            Pcds[PcdCName, TokenSpaceGuid].DscRawValue[self.SkuIdMgr.SystemSkuId][TAB_DEFAULT_STORES_DEFAULT] = PcdValue
+            for SkuName in PcdValueDict[PcdCName, TokenSpaceGuid]:
+                Settings = PcdValueDict[PcdCName, TokenSpaceGuid][SkuName]
+                if SkuName not in Pcds[PcdCName, TokenSpaceGuid].DscRawValue:
+                    Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName] = {}
+                Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName][TAB_DEFAULT_STORES_DEFAULT] = Settings[0]
         return Pcds
 
     def GetStructurePcdMaxSize(self, str_pcd):
@@ -1892,10 +1893,13 @@ class DscBuildData(PlatformBuildClassObject):
 
         CApp = CApp + "// SkuName: %s,  DefaultStoreName: %s \n" % (TAB_DEFAULT, TAB_DEFAULT_STORES_DEFAULT)
         inherit_OverrideValues = Pcd.SkuOverrideValues[SkuName]
-        if (SkuName, DefaultStoreName) == (TAB_DEFAULT, TAB_DEFAULT_STORES_DEFAULT):
-            pcddefaultvalue = Pcd.DefaultFromDSC.get(TAB_DEFAULT, {}).get(TAB_DEFAULT_STORES_DEFAULT) if Pcd.DefaultFromDSC else None
+        if Pcd.Type in PCD_DYNAMIC_TYPE_SET or Pcd.Type in PCD_DYNAMIC_EX_TYPE_SET:
+            if (SkuName, DefaultStoreName) == (TAB_DEFAULT, TAB_DEFAULT_STORES_DEFAULT):
+                pcddefaultvalue = Pcd.DefaultFromDSC.get(TAB_DEFAULT, {}).get(TAB_DEFAULT_STORES_DEFAULT) if Pcd.DefaultFromDSC else None
+            else:
+                pcddefaultvalue = Pcd.DscRawValue.get(SkuName, {}).get(DefaultStoreName)
         else:
-            pcddefaultvalue = Pcd.DscRawValue.get(SkuName, {}).get(DefaultStoreName)
+            pcddefaultvalue = Pcd.DscRawValue.get(SkuName, {}).get(TAB_DEFAULT_STORES_DEFAULT)
         for FieldList in [pcddefaultvalue, inherit_OverrideValues.get(DefaultStoreName)]:
             if not FieldList:
                 continue
