@@ -2,7 +2,7 @@
   Light-weight Memory Management Routines for OpenSSL-based Crypto
   Library at Runtime Phase.
 
-Copyright (c) 2009 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -141,6 +141,12 @@ LookupFreeMemRegion (
 
   StartPageIndex = RT_SIZE_TO_PAGES (mRTPageTable->LastEmptyPageOffset);
   ReqPages       = RT_SIZE_TO_PAGES (AllocationSize);
+  if (ReqPages > mRTPageTable->PageCount) {
+    //
+    // No enough region for object allocation.
+    //
+    return (UINTN)(-1);
+  }
 
   //
   // Look up the free memory region with in current memory map table.
@@ -176,6 +182,12 @@ LookupFreeMemRegion (
   // Look up the free memory region from the beginning of the memory table
   // until the StartCursorOffset
   //
+  if (ReqPages > StartPageIndex) {
+    //
+    // No enough region for object allocation.
+    //
+    return (UINTN)(-1);
+  }
   for (Index = 0; Index < (StartPageIndex - ReqPages); ) {
     //
     // Check Consecutive ReqPages Pages.
