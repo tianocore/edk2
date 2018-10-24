@@ -4394,10 +4394,12 @@ class FdfParser:
                 if self._IsKeyword("PCI_DEVICE_ID"):
                     if not self._IsToken(TAB_EQUAL_SPLIT):
                         raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
-                    if not self._GetNextHexNumber():
-                        raise Warning.Expected("Hex device id", self.FileName, self.CurrentLineNumber)
-
-                    Overrides.PciDeviceId = self._Token
+                    # Get a list of PCI IDs
+                    Overrides.PciDeviceId = ""
+                    while (self.__GetNextHexNumber()):
+                        Overrides.PciDeviceId = "{} {}".format(Overrides.PciDeviceId, self.__Token)
+                    if not Overrides.PciDeviceId:
+                        raise Warning.Expected("one or more Hex device ids", self.FileName, self.CurrentLineNumber)
                     continue
 
                 if self._IsKeyword("PCI_REVISION"):
