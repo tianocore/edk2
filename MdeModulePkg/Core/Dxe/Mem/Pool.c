@@ -1,7 +1,7 @@
 /** @file
   UEFI Memory pool management functions.
 
-Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -26,7 +26,8 @@ typedef struct {
 } POOL_FREE;
 
 
-#define POOL_HEAD_SIGNATURE   SIGNATURE_32('p','h','d','0')
+#define POOL_HEAD_SIGNATURE       SIGNATURE_32('p','h','d','0')
+#define POOLPAGE_HEAD_SIGNATURE   SIGNATURE_32('p','h','d','1')
 typedef struct {
   UINT32          Signature;
   UINT32          Reserved;
@@ -367,6 +368,7 @@ CoreAllocatePoolI (
   UINTN       NoPages;
   UINTN       Granularity;
   BOOLEAN     HasPoolTail;
+  BOOLEAN     PageAsPool;
 
   ASSERT_LOCKED (&mPoolMemoryLock);
 
@@ -386,6 +388,7 @@ CoreAllocatePoolI (
 
   HasPoolTail  = !(NeedGuard &&
                    ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0));
+  PageAsPool = (IsHeapGuardEnabled (GUARD_HEAP_TYPE_FREED) && !mOnGuarding);
 
   //
   // Adjusting the Size to be of proper alignment so that
@@ -406,7 +409,7 @@ CoreAllocatePoolI (
   // If allocation is over max size, just allocate pages for the request
   // (slow)
   //
-  if (Index >= SIZE_TO_LIST (Granularity) || NeedGuard) {
+  if (Index >= SIZE_TO_LIST (Granularity) || NeedGuard || PageAsPool) {
     if (!HasPoolTail) {
       Size -= sizeof (POOL_TAIL);
     }
@@ -498,7 +501,7 @@ Done:
     //
     // If we have a pool buffer, fill in the header & tail info
     //
-    Head->Signature = POOL_HEAD_SIGNATURE;
+    Head->Signature = (PageAsPool) ? POOLPAGE_HEAD_SIGNATURE : POOL_HEAD_SIGNATURE;
     Head->Size      = Size;
     Head->Type      = (EFI_MEMORY_TYPE) PoolType;
     Buffer          = Head->Data;
@@ -615,6 +618,7 @@ CoreFreePoolPagesI (
   CoreFreePoolPages (Memory, NoPages);
   CoreReleaseMemoryLock ();
 
+  GuardFreedPagesChecked (Memory, NoPages);
   ApplyMemoryProtectionPolicy (PoolType, EfiConventionalMemory,
     (EFI_PHYSICAL_ADDRESS)(UINTN)Memory, EFI_PAGES_TO_SIZE (NoPages));
 }
@@ -685,15 +689,19 @@ CoreFreePoolI (
   UINTN       Granularity;
   BOOLEAN     IsGuarded;
   BOOLEAN     HasPoolTail;
+  BOOLEAN     PageAsPool;
 
   ASSERT(Buffer != NULL);
   //
   // Get the head & tail of the pool entry
   //
-  Head = CR (Buffer, POOL_HEAD, Data, POOL_HEAD_SIGNATURE);
+  Head = BASE_CR (Buffer, POOL_HEAD, Data);
   ASSERT(Head != NULL);
 
-  if (Head->Signature != POOL_HEAD_SIGNATURE) {
+  if (Head->Signature != POOL_HEAD_SIGNATURE &&
+      Head->Signature != POOLPAGE_HEAD_SIGNATURE) {
+    ASSERT (Head->Signature == POOL_HEAD_SIGNATURE ||
+            Head->Signature == POOLPAGE_HEAD_SIGNATURE);
     return EFI_INVALID_PARAMETER;
   }
 
@@ -701,6 +709,7 @@ CoreFreePoolI (
                 IsMemoryGuarded ((EFI_PHYSICAL_ADDRESS)(UINTN)Head);
   HasPoolTail = !(IsGuarded &&
                   ((PcdGet8 (PcdHeapGuardPropertyMask) & BIT7) == 0));
+  PageAsPool = (Head->Signature == POOLPAGE_HEAD_SIGNATURE);
 
   if (HasPoolTail) {
     Tail = HEAD_TO_TAIL (Head);
@@ -757,7 +766,7 @@ CoreFreePoolI (
   //
   // If it's not on the list, it must be pool pages
   //
-  if (Index >= SIZE_TO_LIST (Granularity) || IsGuarded) {
+  if (Index >= SIZE_TO_LIST (Granularity) || IsGuarded || PageAsPool) {
 
     //
     // Return the memory pages back to free memory

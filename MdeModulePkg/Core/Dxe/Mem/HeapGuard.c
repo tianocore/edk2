@@ -44,6 +44,11 @@ GLOBAL_REMOVE_IF_UNREFERENCED UINTN mLevelShift[GUARDED_HEAP_MAP_TABLE_DEPTH]
 GLOBAL_REMOVE_IF_UNREFERENCED UINTN mLevelMask[GUARDED_HEAP_MAP_TABLE_DEPTH]
                                     = GUARDED_HEAP_MAP_TABLE_DEPTH_MASKS;
 
+//
+// Used for promoting freed but not used pages.
+//
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_PHYSICAL_ADDRESS mLastPromotedPage = BASE_4GB;
+
 /**
   Set corresponding bits in bitmap table to 1 according to the address.
 
@@ -379,7 +384,7 @@ ClearGuardedMemoryBits (
 
   @return An integer containing the guarded memory bitmap.
 **/
-UINTN
+UINT64
 GetGuardedMemoryBits (
   IN EFI_PHYSICAL_ADDRESS    Address,
   IN UINTN                   NumberOfPages
@@ -387,7 +392,7 @@ GetGuardedMemoryBits (
 {
   UINT64            *BitMap;
   UINTN             Bits;
-  UINTN             Result;
+  UINT64            Result;
   UINTN             Shift;
   UINTN             BitsToUnitEnd;
 
@@ -660,15 +665,16 @@ IsPageTypeToGuard (
 /**
   Check to see if the heap guard is enabled for page and/or pool allocation.
 
+  @param[in]  GuardType   Specify the sub-type(s) of Heap Guard.
+
   @return TRUE/FALSE.
 **/
 BOOLEAN
 IsHeapGuardEnabled (
-  VOID
+  UINT8           GuardType
   )
 {
-  return IsMemoryTypeToGuard (EfiMaxMemoryType, AllocateAnyPages,
-                              GUARD_HEAP_TYPE_POOL|GUARD_HEAP_TYPE_PAGE);
+  return IsMemoryTypeToGuard (EfiMaxMemoryType, AllocateAnyPages, GuardType);
 }
 
 /**
@@ -1204,6 +1210,380 @@ SetAllGuardPages (
 }
 
 /**
+  Find the address of top-most guarded free page.
+
+  @param[out]  Address    Start address of top-most guarded free page.
+
+  @return VOID.
+**/
+VOID
+GetLastGuardedFreePageAddress (
+  OUT EFI_PHYSICAL_ADDRESS      *Address
+  )
+{
+  EFI_PHYSICAL_ADDRESS    AddressGranularity;
+  EFI_PHYSICAL_ADDRESS    BaseAddress;
+  UINTN                   Level;
+  UINT64                  Map;
+  INTN                    Index;
+
+  ASSERT (mMapLevel >= 1);
+
+  BaseAddress = 0;
+  Map = mGuardedMemoryMap;
+  for (Level = GUARDED_HEAP_MAP_TABLE_DEPTH - mMapLevel;
+       Level < GUARDED_HEAP_MAP_TABLE_DEPTH;
+       ++Level) {
+    AddressGranularity = LShiftU64 (1, mLevelShift[Level]);
+
+    //
+    // Find the non-NULL entry at largest index.
+    //
+    for (Index = (INTN)mLevelMask[Level]; Index >= 0 ; --Index) {
+      if (((UINT64 *)(UINTN)Map)[Index] != 0) {
+        BaseAddress += MultU64x32 (AddressGranularity, (UINT32)Index);
+        Map = ((UINT64 *)(UINTN)Map)[Index];
+        break;
+      }
+    }
+  }
+
+  //
+  // Find the non-zero MSB then get the page address.
+  //
+  while (Map != 0) {
+    Map = RShiftU64 (Map, 1);
+    BaseAddress += EFI_PAGES_TO_SIZE (1);
+  }
+
+  *Address = BaseAddress;
+}
+
+/**
+  Record freed pages.
+
+  @param[in]  BaseAddress   Base address of just freed pages.
+  @param[in]  Pages         Number of freed pages.
+
+  @return VOID.
+**/
+VOID
+MarkFreedPages (
+  IN EFI_PHYSICAL_ADDRESS     BaseAddress,
+  IN UINTN                    Pages
+  )
+{
+  SetGuardedMemoryBits (BaseAddress, Pages);
+}
+
+/**
+  Record freed pages as well as mark them as not-present.
+
+  @param[in]  BaseAddress   Base address of just freed pages.
+  @param[in]  Pages         Number of freed pages.
+
+  @return VOID.
+**/
+VOID
+EFIAPI
+GuardFreedPages (
+  IN  EFI_PHYSICAL_ADDRESS    BaseAddress,
+  IN  UINTN                   Pages
+  )
+{
+  EFI_STATUS      Status;
+
+  //
+  // Legacy memory lower than 1MB might be accessed with no allocation. Leave
+  // them alone.
+  //
+  if (BaseAddress < BASE_1MB) {
+    return;
+  }
+
+  MarkFreedPages (BaseAddress, Pages);
+  if (gCpu != NULL) {
+    //
+    // Set flag to make sure allocating memory without GUARD for page table
+    // operation; otherwise infinite loops could be caused.
+    //
+    mOnGuarding = TRUE;
+    //
+    // Note: This might overwrite other attributes needed by other features,
+    // such as NX memory protection.
+    //
+    Status = gCpu->SetMemoryAttributes (
+                     gCpu,
+                     BaseAddress,
+                     EFI_PAGES_TO_SIZE (Pages),
+                     EFI_MEMORY_RP
+                     );
+    //
+    // Normally we should ASSERT the returned Status. But there might be memory
+    // alloc/free involved in SetMemoryAttributes(), which might fail this
+    // calling. It's rare case so it's OK to let a few tiny holes be not-guarded.
+    //
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "Failed to guard freed pages: %p (%lu)\n", BaseAddress, (UINT64)Pages));
+    }
+    mOnGuarding = FALSE;
+  }
+}
+
+/**
+  Record freed pages as well as mark them as not-present, if enabled.
+
+  @param[in]  BaseAddress   Base address of just freed pages.
+  @param[in]  Pages         Number of freed pages.
+
+  @return VOID.
+**/
+VOID
+EFIAPI
+GuardFreedPagesChecked (
+  IN  EFI_PHYSICAL_ADDRESS    BaseAddress,
+  IN  UINTN                   Pages
+  )
+{
+  if (IsHeapGuardEnabled (GUARD_HEAP_TYPE_FREED)) {
+    GuardFreedPages (BaseAddress, Pages);
+  }
+}
+
+/**
+  Mark all pages freed before CPU Arch Protocol as not-present.
+
+**/
+VOID
+GuardAllFreedPages (
+  VOID
+  )
+{
+  UINTN     Entries[GUARDED_HEAP_MAP_TABLE_DEPTH];
+  UINTN     Shifts[GUARDED_HEAP_MAP_TABLE_DEPTH];
+  UINTN     Indices[GUARDED_HEAP_MAP_TABLE_DEPTH];
+  UINT64    Tables[GUARDED_HEAP_MAP_TABLE_DEPTH];
+  UINT64    Addresses[GUARDED_HEAP_MAP_TABLE_DEPTH];
+  UINT64    TableEntry;
+  UINT64    Address;
+  UINT64    GuardPage;
+  INTN      Level;
+  UINTN     BitIndex;
+  UINTN     GuardPageNumber;
+
+  if (mGuardedMemoryMap == 0 ||
+      mMapLevel == 0 ||
+      mMapLevel > GUARDED_HEAP_MAP_TABLE_DEPTH) {
+    return;
+  }
+
+  CopyMem (Entries, mLevelMask, sizeof (Entries));
+  CopyMem (Shifts, mLevelShift, sizeof (Shifts));
+
+  SetMem (Tables, sizeof(Tables), 0);
+  SetMem (Addresses, sizeof(Addresses), 0);
+  SetMem (Indices, sizeof(Indices), 0);
+
+  Level           = GUARDED_HEAP_MAP_TABLE_DEPTH - mMapLevel;
+  Tables[Level]   = mGuardedMemoryMap;
+  Address         = 0;
+  GuardPage       = (UINT64)-1;
+  GuardPageNumber = 0;
+
+  while (TRUE) {
+    if (Indices[Level] > Entries[Level]) {
+      Tables[Level] = 0;
+      Level        -= 1;
+    } else {
+      TableEntry  = ((UINT64 *)(UINTN)(Tables[Level]))[Indices[Level]];
+      Address     = Addresses[Level];
+
+      if (Level < GUARDED_HEAP_MAP_TABLE_DEPTH - 1) {
+        Level            += 1;
+        Tables[Level]     = TableEntry;
+        Addresses[Level]  = Address;
+        Indices[Level]    = 0;
+
+        continue;
+      } else {
+        BitIndex = 1;
+        while (BitIndex != 0) {
+          if ((TableEntry & BitIndex) != 0) {
+            if (GuardPage == (UINT64)-1) {
+              GuardPage = Address;
+            }
+            ++GuardPageNumber;
+          } else if (GuardPageNumber > 0) {
+            GuardFreedPages (GuardPage, GuardPageNumber);
+            GuardPageNumber = 0;
+            GuardPage       = (UINT64)-1;
+          }
+
+          if (TableEntry == 0) {
+            break;
+          }
+
+          Address += EFI_PAGES_TO_SIZE (1);
+          BitIndex = LShiftU64 (BitIndex, 1);
+        }
+      }
+    }
+
+    if (Level < (GUARDED_HEAP_MAP_TABLE_DEPTH - (INTN)mMapLevel)) {
+      break;
+    }
+
+    Indices[Level] += 1;
+    Address = (Level == 0) ? 0 : Addresses[Level - 1];
+    Addresses[Level] = Address | LShiftU64 (Indices[Level], Shifts[Level]);
+
+  }
+
+  //
+  // Update the maximum address of freed page which can be used for memory
+  // promotion upon out-of-memory-space.
+  //
+  GetLastGuardedFreePageAddress (&Address);
+  if (Address != 0) {
+    mLastPromotedPage = Address;
+  }
+}
+
+/**
+  This function checks to see if the given memory map descriptor in a memory map
+  can be merged with any guarded free pages.
+
+  @param  MemoryMapEntry    A pointer to a descriptor in MemoryMap.
+  @param  MaxAddress        Maximum address to stop the merge.
+
+  @return VOID
+
+**/
+VOID
+MergeGuardPages (
+  IN EFI_MEMORY_DESCRIPTOR      *MemoryMapEntry,
+  IN EFI_PHYSICAL_ADDRESS       MaxAddress
+  )
+{
+  EFI_PHYSICAL_ADDRESS        EndAddress;
+  UINT64                      Bitmap;
+  INTN                        Pages;
+
+  if (!IsHeapGuardEnabled (GUARD_HEAP_TYPE_FREED) ||
+      MemoryMapEntry->Type >= EfiMemoryMappedIO) {
+    return;
+  }
+
+  Bitmap = 0;
+  Pages  = EFI_SIZE_TO_PAGES (MaxAddress - MemoryMapEntry->PhysicalStart);
+  Pages -= MemoryMapEntry->NumberOfPages;
+  while (Pages > 0) {
+    if (Bitmap == 0) {
+      EndAddress = MemoryMapEntry->PhysicalStart +
+                   EFI_PAGES_TO_SIZE (MemoryMapEntry->NumberOfPages);
+      Bitmap = GetGuardedMemoryBits (EndAddress, GUARDED_HEAP_MAP_ENTRY_BITS);
+    }
+
+    if ((Bitmap & 1) == 0) {
+      break;
+    }
+
+    Pages--;
+    MemoryMapEntry->NumberOfPages++;
+    Bitmap = RShiftU64 (Bitmap, 1);
+  }
+}
+
+/**
+  Put part (at most 64 pages a time) guarded free pages back to free page pool.
+
+  Freed memory guard is used to detect Use-After-Free (UAF) memory issue, which
+  makes use of 'Used then throw away' way to detect any illegal access to freed
+  memory. The thrown-away memory will be marked as not-present so that any access
+  to those memory (after free) will be caught by page-fault exception.
+
+  The problem is that this will consume lots of memory space. Once no memory
+  left in pool to allocate, we have to restore part of the freed pages to their
+  normal function. Otherwise the whole system will stop functioning.
+
+  @param  StartAddress    Start address of promoted memory.
+  @param  EndAddress      End address of promoted memory.
+
+  @return TRUE    Succeeded to promote memory.
+  @return FALSE   No free memory found.
+
+**/
+BOOLEAN
+PromoteGuardedFreePages (
+  OUT EFI_PHYSICAL_ADDRESS      *StartAddress,
+  OUT EFI_PHYSICAL_ADDRESS      *EndAddress
+  )
+{
+  EFI_STATUS              Status;
+  UINTN                   AvailablePages;
+  UINT64                  Bitmap;
+  EFI_PHYSICAL_ADDRESS    Start;
+
+  if (!IsHeapGuardEnabled (GUARD_HEAP_TYPE_FREED)) {
+    return FALSE;
+  }
+
+  //
+  // Similar to memory allocation service, always search the freed pages in
+  // descending direction.
+  //
+  Start           = mLastPromotedPage;
+  AvailablePages  = 0;
+  while (AvailablePages == 0) {
+    Start -= EFI_PAGES_TO_SIZE (GUARDED_HEAP_MAP_ENTRY_BITS);
+    //
+    // If the address wraps around, try the really freed pages at top.
+    //
+    if (Start > mLastPromotedPage) {
+      GetLastGuardedFreePageAddress (&Start);
+      ASSERT (Start != 0);
+      Start -= EFI_PAGES_TO_SIZE (GUARDED_HEAP_MAP_ENTRY_BITS);
+    }
+
+    Bitmap = GetGuardedMemoryBits (Start, GUARDED_HEAP_MAP_ENTRY_BITS);
+    while (Bitmap > 0) {
+      if ((Bitmap & 1) != 0) {
+        ++AvailablePages;
+      } else if (AvailablePages == 0) {
+        Start += EFI_PAGES_TO_SIZE (1);
+      } else {
+        break;
+      }
+
+      Bitmap = RShiftU64 (Bitmap, 1);
+    }
+  }
+
+  if (AvailablePages) {
+    DEBUG ((DEBUG_INFO, "Promoted pages: %lX (%lx)\r\n", Start, (UINT64)AvailablePages));
+    ClearGuardedMemoryBits (Start, AvailablePages);
+
+    if (gCpu != NULL) {
+      //
+      // Set flag to make sure allocating memory without GUARD for page table
+      // operation; otherwise infinite loops could be caused.
+      //
+      mOnGuarding = TRUE;
+      Status = gCpu->SetMemoryAttributes (gCpu, Start, EFI_PAGES_TO_SIZE(AvailablePages), 0);
+      ASSERT_EFI_ERROR (Status);
+      mOnGuarding = FALSE;
+    }
+
+    mLastPromotedPage = Start;
+    *StartAddress     = Start;
+    *EndAddress       = Start + EFI_PAGES_TO_SIZE (AvailablePages) - 1;
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
   Notify function used to set all Guard pages before CPU Arch Protocol installed.
 **/
 VOID
@@ -1212,7 +1592,20 @@ HeapGuardCpuArchProtocolNotify (
   )
 {
   ASSERT (gCpu != NULL);
-  SetAllGuardPages ();
+
+  if (IsHeapGuardEnabled (GUARD_HEAP_TYPE_PAGE|GUARD_HEAP_TYPE_POOL) &&
+      IsHeapGuardEnabled (GUARD_HEAP_TYPE_FREED)) {
+    DEBUG ((DEBUG_ERROR, "Heap guard and freed memory guard cannot be enabled at the same time.\n"));
+    CpuDeadLoop ();
+  }
+
+  if (IsHeapGuardEnabled (GUARD_HEAP_TYPE_PAGE|GUARD_HEAP_TYPE_POOL)) {
+    SetAllGuardPages ();
+  }
+
+  if (IsHeapGuardEnabled (GUARD_HEAP_TYPE_FREED)) {
+    GuardAllFreedPages ();
+  }
 }
 
 /**
@@ -1263,6 +1656,10 @@ DumpGuardedMemoryBitmap (
   CHAR8     String[GUARDED_HEAP_MAP_ENTRY_BITS + 1];
   CHAR8     *Ruler1;
   CHAR8     *Ruler2;
+
+  if (!IsHeapGuardEnabled (GUARD_HEAP_TYPE_ALL)) {
+    return;
+  }
 
   if (mGuardedMemoryMap == 0 ||
       mMapLevel == 0 ||

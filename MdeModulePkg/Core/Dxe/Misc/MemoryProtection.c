@@ -1250,7 +1250,7 @@ ApplyMemoryProtectionPolicy (
   // Don't overwrite Guard pages, which should be the first and/or last page,
   // if any.
   //
-  if (IsHeapGuardEnabled ()) {
+  if (IsHeapGuardEnabled (GUARD_HEAP_TYPE_PAGE|GUARD_HEAP_TYPE_POOL)) {
     if (IsGuardPage (Memory))  {
       Memory += EFI_PAGE_SIZE;
       Length -= EFI_PAGE_SIZE;

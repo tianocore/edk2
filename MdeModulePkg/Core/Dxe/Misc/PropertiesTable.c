@@ -1,7 +1,7 @@
 /** @file
   UEFI PropertiesTable support
 
-Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2015 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -32,6 +32,7 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/PropertiesTable.h>
 
 #include "DxeMain.h"
+#include "HeapGuard.h"
 
 #define PREVIOUS_MEMORY_DESCRIPTOR(MemoryDescriptor, Size) \
   ((EFI_MEMORY_DESCRIPTOR *)((UINT8 *)(MemoryDescriptor) - (Size)))
@@ -205,16 +206,13 @@ MergeMemoryMap (
     NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (MemoryMapEntry, DescriptorSize);
 
     do {
-      MemoryBlockLength = (UINT64) (EfiPagesToSize (MemoryMapEntry->NumberOfPages));
+      MergeGuardPages (NewMemoryMapEntry, NextMemoryMapEntry->PhysicalStart);
+      MemoryBlockLength = (UINT64) (EfiPagesToSize (NewMemoryMapEntry->NumberOfPages));
       if (((UINTN)NextMemoryMapEntry < (UINTN)MemoryMapEnd) &&
-          (MemoryMapEntry->Type == NextMemoryMapEntry->Type) &&
-          (MemoryMapEntry->Attribute == NextMemoryMapEntry->Attribute) &&
-          ((MemoryMapEntry->PhysicalStart + MemoryBlockLength) == NextMemoryMapEntry->PhysicalStart)) {
-        MemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
-        if (NewMemoryMapEntry != MemoryMapEntry) {
-          NewMemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
-        }
-
+          (NewMemoryMapEntry->Type == NextMemoryMapEntry->Type) &&
+          (NewMemoryMapEntry->Attribute == NextMemoryMapEntry->Attribute) &&
+          ((NewMemoryMapEntry->PhysicalStart + MemoryBlockLength) == NextMemoryMapEntry->PhysicalStart)) {
+        NewMemoryMapEntry->NumberOfPages += NextMemoryMapEntry->NumberOfPages;
         NextMemoryMapEntry = NEXT_MEMORY_DESCRIPTOR (NextMemoryMapEntry, DescriptorSize);
         continue;
       } else {

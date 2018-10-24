@@ -401,9 +401,12 @@ PromoteMemoryResource (
   VOID
   )
 {
-  LIST_ENTRY         *Link;
-  EFI_GCD_MAP_ENTRY  *Entry;
-  BOOLEAN            Promoted;
+  LIST_ENTRY                        *Link;
+  EFI_GCD_MAP_ENTRY                 *Entry;
+  BOOLEAN                           Promoted;
+  EFI_PHYSICAL_ADDRESS              StartAddress;
+  EFI_PHYSICAL_ADDRESS              EndAddress;
+  EFI_GCD_MEMORY_SPACE_DESCRIPTOR   Descriptor;
 
   DEBUG ((DEBUG_PAGE, "Promote the memory resource\n"));
 
@@ -450,6 +453,24 @@ PromoteMemoryResource (
   }
 
   CoreReleaseGcdMemoryLock ();
+
+  if (!Promoted) {
+    //
+    // If freed-memory guard is enabled, we could promote pages from
+    // guarded free pages.
+    //
+    Promoted = PromoteGuardedFreePages (&StartAddress, &EndAddress);
+    if (Promoted) {
+      CoreGetMemorySpaceDescriptor (StartAddress, &Descriptor);
+      CoreAddRange (
+        EfiConventionalMemory,
+        StartAddress,
+        EndAddress,
+        Descriptor.Capabilities & ~(EFI_MEMORY_PRESENT | EFI_MEMORY_INITIALIZED |
+                                    EFI_MEMORY_TESTED | EFI_MEMORY_RUNTIME)
+        );
+    }
+  }
 
   return Promoted;
 }
@@ -896,9 +917,15 @@ CoreConvertPagesEx (
     }
 
     //
-    // Add our new range in
+    // Add our new range in. Don't do this for freed pages if freed-memory
+    // guard is enabled.
     //
-    CoreAddRange (MemType, Start, RangeEnd, Attribute);
+    if (!IsHeapGuardEnabled (GUARD_HEAP_TYPE_FREED) ||
+        !ChangingType ||
+        MemType != EfiConventionalMemory) {
+      CoreAddRange (MemType, Start, RangeEnd, Attribute);
+    }
+
     if (ChangingType && (MemType == EfiConventionalMemory)) {
       //
       // Avoid calling DEBUG_CLEAR_MEMORY() for an address of 0 because this
@@ -1514,6 +1541,7 @@ CoreFreePages (
 
   Status = CoreInternalFreePages (Memory, NumberOfPages, &MemoryType);
   if (!EFI_ERROR (Status)) {
+    GuardFreedPagesChecked (Memory, NumberOfPages);
     CoreUpdateProfile (
       (EFI_PHYSICAL_ADDRESS) (UINTN) RETURN_ADDRESS (0),
       MemoryProfileActionFreePages,
@@ -1908,9 +1936,7 @@ Done:
   *MemoryMapSize = BufferSize;
 
   DEBUG_CODE (
-    if (PcdGet8 (PcdHeapGuardPropertyMask) & (BIT1|BIT0)) {
-      DumpGuardedMemoryBitmap ();
-    }
+    DumpGuardedMemoryBitmap ();
   );
 
   return Status;
