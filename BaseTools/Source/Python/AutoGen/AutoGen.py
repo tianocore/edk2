@@ -2120,6 +2120,13 @@ class PlatformAutoGen(AutoGen):
         if Module in self.Platform.Modules:
             PlatformModule = self.Platform.Modules[str(Module)]
             for Key  in PlatformModule.Pcds:
+                if GlobalData.BuildOptionPcd:
+                    for pcd in GlobalData.BuildOptionPcd:
+                        (TokenSpaceGuidCName, TokenCName, FieldName, pcdvalue, _) = pcd
+                        if (TokenCName, TokenSpaceGuidCName) == Key and FieldName =="":
+                            PlatformModule.Pcds[Key].DefaultValue = pcdvalue
+                            PlatformModule.Pcds[Key].PcdValueFromComm = pcdvalue
+                            break
                 Flag = False
                 if Key in Pcds:
                     ToPcd = Pcds[Key]

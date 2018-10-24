@@ -1067,7 +1067,12 @@ class DscBuildData(PlatformBuildClassObject):
                         EdkLogger.error("build", FORMAT_INVALID, Cause, ExtraData="%s.%s" % (TokenSpaceGuidCName, TokenCName))
                 GlobalData.BuildOptionPcd[i] = (TokenSpaceGuidCName, TokenCName, FieldName, pcdvalue, ("build command options", 1))
 
+        if GlobalData.BuildOptionPcd:
+            for pcd in GlobalData.BuildOptionPcd:
+                (TokenSpaceGuidCName, TokenCName, FieldName, pcdvalue, _) = pcd
                 for BuildData in self._Bdb._CACHE_.values():
+                    if BuildData.Arch != self.Arch:
+                        continue
                     if BuildData.MetaFile.Ext == '.dec' or BuildData.MetaFile.Ext == '.dsc':
                         continue
                     for key in BuildData.Pcds:
