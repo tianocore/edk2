@@ -100,6 +100,7 @@ PAGE_ATTRIBUTE_TABLE mPageAttributeTable[] = {
 };
 
 PAGE_TABLE_POOL                   *mPageTablePool = NULL;
+BOOLEAN                           mPageTablePoolLock = FALSE;
 PAGE_TABLE_LIB_PAGING_CONTEXT     mPagingContext;
 EFI_SMM_BASE2_PROTOCOL            *mSmmBase2 = NULL;
 
@@ -1047,6 +1048,16 @@ InitializePageTablePool (
   BOOLEAN                   IsModified;
 
   //
+  // Do not allow re-entrance.
+  //
+  if (mPageTablePoolLock) {
+    return FALSE;
+  }
+
+  mPageTablePoolLock = TRUE;
+  IsModified = FALSE;
+
+  //
   // Always reserve at least PAGE_TABLE_POOL_UNIT_PAGES, including one page for
   // header.
   //
@@ -1056,8 +1067,14 @@ InitializePageTablePool (
   Buffer = AllocateAlignedPages (PoolPages, PAGE_TABLE_POOL_ALIGNMENT);
   if (Buffer == NULL) {
     DEBUG ((DEBUG_ERROR, "ERROR: Out of aligned pages\r\n"));
-    return FALSE;
+    goto Done;
   }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "Paging: added %lu pages to page table pool\r\n",
+    (UINT64)PoolPages
+    ));
 
   //
   // Link all pools into a list for easier track later.
@@ -1092,7 +1109,9 @@ InitializePageTablePool (
     );
   ASSERT (IsModified == TRUE);
 
-  return TRUE;
+Done:
+  mPageTablePoolLock = FALSE;
+  return IsModified;
 }
 
 /**
