@@ -47,6 +47,12 @@
 [Protocols]
   gEdkiiPlatformVTdPolicyProtocolGuid = { 0x3d17e448, 0x466, 0x4e20, { 0x99, 0x9f, 0xb2, 0xe1, 0x34, 0x88, 0xee, 0x22 }}
 
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## Error code for VTd error.<BR><BR>
+  #  EDKII_ERROR_CODE_VTD_ERROR = (EFI_IO_BUS_UNSPECIFIED | (EFI_OEM_SPECIFIC | 0x00000000)) = 0x02008000<BR>
+  # @Prompt Error code for VTd error.
+  gIntelSiliconPkgTokenSpaceGuid.PcdErrorCodeVTdError|0x02008000|UINT32|0x00000005
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   ## This is the GUID of the FFS which contains the Graphics Video BIOS Table (VBT)
   # The VBT content is stored as a RAW section which is consumed by GOP PEI/UEFI driver.

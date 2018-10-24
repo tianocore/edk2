@@ -28,6 +28,7 @@
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/PerformanceLib.h>
 #include <Library/PrintLib.h>
+#include <Library/ReportStatusCodeLib.h>
 
 #include <Guid/EventGroup.h>
 #include <Guid/Acpi.h>

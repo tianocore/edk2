@@ -60,6 +60,7 @@
   CacheMaintenanceLib
   PerformanceLib
   PrintLib
+  ReportStatusCodeLib
 
 [Guids]
   gEfiEventExitBootServicesGuid   ## CONSUMES ## Event
@@ -78,6 +79,7 @@
 
 [Pcd]
   gIntelSiliconPkgTokenSpaceGuid.PcdVTdPolicyPropertyMask   ## CONSUMES
+  gIntelSiliconPkgTokenSpaceGuid.PcdErrorCodeVTdError       ## CONSUMES
 
 [Depex]
   gEfiPciRootBridgeIoProtocolGuid

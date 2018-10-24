@@ -545,6 +545,7 @@ DumpVtdIfError (
     }
 
     if (HasError) {
+      REPORT_STATUS_CODE (EFI_ERROR_CODE, PcdGet32 (PcdErrorCodeVTdError));
       DEBUG((DEBUG_INFO, "\n#### ERROR ####\n"));
       DumpVtdRegs (Num);
       DEBUG((DEBUG_INFO, "#### ERROR ####\n\n"));
