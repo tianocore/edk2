@@ -1011,14 +1011,22 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdHeapGuardPoolType|0x0|UINT64|0x30001053
 
   ## This mask is to control Heap Guard behavior.
-  # Note that due to the limit of pool memory implementation and the alignment
-  # requirement of UEFI spec, BIT7 is a try-best setting which cannot guarantee
-  # that the returned pool is exactly adjacent to head guard page or tail guard
-  # page.
+  #
+  # Note:
+  #   a) Heap Guard is for debug purpose and should not be enabled in product
+  #      BIOS.
+  #   b) Due to the limit of pool memory implementation and the alignment
+  #      requirement of UEFI spec, BIT7 is a try-best setting which cannot
+  #      guarantee that the returned pool is exactly adjacent to head guard
+  #      page or tail guard page.
+  #   c) UEFI freed-memory guard and UEFI pool/page guard cannot be enabled
+  #      at the same time.
+  #
   #   BIT0 - Enable UEFI page guard.<BR>
   #   BIT1 - Enable UEFI pool guard.<BR>
   #   BIT2 - Enable SMM page guard.<BR>
   #   BIT3 - Enable SMM pool guard.<BR>
+  #   BIT4 - Enable UEFI freed-memory guard (Use-After-Free memory detection).<BR>
   #   BIT6 - Enable non-stop mode.<BR>
   #   BIT7 - The direction of Guard Page for Pool Guard.
   #          0 - The returned pool is near the tail guard page.<BR>
