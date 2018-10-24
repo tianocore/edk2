@@ -58,7 +58,7 @@
                                        )
 
 #define HEAP_GUARD_NONSTOP_MODE       \
-        ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT6|BIT1|BIT0)) > BIT6)
+        ((PcdGet8 (PcdHeapGuardPropertyMask) & (BIT6|BIT4|BIT1|BIT0)) > BIT6)
 
 #define NULL_DETECTION_NONSTOP_MODE   \
         ((PcdGet8 (PcdNullPointerDetectionPropertyMask) & (BIT6|BIT0)) > BIT6)
