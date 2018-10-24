@@ -955,6 +955,8 @@
   # free pages for all of them. The page allocation for the type related to
   # cleared bits keeps the same as ususal.
   #
+  # This PCD is only valid if BIT0 and/or BIT2 are set in PcdHeapGuardPropertyMask.
+  #
   # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
   #  EfiReservedMemoryType             0x0000000000000001<BR>
   #  EfiLoaderCode                     0x0000000000000002<BR>
@@ -983,6 +985,8 @@
   # before and after corresponding type of pages which the allocated pool occupies,
   # if there's enough free memory for all of them. The pool allocation for the
   # type related to cleared bits keeps the same as ususal.
+  #
+  # This PCD is only valid if BIT1 and/or BIT3 are set in PcdHeapGuardPropertyMask.
   #
   # Below is bit mask for this PCD: (Order is same as UEFI spec)<BR>
   #  EfiReservedMemoryType             0x0000000000000001<BR>
