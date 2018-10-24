@@ -814,6 +814,82 @@ EhciDelAllAsyncIntTransfers (
   }
 }
 
+/**
+  Insert a single asynchronous interrupt transfer for
+  the device and endpoint.
+
+  @param  Ehc               The EHCI device.
+  @param  DevAddr           The device address.
+  @param  EpAddr            Endpoint addrress & its direction.
+  @param  DevSpeed          The device speed.
+  @param  Toggle            Initial data toggle to use.
+  @param  MaxPacket         The max packet length of the endpoint.
+  @param  Hub               The transaction translator to use.
+  @param  DataLen           The length of data buffer.
+  @param  Callback          The function to call when data is transferred.
+  @param  Context           The context to the callback.
+  @param  Interval          The interval for interrupt transfer.
+
+  @return Created URB or NULL.
+
+**/
+URB *
+EhciInsertAsyncIntTransfer (
+  IN USB2_HC_DEV                        *Ehc,
+  IN UINT8                              DevAddr,
+  IN UINT8                              EpAddr,
+  IN UINT8                              DevSpeed,
+  IN UINT8                              Toggle,
+  IN UINTN                              MaxPacket,
+  IN EFI_USB2_HC_TRANSACTION_TRANSLATOR *Hub,
+  IN UINTN                              DataLen,
+  IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
+  IN VOID                               *Context,
+  IN UINTN                              Interval
+  )
+{
+  VOID      *Data;
+  URB       *Urb;
+
+  Data = AllocatePool (DataLen);
+
+  if (Data == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: failed to allocate buffer\n", __FUNCTION__));
+    return NULL;
+  }
+
+  Urb = EhcCreateUrb (
+          Ehc,
+          DevAddr,
+          EpAddr,
+          DevSpeed,
+          Toggle,
+          MaxPacket,
+          Hub,
+          EHC_INT_TRANSFER_ASYNC,
+          NULL,
+          Data,
+          DataLen,
+          Callback,
+          Context,
+          Interval
+          );
+
+  if (Urb == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: failed to create URB\n", __FUNCTION__));
+    gBS->FreePool (Data);
+    return NULL;
+  }
+
+  //
+  // New asynchronous transfer must inserted to the head.
+  // Check the comments in EhcMoniteAsyncRequests
+  //
+  EhcLinkQhToPeriod (Ehc, Urb->Qh);
+  InsertHeadList (&Ehc->AsyncIntTransfers, &Urb->UrbList);
+
+  return Urb;
+}
 
 /**
   Flush data from PCI controller specific address to mapped system
