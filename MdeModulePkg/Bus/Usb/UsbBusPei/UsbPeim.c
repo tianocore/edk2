@@ -940,59 +940,64 @@ GetExpectedDescriptor (
   OUT UINTN       *ParsedBytes
   )
 {
-  UINT16  DescriptorHeader;
-  UINT8   Len;
-  UINT8   *Ptr;
-  UINTN   Parsed;
+  USB_DESC_HEAD   *Head;
+  UINTN           Offset;
 
-  Parsed  = 0;
-  Ptr     = Buffer;
+  //
+  // Total length is too small that cannot hold the single descriptor header plus data. 
+  //
+  if (Length <= sizeof (USB_DESC_HEAD)) {
+    DEBUG ((DEBUG_ERROR, "GetExpectedDescriptor: met mal-format descriptor, total length = %d!\n", Length));
+    return EFI_DEVICE_ERROR;
+  }
 
-  while (TRUE) {
+  //
+  // All the descriptor has a common LTV (Length, Type, Value)
+  // format. Skip the descriptor that isn't of this Type
+  //
+  Offset = 0;
+  Head   = (USB_DESC_HEAD *)Buffer;
+  while (Offset < Length - sizeof (USB_DESC_HEAD)) {
     //
-    // Buffer length should not less than Desc length
+    // Above condition make sure Head->Len and Head->Type are safe to access
     //
-    if (Length < DescLength) {
+    Head = (USB_DESC_HEAD *)&Buffer[Offset];
+
+    if (Head->Len == 0) {
+      DEBUG ((DEBUG_ERROR, "GetExpectedDescriptor: met mal-format descriptor, Head->Len = 0!\n"));
       return EFI_DEVICE_ERROR;
     }
 
-    DescriptorHeader  = (UINT16) (*Ptr + ((*(Ptr + 1)) << 8));
-
-    Len               = Buffer[0];
-
     //
-    // Check to see if it is a start of expected descriptor
+    // Make sure no overflow when adding Head->Len to Offset.
     //
-    if (DescriptorHeader == ((DescType << 8) | DescLength)) {
+    if (Head->Len > MAX_UINTN - Offset) {
+      DEBUG ((DEBUG_ERROR, "GetExpectedDescriptor: met mal-format descriptor, Head->Len = %d!\n", Head->Len));
+      return EFI_DEVICE_ERROR;
+    }
+
+    if (Head->Type == DescType) {
       break;
     }
 
-    if ((UINT8) (DescriptorHeader >> 8) == DescType) {
-      if (Len > DescLength) {
-        return EFI_DEVICE_ERROR;
-      }
-    }
-    //
-    // Descriptor length should be at least 2
-    // and should not exceed the buffer length
-    //
-    if (Len < 2) {
-      return EFI_DEVICE_ERROR;
-    }
-
-    if (Len > Length) {
-      return EFI_DEVICE_ERROR;
-    }
-    //
-    // Skip this mismatch descriptor
-    //
-    Length -= Len;
-    Ptr += Len;
-    Parsed += Len;
+    Offset += Head->Len;
   }
 
-  *ParsedBytes = Parsed;
+  //
+  // Head->Len is invalid resulting data beyond boundary, or
+  // Descriptor cannot be found: No such type.
+  //
+  if (Length < Offset) {
+    DEBUG ((DEBUG_ERROR, "GetExpectedDescriptor: met mal-format descriptor, Offset/Len = %d/%d!\n", Offset, Length));
+    return EFI_DEVICE_ERROR;
+  }
 
+  if ((Head->Type != DescType) || (Head->Len < DescLength)) {
+    DEBUG ((DEBUG_ERROR, "GetExpectedDescriptor: descriptor cannot be found, Header(T/L) = %d/%d!\n", Head->Type, Head->Len));
+    return EFI_DEVICE_ERROR;
+  }
+
+  *ParsedBytes = Offset;
   return EFI_SUCCESS;
 }
 

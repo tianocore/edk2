@@ -33,6 +33,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include <IndustryStandard/Usb.h>
 
+//
+// A common header for usb standard descriptor.
+// Each stand descriptor has a length and type.
+//
+#pragma pack(1)
+typedef struct {
+  UINT8                   Len;
+  UINT8                   Type;
+} USB_DESC_HEAD;
+#pragma pack()
+
 #define MAX_INTERFACE             8
 #define MAX_ENDPOINT              16
 
