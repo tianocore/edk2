@@ -149,7 +149,7 @@ Mtftp4WrqHandleAck (
 {
   UINT16                    AckNum;
   INTN                      Expected;
-  UINT64                    TotalBlock;
+  UINT64                    BlockCounter;
 
   *Completed  = FALSE;
   AckNum      = NTOHS (Packet->Ack.Block[0]);
@@ -168,9 +168,9 @@ Mtftp4WrqHandleAck (
   //
   // Remove the acked block number, if this is the last block number,
   // tell the Mtftp4WrqInput to finish the transfer. This is the last
-  // block number if the block range are empty..
+  // block number if the block range are empty.
   //
-  Mtftp4RemoveBlockNum (&Instance->Blocks, AckNum, *Completed,&TotalBlock);
+  Mtftp4RemoveBlockNum (&Instance->Blocks, AckNum, *Completed, &BlockCounter);
 
   Expected = Mtftp4GetNextBlockNum (&Instance->Blocks);
 

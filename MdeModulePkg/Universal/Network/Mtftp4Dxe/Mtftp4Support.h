@@ -92,8 +92,8 @@ Mtftp4SetLastBlockNum (
 
   @param  Head                  The block range list to remove from
   @param  Num                   The block number to remove
-  @param  Completed             Wether Num is the last block number
-  @param  TotalBlock            The continuous block number in all
+  @param  Completed             Whether Num is the last block number.
+  @param  BlockCounter          The continuous block counter instead of the value after roll-over.
 
   @retval EFI_NOT_FOUND         The block number isn't in the block range list
   @retval EFI_SUCCESS           The block number has been removed from the list
@@ -105,7 +105,7 @@ Mtftp4RemoveBlockNum (
   IN LIST_ENTRY             *Head,
   IN UINT16                 Num,
   IN BOOLEAN                Completed,
-  OUT UINT64                *TotalBlock
+  OUT UINT64                *BlockCounter
   );
 
 /**

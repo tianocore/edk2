@@ -126,9 +126,13 @@ struct _MTFTP4_PROTOCOL {
   UINT16                        WindowSize;
 
   //
-  // Record the total received block number and the already acked block number.
+  // Record the total received and saved block number.
   //
   UINT64                        TotalBlock;
+  
+  //
+  // Record the acked block number.
+  //
   UINT64                        AckedBlock;
 
   //
