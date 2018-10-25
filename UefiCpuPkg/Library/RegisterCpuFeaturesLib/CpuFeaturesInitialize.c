@@ -1029,6 +1029,7 @@ SetProcessorRegister (
 
   InitApicId = GetInitialApicId ();
   RegisterTable = NULL;
+  ProcIndex = (UINTN)-1;
   for (Index = 0; Index < AcpiCpuData->NumberOfCpus; Index++) {
     if (RegisterTables[Index].InitialApicId == InitApicId) {
       RegisterTable =  &RegisterTables[Index];
