@@ -778,7 +778,6 @@ EhciDelAsyncIntTransfer (
       EhcUnlinkQhFromPeriod (Ehc, Urb->Qh);
       RemoveEntryList (&Urb->UrbList);
 
-      gBS->FreePool (Urb->Data);
       EhcFreeUrb (Ehc, Urb);
       return EFI_SUCCESS;
     }
@@ -809,7 +808,6 @@ EhciDelAllAsyncIntTransfers (
     EhcUnlinkQhFromPeriod (Ehc, Urb->Qh);
     RemoveEntryList (&Urb->UrbList);
 
-    gBS->FreePool (Urb->Data);
     EhcFreeUrb (Ehc, Urb);
   }
 }
@@ -848,15 +846,7 @@ EhciInsertAsyncIntTransfer (
   IN UINTN                              Interval
   )
 {
-  VOID      *Data;
   URB       *Urb;
-
-  Data = AllocatePool (DataLen);
-
-  if (Data == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to allocate buffer\n", __FUNCTION__));
-    return NULL;
-  }
 
   Urb = EhcCreateUrb (
           Ehc,
@@ -868,7 +858,8 @@ EhciInsertAsyncIntTransfer (
           Hub,
           EHC_INT_TRANSFER_ASYNC,
           NULL,
-          Data,
+          TRUE,
+          NULL,
           DataLen,
           Callback,
           Context,
@@ -877,7 +868,6 @@ EhciInsertAsyncIntTransfer (
 
   if (Urb == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: failed to create URB\n", __FUNCTION__));
-    gBS->FreePool (Data);
     return NULL;
   }
 
@@ -890,60 +880,6 @@ EhciInsertAsyncIntTransfer (
 
   return Urb;
 }
-
-/**
-  Flush data from PCI controller specific address to mapped system
-  memory address.
-
-  @param  Ehc                The EHCI device.
-  @param  Urb                The URB to unmap.
-
-  @retval EFI_SUCCESS        Success to flush data to mapped system memory.
-  @retval EFI_DEVICE_ERROR   Fail to flush data to mapped system memory.
-
-**/
-EFI_STATUS
-EhcFlushAsyncIntMap (
-  IN  USB2_HC_DEV         *Ehc,
-  IN  URB                 *Urb
-  )
-{
-  EFI_STATUS                    Status;
-  EFI_PHYSICAL_ADDRESS          PhyAddr;
-  EFI_PCI_IO_PROTOCOL_OPERATION MapOp;
-  EFI_PCI_IO_PROTOCOL           *PciIo;
-  UINTN                         Len;
-  VOID                          *Map;
-
-  PciIo = Ehc->PciIo;
-  Len   = Urb->DataLen;
-
-  if (Urb->Ep.Direction == EfiUsbDataIn) {
-    MapOp = EfiPciIoOperationBusMasterWrite;
-  } else {
-    MapOp = EfiPciIoOperationBusMasterRead;
-  }
-
-  Status = PciIo->Unmap (PciIo, Urb->DataMap);
-  if (EFI_ERROR (Status)) {
-    goto ON_ERROR;
-  }
-
-  Urb->DataMap = NULL;
-
-  Status = PciIo->Map (PciIo, MapOp, Urb->Data, &Len, &PhyAddr, &Map);
-  if (EFI_ERROR (Status) || (Len != Urb->DataLen)) {
-    goto ON_ERROR;
-  }
-
-  Urb->DataPhy  = (VOID *) ((UINTN) PhyAddr);
-  Urb->DataMap  = Map;
-  return EFI_SUCCESS;
-
-ON_ERROR:
-  return EFI_DEVICE_ERROR;
-}
-
 
 /**
   Update the queue head for next round of asynchronous transfer.
@@ -1050,7 +986,6 @@ EhcMonitorAsyncRequests (
   BOOLEAN                 Finished;
   UINT8                   *ProcBuf;
   URB                     *Urb;
-  EFI_STATUS              Status;
 
   OldTpl  = gBS->RaiseTPL (EHC_TPL);
   Ehc     = (USB2_HC_DEV *) Context;
@@ -1066,15 +1001,6 @@ EhcMonitorAsyncRequests (
 
     if (!Finished) {
       continue;
-    }
-
-    //
-    // Flush any PCI posted write transactions from a PCI host
-    // bridge to system memory.
-    //
-    Status = EhcFlushAsyncIntMap (Ehc, Urb);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "EhcMonitorAsyncRequests: Fail to Flush AsyncInt Mapped Memeory\n"));
     }
 
     //

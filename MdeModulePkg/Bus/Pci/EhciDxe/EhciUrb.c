@@ -339,6 +339,14 @@ EhcFreeUrb (
     PciIo->Unmap (PciIo, Urb->DataMap);
   }
 
+  if (Urb->AllocateCommonBuffer) {
+    PciIo->FreeBuffer (
+             PciIo,
+             EFI_SIZE_TO_PAGES (Urb->DataLen),
+             Urb->Data
+             );
+  }
+
   if (Urb->Qh != NULL) {
     //
     // Ensure that this queue head has been unlinked from the
@@ -529,7 +537,8 @@ ON_ERROR:
   @param  Hub                   The transaction translator to use.
   @param  Type                  The transaction type.
   @param  Request               The standard USB request for control transfer.
-  @param  Data                  The user data to transfer.
+  @param  AllocateCommonBuffer  Indicate whether need to allocate common buffer for data transfer.
+  @param  Data                  The user data to transfer, NULL if AllocateCommonBuffer is TRUE.
   @param  DataLen               The length of data buffer.
   @param  Callback              The function to call when data is transferred.
   @param  Context               The context to the callback.
@@ -549,6 +558,7 @@ EhcCreateUrb (
   IN EFI_USB2_HC_TRANSACTION_TRANSLATOR *Hub,
   IN UINTN                              Type,
   IN EFI_USB_DEVICE_REQUEST             *Request,
+  IN BOOLEAN                            AllocateCommonBuffer,
   IN VOID                               *Data,
   IN UINTN                              DataLen,
   IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
@@ -596,8 +606,24 @@ EhcCreateUrb (
   Ep->PollRate    = EhcConvertPollRate (Interval);
 
   Urb->Request    = Request;
+  if (AllocateCommonBuffer) {
+    ASSERT (Data == NULL);
+    Status = Ehc->PciIo->AllocateBuffer (
+                           Ehc->PciIo,
+                           AllocateAnyPages,
+                           EfiBootServicesData,
+                           EFI_SIZE_TO_PAGES (DataLen),
+                           &Data,
+                           0
+                           );
+    if (EFI_ERROR (Status) || (Data == NULL)) {
+      FreePool (Urb);
+      return NULL;
+    }
+  }
   Urb->Data       = Data;
   Urb->DataLen    = DataLen;
+  Urb->AllocateCommonBuffer = AllocateCommonBuffer;
   Urb->Callback   = Callback;
   Urb->Context    = Context;
 
@@ -627,10 +653,14 @@ EhcCreateUrb (
   if (Data != NULL) {
     Len     = DataLen;
 
-    if (Ep->Direction == EfiUsbDataIn) {
-      MapOp = EfiPciIoOperationBusMasterWrite;
+    if (Urb->AllocateCommonBuffer) {
+      MapOp = EfiPciIoOperationBusMasterCommonBuffer;
     } else {
-      MapOp = EfiPciIoOperationBusMasterRead;
+      if (Ep->Direction == EfiUsbDataIn) {
+        MapOp = EfiPciIoOperationBusMasterWrite;
+      } else {
+        MapOp = EfiPciIoOperationBusMasterRead;
+      }
     }
 
     Status  = PciIo->Map (PciIo, MapOp, Data, &Len, &PhyAddr, &Map);

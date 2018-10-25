@@ -3,7 +3,7 @@
     This file contains URB request, each request is warpped in a
     URB (Usb Request Block).
 
-Copyright (c) 2007 - 2010, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -216,6 +216,7 @@ struct _URB {
   EFI_USB_DEVICE_REQUEST          *Request;     // Control transfer only
   VOID                            *RequestPhy;  // Address of the mapped request
   VOID                            *RequestMap;
+  BOOLEAN                         AllocateCommonBuffer;
   VOID                            *Data;
   UINTN                           DataLen;
   VOID                            *DataPhy;     // Address of the mapped user data
@@ -298,20 +299,21 @@ EhcFreeUrb (
 /**
   Create a new URB and its associated QTD.
 
-  @param  Ehc        The EHCI device.
-  @param  DevAddr    The device address.
-  @param  EpAddr     Endpoint addrress & its direction.
-  @param  DevSpeed   The device speed.
-  @param  Toggle     Initial data toggle to use.
-  @param  MaxPacket  The max packet length of the endpoint.
-  @param  Hub        The transaction translator to use.
-  @param  Type       The transaction type.
-  @param  Request    The standard USB request for control transfer.
-  @param  Data       The user data to transfer.
-  @param  DataLen    The length of data buffer.
-  @param  Callback   The function to call when data is transferred.
-  @param  Context    The context to the callback.
-  @param  Interval   The interval for interrupt transfer.
+  @param  Ehc                   The EHCI device.
+  @param  DevAddr               The device address.
+  @param  EpAddr                Endpoint addrress & its direction.
+  @param  DevSpeed              The device speed.
+  @param  Toggle                Initial data toggle to use.
+  @param  MaxPacket             The max packet length of the endpoint.
+  @param  Hub                   The transaction translator to use.
+  @param  Type                  The transaction type.
+  @param  Request               The standard USB request for control transfer.
+  @param  AllocateCommonBuffer  Indicate whether need to allocate common buffer for data transfer.
+  @param  Data                  The user data to transfer, NULL if AllocateCommonBuffer is TRUE.
+  @param  DataLen               The length of data buffer.
+  @param  Callback              The function to call when data is transferred.
+  @param  Context               The context to the callback.
+  @param  Interval              The interval for interrupt transfer.
 
   @return Created URB or NULL.
 
@@ -327,6 +329,7 @@ EhcCreateUrb (
   IN EFI_USB2_HC_TRANSACTION_TRANSLATOR *Hub,
   IN UINTN                              Type,
   IN EFI_USB_DEVICE_REQUEST             *Request,
+  IN BOOLEAN                            AllocateCommonBuffer,
   IN VOID                               *Data,
   IN UINTN                              DataLen,
   IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
