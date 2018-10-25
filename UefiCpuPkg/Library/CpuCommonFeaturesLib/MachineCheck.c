@@ -328,7 +328,7 @@ LmceInitialize (
   MSR_IA32_FEATURE_CONTROL_REGISTER    *MsrRegister;
 
   //
-  // The scope of FastStrings bit in the MSR_IA32_MISC_ENABLE is core for below processor type, only program 
+  // The scope of FastStrings bit in the MSR_IA32_MISC_ENABLE is core for below processor type, only program
   // MSR_IA32_MISC_ENABLE for thread 0 in each core.
   //
   if (IS_SILVERMONT_PROCESSOR (CpuInfo->DisplayFamily, CpuInfo->DisplayModel) ||
