@@ -817,6 +817,20 @@ PeiUsbGetAllConfiguration (
   ConfigDescLength  = ConfigDesc->TotalLength;
 
   //
+  // Reject if TotalLength even cannot cover itself.
+  //
+  if (ConfigDescLength < OFFSET_OF (EFI_USB_CONFIG_DESCRIPTOR, TotalLength) + sizeof (ConfigDesc->TotalLength)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
+  // Reject if TotalLength exceeds the PeiUsbDevice->ConfigurationData.
+  //
+  if (ConfigDescLength > sizeof (PeiUsbDevice->ConfigurationData)) {
+    return EFI_DEVICE_ERROR;
+  }
+
+  //
   // Then we get the total descriptors for this configuration
   //
   Status = PeiUsbGetDescriptor (
