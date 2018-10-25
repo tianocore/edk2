@@ -254,9 +254,8 @@ def CallExtenalBPDGTool(ToolPath, VpdFileName):
         PopenObject.wait()
 
     if PopenObject.returncode != 0:
-        if PopenObject.returncode != 0:
-            EdkLogger.debug(EdkLogger.DEBUG_1, "Fail to call BPDG tool", str(error))
-            EdkLogger.error("BPDG", BuildToolError.COMMAND_FAILURE, "Fail to execute BPDG tool with exit code: %d, the error message is: \n %s" % \
+        EdkLogger.debug(EdkLogger.DEBUG_1, "Fail to call BPDG tool", str(error))
+        EdkLogger.error("BPDG", BuildToolError.COMMAND_FAILURE, "Fail to execute BPDG tool with exit code: %d, the error message is: \n %s" % \
                             (PopenObject.returncode, str(error)))
 
     return PopenObject.returncode
