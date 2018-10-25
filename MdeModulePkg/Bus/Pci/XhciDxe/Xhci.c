@@ -769,6 +769,7 @@ XhcTransfer (
           MaximumPacketLength,
           Type,
           Request,
+          FALSE,
           Data,
           *DataLength,
           NULL,

@@ -118,17 +118,18 @@ ON_EXIT:
 /**
   Create a new URB for a new transaction.
 
-  @param  Xhc       The XHCI Instance
-  @param  BusAddr   The logical device address assigned by UsbBus driver
-  @param  EpAddr    Endpoint addrress
-  @param  DevSpeed  The device speed
-  @param  MaxPacket The max packet length of the endpoint
-  @param  Type      The transaction type
-  @param  Request   The standard USB request for control transfer
-  @param  Data      The user data to transfer
-  @param  DataLen   The length of data buffer
-  @param  Callback  The function to call when data is transferred
-  @param  Context   The context to the callback
+  @param  Xhc                   The XHCI Instance
+  @param  BusAddr               The logical device address assigned by UsbBus driver
+  @param  EpAddr                Endpoint addrress
+  @param  DevSpeed              The device speed
+  @param  MaxPacket             The max packet length of the endpoint
+  @param  Type                  The transaction type
+  @param  Request               The standard USB request for control transfer
+  @param  AllocateCommonBuffer  Indicate whether need to allocate common buffer for data transfer
+  @param  Data                  The user data to transfer, NULL if AllocateCommonBuffer is TRUE
+  @param  DataLen               The length of data buffer
+  @param  Callback              The function to call when data is transferred
+  @param  Context               The context to the callback
 
   @return Created URB or NULL
 
@@ -142,6 +143,7 @@ XhcCreateUrb (
   IN UINTN                              MaxPacket,
   IN UINTN                              Type,
   IN EFI_USB_DEVICE_REQUEST             *Request,
+  IN BOOLEAN                            AllocateCommonBuffer,
   IN VOID                               *Data,
   IN UINTN                              DataLen,
   IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
@@ -169,8 +171,24 @@ XhcCreateUrb (
   Ep->Type      = Type;
 
   Urb->Request  = Request;
+  if (AllocateCommonBuffer) {
+    ASSERT (Data == NULL);
+    Status = Xhc->PciIo->AllocateBuffer (
+                           Xhc->PciIo,
+                           AllocateAnyPages,
+                           EfiBootServicesData,
+                           EFI_SIZE_TO_PAGES (DataLen),
+                           &Data,
+                           0
+                           );
+    if (EFI_ERROR (Status) || (Data == NULL)) {
+      FreePool (Urb);
+      return NULL;
+    }
+  }
   Urb->Data     = Data;
   Urb->DataLen  = DataLen;
+  Urb->AllocateCommonBuffer = AllocateCommonBuffer;
   Urb->Callback = Callback;
   Urb->Context  = Context;
 
@@ -178,7 +196,7 @@ XhcCreateUrb (
   ASSERT_EFI_ERROR (Status);
   if (EFI_ERROR (Status)) {
     DEBUG ((EFI_D_ERROR, "XhcCreateUrb: XhcCreateTransferTrb Failed, Status = %r\n", Status));
-    FreePool (Urb);
+    XhcFreeUrb (Xhc, Urb);
     Urb = NULL;
   }
 
@@ -204,6 +222,14 @@ XhcFreeUrb (
 
   if (Urb->DataMap != NULL) {
     Xhc->PciIo->Unmap (Xhc->PciIo, Urb->DataMap);
+  }
+
+  if (Urb->AllocateCommonBuffer) {
+    Xhc->PciIo->FreeBuffer (
+                  Xhc->PciIo,
+                  EFI_SIZE_TO_PAGES (Urb->DataLen),
+                  Urb->Data
+                  );
   }
 
   FreePool (Urb);
@@ -264,10 +290,14 @@ XhcCreateTransferTrb (
   // No need to remap.
   //
   if ((Urb->Data != NULL) && (Urb->DataMap == NULL)) {
-    if (((UINT8) (Urb->Ep.Direction)) == EfiUsbDataIn) {
-      MapOp = EfiPciIoOperationBusMasterWrite;
+    if (Urb->AllocateCommonBuffer) {
+      MapOp = EfiPciIoOperationBusMasterCommonBuffer;
     } else {
-      MapOp = EfiPciIoOperationBusMasterRead;
+      if (((UINT8) (Urb->Ep.Direction)) == EfiUsbDataIn) {
+        MapOp = EfiPciIoOperationBusMasterWrite;
+      } else {
+        MapOp = EfiPciIoOperationBusMasterRead;
+      }
     }
 
     Len = Urb->DataLen;
@@ -1367,7 +1397,6 @@ XhciDelAsyncIntTransfer (
       }
 
       RemoveEntryList (&Urb->UrbList);
-      FreePool (Urb->Data);
       XhcFreeUrb (Xhc, Urb);
       return EFI_SUCCESS;
     }
@@ -1405,7 +1434,6 @@ XhciDelAllAsyncIntTransfers (
     }
 
     RemoveEntryList (&Urb->UrbList);
-    FreePool (Urb->Data);
     XhcFreeUrb (Xhc, Urb);
   }
 }
@@ -1438,14 +1466,7 @@ XhciInsertAsyncIntTransfer (
   IN VOID                               *Context
   )
 {
-  VOID      *Data;
   URB       *Urb;
-
-  Data = AllocateZeroPool (DataLen);
-  if (Data == NULL) {
-    DEBUG ((DEBUG_ERROR, "%a: failed to allocate buffer\n", __FUNCTION__));
-    return NULL;
-  }
 
   Urb = XhcCreateUrb (
           Xhc,
@@ -1455,14 +1476,14 @@ XhciInsertAsyncIntTransfer (
           MaxPacket,
           XHC_INT_TRANSFER_ASYNC,
           NULL,
-          Data,
+          TRUE,
+          NULL,
           DataLen,
           Callback,
           Context
           );
   if (Urb == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: failed to create URB\n", __FUNCTION__));
-    FreePool (Data);
     return NULL;
   }
 
@@ -1503,61 +1524,6 @@ XhcUpdateAsyncRequest (
 }
 
 /**
-  Flush data from PCI controller specific address to mapped system
-  memory address.
-
-  @param  Xhc                The XHCI device.
-  @param  Urb                The URB to unmap.
-
-  @retval EFI_SUCCESS        Success to flush data to mapped system memory.
-  @retval EFI_DEVICE_ERROR   Fail to flush data to mapped system memory.
-
-**/
-EFI_STATUS
-XhcFlushAsyncIntMap (
-  IN  USB_XHCI_INSTANCE   *Xhc,
-  IN  URB                 *Urb
-  )
-{
-  EFI_STATUS                    Status;
-  EFI_PHYSICAL_ADDRESS          PhyAddr;
-  EFI_PCI_IO_PROTOCOL_OPERATION MapOp;
-  EFI_PCI_IO_PROTOCOL           *PciIo;
-  UINTN                         Len;
-  VOID                          *Map;
-
-  PciIo = Xhc->PciIo;
-  Len   = Urb->DataLen;
-
-  if (Urb->Ep.Direction == EfiUsbDataIn) {
-    MapOp = EfiPciIoOperationBusMasterWrite;
-  } else {
-    MapOp = EfiPciIoOperationBusMasterRead;
-  }
-
-  if (Urb->DataMap != NULL) {
-    Status = PciIo->Unmap (PciIo, Urb->DataMap);
-    if (EFI_ERROR (Status)) {
-      goto ON_ERROR;
-    }
-  }
-
-  Urb->DataMap = NULL;
-
-  Status = PciIo->Map (PciIo, MapOp, Urb->Data, &Len, &PhyAddr, &Map);
-  if (EFI_ERROR (Status) || (Len != Urb->DataLen)) {
-    goto ON_ERROR;
-  }
-
-  Urb->DataPhy  = (VOID *) ((UINTN) PhyAddr);
-  Urb->DataMap  = Map;
-  return EFI_SUCCESS;
-
-ON_ERROR:
-  return EFI_DEVICE_ERROR;
-}
-
-/**
   Interrupt transfer periodic check handler.
 
   @param  Event                 Interrupt event.
@@ -1577,7 +1543,6 @@ XhcMonitorAsyncRequests (
   UINT8                   *ProcBuf;
   URB                     *Urb;
   UINT8                   SlotId;
-  EFI_STATUS              Status;
   EFI_TPL                 OldTpl;
 
   OldTpl = gBS->RaiseTPL (XHC_TPL);
@@ -1603,15 +1568,6 @@ XhcMonitorAsyncRequests (
 
     if (!Urb->Finished) {
       continue;
-    }
-
-    //
-    // Flush any PCI posted write transactions from a PCI host
-    // bridge to system memory.
-    //
-    Status = XhcFlushAsyncIntMap (Xhc, Urb);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "XhcMonitorAsyncRequests: Fail to Flush AsyncInt Mapped Memeory\n"));
     }
 
     //

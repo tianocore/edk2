@@ -172,6 +172,7 @@ typedef struct _URB {
   //
   USB_ENDPOINT                    Ep;
   EFI_USB_DEVICE_REQUEST          *Request;
+  BOOLEAN                         AllocateCommonBuffer;
   VOID                            *Data;
   UINTN                           DataLen;
   VOID                            *DataPhy;
@@ -1432,17 +1433,18 @@ XhcSetTrDequeuePointer (
 /**
   Create a new URB for a new transaction.
 
-  @param  Xhc       The XHCI Instance
-  @param  DevAddr   The device address
-  @param  EpAddr    Endpoint addrress
-  @param  DevSpeed  The device speed
-  @param  MaxPacket The max packet length of the endpoint
-  @param  Type      The transaction type
-  @param  Request   The standard USB request for control transfer
-  @param  Data      The user data to transfer
-  @param  DataLen   The length of data buffer
-  @param  Callback  The function to call when data is transferred
-  @param  Context   The context to the callback
+  @param  Xhc                   The XHCI Instance
+  @param  BusAddr               The logical device address assigned by UsbBus driver
+  @param  EpAddr                Endpoint addrress
+  @param  DevSpeed              The device speed
+  @param  MaxPacket             The max packet length of the endpoint
+  @param  Type                  The transaction type
+  @param  Request               The standard USB request for control transfer
+  @param  AllocateCommonBuffer  Indicate whether need to allocate common buffer for data transfer
+  @param  Data                  The user data to transfer, NULL if AllocateCommonBuffer is TRUE
+  @param  DataLen               The length of data buffer
+  @param  Callback              The function to call when data is transferred
+  @param  Context               The context to the callback
 
   @return Created URB or NULL
 
@@ -1450,12 +1452,13 @@ XhcSetTrDequeuePointer (
 URB*
 XhcCreateUrb (
   IN USB_XHCI_INSTANCE                  *Xhc,
-  IN UINT8                              DevAddr,
+  IN UINT8                              BusAddr,
   IN UINT8                              EpAddr,
   IN UINT8                              DevSpeed,
   IN UINTN                              MaxPacket,
   IN UINTN                              Type,
   IN EFI_USB_DEVICE_REQUEST             *Request,
+  IN BOOLEAN                            AllocateCommonBuffer,
   IN VOID                               *Data,
   IN UINTN                              DataLen,
   IN EFI_ASYNC_USB_TRANSFER_CALLBACK    Callback,
