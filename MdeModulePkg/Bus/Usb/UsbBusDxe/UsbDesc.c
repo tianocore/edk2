@@ -184,7 +184,7 @@ UsbCreateDesc (
   }
 
   //
-  // Total length is too small that cannot hold the single descriptor header plus data. 
+  // Total length is too small that cannot hold the single descriptor header plus data.
   //
   if (Len <= sizeof (USB_DESC_HEAD)) {
     DEBUG ((DEBUG_ERROR, "UsbCreateDesc: met mal-format descriptor, total length = %d!\n", Len));
@@ -658,7 +658,7 @@ UsbGetOneString (
   //
   // Reject if Length even cannot cover itself, or odd because Unicode string byte length should be even.
   //
-  if (EFI_ERROR (Status) || 
+  if (EFI_ERROR (Status) ||
       (Desc.Length < OFFSET_OF (EFI_USB_STRING_DESCRIPTOR, Length) + sizeof (Desc.Length)) ||
       (Desc.Length % 2 != 0)
     ) {
