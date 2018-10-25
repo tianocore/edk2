@@ -346,7 +346,7 @@ ProgramProcessorRegister (
       //  n * P(0)       n * P(1)      ...           n * P(n)
       //
       ASSERT (
-        (ApLocation != NULL) && 
+        (ApLocation != NULL) &&
         (CpuStatus->ValidCoreCountPerPackage != 0) &&
         (CpuFlags->SemaphoreCount) != NULL
         );
@@ -428,7 +428,7 @@ ProgramProcessorRegister (
 /**
 
   Set Processor register for one AP.
-  
+
   @param     PreSmmRegisterTable     Use pre Smm register table or register table.
 
 **/
