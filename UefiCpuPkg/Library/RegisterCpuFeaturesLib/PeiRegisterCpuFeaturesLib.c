@@ -146,6 +146,8 @@ GetProcessorInformation (
 
   @param[in]  Procedure               A pointer to the function to be run on
                                       enabled APs of the system.
+  @param[in]  MpEvent                 The Event used to sync the result.
+
 **/
 VOID
 StartupAPsWorker (

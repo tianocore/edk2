@@ -160,7 +160,7 @@ DetectFeatureScope (
 /**
   Clear dependence for the specified type.
 
-  @param[in]  CurrentFeature     Cpu feature need to clear.
+  @param[in]  CpuFeature         Cpu feature need to clear.
   @param[in]  Before             Before or after dependence relationship.
 
 **/
@@ -202,14 +202,14 @@ ClearFeatureScope (
 /**
   Base on dependence relationship to asjust feature dependence.
 
-  ONLY when the feature before(or after) the find feature also has 
+  ONLY when the feature before(or after) the find feature also has
   dependence with the find feature. In this case, driver need to base
   on dependce relationship to decide how to insert current feature and
   adjust the feature dependence.
 
-  @param[in]  PreviousFeature    CPU feature current before the find one.
-  @param[in]  CurrentFeature     Cpu feature need to adjust.
-  @param[in]  Before             Before or after dependence relationship.
+  @param[in, out]  PreviousFeature    CPU feature current before the find one.
+  @param[in, out]  CurrentFeature     Cpu feature need to adjust.
+  @param[in]       Before             Before or after dependence relationship.
 
   @retval   TRUE   means the current feature dependence has been adjusted.
 
@@ -239,7 +239,7 @@ AdjustFeaturesDependence (
   }
 
   //
-  // If both feature have dependence, keep the one which needs use more 
+  // If both feature have dependence, keep the one which needs use more
   // processors and clear the dependence for the other one.
   //
   if (PreDependType >= CurrentDependType) {
@@ -254,10 +254,10 @@ AdjustFeaturesDependence (
 /**
   Base on dependence relationship to asjust feature order.
 
-  @param[in]  FeatureList        Pointer to CPU feature list
-  @param[in]  FindEntry          The entry this feature depend on.
-  @param[in]  CurrentEntry       The entry for this feature.
-  @param[in]  Before             Before or after dependence relationship.
+  @param[in]       FeatureList        Pointer to CPU feature list
+  @param[in, out]  FindEntry          The entry this feature depend on.
+  @param[in, out]  CurrentEntry       The entry for this feature.
+  @param[in]       Before             Before or after dependence relationship.
 
 **/
 VOID
@@ -279,8 +279,8 @@ AdjustEntry (
   // base on dependence type of feature A and B to update the logic here.
   // For example, feature A has package type dependence and feature B has core type dependence,
   // because package type dependence need to wait for more processors which has strong dependence
-  // than core type dependence. So driver will adjust the feature order to B -> A -> C. and driver 
-  // will remove the feature dependence in feature B. 
+  // than core type dependence. So driver will adjust the feature order to B -> A -> C. and driver
+  // will remove the feature dependence in feature B.
   // Driver just needs to make sure before feature C been executed, feature A has finished its task
   // in all all thread. Feature A finished in all threads also means feature B have finshed in all
   // threads.
