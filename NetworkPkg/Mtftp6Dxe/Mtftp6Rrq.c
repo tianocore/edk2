@@ -102,6 +102,7 @@ Mtftp6RrqSaveBlock (
   UINT16                    Block;
   UINT64                    Start;
   UINT32                    DataLen;
+  UINT64                    BlockCounter;
   BOOLEAN                   Completed;
 
   Completed = FALSE;
@@ -122,10 +123,10 @@ Mtftp6RrqSaveBlock (
   // Remove this block number from the file hole. If Mtftp6RemoveBlockNum
   // returns EFI_NOT_FOUND, the block has been saved, don't save it again.
   // Note that : For bigger files, allowing the block counter to roll over
-  // to accept transfers of unlimited size. So TotalBlock is memorised as
+  // to accept transfers of unlimited size. So BlockCounter is memorised as
   // continuous block counter.
   //
-  Status = Mtftp6RemoveBlockNum (&Instance->BlkList, Block, Completed, &Instance->TotalBlock);
+  Status = Mtftp6RemoveBlockNum (&Instance->BlkList, Block, Completed, &BlockCounter);
 
   if (Status == EFI_NOT_FOUND) {
     return EFI_SUCCESS;
@@ -161,7 +162,7 @@ Mtftp6RrqSaveBlock (
 
   if (Token->Buffer != NULL) {
 
-    Start = MultU64x32 (Instance->TotalBlock - 1, Instance->BlkSize);
+    Start = MultU64x32 (BlockCounter - 1, Instance->BlkSize);
     if (Start + DataLen <= Token->BufferSize) {
       CopyMem ((UINT8 *) Token->Buffer + Start, Packet->Data.Data, DataLen);
       //
@@ -238,9 +239,9 @@ Mtftp6RrqHandleData (
   ASSERT (Expected >= 0);
 
   //
-  // If we are active and received an unexpected packet, transmit
+  // If we are active (Master) and received an unexpected packet, transmit
   // the ACK for the block we received, then restart receiving the
-  // expected one. If we are passive, save the block.
+  // expected one. If we are passive (Slave), save the block.
   //
   if (Instance->IsMaster && (Expected != BlockNum)) {
     //
@@ -261,6 +262,11 @@ Mtftp6RrqHandleData (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  //
+  // Record the total received and saved block number.
+  //
+  Instance->TotalBlock ++;
 
   //
   // Reset the passive client's timer whenever it received a valid data packet.

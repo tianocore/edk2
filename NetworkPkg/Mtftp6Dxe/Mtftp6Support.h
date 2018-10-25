@@ -1,7 +1,7 @@
 /** @file
   Mtftp6 support functions declaration.
 
-  Copyright (c) 2009 - 2010, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -96,8 +96,8 @@ Mtftp6SetLastBlockNum (
 
   @param[in]  Head                   The block range list to remove from.
   @param[in]  Num                    The block number to remove.
-  @param[in]  Completed              Whether Num is the last block number
-  @param[out] TotalBlock             The continuous block number in all
+  @param[in]  Completed              Whether Num is the last block number.
+  @param[out] BlockCounter           The continuous block counter instead of the value after roll-over.
 
   @retval EFI_NOT_FOUND          The block number isn't in the block range list.
   @retval EFI_SUCCESS            The block number has been removed from the list.
@@ -109,7 +109,7 @@ Mtftp6RemoveBlockNum (
   IN LIST_ENTRY             *Head,
   IN UINT16                 Num,
   IN BOOLEAN                Completed,
-  OUT UINT64                *TotalBlock
+  OUT UINT64                *BlockCounter
   );
 
 
