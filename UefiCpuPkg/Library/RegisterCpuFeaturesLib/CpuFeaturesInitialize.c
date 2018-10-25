@@ -671,10 +671,11 @@ AnalysisProcessorFeatures (
         // If feature has dependence with the next feature (ONLY care core/package dependency).
         // and feature initialize succeed, add sync semaphere here.
         //
-        BeforeDep = DetectFeatureScope (CpuFeatureInOrder, TRUE);
         if (NextCpuFeatureInOrder != NULL) {
-          AfterDep  = DetectFeatureScope (NextCpuFeatureInOrder, FALSE);
+          BeforeDep = DetectFeatureScope (CpuFeatureInOrder, TRUE, NextCpuFeatureInOrder->FeatureMask);
+          AfterDep  = DetectFeatureScope (NextCpuFeatureInOrder, FALSE, CpuFeatureInOrder->FeatureMask);
         } else {
+          BeforeDep = DetectFeatureScope (CpuFeatureInOrder, TRUE, NULL);
           AfterDep = NoneDepType;
         }
         //

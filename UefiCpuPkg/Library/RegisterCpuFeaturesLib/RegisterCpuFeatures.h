@@ -193,15 +193,17 @@ DumpCpuFeature (
 /**
   Return feature dependence result.
 
-  @param[in]  CpuFeature        Pointer to CPU feature.
-  @param[in]  Before            Check before dependence or after.
+  @param[in]  CpuFeature            Pointer to CPU feature.
+  @param[in]  Before                Check before dependence or after.
+  @param[in]  NextCpuFeatureMask    Pointer to next CPU feature Mask.
 
   @retval     return the dependence result.
 **/
 CPU_FEATURE_DEPENDENCE_TYPE
 DetectFeatureScope (
   IN CPU_FEATURES_ENTRY         *CpuFeature,
-  IN BOOLEAN                    Before
+  IN BOOLEAN                    Before,
+  IN CHAR8                      *NextCpuFeatureMask
   );
 
 /**
