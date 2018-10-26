@@ -574,9 +574,9 @@ class GenFdsGlobalVariable:
         if BaseAddress:
             Cmd += ("-r", BaseAddress)
 
-        if not ForceRebase:
+        if ForceRebase == False:
             Cmd += ("-F", "FALSE")
-        else:
+        elif ForceRebase == True:
             Cmd += ("-F", "TRUE")
 
         if Capsule:
