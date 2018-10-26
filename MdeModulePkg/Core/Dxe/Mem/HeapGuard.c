@@ -463,7 +463,7 @@ IsGuardPage (
   IN EFI_PHYSICAL_ADDRESS    Address
   )
 {
-  UINTN       BitMap;
+  UINT64        BitMap;
 
   //
   // There must be at least one guarded page before and/or after given
@@ -1368,7 +1368,7 @@ GuardAllFreedPages (
   UINT64    Address;
   UINT64    GuardPage;
   INTN      Level;
-  UINTN     BitIndex;
+  UINT64    BitIndex;
   UINTN     GuardPageNumber;
 
   if (mGuardedMemoryMap == 0 ||
@@ -1475,12 +1475,12 @@ MergeGuardPages (
   }
 
   Bitmap = 0;
-  Pages  = EFI_SIZE_TO_PAGES (MaxAddress - MemoryMapEntry->PhysicalStart);
-  Pages -= MemoryMapEntry->NumberOfPages;
+  Pages  = EFI_SIZE_TO_PAGES ((UINTN)(MaxAddress - MemoryMapEntry->PhysicalStart));
+  Pages -= (INTN)MemoryMapEntry->NumberOfPages;
   while (Pages > 0) {
     if (Bitmap == 0) {
       EndAddress = MemoryMapEntry->PhysicalStart +
-                   EFI_PAGES_TO_SIZE (MemoryMapEntry->NumberOfPages);
+                   EFI_PAGES_TO_SIZE ((UINTN)MemoryMapEntry->NumberOfPages);
       Bitmap = GetGuardedMemoryBits (EndAddress, GUARDED_HEAP_MAP_ENTRY_BITS);
     }
 
