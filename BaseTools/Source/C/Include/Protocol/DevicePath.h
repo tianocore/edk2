@@ -1380,7 +1380,7 @@ extern EFI_GUID  gEfiDebugPortVariableGuid;
 // DebugPort device path definitions...
 //
 #define DEVICE_PATH_MESSAGING_DEBUGPORT EFI_DEBUGPORT_PROTOCOL_GUID
-extern EFI_GUID  gEfiDebugPortDevicePathGuid;
+extern EFI_GUID  gEfiDebugPortProtocolGuid;
 
 typedef struct {
   EFI_DEVICE_PATH_PROTOCOL  Header;
