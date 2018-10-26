@@ -107,13 +107,12 @@ SecStartup (
     }
     IdtSize = sizeof (IdtTableInStack.IdtTable);
   } else {
-    if (IdtDescriptor.Limit + 1 > sizeof (IdtTableInStack.IdtTable)) {
+    IdtSize = IdtDescriptor.Limit + 1;
+    if (IdtSize > sizeof (IdtTableInStack.IdtTable)) {
       //
       // ERROR: IDT table size from boot loader is larger than FSP can support, DeadLoop here!
       //
       CpuDeadLoop();
-    } else {
-      IdtSize = IdtDescriptor.Limit + 1;
     }
     CopyMem ((VOID *) (UINTN) &IdtTableInStack.IdtTable, (VOID *) IdtDescriptor.Base, IdtSize);
   }
