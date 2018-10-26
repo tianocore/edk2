@@ -4,8 +4,8 @@
   (TCG Storage Architecture Core Specification, Version 2.01, Revision 1.00,
   https://trustedcomputinggroup.org/tcg-storage-architecture-core-specification/
 
-  Storage Work Group Storage Security Subsystem Class: Pyrite, Version 1.00 Final, Revision 1.00,
-  https://trustedcomputinggroup.org/tcg-storage-security-subsystem-class-pyrite/
+  Storage Work Group Storage Security Subsystem Class: Pyrite, Specification Version 2.00, Revision 1.00,
+  https://trustedcomputinggroup.org/resource/tcg-storage-security-subsystem-class-pyrite/
 
   Storage Work Group Storage Security Subsystem Class: Opal, Version 2.01 Final, Revision 1.00,
   https://trustedcomputinggroup.org/storage-work-group-storage-security-subsystem-class-opal/
