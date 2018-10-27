@@ -203,7 +203,7 @@ CPU_FEATURE_DEPENDENCE_TYPE
 DetectFeatureScope (
   IN CPU_FEATURES_ENTRY         *CpuFeature,
   IN BOOLEAN                    Before,
-  IN CHAR8                      *NextCpuFeatureMask
+  IN UINT8                      *NextCpuFeatureMask
   );
 
 /**
