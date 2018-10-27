@@ -1559,7 +1559,7 @@ PromoteGuardedFreePages (
     }
   }
 
-  if (AvailablePages) {
+  if (AvailablePages != 0) {
     DEBUG ((DEBUG_INFO, "Promoted pages: %lX (%lx)\r\n", Start, (UINT64)AvailablePages));
     ClearGuardedMemoryBits (Start, AvailablePages);
 
