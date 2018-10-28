@@ -110,7 +110,6 @@ GetProtectedModeCS (
   UINTN                    GdtEntryCount;
   UINT16                   Index;
 
-  Index = (UINT16) -1;
   AsmReadGdtr (&GdtrDesc);
   GdtEntryCount = (GdtrDesc.Limit + 1) / sizeof (IA32_SEGMENT_DESCRIPTOR);
   GdtEntry = (IA32_SEGMENT_DESCRIPTOR *) GdtrDesc.Base;
@@ -122,7 +121,7 @@ GetProtectedModeCS (
     }
     GdtEntry++;
   }
-  ASSERT (Index != -1);
+  ASSERT (Index != GdtEntryCount);
   return Index * 8;
 }
 
