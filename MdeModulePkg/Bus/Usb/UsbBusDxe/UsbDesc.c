@@ -229,6 +229,7 @@ UsbCreateDesc (
   //
   if (Len < Offset) {
     DEBUG ((DEBUG_ERROR, "UsbCreateDesc: met mal-format descriptor, Offset/Len = %d/%d!\n", Offset, Len));
+    return NULL;
   }
 
   if ((Head->Type != Type) || (Head->Len < DescLen)) {
