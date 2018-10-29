@@ -3,6 +3,7 @@
 
   Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
   (C) Copyright 2013-2014 Hewlett-Packard Development Company, L.P.<BR>
+  Copyright 2015-2018 Dell Technologies.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -1208,6 +1209,7 @@ DoStartupScript(
   UINTN                         Delay;
   EFI_INPUT_KEY                 Key;
   CHAR16                        *FileStringPath;
+  CHAR16                        *FullFileStringPath;
   UINTN                         NewSize;
 
   Key.UnicodeChar = CHAR_NULL;
@@ -1275,7 +1277,13 @@ DoStartupScript(
 
   FileStringPath = LocateStartupScript (ImagePath, FilePath);
   if (FileStringPath != NULL) {
-    Status = RunScriptFile (FileStringPath, NULL, L"", ShellInfoObject.NewShellParametersProtocol);
+    FullFileStringPath = FullyQualifyPath(FileStringPath);
+    if (FullFileStringPath == NULL) {
+      Status = RunScriptFile (FileStringPath, NULL, FileStringPath, ShellInfoObject.NewShellParametersProtocol);
+    } else {
+      Status = RunScriptFile (FullFileStringPath, NULL, FullFileStringPath, ShellInfoObject.NewShellParametersProtocol);
+      FreePool(FullFileStringPath);
+    }
     FreePool (FileStringPath);
   } else {
     //
@@ -2429,6 +2437,7 @@ RunCommandOrFile(
   EFI_STATUS                Status;
   EFI_STATUS                StartStatus;
   CHAR16                    *CommandWithPath;
+  CHAR16                    *FullCommandWithPath;
   EFI_DEVICE_PATH_PROTOCOL  *DevPath;
   SHELL_STATUS              CalleeExitStatus;
 
@@ -2474,7 +2483,13 @@ RunCommandOrFile(
       }
       switch (Type) {
         case   Script_File_Name:
-          Status = RunScriptFile (CommandWithPath, NULL, CmdLine, ParamProtocol);
+          FullCommandWithPath = FullyQualifyPath(CommandWithPath);
+          if (FullCommandWithPath == NULL) {
+            Status = RunScriptFile (CommandWithPath, NULL, CmdLine, ParamProtocol);
+          } else {
+            Status = RunScriptFile (FullCommandWithPath, NULL, CmdLine, ParamProtocol);
+            FreePool(FullCommandWithPath);
+          }
           break;
         case   Efi_Application:
           //
@@ -2812,7 +2827,12 @@ RunScriptFileHandle (
       DeleteScriptFileStruct(NewScriptFile);
       return (EFI_OUT_OF_RESOURCES);
     }
-    for (LoopVar = 0 ; LoopVar < 10 && LoopVar < NewScriptFile->Argc; LoopVar++) {
+    //
+    // Put the full path of the script file into Argv[0] as required by section
+    // 3.6.2 of version 2.2 of the shell specification.
+    //
+    NewScriptFile->Argv[0] = StrnCatGrow(&NewScriptFile->Argv[0], NULL, NewScriptFile->ScriptName, 0);
+    for (LoopVar = 1 ; LoopVar < 10 && LoopVar < NewScriptFile->Argc; LoopVar++) {
       ASSERT(NewScriptFile->Argv[LoopVar] == NULL);
       NewScriptFile->Argv[LoopVar] = StrnCatGrow(&NewScriptFile->Argv[LoopVar], NULL, ShellInfoObject.NewShellParametersProtocol->Argv[LoopVar], 0);
       if (NewScriptFile->Argv[LoopVar] == NULL) {
