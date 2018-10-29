@@ -1719,7 +1719,7 @@ CoreGetMemorySpaceMap (
     // AllocatePool() called below has to be running outside the GCD lock.
     //
     DescriptorCount = CoreCountGcdMapEntry (&mGcdMemorySpaceMap);
-    if (DescriptorCount == *NumberOfDescriptors) {
+    if (DescriptorCount == *NumberOfDescriptors && *MemorySpaceMap != NULL) {
       //
       // Fill in the MemorySpaceMap if no memory space map change.
       //
