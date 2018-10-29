@@ -4396,8 +4396,8 @@ class FdfParser:
                         raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
                     # Get a list of PCI IDs
                     Overrides.PciDeviceId = ""
-                    while (self.__GetNextHexNumber()):
-                        Overrides.PciDeviceId = "{} {}".format(Overrides.PciDeviceId, self.__Token)
+                    while (self._GetNextHexNumber()):
+                        Overrides.PciDeviceId = "{} {}".format(Overrides.PciDeviceId, self._Token)
                     if not Overrides.PciDeviceId:
                         raise Warning.Expected("one or more Hex device ids", self.FileName, self.CurrentLineNumber)
                     continue
