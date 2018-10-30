@@ -2257,6 +2257,13 @@ ResolveSymlink (
       }
       FileName[Index] = L'\0';
       break;
+    default:
+      //
+      // According to the ECMA-167 standard (3rd Edition - June 1997), Section
+      // 14.16.1.1, all other values are reserved.
+      //
+      Status = EFI_VOLUME_CORRUPTED;
+      goto Error_Find_File;
     }
 
     //
