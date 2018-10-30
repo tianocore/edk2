@@ -144,7 +144,7 @@ TlsEncryptPacket (
     BufferOutSize += ThisMessageSize;
 
     BufferInPtr += TLS_RECORD_HEADER_LENGTH + ThisPlainMessageSize;
-    TempRecordHeader += ThisMessageSize;
+    TempRecordHeader = (TLS_RECORD_HEADER *)((UINT8 *)TempRecordHeader + ThisMessageSize);
   }
 
   FreePool (BufferIn);
@@ -317,7 +317,7 @@ TlsDecryptPacket (
     BufferOutSize += TLS_RECORD_HEADER_LENGTH + ThisPlainMessageSize;
 
     BufferInPtr += TLS_RECORD_HEADER_LENGTH + ThisCipherMessageSize;
-    TempRecordHeader += TLS_RECORD_HEADER_LENGTH + ThisPlainMessageSize;
+    TempRecordHeader = (TLS_RECORD_HEADER *)((UINT8 *)TempRecordHeader + TLS_RECORD_HEADER_LENGTH + ThisPlainMessageSize);
   }
 
   FreePool (BufferIn);
