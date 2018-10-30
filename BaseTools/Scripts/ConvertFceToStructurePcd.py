@@ -303,7 +303,10 @@ class Config(object):
     list1 = [t for t in list1 if t != '']  # remove '' form list
     first_num = int(list1[0], 16)
     if list1[first_num + 1] == 'STRING':  # parser STRING
-      value = 'L%s' % list1[-1]
+      if list1[-1] == '""':
+        value = "{0x0, 0x0}"
+      else:
+        value = 'L%s' % list1[-1]
     elif list1[first_num + 1] == 'ORDERED_LIST':  # parser ORDERED_LIST
       value_total = int(list1[first_num + 2])
       list2 = list1[-value_total:]
@@ -505,12 +508,22 @@ class mainprocess(object):
     inf_list = self.del_repeat(inf_list)
     header_list = self.plus(self.del_repeat(header_list))
     title_all=list(set(title_list))
-    info_list = self.del_repeat(info_list)
+    info_list = self.remove_bracket(self.del_repeat(info_list))
     for i in range(len(info_list)-1,-1,-1):
       if len(info_list[i]) == 0:
         info_list.remove(info_list[i])
     return keys,title_all,info_list,header_list,inf_list
 
+  def remove_bracket(self,List):
+    for i in List:
+      for j in i:
+        tmp = j.split("|")
+        if (('L"' in j) and ("[" in j)) or (tmp[1].strip() == '{0x0, 0x0}'):
+          tmp[0] = tmp[0][:tmp[0].index('[')]
+          List[List.index(i)][i.index(j)] = "|".join(tmp)
+        else:
+          List[List.index(i)][i.index(j)] = j
+    return List
 
   def write_all(self):
     title_flag=1
