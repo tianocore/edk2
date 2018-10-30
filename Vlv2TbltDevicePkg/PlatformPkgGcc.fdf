@@ -700,6 +700,9 @@ FILE FREEFORM = 878AC2CC-5343-46F2-B563-51F89DAF56BA {
   INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
   INF  MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
   INF  MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
+  INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
+  INF  NetworkPkg/TcpDxe/TcpDxe.inf
+  INF  NetworkPkg/IScsiDxe/IScsiDxe.inf
   !if $(NETWORK_IP6_ENABLE) == TRUE
   INF  NetworkPkg/Ip6Dxe/Ip6Dxe.inf
   INF  NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
@@ -707,22 +710,11 @@ FILE FREEFORM = 878AC2CC-5343-46F2-B563-51F89DAF56BA {
   INF  NetworkPkg/Udp6Dxe/Udp6Dxe.inf
   INF  NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
   !endif
-  !if $(NETWORK_IP6_ENABLE) == TRUE
-  INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
-  INF  NetworkPkg/TcpDxe/TcpDxe.inf
-  !else
-  INF  MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
-  INF  MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf
-  !endif
   !if $(NETWORK_VLAN_ENABLE) == TRUE
   INF  MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
   !endif
   !if $(NETWORK_ISCSI_ENABLE) == TRUE
-  !if $(NETWORK_IP6_ENABLE) == TRUE
     INF  NetworkPkg/IScsiDxe/IScsiDxe.inf
-  !else
-    INF  MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
-  !endif
   !endif
 !endif
 

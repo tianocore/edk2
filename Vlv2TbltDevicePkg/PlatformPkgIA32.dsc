@@ -285,7 +285,7 @@
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
-!if $(FTPM_ENABLE) == TRUE
+!if $(FTPM_ENABLE) == TRUE || $(NETWORK_ISCSI_ENABLE) == TRUE
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
@@ -1516,11 +1516,7 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
 
 !if $(NETWORK_ENABLE) == TRUE
   !if $(NETWORK_ISCSI_ENABLE) == TRUE
-    !if $(NETWORK_IP6_ENABLE) == TRUE
-      NetworkPkg/IScsiDxe/IScsiDxe.inf
-    !else
-      MdeModulePkg/Universal/Network/IScsiDxe/IScsiDxe.inf
-    !endif
+    NetworkPkg/IScsiDxe/IScsiDxe.inf
   !endif
   !if $(NETWORK_VLAN_ENABLE) == TRUE
     MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
@@ -1542,23 +1538,15 @@ $(PLATFORM_BINARY_PACKAGE)/$(DXE_ARCHITECTURE)$(TARGET)/IA32/fTPMInitPeim.inf
     MdeModulePkg/Universal/Network/Dhcp4Dxe/Dhcp4Dxe.inf
     MdeModulePkg/Universal/Network/Ip4Dxe/Ip4Dxe.inf
     MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
-    MdeModulePkg/Universal/Network/Tcp4Dxe/Tcp4Dxe.inf {
-      <PcdsPatchableInModule>
-      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
-    }
     MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
+    NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
+    NetworkPkg/TcpDxe/TcpDxe.inf
     !if $(NETWORK_IP6_ENABLE) == TRUE
       NetworkPkg/Ip6Dxe/Ip6Dxe.inf
       NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf
       NetworkPkg/IpSecDxe/IpSecDxe.inf
-      NetworkPkg/TcpDxe/TcpDxe.inf
       NetworkPkg/Udp6Dxe/Udp6Dxe.inf
       NetworkPkg/Mtftp6Dxe/Mtftp6Dxe.inf
-    !endif
-    !if $(NETWORK_IP6_ENABLE) == TRUE
-      NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
-    !else
-      MdeModulePkg/Universal/Network/UefiPxeBcDxe/UefiPxeBcDxe.inf
     !endif
 !endif
 
