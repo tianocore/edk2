@@ -2145,6 +2145,8 @@ ResolveSymlink (
   UINT8               CompressionId;
   UDF_FILE_INFO       PreviousFile;
 
+  ZeroMem ((VOID *)File, sizeof (UDF_FILE_INFO));
+
   //
   // Symlink files on UDF volumes do not contain so much data other than
   // Path Components which resolves to real filenames, so it's OK to read in
@@ -2288,6 +2290,14 @@ ResolveSymlink (
       break;
     }
 
+    //
+    // Check the content in the file info pointed by File.
+    //
+    if ((File->FileEntry == NULL) || (File->FileIdentifierDesc == NULL)) {
+      Status = EFI_VOLUME_CORRUPTED;
+      goto Error_Find_File;
+    }
+
     if (CompareMem ((VOID *)&PreviousFile, (VOID *)Parent,
                     sizeof (UDF_FILE_INFO)) != 0) {
       CleanupFileInformation (&PreviousFile);
@@ -2300,6 +2310,13 @@ ResolveSymlink (
   // Unmap the symlink file.
   //
   FreePool (ReadFileInfo.FileData);
+
+  //
+  // Check the content in the resolved file info.
+  //
+  if ((File->FileEntry == NULL) || (File->FileIdentifierDesc == NULL)) {
+    return EFI_VOLUME_CORRUPTED;
+  }
 
   return EFI_SUCCESS;
 
