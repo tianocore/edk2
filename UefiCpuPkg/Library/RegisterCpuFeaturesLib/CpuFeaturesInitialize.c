@@ -517,7 +517,7 @@ DumpRegisterTableOnProcessor (
         DebugPrintErrorLevel,
         "Processor: %d: Semaphore: Scope Value: %s\r\n",
         ProcessorNumber,
-        mDependTypeStr[MIN (RegisterTableEntry->Value, InvalidDepType)]
+        mDependTypeStr[MIN ((UINT32)RegisterTableEntry->Value, InvalidDepType)]
         ));
       break;
 
