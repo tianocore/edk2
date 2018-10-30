@@ -2144,6 +2144,8 @@ ResolveSymlink (
   UINTN               Index;
   UINT8               CompressionId;
   UDF_FILE_INFO       PreviousFile;
+  BOOLEAN             NotParent;
+  BOOLEAN             NotFile;
 
   ZeroMem ((VOID *)File, sizeof (UDF_FILE_INFO));
 
@@ -2298,12 +2300,18 @@ ResolveSymlink (
       goto Error_Find_File;
     }
 
-    if (CompareMem ((VOID *)&PreviousFile, (VOID *)Parent,
-                    sizeof (UDF_FILE_INFO)) != 0) {
+    NotParent = (CompareMem ((VOID *)&PreviousFile, (VOID *)Parent,
+                 sizeof (UDF_FILE_INFO)) != 0);
+    NotFile   = (CompareMem ((VOID *)&PreviousFile, (VOID *)File,
+                 sizeof (UDF_FILE_INFO)) != 0);
+
+    if (NotParent && NotFile) {
       CleanupFileInformation (&PreviousFile);
     }
 
-    CopyMem ((VOID *)&PreviousFile, (VOID *)File, sizeof (UDF_FILE_INFO));
+    if (NotFile) {
+      CopyMem ((VOID *)&PreviousFile, (VOID *)File, sizeof (UDF_FILE_INFO));
+    }
   }
 
   //
