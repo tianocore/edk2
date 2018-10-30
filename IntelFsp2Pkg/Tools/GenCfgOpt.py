@@ -531,7 +531,7 @@ EndList
                                                   break
                                         else:
                                           IncludeDsc  = open(IncludeFilePath, "r")
-                                        if IncludeDsc == None:
+                                        if IncludeDsc is None:
                                             print("ERROR: Cannot open file '%s'" % IncludeFilePath)
                                             raise SystemExit
                                         NewDscLines = IncludeDsc.readlines()
@@ -753,7 +753,7 @@ EndList
                     Match = re.match("^\s*#\s+(!BSF|@Bsf)\s+FIELD:{(.+):(\d+)([Bb])?}", DscLine)
                     if Match:
                         SubCfgDict = ConfigDict.copy()
-                        if (Match.group(4) == None) or (Match.group(4) == 'B'):
+                        if (Match.group(4) is None) or (Match.group(4) == 'B'):
                           UnitBitLen = 8
                         elif Match.group(4) == 'b':
                           UnitBitLen = 1

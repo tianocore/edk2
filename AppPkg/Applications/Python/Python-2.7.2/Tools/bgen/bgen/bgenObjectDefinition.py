@@ -238,8 +238,8 @@ class PEP252Mixin:
         # signify a bgen-client that has been partially converted to PEP252.
         assert self.outputGetattr.im_func == PEP252Mixin.outputGetattr.im_func
         assert self.outputSetattr.im_func == PEP252Mixin.outputSetattr.im_func
-        assert self.outputGetattrBody == None
-        assert self.outputGetattrHook == None
+        assert self.outputGetattrBody is None
+        assert self.outputGetattrHook is None
         assert self.basechain == "NULL"
 
     def outputGetattr(self):

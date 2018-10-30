@@ -70,7 +70,7 @@ class Lock:
             return 0
         try:
             self.__mutex.acquire()
-            assert self.__tid == None
+            assert self.__tid is None
             assert self.__count == 0
             self.__tid = thread.get_ident()
             self.__count = 1

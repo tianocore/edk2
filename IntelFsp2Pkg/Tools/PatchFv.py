@@ -706,7 +706,7 @@ class Symbols:
     #
     def getVariable(self, var):
         value = self.dictVariable.get(var, None)
-        if value == None:
+        if value is None:
             raise Exception("Unrecognized variable '%s'" % var)
         return value
 

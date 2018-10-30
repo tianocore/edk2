@@ -215,7 +215,7 @@ class FirmwareFile:
         return highest_bit
 
     def get_next_section(self, section=None):
-        if section == None:
+        if section is None:
             if self.get_type() != FirmwareFile.EFI_FV_FILETYPE_FFS_MIN:
                 section_base = self.get_base() + 0x18;
             else:
@@ -264,7 +264,7 @@ class FirmwareVolume:
             return 0
 
     def get_next_ffs(self, ffs=None):
-        if ffs == None:
+        if ffs is None:
             # Get the offset of the first FFS file from the FV header
             ffs_base = self.fv_base +  self.ec.getMemoryService().readMemory16(self.fv_base + 0x30)
         else:
