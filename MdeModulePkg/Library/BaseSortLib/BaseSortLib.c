@@ -1,7 +1,7 @@
 /** @file
   Library used for sorting routines.
 
-  Copyright (c) 2009 - 2014, Intel Corporation. All rights reserved. <BR>
+  Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved. <BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -193,14 +193,12 @@ DevicePathCompare (
 }
 
 /**
-  Function to compare 2 strings without regard to case of the characters.
+  Not supported in Base version.
 
-  @param[in] Buffer1            Pointer to String to compare.
-  @param[in] Buffer2            Pointer to second String to compare.
+  @param[in] Buffer1  Ignored.
+  @param[in] Buffer2  Ignored.
 
-  @retval 0                     Buffer1 equal to Buffer2.
-  @return < 0                   Buffer1 is less than Buffer2.
-  @return > 0                   Buffer1 is greater than Buffer2.
+  ASSERT and return 0.
 **/
 INTN
 EFIAPI
@@ -215,14 +213,12 @@ StringNoCaseCompare (
 
 
 /**
-  Function to compare 2 strings.
+  Not supported in Base version.
 
-  @param[in] Buffer1            Pointer to String to compare (CHAR16**).
-  @param[in] Buffer2            Pointer to second String to compare (CHAR16**).
+  @param[in] Buffer1  Ignored.
+  @param[in] Buffer2  Ignored.
 
-  @retval 0                     Buffer1 equal to Buffer2.
-  @return < 0                   Buffer1 is less than Buffer2.
-  @return > 0                   Buffer1 is greater than Buffer2.
+  ASSERT and return 0.
 **/
 INTN
 EFIAPI
