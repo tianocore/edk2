@@ -1399,6 +1399,13 @@ class PlatformAutoGen(AutoGen):
                 self.VariableInfo = self.CollectVariables(self._DynamicPcdList)
                 vardump = self.VariableInfo.dump()
                 if vardump:
+                    #
+                    #According to PCD_DATABASE_INIT in edk2\MdeModulePkg\Include\Guid\PcdDataBaseSignatureGuid.h,
+                    #the max size for string PCD should not exceed USHRT_MAX 65535(0xffff).
+                    #typedef UINT16 SIZE_INFO;
+                    #//SIZE_INFO  SizeTable[];
+                    if len(vardump.split(",")) > 0xffff:
+                        EdkLogger.error("build", RESOURCE_OVERFLOW, 'The current length of PCD %s value is %d, it exceeds to the max size of String PCD.' %(".".join([PcdNvStoreDfBuffer.TokenSpaceGuidCName,PcdNvStoreDfBuffer.TokenCName]) ,len(vardump.split(","))))
                     PcdNvStoreDfBuffer.DefaultValue = vardump
                     for skuname in PcdNvStoreDfBuffer.SkuInfoList:
                         PcdNvStoreDfBuffer.SkuInfoList[skuname].DefaultValue = vardump
