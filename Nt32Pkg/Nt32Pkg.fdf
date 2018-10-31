@@ -284,11 +284,7 @@ INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
 # for binary shell, binary fat and logo module.
 #
 ################################################################################
-!ifndef $(USE_OLD_SHELL)
 INF  ShellPkg/Application/Shell/Shell.inf
-!else
-INF  EdkShellBinPkg/FullShell/FullShell.inf
-!endif
 
 INF FatPkg/EnhancedFatDxe/Fat.inf
 INF MdeModulePkg/Universal/Disk/UdfDxe/UdfDxe.inf
