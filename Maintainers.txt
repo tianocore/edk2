@@ -113,12 +113,6 @@ EdkCompatibilityPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/EdkCompatibilityPkg
 M: Liming Gao <liming.gao@intel.com>
 
-EdkShellPkg, EdkShellBinPkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/EdkShellPkg
-M: Ruiyu Ni <ruiyu.ni@intel.com>
-T: svn - https://svn.code.sf.net/p/efi-shell/code/trunk/Shell/
-S: Obsolete (Use ShellPkg & ShellBinPkg instead)
-
 EmbeddedPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmbeddedPkg
 M: Leif Lindholm <leif.lindholm@linaro.org>
