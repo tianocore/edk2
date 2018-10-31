@@ -709,10 +709,7 @@ INF FatPkg/EnhancedFatDxe/Fat.inf
 #
 # UEFI Shell
 #
-FILE APPLICATION = PCD(gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile) {
-#    SECTION PE32 = EdkShellBinPkg/FullShell/$(EDK_DXE_ARCHITECTURE)/Shell_Full.efi
-    SECTION PE32 = ShellBinPkg/UefiShell/$(EDK_DXE_ARCHITECTURE)/Shell.efi
-  }
+INF  ShellPkg/Application/Shell/Shell.inf
 
 #
 # dp command
