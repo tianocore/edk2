@@ -96,7 +96,7 @@
   gEmulatorPkgTokenSpaceGuid.PcdEmuVirtualDisk|L"disk.dmg:FW"|VOID*|0x00001001
 
   gEmulatorPkgTokenSpaceGuid.PcdEmuGop|L"GOP Window"|VOID*|0x00001018
-  gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem|L".!../../../../../EdkShellBinPkg/bin/ia32/Apps"|VOID*|0x00001004
+  gEmulatorPkgTokenSpaceGuid.PcdEmuFileSystem|L"."|VOID*|0x00001004
   gEmulatorPkgTokenSpaceGuid.PcdEmuSerialPort|L"/dev/ttyS0"|VOID*|0x00001002
   gEmulatorPkgTokenSpaceGuid.PcdEmuNetworkInterface|L"en0"|VOID*|0x0000100d
 

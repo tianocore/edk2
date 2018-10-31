@@ -208,12 +208,8 @@ INF  MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
 
 INF FatPkg/EnhancedFatDxe/Fat.inf
 
-!ifndef $(USE_OLD_SHELL)
 INF  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 INF  ShellPkg/Application/Shell/Shell.inf
-!else
-INF  RuleOverride = BINARY EdkShellBinPkg/FullShell/FullShell.inf
-!endif
 
 [Rule.Common.SEC]
   FILE SEC = $(NAMED_GUID)  {
