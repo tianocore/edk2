@@ -1165,6 +1165,8 @@ class PlatformAutoGen(AutoGen):
                 if SkuId is None or SkuId == '':
                     continue
                 if len(Sku.VariableName) > 0:
+                    if Sku.VariableAttribute and 'NV' not in Sku.VariableAttribute:
+                        continue
                     VariableGuidStructure = Sku.VariableGuidValue
                     VariableGuid = GuidStructureStringToGuidString(VariableGuidStructure)
                     for StorageName in Sku.DefaultStoreDict:
