@@ -106,6 +106,10 @@ class WorkspaceDatabase(object):
                 return self._CACHE_[Key]
 
             # check file type
+            BuildObject = self.CreateBuildObject(FilePath, Arch, Target, Toolchain)
+            self._CACHE_[Key] = BuildObject
+            return BuildObject
+        def CreateBuildObject(self,FilePath, Arch, Target, Toolchain):
             Ext = FilePath.Type
             if Ext not in self._FILE_TYPE_:
                 return None
@@ -131,7 +135,6 @@ class WorkspaceDatabase(object):
                                     Target,
                                     Toolchain
                                     )
-            self._CACHE_[Key] = BuildObject
             return BuildObject
 
     # placeholder for file format conversion

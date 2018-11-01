@@ -792,6 +792,15 @@ class InfBuildData(ModuleBuildClassObject):
         RetVal.update(self._GetPcd(MODEL_PCD_DYNAMIC_EX))
         return RetVal
 
+    @cached_property
+    def PcdsName(self):
+        PcdsName = set()
+        for Type in (MODEL_PCD_FIXED_AT_BUILD,MODEL_PCD_PATCHABLE_IN_MODULE,MODEL_PCD_FEATURE_FLAG,MODEL_PCD_DYNAMIC,MODEL_PCD_DYNAMIC_EX):
+            RecordList = self._RawData[Type, self._Arch, self._Platform]
+            for TokenSpaceGuid, PcdCName, _, _, _, _, _ in RecordList:
+                PcdsName.add((PcdCName, TokenSpaceGuid))
+        return PcdsName
+
     ## Retrieve build options specific to this module
     @cached_property
     def BuildOptions(self):
