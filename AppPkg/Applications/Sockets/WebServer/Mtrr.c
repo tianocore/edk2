@@ -15,6 +15,7 @@
 
 #include <WebServer.h>
 #include <Library/MtrrLib.h>
+#include <Register/Msr.h>
 
 #define VARIABLE_MTRR_VALID     0x800
 
