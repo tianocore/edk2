@@ -958,7 +958,7 @@ GetExpectedDescriptor (
   UINTN           Offset;
 
   //
-  // Total length is too small that cannot hold the single descriptor header plus data. 
+  // Total length is too small that cannot hold the single descriptor header plus data.
   //
   if (Length <= sizeof (USB_DESC_HEAD)) {
     DEBUG ((DEBUG_ERROR, "GetExpectedDescriptor: met mal-format descriptor, total length = %d!\n", Length));

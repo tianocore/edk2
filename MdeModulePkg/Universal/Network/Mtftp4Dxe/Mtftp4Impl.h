@@ -129,7 +129,7 @@ struct _MTFTP4_PROTOCOL {
   // Record the total received and saved block number.
   //
   UINT64                        TotalBlock;
-  
+
   //
   // Record the acked block number.
   //
