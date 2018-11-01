@@ -25,7 +25,7 @@
   PLATFORM_VERSION               = 0.96
   DSC_SPECIFICATION              = 0x00010005
   OUTPUT_DIRECTORY               = Build/IntelFrameworkModuleAll
-  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|ARM
+  SUPPORTED_ARCHITECTURES        = IA32|X64|EBC|ARM|AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE|NOOPT
   SKUID_IDENTIFIER               = DEFAULT
 
@@ -75,6 +75,17 @@
   DxeServicesTableLib|MdePkg/Library/DxeServicesTableLib/DxeServicesTableLib.inf
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+
+[LibraryClasses.ARM, LibraryClasses.AARCH64]
+  #
+  # It is not possible to prevent the ARM compiler for generic intrinsic functions.
+  # This library provides the instrinsic functions generate by a given compiler.
+  # And NULL mean link this library into all ARM images.
+  #
+  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
+
+  # Add support for GCC stack protector
+  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
 [LibraryClasses.common.PEIM]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
