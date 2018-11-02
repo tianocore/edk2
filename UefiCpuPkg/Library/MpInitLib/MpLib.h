@@ -89,6 +89,7 @@ typedef enum {
   CpuStateIdle,
   CpuStateReady,
   CpuStateBusy,
+  CpuStateFinished,
   CpuStateDisabled
 } CPU_STATE;
 

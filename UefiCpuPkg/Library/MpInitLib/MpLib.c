@@ -696,7 +696,7 @@ ApWakeupFunction (
             }
           }
         }
-        SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateIdle);
+        SetApState (&CpuMpData->CpuData[ProcessorNumber], CpuStateFinished);
       }
     }
 
@@ -1370,10 +1370,11 @@ CheckThisAP (
   //
   // If the AP finishes for StartupThisAP(), return EFI_SUCCESS.
   //
-  if (GetApState(CpuData) == CpuStateIdle) {
+  if (GetApState(CpuData) == CpuStateFinished) {
     if (CpuData->Finished != NULL) {
       *(CpuData->Finished) = TRUE;
     }
+    SetApState (CpuData, CpuStateIdle);
     return EFI_SUCCESS;
   } else {
     //
@@ -1434,9 +1435,10 @@ CheckAllAPs (
     // Only BSP and corresponding AP access this unit of CPU Data. This means the AP will not modify the
     // value of state after setting the it to CpuStateIdle, so BSP can safely make use of its value.
     //
-    if (GetApState(CpuData) == CpuStateIdle) {
+    if (GetApState(CpuData) == CpuStateFinished) {
       CpuMpData->RunningCount --;
       CpuMpData->CpuData[ProcessorNumber].Waiting = FALSE;
+      SetApState(CpuData, CpuStateIdle);
 
       //
       // If in Single Thread mode, then search for the next waiting AP for execution.
@@ -1937,7 +1939,7 @@ SwitchBSPWorker (
   //
   // Wait for old BSP finished AP task
   //
-  while (GetApState (&CpuMpData->CpuData[CallerNumber]) != CpuStateIdle) {
+  while (GetApState (&CpuMpData->CpuData[CallerNumber]) != CpuStateFinished) {
     CpuPause ();
   }
 
