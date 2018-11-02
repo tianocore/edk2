@@ -172,7 +172,7 @@ M: Jiewen Yao <jiewen.yao@intel.com>
 
 IntelSiliconPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelSiliconPkg
-M: Jiewen Yao <jiewen.yao@intel.com>
+M: Ruiyu Ni <ruiyu.ni@intel.com>
 M: Rangasai V Chaganty <rangasai.v.chaganty@intel.com>
 
 MdeModulePkg
