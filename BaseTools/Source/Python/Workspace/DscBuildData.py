@@ -2184,6 +2184,19 @@ class DscBuildData(PlatformBuildClassObject):
                 return False
         return True
 
+    def ParseCCFlags(self, ccflag):
+        ccflags = set()
+        flag = ""
+        for ch in ccflag:
+            if ch in (r"/", "-"):
+                if flag.strip():
+                    ccflags.add(flag.strip())
+                flag = ch
+            else:
+                flag += ch
+        if flag.strip():
+            ccflags.add(flag.strip())
+        return ccflags
     def GenerateByteArrayValue (self, StructuredPcds):
         #
         # Generate/Compile/Run C application to determine if there are any flexible array members
@@ -2300,34 +2313,28 @@ class DscBuildData(PlatformBuildClassObject):
             Target, Tag, Arch, Tool, Attr = Options[1].split("_")
             if Tool != 'CC':
                 continue
-
+            if Attr != "FLAGS":
+                continue
             if Target == "*" or Target == self._Target:
                 if Tag == "*" or Tag == self._Toolchain:
+                    if 'COMMON' not in BuildOptions:
+                        BuildOptions['COMMON'] = set()
                     if Arch == "*":
-                        if Tool not in BuildOptions:
-                            BuildOptions[Tool] = OrderedDict()
-                        if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or self.BuildOptions[Options].startswith('='):
-                            BuildOptions[Tool][Attr] = self.BuildOptions[Options]
-                        else:
-                            # append options for the same tool except PATH
-                            if Attr != 'PATH':
-                                BuildOptions[Tool][Attr] += " " + self.BuildOptions[Options]
-                            else:
-                                BuildOptions[Tool][Attr] = self.BuildOptions[Options]
+                        BuildOptions['COMMON'].add(self.BuildOptions[Options])
+                    if Arch in self.SupArchList:
+                        if Arch not in BuildOptions:
+                            BuildOptions[Arch] = set()
+                        BuildOptions[Arch] |= self.ParseCCFlags(self.BuildOptions[Options])
+
         if BuildOptions:
-            for Tool in BuildOptions:
-                for Attr in BuildOptions[Tool]:
-                    if Attr == "FLAGS":
-                        Value = BuildOptions[Tool][Attr]
-                        ValueList = Value.split()
-                        if ValueList:
-                            for Id, Item in enumerate(ValueList):
-                                if Item in ['-D', '/D', '-U', '/U']:
-                                    CC_FLAGS += ' ' + Item
-                                    if Id + 1 < len(ValueList):
-                                        CC_FLAGS += ' ' + ValueList[Id + 1]
-                                elif Item.startswith(('-D', '/D', '-U', '/U')):
-                                    CC_FLAGS += ' ' + Item
+            ArchBuildOptions = {arch:flags for arch,flags in BuildOptions.items() if arch != 'COMMON'}
+            if len(ArchBuildOptions.keys()) == 1:
+                BuildOptions['COMMON'] |= (ArchBuildOptions.values()[0])
+            elif len(ArchBuildOptions.keys()) > 1:
+                CommonBuildOptions = reduce(lambda x,y: x&y, ArchBuildOptions.values())
+                BuildOptions['COMMON'] |= CommonBuildOptions
+            ValueList = list(BuildOptions['COMMON'])
+            CC_FLAGS += " ".join([item for item in ValueList if item.startswith(('-D', '/D', '-U', '/U'))])
         MakeApp += CC_FLAGS
 
         if sys.platform == "win32":
