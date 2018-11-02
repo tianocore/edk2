@@ -576,7 +576,8 @@ class InfParser(MetaFileParser):
         NmakeLine = ''
         Content = ''
         try:
-            Content = open(str(self.MetaFile), 'r').readlines()
+            with open(str(self.MetaFile), 'r') as File:
+                Content = File.readlines()
         except:
             EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
 
@@ -950,7 +951,8 @@ class DscParser(MetaFileParser):
     def Start(self):
         Content = ''
         try:
-            Content = open(str(self.MetaFile), 'r').readlines()
+            with open(str(self.MetaFile), 'r') as File:
+                Content = File.readlines()
         except:
             EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
 
@@ -1493,7 +1495,12 @@ class DscParser(MetaFileParser):
             self._SubsectionType = MODEL_UNKNOWN
 
     def __RetrievePcdValue(self):
-        Content = open(str(self.MetaFile), 'r').readlines()
+        try:
+            with open(str(self.MetaFile), 'r') as File:
+                Content = File.readlines()
+        except:
+            EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
+
         GlobalData.gPlatformOtherPcds['DSCFILE'] = str(self.MetaFile)
         for PcdType in (MODEL_PCD_PATCHABLE_IN_MODULE, MODEL_PCD_DYNAMIC_DEFAULT, MODEL_PCD_DYNAMIC_HII,
                         MODEL_PCD_DYNAMIC_VPD, MODEL_PCD_DYNAMIC_EX_DEFAULT, MODEL_PCD_DYNAMIC_EX_HII,
@@ -1786,7 +1793,8 @@ class DecParser(MetaFileParser):
     def Start(self):
         Content = ''
         try:
-            Content = open(str(self.MetaFile), 'r').readlines()
+            with open(str(self.MetaFile), 'r') as File:
+                Content = File.readlines()
         except:
             EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
 

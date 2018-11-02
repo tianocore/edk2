@@ -34,7 +34,8 @@ class InfSectionParser():
         SectionData = []
 
         try:
-            FileLinesList = open(self._FilePath, "r").readlines()
+            with open(self._FilePath, "r") as File:
+                FileLinesList = File.readlines()
         except BaseException:
             EdkLogger.error("build", AUTOGEN_ERROR, 'File %s is opened failed.' % self._FilePath)
 
