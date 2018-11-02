@@ -134,7 +134,7 @@ OpteeInit (
 STATIC
 UINT32
 OpteeCallWithArg (
-  IN EFI_PHYSICAL_ADDRESS PhysicalArg
+  IN UINT64 PhysicalArg
   )
 {
   ARM_SMC_ARGS ArmSmcArgs;
@@ -213,7 +213,7 @@ OpteeOpenSession (
 
   MessageArg->NumParams = 2;
 
-  if (OpteeCallWithArg ((EFI_PHYSICAL_ADDRESS)MessageArg)) {
+  if (OpteeCallWithArg ((UINTN)MessageArg)) {
     MessageArg->Return = OPTEE_ERROR_COMMUNICATION;
     MessageArg->ReturnOrigin = OPTEE_ORIGIN_COMMUNICATION;
   }
@@ -246,7 +246,7 @@ OpteeCloseSession (
   MessageArg->Command = OPTEE_MESSAGE_COMMAND_CLOSE_SESSION;
   MessageArg->Session = Session;
 
-  OpteeCallWithArg ((EFI_PHYSICAL_ADDRESS)MessageArg);
+  OpteeCallWithArg ((UINTN)MessageArg);
 
   return EFI_SUCCESS;
 }
@@ -304,7 +304,7 @@ OpteeToMessageParam (
 
       CopyMem (
         (VOID *)ParamSharedMemoryAddress,
-        (VOID *)InParam->Union.Memory.BufferAddress,
+        (VOID *)(UINTN)InParam->Union.Memory.BufferAddress,
         InParam->Union.Memory.Size
         );
       MessageParam->Union.Memory.BufferAddress = (UINT64)ParamSharedMemoryAddress;
@@ -368,8 +368,8 @@ OpteeFromMessageParam (
       }
 
       CopyMem (
-        (VOID *)OutParam->Union.Memory.BufferAddress,
-        (VOID *)MessageParam->Union.Memory.BufferAddress,
+        (VOID *)(UINTN)OutParam->Union.Memory.BufferAddress,
+        (VOID *)(UINTN)MessageParam->Union.Memory.BufferAddress,
         MessageParam->Union.Memory.Size
         );
       OutParam->Union.Memory.Size = MessageParam->Union.Memory.Size;
@@ -417,7 +417,7 @@ OpteeInvokeFunction (
 
   MessageArg->NumParams = OPTEE_MAX_CALL_PARAMS;
 
-  if (OpteeCallWithArg ((EFI_PHYSICAL_ADDRESS)MessageArg)) {
+  if (OpteeCallWithArg ((UINTN)MessageArg)) {
     MessageArg->Return = OPTEE_ERROR_COMMUNICATION;
     MessageArg->ReturnOrigin = OPTEE_ORIGIN_COMMUNICATION;
   }
