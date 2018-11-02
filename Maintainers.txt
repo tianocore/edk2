@@ -256,10 +256,6 @@ M: Eric Dong <eric.dong@intel.com>
 M: Ruiyu Ni <ruiyu.ni@intel.com>
 R: Laszlo Ersek <lersek@redhat.com>
 
-UnixPkg
-W: https://github.com/tianocore/tianocore.github.io/wiki/UnixPkg
-S: Obsolete (Use EmulatorPkg instead)
-
 Vlv2DeviceRefCodePkg
 M: David Wei <david.wei@intel.com>
 M: Mang Guo <mang.guo@intel.com>
