@@ -975,7 +975,7 @@ MemoryProtectionCpuArchProtocolNotify (
   DEBUG ((DEBUG_INFO, "MemoryProtectionCpuArchProtocolNotify:\n"));
   Status = CoreLocateProtocol (&gEfiCpuArchProtocolGuid, NULL, (VOID **)&gCpu);
   if (EFI_ERROR (Status)) {
-    return;
+    goto Done;
   }
 
   //
@@ -991,7 +991,7 @@ MemoryProtectionCpuArchProtocolNotify (
   HeapGuardCpuArchProtocolNotify ();
 
   if (mImageProtectionPolicy == 0) {
-    return;
+    goto Done;
   }
 
   Status = gBS->LocateHandleBuffer (
@@ -1002,7 +1002,7 @@ MemoryProtectionCpuArchProtocolNotify (
                   &HandleBuffer
                   );
   if (EFI_ERROR (Status) && (NoHandles == 0)) {
-    return ;
+    goto Done;
   }
 
   for (Index = 0; Index < NoHandles; Index++) {
@@ -1025,9 +1025,10 @@ MemoryProtectionCpuArchProtocolNotify (
 
     ProtectUefiImage (LoadedImage, LoadedImageDevicePath);
   }
+  FreePool (HandleBuffer);
 
+Done:
   CoreCloseEvent (Event);
-  return;
 }
 
 /**
