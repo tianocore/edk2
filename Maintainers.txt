@@ -246,6 +246,7 @@ M: Ruiyu Ni <ruiyu.ni@intel.com>
 SignedCapsulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SignedCapsulePkg
 M: Jiewen Yao <jiewen.yao@intel.com>
+M: Chao Zhang <chao.b.zhang@intel.com>
 
 SourceLevelDebugPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SourceLevelDebugPkg
