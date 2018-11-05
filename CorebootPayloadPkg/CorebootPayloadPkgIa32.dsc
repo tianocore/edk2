@@ -83,9 +83,9 @@
   DEFINE USE_HPET_TIMER                   = FALSE
 
   #
-  # Shell options: [BUILD_SHELL, FULL_BIN, MIN_BIN, NONE, UEFI]
+  # Shell options: [BUILD_SHELL, MIN_BIN, NONE, UEFI]
   #
-  DEFINE SHELL_TYPE              = FULL_BIN
+  DEFINE SHELL_TYPE              = UEFI_BIN
 
 [BuildOptions]
   *_*_*_CC_FLAGS                 = -D DISABLE_NEW_DEPRECATED_INTERFACES
@@ -327,13 +327,8 @@
   #
   # Set the proper Shell file GUID
   #
-  !if $(SHELL_TYPE) == FULL_BIN
-  # c57ad6b7-0515-40a8-9d21-551652854e37
-  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile|{ 0xB7, 0xD6, 0x7A, 0xC5, 0x15, 0x05, 0xA8, 0x40, 0x9D, 0x21, 0x55, 0x16, 0x52, 0x85, 0x4E, 0x37 }
-  !else
   # 7C04A583-9E3E-4f1c-AD65-E05268D0B4D1
   gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1c, 0x4f, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }
-  !endif
 
 ################################################################################
 #

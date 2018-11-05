@@ -185,14 +185,6 @@ INF ShellPkg/DynamicCommand/DpDynamicCommand/DpDynamicCommand.inf
 INF ShellPkg/Application/Shell/Shell.inf
 !endif
 
-!if $(SHELL_TYPE) == FULL_BIN
-!if $(ARCH) == IA32
-INF  RuleOverride = BINARY USE = IA32 EdkShellBinPkg/FullShell/FullShell.inf
-!else
-INF  RuleOverride = BINARY USE = X64 EdkShellBinPkg/FullShell/FullShell.inf
-!endif
-!endif
-
 !if $(SHELL_TYPE) == MIN_BIN
 !if $(ARCH) == IA32
 INF  RuleOverride = BINARY USE = IA32 ShellBinPkg/MinUefiShell/MinUefiShell.inf
