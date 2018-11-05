@@ -311,7 +311,7 @@ Mtftp4ConfigUnicastPort (
   UdpConfig.UseDefaultAddress  = Config->UseDefaultSetting;
   IP4_COPY_ADDRESS (&UdpConfig.StationAddress, &Config->StationIp);
   IP4_COPY_ADDRESS (&UdpConfig.SubnetMask, &Config->SubnetMask);
-  UdpConfig.StationPort        = 0;
+  UdpConfig.StationPort        = Config->LocalPort;
   UdpConfig.RemotePort         = 0;
 
   Ip = HTONL (Instance->ServerIp);
