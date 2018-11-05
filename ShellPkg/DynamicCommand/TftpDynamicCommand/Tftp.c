@@ -218,7 +218,7 @@ EFI_MTFTP4_CONFIG_DATA DefaultMtftp4ConfigData = {
   { { 0, 0, 0, 0 } },               // GatewayIp         - Not relevant as UseDefaultSetting=TRUE
   { { 0, 0, 0, 0 } },               // ServerIp          - Not known yet
   69,                               // InitialServerPort - Standard TFTP server port
-  6,                                // TryCount          - Max number of retransmissions.
+  6,                                // TryCount          - The number of times to transmit request packets and wait for a response.
   4                                 // TimeoutValue      - Retransmission timeout in seconds.
 };
 
@@ -420,6 +420,10 @@ RunTftp (
   if (ValueStr != NULL) {
     if (!StringToUint16 (ValueStr, &Mtftp4ConfigData.TryCount)) {
       goto Error;
+    }
+
+    if (Mtftp4ConfigData.TryCount == 0) {
+      Mtftp4ConfigData.TryCount = 6;
     }
   }
 
