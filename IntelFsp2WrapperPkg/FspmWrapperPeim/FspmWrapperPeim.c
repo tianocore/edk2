@@ -3,7 +3,7 @@
   register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
   notify to call FspSiliconInit API.
 
-  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -65,7 +65,7 @@ PeiFspMemoryInit (
   FspHobListPtr = NULL;
   FspmUpdDataPtr = NULL;
 
-  FspmHeaderPtr = (FSP_INFO_HEADER *)FspFindFspHeader (PcdGet32 (PcdFspmBaseAddress));
+  FspmHeaderPtr = (FSP_INFO_HEADER *) FspFindFspHeader (PcdGet32 (PcdFspmBaseAddress));
   DEBUG ((DEBUG_INFO, "FspmHeaderPtr - 0x%x\n", FspmHeaderPtr));
   if (FspmHeaderPtr == NULL) {
     return EFI_DEVICE_ERROR;
@@ -155,8 +155,20 @@ FspmWrapperInit (
 {
   EFI_STATUS           Status;
 
-  Status = PeiFspMemoryInit ();
-  ASSERT_EFI_ERROR (Status);
+  Status = EFI_SUCCESS;
+
+  if (FixedPcdGet8 (PcdFspModeSelection) == 1) {
+    Status = PeiFspMemoryInit ();
+    ASSERT_EFI_ERROR (Status);
+  } else {
+    PeiServicesInstallFvInfoPpi (
+      NULL,
+      (VOID *)(UINTN) PcdGet32 (PcdFspmBaseAddress),
+      (UINT32)((EFI_FIRMWARE_VOLUME_HEADER *) (UINTN) PcdGet32 (PcdFspmBaseAddress))->FvLength,
+      NULL,
+      NULL
+      );
+  }
 
   return Status;
 }
