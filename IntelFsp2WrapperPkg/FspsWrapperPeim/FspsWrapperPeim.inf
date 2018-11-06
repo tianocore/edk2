@@ -6,7 +6,7 @@
 # register TemporaryRamDonePpi to call TempRamExit API, and register MemoryDiscoveredPpi
 # notify to call FspSiliconInit API.
 #
-#  Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -68,6 +68,7 @@
 [Pcd]
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress     ## CONSUMES
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection    ## CONSUMES
 
 [Guids]
   gFspHobGuid                           ## CONSUMES ## HOB

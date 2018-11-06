@@ -71,9 +71,8 @@
   ## Indicate the PEI memory size platform want to report
   gIntelFsp2WrapperTokenSpaceGuid.PcdPeiRecoveryMinMemSize|0x3000000|UINT32|0x40000005
 
-  ## This is the base address of FSP-T/M/S
+  ## This is the base address of FSP-T
   gIntelFsp2WrapperTokenSpaceGuid.PcdFsptBaseAddress|0x00000000|UINT32|0x00000300
-  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00000301
 
   ## This PCD indicates if FSP APIs are skipped from FSP wrapper.<BR><BR>
   #  If a bit is set, that means this FSP API is skipped.<BR>
@@ -93,7 +92,17 @@
   # @Prompt Skip FSP API from FSP wrapper.
   gIntelFsp2WrapperTokenSpaceGuid.PcdSkipFspApi|0x00000000|UINT32|0x40000009
 
+  ## This PCD decides how Wrapper code utilizes FSP
+  # 0: DISPATCH mode (FSP Wrapper will load PeiCore from FSP without calling FSP API)
+  # 1: API mode (FSP Wrapper will call FSP API)
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection|0x00000001|UINT8|0x4000000A
+
 [PcdsFixedAtBuild, PcdsPatchableInModule,PcdsDynamic,PcdsDynamicEx]
+  #
+  ## These are the base address of FSP-M/S
+  #
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress|0x00000000|UINT32|0x00001000
   gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress|0x00000000|UINT32|0x00001001
   #
   # To provide flexibility for platform to pre-allocate FSP UPD buffer
