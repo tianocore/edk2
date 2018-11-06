@@ -181,7 +181,12 @@ GetImageTypeIdGuid (
     if (ImageTypeIdGuidSize == sizeof (EFI_GUID)) {
       FmpDeviceLibGuid = (EFI_GUID *)PcdGetPtr (PcdFmpDeviceImageTypeIdGuid);
     } else {
-      DEBUG ((DEBUG_WARN, "FmpDxe(%s): Fall back to ImageTypeIdGuid of gEfiCallerIdGuid\n", mImageIdName));
+      DEBUG ((
+        DEBUG_ERROR,
+        "FmpDxe(%s): Fall back to ImageTypeIdGuid of gEfiCallerIdGuid. FmpDxe error: misconfiguration\n",
+        mImageIdName
+        ));
+      ASSERT (FALSE);
       FmpDeviceLibGuid = &gEfiCallerIdGuid;
     }
   }
