@@ -111,12 +111,13 @@ typedef struct {
   EFI_FIRMWARE_VOLUME_HEADER          *FvHeader;
   EFI_PEI_FIRMWARE_VOLUME_PPI         *FvPpi;
   EFI_PEI_FV_HANDLE                   FvHandle;
+  UINTN                               PeimCount;
   //
-  // Ponter to the buffer with the PcdPeiCoreMaxPeimPerFv number of Entries.
+  // Ponter to the buffer with the PeimCount number of Entries.
   //
   UINT8                               *PeimState;
   //
-  // Ponter to the buffer with the PcdPeiCoreMaxPeimPerFv number of Entries.
+  // Ponter to the buffer with the PeimCount number of Entries.
   //
   EFI_PEI_FILE_HANDLE                 *FvFileHandles;
   BOOLEAN                             ScanFv;
@@ -176,6 +177,11 @@ EFI_STATUS
   IN PEI_CORE_INSTANCE              *OldCoreData
   );
 
+//
+// Number of files to grow by each time we run out of room
+//
+#define TEMP_FILE_GROWTH_STEP 32
+
 #define PEI_CORE_HANDLE_SIGNATURE  SIGNATURE_32('P','e','i','C')
 
 ///
@@ -209,7 +215,7 @@ struct _PEI_CORE_INSTANCE {
   UINTN                              UnknownFvInfoCount;
 
   ///
-  /// Pointer to the buffer with the PcdPeiCoreMaxPeimPerFv number of entries.
+  /// Pointer to the buffer FvFileHandlers in PEI_CORE_FV_HANDLE specified by CurrentPeimFvCount.
   ///
   EFI_PEI_FILE_HANDLE                *CurrentFvFileHandles;
   UINTN                              AprioriCount;
@@ -256,14 +262,16 @@ struct _PEI_CORE_INSTANCE {
   //
   PE_COFF_LOADER_READ_FILE          ShadowedImageRead;
 
+  UINTN                             TempPeimCount;
+
   //
-  // Pointer to the temp buffer with the PcdPeiCoreMaxPeimPerFv + 1 number of entries.
+  // Pointer to the temp buffer with the TempPeimCount number of entries.
   //
-  EFI_PEI_FILE_HANDLE               *FileHandles;
+  EFI_PEI_FILE_HANDLE               *TempFileHandles;
   //
-  // Pointer to the temp buffer with the PcdPeiCoreMaxPeimPerFv number of entries.
+  // Pointer to the temp buffer with the TempPeimCount number of entries.
   //
-  EFI_GUID                          *FileGuid;
+  EFI_GUID                          *TempFileGuid;
 
   //
   // Temp Memory Range is not covered by PeiTempMem and Stack.
