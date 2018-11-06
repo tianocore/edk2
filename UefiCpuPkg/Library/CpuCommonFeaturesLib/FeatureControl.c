@@ -1,7 +1,7 @@
 /** @file
   Features in MSR_IA32_FEATURE_CONTROL register.
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -183,6 +183,15 @@ LockFeatureControlRegisterInitialize (
   )
 {
   MSR_IA32_FEATURE_CONTROL_REGISTER    *MsrRegister;
+
+  //
+  // When Lock Feature Control Register feature is disabled,
+  // just skip the MSR lock bit setting.
+  // The MSR lock bit is cleared by default and write-once in a boot.
+  //
+  if (!State) {
+    return RETURN_SUCCESS;
+  }
 
   //
   // The scope of Lock bit in the MSR_IA32_FEATURE_CONTROL is core for
