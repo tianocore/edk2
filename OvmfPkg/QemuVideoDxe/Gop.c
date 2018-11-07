@@ -60,7 +60,7 @@ QemuVideoCompleteModeData (
 
   Private->PciIo->GetBarAttributes (
                         Private->PciIo,
-                        0,
+                        Private->FrameBufferVramBarIndex,
                         NULL,
                         (VOID**) &FrameBufDesc
                         );

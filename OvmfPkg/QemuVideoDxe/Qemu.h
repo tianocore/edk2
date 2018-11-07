@@ -92,6 +92,7 @@ typedef enum {
   QEMU_VIDEO_CIRRUS_5446,
   QEMU_VIDEO_BOCHS,
   QEMU_VIDEO_BOCHS_MMIO,
+  QEMU_VIDEO_VMWARE_SVGA,
 } QEMU_VIDEO_VARIANT;
 
 typedef struct {
@@ -120,6 +121,7 @@ typedef struct {
   QEMU_VIDEO_VARIANT                    Variant;
   FRAME_BUFFER_CONFIGURE                *FrameBufferBltConfigure;
   UINTN                                 FrameBufferBltConfigureSize;
+  UINT8                                 FrameBufferVramBarIndex;
 } QEMU_VIDEO_PRIVATE_DATA;
 
 ///

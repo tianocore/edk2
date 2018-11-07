@@ -70,6 +70,12 @@ QEMU_VIDEO_CARD gQemuVideoCardList[] = {
         QEMU_VIDEO_BOCHS_MMIO,
         L"QEMU VirtIO VGA"
     },{
+        PCI_CLASS_DISPLAY_VGA,
+        0x15ad,
+        0x0405,
+        QEMU_VIDEO_VMWARE_SVGA,
+        L"QEMU VMWare SVGA"
+    },{
         0 /* end of list */
     }
 };
@@ -314,6 +320,14 @@ QemuVideoControllerDriverStart (
     if (!EFI_ERROR (Status)) {
       FreePool (MmioDesc);
     }
+  }
+
+  //
+  // VMWare SVGA is handled like Bochs (with port IO only).
+  //
+  if (Private->Variant == QEMU_VIDEO_VMWARE_SVGA) {
+    Private->Variant = QEMU_VIDEO_BOCHS;
+    Private->FrameBufferVramBarIndex = PCI_BAR_IDX1;
   }
 
   //
@@ -764,7 +778,7 @@ ClearScreen (
   Private->PciIo->Mem.Write (
                         Private->PciIo,
                         EfiPciIoWidthFillUint32,
-                        0,
+                        Private->FrameBufferVramBarIndex,
                         0,
                         0x400000 >> 2,
                         &Color
