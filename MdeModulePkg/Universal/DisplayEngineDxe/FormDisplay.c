@@ -2882,6 +2882,7 @@ UiDisplayMenu (
       //
       ControlFlag = CfUpdateHelpString;
 
+      ASSERT (NewPos != NULL);
       UpdateHighlightMenuInfo(NewPos, TopOfScreen, SkipValue);
 
       if (SkipHighLight) {
@@ -2910,7 +2911,7 @@ UiDisplayMenu (
         Temp2 = 0;
       }
 
-      if (NewPos != NULL && (MenuOption == NULL || NewPos != &MenuOption->Link)) {
+      if (MenuOption == NULL || NewPos != &MenuOption->Link) {
         if (MenuOption != NULL) {
           //
           // Remove the old highlight menu.
