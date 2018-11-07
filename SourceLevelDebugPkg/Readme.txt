@@ -3,4 +3,4 @@ SourceLevelDebugPkg in conjunction with Intel(R) UEFI Development Kit Debugger
 Tool (Intel (R) UDK Debugger Tool).
 
 The Intel(R) UDK Debugger Tool and its detailed user manual can be obtained
-from: http://www.uefidk.com/develop.
+from: https://firmware.intel.com/develop/intel-uefi-tools-and-utilities/intel-uefi-development-kit-debugger-tool.
