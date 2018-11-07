@@ -40,7 +40,7 @@ InternalSyncIncrement (
     "lock               \n\t"
     "xadd    %%eax, %1  \n\t"
     "inc     %%eax      \n\t"
-    : "=a" (Result),          // %0
+    : "=&a" (Result),         // %0
       "+m" (*Value)           // %1
     :                         // no inputs that aren't also outputs
     : "memory",
@@ -76,7 +76,7 @@ InternalSyncDecrement (
     "lock                \n\t"
     "xadd    %%eax, %1   \n\t"
     "dec     %%eax       \n\t"
-    : "=a" (Result),           // %0
+    : "=&a" (Result),          // %0
       "+m" (*Value)            // %1
     :                          // no inputs that aren't also outputs
     : "memory",
