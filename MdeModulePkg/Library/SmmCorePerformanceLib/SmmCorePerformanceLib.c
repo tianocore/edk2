@@ -16,7 +16,7 @@
 
  SmmPerformanceHandlerEx(), SmmPerformanceHandler() will receive untrusted input and do basic validation.
 
-Copyright (c) 2011 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2011 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -538,6 +538,13 @@ SmmPerformanceHandlerEx (
          break;
        }
 
+       //
+       // The AsmLfence() call here is to ensure the previous range/content
+       // checks for the CommBuffer have been completed before calling
+       // CopyMem().
+       //
+       AsmLfence ();
+
        GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
 
        for (Index = 0; Index < NumberOfEntries; Index++) {
@@ -649,6 +656,13 @@ SmmPerformanceHandler (
          Status = EFI_ACCESS_DENIED;
          break;
        }
+
+       //
+       // The AsmLfence() call here is to ensure the previous range/content
+       // checks for the CommBuffer have been completed before calling
+       // CopyMem().
+       //
+       AsmLfence ();
 
        GaugeEntryExArray = (GAUGE_DATA_ENTRY_EX *) (mGaugeData + 1);
 
