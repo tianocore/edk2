@@ -125,7 +125,8 @@ ASM_PFX(MmioWrite32Internal):
 //  @return The value read.
 //
 ASM_PFX(MmioRead64Internal):
-  ldrd    r0, r1, [r0]
+  ldr     r1, [r0, #4]
+  ldr     r0, [r0]
   dmb
   bx      lr
 
@@ -141,5 +142,6 @@ ASM_PFX(MmioRead64Internal):
 //
 ASM_PFX(MmioWrite64Internal):
   dmb     st
-  strd    r2, r3, [r0]
+  str     r2, [r0]
+  str     r3, [r0, #4]
   bx      lr
