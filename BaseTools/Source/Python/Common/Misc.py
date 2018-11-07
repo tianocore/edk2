@@ -1297,6 +1297,8 @@ def ParseDevPathValue (Value):
     return '{' + out + '}', Size
 
 def ParseFieldValue (Value):
+    if "{CODE(" in Value:
+        return Value, len(Value.split(","))
     if isinstance(Value, type(0)):
         return Value, (Value.bit_length() + 7) / 8
     if not isinstance(Value, type('')):

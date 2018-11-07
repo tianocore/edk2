@@ -361,6 +361,21 @@ class DecBuildData(PackageBuildClassObject):
             self._Pcds.update(self._GetPcd(MODEL_PCD_DYNAMIC_EX))
         return self._Pcds
 
+    def ParsePcdName(self,TokenCName):
+        TokenCName = TokenCName.strip()
+        if TokenCName.startswith("["):
+            if "." in TokenCName:
+                Demesionattr = TokenCName[:TokenCName.index(".")]
+                Fields = TokenCName[TokenCName.index(".")+1:]
+            else:
+                Demesionattr = TokenCName
+                Fields = ""
+        else:
+            Demesionattr = ""
+            Fields = TokenCName
+
+        return Demesionattr,Fields
+
     def ProcessStructurePcd(self, StructurePcdRawDataSet):
         s_pcd_set = OrderedDict()
         for s_pcd, LineNo in StructurePcdRawDataSet:
@@ -373,6 +388,8 @@ class DecBuildData(PackageBuildClassObject):
             dep_pkgs = []
             struct_pcd = StructurePcd()
             for item, LineNo in s_pcd_set[pcdname]:
+                if not item.TokenCName:
+                    continue
                 if "<HeaderFiles>" in item.TokenCName:
                     struct_pcd.StructuredPcdIncludeFile.append(item.DefaultValue)
                 elif "<Packages>" in item.TokenCName:
@@ -385,7 +402,8 @@ class DecBuildData(PackageBuildClassObject):
                     struct_pcd.PkgPath = self.MetaFile.File
                     struct_pcd.SetDecDefaultValue(item.DefaultValue)
                 else:
-                    struct_pcd.AddDefaultValue(item.TokenCName, item.DefaultValue, self.MetaFile.File, LineNo)
+                    DemesionAttr, Fields = self.ParsePcdName(item.TokenCName)
+                    struct_pcd.AddDefaultValue(Fields, item.DefaultValue, self.MetaFile.File, LineNo,DemesionAttr)
 
             struct_pcd.PackageDecs = dep_pkgs
             str_pcd_set.append(struct_pcd)
@@ -446,15 +464,12 @@ class DecBuildData(PackageBuildClassObject):
         StructurePcds = self.ProcessStructurePcd(StrPcdSet)
         for pcd in StructurePcds:
             Pcds[pcd.TokenCName, pcd.TokenSpaceGuidCName, self._PCD_TYPE_STRING_[Type]] = pcd
-        StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_]*$')
         for pcd in Pcds.values():
             if pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
-                if StructPattern.match(pcd.DatumType) is None:
+                if not pcd.IsAggregateDatumType():
                     EdkLogger.error('build', FORMAT_INVALID, "DatumType only support BOOLEAN, UINT8, UINT16, UINT32, UINT64, VOID* or a valid struct name.", DefinitionPosition[pcd][0], DefinitionPosition[pcd][1])
-        for struct_pcd in Pcds.values():
-            if isinstance(struct_pcd, StructurePcd) and not struct_pcd.StructuredPcdIncludeFile:
-                EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "The structure Pcd %s.%s header file is not found in %s line %s \n" % (struct_pcd.TokenSpaceGuidCName, struct_pcd.TokenCName, DefinitionPosition[struct_pcd][0], DefinitionPosition[struct_pcd][1] ))
-
+                elif not pcd.IsArray() and not pcd.StructuredPcdIncludeFile:
+                    EdkLogger.error("build", PCD_STRUCTURE_PCD_ERROR, "The structure Pcd %s.%s header file is not found in %s line %s \n" % (pcd.TokenSpaceGuidCName, pcd.TokenCName, pcd.DefinitionPosition[0], pcd.DefinitionPosition[1] ))
         return Pcds
 
     @property

@@ -40,6 +40,7 @@ from .MetaFileCommentParser import CheckInfComment
 ## RegEx for finding file versions
 hexVersionPattern = re.compile(r'0[xX][\da-f-A-F]{5,8}')
 decVersionPattern = re.compile(r'\d+\.\d+')
+CODEPattern = re.compile(r"{CODE\([a-fA-F0-9Xx\{\},\s]*\)}")
 
 ## A decorator used to parse macro definition
 def ParseMacro(Parser):
@@ -913,6 +914,10 @@ class DscParser(MetaFileParser):
         #
         self._IdMapping = {-1:-1}
 
+        self._PcdCodeValue = ""
+        self._PcdDataTypeCODE = False
+        self._CurrentPcdName = ""
+
     ## Parser starter
     def Start(self):
         Content = ''
@@ -922,6 +927,9 @@ class DscParser(MetaFileParser):
             EdkLogger.error("Parser", FILE_READ_FAILURE, ExtraData=self.MetaFile)
 
         OwnerId = {}
+
+        Content = self.ProcessMultipleLineCODEValue(Content)
+
         for Index in range(0, len(Content)):
             Line = CleanString(Content[Index])
             # skip empty line
@@ -1133,6 +1141,41 @@ class DscParser(MetaFileParser):
     def _LibraryInstanceParser(self):
         self._ValueList[0] = self._CurrentLine
 
+    def ProcessMultipleLineCODEValue(self,Content):
+        CODEBegin = False
+        CODELine = ""
+        continuelinecount = 0
+        newContent = []
+        for Index in range(0, len(Content)):
+            Line = Content[Index]
+            if CODEBegin:
+                CODELine = CODELine + Line
+                continuelinecount +=1
+                if ")}" in Line:
+                    newContent.append(CODELine)
+                    for _ in range(continuelinecount):
+                        newContent.append("")
+                    CODEBegin = False
+                    CODELine = ""
+                    continuelinecount = 0
+            else:
+                if not Line:
+                    newContent.append(Line)
+                    continue
+                if "{CODE(" not in Line:
+                    newContent.append(Line)
+                    continue
+                elif CODEPattern.findall(Line):
+                    newContent.append(Line)
+                    continue
+                else:
+                    CODEBegin = True
+                    CODELine = Line
+
+        return newContent
+
+    def _DecodeCODEData(self):
+        pass
     ## PCD sections parser
     #
     #   [PcdsFixedAtBuild]
@@ -1149,7 +1192,28 @@ class DscParser(MetaFileParser):
     #
     @ParseMacro
     def _PcdParser(self):
+        if self._PcdDataTypeCODE:
+            self._PcdCodeValue = self._PcdCodeValue + "\n " + self._CurrentLine
+            if self._CurrentLine.endswith(")}"):
+                self._CurrentLine = "|".join((self._CurrentPcdName, self._PcdCodeValue))
+                self._PcdDataTypeCODE = False
+                self._PcdCodeValue = ""
+            else:
+                self._ValueList = None
+                return
         TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT, 1)
+        self._CurrentPcdName = TokenList[0]
+        if TokenList[1].strip().startswith("{CODE"):
+            self._PcdDataTypeCODE = True
+            self._PcdCodeValue = TokenList[1].strip()
+
+        if self._PcdDataTypeCODE:
+            if self._CurrentLine.endswith(")}"):
+                self._PcdDataTypeCODE = False
+                self._PcdCodeValue = ""
+            else:
+                self._ValueList = None
+                return
         self._ValueList[0:1] = GetSplitValueList(TokenList[0], TAB_SPLIT)
         PcdNameTockens = GetSplitValueList(TokenList[0], TAB_SPLIT)
         if len(PcdNameTockens) == 2:
@@ -1907,6 +1971,17 @@ class DecParser(MetaFileParser):
         if self._ValueList[0] not in self._GuidDict:
             self._GuidDict[self._ValueList[0]] = self._ValueList[1]
 
+    def ParsePcdName(self,namelist):
+        if "[" in namelist[1]:
+            pcdname = namelist[1][:namelist[1].index("[")]
+            arrayindex = namelist[1][namelist[1].index("["):]
+            namelist[1] = pcdname
+            if len(namelist) == 2:
+                namelist.append(arrayindex)
+            else:
+                namelist[2] = ".".join((arrayindex,namelist[2]))
+        return namelist
+
     ## PCD sections parser
     #
     #   [PcdsFixedAtBuild]
@@ -1945,9 +2020,16 @@ class DecParser(MetaFileParser):
                     return
             else:
                 PcdTockens = self._CurrentLine.split(TAB_VALUE_SPLIT)
-                PcdNames = PcdTockens[0].split(TAB_SPLIT)
+                PcdNames = self.ParsePcdName(PcdTockens[0].split(TAB_SPLIT))
                 if len(PcdNames) == 2:
-                    self._CurrentStructurePcdName = ""
+                    if PcdNames[1].strip().endswith("]"):
+                        PcdName = PcdNames[1][:PcdNames[1].index('[')]
+                        Index = PcdNames[1][PcdNames[1].index('['):]
+                        self._ValueList[0] = TAB_SPLIT.join((PcdNames[0],PcdName))
+                        self._ValueList[1] = Index
+                        self._ValueList[2] = PcdTockens[1]
+                    else:
+                        self._CurrentStructurePcdName = ""
                 else:
                     if self._CurrentStructurePcdName != TAB_SPLIT.join(PcdNames[:2]):
                         EdkLogger.error('Parser', FORMAT_INVALID, "Pcd Name does not match: %s and %s " % (self._CurrentStructurePcdName, TAB_SPLIT.join(PcdNames[:2])),

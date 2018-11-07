@@ -50,7 +50,7 @@ class PcdClassObject(object):
         self.TokenSpaceGuidCName = Guid
         self.TokenSpaceGuidValue = GuidValue
         self.Type = Type
-        self.DatumType = DatumType
+        self._DatumType = DatumType
         self.DefaultValue = Value
         self.TokenValue = Token
         self.MaxDatumSize = MaxDatumSize
@@ -72,6 +72,63 @@ class PcdClassObject(object):
         self.PcdValueFromFdf = ""
         self.CustomAttribute = {}
         self.UserDefinedDefaultStoresFlag = UserDefinedDefaultStoresFlag
+        self._Capacity = None
+
+    @property
+    def Capacity(self):
+        self._Capacity = []
+        dimension = ArrayIndex.findall(self._DatumType)
+        for item in dimension:
+            maxsize = item.lstrip("[").rstrip("]").strip()
+            if not maxsize:
+                maxsize = "-1"
+            self._Capacity.append(maxsize)
+        if hasattr(self, "SkuOverrideValues"):
+            for sku in self.SkuOverrideValues:
+                for defaultstore in self.SkuOverrideValues[sku]:
+                    fields = self.SkuOverrideValues[sku][defaultstore]
+                    for demesionattr in fields:
+                        deme = ArrayIndex.findall(demesionattr)
+                        for i in range(len(deme)-1):
+                            if int(deme[i].lstrip("[").rstrip("]").strip()) > int(self._Capacity[i]):
+                                print "error"
+        if hasattr(self,"DefaultValues"):
+            for demesionattr in self.DefaultValues:
+                deme = ArrayIndex.findall(demesionattr)
+                for i in range(len(deme)-1):
+                    if int(deme[i].lstrip("[").rstrip("]").strip()) > int(self._Capacity[i]):
+                        print "error"
+        self._Capacity = [str(int(d) + 1) for d in self._Capacity]
+        return self._Capacity
+    @property
+    def DatumType(self):
+        return self._DatumType
+
+    @DatumType.setter
+    def DatumType(self,DataType):
+        self._DatumType = DataType
+        self._Capacity = None
+
+    @property
+    def BaseDatumType(self):
+        if self.IsArray():
+            return self._DatumType[:self._DatumType.index("[")]
+        else:
+            return self._DatumType
+    def IsArray(self):
+        return True if len(self.Capacity) else False
+
+    def IsAggregateDatumType(self):
+        if self.DatumType in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
+            return False
+        if self.IsArray() or StructPattern.match(self.DatumType):
+            return True
+        return False
+
+    def IsSimpleTypeArray(self):
+        if self.IsArray() and self.BaseDatumType in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, "BOOLEAN"]:
+            return True
+        return False
 
     @staticmethod
     def GetPcdMaxSizeWorker(PcdString, MaxSize):
@@ -183,23 +240,27 @@ class StructurePcd(PcdClassObject):
     def __repr__(self):
         return self.TypeName
 
-    def AddDefaultValue (self, FieldName, Value, FileName="", LineNo=0):
-        if FieldName in self.DefaultValues:
-            del self.DefaultValues[FieldName]
-        self.DefaultValues[FieldName] = [Value.strip(), FileName, LineNo]
-        return self.DefaultValues[FieldName]
+    def AddDefaultValue (self, FieldName, Value, FileName="", LineNo=0,DimensionAttr ="-1"):
+        if DimensionAttr not in self.DefaultValues:
+            self.DefaultValues[DimensionAttr] = collections.OrderedDict()
+        if FieldName in self.DefaultValues[DimensionAttr]:
+            del self.DefaultValues[DimensionAttr][FieldName]
+        self.DefaultValues[DimensionAttr][FieldName] = [Value.strip(), FileName, LineNo]
+        return self.DefaultValues[DimensionAttr][FieldName]
 
     def SetDecDefaultValue(self, DefaultValue):
         self.DefaultValueFromDec = DefaultValue
-    def AddOverrideValue (self, FieldName, Value, SkuName, DefaultStoreName, FileName="", LineNo=0):
+    def AddOverrideValue (self, FieldName, Value, SkuName, DefaultStoreName, FileName="", LineNo=0, DimensionAttr = '-1'):
         if SkuName not in self.SkuOverrideValues:
             self.SkuOverrideValues[SkuName] = OrderedDict()
         if DefaultStoreName not in self.SkuOverrideValues[SkuName]:
             self.SkuOverrideValues[SkuName][DefaultStoreName] = OrderedDict()
-        if FieldName in self.SkuOverrideValues[SkuName][DefaultStoreName]:
-            del self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName]
-        self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName] = [Value.strip(), FileName, LineNo]
-        return self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName]
+        if DimensionAttr not in self.SkuOverrideValues[SkuName][DefaultStoreName]:
+            self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr] = collections.OrderedDict()
+        if FieldName in self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr]:
+            del self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName][DimensionAttr]
+        self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr][FieldName] = [Value.strip(), FileName, LineNo]
+        return self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr][FieldName]
 
     def SetPcdMode (self, PcdMode):
         self.PcdMode = PcdMode
@@ -209,7 +270,7 @@ class StructurePcd(PcdClassObject):
         self.TokenSpaceGuidCName = PcdObject.TokenSpaceGuidCName if PcdObject.TokenSpaceGuidCName else PcdObject.TokenSpaceGuidCName
         self.TokenSpaceGuidValue = PcdObject.TokenSpaceGuidValue if PcdObject.TokenSpaceGuidValue else self.TokenSpaceGuidValue
         self.Type = PcdObject.Type if PcdObject.Type else self.Type
-        self.DatumType = PcdObject.DatumType if PcdObject.DatumType else self.DatumType
+        self._DatumType = PcdObject.DatumType if PcdObject.DatumType else self.DatumType
         self.DefaultValue = PcdObject.DefaultValue if  PcdObject.DefaultValue else self.DefaultValue
         self.TokenValue = PcdObject.TokenValue if PcdObject.TokenValue else self.TokenValue
         self.MaxDatumSize = PcdObject.MaxDatumSize if PcdObject.MaxDatumSize else self.MaxDatumSize
