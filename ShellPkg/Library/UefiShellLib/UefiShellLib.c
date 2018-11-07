@@ -72,6 +72,7 @@ FullyQualifyPath(
 {
   CONST CHAR16         *WorkingPath;
   CONST CHAR16         *InputPath;
+  CHAR16               *CharPtr;
   CHAR16               *InputFileSystem;
   UINTN                FileSystemCharCount;
   CHAR16               *FullyQualifiedPath;
@@ -131,7 +132,10 @@ FullyQualifyPath(
         // truncate the new path after the file system part.
         //
         StrCpyS(FullyQualifiedPath, Size/sizeof(CHAR16), WorkingPath);
-        *(StrStr(FullyQualifiedPath, L":") + 1) = CHAR_NULL;
+        CharPtr = StrStr(FullyQualifiedPath, L":");
+        if (CharPtr != NULL) {
+          *(CharPtr + 1) = CHAR_NULL;
+        }
       } else {
         //
         // Relative path: start with the working directory and append "\".
