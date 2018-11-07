@@ -1136,26 +1136,24 @@ CoreInitializeMemoryProtection (
   ASSERT (GetPermissionAttributeForMemoryType (EfiBootServicesData) ==
           GetPermissionAttributeForMemoryType (EfiConventionalMemory));
 
-  if (mImageProtectionPolicy != 0 || PcdGet64 (PcdDxeNxMemoryProtectionPolicy) != 0) {
-    Status = CoreCreateEvent (
-               EVT_NOTIFY_SIGNAL,
-               TPL_CALLBACK,
-               MemoryProtectionCpuArchProtocolNotify,
-               NULL,
-               &Event
-               );
-    ASSERT_EFI_ERROR(Status);
+  Status = CoreCreateEvent (
+             EVT_NOTIFY_SIGNAL,
+             TPL_CALLBACK,
+             MemoryProtectionCpuArchProtocolNotify,
+             NULL,
+             &Event
+             );
+  ASSERT_EFI_ERROR(Status);
 
-    //
-    // Register for protocol notifactions on this event
-    //
-    Status = CoreRegisterProtocolNotify (
-               &gEfiCpuArchProtocolGuid,
-               Event,
-               &Registration
-               );
-    ASSERT_EFI_ERROR(Status);
-  }
+  //
+  // Register for protocol notifactions on this event
+  //
+  Status = CoreRegisterProtocolNotify (
+             &gEfiCpuArchProtocolGuid,
+             Event,
+             &Registration
+             );
+  ASSERT_EFI_ERROR(Status);
 
   //
   // Register a callback to disable NULL pointer detection at EndOfDxe
