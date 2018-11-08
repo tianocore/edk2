@@ -16,6 +16,8 @@ from Common.DataType import *
 import collections
 import re
 from collections import OrderedDict
+from Common.Misc import CopyDict
+import copy
 StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_\[\]]*$')
 ArrayIndex = re.compile("\[\s*\d{0,1}\s*\]")
 ## PcdClassObject
@@ -211,6 +213,37 @@ class PcdClassObject(object):
     def __hash__(self):
         return hash((self.TokenCName, self.TokenSpaceGuidCName))
 
+    def sharedcopy(self,new_pcd):
+        new_pcd.TokenCName = self.TokenCName
+        new_pcd.TokenSpaceGuidCName = self.TokenSpaceGuidCName
+        new_pcd.TokenSpaceGuidValue = self.TokenSpaceGuidValue
+        new_pcd.Type = self.Type
+        new_pcd.DatumType = self.DatumType
+        new_pcd.DefaultValue = self.DefaultValue
+        new_pcd.TokenValue = self.TokenValue
+        new_pcd.MaxDatumSize = self.MaxDatumSize
+
+        new_pcd.Phase = self.Phase
+        new_pcd.Pending = self.Pending
+        new_pcd.IsOverrided = self.IsOverrided
+        new_pcd.IsFromBinaryInf = self.IsFromBinaryInf
+        new_pcd.IsFromDsc = self.IsFromDsc
+        new_pcd.PcdValueFromComm = self.PcdValueFromComm
+        new_pcd.PcdValueFromFdf = self.PcdValueFromFdf
+        new_pcd.UserDefinedDefaultStoresFlag = self.UserDefinedDefaultStoresFlag
+        new_pcd.DscRawValue = self.DscRawValue
+        new_pcd.CustomAttribute = self.CustomAttribute
+        new_pcd.validateranges = [item for item in self.validateranges]
+        new_pcd.validlists = [item for item in self.validlists]
+        new_pcd.expressions = [item for item in self.expressions]
+        new_pcd.SkuInfoList = {key: copy.deepcopy(skuobj) for key,skuobj in self.SkuInfoList.items()}
+        return new_pcd
+
+    def __deepcopy__(self,memo):
+        new_pcd = PcdClassObject()
+        self.sharedcopy(new_pcd)
+        return new_pcd
+
 class StructurePcd(PcdClassObject):
     def __init__(self, StructuredPcdIncludeFile=None, Packages=None, Name=None, Guid=None, Type=None, DatumType=None, Value=None, Token=None, MaxDatumSize=None, SkuInfoList=None, IsOverrided=False, GuidValue=None, validateranges=None, validlists=None, expressions=None,default_store = TAB_DEFAULT_STORES_DEFAULT):
         if SkuInfoList is None:
@@ -302,6 +335,25 @@ class StructurePcd(PcdClassObject):
             self.ValueChain = PcdObject.ValueChain if PcdObject.ValueChain else self.ValueChain
             self.PcdFieldValueFromComm = PcdObject.PcdFieldValueFromComm if PcdObject.PcdFieldValueFromComm else self.PcdFieldValueFromComm
             self.PcdFieldValueFromFdf = PcdObject.PcdFieldValueFromFdf if PcdObject.PcdFieldValueFromFdf else self.PcdFieldValueFromFdf
+
+    def __deepcopy__(self,memo):
+        new_pcd = StructurePcd()
+        self.sharedcopy(new_pcd)
+
+        new_pcd.DefaultValueFromDec = self.DefaultValueFromDec
+        new_pcd.PcdMode = self.PcdMode
+        new_pcd.StructName = self.DatumType
+        new_pcd.PcdDefineLineNo = self.PcdDefineLineNo
+        new_pcd.PkgPath = self.PkgPath
+        new_pcd.StructuredPcdIncludeFile = [item for item in self.StructuredPcdIncludeFile]
+        new_pcd.PackageDecs = [item for item in self.PackageDecs]
+        new_pcd.DefaultValues = CopyDict(self.DefaultValues)
+        new_pcd.DefaultFromDSC=CopyDict(self.DefaultFromDSC)
+        new_pcd.SkuOverrideValues = CopyDict(self.SkuOverrideValues)
+        new_pcd.PcdFieldValueFromComm = CopyDict(self.PcdFieldValueFromComm)
+        new_pcd.PcdFieldValueFromFdf = CopyDict(self.PcdFieldValueFromFdf)
+        new_pcd.ValueChain = {item for item in self.ValueChain}
+        return new_pcd
 
 LibraryClassObject = namedtuple('LibraryClassObject', ['LibraryClass','SupModList'], verbose=False)
 

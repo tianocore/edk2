@@ -17,7 +17,7 @@ from __future__ import absolute_import
 from Common.GlobalData import *
 from CommonDataClass.Exceptions import BadExpression
 from CommonDataClass.Exceptions import WrnExpression
-from .Misc import GuidStringToGuidStructureString, ParseFieldValue
+from .Misc import GuidStringToGuidStructureString, ParseFieldValue,CopyDict
 import Common.EdkLogger as EdkLogger
 import copy
 from Common.DataType import *
@@ -355,7 +355,7 @@ class ValueExpression(BaseExpression):
         #
         # The symbol table including PCD and macro mapping
         #
-        self._Symb = copy.deepcopy(SymbolTable)
+        self._Symb = CopyDict(SymbolTable)
         self._Symb.update(self.LogicalOperators)
         self._Idx = 0
         self._Len = len(self._Expr)

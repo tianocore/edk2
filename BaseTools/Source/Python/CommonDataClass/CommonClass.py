@@ -80,3 +80,18 @@ class SkuInfoClass(object):
                     'VpdOffset = ' + str(self.VpdOffset) + "," + \
                     'DefaultValue = ' + str(self.DefaultValue) + ","
         return Rtn
+
+    def __deepcopy__(self,memo):
+        new_sku = SkuInfoClass()
+        new_sku.SkuIdName = self.SkuIdName
+        new_sku.SkuId = self.SkuId
+        new_sku.VariableName = self.VariableName
+        new_sku.VariableGuid = self.VariableGuid
+        new_sku.VariableGuidValue = self.VariableGuidValue
+        new_sku.VariableOffset = self.VariableOffset
+        new_sku.HiiDefaultValue = self.HiiDefaultValue
+        new_sku.VariableAttribute = self.VariableAttribute
+        new_sku.DefaultStoreDict = {key:value for key,value in self.DefaultStoreDict.items()}
+        new_sku.VpdOffset = self.VpdOffset
+        new_sku.DefaultValue = self.DefaultValue
+        return new_sku

@@ -974,7 +974,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if TAB_DEFAULT_STORES_DEFAULT not in skuobj.DefaultStoreDict:
                     PcdDefaultStoreSet = set(defaultstorename  for defaultstorename in skuobj.DefaultStoreDict)
                     mindefaultstorename = DefaultStoreMgr.GetMin(PcdDefaultStoreSet)
-                    skuobj.DefaultStoreDict[TAB_DEFAULT_STORES_DEFAULT] = copy.deepcopy(skuobj.DefaultStoreDict[mindefaultstorename])
+                    skuobj.DefaultStoreDict[TAB_DEFAULT_STORES_DEFAULT] = CopyDict(skuobj.DefaultStoreDict[mindefaultstorename])
         return Pcds
 
     def RecoverCommandLinePcd(self):
@@ -1528,7 +1528,7 @@ class DscBuildData(PlatformBuildClassObject):
 
                     for defaultstoreid in DefaultStores:
                         if defaultstoreid not in stru_pcd.SkuOverrideValues[skuid]:
-                            stru_pcd.SkuOverrideValues[skuid][defaultstoreid] = copy.deepcopy(stru_pcd.SkuOverrideValues[nextskuid][mindefaultstorename])
+                            stru_pcd.SkuOverrideValues[skuid][defaultstoreid] = CopyDict(stru_pcd.SkuOverrideValues[nextskuid][mindefaultstorename])
                             stru_pcd.ValueChain.add((skuid, defaultstoreid))
         S_pcd_set = DscBuildData.OverrideByFdf(S_pcd_set,self.WorkspaceDir)
         S_pcd_set = DscBuildData.OverrideByComm(S_pcd_set)
@@ -2769,7 +2769,7 @@ class DscBuildData(PlatformBuildClassObject):
                     mindefaultstorename = DefaultStoreObj.GetMin(set(defaultstorename for defaultstorename in skuobj.DefaultStoreDict))
                     for defaultstorename in DefaultStores:
                         if defaultstorename not in skuobj.DefaultStoreDict:
-                            skuobj.DefaultStoreDict[defaultstorename] = copy.deepcopy(skuobj.DefaultStoreDict[mindefaultstorename])
+                            skuobj.DefaultStoreDict[defaultstorename] = CopyDict(skuobj.DefaultStoreDict[mindefaultstorename])
                     skuobj.HiiDefaultValue = skuobj.DefaultStoreDict[mindefaultstorename]
             for skuname, skuid in SkuIds.items():
                 if skuname not in PcdObj.SkuInfoList:

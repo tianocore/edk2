@@ -41,6 +41,7 @@ import uuid
 from CommonDataClass.Exceptions import BadExpression
 from Common.caching import cached_property
 import subprocess
+from collections import OrderedDict
 ## Regular expression used to find out place holders in string template
 gPlaceholderPattern = re.compile("\$\{([^$()\s]+)\}", re.MULTILINE | re.UNICODE)
 
@@ -2130,6 +2131,21 @@ def PackByteFormatGUID(Guid):
                 Guid[10],
                 )
 
+## DeepCopy dict/OrderedDict recusively
+#
+#   @param      ori_dict    a nested dict or ordereddict
+#
+#   @retval     new dict or orderdict
+#
+def CopyDict(ori_dict):
+    dict_type = ori_dict.__class__
+    new_dict = dict_type()
+    for key in ori_dict:
+        if isinstance(ori_dict[key],(dict,OrderedDict)):
+            new_dict[key] = CopyDict(ori_dict[key])
+        else:
+            new_dict[key] = ori_dict[key]
+    return new_dict
 ##
 #
 # This acts like the main() function for the script, unless it is 'import'ed into another
