@@ -269,8 +269,10 @@ CpuInitDataInitialize (
     DEBUG ((DEBUG_INFO, "Package: %d, Valid Core : %d\n", Index, ValidCoreCountPerPackage[Index]));
   }
 
-  CpuFeaturesData->CpuFlags.SemaphoreCount = AllocateZeroPool (sizeof (UINT32) * CpuStatus->PackageCount * CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount);
-  ASSERT (CpuFeaturesData->CpuFlags.SemaphoreCount != NULL);
+  CpuFeaturesData->CpuFlags.CoreSemaphoreCount = AllocateZeroPool (sizeof (UINT32) * CpuStatus->PackageCount * CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount);
+  ASSERT (CpuFeaturesData->CpuFlags.CoreSemaphoreCount != NULL);
+  CpuFeaturesData->CpuFlags.PackageSemaphoreCount = AllocateZeroPool (sizeof (UINT32) * CpuStatus->PackageCount * CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount);
+  ASSERT (CpuFeaturesData->CpuFlags.PackageSemaphoreCount != NULL);
 
   //
   // Get support and configuration PCDs
@@ -963,9 +965,9 @@ ProgramProcessorRegister (
       //  V(0...n)       V(0...n)      ...           V(0...n)
       //  n * P(0)       n * P(1)      ...           n * P(n)
       //
-      SemaphorePtr = CpuFlags->SemaphoreCount;
       switch (RegisterTableEntry->Value) {
       case CoreDepType:
+        SemaphorePtr = CpuFlags->CoreSemaphoreCount;
         //
         // Get Offset info for the first thread in the core which current thread belongs to.
         //
@@ -986,6 +988,7 @@ ProgramProcessorRegister (
         break;
 
       case PackageDepType:
+        SemaphorePtr = CpuFlags->PackageSemaphoreCount;
         ValidCoreCountPerPackage = (UINT32 *)(UINTN)CpuStatus->ValidCoreCountPerPackage;
         //
         // Get Offset info for the first thread in the package which current thread belongs to.
