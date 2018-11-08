@@ -137,7 +137,7 @@ def AscToHexList(Ascii):
 # @retval Str:           A string of .h file content
 #
 def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
-    Str = ''
+    Str = []
     ValueStartPtr = 60
     Line = COMMENT_DEFINE_STR + ' ' + LANGUAGE_NAME_STRING_NAME + ' ' * (ValueStartPtr - len(DEFINE_STR + LANGUAGE_NAME_STRING_NAME)) + DecToHexStr(0, 4) + COMMENT_NOT_REFERENCED
     Str = WriteLine(Str, Line)
@@ -166,12 +166,12 @@ def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
                     Line = COMMENT_DEFINE_STR + ' ' + Name + ' ' * (ValueStartPtr - len(DEFINE_STR + Name)) + DecToHexStr(Token, 4) + COMMENT_NOT_REFERENCED
                 UnusedStr = WriteLine(UnusedStr, Line)
 
-    Str = ''.join([Str, UnusedStr])
+    Str.extend( UnusedStr)
 
     Str = WriteLine(Str, '')
     if IsCompatibleMode or UniGenCFlag:
         Str = WriteLine(Str, 'extern unsigned char ' + BaseName + 'Strings[];')
-    return Str
+    return "".join(Str)
 
 ## Create a complete .h file
 #
@@ -187,7 +187,7 @@ def CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
 def CreateHFile(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag):
     HFile = WriteLine('', CreateHFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniGenCFlag))
 
-    return HFile
+    return "".join(HFile)
 
 ## Create a buffer to store all items in an array
 #
@@ -211,7 +211,7 @@ def CreateArrayItem(Array, Width = 16):
     MaxLength = Width
     Index = 0
     Line = '  '
-    ArrayItem = ''
+    ArrayItem = []
 
     for Item in Array:
         if Index < MaxLength:
@@ -223,7 +223,7 @@ def CreateArrayItem(Array, Width = 16):
             Index = 1
     ArrayItem = Write(ArrayItem, Line.rstrip())
 
-    return ArrayItem
+    return "".join(ArrayItem)
 
 ## CreateCFileStringValue
 #
@@ -238,7 +238,7 @@ def CreateCFileStringValue(Value):
     Value = [StringBlockType] + Value
     Str = WriteLine('', CreateArrayItem(Value))
 
-    return Str
+    return "".join(Str)
 
 ## GetFilteredLanguage
 #
@@ -440,7 +440,7 @@ def CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, UniBinBuffer,
     #
     AllStr = Write(AllStr, Str)
 
-    return AllStr
+    return "".join(AllStr)
 
 ## Create end of .c file
 #
@@ -467,7 +467,7 @@ def CreateCFile(BaseName, UniObjectClass, IsCompatibleMode, FilterInfo):
     CFile = ''
     CFile = WriteLine(CFile, CreateCFileContent(BaseName, UniObjectClass, IsCompatibleMode, None, FilterInfo))
     CFile = WriteLine(CFile, CreateCFileEnd())
-    return CFile
+    return "".join(CFile)
 
 ## GetFileList
 #
@@ -574,13 +574,30 @@ def GetStringFiles(UniFilList, SourceFileList, IncludeList, IncludePathList, Ski
 # Write an item
 #
 def Write(Target, Item):
-    return ''.join([Target, Item])
+    if isinstance(Target,str):
+        Target = [Target]
+    if not Target:
+        Target = []
+    if isinstance(Item,list):
+        Target.extend(Item)
+    else:
+        Target.append(Item)
+    return Target
 
 #
 # Write an item with a break line
 #
 def WriteLine(Target, Item):
-    return ''.join([Target, Item, '\n'])
+    if isinstance(Target,str):
+        Target = [Target]
+    if not Target:
+        Target = []
+    if isinstance(Item, list):
+        Target.extend(Item)
+    else:
+        Target.append(Item)
+    Target.append('\n')
+    return Target
 
 # This acts like the main() function for the script, unless it is 'import'ed into another
 # script.

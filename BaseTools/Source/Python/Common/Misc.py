@@ -778,7 +778,7 @@ class TemplateString(object):
 
     ## Constructor
     def __init__(self, Template=None):
-        self.String = ''
+        self.String = []
         self.IsBinary = False
         self._Template = Template
         self._TemplateSectionList = self._Parse(Template)
@@ -788,7 +788,7 @@ class TemplateString(object):
     #   @retval     string  The string replaced
     #
     def __str__(self):
-        return self.String
+        return "".join(self.String)
 
     ## Split the template string into fragments per the ${BEGIN} and ${END} flags
     #
@@ -836,9 +836,12 @@ class TemplateString(object):
     def Append(self, AppendString, Dictionary=None):
         if Dictionary:
             SectionList = self._Parse(AppendString)
-            self.String += "".join(S.Instantiate(Dictionary) for S in SectionList)
+            self.String.append( "".join(S.Instantiate(Dictionary) for S in SectionList))
         else:
-            self.String += AppendString
+            if isinstance(AppendString,list):
+                self.String.extend(AppendString)
+            else:
+                self.String.append(AppendString)
 
     ## Replace the string template with dictionary of placeholders
     #
@@ -1744,10 +1747,7 @@ class PathClass(object):
     # @retval True  The two PathClass are the same
     #
     def __eq__(self, Other):
-        if isinstance(Other, type(self)):
-            return self.Path == Other.Path
-        else:
-            return self.Path == str(Other)
+        return self.Path == str(Other)
 
     ## Override __cmp__ function
     #
@@ -1757,10 +1757,7 @@ class PathClass(object):
     # @retval -1    The first PathClass is less than the second PathClass
     # @retval 1     The first PathClass is Bigger than the second PathClass
     def __cmp__(self, Other):
-        if isinstance(Other, type(self)):
-            OtherKey = Other.Path
-        else:
-            OtherKey = str(Other)
+        OtherKey = str(Other)
 
         SelfKey = self.Path
         if SelfKey == OtherKey:

@@ -128,13 +128,10 @@ def GetModuleLibInstances(Module, Platform, BuildDatabase, Arch, Target, Toolcha
         for LibraryClassName in M.LibraryClasses:
             if LibraryClassName not in LibraryInstance:
                 # override library instance for this module
-                if LibraryClassName in Platform.Modules[str(Module)].LibraryClasses:
-                    LibraryPath = Platform.Modules[str(Module)].LibraryClasses[LibraryClassName]
-                else:
-                    LibraryPath = Platform.LibraryClasses[LibraryClassName, ModuleType]
-                if LibraryPath is None or LibraryPath == "":
-                    LibraryPath = M.LibraryClasses[LibraryClassName]
-                    if LibraryPath is None or LibraryPath == "":
+                LibraryPath = Platform.Modules[str(Module)].LibraryClasses.get(LibraryClassName,Platform.LibraryClasses[LibraryClassName, ModuleType])
+                if LibraryPath is None:
+                    LibraryPath = M.LibraryClasses.get(LibraryClassName)
+                    if LibraryPath is None:
                         if FileName:
                             EdkLogger.error("build", RESOURCE_NOT_AVAILABLE,
                                             "Instance of library class [%s] is not found" % LibraryClassName,

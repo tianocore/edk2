@@ -614,7 +614,9 @@ class InfBuildData(ModuleBuildClassObject):
             Instance = Record[1]
             if Instance:
                 Instance = NormPath(Instance, self._Macros)
-            RetVal[Lib] = Instance
+                RetVal[Lib] = Instance
+            else:
+                RetVal[Lib] = None
         return RetVal
 
     ## Retrieve library names (for Edk.x style of modules)
