@@ -2682,6 +2682,12 @@ Returns: (VOID)
 
         BytesRemain--;
       }
+      //
+      // Once mOutBuf is fully filled, directly return
+      //
+      if (Sd->mOutBuf >= Sd->mOrigSize) {
+        goto Done ;
+      }
     }
   }
 
