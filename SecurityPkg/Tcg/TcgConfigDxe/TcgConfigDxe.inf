@@ -59,7 +59,6 @@
   ## SOMETIMES_CONSUMES ## Variable:L"PhysicalPresence"
   gEfiPhysicalPresenceGuid
 
-  gEfiIfrTianoGuid                                    ## SOMETIMES_PRODUCES  ## GUID       # HII opcode
   ## PRODUCES            ## HII
   ## CONSUMES            ## HII
   gTcgConfigFormSetGuid

@@ -43,7 +43,6 @@
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
-  MemoryAllocationLib
   PeiServicesLib
   PeimEntryPoint
   DebugLib

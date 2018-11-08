@@ -105,7 +105,6 @@
   gEfiCertPkcs7Guid                             ## SOMETIMES_PRODUCES  ## GUID  # Unique ID for the type of the certificate.
   gEfiCertTypeRsa2048Sha256Guid                 ## SOMETIMES_CONSUMES  ## GUID  # Unique ID for the type of the certificate.
   gEfiFileSystemVolumeLabelInfoIdGuid           ## SOMETIMES_CONSUMES  ## GUID  # Indicate the information type
-  gEfiFileInfoGuid                              ## SOMETIMES_CONSUMES  ## GUID  # Indicate the information type
 
   gEfiCertX509Sha256Guid                        ## SOMETIMES_PRODUCES  ## GUID  # Unique ID for the type of the certificate.
   gEfiCertX509Sha384Guid                        ## SOMETIMES_PRODUCES  ## GUID  # Unique ID for the type of the certificate.
@@ -114,7 +113,6 @@
 [Protocols]
   gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
   gEfiDevicePathProtocolGuid                    ## PRODUCES
-  gEfiBlockIoProtocolGuid                       ## SOMETIMES_CONSUMES
 
 [Depex]
   gEfiHiiConfigRoutingProtocolGuid  AND

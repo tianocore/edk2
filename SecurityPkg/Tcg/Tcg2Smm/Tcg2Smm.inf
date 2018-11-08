@@ -59,7 +59,6 @@
   TpmMeasurementLib
   Tpm2CommandLib
   Tcg2PhysicalPresenceLib
-  IoLib
   PcdLib
 
 [Guids]

@@ -294,29 +294,6 @@ typedef struct {
 } AHCI_CONTEXT;
 
 /**
-  Send Buffer cmd to specific device.
-
-  @param  AhciContext         The pointer to the AHCI_CONTEXT.
-  @param  Port                The number of port.
-  @param  PortMultiplier      The timeout Value of stop.
-  @param  Buffer              The Data Buffer to store IDENTIFY PACKET Data.
-
-  @retval EFI_DEVICE_ERROR    The cmd abort with error occurs.
-  @retval EFI_TIMEOUT         The operation is time out.
-  @retval EFI_UNSUPPORTED     The device is not ready for executing.
-  @retval EFI_SUCCESS         The cmd executes successfully.
-
-**/
-EFI_STATUS
-EFIAPI
-AhciIdentify (
-  IN AHCI_CONTEXT             *AhciContext,
-  IN UINT8                    Port,
-  IN UINT8                    PortMultiplier,
-  IN OUT ATA_IDENTIFY_DATA    *Buffer
-  );
-
-/**
   Allocate transfer-related data struct which is used at AHCI mode.
 
   @param[in, out] AhciContext   The pointer to the AHCI_CONTEXT.

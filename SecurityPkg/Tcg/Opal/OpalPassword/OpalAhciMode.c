@@ -970,58 +970,6 @@ AhciReset (
 }
 
 /**
-  Send Buffer cmd to specific device.
-
-  @param[in]  AhciContext         The pointer to the AHCI_CONTEXT.
-  @param[in]  Port                The port number of attached ATA device.
-  @param[in]  PortMultiplier      The port number of port multiplier of attached ATA device.
-  @param[in, out]  Buffer         The Data Buffer to store IDENTIFY PACKET Data.
-
-  @retval EFI_DEVICE_ERROR    The cmd abort with error occurs.
-  @retval EFI_TIMEOUT         The operation is time out.
-  @retval EFI_UNSUPPORTED     The device is not ready for executing.
-  @retval EFI_SUCCESS         The cmd executes successfully.
-
-**/
-EFI_STATUS
-EFIAPI
-AhciIdentify (
-  IN AHCI_CONTEXT             *AhciContext,
-  IN UINT8                    Port,
-  IN UINT8                    PortMultiplier,
-  IN OUT ATA_IDENTIFY_DATA    *Buffer
-  )
-{
-  EFI_STATUS                   Status;
-  EFI_ATA_COMMAND_BLOCK        AtaCommandBlock;
-
-  if (AhciContext == NULL || Buffer == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-
-  ZeroMem (&AtaCommandBlock, sizeof (EFI_ATA_COMMAND_BLOCK));
-
-  AtaCommandBlock.AtaCommand     = ATA_CMD_IDENTIFY_DRIVE;
-  AtaCommandBlock.AtaSectorCount = 1;
-
-  Status = AhciPioTransfer (
-             AhciContext,
-             Port,
-             PortMultiplier,
-             NULL,
-             0,
-             TRUE,
-             &AtaCommandBlock,
-             NULL,
-             Buffer,
-             sizeof (ATA_IDENTIFY_DATA),
-             ATA_TIMEOUT
-             );
-
-  return Status;
-}
-
-/**
   Allocate transfer-related data struct which is used at AHCI mode.
 
   @param[in, out] AhciContext   The pointer to the AHCI_CONTEXT.

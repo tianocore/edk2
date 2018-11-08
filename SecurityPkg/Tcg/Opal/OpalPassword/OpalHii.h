@@ -286,17 +286,6 @@ OpalHiiAddPackages(
   );
 
 /**
-  Check whether enable feature or not.
-
-  @retval  Return the disk number.
-
-**/
-UINT8
-HiiGetNumConfigRequiredOpalDisksCB(
-  VOID
-  );
-
-/**
   Returns the driver name.
 
   @retval Returns the driver name.

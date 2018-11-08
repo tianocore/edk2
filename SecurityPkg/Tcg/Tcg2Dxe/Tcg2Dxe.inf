@@ -92,7 +92,6 @@
 [Protocols]
   gEfiTcg2ProtocolGuid                               ## PRODUCES
   gEfiTcg2FinalEventsTableGuid                       ## PRODUCES
-  gEfiAcpiTableProtocolGuid                          ## NOTIFY
   gEfiMpServiceProtocolGuid                          ## SOMETIMES_CONSUMES
   gEfiVariableWriteArchProtocolGuid                  ## NOTIFY
   gEfiResetNotificationProtocolGuid                  ## CONSUMES
