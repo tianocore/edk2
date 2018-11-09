@@ -226,12 +226,11 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
 
         """call Workspace build create database"""
         GlobalData.gDatabasePath = os.path.normpath(os.path.join(ConfDirectoryPath, GlobalData.gDatabasePath))
+
         if WorkSpaceDataBase:
             BuildWorkSpace = WorkSpaceDataBase
         else:
-            BuildWorkSpace = WorkspaceDatabase(GlobalData.gDatabasePath)
-            BuildWorkSpace.InitDatabase()
-
+            BuildWorkSpace = WorkspaceDatabase()
         #
         # Get files real name in workspace dir
         #

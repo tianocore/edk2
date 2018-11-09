@@ -1372,8 +1372,7 @@ class DscParser(MetaFileParser):
             MODEL_META_DATA_CONDITIONAL_STATEMENT_ERROR     :   self._ProcessError,
         }
 
-        self._Table = MetaFileStorage(self._RawTable.Cur, self.MetaFile, MODEL_FILE_DSC, True)
-        self._Table.Create()
+        self._Table = MetaFileStorage(self._RawTable.DB, self.MetaFile, MODEL_FILE_DSC, True)
         self._DirectiveStack = []
         self._DirectiveEvalStack = []
         self._FileWithError = self.MetaFile
@@ -1632,7 +1631,7 @@ class DscParser(MetaFileParser):
                 Owner = self._Content[self._ContentIndex - 1][8]
             else:
                 Owner = self._Content[self._ContentIndex - 1][0]
-            IncludedFileTable = MetaFileStorage(self._Table.Cur, IncludedFile1, MODEL_FILE_DSC, False, FromItem=FromItem)
+            IncludedFileTable = MetaFileStorage(self._RawTable.DB, IncludedFile1, MODEL_FILE_DSC, False, FromItem=FromItem)
             Parser = DscParser(IncludedFile1, self._FileType, self._Arch, IncludedFileTable,
                                Owner=Owner, From=FromItem)
 

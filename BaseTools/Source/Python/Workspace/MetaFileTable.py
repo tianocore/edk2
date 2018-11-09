@@ -20,54 +20,59 @@ import uuid
 import Common.EdkLogger as EdkLogger
 from Common.BuildToolError import FORMAT_INVALID
 
-from .MetaDataTable import Table, TableFile
-from .MetaDataTable import ConvertToSqlString
 from CommonDataClass.DataClass import MODEL_FILE_DSC, MODEL_FILE_DEC, MODEL_FILE_INF, \
                                       MODEL_FILE_OTHERS
 from Common.DataType import *
 
-class MetaFileTable(Table):
+class MetaFileTable():
     # TRICK: use file ID as the part before '.'
     _ID_STEP_ = 0.00000001
     _ID_MAX_ = 0.99999999
 
     ## Constructor
-    def __init__(self, Cursor, MetaFile, FileType, Temporary, FromItem=None):
+    def __init__(self, DB, MetaFile, FileType, Temporary, FromItem=None):
         self.MetaFile = MetaFile
-
-        self._FileIndexTable = TableFile(Cursor)
-        self._FileIndexTable.Create(False)
-
-        FileId = self._FileIndexTable.GetFileId(MetaFile, FromItem)
-        if not FileId:
-            FileId = self._FileIndexTable.InsertFile(MetaFile, FileType, FromItem)
-
+        self.TableName = ""
+        self.DB = DB
+        self._NumpyTab = None
+        self.FileId = len(DB.TblFile)
+        self.ID = self.FileId
+        self.CurrentContent = []
+        DB.TblFile.append([MetaFile.Name,
+                        MetaFile.Ext,
+                        MetaFile.Dir,
+                        MetaFile.Path,
+                        FileType,
+                        MetaFile.TimeStamp,
+                        FromItem])
         if Temporary:
-            TableName = "_%s_%s_%s" % (FileType, FileId, uuid.uuid4().hex)
+            self.TableName = "_%s_%s_%s" % (FileType, len(DB.TblFile), uuid.uuid4().hex)
         else:
-            TableName = "_%s_%s" % (FileType, FileId)
-
-        #Table.__init__(self, Cursor, TableName, FileId, False)
-        Table.__init__(self, Cursor, TableName, FileId, Temporary)
-        self.Create(not self.IsIntegrity())
+            self.TableName = "_%s_%s" % (FileType, len(DB.TblFile))
 
     def IsIntegrity(self):
         try:
             TimeStamp = self.MetaFile.TimeStamp
-            Result = self.Cur.execute("select ID from %s where ID<0" % (self.Table)).fetchall()
+            Result = int(self.CurrentContent[-1][0]) < 0
             if not Result:
                 # update the timestamp in database
-                self._FileIndexTable.SetFileTimeStamp(self.IdBase, TimeStamp)
+                self.DB.SetFileTimeStamp(self.FileId, TimeStamp)
                 return False
 
-            if TimeStamp != self._FileIndexTable.GetFileTimeStamp(self.IdBase):
+            if TimeStamp != self.DB.GetFileTimeStamp(self.FileId):
                 # update the timestamp in database
-                self._FileIndexTable.SetFileTimeStamp(self.IdBase, TimeStamp)
+                self.DB.SetFileTimeStamp(self.FileId, TimeStamp)
                 return False
         except Exception as Exc:
             EdkLogger.debug(EdkLogger.DEBUG_5, str(Exc))
             return False
         return True
+
+    def SetEndFlag(self):
+        self.CurrentContent.append(self._DUMMY_)
+
+    def GetAll(self):
+        return [item for item in self.CurrentContent if item[0] > 0 ]
 
 ## Python class representation of table storing module data
 class ModuleTable(MetaFileTable):
@@ -89,11 +94,11 @@ class ModuleTable(MetaFileTable):
         Enabled INTEGER DEFAULT 0
         '''
     # used as table end flag, in case the changes to database is not committed to db file
-    _DUMMY_ = "-1, -1, '====', '====', '====', '====', '====', -1, -1, -1, -1, -1, -1"
+    _DUMMY_ = [-1, -1, '====', '====', '====', '====', '====', -1, -1, -1, -1, -1, -1]
 
     ## Constructor
-    def __init__(self, Cursor, MetaFile, Temporary):
-        MetaFileTable.__init__(self, Cursor, MetaFile, MODEL_FILE_INF, Temporary)
+    def __init__(self, Db, MetaFile, Temporary):
+        MetaFileTable.__init__(self, Db, MetaFile, MODEL_FILE_INF, Temporary)
 
     ## Insert a record into table Inf
     #
@@ -112,22 +117,29 @@ class ModuleTable(MetaFileTable):
     #
     def Insert(self, Model, Value1, Value2, Value3, Scope1=TAB_ARCH_COMMON, Scope2=TAB_COMMON,
                BelongsToItem=-1, StartLine=-1, StartColumn=-1, EndLine=-1, EndColumn=-1, Enabled=0):
-        (Value1, Value2, Value3, Scope1, Scope2) = ConvertToSqlString((Value1, Value2, Value3, Scope1, Scope2))
-        return Table.Insert(
-                        self,
-                        Model,
-                        Value1,
-                        Value2,
-                        Value3,
-                        Scope1,
-                        Scope2,
-                        BelongsToItem,
-                        StartLine,
-                        StartColumn,
-                        EndLine,
-                        EndColumn,
-                        Enabled
-                        )
+
+        (Value1, Value2, Value3, Scope1, Scope2) = (Value1.strip(), Value2.strip(), Value3.strip(), Scope1.strip(), Scope2.strip())
+        self.ID = self.ID + self._ID_STEP_
+        if self.ID >= (MODEL_FILE_INF + self._ID_MAX_):
+            self.ID = MODEL_FILE_INF + self._ID_STEP_
+
+        row = [ self.ID,
+                Model,
+                Value1,
+                Value2,
+                Value3,
+                Scope1,
+                Scope2,
+                BelongsToItem,
+                StartLine,
+                StartColumn,
+                EndLine,
+                EndColumn,
+                Enabled
+            ]
+        self.CurrentContent.append(row)
+        return self.ID
+
 
     ## Query table
     #
@@ -138,18 +150,25 @@ class ModuleTable(MetaFileTable):
     # @retval:       A recordSet of all found records
     #
     def Query(self, Model, Arch=None, Platform=None, BelongsToItem=None):
-        ConditionString = "Model=%s AND Enabled>=0" % Model
-        ValueString = "Value1,Value2,Value3,Scope1,Scope2,ID,StartLine"
+
+        QueryTab = self.CurrentContent
+        result = [item for item in QueryTab if item[1] == Model and item[-1]>=0 ]
 
         if Arch is not None and Arch != TAB_ARCH_COMMON:
-            ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Arch
-        if Platform is not None and Platform != TAB_COMMON:
-            ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT')" % Platform
-        if BelongsToItem is not None:
-            ConditionString += " AND BelongsToItem=%s" % BelongsToItem
+            ArchList = set(['COMMON'])
+            ArchList.add(Arch)
+            result = [item for item in result if item[5] in ArchList]
 
-        SqlCommand = "SELECT %s FROM %s WHERE %s" % (ValueString, self.Table, ConditionString)
-        return self.Exec(SqlCommand)
+        if Platform is not None and Platform != TAB_COMMON:
+            Platformlist = set( ['COMMON','DEFAULT'])
+            Platformlist.add(Platform)
+            result = [item for item in result if item[6] in Platformlist]
+
+        if BelongsToItem is not None:
+            result = [item for item in result if item[7] == BelongsToItem]
+
+        result = [ [r[2],r[3],r[4],r[5],r[6],r[0],r[9]] for r in result ]
+        return result
 
 ## Python class representation of table storing package data
 class PackageTable(MetaFileTable):
@@ -169,7 +188,7 @@ class PackageTable(MetaFileTable):
         Enabled INTEGER DEFAULT 0
         '''
     # used as table end flag, in case the changes to database is not committed to db file
-    _DUMMY_ = "-1, -1, '====', '====', '====', '====', '====', -1, -1, -1, -1, -1, -1"
+    _DUMMY_ = [-1, -1, '====', '====', '====', '====', '====', -1, -1, -1, -1, -1, -1]
 
     ## Constructor
     def __init__(self, Cursor, MetaFile, Temporary):
@@ -194,22 +213,27 @@ class PackageTable(MetaFileTable):
     #
     def Insert(self, Model, Value1, Value2, Value3, Scope1=TAB_ARCH_COMMON, Scope2=TAB_COMMON,
                BelongsToItem=-1, StartLine=-1, StartColumn=-1, EndLine=-1, EndColumn=-1, Enabled=0):
-        (Value1, Value2, Value3, Scope1, Scope2) = ConvertToSqlString((Value1, Value2, Value3, Scope1, Scope2))
-        return Table.Insert(
-                        self,
-                        Model,
-                        Value1,
-                        Value2,
-                        Value3,
-                        Scope1,
-                        Scope2,
-                        BelongsToItem,
-                        StartLine,
-                        StartColumn,
-                        EndLine,
-                        EndColumn,
-                        Enabled
-                        )
+        (Value1, Value2, Value3, Scope1, Scope2) = (Value1.strip(), Value2.strip(), Value3.strip(), Scope1.strip(), Scope2.strip())
+        self.ID = self.ID + self._ID_STEP_
+        if self.ID >= (MODEL_FILE_INF + self._ID_MAX_):
+            self.ID = MODEL_FILE_INF + self._ID_STEP_
+
+        row = [ self.ID,
+                Model,
+                Value1,
+                Value2,
+                Value3,
+                Scope1,
+                Scope2,
+                BelongsToItem,
+                StartLine,
+                StartColumn,
+                EndLine,
+                EndColumn,
+                Enabled
+            ]
+        self.CurrentContent.append(row)
+        return self.ID
 
     ## Query table
     #
@@ -219,23 +243,26 @@ class PackageTable(MetaFileTable):
     # @retval:       A recordSet of all found records
     #
     def Query(self, Model, Arch=None):
-        ConditionString = "Model=%s AND Enabled>=0" % Model
-        ValueString = "Value1,Value2,Value3,Scope1,Scope2,ID,StartLine"
+
+        QueryTab = self.CurrentContent
+        result = [item for item in QueryTab if item[1] == Model and item[-1]>=0 ]
 
         if Arch is not None and Arch != TAB_ARCH_COMMON:
-            ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Arch
+            ArchList = set(['COMMON'])
+            ArchList.add(Arch)
+            result = [item for item in result if item[5] in ArchList]
 
-        SqlCommand = "SELECT %s FROM %s WHERE %s" % (ValueString, self.Table, ConditionString)
-        return self.Exec(SqlCommand)
+        return [[r[2], r[3], r[4], r[5], r[6], r[0], r[8]] for r in result]
 
     def GetValidExpression(self, TokenSpaceGuid, PcdCName):
-        SqlCommand = "select Value1,StartLine from %s WHERE Value2='%s' and Value3='%s'" % (self.Table, TokenSpaceGuid, PcdCName)
-        self.Cur.execute(SqlCommand)
+
+        QueryTab = self.CurrentContent
+        result = [[item[2], item[8]] for item in QueryTab if item[3] == TokenSpaceGuid and item[4] == PcdCName]
         validateranges = []
         validlists = []
         expressions = []
         try:
-            for row in self.Cur:
+            for row in result:
                 comment = row[0]
 
                 LineNum = row[1]
@@ -283,7 +310,7 @@ class PlatformTable(MetaFileTable):
         Enabled INTEGER DEFAULT 0
         '''
     # used as table end flag, in case the changes to database is not committed to db file
-    _DUMMY_ = "-1, -1, '====', '====', '====', '====', '====','====', -1, -1, -1, -1, -1, -1, -1"
+    _DUMMY_ = [-1, -1, '====', '====', '====', '====', '====','====', -1, -1, -1, -1, -1, -1, -1]
 
     ## Constructor
     def __init__(self, Cursor, MetaFile, Temporary, FromItem=0):
@@ -309,24 +336,30 @@ class PlatformTable(MetaFileTable):
     #
     def Insert(self, Model, Value1, Value2, Value3, Scope1=TAB_ARCH_COMMON, Scope2=TAB_COMMON, Scope3=TAB_DEFAULT_STORES_DEFAULT,BelongsToItem=-1,
                FromItem=-1, StartLine=-1, StartColumn=-1, EndLine=-1, EndColumn=-1, Enabled=1):
-        (Value1, Value2, Value3, Scope1, Scope2, Scope3) = ConvertToSqlString((Value1, Value2, Value3, Scope1, Scope2, Scope3))
-        return Table.Insert(
-                        self,
-                        Model,
-                        Value1,
-                        Value2,
-                        Value3,
-                        Scope1,
-                        Scope2,
-                        Scope3,
-                        BelongsToItem,
-                        FromItem,
-                        StartLine,
-                        StartColumn,
-                        EndLine,
-                        EndColumn,
-                        Enabled
-                        )
+        (Value1, Value2, Value3, Scope1, Scope2, Scope3) = (Value1.strip(), Value2.strip(), Value3.strip(), Scope1.strip(), Scope2.strip(), Scope3.strip())
+        self.ID = self.ID + self._ID_STEP_
+        if self.ID >= (MODEL_FILE_INF + self._ID_MAX_):
+            self.ID = MODEL_FILE_INF + self._ID_STEP_
+
+        row = [ self.ID,
+                Model,
+                Value1,
+                Value2,
+                Value3,
+                Scope1,
+                Scope2,
+                Scope3,
+                BelongsToItem,
+                FromItem,
+                StartLine,
+                StartColumn,
+                EndLine,
+                EndColumn,
+                Enabled
+            ]
+        self.CurrentContent.append(row)
+        return self.ID
+
 
     ## Query table
     #
@@ -339,30 +372,33 @@ class PlatformTable(MetaFileTable):
     # @retval:       A recordSet of all found records
     #
     def Query(self, Model, Scope1=None, Scope2=None, BelongsToItem=None, FromItem=None):
-        ConditionString = "Model=%s AND Enabled>0" % Model
-        ValueString = "Value1,Value2,Value3,Scope1,Scope2,Scope3,ID,StartLine"
+
+        QueryTab = self.CurrentContent
+        result = [item for item in QueryTab if item[1] == Model and item[-1]>0 ]
 
         if Scope1 is not None and Scope1 != TAB_ARCH_COMMON:
-            ConditionString += " AND (Scope1='%s' OR Scope1='COMMON')" % Scope1
-        if Scope2 is not None and Scope2 != TAB_COMMON:
-            # Cover the case that CodeBase is 'COMMON' for BuildOptions section
+            Sc1 = set(['COMMON'])
+            Sc1.add(Scope1)
+            result = [item for item in result if item[5] in Sc1]
+        Sc2 = set( ['COMMON','DEFAULT'])
+        if Scope2 and Scope2 != TAB_COMMON:
             if '.' in Scope2:
                 Index = Scope2.index('.')
                 NewScope = TAB_COMMON + Scope2[Index:]
-                ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT' OR Scope2='%s')" % (Scope2, NewScope)
-            else:
-                ConditionString += " AND (Scope2='%s' OR Scope2='COMMON' OR Scope2='DEFAULT')" % Scope2
+                Sc2.add(NewScope)
+            Sc2.add(Scope2)
+            result = [item for item in result if item[6] in Sc2]
 
         if BelongsToItem is not None:
-            ConditionString += " AND BelongsToItem=%s" % BelongsToItem
+            result = [item for item in result if item[8] == BelongsToItem]
         else:
-            ConditionString += " AND BelongsToItem<0"
-
+            result = [item for item in result if item[8] < 0]
         if FromItem is not None:
-            ConditionString += " AND FromItem=%s" % FromItem
+            result = [item for item in result if item[9] == FromItem]
 
-        SqlCommand = "SELECT %s FROM %s WHERE %s" % (ValueString, self.Table, ConditionString)
-        return self.Exec(SqlCommand)
+        result = [ [r[2],r[3],r[4],r[5],r[6],r[7],r[0],r[9]] for r in result ]
+        return result
+
 
 ## Factory class to produce different storage for different type of meta-file
 class MetaFileStorage(object):

@@ -39,12 +39,13 @@ class Table(object):
     _ID_MAX_ = 0x80000000
     _DUMMY_ = 0
 
-    def __init__(self, Cursor, Name='', IdBase=0, Temporary=False):
-        self.Cur = Cursor
+    def __init__(self, Db, Name='', IdBase=0, Temporary=False):
+        self.Db = Db
         self.Table = Name
         self.IdBase = int(IdBase)
         self.ID = int(IdBase)
         self.Temporary = Temporary
+        self.Contents = []
 
     def __str__(self):
         return self.Table
@@ -54,15 +55,7 @@ class Table(object):
     # Create a table
     #
     def Create(self, NewTable=True):
-        if NewTable:
-            self.Drop()
-
-        if self.Temporary:
-            SqlCommand = """create temp table IF NOT EXISTS %s (%s)""" % (self.Table, self._COLUMN_)
-        else:
-            SqlCommand = """create table IF NOT EXISTS %s (%s)""" % (self.Table, self._COLUMN_)
-        EdkLogger.debug(EdkLogger.DEBUG_8, SqlCommand)
-        self.Cur.execute(SqlCommand)
+        self.Db.CreateEmptyTable(self.Table)
         self.ID = self.GetId()
 
     ## Insert table
@@ -73,30 +66,12 @@ class Table(object):
         self.ID = self.ID + self._ID_STEP_
         if self.ID >= (self.IdBase + self._ID_MAX_):
             self.ID = self.IdBase + self._ID_STEP_
-        Values = ", ".join(str(Arg) for Arg in Args)
-        SqlCommand = "insert into %s values(%s, %s)" % (self.Table, self.ID, Values)
-        EdkLogger.debug(EdkLogger.DEBUG_5, SqlCommand)
-        self.Cur.execute(SqlCommand)
+        row = [self.ID]
+        row.extend(Args)
+        self.Contents.append(row)
+
         return self.ID
 
-    ## Query table
-    #
-    # Query all records of the table
-    #
-    def Query(self):
-        SqlCommand = """select * from %s""" % self.Table
-        self.Cur.execute(SqlCommand)
-        for Rs in self.Cur:
-            EdkLogger.verbose(str(Rs))
-        TotalCount = self.GetId()
-
-    ## Drop a table
-    #
-    # Drop the table
-    #
-    def Drop(self):
-        SqlCommand = """drop table IF EXISTS %s""" % self.Table
-        self.Cur.execute(SqlCommand)
 
     ## Get count
     #
@@ -105,14 +80,13 @@ class Table(object):
     # @retval Count:  Total count of all records
     #
     def GetCount(self):
-        SqlCommand = """select count(ID) from %s""" % self.Table
-        Record = self.Cur.execute(SqlCommand).fetchall()
-        return Record[0][0]
+        tab = self.Db.GetTable(self.Table)
+        return len(tab)
+
 
     def GetId(self):
-        SqlCommand = """select max(ID) from %s""" % self.Table
-        Record = self.Cur.execute(SqlCommand).fetchall()
-        Id = Record[0][0]
+        tab = self.Db.GetTable(self.Table)
+        Id = max([int(item[0]) for item in tab])
         if Id is None:
             Id = self.IdBase
         return Id
@@ -134,25 +108,26 @@ class Table(object):
     #
     def Exec(self, SqlCommand):
         EdkLogger.debug(EdkLogger.DEBUG_5, SqlCommand)
-        self.Cur.execute(SqlCommand)
-        RecordSet = self.Cur.fetchall()
+        self.Db.execute(SqlCommand)
+        RecordSet = self.Db.fetchall()
         return RecordSet
 
     def SetEndFlag(self):
-        self.Exec("insert into %s values(%s)" % (self.Table, self._DUMMY_))
-        #
-        # Need to execution commit for table data changed.
-        #
-        self.Cur.connection.commit()
+        Tab = self.Db.GetTable(self.Table)
+        Tab.append(self._DUMMY_)
+
 
     def IsIntegral(self):
-        Result = self.Exec("select min(ID) from %s" % (self.Table))
-        if Result[0][0] != -1:
+        tab = self.Db.GetTable(self.Table)
+        Id = min([int(item[0]) for item in tab])
+        if Id != -1:
             return False
         return True
 
     def GetAll(self):
-        return self.Exec("select * from %s where ID > 0 order by ID" % (self.Table))
+        tab = self.Db.GetTable(self.Table)
+        return tab
+
 
 ## TableFile
 #
@@ -226,22 +201,6 @@ class TableFile(Table):
                         Model,
                         File.TimeStamp
                         )
-
-    ## Get ID of a given file
-    #
-    #   @param  FilePath    Path of file
-    #
-    #   @retval ID          ID value of given file in the table
-    #
-    def GetFileId(self, File, FromItem=None):
-        if FromItem:
-            QueryScript = "select ID from %s where FullPath = '%s' and FromItem = %s" % (self.Table, str(File), str(FromItem))
-        else:
-            QueryScript = "select ID from %s where FullPath = '%s'" % (self.Table, str(File))
-        RecordList = self.Exec(QueryScript)
-        if len(RecordList) == 0:
-            return None
-        return RecordList[0][0]
 
     ## Get type of a given file
     #
@@ -345,8 +304,8 @@ class TableDataModel(Table):
     def GetCrossIndex(self, ModelName):
         CrossIndex = -1
         SqlCommand = """select CrossIndex from DataModel where name = '""" + ModelName + """'"""
-        self.Cur.execute(SqlCommand)
-        for Item in self.Cur:
+        self.Db.execute(SqlCommand)
+        for Item in self.Db:
             CrossIndex = Item[0]
 
         return CrossIndex
