@@ -707,7 +707,7 @@ EmmcSwitchClockFreq (
   //
   // Convert the clock freq unit from MHz to KHz.
   //
-  Status = SdMmcHcClockSupply (PciIo, Slot, ClockFreq * 1000, Private->Capability[Slot]);
+  Status = SdMmcHcClockSupply (PciIo, Slot, ClockFreq * 1000, Private->BaseClkFreq[Slot]);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -1007,7 +1007,7 @@ EmmcSetBusMode (
     return Status;
   }
 
-  ASSERT (Private->Capability[Slot].BaseClkFreq != 0);
+  ASSERT (Private->BaseClkFreq[Slot] != 0);
   //
   // Check if the Host Controller support 8bits bus width.
   //

@@ -118,6 +118,12 @@ typedef struct {
   UINT64                              MaxCurrent[SD_MMC_HC_MAX_SLOT];
 
   UINT32                              ControllerVersion;
+
+  //
+  // Some controllers may require to override base clock frequency
+  // value stored in Capabilities Register 1.
+  //
+  UINT32                              BaseClkFreq[SD_MMC_HC_MAX_SLOT];
 } SD_MMC_HC_PRIVATE_DATA;
 
 #define SD_MMC_HC_TRB_SIG             SIGNATURE_32 ('T', 'R', 'B', 'T')

@@ -625,11 +625,16 @@ SdMmcPciHcDriverBindingStart (
     if (EFI_ERROR (Status)) {
       continue;
     }
+
+    Private->BaseClkFreq[Slot] = Private->Capability[Slot].BaseClkFreq;
+
     if (mOverride != NULL && mOverride->Capability != NULL) {
       Status = mOverride->Capability (
                             Controller,
                             Slot,
-                            &Private->Capability[Slot]);
+                            &Private->Capability[Slot],
+                            &Private->BaseClkFreq[Slot]
+                            );
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_WARN, "%a: Failed to override capability - %r\n",
           __FUNCTION__, Status));
@@ -637,6 +642,12 @@ SdMmcPciHcDriverBindingStart (
       }
     }
     DumpCapabilityReg (Slot, &Private->Capability[Slot]);
+    DEBUG ((
+      DEBUG_INFO,
+      "Slot[%d] Base Clock Frequency: %dMHz\n",
+      Slot,
+      Private->BaseClkFreq[Slot]
+      ));
 
     Support64BitDma &= Private->Capability[Slot].SysBus64;
 

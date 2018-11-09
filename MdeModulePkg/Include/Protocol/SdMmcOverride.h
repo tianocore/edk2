@@ -22,7 +22,7 @@
 #define EDKII_SD_MMC_OVERRIDE_PROTOCOL_GUID \
   { 0xeaf9e3c1, 0xc9cd, 0x46db, { 0xa5, 0xe5, 0x5a, 0x12, 0x4c, 0x83, 0x23, 0x23 } }
 
-#define EDKII_SD_MMC_OVERRIDE_PROTOCOL_VERSION    0x1
+#define EDKII_SD_MMC_OVERRIDE_PROTOCOL_VERSION    0x2
 
 typedef struct _EDKII_SD_MMC_OVERRIDE EDKII_SD_MMC_OVERRIDE;
 
@@ -58,6 +58,8 @@ typedef enum {
   @param[in]      ControllerHandle      The EFI_HANDLE of the controller.
   @param[in]      Slot                  The 0 based slot index.
   @param[in,out]  SdMmcHcSlotCapability The SDHCI capability structure.
+  @param[in,out]  BaseClkFreq           The base clock frequency value that
+                                        optionally can be updated.
 
   @retval EFI_SUCCESS           The override function completed successfully.
   @retval EFI_NOT_FOUND         The specified controller or slot does not exist.
@@ -69,7 +71,8 @@ EFI_STATUS
 (EFIAPI * EDKII_SD_MMC_CAPABILITY) (
   IN      EFI_HANDLE                      ControllerHandle,
   IN      UINT8                           Slot,
-  IN  OUT VOID                            *SdMmcHcSlotCapability
+  IN OUT  VOID                            *SdMmcHcSlotCapability,
+  IN OUT  UINT32                          *BaseClkFreq
   );
 
 /**
