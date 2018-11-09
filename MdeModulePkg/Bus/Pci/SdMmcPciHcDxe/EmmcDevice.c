@@ -651,6 +651,7 @@ EmmcSwitchBusWidth (
   @param[in] Slot           The slot number of the SD card to send the command to.
   @param[in] Rca            The relative device address to be assigned.
   @param[in] HsTiming       The value to be written to HS_TIMING field of EXT_CSD register.
+  @param[in] Timing         The bus mode timing indicator.
   @param[in] ClockFreq      The max clock frequency to be set, the unit is MHz.
 
   @retval EFI_SUCCESS       The operation is done correctly.
@@ -664,6 +665,7 @@ EmmcSwitchClockFreq (
   IN UINT8                              Slot,
   IN UINT16                             Rca,
   IN UINT8                              HsTiming,
+  IN SD_MMC_BUS_MODE                    Timing,
   IN UINT32                             ClockFreq
   )
 {
@@ -706,6 +708,27 @@ EmmcSwitchClockFreq (
   // Convert the clock freq unit from MHz to KHz.
   //
   Status = SdMmcHcClockSupply (PciIo, Slot, ClockFreq * 1000, Private->Capability[Slot]);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
+    Status = mOverride->NotifyPhase (
+                          Private->ControllerHandle,
+                          Slot,
+                          EdkiiSdMmcSwitchClockFreqPost,
+                          &Timing
+                          );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: SD/MMC switch clock freq post notifier callback failed - %r\n",
+        __FUNCTION__,
+        Status
+        ));
+      return Status;
+    }
+  }
 
   return Status;
 }
@@ -775,7 +798,7 @@ EmmcSwitchToHighSpeed (
   }
 
   HsTiming = 1;
-  Status = EmmcSwitchClockFreq (PciIo, PassThru, Slot, Rca, HsTiming, ClockFreq);
+  Status = EmmcSwitchClockFreq (PciIo, PassThru, Slot, Rca, HsTiming, Timing, ClockFreq);
 
   return Status;
 }
@@ -863,7 +886,7 @@ EmmcSwitchToHS200 (
   Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_CLOCK_CTRL, sizeof (ClockCtrl), &ClockCtrl);
 
   HsTiming = 2;
-  Status = EmmcSwitchClockFreq (PciIo, PassThru, Slot, Rca, HsTiming, ClockFreq);
+  Status = EmmcSwitchClockFreq (PciIo, PassThru, Slot, Rca, HsTiming, Timing, ClockFreq);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -913,7 +936,7 @@ EmmcSwitchToHS400 (
   // Set to Hight Speed timing and set the clock frequency to a value less than 52MHz.
   //
   HsTiming = 1;
-  Status = EmmcSwitchClockFreq (PciIo, PassThru, Slot, Rca, HsTiming, 52);
+  Status = EmmcSwitchClockFreq (PciIo, PassThru, Slot, Rca, HsTiming, SdMmcMmcHsSdr, 52);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -933,7 +956,7 @@ EmmcSwitchToHS400 (
   }
 
   HsTiming = 3;
-  Status = EmmcSwitchClockFreq (PciIo, PassThru, Slot, Rca, HsTiming, ClockFreq);
+  Status = EmmcSwitchClockFreq (PciIo, PassThru, Slot, Rca, HsTiming, Timing, ClockFreq);
 
   return Status;
 }
