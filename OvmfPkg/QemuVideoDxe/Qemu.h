@@ -92,6 +92,7 @@ typedef enum {
   QEMU_VIDEO_CIRRUS_5446,
   QEMU_VIDEO_BOCHS,
   QEMU_VIDEO_BOCHS_MMIO,
+  QEMU_VIDEO_VMWARE_SVGA,
 } QEMU_VIDEO_VARIANT;
 
 typedef struct {
@@ -116,10 +117,13 @@ typedef struct {
   //
   UINTN                                 MaxMode;
   QEMU_VIDEO_MODE_DATA                  *ModeData;
+  EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *VmwareSvgaModeInfo;
 
   QEMU_VIDEO_VARIANT                    Variant;
   FRAME_BUFFER_CONFIGURE                *FrameBufferBltConfigure;
   UINTN                                 FrameBufferBltConfigureSize;
+  UINT8                                 FrameBufferVramBarIndex;
+  UINT16                                VmwareSvgaBasePort;
 } QEMU_VIDEO_PRIVATE_DATA;
 
 ///
@@ -503,9 +507,34 @@ QemuVideoBochsModeSetup (
   BOOLEAN                  IsQxl
   );
 
+EFI_STATUS
+QemuVideoVmwareSvgaModeSetup (
+  QEMU_VIDEO_PRIVATE_DATA *Private
+  );
+
 VOID
 InstallVbeShim (
   IN CONST CHAR16         *CardName,
   IN EFI_PHYSICAL_ADDRESS FrameBufferBase
   );
+
+VOID
+VmwareSvgaWrite (
+  QEMU_VIDEO_PRIVATE_DATA *Private,
+  UINT16                  Register,
+  UINT32                  Value
+  );
+
+UINT32
+VmwareSvgaRead (
+  QEMU_VIDEO_PRIVATE_DATA *Private,
+  UINT16                  Register
+  );
+
+VOID
+InitializeVmwareSvgaGraphicsMode (
+  QEMU_VIDEO_PRIVATE_DATA  *Private,
+  QEMU_VIDEO_BOCHS_MODES   *ModeData
+  );
+
 #endif
