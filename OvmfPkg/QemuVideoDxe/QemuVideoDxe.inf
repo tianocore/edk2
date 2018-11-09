@@ -41,8 +41,14 @@
   Qemu.h
 
 [Sources.Ia32, Sources.X64]
+  UnalignedIoGcc.c    | GCC
+  UnalignedIoIcc.c    | INTEL
+  UnalignedIoMsc.c    | MSFT
   VbeShim.c
   VbeShim.h
+
+[Sources.EBC]
+  UnalignedIoUnsupported.c
 
 [Packages]
   MdePkg/MdePkg.dec
