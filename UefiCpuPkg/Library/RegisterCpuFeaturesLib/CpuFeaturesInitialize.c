@@ -528,6 +528,32 @@ DumpRegisterTableOnProcessor (
 }
 
 /**
+  Get the biggest dependence type.
+  PackageDepType > CoreDepType > ThreadDepType > NoneDepType.
+
+  @param[in]  BeforeDep           Before dependence type.
+  @param[in]  AfterDep            After dependence type.
+  @param[in]  NoneNeibBeforeDep   Before dependence type for not neighborhood features.
+  @param[in]  NoneNeibAfterDep    After dependence type for not neighborhood features.
+
+  @retval  Return the biggest dependence type.
+**/
+CPU_FEATURE_DEPENDENCE_TYPE
+BiggestDep (
+  IN CPU_FEATURE_DEPENDENCE_TYPE  BeforeDep,
+  IN CPU_FEATURE_DEPENDENCE_TYPE  AfterDep,
+  IN CPU_FEATURE_DEPENDENCE_TYPE  NoneNeibBeforeDep,
+  IN CPU_FEATURE_DEPENDENCE_TYPE  NoneNeibAfterDep
+  )
+{
+  CPU_FEATURE_DEPENDENCE_TYPE Bigger;
+
+  Bigger = MAX (BeforeDep, AfterDep);
+  Bigger = MAX (Bigger, NoneNeibBeforeDep);
+  return MAX(Bigger, NoneNeibAfterDep);
+}
+
+/**
   Analysis register CPU features on each processor and save CPU setting in CPU register table.
 
   @param[in]  NumberOfCpus  Number of processor in system
@@ -551,6 +577,8 @@ AnalysisProcessorFeatures (
   BOOLEAN                              Success;
   CPU_FEATURE_DEPENDENCE_TYPE          BeforeDep;
   CPU_FEATURE_DEPENDENCE_TYPE          AfterDep;
+  CPU_FEATURE_DEPENDENCE_TYPE          NoneNeibBeforeDep;
+  CPU_FEATURE_DEPENDENCE_TYPE          NoneNeibAfterDep;
 
   CpuFeaturesData = GetCpuFeaturesData ();
   CpuFeaturesData->CapabilityPcd = AllocatePool (CpuFeaturesData->BitMaskSize);
@@ -627,14 +655,9 @@ AnalysisProcessorFeatures (
     //
     CpuInfo = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo;
     Entry = GetFirstNode (&CpuInitOrder->OrderList);
-    NextEntry = Entry->ForwardLink;
     while (!IsNull (&CpuInitOrder->OrderList, Entry)) {
       CpuFeatureInOrder = CPU_FEATURE_ENTRY_FROM_LINK (Entry);
-      if (!IsNull (&CpuInitOrder->OrderList, NextEntry)) {
-        NextCpuFeatureInOrder = CPU_FEATURE_ENTRY_FROM_LINK (NextEntry);
-      } else {
-        NextCpuFeatureInOrder = NULL;
-      }
+
       Success = FALSE;
       if (IsBitMaskMatch (CpuFeatureInOrder->FeatureMask, CpuFeaturesData->SettingPcd)) {
         Status = CpuFeatureInOrder->InitializeFunc (ProcessorNumber, CpuInfo, CpuFeatureInOrder->ConfigData, TRUE);
@@ -667,31 +690,43 @@ AnalysisProcessorFeatures (
       }
 
       if (Success) {
-        //
-        // If feature has dependence with the next feature (ONLY care core/package dependency).
-        // and feature initialize succeed, add sync semaphere here.
-        //
-        if (NextCpuFeatureInOrder != NULL) {
+        NextEntry = Entry->ForwardLink;
+        if (!IsNull (&CpuInitOrder->OrderList, NextEntry)) {
+          NextCpuFeatureInOrder = CPU_FEATURE_ENTRY_FROM_LINK (NextEntry);
+
+          //
+          // If feature has dependence with the next feature (ONLY care core/package dependency).
+          // and feature initialize succeed, add sync semaphere here.
+          //
           BeforeDep = DetectFeatureScope (CpuFeatureInOrder, TRUE, NextCpuFeatureInOrder->FeatureMask);
           AfterDep  = DetectFeatureScope (NextCpuFeatureInOrder, FALSE, CpuFeatureInOrder->FeatureMask);
+          //
+          // Check whether next feature has After type dependence with not neighborhood CPU
+          // Features in former CPU features.
+          //
+          NoneNeibAfterDep = DetectNoneNeighborhoodFeatureScope(NextCpuFeatureInOrder, FALSE, &CpuInitOrder->OrderList);
         } else {
-          BeforeDep = DetectFeatureScope (CpuFeatureInOrder, TRUE, NULL);
-          AfterDep = NoneDepType;
+          BeforeDep        = NoneDepType;
+          AfterDep         = NoneDepType;
+          NoneNeibAfterDep = NoneDepType;
         }
         //
-        // Assume only one of the depend is valid.
+        // Check whether current feature has Before type dependence with none neighborhood
+        // CPU features in after Cpu features.
         //
-        ASSERT (!(BeforeDep > ThreadDepType && AfterDep > ThreadDepType));
+        NoneNeibBeforeDep = DetectNoneNeighborhoodFeatureScope(CpuFeatureInOrder, TRUE, &CpuInitOrder->OrderList);
+
+        //
+        // Get the biggest dependence and add semaphore for it.
+        // PackageDepType > CoreDepType > ThreadDepType > NoneDepType.
+        //
+        BeforeDep = BiggestDep(BeforeDep, AfterDep, NoneNeibBeforeDep, NoneNeibAfterDep);
         if (BeforeDep > ThreadDepType) {
           CPU_REGISTER_TABLE_WRITE32 (ProcessorNumber, Semaphore, 0, BeforeDep);
         }
-        if (AfterDep > ThreadDepType) {
-          CPU_REGISTER_TABLE_WRITE32 (ProcessorNumber, Semaphore, 0, AfterDep);
-        }
       }
 
-      Entry     = Entry->ForwardLink;
-      NextEntry = Entry->ForwardLink;
+      Entry = Entry->ForwardLink;
     }
 
     //

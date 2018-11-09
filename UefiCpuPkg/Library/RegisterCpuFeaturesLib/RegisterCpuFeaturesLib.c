@@ -113,6 +113,75 @@ IsBitMaskMatchCheck (
 }
 
 /**
+  Try to find the specify cpu featuren in former/after feature list.
+
+  @param[in]  FeatureList        Pointer to dependent CPU feature list
+  @param[in]  CurrentEntry       Pointer to current CPU feature entry.
+  @param[in]  SearchFormer       Find in former feature or after features.
+  @param[in]  FeatureMask        Pointer to CPU feature bit mask
+
+  @retval TRUE  The feature bit mask is in dependent CPU feature bit mask buffer.
+  @retval FALSE The feature bit mask is not in dependent CPU feature bit mask buffer.
+**/
+BOOLEAN
+FindSpecifyFeature (
+  IN LIST_ENTRY              *FeatureList,
+  IN LIST_ENTRY              *CurrentEntry,
+  IN BOOLEAN                 SearchFormer,
+  IN UINT8                   *FeatureMask
+  )
+{
+  CPU_FEATURES_ENTRY         *CpuFeature;
+  LIST_ENTRY                 *NextEntry;
+
+  //
+  // Check whether exist the not neighborhood entry first.
+  // If not exist, return FALSE means not found status.
+  //
+  if (SearchFormer) {
+    NextEntry = CurrentEntry->BackLink;
+    if (IsNull (FeatureList, NextEntry)) {
+      return FALSE;
+    }
+
+    NextEntry = NextEntry->BackLink;
+    if (IsNull (FeatureList, NextEntry)) {
+      return FALSE;
+    }
+
+    NextEntry = CurrentEntry->BackLink->BackLink;
+  } else {
+    NextEntry = CurrentEntry->ForwardLink;
+    if (IsNull (FeatureList, NextEntry)) {
+      return FALSE;
+    }
+
+    NextEntry = NextEntry->ForwardLink;
+    if (IsNull (FeatureList, NextEntry)) {
+      return FALSE;
+    }
+
+    NextEntry = CurrentEntry->ForwardLink->ForwardLink;
+  }
+
+  while (!IsNull (FeatureList, NextEntry)) {
+    CpuFeature = CPU_FEATURE_ENTRY_FROM_LINK (NextEntry);
+
+    if (IsBitMaskMatchCheck (FeatureMask, CpuFeature->FeatureMask)) {
+      return TRUE;
+    }
+
+    if (SearchFormer) {
+      NextEntry = NextEntry->BackLink;
+    } else {
+      NextEntry = NextEntry->ForwardLink;
+    }
+  }
+
+  return FALSE;
+}
+
+/**
   Return feature dependence result.
 
   @param[in]  CpuFeature            Pointer to CPU feature.
@@ -172,6 +241,59 @@ DetectFeatureScope (
 
   if ((CpuFeature->AfterFeatureBitMask != NULL) &&
       IsBitMaskMatchCheck (NextCpuFeatureMask, CpuFeature->AfterFeatureBitMask)) {
+    return ThreadDepType;
+  }
+
+  return NoneDepType;
+}
+
+/**
+  Return feature dependence result.
+
+  @param[in]  CpuFeature            Pointer to CPU feature.
+  @param[in]  Before                Check before dependence or after.
+  @param[in]  FeatureList           Pointer to CPU feature list.
+
+  @retval     return the dependence result.
+**/
+CPU_FEATURE_DEPENDENCE_TYPE
+DetectNoneNeighborhoodFeatureScope (
+  IN CPU_FEATURES_ENTRY         *CpuFeature,
+  IN BOOLEAN                    Before,
+  IN LIST_ENTRY                 *FeatureList
+  )
+{
+  if (Before) {
+    if ((CpuFeature->PackageBeforeFeatureBitMask != NULL) &&
+        FindSpecifyFeature(FeatureList, &CpuFeature->Link, FALSE, CpuFeature->PackageBeforeFeatureBitMask)) {
+      return PackageDepType;
+    }
+
+    if ((CpuFeature->CoreBeforeFeatureBitMask != NULL) &&
+        FindSpecifyFeature(FeatureList, &CpuFeature->Link, FALSE, CpuFeature->CoreBeforeFeatureBitMask)) {
+      return CoreDepType;
+    }
+
+    if ((CpuFeature->BeforeFeatureBitMask != NULL) &&
+        FindSpecifyFeature(FeatureList, &CpuFeature->Link, FALSE, CpuFeature->BeforeFeatureBitMask)) {
+      return ThreadDepType;
+    }
+
+    return NoneDepType;
+  }
+
+  if ((CpuFeature->PackageAfterFeatureBitMask != NULL) &&
+      FindSpecifyFeature(FeatureList, &CpuFeature->Link, TRUE, CpuFeature->PackageAfterFeatureBitMask)) {
+    return PackageDepType;
+  }
+
+  if ((CpuFeature->CoreAfterFeatureBitMask != NULL) &&
+      FindSpecifyFeature(FeatureList, &CpuFeature->Link, TRUE, CpuFeature->CoreAfterFeatureBitMask)) {
+    return CoreDepType;
+  }
+
+  if ((CpuFeature->AfterFeatureBitMask != NULL) &&
+      FindSpecifyFeature(FeatureList, &CpuFeature->Link, TRUE, CpuFeature->AfterFeatureBitMask)) {
     return ThreadDepType;
   }
 

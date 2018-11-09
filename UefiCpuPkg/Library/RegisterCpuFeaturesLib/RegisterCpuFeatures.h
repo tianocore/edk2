@@ -207,6 +207,22 @@ DetectFeatureScope (
   );
 
 /**
+  Return feature dependence result.
+
+  @param[in]  CpuFeature            Pointer to CPU feature.
+  @param[in]  Before                Check before dependence or after.
+  @param[in]  FeatureList           Pointer to CPU feature list.
+
+  @retval     return the dependence result.
+**/
+CPU_FEATURE_DEPENDENCE_TYPE
+DetectNoneNeighborhoodFeatureScope (
+  IN CPU_FEATURES_ENTRY         *CpuFeature,
+  IN BOOLEAN                    Before,
+  IN LIST_ENTRY                 *FeatureList
+  );
+
+/**
   Programs registers for the calling processor.
 
   @param[in,out] Buffer  The pointer to private data buffer.
