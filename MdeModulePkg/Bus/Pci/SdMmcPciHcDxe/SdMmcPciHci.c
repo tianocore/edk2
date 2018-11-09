@@ -444,7 +444,8 @@ SdMmcHcReset (
     Status = mOverride->NotifyPhase (
                           Private->ControllerHandle,
                           Slot,
-                          EdkiiSdMmcResetPre);
+                          EdkiiSdMmcResetPre,
+                          NULL);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_WARN,
         "%a: SD/MMC pre reset notifier callback failed - %r\n",
@@ -494,7 +495,8 @@ SdMmcHcReset (
     Status = mOverride->NotifyPhase (
                           Private->ControllerHandle,
                           Slot,
-                          EdkiiSdMmcResetPost);
+                          EdkiiSdMmcResetPost,
+                          NULL);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_WARN,
         "%a: SD/MMC post reset notifier callback failed - %r\n",
@@ -1088,7 +1090,8 @@ SdMmcHcInitHost (
     Status = mOverride->NotifyPhase (
                           Private->ControllerHandle,
                           Slot,
-                          EdkiiSdMmcInitHostPre);
+                          EdkiiSdMmcInitHostPre,
+                          NULL);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_WARN,
         "%a: SD/MMC pre init notifier callback failed - %r\n",
@@ -1123,7 +1126,8 @@ SdMmcHcInitHost (
     Status = mOverride->NotifyPhase (
                           Private->ControllerHandle,
                           Slot,
-                          EdkiiSdMmcInitHostPost);
+                          EdkiiSdMmcInitHostPost,
+                          NULL);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_WARN,
         "%a: SD/MMC post init notifier callback failed - %r\n",

@@ -63,6 +63,7 @@ EFI_STATUS
   @param[in]      PhaseType             The type of operation and whether the
                                         hook is invoked right before (pre) or
                                         right after (post)
+  @param[in,out]  PhaseData             The pointer to a phase-specific data.
 
   @retval EFI_SUCCESS           The override function completed successfully.
   @retval EFI_NOT_FOUND         The specified controller or slot does not exist.
@@ -74,7 +75,8 @@ EFI_STATUS
 (EFIAPI * EDKII_SD_MMC_NOTIFY_PHASE) (
   IN      EFI_HANDLE                      ControllerHandle,
   IN      UINT8                           Slot,
-  IN      EDKII_SD_MMC_PHASE_TYPE         PhaseType
+  IN      EDKII_SD_MMC_PHASE_TYPE         PhaseType,
+  IN OUT  VOID                           *PhaseData
   );
 
 struct _EDKII_SD_MMC_OVERRIDE {
