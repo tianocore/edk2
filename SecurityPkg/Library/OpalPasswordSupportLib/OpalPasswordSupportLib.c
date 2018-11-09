@@ -1,7 +1,7 @@
 /** @file
   Implementation of Opal password support library.
 
-Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2016 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -706,6 +706,11 @@ SmmOpalPasswordHandler (
         Status = EFI_INVALID_PARAMETER;
         goto EXIT;
       }
+      //
+      // The AsmLfence() call here is to ensure the above range checks for the
+      // CommBuffer have been completed before calling into OpalSavePasswordToSmm().
+      //
+      AsmLfence ();
 
       Status = OpalSavePasswordToSmm (&DeviceBuffer->OpalDevicePath, DeviceBuffer->Password, DeviceBuffer->PasswordLength);
       break;
