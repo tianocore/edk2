@@ -442,7 +442,8 @@ NvmePassThru (
   // specific addresses.
   //
   if ((Sq->Opc & (BIT0 | BIT1)) != 0) {
-    if ((Packet->TransferLength == 0) || (Packet->TransferBuffer == NULL)) {
+    if (((Packet->TransferLength != 0) && (Packet->TransferBuffer == NULL)) ||
+        ((Packet->TransferLength == 0) && (Packet->TransferBuffer != NULL))) {
       return EFI_INVALID_PARAMETER;
     }
 
@@ -468,21 +469,23 @@ NvmePassThru (
         MapOp = EdkiiIoMmuOperationBusMasterWrite;
       }
 
-      MapLength = Packet->TransferLength;
-      Status = IoMmuMap (
-                 MapOp,
-                 Packet->TransferBuffer,
-                 &MapLength,
-                 &PhyAddr,
-                 &MapData
-                 );
-      if (EFI_ERROR (Status) || (MapLength != Packet->TransferLength)) {
-        Status = EFI_OUT_OF_RESOURCES;
-        DEBUG ((DEBUG_ERROR, "%a: Fail to map data buffer.\n", __FUNCTION__));
-        goto Exit;
-      }
+      if ((Packet->TransferLength != 0) && (Packet->TransferBuffer != NULL)) {
+        MapLength = Packet->TransferLength;
+        Status = IoMmuMap (
+                   MapOp,
+                   Packet->TransferBuffer,
+                   &MapLength,
+                   &PhyAddr,
+                   &MapData
+                   );
+        if (EFI_ERROR (Status) || (MapLength != Packet->TransferLength)) {
+          Status = EFI_OUT_OF_RESOURCES;
+          DEBUG ((DEBUG_ERROR, "%a: Fail to map data buffer.\n", __FUNCTION__));
+          goto Exit;
+        }
 
-      Sq->Prp[0] = PhyAddr;
+        Sq->Prp[0] = PhyAddr;
+      }
 
       if((Packet->MetadataLength != 0) && (Packet->MetadataBuffer != NULL)) {
         MapLength = Packet->MetadataLength;
