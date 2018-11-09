@@ -26,11 +26,28 @@
 
 typedef struct _EDKII_SD_MMC_OVERRIDE EDKII_SD_MMC_OVERRIDE;
 
+//
+// Bus timing modes
+//
+typedef enum {
+  SdMmcUhsSdr12,
+  SdMmcUhsSdr25,
+  SdMmcUhsSdr50,
+  SdMmcUhsSdr104,
+  SdMmcUhsDdr50,
+  SdMmcMmcLegacy,
+  SdMmcMmcHsSdr,
+  SdMmcMmcHsDdr,
+  SdMmcMmcHs200,
+  SdMmcMmcHs400,
+} SD_MMC_BUS_MODE;
+
 typedef enum {
   EdkiiSdMmcResetPre,
   EdkiiSdMmcResetPost,
   EdkiiSdMmcInitHostPre,
   EdkiiSdMmcInitHostPost,
+  EdkiiSdMmcUhsSignaling,
 } EDKII_SD_MMC_PHASE_TYPE;
 
 /**

@@ -1138,6 +1138,95 @@ SdMmcHcInitHost (
 }
 
 /**
+  Set SD Host Controler control 2 registry according to selected speed.
+
+  @param[in] ControllerHandle The handle of the controller.
+  @param[in] PciIo            The PCI IO protocol instance.
+  @param[in] Slot             The slot number of the SD card to send the command to.
+  @param[in] Timing           The timing to select.
+
+  @retval EFI_SUCCESS         The timing is set successfully.
+  @retval Others              The timing isn't set successfully.
+**/
+EFI_STATUS
+SdMmcHcUhsSignaling (
+  IN EFI_HANDLE             ControllerHandle,
+  IN EFI_PCI_IO_PROTOCOL    *PciIo,
+  IN UINT8                  Slot,
+  IN SD_MMC_BUS_MODE        Timing
+  )
+{
+  EFI_STATUS                 Status;
+  UINT8                      HostCtrl2;
+
+  HostCtrl2 = (UINT8)~SD_MMC_HC_CTRL_UHS_MASK;
+  Status = SdMmcHcAndMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  switch (Timing) {
+    case SdMmcUhsSdr12:
+      HostCtrl2 = SD_MMC_HC_CTRL_UHS_SDR12;
+      break;
+    case SdMmcUhsSdr25:
+      HostCtrl2 = SD_MMC_HC_CTRL_UHS_SDR25;
+      break;
+    case SdMmcUhsSdr50:
+      HostCtrl2 = SD_MMC_HC_CTRL_UHS_SDR50;
+      break;
+    case SdMmcUhsSdr104:
+      HostCtrl2 = SD_MMC_HC_CTRL_UHS_SDR104;
+      break;
+    case SdMmcUhsDdr50:
+      HostCtrl2 = SD_MMC_HC_CTRL_UHS_DDR50;
+      break;
+    case SdMmcMmcLegacy:
+      HostCtrl2 = SD_MMC_HC_CTRL_MMC_LEGACY;
+      break;
+    case SdMmcMmcHsSdr:
+      HostCtrl2 = SD_MMC_HC_CTRL_MMC_HS_SDR;
+      break;
+    case SdMmcMmcHsDdr:
+      HostCtrl2 = SD_MMC_HC_CTRL_MMC_HS_DDR;
+      break;
+    case SdMmcMmcHs200:
+      HostCtrl2 = SD_MMC_HC_CTRL_MMC_HS200;
+      break;
+    case SdMmcMmcHs400:
+      HostCtrl2 = SD_MMC_HC_CTRL_MMC_HS400;
+      break;
+    default:
+     HostCtrl2 = 0;
+     break;
+  }
+  Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
+    Status = mOverride->NotifyPhase (
+                          ControllerHandle,
+                          Slot,
+                          EdkiiSdMmcUhsSignaling,
+                          &Timing
+                          );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: SD/MMC uhs signaling notifier callback failed - %r\n",
+        __FUNCTION__,
+        Status
+        ));
+      return Status;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+/**
   Turn on/off LED.
 
   @param[in] PciIo          The PCI IO protocol instance.

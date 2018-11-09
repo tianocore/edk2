@@ -63,6 +63,21 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SD_MMC_HC_CTRL_VER            0xFE
 
 //
+// SD Host Controller bits to HOST_CTRL2 register
+//
+#define SD_MMC_HC_CTRL_UHS_MASK       0x0007
+#define SD_MMC_HC_CTRL_UHS_SDR12      0x0000
+#define SD_MMC_HC_CTRL_UHS_SDR25      0x0001
+#define SD_MMC_HC_CTRL_UHS_SDR50      0x0002
+#define SD_MMC_HC_CTRL_UHS_SDR104     0x0003
+#define SD_MMC_HC_CTRL_UHS_DDR50      0x0004
+#define SD_MMC_HC_CTRL_MMC_LEGACY     0x0000
+#define SD_MMC_HC_CTRL_MMC_HS_SDR     0x0001
+#define SD_MMC_HC_CTRL_MMC_HS_DDR     0x0004
+#define SD_MMC_HC_CTRL_MMC_HS200      0x0003
+#define SD_MMC_HC_CTRL_MMC_HS400      0x0005
+
+//
 // The transfer modes supported by SD Host Controller
 // Simplified Spec 3.0 Table 1-2
 //
@@ -516,6 +531,25 @@ EFI_STATUS
 SdMmcHcInitTimeoutCtrl (
   IN EFI_PCI_IO_PROTOCOL    *PciIo,
   IN UINT8                  Slot
+  );
+
+/**
+  Set SD Host Controller control 2 registry according to selected speed.
+
+  @param[in] ControllerHandle The handle of the controller.
+  @param[in] PciIo            The PCI IO protocol instance.
+  @param[in] Slot             The slot number of the SD card to send the command to.
+  @param[in] Timing           The timing to select.
+
+  @retval EFI_SUCCESS         The timing is set successfully.
+  @retval Others              The timing isn't set successfully.
+**/
+EFI_STATUS
+SdMmcHcUhsSignaling (
+  IN EFI_HANDLE             ControllerHandle,
+  IN EFI_PCI_IO_PROTOCOL    *PciIo,
+  IN UINT8                  Slot,
+  IN SD_MMC_BUS_MODE        Timing
   );
 
 #endif
