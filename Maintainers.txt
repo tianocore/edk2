@@ -51,9 +51,8 @@ W: https://github.com/tianocore/tianocore.github.io/wiki/Security
 
 EDK II Releases:
 ----------------
-UDK2014
-W: http://www.tianocore.org/udk2014/
-S: Supported
+W: https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-Release-Planning
+M: Liming Gao <liming.gao@intel.com>
 
 EDK II Packages:
 ----------------
