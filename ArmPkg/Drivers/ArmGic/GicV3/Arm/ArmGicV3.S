@@ -66,7 +66,7 @@ ASM_FUNC(ArmGicV3EndOfInterrupt)
 //  VOID
 //  );
 ASM_FUNC(ArmGicV3AcknowledgeInterrupt)
-        mrc     p15, 0, r0, c12, c8, 0 //ICC_IAR1
+        mrc     p15, 0, r0, c12, c12, 0 //ICC_IAR1
         bx      lr
 
 //VOID
