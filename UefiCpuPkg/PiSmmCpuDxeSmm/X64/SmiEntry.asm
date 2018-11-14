@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,8 @@
 ;   Code template of the SMI handler for a particular processor
 ;
 ;-------------------------------------------------------------------------------
+
+INCLUDE    StuffRsbAsm.inc
 
 ;
 ; Variables referenced by C code
@@ -189,6 +191,7 @@ _SmiHandler:
     DB      48h                         ; FXRSTOR64
     fxrstor [rsp]
 
+    StuffRsb64
     rsm
 
 gcSmiHandlerSize    DW      $ - _SmiEntryPoint

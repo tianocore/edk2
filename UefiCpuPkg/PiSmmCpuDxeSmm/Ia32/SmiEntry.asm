@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,8 @@
     .686p
     .model  flat,C
     .xmm
+
+INCLUDE    StuffRsbAsm.inc
 
 DSC_OFFSET    EQU     0fb00h
 DSC_GDTPTR    EQU     30h
@@ -169,6 +171,7 @@ _SmiHandler PROC
     call    eax
     pop     ecx
 
+    StuffRsb32
     rsm
 _SmiHandler ENDP
 

@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -21,6 +21,8 @@
     .686p
     .xmm
     .model  flat,C
+
+INCLUDE    StuffRsbAsm.inc
 
 SmmInitHandler  PROTO   C
 
@@ -70,6 +72,7 @@ gSmmJmpAddr LABEL   QWORD
     DB      0bch                        ; mov esp, imm32
 gSmmInitStack  DD ?
     call    SmmInitHandler
+    StuffRsb32
     rsm
 SmmStartup  ENDP
 

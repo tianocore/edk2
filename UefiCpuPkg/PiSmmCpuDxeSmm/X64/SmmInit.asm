@@ -1,5 +1,5 @@
 ;------------------------------------------------------------------------------ ;
-; Copyright (c) 2009 - 2015, Intel Corporation. All rights reserved.<BR>
+; Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
 ; This program and the accompanying materials
 ; are licensed and made available under the terms and conditions of the BSD License
 ; which accompanies this distribution.  The full text of the license may be found at
@@ -17,6 +17,8 @@
 ;   Functions for relocating SMBASE's for all processors
 ;
 ;-------------------------------------------------------------------------------
+
+INCLUDE    StuffRsbAsm.inc
 
 EXTERNDEF   SmmInitHandler:PROC
 EXTERNDEF   gSmmCr0:DWORD
@@ -88,6 +90,7 @@ gSmmInitStack   DQ      ?
     movdqa  xmm4, [rsp + 40h]
     movdqa  xmm5, [rsp + 50h]
 
+    StuffRsb64
     rsm
 SmmStartup  ENDP
 
