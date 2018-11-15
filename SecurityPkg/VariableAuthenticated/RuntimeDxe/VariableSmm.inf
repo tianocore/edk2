@@ -52,6 +52,7 @@
   AuthService.c
   Variable.h
   AuthService.h
+  LoadFenceSmm.c
 
 [Packages]
   MdePkg/MdePkg.dec

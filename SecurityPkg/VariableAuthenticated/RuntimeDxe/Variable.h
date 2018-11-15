@@ -671,4 +671,15 @@ VariableLockRequestToLock (
 
 extern VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal;
 
+/**
+  This service is consumed by the variable modules to perform a serializing
+  operation on all load-from-memory instructions that were issued prior to the
+  call of this function.
+
+**/
+VOID
+MemoryLoadFence (
+  VOID
+  );
+
 #endif

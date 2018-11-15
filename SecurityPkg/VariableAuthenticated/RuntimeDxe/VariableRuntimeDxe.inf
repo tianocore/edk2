@@ -44,6 +44,7 @@
   AuthService.c
   AuthService.h
   Measurement.c
+  LoadFenceDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
