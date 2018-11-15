@@ -107,6 +107,11 @@ typedef struct {
 #define PEIM_STATE_REGISTER_FOR_SHADOW    0x02
 #define PEIM_STATE_DONE                   0x03
 
+//
+// Number of FV instances to grow by each time we run out of room
+//
+#define FV_GROWTH_STEP 8
+
 typedef struct {
   EFI_FIRMWARE_VOLUME_HEADER          *FvHeader;
   EFI_PEI_FIRMWARE_VOLUME_PPI         *FvPpi;
@@ -202,16 +207,22 @@ struct _PEI_CORE_INSTANCE {
   UINTN                              FvCount;
 
   ///
-  /// Pointer to the buffer with the PcdPeiCoreMaxFvSupported number of entries.
+  /// The max count of FVs which contains FFS and could be dispatched by PeiCore.
+  ///
+  UINTN                              MaxFvCount;
+
+  ///
+  /// Pointer to the buffer with the MaxFvCount number of entries.
   /// Each entry is for one FV which contains FFS and could be dispatched by PeiCore.
   ///
   PEI_CORE_FV_HANDLE                 *Fv;
 
   ///
-  /// Pointer to the buffer with the PcdPeiCoreMaxFvSupported number of entries.
+  /// Pointer to the buffer with the MaxUnknownFvInfoCount number of entries.
   /// Each entry is for one FV which could not be dispatched by PeiCore.
   ///
   PEI_CORE_UNKNOW_FORMAT_FV_INFO     *UnknownFvInfo;
+  UINTN                              MaxUnknownFvInfoCount;
   UINTN                              UnknownFvInfoCount;
 
   ///

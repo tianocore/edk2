@@ -503,6 +503,10 @@ PeiInitializeFv (
                     );
   ASSERT_EFI_ERROR (Status);
 
+  PrivateData->Fv = AllocateZeroPool (sizeof (PEI_CORE_FV_HANDLE) * FV_GROWTH_STEP);
+  ASSERT (PrivateData->Fv != NULL);
+  PrivateData->MaxFvCount = FV_GROWTH_STEP;
+
   //
   // Update internal PEI_CORE_FV array.
   //
@@ -560,6 +564,7 @@ FirmwareVolmeInfoPpiNotifyCallback (
   VOID                                  *DepexData;
   BOOLEAN                               IsFvInfo2;
   UINTN                                 CurFvCount;
+  VOID                                  *TempPtr;
 
   Status       = EFI_SUCCESS;
   PrivateData  = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
@@ -626,10 +631,21 @@ FirmwareVolmeInfoPpiNotifyCallback (
       }
     }
 
-    if (PrivateData->FvCount >= PcdGet32 (PcdPeiCoreMaxFvSupported)) {
-      DEBUG ((EFI_D_ERROR, "The number of Fv Images (%d) exceed the max supported FVs (%d) in Pei", PrivateData->FvCount + 1, PcdGet32 (PcdPeiCoreMaxFvSupported)));
-      DEBUG ((EFI_D_ERROR, "PcdPeiCoreMaxFvSupported value need be reconfigurated in DSC"));
-      ASSERT (FALSE);
+    if (PrivateData->FvCount >= PrivateData->MaxFvCount) {
+      //
+      // Run out of room, grow the buffer.
+      //
+      TempPtr = AllocateZeroPool (
+                  sizeof (PEI_CORE_FV_HANDLE) * (PrivateData->MaxFvCount + FV_GROWTH_STEP)
+                  );
+      ASSERT (TempPtr != NULL);
+      CopyMem (
+        TempPtr,
+        PrivateData->Fv,
+        sizeof (PEI_CORE_FV_HANDLE) * PrivateData->MaxFvCount
+        );
+      PrivateData->Fv = TempPtr;
+      PrivateData->MaxFvCount = PrivateData->MaxFvCount + FV_GROWTH_STEP;
     }
 
     //
@@ -2157,7 +2173,6 @@ FindNextCoreFvHandle (
     }
   }
 
-  ASSERT (Private->FvCount <= PcdGet32 (PcdPeiCoreMaxFvSupported));
   if (Instance >= Private->FvCount) {
     return NULL;
   }
@@ -2205,7 +2220,7 @@ PeiReinitializeFv (
   //
   // Fixup all FvPpi pointers for the implementation in flash to permanent memory.
   //
-  for (Index = 0; Index < PcdGet32 (PcdPeiCoreMaxFvSupported); Index ++) {
+  for (Index = 0; Index < PrivateData->FvCount; Index ++) {
     if (PrivateData->Fv[Index].FvPpi == OldFfsFvPpi) {
       PrivateData->Fv[Index].FvPpi = &mPeiFfs2FwVol.Fv;
     }
@@ -2233,7 +2248,7 @@ PeiReinitializeFv (
   //
   // Fixup all FvPpi pointers for the implementation in flash to permanent memory.
   //
-  for (Index = 0; Index < PcdGet32 (PcdPeiCoreMaxFvSupported); Index ++) {
+  for (Index = 0; Index < PrivateData->FvCount; Index ++) {
     if (PrivateData->Fv[Index].FvPpi == OldFfsFvPpi) {
       PrivateData->Fv[Index].FvPpi = &mPeiFfs3FwVol.Fv;
     }
@@ -2263,9 +2278,23 @@ AddUnknownFormatFvInfo (
   )
 {
   PEI_CORE_UNKNOW_FORMAT_FV_INFO    *NewUnknownFv;
+  VOID                              *TempPtr;
 
-  if (PrivateData->UnknownFvInfoCount + 1 >= PcdGet32 (PcdPeiCoreMaxFvSupported)) {
-    return EFI_OUT_OF_RESOURCES;
+  if (PrivateData->UnknownFvInfoCount >= PrivateData->MaxUnknownFvInfoCount) {
+    //
+    // Run out of room, grow the buffer.
+    //
+    TempPtr = AllocateZeroPool (
+                sizeof (PEI_CORE_UNKNOW_FORMAT_FV_INFO) * (PrivateData->MaxUnknownFvInfoCount + FV_GROWTH_STEP)
+                );
+    ASSERT (TempPtr != NULL);
+    CopyMem (
+      TempPtr,
+      PrivateData->UnknownFvInfo,
+      sizeof (PEI_CORE_UNKNOW_FORMAT_FV_INFO) * PrivateData->MaxUnknownFvInfoCount
+      );
+    PrivateData->UnknownFvInfo = TempPtr;
+    PrivateData->MaxUnknownFvInfoCount = PrivateData->MaxUnknownFvInfoCount + FV_GROWTH_STEP;
   }
 
   NewUnknownFv = &PrivateData->UnknownFvInfo[PrivateData->UnknownFvInfoCount];
@@ -2368,6 +2397,7 @@ ThirdPartyFvPpiNotifyCallback (
   EFI_PEI_FILE_HANDLE          FileHandle;
   VOID                         *DepexData;
   UINTN                        CurFvCount;
+  VOID                         *TempPtr;
 
   PrivateData  = PEI_CORE_INSTANCE_FROM_PS_THIS (PeiServices);
   FvPpi = (EFI_PEI_FIRMWARE_VOLUME_PPI*) Ppi;
@@ -2403,10 +2433,21 @@ ThirdPartyFvPpiNotifyCallback (
       continue;
     }
 
-    if (PrivateData->FvCount >= PcdGet32 (PcdPeiCoreMaxFvSupported)) {
-      DEBUG ((EFI_D_ERROR, "The number of Fv Images (%d) exceed the max supported FVs (%d) in Pei", PrivateData->FvCount + 1, PcdGet32 (PcdPeiCoreMaxFvSupported)));
-      DEBUG ((EFI_D_ERROR, "PcdPeiCoreMaxFvSupported value need be reconfigurated in DSC"));
-      ASSERT (FALSE);
+    if (PrivateData->FvCount >= PrivateData->MaxFvCount) {
+      //
+      // Run out of room, grow the buffer.
+      //
+      TempPtr = AllocateZeroPool (
+                  sizeof (PEI_CORE_FV_HANDLE) * (PrivateData->MaxFvCount + FV_GROWTH_STEP)
+                  );
+      ASSERT (TempPtr != NULL);
+      CopyMem (
+        TempPtr,
+        PrivateData->Fv,
+        sizeof (PEI_CORE_FV_HANDLE) * PrivateData->MaxFvCount
+        );
+      PrivateData->Fv = TempPtr;
+      PrivateData->MaxFvCount = PrivateData->MaxFvCount + FV_GROWTH_STEP;
     }
 
     //
