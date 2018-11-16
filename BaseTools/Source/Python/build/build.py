@@ -36,7 +36,6 @@ from subprocess import *
 from Common import Misc as Utils
 
 from Common.LongFilePathSupport import OpenLongFilePath as open
-from Common.LongFilePathSupport import LongFilePath
 from Common.TargetTxtClassObject import *
 from Common.ToolDefClassObject import *
 from Common.DataType import *

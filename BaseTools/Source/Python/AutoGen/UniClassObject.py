@@ -24,7 +24,7 @@ from io import BytesIO
 from Common.BuildToolError import *
 from Common.StringUtils import GetLineNo
 from Common.Misc import PathClass
-from Common.LongFilePathSupport import LongFilePath
+from Common.LongFilePathSupport import LongFilePath, UniToStr
 from Common.GlobalData import *
 ##
 # Static definitions
@@ -45,18 +45,6 @@ TAB = u'\t'
 BACK_SLASH_PLACEHOLDER = u'\u0006'
 
 gIncludePattern = re.compile("^#include +[\"<]+([^\"< >]+)[>\"]+$", re.MULTILINE | re.UNICODE)
-
-## Convert a python unicode string to a normal string
-#
-# Convert a python unicode string to a normal string
-# UniToStr(u'I am a string') is 'I am a string'
-#
-# @param Uni:  The python unicode string
-#
-# @retval:     The formatted normal string
-#
-def UniToStr(Uni):
-    return repr(Uni)[2:-1]
 
 ## Convert a unicode string to a Hex list
 #
