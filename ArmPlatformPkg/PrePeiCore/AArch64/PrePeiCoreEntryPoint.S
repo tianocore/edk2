@@ -76,6 +76,9 @@ _PrepareArguments:
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
   ldr   x3, =ASM_PFX(CEntryPoint)
 
+  // Set the frame pointer to NULL so any backtraces terminate here
+  mov   x29, xzr
+
   // Jump to PrePeiCore C code
   //    x0 = mp_id
   //    x1 = pei_core_address

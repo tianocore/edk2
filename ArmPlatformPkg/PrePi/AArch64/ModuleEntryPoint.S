@@ -109,6 +109,9 @@ _PrepareArguments:
   // Ensure we're jumping to FV version of the code (not boot remapped alias)
   ldr   x4, =ASM_PFX(CEntryPoint)
 
+  // Set the frame pointer to NULL so any backtraces terminate here
+  mov   x29, xzr
+
   // Jump to PrePiCore C code
   //    x0 = MpId
   //    x1 = UefiMemoryBase
