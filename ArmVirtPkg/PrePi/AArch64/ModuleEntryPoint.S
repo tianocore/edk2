@@ -121,6 +121,9 @@ _GetStackBase:
   mov   x1, x21
   mov   x2, x22
 
+  // Set the frame pointer to NULL so any backtraces terminate here
+  mov   x29, xzr
+
   // Jump to PrePiCore C code
   //    x0 = MpId
   //    x1 = UefiMemoryBase
