@@ -51,7 +51,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 // Default value
 //
 #define TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT (TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_ENABLE_BLOCK_SID | \
-                                                   TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID)
+                                                   TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_PP_REQUIRED_FOR_DISABLE_BLOCK_SID |\
+                                                   TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_ENABLE_BLOCK_SID)
 
 /**
   Check and execute the pending TPM request.

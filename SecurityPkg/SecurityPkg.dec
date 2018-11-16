@@ -410,7 +410,7 @@
   # PCD can be configured for different settings in different scenarios
   # Default setting is TCG2_BIOS_TPM_MANAGEMENT_FLAG_DEFAULT | TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_DEFAULT
   # @Prompt Initial setting of TCG2 Persistent Firmware Management Flags
-  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags|0x300E2|UINT32|0x0001001B
+  gEfiSecurityPkgTokenSpaceGuid.PcdTcg2PhysicalPresenceFlags|0x700E2|UINT32|0x0001001B
 
   ## Indicate current TPM2 Interrupt Number reported by _CRS control method.<BR><BR>
   # TPM2 Interrupt feature is disabled If the pcd is set to 0.<BR>
