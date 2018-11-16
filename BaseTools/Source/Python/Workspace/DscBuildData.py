@@ -2315,11 +2315,11 @@ class DscBuildData(PlatformBuildClassObject):
                 continue
             if Attr != "FLAGS":
                 continue
-            if Target == "*" or Target == self._Target:
-                if Tag == "*" or Tag == self._Toolchain:
+            if Target == TAB_STAR or Target == self._Target:
+                if Tag == TAB_STAR or Tag == self._Toolchain:
                     if 'COMMON' not in BuildOptions:
                         BuildOptions['COMMON'] = set()
-                    if Arch == "*":
+                    if Arch == TAB_STAR:
                         BuildOptions['COMMON'].add(self.BuildOptions[Options])
                     if Arch in self.SupArchList:
                         if Arch not in BuildOptions:

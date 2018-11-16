@@ -21,7 +21,7 @@ import array
 import re
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from struct import *
-from Common.DataType import MAX_SIZE_TYPE, MAX_VAL_TYPE
+from Common.DataType import MAX_SIZE_TYPE, MAX_VAL_TYPE, TAB_STAR
 import Common.EdkLogger as EdkLogger
 import Common.BuildToolError as BuildToolError
 
@@ -87,7 +87,7 @@ class PcdEntry:
     #  for both hexadecimal and decimal.
     #
     def _GenOffsetValue(self):
-        if self.PcdOffset != "*" :
+        if self.PcdOffset != TAB_STAR:
             try:
                 self.PcdBinOffset = int (self.PcdOffset)
             except:
@@ -423,7 +423,7 @@ class GenVPD :
                     Alignment = 1
 
                 PCD.Alignment = Alignment
-                if PCD.PcdOffset != '*':
+                if PCD.PcdOffset != TAB_STAR:
                     if PCD.PcdOccupySize % Alignment != 0:
                         if PCD.PcdUnpackValue.startswith("{"):
                             EdkLogger.warn("BPDG", "The offset value of PCD %s is not 8-byte aligned!" %(PCD.PcdCName), File=self.InputFileName)
@@ -469,7 +469,7 @@ class GenVPD :
     def FormatFileLine (self) :
 
         for eachPcd in self.FileLinesList :
-            if eachPcd.PcdOffset != '*' :
+            if eachPcd.PcdOffset != TAB_STAR :
                 # Use pcd's Offset value as key, and pcd's Value as value
                 self.PcdFixedOffsetSizeList.append(eachPcd)
             else :
@@ -484,7 +484,7 @@ class GenVPD :
     def FixVpdOffset (self):
         # At first, the offset should start at 0
         # Sort fixed offset list in order to find out where has free spaces for the pcd's offset
-        # value is "*" to insert into.
+        # value is TAB_STAR to insert into.
 
         self.PcdFixedOffsetSizeList.sort(key=lambda x: x.PcdBinOffset)
 
@@ -502,7 +502,7 @@ class GenVPD :
                         self.PcdUnknownOffsetList[index+i -1 ], self.PcdUnknownOffsetList[index+i] = self.PcdUnknownOffsetList[index+i], self.PcdUnknownOffsetList[index+i -1]
 
         #
-        # Process all Offset value are "*"
+        # Process all Offset value are TAB_STAR
         #
         if (len(self.PcdFixedOffsetSizeList) == 0) and (len(self.PcdUnknownOffsetList) != 0) :
             # The offset start from 0
@@ -571,7 +571,7 @@ class GenVPD :
                         eachUnfixedPcd      = self.PcdUnknownOffsetList[countOfUnfixedList]
                         needFixPcdSize      = eachUnfixedPcd.PcdOccupySize
                         # Not been fixed
-                        if eachUnfixedPcd.PcdOffset == '*' :
+                        if eachUnfixedPcd.PcdOffset == TAB_STAR :
                             if LastOffset % eachUnfixedPcd.Alignment != 0:
                                 LastOffset = (LastOffset / eachUnfixedPcd.Alignment + 1) * eachUnfixedPcd.Alignment
                             # The offset un-fixed pcd can write into this free space

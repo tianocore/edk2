@@ -131,7 +131,7 @@ class Section (SectionClassObject):
                     if File.Type == FileType or (int(FfsInf.PiSpecVersion, 16) >= 0x0001000A \
                                                  and FileType == 'DXE_DPEX' and File.Type == BINARY_FILE_TYPE_SMM_DEPEX) \
                                                  or (FileType == BINARY_FILE_TYPE_TE and File.Type == BINARY_FILE_TYPE_PE32):
-                        if '*' in FfsInf.TargetOverrideList or File.Target == '*' or File.Target in FfsInf.TargetOverrideList or FfsInf.TargetOverrideList == []:
+                        if TAB_STAR in FfsInf.TargetOverrideList or File.Target == TAB_STAR or File.Target in FfsInf.TargetOverrideList or FfsInf.TargetOverrideList == []:
                             FileList.append(FfsInf.PatchEfiFile(File.Path, File.Type))
                         else:
                             GenFdsGlobalVariable.InfLogger ("\nBuild Target \'%s\' of File %s is not in the Scope of %s specified by INF %s in FDF" %(File.Target, File.File, FfsInf.TargetOverrideList, FfsInf.InfFileName))

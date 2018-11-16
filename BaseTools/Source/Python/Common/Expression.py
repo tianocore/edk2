@@ -244,7 +244,7 @@ class ValueExpression(BaseExpression):
         'IN' : 'in'
     }
 
-    NonLetterOpLst = ['+', '-', '*', '/', '%', '&', '|', '^', '~', '<<', '>>', '!', '=', '>', '<', '?', ':']
+    NonLetterOpLst = ['+', '-', TAB_STAR, '/', '%', '&', '|', '^', '~', '<<', '>>', '!', '=', '>', '<', '?', ':']
 
 
     SymbolPattern = re.compile("("
@@ -498,7 +498,7 @@ class ValueExpression(BaseExpression):
 
     # A [ * B]*
     def _MulExpr(self):
-        return self._ExprFuncTemplate(self._UnaryExpr, {"*", "/", "%"})
+        return self._ExprFuncTemplate(self._UnaryExpr, {TAB_STAR, "/", "%"})
 
     # [!]*A
     def _UnaryExpr(self):

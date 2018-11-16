@@ -1088,7 +1088,7 @@ class tdict:
     _ListType = type([])
     _TupleType = type(())
     _Wildcard = 'COMMON'
-    _ValidWildcardList = ['COMMON', 'DEFAULT', 'ALL', '*', 'PLATFORM']
+    _ValidWildcardList = ['COMMON', 'DEFAULT', 'ALL', TAB_STAR, 'PLATFORM']
 
     def __init__(self, _Single_=False, _Level_=2):
         self._Level_ = _Level_

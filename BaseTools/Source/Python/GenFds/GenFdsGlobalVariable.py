@@ -217,12 +217,12 @@ class GenFdsGlobalVariable:
 
         if not Inf.IsBinaryModule:
             for File in Inf.Sources:
-                if File.TagName in {"", "*", GenFdsGlobalVariable.ToolChainTag} and \
-                    File.ToolChainFamily in {"", "*", GenFdsGlobalVariable.ToolChainFamily}:
+                if File.TagName in {"", DataType.TAB_STAR, GenFdsGlobalVariable.ToolChainTag} and \
+                    File.ToolChainFamily in {"", DataType.TAB_STAR, GenFdsGlobalVariable.ToolChainFamily}:
                     FileList.append((File, DataType.TAB_UNKNOWN_FILE))
 
         for File in Inf.Binaries:
-            if File.Target in {DataType.TAB_COMMON, '*', GenFdsGlobalVariable.TargetName}:
+            if File.Target in {DataType.TAB_COMMON, DataType.TAB_STAR, GenFdsGlobalVariable.TargetName}:
                 FileList.append((File, File.Type))
 
         for File, FileType in FileList:
@@ -893,7 +893,7 @@ def FindExtendTool(KeyStringList, CurrentArchList, NameGuid):
             for Index in range(2, -1, -1):
                 for Key in list(BuildOption.keys()):
                     List = Key.split('_')
-                    if List[Index] == '*':
+                    if List[Index] == DataType.TAB_STAR:
                         for String in ToolDb[ToolList[Index]]:
                             if String in [Arch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]:
                                 List[Index] = String

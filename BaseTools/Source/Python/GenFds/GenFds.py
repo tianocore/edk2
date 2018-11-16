@@ -653,7 +653,7 @@ class GenFds(object):
                             FileGuidList.append(FileStatementGuid)
                         Name = []
                         FfsPath = os.path.join(GenFdsGlobalVariable.FvDir, 'Ffs')
-                        FfsPath = glob(os.path.join(FfsPath, FileStatementGuid) + '*')
+                        FfsPath = glob(os.path.join(FfsPath, FileStatementGuid) + TAB_STAR)
                         if not FfsPath:
                             continue
                         if not os.path.exists(FfsPath[0]):

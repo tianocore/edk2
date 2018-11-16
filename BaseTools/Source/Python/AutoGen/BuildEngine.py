@@ -110,7 +110,7 @@ class FileBuildRule:
         self.IncListFileMacro = self.INC_LIST_MACRO
 
         self.SourceFileType = Type
-        # source files listed not in "*" or "?" pattern format
+        # source files listed not in TAB_STAR or "?" pattern format
         if not ExtraDependency:
             self.ExtraSourceFileList = []
         else:
@@ -150,12 +150,12 @@ class FileBuildRule:
         self.SourceFileExtList = set()
         for File in Input:
             Base, Ext = os.path.splitext(File)
-            if Base.find("*") >= 0:
-                # There's "*" in the file name
+            if Base.find(TAB_STAR) >= 0:
+                # There's TAB_STAR in the file name
                 self.IsMultipleInput = True
                 self.GenFileListMacro = True
             elif Base.find("?") < 0:
-                # There's no "*" and "?" in file name
+                # There's no TAB_STAR and "?" in file name
                 self.ExtraSourceFileList.append(File)
                 continue
             self.SourceFileExtList.add(Ext)
@@ -553,7 +553,7 @@ class BuildRule:
     #
     #   @param  FileExt             The extension of a file
     #   @param  ToolChainFamily     The tool chain family name
-    #   @param  BuildVersion        The build version number. "*" means any rule
+    #   @param  BuildVersion        The build version number. TAB_STAR means any rule
     #                               is applicalbe.
     #
     #   @retval FileType        The file type string

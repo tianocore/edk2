@@ -1438,7 +1438,7 @@ class PlatformAutoGen(AutoGen):
                         PcdValue = Sku.DefaultValue
                         if PcdValue == "":
                             PcdValue  = Pcd.DefaultValue
-                        if Sku.VpdOffset != '*':
+                        if Sku.VpdOffset != TAB_STAR:
                             if PcdValue.startswith("{"):
                                 Alignment = 8
                             elif PcdValue.startswith("L"):
@@ -1462,7 +1462,7 @@ class PlatformAutoGen(AutoGen):
                             VpdFile.Add(Pcd, SkuName, Sku.VpdOffset)
                         SkuValueMap[PcdValue].append(Sku)
                         # if the offset of a VPD is *, then it need to be fixed up by third party tool.
-                        if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
+                        if not NeedProcessVpdMapFile and Sku.VpdOffset == TAB_STAR:
                             NeedProcessVpdMapFile = True
                             if self.Platform.VpdToolGuid is None or self.Platform.VpdToolGuid == '':
                                 EdkLogger.error("Build", FILE_NOT_FOUND, \
@@ -1522,7 +1522,7 @@ class PlatformAutoGen(AutoGen):
                                 PcdValue = Sku.DefaultValue
                                 if PcdValue == "":
                                     PcdValue  = DscPcdEntry.DefaultValue
-                                if Sku.VpdOffset != '*':
+                                if Sku.VpdOffset != TAB_STAR:
                                     if PcdValue.startswith("{"):
                                         Alignment = 8
                                     elif PcdValue.startswith("L"):
@@ -1545,7 +1545,7 @@ class PlatformAutoGen(AutoGen):
                                     SkuValueMap[PcdValue] = []
                                     VpdFile.Add(DscPcdEntry, SkuName, Sku.VpdOffset)
                                 SkuValueMap[PcdValue].append(Sku)
-                                if not NeedProcessVpdMapFile and Sku.VpdOffset == "*":
+                                if not NeedProcessVpdMapFile and Sku.VpdOffset == TAB_STAR:
                                     NeedProcessVpdMapFile = True
                             if DscPcdEntry.DatumType == TAB_VOID and PcdValue.startswith("L"):
                                 UnicodePcdArray.add(DscPcdEntry)
@@ -1573,7 +1573,7 @@ class PlatformAutoGen(AutoGen):
                     if os.path.exists(VpdMapFilePath):
                         VpdFile.Read(VpdMapFilePath)
 
-                        # Fixup "*" offset
+                        # Fixup TAB_STAR offset
                         for pcd in VpdSkuMap:
                             vpdinfo = VpdFile.GetVpdInfo(pcd)
                             if vpdinfo is None:
@@ -2210,15 +2210,15 @@ class PlatformAutoGen(AutoGen):
     def CalculatePriorityValue(self, Key):
         Target, ToolChain, Arch, CommandType, Attr = Key.split('_')
         PriorityValue = 0x11111
-        if Target == "*":
+        if Target == TAB_STAR:
             PriorityValue &= 0x01111
-        if ToolChain == "*":
+        if ToolChain == TAB_STAR:
             PriorityValue &= 0x10111
-        if Arch == "*":
+        if Arch == TAB_STAR:
             PriorityValue &= 0x11011
-        if CommandType == "*":
+        if CommandType == TAB_STAR:
             PriorityValue &= 0x11101
-        if Attr == "*":
+        if Attr == TAB_STAR:
             PriorityValue &= 0x11110
 
         return self.PrioList["0x%0.5x" % PriorityValue]
@@ -2253,9 +2253,9 @@ class PlatformAutoGen(AutoGen):
             if (Key[0] == self.BuildRuleFamily and
                 (ModuleStyle is None or len(Key) < 3 or (len(Key) > 2 and Key[2] == ModuleStyle))):
                 Target, ToolChain, Arch, CommandType, Attr = Key[1].split('_')
-                if (Target == self.BuildTarget or Target == "*") and\
-                    (ToolChain == self.ToolChain or ToolChain == "*") and\
-                    (Arch == self.Arch or Arch == "*") and\
+                if (Target == self.BuildTarget or Target == TAB_STAR) and\
+                    (ToolChain == self.ToolChain or ToolChain == TAB_STAR) and\
+                    (Arch == self.Arch or Arch == TAB_STAR) and\
                     Options[Key].startswith("="):
 
                     if OverrideList.get(Key[1]) is not None:
@@ -2276,11 +2276,11 @@ class PlatformAutoGen(AutoGen):
                     # Compare two Key, if one is included by another, choose the higher priority one
                     #
                     Target2, ToolChain2, Arch2, CommandType2, Attr2 = NextKey.split("_")
-                    if (Target1 == Target2 or Target1 == "*" or Target2 == "*") and\
-                        (ToolChain1 == ToolChain2 or ToolChain1 == "*" or ToolChain2 == "*") and\
-                        (Arch1 == Arch2 or Arch1 == "*" or Arch2 == "*") and\
-                        (CommandType1 == CommandType2 or CommandType1 == "*" or CommandType2 == "*") and\
-                        (Attr1 == Attr2 or Attr1 == "*" or Attr2 == "*"):
+                    if (Target1 == Target2 or Target1 == TAB_STAR or Target2 == TAB_STAR) and\
+                        (ToolChain1 == ToolChain2 or ToolChain1 == TAB_STAR or ToolChain2 == TAB_STAR) and\
+                        (Arch1 == Arch2 or Arch1 == TAB_STAR or Arch2 == TAB_STAR) and\
+                        (CommandType1 == CommandType2 or CommandType1 == TAB_STAR or CommandType2 == TAB_STAR) and\
+                        (Attr1 == Attr2 or Attr1 == TAB_STAR or Attr2 == TAB_STAR):
 
                         if self.CalculatePriorityValue(NowKey) > self.CalculatePriorityValue(NextKey):
                             if Options.get((self.BuildRuleFamily, NextKey)) is not None:
@@ -2309,9 +2309,9 @@ class PlatformAutoGen(AutoGen):
                     continue
                 FamilyMatch = True
             # expand any wildcard
-            if Target == "*" or Target == self.BuildTarget:
-                if Tag == "*" or Tag == self.ToolChain:
-                    if Arch == "*" or Arch == self.Arch:
+            if Target == TAB_STAR or Target == self.BuildTarget:
+                if Tag == TAB_STAR or Tag == self.ToolChain:
+                    if Arch == TAB_STAR or Arch == self.Arch:
                         if Tool not in BuildOptions:
                             BuildOptions[Tool] = {}
                         if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or Options[Key].startswith('='):
@@ -2344,9 +2344,9 @@ class PlatformAutoGen(AutoGen):
                 continue
 
             # expand any wildcard
-            if Target == "*" or Target == self.BuildTarget:
-                if Tag == "*" or Tag == self.ToolChain:
-                    if Arch == "*" or Arch == self.Arch:
+            if Target == TAB_STAR or Target == self.BuildTarget:
+                if Tag == TAB_STAR or Tag == self.ToolChain:
+                    if Arch == TAB_STAR or Arch == self.Arch:
                         if Tool not in BuildOptions:
                             BuildOptions[Tool] = {}
                         if Attr != "FLAGS" or Attr not in BuildOptions[Tool] or Options[Key].startswith('='):
@@ -2971,8 +2971,8 @@ class ModuleAutoGen(AutoGen):
     @cached_property
     def SourceFileList(self):
         RetVal = []
-        ToolChainTagSet = {"", "*", self.ToolChain}
-        ToolChainFamilySet = {"", "*", self.ToolChainFamily, self.BuildRuleFamily}
+        ToolChainTagSet = {"", TAB_STAR, self.ToolChain}
+        ToolChainFamilySet = {"", TAB_STAR, self.ToolChainFamily, self.BuildRuleFamily}
         for F in self.Module.Sources:
             # match tool chain
             if F.TagName not in ToolChainTagSet:
@@ -3047,7 +3047,7 @@ class ModuleAutoGen(AutoGen):
     def BinaryFileList(self):
         RetVal = []
         for F in self.Module.Binaries:
-            if F.Target not in [TAB_ARCH_COMMON, '*'] and F.Target != self.BuildTarget:
+            if F.Target not in [TAB_ARCH_COMMON, TAB_STAR] and F.Target != self.BuildTarget:
                 continue
             RetVal.append(F)
             self._ApplyBuildRule(F, F.Type, BinaryFileList=RetVal)

@@ -57,7 +57,7 @@ FILE_COMMENT_TEMPLATE = \
 #  <PcdName>         ::=  <TokenSpaceCName> "." <PcdCName>
 #  <TokenSpaceCName> ::=  C Variable Name of the Token Space GUID
 #  <PcdCName>        ::=  C Variable Name of the PCD
-#  <Offset>          ::=  {"*"} {<HexNumber>}
+#  <Offset>          ::=  {TAB_STAR} {<HexNumber>}
 #  <HexNumber>       ::=  "0x" (a-fA-F0-9){1,8}
 #  <Size>            ::=  <HexNumber>
 #  <Value>           ::=  {<HexNumber>} {<NonNegativeInt>} {<QString>} {<Array>}
@@ -92,7 +92,7 @@ class VpdInfoFile:
         if (Vpd is None):
             EdkLogger.error("VpdInfoFile", BuildToolError.ATTRIBUTE_UNKNOWN_ERROR, "Invalid VPD PCD entry.")
 
-        if not (Offset >= 0 or Offset == "*"):
+        if not (Offset >= 0 or Offset == TAB_STAR):
             EdkLogger.error("VpdInfoFile", BuildToolError.PARAMETER_INVALID, "Invalid offset parameter: %s." % Offset)
 
         if Vpd.DatumType == TAB_VOID:
@@ -186,8 +186,8 @@ class VpdInfoFile:
                         VpdObjectTokenCName = PcdItem[0]
                 for sku in VpdObject.SkuInfoList:
                     if VpdObject.TokenSpaceGuidCName == TokenSpaceName and VpdObjectTokenCName == PcdTokenName.strip() and sku == SkuId:
-                        if self._VpdArray[VpdObject][sku] == "*":
-                            if Offset == "*":
+                        if self._VpdArray[VpdObject][sku] == TAB_STAR:
+                            if Offset == TAB_STAR:
                                 EdkLogger.error("BPDG", BuildToolError.FORMAT_INVALID, "The offset of %s has not been fixed up by third-party BPDG tool." % PcdName)
                             self._VpdArray[VpdObject][sku] = Offset
                         Found = True

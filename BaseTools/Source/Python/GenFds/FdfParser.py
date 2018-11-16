@@ -64,7 +64,6 @@ T_CHAR_CR = '\r'
 T_CHAR_TAB = '\t'
 T_CHAR_DOUBLE_QUOTE = '\"'
 T_CHAR_SINGLE_QUOTE = '\''
-T_CHAR_STAR = '*'
 T_CHAR_BRACE_R = '}'
 
 SEPARATORS = {TAB_EQUAL_SPLIT, TAB_VALUE_SPLIT, TAB_COMMA_SPLIT, '{', T_CHAR_BRACE_R}
@@ -533,7 +532,7 @@ class FdfParser:
                     InComment = False
                     HashComment = False
             # check for */ comment end
-            elif InComment and not DoubleSlashComment and not HashComment and self._CurrentChar() == T_CHAR_STAR and self._NextChar() == TAB_BACK_SLASH:
+            elif InComment and not DoubleSlashComment and not HashComment and self._CurrentChar() == TAB_STAR and self._NextChar() == TAB_BACK_SLASH:
                 self._SetCurrentCharValue(TAB_SPACE_SPLIT)
                 self._GetOneChar()
                 self._SetCurrentCharValue(TAB_SPACE_SPLIT)
@@ -552,7 +551,7 @@ class FdfParser:
                 InComment = True
                 HashComment = True
             # check for /* comment start
-            elif self._CurrentChar() == TAB_BACK_SLASH and self._NextChar() == T_CHAR_STAR:
+            elif self._CurrentChar() == TAB_BACK_SLASH and self._NextChar() == TAB_STAR:
                 self._SetCurrentCharValue(TAB_SPACE_SPLIT)
                 self._GetOneChar()
                 self._SetCurrentCharValue(TAB_SPACE_SPLIT)
