@@ -22,13 +22,21 @@
 //
 // Standard event types
 //
+#define EV_PREBOOT_CERT             ((TCG_EVENTTYPE) 0x00000000)
 #define EV_POST_CODE                ((TCG_EVENTTYPE) 0x00000001)
 #define EV_NO_ACTION                ((TCG_EVENTTYPE) 0x00000003)
 #define EV_SEPARATOR                ((TCG_EVENTTYPE) 0x00000004)
+#define EV_ACTION                   ((TCG_EVENTTYPE) 0x00000005)
 #define EV_S_CRTM_CONTENTS          ((TCG_EVENTTYPE) 0x00000007)
 #define EV_S_CRTM_VERSION           ((TCG_EVENTTYPE) 0x00000008)
 #define EV_CPU_MICROCODE            ((TCG_EVENTTYPE) 0x00000009)
+#define EV_PLATFORM_CONFIG_FLAGS    ((TCG_EVENTTYPE) 0x0000000A)
 #define EV_TABLE_OF_DEVICES         ((TCG_EVENTTYPE) 0x0000000B)
+#define EV_COMPACT_HASH             ((TCG_EVENTTYPE) 0x0000000C)
+#define EV_NONHOST_CODE             ((TCG_EVENTTYPE) 0x0000000F)
+#define EV_NONHOST_CONFIG           ((TCG_EVENTTYPE) 0x00000010)
+#define EV_NONHOST_INFO             ((TCG_EVENTTYPE) 0x00000011)
+#define EV_OMIT_BOOT_DEVICE_EVENTS  ((TCG_EVENTTYPE) 0x00000012)
 
 //
 // EFI specific event types
@@ -43,6 +51,7 @@
 #define EV_EFI_ACTION                       (EV_EFI_EVENT_BASE + 7)
 #define EV_EFI_PLATFORM_FIRMWARE_BLOB       (EV_EFI_EVENT_BASE + 8)
 #define EV_EFI_HANDOFF_TABLES               (EV_EFI_EVENT_BASE + 9)
+#define EV_EFI_HCRTM_EVENT                  (EV_EFI_EVENT_BASE + 0x10)
 #define EV_EFI_VARIABLE_AUTHORITY           (EV_EFI_EVENT_BASE + 0xE0)
 
 #define EFI_CALLING_EFI_APPLICATION         \
