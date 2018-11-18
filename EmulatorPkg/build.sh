@@ -179,16 +179,16 @@ then
   PROCESSOR=$HOST_PROCESSOR
 fi
 
+BUILD_OUTPUT_DIR=$WORKSPACE/Build/Emulator$PROCESSOR
+
 case $PROCESSOR in
   IA32)
     ARCH_SIZE=32
-    BUILD_OUTPUT_DIR=$WORKSPACE/Build/Emulator32
     LIB_NAMES="ld-linux.so.2 libdl.so.2 crt1.o crti.o crtn.o"
     LIB_SEARCH_PATHS="/usr/lib/i386-linux-gnu /usr/lib32 /lib32 /usr/lib /lib"
     ;;
   X64)
     ARCH_SIZE=64
-    BUILD_OUTPUT_DIR=$WORKSPACE/Build/Emulator
     LIB_NAMES="ld-linux-x86-64.so.2 libdl.so.2 crt1.o crti.o crtn.o"
     LIB_SEARCH_PATHS="/usr/lib/x86_64-linux-gnu /usr/lib64 /lib64 /usr/lib /lib"
     ;;
