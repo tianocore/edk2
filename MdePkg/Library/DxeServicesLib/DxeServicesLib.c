@@ -253,6 +253,9 @@ GetSectionFromAnyFvByFileType  (
   EFI_FV_FILE_ATTRIBUTES        Attributes;
   EFI_FIRMWARE_VOLUME2_PROTOCOL *Fv;
 
+  ASSERT (Buffer != NULL);
+  ASSERT (Size != NULL);
+
   //
   // Locate all available FVs.
   //
