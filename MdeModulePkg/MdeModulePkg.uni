@@ -914,10 +914,6 @@
                                                                                           "this PCD to be TURE if and only if all runtime driver has seperated Code/Data\n"
                                                                                           "section. If PE code/data sections are merged, the result is unpredictable.\n"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdIdentifyMappingPageTablePtr_PROMPT  #language en-US "Identify Mapping Page Table pointer."
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdIdentifyMappingPageTablePtr_HELP  #language en-US "This dynamic PCD hold an address to point to the memory of page table. The page table establishes a 1:1\n"
-                                                                                                "Virtual to Physical mapping according to the processor physical address bits."
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdShadowPeimOnBoot_HELP  #language en-US "Indicates if to shadow PEIM and PeiCore after memory is ready.<BR><BR>\n"
                                                                                      "This PCD is used on other boot path except for S3 boot.\n"
                                                                                      "TRUE  - Shadow PEIM and PeiCore after memory is ready.<BR>\n"
