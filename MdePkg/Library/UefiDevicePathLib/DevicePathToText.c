@@ -972,7 +972,7 @@ DevPathToTextUsbWWID (
 
   SerialNumberStr = (CHAR16 *) ((UINT8 *) UsbWWId + sizeof (USB_WWID_DEVICE_PATH));
   Length = (UINT16) ((DevicePathNodeLength ((EFI_DEVICE_PATH_PROTOCOL *) UsbWWId) - sizeof (USB_WWID_DEVICE_PATH)) / sizeof (CHAR16));
-  if (SerialNumberStr [Length - 1] != 0) {
+  if (Length >= 1 && SerialNumberStr [Length - 1] != 0) {
     //
     // In case no NULL terminator in SerialNumber, create a new one with NULL terminator
     //
