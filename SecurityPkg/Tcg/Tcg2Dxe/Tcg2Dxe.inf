@@ -2,9 +2,9 @@
 #  Produces Tcg2 protocol and measure boot environment
 #
 #  Spec Compliance Info:
-#    "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 00.21"
+#    "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 1.03 v51"
 #      along with
-#    "Errata for PC Client Specific Platform Firmware Profile Specification Version 1.0 Revision 0.21"
+#    "Errata for PC Client Specific Platform Firmware Profile Specification Version 1.0 Revision 1.03"
 #    "TCG EFI Protocol Specification" "Family 2.0" "Level 00 Revision 00.13"
 #
 #  This module will produce Tcg2 protocol and measure boot environment.

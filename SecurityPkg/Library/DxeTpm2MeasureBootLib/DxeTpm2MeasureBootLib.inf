@@ -2,7 +2,9 @@
 #  Provides security service for TPM 2.0 measured boot
 #
 #  Spec Compliance Info:
-#    "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 00.21"
+#    "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 1.03 v51"
+#      along with
+#    "Errata for PC Client Specific Platform Firmware Profile Specification Version 1.0 Revision 1.03"
 #
 #  This library instance hooks LoadImage() API to measure every image that
 #  is not measured in PEI phase. And, it will also measure GPT partition.

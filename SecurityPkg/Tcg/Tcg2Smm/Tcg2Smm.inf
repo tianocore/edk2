@@ -6,7 +6,9 @@
 #     "Physical Presence Interface Specification Version 1.30 Revision 00.52"
 #     "Platform Reset Attack Mitigation Specification Version 1.00"
 #    TPM2.0 ACPI device object
-#     "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 00.21"
+#     "TCG PC Client Platform Firmware Profile Specification for TPM Family 2.0 Level 00 Revision 1.03 v51"
+#       along with
+#     "Errata for PC Client Specific Platform Firmware Profile Specification Version 1.0 Revision 1.03"
 #
 #  This driver implements TPM 2.0 definition block in ACPI table and
 #  registers SMI callback functions for Tcg2 physical presence and
