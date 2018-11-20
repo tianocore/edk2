@@ -416,7 +416,7 @@ class PATH(object):
 
   def header(self,struct):
     header={}
-    head_re = re.compile(r'} %s;[\s\S\n]+h{1}"'%struct,re.M|re.S)
+    head_re = re.compile('typedef.*} %s;[\n]+(.*?)(?:typedef|formset)'%struct,re.M|re.S)
     head_re2 = re.compile(r'#line[\s\d]+"(\S+h)"')
     for i in list(self.lstinf.keys()):
       with open(i,'r') as lst:
