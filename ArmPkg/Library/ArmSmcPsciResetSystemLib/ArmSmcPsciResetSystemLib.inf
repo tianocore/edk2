@@ -21,6 +21,14 @@
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = ResetSystemLib
 
+[Sources.AARCH64]
+  AArch64/Reset.S   | GCC
+  AArch64/Reset.asm | MSFT
+
+[Sources.ARM]
+  Arm/Reset.S       | GCC
+  Arm/Reset.asm     | RVCT
+
 [Sources]
   ArmSmcPsciResetSystemLib.c
 

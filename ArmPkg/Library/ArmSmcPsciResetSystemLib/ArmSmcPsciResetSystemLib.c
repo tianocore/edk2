@@ -1,7 +1,7 @@
 /** @file
   ResetSystemLib implementation using PSCI calls
 
-  Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
+  Copyright (c) 2017 - 2018, Linaro Ltd. All rights reserved.<BR>
 
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -81,6 +81,8 @@ ResetShutdown (
   ArmCallSmc (&ArmSmcArgs);
 }
 
+VOID DisableMmuAndReenterPei (VOID);
+
 /**
   This function causes the system to enter S3 and then wake up immediately.
 
@@ -92,7 +94,12 @@ EnterS3WithImmediateWake (
   VOID
   )
 {
-  VOID (*Reset)(VOID);
+  EFI_PHYSICAL_ADDRESS        Alloc;
+  EFI_MEMORY_DESCRIPTOR       *MemMap;
+  UINTN                       MemMapSize;
+  UINTN                       MapKey, DescriptorSize;
+  UINT32                      DescriptorVersion;
+  EFI_STATUS                  Status;
 
   if (FeaturePcdGet (PcdArmReenterPeiForCapsuleWarmReboot) &&
       !EfiAtRuntime ()) {
@@ -101,11 +108,49 @@ EnterS3WithImmediateWake (
     // immediate wake (which is used by capsule update) by disabling the MMU
     // and interrupts, and jumping to the PEI entry point.
     //
-    Reset = (VOID (*)(VOID))(UINTN)FixedPcdGet64 (PcdFvBaseAddress);
 
-    gBS->RaiseTPL (TPL_HIGH_LEVEL);
-    ArmDisableMmu ();
-    Reset ();
+    //
+    // Obtain the size of the memory map
+    //
+    MemMapSize = 0;
+    MemMap = NULL;
+    Status = gBS->GetMemoryMap (&MemMapSize, MemMap, &MapKey, &DescriptorSize,
+                    &DescriptorVersion);
+    ASSERT (Status == EFI_BUFFER_TOO_SMALL);
+
+    //
+    // Add some slack to the allocation to cater for changes in the memory
+    // map if ExitBootServices () fails the first time around.
+    //
+    MemMapSize += SIZE_4KB;
+    Status = gBS->AllocatePages (AllocateAnyPages, EfiBootServicesData,
+                    EFI_SIZE_TO_PAGES (MemMapSize), &Alloc);
+    ASSERT_EFI_ERROR (Status);
+
+    MemMap = (EFI_MEMORY_DESCRIPTOR *)(UINTN)Alloc;
+
+    Status = gBS->GetMemoryMap (&MemMapSize, MemMap, &MapKey, &DescriptorSize,
+                    &DescriptorVersion);
+    ASSERT_EFI_ERROR (Status);
+
+    Status = gBS->ExitBootServices (gImageHandle, MapKey);
+    if (EFI_ERROR (Status)) {
+      //
+      // ExitBootServices () may fail the first time around if an event fired
+      // right after the call to GetMemoryMap() which allocated or freed memory.
+      // Since that first call to ExitBootServices () will disarm the timer,
+      // this is guaranteed not to happen again, so one additional attempt
+      // should suffice.
+      //
+      Status = gBS->GetMemoryMap (&MemMapSize, MemMap, &MapKey, &DescriptorSize,
+                      &DescriptorVersion);
+      ASSERT_EFI_ERROR (Status);
+
+      Status = gBS->ExitBootServices (gImageHandle, MapKey);
+      ASSERT_EFI_ERROR (Status);
+    }
+
+    DisableMmuAndReenterPei ();
   }
 }
 
