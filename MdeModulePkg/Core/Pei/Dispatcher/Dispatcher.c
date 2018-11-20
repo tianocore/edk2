@@ -1036,7 +1036,7 @@ PeiDispatcher (
           // Process the Notify list and dispatch any notifies for
           // newly installed PPIs.
           //
-          ProcessNotifyList (Private);
+          ProcessDispatchNotifyList (Private);
         }
       }
     }
@@ -1183,10 +1183,10 @@ PeiDispatcher (
             // Process the Notify list and dispatch any notifies for
             // newly installed PPIs.
             //
-            ProcessNotifyList (Private);
+            ProcessDispatchNotifyList (Private);
 
             //
-            // Recheck SwitchStackSignal after ProcessNotifyList()
+            // Recheck SwitchStackSignal after ProcessDispatchNotifyList()
             // in case PeiInstallPeiMemory() is done in a callback with
             // EFI_PEI_PPI_DESCRIPTOR_NOTIFY_DISPATCH.
             //
@@ -1227,7 +1227,7 @@ PeiDispatcher (
               // Process the Notify list and dispatch any notifies for
               // newly installed PPIs.
               //
-              ProcessNotifyList (Private);
+              ProcessDispatchNotifyList (Private);
             }
           }
         }

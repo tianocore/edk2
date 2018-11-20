@@ -190,7 +190,15 @@ PeiCore (
         if (OldCoreData->CurrentFvFileHandles != NULL) {
           OldCoreData->CurrentFvFileHandles = (EFI_PEI_FILE_HANDLE *) ((UINT8 *) OldCoreData->CurrentFvFileHandles + OldCoreData->HeapOffset);
         }
-        OldCoreData->PpiData.PpiListPtrs  = (PEI_PPI_LIST_POINTERS *) ((UINT8 *) OldCoreData->PpiData.PpiListPtrs + OldCoreData->HeapOffset);
+        if (OldCoreData->PpiData.PpiList.PpiPtrs != NULL) {
+          OldCoreData->PpiData.PpiList.PpiPtrs = (PEI_PPI_LIST_POINTERS *) ((UINT8 *) OldCoreData->PpiData.PpiList.PpiPtrs + OldCoreData->HeapOffset);
+        }
+        if (OldCoreData->PpiData.CallbackNotifyList.NotifyPtrs != NULL) {
+          OldCoreData->PpiData.CallbackNotifyList.NotifyPtrs = (PEI_PPI_LIST_POINTERS *) ((UINT8 *) OldCoreData->PpiData.CallbackNotifyList.NotifyPtrs + OldCoreData->HeapOffset);
+        }
+        if (OldCoreData->PpiData.DispatchNotifyList.NotifyPtrs != NULL) {
+          OldCoreData->PpiData.DispatchNotifyList.NotifyPtrs = (PEI_PPI_LIST_POINTERS *) ((UINT8 *) OldCoreData->PpiData.DispatchNotifyList.NotifyPtrs + OldCoreData->HeapOffset);
+        }
         OldCoreData->Fv                   = (PEI_CORE_FV_HANDLE *) ((UINT8 *) OldCoreData->Fv + OldCoreData->HeapOffset);
         for (Index = 0; Index < OldCoreData->FvCount; Index ++) {
           if (OldCoreData->Fv[Index].PeimState != NULL) {
@@ -210,7 +218,15 @@ PeiCore (
         if (OldCoreData->CurrentFvFileHandles != NULL) {
           OldCoreData->CurrentFvFileHandles = (EFI_PEI_FILE_HANDLE *) ((UINT8 *) OldCoreData->CurrentFvFileHandles - OldCoreData->HeapOffset);
         }
-        OldCoreData->PpiData.PpiListPtrs  = (PEI_PPI_LIST_POINTERS *) ((UINT8 *) OldCoreData->PpiData.PpiListPtrs - OldCoreData->HeapOffset);
+        if (OldCoreData->PpiData.PpiList.PpiPtrs != NULL) {
+          OldCoreData->PpiData.PpiList.PpiPtrs = (PEI_PPI_LIST_POINTERS *) ((UINT8 *) OldCoreData->PpiData.PpiList.PpiPtrs - OldCoreData->HeapOffset);
+        }
+        if (OldCoreData->PpiData.CallbackNotifyList.NotifyPtrs != NULL) {
+          OldCoreData->PpiData.CallbackNotifyList.NotifyPtrs = (PEI_PPI_LIST_POINTERS *) ((UINT8 *) OldCoreData->PpiData.CallbackNotifyList.NotifyPtrs - OldCoreData->HeapOffset);
+        }
+        if (OldCoreData->PpiData.DispatchNotifyList.NotifyPtrs != NULL) {
+          OldCoreData->PpiData.DispatchNotifyList.NotifyPtrs = (PEI_PPI_LIST_POINTERS *) ((UINT8 *) OldCoreData->PpiData.DispatchNotifyList.NotifyPtrs - OldCoreData->HeapOffset);
+        }
         OldCoreData->Fv                   = (PEI_CORE_FV_HANDLE *) ((UINT8 *) OldCoreData->Fv - OldCoreData->HeapOffset);
         for (Index = 0; Index < OldCoreData->FvCount; Index ++) {
           if (OldCoreData->Fv[Index].PeimState != NULL) {
@@ -337,14 +353,6 @@ PeiCore (
   // Initialize PEI Core Services
   //
   InitializeMemoryServices   (&PrivateData, SecCoreData, OldCoreData);
-  if (OldCoreData == NULL) {
-    //
-    // Initialize PEI Core Private Data Buffer
-    //
-    PrivateData.PpiData.PpiListPtrs  = AllocateZeroPool (sizeof (PEI_PPI_LIST_POINTERS) * PcdGet32 (PcdPeiCoreMaxPpiSupported));
-    ASSERT (PrivateData.PpiData.PpiListPtrs != NULL);
-  }
-  InitializePpiServices      (&PrivateData,    OldCoreData);
 
   //
   // Update performance measurements
@@ -414,7 +422,7 @@ PeiCore (
     //
     // Process the Notify list and dispatch any notifies for the Memory Discovered PPI
     //
-    ProcessNotifyList (&PrivateData);
+    ProcessDispatchNotifyList (&PrivateData);
 
     PERF_INMODULE_END ("DisMem");
   }

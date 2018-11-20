@@ -66,36 +66,59 @@ typedef union {
 } PEI_PPI_LIST_POINTERS;
 
 ///
-/// PPI database structure which contains two link: PpiList and NotifyList. PpiList
-/// is in head of PpiListPtrs array and notify is in end of PpiListPtrs.
+/// Number of PEI_PPI_LIST_POINTERS to grow by each time we run out of room
+///
+#define PPI_GROWTH_STEP             64
+#define CALLBACK_NOTIFY_GROWTH_STEP 32
+#define DISPATCH_NOTIFY_GROWTH_STEP 8
+
+typedef struct {
+  UINTN                 CurrentCount;
+  UINTN                 MaxCount;
+  UINTN                 LastDispatchedCount;
+  ///
+  /// MaxCount number of entries.
+  ///
+  PEI_PPI_LIST_POINTERS *PpiPtrs;
+} PEI_PPI_LIST;
+
+typedef struct {
+  UINTN                 CurrentCount;
+  UINTN                 MaxCount;
+  ///
+  /// MaxCount number of entries.
+  ///
+  PEI_PPI_LIST_POINTERS *NotifyPtrs;
+} PEI_CALLBACK_NOTIFY_LIST;
+
+typedef struct {
+  UINTN                 CurrentCount;
+  UINTN                 MaxCount;
+  UINTN                 LastDispatchedCount;
+  ///
+  /// MaxCount number of entries.
+  ///
+  PEI_PPI_LIST_POINTERS *NotifyPtrs;
+} PEI_DISPATCH_NOTIFY_LIST;
+
+///
+/// PPI database structure which contains three links:
+/// PpiList, CallbackNotifyList and DispatchNotifyList.
 ///
 typedef struct {
   ///
-  /// index of end of PpiList link list.
+  /// PPI List.
   ///
-  INTN                    PpiListEnd;
+  PEI_PPI_LIST              PpiList;
   ///
-  /// index of end of notify link list.
+  /// Notify List at dispatch level.
   ///
-  INTN                    NotifyListEnd;
+  PEI_CALLBACK_NOTIFY_LIST  CallbackNotifyList;
   ///
-  /// index of the dispatched notify list.
+  /// Notify List at callback level.
   ///
-  INTN                    DispatchListEnd;
-  ///
-  /// index of last installed Ppi description in PpiList link list.
-  ///
-  INTN                    LastDispatchedInstall;
-  ///
-  /// index of last dispatched notify in Notify link list.
-  ///
-  INTN                    LastDispatchedNotify;
-  ///
-  /// Ppi database has the PcdPeiCoreMaxPpiSupported number of entries.
-  ///
-  PEI_PPI_LIST_POINTERS   *PpiListPtrs;
+  PEI_DISPATCH_NOTIFY_LIST  DispatchNotifyList;
 } PEI_PPI_DATABASE;
-
 
 //
 // PEI_CORE_FV_HANDE.PeimState
@@ -555,13 +578,13 @@ PeiNotifyPpi (
 
 **/
 VOID
-ProcessNotifyList (
+ProcessDispatchNotifyList (
   IN PEI_CORE_INSTANCE  *PrivateData
   );
 
 /**
 
-  Dispatch notifications.
+  Process notifications.
 
   @param PrivateData        PeiCore's private data structure
   @param NotifyType         Type of notify to fire.
@@ -572,7 +595,7 @@ ProcessNotifyList (
 
 **/
 VOID
-DispatchNotify (
+ProcessNotify (
   IN PEI_CORE_INSTANCE  *PrivateData,
   IN UINTN               NotifyType,
   IN INTN                InstallStartIndex,
