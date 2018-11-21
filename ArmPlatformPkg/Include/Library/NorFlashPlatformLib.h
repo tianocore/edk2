@@ -20,7 +20,6 @@ typedef struct {
   UINTN       RegionBaseAddress;    // Start address of one single region
   UINTN       Size;
   UINTN       BlockSize;
-  EFI_GUID    Guid;
 } NOR_FLASH_DESCRIPTION;
 
 EFI_STATUS
