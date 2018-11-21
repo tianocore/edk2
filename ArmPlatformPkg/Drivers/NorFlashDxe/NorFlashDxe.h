@@ -125,6 +125,7 @@ typedef struct _NOR_FLASH_INSTANCE                NOR_FLASH_INSTANCE;
 #pragma pack (1)
 typedef struct {
   VENDOR_DEVICE_PATH                  Vendor;
+  UINT8                               Index;
   EFI_DEVICE_PATH_PROTOCOL            End;
 } NOR_FLASH_DEVICE_PATH;
 #pragma pack ()

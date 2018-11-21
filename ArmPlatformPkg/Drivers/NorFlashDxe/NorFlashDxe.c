@@ -89,6 +89,7 @@ NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
       },
       { 0x0, 0x0, 0x0, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 } }, // GUID ... NEED TO BE FILLED
     },
+    0, // Index
     {
       END_DEVICE_PATH_TYPE,
       END_ENTIRE_DEVICE_PATH_SUBTYPE,
@@ -105,7 +106,6 @@ NorFlashCreateInstance (
   IN UINT32                 Index,
   IN UINT32                 BlockSize,
   IN BOOLEAN                SupportFvb,
-  IN CONST GUID             *NorFlashGuid,
   OUT NOR_FLASH_INSTANCE**  NorFlashInstance
   )
 {
@@ -128,7 +128,8 @@ NorFlashCreateInstance (
   Instance->Media.BlockSize = BlockSize;
   Instance->Media.LastBlock = (NorFlashSize / BlockSize)-1;
 
-  CopyGuid (&Instance->DevicePath.Vendor.Guid, NorFlashGuid);
+  CopyGuid (&Instance->DevicePath.Vendor.Guid, &gEfiCallerIdGuid);
+  Instance->DevicePath.Index = (UINT8)Index;
 
   Instance->ShadowBuffer = AllocateRuntimePool (BlockSize);;
   if (Instance->ShadowBuffer == NULL) {
@@ -1314,7 +1315,6 @@ NorFlashInitialise (
       Index,
       NorFlashDevices[Index].BlockSize,
       ContainVariableStorage,
-      &NorFlashDevices[Index].Guid,
       &mNorFlashInstances[Index]
     );
     if (EFI_ERROR(Status)) {
