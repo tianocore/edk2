@@ -1,6 +1,6 @@
 /** @file
 
- Copyright (c) 2014, Linaro Ltd. All rights reserved.<BR>
+ Copyright (c) 2014-2018, Linaro Ltd. All rights reserved.<BR>
 
  This program and the accompanying materials
  are licensed and made available under the terms and conditions of the BSD License
@@ -12,13 +12,16 @@
 
  **/
 
+#include <Library/BaseLib.h>
+#include <Library/DebugLib.h>
 #include <Library/NorFlashPlatformLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+
+#include <Protocol/FdtClient.h>
 
 #define QEMU_NOR_BLOCK_SIZE    SIZE_256KB
-#define QEMU_NOR0_BASE         0x0
-#define QEMU_NOR0_SIZE         SIZE_64MB
-#define QEMU_NOR1_BASE         0x04000000
-#define QEMU_NOR1_SIZE         SIZE_64MB
+
+#define MAX_FLASH_BANKS        4
 
 EFI_STATUS
 NorFlashPlatformInitialization (
@@ -28,21 +31,7 @@ NorFlashPlatformInitialization (
   return EFI_SUCCESS;
 }
 
-NOR_FLASH_DESCRIPTION mNorFlashDevices[] = {
-  {
-    QEMU_NOR0_BASE,
-    QEMU_NOR0_BASE,
-    QEMU_NOR0_SIZE,
-    QEMU_NOR_BLOCK_SIZE,
-    {0xF9B94AE2, 0x8BA6, 0x409B, {0x9D, 0x56, 0xB9, 0xB4, 0x17, 0xF5, 0x3C, 0xB3}}
-  }, {
-    QEMU_NOR1_BASE,
-    QEMU_NOR1_BASE,
-    QEMU_NOR1_SIZE,
-    QEMU_NOR_BLOCK_SIZE,
-    {0x8047DB4B, 0x7E9C, 0x4C0C, {0x8E, 0xBC, 0xDF, 0xBB, 0xAA, 0xCA, 0xCE, 0x8F}}
-  }
-};
+NOR_FLASH_DESCRIPTION mNorFlashDevices[MAX_FLASH_BANKS];
 
 EFI_STATUS
 NorFlashPlatformGetDevices (
@@ -50,7 +39,54 @@ NorFlashPlatformGetDevices (
   OUT UINT32                  *Count
   )
 {
+  FDT_CLIENT_PROTOCOL         *FdtClient;
+  INT32                       Node;
+  EFI_STATUS                  Status;
+  EFI_STATUS                  FindNodeStatus;
+  CONST UINT32                *Reg;
+  UINT32                      PropSize;
+  UINT32                      Num;
+  UINT64                      Base;
+  UINT64                      Size;
+
+  Status = gBS->LocateProtocol (&gFdtClientProtocolGuid, NULL,
+                  (VOID **)&FdtClient);
+  ASSERT_EFI_ERROR (Status);
+
+  Num = 0;
+  for (FindNodeStatus = FdtClient->FindCompatibleNode (FdtClient,
+                                     "cfi-flash", &Node);
+       !EFI_ERROR (FindNodeStatus) && Num < MAX_FLASH_BANKS;
+       FindNodeStatus = FdtClient->FindNextCompatibleNode (FdtClient,
+                                     "cfi-flash", Node, &Node)) {
+
+    Status = FdtClient->GetNodeProperty (FdtClient, Node, "reg",
+                          (CONST VOID **)&Reg, &PropSize);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: GetNodeProperty () failed (Status == %r)\n",
+        __FUNCTION__, Status));
+      continue;
+    }
+
+    ASSERT ((PropSize % (4 * sizeof (UINT32))) == 0);
+
+    while (PropSize >= (4 * sizeof (UINT32)) && Num < MAX_FLASH_BANKS) {
+      Base = SwapBytes64 (ReadUnaligned64 ((VOID *)&Reg[0]));
+      Size = SwapBytes64 (ReadUnaligned64 ((VOID *)&Reg[2]));
+      Reg += 4;
+
+      mNorFlashDevices[Num].DeviceBaseAddress = (UINTN)Base;
+      mNorFlashDevices[Num].RegionBaseAddress = (UINTN)Base;
+      mNorFlashDevices[Num].Size              = (UINTN)Size;
+      mNorFlashDevices[Num].BlockSize         = QEMU_NOR_BLOCK_SIZE;
+      Num++;
+
+      PropSize -= 4 * sizeof (UINT32);
+    }
+  }
+
   *NorFlashDescriptions = mNorFlashDevices;
-  *Count = ARRAY_SIZE (mNorFlashDevices);
+  *Count = Num;
+
   return EFI_SUCCESS;
 }
