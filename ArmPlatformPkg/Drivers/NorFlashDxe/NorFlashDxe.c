@@ -82,7 +82,10 @@ NOR_FLASH_INSTANCE  mNorFlashInstanceTemplate = {
       {
         HARDWARE_DEVICE_PATH,
         HW_VENDOR_DP,
-        { (UINT8)sizeof(VENDOR_DEVICE_PATH), (UINT8)((sizeof(VENDOR_DEVICE_PATH)) >> 8) }
+        {
+          (UINT8)(OFFSET_OF (NOR_FLASH_DEVICE_PATH, End)),
+          (UINT8)(OFFSET_OF (NOR_FLASH_DEVICE_PATH, End) >> 8)
+        }
       },
       { 0x0, 0x0, 0x0, { 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0 } }, // GUID ... NEED TO BE FILLED
     },
@@ -99,7 +102,7 @@ NorFlashCreateInstance (
   IN UINTN                  NorFlashDeviceBase,
   IN UINTN                  NorFlashRegionBase,
   IN UINTN                  NorFlashSize,
-  IN UINT32                 MediaId,
+  IN UINT32                 Index,
   IN UINT32                 BlockSize,
   IN BOOLEAN                SupportFvb,
   IN CONST GUID             *NorFlashGuid,
@@ -121,7 +124,7 @@ NorFlashCreateInstance (
   Instance->Size = NorFlashSize;
 
   Instance->BlockIoProtocol.Media = &Instance->Media;
-  Instance->Media.MediaId = MediaId;
+  Instance->Media.MediaId = Index;
   Instance->Media.BlockSize = BlockSize;
   Instance->Media.LastBlock = (NorFlashSize / BlockSize)-1;
 

@@ -122,10 +122,12 @@
 
 typedef struct _NOR_FLASH_INSTANCE                NOR_FLASH_INSTANCE;
 
+#pragma pack (1)
 typedef struct {
   VENDOR_DEVICE_PATH                  Vendor;
   EFI_DEVICE_PATH_PROTOCOL            End;
 } NOR_FLASH_DEVICE_PATH;
+#pragma pack ()
 
 struct _NOR_FLASH_INSTANCE {
   UINT32                              Signature;
