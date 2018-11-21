@@ -257,12 +257,12 @@ M: Ruiyu Ni <ruiyu.ni@intel.com>
 R: Laszlo Ersek <lersek@redhat.com>
 
 Vlv2DeviceRefCodePkg
-M: David Wei <david.wei@intel.com>
-M: Mang Guo <mang.guo@intel.com>
+M: Zailiang Sun <zailiang.sun@intel.com>
+M: Yi Qian <yi.qian@intel.com>
 
 Vlv2TbltDevicePkg
-M: David Wei <david.wei@intel.com>
-M: Mang Guo <mang.guo@intel.com>
+M: Zailiang Sun <zailiang.sun@intel.com>
+M: Yi Qian <yi.qian@intel.com>
 
 StandaloneMmPkg
 M: Achin Gupta <achin.gupta@arm.com>
