@@ -845,6 +845,10 @@ IScsiCreateAttempts (
                     );
     FreePool (AttemptConfigOrder);
     if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR,
+        "%a: Failed to set 'InitialAttemptOrder' with Guid (%g): "
+        "%r\n",
+        __FUNCTION__, &gIScsiConfigGuid, Status));
       return Status;
     }
 
@@ -887,6 +891,10 @@ IScsiCreateAttempts (
                     );
     FreePool (AttemptConfigData);
     if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR,
+          "%a: Failed to set variable (mPrivate->PortString) with Guid (%g): "
+          "%r\n",
+          __FUNCTION__, &gEfiIScsiInitiatorNameProtocolGuid, Status));
       return Status;
     }
   }
