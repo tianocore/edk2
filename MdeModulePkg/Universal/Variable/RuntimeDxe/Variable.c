@@ -3234,14 +3234,44 @@ VariableServiceSetVariable (
     //
     if ((Attributes & VARIABLE_ATTRIBUTE_AT_AW) != 0) {
       if (StrSize (VariableName) + PayloadSize > mVariableModuleGlobal->MaxAuthVariableSize - GetVariableHeaderSize ()) {
+        DEBUG ((DEBUG_ERROR,
+          "%a: Failed to set variable '%s' with Guid %g\n",
+          __FUNCTION__, VariableName, VendorGuid));
+        DEBUG ((DEBUG_ERROR,
+          "NameSize(0x%x) + PayloadSize(0x%x) > "
+          "MaxAuthVariableSize(0x%x) - HeaderSize(0x%x)\n",
+          StrSize (VariableName), PayloadSize,
+          mVariableModuleGlobal->MaxAuthVariableSize,
+          GetVariableHeaderSize ()
+          ));
         return EFI_INVALID_PARAMETER;
       }
     } else if ((Attributes & EFI_VARIABLE_NON_VOLATILE) != 0) {
       if (StrSize (VariableName) + PayloadSize > mVariableModuleGlobal->MaxVariableSize - GetVariableHeaderSize ()) {
+        DEBUG ((DEBUG_ERROR,
+          "%a: Failed to set variable '%s' with Guid %g\n",
+          __FUNCTION__, VariableName, VendorGuid));
+        DEBUG ((DEBUG_ERROR,
+          "NameSize(0x%x) + PayloadSize(0x%x) > "
+          "MaxVariableSize(0x%x) - HeaderSize(0x%x)\n",
+          StrSize (VariableName), PayloadSize,
+          mVariableModuleGlobal->MaxVariableSize,
+          GetVariableHeaderSize ()
+          ));
         return EFI_INVALID_PARAMETER;
       }
     } else {
       if (StrSize (VariableName) + PayloadSize > mVariableModuleGlobal->MaxVolatileVariableSize - GetVariableHeaderSize ()) {
+        DEBUG ((DEBUG_ERROR,
+          "%a: Failed to set variable '%s' with Guid %g\n",
+          __FUNCTION__, VariableName, VendorGuid));
+        DEBUG ((DEBUG_ERROR,
+          "NameSize(0x%x) + PayloadSize(0x%x) > "
+          "MaxVolatileVariableSize(0x%x) - HeaderSize(0x%x)\n",
+          StrSize (VariableName), PayloadSize,
+          mVariableModuleGlobal->MaxVolatileVariableSize,
+          GetVariableHeaderSize ()
+          ));
         return EFI_INVALID_PARAMETER;
       }
     }
