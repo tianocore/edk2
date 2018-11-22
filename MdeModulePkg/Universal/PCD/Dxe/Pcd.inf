@@ -73,7 +73,7 @@
 #
 #      c) OEM specificed storage area:
 #         - The PCD value is stored in OEM specified area which base address is
-#           specified by a FixedAtBuild PCD setting - PcdVpdBaseAddress.
+#           specified by PCD setting - PcdVpdBaseAddress64 or PcdVpdBaseAddress.
 #         - The area is read only for PEI and DXE phase.
 #         - [PcdsDynamicVpd] is used as section name for this type PCD in platform
 #           DSC file. [PcdsDynamicExVpd] is for dynamicex type PCD.
@@ -344,6 +344,7 @@
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress      ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress64    ## SOMETIMES_CONSUMES
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNvStoreDefaultId ## SOMETIMES_CONSUMES
 
 [Depex]

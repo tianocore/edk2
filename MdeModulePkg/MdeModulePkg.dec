@@ -2022,5 +2022,13 @@
   # @Prompt NV Storage Default Value Buffer
   gEfiMdeModulePkgTokenSpaceGuid.PcdNvStoreDefaultValueBuffer|{0x0}|VOID*|0x00030005
 
+  ## VPD type PCD allows a developer to point to an absolute physical address PcdVpdBaseAddress64
+  #  to store PCD value. It will be DynamicExDefault only.
+  #  It is used to set VPD region base address. So, it can't be DynamicExVpd PCD. Its value is
+  #  required to be accessed in PcdDxe driver entry point. So, its value must be set in PEI phase.
+  #  It can't depend on EFI variable service, and can't be DynamicExHii PCD.
+  # @Prompt 64bit VPD base address.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress64|0x0|UINT64|0x00030006
+
 [UserExtensions.TianoCore."ExtraFiles"]
   MdeModulePkgExtra.uni

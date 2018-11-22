@@ -48,6 +48,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
   #error "Please make sure the version of PCD DXE Service and the generated PCD DXE Database match."
 #endif
 
+extern UINTN     mVpdBaseAddress;
+
 /**
   Retrieve additional information associated with a PCD token in the default token space.
 

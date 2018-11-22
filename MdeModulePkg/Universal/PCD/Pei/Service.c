@@ -861,6 +861,7 @@ GetWorker (
   UINT32              LocalTokenNumber;
   UINT32              LocalTokenCount;
   UINT8               *VaraiableDefaultBuffer;
+  UINTN               VpdBaseAddress;
 
   //
   // TokenNumber Zero is reserved as PCD_INVALID_TOKEN_NUMBER.
@@ -889,7 +890,19 @@ GetWorker (
     {
       VPD_HEAD *VpdHead;
       VpdHead = (VPD_HEAD *) ((UINT8 *)PeiPcdDb + Offset);
-      return (VOID *) ((UINTN) PcdGet32 (PcdVpdBaseAddress) + VpdHead->Offset);
+
+      //
+      // PcdVpdBaseAddress64 is DynamicEx PCD only. So, PeiPcdGet64Ex() is used to get its value.
+      //
+      VpdBaseAddress = (UINTN) PeiPcdGet64Ex (&gEfiMdeModulePkgTokenSpaceGuid, PcdToken (PcdVpdBaseAddress64));
+      if (VpdBaseAddress == 0) {
+        //
+        // PcdVpdBaseAddress64 is not set, get value from PcdVpdBaseAddress.
+        //
+        VpdBaseAddress = (UINTN) PcdGet32 (PcdVpdBaseAddress);
+      }
+      ASSERT (VpdBaseAddress != 0);
+      return (VOID *)(VpdBaseAddress + VpdHead->Offset);
     }
 
     case PCD_TYPE_HII|PCD_TYPE_STRING:
