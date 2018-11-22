@@ -743,7 +743,6 @@ FILE FREEFORM = 878AC2CC-5343-46F2-B563-51F89DAF56BA {
   INF  MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
   INF  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
   INF  NetworkPkg/TcpDxe/TcpDxe.inf
-  INF  NetworkPkg/IScsiDxe/IScsiDxe.inf
   !if $(NETWORK_IP6_ENABLE) == TRUE
   INF  NetworkPkg/Ip6Dxe/Ip6Dxe.inf
   INF  NetworkPkg/Dhcp6Dxe/Dhcp6Dxe.inf

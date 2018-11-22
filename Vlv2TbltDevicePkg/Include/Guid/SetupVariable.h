@@ -1,6 +1,6 @@
 /** @file
 
-  Copyright (c) 2004  - 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2004  - 2018, Intel Corporation. All rights reserved.<BR>
 
 
   This program and the accompanying materials are licensed and made available under
@@ -1310,6 +1310,9 @@ typedef struct {
   UINT8   GpioWakeCapability;
   UINT8   RtcBattery;
   UINT8   LpeAudioReportedByDSDT;
+  
+  UINT8   Uart1Int3511Com; // Report UART1 as COM with _HID INT3511
+  CHAR16  SystemUuid[37];
 
 } SYSTEM_CONFIGURATION;
 #pragma pack()
