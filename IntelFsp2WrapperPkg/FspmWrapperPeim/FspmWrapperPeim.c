@@ -157,7 +157,7 @@ FspmWrapperInit (
 
   Status = EFI_SUCCESS;
 
-  if (FixedPcdGet8 (PcdFspModeSelection) == 1) {
+  if (PcdGet8 (PcdFspModeSelection) == 1) {
     Status = PeiFspMemoryInit ();
     ASSERT_EFI_ERROR (Status);
   } else {

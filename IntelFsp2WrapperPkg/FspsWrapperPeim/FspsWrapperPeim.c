@@ -349,7 +349,7 @@ FspsWrapperPeimEntryPoint (
 {
   DEBUG ((DEBUG_INFO, "FspsWrapperPeimEntryPoint\n"));
 
-  if (FixedPcdGet8 (PcdFspModeSelection) == 1) {
+  if (PcdGet8 (PcdFspModeSelection) == 1) {
     FspsWrapperInit ();
   } else {
     PeiServicesInstallFvInfoPpi (
