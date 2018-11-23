@@ -35,6 +35,3 @@
   ArmLib
   CacheMaintenanceLib
   MemoryAllocationLib
-
-[Pcd.AARCH64]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize

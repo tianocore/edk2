@@ -604,8 +604,15 @@ ArmConfigureMmu (
     return EFI_INVALID_PARAMETER;
   }
 
-  // Cover the entire GCD memory space
-  MaxAddress = (1UL << PcdGet8 (PcdPrePiCpuMemorySize)) - 1;
+  //
+  // Limit the virtual address space to what we can actually use: UEFI
+  // mandates a 1:1 mapping, so no point in making the virtual address
+  // space larger than the physical address space. We also have to take
+  // into account the architectural limitations that result from UEFI's
+  // use of 4 KB pages.
+  //
+  MaxAddress = MIN (LShiftU64 (1ULL, ArmGetPhysicalAddressBits ()) - 1,
+                    MAX_ADDRESS);
 
   // Lookup the Table Level to get the information
   LookupAddresstoRootTable (MaxAddress, &T0SZ, &RootTableEntryCount);

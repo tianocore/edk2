@@ -40,8 +40,5 @@
   CacheMaintenanceLib
   MemoryAllocationLib
 
-[Pcd.AARCH64]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
-
 [Pcd.ARM]
   gArmTokenSpaceGuid.PcdNormalMemoryNonshareableOverride
