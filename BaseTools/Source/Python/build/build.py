@@ -51,7 +51,7 @@ from PatchPcdValue.PatchPcdValue import *
 
 import Common.EdkLogger
 import Common.GlobalData as GlobalData
-from GenFds.GenFds import GenFds
+from GenFds.GenFds import GenFds, GenFdsApi
 
 from collections import OrderedDict, defaultdict
 
@@ -1391,7 +1391,7 @@ class Build():
 
         # genfds
         if Target == 'fds':
-            LaunchCommand(AutoGenObject.GenFdsCommand, AutoGenObject.MakeFileDir)
+            GenFdsApi(AutoGenObject.GenFdsCommandDict, self.Db)
             return True
 
         # run
@@ -2135,7 +2135,7 @@ class Build():
                         # Generate FD image if there's a FDF file found
                         #
                         GenFdsStart = time.time()
-                        LaunchCommand(Wa.GenFdsCommand, os.getcwd())
+                        GenFdsApi(Wa.GenFdsCommandDict, self.Db)
 
                         #
                         # Create MAP file for all platform FVs after GenFds.

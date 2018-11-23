@@ -935,6 +935,10 @@ class WorkspaceAutoGen(AutoGen):
     def GenFdsCommand(self):
         return (GenMake.TopLevelMakefile(self)._TEMPLATE_.Replace(GenMake.TopLevelMakefile(self)._TemplateDict)).strip()
 
+    @property
+    def GenFdsCommandDict(self):
+        return GenMake.TopLevelMakefile(self)._TemplateDict
+
     ## Create makefile for the platform and modules in it
     #
     #   @param      CreateDepsMakeFile      Flag indicating if the makefile for
