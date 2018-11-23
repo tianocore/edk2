@@ -44,7 +44,6 @@ GenFw.exe
 GenPage.exe
 GenPatchPcdTable.exe
 GenSec.exe
-GenVtf.exe
 ImportTool.bat
 LzmaCompress.exe
 LzmaF86Compress.bat

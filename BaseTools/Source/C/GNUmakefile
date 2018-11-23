@@ -63,7 +63,6 @@ APPLICATIONS = \
   GenPage \
   GenSec \
   GenCrc32 \
-  GenVtf \
   LzmaCompress \
   Split \
   TianoCompress \
