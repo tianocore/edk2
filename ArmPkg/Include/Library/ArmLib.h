@@ -733,4 +733,10 @@ ArmWriteCntvOff (
   UINT64   Val
   );
 
+UINTN
+EFIAPI
+ArmGetPhysicalAddressBits (
+  VOID
+  );
+
 #endif // __ARM_LIB__

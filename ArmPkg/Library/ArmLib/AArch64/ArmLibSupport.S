@@ -196,4 +196,21 @@ ASM_FUNC(ArmWriteSctlr)
 3:msr   sctlr_el3, x0
 4:ret
 
+ASM_FUNC(ArmGetPhysicalAddressBits)
+  mrs   x0, id_aa64mmfr0_el1
+  adr   x1, .LPARanges
+  and   x0, x0, #0xf
+  ldrb  w0, [x1, x0]
+  ret
+
+//
+// Bits 0..3 of the AA64MFR0_EL1 system register encode the size of the
+// physical address space support on this CPU:
+// 0 == 32 bits, 1 == 36 bits, etc etc
+// 7 and up are reserved
+//
+.LPARanges:
+  .byte 32, 36, 40, 42, 44, 48, 52,  0
+  .byte  0,  0,  0,  0,  0,  0,  0,  0
+
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED

@@ -165,4 +165,12 @@ ASM_FUNC(ArmWriteCpuActlr)
   isb
   bx      lr
 
+ASM_FUNC (ArmGetPhysicalAddressBits)
+  mrc     p15, 0, r0, c0, c1, 4   // MMFR0
+  and     r0, r0, #0xf            // VMSA [3:0]
+  cmp     r0, #5                  // >= 5 implies LPAE support
+  movlt   r0, #32                 // 32 bits if no LPAE
+  movge   r0, #40                 // 40 bits if LPAE
+  bx      lr
+
 ASM_FUNCTION_REMOVE_IF_UNREFERENCED
