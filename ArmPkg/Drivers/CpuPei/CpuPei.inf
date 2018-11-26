@@ -50,7 +50,6 @@
   gArmMpCoreInfoGuid
 
 [FixedPcd]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
 
 [Depex]
