@@ -170,22 +170,18 @@
   gEmbeddedTokenSpaceGuid.PcdAndroidBootDevicePath|L""|VOID*|0x00000057
 
 [PcdsFixedAtBuild.ARM]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|32|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
 
   # ISP1761 USB OTG Controller
   gEmbeddedTokenSpaceGuid.PcdIsp1761BaseAddress|0|UINT32|0x00000021
 
 [PcdsFixedAtBuild.AARCH64]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|48|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|0|UINT8|0x00000011
 
 [PcdsFixedAtBuild.IA32]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|36|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011
 
 [PcdsFixedAtBuild.X64]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|52|UINT8|0x00000010
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16|UINT8|0x00000011
 
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
