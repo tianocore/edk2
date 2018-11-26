@@ -143,10 +143,6 @@
   gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize|16
 
 [PcdsFixedAtBuild.AARCH64]
-  # KVM limits it IPA space to 40 bits (1 TB), so there is no need to
-  # support anything bigger, even if the host hardware does
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|40
-
   # Clearing BIT0 in this PCD prevents installing a 32-bit SMBIOS entry point,
   # if the entry point version is >= 3.0. AARCH64 OSes cannot assume the
   # presence of the 32-bit entry point anyway (because many AARCH64 systems

@@ -388,9 +388,6 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdSetNxForStack|TRUE
 
-[PcdsFixedAtBuild.ARM]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize|40
-
 [Components.common]
   #
   # Ramdisk support
