@@ -57,9 +57,6 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdFvSize
 
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
-
 [Depex]
   TRUE
 
