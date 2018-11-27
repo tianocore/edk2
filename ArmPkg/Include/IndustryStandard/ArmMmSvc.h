@@ -40,4 +40,11 @@
     ((((c_perm) & SET_MEM_ATTR_CODE_PERM_MASK) << SET_MEM_ATTR_CODE_PERM_SHIFT) | \
     (( (d_perm) & SET_MEM_ATTR_DATA_PERM_MASK) << SET_MEM_ATTR_DATA_PERM_SHIFT))
 
+/* MM SVC Return error codes */
+#define ARM_SVC_SPM_RET_SUCCESS               0
+#define ARM_SVC_SPM_RET_NOT_SUPPORTED        -1
+#define ARM_SVC_SPM_RET_INVALID_PARAMS       -2
+#define ARM_SVC_SPM_RET_DENIED               -3
+#define ARM_SVC_SPM_RET_NO_MEMORY            -5
+
 #endif
