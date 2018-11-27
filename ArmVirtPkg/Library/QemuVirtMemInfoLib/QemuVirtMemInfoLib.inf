@@ -24,12 +24,6 @@
 [Sources]
   QemuVirtMemInfoLib.c
 
-[Sources.ARM]
-  Arm/PhysAddrTop.S
-
-[Sources.AARCH64]
-  AArch64/PhysAddrTop.S
-
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmVirtPkg/ArmVirtPkg.dec
@@ -51,4 +45,3 @@
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFdSize
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize

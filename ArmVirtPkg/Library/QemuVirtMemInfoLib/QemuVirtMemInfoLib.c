@@ -21,11 +21,6 @@
 // Number of Virtual Memory Map Descriptors
 #define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS          5
 
-EFI_PHYSICAL_ADDRESS
-ArmGetPhysAddrTop (
-  VOID
-  );
-
 /**
   Return the Virtual Memory Map of your platform
 
@@ -45,7 +40,6 @@ ArmVirtGetMemoryMap (
   )
 {
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
-  UINT64                        TopOfMemory;
 
   ASSERT (VirtualMemoryMap != NULL);
 
@@ -78,23 +72,14 @@ ArmVirtGetMemoryMap (
   VirtualMemoryTable[1].Length       = VirtualMemoryTable[0].PhysicalBase;
   VirtualMemoryTable[1].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
 
-  // Peripheral space after DRAM
-  TopOfMemory = MIN (1ULL << FixedPcdGet8 (PcdPrePiCpuMemorySize),
-                     ArmGetPhysAddrTop ());
-  VirtualMemoryTable[2].PhysicalBase = VirtualMemoryTable[0].Length + VirtualMemoryTable[1].Length;
-  VirtualMemoryTable[2].VirtualBase  = VirtualMemoryTable[2].PhysicalBase;
-  VirtualMemoryTable[2].Length       = TopOfMemory -
-                                       VirtualMemoryTable[2].PhysicalBase;
-  VirtualMemoryTable[2].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
-
   // Remap the FD region as normal executable memory
-  VirtualMemoryTable[3].PhysicalBase = PcdGet64 (PcdFdBaseAddress);
-  VirtualMemoryTable[3].VirtualBase  = VirtualMemoryTable[3].PhysicalBase;
-  VirtualMemoryTable[3].Length       = FixedPcdGet32 (PcdFdSize);
-  VirtualMemoryTable[3].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
+  VirtualMemoryTable[2].PhysicalBase = PcdGet64 (PcdFdBaseAddress);
+  VirtualMemoryTable[2].VirtualBase  = VirtualMemoryTable[2].PhysicalBase;
+  VirtualMemoryTable[2].Length       = FixedPcdGet32 (PcdFdSize);
+  VirtualMemoryTable[2].Attributes   = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
 
   // End of Table
-  ZeroMem (&VirtualMemoryTable[4], sizeof (ARM_MEMORY_REGION_DESCRIPTOR));
+  ZeroMem (&VirtualMemoryTable[3], sizeof (ARM_MEMORY_REGION_DESCRIPTOR));
 
   *VirtualMemoryMap = VirtualMemoryTable;
 }
