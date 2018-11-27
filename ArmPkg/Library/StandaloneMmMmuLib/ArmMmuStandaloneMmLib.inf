@@ -22,7 +22,7 @@
   PI_SPECIFICATION_VERSION       = 0x00010032
 
 [Sources.AARCH64]
-  Aarch64/ArmMmuStandaloneMmLib.c
+  AArch64/ArmMmuStandaloneMmLib.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
