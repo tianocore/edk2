@@ -20,7 +20,7 @@
  * delegated events and request the Secure partition manager to perform
  * privileged operations on its behalf.
  */
-#define ARM_SVC_ID_SPM_VERSION_AARCH64             0xC4000060
+#define ARM_SVC_ID_SPM_VERSION_AARCH32             0x84000060
 #define ARM_SVC_ID_SP_EVENT_COMPLETE_AARCH64       0xC4000061
 #define ARM_SVC_ID_SP_GET_MEM_ATTRIBUTES_AARCH64   0xC4000064
 #define ARM_SVC_ID_SP_SET_MEM_ATTRIBUTES_AARCH64   0xC4000065
