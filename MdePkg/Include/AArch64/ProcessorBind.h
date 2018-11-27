@@ -138,9 +138,9 @@ typedef INT64   INTN;
 #define MAX_2_BITS  0xC000000000000000ULL
 
 ///
-/// Maximum legal AARCH64  address
+/// Maximum legal AARCH64  address (48 bits for 4 KB page size)
 ///
-#define MAX_ADDRESS   0xFFFFFFFFFFFFFFFFULL
+#define MAX_ADDRESS   0xFFFFFFFFFFFFULL
 
 ///
 /// Maximum legal AArch64 INTN and UINTN values.
