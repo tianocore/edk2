@@ -240,6 +240,9 @@
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0|UINT64|0x00000029
   gArmTokenSpaceGuid.PcdSystemMemorySize|0|UINT64|0x0000002A
 
+  gArmTokenSpaceGuid.PcdMmBufferBase|0|UINT64|0x00000045
+  gArmTokenSpaceGuid.PcdMmBufferSize|0|UINT64|0x00000046
+
 [PcdsFixedAtBuild.common, PcdsDynamic.common]
   #
   # ARM Architectural Timer
