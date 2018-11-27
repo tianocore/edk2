@@ -42,6 +42,7 @@
 [LibraryClasses]
   DebugLib
   DevicePathLib
+  DxeServicesTableLib
   MemoryAllocationLib
   PciPcdProducerLib
 

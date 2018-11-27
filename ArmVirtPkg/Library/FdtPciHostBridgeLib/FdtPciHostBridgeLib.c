@@ -17,6 +17,7 @@
 #include <Library/PciHostBridgeLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -81,6 +82,33 @@ typedef struct {
 #define DTB_PCI_HOST_RANGE_MMIO64       (BIT25 | BIT24)
 #define DTB_PCI_HOST_RANGE_IO           BIT24
 #define DTB_PCI_HOST_RANGE_TYPEMASK     (BIT31 | BIT30 | BIT29 | BIT25 | BIT24)
+
+STATIC
+EFI_STATUS
+MapGcdMmioSpace (
+  IN    UINT64    Base,
+  IN    UINT64    Size
+  )
+{
+  EFI_STATUS    Status;
+
+  Status = gDS->AddMemorySpace (EfiGcdMemoryTypeMemoryMappedIo, Base, Size,
+                  EFI_MEMORY_UC);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
+      "%a: failed to add GCD memory space for region [0x%Lx+0x%Lx)\n",
+      __FUNCTION__, Base, Size));
+    return Status;
+  }
+
+  Status = gDS->SetMemorySpaceAttributes (Base, Size, EFI_MEMORY_UC);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
+      "%a: failed to set memory space attributes for region [0x%Lx+0x%Lx)\n",
+      __FUNCTION__, Base, Size));
+  }
+  return Status;
+}
 
 STATIC
 EFI_STATUS
@@ -266,7 +294,23 @@ ProcessPciHost (
     "Io[0x%Lx+0x%Lx)@0x%Lx Mem32[0x%Lx+0x%Lx)@0x0 Mem64[0x%Lx+0x%Lx)@0x0\n",
     __FUNCTION__, ConfigBase, ConfigSize, *BusMin, *BusMax, *IoBase, *IoSize,
     IoTranslation, *Mmio32Base, *Mmio32Size, *Mmio64Base, *Mmio64Size));
-  return EFI_SUCCESS;
+
+  // Map the ECAM space in the GCD memory map
+  Status = MapGcdMmioSpace (ConfigBase, ConfigSize);
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Map the MMIO window that provides I/O access - the PCI host bridge code
+  // is not aware of this translation and so it will only map the I/O view
+  // in the GCD I/O map.
+  //
+  Status = MapGcdMmioSpace (*IoBase + IoTranslation, *IoSize);
+  ASSERT_EFI_ERROR (Status);
+
+  return Status;
 }
 
 STATIC PCI_ROOT_BRIDGE mRootBridge;
