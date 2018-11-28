@@ -138,7 +138,7 @@ T: git - https://github.com/tianocore/edk2-FatPkg.git
 
 FmpDevicePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/FmpDevicePkg
-M: Star Zeng <star.zeng@intel.com>
+M: Liming Gao <liming.gao@intel.com>
 M: Michael D Kinney <michael.d.kinney@intel.com>
 
 IntelFrameworkModulePkg
