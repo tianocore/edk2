@@ -229,7 +229,7 @@ class CapsulePayload(CapsuleData):
                        )
         if AuthData:
             Buffer += pack('QIHH', AuthData[0], AuthData[1], AuthData[2], AuthData[3])
-            Buffer += uuid.UUID(AuthData[4]).get_bytes_le()
+            Buffer += uuid.UUID(AuthData[4]).bytes_le
 
         #
         # Append file content to the structure
