@@ -8,6 +8,11 @@ In general, you should not privately email the maintainer. You should
 email the edk2-devel list, and Cc the package maintainers and
 reviewers.
 
+If the package maintainer wants to hand over the role to other people,
+the package maintainer should send the patch to update Maintainers.txt
+with new maintainer, and the new maintainer should follow up with
+an Acked-by or a Reviewed-by.
+
 Descriptions of section entries:
 
   L: Mailing list that is relevant to this area (default is edk2-devel)
