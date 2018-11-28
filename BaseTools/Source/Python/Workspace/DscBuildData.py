@@ -1676,7 +1676,7 @@ class DscBuildData(PlatformBuildClassObject):
             else:
                 PcdValueDict[PcdCName, TokenSpaceGuid] = {SkuName:(PcdValue, DatumType, MaxDatumSize)}
 
-        for ((PcdCName, TokenSpaceGuid), PcdSetting) in PcdValueDict.iteritems():
+        for ((PcdCName, TokenSpaceGuid), PcdSetting) in PcdValueDict.items():
             if self.SkuIdMgr.SystemSkuId in PcdSetting:
                 PcdValue, DatumType, MaxDatumSize = PcdSetting[self.SkuIdMgr.SystemSkuId]
             elif TAB_DEFAULT in PcdSetting:

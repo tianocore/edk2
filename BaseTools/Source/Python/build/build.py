@@ -2088,7 +2088,7 @@ class Build():
 
                     # Look through the tool definitions for GUIDed tools
                     guidAttribs = []
-                    for (attrib, value) in self.ToolDef.ToolsDefTxtDictionary.iteritems():
+                    for (attrib, value) in self.ToolDef.ToolsDefTxtDictionary.items():
                         if attrib.upper().endswith('_GUID'):
                             split = attrib.split('_')
                             thisPrefix = '_'.join(split[0:3]) + '_'
