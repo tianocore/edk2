@@ -175,13 +175,14 @@ M: Rangasai V Chaganty <rangasai.v.chaganty@intel.com>
 
 MdeModulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdeModulePkg
-M: Star Zeng <star.zeng@intel.com>
 M: Jian J Wang <jian.j.wang@intel.com>
+M: Hao Wu <hao.a.wu@intel.com>
 M: NetworkPkg maintainers
   (Universal/Network and related libraries, header files)
 R: Ruiyu Ni <ruiyu.ni@intel.com>
   (especially for Bus, Universal/Console, Universal/Disk,
    Universal/BdsDxe and related libraries, header files)
+R: Star Zeng <star.zeng@intel.com>
 
 MdePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/MdePkg
