@@ -1448,7 +1448,7 @@ def CheckPcdDatum(Type, Value):
 def CommonPath(PathList):
     P1 = min(PathList).split(os.path.sep)
     P2 = max(PathList).split(os.path.sep)
-    for Index in xrange(min(len(P1), len(P2))):
+    for Index in range(min(len(P1), len(P2))):
         if P1[Index] != P2[Index]:
             return os.path.sep.join(P1[:Index])
     return os.path.sep.join(P1)
