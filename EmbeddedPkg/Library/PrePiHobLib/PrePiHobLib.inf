@@ -47,9 +47,6 @@
   gEfiHobMemoryAllocStackGuid
 
 [FixedPcd.common]
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuMemorySize
-  gEmbeddedTokenSpaceGuid.PcdPrePiCpuIoSize
-
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIReclaimMemory
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiACPIMemoryNVS
   gEmbeddedTokenSpaceGuid.PcdMemoryTypeEfiReservedMemoryType

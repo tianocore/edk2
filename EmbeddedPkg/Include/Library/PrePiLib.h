@@ -275,24 +275,6 @@ HobConstructor (
   );
 
 /**
-  Retrieves the magic value from the PE/COFF header.
-
-  @param  Hdr             The buffer in which to return the PE32, PE32+, or TE header.
-
-  @return EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC - Image is PE32
-  @return EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC - Image is PE32+
-
-**/
-VOID
-CreateHobList (
-  IN VOID   *MemoryBegin,
-  IN UINTN  MemoryLength,
-  IN VOID   *HobBase,
-  IN VOID   *StackBase
-  );
-
-
-/**
   This service enables PEIMs to create various types of HOBs.
 
   @param  Type                  The type of HOB to be installed.

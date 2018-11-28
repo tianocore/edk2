@@ -175,47 +175,6 @@ BuildResourceDescriptorHob (
   Hob->ResourceLength    = NumberOfBytes;
 }
 
-/**
-
-
-**/
-VOID
-CreateHobList (
-  IN VOID   *MemoryBegin,
-  IN UINTN  MemoryLength,
-  IN VOID   *HobBase,
-  IN VOID   *StackBase
-  )
-{
-  EFI_HOB_HANDOFF_INFO_TABLE  *Hob;
-  EFI_RESOURCE_ATTRIBUTE_TYPE Attributes;
-
-  Hob = HobConstructor (MemoryBegin,MemoryLength,HobBase,StackBase);
-  SetHobList (Hob);
-
-  BuildCpuHob (PcdGet8 (PcdPrePiCpuMemorySize), PcdGet8 (PcdPrePiCpuIoSize));
-
-  Attributes =(
-    EFI_RESOURCE_ATTRIBUTE_PRESENT |
-    EFI_RESOURCE_ATTRIBUTE_INITIALIZED |
-    EFI_RESOURCE_ATTRIBUTE_TESTED |
-    EFI_RESOURCE_ATTRIBUTE_UNCACHEABLE |
-    EFI_RESOURCE_ATTRIBUTE_WRITE_COMBINEABLE |
-    EFI_RESOURCE_ATTRIBUTE_WRITE_THROUGH_CACHEABLE |
-    EFI_RESOURCE_ATTRIBUTE_WRITE_BACK_CACHEABLE
-  );
-
-  BuildResourceDescriptorHob (EFI_RESOURCE_SYSTEM_MEMORY, Attributes, (UINTN)MemoryBegin, MemoryLength);
-
-  BuildStackHob ((EFI_PHYSICAL_ADDRESS)(UINTN)StackBase, ((UINTN)MemoryBegin + MemoryLength) - (UINTN)StackBase);
-
-  if (FeaturePcdGet (PcdPrePiProduceMemoryTypeInformationHob)) {
-    // Optional feature that helps prevent EFI memory map fragmentation.
-    BuildMemoryTypeInformationHob ();
-  }
-}
-
-
 VOID
 EFIAPI
 BuildFvHobs (
