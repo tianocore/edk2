@@ -1261,9 +1261,9 @@
                                                                                                       "On TRUE, the string FPDT record will be used to store every performance entry.\n"
                                                                                                       "On FALSE, the different FPDT record will be used to store the different performance entries."
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVpdBaseAddress_PROMPT  #language en-US "64bit VPD base address"
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVpdBaseAddress64_PROMPT  #language en-US "64bit VPD base address"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVpdBaseAddress_HELP  #language en-US "VPD type PCD allows a developer to point to an absolute physical address PcdVpdBaseAddress64"
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVpdBaseAddress64_HELP  #language en-US "VPD type PCD allows a developer to point to an absolute physical address PcdVpdBaseAddress64"
                                                                                    "to store PCD value. It will be DynamicExDefault only."
                                                                                    "It is used to set VPD region base address. So, it can't be DynamicExVpd PCD. Its value is"
                                                                                    "required to be accessed in PcdDxe driver entry point. So, its value must be set in PEI phase."
