@@ -520,7 +520,7 @@ EisaIdFromText (
   return (((Text[0] - 'A' + 1) & 0x1f) << 10)
        + (((Text[1] - 'A' + 1) & 0x1f) <<  5)
        + (((Text[2] - 'A' + 1) & 0x1f) <<  0)
-       + (UINT32) (StrHexToUintn (&Text[3]) << 16)
+       + (UINT32) (StrHexToUint64 (&Text[3]) << 16)
        ;
 }
 
@@ -1506,7 +1506,7 @@ DevPathFromTextNVMe (
 
   Index = sizeof (Nvme->NamespaceUuid) / sizeof (UINT8);
   while (Index-- != 0) {
-    Uuid[Index] = (UINT8) StrHexToUintn (SplitStr (&NamespaceUuidStr, L'-'));
+    Uuid[Index] = (UINT8) StrHexToUint64 (SplitStr (&NamespaceUuidStr, L'-'));
   }
 
   return (EFI_DEVICE_PATH_PROTOCOL *) Nvme;
