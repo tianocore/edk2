@@ -1785,7 +1785,7 @@ StrToIpv4Address (
 {
   RETURN_STATUS          Status;
   UINTN                  AddressIndex;
-  UINTN                  Uintn;
+  UINT64                 Uint64;
   EFI_IPv4_ADDRESS       LocalAddress;
   UINT8                  LocalPrefixLength;
   CHAR16                 *Pointer;
@@ -1812,7 +1812,7 @@ StrToIpv4Address (
     //
     // Get D or P.
     //
-    Status = StrDecimalToUintnS ((CONST CHAR16 *) Pointer, &Pointer, &Uintn);
+    Status = StrDecimalToUint64S ((CONST CHAR16 *) Pointer, &Pointer, &Uint64);
     if (RETURN_ERROR (Status)) {
       return RETURN_UNSUPPORTED;
     }
@@ -1820,18 +1820,18 @@ StrToIpv4Address (
       //
       // It's P.
       //
-      if (Uintn > 32) {
+      if (Uint64 > 32) {
         return RETURN_UNSUPPORTED;
       }
-      LocalPrefixLength = (UINT8) Uintn;
+      LocalPrefixLength = (UINT8) Uint64;
     } else {
       //
       // It's D.
       //
-      if (Uintn > MAX_UINT8) {
+      if (Uint64 > MAX_UINT8) {
         return RETURN_UNSUPPORTED;
       }
-      LocalAddress.Addr[AddressIndex] = (UINT8) Uintn;
+      LocalAddress.Addr[AddressIndex] = (UINT8) Uint64;
       AddressIndex++;
     }
 
@@ -1888,7 +1888,7 @@ StrToIpv6Address (
 {
   RETURN_STATUS          Status;
   UINTN                  AddressIndex;
-  UINTN                  Uintn;
+  UINT64                 Uint64;
   EFI_IPv6_ADDRESS       LocalAddress;
   UINT8                  LocalPrefixLength;
   CONST CHAR16           *Pointer;
@@ -1969,7 +1969,7 @@ StrToIpv6Address (
         //
         // Get X.
         //
-        Status = StrHexToUintnS (Pointer, &End, &Uintn);
+        Status = StrHexToUint64S (Pointer, &End, &Uint64);
         if (RETURN_ERROR (Status) || End - Pointer > 4) {
           //
           // Number of hexadecimal digit characters is no more than 4.
@@ -1978,24 +1978,24 @@ StrToIpv6Address (
         }
         Pointer = End;
         //
-        // Uintn won't exceed MAX_UINT16 if number of hexadecimal digit characters is no more than 4.
+        // Uint64 won't exceed MAX_UINT16 if number of hexadecimal digit characters is no more than 4.
         //
         ASSERT (AddressIndex + 1 < ARRAY_SIZE (Address->Addr));
-        LocalAddress.Addr[AddressIndex] = (UINT8) ((UINT16) Uintn >> 8);
-        LocalAddress.Addr[AddressIndex + 1] = (UINT8) Uintn;
+        LocalAddress.Addr[AddressIndex] = (UINT8) ((UINT16) Uint64 >> 8);
+        LocalAddress.Addr[AddressIndex + 1] = (UINT8) Uint64;
         AddressIndex += 2;
       } else {
         //
         // Get P, then exit the loop.
         //
-        Status = StrDecimalToUintnS (Pointer, &End, &Uintn);
-        if (RETURN_ERROR (Status) || End == Pointer || Uintn > 128) {
+        Status = StrDecimalToUint64S (Pointer, &End, &Uint64);
+        if (RETURN_ERROR (Status) || End == Pointer || Uint64 > 128) {
           //
           // Prefix length should not exceed 128.
           //
           return RETURN_UNSUPPORTED;
         }
-        LocalPrefixLength = (UINT8) Uintn;
+        LocalPrefixLength = (UINT8) Uint64;
         Pointer = End;
         break;
       }
