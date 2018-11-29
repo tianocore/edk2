@@ -62,7 +62,7 @@ IsDevicePathValid (
   ASSERT (DevicePath != NULL);
 
   if (MaxSize == 0) {
-    MaxSize = MAX_UINTN;
+    MaxSize = MAX_UINT32;
  }
 
   //
@@ -78,7 +78,7 @@ IsDevicePathValid (
       return FALSE;
     }
 
-    if (NodeLength > MAX_UINTN - Size) {
+    if (NodeLength > MAX_UINT32 - Size) {
       return FALSE;
     }
     Size += NodeLength;
