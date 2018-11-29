@@ -251,16 +251,6 @@ StrSize (
   CONST CHAR16              *String
   );
 
-UINTN
-StrHexToUintn (
-  CONST CHAR16              *String
-  );
-
-UINTN
-StrDecimalToUintn (
-  CONST CHAR16              *String
-  );
-
 UINT64
 StrHexToUint64 (
   CONST CHAR16             *String
@@ -279,24 +269,10 @@ StrHexToUint64S (
   );
 
 RETURN_STATUS
-StrHexToUintnS (
-    CONST CHAR16             *String,
-         CHAR16             **EndPointer,  OPTIONAL
-         UINTN              *Data
-  );
-
-RETURN_STATUS
 StrDecimalToUint64S (
     CONST CHAR16             *String,
          CHAR16             **EndPointer,  OPTIONAL
          UINT64             *Data
-  );
-
-RETURN_STATUS
-StrDecimalToUintnS (
-    CONST CHAR16             *String,
-         CHAR16             **EndPointer,  OPTIONAL
-         UINTN              *Data
   );
 
 VOID *

@@ -882,72 +882,6 @@ InternalSafeStringNoStrOverlap (
   return !InternalSafeStringIsOverlap (Str1, Size1 * sizeof(CHAR16), Str2, Size2 * sizeof(CHAR16));
 }
 
-RETURN_STATUS
-StrDecimalToUintnS (
-    CONST CHAR16             *String,
-         CHAR16             **EndPointer,  OPTIONAL
-         UINTN              *Data
-  )
-{
-  ASSERT (((UINTN) String & BIT0) == 0);
-
-  //
-  // 1. Neither String nor Data shall be a null pointer.
-  //
-  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
-  SAFE_STRING_CONSTRAINT_CHECK ((Data != NULL), RETURN_INVALID_PARAMETER);
-
-  //
-  // 2. The length of String shall not be greater than RSIZE_MAX.
-  //
-  if (RSIZE_MAX != 0) {
-    SAFE_STRING_CONSTRAINT_CHECK ((StrnLenS (String, RSIZE_MAX + 1) <= RSIZE_MAX), RETURN_INVALID_PARAMETER);
-  }
-
-  if (EndPointer != NULL) {
-    *EndPointer = (CHAR16 *) String;
-  }
-
-  //
-  // Ignore the pad spaces (space or tab)
-  //
-  while ((*String == L' ') || (*String == L'\t')) {
-    String++;
-  }
-
-  //
-  // Ignore leading Zeros after the spaces
-  //
-  while (*String == L'0') {
-    String++;
-  }
-
-  *Data = 0;
-
-  while (InternalIsDecimalDigitCharacter (*String)) {
-    //
-    // If the number represented by String overflows according to the range
-    // defined by UINTN, then MAX_UINTN is stored in *Data and
-    // RETURN_UNSUPPORTED is returned.
-    //
-    if (*Data > ((MAX_UINTN - (*String - L'0')) / 10)) {
-      *Data = MAX_UINTN;
-      if (EndPointer != NULL) {
-        *EndPointer = (CHAR16 *) String;
-      }
-      return RETURN_UNSUPPORTED;
-    }
-
-    *Data = *Data * 10 + (*String - L'0');
-    String++;
-  }
-
-  if (EndPointer != NULL) {
-    *EndPointer = (CHAR16 *) String;
-  }
-  return RETURN_SUCCESS;
-}
-
 /**
   Convert a Null-terminated Unicode decimal string to a value of type UINT64.
 
@@ -1064,9 +998,9 @@ StrDecimalToUint64S (
 
 /**
   Convert a Null-terminated Unicode hexadecimal string to a value of type
-  UINTN.
+  UINT64.
 
-  This function outputs a value of type UINTN by interpreting the contents of
+  This function outputs a value of type UINT64 by interpreting the contents of
   the Unicode string specified by String as a hexadecimal number. The format of
   the input Unicode string String is:
 
@@ -1091,8 +1025,8 @@ StrDecimalToUint64S (
 
   If String has no valid hexadecimal digits in the above format, then 0 is
   stored at the location pointed to by Data.
-  If the number represented by String exceeds the range defined by UINTN, then
-  MAX_UINTN is stored at the location pointed to by Data.
+  If the number represented by String exceeds the range defined by UINT64, then
+  MAX_UINT64 is stored at the location pointed to by Data.
 
   If EndPointer is not NULL, a pointer to the character that stopped the scan
   is stored at the location pointed to by EndPointer. If String has no valid
@@ -1112,85 +1046,9 @@ StrDecimalToUint64S (
                                    characters, not including the
                                    Null-terminator.
   @retval RETURN_UNSUPPORTED       If the number represented by String exceeds
-                                   the range defined by UINTN.
+                                   the range defined by UINT64.
 
 **/
-RETURN_STATUS
-StrHexToUintnS (
-    CONST CHAR16             *String,
-         CHAR16             **EndPointer,  OPTIONAL
-         UINTN              *Data
-  )
-{
-  ASSERT (((UINTN) String & BIT0) == 0);
-
-  //
-  // 1. Neither String nor Data shall be a null pointer.
-  //
-  SAFE_STRING_CONSTRAINT_CHECK ((String != NULL), RETURN_INVALID_PARAMETER);
-  SAFE_STRING_CONSTRAINT_CHECK ((Data != NULL), RETURN_INVALID_PARAMETER);
-
-  //
-  // 2. The length of String shall not be greater than RSIZE_MAX.
-  //
-  if (RSIZE_MAX != 0) {
-    SAFE_STRING_CONSTRAINT_CHECK ((StrnLenS (String, RSIZE_MAX + 1) <= RSIZE_MAX), RETURN_INVALID_PARAMETER);
-  }
-
-  if (EndPointer != NULL) {
-    *EndPointer = (CHAR16 *) String;
-  }
-
-  //
-  // Ignore the pad spaces (space or tab)
-  //
-  while ((*String == L' ') || (*String == L'\t')) {
-    String++;
-  }
-
-  //
-  // Ignore leading Zeros after the spaces
-  //
-  while (*String == L'0') {
-    String++;
-  }
-
-  if (InternalCharToUpper (*String) == L'X') {
-    if (*(String - 1) != L'0') {
-      *Data = 0;
-      return RETURN_SUCCESS;
-    }
-    //
-    // Skip the 'X'
-    //
-    String++;
-  }
-
-  *Data = 0;
-
-  while (InternalIsHexaDecimalDigitCharacter (*String)) {
-    //
-    // If the number represented by String overflows according to the range
-    // defined by UINTN, then MAX_UINTN is stored in *Data and
-    // RETURN_UNSUPPORTED is returned.
-    //
-    if (*Data > ((MAX_UINTN - InternalHexCharToUintn (*String)) >> 4)) {
-      *Data = MAX_UINTN;
-      if (EndPointer != NULL) {
-        *EndPointer = (CHAR16 *) String;
-      }
-      return RETURN_UNSUPPORTED;
-    }
-
-    *Data = (*Data << 4) + InternalHexCharToUintn (*String);
-    String++;
-  }
-
-  if (EndPointer != NULL) {
-    *EndPointer = (CHAR16 *) String;
-  }
-  return RETURN_SUCCESS;
-}
 RETURN_STATUS
 StrHexToUint64S (
     CONST CHAR16             *String,
@@ -1288,28 +1146,6 @@ StrHexToUint64 (
   UINT64    Result;
 
   StrHexToUint64S (String, (CHAR16 **) NULL, &Result);
-  return Result;
-}
-
-UINTN
-StrDecimalToUintn (
-  CONST CHAR16              *String
-  )
-{
-  UINTN     Result;
-
-  StrDecimalToUintnS (String, (CHAR16 **) NULL, &Result);
-  return Result;
-}
-
-UINTN
-StrHexToUintn (
-  CONST CHAR16              *String
-  )
-{
-  UINTN     Result;
-
-  StrHexToUintnS (String, (CHAR16 **) NULL, &Result);
   return Result;
 }
 
