@@ -84,8 +84,9 @@ R: Julien Grall <julien.grall@linaro.org>
 
 BaseTools
 W: https://github.com/tianocore/tianocore.github.io/wiki/BaseTools
-M: Yonghong Zhu <yonghong.zhu@intel.com>
+M: Bob Feng <bob.c.feng@intel.com>
 M: Liming Gao <liming.gao@intel.com>
+R: Yonghong Zhu <yonghong.zhu@intel.com>
 
 BeagleBoardPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/BeagleBoardPkg
