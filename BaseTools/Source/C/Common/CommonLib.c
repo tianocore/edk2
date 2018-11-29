@@ -2252,9 +2252,9 @@ Strtoi (
   )
 {
   if (IsHexStr (Str)) {
-    return StrHexToUintn (Str);
+    return (UINTN)StrHexToUint64 (Str);
   } else {
-    return StrDecimalToUintn (Str);
+    return (UINTN)StrDecimalToUint64 (Str);
   }
 }
 
