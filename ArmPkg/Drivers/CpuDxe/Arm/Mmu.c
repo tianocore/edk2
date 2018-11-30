@@ -457,6 +457,9 @@ GetMemoryRegion (
 
   // Get the section at the given index
   SectionDescriptor = FirstLevelTable[TableIndex];
+  if (!SectionDescriptor) {
+    return EFI_NOT_FOUND;
+  }
 
   // If 'BaseAddress' belongs to the section then round it to the section boundary
   if (((SectionDescriptor & TT_DESCRIPTOR_SECTION_TYPE_MASK) == TT_DESCRIPTOR_SECTION_TYPE_SECTION) ||
