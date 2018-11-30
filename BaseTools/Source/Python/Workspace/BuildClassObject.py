@@ -355,7 +355,7 @@ class StructurePcd(PcdClassObject):
         new_pcd.ValueChain = {item for item in self.ValueChain}
         return new_pcd
 
-LibraryClassObject = namedtuple('LibraryClassObject', ['LibraryClass','SupModList'], verbose=False)
+LibraryClassObject = namedtuple('LibraryClassObject', ['LibraryClass','SupModList'])
 
 ## ModuleBuildClassObject
 #
