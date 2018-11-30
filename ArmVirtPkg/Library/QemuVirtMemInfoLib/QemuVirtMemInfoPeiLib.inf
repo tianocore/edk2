@@ -43,9 +43,11 @@
 
 [Pcd]
   gArmTokenSpaceGuid.PcdFdBaseAddress
+  gArmTokenSpaceGuid.PcdFvBaseAddress
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdFdSize
+  gArmTokenSpaceGuid.PcdFvSize
   gArmVirtTokenSpaceGuid.PcdDeviceTreeInitialBaseAddress
