@@ -18,20 +18,16 @@ LIBRARIES = Common
 APPLICATIONS = \
   VfrCompile \
   BrotliCompress \
-  EfiLdrImage \
   EfiRom \
-  GenBootSector \
   GenCrc32 \
   GenFfs \
   GenFv \
   GenFw \
-  GenPage \
   GenSec \
   LzmaCompress \
   Split \
   TianoCompress \
   VolInfo \
-  BootSectImage \
   DevicePath
 
 all: libs apps install
