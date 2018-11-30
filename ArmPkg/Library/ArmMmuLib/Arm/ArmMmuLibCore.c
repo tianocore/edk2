@@ -695,8 +695,12 @@ UpdateSectionEntries (
     } else {
       // still a section entry
 
-      // mask off appropriate fields
-      Descriptor = CurrentDescriptor & ~EntryMask;
+      if (CurrentDescriptor != 0) {
+        // mask off appropriate fields
+        Descriptor = CurrentDescriptor & ~EntryMask;
+      } else {
+        Descriptor = ((UINTN)FirstLevelIdx + i) << TT_DESCRIPTOR_SECTION_BASE_SHIFT;
+      }
 
       // mask in new attributes and/or permissions
       Descriptor |= EntryValue;
