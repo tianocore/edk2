@@ -81,7 +81,6 @@
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInstanceGuid                    ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmInitializationPolicy            ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdTpmScrtmPolicy                     ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported             ## CONSUMES
   gEfiSecurityPkgTokenSpaceGuid.PcdStatusCodeSubClassTpmDevice        ## SOMETIMES_CONSUMES
 
 [Depex]

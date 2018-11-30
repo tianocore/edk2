@@ -71,10 +71,17 @@ EFI_PEI_PPI_DESCRIPTOR  mTpmInitializationDonePpiList = {
   NULL
 };
 
+//
+// Number of firmware blobs to grow by each time we run out of room
+//
+#define FIRMWARE_BLOB_GROWTH_STEP 4
+
 EFI_PLATFORM_FIRMWARE_BLOB *mMeasuredBaseFvInfo;
+UINT32 mMeasuredMaxBaseFvIndex = 0;
 UINT32 mMeasuredBaseFvIndex = 0;
 
 EFI_PLATFORM_FIRMWARE_BLOB *mMeasuredChildFvInfo;
+UINT32 mMeasuredMaxChildFvIndex = 0;
 UINT32 mMeasuredChildFvIndex = 0;
 
 /**
@@ -615,12 +622,19 @@ MeasureFvImage (
   //
   // Add new FV into the measured FV list.
   //
-  ASSERT (mMeasuredBaseFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported));
-  if (mMeasuredBaseFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported)) {
-    mMeasuredBaseFvInfo[mMeasuredBaseFvIndex].BlobBase   = FvBase;
-    mMeasuredBaseFvInfo[mMeasuredBaseFvIndex].BlobLength = FvLength;
-    mMeasuredBaseFvIndex++;
+  if (mMeasuredBaseFvIndex >= mMeasuredMaxBaseFvIndex) {
+    mMeasuredBaseFvInfo = ReallocatePool (
+                            sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * mMeasuredMaxBaseFvIndex,
+                            sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredMaxBaseFvIndex + FIRMWARE_BLOB_GROWTH_STEP),
+                            mMeasuredBaseFvInfo
+                            );
+    ASSERT (mMeasuredBaseFvInfo != NULL);
+    mMeasuredMaxBaseFvIndex = mMeasuredMaxBaseFvIndex + FIRMWARE_BLOB_GROWTH_STEP;
   }
+
+  mMeasuredBaseFvInfo[mMeasuredBaseFvIndex].BlobBase   = FvBase;
+  mMeasuredBaseFvInfo[mMeasuredBaseFvIndex].BlobLength = FvLength;
+  mMeasuredBaseFvIndex++;
 
   return Status;
 }
@@ -724,20 +738,26 @@ FirmwareVolmeInfoPpiNotifyCallback (
   //
   if (Fv->ParentFvName != NULL || Fv->ParentFileName != NULL ) {
 
-    ASSERT (mMeasuredChildFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported));
-    if (mMeasuredChildFvIndex < PcdGet32 (PcdPeiCoreMaxFvSupported)) {
-      //
-      // Check whether FV is in the measured child FV list.
-      //
-      for (Index = 0; Index < mMeasuredChildFvIndex; Index++) {
-        if (mMeasuredChildFvInfo[Index].BlobBase == (EFI_PHYSICAL_ADDRESS) (UINTN) Fv->FvInfo) {
-          return EFI_SUCCESS;
-        }
-      }
-      mMeasuredChildFvInfo[mMeasuredChildFvIndex].BlobBase   = (EFI_PHYSICAL_ADDRESS) (UINTN) Fv->FvInfo;
-      mMeasuredChildFvInfo[mMeasuredChildFvIndex].BlobLength = Fv->FvInfoSize;
-      mMeasuredChildFvIndex++;
+    if (mMeasuredChildFvIndex >= mMeasuredMaxChildFvIndex) {
+      mMeasuredChildFvInfo = ReallocatePool (
+                               sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * mMeasuredMaxChildFvIndex,
+                               sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * (mMeasuredMaxChildFvIndex + FIRMWARE_BLOB_GROWTH_STEP),
+                               mMeasuredChildFvInfo
+                               );
+      ASSERT (mMeasuredChildFvInfo != NULL);
+      mMeasuredMaxChildFvIndex = mMeasuredMaxChildFvIndex + FIRMWARE_BLOB_GROWTH_STEP;
     }
+    //
+    // Check whether FV is in the measured child FV list.
+    //
+    for (Index = 0; Index < mMeasuredChildFvIndex; Index++) {
+      if (mMeasuredChildFvInfo[Index].BlobBase == (EFI_PHYSICAL_ADDRESS) (UINTN) Fv->FvInfo) {
+        return EFI_SUCCESS;
+      }
+    }
+    mMeasuredChildFvInfo[mMeasuredChildFvIndex].BlobBase   = (EFI_PHYSICAL_ADDRESS) (UINTN) Fv->FvInfo;
+    mMeasuredChildFvInfo[mMeasuredChildFvIndex].BlobLength = Fv->FvInfoSize;
+    mMeasuredChildFvIndex++;
     return EFI_SUCCESS;
   }
 
@@ -760,11 +780,6 @@ PeimEntryMP (
   )
 {
   EFI_STATUS                        Status;
-
-  mMeasuredBaseFvInfo  = (EFI_PLATFORM_FIRMWARE_BLOB *) AllocateZeroPool (sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * PcdGet32 (PcdPeiCoreMaxFvSupported));
-  ASSERT (mMeasuredBaseFvInfo != NULL);
-  mMeasuredChildFvInfo = (EFI_PLATFORM_FIRMWARE_BLOB *) AllocateZeroPool (sizeof (EFI_PLATFORM_FIRMWARE_BLOB) * PcdGet32 (PcdPeiCoreMaxFvSupported));
-  ASSERT (mMeasuredChildFvInfo != NULL);
 
   if (PcdGet8 (PcdTpm2ScrtmPolicy) == 1) {
     Status = MeasureCRTMVersion ();
