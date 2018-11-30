@@ -75,13 +75,22 @@ NorFlashPlatformGetDevices (
       Size = SwapBytes64 (ReadUnaligned64 ((VOID *)&Reg[2]));
       Reg += 4;
 
+      PropSize -= 4 * sizeof (UINT32);
+
+      //
+      // Disregard any flash devices that overlap with the primary FV.
+      // The firmware is not updatable from inside the guest anyway.
+      //
+      if ((PcdGet64 (PcdFvBaseAddress) + PcdGet32 (PcdFvSize) > Base) &&
+          (Base + Size) > PcdGet64 (PcdFvBaseAddress)) {
+        continue;
+      }
+
       mNorFlashDevices[Num].DeviceBaseAddress = (UINTN)Base;
       mNorFlashDevices[Num].RegionBaseAddress = (UINTN)Base;
       mNorFlashDevices[Num].Size              = (UINTN)Size;
       mNorFlashDevices[Num].BlockSize         = QEMU_NOR_BLOCK_SIZE;
       Num++;
-
-      PropSize -= 4 * sizeof (UINT32);
     }
   }
 
