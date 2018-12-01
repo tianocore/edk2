@@ -24,6 +24,7 @@ CHAR16 *mBarTypeStr[] = {
   L"PMem32",
   L" Mem64",
   L"PMem64",
+  L" OpRom",
   L"    Io",
   L"   Mem",
   L"Unknow"
@@ -425,14 +426,8 @@ PciHostBridgeResourceAllocator (
   PCI_RESOURCE_NODE                              PMem32Pool;
   PCI_RESOURCE_NODE                              Mem64Pool;
   PCI_RESOURCE_NODE                              PMem64Pool;
-  BOOLEAN                                        ReAllocate;
   EFI_DEVICE_HANDLE_EXTENDED_DATA_PAYLOAD        HandleExtendedData;
   EFI_RESOURCE_ALLOC_FAILURE_ERROR_DATA_PAYLOAD  AllocFailExtendedData;
-
-  //
-  // Reallocate flag
-  //
-  ReAllocate = FALSE;
 
   //
   // It may try several times if the resource allocation fails
@@ -515,6 +510,17 @@ PciHostBridgeResourceAllocator (
                        );
 
       //
+      // Get the max ROM size that the root bridge can process
+      // Insert to resource map so that there will be dedicate MEM32 resource range for Option ROM.
+      // All devices' Option ROM share the same MEM32 resource.
+      //
+      MaxOptionRomSize = GetMaxOptionRomSize (RootBridgeDev);
+      RootBridgeDev->PciBar[0].BarType   = PciBarTypeOpRom;
+      RootBridgeDev->PciBar[0].Length    = MaxOptionRomSize;
+      RootBridgeDev->PciBar[0].Alignment = MaxOptionRomSize - 1;
+      GetResourceFromDevice (RootBridgeDev, IoBridge, Mem32Bridge, PMem32Bridge, Mem64Bridge, PMem64Bridge);
+
+      //
       // Create resourcemap by going through all the devices subject to this root bridge
       //
       CreateResourceMap (
@@ -525,38 +531,6 @@ PciHostBridgeResourceAllocator (
         Mem64Bridge,
         PMem64Bridge
         );
-
-      //
-      // Get the max ROM size that the root bridge can process
-      //
-      RootBridgeDev->RomSize = Mem32Bridge->Length;
-
-      //
-      // Skip to enlarge the resource request during realloction
-      //
-      if (!ReAllocate) {
-        //
-        // Get Max Option Rom size for current root bridge
-        //
-        MaxOptionRomSize = GetMaxOptionRomSize (RootBridgeDev);
-
-        //
-        // Enlarger the mem32 resource to accomdate the option rom
-        // if the mem32 resource is not enough to hold the rom
-        //
-        if (MaxOptionRomSize > Mem32Bridge->Length) {
-
-          Mem32Bridge->Length     = MaxOptionRomSize;
-          RootBridgeDev->RomSize  = MaxOptionRomSize;
-
-          //
-          // Alignment should be adjusted as well
-          //
-          if (Mem32Bridge->Alignment < MaxOptionRomSize - 1) {
-            Mem32Bridge->Alignment = MaxOptionRomSize - 1;
-          }
-        }
-      }
 
       //
       // Based on the all the resource tree, construct ACPI resource node to
@@ -760,8 +734,6 @@ PciHostBridgeResourceAllocator (
       if (EFI_ERROR (Status)) {
         return Status;
       }
-
-      ReAllocate = TRUE;
     }
   }
   //
@@ -829,11 +801,6 @@ PciHostBridgeResourceAllocator (
       );
 
     //
-    // Process option rom for this root bridge
-    //
-    ProcessOptionRom (RootBridgeDev, Mem32Base, RootBridgeDev->RomSize);
-
-    //
     // Create the entire system resource map from the information collected by
     // enumerator. Several resource tree was created
     //
@@ -888,6 +855,20 @@ PciHostBridgeResourceAllocator (
       PMem64Base,
       PMem64Bridge
       );
+
+    //
+    // Process Option ROM for this root bridge after all BARs are programmed.
+    // The PPB's MEM32 RANGE BAR is re-programmed to the Option ROM BAR Base in order to
+    // shadow the Option ROM of the devices under the PPB.
+    // After the shadow, Option ROM BAR decoding is turned off and the PPB's MEM32 RANGE
+    // BAR is restored back to the original value.
+    // The original value is programmed by ProgramResource() above.
+    //
+    DEBUG ((
+      DEBUG_INFO, "Process Option ROM: BAR Base/Length = %lx/%lx\n",
+      RootBridgeDev->PciBar[0].BaseAddress, RootBridgeDev->PciBar[0].Length
+      ));
+    ProcessOptionRom (RootBridgeDev, RootBridgeDev->PciBar[0].BaseAddress, RootBridgeDev->PciBar[0].Length);
 
     IoBridge    ->PciDev->PciBar[IoBridge    ->Bar].BaseAddress = IoBase;
     Mem32Bridge ->PciDev->PciBar[Mem32Bridge ->Bar].BaseAddress = Mem32Base;

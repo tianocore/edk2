@@ -446,13 +446,14 @@ GetResourceFromDevice (
     switch ((PciDev->PciBar)[Index].BarType) {
 
     case PciBarTypeMem32:
+    case PciBarTypeOpRom:
 
       Node = CreateResourceNode (
               PciDev,
               (PciDev->PciBar)[Index].Length,
               (PciDev->PciBar)[Index].Alignment,
               Index,
-              PciBarTypeMem32,
+              (PciDev->PciBar)[Index].BarType,
               PciResUsageTypical
               );
 
@@ -1307,7 +1308,13 @@ ProgramBar (
                  1,
                  &Address
                  );
+  //
+  // Continue to the case PciBarTypeOpRom to set the BaseAddress.
+  // PciBarTypeOpRom is a virtual BAR only in root bridge, to capture
+  // the MEM32 resource requirement for Option ROM shadow.
+  //
 
+  case PciBarTypeOpRom:
     Node->PciDev->PciBar[Node->Bar].BaseAddress = Address;
 
     break;
@@ -1656,6 +1663,8 @@ ProgrameUpstreamBridgeForRom (
 {
   PCI_IO_DEVICE     *Parent;
   PCI_RESOURCE_NODE Node;
+  UINT64            Base;
+  UINT64            Length;
   //
   // For root bridge, just return.
   //
@@ -1667,7 +1676,6 @@ ProgrameUpstreamBridgeForRom (
     }
 
     Node.PciDev     = Parent;
-    Node.Length     = PciDevice->RomSize;
     Node.Alignment  = 0;
     Node.Bar        = PPB_MEM32_RANGE;
     Node.ResType    = PciBarTypeMem32;
@@ -1677,10 +1685,33 @@ ProgrameUpstreamBridgeForRom (
     // Program PPB to only open a single <= 16MB apperture
     //
     if (Enable) {
+      //
+      // Save the original PPB_MEM32_RANGE BAR.
+      // The values will be changed by ProgramPpbApperture().
+      //
+      Base   = Parent->PciBar[Node.Bar].BaseAddress;
+      Length = Parent->PciBar[Node.Bar].Length;
+
+      //
+      // Only cover MMIO for Option ROM.
+      //
+      Node.Length     = PciDevice->RomSize;
       ProgramPpbApperture (OptionRomBase, &Node);
+
+      //
+      // Restore the original PPB_MEM32_RANGE BAR.
+      // So the MEM32 RANGE BAR register can be restored when disable the decoding.
+      //
+      Parent->PciBar[Node.Bar].BaseAddress = Base;
+      Parent->PciBar[Node.Bar].Length      = Length;
+
       PCI_ENABLE_COMMAND_REGISTER (Parent, EFI_PCI_COMMAND_MEMORY_SPACE);
     } else {
-      InitializePpb (Parent);
+      //
+      // Cover 32bit MMIO for devices below the bridge.
+      //
+      Node.Length     = Parent->PciBar[Node.Bar].Length;
+      ProgramPpbApperture (Parent->PciBar[Node.Bar].BaseAddress, &Node);
       PCI_DISABLE_COMMAND_REGISTER (Parent, EFI_PCI_COMMAND_MEMORY_SPACE);
     }
 

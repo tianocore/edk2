@@ -583,23 +583,10 @@ RomDecode (
   )
 {
   UINT32              Value32;
-  UINT32              Offset;
-  UINT32              OffsetMax;
   EFI_PCI_IO_PROTOCOL *PciIo;
 
   PciIo = &PciDevice->PciIo;
   if (Enable) {
-    //
-    // Clear all bars
-    //
-    OffsetMax = 0x24;
-    if (IS_PCI_BRIDGE(&PciDevice->Pci)) {
-      OffsetMax = 0x14;
-    }
-
-    for (Offset = 0x10; Offset <= OffsetMax; Offset += sizeof (UINT32)) {
-      PciIo->Pci.Write (PciIo, EfiPciIoWidthUint32, Offset, 1, &gAllZero);
-    }
 
     //
     // set the Rom base address: now is hardcode
