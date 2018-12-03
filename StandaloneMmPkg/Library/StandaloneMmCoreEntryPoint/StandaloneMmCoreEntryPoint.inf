@@ -45,7 +45,7 @@
   DebugLib
 
 [LibraryClasses.AARCH64]
-  ArmMmuLib
+  StandaloneMmMmuLib
   ArmSvcLib
 
 [Guids]
