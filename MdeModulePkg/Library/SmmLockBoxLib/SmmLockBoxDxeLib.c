@@ -1,6 +1,6 @@
 /** @file
 
-Copyright (c) 2010 - 2018, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
 
 This program and the accompanying materials
 are licensed and made available under the terms and conditions
@@ -153,7 +153,7 @@ SaveLockBox (
   UINT8                           *CommBuffer;
   UINTN                           CommSize;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxDxeLib SaveLockBox - Enter\n"));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxDxeLib SaveLockBox - Enter\n"));
 
   //
   // Basic check
@@ -199,7 +199,7 @@ SaveLockBox (
 
   Status = (EFI_STATUS)LockBoxParameterSave->Header.ReturnStatus;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxDxeLib SaveLockBox - Exit (%r)\n", Status));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxDxeLib SaveLockBox - Exit (%r)\n", Status));
 
   //
   // Done
@@ -235,7 +235,7 @@ SetLockBoxAttributes (
   UINT8                                     *CommBuffer;
   UINTN                                     CommSize;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxDxeLib SetLockBoxAttributes - Enter\n"));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxDxeLib SetLockBoxAttributes - Enter\n"));
 
   //
   // Basic check
@@ -281,7 +281,7 @@ SetLockBoxAttributes (
 
   Status = (EFI_STATUS)LockBoxParameterSetAttributes->Header.ReturnStatus;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxDxeLib SetLockBoxAttributes - Exit (%r)\n", Status));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxDxeLib SetLockBoxAttributes - Exit (%r)\n", Status));
 
   //
   // Done
@@ -322,7 +322,7 @@ UpdateLockBox (
   UINT8                             *CommBuffer;
   UINTN                             CommSize;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxDxeLib UpdateLockBox - Enter\n"));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxDxeLib UpdateLockBox - Enter\n"));
 
   //
   // Basic check
@@ -369,7 +369,7 @@ UpdateLockBox (
 
   Status = (EFI_STATUS)LockBoxParameterUpdate->Header.ReturnStatus;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxDxeLib UpdateLockBox - Exit (%r)\n", Status));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxDxeLib UpdateLockBox - Exit (%r)\n", Status));
 
   //
   // Done
@@ -411,7 +411,7 @@ RestoreLockBox (
   UINT8                              *CommBuffer;
   UINTN                              CommSize;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxDxeLib RestoreLockBox - Enter\n"));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxDxeLib RestoreLockBox - Enter\n"));
 
   //
   // Basic check
@@ -467,7 +467,7 @@ RestoreLockBox (
 
   Status = (EFI_STATUS)LockBoxParameterRestore->Header.ReturnStatus;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxDxeLib RestoreLockBox - Exit (%r)\n", Status));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxDxeLib RestoreLockBox - Exit (%r)\n", Status));
 
   //
   // Done
@@ -496,7 +496,7 @@ RestoreAllLockBoxInPlace (
   UINT8                                           *CommBuffer;
   UINTN                                           CommSize;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxDxeLib RestoreAllLockBoxInPlace - Enter\n"));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxDxeLib RestoreAllLockBoxInPlace - Enter\n"));
 
   SmmCommunication = LockBoxGetSmmCommProtocol ();
   if (SmmCommunication == NULL) {
@@ -532,7 +532,7 @@ RestoreAllLockBoxInPlace (
 
   Status = (EFI_STATUS)LockBoxParameterRestoreAllInPlace->Header.ReturnStatus;
 
-  DEBUG ((EFI_D_INFO, "SmmLockBoxDxeLib RestoreAllLockBoxInPlace - Exit (%r)\n", Status));
+  DEBUG ((DEBUG_INFO, "SmmLockBoxDxeLib RestoreAllLockBoxInPlace - Exit (%r)\n", Status));
 
   //
   // Done
