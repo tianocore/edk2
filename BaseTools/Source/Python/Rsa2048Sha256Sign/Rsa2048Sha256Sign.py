@@ -163,9 +163,9 @@ if __name__ == '__main__':
   if args.MonotonicCountStr:
     try:
       if args.MonotonicCountStr.upper().startswith('0X'):
-        args.MonotonicCountValue = (long)(args.MonotonicCountStr, 16)
+        args.MonotonicCountValue = int(args.MonotonicCountStr, 16)
       else:
-        args.MonotonicCountValue = (long)(args.MonotonicCountStr)
+        args.MonotonicCountValue = int(args.MonotonicCountStr)
     except:
         pass
 

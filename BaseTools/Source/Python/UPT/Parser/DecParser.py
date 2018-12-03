@@ -620,11 +620,11 @@ class _DecPcd(_DecBase):
         if not IsValidToken(PCD_TOKEN_PATTERN, Token):
             self._LoggerError(ST.ERR_DECPARSE_PCD_TOKEN % Token)
         elif not Token.startswith('0x') and not Token.startswith('0X'):
-            if long(Token) > 4294967295:
+            if int(Token) > 4294967295:
                 self._LoggerError(ST.ERR_DECPARSE_PCD_TOKEN_INT % Token)
-            Token = hex(long(Token))[:-1]
+            Token = hex(int(Token))[:-1]
 
-        IntToken = long(Token, 0)
+        IntToken = int(Token, 0)
         if (Guid, IntToken) in self.TokenMap:
             if self.TokenMap[Guid, IntToken] != CName:
                 self._LoggerError(ST.ERR_DECPARSE_PCD_TOKEN_UNIQUE%(Token))

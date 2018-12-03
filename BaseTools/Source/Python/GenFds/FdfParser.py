@@ -1562,7 +1562,7 @@ class FdfParser:
                 self.SetPcdLocalation(pcdPair)
                 FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
                 self.Profile.PcdFileLineDict[pcdPair] = FileLineTuple
-            Obj.Size = long(Size, 0)
+            Obj.Size = int(Size, 0)
             return True
 
         if self._IsKeyword("ErasePolarity"):
@@ -1597,7 +1597,7 @@ class FdfParser:
             if not self._GetNextDecimalNumber() and not self._GetNextHexNumber():
                 raise Warning.Expected("address", self.FileName, self.CurrentLineNumber)
 
-            BsAddress = long(self._Token, 0)
+            BsAddress = int(self._Token, 0)
             Obj.BsBaseAddress = BsAddress
 
         if self._IsKeyword("RtBaseAddress"):
@@ -1607,7 +1607,7 @@ class FdfParser:
             if not self._GetNextDecimalNumber() and not self._GetNextHexNumber():
                 raise Warning.Expected("address", self.FileName, self.CurrentLineNumber)
 
-            RtAddress = long(self._Token, 0)
+            RtAddress = int(self._Token, 0)
             Obj.RtBaseAddress = RtAddress
 
     ## _GetBlockStatements() method
@@ -1655,7 +1655,7 @@ class FdfParser:
             self.SetPcdLocalation(PcdPair)
             FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
             self.Profile.PcdFileLineDict[PcdPair] = FileLineTuple
-        BlockSize = long(BlockSize, 0)
+        BlockSize = int(BlockSize, 0)
 
         BlockNumber = None
         if self._IsKeyword("NumBlocks"):
@@ -1665,7 +1665,7 @@ class FdfParser:
             if not self._GetNextDecimalNumber() and not self._GetNextHexNumber():
                 raise Warning.Expected("block numbers", self.FileName, self.CurrentLineNumber)
 
-            BlockNumber = long(self._Token, 0)
+            BlockNumber = int(self._Token, 0)
 
         Obj.BlockSizeList.append((BlockSize, BlockNumber, BlockSizePcd))
         return True
@@ -1774,7 +1774,7 @@ class FdfParser:
             Expr += CurCh
             self._GetOneChar()
         try:
-            return long(
+            return int(
                 ValueExpression(Expr,
                                 self._CollectMacroPcd()
                                 )(True), 0)
@@ -1822,7 +1822,7 @@ class FdfParser:
                            RegionOffsetPcdPattern.match(self._CurrentLine()[self.CurrentOffsetWithinLine:]))
             if IsRegionPcd:
                 RegionObj.PcdOffset = self._GetNextPcdSettings()
-                self.Profile.PcdDict[RegionObj.PcdOffset] = "0x%08X" % (RegionObj.Offset + long(theFd.BaseAddress, 0))
+                self.Profile.PcdDict[RegionObj.PcdOffset] = "0x%08X" % (RegionObj.Offset + int(theFd.BaseAddress, 0))
                 self.SetPcdLocalation(RegionObj.PcdOffset)
                 self._PcdDict['%s.%s' % (RegionObj.PcdOffset[1], RegionObj.PcdOffset[0])] = "0x%x" % RegionObj.Offset
                 FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
@@ -3134,9 +3134,9 @@ class FdfParser:
                     if FdfParser._Verify(Name, Value, 'UINT64'):
                         FmpData.MonotonicCount = Value
                         if FmpData.MonotonicCount.upper().startswith('0X'):
-                            FmpData.MonotonicCount = (long)(FmpData.MonotonicCount, 16)
+                            FmpData.MonotonicCount = int(FmpData.MonotonicCount, 16)
                         else:
-                            FmpData.MonotonicCount = (long)(FmpData.MonotonicCount)
+                            FmpData.MonotonicCount = int(FmpData.MonotonicCount)
             if not self._GetNextToken():
                 break
         else:

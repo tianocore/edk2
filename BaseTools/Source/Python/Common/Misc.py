@@ -1313,7 +1313,7 @@ def CheckPcdDatum(Type, Value):
         if Value and int(Value, 0) < 0:
             return False, "PCD can't be set to negative value[%s] for datum type [%s]" % (Value, Type)
         try:
-            Value = long(Value, 0)
+            Value = int(Value, 0)
             if Value > MAX_VAL_TYPE[Type]:
                 return False, "Too large PCD value[%s] for datum type [%s]" % (Value, Type)
         except:
