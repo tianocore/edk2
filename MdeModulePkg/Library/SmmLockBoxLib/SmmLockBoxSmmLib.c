@@ -604,7 +604,10 @@ SetLockBoxAttributes (
   @retval RETURN_SUCCESS            the information is saved successfully.
   @retval RETURN_INVALID_PARAMETER  the Guid is NULL, or Buffer is NULL, or Length is 0.
   @retval RETURN_NOT_FOUND          the requested GUID not found.
-  @retval RETURN_BUFFER_TOO_SMALL   the original buffer to too small to hold new information.
+  @retval RETURN_BUFFER_TOO_SMALL   for lockbox without attribute LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY,
+                                    the original buffer to too small to hold new information.
+  @retval RETURN_OUT_OF_RESOURCES   for lockbox with attribute LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY,
+                                    no enough resource to save the information.
   @retval RETURN_ACCESS_DENIED      it is too late to invoke this interface
   @retval RETURN_NOT_STARTED        it is too early to invoke this interface
   @retval RETURN_UNSUPPORTED        the service is not supported by implementaion.
@@ -619,13 +622,16 @@ UpdateLockBox (
   )
 {
   SMM_LOCK_BOX_DATA             *LockBox;
+  EFI_PHYSICAL_ADDRESS          SmramBuffer;
+  EFI_STATUS                    Status;
 
   DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib UpdateLockBox - Enter\n"));
 
   //
   // Basic check
   //
-  if ((Guid == NULL) || (Buffer == NULL) || (Length == 0)) {
+  if ((Guid == NULL) || (Buffer == NULL) || (Length == 0) ||
+      (Length > MAX_UINTN - Offset)) {
     DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib UpdateLockBox - Exit (%r)\n", EFI_INVALID_PARAMETER));
     return EFI_INVALID_PARAMETER;
   }
@@ -643,8 +649,66 @@ UpdateLockBox (
   // Update data
   //
   if (LockBox->Length < Offset + Length) {
-    DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib UpdateLockBox - Exit (%r)\n", EFI_BUFFER_TOO_SMALL));
-    return EFI_BUFFER_TOO_SMALL;
+    if ((LockBox->Attributes & LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY) != 0) {
+      //
+      // If 'LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY' attribute is set, enlarge the
+      // LockBox.
+      //
+      DEBUG ((
+        DEBUG_INFO,
+        "SmmLockBoxSmmLib UpdateLockBox - Origin LockBox too small, enlarge.\n"
+        ));
+
+      if (EFI_PAGES_TO_SIZE (EFI_SIZE_TO_PAGES ((UINTN)LockBox->Length)) < Offset + Length) {
+        //
+        // In SaveLockBox(), the SMRAM buffer allocated for LockBox is of page
+        // granularity. Here, if the required size is larger than the origin size
+        // of the pages, allocate new buffer from SMRAM to enlarge the LockBox.
+        //
+        DEBUG ((
+          DEBUG_INFO,
+          "SmmLockBoxSmmLib UpdateLockBox - Allocate new buffer to enlarge.\n"
+          ));
+        Status = gSmst->SmmAllocatePages (
+                          AllocateAnyPages,
+                          EfiRuntimeServicesData,
+                          EFI_SIZE_TO_PAGES (Offset + Length),
+                          &SmramBuffer
+                          );
+        if (EFI_ERROR (Status)) {
+          DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib UpdateLockBox - Exit (%r)\n", EFI_OUT_OF_RESOURCES));
+          return EFI_OUT_OF_RESOURCES;
+        }
+
+        //
+        // Copy origin data to the new SMRAM buffer and wipe the content in the
+        // origin SMRAM buffer.
+        //
+        CopyMem ((VOID *)(UINTN)SmramBuffer, (VOID *)(UINTN)LockBox->SmramBuffer, (UINTN)LockBox->Length);
+        ZeroMem ((VOID *)(UINTN)LockBox->SmramBuffer, (UINTN)LockBox->Length);
+        gSmst->SmmFreePages (LockBox->SmramBuffer, EFI_SIZE_TO_PAGES ((UINTN)LockBox->Length));
+
+        LockBox->SmramBuffer = SmramBuffer;
+      }
+
+      //
+      // Handle uninitialized content in the LockBox.
+      //
+      if (Offset > LockBox->Length) {
+        ZeroMem (
+          (VOID *)((UINTN)LockBox->SmramBuffer + (UINTN)LockBox->Length),
+          Offset - (UINTN)LockBox->Length
+          );
+      }
+      LockBox->Length = Offset + Length;
+    } else {
+      //
+      // If 'LOCK_BOX_ATTRIBUTE_RESTORE_IN_S3_ONLY' attribute is NOT set, return
+      // EFI_BUFFER_TOO_SMALL directly.
+      //
+      DEBUG ((DEBUG_INFO, "SmmLockBoxSmmLib UpdateLockBox - Exit (%r)\n", EFI_BUFFER_TOO_SMALL));
+      return EFI_BUFFER_TOO_SMALL;
+    }
   }
   ASSERT ((UINTN)LockBox->SmramBuffer <= (MAX_ADDRESS - Offset));
   CopyMem ((VOID *)((UINTN)LockBox->SmramBuffer + Offset), Buffer, Length);
