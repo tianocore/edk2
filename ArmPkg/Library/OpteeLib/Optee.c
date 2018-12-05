@@ -123,6 +123,17 @@ OpteeInit (
   return EFI_SUCCESS;
 }
 
+STATIC
+BOOLEAN
+IsOpteeSmcReturnRpc (
+  UINT32 Return
+  )
+{
+  return (Return != OPTEE_SMC_RETURN_UNKNOWN_FUNCTION) &&
+         ((Return & OPTEE_SMC_RETURN_RPC_PREFIX_MASK) ==
+          OPTEE_SMC_RETURN_RPC_PREFIX);
+}
+
 /**
   Does Standard SMC to OP-TEE in secure world.
 
@@ -147,13 +158,22 @@ OpteeCallWithArg (
   while (TRUE) {
     ArmCallSmc (&ArmSmcArgs);
 
-    if (ArmSmcArgs.Arg0 == OPTEE_SMC_RETURN_RPC_FOREIGN_INTERRUPT) {
-      //
-      // A foreign interrupt was raised while secure world was
-      // executing, since they are handled in UEFI a dummy RPC is
-      // performed to let UEFI take the interrupt through the normal
-      // vector.
-      //
+    if (IsOpteeSmcReturnRpc (ArmSmcArgs.Arg0)) {
+      switch (ArmSmcArgs.Arg0) {
+      case OPTEE_SMC_RETURN_RPC_FOREIGN_INTERRUPT:
+        //
+        // A foreign interrupt was raised while secure world was
+        // executing, since they are handled in UEFI a dummy RPC is
+        // performed to let UEFI take the interrupt through the normal
+        // vector.
+        //
+        break;
+
+      default:
+         // Do nothing in case RPC is not implemented.
+        break;
+      }
+
       ArmSmcArgs.Arg0 = OPTEE_SMC_RETURN_FROM_RPC;
     } else {
       break;
