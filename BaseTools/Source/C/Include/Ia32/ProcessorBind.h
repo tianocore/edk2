@@ -132,11 +132,6 @@ typedef INT32   INTN;
 #define MAX_2_BITS  0xC0000000
 
 //
-// Maximum legal IA-32 address
-//
-#define MAX_ADDRESS   0xFFFFFFFF
-
-//
 // Modifier to ensure that all protocol member functions and EFI intrinsics
 // use the correct C calling convention. All protocol member functions and
 // EFI intrinsics are required to modify their member functions with EFIAPI.

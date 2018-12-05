@@ -170,6 +170,5 @@ typedef union {
 
 
 #define EFI_MAX_BIT               MAX_BIT
-#define EFI_MAX_ADDRESS           MAX_ADDRESS
 
 #endif

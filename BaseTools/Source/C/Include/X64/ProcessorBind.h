@@ -151,11 +151,6 @@ typedef INT64   INTN;
 #define MAX_2_BITS  0xC000000000000000ULL
 
 //
-// Maximum legal Itanium-based address
-//
-#define MAX_ADDRESS   0xFFFFFFFFFFFFFFFFULL
-
-//
 // Modifier to ensure that all protocol member functions and EFI intrinsics
 // use the correct C calling convention. All protocol member functions and
 // EFI intrinsics are required to modify thier member functions with EFIAPI.

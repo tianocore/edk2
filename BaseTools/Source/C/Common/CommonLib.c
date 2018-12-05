@@ -1236,7 +1236,6 @@ InternalAllocateCopyPool (
   VOID  *Memory;
 
   ASSERT (Buffer != NULL);
-  ASSERT (AllocationSize <= (MAX_ADDRESS - (UINTN) Buffer + 1));
 
   Memory = malloc (AllocationSize);
   if (Memory != NULL) {

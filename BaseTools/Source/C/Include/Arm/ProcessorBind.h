@@ -89,11 +89,6 @@ typedef INT32   INTN;
 #define MAX_2_BITS   0xC0000000
 
 ///
-/// Maximum legal ARM address
-///
-#define MAX_ADDRESS  0xFFFFFFFF
-
-///
 /// The stack alignment required for ARM
 ///
 #define CPU_STACK_ALIGNMENT  sizeof(UINT64)

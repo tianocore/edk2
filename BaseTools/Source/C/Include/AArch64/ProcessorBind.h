@@ -91,11 +91,6 @@ typedef INT64   INTN;
 #define MAX_2_BITS   0xC000000000000000
 
 ///
-/// Maximum legal AARCH64  address
-///
-#define MAX_ADDRESS  0xFFFFFFFFFFFFFFFF
-
-///
 /// The stack alignment required for AARCH64
 ///
 #define CPU_STACK_ALIGNMENT  16
