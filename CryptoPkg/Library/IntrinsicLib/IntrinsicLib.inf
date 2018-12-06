@@ -51,6 +51,7 @@
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
+  BaseLib
   BaseMemoryLib
 
 [BuildOptions]
