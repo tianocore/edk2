@@ -27,7 +27,6 @@ import time
 import platform
 import traceback
 import encodings.ascii
-import itertools
 import multiprocessing
 
 from struct import *
@@ -1102,9 +1101,8 @@ class Build():
                 f = open(PrebuildEnvFile)
                 envs = f.readlines()
                 f.close()
-                envs = itertools.imap(lambda l: l.split('=', 1), envs)
-                envs = itertools.ifilter(lambda l: len(l) == 2, envs)
-                envs = itertools.imap(lambda l: [i.strip() for i in l], envs)
+                envs = [l.split("=", 1) for l in envs ]
+                envs = [[I.strip() for I in item] for item in envs if len(item) == 2]
                 os.environ.update(dict(envs))
             EdkLogger.info("\n- Prebuild Done -\n")
 
