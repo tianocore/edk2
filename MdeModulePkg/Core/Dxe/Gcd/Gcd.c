@@ -2284,7 +2284,7 @@ CoreInitializeMemoryServices (
     // region that is big enough to initialize the DXE core.  Always skip the PHIT Resource HOB.
     // The max address must be within the physically addressible range for the processor.
     //
-    HighAddress = MAX_ADDRESS;
+    HighAddress = MAX_ALLOC_ADDRESS;
     for (Hob.Raw = *HobStart; !END_OF_HOB_LIST(Hob); Hob.Raw = GET_NEXT_HOB(Hob)) {
       //
       // Skip the Resource Descriptor HOB that contains the PHIT
@@ -2300,7 +2300,7 @@ CoreInitializeMemoryServices (
       }
 
       //
-      // Skip Resource Descriptor HOBs that do not describe tested system memory below MAX_ADDRESS
+      // Skip Resource Descriptor HOBs that do not describe tested system memory below MAX_ALLOC_ADDRESS
       //
       ResourceHob = Hob.ResourceDescriptor;
       if (ResourceHob->ResourceType != EFI_RESOURCE_SYSTEM_MEMORY) {
@@ -2309,14 +2309,14 @@ CoreInitializeMemoryServices (
       if ((ResourceHob->ResourceAttribute & MEMORY_ATTRIBUTE_MASK) != TESTED_MEMORY_ATTRIBUTES) {
         continue;
       }
-      if ((ResourceHob->PhysicalStart + ResourceHob->ResourceLength) > (EFI_PHYSICAL_ADDRESS)MAX_ADDRESS) {
+      if ((ResourceHob->PhysicalStart + ResourceHob->ResourceLength) > (EFI_PHYSICAL_ADDRESS)MAX_ALLOC_ADDRESS) {
         continue;
       }
 
       //
       // Skip Resource Descriptor HOBs that are below a previously found Resource Descriptor HOB
       //
-      if (HighAddress != (EFI_PHYSICAL_ADDRESS)MAX_ADDRESS && ResourceHob->PhysicalStart <= HighAddress) {
+      if (HighAddress != (EFI_PHYSICAL_ADDRESS)MAX_ALLOC_ADDRESS && ResourceHob->PhysicalStart <= HighAddress) {
         continue;
       }
 
