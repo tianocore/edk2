@@ -612,7 +612,7 @@ ArmConfigureMmu (
   // use of 4 KB pages.
   //
   MaxAddress = MIN (LShiftU64 (1ULL, ArmGetPhysicalAddressBits ()) - 1,
-                    MAX_ADDRESS);
+                    MAX_ALLOC_ADDRESS);
 
   // Lookup the Table Level to get the information
   LookupAddresstoRootTable (MaxAddress, &T0SZ, &RootTableEntryCount);
