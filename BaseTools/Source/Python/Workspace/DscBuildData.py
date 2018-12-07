@@ -2352,16 +2352,16 @@ class DscBuildData(PlatformBuildClassObject):
 
     def ParseCCFlags(self, ccflag):
         ccflags = set()
-        flag = ""
-        for ch in ccflag:
-            if ch in (r"/", "-"):
-                if flag.strip():
-                    ccflags.add(flag.strip())
-                flag = ch
-            else:
-                flag += ch
-        if flag.strip():
-            ccflags.add(flag.strip())
+        ccflaglist = ccflag.split(" ")
+        i = 0
+        while i < len(ccflaglist):
+            item = ccflaglist[i].strip()
+            if item in (r"/D", r"/U","-D","-U"):
+                ccflags.add(" ".join((ccflaglist[i],ccflaglist[i+1])))
+                i = i+1
+            elif item.startswith((r"/D", r"/U","-D","-U")):
+                ccflags.add(item)
+            i +=1
         return ccflags
     def GenerateByteArrayValue (self, StructuredPcds):
         #
@@ -2488,7 +2488,7 @@ class DscBuildData(PlatformBuildClassObject):
                     if 'COMMON' not in BuildOptions:
                         BuildOptions['COMMON'] = set()
                     if Arch == TAB_STAR:
-                        BuildOptions['COMMON'].add(self.BuildOptions[Options])
+                        BuildOptions['COMMON']|= self.ParseCCFlags(self.BuildOptions[Options])
                     if Arch in self.SupArchList:
                         if Arch not in BuildOptions:
                             BuildOptions[Arch] = set()
@@ -2502,7 +2502,7 @@ class DscBuildData(PlatformBuildClassObject):
                 CommonBuildOptions = reduce(lambda x,y: x&y, ArchBuildOptions.values())
                 BuildOptions['COMMON'] |= CommonBuildOptions
             ValueList = list(BuildOptions['COMMON'])
-            CC_FLAGS += " ".join([item for item in ValueList if item.startswith(('-D', '/D', '-U', '/U'))])
+            CC_FLAGS += " ".join(ValueList)
         MakeApp += CC_FLAGS
 
         if sys.platform == "win32":
