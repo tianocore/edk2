@@ -143,6 +143,11 @@ typedef INT64   INTN;
 #define MAX_ADDRESS   0xFFFFFFFFFFFFFFFFULL
 
 ///
+/// Maximum usable address at boot time (48 bits using 4 KB pages)
+///
+#define MAX_ALLOC_ADDRESS   0xFFFFFFFFFFFFULL
+
+///
 /// Maximum legal AArch64 INTN and UINTN values.
 ///
 #define MAX_INTN   ((INTN)0x7FFFFFFFFFFFFFFFULL)

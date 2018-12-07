@@ -104,6 +104,11 @@ typedef unsigned long         UINTN;
 #define MAX_ADDRESS   ((UINTN)(~0ULL >> (64 - sizeof (INTN) * 8)))
 
 ///
+/// Maximum usable address at boot time (48 bits using 4 KB pages)
+///
+#define MAX_ALLOC_ADDRESS   MAX_ADDRESS
+
+///
 /// Maximum legal EBC INTN and UINTN values.
 ///
 #define MAX_UINTN  ((UINTN)(~0ULL >> (64 - sizeof (INTN) * 8)))

@@ -247,6 +247,11 @@ typedef INT32   INTN;
 #define MAX_ADDRESS   0xFFFFFFFF
 
 ///
+/// Maximum usable address at boot time
+///
+#define MAX_ALLOC_ADDRESS   MAX_ADDRESS
+
+///
 /// Maximum legal IA-32 INTN and UINTN values.
 ///
 #define MAX_INTN   ((INTN)0x7FFFFFFF)
