@@ -75,18 +75,18 @@ MemoryPeim (
   SystemMemoryTop = PcdGet64 (PcdSystemMemoryBase) +
                     PcdGet64 (PcdSystemMemorySize);
 
-  if (SystemMemoryTop - 1 > MAX_ADDRESS) {
+  if (SystemMemoryTop - 1 > MAX_ALLOC_ADDRESS) {
     BuildResourceDescriptorHob (
         EFI_RESOURCE_SYSTEM_MEMORY,
         ResourceAttributes,
         PcdGet64 (PcdSystemMemoryBase),
-        (UINT64)MAX_ADDRESS - PcdGet64 (PcdSystemMemoryBase) + 1
+        (UINT64)MAX_ALLOC_ADDRESS - PcdGet64 (PcdSystemMemoryBase) + 1
         );
     BuildResourceDescriptorHob (
         EFI_RESOURCE_SYSTEM_MEMORY,
         ResourceAttributes,
-        (UINT64)MAX_ADDRESS + 1,
-        SystemMemoryTop - MAX_ADDRESS - 1
+        (UINT64)MAX_ALLOC_ADDRESS + 1,
+        SystemMemoryTop - MAX_ALLOC_ADDRESS - 1
         );
   } else {
     BuildResourceDescriptorHob (
