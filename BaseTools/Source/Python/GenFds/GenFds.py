@@ -751,7 +751,7 @@ class GenFds(object):
                                     F.read()
                                     length = F.tell()
                                     F.seek(4)
-                                    TmpStr = unpack('%dh' % ((length - 4) / 2), F.read())
+                                    TmpStr = unpack('%dh' % ((length - 4) // 2), F.read())
                                     Name = ''.join(chr(c) for c in TmpStr[:-1])
                         else:
                             FileList = []

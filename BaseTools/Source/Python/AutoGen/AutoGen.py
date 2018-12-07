@@ -3814,7 +3814,7 @@ class ModuleAutoGen(AutoGen):
                         Padding = '0x00, '
                         if Unicode:
                             Padding = Padding * 2
-                            ArraySize = ArraySize / 2
+                            ArraySize = ArraySize // 2
                         if ArraySize < (len(PcdValue) + 1):
                             if Pcd.MaxSizeUserSet:
                                 EdkLogger.error("build", AUTOGEN_ERROR,

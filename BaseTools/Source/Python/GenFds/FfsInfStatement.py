@@ -772,9 +772,9 @@ class FfsInfStatement(FfsInfStatementClassObject):
                     if ImageObj.SectionAlignment < 0x400:
                         self.Alignment = str (ImageObj.SectionAlignment)
                     elif ImageObj.SectionAlignment < 0x100000:
-                        self.Alignment = str (ImageObj.SectionAlignment / 0x400) + 'K'
+                        self.Alignment = str (ImageObj.SectionAlignment // 0x400) + 'K'
                     else:
-                        self.Alignment = str (ImageObj.SectionAlignment / 0x100000) + 'M'
+                        self.Alignment = str (ImageObj.SectionAlignment // 0x100000) + 'M'
 
                 if not NoStrip:
                     FileBeforeStrip = os.path.join(self.OutputPath, ModuleName + '.reloc')
@@ -814,9 +814,9 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 if ImageObj.SectionAlignment < 0x400:
                     self.Alignment = str (ImageObj.SectionAlignment)
                 elif ImageObj.SectionAlignment < 0x100000:
-                    self.Alignment = str (ImageObj.SectionAlignment / 0x400) + 'K'
+                    self.Alignment = str (ImageObj.SectionAlignment // 0x400) + 'K'
                 else:
-                    self.Alignment = str (ImageObj.SectionAlignment / 0x100000) + 'M'
+                    self.Alignment = str (ImageObj.SectionAlignment // 0x100000) + 'M'
 
             if not NoStrip:
                 FileBeforeStrip = os.path.join(self.OutputPath, ModuleName + '.reloc')

@@ -248,9 +248,9 @@ class EfiSection (EfiSectionClassObject):
                         if ImageObj.SectionAlignment < 0x400:
                             Align = str (ImageObj.SectionAlignment)
                         elif ImageObj.SectionAlignment < 0x100000:
-                            Align = str (ImageObj.SectionAlignment / 0x400) + 'K'
+                            Align = str (ImageObj.SectionAlignment // 0x400) + 'K'
                         else:
-                            Align = str (ImageObj.SectionAlignment / 0x100000) + 'M'
+                            Align = str (ImageObj.SectionAlignment // 0x100000) + 'M'
 
                     if File[(len(File)-4):] == '.efi':
                         MapFile = File.replace('.efi', '.map')

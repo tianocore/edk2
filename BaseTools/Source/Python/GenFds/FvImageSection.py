@@ -71,7 +71,7 @@ class FvImageSection(FvImageSectionClassObject):
                     # PI FvHeader is 0x48 byte
                     FvHeaderBuffer = FvFileObj.read(0x48)
                     # FV alignment position.
-                    FvAlignmentValue = 1 << (ord (FvHeaderBuffer[0x2E]) & 0x1F)
+                    FvAlignmentValue = 1 << (FvHeaderBuffer[0x2E] & 0x1F)
                     FvFileObj.close()
                 if FvAlignmentValue > MaxFvAlignment:
                     MaxFvAlignment = FvAlignmentValue
@@ -87,9 +87,9 @@ class FvImageSection(FvImageSectionClassObject):
                     if MaxFvAlignment >= 0x1000000:
                         self.Alignment = "16M"
                     else:
-                        self.Alignment = str(MaxFvAlignment / 0x100000) + "M"
+                        self.Alignment = str(MaxFvAlignment // 0x100000) + "M"
                 else:
-                    self.Alignment = str (MaxFvAlignment / 0x400) + "K"
+                    self.Alignment = str (MaxFvAlignment // 0x400) + "K"
             else:
                 # MaxFvAlignment is less than 1K
                 self.Alignment = str (MaxFvAlignment)
@@ -129,9 +129,9 @@ class FvImageSection(FvImageSectionClassObject):
                                 if FvAlignmentValue >= 0x1000000:
                                     self.Alignment = "16M"
                                 else:
-                                    self.Alignment = str(FvAlignmentValue / 0x100000) + "M"
+                                    self.Alignment = str(FvAlignmentValue // 0x100000) + "M"
                             else:
-                                self.Alignment = str (FvAlignmentValue / 0x400) + "K"
+                                self.Alignment = str (FvAlignmentValue // 0x400) + "K"
                         else:
                             # FvAlignmentValue is less than 1K
                             self.Alignment = str (FvAlignmentValue)
