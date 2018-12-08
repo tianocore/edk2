@@ -51,6 +51,8 @@ typedef struct {
   EFI_DEVICE_PATH_PROTOCOL       End;
 } HII_VENDOR_DEVICE_PATH;
 
+#pragma pack()
+
 typedef struct {
   EFI_HANDLE                        DeviceHandle;
   EFI_DEVICE_PATH_PROTOCOL          *DevicePath;
@@ -99,8 +101,6 @@ typedef struct {
 } FILE_EXPLORER_CALLBACK_DATA;
 
 #define FILE_EXPLORER_PRIVATE_FROM_THIS(a)  CR (a, FILE_EXPLORER_CALLBACK_DATA, FeConfigAccess, FILE_EXPLORER_CALLBACK_DATA_SIGNATURE)
-
-#pragma pack()
 
 extern UINT8    FileExplorerVfrBin[];
 
