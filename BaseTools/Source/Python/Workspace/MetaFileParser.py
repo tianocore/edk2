@@ -1203,7 +1203,7 @@ class DscParser(MetaFileParser):
                 return
         TokenList = GetSplitValueList(self._CurrentLine, TAB_VALUE_SPLIT, 1)
         self._CurrentPcdName = TokenList[0]
-        if TokenList[1].strip().startswith("{CODE"):
+        if len(TokenList) == 2 and TokenList[1].strip().startswith("{CODE"):
             self._PcdDataTypeCODE = True
             self._PcdCodeValue = TokenList[1].strip()
 

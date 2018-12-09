@@ -291,7 +291,7 @@ class StructurePcd(PcdClassObject):
         if DimensionAttr not in self.SkuOverrideValues[SkuName][DefaultStoreName]:
             self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr] = collections.OrderedDict()
         if FieldName in self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr]:
-            del self.SkuOverrideValues[SkuName][DefaultStoreName][FieldName][DimensionAttr]
+            del self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr][FieldName]
         self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr][FieldName] = [Value.strip(), FileName, LineNo]
         return self.SkuOverrideValues[SkuName][DefaultStoreName][DimensionAttr][FieldName]
 
