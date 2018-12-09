@@ -177,8 +177,8 @@ class VpdInfoFile:
             Found = False
 
             if (TokenSpaceName, PcdTokenName) not in self._VpdInfo:
-                self._VpdInfo[(TokenSpaceName, PcdTokenName)] = []
-            self._VpdInfo[(TokenSpaceName, PcdTokenName)].append((SkuId, Offset, Value))
+                self._VpdInfo[(TokenSpaceName, PcdTokenName)] = {}
+            self._VpdInfo[(TokenSpaceName, PcdTokenName)][(SkuId, Offset)] = Value
             for VpdObject in self._VpdArray:
                 VpdObjectTokenCName = VpdObject.TokenCName
                 for PcdItem in GlobalData.MixedPcd:
@@ -219,7 +219,7 @@ class VpdInfoFile:
         return self._VpdArray[vpd]
     def GetVpdInfo(self, arg):
         (PcdTokenName, TokenSpaceName) = arg
-        return self._VpdInfo.get((TokenSpaceName, PcdTokenName))
+        return [(sku,offset,value) for (sku,offset),value in self._VpdInfo.get((TokenSpaceName, PcdTokenName)).items()]
 
 ## Call external BPDG tool to process VPD file
 #
