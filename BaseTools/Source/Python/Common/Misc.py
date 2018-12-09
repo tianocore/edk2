@@ -2139,6 +2139,8 @@ def PackByteFormatGUID(Guid):
 #
 def CopyDict(ori_dict):
     dict_type = ori_dict.__class__
+    if dict_type not in (dict,OrderedDict):
+        return ori_dict
     new_dict = dict_type()
     for key in ori_dict:
         if isinstance(ori_dict[key],(dict,OrderedDict)):

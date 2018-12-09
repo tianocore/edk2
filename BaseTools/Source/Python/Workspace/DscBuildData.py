@@ -974,7 +974,7 @@ class DscBuildData(PlatformBuildClassObject):
                 if TAB_DEFAULT_STORES_DEFAULT not in skuobj.DefaultStoreDict:
                     PcdDefaultStoreSet = set(defaultstorename  for defaultstorename in skuobj.DefaultStoreDict)
                     mindefaultstorename = DefaultStoreMgr.GetMin(PcdDefaultStoreSet)
-                    skuobj.DefaultStoreDict[TAB_DEFAULT_STORES_DEFAULT] = CopyDict(skuobj.DefaultStoreDict[mindefaultstorename])
+                    skuobj.DefaultStoreDict[TAB_DEFAULT_STORES_DEFAULT] = skuobj.DefaultStoreDict[mindefaultstorename]
         return Pcds
 
     def RecoverCommandLinePcd(self):
@@ -2769,7 +2769,7 @@ class DscBuildData(PlatformBuildClassObject):
                     mindefaultstorename = DefaultStoreObj.GetMin(set(defaultstorename for defaultstorename in skuobj.DefaultStoreDict))
                     for defaultstorename in DefaultStores:
                         if defaultstorename not in skuobj.DefaultStoreDict:
-                            skuobj.DefaultStoreDict[defaultstorename] = CopyDict(skuobj.DefaultStoreDict[mindefaultstorename])
+                            skuobj.DefaultStoreDict[defaultstorename] = skuobj.DefaultStoreDict[mindefaultstorename]
                     skuobj.HiiDefaultValue = skuobj.DefaultStoreDict[mindefaultstorename]
             for skuname, skuid in SkuIds.items():
                 if skuname not in PcdObj.SkuInfoList:
