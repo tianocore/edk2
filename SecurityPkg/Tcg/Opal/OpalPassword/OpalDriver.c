@@ -425,6 +425,47 @@ BuildOpalDeviceInfo (
 }
 
 /**
+
+  Send BlockSid command if needed.
+
+**/
+VOID
+SendBlockSidCommand (
+  VOID
+  )
+{
+  OPAL_DRIVER_DEVICE                         *Itr;
+  TCG_RESULT                                 Result;
+  OPAL_SESSION                               Session;
+  UINT32                                     PpStorageFlag;
+
+  PpStorageFlag = Tcg2PhysicalPresenceLibGetManagementFlags ();
+  if ((PpStorageFlag & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_ENABLE_BLOCK_SID) != 0) {
+    //
+    // Send BlockSID command to each Opal disk
+    //
+    Itr = mOpalDriver.DeviceList;
+    while (Itr != NULL) {
+      if (Itr->OpalDisk.SupportedAttributes.BlockSid) {
+        ZeroMem(&Session, sizeof(Session));
+        Session.Sscp = Itr->OpalDisk.Sscp;
+        Session.MediaId = Itr->OpalDisk.MediaId;
+        Session.OpalBaseComId = Itr->OpalDisk.OpalBaseComId;
+
+        DEBUG ((DEBUG_INFO, "OpalPassword: EndOfDxe point, send BlockSid command to device!\n"));
+        Result = OpalBlockSid (&Session, TRUE);  // HardwareReset must always be TRUE
+        if (Result != TcgResultSuccess) {
+          DEBUG ((DEBUG_ERROR, "OpalBlockSid fail\n"));
+          break;
+        }
+      }
+
+      Itr = Itr->Next;
+    }
+  }
+}
+
+/**
   Notification function of EFI_END_OF_DXE_EVENT_GROUP_GUID event group.
 
   This is a notification function registered on EFI_END_OF_DXE_EVENT_GROUP_GUID event group.
@@ -474,6 +515,11 @@ OpalEndOfDxeEventNotify (
     ZeroMem (TmpDev->OpalDisk.Password, TmpDev->OpalDisk.PasswordLength);
     TmpDev = TmpDev->Next;
   }
+
+  //
+  // Send BlockSid command if needed.
+  //
+  SendBlockSidCommand ();
 
   DEBUG ((DEBUG_INFO, "%a() - exit\n", __FUNCTION__));
 
@@ -2263,53 +2309,6 @@ OpalDriverGetDeviceList(
 }
 
 /**
-  ReadyToBoot callback to send BlockSid command.
-
-  @param  Event   Pointer to this event
-  @param  Context Event handler private Data
-
-**/
-VOID
-EFIAPI
-ReadyToBootCallback (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
-  )
-{
-  OPAL_DRIVER_DEVICE                         *Itr;
-  TCG_RESULT                                 Result;
-  OPAL_SESSION                               Session;
-  UINT32                                     PpStorageFlag;
-
-  gBS->CloseEvent (Event);
-
-  PpStorageFlag = Tcg2PhysicalPresenceLibGetManagementFlags ();
-  if ((PpStorageFlag & TCG2_BIOS_STORAGE_MANAGEMENT_FLAG_ENABLE_BLOCK_SID) != 0) {
-    //
-    // Send BlockSID command to each Opal disk
-    //
-    Itr = mOpalDriver.DeviceList;
-    while (Itr != NULL) {
-      if (Itr->OpalDisk.SupportedAttributes.BlockSid) {
-        ZeroMem(&Session, sizeof(Session));
-        Session.Sscp = Itr->OpalDisk.Sscp;
-        Session.MediaId = Itr->OpalDisk.MediaId;
-        Session.OpalBaseComId = Itr->OpalDisk.OpalBaseComId;
-
-        DEBUG ((DEBUG_INFO, "OpalPassword: ReadyToBoot point, send BlockSid command to device!\n"));
-        Result = OpalBlockSid (&Session, TRUE);  // HardwareReset must always be TRUE
-        if (Result != TcgResultSuccess) {
-          DEBUG ((DEBUG_ERROR, "OpalBlockSid fail\n"));
-          break;
-        }
-      }
-
-      Itr = Itr->Next;
-    }
-  }
-}
-
-/**
   Stop this Controller.
 
   @param  Dev               The device need to be stopped.
@@ -2571,7 +2570,6 @@ EfiDriverEntryPoint(
   )
 {
   EFI_STATUS                     Status;
-  EFI_EVENT                      ReadyToBootEvent;
   EFI_EVENT                      EndOfDxeEvent;
 
   Status = EfiLibInstallDriverBindingComponentName2 (
@@ -2603,16 +2601,6 @@ EfiDriverEntryPoint(
                   &EndOfDxeEvent
                   );
   ASSERT_EFI_ERROR (Status);
-
-  //
-  // register a ReadyToBoot event callback for sending BlockSid command
-  //
-  Status = EfiCreateEventReadyToBootEx (
-                  TPL_CALLBACK,
-                  ReadyToBootCallback,
-                  (VOID *) &ImageHandle,
-                  &ReadyToBootEvent
-                  );
 
   //
   // Install Hii packages.
