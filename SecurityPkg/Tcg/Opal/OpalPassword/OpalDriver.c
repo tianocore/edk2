@@ -458,6 +458,11 @@ SendBlockSidCommand (
           DEBUG ((DEBUG_ERROR, "OpalBlockSid fail\n"));
           break;
         }
+
+        //
+        // Record BlockSID command has been sent.
+        //
+        Itr->OpalDisk.SentBlockSID = TRUE;
       }
 
       Itr = Itr->Next;
@@ -2203,6 +2208,12 @@ ProcessOpalRequest (
       if (TempVariable->OpalRequest.EnableFeature != 0) {
         ProcessOpalRequestEnableFeature (Dev, L"Enable Feature:");
       }
+
+      //
+      // Update Device ownership.
+      // Later BlockSID command may block the update.
+      //
+      OpalDiskUpdateOwnerShip (&Dev->OpalDisk);
 
       break;
     }

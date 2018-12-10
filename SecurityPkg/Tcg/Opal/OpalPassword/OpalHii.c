@@ -1216,6 +1216,40 @@ OpalDiskInitialize (
 }
 
 /**
+  Update the device ownship
+
+  @param OpalDisk                The Opal device.
+
+  @retval EFI_SUCESS             Get ownership success.
+  @retval EFI_ACCESS_DENIED      Has send BlockSID command, can't change ownership.
+  @retval EFI_INVALID_PARAMETER  Not get Msid info before get ownership info.
+
+**/
+EFI_STATUS
+OpalDiskUpdateOwnerShip (
+  OPAL_DISK        *OpalDisk
+  )
+{
+  OPAL_SESSION  Session;
+
+  if (OpalDisk->MsidLength == 0) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (OpalDisk->SentBlockSID) {
+    return EFI_ACCESS_DENIED;
+  }
+
+  ZeroMem(&Session, sizeof(Session));
+  Session.Sscp = OpalDisk->Sscp;
+  Session.MediaId = OpalDisk->MediaId;
+  Session.OpalBaseComId = OpalDisk->OpalBaseComId;
+
+  OpalDisk->Owner = OpalUtilDetermineOwnership(&Session, OpalDisk->Msid, OpalDisk->MsidLength);
+  return EFI_SUCCESS;
+}
+
+/**
   Update the device info.
 
   @param OpalDisk                The Opal device.
@@ -1223,6 +1257,7 @@ OpalDiskInitialize (
   @retval EFI_SUCESS             Initialize the device success.
   @retval EFI_DEVICE_ERROR       Get info from device failed.
   @retval EFI_INVALID_PARAMETER  Not get Msid info before get ownership info.
+  @retval EFI_ACCESS_DENIED      Has send BlockSID command, can't change ownership.
 
 **/
 EFI_STATUS
@@ -1243,15 +1278,6 @@ OpalDiskUpdateStatus (
     return EFI_DEVICE_ERROR;
   }
 
-  if (OpalDisk->MsidLength == 0) {
-    return EFI_INVALID_PARAMETER;
-  } else {
-    //
-    // Base on the Msid info to get the ownership, so Msid info must get first.
-    //
-    OpalDisk->Owner = OpalUtilDetermineOwnership(&Session, OpalDisk->Msid, OpalDisk->MsidLength);
-  }
-
-  return EFI_SUCCESS;
+  return OpalDiskUpdateOwnerShip (OpalDisk);
 }
 

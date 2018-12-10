@@ -357,4 +357,19 @@ OpalDiskInitialize (
   IN OPAL_DRIVER_DEVICE          *Dev
   );
 
+/**
+  Update the device ownership
+
+  @param OpalDisk                The Opal device.
+
+  @retval EFI_SUCESS             Get ownership success.
+  @retval EFI_ACCESS_DENIED      Has send BlockSID command, can't change ownership.
+  @retval EFI_INVALID_PARAMETER  Not get Msid info before get ownership info.
+
+**/
+EFI_STATUS
+OpalDiskUpdateOwnerShip (
+  OPAL_DISK        *OpalDisk
+  );
+
 #endif // _HII_H_

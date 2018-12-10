@@ -143,6 +143,7 @@ typedef struct {
   UINT8                                           Password[OPAL_MAX_PASSWORD_SIZE];
 
   UINT32                                          EstimateTimeCost;
+  BOOLEAN                                         SentBlockSID;           // Check whether BlockSid command has been sent.
 } OPAL_DISK;
 
 //
