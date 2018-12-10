@@ -153,6 +153,7 @@ CPUID_CACHE_INFO_DESCRIPTION  mCpuidCacheInfoDescription[] = {
   { 0xEC , "Cache"    , "3rd-level cache: 24MByte, 24-way set associative, 64 byte line size" },
   { 0xF0 , "Prefetch" , "64-Byte prefetching" },
   { 0xF1 , "Prefetch" , "128-Byte prefetching" },
+  { 0xFE , "General"  , "CPUID leaf 2 does not report TLB descriptor information; use CPUID leaf 18H to query TLB and other address translation parameters." },
   { 0xFF , "General"  , "CPUID leaf 2 does not report cache descriptor information, use CPUID leaf 4 to query cache parameters" }
 };
 
@@ -557,6 +558,12 @@ CpuidThermalPowerManagement (
   PRINT_BIT_FIELD (Eax, HWP_Energy_Performance_Preference);
   PRINT_BIT_FIELD (Eax, HWP_Package_Level_Request);
   PRINT_BIT_FIELD (Eax, HDC);
+  PRINT_BIT_FIELD (Eax, TurboBoostMaxTechnology30);
+  PRINT_BIT_FIELD (Eax, HWPCapabilities);
+  PRINT_BIT_FIELD (Eax, HWPPECIOverride);
+  PRINT_BIT_FIELD (Eax, FlexibleHWP);
+  PRINT_BIT_FIELD (Eax, FastAccessMode);
+  PRINT_BIT_FIELD (Eax, IgnoringIdleLogicalProcessorHWPRequest);
   PRINT_BIT_FIELD (Ebx, InterruptThresholds);
   PRINT_BIT_FIELD (Ecx, HardwareCoordinationFeedback);
   PRINT_BIT_FIELD (Ecx, PerformanceEnergyBias);
@@ -574,6 +581,7 @@ CpuidStructuredExtendedFeatureFlags (
   UINT32                                       Eax;
   CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_EBX  Ebx;
   CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_ECX  Ecx;
+  CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS_EDX  Edx;
   UINT32                                       SubLeaf;
 
   if (CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS > gMaximumBasicFunction) {
@@ -589,11 +597,11 @@ CpuidStructuredExtendedFeatureFlags (
     AsmCpuidEx (
       CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS,
       SubLeaf,
-      NULL, &Ebx.Uint32, &Ecx.Uint32, NULL
+      NULL, &Ebx.Uint32, &Ecx.Uint32, &Edx.Uint32
       );
-    if (Ebx.Uint32 != 0 || Ecx.Uint32 != 0) {
+    if (Ebx.Uint32 != 0 || Ecx.Uint32 != 0 || Edx.Uint32 != 0) {
       Print (L"CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS (Leaf %08x, Sub-Leaf %08x)\n", CPUID_STRUCTURED_EXTENDED_FEATURE_FLAGS, SubLeaf);
-      Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax, Ebx.Uint32, Ecx.Uint32, 0);
+      Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax, Ebx.Uint32, Ecx.Uint32, Edx.Uint32);
       PRINT_BIT_FIELD (Ebx, FSGSBASE);
       PRINT_BIT_FIELD (Ebx, IA32_TSC_ADJUST);
       PRINT_BIT_FIELD (Ebx, SGX);
@@ -610,20 +618,39 @@ CpuidStructuredExtendedFeatureFlags (
       PRINT_BIT_FIELD (Ebx, DeprecateFpuCsDs);
       PRINT_BIT_FIELD (Ebx, MPX);
       PRINT_BIT_FIELD (Ebx, RDT_A);
+      PRINT_BIT_FIELD (Ebx, AVX512F);
+      PRINT_BIT_FIELD (Ebx, AVX512DQ);
       PRINT_BIT_FIELD (Ebx, RDSEED);
       PRINT_BIT_FIELD (Ebx, ADX);
       PRINT_BIT_FIELD (Ebx, SMAP);
+      PRINT_BIT_FIELD (Ebx, AVX512_IFMA);
       PRINT_BIT_FIELD (Ebx, CLFLUSHOPT);
       PRINT_BIT_FIELD (Ebx, CLWB);
       PRINT_BIT_FIELD (Ebx, IntelProcessorTrace);
+      PRINT_BIT_FIELD (Ebx, AVX512PF);
+      PRINT_BIT_FIELD (Ebx, AVX512ER);
+      PRINT_BIT_FIELD (Ebx, AVX512CD);
       PRINT_BIT_FIELD (Ebx, SHA);
+      PRINT_BIT_FIELD (Ebx, AVX512BW);
+      PRINT_BIT_FIELD (Ebx, AVX512VL);
+
       PRINT_BIT_FIELD (Ecx, PREFETCHWT1);
+      PRINT_BIT_FIELD (Ecx, AVX512_VBMI);
       PRINT_BIT_FIELD (Ecx, UMIP);
       PRINT_BIT_FIELD (Ecx, PKU);
       PRINT_BIT_FIELD (Ecx, OSPKE);
+      PRINT_BIT_FIELD (Ecx, AVX512_VPOPCNTDQ);
       PRINT_BIT_FIELD (Ecx, MAWAU);
       PRINT_BIT_FIELD (Ecx, RDPID);
       PRINT_BIT_FIELD (Ecx, SGX_LC);
+
+      PRINT_BIT_FIELD (Edx, AVX512_4VNNIW);
+      PRINT_BIT_FIELD (Edx, AVX512_4FMAPS);
+      PRINT_BIT_FIELD (Edx, EnumeratesSupportForIBRSAndIBPB);
+      PRINT_BIT_FIELD (Edx, EnumeratesSupportForSTIBP);
+      PRINT_BIT_FIELD (Edx, EnumeratesSupportForL1D_FLUSH);
+      PRINT_BIT_FIELD (Edx, EnumeratesSupportForCapability);
+      PRINT_BIT_FIELD (Edx, EnumeratesSupportForSSBD);
     }
   }
 }
@@ -681,6 +708,7 @@ CpuidArchitecturalPerformanceMonitoring (
   PRINT_BIT_FIELD (Ebx, AllBranchMispredictRetired);
   PRINT_BIT_FIELD (Edx, FixedFunctionPerformanceCounters);
   PRINT_BIT_FIELD (Edx, FixedFunctionPerformanceCounterWidth);
+  PRINT_BIT_FIELD (Edx, AnyThreadDeprecation);
 }
 
 /**
@@ -747,6 +775,7 @@ CpuidExtendedStateSubLeaf (
   PRINT_BIT_FIELD (Eax, XSAVES);
   PRINT_VALUE     (Ebx, EnabledSaveStateSize_XCR0_IA32_XSS);
   PRINT_BIT_FIELD (Ecx, XCR0);
+  PRINT_BIT_FIELD (Ecx, HWPState);
   PRINT_BIT_FIELD (Ecx, PT);
   PRINT_BIT_FIELD (Ecx, XCR0_1);
   PRINT_VALUE     (Edx, IA32_XSS_Supported_32_63);
@@ -814,6 +843,7 @@ CpuidExtendedStateMainLeaf (
   PRINT_BIT_FIELD (Eax, AVX_512);
   PRINT_BIT_FIELD (Eax, IA32_XSS);
   PRINT_BIT_FIELD (Eax, PKRU);
+  PRINT_BIT_FIELD (Eax, IA32_XSS_2);
   PRINT_VALUE     (Ebx, EnabledSaveStateSize);
   PRINT_VALUE     (Ecx, SupportedSaveStateSize);
   PRINT_VALUE     (Edx, XCR0_Supported_32_63);
@@ -879,6 +909,33 @@ CpuidIntelRdtMonitoringL3CacheCapabilitySubLeaf (
 }
 
 /**
+  Display CPUID_INTEL_RDT_ALLOCATION memory bandwidth allocation technology enumeration
+  sub-leaf.
+
+**/
+VOID
+CpuidIntelRdtAllocationMemoryBandwidthSubLeaf (
+  VOID
+  )
+{
+  CPUID_INTEL_RDT_ALLOCATION_MEMORY_BANDWIDTH_SUB_LEAF_EAX  Eax;
+  UINT32                                                    Ebx;
+  CPUID_INTEL_RDT_ALLOCATION_MEMORY_BANDWIDTH_SUB_LEAF_ECX  Ecx;
+  CPUID_INTEL_RDT_ALLOCATION_MEMORY_BANDWIDTH_SUB_LEAF_EDX  Edx;
+
+  AsmCpuidEx (
+    CPUID_INTEL_RDT_ALLOCATION, CPUID_INTEL_RDT_ALLOCATION_MEMORY_BANDWIDTH_SUB_LEAF,
+    &Eax.Uint32, &Ebx, &Ecx.Uint32, &Edx.Uint32
+    );
+  Print (L"CPUID_INTEL_RDT_ALLOCATION (Leaf %08x, Sub-Leaf %08x)\n", CPUID_INTEL_RDT_ALLOCATION, CPUID_INTEL_RDT_ALLOCATION_MEMORY_BANDWIDTH_SUB_LEAF);
+  Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax.Uint32, Ebx, Ecx.Uint32, Edx.Uint32);
+  PRINT_BIT_FIELD (Eax, MaximumMBAThrottling);
+  PRINT_VALUE     (Ebx, AllocationUnitBitMap);
+  PRINT_BIT_FIELD (Ecx, Liner);
+  PRINT_BIT_FIELD (Edx, HighestCosNumber);
+}
+
+/**
   Display CPUID_INTEL_RDT_ALLOCATION L3 cache allocation technology enumeration
   sub-leaf.
 
@@ -901,7 +958,6 @@ CpuidIntelRdtAllocationL3CacheSubLeaf (
   Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax.Uint32, Ebx, Ecx.Uint32, Edx.Uint32);
   PRINT_BIT_FIELD (Eax, CapacityLength);
   PRINT_VALUE     (Ebx, AllocationUnitBitMap);
-  PRINT_BIT_FIELD (Ecx, CosUpdatesInfrequent);
   PRINT_BIT_FIELD (Ecx, CodeDataPrioritization);
   PRINT_BIT_FIELD (Edx, HighestCosNumber);
 }
@@ -954,7 +1010,8 @@ CpuidIntelRdtAllocationMainLeaf (
   Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", 0, Ebx.Uint32, 0, 0);
   PRINT_BIT_FIELD (Ebx, L3CacheAllocation);
   PRINT_BIT_FIELD (Ebx, L2CacheAllocation);
-
+  PRINT_BIT_FIELD (Ebx, MemoryBandwidth);
+  CpuidIntelRdtAllocationMemoryBandwidthSubLeaf ();
   CpuidIntelRdtAllocationL3CacheSubLeaf ();
   CpuidIntelRdtAllocationL2CacheSubLeaf ();
 }
@@ -980,6 +1037,8 @@ CpuidEnumerationOfIntelSgxCapabilities0SubLeaf (
   Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax.Uint32, Ebx, 0, Edx.Uint32);
   PRINT_BIT_FIELD (Eax, SGX1);
   PRINT_BIT_FIELD (Eax, SGX2);
+  PRINT_BIT_FIELD (Eax, ENCLV);
+  PRINT_BIT_FIELD (Eax, ENCLS);
   PRINT_BIT_FIELD (Edx, MaxEnclaveSize_Not64);
   PRINT_BIT_FIELD (Edx, MaxEnclaveSize_64);
 }
@@ -1285,6 +1344,81 @@ CpuidSocVendor (
 }
 
 /**
+  Display CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS main leaf and sub-leafs.
+
+**/
+VOID
+CpuidDeterministicAddressTranslationParameters (
+  VOID
+  )
+{
+  UINT32                                                  Eax;
+  CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS_EBX  Ebx;
+  UINT32                                                  Ecx;
+  CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS_EDX  Edx;
+
+  if (CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS > gMaximumBasicFunction) {
+    return;
+  }
+
+  AsmCpuidEx (
+    CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS,
+    CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS_MAIN_LEAF,
+    &Eax, &Ebx.Uint32, &Ecx, &Edx.Uint32
+    );
+  Print (L"CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS (Leaf %08x, Sub-Leaf %08x)\n", CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS, CPUID_DETERMINISTIC_ADDRESS_TRANSLATION_PARAMETERS_MAIN_LEAF);
+  Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax, Ebx.Uint32, Ecx, Edx.Uint32);
+
+  PRINT_VALUE     (Eax, MaxID_Index);
+  PRINT_BIT_FIELD (Ebx, Page4K);
+  PRINT_BIT_FIELD (Ebx, Page2M);
+  PRINT_BIT_FIELD (Ebx, Page4M);
+  PRINT_BIT_FIELD (Ebx, Page1G);
+  PRINT_BIT_FIELD (Ebx, Partitioning);
+  PRINT_BIT_FIELD (Ebx, Way);
+
+  PRINT_VALUE     (Ecx, NumberOfSets);
+
+  PRINT_BIT_FIELD (Edx, TranslationCacheType);
+  PRINT_BIT_FIELD (Edx, TranslationCacheLevel);
+  PRINT_BIT_FIELD (Edx, FullyAssociative);
+  PRINT_BIT_FIELD (Edx, MaximumNum);
+}
+
+/**
+  Display CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION main leaf and sub-leafs.
+
+**/
+VOID
+CpuidV2ExtendedTopologyEnumeration (
+  VOID
+  )
+{
+  CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION_EAX  Eax;
+  CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION_EBX  Ebx;
+  CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION_ECX  Ecx;
+  UINT32                                      Edx;
+
+  if (CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION > gMaximumBasicFunction) {
+    return;
+  }
+
+  AsmCpuidEx (
+    CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION,
+    CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION_MAIN_LEAF,
+    &Eax.Uint32, &Ebx.Uint32, &Ecx.Uint32, &Edx
+    );
+  Print (L"CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION (Leaf %08x, Sub-Leaf %08x)\n", CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION, CPUID_V2_EXTENDED_TOPOLOGY_ENUMERATION_MAIN_LEAF);
+  Print (L"  EAX:%08x  EBX:%08x  ECX:%08x  EDX:%08x\n", Eax.Uint32, Ebx.Uint32, Ecx.Uint32, Edx);
+
+  PRINT_BIT_FIELD (Eax, BitsNum);
+  PRINT_BIT_FIELD (Ebx, ProcessorsNum);
+  PRINT_BIT_FIELD (Ecx, LevelNum);
+  PRINT_BIT_FIELD (Ecx, LevelType);
+  PRINT_VALUE     (Edx, x2APICID);
+}
+
+/**
   Display CPUID_EXTENDED_FUNCTION leaf.
 
 **/
@@ -1495,6 +1629,8 @@ UefiMain (
   CpuidTimeStampCounter ();
   CpuidProcessorFrequency ();
   CpuidSocVendor ();
+  CpuidDeterministicAddressTranslationParameters ();
+  CpuidV2ExtendedTopologyEnumeration ();
   CpuidExtendedFunction ();
   CpuidExtendedCpuSig ();
   CpuidProcessorBrandString ();
