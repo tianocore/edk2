@@ -35,6 +35,7 @@
 
 #define OPTEE_MESSAGE_ATTRIBUTE_TYPE_MASK                0xff
 
+#define OPTEE_SUCCESS                           0x00000000
 #define OPTEE_ORIGIN_COMMUNICATION              0x00000002
 #define OPTEE_ERROR_COMMUNICATION               0xFFFF000E
 
