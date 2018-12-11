@@ -267,6 +267,8 @@ DefaultExceptionHandler (
   DEBUG ((EFI_D_ERROR, "\n"));
   ASSERT (FALSE);
 
+  CpuDeadLoop ();   // may return if executing under a debugger
+
   // Clear the error registers that we have already displayed incase some one wants to keep going
   SystemContext.SystemContextArm->DFSR = 0;
   SystemContext.SystemContextArm->IFSR = 0;
