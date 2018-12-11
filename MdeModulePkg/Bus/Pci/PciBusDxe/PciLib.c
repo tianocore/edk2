@@ -515,10 +515,12 @@ PciHostBridgeResourceAllocator (
       // All devices' Option ROM share the same MEM32 resource.
       //
       MaxOptionRomSize = GetMaxOptionRomSize (RootBridgeDev);
-      RootBridgeDev->PciBar[0].BarType   = PciBarTypeOpRom;
-      RootBridgeDev->PciBar[0].Length    = MaxOptionRomSize;
-      RootBridgeDev->PciBar[0].Alignment = MaxOptionRomSize - 1;
-      GetResourceFromDevice (RootBridgeDev, IoBridge, Mem32Bridge, PMem32Bridge, Mem64Bridge, PMem64Bridge);
+      if (MaxOptionRomSize != 0) {
+        RootBridgeDev->PciBar[0].BarType   = PciBarTypeOpRom;
+        RootBridgeDev->PciBar[0].Length    = MaxOptionRomSize;
+        RootBridgeDev->PciBar[0].Alignment = MaxOptionRomSize - 1;
+        GetResourceFromDevice (RootBridgeDev, IoBridge, Mem32Bridge, PMem32Bridge, Mem64Bridge, PMem64Bridge);
+      }
 
       //
       // Create resourcemap by going through all the devices subject to this root bridge
