@@ -68,11 +68,19 @@
 [LibraryClasses.common.UEFI_DRIVER]
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
 
-[BuildOptions.ARM.EDKII.SEC, BuildOptions.ARM.EDKII.BASE]
+[BuildOptions.common.EDKII.SEC, BuildOptions.common.EDKII.BASE]
   # Avoid MOVT/MOVW instruction pairs in code that may end up in the PIE
   # executable we build for the relocatable PrePi. They are not runtime
   # relocatable in ELF.
-  *_CLANG35_*_CC_FLAGS = -mno-movt
+  *_CLANG35_ARM_CC_FLAGS = -mno-movt
+
+  #
+  # CLANG38 with LTO support enabled uses the GNU GOLD linker, which insists
+  # on emitting GOT based symbol references when running in shared mode, unless
+  # we override visibility to 'hidden' in all modules that make up the PrePi
+  # build.
+  #
+  GCC:*_CLANG38_*_CC_FLAGS = -include $(WORKSPACE)/ArmVirtPkg/Include/Platform/Hidden.h
 
 ################################################################################
 #

@@ -105,4 +105,4 @@
   gArmTokenSpaceGuid.PcdFvBaseAddress
 
 [BuildOptions]
-  GCC:*_*_*_DLINK_FLAGS = -pie -Wl,-T,$(MODULE_DIR)/Scripts/PrePi-PIE.lds
+  GCC:*_*_*_DLINK_FLAGS = -shared -Wl,-Bsymbolic -Wl,-T,$(MODULE_DIR)/Scripts/PrePi-PIE.lds
