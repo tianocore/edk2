@@ -59,6 +59,7 @@
   ## Arm System Control and Management Interface(SCMI) Clock management protocol
   ## ArmPkg/Include/Protocol/ArmScmiClockProtocol.h
   gArmScmiClockProtocolGuid = { 0x91ce67a8, 0xe0aa, 0x4012, { 0xb9, 0x9f, 0xb6, 0xfc, 0xf3, 0x4, 0x8e, 0xaa } }
+  gArmScmiClock2ProtocolGuid = { 0xb8d8caf2, 0x9e94, 0x462c, { 0xa8, 0x34, 0x6c, 0x99, 0xfc, 0x05, 0xef, 0xcf } }
 
   ## Arm System Control and Management Interface(SCMI) Clock management protocol
   ## ArmPkg/Include/Protocol/ArmScmiPerformanceProtocol.h

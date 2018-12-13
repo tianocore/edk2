@@ -46,6 +46,7 @@
 [Protocols]
   gArmScmiBaseProtocolGuid
   gArmScmiClockProtocolGuid
+  gArmScmiClock2ProtocolGuid
   gArmScmiPerformanceProtocolGuid
 
 [Depex]

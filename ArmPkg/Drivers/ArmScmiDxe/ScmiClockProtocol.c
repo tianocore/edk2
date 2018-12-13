@@ -19,6 +19,7 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/ArmScmiClockProtocol.h>
+#include <Protocol/ArmScmiClock2Protocol.h>
 
 #include "ArmScmiClockProtocolPrivate.h"
 #include "ScmiPrivate.h"
@@ -388,6 +389,53 @@ ClockRateSet (
   return Status;
 }
 
+/** Enable/Disable specified clock.
+
+  @param[in]  This        A Pointer to SCMI_CLOCK_PROTOCOL Instance.
+  @param[in]  ClockId     Identifier for the clock device.
+  @param[in]  Enable      TRUE to enable, FALSE to disable.
+
+  @retval EFI_SUCCESS          Clock enable/disable successful.
+  @retval EFI_DEVICE_ERROR     SCP returns an SCMI error.
+  @retval !(EFI_SUCCESS)       Other errors.
+**/
+STATIC
+EFI_STATUS
+ClockEnable (
+  IN SCMI_CLOCK2_PROTOCOL *This,
+  IN UINT32               ClockId,
+  IN BOOLEAN              Enable
+  )
+{
+  EFI_STATUS                  Status;
+  CLOCK_CONFIG_SET_ATTRIBUTES *ClockConfigSetAttributes;
+  SCMI_COMMAND                Cmd;
+  UINT32                      PayloadLength;
+
+  Status = ScmiCommandGetPayload ((UINT32**)&ClockConfigSetAttributes);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  // Fill arguments for clock protocol command.
+  ClockConfigSetAttributes->ClockId    = ClockId;
+  ClockConfigSetAttributes->Attributes = Enable ? BIT0 : 0;
+
+  Cmd.ProtocolId = SCMI_PROTOCOL_ID_CLOCK;
+  Cmd.MessageId  = SCMI_MESSAGE_ID_CLOCK_CONFIG_SET;
+
+  PayloadLength = sizeof (CLOCK_CONFIG_SET_ATTRIBUTES);
+
+  // Execute and wait for response on a SCMI channel.
+  Status = ScmiCommandExecute (
+             &Cmd,
+             &PayloadLength,
+             NULL
+             );
+
+  return Status;
+}
+
 // Instance of the SCMI clock management protocol.
 STATIC CONST SCMI_CLOCK_PROTOCOL ScmiClockProtocol = {
   ClockGetVersion,
@@ -396,6 +444,18 @@ STATIC CONST SCMI_CLOCK_PROTOCOL ScmiClockProtocol = {
   ClockDescribeRates,
   ClockRateGet,
   ClockRateSet
+ };
+
+// Instance of the SCMI clock management protocol.
+STATIC CONST SCMI_CLOCK2_PROTOCOL ScmiClock2Protocol = {
+  (SCMI_CLOCK2_GET_VERSION)ClockGetVersion,
+  (SCMI_CLOCK2_GET_TOTAL_CLOCKS)ClockGetTotalClocks,
+  (SCMI_CLOCK2_GET_CLOCK_ATTRIBUTES)ClockGetClockAttributes,
+  (SCMI_CLOCK2_DESCRIBE_RATES)ClockDescribeRates,
+  (SCMI_CLOCK2_RATE_GET)ClockRateGet,
+  (SCMI_CLOCK2_RATE_SET)ClockRateSet,
+  SCMI_CLOCK2_PROTOCOL_VERSION,
+  ClockEnable
  };
 
 /** Initialize clock management protocol and install protocol on a given handle.
@@ -413,6 +473,8 @@ ScmiClockProtocolInit (
                 Handle,
                 &gArmScmiClockProtocolGuid,
                 &ScmiClockProtocol,
+                &gArmScmiClock2ProtocolGuid,
+                &ScmiClock2Protocol,
                 NULL
                 );
 }

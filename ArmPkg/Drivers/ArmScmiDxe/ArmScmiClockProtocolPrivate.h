@@ -59,6 +59,13 @@ typedef struct {
   CLOCK_RATE_DWORD Rate;
 } CLOCK_RATE_SET_ATTRIBUTES;
 
+
+// Message parameters for CLOCK_CONFIG_SET command.
+typedef struct {
+  UINT32 ClockId;
+  UINT32 Attributes;
+} CLOCK_CONFIG_SET_ATTRIBUTES;
+
 //  if ClockAttr Bit[0] is set then clock device is enabled.
 #define CLOCK_ENABLE_MASK         0x1
 #define CLOCK_ENABLED(ClockAttr)  ((ClockAttr & CLOCK_ENABLE_MASK) == 1)
