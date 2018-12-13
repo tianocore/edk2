@@ -121,6 +121,7 @@
   CryptoPkg/Library/BaseCryptLib/PeiCryptLib.inf
   CryptoPkg/Library/BaseCryptLib/RuntimeCryptLib.inf
   CryptoPkg/Library/TlsLib/TlsLib.inf
+  CryptoPkg/Library/OpensslLib/OpensslLib.inf
 
 [Components.IA32, Components.X64]
   CryptoPkg/Library/BaseCryptLib/SmmCryptLib.inf

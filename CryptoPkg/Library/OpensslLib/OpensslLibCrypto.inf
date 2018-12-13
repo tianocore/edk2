@@ -175,6 +175,7 @@
   $(OPENSSL_PATH)/crypto/conf/conf_mall.c
   $(OPENSSL_PATH)/crypto/conf/conf_mod.c
   $(OPENSSL_PATH)/crypto/conf/conf_sap.c
+  $(OPENSSL_PATH)/crypto/conf/conf_ssl.c
   $(OPENSSL_PATH)/crypto/cpt_err.c
   $(OPENSSL_PATH)/crypto/cryptlib.c
   $(OPENSSL_PATH)/crypto/cversion.c
@@ -281,6 +282,7 @@
   $(OPENSSL_PATH)/crypto/evp/pmeth_lib.c
   $(OPENSSL_PATH)/crypto/evp/scrypt.c
   $(OPENSSL_PATH)/crypto/ex_data.c
+  $(OPENSSL_PATH)/crypto/getenv.c
   $(OPENSSL_PATH)/crypto/hmac/hm_ameth.c
   $(OPENSSL_PATH)/crypto/hmac/hm_pmeth.c
   $(OPENSSL_PATH)/crypto/hmac/hmac.c
@@ -418,6 +420,7 @@
   $(OPENSSL_PATH)/crypto/x509/x509_err.c
   $(OPENSSL_PATH)/crypto/x509/x509_ext.c
   $(OPENSSL_PATH)/crypto/x509/x509_lu.c
+  $(OPENSSL_PATH)/crypto/x509/x509_meth.c
   $(OPENSSL_PATH)/crypto/x509/x509_obj.c
   $(OPENSSL_PATH)/crypto/x509/x509_r2x.c
   $(OPENSSL_PATH)/crypto/x509/x509_req.c

@@ -2,7 +2,7 @@
  * WARNING: do not edit!
  * Generated from include/openssl/opensslconf.h.in
  *
- * Copyright 2016 The OpenSSL Project Authors. All Rights Reserved.
+ * Copyright 2016-2018 The OpenSSL Project Authors. All Rights Reserved.
  *
  * Licensed under the OpenSSL license (the "License").  You may not use
  * this file except in compliance with the License.  You can obtain a copy
@@ -235,12 +235,18 @@ extern "C" {
  * still won't see them if the library has been built to disable deprecated
  * functions.
  */
-#if defined(OPENSSL_NO_DEPRECATED)
-# define DECLARE_DEPRECATED(f)
-#elif __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ > 0)
-# define DECLARE_DEPRECATED(f)    f __attribute__ ((deprecated));
-#else
-# define DECLARE_DEPRECATED(f)   f;
+#ifndef DECLARE_DEPRECATED
+# if defined(OPENSSL_NO_DEPRECATED)
+#  define DECLARE_DEPRECATED(f)
+# else
+#  define DECLARE_DEPRECATED(f)   f;
+#  ifdef __GNUC__
+#   if __GNUC__ > 3 || (__GNUC__ == 3 && __GNUC_MINOR__ > 0)
+#    undef DECLARE_DEPRECATED
+#    define DECLARE_DEPRECATED(f)    f __attribute__ ((deprecated));
+#   endif
+#  endif
+# endif
 #endif
 
 #ifndef OPENSSL_FILE
