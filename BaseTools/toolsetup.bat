@@ -274,6 +274,7 @@ goto check_build_environment
   echo.
 
 :check_build_environment
+  set PYTHONHASHSEED=0
   if defined BASETOOLS_PYTHON_SOURCE goto VisualStudioAvailable
 
   if not defined BASE_TOOLS_PATH (

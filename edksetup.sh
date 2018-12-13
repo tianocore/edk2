@@ -77,7 +77,7 @@ function SetWorkspace()
   # Set $WORKSPACE
   #
   export WORKSPACE=`pwd`
-
+  export PYTHONHASHSEED=0
   return 0
 }
 
