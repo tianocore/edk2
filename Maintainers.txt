@@ -102,8 +102,9 @@ S: Maintained
 
 CryptoPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/CryptoPkg
-M: Qin Long <qin.long@intel.com>
 M: Ting Ye <ting.ye@intel.com>
+R: Gang Wei <gang.wei@intel.com>
+R: Jian Wang <jian.j.wang@intel.com>
 
 DynamicTablesPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/DynamicTablesPkg
