@@ -206,9 +206,7 @@ class MetaFileParser(object):
     ## Set parsing complete flag in both class and table
     def _Done(self):
         self._Finished = True
-        ## Do not set end flag when processing included files
-        if self._From == -1:
-            self._Table.SetEndFlag()
+        self._Table.SetEndFlag()
 
     def _PostProcess(self):
         self._PostProcessed = True
@@ -241,13 +239,7 @@ class MetaFileParser(object):
             DataInfo = (DataInfo,)
 
         # Parse the file first, if necessary
-        if not self._Finished:
-            if self._RawTable.IsIntegrity():
-                self._Finished = True
-            else:
-                self._Table = self._RawTable
-                self._PostProcessed = False
-                self.Start()
+        self.StartParse()
 
         # No specific ARCH or Platform given, use raw data
         if self._RawTable and (len(DataInfo) == 1 or DataInfo[1] is None):
@@ -259,6 +251,14 @@ class MetaFileParser(object):
 
         return self._FilterRecordList(self._Table.Query(*DataInfo), DataInfo[1])
 
+    def StartParse(self):
+        if not self._Finished:
+            if self._RawTable.IsIntegrity():
+                self._Finished = True
+            else:
+                self._Table = self._RawTable
+                self._PostProcessed = False
+                self.Start()
     ## Data parser for the common format in different type of file
     #
     #   The common format in the meatfile is like
@@ -917,6 +917,7 @@ class DscParser(MetaFileParser):
         self._PcdCodeValue = ""
         self._PcdDataTypeCODE = False
         self._CurrentPcdName = ""
+        self._Content = None
 
     ## Parser starter
     def Start(self):
@@ -1645,9 +1646,7 @@ class DscParser(MetaFileParser):
             Parser._Scope = self._Scope
             Parser._Enabled = self._Enabled
             # Parse the included file
-            Parser.Start()
-
-
+            Parser.StartParse()
             # Insert all records in the table for the included file into dsc file table
             Records = IncludedFileTable.GetAll()
             if Records:

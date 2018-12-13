@@ -163,10 +163,10 @@ class WorkspaceDatabase(object):
         self.TransformObject = WorkspaceDatabase.TransformObjectFactory(self)
 
     def SetFileTimeStamp(self,FileId,TimeStamp):
-        self.TblFile[FileId][6] = TimeStamp
+        self.TblFile[FileId-1][6] = TimeStamp
 
     def GetFileTimeStamp(self,FileId):
-        return self.TblFile[FileId][6]
+        return self.TblFile[FileId-1][6]
 
 
     ## Summarize all packages in the database

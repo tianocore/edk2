@@ -881,7 +881,7 @@ class DscBuildData(PlatformBuildClassObject):
         return self._LibraryClasses
 
     def _ValidatePcd(self, PcdCName, TokenSpaceGuid, Setting, PcdType, LineNo):
-        if self._DecPcds is None:
+        if not self._DecPcds:
 
             FdfInfList = []
             if GlobalData.gFdfParser:
