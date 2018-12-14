@@ -1053,22 +1053,9 @@
   # @Prompt VPD base address.
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0|UINT32|0x00010010
 
-  ## Maximum number of FV is supported by PeiCore's dispatching.
-  # @Prompt Maximum number of FV supported by PeiCore.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxFvSupported|6|UINT32|0x00010030
-
-  ## Maximum File count in every FV is supported by PeiCore's dispatching.
-  #  PeiCore supported File type includes PEIM, Combined PEIM and FV.
-  # @Prompt Maximum File count per FV supported by PeiCore.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeimPerFv|32|UINT32|0x00010031
-
   ## Maximum stack size for PeiCore.
   # @Prompt Maximum stack size for PeiCore.
   gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPeiStackSize|0x20000|UINT32|0x00010032
-
-  ## Maximum PPI count is supported by PeiCore's PPI database.
-  # @Prompt Maximum PPI count supported by PeiCore.
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPeiCoreMaxPpiSupported|64|UINT32|0x00010033
 
   ## The maximum size of a single non-HwErr type variable.
   # @Prompt Maximum variable size.

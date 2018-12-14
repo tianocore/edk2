@@ -69,21 +69,9 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdVpdBaseAddress_HELP  #language en-US "VPD type PCD allows a developer to point to an absolute physical address PCDVPDBASEADDRESS to store PCD value."
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPeiCoreMaxFvSupported_PROMPT  #language en-US "Maximum number of FV supported by PeiCore"
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPeiCoreMaxFvSupported_HELP  #language en-US "Maximum number of FV is supported by PeiCore's dispatching."
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPeiCoreMaxPeimPerFv_PROMPT  #language en-US "Maximum File count per FV supported by PeiCore"
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPeiCoreMaxPeimPerFv_HELP  #language en-US "Maximum File count in every FV is supported by PeiCore's dispatching. PeiCore supported File type includes PEIM, Combined PEIM and FV."
-
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPeiCoreMaxPeiStackSize_PROMPT  #language en-US "Maximum stack size for PeiCore"
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPeiCoreMaxPeiStackSize_HELP  #language en-US "Maximum stack size for PeiCore."
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPeiCoreMaxPpiSupported_PROMPT  #language en-US "Maximum PPI count supported by PeiCore"
-
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdPeiCoreMaxPpiSupported_HELP  #language en-US "Maximum PPI count is supported by PeiCore's PPI database."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdMaxVariableSize_PROMPT  #language en-US "Maximum variable size"
 
