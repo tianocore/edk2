@@ -80,9 +80,7 @@
   DpcLib|MdeModulePkg/Library/DxeDpcLib/DxeDpcLib.inf
   UdpIoLib|MdeModulePkg/Library/DxeUdpIoLib/DxeUdpIoLib.inf
   IpIoLib|MdeModulePkg/Library/DxeIpIoLib/DxeIpIoLib.inf
-!if $(NETWORK_IP6_ENABLE) == TRUE
   TcpIoLib|MdeModulePkg/Library/DxeTcpIoLib/DxeTcpIoLib.inf
-!endif
 !if $(HTTP_BOOT_ENABLE) == TRUE
   HttpLib|MdeModulePkg/Library/DxeHttpLib/DxeHttpLib.inf
 !endif
