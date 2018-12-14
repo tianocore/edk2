@@ -33,7 +33,7 @@ from .MetaFileParser import *
 
 from .WorkspaceCommon import GetDeclaredPcd
 from Common.Misc import AnalyzeDscPcd
-from Common.Misc import ProcessDuplicatedInf
+from Common.Misc import ProcessDuplicatedInf,RemoveCComments
 import re
 from Common.Parsing import IsValidWord
 from Common.VariableAttributes import VariableAttributes
@@ -1575,7 +1575,7 @@ class DscBuildData(PlatformBuildClassObject):
 
             for str_pcd_obj in S_pcd_set.values():
 
-                str_pcd_obj.MaxDatumSize = self.GetStructurePcdMaxSize(str_pcd_obj)
+                str_pcd_obj.MaxDatumSize = DscBuildData.GetStructurePcdMaxSize(str_pcd_obj)
                 Pcds[str_pcd_obj.TokenCName, str_pcd_obj.TokenSpaceGuidCName] = str_pcd_obj
                 Pcds[str_pcd_obj.TokenCName, str_pcd_obj.TokenSpaceGuidCName].CustomAttribute['IsStru']=True
 
@@ -1689,9 +1689,10 @@ class DscBuildData(PlatformBuildClassObject):
                 Pcds[PcdCName, TokenSpaceGuid].DscRawValue[SkuName][TAB_DEFAULT_STORES_DEFAULT] = Settings[0]
         return Pcds
 
-    def GetStructurePcdMaxSize(self, str_pcd):
+    @staticmethod
+    def GetStructurePcdMaxSize(str_pcd):
         pcd_default_value = str_pcd.DefaultValue
-        sku_values = [skuobj.HiiDefaultValue if str_pcd.Type in [self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], self._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]] else skuobj.DefaultValue for skuobj in str_pcd.SkuInfoList.values()]
+        sku_values = [skuobj.HiiDefaultValue if str_pcd.Type in [DscBuildData._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_HII], DscBuildData._PCD_TYPE_STRING_[MODEL_PCD_DYNAMIC_EX_HII]] else skuobj.DefaultValue for skuobj in str_pcd.SkuInfoList.values()]
         sku_values.append(pcd_default_value)
 
         def get_length(value):
@@ -1703,7 +1704,10 @@ class DscBuildData(PlatformBuildClassObject):
                     return len(Value[2:-1])
                 if Value[0] == '"' and Value[-1] == '"':
                     return len(Value) - 2
-                if Value[0] == '{' and Value[-1] == '}':
+                if Value.strip().startswith("{CODE("):
+                    tmpValue = RemoveCComments(Value)
+                    return len(tmpValue.split(","))
+                if (Value[0] == '{' and Value[-1] == '}'):
                     return len(Value.split(","))
                 if Value.startswith("L'") and Value.endswith("'") and len(list(Value[2:-1])) > 1:
                     return  len(list(Value[2:-1]))
@@ -1866,7 +1870,8 @@ class DscBuildData(PlatformBuildClassObject):
                     r_datatype.append("[1]")
                 else:
                     r_datatype.append("[" + dem + "]")
-            CApp = '  Size = sizeof(%s);\n' % ("".join(r_datatype))
+            sizebasevalue = "(%s / sizeof(%s) + 1)" % ((DscBuildData.GetStructurePcdMaxSize(Pcd), Pcd.BaseDatumType))
+            CApp = '  Size = sizeof(%s) > %s?sizeof(%s) : %s ;\n' % ( ("".join(r_datatype), sizebasevalue, "".join(r_datatype), sizebasevalue)  )
         else:
             CApp = '  Size = sizeof(%s);\n' % (Pcd.DatumType)
         CApp = CApp + '  Cal_%s_%s_Size(&Size);\n' % (Pcd.TokenSpaceGuidCName, Pcd.TokenCName)
@@ -2248,7 +2253,7 @@ class DscBuildData(PlatformBuildClassObject):
 
             PcdDefaultValue = StringToArray(Pcd.DefaultValueFromDec.strip())
 
-            InitByteValue += '%s.%s.%s.%s|%s|%s\n' % (SkuName, DefaultStoreName, Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Pcd.BaseDatumType, PcdDefaultValue)
+            InitByteValue += '%s.%s.%s.%s|%s|%s\n' % (SkuName, DefaultStoreName, Pcd.TokenSpaceGuidCName, Pcd.TokenCName, Pcd.DatumType, PcdDefaultValue)
 
             #
             # Get current PCD value and size
@@ -2318,29 +2323,39 @@ class DscBuildData(PlatformBuildClassObject):
             return CApp
         Demesion = ""
         for d in Pcd.Capacity:
-            if d == "0":
-                Demesion += "[]"
-            else:
-                Demesion += "["+d+"]"
+            Demesion += "[]"
 
         Value = Pcd.DefaultValueFromDec
         if "{CODE(" in Pcd.DefaultValueFromDec:
             realvalue = Pcd.DefaultValueFromDec.strip()[6:-2] # "{CODE(").rstrip(")}"
-            CApp += "static %s %s_%s_INIT_Value%s = %s;\n" % (Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,Demesion,realvalue)
+        else:
+            realvalue = Pcd.DefaultValueFromDec.strip()
+        CApp += "static %s %s_%s_INIT_Value%s = %s;\n" % (Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,Demesion,realvalue)
 
-        for skuname in Pcd.SkuInfoList:
-            skuinfo = Pcd.SkuInfoList[skuname]
-            if skuinfo.VariableName:
-                for defaultstore in skuinfo.DefaultStoreDict:
-                    Value = skuinfo[defaultstore]
+        if Pcd.Type in PCD_DYNAMIC_TYPE_SET | PCD_DYNAMIC_EX_TYPE_SET:
+            for skuname in Pcd.SkuInfoList:
+                skuinfo = Pcd.SkuInfoList[skuname]
+                if skuinfo.VariableName:
+                    for defaultstore in skuinfo.DefaultStoreDict:
+                        Value = skuinfo[defaultstore]
+                        if "{CODE(" in Value:
+                            realvalue = Value.strip()[6:-2] # "{CODE(").rstrip(")}"
+                        else:
+                            realvalue = Value.strip()
+                        CApp += "static %s %s_%s_%s_%s_Value%s = %s;\n" % (Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,skuname,defaultstore,Demesion,realvalue)
+                else:
+                    Value = skuinfo.DefaultValue
                     if "{CODE(" in Value:
                         realvalue = Value.strip()[6:-2] # "{CODE(").rstrip(")}"
-                        CApp += "static %s %s_%s_%s_%s_Value%s = %s;\n" % (Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,skuname,defaultstore,Demesion,realvalue)
-            else:
-                Value = skuinfo.DefaultValue
-                if "{CODE(" in Value:
-                    realvalue = Value.strip()[6:-2] # "{CODE(").rstrip(")}"
+                    else:
+                        realvalue = Value.strip()
                     CApp += "static %s %s_%s_%s_%s_Value%s = %s;\n" % (Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,skuname,TAB_DEFAULT_STORES_DEFAULT,Demesion,realvalue)
+        else:
+            if "{CODE(" in Pcd.DefaultValue:
+                realvalue = Pcd.DefaultValue.strip()[6:-2] # "{CODE(").rstrip(")}"
+            else:
+                realvalue = Pcd.DefaultValue.strip()
+            CApp += "static %s %s_%s_DEFAULT_STANDARD_Value%s = %s;\n" % (Pcd.BaseDatumType,Pcd.TokenSpaceGuidCName,Pcd.TokenCName,Demesion,realvalue)
         return CApp
     def SkuOverrideValuesEmpty(self,OverrideValues):
         if not OverrideValues:

@@ -19,7 +19,7 @@ from collections import OrderedDict
 from Common.Misc import CopyDict
 import copy
 StructPattern = re.compile(r'[_a-zA-Z][0-9A-Za-z_\[\]]*$')
-ArrayIndex = re.compile("\[\s*\d{0,1}\s*\]")
+ArrayIndex = re.compile("\[\s*[0-9a-fA-FxX]*\s*\]")
 ## PcdClassObject
 #
 # This Class is used for PcdObject
@@ -84,6 +84,7 @@ class PcdClassObject(object):
             maxsize = item.lstrip("[").rstrip("]").strip()
             if not maxsize:
                 maxsize = "-1"
+            maxsize = str(int(maxsize,16)) if maxsize.startswith(("0x","0X")) else maxsize
             self._Capacity.append(maxsize)
         if hasattr(self, "SkuOverrideValues"):
             for sku in self.SkuOverrideValues:
