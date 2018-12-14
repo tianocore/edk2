@@ -62,6 +62,7 @@
 #   $(BIN_DIR)          Common directory for executable files
 #   $(FV_DIR)           Directory to store flash image files
 #   $(INC)              Search path of current module
+#   $(NASM_INC)         Search nasm file path of current module
 #   $(INC_LIST)         A file containing search pathes of current module
 #   $(LIBS)             Static library files of current module
 #   $(<tool>_FLAGS)     Tools flags of current module
@@ -225,7 +226,7 @@
     <Command>
         "$(PP)" $(PP_FLAGS) $(INC) ${src} > ${d_path}(+)${s_base}.i
         Trim --trim-long --source-code -o ${d_path}(+)${s_base}.iii ${d_path}(+)${s_base}.i
-        "$(NASM)" -I${s_path}(+) $(NASM_FLAGS) -o $dst ${d_path}(+)${s_base}.iii
+        "$(NASM)" -I${s_path}(+) $(NASM_INC) $(NASM_FLAGS) -o $dst ${d_path}(+)${s_base}.iii
 
 [Device-Tree-Source-File]
     <InputFile>
