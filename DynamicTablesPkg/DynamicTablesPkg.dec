@@ -22,3 +22,8 @@
 [Includes]
   Include
 
+[Protocols]
+
+  # Configuration Manager Protocol GUID
+  gEdkiiConfigurationManagerProtocolGuid = { 0xd85a4835, 0x5a82, 0x4894, { 0xac, 0x2, 0x70, 0x6f, 0x43, 0xd5, 0x97, 0x8e } }
+
