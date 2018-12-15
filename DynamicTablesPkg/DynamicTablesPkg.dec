@@ -30,3 +30,14 @@
   # Dynamic Table Factory Protocol GUID
   gEdkiiDynamicTableFactoryProtocolGuid = { 0x91d1e327, 0xfe5a, 0x49b8, { 0xab, 0x65, 0xe, 0xce, 0x2d, 0xdb, 0x45, 0xec } }
 
+[PcdsFixedAtBuild]
+
+  # Maximum number of Custom ACPI Generators
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomACPIGenerators|1|UINT16|0xC0000001
+
+  # Maximum number of Custom SMBIOS Generators
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomSMBIOSGenerators|1|UINT16|0xC0000002
+
+  # Maximum number of Custom DT Generators
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMaxCustomDTGenerators|1|UINT16|0xC0000003
+

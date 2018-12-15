@@ -1,5 +1,5 @@
 ## @file
-#  Dsc include file for Dynamic Tables Framework.
+#  fdf include file for Dynamic Tables Framework.
 #
 #  Copyright (c) 2017 - 2018, ARM Limited. All rights reserved.<BR>
 #
@@ -13,14 +13,8 @@
 #
 ##
 
-[Defines]
-
-[LibraryClasses.common]
-  TableHelperLib|DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
-
-[Components.common]
   #
   # Dynamic Table Factory Dxe
   #
-  DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf
+  INF DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf
 
