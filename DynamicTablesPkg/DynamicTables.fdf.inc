@@ -18,3 +18,7 @@
   #
   INF DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf
 
+  #
+  # Dynamic Tables Dxe
+  #
+  INF DynamicTablesPkg/Drivers/DynamicTableManagerDxe/DynamicTableManagerDxe.inf
