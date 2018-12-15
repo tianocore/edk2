@@ -15,6 +15,9 @@
 
 [Defines]
 
+[BuildOptions]
+  *_*_*_ASL_FLAGS          = -tc -li -so
+
 [LibraryClasses.common]
   TableHelperLib|DynamicTablesPkg/Library/Common/TableHelperLib/TableHelperLib.inf
 
@@ -22,7 +25,10 @@
   #
   # Dynamic Table Factory Dxe
   #
-  DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf
+  DynamicTablesPkg/Drivers/DynamicTableFactoryDxe/DynamicTableFactoryDxe.inf {
+    <LibraryClasses>
+      NULL|DynamicTablesPkg/Library/Acpi/Arm/AcpiRawLibArm/AcpiRawLibArm.inf
+  }
 
   #
   # Dynamic Tables Manager Dxe
