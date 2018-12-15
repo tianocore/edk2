@@ -31,9 +31,6 @@
   SKUID_IDENTIFIER               = DEFAULT
 
 [BuildOptions]
-  XCODE:*_*_ARM_PLATFORM_FLAGS  == -arch armv7
-  GCC:*_*_ARM_PLATFORM_FLAGS    == -march=armv7-a -mfpu=neon
-
   RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
   *_*_*_CC_FLAGS  = -DDISABLE_NEW_DEPRECATED_INTERFACES
 
