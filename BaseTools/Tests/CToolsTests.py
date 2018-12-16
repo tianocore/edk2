@@ -26,7 +26,7 @@ modules = (
 
 
 def TheTestSuite():
-    suites = map(lambda module: module.TheTestSuite(), modules)
+    suites = list(map(lambda module: module.TheTestSuite(), modules))
     return unittest.TestSuite(suites)
 
 if __name__ == '__main__':
