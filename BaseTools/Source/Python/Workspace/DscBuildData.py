@@ -39,6 +39,7 @@ from Common.Parsing import IsValidWord
 from Common.VariableAttributes import VariableAttributes
 import Common.GlobalData as GlobalData
 import subprocess
+from functools import reduce
 from Common.Misc import SaveFileOnChange
 from Workspace.BuildClassObject import PlatformBuildClassObject, StructurePcd, PcdClassObject, ModuleBuildClassObject
 from collections import OrderedDict, defaultdict
@@ -1928,7 +1929,7 @@ class DscBuildData(PlatformBuildClassObject):
         if index:
             indicator = "(Pcd"
             if len(pcd_capacity)>2:
-                for i in xrange(0,len(index_elements)):
+                for i in range(0,len(index_elements)):
                     index_ele = index_elements[i]
                     index_num = index_ele.strip("[").strip("]").strip()
                     if i == len(index_elements) -2:
