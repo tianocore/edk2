@@ -10,12 +10,12 @@
 # THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
 # WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
-import plugins.EdkPlugins.basemodel.ini as ini
-import plugins.EdkPlugins.edk2.model.dsc as dsc
-import plugins.EdkPlugins.edk2.model.inf as inf
-import plugins.EdkPlugins.edk2.model.dec as dec
+from ...basemodel import ini
+from ...edk2.model import dsc
+from ...edk2.model import inf
+from ...edk2.model import dec
 import os
-from plugins.EdkPlugins.basemodel.message import *
+from ...basemodel.message import *
 
 class SurfaceObject(object):
     _objs = {}
@@ -655,13 +655,13 @@ class Package(SurfaceObject):
         return self._pcds
 
     def GetPpis(self):
-        return self._ppis.values()
+        return list(self._ppis.values())
 
     def GetProtocols(self):
-        return self._protocols.values()
+        return list(self._protocols.values())
 
     def GetGuids(self):
-        return self._guids.values()
+        return list(self._guids.values())
 
     def Destroy(self):
         for pcd in self._pcds.values():

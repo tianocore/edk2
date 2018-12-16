@@ -16,8 +16,8 @@ from __future__ import print_function
 import os, sys, logging, traceback, subprocess
 from optparse import OptionParser
 
-import plugins.EdkPlugins.edk2.model.baseobject as baseobject
-import plugins.EdkPlugins.edk2.model.doxygengen as doxygengen
+from .plugins.EdkPlugins.edk2.model import baseobject
+from .plugins.EdkPlugins.edk2.model import doxygengen
 
 gArchMarcoDict = {'ALL'      : 'MDE_CPU_IA32 MDE_CPU_X64 MDE_CPU_EBC MDE_CPU_IPF _MSC_EXTENSIONS __GNUC__ __INTEL_COMPILER',
                   'IA32_MSFT': 'MDE_CPU_IA32 _MSC_EXTENSIONS',
@@ -38,7 +38,7 @@ def parseCmdArgs():
                       help='Specify the absolute path of doxygen tools installation. For example: C:\\Program Files\\doxygen\bin\doxygen.exe')
     parser.add_option('-o', '--output', action='store', dest='OutputPath',
                       help='Specify the document output path. For example: c:\\docoutput')
-    parser.add_option('-a', '--arch', action='store', dest='Arch', choices=gArchMarcoDict.keys(),
+    parser.add_option('-a', '--arch', action='store', dest='Arch', choices=list(gArchMarcoDict.keys()),
                       help='Specify the architecture used in preprocess package\'s source. For example: -a IA32_MSFT')
     parser.add_option('-m', '--mode', action='store', dest='DocumentMode', choices=['CHM', 'HTML'],
                       help='Specify the document mode from : CHM or HTML')

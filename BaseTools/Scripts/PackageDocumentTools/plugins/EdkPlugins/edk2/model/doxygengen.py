@@ -16,7 +16,7 @@
 """This file produce action class to generate doxygen document for edk2 codebase.
    The action classes are shared by GUI and command line tools.
 """
-import plugins.EdkPlugins.basemodel.doxygen as doxygen
+from ...basemodel import doxygen
 import os
 try:
     import wx
@@ -24,9 +24,9 @@ try:
 except:
     gInGui = False
 import re
-import plugins.EdkPlugins.edk2.model.inf as inf
-import plugins.EdkPlugins.edk2.model.dec as dec
-from plugins.EdkPlugins.basemodel.message import *
+from ...edk2.model import inf
+from ...edk2.model import dec
+from ...basemodel.message import *
 
 _ignore_dir = ['.svn', '_svn', 'cvs']
 _inf_key_description_mapping_table = {
@@ -386,7 +386,7 @@ class PackageDocumentAction(DoxygenAction):
         configFile.AddFile(path)
 
         no = 0
-        for no in xrange(len(lines)):
+        for no in range(len(lines)):
             if len(lines[no].strip()) == 0:
                 continue
             if lines[no].strip()[:2] in ['##', '//', '/*', '*/']:
@@ -1000,7 +1000,7 @@ class PackageDocumentAction(DoxygenAction):
         #file = textfile.TextFile(path)
 
         try:
-            file = open(path, 'rb')
+            file = open(path, 'r')
         except (IOError, OSError) as msg:
             return None
 

@@ -67,7 +67,7 @@ class Page(BaseDoxygeItem):
 
     def AddSection(self, section):
         self.mSections.append(section)
-        self.mSections.sort(cmp=lambda x, y: cmp(x.mName.lower(), y.mName.lower()))
+        self.mSections.sort(key=lambda x: x.mName.lower())
 
     def Generate(self):
         if self.mIsMainPage:
@@ -80,7 +80,7 @@ class Page(BaseDoxygeItem):
             self.mText.append(self.mDescription)
         endIndex = len(self.mText)
 
-        self.mSections.sort()
+        self.mSections.sort(key=lambda x: x.mName.lower())
         for sect in self.mSections:
             self.mText += sect.Generate()
 

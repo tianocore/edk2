@@ -135,7 +135,7 @@ class parser_lst(object):
                       tmp_dict[offset] = tmp_name
                       pcdname_num = int(pcdname_num_re.findall(t_name)[0],10)
                       uint = int(unit_num.findall(uint)[0],10)
-                      bit = uint / 8
+                      bit = uint // 8
                       for i in range(1, pcdname_num):
                         offset += bit
                         tmp_name = pcdname2_re.findall(t_name)[0] + '[%s]' % i
