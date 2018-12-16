@@ -43,8 +43,9 @@ if __name__ == '__main__':
   #
   # Create command line argument parser object
   #
-  parser = argparse.ArgumentParser(prog=__prog__, version=__version__, usage=__usage__, description=__copyright__, conflict_handler='resolve')
+  parser = argparse.ArgumentParser(prog=__prog__, usage=__usage__, description=__copyright__, conflict_handler='resolve')
   group = parser.add_mutually_exclusive_group(required=True)
+  group.add_argument("--version", action='version', version=__version__)
   group.add_argument("-o", "--output", dest='OutputFile', type=argparse.FileType('wb'), metavar='filename', nargs='*', help="specify the output private key filename in PEM format")
   group.add_argument("-i", "--input", dest='InputFile', type=argparse.FileType('rb'), metavar='filename', nargs='*', help="specify the input private key filename in PEM format")
   parser.add_argument("--public-key-hash", dest='PublicKeyHashFile', type=argparse.FileType('wb'), help="specify the public key hash filename that is SHA 256 hash of 2048 bit RSA public key in binary format")

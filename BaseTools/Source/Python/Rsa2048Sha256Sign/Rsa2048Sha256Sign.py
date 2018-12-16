@@ -62,10 +62,11 @@ if __name__ == '__main__':
   #
   # Create command line argument parser object
   #
-  parser = argparse.ArgumentParser(prog=__prog__, version=__version__, usage=__usage__, description=__copyright__, conflict_handler='resolve')
+  parser = argparse.ArgumentParser(prog=__prog__, usage=__usage__, description=__copyright__, conflict_handler='resolve')
   group = parser.add_mutually_exclusive_group(required=True)
   group.add_argument("-e", action="store_true", dest='Encode', help='encode file')
   group.add_argument("-d", action="store_true", dest='Decode', help='decode file')
+  group.add_argument("--version", action='version', version=__version__)
   parser.add_argument("-o", "--output", dest='OutputFile', type=str, metavar='filename', help="specify the output filename", required=True)
   parser.add_argument("--monotonic-count", dest='MonotonicCountStr', type=str, help="specify the MonotonicCount in FMP capsule.")
   parser.add_argument("--private-key", dest='PrivateKeyFile', type=argparse.FileType('rb'), help="specify the private key filename.  If not specified, a test signing key is used.")

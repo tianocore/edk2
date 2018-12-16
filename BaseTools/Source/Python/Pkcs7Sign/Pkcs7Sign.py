@@ -76,10 +76,11 @@ if __name__ == '__main__':
   #
   # Create command line argument parser object
   #
-  parser = argparse.ArgumentParser(prog=__prog__, version=__version__, usage=__usage__, description=__copyright__, conflict_handler='resolve')
+  parser = argparse.ArgumentParser(prog=__prog__, usage=__usage__, description=__copyright__, conflict_handler='resolve')
   group = parser.add_mutually_exclusive_group(required=True)
   group.add_argument("-e", action="store_true", dest='Encode', help='encode file')
   group.add_argument("-d", action="store_true", dest='Decode', help='decode file')
+  group.add_argument("--version", action='version', version=__version__)
   parser.add_argument("-o", "--output", dest='OutputFile', type=str, metavar='filename', help="specify the output filename", required=True)
   parser.add_argument("--signer-private-cert", dest='SignerPrivateCertFile', type=argparse.FileType('rb'), help="specify the signer private cert filename.  If not specified, a test signer private cert is used.")
   parser.add_argument("--other-public-cert", dest='OtherPublicCertFile', type=argparse.FileType('rb'), help="specify the other public cert filename.  If not specified, a test other public cert is used.")
