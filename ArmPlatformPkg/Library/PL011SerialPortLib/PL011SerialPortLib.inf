@@ -36,8 +36,10 @@
   MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
 
-[FixedPcd]
+[Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+
+[FixedPcd]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
