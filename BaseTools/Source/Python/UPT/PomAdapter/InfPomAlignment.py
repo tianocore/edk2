@@ -133,7 +133,7 @@ class InfPomAlignment(ModuleObject):
         #
         # Should only have one ArchString Item.
         #
-        ArchString = RecordSet.keys()[0]
+        ArchString = list(RecordSet.keys())[0]
         ArchList = GetSplitValueList(ArchString, ' ')
         ArchList = ConvertArchList(ArchList)
         HasCalledFlag = False

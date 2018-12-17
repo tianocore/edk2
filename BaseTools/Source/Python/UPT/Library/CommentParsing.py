@@ -74,7 +74,7 @@ def ParseHeaderCommentSection(CommentList, FileName = None, IsBinaryHeader = Fal
     # first find the last copyright line
     #
     Last = 0
-    for Index in xrange(len(CommentList)-1, 0, -1):
+    for Index in range(len(CommentList)-1, 0, -1):
         Line = CommentList[Index][0]
         if _IsCopyrightLine(Line):
             Last = Index
@@ -206,17 +206,15 @@ def ParsePcdErrorCode (Value = None, ContainerFile = None, LineNum = None):
             Base = 16
         else:
             Base = 10
-        ErrorCode = long(Value, Base)
+        ErrorCode = int(Value, Base)
         if ErrorCode > PCD_ERR_CODE_MAX_SIZE or ErrorCode < 0:
             Logger.Error('Parser',
                         FORMAT_NOT_SUPPORTED,
                         "The format %s of ErrorCode is not valid, should be UNIT32 type or long type" % Value,
                         File = ContainerFile,
                         Line = LineNum)
-        #
-        # To delete the tailing 'L'
-        #
-        return hex(ErrorCode)[:-1]
+        ErrorCode = '0x%x' % ErrorCode
+        return ErrorCode
     except ValueError as XStr:
         if XStr:
             pass

@@ -227,7 +227,7 @@ class InfSectionParser(InfDefinSectionParser,
         self.InfBuildOptionSection = InfBuildOptionsObject()
         self.InfLibraryClassSection = InfLibraryClassObject()
         self.InfPackageSection = InfPackageObject()
-        self.InfPcdSection = InfPcdObject(self.MetaFiles.keys()[0])
+        self.InfPcdSection = InfPcdObject(list(self.MetaFiles.keys())[0])
         self.InfSourcesSection = InfSourcesObject()
         self.InfUserExtensionSection = InfUserExtensionObject()
         self.InfProtocolSection = InfProtocolObject()
@@ -455,7 +455,7 @@ class InfSectionParser(InfDefinSectionParser,
                     Arch = Match.groups(1)[0].upper()
                     ArchList.append(Arch)
             CommentSoFar = ''
-            for Index in xrange(1, len(List)):
+            for Index in range(1, len(List)):
                 Result = ParseComment(List[Index], DT.ALL_USAGE_TOKENS, TokenDict, [], False)
                 Usage = Result[0]
                 Type = Result[1]

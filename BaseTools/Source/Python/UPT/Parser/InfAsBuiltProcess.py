@@ -205,7 +205,7 @@ def GetFileLineContent(FileName, WorkSpace, LineNo, OriginalString):
 
     try:
         FullFileName = FullFileName.replace('\\', '/')
-        Inputfile = open(FullFileName, "rb", 0)
+        Inputfile = open(FullFileName, "r")
         try:
             FileLinesList = Inputfile.readlines()
         except BaseException:
@@ -247,7 +247,7 @@ def GetGuidVerFormLibInstance(Guid, Version, WorkSpace, CurrentInfFileName):
                 continue
             InfFile = InfFile.replace('\\', '/')
             if InfFile not in GlobalData.gLIBINSTANCEDICT:
-                InfFileObj = open(InfFile, "rb", 0)
+                InfFileObj = open(InfFile, "r")
                 GlobalData.gLIBINSTANCEDICT[InfFile] = InfFileObj
             else:
                 InfFileObj = GlobalData.gLIBINSTANCEDICT[InfFile]

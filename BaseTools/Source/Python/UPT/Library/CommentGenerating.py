@@ -124,10 +124,8 @@ def GenHeaderCommentSection(Abstract, Description, Copyright, License, IsBinaryH
     #
     # Convert special character to (c), (r) and (tm).
     #
-    if isinstance(Abstract, unicode):
-        Abstract = ConvertSpecialUnicodes(Abstract)
-    if isinstance(Description, unicode):
-        Description = ConvertSpecialUnicodes(Description)
+    Abstract = ConvertSpecialUnicodes(Abstract)
+    Description = ConvertSpecialUnicodes(Description)
     if IsBinaryHeader:
         Content += CommChar * 2 + TAB_SPACE_SPLIT + TAB_BINARY_HEADER_COMMENT + '\r\n'
     elif CommChar == TAB_COMMENT_EDK1_SPLIT:

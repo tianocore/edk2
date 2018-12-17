@@ -119,10 +119,12 @@ def UniToHexList(Uni):
 # @retval NewUni:  The converted unicode string
 #
 def ConvertSpecialUnicodes(Uni):
-    NewUni = Uni
+    OldUni = NewUni = Uni
     NewUni = NewUni.replace(u'\u00A9', '(c)')
     NewUni = NewUni.replace(u'\u00AE', '(r)')
     NewUni = NewUni.replace(u'\u2122', '(tm)')
+    if OldUni == NewUni:
+        NewUni = OldUni
     return NewUni
 
 ## GetLanguageCode1766
@@ -513,7 +515,7 @@ class UniFileClassObject(object):
                     FileIn[LineCount-1] = Line
                     FileIn[LineCount] = '\r\n'
                     LineCount -= 1
-                    for Index in xrange (LineCount + 1, len (FileIn) - 1):
+                    for Index in range (LineCount + 1, len (FileIn) - 1):
                         if (Index == len(FileIn) -1):
                             FileIn[Index] = '\r\n'
                         else:

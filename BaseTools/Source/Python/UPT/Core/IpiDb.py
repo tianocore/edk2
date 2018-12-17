@@ -44,7 +44,7 @@ class IpiDatabase(object):
         Dir = os.path.dirname(DbPath)
         if not os.path.isdir(Dir):
             os.mkdir(Dir)
-        self.Conn = sqlite3.connect(unicode(DbPath), isolation_level='DEFERRED')
+        self.Conn = sqlite3.connect(u''.join(DbPath), isolation_level='DEFERRED')
         self.Conn.execute("PRAGMA page_size=4096")
         self.Conn.execute("PRAGMA synchronous=OFF")
         self.Cur = self.Conn.cursor()
@@ -921,7 +921,7 @@ class IpiDatabase(object):
     def __ConvertToSqlString(self, StringList):
         if self.DpTable:
             pass
-        return map(lambda s: s.replace("'", "''"), StringList)
+        return list(map(lambda s: s.replace("'", "''"), StringList))
 
 
 

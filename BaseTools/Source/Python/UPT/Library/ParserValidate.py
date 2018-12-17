@@ -727,7 +727,7 @@ def IsValidUserId(UserId):
 #
 def CheckUTF16FileHeader(File):
     FileIn = open(File, 'rb').read(2)
-    if FileIn != '\xff\xfe':
+    if FileIn != b'\xff\xfe':
         return False
 
     return True

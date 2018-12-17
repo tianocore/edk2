@@ -151,7 +151,7 @@ def IsValidNumValUint8(Token):
     else:
         Base = 10
     try:
-        TokenValue = long(Token, Base)
+        TokenValue = int(Token, Base)
     except BaseException:
         Valid, Cause = IsValidLogicalExpr(Token, True)
         if Cause:
@@ -262,30 +262,10 @@ def IsValidPcdDatum(Type, Value):
                 Value = Value.lstrip('0')
                 if not Value:
                     return True, ""
-            Value = long(Value, 0)
-            TypeLenMap = {
-                #
-                # 0x00 - 0xff
-                #
-                'UINT8'  : 2,
-                #
-                # 0x0000 - 0xffff
-                #
-                'UINT16' : 4,
-                #
-                # 0x00000000 - 0xffffffff
-                #
-                'UINT32' : 8,
-                #
-                # 0x0 - 0xffffffffffffffff
-                #
-                'UINT64' : 16
-            }
-            HexStr = hex(Value)
-            #
-            # First two chars of HexStr are 0x and tail char is L
-            #
-            if TypeLenMap[Type] < len(HexStr) - 3:
+            Value = int(Value, 0)
+            MAX_VAL_TYPE = {"BOOLEAN": 0x01, 'UINT8': 0xFF, 'UINT16': 0xFFFF, 'UINT32': 0xFFFFFFFF,
+                            'UINT64': 0xFFFFFFFFFFFFFFFF}
+            if Value > MAX_VAL_TYPE[Type]:
                 return False, ST.ERR_DECPARSE_PCD_INT_EXCEED % (StrVal, Type)
         except BaseException:
             Valid, Cause = IsValidLogicalExpr(Value, True)

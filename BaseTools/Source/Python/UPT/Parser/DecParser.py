@@ -622,7 +622,7 @@ class _DecPcd(_DecBase):
         elif not Token.startswith('0x') and not Token.startswith('0X'):
             if int(Token) > 4294967295:
                 self._LoggerError(ST.ERR_DECPARSE_PCD_TOKEN_INT % Token)
-            Token = hex(int(Token))[:-1]
+            Token = '0x%x' % int(Token)
 
         IntToken = int(Token, 0)
         if (Guid, IntToken) in self.TokenMap:
@@ -752,7 +752,7 @@ class _DecUserExtension(_DecBase):
 class Dec(_DecBase, _DecComments):
     def __init__(self, DecFile, Parse = True):
         try:
-            Content = ConvertSpecialChar(open(DecFile, 'rb').readlines())
+            Content = ConvertSpecialChar(open(DecFile, 'r').readlines())
         except BaseException:
             Logger.Error(TOOL_NAME, FILE_OPEN_FAILURE, File=DecFile,
                          ExtraData=ST.ERR_DECPARSE_FILEOPEN % DecFile)

@@ -32,7 +32,7 @@ from os import linesep
 from os import walk
 from os import environ
 import re
-from UserDict import IterableUserDict
+from collections import OrderedDict
 
 import Logger.Log as Logger
 from Logger import StringTable as ST
@@ -160,23 +160,35 @@ def RemoveDirectory(Directory, Recursively=False):
 #                              or not
 #
 def SaveFileOnChange(File, Content, IsBinaryFile=True):
-    if not IsBinaryFile:
-        Content = Content.replace("\n", linesep)
-
     if os.path.exists(File):
-        try:
-            if Content == __FileHookOpen__(File, "rb").read():
-                return False
-        except BaseException:
-            Logger.Error(None, ToolError.FILE_OPEN_FAILURE, ExtraData=File)
+        if IsBinaryFile:
+            try:
+                if Content == __FileHookOpen__(File, "rb").read():
+                    return False
+            except BaseException:
+                Logger.Error(None, ToolError.FILE_OPEN_FAILURE, ExtraData=File)
+        else:
+            try:
+                if Content == __FileHookOpen__(File, "r").read():
+                    return False
+            except BaseException:
+                Logger.Error(None, ToolError.FILE_OPEN_FAILURE, ExtraData=File)
 
     CreateDirectory(os.path.dirname(File))
-    try:
-        FileFd = __FileHookOpen__(File, "wb")
-        FileFd.write(Content)
-        FileFd.close()
-    except BaseException:
-        Logger.Error(None, ToolError.FILE_CREATE_FAILURE, ExtraData=File)
+    if IsBinaryFile:
+        try:
+            FileFd = __FileHookOpen__(File, "wb")
+            FileFd.write(Content)
+            FileFd.close()
+        except BaseException:
+            Logger.Error(None, ToolError.FILE_CREATE_FAILURE, ExtraData=File)
+    else:
+        try:
+            FileFd = __FileHookOpen__(File, "w")
+            FileFd.write(Content)
+            FileFd.close()
+        except BaseException:
+            Logger.Error(None, ToolError.FILE_CREATE_FAILURE, ExtraData=File)
 
     return True
 
@@ -288,148 +300,6 @@ def RealPath2(File, Dir='', OverrideDir=''):
 
     return None, None
 
-## A dict which can access its keys and/or values orderly
-#
-#  The class implements a new kind of dict which its keys or values can be
-#  accessed in the order they are added into the dict. It guarantees the order
-#  by making use of an internal list to keep a copy of keys.
-#
-class Sdict(IterableUserDict):
-    ## Constructor
-    #
-    def __init__(self):
-        IterableUserDict.__init__(self)
-        self._key_list = []
-
-    ## [] operator
-    #
-    def __setitem__(self, Key, Value):
-        if Key not in self._key_list:
-            self._key_list.append(Key)
-        IterableUserDict.__setitem__(self, Key, Value)
-
-    ## del operator
-    #
-    def __delitem__(self, Key):
-        self._key_list.remove(Key)
-        IterableUserDict.__delitem__(self, Key)
-
-    ## used in "for k in dict" loop to ensure the correct order
-    #
-    def __iter__(self):
-        return self.iterkeys()
-
-    ## len() support
-    #
-    def __len__(self):
-        return len(self._key_list)
-
-    ## "in" test support
-    #
-    def __contains__(self, Key):
-        return Key in self._key_list
-
-    ## indexof support
-    #
-    def index(self, Key):
-        return self._key_list.index(Key)
-
-    ## insert support
-    #
-    def insert(self, Key, Newkey, Newvalue, Order):
-        Index = self._key_list.index(Key)
-        if Order == 'BEFORE':
-            self._key_list.insert(Index, Newkey)
-            IterableUserDict.__setitem__(self, Newkey, Newvalue)
-        elif Order == 'AFTER':
-            self._key_list.insert(Index + 1, Newkey)
-            IterableUserDict.__setitem__(self, Newkey, Newvalue)
-
-    ## append support
-    #
-    def append(self, Sdict2):
-        for Key in Sdict2:
-            if Key not in self._key_list:
-                self._key_list.append(Key)
-            IterableUserDict.__setitem__(self, Key, Sdict2[Key])
-    ## hash key
-    #
-    def has_key(self, Key):
-        return Key in self._key_list
-
-    ## Empty the dict
-    #
-    def clear(self):
-        self._key_list = []
-        IterableUserDict.clear(self)
-
-    ## Return a copy of keys
-    #
-    def keys(self):
-        Keys = []
-        for Key in self._key_list:
-            Keys.append(Key)
-        return Keys
-
-    ## Return a copy of values
-    #
-    def values(self):
-        Values = []
-        for Key in self._key_list:
-            Values.append(self[Key])
-        return Values
-
-    ## Return a copy of (key, value) list
-    #
-    def items(self):
-        Items = []
-        for Key in self._key_list:
-            Items.append((Key, self[Key]))
-        return Items
-
-    ## Iteration support
-    #
-    def iteritems(self):
-        return iter(self.items())
-
-    ## Keys interation support
-    #
-    def iterkeys(self):
-        return iter(self.keys())
-
-    ## Values interation support
-    #
-    def itervalues(self):
-        return iter(self.values())
-
-    ## Return value related to a key, and remove the (key, value) from the dict
-    #
-    def pop(self, Key, *Dv):
-        Value = None
-        if Key in self._key_list:
-            Value = self[Key]
-            self.__delitem__(Key)
-        elif len(Dv) != 0 :
-            Value = Dv[0]
-        return Value
-
-    ## Return (key, value) pair, and remove the (key, value) from the dict
-    #
-    def popitem(self):
-        Key = self._key_list[-1]
-        Value = self[Key]
-        self.__delitem__(Key)
-        return Key, Value
-    ## update method
-    #
-    def update(self, Dict=None, **Kwargs):
-        if Dict is not None:
-            for Key1, Val1 in Dict.items():
-                self[Key1] = Val1
-        if len(Kwargs):
-            for Key1, Val1 in Kwargs.items():
-                self[Key1] = Val1
-
 ## CommonPath
 #
 # @param PathList: PathList
@@ -437,7 +307,7 @@ class Sdict(IterableUserDict):
 def CommonPath(PathList):
     Path1 = min(PathList).split(os.path.sep)
     Path2 = max(PathList).split(os.path.sep)
-    for Index in xrange(min(len(Path1), len(Path2))):
+    for Index in range(min(len(Path1), len(Path2))):
         if Path1[Index] != Path2[Index]:
             return os.path.sep.join(Path1[:Index])
     return os.path.sep.join(Path1)
@@ -890,7 +760,7 @@ def ProcessEdkComment(LineList):
             if FindEdkBlockComment:
                 if FirstPos == -1:
                     FirstPos = StartPos
-                for Index in xrange(StartPos, EndPos+1):
+                for Index in range(StartPos, EndPos+1):
                     LineList[Index] = ''
                 FindEdkBlockComment = False
         elif Line.find("//") != -1 and not Line.startswith("#"):
@@ -957,7 +827,7 @@ def GetLibInstanceInfo(String, WorkSpace, LineNo):
         FileLinesList = []
 
         try:
-            FInputfile = open(FullFileName, "rb", 0)
+            FInputfile = open(FullFileName, "r")
             try:
                 FileLinesList = FInputfile.readlines()
             except BaseException:

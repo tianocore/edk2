@@ -42,7 +42,7 @@ MSG_USAGE_STRING = _("\n"
 MSG_VERSION_NUMBER = _("1.1")
 MSG_VERSION = _("UEFI Packaging Tool (UEFIPT) - Revision " + \
                 MSG_VERSION_NUMBER)
-MSG_COPYRIGHT = _("Copyright (c) 2011 - 2016 Intel Corporation All Rights Reserved.")
+MSG_COPYRIGHT = _("Copyright (c) 2011 - 2018 Intel Corporation All Rights Reserved.")
 MSG_VERSION_COPYRIGHT = _("\n  %s\n  %s" % (MSG_VERSION, MSG_COPYRIGHT))
 MSG_USAGE = _("%s [options]\n%s" % ("UPT", MSG_VERSION_COPYRIGHT))
 MSG_DESCRIPTION = _("The UEFIPT is used to create, " + \

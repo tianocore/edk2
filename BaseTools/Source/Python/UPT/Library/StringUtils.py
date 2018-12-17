@@ -20,7 +20,6 @@ StringUtils
 #
 import re
 import os.path
-from string import strip
 import Logger.Log as Logger
 import Library.DataType as DataType
 from Logger.ToolError import FORMAT_INVALID
@@ -44,7 +43,7 @@ gMACRO_PATTERN = re.compile("\$\(([_A-Z][_A-Z0-9]*)\)", re.UNICODE)
 #
 #
 def GetSplitValueList(String, SplitTag=DataType.TAB_VALUE_SPLIT, MaxSplit= -1):
-    return map(lambda l: l.strip(), String.split(SplitTag, MaxSplit))
+    return list(map(lambda l: l.strip(), String.split(SplitTag, MaxSplit)))
 
 ## MergeArches
 #
@@ -435,7 +434,7 @@ def GetSingleValueOfKeyFromLines(Lines, Dictionary, CommentCharacter, KeySplitCh
                 #
                 LineList[1] = CleanString(LineList[1], CommentCharacter)
                 if ValueSplitFlag:
-                    Value = map(strip, LineList[1].split(ValueSplitCharacter))
+                    Value = list(map(lambda x: x.strip(), LineList[1].split(ValueSplitCharacter)))
                 else:
                     Value = CleanString(LineList[1], CommentCharacter).splitlines()
 
@@ -632,7 +631,7 @@ def SplitString(String):
 # @param StringList:  A list for strings to be converted
 #
 def ConvertToSqlString(StringList):
-    return map(lambda s: s.replace("'", "''"), StringList)
+    return list(map(lambda s: s.replace("'", "''"), StringList))
 
 ## Convert To Sql String
 #
@@ -940,23 +939,24 @@ def SplitPcdEntry(String):
 def IsMatchArch(Arch1, Arch2):
     if 'COMMON' in Arch1 or 'COMMON' in Arch2:
         return True
-    if isinstance(Arch1, basestring) and isinstance(Arch2, basestring):
-        if Arch1 == Arch2:
-            return True
+    try:
+        if isinstance(Arch1, list) and isinstance(Arch2, list):
+            for Item1 in Arch1:
+                for Item2 in Arch2:
+                    if Item1 == Item2:
+                        return True
 
-    if isinstance(Arch1, basestring) and isinstance(Arch2, list):
-        return Arch1 in Arch2
+        elif isinstance(Arch1, list):
+            return Arch2 in Arch1
 
-    if isinstance(Arch2, basestring) and isinstance(Arch1, list):
-        return Arch2 in Arch1
+        elif isinstance(Arch2, list):
+            return Arch1 in Arch2
 
-    if isinstance(Arch1, list) and isinstance(Arch2, list):
-        for Item1 in Arch1:
-            for Item2 in Arch2:
-                if Item1 == Item2:
-                    return True
-
-    return False
+        else:
+            if Arch1 == Arch2:
+                return True
+    except:
+        return False
 
 # Search all files in FilePath to find the FileName with the largest index
 # Return the FileName with index +1 under the FilePath

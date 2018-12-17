@@ -180,7 +180,7 @@ def XmlElementData(Dom):
 # @param  String             A XPath style path.
 #
 def XmlElementList(Dom, String):
-    return map(XmlElementData, XmlList(Dom, String))
+    return list(map(XmlElementData, XmlList(Dom, String)))
 
 
 ## Get the XML attribute of the current node.
