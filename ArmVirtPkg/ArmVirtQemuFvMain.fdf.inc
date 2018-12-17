@@ -126,9 +126,9 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/Network/VlanConfigDxe/VlanConfigDxe.inf
   INF MdeModulePkg/Universal/Network/Mtftp4Dxe/Mtftp4Dxe.inf
   INF MdeModulePkg/Universal/Network/Udp4Dxe/Udp4Dxe.inf
+  INF NetworkPkg/TcpDxe/TcpDxe.inf
   INF NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf
   INF NetworkPkg/IScsiDxe/IScsiDxe.inf
-  INF NetworkPkg/TcpDxe/TcpDxe.inf
 !if $(NETWORK_IP6_ENABLE) == TRUE
   INF NetworkPkg/Ip6Dxe/Ip6Dxe.inf
   INF NetworkPkg/Udp6Dxe/Udp6Dxe.inf
