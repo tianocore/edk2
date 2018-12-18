@@ -34,15 +34,16 @@
 #define TIME_UNITS_PER_SECOND 10000000
 
 // Tick frequency of the generic timer basis of the generic watchdog.
-UINTN mTimerFrequencyHz = 0;
+STATIC UINTN mTimerFrequencyHz = 0;
 
 /* In cases where the compare register was set manually, information about
    how long the watchdog was asked to wait cannot be retrieved from hardware.
    It is therefore stored here. 0 means the timer is not running. */
-UINT64 mNumTimerTicks = 0;
+STATIC UINT64 mNumTimerTicks = 0;
 
-EFI_HARDWARE_INTERRUPT2_PROTOCOL *mInterruptProtocol;
+STATIC EFI_HARDWARE_INTERRUPT2_PROTOCOL *mInterruptProtocol;
 
+STATIC
 VOID
 WatchdogWriteOffsetRegister (
   UINT32  Value
@@ -51,6 +52,7 @@ WatchdogWriteOffsetRegister (
   MmioWrite32 (GENERIC_WDOG_OFFSET_REG, Value);
 }
 
+STATIC
 VOID
 WatchdogWriteCompareRegister (
   UINT64  Value
@@ -60,6 +62,7 @@ WatchdogWriteCompareRegister (
   MmioWrite32 (GENERIC_WDOG_COMPARE_VALUE_REG_HIGH, (Value >> 32) & MAX_UINT32);
 }
 
+STATIC
 VOID
 WatchdogEnable (
   VOID
@@ -68,6 +71,7 @@ WatchdogEnable (
   MmioWrite32 (GENERIC_WDOG_CONTROL_STATUS_REG, GENERIC_WDOG_ENABLED);
 }
 
+STATIC
 VOID
 WatchdogDisable (
   VOID
@@ -79,6 +83,7 @@ WatchdogDisable (
 /** On exiting boot services we must make sure the Watchdog Timer
     is stopped.
 **/
+STATIC
 VOID
 EFIAPI
 WatchdogExitBootServicesEvent (
@@ -93,6 +98,7 @@ WatchdogExitBootServicesEvent (
 /* This function is called when the watchdog's first signal (WS0) goes high.
    It uses the ResetSystem Runtime Service to reset the board.
 */
+STATIC
 VOID
 EFIAPI
 WatchdogInterruptHandler (
@@ -141,10 +147,11 @@ WatchdogInterruptHandler (
   @retval EFI_UNSUPPORTED       The code does not support NotifyFunction.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 WatchdogRegisterHandler (
-  IN CONST EFI_WATCHDOG_TIMER_ARCH_PROTOCOL   *This,
+  IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL         *This,
   IN EFI_WATCHDOG_TIMER_NOTIFY                NotifyFunction
   )
 {
@@ -167,10 +174,11 @@ WatchdogRegisterHandler (
                                 in TimerPeriod 100ns units.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 WatchdogSetTimerPeriod (
-  IN CONST EFI_WATCHDOG_TIMER_ARCH_PROTOCOL   *This,
+  IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL         *This,
   IN UINT64                                   TimerPeriod   // In 100ns units
   )
 {
@@ -222,10 +230,11 @@ WatchdogSetTimerPeriod (
   @retval EFI_INVALID_PARAMETER TimerPeriod is NULL.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 WatchdogGetTimerPeriod (
-  IN CONST EFI_WATCHDOG_TIMER_ARCH_PROTOCOL   *This,
+  IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL         *This,
   OUT UINT64                                  *TimerPeriod
   )
 {
@@ -270,13 +279,13 @@ WatchdogGetTimerPeriod (
   Retrieves the period of the timer interrupt in 100ns units.
 
 **/
-EFI_WATCHDOG_TIMER_ARCH_PROTOCOL    gWatchdogTimer = {
-  (EFI_WATCHDOG_TIMER_REGISTER_HANDLER)WatchdogRegisterHandler,
-  (EFI_WATCHDOG_TIMER_SET_TIMER_PERIOD)WatchdogSetTimerPeriod,
-  (EFI_WATCHDOG_TIMER_GET_TIMER_PERIOD)WatchdogGetTimerPeriod
+STATIC EFI_WATCHDOG_TIMER_ARCH_PROTOCOL mWatchdogTimer = {
+  WatchdogRegisterHandler,
+  WatchdogSetTimerPeriod,
+  WatchdogGetTimerPeriod
 };
 
-EFI_EVENT                           EfiExitBootServicesEvent = (EFI_EVENT)NULL;
+STATIC EFI_EVENT mEfiExitBootServicesEvent;
 
 EFI_STATUS
 EFIAPI
@@ -288,6 +297,10 @@ GenericWatchdogEntry (
   EFI_STATUS                      Status;
   EFI_HANDLE                      Handle;
 
+  Status = gBS->LocateProtocol (&gHardwareInterrupt2ProtocolGuid, NULL,
+                  (VOID **)&mInterruptProtocol);
+  ASSERT_EFI_ERROR (Status);
+
   /* Make sure the Watchdog Timer Architectural Protocol has not been installed
      in the system yet.
      This will avoid conflicts with the universal watchdog */
@@ -296,51 +309,45 @@ GenericWatchdogEntry (
   mTimerFrequencyHz = ArmGenericTimerGetTimerFreq ();
   ASSERT (mTimerFrequencyHz != 0);
 
-  // Register for an ExitBootServicesEvent
-  Status = gBS->CreateEvent (
-                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
-                  TPL_NOTIFY,
-                  WatchdogExitBootServicesEvent,
-                  NULL,
-                  &EfiExitBootServicesEvent
-                  );
-  if (!EFI_ERROR (Status)) {
-    // Install interrupt handler
-    Status = gBS->LocateProtocol (
-                    &gHardwareInterrupt2ProtocolGuid,
-                    NULL,
-                    (VOID **)&mInterruptProtocol
-                    );
-    if (!EFI_ERROR (Status)) {
-      Status = mInterruptProtocol->RegisterInterruptSource (
-                 mInterruptProtocol,
-                 FixedPcdGet32 (PcdGenericWatchdogEl2IntrNum),
-                 WatchdogInterruptHandler
-                 );
-      if (!EFI_ERROR (Status)) {
-        Status = mInterruptProtocol->SetTriggerType (
-                   mInterruptProtocol,
-                   FixedPcdGet32 (PcdGenericWatchdogEl2IntrNum),
-                   EFI_HARDWARE_INTERRUPT2_TRIGGER_EDGE_RISING
-                   );
-        if (!EFI_ERROR (Status)) {
-          // Install the Timer Architectural Protocol onto a new handle
-          Handle = NULL;
-          Status = gBS->InstallMultipleProtocolInterfaces (
-                          &Handle,
-                          &gEfiWatchdogTimerArchProtocolGuid,
-                          &gWatchdogTimer,
-                          NULL
-                          );
-        }
-      }
-    }
+  // Install interrupt handler
+  Status = mInterruptProtocol->RegisterInterruptSource (mInterruptProtocol,
+                                 FixedPcdGet32 (PcdGenericWatchdogEl2IntrNum),
+                                 WatchdogInterruptHandler);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
+  Status = mInterruptProtocol->SetTriggerType (mInterruptProtocol,
+                                 FixedPcdGet32 (PcdGenericWatchdogEl2IntrNum),
+                                 EFI_HARDWARE_INTERRUPT2_TRIGGER_EDGE_RISING);
+  if (EFI_ERROR (Status)) {
+    goto UnregisterHandler;
+  }
+
+  // Install the Timer Architectural Protocol onto a new handle
+  Handle = NULL;
+  Status = gBS->InstallMultipleProtocolInterfaces (&Handle,
+                  &gEfiWatchdogTimerArchProtocolGuid, &mWatchdogTimer,
+                  NULL);
+  if (EFI_ERROR (Status)) {
+    goto UnregisterHandler;
+  }
+
+  // Register for an ExitBootServicesEvent
+  Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_NOTIFY,
+                  WatchdogExitBootServicesEvent, NULL,
+                  &mEfiExitBootServicesEvent);
   ASSERT_EFI_ERROR (Status);
 
   mNumTimerTicks = 0;
   WatchdogDisable ();
 
+  return EFI_SUCCESS;
+
+UnregisterHandler:
+  // Unregister the handler
+  mInterruptProtocol->RegisterInterruptSource (mInterruptProtocol,
+                        FixedPcdGet32 (PcdGenericWatchdogEl2IntrNum),
+                        NULL);
   return Status;
 }
