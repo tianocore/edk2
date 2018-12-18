@@ -167,7 +167,7 @@ class BuildFile(object):
         "gmake" :   "include"
     }
 
-    _INC_FLAG_ = {TAB_COMPILER_MSFT : "/I", "GCC" : "-I", "INTEL" : "-I", "RVCT" : "-I"}
+    _INC_FLAG_ = {TAB_COMPILER_MSFT : "/I", "GCC" : "-I", "INTEL" : "-I", "RVCT" : "-I", "NASM" : "-I"}
 
     ## Constructor of BuildFile
     #
@@ -596,6 +596,24 @@ cleanlib:
                                                 }
                                                 )
         FileMacroList.append(FileMacro)
+        # Add support when compiling .nasm source files
+        for File in self.FileCache.keys():
+            if not str(File).endswith('.nasm'):
+                continue
+            IncludePathList = []
+            for P in  MyAgo.IncludePathList:
+                IncludePath = self._INC_FLAG_['NASM'] + self.PlaceMacro(P, self.Macros)
+                if IncludePath.endswith(os.sep):
+                    IncludePath = IncludePath.rstrip(os.sep)
+                # When compiling .nasm files, need to add a literal backslash at each path
+                # To specify a literal backslash at the end of the line, precede it with a caret (^)
+                if P == MyAgo.IncludePathList[-1] and os.sep == '\\':
+                    IncludePath = ''.join([IncludePath, '^', os.sep])
+                else:
+                    IncludePath = os.path.join(IncludePath, '')
+                IncludePathList.append(IncludePath)
+            FileMacroList.append(self._FILE_MACRO_TEMPLATE.Replace({"macro_name": "NASM_INC", "source_file": IncludePathList}))
+            break
 
         # Generate macros used to represent files containing list of input files
         for ListFileMacro in self.ListFileMacros:
