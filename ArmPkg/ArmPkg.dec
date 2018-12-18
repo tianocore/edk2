@@ -80,10 +80,6 @@
   # it has been configured by the CPU DXE
   gArmTokenSpaceGuid.PcdDebuggerExceptionSupport|FALSE|BOOLEAN|0x00000032
 
-  # Define if the spin-table mechanism is used by the secondary cores when booting
-  # Linux (instead of PSCI)
-  gArmTokenSpaceGuid.PcdArmLinuxSpinTable|FALSE|BOOLEAN|0x00000033
-
   # Define if the GICv3 controller should use the GICv2 legacy
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE|BOOLEAN|0x00000042
 
@@ -173,16 +169,6 @@
   # By default we do not do a transition to non-secure mode
   gArmTokenSpaceGuid.PcdArmNonSecModeTransition|0x0|UINT32|0x0000003E
 
-  # The Linux ATAGs are expected to be under 0x4000 (16KB) from the beginning of the System Memory
-  gArmTokenSpaceGuid.PcdArmLinuxAtagMaxOffset|0x4000|UINT32|0x00000020
-
-  # If the fixed FDT address is not available, then it should be loaded below the kernel.
-  # The recommendation from the Linux kernel is to have the FDT below 16KB.
-  # (see the kernel doc: Documentation/arm/Booting)
-  gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset|0x4000|UINT32|0x00000023
-  # The FDT blob must be loaded at a 64bit aligned address.
-  gArmTokenSpaceGuid.PcdArmLinuxFdtAlignment|0x8|UINT32|0x00000026
-
   # Non Secure Access Control Register
   # - BIT15 : NSASEDIS - Disable Non-secure Advanced SIMD functionality
   # - BIT14 : NSD32DIS - Disable Non-secure use of D16-D31
@@ -221,12 +207,6 @@
   # Other modes include using SP0 or switching to Aarch32, but these are
   # not currently supported.
   gArmTokenSpaceGuid.PcdArmNonSecModeTransition|0x3c9|UINT32|0x0000003E
-  # If the fixed FDT address is not available, then it should be loaded above the kernel.
-  # The recommendation from the AArch64 Linux kernel is to have the FDT below 512MB.
-  # (see the kernel doc: Documentation/arm64/booting.txt)
-  gArmTokenSpaceGuid.PcdArmLinuxFdtMaxOffset|0x20000000|UINT32|0x00000023
-  # The FDT blob must be loaded at a 2MB aligned address.
-  gArmTokenSpaceGuid.PcdArmLinuxFdtAlignment|0x00200000|UINT32|0x00000026
 
 
 #
