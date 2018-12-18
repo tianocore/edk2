@@ -42,6 +42,7 @@ STATIC UINTN mTimerFrequencyHz = 0;
 STATIC UINT64 mNumTimerTicks = 0;
 
 STATIC EFI_HARDWARE_INTERRUPT2_PROTOCOL *mInterruptProtocol;
+STATIC EFI_WATCHDOG_TIMER_NOTIFY        mWatchdogNotify;
 
 STATIC
 VOID
@@ -107,17 +108,25 @@ WatchdogInterruptHandler (
   )
 {
   STATIC CONST CHAR16 ResetString[]= L"The generic watchdog timer ran out.";
+  UINT64              TimerPeriod;
 
   WatchdogDisable ();
 
   mInterruptProtocol->EndOfInterrupt (mInterruptProtocol, Source);
 
-  gRT->ResetSystem (
-         EfiResetCold,
-         EFI_TIMEOUT,
-         StrSize (ResetString),
-         (VOID *) &ResetString
-         );
+  //
+  // The notify function should be called with the elapsed number of ticks
+  // since the watchdog was armed, which should exceed the timer period.
+  // We don't actually know the elapsed number of ticks, so let's return
+  // the timer period plus 1.
+  //
+  if (mWatchdogNotify != NULL) {
+    TimerPeriod = ((TIME_UNITS_PER_SECOND / mTimerFrequencyHz) * mNumTimerTicks);
+    mWatchdogNotify (TimerPeriod + 1);
+  }
+
+  gRT->ResetSystem (EfiResetCold, EFI_TIMEOUT, StrSize (ResetString),
+         (CHAR16 *)ResetString);
 
   // If we got here then the reset didn't work
   ASSERT (FALSE);
@@ -155,9 +164,16 @@ WatchdogRegisterHandler (
   IN EFI_WATCHDOG_TIMER_NOTIFY                NotifyFunction
   )
 {
-  // ERROR: This function is not supported.
-  // The watchdog will reset the board
-  return EFI_UNSUPPORTED;
+  if (mWatchdogNotify == NULL && NotifyFunction == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (mWatchdogNotify != NULL && NotifyFunction != NULL) {
+    return EFI_ALREADY_STARTED;
+  }
+
+  mWatchdogNotify = NotifyFunction;
+  return EFI_SUCCESS;
 }
 
 /**
