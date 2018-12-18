@@ -152,7 +152,7 @@ typedef enum {
 #define NOFLSH    0x0800    /* don't flush output on signal */
 #define FLUSHO    0x1000    /* output being flushed (state) */
 
-typedef INT8    cc_t;
+typedef UINT8   cc_t;
 typedef UINT16  tcflag_t;
 typedef UINT32  speed_t;
 
