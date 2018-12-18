@@ -21,12 +21,17 @@
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
 
+#include <Protocol/HardwareInterrupt.h>
 #include <Protocol/WatchdogTimer.h>
 
 #include "SP805Watchdog.h"
 
-STATIC EFI_EVENT          mEfiExitBootServicesEvent;
+STATIC EFI_EVENT                        mEfiExitBootServicesEvent;
+STATIC EFI_HARDWARE_INTERRUPT_PROTOCOL  *mInterrupt;
+STATIC EFI_WATCHDOG_TIMER_NOTIFY        mWatchdogNotify;
+STATIC UINT32                           mTimerPeriod;
 
 /**
   Make sure the SP805 registers are unlocked for writing.
@@ -63,6 +68,33 @@ SP805Lock (
     // To lock it, just write in any number (except the special unlock code).
     MmioWrite32 (SP805_WDOG_LOCK_REG, SP805_WDOG_LOCK_IS_LOCKED);
   }
+}
+
+STATIC
+VOID
+EFIAPI
+SP805InterruptHandler (
+  IN  HARDWARE_INTERRUPT_SOURCE   Source,
+  IN  EFI_SYSTEM_CONTEXT          SystemContext
+  )
+{
+  SP805Unlock ();
+  MmioWrite32 (SP805_WDOG_INT_CLR_REG, 0); // write of any value clears the irq
+  SP805Lock ();
+
+  mInterrupt->EndOfInterrupt (mInterrupt, Source);
+
+  //
+  // The notify function should be called with the elapsed number of ticks
+  // since the watchdog was armed, which should exceed the timer period.
+  // We don't actually know the elapsed number of ticks, so let's return
+  // the timer period plus 1.
+  //
+  if (mWatchdogNotify != NULL) {
+    mWatchdogNotify (mTimerPeriod + 1);
+  }
+
+  gRT->ResetSystem (EfiResetCold, EFI_TIMEOUT, 0, NULL);
 }
 
 /**
@@ -149,9 +181,16 @@ SP805RegisterHandler (
   IN EFI_WATCHDOG_TIMER_NOTIFY                NotifyFunction
   )
 {
-  // ERROR: This function is not supported.
-  // The hardware watchdog will reset the board
-  return EFI_INVALID_PARAMETER;
+  if (mWatchdogNotify == NULL && NotifyFunction == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  if (mWatchdogNotify != NULL && NotifyFunction != NULL) {
+    return EFI_ALREADY_STARTED;
+  }
+
+  mWatchdogNotify = NotifyFunction;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -202,19 +241,16 @@ SP805SetTimerPeriod (
     SP805Stop ();
   } else {
     // Calculate the Watchdog ticks required for a delay of (TimerTicks * 100) nanoseconds
-    // The SP805 will count down to ZERO once, generate an interrupt and
-    // then it will again reload the initial value and start again.
-    // On the second time when it reaches ZERO, it will actually reset the board.
-    // Therefore, we need to load half the required delay.
+    // The SP805 will count down to zero and generate an interrupt.
     //
-    // WatchdogTicks = ((TimerPeriod * 100 * SP805_CLOCK_FREQUENCY) / 1GHz) / 2 ;
+    // WatchdogTicks = ((TimerPeriod * 100 * SP805_CLOCK_FREQUENCY) / 1GHz);
     //
     // i.e.:
     //
-    // WatchdogTicks = (TimerPeriod * SP805_CLOCK_FREQUENCY) / 20 MHz ;
+    // WatchdogTicks = (TimerPeriod * SP805_CLOCK_FREQUENCY) / 10 MHz ;
 
     Ticks64bit = MultU64x32 (TimerPeriod, PcdGet32 (PcdSP805WatchdogClockFrequencyInHz));
-    Ticks64bit = DivU64x32 (Ticks64bit, 20000000);
+    Ticks64bit = DivU64x32 (Ticks64bit, 10 * 1000 * 1000);
 
     // The registers in the SP805 are only 32 bits
     if (Ticks64bit > MAX_UINT32) {
@@ -233,9 +269,12 @@ SP805SetTimerPeriod (
     SP805Start ();
   }
 
+  mTimerPeriod = TimerPeriod;
+
 EXIT:
   // Ensure the watchdog is locked before exiting.
   SP805Lock ();
+  ASSERT_EFI_ERROR (Status);
   return Status;
 }
 
@@ -262,25 +301,11 @@ SP805GetTimerPeriod (
   OUT UINT64                                  *TimerPeriod
   )
 {
-  UINT64      ReturnValue;
-
   if (TimerPeriod == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  // Check if the watchdog is stopped
-  if ((MmioRead32 (SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_INTEN) == 0) {
-    // It is stopped, so return zero.
-    ReturnValue = 0;
-  } else {
-    // Convert the Watchdog ticks into TimerPeriod
-    // Ensure 64bit arithmetic throughout because the Watchdog ticks may already
-    // be at the maximum 32 bit value and we still need to multiply that by 600.
-    ReturnValue = MultU64x32 (MmioRead32 (SP805_WDOG_LOAD_REG), 600);
-  }
-
-  *TimerPeriod = ReturnValue;
-
+  *TimerPeriod = mTimerPeriod;
   return EFI_SUCCESS;
 }
 
@@ -343,6 +368,11 @@ SP805Initialize (
   EFI_STATUS  Status;
   EFI_HANDLE  Handle;
 
+  // Find the interrupt controller protocol.  ASSERT if not found.
+  Status = gBS->LocateProtocol (&gHardwareInterruptProtocolGuid, NULL,
+                  (VOID **)&mInterrupt);
+  ASSERT_EFI_ERROR (Status);
+
   // Unlock access to the SP805 registers
   SP805Unlock ();
 
@@ -350,12 +380,30 @@ SP805Initialize (
   SP805Stop ();
 
   // Set the watchdog to reset the board when triggered
+  // This is a last resort in case the interrupt handler fails
   if ((MmioRead32 (SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_RESEN) == 0) {
     MmioOr32 (SP805_WDOG_CONTROL_REG, SP805_WDOG_CTRL_RESEN);
   }
 
+  // Clear any pending interrupts
+  MmioWrite32 (SP805_WDOG_INT_CLR_REG, 0); // write of any value clears the irq
+
   // Prohibit any rogue access to SP805 registers
   SP805Lock ();
+
+  if (PcdGet32 (PcdSP805WatchdogInterrupt) > 0) {
+    Status = mInterrupt->RegisterInterruptSource (mInterrupt,
+                           PcdGet32 (PcdSP805WatchdogInterrupt),
+                           SP805InterruptHandler);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: failed to register watchdog interrupt - %r\n",
+        __FUNCTION__, Status));
+      return Status;
+    }
+  } else {
+    DEBUG ((DEBUG_WARN, "%a: no interrupt specified, running in RESET mode only\n",
+      __FUNCTION__));
+  }
 
   //
   // Make sure the Watchdog Timer Architectural Protocol has not been installed in the system yet.

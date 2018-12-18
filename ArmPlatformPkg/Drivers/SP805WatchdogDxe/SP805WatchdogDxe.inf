@@ -27,6 +27,7 @@
 [Packages]
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
 
 [LibraryClasses]
@@ -35,13 +36,16 @@
   IoLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
 
 [Pcd]
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogClockFrequencyInHz
+  gArmPlatformTokenSpaceGuid.PcdSP805WatchdogInterrupt
 
 [Protocols]
+  gHardwareInterruptProtocolGuid          ## ALWAYS_CONSUMES
   gEfiWatchdogTimerArchProtocolGuid       ## ALWAYS_PRODUCES
 
 [Depex]
-  TRUE
+  gHardwareInterruptProtocolGuid

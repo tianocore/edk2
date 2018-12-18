@@ -70,6 +70,7 @@
   ## SP805 Watchdog
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogBase|0x0|UINT32|0x00000023
   gArmPlatformTokenSpaceGuid.PcdSP805WatchdogClockFrequencyInHz|32000|UINT32|0x00000021
+  gArmPlatformTokenSpaceGuid.PcdSP805WatchdogInterrupt|0|UINT32|0x0000002E
 
   ## PL011 UART
   gArmPlatformTokenSpaceGuid.PL011UartClkInHz|24000000|UINT32|0x0000001F
