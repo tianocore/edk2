@@ -3,6 +3,7 @@
 #
 #  Copyright (c) 2014, Hewlett-Packard Development Company, L.P.<BR>
 #  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2018, Hewlett Packard Enterprise Development, L.P.<BR>
 #
 #  This program and the accompanying materials
 #  are licensed and made available under the terms and conditions of the BSD License
@@ -1384,7 +1385,8 @@ class Build():
 
         # genfds
         if Target == 'fds':
-            GenFdsApi(AutoGenObject.GenFdsCommandDict, self.Db)
+            if GenFdsApi(AutoGenObject.GenFdsCommandDict, self.Db):
+                EdkLogger.error("build", COMMAND_FAILURE)
             return True
 
         # run
@@ -2122,7 +2124,8 @@ class Build():
                         # Generate FD image if there's a FDF file found
                         #
                         GenFdsStart = time.time()
-                        GenFdsApi(Wa.GenFdsCommandDict, self.Db)
+                        if GenFdsApi(Wa.GenFdsCommandDict, self.Db):
+                            EdkLogger.error("build", COMMAND_FAILURE)
 
                         #
                         # Create MAP file for all platform FVs after GenFds.
