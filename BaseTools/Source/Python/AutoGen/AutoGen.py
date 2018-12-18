@@ -681,17 +681,17 @@ class WorkspaceAutoGen(AutoGen):
         #
         content = 'gCommandLineDefines: '
         content += str(GlobalData.gCommandLineDefines)
-        content += os.linesep
+        content += TAB_LINE_BREAK
         content += 'BuildOptionPcd: '
         content += str(GlobalData.BuildOptionPcd)
-        content += os.linesep
+        content += TAB_LINE_BREAK
         content += 'Active Platform: '
         content += str(self.Platform)
-        content += os.linesep
+        content += TAB_LINE_BREAK
         if self.FdfFile:
             content += 'Flash Image Definition: '
             content += str(self.FdfFile)
-            content += os.linesep
+            content += TAB_LINE_BREAK
         SaveFileOnChange(os.path.join(self.BuildDir, 'BuildOptions'), content, False)
 
         #
@@ -701,7 +701,7 @@ class WorkspaceAutoGen(AutoGen):
         if Pa.PcdTokenNumber:
             if Pa.DynamicPcdList:
                 for Pcd in Pa.DynamicPcdList:
-                    PcdTokenNumber += os.linesep
+                    PcdTokenNumber += TAB_LINE_BREAK
                     PcdTokenNumber += str((Pcd.TokenCName, Pcd.TokenSpaceGuidCName))
                     PcdTokenNumber += ' : '
                     PcdTokenNumber += str(Pa.PcdTokenNumber[Pcd.TokenCName, Pcd.TokenSpaceGuidCName])

@@ -548,8 +548,8 @@ cleanlib:
                 NewRespStr = ' '.join(NewStr)
                 SaveFileOnChange(RespFile, NewRespStr, False)
                 ToolsDef.append("%s = %s" % (Resp, UnexpandMacroStr + ' @' + RespFile))
-                RespFileListContent += '@' + RespFile + os.linesep
-                RespFileListContent += NewRespStr + os.linesep
+                RespFileListContent += '@' + RespFile + TAB_LINE_BREAK
+                RespFileListContent += NewRespStr + TAB_LINE_BREAK
             SaveFileOnChange(RespFileList, RespFileListContent, False)
         else:
             if os.path.exists(RespFileList):
