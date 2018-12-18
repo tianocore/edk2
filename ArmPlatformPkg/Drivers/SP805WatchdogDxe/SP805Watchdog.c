@@ -1,6 +1,7 @@
 /** @file
 *
 *  Copyright (c) 2011-2013, ARM Limited. All rights reserved.
+*  Copyright (c) 2018, Linaro Limited. All rights reserved.
 *
 *  This program and the accompanying materials
 *  are licensed and made available under the terms and conditions of the BSD License
@@ -19,16 +20,13 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
-#include <Library/PcdLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/UefiRuntimeServicesTableLib.h>
-#include <Library/UefiLib.h>
 
 #include <Protocol/WatchdogTimer.h>
 
 #include "SP805Watchdog.h"
 
-EFI_EVENT                           EfiExitBootServicesEvent = (EFI_EVENT)NULL;
+STATIC EFI_EVENT          mEfiExitBootServicesEvent;
 
 /**
   Make sure the SP805 registers are unlocked for writing.
@@ -43,8 +41,8 @@ SP805Unlock (
   VOID
   )
 {
-  if( MmioRead32(SP805_WDOG_LOCK_REG) == SP805_WDOG_LOCK_IS_LOCKED ) {
-    MmioWrite32(SP805_WDOG_LOCK_REG, SP805_WDOG_SPECIAL_UNLOCK_CODE);
+  if (MmioRead32 (SP805_WDOG_LOCK_REG) == SP805_WDOG_LOCK_IS_LOCKED) {
+    MmioWrite32 (SP805_WDOG_LOCK_REG, SP805_WDOG_SPECIAL_UNLOCK_CODE);
   }
 }
 
@@ -61,9 +59,9 @@ SP805Lock (
   VOID
   )
 {
-  if( MmioRead32(SP805_WDOG_LOCK_REG) == SP805_WDOG_LOCK_IS_UNLOCKED ) {
+  if (MmioRead32 (SP805_WDOG_LOCK_REG) == SP805_WDOG_LOCK_IS_UNLOCKED) {
     // To lock it, just write in any number (except the special unlock code).
-    MmioWrite32(SP805_WDOG_LOCK_REG, SP805_WDOG_LOCK_IS_LOCKED);
+    MmioWrite32 (SP805_WDOG_LOCK_REG, SP805_WDOG_LOCK_IS_LOCKED);
   }
 }
 
@@ -77,8 +75,8 @@ SP805Stop (
   )
 {
   // Disable interrupts
-  if ( (MmioRead32(SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_INTEN) != 0 ) {
-    MmioAnd32(SP805_WDOG_CONTROL_REG, ~SP805_WDOG_CTRL_INTEN);
+  if ((MmioRead32 (SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_INTEN) != 0) {
+    MmioAnd32 (SP805_WDOG_CONTROL_REG, ~SP805_WDOG_CTRL_INTEN);
   }
 }
 
@@ -94,8 +92,8 @@ SP805Start (
   )
 {
   // Enable interrupts
-  if ( (MmioRead32(SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_INTEN) == 0 ) {
-    MmioOr32(SP805_WDOG_CONTROL_REG, SP805_WDOG_CTRL_INTEN);
+  if ((MmioRead32 (SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_INTEN) == 0) {
+    MmioOr32 (SP805_WDOG_CONTROL_REG, SP805_WDOG_CTRL_INTEN);
   }
 }
 
@@ -103,6 +101,7 @@ SP805Start (
     On exiting boot services we must make sure the SP805 Watchdog Timer
     is stopped.
 **/
+STATIC
 VOID
 EFIAPI
 ExitBootServicesEvent (
@@ -110,9 +109,9 @@ ExitBootServicesEvent (
   IN VOID       *Context
   )
 {
-  SP805Unlock();
-  SP805Stop();
-  SP805Lock();
+  SP805Unlock ();
+  SP805Stop ();
+  SP805Lock ();
 }
 
 /**
@@ -142,10 +141,11 @@ ExitBootServicesEvent (
                                 previously registered.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 SP805RegisterHandler (
-  IN CONST EFI_WATCHDOG_TIMER_ARCH_PROTOCOL   *This,
+  IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL         *This,
   IN EFI_WATCHDOG_TIMER_NOTIFY                NotifyFunction
   )
 {
@@ -182,22 +182,24 @@ SP805RegisterHandler (
   @retval EFI_DEVICE_ERROR      The timer period could not be changed due to a device error.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 SP805SetTimerPeriod (
-  IN CONST EFI_WATCHDOG_TIMER_ARCH_PROTOCOL   *This,
+  IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL         *This,
   IN UINT64                                   TimerPeriod   // In 100ns units
   )
 {
-  EFI_STATUS  Status = EFI_SUCCESS;
+  EFI_STATUS  Status;
   UINT64      Ticks64bit;
 
-  SP805Unlock();
+  SP805Unlock ();
 
-  if( TimerPeriod == 0 ) {
+  Status = EFI_SUCCESS;
+
+  if (TimerPeriod == 0) {
     // This is a watchdog stop request
-    SP805Stop();
-    goto EXIT;
+    SP805Stop ();
   } else {
     // Calculate the Watchdog ticks required for a delay of (TimerTicks * 100) nanoseconds
     // The SP805 will count down to ZERO once, generate an interrupt and
@@ -211,10 +213,11 @@ SP805SetTimerPeriod (
     //
     // WatchdogTicks = (TimerPeriod * SP805_CLOCK_FREQUENCY) / 20 MHz ;
 
-    Ticks64bit = DivU64x32(MultU64x32(TimerPeriod, (UINTN)PcdGet32(PcdSP805WatchdogClockFrequencyInHz)), 20000000);
+    Ticks64bit = MultU64x32 (TimerPeriod, PcdGet32 (PcdSP805WatchdogClockFrequencyInHz));
+    Ticks64bit = DivU64x32 (Ticks64bit, 20000000);
 
     // The registers in the SP805 are only 32 bits
-    if(Ticks64bit > (UINT64)0xFFFFFFFF) {
+    if (Ticks64bit > MAX_UINT32) {
       // We could load the watchdog with the maximum supported value but
       // if a smaller value was requested, this could have the watchdog
       // triggering before it was intended.
@@ -224,15 +227,15 @@ SP805SetTimerPeriod (
     }
 
     // Update the watchdog with a 32-bit value.
-    MmioWrite32(SP805_WDOG_LOAD_REG, (UINT32)Ticks64bit);
+    MmioWrite32 (SP805_WDOG_LOAD_REG, (UINT32)Ticks64bit);
 
     // Start the watchdog
-    SP805Start();
+    SP805Start ();
   }
 
-  EXIT:
+EXIT:
   // Ensure the watchdog is locked before exiting.
-  SP805Lock();
+  SP805Lock ();
   return Status;
 }
 
@@ -251,14 +254,14 @@ SP805SetTimerPeriod (
   @retval EFI_INVALID_PARAMETER TimerPeriod is NULL.
 
 **/
+STATIC
 EFI_STATUS
 EFIAPI
 SP805GetTimerPeriod (
-  IN CONST EFI_WATCHDOG_TIMER_ARCH_PROTOCOL   *This,
+  IN EFI_WATCHDOG_TIMER_ARCH_PROTOCOL         *This,
   OUT UINT64                                  *TimerPeriod
   )
 {
-  EFI_STATUS  Status = EFI_SUCCESS;
   UINT64      ReturnValue;
 
   if (TimerPeriod == NULL) {
@@ -266,19 +269,19 @@ SP805GetTimerPeriod (
   }
 
   // Check if the watchdog is stopped
-  if ( (MmioRead32(SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_INTEN) == 0 ) {
+  if ((MmioRead32 (SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_INTEN) == 0) {
     // It is stopped, so return zero.
     ReturnValue = 0;
   } else {
     // Convert the Watchdog ticks into TimerPeriod
     // Ensure 64bit arithmetic throughout because the Watchdog ticks may already
     // be at the maximum 32 bit value and we still need to multiply that by 600.
-    ReturnValue = MultU64x32( MmioRead32(SP805_WDOG_LOAD_REG), 600 );
+    ReturnValue = MultU64x32 (MmioRead32 (SP805_WDOG_LOAD_REG), 600);
   }
 
   *TimerPeriod = ReturnValue;
 
-  return Status;
+  return EFI_SUCCESS;
 }
 
 /**
@@ -313,10 +316,10 @@ SP805GetTimerPeriod (
   Retrieves the period of the timer interrupt in 100 nS units.
 
 **/
-EFI_WATCHDOG_TIMER_ARCH_PROTOCOL    gWatchdogTimer = {
-  (EFI_WATCHDOG_TIMER_REGISTER_HANDLER) SP805RegisterHandler,
-  (EFI_WATCHDOG_TIMER_SET_TIMER_PERIOD) SP805SetTimerPeriod,
-  (EFI_WATCHDOG_TIMER_GET_TIMER_PERIOD) SP805GetTimerPeriod
+STATIC EFI_WATCHDOG_TIMER_ARCH_PROTOCOL mWatchdogTimer = {
+  SP805RegisterHandler,
+  SP805SetTimerPeriod,
+  SP805GetTimerPeriod
 };
 
 /**
@@ -347,12 +350,12 @@ SP805Initialize (
   SP805Stop ();
 
   // Set the watchdog to reset the board when triggered
-  if ((MmioRead32(SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_RESEN) == 0) {
+  if ((MmioRead32 (SP805_WDOG_CONTROL_REG) & SP805_WDOG_CTRL_RESEN) == 0) {
     MmioOr32 (SP805_WDOG_CONTROL_REG, SP805_WDOG_CTRL_RESEN);
   }
 
   // Prohibit any rogue access to SP805 registers
-  SP805Lock();
+  SP805Lock ();
 
   //
   // Make sure the Watchdog Timer Architectural Protocol has not been installed in the system yet.
@@ -361,28 +364,26 @@ SP805Initialize (
   ASSERT_PROTOCOL_ALREADY_INSTALLED (NULL, &gEfiWatchdogTimerArchProtocolGuid);
 
   // Register for an ExitBootServicesEvent
-  Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_NOTIFY, ExitBootServicesEvent, NULL, &EfiExitBootServicesEvent);
-  if (EFI_ERROR(Status)) {
+  Status = gBS->CreateEvent (EVT_SIGNAL_EXIT_BOOT_SERVICES, TPL_NOTIFY,
+                  ExitBootServicesEvent, NULL, &mEfiExitBootServicesEvent);
+  if (EFI_ERROR (Status)) {
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
 
   // Install the Timer Architectural Protocol onto a new handle
   Handle = NULL;
-  Status = gBS->InstallMultipleProtocolInterfaces(
+  Status = gBS->InstallMultipleProtocolInterfaces (
                   &Handle,
-                  &gEfiWatchdogTimerArchProtocolGuid, &gWatchdogTimer,
+                  &gEfiWatchdogTimerArchProtocolGuid, &mWatchdogTimer,
                   NULL
                   );
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     Status = EFI_OUT_OF_RESOURCES;
     goto EXIT;
   }
 
 EXIT:
-  if(EFI_ERROR(Status)) {
-    // The watchdog failed to initialize
-    ASSERT(FALSE);
-  }
+  ASSERT_EFI_ERROR (Status);
   return Status;
 }
