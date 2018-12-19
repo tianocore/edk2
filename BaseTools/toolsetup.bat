@@ -274,8 +274,7 @@ goto check_build_environment
   echo.
 
 :check_build_environment
-  set PYTHONHASHSEED=0
-  if defined BASETOOLS_PYTHON_SOURCE goto VisualStudioAvailable
+  set PYTHONHASHSEED=1
 
   if not defined BASE_TOOLS_PATH (
      if not exist "Source\C\Makefile" (
@@ -286,24 +285,60 @@ goto check_build_environment
      )
   )
 
-  if not defined PYTHON_HOME (
-    if defined PYTHONHOME (
-      set PYTHON_HOME=%PYTHONHOME%
-    ) else (
+:defined_python
+if defined PYTHON3_ENABLE (
+  if "%PYTHON3_ENABLE%" EQU "TRUE" (
+    set PYTHON=py -3
+    %PYTHON% --version >NUL 2>&1
+    if %ERRORLEVEL% NEQ 0 (
       echo.
-      echo !!! ERROR !!! Binary python tools are missing. PYTHON_HOME environment variable is not set.
-      echo PYTHON_HOME is required to build or execute the python tools.
+      echo !!! ERROR !!!  PYTHON3 is not installed or added to environment variables
       echo.
       goto end
+    ) else (
+      goto check_freezer_path
+    )
+  ) 
+)
+
+if defined PYTHON_HOME (
+  if EXIST "%PYTHON_HOME%" (
+    set PYTHON=%PYTHON_HOME%\python.exe
+    goto check_freezer_path
     )
   )
+if defined PYTHONHOME (
+  if EXIST "%PYTHONHOME%" (
+    set PYTHON_HOME=%PYTHONHOME%
+    set PYTHON=%PYTHON_HOME%\python.exe
+    goto check_freezer_path
+    )
+  )
+  
+  echo.
+  echo !!! ERROR !!! Binary python tools are missing.
+  echo PYTHON_HOME or PYTHON3_ENABLE environment variable is not set successfully.
+  echo PYTHON_HOME or PYTHON3_ENABLE is required to build or execute the python tools.
+  echo.
+  goto end
 
+:check_freezer_path
+  if defined BASETOOLS_PYTHON_SOURCE goto print_python_info
   set "PATH=%BASE_TOOLS_PATH%\BinWrappers\WindowsLike;%PATH%"
   set BASETOOLS_PYTHON_SOURCE=%BASE_TOOLS_PATH%\Source\Python
   set PYTHONPATH=%BASETOOLS_PYTHON_SOURCE%;%PYTHONPATH%
 
+:print_python_info
   echo                PATH = %PATH%
-  echo         PYTHON_HOME = %PYTHON_HOME%
+  if "%PYTHON3_ENABLE%" EQU "TRUE" (
+    echo      PYTHON3_ENABLE = %PYTHON3_ENABLE%
+    echo             PYTHON3 = %PYTHON%
+  ) else (
+    echo      PYTHON3_ENABLE = %PYTHON3_ENABLE%
+    if defined PYTHON_HOME (
+      echo         PYTHON_HOME = %PYTHON_HOME%
+    )
+  )
   echo          PYTHONPATH = %PYTHONPATH%
   echo.
 

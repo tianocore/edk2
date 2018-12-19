@@ -77,7 +77,7 @@ function SetWorkspace()
   # Set $WORKSPACE
   #
   export WORKSPACE=`pwd`
-  export PYTHONHASHSEED=0
+  export PYTHONHASHSEED=1
   return 0
 }
 
@@ -111,10 +111,59 @@ function SetupEnv()
   fi
 }
 
+function SetupPython()
+{    
+  if [ $PYTHON3_ENABLE ] && [ $PYTHON3_ENABLE == TRUE ]
+  then
+    for python in $(which python3)
+    do
+      python=$(echo $python | grep "[[:digit:]]$" || true)
+      python_version=${python##*python}
+      if [ -z "${python_version}" ];then
+        continue
+      fi
+      if [ -z $origin_version ];then
+        origin_version=$python_version
+        export PYTHON=$python
+        continue
+      fi
+      ret=`echo "$origin_version < $python_version" |bc`
+      if [ "$ret" -eq 1 ]; then
+        origin_version=$python_version
+        export PYTHON=$python
+      fi
+    done
+  fi
+  
+  if [ -z $PYTHON3_ENABLE ] || [ $PYTHON3_ENABLE != TRUE ]
+  then
+    for python in $(which python2)
+    do
+      python=$(echo $python | grep "[[:digit:]]$" || true)
+      python_version=${python##*python}
+      if [ -z "${python_version}" ];then
+        continue
+      fi
+      if [ -z $origin_version ] || [ $origin_version -ge 3 ]
+      then
+        origin_version=$python_version
+        export PYTHON=$python
+        continue
+      fi
+      ret=`echo "$origin_version < $python_version" |bc`
+      if [ "$ret" -eq 1 ]; then
+        origin_version=$python_version
+        export PYTHON=$python
+      fi
+    done
+  fi
+}
+
 function SourceEnv()
 {
   SetWorkspace &&
   SetupEnv
+  SetupPython
 }
 
 I=$#
