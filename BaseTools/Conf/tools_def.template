@@ -5231,7 +5231,7 @@ RELEASE_GCC5_AARCH64_DLINK_XIPFLAGS = -z common-page-size=0x20
 *_CLANG35_*_DLINK_PATH           = ENV(CLANG35_BIN)clang
 *_CLANG35_*_ASLDLINK_PATH        = ENV(CLANG35_BIN)clang
 
-DEFINE CLANG35_ARM_TARGET        = -target arm-linux-gnueabihf
+DEFINE CLANG35_ARM_TARGET        = -target arm-linux-gnueabi
 DEFINE CLANG35_AARCH64_TARGET    = -target aarch64-linux-gnu
 
 DEFINE CLANG35_WARNING_OVERRIDES = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unknown-warning-option
@@ -5384,7 +5384,7 @@ NOOPT_CLANG38_X64_DLINK2_FLAGS     = DEF(GCC5_X64_DLINK2_FLAGS) -O0
 ##################
 # CLANG38 ARM definitions
 ##################
-DEFINE CLANG38_ARM_TARGET        = -target arm-linux-gnueabihf
+DEFINE CLANG38_ARM_TARGET        = -target arm-linux-gnueabi
 DEFINE CLANG38_ARM_CC_FLAGS      = DEF(GCC_ARM_CC_FLAGS) DEF(CLANG38_ARM_TARGET) DEF(CLANG38_WARNING_OVERRIDES) -mno-movt
 DEFINE CLANG38_ARM_DLINK_FLAGS   = DEF(CLANG38_ARM_TARGET) DEF(GCC_ARM_DLINK_FLAGS)
 
