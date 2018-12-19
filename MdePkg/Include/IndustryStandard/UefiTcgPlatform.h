@@ -56,8 +56,6 @@
 
 #define EFI_CALLING_EFI_APPLICATION         \
   "Calling EFI Application from Boot Option"
-#define EFI_RETURNING_FROM_EFI_APPLICATOIN  \
-  "Returning from EFI Application from Boot Option"
 #define EFI_RETURNING_FROM_EFI_APPLICATION  \
   "Returning from EFI Application from Boot Option"
 #define EFI_EXIT_BOOT_SERVICES_INVOCATION   \
