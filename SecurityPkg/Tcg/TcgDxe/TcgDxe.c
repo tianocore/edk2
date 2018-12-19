@@ -1180,10 +1180,10 @@ OnReadyToBoot (
     // 6. Not first attempt, meaning a return from last attempt
     //
     Status = TcgMeasureAction (
-               EFI_RETURNING_FROM_EFI_APPLICATOIN
+               EFI_RETURNING_FROM_EFI_APPLICATION
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATOIN));
+      DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATION));
     }
   }
 

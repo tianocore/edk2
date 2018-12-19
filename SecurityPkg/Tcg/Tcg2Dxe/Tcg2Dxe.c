@@ -2314,10 +2314,10 @@ OnReadyToBoot (
     //
     Status = TcgMeasureAction (
                4,
-               EFI_RETURNING_FROM_EFI_APPLICATOIN
+               EFI_RETURNING_FROM_EFI_APPLICATION
                );
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATOIN));
+      DEBUG ((EFI_D_ERROR, "%a not Measured. Error!\n", EFI_RETURNING_FROM_EFI_APPLICATION));
     }
 
     //
