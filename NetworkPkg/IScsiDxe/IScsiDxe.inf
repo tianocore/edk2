@@ -4,16 +4,6 @@
 #  The iSCSI driver provides iSCSI service in the preboot environment and supports
 #  booting over iSCSI. This driver supports both IPv4 and IPv6 network stack.
 #
-#  Notes:
-#  1) This driver can't co-work with the IScsiDxe driver in MdeModulePkg.
-#  2) This driver includes more bug fixes and supports more features (e.g. IPv6, Dns
-#     support for target URL configuration, iSCSI keyword support) than the IscsiDxe
-#     driver in MdeModulePkg. So, we recommend using this driver even though both of
-#     them can be used.
-#  3) This driver depends on OpenSSL. To use this driver, please follow the
-#     instructions found in the file "OpenSSL-HOWTO.txt" located in
-#     CryptoPkg\Library\OpensslLib to enable the OpenSSL building first.
-#
 # Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
