@@ -42,6 +42,7 @@
   PeCoffGetEntryPointLib
   ArmDisassemblerLib
   SerialPortLib
+  UefiBootServicesTableLib
 
 [Guids]
   gEfiDebugImageInfoTableGuid

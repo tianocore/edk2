@@ -22,6 +22,7 @@
 #include <Library/PrintLib.h>
 #include <Library/ArmDisassemblerLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
 #include <Protocol/DebugSupport.h>
@@ -159,14 +160,21 @@ DefaultExceptionHandler (
   INT32  Offset;
 
   if (mRecursiveException) {
-    CharCount = AsciiSPrint (Buffer, sizeof (Buffer),"\nRecursive exception occurred while dumping the CPU state\n");
-    SerialPortWrite ((UINT8 *) Buffer, CharCount);
+    STATIC CHAR8 CONST Message[] = "\nRecursive exception occurred while dumping the CPU state\n";
+
+    SerialPortWrite ((UINT8 *)Message, sizeof Message - 1);
+    if (gST->ConOut != NULL) {
+      AsciiPrint (Message);
+    }
     CpuDeadLoop ();
   }
   mRecursiveException = TRUE;
 
   CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"\n\n%a Exception at 0x%016lx\n", gExceptionTypeString[ExceptionType], SystemContext.SystemContextAArch64->ELR);
   SerialPortWrite ((UINT8 *) Buffer, CharCount);
+  if (gST->ConOut != NULL) {
+    AsciiPrint (Buffer);
+  }
 
   DEBUG_CODE_BEGIN ();
     CHAR8  *Pdb, *PrevPdb;

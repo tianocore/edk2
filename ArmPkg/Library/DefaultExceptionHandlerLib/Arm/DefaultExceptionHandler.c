@@ -21,6 +21,7 @@
 #include <Library/PrintLib.h>
 #include <Library/ArmDisassemblerLib.h>
 #include <Library/SerialPortLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
 
@@ -194,7 +195,10 @@ DefaultExceptionHandler (
 
   CharCount = AsciiSPrint (Buffer,sizeof (Buffer),"\n%a Exception PC at 0x%08x  CPSR 0x%08x ",
          gExceptionTypeString[ExceptionType], SystemContext.SystemContextArm->PC, SystemContext.SystemContextArm->CPSR);
-  SerialPortWrite ((UINT8 *) Buffer, CharCount);
+  SerialPortWrite ((UINT8 *)Buffer, CharCount);
+  if (gST->ConOut != NULL) {
+    AsciiPrint (Buffer);
+  }
 
   DEBUG_CODE_BEGIN ();
     CHAR8   *Pdb;
