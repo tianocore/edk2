@@ -17,9 +17,9 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = DefaultExceptionHandlerLib
   FILE_GUID                      = EACDB354-DF1A-4AF9-A171-499737ED818F
-  MODULE_TYPE                    = UEFI_DRIVER
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DefaultExceptionHandlerLib
+  LIBRARY_CLASS                  = DefaultExceptionHandlerLib|DXE_CORE DXE_DRIVER
 
 [Sources.common]
   DefaultExceptionHandlerUefi.c
