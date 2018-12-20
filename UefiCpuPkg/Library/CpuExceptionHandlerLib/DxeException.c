@@ -285,7 +285,7 @@ InitializeCpuExceptionHandlersEx (
 
         InitData = &EssData;
       }
-      Status = ArchSetupExcpetionStack (InitData);
+      Status = ArchSetupExceptionStack (InitData);
     }
   }
 

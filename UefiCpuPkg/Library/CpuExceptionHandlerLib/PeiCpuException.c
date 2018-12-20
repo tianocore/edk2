@@ -260,7 +260,7 @@ InitializeCpuExceptionHandlersEx (
     // Initializing stack switch is only necessary for Stack Guard functionality.
     //
     if (PcdGetBool (PcdCpuStackGuard) && InitData != NULL) {
-      Status = ArchSetupExcpetionStack (InitData);
+      Status = ArchSetupExceptionStack (InitData);
     }
   }
 

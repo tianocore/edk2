@@ -305,7 +305,7 @@ CommonExceptionHandlerWorker (
   @retval EFI_INVALID_PARAMETER   StackSwitchData contains invalid content.
 **/
 EFI_STATUS
-ArchSetupExcpetionStack (
+ArchSetupExceptionStack (
   IN CPU_EXCEPTION_INIT_DATA        *StackSwitchData
   );
 

@@ -126,7 +126,7 @@ ArchRestoreExceptionContext (
 
 **/
 EFI_STATUS
-ArchSetupExcpetionStack (
+ArchSetupExceptionStack (
   IN CPU_EXCEPTION_INIT_DATA          *StackSwitchData
   )
 {
