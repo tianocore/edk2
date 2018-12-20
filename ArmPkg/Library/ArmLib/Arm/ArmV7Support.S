@@ -262,6 +262,8 @@ ASM_FUNC(ArmEnableVFP)
 #ifndef __clang__
   mcr     p10,#0x7,r0,c8,c0,#0
 #else
+  # Set the FPU model so Clang does not choke on the next instruction
+  .fpu    neon
   vmsr    fpexc, r0
 #endif
   bx      lr
