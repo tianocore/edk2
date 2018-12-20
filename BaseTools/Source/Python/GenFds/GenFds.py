@@ -41,6 +41,8 @@ from Workspace.WorkspaceDatabase import WorkspaceDatabase
 from .FdfParser import FdfParser, Warning
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from .FfsFileStatement import FileStatement
+import Common.DataType as DataType
+from struct import Struct
 
 ## Version and Copyright
 versionNumber = "1.0" + ' ' + gBUILD_VERSION
@@ -62,11 +64,60 @@ def main():
     EdkLogger.Initialize()
     return GenFdsApi(OptionsToCommandDict(Options))
 
+def resetFdsGlobalVariable():
+    GenFdsGlobalVariable.FvDir = ''
+    GenFdsGlobalVariable.OutputDirDict = {}
+    GenFdsGlobalVariable.BinDir = ''
+    # will be FvDir + os.sep + 'Ffs'
+    GenFdsGlobalVariable.FfsDir = ''
+    GenFdsGlobalVariable.FdfParser = None
+    GenFdsGlobalVariable.LibDir = ''
+    GenFdsGlobalVariable.WorkSpace = None
+    GenFdsGlobalVariable.WorkSpaceDir = ''
+    GenFdsGlobalVariable.ConfDir = ''
+    GenFdsGlobalVariable.EdkSourceDir = ''
+    GenFdsGlobalVariable.OutputDirFromDscDict = {}
+    GenFdsGlobalVariable.TargetName = ''
+    GenFdsGlobalVariable.ToolChainTag = ''
+    GenFdsGlobalVariable.RuleDict = {}
+    GenFdsGlobalVariable.ArchList = None
+    GenFdsGlobalVariable.VtfDict = {}
+    GenFdsGlobalVariable.ActivePlatform = None
+    GenFdsGlobalVariable.FvAddressFileName = ''
+    GenFdsGlobalVariable.VerboseMode = False
+    GenFdsGlobalVariable.DebugLevel = -1
+    GenFdsGlobalVariable.SharpCounter = 0
+    GenFdsGlobalVariable.SharpNumberPerLine = 40
+    GenFdsGlobalVariable.FdfFile = ''
+    GenFdsGlobalVariable.FdfFileTimeStamp = 0
+    GenFdsGlobalVariable.FixedLoadAddress = False
+    GenFdsGlobalVariable.PlatformName = ''
+
+    GenFdsGlobalVariable.BuildRuleFamily = DataType.TAB_COMPILER_MSFT
+    GenFdsGlobalVariable.ToolChainFamily = DataType.TAB_COMPILER_MSFT
+    GenFdsGlobalVariable.__BuildRuleDatabase = None
+    GenFdsGlobalVariable.GuidToolDefinition = {}
+    GenFdsGlobalVariable.FfsCmdDict = {}
+    GenFdsGlobalVariable.SecCmdList = []
+    GenFdsGlobalVariable.CopyList   = []
+    GenFdsGlobalVariable.ModuleFile = ''
+    GenFdsGlobalVariable.EnableGenfdsMultiThread = False
+
+    GenFdsGlobalVariable.LargeFileInFvFlags = []
+    GenFdsGlobalVariable.EFI_FIRMWARE_FILE_SYSTEM3_GUID = '5473C07A-3DCB-4dca-BD6F-1E9689E7349A'
+    GenFdsGlobalVariable.LARGE_FILE_SIZE = 0x1000000
+
+    GenFdsGlobalVariable.SectionHeader = Struct("3B 1B")
+
+    # FvName, FdName, CapName in FDF, Image file name
+    GenFdsGlobalVariable.ImageBinDict = {}
+
 def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
     global Workspace
     Workspace = ""
     ArchList = None
     ReturnCode = 0
+    resetFdsGlobalVariable()
 
     try:
         if FdsCommandDict.get("verbose"):
