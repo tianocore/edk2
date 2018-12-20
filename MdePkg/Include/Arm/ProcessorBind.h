@@ -151,7 +151,7 @@ typedef INT32   INTN;
 ///
 /// Maximum usable address at boot time
 ///
-#define MAX_ALLOC_ADDRESS   MAX_ALLOC_ADDRESS
+#define MAX_ALLOC_ADDRESS   MAX_ADDRESS
 
 ///
 /// Maximum legal ARM INTN and UINTN values.
