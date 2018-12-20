@@ -1,7 +1,7 @@
 /** @file
   CPU Features Initialize functions.
 
-  Copyright (c) 2017 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
   which accompanies this distribution.  The full text of the license may be found at
@@ -841,7 +841,12 @@ ProgramProcessorRegister (
     RegisterTableEntry = &RegisterTableEntryHead[Index];
 
     DEBUG_CODE_BEGIN ();
-      AcquireSpinLock (&CpuFlags->ConsoleLogLock);
+      //
+      // Wait for the AP to release the MSR spin lock.
+      //
+      while (!AcquireSpinLockOrFail (&CpuFlags->ConsoleLogLock)) {
+        CpuPause ();
+      }
       ThreadIndex = ApLocation->Package * CpuStatus->MaxCoreCount * CpuStatus->MaxThreadCount +
               ApLocation->Core * CpuStatus->MaxThreadCount +
               ApLocation->Thread;
