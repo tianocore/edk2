@@ -141,7 +141,6 @@
   ArmPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
   ArmPkg/Library/ArmLib/ArmBaseLib.inf
   ArmPkg/Library/ArmSoftFloatLib/ArmSoftFloatLib.inf
-  ArmPkg/Library/DefaultExceptionHandlerLib/DefaultExceptionHandlerLibBase.inf
   ArmPkg/Library/PeiServicesTablePointerLib/PeiServicesTablePointerLib.inf
   ArmPkg/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
 
