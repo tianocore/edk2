@@ -5,12 +5,6 @@
 #  PXE-compatible device for network access or booting. This driver supports
 #  both IPv4 and IPv6 network stack.
 #
-#  Notes:
-#  1) This driver can't co-work with the UefiPxeBcDxe driver in MdeModulePkg.
-#  2) This driver includes more bug fixes and supports more features (e.g. IPv6,
-#     MTFTP windowsize) than the UefiPxeBcDxe driver in MdeModulePkg. So, we
-#     recommend using this driver even though both of them can be used.
-#
 #  Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 #  This program and the accompanying materials
