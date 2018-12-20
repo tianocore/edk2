@@ -1,7 +1,7 @@
 /** @file
   CPU Register Table Library functions.
 
-  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2016 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -12,6 +12,8 @@
 #include <Library/PeiServicesLib.h>
 #include <Library/PeiServicesTablePointerLib.h>
 #include <Ppi/MpServices.h>
+#include <Ppi/MpServices2.h>
+
 #include "RegisterCpuFeatures.h"
 
 #define REGISTER_CPU_FEATURES_GUID \
@@ -154,7 +156,7 @@ GetProcessorInformation (
 
 **/
 VOID
-StartupAPsWorker (
+StartupAllAPsWorker (
   IN  EFI_AP_PROCEDURE                 Procedure,
   IN  EFI_EVENT                        MpEvent
   )
@@ -174,6 +176,47 @@ StartupAPsWorker (
                  CpuMpPpi,
                  Procedure,
                  FALSE,
+                 0,
+                 CpuFeaturesData
+                 );
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
+  Worker function to execute a caller provided function on all enabled CPUs.
+
+  @param[in]  Procedure               A pointer to the function to be run on
+                                      enabled CPUs of the system.
+
+**/
+VOID
+StartupAllCPUsWorker (
+  IN  EFI_AP_PROCEDURE                 Procedure
+  )
+{
+  EFI_STATUS                           Status;
+  EDKII_PEI_MP_SERVICES2_PPI           *CpuMp2Ppi;
+  CPU_FEATURES_DATA                    *CpuFeaturesData;
+
+  CpuFeaturesData = GetCpuFeaturesData ();
+
+  //
+  // Get MP Services2 Ppi
+  //
+  Status = PeiServicesLocatePpi (
+             &gEdkiiPeiMpServices2PpiGuid,
+             0,
+             NULL,
+             (VOID **)&CpuMp2Ppi
+             );
+  ASSERT_EFI_ERROR (Status);
+
+  //
+  // Wakeup all APs for data collection.
+  //
+  Status = CpuMp2Ppi->StartupAllCPUs (
+                 CpuMp2Ppi,
+                 Procedure,
                  0,
                  CpuFeaturesData
                  );
@@ -267,23 +310,9 @@ CpuFeaturesInitialize (
   CpuFeaturesData->BspNumber = OldBspNumber;
 
   //
-  // Known limitation: In PEI phase, CpuFeatures driver not
-  // support async mode execute tasks. So semaphore type
-  // register can't been used for this instance, must use
-  // DXE type instance.
+  // Start to program register for all CPUs.
   //
-
-  if (CpuFeaturesData->NumberOfCpus > 1) {
-    //
-    // Wakeup all APs for programming.
-    //
-    StartupAPsWorker (SetProcessorRegister, NULL);
-  }
-
-  //
-  // Programming BSP
-  //
-  SetProcessorRegister (CpuFeaturesData);
+  StartupAllCPUsWorker (SetProcessorRegister);
 
   //
   // Switch to new BSP if required

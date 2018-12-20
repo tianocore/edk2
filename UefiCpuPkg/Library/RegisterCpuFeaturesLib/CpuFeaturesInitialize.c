@@ -1074,7 +1074,7 @@ CpuFeaturesDetect (
     //
     // Wakeup all APs for data collection.
     //
-    StartupAPsWorker (CollectProcessorData, NULL);
+    StartupAllAPsWorker (CollectProcessorData, NULL);
   }
 
   //

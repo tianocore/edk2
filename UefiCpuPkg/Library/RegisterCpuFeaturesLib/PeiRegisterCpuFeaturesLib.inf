@@ -46,6 +46,7 @@
 
 [Ppis]
   gEfiPeiMpServicesPpiGuid                                             ## CONSUMES
+  gEdkiiPeiMpServices2PpiGuid                                          ## CONSUMES
 
 [Pcd]
   gUefiCpuPkgTokenSpaceGuid.PcdCpuS3DataAddress                        ## CONSUMES

@@ -1,7 +1,7 @@
 /** @file
   CPU Register Table Library functions.
 
-  Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
@@ -116,7 +116,7 @@ GetProcessorInformation (
                                       to check whether procedure has done.
 **/
 VOID
-StartupAPsWorker (
+StartupAllAPsWorker (
   IN  EFI_AP_PROCEDURE                 Procedure,
   IN  EFI_EVENT                        MpEvent
   )
@@ -248,7 +248,7 @@ CpuFeaturesInitialize (
     //
     // Wakeup all APs for programming.
     //
-    StartupAPsWorker (SetProcessorRegister, MpEvent);
+    StartupAllAPsWorker (SetProcessorRegister, MpEvent);
   }
 
   //

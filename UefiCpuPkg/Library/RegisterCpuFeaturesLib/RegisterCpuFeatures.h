@@ -145,7 +145,7 @@ GetProcessorInformation (
                                       to check whether procedure has done.
 **/
 VOID
-StartupAPsWorker (
+StartupAllAPsWorker (
   IN  EFI_AP_PROCEDURE                 Procedure,
   IN  EFI_EVENT                        MpEvent
   );
