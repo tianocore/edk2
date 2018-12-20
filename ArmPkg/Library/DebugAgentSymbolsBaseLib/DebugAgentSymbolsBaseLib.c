@@ -14,7 +14,6 @@
 **/
 
 #include <Uefi.h>
-#include <Library/ArmLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
@@ -282,12 +281,6 @@ InitializeDebugAgent (
   EFI_STATUS            Status;
   EFI_FFS_FILE_HEADER   *FfsHeader;
   PE_COFF_LOADER_IMAGE_CONTEXT  ImageContext;
-
-  // Now we've got UART, check the Debug Agent Vector Table
-  // Note: The AArch64 Vector table must be 2k-byte aligned - if this assertion fails ensure
-  // 'Align=4K' is defined into your FDF for this module.
-  ASSERT (((UINTN)DebugAgentVectorTable & ARM_VECTOR_TABLE_ALIGNMENT) == 0);
-  ArmWriteVBar ((UINTN)DebugAgentVectorTable);
 
   // We use InitFlag to know if DebugAgent has been initialized from
   // Sec (DEBUG_AGENT_INIT_PREMEM_SEC) or PrePi (DEBUG_AGENT_INIT_POSTMEM_SEC)
