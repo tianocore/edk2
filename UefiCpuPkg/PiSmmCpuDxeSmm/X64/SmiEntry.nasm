@@ -18,7 +18,7 @@
 ;
 ;-------------------------------------------------------------------------------
 
-%include "StuffRsb.inc"
+%include "StuffRsbNasm.inc"
 
 ;
 ; Variables referrenced by C code

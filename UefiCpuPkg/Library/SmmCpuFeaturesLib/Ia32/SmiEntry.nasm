@@ -18,7 +18,7 @@
 ;
 ;-------------------------------------------------------------------------------
 
-%include "StuffRsb.inc"
+%include "StuffRsbNasm.inc"
 
 %define MSR_IA32_MISC_ENABLE 0x1A0
 %define MSR_EFER      0xc0000080

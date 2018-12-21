@@ -18,7 +18,7 @@
 ;
 ;-------------------------------------------------------------------------------
 
-%include "StuffRsb.inc"
+%include "StuffRsbNasm.inc"
 
 global  ASM_PFX(gcStmPsd)
 

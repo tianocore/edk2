@@ -11,7 +11,8 @@
 ;
 ; Abstract:
 ;
-;   This file provides macro definitions for stuffing the Return Stack Buffer (RSB).
+;   This file provides macro definitions for stuffing the Return Stack Buffer (RSB)
+;   for NASM files.
 ;
 ;------------------------------------------------------------------------------
 

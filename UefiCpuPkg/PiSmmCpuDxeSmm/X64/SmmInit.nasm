@@ -18,7 +18,7 @@
 ;
 ;-------------------------------------------------------------------------------
 
-%include "StuffRsb.inc"
+%include "StuffRsbNasm.inc"
 
 extern ASM_PFX(SmmInitHandler)
 extern ASM_PFX(mRebasedFlag)
