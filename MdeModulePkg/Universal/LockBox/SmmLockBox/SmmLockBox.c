@@ -77,10 +77,10 @@ SmmLockBoxSave (
     return ;
   }
   //
-  // The AsmLfence() call here is to ensure the above range check for the
-  // CommBuffer have been completed before calling into SaveLockBox().
+  // The SpeculationBarrier() call here is to ensure the above range check for
+  // the CommBuffer have been completed before calling into SaveLockBox().
   //
-  AsmLfence ();
+  SpeculationBarrier ();
 
   //
   // Save data
@@ -166,10 +166,10 @@ SmmLockBoxUpdate (
     return ;
   }
   //
-  // The AsmLfence() call here is to ensure the above range check for the
-  // CommBuffer have been completed before calling into UpdateLockBox().
+  // The SpeculationBarrier() call here is to ensure the above range check for
+  // the CommBuffer have been completed before calling into UpdateLockBox().
   //
-  AsmLfence ();
+  SpeculationBarrier ();
 
   //
   // Update data
