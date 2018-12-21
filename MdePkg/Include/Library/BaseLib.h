@@ -5111,6 +5111,21 @@ CpuDeadLoop (
   VOID
   );
 
+
+/**
+  Uses as a barrier to stop speculative execution.
+
+  Ensures that no later instruction will execute speculatively, until all prior
+  instructions have completed.
+
+**/
+VOID
+EFIAPI
+SpeculationBarrier (
+  VOID
+  );
+
+
 #if defined (MDE_CPU_IA32) || defined (MDE_CPU_X64)
 ///
 /// IA32 and x64 Specific Functions.
