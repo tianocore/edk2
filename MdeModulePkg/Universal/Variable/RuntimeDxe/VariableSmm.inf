@@ -54,7 +54,7 @@
   PrivilegePolymorphic.h
   VariableExLib.c
   TcgMorLockSmm.c
-  LoadFenceSmm.c
+  SpeculationBarrierSmm.c
 
 [Packages]
   MdePkg/MdePkg.dec

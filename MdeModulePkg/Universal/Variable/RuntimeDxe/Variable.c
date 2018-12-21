@@ -3201,11 +3201,11 @@ VariableServiceSetVariable (
       return EFI_SECURITY_VIOLATION;
     }
     //
-    // The MemoryLoadFence() call here is to ensure the above sanity check
-    // for the EFI_VARIABLE_AUTHENTICATION_2 descriptor has been completed
+    // The VariableSpeculationBarrier() call here is to ensure the above sanity
+    // check for the EFI_VARIABLE_AUTHENTICATION_2 descriptor has been completed
     // before the execution of subsequent codes.
     //
-    MemoryLoadFence ();
+    VariableSpeculationBarrier ();
     PayloadSize = DataSize - AUTHINFO2_SIZE (Data);
   } else {
     PayloadSize = DataSize;

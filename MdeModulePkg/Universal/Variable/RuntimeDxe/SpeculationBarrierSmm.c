@@ -1,5 +1,5 @@
 /** @file
-  Serialize operation on all load-from-memory instructions (SMM version).
+  Barrier to stop speculative execution (SMM version).
 
 Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
@@ -16,15 +16,17 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "Variable.h"
 
 /**
-  This service is consumed by the variable modules to perform a serializing
-  operation on all load-from-memory instructions that were issued prior to the
-  call of this function.
+  This service is consumed by the variable modules to place a barrier to stop
+  speculative execution.
+
+  Ensures that no later instruction will execute speculatively, until all prior
+  instructions have completed.
 
 **/
 VOID
-MemoryLoadFence (
+VariableSpeculationBarrier (
   VOID
   )
 {
-  AsmLfence ();
+  SpeculationBarrier ();
 }
