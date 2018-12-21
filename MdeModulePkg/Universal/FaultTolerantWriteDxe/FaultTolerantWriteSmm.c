@@ -419,11 +419,11 @@ SmmFaultTolerantWriteHandler (
                  );
       if (!EFI_ERROR (Status)) {
         //
-        // The AsmLfence() call here is to ensure the previous range/content
-        // checks for the CommBuffer have been completed before calling into
-        // FtwWrite().
+        // The SpeculationBarrier() call here is to ensure the previous
+        // range/content checks for the CommBuffer have been completed before
+        // calling into FtwWrite().
         //
-        AsmLfence ();
+        SpeculationBarrier ();
         Status = FtwWrite(
                    &mFtwDevice->FtwInstance,
                    SmmFtwWriteHeader->Lba,
