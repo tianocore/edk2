@@ -160,68 +160,66 @@ DefinitionBlock (
         //
         // Do not configure Interrupt if IRQ Num is configured 0 by default
         //
-        If (LEqual(IRQN, 0)) {
-          Return (0)
-        }
+        If (LNotEqual(IRQN, 0)) {
+          //
+          // Update resource descriptor
+          // Use the field name to identify the offsets in the argument
+          // buffer and RES0 buffer.
+          //
+          CreateDWordField(Arg0, ^INTR._INT, IRQ0)
+          CreateDWordField(RES0, ^INTR._INT, LIRQ)
+          Store(IRQ0, LIRQ)
+          Store(IRQ0, IRQN)
 
-        //
-        // Update resource descriptor
-        // Use the field name to identify the offsets in the argument
-        // buffer and RES0 buffer.
-        //
-        CreateDWordField(Arg0, ^INTR._INT, IRQ0)
-        CreateDWordField(RES0, ^INTR._INT, LIRQ)
-        Store(IRQ0, LIRQ)
-        Store(IRQ0, IRQN)
+          CreateBitField(Arg0, ^INTR._HE, ITRG)
+          CreateBitField(RES0, ^INTR._HE, LTRG)
+          Store(ITRG, LTRG)
 
-        CreateBitField(Arg0, ^INTR._HE, ITRG)
-        CreateBitField(RES0, ^INTR._HE, LTRG)
-        Store(ITRG, LTRG)
+          CreateBitField(Arg0, ^INTR._LL, ILVL)
+          CreateBitField(RES0, ^INTR._LL, LLVL)
+          Store(ILVL, LLVL)
 
-        CreateBitField(Arg0, ^INTR._LL, ILVL)
-        CreateBitField(RES0, ^INTR._LL, LLVL)
-        Store(ILVL, LLVL)
-
-        //
-        // Update TPM FIFO PTP/TIS interface only, identified by TPM_INTERFACE_ID_x lowest
-        // nibble.
-        // 0000 - FIFO interface as defined in PTP for TPM 2.0 is active
-        // 1111 - FIFO interface as defined in TIS1.3 is active
-        //
-        If (LOr(LEqual (And (TID0, 0x0F), 0x00), LEqual (And (TID0, 0x0F), 0x0F))) {
           //
-          // If FIFO interface, interrupt vector register is
-          // available. TCG PTP specification allows only
-          // values 1..15 in this field. For other interrupts
-          // the field should stay 0.
+          // Update TPM FIFO PTP/TIS interface only, identified by TPM_INTERFACE_ID_x lowest
+          // nibble.
+          // 0000 - FIFO interface as defined in PTP for TPM 2.0 is active
+          // 1111 - FIFO interface as defined in TIS1.3 is active
           //
-          If (LLess (IRQ0, 16)) {
-            Store (And(IRQ0, 0xF), INTV)
-          }
-          //
-          // Interrupt enable register (TPM_INT_ENABLE_x) bits 3:4
-          // contains settings for interrupt polarity.
-          // The other bits of the byte enable individual interrupts.
-          // They should be all be zero, but to avoid changing the
-          // configuration, the other bits are be preserved.
-          // 00 - high level
-          // 01 - low level
-          // 10 - rising edge
-          // 11 - falling edge
-          //
-          // ACPI spec definitions:
-          // _HE: '1' is Edge, '0' is Level
-          // _LL: '1' is ActiveHigh, '0' is ActiveLow (inverted from TCG spec)
-          //
-          If (LEqual (ITRG, 1)) {
-            Or(INTE, 0x00000010, INTE)
-          } Else {
-            And(INTE, 0xFFFFFFEF, INTE)
-          }
-          if (LEqual (ILVL, 0)) {
-            Or(INTE, 0x00000008, INTE)
-          } Else {
-            And(INTE, 0xFFFFFFF7, INTE)
+          If (LOr(LEqual (And (TID0, 0x0F), 0x00), LEqual (And (TID0, 0x0F), 0x0F))) {
+            //
+            // If FIFO interface, interrupt vector register is
+            // available. TCG PTP specification allows only
+            // values 1..15 in this field. For other interrupts
+            // the field should stay 0.
+            //
+            If (LLess (IRQ0, 16)) {
+              Store (And(IRQ0, 0xF), INTV)
+            }
+            //
+            // Interrupt enable register (TPM_INT_ENABLE_x) bits 3:4
+            // contains settings for interrupt polarity.
+            // The other bits of the byte enable individual interrupts.
+            // They should be all be zero, but to avoid changing the
+            // configuration, the other bits are be preserved.
+            // 00 - high level
+            // 01 - low level
+            // 10 - rising edge
+            // 11 - falling edge
+            //
+            // ACPI spec definitions:
+            // _HE: '1' is Edge, '0' is Level
+            // _LL: '1' is ActiveHigh, '0' is ActiveLow (inverted from TCG spec)
+            //
+            If (LEqual (ITRG, 1)) {
+              Or(INTE, 0x00000010, INTE)
+            } Else {
+              And(INTE, 0xFFFFFFEF, INTE)
+            }
+            if (LEqual (ILVL, 0)) {
+              Or(INTE, 0x00000008, INTE)
+            } Else {
+              And(INTE, 0xFFFFFFF7, INTE)
+            }
           }
         }
       }
@@ -284,12 +282,12 @@ DefinitionBlock (
       //
       // TCG Hardware Information
       //
-      Method (HINF, 3, Serialized, 0, {BuffObj, PkgObj}, {UnknownObj, UnknownObj, UnknownObj}) // IntObj, IntObj, PkgObj
+      Method (HINF, 1, Serialized, 0, {BuffObj, PkgObj}, {UnknownObj}) // IntObj
       {
         //
         // Switch by function index
         //
-        Switch (ToInteger(Arg1))
+        Switch (ToInteger(Arg0))
         {
           Case (0)
           {
@@ -333,12 +331,12 @@ DefinitionBlock (
       //
       // TCG Physical Presence Interface
       //
-      Method (TPPI, 3, Serialized, 0, {BuffObj, PkgObj, IntObj, StrObj}, {UnknownObj, UnknownObj, UnknownObj}) // IntObj, IntObj, PkgObj
+      Method (TPPI, 2, Serialized, 0, {BuffObj, PkgObj, IntObj, StrObj}, {UnknownObj, UnknownObj}) // IntObj, PkgObj
       {
         //
         // Switch by function index
         //
-        Switch (ToInteger(Arg1))
+        Switch (ToInteger(Arg0))
         {
           Case (0)
           {
@@ -360,7 +358,7 @@ DefinitionBlock (
             // b) Submit TPM Operation Request to Pre-OS Environment
             //
 
-            Store (DerefOf (Index (Arg2, 0x00)), PPRQ)
+            Store (DerefOf (Index (Arg1, 0x00)), PPRQ)
             Store (0, PPRM)
             Store (0x02, PPIP)
 
@@ -421,10 +419,10 @@ DefinitionBlock (
             // g) Submit TPM Operation Request to Pre-OS Environment 2
             //
             Store (7, PPIP)
-            Store (DerefOf (Index (Arg2, 0x00)), PPRQ)
+            Store (DerefOf (Index (Arg1, 0x00)), PPRQ)
             Store (0, PPRM)
             If (LEqual (PPRQ, 23)) {
-              Store (DerefOf (Index (Arg2, 0x01)), PPRM)
+              Store (DerefOf (Index (Arg1, 0x01)), PPRM)
             }
 
             //
@@ -439,7 +437,7 @@ DefinitionBlock (
             // e) Get User Confirmation Status for Operation
             //
             Store (8, PPIP)
-            Store (DerefOf (Index (Arg2, 0x00)), UCRQ)
+            Store (DerefOf (Index (Arg1, 0x00)), UCRQ)
 
             //
             // Trigger the SMI interrupt
@@ -454,12 +452,12 @@ DefinitionBlock (
         Return (1)
       }
 
-      Method (TMCI, 3, Serialized, 0, IntObj, {UnknownObj, UnknownObj, UnknownObj}) // IntObj, IntObj, PkgObj
+      Method (TMCI, 2, Serialized, 0, IntObj, {UnknownObj, UnknownObj}) // IntObj, PkgObj
       {
         //
         // Switch by function index
         //
-        Switch (ToInteger (Arg1))
+        Switch (ToInteger (Arg0))
         {
           Case (0)
           {
@@ -473,7 +471,7 @@ DefinitionBlock (
             //
             // Save the Operation Value of the Request to MORD (reserved memory)
             //
-            Store (DerefOf (Index (Arg2, 0x00)), MORD)
+            Store (DerefOf (Index (Arg1, 0x00)), MORD)
 
             //
             // Trigger the SMI through ACPI _DSM method.
@@ -499,7 +497,7 @@ DefinitionBlock (
         //
         If(LEqual(Arg0, ToUUID ("cf8e16a5-c1e8-4e25-b712-4f54a96702c8")))
         {
-          Return (HINF (Arg1, Arg2, Arg3))
+          Return (HINF (Arg2))
         }
 
         //
@@ -507,7 +505,7 @@ DefinitionBlock (
         //
         If(LEqual(Arg0, ToUUID ("3dddfaa6-361b-4eb4-a424-8d10089d1653")))
         {
-          Return (TPPI (Arg1, Arg2, Arg3))
+          Return (TPPI (Arg2, Arg3))
         }
 
         //
@@ -515,7 +513,7 @@ DefinitionBlock (
         //
         If(LEqual(Arg0, ToUUID ("376054ed-cc13-4675-901c-4756d7f2d45d")))
         {
-          Return (TMCI (Arg1, Arg2, Arg3))
+          Return (TMCI (Arg2, Arg3))
         }
 
         Return (Buffer () {0})

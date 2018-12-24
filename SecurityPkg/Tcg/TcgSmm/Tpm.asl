@@ -120,12 +120,12 @@ DefinitionBlock (
       //
       // TCG Hardware Information
       //
-      Method (HINF, 3, Serialized, 0, {BuffObj, PkgObj}, {UnknownObj, UnknownObj, UnknownObj}) // IntObj, IntObj, PkgObj
+      Method (HINF, 1, Serialized, 0, {BuffObj, PkgObj}, {UnknownObj}) // IntObj
       {
         //
         // Switch by function index
         //
-        Switch (ToInteger(Arg1))
+        Switch (ToInteger(Arg0))
         {
           Case (0)
           {
@@ -169,12 +169,12 @@ DefinitionBlock (
       //
       // TCG Physical Presence Interface
       //
-      Method (TPPI, 3, Serialized, 0, {BuffObj, PkgObj, IntObj, StrObj}, {UnknownObj, UnknownObj, UnknownObj}) // IntObj, IntObj, PkgObj
+      Method (TPPI, 2, Serialized, 0, {BuffObj, PkgObj, IntObj, StrObj}, {UnknownObj, UnknownObj}) // IntObj, PkgObj
       {
         //
         // Switch by function index
         //
-        Switch (ToInteger(Arg1))
+        Switch (ToInteger(Arg0))
         {
           Case (0)
           {
@@ -196,7 +196,7 @@ DefinitionBlock (
             // b) Submit TPM Operation Request to Pre-OS Environment
             //
 
-            Store (DerefOf (Index (Arg2, 0x00)), PPRQ)
+            Store (DerefOf (Index (Arg1, 0x00)), PPRQ)
             Store (0x02, PPIP)
 
             //
@@ -256,7 +256,7 @@ DefinitionBlock (
             // g) Submit TPM Operation Request to Pre-OS Environment 2
             //
             Store (7, PPIP)
-            Store (DerefOf (Index (Arg2, 0x00)), PPRQ)
+            Store (DerefOf (Index (Arg1, 0x00)), PPRQ)
 
             //
             // Trigger the SMI interrupt
@@ -270,7 +270,7 @@ DefinitionBlock (
             // e) Get User Confirmation Status for Operation
             //
             Store (8, PPIP)
-            Store (DerefOf (Index (Arg2, 0x00)), UCRQ)
+            Store (DerefOf (Index (Arg1, 0x00)), UCRQ)
 
             //
             // Trigger the SMI interrupt
@@ -285,12 +285,12 @@ DefinitionBlock (
         Return (1)
       }
 
-      Method (TMCI, 3, Serialized, 0, IntObj, {UnknownObj, UnknownObj, UnknownObj}) // IntObj, IntObj, PkgObj
+      Method (TMCI, 2, Serialized, 0, IntObj, {UnknownObj, UnknownObj}) // IntObj, PkgObj
       {
         //
         // Switch by function index
         //
-        Switch (ToInteger (Arg1))
+        Switch (ToInteger (Arg0))
         {
           Case (0)
           {
@@ -304,7 +304,7 @@ DefinitionBlock (
             //
             // Save the Operation Value of the Request to MORD (reserved memory)
             //
-            Store (DerefOf (Index (Arg2, 0x00)), MORD)
+            Store (DerefOf (Index (Arg1, 0x00)), MORD)
 
             //
             // Trigger the SMI through ACPI _DSM method.
@@ -330,7 +330,7 @@ DefinitionBlock (
         //
         If(LEqual(Arg0, ToUUID ("cf8e16a5-c1e8-4e25-b712-4f54a96702c8")))
         {
-          Return (HINF (Arg1, Arg2, Arg3))
+          Return (HINF (Arg2))
         }
 
         //
@@ -338,7 +338,7 @@ DefinitionBlock (
         //
         If(LEqual(Arg0, ToUUID ("3dddfaa6-361b-4eb4-a424-8d10089d1653")))
         {
-          Return (TPPI (Arg1, Arg2, Arg3))
+          Return (TPPI (Arg2, Arg3))
         }
 
         //
@@ -346,7 +346,7 @@ DefinitionBlock (
         //
         If(LEqual(Arg0, ToUUID ("376054ed-cc13-4675-901c-4756d7f2d45d")))
         {
-          Return (TMCI (Arg1, Arg2, Arg3))
+          Return (TMCI (Arg2, Arg3))
         }
 
         Return (Buffer () {0})
