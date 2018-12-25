@@ -791,6 +791,12 @@ class Build():
             # Print the same path style with WORKSPACE env.
             EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_BIN", os.path.normcase(os.path.normpath(os.environ["EDK_TOOLS_BIN"]))))
         EdkLogger.quiet("%-16s = %s" % ("CONF_PATH", GlobalData.gConfDirectory))
+        if "PYTHON3_ENABLE" in os.environ:
+            PYTHON3_ENABLE = os.environ["PYTHON3_ENABLE"]
+            if PYTHON3_ENABLE != "TRUE":
+                PYTHON3_ENABLE = "FALSE"
+            EdkLogger.quiet("%-16s = %s" % ("PYTHON3_ENABLE", PYTHON3_ENABLE))
+        EdkLogger.quiet("%-16s = %s" % ("PYTHON", os.environ["PYTHON"]))
         self.InitPreBuild()
         self.InitPostBuild()
         if self.Prebuild:
