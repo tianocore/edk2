@@ -1537,7 +1537,8 @@ ProcessOpalRequestRevert (
 
   PopUpString = OpalGetPopUpString (Dev, RequestString);
 
-  if (Dev->OpalDisk.EstimateTimeCost > MAX_ACCEPTABLE_REVERTING_TIME) {
+  if ((!KeepUserData) &&
+      (Dev->OpalDisk.EstimateTimeCost > MAX_ACCEPTABLE_REVERTING_TIME)) {
     BufferSize = StrSize (L"Warning: Revert action will take about ####### seconds, DO NOT power off system during the revert action!");
     PopUpString2 = AllocateZeroPool (BufferSize);
     ASSERT (PopUpString2 != NULL);
