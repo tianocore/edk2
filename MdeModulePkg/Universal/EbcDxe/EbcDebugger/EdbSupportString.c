@@ -307,37 +307,6 @@ AsciiAtoi (
   return RetVal;
 }
 
-/**
-
-  Convert the character to upper case.
-
-  @param  Chr    the character to be converted.
-
-**/
-STATIC
-CHAR16
-InternalUnicodeToUpper (
-  IN      CHAR16                    Chr
-  )
-{
-  return (Chr >= L'a' && Chr <= L'z') ? Chr - (L'a' - L'A') : Chr;
-}
-
-/**
-
-  Convert the character to upper case.
-
-  @param  Chr    the character to be converted.
-
-**/
-STATIC
-CHAR8
-InternalAsciiToUpper (
-  IN      CHAR8                     Chr
-  )
-{
-  return (Chr >= 'a' && Chr <= 'z') ? Chr - ('a' - 'A') : Chr;
-}
 
 /**
   Compare the Unicode and Ascii string pointed by String to the string pointed by String2.
@@ -390,12 +359,12 @@ StriCmp (
   )
 {
   while ((*String != L'\0') &&
-         (InternalUnicodeToUpper (*String) == InternalUnicodeToUpper (*String2))) {
+         (CharToUpper (*String) == CharToUpper (*String2))) {
     String++;
     String2++;
   }
 
-  return InternalUnicodeToUpper (*String) - InternalUnicodeToUpper (*String2);
+  return CharToUpper (*String) - CharToUpper (*String2);
 }
 
 /**
@@ -418,12 +387,12 @@ StriCmpUnicodeAndAscii (
   )
 {
   while ((*String != L'\0') &&
-         (InternalUnicodeToUpper (*String) == (CHAR16)InternalAsciiToUpper (*String2))) {
+         (CharToUpper (*String) == (CHAR16)AsciiCharToUpper (*String2))) {
     String++;
     String2++;
   }
 
-  return InternalUnicodeToUpper (*String) - (CHAR16)InternalAsciiToUpper (*String2);
+  return CharToUpper (*String) - (CHAR16)AsciiCharToUpper (*String2);
 }
 
 /**
