@@ -1655,43 +1655,42 @@ Returns:
   //
   // Find the PEI Core
   //
+  PeiCorePhysicalAddress = 0;
   Status = GetFileByType (EFI_FV_FILETYPE_PEI_CORE, 1, &PeiCoreFile);
-  if (EFI_ERROR (Status) || PeiCoreFile == NULL) {
-    Error (NULL, 0, 3000, "Invalid", "could not find the PEI core in the FV.");
-    return EFI_ABORTED;
-  }
-  //
-  // PEI Core found, now find PE32 or TE section
-  //
-  Status = GetSectionByType (PeiCoreFile, EFI_SECTION_PE32, 1, &Pe32Section);
-  if (Status == EFI_NOT_FOUND) {
-    Status = GetSectionByType (PeiCoreFile, EFI_SECTION_TE, 1, &Pe32Section);
-  }
+  if (!EFI_ERROR (Status) && (PeiCoreFile != NULL)) {
+    //
+    // PEI Core found, now find PE32 or TE section
+    //
+    Status = GetSectionByType (PeiCoreFile, EFI_SECTION_PE32, 1, &Pe32Section);
+    if (Status == EFI_NOT_FOUND) {
+      Status = GetSectionByType (PeiCoreFile, EFI_SECTION_TE, 1, &Pe32Section);
+    }
 
-  if (EFI_ERROR (Status)) {
-    Error (NULL, 0, 3000, "Invalid", "could not find either a PE32 or a TE section in PEI core file.");
-    return EFI_ABORTED;
-  }
+    if (EFI_ERROR (Status)) {
+      Error (NULL, 0, 3000, "Invalid", "could not find either a PE32 or a TE section in PEI core file.");
+      return EFI_ABORTED;
+    }
 
-  SecHeaderSize = GetSectionHeaderLength(Pe32Section.CommonHeader);
-  Status = GetPe32Info (
-            (VOID *) ((UINTN) Pe32Section.Pe32Section + SecHeaderSize),
-            &EntryPoint,
-            &BaseOfCode,
-            &MachineType
-            );
+    SecHeaderSize = GetSectionHeaderLength(Pe32Section.CommonHeader);
+    Status = GetPe32Info (
+              (VOID *) ((UINTN) Pe32Section.Pe32Section + SecHeaderSize),
+              &EntryPoint,
+              &BaseOfCode,
+              &MachineType
+              );
 
-  if (EFI_ERROR (Status)) {
-    Error (NULL, 0, 3000, "Invalid", "could not get the PE32 entry point for the PEI core.");
-    return EFI_ABORTED;
+    if (EFI_ERROR (Status)) {
+      Error (NULL, 0, 3000, "Invalid", "could not get the PE32 entry point for the PEI core.");
+      return EFI_ABORTED;
+    }
+    //
+    // Physical address is FV base + offset of PE32 + offset of the entry point
+    //
+    PeiCorePhysicalAddress = FvInfo->BaseAddress;
+    PeiCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + SecHeaderSize - (UINTN) FvImage->FileImage;
+    PeiCorePhysicalAddress += EntryPoint;
+    DebugMsg (NULL, 0, 9, "PeiCore physical entry point address", "Address = 0x%llX", (unsigned long long) PeiCorePhysicalAddress);
   }
-  //
-  // Physical address is FV base + offset of PE32 + offset of the entry point
-  //
-  PeiCorePhysicalAddress = FvInfo->BaseAddress;
-  PeiCorePhysicalAddress += (UINTN) Pe32Section.Pe32Section + SecHeaderSize - (UINTN) FvImage->FileImage;
-  PeiCorePhysicalAddress += EntryPoint;
-  DebugMsg (NULL, 0, 9, "PeiCore physical entry point address", "Address = 0x%llX", (unsigned long long) PeiCorePhysicalAddress);
 
   if (MachineType == EFI_IMAGE_MACHINE_IA64) {
     //
@@ -1749,16 +1748,17 @@ Returns:
     *SecCoreEntryAddressPtr = SecCorePhysicalAddress;
 
   } else if (MachineType == EFI_IMAGE_MACHINE_IA32 || MachineType == EFI_IMAGE_MACHINE_X64) {
-    //
-    // Get the location to update
-    //
-    Ia32ResetAddressPtr  = (UINT32 *) ((UINTN) FvImage->Eof - IA32_PEI_CORE_ENTRY_OFFSET);
+    if (PeiCorePhysicalAddress != 0) {
+      //
+      // Get the location to update
+      //
+      Ia32ResetAddressPtr  = (UINT32 *) ((UINTN) FvImage->Eof - IA32_PEI_CORE_ENTRY_OFFSET);
 
-    //
-    // Write lower 32 bits of physical address for Pei Core entry
-    //
-    *Ia32ResetAddressPtr = (UINT32) PeiCorePhysicalAddress;
-
+      //
+      // Write lower 32 bits of physical address for Pei Core entry
+      //
+      *Ia32ResetAddressPtr = (UINT32) PeiCorePhysicalAddress;
+    }
     //
     // Write SecCore Entry point relative address into the jmp instruction in reset vector.
     //
