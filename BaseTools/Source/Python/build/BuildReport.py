@@ -1424,9 +1424,10 @@ class PcdReport(object):
     def OverrideFieldValue(self, Pcd, OverrideStruct):
         OverrideFieldStruct = collections.OrderedDict()
         if OverrideStruct:
-            for Key, Values in OverrideStruct.items():
-                if Values[1] and Values[1].endswith('.dsc'):
-                    OverrideFieldStruct[Key] = Values
+            for _, Values in OverrideStruct.items():
+                for Key,value in Values.items():
+                    if value[1] and value[1].endswith('.dsc'):
+                        OverrideFieldStruct[Key] = value
         if Pcd.PcdFieldValueFromFdf:
             for Key, Values in Pcd.PcdFieldValueFromFdf.items():
                 if Key in OverrideFieldStruct and Values[0] == OverrideFieldStruct[Key][0]:
