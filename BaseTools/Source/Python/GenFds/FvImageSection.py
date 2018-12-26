@@ -103,6 +103,8 @@ class FvImageSection(FvImageSectionClassObject):
             Fv = GenFdsGlobalVariable.FdfParser.Profile.FvDict.get(self.FvName)
             if Fv is not None:
                 self.Fv = Fv
+                if not self.FvAddr and self.Fv.BaseAddress:
+                    self.FvAddr = self.Fv.BaseAddress
                 FvFileName = Fv.AddToBuffer(Buffer, self.FvAddr, MacroDict = Dict, Flag=IsMakefile)
                 if Fv.FvAlignment is not None:
                     if self.Alignment is None:
