@@ -1144,7 +1144,6 @@ class PlatformAutoGen(AutoGen):
         self.SourceOverrideDir = None
         self.FdTargetList = self.Workspace.FdTargetList
         self.FvTargetList = self.Workspace.FvTargetList
-        self.AllPcdList = []
         # get the original module/package/platform objects
         self.BuildDatabase = Workspace.BuildDatabase
         self.DscBuildDataObj = Workspace.Platform
@@ -1225,6 +1224,9 @@ class PlatformAutoGen(AutoGen):
 
         self.IsMakeFileCreated = True
 
+    @property
+    def AllPcdList(self):
+        return self.DynamicPcdList + self.NonDynamicPcdList
     ## Deal with Shared FixedAtBuild Pcds
     #
     def CollectFixedAtBuildPcds(self):
@@ -1739,7 +1741,6 @@ class PlatformAutoGen(AutoGen):
                     pcd.SkuInfoList[SkuName] = copy.deepcopy(pcd.SkuInfoList[TAB_DEFAULT])
                     pcd.SkuInfoList[SkuName].SkuId = SkuId
                     pcd.SkuInfoList[SkuName].SkuIdName = SkuName
-        self.AllPcdList = self._NonDynamicPcdList + self._DynamicPcdList
 
     def FixVpdOffset(self, VpdFile ):
         FvPath = os.path.join(self.BuildDir, TAB_FV_DIRECTORY)
