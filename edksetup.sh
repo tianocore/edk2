@@ -115,11 +115,14 @@ function SetupPython()
 {    
   if [ $PYTHON3_ENABLE ] && [ $PYTHON3_ENABLE == TRUE ]
   then
-    for python in $(which python3)
+    if [ $origin_version ];then
+      origin_version=
+    fi
+    for python in $(whereis python3)
     do
       python=$(echo $python | grep "[[:digit:]]$" || true)
       python_version=${python##*python}
-      if [ -z "${python_version}" ];then
+      if [ -z "${python_version}" ] || (! command -v $python >/dev/null 2>&1);then
         continue
       fi
       if [ -z $origin_version ];then
@@ -137,14 +140,17 @@ function SetupPython()
   
   if [ -z $PYTHON3_ENABLE ] || [ $PYTHON3_ENABLE != TRUE ]
   then
-    for python in $(which python2)
+    if [ $origin_version ];then
+      origin_version=
+    fi
+    for python in $(whereis python2)
     do
       python=$(echo $python | grep "[[:digit:]]$" || true)
       python_version=${python##*python}
-      if [ -z "${python_version}" ];then
+      if [ -z "${python_version}" ] || (! command -v $python >/dev/null 2>&1);then
         continue
       fi
-      if [ -z $origin_version ] || [ $origin_version -ge 3 ]
+      if [ -z $origin_version ]
       then
         origin_version=$python_version
         export PYTHON=$python
