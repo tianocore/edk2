@@ -1276,11 +1276,9 @@ PciIoAttributes (
 
   Dev = NON_DISCOVERABLE_PCI_DEVICE_FROM_PCI_IO(This);
 
-  if (Attributes) {
-      if ((Attributes & (~(DEV_SUPPORTED_ATTRIBUTES))) != 0) {
-        return EFI_UNSUPPORTED;
-      }
-    }
+  if ((Attributes & (~(DEV_SUPPORTED_ATTRIBUTES))) != 0) {
+    return EFI_UNSUPPORTED;
+  }
 
   Enable = FALSE;
   switch (Operation) {
