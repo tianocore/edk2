@@ -1,7 +1,7 @@
 /*++ @file
 Vfr Syntax
 
-Copyright (c) 2004 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -5322,7 +5322,7 @@ EfiVfrParser::_STOU8 (
     }
     if((IsHex && ((Value/16) != PreviousValue)) || (!IsHex && ((Value/10) != PreviousValue))) {
       sprintf(ErrorMsg, "Overflow: Value %s is too large to store in a UINT8", OrigString);
-      gCVfrErrorHandle.HandleWarning (VFR_WARNING_STRING_TO_UINT_OVERFLOW, LineNum, ErrorMsg);
+      mParserStatus = mParserStatus + gCVfrErrorHandle.HandleError (VFR_RETURN_STRING_TO_UINT_OVERFLOW, LineNum, ErrorMsg);
     }
   }
 
@@ -5359,7 +5359,7 @@ EfiVfrParser::_STOU16 (
     }
     if((IsHex && ((Value/16) != PreviousValue)) || (!IsHex && ((Value/10) != PreviousValue))) {
       sprintf(ErrorMsg, "Overflow: Value %s is too large to store in a UINT16", OrigString);
-      gCVfrErrorHandle.HandleWarning (VFR_WARNING_STRING_TO_UINT_OVERFLOW, LineNum, ErrorMsg);
+      mParserStatus = mParserStatus + gCVfrErrorHandle.HandleError (VFR_RETURN_STRING_TO_UINT_OVERFLOW, LineNum, ErrorMsg);
     }
   }
 
@@ -5396,7 +5396,7 @@ EfiVfrParser::_STOU32 (
     }
     if((IsHex && ((Value/16) != PreviousValue)) || (!IsHex && ((Value/10) != PreviousValue ))) {
       sprintf(ErrorMsg, "Overflow: Value %s is too large to store in a UINT32", OrigString);
-      gCVfrErrorHandle.HandleWarning (VFR_WARNING_STRING_TO_UINT_OVERFLOW, LineNum, ErrorMsg);
+      mParserStatus = mParserStatus + gCVfrErrorHandle.HandleError (VFR_RETURN_STRING_TO_UINT_OVERFLOW, LineNum, ErrorMsg);
     }
   }
 
@@ -5432,7 +5432,7 @@ EfiVfrParser::_STOU64 (
     }
     if((IsHex && ((Value/16) != PreviousValue)) || ((!IsHex && (Value/10) != PreviousValue))) {
       sprintf(ErrorMsg, "Overflow: Value %s is too large to store in a UINT64", OrigString);
-      gCVfrErrorHandle.HandleWarning (VFR_WARNING_STRING_TO_UINT_OVERFLOW, LineNum, ErrorMsg);
+      mParserStatus = mParserStatus + gCVfrErrorHandle.HandleError (VFR_RETURN_STRING_TO_UINT_OVERFLOW, LineNum, ErrorMsg);
     }
   }
 
