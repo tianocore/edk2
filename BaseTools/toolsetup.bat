@@ -286,43 +286,77 @@ goto check_build_environment
   )
 
 :defined_python
+if defined PYTHON_COMMAND if not defined PYTHON3_ENABLE (
+  goto check_python_available
+)
 if defined PYTHON3_ENABLE (
   if "%PYTHON3_ENABLE%" EQU "TRUE" (
-    set PYTHON=py -3
-    %PYTHON% --version >NUL 2>&1
-    if %ERRORLEVEL% NEQ 0 (
+    set PYTHON_COMMAND=py -3
+    goto check_python_available
+  ) else (
+    goto check_python2
+  )
+)
+if not defined PYTHON_COMMAND if not defined PYTHON3_ENABLE (
+  set PYTHON_COMMAND=py -3
+  py -3 %BASE_TOOLS_PATH%\Tests\PythonTest.py >PythonCheck.txt 2>&1
+  setlocal enabledelayedexpansion
+  set /p PythonCheck=<"PythonCheck.txt"
+  del PythonCheck.txt
+  if "!PythonCheck!" NEQ "TRUE" (
+    if not defined PYTHON_HOME if not defined PYTHONHOME (
+      endlocal
+      set PYTHON_COMMAND=
       echo.
-      echo !!! ERROR !!!  PYTHON3 is not installed or added to environment variables
+      echo !!! ERROR !!! Binary python tools are missing.
+      echo PYTHON_COMMAND, PYTHON3_ENABLE or PYTHON_HOME
+      echo Environment variable is not set successfully.
+      echo They is required to build or execute the python tools.
       echo.
       goto end
     ) else (
-      goto check_freezer_path
+      goto check_python2
     )
-  ) 
+  ) else (
+    goto check_freezer_path
+  )
 )
 
+:check_python2
+endlocal
 if defined PYTHON_HOME (
   if EXIST "%PYTHON_HOME%" (
-    set PYTHON=%PYTHON_HOME%\python.exe
-    goto check_freezer_path
-    )
+    set PYTHON_COMMAND=%PYTHON_HOME%\python.exe
+    goto check_python_available
   )
+)
 if defined PYTHONHOME (
   if EXIST "%PYTHONHOME%" (
     set PYTHON_HOME=%PYTHONHOME%
-    set PYTHON=%PYTHON_HOME%\python.exe
-    goto check_freezer_path
-    )
+    set PYTHON_COMMAND=%PYTHON_HOME%\python.exe
+    goto check_python_available
   )
-  
-  echo.
-  echo !!! ERROR !!! Binary python tools are missing.
-  echo PYTHON_HOME or PYTHON3_ENABLE environment variable is not set successfully.
-  echo PYTHON_HOME or PYTHON3_ENABLE is required to build or execute the python tools.
-  echo.
-  goto end
+)
+echo.
+echo !!! ERROR !!!  PYTHON_HOME is not defined or The value of this variable does not exist
+echo.
+goto end
+:check_python_available
+%PYTHON_COMMAND% %BASE_TOOLS_PATH%\Tests\PythonTest.py >PythonCheck.txt 2>&1
+  setlocal enabledelayedexpansion
+  set /p PythonCheck=<"PythonCheck.txt"
+  del PythonCheck.txt
+  if "!PythonCheck!" NEQ "TRUE" (
+    echo.
+    echo ! ERROR !  "%PYTHON_COMMAND%" is not installed or added to environment variables
+    echo.
+    goto end
+  ) else (
+    goto check_freezer_path
+  )
 
 :check_freezer_path
+  endlocal
   if defined BASETOOLS_PYTHON_SOURCE goto print_python_info
   set "PATH=%BASE_TOOLS_PATH%\BinWrappers\WindowsLike;%PATH%"
   set BASETOOLS_PYTHON_SOURCE=%BASE_TOOLS_PATH%\Source\Python
@@ -330,14 +364,12 @@ if defined PYTHONHOME (
 
 :print_python_info
   echo                PATH = %PATH%
-  if "%PYTHON3_ENABLE%" EQU "TRUE" (
+  if defined PYTHON3_ENABLE if "%PYTHON3_ENABLE%" EQU "TRUE" (
     echo      PYTHON3_ENABLE = %PYTHON3_ENABLE%
-    echo             PYTHON3 = %PYTHON%
+    echo             PYTHON3 = %PYTHON_COMMAND%
   ) else (
-    echo      PYTHON3_ENABLE = %PYTHON3_ENABLE%
-    if defined PYTHON_HOME (
-      echo         PYTHON_HOME = %PYTHON_HOME%
-    )
+    echo      PYTHON3_ENABLE = FALSE
+    echo      PYTHON_COMMAND = %PYTHON_COMMAND%
   )
   echo          PYTHONPATH = %PYTHONPATH%
   echo.

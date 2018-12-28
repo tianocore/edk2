@@ -38,7 +38,8 @@ libs: $(LIBRARIES)
 	@echo # Build libraries
 	@echo ######################
 	@if not exist $(LIB_PATH) mkdir $(LIB_PATH)
-	@$(PYTHON) Makefiles\NmakeSubdirs.py all $**
+  @if defined PYTHON_COMMAND $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py all $**
+  @if not defined PYTHON_COMMAND $(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py all $**
 
 apps: $(APPLICATIONS)
 	@echo.
@@ -46,7 +47,8 @@ apps: $(APPLICATIONS)
 	@echo # Build executables
 	@echo ######################
 	@if not exist $(BIN_PATH) mkdir $(BIN_PATH)
-	@$(PYTHON) Makefiles\NmakeSubdirs.py all $**
+  @if defined PYTHON_COMMAND $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py all $**
+  @if not defined PYTHON_COMMAND $(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py all $**
 
 install: $(LIB_PATH) $(BIN_PATH)
 	@echo.
@@ -60,11 +62,13 @@ install: $(LIB_PATH) $(BIN_PATH)
 
 .PHONY: clean
 clean:
-  @$(PYTHON) Makefiles\NmakeSubdirs.py clean $(LIBRARIES) $(APPLICATIONS)
+  @if defined PYTHON_COMMAND $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py clean $(LIBRARIES) $(APPLICATIONS)
+  @if not defined PYTHON_COMMAND $(PYTHON_HOME)\python.exe Makefiles\NmakeSubdirs.py clean $(LIBRARIES) $(APPLICATIONS)
 
 .PHONY: cleanall
 cleanall:
-  @$(PYTHON) Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
+  @if defined PYTHON_COMMAND $(PYTHON_COMMAND) $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
+  @if not defined PYTHON_COMMAND $(PYTHON_HOME)\python.exe $(PYTHON_COMMAND) Makefiles\NmakeSubdirs.py cleanall $(LIBRARIES) $(APPLICATIONS)
 
 !INCLUDE Makefiles\ms.rule
 

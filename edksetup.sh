@@ -90,7 +90,7 @@ function SetupEnv()
   then
     . $WORKSPACE/BaseTools/BuildEnv
   elif [ -n "$PACKAGES_PATH" ]
-  then 
+  then
     PATH_LIST=$PACKAGES_PATH
     PATH_LIST=${PATH_LIST//:/ }
     for DIR in $PATH_LIST
@@ -111,11 +111,9 @@ function SetupEnv()
   fi
 }
 
-function SetupPython()
-{    
-  if [ $PYTHON3_ENABLE ] && [ $PYTHON3_ENABLE == TRUE ]
-  then
-    if [ $origin_version ];then
+function SetupPython3()
+{
+  if [ $origin_version ];then
       origin_version=
     fi
     for python in $(whereis python3)
@@ -127,18 +125,35 @@ function SetupPython()
       fi
       if [ -z $origin_version ];then
         origin_version=$python_version
-        export PYTHON=$python
+        export PYTHON_COMMAND=$python
         continue
       fi
       ret=`echo "$origin_version < $python_version" |bc`
       if [ "$ret" -eq 1 ]; then
         origin_version=$python_version
-        export PYTHON=$python
+        export PYTHON_COMMAND=$python
       fi
     done
+    return 0
+}
+
+function SetupPython()
+{
+  if [ $PYTHON_COMMAND ] && [ -z $PYTHON3_ENABLE ];then
+    if ( command -v $PYTHON_COMMAND >/dev/null 2>&1 );then
+      return 0
+    else
+      echo $PYTHON_COMMAND Cannot be used to build or execute the python tools.
+      return 1
+    fi
   fi
-  
-  if [ -z $PYTHON3_ENABLE ] || [ $PYTHON3_ENABLE != TRUE ]
+
+  if [ $PYTHON3_ENABLE ] && [ $PYTHON3_ENABLE == TRUE ]
+  then
+    SetupPython3
+  fi
+
+  if [ $PYTHON3_ENABLE ] && [ $PYTHON3_ENABLE != TRUE ]
   then
     if [ $origin_version ];then
       origin_version=
@@ -153,16 +168,19 @@ function SetupPython()
       if [ -z $origin_version ]
       then
         origin_version=$python_version
-        export PYTHON=$python
+        export PYTHON_COMMAND=$python
         continue
       fi
       ret=`echo "$origin_version < $python_version" |bc`
       if [ "$ret" -eq 1 ]; then
         origin_version=$python_version
-        export PYTHON=$python
+        export PYTHON_COMMAND=$python
       fi
     done
+    return 0
   fi
+
+  SetupPython3
 }
 
 function SourceEnv()

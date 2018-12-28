@@ -796,7 +796,8 @@ class Build():
             if PYTHON3_ENABLE != "TRUE":
                 PYTHON3_ENABLE = "FALSE"
             EdkLogger.quiet("%-16s = %s" % ("PYTHON3_ENABLE", PYTHON3_ENABLE))
-        EdkLogger.quiet("%-16s = %s" % ("PYTHON", os.environ["PYTHON"]))
+        if "PYTHON_COMMAND" in os.environ:
+            EdkLogger.quiet("%-16s = %s" % ("PYTHON_COMMAND", os.environ["PYTHON_COMMAND"]))
         self.InitPreBuild()
         self.InitPostBuild()
         if self.Prebuild:
