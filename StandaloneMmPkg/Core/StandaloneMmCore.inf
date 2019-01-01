@@ -49,6 +49,7 @@
   BaseMemoryLib
   CacheMaintenanceLib
   DebugLib
+  ExtractGuidedSectionLib
   FvLib
   HobLib
   MemoryAllocationLib
