@@ -112,11 +112,10 @@ VERIFY_SIZE_OF (__VERIFY_UINT32_ENUM_SIZE, 4);
 // warnings.
 //
 #ifndef UNREACHABLE
-  #if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 4)
+  #ifdef __GNUC__
     ///
     /// Signal compilers and analyzers that this call is not reachable.  It is
     /// up to the compiler to remove any code past that point.
-    /// Not implemented by GCC 4.4 or earlier.
     ///
     #define UNREACHABLE()  __builtin_unreachable ()
   #elif defined (__has_feature)
