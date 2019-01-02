@@ -978,6 +978,11 @@ class DscParser(MetaFileParser):
             self._ItemType = SectionType
 
             self._ValueList = ['', '', '']
+            # "SET pcd = pcd_expression" syntax is not supported in Dsc file.
+            if self._CurrentLine.upper().strip().startswith("SET "):
+                EdkLogger.error('Parser', FORMAT_INVALID, '''"SET pcd = pcd_expression" syntax is not support in Dsc file''',
+                                ExtraData=self._CurrentLine,
+                                File=self.MetaFile, Line=self._LineIndex + 1)
             self._SectionParser[SectionType](self)
             if self._ValueList is None:
                 continue
