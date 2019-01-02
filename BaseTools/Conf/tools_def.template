@@ -429,7 +429,7 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Intel C Compiler V9.1
 #                        Dependencies:
 #                             Microsoft Visual Studio 2003 or 2005
-#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) 
+#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK)
 #                             version 3790.1830 for X64 target architectures
 #                        Optional:
 #                             Required to build EBC drivers:
@@ -441,7 +441,7 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Intel C Compiler V11.1
 #                        Dependencies:
 #                             Microsoft Visual Studio 2005 or 2008
-#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) 
+#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK)
 #                             version 3790.1830 for X64 target architectures
 #                        Optional:
 #                             Required to build EBC drivers:
@@ -541,7 +541,7 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Intel C Compiler V9.1
 #                        Dependencies:
 #                             Microsoft Visual Studio 2003 or 2005
-#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) 
+#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK)
 #                             version 3790.1830 for X64 target architectures
 #                        Optional:
 #                             Required to build EBC drivers:
@@ -553,7 +553,7 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Intel C Compiler V11.1
 #                        Dependencies:
 #                             Microsoft Visual Studio 2005 or 2008
-#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) 
+#                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK)
 #                             version 3790.1830 for X64 target architectures
 #                        Optional:
 #                             Required to build EBC drivers:
@@ -569,21 +569,21 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
-#                               https://acpica.org/downloads 
+#                               https://acpica.org/downloads
 #   VS2008x86   -win64-  Requires:
 #                             Microsoft Visual Studio 2008 (x86)
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
-#                               https://acpica.org/downloads 
+#                               https://acpica.org/downloads
 #   VS2010x86   -win64-  Requires:
 #                             Microsoft Visual Studio 2010 (x86) Premium Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
-#                               https://acpica.org/downloads 
+#                               https://acpica.org/downloads
 #   VS2012x86   -win64-  Requires:
 #                             Microsoft Visual Studio 2012 (x86) Professional Edition
 #                             Microsoft Windows Server 2003 Driver Development Kit (Microsoft WINDDK) version 3790.1830
@@ -609,29 +609,29 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Intel C Compiler V9.1(x86)
 #                        Dependencies:
 #                             Microsoft Visual Studio 2003 or 2005
-#                             Microsoft Windows Server 2003 Driver Development Kit 
+#                             Microsoft Windows Server 2003 Driver Development Kit
 #                             (Microsoft WINDDK) version 3790.1830 for X64 target architectures
 #                        Optional:
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
-#                               https://acpica.org/downloads 
+#                               https://acpica.org/downloads
 #   ICC11x86    -win64-  Requires:
 #                             Intel C Compiler V11.1(x86)
 #                        Dependencies:
 #                             Microsoft Visual Studio 2005 or 2008
-#                             Microsoft Windows Server 2003 Driver Development Kit 
+#                             Microsoft Windows Server 2003 Driver Development Kit
 #                             (Microsoft WINDDK) version 3790.1830 for X64 target architectures
 #                        Optional:
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
-#                               https://acpica.org/downloads 
+#                               https://acpica.org/downloads
 #  VS2005x86xASL -win64- Requires:
 #                             Microsoft Visual Studio 2005 Team Suite Edition (x86)
-#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830 
+#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build EBC drivers:
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
@@ -640,35 +640,35 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
 #  VS2008x86xASL -win64- Requires:
 #                             Microsoft Visual Studio 2008 (x86)
-#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830 
+#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
 #                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
 #  VS2010x86xASL -win64- Requires:
 #                             Microsoft Visual Studio 2010 (x86) Premium Edition
-#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830 
+#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
 #                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
 #  VS2012x86xASL -win64- Requires:
 #                             Microsoft Visual Studio 2012 (x86) Professional Edition
-#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830 
+#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
 #                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
 #  VS2013x86xASL -win64- Requires:
 #                             Microsoft Visual Studio 2013 (x86) Professional
-#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830 
+#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
 #                               http://download.microsoft.com/download/2/c/1/2c16c7e0-96c1-40f5-81fc-3e4bf7b65496/microsoft_asl_compiler-v4-0-0.msi
 #  VS2015x86xASL -win64- Requires:
 #                             Microsoft Visual Studio 2015 (x86) Professional
-#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830 
+#                             Microsoft Windows Server 2003 Driver Development Kit(Microsoft WINDDK) version 3790.1830
 #                        Optional:
 #                             Required to build platforms or ACPI tables:
 #                               Microsoft ASL ACPI Compiler (asl.exe) v4.0.0 from
@@ -705,7 +705,7 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                               Intel(r) Compiler for Efi Byte Code (Intel(r) EBC Compiler)
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler (iasl.exe) from
-#                               https://acpica.org/downloads 
+#                               https://acpica.org/downloads
 #  CYGGCCx86xASL -win64- Requires:
 #                             CygWin, GCC 4.3.0, binutils 2.20.51.0.5
 #                             Microsoft Visual Studio 2005 or 2008
@@ -4383,7 +4383,7 @@ DEFINE GCC5_AARCH64_ASLDLINK_FLAGS   = DEF(GCC49_AARCH64_ASLDLINK_FLAGS)
 *_GCC44_IA32_DLINK_FLAGS          = DEF(GCC44_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386
 *_GCC44_IA32_DLINK2_FLAGS         = DEF(GCC44_IA32_DLINK2_FLAGS)
 *_GCC44_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
-*_GCC44_IA32_OBJCOPY_FLAGS        = 
+*_GCC44_IA32_OBJCOPY_FLAGS        =
 *_GCC44_IA32_NASM_FLAGS           = -f elf32
 
   DEBUG_GCC44_IA32_CC_FLAGS       = DEF(GCC44_IA32_CC_FLAGS) -Os
@@ -4411,7 +4411,7 @@ RELEASE_GCC44_IA32_CC_FLAGS       = DEF(GCC44_IA32_CC_FLAGS) -Os
 *_GCC44_X64_DLINK_FLAGS          = DEF(GCC44_X64_DLINK_FLAGS)
 *_GCC44_X64_DLINK2_FLAGS         = DEF(GCC44_X64_DLINK2_FLAGS)
 *_GCC44_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
-*_GCC44_X64_OBJCOPY_FLAGS        = 
+*_GCC44_X64_OBJCOPY_FLAGS        =
 *_GCC44_X64_NASM_FLAGS           = -f elf64
 
   DEBUG_GCC44_X64_CC_FLAGS       = DEF(GCC44_X64_CC_FLAGS) -Os
@@ -4459,7 +4459,7 @@ RELEASE_GCC44_X64_CC_FLAGS       = DEF(GCC44_X64_CC_FLAGS) -Os
 *_GCC45_IA32_DLINK_FLAGS          = DEF(GCC45_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386
 *_GCC45_IA32_DLINK2_FLAGS         = DEF(GCC45_IA32_DLINK2_FLAGS)
 *_GCC45_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
-*_GCC45_IA32_OBJCOPY_FLAGS        = 
+*_GCC45_IA32_OBJCOPY_FLAGS        =
 *_GCC45_IA32_NASM_FLAGS           = -f elf32
 
   DEBUG_GCC45_IA32_CC_FLAGS       = DEF(GCC45_IA32_CC_FLAGS) -Os
@@ -4487,7 +4487,7 @@ RELEASE_GCC45_IA32_CC_FLAGS       = DEF(GCC45_IA32_CC_FLAGS) -Os
 *_GCC45_X64_DLINK_FLAGS          = DEF(GCC45_X64_DLINK_FLAGS)
 *_GCC45_X64_DLINK2_FLAGS         = DEF(GCC45_X64_DLINK2_FLAGS)
 *_GCC45_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
-*_GCC45_X64_OBJCOPY_FLAGS        = 
+*_GCC45_X64_OBJCOPY_FLAGS        =
 *_GCC45_X64_NASM_FLAGS           = -f elf64
 
   DEBUG_GCC45_X64_CC_FLAGS       = DEF(GCC45_X64_CC_FLAGS) -Os
@@ -4535,7 +4535,7 @@ RELEASE_GCC45_X64_CC_FLAGS       = DEF(GCC45_X64_CC_FLAGS) -Os
 *_GCC46_IA32_DLINK_FLAGS          = DEF(GCC46_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386
 *_GCC46_IA32_DLINK2_FLAGS         = DEF(GCC46_IA32_DLINK2_FLAGS)
 *_GCC46_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
-*_GCC46_IA32_OBJCOPY_FLAGS        = 
+*_GCC46_IA32_OBJCOPY_FLAGS        =
 *_GCC46_IA32_NASM_FLAGS           = -f elf32
 
   DEBUG_GCC46_IA32_CC_FLAGS       = DEF(GCC46_IA32_CC_FLAGS) -Os
@@ -4563,7 +4563,7 @@ RELEASE_GCC46_IA32_CC_FLAGS       = DEF(GCC46_IA32_CC_FLAGS) -Os -Wno-unused-but
 *_GCC46_X64_DLINK_FLAGS          = DEF(GCC46_X64_DLINK_FLAGS)
 *_GCC46_X64_DLINK2_FLAGS         = DEF(GCC46_X64_DLINK2_FLAGS)
 *_GCC46_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
-*_GCC46_X64_OBJCOPY_FLAGS        = 
+*_GCC46_X64_OBJCOPY_FLAGS        =
 *_GCC46_X64_NASM_FLAGS           = -f elf64
 
   DEBUG_GCC46_X64_CC_FLAGS       = DEF(GCC46_X64_CC_FLAGS) -Os
@@ -4611,7 +4611,7 @@ RELEASE_GCC46_X64_CC_FLAGS       = DEF(GCC46_X64_CC_FLAGS) -Os -Wno-unused-but-s
 *_GCC47_IA32_DLINK_FLAGS          = DEF(GCC47_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386
 *_GCC47_IA32_DLINK2_FLAGS         = DEF(GCC47_IA32_DLINK2_FLAGS)
 *_GCC47_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
-*_GCC47_IA32_OBJCOPY_FLAGS        = 
+*_GCC47_IA32_OBJCOPY_FLAGS        =
 *_GCC47_IA32_NASM_FLAGS           = -f elf32
 
   DEBUG_GCC47_IA32_CC_FLAGS       = DEF(GCC47_IA32_CC_FLAGS) -Os
@@ -4639,7 +4639,7 @@ RELEASE_GCC47_IA32_CC_FLAGS       = DEF(GCC47_IA32_CC_FLAGS) -Os -Wno-unused-but
 *_GCC47_X64_DLINK_FLAGS          = DEF(GCC47_X64_DLINK_FLAGS)
 *_GCC47_X64_DLINK2_FLAGS         = DEF(GCC47_X64_DLINK2_FLAGS)
 *_GCC47_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
-*_GCC47_X64_OBJCOPY_FLAGS        = 
+*_GCC47_X64_OBJCOPY_FLAGS        =
 *_GCC47_X64_NASM_FLAGS           = -f elf64
 
   DEBUG_GCC47_X64_CC_FLAGS       = DEF(GCC47_X64_CC_FLAGS) -Os
@@ -4687,7 +4687,7 @@ RELEASE_GCC47_X64_CC_FLAGS       = DEF(GCC47_X64_CC_FLAGS) -Os -Wno-unused-but-s
 *_GCC48_IA32_DLINK_FLAGS          = DEF(GCC48_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386
 *_GCC48_IA32_DLINK2_FLAGS         = DEF(GCC48_IA32_DLINK2_FLAGS)
 *_GCC48_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
-*_GCC48_IA32_OBJCOPY_FLAGS        = 
+*_GCC48_IA32_OBJCOPY_FLAGS        =
 *_GCC48_IA32_NASM_FLAGS           = -f elf32
 
   DEBUG_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Os
@@ -4715,7 +4715,7 @@ RELEASE_GCC48_IA32_CC_FLAGS       = DEF(GCC48_IA32_CC_FLAGS) -Os -Wno-unused-but
 *_GCC48_X64_DLINK_FLAGS          = DEF(GCC48_X64_DLINK_FLAGS)
 *_GCC48_X64_DLINK2_FLAGS         = DEF(GCC48_X64_DLINK2_FLAGS)
 *_GCC48_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
-*_GCC48_X64_OBJCOPY_FLAGS        = 
+*_GCC48_X64_OBJCOPY_FLAGS        =
 *_GCC48_X64_NASM_FLAGS           = -f elf64
 
   DEBUG_GCC48_X64_CC_FLAGS       = DEF(GCC48_X64_CC_FLAGS) -Os
@@ -4826,7 +4826,7 @@ RELEASE_GCC48_AARCH64_CC_FLAGS   = DEF(GCC48_AARCH64_CC_FLAGS) -Wno-unused-but-s
 *_GCC49_IA32_DLINK_FLAGS          = DEF(GCC49_IA32_X64_DLINK_FLAGS) -Wl,-m,elf_i386,--oformat=elf32-i386
 *_GCC49_IA32_DLINK2_FLAGS         = DEF(GCC49_IA32_DLINK2_FLAGS)
 *_GCC49_IA32_RC_FLAGS             = DEF(GCC_IA32_RC_FLAGS)
-*_GCC49_IA32_OBJCOPY_FLAGS        = 
+*_GCC49_IA32_OBJCOPY_FLAGS        =
 *_GCC49_IA32_NASM_FLAGS           = -f elf32
 
   DEBUG_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Os
@@ -4854,7 +4854,7 @@ RELEASE_GCC49_IA32_CC_FLAGS       = DEF(GCC49_IA32_CC_FLAGS) -Os -Wno-unused-but
 *_GCC49_X64_DLINK_FLAGS          = DEF(GCC49_X64_DLINK_FLAGS)
 *_GCC49_X64_DLINK2_FLAGS         = DEF(GCC49_X64_DLINK2_FLAGS)
 *_GCC49_X64_RC_FLAGS             = DEF(GCC_X64_RC_FLAGS)
-*_GCC49_X64_OBJCOPY_FLAGS        = 
+*_GCC49_X64_OBJCOPY_FLAGS        =
 *_GCC49_X64_NASM_FLAGS           = -f elf64
 
   DEBUG_GCC49_X64_CC_FLAGS       = DEF(GCC49_X64_CC_FLAGS) -Os
@@ -5691,7 +5691,7 @@ NOOPT_ICC_X64_NASM_FLAGS                 = -O0 -f win64 -g
 
   DEBUG_ICC_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
 RELEASE_ICC_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
-NOOPT_ICC_X64_DLINK_FLAGS                = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG    
+NOOPT_ICC_X64_DLINK_FLAGS                = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
 
       *_ICC_X64_SLINK_FLAGS              = /nologo /LTCG
 
@@ -5810,7 +5810,7 @@ NOOPT_ICCxASL_X64_NASM_FLAGS                 = -O0 -f win64 -g
 
   DEBUG_ICCxASL_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
 RELEASE_ICCxASL_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
-NOOPT_ICCxASL_X64_DLINK_FLAGS                = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG  
+NOOPT_ICCxASL_X64_DLINK_FLAGS                = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
 
       *_ICCxASL_X64_SLINK_FLAGS              = /nologo /LTCG
 
@@ -6053,7 +6053,7 @@ NOOPT_ICCx86xASL_X64_NASM_FLAGS                 = -O0 -f win64 -g
   DEBUG_ICCx86xASL_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
 RELEASE_ICCx86xASL_X64_DLINK_FLAGS              = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /IGNORE:4254 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /MERGE:.rdata=.data
 NOOPT_ICCx86xASL_X64_DLINK_FLAGS                = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /Machine:X64 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:CONSOLE /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
- 
+
       *_ICCx86xASL_X64_SLINK_FLAGS              = /nologo /LTCG
 
 
@@ -6607,7 +6607,7 @@ RELEASE_MYTOOLS_IA32_CC_FLAGS            = /nologo /c /WX /GS- /W4 /Gs32768 /Gy 
 NOOPT_MYTOOLS_IA32_CC_FLAGS              = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
   DEBUG_MYTOOLS_IA32_ASM_FLAGS           = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
 RELEASE_MYTOOLS_IA32_ASM_FLAGS           = /nologo /c /WX /W3 /coff /Cx /Zd
-NOOPT_MYTOOLS_IA32_ASM_FLAGS             = /nologo /c /WX /W3 /coff /Cx /Zd /Zi  
+NOOPT_MYTOOLS_IA32_ASM_FLAGS             = /nologo /c /WX /W3 /coff /Cx /Zd /Zi
   DEBUG_MYTOOLS_IA32_NASM_FLAGS          = -Ox -f win32 -g
 RELEASE_MYTOOLS_IA32_NASM_FLAGS          = -Ox -f win32
 NOOPT_MYTOOLS_IA32_NASM_FLAGS            = -O0 -f win32 -g
@@ -6635,10 +6635,10 @@ NOOPT_MYTOOLS_IA32_DLINK_FLAGS           = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /O
 
   DEBUG_MYTOOLS_X64_CC_FLAGS             = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm
 RELEASE_MYTOOLS_X64_CC_FLAGS             = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF
-NOOPT_MYTOOLS_X64_CC_FLAGS               = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od  
+NOOPT_MYTOOLS_X64_CC_FLAGS               = /nologo /c /WX /GS- /W4 /Gs32768 /Gy /D UNICODE /FIAutoGen.h /EHs-c- /GR- /GF /Zi /Gm /Od
   DEBUG_MYTOOLS_X64_ASM_FLAGS            = /nologo /c /WX /W3 /Cx /Zd /Zi
 RELEASE_MYTOOLS_X64_ASM_FLAGS            = /nologo /c /WX /W3 /Cx /Zd
-NOOPT_MYTOOLS_X64_ASM_FLAGS              = /nologo /c /WX /W3 /Cx /Zd /Zi  
+NOOPT_MYTOOLS_X64_ASM_FLAGS              = /nologo /c /WX /W3 /Cx /Zd /Zi
   DEBUG_MYTOOLS_X64_NASM_FLAGS           = -Ox -f win64 -g
 RELEASE_MYTOOLS_X64_NASM_FLAGS           = -Ox -f win64
 NOOPT_MYTOOLS_X64_NASM_FLAGS             = -O0 -f win64 -g
@@ -6706,7 +6706,7 @@ NOOPT_MYTOOLS_X64_DLINK_FLAGS            = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /O
 
   DEBUG_XCODE5_*_MTOC_FLAGS = -align 0x20 -d $(DEBUG_DIR)/$(MODULE_NAME).dll
   NOOPT_XCODE5_*_MTOC_FLAGS = -align 0x20 -d $(DEBUG_DIR)/$(MODULE_NAME).dll
-RELEASE_XCODE5_*_MTOC_FLAGS = -align 0x20 
+RELEASE_XCODE5_*_MTOC_FLAGS = -align 0x20
 
 ####################
 # IA-32 definitions
@@ -6718,7 +6718,7 @@ RELEASE_XCODE5_IA32_DLINK_FLAGS      = -arch i386 -u _$(IMAGE_ENTRY_POINT) -e _$
 *_XCODE5_IA32_SLINK_FLAGS      = -static -o
   DEBUG_XCODE5_IA32_ASM_FLAGS  = -arch i386 -g
   NOOPT_XCODE5_IA32_ASM_FLAGS  = -arch i386 -g
-RELEASE_XCODE5_IA32_ASM_FLAGS  = -arch i386 
+RELEASE_XCODE5_IA32_ASM_FLAGS  = -arch i386
       *_XCODE5_IA32_NASM_FLAGS = -f macho32
 
 
@@ -6736,10 +6736,10 @@ RELEASE_XCODE5_X64_DLINK_FLAGS      = -arch x86_64 -u _$(IMAGE_ENTRY_POINT) -e _
 *_XCODE5_X64_SLINK_FLAGS      = -static -o
   DEBUG_XCODE5_X64_ASM_FLAGS  = -arch x86_64 -g
   NOOPT_XCODE5_X64_ASM_FLAGS  = -arch x86_64 -g
-RELEASE_XCODE5_X64_ASM_FLAGS  = -arch x86_64 
+RELEASE_XCODE5_X64_ASM_FLAGS  = -arch x86_64
       *_XCODE5_X64_NASM_FLAGS = -f macho64
-*_XCODE5_*_PP_FLAGS         = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h 
-*_XCODE5_*_VFRPP_FLAGS      = -x c -E -P -DVFRCOMPILE -include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h 
+*_XCODE5_*_PP_FLAGS         = -E -x assembler-with-cpp -include $(DEST_DIR_DEBUG)/AutoGen.h
+*_XCODE5_*_VFRPP_FLAGS      = -x c -E -P -DVFRCOMPILE -include $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h
 
   DEBUG_XCODE5_X64_CC_FLAGS   = -target x86_64-pc-win32-macho -c -g -Os       -Wall -Werror -Wextra -include AutoGen.h -funsigned-char -fno-ms-extensions -fno-stack-protector -fno-builtin -fshort-wchar -mno-implicit-float -mms-bitfields -Wno-unused-parameter -Wno-missing-braces -Wno-missing-field-initializers -Wno-tautological-compare -Wno-sign-compare -Wno-varargs -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -D NO_MSABI_VA_FUNCS $(PLATFORM_FLAGS)
   NOOPT_XCODE5_X64_CC_FLAGS   = -target x86_64-pc-win32-macho -c -g -O0       -Wall -Werror -Wextra -include AutoGen.h -funsigned-char -fno-ms-extensions -fno-stack-protector -fno-builtin -fshort-wchar -mno-implicit-float -mms-bitfields -Wno-unused-parameter -Wno-missing-braces -Wno-missing-field-initializers -Wno-tautological-compare -Wno-sign-compare -Wno-varargs -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -D NO_MSABI_VA_FUNCS $(PLATFORM_FLAGS)
@@ -6768,12 +6768,12 @@ DEFINE RVCT_ALL_DLINK_FLAGS = --no_scanlib --no_exceptions --datacompressor off 
 # Use default values, or override in DSC file
 #
 *_RVCT_ARM_ARCHCC_FLAGS    = --thumb --fpu=softvfp
-*_RVCT_ARM_ARCHASM_FLAGS   = 
-*_RVCT_ARM_ARCHDLINK_FLAGS = 
+*_RVCT_ARM_ARCHASM_FLAGS   =
+*_RVCT_ARM_ARCHDLINK_FLAGS =
 *_RVCT_ARM_PLATFORM_FLAGS  = --cpu 7-A
 
-  DEBUG_RVCT_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map 
-RELEASE_RVCT_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map 
+  DEBUG_RVCT_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map
+RELEASE_RVCT_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 
 
 *_RVCT_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
@@ -6810,11 +6810,11 @@ RELEASE_RVCT_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --diag_suppress=5
 # Use default values, or override in DSC file
 #
 *_RVCTLINUX_ARM_ARCHCC_FLAGS    = --thumb --fpu=softvfp
-*_RVCTLINUX_ARM_ARCHASM_FLAGS   = 
-*_RVCTLINUX_ARM_ARCHDLINK_FLAGS = 
+*_RVCTLINUX_ARM_ARCHASM_FLAGS   =
+*_RVCTLINUX_ARM_ARCHDLINK_FLAGS =
 *_RVCTLINUX_ARM_PLATFORM_FLAGS  = --cpu 7-A
 
-DEBUG_RVCTLINUX_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map 
+DEBUG_RVCTLINUX_ARM_DLINK_FLAGS     = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 RELEASE_RVCTLINUX_ARM_DLINK_FLAGS   = $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list $(DEST_DIR_DEBUG)/$(BASE_NAME).map
 
 *_RVCTLINUX_ARM_ASM_FLAGS       = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
@@ -6858,12 +6858,12 @@ RELEASE_RVCTLINUX_ARM_CC_FLAGS  = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) --diag_suppr
 #
 *_RVCTCYGWIN_ARM_ARCHCC_FLAGS    = --thumb --fpu=softvfp
 *_RVCTCYGWIN_ARM_ARCHASM_FLAGS   =
-*_RVCTCYGWIN_ARM_ARCHDLINK_FLAGS = 
+*_RVCTCYGWIN_ARM_ARCHDLINK_FLAGS =
 *_RVCTCYGWIN_ARM_PLATFORM_FLAGS  = --cpu 7-A
 
-  DEBUG_RVCTCYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map` 
-RELEASE_RVCTCYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map` 
- 
+  DEBUG_RVCTCYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map`
+RELEASE_RVCTCYGWIN_ARM_DLINK_FLAGS     = "$(DLINKPATH_FLAG)" $(ARCHDLINK_FLAGS) DEF(RVCT_ALL_DLINK_FLAGS) --entry $(IMAGE_ENTRY_POINT) --map --list `cygpath -m $(DEST_DIR_DEBUG)/$(BASE_NAME).map`
+
 *_RVCTCYGWIN_ARM_ASM_FLAGS       = "$(ASMPATH_FLAG)" $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(RVCT_ALL_ASM_FLAGS)
 *_RVCTCYGWIN_ARM_PP_FLAGS        = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E
 *_RVCTCYGWIN_ARM_VFRPP_FLAGS     = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) -E  -DVFRCOMPILE --preinclude `cygpath -m $(DEST_DIR_DEBUG)/$(MODULE_NAME)StrDefs.h`
@@ -6939,8 +6939,8 @@ RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_F
 #
 #       Rsa2048Sha256Sign --private-key MyKey.pem %1 %2 %3 %4 %5 %6 %7 %8 %9
 #
-#   WARNING: Vendors that uses private keys are responsible for proper management and protection 
-#            of private keys.  Vendors may choose to use infrastructure such as signing servers 
+#   WARNING: Vendors that uses private keys are responsible for proper management and protection
+#            of private keys.  Vendors may choose to use infrastructure such as signing servers
 #            or signing portals to support the management and protection of private keys.
 #
 ##################
