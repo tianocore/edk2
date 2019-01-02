@@ -16,9 +16,9 @@
   INF_VERSION                    = 0x00010019
   BASE_NAME                      = NorFlashInfoLib
   FILE_GUID                      = 6b639c7e-9b53-4e9f-89a3-2e711729709c
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = NorFlashInfoLib|DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION
+  LIBRARY_CLASS                  = NorFlashInfoLib
 
 [Sources]
   NorFlashInfoLib.c
@@ -30,5 +30,4 @@
 [LibraryClasses]
   BaseLib
   DebugLib
-  DxeServicesLib
   MemoryAllocationLib
