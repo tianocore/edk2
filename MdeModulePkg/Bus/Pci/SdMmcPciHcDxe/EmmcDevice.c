@@ -1,6 +1,7 @@
 /** @file
   This file provides some helper functions which are specific for EMMC device.
 
+  Copyright (c) 2018, NVIDIA CORPORATION. All rights reserved.
   Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -707,7 +708,7 @@ EmmcSwitchClockFreq (
   //
   // Convert the clock freq unit from MHz to KHz.
   //
-  Status = SdMmcHcClockSupply (PciIo, Slot, ClockFreq * 1000, Private->BaseClkFreq[Slot]);
+  Status = SdMmcHcClockSupply (PciIo, Slot, ClockFreq * 1000, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
   if (EFI_ERROR (Status)) {
     return Status;
   }

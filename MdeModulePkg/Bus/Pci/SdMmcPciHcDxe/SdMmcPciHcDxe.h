@@ -2,6 +2,7 @@
 
   Provides some data structure definitions used by the SD/MMC host controller driver.
 
+Copyright (c) 2018, NVIDIA CORPORATION. All rights reserved.
 Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -116,8 +117,7 @@ typedef struct {
   SD_MMC_HC_SLOT                      Slot[SD_MMC_HC_MAX_SLOT];
   SD_MMC_HC_SLOT_CAP                  Capability[SD_MMC_HC_MAX_SLOT];
   UINT64                              MaxCurrent[SD_MMC_HC_MAX_SLOT];
-
-  UINT32                              ControllerVersion;
+  UINT16                              ControllerVersion[SD_MMC_HC_MAX_SLOT];
 
   //
   // Some controllers may require to override base clock frequency
@@ -150,7 +150,8 @@ typedef struct {
   BOOLEAN                             Started;
   UINT64                              Timeout;
 
-  SD_MMC_HC_ADMA_DESC_LINE            *AdmaDesc;
+  SD_MMC_HC_ADMA_32_DESC_LINE         *Adma32Desc;
+  SD_MMC_HC_ADMA_64_DESC_LINE         *Adma64Desc;
   EFI_PHYSICAL_ADDRESS                AdmaDescPhy;
   VOID                                *AdmaMap;
   UINT32                              AdmaPages;
