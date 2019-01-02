@@ -179,23 +179,11 @@ sed -i '/^MAX_CONCURRENT_THREAD_NUMBER/d' Conf/target.txt
 
 gcc_version=$(gcc -v 2>&1 | tail -1 | awk '{print $3}')
 case $gcc_version in
-    4.5.*)
-      TARGET_TOOLS=GCC45
-      ;;
-    4.6.*)
-      TARGET_TOOLS=GCC46
-      ;;
-    4.7.*)
-      TARGET_TOOLS=GCC47
-      ;;
-    4.8.*)
-      TARGET_TOOLS=GCC48
-      ;;
     4.9.*|4.1[0-9].*|5.*.*|6.*.*)
       TARGET_TOOLS=GCC49
       ;;
     *)
-      TARGET_TOOLS=GCC44
+      TARGET_TOOLS=GCC48
       ;;
 esac
 
