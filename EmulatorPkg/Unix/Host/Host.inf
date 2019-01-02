@@ -124,10 +124,6 @@
    GCC:*_*_X64_DLINK_FLAGS == -o $(BIN_DIR)/Host -m64 -L/usr/X11R6/lib
    GCC:*_GCC5_X64_DLINK_FLAGS == -flto -o $(BIN_DIR)/Host -m64 -L/usr/X11R6/lib
    GCC:*_*_X64_CC_FLAGS == -m64 -g -fshort-wchar -fno-strict-aliasing -Wall -malign-double -idirafter/usr/include -c -include $(DEST_DIR_DEBUG)/AutoGen.h -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
-   GCC:*_GCC44_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
-   GCC:*_GCC45_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
-   GCC:*_GCC46_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
-   GCC:*_GCC47_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
    GCC:*_GCC48_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
    GCC:*_GCC49_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))"
    GCC:*_GCC5_X64_CC_FLAGS = "-DEFIAPI=__attribute__((ms_abi))" -flto -DUSING_LTO -Os
