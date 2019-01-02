@@ -115,8 +115,8 @@ $ OvmfPkg/build.sh -a X64 qemu
 And to run a 64-bit UEFI bootable ISO image:
 $ OvmfPkg/build.sh -a X64 qemu -cdrom /path/to/disk-image.iso
 
-To build a 32-bit OVMF without debug messages using GCC 4.5:
-$ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC45
+To build a 32-bit OVMF without debug messages using GCC 4.8:
+$ OvmfPkg/build.sh -a IA32 -b RELEASE -t GCC48
 
 === SMM support ===
 
@@ -406,7 +406,7 @@ volume image.
 
 If you build with the UNIXGCC toolchain, then debugging will be disabled
 due to larger image sizes being produced by the UNIXGCC toolchain. The
-first choice recommendation is to use GCC44 or newer instead.
+first choice recommendation is to use GCC48 or newer instead.
 
 If you must use UNIXGCC, then you can override the build options for
 particular libraries and modules in the .dsc to re-enable debugging
