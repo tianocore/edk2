@@ -102,8 +102,6 @@
   #
   MSFT:*_*_*_CC_FLAGS = /wd4090
 
-  GCC:*_GCC44_IA32_CC_FLAGS = "-D__cdecl=__attribute__((cdecl))" "-D__declspec(t)=__attribute__((t))"
-
   # -JCryptoPkg/Include : To disable the use of the system includes provided by RVCT
   # --diag_remark=1     : Reduce severity of "#1-D: last line of file ends without a newline"
   RVCT:*_*_ARM_CC_FLAGS = -JCryptoPkg/Include --diag_remark=1
