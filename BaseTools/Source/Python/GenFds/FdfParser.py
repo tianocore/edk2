@@ -2589,7 +2589,7 @@ class FdfParser:
     #
     @staticmethod
     def _FileCouldHaveRelocFlag (FileType):
-        if FileType in {SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM, 'PEI_DXE_COMBO'}:
+        if FileType in {SUP_MODULE_SEC, SUP_MODULE_PEI_CORE, SUP_MODULE_PEIM, SUP_MODULE_MM_CORE_STANDALONE, 'PEI_DXE_COMBO'}:
             return True
         else:
             return False
