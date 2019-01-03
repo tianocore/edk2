@@ -15,7 +15,7 @@
   PeCoffLoaderGetPeHeader() routine will do basic check for PE/COFF header.
   PeCoffLoaderGetImageInfo() routine will do basic check for whole PE/COFF image.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   Portions copyright (c) 2008 - 2009, Apple Inc. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -1671,6 +1671,7 @@ PeCoffLoaderRelocateImageForRuntime (
   EFI_IMAGE_DATA_DIRECTORY            *RelocDir;
   EFI_IMAGE_BASE_RELOCATION           *RelocBase;
   EFI_IMAGE_BASE_RELOCATION           *RelocBaseEnd;
+  EFI_IMAGE_BASE_RELOCATION           *RelocBaseOrig;
   UINT16                              *Reloc;
   UINT16                              *RelocEnd;
   CHAR8                               *Fixup;
@@ -1681,10 +1682,18 @@ PeCoffLoaderRelocateImageForRuntime (
   CHAR8                               *FixupData;
   UINTN                               Adjust;
   RETURN_STATUS                       Status;
+  PE_COFF_LOADER_IMAGE_CONTEXT        ImageContext;
+
+  if (RelocationData == NULL || ImageBase == 0x0 || VirtImageBase == 0x0) {
+    return;
+  }
 
   OldBase = (CHAR8 *)((UINTN)ImageBase);
   NewBase = (CHAR8 *)((UINTN)VirtImageBase);
   Adjust = (UINTN) NewBase - (UINTN) OldBase;
+
+  ImageContext.ImageAddress = ImageBase;
+  ImageContext.ImageSize = ImageSize;
 
   //
   // Find the image's relocate dir info
@@ -1732,8 +1741,11 @@ PeCoffLoaderRelocateImageForRuntime (
   //
   if (NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC) {
     RelocDir      = DataDirectory + EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC;
-    RelocBase     = (EFI_IMAGE_BASE_RELOCATION *)(UINTN)(ImageBase + RelocDir->VirtualAddress);
-    RelocBaseEnd  = (EFI_IMAGE_BASE_RELOCATION *)(UINTN)(ImageBase + RelocDir->VirtualAddress + RelocDir->Size);
+    RelocBase     = (EFI_IMAGE_BASE_RELOCATION *) PeCoffLoaderImageAddress (&ImageContext, RelocDir->VirtualAddress, 0);
+    RelocBaseEnd  = (EFI_IMAGE_BASE_RELOCATION *) PeCoffLoaderImageAddress (&ImageContext,
+                                                                            RelocDir->VirtualAddress + RelocDir->Size,
+                                                                            0
+                                                                            );
   } else {
     //
     // Cannot find relocations, cannot continue to relocate the image, ASSERT for this invalid image.
@@ -1747,96 +1759,109 @@ PeCoffLoaderRelocateImageForRuntime (
   //
   ASSERT (RelocBase != NULL && RelocBaseEnd != NULL);
 
-  //
-  // Run the whole relocation block. And re-fixup data that has not been
-  // modified. The FixupData is used to see if the image has been modified
-  // since it was relocated. This is so data sections that have been updated
-  // by code will not be fixed up, since that would set them back to
-  // defaults.
-  //
-  FixupData = RelocationData;
-  while (RelocBase < RelocBaseEnd) {
+  if (Adjust != 0) {
     //
-    // Add check for RelocBase->SizeOfBlock field.
+    // Run the whole relocation block. And re-fixup data that has not been
+    // modified. The FixupData is used to see if the image has been modified
+    // since it was relocated. This is so data sections that have been updated
+    // by code will not be fixed up, since that would set them back to
+    // defaults.
     //
-    if ((RelocBase->SizeOfBlock == 0) || (RelocBase->SizeOfBlock > RelocDir->Size)) {
+    FixupData = RelocationData;
+    RelocBaseOrig = RelocBase;
+    while (RelocBase < RelocBaseEnd) {
       //
-      // Data invalid, cannot continue to relocate the image, just return.
+      // Add check for RelocBase->SizeOfBlock field.
       //
-      return;
-    }
-
-    Reloc     = (UINT16 *) ((UINT8 *) RelocBase + sizeof (EFI_IMAGE_BASE_RELOCATION));
-    RelocEnd  = (UINT16 *) ((UINT8 *) RelocBase + RelocBase->SizeOfBlock);
-    FixupBase = (CHAR8 *) ((UINTN)ImageBase) + RelocBase->VirtualAddress;
-
-    //
-    // Run this relocation record
-    //
-    while (Reloc < RelocEnd) {
-
-      Fixup = FixupBase + (*Reloc & 0xFFF);
-      switch ((*Reloc) >> 12) {
-
-      case EFI_IMAGE_REL_BASED_ABSOLUTE:
-        break;
-
-      case EFI_IMAGE_REL_BASED_HIGH:
-        Fixup16 = (UINT16 *) Fixup;
-        if (*(UINT16 *) FixupData == *Fixup16) {
-          *Fixup16 = (UINT16) (*Fixup16 + ((UINT16) ((UINT32) Adjust >> 16)));
-        }
-
-        FixupData = FixupData + sizeof (UINT16);
-        break;
-
-      case EFI_IMAGE_REL_BASED_LOW:
-        Fixup16 = (UINT16 *) Fixup;
-        if (*(UINT16 *) FixupData == *Fixup16) {
-          *Fixup16 = (UINT16) (*Fixup16 + ((UINT16) Adjust & 0xffff));
-        }
-
-        FixupData = FixupData + sizeof (UINT16);
-        break;
-
-      case EFI_IMAGE_REL_BASED_HIGHLOW:
-        Fixup32       = (UINT32 *) Fixup;
-        FixupData = ALIGN_POINTER (FixupData, sizeof (UINT32));
-        if (*(UINT32 *) FixupData == *Fixup32) {
-          *Fixup32 = *Fixup32 + (UINT32) Adjust;
-        }
-
-        FixupData = FixupData + sizeof (UINT32);
-        break;
-
-      case EFI_IMAGE_REL_BASED_DIR64:
-        Fixup64       = (UINT64 *)Fixup;
-        FixupData = ALIGN_POINTER (FixupData, sizeof (UINT64));
-        if (*(UINT64 *) FixupData == *Fixup64) {
-          *Fixup64 = *Fixup64 + (UINT64)Adjust;
-        }
-
-        FixupData = FixupData + sizeof (UINT64);
-        break;
-
-      default:
+      if ((RelocBase->SizeOfBlock == 0) || (RelocBase->SizeOfBlock > RelocDir->Size)) {
         //
-        // Only Itanium requires ConvertPeImage_Ex
+        // Data invalid, cannot continue to relocate the image, just return.
         //
-        Status = PeHotRelocateImageEx (Reloc, Fixup, &FixupData, Adjust);
-        if (RETURN_ERROR (Status)) {
-          return ;
+        return;
+      }
+
+      Reloc     = (UINT16 *) ((UINT8 *) RelocBase + sizeof (EFI_IMAGE_BASE_RELOCATION));
+      RelocEnd  = (UINT16 *) ((UINT8 *) RelocBase + RelocBase->SizeOfBlock);
+      if ((UINTN)RelocEnd > (UINTN)RelocBaseOrig + RelocDir->Size) {
+        return;
+      }
+
+      FixupBase = PeCoffLoaderImageAddress (&ImageContext, RelocBase->VirtualAddress, 0);
+      if (FixupBase == NULL) {
+        return;
+      }
+
+      //
+      // Run this relocation record
+      //
+      while (Reloc < RelocEnd) {
+
+        Fixup = PeCoffLoaderImageAddress (&ImageContext, RelocBase->VirtualAddress + (*Reloc & 0xFFF), 0);
+        if (Fixup == NULL) {
+          return;
         }
+        switch ((*Reloc) >> 12) {
+
+        case EFI_IMAGE_REL_BASED_ABSOLUTE:
+          break;
+
+        case EFI_IMAGE_REL_BASED_HIGH:
+          Fixup16 = (UINT16 *) Fixup;
+          if (*(UINT16 *) FixupData == *Fixup16) {
+            *Fixup16 = (UINT16) (*Fixup16 + ((UINT16) ((UINT32) Adjust >> 16)));
+          }
+
+          FixupData = FixupData + sizeof (UINT16);
+          break;
+
+        case EFI_IMAGE_REL_BASED_LOW:
+          Fixup16 = (UINT16 *) Fixup;
+          if (*(UINT16 *) FixupData == *Fixup16) {
+            *Fixup16 = (UINT16) (*Fixup16 + ((UINT16) Adjust & 0xffff));
+          }
+
+          FixupData = FixupData + sizeof (UINT16);
+          break;
+
+        case EFI_IMAGE_REL_BASED_HIGHLOW:
+          Fixup32       = (UINT32 *) Fixup;
+          FixupData = ALIGN_POINTER (FixupData, sizeof (UINT32));
+          if (*(UINT32 *) FixupData == *Fixup32) {
+            *Fixup32 = *Fixup32 + (UINT32) Adjust;
+          }
+
+          FixupData = FixupData + sizeof (UINT32);
+          break;
+
+        case EFI_IMAGE_REL_BASED_DIR64:
+          Fixup64       = (UINT64 *)Fixup;
+          FixupData = ALIGN_POINTER (FixupData, sizeof (UINT64));
+          if (*(UINT64 *) FixupData == *Fixup64) {
+            *Fixup64 = *Fixup64 + (UINT64)Adjust;
+          }
+
+          FixupData = FixupData + sizeof (UINT64);
+          break;
+
+        default:
+          //
+          // Only Itanium requires ConvertPeImage_Ex
+          //
+          Status = PeHotRelocateImageEx (Reloc, Fixup, &FixupData, Adjust);
+          if (RETURN_ERROR (Status)) {
+            return ;
+          }
+        }
+        //
+        // Next relocation record
+        //
+        Reloc += 1;
       }
       //
-      // Next relocation record
+      // next reloc block
       //
-      Reloc += 1;
+      RelocBase = (EFI_IMAGE_BASE_RELOCATION *) RelocEnd;
     }
-    //
-    // next reloc block
-    //
-    RelocBase = (EFI_IMAGE_BASE_RELOCATION *) RelocEnd;
   }
 }
 
