@@ -343,12 +343,6 @@ DEFINE DTC_BIN                 = ENV(DTC_PREFIX)dtc
 #                             Required to build platforms or ACPI tables:
 #                               Intel(r) ACPI Compiler from
 #                               https://acpica.org/downloads
-#   GCC44       -Linux,Windows-  Requires:
-#                             GCC 4.4 targeting x86_64-linux-gnu
-#                        Optional:
-#                             Required to build platforms or ACPI tables:
-#                               Intel(r) ACPI Compiler from
-#                               https://acpica.org/downloads
 #   GCC48       -Linux,Windows-  Requires:
 #                             GCC 4.8 targeting x86_64-linux-gnu, aarch64-linux-gnu, or arm-linux-gnueabi
 #                        Optional:
