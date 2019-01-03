@@ -4139,12 +4139,12 @@ DEFINE GCC_X64_RC_FLAGS            = -I binary -O elf64-x86-64        -B i386   
 DEFINE GCC_ARM_RC_FLAGS            = -I binary -O elf32-littlearm     -B arm     --rename-section .data=.hii
 DEFINE GCC_AARCH64_RC_FLAGS        = -I binary -O elf64-littleaarch64 -B aarch64 --rename-section .data=.hii
 
-DEFINE GCC44_ALL_CC_FLAGS            = -g -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -include AutoGen.h -fno-common -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
+DEFINE GCC48_ALL_CC_FLAGS            = -g -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -include AutoGen.h -fno-common -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
 DEFINE GCC44_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x20
 DEFINE GCC44_IA32_X64_DLINK_FLAGS    = DEF(GCC44_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive
 
-DEFINE GCC48_IA32_CC_FLAGS           = DEF(GCC44_ALL_CC_FLAGS) -m32 -march=i586 -malign-double -fno-stack-protector -D EFI32 -fno-asynchronous-unwind-tables -Wno-address
-DEFINE GCC48_X64_CC_FLAGS            = DEF(GCC44_ALL_CC_FLAGS) -m64 -fno-stack-protector "-DEFIAPI=__attribute__((ms_abi))" -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables -Wno-address
+DEFINE GCC48_IA32_CC_FLAGS           = DEF(GCC48_ALL_CC_FLAGS) -m32 -march=i586 -malign-double -fno-stack-protector -D EFI32 -fno-asynchronous-unwind-tables -Wno-address
+DEFINE GCC48_X64_CC_FLAGS            = DEF(GCC48_ALL_CC_FLAGS) -m64 -fno-stack-protector "-DEFIAPI=__attribute__((ms_abi))" -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables -Wno-address
 DEFINE GCC48_IA32_X64_ASLDLINK_FLAGS = DEF(GCC44_IA32_X64_DLINK_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
 DEFINE GCC48_IA32_X64_DLINK_FLAGS    = DEF(GCC44_IA32_X64_DLINK_FLAGS)
 DEFINE GCC48_IA32_DLINK2_FLAGS       = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220 DEF(GCC_DLINK2_FLAGS_COMMON)
@@ -4177,7 +4177,7 @@ DEFINE GCC49_ARM_ASM_FLAGS           = DEF(GCC48_ARM_ASM_FLAGS)
 DEFINE GCC49_AARCH64_ASM_FLAGS       = DEF(GCC48_AARCH64_ASM_FLAGS)
 DEFINE GCC49_ARM_CC_FLAGS            = DEF(GCC48_ARM_CC_FLAGS)
 DEFINE GCC49_ARM_CC_XIPFLAGS         = DEF(GCC48_ARM_CC_XIPFLAGS)
-DEFINE GCC49_AARCH64_CC_FLAGS        = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC44_ALL_CC_FLAGS) DEF(GCC_AARCH64_CC_FLAGS) -mcmodel=small
+DEFINE GCC49_AARCH64_CC_FLAGS        = $(ARCHCC_FLAGS) $(PLATFORM_FLAGS) DEF(GCC48_ALL_CC_FLAGS) DEF(GCC_AARCH64_CC_FLAGS) -mcmodel=small
 DEFINE GCC49_AARCH64_CC_XIPFLAGS     = DEF(GCC48_AARCH64_CC_XIPFLAGS)
 DEFINE GCC49_ARM_DLINK_FLAGS         = DEF(GCC48_ARM_DLINK_FLAGS)
 DEFINE GCC49_ARM_DLINK2_FLAGS        = DEF(GCC48_ARM_DLINK2_FLAGS)
@@ -4818,7 +4818,7 @@ DEFINE CLANG38_IA32_TARGET          = -target i686-pc-linux-gnu
 DEFINE CLANG38_X64_TARGET           = -target x86_64-pc-linux-gnu
 
 DEFINE CLANG38_WARNING_OVERRIDES    = -Wno-parentheses-equality -Wno-tautological-compare -Wno-tautological-constant-out-of-range-compare -Wno-empty-body -Wno-unused-const-variable -Wno-varargs -Wno-unknown-warning-option
-DEFINE CLANG38_ALL_CC_FLAGS         = DEF(GCC44_ALL_CC_FLAGS) DEF(CLANG38_WARNING_OVERRIDES) -fno-stack-protector -mms-bitfields -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -msoft-float -mno-implicit-float  -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -funsigned-char -fno-ms-extensions -Wno-null-dereference
+DEFINE CLANG38_ALL_CC_FLAGS         = DEF(GCC48_ALL_CC_FLAGS) DEF(CLANG38_WARNING_OVERRIDES) -fno-stack-protector -mms-bitfields -Wno-address -Wno-shift-negative-value -Wno-unknown-pragmas -Wno-incompatible-library-redeclaration -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -msoft-float -mno-implicit-float  -ftrap-function=undefined_behavior_has_been_optimized_away_by_clang -funsigned-char -fno-ms-extensions -Wno-null-dereference
 
 ###########################
 # CLANG38 IA32 definitions
