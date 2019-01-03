@@ -4141,14 +4141,13 @@ DEFINE GCC_AARCH64_RC_FLAGS        = -I binary -O elf64-littleaarch64 -B aarch64
 
 DEFINE GCC48_ALL_CC_FLAGS            = -g -fshort-wchar -fno-builtin -fno-strict-aliasing -Wall -Werror -Wno-array-bounds -ffunction-sections -fdata-sections -include AutoGen.h -fno-common -DSTRING_ARRAY_NAME=$(BASE_NAME)Strings
 DEFINE GCC44_IA32_X64_DLINK_COMMON   = -nostdlib -Wl,-n,-q,--gc-sections -z common-page-size=0x20
-DEFINE GCC44_IA32_X64_DLINK_FLAGS    = DEF(GCC44_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive
 
 DEFINE GCC48_IA32_CC_FLAGS           = DEF(GCC48_ALL_CC_FLAGS) -m32 -march=i586 -malign-double -fno-stack-protector -D EFI32 -fno-asynchronous-unwind-tables -Wno-address
 DEFINE GCC48_X64_CC_FLAGS            = DEF(GCC48_ALL_CC_FLAGS) -m64 -fno-stack-protector "-DEFIAPI=__attribute__((ms_abi))" -maccumulate-outgoing-args -mno-red-zone -Wno-address -mcmodel=small -fpie -fno-asynchronous-unwind-tables -Wno-address
 DEFINE GCC48_IA32_X64_ASLDLINK_FLAGS = DEF(GCC44_IA32_X64_DLINK_COMMON) -Wl,--entry,ReferenceAcpiTable -u ReferenceAcpiTable
-DEFINE GCC48_IA32_X64_DLINK_FLAGS    = DEF(GCC44_IA32_X64_DLINK_FLAGS)
+DEFINE GCC48_IA32_X64_DLINK_FLAGS    = DEF(GCC44_IA32_X64_DLINK_COMMON) -Wl,--entry,$(IMAGE_ENTRY_POINT) -u $(IMAGE_ENTRY_POINT) -Wl,-Map,$(DEST_DIR_DEBUG)/$(BASE_NAME).map,--whole-archive
 DEFINE GCC48_IA32_DLINK2_FLAGS       = -Wl,--defsym=PECOFF_HEADER_SIZE=0x220 DEF(GCC_DLINK2_FLAGS_COMMON)
-DEFINE GCC48_X64_DLINK_FLAGS         = DEF(GCC44_IA32_X64_DLINK_FLAGS) -Wl,-melf_x86_64,--oformat=elf64-x86-64,-pie
+DEFINE GCC48_X64_DLINK_FLAGS         = DEF(GCC48_IA32_X64_DLINK_FLAGS) -Wl,-melf_x86_64,--oformat=elf64-x86-64,-pie
 DEFINE GCC48_X64_DLINK2_FLAGS        = -Wl,--defsym=PECOFF_HEADER_SIZE=0x228 DEF(GCC_DLINK2_FLAGS_COMMON)
 DEFINE GCC48_ASM_FLAGS               = DEF(GCC_ASM_FLAGS)
 DEFINE GCC48_ARM_ASM_FLAGS           = $(ARCHASM_FLAGS) $(PLATFORM_FLAGS) DEF(GCC_ASM_FLAGS) -mlittle-endian
