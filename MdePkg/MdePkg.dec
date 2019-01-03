@@ -243,6 +243,10 @@
   ##
   SafeIntLib|Include/Library/SafeIntLib.h
 
+  ## @libraryclass Provides a service to retrieve a pointer to the Standalone MM Services Table.
+  #                Only available to MM_STANDALONE, SMM/DXE Combined and SMM module types.
+  MmServicesTableLib|Include/Library/MmServicesTableLib.h
+
 [LibraryClasses.IA32, LibraryClasses.X64]
   ##  @libraryclass  Abstracts both S/W SMI generation and detection.
   ##
