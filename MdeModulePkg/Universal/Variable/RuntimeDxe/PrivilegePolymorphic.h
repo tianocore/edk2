@@ -97,4 +97,67 @@ VariableSpeculationBarrier (
   VOID
   );
 
+/**
+  Notify the system that the SMM variable driver is ready
+**/
+VOID
+VariableNotifySmmReady (
+  VOID
+  );
+
+/**
+  Notify the system that the SMM variable write driver is ready
+**/
+VOID
+VariableNotifySmmWriteReady (
+  VOID
+  );
+
+/**
+  Variable Driver main entry point. The Variable driver places the 4 EFI
+  runtime services in the EFI System Table and installs arch protocols
+  for variable read and write services being available. It also registers
+  a notification function for an EVT_SIGNAL_VIRTUAL_ADDRESS_CHANGE event.
+
+  @retval EFI_SUCCESS       Variable service successfully initialized.
+**/
+EFI_STATUS
+EFIAPI
+MmVariableServiceInitialize (
+  VOID
+  );
+
+/**
+  This function checks if the buffer is valid per processor architecture and
+  does not overlap with SMRAM.
+
+  @param Buffer The buffer start address to be checked.
+  @param Length The buffer length to be checked.
+
+  @retval TRUE  This buffer is valid per processor architecture and does not
+                overlap with SMRAM.
+  @retval FALSE This buffer is not valid per processor architecture or overlaps
+                with SMRAM.
+**/
+BOOLEAN
+VariableSmmIsBufferOutsideSmmValid (
+  IN EFI_PHYSICAL_ADDRESS  Buffer,
+  IN UINT64                Length
+  );
+
+/**
+  Whether the TCG or TCG2 protocols are installed in the UEFI protocol database.
+  This information is used by the MorLock code to infer whether an existing
+  MOR variable is legitimate or not.
+
+  @retval TRUE  Either the TCG or TCG2 protocol is installed in the UEFI
+                protocol database
+  @retval FALSE Neither the TCG nor the TCG2 protocol is installed in the UEFI
+                protocol database
+**/
+BOOLEAN
+VariableHaveTcgProtocols (
+  VOID
+  );
+
 #endif

@@ -48,6 +48,7 @@
 [Sources]
   Reclaim.c
   Variable.c
+  VariableTraditionalMm.c
   VariableSmm.c
   VarCheck.c
   Variable.h
@@ -66,7 +67,7 @@
   BaseLib
   SynchronizationLib
   UefiLib
-  SmmServicesTableLib
+  MmServicesTableLib
   BaseMemoryLib
   DebugLib
   DxeServicesTableLib
@@ -85,7 +86,7 @@
   ## PRODUCES
   ## UNDEFINED # SmiHandlerRegister
   gEfiSmmVariableProtocolGuid
-  gEfiSmmEndOfDxeProtocolGuid                   ## NOTIFY
+  gEfiMmEndOfDxeProtocolGuid                    ## NOTIFY
   gEdkiiSmmVarCheckProtocolGuid                 ## PRODUCES
   gEfiTcgProtocolGuid                           ## SOMETIMES_CONSUMES
   gEfiTcg2ProtocolGuid                          ## SOMETIMES_CONSUMES

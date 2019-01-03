@@ -21,7 +21,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/DebugLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include "Variable.h"
 
 typedef struct {
@@ -419,8 +418,6 @@ MorLockInitAtEndOfDxe (
 {
   UINTN      MorSize;
   EFI_STATUS MorStatus;
-  EFI_STATUS TcgStatus;
-  VOID       *TcgInterface;
 
   if (!mMorLockInitializationRequired) {
     //
@@ -458,20 +455,7 @@ MorLockInitAtEndOfDxe (
     // can be deduced from the absence of the TCG / TCG2 protocols, as edk2's
     // MOR implementation depends on (one of) those protocols.
     //
-    TcgStatus = gBS->LocateProtocol (
-                       &gEfiTcg2ProtocolGuid,
-                       NULL,                     // Registration
-                       &TcgInterface
-                       );
-    if (EFI_ERROR (TcgStatus)) {
-      TcgStatus = gBS->LocateProtocol (
-                         &gEfiTcgProtocolGuid,
-                         NULL,                   // Registration
-                         &TcgInterface
-                         );
-    }
-
-    if (!EFI_ERROR (TcgStatus)) {
+    if (VariableHaveTcgProtocols ()) {
       //
       // The MOR variable originates from the platform firmware; set the MOR
       // Control Lock variable to report the locking capability to the OS.
