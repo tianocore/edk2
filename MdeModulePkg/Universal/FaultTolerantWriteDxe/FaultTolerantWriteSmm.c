@@ -54,14 +54,13 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
-#include <PiSmm.h>
-#include <Library/SmmServicesTableLib.h>
-#include <Library/SmmMemLib.h>
+#include <PiMm.h>
+#include <Library/MmServicesTableLib.h>
 #include <Library/BaseLib.h>
 #include <Protocol/SmmSwapAddressRange.h>
 #include "FaultTolerantWrite.h"
 #include "FaultTolerantWriteSmmCommon.h"
-#include <Protocol/SmmEndOfDxe.h>
+#include <Protocol/MmEndOfDxe.h>
 
 EFI_EVENT                                 mFvbRegistration = NULL;
 EFI_FTW_DEVICE                            *mFtwDevice      = NULL;
@@ -92,7 +91,7 @@ FtwGetFvbByHandle (
   //
   // To get the SMM FVB protocol interface on the handle
   //
-  return gSmst->SmmHandleProtocol (
+  return gMmst->MmHandleProtocol (
                   FvBlockHandle,
                   &gEfiSmmFirmwareVolumeBlockProtocolGuid,
                   (VOID **) FvBlock
@@ -119,7 +118,7 @@ FtwGetSarProtocol (
   //
   // Locate Smm Swap Address Range protocol
   //
-  Status = gSmst->SmmLocateProtocol (
+  Status = gMmst->MmLocateProtocol (
                     &gEfiSmmSwapAddressRangeProtocolGuid,
                     NULL,
                     SarProtocol
@@ -158,7 +157,7 @@ GetFvbCountAndBuffer (
   BufferSize     = 0;
   *NumberHandles = 0;
   *Buffer        = NULL;
-  Status = gSmst->SmmLocateHandle (
+  Status = gMmst->MmLocateHandle (
                     ByProtocol,
                     &gEfiSmmFirmwareVolumeBlockProtocolGuid,
                     NULL,
@@ -174,7 +173,7 @@ GetFvbCountAndBuffer (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gSmst->SmmLocateHandle (
+  Status = gMmst->MmLocateHandle (
                     ByProtocol,
                     &gEfiSmmFirmwareVolumeBlockProtocolGuid,
                     NULL,
@@ -336,7 +335,7 @@ SmmFaultTolerantWriteHandler (
   }
   CommBufferPayloadSize = TempCommBufferSize - SMM_FTW_COMMUNICATE_HEADER_SIZE;
 
-  if (!SmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
+  if (!FtwSmmIsBufferOutsideSmmValid ((UINTN)CommBuffer, TempCommBufferSize)) {
     DEBUG ((EFI_D_ERROR, "SmmFtwHandler: SMM communication buffer in SMRAM or overflow!\n"));
     return EFI_SUCCESS;
   }
@@ -525,13 +524,12 @@ FvbNotificationEvent (
   EFI_STATUS                              Status;
   EFI_SMM_FAULT_TOLERANT_WRITE_PROTOCOL   *FtwProtocol;
   EFI_HANDLE                              SmmFtwHandle;
-  EFI_HANDLE                              FtwHandle;
 
   //
   // Just return to avoid install SMM FaultTolerantWriteProtocol again
   // if SMM Fault Tolerant Write protocol had been installed.
   //
-  Status = gSmst->SmmLocateProtocol (
+  Status = gMmst->MmLocateProtocol (
                     &gEfiSmmFaultTolerantWriteProtocolGuid,
                     NULL,
                     (VOID **) &FtwProtocol
@@ -551,7 +549,7 @@ FvbNotificationEvent (
   //
   // Install protocol interface
   //
-  Status = gSmst->SmmInstallProtocolInterface (
+  Status = gMmst->MmInstallProtocolInterface (
                     &mFtwDevice->Handle,
                     &gEfiSmmFaultTolerantWriteProtocolGuid,
                     EFI_NATIVE_INTERFACE,
@@ -562,20 +560,13 @@ FvbNotificationEvent (
   ///
   /// Register SMM FTW SMI handler
   ///
-  Status = gSmst->SmiHandlerRegister (SmmFaultTolerantWriteHandler, &gEfiSmmFaultTolerantWriteProtocolGuid, &SmmFtwHandle);
+  Status = gMmst->MmiHandlerRegister (SmmFaultTolerantWriteHandler, &gEfiSmmFaultTolerantWriteProtocolGuid, &SmmFtwHandle);
   ASSERT_EFI_ERROR (Status);
 
   //
   // Notify the Ftw wrapper driver SMM Ftw is ready
   //
-  FtwHandle = NULL;
-  Status = gBS->InstallProtocolInterface (
-                  &FtwHandle,
-                  &gEfiSmmFaultTolerantWriteProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
+  FtwNotifySmmReady ();
 
   return EFI_SUCCESS;
 }
@@ -592,7 +583,7 @@ FvbNotificationEvent (
 **/
 EFI_STATUS
 EFIAPI
-SmmEndOfDxeCallback (
+MmEndOfDxeCallback (
   IN CONST EFI_GUID                       *Protocol,
   IN VOID                                 *Interface,
   IN EFI_HANDLE                           Handle
@@ -603,25 +594,19 @@ SmmEndOfDxeCallback (
 }
 
 /**
-  This function is the entry point of the Fault Tolerant Write driver.
-
-  @param[in] ImageHandle        A handle for the image that is initializing this driver
-  @param[in] SystemTable        A pointer to the EFI system table
+  Shared entry point of the module
 
   @retval EFI_SUCCESS           The initialization finished successfully.
   @retval EFI_OUT_OF_RESOURCES  Allocate memory error
   @retval EFI_INVALID_PARAMETER Workspace or Spare block does not exist
-
 **/
 EFI_STATUS
-EFIAPI
-SmmFaultTolerantWriteInitialize (
-  IN EFI_HANDLE                           ImageHandle,
-  IN EFI_SYSTEM_TABLE                     *SystemTable
+MmFaultTolerantWriteInitialize (
+  VOID
   )
 {
   EFI_STATUS                              Status;
-  VOID                                    *SmmEndOfDxeRegistration;
+  VOID                                    *MmEndOfDxeRegistration;
 
   //
   // Allocate private data structure for SMM FTW protocol and do some initialization
@@ -634,17 +619,17 @@ SmmFaultTolerantWriteInitialize (
   //
   // Register EFI_SMM_END_OF_DXE_PROTOCOL_GUID notify function.
   //
-  Status = gSmst->SmmRegisterProtocolNotify (
-                    &gEfiSmmEndOfDxeProtocolGuid,
-                    SmmEndOfDxeCallback,
-                    &SmmEndOfDxeRegistration
+  Status = gMmst->MmRegisterProtocolNotify (
+                    &gEfiMmEndOfDxeProtocolGuid,
+                    MmEndOfDxeCallback,
+                    &MmEndOfDxeRegistration
                     );
   ASSERT_EFI_ERROR (Status);
 
   //
   // Register FvbNotificationEvent () notify function.
   //
-  Status = gSmst->SmmRegisterProtocolNotify (
+  Status = gMmst->MmRegisterProtocolNotify (
                     &gEfiSmmFirmwareVolumeBlockProtocolGuid,
                     FvbNotificationEvent,
                     &mFvbRegistration

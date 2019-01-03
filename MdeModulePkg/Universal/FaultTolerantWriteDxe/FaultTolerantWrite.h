@@ -31,7 +31,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Library/UefiDriverEntryPoint.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/UefiBootServicesTableLib.h>
 #include <Library/ReportStatusCodeLib.h>
 
 //
@@ -764,6 +763,28 @@ WriteWorkSpaceData (
   IN UINTN                              Offset,
   IN UINTN                              Length,
   IN UINT8                              *Buffer
+  );
+
+/**
+  Internal implementation of CRC32. Depending on the execution context
+  (traditional SMM or DXE vs standalone MM), this function is implemented
+  via a call to the CalculateCrc32 () boot service, or via a library
+  call.
+
+  If Buffer is NULL, then ASSERT().
+  If Length is greater than (MAX_ADDRESS - Buffer + 1), then ASSERT().
+
+  @param[in]  Buffer       A pointer to the buffer on which the 32-bit CRC is
+                           to be computed.
+  @param[in]  Length       The number of bytes in the buffer Data.
+
+  @retval Crc32            The 32-bit CRC was computed for the data buffer.
+
+**/
+UINT32
+FtwCalculateCrc32 (
+  IN  VOID                         *Buffer,
+  IN  UINTN                        Length
   );
 
 #endif

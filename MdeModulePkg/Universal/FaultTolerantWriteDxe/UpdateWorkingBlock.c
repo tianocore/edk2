@@ -29,8 +29,6 @@ InitializeLocalWorkSpaceHeader (
   VOID
   )
 {
-  EFI_STATUS                              Status;
-
   //
   // Check signature with gEdkiiWorkingBlockSignatureGuid.
   //
@@ -64,12 +62,8 @@ InitializeLocalWorkSpaceHeader (
   //
   // Calculate the Crc of woking block header
   //
-  Status = gBS->CalculateCrc32 (
-                  &mWorkingBlockHeader,
-                  sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER),
-                  &mWorkingBlockHeader.Crc
-                  );
-  ASSERT_EFI_ERROR (Status);
+  mWorkingBlockHeader.Crc = FtwCalculateCrc32 (&mWorkingBlockHeader,
+                              sizeof (EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER));
 
   mWorkingBlockHeader.WorkingBlockValid    = FTW_VALID_STATE;
   mWorkingBlockHeader.WorkingBlockInvalid  = FTW_INVALID_STATE;

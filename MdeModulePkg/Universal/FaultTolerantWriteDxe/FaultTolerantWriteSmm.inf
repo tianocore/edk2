@@ -37,6 +37,7 @@
   FtwMisc.c
   UpdateWorkingBlock.c
   FaultTolerantWrite.c
+  FaultTolerantWriteTraditionalMm.c
   FaultTolerantWriteSmm.c
   FaultTolerantWrite.h
   FaultTolerantWriteSmmCommon.h
@@ -46,7 +47,7 @@
   MdeModulePkg/MdeModulePkg.dec
 
 [LibraryClasses]
-  SmmServicesTableLib
+  MmServicesTableLib
   MemoryAllocationLib
   BaseMemoryLib
   UefiDriverEntryPoint
@@ -73,7 +74,7 @@
   ## PRODUCES
   ## UNDEFINED # SmiHandlerRegister
   gEfiSmmFaultTolerantWriteProtocolGuid
-  gEfiSmmEndOfDxeProtocolGuid                      ## CONSUMES
+  gEfiMmEndOfDxeProtocolGuid                      ## CONSUMES
 
 [FeaturePcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFullFtwServiceEnable    ## CONSUMES
