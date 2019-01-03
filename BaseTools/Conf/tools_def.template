@@ -6588,7 +6588,6 @@ RELEASE_RVCTCYGWIN_ARM_CC_FLAGS  = "$(CCPATH_FLAG)" $(ARCHCC_FLAGS) $(PLATFORM_F
 ##################
 # LzmaF86Compress tool definitions with converter for x86 code.
 # It can improve the compression ratio if the input file is IA32 or X64 PE image.
-# Notes: If X64 PE image is built based on GCC44, it may not get the better compression.
 ##################
 *_*_*_LZMAF86_PATH         = LzmaF86Compress
 *_*_*_LZMAF86_GUID         = D42AE6BD-1352-4bfb-909A-CA72A6EAE889
