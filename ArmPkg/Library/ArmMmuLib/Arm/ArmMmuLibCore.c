@@ -294,8 +294,8 @@ FillTranslationTable (
       PhysicalBase += TT_DESCRIPTOR_SECTION_SIZE;
       RemainLength -= TT_DESCRIPTOR_SECTION_SIZE;
     } else {
-      PageMapLength = MIN (RemainLength, TT_DESCRIPTOR_SECTION_SIZE) -
-                      (PhysicalBase % TT_DESCRIPTOR_SECTION_SIZE);
+      PageMapLength = MIN (RemainLength, TT_DESCRIPTOR_SECTION_SIZE -
+                                         (PhysicalBase % TT_DESCRIPTOR_SECTION_SIZE));
 
       // Case: Physical address aligned on the Section Size (1MB) && the length
       //       does not fill a section
