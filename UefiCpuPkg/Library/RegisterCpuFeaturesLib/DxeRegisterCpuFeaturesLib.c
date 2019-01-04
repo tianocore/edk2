@@ -20,7 +20,6 @@
 #include "RegisterCpuFeatures.h"
 
 CPU_FEATURES_DATA          mCpuFeaturesData = {0};
-EFI_MP_SERVICES_PROTOCOL   *mCpuFeaturesMpServices = NULL;
 
 /**
   Worker function to get CPU_FEATURES_DATA pointer.
@@ -38,46 +37,46 @@ GetCpuFeaturesData (
 /**
   Worker function to get EFI_MP_SERVICES_PROTOCOL pointer.
 
-  @return Pointer to EFI_MP_SERVICES_PROTOCOL.
+  @return MP_SERVICES variable.
 **/
-EFI_MP_SERVICES_PROTOCOL *
-GetMpProtocol (
+MP_SERVICES
+GetMpService (
   VOID
   )
 {
-  EFI_STATUS             Status;
+  EFI_STATUS                Status;
+  MP_SERVICES               MpService;
 
-  if (mCpuFeaturesMpServices == NULL) {
-    //
-    // Get MP Services Protocol
-    //
-    Status = gBS->LocateProtocol (
-                  &gEfiMpServiceProtocolGuid,
-                  NULL,
-                  (VOID **)&mCpuFeaturesMpServices
-                  );
-    ASSERT_EFI_ERROR (Status);
-  }
+  //
+  // Get MP Services Protocol
+  //
+  Status = gBS->LocateProtocol (
+                &gEfiMpServiceProtocolGuid,
+                NULL,
+                (VOID **)&MpService.Protocol
+                );
+  ASSERT_EFI_ERROR (Status);
 
-  ASSERT (mCpuFeaturesMpServices != NULL);
-  return mCpuFeaturesMpServices;
+  return MpService;
 }
 
 /**
   Worker function to return processor index.
 
+  @param  CpuFeaturesData    Cpu Feature Data structure.
+
   @return  The processor index.
 **/
 UINTN
 GetProcessorIndex (
-  VOID
+  IN CPU_FEATURES_DATA        *CpuFeaturesData
   )
 {
   EFI_STATUS                           Status;
   UINTN                                ProcessorIndex;
   EFI_MP_SERVICES_PROTOCOL             *MpServices;
 
-  MpServices = GetMpProtocol ();
+  MpServices = CpuFeaturesData->MpService.Protocol;
   Status = MpServices->WhoAmI(MpServices, &ProcessorIndex);
   ASSERT_EFI_ERROR (Status);
   return ProcessorIndex;
@@ -101,8 +100,11 @@ GetProcessorInformation (
 {
   EFI_STATUS                           Status;
   EFI_MP_SERVICES_PROTOCOL             *MpServices;
+  CPU_FEATURES_DATA                    *CpuFeaturesData;
 
-  MpServices = GetMpProtocol ();
+  CpuFeaturesData = GetCpuFeaturesData ();
+  MpServices = CpuFeaturesData->MpService.Protocol;
+
   Status = MpServices->GetProcessorInfo (
                MpServices,
                ProcessorNumber,
@@ -130,8 +132,8 @@ StartupAPsWorker (
   CPU_FEATURES_DATA                    *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData ();
+  MpServices = CpuFeaturesData->MpService.Protocol;
 
-  MpServices = GetMpProtocol ();
   //
   // Wakeup all APs
   //
@@ -159,8 +161,11 @@ SwitchNewBsp (
 {
   EFI_STATUS                           Status;
   EFI_MP_SERVICES_PROTOCOL             *MpServices;
+  CPU_FEATURES_DATA                    *CpuFeaturesData;
 
-  MpServices = GetMpProtocol ();
+  CpuFeaturesData = GetCpuFeaturesData ();
+  MpServices = CpuFeaturesData->MpService.Protocol;
+
   //
   // Wakeup all APs
   //
@@ -190,8 +195,10 @@ GetNumberOfProcessor (
 {
   EFI_STATUS                           Status;
   EFI_MP_SERVICES_PROTOCOL             *MpServices;
+  CPU_FEATURES_DATA                    *CpuFeaturesData;
 
-  MpServices = GetMpProtocol ();
+  CpuFeaturesData = GetCpuFeaturesData ();
+  MpServices = CpuFeaturesData->MpService.Protocol;
 
   //
   // Get the number of CPUs
@@ -225,7 +232,7 @@ CpuFeaturesInitialize (
 
   CpuFeaturesData = GetCpuFeaturesData ();
 
-  OldBspNumber = GetProcessorIndex();
+  OldBspNumber = GetProcessorIndex (CpuFeaturesData);
   CpuFeaturesData->BspNumber = OldBspNumber;
 
   Status = gBS->CreateEvent (

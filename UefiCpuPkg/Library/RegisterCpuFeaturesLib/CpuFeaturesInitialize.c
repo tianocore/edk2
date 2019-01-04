@@ -134,11 +134,10 @@ FillProcessorInfo (
 /**
   Prepares for private data used for CPU features.
 
-  @param[in]  NumberOfCpus  Number of processor in system
 **/
 VOID
 CpuInitDataInitialize (
-  IN UINTN                             NumberOfCpus
+  VOID
   )
 {
   EFI_STATUS                           Status;
@@ -157,12 +156,22 @@ CpuInitDataInitialize (
   ACPI_CPU_DATA                        *AcpiCpuData;
   CPU_STATUS_INFORMATION               *CpuStatus;
   UINT32                               *ValidCoreCountPerPackage;
+  UINTN                                NumberOfCpus;
+  UINTN                                NumberOfEnabledProcessors;
 
   Core    = 0;
   Package = 0;
   Thread  = 0;
 
   CpuFeaturesData = GetCpuFeaturesData ();
+
+  //
+  // Initialize CpuFeaturesData->MpService as early as possile, so later function can use it.
+  //
+  CpuFeaturesData->MpService = GetMpService ();
+
+  GetNumberOfProcessor (&NumberOfCpus, &NumberOfEnabledProcessors);
+
   CpuFeaturesData->InitOrder = AllocateZeroPool (sizeof (CPU_FEATURES_INIT_ORDER) * NumberOfCpus);
   ASSERT (CpuFeaturesData->InitOrder != NULL);
 
@@ -409,7 +418,7 @@ CollectProcessorData (
   CPU_FEATURES_DATA                    *CpuFeaturesData;
 
   CpuFeaturesData = (CPU_FEATURES_DATA *)Buffer;
-  ProcessorNumber = GetProcessorIndex ();
+  ProcessorNumber = GetProcessorIndex (CpuFeaturesData);
   CpuInfo = &CpuFeaturesData->InitOrder[ProcessorNumber].CpuInfo;
   //
   // collect processor information
@@ -1105,15 +1114,11 @@ CpuFeaturesDetect (
   VOID
   )
 {
-  UINTN                  NumberOfCpus;
-  UINTN                  NumberOfEnabledProcessors;
   CPU_FEATURES_DATA      *CpuFeaturesData;
 
   CpuFeaturesData = GetCpuFeaturesData();
 
-  GetNumberOfProcessor (&NumberOfCpus, &NumberOfEnabledProcessors);
-
-  CpuInitDataInitialize (NumberOfCpus);
+  CpuInitDataInitialize ();
 
   //
   // Wakeup all APs for data collection.
@@ -1125,6 +1130,6 @@ CpuFeaturesDetect (
   //
   CollectProcessorData (CpuFeaturesData);
 
-  AnalysisProcessorFeatures (NumberOfCpus);
+  AnalysisProcessorFeatures (CpuFeaturesData->NumberOfCpus);
 }
 

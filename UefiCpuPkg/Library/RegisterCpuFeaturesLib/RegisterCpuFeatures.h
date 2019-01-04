@@ -14,6 +14,10 @@
 
 #ifndef _REGISTER_CPU_FEATURES_H_
 #define _REGISTER_CPU_FEATURES_H_
+#include <PiPei.h>
+#include <PiDxe.h>
+#include <Ppi/MpServices.h>
+#include <Protocol/MpService.h>
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
@@ -66,6 +70,11 @@ typedef struct {
   volatile UINT32          *PackageSemaphoreCount;  // Semaphore containers used to program Package semaphore.
 } PROGRAM_CPU_REGISTER_FLAGS;
 
+typedef union {
+  EFI_MP_SERVICES_PROTOCOL  *Protocol;
+  EFI_PEI_MP_SERVICES_PPI   *Ppi;
+} MP_SERVICES;
+
 typedef struct {
   UINTN                    FeaturesCount;
   UINT32                   BitMaskSize;
@@ -85,6 +94,8 @@ typedef struct {
   UINTN                    BspNumber;
 
   PROGRAM_CPU_REGISTER_FLAGS  CpuFlags;
+
+  MP_SERVICES              MpService;
 } CPU_FEATURES_DATA;
 
 #define CPU_FEATURE_ENTRY_FROM_LINK(a) \
@@ -108,11 +119,13 @@ GetCpuFeaturesData (
 /**
   Worker function to return processor index.
 
+  @param  CpuFeaturesData    Cpu Feature Data structure.
+
   @return  The processor index.
 **/
 UINTN
 GetProcessorIndex (
-  VOID
+  IN CPU_FEATURES_DATA        *CpuFeaturesData
   );
 
 /**
@@ -242,6 +255,16 @@ SetProcessorRegister (
 **/
 ACPI_CPU_DATA *
 GetAcpiCpuData (
+  VOID
+  );
+
+/**
+  Worker function to get MP service pointer.
+
+  @return MP_SERVICES variable.
+**/
+MP_SERVICES
+GetMpService (
   VOID
   );
 
