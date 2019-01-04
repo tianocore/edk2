@@ -47,7 +47,6 @@ ERROR_C_FUNCTION_LAYOUT_CHECK_NO_INIT_OF_VARIABLE = 5007
 ERROR_C_FUNCTION_LAYOUT_CHECK_NO_STATIC = 5008
 ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_2 = 5009
 ERROR_C_FUNCTION_LAYOUT_CHECK_FUNCTION_PROTO_TYPE_3 = 5010
-ERROR_C_FUNCTION_LAYOUT_CHECK_NO_DEPRECATE = 5011
 
 ERROR_INCLUDE_FILE_CHECK_ALL = 6000
 ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_1 = 6001
@@ -147,7 +146,6 @@ gEccErrorMessage = {
     ERROR_C_FUNCTION_LAYOUT_CHECK_DATA_DECLARATION : "The data declarations should be the first code in a module",
     ERROR_C_FUNCTION_LAYOUT_CHECK_NO_INIT_OF_VARIABLE : "There should be no initialization of a variable as part of its declaration",
     ERROR_C_FUNCTION_LAYOUT_CHECK_NO_STATIC : "There should be no use of STATIC for functions",
-    ERROR_C_FUNCTION_LAYOUT_CHECK_NO_DEPRECATE : "The deprecated function should NOT be used",
 
     ERROR_INCLUDE_FILE_CHECK_ALL : "",
     ERROR_INCLUDE_FILE_CHECK_IFNDEF_STATEMENT_1 : "All include file contents should be guarded by a #ifndef statement.",
@@ -169,7 +167,7 @@ gEccErrorMessage = {
     ERROR_NAMING_CONVENTION_CHECK_ALL : "",
     ERROR_NAMING_CONVENTION_CHECK_DEFINE_STATEMENT : "Only capital letters are allowed to be used for #define declarations",
     ERROR_NAMING_CONVENTION_CHECK_TYPEDEF_STATEMENT : "Only capital letters are allowed to be used for typedef declarations",
-    ERROR_NAMING_CONVENTION_CHECK_IFNDEF_STATEMENT : "The #ifndef at the start of an include file should use a postfix underscore characters, '_'",
+    ERROR_NAMING_CONVENTION_CHECK_IFNDEF_STATEMENT : "The #ifndef at the start of an include file should use both prefix and postfix underscore characters, '_'",
     ERROR_NAMING_CONVENTION_CHECK_PATH_NAME : """Path name does not follow the rules: 1. First character should be upper case 2. Must contain lower case characters 3. No white space characters""",
     ERROR_NAMING_CONVENTION_CHECK_VARIABLE_NAME : """Variable name does not follow the rules: 1. First character should be upper case 2. Must contain lower case characters 3. No white space characters 4. Global variable name must start with a 'g'""",
     ERROR_NAMING_CONVENTION_CHECK_FUNCTION_NAME : """Function name does not follow the rules: 1. First character should be upper case 2. Must contain lower case characters 3. No white space characters""",

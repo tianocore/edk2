@@ -21,10 +21,16 @@ from __future__ import absolute_import
 import re
 import Common.LongFilePathOs as os
 import sys
+if sys.version_info.major == 3:
+    import antlr4 as antlr
+    from Ecc.CParser4.CLexer import CLexer
+    from Ecc.CParser4.CParser import CParser
+else:
+    import antlr3 as antlr
+    antlr.InputString = antlr.StringStream
+    from Ecc.CParser3.CLexer import CLexer
+    from Ecc.CParser3.CParser import CParser
 
-import antlr3
-from Ecc.CLexer import CLexer
-from Ecc.CParser import CParser
 
 from Ecc import FileProfile
 from Ecc.CodeFragment import Comment
@@ -503,9 +509,9 @@ class CodeFragmentCollector:
         FileStringContents = ''
         for fileLine in self.Profile.FileLinesList:
             FileStringContents += fileLine
-        cStream = antlr3.StringStream(FileStringContents)
+        cStream = antlr.InputStream(FileStringContents)
         lexer = CLexer(cStream)
-        tStream = antlr3.CommonTokenStream(lexer)
+        tStream = antlr.CommonTokenStream(lexer)
         parser = CParser(tStream)
         parser.translation_unit()
 
@@ -516,9 +522,9 @@ class CodeFragmentCollector:
         FileStringContents = ''
         for fileLine in self.Profile.FileLinesList:
             FileStringContents += fileLine
-        cStream = antlr3.StringStream(FileStringContents)
+        cStream = antlr.InputStream(FileStringContents)
         lexer = CLexer(cStream)
-        tStream = antlr3.CommonTokenStream(lexer)
+        tStream = antlr.CommonTokenStream(lexer)
         parser = CParser(tStream)
         parser.translation_unit()
 
