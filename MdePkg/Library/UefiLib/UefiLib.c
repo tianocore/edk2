@@ -1439,6 +1439,87 @@ GetVariable2 (
   return Status;
 }
 
+/** Return the attributes of the variable.
+
+  Returns the status whether get the variable success. The function retrieves
+  variable  through the UEFI Runtime Service GetVariable().  The
+  returned buffer is allocated using AllocatePool().  The caller is responsible
+  for freeing this buffer with FreePool().  The attributes are returned if
+  the caller provides a valid Attribute parameter.
+
+  If Name  is NULL, then ASSERT().
+  If Guid  is NULL, then ASSERT().
+  If Value is NULL, then ASSERT().
+
+  @param[in]  Name  The pointer to a Null-terminated Unicode string.
+  @param[in]  Guid  The pointer to an EFI_GUID structure
+  @param[out] Value The buffer point saved the variable info.
+  @param[out] Size  The buffer size of the variable.
+  @param[out] Attr  The pointer to the variable attributes as found in var store
+
+  @retval EFI_OUT_OF_RESOURCES      Allocate buffer failed.
+  @retval EFI_SUCCESS               Find the specified variable.
+  @retval Others Errors             Return errors from call to gRT->GetVariable.
+
+**/
+EFI_STATUS
+EFIAPI
+GetVariable3(
+  IN CONST CHAR16       *Name,
+  IN CONST EFI_GUID     *Guid,
+     OUT VOID           **Value,
+     OUT UINTN          *Size OPTIONAL,
+     OUT UINT32         *Attr OPTIONAL
+  )
+{
+  EFI_STATUS  Status;
+  UINTN       BufferSize;
+
+  ASSERT(Name != NULL && Guid != NULL && Value != NULL);
+
+  //
+  // Try to get the variable size.
+  //
+  BufferSize = 0;
+  *Value = NULL;
+  if (Size != NULL) {
+    *Size = 0;
+  }
+
+  if (Attr != NULL) {
+    *Attr = 0;
+  }
+
+  Status = gRT->GetVariable((CHAR16 *)Name, (EFI_GUID *)Guid, Attr, &BufferSize, *Value);
+  if (Status != EFI_BUFFER_TOO_SMALL) {
+    return Status;
+  }
+
+  //
+  // Allocate buffer to get the variable.
+  //
+  *Value = AllocatePool(BufferSize);
+  ASSERT(*Value != NULL);
+  if (*Value == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  //
+  // Get the variable data.
+  //
+  Status = gRT->GetVariable((CHAR16 *)Name, (EFI_GUID *)Guid, Attr, &BufferSize, *Value);
+  if (EFI_ERROR(Status)) {
+    FreePool(*Value);
+    *Value = NULL;
+  }
+
+  if (Size != NULL) {
+    *Size = BufferSize;
+  }
+
+  return Status;
+}
+
 /**
   Returns a pointer to an allocated buffer that contains the contents of a
   variable retrieved through the UEFI Runtime Service GetVariable().  This

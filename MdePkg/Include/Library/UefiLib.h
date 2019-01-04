@@ -737,9 +737,9 @@ GetEfiGlobalVariable (
   @param[out] Value The buffer point saved the variable info.
   @param[out] Size  The buffer size of the variable.
 
-  @return EFI_OUT_OF_RESOURCES      Allocate buffer failed.
-  @return EFI_SUCCESS               Find the specified variable.
-  @return Others Errors             Return errors from call to gRT->GetVariable.
+  @retval EFI_OUT_OF_RESOURCES      Allocate buffer failed.
+  @retval EFI_SUCCESS               Find the specified variable.
+  @retval Others Errors             Return errors from call to gRT->GetVariable.
 
 **/
 EFI_STATUS
@@ -765,9 +765,9 @@ GetVariable2 (
   @param[out] Value The buffer point saved the variable info.
   @param[out] Size  The buffer size of the variable.
 
-  @return EFI_OUT_OF_RESOURCES      Allocate buffer failed.
-  @return EFI_SUCCESS               Find the specified variable.
-  @return Others Errors             Return errors from call to gRT->GetVariable.
+  @retval EFI_OUT_OF_RESOURCES      Allocate buffer failed.
+  @retval EFI_SUCCESS               Find the specified variable.
+  @retval Others Errors             Return errors from call to gRT->GetVariable.
 
 **/
 EFI_STATUS
@@ -776,6 +776,39 @@ GetEfiGlobalVariable2 (
   IN CONST CHAR16    *Name,
   OUT VOID           **Value,
   OUT UINTN          *Size OPTIONAL
+  );
+
+/** Return the attributes of the variable.
+
+  Returns the status whether get the variable success. The function retrieves
+  variable  through the UEFI Runtime Service GetVariable().  The
+  returned buffer is allocated using AllocatePool().  The caller is responsible
+  for freeing this buffer with FreePool().  The attributes are returned if
+  the caller provides a valid Attribute parameter.
+
+  If Name  is NULL, then ASSERT().
+  If Guid  is NULL, then ASSERT().
+  If Value is NULL, then ASSERT().
+
+  @param[in]  Name  The pointer to a Null-terminated Unicode string.
+  @param[in]  Guid  The pointer to an EFI_GUID structure
+  @param[out] Value The buffer point saved the variable info.
+  @param[out] Size  The buffer size of the variable.
+  @param[out] Attr  The pointer to the variable attributes as found in var store
+
+  @retval EFI_OUT_OF_RESOURCES      Allocate buffer failed.
+  @retval EFI_SUCCESS               Find the specified variable.
+  @retval Others Errors             Return errors from call to gRT->GetVariable.
+
+**/
+EFI_STATUS
+EFIAPI
+GetVariable3(
+  IN CONST CHAR16       *Name,
+  IN CONST EFI_GUID     *Guid,
+     OUT VOID           **Value,
+     OUT UINTN          *Size OPTIONAL,
+     OUT UINT32         *Attr OPTIONAL
   );
 
 /**
