@@ -1505,7 +1505,7 @@ BuildAdmaDescTable (
         Trb->Adma32Desc[Index].Valid = 1;
         Trb->Adma32Desc[Index].Act   = 2;
         if (DataLength26) {
-          Trb->Adma32Desc[Index].UpperLength = (UINT16)(Remaining >> 16);
+          Trb->Adma32Desc[Index].UpperLength = (UINT16)RShiftU64 (Remaining, 16);
         }
         Trb->Adma32Desc[Index].LowerLength = (UINT16)(Remaining & MAX_UINT16);
         Trb->Adma32Desc[Index].Address = (UINT32)Address;
@@ -1524,11 +1524,11 @@ BuildAdmaDescTable (
         Trb->Adma64Desc[Index].Valid = 1;
         Trb->Adma64Desc[Index].Act   = 2;
         if (DataLength26) {
-          Trb->Adma64Desc[Index].UpperLength  = (UINT16)(Remaining >> 16);
+          Trb->Adma64Desc[Index].UpperLength  = (UINT16)RShiftU64 (Remaining, 16);
         }
         Trb->Adma64Desc[Index].LowerLength  = (UINT16)(Remaining & MAX_UINT16);
         Trb->Adma64Desc[Index].LowerAddress = (UINT32)Address;
-        Trb->Adma64Desc[Index].UpperAddress = (UINT32)(Address >> 32);
+        Trb->Adma64Desc[Index].UpperAddress = (UINT32)RShiftU64 (Address, 32);
         break;
       } else {
         Trb->Adma64Desc[Index].Valid = 1;
@@ -1538,7 +1538,7 @@ BuildAdmaDescTable (
         }
         Trb->Adma64Desc[Index].LowerLength  = 0;
         Trb->Adma64Desc[Index].LowerAddress = (UINT32)Address;
-        Trb->Adma64Desc[Index].UpperAddress = (UINT32)(Address >> 32);
+        Trb->Adma64Desc[Index].UpperAddress = (UINT32)RShiftU64 (Address, 32);
       }
     }
 
