@@ -250,7 +250,7 @@ def FileLinesSplit(Content=None, MaxLength=None):
     for NewLine in NewContentList:
         NewContent += NewLine + TAB_LINE_BREAK
 
-    NewContent = NewContent.replace(TAB_LINE_BREAK, gEndOfLine).replace('\r\r\n', gEndOfLine)
+    NewContent = NewContent.replace(gEndOfLine, TAB_LINE_BREAK).replace('\r\r\n', gEndOfLine)
     return NewContent
 
 
