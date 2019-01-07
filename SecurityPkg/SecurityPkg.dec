@@ -5,7 +5,7 @@
 #  It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 #  and libraries instances, which are used for those features.
 #
-# Copyright (c) 2009 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2015 Hewlett Packard Enterprise Development LP <BR>
 # Copyright (c) 2017, Microsoft Corporation.  All rights reserved. <BR>
 # This program and the accompanying materials are licensed and made available under
@@ -139,21 +139,9 @@
   #  Include/Guid/Tcg2PhysicalPresenceData.h
   gEfiTcg2PhysicalPresenceGuid = { 0xaeb9c5c1, 0x94f1, 0x4d02, { 0xbf, 0xd9, 0x46, 0x2, 0xdb, 0x2d, 0x3c, 0x54 }}
 
-  ## GUID used for form browser, password credential and provider identifier.
-  # Include/Guid/PwdCredentialProviderHii.h
-  gPwdCredentialProviderGuid         = { 0x78b9ec8b, 0xc000, 0x46c5, { 0xac, 0x93, 0x24, 0xa0, 0xc1, 0xbb, 0x0, 0xce }}
-
-  ## GUID used for form browser, USB credential and provider identifier.
-  #  Include/Guid/UsbCredentialProviderHii.h
-  gUsbCredentialProviderGuid         = { 0xd0849ed1, 0xa88c, 0x4ba6, { 0xb1, 0xd6, 0xab, 0x50, 0xe2, 0x80, 0xb7, 0xa9 }}
-
   ## GUID used for FormSet guid and user profile variable.
   # Include/Guid/UserIdentifyManagerHii.h
   gUserIdentifyManagerGuid           = { 0x3ccd3dd8, 0x8d45, 0x4fed, { 0x96, 0x2d, 0x2b, 0x38, 0xcd, 0x82, 0xb3, 0xc4 }}
-
-  ## GUID used for FormSet.
-  #  Include/Guid/UserProfileManagerHii.h
-  gUserProfileManagerGuid            = { 0xc35f272c, 0x97c2, 0x465a, { 0xa2, 0x16, 0x69, 0x6b, 0x66, 0x8a, 0x8c, 0xfe }}
 
   ## GUID used for FormSet.
   #  Include/Guid/TcgConfigHii.h
