@@ -744,6 +744,10 @@ ArmSetMemoryAttributes (
   UINT64        ChunkLength;
   BOOLEAN       FlushTlbs;
 
+  if (BaseAddress > (UINT64)MAX_ADDRESS - Length + 1) {
+    return EFI_UNSUPPORTED;
+  }
+
   if (Length == 0) {
     return EFI_SUCCESS;
   }
