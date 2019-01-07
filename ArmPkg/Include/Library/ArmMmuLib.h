@@ -59,7 +59,8 @@ VOID
 EFIAPI
 ArmReplaceLiveTranslationEntry (
   IN  UINT64  *Entry,
-  IN  UINT64  Value
+  IN  UINT64  Value,
+  IN  UINT64  RegionStart
   );
 
 EFI_STATUS

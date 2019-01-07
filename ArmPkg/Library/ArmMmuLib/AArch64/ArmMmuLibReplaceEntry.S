@@ -32,13 +32,14 @@
   dmb   sy
   dc    ivac, x0
 
-  // flush the TLBs
+  // flush translations for the target address from the TLBs
+  lsr   x2, x2, #12
   .if   \el == 1
-  tlbi  vmalle1
+  tlbi  vaae1, x2
   .else
-  tlbi  alle\el
+  tlbi  vae\el, x2
   .endif
-  dsb   sy
+  dsb   nsh
 
   // re-enable the MMU
   msr   sctlr_el\el, x8
@@ -48,19 +49,20 @@
 //VOID
 //ArmReplaceLiveTranslationEntry (
 //  IN  UINT64  *Entry,
-//  IN  UINT64  Value
+//  IN  UINT64  Value,
+//  IN  UINT64  Address
 //  )
 ASM_FUNC(ArmReplaceLiveTranslationEntry)
 
   // disable interrupts
-  mrs   x2, daif
+  mrs   x4, daif
   msr   daifset, #0xf
   isb
 
   // clean and invalidate first so that we don't clobber
   // adjacent entries that are dirty in the caches
   dc    civac, x0
-  dsb   ish
+  dsb   nsh
 
   EL1_OR_EL2_OR_EL3(x3)
 1:__replace_entry 1
@@ -69,7 +71,7 @@ ASM_FUNC(ArmReplaceLiveTranslationEntry)
   b     4f
 3:__replace_entry 3
 
-4:msr   daif, x2
+4:msr   daif, x4
   ret
 
 ASM_GLOBAL ASM_PFX(ArmReplaceLiveTranslationEntrySize)
