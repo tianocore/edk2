@@ -41,6 +41,12 @@ STATIC CONST CHAR16 mTftpProgressFrame[] = L"[                                  
 // (TFTP_PROGRESS_MESSAGE_SIZE-1) '\b'
 STATIC CONST CHAR16 mTftpProgressDelete[] = L"\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b";
 
+// Local File Handle
+SHELL_FILE_HANDLE     mFileHandle;
+
+// Path of the local file, Unicode encoded
+CONST CHAR16         *mLocalFilePath;
+
 /**
   Check and convert the UINT16 option values of the 'tftp' command
 
@@ -166,9 +172,6 @@ GetFileSize (
   @param[in]   FileSize       Size of the file in number of bytes
   @param[in]   BlockSize      Value of the TFTP blksize option
   @param[in]   WindowSize     Value of the TFTP window size option
-  @param[out]  Data           Address where to store the address of the buffer
-                              where the data of the file were downloaded in
-                              case of success.
 
   @retval  EFI_SUCCESS           The file was downloaded.
   @retval  EFI_OUT_OF_RESOURCES  A memory allocation failed.
@@ -184,8 +187,7 @@ DownloadFile (
   IN   CONST CHAR8          *AsciiFilePath,
   IN   UINTN                FileSize,
   IN   UINT16               BlockSize,
-  IN   UINT16               WindowSize,
-  OUT  VOID                 **Data
+  IN   UINT16               WindowSize
   );
 
 /**
@@ -287,7 +289,6 @@ RunTftp (
   CHAR8                   *AsciiRemoteFilePath;
   UINTN                   FilePathSize;
   CONST CHAR16            *Walker;
-  CONST CHAR16            *LocalFilePath;
   EFI_MTFTP4_CONFIG_DATA  Mtftp4ConfigData;
   EFI_HANDLE              *Handles;
   UINTN                   HandleCount;
@@ -297,9 +298,6 @@ RunTftp (
   EFI_HANDLE              Mtftp4ChildHandle;
   EFI_MTFTP4_PROTOCOL     *Mtftp4;
   UINTN                   FileSize;
-  UINTN                   DataSize;
-  VOID                    *Data;
-  SHELL_FILE_HANDLE       FileHandle;
   UINT16                  BlockSize;
   UINT16                  WindowSize;
 
@@ -309,7 +307,6 @@ RunTftp (
   AsciiRemoteFilePath = NULL;
   Handles             = NULL;
   FileSize            = 0;
-  DataSize            = 0;
   BlockSize           = MTFTP_DEFAULT_BLKSIZE;
   WindowSize          = MTFTP_DEFAULT_WINDOWSIZE;
 
@@ -385,7 +382,7 @@ RunTftp (
   UnicodeStrToAsciiStrS (RemoteFilePath, AsciiRemoteFilePath, FilePathSize);
 
   if (ParamCount == 4) {
-    LocalFilePath = ShellCommandLineGetRawValue (CheckPackage, 3);
+    mLocalFilePath = ShellCommandLineGetRawValue (CheckPackage, 3);
   } else {
     Walker = RemoteFilePath + StrLen (RemoteFilePath);
     while ((--Walker) >= RemoteFilePath) {
@@ -394,7 +391,7 @@ RunTftp (
         break;
       }
     }
-    LocalFilePath = Walker + 1;
+    mLocalFilePath = Walker + 1;
   }
 
   //
@@ -492,7 +489,6 @@ RunTftp (
        (NicNumber < HandleCount) && (ShellStatus != SHELL_SUCCESS);
        NicNumber++) {
     ControllerHandle = Handles[NicNumber];
-    Data = NULL;
 
     Status = GetNicName (ControllerHandle, NicNumber, NicName);
     if (EFI_ERROR (Status)) {
@@ -543,7 +539,7 @@ RunTftp (
       goto NextHandle;
     }
 
-    Status = DownloadFile (Mtftp4, RemoteFilePath, AsciiRemoteFilePath, FileSize, BlockSize, WindowSize, &Data);
+    Status = DownloadFile (Mtftp4, RemoteFilePath, AsciiRemoteFilePath, FileSize, BlockSize, WindowSize);
     if (EFI_ERROR (Status)) {
       ShellPrintHiiEx (
         -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_DOWNLOAD),
@@ -552,44 +548,7 @@ RunTftp (
       goto NextHandle;
     }
 
-    DataSize = FileSize;
-
-    if (!EFI_ERROR (ShellFileExists (LocalFilePath))) {
-      ShellDeleteFileByName (LocalFilePath);
-    }
-
-    Status = ShellOpenFileByName (
-               LocalFilePath,
-               &FileHandle,
-               EFI_FILE_MODE_CREATE |
-               EFI_FILE_MODE_WRITE  |
-               EFI_FILE_MODE_READ,
-               0
-               );
-    if (EFI_ERROR (Status)) {
-      ShellPrintHiiEx (
-        -1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL),
-        mTftpHiiHandle, L"tftp", LocalFilePath
-      );
-      goto NextHandle;
-    }
-
-    Status = ShellWriteFile (FileHandle, &FileSize, Data);
-    if (!EFI_ERROR (Status)) {
-      ShellStatus = SHELL_SUCCESS;
-    } else {
-      ShellPrintHiiEx (
-        -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_WRITE),
-        mTftpHiiHandle, LocalFilePath, Status
-      );
-    }
-    ShellCloseFile (&FileHandle);
-
     NextHandle:
-
-    if (Data != NULL) {
-      gBS->FreePages ((EFI_PHYSICAL_ADDRESS)(UINTN)Data, EFI_SIZE_TO_PAGES (DataSize));
-    }
 
     CloseProtocolAndDestroyServiceChild (
       ControllerHandle,
@@ -912,9 +871,6 @@ Error :
   @param[in]   FileSize       Size of the file in number of bytes
   @param[in]   BlockSize      Value of the TFTP blksize option
   @param[in]   WindowSize     Value of the TFTP window size option
-  @param[out]  Data           Address where to store the address of the buffer
-                              where the data of the file were downloaded in
-                              case of success.
 
   @retval  EFI_SUCCESS           The file was downloaded.
   @retval  EFI_OUT_OF_RESOURCES  A memory allocation failed.
@@ -930,13 +886,10 @@ DownloadFile (
   IN   CONST CHAR8          *AsciiFilePath,
   IN   UINTN                FileSize,
   IN   UINT16               BlockSize,
-  IN   UINT16               WindowSize,
-  OUT  VOID                 **Data
+  IN   UINT16               WindowSize
   )
 {
   EFI_STATUS            Status;
-  EFI_PHYSICAL_ADDRESS  PagesAddress;
-  VOID                  *Buffer;
   DOWNLOAD_CONTEXT      *TftpContext;
   EFI_MTFTP4_TOKEN      Mtftp4Token;
   UINT8                 BlksizeBuf[10];
@@ -944,22 +897,6 @@ DownloadFile (
 
   ZeroMem (&Mtftp4Token, sizeof (EFI_MTFTP4_TOKEN));
 
-  // Downloaded file can be large. BS.AllocatePages() is more faster
-  // than AllocatePool() and avoid fragmentation.
-  // The downloaded file could be an EFI application. Marking the
-  // allocated page as EfiBootServicesCode would allow to execute a
-  // potential downloaded EFI application.
-  Status = gBS->AllocatePages (
-                   AllocateAnyPages,
-                   EfiBootServicesCode,
-                   EFI_SIZE_TO_PAGES (FileSize),
-                   &PagesAddress
-                   );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Buffer = (VOID*)(UINTN)PagesAddress;
   TftpContext = AllocatePool (sizeof (DOWNLOAD_CONTEXT));
   if (TftpContext == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
@@ -970,8 +907,6 @@ DownloadFile (
   TftpContext->LastReportedNbOfBytes = 0;
 
   Mtftp4Token.Filename    = (UINT8*)AsciiFilePath;
-  Mtftp4Token.BufferSize  = FileSize;
-  Mtftp4Token.Buffer      = Buffer;
   Mtftp4Token.CheckPacket = CheckPacket;
   Mtftp4Token.Context     = (VOID*)TftpContext;
   Mtftp4Token.OptionCount = 0;
@@ -1000,14 +935,41 @@ DownloadFile (
     mTftpHiiHandle, FilePath
     );
 
+  //
+  // OPEN FILE
+  //
+  if (!EFI_ERROR (ShellFileExists (mLocalFilePath))) {
+    ShellDeleteFileByName (mLocalFilePath);
+  }
+
+  Status = ShellOpenFileByName (
+              mLocalFilePath,
+              &mFileHandle,
+              EFI_FILE_MODE_CREATE |
+              EFI_FILE_MODE_WRITE  |
+              EFI_FILE_MODE_READ,
+              0
+              );
+  if (EFI_ERROR (Status)) {
+    ShellPrintHiiEx (
+      -1, -1, NULL, STRING_TOKEN (STR_GEN_FILE_OPEN_FAIL),
+      mTftpHiiHandle, L"tftp", mLocalFilePath
+    );
+    goto Error;
+  }
+
   Status = Mtftp4->ReadFile (Mtftp4, &Mtftp4Token);
   ShellPrintHiiEx (
     -1, -1, NULL, STRING_TOKEN (STR_GEN_CRLF),
     mTftpHiiHandle
     );
 
-Error :
+  //
+  // CLOSE FILE
+  //
+  ShellCloseFile (&mFileHandle);
 
+Error :
   if (TftpContext != NULL) {
     FreePool (TftpContext);
   }
@@ -1016,14 +978,7 @@ Error :
     FreePool (Mtftp4Token.OptionList);
   }
 
-  if (EFI_ERROR (Status)) {
-    gBS->FreePages (PagesAddress, EFI_SIZE_TO_PAGES (FileSize));
-    return Status;
-  }
-
-  *Data = Buffer;
-
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
@@ -1054,6 +1009,7 @@ CheckPacket (
   UINTN             Index;
   UINTN             LastStep;
   UINTN             Step;
+  UINTN             DownloadLen;
   EFI_STATUS        Status;
 
   if ((NTOHS (Packet->OpCode)) != EFI_MTFTP4_OPCODE_DATA) {
@@ -1061,17 +1017,35 @@ CheckPacket (
   }
 
   Context = (DOWNLOAD_CONTEXT*)Token->Context;
-  if (Context->DownloadedNbOfBytes == 0) {
-    ShellPrintEx (-1, -1, L"%s       0 Kb", mTftpProgressFrame);
-  }
 
   //
   // The data in the packet are prepended with two UINT16 :
   // . OpCode = EFI_MTFTP4_OPCODE_DATA
   // . Block  = the number of this block of data
   //
-  Context->DownloadedNbOfBytes += PacketLen - sizeof (Packet->OpCode)
-                                            - sizeof (Packet->Data.Block);
+  DownloadLen = (UINTN)PacketLen - sizeof (Packet->OpCode) - sizeof (Packet->Data.Block);
+
+  ShellSetFilePosition(mFileHandle, Context->DownloadedNbOfBytes);
+  Status = ShellWriteFile (mFileHandle, &DownloadLen, Packet->Data.Data);
+  if (EFI_ERROR (Status)) {
+    if (Context->DownloadedNbOfBytes > 0) {
+      ShellPrintHiiEx (
+        -1, -1, NULL, STRING_TOKEN (STR_GEN_CRLF),
+        mTftpHiiHandle
+      );
+    }
+    ShellPrintHiiEx (
+      -1, -1, NULL, STRING_TOKEN (STR_TFTP_ERR_WRITE),
+      mTftpHiiHandle, mLocalFilePath, Status
+    );
+    return Status;
+  }
+
+  if (Context->DownloadedNbOfBytes == 0) {
+    ShellPrintEx (-1, -1, L"%s       0 Kb", mTftpProgressFrame);
+  }
+
+  Context->DownloadedNbOfBytes += DownloadLen;
   NbOfKb = Context->DownloadedNbOfBytes / 1024;
 
   Progress[0] = L'\0';
