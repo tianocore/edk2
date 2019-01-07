@@ -382,7 +382,7 @@ UpdateRegionMapping (
 
       // Break the inner loop when next block is a table
       // Rerun GetBlockEntryListFromAddress to avoid page table memory leak
-      if (TableLevel != 3 &&
+      if (TableLevel != 3 && BlockEntry <= LastBlockEntry &&
           (*BlockEntry & TT_TYPE_MASK) == TT_TYPE_TABLE_ENTRY) {
             break;
       }
