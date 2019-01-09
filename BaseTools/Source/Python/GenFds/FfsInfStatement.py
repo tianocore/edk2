@@ -30,6 +30,7 @@ from . import RuleSimpleFile
 from . import RuleComplexFile
 from CommonDataClass.FdfClass import FfsInfStatementClassObject
 from Common.MultipleWorkspace import MultipleWorkspace as mws
+from Common.DataType import SUP_MODULE_USER_DEFINED
 from Common.StringUtils import *
 from Common.Misc import PathClass
 from Common.Misc import GuidStructureByteArrayToGuidString
@@ -94,7 +95,7 @@ class FfsInfStatement(FfsInfStatementClassObject):
                 ModuleType = self.InfModule.ModuleType
                 PlatformDataBase = GenFdsGlobalVariable.WorkSpace.BuildObject[GenFdsGlobalVariable.ActivePlatform, self.CurrentArch, GenFdsGlobalVariable.TargetName, GenFdsGlobalVariable.ToolChainTag]
 
-                if ModuleType != DataType.SUP_MODULE_USER_DEFINED:
+                if ModuleType != SUP_MODULE_USER_DEFINED:
                     for LibraryClass in PlatformDataBase.LibraryClasses.GetKeys():
                         if LibraryClass.startswith("NULL") and PlatformDataBase.LibraryClasses[LibraryClass, ModuleType]:
                             self.InfModule.LibraryClasses[LibraryClass] = PlatformDataBase.LibraryClasses[LibraryClass, ModuleType]

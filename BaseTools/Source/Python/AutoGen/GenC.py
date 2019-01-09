@@ -18,7 +18,7 @@ import string
 import collections
 import struct
 from Common import EdkLogger
-
+from Common import GlobalData
 from Common.BuildToolError import *
 from Common.DataType import *
 from Common.Misc import *

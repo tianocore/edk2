@@ -37,8 +37,8 @@ from subprocess import *
 from Common import Misc as Utils
 
 from Common.LongFilePathSupport import OpenLongFilePath as open
-from Common.TargetTxtClassObject import *
-from Common.ToolDefClassObject import *
+from Common.TargetTxtClassObject import TargetTxtClassObject
+from Common.ToolDefClassObject import ToolDefClassObject
 from Common.DataType import *
 from Common.BuildVersion import gBUILD_VERSION
 from AutoGen.AutoGen import *
@@ -884,7 +884,7 @@ class Build():
         if os.path.isfile(BuildConfigurationFile) == True:
             StatusCode = self.TargetTxt.LoadTargetTxtFile(BuildConfigurationFile)
 
-            ToolDefinitionFile = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
+            ToolDefinitionFile = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_TOOL_CHAIN_CONF]
             if ToolDefinitionFile == '':
                 ToolDefinitionFile = gToolsDefinition
                 ToolDefinitionFile = os.path.normpath(mws.join(self.WorkspaceDir, 'Conf', ToolDefinitionFile))
@@ -897,16 +897,16 @@ class Build():
 
         # if no ARCH given in command line, get it from target.txt
         if not self.ArchList:
-            self.ArchList = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TARGET_ARCH]
+            self.ArchList = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_TARGET_ARCH]
         self.ArchList = tuple(self.ArchList)
 
         # if no build target given in command line, get it from target.txt
         if not self.BuildTargetList:
-            self.BuildTargetList = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TARGET]
+            self.BuildTargetList = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_TARGET]
 
         # if no tool chain given in command line, get it from target.txt
         if not self.ToolChainList:
-            self.ToolChainList = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_TOOL_CHAIN_TAG]
+            self.ToolChainList = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_TOOL_CHAIN_TAG]
             if self.ToolChainList is None or len(self.ToolChainList) == 0:
                 EdkLogger.error("build", RESOURCE_NOT_AVAILABLE, ExtraData="No toolchain given. Don't know how to build.\n")
 
@@ -936,7 +936,7 @@ class Build():
         self.ToolChainFamily = ToolChainFamily
 
         if self.ThreadNumber is None:
-            self.ThreadNumber = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER]
+            self.ThreadNumber = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_MAX_CONCURRENT_THREAD_NUMBER]
             if self.ThreadNumber == '':
                 self.ThreadNumber = 0
             else:
@@ -949,7 +949,7 @@ class Build():
                 self.ThreadNumber = 1
 
         if not self.PlatformFile:
-            PlatformFile = self.TargetTxt.TargetTxtDictionary[DataType.TAB_TAT_DEFINES_ACTIVE_PLATFORM]
+            PlatformFile = self.TargetTxt.TargetTxtDictionary[TAB_TAT_DEFINES_ACTIVE_PLATFORM]
             if not PlatformFile:
                 # Try to find one in current directory
                 WorkingDirectory = os.getcwd()

@@ -16,8 +16,10 @@ from Common.DataType import *
 from Common.Misc import *
 from types import *
 from collections import OrderedDict
-
+from CommonDataClass.DataClass import *
 from Workspace.BuildClassObject import PackageBuildClassObject, StructurePcd, PcdClassObject
+from Common.GlobalData import gGlobalDefines, gEcpSource
+from re import compile
 
 ## Platform build information from DEC file
 #
@@ -109,7 +111,7 @@ class DecBuildData(PackageBuildClassObject):
     @property
     def _Macros(self):
         if self._MacroDict is None:
-            self._MacroDict = dict(GlobalData.gGlobalDefines)
+            self._MacroDict = dict(gGlobalDefines)
         return self._MacroDict
 
     ## Get architecture
@@ -298,7 +300,7 @@ class DecBuildData(PackageBuildClassObject):
             PublicInclues = []
             RecordList = self._RawData[MODEL_EFI_INCLUDE, self._Arch]
             Macros = self._Macros
-            Macros["EDK_SOURCE"] = GlobalData.gEcpSource
+            Macros["EDK_SOURCE"] = gEcpSource
             for Record in RecordList:
                 File = PathClass(NormPath(Record[0], Macros), self._PackageDir, Arch=self._Arch)
                 LineNo = Record[-1]
@@ -464,6 +466,7 @@ class DecBuildData(PackageBuildClassObject):
         StructurePcds = self.ProcessStructurePcd(StrPcdSet)
         for pcd in StructurePcds:
             Pcds[pcd.TokenCName, pcd.TokenSpaceGuidCName, self._PCD_TYPE_STRING_[Type]] = pcd
+        StructPattern = compile(r'[_a-zA-Z][0-9A-Za-z_]*$')
         for pcd in Pcds.values():
             if pcd.DatumType not in [TAB_UINT8, TAB_UINT16, TAB_UINT32, TAB_UINT64, TAB_VOID, "BOOLEAN"]:
                 if not pcd.IsAggregateDatumType():

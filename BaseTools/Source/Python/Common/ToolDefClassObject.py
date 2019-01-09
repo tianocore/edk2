@@ -1,7 +1,7 @@
 ## @file
 # This file is used to define each component of tools_def.txt file
 #
-# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -20,7 +20,7 @@ import re
 from . import EdkLogger
 
 from .BuildToolError import *
-from .TargetTxtClassObject import *
+from Common.TargetTxtClassObject import TargetTxtDict
 from Common.LongFilePathSupport import OpenLongFilePath as open
 from Common.Misc import PathClass
 from Common.StringUtils import NormPath

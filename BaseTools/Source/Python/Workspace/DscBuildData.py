@@ -25,8 +25,8 @@ from Common.Misc import *
 from types import *
 from Common.Expression import *
 from CommonDataClass.CommonClass import SkuInfoClass
-from Common.TargetTxtClassObject import *
-from Common.ToolDefClassObject import *
+from Common.TargetTxtClassObject import TargetTxtClassObject
+from Common.ToolDefClassObject import ToolDefClassObject
 from .MetaDataTable import *
 from .MetaFileTable import *
 from .MetaFileParser import *

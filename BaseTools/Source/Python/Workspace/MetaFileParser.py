@@ -36,6 +36,7 @@ from Common.LongFilePathSupport import OpenLongFilePath as open
 from collections import defaultdict
 from .MetaFileTable import MetaFileStorage
 from .MetaFileCommentParser import CheckInfComment
+from Common.DataType import TAB_COMMENT_EDK_START, TAB_COMMENT_EDK_END
 
 ## RegEx for finding file versions
 hexVersionPattern = re.compile(r'0[xX][\da-f-A-F]{5,8}')
@@ -45,7 +46,7 @@ CODEPattern = re.compile(r"{CODE\([a-fA-F0-9Xx\{\},\s]*\)}")
 ## A decorator used to parse macro definition
 def ParseMacro(Parser):
     def MacroParser(self):
-        Match = gMacroDefPattern.match(self._CurrentLine)
+        Match = GlobalData.gMacroDefPattern.match(self._CurrentLine)
         if not Match:
             # Not 'DEFINE/EDK_GLOBAL' statement, call decorated method
             Parser(self)
@@ -66,7 +67,7 @@ def ParseMacro(Parser):
             EdkLogger.error('Parser', FORMAT_INVALID, "%s can only be defined via environment variable" % Name,
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
         # Only upper case letters, digit and '_' are allowed
-        if not gMacroNamePattern.match(Name):
+        if not GlobalData.gMacroNamePattern.match(Name):
             EdkLogger.error('Parser', FORMAT_INVALID, "The macro name must be in the pattern [A-Z][A-Z0-9_]*",
                             ExtraData=self._CurrentLine, File=self.MetaFile, Line=self._LineIndex + 1)
 
@@ -562,10 +563,10 @@ class InfParser(MetaFileParser):
                     SectionComments.extend(Comments)
                     Comments = []
                 continue
-            if Line.find(DataType.TAB_COMMENT_EDK_START) > -1:
+            if Line.find(TAB_COMMENT_EDK_START) > -1:
                 IsFindBlockComment = True
                 continue
-            if Line.find(DataType.TAB_COMMENT_EDK_END) > -1:
+            if Line.find(TAB_COMMENT_EDK_END) > -1:
                 IsFindBlockComment = False
                 continue
             if IsFindBlockComment:

@@ -24,7 +24,6 @@ import Common.LongFilePathOs as os
 from .GenFdsGlobalVariable import GenFdsGlobalVariable
 from .GenFdsGlobalVariable import FindExtendTool
 from CommonDataClass.FdfClass import GuidSectionClassObject
-from Common import ToolDefClassObject
 import sys
 from Common import EdkLogger
 from Common.BuildToolError import *

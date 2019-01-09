@@ -1,7 +1,7 @@
 ## @file
 # Generate AutoGen.h, AutoGen.c and *.depex files
 #
-# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2018, Hewlett Packard Enterprise Development, L.P.<BR>
 #
 # This program and the accompanying materials
@@ -52,6 +52,7 @@ from .GenVar import VariableMgr, var_info
 from collections import OrderedDict
 from collections import defaultdict
 from Workspace.WorkspaceCommon import OrderedListDict
+from Common.ToolDefClassObject import gDefaultToolsDefFile
 
 from Common.caching import cached_property, cached_class_function
 
@@ -84,9 +85,6 @@ gMakeTypeMap = {TAB_COMPILER_MSFT:"nmake", "GCC":"gmake"}
 
 ## Build rule configuration file
 gDefaultBuildRuleFile = 'build_rule.txt'
-
-## Tools definition configuration file
-gDefaultToolsDefFile = 'tools_def.txt'
 
 ## Build rule default version
 AutoGenReqBuildRuleVerNum = "0.1"

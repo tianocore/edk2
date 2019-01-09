@@ -22,6 +22,9 @@ from Common.VariableAttributes import VariableAttributes
 import copy
 from struct import unpack
 from Common.DataType import *
+from Common import GlobalData
+from Common import EdkLogger
+import Common.LongFilePathOs as os
 
 DATABASE_VERSION = 7
 
