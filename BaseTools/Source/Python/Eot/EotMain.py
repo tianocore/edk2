@@ -929,8 +929,6 @@ class Ffs(Image):
     _SIZE_      = struct.Struct("20x 3B")
     _STATE_     = struct.Struct("23x 1B")
 
-    VTF_GUID = "1BA0062E-C779-4582-8566-336AE8F78F09"
-
     FFS_ATTRIB_FIXED              = 0x04
     FFS_ATTRIB_DATA_ALIGNMENT     = 0x38
     FFS_ATTRIB_CHECKSUM           = 0x40

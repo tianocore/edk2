@@ -81,7 +81,6 @@ def resetFdsGlobalVariable():
     GenFdsGlobalVariable.ToolChainTag = ''
     GenFdsGlobalVariable.RuleDict = {}
     GenFdsGlobalVariable.ArchList = None
-    GenFdsGlobalVariable.VtfDict = {}
     GenFdsGlobalVariable.ActivePlatform = None
     GenFdsGlobalVariable.FvAddressFileName = ''
     GenFdsGlobalVariable.VerboseMode = False
@@ -251,15 +250,7 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
                 if len(List) == 2:
                     if not List[1].strip():
                         EdkLogger.error("GenFds", OPTION_VALUE_INVALID, ExtraData="No Value given for Macro %s" %List[0])
-                    if List[0].strip() == "EFI_SOURCE":
-                        GlobalData.gEfiSource = List[1].strip()
-                        GlobalData.gGlobalDefines["EFI_SOURCE"] = GlobalData.gEfiSource
-                        continue
-                    elif List[0].strip() == "EDK_SOURCE":
-                        GlobalData.gEdkSource = List[1].strip()
-                        GlobalData.gGlobalDefines["EDK_SOURCE"] = GlobalData.gEdkSource
-                        continue
-                    elif List[0].strip() in ["WORKSPACE", "TARGET", "TOOLCHAIN"]:
+                    if List[0].strip() in ["WORKSPACE", "TARGET", "TOOLCHAIN"]:
                         GlobalData.gGlobalDefines[List[0].strip()] = List[1].strip()
                     else:
                         GlobalData.gCommandLineDefines[List[0].strip()] = List[1].strip()

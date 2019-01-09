@@ -74,11 +74,10 @@ class FV (object):
     #   @param  BlockSize   block size of FV
     #   @param  BlockNum    How many blocks in FV
     #   @param  ErasePolarity      Flash erase polarity
-    #   @param  VtfDict     VTF objects
     #   @param  MacroDict   macro value pair
     #   @retval string      Generated FV file path
     #
-    def AddToBuffer (self, Buffer, BaseAddress=None, BlockSize= None, BlockNum=None, ErasePloarity='1', VtfDict=None, MacroDict = {}, Flag=False):
+    def AddToBuffer (self, Buffer, BaseAddress=None, BlockSize= None, BlockNum=None, ErasePloarity='1',  MacroDict = {}, Flag=False):
         if BaseAddress is None and self.UiFvName.upper() + 'fv' in GenFdsGlobalVariable.ImageBinDict:
             return GenFdsGlobalVariable.ImageBinDict[self.UiFvName.upper() + 'fv']
 
@@ -105,7 +104,7 @@ class FV (object):
         if self.FvBaseAddress is not None:
             BaseAddress = self.FvBaseAddress
         if not Flag:
-            self._InitializeInf(BaseAddress, BlockSize, BlockNum, ErasePloarity, VtfDict)
+            self._InitializeInf(BaseAddress, BlockSize, BlockNum, ErasePloarity)
         #
         # First Process the Apriori section
         #
@@ -270,9 +269,8 @@ class FV (object):
     #   @param  BlockSize   block size of FV
     #   @param  BlockNum    How many blocks in FV
     #   @param  ErasePolarity      Flash erase polarity
-    #   @param  VtfDict     VTF objects
     #
-    def _InitializeInf (self, BaseAddress = None, BlockSize= None, BlockNum = None, ErasePloarity='1', VtfDict=None):
+    def _InitializeInf (self, BaseAddress = None, BlockSize= None, BlockNum = None, ErasePloarity='1'):
         #
         # Create FV inf file
         #
@@ -435,7 +433,3 @@ class FV (object):
         # Add [Files]
         #
         self.FvInfFile.writelines("[files]" + TAB_LINE_BREAK)
-        if VtfDict and self.UiFvName in VtfDict:
-            self.FvInfFile.writelines("EFI_FILE_NAME = "                   + \
-                                       VtfDict[self.UiFvName]              + \
-                                       TAB_LINE_BREAK)

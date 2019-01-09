@@ -53,8 +53,6 @@ from .CapsuleData import CapsuleFfs, CapsulePayload, CapsuleFv, CapsuleFd, Capsu
 from .RuleComplexFile import RuleComplexFile
 from .RuleSimpleFile import RuleSimpleFile
 from .EfiSection import EfiSection
-from .Vtf import Vtf
-from .ComponentStatement import ComponentStatement
 from .OptionRom import OPTIONROM
 from .OptRomInfStatement import OptRomInfStatement, OverrideAttribs
 from .OptRomFileStatement import OptRomFileStatement
@@ -234,7 +232,6 @@ class FileProfile:
         self.FdNameNotSet = False
         self.FvDict = {}
         self.CapsuleDict = {}
-        self.VtfList = []
         self.RuleDict = {}
         self.OptRomDict = {}
         self.FmpPayloadDict = {}
@@ -478,7 +475,6 @@ class FdfParser:
         # [FV.UiName]
         # [Capsule.UiName]
         # [Rule]: don't take rule section into account, macro is not allowed in this section
-        # [VTF.arch.UiName, arch]
         # [OptionRom.DriverName]
         self._CurSection = []
         Section = Section.strip()[1:-1].upper().replace(' ', '').strip(TAB_SPLIT)
@@ -489,12 +485,6 @@ class FdfParser:
 
         if Item == TAB_COMMON_DEFINES.upper():
             self._CurSection = [TAB_COMMON, TAB_COMMON, TAB_COMMON]
-        elif Item == 'VTF' and len(ItemList) == 3:
-            UiName = ItemList[2]
-            Pos = UiName.find(TAB_COMMA_SPLIT)
-            if Pos != -1:
-                UiName = UiName[:Pos]
-            self._CurSection = ['VTF', UiName, ItemList[1]]
         elif len(ItemList) > 1:
             self._CurSection = [ItemList[0], ItemList[1], TAB_COMMON]
         elif len(ItemList) > 0:
@@ -1330,7 +1320,7 @@ class FdfParser:
             #
             # Keep processing sections of the FDF until no new sections or a syntax error is found
             #
-            while self._GetFd() or self._GetFv() or self._GetFmp() or self._GetCapsule() or self._GetVtf() or self._GetRule() or self._GetOptionRom():
+            while self._GetFd() or self._GetFv() or self._GetFmp() or self._GetCapsule() or self._GetRule() or self._GetOptionRom():
                 pass
 
         except Warning as X:
@@ -1358,8 +1348,8 @@ class FdfParser:
     def SectionParser(self, section):
         S = section.upper()
         if not S.startswith("[DEFINES") and not S.startswith("[FD.") and not S.startswith("[FV.") and not S.startswith("[CAPSULE.") \
-            and not S.startswith("[VTF.") and not S.startswith("[RULE.") and not S.startswith("[OPTIONROM.") and not S.startswith('[FMPPAYLOAD.'):
-            raise Warning("Unknown section or section appear sequence error (The correct sequence should be [DEFINES], [FD.], [FV.], [Capsule.], [VTF.], [Rule.], [OptionRom.], [FMPPAYLOAD.])", self.FileName, self.CurrentLineNumber)
+             and not S.startswith("[RULE.") and not S.startswith("[OPTIONROM.") and not S.startswith('[FMPPAYLOAD.'):
+            raise Warning("Unknown section or section appear sequence error (The correct sequence should be [DEFINES], [FD.], [FV.], [Capsule.], [Rule.], [OptionRom.], [FMPPAYLOAD.])", self.FileName, self.CurrentLineNumber)
 
     ## _GetDefines() method
     #
@@ -1432,7 +1422,7 @@ class FdfParser:
         S = self._Token.upper()
         if S.startswith(TAB_SECTION_START) and not S.startswith("[FD."):
             if not S.startswith("[FV.") and not S.startswith('[FMPPAYLOAD.') and not S.startswith("[CAPSULE.") \
-                and not S.startswith("[VTF.") and not S.startswith("[RULE.") and not S.startswith("[OPTIONROM."):
+                and not S.startswith("[RULE.") and not S.startswith("[OPTIONROM."):
                 raise Warning("Unknown section", self.FileName, self.CurrentLineNumber)
             self._UndoToken()
             return False
@@ -4080,211 +4070,6 @@ class FdfParser:
             return True
 
         return False
-
-    ## _GetVtf() method
-    #
-    #   Get VTF section contents and store its data into VTF list of self.Profile
-    #
-    #   @param  self        The object pointer
-    #   @retval True        Successfully find a VTF
-    #   @retval False       Not able to find a VTF
-    #
-    def _GetVtf(self):
-        HW_ARCH_SET = {TAB_ARCH_IA32, TAB_ARCH_X64, TAB_ARCH_IPF, TAB_ARCH_ARM, TAB_ARCH_AARCH64}
-        if not self._GetNextToken():
-            return False
-
-        S = self._Token.upper()
-        if S.startswith(TAB_SECTION_START) and not S.startswith("[VTF."):
-            self.SectionParser(S)
-            self._UndoToken()
-            return False
-
-        self._UndoToken()
-        if not self._IsToken("[VTF.", True):
-            FileLineTuple = GetRealFileLine(self.FileName, self.CurrentLineNumber)
-            #print 'Parsing String: %s in File %s, At line: %d, Offset Within Line: %d' \
-            #        % (self.Profile.FileLinesList[self.CurrentLineNumber - 1][self.CurrentOffsetWithinLine:], FileLineTuple[0], FileLineTuple[1], self.CurrentOffsetWithinLine)
-            raise Warning.Expected("[VTF.]", self.FileName, self.CurrentLineNumber)
-
-        if not self._SkipToToken(TAB_SPLIT):
-            raise Warning.Expected("'.'", self.FileName, self.CurrentLineNumber)
-
-        Arch = self._SkippedChars.rstrip(TAB_SPLIT).upper()
-        if Arch not in HW_ARCH_SET:
-            raise Warning("Unknown Arch '%s'" % Arch, self.FileName, self.CurrentLineNumber)
-
-        if not self._GetNextWord():
-            raise Warning.Expected("VTF name", self.FileName, self.CurrentLineNumber)
-        Name = self._Token.upper()
-
-        VtfObj = Vtf()
-        VtfObj.UiName = Name
-        VtfObj.KeyArch = Arch
-
-        if self._IsToken(TAB_COMMA_SPLIT):
-            if not self._GetNextWord():
-                raise Warning.Expected("Arch list", self.FileName, self.CurrentLineNumber)
-            if self._Token.upper() not in HW_ARCH_SET:
-                raise Warning("Unknown Arch '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
-            VtfObj.ArchList = self._Token.upper()
-
-        if not self._IsToken(TAB_SECTION_END):
-            raise Warning.ExpectedBracketClose(self.FileName, self.CurrentLineNumber)
-
-        if self._IsKeyword("IA32_RST_BIN"):
-            if not self._IsToken(TAB_EQUAL_SPLIT):
-                raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
-
-            if not self._GetNextToken():
-                raise Warning.Expected("Reset file", self.FileName, self.CurrentLineNumber)
-
-            VtfObj.ResetBin = self._Token
-            if VtfObj.ResetBin.replace(TAB_WORKSPACE, '').find('$') == -1:
-                #check for file path
-                ErrorCode, ErrorInfo = PathClass(NormPath(VtfObj.ResetBin), GenFdsGlobalVariable.WorkSpaceDir).Validate()
-                if ErrorCode != 0:
-                    EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
-
-        while self._GetComponentStatement(VtfObj):
-            pass
-
-        self.Profile.VtfList.append(VtfObj)
-        return True
-
-    ## _GetComponentStatement() method
-    #
-    #   Get components in VTF
-    #
-    #   @param  self        The object pointer
-    #   @param  VtfObj         for whom component is got
-    #   @retval True        Successfully find a component
-    #   @retval False       Not able to find a component
-    #
-    def _GetComponentStatement(self, VtfObj):
-        if not self._IsKeyword("COMP_NAME"):
-            return False
-
-        if not self._IsToken(TAB_EQUAL_SPLIT):
-            raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
-
-        if not self._GetNextWord():
-            raise Warning.Expected("Component Name", self.FileName, self.CurrentLineNumber)
-
-        CompStatementObj = ComponentStatement()
-        CompStatementObj.CompName = self._Token
-
-        if not self._IsKeyword("COMP_LOC"):
-            raise Warning.Expected("COMP_LOC", self.FileName, self.CurrentLineNumber)
-
-        if not self._IsToken(TAB_EQUAL_SPLIT):
-            raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
-
-        CompStatementObj.CompLoc = ""
-        if self._GetNextWord():
-            CompStatementObj.CompLoc = self._Token
-            if self._IsToken(TAB_VALUE_SPLIT):
-                if not self._GetNextWord():
-                    raise Warning.Expected("Region Name", self.FileName, self.CurrentLineNumber)
-
-                if self._Token not in {"F", "N", "S"}:    #, "H", "L", "PH", "PL"): not support
-                    raise Warning("Unknown location type '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
-
-                CompStatementObj.FilePos = self._Token
-        else:
-            self.CurrentLineNumber += 1
-            self.CurrentOffsetWithinLine = 0
-
-        if not self._IsKeyword("COMP_TYPE"):
-            raise Warning.Expected("COMP_TYPE", self.FileName, self.CurrentLineNumber)
-
-        if not self._IsToken(TAB_EQUAL_SPLIT):
-            raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
-
-        if not self._GetNextToken():
-            raise Warning.Expected("Component type", self.FileName, self.CurrentLineNumber)
-        if self._Token not in {"FIT", "PAL_B", "PAL_A", "OEM"}:
-            if not self._Token.startswith("0x") or len(self._Token) < 3 or len(self._Token) > 4 or \
-                not self._Token[2] in hexdigits or not self._Token[-1] in hexdigits:
-                raise Warning("Unknown location type '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
-        CompStatementObj.CompType = self._Token
-
-        if not self._IsKeyword("COMP_VER"):
-            raise Warning.Expected("COMP_VER", self.FileName, self.CurrentLineNumber)
-
-        if not self._IsToken(TAB_EQUAL_SPLIT):
-            raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
-
-        if not self._GetNextToken():
-            raise Warning.Expected("Component version", self.FileName, self.CurrentLineNumber)
-
-        Pattern = compile('-$|[0-9a-fA-F]{1,2}\.[0-9a-fA-F]{1,2}$', DOTALL)
-        if Pattern.match(self._Token) is None:
-            raise Warning("Unknown version format '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
-        CompStatementObj.CompVer = self._Token
-
-        if not self._IsKeyword("COMP_CS"):
-            raise Warning.Expected("COMP_CS", self.FileName, self.CurrentLineNumber)
-
-        if not self._IsToken(TAB_EQUAL_SPLIT):
-            raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
-
-        if not self._GetNextToken():
-            raise Warning.Expected("Component CS", self.FileName, self.CurrentLineNumber)
-        if self._Token not in {"1", "0"}:
-            raise Warning("Unknown Component CS '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
-        CompStatementObj.CompCs = self._Token
-
-
-        if not self._IsKeyword("COMP_BIN"):
-            raise Warning.Expected("COMP_BIN", self.FileName, self.CurrentLineNumber)
-
-        if not self._IsToken(TAB_EQUAL_SPLIT):
-            raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
-
-        if not self._GetNextToken():
-            raise Warning.Expected("Component file", self.FileName, self.CurrentLineNumber)
-
-        CompStatementObj.CompBin = self._Token
-        if CompStatementObj.CompBin != '-' and CompStatementObj.CompBin.replace(TAB_WORKSPACE, '').find('$') == -1:
-            #check for file path
-            ErrorCode, ErrorInfo = PathClass(NormPath(CompStatementObj.CompBin), GenFdsGlobalVariable.WorkSpaceDir).Validate()
-            if ErrorCode != 0:
-                EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
-
-        if not self._IsKeyword("COMP_SYM"):
-            raise Warning.Expected("COMP_SYM", self.FileName, self.CurrentLineNumber)
-
-        if not self._IsToken(TAB_EQUAL_SPLIT):
-            raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
-
-        if not self._GetNextToken():
-            raise Warning.Expected("Component symbol file", self.FileName, self.CurrentLineNumber)
-
-        CompStatementObj.CompSym = self._Token
-        if CompStatementObj.CompSym != '-' and CompStatementObj.CompSym.replace(TAB_WORKSPACE, '').find('$') == -1:
-            #check for file path
-            ErrorCode, ErrorInfo = PathClass(NormPath(CompStatementObj.CompSym), GenFdsGlobalVariable.WorkSpaceDir).Validate()
-            if ErrorCode != 0:
-                EdkLogger.error("GenFds", ErrorCode, ExtraData=ErrorInfo)
-
-        if not self._IsKeyword("COMP_SIZE"):
-            raise Warning.Expected("COMP_SIZE", self.FileName, self.CurrentLineNumber)
-
-        if not self._IsToken(TAB_EQUAL_SPLIT):
-            raise Warning.ExpectedEquals(self.FileName, self.CurrentLineNumber)
-
-        if self._IsToken("-"):
-            CompStatementObj.CompSize = self._Token
-        elif self._GetNextDecimalNumber():
-            CompStatementObj.CompSize = self._Token
-        elif self._GetNextHexNumber():
-            CompStatementObj.CompSize = self._Token
-        else:
-            raise Warning("Unknown size '%s'" % self._Token, self.FileName, self.CurrentLineNumber)
-
-        VtfObj.ComponentStatementList.append(CompStatementObj)
-        return True
 
     ## _GetOptionRom() method
     #

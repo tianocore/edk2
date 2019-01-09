@@ -35,7 +35,6 @@ class FDClassObject:
         # SetVarDict[var] = value
         self.SetVarDict = {}
         self.RegionList = []
-        self.vtfRawDict = {}
 
 ## FFS data in FDF
 #
@@ -304,25 +303,6 @@ class CapsuleClassObject :
         self.TokensDict = {}
         self.CapsuleDataList = []
         self.FmpPayloadList = []
-
-## VTF component data in FDF
-#
-#
-class ComponentStatementClassObject :
-    ## The constructor
-    #
-    #   @param  self        The object pointer
-    #
-    def __init__(self):
-        self.CompName = None
-        self.CompLoc = None
-        self.CompType = None
-        self.CompVer = None
-        self.CompCs = None
-        self.CompBin = None
-        self.CompSym = None
-        self.CompSize = None
-        self.FilePos = None
 
 ## OptionROM data in FDF
 #

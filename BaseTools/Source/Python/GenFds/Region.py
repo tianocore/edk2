@@ -75,12 +75,11 @@ class Region(object):
     #   @param  BlockSize   block size of region
     #   @param  BlockNum    How many blocks in region
     #   @param  ErasePolarity      Flash erase polarity
-    #   @param  VtfDict     VTF objects
     #   @param  MacroDict   macro value pair
     #   @retval string      Generated FV file path
     #
 
-    def AddToBuffer(self, Buffer, BaseAddress, BlockSizeList, ErasePolarity, ImageBinDict, vtfDict=None, MacroDict={}, Flag=False):
+    def AddToBuffer(self, Buffer, BaseAddress, BlockSizeList, ErasePolarity, ImageBinDict,  MacroDict={}, Flag=False):
         Size = self.Size
         if not Flag:
             GenFdsGlobalVariable.InfLogger('\nGenerate Region at Offset 0x%X' % self.Offset)
@@ -136,7 +135,7 @@ class Region(object):
                         FvBaseAddress = '0x%X' % self.FvAddress
                         BlockSize = None
                         BlockNum = None
-                        FvObj.AddToBuffer(FvBuffer, FvBaseAddress, BlockSize, BlockNum, ErasePolarity, vtfDict, Flag=Flag)
+                        FvObj.AddToBuffer(FvBuffer, FvBaseAddress, BlockSize, BlockNum, ErasePolarity, Flag=Flag)
                         if Flag:
                             continue
 

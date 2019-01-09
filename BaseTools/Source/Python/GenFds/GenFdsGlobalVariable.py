@@ -56,7 +56,6 @@ class GenFdsGlobalVariable:
     ToolChainTag = ''
     RuleDict = {}
     ArchList = None
-    VtfDict = {}
     ActivePlatform = None
     FvAddressFileName = ''
     VerboseMode = False

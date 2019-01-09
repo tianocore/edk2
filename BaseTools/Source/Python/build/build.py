@@ -1398,11 +1398,7 @@ class Build():
                             Name = StrList[1]
                             RelativeAddress = int (StrList[2], 16) - OrigImageBaseAddress
                             FunctionList.append ((Name, RelativeAddress))
-                            if ModuleInfo.Arch == 'IPF' and Name.endswith('_ModuleEntryPoint'):
-                                #
-                                # Get the real entry point address for IPF image.
-                                #
-                                ModuleInfo.Image.EntryPoint = RelativeAddress
+
                 ImageMap.close()
             #
             # Add general information.
@@ -1500,9 +1496,6 @@ class Build():
         RtSize  = 0
         # reserve 4K size in SMRAM to make SMM module address not from 0.
         SmmSize = 0x1000
-        IsIpfPlatform = False
-        if 'IPF' in self.ArchList:
-            IsIpfPlatform = True
         for ModuleGuid in ModuleList:
             Module = ModuleList[ModuleGuid]
             GlobalData.gProcessingFile = "%s [%s, %s, %s]" % (Module.MetaFile, Module.Arch, Module.ToolChain, Module.BuildTarget)
@@ -1526,9 +1519,6 @@ class Build():
                         BtSize += ImageInfo.Image.Size
                     elif Module.ModuleType in [SUP_MODULE_DXE_RUNTIME_DRIVER, EDK_COMPONENT_TYPE_RT_DRIVER, SUP_MODULE_DXE_SAL_DRIVER, EDK_COMPONENT_TYPE_SAL_RT_DRIVER]:
                         RtModuleList[Module.MetaFile] = ImageInfo
-                        #IPF runtime driver needs to be at 2 page alignment.
-                        if IsIpfPlatform and ImageInfo.Image.Size % 0x2000 != 0:
-                            ImageInfo.Image.Size = (ImageInfo.Image.Size / 0x2000 + 1) * 0x2000
                         RtSize += ImageInfo.Image.Size
                     elif Module.ModuleType in [SUP_MODULE_SMM_CORE, SUP_MODULE_DXE_SMM_DRIVER, SUP_MODULE_MM_STANDALONE, SUP_MODULE_MM_CORE_STANDALONE]:
                         SmmModuleList[Module.MetaFile] = ImageInfo
@@ -1575,10 +1565,6 @@ class Build():
             TopMemoryAddress = self.LoadFixAddress
             if TopMemoryAddress < RtSize + BtSize + PeiSize:
                 EdkLogger.error("build", PARAMETER_INVALID, "FIX_LOAD_TOP_MEMORY_ADDRESS is too low to load driver")
-            # Make IPF runtime driver at 2 page alignment.
-            if IsIpfPlatform:
-                ReservedRuntimeMemorySize = TopMemoryAddress % 0x2000
-                RtSize = RtSize + ReservedRuntimeMemorySize
 
         #
         # Patch FixAddress related PCDs into EFI image
@@ -2238,8 +2224,8 @@ def LogBuildTime(Time):
 #
 def MyOptionParser():
     Parser = OptionParser(description=__copyright__, version=__version__, prog="build.exe", usage="%prog [options] [all|fds|genc|genmake|clean|cleanall|cleanlib|modules|libraries|run]")
-    Parser.add_option("-a", "--arch", action="append", type="choice", choices=['IA32', 'X64', 'IPF', 'EBC', 'ARM', 'AARCH64'], dest="TargetArch",
-        help="ARCHS is one of list: IA32, X64, IPF, ARM, AARCH64 or EBC, which overrides target.txt's TARGET_ARCH definition. To specify more archs, please repeat this option.")
+    Parser.add_option("-a", "--arch", action="append", type="choice", choices=['IA32', 'X64', 'EBC', 'ARM', 'AARCH64'], dest="TargetArch",
+        help="ARCHS is one of list: IA32, X64, ARM, AARCH64 or EBC, which overrides target.txt's TARGET_ARCH definition. To specify more archs, please repeat this option.")
     Parser.add_option("-p", "--platform", action="callback", type="string", dest="PlatformFile", callback=SingleCheckCallback,
         help="Build the platform specified by the DSC file name argument, overriding target.txt's ACTIVE_PLATFORM definition.")
     Parser.add_option("-m", "--module", action="callback", type="string", dest="ModuleFile", callback=SingleCheckCallback,
