@@ -1,6 +1,7 @@
 /** @file
   The entry point of IScsi driver.
 
+Copyright (c) 2019, NVIDIA Corporation. All rights reserved.
 Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
 (C) Copyright 2017 Hewlett Packard Enterprise Development LP<BR>
 
@@ -1861,28 +1862,18 @@ Error3:
          );
 
 Error2:
-  gBS->UninstallMultipleProtocolInterfaces (
-         gIScsiIp6DriverBinding.DriverBindingHandle,
-         &gEfiDriverBindingProtocolGuid,
-         &gIScsiIp6DriverBinding,
-         &gEfiComponentName2ProtocolGuid,
-         &gIScsiComponentName2,
-         &gEfiComponentNameProtocolGuid,
-         &gIScsiComponentName,
-         NULL
-         );
+  EfiLibUninstallDriverBindingComponentName2 (
+    &gIScsiIp6DriverBinding,
+    &gIScsiComponentName,
+    &gIScsiComponentName2
+    );
 
 Error1:
-  gBS->UninstallMultipleProtocolInterfaces (
-         ImageHandle,
-         &gEfiDriverBindingProtocolGuid,
-         &gIScsiIp4DriverBinding,
-         &gEfiComponentName2ProtocolGuid,
-         &gIScsiComponentName2,
-         &gEfiComponentNameProtocolGuid,
-         &gIScsiComponentName,
-         NULL
-         );
+  EfiLibUninstallDriverBindingComponentName2 (
+    &gIScsiIp4DriverBinding,
+    &gIScsiComponentName,
+    &gIScsiComponentName2
+    );
 
   return Status;
 }
