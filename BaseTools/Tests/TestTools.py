@@ -24,6 +24,7 @@ import shutil
 import subprocess
 import sys
 import unittest
+import codecs
 
 TestsDir = os.path.realpath(os.path.split(sys.argv[0])[0])
 BaseToolsDir = os.path.realpath(os.path.join(TestsDir, '..'))
@@ -150,7 +151,7 @@ class BaseToolsTest(unittest.TestCase):
             with open(self.GetTmpFilePath(fileName), 'wb') as f:
                 f.write(data)
         else:
-            with open(self.GetTmpFilePath(fileName), 'w') as f:
+            with codecs.open(self.GetTmpFilePath(fileName), 'w', encoding='utf-8') as f:
                 f.write(data)
 
     def GenRandomFileData(self, fileName, minlen = None, maxlen = None):
