@@ -174,16 +174,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define IA32_SEC_CORE_ENTRY_OFFSET     0xD
 
 //
-// Defines to calculate the FIT table
-//
-#define IPF_FIT_ADDRESS_OFFSET        0x20
-
-//
-// Defines to calculate the offset for SALE_ENTRY
-//
-#define IPF_SALE_ENTRY_ADDRESS_OFFSET 0x18
-
-//
 // Symbol file definitions, current max size if 512K
 //
 #define SYMBOL_FILE_SIZE              0x80000

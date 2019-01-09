@@ -486,7 +486,6 @@ ScanSections64 (
   mNtHdrOffset = mCoffOffset;
   switch (mEhdr->e_machine) {
   case EM_X86_64:
-  case EM_IA_64:
   case EM_AARCH64:
     mCoffOffset += sizeof (EFI_IMAGE_NT_HEADERS64);
   break;
@@ -691,10 +690,6 @@ ScanSections64 (
   switch (mEhdr->e_machine) {
   case EM_X86_64:
     NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_X64;
-    NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
-    break;
-  case EM_IA_64:
-    NtHdr->Pe32Plus.FileHeader.Machine = EFI_IMAGE_MACHINE_IPF;
     NtHdr->Pe32Plus.OptionalHeader.Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
     break;
   case EM_AARCH64:

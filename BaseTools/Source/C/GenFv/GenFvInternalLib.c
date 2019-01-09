@@ -905,15 +905,7 @@ Returns:
     fprintf (FvMapFile, "BaseAddress=0x%010llx, ", (unsigned long long) (ImageBaseAddress + Offset));
   }
 
-  if (FfsFile->Type != EFI_FV_FILETYPE_SECURITY_CORE && pImageContext->Machine == EFI_IMAGE_MACHINE_IA64) {
-    //
-    // Process IPF PLABEL to get the real address after the image has been rebased.
-    // PLABEL structure is got by AddressOfEntryPoint offset to ImageBuffer stored in pImageContext->Handle.
-    //
-    fprintf (FvMapFile, "EntryPoint=0x%010llx", (unsigned long long) (*(UINT64 *)((UINTN) pImageContext->Handle + (UINTN) AddressOfEntryPoint)));
-  } else {
-    fprintf (FvMapFile, "EntryPoint=0x%010llx", (unsigned long long) (ImageBaseAddress + AddressOfEntryPoint));
-  }
+  fprintf (FvMapFile, "EntryPoint=0x%010llx", (unsigned long long) (ImageBaseAddress + AddressOfEntryPoint));
   fprintf (FvMapFile, ")\n");
 
   fprintf (FvMapFile, "(GUID=%s", FileGuidName);
@@ -1541,7 +1533,6 @@ Returns:
   UINT16                    MachineType;
   EFI_PHYSICAL_ADDRESS      PeiCorePhysicalAddress;
   EFI_PHYSICAL_ADDRESS      SecCorePhysicalAddress;
-  EFI_PHYSICAL_ADDRESS      *SecCoreEntryAddressPtr;
   INT32                     Ia32SecEntryOffset;
   UINT32                    *Ia32ResetAddressPtr;
   UINT8                     *BytePointer;
@@ -1551,8 +1542,6 @@ Returns:
   UINT32                    IpiVector;
   UINTN                     Index;
   EFI_FFS_FILE_STATE        SavedState;
-  UINT64                    FitAddress;
-  FIT_TABLE                 *FitTablePtr;
   BOOLEAN                   Vtf0Detected;
   UINT32                    FfsHeaderSize;
   UINT32                    SecHeaderSize;
@@ -1692,62 +1681,7 @@ Returns:
     DebugMsg (NULL, 0, 9, "PeiCore physical entry point address", "Address = 0x%llX", (unsigned long long) PeiCorePhysicalAddress);
   }
 
-  if (MachineType == EFI_IMAGE_MACHINE_IA64) {
-    //
-    // Update PEI_CORE address
-    //
-    //
-    // Set the uncached attribute bit in the physical address
-    //
-    PeiCorePhysicalAddress |= 0x8000000000000000ULL;
-
-    //
-    // Check if address is aligned on a 16 byte boundary
-    //
-    if (PeiCorePhysicalAddress & 0xF) {
-      Error (NULL, 0, 3000, "Invalid",
-        "PEI_CORE entry point is not aligned on a 16 byte boundary, address specified is %llXh.",
-        (unsigned long long) PeiCorePhysicalAddress
-        );
-      return EFI_ABORTED;
-    }
-    //
-    // First Get the FIT table address
-    //
-    FitAddress  = (*(UINT64 *) (FvImage->Eof - IPF_FIT_ADDRESS_OFFSET)) & 0xFFFFFFFF;
-
-    FitTablePtr = (FIT_TABLE *) (FvImage->FileImage + (FitAddress - FvInfo->BaseAddress));
-
-    Status      = UpdatePeiCoreEntryInFit (FitTablePtr, PeiCorePhysicalAddress);
-
-    if (!EFI_ERROR (Status)) {
-      UpdateFitCheckSum (FitTablePtr);
-    }
-
-    //
-    // Update SEC_CORE address
-    //
-    //
-    // Set the uncached attribute bit in the physical address
-    //
-    SecCorePhysicalAddress |= 0x8000000000000000ULL;
-    //
-    // Check if address is aligned on a 16 byte boundary
-    //
-    if (SecCorePhysicalAddress & 0xF) {
-      Error (NULL, 0, 3000, "Invalid",
-        "SALE_ENTRY entry point is not aligned on a 16 byte boundary, address specified is %llXh.",
-        (unsigned long long) SecCorePhysicalAddress
-        );
-      return EFI_ABORTED;
-    }
-    //
-    // Update the address
-    //
-    SecCoreEntryAddressPtr  = (EFI_PHYSICAL_ADDRESS *) ((UINTN) FvImage->Eof - IPF_SALE_ENTRY_ADDRESS_OFFSET);
-    *SecCoreEntryAddressPtr = SecCorePhysicalAddress;
-
-  } else if (MachineType == EFI_IMAGE_MACHINE_IA32 || MachineType == EFI_IMAGE_MACHINE_X64) {
+if (MachineType == EFI_IMAGE_MACHINE_IA32 || MachineType == EFI_IMAGE_MACHINE_X64) {
     if (PeiCorePhysicalAddress != 0) {
       //
       // Get the location to update
@@ -2436,7 +2370,7 @@ Returns:
   //
   // Verify machine type is supported
   //
-  if ((*MachineType != EFI_IMAGE_MACHINE_IA32) && (*MachineType != EFI_IMAGE_MACHINE_IA64) && (*MachineType != EFI_IMAGE_MACHINE_X64) && (*MachineType != EFI_IMAGE_MACHINE_EBC) &&
+  if ((*MachineType != EFI_IMAGE_MACHINE_IA32) &&  (*MachineType != EFI_IMAGE_MACHINE_X64) && (*MachineType != EFI_IMAGE_MACHINE_EBC) &&
       (*MachineType != EFI_IMAGE_MACHINE_ARMT) && (*MachineType != EFI_IMAGE_MACHINE_AARCH64)) {
     Error (NULL, 0, 3000, "Invalid", "Unrecognized machine type in the PE32 file.");
     return EFI_UNSUPPORTED;

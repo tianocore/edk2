@@ -1014,7 +1014,7 @@ Returns:
   //
   // Update Image Base Address
   //
-  if ((ImgHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) && (ImgHdr->Pe32.FileHeader.Machine != IMAGE_FILE_MACHINE_IA64)) {
+  if ((ImgHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC)) {
     ImgHdr->Pe32.OptionalHeader.ImageBase = (UINT32) NewPe32BaseAddress;
   } else if (ImgHdr->Pe32Plus.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
     ImgHdr->Pe32Plus.OptionalHeader.ImageBase = NewPe32BaseAddress;
@@ -2180,7 +2180,7 @@ Returns:
   // Set new base address into image
   //
   if (mOutImageType == FW_REBASE_IMAGE || mOutImageType == FW_SET_ADDRESS_IMAGE) {
-    if ((PeHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC) && (PeHdr->Pe32.FileHeader.Machine != IMAGE_FILE_MACHINE_IA64)) {
+    if ((PeHdr->Pe32.OptionalHeader.Magic == EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC)) {
       if (NewBaseAddress >= 0x100000000ULL) {
         Error (NULL, 0, 3000, "Invalid", "New base address is larger than 4G for 32bit PE image");
         goto Finish;
@@ -2451,7 +2451,7 @@ Returns:
     // Zero the .pdata section for X64 machine and don't check the Debug Directory is empty
     // For Itaninum and X64 Image, remove .pdata section.
     //
-    if ((!KeepExceptionTableFlag && PeHdr->Pe32.FileHeader.Machine == IMAGE_FILE_MACHINE_X64) || PeHdr->Pe32.FileHeader.Machine == IMAGE_FILE_MACHINE_IA64) {
+    if ((!KeepExceptionTableFlag && PeHdr->Pe32.FileHeader.Machine == IMAGE_FILE_MACHINE_X64)) {
       if (Optional64->NumberOfRvaAndSizes > EFI_IMAGE_DIRECTORY_ENTRY_EXCEPTION &&
         Optional64->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_EXCEPTION].VirtualAddress != 0 &&
         Optional64->DataDirectory[EFI_IMAGE_DIRECTORY_ENTRY_EXCEPTION].Size != 0) {

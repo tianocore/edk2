@@ -56,13 +56,6 @@ PeCoffLoaderRelocateIa32Image (
   IN UINT64      Adjust
   );
 
-RETURN_STATUS
-PeCoffLoaderRelocateIpfImage (
-  IN UINT16      *Reloc,
-  IN OUT CHAR8   *Fixup,
-  IN OUT CHAR8   **FixupData,
-  IN UINT64      Adjust
-  );
 
 RETURN_STATUS
 PeCoffLoaderRelocateArmImage (
@@ -184,7 +177,6 @@ Returns:
   }
 
   if (ImageContext->Machine != EFI_IMAGE_MACHINE_IA32 && \
-      ImageContext->Machine != EFI_IMAGE_MACHINE_IA64 && \
       ImageContext->Machine != EFI_IMAGE_MACHINE_X64  && \
       ImageContext->Machine != EFI_IMAGE_MACHINE_ARMT && \
       ImageContext->Machine != EFI_IMAGE_MACHINE_EBC  && \
@@ -816,9 +808,6 @@ Returns:
         case EFI_IMAGE_MACHINE_ARMT:
           Status = PeCoffLoaderRelocateArmImage (&Reloc, Fixup, &FixupData, Adjust);
           break;
-        case EFI_IMAGE_MACHINE_IA64:
-          Status = PeCoffLoaderRelocateIpfImage (Reloc, Fixup, &FixupData, Adjust);
-          break;
         default:
           Status = RETURN_UNSUPPORTED;
           break;
@@ -1319,9 +1308,8 @@ PeCoffLoaderGetPdbPointer (
       Magic = EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC;
       break;
     case EFI_IMAGE_MACHINE_X64:
-    case EFI_IMAGE_MACHINE_IPF:
       //
-      // Assume PE32+ image with X64 or IPF Machine field
+      // Assume PE32+ image with X64 Machine field
       //
       Magic = EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC;
       break;

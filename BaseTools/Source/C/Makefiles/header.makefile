@@ -3,7 +3,6 @@
 # The makefile can be invoked with
 # HOST_ARCH = x86_64 or x64 for EM64T build
 # HOST_ARCH = ia32 or IA32 for IA32 build
-# HOST_ARCH = ia64 or IA64 for IA64 build
 # HOST_ARCH = Arm or ARM for ARM build
 #
 # Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>

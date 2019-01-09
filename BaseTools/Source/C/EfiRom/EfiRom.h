@@ -115,9 +115,8 @@ typedef struct {
 //
 static STRING_LOOKUP  mMachineTypes[] = {
   { EFI_IMAGE_MACHINE_IA32, "IA32" },
-  { EFI_IMAGE_MACHINE_IA64, "IA64" },
-  { EFI_IMAGE_MACHINE_EBC, "EBC" },
   { EFI_IMAGE_MACHINE_X64, "X64" },
+  { EFI_IMAGE_MACHINE_EBC, "EBC" },
   { EFI_IMAGE_MACHINE_ARMT, "ARM" },
   { EFI_IMAGE_MACHINE_AARCH64, "AA64" },
   { 0, NULL }
