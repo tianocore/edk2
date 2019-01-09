@@ -390,6 +390,7 @@
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   SmmMemLib|MdePkg/Library/SmmMemLib/SmmMemLib.inf
+  MmServicesTableLib|MdePkg/Library/MmServicesTableLib/MmServicesTableLib.inf
   SmmServicesTableLib|MdePkg/Library/SmmServicesTableLib/SmmServicesTableLib.inf
 !ifdef $(DEBUG_ON_SERIAL_PORT)
   DebugLib|MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
