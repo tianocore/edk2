@@ -12,6 +12,7 @@
   of size reduction when compiler optimization is disabled. If MDEPKG_NDEBUG is
   defined, then debug and assert related macros wrapped by it are the NULL implementations.
 
+Copyright (c) 2019, NVIDIA Corporation. All rights reserved.
 Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials are licensed and made available under
 the terms and conditions of the BSD License that accompanies this distribution.
@@ -1283,6 +1284,7 @@ AsciiPrintXY (
   ...
   );
 
+
 /**
   Installs and completes the initialization of a Driver Binding Protocol instance.
 
@@ -1312,6 +1314,25 @@ EfiLibInstallDriverBinding (
   IN CONST EFI_SYSTEM_TABLE       *SystemTable,
   IN EFI_DRIVER_BINDING_PROTOCOL  *DriverBinding,
   IN EFI_HANDLE                   DriverBindingHandle
+  );
+
+
+/**
+  Uninstalls a Driver Binding Protocol instance.
+
+  If DriverBinding is NULL, then ASSERT().
+  If DriverBinding can not be uninstalled, then ASSERT().
+
+  @param  DriverBinding        A Driver Binding Protocol instance that this driver produced.
+
+  @retval EFI_SUCCESS           The protocol uninstallation successfully completed.
+  @retval Others                Status from gBS->UninstallMultipleProtocolInterfaces().
+
+**/
+EFI_STATUS
+EFIAPI
+EfiLibUninstallDriverBinding (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *DriverBinding
   );
 
 
@@ -1354,6 +1375,31 @@ EfiLibInstallAllDriverProtocols (
   );
 
 
+/**
+  Uninstalls a Driver Binding Protocol instance and optionally uninstalls the
+  Component Name, Driver Configuration and Driver Diagnostics Protocols.
+
+  If DriverBinding is NULL, then ASSERT().
+  If the uninstallation fails, then ASSERT().
+
+  @param  DriverBinding        A Driver Binding Protocol instance that this driver produced.
+  @param  ComponentName        A Component Name Protocol instance that this driver produced.
+  @param  DriverConfiguration  A Driver Configuration Protocol instance that this driver produced.
+  @param  DriverDiagnostics    A Driver Diagnostics Protocol instance that this driver produced.
+
+  @retval EFI_SUCCESS           The protocol uninstallation successfully completed.
+  @retval Others                Status from gBS->UninstallMultipleProtocolInterfaces().
+
+**/
+EFI_STATUS
+EFIAPI
+EfiLibUninstallAllDriverProtocols (
+  IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration, OPTIONAL
+  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics    OPTIONAL
+  );
+
 
 /**
   Installs Driver Binding Protocol with optional Component Name and Component Name 2 Protocols.
@@ -1385,6 +1431,29 @@ EfiLibInstallDriverBindingComponentName2 (
   IN CONST EFI_SYSTEM_TABLE                   *SystemTable,
   IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
   IN EFI_HANDLE                               DriverBindingHandle,
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
+  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2       OPTIONAL
+  );
+
+
+/**
+  Uninstalls Driver Binding Protocol with optional Component Name and Component Name 2 Protocols.
+
+  If DriverBinding is NULL, then ASSERT().
+  If the uninstallation fails, then ASSERT().
+
+  @param  DriverBinding        A Driver Binding Protocol instance that this driver produced.
+  @param  ComponentName        A Component Name Protocol instance that this driver produced.
+  @param  ComponentName2       A Component Name 2 Protocol instance that this driver produced.
+
+  @retval EFI_SUCCESS           The protocol installation successfully completed.
+  @retval Others                Status from gBS->UninstallMultipleProtocolInterfaces().
+
+**/
+EFI_STATUS
+EFIAPI
+EfiLibUninstallDriverBindingComponentName2 (
+  IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
   IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,       OPTIONAL
   IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2       OPTIONAL
   );
@@ -1433,6 +1502,40 @@ EfiLibInstallAllDriverProtocols2 (
   IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics,    OPTIONAL
   IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2    OPTIONAL
   );
+
+
+/**
+  Uninstalls Driver Binding Protocol with optional Component Name, Component Name 2, Driver
+  Configuration, Driver Configuration 2, Driver Diagnostics, and Driver Diagnostics 2 Protocols.
+
+  If DriverBinding is NULL, then ASSERT().
+  If the installation fails, then ASSERT().
+
+
+  @param  DriverBinding         A Driver Binding Protocol instance that this driver produced.
+  @param  ComponentName         A Component Name Protocol instance that this driver produced.
+  @param  ComponentName2        A Component Name 2 Protocol instance that this driver produced.
+  @param  DriverConfiguration   A Driver Configuration Protocol instance that this driver produced.
+  @param  DriverConfiguration2  A Driver Configuration Protocol 2 instance that this driver produced.
+  @param  DriverDiagnostics     A Driver Diagnostics Protocol instance that this driver produced.
+  @param  DriverDiagnostics2    A Driver Diagnostics Protocol 2 instance that this driver produced.
+
+  @retval EFI_SUCCESS           The protocol uninstallation successfully completed.
+  @retval Others                Status from gBS->UninstallMultipleProtocolInterfaces().
+
+**/
+EFI_STATUS
+EFIAPI
+EfiLibUninstallAllDriverProtocols2 (
+  IN EFI_DRIVER_BINDING_PROTOCOL              *DriverBinding,
+  IN CONST EFI_COMPONENT_NAME_PROTOCOL        *ComponentName,        OPTIONAL
+  IN CONST EFI_COMPONENT_NAME2_PROTOCOL       *ComponentName2,       OPTIONAL
+  IN CONST EFI_DRIVER_CONFIGURATION_PROTOCOL  *DriverConfiguration,  OPTIONAL
+  IN CONST EFI_DRIVER_CONFIGURATION2_PROTOCOL *DriverConfiguration2, OPTIONAL
+  IN CONST EFI_DRIVER_DIAGNOSTICS_PROTOCOL    *DriverDiagnostics,    OPTIONAL
+  IN CONST EFI_DRIVER_DIAGNOSTICS2_PROTOCOL   *DriverDiagnostics2    OPTIONAL
+  );
+
 
 /**
   Appends a formatted Unicode string to a Null-terminated Unicode string
