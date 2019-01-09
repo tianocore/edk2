@@ -124,12 +124,12 @@ EmulatorPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/EmulatorPkg
 M: Jordan Justen <jordan.l.justen@intel.com>
 M: Andrew Fish <afish@apple.com>
-M: Ruiyu Ni <ruiyu.ni@intel.com>
+M: Ray Ni <ray.ni@intel.com>
 S: Maintained
 
 FatPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/Edk2-fat-driver
-M: Ruiyu Ni <ruiyu.ni@intel.com>
+M: Ray Ni <ray.ni@intel.com>
 T: svn - https://svn.code.sf.net/p/edk2-fatdriver2/code/trunk/EnhancedFat
 T: git - https://github.com/tianocore/edk2-FatPkg.git
 
@@ -173,7 +173,7 @@ R: Star Zeng <star.zeng@intel.com>
 
 IntelSiliconPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/IntelSiliconPkg
-M: Ruiyu Ni <ruiyu.ni@intel.com>
+M: Ray Ni <ray.ni@intel.com>
 M: Rangasai V Chaganty <rangasai.v.chaganty@intel.com>
 
 MdeModulePkg
@@ -182,7 +182,7 @@ M: Jian J Wang <jian.j.wang@intel.com>
 M: Hao Wu <hao.a.wu@intel.com>
 M: NetworkPkg maintainers
   (Universal/Network and related libraries, header files)
-R: Ruiyu Ni <ruiyu.ni@intel.com>
+R: Ray Ni <ray.ni@intel.com>
   (especially for Bus, Universal/Console, Universal/Disk,
    Universal/BdsDxe and related libraries, header files)
 R: Star Zeng <star.zeng@intel.com>
@@ -199,7 +199,7 @@ M: Jiaxin Wu <jiaxin.wu@intel.com>
 
 Nt32Pkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/Nt32Pkg
-M: Ruiyu Ni <ruiyu.ni@intel.com>
+M: Ray Ni <ray.ni@intel.com>
 M: Hao Wu <hao.a.wu@intel.com>
 
 Omap35xxPkg
@@ -209,7 +209,7 @@ M: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 OptionRomPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/OptionRomPkg
-M: Ruiyu Ni <ruiyu.ni@intel.com>
+M: Ray Ni <ray.ni@intel.com>
 
 OvmfPkg
 W: http://www.tianocore.org/ovmf/
@@ -222,7 +222,7 @@ S: Maintained
 
 PcAtChipsetPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/PcAtChipsetPkg
-M: Ruiyu Ni <ruiyu.ni@intel.com>
+M: Ray Ni <ray.ni@intel.com>
 
 QuarkPlatformPkg, QuarkSocPkg
 M: Michael D Kinney <michael.d.kinney@intel.com>
@@ -236,14 +236,14 @@ M: Jiewen Yao <jiewen.yao@intel.com>
 ShellBinPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
 M: Jaben Carsey <jaben.carsey@intel.com>      (Ia32/X64)
-M: Ruiyu Ni <ruiyu.ni@intel.com>          (Ia32/X64)
+M: Ray Ni <ray.ni@intel.com>          (Ia32/X64)
 M: Leif Lindholm <leif.lindholm@linaro.org>   (ARM/AArch64)
 M: Ard Biesheuvel <ard.biesheuvel@linaro.org> (ARM/AArch64)
 
 ShellPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/ShellPkg
 M: Jaben Carsey <jaben.carsey@intel.com>
-M: Ruiyu Ni <ruiyu.ni@intel.com>
+M: Ray Ni <ray.ni@intel.com>
 
 SignedCapsulePkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/SignedCapsulePkg
@@ -262,7 +262,7 @@ M: Jaben Carsey <jaben.carsey@intel.com>
 UefiCpuPkg
 W: https://github.com/tianocore/tianocore.github.io/wiki/UefiCpuPkg
 M: Eric Dong <eric.dong@intel.com>
-M: Ruiyu Ni <ruiyu.ni@intel.com>
+M: Ray Ni <ray.ni@intel.com>
 R: Laszlo Ersek <lersek@redhat.com>
 
 Vlv2DeviceRefCodePkg
