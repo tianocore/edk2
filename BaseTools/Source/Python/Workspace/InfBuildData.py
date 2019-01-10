@@ -21,6 +21,44 @@ from .MetaFileParser import *
 from collections import OrderedDict
 from Workspace.BuildClassObject import ModuleBuildClassObject, LibraryClassObject, PcdClassObject
 
+## Get Protocol value from given packages
+#
+#   @param      CName           The CName of the GUID
+#   @param      PackageList     List of packages looking-up in
+#   @param      Inffile         The driver file
+#
+#   @retval     GuidValue   if the CName is found in any given package
+#   @retval     None        if the CName is not found in all given packages
+#
+def _ProtocolValue(CName, PackageList, Inffile = None):
+    for P in PackageList:
+        ProtocolKeys = P.Protocols.keys()
+        if Inffile and P._PrivateProtocols:
+            if not Inffile.startswith(P.MetaFile.Dir):
+                ProtocolKeys = [x for x in P.Protocols if x not in P._PrivateProtocols]
+        if CName in ProtocolKeys:
+            return P.Protocols[CName]
+    return None
+
+## Get PPI value from given packages
+#
+#   @param      CName           The CName of the GUID
+#   @param      PackageList     List of packages looking-up in
+#   @param      Inffile         The driver file
+#
+#   @retval     GuidValue   if the CName is found in any given package
+#   @retval     None        if the CName is not found in all given packages
+#
+def _PpiValue(CName, PackageList, Inffile = None):
+    for P in PackageList:
+        PpiKeys = P.Ppis.keys()
+        if Inffile and P._PrivatePpis:
+            if not Inffile.startswith(P.MetaFile.Dir):
+                PpiKeys = [x for x in P.Ppis if x not in P._PrivatePpis]
+        if CName in PpiKeys:
+            return P.Ppis[CName]
+    return None
+
 ## Module build information from INF file
 #
 #  This class is used to retrieve information stored in database and convert them
@@ -566,7 +604,7 @@ class InfBuildData(ModuleBuildClassObject):
         RecordList = self._RawData[MODEL_EFI_PROTOCOL, self._Arch, self._Platform]
         for Record in RecordList:
             CName = Record[0]
-            Value = ProtocolValue(CName, self.Packages, self.MetaFile.Path)
+            Value = _ProtocolValue(CName, self.Packages, self.MetaFile.Path)
             if Value is None:
                 PackageList = "\n\t".join(str(P) for P in self.Packages)
                 EdkLogger.error('build', RESOURCE_NOT_AVAILABLE,
@@ -590,7 +628,7 @@ class InfBuildData(ModuleBuildClassObject):
         RecordList = self._RawData[MODEL_EFI_PPI, self._Arch, self._Platform]
         for Record in RecordList:
             CName = Record[0]
-            Value = PpiValue(CName, self.Packages, self.MetaFile.Path)
+            Value = _PpiValue(CName, self.Packages, self.MetaFile.Path)
             if Value is None:
                 PackageList = "\n\t".join(str(P) for P in self.Packages)
                 EdkLogger.error('build', RESOURCE_NOT_AVAILABLE,
@@ -762,9 +800,9 @@ class InfBuildData(ModuleBuildClassObject):
                         Value = Token
                     else:
                         # get the GUID value now
-                        Value = ProtocolValue(Token, self.Packages, self.MetaFile.Path)
+                        Value = _ProtocolValue(Token, self.Packages, self.MetaFile.Path)
                         if Value is None:
-                            Value = PpiValue(Token, self.Packages, self.MetaFile.Path)
+                            Value = _PpiValue(Token, self.Packages, self.MetaFile.Path)
                             if Value is None:
                                 Value = GuidValue(Token, self.Packages, self.MetaFile.Path)
 

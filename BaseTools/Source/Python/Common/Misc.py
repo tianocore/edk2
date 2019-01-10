@@ -611,44 +611,6 @@ def GuidValue(CName, PackageList, Inffile = None):
             return P.Guids[CName]
     return None
 
-## Get Protocol value from given packages
-#
-#   @param      CName           The CName of the GUID
-#   @param      PackageList     List of packages looking-up in
-#   @param      Inffile         The driver file
-#
-#   @retval     GuidValue   if the CName is found in any given package
-#   @retval     None        if the CName is not found in all given packages
-#
-def ProtocolValue(CName, PackageList, Inffile = None):
-    for P in PackageList:
-        ProtocolKeys = P.Protocols.keys()
-        if Inffile and P._PrivateProtocols:
-            if not Inffile.startswith(P.MetaFile.Dir):
-                ProtocolKeys = [x for x in P.Protocols if x not in P._PrivateProtocols]
-        if CName in ProtocolKeys:
-            return P.Protocols[CName]
-    return None
-
-## Get PPI value from given packages
-#
-#   @param      CName           The CName of the GUID
-#   @param      PackageList     List of packages looking-up in
-#   @param      Inffile         The driver file
-#
-#   @retval     GuidValue   if the CName is found in any given package
-#   @retval     None        if the CName is not found in all given packages
-#
-def PpiValue(CName, PackageList, Inffile = None):
-    for P in PackageList:
-        PpiKeys = P.Ppis.keys()
-        if Inffile and P._PrivatePpis:
-            if not Inffile.startswith(P.MetaFile.Dir):
-                PpiKeys = [x for x in P.Ppis if x not in P._PrivatePpis]
-        if CName in PpiKeys:
-            return P.Ppis[CName]
-    return None
-
 ## A string template class
 #
 #  This class implements a template for string replacement. A string template
