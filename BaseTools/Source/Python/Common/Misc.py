@@ -1,7 +1,7 @@
 ## @file
 # Common routines used by all tools
 #
-# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
 # which accompanies this distribution.  The full text of the license may be found at
@@ -1148,22 +1148,6 @@ class tdict:
             for Key in self.data:
                 keys |= self.data[Key].GetKeys(KeyIndex - 1)
             return keys
-
-def IsFieldValueAnArray (Value):
-    Value = Value.strip()
-    if Value.startswith(TAB_GUID) and Value.endswith(')'):
-        return True
-    if Value.startswith('L"') and Value.endswith('"')  and len(list(Value[2:-1])) > 1:
-        return True
-    if Value[0] == '"' and Value[-1] == '"' and len(list(Value[1:-1])) > 1:
-        return True
-    if Value[0] == '{' and Value[-1] == '}':
-        return True
-    if Value.startswith("L'") and Value.endswith("'") and len(list(Value[2:-1])) > 1:
-        return True
-    if Value[0] == "'" and Value[-1] == "'" and len(list(Value[1:-1])) > 1:
-        return True
-    return False
 
 def AnalyzePcdExpression(Setting):
     RanStr = ''.join(sample(string.ascii_letters + string.digits, 8))

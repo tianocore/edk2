@@ -1,7 +1,7 @@
 ## @file
 # This file is used to create a database used by build tool
 #
-# Copyright (c) 2008 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2008 - 2019, Intel Corporation. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -43,6 +43,22 @@ from Common.Misc import SaveFileOnChange
 from Workspace.BuildClassObject import PlatformBuildClassObject, StructurePcd, PcdClassObject, ModuleBuildClassObject
 from collections import OrderedDict, defaultdict
 from .BuildClassObject import ArrayIndex
+
+def _IsFieldValueAnArray (Value):
+    Value = Value.strip()
+    if Value.startswith(TAB_GUID) and Value.endswith(')'):
+        return True
+    if Value.startswith('L"') and Value.endswith('"')  and len(list(Value[2:-1])) > 1:
+        return True
+    if Value[0] == '"' and Value[-1] == '"' and len(list(Value[1:-1])) > 1:
+        return True
+    if Value[0] == '{' and Value[-1] == '}':
+        return True
+    if Value.startswith("L'") and Value.endswith("'") and len(list(Value[2:-1])) > 1:
+        return True
+    if Value[0] == "'" and Value[-1] == "'" and len(list(Value[1:-1])) > 1:
+        return True
+    return False
 
 PcdValueInitName = 'PcdValueInit'
 
@@ -1107,7 +1123,7 @@ class DscBuildData(PlatformBuildClassObject):
             IsArray = False
             TokenCName += '.' + FieldName
         if PcdValue.startswith('H'):
-            if FieldName and IsFieldValueAnArray(PcdValue[1:]):
+            if FieldName and _IsFieldValueAnArray(PcdValue[1:]):
                 PcdDatumType = TAB_VOID
                 IsArray = True
             if FieldName and not IsArray:
@@ -1118,7 +1134,7 @@ class DscBuildData(PlatformBuildClassObject):
                 EdkLogger.error('Parser', FORMAT_INVALID, 'PCD [%s.%s] Value "%s",  %s' %
                                 (TokenSpaceGuidCName, TokenCName, PcdValue, Value))
         elif PcdValue.startswith("L'") or PcdValue.startswith("'"):
-            if FieldName and IsFieldValueAnArray(PcdValue):
+            if FieldName and _IsFieldValueAnArray(PcdValue):
                 PcdDatumType = TAB_VOID
                 IsArray = True
             if FieldName and not IsArray:
@@ -1130,7 +1146,7 @@ class DscBuildData(PlatformBuildClassObject):
                                 (TokenSpaceGuidCName, TokenCName, PcdValue, Value))
         elif PcdValue.startswith('L'):
             PcdValue = 'L"' + PcdValue[1:] + '"'
-            if FieldName and IsFieldValueAnArray(PcdValue):
+            if FieldName and _IsFieldValueAnArray(PcdValue):
                 PcdDatumType = TAB_VOID
                 IsArray = True
             if FieldName and not IsArray:
@@ -1159,7 +1175,7 @@ class DscBuildData(PlatformBuildClassObject):
                     Num = int(PcdValue, Base)
                 except:
                     PcdValue = '"' + PcdValue + '"'
-                if IsFieldValueAnArray(PcdValue):
+                if _IsFieldValueAnArray(PcdValue):
                     PcdDatumType = TAB_VOID
                     IsArray = True
                 if not IsArray:
@@ -1764,7 +1780,7 @@ class DscBuildData(PlatformBuildClassObject):
                 continue
             for FieldName in FieldList:
                 FieldName = "." + FieldName
-                IsArray = IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
+                IsArray = _IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
                 if IsArray and not (FieldList[FieldName.strip(".")][0].startswith('{GUID') and FieldList[FieldName.strip(".")][0].endswith('}')):
                     try:
                         Value = ValueExpressionEx(FieldList[FieldName.strip(".")][0], TAB_VOID, self._GuidDict)(True)
@@ -1795,7 +1811,7 @@ class DscBuildData(PlatformBuildClassObject):
                             continue
                         for FieldName in FieldList:
                             FieldName = "." + FieldName
-                            IsArray = IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
+                            IsArray = _IsFieldValueAnArray(FieldList[FieldName.strip(".")][0])
                             if IsArray and not (FieldList[FieldName.strip(".")][0].startswith('{GUID') and FieldList[FieldName.strip(".")][0].endswith('}')):
                                 try:
                                     Value = ValueExpressionEx(FieldList[FieldName.strip(".")][0], TAB_VOID, self._GuidDict)(True)
@@ -1819,7 +1835,7 @@ class DscBuildData(PlatformBuildClassObject):
             CApp = CApp + "// From fdf \n"
         for FieldName in Pcd.PcdFieldValueFromFdf:
             FieldName = "." + FieldName
-            IsArray = IsFieldValueAnArray(Pcd.PcdFieldValueFromFdf[FieldName.strip(".")][0])
+            IsArray = _IsFieldValueAnArray(Pcd.PcdFieldValueFromFdf[FieldName.strip(".")][0])
             if IsArray and not (Pcd.PcdFieldValueFromFdf[FieldName.strip(".")][0].startswith('{GUID') and Pcd.PcdFieldValueFromFdf[FieldName.strip(".")][0].endswith('}')):
                 try:
                     Value = ValueExpressionEx(Pcd.PcdFieldValueFromFdf[FieldName.strip(".")][0], TAB_VOID, self._GuidDict)(True)
@@ -1843,7 +1859,7 @@ class DscBuildData(PlatformBuildClassObject):
             CApp = CApp + "// From Command Line \n"
         for FieldName in Pcd.PcdFieldValueFromComm:
             FieldName = "." + FieldName
-            IsArray = IsFieldValueAnArray(Pcd.PcdFieldValueFromComm[FieldName.strip(".")][0])
+            IsArray = _IsFieldValueAnArray(Pcd.PcdFieldValueFromComm[FieldName.strip(".")][0])
             if IsArray and not (Pcd.PcdFieldValueFromComm[FieldName.strip(".")][0].startswith('{GUID') and Pcd.PcdFieldValueFromComm[FieldName.strip(".")][0].endswith('}')):
                 try:
                     Value = ValueExpressionEx(Pcd.PcdFieldValueFromComm[FieldName.strip(".")][0], TAB_VOID, self._GuidDict)(True)
@@ -1945,7 +1961,7 @@ class DscBuildData(PlatformBuildClassObject):
         CApp = CApp + '  UINT32  FieldSize;\n'
         CApp = CApp + '  CHAR8   *Value;\n'
         DefaultValueFromDec = Pcd.DefaultValueFromDec
-        IsArray = IsFieldValueAnArray(Pcd.DefaultValueFromDec)
+        IsArray = _IsFieldValueAnArray(Pcd.DefaultValueFromDec)
         if IsArray:
             try:
                 DefaultValueFromDec = ValueExpressionEx(Pcd.DefaultValueFromDec, TAB_VOID)(True)
@@ -1970,7 +1986,7 @@ class DscBuildData(PlatformBuildClassObject):
             if not FieldList:
                 continue
             for FieldName in FieldList:
-                IsArray = IsFieldValueAnArray(FieldList[FieldName][0])
+                IsArray = _IsFieldValueAnArray(FieldList[FieldName][0])
                 if IsArray:
                     try:
                         FieldList[FieldName][0] = ValueExpressionEx(FieldList[FieldName][0], TAB_VOID, self._GuidDict)(True)
@@ -2034,7 +2050,7 @@ class DscBuildData(PlatformBuildClassObject):
         pcddefaultvalue = self.GetPcdDscRawDefaultValue(Pcd, SkuName, DefaultStoreName)
         if pcddefaultvalue:
             FieldList = pcddefaultvalue
-            IsArray = IsFieldValueAnArray(FieldList)
+            IsArray = _IsFieldValueAnArray(FieldList)
             if IsArray:
                 if "{CODE(" not in FieldList:
                     try:
@@ -2085,7 +2101,7 @@ class DscBuildData(PlatformBuildClassObject):
             if (SkuName, DefaultStoreName) == (TAB_DEFAULT, TAB_DEFAULT_STORES_DEFAULT) or (( (SkuName, '') not in Pcd.ValueChain) and ( (SkuName, DefaultStoreName) not in Pcd.ValueChain )):
                 for FieldName in FieldList:
                     indicator = self.GetIndicator(index, FieldName,Pcd)
-                    IsArray = IsFieldValueAnArray(FieldList[FieldName][0])
+                    IsArray = _IsFieldValueAnArray(FieldList[FieldName][0])
                     if IsArray:
                         try:
                             FieldList[FieldName][0] = ValueExpressionEx(FieldList[FieldName][0], TAB_VOID, self._GuidDict)(True)
@@ -2134,7 +2150,7 @@ class DscBuildData(PlatformBuildClassObject):
             if not FieldList:
                 continue
             if pcddefaultvalue and FieldList == pcddefaultvalue:
-                IsArray = IsFieldValueAnArray(FieldList)
+                IsArray = _IsFieldValueAnArray(FieldList)
                 if IsArray:
                     try:
                         FieldList = ValueExpressionEx(FieldList, TAB_VOID)(True)
@@ -2153,7 +2169,7 @@ class DscBuildData(PlatformBuildClassObject):
                     CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
                 continue
             for FieldName in FieldList:
-                IsArray = IsFieldValueAnArray(FieldList[FieldName][0])
+                IsArray = _IsFieldValueAnArray(FieldList[FieldName][0])
                 if IsArray:
                     try:
                         FieldList[FieldName][0] = ValueExpressionEx(FieldList[FieldName][0], TAB_VOID, self._GuidDict)(True)
@@ -2202,7 +2218,7 @@ class DscBuildData(PlatformBuildClassObject):
             if not FieldList:
                 continue
             if pcddefaultvalue and FieldList == pcddefaultvalue:
-                IsArray = IsFieldValueAnArray(FieldList)
+                IsArray = _IsFieldValueAnArray(FieldList)
                 if IsArray:
                     try:
                         FieldList = ValueExpressionEx(FieldList, TAB_VOID)(True)
@@ -2221,7 +2237,7 @@ class DscBuildData(PlatformBuildClassObject):
                     CApp = CApp + '  memcpy (Pcd, Value, %d);\n' % (ValueSize)
                 continue
             for FieldName in FieldList:
-                IsArray = IsFieldValueAnArray(FieldList[FieldName][0])
+                IsArray = _IsFieldValueAnArray(FieldList[FieldName][0])
                 if IsArray:
                     try:
                         FieldList[FieldName][0] = ValueExpressionEx(FieldList[FieldName][0], TAB_VOID, self._GuidDict)(True)
