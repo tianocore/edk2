@@ -1512,35 +1512,6 @@ def CheckPcdDatum(Type, Value):
 
     return True, ""
 
-## Split command line option string to list
-#
-# subprocess.Popen needs the args to be a sequence. Otherwise there's problem
-# in non-windows platform to launch command
-#
-def SplitOption(OptionString):
-    OptionList = []
-    LastChar = " "
-    OptionStart = 0
-    QuotationMark = ""
-    for Index in range(0, len(OptionString)):
-        CurrentChar = OptionString[Index]
-        if CurrentChar in ['"', "'"]:
-            if QuotationMark == CurrentChar:
-                QuotationMark = ""
-            elif QuotationMark == "":
-                QuotationMark = CurrentChar
-            continue
-        elif QuotationMark:
-            continue
-
-        if CurrentChar in ["/", "-"] and LastChar in [" ", "\t", "\r", "\n"]:
-            if Index > OptionStart:
-                OptionList.append(OptionString[OptionStart:Index - 1])
-            OptionStart = Index
-        LastChar = CurrentChar
-    OptionList.append(OptionString[OptionStart:])
-    return OptionList
-
 def CommonPath(PathList):
     P1 = min(PathList).split(os.path.sep)
     P2 = max(PathList).split(os.path.sep)
@@ -1548,45 +1519,6 @@ def CommonPath(PathList):
         if P1[Index] != P2[Index]:
             return os.path.sep.join(P1[:Index])
     return os.path.sep.join(P1)
-
-#
-# Convert string to C format array
-#
-def ConvertStringToByteArray(Value):
-    Value = Value.strip()
-    if not Value:
-        return None
-    if Value[0] == '{':
-        if not Value.endswith('}'):
-            return None
-        Value = Value.replace(' ', '').replace('{', '').replace('}', '')
-        ValFields = Value.split(',')
-        try:
-            for Index in range(len(ValFields)):
-                ValFields[Index] = str(int(ValFields[Index], 0))
-        except ValueError:
-            return None
-        Value = '{' + ','.join(ValFields) + '}'
-        return Value
-
-    Unicode = False
-    if Value.startswith('L"'):
-        if not Value.endswith('"'):
-            return None
-        Value = Value[1:]
-        Unicode = True
-    elif not Value.startswith('"') or not Value.endswith('"'):
-        return None
-
-    Value = eval(Value)         # translate escape character
-    NewValue = '{'
-    for Index in range(0, len(Value)):
-        if Unicode:
-            NewValue = NewValue + str(ord(Value[Index]) % 0x10000) + ','
-        else:
-            NewValue = NewValue + str(ord(Value[Index]) % 0x100) + ','
-    Value = NewValue + '0}'
-    return Value
 
 class PathClass(object):
     def __init__(self, File='', Root='', AlterRoot='', Type='', IsBinary=False,

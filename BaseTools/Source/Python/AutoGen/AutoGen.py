@@ -31,7 +31,7 @@ from io import BytesIO
 
 from .StrGather import *
 from .BuildEngine import BuildRule
-
+import shutil
 from Common.LongFilePathSupport import CopyLongFilePath
 from Common.BuildToolError import *
 from Common.DataType import *
@@ -171,6 +171,73 @@ ${tail_comments}
 ## @AsBuilt${BEGIN}
 ##   ${flags_item}${END}
 """)
+## Split command line option string to list
+#
+# subprocess.Popen needs the args to be a sequence. Otherwise there's problem
+# in non-windows platform to launch command
+#
+def _SplitOption(OptionString):
+    OptionList = []
+    LastChar = " "
+    OptionStart = 0
+    QuotationMark = ""
+    for Index in range(0, len(OptionString)):
+        CurrentChar = OptionString[Index]
+        if CurrentChar in ['"', "'"]:
+            if QuotationMark == CurrentChar:
+                QuotationMark = ""
+            elif QuotationMark == "":
+                QuotationMark = CurrentChar
+            continue
+        elif QuotationMark:
+            continue
+
+        if CurrentChar in ["/", "-"] and LastChar in [" ", "\t", "\r", "\n"]:
+            if Index > OptionStart:
+                OptionList.append(OptionString[OptionStart:Index - 1])
+            OptionStart = Index
+        LastChar = CurrentChar
+    OptionList.append(OptionString[OptionStart:])
+    return OptionList
+
+#
+# Convert string to C format array
+#
+def _ConvertStringToByteArray(Value):
+    Value = Value.strip()
+    if not Value:
+        return None
+    if Value[0] == '{':
+        if not Value.endswith('}'):
+            return None
+        Value = Value.replace(' ', '').replace('{', '').replace('}', '')
+        ValFields = Value.split(',')
+        try:
+            for Index in range(len(ValFields)):
+                ValFields[Index] = str(int(ValFields[Index], 0))
+        except ValueError:
+            return None
+        Value = '{' + ','.join(ValFields) + '}'
+        return Value
+
+    Unicode = False
+    if Value.startswith('L"'):
+        if not Value.endswith('"'):
+            return None
+        Value = Value[1:]
+        Unicode = True
+    elif not Value.startswith('"') or not Value.endswith('"'):
+        return None
+
+    Value = eval(Value)         # translate escape character
+    NewValue = '{'
+    for Index in range(0, len(Value)):
+        if Unicode:
+            NewValue = NewValue + str(ord(Value[Index]) % 0x10000) + ','
+        else:
+            NewValue = NewValue + str(ord(Value[Index]) % 0x100) + ','
+    Value = NewValue + '0}'
+    return Value
 
 ## Base class for AutoGen
 #
@@ -1769,11 +1836,11 @@ class PlatformAutoGen(AutoGen):
     def BuildCommand(self):
         RetVal = []
         if "MAKE" in self.ToolDefinition and "PATH" in self.ToolDefinition["MAKE"]:
-            RetVal += SplitOption(self.ToolDefinition["MAKE"]["PATH"])
+            RetVal += _SplitOption(self.ToolDefinition["MAKE"]["PATH"])
             if "FLAGS" in self.ToolDefinition["MAKE"]:
                 NewOption = self.ToolDefinition["MAKE"]["FLAGS"].strip()
                 if NewOption != '':
-                    RetVal += SplitOption(NewOption)
+                    RetVal += _SplitOption(NewOption)
             if "MAKE" in self.EdkIIBuildOption:
                 if "FLAGS" in self.EdkIIBuildOption["MAKE"]:
                     Flags = self.EdkIIBuildOption["MAKE"]["FLAGS"]
@@ -3417,7 +3484,7 @@ class ModuleAutoGen(AutoGen):
                 Guid = gEfiVarStoreGuidPattern.search(Content, Pos)
                 if not Guid:
                     break
-                NameArray = ConvertStringToByteArray('L"' + Name.group(1) + '"')
+                NameArray = _ConvertStringToByteArray('L"' + Name.group(1) + '"')
                 NameGuids.add((NameArray, GuidStructureStringToGuidString(Guid.group(1))))
                 Pos = Content.find('efivarstore', Name.end())
         if not NameGuids:
@@ -3430,7 +3497,7 @@ class ModuleAutoGen(AutoGen):
                 Value = GuidValue(SkuInfo.VariableGuid, self.PlatformInfo.PackageList, self.MetaFile.Path)
                 if not Value:
                     continue
-                Name = ConvertStringToByteArray(SkuInfo.VariableName)
+                Name = _ConvertStringToByteArray(SkuInfo.VariableName)
                 Guid = GuidStructureStringToGuidString(Value)
                 if (Name, Guid) in NameGuids and Pcd not in HiiExPcds:
                     HiiExPcds.append(Pcd)
