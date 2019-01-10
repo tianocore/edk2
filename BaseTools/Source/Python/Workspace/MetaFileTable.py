@@ -76,7 +76,7 @@ class MetaFileTable():
         self.CurrentContent.append(self._DUMMY_)
 
     def GetAll(self):
-        return [item for item in self.CurrentContent if item[0] >= 0 ]
+        return [item for item in self.CurrentContent if item[0] >= 0 and item[-1]>=0]
 
 ## Python class representation of table storing module data
 class ModuleTable(MetaFileTable):
@@ -373,7 +373,6 @@ class PlatformTable(MetaFileTable):
 
         QueryTab = self.CurrentContent
         result = [item for item in QueryTab if item[1] == Model and item[-1]>0 ]
-
         if Scope1 is not None and Scope1 != TAB_ARCH_COMMON:
             Sc1 = set(['COMMON'])
             Sc1.add(Scope1)
@@ -397,6 +396,10 @@ class PlatformTable(MetaFileTable):
         result = [ [r[2],r[3],r[4],r[5],r[6],r[7],r[0],r[9]] for r in result ]
         return result
 
+    def DisableComponent(self,comp_id):
+        for item in self.CurrentContent:
+            if item[0] == comp_id or item[8] == comp_id:
+                item[-1] = -1
 
 ## Factory class to produce different storage for different type of meta-file
 class MetaFileStorage(object):

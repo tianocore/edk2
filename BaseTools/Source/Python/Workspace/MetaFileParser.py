@@ -1697,6 +1697,11 @@ class DscParser(MetaFileParser):
         self._ValueList = [ReplaceMacro(Value, self._Macros, RaiseError=False)
                            for Value in self._ValueList]
 
+    def DisableOverrideComponent(self,module_id):
+        for ori_id in self._IdMapping:
+            if self._IdMapping[ori_id] == module_id:
+                self._RawTable.DisableComponent(ori_id)
+
     _SectionParser = {
         MODEL_META_DATA_HEADER                          :   _DefineParser,
         MODEL_EFI_SKU_ID                                :   _SkuIdParser,

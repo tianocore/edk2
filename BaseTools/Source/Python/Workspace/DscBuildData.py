@@ -706,18 +706,30 @@ class DscBuildData(PlatformBuildClassObject):
             GlobalData.gDefaultStores = sorted(self.DefaultStores.keys())
         return self.DefaultStores
 
+    def OverrideDuplicateModule(self):
+        RecordList = self._RawData[MODEL_META_DATA_COMPONENT, self._Arch]
+        Macros = self._Macros
+        Macros["EDK_SOURCE"] = GlobalData.gEcpSource
+        Components = {}
+        for Record in RecordList:
+            ModuleId = Record[6]
+            file_guid = self._RawData[MODEL_META_DATA_HEADER, self._Arch, None, ModuleId]
+            file_guid_str = file_guid[0][2] if file_guid else "NULL"
+            ModuleFile = PathClass(NormPath(Record[0], Macros), GlobalData.gWorkspace, Arch=self._Arch)
+            if self._Arch != TAB_ARCH_COMMON and (file_guid_str,str(ModuleFile)) in Components:
+                self._RawData.DisableOverrideComponent(Components[(file_guid_str,str(ModuleFile))])
+            Components[(file_guid_str,str(ModuleFile))] = ModuleId
+        self._RawData._PostProcessed = False
     ## Retrieve [Components] section information
     @property
     def Modules(self):
         if self._Modules is not None:
             return self._Modules
-
+        self.OverrideDuplicateModule()
         self._Modules = OrderedDict()
         RecordList = self._RawData[MODEL_META_DATA_COMPONENT, self._Arch]
         Macros = self._Macros
         for Record in RecordList:
-            DuplicatedFile = False
-
             ModuleFile = PathClass(NormPath(Record[0], Macros), GlobalData.gWorkspace, Arch=self._Arch)
             ModuleId = Record[6]
             LineNo = Record[7]
@@ -727,10 +739,6 @@ class DscBuildData(PlatformBuildClassObject):
             if ErrorCode != 0:
                 EdkLogger.error('build', ErrorCode, File=self.MetaFile, Line=LineNo,
                                 ExtraData=ErrorInfo)
-            # Check duplication
-            # If arch is COMMON, no duplicate module is checked since all modules in all component sections are selected
-            if self._Arch != TAB_ARCH_COMMON and ModuleFile in self._Modules:
-                DuplicatedFile = True
 
             Module = ModuleBuildClassObject()
             Module.MetaFile = ModuleFile
@@ -793,8 +801,6 @@ class DscBuildData(PlatformBuildClassObject):
                     Module.BuildOptions[ToolChainFamily, ToolChain] = OptionString + " " + Option
 
             RecordList = self._RawData[MODEL_META_DATA_HEADER, self._Arch, None, ModuleId]
-            if DuplicatedFile and not RecordList:
-                EdkLogger.error('build', FILE_DUPLICATED, File=self.MetaFile, ExtraData=str(ModuleFile), Line=LineNo)
             if RecordList:
                 if len(RecordList) != 1:
                     EdkLogger.error('build', OPTION_UNKNOWN, 'Only FILE_GUID can be listed in <Defines> section.',
