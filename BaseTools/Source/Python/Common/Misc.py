@@ -487,43 +487,6 @@ def SaveFileOnChange(File, Content, IsBinaryFile=True):
 
     return True
 
-## Make a Python object persistent on file system
-#
-#   @param      Data    The object to be stored in file
-#   @param      File    The path of file to store the object
-#
-def DataDump(Data, File):
-    Fd = None
-    try:
-        Fd = open(File, 'wb')
-        pickle.dump(Data, Fd, pickle.HIGHEST_PROTOCOL)
-    except:
-        EdkLogger.error("", FILE_OPEN_FAILURE, ExtraData=File, RaiseError=False)
-    finally:
-        if Fd is not None:
-            Fd.close()
-
-## Restore a Python object from a file
-#
-#   @param      File    The path of file stored the object
-#
-#   @retval     object  A python object
-#   @retval     None    If failure in file operation
-#
-def DataRestore(File):
-    Data = None
-    Fd = None
-    try:
-        Fd = open(File, 'rb')
-        Data = pickle.load(Fd)
-    except Exception as e:
-        EdkLogger.verbose("Failed to load [%s]\n\t%s" % (File, str(e)))
-        Data = None
-    finally:
-        if Fd is not None:
-            Fd.close()
-    return Data
-
 ## Retrieve and cache the real path name in file system
 #
 #   @param      Root    The root directory of path relative to

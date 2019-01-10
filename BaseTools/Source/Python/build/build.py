@@ -32,6 +32,7 @@ import multiprocessing
 
 from struct import *
 from threading import *
+import threading
 from optparse import OptionParser
 from subprocess import *
 from Common import Misc as Utils
@@ -70,6 +71,43 @@ gToolsDefinition = "tools_def.txt"
 
 TemporaryTablePattern = re.compile(r'^_\d+_\d+_[a-fA-F0-9]+$')
 TmpTableDict = {}
+
+## Make a Python object persistent on file system
+#
+#   @param      Data    The object to be stored in file
+#   @param      File    The path of file to store the object
+#
+def _DataDump(Data, File):
+    Fd = None
+    try:
+        Fd = open(File, 'wb')
+        pickle.dump(Data, Fd, pickle.HIGHEST_PROTOCOL)
+    except:
+        EdkLogger.error("", FILE_OPEN_FAILURE, ExtraData=File, RaiseError=False)
+    finally:
+        if Fd is not None:
+            Fd.close()
+
+## Restore a Python object from a file
+#
+#   @param      File    The path of file stored the object
+#
+#   @retval     object  A python object
+#   @retval     None    If failure in file operation
+#
+def _DataRestore(File):
+    Data = None
+    Fd = None
+    try:
+        Fd = open(File, 'rb')
+        Data = pickle.load(Fd)
+    except Exception as e:
+        EdkLogger.verbose("Failed to load [%s]\n\t%s" % (File, str(e)))
+        Data = None
+    finally:
+        if Fd is not None:
+            Fd.close()
+    return Data
 
 ## Check environment PATH variable to make sure the specified tool is found
 #
@@ -2163,19 +2201,19 @@ class Build():
     def DumpBuildData(self):
         CacheDirectory = os.path.dirname(GlobalData.gDatabasePath)
         Utils.CreateDirectory(CacheDirectory)
-        Utils.DataDump(Utils.gFileTimeStampCache, os.path.join(CacheDirectory, "gFileTimeStampCache"))
-        Utils.DataDump(Utils.gDependencyDatabase, os.path.join(CacheDirectory, "gDependencyDatabase"))
+        Utils._DataDump(Utils.gFileTimeStampCache, os.path.join(CacheDirectory, "gFileTimeStampCache"))
+        Utils._DataDump(Utils.gDependencyDatabase, os.path.join(CacheDirectory, "gDependencyDatabase"))
 
     def RestoreBuildData(self):
         FilePath = os.path.join(os.path.dirname(GlobalData.gDatabasePath), "gFileTimeStampCache")
         if Utils.gFileTimeStampCache == {} and os.path.isfile(FilePath):
-            Utils.gFileTimeStampCache = Utils.DataRestore(FilePath)
+            Utils.gFileTimeStampCache = Utils._DataRestore(FilePath)
             if Utils.gFileTimeStampCache is None:
                 Utils.gFileTimeStampCache = {}
 
         FilePath = os.path.join(os.path.dirname(GlobalData.gDatabasePath), "gDependencyDatabase")
         if Utils.gDependencyDatabase == {} and os.path.isfile(FilePath):
-            Utils.gDependencyDatabase = Utils.DataRestore(FilePath)
+            Utils.gDependencyDatabase = Utils._DataRestore(FilePath)
             if Utils.gDependencyDatabase is None:
                 Utils.gDependencyDatabase = {}
 
