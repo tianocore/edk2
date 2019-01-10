@@ -103,12 +103,12 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdPciDegradeResourceForOptionRom  ## CONSUMES
 
 [Pcd]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize         ## SOMETIMES_CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport                ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport                  ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport                ## CONSUMES
-  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration    ## SOMETIMES_CONSUMES
-  gCpPlatTokenSpaceGuid.PcdUefiOptimizedBootEx
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize                 ## SOMETIMES_CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport                        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport                          ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdRootPortAbortsNonZeroNonAriDevices  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport                        ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdPciDisableBusEnumeration            ## SOMETIMES_CONSUMES
 
 [UserExtensions.TianoCore."ExtraFiles"]
   PciBusDxeExtra.uni
