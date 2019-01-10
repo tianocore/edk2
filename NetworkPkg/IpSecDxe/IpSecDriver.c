@@ -631,16 +631,11 @@ IpSecDriverEntryPoint (
   return Status;
 
 ON_UNINSTALL_IPSEC4_DB:
-  gBS->UninstallMultipleProtocolInterfaces (
-         ImageHandle,
-         &gEfiDriverBindingProtocolGuid,
-         &gIpSec4DriverBinding,
-         &gEfiComponentName2ProtocolGuid,
-         &gIpSecComponentName2,
-         &gEfiComponentNameProtocolGuid,
-         &gIpSecComponentName,
-         NULL
-         );
+  EfiLibUninstallDriverBindingComponentName2 (
+    &gIpSec4DriverBinding,
+    &gIpSecComponentName,
+    &gIpSecComponentName2
+    );
 
 ON_UNINSTALL_IPSEC:
   gBS->UninstallProtocolInterface (

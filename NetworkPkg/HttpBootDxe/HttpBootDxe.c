@@ -1327,16 +1327,11 @@ HttpBootDxeDriverEntryPoint (
              &gHttpBootDxeComponentName2
              );
   if (EFI_ERROR (Status)) {
-    gBS->UninstallMultipleProtocolInterfaces(
-           ImageHandle,
-           &gEfiDriverBindingProtocolGuid,
-           &gHttpBootIp4DxeDriverBinding,
-           &gEfiComponentName2ProtocolGuid,
-           &gHttpBootDxeComponentName2,
-           &gEfiComponentNameProtocolGuid,
-           &gHttpBootDxeComponentName,
-           NULL
-           );
+    EfiLibUninstallDriverBindingComponentName2(
+      &gHttpBootIp4DxeDriverBinding,
+      &gHttpBootDxeComponentName,
+      &gHttpBootDxeComponentName2
+      );
   }
   return Status;
 }

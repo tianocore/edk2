@@ -510,28 +510,18 @@ DnsDriverEntryPoint (
     FreePool (mDriverData);
 
   Error2:
-     gBS->UninstallMultipleProtocolInterfaces (
-           gDns6DriverBinding.DriverBindingHandle,
-           &gEfiDriverBindingProtocolGuid,
-           &gDns6DriverBinding,
-           &gEfiComponentName2ProtocolGuid,
-           &gDnsComponentName2,
-           &gEfiComponentNameProtocolGuid,
-           &gDnsComponentName,
-           NULL
-           );
+     EfiLibUninstallDriverBindingComponentName2 (
+       &gDns6DriverBinding,
+       &gDnsComponentName,
+       &gDnsComponentName2
+       );
 
   Error1:
-    gBS->UninstallMultipleProtocolInterfaces (
-           ImageHandle,
-           &gEfiDriverBindingProtocolGuid,
-           &gDns4DriverBinding,
-           &gEfiComponentName2ProtocolGuid,
-           &gDnsComponentName2,
-           &gEfiComponentNameProtocolGuid,
-           &gDnsComponentName,
-           NULL
-           );
+    EfiLibUninstallDriverBindingComponentName2 (
+      &gDns4DriverBinding,
+      &gDnsComponentName,
+      &gDnsComponentName2
+      );
 
   return Status;
 }

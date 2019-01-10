@@ -202,16 +202,11 @@ TcpDriverEntryPoint (
              &gTcpComponentName2
              );
   if (EFI_ERROR (Status)) {
-    gBS->UninstallMultipleProtocolInterfaces (
-           ImageHandle,
-           &gEfiDriverBindingProtocolGuid,
-           &gTcp4DriverBinding,
-           &gEfiComponentName2ProtocolGuid,
-           &gTcpComponentName2,
-           &gEfiComponentNameProtocolGuid,
-           &gTcpComponentName,
-           NULL
-           );
+    EfiLibUninstallDriverBindingComponentName2 (
+      &gTcp4DriverBinding,
+      &gTcpComponentName,
+      &gTcpComponentName2
+      );
     return Status;
   }
 

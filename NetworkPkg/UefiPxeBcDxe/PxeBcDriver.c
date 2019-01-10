@@ -1269,16 +1269,11 @@ PxeBcDriverEntryPoint (
              &gPxeBcComponentName2
              );
   if (EFI_ERROR (Status)) {
-    gBS->UninstallMultipleProtocolInterfaces (
-           ImageHandle,
-           &gEfiDriverBindingProtocolGuid,
-           &gPxeBcIp4DriverBinding,
-           &gEfiComponentName2ProtocolGuid,
-           &gPxeBcComponentName2,
-           &gEfiComponentNameProtocolGuid,
-           &gPxeBcComponentName,
-           NULL
-           );
+    EfiLibUninstallDriverBindingComponentName2 (
+      &gPxeBcIp4DriverBinding,
+      &gPxeBcComponentName,
+      &gPxeBcComponentName2
+      );
   }
 
   return Status;
