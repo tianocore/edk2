@@ -15,8 +15,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include "IScsiImpl.h"
 
 CHAR16          mVendorStorageName[]     = L"ISCSI_CONFIG_IFR_NVDATA";
-BOOLEAN         mIScsiDeviceListUpdated  = FALSE;
-UINTN           mNumberOfIScsiDevices    = 0;
 ISCSI_FORM_CALLBACK_INFO  *mCallbackInfo = NULL;
 
 HII_VENDOR_DEVICE_PATH  mIScsiHiiVendorDevicePath = {
