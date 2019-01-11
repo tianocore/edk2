@@ -205,7 +205,7 @@ def TrimPreprocessedFile(Source, Target, ConvertHex, TrimLong):
             else:
                 if LineNumber > (len(NewLines) + 1):
                     for LineIndex in range(len(NewLines), LineNumber-1):
-                        NewLines.append(os.linesep)
+                        NewLines.append(TAB_LINE_BREAK)
                 NewLines.append(Line)
             LineNumber = None
             EdkLogger.verbose("Now we have lines: %d" % len(NewLines))
