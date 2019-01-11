@@ -4,7 +4,7 @@
   This module will execute the boot script saved during last boot and after that,
   control is passed to OS waking up handler.
 
-  Copyright (c) 2006 - 2018, Intel Corporation. All rights reserved.<BR>
+  Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
   Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
 
   This program and the accompanying materials
@@ -316,7 +316,7 @@ IsLongModeWakingVector (
   if (Facs->XFirmwareWakingVector != 0) {
     if ((Facs->Version == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
         ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0) &&
-        ((Facs->Flags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
+        ((Facs->OspmFlags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
       // Both BIOS and OS wants 64bit vector
       if (FeaturePcdGet (PcdDxeIplSwitchToLongMode)) {
         return TRUE;
@@ -499,7 +499,7 @@ S3ResumeBootOs (
       ));
     if ((Facs->Version == EFI_ACPI_4_0_FIRMWARE_ACPI_CONTROL_STRUCTURE_VERSION) &&
         ((Facs->Flags & EFI_ACPI_4_0_64BIT_WAKE_SUPPORTED_F) != 0) &&
-        ((Facs->Flags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
+        ((Facs->OspmFlags & EFI_ACPI_4_0_OSPM_64BIT_WAKE__F) != 0)) {
       //
       // X64 long mode waking vector
       //
