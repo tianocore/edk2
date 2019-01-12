@@ -342,6 +342,40 @@ OnEndOfDxe (
 }
 
 /**
+  Initializes variable write service for DXE.
+
+**/
+VOID
+VariableWriteServiceInitializeDxe (
+  VOID
+  )
+{
+  EFI_STATUS    Status;
+
+  Status = VariableWriteServiceInitialize ();
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Variable write service initialization failed. Status = %r\n", Status));
+  }
+
+  //
+  // Some Secure Boot Policy Var (SecureBoot, etc) updates following other
+  // Secure Boot Policy Variable change. Record their initial value.
+  //
+  RecordSecureBootPolicyVarData();
+
+  //
+  // Install the Variable Write Architectural protocol.
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &mHandle,
+                  &gEfiVariableWriteArchProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+}
+
+/**
   Fault Tolerant Write protocol notification event handler.
 
   Non-Volatile variable write may needs FTW protocol to reclaim when
@@ -423,27 +457,10 @@ FtwNotificationEvent (
     }
   }
 
-  Status = VariableWriteServiceInitialize ();
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Variable write service initialization failed. Status = %r\n", Status));
-  }
-
   //
-  // Some Secure Boot Policy Var (SecureBoot, etc) updates following other
-  // Secure Boot Policy Variable change. Record their initial value.
+  // Initializes variable write service after FTW was ready.
   //
-  RecordSecureBootPolicyVarData();
-
-  //
-  // Install the Variable Write Architectural protocol.
-  //
-  Status = gBS->InstallProtocolInterface (
-                  &mHandle,
-                  &gEfiVariableWriteArchProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
+  VariableWriteServiceInitializeDxe ();
 
   //
   // Close the notify event to avoid install gEfiVariableWriteArchProtocolGuid again.
