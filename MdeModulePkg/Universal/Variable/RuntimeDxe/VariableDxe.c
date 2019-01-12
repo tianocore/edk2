@@ -382,13 +382,17 @@ FtwNotificationEvent (
     ASSERT (PcdGet32 (PcdFlashNvStorageVariableSize) <= FtwMaxBlockSize);
   }
 
+  NvStorageVariableBase = NV_STORAGE_VARIABLE_BASE;
+  VariableStoreBase = NvStorageVariableBase + mNvFvHeaderCache->HeaderLength;
+
+  //
+  // Let NonVolatileVariableBase point to flash variable store base directly after FTW ready.
+  //
+  mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = VariableStoreBase;
+
   //
   // Find the proper FVB protocol for variable.
   //
-  NvStorageVariableBase = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
-  if (NvStorageVariableBase == 0) {
-    NvStorageVariableBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
-  }
   Status = GetFvbInfoByAddress (NvStorageVariableBase, NULL, &FvbProtocol);
   if (EFI_ERROR (Status)) {
     return ;
@@ -398,7 +402,6 @@ FtwNotificationEvent (
   //
   // Mark the variable storage region of the FLASH as RUNTIME.
   //
-  VariableStoreBase   = NvStorageVariableBase + mNvFvHeaderCache->HeaderLength;
   VariableStoreLength = mNvVariableCache->Size;
   BaseAddress = VariableStoreBase & (~EFI_PAGE_MASK);
   Length      = VariableStoreLength + (VariableStoreBase - BaseAddress);

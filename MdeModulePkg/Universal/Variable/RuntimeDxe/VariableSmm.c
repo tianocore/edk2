@@ -14,7 +14,7 @@
   VariableServiceSetVariable(), VariableServiceQueryVariableInfo(), ReclaimForOS(),
   SmmVariableGetStatistics() should also do validation based on its own knowledge.
 
-Copyright (c) 2010 - 2016, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2010 - 2019, Intel Corporation. All rights reserved.<BR>
 Copyright (c) 2018, Linaro, Ltd. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
@@ -862,6 +862,7 @@ SmmFtwNotificationEvent (
   )
 {
   EFI_STATUS                              Status;
+  EFI_PHYSICAL_ADDRESS                    VariableStoreBase;
   EFI_SMM_FIRMWARE_VOLUME_BLOCK_PROTOCOL  *FvbProtocol;
   EFI_SMM_FAULT_TOLERANT_WRITE_PROTOCOL   *FtwProtocol;
   EFI_PHYSICAL_ADDRESS                    NvStorageVariableBase;
@@ -884,13 +885,17 @@ SmmFtwNotificationEvent (
     ASSERT (PcdGet32 (PcdFlashNvStorageVariableSize) <= FtwMaxBlockSize);
   }
 
+  NvStorageVariableBase = NV_STORAGE_VARIABLE_BASE;
+  VariableStoreBase = NvStorageVariableBase + mNvFvHeaderCache->HeaderLength;
+
+  //
+  // Let NonVolatileVariableBase point to flash variable store base directly after FTW ready.
+  //
+  mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = VariableStoreBase;
+
   //
   // Find the proper FVB protocol for variable.
   //
-  NvStorageVariableBase = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
-  if (NvStorageVariableBase == 0) {
-    NvStorageVariableBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
-  }
   Status = GetFvbInfoByAddress (NvStorageVariableBase, NULL, &FvbProtocol);
   if (EFI_ERROR (Status)) {
     return EFI_NOT_FOUND;

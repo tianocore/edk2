@@ -2,7 +2,7 @@
   The internal header file includes the common header files, defines
   internal structure and functions used by Variable modules.
 
-Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+Copyright (c) 2006 - 2019, Intel Corporation. All rights reserved.<BR>
 This program and the accompanying materials
 are licensed and made available under the terms and conditions of the BSD License
 which accompanies this distribution.  The full text of the license may be found at
@@ -45,6 +45,11 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #include <Guid/VarErrorFlag.h>
 
 #include "PrivilegePolymorphic.h"
+
+#define NV_STORAGE_VARIABLE_BASE (EFI_PHYSICAL_ADDRESS) \
+                                   (PcdGet64 (PcdFlashNvStorageVariableBase64) != 0 ? \
+                                    PcdGet64 (PcdFlashNvStorageVariableBase64) : \
+                                    PcdGet32 (PcdFlashNvStorageVariableBase))
 
 #define EFI_VARIABLE_ATTRIBUTES_MASK (EFI_VARIABLE_NON_VOLATILE | \
                                       EFI_VARIABLE_BOOTSERVICE_ACCESS | \
@@ -473,7 +478,7 @@ GetMaxVariableSize (
   );
 
 /**
-  Initializes variable write service after FVB was ready.
+  Initializes variable write service.
 
   @retval EFI_SUCCESS          Function successfully executed.
   @retval Others               Fail to initialize the variable service.

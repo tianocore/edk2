@@ -3770,10 +3770,7 @@ InitRealNonVolatileVariableStore (
     return EFI_OUT_OF_RESOURCES;
   }
 
-  NvStorageBase = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
-  if (NvStorageBase == 0) {
-    NvStorageBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
-  }
+  NvStorageBase = NV_STORAGE_VARIABLE_BASE;
   ASSERT (NvStorageBase != 0);
 
   //
@@ -4027,7 +4024,7 @@ FlushHobVariableToFlash (
 }
 
 /**
-  Initializes variable write service after FTW was ready.
+  Initializes variable write service.
 
   @retval EFI_SUCCESS          Function successfully executed.
   @retval Others               Fail to initialize the variable service.
@@ -4041,22 +4038,9 @@ VariableWriteServiceInitialize (
   EFI_STATUS                      Status;
   UINTN                           Index;
   UINT8                           Data;
-  EFI_PHYSICAL_ADDRESS            VariableStoreBase;
-  EFI_PHYSICAL_ADDRESS            NvStorageBase;
   VARIABLE_ENTRY_PROPERTY         *VariableEntry;
 
   AcquireLockOnlyAtBootTime(&mVariableModuleGlobal->VariableGlobal.VariableServicesLock);
-
-  NvStorageBase = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFlashNvStorageVariableBase64);
-  if (NvStorageBase == 0) {
-    NvStorageBase = (EFI_PHYSICAL_ADDRESS) PcdGet32 (PcdFlashNvStorageVariableBase);
-  }
-  VariableStoreBase = NvStorageBase + (mNvFvHeaderCache->HeaderLength);
-
-  //
-  // Let NonVolatileVariableBase point to flash variable store base directly after FTW ready.
-  //
-  mVariableModuleGlobal->VariableGlobal.NonVolatileVariableBase = VariableStoreBase;
 
   //
   // Check if the free area is really free.
