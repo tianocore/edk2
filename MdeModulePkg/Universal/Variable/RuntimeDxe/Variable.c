@@ -2139,7 +2139,6 @@ UpdateVariable (
   VARIABLE_POINTER_TRACK              *Variable;
   VARIABLE_POINTER_TRACK              NvVariable;
   VARIABLE_STORE_HEADER               *VariableStoreHeader;
-  UINTN                               CacheOffset;
   UINT8                               *BufferForMerge;
   UINTN                               MergedBufSize;
   BOOLEAN                             DataReady;
@@ -2577,7 +2576,6 @@ UpdateVariable (
     //
     // Step 1:
     //
-    CacheOffset = mVariableModuleGlobal->NonVolatileLastVariableOffset;
     Status = UpdateVariableStore (
                &mVariableModuleGlobal->VariableGlobal,
                FALSE,
@@ -2643,6 +2641,11 @@ UpdateVariable (
       goto Done;
     }
 
+    //
+    // Update the memory copy of Flash region.
+    //
+    CopyMem ((UINT8 *)mNvVariableCache + mVariableModuleGlobal->NonVolatileLastVariableOffset, (UINT8 *)NextVariable, VarSize);
+
     mVariableModuleGlobal->NonVolatileLastVariableOffset += HEADER_ALIGN (VarSize);
 
     if ((Attributes & EFI_VARIABLE_HARDWARE_ERROR_RECORD) != 0) {
@@ -2653,10 +2656,6 @@ UpdateVariable (
         mVariableModuleGlobal->CommonUserVariableTotalSize += HEADER_ALIGN (VarSize);
       }
     }
-    //
-    // update the memory copy of Flash region.
-    //
-    CopyMem ((UINT8 *)mNvVariableCache + CacheOffset, (UINT8 *)NextVariable, VarSize);
   } else {
     //
     // Create a volatile variable.
