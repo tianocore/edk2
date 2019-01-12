@@ -3,7 +3,7 @@
 # It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 # and libraries instances, which are used for those modules.
 #
-# Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 # (C) Copyright 2016 Hewlett Packard Enterprise Development LP<BR>
 # Copyright (c) 2017, AMD Incorporated. All rights reserved.<BR>
@@ -1586,7 +1586,15 @@
   # @Prompt 64-bit Base address of flash FTW working block range.
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0x0|UINT64|0x80000010
 
-  ## This PCD defines a reserved memory range for the EMU Variable driver's NV Variable Store.
+  ## Indicates if Variable driver will enable emulated variable NV mode.<BR><BR>
+  #  If this PCD is configured to dynamic, its value should be set before Variable driver starts to work,<BR>
+  #  otherwise default value will take effect.<BR>
+  #   TRUE  - An EMU variable NV storage will be allocated or reserved for NV variables.<BR>
+  #   FALSE - No EMU variable NV storage will be allocated or reserved for NV variables.<BR>
+  # @Prompt EMU variable NV mode enable.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE|BOOLEAN|0x01100001
+
+  ## This PCD defines a reserved memory range for EMU variable NV storage.
   #  The range is valid if non-zero. The memory range size must be PcdVariableStoreSize.
   # @Prompt Reserved memory range for EMU variable NV storage.
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0|UINT64|0x40000008

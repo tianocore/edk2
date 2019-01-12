@@ -4,7 +4,7 @@
 // It also provides the definitions(including PPIs/PROTOCOLs/GUIDs and library classes)
 // and libraries instances, which are used for those modules.
 //
-// Copyright (c) 2007 - 2018, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 //
 // This program and the accompanying materials are licensed and made available under
 // the terms and conditions of the BSD License that accompanies this distribution.
@@ -389,9 +389,17 @@
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdFlashNvStorageFtwWorkingBase64_HELP  #language en-US "64-bit Base address of the FTW working block range in flash device. If PcdFlashNvStorageFtwWorkingSize is larger than one block size, this value should be block size aligned."
 
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEmuVariableNvModeEnable_PROMPT  #language en-US "EMU variable NV mode enable"
+
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEmuVariableNvModeEnable_HELP  #language en-US "Indicates if Variable driver will enable emulated variable NV mode.<BR><BR>"
+                                                                                  "If this PCD is configured to dynamic, its value should be set before Variable driver starts to work,<BR>"
+                                                                                  "otherwise default value will take effect.<BR>"
+                                                                                  "TRUE  - An EMU variable NV storage will be allocated or reserved for NV variables.<BR>"
+                                                                                  "FALSE - No EMU variable NV storage will be allocated or reserved for NV variables.<BR>"
+
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEmuVariableNvStoreReserved_PROMPT  #language en-US "Reserved memory range for EMU variable NV storage"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEmuVariableNvStoreReserved_HELP  #language en-US "This PCD defines a reserved memory range for the EMU Variable driver's NV Variable Store. The range is valid if non-zero. The memory range size must be PcdVariableStoreSize."
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEmuVariableNvStoreReserved_HELP  #language en-US "This PCD defines a reserved memory range for EMU variable NV storage. The range is valid if non-zero. The memory range size must be PcdVariableStoreSize."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHelloWorldPrintTimes_PROMPT  #language en-US "HelloWorld print times"
 
