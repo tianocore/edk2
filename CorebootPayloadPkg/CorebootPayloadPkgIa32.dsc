@@ -3,7 +3,7 @@
 #
 # Provides drivers and definitions to create uefi payload for coreboot.
 #
-# Copyright (c) 2014 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
 # This program and the accompanying materials are licensed and made available under
 # the terms and conditions of the BSD License that accompanies this distribution.
 # The full text of the license may be found at
@@ -203,6 +203,9 @@
   DebugLib|MdeModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
   FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
+  AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
+  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
 
 [LibraryClasses.IA32.SEC]
   DebugLib|MdePkg/Library/BaseDebugLibNull/BaseDebugLibNull.inf
@@ -277,6 +280,10 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxVariableSize|0x10000
   gEfiMdeModulePkgTokenSpaceGuid.PcdMaxHardwareErrorVariableSize|0x8000
   gEfiMdeModulePkgTokenSpaceGuid.PcdVariableStoreSize|0x10000
+  #
+  # Make VariableRuntimeDxe work at emulated non-volatile variable mode.
+  #
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
 
   gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress|0x0
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootManagerMenuFile|{ 0x21, 0xaa, 0x2c, 0x46, 0x14, 0x76, 0x03, 0x45, 0x83, 0x6e, 0x8a, 0xb6, 0xf4, 0x66, 0x23, 0x31 }
@@ -417,7 +424,7 @@
   MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
-  MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
 
   #
   # Following are the DXE drivers
