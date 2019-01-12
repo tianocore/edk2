@@ -1,7 +1,7 @@
 # FLASH layout file for Beagle board.
 #
 # Copyright (c) 2009, Apple Inc. All rights reserved.<BR>
-# Copyright (c) 2015 - 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
 #
 #    This program and the accompanying materials
@@ -106,7 +106,7 @@ FvNameGuid         = d0dd3e90-343d-4cb3-8f69-772214989282
   INF MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
   INF MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
   INF MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
-  INF MdeModulePkg/Universal/Variable/EmuRuntimeDxe/EmuVariableRuntimeDxe.inf
+  INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   INF EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
 
   INF MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
