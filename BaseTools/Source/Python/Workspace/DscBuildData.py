@@ -709,7 +709,6 @@ class DscBuildData(PlatformBuildClassObject):
     def OverrideDuplicateModule(self):
         RecordList = self._RawData[MODEL_META_DATA_COMPONENT, self._Arch]
         Macros = self._Macros
-        Macros["EDK_SOURCE"] = GlobalData.gEcpSource
         Components = {}
         for Record in RecordList:
             ModuleId = Record[6]
