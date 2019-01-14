@@ -332,10 +332,6 @@ class LibraryReport(object):
     #
     def __init__(self, M):
         self.LibraryList = []
-        if int(str(M.AutoGenVersion), 0) >= 0x00010005:
-            self._EdkIIModule = True
-        else:
-            self._EdkIIModule = False
 
         for Lib in M.DependentLibraryList:
             LibInfPath = str(Lib)
@@ -368,28 +364,23 @@ class LibraryReport(object):
                 LibInfPath = LibraryItem[0]
                 FileWrite(File, LibInfPath)
 
-                #
-                # Report library class, library constructor and destructor for
-                # EDKII style module.
-                #
-                if self._EdkIIModule:
-                    LibClass = LibraryItem[1]
-                    EdkIILibInfo = ""
-                    LibConstructor = " ".join(LibraryItem[2])
-                    if LibConstructor:
-                        EdkIILibInfo += " C = " + LibConstructor
-                    LibDestructor = " ".join(LibraryItem[3])
-                    if LibDestructor:
-                        EdkIILibInfo += " D = " + LibDestructor
-                    LibDepex = " ".join(LibraryItem[4])
-                    if LibDepex:
-                        EdkIILibInfo += " Depex = " + LibDepex
-                    if LibraryItem[5]:
-                        EdkIILibInfo += " Time = " + LibraryItem[5]
-                    if EdkIILibInfo:
-                        FileWrite(File, "{%s: %s}" % (LibClass, EdkIILibInfo))
-                    else:
-                        FileWrite(File, "{%s}" % LibClass)
+                LibClass = LibraryItem[1]
+                EdkIILibInfo = ""
+                LibConstructor = " ".join(LibraryItem[2])
+                if LibConstructor:
+                    EdkIILibInfo += " C = " + LibConstructor
+                LibDestructor = " ".join(LibraryItem[3])
+                if LibDestructor:
+                    EdkIILibInfo += " D = " + LibDestructor
+                LibDepex = " ".join(LibraryItem[4])
+                if LibDepex:
+                    EdkIILibInfo += " Depex = " + LibDepex
+                if LibraryItem[5]:
+                    EdkIILibInfo += " Time = " + LibraryItem[5]
+                if EdkIILibInfo:
+                    FileWrite(File, "{%s: %s}" % (LibClass, EdkIILibInfo))
+                else:
+                    FileWrite(File, "{%s}" % LibClass)
 
             FileWrite(File, gSubSectionEnd)
 
@@ -1546,15 +1537,8 @@ class PredictionReport(object):
 
                 if Module.Guid and not Module.IsLibrary:
                     EntryPoint = " ".join(Module.Module.ModuleEntryPointList)
-                    if int(str(Module.AutoGenVersion), 0) >= 0x00010005:
-                        RealEntryPoint = "_ModuleEntryPoint"
-                    else:
-                        RealEntryPoint = EntryPoint
-                        if EntryPoint == "_ModuleEntryPoint":
-                            CCFlags = Module.BuildOption.get("CC", {}).get("FLAGS", "")
-                            Match = gGlueLibEntryPoint.search(CCFlags)
-                            if Match:
-                                EntryPoint = Match.group(1)
+
+                    RealEntryPoint = "_ModuleEntryPoint"
 
                     self._FfsEntryPoint[Module.Guid.upper()] = (EntryPoint, RealEntryPoint)
 

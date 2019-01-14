@@ -476,18 +476,11 @@ cleanlib:
         else:
             ModuleEntryPoint = "_ModuleEntryPoint"
 
-        # Intel EBC compiler enforces EfiMain
-        if MyAgo.AutoGenVersion < 0x00010005 and MyAgo.Arch == "EBC":
-            ArchEntryPoint = "EfiMain"
-        else:
-            ArchEntryPoint = ModuleEntryPoint
+        ArchEntryPoint = ModuleEntryPoint
 
         if MyAgo.Arch == "EBC":
             # EBC compiler always use "EfiStart" as entry point. Only applies to EdkII modules
             ImageEntryPoint = "EfiStart"
-        elif MyAgo.AutoGenVersion < 0x00010005:
-            # Edk modules use entry point specified in INF file
-            ImageEntryPoint = ModuleEntryPoint
         else:
             # EdkII modules always use "_ModuleEntryPoint" as entry point
             ImageEntryPoint = "_ModuleEntryPoint"
@@ -625,11 +618,6 @@ cleanlib:
                 False
                 )
 
-        # Edk modules need <BaseName>StrDefs.h for string ID
-        #if MyAgo.AutoGenVersion < 0x00010005 and len(MyAgo.UnicodeFileList) > 0:
-        #    BcTargetList = ['strdefs']
-        #else:
-        #    BcTargetList = []
         BcTargetList = []
 
         MakefileName = self._FILE_NAME_[self._FileType]
@@ -1537,13 +1525,9 @@ class TopLevelMakefile(BuildFile):
         if MyAgo.FdfFile is not None and MyAgo.FdfFile != "":
             FdfFileList = [MyAgo.FdfFile]
             # macros passed to GenFds
-            MacroList.append('"%s=%s"' % ("EFI_SOURCE", GlobalData.gEfiSource.replace('\\', '\\\\')))
-            MacroList.append('"%s=%s"' % ("EDK_SOURCE", GlobalData.gEdkSource.replace('\\', '\\\\')))
             MacroDict = {}
             MacroDict.update(GlobalData.gGlobalDefines)
             MacroDict.update(GlobalData.gCommandLineDefines)
-            MacroDict.pop("EFI_SOURCE", "dummy")
-            MacroDict.pop("EDK_SOURCE", "dummy")
             for MacroName in MacroDict:
                 if MacroDict[MacroName] != "":
                     MacroList.append('"%s=%s"' % (MacroName, MacroDict[MacroName].replace('\\', '\\\\')))

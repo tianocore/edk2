@@ -122,64 +122,8 @@ def CheckEnvVariable():
             elif ' ' in Path:
                 EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in PACKAGES_PATH", ExtraData=Path)
 
-    #
-    # Check EFI_SOURCE (Edk build convention). EDK_SOURCE will always point to ECP
-    #
-    if "ECP_SOURCE" not in os.environ:
-        os.environ["ECP_SOURCE"] = mws.join(WorkspaceDir, GlobalData.gEdkCompatibilityPkg)
-    if "EFI_SOURCE" not in os.environ:
-        os.environ["EFI_SOURCE"] = os.environ["ECP_SOURCE"]
-    if "EDK_SOURCE" not in os.environ:
-        os.environ["EDK_SOURCE"] = os.environ["ECP_SOURCE"]
 
-    #
-    # Unify case of characters on case-insensitive systems
-    #
-    EfiSourceDir = os.path.normcase(os.path.normpath(os.environ["EFI_SOURCE"]))
-    EdkSourceDir = os.path.normcase(os.path.normpath(os.environ["EDK_SOURCE"]))
-    EcpSourceDir = os.path.normcase(os.path.normpath(os.environ["ECP_SOURCE"]))
-
-    os.environ["EFI_SOURCE"] = EfiSourceDir
-    os.environ["EDK_SOURCE"] = EdkSourceDir
-    os.environ["ECP_SOURCE"] = EcpSourceDir
     os.environ["EDK_TOOLS_PATH"] = os.path.normcase(os.environ["EDK_TOOLS_PATH"])
-
-    if not os.path.exists(EcpSourceDir):
-        EdkLogger.verbose("ECP_SOURCE = %s doesn't exist. Edk modules could not be built." % EcpSourceDir)
-    elif ' ' in EcpSourceDir:
-        EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in ECP_SOURCE path",
-                        ExtraData=EcpSourceDir)
-    if not os.path.exists(EdkSourceDir):
-        if EdkSourceDir == EcpSourceDir:
-            EdkLogger.verbose("EDK_SOURCE = %s doesn't exist. Edk modules could not be built." % EdkSourceDir)
-        else:
-            EdkLogger.error("build", PARAMETER_INVALID, "EDK_SOURCE does not exist",
-                            ExtraData=EdkSourceDir)
-    elif ' ' in EdkSourceDir:
-        EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in EDK_SOURCE path",
-                        ExtraData=EdkSourceDir)
-    if not os.path.exists(EfiSourceDir):
-        if EfiSourceDir == EcpSourceDir:
-            EdkLogger.verbose("EFI_SOURCE = %s doesn't exist. Edk modules could not be built." % EfiSourceDir)
-        else:
-            EdkLogger.error("build", PARAMETER_INVALID, "EFI_SOURCE does not exist",
-                            ExtraData=EfiSourceDir)
-    elif ' ' in EfiSourceDir:
-        EdkLogger.error("build", FORMAT_NOT_SUPPORTED, "No space is allowed in EFI_SOURCE path",
-                        ExtraData=EfiSourceDir)
-
-    # check those variables on single workspace case
-    if not PackagesPath:
-        # change absolute path to relative path to WORKSPACE
-        if EfiSourceDir.upper().find(WorkspaceDir.upper()) != 0:
-            EdkLogger.error("build", PARAMETER_INVALID, "EFI_SOURCE is not under WORKSPACE",
-                            ExtraData="WORKSPACE = %s\n    EFI_SOURCE = %s" % (WorkspaceDir, EfiSourceDir))
-        if EdkSourceDir.upper().find(WorkspaceDir.upper()) != 0:
-            EdkLogger.error("build", PARAMETER_INVALID, "EDK_SOURCE is not under WORKSPACE",
-                            ExtraData="WORKSPACE = %s\n    EDK_SOURCE = %s" % (WorkspaceDir, EdkSourceDir))
-        if EcpSourceDir.upper().find(WorkspaceDir.upper()) != 0:
-            EdkLogger.error("build", PARAMETER_INVALID, "ECP_SOURCE is not under WORKSPACE",
-                            ExtraData="WORKSPACE = %s\n    ECP_SOURCE = %s" % (WorkspaceDir, EcpSourceDir))
 
     # check EDK_TOOLS_PATH
     if "EDK_TOOLS_PATH" not in os.environ:
@@ -192,14 +136,8 @@ def CheckEnvVariable():
                         ExtraData="PATH")
 
     GlobalData.gWorkspace = WorkspaceDir
-    GlobalData.gEfiSource = EfiSourceDir
-    GlobalData.gEdkSource = EdkSourceDir
-    GlobalData.gEcpSource = EcpSourceDir
 
     GlobalData.gGlobalDefines["WORKSPACE"]  = WorkspaceDir
-    GlobalData.gGlobalDefines["EFI_SOURCE"] = EfiSourceDir
-    GlobalData.gGlobalDefines["EDK_SOURCE"] = EdkSourceDir
-    GlobalData.gGlobalDefines["ECP_SOURCE"] = EcpSourceDir
     GlobalData.gGlobalDefines["EDK_TOOLS_PATH"] = os.environ["EDK_TOOLS_PATH"]
 
 ## Get normalized file path
@@ -848,9 +786,6 @@ class Build():
         if "PACKAGES_PATH" in os.environ:
             # WORKSPACE env has been converted before. Print the same path style with WORKSPACE env.
             EdkLogger.quiet("%-16s = %s" % ("PACKAGES_PATH", os.path.normcase(os.path.normpath(os.environ["PACKAGES_PATH"]))))
-        EdkLogger.quiet("%-16s = %s" % ("ECP_SOURCE", os.environ["ECP_SOURCE"]))
-        EdkLogger.quiet("%-16s = %s" % ("EDK_SOURCE", os.environ["EDK_SOURCE"]))
-        EdkLogger.quiet("%-16s = %s" % ("EFI_SOURCE", os.environ["EFI_SOURCE"]))
         EdkLogger.quiet("%-16s = %s" % ("EDK_TOOLS_PATH", os.environ["EDK_TOOLS_PATH"]))
         if "EDK_TOOLS_BIN" in os.environ:
             # Print the same path style with WORKSPACE env.

@@ -715,7 +715,6 @@ class DscBuildData(PlatformBuildClassObject):
         self._Modules = OrderedDict()
         RecordList = self._RawData[MODEL_META_DATA_COMPONENT, self._Arch]
         Macros = self._Macros
-        Macros["EDK_SOURCE"] = GlobalData.gEcpSource
         for Record in RecordList:
             DuplicatedFile = False
 
@@ -858,8 +857,6 @@ class DscBuildData(PlatformBuildClassObject):
                         continue
                     self._LibraryClasses[LibraryClass, ModuleType] = LibraryInstance
 
-            # for Edk style library instances, which are listed in different section
-            Macros["EDK_SOURCE"] = GlobalData.gEcpSource
             RecordList = self._RawData[MODEL_EFI_LIBRARY_INSTANCE, self._Arch]
             for Record in RecordList:
                 File = PathClass(NormPath(Record[0], Macros), GlobalData.gWorkspace, Arch=self._Arch)

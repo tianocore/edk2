@@ -42,11 +42,8 @@ if %WORKSPACE% == %CD% (
 
 :SetWorkSpace
 @REM set new workspace
-@REM clear EFI_SOURCE and EDK_SOURCE for the new workspace
 if not defined WORKSPACE (
   set WORKSPACE=%CD%
-  set EFI_SOURCE=
-  set EDK_SOURCE=
 )
 
 :ParseArgs

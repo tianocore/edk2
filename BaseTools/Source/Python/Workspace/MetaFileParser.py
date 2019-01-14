@@ -686,18 +686,6 @@ class InfParser(MetaFileParser):
                 Value = self._ValueList[Index]
                 if not Value:
                     continue
-
-                if Value.upper().find('$(EFI_SOURCE)\Edk'.upper()) > -1 or Value.upper().find('$(EFI_SOURCE)/Edk'.upper()) > -1:
-                    Value = '$(EDK_SOURCE)' + Value[17:]
-                if Value.find('$(EFI_SOURCE)') > -1 or Value.find('$(EDK_SOURCE)') > -1:
-                    pass
-                elif Value.startswith('.'):
-                    pass
-                elif Value.startswith('$('):
-                    pass
-                else:
-                    Value = '$(EFI_SOURCE)/' + Value
-
                 self._ValueList[Index] = ReplaceMacro(Value, Macros)
 
     ## Parse [Sources] section
@@ -1600,16 +1588,6 @@ class DscParser(MetaFileParser):
             # Allow using system environment variables  in path after !include
             #
             __IncludeMacros['WORKSPACE'] = GlobalData.gGlobalDefines['WORKSPACE']
-            if "ECP_SOURCE" in GlobalData.gGlobalDefines:
-                __IncludeMacros['ECP_SOURCE'] = GlobalData.gGlobalDefines['ECP_SOURCE']
-            #
-            # During GenFds phase call DSC parser, will go into this branch.
-            #
-            elif "ECP_SOURCE" in GlobalData.gCommandLineDefines:
-                __IncludeMacros['ECP_SOURCE'] = GlobalData.gCommandLineDefines['ECP_SOURCE']
-
-            __IncludeMacros['EFI_SOURCE'] = GlobalData.gGlobalDefines['EFI_SOURCE']
-            __IncludeMacros['EDK_SOURCE'] = GlobalData.gGlobalDefines['EDK_SOURCE']
             #
             # Allow using MACROs comes from [Defines] section to keep compatible.
             #

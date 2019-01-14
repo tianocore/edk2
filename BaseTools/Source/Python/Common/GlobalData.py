@@ -13,13 +13,7 @@
 import re
 
 gIsWindows = None
-
-gEdkCompatibilityPkg = "EdkCompatibilityPkg"
 gWorkspace = "."
-gEdkSource = "EdkCompatibilityPkg"
-gEfiSource = "."
-gEcpSource = "EdkCompatibilityPkg"
-
 gOptions = None
 gCaseInsensitive = False
 gAllFiles = None

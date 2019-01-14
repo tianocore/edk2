@@ -18,7 +18,7 @@ from types import *
 from collections import OrderedDict
 from CommonDataClass.DataClass import *
 from Workspace.BuildClassObject import PackageBuildClassObject, StructurePcd, PcdClassObject
-from Common.GlobalData import gGlobalDefines, gEcpSource
+from Common.GlobalData import gGlobalDefines
 from re import compile
 
 ## Platform build information from DEC file
@@ -300,7 +300,6 @@ class DecBuildData(PackageBuildClassObject):
             PublicInclues = []
             RecordList = self._RawData[MODEL_EFI_INCLUDE, self._Arch]
             Macros = self._Macros
-            Macros["EDK_SOURCE"] = gEcpSource
             for Record in RecordList:
                 File = PathClass(NormPath(Record[0], Macros), self._PackageDir, Arch=self._Arch)
                 LineNo = Record[-1]

@@ -2174,42 +2174,7 @@ class PlatformAutoGen(AutoGen):
                     Pcd.MaxDatumSize = str(len(Value) - 1)
         return Pcds.values()
 
-    ## Resolve library names to library modules
-    #
-    # (for Edk.x modules)
-    #
-    #   @param  Module  The module from which the library names will be resolved
-    #
-    #   @retval library_list    The list of library modules
-    #
-    def ResolveLibraryReference(self, Module):
-        EdkLogger.verbose("")
-        EdkLogger.verbose("Library instances of module [%s] [%s]:" % (str(Module), self.Arch))
-        LibraryConsumerList = [Module]
 
-        # "CompilerStub" is a must for Edk modules
-        if Module.Libraries:
-            Module.Libraries.append("CompilerStub")
-        LibraryList = []
-        while len(LibraryConsumerList) > 0:
-            M = LibraryConsumerList.pop()
-            for LibraryName in M.Libraries:
-                Library = self.Platform.LibraryClasses[LibraryName, ':dummy:']
-                if Library is None:
-                    for Key in self.Platform.LibraryClasses.data:
-                        if LibraryName.upper() == Key.upper():
-                            Library = self.Platform.LibraryClasses[Key, ':dummy:']
-                            break
-                    if Library is None:
-                        EdkLogger.warn("build", "Library [%s] is not found" % LibraryName, File=str(M),
-                            ExtraData="\t%s [%s]" % (str(Module), self.Arch))
-                        continue
-
-                if Library not in LibraryList:
-                    LibraryList.append(Library)
-                    LibraryConsumerList.append(Library)
-                    EdkLogger.verbose("\t" + LibraryName + " : " + str(Library) + ' ' + str(type(Library)))
-        return LibraryList
 
     ## Calculate the priority value of the build option
     #
@@ -2377,12 +2342,8 @@ class PlatformAutoGen(AutoGen):
     #
     def ApplyBuildOption(self, Module):
         # Get the different options for the different style module
-        if Module.AutoGenVersion < 0x00010005:
-            PlatformOptions = self.EdkBuildOption
-            ModuleTypeOptions = self.Platform.GetBuildOptionsByModuleType(EDK_NAME, Module.ModuleType)
-        else:
-            PlatformOptions = self.EdkIIBuildOption
-            ModuleTypeOptions = self.Platform.GetBuildOptionsByModuleType(EDKII_NAME, Module.ModuleType)
+        PlatformOptions = self.EdkIIBuildOption
+        ModuleTypeOptions = self.Platform.GetBuildOptionsByModuleType(EDKII_NAME, Module.ModuleType)
         ModuleTypeOptions = self._ExpandBuildOption(ModuleTypeOptions)
         ModuleOptions = self._ExpandBuildOption(Module.BuildOptions)
         if Module in self.Platform.Modules:
@@ -2422,11 +2383,6 @@ class PlatformAutoGen(AutoGen):
                         else:
                             BuildOptions[Tool][Attr] = mws.handleWsMacro(Value)
 
-        if Module.AutoGenVersion < 0x00010005 and self.Workspace.UniFlag is not None:
-            #
-            # Override UNI flag only for EDK module.
-            #
-            BuildOptions['BUILD']['FLAGS'] = self.Workspace.UniFlag
         return BuildOptions, BuildRuleOrder
 
 #
@@ -2962,14 +2918,13 @@ class ModuleAutoGen(AutoGen):
             # EDK II modules must not reference header files outside of the packages they depend on or
             # within the module's directory tree. Report error if violation.
             #
-            if self.AutoGenVersion >= 0x00010005:
-                for Path in IncPathList:
-                    if (Path not in self.IncludePathList) and (CommonPath([Path, self.MetaFile.Dir]) != self.MetaFile.Dir):
-                        ErrMsg = "The include directory for the EDK II module in this line is invalid %s specified in %s FLAGS '%s'" % (Path, Tool, FlagOption)
-                        EdkLogger.error("build",
-                                        PARAMETER_INVALID,
-                                        ExtraData=ErrMsg,
-                                        File=str(self.MetaFile))
+            for Path in IncPathList:
+                if (Path not in self.IncludePathList) and (CommonPath([Path, self.MetaFile.Dir]) != self.MetaFile.Dir):
+                    ErrMsg = "The include directory for the EDK II module in this line is invalid %s specified in %s FLAGS '%s'" % (Path, Tool, FlagOption)
+                    EdkLogger.error("build",
+                                    PARAMETER_INVALID,
+                                    ExtraData=ErrMsg,
+                                    File=str(self.MetaFile))
             RetVal += IncPathList
         return RetVal
 
@@ -2999,7 +2954,7 @@ class ModuleAutoGen(AutoGen):
                 continue
 
             # add the file path into search path list for file including
-            if F.Dir not in self.IncludePathList and self.AutoGenVersion >= 0x00010005:
+            if F.Dir not in self.IncludePathList:
                 self.IncludePathList.insert(0, F.Dir)
             RetVal.append(F)
 
@@ -3261,8 +3216,6 @@ class ModuleAutoGen(AutoGen):
         # only merge library classes and PCD for non-library module
         if self.IsLibrary:
             return []
-        if self.AutoGenVersion < 0x00010005:
-            return self.PlatformInfo.ResolveLibraryReference(self.Module)
         return self.PlatformInfo.ApplyLibraryInstance(self.Module)
 
     ## Get the list of PCDs from current module
@@ -3351,19 +3304,8 @@ class ModuleAutoGen(AutoGen):
     @cached_property
     def IncludePathList(self):
         RetVal = []
-        if self.AutoGenVersion < 0x00010005:
-            for Inc in self.Module.Includes:
-                if Inc not in RetVal:
-                    RetVal.append(Inc)
-                # for Edk modules
-                Inc = path.join(Inc, self.Arch.capitalize())
-                if os.path.exists(Inc) and Inc not in RetVal:
-                    RetVal.append(Inc)
-            # Edk module needs to put DEBUG_DIR at the end of search path and not to use SOURCE_DIR all the time
-            RetVal.append(self.DebugDir)
-        else:
-            RetVal.append(self.MetaFile.Dir)
-            RetVal.append(self.DebugDir)
+        RetVal.append(self.MetaFile.Dir)
+        RetVal.append(self.DebugDir)
 
         for Package in self.Module.Packages:
             PackageDir = mws.join(self.WorkspaceDir, Package.MetaFile.Dir)
@@ -3524,10 +3466,6 @@ class ModuleAutoGen(AutoGen):
             return
 
         if self.IsAsBuiltInfCreated:
-            return
-
-        # Skip the following code for EDK I inf
-        if self.AutoGenVersion < 0x00010005:
             return
 
         # Skip the following code for libraries
@@ -3986,17 +3924,10 @@ class ModuleAutoGen(AutoGen):
 
         for File in self.AutoGenFileList:
             if GenC.Generate(File.Path, self.AutoGenFileList[File], File.IsBinary):
-                #Ignore Edk AutoGen.c
-                if self.AutoGenVersion < 0x00010005 and File.Name == 'AutoGen.c':
-                        continue
-
                 AutoGenList.append(str(File))
             else:
                 IgoredAutoGenList.append(str(File))
 
-        # Skip the following code for EDK I inf
-        if self.AutoGenVersion < 0x00010005:
-            return
 
         for ModuleType in self.DepexList:
             # Ignore empty [depex] section or [depex] section for SUP_MODULE_USER_DEFINED module

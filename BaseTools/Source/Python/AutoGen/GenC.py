@@ -1681,22 +1681,6 @@ def CreateUnicodeStringCode(Info, AutoGenC, AutoGenH, UniGenCFlag, UniGenBinBuff
     # Get all files under [Sources] section in inf file for EDK-II module
     EDK2Module = True
     SrcList = [F for F in Info.SourceFileList]
-    if Info.AutoGenVersion < 0x00010005:
-        EDK2Module = False
-        # Get all files under the module directory for EDK-I module
-        Cwd = os.getcwd()
-        os.chdir(Info.MetaFile.Dir)
-        for Root, Dirs, Files in os.walk("."):
-            if 'CVS' in Dirs:
-                Dirs.remove('CVS')
-            if '.svn' in Dirs:
-                Dirs.remove('.svn')
-            for File in Files:
-                File = PathClass(os.path.join(Root, File), Info.MetaFile.Dir)
-                if File in SrcList:
-                    continue
-                SrcList.append(File)
-        os.chdir(Cwd)
 
     if 'BUILD' in Info.BuildOption and Info.BuildOption['BUILD']['FLAGS'].find('-c') > -1:
         CompatibleMode = True
@@ -1984,42 +1968,41 @@ def CreateHeaderCode(Info, AutoGenC, AutoGenH):
     # header file Prologue
     AutoGenH.Append(gAutoGenHPrologueString.Replace({'File':'AUTOGENH','Guid':Info.Guid.replace('-', '_')}))
     AutoGenH.Append(gAutoGenHCppPrologueString)
-    if Info.AutoGenVersion >= 0x00010005:
-        # header files includes
-        if Info.ModuleType in gModuleTypeHeaderFile:
-            AutoGenH.Append("#include <%s>\n" % gModuleTypeHeaderFile[Info.ModuleType][0])
-        #
-        # if either PcdLib in [LibraryClasses] sections or there exist Pcd section, add PcdLib.h
-        # As if modules only uses FixedPcd, then PcdLib is not needed in [LibraryClasses] section.
-        #
-        if 'PcdLib' in Info.Module.LibraryClasses or Info.Module.Pcds:
-            AutoGenH.Append("#include <Library/PcdLib.h>\n")
 
-        AutoGenH.Append('\nextern GUID  gEfiCallerIdGuid;')
-        AutoGenH.Append('\nextern CHAR8 *gEfiCallerBaseName;\n\n')
+    # header files includes
+    if Info.ModuleType in gModuleTypeHeaderFile:
+        AutoGenH.Append("#include <%s>\n" % gModuleTypeHeaderFile[Info.ModuleType][0])
+    #
+    # if either PcdLib in [LibraryClasses] sections or there exist Pcd section, add PcdLib.h
+    # As if modules only uses FixedPcd, then PcdLib is not needed in [LibraryClasses] section.
+    #
+    if 'PcdLib' in Info.Module.LibraryClasses or Info.Module.Pcds:
+        AutoGenH.Append("#include <Library/PcdLib.h>\n")
 
-        if Info.IsLibrary:
-            return
+    AutoGenH.Append('\nextern GUID  gEfiCallerIdGuid;')
+    AutoGenH.Append('\nextern CHAR8 *gEfiCallerBaseName;\n\n')
 
-        AutoGenH.Append("#define EFI_CALLER_ID_GUID \\\n  %s\n" % GuidStringToGuidStructureString(Info.Guid))
+    if Info.IsLibrary:
+        return
+
+    AutoGenH.Append("#define EFI_CALLER_ID_GUID \\\n  %s\n" % GuidStringToGuidStructureString(Info.Guid))
 
     if Info.IsLibrary:
         return
     # C file header
     AutoGenC.Append(gAutoGenHeaderString.Replace({'FileName':'AutoGen.c'}))
-    if Info.AutoGenVersion >= 0x00010005:
-        # C file header files includes
-        if Info.ModuleType in gModuleTypeHeaderFile:
-            for Inc in gModuleTypeHeaderFile[Info.ModuleType]:
-                AutoGenC.Append("#include <%s>\n" % Inc)
-        else:
-            AutoGenC.Append("#include <%s>\n" % gBasicHeaderFile)
+    # C file header files includes
+    if Info.ModuleType in gModuleTypeHeaderFile:
+        for Inc in gModuleTypeHeaderFile[Info.ModuleType]:
+            AutoGenC.Append("#include <%s>\n" % Inc)
+    else:
+        AutoGenC.Append("#include <%s>\n" % gBasicHeaderFile)
 
-        #
-        # Publish the CallerId Guid
-        #
-        AutoGenC.Append('\nGLOBAL_REMOVE_IF_UNREFERENCED GUID gEfiCallerIdGuid = %s;\n' % GuidStringToGuidStructureString(Info.Guid))
-        AutoGenC.Append('\nGLOBAL_REMOVE_IF_UNREFERENCED CHAR8 *gEfiCallerBaseName = "%s";\n' % Info.Name)
+    #
+    # Publish the CallerId Guid
+    #
+    AutoGenC.Append('\nGLOBAL_REMOVE_IF_UNREFERENCED GUID gEfiCallerIdGuid = %s;\n' % GuidStringToGuidStructureString(Info.Guid))
+    AutoGenC.Append('\nGLOBAL_REMOVE_IF_UNREFERENCED CHAR8 *gEfiCallerBaseName = "%s";\n' % Info.Name)
 
 ## Create common code for header file
 #
@@ -2045,15 +2028,14 @@ def CreateFooterCode(Info, AutoGenC, AutoGenH):
 def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer, StringIdf, IdfGenCFlag, IdfGenBinBuffer):
     CreateHeaderCode(Info, AutoGenC, AutoGenH)
 
-    if Info.AutoGenVersion >= 0x00010005:
-        CreateGuidDefinitionCode(Info, AutoGenC, AutoGenH)
-        CreateProtocolDefinitionCode(Info, AutoGenC, AutoGenH)
-        CreatePpiDefinitionCode(Info, AutoGenC, AutoGenH)
-        CreatePcdCode(Info, AutoGenC, AutoGenH)
-        CreateLibraryConstructorCode(Info, AutoGenC, AutoGenH)
-        CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH)
-        CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH)
-        CreateModuleUnloadImageCode(Info, AutoGenC, AutoGenH)
+    CreateGuidDefinitionCode(Info, AutoGenC, AutoGenH)
+    CreateProtocolDefinitionCode(Info, AutoGenC, AutoGenH)
+    CreatePpiDefinitionCode(Info, AutoGenC, AutoGenH)
+    CreatePcdCode(Info, AutoGenC, AutoGenH)
+    CreateLibraryConstructorCode(Info, AutoGenC, AutoGenH)
+    CreateLibraryDestructorCode(Info, AutoGenC, AutoGenH)
+    CreateModuleEntryPointCode(Info, AutoGenC, AutoGenH)
+    CreateModuleUnloadImageCode(Info, AutoGenC, AutoGenH)
 
     if Info.UnicodeFileList:
         FileName = "%sStrDefs.h" % Info.Name
@@ -2111,10 +2093,6 @@ def CreateCode(Info, AutoGenC, AutoGenH, StringH, UniGenCFlag, UniGenBinBuffer, 
         AutoGenH.Append('#include "%s"\n' % FileName)
 
     CreateFooterCode(Info, AutoGenC, AutoGenH)
-
-    # no generation of AutoGen.c for Edk modules without unicode file
-    if Info.AutoGenVersion < 0x00010005 and len(Info.UnicodeFileList) == 0:
-        AutoGenC.String = ''
 
 ## Create the code file
 #
