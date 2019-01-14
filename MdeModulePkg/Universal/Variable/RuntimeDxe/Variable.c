@@ -301,7 +301,7 @@ UpdateVariableStore (
       DataPtr += mVariableModuleGlobal->VariableGlobal.VolatileVariableBase;
     }
 
-    if ((DataPtr + DataSize) > ((UINTN) ((UINT8 *) VolatileBase + VolatileBase->Size))) {
+    if ((DataPtr + DataSize) > ((UINTN) VolatileBase + VolatileBase->Size)) {
       return EFI_OUT_OF_RESOURCES;
     }
 
