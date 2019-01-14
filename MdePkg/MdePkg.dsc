@@ -116,6 +116,7 @@
   MdePkg/Library/BaseExtractGuidedSectionLib/BaseExtractGuidedSectionLib.inf
 
   MdePkg/Library/StandaloneMmDriverEntryPoint/StandaloneMmDriverEntryPoint.inf
+  MdePkg/Library/StandaloneMmServicesTableLib/StandaloneMmServicesTableLib.inf
 
 [Components.IA32, Components.X64]
   MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
