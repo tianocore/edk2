@@ -21,13 +21,19 @@ import re
 import Common.LongFilePathOs as os
 import sys
 
-import antlr3
-from .CLexer import CLexer
-from .CParser import CParser
+if sys.version_info.major == 3:
+    import antlr4 as antlr
+    from Eot.CParser4.CLexer import CLexer
+    from Eot.CParser4.CParser import CParser
+else:
+    import antlr3 as antlr
+    antlr.InputStream = antlr.StringStream
+    from Eot.CParser3.CLexer import CLexer
+    from Eot.CParser3.CParser import CParser
 
-from . import FileProfile
-from .CodeFragment import PP_Directive
-from .ParserWarning import Warning
+from Eot import FileProfile
+from Eot.CodeFragment import PP_Directive
+from Eot.ParserWarning import Warning
 
 
 ##define T_CHAR_SPACE                ' '
@@ -354,9 +360,9 @@ class CodeFragmentCollector:
         FileStringContents = ''
         for fileLine in self.Profile.FileLinesList:
             FileStringContents += fileLine
-        cStream = antlr3.StringStream(FileStringContents)
+        cStream = antlr.InputStream(FileStringContents)
         lexer = CLexer(cStream)
-        tStream = antlr3.CommonTokenStream(lexer)
+        tStream = antlr.CommonTokenStream(lexer)
         parser = CParser(tStream)
         parser.translation_unit()
 
