@@ -1422,6 +1422,12 @@ SupportCapsuleImage (
 
   if (IsFmpCapsule(CapsuleHeader)) {
     //
+    // Fake capsule header is valid case in QueryCapsuleCpapbilities().
+    //
+    if (CapsuleHeader->HeaderSize == CapsuleHeader->CapsuleImageSize) {
+      return EFI_SUCCESS;
+    }
+    //
     // Check layout of FMP capsule
     //
     return ValidateFmpCapsule(CapsuleHeader, NULL);
