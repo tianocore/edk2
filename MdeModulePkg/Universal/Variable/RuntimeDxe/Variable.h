@@ -92,6 +92,7 @@ typedef struct {
   UINT32                ReentrantState;
   BOOLEAN               AuthFormat;
   BOOLEAN               AuthSupport;
+  BOOLEAN               EmuNvMode;
 } VARIABLE_GLOBAL;
 
 typedef struct {

@@ -236,14 +236,16 @@ VariableClassAddressChangeEvent (
 {
   UINTN          Index;
 
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetBlockSize);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetPhysicalAddress);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetAttributes);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->SetAttributes);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Read);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Write);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->EraseBlocks);
-  EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance);
+  if (mVariableModuleGlobal->FvbInstance != NULL) {
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetBlockSize);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetPhysicalAddress);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->GetAttributes);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->SetAttributes);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Read);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->Write);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance->EraseBlocks);
+    EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->FvbInstance);
+  }
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->PlatformLangCodes);
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->LangCodes);
   EfiConvertPointer (0x0, (VOID **) &mVariableModuleGlobal->PlatformLang);
@@ -528,16 +530,23 @@ VariableServiceInitialize (
                   );
   ASSERT_EFI_ERROR (Status);
 
-  //
-  // Register FtwNotificationEvent () notify function.
-  //
-  EfiCreateProtocolNotifyEvent (
-    &gEfiFaultTolerantWriteProtocolGuid,
-    TPL_CALLBACK,
-    FtwNotificationEvent,
-    (VOID *)SystemTable,
-    &mFtwRegistration
-    );
+  if (!PcdGetBool (PcdEmuVariableNvModeEnable)) {
+    //
+    // Register FtwNotificationEvent () notify function.
+    //
+    EfiCreateProtocolNotifyEvent (
+      &gEfiFaultTolerantWriteProtocolGuid,
+      TPL_CALLBACK,
+      FtwNotificationEvent,
+      (VOID *)SystemTable,
+      &mFtwRegistration
+      );
+  } else {
+    //
+    // Emulated non-volatile variable mode does not depend on FVB and FTW.
+    //
+    VariableWriteServiceInitializeDxe ();
+  }
 
   Status = gBS->CreateEventEx (
                   EVT_NOTIFY_SIGNAL,
