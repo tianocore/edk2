@@ -68,7 +68,6 @@ typedef struct _DHCP6_INSTANCE DHCP6_INSTANCE;
 #define DHCP6_SERVICE_FROM_THIS(Service)   CR ((Service), DHCP6_SERVICE, ServiceBinding, DHCP6_SERVICE_SIGNATURE)
 
 extern EFI_IPv6_ADDRESS           mAllDhcpRelayAndServersAddress;
-extern EFI_IPv6_ADDRESS           mAllDhcpServersAddress;
 extern EFI_DHCP6_PROTOCOL         gDhcp6ProtocolTemplate;
 
 //

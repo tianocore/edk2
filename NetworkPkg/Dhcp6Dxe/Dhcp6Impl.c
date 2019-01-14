@@ -19,10 +19,8 @@
 // Well-known multi-cast address defined in section-24.1 of rfc-3315
 //
 //   ALL_DHCP_Relay_Agents_and_Servers address: FF02::1:2
-//   ALL_DHCP_Servers address:                  FF05::1:3
 //
 EFI_IPv6_ADDRESS   mAllDhcpRelayAndServersAddress = {{0xFF, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2}};
-EFI_IPv6_ADDRESS   mAllDhcpServersAddress         = {{0xFF, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 3}};
 
 EFI_DHCP6_PROTOCOL gDhcp6ProtocolTemplate = {
   EfiDhcp6GetModeData,
