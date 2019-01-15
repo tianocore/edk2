@@ -636,34 +636,14 @@ class InfBuildData(ModuleBuildClassObject):
         Macros['PROCESSOR'] = GlobalData.gEdkGlobal.get('PROCESSOR', self._Arch)
         RecordList = self._RawData[MODEL_EFI_INCLUDE, self._Arch, self._Platform]
         for Record in RecordList:
-            if Record[0].find('EDK_SOURCE') > -1:
-                File = NormPath(Record[0], self._Macros)
-                if File[0] == '.':
-                    File = os.path.join(self._ModuleDir, File)
-                else:
-                    File = os.path.join(GlobalData.gWorkspace, File)
-                File = RealPath(os.path.normpath(File))
-                if File:
-                    RetVal.append(File)
-
-                # TRICK: let compiler to choose correct header file
-                File = NormPath(Record[0], self._Macros)
-                if File[0] == '.':
-                    File = os.path.join(self._ModuleDir, File)
-                else:
-                    File = os.path.join(GlobalData.gWorkspace, File)
-                File = RealPath(os.path.normpath(File))
-                if File:
-                    RetVal.append(File)
+            File = NormPath(Record[0], Macros)
+            if File[0] == '.':
+                File = os.path.join(self._ModuleDir, File)
             else:
-                File = NormPath(Record[0], Macros)
-                if File[0] == '.':
-                    File = os.path.join(self._ModuleDir, File)
-                else:
-                    File = mws.join(GlobalData.gWorkspace, File)
-                File = RealPath(os.path.normpath(File))
-                if File:
-                    RetVal.append(File)
+                File = mws.join(GlobalData.gWorkspace, File)
+            File = RealPath(os.path.normpath(File))
+            if File:
+                RetVal.append(File)
         return RetVal
 
     ## Retrieve packages this module depends on
