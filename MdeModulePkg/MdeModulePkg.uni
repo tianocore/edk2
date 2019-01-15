@@ -397,9 +397,9 @@
                                                                                   "TRUE  - An EMU variable NV storage will be allocated or reserved for NV variables.<BR>"
                                                                                   "FALSE - No EMU variable NV storage will be allocated or reserved for NV variables.<BR>"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEmuVariableNvStoreReserved_PROMPT  #language en-US "Reserved memory range for EMU variable NV storage"
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEmuVariableNvStoreReserved_PROMPT  #language en-US "Base of reserved memory range for EMU variable NV storage"
 
-#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEmuVariableNvStoreReserved_HELP  #language en-US "This PCD defines a reserved memory range for EMU variable NV storage. The range is valid if non-zero. The memory range size must be PcdVariableStoreSize."
+#string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdEmuVariableNvStoreReserved_HELP  #language en-US "This PCD defines the base address of reserved memory range for EMU variable NV storage. A non-ZERO value indicates a valid range reserved with size given by PcdVariableStoreSize."
 
 #string STR_gEfiMdeModulePkgTokenSpaceGuid_PcdHelloWorldPrintTimes_PROMPT  #language en-US "HelloWorld print times"
 

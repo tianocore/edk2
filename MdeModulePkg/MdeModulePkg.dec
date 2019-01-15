@@ -1594,9 +1594,9 @@
   # @Prompt EMU variable NV mode enable.
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|FALSE|BOOLEAN|0x01100001
 
-  ## This PCD defines a reserved memory range for EMU variable NV storage.
-  #  The range is valid if non-zero. The memory range size must be PcdVariableStoreSize.
-  # @Prompt Reserved memory range for EMU variable NV storage.
+  ## This PCD defines the base address of reserved memory range for EMU variable NV storage.
+  #  A non-ZERO value indicates a valid range reserved with size given by PcdVariableStoreSize.
+  # @Prompt Base of reserved memory range for EMU variable NV storage.
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvStoreReserved|0|UINT64|0x40000008
 
   ## This PCD defines the times to print hello world string.
