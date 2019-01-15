@@ -287,6 +287,12 @@
   SecurityPkg/Tcg/Opal/OpalPassword/OpalPasswordDxe.inf
   SecurityPkg/Tcg/Opal/OpalPassword/OpalPasswordPei.inf
 
+  #
+  # HDD Password solution
+  #
+  SecurityPkg/HddPassword/HddPasswordDxe.inf
+  SecurityPkg/HddPassword/HddPasswordPei.inf
+
 [BuildOptions]
    MSFT:*_*_IA32_DLINK_FLAGS = /ALIGN:256
   INTEL:*_*_IA32_DLINK_FLAGS = /ALIGN:256
