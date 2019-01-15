@@ -792,9 +792,14 @@ InitializeVariableQuota (
   VOID
   );
 
-extern VARIABLE_MODULE_GLOBAL  *mVariableModuleGlobal;
+extern VARIABLE_MODULE_GLOBAL       *mVariableModuleGlobal;
+extern EFI_FIRMWARE_VOLUME_HEADER   *mNvFvHeaderCache;
+extern VARIABLE_STORE_HEADER        *mNvVariableCache;
+extern VARIABLE_INFO_ENTRY          *gVariableInfo;
+extern BOOLEAN                      mEndOfDxe;
+extern VAR_CHECK_REQUEST_SOURCE     mRequestSource;
 
-extern AUTH_VAR_LIB_CONTEXT_OUT mAuthContextOut;
+extern AUTH_VAR_LIB_CONTEXT_OUT     mAuthContextOut;
 
 /**
   Finds variable in storage blocks of volatile and non-volatile storage areas.

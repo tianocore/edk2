@@ -17,13 +17,9 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 #include "Variable.h"
 
-extern VARIABLE_STORE_HEADER        *mNvVariableCache;
-extern EFI_FIRMWARE_VOLUME_HEADER   *mNvFvHeaderCache;
-extern VARIABLE_INFO_ENTRY          *gVariableInfo;
 EFI_HANDLE                          mHandle                    = NULL;
 EFI_EVENT                           mVirtualAddressChangeEvent = NULL;
 EFI_EVENT                           mFtwRegistration           = NULL;
-extern BOOLEAN                      mEndOfDxe;
 VOID                                ***mVarCheckAddressPointer = NULL;
 UINTN                               mVarCheckAddressPointerCount = 0;
 EDKII_VARIABLE_LOCK_PROTOCOL        mVariableLock              = { VariableLockRequestToLock };
