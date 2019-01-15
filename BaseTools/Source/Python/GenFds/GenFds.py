@@ -189,7 +189,6 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
         else:
             EdkLogger.error("GenFds", OPTION_MISSING, "Missing active platform")
 
-        GlobalData.BuildOptionPcd = FdsCommandDict.get("OptionPcd") if FdsCommandDict.get("OptionPcd") else {}
         GenFdsGlobalVariable.ActivePlatform = PathClass(NormPath(ActivePlatform))
 
         if FdsCommandDict.get("conf_directory"):
