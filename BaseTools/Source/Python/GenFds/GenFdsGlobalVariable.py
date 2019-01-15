@@ -50,7 +50,6 @@ class GenFdsGlobalVariable:
     WorkSpace = None
     WorkSpaceDir = ''
     ConfDir = ''
-    EdkSourceDir = ''
     OutputDirFromDscDict = {}
     TargetName = ''
     ToolChainTag = ''
@@ -340,7 +339,6 @@ class GenFdsGlobalVariable:
         GenFdsGlobalVariable.ToolChainTag = GlobalData.gGlobalDefines["TOOL_CHAIN_TAG"]
         GenFdsGlobalVariable.TargetName = GlobalData.gGlobalDefines["TARGET"]
         GenFdsGlobalVariable.ActivePlatform = GlobalData.gActivePlatform
-        GenFdsGlobalVariable.EdkSourceDir = GlobalData.gGlobalDefines["EDK_SOURCE"]
         GenFdsGlobalVariable.ConfDir  = GlobalData.gConfDirectory
         GenFdsGlobalVariable.EnableGenfdsMultiThread = GlobalData.gEnableGenfdsMultiThread
         for Arch in ArchList:
@@ -757,7 +755,6 @@ class GenFdsGlobalVariable:
             return None
 
         Dict = {'$(WORKSPACE)': GenFdsGlobalVariable.WorkSpaceDir,
-                '$(EDK_SOURCE)': GenFdsGlobalVariable.EdkSourceDir,
 #                '$(OUTPUT_DIRECTORY)': GenFdsGlobalVariable.OutputDirFromDsc,
                 '$(TARGET)': GenFdsGlobalVariable.TargetName,
                 '$(TOOL_CHAIN_TAG)': GenFdsGlobalVariable.ToolChainTag,

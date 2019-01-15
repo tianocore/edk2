@@ -75,7 +75,6 @@ def resetFdsGlobalVariable():
     GenFdsGlobalVariable.WorkSpace = None
     GenFdsGlobalVariable.WorkSpaceDir = ''
     GenFdsGlobalVariable.ConfDir = ''
-    GenFdsGlobalVariable.EdkSourceDir = ''
     GenFdsGlobalVariable.OutputDirFromDscDict = {}
     GenFdsGlobalVariable.TargetName = ''
     GenFdsGlobalVariable.ToolChainTag = ''
@@ -143,8 +142,6 @@ def GenFdsApi(FdsCommandDict, WorkSpaceDataBase=None):
         else:
             Workspace = os.path.normcase(FdsCommandDict.get("Workspace",os.environ.get('WORKSPACE')))
             GenFdsGlobalVariable.WorkSpaceDir = Workspace
-            if 'EDK_SOURCE' in os.environ:
-                GenFdsGlobalVariable.EdkSourceDir = os.path.normcase(os.environ['EDK_SOURCE'])
             if FdsCommandDict.get("debug"):
                 GenFdsGlobalVariable.VerboseLogger("Using Workspace:" + Workspace)
             if FdsCommandDict.get("GenfdsMultiThread"):
