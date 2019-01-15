@@ -3019,7 +3019,7 @@ class ModuleAutoGen(AutoGen):
         self.BuildOption
         for SingleFile in FileList:
             if self.BuildRuleOrder and SingleFile.Ext in self.BuildRuleOrder and SingleFile.Ext in self.BuildRules:
-                key = SingleFile.Path.split(SingleFile.Ext)[0]
+                key = SingleFile.Path.rsplit(SingleFile.Ext,1)[0]
                 if key in Order_Dict:
                     Order_Dict[key].append(SingleFile.Ext)
                 else:
