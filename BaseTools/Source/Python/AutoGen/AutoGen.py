@@ -2779,10 +2779,10 @@ class ModuleAutoGen(AutoGen):
                     if '.' not in item:
                         NewList.append(item)
                     else:
-                        if item not in self._FixedPcdVoidTypeDict:
+                        if item not in self.FixedVoidTypePcds:
                             EdkLogger.error("build", FORMAT_INVALID, "{} used in [Depex] section should be used as FixedAtBuild type and VOID* datum type in the module.".format(item))
                         else:
-                            Value = self._FixedPcdVoidTypeDict[item]
+                            Value = self.FixedVoidTypePcds[item]
                             if len(Value.split(',')) != 16:
                                 EdkLogger.error("build", FORMAT_INVALID,
                                                 "{} used in [Depex] section should be used as FixedAtBuild type and VOID* datum type and 16 bytes in the module.".format(item))
