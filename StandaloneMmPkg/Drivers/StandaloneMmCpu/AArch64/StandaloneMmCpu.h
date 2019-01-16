@@ -40,7 +40,7 @@ extern MP_INFORMATION_HOB_DATA       *mMpInformationHobData;
 extern EFI_MM_CONFIGURATION_PROTOCOL mMmConfig;
 
 EFI_STATUS
-PiMmStandloneArmTfCpuDriverEntry (
+PiMmStandaloneArmTfCpuDriverEntry (
   IN UINTN EventId,
   IN UINTN CpuNumber,
   IN UINTN NsCommBufferAddr
@@ -53,12 +53,6 @@ PiMmCpuTpFwRootMmiHandler (
   IN     CONST VOID               *Context,        OPTIONAL
   IN OUT VOID                     *CommBuffer,     OPTIONAL
   IN OUT UINTN                    *CommBufferSize  OPTIONAL
-  );
-
-EFI_STATUS _PiMmStandloneArmTfCpuDriverEntry (
-  IN UINTN EventId,
-  IN UINTN CpuNumber,
-  IN UINTN NsCommBufferAddr
   );
 
 #endif

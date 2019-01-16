@@ -65,7 +65,7 @@ EFI_MM_CONFIGURATION_PROTOCOL mMmConfig = {
 STATIC EFI_MM_ENTRY_POINT     mMmEntryPoint = NULL;
 
 EFI_STATUS
-PiMmStandloneArmTfCpuDriverEntry (
+PiMmStandaloneArmTfCpuDriverEntry (
   IN UINTN EventId,
   IN UINTN CpuNumber,
   IN UINTN NsCommBufferAddr

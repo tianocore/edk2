@@ -74,7 +74,7 @@ GetGuidedHobData (
 }
 
 EFI_STATUS
-StandloneMmCpuInitialize (
+StandaloneMmCpuInitialize (
   IN EFI_HANDLE         ImageHandle,  // not actual imagehandle
   IN EFI_MM_SYSTEM_TABLE   *SystemTable  // not actual systemtable
   )
@@ -147,8 +147,8 @@ StandloneMmCpuInitialize (
   // Share the entry point of the CPU driver
   DEBUG ((DEBUG_INFO, "Sharing Cpu Driver EP *0x%lx = 0x%lx\n",
           (UINT64) CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr,
-          (UINT64) PiMmStandloneArmTfCpuDriverEntry));
-  *(CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr) = PiMmStandloneArmTfCpuDriverEntry;
+          (UINT64) PiMmStandaloneArmTfCpuDriverEntry));
+  *(CpuDriverEntryPointDesc->ArmTfCpuDriverEpPtr) = PiMmStandaloneArmTfCpuDriverEntry;
 
   // Find the descriptor that contains the whereabouts of the buffer for
   // communication with the Normal world.
