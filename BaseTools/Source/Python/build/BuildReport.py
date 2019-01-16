@@ -1245,9 +1245,11 @@ class PcdReport(object):
                         Value = "0x{:X} ({})".format(int(Value, 0), Value)
                 FileWrite(File, '    %*s = %s' % (self.MaxLen + 19, 'DEC DEFAULT', Value))
             if IsStructure:
-                self.PrintStructureInfo(File, Pcd.DefaultValues)
+                for filedvalues in Pcd.DefaultValues.values():
+                    self.PrintStructureInfo(File, filedvalues)
         if DecMatch and IsStructure:
-            self.PrintStructureInfo(File, Pcd.DefaultValues)
+            for filedvalues in Pcd.DefaultValues.values():
+                self.PrintStructureInfo(File, filedvalues)
 
     def PrintPcdValue(self, File, Pcd, PcdTokenCName, TypeName, IsStructure, DscMatch, DscDefaultValue, InfMatch, InfDefaultValue, DecMatch, DecDefaultValue, Flag = '  '):
         if not Pcd.SkuInfoList:
