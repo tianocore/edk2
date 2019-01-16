@@ -12,6 +12,8 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 
 **/
 
+#include <Uefi/UefiBaseType.h>
+
 #include <Library/VarCheckLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -921,21 +923,17 @@ VariablePropertySetUefiDefined (
   Constructor function of VarCheckUefiLib to set property and
   register SetVariable check handler for UEFI defined variables.
 
-  @param[in] ImageHandle    The firmware allocated handle for the EFI image.
-  @param[in] SystemTable    A pointer to the EFI System Table.
-
   @retval EFI_SUCCESS       The constructor executed correctly.
 
 **/
-EFI_STATUS
+RETURN_STATUS
 EFIAPI
 VarCheckUefiLibNullClassConstructor (
-  IN EFI_HANDLE             ImageHandle,
-  IN EFI_SYSTEM_TABLE       *SystemTable
+  VOID
   )
 {
   VariablePropertySetUefiDefined ();
   VarCheckLibRegisterSetVariableCheckHandler (SetVariableCheckHandlerUefiDefined);
 
-  return EFI_SUCCESS;
+  return RETURN_SUCCESS;
 }

@@ -19,9 +19,9 @@
   BASE_NAME                      = VarCheckUefiLib
   MODULE_UNI_FILE                = VarCheckUefiLib.uni
   FILE_GUID                      = AC24A4C7-F845-4665-90E5-6431D6E28DC0
-  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = NULL|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = NULL|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER MM_STANDALONE
   CONSTRUCTOR                    = VarCheckUefiLibNullClassConstructor
 
 #
