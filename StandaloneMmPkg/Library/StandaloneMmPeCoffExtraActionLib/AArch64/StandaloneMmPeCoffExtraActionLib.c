@@ -145,8 +145,7 @@ UpdatePeCoffPermissions (
 
     if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_EXECUTE) == 0) {
 
-      if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_WRITE) == 0 &&
-          TmpContext.ImageType != EFI_IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER) {
+      if ((SectionHeader.Characteristics & EFI_IMAGE_SCN_MEM_WRITE) == 0) {
 
         DEBUG ((DEBUG_INFO,
           "%a: Mapping section %d of image at 0x%lx with RO-XN permissions and size 0x%x\n",
@@ -159,13 +158,9 @@ UpdatePeCoffPermissions (
       }
     } else {
         DEBUG ((DEBUG_INFO,
-          "%a: Mapping section %d of image at 0x%lx with RO-XN permissions and size 0x%x\n",
-           __FUNCTION__, Index, Base, SectionHeader.Misc.VirtualSize));
-        ReadOnlyUpdater (Base, SectionHeader.Misc.VirtualSize);
-
-        DEBUG ((DEBUG_INFO,
           "%a: Mapping section %d of image at 0x%lx with RO-X permissions and size 0x%x\n",
           __FUNCTION__, Index, Base, SectionHeader.Misc.VirtualSize));
+        ReadOnlyUpdater (Base, SectionHeader.Misc.VirtualSize);
         NoExecUpdater (Base, SectionHeader.Misc.VirtualSize);
     }
 
