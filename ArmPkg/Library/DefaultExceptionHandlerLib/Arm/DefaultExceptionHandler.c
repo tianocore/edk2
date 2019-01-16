@@ -22,6 +22,7 @@
 #include <Library/ArmDisassemblerLib.h>
 #include <Library/SerialPortLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 
 #include <Guid/DebugImageInfoTable.h>
 
