@@ -78,7 +78,7 @@ UpdateMmFoundationPeCoffPermissions (
             "%a: Section %d of image at 0x%lx has 0x%x permissions\n",
             __FUNCTION__, Index, ImageContext->ImageAddress, SectionHeader.Characteristics));
     DEBUG ((DEBUG_INFO,
-            "%a: Section %d of image at 0x%lx has %s name\n",
+            "%a: Section %d of image at 0x%lx has %a name\n",
             __FUNCTION__, Index, ImageContext->ImageAddress, SectionHeader.Name));
     DEBUG ((DEBUG_INFO,
             "%a: Section %d of image at 0x%lx has 0x%x address\n",
