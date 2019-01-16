@@ -294,7 +294,6 @@ MmLoadImage (
   IN OUT EFI_MM_DRIVER_ENTRY  *DriverEntry
   )
 {
-  VOID                           *Buffer;
   UINTN                          PageCount;
   EFI_STATUS                     Status;
   EFI_PHYSICAL_ADDRESS           DstBuffer;
@@ -302,17 +301,12 @@ MmLoadImage (
 
   DEBUG ((DEBUG_INFO, "MmLoadImage - %g\n", &DriverEntry->FileName));
 
-  Buffer = AllocateCopyPool (DriverEntry->Pe32DataSize, DriverEntry->Pe32Data);
-  if (Buffer == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-
   Status               = EFI_SUCCESS;
 
   //
   // Initialize ImageContext
   //
-  ImageContext.Handle = Buffer;
+  ImageContext.Handle = DriverEntry->Pe32Data;
   ImageContext.ImageRead = PeCoffLoaderImageReadFromMemory;
 
   //
@@ -320,9 +314,6 @@ MmLoadImage (
   //
   Status = PeCoffLoaderGetImageInfo (&ImageContext);
   if (EFI_ERROR (Status)) {
-    if (Buffer != NULL) {
-      MmFreePool (Buffer);
-    }
     return Status;
   }
 
@@ -336,9 +327,6 @@ MmLoadImage (
              &DstBuffer
              );
   if (EFI_ERROR (Status)) {
-    if (Buffer != NULL) {
-      MmFreePool (Buffer);
-    }
     return Status;
   }
 
@@ -355,9 +343,6 @@ MmLoadImage (
   //
   Status = PeCoffLoaderLoadImage (&ImageContext);
   if (EFI_ERROR (Status)) {
-    if (Buffer != NULL) {
-      MmFreePool (Buffer);
-    }
     MmFreePages (DstBuffer, PageCount);
     return Status;
   }
@@ -367,9 +352,6 @@ MmLoadImage (
   //
   Status = PeCoffLoaderRelocateImage (&ImageContext);
   if (EFI_ERROR (Status)) {
-    if (Buffer != NULL) {
-      MmFreePool (Buffer);
-    }
     MmFreePages (DstBuffer, PageCount);
     return Status;
   }
@@ -393,9 +375,6 @@ MmLoadImage (
                                               (VOID **)&DriverEntry->LoadedImage
                                               );
     if (EFI_ERROR (Status)) {
-      if (Buffer != NULL) {
-        MmFreePool (Buffer);
-      }
       MmFreePages (DstBuffer, PageCount);
       return Status;
     }
@@ -482,13 +461,6 @@ MmLoadImage (
 
   DEBUG_CODE_END ();
 
-  //
-  // Free buffer allocated by Fv->ReadSection.
-  //
-  // The UEFI Boot Services FreePool() function must be used because Fv->ReadSection
-  // used the UEFI Boot Services AllocatePool() function
-  //
-  MmFreePool (Buffer);
   return Status;
 }
 
