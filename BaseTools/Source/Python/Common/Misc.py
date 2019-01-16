@@ -1525,8 +1525,6 @@ def AnalyzeDscPcd(Setting, PcdType, DataType=''):
             Offset = FieldList[2]
         if len(FieldList) > 3:
             Value = FieldList[3]
-            if not Value:
-                IsValid = False
         if len(FieldList) > 4:
             Attribute = FieldList[4]
         return [HiiString, Guid, Offset, Value, Attribute], IsValid, 3
