@@ -31,6 +31,7 @@
 
 [Sources]
   Mbr.c
+  Gpt.c
   Eltorito.c
   Part.c
   FatLiteApi.c
@@ -49,6 +50,7 @@
 [LibraryClasses]
   PcdLib
   BaseMemoryLib
+  MemoryAllocationLib
   PeimEntryPoint
   BaseLib
   DebugLib
@@ -61,6 +63,7 @@
   gRecoveryOnFatIdeDiskGuid                   ## SOMETIMES_CONSUMES   ## UNDEFINED
   gRecoveryOnFatFloppyDiskGuid                ## SOMETIMES_CONSUMES   ## UNDEFINED
   gRecoveryOnFatNvmeDiskGuid                  ## SOMETIMES_CONSUMES   ## UNDEFINED
+  gEfiPartTypeUnusedGuid                      ## SOMETIMES_CONSUMES   ## UNDEFINED
 
 
 [Ppis]
