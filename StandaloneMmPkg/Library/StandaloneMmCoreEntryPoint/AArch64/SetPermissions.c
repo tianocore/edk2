@@ -143,9 +143,12 @@ LocateStandaloneMmCorePeCoffData (
 
   Status = FfsFindSectionData (EFI_SECTION_PE32, FileHeader, TeData, TeDataSize);
   if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "Unable to locate Standalone MM Section data - 0x%x\n",
-              Status));
-    return Status;
+    Status = FfsFindSectionData (EFI_SECTION_TE, FileHeader, TeData, TeDataSize);
+    if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "Unable to locate Standalone MM Section data - %r\n",
+                Status));
+      return Status;
+    }
   }
 
   DEBUG ((DEBUG_INFO, "Found Standalone MM PE data - 0x%x\n", *TeData));
@@ -155,10 +158,9 @@ LocateStandaloneMmCorePeCoffData (
 STATIC
 EFI_STATUS
 GetPeCoffSectionInformation (
-  IN  CONST PE_COFF_LOADER_IMAGE_CONTEXT      *ImageContext,
-  IN  OUT   PE_COFF_LOADER_IMAGE_CONTEXT      *TmpContext,
-  IN  OUT   UINT32                            *SectionHeaderOffset,
-  IN  OUT   UINT16                            *NumberOfSections
+  IN  OUT   PE_COFF_LOADER_IMAGE_CONTEXT      *ImageContext,
+      OUT   UINT32                            *SectionHeaderOffset,
+      OUT   UINT16                            *NumberOfSections
   )
 {
   RETURN_STATUS                         Status;
@@ -168,44 +170,29 @@ GetPeCoffSectionInformation (
   UINTN                                 ReadSize;
 
   ASSERT (ImageContext != NULL);
-  ASSERT (TmpContext != NULL);
   ASSERT (SectionHeaderOffset != NULL);
   ASSERT (NumberOfSections != NULL);
 
-  //
-  // We need to copy ImageContext since PeCoffLoaderGetImageInfo ()
-  // will mangle the ImageAddress field
-  //
-  CopyMem (TmpContext, ImageContext, sizeof (*TmpContext));
-
-  if (TmpContext->PeCoffHeaderOffset == 0) {
-    Status = PeCoffLoaderGetImageInfo (TmpContext);
-    if (RETURN_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR,
-              "%a: PeCoffLoaderGetImageInfo () failed (Status = %r)\n",
-              __FUNCTION__, Status));
-      return Status;
-    }
+  Status = PeCoffLoaderGetImageInfo (ImageContext);
+  if (RETURN_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
+            "%a: PeCoffLoaderGetImageInfo () failed (Status == %r)\n",
+            __FUNCTION__, Status));
+    return Status;
   }
 
-  if (TmpContext->IsTeImage &&
-      TmpContext->ImageAddress == ImageContext->ImageAddress) {
-    DEBUG ((DEBUG_INFO, "%a: ignoring XIP TE image at 0x%lx\n", __FUNCTION__,
-            ImageContext->ImageAddress));
-    return RETURN_UNSUPPORTED;
-  }
-
-  if (TmpContext->SectionAlignment < EFI_PAGE_SIZE) {
+  if (ImageContext->SectionAlignment < EFI_PAGE_SIZE) {
     //
     // The sections need to be at least 4 KB aligned, since that is the
     // granularity at which we can tighten permissions.
     //
-    if (!TmpContext->IsTeImage) {
+    if (!ImageContext->IsTeImage) {
       DEBUG ((DEBUG_WARN,
               "%a: non-TE Image at 0x%lx has SectionAlignment < 4 KB (%lu)\n",
-              __FUNCTION__, ImageContext->ImageAddress, TmpContext->SectionAlignment));
+              __FUNCTION__, ImageContext->ImageAddress, ImageContext->SectionAlignment));
+      return RETURN_UNSUPPORTED;
     }
-    return RETURN_UNSUPPORTED;
+    ImageContext->SectionAlignment = EFI_PAGE_SIZE;
   }
 
   //
@@ -217,9 +204,9 @@ GetPeCoffSectionInformation (
   Hdr.Union = &HdrData;
   Size = sizeof (EFI_IMAGE_OPTIONAL_HEADER_UNION);
   ReadSize = Size;
-  Status = TmpContext->ImageRead (
-                         TmpContext->Handle,
-                         TmpContext->PeCoffHeaderOffset,
+  Status = ImageContext->ImageRead (
+                         ImageContext->Handle,
+                         ImageContext->PeCoffHeaderOffset,
                          &Size,
                          Hdr.Pe32
                          );
@@ -231,23 +218,28 @@ GetPeCoffSectionInformation (
     return Status;
   }
 
-  ASSERT (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE);
+  if (!ImageContext->IsTeImage) {
+    ASSERT (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE);
 
-  *SectionHeaderOffset = TmpContext->PeCoffHeaderOffset + sizeof (UINT32) +
-                        sizeof (EFI_IMAGE_FILE_HEADER);
-  *NumberOfSections    = Hdr.Pe32->FileHeader.NumberOfSections;
+    *SectionHeaderOffset = ImageContext->PeCoffHeaderOffset + sizeof (UINT32) +
+                          sizeof (EFI_IMAGE_FILE_HEADER);
+    *NumberOfSections    = Hdr.Pe32->FileHeader.NumberOfSections;
 
-  switch (Hdr.Pe32->OptionalHeader.Magic) {
-  case EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC:
-    *SectionHeaderOffset += Hdr.Pe32->FileHeader.SizeOfOptionalHeader;
-    break;
-  case EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC:
-    *SectionHeaderOffset += Hdr.Pe32Plus->FileHeader.SizeOfOptionalHeader;
-    break;
-  default:
-    ASSERT (FALSE);
+    switch (Hdr.Pe32->OptionalHeader.Magic) {
+    case EFI_IMAGE_NT_OPTIONAL_HDR32_MAGIC:
+      *SectionHeaderOffset += Hdr.Pe32->FileHeader.SizeOfOptionalHeader;
+      break;
+    case EFI_IMAGE_NT_OPTIONAL_HDR64_MAGIC:
+      *SectionHeaderOffset += Hdr.Pe32Plus->FileHeader.SizeOfOptionalHeader;
+      break;
+    default:
+      ASSERT (FALSE);
+    }
+  } else {
+    *SectionHeaderOffset = (UINTN)(sizeof (EFI_TE_IMAGE_HEADER));
+    *NumberOfSections = Hdr.Te->NumberOfSections;
+    ImageContext->ImageAddress -= (UINT32)Hdr.Te->StrippedSize - sizeof (EFI_TE_IMAGE_HEADER);
   }
-
   return RETURN_SUCCESS;
 }
 
@@ -261,7 +253,6 @@ GetStandaloneMmCorePeCoffSections (
   )
 {
   EFI_STATUS                   Status;
-  PE_COFF_LOADER_IMAGE_CONTEXT TmpContext;
 
   // Initialize the Image Context
   ZeroMem (ImageContext, sizeof (PE_COFF_LOADER_IMAGE_CONTEXT));
@@ -270,15 +261,9 @@ GetStandaloneMmCorePeCoffSections (
 
   DEBUG ((DEBUG_INFO, "Found Standalone MM PE data - 0x%x\n", TeData));
 
-  Status = PeCoffLoaderGetImageInfo (ImageContext);
+  Status = GetPeCoffSectionInformation (ImageContext, SectionHeaderOffset, NumberOfSections);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Unable to locate Standalone MM Core PE-COFF Image information - 0x%x\n", Status));
-    return Status;
-  }
-
-  Status = GetPeCoffSectionInformation (ImageContext, &TmpContext, SectionHeaderOffset, NumberOfSections);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Unable to locate Standalone MM Core PE-COFF Section information - 0x%x\n", Status));
+    DEBUG ((DEBUG_ERROR, "Unable to locate Standalone MM Core PE-COFF Section information - %r\n", Status));
     return Status;
   }
 
