@@ -3,6 +3,7 @@
 #
 # Copyright (c) 2007 - 2019, Intel Corporation. All rights reserved.<BR>
 # Copyright (c) 2018, Hewlett Packard Enterprise Development, L.P.<BR>
+# Copyright (c) 2019, American Megatrends, Inc. All rights reserved.<BR>
 #
 # This program and the accompanying materials
 # are licensed and made available under the terms and conditions of the BSD License
@@ -935,7 +936,56 @@ class WorkspaceAutoGen(AutoGen):
 
     @property
     def GenFdsCommandDict(self):
-        return GenMake.TopLevelMakefile(self)._TemplateDict
+        FdsCommandDict = {}
+        LogLevel = EdkLogger.GetLevel()
+        if LogLevel == EdkLogger.VERBOSE:
+            FdsCommandDict["verbose"] = True
+        elif LogLevel <= EdkLogger.DEBUG_9:
+            FdsCommandDict["debug"] = LogLevel - 1
+        elif LogLevel == EdkLogger.QUIET:
+            FdsCommandDict["quiet"] = True
+
+        if GlobalData.gEnableGenfdsMultiThread:
+            FdsCommandDict["GenfdsMultiThread"] = True
+        if GlobalData.gIgnoreSource:
+            FdsCommandDict["IgnoreSources"] = True
+
+        FdsCommandDict["OptionPcd"] = []
+        for pcd in GlobalData.BuildOptionPcd:
+            if pcd[2]:
+                pcdname = '.'.join(pcd[0:3])
+            else:
+                pcdname = '.'.join(pcd[0:2])
+            if pcd[3].startswith('{'):
+                FdsCommandDict["OptionPcd"].append(pcdname + '=' + 'H' + '"' + pcd[3] + '"')
+            else:
+                FdsCommandDict["OptionPcd"].append(pcdname + '=' + pcd[3])
+
+        MacroList = []
+        # macros passed to GenFds
+        MacroDict = {}
+        MacroDict.update(GlobalData.gGlobalDefines)
+        MacroDict.update(GlobalData.gCommandLineDefines)
+        for MacroName in MacroDict:
+            if MacroDict[MacroName] != "":
+                MacroList.append('"%s=%s"' % (MacroName, MacroDict[MacroName].replace('\\', '\\\\')))
+            else:
+                MacroList.append('"%s"' % MacroName)
+        FdsCommandDict["macro"] = MacroList
+
+        FdsCommandDict["fdf_file"] = [self.FdfFile]
+        FdsCommandDict["build_target"] = self.BuildTarget
+        FdsCommandDict["toolchain_tag"] = self.ToolChain
+        FdsCommandDict["active_platform"] = str(self)
+
+        FdsCommandDict["conf_directory"] = GlobalData.gConfDirectory
+        FdsCommandDict["build_architecture_list"] = ','.join(self.ArchList)
+        FdsCommandDict["platform_build_directory"] = self.BuildDir
+
+        FdsCommandDict["fd"] = self.FdTargetList
+        FdsCommandDict["fv"] = self.FvTargetList
+        FdsCommandDict["cap"] = self.CapTargetList
+        return FdsCommandDict
 
     ## Create makefile for the platform and modules in it
     #
