@@ -1026,13 +1026,15 @@ class PcdReport(object):
 
 
                 if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
-                    if PcdValue.startswith('0') and not PcdValue.lower().startswith('0x') and len(PcdValue) > 2:
+                    if PcdValue.startswith('0') and not PcdValue.lower().startswith('0x') and \
+                            len(PcdValue) > 1 and PcdValue.lstrip('0'):
                         PcdValue = PcdValue.lstrip('0')
                     PcdValueNumber = int(PcdValue.strip(), 0)
                     if DecDefaultValue is None:
                         DecMatch = True
                     else:
-                        if DecDefaultValue.startswith('0') and not DecDefaultValue.lower().startswith('0x') and len(DecDefaultValue) > 2:
+                        if DecDefaultValue.startswith('0') and not DecDefaultValue.lower().startswith('0x') and \
+                                len(DecDefaultValue) > 1 and DecDefaultValue.lstrip('0'):
                             DecDefaultValue = DecDefaultValue.lstrip('0')
                         DecDefaultValueNumber = int(DecDefaultValue.strip(), 0)
                         DecMatch = (DecDefaultValueNumber == PcdValueNumber)
@@ -1040,7 +1042,8 @@ class PcdReport(object):
                     if InfDefaultValue is None:
                         InfMatch = True
                     else:
-                        if InfDefaultValue.startswith('0') and not InfDefaultValue.lower().startswith('0x') and len(InfDefaultValue) > 2:
+                        if InfDefaultValue.startswith('0') and not InfDefaultValue.lower().startswith('0x') and \
+                                len(InfDefaultValue) > 1 and InfDefaultValue.lstrip('0'):
                             InfDefaultValue = InfDefaultValue.lstrip('0')
                         InfDefaultValueNumber = int(InfDefaultValue.strip(), 0)
                         InfMatch = (InfDefaultValueNumber == PcdValueNumber)
@@ -1048,7 +1051,8 @@ class PcdReport(object):
                     if DscDefaultValue is None:
                         DscMatch = True
                     else:
-                        if DscDefaultValue.startswith('0') and not DscDefaultValue.lower().startswith('0x') and len(DscDefaultValue) > 2:
+                        if DscDefaultValue.startswith('0') and not DscDefaultValue.lower().startswith('0x') and \
+                                len(DscDefaultValue) > 1 and DscDefaultValue.lstrip('0'):
                             DscDefaultValue = DscDefaultValue.lstrip('0')
                         DscDefaultValueNumber = int(DscDefaultValue.strip(), 0)
                         DscMatch = (DscDefaultValueNumber == PcdValueNumber)
@@ -1171,7 +1175,8 @@ class PcdReport(object):
                         for ModulePath in ModuleOverride:
                             ModuleDefault = ModuleOverride[ModulePath]
                             if Pcd.DatumType in TAB_PCD_NUMERIC_TYPES:
-                                if ModuleDefault.startswith('0') and not ModuleDefault.lower().startswith('0x') and len(ModuleDefault) > 2:
+                                if ModuleDefault.startswith('0') and not ModuleDefault.lower().startswith('0x') and \
+                                        len(ModuleDefault) > 1 and ModuleDefault.lstrip('0'):
                                     ModuleDefault = ModuleDefault.lstrip('0')
                                 ModulePcdDefaultValueNumber = int(ModuleDefault.strip(), 0)
                                 Match = (ModulePcdDefaultValueNumber == PcdValueNumber)
@@ -1274,7 +1279,7 @@ class PcdReport(object):
                     FileWrite(File, Array)
             else:
                 if Pcd.DatumType in TAB_PCD_CLEAN_NUMERIC_TYPES:
-                    if Value.startswith('0') and not Value.lower().startswith('0x') and len(Value) > 2:
+                    if Value.startswith('0') and not Value.lower().startswith('0x') and len(Value) > 1 and Value.lstrip('0'):
                         Value = Value.lstrip('0')
                     if Value.startswith(('0x', '0X')):
                         Value = '{} ({:d})'.format(Value, int(Value, 0))

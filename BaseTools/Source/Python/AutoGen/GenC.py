@@ -1010,7 +1010,7 @@ def CreateModulePcdCode(Info, AutoGenC, AutoGenH, Pcd):
             try:
                 if Value.upper().endswith('L'):
                     Value = Value[:-1]
-                if Value.startswith('0') and not Value.lower().startswith('0x') and len(Value) > 2:
+                if Value.startswith('0') and not Value.lower().startswith('0x') and len(Value) > 1 and Value.lstrip('0'):
                     Value = Value.lstrip('0')
                 ValueNumber = int (Value, 0)
             except:
