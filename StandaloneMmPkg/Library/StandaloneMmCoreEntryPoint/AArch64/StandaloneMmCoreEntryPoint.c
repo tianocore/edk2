@@ -295,7 +295,6 @@ _ModuleEntryPoint (
   //
   ProcessModuleEntryPointList (HobStart);
 
-  ASSERT_EFI_ERROR (CpuDriverEntryPoint);
   DEBUG ((DEBUG_INFO, "Shared Cpu Driver EP 0x%lx\n", (UINT64) CpuDriverEntryPoint));
 
 finish:
@@ -303,5 +302,4 @@ finish:
   InitMmFoundationSvcArgs.Arg0 = ARM_SVC_ID_SP_EVENT_COMPLETE_AARCH64;
   InitMmFoundationSvcArgs.Arg1 = Status;
   DelegatedEventLoop (&InitMmFoundationSvcArgs);
-  ASSERT_EFI_ERROR (0);
 }
