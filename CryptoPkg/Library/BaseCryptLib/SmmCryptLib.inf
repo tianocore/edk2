@@ -30,7 +30,7 @@
   MODULE_TYPE                    = DXE_SMM_DRIVER
   VERSION_STRING                 = 1.0
   PI_SPECIFICATION_VERSION       = 0x0001000A
-  LIBRARY_CLASS                  = BaseCryptLib|DXE_SMM_DRIVER SMM_CORE
+  LIBRARY_CLASS                  = BaseCryptLib|DXE_SMM_DRIVER SMM_CORE MM_STANDALONE
 
 #
 # The following information is for reference only and not required by the build tools.
