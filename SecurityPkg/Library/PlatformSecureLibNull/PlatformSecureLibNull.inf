@@ -21,9 +21,9 @@
   BASE_NAME                      = PlatformSecureLibNull
   MODULE_UNI_FILE                = PlatformSecureLibNull.uni
   FILE_GUID                      = 7FA68D82-10A4-4e71-9524-D3D9500D3CDF
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = PlatformSecureLib|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_DRIVER
+  LIBRARY_CLASS                  = PlatformSecureLib|DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_DRIVER MM_STANDALONE
   CONSTRUCTOR                    = PlatformSecureLibNullConstructor
 
 #
