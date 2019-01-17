@@ -20,7 +20,7 @@ from .GenFdsGlobalVariable import GenFdsGlobalVariable, FindExtendTool
 from CommonDataClass.FdfClass import CapsuleClassObject
 import Common.LongFilePathOs as os
 from io import BytesIO
-from Common.Misc import SaveFileOnChange, PackRegistryFormatGuid
+from Common.Misc import SaveFileOnChange, PackGUID
 import uuid
 from struct import pack
 from Common import EdkLogger
@@ -66,7 +66,7 @@ class Capsule (CapsuleClassObject):
         #
         # Use FMP capsule GUID: 6DCBD5ED-E82D-4C44-BDA1-7194199AD92A
         #
-        Header.write(PackRegistryFormatGuid('6DCBD5ED-E82D-4C44-BDA1-7194199AD92A'))
+        Header.write(PackGUID('6DCBD5ED-E82D-4C44-BDA1-7194199AD92A'.split('-')))
         HdrSize = 0
         if 'CAPSULE_HEADER_SIZE' in self.TokensDict:
             Header.write(pack('=I', int(self.TokensDict['CAPSULE_HEADER_SIZE'], 16)))

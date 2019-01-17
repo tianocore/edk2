@@ -1904,12 +1904,6 @@ class SkuClass():
         else:
             return 'DEFAULT'
 
-#
-# Pack a registry format GUID
-#
-def PackRegistryFormatGuid(Guid):
-    return PackGUID(Guid.split('-'))
-
 ##  Get the integer value from string like "14U" or integer like 2
 #
 #   @param      Input   The object that may be either a integer value or a string
