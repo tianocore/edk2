@@ -1,7 +1,7 @@
 ## @file
 # Collect all defined strings in multiple uni files.
 #
-# Copyright (c) 2014 - 2018, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2014 - 2019, Intel Corporation. All rights reserved.<BR>
 #
 # This program and the accompanying materials are licensed and made available
 # under the terms and conditions of the BSD License which accompanies this
@@ -597,6 +597,15 @@ class UniFileClassObject(object):
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
                                     ExtraData='''The line %s misses '"' at the end of it in file %s'''
                                               % (LineCount, File.Path))
+
+                #
+                # Check the situation that there has more than 2 '"' for the language entry
+                #
+                if Line.strip() and Line.replace(u'\\"', '').count(u'"') > 2:
+                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
+                                    ExtraData='''The line %s has more than 2 '"' for language entry in file %s'''
+                                    % (LineCount, File.Path))
+
             elif Line.startswith(u'#language'):
                 if StringEntryExistsFlag == 2:
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
@@ -745,13 +754,6 @@ class UniFileClassObject(object):
                 else:
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
             elif Line.startswith(u'"'):
-                #
-                # Check the situation that there has more than 2 '"' for the language entry
-                #
-                if Line.replace(u'\\"', '').count(u'"') > 2:
-                    EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID,
-                                    ExtraData='''The line %s has more than 2 '"' for language entry in file %s'''
-                                    % (LineCount, File.Path))
                 if u'#string' in Line  or u'#language' in Line:
                     EdkLogger.Error("Unicode File Parser", ToolError.FORMAT_INVALID, ExtraData=File.Path)
                 NewLines.append(Line)
