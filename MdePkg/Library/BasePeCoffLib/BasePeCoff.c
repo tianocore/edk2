@@ -1743,7 +1743,7 @@ PeCoffLoaderRelocateImageForRuntime (
     RelocDir      = DataDirectory + EFI_IMAGE_DIRECTORY_ENTRY_BASERELOC;
     RelocBase     = (EFI_IMAGE_BASE_RELOCATION *) PeCoffLoaderImageAddress (&ImageContext, RelocDir->VirtualAddress, 0);
     RelocBaseEnd  = (EFI_IMAGE_BASE_RELOCATION *) PeCoffLoaderImageAddress (&ImageContext,
-                                                                            RelocDir->VirtualAddress + RelocDir->Size,
+                                                                            RelocDir->VirtualAddress + RelocDir->Size - 1,
                                                                             0
                                                                             );
   } else {
