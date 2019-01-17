@@ -64,21 +64,6 @@ WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
 #define SD_MMC_HC_CTRL_VER            0xFE
 
 //
-// SD Host Controller bits to HOST_CTRL2 register
-//
-#define SD_MMC_HC_CTRL_UHS_MASK       0x0007
-#define SD_MMC_HC_CTRL_UHS_SDR12      0x0000
-#define SD_MMC_HC_CTRL_UHS_SDR25      0x0001
-#define SD_MMC_HC_CTRL_UHS_SDR50      0x0002
-#define SD_MMC_HC_CTRL_UHS_SDR104     0x0003
-#define SD_MMC_HC_CTRL_UHS_DDR50      0x0004
-#define SD_MMC_HC_CTRL_MMC_LEGACY     0x0000
-#define SD_MMC_HC_CTRL_MMC_HS_SDR     0x0001
-#define SD_MMC_HC_CTRL_MMC_HS_DDR     0x0004
-#define SD_MMC_HC_CTRL_MMC_HS200      0x0003
-#define SD_MMC_HC_CTRL_MMC_HS400      0x0005
-
-//
 // The transfer modes supported by SD Host Controller
 // Simplified Spec 3.0 Table 1-2
 //
@@ -92,38 +77,18 @@ typedef enum {
 //
 // The maximum data length of each descriptor line
 //
-#define ADMA_MAX_DATA_PER_LINE_16B     SIZE_64KB
-#define ADMA_MAX_DATA_PER_LINE_26B     SIZE_64MB
+#define ADMA_MAX_DATA_PER_LINE     0x10000
 
-//
-// ADMA descriptor for 32b addressing.
-//
 typedef struct {
   UINT32 Valid:1;
   UINT32 End:1;
   UINT32 Int:1;
   UINT32 Reserved:1;
   UINT32 Act:2;
-  UINT32 UpperLength:10;
-  UINT32 LowerLength:16;
+  UINT32 Reserved1:10;
+  UINT32 Length:16;
   UINT32 Address;
-} SD_MMC_HC_ADMA_32_DESC_LINE;
-
-//
-// ADMA descriptor for 64b addressing.
-//
-typedef struct {
-  UINT32 Valid:1;
-  UINT32 End:1;
-  UINT32 Int:1;
-  UINT32 Reserved:1;
-  UINT32 Act:2;
-  UINT32 UpperLength:10;
-  UINT32 LowerLength:16;
-  UINT32 LowerAddress;
-  UINT32 UpperAddress;
-  UINT32 Reserved1;
-} SD_MMC_HC_ADMA_64_DESC_LINE;
+} SD_MMC_HC_ADMA_DESC_LINE;
 
 #define SD_MMC_SDMA_BOUNDARY          512 * 1024
 #define SD_MMC_SDMA_ROUND_UP(x, n)    (((x) + n) & ~(n - 1))
@@ -150,43 +115,26 @@ typedef struct {
   UINT32   Voltage33:1;       // bit 24
   UINT32   Voltage30:1;       // bit 25
   UINT32   Voltage18:1;       // bit 26
-  UINT32   SysBus64V4:1;      // bit 27
-  UINT32   SysBus64V3:1;      // bit 28
+  UINT32   Reserved3:1;       // bit 27
+  UINT32   SysBus64:1;        // bit 28
   UINT32   AsyncInt:1;        // bit 29
   UINT32   SlotType:2;        // bit 30:31
   UINT32   Sdr50:1;           // bit 32
   UINT32   Sdr104:1;          // bit 33
   UINT32   Ddr50:1;           // bit 34
-  UINT32   Reserved3:1;       // bit 35
+  UINT32   Reserved4:1;       // bit 35
   UINT32   DriverTypeA:1;     // bit 36
   UINT32   DriverTypeC:1;     // bit 37
   UINT32   DriverTypeD:1;     // bit 38
   UINT32   DriverType4:1;     // bit 39
   UINT32   TimerCount:4;      // bit 40:43
-  UINT32   Reserved4:1;       // bit 44
+  UINT32   Reserved5:1;       // bit 44
   UINT32   TuningSDR50:1;     // bit 45
   UINT32   RetuningMod:2;     // bit 46:47
   UINT32   ClkMultiplier:8;   // bit 48:55
-  UINT32   Reserved5:7;       // bit 56:62
+  UINT32   Reserved6:7;       // bit 56:62
   UINT32   Hs400:1;           // bit 63
 } SD_MMC_HC_SLOT_CAP;
-
-//
-// SD Host controller version
-//
-#define SD_MMC_HC_CTRL_VER_100        0x00
-#define SD_MMC_HC_CTRL_VER_200        0x01
-#define SD_MMC_HC_CTRL_VER_300        0x02
-#define SD_MMC_HC_CTRL_VER_400        0x03
-#define SD_MMC_HC_CTRL_VER_410        0x04
-#define SD_MMC_HC_CTRL_VER_420        0x05
-
-//
-// SD Host controller V4 enhancements
-//
-#define SD_MMC_HC_V4_EN               BIT12
-#define SD_MMC_HC_64_ADDR_EN          BIT13
-#define SD_MMC_HC_26_DATA_LEN_ADMA_EN BIT10
 
 /**
   Dump the content of SD/MMC host controller's Capability Register.
@@ -351,21 +299,19 @@ SdMmcHcWaitMmioSet (
   );
 
 /**
-  Get the controller version information from the specified slot.
+  Software reset the specified SD/MMC host controller.
 
-  @param[in]  PciIo           The PCI IO protocol instance.
-  @param[in]  Slot            The slot number of the SD card to send the command to.
-  @param[out] Version         The buffer to store the version information.
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
 
-  @retval EFI_SUCCESS         The operation executes successfully.
-  @retval Others              The operation fails.
+  @retval EFI_SUCCESS       The software reset executes successfully.
+  @retval Others            The software reset fails.
 
 **/
 EFI_STATUS
-SdMmcHcGetControllerVersion (
-  IN  EFI_PCI_IO_PROTOCOL  *PciIo,
-  IN  UINT8                Slot,
-  OUT UINT16               *Version
+SdMmcHcReset (
+  IN EFI_PCI_IO_PROTOCOL    *PciIo,
+  IN UINT8                  Slot
   );
 
 /**
@@ -469,8 +415,7 @@ SdMmcHcStopClock (
   @param[in] PciIo          The PCI IO protocol instance.
   @param[in] Slot           The slot number of the SD card to send the command to.
   @param[in] ClockFreq      The max clock frequency to be set. The unit is KHz.
-  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
-  @param[in] ControllerVer  The version of host controller.
+  @param[in] Capability     The capability of the slot.
 
   @retval EFI_SUCCESS       The clock is supplied successfully.
   @retval Others            The clock isn't supplied successfully.
@@ -481,8 +426,7 @@ SdMmcHcClockSupply (
   IN EFI_PCI_IO_PROTOCOL    *PciIo,
   IN UINT8                  Slot,
   IN UINT64                 ClockFreq,
-  IN UINT32                 BaseClkFreq,
-  IN UINT16                 ControllerVer
+  IN SD_MMC_HC_SLOT_CAP     Capability
   );
 
 /**
@@ -530,8 +474,7 @@ SdMmcHcSetBusWidth (
 
   @param[in] PciIo          The PCI IO protocol instance.
   @param[in] Slot           The slot number of the SD card to send the command to.
-  @param[in] BaseClkFreq    The base clock frequency of host controller in MHz.
-  @param[in] ControllerVer  The version of host controller.
+  @param[in] Capability     The capability of the slot.
 
   @retval EFI_SUCCESS       The clock is supplied successfully.
   @retval Others            The clock isn't supplied successfully.
@@ -541,8 +484,7 @@ EFI_STATUS
 SdMmcHcInitClockFreq (
   IN EFI_PCI_IO_PROTOCOL    *PciIo,
   IN UINT8                  Slot,
-  IN UINT32                 BaseClkFreq,
-  IN UINT16                 ControllerVer
+  IN SD_MMC_HC_SLOT_CAP     Capability
   );
 
 /**
@@ -584,22 +526,60 @@ SdMmcHcInitTimeoutCtrl (
   );
 
 /**
-  Set SD Host Controller control 2 registry according to selected speed.
+  Initial SD/MMC host controller with lowest clock frequency, max power and max timeout value
+  at initialization.
 
-  @param[in] ControllerHandle The handle of the controller.
-  @param[in] PciIo            The PCI IO protocol instance.
-  @param[in] Slot             The slot number of the SD card to send the command to.
-  @param[in] Timing           The timing to select.
+  @param[in] PciIo          The PCI IO protocol instance.
+  @param[in] Slot           The slot number of the SD card to send the command to.
+  @param[in] Capability     The capability of the slot.
 
-  @retval EFI_SUCCESS         The timing is set successfully.
-  @retval Others              The timing isn't set successfully.
+  @retval EFI_SUCCESS       The host controller is initialized successfully.
+  @retval Others            The host controller isn't initialized successfully.
+
 **/
 EFI_STATUS
-SdMmcHcUhsSignaling (
-  IN EFI_HANDLE             ControllerHandle,
+SdMmcHcInitHost (
   IN EFI_PCI_IO_PROTOCOL    *PciIo,
   IN UINT8                  Slot,
-  IN SD_MMC_BUS_MODE        Timing
+  IN SD_MMC_HC_SLOT_CAP     Capability
   );
+
+
+
+BOOLEAN 
+BhtHostPciSupport(EFI_PCI_IO_PROTOCOL *PciIo);
+UINT32 
+PciBhtRead32(EFI_PCI_IO_PROTOCOL *PciIo, UINT32 offset);
+void 
+PciBhtWrite32(EFI_PCI_IO_PROTOCOL *PciIo, UINT32 offset, UINT32 value);
+void 
+PciBhtOr32(EFI_PCI_IO_PROTOCOL *PciIo, UINT32 offset, UINT32 value);
+void 
+PciBhtAnd32(EFI_PCI_IO_PROTOCOL *PciIo, UINT32 offset, UINT32 value);
+extern void 
+DbgNull(IN CONST CHAR16 * fmt, ...);
+
+
+#if(1)
+#define DbgMsg	Print
+#else
+#define DbgMsg	DbgNull
+#endif
+
+
+#define PCI_DEV_ID_RJ		0x8320
+#define PCI_DEV_ID_SDS0		0x8420
+#define PCI_DEV_ID_SDS1		0x8421
+#define PCI_DEV_ID_FJ2		0x8520
+#define PCI_DEV_ID_SB0		0x8620
+#define PCI_DEV_ID_SB1		0x8621
+
+
+// O2/BHT add BAR1 for PCIR mapping registers
+// These registers is defined by O2/BHT, but we may follow name definition rule.
+#define	BHT_PCIRMappingVal	        (0x200)		/* PCI CFG Space Register Mapping Value Register */
+#define	BHT_PCIRMappingCtl	        (0x204)		/* PCI CFG Space Register Mapping Control Register */
+#define	BHT_PCIRMappingEn		  	(0x208)		/* PCI CFG Space Register Mapping Enable Register */
+#define	BHT_GPIOCTL			  		(0x210)		/* GPIO control register*/
 
 #endif
