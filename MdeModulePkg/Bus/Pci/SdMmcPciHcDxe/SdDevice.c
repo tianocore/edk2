@@ -1,7 +1,6 @@
 /** @file
   This file provides some helper functions which are specific for SD card device.
 
-  Copyright (c) 2018, NVIDIA CORPORATION. All rights reserved.
   Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -319,9 +318,116 @@ SdCardSetRca (
   return Status;
 }
 
+/**
+  Send command SEND_CSD to the SD device to get the data of the CSD register.
 
+  Refer to SD Physical Layer Simplified Spec 4.1 Section 4.7 for details.
 
+  @param[in]  PassThru      A pointer to the EFI_SD_MMC_PASS_THRU_PROTOCOL instance.
+  @param[in]  Slot          The slot number of the SD card to send the command to.
+  @param[in]  Rca           The relative device address of selected device.
+  @param[out] Csd           The buffer to store the content of the CSD register.
+                            Note the caller should ignore the lowest byte of this
+                            buffer as the content of this byte is meaningless even
+                            if the operation succeeds.
 
+  @retval EFI_SUCCESS       The operation is done correctly.
+  @retval Others            The operation fails.
+
+**/
+EFI_STATUS
+SdCardGetCsd (
+  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
+  IN     UINT8                          Slot,
+  IN     UINT16                         Rca,
+     OUT SD_CSD                         *Csd
+  )
+{
+  EFI_SD_MMC_COMMAND_BLOCK              SdMmcCmdBlk;
+  EFI_SD_MMC_STATUS_BLOCK               SdMmcStatusBlk;
+  EFI_SD_MMC_PASS_THRU_COMMAND_PACKET   Packet;
+  EFI_STATUS                            Status;
+
+  ZeroMem (&SdMmcCmdBlk, sizeof (SdMmcCmdBlk));
+  ZeroMem (&SdMmcStatusBlk, sizeof (SdMmcStatusBlk));
+  ZeroMem (&Packet, sizeof (Packet));
+
+  Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
+  Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
+  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+
+  SdMmcCmdBlk.CommandIndex = SD_SEND_CSD;
+  SdMmcCmdBlk.CommandType  = SdMmcCommandTypeAc;
+  SdMmcCmdBlk.ResponseType = SdMmcResponseTypeR2;
+  SdMmcCmdBlk.CommandArgument = (UINT32)Rca << 16;
+
+  Status = SdMmcPassThruPassThru (PassThru, Slot, &Packet, NULL);
+  if (!EFI_ERROR (Status)) {
+    //
+    // For details, refer to SD Host Controller Simplified Spec 3.0 Table 2-12.
+    //
+    CopyMem (((UINT8*)Csd) + 1, &SdMmcStatusBlk.Resp0, sizeof (SD_CSD) - 1);
+  }
+
+  return Status;
+}
+
+/**
+  Send command SEND_CSD to the SD device to get the data of the CSD register.
+
+  Refer to SD Physical Layer Simplified Spec 4.1 Section 4.7 for details.
+
+  @param[in]  PassThru      A pointer to the EFI_SD_MMC_PASS_THRU_PROTOCOL instance.
+  @param[in]  Slot          The slot number of the SD card to send the command to.
+  @param[in]  Rca           The relative device address of selected device.
+  @param[out] Scr           The buffer to store the content of the SCR register.
+
+  @retval EFI_SUCCESS       The operation is done correctly.
+  @retval Others            The operation fails.
+
+**/
+EFI_STATUS
+SdCardGetScr (
+  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *PassThru,
+  IN     UINT8                          Slot,
+  IN     UINT16                         Rca,
+     OUT SD_SCR                         *Scr
+  )
+{
+  EFI_SD_MMC_COMMAND_BLOCK              SdMmcCmdBlk;
+  EFI_SD_MMC_STATUS_BLOCK               SdMmcStatusBlk;
+  EFI_SD_MMC_PASS_THRU_COMMAND_PACKET   Packet;
+  EFI_STATUS                            Status;
+
+  ZeroMem (&SdMmcCmdBlk, sizeof (SdMmcCmdBlk));
+  ZeroMem (&SdMmcStatusBlk, sizeof (SdMmcStatusBlk));
+  ZeroMem (&Packet, sizeof (Packet));
+
+  Packet.SdMmcCmdBlk    = &SdMmcCmdBlk;
+  Packet.SdMmcStatusBlk = &SdMmcStatusBlk;
+  Packet.Timeout        = SD_MMC_HC_GENERIC_TIMEOUT;
+
+  SdMmcCmdBlk.CommandIndex = SD_APP_CMD;
+  SdMmcCmdBlk.CommandType  = SdMmcCommandTypeAc;
+  SdMmcCmdBlk.ResponseType = SdMmcResponseTypeR1;
+  SdMmcCmdBlk.CommandArgument = (UINT32)Rca << 16;
+
+  Status = SdMmcPassThruPassThru (PassThru, Slot, &Packet, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  SdMmcCmdBlk.CommandIndex = SD_SEND_SCR;
+  SdMmcCmdBlk.CommandType  = SdMmcCommandTypeAdtc;
+  SdMmcCmdBlk.ResponseType = SdMmcResponseTypeR1;
+
+  Packet.InDataBuffer     = Scr;
+  Packet.InTransferLength = sizeof (SD_SCR);
+
+  Status = SdMmcPassThruPassThru (PassThru, Slot, &Packet, NULL);
+
+  return Status;
+}
 
 /**
   Send command SELECT_DESELECT_CARD to the SD device to select/deselect it.
@@ -785,8 +891,8 @@ SdCardSetBusMode (
   UINT8                        BusWidth;
   UINT8                        AccessMode;
   UINT8                        HostCtrl1;
+  UINT8                        HostCtrl2;
   UINT8                        SwitchResp[64];
-  SD_MMC_BUS_MODE              Timing;
   SD_MMC_HC_PRIVATE_DATA       *Private;
 
   Private = SD_MMC_HC_PRIVATE_FROM_THIS (PassThru);
@@ -818,23 +924,18 @@ SdCardSetBusMode (
   if (S18A && (Capability->Sdr104 != 0) && ((SwitchResp[13] & BIT3) != 0)) {
     ClockFreq = 208;
     AccessMode = 3;
-    Timing = SdMmcUhsSdr104;
   } else if (S18A && (Capability->Sdr50 != 0) && ((SwitchResp[13] & BIT2) != 0)) {
     ClockFreq = 100;
     AccessMode = 2;
-    Timing = SdMmcUhsSdr50;
   } else if (S18A && (Capability->Ddr50 != 0) && ((SwitchResp[13] & BIT4) != 0)) {
     ClockFreq = 50;
     AccessMode = 4;
-    Timing = SdMmcUhsDdr50;
   } else if ((SwitchResp[13] & BIT1) != 0) {
     ClockFreq = 50;
     AccessMode = 1;
-    Timing = SdMmcUhsSdr25;
   } else {
     ClockFreq = 25;
     AccessMode = 0;
-    Timing = SdMmcUhsSdr12;
   }
 
   Status = SdCardSwitch (PassThru, Slot, AccessMode, 0xF, 0xF, 0xF, TRUE, SwitchResp);
@@ -860,32 +961,20 @@ SdCardSetBusMode (
     }
   }
 
-  Status = SdMmcHcUhsSignaling (Private->ControllerHandle, PciIo, Slot, Timing);
+  HostCtrl2 = (UINT8)~0x7;
+  Status = SdMmcHcAndMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+  HostCtrl2 = AccessMode;
+  Status = SdMmcHcOrMmio (PciIo, Slot, SD_MMC_HC_HOST_CTRL2, sizeof (HostCtrl2), &HostCtrl2);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = SdMmcHcClockSupply (PciIo, Slot, ClockFreq * 1000, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
+  Status = SdMmcHcClockSupply (PciIo, Slot, ClockFreq * 1000, *Capability);
   if (EFI_ERROR (Status)) {
     return Status;
-  }
-
-  if (mOverride != NULL && mOverride->NotifyPhase != NULL) {
-    Status = mOverride->NotifyPhase (
-                          Private->ControllerHandle,
-                          Slot,
-                          EdkiiSdMmcSwitchClockFreqPost,
-                          &Timing
-                          );
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a: SD/MMC switch clock freq post notifier callback failed - %r\n",
-        __FUNCTION__,
-        Status
-        ));
-      return Status;
-    }
   }
 
   if ((AccessMode == 3) || ((AccessMode == 2) && (Capability->TuningSDR50 != 0))) {
@@ -996,10 +1085,9 @@ SdCardIdentification (
     return Status;
   }
 
-  if (((ControllerVer & 0xFF) >= SD_MMC_HC_CTRL_VER_300) &&
-      ((ControllerVer & 0xFF) <= SD_MMC_HC_CTRL_VER_420)) {
+  if (((ControllerVer & 0xFF) == 2) || ((ControllerVer & 0xFF) == 3)) {
     S18r = TRUE;
-  } else if (((ControllerVer & 0xFF) == SD_MMC_HC_CTRL_VER_100) || ((ControllerVer & 0xFF) == SD_MMC_HC_CTRL_VER_200)) {
+  } else if (((ControllerVer & 0xFF) == 0) || ((ControllerVer & 0xFF) == 1)) {
     S18r = FALSE;
   } else {
     ASSERT (FALSE);
@@ -1065,7 +1153,7 @@ SdCardIdentification (
         goto Error;
       }
 
-      SdMmcHcInitClockFreq (PciIo, Slot, Private->BaseClkFreq[Slot], Private->ControllerVersion[Slot]);
+      SdMmcHcInitClockFreq (PciIo, Slot, Private->Capability[Slot]);
 
       gBS->Stall (1000);
 
