@@ -4,7 +4,6 @@
 
   It would expose EFI_SD_MMC_PASS_THRU_PROTOCOL for upper layer use.
 
-  Copyright (c) 2018, NVIDIA CORPORATION. All rights reserved.
   Copyright (c) 2015 - 2016, Intel Corporation. All rights reserved.<BR>
   This program and the accompanying materials
   are licensed and made available under the terms and conditions of the BSD License
@@ -17,8 +16,6 @@
 **/
 
 #include "SdMmcPciHcDxe.h"
-
-EDKII_SD_MMC_OVERRIDE           *mOverride;
 
 //
 // Driver Global Variables
@@ -63,9 +60,7 @@ SD_MMC_HC_PRIVATE_DATA gSdMmcPciHcTemplate = {
   {                                 // MaxCurrent
     0,
   },
-  {
-    0                               // ControllerVersion
-  }
+  0                                 // ControllerVersion
 };
 
 SD_DEVICE_PATH    mSdDpTemplate = {
@@ -286,14 +281,14 @@ SdMmcPciHcEnumerateDevice (
         //
         // Reset the specified slot of the SD/MMC Pci Host Controller
         //
-        Status = SdMmcHcReset (Private, Slot);
+        Status = SdMmcHcReset (Private->PciIo, Slot);
         if (EFI_ERROR (Status)) {
           continue;
         }
         //
         // Reinitialize slot and restart identification process for the new attached device
         //
-        Status = SdMmcHcInitHost (Private, Slot);
+        Status = SdMmcHcInitHost (Private->PciIo, Slot, Private->Capability[Slot]);
         if (EFI_ERROR (Status)) {
           continue;
         }
@@ -533,6 +528,8 @@ SdMmcPciHcDriverBindingStart (
   UINT32                          RoutineNum;
   BOOLEAN                         MediaPresent;
   BOOLEAN                         Support64BitDma;
+  UINT16                          IntStatus;
+  UINT32                          value;
 
   DEBUG ((DEBUG_INFO, "SdMmcPciHcDriverBindingStart: Start\n"));
 
@@ -606,68 +603,17 @@ SdMmcPciHcDriverBindingStart (
     goto Done;
   }
 
-  //
-  // Attempt to locate the singleton instance of the SD/MMC override protocol,
-  // which implements platform specific workarounds for non-standard SDHCI
-  // implementations.
-  //
-  if (mOverride == NULL) {
-    Status = gBS->LocateProtocol (&gEdkiiSdMmcOverrideProtocolGuid, NULL,
-                    (VOID **)&mOverride);
-    if (!EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "%a: found SD/MMC override protocol\n",
-        __FUNCTION__));
-    }
-  }
-
   Support64BitDma = TRUE;
   for (Slot = FirstBar; Slot < (FirstBar + SlotNum); Slot++) {
     Private->Slot[Slot].Enable = TRUE;
-
-    //
-    // Get SD/MMC Pci Host Controller Version
-    //
-    Status = SdMmcHcGetControllerVersion (PciIo, Slot, &Private->ControllerVersion[Slot]);
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
 
     Status = SdMmcHcGetCapability (PciIo, Slot, &Private->Capability[Slot]);
     if (EFI_ERROR (Status)) {
       continue;
     }
-
-    Private->BaseClkFreq[Slot] = Private->Capability[Slot].BaseClkFreq;
-
-    if (mOverride != NULL && mOverride->Capability != NULL) {
-      Status = mOverride->Capability (
-                            Controller,
-                            Slot,
-                            &Private->Capability[Slot],
-                            &Private->BaseClkFreq[Slot]
-                            );
-      if (EFI_ERROR (Status)) {
-        DEBUG ((DEBUG_WARN, "%a: Failed to override capability - %r\n",
-          __FUNCTION__, Status));
-        continue;
-      }
-    }
     DumpCapabilityReg (Slot, &Private->Capability[Slot]);
-    DEBUG ((
-      DEBUG_INFO,
-      "Slot[%d] Base Clock Frequency: %dMHz\n",
-      Slot,
-      Private->BaseClkFreq[Slot]
-      ));
 
-    //
-    // If any of the slots does not support 64b system bus
-    // do not enable 64b DMA in the PCI layer.
-    //
-    if (Private->Capability[Slot].SysBus64V3 == 0 &&
-        Private->Capability[Slot].SysBus64V4 == 0) {
-      Support64BitDma = FALSE;
-    }
+    Support64BitDma &= Private->Capability[Slot].SysBus64;
 
     Status = SdMmcHcGetMaxCurrent (PciIo, Slot, &Private->MaxCurrent[Slot]);
     if (EFI_ERROR (Status)) {
@@ -683,28 +629,22 @@ SdMmcPciHcDriverBindingStart (
     //
     // Reset the specified slot of the SD/MMC Pci Host Controller
     //
-    Status = SdMmcHcReset (Private, Slot);
+    Status = SdMmcHcReset (PciIo, Slot);
     if (EFI_ERROR (Status)) {
       continue;
     }
     //
     // Check whether there is a SD/MMC card attached
     //
-    if (Private->Slot[Slot].SlotType == RemovableSlot) {
-      Status = SdMmcHcCardDetect (PciIo, Slot, &MediaPresent);
-      if (EFI_ERROR (Status) && (Status != EFI_MEDIA_CHANGED)) {
-        continue;
-      } else if (!MediaPresent) {
-        DEBUG ((
-          DEBUG_INFO,
-          "SdMmcHcCardDetect: No device attached in Slot[%d]!!!\n",
-          Slot
-          ));
-        continue;
-      }
+    Status = SdMmcHcCardDetect (PciIo, Slot, &MediaPresent);
+    if (EFI_ERROR (Status) && (Status != EFI_MEDIA_CHANGED)) {
+      continue;
+    } else if (!MediaPresent) {
+      DEBUG ((DEBUG_INFO, "SdMmcHcCardDetect: No device attached in Slot[%d]!!!\n", Slot));
+      continue;
     }
 
-    Status = SdMmcHcInitHost (Private, Slot);
+    Status = SdMmcHcInitHost (PciIo, Slot, Private->Capability[Slot]);
     if (EFI_ERROR (Status)) {
       continue;
     }
@@ -727,7 +667,44 @@ SdMmcPciHcDriverBindingStart (
     if (Index == RoutineNum) {
       Private->Slot[Slot].Initialized = FALSE;
     }
+	
   }
+  
+  if(BhtHostPciSupport(Private->PciIo)){
+
+	SdMmcHcRwMmio (Private->PciIo,0,0x110,TRUE,sizeof (value),&value);
+	DbgMsg(L"0x110: 0x%x\n",value);
+
+	SdMmcHcRwMmio (Private->PciIo,0,0x114,TRUE,sizeof (value),&value);
+	DbgMsg(L"0x114: 0x%x\n",value);
+	
+	SdMmcHcRwMmio (Private->PciIo,0,0x1a8,TRUE,sizeof (value),&value);
+	DbgMsg(L"MEM 1A8: 0x%x\n",value);
+	SdMmcHcRwMmio (Private->PciIo,0,0x1ac,TRUE,sizeof (value),&value);
+	DbgMsg(L"MEM 1AC: 0x%x\n",value);
+	SdMmcHcRwMmio (Private->PciIo,0,0x1B0,TRUE,sizeof (value),&value);
+	DbgMsg(L"MEM 1B0: 0x%x\n",value);
+
+	DbgMsg(L" - pcr 0x304 = 0x%08x\n", PciBhtRead32(Private->PciIo, 0x304));
+	DbgMsg(L" - pcr 0x328 = 0x%08x\n", PciBhtRead32(Private->PciIo, 0x328));
+	DbgMsg(L" - pcr 0x3e4 = 0x%08x\n", PciBhtRead32(Private->PciIo, 0x3e4));
+
+	SdMmcHcRwMmio (Private->PciIo,0,0x040,TRUE,sizeof (value),&value);
+	DbgMsg(L"0x40: 0x%x\n",value);
+	
+	SdMmcHcRwMmio (Private->PciIo,0,SD_MMC_HC_PRESENT_STATE,TRUE,sizeof (value),&value);
+	DbgMsg(L"Present State: 0x%x\n",value);
+	SdMmcHcRwMmio (Private->PciIo,0,SD_MMC_HC_HOST_CTRL1,TRUE,sizeof (IntStatus),&IntStatus);
+	DbgMsg(L"Power&Host1: 0x%x\n",IntStatus);
+	SdMmcHcRwMmio (Private->PciIo,0,SD_MMC_HC_CLOCK_CTRL,TRUE,sizeof (IntStatus),&IntStatus);
+	DbgMsg(L"CLK: 0x%x\n",IntStatus);
+	SdMmcHcRwMmio (Private->PciIo,0,SD_MMC_HC_TIMEOUT_CTRL,TRUE,sizeof (IntStatus),&IntStatus);
+	DbgMsg(L"SWR&Timeout: 0x%x\n",IntStatus);
+	SdMmcHcRwMmio (Private->PciIo,0,SD_MMC_HC_NOR_INT_STS,TRUE,sizeof (value),&value);
+	DbgMsg(L"INR&IER: 0x%x\n",value);
+	SdMmcHcRwMmio (Private->PciIo,0,SD_MMC_HC_HOST_CTRL2,TRUE,sizeof (IntStatus),&IntStatus);
+	DbgMsg(L"Host2: 0x%x\n",IntStatus);
+  	}
 
   //
   // Enable 64-bit DMA support in the PCI layer if this controller
